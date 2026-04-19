@@ -1,0 +1,4 @@
+display_name: "Game Accessibility Spatial Exploration"
+short_description: "Accessible world navigation for spatial games"
+default_prompt: "Use $game-accessibility-spatial-exploration to design accessible cursor, scanner, and sonification systems for a spatial game."
+

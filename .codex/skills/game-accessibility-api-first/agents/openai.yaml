@@ -1,0 +1,4 @@
+display_name: "Game Accessibility API-First"
+short_description: "Build screen-reader mods from official APIs"
+default_prompt: "Use $game-accessibility-api-first to plan an accessibility mod using a game's supported mod or plugin API."
+

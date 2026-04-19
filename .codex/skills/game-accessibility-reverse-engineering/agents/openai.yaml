@@ -1,0 +1,4 @@
+display_name: "Game Accessibility Reverse Engineering"
+short_description: "Patch and decompile games for accessibility"
+default_prompt: "Use $game-accessibility-reverse-engineering to make a new game screen accessible when the game has no usable mod API."
+

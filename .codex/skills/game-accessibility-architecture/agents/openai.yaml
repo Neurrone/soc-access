@@ -1,0 +1,4 @@
+display_name: "Game Accessibility Architecture"
+short_description: "Cross-game screen-reader mod architecture"
+default_prompt: "Use $game-accessibility-architecture to design the core architecture for a screen-reader game mod."
+

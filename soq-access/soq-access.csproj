@@ -1,0 +1,67 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <Import Project="GamePaths.props" Condition="Exists('GamePaths.props')" />
+
+  <PropertyGroup>
+    <TargetFramework>net472</TargetFramework>
+    <AssemblyName>SongsOfConquest.Access</AssemblyName>
+    <RootNamespace>SongsOfConquestAccess</RootNamespace>
+    <Description>Accessibility mod for Songs of Conquest</Description>
+    <Version>0.1.0</Version>
+    <LangVersion>7.3</LangVersion>
+    <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
+    <DeployToGame>false</DeployToGame>
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <BepInExCoreDir>$(GameDir)\BepInEx\core</BepInExCoreDir>
+    <GameManagedDir>$(GameDir)\SongsOfConquest_Data\Managed</GameManagedDir>
+    <ScriptOutputDir>$(GameDir)\BepInEx\scripts</ScriptOutputDir>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Reference Include="BepInEx">
+      <HintPath>$(BepInExCoreDir)\BepInEx.dll</HintPath>
+      <Private>false</Private>
+    </Reference>
+    <Reference Include="UnityEngine">
+      <HintPath>$(GameManagedDir)\UnityEngine.dll</HintPath>
+      <Private>false</Private>
+    </Reference>
+    <Reference Include="UnityEngine.CoreModule">
+      <HintPath>$(GameManagedDir)\UnityEngine.CoreModule.dll</HintPath>
+      <Private>false</Private>
+    </Reference>
+    <Reference Include="Assembly-CSharp">
+      <HintPath>$(GameManagedDir)\Assembly-CSharp.dll</HintPath>
+      <Private>false</Private>
+    </Reference>
+    <Reference Include="Lavapotion.SongsOfConquest.GameLogicLayer.Runtime">
+      <HintPath>$(GameManagedDir)\Lavapotion.SongsOfConquest.GameLogicLayer.Runtime.dll</HintPath>
+      <Private>false</Private>
+    </Reference>
+    <Reference Include="Lavapotion.SongsOfConquest.ProjectInstaller.Runtime">
+      <HintPath>$(GameManagedDir)\Lavapotion.SongsOfConquest.ProjectInstaller.Runtime.dll</HintPath>
+      <Private>false</Private>
+    </Reference>
+    <Reference Include="Lavapotion.SongsOfConquest.UILayer.Runtime">
+      <HintPath>$(GameManagedDir)\Lavapotion.SongsOfConquest.UILayer.Runtime.dll</HintPath>
+      <Private>false</Private>
+    </Reference>
+    <Reference Include="Lavapotion.SongsOfConquest.UtilitiesLayer.Runtime">
+      <HintPath>$(GameManagedDir)\Lavapotion.SongsOfConquest.UtilitiesLayer.Runtime.dll</HintPath>
+      <Private>false</Private>
+    </Reference>
+  </ItemGroup>
+
+  <Target Name="DeployToScriptFolder"
+          AfterTargets="Build"
+          Condition="'$(DeployToGame)' == 'true' and '$(GameDir)' != ''">
+    <MakeDir Directories="$(ScriptOutputDir)" />
+    <Copy SourceFiles="$(TargetPath)" DestinationFolder="$(ScriptOutputDir)" />
+    <Copy SourceFiles="$(TargetDir)$(TargetName).pdb"
+          DestinationFolder="$(ScriptOutputDir)"
+          Condition="Exists('$(TargetDir)$(TargetName).pdb')" />
+  </Target>
+
+</Project>
