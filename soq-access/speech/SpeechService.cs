@@ -51,19 +51,23 @@ namespace SongsOfConquestAccess.Speech
         {
             if (!_initialized)
             {
+                _logger.LogWarning("SpeechService dropped speech because it is not initialized");
                 return;
             }
 
             if (!_nativeSpeech.IsActive)
             {
+                _logger.LogWarning("SpeechService dropped speech because no active speech backend is available");
                 return;
             }
 
             if (string.IsNullOrEmpty(text))
             {
+                _logger.LogWarning("SpeechService dropped empty speech text");
                 return;
             }
 
+            _logger.LogInfo("SpeechService speaking: \"" + text + "\", interrupt=" + interrupt);
             _nativeSpeech.Speak(text, interrupt);
         }
 
