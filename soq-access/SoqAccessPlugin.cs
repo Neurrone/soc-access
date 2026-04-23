@@ -69,7 +69,6 @@ namespace SongsOfConquestAccess
 
         private void Update()
         {
-            _screenManager?.Reconcile();
             UIManager.Update();
         }
 

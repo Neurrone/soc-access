@@ -4,7 +4,6 @@ using InputActions;
 using SongsOfConquest.Client.InputManagement;
 using SongsOfConquestAccess.Input;
 using UnityEngine.InputSystem;
-using GameUIActions = InputActions.UI;
 using InputSystemGamepad = UnityEngine.InputSystem.Gamepad;
 using UnityInputAction = UnityEngine.InputSystem.InputAction;
 

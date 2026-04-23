@@ -23,7 +23,7 @@ namespace SongsOfConquestAccess.Screens
 
         public virtual void OnFocus()
         {
-            RootWidget.FocusCurrentOrFirst();
+            RootWidget.Focus();
         }
 
         public virtual void OnUnfocus()

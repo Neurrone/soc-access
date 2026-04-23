@@ -1,3 +1,4 @@
+using SongsOfConquestAccess.Input;
 using SongsOfConquestAccess.Adapters;
 using SongsOfConquestAccess.UI;
 
@@ -11,22 +12,21 @@ namespace SongsOfConquestAccess.Screens
             : base(sourceKey, BuildRootWidget(adapter))
         {
             _adapter = adapter;
-
-            SoqAccessPlugin.Instance?.LogInfo(
-                "QuestionDialogScreen built widget tree: title=\""
-                + (_adapter != null ? _adapter.Title : string.Empty)
-                + "\", positive=\""
-                + (_adapter != null ? _adapter.PositiveLabel : string.Empty)
-                + "\", negative=\""
-                + (_adapter != null ? _adapter.NegativeLabel : string.Empty)
-                + "\", body=\""
-                + Truncate(_adapter != null ? _adapter.Body : string.Empty)
-                + "\"");
         }
 
         public override bool IsPresent()
         {
             return _adapter != null && _adapter.IsPresent();
+        }
+
+        public override bool OnActionJustPressed(InputAction action)
+        {
+            if (action != null && action.Key == AccessibilityActions.Cancel.Key)
+            {
+                return _adapter != null && _adapter.ActivateAction(2);
+            }
+
+            return base.OnActionJustPressed(action);
         }
 
         private static ContainerWidget BuildRootWidget(QuestionDialogAdapter adapter)
@@ -74,16 +74,6 @@ namespace SongsOfConquestAccess.Screens
                 () => adapter != null));
 
             return root;
-        }
-
-        private static string Truncate(string value)
-        {
-            if (string.IsNullOrEmpty(value) || value.Length <= 120)
-            {
-                return value ?? string.Empty;
-            }
-
-            return value.Substring(0, 120) + "...";
         }
     }
 }

@@ -1,5 +1,7 @@
 using System.Collections.Generic;
+using SongsOfConquest.Client.Menu.Main;
 using SongsOfConquest.Client.Menu.Popup;
+using SongsOfConquest.Client.UI;
 using SongsOfConquestAccess.Adapters;
 
 namespace SongsOfConquestAccess.Screens
@@ -21,17 +23,12 @@ namespace SongsOfConquestAccess.Screens
             _screenManager = screenManager;
             _runtimeScreenProbes = new List<IRuntimeScreenProbe>
             {
+                new MainMenuRuntimeScreenProbe(),
                 new QuestionDialogRuntimeScreenProbe()
             };
         }
 
-        public void OnQuestionDialogOpened(
-            object sourceKey,
-            PopupMenu.Settings settings,
-            string title,
-            string body,
-            string positiveLabel,
-            string negativeLabel)
+        public void OnQuestionDialogOpened(object sourceKey, PopupMenu.Settings settings)
         {
             if (settings == null)
             {
@@ -40,83 +37,163 @@ namespace SongsOfConquestAccess.Screens
                 return;
             }
 
+            object resolvedSourceKey = sourceKey ?? (settings != null ? (object)settings.ContainerTransform : null);
             QuestionDialogAdapter adapter = new QuestionDialogAdapter(
-                sourceKey,
-                settings.ContainerTransform,
-                settings.InputField,
-                settings.PositiveButton,
-                settings.NegativeButton,
-                title,
-                body,
-                positiveLabel,
-                negativeLabel);
+                resolvedSourceKey,
+                settings);
             if (!adapter.IsPresent())
             {
-                SoqAccessPlugin.Instance?.LogInfo("ScreenDetector.OnQuestionDialogOpened ignored popup settings because the popup is not a live question dialog");
+                ResyncFromRuntimeState();
                 return;
             }
 
-            QuestionDialogScreen screen = new QuestionDialogScreen(sourceKey, adapter);
-            if (_screenManager.IsTopScreen<QuestionDialogScreen>())
+            QuestionDialogScreen screen = new QuestionDialogScreen(adapter.SourceKey, adapter);
+            Screen current = _screenManager.CurrentScreen;
+            if (current is QuestionDialogScreen && ReferenceEquals(current.SourceKey, screen.SourceKey))
             {
                 _screenManager.ReplaceTopScreen(screen);
-                SoqAccessPlugin.Instance?.LogInfo("ScreenDetector replaced top screen: " + screen.GetType().Name);
+                return;
             }
-            else
-            {
-                _screenManager.PushScreen(screen);
-                SoqAccessPlugin.Instance?.LogInfo("ScreenDetector pushed screen: " + screen.GetType().Name);
-            }
+
+            _screenManager.RemoveScreenForSource(screen.SourceKey);
+            _screenManager.PushScreen(screen);
         }
 
         public void OnQuestionDialogClosed(object sourceKey)
         {
-            bool removed = _screenManager.RemoveScreenForSource(sourceKey);
-            if (!removed)
+            if (sourceKey == null || !_screenManager.RemoveScreenForSource(sourceKey))
             {
-                removed = _screenManager.RemoveTopScreen<QuestionDialogScreen>();
+                ResyncFromRuntimeState();
+            }
+        }
+
+        public void OnMainMenuAvailable(MainMenu mainMenu)
+        {
+            MainMenuAdapter adapter = new MainMenuAdapter(mainMenu);
+            if (!adapter.IsPresent())
+            {
+                ResyncFromRuntimeState();
+                return;
             }
 
-            if (removed)
+            MainMenuScreen screen = new MainMenuScreen(adapter);
+            Screen current = _screenManager.CurrentScreen;
+            if (current is MainMenuScreen && ReferenceEquals(current.SourceKey, screen.SourceKey))
             {
-                SoqAccessPlugin.Instance?.LogInfo("ScreenDetector removed question dialog screen");
+                _screenManager.ReplaceTopScreen(screen);
+                return;
+            }
+
+            _screenManager.RemoveScreens(existing =>
+                existing is MainMenuScreen && ReferenceEquals(existing.SourceKey, screen.SourceKey));
+
+            if (current is QuestionDialogScreen)
+            {
+                _screenManager.InsertScreenBelowTop(screen);
+                return;
+            }
+
+            _screenManager.PushScreen(screen);
+        }
+
+        public void OnMainMenuFoldoutOpened(MainMenu mainMenu, FoldoutUIButton foldoutButton)
+        {
+            if (mainMenu == null || foldoutButton == null)
+            {
+                return;
+            }
+
+            MainMenuAdapter owner = new MainMenuAdapter(mainMenu);
+            MainMenuAdapter.NativeFoldoutAdapter foldout = ResolveFoldout(owner, foldoutButton);
+            if (owner == null || foldout == null || !owner.IsPresent() || !foldout.IsVisible() || !foldout.IsOpen())
+            {
+                return;
+            }
+
+            FoldoutMenuScreen screen = new FoldoutMenuScreen(owner, foldout);
+            Screen current = _screenManager.CurrentScreen;
+            if (current is FoldoutMenuScreen && ReferenceEquals(current.SourceKey, screen.SourceKey))
+            {
+                _screenManager.ReplaceTopScreen(screen);
+                return;
+            }
+
+            RemoveKnownFoldouts(owner);
+            _screenManager.PushScreen(screen);
+        }
+
+        public void OnMainMenuFoldoutClosed(FoldoutUIButton foldoutButton)
+        {
+            if (foldoutButton == null || !_screenManager.RemoveScreenForSource(foldoutButton))
+            {
+                ResyncFromRuntimeState();
+            }
+        }
+
+        public void OnMainMenuHidden(MainMenu mainMenu)
+        {
+            if (mainMenu == null)
+            {
+                ResyncFromRuntimeState();
+                return;
+            }
+
+            MainMenuAdapter adapter = new MainMenuAdapter(mainMenu);
+            object extrasSourceKey = adapter.ExtrasFoldout != null ? adapter.ExtrasFoldout.SourceKey : null;
+            object multiplayerSourceKey = adapter.MultiplayerFoldout != null ? adapter.MultiplayerFoldout.SourceKey : null;
+            bool removed = _screenManager.RemoveScreens(screen =>
+                (screen is MainMenuScreen && ReferenceEquals(screen.SourceKey, mainMenu))
+                || (extrasSourceKey != null && ReferenceEquals(screen.SourceKey, extrasSourceKey))
+                || (multiplayerSourceKey != null && ReferenceEquals(screen.SourceKey, multiplayerSourceKey)));
+            if (!removed)
+            {
+                ResyncFromRuntimeState();
             }
         }
 
         public void ResyncFromRuntimeState()
         {
-            SoqAccessPlugin.Instance?.LogInfo("ResyncFromRuntimeState started");
-            Screen activeScreen = null;
+            List<Screen> activeScreens = new List<Screen>();
             for (int i = 0; i < _runtimeScreenProbes.Count; i++)
             {
-                activeScreen = _runtimeScreenProbes[i].TryGetActiveScreen();
-                if (activeScreen != null)
-                {
-                    break;
-                }
+                _runtimeScreenProbes[i].AddActiveScreens(activeScreens);
             }
 
-            if (activeScreen == null)
-            {
-                SoqAccessPlugin.Instance?.LogInfo("ResyncFromRuntimeState found no active question dialog");
-                if (_screenManager.RemoveTopScreen<QuestionDialogScreen>())
-                {
-                    SoqAccessPlugin.Instance?.LogInfo("Removed top question dialog screen because runtime probe found nothing");
-                }
+            _screenManager.SynchronizeStack(activeScreens);
+        }
 
+        private void RemoveKnownFoldouts(MainMenuAdapter adapter)
+        {
+            if (adapter == null)
+            {
                 return;
             }
 
-            if (_screenManager.CurrentScreen != null && _screenManager.CurrentScreen.GetType() == activeScreen.GetType())
+            object extrasSourceKey = adapter.ExtrasFoldout != null ? adapter.ExtrasFoldout.SourceKey : null;
+            object multiplayerSourceKey = adapter.MultiplayerFoldout != null ? adapter.MultiplayerFoldout.SourceKey : null;
+            _screenManager.RemoveScreens(screen =>
+                (extrasSourceKey != null && ReferenceEquals(screen.SourceKey, extrasSourceKey))
+                || (multiplayerSourceKey != null && ReferenceEquals(screen.SourceKey, multiplayerSourceKey)));
+        }
+
+        private static MainMenuAdapter.NativeFoldoutAdapter ResolveFoldout(MainMenuAdapter adapter, FoldoutUIButton foldoutButton)
+        {
+            if (adapter == null || foldoutButton == null)
             {
-                _screenManager.ReplaceTopScreen(activeScreen);
-                SoqAccessPlugin.Instance?.LogInfo("ResyncFromRuntimeState replaced top screen from live runtime probe: " + activeScreen.GetType().Name);
+                return null;
             }
-            else
+
+            if (adapter.ExtrasFoldout != null && ReferenceEquals(adapter.ExtrasFoldout.SourceKey, foldoutButton))
             {
-                _screenManager.PushScreen(activeScreen);
-                SoqAccessPlugin.Instance?.LogInfo("ResyncFromRuntimeState pushed screen from live runtime probe: " + activeScreen.GetType().Name);
+                return adapter.ExtrasFoldout;
             }
+
+            if (adapter.MultiplayerFoldout != null && ReferenceEquals(adapter.MultiplayerFoldout.SourceKey, foldoutButton))
+            {
+                return adapter.MultiplayerFoldout;
+            }
+
+            return null;
         }
     }
 }

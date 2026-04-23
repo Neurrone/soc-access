@@ -54,6 +54,23 @@ namespace SongsOfConquestAccess.Screens
             return true;
         }
 
+        public void InsertScreenBelowTop(Screen screen)
+        {
+            if (screen == null)
+            {
+                return;
+            }
+
+            if (_stack.Count == 0)
+            {
+                PushScreen(screen);
+                return;
+            }
+
+            _stack.Insert(_stack.Count - 1, screen);
+            screen.OnPush();
+        }
+
         public bool RemoveScreenForSource(object sourceKey)
         {
             if (sourceKey == null)
@@ -114,6 +131,49 @@ namespace SongsOfConquestAccess.Screens
             return true;
         }
 
+        public bool RemoveScreens(System.Predicate<Screen> predicate)
+        {
+            if (predicate == null || _stack.Count == 0)
+            {
+                return false;
+            }
+
+            bool removedAny = false;
+            bool removedTop = false;
+            Screen previousTop = CurrentScreen;
+            if (previousTop != null && predicate(previousTop))
+            {
+                removedTop = true;
+                previousTop.OnUnfocus();
+                UIManager.Reset();
+            }
+
+            for (int i = _stack.Count - 1; i >= 0; i--)
+            {
+                Screen screen = _stack[i];
+                if (!predicate(screen))
+                {
+                    continue;
+                }
+
+                _stack.RemoveAt(i);
+                screen.OnPop();
+                removedAny = true;
+            }
+
+            if (!removedAny)
+            {
+                return false;
+            }
+
+            if (removedTop)
+            {
+                CurrentScreen?.OnFocus();
+            }
+
+            return true;
+        }
+
         public void Clear()
         {
             if (_stack.Count == 0)
@@ -131,6 +191,56 @@ namespace SongsOfConquestAccess.Screens
             _stack.Clear();
         }
 
+        public void SynchronizeStack(IReadOnlyList<Screen> desiredStack)
+        {
+            if (desiredStack == null)
+            {
+                desiredStack = Array.Empty<Screen>();
+            }
+
+            int prefixLength = 0;
+            int sharedCount = Math.Min(_stack.Count, desiredStack.Count);
+            while (prefixLength < sharedCount && AreEquivalent(_stack[prefixLength], desiredStack[prefixLength]))
+            {
+                prefixLength++;
+            }
+
+            if (prefixLength == _stack.Count && prefixLength == desiredStack.Count)
+            {
+                return;
+            }
+
+            if (_stack.Count > 0)
+            {
+                _stack[_stack.Count - 1].OnUnfocus();
+                UIManager.Reset();
+            }
+
+            for (int i = _stack.Count - 1; i >= prefixLength; i--)
+            {
+                Screen removed = _stack[i];
+                _stack.RemoveAt(i);
+                removed.OnPop();
+            }
+
+            for (int i = prefixLength; i < desiredStack.Count; i++)
+            {
+                Screen added = desiredStack[i];
+                if (added == null)
+                {
+                    continue;
+                }
+
+                _stack.Add(added);
+                added.OnPush();
+            }
+
+            if (_stack.Count > 0)
+            {
+                _stack[_stack.Count - 1].OnFocus();
+            }
+        }
+
         public bool DispatchAction(InputAction action)
         {
             if (action == null)
@@ -145,75 +255,36 @@ namespace SongsOfConquestAccess.Screens
                 return false;
             }
 
-            for (int i = _stack.Count - 1; i >= 0; i--)
-            {
-                Screen screen = _stack[i];
-                if (!screen.HasClaimed(action.Key))
-                {
-                    SoqAccessPlugin.Instance?.LogInfo(
-                        "ScreenManager.DispatchAction action "
-                        + action.Key
-                        + " is not claimed by screen "
-                        + DescribeScreen(screen));
-                    continue;
-                }
+            Screen screen = CurrentScreen;
+            bool handled = screen.OnActionJustPressed(action);
+            SoqAccessPlugin.Instance?.LogInfo(
+                "ScreenManager.DispatchAction action "
+                + action.Key
+                + " on top screen "
+                + DescribeScreen(screen)
+                + " returned "
+                + handled);
 
-                bool handled = screen.OnActionJustPressed(action);
-                SoqAccessPlugin.Instance?.LogInfo(
-                    "ScreenManager.DispatchAction action "
-                    + action.Key
-                    + " on screen "
-                    + DescribeScreen(screen)
-                    + " returned "
-                    + handled);
-
-                // Once a screen claims an action, lower layers should not receive it even if
-                // the currently focused widget does nothing with that action. This keeps native
-                // game UI beneath the accessibility screen from responding to owned inputs.
-                return true;
-            }
-
-            return false;
-        }
-
-        public void Reconcile()
-        {
-            Screen current = CurrentScreen;
-            if (current == null)
-            {
-                return;
-            }
-
-            if (!current.IsPresent())
-            {
-                SoqAccessPlugin.Instance?.LogInfo("ScreenManager detected stale screen: " + DescribeScreen(current));
-                bool removed = RemoveScreenForSource(current.SourceKey);
-                if (!removed)
-                {
-                    RemoveTopScreenByType(current.GetType());
-                }
-            }
-        }
-
-        private bool RemoveTopScreenByType(Type screenType)
-        {
-            if (_stack.Count == 0 || screenType == null || _stack[_stack.Count - 1].GetType() != screenType)
-            {
-                return false;
-            }
-
-            Screen removed = _stack[_stack.Count - 1];
-            removed.OnUnfocus();
-            UIManager.Reset();
-            _stack.RemoveAt(_stack.Count - 1);
-            removed.OnPop();
-            CurrentScreen?.OnFocus();
+            // Accessibility input is currently modal to the top accessibility screen.
+            // Even if the screen ignores a particular action, lower accessibility screens
+            // and the native UI beneath them should not receive it.
             return true;
         }
 
         private static string DescribeScreen(Screen screen)
         {
             return screen != null ? screen.GetType().Name : "<null>";
+        }
+
+        private static bool AreEquivalent(Screen current, Screen desired)
+        {
+            if (current == null || desired == null)
+            {
+                return false;
+            }
+
+            return current.GetType() == desired.GetType()
+                && ReferenceEquals(current.SourceKey, desired.SourceKey);
         }
     }
 }

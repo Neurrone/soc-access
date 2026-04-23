@@ -1,7 +1,9 @@
+using System.Collections.Generic;
+
 namespace SongsOfConquestAccess.Screens
 {
     internal interface IRuntimeScreenProbe
     {
-        Screen TryGetActiveScreen();
+        void AddActiveScreens(List<Screen> screens);
     }
 }
