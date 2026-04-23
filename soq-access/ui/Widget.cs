@@ -67,6 +67,11 @@ namespace SongsOfConquestAccess.UI
             return false;
         }
 
+        public virtual Widget GetFocusedWidget()
+        {
+            return this;
+        }
+
         public void Focus()
         {
             OnFocus();

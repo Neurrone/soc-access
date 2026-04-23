@@ -47,16 +47,21 @@ namespace SongsOfConquestAccess.UI
             _children.Add(child);
         }
 
-        public void FocusCurrentOrFirst()
+        protected override void OnFocus()
         {
             if (FocusedChild != null && FocusedChild.IsVisible)
             {
                 FocusedChild.Focus();
-                UIManager.SetFocusedWidget(FocusedChild);
+                UIManager.SetFocusedWidget(FocusedChild.GetFocusedWidget());
                 return;
             }
 
             SetFocus(FindFirstVisibleIndex());
+        }
+
+        public override Widget GetFocusedWidget()
+        {
+            return FocusedChild != null ? FocusedChild.GetFocusedWidget() : this;
         }
 
         public override bool ClaimsAction(string actionKey)
@@ -171,7 +176,7 @@ namespace SongsOfConquestAccess.UI
 
             _focusedIndex = index;
             next.Focus();
-            UIManager.SetFocusedWidget(next);
+            UIManager.SetFocusedWidget(next.GetFocusedWidget());
             return true;
         }
     }

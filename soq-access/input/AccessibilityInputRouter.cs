@@ -49,9 +49,19 @@ namespace SongsOfConquestAccess.Input
                 case Key.Tab:
                     bool reverse = keyboard != null && (keyboard.leftShiftKey.isPressed || keyboard.rightShiftKey.isPressed);
                     return reverse ? AccessibilityActions.PreviousWidget : AccessibilityActions.NextWidget;
+                case Key.UpArrow:
+                    return AccessibilityActions.PreviousMenuItem;
+                case Key.DownArrow:
+                    return AccessibilityActions.NextMenuItem;
+                case Key.Home:
+                    return AccessibilityActions.FirstMenuItem;
+                case Key.End:
+                    return AccessibilityActions.LastMenuItem;
                 case Key.Enter:
                 case Key.NumpadEnter:
                     return AccessibilityActions.Activate;
+                case Key.Escape:
+                    return AccessibilityActions.Cancel;
                 default:
                     return null;
             }
