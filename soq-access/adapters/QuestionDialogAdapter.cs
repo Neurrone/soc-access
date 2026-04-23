@@ -21,7 +21,7 @@ namespace SongsOfConquestAccess.Adapters
         private readonly string _body;
         private readonly string[] _actionLabels;
 
-        public QuestionDialogAdapter(
+        private QuestionDialogAdapter(
             object sourceKey,
             IUITransform containerTransform,
             UITextMeshInputField inputField,
@@ -42,31 +42,20 @@ namespace SongsOfConquestAccess.Adapters
             _actionLabels = new[] { NormalizeForSpeech(positiveLabel), NormalizeForSpeech(negativeLabel) };
         }
 
-        public QuestionDialogAdapter(PopupMenu.Settings settings)
+        public QuestionDialogAdapter(object sourceKey, PopupMenu.Settings settings)
             : this(
-                settings,
+                sourceKey,
                 settings != null ? settings.ContainerTransform : null,
                 settings != null ? settings.InputField : null,
                 settings != null ? settings.PositiveButton : null,
                 settings != null ? settings.NegativeButton : null,
+                // Read popup text through UITextMeshTextUtility rather than the raw public
+                // Text properties. On hot reload, PopupMenu can remain visible while those
+                // public values revert to prefab placeholder content.
                 GetText(settings != null ? settings.HeaderText : null),
                 GetText(settings != null ? settings.MessageText : null),
                 GetButtonText(settings != null ? settings.PositiveButton : null),
                 GetButtonText(settings != null ? settings.NegativeButton : null))
-        {
-        }
-
-        public QuestionDialogAdapter(PopupMenuInstaller installer)
-            : this(
-                installer,
-                installer != null ? installer.ContainerTransform : null,
-                installer != null ? installer.InputField : null,
-                installer != null ? installer.PositiveButton : null,
-                installer != null ? installer.NegativeButton : null,
-                GetText(installer != null ? installer.HeaderText : null),
-                GetText(installer != null ? installer.MessageText : null),
-                GetButtonText(installer != null ? installer.PositiveButton : null),
-                GetButtonText(installer != null ? installer.NegativeButton : null))
         {
         }
 
@@ -198,12 +187,12 @@ namespace SongsOfConquestAccess.Adapters
 
         private static string GetButtonText(IUIButton button)
         {
-            return button != null ? button.Text : string.Empty;
+            return UITextMeshTextUtility.GetEffectiveButtonText(button);
         }
 
         private static string GetText(IUITextMesh textMesh)
         {
-            return textMesh != null ? textMesh.Text : string.Empty;
+            return UITextMeshTextUtility.GetEffectiveText(textMesh);
         }
 
         private static string NormalizeForSpeech(string value)
