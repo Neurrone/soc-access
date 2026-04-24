@@ -1,6 +1,6 @@
 # Songs of Conquest Access
 
-This repository contains a BepInEx-based mod to make the Songs of Conquest game screen reader accessible. The active mod project is built for Script Engine hot reload.
+This repository contains a BepInEx-based mod to make the Songs of Conquest game screen reader accessible. The active mod project is built for Script Engine hot reload using the BepInEx script reload plugin.
 
 Use the game accessibility skills in this repository.
 
@@ -10,17 +10,19 @@ Keep all authored mod code under `soq-access/`. Current reusable speech code liv
 
 Layout:
 
-- `soq-access/speech/` for Tolk and output plumbing
+- `soq-access/adapters/` for any code that interacts directly with the game
+- `soq-access/input/` for receiving keyboard input
 - `soq-access/patches/` for Harmony or BepInEx hook classes
+- `soq-access/speech/` for Tolk and output plumbing
 - `soq-access/screens/` for accessible screen models
+- `soq-access/ui/` for UI widgets in the accessibility tree
 - `soq-access/tests/` for any offline tests introduced later
 - `soq-access/soq-access.csproj` is the live mod project and currently targets `.NET Framework 4.7.2`
 
 ## Build, Test, and Development Commands
 
-There is no root solution or committed build script yet. Add new build artifacts under `soq-access/`.
-
 Useful commands:
+
 - `rg "ShowAnalyticsConsentIfNecessary" decompiled` to trace game behavior quickly
 - `dotnet build soq-access\soq-access.csproj` to build the mod locally
 - `dotnet build soq-access\soq-access.csproj /p:DeployToGame=true` to build and copy the DLL to `BepInEx\scripts` for Script Engine hot reload
@@ -30,9 +32,12 @@ Prefer fast text search over manual browsing when tracing the game code. Do not 
 
 ## Coding Style & Naming Conventions
 
-Use C# conventions: 4-space indentation, PascalCase for types and public members, camelCase for locals and private fields unless the surrounding code already uses underscore-prefixed fields. Keep engine-specific access isolated in patch or adapter classes; keep speech composition out of hook methods. Favor small, explicit wrappers around reflected or patched game objects.
+Use C# conventions: 4-space indentation, PascalCase for types and public members, camelCase for locals and private fields unless the surrounding code already uses underscore-prefixed fields. Avoid repeating words in file names. For example, use `adapters/ContinueMenuButton.cs` instead of `adapters/ContinueMenuButtonAdapter.cs` to avoid repeating adapter.
+
+Keep engine-specific access isolated in patch or adapter classes; keep speech composition out of hook methods. Favor small, explicit wrappers around reflected or patched game objects. Avoid creating unneeded abstractions and change code sergically so that you never implement more than what is requested.
 
 Because the mod is hot-reloaded by Script Engine, every change must be reload-safe:
+
 - unsubscribe any events in `OnDestroy()`
 - dispose native resources in `OnDestroy()`
 - unpatch Harmony hooks on unload
@@ -53,5 +58,12 @@ This directory is not currently a git repository, so there is no local commit hi
 Game DLLs live outside the repo at `D:\games\steam\steamapps\common\SongsOfConquest\SongsOfConquest_Data\Managed`. Reference them for analysis and local builds, but do not copy proprietary binaries into `soq-access/`.
 
 Current environment assumptions:
+
 - `BepInEx.cfg` uses `HideManagerGameObject = true`
 - Script Engine config uses `DumpAssemblies = true` for debugging reload behavior
+
+## Logs
+
+Look at `GamePaths.props` for the path to the local game install. Logs are in the `BepInEx/LogOutput.log` in the game installation.
+
+If you are unable to implement a feature correctly even after inspecting the decompiled source code, you should offer to add runtime logging to help with debugging, instead of continuing to guess at what might be wrong. Then once the task is complete, offer to remove the now unneeded logs.
