@@ -4,17 +4,12 @@ using HarmonyLib;
 using SongsOfConquest.Client.Menu.Main;
 using SongsOfConquest.Client.Menu.Utils;
 using SongsOfConquest.Client.UI;
-using SongsOfConquest.Common.Localization;
 using UnityEngine;
-using UnityEngine.EventSystems;
-using UnityEngine.UI;
 
 namespace SongsOfConquestAccess.Adapters
 {
     internal sealed class MainMenuAdapter
     {
-        private static readonly HashSet<int> LoggedMainMenuNodeTrees = new HashSet<int>();
-
         private static readonly AccessTools.FieldRef<MainMenu, GameObject> LeftButtonContainerRef =
             AccessTools.FieldRefAccess<MainMenu, GameObject>("_leftButtonContainer");
         private static readonly AccessTools.FieldRef<MainMenu, GameObject> ContinueContainerRef =
@@ -61,8 +56,6 @@ namespace SongsOfConquestAccess.Adapters
             AccessTools.FieldRefAccess<FoldoutUIButton, HoverEventsImage>("_foldoutBackground");
         private static readonly AccessTools.FieldRef<FoldoutUIButton, bool> FoldoutIsOverButtonRef =
             AccessTools.FieldRefAccess<FoldoutUIButton, bool>("_isOverButton");
-        private static readonly AccessTools.FieldRef<UITextMeshLocalization, string> UITextMeshLocalizationKeyRef =
-            AccessTools.FieldRefAccess<UITextMeshLocalization, string>("_localizationKey");
 
         private readonly MainMenu _mainMenu;
         private readonly List<IMenuButtonAdapter> _topLevelItems;
@@ -115,8 +108,6 @@ namespace SongsOfConquestAccess.Adapters
                 new StandardMenuButtonAdapter("hotseat", HotseatButtonRef(_mainMenu)),
                 MultiplayerFoldout.TriggerButton
             };
-
-            LogDiscoveredMenuNodesOnce();
         }
 
         public object SourceKey
@@ -158,185 +149,6 @@ namespace SongsOfConquestAccess.Adapters
         private static bool IsLiveSceneObject(GameObject gameObject)
         {
             return gameObject != null && gameObject.scene.IsValid() && gameObject.scene.isLoaded;
-        }
-
-        private void LogDiscoveredMenuNodesOnce()
-        {
-            if (_mainMenu == null || _mainMenu.gameObject == null)
-            {
-                return;
-            }
-
-            int menuId = _mainMenu.gameObject.GetInstanceID();
-            if (!LoggedMainMenuNodeTrees.Add(menuId))
-            {
-                return;
-            }
-
-            SoqAccessPlugin.Instance?.LogInfo(
-                "MainMenuAdapter runtime node dump for "
-                + DescribeTransform(_mainMenu.transform)
-                + " in scene "
-                + _mainMenu.gameObject.scene.name);
-
-            LogButtonNodes("top-level", _topLevelItems);
-            LogFoldoutNodes("extras", ExtrasFoldout);
-            LogFoldoutNodes("multiplayer", MultiplayerFoldout);
-        }
-
-        private static void LogButtonNodes(string group, IReadOnlyList<IMenuButtonAdapter> items)
-        {
-            if (items == null)
-            {
-                return;
-            }
-
-            for (int i = 0; i < items.Count; i++)
-            {
-                IMenuButtonAdapter item = items[i];
-                if (item == null)
-                {
-                    continue;
-                }
-
-                LogButtonNodes(group, item);
-            }
-        }
-
-        private static void LogFoldoutNodes(string group, NativeFoldoutAdapter foldout)
-        {
-            if (foldout == null)
-            {
-                return;
-            }
-
-            LogButtonNodes(group + "-button", foldout.TriggerButton);
-            LogButtonNodes(group + "-items", foldout.Items);
-        }
-
-        private static void LogButtonNodes(string group, IMenuButtonAdapter item)
-        {
-            string itemId = item != null ? item.Id : string.Empty;
-            UIButton button = item != null ? item.Button : null;
-            if (button == null)
-            {
-                SoqAccessPlugin.Instance?.LogInfo("MainMenuAdapter node dump [" + group + ":" + itemId + "] button=<null>");
-                return;
-            }
-
-            Component buttonComponent = (Component)button;
-            GameObject buttonObject = buttonComponent.gameObject;
-            Selectable selectable = button.GetSelectable();
-            SoqAccessPlugin.Instance?.LogInfo(
-                "MainMenuAdapter node dump ["
-                + group
-                + ":"
-                + itemId
-                + "] path="
-                + DescribeTransform(buttonComponent.transform)
-                + ", activeInHierarchy="
-                + buttonObject.activeInHierarchy
-                + ", buttonActive="
-                + button.Active
-                + ", interactable="
-                + button.Interactable
-                + ", selectableEnabled="
-                + (selectable != null && selectable.isActiveAndEnabled)
-                + ", adapterType="
-                + item.GetType().Name
-                + ", directText=\""
-                + MenuButtonTextUtility.NormalizeForSpeech(button.Text)
-                + "\"");
-
-            UITextMesh[] textMeshes = buttonObject.GetComponentsInChildren<UITextMesh>(includeInactive: true);
-            for (int i = 0; i < textMeshes.Length; i++)
-            {
-                UITextMesh textMesh = textMeshes[i];
-                if (textMesh == null)
-                {
-                    continue;
-                }
-
-                SoqAccessPlugin.Instance?.LogInfo(
-                    "  UITextMesh path="
-                    + DescribeTransform(textMesh.transform)
-                    + ", activeInHierarchy="
-                    + textMesh.gameObject.activeInHierarchy
-                    + ", enabled="
-                    + textMesh.enabled
-                    + ", text=\""
-                    + MenuButtonTextUtility.NormalizeForSpeech(textMesh.Text)
-                    + "\"");
-
-                LogUITextMeshLocalization(textMesh);
-            }
-
-            Text[] texts = buttonObject.GetComponentsInChildren<Text>(includeInactive: true);
-            for (int i = 0; i < texts.Length; i++)
-            {
-                Text text = texts[i];
-                if (text == null)
-                {
-                    continue;
-                }
-
-                SoqAccessPlugin.Instance?.LogInfo(
-                    "  Text path="
-                    + DescribeTransform(text.transform)
-                    + ", activeInHierarchy="
-                    + text.gameObject.activeInHierarchy
-                    + ", enabled="
-                    + text.enabled
-                    + ", text=\""
-                    + MenuButtonTextUtility.NormalizeForSpeech(text.text)
-                    + "\"");
-            }
-        }
-
-        private static string DescribeTransform(Transform transform)
-        {
-            if (transform == null)
-            {
-                return "<null>";
-            }
-
-            string path = transform.name;
-            Transform current = transform.parent;
-            while (current != null)
-            {
-                path = current.name + "/" + path;
-                current = current.parent;
-            }
-
-            return path;
-        }
-
-        private static void LogUITextMeshLocalization(UITextMesh textMesh)
-        {
-            if (textMesh == null)
-            {
-                return;
-            }
-
-            UITextMeshLocalization localization = ((Component)textMesh).GetComponent<UITextMeshLocalization>();
-            if (localization == null)
-            {
-                return;
-            }
-
-            string key = UITextMeshLocalizationKeyRef(localization) ?? string.Empty;
-            string resolvedText = string.Empty;
-            if (!string.IsNullOrWhiteSpace(key) && GlobalLocalizationVariables.LocalizationHandler != null)
-            {
-                resolvedText = MenuButtonTextUtility.NormalizeForSpeech(GlobalLocalizationVariables.LocalizationHandler.GetText(key));
-            }
-
-            SoqAccessPlugin.Instance?.LogInfo(
-                "    UITextMeshLocalization key=\""
-                + key
-                + "\", resolvedText=\""
-                + resolvedText
-                + "\"");
         }
 
         internal sealed class NativeFoldoutAdapter
