@@ -87,16 +87,28 @@ namespace SongsOfConquestAccess.Screens
                 return;
             }
 
-            _screenManager.RemoveScreens(existing =>
-                existing is MainMenuScreen && ReferenceEquals(existing.SourceKey, screen.SourceKey));
+            _screenManager.PushScreen(screen);
+        }
 
-            if (current is QuestionDialogScreen)
+        public void OnMainMenuHidden(MainMenu mainMenu)
+        {
+            if (mainMenu == null)
             {
-                _screenManager.InsertScreenBelowTop(screen);
+                ResyncFromRuntimeState();
                 return;
             }
 
-            _screenManager.PushScreen(screen);
+            MainMenuAdapter adapter = new MainMenuAdapter(mainMenu);
+            object extrasSourceKey = adapter.ExtrasFoldout != null ? adapter.ExtrasFoldout.SourceKey : null;
+            object multiplayerSourceKey = adapter.MultiplayerFoldout != null ? adapter.MultiplayerFoldout.SourceKey : null;
+            bool removed = _screenManager.RemoveScreens(screen =>
+                (screen is MainMenuScreen && ReferenceEquals(screen.SourceKey, mainMenu))
+                || (extrasSourceKey != null && ReferenceEquals(screen.SourceKey, extrasSourceKey))
+                || (multiplayerSourceKey != null && ReferenceEquals(screen.SourceKey, multiplayerSourceKey)));
+            if (!removed)
+            {
+                ResyncFromRuntimeState();
+            }
         }
 
         public void OnMainMenuFoldoutOpened(MainMenu mainMenu, FoldoutUIButton foldoutButton)
@@ -168,31 +180,7 @@ namespace SongsOfConquestAccess.Screens
                 return;
             }
 
-            _screenManager.RemoveScreens(existing =>
-                existing is CampaignMapSelectScreen && ReferenceEquals(existing.SourceKey, screen.SourceKey));
-
             _screenManager.PushScreen(screen);
-        }
-
-        public void OnMainMenuHidden(MainMenu mainMenu)
-        {
-            if (mainMenu == null)
-            {
-                ResyncFromRuntimeState();
-                return;
-            }
-
-            MainMenuAdapter adapter = new MainMenuAdapter(mainMenu);
-            object extrasSourceKey = adapter.ExtrasFoldout != null ? adapter.ExtrasFoldout.SourceKey : null;
-            object multiplayerSourceKey = adapter.MultiplayerFoldout != null ? adapter.MultiplayerFoldout.SourceKey : null;
-            bool removed = _screenManager.RemoveScreens(screen =>
-                (screen is MainMenuScreen && ReferenceEquals(screen.SourceKey, mainMenu))
-                || (extrasSourceKey != null && ReferenceEquals(screen.SourceKey, extrasSourceKey))
-                || (multiplayerSourceKey != null && ReferenceEquals(screen.SourceKey, multiplayerSourceKey)));
-            if (!removed)
-            {
-                ResyncFromRuntimeState();
-            }
         }
 
         public void ResyncFromRuntimeState()
