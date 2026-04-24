@@ -1,10 +1,8 @@
-using System;
 using System.Collections;
 using System.Collections.Generic;
 using HarmonyLib;
 using SongsOfConquest.Client.Menu.Main;
 using SongsOfConquest.Client.Menu.Loading;
-using SongsOfConquest.Client.Settings;
 using SongsOfConquest.Client.UI;
 using UnityEngine;
 
@@ -13,44 +11,11 @@ namespace SongsOfConquestAccess
     [HarmonyPatch]
     internal static class MainMenuPatches
     {
-        private static readonly AccessTools.FieldRef<MainMenu, IClientSettings> ClientSettingsRef =
-            AccessTools.FieldRefAccess<MainMenu, IClientSettings>("_clientSettings");
         private static readonly AccessTools.FieldRef<MainMenu, GameObject> LeftButtonContainerRef =
             AccessTools.FieldRefAccess<MainMenu, GameObject>("_leftButtonContainer");
 
-        private static readonly Type UnityCloudType = AccessTools.TypeByName("UnityCloud");
-        private static readonly System.Reflection.PropertyInfo UnityCloudHasOptInConsentProperty =
-            UnityCloudType != null ? AccessTools.Property(UnityCloudType, "HasOptInConsent") : null;
         private static readonly Dictionary<MainMenu, Coroutine> PendingOpenCoroutines =
             new Dictionary<MainMenu, Coroutine>();
-
-        [HarmonyPatch(typeof(MainMenu), "ShowAnalyticsConsentIfNecessary")]
-        [HarmonyPrefix]
-        private static void ShowAnalyticsConsentIfNecessaryPrefix(MainMenu __instance)
-        {
-            IClientSettings clientSettings = null;
-            if (__instance != null)
-            {
-                clientSettings = ClientSettingsRef(__instance);
-            }
-
-            bool? previousClientSetting = clientSettings != null ? clientSettings.OptInAnalytics : null;
-            bool? previousUnityCloudSetting = GetUnityCloudOptInConsent();
-
-            if (clientSettings != null)
-            {
-                clientSettings.OptInAnalytics = null;
-            }
-
-            SetUnityCloudOptInConsent(null);
-
-            SoqAccessPlugin.Instance?.LogInfo(
-                "MainMenu.ShowAnalyticsConsentIfNecessary prefix cleared analytics consent state: client="
-                + NullableBoolToString(previousClientSetting)
-                + " -> null, unityCloud="
-                + NullableBoolToString(previousUnityCloudSetting)
-                + " -> null");
-        }
 
         [HarmonyPatch(typeof(MainMenu), "HandleSceneLoaded")]
         [HarmonyPostfix]
@@ -112,42 +77,6 @@ namespace SongsOfConquestAccess
 
             StopPendingOpenCoroutine(__instance);
             SoqAccessPlugin.Instance?.ScreenDetector?.OnMainMenuHidden(__instance);
-        }
-
-        private static bool? GetUnityCloudOptInConsent()
-        {
-            if (UnityCloudHasOptInConsentProperty == null)
-            {
-                return null;
-            }
-
-            object value = UnityCloudHasOptInConsentProperty.GetValue(null, null);
-            if (value == null)
-            {
-                return null;
-            }
-
-            if (value is bool boolValue)
-            {
-                return boolValue;
-            }
-
-            return null;
-        }
-
-        private static void SetUnityCloudOptInConsent(bool? value)
-        {
-            if (UnityCloudHasOptInConsentProperty == null || !UnityCloudHasOptInConsentProperty.CanWrite)
-            {
-                return;
-            }
-
-            UnityCloudHasOptInConsentProperty.SetValue(null, value, null);
-        }
-
-        private static string NullableBoolToString(bool? value)
-        {
-            return value.HasValue ? value.Value.ToString() : "<null>";
         }
 
         private static void RestartPendingOpenCoroutine(MainMenu mainMenu)
