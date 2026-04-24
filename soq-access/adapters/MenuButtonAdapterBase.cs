@@ -1,7 +1,6 @@
 using System;
 using SongsOfConquest.Client.UI;
 using UnityEngine;
-using UnityEngine.EventSystems;
 using UnityEngine.UI;
 
 namespace SongsOfConquestAccess.Adapters
@@ -10,20 +9,17 @@ namespace SongsOfConquestAccess.Adapters
     {
         private readonly Func<bool> _isVisible;
         private readonly Func<bool> _activate;
-        private readonly MenuButtonFocusMode _focusMode;
 
         protected MenuButtonAdapterBase(
             string id,
             UIButton button,
             Func<bool> isVisible,
-            Func<bool> activate,
-            MenuButtonFocusMode focusMode)
+            Func<bool> activate)
         {
             Id = id ?? string.Empty;
             Button = button;
             _isVisible = isVisible;
             _activate = activate;
-            _focusMode = focusMode;
         }
 
         public string Id { get; private set; }
@@ -43,16 +39,6 @@ namespace SongsOfConquestAccess.Adapters
         public bool IsVisible()
         {
             return (_isVisible == null || _isVisible()) && IsButtonVisible(Button);
-        }
-
-        public void Focus()
-        {
-            if (_focusMode == MenuButtonFocusMode.SemanticOnly)
-            {
-                return;
-            }
-
-            SelectButton(Button);
         }
 
         public bool Activate()
@@ -99,27 +85,5 @@ namespace SongsOfConquestAccess.Adapters
         }
 
         protected abstract string BuildLabel();
-
-        private static void SelectButton(UIButton button)
-        {
-            if (button == null)
-            {
-                return;
-            }
-
-            Selectable selectable = button.GetSelectable();
-            if (selectable == null)
-            {
-                return;
-            }
-
-            if (EventSystem.current != null)
-            {
-                EventSystem.current.SetSelectedGameObject(selectable.gameObject);
-                return;
-            }
-
-            selectable.Select();
-        }
     }
 }

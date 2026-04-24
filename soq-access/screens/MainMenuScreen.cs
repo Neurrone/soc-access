@@ -54,7 +54,7 @@ namespace SongsOfConquestAccess.Screens
                     item.GetLabel,
                     item.GetStatus,
                     item.Activate,
-                    item.Focus,
+                    null,
                     item.IsVisible));
             }
         }

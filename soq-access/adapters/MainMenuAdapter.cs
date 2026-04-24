@@ -65,7 +65,7 @@ namespace SongsOfConquestAccess.Adapters
             _mainMenu = mainMenu;
             ExtrasFoldout = new NativeFoldoutAdapter(
                 "extras",
-                new FoldoutMenuButtonAdapter(
+                new StandardMenuButtonAdapter(
                     "extras",
                     GetFoldoutButton(ExtrasFoldoutRef(_mainMenu)),
                     () => MenuButtonAdapterBase.IsButtonVisible(GetFoldoutButton(ExtrasFoldoutRef(_mainMenu))),
@@ -73,15 +73,15 @@ namespace SongsOfConquestAccess.Adapters
                 ExtrasFoldoutRef(_mainMenu),
                 new[]
                 {
-                    new StandardMenuButtonAdapter("tutorial-and-codex", TutorialAndCodexButtonRef(_mainMenu), null, null, MenuButtonFocusMode.SemanticOnly),
-                    new StandardMenuButtonAdapter("player-stats", PlayerStatsButtonRef(_mainMenu), null, null, MenuButtonFocusMode.SemanticOnly),
-                    new StandardMenuButtonAdapter("credits", CreditsButtonRef(_mainMenu), null, null, MenuButtonFocusMode.SemanticOnly),
-                    new StandardMenuButtonAdapter("battlegrounds", BattlegroundsButtonRef(_mainMenu), null, null, MenuButtonFocusMode.SemanticOnly),
-                    new StandardMenuButtonAdapter("digital-artbook", DigitalArtbookButtonRef(_mainMenu), null, null, MenuButtonFocusMode.SemanticOnly)
+                    new StandardMenuButtonAdapter("tutorial-and-codex", TutorialAndCodexButtonRef(_mainMenu)),
+                    new StandardMenuButtonAdapter("player-stats", PlayerStatsButtonRef(_mainMenu)),
+                    new StandardMenuButtonAdapter("credits", CreditsButtonRef(_mainMenu)),
+                    new StandardMenuButtonAdapter("battlegrounds", BattlegroundsButtonRef(_mainMenu)),
+                    new StandardMenuButtonAdapter("digital-artbook", DigitalArtbookButtonRef(_mainMenu))
                 });
             MultiplayerFoldout = new NativeFoldoutAdapter(
                 "multiplayer",
-                new FoldoutMenuButtonAdapter(
+                new StandardMenuButtonAdapter(
                     "multiplayer",
                     GetFoldoutButton(MultiplayerFoldoutRef(_mainMenu)),
                     () => MenuButtonAdapterBase.IsButtonVisible(GetFoldoutButton(MultiplayerFoldoutRef(_mainMenu))),
@@ -89,10 +89,10 @@ namespace SongsOfConquestAccess.Adapters
                 MultiplayerFoldoutRef(_mainMenu),
                 new[]
                 {
-                    new StandardMenuButtonAdapter("host-online", HostOnlineButtonRef(_mainMenu), null, null, MenuButtonFocusMode.SemanticOnly),
-                    new StandardMenuButtonAdapter("join-with-code", JoinWithCodeButtonRef(_mainMenu), null, null, MenuButtonFocusMode.SemanticOnly),
-                    new StandardMenuButtonAdapter("find-online", FindOnlineButtonRef(_mainMenu), null, null, MenuButtonFocusMode.SemanticOnly),
-                    new StandardMenuButtonAdapter("start-hotseat", StartHotseatButtonRef(_mainMenu), null, null, MenuButtonFocusMode.SemanticOnly)
+                    new StandardMenuButtonAdapter("host-online", HostOnlineButtonRef(_mainMenu)),
+                    new StandardMenuButtonAdapter("join-with-code", JoinWithCodeButtonRef(_mainMenu)),
+                    new StandardMenuButtonAdapter("find-online", FindOnlineButtonRef(_mainMenu)),
+                    new StandardMenuButtonAdapter("start-hotseat", StartHotseatButtonRef(_mainMenu))
                 });
 
             _topLevelItems = new List<IMenuButtonAdapter>

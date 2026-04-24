@@ -6,7 +6,7 @@ namespace SongsOfConquestAccess.Adapters
     internal sealed class ContinueMenuButtonAdapter : MenuButtonAdapterBase
     {
         public ContinueMenuButtonAdapter(string id, UIButton button, Func<bool> isVisible = null)
-            : base(id, button, isVisible, null, MenuButtonFocusMode.NativeAndSemantic)
+            : base(id, button, isVisible, null)
         {
         }
 

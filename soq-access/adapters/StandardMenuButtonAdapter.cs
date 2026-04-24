@@ -9,9 +9,8 @@ namespace SongsOfConquestAccess.Adapters
             string id,
             UIButton button,
             Func<bool> isVisible = null,
-            Func<bool> activate = null,
-            MenuButtonFocusMode focusMode = MenuButtonFocusMode.NativeAndSemantic)
-            : base(id, button, isVisible, activate, focusMode)
+            Func<bool> activate = null)
+            : base(id, button, isVisible, activate)
         {
         }
 

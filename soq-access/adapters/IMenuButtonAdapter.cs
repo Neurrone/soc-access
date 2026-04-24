@@ -14,8 +14,6 @@ namespace SongsOfConquestAccess.Adapters
 
         bool IsVisible();
 
-        void Focus();
-
         bool Activate();
     }
 }
