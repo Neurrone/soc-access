@@ -88,6 +88,11 @@ namespace SongsOfConquestAccess
             get { return _inputRouter; }
         }
 
+        internal ScreenManager ScreenManager
+        {
+            get { return _screenManager; }
+        }
+
         internal void LogInfo(string message)
         {
             Logger.LogInfo(message);

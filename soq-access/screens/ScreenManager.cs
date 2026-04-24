@@ -271,6 +271,12 @@ namespace SongsOfConquestAccess.Screens
             return true;
         }
 
+        public bool CurrentScreenClaimsAction(string actionKey)
+        {
+            Screen screen = CurrentScreen;
+            return screen != null && screen.HasClaimed(actionKey);
+        }
+
         private static string DescribeScreen(Screen screen)
         {
             return screen != null ? screen.GetType().Name : "<null>";

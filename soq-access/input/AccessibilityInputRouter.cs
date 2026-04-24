@@ -15,36 +15,60 @@ namespace SongsOfConquestAccess.Input
         }
 
         /// <summary>
-        /// Convert raw keyboard input from the game's central input hook into one
-        /// semantic accessibility action, then dispatch it through the screen stack.
+        /// Entry point for keyboard callbacks that arrive through the game's central
+        /// UnityInputManager hook.
+        ///
+        /// Most keyboard actions we care about use this path, but some UI navigation
+        /// keys such as arrow keys do not surface there and must be
+        /// intercepted lower down in the Unity UI input module.
         /// </summary>
         public bool TryHandleKeyboardInput(InputSource source, InputPhase phase, InputControl control)
         {
-            InputAction action = TryGetKeyboardAccessibilityAction(source, phase, control);
+            KeyControl keyControl = null;
+            if (source == InputSource.Keyboard && phase == InputPhase.Down)
+            {
+                keyControl = control as KeyControl;
+            }
+
+            Key? key = keyControl != null ? (Key?)keyControl.keyCode : null;
+            return TryHandleKeyboardKey(key, "AccessibilityInputRouter detected");
+        }
+
+        /// <summary>
+        /// Entry point for raw keyboard interception below the game's normal action
+        /// callback layer.
+        ///
+        /// This exists because keys like arrows are processed by the
+        /// Unity UI input module and do not arrive through TryHandleKeyboardInput.
+        /// The mapping and dispatch logic is shared so both interception layers stay
+        /// behaviorally identical.
+        /// </summary>
+        public bool TryHandleRawKeyboardKey(Key key)
+        {
+            return TryHandleKeyboardKey(key, "AccessibilityInputRouter intercepted raw key");
+        }
+
+        private bool TryHandleKeyboardKey(Key? key, string logPrefix)
+        {
+            if (!key.HasValue)
+            {
+                return false;
+            }
+
+            InputAction action = TryGetAccessibilityActionForKey(key.Value);
             if (action == null)
             {
                 return false;
             }
 
-            SoqAccessPlugin.Instance?.LogInfo("AccessibilityInputRouter detected action " + action.Key);
+            SoqAccessPlugin.Instance?.LogInfo(logPrefix + " key " + key.Value + " as action " + action.Key);
             return _screenManager != null && _screenManager.DispatchAction(action);
         }
 
-        private static InputAction TryGetKeyboardAccessibilityAction(InputSource source, InputPhase phase, InputControl control)
+        private static InputAction TryGetAccessibilityActionForKey(Key keyCode)
         {
-            if (source != InputSource.Keyboard || phase != InputPhase.Down)
-            {
-                return null;
-            }
-
-            KeyControl keyControl = control as KeyControl;
-            if (keyControl == null)
-            {
-                return null;
-            }
-
             Keyboard keyboard = Keyboard.current;
-            switch (keyControl.keyCode)
+            switch (keyCode)
             {
                 case Key.Tab:
                     bool reverse = keyboard != null && (keyboard.leftShiftKey.isPressed || keyboard.rightShiftKey.isPressed);
