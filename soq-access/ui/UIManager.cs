@@ -9,6 +9,7 @@ namespace SongsOfConquestAccess.UI
         private static Widget _lastFocusedWidget;
         private static string _lastAnnouncement;
         private static bool _dirty;
+        private static readonly FocusContext FocusContext = new FocusContext();
 
         public static void SetFocusedWidget(Widget widget)
         {
@@ -23,6 +24,7 @@ namespace SongsOfConquestAccess.UI
             _lastFocusedWidget = null;
             _lastAnnouncement = null;
             _dirty = false;
+            FocusContext.Reset();
         }
 
         public static void Update()
@@ -33,7 +35,6 @@ namespace SongsOfConquestAccess.UI
             }
 
             _dirty = false;
-            _lastFocusedWidget = _currentWidget;
 
             string announcement = BuildAnnouncement(_currentWidget);
             if (string.IsNullOrWhiteSpace(announcement))
@@ -41,6 +42,7 @@ namespace SongsOfConquestAccess.UI
                 return;
             }
 
+            _lastFocusedWidget = _currentWidget;
             if (announcement == _lastAnnouncement)
             {
                 return;
@@ -54,12 +56,12 @@ namespace SongsOfConquestAccess.UI
         private static string BuildAnnouncement(Widget widget)
         {
             List<string> parts = new List<string>(2);
-            if (widget.IncludeParentLabelInAnnouncement && widget.Parent != null && widget.Parent.AnnounceName)
+            if (widget.IncludeParentLabelInAnnouncement && widget.Parent != null)
             {
                 AddIfNotEmpty(parts, widget.Parent.GetLabel());
             }
 
-            AddIfNotEmpty(parts, widget.GetFocusMessage());
+            AddIfNotEmpty(parts, FocusContext.BuildAnnouncement(widget));
             return string.Join(". ", parts.ToArray());
         }
 

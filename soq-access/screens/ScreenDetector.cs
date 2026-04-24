@@ -26,6 +26,7 @@ namespace SongsOfConquestAccess.Screens
             {
                 new MainMenuRuntimeScreenProbe(),
                 new CampaignMenuRuntimeScreenProbe(),
+                new CampaignMapSelectRuntimeScreenProbe(),
                 new QuestionDialogRuntimeScreenProbe()
             };
         }
@@ -142,6 +143,34 @@ namespace SongsOfConquestAccess.Screens
             }
 
             CampaignMenuScreen screen = new CampaignMenuScreen(adapter);
+            _screenManager.PushScreen(screen);
+        }
+
+        public void OnCampaignMapSelectAvailable(CampaignMapSelectedInformationView informationView)
+        {
+            CampaignMapSelectAdapter adapter = CampaignMapSelectRuntimeScreenProbe.FindActiveCampaignMapSelect(informationView);
+            if (adapter == null || !adapter.IsPresent())
+            {
+                ResyncFromRuntimeState();
+                return;
+            }
+
+            CampaignMapSelectScreen screen = new CampaignMapSelectScreen(
+                adapter,
+                CampaignMapSelectScreen.ConsumeFocusDifficultyAfterNextRebuild());
+            Screen current = _screenManager.CurrentScreen;
+            if (current is CampaignMapSelectScreen && ReferenceEquals(current.SourceKey, screen.SourceKey))
+            {
+                // Difficulty changes cause the game to redraw the selected mission details by
+                // calling Show(...) again, so rebuild this accessibility screen from the fresh
+                // native state instead of mutating stale labels and button visibility.
+                _screenManager.ReplaceTopScreen(screen);
+                return;
+            }
+
+            _screenManager.RemoveScreens(existing =>
+                existing is CampaignMapSelectScreen && ReferenceEquals(existing.SourceKey, screen.SourceKey));
+
             _screenManager.PushScreen(screen);
         }
 

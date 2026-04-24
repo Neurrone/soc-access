@@ -16,7 +16,7 @@ namespace SongsOfConquestAccess.UI
 
         public string Label { get; set; }
 
-        public bool AnnounceName { get; set; } = true;
+        public override bool AnnounceName { get; } = false;
 
         public Widget FocusedChild
         {
@@ -45,6 +45,26 @@ namespace SongsOfConquestAccess.UI
 
             child.Parent = this;
             _children.Add(child);
+        }
+
+        public bool SetFocusedChildById(string id)
+        {
+            if (string.IsNullOrWhiteSpace(id))
+            {
+                return false;
+            }
+
+            for (int i = 0; i < _children.Count; i++)
+            {
+                Widget child = _children[i];
+                if (child != null && child.IsVisible && child.Id == id)
+                {
+                    _focusedIndex = i;
+                    return true;
+                }
+            }
+
+            return false;
         }
 
         protected override void OnFocus()

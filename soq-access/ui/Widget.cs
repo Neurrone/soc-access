@@ -11,7 +11,7 @@ namespace SongsOfConquestAccess.UI
 
         public string Id { get; private set; }
 
-        public ContainerWidget Parent { get; internal set; }
+        public Widget Parent { get; internal set; }
 
         public virtual bool IsVisible
         {
@@ -19,6 +19,11 @@ namespace SongsOfConquestAccess.UI
         }
 
         public virtual bool IncludeParentLabelInAnnouncement
+        {
+            get { return false; }
+        }
+
+        public virtual bool AnnounceName
         {
             get { return false; }
         }

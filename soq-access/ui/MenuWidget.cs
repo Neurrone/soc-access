@@ -34,6 +34,11 @@ namespace SongsOfConquestAccess.UI
             return Label;
         }
 
+        public override bool AnnounceName
+        {
+            get { return true; }
+        }
+
         public override string GetRole()
         {
             return "menu";
@@ -46,8 +51,28 @@ namespace SongsOfConquestAccess.UI
                 return;
             }
 
-            item.Parent = null;
+            item.Parent = this;
             _items.Add(item);
+        }
+
+        public bool SetFocusedItemById(string id)
+        {
+            if (string.IsNullOrWhiteSpace(id))
+            {
+                return false;
+            }
+
+            for (int i = 0; i < _items.Count; i++)
+            {
+                MenuItemWidget item = _items[i];
+                if (item != null && item.IsVisible && item.Id == id)
+                {
+                    _focusedIndex = i;
+                    return true;
+                }
+            }
+
+            return false;
         }
 
         public override Widget GetFocusedWidget()
