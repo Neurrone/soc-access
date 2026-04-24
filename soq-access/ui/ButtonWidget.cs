@@ -8,15 +8,22 @@ namespace SongsOfConquestAccess.UI
         private readonly Func<bool> _activate;
         private readonly Action _onFocus;
         private readonly Func<bool> _isEnabled;
+        private readonly Func<bool> _isVisible;
         private readonly string _label;
 
-        public ButtonWidget(string id, string label, Func<bool> activate, Action onFocus, Func<bool> isEnabled)
+        public ButtonWidget(string id, string label, Func<bool> activate, Action onFocus, Func<bool> isEnabled, Func<bool> isVisible = null)
             : base(id)
         {
             _label = label ?? string.Empty;
             _activate = activate;
             _onFocus = onFocus;
             _isEnabled = isEnabled;
+            _isVisible = isVisible;
+        }
+
+        public override bool IsVisible
+        {
+            get { return _isVisible == null || _isVisible(); }
         }
 
         public override string GetLabel()

@@ -27,7 +27,7 @@ namespace SongsOfConquestAccess.Adapters
 
         public static string GetDirectButtonText(UIButton button)
         {
-            return NormalizeForSpeech(button != null ? button.Text : string.Empty);
+            return NormalizeForSpeech(UITextMeshTextUtility.GetEffectiveButtonText(button));
         }
 
         public static string GetStandardButtonLabel(UIButton button)
@@ -155,6 +155,49 @@ namespace SongsOfConquestAccess.Adapters
             return string.Empty;
         }
 
+        public static string GetAllVisibleText(UIButton button)
+        {
+            if (button == null)
+            {
+                return string.Empty;
+            }
+
+            List<string> parts = new List<string>();
+            UITextMesh[] textMeshes = ((Component)button).GetComponentsInChildren<UITextMesh>(includeInactive: false);
+            for (int i = 0; i < textMeshes.Length; i++)
+            {
+                UITextMesh textMesh = textMeshes[i];
+                if (textMesh == null || !textMesh.gameObject.activeInHierarchy)
+                {
+                    continue;
+                }
+
+                string candidate = GetResolvedText(textMesh);
+                if (!string.IsNullOrWhiteSpace(candidate) && !parts.Contains(candidate))
+                {
+                    parts.Add(candidate);
+                }
+            }
+
+            Text[] texts = ((Component)button).GetComponentsInChildren<Text>(includeInactive: false);
+            for (int i = 0; i < texts.Length; i++)
+            {
+                Text text = texts[i];
+                if (text == null || !text.gameObject.activeInHierarchy)
+                {
+                    continue;
+                }
+
+                string candidate = NormalizeForSpeech(text.text);
+                if (!string.IsNullOrWhiteSpace(candidate) && !parts.Contains(candidate))
+                {
+                    parts.Add(candidate);
+                }
+            }
+
+            return parts.Count == 0 ? string.Empty : string.Join(". ", parts.ToArray());
+        }
+
         public static string JoinParts(params string[] parts)
         {
             if (parts == null || parts.Length == 0)
@@ -211,7 +254,7 @@ namespace SongsOfConquestAccess.Adapters
                 return localized;
             }
 
-            return NormalizeForSpeech(textMesh.Text);
+            return NormalizeForSpeech(UITextMeshTextUtility.GetEffectiveText(textMesh));
         }
 
         private static string GetLocalizedText(UITextMesh textMesh)

@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using SongsOfConquest.Client.Menu;
 using SongsOfConquest.Client.Menu.Main;
 using SongsOfConquest.Client.Menu.Popup;
 using SongsOfConquest.Client.UI;
@@ -24,6 +25,7 @@ namespace SongsOfConquestAccess.Screens
             _runtimeScreenProbes = new List<IRuntimeScreenProbe>
             {
                 new MainMenuRuntimeScreenProbe(),
+                new CampaignMenuRuntimeScreenProbe(),
                 new QuestionDialogRuntimeScreenProbe()
             };
         }
@@ -128,6 +130,19 @@ namespace SongsOfConquestAccess.Screens
             {
                 ResyncFromRuntimeState();
             }
+        }
+
+        public void OnCampaignMenuAvailable(CampaignMenu campaignMenu)
+        {
+            CampaignMenuAdapter adapter = new CampaignMenuAdapter(campaignMenu);
+            if (!adapter.IsPresent())
+            {
+                ResyncFromRuntimeState();
+                return;
+            }
+
+            CampaignMenuScreen screen = new CampaignMenuScreen(adapter);
+            _screenManager.PushScreen(screen);
         }
 
         public void OnMainMenuHidden(MainMenu mainMenu)
