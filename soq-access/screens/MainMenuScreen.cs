@@ -19,17 +19,6 @@ namespace SongsOfConquestAccess.Screens
             return _adapter != null && _adapter.IsPresent();
         }
 
-        public override void OnFocus()
-        {
-            SoqAccessPlugin.Instance?.LogInfo("MainMenuScreen.OnFocus");
-            base.OnFocus();
-        }
-
-        public override bool OnActionJustPressed(InputAction action)
-        {
-            return base.OnActionJustPressed(action);
-        }
-
         private static ContainerWidget BuildRootWidget(MainMenuAdapter adapter)
         {
             ContainerWidget root = new ContainerWidget("main-menu-screen", "Main menu");

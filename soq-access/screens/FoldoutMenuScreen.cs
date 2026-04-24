@@ -25,11 +25,6 @@ namespace SongsOfConquestAccess.Screens
                 && _foldout.IsOpen();
         }
 
-        public override void OnFocus()
-        {
-            base.OnFocus();
-        }
-
         public override bool OnActionJustPressed(InputAction action)
         {
             if (action != null && action.Key == AccessibilityActions.Cancel.Key)
