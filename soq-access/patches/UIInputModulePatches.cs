@@ -29,9 +29,10 @@ namespace SongsOfConquestAccess
                 return true;
             }
 
-            // Arrow keys do not arrive through UnityInputManager.HandleInputActionTriggered.
-            // Intercept them at the UI module's navigation stage instead, but only when the top
-            // accessibility screen actually owns menu navigation.
+            // Some UI navigation keys are mapped in AccessibilityInputRouter but do not arrive
+            // through UnityInputManager.HandleInputActionTriggered unless the game has an active
+            // input action bound for them. Intercept those keys at the UI module's navigation
+            // stage instead, but only when the top accessibility screen owns the action.
             if (keyboard.upArrowKey.wasPressedThisFrame
                 && plugin.ScreenManager.CurrentScreenClaimsAction(AccessibilityActions.PreviousMenuItem.Key))
             {
@@ -43,6 +44,20 @@ namespace SongsOfConquestAccess
                 && plugin.ScreenManager.CurrentScreenClaimsAction(AccessibilityActions.NextMenuItem.Key))
             {
                 plugin.InputRouter.TryHandleRawKeyboardKey(Key.DownArrow);
+                return false;
+            }
+
+            if (keyboard.homeKey.wasPressedThisFrame
+                && plugin.ScreenManager.CurrentScreenClaimsAction(AccessibilityActions.FirstMenuItem.Key))
+            {
+                plugin.InputRouter.TryHandleRawKeyboardKey(Key.Home);
+                return false;
+            }
+
+            if (keyboard.endKey.wasPressedThisFrame
+                && plugin.ScreenManager.CurrentScreenClaimsAction(AccessibilityActions.LastMenuItem.Key))
+            {
+                plugin.InputRouter.TryHandleRawKeyboardKey(Key.End);
                 return false;
             }
 
