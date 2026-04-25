@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using SongsOfConquest.Client.Adventure;
 using SongsOfConquest.Client.Menu;
 using SongsOfConquest.Client.Menu.Main;
 using SongsOfConquest.Client.Menu.Popup;
@@ -27,6 +28,7 @@ namespace SongsOfConquestAccess.Screens
                 new MainMenuRuntimeScreenProbe(),
                 new CampaignMenuRuntimeScreenProbe(),
                 new CampaignMapSelectRuntimeScreenProbe(),
+                new LetterboxStoryTextRuntimeScreenProbe(),
                 new QuestionDialogRuntimeScreenProbe()
             };
         }
@@ -65,6 +67,35 @@ namespace SongsOfConquestAccess.Screens
         public void OnQuestionDialogClosed(object sourceKey)
         {
             if (sourceKey == null || !_screenManager.RemoveScreenForSource(sourceKey))
+            {
+                ResyncFromRuntimeState();
+            }
+        }
+
+        public void OnLetterboxStoryTextShown(LetterboxStoryText storyText)
+        {
+            LetterboxStoryTextAdapter adapter = new LetterboxStoryTextAdapter(storyText);
+            if (!adapter.IsPresent())
+            {
+                ResyncFromRuntimeState();
+                return;
+            }
+
+            LetterboxStoryTextScreen screen = new LetterboxStoryTextScreen(adapter);
+            Screen current = _screenManager.CurrentScreen;
+            if (current is LetterboxStoryTextScreen && ReferenceEquals(current.SourceKey, screen.SourceKey))
+            {
+                _screenManager.ReplaceTopScreen(screen);
+                return;
+            }
+
+            _screenManager.RemoveScreenForSource(screen.SourceKey);
+            _screenManager.PushScreen(screen);
+        }
+
+        public void OnLetterboxStoryTextHidden(LetterboxStoryText storyText)
+        {
+            if (storyText == null || !_screenManager.RemoveScreenForSource(storyText))
             {
                 ResyncFromRuntimeState();
             }
