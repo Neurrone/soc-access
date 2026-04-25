@@ -34,6 +34,34 @@ namespace SongsOfConquestAccess
             // input action bound for them. Intercept those keys at the UI module's navigation
             // stage instead, but only when the top accessibility screen owns the action.
             if (keyboard.upArrowKey.wasPressedThisFrame
+                && plugin.ScreenManager.CurrentScreenClaimsAction(AccessibilityActions.MapMoveNorth.Key))
+            {
+                plugin.InputRouter.TryHandleRawKeyboardKey(Key.UpArrow);
+                return false;
+            }
+
+            if (keyboard.downArrowKey.wasPressedThisFrame
+                && plugin.ScreenManager.CurrentScreenClaimsAction(AccessibilityActions.MapMoveSouth.Key))
+            {
+                plugin.InputRouter.TryHandleRawKeyboardKey(Key.DownArrow);
+                return false;
+            }
+
+            if (keyboard.leftArrowKey.wasPressedThisFrame
+                && plugin.ScreenManager.CurrentScreenClaimsAction(AccessibilityActions.MapMoveWest.Key))
+            {
+                plugin.InputRouter.TryHandleRawKeyboardKey(Key.LeftArrow);
+                return false;
+            }
+
+            if (keyboard.rightArrowKey.wasPressedThisFrame
+                && plugin.ScreenManager.CurrentScreenClaimsAction(AccessibilityActions.MapMoveEast.Key))
+            {
+                plugin.InputRouter.TryHandleRawKeyboardKey(Key.RightArrow);
+                return false;
+            }
+
+            if (keyboard.upArrowKey.wasPressedThisFrame
                 && plugin.ScreenManager.CurrentScreenClaimsAction(AccessibilityActions.PreviousMenuItem.Key))
             {
                 plugin.InputRouter.TryHandleRawKeyboardKey(Key.UpArrow);

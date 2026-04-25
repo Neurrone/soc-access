@@ -1,9 +1,10 @@
 using System.Collections.Generic;
 using HarmonyLib;
-using InputActions;
 using SongsOfConquest.Client.InputManagement;
 using SongsOfConquestAccess.Input;
+using UnityEngine;
 using UnityEngine.InputSystem;
+using CameraActions = InputActions.Camera;
 using InputSystemGamepad = UnityEngine.InputSystem.Gamepad;
 using UnityInputAction = UnityEngine.InputSystem.InputAction;
 
@@ -112,6 +113,27 @@ namespace SongsOfConquestAccess
                 default:
                     return InputPhase.Unknown;
             }
+        }
+    }
+
+    [HarmonyPatch(typeof(UnityInputManager), "GetStick")]
+    internal static class InputManagerGetStickPatches
+    {
+        [HarmonyPostfix]
+        private static void GetStickPostfix(ActionReference action, ref Vector2 __result)
+        {
+            if (action.Identifier != CameraActions.MoveCamera.Identifier)
+            {
+                return;
+            }
+
+            AccessibilityInputRouter router = SoqAccessPlugin.Instance != null ? SoqAccessPlugin.Instance.InputRouter : null;
+            if (router == null || !router.ShouldSuppressCameraMovePolling())
+            {
+                return;
+            }
+
+            __result = Vector2.zero;
         }
     }
 }

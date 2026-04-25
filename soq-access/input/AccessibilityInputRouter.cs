@@ -25,13 +25,26 @@ namespace SongsOfConquestAccess.Input
         public bool TryHandleKeyboardInput(InputSource source, InputPhase phase, InputControl control)
         {
             KeyControl keyControl = null;
-            if (source == InputSource.Keyboard && phase == InputPhase.Down)
+            if (source == InputSource.Keyboard)
             {
                 keyControl = control as KeyControl;
             }
 
             Key? key = keyControl != null ? (Key?)keyControl.keyCode : null;
+            if (phase != InputPhase.Down)
+            {
+                return ShouldSuppressKeyboardKey(key);
+            }
+
             return TryHandleKeyboardKey(key, "AccessibilityInputRouter detected");
+        }
+
+        public bool ShouldSuppressCameraMovePolling()
+        {
+            return CurrentScreenClaims(AccessibilityActions.MapMoveNorth)
+                || CurrentScreenClaims(AccessibilityActions.MapMoveSouth)
+                || CurrentScreenClaims(AccessibilityActions.MapMoveWest)
+                || CurrentScreenClaims(AccessibilityActions.MapMoveEast);
         }
 
         /// <summary>
@@ -65,7 +78,29 @@ namespace SongsOfConquestAccess.Input
             return _screenManager != null && _screenManager.DispatchAction(action);
         }
 
-        private static InputAction TryGetAccessibilityActionForKey(Key keyCode)
+        private bool ShouldSuppressKeyboardKey(Key? key)
+        {
+            if (!key.HasValue)
+            {
+                return false;
+            }
+
+            switch (key.Value)
+            {
+                case Key.UpArrow:
+                    return CurrentScreenClaims(AccessibilityActions.MapMoveNorth);
+                case Key.DownArrow:
+                    return CurrentScreenClaims(AccessibilityActions.MapMoveSouth);
+                case Key.LeftArrow:
+                    return CurrentScreenClaims(AccessibilityActions.MapMoveWest);
+                case Key.RightArrow:
+                    return CurrentScreenClaims(AccessibilityActions.MapMoveEast);
+                default:
+                    return false;
+            }
+        }
+
+        private InputAction TryGetAccessibilityActionForKey(Key keyCode)
         {
             Keyboard keyboard = Keyboard.current;
             switch (keyCode)
@@ -74,9 +109,23 @@ namespace SongsOfConquestAccess.Input
                     bool reverse = keyboard != null && (keyboard.leftShiftKey.isPressed || keyboard.rightShiftKey.isPressed);
                     return reverse ? AccessibilityActions.PreviousWidget : AccessibilityActions.NextWidget;
                 case Key.UpArrow:
+                    if (CurrentScreenClaims(AccessibilityActions.MapMoveNorth))
+                    {
+                        return AccessibilityActions.MapMoveNorth;
+                    }
+
                     return AccessibilityActions.PreviousMenuItem;
                 case Key.DownArrow:
+                    if (CurrentScreenClaims(AccessibilityActions.MapMoveSouth))
+                    {
+                        return AccessibilityActions.MapMoveSouth;
+                    }
+
                     return AccessibilityActions.NextMenuItem;
+                case Key.LeftArrow:
+                    return CurrentScreenClaims(AccessibilityActions.MapMoveWest) ? AccessibilityActions.MapMoveWest : null;
+                case Key.RightArrow:
+                    return CurrentScreenClaims(AccessibilityActions.MapMoveEast) ? AccessibilityActions.MapMoveEast : null;
                 case Key.Home:
                     return AccessibilityActions.FirstMenuItem;
                 case Key.End:
@@ -89,6 +138,13 @@ namespace SongsOfConquestAccess.Input
                 default:
                     return null;
             }
+        }
+
+        private bool CurrentScreenClaims(InputAction action)
+        {
+            return action != null
+                && _screenManager != null
+                && _screenManager.CurrentScreenClaimsAction(action.Key);
         }
     }
 }

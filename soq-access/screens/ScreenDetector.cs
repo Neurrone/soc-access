@@ -29,6 +29,7 @@ namespace SongsOfConquestAccess.Screens
                 new MainMenuRuntimeScreenProbe(),
                 new CampaignMenuRuntimeScreenProbe(),
                 new CampaignMapSelectRuntimeScreenProbe(),
+                new AdventureMapRuntimeScreenProbe(),
                 new LetterboxStoryTextRuntimeScreenProbe(),
                 new QuestionDialogRuntimeScreenProbe()
             };
@@ -232,6 +233,30 @@ namespace SongsOfConquestAccess.Screens
             {
                 _screenManager.RemoveScreens(screen => screen is CampaignMenuScreen);
             }
+        }
+
+        public void OnAdventureSceneLoaded()
+        {
+            AdventureMapScreen screen = AdventureMapRuntimeScreenProbe.FindActiveAdventureMapScreen();
+            if (screen == null || !screen.IsPresent())
+            {
+                SoqAccessPlugin.Instance?.LogWarning("ScreenDetector.OnAdventureSceneLoaded could not find a ready adventure map");
+                return;
+            }
+
+            Screen current = _screenManager.CurrentScreen;
+            if (current is AdventureMapScreen && ReferenceEquals(current.SourceKey, screen.SourceKey))
+            {
+                _screenManager.ReplaceTopScreen(screen);
+                return;
+            }
+
+            _screenManager.PushScreen(screen);
+        }
+
+        public void OnAdventureSceneUnloading()
+        {
+            _screenManager.RemoveScreens(screen => screen is AdventureMapScreen);
         }
 
         public void ResyncFromRuntimeState()

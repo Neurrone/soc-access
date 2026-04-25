@@ -49,6 +49,10 @@
       <HintPath>$(GameManagedDir)\UnityEngine.InputLegacyModule.dll</HintPath>
       <Private>false</Private>
     </Reference>
+    <Reference Include="Unity.Mathematics">
+      <HintPath>$(GameManagedDir)\Unity.Mathematics.dll</HintPath>
+      <Private>false</Private>
+    </Reference>
     <Reference Include="Unity.InputSystem">
       <HintPath>$(GameManagedDir)\Unity.InputSystem.dll</HintPath>
       <Private>false</Private>
@@ -83,6 +87,10 @@
     </Reference>
     <Reference Include="Lavapotion.SongsOfConquest.UtilitiesLayer.Runtime">
       <HintPath>$(GameManagedDir)\Lavapotion.SongsOfConquest.UtilitiesLayer.Runtime.dll</HintPath>
+      <Private>false</Private>
+    </Reference>
+    <Reference Include="Lavapotion.Utilities">
+      <HintPath>$(GameManagedDir)\Lavapotion.Utilities.dll</HintPath>
       <Private>false</Private>
     </Reference>
   </ItemGroup>
