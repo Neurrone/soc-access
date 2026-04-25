@@ -26,6 +26,8 @@ namespace SongsOfConquestAccess
                 return;
             }
 
+            SoqAccessPlugin.Instance?.ScreenDetector?.OnMainMenuSceneLoaded(loadedScene);
+
             if (loadedScene != MainMenuSceneType.MainMenu)
             {
                 StopPendingOpenCoroutine(__instance);

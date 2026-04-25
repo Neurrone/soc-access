@@ -18,5 +18,12 @@ namespace SongsOfConquestAccess
         {
             SoqAccessPlugin.Instance?.ScreenDetector?.OnCampaignMapSelectAvailable(__instance);
         }
+
+        [HarmonyPatch(typeof(CampaignMapSelectedInformationView), "Dispose")]
+        [HarmonyPostfix]
+        private static void CampaignMapSelectedInformationViewDisposePostfix(CampaignMapSelectedInformationView __instance)
+        {
+            SoqAccessPlugin.Instance?.ScreenDetector?.OnCampaignMapSelectHidden(__instance);
+        }
     }
 }

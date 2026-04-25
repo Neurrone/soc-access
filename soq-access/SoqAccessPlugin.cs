@@ -4,7 +4,7 @@ using SongsOfConquestAccess.Input;
 using SongsOfConquestAccess.Screens;
 using SongsOfConquestAccess.Speech;
 using SongsOfConquestAccess.UI;
-using UnityEngine.SceneManagement;
+using UnityEngine;
 
 namespace SongsOfConquestAccess
 {
@@ -38,7 +38,6 @@ namespace SongsOfConquestAccess
             _harmony = new Harmony(PluginGuid);
             _harmony.PatchAll(typeof(PopupMenuPatches).Assembly);
             Logger.LogInfo("Harmony patches applied");
-            SceneManager.sceneLoaded += HandleSceneLoaded;
         }
 
         private void Start()
@@ -51,7 +50,6 @@ namespace SongsOfConquestAccess
         private void OnDestroy()
         {
             Logger.LogInfo("Accessibility plugin OnDestroy");
-            SceneManager.sceneLoaded -= HandleSceneLoaded;
             _harmony?.UnpatchSelf();
             _harmony = null;
             _inputRouter = null;
@@ -70,12 +68,6 @@ namespace SongsOfConquestAccess
         private void Update()
         {
             UIManager.Update();
-        }
-
-        private void HandleSceneLoaded(Scene scene, LoadSceneMode loadSceneMode)
-        {
-            Logger.LogInfo("Scene loaded: " + scene.name + ", mode: " + loadSceneMode);
-            _screenDetector?.ResyncFromRuntimeState();
         }
 
         internal ScreenDetector ScreenDetector
@@ -115,5 +107,6 @@ namespace SongsOfConquestAccess
             _announcedReady = true;
             Logger.LogInfo(message);
         }
+
     }
 }

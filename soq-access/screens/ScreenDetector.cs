@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using SongsOfConquest.Client.Adventure;
 using SongsOfConquest.Client.Menu;
+using SongsOfConquest.Client.Menu.Loading;
 using SongsOfConquest.Client.Menu.Main;
 using SongsOfConquest.Client.Menu.Popup;
 using SongsOfConquest.Client.UI;
@@ -212,6 +213,25 @@ namespace SongsOfConquestAccess.Screens
             }
 
             _screenManager.PushScreen(screen);
+        }
+
+        public void OnCampaignMapSelectHidden(CampaignMapSelectedInformationView informationView)
+        {
+            if (informationView != null)
+            {
+                _screenManager.RemoveScreenForSource(informationView);
+                return;
+            }
+
+            _screenManager.RemoveScreens(screen => screen is CampaignMapSelectScreen);
+        }
+
+        public void OnMainMenuSceneLoaded(MainMenuSceneType loadedScene)
+        {
+            if (loadedScene != MainMenuSceneType.Campaign)
+            {
+                _screenManager.RemoveScreens(screen => screen is CampaignMenuScreen);
+            }
         }
 
         public void ResyncFromRuntimeState()
