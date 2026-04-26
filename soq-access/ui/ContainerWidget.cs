@@ -31,6 +31,11 @@ namespace SongsOfConquestAccess.UI
             }
         }
 
+        public int FocusedIndex
+        {
+            get { return _focusedIndex; }
+        }
+
         public override string GetLabel()
         {
             return Label;
@@ -65,6 +70,11 @@ namespace SongsOfConquestAccess.UI
             }
 
             return false;
+        }
+
+        public bool SetFocusByIndex(int index)
+        {
+            return SetFocus(ClampToVisibleIndex(index));
         }
 
         protected override void OnFocus()
@@ -165,6 +175,60 @@ namespace SongsOfConquestAccess.UI
         private int FindFirstVisibleIndex()
         {
             for (int i = 0; i < _children.Count; i++)
+            {
+                if (_children[i].IsVisible)
+                {
+                    return i;
+                }
+            }
+
+            return -1;
+        }
+
+        private int FindLastVisibleIndex()
+        {
+            for (int i = _children.Count - 1; i >= 0; i--)
+            {
+                if (_children[i].IsVisible)
+                {
+                    return i;
+                }
+            }
+
+            return -1;
+        }
+
+        private int ClampToVisibleIndex(int index)
+        {
+            if (_children.Count == 0)
+            {
+                return -1;
+            }
+
+            if (index < 0)
+            {
+                return FindFirstVisibleIndex();
+            }
+
+            if (index >= _children.Count)
+            {
+                return FindLastVisibleIndex();
+            }
+
+            if (_children[index].IsVisible)
+            {
+                return index;
+            }
+
+            for (int i = index; i < _children.Count; i++)
+            {
+                if (_children[i].IsVisible)
+                {
+                    return i;
+                }
+            }
+
+            for (int i = index - 1; i >= 0; i--)
             {
                 if (_children[i].IsVisible)
                 {

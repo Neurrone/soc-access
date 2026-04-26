@@ -29,6 +29,11 @@ namespace SongsOfConquestAccess.UI
             }
         }
 
+        public int FocusedIndex
+        {
+            get { return _focusedIndex; }
+        }
+
         public override string GetLabel()
         {
             return Label;
@@ -75,6 +80,11 @@ namespace SongsOfConquestAccess.UI
             return false;
         }
 
+        public bool SetFocusByIndex(int index)
+        {
+            return SetFocus(ClampToVisibleIndex(index));
+        }
+
         public override Widget GetFocusedWidget()
         {
             return FocusedItem != null ? FocusedItem.GetFocusedWidget() : this;
@@ -84,13 +94,11 @@ namespace SongsOfConquestAccess.UI
         {
             if (FocusedItem != null && FocusedItem.IsVisible)
             {
-                SoqAccessPlugin.Instance?.LogInfo("MenuWidget.OnFocus reusing focused item " + FocusedItem.Id);
                 FocusedItem.Focus();
                 UIManager.SetFocusedWidget(FocusedItem.GetFocusedWidget());
                 return;
             }
 
-            SoqAccessPlugin.Instance?.LogInfo("MenuWidget.OnFocus selecting first visible item");
             SetFocus(FindFirstVisibleIndex());
         }
 
@@ -150,7 +158,6 @@ namespace SongsOfConquestAccess.UI
         {
             if (_items.Count == 0)
             {
-                SoqAccessPlugin.Instance?.LogInfo("MenuWidget.MoveRelative ignored because there are no items");
                 return false;
             }
 
@@ -165,7 +172,6 @@ namespace SongsOfConquestAccess.UI
             {
                 if (_items[nextIndex].IsVisible)
                 {
-                    SoqAccessPlugin.Instance?.LogInfo("MenuWidget.MoveRelative moving focus to index " + nextIndex + " (" + _items[nextIndex].Id + ")");
                     return SetFocus(nextIndex);
                 }
 
@@ -201,18 +207,57 @@ namespace SongsOfConquestAccess.UI
             return -1;
         }
 
+        private int ClampToVisibleIndex(int index)
+        {
+            if (_items.Count == 0)
+            {
+                return -1;
+            }
+
+            if (index < 0)
+            {
+                return FindFirstVisibleIndex();
+            }
+
+            if (index >= _items.Count)
+            {
+                return FindLastVisibleIndex();
+            }
+
+            if (_items[index].IsVisible)
+            {
+                return index;
+            }
+
+            for (int i = index; i < _items.Count; i++)
+            {
+                if (_items[i].IsVisible)
+                {
+                    return i;
+                }
+            }
+
+            for (int i = index - 1; i >= 0; i--)
+            {
+                if (_items[i].IsVisible)
+                {
+                    return i;
+                }
+            }
+
+            return -1;
+        }
+
         private bool SetFocus(int index)
         {
             if (index < 0 || index >= _items.Count)
             {
-                SoqAccessPlugin.Instance?.LogInfo("MenuWidget.SetFocus rejected invalid index " + index);
                 return false;
             }
 
             MenuItemWidget next = _items[index];
             if (next == null || !next.IsVisible)
             {
-                SoqAccessPlugin.Instance?.LogInfo("MenuWidget.SetFocus rejected index " + index + " because the item is not visible");
                 return false;
             }
 
@@ -223,7 +268,6 @@ namespace SongsOfConquestAccess.UI
             }
 
             _focusedIndex = index;
-            SoqAccessPlugin.Instance?.LogInfo("MenuWidget.SetFocus focused index " + index + " (" + next.Id + ")");
             next.Focus();
             UIManager.SetFocusedWidget(next.GetFocusedWidget());
             return true;
