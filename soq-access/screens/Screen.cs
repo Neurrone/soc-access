@@ -13,7 +13,7 @@ namespace SongsOfConquestAccess.Screens
 
         public object SourceKey { get; private set; }
 
-        public ContainerWidget RootWidget { get; private set; }
+        public ContainerWidget RootWidget { get; protected set; }
 
         public abstract bool IsPresent();
 
