@@ -43,6 +43,27 @@ Because the mod is hot-reloaded by Script Engine, every change must be reload-sa
 - unpatch Harmony hooks on unload
 - avoid leaving loose `GameObject`s or components alive across reloads
 
+## Native Input Equivalence
+
+When implementing keyboard access that is meant to emulate an existing mouse or gamepad action, always invoke the game's native input path instead of recreating the action's rules in the mod.
+
+Before adding any custom validation logic, inspect the decompiled input flow and identify:
+
+- the native public or private method that handles the action
+- the hover, cursor, pointer, or selection state that method expects to already be populated
+- the native feedback path for denied actions, sounds, tooltips, and notifications
+
+Do not reconstruct movement, pathing, interaction, or actionability rules in the mod unless the user explicitly approves that tradeoff. If native behavior depends on cursor state, update or synthesize the same cursor/input state the game uses before invoking the native handler.
+
+If native emulation behaves differently from mouse input:
+
+1. Add targeted runtime logging at the native input boundary.
+2. Compare native mouse input and accessibility-triggered input using the same tile and screen point.
+3. Fix the state mismatch, not the symptom.
+4. Avoid adding special-case fallback logic unless the user explicitly asks for it.
+
+For map cursor overlays, ensure the overlay represents the actual native screen point used for input. If users rely on the overlay to compare against mouse clicks, overlay accuracy is part of input correctness.
+
 ## Screen Readiness Hooks
 
 Do not treat Unity scene load or `MonoBehaviour.Awake()` as proof that a menu is accessible-ready.
