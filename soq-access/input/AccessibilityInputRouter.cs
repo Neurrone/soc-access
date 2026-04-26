@@ -1,5 +1,6 @@
 using SongsOfConquest.Client.InputManagement;
 using SongsOfConquestAccess.Screens;
+using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.InputSystem.Controls;
 
@@ -9,6 +10,7 @@ namespace SongsOfConquestAccess.Input
     {
         private readonly ScreenManager _screenManager;
         private Key? _pressedAccessibilityKey;
+        private int _pressedAccessibilityKeyFrame = -1;
 
         public AccessibilityInputRouter(ScreenManager screenManager)
         {
@@ -37,6 +39,7 @@ namespace SongsOfConquestAccess.Input
                 if (phase == InputPhase.Up && key.HasValue && _pressedAccessibilityKey == key.Value)
                 {
                     _pressedAccessibilityKey = null;
+                    _pressedAccessibilityKeyFrame = -1;
                 }
 
                 return ShouldSuppressKeyboardKey(key);
@@ -64,10 +67,15 @@ namespace SongsOfConquestAccess.Input
         /// </summary>
         public bool TryHandleRawKeyboardKey(Key key)
         {
-            return TryHandleKeyboardKey(key, "AccessibilityInputRouter intercepted raw key");
+            return TryHandleKeyboardKey(key, "AccessibilityInputRouter intercepted raw key", true);
         }
 
         private bool TryHandleKeyboardKey(Key? key, string logPrefix)
+        {
+            return TryHandleKeyboardKey(key, logPrefix, false);
+        }
+
+        private bool TryHandleKeyboardKey(Key? key, string logPrefix, bool rawFreshPress)
         {
             if (!key.HasValue)
             {
@@ -87,10 +95,20 @@ namespace SongsOfConquestAccess.Input
             // until its Up event clears _pressedAccessibilityKey.
             if (_pressedAccessibilityKey == key.Value)
             {
+                // Raw UI-module interception is driven by wasPressedThisFrame and may
+                // not receive a matching Up event through UnityInputManager. Keep
+                // suppressing same-frame duplicates, but allow the next physical press.
+                if (rawFreshPress && _pressedAccessibilityKeyFrame != Time.frameCount)
+                {
+                    _pressedAccessibilityKeyFrame = Time.frameCount;
+                    return _screenManager != null && _screenManager.DispatchAction(action);
+                }
+
                 return true;
             }
 
             _pressedAccessibilityKey = key.Value;
+            _pressedAccessibilityKeyFrame = Time.frameCount;
             return _screenManager != null && _screenManager.DispatchAction(action);
         }
 
