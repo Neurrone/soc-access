@@ -8,6 +8,7 @@ namespace SongsOfConquestAccess.Input
     internal sealed class AccessibilityInputRouter
     {
         private readonly ScreenManager _screenManager;
+        private Key? _pressedAccessibilityKey;
 
         public AccessibilityInputRouter(ScreenManager screenManager)
         {
@@ -33,6 +34,11 @@ namespace SongsOfConquestAccess.Input
             Key? key = keyControl != null ? (Key?)keyControl.keyCode : null;
             if (phase != InputPhase.Down)
             {
+                if (phase == InputPhase.Up && key.HasValue && _pressedAccessibilityKey == key.Value)
+                {
+                    _pressedAccessibilityKey = null;
+                }
+
                 return ShouldSuppressKeyboardKey(key);
             }
 
@@ -74,7 +80,17 @@ namespace SongsOfConquestAccess.Input
                 return false;
             }
 
-            SoqAccessPlugin.Instance?.LogInfo(logPrefix + " key " + key.Value + " as action " + action.Key);
+            // A single physical key press can arrive more than once from the game's
+            // input stack. For example, Tab can be reported through multiple native
+            // actions on the commander sheet. Treat the first Down event as the
+            // accessibility action and suppress later Down events for the same key
+            // until its Up event clears _pressedAccessibilityKey.
+            if (_pressedAccessibilityKey == key.Value)
+            {
+                return true;
+            }
+
+            _pressedAccessibilityKey = key.Value;
             return _screenManager != null && _screenManager.DispatchAction(action);
         }
 
