@@ -1,0 +1,66 @@
+using SongsOfConquestAccess.Adapters;
+using SongsOfConquestAccess.Input;
+using SongsOfConquestAccess.UI;
+
+namespace SongsOfConquestAccess.Screens
+{
+    internal sealed class TutorialSimpleScreen : Screen
+    {
+        private readonly TutorialSimpleAdapter _adapter;
+
+        public TutorialSimpleScreen(TutorialSimpleAdapter adapter)
+            : base(adapter != null ? adapter.SourceKey : null, BuildRoot(adapter))
+        {
+            _adapter = adapter;
+        }
+
+        public override bool IsPresent()
+        {
+            return _adapter != null && _adapter.IsPresent();
+        }
+
+        public override bool OnActionJustPressed(InputAction action)
+        {
+            if (action != null && action.Key == AccessibilityActions.Cancel.Key)
+            {
+                if (_adapter != null && _adapter.IsOkAvailable())
+                {
+                    _adapter.ActivateOk();
+                }
+
+                return true;
+            }
+
+            return base.OnActionJustPressed(action);
+        }
+
+        private static ContainerWidget BuildRoot(TutorialSimpleAdapter adapter)
+        {
+            ContainerWidget root = new ContainerWidget("tutorial-simple-screen", "Tutorial");
+            root.AddChild(new TextWidget(
+                "tutorial-simple-header",
+                () => adapter != null ? adapter.Header : string.Empty,
+                null,
+                includeParentLabelInAnnouncement: false));
+            root.AddChild(new TextWidget(
+                "tutorial-simple-description",
+                () => adapter != null ? adapter.Description : string.Empty,
+                null,
+                includeParentLabelInAnnouncement: false));
+            root.AddChild(new CheckboxWidget(
+                "tutorial-simple-tutorials-toggle",
+                adapter != null ? adapter.TutorialsToggleLabel : "Show tutorials",
+                () => { if (adapter != null) adapter.ToggleTutorials(); },
+                () => adapter != null && adapter.IsTutorialsChecked(),
+                () => adapter != null));
+            root.AddChild(new ButtonWidget(
+                "tutorial-simple-ok",
+                adapter != null ? adapter.OkLabel : "OK",
+                () => adapter != null && adapter.ActivateOk(),
+                null,
+                () => adapter != null && adapter.IsOkAvailable(),
+                () => adapter != null && adapter.IsOkAvailable()));
+            return root;
+        }
+    }
+}

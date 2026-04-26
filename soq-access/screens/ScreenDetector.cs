@@ -34,8 +34,27 @@ namespace SongsOfConquestAccess.Screens
                 new AdventureMapRuntimeScreenProbe(),
                 new CommanderSheetRuntimeScreenProbe(),
                 new LetterboxStoryTextRuntimeScreenProbe(),
-                new QuestionDialogRuntimeScreenProbe()
+                new QuestionDialogRuntimeScreenProbe(),
+                new TutorialRuntimeScreenProbe()
             };
+        }
+
+        public void OnTutorialOpened(TutorialMenu tutorialMenu)
+        {
+            PushOrReplaceTutorialScreen(tutorialMenu);
+        }
+
+        public void OnTutorialPageChanged(TutorialMenu tutorialMenu)
+        {
+            PushOrReplaceTutorialScreen(tutorialMenu);
+        }
+
+        public void OnTutorialClosed(TutorialMenu tutorialMenu)
+        {
+            if (tutorialMenu == null || !_screenManager.RemoveScreenForSource(tutorialMenu))
+            {
+                ResyncFromRuntimeState();
+            }
         }
 
         public void OnQuestionDialogOpened(object sourceKey, PopupMenu.Settings settings)
@@ -331,6 +350,50 @@ namespace SongsOfConquestAccess.Screens
             }
 
             _screenManager.SynchronizeStack(activeScreens);
+        }
+
+        private void PushOrReplaceTutorialScreen(TutorialMenu tutorialMenu)
+        {
+            if (tutorialMenu == null)
+            {
+                ResyncFromRuntimeState();
+                return;
+            }
+
+            Screen screen = BuildTutorialScreen(tutorialMenu);
+            if (screen == null || !screen.IsPresent())
+            {
+                ResyncFromRuntimeState();
+                return;
+            }
+
+            Screen current = _screenManager.CurrentScreen;
+            if ((current is TutorialSlideshowScreen || current is TutorialSimpleScreen)
+                && ReferenceEquals(current.SourceKey, screen.SourceKey))
+            {
+                _screenManager.ReplaceTopScreen(screen);
+                return;
+            }
+
+            _screenManager.RemoveScreenForSource(screen.SourceKey);
+            _screenManager.PushScreen(screen);
+        }
+
+        private static Screen BuildTutorialScreen(TutorialMenu tutorialMenu)
+        {
+            TutorialSlideshowAdapter slideshowAdapter = new TutorialSlideshowAdapter(tutorialMenu);
+            if (slideshowAdapter.IsPresent())
+            {
+                return new TutorialSlideshowScreen(slideshowAdapter);
+            }
+
+            TutorialSimpleAdapter simpleAdapter = new TutorialSimpleAdapter(tutorialMenu);
+            if (simpleAdapter.IsPresent())
+            {
+                return new TutorialSimpleScreen(simpleAdapter);
+            }
+
+            return null;
         }
 
         private void RemoveKnownFoldouts(MainMenuAdapter adapter)
