@@ -95,6 +95,8 @@ namespace SongsOfConquestAccess.Input
                     return CurrentScreenClaims(AccessibilityActions.MapMoveWest);
                 case Key.RightArrow:
                     return CurrentScreenClaims(AccessibilityActions.MapMoveEast);
+                case Key.Backslash:
+                    return CurrentScreenClaims(AccessibilityActions.MapSecondaryAction);
                 default:
                     return false;
             }
@@ -133,6 +135,8 @@ namespace SongsOfConquestAccess.Input
                 case Key.Enter:
                 case Key.NumpadEnter:
                     return AccessibilityActions.Activate;
+                case Key.Backslash:
+                    return AccessibilityActions.MapSecondaryAction;
                 case Key.Escape:
                     return AccessibilityActions.Cancel;
                 default:

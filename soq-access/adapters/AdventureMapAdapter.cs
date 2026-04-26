@@ -9,14 +9,17 @@ using SongsOfConquest.Client.Adventure.Map;
 using SongsOfConquest.Client.Gamestate;
 using SongsOfConquest.Client.Gamestate.Facade;
 using SongsOfConquest.Client.Grid;
+using SongsOfConquest.Client.InputManagement;
 using SongsOfConquest.Client.Menu.Tooltip;
 using SongsOfConquest.Common.Details;
 using SongsOfConquest.Common.Entities;
 using SongsOfConquest.Common.Entities.Adventure;
 using SongsOfConquest.Common.Gamestate;
 using SongsOfConquest.Common.Localization;
+using SongsOfConquestAccess.Events;
 using Unity.Mathematics;
 using UnityEngine;
+using UnityEngine.UI;
 using Zenject;
 
 namespace SongsOfConquestAccess.Adapters
@@ -35,6 +38,9 @@ namespace SongsOfConquestAccess.Adapters
         private readonly IAdventureTooltipManager _tooltipManager;
         private readonly ILocalizationHandler _localizationHandler;
         private readonly ICartographyVisualManifest _cartographyVisualManifest;
+        private readonly IHumanAdventureController _humanAdventureController;
+        private readonly IHumanAdventureControllerFacade _humanAdventureControllerFacade;
+        private readonly IInputManager _inputManager;
         private readonly MethodInfo _worldToPointMethod;
         private readonly MethodInfo _pointToWorldMethod;
         private readonly MethodInfo _getTooltipForTilePositionMethod;
@@ -42,8 +48,9 @@ namespace SongsOfConquestAccess.Adapters
         private readonly FieldInfo _innerTooltipManagerField;
         private readonly FieldInfo _gamepadTooltipHandleField;
         private readonly FieldInfo _fogHasFinishedLoadingField;
+        private readonly FieldInfo _currentInputModuleField;
         private GameObject _cursorOverlay;
-        private LineRenderer _cursorLine;
+        private RectTransform[] _cursorOverlaySegments;
 
         public AdventureMapAdapter(
             object sourceKey,
@@ -56,7 +63,10 @@ namespace SongsOfConquestAccess.Adapters
             object cartographyConverter,
             IAdventureTooltipManager tooltipManager,
             ILocalizationHandler localizationHandler,
-            ICartographyVisualManifest cartographyVisualManifest)
+            ICartographyVisualManifest cartographyVisualManifest,
+            IHumanAdventureController humanAdventureController,
+            IHumanAdventureControllerFacade humanAdventureControllerFacade,
+            IInputManager inputManager)
         {
             SourceKey = sourceKey;
             _container = container;
@@ -69,6 +79,9 @@ namespace SongsOfConquestAccess.Adapters
             _tooltipManager = tooltipManager;
             _localizationHandler = localizationHandler;
             _cartographyVisualManifest = cartographyVisualManifest;
+            _humanAdventureController = humanAdventureController;
+            _humanAdventureControllerFacade = humanAdventureControllerFacade;
+            _inputManager = inputManager;
             _worldToPointMethod = cartographyConverter != null
                 ? AccessTools.Method(cartographyConverter.GetType(), "WorldToPoint", new[] { typeof(float3) })
                 : null;
@@ -90,6 +103,9 @@ namespace SongsOfConquestAccess.Adapters
                 : null;
             _fogHasFinishedLoadingField = fogManager != null
                 ? AccessTools.Field(fogManager.GetType(), "_hasFinishedLoading")
+                : null;
+            _currentInputModuleField = humanAdventureController != null
+                ? AccessTools.Field(humanAdventureController.GetType(), "_currentInputModule")
                 : null;
         }
 
@@ -170,6 +186,11 @@ namespace SongsOfConquestAccess.Adapters
             if (_cartographyVisualManifest == null)
             {
                 return "missing cartography visual manifest";
+            }
+
+            if (_inputManager == null)
+            {
+                return "missing input manager";
             }
 
             if (_facade.Level.Width <= 0 || _facade.Level.Height <= 0)
@@ -301,28 +322,42 @@ namespace SongsOfConquestAccess.Adapters
             try
             {
                 EnsureCursorOverlay();
-                if (_cursorLine == null || _cursorOverlay == null)
+                if (_cursorOverlaySegments == null || _cursorOverlay == null)
                 {
                     return;
                 }
 
-                if (ShouldShowTileDiamond(tile))
-                {
-                    Vector3[] points = GetTileOutlinePoints(tile);
-                    _cursorLine.positionCount = points.Length;
-                    _cursorLine.SetPositions(points);
-                    _cursorOverlay.SetActive(true);
-                }
-                else
-                {
-                    _cursorOverlay.SetActive(false);
-                }
+                SetScreenOverlayPosition(GetScreenPoint(tile));
+                _cursorOverlay.SetActive(true);
 
                 ShowFocusedTileTooltip(tile);
             }
             catch (Exception exception)
             {
                 SoqAccessPlugin.Instance?.LogWarning("AdventureMapAdapter failed to set focused tile overlay: " + exception.Message);
+            }
+        }
+
+        public void EnsureTileInView(Vector2Int tile)
+        {
+            if (!IsWithinMap(tile) || _cameraController == null)
+            {
+                return;
+            }
+
+            try
+            {
+                Vector3 world = GetWorldCenter(tile);
+                _cameraController.MoveToIncludePosition(
+                    world,
+                    0.10f,
+                    0.10f,
+                    0.10f,
+                    0.10f);
+            }
+            catch (Exception exception)
+            {
+                SoqAccessPlugin.Instance?.LogWarning("AdventureMapAdapter failed to keep focused tile in view: " + exception.Message);
             }
         }
 
@@ -337,13 +372,349 @@ namespace SongsOfConquestAccess.Adapters
             {
                 UnityEngine.Object.Destroy(_cursorOverlay);
                 _cursorOverlay = null;
-                _cursorLine = null;
+                _cursorOverlaySegments = null;
                 _tooltipManager?.HideTileTooltip();
             }
             catch (Exception exception)
             {
                 SoqAccessPlugin.Instance?.LogWarning("AdventureMapAdapter failed to clear focused tile overlay: " + exception.Message);
             }
+        }
+
+        public bool HandlePrimaryAction(Vector2Int position)
+        {
+            Vector2Int tilePosition = ClampToMap(position);
+
+            try
+            {
+                TryInvokeNativeMapInput(
+                    tilePosition,
+                    "primary",
+                    "Map input is not ready.",
+                    "Could not target tile.",
+                    delegate(object inputModule, ScreenInputOverride screenInputOverride)
+                    {
+                        InvokeNativeInputModuleAction(inputModule, "HandlePrimaryInputStart");
+                        InvokeNativeInputModuleAction(inputModule, "HandlePrimaryInputClick");
+                    });
+                return true;
+            }
+            catch (Exception exception)
+            {
+                SoqAccessPlugin.Instance?.LogWarning("AdventureMapAdapter primary action failed: " + exception);
+                PublishDenied(tilePosition, "Could not perform primary action.");
+                return true;
+            }
+        }
+
+        public bool HandleSecondaryAction(Vector2Int position)
+        {
+            Vector2Int tilePosition = ClampToMap(position);
+
+            try
+            {
+                TryInvokeNativeMapInput(
+                    tilePosition,
+                    "secondary",
+                    "Map interaction is not ready.",
+                    "Could not target tile.",
+                    delegate(object inputModule, ScreenInputOverride screenInputOverride)
+                    {
+                        ICommanderState selectedCommander = _selectionHandler.SelectedCommander;
+                        bool hadDestination = selectedCommander != null && selectedCommander.Destination.HasDestination;
+                        Vector2Int previousDestination = hadDestination ? selectedCommander.Destination.Destination : Vector2Int.zero;
+                        HumanAdventureController.State previousState = _humanAdventureControllerFacade.StateMachine.CurrentStateType;
+
+                        InvokeNativeInputModuleAction(inputModule, "HandleSecondaryInputStart");
+                        InvokeNativeInputModuleAction(inputModule, "HandleSecondaryInputEnded");
+
+                        LogNativeSecondaryDiagnostic(tilePosition, selectedCommander, previousState, hadDestination, previousDestination);
+                    });
+                return true;
+            }
+            catch (Exception exception)
+            {
+                SoqAccessPlugin.Instance?.LogWarning("AdventureMapAdapter secondary action failed: " + exception);
+                PublishDenied(tilePosition, "Could not perform secondary action.");
+                return true;
+            }
+        }
+
+        private bool TryInvokeNativeMapInput(
+            Vector2Int tilePosition,
+            string inputName,
+            string unavailableMessage,
+            string targetFailureMessage,
+            Action<object, ScreenInputOverride> invoke)
+        {
+            if (_humanAdventureControllerFacade == null)
+            {
+                PublishDenied(tilePosition, unavailableMessage);
+                return false;
+            }
+
+            object inputModule = GetCurrentInputModule();
+            if (inputModule == null)
+            {
+                SoqAccessPlugin.Instance?.LogWarning("AdventureMapAdapter could not invoke native " + inputName + " action because current input module was null");
+                PublishDenied(tilePosition, unavailableMessage);
+                return false;
+            }
+
+            ScreenInputOverride screenInputOverride;
+            if (!TryBeginScreenInputOverride(tilePosition, out screenInputOverride))
+            {
+                PublishDenied(tilePosition, targetFailureMessage);
+                return false;
+            }
+
+            try
+            {
+                InvokeNativeInputModuleAction(inputModule, "UpdateCurrentTile");
+                LogNativeHoverDiagnostic(tilePosition, screenInputOverride.ScreenPosition);
+                invoke?.Invoke(inputModule, screenInputOverride);
+            }
+            finally
+            {
+                screenInputOverride.Restore();
+            }
+
+            return true;
+        }
+
+        private bool TryBeginScreenInputOverride(Vector2Int tilePosition, out ScreenInputOverride screenInputOverride)
+        {
+            screenInputOverride = null;
+            if (_inputManager == null || _inputManager.Screen == null || _inputManager.Screen.Primary == null)
+            {
+                SoqAccessPlugin.Instance?.LogWarning("AdventureMapAdapter could not override native screen input because primary screen input was unavailable");
+                return false;
+            }
+
+            if (_cameraController == null || _cameraController.Camera == null)
+            {
+                SoqAccessPlugin.Instance?.LogWarning("AdventureMapAdapter could not override native screen input because the adventure camera was unavailable");
+                return false;
+            }
+
+            object response = ResolveWritableScreenInputResponse(_inputManager.Screen.Primary);
+            if (response == null)
+            {
+                SoqAccessPlugin.Instance?.LogWarning("AdventureMapAdapter could not override native screen input because no writable ScreenInputResponse could be resolved from " + _inputManager.Screen.Primary.GetType().FullName);
+                return false;
+            }
+
+            Vector3 worldPosition = GetWorldCenter(tilePosition);
+            Vector3 screenPosition3 = _cameraController.Camera.WorldToScreenPoint(worldPosition);
+            Vector2 screenPosition = new Vector2(screenPosition3.x, screenPosition3.y);
+            if (screenPosition3.z < 0f
+                || screenPosition.x < 0f
+                || screenPosition.y < 0f
+                || screenPosition.x > Screen.width
+                || screenPosition.y > Screen.height)
+            {
+                SoqAccessPlugin.Instance?.LogWarning("AdventureMapAdapter could not target tile " + FormatTile(tilePosition) + " because its screen position is outside the current view: " + screenPosition);
+                return false;
+            }
+
+            screenInputOverride = ScreenInputOverride.Apply(response, screenPosition);
+            return screenInputOverride != null;
+        }
+
+        private object ResolveWritableScreenInputResponse(object response)
+        {
+            if (response == null)
+            {
+                return null;
+            }
+
+            PropertyInfo positionProperty = AccessTools.Property(response.GetType(), "Position");
+            if (positionProperty != null && positionProperty.CanWrite)
+            {
+                return response;
+            }
+
+            FieldInfo currentResponseField = AccessTools.Field(response.GetType(), "_currentResponse");
+            object currentResponse = currentResponseField != null ? currentResponseField.GetValue(response) : null;
+            positionProperty = currentResponse != null ? AccessTools.Property(currentResponse.GetType(), "Position") : null;
+            if (positionProperty != null && positionProperty.CanWrite)
+            {
+                return currentResponse;
+            }
+
+            FieldInfo mouseResponseField = AccessTools.Field(response.GetType(), "_mouseResponse");
+            object mouseResponse = mouseResponseField != null ? mouseResponseField.GetValue(response) : null;
+            positionProperty = mouseResponse != null ? AccessTools.Property(mouseResponse.GetType(), "Position") : null;
+            if (positionProperty != null && positionProperty.CanWrite)
+            {
+                return mouseResponse;
+            }
+
+            return null;
+        }
+
+        private void LogNativeHoverDiagnostic(Vector2Int tilePosition, Vector2 screenPosition)
+        {
+            SoqAccessPlugin.Instance?.LogInfo(
+                "AdventureMap native hover updated from synthetic screen input: tile="
+                + FormatTile(tilePosition)
+                + "; screenPosition="
+                + screenPosition
+                + "; currentDestination="
+                + FormatTile(_humanAdventureControllerFacade.CurrentDestinationTile));
+        }
+
+        private sealed class ScreenInputOverride
+        {
+            private readonly object _response;
+            private readonly PropertyInfo _positionProperty;
+            private readonly PropertyInfo _deltaProperty;
+            private readonly PropertyInfo _isOverUIProperty;
+            private readonly PropertyInfo _isPanningProperty;
+            private readonly PropertyInfo _wasActivatedOverUIProperty;
+            private readonly object _oldPosition;
+            private readonly object _oldDelta;
+            private readonly object _oldIsOverUI;
+            private readonly object _oldIsPanning;
+            private readonly object _oldWasActivatedOverUI;
+            private bool _restored;
+
+            private ScreenInputOverride(
+                object response,
+                Vector2 screenPosition,
+                PropertyInfo positionProperty,
+                PropertyInfo deltaProperty,
+                PropertyInfo isOverUIProperty,
+                PropertyInfo isPanningProperty,
+                PropertyInfo wasActivatedOverUIProperty)
+            {
+                _response = response;
+                ScreenPosition = screenPosition;
+                _positionProperty = positionProperty;
+                _deltaProperty = deltaProperty;
+                _isOverUIProperty = isOverUIProperty;
+                _isPanningProperty = isPanningProperty;
+                _wasActivatedOverUIProperty = wasActivatedOverUIProperty;
+                _oldPosition = _positionProperty.GetValue(_response, null);
+                _oldDelta = _deltaProperty.GetValue(_response, null);
+                _oldIsOverUI = _isOverUIProperty.GetValue(_response, null);
+                _oldIsPanning = _isPanningProperty.GetValue(_response, null);
+                _oldWasActivatedOverUI = _wasActivatedOverUIProperty.GetValue(_response, null);
+
+                _positionProperty.SetValue(_response, screenPosition, null);
+                _deltaProperty.SetValue(_response, Vector2.zero, null);
+                _isOverUIProperty.SetValue(_response, false, null);
+                _isPanningProperty.SetValue(_response, false, null);
+                _wasActivatedOverUIProperty.SetValue(_response, false, null);
+            }
+
+            public Vector2 ScreenPosition { get; private set; }
+
+            public static ScreenInputOverride Apply(object response, Vector2 screenPosition)
+            {
+                if (response == null)
+                {
+                    return null;
+                }
+
+                Type responseType = response.GetType();
+                PropertyInfo positionProperty = GetWritableProperty(responseType, "Position");
+                PropertyInfo deltaProperty = GetWritableProperty(responseType, "Delta");
+                PropertyInfo isOverUIProperty = GetWritableProperty(responseType, "IsOverUI");
+                PropertyInfo isPanningProperty = GetWritableProperty(responseType, "IsPanning");
+                PropertyInfo wasActivatedOverUIProperty = GetWritableProperty(responseType, "WasActivatedOverUI");
+                if (positionProperty == null
+                    || deltaProperty == null
+                    || isOverUIProperty == null
+                    || isPanningProperty == null
+                    || wasActivatedOverUIProperty == null)
+                {
+                    SoqAccessPlugin.Instance?.LogWarning("AdventureMapAdapter could not override native screen input because required writable properties were missing on " + responseType.FullName);
+                    return null;
+                }
+
+                return new ScreenInputOverride(
+                    response,
+                    screenPosition,
+                    positionProperty,
+                    deltaProperty,
+                    isOverUIProperty,
+                    isPanningProperty,
+                    wasActivatedOverUIProperty);
+            }
+
+            public void Restore()
+            {
+                if (_restored)
+                {
+                    return;
+                }
+
+                _positionProperty.SetValue(_response, _oldPosition, null);
+                _deltaProperty.SetValue(_response, _oldDelta, null);
+                _isOverUIProperty.SetValue(_response, _oldIsOverUI, null);
+                _isPanningProperty.SetValue(_response, _oldIsPanning, null);
+                _wasActivatedOverUIProperty.SetValue(_response, _oldWasActivatedOverUI, null);
+                _restored = true;
+            }
+
+            private static PropertyInfo GetWritableProperty(Type type, string name)
+            {
+                PropertyInfo property = AccessTools.Property(type, name);
+                return property != null && property.CanWrite ? property : null;
+            }
+        }
+
+        private object GetCurrentInputModule()
+        {
+            if (_humanAdventureController == null || _currentInputModuleField == null)
+            {
+                return null;
+            }
+
+            return _currentInputModuleField.GetValue(_humanAdventureController);
+        }
+
+        private void InvokeNativeInputModuleAction(object inputModule, string methodName)
+        {
+            MethodInfo method = inputModule != null ? AccessTools.Method(inputModule.GetType(), methodName) : null;
+            if (method == null)
+            {
+                throw new MissingMethodException(inputModule != null ? inputModule.GetType().FullName : "<null>", methodName);
+            }
+
+            method.Invoke(inputModule, null);
+        }
+
+        private void LogNativeSecondaryDiagnostic(
+            Vector2Int tilePosition,
+            ICommanderState selectedCommander,
+            HumanAdventureController.State previousState,
+            bool hadDestination,
+            Vector2Int previousDestination)
+        {
+            string previousDestinationText = hadDestination ? FormatTile(previousDestination) : "<none>";
+            string currentDestinationText = selectedCommander != null && selectedCommander.Destination.HasDestination
+                ? FormatTile(selectedCommander.Destination.Destination)
+                : "<none>";
+            SoqAccessPlugin.Instance?.LogInfo(
+                "AdventureMap native secondary result: tile="
+                + FormatTile(tilePosition)
+                + "; previousState="
+                + previousState
+                + "; currentState="
+                + _humanAdventureControllerFacade.StateMachine.CurrentStateType
+                + "; previousDestination="
+                + previousDestinationText
+                + "; currentDestination="
+                + currentDestinationText
+                + "; selectedCommander="
+                + DescribeCommanderForDiagnostics(selectedCommander));
+        }
+
+        private void PublishDenied(Vector2Int tilePosition, string message)
+        {
+            AccessibilityEventBus.Publish(new MapActionFailedEvent(tilePosition, message));
         }
 
         private Vector2Int GetCameraCenterTile()
@@ -371,56 +742,63 @@ namespace SongsOfConquestAccess.Adapters
 
         private void EnsureCursorOverlay()
         {
-            if (_cursorOverlay != null && _cursorLine != null)
+            if (_cursorOverlay != null && _cursorOverlaySegments != null)
             {
                 return;
             }
 
             _cursorOverlay = new GameObject("SongsOfConquestAccess_AdventureMapCursor");
-            _cursorLine = _cursorOverlay.AddComponent<LineRenderer>();
-            _cursorLine.useWorldSpace = true;
-            _cursorLine.loop = true;
-            _cursorLine.widthMultiplier = 0.08f;
-            _cursorLine.numCornerVertices = 2;
-            _cursorLine.numCapVertices = 2;
-            _cursorLine.startColor = Color.yellow;
-            _cursorLine.endColor = Color.yellow;
-            Shader shader = Shader.Find("Hidden/Internal-Colored") ?? Shader.Find("Sprites/Default");
-            Material material = new Material(shader);
-            material.color = Color.yellow;
-            material.renderQueue = 5000;
-            if (material.HasProperty("_ZTest"))
-            {
-                material.SetInt("_ZTest", (int)UnityEngine.Rendering.CompareFunction.Always);
-            }
+            Canvas canvas = _cursorOverlay.AddComponent<Canvas>();
+            canvas.renderMode = RenderMode.ScreenSpaceOverlay;
+            canvas.sortingOrder = short.MaxValue;
+            CanvasScaler scaler = _cursorOverlay.AddComponent<CanvasScaler>();
+            scaler.uiScaleMode = CanvasScaler.ScaleMode.ConstantPixelSize;
+            CanvasGroup canvasGroup = _cursorOverlay.AddComponent<CanvasGroup>();
+            canvasGroup.blocksRaycasts = false;
+            canvasGroup.interactable = false;
 
-            if (material.HasProperty("_ZWrite"))
+            _cursorOverlaySegments = new[]
             {
-                material.SetInt("_ZWrite", 0);
-            }
-
-            _cursorLine.material = material;
+                CreateOverlaySegment("Top"),
+                CreateOverlaySegment("Right"),
+                CreateOverlaySegment("Bottom"),
+                CreateOverlaySegment("Left")
+            };
         }
 
-        private Vector3[] GetTileOutlinePoints(Vector2Int tile)
+        private RectTransform CreateOverlaySegment(string name)
         {
-            Vector3 center = GetWorldCenter(tile);
-            Vector3 east = GetWorldCenter(ClampToMap(new Vector2Int(tile.x + 1, tile.y)));
-            Vector3 north = GetWorldCenter(ClampToMap(new Vector2Int(tile.x, tile.y + 1)));
-            Vector3 west = GetWorldCenter(ClampToMap(new Vector2Int(tile.x - 1, tile.y)));
-            Vector3 south = GetWorldCenter(ClampToMap(new Vector2Int(tile.x, tile.y - 1)));
+            GameObject segment = new GameObject(name);
+            segment.transform.SetParent(_cursorOverlay.transform, false);
+            Image image = segment.AddComponent<Image>();
+            image.color = Color.yellow;
+            image.raycastTarget = false;
+            RectTransform rect = segment.GetComponent<RectTransform>();
+            rect.anchorMin = Vector2.zero;
+            rect.anchorMax = Vector2.zero;
+            rect.pivot = new Vector2(0.5f, 0.5f);
+            return rect;
+        }
 
-            Vector3 eastCorner = MidpointOrFallback(center, east, new Vector3(0.75f, 0f, 0f));
-            Vector3 northCorner = MidpointOrFallback(center, north, new Vector3(0f, 0f, 0.75f));
-            Vector3 westCorner = MidpointOrFallback(center, west, new Vector3(-0.75f, 0f, 0f));
-            Vector3 southCorner = MidpointOrFallback(center, south, new Vector3(0f, 0f, -0.75f));
-            return new[]
+        private void SetScreenOverlayPosition(Vector2 point)
+        {
+            const float size = 42f;
+            const float thickness = 4f;
+            if (_cursorOverlaySegments == null || _cursorOverlaySegments.Length != 4)
             {
-                RaiseAboveGround(eastCorner),
-                RaiseAboveGround(northCorner),
-                RaiseAboveGround(westCorner),
-                RaiseAboveGround(southCorner)
-            };
+                return;
+            }
+
+            SetSegment(_cursorOverlaySegments[0], point + new Vector2(0f, size * 0.5f), new Vector2(size, thickness));
+            SetSegment(_cursorOverlaySegments[1], point + new Vector2(size * 0.5f, 0f), new Vector2(thickness, size));
+            SetSegment(_cursorOverlaySegments[2], point + new Vector2(0f, -size * 0.5f), new Vector2(size, thickness));
+            SetSegment(_cursorOverlaySegments[3], point + new Vector2(-size * 0.5f, 0f), new Vector2(thickness, size));
+        }
+
+        private static void SetSegment(RectTransform segment, Vector2 position, Vector2 size)
+        {
+            segment.anchoredPosition = position;
+            segment.sizeDelta = size;
         }
 
         private Vector3 GetWorldCenter(Vector2Int tile)
@@ -482,35 +860,6 @@ namespace SongsOfConquestAccess.Adapters
             }
         }
 
-        private bool ShouldShowTileDiamond(Vector2Int tile)
-        {
-            int localTeamId = GetLocalTeamId();
-            try
-            {
-                if (_facade.Commanders.ExistsAtPoint(localTeamId, tile))
-                {
-                    return false;
-                }
-            }
-            catch (Exception)
-            {
-            }
-
-            try
-            {
-                IMapEntity entity = _facade.MapEntities.GetAt(tile);
-                if (entity != null && entity.IsVisibleInGame && entity.Category != MapEntityCategory.Artistic)
-                {
-                    return false;
-                }
-            }
-            catch (Exception)
-            {
-            }
-
-            return true;
-        }
-
         private bool ShouldShowFocusedTileTooltip(Vector2Int tile)
         {
             int localTeamId = GetLocalTeamId();
@@ -556,29 +905,13 @@ namespace SongsOfConquestAccess.Adapters
         private Vector2 GetScreenPoint(Vector2Int tile)
         {
             Vector3 world = GetWorldCenter(tile);
-            Camera camera = Camera.main;
-            if (camera == null)
+            if (_cameraController == null || _cameraController.Camera == null)
             {
                 return new Vector2(Screen.width * 0.5f, Screen.height * 0.5f);
             }
 
-            return camera.WorldToScreenPoint(world);
-        }
-
-        private static Vector3 MidpointOrFallback(Vector3 center, Vector3 neighbour, Vector3 fallbackOffset)
-        {
-            if ((neighbour - center).sqrMagnitude < 0.001f)
-            {
-                return center + fallbackOffset;
-            }
-
-            return Vector3.Lerp(center, neighbour, 0.5f);
-        }
-
-        private static Vector3 RaiseAboveGround(Vector3 point)
-        {
-            point.y += 3f;
-            return point;
+            Vector3 point = _cameraController.Camera.WorldToScreenPoint(world);
+            return new Vector2(point.x, point.y);
         }
 
         private Vector2Int ClampToMap(Vector2Int position)
@@ -790,6 +1123,21 @@ namespace SongsOfConquestAccess.Adapters
                 return;
             }
 
+            ICommanderState selectedCommander = _selectionHandler.SelectedCommander;
+            ICommanderState nativeCommanderAtPoint = null;
+            int localTeamId = GetLocalTeamId();
+            if (tile.IsVisible && localTeamId != -1)
+            {
+                try
+                {
+                    nativeCommanderAtPoint = _facade.Commanders.GetAtPoint(localTeamId, tile.Position);
+                }
+                catch (Exception exception)
+                {
+                    SoqAccessPlugin.Instance?.LogWarning("AdventureMapTile diagnostic failed native GetAtPoint lookup: " + exception.Message);
+                }
+            }
+
             string message = "AdventureMapTile diagnostic: position="
                 + tile.Position.x
                 + ","
@@ -800,8 +1148,14 @@ namespace SongsOfConquestAccess.Adapters
                 + tile.IsVisible
                 + "; explored="
                 + tile.IsExplored
+                + "; selectedCommander="
+                + DescribeCommanderForDiagnostics(selectedCommander)
+                + "; selectedCommanderState="
+                + DescribeCommanderStateForDiagnostics(selectedCommander)
                 + "; commander="
                 + DescribeCommander(tile.Commander)
+                + "; nativeCommanderAtPoint="
+                + DescribeCommander(nativeCommanderAtPoint)
                 + "; mapEntity="
                 + DescribeMapEntity(tile.MapEntity)
                 + "; mapEntityName="
@@ -822,6 +1176,34 @@ namespace SongsOfConquestAccess.Adapters
                 + tile.ToSpeech()
                 + "\"";
             SoqAccessPlugin.Instance?.LogInfo(message);
+        }
+
+        private static string DescribeCommanderForDiagnostics(ICommanderState commander)
+        {
+            return DescribeCommander(commander);
+        }
+
+        private static string DescribeCommanderStateForDiagnostics(ICommanderState commander)
+        {
+            if (commander == null)
+            {
+                return "<null>";
+            }
+
+            string destination = "<none>";
+            if (commander.Destination != null && commander.Destination.HasDestination)
+            {
+                destination = FormatTile(commander.Destination.Destination);
+            }
+
+            return "internalState="
+                + commander.InternalState
+                + ",storedBuildingId="
+                + commander.StoredBuildingId
+                + ",movesLeft="
+                + commander.MovesLeft
+                + ",destination="
+                + destination;
         }
 
         private static string DescribeMapEntity(IMapEntity entity)
@@ -1087,6 +1469,27 @@ namespace SongsOfConquestAccess.Adapters
 
             try
             {
+                if (selectedCommander != null && entity.DidVisit(selectedCommander.Id))
+                {
+                    MapEntityDidVisitDetails didVisitDetails = entity.GetDidVisitDetails(selectedCommander.Id) as MapEntityDidVisitDetails;
+                    if (didVisitDetails != null)
+                    {
+                        tile.MapEntityDetails.Add("visited");
+                        if (didVisitDetails.InformationLines != null)
+                        {
+                            for (int i = 0; i < didVisitDetails.InformationLines.Count; i++)
+                            {
+                                if (!string.IsNullOrWhiteSpace(didVisitDetails.InformationLines[i]))
+                                {
+                                    tile.MapEntityDetails.Add(didVisitDetails.InformationLines[i]);
+                                }
+                            }
+                        }
+
+                        return;
+                    }
+                }
+
                 IDetails details = entity.GetPreVisitDetails(
                     selectedCommander != null ? selectedCommander.Id : -1,
                     false,
@@ -1176,5 +1579,6 @@ namespace SongsOfConquestAccess.Adapters
             StandaloneDecoration,
             Effect
         }
+
     }
 }

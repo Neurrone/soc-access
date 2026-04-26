@@ -93,6 +93,10 @@
       <HintPath>$(GameManagedDir)\Lavapotion.Utilities.dll</HintPath>
       <Private>false</Private>
     </Reference>
+    <Reference Include="Lavapotion.Pathfinding">
+      <HintPath>$(GameManagedDir)\Lavapotion.Pathfinding.dll</HintPath>
+      <Private>false</Private>
+    </Reference>
   </ItemGroup>
 
   <Target Name="DeployToScriptFolder"

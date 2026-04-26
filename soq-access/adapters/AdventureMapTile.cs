@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Text.RegularExpressions;
 using SongsOfConquest.Common.Entities;
 using SongsOfConquest.Common.Gamestate;
 using SongsOfConquest.Common.Map;
@@ -42,6 +43,8 @@ namespace SongsOfConquestAccess.Adapters
         public string MapEntityName { get; set; }
 
         public string MapEntityHint { get; set; }
+
+        public List<string> MapEntityDetails { get; private set; } = new List<string>();
 
         public string MapEntityRelationship { get; set; }
 
@@ -134,6 +137,14 @@ namespace SongsOfConquestAccess.Adapters
                     details.Add(MapEntityRelationship);
                 }
 
+                for (int i = 0; i < MapEntityDetails.Count; i++)
+                {
+                    if (!string.IsNullOrWhiteSpace(MapEntityDetails[i]))
+                    {
+                        details.Add(CleanSpeechText(MapEntityDetails[i]));
+                    }
+                }
+
                 details.AddRange(GetMovementDetails());
 
                 parts.Add(AppendDetails(mapEntity, details));
@@ -209,6 +220,17 @@ namespace SongsOfConquestAccess.Adapters
             }
 
             return new string(chars.ToArray());
+        }
+
+        private static string CleanSpeechText(string text)
+        {
+            if (string.IsNullOrWhiteSpace(text))
+            {
+                return string.Empty;
+            }
+
+            string withoutTags = Regex.Replace(text, "<.*?>", string.Empty);
+            return Regex.Replace(withoutTags, "\\s+", " ").Trim();
         }
     }
 }

@@ -9,8 +9,10 @@ using SongsOfConquest.Client.Adventure.Map;
 using SongsOfConquest.Client.Adventure.View;
 using SongsOfConquest.Client.Gamestate;
 using SongsOfConquest.Client.Grid;
+using SongsOfConquest.Client.InputManagement;
 using SongsOfConquest.Common.Localization;
 using SongsOfConquestAccess.Adapters;
+using SongsOfConquestAccess.Events;
 using UnityEngine;
 using Zenject;
 
@@ -29,20 +31,19 @@ namespace SongsOfConquestAccess.Screens
                 return;
             }
 
-            AdventureMapAdapter adapter = FindActiveAdventureMap();
-            if (adapter != null)
+            AdventureMapScreen screen = FindActiveAdventureMapScreen();
+            if (screen != null)
             {
-                screens.Add(new AdventureMapScreen(adapter));
+                screens.Add(screen);
             }
         }
 
         public static AdventureMapScreen FindActiveAdventureMapScreen()
         {
-            AdventureMapAdapter adapter = FindActiveAdventureMap();
-            return adapter != null ? new AdventureMapScreen(adapter) : null;
+            return FindActiveAdventureMap();
         }
 
-        private static AdventureMapAdapter FindActiveAdventureMap()
+        private static AdventureMapScreen FindActiveAdventureMap()
         {
             AdventureViewInstaller[] installers = Resources.FindObjectsOfTypeAll<AdventureViewInstaller>();
             if (installers.Length == 0)
@@ -70,6 +71,9 @@ namespace SongsOfConquestAccess.Screens
                 IAdventureTooltipManager tooltipManager = TryResolve<IAdventureTooltipManager>(container);
                 ILocalizationHandler localizationHandler = TryResolve<ILocalizationHandler>(container);
                 ICartographyVisualManifest cartographyVisualManifest = TryResolve<ICartographyVisualManifest>(container);
+                IHumanAdventureController humanAdventureController = TryResolve<IHumanAdventureController>(container);
+                IHumanAdventureControllerFacade humanAdventureControllerFacade = TryResolve<IHumanAdventureControllerFacade>(container);
+                IInputManager inputManager = TryResolve<IInputManager>(container);
                 object cartographyConverter = TryResolveByTypeName(container, "Lavapotion.Cartography.ICartographyConverter");
 
                 AdventureMapAdapter adapter = new AdventureMapAdapter(
@@ -83,11 +87,19 @@ namespace SongsOfConquestAccess.Screens
                     cartographyConverter,
                     tooltipManager,
                     localizationHandler,
-                    cartographyVisualManifest);
+                    cartographyVisualManifest,
+                    humanAdventureController,
+                    humanAdventureControllerFacade,
+                    inputManager);
                 if (adapter.IsPresent())
                 {
                     LogProbeDiagnostic("Adventure map probe found ready adventure map");
-                    return adapter;
+                    AdventureMapEventListener eventListener = new AdventureMapEventListener(
+                        facade,
+                        selectionHandler,
+                        humanAdventureControllerFacade,
+                        localizationHandler);
+                    return new AdventureMapScreen(adapter, eventListener);
                 }
 
                 LogProbeDiagnostic("Adventure map probe found installer but adapter is not ready: " + adapter.GetReadinessDiagnostic());

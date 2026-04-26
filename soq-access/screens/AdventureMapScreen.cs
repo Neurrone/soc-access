@@ -1,4 +1,5 @@
 using SongsOfConquestAccess.Adapters;
+using SongsOfConquestAccess.Events;
 using SongsOfConquestAccess.UI;
 
 namespace SongsOfConquestAccess.Screens
@@ -6,16 +7,23 @@ namespace SongsOfConquestAccess.Screens
     internal sealed class AdventureMapScreen : Screen
     {
         private readonly AdventureMapAdapter _adapter;
+        private readonly AdventureMapEventListener _eventListener;
 
-        public AdventureMapScreen(AdventureMapAdapter adapter)
+        public AdventureMapScreen(AdventureMapAdapter adapter, AdventureMapEventListener eventListener)
             : base(adapter != null ? adapter.SourceKey : null, BuildRoot(adapter))
         {
             _adapter = adapter;
+            _eventListener = eventListener;
         }
 
         public override bool IsPresent()
         {
             return _adapter != null && _adapter.IsPresent();
+        }
+
+        public override void OnPush()
+        {
+            _eventListener?.Attach();
         }
 
         public override void OnUnfocus()
@@ -25,6 +33,7 @@ namespace SongsOfConquestAccess.Screens
 
         public override void OnPop()
         {
+            _eventListener?.Detach();
             _adapter?.ClearFocusedTileOverlay();
         }
 

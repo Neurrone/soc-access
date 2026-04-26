@@ -29,10 +29,15 @@ namespace SongsOfConquestAccess.UI
 
         public override bool ClaimsAction(string actionKey)
         {
+            // TODO: Enter on an already-selected wielder should eventually open an
+            // accessible selected-wielder HUD screen. That is explicitly outside
+            // the initial adventure-map interaction scope; see wielders.md.
             return actionKey == AccessibilityActions.MapMoveNorth.Key
                 || actionKey == AccessibilityActions.MapMoveSouth.Key
                 || actionKey == AccessibilityActions.MapMoveWest.Key
-                || actionKey == AccessibilityActions.MapMoveEast.Key;
+                || actionKey == AccessibilityActions.MapMoveEast.Key
+                || actionKey == AccessibilityActions.Activate.Key
+                || actionKey == AccessibilityActions.MapSecondaryAction.Key;
         }
 
         public override bool HandleAction(InputAction action)
@@ -62,6 +67,16 @@ namespace SongsOfConquestAccess.UI
                 return Move(1, 0);
             }
 
+            if (action.Key == AccessibilityActions.Activate.Key)
+            {
+                return _adapter.HandlePrimaryAction(_cursorTile);
+            }
+
+            if (action.Key == AccessibilityActions.MapSecondaryAction.Key)
+            {
+                return _adapter.HandleSecondaryAction(_cursorTile);
+            }
+
             return false;
         }
 
@@ -84,6 +99,7 @@ namespace SongsOfConquestAccess.UI
             }
 
             _cursorTile = nextTile;
+            _adapter.EnsureTileInView(_cursorTile);
             _adapter.SetFocusedTileOverlay(_cursorTile);
             UIManager.SetFocusedWidget(this);
             return true;

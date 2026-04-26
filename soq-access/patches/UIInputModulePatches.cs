@@ -61,6 +61,13 @@ namespace SongsOfConquestAccess
                 return false;
             }
 
+            if (keyboard.backslashKey.wasPressedThisFrame
+                && plugin.ScreenManager.CurrentScreenClaimsAction(AccessibilityActions.MapSecondaryAction.Key))
+            {
+                plugin.InputRouter.TryHandleRawKeyboardKey(Key.Backslash);
+                return false;
+            }
+
             if (keyboard.upArrowKey.wasPressedThisFrame
                 && plugin.ScreenManager.CurrentScreenClaimsAction(AccessibilityActions.PreviousMenuItem.Key))
             {

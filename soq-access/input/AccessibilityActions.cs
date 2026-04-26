@@ -12,6 +12,7 @@ namespace SongsOfConquestAccess.Input
         public static readonly InputAction MapMoveSouth = new InputAction("map_move_south", "Map Move South");
         public static readonly InputAction MapMoveWest = new InputAction("map_move_west", "Map Move West");
         public static readonly InputAction MapMoveEast = new InputAction("map_move_east", "Map Move East");
+        public static readonly InputAction MapSecondaryAction = new InputAction("map_secondary_action", "Map Secondary Action");
         public static readonly InputAction Activate = new InputAction("activate", "Activate");
         public static readonly InputAction Cancel = new InputAction("cancel", "Cancel");
     }
