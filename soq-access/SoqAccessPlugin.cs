@@ -1,5 +1,6 @@
 using BepInEx;
 using HarmonyLib;
+using SongsOfConquestAccess.Events;
 using SongsOfConquestAccess.Input;
 using SongsOfConquestAccess.Screens;
 using SongsOfConquestAccess.Speech;
@@ -19,6 +20,7 @@ namespace SongsOfConquestAccess
 
         private Harmony _harmony;
         private SpeechService _speechService;
+        private SpeechEventAnnouncer _speechEventAnnouncer;
         private ScreenManager _screenManager;
         private ScreenDetector _screenDetector;
         private AccessibilityInputRouter _inputRouter;
@@ -32,6 +34,8 @@ namespace SongsOfConquestAccess
             bool speechInitialized = _speechService.Initialize();
             Logger.LogInfo("Speech initialization result: " + speechInitialized);
             SpeechPipeline.Initialize(_speechService);
+            _speechEventAnnouncer = new SpeechEventAnnouncer();
+            _speechEventAnnouncer.Attach();
             _screenManager = new ScreenManager();
             _screenDetector = new ScreenDetector(_screenManager);
             _inputRouter = new AccessibilityInputRouter(_screenManager);
@@ -56,6 +60,9 @@ namespace SongsOfConquestAccess
             _screenDetector = null;
             _screenManager = null;
             UIManager.Reset();
+            _speechEventAnnouncer?.Detach();
+            _speechEventAnnouncer = null;
+            AccessibilityEventBus.Reset();
             SpeechPipeline.Shutdown();
             _speechService?.Dispose();
             _speechService = null;
