@@ -6,6 +6,7 @@ using SongsOfConquest.Client.UI;
 using SongsOfConquest.Common;
 using SongsOfConquest.Common.Campaign;
 using SongsOfConquest.Common.Localization;
+using SongsOfConquestAccess.Speech;
 using UnityEngine;
 using UnityEngine.EventSystems;
 
@@ -198,7 +199,7 @@ namespace SongsOfConquestAccess.Adapters
         {
             if (!string.IsNullOrWhiteSpace(localizationKey) && GlobalLocalizationVariables.LocalizationHandler != null)
             {
-                string localized = MenuButtonTextUtility.NormalizeForSpeech(
+                string localized = SpeechTextSanitizer.Normalize(
                     GlobalLocalizationVariables.LocalizationHandler.GetText(localizationKey));
                 if (!string.IsNullOrWhiteSpace(localized))
                 {
@@ -211,7 +212,7 @@ namespace SongsOfConquestAccess.Adapters
 
         private static string GetText(UITextMesh textMesh)
         {
-            return MenuButtonTextUtility.NormalizeForSpeech(UITextMeshTextUtility.GetEffectiveText(textMesh));
+            return SpeechTextSanitizer.Normalize(UITextMeshTextUtility.GetEffectiveText(textMesh));
         }
     }
 }

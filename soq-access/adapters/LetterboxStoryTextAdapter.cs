@@ -1,16 +1,14 @@
 using System.Reflection;
-using System.Text.RegularExpressions;
 using HarmonyLib;
 using SongsOfConquest.Client.Adventure;
 using SongsOfConquest.Client.UI;
+using SongsOfConquestAccess.Speech;
 using UnityEngine;
 
 namespace SongsOfConquestAccess.Adapters
 {
     internal sealed class LetterboxStoryTextAdapter
     {
-        private static readonly Regex RichTextTagRegex = new Regex("<.*?>", RegexOptions.Compiled);
-
         private static readonly AccessTools.FieldRef<LetterboxStoryText, UITransform> ContainerRef =
             AccessTools.FieldRefAccess<LetterboxStoryText, UITransform>("_container");
 
@@ -40,12 +38,12 @@ namespace SongsOfConquestAccess.Adapters
 
         public string Title
         {
-            get { return NormalizeForSpeech(GetText(TitleTextRef)); }
+            get { return SpeechTextSanitizer.Normalize(GetText(TitleTextRef)); }
         }
 
         public string Body
         {
-            get { return NormalizeForSpeech(GetText(LoreTextRef)); }
+            get { return SpeechTextSanitizer.Normalize(GetText(LoreTextRef)); }
         }
 
         public bool IsPresent()
@@ -101,15 +99,5 @@ namespace SongsOfConquestAccess.Adapters
             return UITextMeshTextUtility.GetEffectiveText(textRef(_storyText));
         }
 
-        private static string NormalizeForSpeech(string value)
-        {
-            if (string.IsNullOrWhiteSpace(value))
-            {
-                return string.Empty;
-            }
-
-            string withoutTags = RichTextTagRegex.Replace(value, string.Empty);
-            return Regex.Replace(withoutTags, "[ \t\r\n]+", " ").Trim();
-        }
     }
 }

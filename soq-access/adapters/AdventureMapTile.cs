@@ -1,8 +1,8 @@
 using System.Collections.Generic;
-using System.Text.RegularExpressions;
 using SongsOfConquest.Common.Entities;
 using SongsOfConquest.Common.Gamestate;
 using SongsOfConquest.Common.Map;
+using SongsOfConquestAccess.Speech;
 using UnityEngine;
 
 namespace SongsOfConquestAccess.Adapters
@@ -141,7 +141,7 @@ namespace SongsOfConquestAccess.Adapters
                 {
                     if (!string.IsNullOrWhiteSpace(MapEntityDetails[i]))
                     {
-                        details.Add(CleanSpeechText(MapEntityDetails[i]));
+                        details.Add(SpeechTextSanitizer.Normalize(MapEntityDetails[i]));
                     }
                 }
 
@@ -222,15 +222,5 @@ namespace SongsOfConquestAccess.Adapters
             return new string(chars.ToArray());
         }
 
-        private static string CleanSpeechText(string text)
-        {
-            if (string.IsNullOrWhiteSpace(text))
-            {
-                return string.Empty;
-            }
-
-            string withoutTags = Regex.Replace(text, "<.*?>", string.Empty);
-            return Regex.Replace(withoutTags, "\\s+", " ").Trim();
-        }
     }
 }

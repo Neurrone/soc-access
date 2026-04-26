@@ -1,7 +1,7 @@
-using System.Text.RegularExpressions;
 using SongsOfConquest.Client;
 using SongsOfConquest.Client.Menu.Popup;
 using SongsOfConquest.Client.UI;
+using SongsOfConquestAccess.Speech;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
@@ -10,8 +10,6 @@ namespace SongsOfConquestAccess.Adapters
 {
     internal sealed class QuestionDialogAdapter
     {
-        private static readonly Regex RichTextTagRegex = new Regex("<.*?>", RegexOptions.Compiled);
-
         private readonly object _sourceKey;
         private readonly IUITransform _containerTransform;
         private readonly UITextMeshInputField _inputField;
@@ -37,9 +35,9 @@ namespace SongsOfConquestAccess.Adapters
             _inputField = inputField;
             _positiveButton = positiveButton;
             _negativeButton = negativeButton;
-            _title = NormalizeForSpeech(title);
-            _body = NormalizeForSpeech(body);
-            _actionLabels = new[] { NormalizeForSpeech(positiveLabel), NormalizeForSpeech(negativeLabel) };
+            _title = SpeechTextSanitizer.Normalize(title);
+            _body = SpeechTextSanitizer.Normalize(body);
+            _actionLabels = new[] { SpeechTextSanitizer.Normalize(positiveLabel), SpeechTextSanitizer.Normalize(negativeLabel) };
         }
 
         public QuestionDialogAdapter(object sourceKey, PopupMenu.Settings settings)
@@ -195,15 +193,5 @@ namespace SongsOfConquestAccess.Adapters
             return UITextMeshTextUtility.GetEffectiveText(textMesh);
         }
 
-        private static string NormalizeForSpeech(string value)
-        {
-            if (string.IsNullOrWhiteSpace(value))
-            {
-                return string.Empty;
-            }
-
-            string withoutTags = RichTextTagRegex.Replace(value, string.Empty);
-            return Regex.Replace(withoutTags, "\\s+", " ").Trim();
-        }
     }
 }

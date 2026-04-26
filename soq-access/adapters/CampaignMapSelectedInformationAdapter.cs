@@ -7,6 +7,7 @@ using SongsOfConquest.Common;
 using SongsOfConquest.Common.Campaign;
 using SongsOfConquest.Common.Localization;
 using SongsOfConquest.Common.Map;
+using SongsOfConquestAccess.Speech;
 using UnityEngine;
 using UnityEngine.EventSystems;
 
@@ -98,7 +99,7 @@ namespace SongsOfConquestAccess.Adapters
                 return string.Empty;
             }
 
-            return MenuButtonTextUtility.NormalizeForSpeech(localization.GetText(map.Metadata.Name));
+            return SpeechTextSanitizer.Normalize(localization.GetText(map.Metadata.Name));
         }
 
         public string GetDescription()
@@ -110,7 +111,7 @@ namespace SongsOfConquestAccess.Adapters
                 return string.Empty;
             }
 
-            return MenuButtonTextUtility.NormalizeForSpeech(localization.GetText(map.Metadata.Description));
+            return SpeechTextSanitizer.Normalize(localization.GetText(map.Metadata.Description));
         }
 
         public string GetMissionCounter()
@@ -141,7 +142,7 @@ namespace SongsOfConquestAccess.Adapters
             for (int i = 0; i < map.Metadata.WinConditions.Length; i++)
             {
                 string text = localization.GetText("GameModes/" + map.Metadata.WinConditions[i] + "/Name");
-                text = MenuButtonTextUtility.NormalizeForSpeech(text);
+                text = SpeechTextSanitizer.Normalize(text);
                 if (!string.IsNullOrWhiteSpace(text) && !parts.Contains(text))
                 {
                     parts.Add(text);
@@ -159,7 +160,7 @@ namespace SongsOfConquestAccess.Adapters
                 return string.Empty;
             }
 
-            return MenuButtonTextUtility.NormalizeForSpeech(localization.GetText("Campaign/Difficulty/" + difficulty));
+            return SpeechTextSanitizer.Normalize(localization.GetText("Campaign/Difficulty/" + difficulty));
         }
 
         public bool SelectDifficulty(CampaignDifficulty difficulty)
@@ -223,7 +224,7 @@ namespace SongsOfConquestAccess.Adapters
 
         private static string GetText(UITextMesh textMesh)
         {
-            return MenuButtonTextUtility.NormalizeForSpeech(UITextMeshTextUtility.GetEffectiveText(textMesh));
+            return SpeechTextSanitizer.Normalize(UITextMeshTextUtility.GetEffectiveText(textMesh));
         }
 
         private static bool IsGameObjectActive(GameObject gameObject)

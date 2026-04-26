@@ -1,9 +1,9 @@
 using System.Collections.Generic;
 using System.Text;
-using System.Text.RegularExpressions;
 using SongsOfConquest.Client.Adventure;
 using SongsOfConquest.Common.Economy;
 using SongsOfConquest.Common.Rewards;
+using SongsOfConquestAccess.Speech;
 using UnityEngine;
 
 namespace SongsOfConquestAccess.Events
@@ -37,7 +37,7 @@ namespace SongsOfConquestAccess.Events
             List<string> parts = BuildRewardSummaries();
             return parts.Count == 0
                 ? string.Empty
-                : CleanSpeechText("Reward: " + string.Join(", ", parts.ToArray()));
+                : SpeechTextSanitizer.Normalize("Reward: " + string.Join(", ", parts.ToArray()));
         }
 
         private List<string> BuildRewardSummaries()
@@ -110,16 +110,6 @@ namespace SongsOfConquestAccess.Events
             return amount == 1 ? string.Empty : "s";
         }
 
-        private static string CleanSpeechText(string text)
-        {
-            if (string.IsNullOrWhiteSpace(text))
-            {
-                return string.Empty;
-            }
-
-            string withoutTags = Regex.Replace(text, "<.*?>", string.Empty);
-            return Regex.Replace(withoutTags, "\\s+", " ").Trim();
-        }
     }
 
     internal sealed class WorldMessageNotificationEvent : IAccessibilityEvent
@@ -149,7 +139,7 @@ namespace SongsOfConquestAccess.Events
 
         public string GetSpeechText()
         {
-            return CleanSpeechText(JoinNonEmpty("Notification", Header, Body, Effects));
+            return SpeechTextSanitizer.Normalize(JoinNonEmpty("Notification", Header, Body, Effects));
         }
 
         private static string JoinNonEmpty(string prefix, params string[] values)
@@ -176,16 +166,6 @@ namespace SongsOfConquestAccess.Events
             return builder.ToString();
         }
 
-        private static string CleanSpeechText(string text)
-        {
-            if (string.IsNullOrWhiteSpace(text))
-            {
-                return string.Empty;
-            }
-
-            string withoutTags = Regex.Replace(text, "<.*?>", string.Empty);
-            return Regex.Replace(withoutTags, "\\s+", " ").Trim();
-        }
     }
 
     internal sealed class DeniedMoveNotificationEvent : IAccessibilityEvent
@@ -206,18 +186,7 @@ namespace SongsOfConquestAccess.Events
 
         public string GetSpeechText()
         {
-            return CleanSpeechText(LocalizedMessage);
-        }
-
-        private static string CleanSpeechText(string text)
-        {
-            if (string.IsNullOrWhiteSpace(text))
-            {
-                return string.Empty;
-            }
-
-            string withoutTags = Regex.Replace(text, "<.*?>", string.Empty);
-            return Regex.Replace(withoutTags, "\\s+", " ").Trim();
+            return SpeechTextSanitizer.Normalize(LocalizedMessage);
         }
     }
 
@@ -245,18 +214,7 @@ namespace SongsOfConquestAccess.Events
 
         public string GetSpeechText()
         {
-            return CleanSpeechText(LocalizedMessage);
-        }
-
-        private static string CleanSpeechText(string text)
-        {
-            if (string.IsNullOrWhiteSpace(text))
-            {
-                return string.Empty;
-            }
-
-            string withoutTags = Regex.Replace(text, "<.*?>", string.Empty);
-            return Regex.Replace(withoutTags, "\\s+", " ").Trim();
+            return SpeechTextSanitizer.Normalize(LocalizedMessage);
         }
     }
 }

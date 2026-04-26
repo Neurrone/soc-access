@@ -3,6 +3,7 @@ using HarmonyLib;
 using SongsOfConquest.Client.Menu;
 using SongsOfConquest.Client.UI;
 using SongsOfConquest.Common.Campaign;
+using SongsOfConquestAccess.Speech;
 using UnityEngine;
 using UnityEngine.EventSystems;
 
@@ -38,7 +39,7 @@ namespace SongsOfConquestAccess.Adapters
         public string GetLabel()
         {
             ICampaignMapDefinition definition = Definition;
-            return MenuButtonTextUtility.NormalizeForSpeech(definition != null ? definition.DisplayName : string.Empty);
+            return SpeechTextSanitizer.Normalize(definition != null ? definition.DisplayName : string.Empty);
         }
 
         public string GetStatus()
