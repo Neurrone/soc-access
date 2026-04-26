@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using SongsOfConquest.Client.Adventure.UI;
 using SongsOfConquest.Client.Adventure;
 using SongsOfConquest.Client.Menu;
 using SongsOfConquest.Client.Menu.Loading;
@@ -6,6 +7,7 @@ using SongsOfConquest.Client.Menu.Main;
 using SongsOfConquest.Client.Menu.Popup;
 using SongsOfConquest.Client.UI;
 using SongsOfConquestAccess.Adapters;
+using UnityEngine;
 
 namespace SongsOfConquestAccess.Screens
 {
@@ -30,6 +32,7 @@ namespace SongsOfConquestAccess.Screens
                 new CampaignMenuRuntimeScreenProbe(),
                 new CampaignMapSelectRuntimeScreenProbe(),
                 new AdventureMapRuntimeScreenProbe(),
+                new CommanderSheetRuntimeScreenProbe(),
                 new LetterboxStoryTextRuntimeScreenProbe(),
                 new QuestionDialogRuntimeScreenProbe()
             };
@@ -257,6 +260,66 @@ namespace SongsOfConquestAccess.Screens
         public void OnAdventureSceneUnloading()
         {
             _screenManager.RemoveScreens(screen => screen is AdventureMapScreen);
+        }
+
+        public void OnCommanderSheetOpened(CommanderSheet commanderSheet)
+        {
+            CommanderSheetAdapter adapter = new CommanderSheetAdapter(commanderSheet);
+            if (!adapter.IsPresent())
+            {
+                ResyncFromRuntimeState();
+                return;
+            }
+
+            CommanderSheetScreen screen = new CommanderSheetScreen(adapter);
+            Screen current = _screenManager.CurrentScreen;
+            if (current is CommanderSheetScreen && ReferenceEquals(current.SourceKey, screen.SourceKey))
+            {
+                _screenManager.ReplaceTopScreen(screen);
+                return;
+            }
+
+            _screenManager.RemoveScreenForSource(screen.SourceKey);
+            _screenManager.PushScreen(screen);
+        }
+
+        public void OnCommanderSheetClosed(CommanderSheet commanderSheet)
+        {
+            if (commanderSheet == null || !_screenManager.RemoveScreenForSource(commanderSheet))
+            {
+                ResyncFromRuntimeState();
+            }
+        }
+
+        public void OnCommanderSheetChanged(object sourceKey)
+        {
+            CommanderSheetScreen screen = _screenManager.FindScreenForSource<CommanderSheetScreen>(sourceKey);
+            if (screen == null)
+            {
+                return;
+            }
+
+            if (!screen.IsPresent())
+            {
+                _screenManager.RemoveScreenForSource(sourceKey);
+                return;
+            }
+
+            screen.Refresh(ReferenceEquals(_screenManager.CurrentScreen, screen));
+        }
+
+        public void OnCommanderSheetComponentChanged(Component component)
+        {
+            if (component == null)
+            {
+                return;
+            }
+
+            CommanderSheet sheet = component.GetComponentInParent<CommanderSheet>(true);
+            if (sheet != null)
+            {
+                OnCommanderSheetChanged(sheet);
+            }
         }
 
         public void ResyncFromRuntimeState()

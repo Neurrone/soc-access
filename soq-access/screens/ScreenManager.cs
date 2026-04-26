@@ -104,6 +104,25 @@ namespace SongsOfConquestAccess.Screens
             return false;
         }
 
+        public TScreen FindScreenForSource<TScreen>(object sourceKey) where TScreen : Screen
+        {
+            if (sourceKey == null)
+            {
+                return null;
+            }
+
+            for (int i = _stack.Count - 1; i >= 0; i--)
+            {
+                TScreen screen = _stack[i] as TScreen;
+                if (screen != null && ReferenceEquals(screen.SourceKey, sourceKey))
+                {
+                    return screen;
+                }
+            }
+
+            return null;
+        }
+
         public bool IsTopScreen<TScreen>() where TScreen : Screen
         {
             return CurrentScreen is TScreen;
@@ -264,6 +283,7 @@ namespace SongsOfConquestAccess.Screens
                 + DescribeScreen(screen)
                 + " returned "
                 + handled);
+            UIManager.Update();
 
             // Accessibility input is currently modal to the top accessibility screen.
             // Even if the screen ignores a particular action, lower accessibility screens
