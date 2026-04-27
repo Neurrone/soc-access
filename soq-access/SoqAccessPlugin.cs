@@ -56,6 +56,7 @@ namespace SongsOfConquestAccess
             Logger.LogInfo("Accessibility plugin OnDestroy");
             _harmony?.UnpatchSelf();
             _harmony = null;
+            _inputRouter?.Dispose();
             _inputRouter = null;
             _screenDetector = null;
             _screenManager = null;
@@ -74,6 +75,7 @@ namespace SongsOfConquestAccess
 
         private void Update()
         {
+            _inputRouter?.Update();
             UIManager.Update();
         }
 

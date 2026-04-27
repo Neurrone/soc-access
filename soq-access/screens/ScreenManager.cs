@@ -285,10 +285,11 @@ namespace SongsOfConquestAccess.Screens
                 + handled);
             UIManager.Update();
 
-            // Accessibility input is currently modal to the top accessibility screen.
-            // Even if the screen ignores a particular action, lower accessibility screens
-            // and the native UI beneath them should not receive it.
-            return true;
+            // Accessibility actions are offered only to the top accessibility
+            // screen. If that screen does not handle the action, return false so
+            // the input router can leave the native input event unhandled and
+            // let the game process it.
+            return handled;
         }
 
         public bool CurrentScreenClaimsAction(string actionKey)

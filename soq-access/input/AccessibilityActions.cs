@@ -1,19 +1,69 @@
+using UnityEngine.InputSystem;
+
 namespace SongsOfConquestAccess.Input
 {
     internal static class AccessibilityActions
     {
-        public static readonly InputAction NextWidget = new InputAction("next_widget", "Next Widget");
-        public static readonly InputAction PreviousWidget = new InputAction("previous_widget", "Previous Widget");
-        public static readonly InputAction NextMenuItem = new InputAction("next_menu_item", "Next Menu Item");
-        public static readonly InputAction PreviousMenuItem = new InputAction("previous_menu_item", "Previous Menu Item");
-        public static readonly InputAction FirstMenuItem = new InputAction("first_menu_item", "First Menu Item");
-        public static readonly InputAction LastMenuItem = new InputAction("last_menu_item", "Last Menu Item");
-        public static readonly InputAction MapMoveNorth = new InputAction("map_move_north", "Map Move North");
-        public static readonly InputAction MapMoveSouth = new InputAction("map_move_south", "Map Move South");
-        public static readonly InputAction MapMoveWest = new InputAction("map_move_west", "Map Move West");
-        public static readonly InputAction MapMoveEast = new InputAction("map_move_east", "Map Move East");
-        public static readonly InputAction MapSecondaryAction = new InputAction("map_secondary_action", "Map Secondary Action");
-        public static readonly InputAction Activate = new InputAction("activate", "Activate");
-        public static readonly InputAction Cancel = new InputAction("cancel", "Cancel");
+        public static readonly InputAction NextWidget = OneShot("next_widget", "Next Widget")
+            .AddBinding(new KeyboardBinding(Key.Tab));
+
+        public static readonly InputAction PreviousWidget = OneShot("previous_widget", "Previous Widget")
+            .AddBinding(new KeyboardBinding(Key.Tab, shift: true));
+
+        public static readonly InputAction NextMenuItem = OneShot("next_menu_item", "Next Menu Item")
+            .AddBinding(new KeyboardBinding(Key.DownArrow));
+
+        public static readonly InputAction PreviousMenuItem = OneShot("previous_menu_item", "Previous Menu Item")
+            .AddBinding(new KeyboardBinding(Key.UpArrow));
+
+        public static readonly InputAction FirstMenuItem = OneShot("first_menu_item", "First Menu Item")
+            .AddBinding(new KeyboardBinding(Key.Home));
+
+        public static readonly InputAction LastMenuItem = OneShot("last_menu_item", "Last Menu Item")
+            .AddBinding(new KeyboardBinding(Key.End));
+
+        public static readonly InputAction MapMoveNorth = OneShot("map_move_north", "Map Move North")
+            .AddBinding(new KeyboardBinding(Key.UpArrow));
+
+        public static readonly InputAction MapMoveSouth = OneShot("map_move_south", "Map Move South")
+            .AddBinding(new KeyboardBinding(Key.DownArrow));
+
+        public static readonly InputAction MapMoveWest = OneShot("map_move_west", "Map Move West")
+            .AddBinding(new KeyboardBinding(Key.LeftArrow));
+
+        public static readonly InputAction MapMoveEast = OneShot("map_move_east", "Map Move East")
+            .AddBinding(new KeyboardBinding(Key.RightArrow));
+
+        public static readonly InputAction MapSecondaryAction = OneShot("map_secondary_action", "Map Secondary Action")
+            .AddBinding(new KeyboardBinding(Key.Backslash));
+
+        public static readonly InputAction Activate = OneShot("activate", "Activate")
+            .AddBinding(new KeyboardBinding(Key.Enter))
+            .AddBinding(new KeyboardBinding(Key.NumpadEnter));
+
+        public static readonly InputAction Cancel = OneShot("cancel", "Cancel")
+            .AddBinding(new KeyboardBinding(Key.Escape));
+
+        public static readonly InputAction[] All =
+        {
+            NextWidget,
+            PreviousWidget,
+            NextMenuItem,
+            PreviousMenuItem,
+            FirstMenuItem,
+            LastMenuItem,
+            MapMoveNorth,
+            MapMoveSouth,
+            MapMoveWest,
+            MapMoveEast,
+            MapSecondaryAction,
+            Activate,
+            Cancel
+        };
+
+        private static InputAction OneShot(string key, string label)
+        {
+            return new InputAction(key, label, InputRepeatPolicy.OneShotUntilRelease());
+        }
     }
 }

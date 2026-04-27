@@ -1,51 +1,41 @@
-using SongsOfConquest.Client.InputManagement;
+using System;
+using System.Collections.Generic;
 using SongsOfConquestAccess.Screens;
-using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.InputSystem.Controls;
+using UnityEngine.InputSystem.LowLevel;
 
 namespace SongsOfConquestAccess.Input
 {
-    internal sealed class AccessibilityInputRouter
+    internal sealed class AccessibilityInputRouter : IDisposable, IObserver<InputEventPtr>
     {
         private readonly ScreenManager _screenManager;
-        private Key? _pressedAccessibilityKey;
-        private int _pressedAccessibilityKeyFrame = -1;
+        private readonly Dictionary<string, ActiveBindingState> _activeBindings =
+            new Dictionary<string, ActiveBindingState>();
+        private IDisposable _rawInputSubscription;
 
         public AccessibilityInputRouter(ScreenManager screenManager)
         {
             _screenManager = screenManager;
+            _rawInputSubscription = InputSystem.onEvent.Subscribe(this);
+            SoqAccessPlugin.Instance?.LogInfo("AccessibilityInputRouter raw keyboard input attached");
         }
 
-        /// <summary>
-        /// Entry point for keyboard callbacks that arrive through the game's central
-        /// UnityInputManager hook.
-        ///
-        /// Most keyboard actions we care about use this path, but some UI navigation
-        /// keys such as arrow keys do not surface there and must be
-        /// intercepted lower down in the Unity UI input module.
-        /// </summary>
-        public bool TryHandleKeyboardInput(InputSource source, InputPhase phase, InputControl control)
+        public void Dispose()
         {
-            KeyControl keyControl = null;
-            if (source == InputSource.Keyboard)
+            if (_rawInputSubscription != null)
             {
-                keyControl = control as KeyControl;
+                _rawInputSubscription.Dispose();
+                _rawInputSubscription = null;
+                SoqAccessPlugin.Instance?.LogInfo("AccessibilityInputRouter raw keyboard input detached");
             }
 
-            Key? key = keyControl != null ? (Key?)keyControl.keyCode : null;
-            if (phase != InputPhase.Down)
-            {
-                if (phase == InputPhase.Up && key.HasValue && _pressedAccessibilityKey == key.Value)
-                {
-                    _pressedAccessibilityKey = null;
-                    _pressedAccessibilityKeyFrame = -1;
-                }
+            _activeBindings.Clear();
+        }
 
-                return ShouldSuppressKeyboardKey(key);
-            }
-
-            return TryHandleKeyboardKey(key, "AccessibilityInputRouter detected");
+        public void Update()
+        {
+            ConfirmPendingReleases();
         }
 
         public bool ShouldSuppressCameraMovePolling()
@@ -56,125 +46,182 @@ namespace SongsOfConquestAccess.Input
                 || CurrentScreenClaims(AccessibilityActions.MapMoveEast);
         }
 
-        /// <summary>
-        /// Entry point for raw keyboard interception below the game's normal action
-        /// callback layer.
-        ///
-        /// This exists because keys like arrows are processed by the
-        /// Unity UI input module and do not arrive through TryHandleKeyboardInput.
-        /// The mapping and dispatch logic is shared so both interception layers stay
-        /// behaviorally identical.
-        /// </summary>
-        public bool TryHandleRawKeyboardKey(Key key)
+        public void OnCompleted()
         {
-            return TryHandleKeyboardKey(key, "AccessibilityInputRouter intercepted raw key", true);
+            // Required by IObserver<InputEventPtr>. Unity's input event stream
+            // stays live until we unsubscribe, so the router has no completion
+            // behavior to run here.
         }
 
-        private bool TryHandleKeyboardKey(Key? key, string logPrefix)
+        public void OnError(Exception error)
         {
-            return TryHandleKeyboardKey(key, logPrefix, false);
+            SoqAccessPlugin.Instance?.LogWarning("AccessibilityInputRouter raw input stream error: " + error);
         }
 
-        private bool TryHandleKeyboardKey(Key? key, string logPrefix, bool rawFreshPress)
+        public void OnNext(InputEventPtr value)
         {
-            if (!key.HasValue)
+            if (!value.valid)
             {
-                return false;
+                return;
             }
 
-            InputAction action = TryGetAccessibilityActionForKey(key.Value);
-            if (action == null)
+            InputDevice device = InputSystem.GetDeviceById(value.deviceId);
+            if (!(device is Keyboard))
             {
-                return false;
+                return;
             }
 
-            // A single physical key press can arrive more than once from the game's
-            // input stack. For example, Tab can be reported through multiple native
-            // actions on the commander sheet. Treat the first Down event as the
-            // accessibility action and suppress later Down events for the same key
-            // until its Up event clears _pressedAccessibilityKey.
-            if (_pressedAccessibilityKey == key.Value)
+            foreach (InputControl control in InputControlExtensions.EnumerateChangedControls(value, device, 0f))
             {
-                // Raw UI-module interception is driven by wasPressedThisFrame and may
-                // not receive a matching Up event through UnityInputManager. Keep
-                // suppressing same-frame duplicates, but allow the next physical press.
-                if (rawFreshPress && _pressedAccessibilityKeyFrame != Time.frameCount)
+                KeyControl keyControl = control as KeyControl;
+                if (keyControl == null)
                 {
-                    _pressedAccessibilityKeyFrame = Time.frameCount;
-                    return _screenManager != null && _screenManager.DispatchAction(action);
+                    continue;
                 }
 
+                float rawValue;
+                if (!InputControlExtensions.ReadValueFromEvent(keyControl, value, out rawValue))
+                {
+                    continue;
+                }
+
+                bool pressed = rawValue >= keyControl.pressPointOrDefault;
+                if (pressed)
+                {
+                    if (TryHandleKeyDown(keyControl.keyCode))
+                    {
+                        value.handled = true;
+                    }
+                }
+            }
+        }
+
+        private bool TryHandleKeyDown(Key key)
+        {
+            ActiveBindingState activeForKey = FindActiveBindingForKey(key);
+            if (activeForKey != null)
+            {
+                // Modifier state can change while a primary key is still held
+                // (for example, releasing Shift before releasing Tab). Do not let
+                // the same held primary key trigger a different binding until the
+                // primary key has been confirmed released.
                 return true;
             }
 
-            _pressedAccessibilityKey = key.Value;
-            _pressedAccessibilityKeyFrame = Time.frameCount;
-            return _screenManager != null && _screenManager.DispatchAction(action);
-        }
-
-        private bool ShouldSuppressKeyboardKey(Key? key)
-        {
-            if (!key.HasValue)
+            KeyboardStateSnapshot state = KeyboardStateSnapshot.Capture();
+            BindingMatch match = ResolveClaimedMatch(key, state);
+            if (match == null)
             {
                 return false;
             }
 
-            switch (key.Value)
+            bool handled = _screenManager != null && _screenManager.DispatchAction(match.Action);
+            if (!handled)
             {
-                case Key.UpArrow:
-                    return CurrentScreenClaims(AccessibilityActions.MapMoveNorth);
-                case Key.DownArrow:
-                    return CurrentScreenClaims(AccessibilityActions.MapMoveSouth);
-                case Key.LeftArrow:
-                    return CurrentScreenClaims(AccessibilityActions.MapMoveWest);
-                case Key.RightArrow:
-                    return CurrentScreenClaims(AccessibilityActions.MapMoveEast);
-                case Key.Backslash:
-                    return CurrentScreenClaims(AccessibilityActions.MapSecondaryAction);
-                default:
-                    return false;
+                return false;
             }
+
+            _activeBindings[match.Binding.Id] = new ActiveBindingState(match.Action, match.Binding);
+            return true;
         }
 
-        private InputAction TryGetAccessibilityActionForKey(Key keyCode)
+        private ActiveBindingState FindActiveBindingForKey(Key key)
         {
-            Keyboard keyboard = Keyboard.current;
-            switch (keyCode)
+            foreach (ActiveBindingState state in _activeBindings.Values)
             {
-                case Key.Tab:
-                    bool reverse = keyboard != null && (keyboard.leftShiftKey.isPressed || keyboard.rightShiftKey.isPressed);
-                    return reverse ? AccessibilityActions.PreviousWidget : AccessibilityActions.NextWidget;
-                case Key.UpArrow:
-                    if (CurrentScreenClaims(AccessibilityActions.MapMoveNorth))
-                    {
-                        return AccessibilityActions.MapMoveNorth;
-                    }
+                if (state.Binding.UsesKey(key))
+                {
+                    return state;
+                }
+            }
 
-                    return AccessibilityActions.PreviousMenuItem;
-                case Key.DownArrow:
-                    if (CurrentScreenClaims(AccessibilityActions.MapMoveSouth))
-                    {
-                        return AccessibilityActions.MapMoveSouth;
-                    }
+            return null;
+        }
 
-                    return AccessibilityActions.NextMenuItem;
-                case Key.LeftArrow:
-                    return CurrentScreenClaims(AccessibilityActions.MapMoveWest) ? AccessibilityActions.MapMoveWest : null;
-                case Key.RightArrow:
-                    return CurrentScreenClaims(AccessibilityActions.MapMoveEast) ? AccessibilityActions.MapMoveEast : null;
-                case Key.Home:
-                    return AccessibilityActions.FirstMenuItem;
-                case Key.End:
-                    return AccessibilityActions.LastMenuItem;
-                case Key.Enter:
-                case Key.NumpadEnter:
-                    return AccessibilityActions.Activate;
-                case Key.Backslash:
-                    return AccessibilityActions.MapSecondaryAction;
-                case Key.Escape:
-                    return AccessibilityActions.Cancel;
-                default:
-                    return null;
+        private BindingMatch ResolveClaimedMatch(Key key, KeyboardStateSnapshot state)
+        {
+            for (int i = 0; i < AccessibilityActions.All.Length; i++)
+            {
+                InputAction action = AccessibilityActions.All[i];
+                if (!CurrentScreenClaims(action))
+                {
+                    continue;
+                }
+
+                KeyboardBinding binding = FindMatchingKeyboardBinding(action, key, state);
+                if (binding != null)
+                {
+                    return new BindingMatch(action, binding);
+                }
+            }
+
+            return null;
+        }
+
+        private static KeyboardBinding FindMatchingKeyboardBinding(
+            InputAction action,
+            Key key,
+            KeyboardStateSnapshot state)
+        {
+            if (action == null || action.Bindings == null)
+            {
+                return null;
+            }
+
+            for (int i = 0; i < action.Bindings.Count; i++)
+            {
+                KeyboardBinding binding = action.Bindings[i] as KeyboardBinding;
+                if (binding != null && binding.MatchesKeyDown(key, state))
+                {
+                    return binding;
+                }
+            }
+
+            return null;
+        }
+
+        private void ConfirmPendingReleases()
+        {
+            if (_activeBindings.Count == 0)
+            {
+                return;
+            }
+
+            Keyboard keyboard = Keyboard.current;
+            if (keyboard == null)
+            {
+                return;
+            }
+
+            List<string> released = null;
+            foreach (KeyValuePair<string, ActiveBindingState> item in _activeBindings)
+            {
+                ActiveBindingState state = item.Value;
+                if (keyboard[state.Binding.Key].isPressed)
+                {
+                    continue;
+                }
+
+                // In testing, handled raw keyboard events did not produce a
+                // matching raw Up event for this observer. Raw events are used
+                // only for press interception; release detection comes from the
+                // current physical keyboard state during Update.
+                if (released == null)
+                {
+                    released = new List<string>();
+                }
+
+                released.Add(item.Key);
+            }
+
+            if (released == null)
+            {
+                return;
+            }
+
+            for (int i = 0; i < released.Count; i++)
+            {
+                _activeBindings.Remove(released[i]);
             }
         }
 
@@ -183,6 +230,62 @@ namespace SongsOfConquestAccess.Input
             return action != null
                 && _screenManager != null
                 && _screenManager.CurrentScreenClaimsAction(action.Key);
+        }
+
+        private sealed class ActiveBindingState
+        {
+            public ActiveBindingState(InputAction action, KeyboardBinding binding)
+            {
+                Action = action;
+                Binding = binding;
+            }
+
+            public InputAction Action { get; private set; }
+
+            public KeyboardBinding Binding { get; private set; }
+        }
+
+        private sealed class BindingMatch
+        {
+            public BindingMatch(InputAction action, KeyboardBinding binding)
+            {
+                Action = action;
+                Binding = binding;
+            }
+
+            public InputAction Action { get; private set; }
+
+            public KeyboardBinding Binding { get; private set; }
+        }
+
+        internal sealed class KeyboardStateSnapshot
+        {
+            private KeyboardStateSnapshot(bool ctrl, bool shift, bool alt)
+            {
+                Ctrl = ctrl;
+                Shift = shift;
+                Alt = alt;
+            }
+
+            public bool Ctrl { get; private set; }
+
+            public bool Shift { get; private set; }
+
+            public bool Alt { get; private set; }
+
+            public static KeyboardStateSnapshot Capture()
+            {
+                Keyboard keyboard = Keyboard.current;
+                if (keyboard == null)
+                {
+                    return new KeyboardStateSnapshot(false, false, false);
+                }
+
+                return new KeyboardStateSnapshot(
+                    keyboard.leftCtrlKey.isPressed || keyboard.rightCtrlKey.isPressed,
+                    keyboard.leftShiftKey.isPressed || keyboard.rightShiftKey.isPressed,
+                    keyboard.leftAltKey.isPressed || keyboard.rightAltKey.isPressed);
+            }
         }
     }
 }
