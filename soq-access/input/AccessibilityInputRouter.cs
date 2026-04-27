@@ -9,6 +9,8 @@ namespace SongsOfConquestAccess.Input
 {
     internal sealed class AccessibilityInputRouter : IDisposable, IObserver<InputEventPtr>
     {
+        private const float ReleasePollingDelaySeconds = 0.05f;
+
         private readonly ScreenManager _screenManager;
         private readonly Dictionary<string, ActiveBindingState> _activeBindings =
             new Dictionary<string, ActiveBindingState>();
@@ -193,15 +195,29 @@ namespace SongsOfConquestAccess.Input
             foreach (KeyValuePair<string, ActiveBindingState> item in _activeBindings)
             {
                 ActiveBindingState state = item.Value;
+                if (UnityEngine.Time.unscaledTime - state.ActivatedAtSeconds < ReleasePollingDelaySeconds)
+                {
+                    continue;
+                }
+
                 if (keyboard[state.Binding.Key].isPressed)
                 {
                     continue;
                 }
 
                 // In testing, handled raw keyboard events did not produce a
-                // matching raw Up event for this observer. Raw events are used
-                // only for press interception; release detection comes from the
-                // current physical keyboard state during Update.
+                // matching raw Up event for this observer, so raw events are
+                // used only for press interception and release detection comes
+                // from the current physical keyboard state during Update.
+                //
+                // Keyboard.current can still be stale when the raw Down event is
+                // handled: Tab was observed as not pressed in the same frame
+                // that its raw Down event dispatched. Without the short delay
+                // above, the binding is activated and released immediately. If
+                // Unity then emits a duplicate raw Down for the same physical
+                // press, such as Shift+Tab after commander sheet modifier tab
+                // focus changes, the duplicate is treated as a new action
+                // instead of being suppressed by the active binding.
                 if (released == null)
                 {
                     released = new List<string>();
@@ -234,11 +250,14 @@ namespace SongsOfConquestAccess.Input
             {
                 Action = action;
                 Binding = binding;
+                ActivatedAtSeconds = UnityEngine.Time.unscaledTime;
             }
 
             public InputAction Action { get; private set; }
 
             public KeyboardBinding Binding { get; private set; }
+
+            public float ActivatedAtSeconds { get; private set; }
         }
 
         private sealed class BindingMatch
