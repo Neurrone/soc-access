@@ -17,7 +17,7 @@ namespace SongsOfConquestAccess.Screens
             LetterboxStoryTextAdapter adapter = FindActiveLetterboxStoryText();
             if (adapter != null)
             {
-                screens.Add(new LetterboxStoryTextScreen(adapter));
+                screens.Add(new StoryTextScreen(adapter));
             }
         }
 

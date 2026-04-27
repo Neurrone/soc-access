@@ -106,9 +106,9 @@ namespace SongsOfConquestAccess.Screens
                 return;
             }
 
-            LetterboxStoryTextScreen screen = new LetterboxStoryTextScreen(adapter);
+            StoryTextScreen screen = new StoryTextScreen(adapter);
             Screen current = _screenManager.CurrentScreen;
-            if (current is LetterboxStoryTextScreen && ReferenceEquals(current.SourceKey, screen.SourceKey))
+            if (current is StoryTextScreen && ReferenceEquals(current.SourceKey, screen.SourceKey))
             {
                 _screenManager.ReplaceTopScreen(screen);
                 return;

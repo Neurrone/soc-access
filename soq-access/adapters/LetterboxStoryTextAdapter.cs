@@ -7,7 +7,7 @@ using UnityEngine;
 
 namespace SongsOfConquestAccess.Adapters
 {
-    internal sealed class LetterboxStoryTextAdapter
+    internal sealed class LetterboxStoryTextAdapter : IStoryTextAdapter
     {
         private static readonly AccessTools.FieldRef<LetterboxStoryText, UITransform> ContainerRef =
             AccessTools.FieldRefAccess<LetterboxStoryText, UITransform>("_container");

@@ -4,11 +4,11 @@ using SongsOfConquestAccess.UI;
 
 namespace SongsOfConquestAccess.Screens
 {
-    internal sealed class LetterboxStoryTextScreen : Screen
+    internal sealed class StoryTextScreen : Screen
     {
-        private readonly LetterboxStoryTextAdapter _adapter;
+        private readonly IStoryTextAdapter _adapter;
 
-        public LetterboxStoryTextScreen(LetterboxStoryTextAdapter adapter)
+        public StoryTextScreen(IStoryTextAdapter adapter)
             : base(adapter != null ? adapter.SourceKey : null, BuildRootWidget(adapter))
         {
             _adapter = adapter;
@@ -29,9 +29,9 @@ namespace SongsOfConquestAccess.Screens
             return base.OnActionJustPressed(action);
         }
 
-        private static ContainerWidget BuildRootWidget(LetterboxStoryTextAdapter adapter)
+        private static ContainerWidget BuildRootWidget(IStoryTextAdapter adapter)
         {
-            ContainerWidget root = new ContainerWidget("letterbox-story-text", string.Empty);
+            ContainerWidget root = new ContainerWidget("story-text", string.Empty);
 
             root.AddChild(new TextWidget(
                 "story-text",
@@ -49,7 +49,7 @@ namespace SongsOfConquestAccess.Screens
             return root;
         }
 
-        private static string BuildStoryText(LetterboxStoryTextAdapter adapter)
+        private static string BuildStoryText(IStoryTextAdapter adapter)
         {
             if (adapter == null)
             {
