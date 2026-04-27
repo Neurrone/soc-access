@@ -88,8 +88,7 @@ namespace SongsOfConquestAccess.Adapters
                 return false;
             }
 
-            Button.OnClicked?.Invoke();
-            return true;
+            return NativeSelectionUtility.Click(Button);
         }
 
         public void FocusNative()

@@ -57,13 +57,12 @@ namespace SongsOfConquestAccess.Adapters
 
         public bool Activate()
         {
-            if (!IsVisible() || _button.OnClicked == null)
+            if (!IsVisible())
             {
                 return false;
             }
 
-            _button.OnClicked.Invoke(_button);
-            return true;
+            return NativeSelectionUtility.Click(GetVisibleNativeButton());
         }
 
         public void FocusNative()

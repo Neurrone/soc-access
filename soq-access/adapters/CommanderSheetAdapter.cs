@@ -154,8 +154,7 @@ namespace SongsOfConquestAccess.Adapters
                 return false;
             }
 
-            button.OnClicked?.Invoke();
-            return true;
+            return NativeSelectionUtility.Click(button);
         }
 
         public bool Close()

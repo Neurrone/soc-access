@@ -73,11 +73,11 @@ namespace SongsOfConquestAccess.Adapters
                 ExtrasFoldoutRef(_mainMenu),
                 new[]
                 {
-                    new StandardMenuButtonAdapter("tutorial-and-codex", TutorialAndCodexButtonRef(_mainMenu)),
-                    new StandardMenuButtonAdapter("player-stats", PlayerStatsButtonRef(_mainMenu)),
-                    new StandardMenuButtonAdapter("credits", CreditsButtonRef(_mainMenu)),
-                    new StandardMenuButtonAdapter("battlegrounds", BattlegroundsButtonRef(_mainMenu)),
-                    new StandardMenuButtonAdapter("digital-artbook", DigitalArtbookButtonRef(_mainMenu))
+                    CreateMainMenuButton("tutorial-and-codex", TutorialAndCodexButtonRef(_mainMenu)),
+                    CreateMainMenuButton("player-stats", PlayerStatsButtonRef(_mainMenu)),
+                    CreateMainMenuButton("credits", CreditsButtonRef(_mainMenu)),
+                    CreateMainMenuButton("battlegrounds", BattlegroundsButtonRef(_mainMenu)),
+                    CreateMainMenuButton("digital-artbook", DigitalArtbookButtonRef(_mainMenu))
                 });
             MultiplayerFoldout = new NativeFoldoutAdapter(
                 "multiplayer",
@@ -89,23 +89,23 @@ namespace SongsOfConquestAccess.Adapters
                 MultiplayerFoldoutRef(_mainMenu),
                 new[]
                 {
-                    new StandardMenuButtonAdapter("host-online", HostOnlineButtonRef(_mainMenu)),
-                    new StandardMenuButtonAdapter("join-with-code", JoinWithCodeButtonRef(_mainMenu)),
-                    new StandardMenuButtonAdapter("find-online", FindOnlineButtonRef(_mainMenu)),
-                    new StandardMenuButtonAdapter("start-hotseat", StartHotseatButtonRef(_mainMenu))
+                    CreateMainMenuButton("host-online", HostOnlineButtonRef(_mainMenu)),
+                    CreateMainMenuButton("join-with-code", JoinWithCodeButtonRef(_mainMenu)),
+                    CreateMainMenuButton("find-online", FindOnlineButtonRef(_mainMenu)),
+                    CreateMainMenuButton("start-hotseat", StartHotseatButtonRef(_mainMenu))
                 });
 
             _topLevelItems = new List<IMenuButtonAdapter>
             {
-                new ContinueMenuButtonAdapter("continue", ContinueButtonRef(_mainMenu), IsContinueVisible),
-                new StandardMenuButtonAdapter("campaign", CampaignButtonRef(_mainMenu)),
-                new StandardMenuButtonAdapter("skirmish", SkirmishButtonRef(_mainMenu)),
-                new StandardMenuButtonAdapter("load-game", LoadGameButtonRef(_mainMenu)),
-                new StandardMenuButtonAdapter("quit", QuitButtonRef(_mainMenu)),
-                new StandardMenuButtonAdapter("map-editor", MapEditorButtonRef(_mainMenu)),
-                new StandardMenuButtonAdapter("community-maps", CommunityMapsButtonRef(_mainMenu)),
+                new ContinueMenuButtonAdapter("continue", ContinueButtonRef(_mainMenu), IsContinueVisible, () => NativeSelectionUtility.Click(ContinueButtonRef(_mainMenu))),
+                CreateMainMenuButton("campaign", CampaignButtonRef(_mainMenu)),
+                CreateMainMenuButton("skirmish", SkirmishButtonRef(_mainMenu)),
+                CreateMainMenuButton("load-game", LoadGameButtonRef(_mainMenu)),
+                CreateMainMenuButton("quit", QuitButtonRef(_mainMenu)),
+                CreateMainMenuButton("map-editor", MapEditorButtonRef(_mainMenu)),
+                CreateMainMenuButton("community-maps", CommunityMapsButtonRef(_mainMenu)),
                 ExtrasFoldout.TriggerButton,
-                new StandardMenuButtonAdapter("hotseat", HotseatButtonRef(_mainMenu)),
+                CreateMainMenuButton("hotseat", HotseatButtonRef(_mainMenu)),
                 MultiplayerFoldout.TriggerButton
             };
         }
@@ -134,6 +134,11 @@ namespace SongsOfConquestAccess.Adapters
         private bool IsContinueVisible()
         {
             return IsGameObjectActive(ContinueContainerRef(_mainMenu)) && MenuButtonAdapterBase.IsButtonVisible(ContinueButtonRef(_mainMenu));
+        }
+
+        private static IMenuButtonAdapter CreateMainMenuButton(string id, UIButton button)
+        {
+            return new StandardMenuButtonAdapter(id, button, null, () => NativeSelectionUtility.Click(button));
         }
 
         private static UIButton GetFoldoutButton(FoldoutUIButton foldout)
