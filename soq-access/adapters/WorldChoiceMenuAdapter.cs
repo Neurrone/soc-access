@@ -71,8 +71,7 @@ namespace SongsOfConquestAccess.Adapters
                 return false;
             }
 
-            _settings.OkButton.OnClicked?.Invoke();
-            return true;
+            return NativeSelectionUtility.Click(_settings.OkButton);
         }
 
         public bool Close()
@@ -130,14 +129,20 @@ namespace SongsOfConquestAccess.Adapters
             }
 
             Selectable selectable = choice.Button.GetSelectable();
-            NativeSelectionUtility.SelectAndShowTooltip(selectable);
+            // Reward choice buttons carry a native StaticTooltipLocation, but in this menu
+            // that location is the broad gamepad frame around the choice area. Accessibility
+            // focus should place the visual tooltip next to the focused choice itself, so
+            // pass the button rect as the explicit anchor.
+            NativeSelectionUtility.SelectAndShowTooltip(
+                selectable,
+                selectable != null ? selectable.GetComponent<RectTransform>() : null);
 
-            if (choice.Interactable)
-            {
-                choice.Button.OnClicked?.Invoke();
-            }
-
-            return true;
+            // Accessibility focus in this menu intentionally mirrors a single native click:
+            // the reward becomes the selected choice through the game's pointer-click handler.
+            // Do not route this through UIButton.OnSubmit;
+            // reward buttons wire OnGamepadDown to immediate confirmation, so submitting here
+            // would close the menu while the user is only moving through choices.
+            return !choice.Interactable || NativeSelectionUtility.Click(choice.Button);
         }
 
         private string BuildChoiceLabel(IWorldMapChoiceButton button)

@@ -60,6 +60,7 @@ namespace SongsOfConquestAccess
             _inputRouter = null;
             _screenDetector = null;
             _screenManager = null;
+            TooltipPatches.Reset();
             UIManager.Reset();
             _speechEventAnnouncer?.Detach();
             _speechEventAnnouncer = null;
