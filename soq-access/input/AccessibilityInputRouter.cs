@@ -115,11 +115,7 @@ namespace SongsOfConquestAccess.Input
                 return false;
             }
 
-            bool handled = _screenManager != null && _screenManager.DispatchAction(match.Action);
-            if (!handled)
-            {
-                return false;
-            }
+            _screenManager?.DispatchAction(match.Action);
 
             _activeBindings[match.Binding.Id] = new ActiveBindingState(match.Action, match.Binding);
             return true;
