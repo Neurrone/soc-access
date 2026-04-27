@@ -25,6 +25,12 @@ namespace SongsOfConquestAccess.Screens
                 && _foldout.IsOpen();
         }
 
+        public override bool HasClaimed(string actionKey)
+        {
+            return actionKey == AccessibilityActions.Cancel.Key
+                || base.HasClaimed(actionKey);
+        }
+
         public override bool OnActionJustPressed(InputAction action)
         {
             if (action != null && action.Key == AccessibilityActions.Cancel.Key)
