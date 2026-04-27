@@ -286,9 +286,10 @@ namespace SongsOfConquestAccess.Screens
             UIManager.Update();
 
             // Accessibility actions are offered only to the top accessibility
-            // screen. If that screen does not handle the action, return false so
-            // the input router can leave the native input event unhandled and
-            // let the game process it.
+            // screen. Claiming happens before dispatch in the input router; if a
+            // screen claims an action, the router owns that input event even when
+            // this method returns false. The return value only reports whether
+            // the screen performed an action.
             return handled;
         }
 
