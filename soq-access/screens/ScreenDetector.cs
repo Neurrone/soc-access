@@ -35,6 +35,8 @@ namespace SongsOfConquestAccess.Screens
                 new WorldChoiceMenuRuntimeScreenProbe(),
                 new CommanderSheetRuntimeScreenProbe(),
                 new LetterboxStoryTextRuntimeScreenProbe(),
+                new StoryTextRuntimeScreenProbe(),
+                new DialogueMenuRuntimeScreenProbe(),
                 new QuestionDialogRuntimeScreenProbe(),
                 new TutorialRuntimeScreenProbe()
             };
@@ -121,6 +123,65 @@ namespace SongsOfConquestAccess.Screens
         public void OnLetterboxStoryTextHidden(LetterboxStoryText storyText)
         {
             if (storyText == null || !_screenManager.RemoveScreenForSource(storyText))
+            {
+                ResyncFromRuntimeState();
+            }
+        }
+
+        public void OnStoryTextShown(StoryText storyText)
+        {
+            StoryTextAdapter adapter = new StoryTextAdapter(storyText);
+            if (!adapter.IsPresent())
+            {
+                ResyncFromRuntimeState();
+                return;
+            }
+
+            StoryTextScreen screen = new StoryTextScreen(adapter);
+            Screen current = _screenManager.CurrentScreen;
+            if (current is StoryTextScreen && ReferenceEquals(current.SourceKey, screen.SourceKey))
+            {
+                _screenManager.ReplaceTopScreen(screen);
+                return;
+            }
+
+            _screenManager.RemoveScreenForSource(screen.SourceKey);
+            _screenManager.PushScreen(screen);
+        }
+
+        public void OnStoryTextHidden(StoryText storyText)
+        {
+            if (storyText == null || !_screenManager.RemoveScreenForSource(storyText))
+            {
+                ResyncFromRuntimeState();
+            }
+        }
+
+        public void OnDialogueMenuAvailable(DialogueMenu dialogueMenu)
+        {
+            DialogueMenuAdvanceGuard.ClearPending(dialogueMenu);
+            DialogueMenuAdapter adapter = new DialogueMenuAdapter(dialogueMenu);
+            if (!adapter.IsPresent())
+            {
+                ResyncFromRuntimeState();
+                return;
+            }
+
+            StoryTextScreen screen = new StoryTextScreen(adapter);
+            Screen current = _screenManager.CurrentScreen;
+            if (current is StoryTextScreen && ReferenceEquals(current.SourceKey, screen.SourceKey))
+            {
+                _screenManager.ReplaceTopScreen(screen);
+                return;
+            }
+
+            _screenManager.RemoveScreenForSource(screen.SourceKey);
+            _screenManager.PushScreen(screen);
+        }
+
+        public void OnDialogueMenuHidden(DialogueMenu dialogueMenu)
+        {
+            if (dialogueMenu == null || !_screenManager.RemoveScreenForSource(dialogueMenu))
             {
                 ResyncFromRuntimeState();
             }
