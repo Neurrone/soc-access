@@ -32,6 +32,7 @@ namespace SongsOfConquestAccess.Screens
                 new CampaignMenuRuntimeScreenProbe(),
                 new CampaignMapSelectRuntimeScreenProbe(),
                 new AdventureMapRuntimeScreenProbe(),
+                new WorldChoiceMenuRuntimeScreenProbe(),
                 new CommanderSheetRuntimeScreenProbe(),
                 new LetterboxStoryTextRuntimeScreenProbe(),
                 new QuestionDialogRuntimeScreenProbe(),
@@ -279,6 +280,35 @@ namespace SongsOfConquestAccess.Screens
         public void OnAdventureSceneUnloading()
         {
             _screenManager.RemoveScreens(screen => screen is AdventureMapScreen);
+        }
+
+        public void OnWorldChoiceMenuOpened(WorldChoiceMenu menu)
+        {
+            WorldChoiceMenuAdapter adapter = new WorldChoiceMenuAdapter(menu);
+            if (!adapter.IsPresent())
+            {
+                ResyncFromRuntimeState();
+                return;
+            }
+
+            WorldChoiceMenuScreen screen = new WorldChoiceMenuScreen(adapter);
+            Screen current = _screenManager.CurrentScreen;
+            if (current is WorldChoiceMenuScreen && ReferenceEquals(current.SourceKey, screen.SourceKey))
+            {
+                _screenManager.ReplaceTopScreen(screen);
+                return;
+            }
+
+            _screenManager.RemoveScreenForSource(screen.SourceKey);
+            _screenManager.PushScreen(screen);
+        }
+
+        public void OnWorldChoiceMenuClosed(WorldChoiceMenu menu)
+        {
+            if (menu == null || !_screenManager.RemoveScreenForSource(menu))
+            {
+                ResyncFromRuntimeState();
+            }
         }
 
         public void OnCommanderSheetOpened(CommanderSheet commanderSheet)
