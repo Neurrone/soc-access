@@ -3,6 +3,7 @@ using HarmonyLib;
 using SongsOfConquest.Client.Adventure;
 using SongsOfConquest.Client.UI;
 using SongsOfConquestAccess.Speech;
+using TMPro;
 using UnityEngine;
 
 namespace SongsOfConquestAccess.Adapters
@@ -64,7 +65,8 @@ namespace SongsOfConquestAccess.Adapters
                 && component.gameObject != null
                 && component.gameObject.activeInHierarchy
                 && component.gameObject.scene.IsValid()
-                && component.gameObject.scene.isLoaded;
+                && component.gameObject.scene.isLoaded
+                && HasTextStarted();
         }
 
         public bool AdvanceNow()
@@ -87,6 +89,15 @@ namespace SongsOfConquestAccess.Adapters
         private bool IsTyping()
         {
             return _storyText != null && TypeRoutineRef(_storyText) != null;
+        }
+
+        private bool HasTextStarted()
+        {
+            UITextMesh loreText = _storyText != null ? LoreTextRef(_storyText) : null;
+            TMP_Text tmpText = loreText as TMP_Text;
+            return !IsTyping()
+                || tmpText == null
+                || tmpText.maxVisibleCharacters > 0;
         }
 
         private string GetText(AccessTools.FieldRef<LetterboxStoryText, UITextMesh> textRef)
