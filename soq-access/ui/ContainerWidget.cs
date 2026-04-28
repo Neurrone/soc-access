@@ -52,6 +52,16 @@ namespace SongsOfConquestAccess.UI
             _children.Add(child);
         }
 
+        public Widget GetChildAt(int index)
+        {
+            if (index < 0 || index >= _children.Count)
+            {
+                return null;
+            }
+
+            return _children[index];
+        }
+
         public bool SetFocusedChildById(string id)
         {
             if (string.IsNullOrWhiteSpace(id))
