@@ -37,9 +37,24 @@ namespace SongsOfConquestAccess.Input
         public static readonly InputAction MapSecondaryAction = OneShot("map_secondary_action", "Map Secondary Action")
             .AddBinding(new KeyboardBinding(Key.Backslash));
 
+        public static readonly InputAction SliderDecrease = OneShot("slider_decrease", "Slider Decrease")
+            .AddBinding(new KeyboardBinding(Key.LeftArrow));
+
+        public static readonly InputAction SliderIncrease = OneShot("slider_increase", "Slider Increase")
+            .AddBinding(new KeyboardBinding(Key.RightArrow));
+
+        public static readonly InputAction SliderMinimum = OneShot("slider_minimum", "Slider Minimum")
+            .AddBinding(new KeyboardBinding(Key.Home));
+
+        public static readonly InputAction SliderMaximum = OneShot("slider_maximum", "Slider Maximum")
+            .AddBinding(new KeyboardBinding(Key.End));
+
         public static readonly InputAction Activate = OneShot("activate", "Activate")
             .AddBinding(new KeyboardBinding(Key.Enter))
             .AddBinding(new KeyboardBinding(Key.NumpadEnter));
+
+        public static readonly InputAction SelectArmyStack = OneShot("select_army_stack", "Select Army Stack")
+            .AddBinding(new KeyboardBinding(Key.Space));
 
         public static readonly InputAction Cancel = OneShot("cancel", "Cancel")
             .AddBinding(new KeyboardBinding(Key.Escape));
@@ -57,7 +72,12 @@ namespace SongsOfConquestAccess.Input
             MapMoveWest,
             MapMoveEast,
             MapSecondaryAction,
+            SliderDecrease,
+            SliderIncrease,
+            SliderMinimum,
+            SliderMaximum,
             Activate,
+            SelectArmyStack,
             Cancel
         };
 

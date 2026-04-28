@@ -32,6 +32,8 @@ namespace SongsOfConquestAccess.Screens
                 new CampaignMenuRuntimeScreenProbe(),
                 new CampaignMapSelectRuntimeScreenProbe(),
                 new AdventureMapRuntimeScreenProbe(),
+                new HostileJoinMenuRuntimeScreenProbe(),
+                new MoveTroopPopupRuntimeScreenProbe(),
                 new WorldChoiceMenuRuntimeScreenProbe(),
                 new CommanderSheetRuntimeScreenProbe(),
                 new LetterboxStoryTextRuntimeScreenProbe(),
@@ -365,6 +367,42 @@ namespace SongsOfConquestAccess.Screens
         }
 
         public void OnWorldChoiceMenuClosed(WorldChoiceMenu menu)
+        {
+            if (menu == null || !_screenManager.RemoveScreenForSource(menu))
+            {
+                ResyncFromRuntimeState();
+            }
+        }
+
+        public void OnHostileJoinMenuChanged(HostileJoinMenu menu)
+        {
+            if (menu == null)
+            {
+                ResyncFromRuntimeState();
+                return;
+            }
+
+            HostileJoinMenuAdapter adapter = new HostileJoinMenuAdapter(menu);
+            if (!adapter.IsPresent())
+            {
+                adapter.Dispose();
+                ResyncFromRuntimeState();
+                return;
+            }
+
+            HostileJoinMenuScreen screen = new HostileJoinMenuScreen(adapter);
+            Screen current = _screenManager.CurrentScreen;
+            if (current is HostileJoinMenuScreen && ReferenceEquals(current.SourceKey, screen.SourceKey))
+            {
+                _screenManager.ReplaceTopScreen(screen);
+                return;
+            }
+
+            _screenManager.RemoveScreenForSource(screen.SourceKey);
+            _screenManager.PushScreen(screen);
+        }
+
+        public void OnHostileJoinMenuClosed(HostileJoinMenu menu)
         {
             if (menu == null || !_screenManager.RemoveScreenForSource(menu))
             {
