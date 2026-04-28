@@ -12,8 +12,6 @@ namespace SongsOfConquestAccess.Screens
     internal sealed class CommanderSheetScreen : Screen
     {
         private readonly CommanderSheetAdapter _adapter;
-        private bool _refreshPending;
-        private int _pendingFocusedIndex = -1;
         private Action<int, bool> _artifactChangedHandler;
         private Action<int> _statisticsChangedHandler;
         private Action<ICommanderState, SkillReference> _skillAddedHandler;
@@ -32,18 +30,6 @@ namespace SongsOfConquestAccess.Screens
         public override void OnPush()
         {
             AttachListeners();
-        }
-
-        public override void OnFocus()
-        {
-            if (_refreshPending)
-            {
-                _refreshPending = false;
-                Refresh(focusAfterRefresh: true);
-                return;
-            }
-
-            base.OnFocus();
         }
 
         public override void OnPop()
@@ -66,26 +52,17 @@ namespace SongsOfConquestAccess.Screens
         {
             if (!IsPresent())
             {
-                _refreshPending = false;
-                _pendingFocusedIndex = -1;
                 return;
             }
 
-            int focusedIndex = _pendingFocusedIndex >= 0
-                ? _pendingFocusedIndex
-                : (RootWidget != null ? RootWidget.FocusedIndex : -1);
+            int focusedIndex = RootWidget != null ? RootWidget.FocusedIndex : -1;
+            RootWidget = BuildRoot(_adapter);
 
             if (!focusAfterRefresh)
             {
-                _refreshPending = true;
-                _pendingFocusedIndex = focusedIndex;
-                RootWidget = BuildRoot(_adapter);
                 return;
             }
 
-            _refreshPending = false;
-            _pendingFocusedIndex = -1;
-            RootWidget = BuildRoot(_adapter);
             if (RootWidget == null || !RootWidget.SetFocusByIndex(focusedIndex))
             {
                 RootWidget?.Focus();
