@@ -40,14 +40,6 @@ namespace SongsOfConquestAccess.Input
             ConfirmPendingReleases();
         }
 
-        public bool ShouldSuppressCameraMovePolling()
-        {
-            return CurrentScreenClaims(AccessibilityActions.MapMoveNorth)
-                || CurrentScreenClaims(AccessibilityActions.MapMoveSouth)
-                || CurrentScreenClaims(AccessibilityActions.MapMoveWest)
-                || CurrentScreenClaims(AccessibilityActions.MapMoveEast);
-        }
-
         public void OnCompleted()
         {
             // Required by IObserver<InputEventPtr>. Unity's input event stream
