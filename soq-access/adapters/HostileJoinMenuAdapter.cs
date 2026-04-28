@@ -12,6 +12,7 @@ using SongsOfConquest.Client.UI;
 using SongsOfConquest.Common;
 using SongsOfConquest.Common.Gamestate;
 using SongsOfConquest.Common.Localization;
+using SongsOfConquestAccess.Events;
 using SongsOfConquestAccess.Speech;
 using SongsOfConquestAccess.UI;
 using UnityEngine;
@@ -190,7 +191,7 @@ namespace SongsOfConquestAccess.Adapters
             if (!InvokeBool(CanDropHereMethod, movable))
             {
                 movable.Reset();
-                Speak("Cannot drop there.");
+                AccessibilityEventBus.Publish(new ArmyExchangeInvalidDestinationEvent(source.Id, target.Id));
                 return true;
             }
 
@@ -313,11 +314,6 @@ namespace SongsOfConquestAccess.Adapters
         private string GetTroopName(int troopId)
         {
             return SpeechTextSanitizer.Normalize(_facade != null ? _facade.Troops.GetName(troopId) : string.Empty);
-        }
-
-        private static void Speak(string text)
-        {
-            SpeechPipeline.Output(new SpeechRequest(text, interrupt: true));
         }
 
         private static bool InvokeBool(MethodInfo method, object instance)

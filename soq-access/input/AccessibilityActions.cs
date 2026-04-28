@@ -2,6 +2,9 @@ using UnityEngine.InputSystem;
 
 namespace SongsOfConquestAccess.Input
 {
+    // If a new widget uses the same key (such as the arrow keys) as an existing widget, do not reuse the previous widget's action in the new widget
+    // Instead, create new semantic actions for the new widget.
+    // For example, the map navigation and menu widgets both use the arrow keys, but different actions
     internal static class AccessibilityActions
     {
         public static readonly InputAction NextWidget = OneShot("next_widget", "Next Widget")
@@ -49,6 +52,18 @@ namespace SongsOfConquestAccess.Input
         public static readonly InputAction SliderMaximum = OneShot("slider_maximum", "Slider Maximum")
             .AddBinding(new KeyboardBinding(Key.End));
 
+        public static readonly InputAction PreviousArmySlot = OneShot("previous_army_slot", "Previous Army Slot")
+            .AddBinding(new KeyboardBinding(Key.UpArrow));
+
+        public static readonly InputAction NextArmySlot = OneShot("next_army_slot", "Next Army Slot")
+            .AddBinding(new KeyboardBinding(Key.DownArrow));
+
+        public static readonly InputAction PreviousArmy = OneShot("previous_army", "Previous Army")
+            .AddBinding(new KeyboardBinding(Key.LeftArrow));
+
+        public static readonly InputAction NextArmy = OneShot("next_army", "Next Army")
+            .AddBinding(new KeyboardBinding(Key.RightArrow));
+
         public static readonly InputAction Activate = OneShot("activate", "Activate")
             .AddBinding(new KeyboardBinding(Key.Enter))
             .AddBinding(new KeyboardBinding(Key.NumpadEnter));
@@ -76,6 +91,10 @@ namespace SongsOfConquestAccess.Input
             SliderIncrease,
             SliderMinimum,
             SliderMaximum,
+            PreviousArmySlot,
+            NextArmySlot,
+            PreviousArmy,
+            NextArmy,
             Activate,
             SelectArmyStack,
             Cancel

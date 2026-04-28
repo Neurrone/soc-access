@@ -82,10 +82,10 @@ namespace SongsOfConquestAccess.UI
 
         public override bool ClaimsAction(string actionKey)
         {
-            return actionKey == AccessibilityActions.MapMoveNorth.Key
-                || actionKey == AccessibilityActions.MapMoveSouth.Key
-                || actionKey == AccessibilityActions.MapMoveWest.Key
-                || actionKey == AccessibilityActions.MapMoveEast.Key
+            return actionKey == AccessibilityActions.PreviousArmySlot.Key
+                || actionKey == AccessibilityActions.NextArmySlot.Key
+                || actionKey == AccessibilityActions.PreviousArmy.Key
+                || actionKey == AccessibilityActions.NextArmy.Key
                 || actionKey == AccessibilityActions.SelectArmyStack.Key
                 || actionKey == AccessibilityActions.Activate.Key
                 || actionKey == AccessibilityActions.Cancel.Key;
@@ -103,22 +103,22 @@ namespace SongsOfConquestAccess.UI
                 return false;
             }
 
-            if (action.Key == AccessibilityActions.MapMoveNorth.Key)
+            if (action.Key == AccessibilityActions.PreviousArmySlot.Key)
             {
                 return MoveVertical(-1);
             }
 
-            if (action.Key == AccessibilityActions.MapMoveSouth.Key)
+            if (action.Key == AccessibilityActions.NextArmySlot.Key)
             {
                 return MoveVertical(1);
             }
 
-            if (action.Key == AccessibilityActions.MapMoveWest.Key)
+            if (action.Key == AccessibilityActions.PreviousArmy.Key)
             {
                 return MoveHorizontal(-1);
             }
 
-            if (action.Key == AccessibilityActions.MapMoveEast.Key)
+            if (action.Key == AccessibilityActions.NextArmy.Key)
             {
                 return MoveHorizontal(1);
             }

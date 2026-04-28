@@ -21,5 +21,10 @@ namespace SongsOfConquestAccess.Events
             public const string DeniedMove = "notification.denied_move";
             public const string DeniedEntityInteraction = "notification.denied_entity_interaction";
         }
+
+        public static class ArmyExchange
+        {
+            public const string InvalidDestination = "army_exchange.invalid_destination";
+        }
     }
 }
