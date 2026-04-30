@@ -336,7 +336,7 @@ namespace SongsOfConquestAccess.UI
 
         private static void Speak(string text)
         {
-            SpeechPipeline.Output(new SpeechRequest(text, interrupt: true));
+            SpeechPipeline.Output(new SpeechRequest(text, interrupt: false));
         }
 
         internal sealed class SlotData

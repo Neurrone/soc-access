@@ -159,7 +159,7 @@ namespace SongsOfConquestAccess.UI
             string valueText = GetValueText();
             if (!string.IsNullOrWhiteSpace(valueText))
             {
-                SpeechPipeline.Output(new SpeechRequest(valueText, interrupt: true));
+                SpeechPipeline.Output(new SpeechRequest(valueText, interrupt: false));
             }
         }
 

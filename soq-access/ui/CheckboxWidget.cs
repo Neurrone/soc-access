@@ -58,7 +58,7 @@ namespace SongsOfConquestAccess.UI
             }
 
             _toggle();
-            SpeechPipeline.Output(new SpeechRequest(GetStatus(), interrupt: true));
+            SpeechPipeline.Output(new SpeechRequest(GetStatus(), interrupt: false));
             return true;
         }
 

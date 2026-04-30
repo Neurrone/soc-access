@@ -296,6 +296,23 @@ namespace SongsOfConquestAccess.Screens
 
         public bool HandleGlobalAction(InputAction action)
         {
+            if (!CanHandleGlobalAction(action))
+            {
+                return false;
+            }
+
+            if (action.Key == AccessibilityActions.TooltipActionsMenu.Key)
+            {
+                Tooltip tooltip = UIManager.CurrentWidget.GetTooltip();
+                PushScreen(new TooltipActionsMenuScreen(tooltip.Actions, () => RemoveTopScreen<TooltipActionsMenuScreen>()));
+                return true;
+            }
+
+            return false;
+        }
+
+        public bool CanHandleGlobalAction(InputAction action)
+        {
             if (!AccessibilityActions.IsGlobalAction(action))
             {
                 return false;
@@ -309,13 +326,9 @@ namespace SongsOfConquestAccess.Screens
                 }
 
                 Tooltip tooltip = UIManager.CurrentWidget != null ? UIManager.CurrentWidget.GetTooltip() : null;
-                if (tooltip == null || tooltip.Actions == null || tooltip.Actions.Count == 0)
-                {
-                    return false;
-                }
-
-                PushScreen(new TooltipActionsMenuScreen(tooltip.Actions, () => RemoveTopScreen<TooltipActionsMenuScreen>()));
-                return true;
+                return tooltip != null
+                    && tooltip.Actions != null
+                    && tooltip.Actions.Count > 0;
             }
 
             return false;

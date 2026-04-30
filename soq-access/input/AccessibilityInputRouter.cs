@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using SongsOfConquestAccess.Speech;
 using SongsOfConquestAccess.Screens;
 using UnityEngine.InputSystem;
 using UnityEngine.InputSystem.Controls;
@@ -112,14 +113,24 @@ namespace SongsOfConquestAccess.Input
                     return false;
                 }
 
-                _screenManager?.HandleGlobalAction(match.Action);
+                if (_screenManager != null && _screenManager.CanHandleGlobalAction(match.Action))
+                {
+                    // Global actions such as opening the tooltip actions menu
+                    // can produce new focus speech. Silence only after the
+                    // preflight proves the action will run, so no-op global
+                    // presses do not cut off the current announcement.
+                    SpeechPipeline.Silence();
+                    _screenManager.HandleGlobalAction(match.Action);
+                }
             }
             else
             {
+                SpeechPipeline.Silence();
                 _screenManager?.DispatchAction(match.Action);
             }
 
-            _activeBindings[match.Binding.Id] = new ActiveBindingState(match.Action, match.Binding);
+            ActiveBindingState bindingState = new ActiveBindingState(match.Action, match.Binding);
+            _activeBindings[match.Binding.Id] = bindingState;
             return true;
         }
 
@@ -220,19 +231,13 @@ namespace SongsOfConquestAccess.Input
                     continue;
                 }
 
-                // In testing, handled raw keyboard events did not produce a
-                // matching raw Up event for this observer, so raw events are
-                // used only for press interception and release detection comes
-                // from the current physical keyboard state during Update.
-                //
-                // Keyboard.current can still be stale when the raw Down event is
-                // handled: Tab was observed as not pressed in the same frame
-                // that its raw Down event dispatched. Without the short delay
-                // above, the binding is activated and released immediately. If
-                // Unity then emits a duplicate raw Down for the same physical
-                // press, such as Shift+Tab after commander sheet modifier tab
-                // focus changes, the duplicate is treated as a new action
-                // instead of being suppressed by the active binding.
+                // Raw key-up would be a cleaner release signal, but in this
+                // Unity/BepInEx input path handled key-down events did not
+                // produce observable pressed=false key events in this observer.
+                // When release detection was switched to raw key-up only, each
+                // key stayed active after its first press and later presses were
+                // suppressed forever. Polling Keyboard.current is therefore the
+                // release source used for one-shot bindings here.
                 if (released == null)
                 {
                     released = new List<string>();
@@ -316,6 +321,7 @@ namespace SongsOfConquestAccess.Input
                     keyboard.leftShiftKey.isPressed || keyboard.rightShiftKey.isPressed,
                     keyboard.leftAltKey.isPressed || keyboard.rightAltKey.isPressed);
             }
+
         }
     }
 }

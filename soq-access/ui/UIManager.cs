@@ -59,7 +59,7 @@ namespace SongsOfConquestAccess.UI
 
             _lastAnnouncement = announcement;
             SoqAccessPlugin.Instance?.LogInfo("UIManager speaking focused widget: \"" + announcement + "\"");
-            SpeechPipeline.Output(new SpeechRequest(announcement, interrupt: true));
+            SpeechPipeline.Output(new SpeechRequest(announcement, interrupt: false));
 
             // Future buffer hook: populate the UI review buffer here from the
             // same label/status/tooltip lines used for the focus announcement.
