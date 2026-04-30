@@ -1,9 +1,13 @@
 using System.Collections.Generic;
+using SongsOfConquestAccess.Adapters;
+using SongsOfConquestAccess.Speech;
 
 namespace SongsOfConquestAccess.UI
 {
     internal abstract class Widget
     {
+        private static readonly IReadOnlyList<string> EmptyTooltipLines = new string[0];
+
         protected Widget(string id)
         {
             Id = id ?? string.Empty;
@@ -43,18 +47,37 @@ namespace SongsOfConquestAccess.UI
             return string.Empty;
         }
 
-        public virtual string GetTooltip()
+        // Returns tooltip text, native visual display metadata, and optional
+        // structured actions for this widget. Null means this widget has no
+        // tooltip. Tooltip text lines are used for focus speech and future buffer
+        // review. Visual metadata is used only to display the game's native
+        // visual tooltip.
+        public virtual Tooltip GetTooltip()
         {
-            return string.Empty;
+            return null;
         }
 
         public virtual string GetFocusMessage()
         {
-            List<string> parts = new List<string>(3);
+            List<string> parts = new List<string>(4);
             AddIfNotEmpty(parts, GetLabel());
             AddIfNotEmpty(parts, GetRole());
             AddIfNotEmpty(parts, GetStatus());
-            return string.Join(" ", parts.ToArray());
+            string focusText = string.Join(" ", parts.ToArray());
+            Tooltip tooltip = GetTooltip();
+            IReadOnlyList<string> tooltipLines = GetTooltipSpeechLines(tooltip);
+            if (tooltipLines.Count > 0)
+            {
+                return TerminateSentence(focusText) + "\nTooltip: " + BuildTooltipSpeechText(tooltipLines, tooltip).Trim();
+            }
+
+            return AppendAvailableActions(TerminateSentence(focusText), tooltip);
+        }
+
+        public IReadOnlyList<string> GetTooltipTextLines()
+        {
+            Tooltip tooltip = GetTooltip();
+            return tooltip != null && tooltip.TextLines != null ? tooltip.TextLines : EmptyTooltipLines;
         }
 
         public virtual bool ClaimsAction(string actionKey)
@@ -101,6 +124,92 @@ namespace SongsOfConquestAccess.UI
             {
                 parts.Add(value);
             }
+        }
+
+        protected static string TerminateSentence(string value)
+        {
+            value = value != null ? value.Trim() : string.Empty;
+            if (value.Length == 0)
+            {
+                return string.Empty;
+            }
+
+            char last = value[value.Length - 1];
+            return last == '.' || last == '!' || last == '?' || last == ':' || last == ';'
+                ? value
+                : value + ".";
+        }
+
+        protected static IReadOnlyList<string> GetTooltipSpeechLines(Tooltip tooltip)
+        {
+            if (tooltip == null || tooltip.TextLines == null)
+            {
+                return EmptyTooltipLines;
+            }
+
+            List<string> lines = new List<string>();
+            for (int i = 0; i < tooltip.TextLines.Count; i++)
+            {
+                string line = SpeechTextSanitizer.Normalize(tooltip.TextLines[i]);
+                if (!string.IsNullOrWhiteSpace(line))
+                {
+                    lines.Add(line);
+                }
+            }
+
+            return lines.Count == 0 ? EmptyTooltipLines : lines;
+        }
+
+        protected static string BuildTooltipSpeechText(IReadOnlyList<string> tooltipLines, Tooltip tooltip)
+        {
+            string tooltipText = tooltipLines != null ? string.Join("\n", tooltipLines).Trim() : string.Empty;
+            return AppendAvailableActions(tooltipText, tooltip);
+        }
+
+        private static string AppendAvailableActions(string text, Tooltip tooltip)
+        {
+            string actionsText = BuildAvailableActionsText(tooltip);
+            if (string.IsNullOrWhiteSpace(actionsText))
+            {
+                return text;
+            }
+
+            if (string.IsNullOrWhiteSpace(text))
+            {
+                return actionsText;
+            }
+
+            return text.TrimEnd() + "\n" + actionsText;
+        }
+
+        private static string BuildAvailableActionsText(Tooltip tooltip)
+        {
+            if (tooltip == null || tooltip.Actions == null || tooltip.Actions.Count == 0)
+            {
+                return string.Empty;
+            }
+
+            List<string> labels = new List<string>();
+            for (int i = 0; i < tooltip.Actions.Count; i++)
+            {
+                TooltipAction action = tooltip.Actions[i];
+                string label = SpeechTextSanitizer.Normalize(action != null ? action.Label : null);
+                if (!string.IsNullOrWhiteSpace(label))
+                {
+                    labels.Add(label);
+                }
+            }
+
+            if (labels.Count == 0)
+            {
+                return string.Empty;
+            }
+
+            // Enriched tooltips remove native mouse/gamepad instruction rows such
+            // as "CTRL + Drop" and replace them with structured actions. Announce
+            // the action labels here so the player knows the Applications menu
+            // has commands.
+            return "Available actions: " + string.Join(", ", labels.ToArray()) + ".";
         }
     }
 }
