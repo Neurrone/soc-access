@@ -104,6 +104,42 @@ namespace SongsOfConquestAccess.Input
         public static readonly InputAction Cancel = OneShot("cancel", "Cancel")
             .AddBinding(new KeyboardBinding(Key.Escape));
 
+        public static readonly InputAction TroopPlacementMoveWest = OneShot("troop_placement_move_west", "Troop Placement Move West")
+            .AddBinding(new KeyboardBinding(Key.A));
+
+        public static readonly InputAction TroopPlacementMoveEast = OneShot("troop_placement_move_east", "Troop Placement Move East")
+            .AddBinding(new KeyboardBinding(Key.D));
+
+        public static readonly InputAction TroopPlacementMoveNorthWest = OneShot("troop_placement_move_north_west", "Troop Placement Move Northwest")
+            .AddBinding(new KeyboardBinding(Key.Q));
+
+        public static readonly InputAction TroopPlacementMoveNorthEast = OneShot("troop_placement_move_north_east", "Troop Placement Move Northeast")
+            .AddBinding(new KeyboardBinding(Key.E));
+
+        public static readonly InputAction TroopPlacementMoveSouthWest = OneShot("troop_placement_move_south_west", "Troop Placement Move Southwest")
+            .AddBinding(new KeyboardBinding(Key.Z));
+
+        public static readonly InputAction TroopPlacementMoveSouthEast = OneShot("troop_placement_move_south_east", "Troop Placement Move Southeast")
+            .AddBinding(new KeyboardBinding(Key.C));
+
+        public static readonly InputAction TroopPlacementNextOwnSpawn = OneShot("troop_placement_next_own_spawn", "Next Own Spawn Point")
+            .AddBinding(new KeyboardBinding(Key.W));
+
+        public static readonly InputAction TroopPlacementPreviousOwnSpawn = OneShot("troop_placement_previous_own_spawn", "Previous Own Spawn Point")
+            .AddBinding(new KeyboardBinding(Key.W, shift: true));
+
+        public static readonly InputAction TroopPlacementNextEnemySpawn = OneShot("troop_placement_next_enemy_spawn", "Next Enemy Spawn Point")
+            .AddBinding(new KeyboardBinding(Key.X));
+
+        public static readonly InputAction TroopPlacementPreviousEnemySpawn = OneShot("troop_placement_previous_enemy_spawn", "Previous Enemy Spawn Point")
+            .AddBinding(new KeyboardBinding(Key.X, shift: true));
+
+        public static readonly InputAction TroopPlacementStartDrag = OneShot("troop_placement_start_drag", "Start Troop Placement Drag")
+            .AddBinding(new KeyboardBinding(Key.Space));
+
+        public static readonly InputAction TroopPlacementCancelDrag = OneShot("troop_placement_cancel_drag", "Cancel Troop Placement Drag")
+            .AddBinding(new KeyboardBinding(Key.Escape));
+
         public static readonly InputAction[] NON_GLOBAL_ACTIONS =
         {
             NextWidget,
@@ -125,6 +161,18 @@ namespace SongsOfConquestAccess.Input
             NextArmySlot,
             PreviousArmy,
             NextArmy,
+            TroopPlacementMoveWest,
+            TroopPlacementMoveEast,
+            TroopPlacementMoveNorthWest,
+            TroopPlacementMoveNorthEast,
+            TroopPlacementMoveSouthWest,
+            TroopPlacementMoveSouthEast,
+            TroopPlacementNextOwnSpawn,
+            TroopPlacementPreviousOwnSpawn,
+            TroopPlacementNextEnemySpawn,
+            TroopPlacementPreviousEnemySpawn,
+            TroopPlacementStartDrag,
+            TroopPlacementCancelDrag,
             Activate,
             SelectArmyStack,
             Cancel

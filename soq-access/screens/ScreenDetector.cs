@@ -32,6 +32,7 @@ namespace SongsOfConquestAccess.Screens
                 new CampaignMenuRuntimeScreenProbe(),
                 new CampaignMapSelectRuntimeScreenProbe(),
                 new AdventureMapRuntimeScreenProbe(),
+                new PreBattleMenuRuntimeScreenProbe(),
                 new HostileJoinMenuRuntimeScreenProbe(),
                 new MoveTroopPopupRuntimeScreenProbe(),
                 new WorldChoiceMenuRuntimeScreenProbe(),
@@ -346,6 +347,41 @@ namespace SongsOfConquestAccess.Screens
         public void OnAdventureSceneUnloading()
         {
             _screenManager.RemoveScreens(screen => screen is AdventureMapScreen);
+        }
+
+        public void OnPreBattleMenuChanged(PreBattleMenu menu)
+        {
+            if (menu == null)
+            {
+                ResyncFromRuntimeState();
+                return;
+            }
+
+            PreBattleMenuAdapter adapter = new PreBattleMenuAdapter(menu);
+            if (!adapter.IsPresent())
+            {
+                ResyncFromRuntimeState();
+                return;
+            }
+
+            PreBattleMenuScreen screen = new PreBattleMenuScreen(adapter);
+            Screen current = _screenManager.CurrentScreen;
+            if (current is PreBattleMenuScreen && ReferenceEquals(current.SourceKey, screen.SourceKey))
+            {
+                _screenManager.ReplaceTopScreen(screen);
+                return;
+            }
+
+            _screenManager.RemoveScreenForSource(screen.SourceKey);
+            _screenManager.PushScreen(screen);
+        }
+
+        public void OnPreBattleMenuClosed(PreBattleMenu menu)
+        {
+            if (menu == null || !_screenManager.RemoveScreenForSource(menu))
+            {
+                ResyncFromRuntimeState();
+            }
         }
 
         public void OnWorldChoiceMenuOpened(WorldChoiceMenu menu)
