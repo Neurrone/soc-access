@@ -1,10 +1,12 @@
 using System.Reflection;
+using DG.Tweening;
 using HarmonyLib;
 using SongsOfConquest.Client.Adventure;
 using SongsOfConquest.Client.UI;
 using SongsOfConquestAccess.Speech;
 using TMPro;
 using UnityEngine;
+using UnityEngine.UI;
 
 namespace SongsOfConquestAccess.Adapters
 {
@@ -18,6 +20,18 @@ namespace SongsOfConquestAccess.Adapters
 
         private static readonly AccessTools.FieldRef<LetterboxStoryText, UITextMesh> LoreTextRef =
             AccessTools.FieldRefAccess<LetterboxStoryText, UITextMesh>("_loreText");
+
+        private static readonly AccessTools.FieldRef<LetterboxStoryText, Image> TopLetterboxRef =
+            AccessTools.FieldRefAccess<LetterboxStoryText, Image>("_topLetterbox");
+
+        private static readonly AccessTools.FieldRef<LetterboxStoryText, Image> BottomLetterboxRef =
+            AccessTools.FieldRefAccess<LetterboxStoryText, Image>("_bottomLetterbox");
+
+        private static readonly AccessTools.FieldRef<LetterboxStoryText, CanvasGroup> GradientsRef =
+            AccessTools.FieldRefAccess<LetterboxStoryText, CanvasGroup>("_gradients");
+
+        private static readonly AccessTools.FieldRef<LetterboxStoryText, CanvasGroup> TextCanvasGroupRef =
+            AccessTools.FieldRefAccess<LetterboxStoryText, CanvasGroup>("_textCanvasGroup");
 
         private static readonly AccessTools.FieldRef<LetterboxStoryText, Coroutine> TypeRoutineRef =
             AccessTools.FieldRefAccess<LetterboxStoryText, Coroutine>("_typeRoutine");
@@ -80,6 +94,7 @@ namespace SongsOfConquestAccess.Adapters
             AbortCurrentStateMethod.Invoke(_storyText, null);
             if (wasTyping && IsPresent())
             {
+                CompleteVisibleTextTweens();
                 AbortCurrentStateMethod.Invoke(_storyText, null);
             }
 
@@ -98,6 +113,32 @@ namespace SongsOfConquestAccess.Adapters
             return !IsTyping()
                 || tmpText == null
                 || tmpText.maxVisibleCharacters > 0;
+        }
+
+        private void CompleteVisibleTextTweens()
+        {
+            CompleteTween(TextCanvasGroupRef(_storyText));
+            CompleteTween(GradientsRef(_storyText));
+
+            Image topLetterbox = TopLetterboxRef(_storyText);
+            if (topLetterbox != null)
+            {
+                CompleteTween(topLetterbox.rectTransform);
+            }
+
+            Image bottomLetterbox = BottomLetterboxRef(_storyText);
+            if (bottomLetterbox != null)
+            {
+                CompleteTween(bottomLetterbox.rectTransform);
+            }
+        }
+
+        private static void CompleteTween(object target)
+        {
+            if (target != null)
+            {
+                DOTween.Kill(target, true);
+            }
         }
 
         private string GetText(AccessTools.FieldRef<LetterboxStoryText, UITextMesh> textRef)
