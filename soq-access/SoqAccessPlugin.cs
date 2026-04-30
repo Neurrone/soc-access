@@ -60,6 +60,8 @@ namespace SongsOfConquestAccess
             _inputRouter = null;
             _screenDetector = null;
             _screenManager = null;
+            StoryMapSuppression.Reset();
+            StoryCameraFocusPatches.ResetDedupe();
             TooltipPatches.Reset();
             UIManager.Reset();
             _speechEventAnnouncer?.Detach();

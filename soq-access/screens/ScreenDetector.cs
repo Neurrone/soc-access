@@ -124,6 +124,7 @@ namespace SongsOfConquestAccess.Screens
 
         public void OnLetterboxStoryTextHidden(LetterboxStoryText storyText)
         {
+            StoryMapSuppression.Clear(storyText);
             if (storyText == null || !_screenManager.RemoveScreenForSource(storyText))
             {
                 ResyncFromRuntimeState();
@@ -153,6 +154,7 @@ namespace SongsOfConquestAccess.Screens
 
         public void OnStoryTextHidden(StoryText storyText)
         {
+            StoryMapSuppression.Clear(storyText);
             if (storyText == null || !_screenManager.RemoveScreenForSource(storyText))
             {
                 ResyncFromRuntimeState();
@@ -183,6 +185,7 @@ namespace SongsOfConquestAccess.Screens
 
         public void OnDialogueMenuHidden(DialogueMenu dialogueMenu)
         {
+            StoryMapSuppression.Clear(dialogueMenu);
             if (dialogueMenu == null || !_screenManager.RemoveScreenForSource(dialogueMenu))
             {
                 ResyncFromRuntimeState();

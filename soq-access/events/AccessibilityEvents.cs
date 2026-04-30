@@ -22,6 +22,11 @@ namespace SongsOfConquestAccess.Events
             public const string DeniedEntityInteraction = "notification.denied_entity_interaction";
         }
 
+        public static class Story
+        {
+            public const string CameraFocusStarted = "story.camera_focus.started";
+        }
+
         public static class ArmyExchange
         {
             public const string InvalidDestination = "army_exchange.invalid_destination";

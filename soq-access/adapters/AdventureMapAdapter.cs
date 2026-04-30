@@ -21,6 +21,7 @@ using Unity.Mathematics;
 using UnityEngine;
 using UnityEngine.UI;
 using Zenject;
+using StoryMapSuppression = SongsOfConquestAccess.StoryMapSuppression;
 
 namespace SongsOfConquestAccess.Adapters
 {
@@ -211,6 +212,11 @@ namespace SongsOfConquestAccess.Adapters
             if (!HumanAdventureController.CanLocalTeamUseHUD(_facade))
             {
                 return "local team cannot use HUD";
+            }
+
+            if (StoryMapSuppression.IsActive)
+            {
+                return "story interaction active";
             }
 
             if (!IsFogReady())
