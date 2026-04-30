@@ -7,6 +7,36 @@ namespace SongsOfConquestAccess.Input
     // For example, the map navigation and menu widgets both use the arrow keys, but different actions
     internal static class AccessibilityActions
     {
+        // Global actions are available on every accessibility screen. The input
+        // router checks screen-claimed actions first, then global actions, so
+        // screens can own keys before global fallbacks see them.
+        public static readonly InputAction TooltipActionsMenu = OneShot("tooltip_actions_menu", "Tooltip Actions Menu")
+            .AddBinding(new KeyboardBinding(Key.F10, shift: true));
+
+        public static readonly InputAction[] GLOBAL_ACTIONS =
+        {
+            TooltipActionsMenu
+        };
+
+        public static bool IsGlobalAction(InputAction action)
+        {
+            if (action == null)
+            {
+                return false;
+            }
+
+            for (int i = 0; i < GLOBAL_ACTIONS.Length; i++)
+            {
+                InputAction globalAction = GLOBAL_ACTIONS[i];
+                if (globalAction != null && globalAction.Key == action.Key)
+                {
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
         public static readonly InputAction NextWidget = OneShot("next_widget", "Next Widget")
             .AddBinding(new KeyboardBinding(Key.Tab));
 
@@ -74,7 +104,7 @@ namespace SongsOfConquestAccess.Input
         public static readonly InputAction Cancel = OneShot("cancel", "Cancel")
             .AddBinding(new KeyboardBinding(Key.Escape));
 
-        public static readonly InputAction[] All =
+        public static readonly InputAction[] NON_GLOBAL_ACTIONS =
         {
             NextWidget,
             PreviousWidget,

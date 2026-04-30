@@ -233,7 +233,8 @@ namespace SongsOfConquestAccess.Screens
                     null,
                     () => adapter.FocusModifierCategory(captured.Index),
                     () => adapter.FocusModifierCategory(captured.Index),
-                    () => true));
+                    () => true,
+                    captured.Tooltip));
             }
 
             menu.SetFocusedItemById(activeId);
@@ -268,7 +269,8 @@ namespace SongsOfConquestAccess.Screens
                     () => item.Status,
                     item.Activate ?? (() => false),
                     item.OnFocus ?? emptyItemFocus,
-                    () => true));
+                    () => true,
+                    item.Tooltip));
             }
 
             return menu;

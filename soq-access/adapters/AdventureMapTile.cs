@@ -127,11 +127,6 @@ namespace SongsOfConquestAccess.Adapters
             {
                 string mapEntity = FirstNonEmpty(MapEntityName, "Map entity");
                 List<string> details = new List<string>();
-                if (!string.IsNullOrWhiteSpace(MapEntityHint))
-                {
-                    details.Add(MapEntityHint);
-                }
-
                 if (!string.IsNullOrWhiteSpace(MapEntityRelationship))
                 {
                     details.Add(MapEntityRelationship);

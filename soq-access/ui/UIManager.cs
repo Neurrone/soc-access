@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using SongsOfConquestAccess.Adapters;
 using SongsOfConquestAccess.Speech;
 
 namespace SongsOfConquestAccess.UI
@@ -10,6 +11,11 @@ namespace SongsOfConquestAccess.UI
         private static string _lastAnnouncement;
         private static bool _dirty;
         private static readonly FocusContext FocusContext = new FocusContext();
+
+        public static Widget CurrentWidget
+        {
+            get { return _currentWidget; }
+        }
 
         public static void SetFocusedWidget(Widget widget)
         {
@@ -25,6 +31,7 @@ namespace SongsOfConquestAccess.UI
             _lastAnnouncement = null;
             _dirty = false;
             FocusContext.Reset();
+            NativeTooltipUtility.HideTooltip();
         }
 
         public static void Update()
@@ -39,18 +46,24 @@ namespace SongsOfConquestAccess.UI
             string announcement = BuildAnnouncement(_currentWidget);
             if (string.IsNullOrWhiteSpace(announcement))
             {
+                NativeTooltipUtility.HideTooltip();
                 return;
             }
 
             _lastFocusedWidget = _currentWidget;
             if (announcement == _lastAnnouncement)
             {
+                ShowNativeTooltip(_currentWidget);
                 return;
             }
 
             _lastAnnouncement = announcement;
             SoqAccessPlugin.Instance?.LogInfo("UIManager speaking focused widget: \"" + announcement + "\"");
             SpeechPipeline.Output(new SpeechRequest(announcement, interrupt: true));
+
+            // Future buffer hook: populate the UI review buffer here from the
+            // same label/status/tooltip lines used for the focus announcement.
+            ShowNativeTooltip(_currentWidget);
         }
 
         private static string BuildAnnouncement(Widget widget)
@@ -71,6 +84,12 @@ namespace SongsOfConquestAccess.UI
             {
                 parts.Add(value);
             }
+        }
+
+        private static void ShowNativeTooltip(Widget widget)
+        {
+            Tooltip tooltip = widget != null ? widget.GetTooltip() : null;
+            NativeTooltipUtility.ShowVisualTooltip(tooltip != null ? tooltip.VisualMetadata : null);
         }
     }
 }

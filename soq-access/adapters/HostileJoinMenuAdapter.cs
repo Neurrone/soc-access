@@ -145,12 +145,17 @@ namespace SongsOfConquestAccess.Adapters
 
         public void FocusMassMove()
         {
-            NativeSelectionUtility.SelectAndShowTooltip(_settings != null ? _settings.MassMoveButton : null);
+            NativeSelectionUtility.Select(_settings != null ? _settings.MassMoveButton : null);
+        }
+
+        public Tooltip MassMoveTooltip
+        {
+            get { return Tooltip.ForComponent(_settings != null ? _settings.MassMoveButton : null, _localization); }
         }
 
         public void HideNativeTooltip()
         {
-            NativeSelectionUtility.HideTooltip();
+            NativeTooltipUtility.HideTooltip();
         }
 
         public void Dispose()
@@ -278,8 +283,46 @@ namespace SongsOfConquestAccess.Adapters
                     maxSize,
                     entry.Troop != null,
                     capturedEntry,
-                    () => FocusSlot(capturedEntry));
+                    () => FocusSlot(capturedEntry),
+                    entry.Troop != null ? BuildTroopTooltip(entry) : null);
             }
+        }
+
+        private Tooltip BuildTroopTooltip(TroopHUDEntry entry)
+        {
+            Tooltip tooltip = Tooltip.ForComponent(entry != null ? entry.GetSelectable() : null, _localization);
+            AdventureTroopDetails details = entry != null ? entry.TroopDetails : null;
+            if (tooltip == null || details == null || !details.ShowDisbandInstruction || !details.CanDisband || _localization == null)
+            {
+                return tooltip;
+            }
+
+            string disbandLine = GetLocalizedText("Adventure/TroopHUD/DisbandInstruction", "Disband Troop");
+            List<string> instructionLines = new List<string> { disbandLine };
+            List<TooltipAction> actions = new List<TooltipAction>
+            {
+                new TooltipAction(disbandLine, () => InvokeTroopRightClick(entry))
+            };
+
+            // AdventureTroopDetails also draws the disband action as a native
+            // tooltip instruction row. Remove only the exact localized line we
+            // are replacing with a structured action; if CanDisband is false,
+            // the native "cannot disband" status row remains normal tooltip text.
+            // Keep this explicit instead of using input metadata alone because
+            // the troop adapter also relies on CanDisband and invokes the TroopHUD
+            // right-click callback directly.
+            return new Tooltip(() => RemoveExactLines(tooltip.TextLines, instructionLines), tooltip.VisualMetadata, actions);
+        }
+
+        private static bool InvokeTroopRightClick(TroopHUDEntry entry)
+        {
+            if (entry == null || entry.OnRightClick == null)
+            {
+                return false;
+            }
+
+            entry.OnRightClick(entry);
+            return true;
         }
 
         private void FocusSlot(TroopHUDEntry entry)
@@ -290,7 +333,7 @@ namespace SongsOfConquestAccess.Adapters
                 return;
             }
 
-            NativeSelectionUtility.SelectAndShowTooltip(entry.GetSelectable());
+            NativeSelectionUtility.Select(entry.GetSelectable());
         }
 
         private List<TroopHUDEntry> GetEntries(TroopHUD hud)
@@ -336,6 +379,45 @@ namespace SongsOfConquestAccess.Adapters
         private static bool IsButtonEnabled(UIButton button)
         {
             return button != null && button.Active && button.Interactable;
+        }
+
+        private string GetLocalizedText(string key, string fallback)
+        {
+            string text = _localization != null ? _localization.GetText(key) : string.Empty;
+            return string.IsNullOrWhiteSpace(text) || text == key ? fallback : text;
+        }
+
+        private static IReadOnlyList<string> RemoveExactLines(IReadOnlyList<string> lines, IReadOnlyList<string> linesToRemove)
+        {
+            if (lines == null || lines.Count == 0 || linesToRemove == null || linesToRemove.Count == 0)
+            {
+                return lines ?? new string[0];
+            }
+
+            List<string> result = new List<string>();
+            for (int i = 0; i < lines.Count; i++)
+            {
+                string line = lines[i];
+                if (!ContainsExact(linesToRemove, line))
+                {
+                    result.Add(line);
+                }
+            }
+
+            return result;
+        }
+
+        private static bool ContainsExact(IReadOnlyList<string> lines, string candidate)
+        {
+            for (int i = 0; i < lines.Count; i++)
+            {
+                if (string.Equals(lines[i], candidate, StringComparison.Ordinal))
+                {
+                    return true;
+                }
+            }
+
+            return false;
         }
 
         private static T GetField<T>(object owner, FieldInfo field) where T : class

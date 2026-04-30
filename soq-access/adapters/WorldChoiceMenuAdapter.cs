@@ -87,7 +87,7 @@ namespace SongsOfConquestAccess.Adapters
 
         public void HideNativeTooltip()
         {
-            NativeSelectionUtility.HideTooltip();
+            NativeTooltipUtility.HideTooltip();
         }
 
         public IReadOnlyList<ChoiceItem> GetChoices()
@@ -103,12 +103,17 @@ namespace SongsOfConquestAccess.Adapters
                 }
 
                 int capturedIndex = i;
+                Selectable selectable = button.Button != null ? button.Button.GetSelectable() : null;
                 choices.Add(new ChoiceItem(
                     "reward-" + i,
                     BuildChoiceLabel(button),
                     button.Interactable ? string.Empty : "disabled",
                     () => FocusReward(capturedIndex),
-                    () => true));
+                    () => true,
+                    Tooltip.ForComponent(
+                        selectable,
+                        selectable != null ? selectable.GetComponent<RectTransform>() : null,
+                        _localization)));
             }
 
             return choices;
@@ -129,13 +134,7 @@ namespace SongsOfConquestAccess.Adapters
             }
 
             Selectable selectable = choice.Button.GetSelectable();
-            // Reward choice buttons carry a native StaticTooltipLocation, but in this menu
-            // that location is the broad gamepad frame around the choice area. Accessibility
-            // focus should place the visual tooltip next to the focused choice itself, so
-            // pass the button rect as the explicit anchor.
-            NativeSelectionUtility.SelectAndShowTooltip(
-                selectable,
-                selectable != null ? selectable.GetComponent<RectTransform>() : null);
+            NativeSelectionUtility.Select(selectable);
 
             // Accessibility focus in this menu intentionally mirrors a single native click:
             // the reward becomes the selected choice through the game's pointer-click handler.
@@ -148,28 +147,7 @@ namespace SongsOfConquestAccess.Adapters
         private string BuildChoiceLabel(IWorldMapChoiceButton button)
         {
             string visibleText = GetText(button != null ? button.TypeTextMesh : null);
-            string detailsText = GetDetailsText(button);
-            return MenuButtonTextUtility.JoinParts(visibleText, detailsText);
-        }
-
-        private string GetDetailsText(IWorldMapChoiceButton button)
-        {
-            if (button == null || button.Button == null)
-            {
-                return string.Empty;
-            }
-
-            try
-            {
-                ITooltipable tooltipable = button.Button as ITooltipable;
-                IDetails details = tooltipable != null ? tooltipable.GetDetails(Vector2.zero) : null;
-                return DetailsTextUtility.ToText(details, _localization);
-            }
-            catch (Exception ex)
-            {
-                SoqAccessPlugin.Instance?.LogWarning("WorldChoiceMenuAdapter could not build reward details: " + ex.Message);
-                return string.Empty;
-            }
+            return visibleText;
         }
 
         private List<IWorldMapChoiceButton> GetRewardButtons()
@@ -190,13 +168,14 @@ namespace SongsOfConquestAccess.Adapters
 
         internal sealed class ChoiceItem
         {
-            public ChoiceItem(string id, string label, string status, Action onFocus, Func<bool> isVisible)
+            public ChoiceItem(string id, string label, string status, Action onFocus, Func<bool> isVisible, Tooltip tooltip = null)
             {
                 Id = id ?? string.Empty;
                 Label = label ?? string.Empty;
                 Status = status ?? string.Empty;
                 OnFocus = onFocus;
                 IsVisible = isVisible;
+                Tooltip = tooltip;
             }
 
             public string Id { get; private set; }
@@ -204,6 +183,7 @@ namespace SongsOfConquestAccess.Adapters
             public string Status { get; private set; }
             public Action OnFocus { get; private set; }
             public Func<bool> IsVisible { get; private set; }
+            public Tooltip Tooltip { get; private set; }
         }
     }
 }

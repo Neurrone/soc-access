@@ -106,10 +106,18 @@ namespace SongsOfConquestAccess.Input
             BindingMatch match = ResolveClaimedMatch(key, state);
             if (match == null)
             {
-                return false;
-            }
+                match = ResolveGlobalMatch(key, state);
+                if (match == null)
+                {
+                    return false;
+                }
 
-            _screenManager?.DispatchAction(match.Action);
+                _screenManager?.HandleGlobalAction(match.Action);
+            }
+            else
+            {
+                _screenManager?.DispatchAction(match.Action);
+            }
 
             _activeBindings[match.Binding.Id] = new ActiveBindingState(match.Action, match.Binding);
             return true;
@@ -130,14 +138,29 @@ namespace SongsOfConquestAccess.Input
 
         private BindingMatch ResolveClaimedMatch(Key key, KeyboardStateSnapshot state)
         {
-            for (int i = 0; i < AccessibilityActions.All.Length; i++)
+            for (int i = 0; i < AccessibilityActions.NON_GLOBAL_ACTIONS.Length; i++)
             {
-                InputAction action = AccessibilityActions.All[i];
+                InputAction action = AccessibilityActions.NON_GLOBAL_ACTIONS[i];
                 if (!CurrentScreenClaims(action))
                 {
                     continue;
                 }
 
+                KeyboardBinding binding = FindMatchingKeyboardBinding(action, key, state);
+                if (binding != null)
+                {
+                    return new BindingMatch(action, binding);
+                }
+            }
+
+            return null;
+        }
+
+        private BindingMatch ResolveGlobalMatch(Key key, KeyboardStateSnapshot state)
+        {
+            for (int i = 0; i < AccessibilityActions.GLOBAL_ACTIONS.Length; i++)
+            {
+                InputAction action = AccessibilityActions.GLOBAL_ACTIONS[i];
                 KeyboardBinding binding = FindMatchingKeyboardBinding(action, key, state);
                 if (binding != null)
                 {

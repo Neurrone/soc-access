@@ -162,7 +162,8 @@ namespace SongsOfConquestAccess.Screens
                 adapter.MassMoveLabel,
                 adapter.ActivateMassMove,
                 adapter.FocusMassMove,
-                adapter.IsMassMoveEnabled));
+                adapter.IsMassMoveEnabled,
+                tooltip: adapter.MassMoveTooltip));
 
             return root;
         }

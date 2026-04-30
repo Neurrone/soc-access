@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Collections;
 using System.Linq;
 using System.Reflection;
 using HarmonyLib;
@@ -221,9 +222,9 @@ namespace SongsOfConquestAccess.Adapters
         {
             return new[]
             {
-                new ModifierCategory("modifier-category-troop", "Troop modifiers", 0),
-                new ModifierCategory("modifier-category-temporary", "Temporary modifiers", 1),
-                new ModifierCategory("modifier-category-gear", "Gear modifiers", 2)
+                new ModifierCategory("modifier-category-troop", "Troop modifiers", 0, Tooltip.ForComponent(GetModifierCategoryButton(0) as Component, _localization)),
+                new ModifierCategory("modifier-category-temporary", "Temporary modifiers", 1, Tooltip.ForComponent(GetModifierCategoryButton(1) as Component, _localization)),
+                new ModifierCategory("modifier-category-gear", "Gear modifiers", 2, Tooltip.ForComponent(GetModifierCategoryButton(2) as Component, _localization))
             };
         }
 
@@ -235,7 +236,7 @@ namespace SongsOfConquestAccess.Adapters
             }
 
             UIButton button = GetModifierCategoryButton(categoryIndex);
-            NativeSelectionUtility.SelectAndShowTooltip(button as Component);
+            NativeSelectionUtility.Select(button as Component);
 
             if (GetActiveModifierCategoryIndex() == categoryIndex)
             {
@@ -330,9 +331,13 @@ namespace SongsOfConquestAccess.Adapters
                 string slotName = GetInventorySlotName(slot);
                 string label = artifact == null
                     ? slotName + ", empty"
-                    : MenuButtonTextUtility.JoinParts(slotName, GetArtifactLabel(artifact));
+                    : MenuButtonTextUtility.JoinParts(slotName, GetArtifactName(artifact));
                 InventorySlot capturedSlot = slot;
-                items.Add(new LabeledItem("equipment-" + slot, label, onFocus: () => SelectEquipmentSlot(capturedSlot)));
+                items.Add(new LabeledItem(
+                    "equipment-" + slot,
+                    label,
+                    onFocus: () => SelectEquipmentSlot(capturedSlot),
+                    tooltip: BuildEquipmentTooltip(artifact, GetEquipmentSlotSelectable(slot))));
             }
 
             return items;
@@ -342,7 +347,16 @@ namespace SongsOfConquestAccess.Adapters
         {
             return GetArtifactsForSlot(InventorySlot.None)
                 .OrderBy(artifact => artifact.PositionIndex)
-                .Select((artifact, index) => new LabeledItem("inventory-" + index, GetArtifactLabel(artifact)))
+                .Select((artifact, index) =>
+                {
+                    InventoryArtifactMovable movable = GetArtifactMovable(artifact);
+                    InventoryArtifactMovable capturedMovable = movable;
+                    return new LabeledItem(
+                        "inventory-" + index,
+                        GetArtifactName(artifact),
+                        onFocus: () => SelectArtifact(capturedMovable),
+                        tooltip: BuildEquipmentTooltip(artifact, movable != null ? movable.GetSelectable() : null));
+                })
                 .ToArray();
         }
 
@@ -374,13 +388,16 @@ namespace SongsOfConquestAccess.Adapters
             for (int i = 0; i < skills.Count; i++)
             {
                 SkillReference skill = skills[i];
-                IDetails details = _skillLookup.GetDetails(skill, commander.Stats);
-                string text = DetailsTextUtility.ToText(details, _localization);
+                string text = GetSkillName(skill);
                 if (!string.IsNullOrWhiteSpace(text))
                 {
                     int capturedIndex = i;
                     bool capturedPowers = powers;
-                    items.Add(new LabeledItem((powers ? "power-" : "skill-") + i, text, onFocus: () => SelectSkillEntry(capturedPowers, capturedIndex)));
+                    items.Add(new LabeledItem(
+                        (powers ? "power-" : "skill-") + i,
+                        text,
+                        onFocus: () => SelectSkillEntry(capturedPowers, capturedIndex),
+                        tooltip: Tooltip.ForComponent(GetSkillEntryComponent(capturedPowers, capturedIndex), _localization)));
                 }
             }
 
@@ -394,22 +411,13 @@ namespace SongsOfConquestAccess.Adapters
 
         private void AddStat(List<LabeledItem> items, ICommanderState commander, StatEntryType type, string label, int value, int originalValue)
         {
-            CommanderStatDetails details = new CommanderStatDetails
-            {
-                Modifiers = commander.BacteriaModifiers.ToList(),
-                Type = type,
-                Id = commander.Id,
-                OriginalValue = originalValue,
-                AdventureFacade = _facade,
-                FactionLookup = _factionLookup
-            };
             items.Add(new LabeledItem(
                 "stat-" + type,
-                MenuButtonTextUtility.JoinParts(label + ", " + value, DetailsTextUtility.ToText(details, _localization)),
-                onFocus: () => SelectStatTooltip(type)));
+                label + ", " + value,
+                tooltip: Tooltip.ForComponent(GetStatTooltipComponent(type), _localization)));
         }
 
-        private void SelectStatTooltip(StatEntryType type)
+        private Component GetStatTooltipComponent(StatEntryType type)
         {
             UIImage tooltipImage = null;
             switch (type)
@@ -428,35 +436,196 @@ namespace SongsOfConquestAccess.Adapters
                     break;
             }
 
-            NativeSelectionUtility.SelectAndShowTooltip(tooltipImage as Component);
+            return tooltipImage as Component;
         }
 
         private void SelectEquipmentSlot(InventorySlot slot)
         {
-            InventoryHUDSlot nativeSlot = _inventory != null ? _inventory.GetSlot(slot) : null;
-            Selectable selectable = nativeSlot != null ? nativeSlot.GetFirstSelectable() : null;
+            Selectable selectable = GetEquipmentSlotSelectable(slot);
             if (selectable != null)
             {
-                NativeSelectionUtility.SelectAndShowTooltip(selectable);
+                NativeSelectionUtility.Select(selectable);
             }
         }
 
+        private Selectable GetEquipmentSlotSelectable(InventorySlot slot)
+        {
+            InventoryHUDSlot nativeSlot = _inventory != null ? _inventory.GetSlot(slot) : null;
+            return nativeSlot != null ? nativeSlot.GetFirstSelectable() : null;
+        }
+
+        private void SelectArtifact(InventoryArtifactMovable movable)
+        {
+            if (movable != null)
+            {
+                NativeSelectionUtility.Select(movable.GetSelectable());
+            }
+        }
+
+        private Tooltip BuildEquipmentTooltip(IArtifactState artifact, Selectable selectable)
+        {
+            Tooltip tooltip = Tooltip.ForComponent(selectable, _localization);
+            InventoryArtifactMovable movable = GetArtifactMovable(artifact);
+            if (tooltip == null || artifact == null || movable == null || _localization == null)
+            {
+                return tooltip;
+            }
+
+            List<TooltipAction> actions = new List<TooltipAction>();
+            List<string> instructionLines = new List<string>();
+
+            // ArtifactDetails renders these activation hints as ordinary tooltip
+            // rows. When this adapter supports the corresponding action, remove
+            // the native instruction row by comparing against the same localized
+            // string key the game used to draw it. Do not compare English text:
+            // unsupported or unrecognized rows must remain in TextLines so the
+            // player still hears that something may be available. Do not rely on
+            // captured InputType here: some real artifact actions are drawn with
+            // InputType.NoInput, so the input hint alone is not a reliable action
+            // signal for equipment.
+            string equipInstructionKey = artifact.IsEquipped
+                ? "Adventure/TooltipInstruction/Unequip"
+                : "Adventure/TooltipInstruction/Equip";
+            string equipLabel = GetLocalizedText(equipInstructionKey, artifact.IsEquipped ? "Unequip" : "Equip");
+            AddLocalizedLine(instructionLines, equipInstructionKey);
+            actions.Add(new TooltipAction(equipLabel, () => InvokeArtifactAction(movable, _inventory.EquipArtifact)));
+
+            if (artifact.IsImportant)
+            {
+                return new Tooltip(() => RemoveExactLines(tooltip.TextLines, instructionLines), tooltip.VisualMetadata, actions);
+            }
+
+            if (_inventory.IsArtifactShopInventory)
+            {
+                AddLocalizedLine(instructionLines, "Adventure/TooltipInstruction/Sell");
+                actions.Add(new TooltipAction(
+                    GetLocalizedText("Adventure/TooltipInstruction/Sell", "Sell"),
+                    () => InvokeArtifactAction(movable, _inventory.SellArtifact)));
+            }
+            else
+            {
+                AddLocalizedLine(instructionLines, "Adventure/TooltipInstruction/Destroy");
+                AddLocalizedLine(instructionLines, "Adventure/TooltipInstruction/Destroy.Gamepad");
+                actions.Add(new TooltipAction(
+                    GetLocalizedText("Adventure/TooltipInstruction/Destroy.Gamepad", "Destroy"),
+                    () => InvokeArtifactAction(movable, _inventory.DestroyArtifact)));
+            }
+
+            AddLocalizedLine(instructionLines, "Adventure/TooltipInstruction/Drop");
+            AddLocalizedLine(instructionLines, "Adventure/TooltipInstruction/Drop.Gamepad");
+            actions.Add(new TooltipAction(
+                GetLocalizedText("Adventure/TooltipInstruction/Drop.Gamepad", "Drop"),
+                () => InvokeArtifactAction(movable, _inventory.DropArtifact)));
+
+            AddLocalizedLine(instructionLines, "Adventure/TooltipInstruction/AutoArrange");
+            AddLocalizedLine(instructionLines, "Adventure/TooltipInstruction/AutoArrange.Gamepad");
+            actions.Add(new TooltipAction(
+                GetLocalizedText("Adventure/TooltipInstruction/AutoArrange.Gamepad", "Auto Arrange"),
+                () => InvokeArtifactAction(movable, _inventory.AutoArrangeArtifacts)));
+
+            return new Tooltip(() => RemoveExactLines(tooltip.TextLines, instructionLines), tooltip.VisualMetadata, actions);
+        }
+
+        private InventoryArtifactMovable GetArtifactMovable(IArtifactState artifact)
+        {
+            if (artifact == null || InventoryArtifactMapField == null || _inventory == null)
+            {
+                return null;
+            }
+
+            IDictionary artifactMap = InventoryArtifactMapField.GetValue(_inventory) as IDictionary;
+            if (artifactMap == null || !artifactMap.Contains(artifact))
+            {
+                return null;
+            }
+
+            return artifactMap[artifact] as InventoryArtifactMovable;
+        }
+
+        private static bool InvokeArtifactAction(InventoryArtifactMovable movable, Action<InventoryArtifactMovable> action)
+        {
+            if (movable == null || action == null)
+            {
+                return false;
+            }
+
+            action(movable);
+            return true;
+        }
+
+        private void AddLocalizedLine(List<string> lines, string key)
+        {
+            string line = _localization != null ? _localization.GetText(key) : string.Empty;
+            if (!string.IsNullOrWhiteSpace(line) && !lines.Contains(line))
+            {
+                lines.Add(line);
+            }
+        }
+
+        private string GetLocalizedText(string key, string fallback)
+        {
+            string text = _localization != null ? _localization.GetText(key) : string.Empty;
+            return string.IsNullOrWhiteSpace(text) || text == key ? fallback : text;
+        }
+
+        private static IReadOnlyList<string> RemoveExactLines(IReadOnlyList<string> lines, IReadOnlyList<string> linesToRemove)
+        {
+            if (lines == null || lines.Count == 0 || linesToRemove == null || linesToRemove.Count == 0)
+            {
+                return lines ?? new string[0];
+            }
+
+            List<string> result = new List<string>();
+            for (int i = 0; i < lines.Count; i++)
+            {
+                string line = lines[i];
+                if (!ContainsExact(linesToRemove, line))
+                {
+                    result.Add(line);
+                }
+            }
+
+            return result;
+        }
+
+        private static bool ContainsExact(IReadOnlyList<string> lines, string candidate)
+        {
+            for (int i = 0; i < lines.Count; i++)
+            {
+                if (string.Equals(lines[i], candidate, StringComparison.Ordinal))
+                {
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
         private void SelectSkillEntry(bool powers, int index)
+        {
+            Component component = GetSkillEntryComponent(powers, index);
+            if (component != null)
+            {
+                NativeSelectionUtility.Select(component);
+            }
+        }
+
+        private Component GetSkillEntryComponent(bool powers, int index)
         {
             List<CommanderSheetSkillEntry> entries = powers
                 ? GetField<List<CommanderSheetSkillEntry>>(_skills, PowerEntriesField)
                 : GetField<List<CommanderSheetSkillEntry>>(_skills, SkillEntriesField);
             if (entries == null || index < 0 || index >= entries.Count)
             {
-                return;
+                return null;
             }
 
-            NativeSelectionUtility.SelectAndShowTooltip(entries[index] as Component);
+            return entries[index] as Component;
         }
 
         public void HideNativeTooltip()
         {
-            NativeSelectionUtility.HideTooltip();
+            NativeTooltipUtility.HideTooltip();
         }
 
         private Transform GetActiveModifierContent()
@@ -509,9 +678,7 @@ namespace SongsOfConquestAccess.Adapters
                 return string.Empty;
             }
 
-            string name = _artifactLookup != null
-                ? _artifactLookup.GetLocalizedName(artifact.Type)
-                : artifact.Type.ToString();
+            string name = GetArtifactName(artifact);
             string details = string.Empty;
             if (_artifactLookup != null)
             {
@@ -527,6 +694,33 @@ namespace SongsOfConquestAccess.Adapters
             }
 
             return MenuButtonTextUtility.JoinParts(name, details);
+        }
+
+        private string GetArtifactName(IArtifactState artifact)
+        {
+            if (artifact == null)
+            {
+                return string.Empty;
+            }
+
+            return _artifactLookup != null
+                ? _artifactLookup.GetLocalizedName(artifact.Type)
+                : artifact.Type.ToString();
+        }
+
+        private string GetSkillName(SkillReference skill)
+        {
+            if (_localization != null)
+            {
+                string key = skill.GetLocalizationNameKey();
+                string text = _localization.GetText(key, skill.Level);
+                if (!string.IsNullOrWhiteSpace(text) && text != key)
+                {
+                    return SpeechTextSanitizer.Normalize(text);
+                }
+            }
+
+            return skill.Skill.ToString();
         }
 
         private string GetInventorySlotName(InventorySlot slot)
@@ -550,13 +744,14 @@ namespace SongsOfConquestAccess.Adapters
 
         internal sealed class LabeledItem
         {
-            public LabeledItem(string id, string label, string status = null, Action onFocus = null, Func<bool> activate = null)
+            public LabeledItem(string id, string label, string status = null, Action onFocus = null, Func<bool> activate = null, Tooltip tooltip = null)
             {
                 Id = id ?? string.Empty;
                 Label = label ?? string.Empty;
                 Status = status ?? string.Empty;
                 OnFocus = onFocus;
                 Activate = activate;
+                Tooltip = tooltip;
             }
 
             public string Id { get; private set; }
@@ -564,20 +759,23 @@ namespace SongsOfConquestAccess.Adapters
             public string Status { get; private set; }
             public Action OnFocus { get; private set; }
             public Func<bool> Activate { get; private set; }
+            public Tooltip Tooltip { get; private set; }
         }
 
         internal sealed class ModifierCategory
         {
-            public ModifierCategory(string id, string label, int index)
+            public ModifierCategory(string id, string label, int index, Tooltip tooltip = null)
             {
                 Id = id;
                 Label = label;
                 Index = index;
+                Tooltip = tooltip;
             }
 
             public string Id { get; private set; }
             public string Label { get; private set; }
             public int Index { get; private set; }
+            public Tooltip Tooltip { get; private set; }
         }
     }
 }

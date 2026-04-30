@@ -93,7 +93,8 @@ namespace SongsOfConquestAccess.Screens
                     () => choice.Status,
                     () => false,
                     choice.OnFocus,
-                    choice.IsVisible));
+                    choice.IsVisible,
+                    choice.Tooltip));
             }
 
             return menu;

@@ -4,6 +4,7 @@ using HarmonyLib;
 using SongsOfConquest.Client;
 using SongsOfConquest.Client.Adventure.UI;
 using SongsOfConquest.Client.UI;
+using SongsOfConquest.Common.Localization;
 using SongsOfConquestAccess.Speech;
 using SongsOfConquestAccess.UI;
 using UnityEngine;
@@ -19,6 +20,7 @@ namespace SongsOfConquestAccess.Adapters
         private static readonly FieldInfo MoveAllButtonLeftField = AccessTools.Field(typeof(TroopHUDEntryMovable), "_moveAllButtonLeft");
         private static readonly FieldInfo MoveAllButtonRightField = AccessTools.Field(typeof(TroopHUDEntryMovable), "_moveAllButtonRight");
         private static readonly FieldInfo SplitHalfButtonField = AccessTools.Field(typeof(TroopHUDEntryMovable), "_splitHalfButton");
+        private static readonly FieldInfo LocalizationField = AccessTools.Field(typeof(TroopHUDEntryMovable), "_localization");
         private static readonly FieldInfo LeftPortraitAmountField = AccessTools.Field(typeof(TroopHUDEntryMovable), "_leftPortraitAmount");
         private static readonly FieldInfo RightPortraitAmountField = AccessTools.Field(typeof(TroopHUDEntryMovable), "_rightPortraitAmount");
         private static readonly FieldInfo DecideTargetTroopEntryField = AccessTools.Field(typeof(TroopHUDEntryMovable), "_decideTargetTroopEntry");
@@ -30,10 +32,12 @@ namespace SongsOfConquestAccess.Adapters
         private static readonly MethodInfo AnimateTroopsUIsToDestinationsMethod = AccessTools.Method(typeof(TroopHUDEntryMovable), "AnimateTroopsUIsToDestinations");
 
         private readonly TroopHUDEntryMovable _movable;
+        private readonly ILocalizationHandler _localization;
 
         public MoveTroopPopupAdapter(TroopHUDEntryMovable movable)
         {
             _movable = movable;
+            _localization = GetField<ILocalizationHandler>(LocalizationField);
         }
 
         public object SourceKey
@@ -69,8 +73,9 @@ namespace SongsOfConquestAccess.Adapters
                 "move-troop-move-all-left",
                 "Move all left",
                 () => Invoke(HandleMoveAllLeftMethod),
-                () => NativeSelectionUtility.SelectAndShowTooltip(button),
-                () => IsButtonEnabled(button));
+                null,
+                () => IsButtonEnabled(button),
+                tooltip: Tooltip.ForComponent(button, _localization));
         }
 
         public ButtonWidget BuildSplitButton()
@@ -80,8 +85,9 @@ namespace SongsOfConquestAccess.Adapters
                 "move-troop-split-equal",
                 "Split equally",
                 () => Invoke(HandleSplitMethod),
-                () => NativeSelectionUtility.SelectAndShowTooltip(button),
-                () => IsButtonEnabled(button));
+                null,
+                () => IsButtonEnabled(button),
+                tooltip: Tooltip.ForComponent(button, _localization));
         }
 
         public ButtonWidget BuildMoveAllRightButton()
@@ -91,8 +97,9 @@ namespace SongsOfConquestAccess.Adapters
                 "move-troop-move-all-right",
                 "Move all right",
                 () => Invoke(HandleMoveAllRightMethod),
-                () => NativeSelectionUtility.SelectAndShowTooltip(button),
-                () => IsButtonEnabled(button));
+                null,
+                () => IsButtonEnabled(button),
+                tooltip: Tooltip.ForComponent(button, _localization));
         }
 
         public SliderWidget BuildDistributionSlider()
@@ -135,7 +142,7 @@ namespace SongsOfConquestAccess.Adapters
 
         public void HideNativeTooltip()
         {
-            NativeSelectionUtility.HideTooltip();
+            NativeTooltipUtility.HideTooltip();
         }
 
         private string GetDistributionText()

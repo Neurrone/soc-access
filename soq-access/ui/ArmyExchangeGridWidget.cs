@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using SongsOfConquestAccess.Adapters;
 using SongsOfConquestAccess.Input;
 using SongsOfConquestAccess.Speech;
 
@@ -349,7 +350,8 @@ namespace SongsOfConquestAccess.UI
                 int maxSize,
                 bool isOccupied,
                 object nativeSource,
-                Action onFocus)
+                Action onFocus,
+                Tooltip tooltip = null)
             {
                 Id = id ?? string.Empty;
                 ArmyLabel = armyLabel ?? string.Empty;
@@ -360,6 +362,7 @@ namespace SongsOfConquestAccess.UI
                 IsOccupied = isOccupied;
                 NativeSource = nativeSource;
                 OnFocus = onFocus;
+                Tooltip = tooltip;
             }
 
             public string Id { get; private set; }
@@ -379,6 +382,8 @@ namespace SongsOfConquestAccess.UI
             public object NativeSource { get; private set; }
 
             public Action OnFocus { get; private set; }
+
+            public Tooltip Tooltip { get; private set; }
         }
 
         internal sealed class SlotWidget : Widget
@@ -415,7 +420,7 @@ namespace SongsOfConquestAccess.UI
 
             public override string GetFocusMessage()
             {
-                return GetLabel();
+                return base.GetFocusMessage();
             }
 
             public override string GetLabel()
@@ -442,6 +447,11 @@ namespace SongsOfConquestAccess.UI
             public override bool HandleAction(InputAction action)
             {
                 return _grid != null && _grid.HandleAction(action);
+            }
+
+            public override Tooltip GetTooltip()
+            {
+                return _data != null ? _data.Tooltip : null;
             }
 
             protected override void OnFocus()

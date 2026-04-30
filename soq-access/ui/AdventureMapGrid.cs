@@ -18,13 +18,18 @@ namespace SongsOfConquestAccess.UI
 
         public override string GetRole()
         {
-            return "world grid";
+            return string.Empty;
         }
 
-        public override string GetFocusMessage()
+        public override string GetLabel()
         {
             AdventureMapTile tile = _adapter != null ? _adapter.GetTile(_cursorTile) : null;
             return tile != null ? tile.ToSpeech() : "Adventure map";
+        }
+
+        public override Tooltip GetTooltip()
+        {
+            return _adapter != null ? _adapter.GetTooltip(_cursorTile) : null;
         }
 
         public override bool ClaimsAction(string actionKey)

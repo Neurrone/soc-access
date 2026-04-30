@@ -1,4 +1,5 @@
 using System;
+using SongsOfConquestAccess.Adapters;
 using SongsOfConquestAccess.Input;
 
 namespace SongsOfConquestAccess.UI
@@ -10,8 +11,9 @@ namespace SongsOfConquestAccess.UI
         private readonly Func<bool> _isEnabled;
         private readonly Func<bool> _isVisible;
         private readonly string _label;
+        private readonly Tooltip _tooltip;
 
-        public ButtonWidget(string id, string label, Func<bool> activate, Action onFocus, Func<bool> isEnabled, Func<bool> isVisible = null)
+        public ButtonWidget(string id, string label, Func<bool> activate, Action onFocus, Func<bool> isEnabled, Func<bool> isVisible = null, Tooltip tooltip = null)
             : base(id)
         {
             _label = label ?? string.Empty;
@@ -19,6 +21,7 @@ namespace SongsOfConquestAccess.UI
             _onFocus = onFocus;
             _isEnabled = isEnabled;
             _isVisible = isVisible;
+            _tooltip = tooltip;
         }
 
         public override bool IsVisible
@@ -39,6 +42,11 @@ namespace SongsOfConquestAccess.UI
         public override string GetStatus()
         {
             return IsEnabled() ? string.Empty : "disabled";
+        }
+
+        public override Tooltip GetTooltip()
+        {
+            return _tooltip;
         }
 
         public override bool ClaimsAction(string actionKey)

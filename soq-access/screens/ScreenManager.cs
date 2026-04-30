@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using SongsOfConquestAccess.Adapters;
 using SongsOfConquestAccess.Input;
 using SongsOfConquestAccess.UI;
 
@@ -291,6 +292,33 @@ namespace SongsOfConquestAccess.Screens
             // this method returns false. The return value only reports whether
             // the screen performed an action.
             return handled;
+        }
+
+        public bool HandleGlobalAction(InputAction action)
+        {
+            if (!AccessibilityActions.IsGlobalAction(action))
+            {
+                return false;
+            }
+
+            if (action.Key == AccessibilityActions.TooltipActionsMenu.Key)
+            {
+                if (CurrentScreen is TooltipActionsMenuScreen)
+                {
+                    return false;
+                }
+
+                Tooltip tooltip = UIManager.CurrentWidget != null ? UIManager.CurrentWidget.GetTooltip() : null;
+                if (tooltip == null || tooltip.Actions == null || tooltip.Actions.Count == 0)
+                {
+                    return false;
+                }
+
+                PushScreen(new TooltipActionsMenuScreen(tooltip.Actions, () => RemoveTopScreen<TooltipActionsMenuScreen>()));
+                return true;
+            }
+
+            return false;
         }
 
         public bool CurrentScreenClaimsAction(string actionKey)

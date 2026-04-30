@@ -1,5 +1,6 @@
 using HarmonyLib;
 using SongsOfConquest.Client.Menu.Tooltip;
+using SongsOfConquest.Common.Details;
 using UnityEngine;
 
 namespace SongsOfConquestAccess
@@ -78,6 +79,30 @@ namespace SongsOfConquestAccess
             _accessibilityTooltipHandle = tooltipManager.ForceDisplayTooltip(
                 tooltipable,
                 new TooltipLocation(rectTransform, anchors));
+        }
+
+        public static void ShowAccessibilityTooltipAtScreenPoint(
+            ITooltipable tooltipable,
+            Vector2 screenPoint,
+            IDetails details)
+        {
+            HideAccessibilityTooltip();
+
+            if (tooltipable == null || details == null || _currentManager == null)
+            {
+                return;
+            }
+
+            ITooltipManager tooltipManager = TooltipManagerRef(_currentManager);
+            if (tooltipManager == null)
+            {
+                return;
+            }
+
+            _accessibilityTooltipHandle = tooltipManager.ForceDisplayTooltip(
+                tooltipable,
+                new TooltipLocation(screenPoint),
+                details);
         }
 
         public static void HideAccessibilityTooltip()

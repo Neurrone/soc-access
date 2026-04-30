@@ -329,12 +329,119 @@ namespace SongsOfConquestAccess.Adapters
 
                 SetScreenOverlayPosition(GetScreenPoint(tile));
                 _cursorOverlay.SetActive(true);
-
-                ShowFocusedTileTooltip(tile);
             }
             catch (Exception exception)
             {
                 SoqAccessPlugin.Instance?.LogWarning("AdventureMapAdapter failed to set focused tile overlay: " + exception.Message);
+            }
+        }
+
+        public Tooltip GetTooltip(Vector2Int tile)
+        {
+            if (_tooltipManager == null || !ShouldShowFocusedTileTooltip(tile))
+            {
+                return null;
+            }
+
+            IDetails details = GetTooltipDetailsForTile(tile);
+            if (details == null)
+            {
+                return null;
+            }
+
+            object runtimeTooltipBehavior = _runtimeTooltipBehaviorField?.GetValue(_tooltipManager);
+            ITooltipable tooltipable = runtimeTooltipBehavior as ITooltipable;
+            if (tooltipable == null)
+            {
+                return null;
+            }
+
+            DetailsTextUtility captured = DetailsTextUtility.Capture(details, _localizationHandler);
+            List<string> textLines = new List<string>(captured.TextLines);
+            List<TooltipAction> actions = BuildMapTooltipActions(tile, captured.InstructionRows, textLines);
+            return new Tooltip(
+                () => textLines,
+                new VisualTooltipMetadata(tooltipable, GetScreenPoint(tile), details),
+                actions);
+        }
+
+        private List<TooltipAction> BuildMapTooltipActions(
+            Vector2Int tile,
+            IReadOnlyList<TooltipInstructionRow> instructionRows,
+            List<string> textLines)
+        {
+            List<TooltipAction> actions = new List<TooltipAction>();
+            if (instructionRows == null || instructionRows.Count == 0)
+            {
+                return actions;
+            }
+
+            for (int i = 0; i < instructionRows.Count; i++)
+            {
+                TooltipInstructionRow row = instructionRows[i];
+                if (row == null || string.IsNullOrWhiteSpace(row.Text))
+                {
+                    continue;
+                }
+
+                Vector2Int capturedTile = tile;
+                if (IsPrimaryMapInstruction(row.InputType))
+                {
+                    RemoveExactLine(textLines, row.Text);
+                    actions.Add(new TooltipAction(row.Text, () => HandlePrimaryAction(capturedTile)));
+                }
+                else if (IsSecondaryMapInstruction(row.InputType))
+                {
+                    RemoveExactLine(textLines, row.Text);
+                    actions.Add(new TooltipAction(row.Text, () => HandleSecondaryAction(capturedTile)));
+                }
+            }
+
+            return actions;
+        }
+
+        private bool IsPrimaryMapInstruction(InputType inputType)
+        {
+            // Map tooltip rows describe the native input that would activate the
+            // row. When it is primary input, reuse the same primary map path as
+            // pressing Enter on the accessibility cursor; the native map input
+            // module decides what primary means for the focused tile.
+            if (_inputManager != null)
+            {
+                return inputType == InputType.GetLeftMouseClickOrConfirm(_inputManager)
+                    || inputType == InputType.LeftMouseClickOrSelect;
+            }
+
+            return inputType == InputType.LeftMouseClickOrConfirm
+                || inputType == InputType.LeftMouseClickOrSelect;
+        }
+
+        private bool IsSecondaryMapInstruction(InputType inputType)
+        {
+            // Secondary rows cover Visit, Pickup, Attack, Claim, Repair, and
+            // similar map interactions. Use the same path as the accessibility
+            // map secondary key so we do not recreate game interaction rules.
+            if (_inputManager != null)
+            {
+                return inputType == InputType.GetRightMouseClickOrCursorConfirm(_inputManager);
+            }
+
+            return inputType == InputType.RightMouseClickOrCursorConfirm;
+        }
+
+        private static void RemoveExactLine(List<string> lines, string lineToRemove)
+        {
+            if (lines == null || string.IsNullOrWhiteSpace(lineToRemove))
+            {
+                return;
+            }
+
+            for (int i = lines.Count - 1; i >= 0; i--)
+            {
+                if (string.Equals(lines[i], lineToRemove, StringComparison.Ordinal))
+                {
+                    lines.RemoveAt(i);
+                }
             }
         }
 

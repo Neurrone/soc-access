@@ -12,11 +12,6 @@ namespace SongsOfConquestAccess.Adapters
             return component != null && Select(component.gameObject);
         }
 
-        public static bool SelectAndShowTooltip(Component component)
-        {
-            return component != null && SelectAndShowTooltip(component.gameObject);
-        }
-
         public static bool Select(Selectable selectable)
         {
             if (selectable == null)
@@ -31,43 +26,6 @@ namespace SongsOfConquestAccess.Adapters
 
             selectable.Select();
             return true;
-        }
-
-        public static bool SelectAndShowTooltip(Selectable selectable)
-        {
-            return selectable != null && SelectAndShowTooltip(selectable.gameObject);
-        }
-
-        public static bool SelectAndShowTooltip(Selectable selectable, RectTransform tooltipAnchor)
-        {
-            return selectable != null && SelectAndShowTooltip(selectable.gameObject, tooltipAnchor);
-        }
-
-        public static bool SelectAndShowTooltip(GameObject gameObject)
-        {
-            bool selected = Select(gameObject);
-            if (selected)
-            {
-                TooltipPatches.ShowAccessibilityTooltip(gameObject);
-            }
-
-            return selected;
-        }
-
-        public static bool SelectAndShowTooltip(GameObject gameObject, RectTransform tooltipAnchor)
-        {
-            bool selected = Select(gameObject);
-            if (selected)
-            {
-                TooltipPatches.ShowAccessibilityTooltip(gameObject, tooltipAnchor);
-            }
-
-            return selected;
-        }
-
-        public static void HideTooltip()
-        {
-            TooltipPatches.HideAccessibilityTooltip();
         }
 
         public static bool Click(IUIButton button)

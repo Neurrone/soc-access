@@ -7,19 +7,24 @@ using SongsOfConquest.Client.Menu.Tooltip;
 using SongsOfConquest.Client.UI;
 using SongsOfConquest.Common.Details;
 using SongsOfConquest.Common.Localization;
-using SongsOfConquestAccess.Speech;
 using UnityEngine;
 using UnityEngine.AddressableAssets;
 
 namespace SongsOfConquestAccess.Adapters
 {
+    // Native tooltip/details objects do not expose their contents as plain text.
+    // They reveal content by drawing into an IDetailsDrawer via IDetails.Draw(...).
+    // This class is a text-capturing fake drawer: text-producing draw calls become
+    // speech/buffer lines, while visual-only draw calls are implemented as safe
+    // no-ops so native details builders can run without needing per-details parsers.
     internal sealed class DetailsTextUtility : IDetailsDrawer
     {
         // Native details builders often mutate the element returned from AddText/AddImage,
         // for example drawer.AddText(...).FontColor = .... Return a no-op element so
-        // those builders can run while this drawer captures only text for speech.
+        // those builders can run while this drawer captures only text.
         private static readonly NullDetailsElement NullElement = new NullDetailsElement();
         private readonly List<string> _parts = new List<string>();
+        private readonly List<TooltipInstructionRow> _instructionRows = new List<TooltipInstructionRow>();
 
         public IEnumerable<DetailsSidePanelDescription> AllSidePanels
         {
@@ -28,11 +33,29 @@ namespace SongsOfConquestAccess.Adapters
 
         public static string ToText(IDetails details, ILocalizationHandler localization)
         {
+            IReadOnlyList<string> parts = ToLines(details, localization);
+            return JoinSentences(parts);
+        }
+
+        public static IReadOnlyList<string> ToLines(IDetails details, ILocalizationHandler localization)
+        {
+            return Capture(details, localization).TextLines;
+        }
+
+        public static DetailsTextUtility Capture(IDetails details, ILocalizationHandler localization)
+        {
             if (details == null || localization == null)
             {
-                return string.Empty;
+                return new DetailsTextUtility();
             }
 
+            // Native details may include instruction rows from AddLabelWithImage
+            // or AddLabelsWithInputTypes. Generic extraction preserves those
+            // rows because they are ambiguous: some are status messages, while
+            // others describe real actions. Adapters that understand a specific
+            // tooltip source may replace known action instruction rows with
+            // structured TooltipAction entries. Unknown rows remain in TextLines
+            // so unsupported actions are still spoken.
             DetailsTextUtility drawer = new DetailsTextUtility();
             try
             {
@@ -43,7 +66,20 @@ namespace SongsOfConquestAccess.Adapters
                 SoqAccessPlugin.Instance?.LogWarning("DetailsTextUtility failed to draw details: " + ex.Message);
             }
 
-            return JoinSentences(drawer._parts);
+            return drawer;
+        }
+
+        public IReadOnlyList<string> TextLines
+        {
+            get { return _parts.ToArray(); }
+        }
+
+        // Native tooltip instruction rows are draw-time metadata. They are not
+        // accessibility actions by themselves; an adapter that understands the
+        // native source must decide whether an instruction can be invoked safely.
+        public IReadOnlyList<TooltipInstructionRow> InstructionRows
+        {
+            get { return _instructionRows.ToArray(); }
         }
 
         public void RegisterSidePanelDescription(DetailsSidePanelDescription description)
@@ -86,8 +122,7 @@ namespace SongsOfConquestAccess.Adapters
 
         public void AddDualHeaderWithBackground(string leftText, string rightText)
         {
-            Add(leftText);
-            Add(rightText);
+            AddRow(leftText, rightText);
         }
 
         public void AddHeader(string header)
@@ -97,8 +132,7 @@ namespace SongsOfConquestAccess.Adapters
 
         public void AddTextWithBackground(string leftText, string rightText)
         {
-            Add(leftText);
-            Add(rightText);
+            AddRow(leftText, rightText);
         }
 
         public void AddImageDivider()
@@ -125,14 +159,13 @@ namespace SongsOfConquestAccess.Adapters
 
         public (IUITextMesh headerText, IUITextMesh descriptionText) AddTextWithHeader(string header, string details)
         {
-            Add(header);
-            Add(details);
+            AddRow(header, details);
             return (NullElement, NullElement);
         }
 
         public void AddLabelWithImage(string text, InputType type)
         {
-            Add(text);
+            AddInstruction(text, type);
         }
 
         public void AddFrameTopHex(Sprite icon)
@@ -151,8 +184,7 @@ namespace SongsOfConquestAccess.Adapters
 
         public void AddTextLeftRight(string leftText, string rightText)
         {
-            Add(leftText);
-            Add(rightText);
+            AddRow(leftText, rightText);
         }
 
         public IUITextMesh AddSingleTextWithBackground(string text)
@@ -163,14 +195,12 @@ namespace SongsOfConquestAccess.Adapters
 
         public void AddEntry(Sprite icon, string text, string value, bool showBackground)
         {
-            Add(text);
-            Add(value);
+            AddRow(text, value);
         }
 
         public void AddEntryWithReference(AssetReferenceT<Sprite> iconReference, string text, string value, bool showBackground)
         {
-            Add(text);
-            Add(value);
+            AddRow(text, value);
         }
 
         public void AddBottomFade(Color color)
@@ -179,9 +209,9 @@ namespace SongsOfConquestAccess.Adapters
 
         public void AddLabelsWithInputTypes(string inputLabel, InputType inputType, string secondaryInputLabel = null, InputType secondaryInputType = default(InputType), string thirdInputLabel = null, InputType thirdInputType = default(InputType), bool addSpaceIfDrawn = true, int? separatorSpaces = null)
         {
-            Add(inputLabel);
-            Add(secondaryInputLabel);
-            Add(thirdInputLabel);
+            AddInstruction(inputLabel, inputType);
+            AddInstruction(secondaryInputLabel, secondaryInputType);
+            AddInstruction(thirdInputLabel, thirdInputType);
         }
 
         public void BeginHorizontal()
@@ -233,10 +263,33 @@ namespace SongsOfConquestAccess.Adapters
 
         private void Add(string value)
         {
-            string normalized = SpeechTextSanitizer.Normalize(value);
-            if (!string.IsNullOrWhiteSpace(normalized) && !_parts.Contains(normalized))
+            if (!string.IsNullOrWhiteSpace(value) && !_parts.Contains(value))
             {
-                _parts.Add(normalized);
+                _parts.Add(value);
+            }
+        }
+
+        private void AddRow(string leftText, string rightText)
+        {
+            string left = leftText ?? string.Empty;
+            string right = rightText ?? string.Empty;
+            if (!string.IsNullOrWhiteSpace(left) && !string.IsNullOrWhiteSpace(right))
+            {
+                Add(left.TrimEnd(':') + ": " + right);
+            }
+            else
+            {
+                Add(left);
+                Add(right);
+            }
+        }
+
+        private void AddInstruction(string text, InputType inputType)
+        {
+            Add(text);
+            if (!string.IsNullOrWhiteSpace(text))
+            {
+                _instructionRows.Add(new TooltipInstructionRow(text, inputType));
             }
         }
 
@@ -245,7 +298,7 @@ namespace SongsOfConquestAccess.Adapters
             StringBuilder builder = new StringBuilder();
             for (int i = 0; i < parts.Count; i++)
             {
-                string part = SpeechTextSanitizer.Normalize(parts[i]);
+                string part = SongsOfConquestAccess.Speech.SpeechTextSanitizer.Normalize(parts[i]);
                 if (string.IsNullOrWhiteSpace(part))
                 {
                     continue;
@@ -459,5 +512,18 @@ namespace SongsOfConquestAccess.Adapters
                 return default(T);
             }
         }
+    }
+
+    internal sealed class TooltipInstructionRow
+    {
+        public TooltipInstructionRow(string text, InputType inputType)
+        {
+            Text = text ?? string.Empty;
+            InputType = inputType;
+        }
+
+        public string Text { get; private set; }
+
+        public InputType InputType { get; private set; }
     }
 }
