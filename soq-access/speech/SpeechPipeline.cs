@@ -32,5 +32,10 @@ namespace SongsOfConquestAccess.Speech
             SoqAccessPlugin.Instance?.LogInfo("SpeechPipeline output: \"" + text + "\", interrupt=" + request.Interrupt);
             _speechService.Speak(text, request.Interrupt);
         }
+
+        public static void Silence()
+        {
+            _speechService?.Silence();
+        }
     }
 }

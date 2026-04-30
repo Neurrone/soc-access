@@ -71,6 +71,22 @@ namespace SongsOfConquestAccess.Speech
             _nativeSpeech.Speak(text, interrupt);
         }
 
+        public void Silence()
+        {
+            if (!_initialized)
+            {
+                return;
+            }
+
+            if (!_nativeSpeech.IsActive)
+            {
+                return;
+            }
+
+            _logger.LogInfo("SpeechService silencing speech");
+            _nativeSpeech.Silence();
+        }
+
         public void Dispose()
         {
             _nativeSpeech.Dispose();

@@ -50,6 +50,9 @@ namespace Tolk
         private delegate void Tolk_TrySAPIDelegate(bool trySAPI);
 
         [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+        private delegate bool Tolk_SilenceDelegate();
+
+        [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
         private delegate int nvdaController_testIfRunningDelegate();
 
         [UnmanagedFunctionPointer(CallingConvention.Cdecl, CharSet = CharSet.Unicode)]
@@ -66,6 +69,7 @@ namespace Tolk
         private Tolk_HasSpeechDelegate Tolk_HasSpeech;
         private Tolk_HasBrailleDelegate Tolk_HasBraille;
         private Tolk_TrySAPIDelegate Tolk_TrySAPI;
+        private Tolk_SilenceDelegate Tolk_Silence;
         private nvdaController_testIfRunningDelegate nvdaController_testIfRunning;
         private nvdaController_speakTextDelegate nvdaController_speakText;
 
@@ -220,6 +224,26 @@ namespace Tolk
             }
         }
 
+        public void Silence()
+        {
+            if (!IsActive)
+            {
+                return;
+            }
+
+            try
+            {
+                lock (tolkLock)
+                {
+                    Tolk_Silence?.Invoke();
+                }
+            }
+            catch (Exception ex)
+            {
+                options?.Error?.Invoke($"Error silencing speech (native): {ex.Message}");
+            }
+        }
+
         public void Dispose()
         {
             Shutdown();
@@ -263,6 +287,7 @@ namespace Tolk
             Tolk_HasSpeech = GetFunction<Tolk_HasSpeechDelegate>(tolkHandle, "Tolk_HasSpeech");
             Tolk_HasBraille = GetFunction<Tolk_HasBrailleDelegate>(tolkHandle, "Tolk_HasBraille");
             Tolk_TrySAPI = GetFunction<Tolk_TrySAPIDelegate>(tolkHandle, "Tolk_TrySAPI");
+            Tolk_Silence = GetFunction<Tolk_SilenceDelegate>(tolkHandle, "Tolk_Silence");
         }
 
         private bool TestNvda()
@@ -337,6 +362,7 @@ namespace Tolk
             Tolk_HasSpeech = null;
             Tolk_HasBraille = null;
             Tolk_TrySAPI = null;
+            Tolk_Silence = null;
             nvdaController_testIfRunning = null;
             nvdaController_speakText = null;
         }
