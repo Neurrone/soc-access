@@ -1,4 +1,5 @@
 using System;
+using SongsOfConquestAccess.Adapters;
 
 namespace SongsOfConquestAccess.UI
 {
@@ -7,13 +8,28 @@ namespace SongsOfConquestAccess.UI
         private readonly Func<string> _getText;
         private readonly Action _onFocus;
         private readonly bool _includeParentLabelInAnnouncement;
+        private readonly Tooltip _tooltip;
+        private readonly Func<bool> _isVisible;
 
-        public TextWidget(string id, Func<string> getText, Action onFocus, bool includeParentLabelInAnnouncement)
+        public TextWidget(
+            string id,
+            Func<string> getText,
+            Action onFocus,
+            bool includeParentLabelInAnnouncement,
+            Tooltip tooltip = null,
+            Func<bool> isVisible = null)
             : base(id)
         {
             _getText = getText;
             _onFocus = onFocus;
             _includeParentLabelInAnnouncement = includeParentLabelInAnnouncement;
+            _tooltip = tooltip;
+            _isVisible = isVisible;
+        }
+
+        public override bool IsVisible
+        {
+            get { return _isVisible == null || _isVisible(); }
         }
 
         public override bool IncludeParentLabelInAnnouncement
@@ -24,6 +40,11 @@ namespace SongsOfConquestAccess.UI
         public override string GetLabel()
         {
             return _getText != null ? _getText() ?? string.Empty : string.Empty;
+        }
+
+        public override Tooltip GetTooltip()
+        {
+            return _tooltip;
         }
 
         protected override void OnFocus()

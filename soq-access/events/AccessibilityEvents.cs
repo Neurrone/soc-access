@@ -31,5 +31,31 @@ namespace SongsOfConquestAccess.Events
         {
             public const string InvalidDestination = "army_exchange.invalid_destination";
         }
+
+        public static class Combat
+        {
+            public const string NewTurn = "combat.turn.new";
+            public const string NewRound = "combat.round.new";
+            public const string QueueChanged = "combat.queue.changed";
+            public const string TroopMoved = "combat.troop.moved";
+            public const string Attack = "combat.attack";
+            public const string Damage = "combat.damage";
+            public const string SpellCast = "combat.spell.cast";
+            public const string FaeyFire = "combat.faey_fire";
+            public const string BacteriaAdded = "combat.bacteria.added";
+            public const string BacteriaRemoved = "combat.bacteria.removed";
+            public const string BacteriaModifierApplied = "combat.bacteria.modifier_applied";
+            public const string EssenceGenerated = "combat.essence.generated";
+            public const string TroopCreated = "combat.troop.created";
+            public const string MapEntityCreated = "combat.map_entity.created";
+            public const string MapEntityDestroyed = "combat.map_entity.destroyed";
+            public const string TroopPushed = "combat.troop.pushed";
+            public const string AbilityUsed = "combat.ability.used";
+            public const string Teleport = "combat.teleport";
+            public const string BurrowUp = "combat.burrow_up";
+            public const string AbilityComplete = "combat.ability.complete";
+            public const string BattleResult = "combat.battle_result";
+            public const string HudNotification = "combat.hud.notification";
+        }
     }
 }

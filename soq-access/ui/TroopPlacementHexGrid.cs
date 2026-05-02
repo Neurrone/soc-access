@@ -45,12 +45,12 @@ namespace SongsOfConquestAccess.UI
 
         public override bool ClaimsAction(string actionKey)
         {
-            return actionKey == AccessibilityActions.TroopPlacementMoveWest.Key
-                || actionKey == AccessibilityActions.TroopPlacementMoveEast.Key
-                || actionKey == AccessibilityActions.TroopPlacementMoveNorthWest.Key
-                || actionKey == AccessibilityActions.TroopPlacementMoveNorthEast.Key
-                || actionKey == AccessibilityActions.TroopPlacementMoveSouthWest.Key
-                || actionKey == AccessibilityActions.TroopPlacementMoveSouthEast.Key
+            return actionKey == AccessibilityActions.HexGridWest.Key
+                || actionKey == AccessibilityActions.HexGridEast.Key
+                || actionKey == AccessibilityActions.HexGridNorthWest.Key
+                || actionKey == AccessibilityActions.HexGridNorthEast.Key
+                || actionKey == AccessibilityActions.HexGridSouthWest.Key
+                || actionKey == AccessibilityActions.HexGridSouthEast.Key
                 || actionKey == AccessibilityActions.TroopPlacementNextOwnSpawn.Key
                 || actionKey == AccessibilityActions.TroopPlacementPreviousOwnSpawn.Key
                 || actionKey == AccessibilityActions.TroopPlacementNextEnemySpawn.Key
@@ -72,32 +72,32 @@ namespace SongsOfConquestAccess.UI
                 return false;
             }
 
-            if (action.Key == AccessibilityActions.TroopPlacementMoveWest.Key)
+            if (action.Key == AccessibilityActions.HexGridWest.Key)
             {
                 return Move(-1, 0);
             }
 
-            if (action.Key == AccessibilityActions.TroopPlacementMoveEast.Key)
+            if (action.Key == AccessibilityActions.HexGridEast.Key)
             {
                 return Move(1, 0);
             }
 
-            if (action.Key == AccessibilityActions.TroopPlacementMoveNorthWest.Key)
+            if (action.Key == AccessibilityActions.HexGridNorthWest.Key)
             {
                 return MoveDiagonal(north: true, east: false);
             }
 
-            if (action.Key == AccessibilityActions.TroopPlacementMoveNorthEast.Key)
+            if (action.Key == AccessibilityActions.HexGridNorthEast.Key)
             {
                 return MoveDiagonal(north: true, east: true);
             }
 
-            if (action.Key == AccessibilityActions.TroopPlacementMoveSouthWest.Key)
+            if (action.Key == AccessibilityActions.HexGridSouthWest.Key)
             {
                 return MoveDiagonal(north: false, east: false);
             }
 
-            if (action.Key == AccessibilityActions.TroopPlacementMoveSouthEast.Key)
+            if (action.Key == AccessibilityActions.HexGridSouthEast.Key)
             {
                 return MoveDiagonal(north: false, east: true);
             }

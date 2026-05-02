@@ -32,6 +32,8 @@ namespace SongsOfConquestAccess.Screens
                 new CampaignMenuRuntimeScreenProbe(),
                 new CampaignMapSelectRuntimeScreenProbe(),
                 new AdventureMapRuntimeScreenProbe(),
+                new CombatRuntimeScreenProbe(),
+                new PostBattleResultRuntimeScreenProbe(),
                 new PreBattleMenuRuntimeScreenProbe(),
                 new HostileJoinMenuRuntimeScreenProbe(),
                 new MoveTroopPopupRuntimeScreenProbe(),
@@ -347,6 +349,82 @@ namespace SongsOfConquestAccess.Screens
         public void OnAdventureSceneUnloading()
         {
             _screenManager.RemoveScreens(screen => screen is AdventureMapScreen);
+        }
+
+        public bool OnCombatAvailable()
+        {
+            CombatScreen screen = CombatRuntimeScreenProbe.FindActiveCombatScreen();
+            if (screen == null || !screen.IsPresent())
+            {
+                SoqAccessPlugin.Instance?.LogWarning("ScreenDetector.OnCombatAvailable could not find a ready combat screen");
+                return false;
+            }
+
+            Screen current = _screenManager.CurrentScreen;
+            if (current is CombatScreen && ReferenceEquals(current.SourceKey, screen.SourceKey))
+            {
+                _screenManager.ReplaceTopScreen(screen);
+                return true;
+            }
+
+            _screenManager.RemoveScreenForSource(screen.SourceKey);
+            if (IsTutorialTopScreen())
+            {
+                _screenManager.InsertScreenBelowTop(screen);
+                return true;
+            }
+
+            _screenManager.PushScreen(screen);
+            return true;
+        }
+
+        public void OnCombatInteractionEnded()
+        {
+            _screenManager.RemoveScreens(screen => screen is CombatScreen);
+            CombatEventNarrator.Reset();
+        }
+
+        public void OnPostBattleResultShown(AdventureBattleMenu battleMenu)
+        {
+            PostBattleMenu menu = PostBattleResultAdapter.GetPostBattleMenu(battleMenu);
+            PostBattleResultAdapter adapter = new PostBattleResultAdapter(battleMenu, menu);
+            PostBattleResultScreen screen = new PostBattleResultScreen(adapter);
+            if (screen == null || !screen.IsPresent())
+            {
+                SoqAccessPlugin.Instance?.LogWarning("ScreenDetector.OnPostBattleResultShown could not find a ready post-battle result screen");
+                return;
+            }
+
+            Screen current = _screenManager.CurrentScreen;
+            if (current is PostBattleResultScreen && ReferenceEquals(current.SourceKey, screen.SourceKey))
+            {
+                _screenManager.ReplaceTopScreen(screen);
+                return;
+            }
+
+            _screenManager.RemoveScreenForSource(screen.SourceKey);
+            _screenManager.PushScreen(screen);
+        }
+
+        public void OnPostBattleResultFullyPopulated()
+        {
+            Screen current = _screenManager.CurrentScreen;
+            if (current is PostBattleResultScreen screen)
+            {
+                _screenManager.ReplaceTopScreen(screen.Rebuild());
+            }
+        }
+
+        public void OnPostBattleResultHidden()
+        {
+            _screenManager.RemoveScreenForSource(PostBattleResultAdapter.SourceKey);
+        }
+
+        private bool IsTutorialTopScreen()
+        {
+            Screen current = _screenManager.CurrentScreen;
+            return current is TutorialSlideshowScreen
+                || current is TutorialSimpleScreen;
         }
 
         public void OnPreBattleMenuChanged(PreBattleMenu menu)

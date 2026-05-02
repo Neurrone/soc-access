@@ -104,23 +104,32 @@ namespace SongsOfConquestAccess.Input
         public static readonly InputAction Cancel = OneShot("cancel", "Cancel")
             .AddBinding(new KeyboardBinding(Key.Escape));
 
-        public static readonly InputAction TroopPlacementMoveWest = OneShot("troop_placement_move_west", "Troop Placement Move West")
+        public static readonly InputAction HexGridWest = OneShot("hex_grid_west", "Hex Grid West")
             .AddBinding(new KeyboardBinding(Key.A));
 
-        public static readonly InputAction TroopPlacementMoveEast = OneShot("troop_placement_move_east", "Troop Placement Move East")
+        public static readonly InputAction HexGridEast = OneShot("hex_grid_east", "Hex Grid East")
             .AddBinding(new KeyboardBinding(Key.D));
 
-        public static readonly InputAction TroopPlacementMoveNorthWest = OneShot("troop_placement_move_north_west", "Troop Placement Move Northwest")
+        public static readonly InputAction HexGridNorthWest = OneShot("hex_grid_north_west", "Hex Grid Northwest")
             .AddBinding(new KeyboardBinding(Key.Q));
 
-        public static readonly InputAction TroopPlacementMoveNorthEast = OneShot("troop_placement_move_north_east", "Troop Placement Move Northeast")
+        public static readonly InputAction HexGridNorthEast = OneShot("hex_grid_north_east", "Hex Grid Northeast")
             .AddBinding(new KeyboardBinding(Key.E));
 
-        public static readonly InputAction TroopPlacementMoveSouthWest = OneShot("troop_placement_move_south_west", "Troop Placement Move Southwest")
+        public static readonly InputAction HexGridSouthWest = OneShot("hex_grid_south_west", "Hex Grid Southwest")
             .AddBinding(new KeyboardBinding(Key.Z));
 
-        public static readonly InputAction TroopPlacementMoveSouthEast = OneShot("troop_placement_move_south_east", "Troop Placement Move Southeast")
+        public static readonly InputAction HexGridSouthEast = OneShot("hex_grid_south_east", "Hex Grid Southeast")
             .AddBinding(new KeyboardBinding(Key.C));
+
+        public static readonly InputAction CombatInspect = OneShot("combat_inspect", "Inspect Combat Hex")
+            .AddBinding(new KeyboardBinding(Key.I));
+
+        public static readonly InputAction CombatNextRelevantTile = OneShot("combat_next_relevant_tile", "Next Relevant Combat Tile")
+            .AddBinding(new KeyboardBinding(Key.W));
+
+        public static readonly InputAction CombatPreviousRelevantTile = OneShot("combat_previous_relevant_tile", "Previous Relevant Combat Tile")
+            .AddBinding(new KeyboardBinding(Key.W, shift: true));
 
         public static readonly InputAction TroopPlacementNextOwnSpawn = OneShot("troop_placement_next_own_spawn", "Next Own Spawn Point")
             .AddBinding(new KeyboardBinding(Key.W));
@@ -161,12 +170,15 @@ namespace SongsOfConquestAccess.Input
             NextArmySlot,
             PreviousArmy,
             NextArmy,
-            TroopPlacementMoveWest,
-            TroopPlacementMoveEast,
-            TroopPlacementMoveNorthWest,
-            TroopPlacementMoveNorthEast,
-            TroopPlacementMoveSouthWest,
-            TroopPlacementMoveSouthEast,
+            HexGridWest,
+            HexGridEast,
+            HexGridNorthWest,
+            HexGridNorthEast,
+            HexGridSouthWest,
+            HexGridSouthEast,
+            CombatInspect,
+            CombatNextRelevantTile,
+            CombatPreviousRelevantTile,
             TroopPlacementNextOwnSpawn,
             TroopPlacementPreviousOwnSpawn,
             TroopPlacementNextEnemySpawn,

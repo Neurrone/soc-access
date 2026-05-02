@@ -14,6 +14,15 @@ namespace SongsOfConquestAccess.Screens
                 return;
             }
 
+            Screen screen = FindActiveTutorialScreen();
+            if (screen != null)
+            {
+                screens.Add(screen);
+            }
+        }
+
+        public static Screen FindActiveTutorialScreen()
+        {
             TutorialMenu[] menus = Resources.FindObjectsOfTypeAll<TutorialMenu>();
             for (int i = 0; i < menus.Length; i++)
             {
@@ -26,17 +35,17 @@ namespace SongsOfConquestAccess.Screens
                 TutorialSlideshowAdapter slideshowAdapter = new TutorialSlideshowAdapter(menu);
                 if (slideshowAdapter.IsPresent())
                 {
-                    screens.Add(new TutorialSlideshowScreen(slideshowAdapter));
-                    return;
+                    return new TutorialSlideshowScreen(slideshowAdapter);
                 }
 
                 TutorialSimpleAdapter simpleAdapter = new TutorialSimpleAdapter(menu);
                 if (simpleAdapter.IsPresent())
                 {
-                    screens.Add(new TutorialSimpleScreen(simpleAdapter));
-                    return;
+                    return new TutorialSimpleScreen(simpleAdapter);
                 }
             }
+
+            return null;
         }
     }
 }
