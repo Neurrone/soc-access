@@ -21,6 +21,7 @@ namespace SongsOfConquestAccess
                 yield return original.Current;
             }
 
+            CampaignMenuLifetimeNotifier.Attach(campaignMenu);
             SoqAccessPlugin.Instance?.ScreenDetector?.OnCampaignMenuAvailable(campaignMenu);
         }
     }

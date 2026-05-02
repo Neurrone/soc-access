@@ -148,65 +148,12 @@ namespace SongsOfConquestAccess.Adapters
 
         private string BuildProgressStatus()
         {
-            ICampaignDefinition definition = GetDefinition();
-            CampaignState state = GetCampaignState();
-            if (definition == null || definition.Maps == null || definition.Maps.Count == 0 || state == null)
-            {
-                return string.Empty;
-            }
-
-            int available = 0;
-            int completed = 0;
-            for (int i = 0; i < definition.Maps.Count; i++)
-            {
-                ICampaignMapDefinition map = definition.Maps[i];
-                if (map == null)
-                {
-                    continue;
-                }
-
-                CampaignLevelState level = state.GetLevel(map);
-                bool unlocked = i == 0 || (level != null && !level.IsLocked);
-                bool isCompleted = level != null && level.IsCompleted;
-                if (unlocked || isCompleted)
-                {
-                    available++;
-                }
-
-                if (isCompleted)
-                {
-                    completed++;
-                }
-            }
-
-            if (completed >= definition.Maps.Count)
-            {
-                return GetLocalizedText("Common/CampaignSelectMenu/CampaignCompleted", "campaign completed");
-            }
-
-            List<string> parts = new List<string>();
-            parts.Add(completed + " of " + definition.Maps.Count + " missions completed");
-            if (available > 0)
-            {
-                parts.Add(available + " available");
-            }
-
-            return string.Join(". ", parts.ToArray());
+            return CampaignProgress.BuildMissionStatus(GetDefinition(), GetCampaignState(), null);
         }
 
         private static string GetLocalizedText(string localizationKey, string fallback)
         {
-            if (!string.IsNullOrWhiteSpace(localizationKey) && GlobalLocalizationVariables.LocalizationHandler != null)
-            {
-                string localized = SpeechTextSanitizer.Normalize(
-                    GlobalLocalizationVariables.LocalizationHandler.GetText(localizationKey));
-                if (!string.IsNullOrWhiteSpace(localized))
-                {
-                    return localized;
-                }
-            }
-
-            return fallback;
+            return CampaignProgress.GetLocalizedText(localizationKey, fallback);
         }
 
         private static string GetText(UITextMesh textMesh)

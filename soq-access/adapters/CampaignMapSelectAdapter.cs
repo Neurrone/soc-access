@@ -40,7 +40,7 @@ namespace SongsOfConquestAccess.Adapters
 
             MainMenuManager.Settings mainMenuSettings = GetMainMenuSettings();
             BackButton = mainMenuSettings != null ? new StandardMenuButtonAdapter("back", mainMenuSettings.BackButton) : null;
-            OptionsButton = mainMenuSettings != null ? new StandardMenuButtonAdapter("options", mainMenuSettings.OptionsButton) : null;
+            OptionsButton = mainMenuSettings != null ? new OptionsMenuButtonAdapter(mainMenuSettings.OptionsButton) : null;
         }
 
         public object SourceKey

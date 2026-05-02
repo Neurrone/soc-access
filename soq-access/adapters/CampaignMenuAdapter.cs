@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using HarmonyLib;
 using SongsOfConquest.Client.Menu.Common;
+using SongsOfConquest.Client.Menu.Loading;
 using SongsOfConquest.Client.Menu.Main;
 using SongsOfConquest.Client.Menu;
 using SongsOfConquest.Client.UI;
@@ -61,13 +62,10 @@ namespace SongsOfConquestAccess.Adapters
                 () => settings.BackButton != null && MenuButtonAdapterBase.IsButtonVisible(settings.BackButton),
                 null,
                 includeAllVisibleText: false) : null;
-            OptionsButton = settings != null ? new OptionalMenuButtonAdapter(
-                "options",
+            OptionsButton = settings != null ? new OptionsMenuButtonAdapter(
                 settings.OptionsButton,
-                "Options",
                 () => settings.OptionsButton != null && MenuButtonAdapterBase.IsButtonVisible(settings.OptionsButton),
-                null,
-                includeAllVisibleText: false) : null;
+                null) : null;
         }
 
         public object SourceKey
@@ -102,6 +100,7 @@ namespace SongsOfConquestAccess.Adapters
         public bool IsPresent()
         {
             return _campaignMenu != null
+                && IsLoadedMainMenuScene(MainMenuSceneType.Campaign)
                 && IsLiveSceneObject(_campaignMenu.gameObject)
                 && IsGameObjectActive(GetCampaignButtonContainer())
                 && HasVisibleCampaignButton();
@@ -165,6 +164,12 @@ namespace SongsOfConquestAccess.Adapters
         private static bool IsLiveSceneObject(GameObject gameObject)
         {
             return gameObject != null && gameObject.scene.IsValid() && gameObject.scene.isLoaded;
+        }
+
+        private static bool IsLoadedMainMenuScene(MainMenuSceneType sceneType)
+        {
+            MainMenuSceneLoader loader = MainMenuSceneLoader.UnsafeInstance;
+            return loader != null && loader.CurrentlyLoadedScene == sceneType;
         }
 
         private MainMenuManager.Settings GetMainMenuSettings()

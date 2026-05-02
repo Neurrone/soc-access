@@ -30,6 +30,7 @@ namespace SongsOfConquestAccess.Screens
             {
                 new MainMenuRuntimeScreenProbe(),
                 new CampaignMenuRuntimeScreenProbe(),
+                new TaleSelectRuntimeScreenProbe(),
                 new CampaignMapSelectRuntimeScreenProbe(),
                 new AdventureMapRuntimeScreenProbe(),
                 new CombatRuntimeScreenProbe(),
@@ -281,6 +282,42 @@ namespace SongsOfConquestAccess.Screens
 
             CampaignMenuScreen screen = new CampaignMenuScreen(adapter);
             _screenManager.PushScreen(screen);
+        }
+
+        public void OnCampaignMenuHidden(CampaignMenu campaignMenu)
+        {
+            if (campaignMenu == null || !_screenManager.RemoveScreenForSource(campaignMenu))
+            {
+                ResyncFromRuntimeState();
+            }
+        }
+
+        public void OnTaleSelectAvailable(TaleButtonLayoutCoordinator coordinator)
+        {
+            TaleSelectAdapter adapter = new TaleSelectAdapter(coordinator);
+            if (!adapter.IsPresent())
+            {
+                ResyncFromRuntimeState();
+                return;
+            }
+
+            TaleSelectScreen screen = new TaleSelectScreen(adapter);
+            Screen current = _screenManager.CurrentScreen;
+            if (current is TaleSelectScreen && ReferenceEquals(current.SourceKey, screen.SourceKey))
+            {
+                _screenManager.ReplaceTopScreen(screen);
+                return;
+            }
+
+            _screenManager.PushScreen(screen);
+        }
+
+        public void OnTaleSelectHidden(TaleButtonLayoutCoordinator coordinator)
+        {
+            if (coordinator == null || !_screenManager.RemoveScreenForSource(coordinator))
+            {
+                ResyncFromRuntimeState();
+            }
         }
 
         public void OnCampaignMapSelectAvailable(CampaignMapSelectedInformationView informationView)
