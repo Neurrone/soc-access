@@ -202,6 +202,9 @@ namespace SongsOfConquestAccess
         [HarmonyPrefix]
         private static void BattleHUDNotificationManagerShowTroopBacteriaNotificationPrefix(int troopId, string localizedText)
         {
+            // Bacteria popup names are duplicate noise for screen-reader users.
+            // Effect details, such as Momentum stat changes, are read from the
+            // structured bacteria modifier events instead.
             CombatEventNarrator.NotifyBacteriaAddedStarted(troopId, localizedText);
         }
 

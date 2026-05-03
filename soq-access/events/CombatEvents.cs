@@ -216,11 +216,10 @@ namespace SongsOfConquestAccess.Events.Combat
         public string Format()
         {
             string name = FormatModifierType(ModifierType);
-            string direction = Amount > 0 ? "increased" : "reduced";
-            int amount = Math.Abs(Amount);
+            string amount = (Amount > 0 ? "+" : string.Empty) + Amount;
             return ApplicationType == BacteriaModifierApplicationType.Percentage
-                ? name + " " + direction + " by " + amount + " percent"
-                : name + " " + direction + " by " + amount;
+                ? name + " " + amount + "%"
+                : name + " " + amount;
         }
     }
 
@@ -419,6 +418,8 @@ namespace SongsOfConquestAccess.Events.Combat
 
     internal sealed class BacteriaAddedEvent : IAccessibilityEvent
     {
+        // TODO: Remove this event type if we verify there is no future need to
+        // emit bacteria-added announcements separately from modifier details.
         public BacteriaAddedEvent(TroopRef target, BacteriaRef bacteria) { Target = target; Bacteria = bacteria; }
         public string Kind { get { return AccessibilityEvents.Combat.BacteriaAdded; } }
         public bool Interrupt { get { return false; } }
@@ -488,12 +489,20 @@ namespace SongsOfConquestAccess.Events.Combat
         public string GetSpeechText()
         {
             List<string> parts = new List<string>();
-            AddAmount(parts, Order, "order");
-            AddAmount(parts, Creation, "creation");
-            AddAmount(parts, Chaos, "chaos");
-            AddAmount(parts, Arcana, "arcana");
-            AddAmount(parts, Destruction, "destruction");
-            return parts.Count == 0 ? string.Empty : Actor.Format() + " generates " + FormatList(parts) + " essence";
+            AddEssenceAmount(parts, Order, "order");
+            AddEssenceAmount(parts, Creation, "creation");
+            AddEssenceAmount(parts, Chaos, "chaos");
+            AddEssenceAmount(parts, Arcana, "arcana");
+            AddEssenceAmount(parts, Destruction, "destruction");
+            return FormatList(parts);
+        }
+
+        private static void AddEssenceAmount(List<string> parts, int amount, string name)
+        {
+            if (amount > 0)
+            {
+                parts.Add("+" + amount + " " + name + " essence");
+            }
         }
     }
 

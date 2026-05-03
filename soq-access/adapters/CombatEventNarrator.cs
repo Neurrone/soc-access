@@ -26,6 +26,7 @@ namespace SongsOfConquestAccess.Adapters
     internal static class CombatEventNarrator
     {
         private static readonly Queue<PendingCombatEvent> PendingEvents = new Queue<PendingCombatEvent>();
+        private static readonly Queue<string> SuppressedNativeNotifications = new Queue<string>();
         private static int _activeBlockingVisuals;
         private static int _currentTurnTroopId = -1;
 
@@ -57,6 +58,11 @@ namespace SongsOfConquestAccess.Adapters
         {
             string text = SpeechTextSanitizer.Normalize(localizedText);
             if (string.IsNullOrWhiteSpace(text))
+            {
+                return;
+            }
+
+            if (ConsumeSuppressedNativeNotification(text))
             {
                 return;
             }
@@ -152,10 +158,11 @@ namespace SongsOfConquestAccess.Adapters
 
         public static void NotifyBacteriaAddedStarted(int troopId, string localizedText)
         {
-            StartMatching(
-                pending => pending.Kind == PendingCombatEventKind.BacteriaAdded
-                    && pending.TroopId == troopId,
-                null);
+            string text = SpeechTextSanitizer.Normalize(localizedText);
+            if (!string.IsNullOrWhiteSpace(text))
+            {
+                SuppressedNativeNotifications.Enqueue(text);
+            }
         }
 
         public static void NotifyBacteriaRemovedStarted(int troopId, BacteriaReference bacteriaReference)
@@ -233,6 +240,7 @@ namespace SongsOfConquestAccess.Adapters
         public static void Reset()
         {
             PendingEvents.Clear();
+            SuppressedNativeNotifications.Clear();
             _activeBlockingVisuals = 0;
             _currentTurnTroopId = -1;
         }
@@ -536,27 +544,8 @@ namespace SongsOfConquestAccess.Adapters
 
         private static void EnqueueBacteriaAdded(AddBattleBacteriaCommand.Response response, CombatAdapter adapter)
         {
-            if (response.Entries == null)
-            {
-                return;
-            }
-
-            for (int i = 0; i < response.Entries.Length; i++)
-            {
-                AddBattleBacteriaCommand.ResponseEntry entry = response.Entries[i];
-                if (!IsBattleTroopType(entry.StateTypeName) || entry.BacteriaReference == null)
-                {
-                    continue;
-                }
-
-                IBattleTroopState troop = adapter.GetTroop(entry.StateId);
-                Enqueue(PendingCombatEvent.CreateBacteria(
-                    PendingCombatEventKind.BacteriaAdded,
-                    new BacteriaAddedEvent(adapter.CreateTroopRef(troop), adapter.CreateBacteriaRef(entry.BacteriaReference)),
-                    entry.StateId,
-                    entry.BacteriaReference,
-                    optionalVisual: true));
-            }
+            // Bacteria applications are intentionally quiet for now. The useful
+            // effect details are emitted by the follow-up modifier events.
         }
 
         private static void EnqueueBacteriaRemoved(RemoveBattleBacteriaCommand.Response response, CombatAdapter adapter)
@@ -784,12 +773,6 @@ namespace SongsOfConquestAccess.Adapters
                 PendingCombatEvent pending = PendingEvents.Peek();
                 if (!pending.IsDirect)
                 {
-                    if (pending.OptionalVisual && PendingEvents.Count > 1)
-                    {
-                        PendingEvents.Dequeue();
-                        continue;
-                    }
-
                     return;
                 }
 
@@ -1030,6 +1013,20 @@ namespace SongsOfConquestAccess.Adapters
             return left.Id == right.Id && left.BacteriaType == right.BacteriaType;
         }
 
+        private static bool ConsumeSuppressedNativeNotification(string text)
+        {
+            while (SuppressedNativeNotifications.Count > 0)
+            {
+                string suppressed = SuppressedNativeNotifications.Dequeue();
+                if (string.Equals(suppressed, text, StringComparison.Ordinal))
+                {
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
         private static void PublishEvent(IAccessibilityEvent accessibilityEvent)
         {
             if (accessibilityEvent == null)
@@ -1063,7 +1060,6 @@ namespace SongsOfConquestAccess.Adapters
             public BacteriaReference Bacteria;
             public bool BurrowSuccess;
             public bool IsDirect;
-            public bool OptionalVisual;
 
             public static PendingCombatEvent Direct(PendingCombatEventKind kind, IAccessibilityEvent accessibilityEvent)
             {
@@ -1133,15 +1129,14 @@ namespace SongsOfConquestAccess.Adapters
                 };
             }
 
-            public static PendingCombatEvent CreateBacteria(PendingCombatEventKind kind, IAccessibilityEvent accessibilityEvent, int troopId, BacteriaReference bacteria, bool optionalVisual = false)
+            public static PendingCombatEvent CreateBacteria(PendingCombatEventKind kind, IAccessibilityEvent accessibilityEvent, int troopId, BacteriaReference bacteria)
             {
                 return new PendingCombatEvent
                 {
                     Kind = kind,
                     Event = accessibilityEvent,
                     TroopId = troopId,
-                    Bacteria = bacteria,
-                    OptionalVisual = optionalVisual
+                    Bacteria = bacteria
                 };
             }
 
