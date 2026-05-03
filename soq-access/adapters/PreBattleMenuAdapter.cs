@@ -452,7 +452,7 @@ namespace SongsOfConquestAccess.Adapters
                     int index = map.PointToIndex(point);
                     byte[] elevations = map.Contents.ElevationsArray;
                     byte[] decorations = map.Contents.DecorationsArray;
-                    tile.IsHighGround = elevations != null && index < elevations.Length && elevations[index] > 0;
+                    tile.Elevation = elevations != null && index < elevations.Length ? elevations[index] : (byte)0;
                     tile.IsBlocked = decorations != null && index < decorations.Length && IsBlocker(decorations[index]);
                 }
             }
@@ -1162,7 +1162,7 @@ namespace SongsOfConquestAccess.Adapters
 
         public Vector2Int Point { get; private set; }
 
-        public bool IsHighGround { get; set; }
+        public byte Elevation { get; set; }
 
         public bool IsBlocked { get; set; }
 

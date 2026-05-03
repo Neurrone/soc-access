@@ -234,7 +234,6 @@ namespace SongsOfConquestAccess.Adapters
 
             CombatTile tile = new CombatTile(point);
             tile.Elevation = SafeGetElevation(point);
-            tile.IsHighGround = tile.Elevation > 0;
             tile.IsReachable = IsReachable(point);
             tile.IsWalkable = IsWalkable(point);
             tile.Troop = GetTroopAt(point);
@@ -733,9 +732,9 @@ namespace SongsOfConquestAccess.Adapters
                 parts.Add("blocked");
             }
 
-            if (tile.IsHighGround)
+            if (tile.Elevation > 0)
             {
-                parts.Add("high ground");
+                parts.Add("elevated ground, height " + tile.Elevation);
             }
 
             parts.Add(FormatPoint(tile.Point));
@@ -2008,8 +2007,6 @@ namespace SongsOfConquestAccess.Adapters
         public Vector2Int Point { get; private set; }
 
         public byte Elevation { get; set; }
-
-        public bool IsHighGround { get; set; }
 
         public bool IsReachable { get; set; }
 

@@ -360,9 +360,9 @@ namespace SongsOfConquestAccess.UI
                 parts.Add("Blocked");
             }
 
-            if (tile.IsHighGround)
+            if (tile.Elevation > 0)
             {
-                parts.Add("High ground");
+                parts.Add("elevated ground, height " + tile.Elevation);
             }
 
             parts.Add(FormatPoint(tile.Point));
