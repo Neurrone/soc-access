@@ -27,10 +27,13 @@ namespace SongsOfConquestAccess.Adapters
         private static readonly FieldInfo AttackerInfoLabelField = AccessTools.Field(typeof(PostBattleMenu), "_attackerInfoLabel");
         private static readonly FieldInfo DefenderInfoLabelField = AccessTools.Field(typeof(PostBattleMenu), "_defenderInfoLabel");
         private static readonly FieldInfo AttackerXpTextField = AccessTools.Field(typeof(PostBattleMenu), "_attackerXPText");
+        private static readonly FieldInfo IsLocalTeamAttackerField = AccessTools.Field(typeof(PostBattleMenu), "_isLocalTeamAttacker");
         private static readonly FieldInfo AttackerLootContainerField = AccessTools.Field(typeof(PostBattleMenu), "_attackerLootContainer");
         private static readonly FieldInfo DefenderLootContainerField = AccessTools.Field(typeof(PostBattleMenu), "_defenderLootContainer");
         private static readonly FieldInfo ConfirmButtonField = AccessTools.Field(typeof(PostBattleMenu), "_confirmButton");
         private static readonly FieldInfo RedoManualBattleButtonField = AccessTools.Field(typeof(PostBattleMenu), "_replayManualBattleButton");
+        private static readonly FieldInfo CommanderPortraitButtonField = AccessTools.Field(typeof(CommanderHUDPortrait), "_wielderPortraitButton");
+        private static readonly MethodInfo CommanderPortraitRefreshTooltipMethod = AccessTools.Method(typeof(CommanderHUDPortrait), "RefreshTooltip");
 
         private static readonly FieldInfo TroopEntryAmountField = AccessTools.Field(typeof(AdventureBattleMenuTroopEntry), "_amount");
         private static readonly FieldInfo TroopEntryTooltipAreaField = AccessTools.Field(typeof(AdventureBattleMenuTroopEntry), "_tooltipArea");
@@ -107,12 +110,17 @@ namespace SongsOfConquestAccess.Adapters
 
         public string XpText
         {
-            get { return GetText(AttackerXpTextField); }
+            get { return BuildXpText(); }
         }
 
         public bool XpVisible
         {
             get { return IsTextVisible(AttackerXpTextField); }
+        }
+
+        public bool XpBelongsToAttacker
+        {
+            get { return GetFieldValue<bool>(IsLocalTeamAttackerField); }
         }
 
         public IReadOnlyList<ResultEntry> AttackerTroopsLost
@@ -188,7 +196,50 @@ namespace SongsOfConquestAccess.Adapters
                 portrait = ResolveCommanderPortraitByName(settingsFieldName);
             }
 
-            return Tooltip.ForComponent(portrait, _localization);
+            if (portrait == null || portrait.Commander == null)
+            {
+                return null;
+            }
+
+            UIButton button = GetCommanderPortraitButton(portrait);
+            if (button == null)
+            {
+                return null;
+            }
+
+            CommanderHUDPortrait capturedPortrait = portrait;
+            UIButton capturedButton = button;
+            return new Tooltip(
+                () =>
+                {
+                    RefreshCommanderTooltip(capturedPortrait);
+                    return NativeTooltipUtility.GetTooltipLinesForComponent(capturedButton, _localization);
+                },
+                VisualTooltipMetadata.ForComponent(capturedButton));
+        }
+
+        private static UIButton GetCommanderPortraitButton(CommanderHUDPortrait portrait)
+        {
+            return portrait != null && CommanderPortraitButtonField != null
+                ? CommanderPortraitButtonField.GetValue(portrait) as UIButton
+                : null;
+        }
+
+        private static void RefreshCommanderTooltip(CommanderHUDPortrait portrait)
+        {
+            if (portrait == null || portrait.Commander == null || CommanderPortraitRefreshTooltipMethod == null)
+            {
+                return;
+            }
+
+            try
+            {
+                CommanderPortraitRefreshTooltipMethod.Invoke(portrait, null);
+            }
+            catch (Exception exception)
+            {
+                SoqAccessPlugin.Instance?.LogWarning("PostBattleResultAdapter failed to refresh commander tooltip: " + exception.Message);
+            }
         }
 
         private CommanderHUDPortrait ResolveCommanderPortraitByName(string settingsFieldName)
@@ -304,6 +355,41 @@ namespace SongsOfConquestAccess.Adapters
             return string.IsNullOrWhiteSpace(label) ? string.Empty : label + " lost";
         }
 
+        private string BuildXpText()
+        {
+            string text = GetText(AttackerXpTextField);
+            if (string.IsNullOrWhiteSpace(text))
+            {
+                return string.Empty;
+            }
+
+            int amount;
+            return TryParsePositiveInt(text, out amount) && _localization != null
+                ? SpeechTextSanitizer.Normalize(_localization.GetText("Common/Stats/xp", amount))
+                : text;
+        }
+
+        private static bool TryParsePositiveInt(string text, out int value)
+        {
+            value = 0;
+            if (string.IsNullOrWhiteSpace(text))
+            {
+                return false;
+            }
+
+            string digits = string.Empty;
+            for (int i = 0; i < text.Length; i++)
+            {
+                char c = text[i];
+                if (c >= '0' && c <= '9')
+                {
+                    digits += c;
+                }
+            }
+
+            return digits.Length > 0 && int.TryParse(digits, out value);
+        }
+
         private static string GetFirstTooltipLine(Tooltip tooltip)
         {
             if (tooltip == null || tooltip.TextLines == null)
@@ -359,6 +445,17 @@ namespace SongsOfConquestAccess.Adapters
         private T GetField<T>(FieldInfo field) where T : class
         {
             return GetField<T>(_menu, field);
+        }
+
+        private T GetFieldValue<T>(FieldInfo field)
+        {
+            if (_menu == null || field == null)
+            {
+                return default(T);
+            }
+
+            object value = field.GetValue(_menu);
+            return value is T ? (T)value : default(T);
         }
 
         private static T GetField<T>(object instance, FieldInfo field) where T : class

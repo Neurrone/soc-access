@@ -56,7 +56,12 @@ namespace SongsOfConquestAccess.Screens
                 includeParentLabelInAnnouncement: false,
                 tooltip: adapter.AttackerCommanderTooltip));
 
-            AddEntryMenu(root, "post-battle-attacker-troops-lost", "Attacker troops lost", adapter.AttackerTroopsLost, adapter);
+            if (adapter.XpBelongsToAttacker)
+            {
+                AddXpWidget(root, adapter);
+            }
+
+            AddEntryMenu(root, "post-battle-attacker-troops-lost", "Attacker troops lost", adapter.AttackerTroopsLost, adapter, addNoneWhenEmpty: true);
 
             root.AddChild(new TextWidget(
                 "post-battle-attacker-returned-troops",
@@ -72,7 +77,12 @@ namespace SongsOfConquestAccess.Screens
                 includeParentLabelInAnnouncement: false,
                 tooltip: adapter.DefenderCommanderTooltip));
 
-            AddEntryMenu(root, "post-battle-defender-troops-lost", "Defender troops lost", adapter.DefenderTroopsLost, adapter);
+            if (!adapter.XpBelongsToAttacker)
+            {
+                AddXpWidget(root, adapter);
+            }
+
+            AddEntryMenu(root, "post-battle-defender-troops-lost", "Defender troops lost", adapter.DefenderTroopsLost, adapter, addNoneWhenEmpty: true);
 
             root.AddChild(new TextWidget(
                 "post-battle-defender-returned-troops",
@@ -81,18 +91,21 @@ namespace SongsOfConquestAccess.Screens
                 includeParentLabelInAnnouncement: false,
                 isVisible: () => adapter.DefenderReturnedTroopsVisible));
 
+            AddEntryMenu(root, "post-battle-loot", "Loot", adapter.Loot, adapter, addNoneWhenEmpty: false);
+
+            root.AddChild(adapter.BuildAcceptButton());
+            root.AddChild(adapter.BuildRedoManualBattleButton());
+            return root;
+        }
+
+        private static void AddXpWidget(ContainerWidget root, PostBattleResultAdapter adapter)
+        {
             root.AddChild(new TextWidget(
                 "post-battle-xp",
                 () => adapter.XpText,
                 adapter.HideNativeTooltip,
                 includeParentLabelInAnnouncement: false,
                 isVisible: () => adapter.XpVisible));
-
-            AddEntryMenu(root, "post-battle-loot", "Loot", adapter.Loot, adapter);
-
-            root.AddChild(adapter.BuildAcceptButton());
-            root.AddChild(adapter.BuildRedoManualBattleButton());
-            return root;
         }
 
         private static void AddEntryMenu(
@@ -100,14 +113,33 @@ namespace SongsOfConquestAccess.Screens
             string id,
             string label,
             IReadOnlyList<PostBattleResultAdapter.ResultEntry> entries,
-            PostBattleResultAdapter adapter)
+            PostBattleResultAdapter adapter,
+            bool addNoneWhenEmpty)
         {
-            if (root == null || entries == null || entries.Count == 0)
+            if (root == null)
             {
                 return;
             }
 
             MenuWidget menu = new MenuWidget(id, label);
+            if (entries == null || entries.Count == 0)
+            {
+                if (!addNoneWhenEmpty)
+                {
+                    return;
+                }
+
+                menu.AddItem(new MenuItemWidget(
+                    id + "-none",
+                    () => "None",
+                    getStatus: null,
+                    activate: null,
+                    onFocus: adapter.HideNativeTooltip,
+                    isVisible: () => true));
+                root.AddChild(menu);
+                return;
+            }
+
             for (int i = 0; i < entries.Count; i++)
             {
                 PostBattleResultAdapter.ResultEntry entry = entries[i];
