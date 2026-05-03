@@ -50,13 +50,14 @@ namespace SongsOfConquestAccess.UI
                 return;
             }
 
-            _lastFocusedWidget = _currentWidget;
-            if (announcement == _lastAnnouncement)
+            bool didFocusChange = !ReferenceEquals(_currentWidget, _lastFocusedWidget);
+            if (!didFocusChange && announcement == _lastAnnouncement)
             {
                 ShowNativeTooltip(_currentWidget);
                 return;
             }
 
+            _lastFocusedWidget = _currentWidget;
             _lastAnnouncement = announcement;
             SoqAccessPlugin.Instance?.LogInfo("UIManager speaking focused widget: \"" + announcement + "\"");
             SpeechPipeline.Output(new SpeechRequest(announcement, interrupt: false));
