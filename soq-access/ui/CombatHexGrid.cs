@@ -141,6 +141,24 @@ namespace SongsOfConquestAccess.UI
             _adapter?.ClearFocusedTileOverlay();
         }
 
+        public bool MoveToActingTroop(Vector2Int point)
+        {
+            RefreshSnapshot();
+            if (_snapshot == null || !_snapshot.IsValidTile(point))
+            {
+                return false;
+            }
+
+            if (_inspectContext != null)
+            {
+                ExitInspect();
+            }
+
+            _cursor = point;
+            FocusCurrentTile(updateNativeFocus: true);
+            return true;
+        }
+
         private bool Move(int xDelta, int yDelta)
         {
             return SetCursor(new Vector2Int(_cursor.x + xDelta, _cursor.y + yDelta));

@@ -1,16 +1,24 @@
 using SongsOfConquestAccess.Adapters;
 using SongsOfConquestAccess.UI;
+using UnityEngine;
 
 namespace SongsOfConquestAccess.Screens
 {
     internal sealed class CombatScreen : Screen
     {
         private readonly CombatAdapter _adapter;
+        private readonly CombatHexGrid _grid;
 
         public CombatScreen(CombatAdapter adapter)
-            : base(BuildRoot(adapter))
+            : this(adapter, new CombatHexGrid(adapter))
+        {
+        }
+
+        private CombatScreen(CombatAdapter adapter, CombatHexGrid grid)
+            : base(BuildRoot(grid))
         {
             _adapter = adapter;
+            _grid = grid;
         }
 
         public override bool IsPresent()
@@ -21,6 +29,17 @@ namespace SongsOfConquestAccess.Screens
         public CombatAdapter Adapter
         {
             get { return _adapter; }
+        }
+
+        public void MoveCursorToLocalActingTroop(int troopId)
+        {
+            Vector2Int position;
+            if (_adapter != null
+                && _adapter.TryGetLocalActingTroopPosition(troopId, out position)
+                && _grid != null)
+            {
+                _grid.MoveToActingTroop(position);
+            }
         }
 
         public override void OnUnfocus()
@@ -35,10 +54,10 @@ namespace SongsOfConquestAccess.Screens
             _adapter?.ClearFocusedTileOverlay();
         }
 
-        private static ContainerWidget BuildRoot(CombatAdapter adapter)
+        private static ContainerWidget BuildRoot(CombatHexGrid grid)
         {
             ContainerWidget root = new ContainerWidget("combat-screen", "Combat");
-            root.AddChild(new CombatHexGrid(adapter));
+            root.AddChild(grid);
             return root;
         }
     }

@@ -318,6 +318,7 @@ namespace SongsOfConquestAccess.Adapters
             tile.IsWalkable = IsWalkable(point);
             tile.Troop = GetTroopAt(point);
             tile.Entity = GetAttackableEntityAt(point);
+            tile.DecorativeFeature = GetDecorativeFeatureAt(point, tile.Entity);
             return tile;
         }
 
@@ -817,8 +818,6 @@ namespace SongsOfConquestAccess.Adapters
                 parts.Add("elevated ground, height " + tile.Elevation);
             }
 
-            parts.Add(FormatPoint(tile.Point));
-
             if (context != null)
             {
                 context.AddIndicators(tile.Point, parts);
@@ -827,6 +826,13 @@ namespace SongsOfConquestAccess.Adapters
             {
                 AddEnemyInfluence(tile.Point, tile.Troop, parts);
             }
+
+            if (!string.IsNullOrWhiteSpace(tile.DecorativeFeature))
+            {
+                parts.Add(tile.DecorativeFeature);
+            }
+
+            parts.Add(FormatPoint(tile.Point));
 
             return string.Join(", ", parts.ToArray());
         }
@@ -1440,6 +1446,24 @@ namespace SongsOfConquestAccess.Adapters
             return entity != null && entity.IsEnabled && entity.HasComponent<IHealthComponent>() ? entity : null;
         }
 
+        private string GetDecorativeFeatureAt(Vector2Int point, IMapEntity attackableEntity)
+        {
+            IMapEntity entity = _facade != null && _facade.MapEntities != null
+                ? _facade.MapEntities.GetAtIncludingNonBlockers(point)
+                : null;
+            if (entity == null || !entity.IsEnabled)
+            {
+                return string.Empty;
+            }
+
+            if (attackableEntity != null && entity.Id == attackableEntity.Id)
+            {
+                return string.Empty;
+            }
+
+            return IsDebris(entity) ? "debris" : string.Empty;
+        }
+
         private string DescribeTroop(IBattleTroopState troop)
         {
             return FormatTroopGridLabel(troop);
@@ -1469,7 +1493,9 @@ namespace SongsOfConquestAccess.Adapters
                 return string.Empty;
             }
 
-            return FormatTroopLabel(troop, troop.Stats.Size, includeHealth: true, includePosition: false);
+            string label = FormatTroopLabel(troop, troop.Stats.Size, includeHealth: true, includePosition: false);
+            IBattleTroopState current = GetCurrentTroop();
+            return current != null && current.Id == troop.Id ? "acting, " + label : label;
         }
 
         public string FormatTroopEventLabel(IBattleTroopState troop)
@@ -1709,6 +1735,30 @@ namespace SongsOfConquestAccess.Adapters
             }
         }
 
+        public bool TryGetLocalActingTroopPosition(int troopId, out Vector2Int position)
+        {
+            position = Vector2Int.zero;
+            if (_facade == null || _facade.Teams == null || !_facade.Teams.IsCurrentLocal)
+            {
+                return false;
+            }
+
+            IBattleTroopState troop = GetTroop(troopId);
+            if (troop == null)
+            {
+                return false;
+            }
+
+            int localTeamId = GetLocalTeamId();
+            if (localTeamId >= 0 && troop.TeamId != localTeamId)
+            {
+                return false;
+            }
+
+            position = troop.Position;
+            return IsValidTile(position);
+        }
+
         public string LocalizeText(string key)
         {
             return Localize(key);
@@ -1719,6 +1769,11 @@ namespace SongsOfConquestAccess.Adapters
             if (entity == null)
             {
                 return string.Empty;
+            }
+
+            if (IsDebris(entity))
+            {
+                return "debris";
             }
 
             string customNameKey;
@@ -1743,6 +1798,11 @@ namespace SongsOfConquestAccess.Adapters
             }
 
             return SpeechTextSanitizer.Normalize(entity.NameKey);
+        }
+
+        private static bool IsDebris(IMapEntity entity)
+        {
+            return entity != null && (entity.BlueprintId == 24 || entity.BlueprintId == 25);
         }
 
         private string Localize(string key)
@@ -2095,6 +2155,8 @@ namespace SongsOfConquestAccess.Adapters
         public IBattleTroopState Troop { get; set; }
 
         public IMapEntity Entity { get; set; }
+
+        public string DecorativeFeature { get; set; }
     }
 
     internal enum CombatRangeIndicator

@@ -121,6 +121,7 @@ namespace SongsOfConquestAccess.Adapters
                 pending => pending.Kind == PendingCombatEventKind.NewTurn
                     && pending.TroopId == troopId,
                 null);
+            MoveCombatCursorToLocalActingTroop(troopId);
         }
 
         public static void NotifyNewRoundPopupVisible()
@@ -128,6 +129,12 @@ namespace SongsOfConquestAccess.Adapters
             StartMatching(
                 pending => pending.Kind == PendingCombatEventKind.NewRound,
                 null);
+        }
+
+        private static void MoveCombatCursorToLocalActingTroop(int troopId)
+        {
+            CombatScreen screen = SoqAccessPlugin.Instance?.ScreenManager?.CurrentScreen as CombatScreen;
+            screen?.MoveCursorToLocalActingTroop(troopId);
         }
 
         public static void NotifySpellStarted(SpellCastResponse response)
@@ -451,11 +458,6 @@ namespace SongsOfConquestAccess.Adapters
             DestroyBattleMapEntityCommand.Response destroyedEntity = response as DestroyBattleMapEntityCommand.Response;
             if (destroyedEntity != null)
             {
-                IMapEntity entity = adapter.GetMapEntity(destroyedEntity.MapEntityId);
-                Enqueue(PendingCombatEvent.Visual(
-                    PendingCombatEventKind.MapEntityDestroyed,
-                    new MapEntityDestroyedEvent(adapter.CreateEntityRef(entity)),
-                    entityId: destroyedEntity.MapEntityId));
                 return;
             }
 
