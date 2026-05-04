@@ -7,10 +7,12 @@ using System.Text.RegularExpressions;
 using HarmonyLib;
 using Lavapotion.Pathfinding;
 using SongsOfConquest;
+using SongsOfConquest.Client;
 using SongsOfConquest.Common.Bacterias;
 using SongsOfConquest.Client.Battle;
 using SongsOfConquest.Client.Battle.Facade;
 using SongsOfConquest.Client.Battle.Controller;
+using SongsOfConquest.Client.Battle.HUD;
 using SongsOfConquest.Client.Battle.View;
 using SongsOfConquest.Client.InputManagement;
 using SongsOfConquest.Client.Menu.Tooltip;
@@ -40,6 +42,10 @@ namespace SongsOfConquestAccess.Adapters
             AccessTools.Property(typeof(BattleSceneInstaller), "Container");
         private static readonly Dictionary<BattleAttackPreview, string> AttackPreviewAdditionalTexts =
             new Dictionary<BattleAttackPreview, string>();
+        private static readonly FieldInfo SpellTargetInstructionSpellNameField =
+            AccessTools.Field(typeof(BattleSpellTargetInstruction), "_spellName");
+        private static readonly FieldInfo SpellTargetInstructionTextField =
+            AccessTools.Field(typeof(BattleSpellTargetInstruction), "_targetInstruction");
         private readonly object _sourceKey;
         private readonly DiContainer _container;
         private readonly IClientBattleFacade _facade;
@@ -55,8 +61,12 @@ namespace SongsOfConquestAccess.Adapters
         private readonly object _cartographyConverter;
         private readonly IHumanBattleControllerFacade _humanBattleController;
         private readonly MouseKeyboardHumanBattleControllerModule _mouseKeyboardInputModule;
+        private readonly IHumanBattleSpellController _battleSpellController;
+        private readonly MouseKeyboardHumanBattleSpellModule _mouseKeyboardSpellInputModule;
+        private readonly IBattleHudSignals _battleHudSignals;
         private readonly MethodInfo _pointToWorldMethod;
         private readonly MethodInfo _secondaryClickMethod;
+        private readonly MethodInfo _spellPrimaryClickMethod;
         private readonly MethodInfo _updateCurrentTileMethod;
         private readonly MethodInfo _updateAttackPreviewsMethod;
         private readonly FieldInfo _tooltipBehaviorField;
@@ -68,6 +78,8 @@ namespace SongsOfConquestAccess.Adapters
         private readonly FieldInfo _attackPreviewAdditionalTextField;
         private GameObject _cursorOverlay;
         private RectTransform[] _cursorOverlaySegments;
+        private Action<ISpellDefinition, string> _targetInstructionHandler;
+        private Action<ISpellDefinition> _beginCastHandler;
 
         public CombatAdapter(BattleSceneInstaller installer)
             : this(
@@ -85,7 +97,10 @@ namespace SongsOfConquestAccess.Adapters
                 Resolve<ICameraLookup>(GetContainer(installer)),
                 ResolveByTypeName(GetContainer(installer), "Lavapotion.Cartography.ICartographyConverter"),
                 Resolve<IHumanBattleControllerFacade>(GetContainer(installer)),
-                Resolve<MouseKeyboardHumanBattleControllerModule>(GetContainer(installer)))
+                Resolve<MouseKeyboardHumanBattleControllerModule>(GetContainer(installer)),
+                Resolve<IHumanBattleSpellController>(GetContainer(installer)),
+                Resolve<MouseKeyboardHumanBattleSpellModule>(GetContainer(installer)),
+                Resolve<IBattleHudSignals>(GetContainer(installer)))
         {
         }
 
@@ -104,7 +119,10 @@ namespace SongsOfConquestAccess.Adapters
             ICameraLookup cameraLookup,
             object cartographyConverter,
             IHumanBattleControllerFacade humanBattleController,
-            MouseKeyboardHumanBattleControllerModule mouseKeyboardInputModule)
+            MouseKeyboardHumanBattleControllerModule mouseKeyboardInputModule,
+            IHumanBattleSpellController battleSpellController,
+            MouseKeyboardHumanBattleSpellModule mouseKeyboardSpellInputModule,
+            IBattleHudSignals battleHudSignals)
         {
             _sourceKey = sourceKey;
             _container = container;
@@ -121,11 +139,17 @@ namespace SongsOfConquestAccess.Adapters
             _cartographyConverter = cartographyConverter;
             _humanBattleController = humanBattleController;
             _mouseKeyboardInputModule = mouseKeyboardInputModule;
+            _battleSpellController = battleSpellController;
+            _mouseKeyboardSpellInputModule = mouseKeyboardSpellInputModule;
+            _battleHudSignals = battleHudSignals;
             _pointToWorldMethod = cartographyConverter != null
                 ? AccessTools.Method(cartographyConverter.GetType(), "PointToWorld", new[] { typeof(int2), typeof(int) })
                 : null;
             _secondaryClickMethod = mouseKeyboardInputModule != null
                 ? AccessTools.Method(mouseKeyboardInputModule.GetType(), "PreHandleSecondaryClick")
+                : null;
+            _spellPrimaryClickMethod = mouseKeyboardSpellInputModule != null
+                ? AccessTools.Method(mouseKeyboardSpellInputModule.GetType(), "HandlePrimaryClick")
                 : null;
             _updateCurrentTileMethod = mouseKeyboardInputModule != null
                 ? AccessTools.Method(mouseKeyboardInputModule.GetType(), "UpdateCurrentTile")
@@ -296,6 +320,15 @@ namespace SongsOfConquestAccess.Adapters
 
         public Vector2Int GetInitialTile()
         {
+            if (IsSpellTargetingActive())
+            {
+                Vector2Int hoverTile = _battleSpellController.CurrentHoverTile;
+                if (IsValidTile(hoverTile))
+                {
+                    return hoverTile;
+                }
+            }
+
             IBattleTroopState current = GetCurrentTroop();
             if (current != null && IsValidTile(current.Position))
             {
@@ -354,6 +387,11 @@ namespace SongsOfConquestAccess.Adapters
             _gridManager?.SetCurrentTile(point, path);
             _pathManager?.SetCurrentTile(point, path);
             _highlightManager?.SetCurrentTile(point);
+            if (IsAnySpellCastingStateActive())
+            {
+                return;
+            }
+
             _cursorManager?.SetState(BattleCursorManager.State.CurrentTroop);
             _gridManager?.SetState(BattleGridManager.State.CurrentTroop);
             _pathManager?.SetState(BattlePathManager.State.CurrentTroop);
@@ -368,6 +406,169 @@ namespace SongsOfConquestAccess.Adapters
             {
                 SynchronizeNativeHoverForPreview(point);
             }
+        }
+
+        public void AttachSpellTargetingNarration()
+        {
+            if (_battleHudSignals == null || _targetInstructionHandler != null)
+            {
+                return;
+            }
+
+            _targetInstructionHandler = HandleTargetInstruction;
+            _battleHudSignals.OnRequestTargetInstruction =
+                (Action<ISpellDefinition, string>)Delegate.Combine(_battleHudSignals.OnRequestTargetInstruction, _targetInstructionHandler);
+        }
+
+        public void DetachSpellTargetingNarration()
+        {
+            if (_battleHudSignals == null || _targetInstructionHandler == null)
+            {
+                return;
+            }
+
+            _battleHudSignals.OnRequestTargetInstruction =
+                (Action<ISpellDefinition, string>)Delegate.Remove(_battleHudSignals.OnRequestTargetInstruction, _targetInstructionHandler);
+            _targetInstructionHandler = null;
+        }
+
+        public void AttachSpellCastBegin(Action handler)
+        {
+            if (_battleHudSignals == null || handler == null || _beginCastHandler != null)
+            {
+                return;
+            }
+
+            _beginCastHandler = _ => handler();
+            _battleHudSignals.OnBeginCast =
+                (Action<ISpellDefinition>)Delegate.Combine(_battleHudSignals.OnBeginCast, _beginCastHandler);
+        }
+
+        public void DetachSpellCastBegin()
+        {
+            if (_battleHudSignals == null || _beginCastHandler == null)
+            {
+                return;
+            }
+
+            _battleHudSignals.OnBeginCast =
+                (Action<ISpellDefinition>)Delegate.Remove(_battleHudSignals.OnBeginCast, _beginCastHandler);
+            _beginCastHandler = null;
+        }
+
+        public void AnnounceVisibleSpellTargetInstruction()
+        {
+            if (!IsSpellTargetingActive())
+            {
+                return;
+            }
+
+            string text = GetVisibleSpellTargetInstructionText();
+            if (!string.IsNullOrWhiteSpace(text))
+            {
+                SpeechPipeline.Output(new SpeechRequest(text, interrupt: false));
+            }
+        }
+
+        public bool IsSpellTargetingActive()
+        {
+            if (_battleSpellController == null)
+            {
+                return false;
+            }
+
+            HumanBattleSpellController.State state = _battleSpellController.CurrentState;
+            return state == HumanBattleSpellController.State.CastingBacteriaSpell
+                || state == HumanBattleSpellController.State.CastingTeleportSpell
+                || state == HumanBattleSpellController.State.CastingSummonSpell;
+        }
+
+        private bool IsAnySpellCastingStateActive()
+        {
+            if (IsSpellTargetingActive())
+            {
+                return true;
+            }
+
+            return _humanBattleController != null
+                && _humanBattleController.StateMachine != null
+                && _humanBattleController.StateMachine.CurrentStateType == HumanBattleController.State.CastingSpell;
+        }
+
+        public bool HasVisibleSpellTargetInstruction()
+        {
+            return !string.IsNullOrWhiteSpace(GetVisibleSpellTargetInstructionText());
+        }
+
+        public bool IsSpellTargetSelected(Vector2Int point)
+        {
+            return _battleSpellController != null
+                && _battleSpellController.SelectedTargets != null
+                && _battleSpellController.SelectedTargets.Contains(point);
+        }
+
+        public void FocusSpellTargetTile(Vector2Int point)
+        {
+            if (!IsSpellTargetingActive() || !IsValidTile(point))
+            {
+                return;
+            }
+
+            PathNode[] path = GetPathTo(point);
+            _battleSpellController.SetCurrentTile(point);
+            _cursorManager?.SetCurrentTile(point);
+            _gridManager?.SetCurrentTile(point, path);
+            _pathManager?.SetCurrentTile(point, path);
+            _highlightManager?.SetCurrentTile(point);
+        }
+
+        public bool ConfirmSpellTarget(Vector2Int point)
+        {
+            if (!IsSpellTargetingActive() || !IsValidTile(point))
+            {
+                return false;
+            }
+
+            bool wasSelected = IsSpellTargetSelected(point);
+            FocusSpellTargetTile(point);
+            if (_spellPrimaryClickMethod == null || _mouseKeyboardSpellInputModule == null)
+            {
+                SoqAccessPlugin.Instance?.LogWarning("CombatAdapter cannot confirm spell target because native HandlePrimaryClick was not found");
+                return false;
+            }
+
+            try
+            {
+                _spellPrimaryClickMethod.Invoke(_mouseKeyboardSpellInputModule, null);
+            }
+            catch (Exception exception)
+            {
+                SoqAccessPlugin.Instance?.LogWarning("CombatAdapter failed to invoke native spell primary click: " + exception.Message);
+                return false;
+            }
+
+            bool isSelected = IsSpellTargetSelected(point);
+            if (!wasSelected && isSelected)
+            {
+                SpeechPipeline.Output(new SpeechRequest("selected", interrupt: false));
+            }
+            else if (wasSelected && !isSelected && IsSpellTargetingActive())
+            {
+                SpeechPipeline.Output(new SpeechRequest("unselected", interrupt: false));
+            }
+
+            return true;
+        }
+
+        public bool CancelSpellTargeting()
+        {
+            if (!IsSpellTargetingActive() || _battleSpellController == null)
+            {
+                return false;
+            }
+
+            _battleSpellController.HandleSpellCastCancelled();
+            return true;
         }
 
         public CombatInspectContext BeginInspect(Vector2Int point)
@@ -393,6 +594,11 @@ namespace SongsOfConquestAccess.Adapters
 
         public void HandleSecondaryAction(Vector2Int point)
         {
+            if (CancelSpellTargeting())
+            {
+                return;
+            }
+
             InvokeNativeClickWithHover(point, _secondaryClickMethod, "secondary");
         }
 
@@ -867,8 +1073,12 @@ namespace SongsOfConquestAccess.Adapters
             _humanBattleController.MapEntitiesWithinMeleeReach = _facade.Level.AllMapEntitiesWithinMeleeReach(_facade.Troops.Current).ToList();
 
             HumanBattleController.State currentState = _humanBattleController.StateMachine.CurrentStateType;
-            if (currentState == HumanBattleController.State.ChoosingAbilityTarget
-                || currentState == HumanBattleController.State.CastingSpell)
+            if (currentState == HumanBattleController.State.ChoosingAbilityTarget)
+            {
+                return;
+            }
+
+            if (IsAnySpellCastingStateActive())
             {
                 return;
             }
@@ -919,6 +1129,57 @@ namespace SongsOfConquestAccess.Adapters
                 _pathManager?.SetState(BattlePathManager.State.CurrentTroop);
                 _humanBattleController.StateMachine.ChangeState(HumanBattleController.State.ShowCurrentTroop);
             }
+        }
+
+        private void HandleTargetInstruction(ISpellDefinition spell, string instruction)
+        {
+            string spellName = spell != null ? SpeechTextSanitizer.Normalize(Localize(spell.NameKey)) : string.Empty;
+            instruction = SpeechTextSanitizer.Normalize(instruction);
+            string text = !string.IsNullOrWhiteSpace(spellName) && !string.IsNullOrWhiteSpace(instruction)
+                ? spellName + ": " + instruction
+                : (!string.IsNullOrWhiteSpace(spellName) ? spellName : instruction);
+            if (!string.IsNullOrWhiteSpace(text))
+            {
+                SpeechPipeline.Output(new SpeechRequest(text, interrupt: false));
+            }
+        }
+
+        private string GetVisibleSpellTargetInstructionText()
+        {
+            BattleSpellTargetInstruction[] instructions = Resources.FindObjectsOfTypeAll<BattleSpellTargetInstruction>();
+            for (int i = 0; i < instructions.Length; i++)
+            {
+                BattleSpellTargetInstruction instruction = instructions[i];
+                if (instruction == null || !((Component)instruction).gameObject.activeInHierarchy)
+                {
+                    continue;
+                }
+
+                UITextMesh spellNameText = SpellTargetInstructionSpellNameField != null
+                    ? SpellTargetInstructionSpellNameField.GetValue(instruction) as UITextMesh
+                    : null;
+                UITextMesh targetInstructionText = SpellTargetInstructionTextField != null
+                    ? SpellTargetInstructionTextField.GetValue(instruction) as UITextMesh
+                    : null;
+                string spellName = SpeechTextSanitizer.Normalize(UITextMeshTextUtility.GetEffectiveText(spellNameText));
+                string targetInstruction = SpeechTextSanitizer.Normalize(UITextMeshTextUtility.GetEffectiveText(targetInstructionText));
+                if (!string.IsNullOrWhiteSpace(spellName) && !string.IsNullOrWhiteSpace(targetInstruction))
+                {
+                    return spellName + ": " + targetInstruction;
+                }
+
+                if (!string.IsNullOrWhiteSpace(spellName))
+                {
+                    return spellName;
+                }
+
+                if (!string.IsNullOrWhiteSpace(targetInstruction))
+                {
+                    return targetInstruction;
+                }
+            }
+
+            return string.Empty;
         }
 
         private bool IsNativeTileToInspect(Vector2Int point)

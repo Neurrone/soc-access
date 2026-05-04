@@ -31,6 +31,13 @@ namespace SongsOfConquestAccess.Screens
             get { return _adapter; }
         }
 
+        public override void OnPush()
+        {
+            _grid?.AttachSpellCastBegin();
+            _adapter?.AttachSpellTargetingNarration();
+            _adapter?.AnnounceVisibleSpellTargetInstruction();
+        }
+
         public void MoveCursorToLocalActingTroop(int troopId)
         {
             Vector2Int position;
@@ -50,6 +57,8 @@ namespace SongsOfConquestAccess.Screens
 
         public override void OnPop()
         {
+            _grid?.DetachSpellCastBegin();
+            _adapter?.DetachSpellTargetingNarration();
             _adapter?.ClearNativeTooltip();
             _adapter?.ClearFocusedTileOverlay();
         }

@@ -10,8 +10,9 @@ namespace SongsOfConquestAccess.UI
         private readonly Func<string> _getStatus;
         private readonly Func<bool> _activate;
         private readonly Action _onFocus;
+        private readonly Action _onUnfocus;
         private readonly Func<bool> _isVisible;
-        private readonly Tooltip _tooltip;
+        private readonly Func<Tooltip> _getTooltip;
 
         public MenuItemWidget(
             string id,
@@ -20,15 +21,30 @@ namespace SongsOfConquestAccess.UI
             Func<bool> activate,
             Action onFocus,
             Func<bool> isVisible,
-            Tooltip tooltip = null)
+            Tooltip tooltip = null,
+            Action onUnfocus = null)
+            : this(id, getLabel, getStatus, activate, onFocus, isVisible, () => tooltip, onUnfocus)
+        {
+        }
+
+        public MenuItemWidget(
+            string id,
+            Func<string> getLabel,
+            Func<string> getStatus,
+            Func<bool> activate,
+            Action onFocus,
+            Func<bool> isVisible,
+            Func<Tooltip> getTooltip,
+            Action onUnfocus = null)
             : base(id)
         {
             _getLabel = getLabel;
             _getStatus = getStatus;
             _activate = activate;
             _onFocus = onFocus;
+            _onUnfocus = onUnfocus;
             _isVisible = isVisible;
-            _tooltip = tooltip;
+            _getTooltip = getTooltip;
         }
 
         public override bool IsVisible
@@ -48,7 +64,7 @@ namespace SongsOfConquestAccess.UI
 
         public override Tooltip GetTooltip()
         {
-            return _tooltip;
+            return _getTooltip != null ? _getTooltip() : null;
         }
 
         public override bool ClaimsAction(string actionKey)
@@ -69,6 +85,11 @@ namespace SongsOfConquestAccess.UI
         protected override void OnFocus()
         {
             _onFocus?.Invoke();
+        }
+
+        protected override void OnUnfocus()
+        {
+            _onUnfocus?.Invoke();
         }
     }
 }

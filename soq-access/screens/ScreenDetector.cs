@@ -32,6 +32,7 @@ namespace SongsOfConquestAccess.Screens
                 new CampaignMapSelectRuntimeScreenProbe(),
                 new AdventureMapRuntimeScreenProbe(),
                 new CombatRuntimeScreenProbe(),
+                new SpellbookRuntimeScreenProbe(),
                 new PostBattleResultRuntimeScreenProbe(),
                 new PreBattleMenuRuntimeScreenProbe(),
                 new HostileJoinMenuRuntimeScreenProbe(),
@@ -309,6 +310,23 @@ namespace SongsOfConquestAccess.Screens
             _battleSceneInstaller = null;
             _screenManager.Pop<CombatScreen>("combat closed");
             CombatEventNarrator.Reset();
+        }
+
+        public void OnSpellbookReady(SpellBook spellbook)
+        {
+            SpellbookScreen screen = new SpellbookScreen(new SpellbookAdapter(spellbook));
+            if (_screenManager.CurrentScreen is SpellbookScreen)
+            {
+                SoqAccessPlugin.Instance?.LogWarning("ScreenDetector ignored duplicate spellbook ready while spellbook is already top");
+                return;
+            }
+
+            Push(screen, "spellbook ready");
+        }
+
+        public void OnSpellbookClosed(SpellBook spellbook)
+        {
+            _screenManager.Pop<SpellbookScreen>("spellbook closed");
         }
 
         public void OnPostBattleResultReady(AdventureBattleMenu battleMenu)

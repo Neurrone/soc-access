@@ -63,6 +63,7 @@ namespace SongsOfConquestAccess
         private void OnDestroy()
         {
             Logger.LogInfo("Accessibility plugin OnDestroy");
+            _screenManager?.Clear();
             _harmony?.UnpatchSelf();
             _harmony = null;
             _inputRouter?.Dispose();

@@ -22,6 +22,16 @@ namespace SongsOfConquestAccess.UI
             _cursor = _adapter != null ? _adapter.GetInitialTile() : Vector2Int.zero;
         }
 
+        public void AttachSpellCastBegin()
+        {
+            _adapter?.AttachSpellCastBegin(HandleSpellCastBegin);
+        }
+
+        public void DetachSpellCastBegin()
+        {
+            _adapter?.DetachSpellCastBegin();
+        }
+
         public override bool AnnounceName
         {
             get { return true; }
@@ -35,7 +45,13 @@ namespace SongsOfConquestAccess.UI
         public override string GetLabel()
         {
             CombatTile tile = GetFocusedTile();
-            return _adapter != null ? _adapter.DescribeTile(tile, _inspectContext) : "Combat grid";
+            string label = _adapter != null ? _adapter.DescribeTile(tile, GetEffectiveInspectContext()) : "Combat grid";
+            if (_adapter != null && _adapter.IsSpellTargetingActive() && _adapter.IsSpellTargetSelected(_cursor))
+            {
+                return "selected, " + label;
+            }
+
+            return label;
         }
 
         public override Tooltip GetTooltip()
@@ -54,9 +70,9 @@ namespace SongsOfConquestAccess.UI
                 || actionKey == AccessibilityActions.CombatInspect.Key
                 || actionKey == AccessibilityActions.CombatNextRelevantTile.Key
                 || actionKey == AccessibilityActions.CombatPreviousRelevantTile.Key
-                // TODO: Add native primary click only for spell/ability target confirmation.
+                || (_adapter != null && _adapter.IsSpellTargetingActive() && actionKey == AccessibilityActions.Activate.Key)
                 || actionKey == AccessibilityActions.MapSecondaryAction.Key
-                || (_inspectContext != null && actionKey == AccessibilityActions.Cancel.Key);
+                || ((_inspectContext != null || (_adapter != null && _adapter.IsSpellTargetingActive())) && actionKey == AccessibilityActions.Cancel.Key);
         }
 
         public override bool HasClaimInTree(string actionKey)
@@ -103,6 +119,11 @@ namespace SongsOfConquestAccess.UI
 
             if (action.Key == AccessibilityActions.CombatInspect.Key)
             {
+                if (_adapter != null && (_adapter.IsSpellTargetingActive() || _adapter.HasVisibleSpellTargetInstruction()))
+                {
+                    return true;
+                }
+
                 return EnterInspect();
             }
 
@@ -123,8 +144,21 @@ namespace SongsOfConquestAccess.UI
                 return true;
             }
 
+            if (action.Key == AccessibilityActions.Activate.Key && _adapter != null && _adapter.IsSpellTargetingActive())
+            {
+                bool handled = _adapter.ConfirmSpellTarget(_cursor);
+                UIManager.SetFocusedWidget(this);
+                return handled;
+            }
+
             if (action.Key == AccessibilityActions.Cancel.Key)
             {
+                if (_adapter != null && _adapter.CancelSpellTargeting())
+                {
+                    UIManager.SetFocusedWidget(this);
+                    return true;
+                }
+
                 return ExitInspect();
             }
 
@@ -182,6 +216,11 @@ namespace SongsOfConquestAccess.UI
 
         private bool EnterInspect()
         {
+            if (_adapter != null && (_adapter.IsSpellTargetingActive() || _adapter.HasVisibleSpellTargetInstruction()))
+            {
+                return true;
+            }
+
             if (_inspectContext != null)
             {
                 return true;
@@ -254,7 +293,9 @@ namespace SongsOfConquestAccess.UI
                 return true;
             }
 
-            if (_inspectContext != null && !_inspectContext.Contains(point))
+            if (_inspectContext != null
+                && (_adapter == null || !_adapter.IsSpellTargetingActive())
+                && !_inspectContext.Contains(point))
             {
                 return true;
             }
@@ -272,13 +313,31 @@ namespace SongsOfConquestAccess.UI
         private void FocusCurrentTile(bool updateNativeFocus)
         {
             RefreshSnapshot();
-            if (updateNativeFocus)
+            if (_adapter != null && _adapter.IsSpellTargetingActive())
+            {
+                if (_inspectContext != null)
+                {
+                    ExitInspect();
+                    return;
+                }
+
+                _adapter.FocusSpellTargetTile(_cursor);
+            }
+            else if (updateNativeFocus)
             {
                 _adapter?.FocusTile(_cursor);
             }
 
             _adapter?.SetFocusedTileOverlay(_cursor);
             UIManager.SetFocusedWidget(this);
+        }
+
+        private void HandleSpellCastBegin()
+        {
+            if (_inspectContext != null)
+            {
+                ExitInspect();
+            }
         }
 
         private void MaybeSpeakDisconnectedWarning()
@@ -314,6 +373,11 @@ namespace SongsOfConquestAccess.UI
         private CombatTile GetFocusedTile()
         {
             return _snapshot != null ? _snapshot.Get(_cursor) : null;
+        }
+
+        private CombatInspectContext GetEffectiveInspectContext()
+        {
+            return _adapter != null && _adapter.IsSpellTargetingActive() ? null : _inspectContext;
         }
 
         private static int Mod(int value, int modulus)

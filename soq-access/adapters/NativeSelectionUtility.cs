@@ -51,6 +51,37 @@ namespace SongsOfConquestAccess.Adapters
             return true;
         }
 
+        public static bool PointerClick(Component component)
+        {
+            return Click(component, PointerEventData.InputButton.Left);
+        }
+
+        private static bool Click(Component component, PointerEventData.InputButton button)
+        {
+            if (component == null)
+            {
+                return false;
+            }
+
+            IPointerClickHandler clickHandler = component as IPointerClickHandler;
+            if (clickHandler == null)
+            {
+                clickHandler = component.GetComponent<IPointerClickHandler>();
+            }
+
+            if (clickHandler == null)
+            {
+                return false;
+            }
+
+            PointerEventData eventData = new PointerEventData(EventSystem.current)
+            {
+                button = button
+            };
+            clickHandler.OnPointerClick(eventData);
+            return true;
+        }
+
         public static bool Select(GameObject gameObject)
         {
             if (gameObject == null)

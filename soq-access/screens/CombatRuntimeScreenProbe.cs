@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Reflection;
 using HarmonyLib;
+using SongsOfConquest.Client;
 using SongsOfConquest.Client.Battle;
 using SongsOfConquest.Client.Battle.Controller;
 using SongsOfConquest.Client.Battle.View;
@@ -66,6 +67,9 @@ namespace SongsOfConquestAccess.Screens
                 ICameraLookup cameraLookup = TryResolve<ICameraLookup>(container);
                 IHumanBattleControllerFacade humanBattleController = TryResolve<IHumanBattleControllerFacade>(container);
                 MouseKeyboardHumanBattleControllerModule mouseKeyboardInputModule = TryResolve<MouseKeyboardHumanBattleControllerModule>(container);
+                IHumanBattleSpellController battleSpellController = TryResolve<IHumanBattleSpellController>(container);
+                MouseKeyboardHumanBattleSpellModule mouseKeyboardSpellInputModule = TryResolve<MouseKeyboardHumanBattleSpellModule>(container);
+                IBattleHudSignals battleHudSignals = TryResolve<IBattleHudSignals>(container);
                 object cartographyConverter = TryResolveByTypeName(container, "Lavapotion.Cartography.ICartographyConverter");
 
                 CombatAdapter adapter = new CombatAdapter(
@@ -83,9 +87,13 @@ namespace SongsOfConquestAccess.Screens
                     cameraLookup,
                     cartographyConverter,
                     humanBattleController,
-                    mouseKeyboardInputModule);
+                    mouseKeyboardInputModule,
+                    battleSpellController,
+                    mouseKeyboardSpellInputModule,
+                    battleHudSignals);
                 if (adapter.IsPresent())
                 {
+                    CombatEventNarrator.SetActiveAdapter(adapter);
                     CombatEventNarrator.SyncCurrentTurnTroop(adapter);
                     LogProbeDiagnostic("Combat probe found ready battle");
                     return new CombatScreen(adapter);

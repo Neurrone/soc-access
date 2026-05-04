@@ -12,12 +12,14 @@ using SongsOfConquest.Client;
 using SongsOfConquest;
 using SongsOfConquest.Client.Battle;
 using SongsOfConquest.Client.Battle.Facade;
+using SongsOfConquest.Client.Battle.Controller;
 using SongsOfConquest.Client.Battle.HUD;
 using SongsOfConquest.Client.Battle.Menu;
 using SongsOfConquest.Client.Battle.View;
 using SongsOfConquest.Client.Entities.Battle;
 using SongsOfConquest.Client.Menu;
 using SongsOfConquestAccess.Adapters;
+using SongsOfConquestAccess.Speech;
 using System.Collections;
 using System.Collections.Generic;
 using System.Reflection;
@@ -45,11 +47,41 @@ namespace SongsOfConquestAccess
             SoqAccessPlugin.Instance?.ScreenDetector?.OnBattleSceneReady(__instance);
         }
 
+        [HarmonyPatch(typeof(HumanBattleSpellController), "HandleSpellCastCancelled")]
+        [HarmonyPrefix]
+        private static void HumanBattleSpellControllerHandleSpellCastCancelledPrefix(HumanBattleSpellController __instance)
+        {
+            AnnounceSpellCancelledIfTargeting(__instance);
+        }
+
+        [HarmonyPatch(typeof(HumanBattleSpellController), "HandleHotkeyExitMenu")]
+        [HarmonyPrefix]
+        private static void HumanBattleSpellControllerHandleHotkeyExitMenuPrefix(HumanBattleSpellController __instance)
+        {
+            AnnounceSpellCancelledIfTargeting(__instance);
+        }
+
         [HarmonyPatch(typeof(ClientBattleCommandsFacade), "OnResponseExecuted")]
         [HarmonyPrefix]
         private static void ClientBattleCommandsFacadeOnResponseExecutedPrefix(ICommandResponse r)
         {
             CombatEventNarrator.HandleResponse(r);
+        }
+
+        private static void AnnounceSpellCancelledIfTargeting(HumanBattleSpellController controller)
+        {
+            if (controller == null)
+            {
+                return;
+            }
+
+            HumanBattleSpellController.State state = controller.CurrentState;
+            if (state == HumanBattleSpellController.State.CastingBacteriaSpell
+                || state == HumanBattleSpellController.State.CastingTeleportSpell
+                || state == HumanBattleSpellController.State.CastingSummonSpell)
+            {
+                SpeechPipeline.Output(new SpeechRequest("Spell cancelled", interrupt: false));
+            }
         }
 
         [HarmonyPatch(typeof(BattleNewRoundPopup), "ShowRoutine")]
