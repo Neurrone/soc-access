@@ -9,7 +9,7 @@ namespace SongsOfConquestAccess.Screens
         private readonly PostBattleResultAdapter _adapter;
 
         public PostBattleResultScreen(PostBattleResultAdapter adapter)
-            : base(PostBattleResultAdapter.SourceKey, BuildRoot(adapter))
+            : base(BuildRoot(adapter))
         {
             _adapter = adapter;
         }

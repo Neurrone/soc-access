@@ -10,21 +10,31 @@ namespace SongsOfConquestAccess
         [HarmonyPostfix]
         private static void TutorialMenuOpenPostfix(TutorialMenu __instance)
         {
-            SoqAccessPlugin.Instance?.ScreenDetector?.OnTutorialOpened(__instance);
+            SoqAccessPlugin.Instance?.ScreenDetector?.OnTutorialReady(__instance);
         }
 
         [HarmonyPatch(typeof(TutorialMenu), "UpdatePage")]
         [HarmonyPostfix]
         private static void TutorialMenuUpdatePagePostfix(TutorialMenu __instance)
         {
-            SoqAccessPlugin.Instance?.ScreenDetector?.OnTutorialPageChanged(__instance);
+            SoqAccessPlugin.Instance?.ScreenDetector?.OnTutorialChanged(__instance);
+        }
+
+        [HarmonyPatch(typeof(TutorialMenu), "Close")]
+        [HarmonyPrefix]
+        private static void TutorialMenuClosePrefix(TutorialMenu __instance, out bool __state)
+        {
+            __state = __instance != null && __instance.IsOpen;
         }
 
         [HarmonyPatch(typeof(TutorialMenu), "Close")]
         [HarmonyPostfix]
-        private static void TutorialMenuClosePostfix(TutorialMenu __instance)
+        private static void TutorialMenuClosePostfix(TutorialMenu __instance, bool __state)
         {
-            SoqAccessPlugin.Instance?.ScreenDetector?.OnTutorialClosed(__instance);
+            if (__state)
+            {
+                SoqAccessPlugin.Instance?.ScreenDetector?.OnTutorialClosed(__instance);
+            }
         }
     }
 }

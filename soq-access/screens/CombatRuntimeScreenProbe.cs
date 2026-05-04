@@ -102,12 +102,6 @@ namespace SongsOfConquestAccess.Screens
             return null;
         }
 
-        public static CombatAdapter FindActiveCombatAdapter()
-        {
-            CombatScreen screen = FindActiveCombatScreen();
-            return screen != null ? screen.Adapter : null;
-        }
-
         private static bool IsLiveSceneInstaller(BattleSceneInstaller installer)
         {
             if (installer == null)

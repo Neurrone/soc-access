@@ -1,13 +1,17 @@
 using HarmonyLib;
+using SongsOfConquestAccess.Adapters;
 using SongsOfConquest.Client.Menu;
 using SongsOfConquest.Common.Gamestate;
 using SongsOfConquest.Common.Map;
+using System.Collections.Generic;
 
 namespace SongsOfConquestAccess
 {
     [HarmonyPatch]
     internal static class PreBattleMenuPatches
     {
+        private static readonly HashSet<int> ActiveMenus = new HashSet<int>();
+
         [HarmonyPatch(typeof(PreBattleMenu), "Show", new[]
         {
             typeof(ICommanderState),
@@ -19,13 +23,23 @@ namespace SongsOfConquestAccess
         [HarmonyPostfix]
         private static void PreBattleMenuShowPostfix(PreBattleMenu __instance)
         {
+            if (__instance != null && new PreBattleMenuAdapter(__instance).IsPresent())
+            {
+                ActiveMenus.Add(__instance.GetInstanceID());
+            }
+
             SoqAccessPlugin.Instance?.ScreenDetector?.OnPreBattleMenuChanged(__instance);
         }
 
         [HarmonyPatch(typeof(PreBattleMenu), "Hide")]
-        [HarmonyPostfix]
-        private static void PreBattleMenuHidePostfix(PreBattleMenu __instance)
+        [HarmonyPrefix]
+        private static void PreBattleMenuHidePrefix(PreBattleMenu __instance)
         {
+            if (__instance == null || !ActiveMenus.Remove(__instance.GetInstanceID()))
+            {
+                return;
+            }
+
             SoqAccessPlugin.Instance?.ScreenDetector?.OnPreBattleMenuClosed(__instance);
         }
 
@@ -33,6 +47,11 @@ namespace SongsOfConquestAccess
         [HarmonyPostfix]
         private static void PreBattleMenuReadyPostfix(PreBattleMenu __instance)
         {
+            if (__instance == null || !ActiveMenus.Contains(__instance.GetInstanceID()))
+            {
+                return;
+            }
+
             SoqAccessPlugin.Instance?.ScreenDetector?.OnPreBattleMenuChanged(__instance);
         }
     }

@@ -20,21 +20,7 @@ namespace SongsOfConquestAccess
                 settings = SettingsRef(__instance);
             }
 
-            SoqAccessPlugin.Instance?.ScreenDetector?.OnQuestionDialogOpened(__instance, settings);
-        }
-
-        [HarmonyPatch(typeof(PopupMenu), "HandlePositiveButtonClicked")]
-        [HarmonyPostfix]
-        private static void PopupMenuHandlePositivePostfix(PopupMenu __instance)
-        {
-            SoqAccessPlugin.Instance?.ScreenDetector?.OnQuestionDialogClosed(__instance);
-        }
-
-        [HarmonyPatch(typeof(PopupMenu), "HandleNegativeButtonClicked")]
-        [HarmonyPostfix]
-        private static void PopupMenuHandleNegativePostfix(PopupMenu __instance)
-        {
-            SoqAccessPlugin.Instance?.ScreenDetector?.OnQuestionDialogClosed(__instance);
+            SoqAccessPlugin.Instance?.ScreenDetector?.OnQuestionDialogReady(__instance, settings);
         }
 
         [HarmonyPatch(typeof(PopupMenu), "OnClosed")]

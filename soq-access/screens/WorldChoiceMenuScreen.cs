@@ -10,7 +10,7 @@ namespace SongsOfConquestAccess.Screens
         private readonly WorldChoiceMenuAdapter _adapter;
 
         public WorldChoiceMenuScreen(WorldChoiceMenuAdapter adapter)
-            : base(adapter != null ? adapter.SourceKey : null, BuildRoot(adapter))
+            : base(BuildRoot(adapter))
         {
             _adapter = adapter;
         }

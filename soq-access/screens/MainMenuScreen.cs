@@ -9,7 +9,7 @@ namespace SongsOfConquestAccess.Screens
         private readonly MainMenuAdapter _adapter;
 
         public MainMenuScreen(MainMenuAdapter adapter)
-            : base(adapter != null ? adapter.SourceKey : null, BuildRootWidget(adapter))
+            : base(BuildRootWidget(adapter))
         {
             _adapter = adapter;
         }

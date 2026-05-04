@@ -29,12 +29,20 @@ namespace SongsOfConquestAccess
     internal static class CombatPatches
     {
         private static readonly FieldInfo PuppetViewField = AccessTools.Field(typeof(BattleTroopViewPuppet), "_view");
+        private static readonly HashSet<int> ActivePostBattleMenus = new HashSet<int>();
 
         [HarmonyPatch(typeof(ClientBattleCommandsFacade), "Ready")]
         [HarmonyPostfix]
-        private static void ClientBattleCommandsReadyPostfix()
+        private static void ClientBattleCommandsReadyPostfix(ClientBattleCommandsFacade __instance)
         {
-            SoqAccessPlugin.Instance?.ScreenDetector?.OnCombatAvailable();
+            SoqAccessPlugin.Instance?.ScreenDetector?.OnCombatReady(__instance);
+        }
+
+        [HarmonyPatch(typeof(BattleSceneInstaller), "InstallBindings")]
+        [HarmonyPostfix]
+        private static void BattleSceneInstallerInstallBindingsPostfix(BattleSceneInstaller __instance)
+        {
+            SoqAccessPlugin.Instance?.ScreenDetector?.OnBattleSceneReady(__instance);
         }
 
         [HarmonyPatch(typeof(ClientBattleCommandsFacade), "OnResponseExecuted")]
@@ -231,7 +239,7 @@ namespace SongsOfConquestAccess
         {
             if (outcome != BattleOutcome.Inconclusive)
             {
-                SoqAccessPlugin.Instance?.ScreenDetector?.OnCombatInteractionEnded();
+                SoqAccessPlugin.Instance?.ScreenDetector?.OnCombatClosed();
             }
         }
 
@@ -239,14 +247,25 @@ namespace SongsOfConquestAccess
         [HarmonyPostfix]
         private static void AdventureBattleMenuOpenPostBattlePostfix(AdventureBattleMenu __instance)
         {
-            SoqAccessPlugin.Instance?.ScreenDetector?.OnPostBattleResultShown(__instance);
+            PostBattleMenu menu = PostBattleResultAdapter.GetPostBattleMenu(__instance);
+            if (menu != null)
+            {
+                ActivePostBattleMenus.Add(menu.GetInstanceID());
+            }
+
+            SoqAccessPlugin.Instance?.ScreenDetector?.OnPostBattleResultReady(__instance);
         }
 
         [HarmonyPatch(typeof(PostBattleMenu), "Hide")]
-        [HarmonyPostfix]
-        private static void PostBattleMenuHidePostfix()
+        [HarmonyPrefix]
+        private static void PostBattleMenuHidePrefix(PostBattleMenu __instance)
         {
-            SoqAccessPlugin.Instance?.ScreenDetector?.OnPostBattleResultHidden();
+            if (__instance == null || !ActivePostBattleMenus.Remove(__instance.GetInstanceID()))
+            {
+                return;
+            }
+
+            SoqAccessPlugin.Instance?.ScreenDetector?.OnPostBattleResultClosed();
         }
 
         [HarmonyPatch(typeof(PostBattleMenu), "AnimateResults")]
@@ -263,7 +282,7 @@ namespace SongsOfConquestAccess
                 yield return original.Current;
             }
 
-            SoqAccessPlugin.Instance?.ScreenDetector?.OnPostBattleResultFullyPopulated();
+            SoqAccessPlugin.Instance?.ScreenDetector?.OnPostBattleResultChanged();
         }
 
         [HarmonyPatch(typeof(NotificationPanel), "Show", new[] { typeof(string), typeof(UnityEngine.Vector3), typeof(UnityEngine.Vector2) })]

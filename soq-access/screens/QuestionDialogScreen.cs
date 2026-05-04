@@ -8,8 +8,8 @@ namespace SongsOfConquestAccess.Screens
     {
         private readonly QuestionDialogAdapter _adapter;
 
-        public QuestionDialogScreen(object sourceKey, QuestionDialogAdapter adapter)
-            : base(sourceKey, BuildRootWidget(adapter))
+        public QuestionDialogScreen(QuestionDialogAdapter adapter)
+            : base(BuildRootWidget(adapter))
         {
             _adapter = adapter;
         }

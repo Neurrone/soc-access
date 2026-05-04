@@ -28,7 +28,7 @@ namespace SongsOfConquestAccess.Screens
             }
         }
 
-        public static CampaignMapSelectAdapter FindActiveCampaignMapSelect(CampaignMapSelectedInformationView targetInformationView)
+        private static CampaignMapSelectAdapter FindActiveCampaignMapSelect(CampaignMapSelectedInformationView targetInformationView)
         {
             CampaignMapSelectMenuInstaller[] installers = Resources.FindObjectsOfTypeAll<CampaignMapSelectMenuInstaller>();
             for (int i = 0; i < installers.Length; i++)

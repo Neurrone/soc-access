@@ -9,7 +9,7 @@ namespace SongsOfConquestAccess.Screens
         private readonly IStoryTextAdapter _adapter;
 
         public StoryTextScreen(IStoryTextAdapter adapter)
-            : base(adapter != null ? adapter.SourceKey : null, BuildRootWidget(adapter))
+            : base(BuildRootWidget(adapter))
         {
             _adapter = adapter;
         }

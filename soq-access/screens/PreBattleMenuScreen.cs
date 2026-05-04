@@ -16,7 +16,7 @@ namespace SongsOfConquestAccess.Screens
         }
 
         private PreBattleMenuScreen(PreBattleMenuAdapter adapter, TroopPlacementHexGrid hexGrid)
-            : base(adapter != null ? adapter.SourceKey : null, BuildRoot(adapter, hexGrid))
+            : base(BuildRoot(adapter, hexGrid))
         {
             _adapter = adapter;
             _hexGrid = hexGrid;

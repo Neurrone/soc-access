@@ -9,7 +9,7 @@ namespace SongsOfConquestAccess.Screens
         private readonly TutorialSlideshowAdapter _adapter;
 
         public TutorialSlideshowScreen(TutorialSlideshowAdapter adapter)
-            : base(adapter != null ? adapter.SourceKey : null, BuildRoot(adapter))
+            : base(BuildRoot(adapter))
         {
             _adapter = adapter;
         }

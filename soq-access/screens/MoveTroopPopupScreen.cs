@@ -8,7 +8,7 @@ namespace SongsOfConquestAccess.Screens
         private readonly MoveTroopPopupAdapter _adapter;
 
         public MoveTroopPopupScreen(MoveTroopPopupAdapter adapter)
-            : base(adapter != null ? adapter.SourceKey : null, BuildRoot(adapter))
+            : base(BuildRoot(adapter))
         {
             _adapter = adapter;
         }

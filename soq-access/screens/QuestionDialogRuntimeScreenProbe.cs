@@ -71,7 +71,7 @@ namespace SongsOfConquestAccess.Screens
 
             if (bestAdapter != null)
             {
-                screens.Add(new QuestionDialogScreen(bestAdapter.SourceKey, bestAdapter));
+                screens.Add(new QuestionDialogScreen(bestAdapter));
             }
         }
 

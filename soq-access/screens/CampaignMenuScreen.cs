@@ -12,7 +12,7 @@ namespace SongsOfConquestAccess.Screens
         private readonly CampaignMenuAdapter _adapter;
 
         public CampaignMenuScreen(CampaignMenuAdapter adapter)
-            : base(adapter != null ? adapter.SourceKey : null, BuildRootWidget(adapter))
+            : base(BuildRootWidget(adapter))
         {
             _adapter = adapter;
         }

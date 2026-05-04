@@ -25,7 +25,7 @@ namespace SongsOfConquestAccess.Screens
         }
 
         public CampaignMapSelectScreen(CampaignMapSelectAdapter adapter, bool focusDifficulty)
-            : base(adapter != null ? adapter.SourceKey : null, BuildRootWidget(adapter, focusDifficulty))
+            : base(BuildRootWidget(adapter, focusDifficulty))
         {
             _adapter = adapter;
         }

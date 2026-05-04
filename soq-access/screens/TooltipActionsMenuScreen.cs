@@ -8,12 +8,10 @@ namespace SongsOfConquestAccess.Screens
 {
     internal sealed class TooltipActionsMenuScreen : Screen
     {
-        public const string TooltipActionsMenuSourceKey = "TOOLTIP_ACTIONS_MENU";
-
         private readonly Func<bool> _close;
 
         public TooltipActionsMenuScreen(IReadOnlyList<TooltipAction> actions, Func<bool> close)
-            : base(TooltipActionsMenuSourceKey, BuildRoot(actions, close))
+            : base(BuildRoot(actions, close))
         {
             _close = close;
         }

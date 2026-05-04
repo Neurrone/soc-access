@@ -1,4 +1,5 @@
 using System.Collections;
+using System.Collections.Generic;
 using HarmonyLib;
 using SongsOfConquest.Client.Menu;
 using SongsOfConquestAccess.Adapters;
@@ -8,6 +9,8 @@ namespace SongsOfConquestAccess
     [HarmonyPatch]
     internal static class DialogueMenuPatches
     {
+        private static readonly HashSet<DialogueMenu> ActiveMenus = new HashSet<DialogueMenu>();
+
         [HarmonyPatch(typeof(DialogueMenu), "HandleTypingTextEnter")]
         [HarmonyPostfix]
         private static void DialogueMenuTypingTextEnterPostfix(DialogueMenu __instance)
@@ -27,7 +30,12 @@ namespace SongsOfConquestAccess
             StoryMapSuppression.Clear(__instance);
             StoryCameraFocusPatches.ResetDedupe();
             DialogueMenuAdvanceGuard.ClearPending(__instance);
-            SoqAccessPlugin.Instance?.ScreenDetector?.OnDialogueMenuHidden(__instance);
+            if (__instance == null || !ActiveMenus.Remove(__instance))
+            {
+                return;
+            }
+
+            SoqAccessPlugin.Instance?.ScreenDetector?.OnDialogueMenuClosed(__instance);
         }
 
         private static IEnumerator WaitForDialogueMenuReady(DialogueMenu dialogueMenu)
@@ -43,8 +51,9 @@ namespace SongsOfConquestAccess
                 DialogueMenuAdapter adapter = new DialogueMenuAdapter(dialogueMenu);
                 if (adapter.IsPresent())
                 {
+                    ActiveMenus.Add(dialogueMenu);
                     DialogueMenuAdvanceGuard.ClearPending(dialogueMenu);
-                    SoqAccessPlugin.Instance?.ScreenDetector?.OnDialogueMenuAvailable(dialogueMenu);
+                    SoqAccessPlugin.Instance?.ScreenDetector?.OnDialogueMenuChanged(dialogueMenu);
                     yield break;
                 }
 

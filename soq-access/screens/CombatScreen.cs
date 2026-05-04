@@ -8,7 +8,7 @@ namespace SongsOfConquestAccess.Screens
         private readonly CombatAdapter _adapter;
 
         public CombatScreen(CombatAdapter adapter)
-            : base(adapter != null ? adapter.SourceKey : null, BuildRoot(adapter))
+            : base(BuildRoot(adapter))
         {
             _adapter = adapter;
         }

@@ -6,6 +6,7 @@ using Lavapotion.Cartography;
 using SongsOfConquest.Client;
 using SongsOfConquest.Client.Adventure;
 using SongsOfConquest.Client.Adventure.Map;
+using SongsOfConquest.Client.Adventure.View;
 using SongsOfConquest.Client.Gamestate;
 using SongsOfConquest.Client.Gamestate.Facade;
 using SongsOfConquest.Client.Grid;
@@ -28,6 +29,8 @@ namespace SongsOfConquestAccess.Adapters
     internal sealed class AdventureMapAdapter
     {
         private const byte ExploredButNotVisibleFogValue = 128;
+        private static readonly PropertyInfo InstallerContainerProperty =
+            AccessTools.Property(typeof(AdventureViewInstaller), "Container");
 
         private readonly DiContainer _container;
         private readonly IClientAdventureFacade _facade;
@@ -52,6 +55,25 @@ namespace SongsOfConquestAccess.Adapters
         private readonly FieldInfo _currentInputModuleField;
         private GameObject _cursorOverlay;
         private RectTransform[] _cursorOverlaySegments;
+
+        public AdventureMapAdapter(AdventureViewInstaller installer)
+            : this(
+                installer,
+                GetContainer(installer),
+                Resolve<IClientAdventureFacade>(GetContainer(installer)),
+                Resolve<ISelectionHandler>(GetContainer(installer)),
+                Resolve<IFogManager>(GetContainer(installer)),
+                Resolve<IGrid>(GetContainer(installer)),
+                Resolve<ICameraController>(GetContainer(installer)),
+                ResolveByTypeName(GetContainer(installer), "Lavapotion.Cartography.ICartographyConverter"),
+                Resolve<IAdventureTooltipManager>(GetContainer(installer)),
+                Resolve<ILocalizationHandler>(GetContainer(installer)),
+                Resolve<ICartographyVisualManifest>(GetContainer(installer)),
+                Resolve<IHumanAdventureController>(GetContainer(installer)),
+                Resolve<IHumanAdventureControllerFacade>(GetContainer(installer)),
+                Resolve<IInputManager>(GetContainer(installer)))
+        {
+        }
 
         public AdventureMapAdapter(
             object sourceKey,
@@ -111,6 +133,76 @@ namespace SongsOfConquestAccess.Adapters
         }
 
         public object SourceKey { get; private set; }
+
+        public IClientAdventureFacade Facade
+        {
+            get { return _facade; }
+        }
+
+        public ISelectionHandler SelectionHandler
+        {
+            get { return _selectionHandler; }
+        }
+
+        public IHumanAdventureControllerFacade HumanAdventureControllerFacade
+        {
+            get { return _humanAdventureControllerFacade; }
+        }
+
+        public ILocalizationHandler LocalizationHandler
+        {
+            get { return _localizationHandler; }
+        }
+
+        private static T Resolve<T>(DiContainer container) where T : class
+        {
+            if (container == null)
+            {
+                return null;
+            }
+
+            try
+            {
+                return container.Resolve<T>();
+            }
+            catch
+            {
+                return null;
+            }
+        }
+
+        private static DiContainer GetContainer(AdventureViewInstaller installer)
+        {
+            if (installer == null || InstallerContainerProperty == null)
+            {
+                return null;
+            }
+
+            return InstallerContainerProperty.GetValue(installer, null) as DiContainer;
+        }
+
+        private static object ResolveByTypeName(DiContainer container, string typeName)
+        {
+            if (container == null || string.IsNullOrWhiteSpace(typeName))
+            {
+                return null;
+            }
+
+            Type type = AccessTools.TypeByName(typeName);
+            if (type == null)
+            {
+                return null;
+            }
+
+            try
+            {
+                return container.Resolve(type);
+            }
+            catch
+            {
+                return null;
+            }
+        }
 
         public bool IsPresent()
         {

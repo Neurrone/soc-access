@@ -11,7 +11,7 @@ namespace SongsOfConquestAccess.Screens
         private readonly TaleSelectAdapter _adapter;
 
         public TaleSelectScreen(TaleSelectAdapter adapter)
-            : base(adapter != null ? adapter.SourceKey : null, BuildRootWidget(adapter))
+            : base(BuildRootWidget(adapter))
         {
             _adapter = adapter;
         }

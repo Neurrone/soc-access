@@ -17,7 +17,7 @@ namespace SongsOfConquestAccess.Screens
         private Action<ICommanderState, SkillReference> _skillAddedHandler;
 
         public CommanderSheetScreen(CommanderSheetAdapter adapter)
-            : base(adapter != null ? adapter.SourceKey : null, BuildRoot(adapter))
+            : base(BuildRoot(adapter))
         {
             _adapter = adapter;
         }
@@ -135,7 +135,7 @@ namespace SongsOfConquestAccess.Screens
 
         private void RequestDetectorRefresh()
         {
-            SoqAccessPlugin.Instance?.ScreenDetector?.OnCommanderSheetChanged(_adapter.SourceKey);
+            SoqAccessPlugin.Instance?.ScreenDetector?.OnCommanderSheetChanged();
         }
 
         private static ContainerWidget BuildRoot(CommanderSheetAdapter adapter)

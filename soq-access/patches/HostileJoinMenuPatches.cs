@@ -1,8 +1,10 @@
+using System.Collections;
 using HarmonyLib;
 using SongsOfConquest.Client.Adventure;
 using SongsOfConquest.Common.Adventure.FightOrFlight;
 using SongsOfConquest.Common.Gamestate;
 using SongsOfConquest.Common.Gamestate.Facade;
+using SongsOfConquestAccess.Adapters;
 
 namespace SongsOfConquestAccess
 {
@@ -18,14 +20,14 @@ namespace SongsOfConquestAccess
         [HarmonyPostfix]
         private static void HostileJoinMenuShowMenuPostfix(HostileJoinMenu __instance)
         {
-            SoqAccessPlugin.Instance?.ScreenDetector?.OnHostileJoinMenuChanged(__instance);
+            StartWaitForReady(__instance);
         }
 
         [HarmonyPatch(typeof(HostileJoinMenu), "HandleYesButtonClicked")]
         [HarmonyPostfix]
         private static void HostileJoinMenuHandleYesButtonClickedPostfix(HostileJoinMenu __instance)
         {
-            SoqAccessPlugin.Instance?.ScreenDetector?.OnHostileJoinMenuChanged(__instance);
+            StartWaitForReady(__instance);
         }
 
         [HarmonyPatch(typeof(HostileJoinMenu), "HandleDoneButtonClicked")]
@@ -40,6 +42,32 @@ namespace SongsOfConquestAccess
         private static void HostileJoinMenuHandleNoButtonClickedPostfix(HostileJoinMenu __instance)
         {
             SoqAccessPlugin.Instance?.ScreenDetector?.OnHostileJoinMenuClosed(__instance);
+        }
+
+        private static void StartWaitForReady(HostileJoinMenu menu)
+        {
+            SoqAccessPlugin plugin = SoqAccessPlugin.Instance;
+            if (plugin != null && menu != null)
+            {
+                plugin.StartCoroutine(WaitForReady(menu));
+            }
+        }
+
+        private static IEnumerator WaitForReady(HostileJoinMenu menu)
+        {
+            int frames = 0;
+            while (menu != null && frames < 120)
+            {
+                HostileJoinMenuAdapter adapter = new HostileJoinMenuAdapter(menu);
+                if (adapter.IsPresent())
+                {
+                    SoqAccessPlugin.Instance?.ScreenDetector?.OnHostileJoinMenuChanged(menu);
+                    yield break;
+                }
+
+                frames++;
+                yield return null;
+            }
         }
     }
 }

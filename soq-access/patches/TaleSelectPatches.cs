@@ -27,7 +27,7 @@ namespace SongsOfConquestAccess
 
             TaleSelectLifetimeNotifier.Attach(coordinator);
             SoqAccessPlugin.Instance?.LogInfo("TaleButtonLayoutCoordinator.RebuildLayout completed; notifying screen detector");
-            SoqAccessPlugin.Instance?.ScreenDetector?.OnTaleSelectAvailable(coordinator);
+            SoqAccessPlugin.Instance?.ScreenDetector?.OnTaleSelectLayoutRebuilt(coordinator);
         }
     }
 }

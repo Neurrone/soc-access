@@ -1,4 +1,5 @@
 using HarmonyLib;
+using SongsOfConquest.Client.Adventure.View;
 using SongsOfConquest.Client.Menu.Loading;
 
 namespace SongsOfConquestAccess
@@ -18,14 +19,21 @@ namespace SongsOfConquestAccess
 
             if (state == SceneLoaderState.LoadingScene && __instance.Current == SceneType.Adventure)
             {
-                plugin.ScreenDetector?.OnAdventureSceneUnloading();
+                plugin.ScreenDetector?.OnAdventureMapClosed();
                 return;
             }
 
             if (state == SceneLoaderState.None && __instance.Current == SceneType.Adventure)
             {
-                plugin.ScreenDetector?.OnAdventureSceneLoaded();
+                plugin.ScreenDetector?.OnAdventureMapReady();
             }
+        }
+
+        [HarmonyPatch(typeof(AdventureViewInstaller), "InstallBindings")]
+        [HarmonyPostfix]
+        private static void AdventureViewInstallerInstallBindingsPostfix(AdventureViewInstaller __instance)
+        {
+            SoqAccessPlugin.Instance?.ScreenDetector?.OnAdventureViewReady(__instance);
         }
     }
 }

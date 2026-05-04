@@ -5,13 +5,10 @@ namespace SongsOfConquestAccess.Screens
 {
     internal abstract class Screen
     {
-        protected Screen(object sourceKey, ContainerWidget rootWidget)
+        protected Screen(ContainerWidget rootWidget)
         {
-            SourceKey = sourceKey;
             RootWidget = rootWidget;
         }
-
-        public object SourceKey { get; private set; }
 
         public ContainerWidget RootWidget { get; protected set; }
 

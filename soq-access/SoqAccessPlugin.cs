@@ -40,8 +40,17 @@ namespace SongsOfConquestAccess
             _screenDetector = new ScreenDetector(_screenManager);
             _inputRouter = new AccessibilityInputRouter(_screenManager);
             _harmony = new Harmony(PluginGuid);
-            _harmony.PatchAll(typeof(PopupMenuPatches).Assembly);
-            Logger.LogInfo("Harmony patches applied");
+            try
+            {
+                Logger.LogInfo("Applying Harmony patches");
+                _harmony.PatchAll(typeof(PopupMenuPatches).Assembly);
+                Logger.LogInfo("Harmony patches applied");
+            }
+            catch (System.Exception exception)
+            {
+                Logger.LogError("Harmony patching failed: " + exception);
+                throw;
+            }
         }
 
         private void Start()

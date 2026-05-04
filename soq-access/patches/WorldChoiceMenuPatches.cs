@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Reflection;
 using HarmonyLib;
 using SongsOfConquest.Client.Adventure;
 using SongsOfConquest.Common.Penalties;
@@ -9,6 +10,8 @@ namespace SongsOfConquestAccess
     [HarmonyPatch]
     internal static class WorldChoiceMenuPatches
     {
+        private static readonly FieldInfo AsyncField = AccessTools.Field(typeof(WorldChoiceMenu), "_async");
+
         [HarmonyPatch(typeof(WorldChoiceMenu), "ShowMenuAtPoint", new[]
         {
             typeof(int),
@@ -20,14 +23,24 @@ namespace SongsOfConquestAccess
         [HarmonyPostfix]
         private static void WorldChoiceMenuShowMenuAtPointPostfix(WorldChoiceMenu __instance)
         {
-            SoqAccessPlugin.Instance?.ScreenDetector?.OnWorldChoiceMenuOpened(__instance);
+            SoqAccessPlugin.Instance?.ScreenDetector?.OnWorldChoiceMenuReady(__instance);
         }
 
-        [HarmonyPatch(typeof(WorldChoiceMenu), "HideMenu")]
-        [HarmonyPostfix]
-        private static void WorldChoiceMenuHideMenuPostfix(WorldChoiceMenu __instance)
+        [HarmonyPatch(typeof(WorldChoiceMenu), "HideMenu", new[] { typeof(int), typeof(int) })]
+        [HarmonyPrefix]
+        private static void WorldChoiceMenuHideMenuPrefix(WorldChoiceMenu __instance, out bool __state)
         {
-            SoqAccessPlugin.Instance?.ScreenDetector?.OnWorldChoiceMenuClosed(__instance);
+            __state = __instance != null && AsyncField != null && AsyncField.GetValue(__instance) != null;
+        }
+
+        [HarmonyPatch(typeof(WorldChoiceMenu), "HideMenu", new[] { typeof(int), typeof(int) })]
+        [HarmonyPostfix]
+        private static void WorldChoiceMenuHideMenuPostfix(WorldChoiceMenu __instance, bool __state)
+        {
+            if (__state)
+            {
+                SoqAccessPlugin.Instance?.ScreenDetector?.OnWorldChoiceMenuClosed(__instance);
+            }
         }
     }
 }

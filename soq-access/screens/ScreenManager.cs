@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using SongsOfConquestAccess.Adapters;
 using SongsOfConquestAccess.Input;
@@ -23,11 +22,20 @@ namespace SongsOfConquestAccess.Screens
             }
         }
 
-        public void PushScreen(Screen screen)
+        public void Push(Screen screen, string reason)
         {
             if (screen == null)
             {
                 return;
+            }
+
+            if (CurrentScreen != null && CurrentScreen.GetType() == screen.GetType())
+            {
+                SoqAccessPlugin.Instance?.LogWarning(
+                    "ScreenManager.Push received duplicate top screen "
+                    + DescribeScreen(screen)
+                    + " for "
+                    + reason);
             }
 
             Screen previousTop = CurrentScreen;
@@ -38,10 +46,34 @@ namespace SongsOfConquestAccess.Screens
             screen.OnFocus();
         }
 
-        public bool ReplaceTopScreen(Screen replacement)
+        public bool RefreshTop<TScreen>(Screen replacement, string reason) where TScreen : Screen
         {
-            if (replacement == null || _stack.Count == 0)
+            if (replacement == null)
             {
+                SoqAccessPlugin.Instance?.LogWarning("ScreenManager.RefreshTop ignored " + reason + " because replacement was null");
+                return false;
+            }
+
+            if (!replacement.IsPresent())
+            {
+                SoqAccessPlugin.Instance?.LogWarning(
+                    "ScreenManager.RefreshTop ignored "
+                    + reason
+                    + " because "
+                    + DescribeScreen(replacement)
+                    + " is not present");
+                return false;
+            }
+
+            if (_stack.Count == 0 || !(_stack[_stack.Count - 1] is TScreen))
+            {
+                SoqAccessPlugin.Instance?.LogWarning(
+                    "ScreenManager.RefreshTop ignored "
+                    + reason
+                    + "; expected top "
+                    + typeof(TScreen).Name
+                    + " but current top is "
+                    + DescribeScreen(CurrentScreen));
                 return false;
             }
 
@@ -55,7 +87,7 @@ namespace SongsOfConquestAccess.Screens
             return true;
         }
 
-        public void InsertScreenBelowTop(Screen screen)
+        public void PushBelowTop(Screen screen, string reason)
         {
             if (screen == null)
             {
@@ -64,7 +96,7 @@ namespace SongsOfConquestAccess.Screens
 
             if (_stack.Count == 0)
             {
-                PushScreen(screen);
+                Push(screen, reason);
                 return;
             }
 
@@ -72,73 +104,29 @@ namespace SongsOfConquestAccess.Screens
             screen.OnPush();
         }
 
-        public bool RemoveScreenForSource(object sourceKey)
-        {
-            if (sourceKey == null)
-            {
-                return false;
-            }
-
-            for (int i = _stack.Count - 1; i >= 0; i--)
-            {
-                if (ReferenceEquals(_stack[i].SourceKey, sourceKey))
-                {
-                    bool wasTop = i == _stack.Count - 1;
-                    Screen removed = _stack[i];
-                    if (wasTop)
-                    {
-                        removed.OnUnfocus();
-                        UIManager.Reset();
-                    }
-
-                    _stack.RemoveAt(i);
-                    removed.OnPop();
-                    if (wasTop)
-                    {
-                        CurrentScreen?.OnFocus();
-                    }
-
-                    return true;
-                }
-            }
-
-            return false;
-        }
-
-        public TScreen FindScreenForSource<TScreen>(object sourceKey) where TScreen : Screen
-        {
-            if (sourceKey == null)
-            {
-                return null;
-            }
-
-            for (int i = _stack.Count - 1; i >= 0; i--)
-            {
-                TScreen screen = _stack[i] as TScreen;
-                if (screen != null && ReferenceEquals(screen.SourceKey, sourceKey))
-                {
-                    return screen;
-                }
-            }
-
-            return null;
-        }
-
-        public bool IsTopScreen<TScreen>() where TScreen : Screen
-        {
-            return CurrentScreen is TScreen;
-        }
-
-        public bool RemoveTopScreen<TScreen>() where TScreen : Screen
+        public bool Pop<TScreen>(string reason) where TScreen : Screen
         {
             if (_stack.Count == 0)
             {
+                SoqAccessPlugin.Instance?.LogWarning(
+                    "ScreenManager.Pop ignored "
+                    + reason
+                    + "; expected top "
+                    + typeof(TScreen).Name
+                    + " but stack is empty");
                 return false;
             }
 
             int lastIndex = _stack.Count - 1;
             if (!(_stack[lastIndex] is TScreen))
             {
+                SoqAccessPlugin.Instance?.LogWarning(
+                    "ScreenManager.Pop ignored "
+                    + reason
+                    + "; expected top "
+                    + typeof(TScreen).Name
+                    + " but current top is "
+                    + DescribeScreen(CurrentScreen));
                 return false;
             }
 
@@ -148,49 +136,6 @@ namespace SongsOfConquestAccess.Screens
             _stack.RemoveAt(lastIndex);
             removed.OnPop();
             CurrentScreen?.OnFocus();
-            return true;
-        }
-
-        public bool RemoveScreens(System.Predicate<Screen> predicate)
-        {
-            if (predicate == null || _stack.Count == 0)
-            {
-                return false;
-            }
-
-            bool removedAny = false;
-            bool removedTop = false;
-            Screen previousTop = CurrentScreen;
-            if (previousTop != null && predicate(previousTop))
-            {
-                removedTop = true;
-                previousTop.OnUnfocus();
-                UIManager.Reset();
-            }
-
-            for (int i = _stack.Count - 1; i >= 0; i--)
-            {
-                Screen screen = _stack[i];
-                if (!predicate(screen))
-                {
-                    continue;
-                }
-
-                _stack.RemoveAt(i);
-                screen.OnPop();
-                removedAny = true;
-            }
-
-            if (!removedAny)
-            {
-                return false;
-            }
-
-            if (removedTop)
-            {
-                CurrentScreen?.OnFocus();
-            }
-
             return true;
         }
 
@@ -209,56 +154,6 @@ namespace SongsOfConquestAccess.Screens
             }
 
             _stack.Clear();
-        }
-
-        public void SynchronizeStack(IReadOnlyList<Screen> desiredStack)
-        {
-            if (desiredStack == null)
-            {
-                desiredStack = Array.Empty<Screen>();
-            }
-
-            int prefixLength = 0;
-            int sharedCount = Math.Min(_stack.Count, desiredStack.Count);
-            while (prefixLength < sharedCount && AreEquivalent(_stack[prefixLength], desiredStack[prefixLength]))
-            {
-                prefixLength++;
-            }
-
-            if (prefixLength == _stack.Count && prefixLength == desiredStack.Count)
-            {
-                return;
-            }
-
-            if (_stack.Count > 0)
-            {
-                _stack[_stack.Count - 1].OnUnfocus();
-                UIManager.Reset();
-            }
-
-            for (int i = _stack.Count - 1; i >= prefixLength; i--)
-            {
-                Screen removed = _stack[i];
-                _stack.RemoveAt(i);
-                removed.OnPop();
-            }
-
-            for (int i = prefixLength; i < desiredStack.Count; i++)
-            {
-                Screen added = desiredStack[i];
-                if (added == null)
-                {
-                    continue;
-                }
-
-                _stack.Add(added);
-                added.OnPush();
-            }
-
-            if (_stack.Count > 0)
-            {
-                _stack[_stack.Count - 1].OnFocus();
-            }
         }
 
         public bool DispatchAction(InputAction action)
@@ -304,7 +199,7 @@ namespace SongsOfConquestAccess.Screens
             if (action.Key == AccessibilityActions.TooltipActionsMenu.Key)
             {
                 Tooltip tooltip = UIManager.CurrentWidget.GetTooltip();
-                PushScreen(new TooltipActionsMenuScreen(tooltip.Actions, () => RemoveTopScreen<TooltipActionsMenuScreen>()));
+                Push(new TooltipActionsMenuScreen(tooltip.Actions, () => Pop<TooltipActionsMenuScreen>("tooltip actions menu closed")), "tooltip actions menu opened");
                 return true;
             }
 
@@ -343,17 +238,6 @@ namespace SongsOfConquestAccess.Screens
         private static string DescribeScreen(Screen screen)
         {
             return screen != null ? screen.GetType().Name : "<null>";
-        }
-
-        private static bool AreEquivalent(Screen current, Screen desired)
-        {
-            if (current == null || desired == null)
-            {
-                return false;
-            }
-
-            return current.GetType() == desired.GetType()
-                && ReferenceEquals(current.SourceKey, desired.SourceKey);
         }
     }
 }

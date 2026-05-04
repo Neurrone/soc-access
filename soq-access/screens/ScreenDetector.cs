@@ -1,27 +1,25 @@
 using System.Collections.Generic;
-using SongsOfConquest.Client.Adventure.UI;
 using SongsOfConquest.Client.Adventure;
+using SongsOfConquest.Client.Adventure.UI;
+using SongsOfConquest.Client.Adventure.View;
+using SongsOfConquest.Client.Battle;
+using SongsOfConquest.Client.Battle.Facade;
 using SongsOfConquest.Client.Menu;
 using SongsOfConquest.Client.Menu.Loading;
 using SongsOfConquest.Client.Menu.Main;
 using SongsOfConquest.Client.Menu.Popup;
 using SongsOfConquest.Client.UI;
 using SongsOfConquestAccess.Adapters;
-using UnityEngine;
+using SongsOfConquestAccess.Events;
 
 namespace SongsOfConquestAccess.Screens
 {
-    /// <summary>
-    /// Central detector that translates game lifecycle hooks into accessibility screens.
-    /// Harmony patches should call this class directly instead of making stack decisions.
-    ///
-    /// It also owns the registry of runtime probes used for startup / hot-reload recovery,
-    /// so probe selection stays here rather than leaking into the plugin bootstrap.
-    /// </summary>
     internal sealed class ScreenDetector
     {
         private readonly ScreenManager _screenManager;
         private readonly List<IRuntimeScreenProbe> _runtimeScreenProbes;
+        private AdventureViewInstaller _adventureViewInstaller;
+        private BattleSceneInstaller _battleSceneInstaller;
 
         public ScreenDetector(ScreenManager screenManager)
         {
@@ -48,196 +46,140 @@ namespace SongsOfConquestAccess.Screens
             };
         }
 
-        public void OnTutorialOpened(TutorialMenu tutorialMenu)
+        public void OnTutorialReady(TutorialMenu tutorialMenu)
         {
-            PushOrReplaceTutorialScreen(tutorialMenu);
+            Push(BuildTutorialScreen(tutorialMenu), "tutorial ready");
         }
 
-        public void OnTutorialPageChanged(TutorialMenu tutorialMenu)
+        public void OnTutorialChanged(TutorialMenu tutorialMenu)
         {
-            PushOrReplaceTutorialScreen(tutorialMenu);
+            Screen screen = BuildTutorialScreen(tutorialMenu);
+            if (_screenManager.CurrentScreen is TutorialSlideshowScreen)
+            {
+                _screenManager.RefreshTop<TutorialSlideshowScreen>(screen, "tutorial changed");
+                return;
+            }
+
+            if (_screenManager.CurrentScreen is TutorialSimpleScreen)
+            {
+                _screenManager.RefreshTop<TutorialSimpleScreen>(screen, "tutorial changed");
+                return;
+            }
+
+            LogUnexpectedTop("tutorial changed");
         }
 
         public void OnTutorialClosed(TutorialMenu tutorialMenu)
         {
-            if (tutorialMenu == null || !_screenManager.RemoveScreenForSource(tutorialMenu))
+            if (_screenManager.CurrentScreen is TutorialSlideshowScreen)
             {
-                ResyncFromRuntimeState();
+                _screenManager.Pop<TutorialSlideshowScreen>("tutorial closed");
+                return;
             }
+
+            if (_screenManager.CurrentScreen is TutorialSimpleScreen)
+            {
+                _screenManager.Pop<TutorialSimpleScreen>("tutorial closed");
+                return;
+            }
+
+            LogUnexpectedTop("tutorial closed");
         }
 
-        public void OnQuestionDialogOpened(object sourceKey, PopupMenu.Settings settings)
+        public void OnQuestionDialogReady(object sourceKey, PopupMenu.Settings settings)
         {
             if (settings == null)
             {
-                SoqAccessPlugin.Instance?.LogWarning("ScreenDetector.OnQuestionDialogOpened received null settings; falling back to runtime resync");
-                ResyncFromRuntimeState();
+                SoqAccessPlugin.Instance?.LogWarning("ScreenDetector.OnQuestionDialogReady received null settings");
                 return;
             }
 
             object resolvedSourceKey = sourceKey ?? (settings != null ? (object)settings.ContainerTransform : null);
-            QuestionDialogAdapter adapter = new QuestionDialogAdapter(
-                resolvedSourceKey,
-                settings);
-            if (!adapter.IsPresent())
-            {
-                ResyncFromRuntimeState();
-                return;
-            }
-
-            QuestionDialogScreen screen = new QuestionDialogScreen(adapter.SourceKey, adapter);
-            Screen current = _screenManager.CurrentScreen;
-            if (current is QuestionDialogScreen && ReferenceEquals(current.SourceKey, screen.SourceKey))
-            {
-                _screenManager.ReplaceTopScreen(screen);
-                return;
-            }
-
-            _screenManager.RemoveScreenForSource(screen.SourceKey);
-            _screenManager.PushScreen(screen);
+            Push(new QuestionDialogScreen(new QuestionDialogAdapter(resolvedSourceKey, settings)), "question dialog ready");
         }
 
         public void OnQuestionDialogClosed(object sourceKey)
         {
-            if (sourceKey == null || !_screenManager.RemoveScreenForSource(sourceKey))
-            {
-                ResyncFromRuntimeState();
-            }
+            _screenManager.Pop<QuestionDialogScreen>("question dialog closed");
         }
 
-        public void OnLetterboxStoryTextShown(LetterboxStoryText storyText)
+        public void OnLetterboxStoryTextReady(LetterboxStoryText storyText)
         {
-            LetterboxStoryTextAdapter adapter = new LetterboxStoryTextAdapter(storyText);
-            if (!adapter.IsPresent())
-            {
-                ResyncFromRuntimeState();
-                return;
-            }
-
-            StoryTextScreen screen = new StoryTextScreen(adapter);
-            Screen current = _screenManager.CurrentScreen;
-            if (current is StoryTextScreen && ReferenceEquals(current.SourceKey, screen.SourceKey))
-            {
-                _screenManager.ReplaceTopScreen(screen);
-                return;
-            }
-
-            _screenManager.RemoveScreenForSource(screen.SourceKey);
-            _screenManager.PushScreen(screen);
+            Push(new StoryTextScreen(new LetterboxStoryTextAdapter(storyText)), "letterbox story text ready");
         }
 
-        public void OnLetterboxStoryTextHidden(LetterboxStoryText storyText)
+        public void OnLetterboxStoryTextChanged(LetterboxStoryText storyText)
+        {
+            _screenManager.RefreshTop<StoryTextScreen>(
+                new StoryTextScreen(new LetterboxStoryTextAdapter(storyText)),
+                "letterbox story text changed");
+        }
+
+        public void OnLetterboxStoryTextClosed(LetterboxStoryText storyText)
         {
             StoryMapSuppression.Clear(storyText);
-            if (storyText == null || !_screenManager.RemoveScreenForSource(storyText))
-            {
-                ResyncFromRuntimeState();
-            }
+            _screenManager.Pop<StoryTextScreen>("letterbox story text closed");
         }
 
-        public void OnStoryTextShown(StoryText storyText)
+        public void OnStoryTextReady(StoryText storyText)
         {
-            StoryTextAdapter adapter = new StoryTextAdapter(storyText);
-            if (!adapter.IsPresent())
-            {
-                ResyncFromRuntimeState();
-                return;
-            }
-
-            StoryTextScreen screen = new StoryTextScreen(adapter);
-            Screen current = _screenManager.CurrentScreen;
-            if (current is StoryTextScreen && ReferenceEquals(current.SourceKey, screen.SourceKey))
-            {
-                _screenManager.ReplaceTopScreen(screen);
-                return;
-            }
-
-            _screenManager.RemoveScreenForSource(screen.SourceKey);
-            _screenManager.PushScreen(screen);
+            Push(new StoryTextScreen(new StoryTextAdapter(storyText)), "story text ready");
         }
 
-        public void OnStoryTextHidden(StoryText storyText)
+        public void OnStoryTextChanged(StoryText storyText)
+        {
+            _screenManager.RefreshTop<StoryTextScreen>(
+                new StoryTextScreen(new StoryTextAdapter(storyText)),
+                "story text changed");
+        }
+
+        public void OnStoryTextClosed(StoryText storyText)
         {
             StoryMapSuppression.Clear(storyText);
-            if (storyText == null || !_screenManager.RemoveScreenForSource(storyText))
-            {
-                ResyncFromRuntimeState();
-            }
+            _screenManager.Pop<StoryTextScreen>("story text closed");
         }
 
-        public void OnDialogueMenuAvailable(DialogueMenu dialogueMenu)
+        public void OnDialogueMenuReady(DialogueMenu dialogueMenu)
         {
             DialogueMenuAdvanceGuard.ClearPending(dialogueMenu);
-            DialogueMenuAdapter adapter = new DialogueMenuAdapter(dialogueMenu);
-            if (!adapter.IsPresent())
-            {
-                ResyncFromRuntimeState();
-                return;
-            }
-
-            StoryTextScreen screen = new StoryTextScreen(adapter);
-            Screen current = _screenManager.CurrentScreen;
-            if (current is StoryTextScreen && ReferenceEquals(current.SourceKey, screen.SourceKey))
-            {
-                _screenManager.ReplaceTopScreen(screen);
-                return;
-            }
-
-            _screenManager.RemoveScreenForSource(screen.SourceKey);
-            _screenManager.PushScreen(screen);
+            Push(new StoryTextScreen(new DialogueMenuAdapter(dialogueMenu)), "dialogue menu ready");
         }
 
-        public void OnDialogueMenuHidden(DialogueMenu dialogueMenu)
+        public void OnDialogueMenuChanged(DialogueMenu dialogueMenu)
+        {
+            DialogueMenuAdvanceGuard.ClearPending(dialogueMenu);
+            StoryTextScreen screen = new StoryTextScreen(new DialogueMenuAdapter(dialogueMenu));
+            if (_screenManager.CurrentScreen is StoryTextScreen)
+            {
+                _screenManager.RefreshTop<StoryTextScreen>(screen, "dialogue menu changed");
+                return;
+            }
+
+            Push(screen, "dialogue menu ready");
+        }
+
+        public void OnDialogueMenuClosed(DialogueMenu dialogueMenu)
         {
             StoryMapSuppression.Clear(dialogueMenu);
-            if (dialogueMenu == null || !_screenManager.RemoveScreenForSource(dialogueMenu))
-            {
-                ResyncFromRuntimeState();
-            }
+            _screenManager.Pop<StoryTextScreen>("dialogue menu closed");
         }
 
-        public void OnMainMenuAvailable(MainMenu mainMenu)
+        public void OnMainMenuReady(MainMenu mainMenu)
         {
-            MainMenuAdapter adapter = new MainMenuAdapter(mainMenu);
-            if (!adapter.IsPresent())
-            {
-                ResyncFromRuntimeState();
-                return;
-            }
-
-            MainMenuScreen screen = new MainMenuScreen(adapter);
-            Screen current = _screenManager.CurrentScreen;
-            if (current is MainMenuScreen && ReferenceEquals(current.SourceKey, screen.SourceKey))
-            {
-                _screenManager.ReplaceTopScreen(screen);
-                return;
-            }
-
-            _screenManager.PushScreen(screen);
+            Push(new MainMenuScreen(new MainMenuAdapter(mainMenu)), "main menu ready");
         }
 
-        public void OnMainMenuHidden(MainMenu mainMenu)
+        public void OnMainMenuClosed(MainMenu mainMenu)
         {
-            if (mainMenu == null)
+            if (_screenManager.CurrentScreen is FoldoutMenuScreen)
             {
-                ResyncFromRuntimeState();
-                return;
+                _screenManager.Pop<FoldoutMenuScreen>("main menu closed with foldout open");
             }
 
-            MainMenuAdapter adapter = new MainMenuAdapter(mainMenu);
-            object extrasSourceKey = adapter.ExtrasFoldout != null ? adapter.ExtrasFoldout.SourceKey : null;
-            object multiplayerSourceKey = adapter.MultiplayerFoldout != null ? adapter.MultiplayerFoldout.SourceKey : null;
-            bool removed = _screenManager.RemoveScreens(screen =>
-                (screen is MainMenuScreen && ReferenceEquals(screen.SourceKey, mainMenu))
-                || (extrasSourceKey != null && ReferenceEquals(screen.SourceKey, extrasSourceKey))
-                || (multiplayerSourceKey != null && ReferenceEquals(screen.SourceKey, multiplayerSourceKey)));
-            if (!removed)
-            {
-                ResyncFromRuntimeState();
-            }
+            _screenManager.Pop<MainMenuScreen>("main menu closed");
         }
 
-        public void OnMainMenuFoldoutOpened(MainMenu mainMenu, FoldoutUIButton foldoutButton)
+        public void OnMainMenuFoldoutReady(MainMenu mainMenu, FoldoutUIButton foldoutButton)
         {
             if (mainMenu == null || foldoutButton == null)
             {
@@ -246,356 +188,241 @@ namespace SongsOfConquestAccess.Screens
 
             MainMenuAdapter owner = new MainMenuAdapter(mainMenu);
             MainMenuAdapter.NativeFoldoutAdapter foldout = ResolveFoldout(owner, foldoutButton);
-            if (owner == null || foldout == null || !owner.IsPresent() || !foldout.IsVisible() || !foldout.IsOpen())
+            if (foldout == null || !owner.IsPresent() || !foldout.IsVisible() || !foldout.IsOpen())
             {
                 return;
             }
 
-            FoldoutMenuScreen screen = new FoldoutMenuScreen(owner, foldout);
-            Screen current = _screenManager.CurrentScreen;
-            if (current is FoldoutMenuScreen && ReferenceEquals(current.SourceKey, screen.SourceKey))
-            {
-                _screenManager.ReplaceTopScreen(screen);
-                return;
-            }
-
-            RemoveKnownFoldouts(owner);
-            _screenManager.PushScreen(screen);
+            Push(new FoldoutMenuScreen(owner, foldout), "main menu foldout ready");
         }
 
         public void OnMainMenuFoldoutClosed(FoldoutUIButton foldoutButton)
         {
-            if (foldoutButton == null || !_screenManager.RemoveScreenForSource(foldoutButton))
-            {
-                ResyncFromRuntimeState();
-            }
+            _screenManager.Pop<FoldoutMenuScreen>("main menu foldout closed");
         }
 
-        public void OnCampaignMenuAvailable(CampaignMenu campaignMenu)
+        public void OnCampaignMenuReady(CampaignMenu campaignMenu)
         {
-            CampaignMenuAdapter adapter = new CampaignMenuAdapter(campaignMenu);
-            if (!adapter.IsPresent())
+            Push(new CampaignMenuScreen(new CampaignMenuAdapter(campaignMenu)), "campaign menu ready");
+        }
+
+        public void OnCampaignMenuClosed(CampaignMenu campaignMenu)
+        {
+            _screenManager.Pop<CampaignMenuScreen>("campaign menu closed");
+        }
+
+        public void OnTaleSelectLayoutRebuilt(TaleButtonLayoutCoordinator coordinator)
+        {
+            TaleSelectScreen screen = new TaleSelectScreen(new TaleSelectAdapter(coordinator));
+            if (_screenManager.CurrentScreen is TaleSelectScreen)
             {
-                ResyncFromRuntimeState();
+                _screenManager.RefreshTop<TaleSelectScreen>(screen, "tale select layout rebuilt");
                 return;
             }
 
-            CampaignMenuScreen screen = new CampaignMenuScreen(adapter);
-            _screenManager.PushScreen(screen);
+            Push(screen, "tale select ready");
         }
 
-        public void OnCampaignMenuHidden(CampaignMenu campaignMenu)
+        public void OnTaleSelectClosed(TaleButtonLayoutCoordinator coordinator)
         {
-            if (campaignMenu == null || !_screenManager.RemoveScreenForSource(campaignMenu))
-            {
-                ResyncFromRuntimeState();
-            }
+            _screenManager.Pop<TaleSelectScreen>("tale select closed");
         }
 
-        public void OnTaleSelectAvailable(TaleButtonLayoutCoordinator coordinator)
+        public void OnCampaignMapSelectShown(CampaignMapSelectMenu menu, CampaignMapSelectedInformationView informationView)
         {
-            TaleSelectAdapter adapter = new TaleSelectAdapter(coordinator);
-            if (!adapter.IsPresent())
-            {
-                ResyncFromRuntimeState();
-                return;
-            }
-
-            TaleSelectScreen screen = new TaleSelectScreen(adapter);
-            Screen current = _screenManager.CurrentScreen;
-            if (current is TaleSelectScreen && ReferenceEquals(current.SourceKey, screen.SourceKey))
-            {
-                _screenManager.ReplaceTopScreen(screen);
-                return;
-            }
-
-            _screenManager.PushScreen(screen);
-        }
-
-        public void OnTaleSelectHidden(TaleButtonLayoutCoordinator coordinator)
-        {
-            if (coordinator == null || !_screenManager.RemoveScreenForSource(coordinator))
-            {
-                ResyncFromRuntimeState();
-            }
-        }
-
-        public void OnCampaignMapSelectAvailable(CampaignMapSelectedInformationView informationView)
-        {
-            CampaignMapSelectAdapter adapter = CampaignMapSelectRuntimeScreenProbe.FindActiveCampaignMapSelect(informationView);
-            if (adapter == null || !adapter.IsPresent())
-            {
-                ResyncFromRuntimeState();
-                return;
-            }
-
             CampaignMapSelectScreen screen = new CampaignMapSelectScreen(
-                adapter,
+                new CampaignMapSelectAdapter(menu, informationView),
                 CampaignMapSelectScreen.ConsumeFocusDifficultyAfterNextRebuild());
-            Screen current = _screenManager.CurrentScreen;
-            if (current is CampaignMapSelectScreen && ReferenceEquals(current.SourceKey, screen.SourceKey))
+
+            if (_screenManager.CurrentScreen is CampaignMapSelectScreen)
             {
-                // Difficulty changes cause the game to redraw the selected mission details by
-                // calling Show(...) again, so rebuild this accessibility screen from the fresh
-                // native state instead of mutating stale labels and button visibility.
-                _screenManager.ReplaceTopScreen(screen);
+                _screenManager.RefreshTop<CampaignMapSelectScreen>(screen, "campaign map select shown");
                 return;
             }
 
-            _screenManager.PushScreen(screen);
+            Push(screen, "campaign map select ready");
         }
 
-        public void OnCampaignMapSelectHidden(CampaignMapSelectedInformationView informationView)
+        public void OnCampaignMapSelectClosed(CampaignMapSelectedInformationView informationView)
         {
-            if (informationView != null)
-            {
-                _screenManager.RemoveScreenForSource(informationView);
-                return;
-            }
-
-            _screenManager.RemoveScreens(screen => screen is CampaignMapSelectScreen);
+            _screenManager.Pop<CampaignMapSelectScreen>("campaign map select closed");
         }
 
         public void OnMainMenuSceneLoaded(MainMenuSceneType loadedScene)
         {
-            if (loadedScene != MainMenuSceneType.Campaign)
+            if (loadedScene != MainMenuSceneType.Campaign && _screenManager.CurrentScreen is CampaignMenuScreen)
             {
-                _screenManager.RemoveScreens(screen => screen is CampaignMenuScreen);
+                _screenManager.Pop<CampaignMenuScreen>("main menu scene changed away from campaign");
             }
         }
 
-        public void OnAdventureSceneLoaded()
+        public void OnAdventureViewReady(AdventureViewInstaller installer)
         {
-            AdventureMapScreen screen = AdventureMapRuntimeScreenProbe.FindActiveAdventureMapScreen();
-            if (screen == null || !screen.IsPresent())
-            {
-                SoqAccessPlugin.Instance?.LogWarning("ScreenDetector.OnAdventureSceneLoaded could not find a ready adventure map");
-                return;
-            }
-
-            Screen current = _screenManager.CurrentScreen;
-            if (current is AdventureMapScreen && ReferenceEquals(current.SourceKey, screen.SourceKey))
-            {
-                _screenManager.ReplaceTopScreen(screen);
-                return;
-            }
-
-            _screenManager.PushScreen(screen);
+            _adventureViewInstaller = installer;
         }
 
-        public void OnAdventureSceneUnloading()
+        public void OnAdventureMapReady()
         {
-            _screenManager.RemoveScreens(screen => screen is AdventureMapScreen);
+            AdventureMapAdapter adapter = new AdventureMapAdapter(_adventureViewInstaller);
+            AdventureMapEventListener eventListener = adapter.IsPresent()
+                ? new AdventureMapEventListener(
+                    adapter.Facade,
+                    adapter.SelectionHandler,
+                    adapter.HumanAdventureControllerFacade,
+                    adapter.LocalizationHandler)
+                : null;
+            Push(new AdventureMapScreen(adapter, eventListener), "adventure map ready");
         }
 
-        public bool OnCombatAvailable()
+        public void OnAdventureMapClosed()
         {
-            CombatScreen screen = CombatRuntimeScreenProbe.FindActiveCombatScreen();
-            if (screen == null || !screen.IsPresent())
+            _adventureViewInstaller = null;
+            _screenManager.Pop<AdventureMapScreen>("adventure map closed");
+        }
+
+        public void OnBattleSceneReady(BattleSceneInstaller installer)
+        {
+            _battleSceneInstaller = installer;
+        }
+
+        public bool OnCombatReady(ClientBattleCommandsFacade commands)
+        {
+            CombatAdapter adapter = new CombatAdapter(_battleSceneInstaller);
+            if (!adapter.Matches(commands))
             {
-                SoqAccessPlugin.Instance?.LogWarning("ScreenDetector.OnCombatAvailable could not find a ready combat screen");
+                SoqAccessPlugin.Instance?.LogWarning("ScreenDetector.OnCombatReady ignored because the battle command facade did not match the stored battle scene");
                 return false;
             }
 
-            Screen current = _screenManager.CurrentScreen;
-            if (current is CombatScreen && ReferenceEquals(current.SourceKey, screen.SourceKey))
-            {
-                _screenManager.ReplaceTopScreen(screen);
-                return true;
-            }
-
-            _screenManager.RemoveScreenForSource(screen.SourceKey);
+            CombatEventNarrator.SetActiveAdapter(adapter);
+            CombatScreen screen = new CombatScreen(adapter);
             if (IsTutorialTopScreen())
             {
-                _screenManager.InsertScreenBelowTop(screen);
-                return true;
+                return PushBelowTop(screen, "combat ready");
             }
 
-            _screenManager.PushScreen(screen);
-            return true;
+            return Push(screen, "combat ready");
         }
 
-        public void OnCombatInteractionEnded()
+        public void OnCombatClosed()
         {
-            _screenManager.RemoveScreens(screen => screen is CombatScreen);
+            _battleSceneInstaller = null;
+            _screenManager.Pop<CombatScreen>("combat closed");
             CombatEventNarrator.Reset();
         }
 
-        public void OnPostBattleResultShown(AdventureBattleMenu battleMenu)
+        public void OnPostBattleResultReady(AdventureBattleMenu battleMenu)
         {
             PostBattleMenu menu = PostBattleResultAdapter.GetPostBattleMenu(battleMenu);
-            PostBattleResultAdapter adapter = new PostBattleResultAdapter(battleMenu, menu);
-            PostBattleResultScreen screen = new PostBattleResultScreen(adapter);
-            if (screen == null || !screen.IsPresent())
+            Push(new PostBattleResultScreen(new PostBattleResultAdapter(battleMenu, menu)), "post battle result ready");
+        }
+
+        public void OnPostBattleResultChanged()
+        {
+            PostBattleResultScreen screen = _screenManager.CurrentScreen as PostBattleResultScreen;
+            if (screen == null)
             {
-                SoqAccessPlugin.Instance?.LogWarning("ScreenDetector.OnPostBattleResultShown could not find a ready post-battle result screen");
+                LogUnexpectedTop("post battle result changed");
                 return;
             }
 
-            Screen current = _screenManager.CurrentScreen;
-            if (current is PostBattleResultScreen && ReferenceEquals(current.SourceKey, screen.SourceKey))
-            {
-                _screenManager.ReplaceTopScreen(screen);
-                return;
-            }
-
-            _screenManager.RemoveScreenForSource(screen.SourceKey);
-            _screenManager.PushScreen(screen);
+            _screenManager.RefreshTop<PostBattleResultScreen>(screen.Rebuild(), "post battle result changed");
         }
 
-        public void OnPostBattleResultFullyPopulated()
+        public void OnPostBattleResultClosed()
         {
-            Screen current = _screenManager.CurrentScreen;
-            if (current is PostBattleResultScreen screen)
-            {
-                _screenManager.ReplaceTopScreen(screen.Rebuild());
-            }
+            _screenManager.Pop<PostBattleResultScreen>("post battle result closed");
         }
 
-        public void OnPostBattleResultHidden()
+        public void OnPreBattleMenuReady(PreBattleMenu menu)
         {
-            _screenManager.RemoveScreenForSource(PostBattleResultAdapter.SourceKey);
-        }
-
-        private bool IsTutorialTopScreen()
-        {
-            Screen current = _screenManager.CurrentScreen;
-            return current is TutorialSlideshowScreen
-                || current is TutorialSimpleScreen;
+            Push(new PreBattleMenuScreen(new PreBattleMenuAdapter(menu)), "pre battle menu ready");
         }
 
         public void OnPreBattleMenuChanged(PreBattleMenu menu)
         {
-            if (menu == null)
+            PreBattleMenuScreen screen = new PreBattleMenuScreen(new PreBattleMenuAdapter(menu));
+            if (_screenManager.CurrentScreen is PreBattleMenuScreen)
             {
-                ResyncFromRuntimeState();
+                _screenManager.RefreshTop<PreBattleMenuScreen>(screen, "pre battle menu changed");
                 return;
             }
 
-            PreBattleMenuAdapter adapter = new PreBattleMenuAdapter(menu);
-            if (!adapter.IsPresent())
-            {
-                ResyncFromRuntimeState();
-                return;
-            }
-
-            PreBattleMenuScreen screen = new PreBattleMenuScreen(adapter);
-            Screen current = _screenManager.CurrentScreen;
-            if (current is PreBattleMenuScreen && ReferenceEquals(current.SourceKey, screen.SourceKey))
-            {
-                _screenManager.ReplaceTopScreen(screen);
-                return;
-            }
-
-            _screenManager.RemoveScreenForSource(screen.SourceKey);
-            _screenManager.PushScreen(screen);
+            Push(screen, "pre battle menu ready");
         }
 
         public void OnPreBattleMenuClosed(PreBattleMenu menu)
         {
-            if (menu == null || !_screenManager.RemoveScreenForSource(menu))
-            {
-                ResyncFromRuntimeState();
-            }
+            _screenManager.Pop<PreBattleMenuScreen>("pre battle menu closed");
         }
 
-        public void OnWorldChoiceMenuOpened(WorldChoiceMenu menu)
+        public void OnWorldChoiceMenuReady(WorldChoiceMenu menu)
         {
-            WorldChoiceMenuAdapter adapter = new WorldChoiceMenuAdapter(menu);
-            if (!adapter.IsPresent())
-            {
-                ResyncFromRuntimeState();
-                return;
-            }
-
-            WorldChoiceMenuScreen screen = new WorldChoiceMenuScreen(adapter);
-            Screen current = _screenManager.CurrentScreen;
-            if (current is WorldChoiceMenuScreen && ReferenceEquals(current.SourceKey, screen.SourceKey))
-            {
-                _screenManager.ReplaceTopScreen(screen);
-                return;
-            }
-
-            _screenManager.RemoveScreenForSource(screen.SourceKey);
-            _screenManager.PushScreen(screen);
+            Push(new WorldChoiceMenuScreen(new WorldChoiceMenuAdapter(menu)), "world choice menu ready");
         }
 
         public void OnWorldChoiceMenuClosed(WorldChoiceMenu menu)
         {
-            if (menu == null || !_screenManager.RemoveScreenForSource(menu))
-            {
-                ResyncFromRuntimeState();
-            }
+            _screenManager.Pop<WorldChoiceMenuScreen>("world choice menu closed");
         }
 
-        public void OnHostileJoinMenuChanged(HostileJoinMenu menu)
+        public void OnHostileJoinMenuReady(HostileJoinMenu menu)
         {
-            if (menu == null)
-            {
-                ResyncFromRuntimeState();
-                return;
-            }
-
             HostileJoinMenuAdapter adapter = new HostileJoinMenuAdapter(menu);
             if (!adapter.IsPresent())
             {
                 adapter.Dispose();
-                ResyncFromRuntimeState();
-                return;
+            }
+
+            Push(new HostileJoinMenuScreen(adapter), "hostile join menu ready");
+        }
+
+        public void OnHostileJoinMenuChanged(HostileJoinMenu menu)
+        {
+            HostileJoinMenuAdapter adapter = new HostileJoinMenuAdapter(menu);
+            if (!adapter.IsPresent())
+            {
+                adapter.Dispose();
             }
 
             HostileJoinMenuScreen screen = new HostileJoinMenuScreen(adapter);
-            Screen current = _screenManager.CurrentScreen;
-            if (current is HostileJoinMenuScreen && ReferenceEquals(current.SourceKey, screen.SourceKey))
+            if (_screenManager.CurrentScreen is HostileJoinMenuScreen)
             {
-                _screenManager.ReplaceTopScreen(screen);
+                _screenManager.RefreshTop<HostileJoinMenuScreen>(screen, "hostile join menu changed");
                 return;
             }
 
-            _screenManager.RemoveScreenForSource(screen.SourceKey);
-            _screenManager.PushScreen(screen);
+            Push(screen, "hostile join menu ready");
         }
 
         public void OnHostileJoinMenuClosed(HostileJoinMenu menu)
         {
-            if (menu == null || !_screenManager.RemoveScreenForSource(menu))
-            {
-                ResyncFromRuntimeState();
-            }
+            _screenManager.Pop<HostileJoinMenuScreen>("hostile join menu closed");
         }
 
-        public void OnCommanderSheetOpened(CommanderSheet commanderSheet)
+        public void OnMoveTroopPopupReady(TroopHUDEntryMovable movable)
         {
-            CommanderSheetAdapter adapter = new CommanderSheetAdapter(commanderSheet);
-            if (!adapter.IsPresent())
-            {
-                ResyncFromRuntimeState();
-                return;
-            }
+            Push(new MoveTroopPopupScreen(new MoveTroopPopupAdapter(movable)), "move troop popup ready");
+        }
 
-            CommanderSheetScreen screen = new CommanderSheetScreen(adapter);
-            Screen current = _screenManager.CurrentScreen;
-            if (current is CommanderSheetScreen && ReferenceEquals(current.SourceKey, screen.SourceKey))
-            {
-                _screenManager.ReplaceTopScreen(screen);
-                return;
-            }
+        public void OnMoveTroopPopupClosed(TroopHUDEntryMovable movable)
+        {
+            _screenManager.Pop<MoveTroopPopupScreen>("move troop popup closed");
+        }
 
-            _screenManager.RemoveScreenForSource(screen.SourceKey);
-            _screenManager.PushScreen(screen);
+        public void OnCommanderSheetReady(CommanderSheet commanderSheet)
+        {
+            Push(new CommanderSheetScreen(new CommanderSheetAdapter(commanderSheet)), "commander sheet ready");
         }
 
         public void OnCommanderSheetClosed(CommanderSheet commanderSheet)
         {
-            if (commanderSheet == null || !_screenManager.RemoveScreenForSource(commanderSheet))
-            {
-                ResyncFromRuntimeState();
-            }
+            _screenManager.Pop<CommanderSheetScreen>("commander sheet closed");
         }
 
-        public void OnCommanderSheetChanged(object sourceKey)
+        public void OnCommanderSheetChanged()
         {
-            CommanderSheetScreen screen = _screenManager.FindScreenForSource<CommanderSheetScreen>(sourceKey);
+            CommanderSheetScreen screen = _screenManager.CurrentScreen as CommanderSheetScreen;
             if (screen == null)
             {
                 return;
@@ -603,25 +430,21 @@ namespace SongsOfConquestAccess.Screens
 
             if (!screen.IsPresent())
             {
-                _screenManager.RemoveScreenForSource(sourceKey);
+                _screenManager.Pop<CommanderSheetScreen>("commander sheet no longer present");
                 return;
             }
 
-            screen.Refresh(ReferenceEquals(_screenManager.CurrentScreen, screen));
+            screen.Refresh(true);
         }
 
-        public void OnCommanderSheetComponentChanged(Component component)
+        public void OnCommanderSheetComponentChanged(UnityEngine.Component component)
         {
-            if (component == null)
+            if (component == null || component.GetComponentInParent<CommanderSheet>(true) == null)
             {
                 return;
             }
 
-            CommanderSheet sheet = component.GetComponentInParent<CommanderSheet>(true);
-            if (sheet != null)
-            {
-                OnCommanderSheetChanged(sheet);
-            }
+            OnCommanderSheetChanged();
         }
 
         public void ResyncFromRuntimeState()
@@ -632,34 +455,63 @@ namespace SongsOfConquestAccess.Screens
                 _runtimeScreenProbes[i].AddActiveScreens(activeScreens);
             }
 
-            _screenManager.SynchronizeStack(activeScreens);
+            _screenManager.Clear();
+            for (int i = 0; i < activeScreens.Count; i++)
+            {
+                _screenManager.Push(activeScreens[i], "runtime resync");
+            }
         }
 
-        private void PushOrReplaceTutorialScreen(TutorialMenu tutorialMenu)
+        private bool Push(Screen screen, string reason)
         {
-            if (tutorialMenu == null)
+            if (screen == null)
             {
-                ResyncFromRuntimeState();
-                return;
+                SoqAccessPlugin.Instance?.LogWarning("ScreenDetector ignored " + reason + " because no screen could be built");
+                return false;
             }
 
-            Screen screen = BuildTutorialScreen(tutorialMenu);
-            if (screen == null || !screen.IsPresent())
+            if (!screen.IsPresent())
             {
-                ResyncFromRuntimeState();
-                return;
+                SoqAccessPlugin.Instance?.LogWarning(
+                    "ScreenDetector ignored "
+                    + reason
+                    + " because "
+                    + screen.GetType().Name
+                    + " is not present");
+                return false;
             }
 
-            Screen current = _screenManager.CurrentScreen;
-            if ((current is TutorialSlideshowScreen || current is TutorialSimpleScreen)
-                && ReferenceEquals(current.SourceKey, screen.SourceKey))
+            _screenManager.Push(screen, reason);
+            return true;
+        }
+
+        private bool PushBelowTop(Screen screen, string reason)
+        {
+            if (screen == null)
             {
-                _screenManager.ReplaceTopScreen(screen);
-                return;
+                SoqAccessPlugin.Instance?.LogWarning("ScreenDetector ignored " + reason + " because no screen could be built");
+                return false;
             }
 
-            _screenManager.RemoveScreenForSource(screen.SourceKey);
-            _screenManager.PushScreen(screen);
+            if (!screen.IsPresent())
+            {
+                SoqAccessPlugin.Instance?.LogWarning(
+                    "ScreenDetector ignored "
+                    + reason
+                    + " because "
+                    + screen.GetType().Name
+                    + " is not present");
+                return false;
+            }
+
+            _screenManager.PushBelowTop(screen, reason);
+            return true;
+        }
+
+        private bool IsTutorialTopScreen()
+        {
+            return _screenManager.CurrentScreen is TutorialSlideshowScreen
+                || _screenManager.CurrentScreen is TutorialSimpleScreen;
         }
 
         private static Screen BuildTutorialScreen(TutorialMenu tutorialMenu)
@@ -677,20 +529,6 @@ namespace SongsOfConquestAccess.Screens
             }
 
             return null;
-        }
-
-        private void RemoveKnownFoldouts(MainMenuAdapter adapter)
-        {
-            if (adapter == null)
-            {
-                return;
-            }
-
-            object extrasSourceKey = adapter.ExtrasFoldout != null ? adapter.ExtrasFoldout.SourceKey : null;
-            object multiplayerSourceKey = adapter.MultiplayerFoldout != null ? adapter.MultiplayerFoldout.SourceKey : null;
-            _screenManager.RemoveScreens(screen =>
-                (extrasSourceKey != null && ReferenceEquals(screen.SourceKey, extrasSourceKey))
-                || (multiplayerSourceKey != null && ReferenceEquals(screen.SourceKey, multiplayerSourceKey)));
         }
 
         private static MainMenuAdapter.NativeFoldoutAdapter ResolveFoldout(MainMenuAdapter adapter, FoldoutUIButton foldoutButton)
@@ -711,6 +549,16 @@ namespace SongsOfConquestAccess.Screens
             }
 
             return null;
+        }
+
+        private void LogUnexpectedTop(string reason)
+        {
+            Screen current = _screenManager.CurrentScreen;
+            SoqAccessPlugin.Instance?.LogWarning(
+                "ScreenDetector ignored "
+                + reason
+                + "; unexpected top screen "
+                + (current != null ? current.GetType().Name : "<none>"));
         }
     }
 }

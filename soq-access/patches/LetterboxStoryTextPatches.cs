@@ -1,4 +1,5 @@
 using System.Collections;
+using System.Reflection;
 using HarmonyLib;
 using SongsOfConquest.Client.Adventure;
 using SongsOfConquestAccess.Adapters;
@@ -8,6 +9,8 @@ namespace SongsOfConquestAccess
     [HarmonyPatch]
     internal static class LetterboxStoryTextPatches
     {
+        private static readonly FieldInfo LoreAsyncField = AccessTools.Field(typeof(LetterboxStoryText), "_loreAsync");
+
         [HarmonyPatch(typeof(LetterboxStoryText), "Show")]
         [HarmonyPostfix]
         private static void LetterboxStoryTextShowPostfix(LetterboxStoryText __instance)
@@ -20,12 +23,22 @@ namespace SongsOfConquestAccess
             }
         }
 
-        [HarmonyPatch(typeof(LetterboxStoryText), "ForceHide")]
+        [HarmonyPatch(typeof(LetterboxStoryText), "ForceHide", new[] { typeof(bool) })]
+        [HarmonyPrefix]
+        private static void LetterboxStoryTextForceHidePrefix(LetterboxStoryText __instance, out bool __state)
+        {
+            __state = __instance != null && LoreAsyncField != null && LoreAsyncField.GetValue(__instance) != null;
+        }
+
+        [HarmonyPatch(typeof(LetterboxStoryText), "ForceHide", new[] { typeof(bool) })]
         [HarmonyPostfix]
-        private static void LetterboxStoryTextForceHidePostfix(LetterboxStoryText __instance)
+        private static void LetterboxStoryTextForceHidePostfix(LetterboxStoryText __instance, bool __state)
         {
             StoryMapSuppression.Clear(__instance);
-            SoqAccessPlugin.Instance?.ScreenDetector?.OnLetterboxStoryTextHidden(__instance);
+            if (__state)
+            {
+                SoqAccessPlugin.Instance?.ScreenDetector?.OnLetterboxStoryTextClosed(__instance);
+            }
         }
 
         private static IEnumerator WaitForLetterboxStoryTextReady(LetterboxStoryText storyText)
@@ -36,7 +49,7 @@ namespace SongsOfConquestAccess
                 LetterboxStoryTextAdapter adapter = new LetterboxStoryTextAdapter(storyText);
                 if (adapter.IsPresent())
                 {
-                    SoqAccessPlugin.Instance?.ScreenDetector?.OnLetterboxStoryTextShown(storyText);
+                    SoqAccessPlugin.Instance?.ScreenDetector?.OnLetterboxStoryTextReady(storyText);
                     yield break;
                 }
 

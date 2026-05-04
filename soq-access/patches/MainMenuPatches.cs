@@ -31,7 +31,7 @@ namespace SongsOfConquestAccess
             if (loadedScene != MainMenuSceneType.MainMenu)
             {
                 StopPendingOpenCoroutine(__instance);
-                SoqAccessPlugin.Instance?.ScreenDetector?.OnMainMenuHidden(__instance);
+                SoqAccessPlugin.Instance?.ScreenDetector?.OnMainMenuClosed(__instance);
                 return;
             }
 
@@ -47,7 +47,7 @@ namespace SongsOfConquestAccess
                 return;
             }
 
-            SoqAccessPlugin.Instance?.ScreenDetector?.OnMainMenuFoldoutOpened(__instance, button);
+            SoqAccessPlugin.Instance?.ScreenDetector?.OnMainMenuFoldoutReady(__instance, button);
         }
 
         [HarmonyPatch(typeof(FoldoutUIButton), "ForceClose")]
@@ -78,7 +78,7 @@ namespace SongsOfConquestAccess
             }
 
             StopPendingOpenCoroutine(__instance);
-            SoqAccessPlugin.Instance?.ScreenDetector?.OnMainMenuHidden(__instance);
+            SoqAccessPlugin.Instance?.ScreenDetector?.OnMainMenuClosed(__instance);
         }
 
         private static void RestartPendingOpenCoroutine(MainMenu mainMenu)
@@ -131,7 +131,7 @@ namespace SongsOfConquestAccess
                 if (leftButtonContainer != null && leftButtonContainer.activeInHierarchy)
                 {
                     PendingOpenCoroutines.Remove(trackedMenu);
-                    SoqAccessPlugin.Instance?.ScreenDetector?.OnMainMenuAvailable(mainMenu);
+                    SoqAccessPlugin.Instance?.ScreenDetector?.OnMainMenuReady(mainMenu);
                     yield break;
                 }
 

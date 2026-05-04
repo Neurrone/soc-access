@@ -1,7 +1,7 @@
 using System.Collections.Generic;
-using System.Reflection;
 using HarmonyLib;
 using SongsOfConquest.Client.Adventure.UI;
+using SongsOfConquestAccess.Adapters;
 using UnityEngine;
 
 namespace SongsOfConquestAccess
@@ -9,39 +9,37 @@ namespace SongsOfConquestAccess
     [HarmonyPatch]
     internal static class TroopHUDEntryMovablePatches
     {
-        private static readonly FieldInfo CurrentStateField =
-            AccessTools.Field(typeof(TroopHUDEntryMovable), "_currentState");
-        private static readonly Dictionary<int, string> LastStatesByInstanceId = new Dictionary<int, string>();
+        private static readonly HashSet<int> ActiveMovePopups = new HashSet<int>();
 
-        [HarmonyPatch(typeof(TroopHUDEntryMovable), "Update")]
+        [HarmonyPatch(typeof(TroopHUDEntryMovable), "DecideAmount")]
         [HarmonyPostfix]
-        private static void TroopHUDEntryMovableUpdatePostfix(TroopHUDEntryMovable __instance)
+        private static void TroopHUDEntryMovableDecideAmountPostfix(TroopHUDEntryMovable __instance)
         {
-            if (__instance == null || CurrentStateField == null)
+            if (__instance == null || !new MoveTroopPopupAdapter(__instance).IsPresent())
+            {
+                return;
+            }
+
+            ActiveMovePopups.Add(((Object)__instance).GetInstanceID());
+            SoqAccessPlugin.Instance?.ScreenDetector?.OnMoveTroopPopupReady(__instance);
+        }
+
+        [HarmonyPatch(typeof(TroopHUDEntryMovable), "Reset")]
+        [HarmonyPostfix]
+        private static void TroopHUDEntryMovableResetPostfix(TroopHUDEntryMovable __instance)
+        {
+            if (__instance == null)
             {
                 return;
             }
 
             int instanceId = ((Object)__instance).GetInstanceID();
-            string currentState = GetStateName(__instance);
-            string previousState;
-            if (LastStatesByInstanceId.TryGetValue(instanceId, out previousState)
-                && previousState == currentState)
+            if (!ActiveMovePopups.Remove(instanceId))
             {
                 return;
             }
 
-            LastStatesByInstanceId[instanceId] = currentState;
-            if (previousState == "Deciding" || currentState == "Deciding")
-            {
-                SoqAccessPlugin.Instance?.ScreenDetector?.ResyncFromRuntimeState();
-            }
-        }
-
-        private static string GetStateName(TroopHUDEntryMovable movable)
-        {
-            object value = CurrentStateField.GetValue(movable);
-            return value != null ? value.ToString() : string.Empty;
+            SoqAccessPlugin.Instance?.ScreenDetector?.OnMoveTroopPopupClosed(__instance);
         }
     }
 }

@@ -14,7 +14,7 @@ namespace SongsOfConquestAccess.Screens
         private Action<OnTroopsUpdatedPayload> _troopsUpdatedHandler;
 
         public HostileJoinMenuScreen(HostileJoinMenuAdapter adapter)
-            : base(adapter != null ? adapter.SourceKey : null, BuildRoot(adapter))
+            : base(BuildRoot(adapter))
         {
             _adapter = adapter;
         }

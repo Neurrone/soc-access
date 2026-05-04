@@ -10,7 +10,7 @@ namespace SongsOfConquestAccess.Screens
         private readonly AdventureMapEventListener _eventListener;
 
         public AdventureMapScreen(AdventureMapAdapter adapter, AdventureMapEventListener eventListener)
-            : base(adapter != null ? adapter.SourceKey : null, BuildRoot(adapter))
+            : base(BuildRoot(adapter))
         {
             _adapter = adapter;
             _eventListener = eventListener;

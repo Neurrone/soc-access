@@ -26,7 +26,7 @@ namespace SongsOfConquestAccess
 
         private void OnDestroy()
         {
-            SoqAccessPlugin.Instance?.ScreenDetector?.OnCampaignMenuHidden(_campaignMenu);
+            SoqAccessPlugin.Instance?.ScreenDetector?.OnCampaignMenuClosed(_campaignMenu);
         }
     }
 }

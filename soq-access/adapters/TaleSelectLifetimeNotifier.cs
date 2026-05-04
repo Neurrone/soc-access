@@ -25,7 +25,7 @@ namespace SongsOfConquestAccess.Adapters
 
         private void OnDestroy()
         {
-            SoqAccessPlugin.Instance?.ScreenDetector?.OnTaleSelectHidden(_coordinator);
+            SoqAccessPlugin.Instance?.ScreenDetector?.OnTaleSelectClosed(_coordinator);
         }
     }
 }

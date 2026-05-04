@@ -10,7 +10,7 @@ namespace SongsOfConquestAccess.Screens
         private readonly MainMenuAdapter _owner;
 
         public FoldoutMenuScreen(MainMenuAdapter owner, MainMenuAdapter.NativeFoldoutAdapter foldout)
-            : base(foldout != null ? foldout.SourceKey : null, BuildRootWidget(foldout))
+            : base(BuildRootWidget(foldout))
         {
             _owner = owner;
             _foldout = foldout;

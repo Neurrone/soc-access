@@ -29,6 +29,7 @@ namespace SongsOfConquestAccess.Adapters
         private static readonly Queue<string> SuppressedNativeNotifications = new Queue<string>();
         private static int _activeBlockingVisuals;
         private static int _currentTurnTroopId = -1;
+        private static CombatAdapter _activeAdapter;
 
         public static void HandleResponse(ICommandResponse response)
         {
@@ -243,6 +244,13 @@ namespace SongsOfConquestAccess.Adapters
             SuppressedNativeNotifications.Clear();
             _activeBlockingVisuals = 0;
             _currentTurnTroopId = -1;
+            _activeAdapter = null;
+        }
+
+        public static void SetActiveAdapter(CombatAdapter adapter)
+        {
+            _activeAdapter = adapter;
+            SyncCurrentTurnTroop(adapter);
         }
 
         public static void SyncCurrentTurnTroop(CombatAdapter adapter)
@@ -261,18 +269,17 @@ namespace SongsOfConquestAccess.Adapters
 
         private static CombatAdapter GetAdapter()
         {
-            CombatAdapter adapter = CombatRuntimeScreenProbe.FindActiveCombatAdapter();
-            if (adapter == null || !adapter.IsPresent())
+            if (_activeAdapter == null || !_activeAdapter.IsPresent())
             {
                 return null;
             }
 
             if (_currentTurnTroopId < 0)
             {
-                SyncCurrentTurnTroop(adapter);
+                SyncCurrentTurnTroop(_activeAdapter);
             }
 
-            return adapter;
+            return _activeAdapter;
         }
 
         private static void EnqueueResponse(ICommandResponse response, CombatAdapter adapter)

@@ -38,7 +38,7 @@ namespace SongsOfConquestAccess.Screens
             }
         }
 
-        public static AdventureMapScreen FindActiveAdventureMapScreen()
+        private static AdventureMapScreen FindActiveAdventureMapScreen()
         {
             return FindActiveAdventureMap();
         }

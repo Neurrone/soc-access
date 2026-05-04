@@ -9,6 +9,7 @@ using Lavapotion.Pathfinding;
 using SongsOfConquest;
 using SongsOfConquest.Common.Bacterias;
 using SongsOfConquest.Client.Battle;
+using SongsOfConquest.Client.Battle.Facade;
 using SongsOfConquest.Client.Battle.Controller;
 using SongsOfConquest.Client.Battle.View;
 using SongsOfConquest.Client.InputManagement;
@@ -35,6 +36,8 @@ namespace SongsOfConquestAccess.Adapters
 {
     internal sealed class CombatAdapter
     {
+        private static readonly PropertyInfo InstallerContainerProperty =
+            AccessTools.Property(typeof(BattleSceneInstaller), "Container");
         private static readonly Dictionary<BattleAttackPreview, string> AttackPreviewAdditionalTexts =
             new Dictionary<BattleAttackPreview, string>();
         private readonly object _sourceKey;
@@ -65,6 +68,26 @@ namespace SongsOfConquestAccess.Adapters
         private readonly FieldInfo _attackPreviewAdditionalTextField;
         private GameObject _cursorOverlay;
         private RectTransform[] _cursorOverlaySegments;
+
+        public CombatAdapter(BattleSceneInstaller installer)
+            : this(
+                installer,
+                GetContainer(installer),
+                Resolve<IClientBattleFacade>(GetContainer(installer)),
+                Resolve<IBattleCursorManager>(GetContainer(installer)),
+                Resolve<IBattleGridManager>(GetContainer(installer)),
+                Resolve<IBattlePathManager>(GetContainer(installer)),
+                Resolve<IBattleHighlightManager>(GetContainer(installer)),
+                Resolve<IBattleAttackPreviewHandler>(GetContainer(installer)),
+                Resolve<IBattleTooltipUtility>(GetContainer(installer)),
+                Resolve<IInputManager>(GetContainer(installer)),
+                Resolve<ILocalizationHandler>(GetContainer(installer)),
+                Resolve<ICameraLookup>(GetContainer(installer)),
+                ResolveByTypeName(GetContainer(installer), "Lavapotion.Cartography.ICartographyConverter"),
+                Resolve<IHumanBattleControllerFacade>(GetContainer(installer)),
+                Resolve<MouseKeyboardHumanBattleControllerModule>(GetContainer(installer)))
+        {
+        }
 
         public CombatAdapter(
             object sourceKey,
@@ -126,6 +149,63 @@ namespace SongsOfConquestAccess.Adapters
         public object SourceKey
         {
             get { return _sourceKey; }
+        }
+
+        public bool Matches(ClientBattleCommandsFacade commands)
+        {
+            return commands != null
+                && _facade != null
+                && ReferenceEquals(_facade.Commands, commands);
+        }
+
+        private static DiContainer GetContainer(BattleSceneInstaller installer)
+        {
+            if (installer == null || InstallerContainerProperty == null)
+            {
+                return null;
+            }
+
+            return InstallerContainerProperty.GetValue(installer, null) as DiContainer;
+        }
+
+        private static T Resolve<T>(DiContainer container) where T : class
+        {
+            if (container == null)
+            {
+                return null;
+            }
+
+            try
+            {
+                return container.Resolve<T>();
+            }
+            catch
+            {
+                return null;
+            }
+        }
+
+        private static object ResolveByTypeName(DiContainer container, string typeName)
+        {
+            if (container == null || string.IsNullOrWhiteSpace(typeName))
+            {
+                return null;
+            }
+
+            Type type = AccessTools.TypeByName(typeName);
+            if (type == null)
+            {
+                return null;
+            }
+
+            try
+            {
+                return container.Resolve(type);
+            }
+            catch
+            {
+                return null;
+            }
         }
 
         internal static void CaptureAttackPreviewAdditionalText(BattleAttackPreview preview, string text)
