@@ -1,10 +1,12 @@
 using System;
-using System.Collections.Generic;
+using System.Reflection;
 using HarmonyLib;
 using SongsOfConquest.Client.Adventure;
-using SongsOfConquest.Common.Localization;
-using SongsOfConquest.Common.Rewards;
+using SongsOfConquest.Client.Adventure.UI;
+using SongsOfConquest.Client.UI;
+using SongsOfConquestAccess.Adapters;
 using SongsOfConquestAccess.Events;
+using SongsOfConquestAccess.Speech;
 using UnityEngine;
 
 namespace SongsOfConquestAccess
@@ -12,18 +14,99 @@ namespace SongsOfConquestAccess
     [HarmonyPatch]
     internal static class AdventureNotificationPatches
     {
-        [HarmonyPatch(typeof(AdventureMenuSystem), "ShowRewardWorldNotification", new Type[] { typeof(int), typeof(Vector2Int), typeof(List<RuntimeRewardDataContainer>) })]
+        private static readonly FieldInfo NotificationHudEntrySettingsField =
+            AccessTools.Field(typeof(NotificationHUDEntry), "_settings");
+
+        [HarmonyPatch(typeof(IconNotification), "ShowNotification")]
         [HarmonyPostfix]
-        private static void ShowRewardWorldNotificationPostfix(int commanderId, Vector2Int rewardTilePos, List<RuntimeRewardDataContainer> rewardDataContainers)
+        private static void IconNotificationShowNotificationPostfix(string localizedHeader, string localizedBody)
         {
-            if (rewardDataContainers == null || rewardDataContainers.Count == 0)
+            if (string.IsNullOrWhiteSpace(localizedHeader) && string.IsNullOrWhiteSpace(localizedBody))
             {
-                SoqAccessPlugin.Instance?.LogInfo("Adventure reward notification had no reward data at " + FormatTile(rewardTilePos) + " for commander " + commanderId);
                 return;
             }
 
-            SoqAccessPlugin.Instance?.LogInfo("Adventure reward notification at " + FormatTile(rewardTilePos) + " for commander " + commanderId);
-            AccessibilityEventBus.Publish(new WorldRewardNotificationEvent(commanderId, rewardTilePos, rewardDataContainers));
+            AccessibilityEventBus.Publish(new AdventureIconNotificationEvent(localizedHeader, localizedBody));
+        }
+
+        [HarmonyPatch(typeof(SimpleNotification), "Show", new Type[] { typeof(string), typeof(Vector3), typeof(bool), typeof(bool) })]
+        [HarmonyPostfix]
+        private static void SimpleNotificationShowPostfix(string localizedString)
+        {
+            string normalized = SpeechTextSanitizer.Normalize(localizedString);
+            if (string.IsNullOrWhiteSpace(normalized))
+            {
+                return;
+            }
+
+            AccessibilityEventBus.Publish(new AdventureSimpleNotificationEvent(normalized));
+        }
+
+        [HarmonyPatch(typeof(LevelUpNotification), "ShowNotification")]
+        [HarmonyPostfix]
+        private static void LevelUpNotificationShowNotificationPostfix(string wielderName, int reachedLevel, int factionId, Transform parentNode)
+        {
+            if (string.IsNullOrWhiteSpace(wielderName) && reachedLevel <= 0)
+            {
+                return;
+            }
+
+            AccessibilityEventBus.Publish(new CommanderLevelUpNotificationEvent(wielderName, reachedLevel));
+        }
+
+        [HarmonyPatch(typeof(NotificationHUDEntry), "SetEntry")]
+        [HarmonyPostfix]
+        private static void NotificationHUDEntrySetEntryPostfix(NotificationHUDEntry __instance, NotificationHUDEntryInformation entryInfo, bool setAsLastSibling)
+        {
+            if (entryInfo == null || entryInfo.HasBeenShown)
+            {
+                return;
+            }
+
+            string text = GetNotificationHudEntryText(__instance);
+            if (string.IsNullOrWhiteSpace(text))
+            {
+                text = entryInfo.Text;
+            }
+
+            text = SpeechTextSanitizer.Normalize(text);
+            if (string.IsNullOrWhiteSpace(text))
+            {
+                return;
+            }
+
+            AccessibilityEventBus.Publish(new AdventureHudNotificationEvent(text));
+        }
+
+        [HarmonyPatch(typeof(ObjectiveAnimation), "Show")]
+        [HarmonyPostfix]
+        private static void ObjectiveAnimationShowPostfix(ObjectiveAnimation __instance, ObjectivesHUD.LocalizedObjective localizedObjective, bool canBeCompleted, Vector3 destination, ObjectiveAnimation.ObjectiveState state)
+        {
+            string text = SpeechTextSanitizer.Normalize(GetVisibleText(__instance));
+            if (string.IsNullOrWhiteSpace(text))
+            {
+                return;
+            }
+
+            AccessibilityEventBus.Publish(new ObjectiveNotificationEvent(text));
+        }
+
+        [HarmonyPatch(typeof(AdventureNewRoundPopup), "Show")]
+        [HarmonyPostfix]
+        private static void AdventureNewRoundPopupShowPostfix(AdventureNewRoundPopup __instance, bool requireConfirm, bool blockVisual, string name)
+        {
+            if (requireConfirm)
+            {
+                return;
+            }
+
+            string text = SpeechTextSanitizer.Normalize(GetVisibleText(__instance));
+            if (string.IsNullOrWhiteSpace(text))
+            {
+                return;
+            }
+
+            AccessibilityEventBus.Publish(new AdventureNewTurnPopupEvent(text));
         }
 
         [HarmonyPatch(typeof(CenteredNotification), "Show")]
@@ -67,116 +150,68 @@ namespace SongsOfConquestAccess
             AccessibilityEventBus.Publish(new WorldMessageNotificationEvent(entityId, commanderId, localizedHeader, localizedBody, localizedEffects));
         }
 
-        [HarmonyPatch(typeof(AdventureMenuSystem), "HandleDeniedMove")]
-        [HarmonyPostfix]
-        private static void HandleDeniedMovePostfix(AdventureMenuSystem __instance, DeniedMoveReason reason)
+        private static string GetVisibleText(Component root)
         {
-            string localizedMessage = GetDeniedMoveSpeech(__instance, reason);
-            if (string.IsNullOrWhiteSpace(localizedMessage))
-            {
-                return;
-            }
-
-            SoqAccessPlugin.Instance?.LogInfo("Adventure denied move notification: " + reason);
-            AccessibilityEventBus.Publish(new DeniedMoveNotificationEvent(reason, localizedMessage));
-        }
-
-        [HarmonyPatch(typeof(AdventureMenuSystem), "HandleDeniedEntityInteraction")]
-        [HarmonyPostfix]
-        private static void HandleDeniedEntityInteractionPostfix(OnDeniedEntityInteractionPayload payload)
-        {
-            if (payload == null)
-            {
-                return;
-            }
-
-            // Larger denied-interaction feedback is routed by the game through
-            // ShowWorldNotification(...), which is patched separately. Publishing
-            // here too would announce the same visual notification twice.
-            if (!payload.UseSmallerNotification)
-            {
-                return;
-            }
-
-            if (string.IsNullOrWhiteSpace(payload.LocalizedMessage))
-            {
-                return;
-            }
-
-            SoqAccessPlugin.Instance?.LogInfo("Adventure denied entity notification for entity " + payload.EntityId);
-            AccessibilityEventBus.Publish(new DeniedEntityInteractionNotificationEvent(
-                payload.EntityId,
-                payload.CommanderId,
-                payload.LocalizedEntityName,
-                payload.LocalizedMessage));
-        }
-
-        private static string GetDeniedMoveSpeech(AdventureMenuSystem menuSystem, DeniedMoveReason reason)
-        {
-            string key = GetDeniedMoveLocalizationKey(reason);
-            if (string.IsNullOrWhiteSpace(key))
+            if (root == null)
             {
                 return string.Empty;
             }
 
-            ILocalizationHandler localizationHandler = GetLocalizationHandler(menuSystem);
-            if (localizationHandler == null)
+            UITextMesh[] textMeshes = root.GetComponentsInChildren<UITextMesh>(false);
+            if (textMeshes == null || textMeshes.Length == 0)
             {
-                return key;
+                return string.Empty;
+            }
+
+            System.Text.StringBuilder builder = new System.Text.StringBuilder();
+            for (int i = 0; i < textMeshes.Length; i++)
+            {
+                UITextMesh textMesh = textMeshes[i];
+                if (textMesh == null || !((Component)textMesh).gameObject.activeInHierarchy)
+                {
+                    continue;
+                }
+
+                string text = SpeechTextSanitizer.Normalize(UITextMeshTextUtility.GetEffectiveText(textMesh));
+                if (string.IsNullOrWhiteSpace(text))
+                {
+                    continue;
+                }
+
+                if (builder.Length > 0)
+                {
+                    builder.Append(": ");
+                }
+
+                builder.Append(text);
+            }
+
+            return builder.ToString();
+        }
+
+        private static string GetNotificationHudEntryText(NotificationHUDEntry entry)
+        {
+            if (entry == null || NotificationHudEntrySettingsField == null)
+            {
+                return string.Empty;
             }
 
             try
             {
-                string text = localizationHandler.GetText(key);
-                return string.IsNullOrWhiteSpace(text) ? key : text;
-            }
-            catch (Exception exception)
-            {
-                SoqAccessPlugin.Instance?.LogWarning("Failed to localize denied move notification " + key + ": " + exception.Message);
-                return key;
-            }
-        }
-
-        private static string GetDeniedMoveLocalizationKey(DeniedMoveReason reason)
-        {
-            switch (reason)
-            {
-                case DeniedMoveReason.OutOfMovement:
-                    return "Common/OutOfMovesNotification";
-                case DeniedMoveReason.BattlefieldIsOccupied:
-                    return "Common/DeniedMoveNotification/BattlefieldIsOccupied";
-                case DeniedMoveReason.NotYourTurn:
-                    return "Common/DeniedMoveNotification/NotYourTurn";
-                case DeniedMoveReason.NoPath:
-                    return "Common/DeniedMoveNotification/NoPath";
-                case DeniedMoveReason.Unexplored:
-                    return "Common/DeniedMoveNotification/Unexplored";
-                default:
+                NotificationHUDEntry.Settings settings =
+                    NotificationHudEntrySettingsField.GetValue(entry) as NotificationHUDEntry.Settings;
+                if (settings == null || settings.InformationText == null)
+                {
                     return string.Empty;
-            }
-        }
+                }
 
-        private static ILocalizationHandler GetLocalizationHandler(AdventureMenuSystem menuSystem)
-        {
-            if (menuSystem == null)
-            {
-                return null;
-            }
-
-            try
-            {
-                return AccessTools.Field(typeof(AdventureMenuSystem), "_localizationHandler")?.GetValue(menuSystem) as ILocalizationHandler;
+                return UITextMeshTextUtility.GetEffectiveText(settings.InformationText);
             }
             catch (Exception exception)
             {
-                SoqAccessPlugin.Instance?.LogWarning("Failed to read AdventureMenuSystem localization handler: " + exception.Message);
-                return null;
+                SoqAccessPlugin.Instance?.LogWarning("Failed to read notification HUD entry text: " + exception.Message);
+                return string.Empty;
             }
-        }
-
-        private static string FormatTile(Vector2Int tile)
-        {
-            return tile.x + ", " + tile.y;
         }
     }
 }

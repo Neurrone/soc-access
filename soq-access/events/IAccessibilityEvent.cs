@@ -4,8 +4,6 @@ namespace SongsOfConquestAccess.Events
     {
         string Kind { get; }
 
-        bool Interrupt { get; }
-
         string GetSpeechText();
     }
 }

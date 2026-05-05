@@ -41,9 +41,6 @@ namespace SongsOfConquestAccess.Events
         }
 
         public string Kind { get { return AccessibilityEvents.Story.CameraFocusStarted; } }
-
-        public bool Interrupt { get { return false; } }
-
         public StoryCameraFocusKind FocusKind { get; private set; }
 
         public string FocusReference { get; private set; }

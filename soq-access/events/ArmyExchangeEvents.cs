@@ -13,11 +13,6 @@ namespace SongsOfConquestAccess.Events
             get { return AccessibilityEvents.ArmyExchange.InvalidDestination; }
         }
 
-        public bool Interrupt
-        {
-            get { return true; }
-        }
-
         public string SourceSlotId { get; private set; }
 
         public string TargetSlotId { get; private set; }

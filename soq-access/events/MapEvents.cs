@@ -12,9 +12,6 @@ namespace SongsOfConquestAccess.Events
         }
 
         public string Kind { get { return AccessibilityEvents.Map.WielderSelected; } }
-
-        public bool Interrupt { get { return false; } }
-
         public int WielderId { get; private set; }
 
         public string WielderName { get; private set; }
@@ -37,9 +34,6 @@ namespace SongsOfConquestAccess.Events
         }
 
         public string Kind { get { return AccessibilityEvents.Map.WielderUnselected; } }
-
-        public bool Interrupt { get { return false; } }
-
         public int WielderId { get; private set; }
 
         public string WielderName { get; private set; }
@@ -62,9 +56,6 @@ namespace SongsOfConquestAccess.Events
         }
 
         public string Kind { get { return AccessibilityEvents.Map.WielderMoved; } }
-
-        public bool Interrupt { get { return false; } }
-
         public int WielderId { get; private set; }
 
         public string WielderName { get; private set; }
@@ -92,9 +83,6 @@ namespace SongsOfConquestAccess.Events
         }
 
         public string Kind { get { return AccessibilityEvents.Map.EntitySelected; } }
-
-        public bool Interrupt { get { return false; } }
-
         public int EntityId { get; private set; }
 
         public string EntityName { get; private set; }
@@ -117,9 +105,6 @@ namespace SongsOfConquestAccess.Events
         }
 
         public string Kind { get { return AccessibilityEvents.Map.EntityUnselected; } }
-
-        public bool Interrupt { get { return false; } }
-
         public int EntityId { get; private set; }
 
         public string EntityName { get; private set; }
@@ -142,9 +127,6 @@ namespace SongsOfConquestAccess.Events
         }
 
         public string Kind { get { return AccessibilityEvents.Map.DestinationSet; } }
-
-        public bool Interrupt { get { return false; } }
-
         public int WielderId { get; private set; }
 
         public string WielderName { get; private set; }
@@ -171,9 +153,6 @@ namespace SongsOfConquestAccess.Events
         }
 
         public string Kind { get { return AccessibilityEvents.Map.DestinationCleared; } }
-
-        public bool Interrupt { get { return false; } }
-
         public int WielderId { get; private set; }
 
         public string WielderName { get; private set; }
@@ -196,9 +175,6 @@ namespace SongsOfConquestAccess.Events
         }
 
         public string Kind { get { return AccessibilityEvents.Map.ActionFailed; } }
-
-        public bool Interrupt { get { return false; } }
-
         public Vector2Int Tile { get; private set; }
 
         public string Message { get; private set; }

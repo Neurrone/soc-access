@@ -16,10 +16,13 @@ namespace SongsOfConquestAccess.Events
 
         public static class Notification
         {
-            public const string WorldReward = "notification.world.reward";
+            public const string AdventureIcon = "notification.adventure.icon";
+            public const string AdventureSimple = "notification.adventure.simple";
+            public const string CommanderLevelUp = "notification.adventure.commander_level_up";
+            public const string AdventureHud = "notification.adventure.hud";
+            public const string Objective = "notification.adventure.objective";
+            public const string AdventureNewTurn = "notification.adventure.new_turn";
             public const string WorldMessage = "notification.world.message";
-            public const string DeniedMove = "notification.denied_move";
-            public const string DeniedEntityInteraction = "notification.denied_entity_interaction";
             public const string Centered = "notification.centered";
             public const string CenteredHeavy = "notification.centered_heavy";
         }

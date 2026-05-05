@@ -1,117 +1,137 @@
-using System.Collections.Generic;
 using System.Text;
-using SongsOfConquest.Client.Adventure;
-using SongsOfConquest.Common.Economy;
-using SongsOfConquest.Common.Rewards;
 using SongsOfConquestAccess.Speech;
-using UnityEngine;
 
 namespace SongsOfConquestAccess.Events
 {
     // These events correspond to visual adventure-map notifications shown by the game.
     // They model native notification UI so screen-reader output follows the same feedback
     // sighted players receive.
-    internal sealed class WorldRewardNotificationEvent : IAccessibilityEvent
+    // Detailed adventure-map notification with an icon and optional body text.
+    // Used for claim notifications, claim-with-resources popups, pillage/repair,
+    // siege state changes, artifact notifications, and similar large floating
+    // notifications displayed by IconNotification.ShowNotification(...).
+    internal sealed class AdventureIconNotificationEvent : IAccessibilityEvent
     {
-        public WorldRewardNotificationEvent(int commanderId, Vector2Int rewardTile, IList<RuntimeRewardDataContainer> rewardDataContainers)
+        public AdventureIconNotificationEvent(string header, string body)
         {
-            CommanderId = commanderId;
-            RewardTile = rewardTile;
-            RewardDataContainers = rewardDataContainers != null
-                ? new List<RuntimeRewardDataContainer>(rewardDataContainers)
-                : new List<RuntimeRewardDataContainer>();
+            Header = header ?? string.Empty;
+            Body = body ?? string.Empty;
         }
 
-        public string Kind { get { return AccessibilityEvents.Notification.WorldReward; } }
+        public string Kind { get { return AccessibilityEvents.Notification.AdventureIcon; } }
+        public string Header { get; private set; }
 
-        public bool Interrupt { get { return false; } }
-
-        public int CommanderId { get; private set; }
-
-        public Vector2Int RewardTile { get; private set; }
-
-        public IReadOnlyList<RuntimeRewardDataContainer> RewardDataContainers { get; private set; }
+        public string Body { get; private set; }
 
         public string GetSpeechText()
         {
-            List<string> parts = BuildRewardSummaries();
-            return parts.Count == 0
-                ? string.Empty
-                : SpeechTextSanitizer.Normalize("Reward: " + string.Join(", ", parts.ToArray()));
+            return SpeechTextSanitizer.Normalize(NotificationSpeechText.JoinNonEmpty(null, Header, Body));
         }
-
-        private List<string> BuildRewardSummaries()
-        {
-            List<string> parts = new List<string>();
-            if (RewardDataContainers == null || RewardDataContainers.Count == 0)
-            {
-                return parts;
-            }
-
-            for (int i = 0; i < RewardDataContainers.Count; i++)
-            {
-                string part = BuildRewardPart(RewardDataContainers[i]);
-                if (!string.IsNullOrWhiteSpace(part))
-                {
-                    parts.Add(part);
-                }
-            }
-
-            return parts;
-        }
-
-        private static string BuildRewardPart(RuntimeRewardDataContainer reward)
-        {
-            try
-            {
-                switch (reward.RewardType)
-                {
-                    case RuntimeRewardType.Experience:
-                        RuntimeRewardExperience experience = reward.RewardData as RuntimeRewardExperience;
-                        return experience != null ? experience.Experience + " experience" : "experience";
-                    case RuntimeRewardType.Level:
-                        RuntimeRewardLevel level = reward.RewardData as RuntimeRewardLevel;
-                        return level != null ? level.LevelsToAdd + " level" + PluralSuffix(level.LevelsToAdd) : "level";
-                    case RuntimeRewardType.Resource:
-                    case RuntimeRewardType.RandomExoticResource:
-                        RuntimeRewardResource resource = reward.RewardData as RuntimeRewardResource;
-                        return resource != null ? resource.AmountMinMax.max + " " + FormatResource(resource.Type) : "resources";
-                    case RuntimeRewardType.Artifact:
-                    case RuntimeRewardType.RandomArtifact:
-                        return "artifact";
-                    case RuntimeRewardType.Skill:
-                    case RuntimeRewardType.RandomSkill:
-                        return "skill";
-                    case RuntimeRewardType.Troops:
-                    case RuntimeRewardType.RandomTroopInFaction:
-                        return "troops";
-                    case RuntimeRewardType.Bacteria:
-                        return "effect";
-                    case RuntimeRewardType.StoryObjective:
-                        return "objective progress";
-                    default:
-                        return reward.RewardType.ToString();
-                }
-            }
-            catch (System.Exception exception)
-            {
-                SoqAccessPlugin.Instance?.LogWarning("Failed to build reward notification speech for " + reward.RewardType + ": " + exception.Message);
-                return reward.RewardType.ToString();
-            }
-        }
-
-        private static string FormatResource(ResourceType type)
-        {
-            return type.ToString().ToLowerInvariant();
-        }
-
-        private static string PluralSuffix(int amount)
-        {
-            return amount == 1 ? string.Empty : "s";
-        }
-
     }
 
+    // Small floating adventure-map notification text.
+    // Used for resource rewards, penalties, bacteria/stat changes, commander
+    // messages, entity messages, inventory/market feedback, cursor messages,
+    // and other transient text displayed by SimpleNotification.Show(...).
+    internal sealed class AdventureSimpleNotificationEvent : IAccessibilityEvent
+    {
+        public AdventureSimpleNotificationEvent(string text)
+        {
+            Text = text ?? string.Empty;
+        }
+
+        public string Kind { get { return AccessibilityEvents.Notification.AdventureSimple; } }
+        public string Text { get; private set; }
+
+        public string GetSpeechText()
+        {
+            return SpeechTextSanitizer.Normalize(Text);
+        }
+    }
+
+    // Wielder level-up popup shown above the commander on the adventure map.
+    // The native component displays only the wielder name and the reached level
+    // number, so speech mirrors those visible fields without adding extra wording.
+    internal sealed class CommanderLevelUpNotificationEvent : IAccessibilityEvent
+    {
+        public CommanderLevelUpNotificationEvent(string wielderName, int reachedLevel)
+        {
+            WielderName = wielderName ?? string.Empty;
+            LevelText = reachedLevel.ToString();
+        }
+
+        public string Kind { get { return AccessibilityEvents.Notification.CommanderLevelUp; } }
+        public string WielderName { get; private set; }
+
+        public string LevelText { get; private set; }
+
+        public string GetSpeechText()
+        {
+            return SpeechTextSanitizer.Normalize(NotificationSpeechText.JoinNonEmpty(null, WielderName, LevelText));
+        }
+    }
+
+    // Persistent right-side adventure notification HUD entry.
+    // Used for strategic/log-style notifications such as lost entities, beacon
+    // progress, town threats, player defeated/disconnected, remaining rounds,
+    // hostile growth, and commander max-level messages.
+    internal sealed class AdventureHudNotificationEvent : IAccessibilityEvent
+    {
+        public AdventureHudNotificationEvent(string text)
+        {
+            Text = text ?? string.Empty;
+        }
+
+        public string Kind { get { return AccessibilityEvents.Notification.AdventureHud; } }
+        public string Text { get; private set; }
+
+        public string GetSpeechText()
+        {
+            return SpeechTextSanitizer.Normalize(Text);
+        }
+    }
+
+    // Transient objective update animation shown on the adventure HUD.
+    // Used when objectives are added, updated, or completed; speech mirrors the
+    // visible header plus objective line including progress/optional text.
+    internal sealed class ObjectiveNotificationEvent : IAccessibilityEvent
+    {
+        public ObjectiveNotificationEvent(string text)
+        {
+            Text = text ?? string.Empty;
+        }
+
+        public string Kind { get { return AccessibilityEvents.Notification.Objective; } }
+        public string Text { get; private set; }
+
+        public string GetSpeechText()
+        {
+            return SpeechTextSanitizer.Normalize(Text);
+        }
+    }
+
+    // Non-modal adventure-map new-turn popup shown when control returns to a
+    // local human player/team in online or hotseat-style games. Modal versions
+    // requiring confirm/cancel are handled as popup screens, not notifications.
+    internal sealed class AdventureNewTurnPopupEvent : IAccessibilityEvent
+    {
+        public AdventureNewTurnPopupEvent(string text)
+        {
+            Text = text ?? string.Empty;
+        }
+
+        public string Kind { get { return AccessibilityEvents.Notification.AdventureNewTurn; } }
+        public string Text { get; private set; }
+
+        public string GetSpeechText()
+        {
+            return SpeechTextSanitizer.Normalize(Text);
+        }
+    }
+
+    // World-lore panel notification from AdventureMenuSystem.ShowWorldNotification(...).
+    // Used for larger map-entity messages and denied interactions that display
+    // localized header/body/effects text in the world lore panel.
     internal sealed class WorldMessageNotificationEvent : IAccessibilityEvent
     {
         public WorldMessageNotificationEvent(int entityId, int commanderId, string header, string body, string effects)
@@ -124,9 +144,6 @@ namespace SongsOfConquestAccess.Events
         }
 
         public string Kind { get { return AccessibilityEvents.Notification.WorldMessage; } }
-
-        public bool Interrupt { get { return false; } }
-
         public int EntityId { get; private set; }
 
         public int CommanderId { get; private set; }
@@ -139,10 +156,59 @@ namespace SongsOfConquestAccess.Events
 
         public string GetSpeechText()
         {
-            return SpeechTextSanitizer.Normalize(JoinNonEmpty("Notification", Header, Body, Effects));
+            return SpeechTextSanitizer.Normalize(NotificationSpeechText.JoinNonEmpty("Notification", Header, Body, Effects));
         }
 
-        private static string JoinNonEmpty(string prefix, params string[] values)
+    }
+
+    // Lightweight centered global adventure notification.
+    // Used for short centered messages such as game-saved style feedback.
+    internal sealed class CenteredNotificationEvent : IAccessibilityEvent
+    {
+        private readonly string _text;
+
+        public CenteredNotificationEvent(string text)
+        {
+            _text = SpeechTextSanitizer.Normalize(text);
+            if (string.IsNullOrWhiteSpace(_text))
+            {
+                throw new System.ArgumentException("Centered notification text must be non-empty.", "text");
+            }
+        }
+
+        public string Kind { get { return AccessibilityEvents.Notification.Centered; } }
+        public string GetSpeechText()
+        {
+            return _text;
+        }
+    }
+
+    // Prominent centered adventure notification.
+    // Used for major centered warnings or loss-style messages that the game
+    // displays through CenteredNotificationHeavy.
+    internal sealed class CenteredHeavyNotificationEvent : IAccessibilityEvent
+    {
+        private readonly string _text;
+
+        public CenteredHeavyNotificationEvent(string text)
+        {
+            _text = SpeechTextSanitizer.Normalize(text);
+            if (string.IsNullOrWhiteSpace(_text))
+            {
+                throw new System.ArgumentException("Centered heavy notification text must be non-empty.", "text");
+            }
+        }
+
+        public string Kind { get { return AccessibilityEvents.Notification.CenteredHeavy; } }
+        public string GetSpeechText()
+        {
+            return _text;
+        }
+    }
+
+    internal static class NotificationSpeechText
+    {
+        public static string JoinNonEmpty(string prefix, params string[] values)
         {
             StringBuilder builder = new StringBuilder(prefix ?? string.Empty);
             if (values == null)
@@ -164,103 +230,6 @@ namespace SongsOfConquestAccess.Events
             }
 
             return builder.ToString();
-        }
-
-    }
-
-    internal sealed class DeniedMoveNotificationEvent : IAccessibilityEvent
-    {
-        public DeniedMoveNotificationEvent(DeniedMoveReason reason, string localizedMessage)
-        {
-            Reason = reason;
-            LocalizedMessage = localizedMessage ?? string.Empty;
-        }
-
-        public string Kind { get { return AccessibilityEvents.Notification.DeniedMove; } }
-
-        public bool Interrupt { get { return false; } }
-
-        public DeniedMoveReason Reason { get; private set; }
-
-        public string LocalizedMessage { get; private set; }
-
-        public string GetSpeechText()
-        {
-            return SpeechTextSanitizer.Normalize(LocalizedMessage);
-        }
-    }
-
-    internal sealed class DeniedEntityInteractionNotificationEvent : IAccessibilityEvent
-    {
-        public DeniedEntityInteractionNotificationEvent(int entityId, int commanderId, string entityName, string localizedMessage)
-        {
-            EntityId = entityId;
-            CommanderId = commanderId;
-            EntityName = entityName ?? string.Empty;
-            LocalizedMessage = localizedMessage ?? string.Empty;
-        }
-
-        public string Kind { get { return AccessibilityEvents.Notification.DeniedEntityInteraction; } }
-
-        public bool Interrupt { get { return false; } }
-
-        public int EntityId { get; private set; }
-
-        public int CommanderId { get; private set; }
-
-        public string EntityName { get; private set; }
-
-        public string LocalizedMessage { get; private set; }
-
-        public string GetSpeechText()
-        {
-            return SpeechTextSanitizer.Normalize(LocalizedMessage);
-        }
-    }
-
-    internal sealed class CenteredNotificationEvent : IAccessibilityEvent
-    {
-        private readonly string _text;
-
-        public CenteredNotificationEvent(string text)
-        {
-            _text = SpeechTextSanitizer.Normalize(text);
-            if (string.IsNullOrWhiteSpace(_text))
-            {
-                throw new System.ArgumentException("Centered notification text must be non-empty.", "text");
-            }
-        }
-
-        public string Kind { get { return AccessibilityEvents.Notification.Centered; } }
-
-        public bool Interrupt { get { return false; } }
-
-        public string GetSpeechText()
-        {
-            return _text;
-        }
-    }
-
-    internal sealed class CenteredHeavyNotificationEvent : IAccessibilityEvent
-    {
-        private readonly string _text;
-
-        public CenteredHeavyNotificationEvent(string text)
-        {
-            _text = SpeechTextSanitizer.Normalize(text);
-            if (string.IsNullOrWhiteSpace(_text))
-            {
-                throw new System.ArgumentException("Centered heavy notification text must be non-empty.", "text");
-            }
-        }
-
-        public string Kind { get { return AccessibilityEvents.Notification.CenteredHeavy; } }
-
-        public bool Interrupt { get { return false; } }
-
-        public string GetSpeechText()
-        {
-            return _text;
         }
     }
 }

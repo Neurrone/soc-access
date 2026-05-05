@@ -250,7 +250,6 @@ namespace SongsOfConquestAccess.Events.Combat
     {
         public NewTurnEvent(TroopRef troop) { Troop = troop; }
         public string Kind { get { return AccessibilityEvents.Combat.NewTurn; } }
-        public bool Interrupt { get { return false; } }
         public TroopRef Troop { get; private set; }
         public string GetSpeechText() { return "It is " + Troop.Format(includePosition: true) + "'s turn"; }
     }
@@ -259,7 +258,6 @@ namespace SongsOfConquestAccess.Events.Combat
     {
         public NewRoundEvent(int roundNumber) { RoundNumber = roundNumber; }
         public string Kind { get { return AccessibilityEvents.Combat.NewRound; } }
-        public bool Interrupt { get { return false; } }
         public int RoundNumber { get; private set; }
         public string GetSpeechText() { return RoundNumber > 0 ? "Round " + RoundNumber : string.Empty; }
     }
@@ -267,7 +265,6 @@ namespace SongsOfConquestAccess.Events.Combat
     internal sealed class QueueChangedEvent : IAccessibilityEvent
     {
         public string Kind { get { return AccessibilityEvents.Combat.QueueChanged; } }
-        public bool Interrupt { get { return false; } }
         public string GetSpeechText() { return string.Empty; }
     }
 
@@ -282,7 +279,6 @@ namespace SongsOfConquestAccess.Events.Combat
         }
 
         public string Kind { get { return AccessibilityEvents.Combat.TroopMoved; } }
-        public bool Interrupt { get { return false; } }
         public ActorRef Actor { get; private set; }
         public Vector2Int From { get; private set; }
         public Vector2Int To { get; private set; }
@@ -300,7 +296,6 @@ namespace SongsOfConquestAccess.Events.Combat
         }
 
         public string Kind { get { return AccessibilityEvents.Combat.Attack; } }
-        public bool Interrupt { get { return false; } }
         public ActorRef Attacker { get; private set; }
         public TargetRef Target { get; private set; }
         public AttackTrigger AttackTrigger { get; private set; }
@@ -324,7 +319,6 @@ namespace SongsOfConquestAccess.Events.Combat
         }
 
         public string Kind { get { return AccessibilityEvents.Combat.Damage; } }
-        public bool Interrupt { get { return false; } }
         public ActorRef Attacker { get; private set; }
         public TargetRef Target { get; private set; }
         public int Damage { get; private set; }
@@ -369,7 +363,6 @@ namespace SongsOfConquestAccess.Events.Combat
         }
 
         public string Kind { get { return AccessibilityEvents.Combat.SpellCast; } }
-        public bool Interrupt { get { return false; } }
         public CommanderRef Caster { get; private set; }
         public SpellRef Spell { get; private set; }
         public IReadOnlyList<Vector2Int> SelectedTargetPoints { get; private set; }
@@ -401,7 +394,6 @@ namespace SongsOfConquestAccess.Events.Combat
         }
 
         public string Kind { get { return AccessibilityEvents.Combat.FaeyFire; } }
-        public bool Interrupt { get { return false; } }
         public ActorRef Attacker { get; private set; }
         public IReadOnlyList<FaeyFireDamageSummary> DamageSummaries { get; private set; }
 
@@ -422,7 +414,6 @@ namespace SongsOfConquestAccess.Events.Combat
         // emit bacteria-added announcements separately from modifier details.
         public BacteriaAddedEvent(TroopRef target, BacteriaRef bacteria) { Target = target; Bacteria = bacteria; }
         public string Kind { get { return AccessibilityEvents.Combat.BacteriaAdded; } }
-        public bool Interrupt { get { return false; } }
         public TroopRef Target { get; private set; }
         public BacteriaRef Bacteria { get; private set; }
         public string GetSpeechText() { return Bacteria.Name + " applied to " + Target.Format(includePosition: true); }
@@ -432,7 +423,6 @@ namespace SongsOfConquestAccess.Events.Combat
     {
         public BacteriaRemovedEvent(TroopRef target, BacteriaRef bacteria) { Target = target; Bacteria = bacteria; }
         public string Kind { get { return AccessibilityEvents.Combat.BacteriaRemoved; } }
-        public bool Interrupt { get { return false; } }
         public TroopRef Target { get; private set; }
         public BacteriaRef Bacteria { get; private set; }
         public string GetSpeechText() { return Bacteria.Name + " removed from " + Target.Format(includePosition: true); }
@@ -448,7 +438,6 @@ namespace SongsOfConquestAccess.Events.Combat
         }
 
         public string Kind { get { return AccessibilityEvents.Combat.BacteriaModifierApplied; } }
-        public bool Interrupt { get { return false; } }
         public TroopRef Target { get; private set; }
         public BacteriaRef Bacteria { get; private set; }
         public IReadOnlyList<ModifierChange> Changes { get; private set; }
@@ -478,7 +467,6 @@ namespace SongsOfConquestAccess.Events.Combat
         }
 
         public string Kind { get { return AccessibilityEvents.Combat.EssenceGenerated; } }
-        public bool Interrupt { get { return false; } }
         public ActorRef Actor { get; private set; }
         public int Order { get; private set; }
         public int Creation { get; private set; }
@@ -510,7 +498,6 @@ namespace SongsOfConquestAccess.Events.Combat
     {
         public TroopCreatedEvent(TroopRef troop, bool isSummon) { Troop = troop; IsSummon = isSummon; }
         public string Kind { get { return AccessibilityEvents.Combat.TroopCreated; } }
-        public bool Interrupt { get { return false; } }
         public TroopRef Troop { get; private set; }
         public bool IsSummon { get; private set; }
         public string GetSpeechText() { return Troop.Format(includePosition: true) + (IsSummon ? " summoned" : " created"); }
@@ -520,7 +507,6 @@ namespace SongsOfConquestAccess.Events.Combat
     {
         public MapEntityCreatedEvent(EntityRef entity) { Entity = entity; }
         public string Kind { get { return AccessibilityEvents.Combat.MapEntityCreated; } }
-        public bool Interrupt { get { return false; } }
         public EntityRef Entity { get; private set; }
         public string GetSpeechText() { return Entity.Format() + " appears"; }
     }
@@ -529,7 +515,6 @@ namespace SongsOfConquestAccess.Events.Combat
     {
         public MapEntityDestroyedEvent(EntityRef entity) { Entity = entity; }
         public string Kind { get { return AccessibilityEvents.Combat.MapEntityDestroyed; } }
-        public bool Interrupt { get { return false; } }
         public EntityRef Entity { get; private set; }
         public string GetSpeechText() { return Entity.Format() + " destroyed"; }
     }
@@ -545,7 +530,6 @@ namespace SongsOfConquestAccess.Events.Combat
         }
 
         public string Kind { get { return AccessibilityEvents.Combat.TroopPushed; } }
-        public bool Interrupt { get { return false; } }
         public TroopRef Troop { get; private set; }
         public Vector2Int From { get; private set; }
         public Vector2Int To { get; private set; }
@@ -564,7 +548,6 @@ namespace SongsOfConquestAccess.Events.Combat
         }
 
         public string Kind { get { return AccessibilityEvents.Combat.AbilityUsed; } }
-        public bool Interrupt { get { return false; } }
         public ActorRef Actor { get; private set; }
         public AbilityRef Ability { get; private set; }
         public Vector2Int? TargetingPosition { get; private set; }
@@ -583,7 +566,6 @@ namespace SongsOfConquestAccess.Events.Combat
         }
 
         public string Kind { get { return AccessibilityEvents.Combat.Teleport; } }
-        public bool Interrupt { get { return false; } }
         public ActorRef Actor { get; private set; }
         public Vector2Int From { get; private set; }
         public Vector2Int To { get; private set; }
@@ -595,7 +577,6 @@ namespace SongsOfConquestAccess.Events.Combat
     {
         public BurrowUpEvent(ActorRef actor, bool succeeded) { Actor = actor; Succeeded = succeeded; }
         public string Kind { get { return AccessibilityEvents.Combat.BurrowUp; } }
-        public bool Interrupt { get { return false; } }
         public ActorRef Actor { get; private set; }
         public bool Succeeded { get; private set; }
         public string GetSpeechText() { return Succeeded ? Actor.Format() + " burrows up" : Actor.Format() + ", failed burrow"; }
@@ -604,7 +585,6 @@ namespace SongsOfConquestAccess.Events.Combat
     internal sealed class AbilityCompleteEvent : IAccessibilityEvent
     {
         public string Kind { get { return AccessibilityEvents.Combat.AbilityComplete; } }
-        public bool Interrupt { get { return false; } }
         public string GetSpeechText() { return string.Empty; }
     }
 
@@ -621,7 +601,6 @@ namespace SongsOfConquestAccess.Events.Combat
         }
 
         public string Kind { get { return AccessibilityEvents.Combat.BattleResult; } }
-        public bool Interrupt { get { return false; } }
         public int LocalTeamId { get; private set; }
         public BattleOutcome LocalOutcome { get; private set; }
         public int AttackerTeamId { get; private set; }
@@ -658,7 +637,6 @@ namespace SongsOfConquestAccess.Events.Combat
         }
 
         public string Kind { get { return AccessibilityEvents.Combat.HudNotification; } }
-        public bool Interrupt { get { return false; } }
         public string Text { get; private set; }
         public string GetSpeechText() { return SpeechTextSanitizer.Normalize(Text); }
     }

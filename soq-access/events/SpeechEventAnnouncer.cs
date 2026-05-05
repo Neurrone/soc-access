@@ -43,7 +43,7 @@ namespace SongsOfConquestAccess.Events
                 return;
             }
 
-            SpeechPipeline.Output(new SpeechRequest(text, accessibilityEvent.Interrupt));
+            SpeechPipeline.Output(new SpeechRequest(text, false));
         }
     }
 }
