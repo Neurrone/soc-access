@@ -217,4 +217,50 @@ namespace SongsOfConquestAccess.Events
             return SpeechTextSanitizer.Normalize(LocalizedMessage);
         }
     }
+
+    internal sealed class CenteredNotificationEvent : IAccessibilityEvent
+    {
+        private readonly string _text;
+
+        public CenteredNotificationEvent(string text)
+        {
+            _text = SpeechTextSanitizer.Normalize(text);
+            if (string.IsNullOrWhiteSpace(_text))
+            {
+                throw new System.ArgumentException("Centered notification text must be non-empty.", "text");
+            }
+        }
+
+        public string Kind { get { return AccessibilityEvents.Notification.Centered; } }
+
+        public bool Interrupt { get { return false; } }
+
+        public string GetSpeechText()
+        {
+            return _text;
+        }
+    }
+
+    internal sealed class CenteredHeavyNotificationEvent : IAccessibilityEvent
+    {
+        private readonly string _text;
+
+        public CenteredHeavyNotificationEvent(string text)
+        {
+            _text = SpeechTextSanitizer.Normalize(text);
+            if (string.IsNullOrWhiteSpace(_text))
+            {
+                throw new System.ArgumentException("Centered heavy notification text must be non-empty.", "text");
+            }
+        }
+
+        public string Kind { get { return AccessibilityEvents.Notification.CenteredHeavy; } }
+
+        public bool Interrupt { get { return false; } }
+
+        public string GetSpeechText()
+        {
+            return _text;
+        }
+    }
 }

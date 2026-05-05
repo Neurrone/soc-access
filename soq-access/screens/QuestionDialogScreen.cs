@@ -6,9 +6,9 @@ namespace SongsOfConquestAccess.Screens
 {
     internal sealed class QuestionDialogScreen : Screen
     {
-        private readonly QuestionDialogAdapter _adapter;
+        private readonly IQuestionDialogAdapter _adapter;
 
-        public QuestionDialogScreen(QuestionDialogAdapter adapter)
+        public QuestionDialogScreen(IQuestionDialogAdapter adapter)
             : base(BuildRootWidget(adapter))
         {
             _adapter = adapter;
@@ -19,17 +19,22 @@ namespace SongsOfConquestAccess.Screens
             return _adapter != null && _adapter.IsPresent();
         }
 
+        public object SourceKey
+        {
+            get { return _adapter != null ? _adapter.SourceKey : null; }
+        }
+
         public override bool OnActionJustPressed(InputAction action)
         {
             if (action != null && action.Key == AccessibilityActions.Cancel.Key)
             {
-                return _adapter != null && _adapter.ActivateAction(2);
+                return _adapter != null && _adapter.HasNegativeAction && _adapter.ActivateAction(DialogAction.Negative);
             }
 
             return base.OnActionJustPressed(action);
         }
 
-        private static ContainerWidget BuildRootWidget(QuestionDialogAdapter adapter)
+        private static ContainerWidget BuildRootWidget(IQuestionDialogAdapter adapter)
         {
             string title = adapter != null ? adapter.Title : string.Empty;
             string dialogLabel = string.IsNullOrWhiteSpace(title) ? "dialog" : title + " dialog";
@@ -42,7 +47,7 @@ namespace SongsOfConquestAccess.Screens
                 {
                     if (adapter != null)
                     {
-                        adapter.SyncNativeSelection(0);
+                        adapter.SyncNativeSelection(DialogAction.Body);
                     }
                 },
                 includeParentLabelInAnnouncement: true));
@@ -50,28 +55,30 @@ namespace SongsOfConquestAccess.Screens
             root.AddChild(new ButtonWidget(
                 "positive",
                 adapter != null ? adapter.PositiveLabel : string.Empty,
-                () => adapter != null && adapter.ActivateAction(1),
+                () => adapter != null && adapter.ActivateAction(DialogAction.Positive),
                 () =>
                 {
                     if (adapter != null)
                     {
-                        adapter.SyncNativeSelection(1);
+                        adapter.SyncNativeSelection(DialogAction.Positive);
                     }
                 },
-                () => adapter != null));
+                () => adapter != null && adapter.HasPositiveAction,
+                () => adapter != null && adapter.HasPositiveAction));
 
             root.AddChild(new ButtonWidget(
                 "negative",
                 adapter != null ? adapter.NegativeLabel : string.Empty,
-                () => adapter != null && adapter.ActivateAction(2),
+                () => adapter != null && adapter.ActivateAction(DialogAction.Negative),
                 () =>
                 {
                     if (adapter != null)
                     {
-                        adapter.SyncNativeSelection(2);
+                        adapter.SyncNativeSelection(DialogAction.Negative);
                     }
                 },
-                () => adapter != null));
+                () => adapter != null && adapter.HasNegativeAction,
+                () => adapter != null && adapter.HasNegativeAction));
 
             return root;
         }

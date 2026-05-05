@@ -26,6 +26,32 @@ namespace SongsOfConquestAccess
             AccessibilityEventBus.Publish(new WorldRewardNotificationEvent(commanderId, rewardTilePos, rewardDataContainers));
         }
 
+        [HarmonyPatch(typeof(CenteredNotification), "Show")]
+        [HarmonyPostfix]
+        private static void CenteredNotificationShowPostfix(string text)
+        {
+            string normalized = SongsOfConquestAccess.Speech.SpeechTextSanitizer.Normalize(text);
+            if (string.IsNullOrWhiteSpace(normalized))
+            {
+                return;
+            }
+
+            AccessibilityEventBus.Publish(new CenteredNotificationEvent(normalized));
+        }
+
+        [HarmonyPatch(typeof(CenteredNotificationHeavy), "Show")]
+        [HarmonyPostfix]
+        private static void CenteredNotificationHeavyShowPostfix(string text)
+        {
+            string normalized = SongsOfConquestAccess.Speech.SpeechTextSanitizer.Normalize(text);
+            if (string.IsNullOrWhiteSpace(normalized))
+            {
+                return;
+            }
+
+            AccessibilityEventBus.Publish(new CenteredHeavyNotificationEvent(normalized));
+        }
+
         [HarmonyPatch(typeof(AdventureMenuSystem), "ShowWorldNotification")]
         [HarmonyPostfix]
         private static void ShowWorldNotificationPostfix(int entityId, int commanderId, string localizedHeader, string localizedBody, string localizedEffects)

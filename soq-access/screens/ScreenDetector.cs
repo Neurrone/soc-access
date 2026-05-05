@@ -1,4 +1,6 @@
 using System.Collections.Generic;
+using _8_UILayer.ClientView.Menu.Paus;
+using SongsOfConquest.Client;
 using SongsOfConquest.Client.Adventure;
 using SongsOfConquest.Client.Adventure.UI;
 using SongsOfConquest.Client.Adventure.View;
@@ -43,9 +45,91 @@ namespace SongsOfConquestAccess.Screens
                 new LetterboxStoryTextRuntimeScreenProbe(),
                 new StoryTextRuntimeScreenProbe(),
                 new DialogueMenuRuntimeScreenProbe(),
+                new PauseMenuRuntimeScreenProbe(),
                 new QuestionDialogRuntimeScreenProbe(),
+                new ConfirmPopupRuntimeScreenProbe(),
+                new SystemPopupRuntimeScreenProbe(),
+                new QuitToDesktopPopupRuntimeScreenProbe(),
                 new TutorialRuntimeScreenProbe()
             };
+        }
+
+        public void OnPauseMenuReady(PauseMenu pauseMenu)
+        {
+            PauseMenuScreen screen = new PauseMenuScreen(new PauseMenuAdapter(pauseMenu));
+            if (_screenManager.CurrentScreen is PauseMenuScreen)
+            {
+                _screenManager.RefreshTop<PauseMenuScreen>(screen, "pause menu changed");
+                return;
+            }
+
+            Push(screen, "pause menu ready");
+        }
+
+        public void OnPauseMenuClosed(PauseMenu pauseMenu)
+        {
+            _screenManager.Pop<PauseMenuScreen>("pause menu closed");
+        }
+
+        public void OnConfirmPopupReady(ConfirmPopup popup)
+        {
+            ConfirmPopupAdapter adapter = new ConfirmPopupAdapter(popup);
+            if (!adapter.IsPresent())
+            {
+                return;
+            }
+
+            Push(new QuestionDialogScreen(adapter), "confirm popup ready");
+        }
+
+        public void OnConfirmPopupClosed(ConfirmPopup popup)
+        {
+            if (!IsCurrentQuestionDialogSource(popup))
+            {
+                return;
+            }
+
+            _screenManager.Pop<QuestionDialogScreen>("confirm popup closed");
+        }
+
+        public void OnSystemPopupReady(SystemPopup popup)
+        {
+            SystemPopupAdapter adapter = new SystemPopupAdapter(popup);
+            if (!adapter.IsPresent())
+            {
+                return;
+            }
+
+            Push(new QuestionDialogScreen(adapter), "system popup ready");
+        }
+
+        public void OnSystemPopupClosed(SystemPopup popup)
+        {
+            if (!IsCurrentQuestionDialogSource(popup))
+            {
+                return;
+            }
+
+            _screenManager.Pop<QuestionDialogScreen>("system popup closed");
+        }
+
+        public void OnQuitToDesktopPopupReady(QuitToDesktopPopup popup)
+        {
+            QuitToDesktopPopupAdapter adapter = new QuitToDesktopPopupAdapter(popup);
+            if (!adapter.IsPresent())
+            {
+                return;
+            }
+
+            Push(new QuitToDesktopPopupScreen(adapter), "quit to desktop popup ready");
+        }
+
+        public void OnQuitToDesktopPopupClosed(QuitToDesktopPopup popup)
+        {
+            if (_screenManager.CurrentScreen is QuitToDesktopPopupScreen)
+            {
+                _screenManager.Pop<QuitToDesktopPopupScreen>("quit to desktop popup closed");
+            }
         }
 
         public void OnTutorialReady(TutorialMenu tutorialMenu)
@@ -102,6 +186,11 @@ namespace SongsOfConquestAccess.Screens
 
         public void OnQuestionDialogClosed(object sourceKey)
         {
+            if (sourceKey != null && !IsCurrentQuestionDialogSource(sourceKey))
+            {
+                return;
+            }
+
             _screenManager.Pop<QuestionDialogScreen>("question dialog closed");
         }
 
@@ -598,6 +687,20 @@ namespace SongsOfConquestAccess.Screens
                 + reason
                 + "; unexpected top screen "
                 + (current != null ? current.GetType().Name : "<none>"));
+        }
+
+        private bool IsCurrentQuestionDialogSource(object sourceKey)
+        {
+            QuestionDialogScreen screen = _screenManager.CurrentScreen as QuestionDialogScreen;
+            if (screen == null)
+            {
+                return false;
+            }
+
+            object currentSourceKey = screen.SourceKey;
+            return sourceKey == null
+                || currentSourceKey == null
+                || ReferenceEquals(sourceKey, currentSourceKey);
         }
     }
 }

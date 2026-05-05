@@ -20,6 +20,8 @@ namespace SongsOfConquestAccess.Events
             public const string WorldMessage = "notification.world.message";
             public const string DeniedMove = "notification.denied_move";
             public const string DeniedEntityInteraction = "notification.denied_entity_interaction";
+            public const string Centered = "notification.centered";
+            public const string CenteredHeavy = "notification.centered_heavy";
         }
 
         public static class Story

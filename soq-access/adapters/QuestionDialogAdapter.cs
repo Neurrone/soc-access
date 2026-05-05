@@ -8,7 +8,7 @@ using UnityEngine.UI;
 
 namespace SongsOfConquestAccess.Adapters
 {
-    internal sealed class QuestionDialogAdapter
+    internal sealed class QuestionDialogAdapter : IQuestionDialogAdapter
     {
         private readonly object _sourceKey;
         private readonly IUITransform _containerTransform;
@@ -82,6 +82,16 @@ namespace SongsOfConquestAccess.Adapters
             get { return GetActionLabel(1); }
         }
 
+        public bool HasPositiveAction
+        {
+            get { return IsButtonActive(_positiveButton); }
+        }
+
+        public bool HasNegativeAction
+        {
+            get { return IsButtonActive(_negativeButton); }
+        }
+
         public bool IsPresent()
         {
             if (_containerTransform == null)
@@ -90,15 +100,15 @@ namespace SongsOfConquestAccess.Adapters
             }
 
             return _containerTransform.Active
-                && IsButtonActive(_positiveButton)
-                && IsButtonActive(_negativeButton)
+                && HasPositiveAction
+                && HasNegativeAction
                 && _inputField != null
                 && !_inputField.Active;
         }
 
-        public void SyncNativeSelection(int focusIndex)
+        public void SyncNativeSelection(DialogAction action)
         {
-            if (focusIndex <= 0)
+            if (action == DialogAction.Body)
             {
                 if (EventSystem.current != null)
                 {
@@ -109,12 +119,12 @@ namespace SongsOfConquestAccess.Adapters
             }
 
             Selectable selectable = null;
-            switch (focusIndex)
+            switch (action)
             {
-                case 1:
+                case DialogAction.Positive:
                     selectable = GetSelectable(_positiveButton);
                     break;
-                case 2:
+                case DialogAction.Negative:
                     selectable = GetSelectable(_negativeButton);
                     break;
             }
@@ -133,13 +143,13 @@ namespace SongsOfConquestAccess.Adapters
             selectable.Select();
         }
 
-        public bool ActivateAction(int focusIndex)
+        public bool ActivateAction(DialogAction action)
         {
-            switch (focusIndex)
+            switch (action)
             {
-                case 1:
+                case DialogAction.Positive:
                     return InvokeButton(_positiveButton);
-                case 2:
+                case DialogAction.Negative:
                     return InvokeButton(_negativeButton);
                 default:
                     return false;
