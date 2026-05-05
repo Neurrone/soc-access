@@ -24,9 +24,12 @@ using SongsOfConquest.Common.Entities;
 using SongsOfConquest.Common.Gamestate;
 using SongsOfConquest.Common.Localization;
 using SongsOfConquest.Common.Spells;
+using SongsOfConquest.Server.Bacterias;
 using SongsOfConquest.Server.Battle;
 using SongsOfConquestAccess.Events.Combat;
+using SongsOfConquestAccess.Scanner;
 using SongsOfConquestAccess.Speech;
+using SongsOfConquestAccess.Speech.Spatial;
 using SongsOfConquestAccess.UI;
 using SongsOfConquest.Utilities;
 using Unity.Mathematics;
@@ -353,6 +356,112 @@ namespace SongsOfConquestAccess.Adapters
             tile.Entity = GetAttackableEntityAt(point);
             tile.DecorativeFeature = GetDecorativeFeatureAt(point, tile.Entity);
             return tile;
+        }
+
+        public ScannerSnapshot BuildScannerSnapshot(Vector2Int origin)
+        {
+            ScannerSnapshot snapshot = new ScannerSnapshot();
+            if (_facade == null || _facade.Level == null)
+            {
+                return snapshot;
+            }
+
+            AddCombatTroopScannerResults(snapshot);
+            AddCombatEntityScannerResults(snapshot);
+            AddCombatTerrainScannerResults(snapshot);
+            snapshot.SortByDistance(origin);
+            return snapshot;
+        }
+
+        private void AddCombatTroopScannerResults(ScannerSnapshot snapshot)
+        {
+            for (int y = 0; y < _facade.Level.Size.y; y++)
+            {
+                for (int x = 0; x < _facade.Level.Size.x; x++)
+                {
+                    Vector2Int point = new Vector2Int(x, y);
+                    CombatTile tile = GetTile(point);
+                    if (tile == null)
+                    {
+                        continue;
+                    }
+
+                    if (tile.Troop != null)
+                    {
+                        snapshot.Add("Troops", IsFriendlyTroop(tile.Troop) ? "Friendly" : "Enemy",
+                            new ScannerResult(FormatTroopGridLabel(tile.Troop), point));
+                    }
+                }
+            }
+        }
+
+        private void AddCombatEntityScannerResults(ScannerSnapshot snapshot)
+        {
+            for (int y = 0; y < _facade.Level.Size.y; y++)
+            {
+                for (int x = 0; x < _facade.Level.Size.x; x++)
+                {
+                    Vector2Int point = new Vector2Int(x, y);
+                    CombatTile tile = GetTile(point);
+                    if (tile == null)
+                    {
+                        continue;
+                    }
+
+                    IMapEntity mapEntity = _facade.MapEntities != null ? _facade.MapEntities.GetAtIncludingNonBlockers(point) : null;
+                    if (mapEntity != null && mapEntity.IsEnabled && mapEntity.IsVisibleInGame)
+                    {
+                        if (mapEntity.Category == MapEntityCategory.TownWallGate)
+                        {
+                            snapshot.Add("Entities", IsFriendlyMapEntity(mapEntity) ? "Friendly gates" : "Enemy gates",
+                                new ScannerResult(GetMapEntityName(mapEntity), point));
+                        }
+                        else if (tile.Entity != null)
+                        {
+                            snapshot.Add("Entities", "Attackable",
+                                new ScannerResult(GetMapEntityName(tile.Entity), point));
+                        }
+                        else if (IsDangerousMapEntity(mapEntity))
+                        {
+                            snapshot.Add("Entities", "Dangerous",
+                                new ScannerResult(GetMapEntityName(mapEntity), point));
+                        }
+                    }
+                }
+            }
+        }
+
+        private void AddCombatTerrainScannerResults(ScannerSnapshot snapshot)
+        {
+            for (int y = 0; y < _facade.Level.Size.y; y++)
+            {
+                for (int x = 0; x < _facade.Level.Size.x; x++)
+                {
+                    Vector2Int point = new Vector2Int(x, y);
+                    CombatTile tile = GetTile(point);
+                    if (tile == null)
+                    {
+                        continue;
+                    }
+
+                    if (tile.Elevation > 0)
+                    {
+                        snapshot.Add("Terrain", "Elevated ground",
+                            new ScannerResult("elevated ground, height " + tile.Elevation, point));
+                    }
+
+                    if (!tile.IsWalkable)
+                    {
+                        snapshot.Add("Terrain", "Impassable terrain",
+                            new ScannerResult("impassable", point));
+                    }
+                }
+            }
+        }
+
+        public bool ValidateScannerResult(ScannerResult result)
+        {
+            return result != null && IsValidTile(result.Position);
         }
 
         public bool IsValidTile(Vector2Int point)
@@ -994,53 +1103,7 @@ namespace SongsOfConquestAccess.Adapters
 
         public string DescribeTile(CombatTile tile, CombatInspectContext context)
         {
-            if (tile == null)
-            {
-                return "Combat grid";
-            }
-
-            List<string> parts = new List<string>();
-            if (context == null && tile.IsReachable)
-            {
-                parts.Add("reachable");
-            }
-
-            if (tile.Troop != null)
-            {
-                parts.Add(DescribeTroop(tile.Troop));
-            }
-            else if (tile.Entity != null)
-            {
-                parts.Add(DescribeEntity(tile.Entity));
-            }
-
-            if (!tile.IsWalkable)
-            {
-                parts.Add("blocked");
-            }
-
-            if (tile.Elevation > 0)
-            {
-                parts.Add("elevated ground, height " + tile.Elevation);
-            }
-
-            if (context != null)
-            {
-                context.AddIndicators(tile.Point, parts);
-            }
-            else
-            {
-                AddEnemyInfluence(tile.Point, tile.Troop, parts);
-            }
-
-            if (!string.IsNullOrWhiteSpace(tile.DecorativeFeature))
-            {
-                parts.Add(tile.DecorativeFeature);
-            }
-
-            parts.Add(FormatPoint(tile.Point));
-
-            return string.Join(", ", parts.ToArray());
+            return new CombatTileSpeechFormatter(this, context).DescribeTile(tile);
         }
 
         private void SynchronizeNativeHoverForInput(Vector2Int point)
@@ -1343,7 +1406,7 @@ namespace SongsOfConquestAccess.Adapters
             SynchronizeNativeHoverForPreview(troop.Position);
 
             CombatInspectContext context = CombatInspectContext.ForStack(troop.Position);
-            context.TargetLabel = DescribeTroop(troop);
+            context.TargetLabel = DescribeTroopForSpeech(troop);
             BuildStackRanges(troop, context);
             context.TooltipDetails = _tooltipUtility != null ? _tooltipUtility.GetInspectTroopDetails(troop) : null;
             return context;
@@ -1394,7 +1457,7 @@ namespace SongsOfConquestAccess.Adapters
             CombatInspectContext context = PathfinderExtensions.IsReachable(path, GetCurrentMovesLeft(), true)
                 ? CombatInspectContext.ForEntityPath(entity.Position, ConvertPath(path))
                 : CombatInspectContext.ForEntityOnly(entity.Position);
-            context.TargetLabel = DescribeEntity(entity);
+            context.TargetLabel = DescribeEntityForSpeech(entity);
             context.TooltipDetails = BuildEntityDetails(entity);
             return context;
         }
@@ -1582,7 +1645,7 @@ namespace SongsOfConquestAccess.Adapters
             }
         }
 
-        private void AddEnemyInfluence(Vector2Int point, IBattleTroopState occupyingTroop, List<string> parts)
+        internal void AddEnemyInfluenceForSpeech(Vector2Int point, IBattleTroopState occupyingTroop, List<string> parts)
         {
             if (_facade == null || _facade.Troops == null || _facade.Teams == null || _facade.Teams.Current == null)
             {
@@ -1678,6 +1741,70 @@ namespace SongsOfConquestAccess.Adapters
             return _facade != null && _facade.Troops != null ? _facade.Troops.Current : null;
         }
 
+        private bool IsFriendlyTroop(IBattleTroopState troop)
+        {
+            int localTeamId = GetLocalTeamId();
+            return troop != null && (localTeamId < 0 || troop.TeamId == localTeamId);
+        }
+
+        private bool IsFriendlyMapEntity(IMapEntity entity)
+        {
+            if (entity == null || _facade == null || _facade.MapEntities == null)
+            {
+                return false;
+            }
+
+            try
+            {
+                int owningTeamId = _facade.MapEntities.GetOwningTeamId(entity.Id);
+                int localTeamId = GetLocalTeamId();
+                return localTeamId >= 0 && owningTeamId == localTeamId;
+            }
+            catch
+            {
+                return false;
+            }
+        }
+
+        private bool IsDangerousMapEntity(IMapEntity entity)
+        {
+            if (entity == null || entity.Bacterias == null || entity.Bacterias.Count == 0 || _container == null)
+            {
+                return false;
+            }
+
+            try
+            {
+                IBacteriaLookup bacteriaLookup = Resolve<IBacteriaLookup>(_container);
+                if (bacteriaLookup == null)
+                {
+                    return false;
+                }
+
+                foreach (BacteriaReference bacteriaReference in entity.Bacterias)
+                {
+                    BacteriaInformation bacteria = bacteriaLookup.GetInformation(bacteriaReference.BacteriaType);
+                    if (bacteria == null || bacteria.CustomEffectData.CustomEffect != GenericBacteriaCustomEffect.Aura)
+                    {
+                        continue;
+                    }
+
+                    BacteriaInformation auraBacteria = bacteriaLookup.GetInformation(bacteria.AuraSettings.BacteriaToAdd.BacteriaType);
+                    if (auraBacteria != null
+                        && (auraBacteria.CustomEffectData.CustomEffect == GenericBacteriaCustomEffect.Damage
+                            || auraBacteria.CustomEffectData.CustomEffect == GenericBacteriaCustomEffect.KillAmount))
+                    {
+                        return true;
+                    }
+                }
+            }
+            catch
+            {
+            }
+
+            return false;
+        }
+
         private int GetCurrentMovesLeft()
         {
             IBattleTroopState current = GetCurrentTroop();
@@ -1725,12 +1852,12 @@ namespace SongsOfConquestAccess.Adapters
             return IsDebris(entity) ? "debris" : string.Empty;
         }
 
-        private string DescribeTroop(IBattleTroopState troop)
+        internal string DescribeTroopForSpeech(IBattleTroopState troop)
         {
             return FormatTroopGridLabel(troop);
         }
 
-        private string DescribeEntity(IMapEntity entity)
+        internal string DescribeEntityForSpeech(IMapEntity entity)
         {
             string name = GetMapEntityName(entity);
             if (string.IsNullOrWhiteSpace(name))
@@ -2144,7 +2271,9 @@ namespace SongsOfConquestAccess.Adapters
             _cursorOverlay = new GameObject("SongsOfConquestAccess_CombatCursor");
             Canvas canvas = _cursorOverlay.AddComponent<Canvas>();
             canvas.renderMode = RenderMode.ScreenSpaceOverlay;
-            canvas.sortingOrder = short.MaxValue;
+            // Keep the cursor above map visuals and the native overlay canvas
+            // (29998), but below native tooltip canvases (30001) and windows.
+            canvas.sortingOrder = 29999;
             CanvasScaler scaler = _cursorOverlay.AddComponent<CanvasScaler>();
             scaler.uiScaleMode = CanvasScaler.ScaleMode.ConstantPixelSize;
             CanvasGroup canvasGroup = _cursorOverlay.AddComponent<CanvasGroup>();

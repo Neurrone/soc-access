@@ -53,6 +53,7 @@ namespace SongsOfConquestAccess.Screens
         {
             RootWidget?.Unfocus();
             _adapter?.ClearNativeTooltip();
+            _adapter?.ClearFocusedTileOverlay();
         }
 
         public override void OnPop()

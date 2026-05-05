@@ -2,7 +2,9 @@ using System.Collections.Generic;
 using SongsOfConquest.Common.Entities.Adventure;
 using SongsOfConquestAccess.Adapters;
 using SongsOfConquestAccess.Input;
+using SongsOfConquestAccess.Scanner;
 using SongsOfConquestAccess.Speech;
+using SongsOfConquestAccess.Speech.Spatial;
 using UnityEngine;
 
 namespace SongsOfConquestAccess.UI
@@ -13,6 +15,7 @@ namespace SongsOfConquestAccess.UI
         private TroopPlacementSnapshot _snapshot;
         private Vector2Int _cursor;
         private Vector2Int? _dragSource;
+        private readonly ScannerController _scanner;
 
         public TroopPlacementHexGrid(PreBattleMenuAdapter adapter)
             : base("pre-battle-hex-grid")
@@ -20,6 +23,19 @@ namespace SongsOfConquestAccess.UI
             _adapter = adapter;
             RefreshSnapshot();
             _cursor = GetInitialCursor();
+            _scanner = new ScannerController(
+                origin => _adapter != null ? _adapter.BuildScannerSnapshot(origin) : null,
+                () => _cursor,
+                result => _adapter != null && _adapter.ValidateScannerResult(result),
+                JumpToScannerResult,
+                (result, directions, index, count) => new TroopPlacementScannerSpeechContext(
+                    result,
+                    GetScannerTile(result),
+                    _snapshot,
+                    directions,
+                    index,
+                    count),
+                ScannerDirectionMode.Hex);
         }
 
         public override bool AnnounceName
@@ -29,13 +45,13 @@ namespace SongsOfConquestAccess.UI
 
         public override string GetRole()
         {
-            return "hex grid";
+            return string.Empty;
         }
 
         public override string GetLabel()
         {
             TroopPlacementTile tile = GetFocusedTile();
-            return tile != null ? Describe(tile) : "Troop placement grid";
+            return new TroopPlacementTileSpeechFormatter(_snapshot).DescribeTile(tile);
         }
 
         public override Tooltip GetTooltip()
@@ -51,13 +67,10 @@ namespace SongsOfConquestAccess.UI
                 || actionKey == AccessibilityActions.HexGridNorthEast.Key
                 || actionKey == AccessibilityActions.HexGridSouthWest.Key
                 || actionKey == AccessibilityActions.HexGridSouthEast.Key
-                || actionKey == AccessibilityActions.TroopPlacementNextOwnSpawn.Key
-                || actionKey == AccessibilityActions.TroopPlacementPreviousOwnSpawn.Key
-                || actionKey == AccessibilityActions.TroopPlacementNextEnemySpawn.Key
-                || actionKey == AccessibilityActions.TroopPlacementPreviousEnemySpawn.Key
                 || actionKey == AccessibilityActions.TroopPlacementStartDrag.Key
                 || actionKey == AccessibilityActions.Activate.Key
-                || actionKey == AccessibilityActions.TroopPlacementCancelDrag.Key;
+                || actionKey == AccessibilityActions.TroopPlacementCancelDrag.Key
+                || IsScannerAction(actionKey);
         }
 
         public override bool HasClaimInTree(string actionKey)
@@ -70,6 +83,11 @@ namespace SongsOfConquestAccess.UI
             if (action == null)
             {
                 return false;
+            }
+
+            if (HandleScannerAction(action))
+            {
+                return true;
             }
 
             if (action.Key == AccessibilityActions.HexGridWest.Key)
@@ -100,26 +118,6 @@ namespace SongsOfConquestAccess.UI
             if (action.Key == AccessibilityActions.HexGridSouthEast.Key)
             {
                 return MoveDiagonal(north: false, east: true);
-            }
-
-            if (action.Key == AccessibilityActions.TroopPlacementNextOwnSpawn.Key)
-            {
-                return CycleSpawnPoint(own: true, delta: 1);
-            }
-
-            if (action.Key == AccessibilityActions.TroopPlacementPreviousOwnSpawn.Key)
-            {
-                return CycleSpawnPoint(own: true, delta: -1);
-            }
-
-            if (action.Key == AccessibilityActions.TroopPlacementNextEnemySpawn.Key)
-            {
-                return CycleSpawnPoint(own: false, delta: 1);
-            }
-
-            if (action.Key == AccessibilityActions.TroopPlacementPreviousEnemySpawn.Key)
-            {
-                return CycleSpawnPoint(own: false, delta: -1);
             }
 
             if (action.Key == AccessibilityActions.TroopPlacementStartDrag.Key)
@@ -189,33 +187,6 @@ namespace SongsOfConquestAccess.UI
             return Move(xDelta, yDelta);
         }
 
-        private bool CycleSpawnPoint(bool own, int delta)
-        {
-            if (_snapshot == null)
-            {
-                RefreshSnapshot();
-            }
-
-            List<TroopPlacementTile> spawnPoints = _snapshot != null ? _snapshot.GetSpawnPoints(own) : null;
-            if (spawnPoints == null || spawnPoints.Count == 0)
-            {
-                return true;
-            }
-
-            int currentIndex = 0;
-            for (int i = 0; i < spawnPoints.Count; i++)
-            {
-                if (spawnPoints[i].Point == _cursor)
-                {
-                    currentIndex = i;
-                    break;
-                }
-            }
-
-            int nextIndex = Mod(currentIndex + delta, spawnPoints.Count);
-            return SetCursor(spawnPoints[nextIndex].Point);
-        }
-
         private bool StartDrag()
         {
             TroopPlacementTile tile = GetFocusedTile();
@@ -278,6 +249,89 @@ namespace SongsOfConquestAccess.UI
             return true;
         }
 
+        private bool JumpToScannerResult(Vector2Int point)
+        {
+            return SetCursor(point);
+        }
+
+        private TroopPlacementTile GetScannerTile(ScannerResult result)
+        {
+            if (result == null)
+            {
+                return null;
+            }
+
+            if (_snapshot == null)
+            {
+                RefreshSnapshot();
+            }
+
+            return _snapshot != null ? _snapshot.Get(result.Position) : null;
+        }
+
+        private bool HandleScannerAction(InputAction action)
+        {
+            if (action.Key == AccessibilityActions.ScannerRefresh.Key)
+            {
+                return _scanner.Refresh();
+            }
+
+            if (action.Key == AccessibilityActions.ScannerPreviousCategory.Key)
+            {
+                return _scanner.MoveCategory(-1);
+            }
+
+            if (action.Key == AccessibilityActions.ScannerNextCategory.Key)
+            {
+                return _scanner.MoveCategory(1);
+            }
+
+            if (action.Key == AccessibilityActions.ScannerPreviousSubcategory.Key)
+            {
+                return _scanner.MoveSubcategory(-1);
+            }
+
+            if (action.Key == AccessibilityActions.ScannerNextSubcategory.Key)
+            {
+                return _scanner.MoveSubcategory(1);
+            }
+
+            if (action.Key == AccessibilityActions.ScannerPreviousResult.Key)
+            {
+                return _scanner.MoveResult(-1);
+            }
+
+            if (action.Key == AccessibilityActions.ScannerNextResult.Key)
+            {
+                return _scanner.MoveResult(1);
+            }
+
+            if (action.Key == AccessibilityActions.ScannerJumpToResult.Key)
+            {
+                return _scanner.JumpToCurrent();
+            }
+
+            if (action.Key == AccessibilityActions.ScannerSpeakOrientation.Key)
+            {
+                return _scanner.SpeakOrientation();
+            }
+
+            return false;
+        }
+
+        private static bool IsScannerAction(string actionKey)
+        {
+            return actionKey == AccessibilityActions.ScannerRefresh.Key
+                || actionKey == AccessibilityActions.ScannerPreviousCategory.Key
+                || actionKey == AccessibilityActions.ScannerNextCategory.Key
+                || actionKey == AccessibilityActions.ScannerPreviousSubcategory.Key
+                || actionKey == AccessibilityActions.ScannerNextSubcategory.Key
+                || actionKey == AccessibilityActions.ScannerPreviousResult.Key
+                || actionKey == AccessibilityActions.ScannerNextResult.Key
+                || actionKey == AccessibilityActions.ScannerJumpToResult.Key
+                || actionKey == AccessibilityActions.ScannerSpeakOrientation.Key;
+        }
+
         private void FocusCurrentTile()
         {
             _adapter?.FocusTile(GetFocusedTile());
@@ -334,50 +388,9 @@ namespace SongsOfConquestAccess.UI
             return tile.TroopSide.Value == _snapshot.OwnSide.Value;
         }
 
-        private string Describe(TroopPlacementTile tile)
-        {
-            List<string> parts = new List<string>();
-            if (!string.IsNullOrWhiteSpace(tile.TroopLabel))
-            {
-                parts.Add(tile.TroopLabel);
-            }
-
-            if (tile.SpawnSide.HasValue)
-            {
-                bool enemySpawn = _snapshot != null
-                    && _snapshot.OwnSide.HasValue
-                    && tile.SpawnSide.Value != _snapshot.OwnSide.Value;
-                parts.Add(enemySpawn ? "enemy spawn point" : "spawn point");
-            }
-
-            if (!string.IsNullOrWhiteSpace(tile.EntityLabel))
-            {
-                parts.Add(tile.EntityLabel);
-            }
-
-            if (tile.IsBlocked)
-            {
-                parts.Add("Blocked");
-            }
-
-            if (tile.Elevation > 0)
-            {
-                parts.Add("elevated ground, height " + tile.Elevation);
-            }
-
-            parts.Add(FormatPoint(tile.Point));
-            return string.Join(", ", parts.ToArray());
-        }
-
         private static string FormatPoint(Vector2Int point)
         {
             return "(" + point.x + ", " + point.y + ")";
-        }
-
-        private static int Mod(int value, int modulus)
-        {
-            int result = value % modulus;
-            return result < 0 ? result + modulus : result;
         }
 
         private static void Speak(string text)

@@ -28,6 +28,7 @@ namespace SongsOfConquestAccess.Screens
 
         public override void OnUnfocus()
         {
+            _adapter?.ClearFocusedTileOverlay();
             RootWidget?.Unfocus();
         }
 

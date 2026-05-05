@@ -1,5 +1,7 @@
 using SongsOfConquestAccess.Adapters;
 using SongsOfConquestAccess.Input;
+using SongsOfConquestAccess.Scanner;
+using SongsOfConquestAccess.Speech.Spatial;
 using UnityEngine;
 
 namespace SongsOfConquestAccess.UI
@@ -8,12 +10,25 @@ namespace SongsOfConquestAccess.UI
     {
         private readonly AdventureMapAdapter _adapter;
         private Vector2Int _cursorTile;
+        private readonly ScannerController _scanner;
 
         public AdventureMapGrid(AdventureMapAdapter adapter)
             : base("adventure_map_grid")
         {
             _adapter = adapter;
             _cursorTile = adapter != null ? adapter.GetInitialTile() : Vector2Int.zero;
+            _scanner = new ScannerController(
+                origin => _adapter != null ? _adapter.BuildScannerSnapshot(origin) : null,
+                () => _cursorTile,
+                result => _adapter != null && _adapter.ValidateScannerResult(result),
+                JumpToScannerResult,
+                (result, directions, index, count) => new AdventureScannerSpeechContext(
+                    result,
+                    _adapter.GetTile(result.Position),
+                    directions,
+                    index,
+                    count),
+                ScannerDirectionMode.Square);
         }
 
         public override string GetRole()
@@ -24,7 +39,7 @@ namespace SongsOfConquestAccess.UI
         public override string GetLabel()
         {
             AdventureMapTile tile = _adapter != null ? _adapter.GetTile(_cursorTile) : null;
-            return tile != null ? tile.ToSpeech() : "Adventure map";
+            return new AdventureMapTileSpeechFormatter().DescribeTile(tile);
         }
 
         public override Tooltip GetTooltip()
@@ -42,7 +57,8 @@ namespace SongsOfConquestAccess.UI
                 || actionKey == AccessibilityActions.MapMoveWest.Key
                 || actionKey == AccessibilityActions.MapMoveEast.Key
                 || actionKey == AccessibilityActions.Activate.Key
-                || actionKey == AccessibilityActions.MapSecondaryAction.Key;
+                || actionKey == AccessibilityActions.MapSecondaryAction.Key
+                || IsScannerAction(actionKey);
         }
 
         public override bool HandleAction(InputAction action)
@@ -50,6 +66,11 @@ namespace SongsOfConquestAccess.UI
             if (action == null || _adapter == null)
             {
                 return false;
+            }
+
+            if (HandleScannerAction(action))
+            {
+                return true;
             }
 
             if (action.Key == AccessibilityActions.MapMoveNorth.Key)
@@ -108,6 +129,83 @@ namespace SongsOfConquestAccess.UI
             _adapter.SetFocusedTileOverlay(_cursorTile);
             UIManager.SetFocusedWidget(this);
             return true;
+        }
+
+        private bool JumpToScannerResult(Vector2Int point)
+        {
+            if (_adapter == null)
+            {
+                return false;
+            }
+
+            _cursorTile = point;
+            _adapter.MoveCameraToTile(_cursorTile);
+            _adapter.SetFocusedTileOverlay(_cursorTile);
+            UIManager.SetFocusedWidget(this);
+            return true;
+        }
+
+        private bool HandleScannerAction(InputAction action)
+        {
+            if (action.Key == AccessibilityActions.ScannerRefresh.Key)
+            {
+                return _scanner.Refresh();
+            }
+
+            if (action.Key == AccessibilityActions.ScannerPreviousCategory.Key)
+            {
+                return _scanner.MoveCategory(-1);
+            }
+
+            if (action.Key == AccessibilityActions.ScannerNextCategory.Key)
+            {
+                return _scanner.MoveCategory(1);
+            }
+
+            if (action.Key == AccessibilityActions.ScannerPreviousSubcategory.Key)
+            {
+                return _scanner.MoveSubcategory(-1);
+            }
+
+            if (action.Key == AccessibilityActions.ScannerNextSubcategory.Key)
+            {
+                return _scanner.MoveSubcategory(1);
+            }
+
+            if (action.Key == AccessibilityActions.ScannerPreviousResult.Key)
+            {
+                return _scanner.MoveResult(-1);
+            }
+
+            if (action.Key == AccessibilityActions.ScannerNextResult.Key)
+            {
+                return _scanner.MoveResult(1);
+            }
+
+            if (action.Key == AccessibilityActions.ScannerJumpToResult.Key)
+            {
+                return _scanner.JumpToCurrent();
+            }
+
+            if (action.Key == AccessibilityActions.ScannerSpeakOrientation.Key)
+            {
+                return _scanner.SpeakOrientation();
+            }
+
+            return false;
+        }
+
+        private static bool IsScannerAction(string actionKey)
+        {
+            return actionKey == AccessibilityActions.ScannerRefresh.Key
+                || actionKey == AccessibilityActions.ScannerPreviousCategory.Key
+                || actionKey == AccessibilityActions.ScannerNextCategory.Key
+                || actionKey == AccessibilityActions.ScannerPreviousSubcategory.Key
+                || actionKey == AccessibilityActions.ScannerNextSubcategory.Key
+                || actionKey == AccessibilityActions.ScannerPreviousResult.Key
+                || actionKey == AccessibilityActions.ScannerNextResult.Key
+                || actionKey == AccessibilityActions.ScannerJumpToResult.Key
+                || actionKey == AccessibilityActions.ScannerSpeakOrientation.Key;
         }
     }
 }

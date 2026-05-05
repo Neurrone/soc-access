@@ -1,4 +1,5 @@
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Reflection;
 using HarmonyLib;
@@ -18,6 +19,8 @@ using SongsOfConquest.Common.Entities.Adventure;
 using SongsOfConquest.Common.Gamestate;
 using SongsOfConquest.Common.Localization;
 using SongsOfConquestAccess.Events;
+using SongsOfConquestAccess.Scanner;
+using SongsOfConquestAccess.Speech.Spatial;
 using Unity.Mathematics;
 using UnityEngine;
 using UnityEngine.UI;
@@ -55,6 +58,7 @@ namespace SongsOfConquestAccess.Adapters
         private readonly FieldInfo _currentInputModuleField;
         private GameObject _cursorOverlay;
         private RectTransform[] _cursorOverlaySegments;
+        private Vector2Int? _focusedOverlayTile;
 
         public AdventureMapAdapter(AdventureViewInstaller installer)
             : this(
@@ -343,6 +347,11 @@ namespace SongsOfConquestAccess.Adapters
 
         public AdventureMapTile GetTile(Vector2Int position)
         {
+            return GetTile(position, logDiagnostic: true);
+        }
+
+        private AdventureMapTile GetTile(Vector2Int position, bool logDiagnostic)
+        {
             Vector2Int clamped = ClampToMap(position);
             AdventureMapTile tile = new AdventureMapTile(clamped);
             int localTeamId = GetLocalTeamId();
@@ -354,7 +363,11 @@ namespace SongsOfConquestAccess.Adapters
 
             if (!tile.IsExplored)
             {
-                LogTileDiagnostic(tile, fog, "skipped entity lookup because tile is unexplored");
+                if (logDiagnostic)
+                {
+                    LogTileDiagnostic(tile, fog, "skipped entity lookup because tile is unexplored");
+                }
+
                 return tile;
             }
 
@@ -406,8 +419,627 @@ namespace SongsOfConquestAccess.Adapters
                 tile.IsInteractionPoint = _facade.MapEntities.IsInteractionPoint(localTeamId, clamped);
             }
 
-            LogTileDiagnostic(tile, fog, entityResolutionDiagnostic);
+            if (logDiagnostic)
+            {
+                LogTileDiagnostic(tile, fog, entityResolutionDiagnostic);
+            }
+
             return tile;
+        }
+
+        public ScannerSnapshot BuildScannerSnapshot(Vector2Int origin)
+        {
+            ScannerSnapshot snapshot = new ScannerSnapshot();
+            Dictionary<Vector2Int, AdventureMapTile> tileCache = new Dictionary<Vector2Int, AdventureMapTile>();
+            int localTeamId = GetLocalTeamId();
+            AddWielderScannerResults(snapshot, tileCache);
+            AddStructuralScannerResults(snapshot, localTeamId, tileCache, MapEntityCategory.Town, MapEntityCategory.Settlement);
+            AddStructuralScannerResults(snapshot, localTeamId, tileCache, MapEntityCategory.Building);
+            AddStructuralScannerResults(snapshot, localTeamId, tileCache, MapEntityCategory.BuildSite);
+            AddTroopSourceScannerResults(snapshot, localTeamId, tileCache);
+            AddPickupScannerResults(snapshot, tileCache);
+            AddArtifactMarketScannerResults(snapshot, tileCache);
+            AddObjectiveScannerResults(snapshot, tileCache);
+            AddTeleportScannerResults(snapshot, tileCache);
+            AddObstacleScannerResults(snapshot, tileCache);
+            AddAdventureTerrainScannerResults(snapshot, origin, tileCache);
+            snapshot.SortByDistance(origin);
+            return snapshot;
+        }
+
+        public bool ValidateScannerResult(ScannerResult result)
+        {
+            if (result == null || !IsWithinMap(result.Position))
+            {
+                return false;
+            }
+
+            AdventureMapTile tile = GetTile(result.Position);
+            if (tile == null || !tile.IsExplored)
+            {
+                return false;
+            }
+
+            if (result.StableReference is int stableId)
+            {
+                if (tile.Commander != null && tile.Commander.Id == stableId)
+                {
+                    return true;
+                }
+
+                return tile.MapEntity != null && tile.MapEntity.Id == stableId;
+            }
+
+            return true;
+        }
+
+        private void AddWielderScannerResults(ScannerSnapshot snapshot, Dictionary<Vector2Int, AdventureMapTile> tileCache)
+        {
+            IEnumerable<ICommanderState> commanders = _facade != null && _facade.Commanders != null ? _facade.Commanders.All : null;
+            if (commanders == null)
+            {
+                return;
+            }
+
+            foreach (ICommanderState commander in commanders)
+            {
+                if (commander == null || !commander.IsAlive || !IsWithinMap(commander.Position))
+                {
+                    continue;
+                }
+
+                AdventureMapTile tile = GetScannerTile(tileCache, commander.Position);
+                if (tile == null || tile.Commander == null)
+                {
+                    continue;
+                }
+
+                string name = FirstNonEmpty(tile.CommanderName, "wielder");
+                snapshot.Add("Wielders", "All",
+                    new ScannerResult(name, commander.Position) { StableReference = commander.Id });
+            }
+        }
+
+        private void AddMapEntityScannerResults(ScannerSnapshot snapshot, int localTeamId, Dictionary<Vector2Int, AdventureMapTile> tileCache)
+        {
+            IEnumerable<IMapEntity> entities = _facade != null && _facade.MapEntities != null ? _facade.MapEntities.All : null;
+            if (entities == null)
+            {
+                return;
+            }
+
+            foreach (IMapEntity entity in entities)
+            {
+                if (entity == null || !entity.IsEnabled || !IsWithinMap(entity.Position))
+                {
+                    continue;
+                }
+
+                AdventureMapTile tile = GetScannerTile(tileCache, entity.Position);
+                if (tile == null || tile.MapEntity == null || tile.MapEntity.Id != entity.Id)
+                {
+                    continue;
+                }
+
+                string name = FirstNonEmpty(tile.MapEntityName, GetMapEntityName(entity));
+                bool notVisible = !tile.IsVisible;
+                string relationship = ToTitleCase(GetMapEntityRelationship(entity, localTeamId));
+                ScannerResult result = new ScannerResult(name, entity.Position) { NotVisible = notVisible, StableReference = entity.Id };
+
+                AddStructuralMapEntityResult(snapshot, entity, relationship, result);
+                AddTroopSourceResult(snapshot, entity, relationship, result);
+                AddPickupResult(snapshot, entity, result);
+                AddSpecialMapEntityResult(snapshot, entity, result);
+            }
+        }
+
+        private void AddStructuralScannerResults(ScannerSnapshot snapshot, int localTeamId, Dictionary<Vector2Int, AdventureMapTile> tileCache, params MapEntityCategory[] categories)
+        {
+            ForEachScannerEntity(tileCache, entity =>
+            {
+                if (!IsCategory(entity, categories))
+                {
+                    return;
+                }
+
+                AdventureMapTile tile = GetScannerTile(tileCache, entity.Position);
+                ScannerResult result = CreateMapEntityScannerResult(entity, tile);
+                if (result == null)
+                {
+                    return;
+                }
+
+                string relationship = ToTitleCase(GetMapEntityRelationship(entity, localTeamId));
+                AddStructuralMapEntityResult(snapshot, entity, relationship, result);
+            });
+        }
+
+        private void AddTroopSourceScannerResults(ScannerSnapshot snapshot, int localTeamId, Dictionary<Vector2Int, AdventureMapTile> tileCache)
+        {
+            ForEachScannerEntity(tileCache, entity =>
+            {
+                if (!entity.HasComponent<IRecruitmentPoolComponent>() && !entity.HasComponent<ITroopDwellingComponent>())
+                {
+                    return;
+                }
+
+                AdventureMapTile tile = GetScannerTile(tileCache, entity.Position);
+                ScannerResult result = CreateMapEntityScannerResult(entity, tile);
+                if (result != null)
+                {
+                    AddTroopSourceResult(snapshot, entity, ToTitleCase(GetMapEntityRelationship(entity, localTeamId)), result);
+                }
+            });
+        }
+
+        private void AddPickupScannerResults(ScannerSnapshot snapshot, Dictionary<Vector2Int, AdventureMapTile> tileCache)
+        {
+            ScannerCategory pickups = snapshot.GetOrAddCategory("Pickups");
+            pickups.GetOrAddSubcategory("All");
+            pickups.GetOrAddSubcategory("Unvisited");
+
+            ForEachScannerEntity(tileCache, entity =>
+            {
+                AdventureMapTile tile = GetScannerTile(tileCache, entity.Position);
+                ScannerResult result = CreateMapEntityScannerResult(entity, tile);
+                if (result != null)
+                {
+                    AddPickupResult(snapshot, entity, result);
+                }
+            });
+        }
+
+        private void AddArtifactMarketScannerResults(ScannerSnapshot snapshot, Dictionary<Vector2Int, AdventureMapTile> tileCache)
+        {
+            ForEachScannerEntity(tileCache, entity =>
+            {
+                if (!entity.HasComponent<IArtifactMarketComponent>())
+                {
+                    return;
+                }
+
+                AdventureMapTile tile = GetScannerTile(tileCache, entity.Position);
+                ScannerResult result = CreateMapEntityScannerResult(entity, tile);
+                if (result != null)
+                {
+                    snapshot.Add("Artifact markets", "All", result);
+                }
+            });
+        }
+
+        private void AddObjectiveScannerResults(ScannerSnapshot snapshot, Dictionary<Vector2Int, AdventureMapTile> tileCache)
+        {
+            ForEachScannerEntity(tileCache, entity =>
+            {
+                if (entity.Category != MapEntityCategory.Objective && entity.Category != MapEntityCategory.Story)
+                {
+                    return;
+                }
+
+                AdventureMapTile tile = GetScannerTile(tileCache, entity.Position);
+                ScannerResult result = CreateMapEntityScannerResult(entity, tile);
+                if (result != null)
+                {
+                    snapshot.Add("Objectives", "All", result);
+                }
+            });
+        }
+
+        private void AddTeleportScannerResults(ScannerSnapshot snapshot, Dictionary<Vector2Int, AdventureMapTile> tileCache)
+        {
+            ForEachScannerEntity(tileCache, entity =>
+            {
+                if (!entity.HasComponent<ITeleportComponent>() && !entity.HasComponent<ITownPortalComponent>() && !entity.HasComponent<ITownPortalBuildingComponent>())
+                {
+                    return;
+                }
+
+                AdventureMapTile tile = GetScannerTile(tileCache, entity.Position);
+                ScannerResult result = CreateMapEntityScannerResult(entity, tile);
+                if (result != null)
+                {
+                    snapshot.Add("Teleport", "All", result);
+                }
+            });
+        }
+
+        private void AddObstacleScannerResults(ScannerSnapshot snapshot, Dictionary<Vector2Int, AdventureMapTile> tileCache)
+        {
+            ForEachScannerEntity(tileCache, entity =>
+            {
+                AdventureMapTile tile = GetScannerTile(tileCache, entity.Position);
+                ScannerResult result = CreateMapEntityScannerResult(entity, tile);
+                if (result == null)
+                {
+                    return;
+                }
+
+                if (entity.Category == MapEntityCategory.Hostile)
+                {
+                    snapshot.Add("Obstacles", "Guards", result);
+                }
+                else if (entity.HasComponent<IMagicGateCommonComponent>() || entity.HasComponent<IUnlockWithArtifactComponent>())
+                {
+                    snapshot.Add("Obstacles", "Magic barriers", result);
+                }
+                else if (entity.Category == MapEntityCategory.Obstacle)
+                {
+                    snapshot.Add("Obstacles", "Blockers", result);
+                }
+            });
+        }
+
+        private void ForEachScannerEntity(Dictionary<Vector2Int, AdventureMapTile> tileCache, Action<IMapEntity> action)
+        {
+            IEnumerable<IMapEntity> entities = _facade != null && _facade.MapEntities != null ? _facade.MapEntities.All : null;
+            if (entities == null || action == null)
+            {
+                return;
+            }
+
+            foreach (IMapEntity entity in entities)
+            {
+                if (entity == null || !entity.IsEnabled || !IsWithinMap(entity.Position))
+                {
+                    continue;
+                }
+
+                AdventureMapTile tile = GetScannerTile(tileCache, entity.Position);
+                if (tile == null || tile.MapEntity == null || tile.MapEntity.Id != entity.Id)
+                {
+                    continue;
+                }
+
+                action(entity);
+            }
+        }
+
+        private ScannerResult CreateMapEntityScannerResult(IMapEntity entity, AdventureMapTile tile)
+        {
+            if (entity == null || tile == null || tile.MapEntity == null || tile.MapEntity.Id != entity.Id)
+            {
+                return null;
+            }
+
+            string name = FirstNonEmpty(tile.MapEntityName, GetMapEntityName(entity));
+            return new ScannerResult(name, entity.Position) { NotVisible = !tile.IsVisible, StableReference = entity.Id };
+        }
+
+        private static bool IsCategory(IMapEntity entity, MapEntityCategory[] categories)
+        {
+            if (entity == null || categories == null)
+            {
+                return false;
+            }
+
+            for (int i = 0; i < categories.Length; i++)
+            {
+                if (entity.Category == categories[i])
+                {
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
+        private void AddStructuralMapEntityResult(ScannerSnapshot snapshot, IMapEntity entity, string relationship, ScannerResult result)
+        {
+            switch (entity.Category)
+            {
+                case MapEntityCategory.Town:
+                case MapEntityCategory.Settlement:
+                    snapshot.Add("Settlements", relationship, CloneResult(result));
+                    break;
+                case MapEntityCategory.Building:
+                    snapshot.Add("Buildings", relationship, CloneResult(result));
+                    break;
+                case MapEntityCategory.BuildSite:
+                    snapshot.Add("Build sites", relationship, CloneResult(result));
+                    break;
+            }
+        }
+
+        private void AddTroopSourceResult(ScannerSnapshot snapshot, IMapEntity entity, string relationship, ScannerResult result)
+        {
+            if (entity.HasComponent<IRecruitmentPoolComponent>() || entity.HasComponent<ITroopDwellingComponent>())
+            {
+                snapshot.Add("Troop sources", relationship, CloneResult(result));
+            }
+        }
+
+        private void AddPickupResult(ScannerSnapshot snapshot, IMapEntity entity, ScannerResult result)
+        {
+            MapEntityPreVisitDetails.PreVisitHint hint = GetPreVisitHint(entity);
+            string subcategory = null;
+            switch (hint)
+            {
+                case MapEntityPreVisitDetails.PreVisitHint.SourceOfKnowledge:
+                    subcategory = "Knowledge";
+                    break;
+                case MapEntityPreVisitDetails.PreVisitHint.SourceOfPower:
+                    subcategory = "Power";
+                    break;
+                case MapEntityPreVisitDetails.PreVisitHint.SourceOfRiches:
+                    subcategory = "Riches";
+                    break;
+            }
+
+            if (subcategory == null)
+            {
+                return;
+            }
+
+            snapshot.Add("Pickups", "All", CloneResult(result));
+            if (IsUnvisited(entity))
+            {
+                snapshot.Add("Pickups", "Unvisited", CloneResult(result));
+            }
+
+            snapshot.Add("Pickups", subcategory, CloneResult(result));
+        }
+
+        private bool IsUnvisited(IMapEntity entity)
+        {
+            if (entity == null)
+            {
+                return false;
+            }
+
+            ICommanderState selectedCommander = _selectionHandler != null ? _selectionHandler.SelectedCommander : null;
+            return selectedCommander == null || !entity.DidVisit(selectedCommander.Id);
+        }
+
+        private void AddSpecialMapEntityResult(ScannerSnapshot snapshot, IMapEntity entity, ScannerResult result)
+        {
+            if (entity.HasComponent<IArtifactMarketComponent>())
+            {
+                snapshot.Add("Artifact markets", "All", CloneResult(result));
+            }
+
+            if (entity.Category == MapEntityCategory.Objective || entity.Category == MapEntityCategory.Story)
+            {
+                snapshot.Add("Objectives", "All", CloneResult(result));
+            }
+
+            if (entity.HasComponent<ITeleportComponent>() || entity.HasComponent<ITownPortalComponent>() || entity.HasComponent<ITownPortalBuildingComponent>())
+            {
+                snapshot.Add("Teleport", "All", CloneResult(result));
+            }
+
+            if (entity.Category == MapEntityCategory.Hostile)
+            {
+                snapshot.Add("Obstacles", "Guards", CloneResult(result));
+            }
+            else if (entity.HasComponent<IMagicGateCommonComponent>() || entity.HasComponent<IUnlockWithArtifactComponent>())
+            {
+                snapshot.Add("Obstacles", "Magic barriers", CloneResult(result));
+            }
+            else if (entity.Category == MapEntityCategory.Obstacle)
+            {
+                snapshot.Add("Obstacles", "Blockers", CloneResult(result));
+            }
+        }
+
+        private MapEntityPreVisitDetails.PreVisitHint GetPreVisitHint(IMapEntity entity)
+        {
+            try
+            {
+                ICommanderState selectedCommander = _selectionHandler != null ? _selectionHandler.SelectedCommander : null;
+                IDetails details = entity.GetPreVisitDetails(
+                    selectedCommander != null ? selectedCommander.Id : -1,
+                    false,
+                    ScoutingDetailLevel.VeryFar,
+                    null,
+                    selectedCommander != null && selectedCommander.IsAlive);
+                MapEntityPreVisitDetails preVisit = details as MapEntityPreVisitDetails;
+                return preVisit != null ? preVisit.Hint : MapEntityPreVisitDetails.PreVisitHint.None;
+            }
+            catch
+            {
+                return MapEntityPreVisitDetails.PreVisitHint.None;
+            }
+        }
+
+        private AdventureMapTile GetScannerTile(Dictionary<Vector2Int, AdventureMapTile> tileCache, Vector2Int position)
+        {
+            if (tileCache == null)
+            {
+                return GetTile(position, logDiagnostic: false);
+            }
+
+            Vector2Int clamped = ClampToMap(position);
+            AdventureMapTile tile;
+            if (!tileCache.TryGetValue(clamped, out tile))
+            {
+                tile = GetTile(clamped, logDiagnostic: false);
+                tileCache.Add(clamped, tile);
+            }
+
+            return tile;
+        }
+
+        private void AddAdventureTerrainScannerResults(ScannerSnapshot snapshot, Vector2Int origin, Dictionary<Vector2Int, AdventureMapTile> tileCache)
+        {
+            if (_facade == null || _facade.Level == null)
+            {
+                return;
+            }
+
+            TerrainScanCell[,] terrain = BuildTerrainScan(tileCache);
+            AddTerrainGroups(snapshot, terrain, "Roads", "road", origin, cell => cell.Road);
+            AddTerrainGroups(snapshot, terrain, "Bridges", "bridge", origin, cell => cell.Bridge);
+            AddTerrainGroups(snapshot, terrain, "Water", "water", origin, cell => cell.Water);
+            AddTerrainGroups(snapshot, terrain, "Impassable", "impassable", origin, cell => cell.Impassable);
+        }
+
+        private TerrainScanCell[,] BuildTerrainScan(Dictionary<Vector2Int, AdventureMapTile> tileCache)
+        {
+            int width = _facade.Level.Width;
+            int height = _facade.Level.Height;
+            TerrainScanCell[,] terrain = new TerrainScanCell[width, height];
+            for (int y = 0; y < height; y++)
+            {
+                for (int x = 0; x < width; x++)
+                {
+                    AdventureMapTile tile = GetScannerTile(tileCache, new Vector2Int(x, y));
+                    terrain[x, y] = new TerrainScanCell
+                    {
+                        Explored = tile != null && tile.IsExplored,
+                        Road = tile != null && tile.IsExplored && HasEnvironment(tile, "road"),
+                        Bridge = tile != null && tile.IsExplored && HasEnvironment(tile, "bridge"),
+                        Water = tile != null && tile.IsExplored && HasEnvironment(tile, "water"),
+                        Impassable = tile != null && tile.IsExplored && tile.IsBlocked
+                    };
+                }
+            }
+
+            return terrain;
+        }
+
+        private void AddTerrainGroups(ScannerSnapshot snapshot, TerrainScanCell[,] terrain, string subcategory, string label, Vector2Int origin, Func<TerrainScanCell, bool> predicate)
+        {
+            int width = _facade.Level.Width;
+            int height = _facade.Level.Height;
+            bool[,] visited = new bool[width, height];
+            for (int y = 0; y < height; y++)
+            {
+                for (int x = 0; x < width; x++)
+                {
+                    if (visited[x, y])
+                    {
+                        continue;
+                    }
+
+                    Vector2Int start = new Vector2Int(x, y);
+                    if (!terrain[x, y].Explored || !predicate(terrain[x, y]))
+                    {
+                        visited[x, y] = true;
+                        continue;
+                    }
+
+                    List<Vector2Int> group = FloodTerrainGroup(start, terrain, visited, predicate);
+                    Vector2Int representative = ClosestPoint(group, origin);
+                    snapshot.Add("Terrain", subcategory,
+                        new ScannerResult(group.Count + " " + label, representative) { IsTerrainGroup = true });
+                }
+            }
+        }
+
+        private List<Vector2Int> FloodTerrainGroup(Vector2Int start, TerrainScanCell[,] terrain, bool[,] visited, Func<TerrainScanCell, bool> predicate)
+        {
+            List<Vector2Int> result = new List<Vector2Int>();
+            Queue<Vector2Int> queue = new Queue<Vector2Int>();
+            queue.Enqueue(start);
+            visited[start.x, start.y] = true;
+            while (queue.Count > 0)
+            {
+                Vector2Int point = queue.Dequeue();
+                TerrainScanCell cell = terrain[point.x, point.y];
+                if (!cell.Explored || !predicate(cell))
+                {
+                    continue;
+                }
+
+                result.Add(point);
+                EnqueueTerrainNeighbor(queue, visited, point.x + 1, point.y);
+                EnqueueTerrainNeighbor(queue, visited, point.x - 1, point.y);
+                EnqueueTerrainNeighbor(queue, visited, point.x, point.y + 1);
+                EnqueueTerrainNeighbor(queue, visited, point.x, point.y - 1);
+            }
+
+            return result;
+        }
+
+        private struct TerrainScanCell
+        {
+            public bool Explored;
+
+            public bool Road;
+
+            public bool Bridge;
+
+            public bool Water;
+
+            public bool Impassable;
+        }
+
+        private void EnqueueTerrainNeighbor(Queue<Vector2Int> queue, bool[,] visited, int x, int y)
+        {
+            if (x < 0 || y < 0 || x >= _facade.Level.Width || y >= _facade.Level.Height || visited[x, y])
+            {
+                return;
+            }
+
+            visited[x, y] = true;
+            queue.Enqueue(new Vector2Int(x, y));
+        }
+
+        private static bool HasEnvironment(AdventureMapTile tile, string text)
+        {
+            if (tile == null || tile.Environment == null)
+            {
+                return false;
+            }
+
+            for (int i = 0; i < tile.Environment.Count; i++)
+            {
+                if (!string.IsNullOrWhiteSpace(tile.Environment[i]) && tile.Environment[i].ToLowerInvariant().Contains(text))
+                {
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
+        private static Vector2Int ClosestPoint(List<Vector2Int> points, Vector2Int origin)
+        {
+            if (points == null || points.Count == 0)
+            {
+                return origin;
+            }
+
+            Vector2Int best = points[0];
+            int bestDistance = DistanceSquared(origin, best);
+            for (int i = 1; i < points.Count; i++)
+            {
+                int distance = DistanceSquared(origin, points[i]);
+                if (distance < bestDistance)
+                {
+                    best = points[i];
+                    bestDistance = distance;
+                }
+            }
+
+            return best;
+        }
+
+        private static int DistanceSquared(Vector2Int origin, Vector2Int point)
+        {
+            int x = point.x - origin.x;
+            int y = point.y - origin.y;
+            return x * x + y * y;
+        }
+
+        private static ScannerResult CloneResult(ScannerResult result)
+        {
+            return new ScannerResult(result.Label, result.Position)
+            {
+                NotVisible = result.NotVisible,
+                StableReference = result.StableReference,
+                IsTerrainGroup = result.IsTerrainGroup
+            };
+        }
+
+        private static string ToTitleCase(string value)
+        {
+            if (string.IsNullOrWhiteSpace(value))
+            {
+                return "Neutral";
+            }
+
+            return char.ToUpperInvariant(value[0]) + value.Substring(1).ToLowerInvariant();
         }
 
         public void SetFocusedTileOverlay(Vector2Int tile)
@@ -427,6 +1059,7 @@ namespace SongsOfConquestAccess.Adapters
 
                 SetScreenOverlayPosition(GetScreenPoint(tile));
                 _cursorOverlay.SetActive(true);
+                _focusedOverlayTile = tile;
             }
             catch (Exception exception)
             {
@@ -566,10 +1199,30 @@ namespace SongsOfConquestAccess.Adapters
             }
         }
 
+        public void MoveCameraToTile(Vector2Int tile)
+        {
+            if (!IsWithinMap(tile) || _cameraController == null)
+            {
+                return;
+            }
+
+            try
+            {
+                Vector3 world = GetWorldCenter(tile);
+                _cameraController.MoveToPosition(world, false, Vector3.zero, null, true);
+                SoqAccessPlugin.Instance?.StartCoroutine(RefreshFocusedTileOverlayAfterCameraMove(tile));
+            }
+            catch (Exception exception)
+            {
+                SoqAccessPlugin.Instance?.LogWarning("AdventureMapAdapter failed to move camera to focused tile: " + exception.Message);
+            }
+        }
+
         public void ClearFocusedTileOverlay()
         {
             if (_cursorOverlay == null)
             {
+                _focusedOverlayTile = null;
                 return;
             }
 
@@ -578,6 +1231,7 @@ namespace SongsOfConquestAccess.Adapters
                 UnityEngine.Object.Destroy(_cursorOverlay);
                 _cursorOverlay = null;
                 _cursorOverlaySegments = null;
+                _focusedOverlayTile = null;
                 _tooltipManager?.HideTileTooltip();
             }
             catch (Exception exception)
@@ -955,7 +1609,9 @@ namespace SongsOfConquestAccess.Adapters
             _cursorOverlay = new GameObject("SongsOfConquestAccess_AdventureMapCursor");
             Canvas canvas = _cursorOverlay.AddComponent<Canvas>();
             canvas.renderMode = RenderMode.ScreenSpaceOverlay;
-            canvas.sortingOrder = short.MaxValue;
+            // Keep the cursor above map visuals and the native overlay canvas
+            // (29998), but below native tooltip canvases (30001) and windows.
+            canvas.sortingOrder = 29999;
             CanvasScaler scaler = _cursorOverlay.AddComponent<CanvasScaler>();
             scaler.uiScaleMode = CanvasScaler.ScaleMode.ConstantPixelSize;
             CanvasGroup canvasGroup = _cursorOverlay.AddComponent<CanvasGroup>();
@@ -1004,6 +1660,25 @@ namespace SongsOfConquestAccess.Adapters
         {
             segment.anchoredPosition = position;
             segment.sizeDelta = size;
+        }
+
+        private IEnumerator RefreshFocusedTileOverlayAfterCameraMove(Vector2Int tile)
+        {
+            for (int i = 0; i < 30; i++)
+            {
+                yield return null;
+
+                if (!_focusedOverlayTile.HasValue || _focusedOverlayTile.Value != tile)
+                {
+                    yield break;
+                }
+
+                SetFocusedTileOverlay(tile);
+                if (_cameraController == null || !_cameraController.IsMoving)
+                {
+                    yield break;
+                }
+            }
         }
 
         private Vector3 GetWorldCenter(Vector2Int tile)
@@ -1187,6 +1862,11 @@ namespace SongsOfConquestAccess.Adapters
             if (commander.TeamId == localTeamId)
             {
                 return "friendly";
+            }
+
+            if (_facade.Teams != null && commander.TeamId == _facade.Teams.GetNeutralTeamId)
+            {
+                return "neutral";
             }
 
             return _facade.Teams.IsInPartnership(localTeamId, commander.TeamId) ? "friendly" : "enemy";
@@ -1378,7 +2058,7 @@ namespace SongsOfConquestAccess.Adapters
                 + "; entityResolution="
                 + (entityResolutionDiagnostic ?? string.Empty)
                 + "; speech=\""
-                + tile.ToSpeech()
+                + new AdventureMapTileSpeechFormatter().DescribeTile(tile)
                 + "\"";
             SoqAccessPlugin.Instance?.LogInfo(message);
         }
@@ -1676,23 +2356,8 @@ namespace SongsOfConquestAccess.Adapters
             {
                 if (selectedCommander != null && entity.DidVisit(selectedCommander.Id))
                 {
-                    MapEntityDidVisitDetails didVisitDetails = entity.GetDidVisitDetails(selectedCommander.Id) as MapEntityDidVisitDetails;
-                    if (didVisitDetails != null)
-                    {
-                        tile.MapEntityDetails.Add("visited");
-                        if (didVisitDetails.InformationLines != null)
-                        {
-                            for (int i = 0; i < didVisitDetails.InformationLines.Count; i++)
-                            {
-                                if (!string.IsNullOrWhiteSpace(didVisitDetails.InformationLines[i]))
-                                {
-                                    tile.MapEntityDetails.Add(didVisitDetails.InformationLines[i]);
-                                }
-                            }
-                        }
-
-                        return;
-                    }
+                    tile.MapEntityVisited = true;
+                    return;
                 }
 
                 IDetails details = entity.GetPreVisitDetails(

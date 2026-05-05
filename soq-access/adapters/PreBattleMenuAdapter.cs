@@ -18,6 +18,7 @@ using SongsOfConquest.Common.Gamestate.Facade;
 using SongsOfConquest.Common.Localization;
 using SongsOfConquest.Common.Map;
 using SongsOfConquest.Server.Map;
+using SongsOfConquestAccess.Scanner;
 using SongsOfConquestAccess.Speech;
 using SongsOfConquestAccess.UI;
 using Unity.Mathematics;
@@ -168,6 +169,64 @@ namespace SongsOfConquestAccess.Adapters
             AddTroops(snapshot, deployment, BattleSide.Right_Defender);
             AddMapEntities(snapshot, map);
             return snapshot;
+        }
+
+        public ScannerSnapshot BuildScannerSnapshot(Vector2Int origin)
+        {
+            TroopPlacementSnapshot placement = BuildSnapshot();
+            ScannerSnapshot snapshot = new ScannerSnapshot();
+            AddTroopPlacementTroopScannerResults(snapshot, placement);
+            AddTroopPlacementSpawnScannerResults(snapshot, placement);
+            AddTroopPlacementTerrainScannerResults(snapshot, placement);
+            snapshot.SortByDistance(origin);
+            return snapshot;
+        }
+
+        private void AddTroopPlacementTroopScannerResults(ScannerSnapshot snapshot, TroopPlacementSnapshot placement)
+        {
+            foreach (TroopPlacementTile tile in placement.Tiles)
+            {
+                if (tile.TroopSide.HasValue)
+                {
+                    snapshot.Add("Troops", IsOwnSide(placement, tile.TroopSide.Value) ? "Friendly" : "Enemy",
+                        new ScannerResult(FirstNonEmpty(tile.TroopLabel, "Unknown troop"), tile.Point));
+                }
+            }
+        }
+
+        private void AddTroopPlacementSpawnScannerResults(ScannerSnapshot snapshot, TroopPlacementSnapshot placement)
+        {
+            foreach (TroopPlacementTile tile in placement.Tiles)
+            {
+                if (tile.SpawnSide.HasValue)
+                {
+                    snapshot.Add("Spawn points", IsOwnSide(placement, tile.SpawnSide.Value) ? "Friendly" : "Enemy",
+                        new ScannerResult("spawn point", tile.Point));
+                }
+            }
+        }
+
+        private void AddTroopPlacementTerrainScannerResults(ScannerSnapshot snapshot, TroopPlacementSnapshot placement)
+        {
+            foreach (TroopPlacementTile tile in placement.Tiles)
+            {
+                if (tile.Elevation > 0)
+                {
+                    snapshot.Add("Terrain", "Elevated ground",
+                        new ScannerResult("elevated ground, height " + tile.Elevation, tile.Point));
+                }
+
+                if (tile.IsBlocked)
+                {
+                    snapshot.Add("Terrain", "Impassable terrain",
+                        new ScannerResult("impassable", tile.Point));
+                }
+            }
+        }
+
+        public bool ValidateScannerResult(ScannerResult result)
+        {
+            return result != null && BuildSnapshot().IsValidTile(result.Position);
         }
 
         public bool TryMoveTroop(Vector2Int source, Vector2Int destination)
@@ -583,6 +642,16 @@ namespace SongsOfConquestAccess.Adapters
             return size > 0 ? size + " " + name : name;
         }
 
+        private static bool IsOwnSide(TroopPlacementSnapshot snapshot, BattleSide side)
+        {
+            return snapshot != null && snapshot.OwnSide.HasValue && snapshot.OwnSide.Value == side;
+        }
+
+        private static string FirstNonEmpty(string preferred, string fallback)
+        {
+            return string.IsNullOrWhiteSpace(preferred) ? fallback : preferred;
+        }
+
         private bool ShouldShowSide(BattleSide side)
         {
             BattleSide? ownSide = GetOwnSide();
@@ -914,7 +983,9 @@ namespace SongsOfConquestAccess.Adapters
             _cursorOverlay = new GameObject("SongsOfConquestAccess_TroopPlacementCursor");
             Canvas canvas = _cursorOverlay.AddComponent<Canvas>();
             canvas.renderMode = RenderMode.ScreenSpaceOverlay;
-            canvas.sortingOrder = short.MaxValue;
+            // Keep the cursor above map visuals and the native overlay canvas
+            // (29998), but below native tooltip canvases (30001) and windows.
+            canvas.sortingOrder = 29999;
             CanvasScaler scaler = _cursorOverlay.AddComponent<CanvasScaler>();
             scaler.uiScaleMode = CanvasScaler.ScaleMode.ConstantPixelSize;
             CanvasGroup canvasGroup = _cursorOverlay.AddComponent<CanvasGroup>();

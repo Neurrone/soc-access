@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using SongsOfConquestAccess.Adapters;
 using SongsOfConquestAccess.Input;
+using SongsOfConquestAccess.Scanner;
 using SongsOfConquestAccess.Speech;
 using UnityEngine;
 
@@ -13,6 +14,7 @@ namespace SongsOfConquestAccess.UI
         private Vector2Int _cursor;
         private CombatInspectContext _inspectContext;
         private bool _componentWarningSpoken;
+        private readonly ScannerController _scanner;
 
         public CombatHexGrid(CombatAdapter adapter)
             : base("combat-hex-grid")
@@ -20,6 +22,19 @@ namespace SongsOfConquestAccess.UI
             _adapter = adapter;
             RefreshSnapshot();
             _cursor = _adapter != null ? _adapter.GetInitialTile() : Vector2Int.zero;
+            _scanner = new ScannerController(
+                origin => _adapter != null ? _adapter.BuildScannerSnapshot(origin) : null,
+                () => _cursor,
+                result => _adapter != null && _adapter.ValidateScannerResult(result),
+                JumpToScannerResult,
+                (result, directions, index, count) => new CombatScannerSpeechContext(
+                    result,
+                    _adapter.GetTile(result.Position),
+                    _adapter,
+                    directions,
+                    index,
+                    count),
+                ScannerDirectionMode.Hex);
         }
 
         public void AttachSpellCastBegin()
@@ -72,6 +87,7 @@ namespace SongsOfConquestAccess.UI
                 || actionKey == AccessibilityActions.CombatPreviousRelevantTile.Key
                 || (_adapter != null && _adapter.IsSpellTargetingActive() && actionKey == AccessibilityActions.Activate.Key)
                 || actionKey == AccessibilityActions.MapSecondaryAction.Key
+                || IsScannerAction(actionKey)
                 || ((_inspectContext != null || (_adapter != null && _adapter.IsSpellTargetingActive())) && actionKey == AccessibilityActions.Cancel.Key);
         }
 
@@ -85,6 +101,11 @@ namespace SongsOfConquestAccess.UI
             if (action == null)
             {
                 return false;
+            }
+
+            if (HandleScannerAction(action))
+            {
+                return true;
             }
 
             if (action.Key == AccessibilityActions.HexGridWest.Key)
@@ -308,6 +329,74 @@ namespace SongsOfConquestAccess.UI
             _cursor = point;
             FocusCurrentTile(updateNativeFocus: _inspectContext == null);
             return true;
+        }
+
+        private bool JumpToScannerResult(Vector2Int point)
+        {
+            return SetCursor(point);
+        }
+
+        private bool HandleScannerAction(InputAction action)
+        {
+            if (action.Key == AccessibilityActions.ScannerRefresh.Key)
+            {
+                return _scanner.Refresh();
+            }
+
+            if (action.Key == AccessibilityActions.ScannerPreviousCategory.Key)
+            {
+                return _scanner.MoveCategory(-1);
+            }
+
+            if (action.Key == AccessibilityActions.ScannerNextCategory.Key)
+            {
+                return _scanner.MoveCategory(1);
+            }
+
+            if (action.Key == AccessibilityActions.ScannerPreviousSubcategory.Key)
+            {
+                return _scanner.MoveSubcategory(-1);
+            }
+
+            if (action.Key == AccessibilityActions.ScannerNextSubcategory.Key)
+            {
+                return _scanner.MoveSubcategory(1);
+            }
+
+            if (action.Key == AccessibilityActions.ScannerPreviousResult.Key)
+            {
+                return _scanner.MoveResult(-1);
+            }
+
+            if (action.Key == AccessibilityActions.ScannerNextResult.Key)
+            {
+                return _scanner.MoveResult(1);
+            }
+
+            if (action.Key == AccessibilityActions.ScannerJumpToResult.Key)
+            {
+                return _scanner.JumpToCurrent();
+            }
+
+            if (action.Key == AccessibilityActions.ScannerSpeakOrientation.Key)
+            {
+                return _scanner.SpeakOrientation();
+            }
+
+            return false;
+        }
+
+        private static bool IsScannerAction(string actionKey)
+        {
+            return actionKey == AccessibilityActions.ScannerRefresh.Key
+                || actionKey == AccessibilityActions.ScannerPreviousCategory.Key
+                || actionKey == AccessibilityActions.ScannerNextCategory.Key
+                || actionKey == AccessibilityActions.ScannerPreviousSubcategory.Key
+                || actionKey == AccessibilityActions.ScannerNextSubcategory.Key
+                || actionKey == AccessibilityActions.ScannerPreviousResult.Key
+                || actionKey == AccessibilityActions.ScannerNextResult.Key
+                || actionKey == AccessibilityActions.ScannerJumpToResult.Key
+                || actionKey == AccessibilityActions.ScannerSpeakOrientation.Key;
         }
 
         private void FocusCurrentTile(bool updateNativeFocus)

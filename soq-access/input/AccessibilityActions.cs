@@ -70,6 +70,33 @@ namespace SongsOfConquestAccess.Input
         public static readonly InputAction MapSecondaryAction = OneShot("map_secondary_action", "Map Secondary Action")
             .AddBinding(new KeyboardBinding(Key.Backslash));
 
+        public static readonly InputAction ScannerRefresh = OneShot("scanner_refresh", "Refresh Scanner")
+            .AddBinding(new KeyboardBinding(Key.End));
+
+        public static readonly InputAction ScannerPreviousCategory = OneShot("scanner_previous_category", "Previous Scanner Category")
+            .AddBinding(new KeyboardBinding(Key.PageUp, ctrl: true));
+
+        public static readonly InputAction ScannerNextCategory = OneShot("scanner_next_category", "Next Scanner Category")
+            .AddBinding(new KeyboardBinding(Key.PageDown, ctrl: true));
+
+        public static readonly InputAction ScannerPreviousSubcategory = OneShot("scanner_previous_subcategory", "Previous Scanner Subcategory")
+            .AddBinding(new KeyboardBinding(Key.PageUp, shift: true));
+
+        public static readonly InputAction ScannerNextSubcategory = OneShot("scanner_next_subcategory", "Next Scanner Subcategory")
+            .AddBinding(new KeyboardBinding(Key.PageDown, shift: true));
+
+        public static readonly InputAction ScannerPreviousResult = OneShot("scanner_previous_result", "Previous Scanner Result")
+            .AddBinding(new KeyboardBinding(Key.PageUp));
+
+        public static readonly InputAction ScannerNextResult = OneShot("scanner_next_result", "Next Scanner Result")
+            .AddBinding(new KeyboardBinding(Key.PageDown));
+
+        public static readonly InputAction ScannerJumpToResult = OneShot("scanner_jump_to_result", "Jump To Scanner Result")
+            .AddBinding(new KeyboardBinding(Key.Home));
+
+        public static readonly InputAction ScannerSpeakOrientation = OneShot("scanner_speak_orientation", "Scanner Result Orientation")
+            .AddBinding(new KeyboardBinding(Key.Home, shift: true));
+
         public static readonly InputAction SliderDecrease = OneShot("slider_decrease", "Slider Decrease")
             .AddBinding(new KeyboardBinding(Key.LeftArrow));
 
@@ -131,18 +158,6 @@ namespace SongsOfConquestAccess.Input
         public static readonly InputAction CombatPreviousRelevantTile = OneShot("combat_previous_relevant_tile", "Previous Relevant Combat Tile")
             .AddBinding(new KeyboardBinding(Key.W, shift: true));
 
-        public static readonly InputAction TroopPlacementNextOwnSpawn = OneShot("troop_placement_next_own_spawn", "Next Own Spawn Point")
-            .AddBinding(new KeyboardBinding(Key.W));
-
-        public static readonly InputAction TroopPlacementPreviousOwnSpawn = OneShot("troop_placement_previous_own_spawn", "Previous Own Spawn Point")
-            .AddBinding(new KeyboardBinding(Key.W, shift: true));
-
-        public static readonly InputAction TroopPlacementNextEnemySpawn = OneShot("troop_placement_next_enemy_spawn", "Next Enemy Spawn Point")
-            .AddBinding(new KeyboardBinding(Key.X));
-
-        public static readonly InputAction TroopPlacementPreviousEnemySpawn = OneShot("troop_placement_previous_enemy_spawn", "Previous Enemy Spawn Point")
-            .AddBinding(new KeyboardBinding(Key.X, shift: true));
-
         public static readonly InputAction TroopPlacementStartDrag = OneShot("troop_placement_start_drag", "Start Troop Placement Drag")
             .AddBinding(new KeyboardBinding(Key.Space));
 
@@ -162,6 +177,15 @@ namespace SongsOfConquestAccess.Input
             MapMoveWest,
             MapMoveEast,
             MapSecondaryAction,
+            ScannerRefresh,
+            ScannerPreviousCategory,
+            ScannerNextCategory,
+            ScannerPreviousSubcategory,
+            ScannerNextSubcategory,
+            ScannerPreviousResult,
+            ScannerNextResult,
+            ScannerJumpToResult,
+            ScannerSpeakOrientation,
             SliderDecrease,
             SliderIncrease,
             SliderMinimum,
@@ -179,10 +203,6 @@ namespace SongsOfConquestAccess.Input
             CombatInspect,
             CombatNextRelevantTile,
             CombatPreviousRelevantTile,
-            TroopPlacementNextOwnSpawn,
-            TroopPlacementPreviousOwnSpawn,
-            TroopPlacementNextEnemySpawn,
-            TroopPlacementPreviousEnemySpawn,
             TroopPlacementStartDrag,
             TroopPlacementCancelDrag,
             Activate,
