@@ -104,29 +104,31 @@ namespace SongsOfConquestAccess.Input
             }
 
             KeyboardStateSnapshot state = KeyboardStateSnapshot.Capture();
-            BindingMatch match = ResolveClaimedMatch(key, state);
-            if (match == null)
-            {
-                match = ResolveGlobalMatch(key, state);
-                if (match == null)
-                {
-                    return false;
-                }
-
-                if (_screenManager != null && _screenManager.CanHandleGlobalAction(match.Action))
-                {
-                    // Global actions such as opening the tooltip actions menu
-                    // can produce new focus speech. Silence only after the
-                    // preflight proves the action will run, so no-op global
-                    // presses do not cut off the current announcement.
-                    SpeechPipeline.Silence();
-                    _screenManager.HandleGlobalAction(match.Action);
-                }
-            }
-            else
+            List<BindingMatch> claimedMatches = ResolveClaimedMatches(key, state);
+            if (claimedMatches.Count > 0)
             {
                 SpeechPipeline.Silence();
-                _screenManager?.DispatchAction(match.Action);
+                DispatchClaimedMatches(claimedMatches);
+
+                ActiveBindingState claimedBindingState = new ActiveBindingState(claimedMatches[0].Action, claimedMatches[0].Binding);
+                _activeBindings[claimedMatches[0].Binding.Id] = claimedBindingState;
+                return true;
+            }
+
+            BindingMatch match = ResolveGlobalMatch(key, state);
+            if (match == null)
+            {
+                return false;
+            }
+
+            if (_screenManager != null && _screenManager.CanHandleGlobalAction(match.Action))
+            {
+                // Global actions such as opening the tooltip actions menu
+                // can produce new focus speech. Silence only after the
+                // preflight proves the action will run, so no-op global
+                // presses do not cut off the current announcement.
+                SpeechPipeline.Silence();
+                _screenManager.HandleGlobalAction(match.Action);
             }
 
             ActiveBindingState bindingState = new ActiveBindingState(match.Action, match.Binding);
@@ -147,8 +149,9 @@ namespace SongsOfConquestAccess.Input
             return null;
         }
 
-        private BindingMatch ResolveClaimedMatch(Key key, KeyboardStateSnapshot state)
+        private List<BindingMatch> ResolveClaimedMatches(Key key, KeyboardStateSnapshot state)
         {
+            List<BindingMatch> matches = new List<BindingMatch>();
             for (int i = 0; i < AccessibilityActions.NON_GLOBAL_ACTIONS.Length; i++)
             {
                 InputAction action = AccessibilityActions.NON_GLOBAL_ACTIONS[i];
@@ -160,11 +163,28 @@ namespace SongsOfConquestAccess.Input
                 KeyboardBinding binding = FindMatchingKeyboardBinding(action, key, state);
                 if (binding != null)
                 {
-                    return new BindingMatch(action, binding);
+                    matches.Add(new BindingMatch(action, binding));
                 }
             }
 
-            return null;
+            return matches;
+        }
+
+        private void DispatchClaimedMatches(List<BindingMatch> matches)
+        {
+            if (matches == null)
+            {
+                return;
+            }
+
+            for (int i = 0; i < matches.Count; i++)
+            {
+                BindingMatch match = matches[i];
+                if (match != null && _screenManager != null && _screenManager.DispatchAction(match.Action))
+                {
+                    return;
+                }
+            }
         }
 
         private BindingMatch ResolveGlobalMatch(Key key, KeyboardStateSnapshot state)
