@@ -16,8 +16,18 @@ namespace SongsOfConquestAccess
     [HarmonyPatch(typeof(SpellBook), "Close")]
     internal static class SpellbookClosePatch
     {
-        private static void Postfix(SpellBook __instance)
+        private static void Prefix(SpellBook __instance, ref bool __state)
         {
+            __state = __instance != null && __instance.IsOpen;
+        }
+
+        private static void Postfix(SpellBook __instance, bool __state)
+        {
+            if (!__state)
+            {
+                return;
+            }
+
             SoqAccessPlugin.Instance?.ScreenDetector?.OnSpellbookClosed(__instance);
         }
     }
