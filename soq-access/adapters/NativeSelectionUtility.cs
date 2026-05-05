@@ -56,6 +56,50 @@ namespace SongsOfConquestAccess.Adapters
             return Click(component, PointerEventData.InputButton.Left);
         }
 
+        public static bool PointerEnter(Component component)
+        {
+            if (component == null)
+            {
+                return false;
+            }
+
+            IPointerEnterHandler enterHandler = component as IPointerEnterHandler;
+            if (enterHandler == null)
+            {
+                enterHandler = component.GetComponent<IPointerEnterHandler>();
+            }
+
+            if (enterHandler == null)
+            {
+                return false;
+            }
+
+            enterHandler.OnPointerEnter(new PointerEventData(EventSystem.current));
+            return true;
+        }
+
+        public static bool PointerExit(Component component)
+        {
+            if (component == null)
+            {
+                return false;
+            }
+
+            IPointerExitHandler exitHandler = component as IPointerExitHandler;
+            if (exitHandler == null)
+            {
+                exitHandler = component.GetComponent<IPointerExitHandler>();
+            }
+
+            if (exitHandler == null)
+            {
+                return false;
+            }
+
+            exitHandler.OnPointerExit(new PointerEventData(EventSystem.current));
+            return true;
+        }
+
         private static bool Click(Component component, PointerEventData.InputButton button)
         {
             if (component == null)

@@ -38,6 +38,7 @@ namespace SongsOfConquestAccess.Screens
                 new HostileJoinMenuRuntimeScreenProbe(),
                 new MoveTroopPopupRuntimeScreenProbe(),
                 new WorldChoiceMenuRuntimeScreenProbe(),
+                new LevelUpRuntimeScreenProbe(),
                 new CommanderSheetRuntimeScreenProbe(),
                 new LetterboxStoryTextRuntimeScreenProbe(),
                 new StoryTextRuntimeScreenProbe(),
@@ -382,6 +383,26 @@ namespace SongsOfConquestAccess.Screens
         public void OnWorldChoiceMenuClosed(WorldChoiceMenu menu)
         {
             _screenManager.Pop<WorldChoiceMenuScreen>("world choice menu closed");
+        }
+
+        public void OnLevelUpMenuReady(CommanderLevelUpMenu menu)
+        {
+            LevelUpScreen screen = new LevelUpScreen(new LevelUpMenuAdapter(menu));
+            if (_screenManager.CurrentScreen is LevelUpScreen)
+            {
+                _screenManager.RefreshTop<LevelUpScreen>(screen, "level up menu changed");
+                return;
+            }
+
+            Push(screen, "level up menu ready");
+        }
+
+        public void OnLevelUpMenuClosed(CommanderLevelUpMenu menu)
+        {
+            if (_screenManager.CurrentScreen is LevelUpScreen)
+            {
+                _screenManager.Pop<LevelUpScreen>("level up menu closed");
+            }
         }
 
         public void OnHostileJoinMenuReady(HostileJoinMenu menu)
