@@ -37,6 +37,8 @@ namespace SongsOfConquestAccess.Adapters
 
         public string CommanderRelationship { get; set; }
 
+        public List<string> ZoneOfControlNames { get; private set; } = new List<string>();
+
         public IMapEntity MapEntity { get; set; }
 
         public string MapEntityName { get; set; }

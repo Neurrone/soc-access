@@ -446,7 +446,7 @@ namespace SongsOfConquestAccess.Adapters
 
                     if (tile.Elevation > 0)
                     {
-                        snapshot.Add("Terrain", "Elevated ground",
+                        snapshot.Add("Terrain", "Elevated ground " + tile.Elevation,
                             new ScannerResult("elevated ground, height " + tile.Elevation, point));
                     }
 

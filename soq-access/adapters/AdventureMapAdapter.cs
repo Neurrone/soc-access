@@ -17,6 +17,7 @@ using SongsOfConquest.Common.Details;
 using SongsOfConquest.Common.Entities;
 using SongsOfConquest.Common.Entities.Adventure;
 using SongsOfConquest.Common.Gamestate;
+using SongsOfConquest.Common.Gamestate.Commander;
 using SongsOfConquest.Common.Localization;
 using SongsOfConquestAccess.Events;
 using SongsOfConquestAccess.Scanner;
@@ -360,6 +361,7 @@ namespace SongsOfConquestAccess.Adapters
             tile.IsExplored = tile.IsVisible
                 || fog == ExploredButNotVisibleFogValue
                 || _facade.Level.GetIsPointExplored(localTeamId, clamped);
+            PopulateZoneOfControl(tile, localTeamId);
 
             if (!tile.IsExplored)
             {
@@ -441,7 +443,7 @@ namespace SongsOfConquestAccess.Adapters
             AddArtifactMarketScannerResults(snapshot, tileCache);
             AddObjectiveScannerResults(snapshot, tileCache);
             AddTeleportScannerResults(snapshot, tileCache);
-            AddObstacleScannerResults(snapshot, tileCache);
+            AddObstacleScannerResults(snapshot, localTeamId, origin, tileCache);
             AddAdventureTerrainScannerResults(snapshot, origin, tileCache);
             snapshot.SortByDistance(origin);
             return snapshot;
@@ -452,6 +454,11 @@ namespace SongsOfConquestAccess.Adapters
             if (result == null || !IsWithinMap(result.Position))
             {
                 return false;
+            }
+
+            if (result.Kind == ScannerResultKind.CommanderZoneOfControl)
+            {
+                return ValidateCommanderZoneOfControlResult(result);
             }
 
             AdventureMapTile tile = GetTile(result.Position);
@@ -643,7 +650,7 @@ namespace SongsOfConquestAccess.Adapters
             });
         }
 
-        private void AddObstacleScannerResults(ScannerSnapshot snapshot, Dictionary<Vector2Int, AdventureMapTile> tileCache)
+        private void AddObstacleScannerResults(ScannerSnapshot snapshot, int localTeamId, Vector2Int origin, Dictionary<Vector2Int, AdventureMapTile> tileCache)
         {
             ForEachScannerEntity(tileCache, entity =>
             {
@@ -656,17 +663,195 @@ namespace SongsOfConquestAccess.Adapters
 
                 if (entity.Category == MapEntityCategory.Hostile)
                 {
-                    snapshot.Add("Obstacles", "Guards", result);
+                    snapshot.Add("Obstacles", "All", result);
                 }
                 else if (entity.HasComponent<IMagicGateCommonComponent>() || entity.HasComponent<IUnlockWithArtifactComponent>())
                 {
-                    snapshot.Add("Obstacles", "Magic barriers", result);
+                    snapshot.Add("Obstacles", "All", result);
                 }
                 else if (entity.Category == MapEntityCategory.Obstacle)
                 {
-                    snapshot.Add("Obstacles", "Blockers", result);
+                    snapshot.Add("Obstacles", "All", result);
                 }
             });
+
+            AddHostileZoneOfControlScannerResults(snapshot, localTeamId, origin);
+        }
+
+        private void AddHostileZoneOfControlScannerResults(ScannerSnapshot snapshot, int localTeamId, Vector2Int origin)
+        {
+            IEnumerable<ICommanderState> commanders = _facade != null && _facade.Commanders != null ? _facade.Commanders.All : null;
+            if (commanders == null || localTeamId < 0)
+            {
+                return;
+            }
+
+            foreach (ICommanderState commander in commanders)
+            {
+                if (!IsOverlayVisibleZoneOfControlSource(commander) || !IsHostileZoneOfControlSource(commander, localTeamId))
+                {
+                    continue;
+                }
+
+                List<Vector2Int> points = GetZoneOfControlPoints(localTeamId, commander.Id);
+                if (points.Count == 0)
+                {
+                    continue;
+                }
+
+                Vector2Int representative = ClosestPoint(points, origin);
+                string name = FirstNonEmpty(GetCommanderName(commander), "commander");
+                string tileWord = points.Count == 1 ? " tile" : " tiles";
+                ScannerResult result = new ScannerResult(points.Count + tileWord + " within " + FormatPossessive(name) + " zone of control", representative)
+                {
+                    Kind = ScannerResultKind.CommanderZoneOfControl,
+                    StableReference = commander.Id
+                };
+                result.Points.AddRange(points);
+                snapshot.Add("Obstacles", "All", result);
+            }
+        }
+
+        private void PopulateZoneOfControl(AdventureMapTile tile, int localTeamId)
+        {
+            if (tile == null || localTeamId < 0)
+            {
+                return;
+            }
+
+            IEnumerable<ICommanderState> commanders = _facade != null && _facade.Commanders != null ? _facade.Commanders.All : null;
+            if (commanders == null)
+            {
+                return;
+            }
+
+            foreach (ICommanderState commander in commanders)
+            {
+                if (!IsOverlayVisibleZoneOfControlSource(commander))
+                {
+                    continue;
+                }
+
+                if (tile.Position == commander.Position || !ZoneOfControlContains(localTeamId, commander.Id, tile.Position))
+                {
+                    continue;
+                }
+
+                string name = FirstNonEmpty(GetCommanderName(commander), "commander");
+                if (!ContainsString(tile.ZoneOfControlNames, name))
+                {
+                    tile.ZoneOfControlNames.Add(name);
+                }
+            }
+        }
+
+        private bool ValidateCommanderZoneOfControlResult(ScannerResult result)
+        {
+            if (!(result.StableReference is int commanderId))
+            {
+                return false;
+            }
+
+            int localTeamId = GetLocalTeamId();
+            if (localTeamId < 0)
+            {
+                return false;
+            }
+
+            ICommanderState commander = FindCommanderById(commanderId);
+            if (!IsOverlayVisibleZoneOfControlSource(commander) || !IsHostileZoneOfControlSource(commander, localTeamId))
+            {
+                return false;
+            }
+
+            return ZoneOfControlContains(localTeamId, commanderId, result.Position);
+        }
+
+        private bool IsOverlayVisibleZoneOfControlSource(ICommanderState commander)
+        {
+            if (commander == null || commander.InternalState != CommanderInternalState.Default || !IsWithinMap(commander.Position))
+            {
+                return false;
+            }
+
+            return _fogManager.GetFog(commander.Position.x, commander.Position.y) == byte.MaxValue;
+        }
+
+        private bool IsHostileZoneOfControlSource(ICommanderState commander, int localTeamId)
+        {
+            return commander != null
+                && _facade.Teams != null
+                && !_facade.Teams.IsInPartnership(commander.TeamId, localTeamId);
+        }
+
+        private List<Vector2Int> GetZoneOfControlPoints(int localTeamId, int commanderId)
+        {
+            List<Vector2Int> points = new List<Vector2Int>();
+            IEnumerable<int2> nativePoints = _facade != null && _facade.Commanders != null
+                ? _facade.Commanders.GetZoneOfControlPoints(localTeamId, commanderId)
+                : null;
+            if (nativePoints == null)
+            {
+                return points;
+            }
+
+            ICommanderState commander = FindCommanderById(commanderId);
+            foreach (int2 point in nativePoints)
+            {
+                Vector2Int vector = new Vector2Int(point.x, point.y);
+                if (IsWithinMap(vector) && (commander == null || vector != commander.Position))
+                {
+                    points.Add(vector);
+                }
+            }
+
+            return points;
+        }
+
+        private bool ZoneOfControlContains(int localTeamId, int commanderId, Vector2Int position)
+        {
+            IEnumerable<int2> nativePoints = _facade != null && _facade.Commanders != null
+                ? _facade.Commanders.GetZoneOfControlPoints(localTeamId, commanderId)
+                : null;
+            if (nativePoints == null)
+            {
+                return false;
+            }
+
+            foreach (int2 point in nativePoints)
+            {
+                if (point.x == position.x && point.y == position.y)
+                {
+                    ICommanderState commander = FindCommanderById(commanderId);
+                    if (commander != null && position == commander.Position)
+                    {
+                        return false;
+                    }
+
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
+        private ICommanderState FindCommanderById(int commanderId)
+        {
+            IEnumerable<ICommanderState> commanders = _facade != null && _facade.Commanders != null ? _facade.Commanders.All : null;
+            if (commanders == null)
+            {
+                return null;
+            }
+
+            foreach (ICommanderState commander in commanders)
+            {
+                if (commander != null && commander.Id == commanderId)
+                {
+                    return commander;
+                }
+            }
+
+            return null;
         }
 
         private void ForEachScannerEntity(Dictionary<Vector2Int, AdventureMapTile> tileCache, Action<IMapEntity> action)
@@ -809,15 +994,15 @@ namespace SongsOfConquestAccess.Adapters
 
             if (entity.Category == MapEntityCategory.Hostile)
             {
-                snapshot.Add("Obstacles", "Guards", CloneResult(result));
+                snapshot.Add("Obstacles", "All", CloneResult(result));
             }
             else if (entity.HasComponent<IMagicGateCommonComponent>() || entity.HasComponent<IUnlockWithArtifactComponent>())
             {
-                snapshot.Add("Obstacles", "Magic barriers", CloneResult(result));
+                snapshot.Add("Obstacles", "All", CloneResult(result));
             }
             else if (entity.Category == MapEntityCategory.Obstacle)
             {
-                snapshot.Add("Obstacles", "Blockers", CloneResult(result));
+                snapshot.Add("Obstacles", "All", CloneResult(result));
             }
         }
 
@@ -920,8 +1105,12 @@ namespace SongsOfConquestAccess.Adapters
 
                     List<Vector2Int> group = FloodTerrainGroup(start, terrain, visited, predicate);
                     Vector2Int representative = ClosestPoint(group, origin);
-                    snapshot.Add("Terrain", subcategory,
-                        new ScannerResult(group.Count + " " + label, representative) { IsTerrainGroup = true });
+                    ScannerResult result = new ScannerResult(group.Count + " " + label, representative)
+                    {
+                        Kind = ScannerResultKind.TerrainGroup
+                    };
+                    result.Points.AddRange(group);
+                    snapshot.Add("Terrain", subcategory, result);
                 }
             }
         }
@@ -942,10 +1131,7 @@ namespace SongsOfConquestAccess.Adapters
                 }
 
                 result.Add(point);
-                EnqueueTerrainNeighbor(queue, visited, point.x + 1, point.y);
-                EnqueueTerrainNeighbor(queue, visited, point.x - 1, point.y);
-                EnqueueTerrainNeighbor(queue, visited, point.x, point.y + 1);
-                EnqueueTerrainNeighbor(queue, visited, point.x, point.y - 1);
+                EnqueueTerrainNeighbors(queue, visited, point);
             }
 
             return result;
@@ -962,6 +1148,18 @@ namespace SongsOfConquestAccess.Adapters
             public bool Water;
 
             public bool Impassable;
+        }
+
+        private void EnqueueTerrainNeighbors(Queue<Vector2Int> queue, bool[,] visited, Vector2Int point)
+        {
+            EnqueueTerrainNeighbor(queue, visited, point.x + 1, point.y);
+            EnqueueTerrainNeighbor(queue, visited, point.x - 1, point.y);
+            EnqueueTerrainNeighbor(queue, visited, point.x, point.y + 1);
+            EnqueueTerrainNeighbor(queue, visited, point.x, point.y - 1);
+            EnqueueTerrainNeighbor(queue, visited, point.x + 1, point.y + 1);
+            EnqueueTerrainNeighbor(queue, visited, point.x - 1, point.y + 1);
+            EnqueueTerrainNeighbor(queue, visited, point.x + 1, point.y - 1);
+            EnqueueTerrainNeighbor(queue, visited, point.x - 1, point.y - 1);
         }
 
         private void EnqueueTerrainNeighbor(Queue<Vector2Int> queue, bool[,] visited, int x, int y)
@@ -1024,12 +1222,14 @@ namespace SongsOfConquestAccess.Adapters
 
         private static ScannerResult CloneResult(ScannerResult result)
         {
-            return new ScannerResult(result.Label, result.Position)
+            ScannerResult clone = new ScannerResult(result.Label, result.Position)
             {
                 NotVisible = result.NotVisible,
                 StableReference = result.StableReference,
-                IsTerrainGroup = result.IsTerrainGroup
+                Kind = result.Kind
             };
+            clone.Points.AddRange(result.Points);
+            return clone;
         }
 
         private static string ToTitleCase(string value)
@@ -2143,6 +2343,51 @@ namespace SongsOfConquestAccess.Adapters
         private static string FirstNonEmpty(string preferred, string fallback)
         {
             return string.IsNullOrWhiteSpace(preferred) ? fallback : preferred;
+        }
+
+        private string GetCommanderName(ICommanderState commander)
+        {
+            if (commander == null || _facade == null || _facade.Commanders == null)
+            {
+                return string.Empty;
+            }
+
+            try
+            {
+                return _facade.Commanders.GetName(commander.Id);
+            }
+            catch (Exception)
+            {
+                return string.Empty;
+            }
+        }
+
+        private static bool ContainsString(List<string> values, string value)
+        {
+            if (values == null || string.IsNullOrWhiteSpace(value))
+            {
+                return false;
+            }
+
+            for (int i = 0; i < values.Count; i++)
+            {
+                if (string.Equals(values[i], value, StringComparison.Ordinal))
+                {
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
+        private static string FormatPossessive(string name)
+        {
+            if (string.IsNullOrWhiteSpace(name))
+            {
+                return "commander's";
+            }
+
+            return name.EndsWith("s") || name.EndsWith("S") ? name + "'" : name + "'s";
         }
 
         private void PopulateEnvironment(AdventureMapTile tile, Vector2Int position)

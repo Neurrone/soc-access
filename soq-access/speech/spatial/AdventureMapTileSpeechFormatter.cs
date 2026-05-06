@@ -16,6 +16,14 @@ namespace SongsOfConquestAccess.Speech.Spatial
             if (!tile.IsExplored)
             {
                 parts.Add("Unexplored");
+                for (int i = 0; i < tile.ZoneOfControlNames.Count; i++)
+                {
+                    if (!string.IsNullOrWhiteSpace(tile.ZoneOfControlNames[i]))
+                    {
+                        parts.Add("Within " + FormatPossessive(tile.ZoneOfControlNames[i]) + " zone of control");
+                    }
+                }
+
                 parts.Add(DescribeCoordinates(tile));
                 return string.Join(". ", parts.ToArray()) + ".";
             }
@@ -31,6 +39,14 @@ namespace SongsOfConquestAccess.Speech.Spatial
             if (hasContent)
             {
                 parts.Add(primary);
+            }
+
+            for (int i = 0; i < tile.ZoneOfControlNames.Count; i++)
+            {
+                if (!string.IsNullOrWhiteSpace(tile.ZoneOfControlNames[i]))
+                {
+                    parts.Add("Within " + FormatPossessive(tile.ZoneOfControlNames[i]) + " zone of control");
+                }
             }
 
             for (int i = 0; i < tile.Environment.Count; i++)
@@ -135,6 +151,14 @@ namespace SongsOfConquestAccess.Speech.Spatial
             }
 
             List<string> parts = new List<string>();
+            for (int i = 0; i < tile.ZoneOfControlNames.Count; i++)
+            {
+                if (!string.IsNullOrWhiteSpace(tile.ZoneOfControlNames[i]))
+                {
+                    parts.Add("Within " + FormatPossessive(tile.ZoneOfControlNames[i]) + " zone of control");
+                }
+            }
+
             for (int i = 0; i < tile.Environment.Count; i++)
             {
                 if (!string.IsNullOrWhiteSpace(tile.Environment[i]))
@@ -149,6 +173,16 @@ namespace SongsOfConquestAccess.Speech.Spatial
             }
 
             return string.Join(". ", parts.ToArray());
+        }
+
+        private static string FormatPossessive(string name)
+        {
+            if (string.IsNullOrWhiteSpace(name))
+            {
+                return "commander's";
+            }
+
+            return name.EndsWith("s") || name.EndsWith("S") ? name + "'" : name + "'s";
         }
 
         public string DescribeCoordinates(AdventureMapTile tile)

@@ -34,7 +34,7 @@ namespace SongsOfConquestAccess.Scanner
         {
             List<string> parts = new List<string>();
             CombatTileSpeechFormatter formatter = new CombatTileSpeechFormatter(_adapter, null, includeEnemyInfluence: false);
-            if (_result != null && _result.IsTerrainGroup)
+            if (_result != null && _result.Kind == ScannerResultKind.TerrainGroup)
             {
                 ScannerSpeechUtility.AddIfPresent(parts, _result.Label);
             }

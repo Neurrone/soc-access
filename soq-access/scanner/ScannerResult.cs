@@ -1,13 +1,22 @@
+using System.Collections.Generic;
 using UnityEngine;
 
 namespace SongsOfConquestAccess.Scanner
 {
+    internal enum ScannerResultKind
+    {
+        Point,
+        TerrainGroup,
+        CommanderZoneOfControl
+    }
+
     internal sealed class ScannerResult
     {
         public ScannerResult(string label, Vector2Int position)
         {
             Label = label;
             Position = position;
+            Points = new List<Vector2Int>();
         }
 
         public string Label { get; private set; }
@@ -16,8 +25,10 @@ namespace SongsOfConquestAccess.Scanner
 
         public bool NotVisible { get; set; }
 
-        public bool IsTerrainGroup { get; set; }
+        public ScannerResultKind Kind { get; set; }
 
         public object StableReference { get; set; }
+
+        public List<Vector2Int> Points { get; private set; }
     }
 }
