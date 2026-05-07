@@ -14,6 +14,7 @@ namespace SongsOfConquestAccess.UI
         private readonly Func<int> _getStep;
         private readonly Func<int, bool> _setValue;
         private readonly Func<bool> _isEnabled;
+        private readonly Func<bool> _isVisible;
 
         public SliderWidget(
             string id,
@@ -25,6 +26,21 @@ namespace SongsOfConquestAccess.UI
             Func<int> getStep,
             Func<int, bool> setValue,
             Func<bool> isEnabled)
+            : this(id, label, getValueText, getValue, getMinimumValue, getMaximumValue, getStep, setValue, isEnabled, null)
+        {
+        }
+
+        public SliderWidget(
+            string id,
+            string label,
+            Func<string> getValueText,
+            Func<int> getValue,
+            Func<int> getMinimumValue,
+            Func<int> getMaximumValue,
+            Func<int> getStep,
+            Func<int, bool> setValue,
+            Func<bool> isEnabled,
+            Func<bool> isVisible = null)
             : base(id)
         {
             _label = label ?? string.Empty;
@@ -35,6 +51,12 @@ namespace SongsOfConquestAccess.UI
             _getStep = getStep;
             _setValue = setValue;
             _isEnabled = isEnabled;
+            _isVisible = isVisible;
+        }
+
+        public override bool IsVisible
+        {
+            get { return _isVisible == null || _isVisible(); }
         }
 
         public override string GetLabel()
