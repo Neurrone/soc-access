@@ -8,7 +8,7 @@ namespace SongsOfConquestAccess.UI
         private readonly Func<string> _getText;
         private readonly Action _onFocus;
         private readonly bool _includeParentLabelInAnnouncement;
-        private readonly Tooltip _tooltip;
+        private readonly Func<Tooltip> _getTooltip;
         private readonly Func<bool> _isVisible;
 
         public TextWidget(
@@ -18,12 +18,23 @@ namespace SongsOfConquestAccess.UI
             bool includeParentLabelInAnnouncement,
             Tooltip tooltip = null,
             Func<bool> isVisible = null)
+            : this(id, getText, onFocus, includeParentLabelInAnnouncement, () => tooltip, isVisible)
+        {
+        }
+
+        public TextWidget(
+            string id,
+            Func<string> getText,
+            Action onFocus,
+            bool includeParentLabelInAnnouncement,
+            Func<Tooltip> getTooltip,
+            Func<bool> isVisible = null)
             : base(id)
         {
             _getText = getText;
             _onFocus = onFocus;
             _includeParentLabelInAnnouncement = includeParentLabelInAnnouncement;
-            _tooltip = tooltip;
+            _getTooltip = getTooltip;
             _isVisible = isVisible;
         }
 
@@ -44,7 +55,7 @@ namespace SongsOfConquestAccess.UI
 
         public override Tooltip GetTooltip()
         {
-            return _tooltip;
+            return _getTooltip != null ? _getTooltip() : null;
         }
 
         protected override void OnFocus()

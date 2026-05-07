@@ -10,18 +10,30 @@ namespace SongsOfConquestAccess.UI
         private readonly Action _onFocus;
         private readonly Func<bool> _isEnabled;
         private readonly Func<bool> _isVisible;
-        private readonly string _label;
-        private readonly Tooltip _tooltip;
+        private readonly Func<string> _getLabel;
+        private readonly Func<Tooltip> _getTooltip;
 
         public ButtonWidget(string id, string label, Func<bool> activate, Action onFocus, Func<bool> isEnabled, Func<bool> isVisible = null, Tooltip tooltip = null)
+            : this(id, () => label, activate, onFocus, isEnabled, isVisible, () => tooltip)
+        {
+        }
+
+        public ButtonWidget(
+            string id,
+            Func<string> getLabel,
+            Func<bool> activate,
+            Action onFocus,
+            Func<bool> isEnabled,
+            Func<bool> isVisible = null,
+            Func<Tooltip> getTooltip = null)
             : base(id)
         {
-            _label = label ?? string.Empty;
+            _getLabel = getLabel;
             _activate = activate;
             _onFocus = onFocus;
             _isEnabled = isEnabled;
             _isVisible = isVisible;
-            _tooltip = tooltip;
+            _getTooltip = getTooltip;
         }
 
         public override bool IsVisible
@@ -31,7 +43,7 @@ namespace SongsOfConquestAccess.UI
 
         public override string GetLabel()
         {
-            return _label;
+            return _getLabel != null ? _getLabel() ?? string.Empty : string.Empty;
         }
 
         public override string GetRole()
@@ -46,7 +58,7 @@ namespace SongsOfConquestAccess.UI
 
         public override Tooltip GetTooltip()
         {
-            return _tooltip;
+            return _getTooltip != null ? _getTooltip() : null;
         }
 
         public override bool ClaimsAction(string actionKey)

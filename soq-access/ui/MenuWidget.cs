@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System;
 using SongsOfConquestAccess.Input;
 
 namespace SongsOfConquestAccess.UI
@@ -6,15 +7,27 @@ namespace SongsOfConquestAccess.UI
     internal sealed class MenuWidget : Widget
     {
         private readonly List<MenuItemWidget> _items = new List<MenuItemWidget>();
+        private readonly Func<bool> _isVisible;
         private int _focusedIndex = -1;
 
         public MenuWidget(string id, string label)
+            : this(id, label, null)
+        {
+        }
+
+        public MenuWidget(string id, string label, Func<bool> isVisible)
             : base(id)
         {
             Label = label ?? string.Empty;
+            _isVisible = isVisible;
         }
 
         public string Label { get; private set; }
+
+        public override bool IsVisible
+        {
+            get { return _isVisible == null || _isVisible(); }
+        }
 
         public MenuItemWidget FocusedItem
         {
@@ -159,6 +172,12 @@ namespace SongsOfConquestAccess.UI
             if (_items.Count == 0)
             {
                 return false;
+            }
+
+            MenuItemWidget focusedItem = FocusedItem;
+            if (focusedItem != null && !focusedItem.IsVisible)
+            {
+                return SetFocus(ClampToVisibleIndex(_focusedIndex));
             }
 
             int nextIndex = _focusedIndex;

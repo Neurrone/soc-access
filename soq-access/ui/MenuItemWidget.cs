@@ -12,6 +12,7 @@ namespace SongsOfConquestAccess.UI
         private readonly Action _onFocus;
         private readonly Action _onUnfocus;
         private readonly Func<bool> _isVisible;
+        private readonly Func<bool> _isEnabled;
         private readonly Func<Tooltip> _getTooltip;
 
         public MenuItemWidget(
@@ -22,8 +23,9 @@ namespace SongsOfConquestAccess.UI
             Action onFocus,
             Func<bool> isVisible,
             Tooltip tooltip = null,
-            Action onUnfocus = null)
-            : this(id, getLabel, getStatus, activate, onFocus, isVisible, () => tooltip, onUnfocus)
+            Action onUnfocus = null,
+            Func<bool> isEnabled = null)
+            : this(id, getLabel, getStatus, activate, onFocus, isVisible, () => tooltip, onUnfocus, isEnabled)
         {
         }
 
@@ -35,7 +37,8 @@ namespace SongsOfConquestAccess.UI
             Action onFocus,
             Func<bool> isVisible,
             Func<Tooltip> getTooltip,
-            Action onUnfocus = null)
+            Action onUnfocus = null,
+            Func<bool> isEnabled = null)
             : base(id)
         {
             _getLabel = getLabel;
@@ -44,6 +47,7 @@ namespace SongsOfConquestAccess.UI
             _onFocus = onFocus;
             _onUnfocus = onUnfocus;
             _isVisible = isVisible;
+            _isEnabled = isEnabled;
             _getTooltip = getTooltip;
         }
 
@@ -59,6 +63,11 @@ namespace SongsOfConquestAccess.UI
 
         public override string GetStatus()
         {
+            if (!IsEnabled())
+            {
+                return "disabled";
+            }
+
             return _getStatus != null ? _getStatus() ?? string.Empty : string.Empty;
         }
 
@@ -69,12 +78,12 @@ namespace SongsOfConquestAccess.UI
 
         public override bool ClaimsAction(string actionKey)
         {
-            return IsVisible && actionKey == AccessibilityActions.Activate.Key;
+            return IsVisible && IsEnabled() && actionKey == AccessibilityActions.Activate.Key;
         }
 
         public override bool HandleAction(InputAction action)
         {
-            if (!IsVisible || action == null || action.Key != AccessibilityActions.Activate.Key)
+            if (!IsVisible || !IsEnabled() || action == null || action.Key != AccessibilityActions.Activate.Key)
             {
                 return false;
             }
@@ -90,6 +99,11 @@ namespace SongsOfConquestAccess.UI
         protected override void OnUnfocus()
         {
             _onUnfocus?.Invoke();
+        }
+
+        private bool IsEnabled()
+        {
+            return _isEnabled == null || _isEnabled();
         }
     }
 }
