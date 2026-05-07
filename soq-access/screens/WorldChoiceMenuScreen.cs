@@ -55,6 +55,12 @@ namespace SongsOfConquestAccess.Screens
                 adapter.HideNativeTooltip,
                 includeParentLabelInAnnouncement: false));
 
+            root.AddChild(TroopHudMenu.Build(
+                "world-choice-troops",
+                "Troops",
+                adapter.Troops,
+                () => true));
+
             root.AddChild(new TextWidget(
                 "world-choice-body",
                 () => adapter.Body,

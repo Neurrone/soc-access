@@ -4,7 +4,10 @@ using System.Reflection;
 using HarmonyLib;
 using SongsOfConquest.Client;
 using SongsOfConquest.Client.Adventure;
+using SongsOfConquest.Client.Adventure.UI;
 using SongsOfConquest.Client.Adventure.WorldMenuComponents;
+using SongsOfConquest.Client.Gamestate;
+using SongsOfConquest.Client.Gamestate.Facade;
 using SongsOfConquest.Client.Menu.Tooltip;
 using SongsOfConquest.Client.UI;
 using SongsOfConquest.Common.Details;
@@ -21,16 +24,20 @@ namespace SongsOfConquestAccess.Adapters
         private static readonly FieldInfo AsyncField = AccessTools.Field(typeof(WorldChoiceMenu), "_async");
         private static readonly FieldInfo RewardButtonsField = AccessTools.Field(typeof(WorldChoiceMenu), "_rewardButtons");
         private static readonly FieldInfo LocalizationField = AccessTools.Field(typeof(WorldChoiceMenu), "_localization");
+        private static readonly FieldInfo AdventureFacadeField = AccessTools.Field(typeof(WorldChoiceMenu), "_adventureFacade");
+        private static readonly FieldInfo HeaderTroopHudField = AccessTools.Field(typeof(WielderInteractHeader), "_troopHUD");
 
         private readonly WorldChoiceMenu _menu;
         private readonly WorldChoiceMenu.Settings _settings;
         private readonly ILocalizationHandler _localization;
+        private readonly IClientAdventureFacade _facade;
 
         public WorldChoiceMenuAdapter(WorldChoiceMenu menu)
         {
             _menu = menu;
             _settings = GetField<WorldChoiceMenu.Settings>(menu, SettingsField);
             _localization = GetField<ILocalizationHandler>(menu, LocalizationField);
+            _facade = GetField<IClientAdventureFacade>(menu, AdventureFacadeField);
         }
 
         public object SourceKey
@@ -46,6 +53,11 @@ namespace SongsOfConquestAccess.Adapters
         public string Body
         {
             get { return GetText(_settings != null ? _settings.BodyText : null); }
+        }
+
+        public TroopHudAdapter Troops
+        {
+            get { return new TroopHudAdapter(GetWielderTroopHud(), _facade, _localization, "troops"); }
         }
 
         public bool IsPresent()
@@ -154,6 +166,13 @@ namespace SongsOfConquestAccess.Adapters
         {
             List<IWorldMapChoiceButton> buttons = GetField<List<IWorldMapChoiceButton>>(_menu, RewardButtonsField);
             return buttons ?? new List<IWorldMapChoiceButton>();
+        }
+
+        private TroopHUD GetWielderTroopHud()
+        {
+            return _settings != null && _settings.WielderInteractHeader != null
+                ? GetField<TroopHUD>(_settings.WielderInteractHeader, HeaderTroopHudField)
+                : null;
         }
 
         private static string GetText(IUITextMesh textMesh)
