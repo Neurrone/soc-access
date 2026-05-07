@@ -104,6 +104,11 @@ namespace SongsOfConquestAccess.UI
             SetFocus(FindFirstVisibleIndex(), updateUiManager: true);
         }
 
+        protected override void OnUnfocus()
+        {
+            FocusedChild?.Unfocus();
+        }
+
         public override Widget GetFocusedWidget()
         {
             return FocusedChild != null ? FocusedChild.GetFocusedWidget() : this;
