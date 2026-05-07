@@ -4,7 +4,7 @@ using SongsOfConquestAccess.Input;
 
 namespace SongsOfConquestAccess.UI
 {
-    internal sealed class MenuItemWidget : Widget
+    internal class MenuItemWidget : Widget
     {
         private readonly Func<string> _getLabel;
         private readonly Func<string> _getStatus;
@@ -101,7 +101,7 @@ namespace SongsOfConquestAccess.UI
             _onUnfocus?.Invoke();
         }
 
-        private bool IsEnabled()
+        protected bool IsEnabled()
         {
             return _isEnabled == null || _isEnabled();
         }

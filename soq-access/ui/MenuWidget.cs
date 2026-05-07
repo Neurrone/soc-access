@@ -4,7 +4,7 @@ using SongsOfConquestAccess.Input;
 
 namespace SongsOfConquestAccess.UI
 {
-    internal sealed class MenuWidget : Widget
+    internal class MenuWidget : Widget
     {
         private readonly List<MenuItemWidget> _items = new List<MenuItemWidget>();
         private readonly Func<bool> _isVisible;
@@ -45,6 +45,11 @@ namespace SongsOfConquestAccess.UI
         public int FocusedIndex
         {
             get { return _focusedIndex; }
+        }
+
+        protected MenuItemWidget FocusedItemOrNull
+        {
+            get { return FocusedItem; }
         }
 
         public override string GetLabel()
@@ -122,10 +127,7 @@ namespace SongsOfConquestAccess.UI
 
         public override bool ClaimsAction(string actionKey)
         {
-            return actionKey == AccessibilityActions.NextMenuItem.Key
-                || actionKey == AccessibilityActions.PreviousMenuItem.Key
-                || actionKey == AccessibilityActions.FirstMenuItem.Key
-                || actionKey == AccessibilityActions.LastMenuItem.Key;
+            return ClaimsMenuNavigationAction(actionKey);
         }
 
         public override bool HasClaimInTree(string actionKey)
@@ -135,18 +137,46 @@ namespace SongsOfConquestAccess.UI
                 return true;
             }
 
-            MenuItemWidget focusedItem = FocusedItem;
-            return focusedItem != null && focusedItem.IsVisible && focusedItem.HasClaimInTree(actionKey);
+            return ClaimsFocusedItemAction(actionKey);
         }
 
         public override bool HandleAction(InputAction action)
         {
-            MenuItemWidget focusedItem = FocusedItem;
-            if (focusedItem != null && focusedItem.HandleAction(action))
+            if (HandleFocusedItemAction(action))
             {
                 return true;
             }
 
+            if (action == null)
+            {
+                return false;
+            }
+
+            return HandleMenuNavigationAction(action);
+        }
+
+        protected virtual bool ClaimsFocusedItemAction(string actionKey)
+        {
+            MenuItemWidget focusedItem = FocusedItem;
+            return focusedItem != null && focusedItem.IsVisible && focusedItem.HasClaimInTree(actionKey);
+        }
+
+        protected virtual bool HandleFocusedItemAction(InputAction action)
+        {
+            MenuItemWidget focusedItem = FocusedItem;
+            return focusedItem != null && focusedItem.HandleAction(action);
+        }
+
+        protected virtual bool ClaimsMenuNavigationAction(string actionKey)
+        {
+            return actionKey == AccessibilityActions.NextMenuItem.Key
+                || actionKey == AccessibilityActions.PreviousMenuItem.Key
+                || actionKey == AccessibilityActions.FirstMenuItem.Key
+                || actionKey == AccessibilityActions.LastMenuItem.Key;
+        }
+
+        protected virtual bool HandleMenuNavigationAction(InputAction action)
+        {
             if (action == null)
             {
                 return false;
@@ -167,7 +197,7 @@ namespace SongsOfConquestAccess.UI
             }
         }
 
-        private bool MoveRelative(int delta)
+        protected bool MoveRelative(int delta)
         {
             if (_items.Count == 0)
             {
@@ -200,7 +230,7 @@ namespace SongsOfConquestAccess.UI
             return false;
         }
 
-        private int FindFirstVisibleIndex()
+        protected int FindFirstVisibleIndex()
         {
             for (int i = 0; i < _items.Count; i++)
             {
@@ -213,7 +243,7 @@ namespace SongsOfConquestAccess.UI
             return -1;
         }
 
-        private int FindLastVisibleIndex()
+        protected int FindLastVisibleIndex()
         {
             for (int i = _items.Count - 1; i >= 0; i--)
             {
@@ -226,7 +256,7 @@ namespace SongsOfConquestAccess.UI
             return -1;
         }
 
-        private int ClampToVisibleIndex(int index)
+        protected int ClampToVisibleIndex(int index)
         {
             if (_items.Count == 0)
             {
@@ -267,7 +297,7 @@ namespace SongsOfConquestAccess.UI
             return -1;
         }
 
-        private bool SetFocus(int index)
+        protected bool SetFocus(int index)
         {
             if (index < 0 || index >= _items.Count)
             {
