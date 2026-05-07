@@ -157,7 +157,7 @@ namespace SongsOfConquestAccess.UI
 
         protected override void OnUnfocus()
         {
-            CancelDrag();
+            ClearDrag();
             FocusedSlot?.Unfocus();
         }
 
@@ -273,7 +273,7 @@ namespace SongsOfConquestAccess.UI
             SlotWidget target = FocusedSlot;
             if (_dragSource == null)
             {
-                Speak("Press space to select a stack to drag.");
+                Speak("Press space to drag.");
                 return true;
             }
 
@@ -304,9 +304,14 @@ namespace SongsOfConquestAccess.UI
                 return false;
             }
 
-            _dragSource = null;
+            ClearDrag();
             Speak("Drag cancelled.");
             return true;
+        }
+
+        private void ClearDrag()
+        {
+            _dragSource = null;
         }
 
         private List<SlotWidget> GetColumn(int column)

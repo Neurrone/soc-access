@@ -57,6 +57,16 @@ namespace SongsOfConquestAccess.UI
                 return CompleteDrag();
             }
 
+            if (action.Key == AccessibilityActions.Activate.Key)
+            {
+                DraggableMenuItemWidget item = FocusedItemOrNull as DraggableMenuItemWidget;
+                if (item != null && item.CanDrag && !item.HasActivateBehavior)
+                {
+                    Speak("Press space to drag.");
+                    return true;
+                }
+            }
+
             if (action.Key == AccessibilityActions.Cancel.Key && _dragSource != null)
             {
                 return CancelDrag();
@@ -67,7 +77,7 @@ namespace SongsOfConquestAccess.UI
 
         protected override void OnUnfocus()
         {
-            CancelDrag();
+            ClearDrag();
             base.OnUnfocus();
         }
 
@@ -76,7 +86,6 @@ namespace SongsOfConquestAccess.UI
             DraggableMenuItemWidget source = FocusedItemOrNull as DraggableMenuItemWidget;
             if (source == null || !source.CanDrag)
             {
-                Speak("Nothing to drag.");
                 return true;
             }
 
@@ -100,6 +109,11 @@ namespace SongsOfConquestAccess.UI
                 return true;
             }
 
+            if (ReferenceEquals(target, _dragSource))
+            {
+                return true;
+            }
+
             DraggableMenuItemWidget source = _dragSource;
             if (_drop != null && _drop(source, target))
             {
@@ -116,9 +130,14 @@ namespace SongsOfConquestAccess.UI
                 return false;
             }
 
-            _dragSource = null;
+            ClearDrag();
             Speak("Drag cancelled.");
             return true;
+        }
+
+        private void ClearDrag()
+        {
+            _dragSource = null;
         }
 
         private static void Speak(string text)

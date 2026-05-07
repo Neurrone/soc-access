@@ -50,10 +50,13 @@ namespace SongsOfConquestAccess.Adapters
         private static readonly MethodInfo HandleCloseClickedMethod = AccessTools.Method(typeof(SpellBook), "HandleCloseClicked");
         private static readonly MethodInfo RefreshShownSpellMethod = AccessTools.Method(typeof(SpellBook), "RefreshShownSpell");
         private static readonly FieldInfo QuickbarEntriesField = AccessTools.Field(typeof(SpellbookQuickbar), "_entries");
+        private static readonly FieldInfo QuickbarMovableSpellField = AccessTools.Field(typeof(SpellbookQuickbar), "_movableSpell");
         private static readonly FieldInfo QuickbarAutoPopulateToggleField = AccessTools.Field(typeof(SpellbookQuickbar), "_autoPopulateToggle");
         private static readonly MethodInfo QuickbarSetEmptyMethod = AccessTools.Method(typeof(SpellbookQuickbar), "SetEmpty", new[] { typeof(int) });
         private static readonly FieldInfo QuickbarMainButtonField = AccessTools.Field(typeof(SpellbookQuickbarEntry), "_mainButton");
         private static readonly FieldInfo QuickbarDeleteButtonField = AccessTools.Field(typeof(SpellbookQuickbarEntry), "_deleteButton");
+        private static readonly FieldInfo MovableSpellHoverQuickbarEntryField = AccessTools.Field(typeof(SpellbookMovableSpell), "_hoverQuickbarEntry");
+        private static readonly MethodInfo MovableSpellEndDragMethod = AccessTools.Method(typeof(SpellbookMovableSpell), "EndDrag");
         private static readonly FieldInfo EntryButtonField = AccessTools.Field(typeof(SpellbookSpellEntry), "_button");
 
         private readonly SpellBook _spellbook;
@@ -290,6 +293,31 @@ namespace SongsOfConquestAccess.Adapters
             }
 
             return false;
+        }
+
+        public bool DropQuickbarItem(QuickbarItem source, QuickbarItem target)
+        {
+            SpellbookQuickbarEntry sourceEntry = source != null ? source.Entry : null;
+            SpellbookQuickbarEntry targetEntry = target != null ? target.Entry : null;
+            if (sourceEntry == null || targetEntry == null || sourceEntry.Spell == null || IsAutoPopulateChecked())
+            {
+                return false;
+            }
+
+            SpellbookQuickbar quickbar = GetQuickbar();
+            SpellbookMovableSpell movableSpell = quickbar != null && QuickbarMovableSpellField != null
+                ? QuickbarMovableSpellField.GetValue(quickbar) as SpellbookMovableSpell
+                : null;
+            if (movableSpell == null || MovableSpellHoverQuickbarEntryField == null || MovableSpellEndDragMethod == null)
+            {
+                SoqAccessPlugin.Instance?.LogWarning("Spellbook quickbar drag failed because native movable spell members were not found");
+                return false;
+            }
+
+            movableSpell.BeginDrag(sourceEntry);
+            MovableSpellHoverQuickbarEntryField.SetValue(movableSpell, targetEntry);
+            MovableSpellEndDragMethod.Invoke(movableSpell, null);
+            return true;
         }
 
         public string GetSpellLabel(ISpellDefinition spell)
@@ -783,7 +811,11 @@ namespace SongsOfConquestAccess.Adapters
 
             public int Index { get; private set; }
 
+            public SpellbookQuickbarEntry Entry { get { return _entry; } }
+
             public string Id { get { return "spellbook-quickbar-" + (Index + 1); } }
+
+            public bool CanDrag { get { return _entry != null && _entry.Spell != null && !_adapter.IsAutoPopulateChecked(); } }
 
             public string Label
             {
@@ -796,6 +828,8 @@ namespace SongsOfConquestAccess.Adapters
             }
 
             public bool Activate() { return _entry != null && _adapter.ActivateQuickbar(_entry); }
+
+            public bool DropTo(QuickbarItem target) { return _adapter.DropQuickbarItem(this, target); }
 
             public void Focus() { _adapter.FocusQuickbar(_entry); }
 

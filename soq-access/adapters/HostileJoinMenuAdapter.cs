@@ -1,5 +1,4 @@
 using System;
-using System.Collections.Generic;
 using System.Reflection;
 using HarmonyLib;
 using SongsOfConquest.Client;
@@ -12,10 +11,8 @@ using SongsOfConquest.Client.UI;
 using SongsOfConquest.Common;
 using SongsOfConquest.Common.Gamestate;
 using SongsOfConquest.Common.Localization;
-using SongsOfConquestAccess.Events;
 using SongsOfConquestAccess.Speech;
 using SongsOfConquestAccess.UI;
-using UnityEngine;
 
 namespace SongsOfConquestAccess.Adapters
 {
@@ -29,17 +26,6 @@ namespace SongsOfConquestAccess.Adapters
         private static readonly FieldInfo AdventureFacadeField = AccessTools.Field(typeof(HostileJoinMenu), "_adventureFacade");
         private static readonly FieldInfo LocalizationField = AccessTools.Field(typeof(HostileJoinMenu), "_localizationHandler");
         private static readonly FieldInfo HeaderTroopHudField = AccessTools.Field(typeof(WielderInteractHeader), "_troopHUD");
-        private static readonly FieldInfo TroopHudEntriesField = AccessTools.Field(typeof(TroopHUD), "_troops");
-        private static readonly FieldInfo MovableTroopField = AccessTools.Field(typeof(TroopHUD), "_movableHudTroop");
-        private static readonly FieldInfo CurrentHoverEntryField = AccessTools.Field(typeof(TroopHUDEntryMovable), "_currentHoverEntry");
-        private static readonly FieldInfo IsDraggingRightField = AccessTools.Field(typeof(TroopHUDEntryMovable), "_isDraggingRight");
-        private static readonly FieldInfo DragDirectionField = AccessTools.Field(typeof(TroopHUDEntryMovable), "_dragDirection");
-        private static readonly MethodInfo CanDropHereMethod = AccessTools.Method(typeof(TroopHUDEntryMovable), "CanDropHere");
-        private static readonly MethodInfo CanMergeMethod = AccessTools.Method(typeof(TroopHUDEntryMovable), "CanMerge");
-        private static readonly MethodInfo IsEmptyAndUnlockedMethod = AccessTools.Method(typeof(TroopHUDEntryMovable), "IsEmptyAndUnlocked");
-        private static readonly MethodInfo CanSwapMethod = AccessTools.Method(typeof(TroopHUDEntryMovable), "CanSwap");
-        private static readonly MethodInfo DecideAmountMethod = AccessTools.Method(typeof(TroopHUDEntryMovable), "DecideAmount");
-        private static readonly MethodInfo SwapMethod = AccessTools.Method(typeof(TroopHUDEntryMovable), "Swap");
 
         private readonly HostileJoinMenu _menu;
         private readonly HostileJoinMenu.Settings _settings;
@@ -115,11 +101,13 @@ namespace SongsOfConquestAccess.Adapters
 
         public ArmyExchangeGridWidget BuildArmyExchangeGrid()
         {
+            TroopHudAdapter wielderTroops = new TroopHudAdapter(GetWielderTroopHud(), _facade, _localization, GetWielderArmyLabel());
+            TroopHudAdapter joiningTroops = new TroopHudAdapter(_settings != null ? _settings.TroopHUD : null, _facade, _localization, "joining army");
             return new ArmyExchangeGridWidget(
                 "hostile-join-army-exchange-grid",
                 GetWielderArmyLabel(),
-                BuildSlotData(GetWielderTroopHud(), GetWielderArmyLabel()),
-                BuildSlotData(_settings != null ? _settings.TroopHUD : null, "joining army"),
+                wielderTroops.BuildArmyExchangeSlots(),
+                joiningTroops.BuildArmyExchangeSlots(),
                 Drop);
         }
 
@@ -170,66 +158,9 @@ namespace SongsOfConquestAccess.Adapters
 
         private bool Drop(ArmyExchangeGridWidget.SlotWidget source, ArmyExchangeGridWidget.SlotWidget target)
         {
-            TroopHUDEntry sourceEntry = source != null ? source.NativeSource as TroopHUDEntry : null;
-            TroopHUDEntry targetEntry = target != null ? target.NativeSource as TroopHUDEntry : null;
-            if (sourceEntry == null || targetEntry == null || ReferenceEquals(sourceEntry, targetEntry))
-            {
-                return false;
-            }
-
-            TroopHUD sourceHud = GetTroopHudForEntry(sourceEntry);
-            TroopHUDEntryMovable movable = GetMovable(sourceHud);
-            if (movable == null || sourceEntry.Troop == null)
-            {
-                return false;
-            }
-
-            Vector3 sourceContainerPosition = sourceEntry.Container.Position;
-            movable.BeginDrag(sourceEntry, new Vector2(sourceContainerPosition.x, sourceContainerPosition.y));
-            CurrentHoverEntryField?.SetValue(movable, targetEntry);
-            Vector3 sourcePosition = ((Component)sourceEntry).transform.position;
-            Vector3 targetPosition = ((Component)targetEntry).transform.position;
-            IsDraggingRightField?.SetValue(movable, sourcePosition.x < targetPosition.x);
-            Vector3 dragDirection = targetPosition - sourcePosition;
-            DragDirectionField?.SetValue(movable, new Vector2(dragDirection.x, dragDirection.y));
-
-            if (!InvokeBool(CanDropHereMethod, movable))
-            {
-                movable.Reset();
-                AccessibilityEventBus.Publish(new ArmyExchangeInvalidDestinationEvent(source.Id, target.Id));
-                return false;
-            }
-
-            if (InvokeBool(CanMergeMethod, movable) || InvokeBool(IsEmptyAndUnlockedMethod, movable))
-            {
-                DecideAmountMethod?.Invoke(movable, new object[] { targetEntry.FormationIndex });
-                return true;
-            }
-
-            if (InvokeBool(CanSwapMethod, movable))
-            {
-                SwapMethod?.Invoke(movable, null);
-                return true;
-            }
-
-            return true;
-        }
-
-        private TroopHUD GetTroopHudForEntry(TroopHUDEntry entry)
-        {
-            TroopHUD wielderHud = GetWielderTroopHud();
-            if (ContainsEntry(wielderHud, entry))
-            {
-                return wielderHud;
-            }
-
-            TroopHUD joiningHud = _settings != null ? _settings.TroopHUD : null;
-            if (ContainsEntry(joiningHud, entry))
-            {
-                return joiningHud;
-            }
-
-            return null;
+            TroopHudAdapter.SlotItem sourceItem = source != null ? source.NativeSource as TroopHudAdapter.SlotItem : null;
+            TroopHudAdapter.SlotItem targetItem = target != null ? target.NativeSource as TroopHudAdapter.SlotItem : null;
+            return sourceItem != null && sourceItem.DropTo(targetItem);
         }
 
         private TroopHUD GetWielderTroopHud()
@@ -237,108 +168,6 @@ namespace SongsOfConquestAccess.Adapters
             return _settings != null && _settings.WielderInteractHeader != null
                 ? GetField<TroopHUD>(_settings.WielderInteractHeader, HeaderTroopHudField)
                 : null;
-        }
-
-        private TroopHUDEntryMovable GetMovable(TroopHUD hud)
-        {
-            return GetField<TroopHUDEntryMovable>(hud, MovableTroopField);
-        }
-
-        private bool ContainsEntry(TroopHUD hud, TroopHUDEntry entry)
-        {
-            List<TroopHUDEntry> entries = GetEntries(hud);
-            for (int i = 0; i < entries.Count; i++)
-            {
-                if (ReferenceEquals(entries[i], entry))
-                {
-                    return true;
-                }
-            }
-
-            return false;
-        }
-
-        private IEnumerable<ArmyExchangeGridWidget.SlotData> BuildSlotData(TroopHUD hud, string armyLabel)
-        {
-            List<TroopHUDEntry> entries = GetEntries(hud);
-            for (int i = 0; i < entries.Count; i++)
-            {
-                TroopHUDEntry entry = entries[i];
-                if (entry == null || !((Component)entry).gameObject.activeInHierarchy || !entry.IsUnlocked)
-                {
-                    continue;
-                }
-
-                string id = armyLabel.Replace(" ", "-").ToLowerInvariant() + "-slot-" + (entry.FormationIndex + 1);
-                string troopName = entry.Troop != null ? GetTroopName(entry.Troop.Id) : string.Empty;
-                int currentSize = entry.Troop != null ? entry.Troop.Stats.Size : 0;
-                int maxSize = entry.Troop != null ? entry.Troop.Stats.MaxTroopSize.GetValue() : 0;
-                TroopHUDEntry capturedEntry = entry;
-                yield return new ArmyExchangeGridWidget.SlotData(
-                    id,
-                    armyLabel,
-                    entry.FormationIndex + 1,
-                    troopName,
-                    currentSize,
-                    maxSize,
-                    entry.Troop != null,
-                    capturedEntry,
-                    () => FocusSlot(capturedEntry),
-                    entry.Troop != null ? BuildTroopTooltip(entry) : null);
-            }
-        }
-
-        private Tooltip BuildTroopTooltip(TroopHUDEntry entry)
-        {
-            Tooltip tooltip = Tooltip.ForComponent(entry != null ? entry.GetSelectable() : null, _localization);
-            AdventureTroopDetails details = entry != null ? entry.TroopDetails : null;
-            if (tooltip == null || details == null || !details.ShowDisbandInstruction || !details.CanDisband || _localization == null)
-            {
-                return tooltip;
-            }
-
-            string disbandLine = GetLocalizedText("Adventure/TroopHUD/DisbandInstruction", "Disband Troop");
-            List<string> instructionLines = new List<string> { disbandLine };
-            List<TooltipAction> actions = new List<TooltipAction>
-            {
-                new TooltipAction(disbandLine, () => InvokeTroopRightClick(entry))
-            };
-
-            // AdventureTroopDetails also draws the disband action as a native
-            // tooltip instruction row. Remove only the exact localized line we
-            // are replacing with a structured action; if CanDisband is false,
-            // the native "cannot disband" status row remains normal tooltip text.
-            // Keep this explicit instead of using input metadata alone because
-            // the troop adapter also relies on CanDisband and invokes the TroopHUD
-            // right-click callback directly.
-            return new Tooltip(() => RemoveExactLines(tooltip.TextLines, instructionLines), tooltip.VisualMetadata, actions);
-        }
-
-        private static bool InvokeTroopRightClick(TroopHUDEntry entry)
-        {
-            if (entry == null || entry.OnRightClick == null)
-            {
-                return false;
-            }
-
-            entry.OnRightClick(entry);
-            return true;
-        }
-
-        private void FocusSlot(TroopHUDEntry entry)
-        {
-            if (entry == null || entry.Troop == null)
-            {
-                HideNativeTooltip();
-                return;
-            }
-
-            NativeSelectionUtility.Select(entry.GetSelectable());
-        }
-
-        private List<TroopHUDEntry> GetEntries(TroopHUD hud)
-        {
-            return GetField<List<TroopHUDEntry>>(hud, TroopHudEntriesField) ?? new List<TroopHUDEntry>();
         }
 
         private bool IsJoinStage()
@@ -352,17 +181,6 @@ namespace SongsOfConquestAccess.Adapters
             ICommanderState commander = GetField<ICommanderState>(_menu, AttackingCommanderField);
             string name = commander != null && _facade != null ? _facade.Commanders.GetName(commander.Id) : "wielder";
             return name + "'s army";
-        }
-
-        private string GetTroopName(int troopId)
-        {
-            return SpeechTextSanitizer.Normalize(_facade != null ? _facade.Troops.GetName(troopId) : string.Empty);
-        }
-
-        private static bool InvokeBool(MethodInfo method, object instance)
-        {
-            object value = method != null ? method.Invoke(instance, null) : null;
-            return value is bool && (bool)value;
         }
 
         private static string GetText(IUITextMesh textMesh)
@@ -379,45 +197,6 @@ namespace SongsOfConquestAccess.Adapters
         private static bool IsButtonEnabled(UIButton button)
         {
             return button != null && button.Active && button.Interactable;
-        }
-
-        private string GetLocalizedText(string key, string fallback)
-        {
-            string text = _localization != null ? _localization.GetText(key) : string.Empty;
-            return string.IsNullOrWhiteSpace(text) || text == key ? fallback : text;
-        }
-
-        private static IReadOnlyList<string> RemoveExactLines(IReadOnlyList<string> lines, IReadOnlyList<string> linesToRemove)
-        {
-            if (lines == null || lines.Count == 0 || linesToRemove == null || linesToRemove.Count == 0)
-            {
-                return lines ?? new string[0];
-            }
-
-            List<string> result = new List<string>();
-            for (int i = 0; i < lines.Count; i++)
-            {
-                string line = lines[i];
-                if (!ContainsExact(linesToRemove, line))
-                {
-                    result.Add(line);
-                }
-            }
-
-            return result;
-        }
-
-        private static bool ContainsExact(IReadOnlyList<string> lines, string candidate)
-        {
-            for (int i = 0; i < lines.Count; i++)
-            {
-                if (string.Equals(lines[i], candidate, StringComparison.Ordinal))
-                {
-                    return true;
-                }
-            }
-
-            return false;
         }
 
         private static T GetField<T>(object owner, FieldInfo field) where T : class

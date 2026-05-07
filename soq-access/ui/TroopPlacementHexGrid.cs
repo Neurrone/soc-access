@@ -178,7 +178,7 @@ namespace SongsOfConquestAccess.UI
 
         protected override void OnUnfocus()
         {
-            CancelDrag();
+            ClearDrag();
             _adapter?.HideNativeTooltip();
             _adapter?.ClearFocusedTileOverlay();
         }
@@ -221,7 +221,7 @@ namespace SongsOfConquestAccess.UI
         {
             if (!_dragSource.HasValue)
             {
-                Speak("Press space to select a troop stack first.");
+                Speak("Press space to drag.");
                 return true;
             }
 
@@ -244,9 +244,14 @@ namespace SongsOfConquestAccess.UI
                 return false;
             }
 
-            _dragSource = null;
+            ClearDrag();
             Speak("Drag cancelled.");
             return true;
+        }
+
+        private void ClearDrag()
+        {
+            _dragSource = null;
         }
 
         private bool SetCursor(Vector2Int point)

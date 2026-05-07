@@ -268,6 +268,18 @@ namespace SongsOfConquestAccess.Adapters
             return false;
         }
 
+        public TroopHudAdapter Troops
+        {
+            get
+            {
+                return new TroopHudAdapter(
+                    CommanderSettings != null ? CommanderSettings.TroopHUD : null,
+                    Facade,
+                    LocalizationHandler,
+                    "troops");
+            }
+        }
+
         public bool IsTroopSlotVisible(int index)
         {
             TroopHUDEntry entry = GetTroopSlot(index);

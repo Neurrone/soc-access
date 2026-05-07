@@ -76,6 +76,11 @@ namespace SongsOfConquestAccess.UI
             return _getTooltip != null ? _getTooltip() : null;
         }
 
+        public bool HasActivateBehavior
+        {
+            get { return _activate != null; }
+        }
+
         public override bool ClaimsAction(string actionKey)
         {
             return IsVisible && IsEnabled() && actionKey == AccessibilityActions.Activate.Key;

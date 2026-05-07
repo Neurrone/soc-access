@@ -139,20 +139,37 @@ namespace SongsOfConquestAccess.Screens
 
         private static MenuWidget BuildQuickbarMenu(SpellbookAdapter adapter)
         {
-            MenuWidget menu = new MenuWidget("spellbook-quickbar", "Quickbar");
+            Dictionary<MenuItemWidget, SpellbookAdapter.QuickbarItem> itemByWidget = new Dictionary<MenuItemWidget, SpellbookAdapter.QuickbarItem>();
+            DraggableMenuWidget menu = null;
+            menu = new DraggableMenuWidget(
+                "spellbook-quickbar",
+                "Quickbar",
+                (source, target) =>
+                {
+                    SpellbookAdapter.QuickbarItem sourceItem;
+                    SpellbookAdapter.QuickbarItem targetItem;
+                    return itemByWidget.TryGetValue(source, out sourceItem)
+                        && itemByWidget.TryGetValue(target, out targetItem)
+                        && sourceItem.DropTo(targetItem);
+                });
             IReadOnlyList<SpellbookAdapter.QuickbarItem> items = SafeGet("quickbar", adapter.GetQuickbarItems);
             for (int i = 0; i < items.Count; i++)
             {
                 SpellbookAdapter.QuickbarItem item = items[i];
-                menu.AddItem(new MenuItemWidget(
+                DraggableMenuItemWidget widget = null;
+                widget = new DraggableMenuItemWidget(
                     item.Id,
                     () => item.Label,
                     null,
                     item.Activate,
                     item.Focus,
                     () => true,
+                    () => item.CanDrag,
+                    () => ReferenceEquals(menu.DragSource, widget),
                     () => item.Tooltip,
-                    item.Unfocus));
+                    item.Unfocus);
+                itemByWidget.Add(widget, item);
+                menu.AddItem(widget);
             }
 
             if (items.Count == 0)

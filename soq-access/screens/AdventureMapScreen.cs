@@ -1,3 +1,4 @@
+using System;
 using SongsOfConquestAccess.Adapters;
 using SongsOfConquestAccess.Events;
 using SongsOfConquestAccess.UI;
@@ -237,21 +238,11 @@ namespace SongsOfConquestAccess.Screens
 
         private static MenuWidget BuildTroopSlotsMenu(AdventureHudAdapter adapter)
         {
-            MenuWidget menu = new MenuWidget("adventure-troop-slots", "Troops", adapter.IsTroopMenuVisible);
-            for (int i = 0; i < 9; i++)
-            {
-                int capturedIndex = i;
-                menu.AddItem(new MenuItemWidget(
-                    "adventure-troop-slot-" + (capturedIndex + 1),
-                    () => adapter.GetTroopSlotLabel(capturedIndex),
-                    null,
-                    null,
-                    () => adapter.FocusTroopSlot(capturedIndex),
-                    () => adapter.IsTroopSlotVisible(capturedIndex),
-                    () => adapter.GetTroopSlotTooltip(capturedIndex)));
-            }
-
-            return menu;
+            return TroopHudMenu.Build(
+                "adventure-troop-slots",
+                "Troops",
+                adapter != null ? adapter.Troops : null,
+                adapter != null ? adapter.IsTroopMenuVisible : (Func<bool>)null);
         }
 
         private static MenuWidget BuildResourcesMenu(AdventureHudAdapter adapter)
