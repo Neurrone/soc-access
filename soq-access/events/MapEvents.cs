@@ -184,4 +184,58 @@ namespace SongsOfConquestAccess.Events
             return "Mod error: " + Message;
         }
     }
+
+    internal sealed class MapHudVisibilityChangedEvent : IAccessibilityEvent
+    {
+        public MapHudVisibilityChangedEvent(bool isVisible)
+        {
+            IsVisible = isVisible;
+        }
+
+        public string Kind { get { return AccessibilityEvents.Map.HudVisibilityChanged; } }
+
+        public bool IsVisible { get; private set; }
+
+        public string GetSpeechText()
+        {
+            return IsVisible ? "HUD open" : "HUD closed";
+        }
+    }
+
+    internal sealed class MapCameraFocusEvent : IAccessibilityEvent
+    {
+        public MapCameraFocusEvent(Vector2Int tile)
+        {
+            Tile = tile;
+        }
+
+        public string Kind { get { return AccessibilityEvents.Map.CameraFocus; } }
+
+        public Vector2Int Tile { get; private set; }
+
+        public string GetSpeechText()
+        {
+            // Native HUD paths can emit duplicate center-selection camera focus
+            // events for one user action. This event is still used to move the
+            // accessibility cursor, but speech is intentionally suppressed.
+            return string.Empty;
+        }
+    }
+
+    internal sealed class MapRoundChangedEvent : IAccessibilityEvent
+    {
+        public MapRoundChangedEvent(string roundLabel)
+        {
+            RoundLabel = roundLabel;
+        }
+
+        public string Kind { get { return AccessibilityEvents.Map.RoundChanged; } }
+
+        public string RoundLabel { get; private set; }
+
+        public string GetSpeechText()
+        {
+            return RoundLabel ?? string.Empty;
+        }
+    }
 }

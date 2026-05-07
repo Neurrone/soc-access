@@ -42,6 +42,14 @@ namespace SongsOfConquestAccess
 
         public static void ShowAccessibilityTooltip(GameObject gameObject, RectTransform tooltipAnchor)
         {
+            ShowAccessibilityTooltip(gameObject, tooltipAnchor, null);
+        }
+
+        public static void ShowAccessibilityTooltip(
+            GameObject gameObject,
+            RectTransform tooltipAnchor,
+            TooltipAnchor[] desiredAnchors)
+        {
             HideAccessibilityTooltip();
 
             if (gameObject == null || !gameObject.activeInHierarchy || _currentManager == null)
@@ -62,7 +70,8 @@ namespace SongsOfConquestAccess
             TooltipAnchor[] anchors = null;
             if (tooltipAnchor != null)
             {
-                ApplyStaticTooltipLocationToSelectedObject(gameObject, use: true, tooltipAnchor, desiredAnchors: null);
+                anchors = desiredAnchors;
+                ApplyStaticTooltipLocationToSelectedObject(gameObject, use: true, tooltipAnchor, desiredAnchors);
             }
             else
             {

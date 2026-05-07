@@ -56,6 +56,11 @@ namespace SongsOfConquestAccess.Adapters
             return Click(component, PointerEventData.InputButton.Left);
         }
 
+        public static bool PointerRightClick(Component component)
+        {
+            return Click(component, PointerEventData.InputButton.Right);
+        }
+
         public static bool PointerEnter(Component component)
         {
             if (component == null)

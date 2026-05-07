@@ -135,9 +135,12 @@ namespace SongsOfConquestAccess.Adapters
             _currentInputModuleField = humanAdventureController != null
                 ? AccessTools.Field(humanAdventureController.GetType(), "_currentInputModule")
                 : null;
+            Hud = new AdventureHudAdapter(this, _container);
         }
 
         public object SourceKey { get; private set; }
+
+        public AdventureHudAdapter Hud { get; private set; }
 
         public IClientAdventureFacade Facade
         {

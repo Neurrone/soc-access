@@ -49,12 +49,22 @@ namespace SongsOfConquestAccess.Screens
                 adapter.HideNativeTooltip,
                 includeParentLabelInAnnouncement: false));
 
-            root.AddChild(new TextWidget(
+            CommanderHudPortraitAdapter attackerPortrait = adapter.AttackerCommanderPortrait;
+            root.AddChild(Portrait.Static(
                 "post-battle-attacker-commander",
-                () => adapter.AttackerCommanderText,
-                adapter.HideNativeTooltip,
-                includeParentLabelInAnnouncement: false,
-                tooltip: adapter.AttackerCommanderTooltip));
+                () => attackerPortrait != null ? attackerPortrait.Name : adapter.AttackerCommanderText,
+                () =>
+                {
+                    if (attackerPortrait != null)
+                    {
+                        attackerPortrait.Focus();
+                    }
+                    else
+                    {
+                        adapter.HideNativeTooltip();
+                    }
+                },
+                () => attackerPortrait != null ? attackerPortrait.Tooltip : adapter.AttackerCommanderTooltip));
 
             if (adapter.XpBelongsToAttacker)
             {
@@ -70,12 +80,22 @@ namespace SongsOfConquestAccess.Screens
                 includeParentLabelInAnnouncement: false,
                 isVisible: () => adapter.AttackerReturnedTroopsVisible));
 
-            root.AddChild(new TextWidget(
+            CommanderHudPortraitAdapter defenderPortrait = adapter.DefenderCommanderPortrait;
+            root.AddChild(Portrait.Static(
                 "post-battle-defender-commander",
-                () => adapter.DefenderCommanderText,
-                adapter.HideNativeTooltip,
-                includeParentLabelInAnnouncement: false,
-                tooltip: adapter.DefenderCommanderTooltip));
+                () => defenderPortrait != null ? defenderPortrait.Name : adapter.DefenderCommanderText,
+                () =>
+                {
+                    if (defenderPortrait != null)
+                    {
+                        defenderPortrait.Focus();
+                    }
+                    else
+                    {
+                        adapter.HideNativeTooltip();
+                    }
+                },
+                () => defenderPortrait != null ? defenderPortrait.Tooltip : adapter.DefenderCommanderTooltip));
 
             if (!adapter.XpBelongsToAttacker)
             {

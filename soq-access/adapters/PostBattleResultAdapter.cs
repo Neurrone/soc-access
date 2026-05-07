@@ -32,9 +32,6 @@ namespace SongsOfConquestAccess.Adapters
         private static readonly FieldInfo DefenderLootContainerField = AccessTools.Field(typeof(PostBattleMenu), "_defenderLootContainer");
         private static readonly FieldInfo ConfirmButtonField = AccessTools.Field(typeof(PostBattleMenu), "_confirmButton");
         private static readonly FieldInfo RedoManualBattleButtonField = AccessTools.Field(typeof(PostBattleMenu), "_replayManualBattleButton");
-        private static readonly FieldInfo CommanderPortraitButtonField = AccessTools.Field(typeof(CommanderHUDPortrait), "_wielderPortraitButton");
-        private static readonly MethodInfo CommanderPortraitRefreshTooltipMethod = AccessTools.Method(typeof(CommanderHUDPortrait), "RefreshTooltip");
-
         private static readonly FieldInfo TroopEntryAmountField = AccessTools.Field(typeof(AdventureBattleMenuTroopEntry), "_amount");
         private static readonly FieldInfo TroopEntryTooltipAreaField = AccessTools.Field(typeof(AdventureBattleMenuTroopEntry), "_tooltipArea");
         private static readonly FieldInfo LootEntryMainTransformField = AccessTools.Field(typeof(PostBattleLootEntry), "_mainTransform");
@@ -86,6 +83,28 @@ namespace SongsOfConquestAccess.Adapters
         public Tooltip DefenderCommanderTooltip
         {
             get { return BuildCommanderTooltip("DefenderCommanderHudPortrait"); }
+        }
+
+        public CommanderHudPortraitAdapter AttackerCommanderPortrait
+        {
+            get
+            {
+                return BuildCommanderPortrait(
+                    "post-battle-attacker-commander",
+                    () => AttackerCommanderText,
+                    "AttackerCommanderHudPortrait");
+            }
+        }
+
+        public CommanderHudPortraitAdapter DefenderCommanderPortrait
+        {
+            get
+            {
+                return BuildCommanderPortrait(
+                    "post-battle-defender-commander",
+                    () => DefenderCommanderText,
+                    "DefenderCommanderHudPortrait");
+            }
         }
 
         public string AttackerReturnedTroopsText
@@ -190,6 +209,12 @@ namespace SongsOfConquestAccess.Adapters
 
         private Tooltip BuildCommanderTooltip(string settingsFieldName)
         {
+            CommanderHudPortraitAdapter portrait = BuildCommanderPortrait("post-battle-commander", () => string.Empty, settingsFieldName);
+            return portrait != null ? portrait.Tooltip : null;
+        }
+
+        private CommanderHudPortraitAdapter BuildCommanderPortrait(string id, Func<string> getName, string settingsFieldName)
+        {
             CommanderHUDPortrait portrait = GetBattleMenuSettingsField<CommanderHUDPortrait>(settingsFieldName);
             if (portrait == null)
             {
@@ -201,45 +226,19 @@ namespace SongsOfConquestAccess.Adapters
                 return null;
             }
 
-            UIButton button = GetCommanderPortraitButton(portrait);
+            UIButton button = CommanderHudPortraitAdapter.GetButton(portrait);
             if (button == null)
             {
                 return null;
             }
 
-            CommanderHUDPortrait capturedPortrait = portrait;
-            UIButton capturedButton = button;
-            return new Tooltip(
-                () =>
-                {
-                    RefreshCommanderTooltip(capturedPortrait);
-                    return NativeTooltipUtility.GetTooltipLinesForComponent(capturedButton, _localization);
-                },
-                VisualTooltipMetadata.ForComponent(capturedButton));
-        }
-
-        private static UIButton GetCommanderPortraitButton(CommanderHUDPortrait portrait)
-        {
-            return portrait != null && CommanderPortraitButtonField != null
-                ? CommanderPortraitButtonField.GetValue(portrait) as UIButton
-                : null;
-        }
-
-        private static void RefreshCommanderTooltip(CommanderHUDPortrait portrait)
-        {
-            if (portrait == null || portrait.Commander == null || CommanderPortraitRefreshTooltipMethod == null)
-            {
-                return;
-            }
-
-            try
-            {
-                CommanderPortraitRefreshTooltipMethod.Invoke(portrait, null);
-            }
-            catch (Exception exception)
-            {
-                SoqAccessPlugin.Instance?.LogWarning("PostBattleResultAdapter failed to refresh commander tooltip: " + exception.Message);
-            }
+            return new CommanderHudPortraitAdapter(
+                id,
+                getName,
+                portrait,
+                button,
+                _localization,
+                () => IsPresent());
         }
 
         private CommanderHUDPortrait ResolveCommanderPortraitByName(string settingsFieldName)

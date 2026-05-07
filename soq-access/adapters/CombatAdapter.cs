@@ -145,6 +145,7 @@ namespace SongsOfConquestAccess.Adapters
             _battleSpellController = battleSpellController;
             _mouseKeyboardSpellInputModule = mouseKeyboardSpellInputModule;
             _battleHudSignals = battleHudSignals;
+            Hud = new BattleHudAdapter(container, facade, localization);
             _pointToWorldMethod = cartographyConverter != null
                 ? AccessTools.Method(cartographyConverter.GetType(), "PointToWorld", new[] { typeof(int2), typeof(int) })
                 : null;
@@ -177,6 +178,8 @@ namespace SongsOfConquestAccess.Adapters
         {
             get { return _sourceKey; }
         }
+
+        public BattleHudAdapter Hud { get; private set; }
 
         public bool Matches(ClientBattleCommandsFacade commands)
         {

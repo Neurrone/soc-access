@@ -69,7 +69,7 @@ namespace SongsOfConquestAccess.Adapters
 
             if (metadata.Anchor != null)
             {
-                ShowTooltipForComponent(metadata.Component, metadata.Anchor);
+                ShowTooltipForComponent(metadata.Component, metadata.Anchor, metadata.Anchors);
                 return;
             }
 
@@ -90,6 +90,11 @@ namespace SongsOfConquestAccess.Adapters
 
         public static void ShowTooltipForComponent(Component component, RectTransform anchor)
         {
+            ShowTooltipForComponent(component, anchor, null);
+        }
+
+        public static void ShowTooltipForComponent(Component component, RectTransform anchor, TooltipAnchor[] anchors)
+        {
             if (component == null)
             {
                 HideTooltip();
@@ -97,7 +102,7 @@ namespace SongsOfConquestAccess.Adapters
             }
 
             NativeSelectionUtility.Select(component);
-            TooltipPatches.ShowAccessibilityTooltip(component.gameObject, anchor);
+            TooltipPatches.ShowAccessibilityTooltip(component.gameObject, anchor, anchors);
         }
 
         public static void ShowMapTooltipAtScreenPoint(ITooltipable tooltipable, Vector2 screenPoint, IDetails details)

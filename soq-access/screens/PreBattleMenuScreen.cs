@@ -65,17 +65,17 @@ namespace SongsOfConquestAccess.Screens
                 return root;
             }
 
-            root.AddChild(new TextWidget(
+            root.AddChild(Portrait.Static(
                 "pre-battle-our-wielder",
                 () => adapter.OurWielderText,
-                adapter.HideNativeTooltip,
-                includeParentLabelInAnnouncement: false));
+                adapter.FocusOurWielder,
+                () => adapter.OurWielderTooltip));
 
-            root.AddChild(new TextWidget(
+            root.AddChild(Portrait.Static(
                 "pre-battle-opponent",
                 () => adapter.OpponentText,
-                adapter.HideNativeTooltip,
-                includeParentLabelInAnnouncement: false));
+                adapter.FocusOpponent,
+                getTooltip: null));
 
             root.AddChild(new TextWidget(
                 "pre-battle-instructions",

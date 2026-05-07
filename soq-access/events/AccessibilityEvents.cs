@@ -12,6 +12,9 @@ namespace SongsOfConquestAccess.Events
             public const string DestinationSet = "map.destination.set";
             public const string DestinationCleared = "map.destination.cleared";
             public const string ActionFailed = "map.action.failed";
+            public const string HudVisibilityChanged = "map.hud.visibility_changed";
+            public const string CameraFocus = "map.camera_focus";
+            public const string RoundChanged = "map.round.changed";
         }
 
         public static class Notification

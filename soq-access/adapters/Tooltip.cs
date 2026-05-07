@@ -52,6 +52,15 @@ namespace SongsOfConquestAccess.Adapters
 
         public static Tooltip ForComponent(Component component, RectTransform anchor, ILocalizationHandler localization)
         {
+            return ForComponent(component, anchor, null, localization);
+        }
+
+        public static Tooltip ForComponent(
+            Component component,
+            RectTransform anchor,
+            TooltipAnchor[] anchors,
+            ILocalizationHandler localization)
+        {
             if (component == null)
             {
                 return null;
@@ -59,7 +68,7 @@ namespace SongsOfConquestAccess.Adapters
 
             return new Tooltip(
                 () => NativeTooltipUtility.GetTooltipLinesForComponent(component, localization),
-                VisualTooltipMetadata.ForComponent(component, anchor));
+                VisualTooltipMetadata.ForComponent(component, anchor, anchors));
         }
 
     }
@@ -95,6 +104,8 @@ namespace SongsOfConquestAccess.Adapters
 
         public RectTransform Anchor { get; private set; }
 
+        public TooltipAnchor[] Anchors { get; private set; }
+
         public ITooltipable MapTooltipable { get; private set; }
 
         public Vector2 ScreenPoint { get; private set; }
@@ -118,6 +129,11 @@ namespace SongsOfConquestAccess.Adapters
 
         public static VisualTooltipMetadata ForComponent(Component component, RectTransform anchor)
         {
+            return ForComponent(component, anchor, null);
+        }
+
+        public static VisualTooltipMetadata ForComponent(Component component, RectTransform anchor, TooltipAnchor[] anchors)
+        {
             if (component == null)
             {
                 return null;
@@ -126,7 +142,8 @@ namespace SongsOfConquestAccess.Adapters
             return new VisualTooltipMetadata
             {
                 Component = component,
-                Anchor = anchor
+                Anchor = anchor,
+                Anchors = anchors
             };
         }
 

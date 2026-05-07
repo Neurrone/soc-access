@@ -116,6 +116,33 @@ namespace SongsOfConquestAccess.UI
             _adapter?.ClearFocusedTileOverlay();
         }
 
+        public bool FocusTile(Vector2Int tile)
+        {
+            return FocusTile(tile, updateUiManager: true);
+        }
+
+        public bool FocusTileSilently(Vector2Int tile)
+        {
+            return FocusTile(tile, updateUiManager: false);
+        }
+
+        private bool FocusTile(Vector2Int tile, bool updateUiManager)
+        {
+            if (_adapter == null)
+            {
+                return false;
+            }
+
+            _cursorTile = tile;
+            _adapter.SetFocusedTileOverlay(_cursorTile);
+            if (updateUiManager)
+            {
+                UIManager.SetFocusedWidget(this);
+            }
+
+            return true;
+        }
+
         private bool Move(int xDelta, int yDelta)
         {
             Vector2Int nextTile = _adapter.Move(_cursorTile, xDelta, yDelta);
