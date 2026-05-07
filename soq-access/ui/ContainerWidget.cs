@@ -84,7 +84,12 @@ namespace SongsOfConquestAccess.UI
 
         public bool SetFocusByIndex(int index)
         {
-            return SetFocus(ClampToVisibleIndex(index));
+            return SetFocus(ClampToVisibleIndex(index), updateUiManager: true);
+        }
+
+        public bool SetFocusByIndexSilently(int index)
+        {
+            return SetFocus(ClampToVisibleIndex(index), updateUiManager: false);
         }
 
         protected override void OnFocus()
@@ -96,7 +101,7 @@ namespace SongsOfConquestAccess.UI
                 return;
             }
 
-            SetFocus(FindFirstVisibleIndex());
+            SetFocus(FindFirstVisibleIndex(), updateUiManager: true);
         }
 
         public override Widget GetFocusedWidget()
@@ -162,6 +167,12 @@ namespace SongsOfConquestAccess.UI
                 return false;
             }
 
+            Widget focusedChild = FocusedChild;
+            if (focusedChild != null && !focusedChild.IsVisible)
+            {
+                return SetFocus(ClampToVisibleIndex(_focusedIndex), updateUiManager: true);
+            }
+
             int nextIndex = _focusedIndex;
             if (nextIndex < 0)
             {
@@ -173,7 +184,7 @@ namespace SongsOfConquestAccess.UI
             {
                 if (_children[nextIndex].IsVisible)
                 {
-                    return SetFocus(nextIndex);
+                    return SetFocus(nextIndex, updateUiManager: true);
                 }
 
                 nextIndex += delta;
@@ -249,7 +260,7 @@ namespace SongsOfConquestAccess.UI
             return -1;
         }
 
-        private bool SetFocus(int index)
+        private bool SetFocus(int index, bool updateUiManager)
         {
             if (index < 0 || index >= _children.Count)
             {
@@ -270,7 +281,11 @@ namespace SongsOfConquestAccess.UI
 
             _focusedIndex = index;
             next.Focus();
-            UIManager.SetFocusedWidget(next.GetFocusedWidget());
+            if (updateUiManager)
+            {
+                UIManager.SetFocusedWidget(next.GetFocusedWidget());
+            }
+
             return true;
         }
     }
