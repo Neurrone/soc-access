@@ -38,8 +38,6 @@ namespace SongsOfConquestAccess.Events
             string text = accessibilityEvent.GetSpeechText();
             if (string.IsNullOrWhiteSpace(text))
             {
-                SoqAccessPlugin.Instance?.LogWarning(
-                    "SpeechEventAnnouncer dropped event with empty text: " + accessibilityEvent.Kind);
                 return;
             }
 
