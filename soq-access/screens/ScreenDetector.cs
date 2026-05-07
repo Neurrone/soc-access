@@ -37,6 +37,7 @@ namespace SongsOfConquestAccess.Screens
                 new SpellbookRuntimeScreenProbe(),
                 new PostBattleResultRuntimeScreenProbe(),
                 new PreBattleMenuRuntimeScreenProbe(),
+                new DwellingInteractionRuntimeScreenProbe(),
                 new HostileJoinMenuRuntimeScreenProbe(),
                 new MoveTroopPopupRuntimeScreenProbe(),
                 new WorldChoiceMenuRuntimeScreenProbe(),
@@ -472,6 +473,23 @@ namespace SongsOfConquestAccess.Screens
         public void OnWorldChoiceMenuClosed(WorldChoiceMenu menu)
         {
             _screenManager.Pop<WorldChoiceMenuScreen>("world choice menu closed");
+        }
+
+        public void OnDwellingInteractionReady(DwellingInteractionMenu menu)
+        {
+            DwellingInteractionScreen screen = new DwellingInteractionScreen(new DwellingInteractionMenuAdapter(menu));
+            if (_screenManager.CurrentScreen is DwellingInteractionScreen)
+            {
+                _screenManager.RefreshTop<DwellingInteractionScreen>(screen, "dwelling interaction changed");
+                return;
+            }
+
+            Push(screen, "dwelling interaction ready");
+        }
+
+        public void OnDwellingInteractionClosed(DwellingInteractionMenu menu)
+        {
+            _screenManager.Pop<DwellingInteractionScreen>("dwelling interaction closed");
         }
 
         public void OnLevelUpMenuReady(CommanderLevelUpMenu menu)
