@@ -87,9 +87,9 @@ namespace SongsOfConquestAccess.UI
                 || actionKey == AccessibilityActions.NextArmySlot.Key
                 || actionKey == AccessibilityActions.PreviousArmy.Key
                 || actionKey == AccessibilityActions.NextArmy.Key
-                || actionKey == AccessibilityActions.SelectArmyStack.Key
+                || actionKey == AccessibilityActions.StartDrag.Key
                 || actionKey == AccessibilityActions.Activate.Key
-                || actionKey == AccessibilityActions.Cancel.Key;
+                || (_dragSource != null && actionKey == AccessibilityActions.Cancel.Key);
         }
 
         public override bool HasClaimInTree(string actionKey)
@@ -124,7 +124,7 @@ namespace SongsOfConquestAccess.UI
                 return MoveHorizontal(1);
             }
 
-            if (action.Key == AccessibilityActions.SelectArmyStack.Key)
+            if (action.Key == AccessibilityActions.StartDrag.Key)
             {
                 return StartDrag();
             }
@@ -134,7 +134,7 @@ namespace SongsOfConquestAccess.UI
                 return CompleteDrag();
             }
 
-            if (action.Key == AccessibilityActions.Cancel.Key)
+            if (action.Key == AccessibilityActions.Cancel.Key && _dragSource != null)
             {
                 return CancelDrag();
             }
@@ -157,6 +157,7 @@ namespace SongsOfConquestAccess.UI
 
         protected override void OnUnfocus()
         {
+            CancelDrag();
             FocusedSlot?.Unfocus();
         }
 
@@ -278,14 +279,19 @@ namespace SongsOfConquestAccess.UI
 
             if (target == null || ReferenceEquals(target, _dragSource))
             {
-                return CancelDrag();
+                Speak("Invalid destination.");
+                return true;
             }
 
             SlotWidget source = _dragSource;
-            _dragSource = null;
             if (_drop != null)
             {
-                return _drop(source, target);
+                if (_drop(source, target))
+                {
+                    _dragSource = null;
+                }
+
+                return true;
             }
 
             return true;
@@ -437,6 +443,21 @@ namespace SongsOfConquestAccess.UI
                 }
 
                 return _data.TroopName + ", " + _data.CurrentSize + " / " + _data.MaxSize + ", " + slotLabel;
+            }
+
+            public override string GetStatus()
+            {
+                if (!IsOccupied || _grid == null)
+                {
+                    return string.Empty;
+                }
+
+                if (_grid._dragSource != null)
+                {
+                    return ReferenceEquals(_grid._dragSource, this) ? "dragging" : string.Empty;
+                }
+
+                return "draggable";
             }
 
             public override bool ClaimsAction(string actionKey)

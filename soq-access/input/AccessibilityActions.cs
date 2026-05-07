@@ -125,7 +125,7 @@ namespace SongsOfConquestAccess.Input
             .AddBinding(new KeyboardBinding(Key.Enter))
             .AddBinding(new KeyboardBinding(Key.NumpadEnter));
 
-        public static readonly InputAction SelectArmyStack = OneShot("select_army_stack", "Select Army Stack")
+        public static readonly InputAction StartDrag = OneShot("start_drag", "Start Drag")
             .AddBinding(new KeyboardBinding(Key.Space));
 
         public static readonly InputAction Cancel = OneShot("cancel", "Cancel")
@@ -157,12 +157,6 @@ namespace SongsOfConquestAccess.Input
 
         public static readonly InputAction CombatPreviousRelevantTile = OneShot("combat_previous_relevant_tile", "Previous Relevant Combat Tile")
             .AddBinding(new KeyboardBinding(Key.W, shift: true));
-
-        public static readonly InputAction TroopPlacementStartDrag = OneShot("troop_placement_start_drag", "Start Troop Placement Drag")
-            .AddBinding(new KeyboardBinding(Key.Space));
-
-        public static readonly InputAction TroopPlacementCancelDrag = OneShot("troop_placement_cancel_drag", "Cancel Troop Placement Drag")
-            .AddBinding(new KeyboardBinding(Key.Escape));
 
         public static readonly InputAction[] NON_GLOBAL_ACTIONS =
         {
@@ -203,10 +197,8 @@ namespace SongsOfConquestAccess.Input
             CombatInspect,
             CombatNextRelevantTile,
             CombatPreviousRelevantTile,
-            TroopPlacementStartDrag,
-            TroopPlacementCancelDrag,
+            StartDrag,
             Activate,
-            SelectArmyStack,
             Cancel
         };
 

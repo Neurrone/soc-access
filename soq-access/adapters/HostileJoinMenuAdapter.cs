@@ -197,7 +197,7 @@ namespace SongsOfConquestAccess.Adapters
             {
                 movable.Reset();
                 AccessibilityEventBus.Publish(new ArmyExchangeInvalidDestinationEvent(source.Id, target.Id));
-                return true;
+                return false;
             }
 
             if (InvokeBool(CanMergeMethod, movable) || InvokeBool(IsEmptyAndUnlockedMethod, movable))

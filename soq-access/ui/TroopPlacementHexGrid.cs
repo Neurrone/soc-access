@@ -54,6 +54,22 @@ namespace SongsOfConquestAccess.UI
             return new TroopPlacementTileSpeechFormatter(_snapshot).DescribeTile(tile);
         }
 
+        public override string GetStatus()
+        {
+            TroopPlacementTile tile = GetFocusedTile();
+            if (tile == null)
+            {
+                return string.Empty;
+            }
+
+            if (_dragSource.HasValue)
+            {
+                return tile.Point == _dragSource.Value ? "dragging" : string.Empty;
+            }
+
+            return IsOwnTroop(tile) ? "draggable" : string.Empty;
+        }
+
         public override Tooltip GetTooltip()
         {
             return _adapter != null ? _adapter.GetTileTooltip(GetFocusedTile()) : null;
@@ -67,9 +83,9 @@ namespace SongsOfConquestAccess.UI
                 || actionKey == AccessibilityActions.HexGridNorthEast.Key
                 || actionKey == AccessibilityActions.HexGridSouthWest.Key
                 || actionKey == AccessibilityActions.HexGridSouthEast.Key
-                || actionKey == AccessibilityActions.TroopPlacementStartDrag.Key
+                || actionKey == AccessibilityActions.StartDrag.Key
                 || actionKey == AccessibilityActions.Activate.Key
-                || actionKey == AccessibilityActions.TroopPlacementCancelDrag.Key
+                || (_dragSource.HasValue && actionKey == AccessibilityActions.Cancel.Key)
                 || IsScannerAction(actionKey);
         }
 
@@ -120,7 +136,7 @@ namespace SongsOfConquestAccess.UI
                 return MoveDiagonal(north: false, east: true);
             }
 
-            if (action.Key == AccessibilityActions.TroopPlacementStartDrag.Key)
+            if (action.Key == AccessibilityActions.StartDrag.Key)
             {
                 return StartDrag();
             }
@@ -130,7 +146,7 @@ namespace SongsOfConquestAccess.UI
                 return Drop();
             }
 
-            if (action.Key == AccessibilityActions.TroopPlacementCancelDrag.Key)
+            if (action.Key == AccessibilityActions.Cancel.Key && _dragSource.HasValue)
             {
                 return CancelDrag();
             }
@@ -162,6 +178,7 @@ namespace SongsOfConquestAccess.UI
 
         protected override void OnUnfocus()
         {
+            CancelDrag();
             _adapter?.HideNativeTooltip();
             _adapter?.ClearFocusedTileOverlay();
         }
