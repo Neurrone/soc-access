@@ -35,6 +35,11 @@ namespace SongsOfConquestAccess.Screens
         {
             if (action != null && action.Key == AccessibilityActions.Cancel.Key)
             {
+                if (RootWidget != null && RootWidget.HandleAction(action))
+                {
+                    return true;
+                }
+
                 return _adapter != null && _adapter.Close();
             }
 
