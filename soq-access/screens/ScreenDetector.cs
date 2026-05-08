@@ -35,6 +35,8 @@ namespace SongsOfConquestAccess.Screens
                 new AdventureMapRuntimeScreenProbe(),
                 new CombatRuntimeScreenProbe(),
                 new SpellbookRuntimeScreenProbe(),
+                new PostAdventureResultRuntimeScreenProbe(),
+                new PostAdventureStatsRuntimeScreenProbe(),
                 new PostBattleResultRuntimeScreenProbe(),
                 new PreBattleMenuRuntimeScreenProbe(),
                 new DwellingInteractionRuntimeScreenProbe(),
@@ -442,6 +444,46 @@ namespace SongsOfConquestAccess.Screens
         public void OnPostBattleResultClosed()
         {
             _screenManager.Pop<PostBattleResultScreen>("post battle result closed");
+        }
+
+        public void OnPostAdventureResultReady(PostAdventureMenu menu)
+        {
+            PostAdventureResultScreen screen = new PostAdventureResultScreen(new PostAdventureResultAdapter(menu));
+            if (_screenManager.CurrentScreen is PostAdventureResultScreen)
+            {
+                _screenManager.RefreshTop<PostAdventureResultScreen>(screen, "post adventure result ready");
+                return;
+            }
+
+            Push(screen, "post adventure result ready");
+        }
+
+        public void OnPostAdventureResultClosed(PostAdventureMenu menu)
+        {
+            if (_screenManager.CurrentScreen is PostAdventureResultScreen)
+            {
+                _screenManager.Pop<PostAdventureResultScreen>("post adventure result closed");
+            }
+        }
+
+        public void OnPostAdventureStatsReady(PostAdventureStatsMenu menu)
+        {
+            PostAdventureStatsScreen screen = new PostAdventureStatsScreen(new PostAdventureStatsAdapter(menu));
+            if (_screenManager.CurrentScreen is PostAdventureStatsScreen)
+            {
+                _screenManager.RefreshTop<PostAdventureStatsScreen>(screen, "post adventure stats ready");
+                return;
+            }
+
+            Push(screen, "post adventure stats ready");
+        }
+
+        public void OnPostAdventureStatsClosed(PostAdventureStatsMenu menu)
+        {
+            if (_screenManager.CurrentScreen is PostAdventureStatsScreen)
+            {
+                _screenManager.Pop<PostAdventureStatsScreen>("post adventure stats closed");
+            }
         }
 
         public void OnPreBattleMenuReady(PreBattleMenu menu)
