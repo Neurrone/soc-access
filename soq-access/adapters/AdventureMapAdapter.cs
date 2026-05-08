@@ -49,12 +49,14 @@ namespace SongsOfConquestAccess.Adapters
         private readonly IHumanAdventureController _humanAdventureController;
         private readonly IHumanAdventureControllerFacade _humanAdventureControllerFacade;
         private readonly IInputManager _inputManager;
+        private readonly IMapEntityMiniMenu _mapEntityMiniMenu;
         private readonly MethodInfo _worldToPointMethod;
         private readonly MethodInfo _pointToWorldMethod;
         private readonly MethodInfo _getTooltipForTilePositionMethod;
         private readonly FieldInfo _runtimeTooltipBehaviorField;
         private readonly FieldInfo _innerTooltipManagerField;
         private readonly FieldInfo _gamepadTooltipHandleField;
+        private readonly FieldInfo _miniMenuIsVisibleField;
         private readonly FieldInfo _fogHasFinishedLoadingField;
         private readonly FieldInfo _currentInputModuleField;
         private GameObject _cursorOverlay;
@@ -76,7 +78,8 @@ namespace SongsOfConquestAccess.Adapters
                 Resolve<ICartographyVisualManifest>(GetContainer(installer)),
                 Resolve<IHumanAdventureController>(GetContainer(installer)),
                 Resolve<IHumanAdventureControllerFacade>(GetContainer(installer)),
-                Resolve<IInputManager>(GetContainer(installer)))
+                Resolve<IInputManager>(GetContainer(installer)),
+                Resolve<IMapEntityMiniMenu>(GetContainer(installer)))
         {
         }
 
@@ -94,7 +97,8 @@ namespace SongsOfConquestAccess.Adapters
             ICartographyVisualManifest cartographyVisualManifest,
             IHumanAdventureController humanAdventureController,
             IHumanAdventureControllerFacade humanAdventureControllerFacade,
-            IInputManager inputManager)
+            IInputManager inputManager,
+            IMapEntityMiniMenu mapEntityMiniMenu = null)
         {
             SourceKey = sourceKey;
             _container = container;
@@ -110,6 +114,7 @@ namespace SongsOfConquestAccess.Adapters
             _humanAdventureController = humanAdventureController;
             _humanAdventureControllerFacade = humanAdventureControllerFacade;
             _inputManager = inputManager;
+            _mapEntityMiniMenu = mapEntityMiniMenu ?? Resolve<IMapEntityMiniMenu>(container);
             _worldToPointMethod = cartographyConverter != null
                 ? AccessTools.Method(cartographyConverter.GetType(), "WorldToPoint", new[] { typeof(float3) })
                 : null;
@@ -128,6 +133,10 @@ namespace SongsOfConquestAccess.Adapters
                 : null;
             _gamepadTooltipHandleField = tooltipManagerType != null
                 ? AccessTools.Field(tooltipManagerType, "_gamepadTooltipHandle")
+                : null;
+            Type miniMenuType = _mapEntityMiniMenu != null ? _mapEntityMiniMenu.GetType() : null;
+            _miniMenuIsVisibleField = miniMenuType != null
+                ? AccessTools.Field(miniMenuType, "_isVisible")
                 : null;
             _fogHasFinishedLoadingField = fogManager != null
                 ? AccessTools.Field(fogManager.GetType(), "_hasFinishedLoading")
@@ -1272,6 +1281,12 @@ namespace SongsOfConquestAccess.Adapters
 
         public Tooltip GetTooltip(Vector2Int tile)
         {
+            if (IsSelectedMapEntityMiniMenuOpen())
+            {
+                HideFocusedTileTooltip();
+                return null;
+            }
+
             if (_tooltipManager == null || !ShouldShowFocusedTileTooltip(tile))
             {
                 return null;
@@ -1459,6 +1474,7 @@ namespace SongsOfConquestAccess.Adapters
                         InvokeNativeInputModuleAction(inputModule, "HandlePrimaryInputStart");
                         InvokeNativeInputModuleAction(inputModule, "HandlePrimaryInputClick");
                     });
+                HideFocusedTileTooltipIfSelectedMiniMenuOpens();
                 return true;
             }
             catch (Exception exception)
@@ -1945,6 +1961,11 @@ namespace SongsOfConquestAccess.Adapters
 
         private bool ShouldShowFocusedTileTooltip(Vector2Int tile)
         {
+            if (IsSelectedMapEntityMiniMenuOpen())
+            {
+                return false;
+            }
+
             int localTeamId = GetLocalTeamId();
             try
             {
@@ -1964,6 +1985,51 @@ namespace SongsOfConquestAccess.Adapters
             catch (Exception)
             {
                 return false;
+            }
+        }
+
+        private bool IsSelectedMapEntityMiniMenuOpen()
+        {
+            if (_selectionHandler == null || _selectionHandler.SelectedMapEntity == null || _miniMenuIsVisibleField == null)
+            {
+                return false;
+            }
+
+            try
+            {
+                object value = _miniMenuIsVisibleField.GetValue(_mapEntityMiniMenu);
+                return value is bool && (bool)value;
+            }
+            catch (Exception exception)
+            {
+                SoqAccessPlugin.Instance?.LogWarning("AdventureMapAdapter failed to read map entity mini menu visibility: " + exception.Message);
+                return false;
+            }
+        }
+
+        private void HideFocusedTileTooltip()
+        {
+            _tooltipManager?.HideTileTooltip();
+            NativeTooltipUtility.HideTooltip();
+        }
+
+        private void HideFocusedTileTooltipIfSelectedMiniMenuOpens()
+        {
+            if (IsSelectedMapEntityMiniMenuOpen())
+            {
+                HideFocusedTileTooltip();
+            }
+
+            SoqAccessPlugin.Instance?.StartCoroutine(HideFocusedTileTooltipIfSelectedMiniMenuOpensNextFrame());
+        }
+
+        private IEnumerator HideFocusedTileTooltipIfSelectedMiniMenuOpensNextFrame()
+        {
+            yield return null;
+
+            if (IsSelectedMapEntityMiniMenuOpen())
+            {
+                HideFocusedTileTooltip();
             }
         }
 
