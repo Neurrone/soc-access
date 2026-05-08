@@ -37,16 +37,6 @@ namespace SongsOfConquestAccess.UI
                 ScannerDirectionMode.Hex);
         }
 
-        public void AttachSpellCastBegin()
-        {
-            _adapter?.AttachSpellCastBegin(HandleSpellCastBegin);
-        }
-
-        public void DetachSpellCastBegin()
-        {
-            _adapter?.DetachSpellCastBegin();
-        }
-
         public override bool AnnounceName
         {
             get { return true; }
@@ -61,7 +51,9 @@ namespace SongsOfConquestAccess.UI
         {
             CombatTile tile = GetFocusedTile();
             string label = _adapter != null ? _adapter.DescribeTile(tile, GetEffectiveInspectContext()) : "Combat grid";
-            if (_adapter != null && _adapter.IsSpellTargetingActive() && _adapter.IsSpellTargetSelected(_cursor))
+            if (_adapter != null
+                && _adapter.GetTargetingMode() == CombatTargetingMode.Spell
+                && _adapter.IsSpellTargetSelected(_cursor))
             {
                 return "selected, " + label;
             }
@@ -85,10 +77,10 @@ namespace SongsOfConquestAccess.UI
                 || actionKey == AccessibilityActions.CombatInspect.Key
                 || actionKey == AccessibilityActions.CombatNextRelevantTile.Key
                 || actionKey == AccessibilityActions.CombatPreviousRelevantTile.Key
-                || (_adapter != null && _adapter.IsSpellTargetingActive() && actionKey == AccessibilityActions.Activate.Key)
+                || (_adapter != null && _adapter.GetTargetingMode() != CombatTargetingMode.None && actionKey == AccessibilityActions.Activate.Key)
                 || actionKey == AccessibilityActions.MapSecondaryAction.Key
                 || IsScannerAction(actionKey)
-                || ((_inspectContext != null || (_adapter != null && _adapter.IsSpellTargetingActive())) && actionKey == AccessibilityActions.Cancel.Key);
+                || ((_inspectContext != null || (_adapter != null && _adapter.GetTargetingMode() != CombatTargetingMode.None)) && actionKey == AccessibilityActions.Cancel.Key);
         }
 
         public override bool HasClaimInTree(string actionKey)
@@ -140,7 +132,7 @@ namespace SongsOfConquestAccess.UI
 
             if (action.Key == AccessibilityActions.CombatInspect.Key)
             {
-                if (_adapter != null && (_adapter.IsSpellTargetingActive() || _adapter.HasVisibleSpellTargetInstruction()))
+                if (_adapter != null && _adapter.GetTargetingMode() != CombatTargetingMode.None)
                 {
                     return true;
                 }
@@ -165,16 +157,25 @@ namespace SongsOfConquestAccess.UI
                 return true;
             }
 
-            if (action.Key == AccessibilityActions.Activate.Key && _adapter != null && _adapter.IsSpellTargetingActive())
+            if (action.Key == AccessibilityActions.Activate.Key && _adapter != null)
             {
-                bool handled = _adapter.ConfirmSpellTarget(_cursor);
+                CombatTargetingMode mode = _adapter.GetTargetingMode();
+                bool handled = mode == CombatTargetingMode.Spell
+                    ? _adapter.ConfirmSpellTarget(_cursor)
+                    : mode == CombatTargetingMode.Ability && _adapter.ConfirmAbilityTarget(_cursor);
                 UIManager.SetFocusedWidget(this);
                 return handled;
             }
 
             if (action.Key == AccessibilityActions.Cancel.Key)
             {
-                if (_adapter != null && _adapter.CancelSpellTargeting())
+                if (_adapter != null && _adapter.GetTargetingMode() == CombatTargetingMode.Spell && _adapter.CancelSpellTargeting())
+                {
+                    UIManager.SetFocusedWidget(this);
+                    return true;
+                }
+
+                if (_adapter != null && _adapter.GetTargetingMode() == CombatTargetingMode.Ability && _adapter.CancelAbilityTargeting())
                 {
                     UIManager.SetFocusedWidget(this);
                     return true;
@@ -197,6 +198,11 @@ namespace SongsOfConquestAccess.UI
         }
 
         public bool MoveToActingTroop(Vector2Int point)
+        {
+            return MoveToTroop(point);
+        }
+
+        public bool MoveToTroop(Vector2Int point)
         {
             RefreshSnapshot();
             if (_snapshot == null || !_snapshot.IsValidTile(point))
@@ -237,7 +243,7 @@ namespace SongsOfConquestAccess.UI
 
         private bool EnterInspect()
         {
-            if (_adapter != null && (_adapter.IsSpellTargetingActive() || _adapter.HasVisibleSpellTargetInstruction()))
+            if (_adapter != null && _adapter.GetTargetingMode() != CombatTargetingMode.None)
             {
                 return true;
             }
@@ -315,7 +321,7 @@ namespace SongsOfConquestAccess.UI
             }
 
             if (_inspectContext != null
-                && (_adapter == null || !_adapter.IsSpellTargetingActive())
+                && (_adapter == null || _adapter.GetTargetingMode() == CombatTargetingMode.None)
                 && !_inspectContext.Contains(point))
             {
                 return true;
@@ -402,7 +408,7 @@ namespace SongsOfConquestAccess.UI
         private void FocusCurrentTile(bool updateNativeFocus)
         {
             RefreshSnapshot();
-            if (_adapter != null && _adapter.IsSpellTargetingActive())
+            if (_adapter != null && _adapter.GetTargetingMode() != CombatTargetingMode.None)
             {
                 if (_inspectContext != null)
                 {
@@ -410,7 +416,7 @@ namespace SongsOfConquestAccess.UI
                     return;
                 }
 
-                _adapter.FocusSpellTargetTile(_cursor);
+                _adapter.FocusTargetTile(_cursor);
             }
             else if (updateNativeFocus)
             {
@@ -421,12 +427,14 @@ namespace SongsOfConquestAccess.UI
             UIManager.SetFocusedWidget(this);
         }
 
-        private void HandleSpellCastBegin()
+        public void HandleTargetingBegin()
         {
             if (_inspectContext != null)
             {
                 ExitInspect();
             }
+
+            FocusCurrentTile(updateNativeFocus: true);
         }
 
         private void MaybeSpeakDisconnectedWarning()
@@ -466,7 +474,7 @@ namespace SongsOfConquestAccess.UI
 
         private CombatInspectContext GetEffectiveInspectContext()
         {
-            return _adapter != null && _adapter.IsSpellTargetingActive() ? null : _inspectContext;
+            return _adapter != null && _adapter.GetTargetingMode() != CombatTargetingMode.None ? null : _inspectContext;
         }
 
         private static int Mod(int value, int modulus)

@@ -1,9 +1,12 @@
 using SongsOfConquestAccess.Adapters;
 using SongsOfConquestAccess.Events;
+using SongsOfConquestAccess.Speech;
 using SongsOfConquestAccess.UI;
+using SongsOfConquest.Common;
 using SongsOfConquest.Common.Economy;
 using SongsOfConquest.Common.Gamestate;
 using UnityEngine;
+using System;
 
 namespace SongsOfConquestAccess.Screens
 {
@@ -12,6 +15,7 @@ namespace SongsOfConquestAccess.Screens
         private const int GridIndex = 0;
         private readonly CombatAdapter _adapter;
         private readonly CombatHexGrid _grid;
+        private Action<TroopAbilityTargeting> _abilityTargetingBeginHandler;
 
         public CombatScreen(CombatAdapter adapter)
             : this(adapter, new CombatHexGrid(adapter))
@@ -38,24 +42,49 @@ namespace SongsOfConquestAccess.Screens
         public override void OnPush()
         {
             AccessibilityEventBus.Subscribe(HandleAccessibilityEvent);
-            _grid?.AttachSpellCastBegin();
+            _adapter?.AttachSpellCastBegin(HandleSpellCastBegin);
             _adapter?.AttachSpellTargetingNarration();
+            _abilityTargetingBeginHandler = HandleAbilityTargetingBegin;
+            _adapter?.AttachAbilityTargetingBegin(_abilityTargetingBeginHandler);
             _adapter?.AnnounceVisibleSpellTargetInstruction();
         }
 
         public void MoveCursorToLocalActingTroop(int troopId)
         {
-            Vector2Int position;
-            if (_adapter != null
-                && _adapter.TryGetLocalActingTroopPosition(troopId, out position)
-                && _grid != null)
-            {
-                _grid.MoveToActingTroop(position);
-            }
+            MoveCursorToTroop(troopId, focusGrid: true, requireLocalCurrentTurn: true);
         }
 
-        public void FocusGrid()
+        public bool MoveCursorToTroop(int troopId, bool focusGrid, bool requireLocalCurrentTurn)
         {
+            Vector2Int position;
+            if (_adapter == null
+                || _grid == null
+                || !_adapter.TryGetTroopPosition(troopId, out position, requireLocalCurrentTurn))
+            {
+                return false;
+            }
+
+            if (focusGrid)
+            {
+                RootWidget?.SetFocusByIndexSilently(GridIndex);
+            }
+
+            bool moved = _grid.MoveToTroop(position);
+            if (focusGrid)
+            {
+                FocusGridIfNeeded();
+            }
+
+            return moved;
+        }
+
+        public void FocusGridIfNeeded()
+        {
+            if (ReferenceEquals(RootWidget?.FocusedChild, _grid) && ReferenceEquals(UIManager.CurrentWidget, _grid))
+            {
+                return;
+            }
+
             RootWidget?.SetFocusByIndex(GridIndex);
         }
 
@@ -69,10 +98,42 @@ namespace SongsOfConquestAccess.Screens
         public override void OnPop()
         {
             AccessibilityEventBus.Unsubscribe(HandleAccessibilityEvent);
-            _grid?.DetachSpellCastBegin();
+            _adapter?.DetachSpellCastBegin();
             _adapter?.DetachSpellTargetingNarration();
+            _adapter?.DetachAbilityTargetingBegin(_abilityTargetingBeginHandler);
+            _abilityTargetingBeginHandler = null;
             _adapter?.ClearNativeTooltip();
             _adapter?.ClearFocusedTileOverlay();
+        }
+
+        private void HandleSpellCastBegin()
+        {
+            bool wasGridFocused = ReferenceEquals(RootWidget?.FocusedChild, _grid) && ReferenceEquals(UIManager.CurrentWidget, _grid);
+            if (!wasGridFocused)
+            {
+                RootWidget?.SetFocusByIndexSilently(GridIndex);
+            }
+
+            _grid?.HandleTargetingBegin();
+            FocusGridIfNeeded();
+        }
+
+        private void HandleAbilityTargetingBegin(TroopAbilityTargeting targeting)
+        {
+            bool wasGridFocused = ReferenceEquals(RootWidget?.FocusedChild, _grid) && ReferenceEquals(UIManager.CurrentWidget, _grid);
+            if (!wasGridFocused)
+            {
+                RootWidget?.SetFocusByIndexSilently(GridIndex);
+            }
+
+            _grid?.HandleTargetingBegin();
+            FocusGridIfNeeded();
+
+            string instruction = _adapter != null ? _adapter.BuildAbilityTargetInstruction(targeting) : string.Empty;
+            if (!string.IsNullOrWhiteSpace(instruction))
+            {
+                SpeechPipeline.Output(new SpeechRequest(instruction, interrupt: false));
+            }
         }
 
         private void HandleAccessibilityEvent(IAccessibilityEvent accessibilityEvent)
@@ -80,7 +141,7 @@ namespace SongsOfConquestAccess.Screens
             MapHudVisibilityChangedEvent hudVisibility = accessibilityEvent as MapHudVisibilityChangedEvent;
             if (hudVisibility != null && !hudVisibility.IsVisible)
             {
-                FocusGrid();
+                FocusGridIfNeeded();
             }
         }
 
@@ -93,6 +154,44 @@ namespace SongsOfConquestAccess.Screens
                 return root;
             }
 
+            root.AddChild(new TextWidget(
+                "combat-targeting-instruction",
+                () => adapter.Hud.TargetingInstructionText,
+                null,
+                includeParentLabelInAnnouncement: false,
+                isVisible: adapter.Hud.IsTargetingInstructionVisible));
+            root.AddChild(new ButtonWidget(
+                "combat-cancel-spell",
+                () => adapter.Hud.CancelSpellButtonLabel,
+                adapter.Hud.ClickCancelSpellButton,
+                adapter.Hud.FocusCancelSpellButton,
+                adapter.Hud.IsCancelSpellButtonEnabled,
+                adapter.Hud.IsCancelSpellButtonVisible,
+                () => adapter.Hud.CancelSpellButtonTooltip));
+            root.AddChild(new ButtonWidget(
+                "combat-cancel-ability",
+                () => adapter.Hud.CancelAbilityButtonLabel,
+                () => ActivateCancelAbilityButton(adapter),
+                adapter.Hud.FocusCancelAbilityButton,
+                adapter.Hud.IsCancelAbilityButtonEnabled,
+                adapter.Hud.IsCancelAbilityButtonVisible,
+                () => adapter.Hud.CancelAbilityButtonTooltip));
+            root.AddChild(BuildQuickbarMenu(adapter));
+            root.AddChild(new TextWidget(
+                "combat-current-troop",
+                () => adapter.Hud.CurrentTroopLabel,
+                () => FocusCurrentTroop(adapter),
+                includeParentLabelInAnnouncement: false,
+                isVisible: adapter.Hud.IsCurrentTroopIndicatorVisible));
+            root.AddChild(new ButtonWidget(
+                "combat-current-troop-ability",
+                () => adapter.Hud.AbilityButtonLabel,
+                () => ActivateAbilityButton(adapter),
+                adapter.Hud.FocusAbilityButton,
+                adapter.Hud.IsAbilityButtonEnabled,
+                adapter.Hud.IsAbilityButtonVisible,
+                () => adapter.Hud.AbilityButtonTooltip));
+            root.AddChild(BuildQueueMenu(adapter));
             root.AddChild(Portrait.StaticNative(
                 "combat-attacker-portrait",
                 () => adapter.Hud.Commanders.GetPortraitLabel(CombatHudSide.Attacker),
@@ -100,6 +199,7 @@ namespace SongsOfConquestAccess.Screens
                 adapter.Hud.Commanders.Localization,
                 isVisible: () => adapter.Hud.Commanders.IsPortraitVisible(CombatHudSide.Attacker)));
             root.AddChild(BuildEssenceMenu(adapter, CombatHudSide.Attacker, "combat-attacker-essence", "Attacker essence"));
+            root.AddChild(BuildAiControlButton(adapter, CombatHudSide.Attacker, "combat-attacker-ai-control"));
             root.AddChild(Portrait.StaticNative(
                 "combat-defender-portrait",
                 () => adapter.Hud.Commanders.GetPortraitLabel(CombatHudSide.Defender),
@@ -107,6 +207,7 @@ namespace SongsOfConquestAccess.Screens
                 adapter.Hud.Commanders.Localization,
                 isVisible: () => adapter.Hud.Commanders.IsPortraitVisible(CombatHudSide.Defender)));
             root.AddChild(BuildEssenceMenu(adapter, CombatHudSide.Defender, "combat-defender-essence", "Defender essence"));
+            root.AddChild(BuildAiControlButton(adapter, CombatHudSide.Defender, "combat-defender-ai-control"));
             root.AddChild(new ButtonWidget(
                 "combat-spellbook",
                 () => adapter.Hud.SpellbookButtonLabel,
@@ -123,7 +224,144 @@ namespace SongsOfConquestAccess.Screens
                 adapter.Hud.IsEndTurnButtonEnabled,
                 adapter.Hud.IsEndTurnButtonVisible,
                 () => adapter.Hud.EndTurnButtonTooltip));
+            root.AddChild(BuildBattleLogMenu(adapter));
             return root;
+        }
+
+        private static MenuWidget BuildQuickbarMenu(CombatAdapter adapter)
+        {
+            MenuWidget menu = new MenuWidget("combat-quickbar", "Quickbar", adapter.Hud.IsQuickbarMenuVisible);
+            int slotCount = SafeGetCount("quickbar slots", adapter.Hud.GetQuickbarSlotCount);
+            for (int i = 0; i < slotCount; i++)
+            {
+                int capturedIndex = i;
+                menu.AddItem(new MenuItemWidget(
+                    "combat-quickbar-" + capturedIndex,
+                    () => GetQuickbarItem(adapter, capturedIndex)?.Label,
+                    null,
+                    () => ActivateQuickbarItem(adapter, capturedIndex),
+                    () => GetQuickbarItem(adapter, capturedIndex)?.Focus(),
+                    () => GetQuickbarItem(adapter, capturedIndex)?.IsVisible ?? false,
+                    () => GetQuickbarItem(adapter, capturedIndex)?.Tooltip,
+                    () => GetQuickbarItem(adapter, capturedIndex)?.Unfocus(),
+                    () => GetQuickbarItem(adapter, capturedIndex)?.IsEnabled ?? false));
+            }
+
+            return menu;
+        }
+
+        private static BattleHudAdapter.QuickbarItem GetQuickbarItem(CombatAdapter adapter, int index)
+        {
+            return adapter != null ? adapter.Hud.GetQuickbarItem(index) : null;
+        }
+
+        private static bool ActivateQuickbarItem(CombatAdapter adapter, int index)
+        {
+            BattleHudAdapter.QuickbarItem item = GetQuickbarItem(adapter, index);
+            bool activated = item != null && item.Activate();
+            CombatScreen screen = SoqAccessPlugin.Instance?.ScreenManager?.CurrentScreen as CombatScreen;
+            screen?.FocusGridIfNeeded();
+            return activated;
+        }
+
+        private static bool ActivateAbilityButton(CombatAdapter adapter)
+        {
+            bool activated = adapter != null && adapter.Hud.ClickAbilityButton();
+            CombatScreen screen = SoqAccessPlugin.Instance?.ScreenManager?.CurrentScreen as CombatScreen;
+            if (adapter != null && adapter.GetTargetingMode() == CombatTargetingMode.Ability)
+            {
+                screen?.FocusGridIfNeeded();
+            }
+
+            return activated;
+        }
+
+        private static bool ActivateCancelAbilityButton(CombatAdapter adapter)
+        {
+            bool activated = adapter != null && adapter.Hud.ClickCancelAbilityButton();
+            CombatScreen screen = SoqAccessPlugin.Instance?.ScreenManager?.CurrentScreen as CombatScreen;
+            screen?.FocusGridIfNeeded();
+            return activated;
+        }
+
+        private static MenuWidget BuildQueueMenu(CombatAdapter adapter)
+        {
+            MenuWidget menu = new MenuWidget("combat-queue", "Turn order", adapter.Hud.IsQueueMenuVisible);
+            const int MaxQueueItems = 32;
+            for (int i = 0; i < MaxQueueItems; i++)
+            {
+                int capturedIndex = i;
+                menu.AddItem(new MenuItemWidget(
+                    "combat-queue-" + capturedIndex,
+                    () => GetQueueItem(adapter, capturedIndex)?.Label,
+                    null,
+                    () => ActivateQueueItem(adapter, capturedIndex),
+                    () => GetQueueItem(adapter, capturedIndex)?.Focus(),
+                    () => GetQueueItem(adapter, capturedIndex)?.IsVisible ?? false,
+                    () => GetQueueItem(adapter, capturedIndex)?.Tooltip,
+                    () => GetQueueItem(adapter, capturedIndex)?.Unfocus()));
+            }
+
+            return menu;
+        }
+
+        private static BattleHudAdapter.QueueItem GetQueueItem(CombatAdapter adapter, int index)
+        {
+            return adapter != null ? adapter.Hud.GetQueueItem(index) : null;
+        }
+
+        private static bool ActivateQueueItem(CombatAdapter adapter, int index)
+        {
+            BattleHudAdapter.QueueItem item = GetQueueItem(adapter, index);
+            if (item == null || item.IsRoundMarker)
+            {
+                return false;
+            }
+
+            CombatScreen screen = SoqAccessPlugin.Instance?.ScreenManager?.CurrentScreen as CombatScreen;
+            return screen != null && screen.MoveCursorToTroop(item.TroopId, focusGrid: true, requireLocalCurrentTurn: false);
+        }
+
+        private static MenuWidget BuildBattleLogMenu(CombatAdapter adapter)
+        {
+            MenuWidget menu = new MenuWidget("combat-battle-log", "Battle log", adapter.Hud.IsBattleLogMenuVisible);
+            const int MaxBattleLogEntries = 32;
+            for (int i = 0; i < MaxBattleLogEntries; i++)
+            {
+                int capturedIndex = i;
+                menu.AddItem(new MenuItemWidget(
+                    "combat-battle-log-" + capturedIndex,
+                    () => adapter.Hud.GetBattleLogEntry(capturedIndex),
+                    null,
+                    () => false,
+                    adapter.Hud.FocusBattleLog,
+                    () => capturedIndex < adapter.Hud.GetBattleLogEntryCount(),
+                    onUnfocus: adapter.Hud.UnfocusBattleLog));
+            }
+
+            return menu;
+        }
+
+        private static Widget BuildAiControlButton(CombatAdapter adapter, CombatHudSide side, string id)
+        {
+            CombatHudSide capturedSide = side;
+            return new ButtonWidget(
+                id,
+                () => adapter.Hud.Commanders.GetAiControlButtonLabel(capturedSide),
+                () => adapter.Hud.Commanders.ClickAiControlButton(capturedSide),
+                () => adapter.Hud.Commanders.FocusAiControlButton(capturedSide),
+                () => adapter.Hud.Commanders.IsAiControlButtonEnabled(capturedSide),
+                () => adapter.Hud.Commanders.IsAiControlButtonVisible(capturedSide),
+                () => adapter.Hud.Commanders.GetAiControlButtonTooltip(capturedSide));
+        }
+
+        private static void FocusCurrentTroop(CombatAdapter adapter)
+        {
+            CombatScreen screen = SoqAccessPlugin.Instance?.ScreenManager?.CurrentScreen as CombatScreen;
+            if (screen != null && adapter != null)
+            {
+                screen.MoveCursorToTroop(adapter.Hud.GetCurrentTroopId(), focusGrid: true, requireLocalCurrentTurn: false);
+            }
         }
 
         private static MenuWidget BuildEssenceMenu(CombatAdapter adapter, CombatHudSide side, string id, string label)
@@ -150,6 +388,33 @@ namespace SongsOfConquestAccess.Screens
                 () => adapter.Hud.Commanders.FocusEssence(capturedSide, capturedType),
                 () => adapter.Hud.Commanders.IsEssenceMenuVisible(capturedSide),
                 () => adapter.Hud.Commanders.GetEssenceTooltip(capturedSide, capturedType)));
+        }
+
+        private static System.Collections.Generic.IReadOnlyList<T> SafeGet<T>(string section, System.Func<System.Collections.Generic.IReadOnlyList<T>> getter)
+        {
+            try
+            {
+                System.Collections.Generic.IReadOnlyList<T> items = getter != null ? getter() : null;
+                return items ?? new T[0];
+            }
+            catch (System.Exception exception)
+            {
+                SoqAccessPlugin.Instance?.LogWarning("CombatScreen section " + section + " failed to build: " + exception);
+                return new T[0];
+            }
+        }
+
+        private static int SafeGetCount(string section, System.Func<int> getter)
+        {
+            try
+            {
+                return getter != null ? getter() : 0;
+            }
+            catch (System.Exception exception)
+            {
+                SoqAccessPlugin.Instance?.LogWarning("CombatScreen section " + section + " failed to count: " + exception);
+                return 0;
+            }
         }
     }
 }

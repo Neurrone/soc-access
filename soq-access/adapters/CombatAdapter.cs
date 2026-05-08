@@ -39,6 +39,13 @@ using Zenject;
 
 namespace SongsOfConquestAccess.Adapters
 {
+    internal enum CombatTargetingMode
+    {
+        None,
+        Spell,
+        Ability
+    }
+
     internal sealed class CombatAdapter
     {
         private static readonly PropertyInfo InstallerContainerProperty =
@@ -67,7 +74,9 @@ namespace SongsOfConquestAccess.Adapters
         private readonly IHumanBattleSpellController _battleSpellController;
         private readonly MouseKeyboardHumanBattleSpellModule _mouseKeyboardSpellInputModule;
         private readonly IBattleHudSignals _battleHudSignals;
+        private readonly ITroopAbilityUtility _abilityUtility;
         private readonly MethodInfo _pointToWorldMethod;
+        private readonly MethodInfo _primaryClickMethod;
         private readonly MethodInfo _secondaryClickMethod;
         private readonly MethodInfo _spellPrimaryClickMethod;
         private readonly MethodInfo _updateCurrentTileMethod;
@@ -103,7 +112,8 @@ namespace SongsOfConquestAccess.Adapters
                 Resolve<MouseKeyboardHumanBattleControllerModule>(GetContainer(installer)),
                 Resolve<IHumanBattleSpellController>(GetContainer(installer)),
                 Resolve<MouseKeyboardHumanBattleSpellModule>(GetContainer(installer)),
-                Resolve<IBattleHudSignals>(GetContainer(installer)))
+                Resolve<IBattleHudSignals>(GetContainer(installer)),
+                Resolve<ITroopAbilityUtility>(GetContainer(installer)))
         {
         }
 
@@ -125,7 +135,8 @@ namespace SongsOfConquestAccess.Adapters
             MouseKeyboardHumanBattleControllerModule mouseKeyboardInputModule,
             IHumanBattleSpellController battleSpellController,
             MouseKeyboardHumanBattleSpellModule mouseKeyboardSpellInputModule,
-            IBattleHudSignals battleHudSignals)
+            IBattleHudSignals battleHudSignals,
+            ITroopAbilityUtility abilityUtility)
         {
             _sourceKey = sourceKey;
             _container = container;
@@ -145,12 +156,16 @@ namespace SongsOfConquestAccess.Adapters
             _battleSpellController = battleSpellController;
             _mouseKeyboardSpellInputModule = mouseKeyboardSpellInputModule;
             _battleHudSignals = battleHudSignals;
+            _abilityUtility = abilityUtility;
             Hud = new BattleHudAdapter(container, facade, localization);
             _pointToWorldMethod = cartographyConverter != null
                 ? AccessTools.Method(cartographyConverter.GetType(), "PointToWorld", new[] { typeof(int2), typeof(int) })
                 : null;
             _secondaryClickMethod = mouseKeyboardInputModule != null
                 ? AccessTools.Method(mouseKeyboardInputModule.GetType(), "PreHandleSecondaryClick")
+                : null;
+            _primaryClickMethod = mouseKeyboardInputModule != null
+                ? AccessTools.Method(mouseKeyboardInputModule.GetType(), "PreHandlePrimaryClick")
                 : null;
             _spellPrimaryClickMethod = mouseKeyboardSpellInputModule != null
                 ? AccessTools.Method(mouseKeyboardSpellInputModule.GetType(), "HandlePrimaryClick")
@@ -326,9 +341,18 @@ namespace SongsOfConquestAccess.Adapters
 
         public Vector2Int GetInitialTile()
         {
-            if (IsSpellTargetingActive())
+            CombatTargetingMode mode = GetTargetingMode();
+            if (mode == CombatTargetingMode.Spell)
             {
                 Vector2Int hoverTile = _battleSpellController.CurrentHoverTile;
+                if (IsValidTile(hoverTile))
+                {
+                    return hoverTile;
+                }
+            }
+            else if (mode == CombatTargetingMode.Ability && _humanBattleController != null)
+            {
+                Vector2Int hoverTile = _humanBattleController.CurrentHoverTile;
                 if (IsValidTile(hoverTile))
                 {
                     return hoverTile;
@@ -499,7 +523,7 @@ namespace SongsOfConquestAccess.Adapters
             _gridManager?.SetCurrentTile(point, path);
             _pathManager?.SetCurrentTile(point, path);
             _highlightManager?.SetCurrentTile(point);
-            if (IsAnySpellCastingStateActive())
+            if (GetTargetingMode() != CombatTargetingMode.None || IsAnySpellCastingStateActive())
             {
                 return;
             }
@@ -568,9 +592,31 @@ namespace SongsOfConquestAccess.Adapters
             _beginCastHandler = null;
         }
 
+        public void AttachAbilityTargetingBegin(Action<TroopAbilityTargeting> handler)
+        {
+            if (_battleHudSignals == null || handler == null)
+            {
+                return;
+            }
+
+            _battleHudSignals.OnBeginAbilityTargeting =
+                (Action<TroopAbilityTargeting>)Delegate.Combine(_battleHudSignals.OnBeginAbilityTargeting, handler);
+        }
+
+        public void DetachAbilityTargetingBegin(Action<TroopAbilityTargeting> handler)
+        {
+            if (_battleHudSignals == null || handler == null)
+            {
+                return;
+            }
+
+            _battleHudSignals.OnBeginAbilityTargeting =
+                (Action<TroopAbilityTargeting>)Delegate.Remove(_battleHudSignals.OnBeginAbilityTargeting, handler);
+        }
+
         public void AnnounceVisibleSpellTargetInstruction()
         {
-            if (!IsSpellTargetingActive())
+            if (GetTargetingMode() != CombatTargetingMode.Spell)
             {
                 return;
             }
@@ -582,22 +628,48 @@ namespace SongsOfConquestAccess.Adapters
             }
         }
 
-        public bool IsSpellTargetingActive()
+        public string BuildAbilityTargetInstruction(TroopAbilityTargeting targeting)
         {
-            if (_battleSpellController == null)
+            IBattleTroopState current = GetCurrentTroop();
+            ITroopAbilityDefinition ability = current != null && _abilityUtility != null
+                ? _abilityUtility.GetAbilityDefinition(current)
+                : null;
+            string abilityName = ability != null ? SpeechTextSanitizer.Normalize(Localize(ability.NameKey)) : string.Empty;
+            string instruction = SpeechTextSanitizer.Normalize(Localize("Battle/AbilityTargeting/" + targeting));
+            if (!string.IsNullOrWhiteSpace(abilityName) && !string.IsNullOrWhiteSpace(instruction))
             {
-                return false;
+                return abilityName + ": " + instruction;
             }
 
-            HumanBattleSpellController.State state = _battleSpellController.CurrentState;
-            return state == HumanBattleSpellController.State.CastingBacteriaSpell
-                || state == HumanBattleSpellController.State.CastingTeleportSpell
-                || state == HumanBattleSpellController.State.CastingSummonSpell;
+            return !string.IsNullOrWhiteSpace(abilityName) ? abilityName : instruction;
+        }
+
+        public CombatTargetingMode GetTargetingMode()
+        {
+            if (_battleSpellController != null)
+            {
+                HumanBattleSpellController.State state = _battleSpellController.CurrentState;
+                if (state == HumanBattleSpellController.State.CastingBacteriaSpell
+                    || state == HumanBattleSpellController.State.CastingTeleportSpell
+                    || state == HumanBattleSpellController.State.CastingSummonSpell)
+                {
+                    return CombatTargetingMode.Spell;
+                }
+            }
+
+            if (_humanBattleController != null
+                && _humanBattleController.StateMachine != null
+                && _humanBattleController.StateMachine.CurrentStateType == HumanBattleController.State.ChoosingAbilityTarget)
+            {
+                return CombatTargetingMode.Ability;
+            }
+
+            return CombatTargetingMode.None;
         }
 
         private bool IsAnySpellCastingStateActive()
         {
-            if (IsSpellTargetingActive())
+            if (GetTargetingMode() == CombatTargetingMode.Spell)
             {
                 return true;
             }
@@ -607,42 +679,58 @@ namespace SongsOfConquestAccess.Adapters
                 && _humanBattleController.StateMachine.CurrentStateType == HumanBattleController.State.CastingSpell;
         }
 
-        public bool HasVisibleSpellTargetInstruction()
-        {
-            return !string.IsNullOrWhiteSpace(GetVisibleSpellTargetInstructionText());
-        }
-
         public bool IsSpellTargetSelected(Vector2Int point)
         {
-            return _battleSpellController != null
-                && _battleSpellController.SelectedTargets != null
-                && _battleSpellController.SelectedTargets.Contains(point);
+            return CountSpellTargetSelections(point) > 0;
         }
 
-        public void FocusSpellTargetTile(Vector2Int point)
+        private int CountSpellTargetSelections(Vector2Int point)
         {
-            if (!IsSpellTargetingActive() || !IsValidTile(point))
+            if (_battleSpellController == null || _battleSpellController.SelectedTargets == null)
+            {
+                return 0;
+            }
+
+            int count = 0;
+            for (int i = 0; i < _battleSpellController.SelectedTargets.Count; i++)
+            {
+                if (_battleSpellController.SelectedTargets[i] == point)
+                {
+                    count++;
+                }
+            }
+
+            return count;
+        }
+
+        public void FocusTargetTile(Vector2Int point)
+        {
+            CombatTargetingMode mode = GetTargetingMode();
+            if (mode == CombatTargetingMode.None || !IsValidTile(point))
             {
                 return;
             }
 
-            PathNode[] path = GetPathTo(point);
-            _battleSpellController.SetCurrentTile(point);
-            _cursorManager?.SetCurrentTile(point);
-            _gridManager?.SetCurrentTile(point, path);
-            _pathManager?.SetCurrentTile(point, path);
-            _highlightManager?.SetCurrentTile(point);
+            SynchronizeNativeHoverForInput(point);
+            if (mode == CombatTargetingMode.Spell)
+            {
+                _battleSpellController?.SetCurrentTile(point);
+            }
+            else if (mode == CombatTargetingMode.Ability)
+            {
+                UpdateNativeAttackPreviews();
+            }
         }
 
         public bool ConfirmSpellTarget(Vector2Int point)
         {
-            if (!IsSpellTargetingActive() || !IsValidTile(point))
+            if (GetTargetingMode() != CombatTargetingMode.Spell || !IsValidTile(point))
             {
                 return false;
             }
 
-            bool wasSelected = IsSpellTargetSelected(point);
-            FocusSpellTargetTile(point);
+            int previousSelectionCount = CountSpellTargetSelections(point);
+            FocusTargetTile(point);
             if (_spellPrimaryClickMethod == null || _mouseKeyboardSpellInputModule == null)
             {
                 SoqAccessPlugin.Instance?.LogWarning("CombatAdapter cannot confirm spell target because native HandlePrimaryClick was not found");
@@ -659,27 +747,68 @@ namespace SongsOfConquestAccess.Adapters
                 return false;
             }
 
-            bool isSelected = IsSpellTargetSelected(point);
-            if (!wasSelected && isSelected)
+            int selectionCount = CountSpellTargetSelections(point);
+            if (selectionCount > previousSelectionCount)
             {
-                SpeechPipeline.Output(new SpeechRequest("selected", interrupt: false));
+                SpeechPipeline.Output(new SpeechRequest(selectionCount > 1 ? "selected " + selectionCount + "x" : "selected", interrupt: false));
             }
-            else if (wasSelected && !isSelected && IsSpellTargetingActive())
+            else if (selectionCount < previousSelectionCount && GetTargetingMode() == CombatTargetingMode.Spell)
             {
-                SpeechPipeline.Output(new SpeechRequest("unselected", interrupt: false));
+                SpeechPipeline.Output(new SpeechRequest(selectionCount > 0 ? "selected " + selectionCount + "x" : "unselected", interrupt: false));
             }
 
             return true;
         }
 
+        public bool ConfirmAbilityTarget(Vector2Int point)
+        {
+            if (GetTargetingMode() != CombatTargetingMode.Ability || !IsValidTile(point))
+            {
+                return false;
+            }
+
+            ScreenInputOverride screenInputOverride;
+            if (!TryBeginScreenInputOverride(point, out screenInputOverride))
+            {
+                return false;
+            }
+
+            try
+            {
+                FocusTargetTile(point);
+                return InvokeNativeClick(_primaryClickMethod, "primary ability target");
+            }
+            finally
+            {
+                screenInputOverride.Restore();
+            }
+        }
+
         public bool CancelSpellTargeting()
         {
-            if (!IsSpellTargetingActive() || _battleSpellController == null)
+            if (GetTargetingMode() != CombatTargetingMode.Spell || _battleSpellController == null)
             {
                 return false;
             }
 
             _battleSpellController.HandleSpellCastCancelled();
+            return true;
+        }
+
+        public bool CancelAbilityTargeting()
+        {
+            if (GetTargetingMode() != CombatTargetingMode.Ability || _battleHudSignals == null)
+            {
+                return false;
+            }
+
+            IBattleTroopState current = GetCurrentTroop();
+            if (current == null || (_abilityUtility != null && !_abilityUtility.CanBeAborted(current)))
+            {
+                return false;
+            }
+
+            _battleHudSignals.OnEndAbilityTargeting?.Invoke(false);
             return true;
         }
 
@@ -1283,23 +1412,23 @@ namespace SongsOfConquestAccess.Adapters
             }
         }
 
-        private void InvokeNativeClick(MethodInfo clickMethod, string clickName)
+        private bool InvokeNativeClick(MethodInfo clickMethod, string clickName)
         {
             if (clickMethod == null || _mouseKeyboardInputModule == null)
             {
                 SoqAccessPlugin.Instance?.LogWarning("CombatAdapter cannot emulate " + clickName + " click because the native mouse input module was not resolved.");
-                return;
+                return false;
             }
 
             try
             {
-                // TODO: This invokes the native mouse click path for normal battle states.
-                // Accessibility-driven ability target selection is not implemented yet.
                 clickMethod.Invoke(_mouseKeyboardInputModule, Array.Empty<object>());
+                return true;
             }
             catch (Exception exception)
             {
                 SoqAccessPlugin.Instance?.LogWarning("CombatAdapter failed to emulate native " + clickName + " click: " + exception.Message);
+                return false;
             }
         }
 
@@ -2128,8 +2257,18 @@ namespace SongsOfConquestAccess.Adapters
 
         public bool TryGetLocalActingTroopPosition(int troopId, out Vector2Int position)
         {
+            return TryGetTroopPosition(troopId, out position, requireLocalCurrentTurn: true);
+        }
+
+        public bool TryGetTroopPosition(int troopId, out Vector2Int position, bool requireLocalCurrentTurn)
+        {
             position = Vector2Int.zero;
-            if (_facade == null || _facade.Teams == null || !_facade.Teams.IsCurrentLocal)
+            if (_facade == null || _facade.Teams == null)
+            {
+                return false;
+            }
+
+            if (requireLocalCurrentTurn && !_facade.Teams.IsCurrentLocal)
             {
                 return false;
             }
@@ -2141,7 +2280,7 @@ namespace SongsOfConquestAccess.Adapters
             }
 
             int localTeamId = GetLocalTeamId();
-            if (localTeamId >= 0 && troop.TeamId != localTeamId)
+            if (requireLocalCurrentTurn && localTeamId >= 0 && troop.TeamId != localTeamId)
             {
                 return false;
             }

@@ -22,6 +22,8 @@ namespace SongsOfConquestAccess.Adapters
             AccessTools.Field(typeof(BattleCommanderHUD), "_wielderPortraitContainer");
         private static readonly FieldInfo EssenceContainerField =
             AccessTools.Field(typeof(BattleCommanderHUD), "_essenceContainer");
+        private static readonly FieldInfo AiAutoBattleButtonsField =
+            AccessTools.Field(typeof(BattleCommanderHUD), "_aiAutoBattleButtons");
         private static readonly FieldInfo CommanderStateField =
             AccessTools.Field(typeof(BattleCommanderHUD), "_commanderState");
         private static readonly FieldInfo BattleEssenceCommanderField =
@@ -109,6 +111,37 @@ namespace SongsOfConquestAccess.Adapters
             return GetField<UIButton>(GetCommanderHud(side), WielderPortraitButtonField);
         }
 
+        public bool IsAiControlButtonVisible(CombatHudSide side)
+        {
+            return IsButtonVisible(GetAiControlButton(side));
+        }
+
+        public bool IsAiControlButtonEnabled(CombatHudSide side)
+        {
+            return IsButtonInteractable(GetAiControlButton(side));
+        }
+
+        public string GetAiControlButtonLabel(CombatHudSide side)
+        {
+            string label = GetFirstTooltipLine(GetAiControlButtonTooltip(side));
+            return string.IsNullOrWhiteSpace(label) ? "AI control" : label;
+        }
+
+        public void FocusAiControlButton(CombatHudSide side)
+        {
+            NativeSelectionUtility.Select(GetAiControlButton(side));
+        }
+
+        public bool ClickAiControlButton(CombatHudSide side)
+        {
+            return NativeSelectionUtility.Click(GetAiControlButton(side));
+        }
+
+        public Tooltip GetAiControlButtonTooltip(CombatHudSide side)
+        {
+            return Tooltip.ForComponent(GetAiControlButton(side), _localization);
+        }
+
         public bool IsEssenceMenuVisible(CombatHudSide side)
         {
             BattleEssenceContainer container = GetEssenceContainer(side);
@@ -155,6 +188,25 @@ namespace SongsOfConquestAccess.Adapters
         private BattleEssenceContainer GetEssenceContainer(CombatHudSide side)
         {
             return GetField<BattleEssenceContainer>(GetCommanderHud(side), EssenceContainerField);
+        }
+
+        private UIButton GetAiControlButton(CombatHudSide side)
+        {
+            UIButton[] buttons = GetField<UIButton[]>(GetCommanderHud(side), AiAutoBattleButtonsField);
+            if (buttons == null)
+            {
+                return null;
+            }
+
+            for (int i = 0; i < buttons.Length; i++)
+            {
+                if (IsButtonVisible(buttons[i]))
+                {
+                    return buttons[i];
+                }
+            }
+
+            return null;
         }
 
         private int GetEssenceAmount(CombatHudSide side, EssenceType essenceType)
@@ -249,9 +301,43 @@ namespace SongsOfConquestAccess.Adapters
             return component != null && IsGameObjectVisible(component.gameObject);
         }
 
+        private static bool IsButtonVisible(UIButton button)
+        {
+            return button != null && button.Active && IsGameObjectVisible(button as Component);
+        }
+
+        private static bool IsButtonInteractable(UIButton button)
+        {
+            return IsButtonVisible(button) && button.Interactable;
+        }
+
         private static bool IsGameObjectVisible(GameObject gameObject)
         {
             return gameObject != null && gameObject.activeInHierarchy;
+        }
+
+        private static bool IsGameObjectVisible(Component component)
+        {
+            return component != null && IsGameObjectVisible(component.gameObject);
+        }
+
+        private static string GetFirstTooltipLine(Tooltip tooltip)
+        {
+            if (tooltip == null || tooltip.TextLines == null)
+            {
+                return string.Empty;
+            }
+
+            for (int i = 0; i < tooltip.TextLines.Count; i++)
+            {
+                string line = SpeechTextSanitizer.Normalize(tooltip.TextLines[i]);
+                if (!string.IsNullOrWhiteSpace(line))
+                {
+                    return line;
+                }
+            }
+
+            return string.Empty;
         }
     }
 }

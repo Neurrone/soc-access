@@ -7,6 +7,7 @@ using SongsOfConquest.Client.Battle;
 using SongsOfConquest.Client.Battle.Controller;
 using SongsOfConquest.Client.Battle.View;
 using SongsOfConquest.Client.InputManagement;
+using SongsOfConquest.Common.Battle;
 using SongsOfConquest.Common.Localization;
 using SongsOfConquest.Utilities;
 using SongsOfConquestAccess.Adapters;
@@ -70,6 +71,7 @@ namespace SongsOfConquestAccess.Screens
                 IHumanBattleSpellController battleSpellController = TryResolve<IHumanBattleSpellController>(container);
                 MouseKeyboardHumanBattleSpellModule mouseKeyboardSpellInputModule = TryResolve<MouseKeyboardHumanBattleSpellModule>(container);
                 IBattleHudSignals battleHudSignals = TryResolve<IBattleHudSignals>(container);
+                ITroopAbilityUtility abilityUtility = TryResolve<ITroopAbilityUtility>(container);
                 object cartographyConverter = TryResolveByTypeName(container, "Lavapotion.Cartography.ICartographyConverter");
 
                 CombatAdapter adapter = new CombatAdapter(
@@ -90,7 +92,8 @@ namespace SongsOfConquestAccess.Screens
                     mouseKeyboardInputModule,
                     battleSpellController,
                     mouseKeyboardSpellInputModule,
-                    battleHudSignals);
+                    battleHudSignals,
+                    abilityUtility);
                 if (adapter.IsPresent())
                 {
                     CombatEventNarrator.SetActiveAdapter(adapter);
