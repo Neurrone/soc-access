@@ -43,7 +43,10 @@ namespace SongsOfConquestAccess.Screens
 
         private static ContainerWidget BuildRoot(WorldChoiceMenuAdapter adapter)
         {
-            ContainerWidget root = new ContainerWidget("world-choice-menu", "World choice menu");
+            string title = adapter != null ? adapter.Title : string.Empty;
+            ContainerWidget root = new ContainerWidget(
+                "world-choice-menu",
+                string.IsNullOrWhiteSpace(title) ? "World choice menu" : title);
             if (adapter == null)
             {
                 return root;
@@ -71,14 +74,14 @@ namespace SongsOfConquestAccess.Screens
 
             root.AddChild(new ButtonWidget(
                 "world-choice-confirm",
-                "Confirm",
+                () => adapter.ConfirmLabel,
                 adapter.ActivateConfirm,
                 adapter.HideNativeTooltip,
                 adapter.IsConfirmEnabled));
 
             root.AddChild(new ButtonWidget(
-                "world-choice-close",
-                "Close",
+                "world-choice-cancel",
+                () => adapter.CancelLabel,
                 adapter.Close,
                 adapter.HideNativeTooltip,
                 () => true));
@@ -88,7 +91,7 @@ namespace SongsOfConquestAccess.Screens
 
         private static MenuWidget BuildChoiceMenu(WorldChoiceMenuAdapter adapter)
         {
-            MenuWidget menu = new MenuWidget("world-choice-rewards", "Rewards");
+            MenuWidget menu = new MenuWidget("world-choice-choices", adapter.ChoiceMenuLabel);
             IReadOnlyList<WorldChoiceMenuAdapter.ChoiceItem> choices = adapter.GetChoices();
             for (int i = 0; i < choices.Count; i++)
             {

@@ -23,9 +23,12 @@ namespace SongsOfConquestAccess.Adapters
         private static readonly FieldInfo SettingsField = AccessTools.Field(typeof(WorldChoiceMenu), "_settings");
         private static readonly FieldInfo AsyncField = AccessTools.Field(typeof(WorldChoiceMenu), "_async");
         private static readonly FieldInfo RewardButtonsField = AccessTools.Field(typeof(WorldChoiceMenu), "_rewardButtons");
+        private static readonly FieldInfo PenaltyButtonsField = AccessTools.Field(typeof(WorldChoiceMenu), "_penaltyButtons");
         private static readonly FieldInfo LocalizationField = AccessTools.Field(typeof(WorldChoiceMenu), "_localization");
         private static readonly FieldInfo AdventureFacadeField = AccessTools.Field(typeof(WorldChoiceMenu), "_adventureFacade");
         private static readonly FieldInfo HeaderTroopHudField = AccessTools.Field(typeof(WielderInteractHeader), "_troopHUD");
+        private static readonly FieldInfo HeaderCloseButtonField = AccessTools.Field(typeof(WielderInteractHeader), "_closeButton");
+        private static readonly FieldInfo BackgroundCloseButtonField = AccessTools.Field(typeof(AdventureMenuBackground), "_closeButton");
 
         private readonly WorldChoiceMenu _menu;
         private readonly WorldChoiceMenu.Settings _settings;
@@ -55,6 +58,45 @@ namespace SongsOfConquestAccess.Adapters
             get { return GetText(_settings != null ? _settings.BodyText : null); }
         }
 
+        public string ConfirmLabel
+        {
+            get { return GetButtonText(_settings != null ? _settings.OkButton : null); }
+        }
+
+        public string CancelLabel
+        {
+            get
+            {
+                string label = GetButtonText(GetBackgroundCloseButton());
+                if (!string.IsNullOrWhiteSpace(label))
+                {
+                    return label;
+                }
+
+                return GetButtonText(GetHeaderCloseButton());
+            }
+        }
+
+        public string ChoiceMenuLabel
+        {
+            get
+            {
+                int rewardCount = GetRewardButtons().Count;
+                int penaltyCount = GetPenaltyButtons().Count;
+                if (rewardCount > 0 && penaltyCount > 0)
+                {
+                    return "Choices";
+                }
+
+                if (penaltyCount > 0)
+                {
+                    return "Penalties";
+                }
+
+                return "Rewards";
+            }
+        }
+
         public TroopHudAdapter Troops
         {
             get { return new TroopHudAdapter(GetWielderTroopHud(), _facade, _localization, "troops"); }
@@ -66,7 +108,7 @@ namespace SongsOfConquestAccess.Adapters
                 && _settings != null
                 && AsyncField != null
                 && AsyncField.GetValue(_menu) != null
-                && GetRewardButtons().Count > 0;
+                && (GetRewardButtons().Count > 0 || GetPenaltyButtons().Count > 0);
         }
 
         public bool IsConfirmEnabled()
@@ -104,11 +146,13 @@ namespace SongsOfConquestAccess.Adapters
 
         public IReadOnlyList<ChoiceItem> GetChoices()
         {
-            List<IWorldMapChoiceButton> buttons = GetRewardButtons();
-            List<ChoiceItem> choices = new List<ChoiceItem>(buttons.Count);
-            for (int i = 0; i < buttons.Count; i++)
+            List<IWorldMapChoiceButton> rewardButtons = GetRewardButtons();
+            List<IWorldMapChoiceButton> penaltyButtons = GetPenaltyButtons();
+            List<ChoiceItem> choices = new List<ChoiceItem>(rewardButtons.Count + penaltyButtons.Count);
+
+            for (int i = 0; i < rewardButtons.Count; i++)
             {
-                IWorldMapChoiceButton button = buttons[i];
+                IWorldMapChoiceButton button = rewardButtons[i];
                 if (button == null)
                 {
                     continue;
@@ -121,6 +165,28 @@ namespace SongsOfConquestAccess.Adapters
                     BuildChoiceLabel(button),
                     button.Interactable ? string.Empty : "disabled",
                     () => FocusReward(capturedIndex),
+                    () => true,
+                    Tooltip.ForComponent(
+                        selectable,
+                        selectable != null ? selectable.GetComponent<RectTransform>() : null,
+                        _localization)));
+            }
+
+            for (int i = 0; i < penaltyButtons.Count; i++)
+            {
+                IWorldMapChoiceButton button = penaltyButtons[i];
+                if (button == null)
+                {
+                    continue;
+                }
+
+                int capturedIndex = i;
+                Selectable selectable = button.Button != null ? button.Button.GetSelectable() : null;
+                choices.Add(new ChoiceItem(
+                    "penalty-" + i,
+                    BuildChoiceLabel(button),
+                    button.Interactable ? string.Empty : "disabled",
+                    () => FocusPenalty(capturedIndex),
                     () => true,
                     Tooltip.ForComponent(
                         selectable,
@@ -156,15 +222,42 @@ namespace SongsOfConquestAccess.Adapters
             return !choice.Interactable || NativeSelectionUtility.Click(choice.Button);
         }
 
+        private bool FocusPenalty(int index)
+        {
+            List<IWorldMapChoiceButton> buttons = GetPenaltyButtons();
+            if (index < 0 || index >= buttons.Count)
+            {
+                return false;
+            }
+
+            IWorldMapChoiceButton choice = buttons[index];
+            if (choice == null || choice.Button == null)
+            {
+                return false;
+            }
+
+            Selectable selectable = choice.Button.GetSelectable();
+            NativeSelectionUtility.Select(selectable);
+
+            // Match the reward path: a pointer click selects the native penalty
+            // choice, while the separate Confirm button commits it.
+            return !choice.Interactable || NativeSelectionUtility.Click(choice.Button);
+        }
+
         private string BuildChoiceLabel(IWorldMapChoiceButton button)
         {
-            string visibleText = GetText(button != null ? button.TypeTextMesh : null);
-            return visibleText;
+            return NormalizeChoiceText(GetText(button != null ? button.TypeTextMesh : null));
         }
 
         private List<IWorldMapChoiceButton> GetRewardButtons()
         {
             List<IWorldMapChoiceButton> buttons = GetField<List<IWorldMapChoiceButton>>(_menu, RewardButtonsField);
+            return buttons ?? new List<IWorldMapChoiceButton>();
+        }
+
+        private List<IWorldMapChoiceButton> GetPenaltyButtons()
+        {
+            List<IWorldMapChoiceButton> buttons = GetField<List<IWorldMapChoiceButton>>(_menu, PenaltyButtonsField);
             return buttons ?? new List<IWorldMapChoiceButton>();
         }
 
@@ -175,9 +268,44 @@ namespace SongsOfConquestAccess.Adapters
                 : null;
         }
 
+        private UIButton GetHeaderCloseButton()
+        {
+            return _settings != null && _settings.WielderInteractHeader != null
+                ? GetField<UIButton>(_settings.WielderInteractHeader, HeaderCloseButtonField)
+                : null;
+        }
+
+        private UIButton GetBackgroundCloseButton()
+        {
+            return _settings != null && _settings.AdventureMenuBackground != null
+                ? GetField<UIButton>(_settings.AdventureMenuBackground, BackgroundCloseButtonField)
+                : null;
+        }
+
         private static string GetText(IUITextMesh textMesh)
         {
             return SpeechTextSanitizer.Normalize(UITextMeshTextUtility.GetEffectiveText(textMesh));
+        }
+
+        private static string GetButtonText(IUIButton button)
+        {
+            UIButton concreteButton = button as UIButton;
+            if (concreteButton != null)
+            {
+                return MenuButtonTextUtility.GetStandardButtonLabel(concreteButton);
+            }
+
+            return SpeechTextSanitizer.Normalize(UITextMeshTextUtility.GetEffectiveButtonText(button));
+        }
+
+        private static string NormalizeChoiceText(string text)
+        {
+            if (string.IsNullOrWhiteSpace(text))
+            {
+                return string.Empty;
+            }
+
+            return System.Text.RegularExpressions.Regex.Replace(text, @"-\s+(\d)", "-$1");
         }
 
         private static T GetField<T>(object owner, FieldInfo field) where T : class

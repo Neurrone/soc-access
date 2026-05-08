@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using System.Reflection;
 using HarmonyLib;
 using SongsOfConquest.Client.Adventure;
+using SongsOfConquest.Common.Gamestate;
 using SongsOfConquest.Common.Penalties;
 using SongsOfConquest.Common.Rewards;
 
@@ -22,6 +23,19 @@ namespace SongsOfConquestAccess
         })]
         [HarmonyPostfix]
         private static void WorldChoiceMenuShowMenuAtPointPostfix(WorldChoiceMenu __instance)
+        {
+            SoqAccessPlugin.Instance?.ScreenDetector?.OnWorldChoiceMenuReady(__instance);
+        }
+
+        [HarmonyPatch(typeof(WorldChoiceMenu), "ShowMenu", new[]
+        {
+            typeof(ICommanderState),
+            typeof(string),
+            typeof(string),
+            typeof(List<string>)
+        })]
+        [HarmonyPostfix]
+        private static void WorldChoiceMenuShowMenuPostfix(WorldChoiceMenu __instance)
         {
             SoqAccessPlugin.Instance?.ScreenDetector?.OnWorldChoiceMenuReady(__instance);
         }
