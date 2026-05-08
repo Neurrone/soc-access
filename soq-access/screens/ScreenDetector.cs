@@ -41,6 +41,7 @@ namespace SongsOfConquestAccess.Screens
                 new HostileJoinMenuRuntimeScreenProbe(),
                 new MoveTroopPopupRuntimeScreenProbe(),
                 new WorldChoiceMenuRuntimeScreenProbe(),
+                new WorldConfirmMenuRuntimeScreenProbe(),
                 new LevelUpRuntimeScreenProbe(),
                 new CommanderSheetRuntimeScreenProbe(),
                 new LetterboxStoryTextRuntimeScreenProbe(),
@@ -467,12 +468,27 @@ namespace SongsOfConquestAccess.Screens
 
         public void OnWorldChoiceMenuReady(WorldChoiceMenu menu)
         {
-            Push(new WorldChoiceMenuScreen(new WorldChoiceMenuAdapter(menu)), "world choice menu ready");
+            WorldChoiceMenuAdapter adapter = new WorldChoiceMenuAdapter(menu);
+            Push(new WorldChoiceMenuScreen(adapter), "world choice menu ready");
         }
 
         public void OnWorldChoiceMenuClosed(WorldChoiceMenu menu)
         {
             _screenManager.Pop<WorldChoiceMenuScreen>("world choice menu closed");
+        }
+
+        public void OnWorldConfirmMenuReady(WorldConfirmMenu menu)
+        {
+            WorldConfirmMenuAdapter adapter = new WorldConfirmMenuAdapter(menu);
+            Push(new WorldConfirmMenuScreen(adapter), "world confirm menu ready");
+        }
+
+        public void OnWorldConfirmMenuClosed(WorldConfirmMenu menu)
+        {
+            if (_screenManager.CurrentScreen is WorldConfirmMenuScreen)
+            {
+                _screenManager.Pop<WorldConfirmMenuScreen>("world confirm menu closed");
+            }
         }
 
         public void OnDwellingInteractionReady(DwellingInteractionMenu menu)
