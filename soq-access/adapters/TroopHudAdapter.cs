@@ -5,6 +5,7 @@ using HarmonyLib;
 using SongsOfConquest.Client.Adventure.UI;
 using SongsOfConquest.Client.Gamestate;
 using SongsOfConquest.Client.Gamestate.Facade;
+using SongsOfConquest.Client.InputManagement;
 using SongsOfConquest.Client.Menu.Tooltip;
 using SongsOfConquest.Client.UI;
 using SongsOfConquest.Common.Details;
@@ -102,32 +103,37 @@ namespace SongsOfConquestAccess.Adapters
                 return false;
             }
 
-            Vector3 sourceContainerPosition = sourceEntry.Container.Position;
-            movable.BeginDrag(sourceEntry, new Vector2(sourceContainerPosition.x, sourceContainerPosition.y));
-            CurrentHoverEntryField?.SetValue(movable, targetEntry);
             Vector3 sourcePosition = ((Component)sourceEntry).transform.position;
             Vector3 targetPosition = ((Component)targetEntry).transform.position;
-            IsDraggingRightField?.SetValue(movable, sourcePosition.x < targetPosition.x);
             Vector3 dragDirection = targetPosition - sourcePosition;
-            DragDirectionField?.SetValue(movable, new Vector2(dragDirection.x, dragDirection.y));
 
-            if (!InvokeBool(CanDropHereMethod, movable))
+            using (NativeScreenInputPositionOverride inputOverride = NativeScreenInputPositionOverride.Apply(GetScreenCenter(sourceEntry)))
             {
-                movable.Reset();
-                AccessibilityEventBus.Publish(new ArmyExchangeInvalidDestinationEvent(source.Id, target.Id));
-                return false;
-            }
+                Vector3 sourceContainerPosition = sourceEntry.Container.Position;
+                movable.BeginDrag(sourceEntry, new Vector2(sourceContainerPosition.x, sourceContainerPosition.y));
+                inputOverride?.SetPosition(GetScreenCenter(targetEntry));
+                CurrentHoverEntryField?.SetValue(movable, targetEntry);
+                IsDraggingRightField?.SetValue(movable, sourcePosition.x < targetPosition.x);
+                DragDirectionField?.SetValue(movable, new Vector2(dragDirection.x, dragDirection.y));
 
-            if (InvokeBool(CanMergeMethod, movable) || InvokeBool(IsEmptyAndUnlockedMethod, movable))
-            {
-                DecideAmountMethod?.Invoke(movable, new object[] { targetEntry.FormationIndex });
-                return true;
-            }
+                if (!InvokeBool(CanDropHereMethod, movable))
+                {
+                    movable.Reset();
+                    AccessibilityEventBus.Publish(new ArmyExchangeInvalidDestinationEvent(source.Id, target.Id));
+                    return false;
+                }
 
-            if (InvokeBool(CanSwapMethod, movable))
-            {
-                SwapMethod?.Invoke(movable, null);
-                return true;
+                if (InvokeBool(CanMergeMethod, movable) || InvokeBool(IsEmptyAndUnlockedMethod, movable))
+                {
+                    DecideAmountMethod?.Invoke(movable, new object[] { targetEntry.FormationIndex });
+                    return true;
+                }
+
+                if (InvokeBool(CanSwapMethod, movable))
+                {
+                    SwapMethod?.Invoke(movable, null);
+                    return true;
+                }
             }
 
             return true;
@@ -196,6 +202,20 @@ namespace SongsOfConquestAccess.Adapters
         {
             object value = method != null ? method.Invoke(instance, null) : null;
             return value is bool && (bool)value;
+        }
+
+        private static Vector2 GetScreenCenter(TroopHUDEntry entry)
+        {
+            Component component = entry as Component;
+            RectTransform rectTransform = component != null ? component.GetComponent<RectTransform>() : null;
+            if (rectTransform != null)
+            {
+                Vector3 worldCenter = rectTransform.TransformPoint(rectTransform.rect.center);
+                return RectTransformUtility.WorldToScreenPoint(null, worldCenter);
+            }
+
+            Vector3 position = component != null ? component.transform.position : Vector3.zero;
+            return new Vector2(position.x, position.y);
         }
 
         private static T GetField<T>(object owner, FieldInfo field) where T : class
@@ -316,6 +336,99 @@ namespace SongsOfConquestAccess.Adapters
             public bool DropTo(SlotItem target)
             {
                 return _adapter != null && _adapter.Drop(this, target);
+            }
+        }
+
+        private sealed class NativeScreenInputPositionOverride : IDisposable
+        {
+            private readonly object _response;
+            private readonly PropertyInfo _positionProperty;
+            private readonly object _oldPosition;
+            private bool _disposed;
+
+            private NativeScreenInputPositionOverride(object response, PropertyInfo positionProperty, Vector2 position)
+            {
+                _response = response;
+                _positionProperty = positionProperty;
+                _oldPosition = _positionProperty.GetValue(_response, null);
+                SetPosition(position);
+            }
+
+            public static NativeScreenInputPositionOverride Apply(Vector2 position)
+            {
+                object response = ResolveWritablePrimaryResponse();
+                if (response == null)
+                {
+                    SoqAccessPlugin.Instance?.LogWarning("TroopHudAdapter could not override native screen input position");
+                    return null;
+                }
+
+                PropertyInfo positionProperty = AccessTools.Property(response.GetType(), "Position");
+                if (positionProperty == null || !positionProperty.CanWrite)
+                {
+                    SoqAccessPlugin.Instance?.LogWarning("TroopHudAdapter could not override native screen input position because Position was not writable on " + response.GetType().FullName);
+                    return null;
+                }
+
+                return new NativeScreenInputPositionOverride(response, positionProperty, position);
+            }
+
+            public void SetPosition(Vector2 position)
+            {
+                if (_response != null && _positionProperty != null)
+                {
+                    _positionProperty.SetValue(_response, position, null);
+                }
+            }
+
+            public void Dispose()
+            {
+                if (_disposed || _response == null || _positionProperty == null)
+                {
+                    return;
+                }
+
+                _positionProperty.SetValue(_response, _oldPosition, null);
+                _disposed = true;
+            }
+
+            private static object ResolveWritablePrimaryResponse()
+            {
+                IInputManager inputManager = InputManagerStaticAccessUnsafe.Current;
+                object response = inputManager != null && inputManager.Screen != null
+                    ? inputManager.Screen.Primary
+                    : null;
+                if (response == null)
+                {
+                    return null;
+                }
+
+                if (HasWritablePosition(response))
+                {
+                    return response;
+                }
+
+                FieldInfo currentResponseField = AccessTools.Field(response.GetType(), "_currentResponse");
+                object currentResponse = currentResponseField != null ? currentResponseField.GetValue(response) : null;
+                if (HasWritablePosition(currentResponse))
+                {
+                    return currentResponse;
+                }
+
+                FieldInfo mouseResponseField = AccessTools.Field(response.GetType(), "_mouseResponse");
+                object mouseResponse = mouseResponseField != null ? mouseResponseField.GetValue(response) : null;
+                return HasWritablePosition(mouseResponse) ? mouseResponse : null;
+            }
+
+            private static bool HasWritablePosition(object response)
+            {
+                if (response == null)
+                {
+                    return false;
+                }
+
+                PropertyInfo property = AccessTools.Property(response.GetType(), "Position");
+                return property != null && property.CanWrite;
             }
         }
     }

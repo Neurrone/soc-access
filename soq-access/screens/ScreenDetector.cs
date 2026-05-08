@@ -40,6 +40,7 @@ namespace SongsOfConquestAccess.Screens
                 new PostBattleResultRuntimeScreenProbe(),
                 new PreBattleMenuRuntimeScreenProbe(),
                 new DwellingInteractionRuntimeScreenProbe(),
+                new SettlementRuntimeScreenProbe(),
                 new HostileJoinMenuRuntimeScreenProbe(),
                 new MoveTroopPopupRuntimeScreenProbe(),
                 new WorldChoiceMenuRuntimeScreenProbe(),
@@ -570,6 +571,75 @@ namespace SongsOfConquestAccess.Screens
         public void OnDwellingInteractionClosed(DwellingInteractionMenu menu)
         {
             _screenManager.Pop<DwellingInteractionScreen>("dwelling interaction closed");
+        }
+
+        public void OnSettlementReady(TownInteractionMenu menu)
+        {
+            SettlementScreen screen = new SettlementScreen(new TownInteractionMenuAdapter(menu));
+            if (_screenManager.CurrentScreen is SettlementScreen)
+            {
+                SoqAccessPlugin.Instance?.LogWarning("ScreenDetector ignored duplicate settlement ready while settlement is already top");
+                return;
+            }
+
+            Push(screen, "settlement ready");
+        }
+
+        public void OnSettlementDraftReady(TownInteractionMenu menu)
+        {
+            if (_screenManager.CurrentScreen is SettlementScreen)
+            {
+                _screenManager.Pop<SettlementScreen>("settlement draft opened");
+            }
+
+            Push(new SettlementDraftTroopsScreen(new TownInteractionMenuAdapter(menu)), "settlement draft ready");
+        }
+
+        public void OnSettlementUpgradeReady(TownInteractionMenu menu)
+        {
+            if (_screenManager.CurrentScreen is SettlementScreen)
+            {
+                _screenManager.Pop<SettlementScreen>("settlement upgrade opened");
+            }
+
+            Push(new SettlementUpgradeTroopsScreen(new TownInteractionMenuAdapter(menu)), "settlement upgrade ready");
+        }
+
+        public void OnSettlementBackToTop(TownInteractionMenu menu)
+        {
+            if (_screenManager.CurrentScreen is SettlementDraftTroopsScreen)
+            {
+                _screenManager.Pop<SettlementDraftTroopsScreen>("settlement draft closed");
+            }
+            else if (_screenManager.CurrentScreen is SettlementUpgradeTroopsScreen)
+            {
+                _screenManager.Pop<SettlementUpgradeTroopsScreen>("settlement upgrade closed");
+            }
+            else if (_screenManager.CurrentScreen is SettlementScreen)
+            {
+                SoqAccessPlugin.Instance?.LogWarning("ScreenDetector ignored settlement back to top while settlement is already top");
+                return;
+            }
+
+            Push(new SettlementScreen(new TownInteractionMenuAdapter(menu)), "settlement top level ready");
+        }
+
+        public void OnSettlementClosed(TownInteractionMenu menu)
+        {
+            if (_screenManager.CurrentScreen is SettlementDraftTroopsScreen)
+            {
+                _screenManager.Pop<SettlementDraftTroopsScreen>("settlement closed with draft open");
+            }
+
+            if (_screenManager.CurrentScreen is SettlementUpgradeTroopsScreen)
+            {
+                _screenManager.Pop<SettlementUpgradeTroopsScreen>("settlement closed with upgrade open");
+            }
+
+            if (_screenManager.CurrentScreen is SettlementScreen)
+            {
+                _screenManager.Pop<SettlementScreen>("settlement closed");
+            }
         }
 
         public void OnLevelUpMenuReady(CommanderLevelUpMenu menu)
