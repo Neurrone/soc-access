@@ -8,7 +8,7 @@ using UnityEngine.UI;
 
 namespace SongsOfConquestAccess.Adapters
 {
-    internal sealed class QuestionDialogAdapter : IQuestionDialogAdapter
+    internal sealed class PopupMenuAdapter : IMessageDialogAdapter
     {
         private readonly object _sourceKey;
         private readonly IUITransform _containerTransform;
@@ -19,7 +19,7 @@ namespace SongsOfConquestAccess.Adapters
         private readonly string _body;
         private readonly string[] _actionLabels;
 
-        private QuestionDialogAdapter(
+        private PopupMenuAdapter(
             object sourceKey,
             IUITransform containerTransform,
             UITextMeshInputField inputField,
@@ -40,7 +40,7 @@ namespace SongsOfConquestAccess.Adapters
             _actionLabels = new[] { SpeechTextSanitizer.Normalize(positiveLabel), SpeechTextSanitizer.Normalize(negativeLabel) };
         }
 
-        public QuestionDialogAdapter(object sourceKey, PopupMenu.Settings settings)
+        public PopupMenuAdapter(object sourceKey, PopupMenu.Settings settings)
             : this(
                 sourceKey,
                 settings != null ? settings.ContainerTransform : null,
@@ -100,8 +100,7 @@ namespace SongsOfConquestAccess.Adapters
             }
 
             return _containerTransform.Active
-                && HasPositiveAction
-                && HasNegativeAction
+                && (HasPositiveAction || HasNegativeAction)
                 && _inputField != null
                 && !_inputField.Active;
         }

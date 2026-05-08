@@ -42,7 +42,7 @@ namespace SongsOfConquestAccess.Screens
 
             if (bestAdapter != null)
             {
-                screens.Add(new QuestionDialogScreen(bestAdapter));
+                screens.Add(new MessageDialogScreen(bestAdapter));
             }
         }
 

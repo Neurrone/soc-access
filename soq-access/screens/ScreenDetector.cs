@@ -50,7 +50,8 @@ namespace SongsOfConquestAccess.Screens
                 new StoryTextRuntimeScreenProbe(),
                 new DialogueMenuRuntimeScreenProbe(),
                 new PauseMenuRuntimeScreenProbe(),
-                new QuestionDialogRuntimeScreenProbe(),
+                new MapMessagePopupRuntimeScreenProbe(),
+                new PopupMenuRuntimeScreenProbe(),
                 new ConfirmPopupRuntimeScreenProbe(),
                 new SystemPopupRuntimeScreenProbe(),
                 new QuitToDesktopPopupRuntimeScreenProbe(),
@@ -83,17 +84,17 @@ namespace SongsOfConquestAccess.Screens
                 return;
             }
 
-            Push(new QuestionDialogScreen(adapter), "confirm popup ready");
+            Push(new MessageDialogScreen(adapter), "confirm popup ready");
         }
 
         public void OnConfirmPopupClosed(ConfirmPopup popup)
         {
-            if (!IsCurrentQuestionDialogSource(popup))
+            if (!IsCurrentMessageDialogSource(popup))
             {
                 return;
             }
 
-            _screenManager.Pop<QuestionDialogScreen>("confirm popup closed");
+            _screenManager.Pop<MessageDialogScreen>("confirm popup closed");
         }
 
         public void OnSystemPopupReady(SystemPopup popup)
@@ -104,17 +105,17 @@ namespace SongsOfConquestAccess.Screens
                 return;
             }
 
-            Push(new QuestionDialogScreen(adapter), "system popup ready");
+            Push(new MessageDialogScreen(adapter), "system popup ready");
         }
 
         public void OnSystemPopupClosed(SystemPopup popup)
         {
-            if (!IsCurrentQuestionDialogSource(popup))
+            if (!IsCurrentMessageDialogSource(popup))
             {
                 return;
             }
 
-            _screenManager.Pop<QuestionDialogScreen>("system popup closed");
+            _screenManager.Pop<MessageDialogScreen>("system popup closed");
         }
 
         public void OnQuitToDesktopPopupReady(QuitToDesktopPopup popup)
@@ -176,26 +177,47 @@ namespace SongsOfConquestAccess.Screens
             LogUnexpectedTop("tutorial closed");
         }
 
-        public void OnQuestionDialogReady(object sourceKey, PopupMenu.Settings settings)
+        public void OnPopupMenuReady(object sourceKey, PopupMenu.Settings settings)
         {
             if (settings == null)
             {
-                SoqAccessPlugin.Instance?.LogWarning("ScreenDetector.OnQuestionDialogReady received null settings");
+                SoqAccessPlugin.Instance?.LogWarning("ScreenDetector.OnPopupMenuReady received null settings");
                 return;
             }
 
             object resolvedSourceKey = sourceKey ?? (settings != null ? (object)settings.ContainerTransform : null);
-            Push(new QuestionDialogScreen(new QuestionDialogAdapter(resolvedSourceKey, settings)), "question dialog ready");
+            Push(new MessageDialogScreen(new PopupMenuAdapter(resolvedSourceKey, settings)), "popup menu ready");
         }
 
-        public void OnQuestionDialogClosed(object sourceKey)
+        public void OnPopupMenuClosed(object sourceKey)
         {
-            if (sourceKey != null && !IsCurrentQuestionDialogSource(sourceKey))
+            if (sourceKey != null && !IsCurrentMessageDialogSource(sourceKey))
             {
                 return;
             }
 
-            _screenManager.Pop<QuestionDialogScreen>("question dialog closed");
+            _screenManager.Pop<MessageDialogScreen>("popup menu closed");
+        }
+
+        public void OnMapMessagePopupReady(MapMessagePopup popup)
+        {
+            MapMessagePopupAdapter adapter = new MapMessagePopupAdapter(popup);
+            if (!adapter.IsPresent())
+            {
+                return;
+            }
+
+            Push(new MessageDialogScreen(adapter), "map message popup ready");
+        }
+
+        public void OnMapMessagePopupClosed(MapMessagePopup popup)
+        {
+            if (popup != null && !IsCurrentMessageDialogSource(popup))
+            {
+                return;
+            }
+
+            _screenManager.Pop<MessageDialogScreen>("map message popup closed");
         }
 
         public void OnLetterboxStoryTextReady(LetterboxStoryText storyText)
@@ -765,9 +787,9 @@ namespace SongsOfConquestAccess.Screens
                 + (current != null ? current.GetType().Name : "<none>"));
         }
 
-        private bool IsCurrentQuestionDialogSource(object sourceKey)
+        private bool IsCurrentMessageDialogSource(object sourceKey)
         {
-            QuestionDialogScreen screen = _screenManager.CurrentScreen as QuestionDialogScreen;
+            MessageDialogScreen screen = _screenManager.CurrentScreen as MessageDialogScreen;
             if (screen == null)
             {
                 return false;

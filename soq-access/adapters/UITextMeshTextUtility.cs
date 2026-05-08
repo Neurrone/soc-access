@@ -10,7 +10,7 @@ namespace SongsOfConquestAccess.Adapters
         // Hot reload can desync UITextMesh from TMP_Text on existing popup instances:
         // the public Text/TMP m_text may revert to prefab placeholder strings while the
         // real runtime dialog text still survives in UITextMesh._stringBuilder. For
-        // question dialogs we therefore treat _stringBuilder as the most reliable source.
+        // message dialogs we therefore treat _stringBuilder as the most reliable source.
         private static readonly System.Reflection.FieldInfo StringBuilderField =
             AccessTools.Field(typeof(UITextMesh), "_stringBuilder");
 

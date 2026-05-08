@@ -10,7 +10,7 @@ using UnityEngine.UI;
 
 namespace SongsOfConquestAccess.Adapters
 {
-    internal sealed class ConfirmPopupAdapter : IQuestionDialogAdapter
+    internal sealed class ConfirmPopupAdapter : IMessageDialogAdapter
     {
         private static readonly AccessTools.FieldRef<ConfirmPopup, UITextMesh> TitleRef =
             AccessTools.FieldRefAccess<ConfirmPopup, UITextMesh>("_title");

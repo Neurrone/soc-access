@@ -8,7 +8,7 @@ using Zenject;
 
 namespace SongsOfConquestAccess.Screens
 {
-    internal sealed class QuestionDialogRuntimeScreenProbe : IRuntimeScreenProbe
+    internal sealed class PopupMenuRuntimeScreenProbe : IRuntimeScreenProbe
     {
         private static readonly AccessTools.FieldRef<PopupMenu, PopupMenu.Settings> SettingsRef =
             AccessTools.FieldRefAccess<PopupMenu, PopupMenu.Settings>("_settings");
@@ -23,7 +23,7 @@ namespace SongsOfConquestAccess.Screens
             }
 
             PopupMenuInstaller[] installers = Resources.FindObjectsOfTypeAll<PopupMenuInstaller>();
-            QuestionDialogAdapter bestAdapter = null;
+            PopupMenuAdapter bestAdapter = null;
             int bestSiblingIndex = int.MinValue;
 
             for (int i = 0; i < installers.Length; i++)
@@ -55,7 +55,7 @@ namespace SongsOfConquestAccess.Screens
                     continue;
                 }
 
-                QuestionDialogAdapter adapter = new QuestionDialogAdapter(popupMenu, settings);
+                PopupMenuAdapter adapter = new PopupMenuAdapter(popupMenu, settings);
                 if (!adapter.IsPresent())
                 {
                     continue;
@@ -71,7 +71,7 @@ namespace SongsOfConquestAccess.Screens
 
             if (bestAdapter != null)
             {
-                screens.Add(new QuestionDialogScreen(bestAdapter));
+                screens.Add(new MessageDialogScreen(bestAdapter));
             }
         }
 

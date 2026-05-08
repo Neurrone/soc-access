@@ -7,7 +7,7 @@ namespace SongsOfConquestAccess.Adapters
         Negative = 2
     }
 
-    internal interface IQuestionDialogAdapter
+    internal interface IMessageDialogAdapter
     {
         object SourceKey { get; }
 

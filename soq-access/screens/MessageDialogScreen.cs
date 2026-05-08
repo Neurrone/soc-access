@@ -4,11 +4,11 @@ using SongsOfConquestAccess.UI;
 
 namespace SongsOfConquestAccess.Screens
 {
-    internal sealed class QuestionDialogScreen : Screen
+    internal sealed class MessageDialogScreen : Screen
     {
-        private readonly IQuestionDialogAdapter _adapter;
+        private readonly IMessageDialogAdapter _adapter;
 
-        public QuestionDialogScreen(IQuestionDialogAdapter adapter)
+        public MessageDialogScreen(IMessageDialogAdapter adapter)
             : base(BuildRootWidget(adapter))
         {
             _adapter = adapter;
@@ -34,11 +34,11 @@ namespace SongsOfConquestAccess.Screens
             return base.OnActionJustPressed(action);
         }
 
-        private static ContainerWidget BuildRootWidget(IQuestionDialogAdapter adapter)
+        private static ContainerWidget BuildRootWidget(IMessageDialogAdapter adapter)
         {
             string title = adapter != null ? adapter.Title : string.Empty;
             string dialogLabel = string.IsNullOrWhiteSpace(title) ? "dialog" : title + " dialog";
-            ContainerWidget root = new ContainerWidget("question-dialog", dialogLabel);
+            ContainerWidget root = new ContainerWidget("message-dialog", dialogLabel);
 
             root.AddChild(new TextWidget(
                 "body",
