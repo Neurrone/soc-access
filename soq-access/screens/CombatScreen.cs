@@ -46,6 +46,7 @@ namespace SongsOfConquestAccess.Screens
             _adapter?.AttachSpellTargetingNarration();
             _abilityTargetingBeginHandler = HandleAbilityTargetingBegin;
             _adapter?.AttachAbilityTargetingBegin(_abilityTargetingBeginHandler);
+            _adapter?.AttachAbilityTargetingEnd(HandleAbilityTargetingEnd);
             _adapter?.AnnounceVisibleSpellTargetInstruction();
         }
 
@@ -101,7 +102,10 @@ namespace SongsOfConquestAccess.Screens
             _adapter?.DetachSpellCastBegin();
             _adapter?.DetachSpellTargetingNarration();
             _adapter?.DetachAbilityTargetingBegin(_abilityTargetingBeginHandler);
+            _adapter?.DetachAbilityTargetingEnd();
             _abilityTargetingBeginHandler = null;
+            _adapter?.Hud.ClearSpellTargetInstructionText();
+            _adapter?.Hud.ClearAbilityTargetInstructionText();
             _adapter?.ClearNativeTooltip();
             _adapter?.ClearFocusedTileOverlay();
         }
@@ -130,10 +134,16 @@ namespace SongsOfConquestAccess.Screens
             FocusGridIfNeeded();
 
             string instruction = _adapter != null ? _adapter.BuildAbilityTargetInstruction(targeting) : string.Empty;
+            _adapter?.Hud.SetAbilityTargetInstructionText(instruction);
             if (!string.IsNullOrWhiteSpace(instruction))
             {
                 SpeechPipeline.Output(new SpeechRequest(instruction, interrupt: false));
             }
+        }
+
+        private void HandleAbilityTargetingEnd()
+        {
+            _adapter?.Hud.ClearAbilityTargetInstructionText();
         }
 
         private void HandleAccessibilityEvent(IAccessibilityEvent accessibilityEvent)
@@ -180,7 +190,7 @@ namespace SongsOfConquestAccess.Screens
             root.AddChild(new TextWidget(
                 "combat-current-troop",
                 () => adapter.Hud.CurrentTroopLabel,
-                () => FocusCurrentTroop(adapter),
+                null,
                 includeParentLabelInAnnouncement: false,
                 isVisible: adapter.Hud.IsCurrentTroopIndicatorVisible));
             root.AddChild(new ButtonWidget(
@@ -353,15 +363,6 @@ namespace SongsOfConquestAccess.Screens
                 () => adapter.Hud.Commanders.IsAiControlButtonEnabled(capturedSide),
                 () => adapter.Hud.Commanders.IsAiControlButtonVisible(capturedSide),
                 () => adapter.Hud.Commanders.GetAiControlButtonTooltip(capturedSide));
-        }
-
-        private static void FocusCurrentTroop(CombatAdapter adapter)
-        {
-            CombatScreen screen = SoqAccessPlugin.Instance?.ScreenManager?.CurrentScreen as CombatScreen;
-            if (screen != null && adapter != null)
-            {
-                screen.MoveCursorToTroop(adapter.Hud.GetCurrentTroopId(), focusGrid: true, requireLocalCurrentTurn: false);
-            }
         }
 
         private static MenuWidget BuildEssenceMenu(CombatAdapter adapter, CombatHudSide side, string id, string label)

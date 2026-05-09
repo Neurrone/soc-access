@@ -201,42 +201,60 @@ namespace SongsOfConquestAccess.Adapters
 
         private void AddTroopPlacementTroopScannerResults(ScannerSnapshot snapshot, TroopPlacementSnapshot placement)
         {
+            AddTroopPlacementTroopScannerResults(snapshot, placement, own: true);
+            AddTroopPlacementTroopScannerResults(snapshot, placement, own: false);
+        }
+
+        private void AddTroopPlacementSpawnScannerResults(ScannerSnapshot snapshot, TroopPlacementSnapshot placement)
+        {
+            AddTroopPlacementSpawnScannerResults(snapshot, placement, own: true);
+            AddTroopPlacementSpawnScannerResults(snapshot, placement, own: false);
+        }
+
+        private void AddTroopPlacementTerrainScannerResults(ScannerSnapshot snapshot, TroopPlacementSnapshot placement)
+        {
+            for (int elevation = 1; elevation <= 3; elevation++)
+            {
+                foreach (TroopPlacementTile tile in placement.Tiles)
+                {
+                    if (tile.Elevation == elevation)
+                    {
+                        snapshot.Add("Terrain", "Elevated ground " + elevation,
+                            new ScannerResult("elevated ground, height " + elevation, tile.Point));
+                    }
+                }
+            }
+
             foreach (TroopPlacementTile tile in placement.Tiles)
             {
-                if (tile.TroopSide.HasValue)
+                if (tile.IsBlocked)
                 {
-                    snapshot.Add("Troops", IsOwnSide(placement, tile.TroopSide.Value) ? "Friendly" : "Enemy",
+                    snapshot.Add("Terrain", "Impassable terrain",
+                        new ScannerResult("impassable", tile.Point));
+                }
+            }
+        }
+
+        private void AddTroopPlacementTroopScannerResults(ScannerSnapshot snapshot, TroopPlacementSnapshot placement, bool own)
+        {
+            foreach (TroopPlacementTile tile in placement.Tiles)
+            {
+                if (tile.TroopSide.HasValue && IsOwnSide(placement, tile.TroopSide.Value) == own)
+                {
+                    snapshot.Add("Troops", own ? "Friendly" : "Enemy",
                         new ScannerResult(FirstNonEmpty(tile.TroopLabel, "Unknown troop"), tile.Point));
                 }
             }
         }
 
-        private void AddTroopPlacementSpawnScannerResults(ScannerSnapshot snapshot, TroopPlacementSnapshot placement)
+        private void AddTroopPlacementSpawnScannerResults(ScannerSnapshot snapshot, TroopPlacementSnapshot placement, bool own)
         {
             foreach (TroopPlacementTile tile in placement.Tiles)
             {
-                if (tile.SpawnSide.HasValue)
+                if (tile.SpawnSide.HasValue && IsOwnSide(placement, tile.SpawnSide.Value) == own)
                 {
-                    snapshot.Add("Spawn points", IsOwnSide(placement, tile.SpawnSide.Value) ? "Friendly" : "Enemy",
+                    snapshot.Add("Spawn points", own ? "Friendly" : "Enemy",
                         new ScannerResult("spawn point", tile.Point));
-                }
-            }
-        }
-
-        private void AddTroopPlacementTerrainScannerResults(ScannerSnapshot snapshot, TroopPlacementSnapshot placement)
-        {
-            foreach (TroopPlacementTile tile in placement.Tiles)
-            {
-                if (tile.Elevation > 0)
-                {
-                    snapshot.Add("Terrain", "Elevated ground " + tile.Elevation,
-                        new ScannerResult("elevated ground, height " + tile.Elevation, tile.Point));
-                }
-
-                if (tile.IsBlocked)
-                {
-                    snapshot.Add("Terrain", "Impassable terrain",
-                        new ScannerResult("impassable", tile.Point));
                 }
             }
         }

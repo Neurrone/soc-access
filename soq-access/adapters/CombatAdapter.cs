@@ -52,10 +52,6 @@ namespace SongsOfConquestAccess.Adapters
             AccessTools.Property(typeof(BattleSceneInstaller), "Container");
         private static readonly Dictionary<BattleAttackPreview, string> AttackPreviewAdditionalTexts =
             new Dictionary<BattleAttackPreview, string>();
-        private static readonly FieldInfo SpellTargetInstructionSpellNameField =
-            AccessTools.Field(typeof(BattleSpellTargetInstruction), "_spellName");
-        private static readonly FieldInfo SpellTargetInstructionTextField =
-            AccessTools.Field(typeof(BattleSpellTargetInstruction), "_targetInstruction");
         private readonly object _sourceKey;
         private readonly DiContainer _container;
         private readonly IClientBattleFacade _facade;
@@ -91,7 +87,9 @@ namespace SongsOfConquestAccess.Adapters
         private GameObject _cursorOverlay;
         private RectTransform[] _cursorOverlaySegments;
         private Action<ISpellDefinition, string> _targetInstructionHandler;
+        private Action _spellTargetingEndHandler;
         private Action<ISpellDefinition> _beginCastHandler;
+        private Action<bool> _endAbilityTargetingHandler;
 
         public CombatAdapter(BattleSceneInstaller installer)
             : this(
@@ -402,6 +400,12 @@ namespace SongsOfConquestAccess.Adapters
 
         private void AddCombatTroopScannerResults(ScannerSnapshot snapshot)
         {
+            AddCombatTroopScannerResults(snapshot, friendly: true);
+            AddCombatTroopScannerResults(snapshot, friendly: false);
+        }
+
+        private void AddCombatTroopScannerResults(ScannerSnapshot snapshot, bool friendly)
+        {
             for (int y = 0; y < _facade.Level.Size.y; y++)
             {
                 for (int x = 0; x < _facade.Level.Size.x; x++)
@@ -413,9 +417,9 @@ namespace SongsOfConquestAccess.Adapters
                         continue;
                     }
 
-                    if (tile.Troop != null)
+                    if (tile.Troop != null && IsFriendlyTroop(tile.Troop) == friendly)
                     {
-                        snapshot.Add("Troops", IsFriendlyTroop(tile.Troop) ? "Friendly" : "Enemy",
+                        snapshot.Add("Troops", friendly ? "Friendly" : "Enemy",
                             new ScannerResult(FormatTroopGridLabel(tile.Troop), point));
                     }
                 }
@@ -460,6 +464,28 @@ namespace SongsOfConquestAccess.Adapters
 
         private void AddCombatTerrainScannerResults(ScannerSnapshot snapshot)
         {
+            for (int elevation = 1; elevation <= 3; elevation++)
+            {
+                for (int y = 0; y < _facade.Level.Size.y; y++)
+                {
+                    for (int x = 0; x < _facade.Level.Size.x; x++)
+                    {
+                        Vector2Int point = new Vector2Int(x, y);
+                        CombatTile tile = GetTile(point);
+                        if (tile == null)
+                        {
+                            continue;
+                        }
+
+                        if (tile.Elevation == elevation)
+                        {
+                            snapshot.Add("Terrain", "Elevated ground " + elevation,
+                                new ScannerResult("elevated ground, height " + elevation, point));
+                        }
+                    }
+                }
+            }
+
             for (int y = 0; y < _facade.Level.Size.y; y++)
             {
                 for (int x = 0; x < _facade.Level.Size.x; x++)
@@ -469,12 +495,6 @@ namespace SongsOfConquestAccess.Adapters
                     if (tile == null)
                     {
                         continue;
-                    }
-
-                    if (tile.Elevation > 0)
-                    {
-                        snapshot.Add("Terrain", "Elevated ground " + tile.Elevation,
-                            new ScannerResult("elevated ground, height " + tile.Elevation, point));
                     }
 
                     if (!tile.IsWalkable)
@@ -552,8 +572,15 @@ namespace SongsOfConquestAccess.Adapters
             }
 
             _targetInstructionHandler = HandleTargetInstruction;
+            _spellTargetingEndHandler = HandleSpellTargetingEnd;
             _battleHudSignals.OnRequestTargetInstruction =
                 (Action<ISpellDefinition, string>)Delegate.Combine(_battleHudSignals.OnRequestTargetInstruction, _targetInstructionHandler);
+            _battleHudSignals.OnControllerCancelCast =
+                (Action)Delegate.Combine(_battleHudSignals.OnControllerCancelCast, _spellTargetingEndHandler);
+            _battleHudSignals.OnSpellbookCancelCast =
+                (Action)Delegate.Combine(_battleHudSignals.OnSpellbookCancelCast, _spellTargetingEndHandler);
+            _battleHudSignals.OnSpellEffectComplete =
+                (Action)Delegate.Combine(_battleHudSignals.OnSpellEffectComplete, _spellTargetingEndHandler);
         }
 
         public void DetachSpellTargetingNarration()
@@ -565,7 +592,17 @@ namespace SongsOfConquestAccess.Adapters
 
             _battleHudSignals.OnRequestTargetInstruction =
                 (Action<ISpellDefinition, string>)Delegate.Remove(_battleHudSignals.OnRequestTargetInstruction, _targetInstructionHandler);
+            if (_spellTargetingEndHandler != null)
+            {
+                _battleHudSignals.OnControllerCancelCast =
+                    (Action)Delegate.Remove(_battleHudSignals.OnControllerCancelCast, _spellTargetingEndHandler);
+                _battleHudSignals.OnSpellbookCancelCast =
+                    (Action)Delegate.Remove(_battleHudSignals.OnSpellbookCancelCast, _spellTargetingEndHandler);
+                _battleHudSignals.OnSpellEffectComplete =
+                    (Action)Delegate.Remove(_battleHudSignals.OnSpellEffectComplete, _spellTargetingEndHandler);
+            }
             _targetInstructionHandler = null;
+            _spellTargetingEndHandler = null;
         }
 
         public void AttachSpellCastBegin(Action handler)
@@ -614,6 +651,30 @@ namespace SongsOfConquestAccess.Adapters
                 (Action<TroopAbilityTargeting>)Delegate.Remove(_battleHudSignals.OnBeginAbilityTargeting, handler);
         }
 
+        public void AttachAbilityTargetingEnd(Action handler)
+        {
+            if (_battleHudSignals == null || handler == null || _endAbilityTargetingHandler != null)
+            {
+                return;
+            }
+
+            _endAbilityTargetingHandler = _ => handler();
+            _battleHudSignals.OnEndAbilityTargeting =
+                (Action<bool>)Delegate.Combine(_battleHudSignals.OnEndAbilityTargeting, _endAbilityTargetingHandler);
+        }
+
+        public void DetachAbilityTargetingEnd()
+        {
+            if (_battleHudSignals == null || _endAbilityTargetingHandler == null)
+            {
+                return;
+            }
+
+            _battleHudSignals.OnEndAbilityTargeting =
+                (Action<bool>)Delegate.Remove(_battleHudSignals.OnEndAbilityTargeting, _endAbilityTargetingHandler);
+            _endAbilityTargetingHandler = null;
+        }
+
         public void AnnounceVisibleSpellTargetInstruction()
         {
             if (GetTargetingMode() != CombatTargetingMode.Spell)
@@ -621,7 +682,7 @@ namespace SongsOfConquestAccess.Adapters
                 return;
             }
 
-            string text = GetVisibleSpellTargetInstructionText();
+            string text = Hud != null ? Hud.TargetingInstructionText : string.Empty;
             if (!string.IsNullOrWhiteSpace(text))
             {
                 SpeechPipeline.Output(new SpeechRequest(text, interrupt: false));
@@ -1333,48 +1394,16 @@ namespace SongsOfConquestAccess.Adapters
             string text = !string.IsNullOrWhiteSpace(spellName) && !string.IsNullOrWhiteSpace(instruction)
                 ? spellName + ": " + instruction
                 : (!string.IsNullOrWhiteSpace(spellName) ? spellName : instruction);
+            Hud?.SetSpellTargetInstructionText(text);
             if (!string.IsNullOrWhiteSpace(text))
             {
                 SpeechPipeline.Output(new SpeechRequest(text, interrupt: false));
             }
         }
 
-        private string GetVisibleSpellTargetInstructionText()
+        private void HandleSpellTargetingEnd()
         {
-            BattleSpellTargetInstruction[] instructions = Resources.FindObjectsOfTypeAll<BattleSpellTargetInstruction>();
-            for (int i = 0; i < instructions.Length; i++)
-            {
-                BattleSpellTargetInstruction instruction = instructions[i];
-                if (instruction == null || !((Component)instruction).gameObject.activeInHierarchy)
-                {
-                    continue;
-                }
-
-                UITextMesh spellNameText = SpellTargetInstructionSpellNameField != null
-                    ? SpellTargetInstructionSpellNameField.GetValue(instruction) as UITextMesh
-                    : null;
-                UITextMesh targetInstructionText = SpellTargetInstructionTextField != null
-                    ? SpellTargetInstructionTextField.GetValue(instruction) as UITextMesh
-                    : null;
-                string spellName = SpeechTextSanitizer.Normalize(UITextMeshTextUtility.GetEffectiveText(spellNameText));
-                string targetInstruction = SpeechTextSanitizer.Normalize(UITextMeshTextUtility.GetEffectiveText(targetInstructionText));
-                if (!string.IsNullOrWhiteSpace(spellName) && !string.IsNullOrWhiteSpace(targetInstruction))
-                {
-                    return spellName + ": " + targetInstruction;
-                }
-
-                if (!string.IsNullOrWhiteSpace(spellName))
-                {
-                    return spellName;
-                }
-
-                if (!string.IsNullOrWhiteSpace(targetInstruction))
-                {
-                    return targetInstruction;
-                }
-            }
-
-            return string.Empty;
+            Hud?.ClearSpellTargetInstructionText();
         }
 
         private bool IsNativeTileToInspect(Vector2Int point)
