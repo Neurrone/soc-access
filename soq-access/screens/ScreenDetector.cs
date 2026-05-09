@@ -41,6 +41,7 @@ namespace SongsOfConquestAccess.Screens
                 new PreBattleMenuRuntimeScreenProbe(),
                 new DwellingInteractionRuntimeScreenProbe(),
                 new SettlementRuntimeScreenProbe(),
+                new BuildMenuRuntimeScreenProbe(),
                 new HostileJoinMenuRuntimeScreenProbe(),
                 new MoveTroopPopupRuntimeScreenProbe(),
                 new WorldChoiceMenuRuntimeScreenProbe(),
@@ -640,6 +641,48 @@ namespace SongsOfConquestAccess.Screens
             {
                 _screenManager.Pop<SettlementScreen>("settlement closed");
             }
+        }
+
+        public void OnBuildMenuReady(BuildMenu menu)
+        {
+            if (_screenManager.CurrentScreen is BuildMenuScreen)
+            {
+                SoqAccessPlugin.Instance?.LogWarning("ScreenDetector ignored duplicate build menu ready while build menu is already top");
+                return;
+            }
+
+            BuildMenuAdapter adapter = new BuildMenuAdapter(menu);
+            BuildMenuScreen screen = new BuildMenuScreen(adapter);
+            Push(screen, "build menu ready");
+        }
+
+        public void OnBuildMenuClosed(BuildMenu menu)
+        {
+            if (_screenManager.CurrentScreen is BuildMenuScreen)
+            {
+                _screenManager.Pop<BuildMenuScreen>("build menu closed");
+            }
+        }
+
+        public void OnBuildMenuSiteChanged(BuildMenu menu)
+        {
+            RefreshCurrentBuildMenu();
+        }
+
+        public void OnBuildMenuCategoryChanged(BuildMenu menu)
+        {
+            RefreshCurrentBuildMenu();
+        }
+
+        private void RefreshCurrentBuildMenu()
+        {
+            BuildMenuScreen screen = _screenManager.CurrentScreen as BuildMenuScreen;
+            if (screen == null || !screen.IsPresent())
+            {
+                return;
+            }
+
+            screen.Refresh(focusAfterRefresh: true);
         }
 
         public void OnLevelUpMenuReady(CommanderLevelUpMenu menu)
