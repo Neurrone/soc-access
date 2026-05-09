@@ -50,13 +50,6 @@ namespace SongsOfConquestAccess.Adapters
         private static readonly FieldInfo GarrisonTroopsField = AccessTools.Field(typeof(TownInteractDefencePanel), "_garrisonTroops");
         private static readonly FieldInfo BallistaTroopsField = AccessTools.Field(typeof(TownInteractDefencePanel), "_ballistaTroops");
 
-        private static readonly FieldInfo StoredCommanderField = AccessTools.Field(typeof(DefencePanelWielder), "_storedCommander");
-        private static readonly FieldInfo NoStoredWielderContainerField = AccessTools.Field(typeof(DefencePanelWielder), "_noStoredWielderContainer");
-        private static readonly FieldInfo StoredWielderContainerField = AccessTools.Field(typeof(DefencePanelWielder), "_storedWielderContainer");
-        private static readonly FieldInfo StoreButtonField = AccessTools.Field(typeof(DefencePanelWielder), "_storeButton");
-        private static readonly FieldInfo EjectButtonField = AccessTools.Field(typeof(DefencePanelWielder), "_ejectButton");
-        private static readonly FieldInfo TradeButtonField = AccessTools.Field(typeof(DefencePanelWielder), "_tradeButton");
-
         private readonly TownInteractionMenu _menu;
         private readonly IClientAdventureFacade _facade;
         private readonly ILocalizationHandler _localization;
@@ -258,118 +251,112 @@ namespace SongsOfConquestAccess.Adapters
 
         public string DefendingWielderStatus
         {
-            get
-            {
-                DefencePanelWielder panel = GetDefencePanelWielder();
-                ICommanderState storedCommander = GetField<ICommanderState>(panel, StoredCommanderField);
-                if (storedCommander != null && _facade != null)
-                {
-                    string name = SpeechTextSanitizer.Normalize(_facade.Commanders.GetName(storedCommander.Id));
-                    return string.IsNullOrWhiteSpace(name) ? string.Empty : "Defending wielder: " + name;
-                }
-
-                return GetVisibleText(GetField<GameObject>(panel, NoStoredWielderContainerField));
-            }
+            get { return DefendingWielder.Status; }
         }
 
         public string StoreLabel
         {
-            get { return GetButtonLabel(GetStoreButton()); }
+            get { return DefendingWielder.StoreLabel; }
         }
 
         public string EjectLabel
         {
-            get { return GetButtonLabel(GetEjectButton()); }
+            get { return DefendingWielder.EjectLabel; }
         }
 
         public string TradeLabel
         {
-            get { return GetButtonLabel(GetTradeButton()); }
+            get { return DefendingWielder.TradeLabel; }
+        }
+
+        public DefencePanelWielderAdapter DefendingWielder
+        {
+            get { return new DefencePanelWielderAdapter(GetDefencePanelWielder(), _facade, _localization); }
         }
 
         public bool IsStoreVisible()
         {
-            return IsVisible(GetStoreButton() as Component);
+            return DefendingWielder.IsStoreVisible();
         }
 
         public bool IsEjectVisible()
         {
-            return IsVisible(GetEjectButton() as Component);
+            return DefendingWielder.IsEjectVisible();
         }
 
         public bool IsTradeVisible()
         {
-            return IsVisible(GetTradeButton() as Component);
+            return DefendingWielder.IsTradeVisible();
         }
 
         public bool IsStoreEnabled()
         {
-            return IsButtonEnabled(GetStoreButton());
+            return DefendingWielder.IsStoreEnabled();
         }
 
         public bool IsEjectEnabled()
         {
-            return IsButtonEnabled(GetEjectButton());
+            return DefendingWielder.IsEjectEnabled();
         }
 
         public bool IsTradeEnabled()
         {
-            return IsButtonEnabled(GetTradeButton());
+            return DefendingWielder.IsTradeEnabled();
         }
 
         public Tooltip StoreTooltip
         {
-            get { return Tooltip.ForComponent(GetStoreButton() as Component, _localization); }
+            get { return DefendingWielder.StoreTooltip; }
         }
 
         public Tooltip EjectTooltip
         {
-            get { return Tooltip.ForComponent(GetEjectButton() as Component, _localization); }
+            get { return DefendingWielder.EjectTooltip; }
         }
 
         public Tooltip TradeTooltip
         {
-            get { return Tooltip.ForComponent(GetTradeButton() as Component, _localization); }
+            get { return DefendingWielder.TradeTooltip; }
         }
 
         public bool ActivateStore()
         {
-            return NativeSelectionUtility.Click(GetStoreButton());
+            return DefendingWielder.ActivateStore();
         }
 
         public bool ActivateEject()
         {
-            return NativeSelectionUtility.Click(GetEjectButton());
+            return DefendingWielder.ActivateEject();
         }
 
         public bool ActivateTrade()
         {
-            return NativeSelectionUtility.Click(GetTradeButton());
+            return DefendingWielder.ActivateTrade();
         }
 
         public void FocusStore()
         {
-            NativeSelectionUtility.Select(GetStoreButton());
+            DefendingWielder.FocusStore();
         }
 
         public void FocusEject()
         {
-            NativeSelectionUtility.Select(GetEjectButton());
+            DefendingWielder.FocusEject();
         }
 
         public void FocusTrade()
         {
-            NativeSelectionUtility.Select(GetTradeButton());
+            DefendingWielder.FocusTrade();
         }
 
-        public IReadOnlyList<DefenseSlot> GetGarrisonSlots()
+        public IReadOnlyList<DefenceSlotListAdapter.Slot> GetGarrisonSlots()
         {
-            return BuildDefenseSlots(GetField<List<TroopHUDEntry>>(GetDefencePanelTroops(), GarrisonTroopsField), "garrison");
+            return new DefenceSlotListAdapter(GetField<List<TroopHUDEntry>>(GetDefencePanelTroops(), GarrisonTroopsField), "garrison", _localization).GetSlots();
         }
 
-        public IReadOnlyList<DefenseSlot> GetBallistaSlots()
+        public IReadOnlyList<DefenceSlotListAdapter.Slot> GetBallistaSlots()
         {
-            return BuildDefenseSlots(GetField<List<TroopHUDEntry>>(GetDefencePanelTroops(), BallistaTroopsField), "ballista");
+            return new DefenceSlotListAdapter(GetField<List<TroopHUDEntry>>(GetDefencePanelTroops(), BallistaTroopsField), "ballista", _localization).GetSlots();
         }
 
         public void HideNativeTooltip()
@@ -432,21 +419,6 @@ namespace SongsOfConquestAccess.Adapters
             return GetField<UIButton>(_menu, UpgradeTroopsButtonField);
         }
 
-        private UIButton GetStoreButton()
-        {
-            return GetField<UIButton>(GetDefencePanelWielder(), StoreButtonField);
-        }
-
-        private UIButton GetEjectButton()
-        {
-            return GetField<UIButton>(GetDefencePanelWielder(), EjectButtonField);
-        }
-
-        private UIButton GetTradeButton()
-        {
-            return GetField<UIButton>(GetDefencePanelWielder(), TradeButtonField);
-        }
-
         private int GetInteractingCommanderId()
         {
             object value = InteractingCommanderIdField != null ? InteractingCommanderIdField.GetValue(_menu) : null;
@@ -457,23 +429,6 @@ namespace SongsOfConquestAccess.Adapters
         {
             string name = VisitingWielderName;
             return string.IsNullOrWhiteSpace(name) ? "visiting wielder army" : name + "'s army";
-        }
-
-        private IReadOnlyList<DefenseSlot> BuildDefenseSlots(List<TroopHUDEntry> entries, string idPrefix)
-        {
-            List<DefenseSlot> slots = new List<DefenseSlot>();
-            if (entries == null)
-            {
-                return slots;
-            }
-
-            for (int i = 0; i < entries.Count; i++)
-            {
-                TroopHUDEntry entry = entries[i];
-                slots.Add(new DefenseSlot(idPrefix + "-slot-" + (i + 1), idPrefix, i + 1, entry, _localization));
-            }
-
-            return slots;
         }
 
         private static string GetButtonLabel(UIButton button)
@@ -507,14 +462,14 @@ namespace SongsOfConquestAccess.Adapters
             return string.Join(". ", parts.ToArray());
         }
 
-        private static bool IsButtonEnabled(UIButton button)
-        {
-            return button != null && button.Active && button.Interactable && IsVisible(button as Component);
-        }
-
         private static bool IsVisible(Component component)
         {
             return component != null && component.gameObject != null && component.gameObject.activeInHierarchy;
+        }
+
+        private static bool IsButtonEnabled(UIButton button)
+        {
+            return button != null && button.Active && button.Interactable && IsVisible(button as Component);
         }
 
         private static bool IsVisible(GameObject gameObject)
@@ -527,58 +482,5 @@ namespace SongsOfConquestAccess.Adapters
             return owner != null && field != null ? field.GetValue(owner) as T : null;
         }
 
-        internal sealed class DefenseSlot
-        {
-            private readonly TroopHUDEntry _entry;
-            private readonly ILocalizationHandler _localization;
-            private readonly string _slotType;
-            private readonly int _slotNumber;
-
-            public DefenseSlot(string id, string slotType, int slotNumber, TroopHUDEntry entry, ILocalizationHandler localization)
-            {
-                Id = id ?? string.Empty;
-                _slotType = slotType ?? string.Empty;
-                _slotNumber = slotNumber;
-                _entry = entry;
-                _localization = localization;
-            }
-
-            public string Id { get; private set; }
-
-            public string Label
-            {
-                get
-                {
-                    Tooltip tooltip = Tooltip;
-                    if (tooltip != null && tooltip.TextLines != null && tooltip.TextLines.Count > 0)
-                    {
-                        return SpeechTextSanitizer.Normalize(string.Join(". ", tooltip.TextLines));
-                    }
-
-                    return "Empty " + _slotType + " slot " + _slotNumber;
-                }
-            }
-
-            public Tooltip Tooltip
-            {
-                get
-                {
-                    if (!IsVisible(_entry as Component))
-                    {
-                        return null;
-                    }
-
-                    return Tooltip.ForComponent(_entry != null ? _entry.GetSelectable() : null, _localization);
-                }
-            }
-
-            public void Focus()
-            {
-                if (IsVisible(_entry as Component))
-                {
-                    NativeSelectionUtility.Select(_entry.GetSelectable());
-                }
-            }
-        }
     }
 }

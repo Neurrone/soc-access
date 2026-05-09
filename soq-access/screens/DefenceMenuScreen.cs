@@ -8,14 +8,12 @@ using SongsOfConquestAccess.UI;
 
 namespace SongsOfConquestAccess.Screens
 {
-    internal sealed class SettlementScreen : Screen
+    internal sealed class DefenceMenuScreen : Screen
     {
-        private const int ArmyExchangeGridIndex = 10;
-
-        private readonly TownInteractionMenuAdapter _adapter;
+        private readonly DefenceMenuAdapter _adapter;
         private Action<OnTroopsUpdatedPayload> _troopsUpdatedHandler;
 
-        public SettlementScreen(TownInteractionMenuAdapter adapter)
+        public DefenceMenuScreen(DefenceMenuAdapter adapter)
             : base(BuildRoot(adapter))
         {
             _adapter = adapter;
@@ -66,19 +64,10 @@ namespace SongsOfConquestAccess.Screens
             }
 
             int focusedIndex = RootWidget != null ? RootWidget.FocusedIndex : -1;
-            string gridSlotId = GetFocusedGridSlotId();
-
             RootWidget = BuildRoot(_adapter);
-            RestoreGridFocus(gridSlotId);
-
-            if (!focusAfterRefresh)
+            if (focusAfterRefresh)
             {
-                return;
-            }
-
-            if (RootWidget == null || !RootWidget.SetFocusByIndex(focusedIndex))
-            {
-                RootWidget?.Focus();
+                RootWidget?.SetFocusByIndex(focusedIndex);
             }
         }
 
@@ -117,7 +106,8 @@ namespace SongsOfConquestAccess.Screens
                 return;
             }
 
-            if (payload.ParentId != _adapter.VisitingCommanderId && payload.ParentId != _adapter.SettlementMapEntityId)
+            int storedWielderId = _adapter.DefendingWielder.StoredWielderId;
+            if (payload.ParentId != _adapter.MapEntityId && payload.ParentId != storedWielderId)
             {
                 return;
             }
@@ -126,35 +116,16 @@ namespace SongsOfConquestAccess.Screens
             Refresh(focusAfterRefresh);
         }
 
-        private string GetFocusedGridSlotId()
+        private static ContainerWidget BuildRoot(DefenceMenuAdapter adapter)
         {
-            ArmyExchangeGridWidget grid = RootWidget != null
-                ? RootWidget.GetChildAt(ArmyExchangeGridIndex) as ArmyExchangeGridWidget
-                : null;
-            return grid != null ? grid.FocusedSlotId : null;
-        }
-
-        private void RestoreGridFocus(string gridSlotId)
-        {
-            if (string.IsNullOrWhiteSpace(gridSlotId) || RootWidget == null)
-            {
-                return;
-            }
-
-            ArmyExchangeGridWidget grid = RootWidget.GetChildAt(ArmyExchangeGridIndex) as ArmyExchangeGridWidget;
-            grid?.SetFocusedSlotById(gridSlotId);
-        }
-
-        private static ContainerWidget BuildRoot(TownInteractionMenuAdapter adapter)
-        {
-            ContainerWidget root = new ContainerWidget("settlement", adapter != null ? adapter.Title : "Settlement");
+            ContainerWidget root = new ContainerWidget("defences", adapter != null ? adapter.Title : "Defences");
             if (adapter == null)
             {
                 return root;
             }
 
             root.AddChild(new ButtonWidget(
-                "settlement-tutorial",
+                "defences-tutorial",
                 adapter.GetTutorialButtonLabel(),
                 adapter.ActivateTutorial,
                 adapter.HideNativeTooltip,
@@ -162,86 +133,121 @@ namespace SongsOfConquestAccess.Screens
                 adapter.IsTutorialButtonVisible));
 
             root.AddChild(new TextWidget(
-                "settlement-title",
+                "defences-title",
                 () => adapter.Title,
                 adapter.HideNativeTooltip,
                 includeParentLabelInAnnouncement: false));
 
             root.AddChild(new TextWidget(
-                "settlement-custom-name",
-                () => adapter.CustomName,
+                "defences-subtitle",
+                () => adapter.Subtitle,
                 adapter.HideNativeTooltip,
                 includeParentLabelInAnnouncement: false,
-                isVisible: () => adapter.IsCustomNameVisible));
+                isVisible: () => !string.IsNullOrWhiteSpace(adapter.Subtitle)));
+
+            DefencePanelWielderAdapter defendingWielder = adapter.DefendingWielder;
+            root.AddChild(new TextWidget(
+                "defences-defending-wielder-status",
+                () => defendingWielder.Status,
+                adapter.HideNativeTooltip,
+                includeParentLabelInAnnouncement: false,
+                isVisible: () => !string.IsNullOrWhiteSpace(defendingWielder.Status)));
 
             root.AddChild(Portrait.Static(
-                "settlement-visiting-wielder",
-                () => adapter.VisitingWielderName,
-                adapter.HideNativeTooltip,
-                () => adapter.VisitingWielderTooltip));
+                "defences-defending-wielder",
+                () => defendingWielder.StoredWielderName,
+                defendingWielder.FocusPortrait,
+                () => defendingWielder.PortraitTooltip,
+                () => defendingWielder.IsStoredWielderVisible));
 
             root.AddChild(new ButtonWidget(
-                "settlement-draft-troops",
+                "defences-eject-wielder",
+                () => defendingWielder.EjectLabel,
+                defendingWielder.ActivateEject,
+                defendingWielder.FocusEject,
+                defendingWielder.IsEjectEnabled,
+                defendingWielder.IsEjectVisible,
+                () => defendingWielder.EjectTooltip));
+
+            root.AddChild(new ButtonWidget(
+                "defences-trade-wielder",
+                () => defendingWielder.TradeLabel,
+                defendingWielder.ActivateTrade,
+                defendingWielder.FocusTrade,
+                defendingWielder.IsTradeEnabled,
+                defendingWielder.IsTradeVisible,
+                () => defendingWielder.TradeTooltip));
+
+            if (defendingWielder.IsStoredWielderVisible)
+            {
+                root.AddChild(adapter.BuildArmyExchangeGrid());
+            }
+            else
+            {
+                root.AddChild(TroopHudMenu.Build(
+                    "defences-settlement-troops",
+                    adapter.DefendingTroopsLabel,
+                    adapter.SettlementTroops,
+                    adapter.IsSettlementTroopsVisible));
+            }
+
+            root.AddChild(new ButtonWidget(
+                "defences-draft-troops",
                 () => adapter.DraftLabel,
                 adapter.ActivateDraft,
                 adapter.FocusDraft,
                 adapter.IsDraftEnabled,
-                getTooltip: () => adapter.DraftTooltip));
+                adapter.IsDraftVisible,
+                () => adapter.DraftTooltip));
 
             root.AddChild(new ButtonWidget(
-                "settlement-upgrade-troops",
+                "defences-upgrade-troops",
                 () => adapter.UpgradeLabel,
                 adapter.ActivateUpgrade,
                 adapter.FocusUpgrade,
                 adapter.IsUpgradeEnabled,
-                getTooltip: () => adapter.UpgradeTooltip));
+                adapter.IsUpgradeVisible,
+                () => adapter.UpgradeTooltip));
 
             root.AddChild(new TextWidget(
-                "settlement-defending-wielder-status",
-                () => adapter.DefendingWielderStatus,
+                "defences-tower-summary",
+                () => adapter.TowerSummary,
                 adapter.HideNativeTooltip,
                 includeParentLabelInAnnouncement: false,
-                isVisible: () => !string.IsNullOrWhiteSpace(adapter.DefendingWielderStatus)));
+                isVisible: adapter.HasTowerSummary));
+
+            root.AddChild(BuildTowerMenu(adapter));
+            root.AddChild(BuildDefenseMenu("defences-garrison", "Garrison", adapter.GetGarrisonSlots()));
+            root.AddChild(BuildDefenseMenu("defences-ballista", "Ballista", adapter.GetBallistaSlots()));
 
             root.AddChild(new ButtonWidget(
-                "settlement-store-wielder",
-                () => adapter.StoreLabel,
-                adapter.ActivateStore,
-                adapter.FocusStore,
-                adapter.IsStoreEnabled,
-                adapter.IsStoreVisible,
-                () => adapter.StoreTooltip));
-
-            root.AddChild(new ButtonWidget(
-                "settlement-eject-wielder",
-                () => adapter.EjectLabel,
-                adapter.ActivateEject,
-                adapter.FocusEject,
-                adapter.IsEjectEnabled,
-                adapter.IsEjectVisible,
-                () => adapter.EjectTooltip));
-
-            root.AddChild(new ButtonWidget(
-                "settlement-trade-wielder",
-                () => adapter.TradeLabel,
-                adapter.ActivateTrade,
-                adapter.FocusTrade,
-                adapter.IsTradeEnabled,
-                adapter.IsTradeVisible,
-                () => adapter.TradeTooltip));
-
-            root.AddChild(adapter.BuildArmyExchangeGrid());
-            root.AddChild(BuildDefenseMenu("settlement-garrison", "Garrison", adapter.GetGarrisonSlots()));
-            root.AddChild(BuildDefenseMenu("settlement-ballista", "Ballista", adapter.GetBallistaSlots()));
-
-            root.AddChild(new ButtonWidget(
-                "settlement-close",
+                "defences-close",
                 () => adapter.CloseLabel,
                 adapter.Close,
                 adapter.HideNativeTooltip,
                 () => adapter.IsTopLevelPresent()));
 
             return root;
+        }
+
+        private static MenuWidget BuildTowerMenu(DefenceMenuAdapter adapter)
+        {
+            IReadOnlyList<DefenceMenuAdapter.TowerItem> towers = adapter.GetTowerItems();
+            MenuWidget menu = new MenuWidget("defences-towers", "Towers", () => towers.Count > 0);
+            for (int i = 0; i < towers.Count; i++)
+            {
+                DefenceMenuAdapter.TowerItem tower = towers[i];
+                menu.AddItem(new MenuItemWidget(
+                    tower.Id,
+                    () => tower.Label,
+                    null,
+                    null,
+                    tower.Focus,
+                    () => true,
+                    () => tower.Tooltip));
+            }
+
+            return menu;
         }
 
         private static MenuWidget BuildDefenseMenu(

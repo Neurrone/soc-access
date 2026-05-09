@@ -126,6 +126,7 @@ namespace SongsOfConquestAccess.Adapters
                 if (InvokeBool(CanMergeMethod, movable) || InvokeBool(IsEmptyAndUnlockedMethod, movable))
                 {
                     DecideAmountMethod?.Invoke(movable, new object[] { targetEntry.FormationIndex });
+                    PushMoveTroopPopupIfPresent(movable);
                     return true;
                 }
 
@@ -202,6 +203,20 @@ namespace SongsOfConquestAccess.Adapters
         {
             object value = method != null ? method.Invoke(instance, null) : null;
             return value is bool && (bool)value;
+        }
+
+        private static void PushMoveTroopPopupIfPresent(TroopHUDEntryMovable movable)
+        {
+            if (movable == null)
+            {
+                return;
+            }
+
+            MoveTroopPopupAdapter adapter = new MoveTroopPopupAdapter(movable);
+            if (adapter.IsPresent())
+            {
+                SoqAccessPlugin.Instance?.ScreenDetector?.OnMoveTroopPopupReady(movable);
+            }
         }
 
         private static Vector2 GetScreenCenter(TroopHUDEntry entry)

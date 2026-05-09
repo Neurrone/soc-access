@@ -42,6 +42,7 @@ namespace SongsOfConquestAccess.Screens
                 new PreBattleMenuRuntimeScreenProbe(),
                 new DwellingInteractionRuntimeScreenProbe(),
                 new SettlementRuntimeScreenProbe(),
+                new DefenceMenuRuntimeScreenProbe(),
                 new BuildMenuRuntimeScreenProbe(),
                 new PurchaseWielderRuntimeScreenProbe(),
                 new HostileJoinMenuRuntimeScreenProbe(),
@@ -665,6 +666,79 @@ namespace SongsOfConquestAccess.Screens
             }
         }
 
+        public void OnDefenceMenuReady(DefenceMenu menu)
+        {
+            DefenceMenuScreen screen = new DefenceMenuScreen(new DefenceMenuAdapter(menu));
+            if (_screenManager.CurrentScreen is DefenceMenuScreen)
+            {
+                SoqAccessPlugin.Instance?.LogWarning("ScreenDetector ignored duplicate defence menu ready while defence menu is already top");
+                return;
+            }
+
+            Push(screen, "defence menu ready");
+        }
+
+        public void OnDefenceDraftReady(DefenceMenu menu)
+        {
+            if (_screenManager.CurrentScreen is DefenceMenuScreen)
+            {
+                _screenManager.Pop<DefenceMenuScreen>("defence draft opened");
+            }
+
+            Push(new DefenceDraftTroopsScreen(new DefenceMenuAdapter(menu)), "defence draft ready");
+        }
+
+        public void OnDefenceUpgradeReady(DefenceMenu menu)
+        {
+            if (_screenManager.CurrentScreen is DefenceMenuScreen)
+            {
+                _screenManager.Pop<DefenceMenuScreen>("defence upgrade opened");
+            }
+
+            Push(new DefenceUpgradeTroopsScreen(new DefenceMenuAdapter(menu)), "defence upgrade ready");
+        }
+
+        public void OnDefenceMenuBackToTop(DefenceMenu menu)
+        {
+            if (_screenManager.CurrentScreen is DefenceDraftTroopsScreen)
+            {
+                _screenManager.Pop<DefenceDraftTroopsScreen>("defence draft closed");
+            }
+            else if (_screenManager.CurrentScreen is DefenceUpgradeTroopsScreen)
+            {
+                _screenManager.Pop<DefenceUpgradeTroopsScreen>("defence upgrade closed");
+            }
+            else if (_screenManager.CurrentScreen is DefenceMenuScreen)
+            {
+                SoqAccessPlugin.Instance?.LogWarning("ScreenDetector ignored defence back to top while defence menu is already top");
+                return;
+            }
+            else
+            {
+                return;
+            }
+
+            Push(new DefenceMenuScreen(new DefenceMenuAdapter(menu)), "defence top level ready");
+        }
+
+        public void OnDefenceMenuClosed(DefenceMenu menu)
+        {
+            if (_screenManager.CurrentScreen is DefenceDraftTroopsScreen)
+            {
+                _screenManager.Pop<DefenceDraftTroopsScreen>("defence closed with draft open");
+            }
+
+            if (_screenManager.CurrentScreen is DefenceUpgradeTroopsScreen)
+            {
+                _screenManager.Pop<DefenceUpgradeTroopsScreen>("defence closed with upgrade open");
+            }
+
+            if (_screenManager.CurrentScreen is DefenceMenuScreen)
+            {
+                _screenManager.Pop<DefenceMenuScreen>("defence closed");
+            }
+        }
+
         public void OnBuildMenuReady(BuildMenu menu)
         {
             if (_screenManager.CurrentScreen is BuildMenuScreen)
@@ -783,6 +857,11 @@ namespace SongsOfConquestAccess.Screens
 
         public void OnMoveTroopPopupReady(TroopHUDEntryMovable movable)
         {
+            if (_screenManager.CurrentScreen is MoveTroopPopupScreen)
+            {
+                return;
+            }
+
             Push(new MoveTroopPopupScreen(new MoveTroopPopupAdapter(movable)), "move troop popup ready");
         }
 
