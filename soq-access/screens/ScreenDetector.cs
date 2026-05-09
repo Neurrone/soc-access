@@ -43,6 +43,7 @@ namespace SongsOfConquestAccess.Screens
                 new DwellingInteractionRuntimeScreenProbe(),
                 new SettlementRuntimeScreenProbe(),
                 new BuildMenuRuntimeScreenProbe(),
+                new PurchaseWielderRuntimeScreenProbe(),
                 new HostileJoinMenuRuntimeScreenProbe(),
                 new MoveTroopPopupRuntimeScreenProbe(),
                 new WorldChoiceMenuRuntimeScreenProbe(),
@@ -693,6 +694,26 @@ namespace SongsOfConquestAccess.Screens
         public void OnBuildMenuCategoryChanged(BuildMenu menu)
         {
             RefreshCurrentBuildMenu();
+        }
+
+        public void OnPurchaseWielderReady(PurchaseWielderMenu menu)
+        {
+            PurchaseWielderMenuAdapter adapter = new PurchaseWielderMenuAdapter(menu);
+            if (!adapter.IsPresent())
+            {
+                return;
+            }
+
+            Push(new PurchaseWielderScreen(adapter), "purchase wielder ready");
+        }
+
+        public void OnPurchaseWielderClosed(PurchaseWielderMenu menu)
+        {
+            PurchaseWielderScreen current = _screenManager.CurrentScreen as PurchaseWielderScreen;
+            if (current != null && (menu == null || ReferenceEquals(current.Adapter.Source, menu)))
+            {
+                _screenManager.Pop<PurchaseWielderScreen>("purchase wielder closed");
+            }
         }
 
         private void RefreshCurrentBuildMenu()
