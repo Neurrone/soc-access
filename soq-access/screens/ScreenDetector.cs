@@ -33,6 +33,7 @@ namespace SongsOfConquestAccess.Screens
                 new TaleSelectRuntimeScreenProbe(),
                 new CampaignMapSelectRuntimeScreenProbe(),
                 new AdventureMapRuntimeScreenProbe(),
+                new MapEntityMiniMenuRuntimeScreenProbe(),
                 new CombatRuntimeScreenProbe(),
                 new SpellbookRuntimeScreenProbe(),
                 new PostAdventureResultRuntimeScreenProbe(),
@@ -397,6 +398,26 @@ namespace SongsOfConquestAccess.Screens
         {
             _adventureViewInstaller = null;
             _screenManager.Pop<AdventureMapScreen>("adventure map closed");
+        }
+
+        public void OnMapEntityMiniMenuReady(MapEntityMiniMenu menu)
+        {
+            MapEntityMiniMenuAdapter adapter = new MapEntityMiniMenuAdapter(menu);
+            if (!adapter.IsPresent())
+            {
+                return;
+            }
+
+            Push(new MapEntityMiniMenuScreen(adapter), "map entity mini menu ready");
+        }
+
+        public void OnMapEntityMiniMenuClosed(MapEntityMiniMenu menu)
+        {
+            MapEntityMiniMenuScreen current = _screenManager.CurrentScreen as MapEntityMiniMenuScreen;
+            if (current != null && (menu == null || ReferenceEquals(current.Adapter.Source, menu)))
+            {
+                _screenManager.Pop<MapEntityMiniMenuScreen>("map entity mini menu closed");
+            }
         }
 
         public void OnBattleSceneReady(BattleSceneInstaller installer)
