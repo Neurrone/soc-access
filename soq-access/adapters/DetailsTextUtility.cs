@@ -6,6 +6,7 @@ using SongsOfConquest.Client.InputManagement;
 using SongsOfConquest.Client.Menu.Tooltip;
 using SongsOfConquest.Client.UI;
 using SongsOfConquest.Common.Details;
+using SongsOfConquest.Common.Economy;
 using SongsOfConquest.Common.Localization;
 using UnityEngine;
 using UnityEngine.AddressableAssets;
@@ -25,6 +26,8 @@ namespace SongsOfConquestAccess.Adapters
         private static readonly NullDetailsElement NullElement = new NullDetailsElement();
         private readonly List<string> _parts = new List<string>();
         private readonly List<TooltipInstructionRow> _instructionRows = new List<TooltipInstructionRow>();
+        private ILocalizationHandler _localization;
+        private ResourceType? _pendingResourceIconType;
 
         public IEnumerable<DetailsSidePanelDescription> AllSidePanels
         {
@@ -57,6 +60,7 @@ namespace SongsOfConquestAccess.Adapters
             // structured TooltipAction entries. Unknown rows remain in TextLines
             // so unsupported actions are still spoken.
             DetailsTextUtility drawer = new DetailsTextUtility();
+            drawer._localization = localization;
             try
             {
                 details.Draw(drawer, localization);
@@ -106,6 +110,15 @@ namespace SongsOfConquestAccess.Adapters
 
         public Sprite GetResourceIcon(int resourceType, bool largeIcon = true)
         {
+            if (Enum.IsDefined(typeof(ResourceType), resourceType))
+            {
+                _pendingResourceIconType = (ResourceType)resourceType;
+            }
+            else
+            {
+                _pendingResourceIconType = null;
+            }
+
             return null;
         }
 
@@ -195,6 +208,14 @@ namespace SongsOfConquestAccess.Adapters
 
         public void AddEntry(Sprite icon, string text, string value, bool showBackground)
         {
+            ResourceType? resourceType = _pendingResourceIconType;
+            _pendingResourceIconType = null;
+            if (resourceType.HasValue)
+            {
+                AddResourceRow(resourceType.Value, text, value);
+                return;
+            }
+
             AddRow(text, value);
         }
 
@@ -281,6 +302,101 @@ namespace SongsOfConquestAccess.Adapters
             {
                 Add(left);
                 Add(right);
+            }
+        }
+
+        private void AddResourceRow(ResourceType resourceType, string text, string value)
+        {
+            string amount = SongsOfConquestAccess.Speech.SpeechTextSanitizer.Normalize(text);
+            string right = SongsOfConquestAccess.Speech.SpeechTextSanitizer.Normalize(value);
+            string resourceName = GetResourceName(resourceType, amount);
+            string row = amount;
+            if (!string.IsNullOrWhiteSpace(resourceName) && !ContainsResourceName(amount, resourceName))
+            {
+                row = string.IsNullOrWhiteSpace(amount) ? resourceName : amount + " " + resourceName;
+            }
+
+            if (!string.IsNullOrWhiteSpace(right))
+            {
+                row = string.IsNullOrWhiteSpace(row) ? right : row + ": " + right;
+            }
+
+            if (string.IsNullOrWhiteSpace(row))
+            {
+                return;
+            }
+
+            int previousIndex = _parts.Count - 1;
+            if (previousIndex >= 0 && IsCostHeader(_parts[previousIndex]))
+            {
+                _parts[previousIndex] = _parts[previousIndex].TrimEnd(':') + ": " + row;
+                return;
+            }
+
+            if (previousIndex >= 0 && IsCostLine(_parts[previousIndex]))
+            {
+                _parts[previousIndex] = _parts[previousIndex] + ", " + row;
+                return;
+            }
+
+            Add(row);
+        }
+
+        private string GetResourceName(ResourceType resourceType, string amountText)
+        {
+            if (_localization == null)
+            {
+                return FormatResource(resourceType);
+            }
+
+            int amount;
+            string key = "Common/Resource/" + resourceType;
+            if (int.TryParse(SongsOfConquestAccess.Speech.SpeechTextSanitizer.Normalize(amountText), out amount))
+            {
+                return SongsOfConquestAccess.Speech.SpeechTextSanitizer.Normalize(_localization.GetPluralText(key, amount));
+            }
+
+            return SongsOfConquestAccess.Speech.SpeechTextSanitizer.Normalize(_localization.GetPluralTextGeneric(key));
+        }
+
+        private static bool ContainsResourceName(string text, string resourceName)
+        {
+            return !string.IsNullOrWhiteSpace(text)
+                && !string.IsNullOrWhiteSpace(resourceName)
+                && text.IndexOf(resourceName, StringComparison.OrdinalIgnoreCase) >= 0;
+        }
+
+        private bool IsCostHeader(string text)
+        {
+            string normalized = SongsOfConquestAccess.Speech.SpeechTextSanitizer.Normalize(text).Trim().TrimEnd(':');
+            string costHeader = SongsOfConquestAccess.Speech.SpeechTextSanitizer.Normalize(GetCostHeader()).Trim().TrimEnd(':');
+            return normalized.Equals(costHeader, StringComparison.OrdinalIgnoreCase);
+        }
+
+        private bool IsCostLine(string text)
+        {
+            string normalized = SongsOfConquestAccess.Speech.SpeechTextSanitizer.Normalize(text).Trim();
+            string costHeader = SongsOfConquestAccess.Speech.SpeechTextSanitizer.Normalize(GetCostHeader()).Trim().TrimEnd(':');
+            return normalized.StartsWith(costHeader + ": ", StringComparison.OrdinalIgnoreCase);
+        }
+
+        private string GetCostHeader()
+        {
+            return _localization != null ? _localization.GetText("Adventure/BuildMenu/Cost") : "Cost";
+        }
+
+        private static string FormatResource(ResourceType type)
+        {
+            switch (type)
+            {
+                case ResourceType.AncientAmber:
+                    return "ancient amber";
+                case ResourceType.CelestialOre:
+                    return "celestial ore";
+                case ResourceType.Glimmerweave:
+                    return "glimmerweave";
+                default:
+                    return type.ToString().ToLowerInvariant();
             }
         }
 
