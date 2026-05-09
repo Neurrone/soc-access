@@ -2901,35 +2901,39 @@ namespace SongsOfConquestAccess.Adapters
                 return string.Empty;
             }
 
-            List<string> ranges = new List<string>();
-            if (indicators.Contains(CombatRangeIndicator.Deadly))
+            bool hasZoneOfControl = indicators.Contains(CombatRangeIndicator.ZoneOfControl);
+
+            string attackRangeText = string.Empty;
+            if (hasZoneOfControl)
             {
-                ranges.Add("deadly");
+                attackRangeText = "zone of control";
+            }
+            else if (indicators.Contains(CombatRangeIndicator.Deadly))
+            {
+                attackRangeText = "deadly range";
             }
             else if (indicators.Contains(CombatRangeIndicator.Attack) || indicators.Contains(CombatRangeIndicator.Melee))
             {
-                ranges.Add("attack");
+                attackRangeText = "attack range";
             }
 
-            if (indicators.Contains(CombatRangeIndicator.Movement))
+            bool hasMovement = indicators.Contains(CombatRangeIndicator.Movement);
+            if (!hasMovement)
             {
-                ranges.Add("movement");
+                return attackRangeText;
             }
 
-            string rangeText = FormatList(ranges);
-            if (!string.IsNullOrWhiteSpace(rangeText))
+            if (!hasZoneOfControl && !string.IsNullOrWhiteSpace(attackRangeText))
             {
-                rangeText += " range";
+                string compactAttackText = attackRangeText.EndsWith(" range")
+                    ? attackRangeText.Substring(0, attackRangeText.Length - " range".Length)
+                    : attackRangeText;
+                return compactAttackText + " and movement range";
             }
 
-            if (!indicators.Contains(CombatRangeIndicator.ZoneOfControl))
-            {
-                return rangeText;
-            }
-
-            return string.IsNullOrWhiteSpace(rangeText)
-                ? "zone of control"
-                : rangeText + " and zone of control";
+            return string.IsNullOrWhiteSpace(attackRangeText)
+                ? "movement range"
+                : attackRangeText + " and movement range";
         }
 
         private static string FormatList(List<string> values)

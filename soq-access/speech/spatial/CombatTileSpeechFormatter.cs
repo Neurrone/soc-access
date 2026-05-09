@@ -27,6 +27,7 @@ namespace SongsOfConquestAccess.Speech.Spatial
             AddIfPresent(parts, DescribePrimaryContent(tile));
             AddIfPresent(parts, DescribeTileContext(tile));
             AddIfPresent(parts, DescribeCoordinates(tile));
+            AddIfPresent(parts, DescribeInfluence(tile));
             return string.Join(", ", parts.ToArray());
         }
 
@@ -52,6 +53,17 @@ namespace SongsOfConquestAccess.Speech.Spatial
                 parts.Add(_adapter.DescribeEntityForSpeech(tile.Entity));
             }
 
+            return string.Join(", ", parts.ToArray());
+        }
+
+        public string DescribeInfluence(CombatTile tile)
+        {
+            if (tile == null)
+            {
+                return string.Empty;
+            }
+
+            List<string> parts = new List<string>();
             if (_context != null)
             {
                 _context.AddIndicators(tile.Point, parts);
