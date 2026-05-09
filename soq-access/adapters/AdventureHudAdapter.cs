@@ -82,6 +82,10 @@ namespace SongsOfConquestAccess.Adapters
             AccessTools.Field(typeof(TownListUI), "_entries");
         private static readonly FieldInfo WielderListEntryPoolField =
             AccessTools.Field(typeof(WielderListHUD), "_entryPool");
+        private static readonly FieldInfo WielderListEntryButtonField =
+            AccessTools.Field(typeof(WielderListHUDEntry), "_button");
+        private static readonly MethodInfo WielderListEntryRefreshTooltipMethod =
+            AccessTools.Method(typeof(WielderListHUDEntry), "RefreshTooltip");
         private static readonly FieldInfo TeamQueueEntriesField =
             AccessTools.Field(typeof(TeamQueueHUDBehaviour), "_teamQueueEntries");
         private static readonly FieldInfo TeamQueueRoundTextsField =
@@ -654,6 +658,7 @@ namespace SongsOfConquestAccess.Adapters
             WielderListHUDEntry entry = GetWielderListEntry(index);
             if (entry != null)
             {
+                RefreshWielderListEntryTooltip(entry);
                 NativeSelectionUtility.Select(GetWielderListSelectable(entry));
             }
         }
@@ -661,14 +666,26 @@ namespace SongsOfConquestAccess.Adapters
         public bool ClickWielderListEntry(int index)
         {
             WielderListHUDEntry entry = GetWielderListEntry(index);
-            Selectable selectable = GetWielderListSelectable(entry);
-            return selectable != null && NativeSelectionUtility.PointerClick(selectable);
+            UIButton button = GetWielderListButton(entry);
+            return button != null && NativeSelectionUtility.Click(button);
         }
 
         public Tooltip GetWielderListEntryTooltip(int index)
         {
             WielderListHUDEntry entry = GetWielderListEntry(index);
-            return Tooltip.ForComponent(GetWielderListSelectable(entry), LocalizationHandler);
+            Selectable selectable = GetWielderListSelectable(entry);
+            if (selectable == null)
+            {
+                return null;
+            }
+
+            return new Tooltip(
+                () =>
+                {
+                    RefreshWielderListEntryTooltip(entry);
+                    return NativeTooltipUtility.GetTooltipLinesForComponent(selectable, LocalizationHandler);
+                },
+                VisualTooltipMetadata.ForComponent(selectable));
         }
 
         public bool IsOptionsButtonVisible()
@@ -1424,6 +1441,30 @@ namespace SongsOfConquestAccess.Adapters
             catch
             {
                 return null;
+            }
+        }
+
+        private static UIButton GetWielderListButton(WielderListHUDEntry entry)
+        {
+            return entry != null && WielderListEntryButtonField != null
+                ? WielderListEntryButtonField.GetValue(entry) as UIButton
+                : null;
+        }
+
+        private static void RefreshWielderListEntryTooltip(WielderListHUDEntry entry)
+        {
+            if (entry == null || entry.Commander == null || WielderListEntryRefreshTooltipMethod == null)
+            {
+                return;
+            }
+
+            try
+            {
+                WielderListEntryRefreshTooltipMethod.Invoke(entry, null);
+            }
+            catch (Exception exception)
+            {
+                SoqAccessPlugin.Instance?.LogWarning("AdventureHudAdapter failed to refresh wielder list tooltip: " + exception.Message);
             }
         }
 

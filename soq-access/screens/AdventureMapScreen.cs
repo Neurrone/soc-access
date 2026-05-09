@@ -1,4 +1,5 @@
 using System;
+using SongsOfConquest.Client.Gamestate;
 using SongsOfConquestAccess.Adapters;
 using SongsOfConquestAccess.Events;
 using SongsOfConquestAccess.UI;
@@ -11,9 +12,12 @@ namespace SongsOfConquestAccess.Screens
     internal sealed class AdventureMapScreen : Screen
     {
         private const int GridIndex = 0;
+        private const int TroopSlotsIndex = 8;
         private readonly AdventureMapAdapter _adapter;
         private readonly AdventureMapEventListener _eventListener;
         private readonly AdventureMapGrid _grid;
+        private Action<int> _commanderStatisticsChangedHandler;
+        private Action<CommanderChangedPayload> _commanderChangedHandler;
         private bool _isTopScreen;
 
         public AdventureMapScreen(AdventureMapAdapter adapter, AdventureMapEventListener eventListener)
@@ -37,6 +41,7 @@ namespace SongsOfConquestAccess.Screens
         public override void OnPush()
         {
             _eventListener?.Attach();
+            AttachListeners();
             AccessibilityEventBus.Subscribe(HandleAccessibilityEvent);
         }
 
@@ -56,6 +61,7 @@ namespace SongsOfConquestAccess.Screens
         public override void OnPop()
         {
             AccessibilityEventBus.Unsubscribe(HandleAccessibilityEvent);
+            DetachListeners();
             _isTopScreen = false;
             _eventListener?.Detach();
             _adapter?.ClearFocusedTileOverlay();
@@ -109,6 +115,95 @@ namespace SongsOfConquestAccess.Screens
             }
 
             RootWidget?.SetFocusByIndexSilently(GridIndex);
+        }
+
+        private void AttachListeners()
+        {
+            if (_adapter == null || _adapter.Facade == null || _adapter.Facade.Commands == null)
+            {
+                return;
+            }
+
+            _commanderStatisticsChangedHandler = HandleCommanderStatisticsChanged;
+            _adapter.Facade.Commands.OnCommanderStatisticsChanged =
+                (Action<int>)Delegate.Combine(
+                    _adapter.Facade.Commands.OnCommanderStatisticsChanged,
+                    _commanderStatisticsChangedHandler);
+
+            if (_adapter.SelectionHandler != null)
+            {
+                _commanderChangedHandler = HandleCommanderChanged;
+                _adapter.SelectionHandler.OnCommanderChanged =
+                    (Action<CommanderChangedPayload>)Delegate.Combine(
+                        _adapter.SelectionHandler.OnCommanderChanged,
+                        _commanderChangedHandler);
+            }
+        }
+
+        private void DetachListeners()
+        {
+            if (_adapter == null)
+            {
+                return;
+            }
+
+            if (_adapter.Facade != null && _adapter.Facade.Commands != null && _commanderStatisticsChangedHandler != null)
+            {
+                _adapter.Facade.Commands.OnCommanderStatisticsChanged =
+                    (Action<int>)Delegate.Remove(
+                        _adapter.Facade.Commands.OnCommanderStatisticsChanged,
+                        _commanderStatisticsChangedHandler);
+                _commanderStatisticsChangedHandler = null;
+            }
+
+            if (_adapter.SelectionHandler != null && _commanderChangedHandler != null)
+            {
+                _adapter.SelectionHandler.OnCommanderChanged =
+                    (Action<CommanderChangedPayload>)Delegate.Remove(
+                        _adapter.SelectionHandler.OnCommanderChanged,
+                        _commanderChangedHandler);
+                _commanderChangedHandler = null;
+            }
+        }
+
+        private void HandleCommanderStatisticsChanged(int commanderId)
+        {
+            ICommanderState selectedCommander = _adapter != null && _adapter.SelectionHandler != null
+                ? _adapter.SelectionHandler.SelectedCommander
+                : null;
+            if (selectedCommander == null || selectedCommander.Id != commanderId || RootWidget == null)
+            {
+                return;
+            }
+
+            RebuildTroopSlotsMenu();
+        }
+
+        private void HandleCommanderChanged(CommanderChangedPayload payload)
+        {
+            if (payload == null || payload.SelectedCommander == null || RootWidget == null)
+            {
+                return;
+            }
+
+            RebuildTroopSlotsMenu();
+        }
+
+        private void RebuildTroopSlotsMenu()
+        {
+            MenuWidget previousMenu = RootWidget.GetChildAt(TroopSlotsIndex) as MenuWidget;
+            int previousMenuIndex = previousMenu != null ? previousMenu.FocusedIndex : -1;
+            bool wasTroopMenuFocused = RootWidget.FocusedIndex == TroopSlotsIndex;
+            MenuWidget newMenu = BuildTroopSlotsMenu(_adapter.Hud);
+            if (!RootWidget.ReplaceChildAt(TroopSlotsIndex, newMenu))
+            {
+                return;
+            }
+
+            if (wasTroopMenuFocused && !newMenu.SetFocusByIndex(previousMenuIndex))
+            {
+                RootWidget.SetFocusByIndex(TroopSlotsIndex);
+            }
         }
 
         private static ContainerWidget BuildRoot(AdventureMapAdapter adapter, AdventureMapGrid grid)

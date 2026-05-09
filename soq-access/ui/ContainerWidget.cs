@@ -62,6 +62,31 @@ namespace SongsOfConquestAccess.UI
             return _children[index];
         }
 
+        public bool ReplaceChildAt(int index, Widget child)
+        {
+            if (child == null || index < 0 || index >= _children.Count)
+            {
+                return false;
+            }
+
+            Widget previous = _children[index];
+            bool wasFocused = _focusedIndex == index;
+            if (wasFocused)
+            {
+                previous?.Unfocus();
+            }
+
+            if (previous != null)
+            {
+                previous.Parent = null;
+            }
+
+            child.Parent = this;
+            _children[index] = child;
+
+            return true;
+        }
+
         public bool SetFocusedChildById(string id)
         {
             if (string.IsNullOrWhiteSpace(id))
