@@ -1518,6 +1518,46 @@ namespace SongsOfConquestAccess.Adapters
             }
         }
 
+        public bool TrySelectNextWielder()
+        {
+            if (_humanAdventureController == null)
+            {
+                SoqAccessPlugin.Instance?.LogWarning("AdventureMapAdapter could not select next wielder: controller is not available.");
+                return true;
+            }
+
+            try
+            {
+                _humanAdventureController.TrySelectNextIdleCommander();
+                return true;
+            }
+            catch (Exception exception)
+            {
+                SoqAccessPlugin.Instance?.LogWarning("AdventureMapAdapter next wielder action failed: " + exception);
+                return true;
+            }
+        }
+
+        public bool TrySelectNextSettlement()
+        {
+            if (_humanAdventureController == null)
+            {
+                SoqAccessPlugin.Instance?.LogWarning("AdventureMapAdapter could not select next settlement: controller is not available.");
+                return true;
+            }
+
+            try
+            {
+                _humanAdventureController.TrySelectNextTown();
+                return true;
+            }
+            catch (Exception exception)
+            {
+                SoqAccessPlugin.Instance?.LogWarning("AdventureMapAdapter next settlement action failed: " + exception);
+                return true;
+            }
+        }
+
         private bool TryInvokeNativeMapInput(
             Vector2Int tilePosition,
             string inputName,

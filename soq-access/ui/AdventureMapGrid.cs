@@ -58,6 +58,8 @@ namespace SongsOfConquestAccess.UI
                 || actionKey == AccessibilityActions.MapMoveEast.Key
                 || actionKey == AccessibilityActions.Activate.Key
                 || actionKey == AccessibilityActions.MapSecondaryAction.Key
+                || actionKey == AccessibilityActions.NextWielder.Key
+                || actionKey == AccessibilityActions.NextSettlement.Key
                 || IsScannerAction(actionKey);
         }
 
@@ -101,6 +103,16 @@ namespace SongsOfConquestAccess.UI
             if (action.Key == AccessibilityActions.MapSecondaryAction.Key)
             {
                 return _adapter.HandleSecondaryAction(_cursorTile);
+            }
+
+            if (action.Key == AccessibilityActions.NextWielder.Key)
+            {
+                return _adapter.TrySelectNextWielder();
+            }
+
+            if (action.Key == AccessibilityActions.NextSettlement.Key)
+            {
+                return _adapter.TrySelectNextSettlement();
             }
 
             return false;

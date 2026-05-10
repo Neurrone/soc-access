@@ -70,6 +70,12 @@ namespace SongsOfConquestAccess.Input
         public static readonly InputAction MapSecondaryAction = OneShot("map_secondary_action", "Map Secondary Action", InputClaimScope.FocusedWidget)
             .AddBinding(new KeyboardBinding(Key.Backslash));
 
+        public static readonly InputAction NextWielder = OneShot("next_wielder", "Next Wielder", InputClaimScope.FocusedWidget)
+            .AddBinding(new KeyboardBinding(Key.W));
+
+        public static readonly InputAction NextSettlement = OneShot("next_settlement", "Next Settlement", InputClaimScope.FocusedWidget)
+            .AddBinding(new KeyboardBinding(Key.S));
+
         public static readonly InputAction ScannerRefresh = OneShot("scanner_refresh", "Refresh Scanner", InputClaimScope.FocusedWidget)
             .AddBinding(new KeyboardBinding(Key.End));
 
@@ -171,6 +177,8 @@ namespace SongsOfConquestAccess.Input
             MapMoveWest,
             MapMoveEast,
             MapSecondaryAction,
+            NextWielder,
+            NextSettlement,
             ScannerRefresh,
             ScannerPreviousCategory,
             ScannerNextCategory,
