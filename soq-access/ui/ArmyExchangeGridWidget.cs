@@ -83,10 +83,12 @@ namespace SongsOfConquestAccess.UI
 
         public override bool ClaimsAction(string actionKey)
         {
-            return actionKey == AccessibilityActions.PreviousArmySlot.Key
-                || actionKey == AccessibilityActions.NextArmySlot.Key
-                || actionKey == AccessibilityActions.PreviousArmy.Key
-                || actionKey == AccessibilityActions.NextArmy.Key
+            return actionKey == AccessibilityActions.PreviousRow.Key
+                || actionKey == AccessibilityActions.NextRow.Key
+                || actionKey == AccessibilityActions.PreviousColumn.Key
+                || actionKey == AccessibilityActions.NextColumn.Key
+                || actionKey == AccessibilityActions.FirstRow.Key
+                || actionKey == AccessibilityActions.LastRow.Key
                 || actionKey == AccessibilityActions.StartDrag.Key
                 || actionKey == AccessibilityActions.Activate.Key
                 || (_dragSource != null && actionKey == AccessibilityActions.Cancel.Key);
@@ -104,24 +106,34 @@ namespace SongsOfConquestAccess.UI
                 return false;
             }
 
-            if (action.Key == AccessibilityActions.PreviousArmySlot.Key)
+            if (action.Key == AccessibilityActions.PreviousRow.Key)
             {
                 return MoveVertical(-1);
             }
 
-            if (action.Key == AccessibilityActions.NextArmySlot.Key)
+            if (action.Key == AccessibilityActions.NextRow.Key)
             {
                 return MoveVertical(1);
             }
 
-            if (action.Key == AccessibilityActions.PreviousArmy.Key)
+            if (action.Key == AccessibilityActions.PreviousColumn.Key)
             {
                 return MoveHorizontal(-1);
             }
 
-            if (action.Key == AccessibilityActions.NextArmy.Key)
+            if (action.Key == AccessibilityActions.NextColumn.Key)
             {
                 return MoveHorizontal(1);
+            }
+
+            if (action.Key == AccessibilityActions.FirstRow.Key)
+            {
+                return MoveToRowEdge(first: true);
+            }
+
+            if (action.Key == AccessibilityActions.LastRow.Key)
+            {
+                return MoveToRowEdge(first: false);
             }
 
             if (action.Key == AccessibilityActions.StartDrag.Key)
@@ -218,6 +230,17 @@ namespace SongsOfConquestAccess.UI
 
             int nextRow = Clamp(_focusedRow, 0, column.Count - 1);
             return SetFocus(nextColumn, nextRow);
+        }
+
+        private bool MoveToRowEdge(bool first)
+        {
+            List<SlotWidget> column = GetColumn(_focusedColumn);
+            if (column.Count == 0)
+            {
+                return false;
+            }
+
+            return SetFocus(_focusedColumn, first ? 0 : column.Count - 1);
         }
 
         private bool SetFocus(int column, int row)

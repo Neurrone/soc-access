@@ -21,6 +21,7 @@ using SongsOfConquest.Common.Gamestate.Commander;
 using SongsOfConquest.Common.Localization;
 using SongsOfConquestAccess.Events;
 using SongsOfConquestAccess.Scanner;
+using SongsOfConquestAccess.Speech;
 using SongsOfConquestAccess.Speech.Spatial;
 using Unity.Mathematics;
 using UnityEngine;
@@ -1307,11 +1308,49 @@ namespace SongsOfConquestAccess.Adapters
 
             DetailsTextUtility captured = DetailsTextUtility.Capture(details, _localizationHandler);
             List<string> textLines = new List<string>(captured.TextLines);
+            EnrichArtifactTooltipLines(details, textLines);
             List<TooltipAction> actions = BuildMapTooltipActions(tile, captured.InstructionRows, textLines);
             return new Tooltip(
                 () => textLines,
                 new VisualTooltipMetadata(tooltipable, GetScreenPoint(tile), details),
                 actions);
+        }
+
+        private void EnrichArtifactTooltipLines(IDetails details, List<string> textLines)
+        {
+            ArtifactPreVisitDetails artifactDetails = details as ArtifactPreVisitDetails;
+            if (artifactDetails == null || artifactDetails.Artifacts == null || textLines == null || textLines.Count == 0)
+            {
+                return;
+            }
+
+            for (int i = 0; i < artifactDetails.Artifacts.Length; i++)
+            {
+                ArtifactDetails artifact = artifactDetails.Artifacts[i];
+                string name = Localize(artifact.NameKey);
+                string formattedName = ArtifactSpeechFormatter.FormatName(name, artifact.PowerLevelColor);
+                if (string.IsNullOrWhiteSpace(name) || name == formattedName)
+                {
+                    continue;
+                }
+
+                ReplaceFirstTooltipLine(textLines, name, formattedName);
+            }
+        }
+
+        private static bool ReplaceFirstTooltipLine(List<string> textLines, string oldText, string newText)
+        {
+            string normalizedOldText = SpeechTextSanitizer.Normalize(oldText);
+            for (int i = 0; i < textLines.Count; i++)
+            {
+                if (SpeechTextSanitizer.Normalize(textLines[i]).Equals(normalizedOldText, StringComparison.OrdinalIgnoreCase))
+                {
+                    textLines[i] = newText;
+                    return true;
+                }
+            }
+
+            return false;
         }
 
         private List<TooltipAction> BuildMapTooltipActions(

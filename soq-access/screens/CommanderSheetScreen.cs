@@ -42,6 +42,11 @@ namespace SongsOfConquestAccess.Screens
         {
             if (action != null && action.Key == AccessibilityActions.Cancel.Key)
             {
+                if (RootWidget != null && RootWidget.HandleAction(action))
+                {
+                    return true;
+                }
+
                 return _adapter != null && _adapter.Close();
             }
 
@@ -56,7 +61,9 @@ namespace SongsOfConquestAccess.Screens
             }
 
             int focusedIndex = RootWidget != null ? RootWidget.FocusedIndex : -1;
+            InventoryGridFocus inventoryGridFocus = CaptureInventoryGridFocus();
             RootWidget = BuildRoot(_adapter);
+            RestoreInventoryGridFocus(focusedIndex, inventoryGridFocus);
 
             if (!focusAfterRefresh)
             {
@@ -67,6 +74,25 @@ namespace SongsOfConquestAccess.Screens
             {
                 RootWidget?.Focus();
             }
+        }
+
+        private InventoryGridFocus CaptureInventoryGridFocus()
+        {
+            InventoryGridWidget grid = RootWidget != null ? RootWidget.FocusedChild as InventoryGridWidget : null;
+            return grid != null
+                ? new InventoryGridFocus(grid.FocusedColumnIndex, grid.FocusedRowIndex)
+                : null;
+        }
+
+        private void RestoreInventoryGridFocus(int rootChildIndex, InventoryGridFocus focus)
+        {
+            if (focus == null || RootWidget == null)
+            {
+                return;
+            }
+
+            InventoryGridWidget grid = RootWidget.GetChildAt(rootChildIndex) as InventoryGridWidget;
+            grid?.SetFocusedCell(focus.ColumnIndex, focus.RowIndex);
         }
 
         private void AttachListeners()
@@ -175,11 +201,10 @@ namespace SongsOfConquestAccess.Screens
             IReadOnlyList<CommanderSheetAdapter.LabeledItem> activeModifiers = GetItemsSafely(activeModifierLabel, adapter.GetActiveModifiers);
             root.AddChild(BuildMenu("commander-sheet-active-modifiers", activeModifierLabel, activeModifiers, adapter.HideNativeTooltip));
 
-            IReadOnlyList<CommanderSheetAdapter.LabeledItem> equipment = GetItemsSafely("Equipment", adapter.GetEquipmentSlots);
-            root.AddChild(BuildMenu("commander-sheet-equipment", "Equipment", equipment));
-
-            IReadOnlyList<CommanderSheetAdapter.LabeledItem> inventory = GetItemsSafely("Inventory", adapter.GetInventoryItems);
-            root.AddChild(BuildMenu("commander-sheet-inventory", "Inventory", inventory, adapter.HideNativeTooltip));
+            root.AddChild(new InventoryGridWidget(
+                "commander-sheet-inventory-grid",
+                adapter.BuildInventoryGridColumns(includeOwnerName: false),
+                adapter.DropInventoryGridArtifact));
 
             IReadOnlyList<CommanderSheetAdapter.LabeledItem> skills = GetItemsSafely("Skills", () => adapter.GetSkills(powers: false));
             root.AddChild(BuildMenu("commander-sheet-skills", "Skills", skills));
@@ -274,6 +299,18 @@ namespace SongsOfConquestAccess.Screens
             }
 
             return menu;
+        }
+
+        private sealed class InventoryGridFocus
+        {
+            public InventoryGridFocus(int columnIndex, int rowIndex)
+            {
+                ColumnIndex = columnIndex;
+                RowIndex = rowIndex;
+            }
+
+            public int ColumnIndex { get; private set; }
+            public int RowIndex { get; private set; }
         }
     }
 }

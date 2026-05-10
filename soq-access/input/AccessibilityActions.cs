@@ -115,17 +115,23 @@ namespace SongsOfConquestAccess.Input
         public static readonly InputAction SliderMaximum = OneShot("slider_maximum", "Slider Maximum", InputClaimScope.FocusedWidget)
             .AddBinding(new KeyboardBinding(Key.End));
 
-        public static readonly InputAction PreviousArmySlot = OneShot("previous_army_slot", "Previous Army Slot", InputClaimScope.FocusedWidget)
+        public static readonly InputAction PreviousRow = OneShot("previous_row", "Previous Row", InputClaimScope.FocusedWidget)
             .AddBinding(new KeyboardBinding(Key.UpArrow));
 
-        public static readonly InputAction NextArmySlot = OneShot("next_army_slot", "Next Army Slot", InputClaimScope.FocusedWidget)
+        public static readonly InputAction NextRow = OneShot("next_row", "Next Row", InputClaimScope.FocusedWidget)
             .AddBinding(new KeyboardBinding(Key.DownArrow));
 
-        public static readonly InputAction PreviousArmy = OneShot("previous_army", "Previous Army", InputClaimScope.FocusedWidget)
+        public static readonly InputAction PreviousColumn = OneShot("previous_column", "Previous Column", InputClaimScope.FocusedWidget)
             .AddBinding(new KeyboardBinding(Key.LeftArrow));
 
-        public static readonly InputAction NextArmy = OneShot("next_army", "Next Army", InputClaimScope.FocusedWidget)
+        public static readonly InputAction NextColumn = OneShot("next_column", "Next Column", InputClaimScope.FocusedWidget)
             .AddBinding(new KeyboardBinding(Key.RightArrow));
+
+        public static readonly InputAction FirstRow = OneShot("first_row", "First Row", InputClaimScope.FocusedWidget)
+            .AddBinding(new KeyboardBinding(Key.Home));
+
+        public static readonly InputAction LastRow = OneShot("last_row", "Last Row", InputClaimScope.FocusedWidget)
+            .AddBinding(new KeyboardBinding(Key.End));
 
         public static readonly InputAction Activate = OneShot("activate", "Activate", InputClaimScope.Screen)
             .AddBinding(new KeyboardBinding(Key.Enter))
@@ -201,10 +207,12 @@ namespace SongsOfConquestAccess.Input
             SliderIncrease,
             SliderMinimum,
             SliderMaximum,
-            PreviousArmySlot,
-            NextArmySlot,
-            PreviousArmy,
-            NextArmy,
+            PreviousRow,
+            NextRow,
+            PreviousColumn,
+            NextColumn,
+            FirstRow,
+            LastRow,
             HexGridWest,
             HexGridEast,
             HexGridNorthWest,
