@@ -45,6 +45,7 @@ namespace SongsOfConquestAccess.Screens
                 new SettlementRuntimeScreenProbe(),
                 new DefenceMenuRuntimeScreenProbe(),
                 new BuildMenuRuntimeScreenProbe(),
+                new ResearchMenuRuntimeScreenProbe(),
                 new PurchaseWielderRuntimeScreenProbe(),
                 new HostileJoinMenuRuntimeScreenProbe(),
                 new MoveTroopPopupRuntimeScreenProbe(),
@@ -818,6 +819,36 @@ namespace SongsOfConquestAccess.Screens
             RefreshCurrentBuildMenu();
         }
 
+        public void OnResearchMenuReady(ResearchMenu menu)
+        {
+            ResearchMenuAdapter adapter = new ResearchMenuAdapter(menu);
+            if (!adapter.IsPresent())
+            {
+                return;
+            }
+
+            if (_screenManager.CurrentScreen is ResearchScreen)
+            {
+                SoqAccessPlugin.Instance?.LogWarning("ScreenDetector ignored duplicate research menu ready while research menu is already top");
+                return;
+            }
+
+            Push(new ResearchScreen(adapter), "research menu ready");
+        }
+
+        public void OnResearchMenuClosed(ResearchMenu menu)
+        {
+            if (_screenManager.CurrentScreen is ResearchScreen)
+            {
+                _screenManager.Pop<ResearchScreen>("research menu closed");
+            }
+        }
+
+        public void OnResearchMenuChanged(ResearchMenu menu)
+        {
+            RefreshCurrentResearchMenu();
+        }
+
         public void OnPurchaseWielderReady(PurchaseWielderMenu menu)
         {
             PurchaseWielderMenuAdapter adapter = new PurchaseWielderMenuAdapter(menu);
@@ -841,6 +872,17 @@ namespace SongsOfConquestAccess.Screens
         private void RefreshCurrentBuildMenu()
         {
             BuildMenuScreen screen = _screenManager.CurrentScreen as BuildMenuScreen;
+            if (screen == null || !screen.IsPresent())
+            {
+                return;
+            }
+
+            screen.Refresh(focusAfterRefresh: true);
+        }
+
+        private void RefreshCurrentResearchMenu()
+        {
+            ResearchScreen screen = _screenManager.CurrentScreen as ResearchScreen;
             if (screen == null || !screen.IsPresent())
             {
                 return;

@@ -284,7 +284,7 @@ namespace SongsOfConquestAccess.Adapters
 
         private void Add(string value)
         {
-            if (!string.IsNullOrWhiteSpace(value) && !_parts.Contains(value))
+            if (!string.IsNullOrWhiteSpace(value))
             {
                 _parts.Add(value);
             }
