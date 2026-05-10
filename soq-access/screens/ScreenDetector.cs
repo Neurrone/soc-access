@@ -3,6 +3,7 @@ using _8_UILayer.ClientView.Menu.Paus;
 using SongsOfConquest.Client;
 using SongsOfConquest.Client.Adventure;
 using SongsOfConquest.Client.Adventure.UI;
+using SongsOfConquest.Client.Adventure.UI.Trading;
 using SongsOfConquest.Client.Adventure.View;
 using SongsOfConquest.Client.Battle;
 using SongsOfConquest.Client.Battle.Facade;
@@ -51,6 +52,7 @@ namespace SongsOfConquestAccess.Screens
                 new WorldConfirmMenuRuntimeScreenProbe(),
                 new LevelUpRuntimeScreenProbe(),
                 new CommanderSheetRuntimeScreenProbe(),
+                new TradingMenuRuntimeScreenProbe(),
                 new LetterboxStoryTextRuntimeScreenProbe(),
                 new StoryTextRuntimeScreenProbe(),
                 new DialogueMenuRuntimeScreenProbe(),
@@ -905,6 +907,43 @@ namespace SongsOfConquestAccess.Screens
             }
 
             OnCommanderSheetChanged();
+        }
+
+        public void OnTradingMenuReady(TradingMenu menu)
+        {
+            TradingScreen screen = new TradingScreen(new TradingMenuAdapter(menu));
+            if (_screenManager.CurrentScreen is TradingScreen)
+            {
+                _screenManager.RefreshTop<TradingScreen>(screen, "trading menu changed");
+                return;
+            }
+
+            Push(screen, "trading menu ready");
+        }
+
+        public void OnTradingMenuClosed(TradingMenu menu)
+        {
+            if (_screenManager.CurrentScreen is TradingScreen)
+            {
+                _screenManager.Pop<TradingScreen>("trading menu closed");
+            }
+        }
+
+        public void OnTradingMenuChanged()
+        {
+            TradingScreen screen = _screenManager.CurrentScreen as TradingScreen;
+            if (screen == null)
+            {
+                return;
+            }
+
+            if (!screen.IsPresent())
+            {
+                _screenManager.Pop<TradingScreen>("trading menu no longer present");
+                return;
+            }
+
+            screen.Refresh(true);
         }
 
         public void ResyncFromRuntimeState()

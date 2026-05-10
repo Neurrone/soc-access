@@ -45,6 +45,16 @@ namespace SongsOfConquestAccess.UI
             }
         }
 
+        public int FocusedColumnIndex
+        {
+            get { return _focusedColumn; }
+        }
+
+        public int FocusedRowIndex
+        {
+            get { return _focusedRow; }
+        }
+
         public override bool AnnounceName
         {
             get { return true; }
@@ -79,6 +89,20 @@ namespace SongsOfConquestAccess.UI
             }
 
             return SetFocusedSlotById(_joiningSlots, 1, id);
+        }
+
+        public bool SetFocusedCell(int columnIndex, int rowIndex)
+        {
+            _focusedColumn = Clamp(columnIndex, 0, 1);
+            List<SlotWidget> column = GetColumn(_focusedColumn);
+            if (column.Count == 0)
+            {
+                ClampFocus();
+                return FocusedSlot != null;
+            }
+
+            _focusedRow = Clamp(rowIndex, 0, column.Count - 1);
+            return FocusedSlot != null;
         }
 
         public override bool ClaimsAction(string actionKey)
