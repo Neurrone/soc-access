@@ -35,6 +35,7 @@ namespace SongsOfConquestAccess.Screens
                 new CampaignMapSelectRuntimeScreenProbe(),
                 new AdventureMapRuntimeScreenProbe(),
                 new OwnedEntitiesRuntimeScreenProbe(),
+                new TroopOverviewRuntimeScreenProbe(),
                 new MapEntityMiniMenuRuntimeScreenProbe(),
                 new CombatRuntimeScreenProbe(),
                 new SpellbookRuntimeScreenProbe(),
@@ -108,6 +109,31 @@ namespace SongsOfConquestAccess.Screens
             if (_screenManager.CurrentScreen is OwnedEntitiesScreen)
             {
                 _screenManager.Pop<OwnedEntitiesScreen>("owned entities closed");
+            }
+        }
+
+        public void OnTroopOverviewReady(KingdomTroopOverviewMenu menu)
+        {
+            KingdomTroopOverviewAdapter adapter = new KingdomTroopOverviewAdapter(menu);
+            if (!adapter.IsPresent())
+            {
+                return;
+            }
+
+            if (_screenManager.CurrentScreen is TroopOverviewScreen)
+            {
+                SoqAccessPlugin.Instance?.LogWarning("ScreenDetector ignored duplicate troop overview ready while troop overview is already top");
+                return;
+            }
+
+            Push(new TroopOverviewScreen(adapter), "troop overview ready");
+        }
+
+        public void OnTroopOverviewClosed(KingdomTroopOverviewMenu menu)
+        {
+            if (_screenManager.CurrentScreen is TroopOverviewScreen)
+            {
+                _screenManager.Pop<TroopOverviewScreen>("troop overview closed");
             }
         }
 
