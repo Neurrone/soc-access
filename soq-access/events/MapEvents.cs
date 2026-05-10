@@ -205,20 +205,25 @@ namespace SongsOfConquestAccess.Events
     internal sealed class MapCameraFocusEvent : IAccessibilityEvent
     {
         public MapCameraFocusEvent(Vector2Int tile)
+            : this(tile, announce: false)
+        {
+        }
+
+        public MapCameraFocusEvent(Vector2Int tile, bool announce)
         {
             Tile = tile;
+            Announce = announce;
         }
 
         public string Kind { get { return AccessibilityEvents.Map.CameraFocus; } }
 
         public Vector2Int Tile { get; private set; }
 
+        public bool Announce { get; private set; }
+
         public string GetSpeechText()
         {
-            // Native HUD paths can emit duplicate center-selection camera focus
-            // events for one user action. This event is still used to move the
-            // accessibility cursor, but speech is intentionally suppressed.
-            return string.Empty;
+            return Announce ? "Map camera focuses on (" + Tile.x + ", " + Tile.y + ")" : string.Empty;
         }
     }
 

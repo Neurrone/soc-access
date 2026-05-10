@@ -1,0 +1,83 @@
+using System.Collections.Generic;
+using SongsOfConquestAccess.Adapters;
+using SongsOfConquestAccess.UI;
+
+namespace SongsOfConquestAccess.Screens
+{
+    internal sealed class OwnedEntitiesScreen : Screen
+    {
+        private readonly KingdomEntityOverviewAdapter _adapter;
+
+        public OwnedEntitiesScreen(KingdomEntityOverviewAdapter adapter)
+            : base(BuildRoot(adapter))
+        {
+            _adapter = adapter;
+        }
+
+        public override bool IsPresent()
+        {
+            return _adapter != null && _adapter.IsPresent();
+        }
+
+        public override void OnUnfocus()
+        {
+            _adapter?.HideNativeTooltip();
+            RootWidget?.Unfocus();
+        }
+
+        public override void OnPop()
+        {
+            _adapter?.HideNativeTooltip();
+        }
+
+        private static ContainerWidget BuildRoot(KingdomEntityOverviewAdapter adapter)
+        {
+            ContainerWidget root = new ContainerWidget("owned-entities", "Owned entities");
+            if (adapter == null)
+            {
+                return root;
+            }
+
+            string title = adapter.Title;
+            root.AddChild(new TextWidget(
+                "owned-entities-title",
+                () => title,
+                adapter.HideNativeTooltip,
+                includeParentLabelInAnnouncement: false,
+                isVisible: () => !string.IsNullOrWhiteSpace(title)));
+
+            IReadOnlyList<KingdomEntityOverviewAdapter.GroupItem> groups = adapter.GetGroups();
+            for (int i = 0; i < groups.Count; i++)
+            {
+                root.AddChild(BuildGroupMenu(groups[i]));
+            }
+
+            return root;
+        }
+
+        private static MenuWidget BuildGroupMenu(KingdomEntityOverviewAdapter.GroupItem group)
+        {
+            MenuWidget menu = new MenuWidget(group.Id, group.Label);
+            IReadOnlyList<KingdomEntityOverviewAdapter.RowItem> rows = group.Rows;
+            for (int i = 0; i < rows.Count; i++)
+            {
+                KingdomEntityOverviewAdapter.RowItem row = rows[i];
+                menu.AddItem(new MenuItemWidget(
+                    row.Id,
+                    () => row.Label,
+                    () => row.Status,
+                    row.Activate,
+                    () =>
+                    {
+                        if (row.Focus != null)
+                        {
+                            row.Focus();
+                        }
+                    },
+                    () => true));
+            }
+
+            return menu;
+        }
+    }
+}

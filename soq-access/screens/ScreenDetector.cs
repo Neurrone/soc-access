@@ -34,6 +34,7 @@ namespace SongsOfConquestAccess.Screens
                 new TaleSelectRuntimeScreenProbe(),
                 new CampaignMapSelectRuntimeScreenProbe(),
                 new AdventureMapRuntimeScreenProbe(),
+                new OwnedEntitiesRuntimeScreenProbe(),
                 new MapEntityMiniMenuRuntimeScreenProbe(),
                 new CombatRuntimeScreenProbe(),
                 new SpellbookRuntimeScreenProbe(),
@@ -83,6 +84,31 @@ namespace SongsOfConquestAccess.Screens
         public void OnPauseMenuClosed(PauseMenu pauseMenu)
         {
             _screenManager.Pop<PauseMenuScreen>("pause menu closed");
+        }
+
+        public void OnOwnedEntitiesReady(KingdomEntityOverviewMenu menu)
+        {
+            KingdomEntityOverviewAdapter adapter = new KingdomEntityOverviewAdapter(menu);
+            if (!adapter.IsPresent())
+            {
+                return;
+            }
+
+            if (_screenManager.CurrentScreen is OwnedEntitiesScreen)
+            {
+                SoqAccessPlugin.Instance?.LogWarning("ScreenDetector ignored duplicate owned entities ready while owned entities is already top");
+                return;
+            }
+
+            Push(new OwnedEntitiesScreen(adapter), "owned entities ready");
+        }
+
+        public void OnOwnedEntitiesClosed(KingdomEntityOverviewMenu menu)
+        {
+            if (_screenManager.CurrentScreen is OwnedEntitiesScreen)
+            {
+                _screenManager.Pop<OwnedEntitiesScreen>("owned entities closed");
+            }
         }
 
         public void OnCodexReady(CodexMenu codexMenu)
