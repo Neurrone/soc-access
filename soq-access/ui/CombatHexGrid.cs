@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using SongsOfConquestAccess.Adapters;
 using SongsOfConquestAccess.Input;
 using SongsOfConquestAccess.Scanner;
+using SongsOfConquestAccess.Screens;
 using SongsOfConquestAccess.Speech;
 using UnityEngine;
 
@@ -77,6 +78,9 @@ namespace SongsOfConquestAccess.UI
                 || actionKey == AccessibilityActions.CombatInspect.Key
                 || actionKey == AccessibilityActions.CombatNextRelevantTile.Key
                 || actionKey == AccessibilityActions.CombatPreviousRelevantTile.Key
+                || actionKey == AccessibilityActions.CombatSummarizeEssence.Key
+                || actionKey == AccessibilityActions.CombatSummarizeEnemyEssence.Key
+                || actionKey == AccessibilityActions.CombatFocusTimeline.Key
                 || (_adapter != null && _adapter.GetTargetingMode() != CombatTargetingMode.None && actionKey == AccessibilityActions.Activate.Key)
                 || actionKey == AccessibilityActions.MapSecondaryAction.Key
                 || IsScannerAction(actionKey)
@@ -148,6 +152,22 @@ namespace SongsOfConquestAccess.UI
             if (action.Key == AccessibilityActions.CombatPreviousRelevantTile.Key)
             {
                 return MoveOrdered(-1);
+            }
+
+            if (action.Key == AccessibilityActions.CombatSummarizeEssence.Key)
+            {
+                return SpeakEssenceSummary();
+            }
+
+            if (action.Key == AccessibilityActions.CombatSummarizeEnemyEssence.Key)
+            {
+                return SpeakEnemyEssenceSummary();
+            }
+
+            if (action.Key == AccessibilityActions.CombatFocusTimeline.Key)
+            {
+                CombatScreen screen = SoqAccessPlugin.Instance?.ScreenManager?.CurrentScreen as CombatScreen;
+                return screen != null && screen.FocusTimeline();
             }
 
             if (action.Key == AccessibilityActions.MapSecondaryAction.Key)
@@ -340,6 +360,29 @@ namespace SongsOfConquestAccess.UI
         private bool JumpToScannerResult(Vector2Int point)
         {
             return SetCursor(point);
+        }
+
+        private bool SpeakEssenceSummary()
+        {
+            string summary = _adapter != null ? _adapter.BuildLocalEssenceSummary() : string.Empty;
+            if (string.IsNullOrWhiteSpace(summary))
+            {
+                summary = "No essence";
+            }
+
+            SpeechPipeline.Output(new SpeechRequest(summary, interrupt: false));
+            return true;
+        }
+
+        private bool SpeakEnemyEssenceSummary()
+        {
+            string summary = _adapter != null ? _adapter.BuildEnemyEssenceSummary() : string.Empty;
+            if (!string.IsNullOrWhiteSpace(summary))
+            {
+                SpeechPipeline.Output(new SpeechRequest(summary, interrupt: false));
+            }
+
+            return true;
         }
 
         private bool HandleScannerAction(InputAction action)

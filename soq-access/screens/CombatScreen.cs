@@ -13,6 +13,7 @@ namespace SongsOfConquestAccess.Screens
     internal sealed class CombatScreen : Screen
     {
         private const int GridIndex = 0;
+        private const int TimelineIndex = 7;
         private readonly CombatAdapter _adapter;
         private readonly CombatHexGrid _grid;
         private Action<TroopAbilityTargeting> _abilityTargetingBeginHandler;
@@ -87,6 +88,17 @@ namespace SongsOfConquestAccess.Screens
             }
 
             RootWidget?.SetFocusByIndex(GridIndex);
+        }
+
+        public bool FocusTimeline()
+        {
+            Widget timeline = RootWidget?.GetChildAt(TimelineIndex);
+            if (timeline == null || !timeline.IsVisible)
+            {
+                return true;
+            }
+
+            return RootWidget.SetFocusByIndex(TimelineIndex);
         }
 
         public override void OnUnfocus()

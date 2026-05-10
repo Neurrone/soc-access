@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Reflection;
 using System.Text.RegularExpressions;
 using HarmonyLib;
@@ -157,6 +158,28 @@ namespace SongsOfConquestAccess.Adapters
                 + GetEssenceAmount(side, essenceType);
         }
 
+        public string BuildEssenceSummary(CombatHudSide side, bool requireVisible)
+        {
+            if (requireVisible && !IsEssenceMenuVisible(side))
+            {
+                return string.Empty;
+            }
+
+            List<string> parts = new List<string>();
+            AddEssenceSummaryPart(parts, side, EssenceType.Order);
+            AddEssenceSummaryPart(parts, side, EssenceType.Creation);
+            AddEssenceSummaryPart(parts, side, EssenceType.Chaos);
+            AddEssenceSummaryPart(parts, side, EssenceType.Arcana);
+            AddEssenceSummaryPart(parts, side, EssenceType.Destruction);
+            return string.Join(", ", parts.ToArray());
+        }
+
+        public int GetCommanderTeamId(CombatHudSide side)
+        {
+            ICommanderState commander = GetCommander(GetCommanderHud(side));
+            return commander != null && !commander.GetIsEmpty() ? commander.TeamId : -1;
+        }
+
         public void FocusEssence(CombatHudSide side, EssenceType essenceType)
         {
             NativeSelectionUtility.Select(GetEssenceTooltipComponent(side, essenceType));
@@ -225,6 +248,17 @@ namespace SongsOfConquestAccess.Adapters
             {
                 return 0;
             }
+        }
+
+        private void AddEssenceSummaryPart(List<string> parts, CombatHudSide side, EssenceType essenceType)
+        {
+            int amount = GetEssenceAmount(side, essenceType);
+            if (amount <= 0)
+            {
+                return;
+            }
+
+            parts.Add(Localize("Units/Types/" + essenceType, FormatEnumName(essenceType.ToString())) + " " + amount);
         }
 
         private Component GetEssenceTooltipComponent(CombatHudSide side, EssenceType essenceType)

@@ -2174,6 +2174,32 @@ namespace SongsOfConquestAccess.Adapters
             get { return GetLocalTeamId(); }
         }
 
+        public string BuildLocalEssenceSummary()
+        {
+            CombatHudSide? side = GetLocalCombatHudSide();
+            if (!side.HasValue)
+            {
+                return string.Empty;
+            }
+
+            return Hud != null && Hud.Commanders != null
+                ? Hud.Commanders.BuildEssenceSummary(side.Value, requireVisible: false)
+                : string.Empty;
+        }
+
+        public string BuildEnemyEssenceSummary()
+        {
+            CombatHudSide? side = GetEnemyCombatHudSide();
+            if (!side.HasValue)
+            {
+                return string.Empty;
+            }
+
+            return Hud != null && Hud.Commanders != null
+                ? Hud.Commanders.BuildEssenceSummary(side.Value, requireVisible: true)
+                : string.Empty;
+        }
+
         public string FormatCommanderEventLabel(int commanderId)
         {
             try
@@ -2246,6 +2272,43 @@ namespace SongsOfConquestAccess.Adapters
             {
                 return -1;
             }
+        }
+
+        private CombatHudSide? GetLocalCombatHudSide()
+        {
+            if (Hud == null || Hud.Commanders == null)
+            {
+                return null;
+            }
+
+            int localTeamId = GetLocalTeamId();
+            if (localTeamId < 0)
+            {
+                return null;
+            }
+
+            if (Hud.Commanders.GetCommanderTeamId(CombatHudSide.Attacker) == localTeamId)
+            {
+                return CombatHudSide.Attacker;
+            }
+
+            if (Hud.Commanders.GetCommanderTeamId(CombatHudSide.Defender) == localTeamId)
+            {
+                return CombatHudSide.Defender;
+            }
+
+            return null;
+        }
+
+        private CombatHudSide? GetEnemyCombatHudSide()
+        {
+            CombatHudSide? localSide = GetLocalCombatHudSide();
+            if (!localSide.HasValue)
+            {
+                return null;
+            }
+
+            return localSide.Value == CombatHudSide.Attacker ? CombatHudSide.Defender : CombatHudSide.Attacker;
         }
 
         public IBattleTroopState GetTroop(int troopId)
