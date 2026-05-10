@@ -7,6 +7,10 @@ using SongsOfConquest.Client;
 using SongsOfConquest.Client.Adventure;
 using SongsOfConquest.Client.Gamestate.Facade;
 using SongsOfConquest.Client.UI;
+using SongsOfConquest.Common;
+using SongsOfConquest.Common.Economy;
+using SongsOfConquest.Common.Entities.Adventure;
+using SongsOfConquest.Common.Gamestate;
 using SongsOfConquest.Common.Localization;
 using SongsOfConquestAccess.Speech;
 using UnityEngine;
@@ -117,10 +121,12 @@ namespace SongsOfConquestAccess.Adapters
             private static readonly FieldInfo SliderField = AccessTools.Field(typeof(UpgradeTroopsEntry), "_slider");
             private static readonly FieldInfo SliderValueField = AccessTools.Field(typeof(UpgradeTroopsEntry), "_sliderValue");
             private static readonly FieldInfo PurchaseButtonField = AccessTools.Field(typeof(UpgradeTroopsEntry), "_purchaseButton");
-            private static readonly FieldInfo PurchaseGoldAmountField = AccessTools.Field(typeof(UpgradeTroopsEntry), "_purchaseButtonGoldAmount");
-            private static readonly FieldInfo PurchaseExoticAmountField = AccessTools.Field(typeof(UpgradeTroopsEntry), "_purchaseButtonExoticAmount");
             private static readonly FieldInfo PurchaseMessageContainerField = AccessTools.Field(typeof(UpgradeTroopsEntry), "_purchaseButtonMessageContainer");
             private static readonly FieldInfo PurchaseMessageTextField = AccessTools.Field(typeof(UpgradeTroopsEntry), "_purchaseButtonMessageText");
+            private static readonly FieldInfo CurrentTroopField = AccessTools.Field(typeof(UpgradeTroopsEntry), "_currentTroop");
+            private static readonly FieldInfo RecruitmentPoolField = AccessTools.Field(typeof(UpgradeTroopsEntry), "_recruitmentPool");
+            private static readonly FieldInfo FactionLookupField = AccessTools.Field(typeof(UpgradeTroopsEntry), "_factionLookup");
+            private static readonly FieldInfo TeamStateField = AccessTools.Field(typeof(UpgradeTroopsEntry), "_teamState");
 
             private static readonly MethodInfo HandleSliderChangedMethod = AccessTools.Method(typeof(UpgradeTroopsEntry), "HandleSliderChanged");
             private static readonly MethodInfo HandlePurchaseClickedMethod = AccessTools.Method(typeof(UpgradeTroopsEntry), "HandlePurchaseClicked");
@@ -228,11 +234,38 @@ namespace SongsOfConquestAccess.Adapters
                         return message;
                     }
 
-                    string gold = GetText(GetField<UITextMesh>(_entry, PurchaseGoldAmountField));
-                    string exotic = GetText(GetField<UITextMesh>(_entry, PurchaseExoticAmountField));
-                    return string.IsNullOrWhiteSpace(exotic)
-                        ? "Upgrade for " + gold + " gold"
-                        : "Upgrade for " + gold + " gold and " + exotic;
+                    IReadOnlyList<ResourceCostLine> costs = UpgradeCosts;
+                    return costs.Count == 0 ? "Upgrade" : "Upgrade for " + FormatCostLines(costs);
+                }
+            }
+
+            private IReadOnlyList<ResourceCostLine> UpgradeCosts
+            {
+                get
+                {
+                    Cost cost = GetUpgradeCost();
+                    if (cost == null || cost.CostEntries == null)
+                    {
+                        return new ResourceCostLine[0];
+                    }
+
+                    List<ResourceCostLine> lines = new List<ResourceCostLine>();
+                    for (int i = 0; i < cost.SortedCostEntries.Count; i++)
+                    {
+                        Cost.CostEntry entry = cost.SortedCostEntries[i];
+                        if (entry.Amount == 0 && entry.Type != ResourceType.Gold)
+                        {
+                            continue;
+                        }
+
+                        ITeamState team = GetField<ITeamState>(_entry, TeamStateField);
+                        bool canAfford = team == null
+                            || team.Resources == null
+                            || team.Resources.CanAffordResource(entry.Type, entry.Amount);
+                        lines.Add(new ResourceCostLine(entry.Type, entry.Amount, canAfford));
+                    }
+
+                    return lines;
                 }
             }
 
@@ -279,6 +312,95 @@ namespace SongsOfConquestAccess.Adapters
                 return slider != null ? slider.SliderValue : 0;
             }
 
+            private Cost GetUpgradeCost()
+            {
+                ITroopState troop = GetField<ITroopState>(_entry, CurrentTroopField);
+                IRecruitmentPoolComponent recruitmentPool = GetField<IRecruitmentPoolComponent>(_entry, RecruitmentPoolField);
+                IFactionLookup factionLookup = GetField<IFactionLookup>(_entry, FactionLookupField);
+                if (troop == null || troop.Reference == null || recruitmentPool == null || factionLookup == null)
+                {
+                    return null;
+                }
+
+                Cost cost = factionLookup.GetBaseTroopUpgradeCost(troop.Reference, SliderValue, troop.Reference.UpgradeType + 1);
+                if (cost != null)
+                {
+                    cost.Multiply(recruitmentPool.UnitCostMultiplier);
+                }
+
+                return cost;
+            }
+
+            private string FormatCostLines(IReadOnlyList<ResourceCostLine> costs)
+            {
+                List<string> parts = new List<string>();
+                for (int i = 0; i < costs.Count; i++)
+                {
+                    ResourceCostLine cost = costs[i];
+                    if (cost != null)
+                    {
+                        parts.Add(cost.Amount + " " + GetResourceName(cost.ResourceType));
+                    }
+                }
+
+                return JoinWithAnd(parts);
+            }
+
+            private string GetResourceName(ResourceType resourceType)
+            {
+                string fallback = FormatEnumName(resourceType.ToString());
+                if (_localization == null)
+                {
+                    return fallback;
+                }
+
+                string key = "Common/Resource/" + resourceType;
+                string text = _localization.GetText(key);
+                return string.IsNullOrWhiteSpace(text) || text == key ? fallback : text;
+            }
+
+            private static string JoinWithAnd(List<string> parts)
+            {
+                if (parts.Count == 0)
+                {
+                    return string.Empty;
+                }
+
+                if (parts.Count == 1)
+                {
+                    return parts[0];
+                }
+
+                if (parts.Count == 2)
+                {
+                    return parts[0] + " and " + parts[1];
+                }
+
+                return string.Join(", ", parts.GetRange(0, parts.Count - 1).ToArray()) + ", and " + parts[parts.Count - 1];
+            }
+
+            private static string FormatEnumName(string value)
+            {
+                if (string.IsNullOrWhiteSpace(value))
+                {
+                    return string.Empty;
+                }
+
+                List<char> chars = new List<char>();
+                for (int i = 0; i < value.Length; i++)
+                {
+                    char c = value[i];
+                    if (i > 0 && char.IsUpper(c) && !char.IsWhiteSpace(value[i - 1]))
+                    {
+                        chars.Add(' ');
+                    }
+
+                    chars.Add(char.ToLowerInvariant(c));
+                }
+
+                return new string(chars.ToArray());
+            }
+
             private UISlider GetSlider()
             {
                 return GetField<UISlider>(_entry, SliderField);
@@ -287,6 +409,20 @@ namespace SongsOfConquestAccess.Adapters
             private UIButton GetPurchaseButton()
             {
                 return GetField<UIButton>(_entry, PurchaseButtonField);
+            }
+
+            private sealed class ResourceCostLine
+            {
+                public ResourceCostLine(ResourceType resourceType, int amount, bool canAfford)
+                {
+                    ResourceType = resourceType;
+                    Amount = amount;
+                    CanAfford = canAfford;
+                }
+
+                public ResourceType ResourceType { get; private set; }
+                public int Amount { get; private set; }
+                public bool CanAfford { get; private set; }
             }
         }
     }

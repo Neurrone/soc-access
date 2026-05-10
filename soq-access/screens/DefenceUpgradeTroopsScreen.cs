@@ -1,4 +1,9 @@
+using System;
 using System.Collections.Generic;
+using SongsOfConquest.Client.Gamestate.Facade;
+using SongsOfConquest.Common;
+using SongsOfConquest.Common.Gamestate;
+using SongsOfConquest.Common.Gamestate.Facade;
 using SongsOfConquestAccess.Adapters;
 using SongsOfConquestAccess.Input;
 using SongsOfConquestAccess.UI;
@@ -8,6 +13,8 @@ namespace SongsOfConquestAccess.Screens
     internal sealed class DefenceUpgradeTroopsScreen : Screen
     {
         private readonly DefenceMenuAdapter _adapter;
+        private Action<OnTroopsUpdatedPayload> _troopsUpdatedHandler;
+        private Action<ResourceUpdatedPayload> _resourceUpdatedHandler;
 
         public DefenceUpgradeTroopsScreen(DefenceMenuAdapter adapter)
             : base(BuildRoot(adapter))
@@ -20,6 +27,11 @@ namespace SongsOfConquestAccess.Screens
             return _adapter != null && _adapter.IsUpgradePresent();
         }
 
+        public override void OnPush()
+        {
+            AttachListeners();
+        }
+
         public override void OnUnfocus()
         {
             _adapter?.HideNativeTooltip();
@@ -28,6 +40,7 @@ namespace SongsOfConquestAccess.Screens
 
         public override void OnPop()
         {
+            DetachListeners();
             _adapter?.HideNativeTooltip();
         }
 
@@ -44,6 +57,94 @@ namespace SongsOfConquestAccess.Screens
             }
 
             return base.OnActionJustPressed(action);
+        }
+
+        public void Refresh(bool focusAfterRefresh)
+        {
+            if (!IsPresent())
+            {
+                return;
+            }
+
+            int focusedIndex = RootWidget != null ? RootWidget.FocusedIndex : -1;
+            RootWidget = BuildRoot(_adapter);
+
+            if (!focusAfterRefresh)
+            {
+                return;
+            }
+
+            if (RootWidget == null || !RootWidget.SetFocusByIndex(focusedIndex))
+            {
+                RootWidget?.Focus();
+            }
+        }
+
+        private void AttachListeners()
+        {
+            if (_adapter == null || _adapter.Facade == null || _adapter.Facade.Commands == null)
+            {
+                return;
+            }
+
+            _troopsUpdatedHandler = HandleTroopsUpdated;
+            _resourceUpdatedHandler = delegate(ResourceUpdatedPayload _) { RefreshIfTop(); };
+
+            IClientCommandsFacade commands = _adapter.Facade.Commands;
+            commands.OnTroopsUpdated = (Action<OnTroopsUpdatedPayload>)Delegate.Combine(
+                commands.OnTroopsUpdated,
+                _troopsUpdatedHandler);
+            commands.OnResourceUpdated = (Action<ResourceUpdatedPayload>)Delegate.Combine(
+                commands.OnResourceUpdated,
+                _resourceUpdatedHandler);
+        }
+
+        private void DetachListeners()
+        {
+            if (_adapter == null || _adapter.Facade == null || _adapter.Facade.Commands == null)
+            {
+                return;
+            }
+
+            IClientCommandsFacade commands = _adapter.Facade.Commands;
+            if (_troopsUpdatedHandler != null)
+            {
+                commands.OnTroopsUpdated = (Action<OnTroopsUpdatedPayload>)Delegate.Remove(
+                    commands.OnTroopsUpdated,
+                    _troopsUpdatedHandler);
+                _troopsUpdatedHandler = null;
+            }
+
+            if (_resourceUpdatedHandler != null)
+            {
+                commands.OnResourceUpdated = (Action<ResourceUpdatedPayload>)Delegate.Remove(
+                    commands.OnResourceUpdated,
+                    _resourceUpdatedHandler);
+                _resourceUpdatedHandler = null;
+            }
+        }
+
+        private void HandleTroopsUpdated(OnTroopsUpdatedPayload payload)
+        {
+            if (payload == null || _adapter == null)
+            {
+                return;
+            }
+
+            if (payload.ParentType != TroopParentType.MapEntity || payload.ParentId != _adapter.MapEntityId)
+            {
+                return;
+            }
+
+            RefreshIfTop();
+        }
+
+        private void RefreshIfTop()
+        {
+            if (ReferenceEquals(SoqAccessPlugin.Instance?.ScreenManager?.CurrentScreen, this))
+            {
+                Refresh(true);
+            }
         }
 
         private static ContainerWidget BuildRoot(DefenceMenuAdapter adapter)
