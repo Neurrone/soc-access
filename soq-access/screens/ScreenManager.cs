@@ -139,6 +139,43 @@ namespace SongsOfConquestAccess.Screens
             return true;
         }
 
+        public bool Remove<TScreen>(string reason) where TScreen : Screen
+        {
+            for (int i = _stack.Count - 1; i >= 0; i--)
+            {
+                if (!(_stack[i] is TScreen))
+                {
+                    continue;
+                }
+
+                bool wasTop = i == _stack.Count - 1;
+                Screen removed = _stack[i];
+                if (wasTop)
+                {
+                    removed.OnUnfocus();
+                    UIManager.Reset();
+                }
+
+                _stack.RemoveAt(i);
+                removed.OnPop();
+
+                if (wasTop)
+                {
+                    CurrentScreen?.OnFocus();
+                }
+
+                return true;
+            }
+
+            SoqAccessPlugin.Instance?.LogWarning(
+                "ScreenManager.Remove ignored "
+                + reason
+                + "; no "
+                + typeof(TScreen).Name
+                + " found in stack");
+            return false;
+        }
+
         public void Clear()
         {
             if (_stack.Count == 0)

@@ -415,11 +415,11 @@ namespace SongsOfConquestAccess.Screens
 
         public void OnMapEntityMiniMenuClosed(MapEntityMiniMenu menu)
         {
-            MapEntityMiniMenuScreen current = _screenManager.CurrentScreen as MapEntityMiniMenuScreen;
-            if (current != null && (menu == null || ReferenceEquals(current.Adapter.Source, menu)))
-            {
-                _screenManager.Pop<MapEntityMiniMenuScreen>("map entity mini menu closed");
-            }
+            // Selling a building closes the native mini menu from inside the
+            // confirm popup's async callback, before ConfirmPopup.Close's
+            // postfix pops MessageDialogScreen. Remove the mini menu screen
+            // even when it is temporarily below that dialog.
+            _screenManager.Remove<MapEntityMiniMenuScreen>("map entity mini menu closed");
         }
 
         public void OnBattleSceneReady(BattleSceneInstaller installer)
