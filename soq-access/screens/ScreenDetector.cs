@@ -62,6 +62,7 @@ namespace SongsOfConquestAccess.Screens
                 new ConfirmPopupRuntimeScreenProbe(),
                 new SystemPopupRuntimeScreenProbe(),
                 new QuitToDesktopPopupRuntimeScreenProbe(),
+                new CodexRuntimeScreenProbe(),
                 new TutorialRuntimeScreenProbe()
             };
         }
@@ -81,6 +82,51 @@ namespace SongsOfConquestAccess.Screens
         public void OnPauseMenuClosed(PauseMenu pauseMenu)
         {
             _screenManager.Pop<PauseMenuScreen>("pause menu closed");
+        }
+
+        public void OnCodexReady(CodexMenu codexMenu)
+        {
+            CodexMenuAdapter adapter = new CodexMenuAdapter(codexMenu);
+            if (!adapter.IsPresent())
+            {
+                return;
+            }
+
+            CodexScreen screen = new CodexScreen(adapter);
+            Push(screen, "codex ready");
+        }
+
+        public void OnCodexClosed(CodexMenu codexMenu)
+        {
+            if (_screenManager.CurrentScreen is CodexScreen)
+            {
+                _screenManager.Pop<CodexScreen>("codex closed");
+            }
+        }
+
+        public void OnCodexTabChanged(CodexMenu codexMenu)
+        {
+            CodexMenuAdapter adapter = new CodexMenuAdapter(codexMenu);
+            if (!adapter.IsPresent())
+            {
+                return;
+            }
+
+            CodexScreen screen = new CodexScreen(adapter);
+            if (_screenManager.CurrentScreen is CodexScreen)
+            {
+                _screenManager.RefreshTop<CodexScreen>(screen, "codex tab changed");
+                return;
+            }
+        }
+
+        public void OnCodexArticleChanged(CodexMenu codexMenu)
+        {
+            CodexScreen screen = _screenManager.CurrentScreen as CodexScreen;
+            if (screen != null)
+            {
+                screen.Refresh(focusAfterRefresh: true);
+            }
         }
 
         public void OnConfirmPopupReady(ConfirmPopup popup)

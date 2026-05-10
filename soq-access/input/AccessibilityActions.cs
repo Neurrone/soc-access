@@ -55,6 +55,12 @@ namespace SongsOfConquestAccess.Input
         public static readonly InputAction LastMenuItem = OneShot("last_menu_item", "Last Menu Item", InputClaimScope.Screen)
             .AddBinding(new KeyboardBinding(Key.End));
 
+        public static readonly InputAction NextHeading = OneShot("next_heading", "Next Heading", InputClaimScope.FocusedWidget)
+            .AddBinding(new KeyboardBinding(Key.H));
+
+        public static readonly InputAction PreviousHeading = OneShot("previous_heading", "Previous Heading", InputClaimScope.FocusedWidget)
+            .AddBinding(new KeyboardBinding(Key.H, shift: true));
+
         public static readonly InputAction MapMoveNorth = OneShot("map_move_north", "Map Move North", InputClaimScope.Screen)
             .AddBinding(new KeyboardBinding(Key.UpArrow));
 
@@ -187,6 +193,8 @@ namespace SongsOfConquestAccess.Input
             PreviousMenuItem,
             FirstMenuItem,
             LastMenuItem,
+            NextHeading,
+            PreviousHeading,
             MapMoveNorth,
             MapMoveSouth,
             MapMoveWest,
