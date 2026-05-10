@@ -42,7 +42,7 @@ namespace SongsOfConquestAccess.UI
                     () => true,
                     () => item.IsOccupied,
                     () => ReferenceEquals(menu.DragSource, widget),
-                    () => item.Tooltip);
+                    () => item.IsOccupied ? item.Tooltip : null);
                 slotByWidget.Add(widget, item);
                 menu.AddItem(widget);
             }
