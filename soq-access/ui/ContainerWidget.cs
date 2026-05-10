@@ -164,6 +164,19 @@ namespace SongsOfConquestAccess.UI
             return false;
         }
 
+        public override bool HasFocusedClaimInTree(string actionKey)
+        {
+            if (ClaimsAction(actionKey))
+            {
+                return true;
+            }
+
+            Widget focusedChild = FocusedChild;
+            return focusedChild != null
+                && focusedChild.IsVisible
+                && focusedChild.HasFocusedClaimInTree(actionKey);
+        }
+
         public override bool HandleAction(InputAction action)
         {
             Widget focusedChild = FocusedChild;

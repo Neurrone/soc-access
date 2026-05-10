@@ -1,25 +1,34 @@
 namespace SongsOfConquestAccess.Input
 {
+    internal enum InputClaimScope
+    {
+        FocusedWidget,
+        Screen
+    }
+
     internal sealed class InputAction
     {
         private readonly System.Collections.Generic.List<InputBinding> _bindings =
             new System.Collections.Generic.List<InputBinding>();
 
-        public InputAction(string key, string label)
-            : this(key, label, InputRepeatPolicy.OneShotUntilRelease())
+        public InputAction(string key, string label, InputClaimScope claimScope)
+            : this(key, label, claimScope, InputRepeatPolicy.OneShotUntilRelease())
         {
         }
 
-        public InputAction(string key, string label, InputRepeatPolicy repeatPolicy)
+        public InputAction(string key, string label, InputClaimScope claimScope, InputRepeatPolicy repeatPolicy)
         {
             Key = key ?? string.Empty;
             Label = label ?? string.Empty;
+            ClaimScope = claimScope;
             RepeatPolicy = repeatPolicy ?? InputRepeatPolicy.OneShotUntilRelease();
         }
 
         public string Key { get; private set; }
 
         public string Label { get; private set; }
+
+        public InputClaimScope ClaimScope { get; private set; }
 
         public InputRepeatPolicy RepeatPolicy { get; private set; }
 

@@ -90,6 +90,11 @@ namespace SongsOfConquestAccess.UI
             return ClaimsAction(actionKey);
         }
 
+        public virtual bool HasFocusedClaimInTree(string actionKey)
+        {
+            return ClaimsAction(actionKey);
+        }
+
         public virtual bool HandleAction(Input.InputAction action)
         {
             return false;

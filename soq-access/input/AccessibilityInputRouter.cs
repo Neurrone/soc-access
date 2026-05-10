@@ -281,7 +281,7 @@ namespace SongsOfConquestAccess.Input
         {
             return action != null
                 && _screenManager != null
-                && _screenManager.CurrentScreenClaimsAction(action.Key);
+                && _screenManager.CurrentScreenClaimsAction(action);
         }
 
         private sealed class ActiveBindingState

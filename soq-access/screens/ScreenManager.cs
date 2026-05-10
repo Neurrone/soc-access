@@ -266,10 +266,17 @@ namespace SongsOfConquestAccess.Screens
             return false;
         }
 
-        public bool CurrentScreenClaimsAction(string actionKey)
+        public bool CurrentScreenClaimsAction(InputAction action)
         {
             Screen screen = CurrentScreen;
-            return screen != null && screen.HasClaimed(actionKey);
+            if (screen == null || action == null)
+            {
+                return false;
+            }
+
+            return action.ClaimScope == InputClaimScope.Screen
+                ? screen.HasClaimed(action.Key)
+                : screen.HasFocusedWidgetClaimed(action.Key);
         }
 
         private static string DescribeScreen(Screen screen)

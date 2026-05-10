@@ -36,6 +36,11 @@ namespace SongsOfConquestAccess.Screens
             return RootWidget.HasClaimInTree(actionKey);
         }
 
+        public virtual bool HasFocusedWidgetClaimed(string actionKey)
+        {
+            return RootWidget.HasFocusedClaimInTree(actionKey);
+        }
+
         public virtual bool OnActionJustPressed(InputAction action)
         {
             return RootWidget.HandleAction(action);

@@ -140,6 +140,11 @@ namespace SongsOfConquestAccess.UI
             return ClaimsFocusedItemAction(actionKey);
         }
 
+        public override bool HasFocusedClaimInTree(string actionKey)
+        {
+            return HasClaimInTree(actionKey);
+        }
+
         public override bool HandleAction(InputAction action)
         {
             if (HandleFocusedItemAction(action))
