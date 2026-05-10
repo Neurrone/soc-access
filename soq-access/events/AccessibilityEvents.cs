@@ -5,10 +5,8 @@ namespace SongsOfConquestAccess.Events
         public static class Map
         {
             public const string WielderSelected = "map.wielder.selected";
-            public const string WielderUnselected = "map.wielder.unselected";
             public const string WielderMoved = "map.wielder.moved";
-            public const string EntitySelected = "map.entity.selected";
-            public const string EntityUnselected = "map.entity.unselected";
+            public const string BuildSiteSelected = "map.build_site.selected";
             public const string DestinationSet = "map.destination.set";
             public const string DestinationCleared = "map.destination.cleared";
             public const string ActionFailed = "map.action.failed";

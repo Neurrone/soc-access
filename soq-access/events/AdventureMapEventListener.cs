@@ -3,6 +3,7 @@ using SongsOfConquest.Client.Adventure;
 using SongsOfConquest.Client.Gamestate;
 using SongsOfConquest.Client.Gamestate.Facade;
 using SongsOfConquest.Common.Entities;
+using SongsOfConquest.Common.Entities.Adventure;
 using SongsOfConquest.Common.Gamestate;
 using SongsOfConquest.Common.Gamestate.Facade;
 using SongsOfConquest.Common.Localization;
@@ -112,14 +113,6 @@ namespace SongsOfConquestAccess.Events
                 return;
             }
 
-            if (payload.DeselectedCommander != null)
-            {
-                AccessibilityEventBus.Publish(new MapWielderUnselectedEvent(
-                    payload.DeselectedCommander.Id,
-                    GetCommanderName(payload.DeselectedCommander),
-                    payload.DeselectedCommander.Position));
-            }
-
             if (payload.SelectedCommander != null)
             {
                 AccessibilityEventBus.Publish(new MapWielderSelectedEvent(
@@ -136,20 +129,19 @@ namespace SongsOfConquestAccess.Events
                 return;
             }
 
-            if (payload.DeselectedMapEntity != null)
+            IMapEntity selected = payload.SelectedMapEntity;
+            if (selected == null || selected.Category != MapEntityCategory.BuildSite)
             {
-                AccessibilityEventBus.Publish(new MapEntityUnselectedEvent(
-                    payload.DeselectedMapEntity.Id,
-                    GetMapEntityName(payload.DeselectedMapEntity),
-                    payload.DeselectedMapEntity.Position));
+                return;
             }
 
-            if (payload.SelectedMapEntity != null)
+            IIsBuildSiteComponent buildSite;
+            if (selected.TryGetComponent<IIsBuildSiteComponent>(out buildSite))
             {
-                AccessibilityEventBus.Publish(new MapEntitySelectedEvent(
-                    payload.SelectedMapEntity.Id,
-                    GetMapEntityName(payload.SelectedMapEntity),
-                    payload.SelectedMapEntity.Position));
+                AccessibilityEventBus.Publish(new BuildSiteSelectedEvent(
+                    selected.Id,
+                    buildSite.Size,
+                    selected.Position));
             }
         }
 

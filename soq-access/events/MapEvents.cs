@@ -1,4 +1,5 @@
 using UnityEngine;
+using SongsOfConquest.Common.Entities.Adventure;
 
 namespace SongsOfConquestAccess.Events
 {
@@ -21,28 +22,6 @@ namespace SongsOfConquestAccess.Events
         public string GetSpeechText()
         {
             return "Selected wielder " + WielderName;
-        }
-    }
-
-    internal sealed class MapWielderUnselectedEvent : IAccessibilityEvent
-    {
-        public MapWielderUnselectedEvent(int wielderId, string wielderName, Vector2Int tile)
-        {
-            WielderId = wielderId;
-            WielderName = string.IsNullOrWhiteSpace(wielderName) ? "wielder" : wielderName;
-            Tile = tile;
-        }
-
-        public string Kind { get { return AccessibilityEvents.Map.WielderUnselected; } }
-        public int WielderId { get; private set; }
-
-        public string WielderName { get; private set; }
-
-        public Vector2Int Tile { get; private set; }
-
-        public string GetSpeechText()
-        {
-            return "Unselected wielder " + WielderName;
         }
     }
 
@@ -73,47 +52,35 @@ namespace SongsOfConquestAccess.Events
         }
     }
 
-    internal sealed class MapEntitySelectedEvent : IAccessibilityEvent
+    internal sealed class BuildSiteSelectedEvent : IAccessibilityEvent
     {
-        public MapEntitySelectedEvent(int entityId, string entityName, Vector2Int tile)
+        public BuildSiteSelectedEvent(int entityId, BuildSiteSize size, Vector2Int tile)
         {
             EntityId = entityId;
-            EntityName = string.IsNullOrWhiteSpace(entityName) ? "entity" : entityName;
+            Size = size;
             Tile = tile;
         }
 
-        public string Kind { get { return AccessibilityEvents.Map.EntitySelected; } }
+        public string Kind { get { return AccessibilityEvents.Map.BuildSiteSelected; } }
         public int EntityId { get; private set; }
 
-        public string EntityName { get; private set; }
+        public BuildSiteSize Size { get; private set; }
 
         public Vector2Int Tile { get; private set; }
 
         public string GetSpeechText()
         {
-            return "Selected " + EntityName;
-        }
-    }
-
-    internal sealed class MapEntityUnselectedEvent : IAccessibilityEvent
-    {
-        public MapEntityUnselectedEvent(int entityId, string entityName, Vector2Int tile)
-        {
-            EntityId = entityId;
-            EntityName = string.IsNullOrWhiteSpace(entityName) ? "entity" : entityName;
-            Tile = tile;
+            return "Selected " + FormatSize(Size) + " build site at " + FormatTile(Tile);
         }
 
-        public string Kind { get { return AccessibilityEvents.Map.EntityUnselected; } }
-        public int EntityId { get; private set; }
-
-        public string EntityName { get; private set; }
-
-        public Vector2Int Tile { get; private set; }
-
-        public string GetSpeechText()
+        private static string FormatSize(BuildSiteSize size)
         {
-            return "Unselected " + EntityName;
+            return size.ToString().ToLowerInvariant();
+        }
+
+        private static string FormatTile(Vector2Int tile)
+        {
+            return "(" + tile.x + ", " + tile.y + ")";
         }
     }
 
