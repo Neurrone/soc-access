@@ -894,7 +894,20 @@ namespace SongsOfConquestAccess.Adapters
         private string GetUIText(FieldInfo field)
         {
             UITextMesh text = GetField<UITextMesh>(field);
+            if (!IsVisibleText(text))
+            {
+                return string.Empty;
+            }
+
             return SpeechTextSanitizer.Normalize(UITextMeshTextUtility.GetEffectiveText(text));
+        }
+
+        private static bool IsVisibleText(UITextMesh text)
+        {
+            return text != null
+                && text.Active
+                && text.gameObject != null
+                && text.gameObject.activeInHierarchy;
         }
 
         private static ICommonTroopState FindTroop(ICommonTroopState[] troops, int troopId)
