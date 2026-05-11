@@ -47,8 +47,7 @@ namespace SongsOfConquestAccess.Adapters
                 return true;
             }
 
-            button.OnClicked?.Invoke();
-            return true;
+            return false;
         }
 
         public static bool PointerClick(Component component)
