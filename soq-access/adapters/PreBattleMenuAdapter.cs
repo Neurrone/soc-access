@@ -302,7 +302,6 @@ namespace SongsOfConquestAccess.Adapters
 
         public void FocusTile(TroopPlacementTile tile)
         {
-            LogFocusedTileDiagnostics(tile);
             DeploymentMenu deployment = GetDeploymentMenu();
             if (deployment == null)
             {
@@ -326,83 +325,6 @@ namespace SongsOfConquestAccess.Adapters
             }
 
             hovered(default(OnTroopHoveredPayload));
-        }
-
-        private void LogFocusedTileDiagnostics(TroopPlacementTile tile)
-        {
-            if (tile == null)
-            {
-                SoqAccessPlugin.Instance?.LogInfo("PreBattle focused tile diagnostic: <null tile>");
-                return;
-            }
-
-            MapFormat map = GetMap();
-            if (map == null)
-            {
-                SoqAccessPlugin.Instance?.LogInfo("PreBattle focused tile diagnostic: point=" + FormatPoint(tile.Point) + "; missing map");
-                return;
-            }
-
-            int index = map.PointToIndex(tile.Point);
-            byte elevation = GetLayerValue(map.Contents.ElevationsArray, index);
-            byte decoration = GetLayerValue(map.Contents.DecorationsArray, index);
-            byte water = GetLayerValue(map.Contents.WaterArray, index);
-            byte terrainType = GetLayerValue(map.Contents.TypesArray, index);
-            byte customType = GetLayerValue(map.Contents.CustomTypesArray, index);
-            byte standaloneDecoration = GetLayerValue(map.Contents.StandaloneDecorationsArray, index);
-            byte effect = GetLayerValue(map.Contents.EffectsArray, index);
-            byte road = GetLayerValue(map.Contents.RoadsArray, index);
-            byte bridge = GetLayerValue(map.Contents.BridgesArray, index);
-
-            string message = "PreBattle focused tile diagnostic: point="
-                + FormatPoint(tile.Point)
-                + "; index="
-                + index
-                + "; rendererCanResolve="
-                + CanResolveTile(tile.Point)
-                + "; water="
-                + water
-                + "; elevation="
-                + elevation
-                + "; type="
-                + terrainType
-                + "; customType="
-                + customType
-                + "; decoration="
-                + decoration
-                + "; decorationIsBlocker="
-                + IsBlocker(decoration)
-                + "; tileIsBlocked="
-                + tile.IsBlocked
-                + "; standaloneDecoration="
-                + standaloneDecoration
-                + "; effect="
-                + effect
-                + "; road="
-                + road
-                + "; bridge="
-                + bridge
-                + "; spawnSide="
-                + DescribeSide(tile.SpawnSide)
-                + "; spawnPointId="
-                + tile.SpawnPointId
-                + "; globalSpawnPointId="
-                + tile.GlobalSpawnPointId
-                + "; troopSide="
-                + DescribeSide(tile.TroopSide)
-                + "; troopId="
-                + tile.TroopId
-                + "; troopHidden="
-                + tile.TroopDetailsHidden
-                + "; troopLabel=\""
-                + (tile.TroopLabel ?? string.Empty)
-                + "\"; entityLabel=\""
-                + (tile.EntityLabel ?? string.Empty)
-                + "\"; exactMapEntities="
-                + DescribeMapEntitiesAt(map, tile.Point)
-                + "; nearbyMapEntities="
-                + DescribeNearbyMapEntities(map, tile.Point, 2);
-            SoqAccessPlugin.Instance?.LogInfo(message);
         }
 
         public void HideNativeTooltip()
@@ -591,7 +513,7 @@ namespace SongsOfConquestAccess.Adapters
                 for (int x = 0; x < snapshot.Size.x; x++)
                 {
                     Vector2Int point = new Vector2Int(x, y);
-                    if (!IsUsableTile(map, point))
+                    if (!IsGridTile(map, point))
                     {
                         continue;
                     }
@@ -600,8 +522,10 @@ namespace SongsOfConquestAccess.Adapters
                     int index = map.PointToIndex(point);
                     byte[] elevations = map.Contents.ElevationsArray;
                     byte[] decorations = map.Contents.DecorationsArray;
+                    byte[] water = map.Contents.WaterArray;
                     tile.Elevation = elevations != null && index < elevations.Length ? elevations[index] : (byte)0;
-                    tile.IsBlocked = decorations != null && index < decorations.Length && IsBlocker(decorations[index]);
+                    tile.IsBlocked = (water != null && index < water.Length && water[index] != 0)
+                        || (decorations != null && index < decorations.Length && IsBlocker(decorations[index]));
                 }
             }
         }
@@ -928,151 +852,19 @@ namespace SongsOfConquestAccess.Adapters
             return null;
         }
 
-        private static bool IsUsableTile(MapFormat map, Vector2Int point)
+        private bool IsGridTile(MapFormat map, Vector2Int point)
         {
             if (map == null || !map.IsPointWithinMap(point))
             {
                 return false;
             }
 
-            byte[] water = map.Contents.WaterArray;
-            int index = map.PointToIndex(point);
-            return water == null || index >= water.Length || water[index] == 0;
+            return CanResolveTile(point);
         }
 
         private static bool IsBlocker(byte value)
         {
             return value == 4 || value == 9 || value == 10;
-        }
-
-        private static string FormatPoint(Vector2Int point)
-        {
-            return "(" + point.x + ", " + point.y + ")";
-        }
-
-        private static byte GetLayerValue(byte[] layer, int index)
-        {
-            return layer != null && index >= 0 && index < layer.Length ? layer[index] : (byte)0;
-        }
-
-        private static string DescribeSide(BattleSide? side)
-        {
-            return side.HasValue ? side.Value.ToString() : "<none>";
-        }
-
-        private static string DescribeMapEntitiesAt(MapFormat map, Vector2Int point)
-        {
-            if (map == null || map.Contents.MapEntities == null)
-            {
-                return "<none>";
-            }
-
-            List<string> entries = new List<string>();
-            for (int i = 0; i < map.Contents.MapEntities.Count; i++)
-            {
-                MapEntityFormat entity = map.Contents.MapEntities[i];
-                if (entity != null && entity.X == point.x && entity.Y == point.y)
-                {
-                    entries.Add(DescribeMapEntity(entity));
-                }
-            }
-
-            return entries.Count > 0 ? string.Join(" | ", entries.ToArray()) : "<none>";
-        }
-
-        private static string DescribeNearbyMapEntities(MapFormat map, Vector2Int point, int radius)
-        {
-            if (map == null || map.Contents.MapEntities == null)
-            {
-                return "<none>";
-            }
-
-            List<string> entries = new List<string>();
-            for (int i = 0; i < map.Contents.MapEntities.Count; i++)
-            {
-                MapEntityFormat entity = map.Contents.MapEntities[i];
-                if (entity == null)
-                {
-                    continue;
-                }
-
-                int dx = Math.Abs(entity.X - point.x);
-                int dy = Math.Abs(entity.Y - point.y);
-                if (dx <= radius && dy <= radius)
-                {
-                    entries.Add("d=(" + dx + "," + dy + ") " + DescribeMapEntity(entity));
-                }
-            }
-
-            return entries.Count > 0 ? string.Join(" | ", entries.ToArray()) : "<none>";
-        }
-
-        private static string DescribeMapEntity(MapEntityFormat entity)
-        {
-            if (entity == null)
-            {
-                return "<null>";
-            }
-
-            return "id="
-                + entity.Id
-                + ",name=\""
-                + (entity.Name ?? string.Empty)
-                + "\",point=("
-                + entity.X
-                + ", "
-                + entity.Y
-                + "),components=["
-                + DescribeComponents(entity.Components)
-                + "]";
-        }
-
-        private static string DescribeComponents(List<MapEntityFormatComponent> components)
-        {
-            if (components == null || components.Count == 0)
-            {
-                return string.Empty;
-            }
-
-            List<string> parts = new List<string>();
-            for (int i = 0; i < components.Count; i++)
-            {
-                MapEntityFormatComponent component = components[i];
-                if (component == null)
-                {
-                    continue;
-                }
-
-                parts.Add((component.Identifier ?? string.Empty) + "{" + DescribeFields(component.Fields) + "}");
-            }
-
-            return string.Join(",", parts.ToArray());
-        }
-
-        private static string DescribeFields(List<MapEntityFormatComponentField> fields)
-        {
-            if (fields == null || fields.Count == 0)
-            {
-                return string.Empty;
-            }
-
-            List<string> parts = new List<string>();
-            int count = Math.Min(fields.Count, 8);
-            for (int i = 0; i < count; i++)
-            {
-                MapEntityFormatComponentField field = fields[i];
-                if (field != null)
-                {
-                    parts.Add((field.Identifier ?? string.Empty) + "=" + (field.Value ?? string.Empty));
-                }
-            }
-
-            if (fields.Count > count)
-            {
-                parts.Add("+" + (fields.Count - count) + " more");
-            }
-
-            return string.Join(",", parts.ToArray());
         }
 
         private void EnsureCursorOverlay()
