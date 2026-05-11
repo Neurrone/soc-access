@@ -8,6 +8,33 @@ namespace SongsOfConquestAccess.Adapters
 {
     internal sealed class AdventureMapTile
     {
+        public sealed class CommanderInfo
+        {
+            public ICommanderState Raw { get; set; }
+
+            public string Name { get; set; }
+
+            public bool IsSelected { get; set; }
+
+            public string Relationship { get; set; }
+
+            public bool IsOwnedByLocalTeam { get; set; }
+
+            public string MovementLabel { get; set; }
+
+            public float MovesLeft { get; set; }
+
+            public float MaxMovement { get; set; }
+
+            public bool HasDestination { get; set; }
+
+            public Vector2Int Destination { get; set; }
+
+            public bool HasThisTurnDestination { get; set; }
+
+            public Vector2Int ThisTurnDestination { get; set; }
+        }
+
         public AdventureMapTile(Vector2Int position)
         {
             Position = position;
@@ -29,13 +56,7 @@ namespace SongsOfConquestAccess.Adapters
 
         public List<string> Environment { get; private set; } = new List<string>();
 
-        public ICommanderState Commander { get; set; }
-
-        public string CommanderName { get; set; }
-
-        public bool IsSelectedCommander { get; set; }
-
-        public string CommanderRelationship { get; set; }
+        public CommanderInfo Commander { get; set; }
 
         public List<string> ZoneOfControlNames { get; private set; } = new List<string>();
 

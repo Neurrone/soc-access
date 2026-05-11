@@ -387,12 +387,10 @@ namespace SongsOfConquestAccess.Adapters
 
             if (tile.IsVisible)
             {
-                tile.Commander = GetCommanderAtVisiblePoint(clamped);
-                if (tile.Commander != null)
+                ICommanderState commander = GetCommanderAtVisiblePoint(clamped);
+                if (commander != null)
                 {
-                    tile.CommanderName = _facade.Commanders.GetName(tile.Commander.Id);
-                    tile.IsSelectedCommander = ReferenceEquals(tile.Commander, selectedCommander);
-                    tile.CommanderRelationship = GetCommanderRelationship(tile.Commander, localTeamId);
+                    tile.Commander = CreateCommanderInfo(commander, selectedCommander, localTeamId);
                 }
             }
 
@@ -473,7 +471,7 @@ namespace SongsOfConquestAccess.Adapters
 
             if (result.StableReference is int stableId)
             {
-                if (tile.Commander != null && tile.Commander.Id == stableId)
+                if (tile.Commander != null && tile.Commander.Raw != null && tile.Commander.Raw.Id == stableId)
                 {
                     return true;
                 }
@@ -505,7 +503,7 @@ namespace SongsOfConquestAccess.Adapters
                     continue;
                 }
 
-                string name = FirstNonEmpty(tile.CommanderName, "wielder");
+                string name = FirstNonEmpty(tile.Commander.Name, "wielder");
                 snapshot.Add("Wielders", "All",
                     new ScannerResult(name, commander.Position) { StableReference = commander.Id });
             }
@@ -2154,6 +2152,65 @@ namespace SongsOfConquestAccess.Adapters
             return _facade.Teams.IsInPartnership(localTeamId, commander.TeamId) ? "friendly" : "enemy";
         }
 
+        private AdventureMapTile.CommanderInfo CreateCommanderInfo(
+            ICommanderState commander,
+            ICommanderState selectedCommander,
+            int localTeamId)
+        {
+            AdventureMapTile.CommanderInfo info = new AdventureMapTile.CommanderInfo
+            {
+                Raw = commander,
+                Name = GetCommanderName(commander),
+                IsSelected = ReferenceEquals(commander, selectedCommander),
+                Relationship = GetCommanderRelationship(commander, localTeamId),
+                IsOwnedByLocalTeam = commander != null && commander.TeamId == localTeamId,
+                MovementLabel = FirstNonEmpty(Localize("Commanders/Tooltip/Movement"), "Movement")
+            };
+
+            if (!info.IsOwnedByLocalTeam || commander == null)
+            {
+                return info;
+            }
+
+            info.MovesLeft = commander.MovesLeft;
+            if (commander.Stats != null && commander.Stats.Movement != null)
+            {
+                info.MaxMovement = commander.Stats.Movement.GetValue();
+            }
+
+            if (commander.Destination == null || !commander.Destination.HasDestination)
+            {
+                return info;
+            }
+
+            info.HasDestination = true;
+            info.Destination = commander.Destination.Destination;
+            PopulateThisTurnDestination(info);
+            return info;
+        }
+
+        private void PopulateThisTurnDestination(AdventureMapTile.CommanderInfo info)
+        {
+            if (info == null || info.Raw == null || !info.HasDestination || _facade == null || _facade.Level == null)
+            {
+                return;
+            }
+
+            try
+            {
+                var reachablePointInPath = _facade.Level.GetReachablePointInPath(info.Raw, info.Destination);
+                if (reachablePointInPath.Item1)
+                {
+                    info.HasThisTurnDestination = true;
+                    info.ThisTurnDestination = reachablePointInPath.Item2;
+                }
+            }
+            catch (Exception exception)
+            {
+                SoqAccessPlugin.Instance?.LogWarning("AdventureMapAdapter failed to read commander destination path: " + exception.Message);
+            }
+        }
+
         private ICommanderState GetCommanderAtVisiblePoint(Vector2Int position)
         {
             IEnumerable<ICommanderState> commanders = _facade.Commanders.All;
@@ -2320,7 +2377,7 @@ namespace SongsOfConquestAccess.Adapters
                 + "; selectedCommanderState="
                 + DescribeCommanderStateForDiagnostics(selectedCommander)
                 + "; commander="
-                + DescribeCommander(tile.Commander)
+                + DescribeCommander(tile.Commander != null ? tile.Commander.Raw : null)
                 + "; nativeCommanderAtPoint="
                 + DescribeCommander(nativeCommanderAtPoint)
                 + "; mapEntity="

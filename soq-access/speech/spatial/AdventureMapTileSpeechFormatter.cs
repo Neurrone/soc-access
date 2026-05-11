@@ -1,3 +1,5 @@
+using System;
+using System.Globalization;
 using System.Collections.Generic;
 using SongsOfConquestAccess.Adapters;
 
@@ -95,18 +97,20 @@ namespace SongsOfConquestAccess.Speech.Spatial
             if (tile.Commander != null && tile.IsVisible)
             {
                 List<string> details = new List<string>();
-                if (!string.IsNullOrWhiteSpace(tile.CommanderRelationship))
+                AdventureMapTile.CommanderInfo commander = tile.Commander;
+                if (!string.IsNullOrWhiteSpace(commander.Relationship))
                 {
-                    details.Add(tile.CommanderRelationship);
+                    details.Add(commander.Relationship);
                 }
 
-                if (tile.IsSelectedCommander)
+                if (commander.IsSelected)
                 {
                     details.Add("selected");
                 }
 
+                AddCommanderMovementDetails(commander, details);
                 details.AddRange(GetMovementDetails(tile));
-                return AppendDetails(FirstNonEmpty(tile.CommanderName, "Commander"), details);
+                return AppendDetails(FirstNonEmpty(commander.Name, "Commander"), details);
             }
 
             if (tile.MapEntity != null)
@@ -203,6 +207,41 @@ namespace SongsOfConquestAccess.Speech.Spatial
             }
 
             return details;
+        }
+
+        private static void AddCommanderMovementDetails(AdventureMapTile.CommanderInfo commander, List<string> details)
+        {
+            if (commander == null || details == null || !commander.IsOwnedByLocalTeam)
+            {
+                return;
+            }
+
+            details.Add(FirstNonEmpty(commander.MovementLabel, "Movement") + ": "
+                + FormatMovementValue(commander.MovesLeft)
+                + " / "
+                + FormatMovementValue(commander.MaxMovement));
+
+            if (!commander.HasDestination)
+            {
+                return;
+            }
+
+            details.Add("Destination: " + FormatPoint(commander.Destination));
+            if (commander.HasThisTurnDestination && commander.ThisTurnDestination != commander.Destination)
+            {
+                details.Add("This turn: " + FormatPoint(commander.ThisTurnDestination));
+            }
+        }
+
+        private static string FormatMovementValue(float value)
+        {
+            float normalized = value < 0.5f ? 0f : value;
+            return Math.Round(normalized, 2).ToString("g2", CultureInfo.InvariantCulture);
+        }
+
+        private static string FormatPoint(UnityEngine.Vector2Int point)
+        {
+            return "(" + point.x + ", " + point.y + ")";
         }
 
         private static string AppendDetails(string name, List<string> details)
