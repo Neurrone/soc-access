@@ -274,8 +274,7 @@ namespace SongsOfConquestAccess.Adapters
                 return false;
             }
 
-            button.onClick.Invoke();
-            return true;
+            return NativeSelectionUtility.Click(button);
         }
 
         public bool ClearQuickbarSlot(int index)

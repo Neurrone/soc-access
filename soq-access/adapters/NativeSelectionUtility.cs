@@ -50,6 +50,16 @@ namespace SongsOfConquestAccess.Adapters
             return false;
         }
 
+        public static bool Click(Button button)
+        {
+            if (button == null || !button.IsActive() || !button.IsInteractable())
+            {
+                return false;
+            }
+
+            return Click((Component)button, PointerEventData.InputButton.Left);
+        }
+
         public static bool PointerClick(Component component)
         {
             return Click(component, PointerEventData.InputButton.Left);
