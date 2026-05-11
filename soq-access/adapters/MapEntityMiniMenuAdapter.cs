@@ -137,7 +137,7 @@ namespace SongsOfConquestAccess.Adapters
                 int used;
                 int total;
                 GetUpgradeCounts(out used, out total);
-                return "Upgrades: " + used + " slots used, " + total + " total";
+                return GetLocalizedText("Adventure/MapEntityHUD/Upgrades", "Tier:") + " " + used + " / " + total;
             }
         }
 
@@ -295,6 +295,18 @@ namespace SongsOfConquestAccess.Adapters
         private ILocalizationHandler Localization
         {
             get { return GetField<ILocalizationHandler>(_menu, LocalizationField); }
+        }
+
+        private string GetLocalizedText(string key, string fallback)
+        {
+            ILocalizationHandler localization = Localization;
+            if (localization == null || string.IsNullOrWhiteSpace(key))
+            {
+                return fallback ?? string.Empty;
+            }
+
+            string text = SpeechTextSanitizer.Normalize(localization.GetText(key));
+            return string.IsNullOrWhiteSpace(text) ? fallback ?? string.Empty : text;
         }
 
         private void GetUpgradeCounts(out int used, out int total)
