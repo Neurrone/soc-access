@@ -20,13 +20,13 @@ namespace SongsOfConquestAccess.Screens
                 DefenceMenuAdapter adapter = new DefenceMenuAdapter(menus[i]);
                 if (adapter.IsDraftPresent())
                 {
-                    screens.Add(new DefenceDraftTroopsScreen(adapter));
+                    screens.Add(new DraftTroopsScreen(new DefenceTroopManagementHostAdapter(adapter)));
                     continue;
                 }
 
                 if (adapter.IsUpgradePresent())
                 {
-                    screens.Add(new DefenceUpgradeTroopsScreen(adapter));
+                    screens.Add(new UpgradeTroopsScreen(new DefenceTroopManagementHostAdapter(adapter)));
                     continue;
                 }
 

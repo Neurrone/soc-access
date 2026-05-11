@@ -1,108 +1,41 @@
+using System;
 using System.Collections.Generic;
-using SongsOfConquest.Client;
 using SongsOfConquest.Common;
 using SongsOfConquest.Common.Economy;
-using SongsOfConquest.Common.Gamestate.Faction;
 using SongsOfConquest.Common.Localization;
 using SongsOfConquestAccess.Adapters;
-using SongsOfConquestAccess.Input;
 using SongsOfConquestAccess.UI;
 
 namespace SongsOfConquestAccess.Screens
 {
-    internal sealed class DefenceDraftTroopsScreen : Screen
+    internal sealed class DraftTroopsScreen : TroopManagementScreenBase
     {
-        private readonly DefenceMenuAdapter _adapter;
-
-        public DefenceDraftTroopsScreen(DefenceMenuAdapter adapter)
-            : base(BuildRoot(adapter))
+        public DraftTroopsScreen(ITroopManagementHostAdapter host)
+            : base(host)
         {
-            _adapter = adapter;
         }
 
-        public override bool IsPresent()
-        {
-            return _adapter != null && _adapter.IsDraftPresent();
-        }
+        protected override string ScreenSuffix { get { return "draft-troops"; } }
+        protected override string ScreenTitle { get { return Host != null ? Host.DraftScreenTitle : "Draft troops"; } }
+        protected override bool IsContentPresent() { return Host != null && Host.IsDraftPresent(); }
 
-        public override void OnUnfocus()
+        protected override void AddContentWidgets(ContainerWidget root)
         {
-            _adapter?.HideNativeTooltip();
-            RootWidget?.Unfocus();
-        }
-
-        public override void OnPop()
-        {
-            _adapter?.HideNativeTooltip();
-        }
-
-        public override bool OnActionJustPressed(InputAction action)
-        {
-            if (action != null && action.Key == AccessibilityActions.Cancel.Key)
+            if (root == null || Host == null || Host.PurchaseTroops == null)
             {
-                if (RootWidget != null && RootWidget.HandleAction(action))
-                {
-                    return true;
-                }
-
-                return _adapter != null && _adapter.BackToTop();
+                return;
             }
 
-            return base.OnActionJustPressed(action);
-        }
-
-        private static ContainerWidget BuildRoot(DefenceMenuAdapter adapter)
-        {
-            ContainerWidget root = new ContainerWidget("defences-draft-troops", "Draft defending troops");
-            if (adapter == null)
-            {
-                return root;
-            }
-
-            root.AddChild(new ButtonWidget(
-                "defences-draft-tutorial",
-                adapter.GetTutorialButtonLabel(),
-                adapter.ActivateTutorial,
-                adapter.HideNativeTooltip,
-                adapter.IsTutorialButtonVisible,
-                adapter.IsTutorialButtonVisible));
-
-            root.AddChild(new TextWidget(
-                "defences-draft-title",
-                () => adapter.Title,
-                adapter.HideNativeTooltip,
-                includeParentLabelInAnnouncement: false));
-
-            PurchaseTroopsSubMenuAdapter subMenu = adapter.PurchaseTroops;
-            IReadOnlyList<PurchaseTroopsSubMenuAdapter.RecruitEntry> entries = subMenu.GetRecruitEntries();
+            IReadOnlyList<PurchaseTroopsSubMenuAdapter.RecruitEntry> entries = Host.PurchaseTroops.GetRecruitEntries();
             for (int i = 0; i < entries.Count; i++)
             {
-                AddRecruitWidgets(root, entries[i], adapter);
+                AddRecruitWidgets(root, entries[i]);
             }
-
-            root.AddChild(new ButtonWidget(
-                "defences-draft-back",
-                "Back",
-                adapter.BackToTop,
-                adapter.HideNativeTooltip,
-                () => adapter.IsDraftPresent()));
-
-            root.AddChild(new ButtonWidget(
-                "defences-draft-close",
-                () => adapter.CloseLabel,
-                adapter.Close,
-                adapter.HideNativeTooltip,
-                () => adapter.IsDraftPresent()));
-
-            return root;
         }
 
-        private static void AddRecruitWidgets(
-            ContainerWidget root,
-            PurchaseTroopsSubMenuAdapter.RecruitEntry entry,
-            DefenceMenuAdapter adapter)
+        private void AddRecruitWidgets(ContainerWidget root, PurchaseTroopsSubMenuAdapter.RecruitEntry entry)
         {
-            if (root == null || entry == null)
+            if (root == null || entry == null || Host == null)
             {
                 return;
             }
@@ -122,7 +55,7 @@ namespace SongsOfConquestAccess.Screens
             root.AddChild(new TextWidget(
                 entry.IdPrefix + "-no-troops",
                 () => entry.NoTroopsText,
-                adapter.HideNativeTooltip,
+                Host.HideNativeTooltip,
                 includeParentLabelInAnnouncement: false,
                 isVisible: () => entry.IsNoTroopsVisible));
 

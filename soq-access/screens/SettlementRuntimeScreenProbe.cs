@@ -20,13 +20,13 @@ namespace SongsOfConquestAccess.Screens
                 TownInteractionMenuAdapter adapter = new TownInteractionMenuAdapter(menus[i]);
                 if (adapter.IsDraftPresent())
                 {
-                    screens.Add(new SettlementDraftTroopsScreen(adapter));
+                    screens.Add(new DraftTroopsScreen(new SettlementTroopManagementHostAdapter(adapter)));
                     continue;
                 }
 
                 if (adapter.IsUpgradePresent())
                 {
-                    screens.Add(new SettlementUpgradeTroopsScreen(adapter));
+                    screens.Add(new UpgradeTroopsScreen(new SettlementTroopManagementHostAdapter(adapter)));
                     continue;
                 }
 

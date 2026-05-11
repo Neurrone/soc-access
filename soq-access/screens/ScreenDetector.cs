@@ -767,19 +767,61 @@ namespace SongsOfConquestAccess.Screens
 
         public void OnDwellingInteractionReady(DwellingInteractionMenu menu)
         {
-            DwellingInteractionScreen screen = new DwellingInteractionScreen(new DwellingInteractionMenuAdapter(menu));
-            if (_screenManager.CurrentScreen is DwellingInteractionScreen)
+            DraftTroopsScreen screen = new DraftTroopsScreen(new DwellingTroopManagementHostAdapter(new DwellingInteractionMenuAdapter(menu)));
+            DraftTroopsScreen currentDraft = _screenManager.CurrentScreen as DraftTroopsScreen;
+            if (currentDraft != null && currentDraft.HostIdPrefix == "dwelling")
             {
-                _screenManager.RefreshTop<DwellingInteractionScreen>(screen, "dwelling interaction changed");
+                _screenManager.RefreshTop<DraftTroopsScreen>(screen, "dwelling draft changed");
                 return;
             }
 
-            Push(screen, "dwelling interaction ready");
+            Push(screen, "dwelling draft ready");
+        }
+
+        public void OnDwellingUpgradeReady(DwellingInteractionMenu menu)
+        {
+            DraftTroopsScreen draft = _screenManager.CurrentScreen as DraftTroopsScreen;
+            if (draft != null && draft.HostIdPrefix == "dwelling")
+            {
+                _screenManager.Pop<DraftTroopsScreen>("dwelling upgrade opened");
+            }
+
+            Push(new UpgradeTroopsScreen(new DwellingTroopManagementHostAdapter(new DwellingInteractionMenuAdapter(menu))), "dwelling upgrade ready");
+        }
+
+        public void OnDwellingBackToTop(DwellingInteractionMenu menu)
+        {
+            UpgradeTroopsScreen upgrade = _screenManager.CurrentScreen as UpgradeTroopsScreen;
+            if (upgrade != null && upgrade.HostIdPrefix == "dwelling")
+            {
+                _screenManager.Pop<UpgradeTroopsScreen>("dwelling upgrade closed");
+            }
+            else
+            {
+                DraftTroopsScreen draft = _screenManager.CurrentScreen as DraftTroopsScreen;
+                if (draft != null && draft.HostIdPrefix == "dwelling")
+                {
+                    SoqAccessPlugin.Instance?.LogWarning("ScreenDetector ignored dwelling back to top while draft is already top");
+                    return;
+                }
+            }
+
+            Push(new DraftTroopsScreen(new DwellingTroopManagementHostAdapter(new DwellingInteractionMenuAdapter(menu))), "dwelling draft ready");
         }
 
         public void OnDwellingInteractionClosed(DwellingInteractionMenu menu)
         {
-            _screenManager.Pop<DwellingInteractionScreen>("dwelling interaction closed");
+            UpgradeTroopsScreen upgrade = _screenManager.CurrentScreen as UpgradeTroopsScreen;
+            if (upgrade != null && upgrade.HostIdPrefix == "dwelling")
+            {
+                _screenManager.Pop<UpgradeTroopsScreen>("dwelling closed with upgrade open");
+            }
+
+            DraftTroopsScreen draft = _screenManager.CurrentScreen as DraftTroopsScreen;
+            if (draft != null && draft.HostIdPrefix == "dwelling")
+            {
+                _screenManager.Pop<DraftTroopsScreen>("dwelling interaction closed");
+            }
         }
 
         public void OnSettlementReady(TownInteractionMenu menu)
@@ -801,7 +843,7 @@ namespace SongsOfConquestAccess.Screens
                 _screenManager.Pop<SettlementScreen>("settlement draft opened");
             }
 
-            Push(new SettlementDraftTroopsScreen(new TownInteractionMenuAdapter(menu)), "settlement draft ready");
+            Push(new DraftTroopsScreen(new SettlementTroopManagementHostAdapter(new TownInteractionMenuAdapter(menu))), "settlement draft ready");
         }
 
         public void OnSettlementUpgradeReady(TownInteractionMenu menu)
@@ -811,23 +853,28 @@ namespace SongsOfConquestAccess.Screens
                 _screenManager.Pop<SettlementScreen>("settlement upgrade opened");
             }
 
-            Push(new SettlementUpgradeTroopsScreen(new TownInteractionMenuAdapter(menu)), "settlement upgrade ready");
+            Push(new UpgradeTroopsScreen(new SettlementTroopManagementHostAdapter(new TownInteractionMenuAdapter(menu))), "settlement upgrade ready");
         }
 
         public void OnSettlementBackToTop(TownInteractionMenu menu)
         {
-            if (_screenManager.CurrentScreen is SettlementDraftTroopsScreen)
+            DraftTroopsScreen draft = _screenManager.CurrentScreen as DraftTroopsScreen;
+            if (draft != null && draft.HostIdPrefix == "settlement")
             {
-                _screenManager.Pop<SettlementDraftTroopsScreen>("settlement draft closed");
+                _screenManager.Pop<DraftTroopsScreen>("settlement draft closed");
             }
-            else if (_screenManager.CurrentScreen is SettlementUpgradeTroopsScreen)
+            else
             {
-                _screenManager.Pop<SettlementUpgradeTroopsScreen>("settlement upgrade closed");
-            }
-            else if (_screenManager.CurrentScreen is SettlementScreen)
-            {
-                SoqAccessPlugin.Instance?.LogWarning("ScreenDetector ignored settlement back to top while settlement is already top");
-                return;
+                UpgradeTroopsScreen upgrade = _screenManager.CurrentScreen as UpgradeTroopsScreen;
+                if (upgrade != null && upgrade.HostIdPrefix == "settlement")
+                {
+                    _screenManager.Pop<UpgradeTroopsScreen>("settlement upgrade closed");
+                }
+                else if (_screenManager.CurrentScreen is SettlementScreen)
+                {
+                    SoqAccessPlugin.Instance?.LogWarning("ScreenDetector ignored settlement back to top while settlement is already top");
+                    return;
+                }
             }
 
             Push(new SettlementScreen(new TownInteractionMenuAdapter(menu)), "settlement top level ready");
@@ -835,14 +882,16 @@ namespace SongsOfConquestAccess.Screens
 
         public void OnSettlementClosed(TownInteractionMenu menu)
         {
-            if (_screenManager.CurrentScreen is SettlementDraftTroopsScreen)
+            DraftTroopsScreen draft = _screenManager.CurrentScreen as DraftTroopsScreen;
+            if (draft != null && draft.HostIdPrefix == "settlement")
             {
-                _screenManager.Pop<SettlementDraftTroopsScreen>("settlement closed with draft open");
+                _screenManager.Pop<DraftTroopsScreen>("settlement closed with draft open");
             }
 
-            if (_screenManager.CurrentScreen is SettlementUpgradeTroopsScreen)
+            UpgradeTroopsScreen upgrade = _screenManager.CurrentScreen as UpgradeTroopsScreen;
+            if (upgrade != null && upgrade.HostIdPrefix == "settlement")
             {
-                _screenManager.Pop<SettlementUpgradeTroopsScreen>("settlement closed with upgrade open");
+                _screenManager.Pop<UpgradeTroopsScreen>("settlement closed with upgrade open");
             }
 
             if (_screenManager.CurrentScreen is SettlementScreen)
@@ -870,7 +919,7 @@ namespace SongsOfConquestAccess.Screens
                 _screenManager.Pop<DefenceMenuScreen>("defence draft opened");
             }
 
-            Push(new DefenceDraftTroopsScreen(new DefenceMenuAdapter(menu)), "defence draft ready");
+            Push(new DraftTroopsScreen(new DefenceTroopManagementHostAdapter(new DefenceMenuAdapter(menu))), "defence draft ready");
         }
 
         public void OnDefenceUpgradeReady(DefenceMenu menu)
@@ -880,27 +929,32 @@ namespace SongsOfConquestAccess.Screens
                 _screenManager.Pop<DefenceMenuScreen>("defence upgrade opened");
             }
 
-            Push(new DefenceUpgradeTroopsScreen(new DefenceMenuAdapter(menu)), "defence upgrade ready");
+            Push(new UpgradeTroopsScreen(new DefenceTroopManagementHostAdapter(new DefenceMenuAdapter(menu))), "defence upgrade ready");
         }
 
         public void OnDefenceMenuBackToTop(DefenceMenu menu)
         {
-            if (_screenManager.CurrentScreen is DefenceDraftTroopsScreen)
+            DraftTroopsScreen draft = _screenManager.CurrentScreen as DraftTroopsScreen;
+            if (draft != null && draft.HostIdPrefix == "defences")
             {
-                _screenManager.Pop<DefenceDraftTroopsScreen>("defence draft closed");
-            }
-            else if (_screenManager.CurrentScreen is DefenceUpgradeTroopsScreen)
-            {
-                _screenManager.Pop<DefenceUpgradeTroopsScreen>("defence upgrade closed");
-            }
-            else if (_screenManager.CurrentScreen is DefenceMenuScreen)
-            {
-                SoqAccessPlugin.Instance?.LogWarning("ScreenDetector ignored defence back to top while defence menu is already top");
-                return;
+                _screenManager.Pop<DraftTroopsScreen>("defence draft closed");
             }
             else
             {
-                return;
+                UpgradeTroopsScreen upgrade = _screenManager.CurrentScreen as UpgradeTroopsScreen;
+                if (upgrade != null && upgrade.HostIdPrefix == "defences")
+                {
+                    _screenManager.Pop<UpgradeTroopsScreen>("defence upgrade closed");
+                }
+                else if (_screenManager.CurrentScreen is DefenceMenuScreen)
+                {
+                    SoqAccessPlugin.Instance?.LogWarning("ScreenDetector ignored defence back to top while defence menu is already top");
+                    return;
+                }
+                else
+                {
+                    return;
+                }
             }
 
             Push(new DefenceMenuScreen(new DefenceMenuAdapter(menu)), "defence top level ready");
@@ -908,14 +962,16 @@ namespace SongsOfConquestAccess.Screens
 
         public void OnDefenceMenuClosed(DefenceMenu menu)
         {
-            if (_screenManager.CurrentScreen is DefenceDraftTroopsScreen)
+            DraftTroopsScreen draft = _screenManager.CurrentScreen as DraftTroopsScreen;
+            if (draft != null && draft.HostIdPrefix == "defences")
             {
-                _screenManager.Pop<DefenceDraftTroopsScreen>("defence closed with draft open");
+                _screenManager.Pop<DraftTroopsScreen>("defence closed with draft open");
             }
 
-            if (_screenManager.CurrentScreen is DefenceUpgradeTroopsScreen)
+            UpgradeTroopsScreen upgrade = _screenManager.CurrentScreen as UpgradeTroopsScreen;
+            if (upgrade != null && upgrade.HostIdPrefix == "defences")
             {
-                _screenManager.Pop<DefenceUpgradeTroopsScreen>("defence closed with upgrade open");
+                _screenManager.Pop<UpgradeTroopsScreen>("defence closed with upgrade open");
             }
 
             if (_screenManager.CurrentScreen is DefenceMenuScreen)

@@ -18,9 +18,15 @@ namespace SongsOfConquestAccess.Screens
             for (int i = 0; i < menus.Length; i++)
             {
                 DwellingInteractionMenuAdapter adapter = new DwellingInteractionMenuAdapter(menus[i]);
-                if (adapter.IsPresent())
+                if (adapter.IsUpgradePresent())
                 {
-                    screens.Add(new DwellingInteractionScreen(adapter));
+                    screens.Add(new UpgradeTroopsScreen(new DwellingTroopManagementHostAdapter(adapter)));
+                    continue;
+                }
+
+                if (adapter.IsDraftPresent())
+                {
+                    screens.Add(new DraftTroopsScreen(new DwellingTroopManagementHostAdapter(adapter)));
                 }
             }
         }

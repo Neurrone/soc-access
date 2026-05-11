@@ -49,12 +49,44 @@ namespace SongsOfConquestAccess
             }
         }
 
+        [HarmonyPatch(typeof(DwellingInteractionMenu), "HandleUpgradeClicked")]
+        [HarmonyPostfix]
+        private static void DwellingInteractionMenuHandleUpgradeClickedPostfix(DwellingInteractionMenu __instance)
+        {
+            StartWaitForUpgrade(__instance);
+        }
+
+        [HarmonyPatch(typeof(DwellingInteractionMenu), "HandleBackClicked")]
+        [HarmonyPostfix]
+        private static void DwellingInteractionMenuHandleBackClickedPostfix(DwellingInteractionMenu __instance)
+        {
+            StartWaitForDraftFromSubMenu(__instance);
+        }
+
         private static void StartWaitForReady(DwellingInteractionMenu menu)
         {
             SoqAccessPlugin plugin = SoqAccessPlugin.Instance;
             if (plugin != null && menu != null)
             {
                 plugin.StartCoroutine(WaitForReady(menu));
+            }
+        }
+
+        private static void StartWaitForDraftFromSubMenu(DwellingInteractionMenu menu)
+        {
+            SoqAccessPlugin plugin = SoqAccessPlugin.Instance;
+            if (plugin != null && menu != null)
+            {
+                plugin.StartCoroutine(WaitForDraftFromSubMenu(menu));
+            }
+        }
+
+        private static void StartWaitForUpgrade(DwellingInteractionMenu menu)
+        {
+            SoqAccessPlugin plugin = SoqAccessPlugin.Instance;
+            if (plugin != null && menu != null)
+            {
+                plugin.StartCoroutine(WaitForUpgrade(menu));
             }
         }
 
@@ -67,6 +99,40 @@ namespace SongsOfConquestAccess
                 if (adapter.IsPresent())
                 {
                     SoqAccessPlugin.Instance?.ScreenDetector?.OnDwellingInteractionReady(menu);
+                    yield break;
+                }
+
+                frames++;
+                yield return null;
+            }
+        }
+
+        private static IEnumerator WaitForDraftFromSubMenu(DwellingInteractionMenu menu)
+        {
+            int frames = 0;
+            while (menu != null && frames < 120)
+            {
+                DwellingInteractionMenuAdapter adapter = new DwellingInteractionMenuAdapter(menu);
+                if (adapter.IsDraftPresent())
+                {
+                    SoqAccessPlugin.Instance?.ScreenDetector?.OnDwellingBackToTop(menu);
+                    yield break;
+                }
+
+                frames++;
+                yield return null;
+            }
+        }
+
+        private static IEnumerator WaitForUpgrade(DwellingInteractionMenu menu)
+        {
+            int frames = 0;
+            while (menu != null && frames < 120)
+            {
+                DwellingInteractionMenuAdapter adapter = new DwellingInteractionMenuAdapter(menu);
+                if (adapter.IsUpgradePresent())
+                {
+                    SoqAccessPlugin.Instance?.ScreenDetector?.OnDwellingUpgradeReady(menu);
                     yield break;
                 }
 
