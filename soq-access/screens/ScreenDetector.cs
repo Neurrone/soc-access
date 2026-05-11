@@ -10,6 +10,7 @@ using SongsOfConquest.Client.Battle.Facade;
 using SongsOfConquest.Client.Menu;
 using SongsOfConquest.Client.Menu.Loading;
 using SongsOfConquest.Client.Menu.Main;
+using SongsOfConquest.Client.Menu.Options;
 using SongsOfConquest.Client.Menu.Popup;
 using SongsOfConquest.Client.UI;
 using SongsOfConquestAccess.Adapters;
@@ -59,6 +60,7 @@ namespace SongsOfConquestAccess.Screens
                 new LetterboxStoryTextRuntimeScreenProbe(),
                 new StoryTextRuntimeScreenProbe(),
                 new DialogueMenuRuntimeScreenProbe(),
+                new OptionsMenuRuntimeScreenProbe(),
                 new PauseMenuRuntimeScreenProbe(),
                 new MapMessagePopupRuntimeScreenProbe(),
                 new PopupMenuRuntimeScreenProbe(),
@@ -80,6 +82,45 @@ namespace SongsOfConquestAccess.Screens
             }
 
             Push(screen, "pause menu ready");
+        }
+
+        public void OnOptionsMenuReady(OptionsMenu optionsMenu)
+        {
+            OptionsMenuAdapter adapter = new OptionsMenuAdapter(optionsMenu);
+            if (!adapter.IsPresent())
+            {
+                return;
+            }
+
+            OptionsScreen screen = new OptionsScreen(adapter);
+            if (_screenManager.CurrentScreen is OptionsScreen)
+            {
+                _screenManager.RefreshTop<OptionsScreen>(screen, "options menu changed");
+                return;
+            }
+
+            Push(screen, "options menu ready");
+        }
+
+        public void OnOptionsMenuChanged(OptionsMenu optionsMenu)
+        {
+            OptionsMenuAdapter adapter = new OptionsMenuAdapter(optionsMenu);
+            if (!adapter.IsPresent())
+            {
+                return;
+            }
+
+            OptionsScreen screen = new OptionsScreen(adapter);
+            if (_screenManager.CurrentScreen is OptionsScreen)
+            {
+                _screenManager.RefreshTop<OptionsScreen>(screen, "options content changed");
+                return;
+            }
+        }
+
+        public void OnOptionsMenuClosed(OptionsMenu optionsMenu)
+        {
+            _screenManager.Remove<OptionsScreen>("options menu closed");
         }
 
         public void OnPauseMenuClosed(PauseMenu pauseMenu)

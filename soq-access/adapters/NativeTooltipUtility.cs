@@ -49,6 +49,18 @@ namespace SongsOfConquestAccess.Adapters
 
         public static IReadOnlyList<string> ToSpeechLines(IDetails details, ILocalizationHandler localization)
         {
+            // Options menu controls store already-localized TooltipDescription
+            // text on their label UITextMesh. Those details arrive here as
+            // PlainTextDetails, but the options adapter has no localization
+            // handler, so draw-time extraction would otherwise return no lines.
+            if (localization == null && details is PlainTextDetails plainTextDetails)
+            {
+                List<string> lines = new List<string>();
+                AddIfNotEmpty(lines, plainTextDetails.Title);
+                AddIfNotEmpty(lines, plainTextDetails.Text);
+                return lines.Count == 0 ? EmptyLines : lines;
+            }
+
             IReadOnlyList<string> detailsLines = DetailsTextUtility.ToLines(details, localization);
             return detailsLines.Count == 0 ? EmptyLines : detailsLines;
         }
@@ -129,6 +141,14 @@ namespace SongsOfConquestAccess.Adapters
             }
 
             return gameObject.GetComponent<ITooltipable>();
+        }
+
+        private static void AddIfNotEmpty(List<string> lines, string value)
+        {
+            if (!string.IsNullOrWhiteSpace(value))
+            {
+                lines.Add(value);
+            }
         }
     }
 }
