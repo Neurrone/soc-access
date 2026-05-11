@@ -37,6 +37,7 @@ namespace SongsOfConquestAccess.Screens
                 new AdventureMapRuntimeScreenProbe(),
                 new OwnedEntitiesRuntimeScreenProbe(),
                 new TroopOverviewRuntimeScreenProbe(),
+                new MarketplaceRuntimeScreenProbe(),
                 new MapEntityMiniMenuRuntimeScreenProbe(),
                 new CombatRuntimeScreenProbe(),
                 new SpellbookRuntimeScreenProbe(),
@@ -176,6 +177,48 @@ namespace SongsOfConquestAccess.Screens
             {
                 _screenManager.Pop<TroopOverviewScreen>("troop overview closed");
             }
+        }
+
+        public void OnMarketplaceReady(MarketplaceMenu menu)
+        {
+            MarketplaceMenuAdapter adapter = new MarketplaceMenuAdapter(menu);
+            if (!adapter.IsPresent())
+            {
+                return;
+            }
+
+            if (_screenManager.CurrentScreen is MarketplaceScreen)
+            {
+                SoqAccessPlugin.Instance?.LogWarning("ScreenDetector ignored duplicate marketplace ready while marketplace is already top");
+                return;
+            }
+
+            Push(new MarketplaceScreen(adapter), "marketplace ready");
+        }
+
+        public void OnMarketplaceClosed(MarketplaceMenu menu)
+        {
+            if (_screenManager.CurrentScreen is MarketplaceScreen)
+            {
+                _screenManager.Pop<MarketplaceScreen>("marketplace closed");
+            }
+        }
+
+        public void OnMarketplaceChanged()
+        {
+            MarketplaceScreen screen = _screenManager.CurrentScreen as MarketplaceScreen;
+            if (screen == null)
+            {
+                return;
+            }
+
+            if (!screen.IsPresent())
+            {
+                _screenManager.Pop<MarketplaceScreen>("marketplace no longer present");
+                return;
+            }
+
+            screen.Refresh(focusAfterRefresh: true);
         }
 
         public void OnCodexReady(CodexMenu codexMenu)

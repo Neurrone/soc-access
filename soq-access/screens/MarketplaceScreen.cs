@@ -1,0 +1,177 @@
+using System;
+using System.Collections.Generic;
+using SongsOfConquest.Client.Gamestate.Facade;
+using SongsOfConquest.Common.Economy;
+using SongsOfConquestAccess.Adapters;
+using SongsOfConquestAccess.UI;
+
+namespace SongsOfConquestAccess.Screens
+{
+    internal sealed class MarketplaceScreen : Screen
+    {
+        private const int ResourcesMenuIndex = 1;
+
+        private readonly MarketplaceMenuAdapter _adapter;
+        private Action<ResourceUpdatedPayload> _resourceUpdatedHandler;
+
+        public MarketplaceScreen(MarketplaceMenuAdapter adapter)
+            : base(BuildRoot(adapter))
+        {
+            _adapter = adapter;
+        }
+
+        public override bool IsPresent()
+        {
+            return _adapter != null && _adapter.IsPresent();
+        }
+
+        public override void OnPush()
+        {
+            AttachListeners();
+        }
+
+        public override void OnUnfocus()
+        {
+            _adapter?.HideNativeTooltip();
+            RootWidget?.Unfocus();
+        }
+
+        public override void OnPop()
+        {
+            DetachListeners();
+            _adapter?.HideNativeTooltip();
+        }
+
+        public void Refresh(bool focusAfterRefresh)
+        {
+            if (!IsPresent())
+            {
+                return;
+            }
+
+            int focusedIndex = RootWidget != null ? RootWidget.FocusedIndex : -1;
+            int resourceFocusedIndex = GetFocusedResourceIndex();
+            RootWidget = BuildRoot(_adapter);
+            RestoreResourceFocus(resourceFocusedIndex);
+
+            if (!focusAfterRefresh)
+            {
+                return;
+            }
+
+            if (RootWidget == null || !RootWidget.SetFocusByIndex(focusedIndex))
+            {
+                RootWidget?.Focus();
+            }
+        }
+
+        private void AttachListeners()
+        {
+            if (_adapter == null || _adapter.Facade == null || _adapter.Facade.Commands == null || _resourceUpdatedHandler != null)
+            {
+                return;
+            }
+
+            _resourceUpdatedHandler = HandleResourceUpdated;
+            IClientCommandsFacade commands = _adapter.Facade.Commands;
+            commands.OnResourceUpdated = (Action<ResourceUpdatedPayload>)Delegate.Combine(commands.OnResourceUpdated, _resourceUpdatedHandler);
+        }
+
+        private void DetachListeners()
+        {
+            if (_adapter == null || _adapter.Facade == null || _adapter.Facade.Commands == null || _resourceUpdatedHandler == null)
+            {
+                return;
+            }
+
+            IClientCommandsFacade commands = _adapter.Facade.Commands;
+            commands.OnResourceUpdated = (Action<ResourceUpdatedPayload>)Delegate.Remove(commands.OnResourceUpdated, _resourceUpdatedHandler);
+            _resourceUpdatedHandler = null;
+        }
+
+        private void HandleResourceUpdated(ResourceUpdatedPayload payload)
+        {
+            SoqAccessPlugin.Instance?.ScreenDetector?.OnMarketplaceChanged();
+        }
+
+        private int GetFocusedResourceIndex()
+        {
+            MenuWidget menu = RootWidget != null ? RootWidget.GetChildAt(ResourcesMenuIndex) as MenuWidget : null;
+            return menu != null ? menu.FocusedIndex : -1;
+        }
+
+        private void RestoreResourceFocus(int resourceFocusedIndex)
+        {
+            MenuWidget menu = RootWidget != null ? RootWidget.GetChildAt(ResourcesMenuIndex) as MenuWidget : null;
+            menu?.SetFocusByIndex(resourceFocusedIndex);
+        }
+
+        private static ContainerWidget BuildRoot(MarketplaceMenuAdapter adapter)
+        {
+            ContainerWidget root = new ContainerWidget("marketplace", adapter != null ? adapter.Title : "Marketplace");
+            if (adapter == null)
+            {
+                return root;
+            }
+
+            root.AddChild(new TextWidget(
+                "marketplace-summary",
+                () => adapter.Summary,
+                adapter.HideNativeTooltip,
+                includeParentLabelInAnnouncement: false,
+                isVisible: () => !string.IsNullOrWhiteSpace(adapter.Summary)));
+
+            root.AddChild(BuildResourcesMenu(adapter));
+            AddTradeButton(root, adapter.GetTradeAction(isBuyButton: false, amount: 1));
+            AddTradeButton(root, adapter.GetTradeAction(isBuyButton: false, amount: 5));
+            AddTradeButton(root, adapter.GetTradeAction(isBuyButton: true, amount: 1));
+            AddTradeButton(root, adapter.GetTradeAction(isBuyButton: true, amount: 5));
+            root.AddChild(new TextWidget(
+                "marketplace-tip",
+                () => adapter.TipText,
+                adapter.HideNativeTooltip,
+                includeParentLabelInAnnouncement: false,
+                isVisible: () => !string.IsNullOrWhiteSpace(adapter.TipText)));
+
+            root.AddChild(new ButtonWidget(
+                "marketplace-close",
+                "Close",
+                adapter.Close,
+                adapter.HideNativeTooltip,
+                () => true));
+
+            return root;
+        }
+
+        private static MenuWidget BuildResourcesMenu(MarketplaceMenuAdapter adapter)
+        {
+            MenuWidget menu = new MenuWidget("marketplace-resources", "Resources");
+            IReadOnlyList<MarketplaceMenuAdapter.ResourceItem> resources = adapter.GetResources();
+            for (int i = 0; i < resources.Count; i++)
+            {
+                MarketplaceMenuAdapter.ResourceItem resource = resources[i];
+                ResourceType capturedType = resource.ResourceType;
+                menu.AddItem(new MenuItemWidget(
+                    resource.Id,
+                    () => resource.Label,
+                    null,
+                    () => false,
+                    () => adapter.SelectResource(capturedType),
+                    () => true));
+            }
+
+            return menu;
+        }
+
+        private static void AddTradeButton(ContainerWidget root, MarketplaceMenuAdapter.TradeActionItem action)
+        {
+            root.AddChild(new ButtonWidget(
+                action.Id,
+                action.GetLabel,
+                action.Activate,
+                action.Focus,
+                action.IsEnabled,
+                action.IsVisible));
+        }
+    }
+}
