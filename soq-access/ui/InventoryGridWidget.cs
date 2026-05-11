@@ -11,12 +11,12 @@ namespace SongsOfConquestAccess.UI
     internal sealed class InventoryGridWidget : Widget
     {
         private readonly List<Column> _columns = new List<Column>();
-        private readonly Func<CellWidget, CellWidget, bool> _drop;
+        private readonly Func<CellWidget, CellWidget, DropResult> _drop;
         private int _focusedColumn;
         private int _focusedRow;
         private CellWidget _dragSource;
 
-        public InventoryGridWidget(string id, IEnumerable<Column> columns, Func<CellWidget, CellWidget, bool> drop = null)
+        public InventoryGridWidget(string id, IEnumerable<Column> columns, Func<CellWidget, CellWidget, DropResult> drop = null)
             : base(id)
         {
             _drop = drop;
@@ -321,7 +321,8 @@ namespace SongsOfConquestAccess.UI
             }
 
             CellWidget source = _dragSource;
-            if (source.DropTo(target))
+            DropResult result = source.DropTo(target);
+            if (result == DropResult.Dropped || result == DropResult.DeniedWithFeedback)
             {
                 _dragSource = null;
             }
@@ -493,16 +494,16 @@ namespace SongsOfConquestAccess.UI
                 _cell?.OnFocus?.Invoke();
             }
 
-            public bool DropTo(CellWidget target)
+            public DropResult DropTo(CellWidget target)
             {
                 if (_cell == null || target == null || target._cell == null)
                 {
-                    return false;
+                    return DropResult.Invalid;
                 }
 
                 if (_cell.Movable == null || target._cell.NativeSlot == null)
                 {
-                    return false;
+                    return DropResult.Invalid;
                 }
 
                 if (_grid != null && _grid._drop != null)
@@ -510,14 +511,7 @@ namespace SongsOfConquestAccess.UI
                     return _grid._drop(this, target);
                 }
 
-                InventoryHUD hud = target._cell.NativeSlot.HudParent;
-                if (hud == null)
-                {
-                    return false;
-                }
-
-                hud.ArtifactDroppedOnSlot(_cell.Movable, target._cell.NativeSlot, target._cell.PositionIndex);
-                return true;
+                return DropResult.Invalid;
             }
         }
     }

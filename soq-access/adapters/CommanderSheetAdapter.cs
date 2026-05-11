@@ -555,34 +555,9 @@ namespace SongsOfConquestAccess.Adapters
             return entry != null ? (Selectable)entry : null;
         }
 
-        public bool DropInventoryGridArtifact(InventoryGridWidget.CellWidget source, InventoryGridWidget.CellWidget target)
+        public DropResult DropInventoryGridArtifact(InventoryGridWidget.CellWidget source, InventoryGridWidget.CellWidget target)
         {
-            InventoryArtifactMovable movable = source != null ? source.Movable : null;
-            InventoryHUDSlot targetSlot = target != null ? target.NativeSlot : null;
-            if (movable == null || movable.State == null || targetSlot == null || targetSlot.HudParent == null)
-            {
-                return false;
-            }
-
-            try
-            {
-                int targetOwnerId = targetSlot.HudParent.OwnerId;
-                bool canDrop = movable.State.OwnerId == targetOwnerId
-                    ? _facade.Commands.CanRearrangeArtifact(movable.State.Id, targetSlot.Slot, target.PositionIndex).success
-                    : _facade.Commands.CanGiveArtifact(targetOwnerId, movable.State.Id, targetSlot.Slot, target.PositionIndex).success;
-                if (!canDrop)
-                {
-                    return false;
-                }
-
-                targetSlot.HudParent.ArtifactDroppedOnSlot(movable, targetSlot, target.PositionIndex);
-                return true;
-            }
-            catch (Exception ex)
-            {
-                SoqAccessPlugin.Instance?.LogWarning("CommanderSheetAdapter artifact grid drop failed: " + ex.Message);
-                return false;
-            }
+            return ArtifactDropUtility.DropInventoryGridArtifact(_facade, source, target, "CommanderSheetAdapter artifact grid drop");
         }
 
         private void SelectArtifact(InventoryArtifactMovable movable)
