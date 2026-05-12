@@ -100,12 +100,22 @@ namespace SongsOfConquestAccess.Adapters
 
         public TroopHudAdapter WielderTroops
         {
-            get { return new TroopHudAdapter(GetWielderTroopHud(), _facade, _localization, GetWielderArmyLabel()); }
+            get { return new TroopHudAdapter(GetWielderTroopHud(), _facade, _localization); }
         }
 
         public TroopHudAdapter JoiningTroops
         {
-            get { return new TroopHudAdapter(_settings != null ? _settings.TroopHUD : null, _facade, _localization, "joining army"); }
+            get { return new TroopHudAdapter(_settings != null ? _settings.TroopHUD : null, _facade, _localization); }
+        }
+
+        public string AttackingCommanderName
+        {
+            get
+            {
+                ICommanderState commander = GetField<ICommanderState>(_menu, AttackingCommanderField);
+                string name = commander != null && _facade != null ? _facade.Commanders.GetName(commander.Id) : string.Empty;
+                return SpeechTextSanitizer.Normalize(name);
+            }
         }
 
         public bool ActivateDiscard()
@@ -164,13 +174,6 @@ namespace SongsOfConquestAccess.Adapters
         {
             object value = StageField != null ? StageField.GetValue(_menu) : null;
             return value != null && value.ToString() == "Join";
-        }
-
-        private string GetWielderArmyLabel()
-        {
-            ICommanderState commander = GetField<ICommanderState>(_menu, AttackingCommanderField);
-            string name = commander != null && _facade != null ? _facade.Commanders.GetName(commander.Id) : "wielder";
-            return name + "'s army";
         }
 
         private static string GetText(IUITextMesh textMesh)

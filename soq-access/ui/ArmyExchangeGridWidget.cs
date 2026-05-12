@@ -12,7 +12,7 @@ namespace SongsOfConquestAccess.UI
     {
         private readonly List<SlotWidget> _wielderSlots = new List<SlotWidget>();
         private readonly List<SlotWidget> _joiningSlots = new List<SlotWidget>();
-        private readonly Func<TroopHudAdapter.SlotItem, TroopHudAdapter.SlotItem, bool> _drop;
+        private readonly Func<TroopHudAdapter.SlotItem, TroopHudAdapter.SlotItem, TroopHudAdapter.DropResult> _drop;
         private int _focusedColumn;
         private int _focusedRow;
         private SlotWidget _dragSource;
@@ -20,16 +20,17 @@ namespace SongsOfConquestAccess.UI
         public ArmyExchangeGridWidget(
             string id,
             string wielderArmyLabel,
+            string joiningArmyLabel,
             IEnumerable<TroopHudAdapter.SlotItem> wielderSlots,
             IEnumerable<TroopHudAdapter.SlotItem> joiningSlots,
-            Func<TroopHudAdapter.SlotItem, TroopHudAdapter.SlotItem, bool> drop)
+            Func<TroopHudAdapter.SlotItem, TroopHudAdapter.SlotItem, TroopHudAdapter.DropResult> drop)
             : base(id)
         {
             WielderArmyLabel = string.IsNullOrWhiteSpace(wielderArmyLabel) ? "wielder's army" : wielderArmyLabel;
-            JoiningArmyLabel = "joining army";
+            JoiningArmyLabel = string.IsNullOrWhiteSpace(joiningArmyLabel) ? "joining army" : joiningArmyLabel;
             _drop = drop;
-            AddSlots(_wielderSlots, wielderSlots);
-            AddSlots(_joiningSlots, joiningSlots);
+            AddSlots(_wielderSlots, wielderSlots, WielderArmyLabel);
+            AddSlots(_joiningSlots, joiningSlots, JoiningArmyLabel);
         }
 
         public string WielderArmyLabel { get; private set; }
@@ -211,7 +212,7 @@ namespace SongsOfConquestAccess.UI
             }
         }
 
-        private void AddSlots(List<SlotWidget> target, IEnumerable<TroopHudAdapter.SlotItem> slots)
+        private void AddSlots(List<SlotWidget> target, IEnumerable<TroopHudAdapter.SlotItem> slots, string armyLabel)
         {
             if (slots == null)
             {
@@ -226,7 +227,7 @@ namespace SongsOfConquestAccess.UI
                     continue;
                 }
 
-                SlotWidget widget = new SlotWidget(this, BuildSlotId(target, slot, index), slot);
+                SlotWidget widget = new SlotWidget(this, BuildSlotId(target, slot, index), slot, armyLabel);
                 widget.Parent = this;
                 target.Add(widget);
                 index++;
@@ -335,7 +336,15 @@ namespace SongsOfConquestAccess.UI
             SlotWidget source = _dragSource;
             if (_drop != null)
             {
-                if (_drop(source.Slot, target.Slot))
+                TroopHudAdapter.DropResult result = _drop(source.Slot, target.Slot);
+                if (result == TroopHudAdapter.DropResult.InvalidDestination)
+                {
+                    Speak("Cannot drop there.");
+                    return true;
+                }
+
+                if (result == TroopHudAdapter.DropResult.Completed
+                    || result == TroopHudAdapter.DropResult.MoveAmountPopupOpened)
                 {
                     _dragSource = null;
                 }
@@ -410,12 +419,14 @@ namespace SongsOfConquestAccess.UI
         {
             private readonly ArmyExchangeGridWidget _grid;
             private readonly TroopHudAdapter.SlotItem _slot;
+            private readonly string _armyLabel;
 
-            public SlotWidget(ArmyExchangeGridWidget grid, string id, TroopHudAdapter.SlotItem slot)
+            public SlotWidget(ArmyExchangeGridWidget grid, string id, TroopHudAdapter.SlotItem slot, string armyLabel)
                 : base(id)
             {
                 _grid = grid;
                 _slot = slot;
+                _armyLabel = armyLabel ?? string.Empty;
             }
 
             public TroopHudAdapter.SlotItem Slot
@@ -425,7 +436,7 @@ namespace SongsOfConquestAccess.UI
 
             public string ArmyLabel
             {
-                get { return _slot != null ? _slot.ArmyLabel : string.Empty; }
+                get { return _armyLabel; }
             }
 
             public int SlotNumber
@@ -450,7 +461,7 @@ namespace SongsOfConquestAccess.UI
                     return string.Empty;
                 }
 
-                string slotLabel = _slot.ArmyLabel + " slot " + _slot.SlotNumber;
+                string slotLabel = _armyLabel + " slot " + _slot.SlotNumber;
                 if (!_slot.IsOccupied)
                 {
                     return "Empty, " + slotLabel;

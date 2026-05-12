@@ -92,12 +92,7 @@ namespace SongsOfConquestAccess.Adapters
 
         public TroopHudAdapter Troops
         {
-            get { return new TroopHudAdapter(GetField<TroopHUD>(_panel, TroopHudField), _facade, _localization, BuildArmyLabel()); }
-        }
-
-        public string ArmyLabel
-        {
-            get { return BuildArmyLabel(); }
+            get { return new TroopHudAdapter(GetField<TroopHUD>(_panel, TroopHudField), _facade, _localization); }
         }
 
         public string StoreLabel
@@ -208,12 +203,6 @@ namespace SongsOfConquestAccess.Adapters
         private UIButton GetTradeButton()
         {
             return GetField<UIButton>(_panel, TradeButtonField);
-        }
-
-        private string BuildArmyLabel()
-        {
-            string name = StoredWielderName;
-            return string.IsNullOrWhiteSpace(name) ? "defending wielder army" : name + "'s army";
         }
 
         private string GetButtonLabel(UIButton button, string localizationKey, string fallback)

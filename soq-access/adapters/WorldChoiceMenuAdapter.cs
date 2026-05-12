@@ -99,7 +99,7 @@ namespace SongsOfConquestAccess.Adapters
 
         public TroopHudAdapter Troops
         {
-            get { return new TroopHudAdapter(GetWielderTroopHud(), _facade, _localization, "troops"); }
+            get { return new TroopHudAdapter(GetWielderTroopHud(), _facade, _localization); }
         }
 
         public bool IsPresent()

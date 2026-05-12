@@ -11,7 +11,6 @@ using SongsOfConquest.Client.UI;
 using SongsOfConquest.Common.Details;
 using SongsOfConquest.Common.Gamestate;
 using SongsOfConquest.Common.Localization;
-using SongsOfConquestAccess.Events;
 using SongsOfConquestAccess.Speech;
 using UnityEngine;
 
@@ -34,14 +33,20 @@ namespace SongsOfConquestAccess.Adapters
         private readonly TroopHUD _hud;
         private readonly IClientAdventureFacade _facade;
         private readonly ILocalizationHandler _localization;
-        private readonly string _label;
 
-        public TroopHudAdapter(TroopHUD hud, IClientAdventureFacade facade, ILocalizationHandler localization, string label)
+        public TroopHudAdapter(TroopHUD hud, IClientAdventureFacade facade, ILocalizationHandler localization)
         {
             _hud = hud;
             _facade = facade;
             _localization = localization;
-            _label = string.IsNullOrWhiteSpace(label) ? "army" : label;
+        }
+
+        public enum DropResult
+        {
+            None,
+            Completed,
+            InvalidDestination,
+            MoveAmountPopupOpened
         }
 
         public IReadOnlyList<SlotItem> GetSlots()
@@ -56,25 +61,25 @@ namespace SongsOfConquestAccess.Adapters
                     continue;
                 }
 
-                result.Add(new SlotItem(this, entry, _label));
+                result.Add(new SlotItem(this, entry));
             }
 
             return result;
         }
 
-        public bool Drop(SlotItem source, SlotItem target)
+        public DropResult Drop(SlotItem source, SlotItem target)
         {
             TroopHUDEntry sourceEntry = source != null ? source.Entry : null;
             TroopHUDEntry targetEntry = target != null ? target.Entry : null;
             if (sourceEntry == null || targetEntry == null || ReferenceEquals(sourceEntry, targetEntry))
             {
-                return false;
+                return DropResult.None;
             }
 
             TroopHUDEntryMovable movable = GetMovable();
             if (movable == null || sourceEntry.Troop == null)
             {
-                return false;
+                return DropResult.None;
             }
 
             Vector3 sourcePosition = ((Component)sourceEntry).transform.position;
@@ -93,37 +98,24 @@ namespace SongsOfConquestAccess.Adapters
                 if (!InvokeBool(CanDropHereMethod, movable))
                 {
                     movable.Reset();
-                    AccessibilityEventBus.Publish(new ArmyExchangeInvalidDestinationEvent(
-                        BuildSlotReference(source),
-                        BuildSlotReference(target)));
-                    return false;
+                    return DropResult.InvalidDestination;
                 }
 
                 if (InvokeBool(CanMergeMethod, movable) || InvokeBool(IsEmptyAndUnlockedMethod, movable))
                 {
                     DecideAmountMethod?.Invoke(movable, new object[] { targetEntry.FormationIndex });
                     PushMoveTroopPopupIfPresent(movable);
-                    return true;
+                    return DropResult.MoveAmountPopupOpened;
                 }
 
                 if (InvokeBool(CanSwapMethod, movable))
                 {
                     SwapMethod?.Invoke(movable, null);
-                    return true;
+                    return DropResult.Completed;
                 }
             }
 
-            return true;
-        }
-
-        private static string BuildSlotReference(SlotItem slot)
-        {
-            if (slot == null)
-            {
-                return string.Empty;
-            }
-
-            return slot.ArmyLabel + " slot " + slot.SlotNumber;
+            return DropResult.Completed;
         }
 
         private TroopHUDEntryMovable GetMovable()
@@ -261,16 +253,13 @@ namespace SongsOfConquestAccess.Adapters
         {
             private readonly TroopHudAdapter _adapter;
 
-            public SlotItem(TroopHudAdapter adapter, TroopHUDEntry entry, string armyLabel)
+            public SlotItem(TroopHudAdapter adapter, TroopHUDEntry entry)
             {
                 _adapter = adapter;
                 Entry = entry;
-                ArmyLabel = armyLabel ?? string.Empty;
             }
 
             public TroopHUDEntry Entry { get; private set; }
-
-            public string ArmyLabel { get; private set; }
 
             public int SlotNumber
             {
@@ -310,9 +299,9 @@ namespace SongsOfConquestAccess.Adapters
                 }
             }
 
-            public bool DropTo(SlotItem target)
+            public DropResult DropTo(SlotItem target)
             {
-                return _adapter != null && _adapter.Drop(this, target);
+                return _adapter != null ? _adapter.Drop(this, target) : DropResult.None;
             }
         }
 

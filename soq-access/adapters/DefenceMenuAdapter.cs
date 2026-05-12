@@ -131,7 +131,7 @@ namespace SongsOfConquestAccess.Adapters
 
         public TroopHudAdapter SettlementTroops
         {
-            get { return new TroopHudAdapter(GetField<TroopHUD>(GetDefencePanelTroops(), SettlementTroopHudField), _facade, _localization, DefendingTroopsLabel); }
+            get { return new TroopHudAdapter(GetField<TroopHUD>(GetDefencePanelTroops(), SettlementTroopHudField), _facade, _localization); }
         }
 
         public bool IsSettlementTroopsVisible()

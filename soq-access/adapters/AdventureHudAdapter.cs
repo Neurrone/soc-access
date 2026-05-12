@@ -279,8 +279,7 @@ namespace SongsOfConquestAccess.Adapters
                 return new TroopHudAdapter(
                     CommanderSettings != null ? CommanderSettings.TroopHUD : null,
                     Facade,
-                    LocalizationHandler,
-                    "troops");
+                    LocalizationHandler);
             }
         }
 

@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using SongsOfConquestAccess.Adapters;
+using SongsOfConquestAccess.Speech;
 
 namespace SongsOfConquestAccess.UI
 {
@@ -23,7 +24,14 @@ namespace SongsOfConquestAccess.UI
                         return false;
                     }
 
-                    return sourceSlot.DropTo(targetSlot);
+                    TroopHudAdapter.DropResult result = sourceSlot.DropTo(targetSlot);
+                    if (result == TroopHudAdapter.DropResult.InvalidDestination)
+                    {
+                        Speak("Cannot drop there.");
+                    }
+
+                    return result == TroopHudAdapter.DropResult.Completed
+                        || result == TroopHudAdapter.DropResult.MoveAmountPopupOpened;
                 });
 
             IReadOnlyList<TroopHudAdapter.SlotItem> slots = adapter != null
@@ -69,6 +77,11 @@ namespace SongsOfConquestAccess.UI
             }
 
             return item.TroopName + ", " + slotLabel;
+        }
+
+        private static void Speak(string text)
+        {
+            SpeechPipeline.Output(new SpeechRequest(text, interrupt: false));
         }
     }
 }

@@ -145,12 +145,12 @@ namespace SongsOfConquestAccess.Adapters
 
         public TroopHudAdapter VisitingTroops
         {
-            get { return new TroopHudAdapter(GetField<TroopHUD>(GetHeader(), HeaderTroopHudField), _facade, _localization, BuildVisitingArmyLabel()); }
+            get { return new TroopHudAdapter(GetField<TroopHUD>(GetHeader(), HeaderTroopHudField), _facade, _localization); }
         }
 
         public TroopHudAdapter SettlementTroops
         {
-            get { return new TroopHudAdapter(GetField<TroopHUD>(GetDefencePanelTroops(), SettlementTroopHudField), _facade, _localization, "settlement troops"); }
+            get { return new TroopHudAdapter(GetField<TroopHUD>(GetDefencePanelTroops(), SettlementTroopHudField), _facade, _localization); }
         }
 
         public string DraftLabel
@@ -405,12 +405,6 @@ namespace SongsOfConquestAccess.Adapters
         {
             object value = InteractingCommanderIdField != null ? InteractingCommanderIdField.GetValue(_menu) : null;
             return value is int ? (int)value : -1;
-        }
-
-        private string BuildVisitingArmyLabel()
-        {
-            string name = VisitingWielderName;
-            return string.IsNullOrWhiteSpace(name) ? "visiting wielder army" : name + "'s army";
         }
 
         private static string GetButtonLabel(UIButton button)

@@ -125,12 +125,12 @@ namespace SongsOfConquestAccess.Adapters
 
         public TroopHudAdapter LeftTroops
         {
-            get { return new TroopHudAdapter(_settings != null ? _settings.leftTroopHud : null, _facade, _localization, GetArmyLabel(LeftCommanderId)); }
+            get { return new TroopHudAdapter(_settings != null ? _settings.leftTroopHud : null, _facade, _localization); }
         }
 
         public TroopHudAdapter RightTroops
         {
-            get { return new TroopHudAdapter(_settings != null ? _settings.rightTroopHud : null, _facade, _localization, GetArmyLabel(RightCommanderId)); }
+            get { return new TroopHudAdapter(_settings != null ? _settings.rightTroopHud : null, _facade, _localization); }
         }
 
         public bool Close()
@@ -573,12 +573,6 @@ namespace SongsOfConquestAccess.Adapters
         private static string GetSideId(bool left)
         {
             return left ? "left" : "right";
-        }
-
-        private string GetArmyLabel(int commanderId)
-        {
-            string name = GetCommanderName(commanderId);
-            return string.IsNullOrWhiteSpace(name) ? "army" : name + " army";
         }
 
         private string GetLocalizedText(string key, string fallback)
