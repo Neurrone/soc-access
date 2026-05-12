@@ -50,6 +50,7 @@ namespace SongsOfConquestAccess.Screens
                 new PostBattleResultRuntimeScreenProbe(),
                 new PreBattleMenuRuntimeScreenProbe(),
                 new DwellingInteractionRuntimeScreenProbe(),
+                new RallyPointRuntimeScreenProbe(),
                 new SettlementRuntimeScreenProbe(),
                 new DefenceMenuRuntimeScreenProbe(),
                 new BuildMenuRuntimeScreenProbe(),
@@ -832,6 +833,37 @@ namespace SongsOfConquestAccess.Screens
             if (draft != null && draft.HostIdPrefix == "dwelling")
             {
                 _screenManager.Pop<DraftTroopsScreen>("dwelling interaction closed");
+            }
+        }
+
+        public void OnRallyPointReady(RallyPointInteractionMenu menu)
+        {
+            RallyPointScreen screen = new RallyPointScreen(new RallyPointInteractionMenuAdapter(menu));
+            Push(screen, "rally point ready");
+        }
+
+        public void OnRallyPointChanged(RallyPointInteractionMenu menu)
+        {
+            RallyPointScreen current = _screenManager.CurrentScreen as RallyPointScreen;
+            if (current == null)
+            {
+                return;
+            }
+
+            if (!current.IsPresent())
+            {
+                _screenManager.Pop<RallyPointScreen>("rally point no longer present");
+                return;
+            }
+
+            current.Refresh(focusAfterRefresh: true);
+        }
+
+        public void OnRallyPointClosed(RallyPointInteractionMenu menu)
+        {
+            if (_screenManager.CurrentScreen is RallyPointScreen)
+            {
+                _screenManager.Pop<RallyPointScreen>("rally point closed");
             }
         }
 
