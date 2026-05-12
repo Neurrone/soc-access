@@ -357,13 +357,54 @@ namespace SongsOfConquestAccess.Adapters
                 }
             }
 
-            IBattleTroopState current = GetCurrentTroop();
-            if (current != null && IsValidTile(current.Position))
+            Vector2Int localTroopPosition;
+            if (TryGetInitialLocalTroopPosition(out localTroopPosition))
             {
-                return current.Position;
+                return localTroopPosition;
             }
 
             return Vector2Int.zero;
+        }
+
+        private bool TryGetInitialLocalTroopPosition(out Vector2Int position)
+        {
+            position = Vector2Int.zero;
+            int localTeamId = GetLocalTeamId();
+            if (localTeamId < 0)
+            {
+                return false;
+            }
+
+            IBattleTroopState current = GetCurrentTroop();
+            if (current != null
+                && current.TeamId == localTeamId
+                && current.GetIsAlive()
+                && IsValidTile(current.Position))
+            {
+                position = current.Position;
+                return true;
+            }
+
+            if (_facade == null || _facade.Troops == null || _facade.Troops.All == null)
+            {
+                return false;
+            }
+
+            foreach (IBattleTroopState troop in _facade.Troops.All)
+            {
+                if (troop == null
+                    || troop.TeamId != localTeamId
+                    || !troop.GetIsAlive()
+                    || !IsValidTile(troop.Position))
+                {
+                    continue;
+                }
+
+                position = troop.Position;
+                return true;
+            }
+
+            return false;
         }
 
         public CombatTile GetTile(Vector2Int point)
@@ -2172,6 +2213,43 @@ namespace SongsOfConquestAccess.Adapters
         public int LocalTeamId
         {
             get { return GetLocalTeamId(); }
+        }
+
+        public IReadOnlyList<int> GetAliveBattleTroopIdsForSide(bool enemySide)
+        {
+            List<int> ids = new List<int>();
+            try
+            {
+                if (_facade == null || _facade.Troops == null || _facade.Troops.All == null)
+                {
+                    return ids;
+                }
+
+                int localTeamId = GetLocalTeamId();
+                if (localTeamId < 0)
+                {
+                    return ids;
+                }
+
+                foreach (IBattleTroopState troop in _facade.Troops.All)
+                {
+                    if (troop == null || !troop.GetIsAlive())
+                    {
+                        continue;
+                    }
+
+                    bool isEnemy = troop.TeamId != localTeamId;
+                    if (isEnemy == enemySide)
+                    {
+                        ids.Add(troop.Id);
+                    }
+                }
+            }
+            catch
+            {
+            }
+
+            return ids;
         }
 
         public string BuildLocalEssenceSummary()

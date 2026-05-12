@@ -48,9 +48,10 @@ namespace SongsOfConquestAccess.Events
             public const string Damage = "combat.damage";
             public const string SpellCast = "combat.spell.cast";
             public const string FaeyFire = "combat.faey_fire";
-            public const string BacteriaAdded = "combat.bacteria.added";
             public const string BacteriaRemoved = "combat.bacteria.removed";
             public const string BacteriaModifierApplied = "combat.bacteria.modifier_applied";
+            public const string BacteriaRemovedSummary = "combat.bacteria.removed_summary";
+            public const string BacteriaModifierSummary = "combat.bacteria.modifier_summary";
             public const string EssenceGenerated = "combat.essence.generated";
             public const string TroopCreated = "combat.troop.created";
             public const string MapEntityCreated = "combat.map_entity.created";
@@ -59,7 +60,6 @@ namespace SongsOfConquestAccess.Events
             public const string AbilityUsed = "combat.ability.used";
             public const string Teleport = "combat.teleport";
             public const string BurrowUp = "combat.burrow_up";
-            public const string AbilityComplete = "combat.ability.complete";
             public const string BattleResult = "combat.battle_result";
             public const string HudNotification = "combat.hud.notification";
         }

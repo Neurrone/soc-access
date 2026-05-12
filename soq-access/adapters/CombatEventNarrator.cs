@@ -1,9 +1,9 @@
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using Lavapotion.Networking;
 using Lavapotion.Pathfinding;
-using Lavapotion.Utilities;
 using SongsOfConquest;
 using SongsOfConquest.Common;
 using SongsOfConquest.Common.Bacterias;
@@ -27,8 +27,8 @@ namespace SongsOfConquestAccess.Adapters
     {
         private static readonly Queue<PendingCombatEvent> PendingEvents = new Queue<PendingCombatEvent>();
         private static readonly Queue<string> SuppressedNativeNotifications = new Queue<string>();
-        private static int _activeBlockingVisuals;
         private static int _currentTurnTroopId = -1;
+        private static bool _flushPendingEventsScheduled;
         private static CombatAdapter _activeAdapter;
 
         public static void HandleResponse(ICommandResponse response)
@@ -47,7 +47,7 @@ namespace SongsOfConquestAccess.Adapters
             try
             {
                 EnqueueResponse(response, adapter);
-                TryStartDirectEvents();
+                ScheduleFlushPendingEvents();
             }
             catch (Exception exception)
             {
@@ -77,91 +77,10 @@ namespace SongsOfConquestAccess.Adapters
             PublishEvent(new HudNotificationEvent(text));
         }
 
-        public static void NotifyMoveStarted(int troopId, IList<Vector2Int> path, Async completion)
-        {
-            StartMatching(
-                pending => pending.Kind == PendingCombatEventKind.Move
-                    && pending.TroopId == troopId
-                    && SamePath(pending.Path, path),
-                completion);
-        }
-
-        public static void NotifyAttackStarted(int attackerId, bool targetIsMapEntity, DamageResult result, Async completion)
-        {
-            StartMatching(
-                pending => pending.Kind == PendingCombatEventKind.Attack
-                    && pending.TroopId == attackerId
-                    && pending.TargetIsMapEntity == targetIsMapEntity
-                    && SameDamageResult(pending.DamageResult, result),
-                completion);
-        }
-
-        public static void NotifyPushStarted(int troopId, Vector2Int from, Vector2Int to, Async completion)
-        {
-            StartMatching(
-                pending => pending.Kind == PendingCombatEventKind.Push
-                    && pending.TroopId == troopId
-                    && pending.From == from
-                    && pending.To == to,
-                completion);
-        }
-
-        public static void NotifyAbilityStarted(int troopId, TroopAbilityType abilityType, Vector2Int? targetingPosition, Vector2Int[] movementPath, Async completion)
-        {
-            StartMatching(
-                pending => pending.Kind == PendingCombatEventKind.Ability
-                    && pending.TroopId == troopId
-                    && pending.AbilityType == abilityType,
-                completion);
-        }
-
-        public static void NotifyNewTurnStarted(int troopId)
-        {
-            StartMatching(
-                pending => pending.Kind == PendingCombatEventKind.NewTurn
-                    && pending.TroopId == troopId,
-                null);
-            MoveCombatCursorToLocalActingTroop(troopId);
-        }
-
-        public static void NotifyNewRoundPopupVisible()
-        {
-            StartMatching(
-                pending => pending.Kind == PendingCombatEventKind.NewRound,
-                null);
-        }
-
         private static void MoveCombatCursorToLocalActingTroop(int troopId)
         {
             CombatScreen screen = SoqAccessPlugin.Instance?.ScreenManager?.CurrentScreen as CombatScreen;
             screen?.MoveCursorToLocalActingTroop(troopId);
-        }
-
-        public static void NotifySpellStarted(SpellCastResponse response)
-        {
-            StartMatching(
-                pending => pending.Kind == PendingCombatEventKind.Spell
-                    && pending.Spell == response.Identifier
-                    && pending.SpellTier == response.Tier
-                    && SamePoints(pending.TargetPoints, response.TargetPoints),
-                null);
-        }
-
-        public static void NotifyFaeyFireStarted(int attackerId, IList<DamageResult> results)
-        {
-            StartMatching(
-                pending => pending.Kind == PendingCombatEventKind.FaeyFire
-                    && pending.TroopId == attackerId,
-                null);
-        }
-
-        public static void NotifyDamageIndicatorStarted(DamageResult result, bool targetIsMapEntity)
-        {
-            StartMatching(
-                pending => pending.Kind == PendingCombatEventKind.Damage
-                    && pending.TargetIsMapEntity == targetIsMapEntity
-                    && SameDamageResult(pending.DamageResult, result),
-                null);
         }
 
         public static void NotifyBacteriaAddedStarted(int troopId, string localizedText)
@@ -173,84 +92,12 @@ namespace SongsOfConquestAccess.Adapters
             }
         }
 
-        public static void NotifyBacteriaRemovedStarted(int troopId, BacteriaReference bacteriaReference)
-        {
-            StartMatching(
-                pending => pending.Kind == PendingCombatEventKind.BacteriaRemoved
-                    && pending.TroopId == troopId
-                    && SameBacteria(pending.Bacteria, bacteriaReference),
-                null);
-        }
-
-        public static void NotifyBacteriaModifierAppliedStarted(int troopId, BacteriaReference bacteriaReference)
-        {
-            StartMatching(
-                pending => pending.Kind == PendingCombatEventKind.BacteriaModifierApplied
-                    && pending.TroopId == troopId
-                    && SameBacteria(pending.Bacteria, bacteriaReference),
-                null);
-        }
-
-        public static void NotifyEssenceGeneratedStarted(int troopId)
-        {
-            StartMatching(
-                pending => pending.Kind == PendingCombatEventKind.EssenceGenerated
-                    && pending.TroopId == troopId,
-                null);
-        }
-
-        public static void NotifyMapEntityCreatedStarted(int entityId)
-        {
-            StartMatching(
-                pending => pending.Kind == PendingCombatEventKind.MapEntityCreated
-                    && pending.EntityId == entityId,
-                null);
-        }
-
-        public static void NotifyMapEntityDestroyedStarted(int entityId)
-        {
-            StartMatching(
-                pending => pending.Kind == PendingCombatEventKind.MapEntityDestroyed
-                    && pending.EntityId == entityId,
-                null);
-        }
-
-        public static void NotifyBurrowUpStarted(int troopId, bool burrowSuccess)
-        {
-            StartMatching(
-                pending => pending.Kind == PendingCombatEventKind.BurrowUp
-                    && pending.TroopId == troopId
-                    && pending.BurrowSuccess == burrowSuccess,
-                null);
-        }
-
-        public static void NotifyBattleResultPopupStarted(bool isVictory)
-        {
-            bool releasedQueuedResult = StartMatching(
-                pending => pending.Kind == PendingCombatEventKind.BattleResult,
-                null);
-            if (releasedQueuedResult)
-            {
-                return;
-            }
-
-            _currentTurnTroopId = -1;
-            PublishEvent(new BattleResultEvent(
-                -1,
-                isVictory ? BattleOutcome.Victory : BattleOutcome.Defeat,
-                -1,
-                BattleOutcome.Inconclusive,
-                -1,
-                BattleOutcome.Inconclusive));
-            TryStartDirectEvents();
-        }
-
         public static void Reset()
         {
             PendingEvents.Clear();
             SuppressedNativeNotifications.Clear();
-            _activeBlockingVisuals = 0;
             _currentTurnTroopId = -1;
+            _flushPendingEventsScheduled = false;
             _activeAdapter = null;
         }
 
@@ -300,7 +147,7 @@ namespace SongsOfConquestAccess.Adapters
                     List<Vector2Int> path = ConvertPath(move.Path);
                     Vector2Int start = path[0];
                     Vector2Int end = path[path.Count - 1];
-                    Enqueue(PendingCombatEvent.Visual(
+                    Enqueue(PendingCombatEvent.Create(
                         PendingCombatEventKind.Move,
                         new TroopMovedEvent(CreateActor(adapter, troop, troop.Stats.Size, start), start, end, path),
                         troop.Id,
@@ -317,7 +164,7 @@ namespace SongsOfConquestAccess.Adapters
                 if (troop != null)
                 {
                     _currentTurnTroopId = troop.Id;
-                    Enqueue(PendingCombatEvent.Visual(
+                    Enqueue(PendingCombatEvent.Create(
                         PendingCombatEventKind.NewTurn,
                         new NewTurnEvent(adapter.CreateTroopRef(troop)),
                         troop.Id));
@@ -329,7 +176,7 @@ namespace SongsOfConquestAccess.Adapters
             if (response is NewBattleRoundCommand.Response)
             {
                 int round = adapter.GetCurrentRound() + 1;
-                Enqueue(PendingCombatEvent.Visual(
+                Enqueue(PendingCombatEvent.Create(
                     PendingCombatEventKind.NewRound,
                     new NewRoundEvent(round)));
                 return;
@@ -422,7 +269,7 @@ namespace SongsOfConquestAccess.Adapters
             TroopGenerateEssenceCommand.Response essence = response as TroopGenerateEssenceCommand.Response;
             if (essence != null)
             {
-                Enqueue(PendingCombatEvent.Visual(
+                Enqueue(PendingCombatEvent.Create(
                     PendingCombatEventKind.EssenceGenerated,
                     new EssenceGeneratedEvent(
                         CreateActor(adapter, adapter.GetTroop(essence.BattleTroopId)),
@@ -448,7 +295,7 @@ namespace SongsOfConquestAccess.Adapters
             if (createdEntity != null && createdEntity.State != null)
             {
                 IMapEntity entity = adapter.GetMapEntity(createdEntity.State.Id);
-                Enqueue(PendingCombatEvent.Visual(
+                Enqueue(PendingCombatEvent.Create(
                     PendingCombatEventKind.MapEntityCreated,
                     new MapEntityCreatedEvent(adapter.CreateEntityRef(entity)),
                     entityId: createdEntity.State.Id));
@@ -523,7 +370,6 @@ namespace SongsOfConquestAccess.Adapters
             TroopAbilityActivationCompleteCommand.Response abilityComplete = response as TroopAbilityActivationCompleteCommand.Response;
             if (abilityComplete != null)
             {
-                Enqueue(PendingCombatEvent.Direct(PendingCombatEventKind.AbilityComplete, new AbilityCompleteEvent()));
                 return;
             }
 
@@ -538,7 +384,7 @@ namespace SongsOfConquestAccess.Adapters
             BattleResultCommand.Response battleResult = response as BattleResultCommand.Response;
             if (battleResult != null)
             {
-                Enqueue(PendingCombatEvent.Visual(PendingCombatEventKind.BattleResult, BuildBattleResultEvent(battleResult, adapter)));
+                Enqueue(PendingCombatEvent.Create(PendingCombatEventKind.BattleResult, BuildBattleResultEvent(battleResult, adapter)));
             }
         }
 
@@ -573,11 +419,13 @@ namespace SongsOfConquestAccess.Adapters
                 }
 
                 IBattleTroopState troop = adapter.GetTroop(entry.StateId);
-                Enqueue(PendingCombatEvent.CreateBacteria(
+                EnqueueBacteriaSummary(PendingCombatEvent.CreateBacteriaRemovalSummary(
                     PendingCombatEventKind.BacteriaRemoved,
-                    new BacteriaRemovedEvent(adapter.CreateTroopRef(troop), adapter.CreateBacteriaRef(entry.BacteriaReference)),
+                    adapter.CreateBacteriaRef(entry.BacteriaReference),
+                    adapter.CreateTroopRef(troop),
                     entry.StateId,
-                    entry.BacteriaReference));
+                    entry.BacteriaReference),
+                    adapter);
             }
         }
 
@@ -625,11 +473,14 @@ namespace SongsOfConquestAccess.Adapters
                     }
 
                     IBattleTroopState troop = adapter.GetTroop(changeSet.TargetId);
-                    Enqueue(PendingCombatEvent.CreateBacteria(
+                    EnqueueBacteriaSummary(PendingCombatEvent.CreateBacteriaModifierSummary(
                         PendingCombatEventKind.BacteriaModifierApplied,
-                        new BacteriaModifierAppliedEvent(adapter.CreateTroopRef(troop), adapter.CreateBacteriaRef(bacteria), CreateModifierChanges(group.Value)),
+                        adapter.CreateBacteriaRef(bacteria),
+                        adapter.CreateTroopRef(troop),
+                        CreateModifierChanges(group.Value),
                         changeSet.TargetId,
-                        bacteria));
+                        bacteria),
+                        adapter);
                 }
             }
         }
@@ -673,7 +524,7 @@ namespace SongsOfConquestAccess.Adapters
             {
                 TeleportBattleTroopCommand.ResponseEntry entry = response.Entries[i];
                 IBattleTroopState troop = adapter.GetTroop(entry.Id);
-                Enqueue(PendingCombatEvent.Visual(
+                Enqueue(PendingCombatEvent.Create(
                     PendingCombatEventKind.Teleport,
                     new TeleportEvent(CreateActor(adapter, troop, troop != null ? troop.Stats.Size : 0, entry.OldPosition), entry.OldPosition, entry.NewPosition, response.Source),
                     entry.Id));
@@ -690,114 +541,157 @@ namespace SongsOfConquestAccess.Adapters
             PendingEvents.Enqueue(pending);
         }
 
-        private static bool StartMatching(Func<PendingCombatEvent, bool> predicate, Async completion)
+        private static void EnqueueBacteriaSummary(PendingCombatEvent pending, CombatAdapter adapter)
         {
-            PendingCombatEvent pending = FindAndPromoteMatching(predicate);
             if (pending == null)
             {
-                return false;
+                return;
             }
 
-            if (pending.Kind == PendingCombatEventKind.NewTurn)
+            PendingCombatEvent mergeTarget = FindLatestBacteriaSummaryMergeTarget(pending);
+            if (mergeTarget != null)
             {
-                _currentTurnTroopId = pending.TroopId;
+                mergeTarget.MergeBacteriaSummary(pending, adapter);
+                return;
             }
 
-            PublishEvent(pending.Event);
-
-            if (pending.Kind == PendingCombatEventKind.BattleResult)
-            {
-                _currentTurnTroopId = -1;
-            }
-
-            if (completion != null && !completion.IsCompleted)
-            {
-                _activeBlockingVisuals++;
-                completion.Wait(CompleteBlockingVisual);
-                return true;
-            }
-
-            TryStartDirectEvents();
-            return true;
+            pending.RefreshBacteriaSummaryEvent(adapter);
+            Enqueue(pending);
         }
 
-        private static PendingCombatEvent FindAndPromoteMatching(Func<PendingCombatEvent, bool> predicate)
+        private static PendingCombatEvent FindLatestBacteriaSummaryMergeTarget(PendingCombatEvent pending)
         {
-            if (predicate == null || PendingEvents.Count == 0)
+            if (pending == null || !pending.IsBacteriaSummary || PendingEvents.Count == 0)
             {
                 return null;
             }
 
             PendingCombatEvent[] events = PendingEvents.ToArray();
-            int index = -1;
-            for (int i = 0; i < events.Length; i++)
+            for (int i = events.Length - 1; i >= 0; i--)
             {
-                if (predicate(events[i]))
+                PendingCombatEvent existing = events[i];
+                if (existing.CanMergeBacteriaSummary(pending))
                 {
-                    index = i;
-                    break;
+                    return existing;
+                }
+
+                if (!existing.IsBacteriaSummary)
+                {
+                    return null;
                 }
             }
 
-            if (index < 0)
-            {
-                return null;
-            }
-
-            for (int i = 0; i < index; i++)
-            {
-                SoqAccessPlugin.Instance?.LogWarning("CombatEventNarrator force-completed pending event before visual match: " + events[i].Kind);
-            }
-
-            PendingEvents.Clear();
-            PendingCombatEvent matched = null;
-            for (int i = 0; i < events.Length; i++)
-            {
-                if (i < index)
-                {
-                    continue;
-                }
-
-                if (i == index)
-                {
-                    matched = events[i];
-                    continue;
-                }
-
-                PendingEvents.Enqueue(events[i]);
-            }
-
-            return matched;
+            return null;
         }
 
-        private static void TryStartDirectEvents()
+        private static void ScheduleFlushPendingEvents()
         {
-            if (_activeBlockingVisuals > 0)
+            if (_flushPendingEventsScheduled)
             {
                 return;
             }
 
-            while (PendingEvents.Count > 0)
+            SoqAccessPlugin plugin = SoqAccessPlugin.Instance;
+            if (plugin == null)
             {
-                PendingCombatEvent pending = PendingEvents.Peek();
-                if (!pending.IsDirect)
+                FlushPendingEvents();
+                return;
+            }
+
+            _flushPendingEventsScheduled = true;
+            plugin.StartCoroutine(FlushPendingEventsNextFrame());
+        }
+
+        private static IEnumerator FlushPendingEventsNextFrame()
+        {
+            yield return null;
+            _flushPendingEventsScheduled = false;
+            FlushPendingEvents();
+        }
+
+        private static void FlushPendingEvents()
+        {
+            if (PendingEvents.Count == 0)
+            {
+                return;
+            }
+
+            List<PendingCombatEvent> events = ReorderSpellEvents(PendingEvents.ToList());
+            PendingEvents.Clear();
+            for (int i = 0; i < events.Count; i++)
+            {
+                PendingCombatEvent pending = events[i];
+                if (pending == null)
                 {
-                    return;
+                    continue;
                 }
 
-                PendingEvents.Dequeue();
+                if (pending.Kind == PendingCombatEventKind.NewTurn)
+                {
+                    _currentTurnTroopId = pending.TroopId;
+                    MoveCombatCursorToLocalActingTroop(pending.TroopId);
+                }
+                else if (pending.Kind == PendingCombatEventKind.BattleResult)
+                {
+                    _currentTurnTroopId = -1;
+                }
+
                 PublishEvent(pending.Event);
             }
         }
 
-        private static void CompleteBlockingVisual()
+        private static List<PendingCombatEvent> ReorderSpellEvents(List<PendingCombatEvent> events)
         {
-            if (_activeBlockingVisuals > 0)
+            if (events == null || events.Count < 2)
             {
-                _activeBlockingVisuals--;
+                return events ?? new List<PendingCombatEvent>();
             }
 
-            TryStartDirectEvents();
+            for (int i = 0; i < events.Count; i++)
+            {
+                if (events[i].Kind != PendingCombatEventKind.Spell)
+                {
+                    continue;
+                }
+
+                int insertIndex = i;
+                while (insertIndex > 0 && IsLikelySpellEffect(events[insertIndex - 1]))
+                {
+                    insertIndex--;
+                }
+
+                if (insertIndex == i)
+                {
+                    continue;
+                }
+
+                PendingCombatEvent spell = events[i];
+                events.RemoveAt(i);
+                events.Insert(insertIndex, spell);
+            }
+
+            return events;
+        }
+
+        private static bool IsLikelySpellEffect(PendingCombatEvent pending)
+        {
+            if (pending == null)
+            {
+                return false;
+            }
+
+            switch (pending.Kind)
+            {
+                case PendingCombatEventKind.Damage:
+                case PendingCombatEventKind.BacteriaRemoved:
+                case PendingCombatEventKind.BacteriaModifierApplied:
+                case PendingCombatEventKind.TroopCreated:
+                case PendingCombatEventKind.MapEntityCreated:
+                case PendingCombatEventKind.MapEntityDestroyed:
+                    return true;
+                default:
+                    return false;
+            }
         }
 
         private static DamageEvent BuildTroopDamageEvent(DamageResult result, int attackerId, bool isSplashDamage, int bacteriaType, CombatAdapter adapter)
@@ -938,6 +832,83 @@ namespace SongsOfConquestAccess.Adapters
             return result;
         }
 
+        private static List<ModifierChange> CombineModifierChanges(IList<ModifierChange> left, IList<ModifierChange> right)
+        {
+            List<ModifierChange> result = left != null
+                ? new List<ModifierChange>(left)
+                : new List<ModifierChange>();
+
+            if (right == null)
+            {
+                return result;
+            }
+
+            for (int i = 0; i < right.Count; i++)
+            {
+                ModifierChange change = right[i];
+                if (change == null)
+                {
+                    continue;
+                }
+
+                int index = result.FindIndex(existing => existing != null
+                    && existing.ModifierType == change.ModifierType
+                    && existing.ApplicationType == change.ApplicationType);
+                if (index >= 0)
+                {
+                    ModifierChange existing = result[index];
+                    result[index] = new ModifierChange(
+                        existing.ModifierType,
+                        existing.ApplicationType,
+                        existing.Amount + change.Amount);
+                }
+                else
+                {
+                    result.Add(change);
+                }
+            }
+
+            return result
+                .Where(change => change != null && change.Amount != 0)
+                .OrderBy(change => change.ModifierType.ToString())
+                .ThenBy(change => change.ApplicationType.ToString())
+                .ToList();
+        }
+
+        private static EffectTargetSummaryKind DetermineTargetSummaryKind(IList<TroopRef> targets, CombatAdapter adapter)
+        {
+            if (targets == null || targets.Count == 0 || adapter == null || adapter.LocalTeamId < 0)
+            {
+                return EffectTargetSummaryKind.ExplicitTargets;
+            }
+
+            HashSet<int> affected = new HashSet<int>();
+            for (int i = 0; i < targets.Count; i++)
+            {
+                TroopRef target = targets[i];
+                if (target == null || target.TroopId < 0)
+                {
+                    return EffectTargetSummaryKind.ExplicitTargets;
+                }
+
+                affected.Add(target.TroopId);
+            }
+
+            HashSet<int> local = new HashSet<int>(adapter.GetAliveBattleTroopIdsForSide(enemySide: false));
+            if (local.Count > 0 && affected.SetEquals(local))
+            {
+                return EffectTargetSummaryKind.YourTroops;
+            }
+
+            HashSet<int> enemy = new HashSet<int>(adapter.GetAliveBattleTroopIdsForSide(enemySide: true));
+            if (enemy.Count > 0 && affected.SetEquals(enemy))
+            {
+                return EffectTargetSummaryKind.EnemyTroops;
+            }
+
+            return EffectTargetSummaryKind.ExplicitTargets;
+        }
+
         private static BattleResultEvent BuildBattleResultEvent(BattleResultCommand.Response response, CombatAdapter adapter)
         {
             IBattleResult result = response.Result;
@@ -978,50 +949,6 @@ namespace SongsOfConquestAccess.Adapters
             return points;
         }
 
-        private static bool SamePath(IList<Vector2Int> left, IList<Vector2Int> right)
-        {
-            if (left == null || right == null || left.Count != right.Count)
-            {
-                return false;
-            }
-
-            for (int i = 0; i < left.Count; i++)
-            {
-                if (left[i] != right[i])
-                {
-                    return false;
-                }
-            }
-
-            return true;
-        }
-
-        private static bool SamePoints(IList<Vector2Int> left, IList<Vector2Int> right)
-        {
-            return SamePath(left, right);
-        }
-
-        private static bool SameDamageResult(DamageResult left, DamageResult right)
-        {
-            return left.StateId == right.StateId
-                && left.Damage == right.Damage
-                && left.Kills == right.Kills
-                && left.HealthAfter == right.HealthAfter
-                && left.SizeAfter == right.SizeAfter
-                && left.Type == right.Type
-                && left.AttackTrigger == right.AttackTrigger;
-        }
-
-        private static bool SameBacteria(BacteriaReference left, BacteriaReference right)
-        {
-            if (left == null || right == null)
-            {
-                return false;
-            }
-
-            return left.Id == right.Id && left.BacteriaType == right.BacteriaType;
-        }
-
         private static bool ConsumeSuppressedNativeNotification(string text)
         {
             while (SuppressedNativeNotifications.Count > 0)
@@ -1039,11 +966,6 @@ namespace SongsOfConquestAccess.Adapters
         private static void PublishEvent(IAccessibilityEvent accessibilityEvent)
         {
             if (accessibilityEvent == null)
-            {
-                return;
-            }
-
-            if (accessibilityEvent is QueueChangedEvent || accessibilityEvent is AbilityCompleteEvent)
             {
                 return;
             }
@@ -1067,20 +989,21 @@ namespace SongsOfConquestAccess.Adapters
             public int SpellTier;
             public List<Vector2Int> TargetPoints;
             public BacteriaReference Bacteria;
+            public BacteriaRef BacteriaRef;
+            public List<TroopRef> BacteriaTargets;
+            public List<BacteriaModifierTargetData> BacteriaModifierTargets;
+            public bool IsBacteriaSummary;
             public bool BurrowSuccess;
-            public bool IsDirect;
-
             public static PendingCombatEvent Direct(PendingCombatEventKind kind, IAccessibilityEvent accessibilityEvent)
             {
                 return new PendingCombatEvent
                 {
                     Kind = kind,
-                    Event = accessibilityEvent,
-                    IsDirect = true
+                    Event = accessibilityEvent
                 };
             }
 
-            public static PendingCombatEvent Visual(PendingCombatEventKind kind, IAccessibilityEvent accessibilityEvent, int troopId = -1, List<Vector2Int> path = null, int entityId = -1)
+            public static PendingCombatEvent Create(PendingCombatEventKind kind, IAccessibilityEvent accessibilityEvent, int troopId = -1, List<Vector2Int> path = null, int entityId = -1)
             {
                 return new PendingCombatEvent
                 {
@@ -1138,15 +1061,36 @@ namespace SongsOfConquestAccess.Adapters
                 };
             }
 
-            public static PendingCombatEvent CreateBacteria(PendingCombatEventKind kind, IAccessibilityEvent accessibilityEvent, int troopId, BacteriaReference bacteria)
+            public static PendingCombatEvent CreateBacteriaRemovalSummary(PendingCombatEventKind kind, BacteriaRef bacteriaRef, TroopRef target, int troopId, BacteriaReference bacteria)
             {
-                return new PendingCombatEvent
+                PendingCombatEvent pending = new PendingCombatEvent
                 {
                     Kind = kind,
-                    Event = accessibilityEvent,
                     TroopId = troopId,
-                    Bacteria = bacteria
+                    Bacteria = bacteria,
+                    BacteriaRef = bacteriaRef,
+                    BacteriaTargets = new List<TroopRef>(),
+                    IsBacteriaSummary = true
                 };
+
+                pending.AddUniqueBacteriaTarget(target);
+                return pending;
+            }
+
+            public static PendingCombatEvent CreateBacteriaModifierSummary(PendingCombatEventKind kind, BacteriaRef bacteriaRef, TroopRef target, IList<ModifierChange> changes, int troopId, BacteriaReference bacteria)
+            {
+                PendingCombatEvent pending = new PendingCombatEvent
+                {
+                    Kind = kind,
+                    TroopId = troopId,
+                    Bacteria = bacteria,
+                    BacteriaRef = bacteriaRef,
+                    BacteriaModifierTargets = new List<BacteriaModifierTargetData>(),
+                    IsBacteriaSummary = true
+                };
+
+                pending.AddOrMergeModifierTarget(target, changes);
+                return pending;
             }
 
             public static PendingCombatEvent Push(IAccessibilityEvent accessibilityEvent, int troopId, Vector2Int from, Vector2Int to)
@@ -1182,6 +1126,138 @@ namespace SongsOfConquestAccess.Adapters
                     BurrowSuccess = burrowSuccess
                 };
             }
+
+            public bool CanMergeBacteriaSummary(PendingCombatEvent other)
+            {
+                if (other == null || !IsBacteriaSummary || !other.IsBacteriaSummary || Kind != other.Kind)
+                {
+                    return false;
+                }
+
+                return BacteriaRef != null
+                    && other.BacteriaRef != null
+                    && BacteriaRef.BacteriaType == other.BacteriaRef.BacteriaType;
+            }
+
+            public void MergeBacteriaSummary(PendingCombatEvent other, CombatAdapter adapter)
+            {
+                if (other == null)
+                {
+                    return;
+                }
+
+                if (Kind == PendingCombatEventKind.BacteriaRemoved)
+                {
+                    if (other.BacteriaTargets != null)
+                    {
+                        for (int i = 0; i < other.BacteriaTargets.Count; i++)
+                        {
+                            AddUniqueBacteriaTarget(other.BacteriaTargets[i]);
+                        }
+                    }
+                }
+                else if (Kind == PendingCombatEventKind.BacteriaModifierApplied && other.BacteriaModifierTargets != null)
+                {
+                    for (int i = 0; i < other.BacteriaModifierTargets.Count; i++)
+                    {
+                        BacteriaModifierTargetData target = other.BacteriaModifierTargets[i];
+                        AddOrMergeModifierTarget(target.Target, target.Changes);
+                    }
+                }
+
+                RefreshBacteriaSummaryEvent(adapter);
+            }
+
+            public void RefreshBacteriaSummaryEvent(CombatAdapter adapter)
+            {
+                if (Kind == PendingCombatEventKind.BacteriaRemoved)
+                {
+                    List<TroopRef> targets = BacteriaTargets ?? new List<TroopRef>();
+                    Event = new BacteriaRemovedSummaryEvent(
+                        BacteriaRef,
+                        targets,
+                        DetermineTargetSummaryKind(targets, adapter));
+                }
+                else if (Kind == PendingCombatEventKind.BacteriaModifierApplied)
+                {
+                    List<BacteriaModifierTargetSummary> summaries = new List<BacteriaModifierTargetSummary>();
+                    List<TroopRef> targets = new List<TroopRef>();
+                    if (BacteriaModifierTargets != null)
+                    {
+                        for (int i = 0; i < BacteriaModifierTargets.Count; i++)
+                        {
+                            BacteriaModifierTargetData target = BacteriaModifierTargets[i];
+                            summaries.Add(new BacteriaModifierTargetSummary(target.Target, target.Changes));
+                            targets.Add(target.Target);
+                        }
+                    }
+
+                    Event = new BacteriaModifierSummaryEvent(
+                        BacteriaRef,
+                        summaries,
+                        DetermineTargetSummaryKind(targets, adapter));
+                }
+            }
+
+            private void AddUniqueBacteriaTarget(TroopRef target)
+            {
+                if (target == null)
+                {
+                    return;
+                }
+
+                if (BacteriaTargets == null)
+                {
+                    BacteriaTargets = new List<TroopRef>();
+                }
+
+                for (int i = 0; i < BacteriaTargets.Count; i++)
+                {
+                    if (BacteriaTargets[i] != null && BacteriaTargets[i].TroopId == target.TroopId)
+                    {
+                        return;
+                    }
+                }
+
+                BacteriaTargets.Add(target);
+            }
+
+            private void AddOrMergeModifierTarget(TroopRef target, IList<ModifierChange> changes)
+            {
+                if (target == null)
+                {
+                    return;
+                }
+
+                if (BacteriaModifierTargets == null)
+                {
+                    BacteriaModifierTargets = new List<BacteriaModifierTargetData>();
+                }
+
+                for (int i = 0; i < BacteriaModifierTargets.Count; i++)
+                {
+                    BacteriaModifierTargetData existing = BacteriaModifierTargets[i];
+                    if (existing.Target != null && existing.Target.TroopId == target.TroopId)
+                    {
+                        existing.Changes = CombineModifierChanges(existing.Changes, changes);
+                        return;
+                    }
+                }
+
+                BacteriaModifierTargets.Add(new BacteriaModifierTargetData(target, changes));
+            }
+        }
+
+        private sealed class BacteriaModifierTargetData
+        {
+            public BacteriaModifierTargetData(TroopRef target, IList<ModifierChange> changes)
+            {
+                Target = target;
+                Changes = changes != null ? new List<ModifierChange>(changes) : new List<ModifierChange>();
+            }
+
+            public TroopRef Target;
+            public List<ModifierChange> Changes;
         }
 
         private enum PendingCombatEventKind
@@ -1194,7 +1270,6 @@ namespace SongsOfConquestAccess.Adapters
             Damage,
             Spell,
             FaeyFire,
-            BacteriaAdded,
             BacteriaRemoved,
             BacteriaModifierApplied,
             EssenceGenerated,
@@ -1205,7 +1280,6 @@ namespace SongsOfConquestAccess.Adapters
             Ability,
             Teleport,
             BurrowUp,
-            AbilityComplete,
             BattleResult
         }
     }

@@ -1,5 +1,6 @@
 using SongsOfConquestAccess.Adapters;
 using SongsOfConquestAccess.Events;
+using SongsOfConquestAccess.Events.Combat;
 using SongsOfConquestAccess.Speech;
 using SongsOfConquestAccess.UI;
 using SongsOfConquest.Common;
@@ -17,6 +18,7 @@ namespace SongsOfConquestAccess.Screens
         private readonly CombatAdapter _adapter;
         private readonly CombatHexGrid _grid;
         private Action<TroopAbilityTargeting> _abilityTargetingBeginHandler;
+        private bool _suppressInitialAutoFocus = true;
 
         public CombatScreen(CombatAdapter adapter)
             : this(adapter, new CombatHexGrid(adapter))
@@ -49,6 +51,19 @@ namespace SongsOfConquestAccess.Screens
             _adapter?.AttachAbilityTargetingBegin(_abilityTargetingBeginHandler);
             _adapter?.AttachAbilityTargetingEnd(HandleAbilityTargetingEnd);
             _adapter?.AnnounceVisibleSpellTargetInstruction();
+        }
+
+        public override void OnFocus()
+        {
+            if (_suppressInitialAutoFocus)
+            {
+                // Prevent an extra readout of the combat grid's initial focused tile.
+                // Focus is already set when it is the player's turn.
+                _suppressInitialAutoFocus = false;
+                return;
+            }
+
+            base.OnFocus();
         }
 
         public void MoveCursorToLocalActingTroop(int troopId)
@@ -92,13 +107,15 @@ namespace SongsOfConquestAccess.Screens
 
         public bool FocusTimeline()
         {
-            Widget timeline = RootWidget?.GetChildAt(TimelineIndex);
+            MenuWidget timeline = RootWidget?.GetChildAt(TimelineIndex) as MenuWidget;
             if (timeline == null || !timeline.IsVisible)
             {
                 return true;
             }
 
-            return RootWidget.SetFocusByIndex(TimelineIndex);
+            bool focusedTimeline = RootWidget.SetFocusByIndex(TimelineIndex);
+            bool focusedFirstItem = timeline.SetFocusByIndex(0);
+            return focusedTimeline || focusedFirstItem;
         }
 
         public override void OnUnfocus()
@@ -160,10 +177,37 @@ namespace SongsOfConquestAccess.Screens
 
         private void HandleAccessibilityEvent(IAccessibilityEvent accessibilityEvent)
         {
+            if (accessibilityEvent is QueueChangedEvent)
+            {
+                RefreshTimelineAfterQueueChanged();
+                return;
+            }
+
             MapHudVisibilityChangedEvent hudVisibility = accessibilityEvent as MapHudVisibilityChangedEvent;
             if (hudVisibility != null && !hudVisibility.IsVisible)
             {
                 FocusGridIfNeeded();
+            }
+        }
+
+        private void RefreshTimelineAfterQueueChanged()
+        {
+            if (RootWidget == null || _adapter == null)
+            {
+                return;
+            }
+
+            MenuWidget previousTimeline = RootWidget.GetChildAt(TimelineIndex) as MenuWidget;
+            bool wasTimelineFocused = ReferenceEquals(RootWidget.FocusedChild, previousTimeline);
+            MenuWidget timeline = BuildQueueMenu(_adapter);
+            if (!RootWidget.ReplaceChildAt(TimelineIndex, timeline))
+            {
+                return;
+            }
+
+            if (wasTimelineFocused)
+            {
+                RootWidget.SetFocusByIndex(TimelineIndex);
             }
         }
 
@@ -199,12 +243,13 @@ namespace SongsOfConquestAccess.Screens
                 adapter.Hud.IsCancelAbilityButtonVisible,
                 () => adapter.Hud.CancelAbilityButtonTooltip));
             root.AddChild(BuildQuickbarMenu(adapter));
-            root.AddChild(new TextWidget(
+            root.AddChild(new ButtonWidget(
                 "combat-current-troop",
                 () => adapter.Hud.CurrentTroopLabel,
+                () => ActivateCurrentTroop(adapter),
                 null,
-                includeParentLabelInAnnouncement: false,
-                isVisible: adapter.Hud.IsCurrentTroopIndicatorVisible));
+                () => adapter.Hud.GetCurrentTroopId() >= 0,
+                adapter.Hud.IsCurrentTroopIndicatorVisible));
             root.AddChild(new ButtonWidget(
                 "combat-current-troop-ability",
                 () => adapter.Hud.AbilityButtonLabel,
@@ -342,6 +387,17 @@ namespace SongsOfConquestAccess.Screens
 
             CombatScreen screen = SoqAccessPlugin.Instance?.ScreenManager?.CurrentScreen as CombatScreen;
             return screen != null && screen.MoveCursorToTroop(item.TroopId, focusGrid: true, requireLocalCurrentTurn: false);
+        }
+
+        private static bool ActivateCurrentTroop(CombatAdapter adapter)
+        {
+            if (adapter == null)
+            {
+                return false;
+            }
+
+            CombatScreen screen = SoqAccessPlugin.Instance?.ScreenManager?.CurrentScreen as CombatScreen;
+            return screen != null && screen.MoveCursorToTroop(adapter.GetCurrentTroopId(), focusGrid: true, requireLocalCurrentTurn: false);
         }
 
         private static MenuWidget BuildBattleLogMenu(CombatAdapter adapter)

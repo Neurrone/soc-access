@@ -22,6 +22,13 @@ namespace SongsOfConquestAccess.Events.Combat
         Tile
     }
 
+    internal enum EffectTargetSummaryKind
+    {
+        ExplicitTargets,
+        YourTroops,
+        EnemyTroops
+    }
+
     internal sealed class TroopRef
     {
         public TroopRef(int troopId, int teamId, int localTeamId, string name, int count, Vector2Int position)
@@ -223,6 +230,41 @@ namespace SongsOfConquestAccess.Events.Combat
         }
     }
 
+    internal sealed class BacteriaModifierTargetSummary
+    {
+        public BacteriaModifierTargetSummary(TroopRef target, IList<ModifierChange> changes)
+        {
+            Target = target;
+            Changes = changes != null ? new List<ModifierChange>(changes) : new List<ModifierChange>();
+        }
+
+        public TroopRef Target { get; private set; }
+        public IReadOnlyList<ModifierChange> Changes { get; private set; }
+    }
+
+    internal static class EffectTargetSummary
+    {
+        public static string FormatTargets(IList<TroopRef> targets, EffectTargetSummaryKind kind)
+        {
+            switch (kind)
+            {
+                case EffectTargetSummaryKind.YourTroops:
+                    return "your troops";
+                case EffectTargetSummaryKind.EnemyTroops:
+                    return "enemy troops";
+                default:
+                    return FormatExplicitTargets(targets);
+            }
+        }
+
+        public static string FormatExplicitTargets(IList<TroopRef> targets)
+        {
+            return FormatList(targets != null
+                ? targets.Select(t => t != null ? t.Format(includePosition: true) : "unknown troop").ToList()
+                : new List<string>());
+        }
+    }
+
     internal sealed class FaeyFireDamageSummary
     {
         public FaeyFireDamageSummary(TargetRef target, int boltCount, int totalDamage, int totalKills)
@@ -376,11 +418,6 @@ namespace SongsOfConquestAccess.Events.Combat
                 text += " at " + FormatList(SelectedTargetPoints.Select(FormatPoint).ToList());
             }
 
-            if (AffectedTargets.Count > 0)
-            {
-                text += ", affecting " + FormatList(AffectedTargets.Select(t => t.Format()).ToList());
-            }
-
             return text;
         }
     }
@@ -406,17 +443,6 @@ namespace SongsOfConquestAccess.Events.Combat
 
             return Attacker.Format() + " casts Faey Fire, " + FormatList(DamageSummaries.Select(s => s.FormatBoltText()).ToList());
         }
-    }
-
-    internal sealed class BacteriaAddedEvent : IAccessibilityEvent
-    {
-        // TODO: Remove this event type if we verify there is no future need to
-        // emit bacteria-added announcements separately from modifier details.
-        public BacteriaAddedEvent(TroopRef target, BacteriaRef bacteria) { Target = target; Bacteria = bacteria; }
-        public string Kind { get { return AccessibilityEvents.Combat.BacteriaAdded; } }
-        public TroopRef Target { get; private set; }
-        public BacteriaRef Bacteria { get; private set; }
-        public string GetSpeechText() { return Bacteria.Name + " applied to " + Target.Format(includePosition: true); }
     }
 
     internal sealed class BacteriaRemovedEvent : IAccessibilityEvent
@@ -451,6 +477,88 @@ namespace SongsOfConquestAccess.Events.Combat
             }
 
             return text;
+        }
+    }
+
+    internal sealed class BacteriaRemovedSummaryEvent : IAccessibilityEvent
+    {
+        public BacteriaRemovedSummaryEvent(BacteriaRef bacteria, IList<TroopRef> targets, EffectTargetSummaryKind targetSummaryKind)
+        {
+            Bacteria = bacteria;
+            Targets = targets != null ? new List<TroopRef>(targets) : new List<TroopRef>();
+            TargetSummaryKind = targetSummaryKind;
+        }
+
+        public string Kind { get { return AccessibilityEvents.Combat.BacteriaRemovedSummary; } }
+        public BacteriaRef Bacteria { get; private set; }
+        public IReadOnlyList<TroopRef> Targets { get; private set; }
+        public EffectTargetSummaryKind TargetSummaryKind { get; private set; }
+
+        public string GetSpeechText()
+        {
+            string name = Bacteria != null ? Bacteria.Name : "Effect";
+            return name + " removed from " + EffectTargetSummary.FormatTargets(Targets.ToList(), TargetSummaryKind);
+        }
+    }
+
+    internal sealed class BacteriaModifierSummaryEvent : IAccessibilityEvent
+    {
+        public BacteriaModifierSummaryEvent(BacteriaRef bacteria, IList<BacteriaModifierTargetSummary> targets, EffectTargetSummaryKind targetSummaryKind)
+        {
+            Bacteria = bacteria;
+            Targets = targets != null ? new List<BacteriaModifierTargetSummary>(targets) : new List<BacteriaModifierTargetSummary>();
+            TargetSummaryKind = targetSummaryKind;
+        }
+
+        public string Kind { get { return AccessibilityEvents.Combat.BacteriaModifierSummary; } }
+        public BacteriaRef Bacteria { get; private set; }
+        public IReadOnlyList<BacteriaModifierTargetSummary> Targets { get; private set; }
+        public EffectTargetSummaryKind TargetSummaryKind { get; private set; }
+
+        public string GetSpeechText()
+        {
+            if (Targets.Count == 0)
+            {
+                return string.Empty;
+            }
+
+            Dictionary<string, List<BacteriaModifierTargetSummary>> byChanges = new Dictionary<string, List<BacteriaModifierTargetSummary>>();
+            List<string> changeKeys = new List<string>();
+            for (int i = 0; i < Targets.Count; i++)
+            {
+                BacteriaModifierTargetSummary target = Targets[i];
+                string key = FormatChanges(target.Changes);
+                List<BacteriaModifierTargetSummary> group;
+                if (!byChanges.TryGetValue(key, out group))
+                {
+                    group = new List<BacteriaModifierTargetSummary>();
+                    byChanges[key] = group;
+                    changeKeys.Add(key);
+                }
+
+                group.Add(target);
+            }
+
+            List<string> parts = new List<string>();
+            for (int i = 0; i < changeKeys.Count; i++)
+            {
+                KeyValuePair<string, List<BacteriaModifierTargetSummary>> group =
+                    new KeyValuePair<string, List<BacteriaModifierTargetSummary>>(changeKeys[i], byChanges[changeKeys[i]]);
+                List<TroopRef> groupTargets = group.Value.Select(t => t.Target).ToList();
+                EffectTargetSummaryKind kind = byChanges.Count == 1 ? TargetSummaryKind : EffectTargetSummaryKind.ExplicitTargets;
+                string targets = EffectTargetSummary.FormatTargets(groupTargets, kind);
+                parts.Add(string.IsNullOrWhiteSpace(group.Key) ? targets : targets + ", " + group.Key);
+            }
+
+            string name = Bacteria != null ? Bacteria.Name : "Effect";
+            return name + " affects " + FormatList(parts);
+        }
+
+        private static string FormatChanges(IReadOnlyList<ModifierChange> changes)
+        {
+            return changes != null && changes.Count > 0
+                ? FormatList(changes.Select(c => c.Format()).ToList())
+                : string.Empty;
         }
     }
 
@@ -580,12 +688,6 @@ namespace SongsOfConquestAccess.Events.Combat
         public ActorRef Actor { get; private set; }
         public bool Succeeded { get; private set; }
         public string GetSpeechText() { return Succeeded ? Actor.Format() + " burrows up" : Actor.Format() + ", failed burrow"; }
-    }
-
-    internal sealed class AbilityCompleteEvent : IAccessibilityEvent
-    {
-        public string Kind { get { return AccessibilityEvents.Combat.AbilityComplete; } }
-        public string GetSpeechText() { return string.Empty; }
     }
 
     internal sealed class BattleResultEvent : IAccessibilityEvent

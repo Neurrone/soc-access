@@ -350,7 +350,9 @@ namespace SongsOfConquestAccess.Adapters
         {
             try
             {
-                return _facade != null && _facade.Queue != null ? _facade.Queue.CurrentTroopId : -1;
+                return _facade != null && _facade.Troops != null && _facade.Troops.Current != null
+                    ? _facade.Troops.Current.Id
+                    : -1;
             }
             catch
             {
@@ -371,25 +373,31 @@ namespace SongsOfConquestAccess.Adapters
         public IReadOnlyList<QueueItem> GetQueueItems()
         {
             List<QueueItem> items = new List<QueueItem>();
-            IReadOnlyList<IQueueHUDEntry> entries = GetActiveQueueEntries();
+            if (_facade == null || _facade.Queue == null)
+            {
+                return items;
+            }
+
+            IReadOnlyList<IQueueHUDEntry> nativeEntries = GetActiveQueueEntries();
             int insertedRound = -1;
             int turnsLeftInRound = GetTurnsLeftInRound();
             int nextRound = GetCurrentRound() + 2;
-            for (int i = 0; i < entries.Count; i++)
+            for (int i = 1; i < _facade.Queue.Count; i++)
             {
-                IQueueHUDEntry entry = entries[i];
-                if (entry == null || entry.Troop.Id < 0 || !IsGameObjectVisible(entry.Container))
+                QueuedTroop queuedTroop = _facade.Queue[i];
+                if (queuedTroop.Id < 0)
                 {
                     continue;
                 }
 
-                if (insertedRound < 0 && turnsLeftInRound > 0 && i >= turnsLeftInRound - 1)
+                if (insertedRound < 0 && turnsLeftInRound > 0 && i >= turnsLeftInRound)
                 {
                     items.Add(QueueItem.RoundMarker("combat-queue-round-" + nextRound, "Round " + nextRound));
                     insertedRound = nextRound;
                 }
 
-                items.Add(new QueueItem(this, entry, items.Count + 1));
+                IQueueHUDEntry nativeEntry = FindNativeQueueEntry(nativeEntries, queuedTroop);
+                items.Add(new QueueItem(this, queuedTroop, nativeEntry, items.Count + 1));
             }
 
             return items;
@@ -659,6 +667,28 @@ namespace SongsOfConquestAccess.Adapters
             }
 
             return result;
+        }
+
+        private static IQueueHUDEntry FindNativeQueueEntry(IReadOnlyList<IQueueHUDEntry> entries, QueuedTroop queuedTroop)
+        {
+            if (entries == null)
+            {
+                return null;
+            }
+
+            for (int i = 0; i < entries.Count; i++)
+            {
+                IQueueHUDEntry entry = entries[i];
+                if (entry != null
+                    && entry.Troop.Id == queuedTroop.Id
+                    && entry.Troop.Round == queuedTroop.Round
+                    && IsGameObjectVisible(entry.Container))
+                {
+                    return entry;
+                }
+            }
+
+            return null;
         }
 
         private int GetCurrentRound()
@@ -1106,12 +1136,15 @@ namespace SongsOfConquestAccess.Adapters
         internal sealed class QueueItem
         {
             private readonly BattleHudAdapter _adapter;
+            private readonly QueuedTroop _queuedTroop;
             private readonly IQueueHUDEntry _entry;
             private readonly string _roundLabel;
+            private readonly bool _isRoundMarker;
 
-            public QueueItem(BattleHudAdapter adapter, IQueueHUDEntry entry, int index)
+            public QueueItem(BattleHudAdapter adapter, QueuedTroop queuedTroop, IQueueHUDEntry entry, int index)
             {
                 _adapter = adapter;
+                _queuedTroop = queuedTroop;
                 _entry = entry;
                 Index = index;
             }
@@ -1120,6 +1153,7 @@ namespace SongsOfConquestAccess.Adapters
             {
                 Id = id;
                 _roundLabel = roundLabel;
+                _isRoundMarker = true;
             }
 
             public static QueueItem RoundMarker(string id, string label)
@@ -1133,12 +1167,17 @@ namespace SongsOfConquestAccess.Adapters
 
             public bool IsRoundMarker
             {
-                get { return _entry == null; }
+                get { return _isRoundMarker; }
             }
 
             public int TroopId
             {
-                get { return _entry != null ? _entry.Troop.Id : -1; }
+                get { return IsRoundMarker ? -1 : _queuedTroop.Id; }
+            }
+
+            public bool HasNativeEntry
+            {
+                get { return _entry != null; }
             }
 
             public string Label
@@ -1156,12 +1195,12 @@ namespace SongsOfConquestAccess.Adapters
 
             public bool IsVisible
             {
-                get { return IsRoundMarker || (_entry != null && _entry.Troop.Id >= 0 && IsGameObjectVisible(_entry.Container)); }
+                get { return IsRoundMarker || TroopId >= 0; }
             }
 
             public void Focus()
             {
-                if (IsRoundMarker)
+                if (IsRoundMarker || _entry == null)
                 {
                     return;
                 }
@@ -1173,7 +1212,7 @@ namespace SongsOfConquestAccess.Adapters
 
             public void Unfocus()
             {
-                if (IsRoundMarker)
+                if (IsRoundMarker || _entry == null)
                 {
                     return;
                 }
@@ -1183,7 +1222,7 @@ namespace SongsOfConquestAccess.Adapters
 
             public Tooltip Tooltip
             {
-                get { return IsRoundMarker ? null : Tooltip.ForComponent(_adapter.GetQueueEntryButton(_entry), _adapter._localization); }
+                get { return IsRoundMarker || _entry == null ? null : Tooltip.ForComponent(_adapter.GetQueueEntryButton(_entry), _adapter._localization); }
             }
         }
     }
