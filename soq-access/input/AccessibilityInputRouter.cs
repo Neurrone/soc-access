@@ -11,6 +11,7 @@ namespace SongsOfConquestAccess.Input
     internal sealed class AccessibilityInputRouter : IDisposable, IObserver<InputEventPtr>
     {
         private const float ReleasePollingDelaySeconds = 0.05f;
+        private const float ModifiedReleasePollingDelaySeconds = 0.10f;
 
         private readonly ScreenManager _screenManager;
         private readonly Dictionary<string, ActiveBindingState> _activeBindings =
@@ -241,7 +242,9 @@ namespace SongsOfConquestAccess.Input
             foreach (KeyValuePair<string, ActiveBindingState> item in _activeBindings)
             {
                 ActiveBindingState state = item.Value;
-                if (UnityEngine.Time.unscaledTime - state.ActivatedAtSeconds < ReleasePollingDelaySeconds)
+                float age = UnityEngine.Time.unscaledTime - state.ActivatedAtSeconds;
+                float releaseDelay = GetReleasePollingDelaySeconds(state.Binding);
+                if (age < releaseDelay)
                 {
                     continue;
                 }
@@ -251,13 +254,20 @@ namespace SongsOfConquestAccess.Input
                     continue;
                 }
 
-                // Raw key-up would be a cleaner release signal, but in this
-                // Unity/BepInEx input path handled key-down events did not
-                // produce observable pressed=false key events in this observer.
-                // When release detection was switched to raw key-up only, each
-                // key stayed active after its first press and later presses were
-                // suppressed forever. Polling Keyboard.current is therefore the
-                // release source used for one-shot bindings here.
+                // Plain bindings use the shortest release delay that avoids
+                // duplicate key-down handling, so rapid arrow navigation remains
+                // responsive. Modified bindings use a longer delay because
+                // Unity.InputSystem 1.7.0 can emit duplicate raw Tab pressed
+                // events for Shift+Tab while the key was not actually released.
+                // We also did not observe raw Tab release events in this input
+                // path, so release is inferred from Keyboard.current below. From
+                // the mod side this debounce is the available workaround unless
+                // the game updates to Input System 1.9.0 or newer, which fixes
+                // related press/release frame-state bugs:
+                // https://docs.unity.cn/Packages/com.unity.inputsystem%401.10/changelog/CHANGELOG.html#190---2024-07-15
+                // See also:
+                // https://discussions.unity.com/t/keyboard-current-temporarily-stops-registering-ispressed-or-waspressedthisframe-after-scene-load/1496259
+                // https://discussions.unity.com/t/keyboard-current-key-waspressedthisframe-fires-multiple-times-before-key-is-released/886444
                 if (released == null)
                 {
                     released = new List<string>();
@@ -275,6 +285,16 @@ namespace SongsOfConquestAccess.Input
             {
                 _activeBindings.Remove(released[i]);
             }
+        }
+
+        private static float GetReleasePollingDelaySeconds(KeyboardBinding binding)
+        {
+            if (binding != null && (binding.Ctrl || binding.Shift || binding.Alt))
+            {
+                return ModifiedReleasePollingDelaySeconds;
+            }
+
+            return ReleasePollingDelaySeconds;
         }
 
         private bool CurrentScreenClaims(InputAction action)
