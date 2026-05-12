@@ -118,7 +118,6 @@ namespace SongsOfConquestAccess.Adapters
                 }
 
                 result.Add(new ObjectiveEntry(
-                    "post-adventure-objective-" + i,
                     label,
                     GetObjectiveStatus(entry),
                     entry));
@@ -303,15 +302,12 @@ namespace SongsOfConquestAccess.Adapters
         {
             private readonly PostAdventureMenuObjectiveEntry _entry;
 
-            public ObjectiveEntry(string id, string label, string status, PostAdventureMenuObjectiveEntry entry)
+            public ObjectiveEntry(string label, string status, PostAdventureMenuObjectiveEntry entry)
             {
-                Id = id ?? string.Empty;
                 Label = label ?? string.Empty;
                 Status = status ?? string.Empty;
                 _entry = entry;
             }
-
-            public string Id { get; private set; }
 
             public string Label { get; private set; }
 

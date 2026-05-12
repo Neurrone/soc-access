@@ -30,7 +30,6 @@ using SongsOfConquestAccess.Events.Combat;
 using SongsOfConquestAccess.Scanner;
 using SongsOfConquestAccess.Speech;
 using SongsOfConquestAccess.Speech.Spatial;
-using SongsOfConquestAccess.UI;
 using SongsOfConquest.Utilities;
 using Unity.Mathematics;
 using UnityEngine;

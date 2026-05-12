@@ -20,7 +20,6 @@ using SongsOfConquest.Common.Map;
 using SongsOfConquest.Server.Map;
 using SongsOfConquestAccess.Scanner;
 using SongsOfConquestAccess.Speech;
-using SongsOfConquestAccess.UI;
 using Unity.Mathematics;
 using UnityEngine;
 using UnityEngine.UI;
@@ -149,25 +148,33 @@ namespace SongsOfConquestAccess.Adapters
             get { return GetCommanderTooltip(own: true); }
         }
 
-        public ButtonWidget BuildWithdrawButton()
-        {
-            return BuildButton("pre-battle-withdraw", "Withdraw", GetField<UIButton>(CancelButtonField));
-        }
+        public string WithdrawButtonLabel { get { return GetButtonLabel(CancelButtonField, "Withdraw"); } }
+        public bool Withdraw() { return ActivateButton(CancelButtonField); }
+        public void FocusWithdrawButton() { FocusButton(CancelButtonField); }
+        public bool IsWithdrawButtonEnabled() { return IsButtonEnabled(CancelButtonField); }
+        public bool IsWithdrawButtonVisible() { return IsButtonVisible(CancelButtonField); }
+        public Tooltip WithdrawButtonTooltip { get { return GetButtonTooltip(CancelButtonField); } }
 
-        public ButtonWidget BuildManualBattleButton()
-        {
-            return BuildButton("pre-battle-manual-battle", "Manual battle", GetField<UIButton>(BattleButtonField));
-        }
+        public string ManualBattleButtonLabel { get { return GetButtonLabel(BattleButtonField, "Manual battle"); } }
+        public bool ManualBattle() { return ActivateButton(BattleButtonField); }
+        public void FocusManualBattleButton() { FocusButton(BattleButtonField); }
+        public bool IsManualBattleButtonEnabled() { return IsButtonEnabled(BattleButtonField); }
+        public bool IsManualBattleButtonVisible() { return IsButtonVisible(BattleButtonField); }
+        public Tooltip ManualBattleButtonTooltip { get { return GetButtonTooltip(BattleButtonField); } }
 
-        public ButtonWidget BuildQuickBattleButton()
-        {
-            return BuildButton("pre-battle-quick-battle", "Quick battle", GetField<UIButton>(QuickButtonField));
-        }
+        public string QuickBattleButtonLabel { get { return GetButtonLabel(QuickButtonField, "Quick battle"); } }
+        public bool QuickBattle() { return ActivateButton(QuickButtonField); }
+        public void FocusQuickBattleButton() { FocusButton(QuickButtonField); }
+        public bool IsQuickBattleButtonEnabled() { return IsButtonEnabled(QuickButtonField); }
+        public bool IsQuickBattleButtonVisible() { return IsButtonVisible(QuickButtonField); }
+        public Tooltip QuickBattleButtonTooltip { get { return GetButtonTooltip(QuickButtonField); } }
 
-        public ButtonWidget BuildReadyButton()
-        {
-            return BuildButton("pre-battle-ready", "Ready", GetField<UIButton>(ReadyButtonField));
-        }
+        public string ReadyButtonLabel { get { return GetButtonLabel(ReadyButtonField, "Ready"); } }
+        public bool Ready() { return ActivateButton(ReadyButtonField); }
+        public void FocusReadyButton() { FocusButton(ReadyButtonField); }
+        public bool IsReadyButtonEnabled() { return IsButtonEnabled(ReadyButtonField); }
+        public bool IsReadyButtonVisible() { return IsButtonVisible(ReadyButtonField); }
+        public Tooltip ReadyButtonTooltip { get { return GetButtonTooltip(ReadyButtonField); } }
 
         public TroopPlacementSnapshot BuildSnapshot()
         {
@@ -484,26 +491,38 @@ namespace SongsOfConquestAccess.Adapters
             return renderer.PointToWorld(new int2(tile.x, tile.y), out ignored);
         }
 
-        private ButtonWidget BuildButton(string id, string fallbackLabel, UIButton button)
+        private string GetButtonLabel(FieldInfo field, string fallbackLabel)
         {
-            string label = MenuButtonTextUtility.GetStandardButtonLabel(button);
-            if (string.IsNullOrWhiteSpace(label))
-            {
-                label = fallbackLabel;
-            }
+            string label = MenuButtonTextUtility.GetStandardButtonLabel(GetField<UIButton>(field));
+            return string.IsNullOrWhiteSpace(label) ? fallbackLabel : label;
+        }
 
-            return new ButtonWidget(
-                id,
-                label,
-                () => NativeSelectionUtility.Click(button),
-                () =>
-                {
-                    HideNativeTooltip();
-                    NativeSelectionUtility.Select(button);
-                },
-                () => button == null || button.Interactable,
-                () => button != null && button.Active,
-                Tooltip.ForComponent(button, GetLocalization()));
+        private bool ActivateButton(FieldInfo field)
+        {
+            return NativeSelectionUtility.Click(GetField<UIButton>(field));
+        }
+
+        private void FocusButton(FieldInfo field)
+        {
+            HideNativeTooltip();
+            NativeSelectionUtility.Select(GetField<UIButton>(field));
+        }
+
+        private bool IsButtonEnabled(FieldInfo field)
+        {
+            UIButton button = GetField<UIButton>(field);
+            return button == null || button.Interactable;
+        }
+
+        private bool IsButtonVisible(FieldInfo field)
+        {
+            UIButton button = GetField<UIButton>(field);
+            return button != null && button.Active;
+        }
+
+        private Tooltip GetButtonTooltip(FieldInfo field)
+        {
+            return Tooltip.ForComponent(GetField<UIButton>(field), GetLocalization());
         }
 
         private void AddTiles(TroopPlacementSnapshot snapshot, MapFormat map)

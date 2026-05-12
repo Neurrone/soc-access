@@ -54,10 +54,10 @@ namespace SongsOfConquestAccess.Screens
 
             AddCampaignItems(menu, adapter);
             root.AddChild(menu);
-            AddOptionalButton(root, adapter.CustomCampaignButton);
-            AddOptionalButton(root, adapter.TalesButton);
-            AddOptionalButton(root, adapter.OptionsButton);
-            AddOptionalButton(root, adapter.BackButton);
+            AddOptionalButton(root, "custom-campaigns", adapter.CustomCampaignButton);
+            AddOptionalButton(root, "tales", adapter.TalesButton);
+            AddOptionalButton(root, "options", adapter.OptionsButton);
+            AddOptionalButton(root, "back", adapter.BackButton);
             return root;
         }
 
@@ -77,16 +77,16 @@ namespace SongsOfConquestAccess.Screens
                 }
 
                 menu.AddItem(new MenuItemWidget(
-                    item.Id,
+                    "campaign-" + i,
                     item.GetLabel,
-                    item.GetStatus,
+                    () => BuildMenuButtonStatus(item),
                     item.Activate,
                     item.FocusNative,
                     item.IsVisible));
             }
         }
 
-        private static void AddOptionalButton(ContainerWidget root, IMenuButtonAdapter button)
+        private static void AddOptionalButton(ContainerWidget root, string id, IMenuButtonAdapter button)
         {
             if (root == null || button == null || !button.IsVisible())
             {
@@ -94,7 +94,7 @@ namespace SongsOfConquestAccess.Screens
             }
 
             root.AddChild(new ButtonWidget(
-                button.Id,
+                id,
                 button.GetLabel(),
                 button.Activate,
                 () => FocusNativeButton(button.Button),
@@ -114,6 +114,22 @@ namespace SongsOfConquestAccess.Screens
             {
                 EventSystem.current.SetSelectedGameObject(component.gameObject);
             }
+        }
+
+        private static string BuildMenuButtonStatus(IMenuButtonAdapter item)
+        {
+            if (item == null)
+            {
+                return string.Empty;
+            }
+
+            string nativeStatus = item.GetStatus();
+            if (item.IsEnabled())
+            {
+                return nativeStatus;
+            }
+
+            return string.IsNullOrWhiteSpace(nativeStatus) ? "disabled" : "disabled. " + nativeStatus;
         }
     }
 }

@@ -39,7 +39,7 @@ namespace SongsOfConquestAccess.Adapters
             BuildMissions();
 
             MainMenuManager.Settings mainMenuSettings = GetMainMenuSettings();
-            BackButton = mainMenuSettings != null ? new StandardMenuButtonAdapter("back", mainMenuSettings.BackButton) : null;
+            BackButton = mainMenuSettings != null ? new StandardMenuButtonAdapter(mainMenuSettings.BackButton) : null;
             OptionsButton = mainMenuSettings != null ? new OptionsMenuButtonAdapter(mainMenuSettings.OptionsButton) : null;
         }
 
@@ -70,7 +70,7 @@ namespace SongsOfConquestAccess.Adapters
                 && HasVisibleMission();
         }
 
-        public string SelectedMissionId
+        public int SelectedMissionIndex
         {
             get
             {
@@ -79,11 +79,11 @@ namespace SongsOfConquestAccess.Adapters
                 {
                     if (ReferenceEquals(_missions[i].Source, selected))
                     {
-                        return _missions[i].Id;
+                        return i;
                     }
                 }
 
-                return string.Empty;
+                return -1;
             }
         }
 

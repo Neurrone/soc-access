@@ -163,8 +163,8 @@ namespace SongsOfConquestAccess.Screens
                 SpellbookAdapter.QuickbarItem item = items[i];
                 DraggableMenuItemWidget widget = null;
                 widget = new DraggableMenuItemWidget(
-                    item.Id,
-                    () => item.Label,
+                    "spellbook-quickbar-" + (item.Index + 1),
+                    () => BuildQuickbarLabel(item),
                     null,
                     item.Activate,
                     item.Focus,
@@ -189,6 +189,17 @@ namespace SongsOfConquestAccess.Screens
             }
 
             return menu;
+        }
+
+        private static string BuildQuickbarLabel(SpellbookAdapter.QuickbarItem item)
+        {
+            if (item == null)
+            {
+                return string.Empty;
+            }
+
+            string slot = "Slot " + (item.Index + 1) + ": ";
+            return item.HasSpell ? slot + item.SpellName : slot + "empty";
         }
 
         private static IReadOnlyList<T> SafeGet<T>(string section, Func<IReadOnlyList<T>> getter)

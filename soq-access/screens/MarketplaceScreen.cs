@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using SongsOfConquest.Client.Gamestate.Facade;
 using SongsOfConquest.Common.Economy;
 using SongsOfConquestAccess.Adapters;
@@ -152,8 +153,8 @@ namespace SongsOfConquestAccess.Screens
                 MarketplaceMenuAdapter.ResourceItem resource = resources[i];
                 ResourceType capturedType = resource.ResourceType;
                 menu.AddItem(new MenuItemWidget(
-                    resource.Id,
-                    () => resource.Label,
+                    "marketplace-resource-" + capturedType.ToString().ToLowerInvariant(),
+                    () => BuildResourceLabel(resource),
                     null,
                     () => false,
                     () => adapter.SelectResource(capturedType),
@@ -166,12 +167,54 @@ namespace SongsOfConquestAccess.Screens
         private static void AddTradeButton(ContainerWidget root, MarketplaceMenuAdapter.TradeActionItem action)
         {
             root.AddChild(new ButtonWidget(
-                action.Id,
-                action.GetLabel,
+                BuildTradeActionId(action),
+                () => BuildTradeActionLabel(action),
                 action.Activate,
                 action.Focus,
                 action.IsEnabled,
                 action.IsVisible));
+        }
+
+        private static string BuildResourceLabel(MarketplaceMenuAdapter.ResourceItem resource)
+        {
+            if (resource == null)
+            {
+                return string.Empty;
+            }
+
+            return resource.ResourceName + ": " + FormatAmount(resource.Amount);
+        }
+
+        private static string BuildTradeActionId(MarketplaceMenuAdapter.TradeActionItem action)
+        {
+            string operation = action != null && action.IsBuyButton ? "buy" : "sell";
+            int amount = action != null ? action.Amount : 0;
+            return "marketplace-" + operation + "-" + amount;
+        }
+
+        private static string BuildTradeActionLabel(MarketplaceMenuAdapter.TradeActionItem action)
+        {
+            if (action == null)
+            {
+                return string.Empty;
+            }
+
+            if (action.ResourceType == ResourceType.Gold || action.IsVisible == null || !action.IsVisible())
+            {
+                return action.IsBuyButton ? "Buy" : "Sell";
+            }
+
+            string resourceName = action.ResourceName.ToLowerInvariant();
+            string formattedAmount = FormatAmount(action.Amount);
+            string formattedGold = FormatAmount(action.GoldAmount);
+            return action.IsBuyButton
+                ? "Buy " + formattedAmount + " " + resourceName + " for " + formattedGold + " gold"
+                : "Sell " + formattedAmount + " " + resourceName + " for " + formattedGold + " gold";
+        }
+
+        private static string FormatAmount(int amount)
+        {
+            return amount.ToString("N0", CultureInfo.InvariantCulture);
         }
     }
 }

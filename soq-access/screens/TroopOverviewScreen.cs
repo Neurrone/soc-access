@@ -48,21 +48,22 @@ namespace SongsOfConquestAccess.Screens
             IReadOnlyList<KingdomTroopOverviewAdapter.GroupItem> groups = adapter.GetGroups();
             for (int i = 0; i < groups.Count; i++)
             {
-                root.AddChild(BuildGroupMenu(groups[i]));
+                root.AddChild(BuildGroupMenu(groups[i], i));
             }
 
             return root;
         }
 
-        private static MenuWidget BuildGroupMenu(KingdomTroopOverviewAdapter.GroupItem group)
+        private static MenuWidget BuildGroupMenu(KingdomTroopOverviewAdapter.GroupItem group, int groupIndex)
         {
-            MenuWidget menu = new MenuWidget(group.Id, group.Label);
+            string groupId = "troop-overview-town-" + groupIndex;
+            MenuWidget menu = new MenuWidget(groupId, BuildGroupLabel(group, groupIndex));
             IReadOnlyList<KingdomTroopOverviewAdapter.RowItem> rows = group.Rows;
             for (int i = 0; i < rows.Count; i++)
             {
                 KingdomTroopOverviewAdapter.RowItem row = rows[i];
                 menu.AddItem(new MenuItemWidget(
-                    row.Id,
+                    groupId + "-row-" + i,
                     () => row.Label,
                     () => row.Status,
                     row.Activate,
@@ -77,6 +78,16 @@ namespace SongsOfConquestAccess.Screens
             }
 
             return menu;
+        }
+
+        private static string BuildGroupLabel(KingdomTroopOverviewAdapter.GroupItem group, int groupIndex)
+        {
+            if (group != null && !string.IsNullOrWhiteSpace(group.Label))
+            {
+                return group.Label;
+            }
+
+            return "Group " + (groupIndex + 1);
         }
     }
 }

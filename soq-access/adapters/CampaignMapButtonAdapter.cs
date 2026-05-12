@@ -21,10 +21,7 @@ namespace SongsOfConquestAccess.Adapters
         public CampaignMapButtonAdapter(CampaignMapButton button)
         {
             _button = button;
-            Id = BuildId(button);
         }
-
-        public string Id { get; private set; }
 
         public CampaignMapButton Source
         {
@@ -101,17 +98,6 @@ namespace SongsOfConquestAccess.Adapters
         private UIButton GetPlayedBeforeButton()
         {
             return _button != null ? PlayedBeforeButtonRef(_button) : null;
-        }
-
-        private static string BuildId(CampaignMapButton button)
-        {
-            ICampaignMapDefinition definition = button != null ? button.Definition : null;
-            if (definition != null && !string.IsNullOrWhiteSpace(definition.Identifier))
-            {
-                return "campaign-map-" + definition.Identifier.ToLowerInvariant();
-            }
-
-            return "campaign-map-" + (button != null ? button.GetInstanceID().ToString() : "unknown");
         }
 
         private static bool IsLiveSceneObject(GameObject gameObject)

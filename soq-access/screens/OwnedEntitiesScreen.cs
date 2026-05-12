@@ -49,21 +49,22 @@ namespace SongsOfConquestAccess.Screens
             IReadOnlyList<KingdomEntityOverviewAdapter.GroupItem> groups = adapter.GetGroups();
             for (int i = 0; i < groups.Count; i++)
             {
-                root.AddChild(BuildGroupMenu(groups[i]));
+                root.AddChild(BuildGroupMenu(groups[i], i));
             }
 
             return root;
         }
 
-        private static MenuWidget BuildGroupMenu(KingdomEntityOverviewAdapter.GroupItem group)
+        private static MenuWidget BuildGroupMenu(KingdomEntityOverviewAdapter.GroupItem group, int groupIndex)
         {
-            MenuWidget menu = new MenuWidget(group.Id, group.Label);
+            string groupId = "owned-entities-group-" + groupIndex;
+            MenuWidget menu = new MenuWidget(groupId, BuildGroupLabel(group, groupIndex));
             IReadOnlyList<KingdomEntityOverviewAdapter.RowItem> rows = group.Rows;
             for (int i = 0; i < rows.Count; i++)
             {
                 KingdomEntityOverviewAdapter.RowItem row = rows[i];
                 menu.AddItem(new MenuItemWidget(
-                    row.Id,
+                    groupId + "-row-" + i,
                     () => row.Label,
                     () => row.Status,
                     row.Activate,
@@ -78,6 +79,16 @@ namespace SongsOfConquestAccess.Screens
             }
 
             return menu;
+        }
+
+        private static string BuildGroupLabel(KingdomEntityOverviewAdapter.GroupItem group, int groupIndex)
+        {
+            if (group != null && !string.IsNullOrWhiteSpace(group.Label))
+            {
+                return group.Label;
+            }
+
+            return "Group " + (groupIndex + 1);
         }
     }
 }

@@ -1,7 +1,6 @@
 using System.Collections.Generic;
 using SongsOfConquest.Client.Adventure.UI;
 using SongsOfConquest.Common.Localization;
-using SongsOfConquestAccess.Speech;
 using UnityEngine;
 
 namespace SongsOfConquestAccess.Adapters
@@ -9,13 +8,11 @@ namespace SongsOfConquestAccess.Adapters
     internal sealed class DefenceSlotListAdapter
     {
         private readonly IReadOnlyList<TroopHUDEntry> _entries;
-        private readonly string _slotType;
         private readonly ILocalizationHandler _localization;
 
-        public DefenceSlotListAdapter(IReadOnlyList<TroopHUDEntry> entries, string slotType, ILocalizationHandler localization)
+        public DefenceSlotListAdapter(IReadOnlyList<TroopHUDEntry> entries, ILocalizationHandler localization)
         {
             _entries = entries ?? new TroopHUDEntry[0];
-            _slotType = slotType ?? string.Empty;
             _localization = localization;
         }
 
@@ -25,7 +22,7 @@ namespace SongsOfConquestAccess.Adapters
             for (int i = 0; i < _entries.Count; i++)
             {
                 TroopHUDEntry entry = _entries[i];
-                slots.Add(new Slot(_slotType + "-slot-" + (i + 1), _slotType, i + 1, entry, _localization));
+                slots.Add(new Slot(i + 1, entry, _localization));
             }
 
             return slots;
@@ -35,32 +32,19 @@ namespace SongsOfConquestAccess.Adapters
         {
             private readonly TroopHUDEntry _entry;
             private readonly ILocalizationHandler _localization;
-            private readonly string _slotType;
-            private readonly int _slotNumber;
 
-            public Slot(string id, string slotType, int slotNumber, TroopHUDEntry entry, ILocalizationHandler localization)
+            public Slot(int slotNumber, TroopHUDEntry entry, ILocalizationHandler localization)
             {
-                Id = id ?? string.Empty;
-                _slotType = slotType ?? string.Empty;
-                _slotNumber = slotNumber;
+                SlotNumber = slotNumber;
                 _entry = entry;
                 _localization = localization;
             }
 
-            public string Id { get; private set; }
+            public int SlotNumber { get; private set; }
 
-            public string Label
+            public bool IsOccupied
             {
-                get
-                {
-                    Tooltip tooltip = Tooltip;
-                    if (tooltip != null && tooltip.TextLines != null && tooltip.TextLines.Count > 0)
-                    {
-                        return SpeechTextSanitizer.Normalize(string.Join(". ", tooltip.TextLines));
-                    }
-
-                    return "Empty, slot " + _slotNumber;
-                }
+                get { return _entry != null && _entry.Troop != null; }
             }
 
             public Tooltip Tooltip

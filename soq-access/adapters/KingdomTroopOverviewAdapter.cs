@@ -107,16 +107,11 @@ namespace SongsOfConquestAccess.Adapters
             string tier = NormalizeText(GetText(entry, UpgradeTextField));
             string title = MenuButtonTextUtility.JoinParts(town, tier);
             string label = GetShortCategoryLabel(town);
-            if (string.IsNullOrWhiteSpace(label))
-            {
-                label = "Group " + (index + 1);
-            }
 
             List<RowItem> rows = new List<RowItem>();
             if (!string.IsNullOrWhiteSpace(title))
             {
                 rows.Add(new RowItem(
-                    "troop-overview-town-" + index + "-title",
                     title,
                     string.Empty,
                     () => ClickTown(entry),
@@ -140,16 +135,14 @@ namespace SongsOfConquestAccess.Adapters
                 }
 
                 string amount = NormalizeText(GetText(income, IncomeAmountField));
-                int capturedIndex = i;
                 rows.Add(new RowItem(
-                    "troop-overview-town-" + index + "-troop-" + capturedIndex,
                     troop,
                     amount,
                     () => ClickIncome(income),
                     () => FocusIncome(income)));
             }
 
-            return rows.Count > 0 ? new GroupItem("troop-overview-town-" + index, label, rows) : null;
+            return rows.Count > 0 ? new GroupItem(label, rows) : null;
         }
 
         private static bool ClickTown(KingdomTroopOverviewTownEntry entry)
@@ -255,30 +248,26 @@ namespace SongsOfConquestAccess.Adapters
 
         internal sealed class GroupItem
         {
-            public GroupItem(string id, string label, IReadOnlyList<RowItem> rows)
+            public GroupItem(string label, IReadOnlyList<RowItem> rows)
             {
-                Id = id ?? string.Empty;
                 Label = label ?? string.Empty;
                 Rows = rows ?? new RowItem[0];
             }
 
-            public string Id { get; private set; }
             public string Label { get; private set; }
             public IReadOnlyList<RowItem> Rows { get; private set; }
         }
 
         internal sealed class RowItem
         {
-            public RowItem(string id, string label, string status, Func<bool> activate, Func<bool> focus)
+            public RowItem(string label, string status, Func<bool> activate, Func<bool> focus)
             {
-                Id = id ?? string.Empty;
                 Label = label ?? string.Empty;
                 Status = status ?? string.Empty;
                 Activate = activate;
                 Focus = focus;
             }
 
-            public string Id { get; private set; }
             public string Label { get; private set; }
             public string Status { get; private set; }
             public Func<bool> Activate { get; private set; }

@@ -4,6 +4,7 @@ using SongsOfConquest.Client.Gamestate.Facade;
 using SongsOfConquest.Common.Gamestate.Facade;
 using SongsOfConquestAccess.Adapters;
 using SongsOfConquestAccess.Input;
+using SongsOfConquestAccess.Speech;
 using SongsOfConquestAccess.UI;
 
 namespace SongsOfConquestAccess.Screens
@@ -298,8 +299,8 @@ namespace SongsOfConquestAccess.Screens
             {
                 DefenceSlotListAdapter.Slot slot = slots[i];
                 menu.AddItem(new MenuItemWidget(
-                    slot.Id,
-                    () => slot.Label,
+                    id + "-slot-" + slot.SlotNumber,
+                    () => BuildDefenseSlotLabel(slot),
                     null,
                     null,
                     slot.Focus,
@@ -308,6 +309,22 @@ namespace SongsOfConquestAccess.Screens
             }
 
             return menu;
+        }
+
+        private static string BuildDefenseSlotLabel(DefenceSlotListAdapter.Slot slot)
+        {
+            if (slot == null)
+            {
+                return string.Empty;
+            }
+
+            Tooltip tooltip = slot.Tooltip;
+            if (tooltip != null && tooltip.TextLines != null && tooltip.TextLines.Count > 0)
+            {
+                return SpeechTextSanitizer.Normalize(string.Join(". ", tooltip.TextLines));
+            }
+
+            return "Empty, slot " + slot.SlotNumber;
         }
     }
 }

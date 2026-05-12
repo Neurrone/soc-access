@@ -46,17 +46,16 @@ namespace SongsOfConquestAccess.Adapters
             }
 
             CustomCampaignButton = CreateOptionalButton(
-                "custom-campaigns",
                 "Custom campaigns",
-                campaignMenu != null ? CustomCampaignButtonRef(campaignMenu) : null);
+                campaignMenu != null ? CustomCampaignButtonRef(campaignMenu) : null,
+                includeAllVisibleText: false);
             UIButton talesButton = campaignMenu != null ? TalesButtonRef(campaignMenu) : null;
             TalesButton = CreateOptionalButton(
-                "tales",
                 "Tales",
-                talesButton != null ? ((Component)talesButton).gameObject : null);
+                talesButton != null ? ((Component)talesButton).gameObject : null,
+                includeAllVisibleText: true);
             MainMenuManager.Settings settings = GetMainMenuSettings();
             BackButton = settings != null ? new OptionalMenuButtonAdapter(
-                "back",
                 settings.BackButton,
                 "Back",
                 () => settings.BackButton != null && MenuButtonAdapterBase.IsButtonVisible(settings.BackButton),
@@ -129,7 +128,7 @@ namespace SongsOfConquestAccess.Adapters
             return _campaignMenu != null ? CampaignButtonContainerRef(_campaignMenu) : null;
         }
 
-        private static IMenuButtonAdapter CreateOptionalButton(string id, string fallbackLabel, GameObject root)
+        private static IMenuButtonAdapter CreateOptionalButton(string fallbackLabel, GameObject root, bool includeAllVisibleText)
         {
             if (!IsGameObjectActive(root))
             {
@@ -143,12 +142,11 @@ namespace SongsOfConquestAccess.Adapters
             }
 
             return new OptionalMenuButtonAdapter(
-                id,
                 button,
                 fallbackLabel,
                 () => IsGameObjectActive(root) && MenuButtonAdapterBase.IsButtonVisible(button),
                 null,
-                includeAllVisibleText: id == "tales");
+                includeAllVisibleText);
         }
 
         private static bool IsOptionalButtonUsable(IMenuButtonAdapter button)
@@ -185,13 +183,12 @@ namespace SongsOfConquestAccess.Adapters
             private readonly bool _includeAllVisibleText;
 
             public OptionalMenuButtonAdapter(
-                string id,
                 UIButton button,
                 string fallbackLabel,
                 System.Func<bool> isVisible,
                 System.Func<bool> activate,
                 bool includeAllVisibleText)
-                : base(id, button, isVisible, activate)
+                : base(button, isVisible, activate)
             {
                 _fallbackLabel = fallbackLabel ?? string.Empty;
                 _includeAllVisibleText = includeAllVisibleText;

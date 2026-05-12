@@ -84,10 +84,41 @@ namespace SongsOfConquestAccess.Screens
                 includeParentLabelInAnnouncement: false));
 
             root.AddChild(hexGrid);
-            root.AddChild(adapter.BuildWithdrawButton());
-            root.AddChild(adapter.BuildManualBattleButton());
-            root.AddChild(adapter.BuildQuickBattleButton());
-            root.AddChild(adapter.BuildReadyButton());
+            root.AddChild(new ButtonWidget(
+                "pre-battle-withdraw",
+                adapter.WithdrawButtonLabel,
+                adapter.Withdraw,
+                adapter.FocusWithdrawButton,
+                adapter.IsWithdrawButtonEnabled,
+                adapter.IsWithdrawButtonVisible,
+                adapter.WithdrawButtonTooltip));
+
+            root.AddChild(new ButtonWidget(
+                "pre-battle-manual-battle",
+                adapter.ManualBattleButtonLabel,
+                adapter.ManualBattle,
+                adapter.FocusManualBattleButton,
+                adapter.IsManualBattleButtonEnabled,
+                adapter.IsManualBattleButtonVisible,
+                adapter.ManualBattleButtonTooltip));
+
+            root.AddChild(new ButtonWidget(
+                "pre-battle-quick-battle",
+                adapter.QuickBattleButtonLabel,
+                adapter.QuickBattle,
+                adapter.FocusQuickBattleButton,
+                adapter.IsQuickBattleButtonEnabled,
+                adapter.IsQuickBattleButtonVisible,
+                adapter.QuickBattleButtonTooltip));
+
+            root.AddChild(new ButtonWidget(
+                "pre-battle-ready",
+                adapter.ReadyButtonLabel,
+                adapter.Ready,
+                adapter.FocusReadyButton,
+                adapter.IsReadyButtonEnabled,
+                adapter.IsReadyButtonVisible,
+                adapter.ReadyButtonTooltip));
             return root;
         }
     }

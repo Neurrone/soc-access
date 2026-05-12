@@ -178,7 +178,7 @@ namespace SongsOfConquestAccess.Screens
                 int capturedIndex = i;
                 menu.AddItem(new MenuItemWidget(
                     "purchase-wielder-troop-" + capturedIndex,
-                    () => adapter.GetTroopLabel(capturedIndex),
+                    () => BuildTroopLabel(adapter, capturedIndex),
                     null,
                     () => false,
                     () => adapter.FocusTroop(capturedIndex),
@@ -187,6 +187,23 @@ namespace SongsOfConquestAccess.Screens
             }
 
             return menu;
+        }
+
+        private static string BuildTroopLabel(PurchaseWielderMenuAdapter adapter, int index)
+        {
+            if (adapter == null)
+            {
+                return string.Empty;
+            }
+
+            string name = adapter.GetTroopName(index);
+            if (string.IsNullOrWhiteSpace(name))
+            {
+                name = "Troop slot " + (index + 1);
+            }
+
+            int amount = adapter.GetTroopAmount(index);
+            return amount > 0 ? amount + " " + name : name;
         }
 
         private static MenuWidget BuildSkillsMenu(PurchaseWielderMenuAdapter adapter)
@@ -198,7 +215,7 @@ namespace SongsOfConquestAccess.Screens
                 int capturedIndex = i;
                 menu.AddItem(new MenuItemWidget(
                     "purchase-wielder-skill-" + capturedIndex,
-                    () => adapter.GetSkillLabel(capturedIndex),
+                    () => BuildSkillLabel(adapter, capturedIndex),
                     null,
                     () => false,
                     () => adapter.FocusSkill(capturedIndex),
@@ -207,6 +224,17 @@ namespace SongsOfConquestAccess.Screens
             }
 
             return menu;
+        }
+
+        private static string BuildSkillLabel(PurchaseWielderMenuAdapter adapter, int index)
+        {
+            if (adapter == null)
+            {
+                return string.Empty;
+            }
+
+            string name = adapter.GetSkillName(index);
+            return string.IsNullOrWhiteSpace(name) ? "Skill " + (index + 1) : name;
         }
 
         private static bool HasVisibleSkills(PurchaseWielderMenuAdapter adapter)

@@ -360,11 +360,6 @@ namespace SongsOfConquestAccess.Adapters
             }
         }
 
-        public string CurrentTroopLabel
-        {
-            get { return "Current troop, " + GetTroopLabel(GetCurrentTroopId(), includePosition: false); }
-        }
-
         public bool IsQueueMenuVisible()
         {
             return GetQueueItems().Count > 0;
@@ -392,7 +387,7 @@ namespace SongsOfConquestAccess.Adapters
 
                 if (insertedRound < 0 && turnsLeftInRound > 0 && i >= turnsLeftInRound)
                 {
-                    items.Add(QueueItem.RoundMarker("combat-queue-round-" + nextRound, "Round " + nextRound));
+                    items.Add(QueueItem.RoundMarker(nextRound));
                     insertedRound = nextRound;
                 }
 
@@ -753,14 +748,19 @@ namespace SongsOfConquestAccess.Adapters
             return container != null ? container.GetComponentInChildren<GameLogHandleUI>(true) : null;
         }
 
-        private string GetTroopLabel(int troopId, bool includePosition)
+        public TroopInfo GetCurrentTroopInfo()
+        {
+            return GetTroopInfo(GetCurrentTroopId());
+        }
+
+        public TroopInfo GetTroopInfo(int troopId)
         {
             try
             {
                 IBattleTroopState troop = _facade != null && _facade.Troops != null ? _facade.Troops.Get(troopId) : null;
                 if (troop == null)
                 {
-                    return "unknown troop";
+                    return TroopInfo.Unknown();
                 }
 
                 int size = troop.Stats != null ? troop.Stats.Size : 0;
@@ -770,22 +770,11 @@ namespace SongsOfConquestAccess.Adapters
                     name = "troop";
                 }
 
-                string label = name;
-                if (troop.Stats != null)
-                {
-                    label = troop.Stats.Size + " " + name;
-                }
-
-                if (includePosition)
-                {
-                    label += " at " + CombatAdapter.FormatPoint(troop.Position);
-                }
-
-                return label;
+                return new TroopInfo(name, size, troop.Stats != null);
             }
             catch
             {
-                return "unknown troop";
+                return TroopInfo.Unknown();
             }
         }
 
@@ -1068,16 +1057,16 @@ namespace SongsOfConquestAccess.Adapters
 
             public int Index { get; private set; }
 
-            public string Id
+            public bool HasSpell
             {
                 get
                 {
                     ISpellDefinition spell = _entry != null ? _entry.Spell : null;
-                    return "combat-quickbar-" + Index + "-" + (spell != null ? spell.Id.ToString() : "empty");
+                    return spell != null;
                 }
             }
 
-            public string Label
+            public string SpellName
             {
                 get
                 {
@@ -1087,7 +1076,20 @@ namespace SongsOfConquestAccess.Adapters
                         return string.Empty;
                     }
 
-                    string name = _adapter.Localize(spell.NameKey, "Spell");
+                    return _adapter.Localize(spell.NameKey, "Spell");
+                }
+            }
+
+            public int SpellTier
+            {
+                get
+                {
+                    ISpellDefinition spell = _entry != null ? _entry.Spell : null;
+                    if (spell == null)
+                    {
+                        return 0;
+                    }
+
                     int tier = 1;
                     try
                     {
@@ -1098,7 +1100,7 @@ namespace SongsOfConquestAccess.Adapters
                         tier = 1;
                     }
 
-                    return name + ", tier " + tier;
+                    return tier;
                 }
             }
 
@@ -1138,7 +1140,7 @@ namespace SongsOfConquestAccess.Adapters
             private readonly BattleHudAdapter _adapter;
             private readonly QueuedTroop _queuedTroop;
             private readonly IQueueHUDEntry _entry;
-            private readonly string _roundLabel;
+            private readonly int _roundNumber;
             private readonly bool _isRoundMarker;
 
             public QueueItem(BattleHudAdapter adapter, QueuedTroop queuedTroop, IQueueHUDEntry entry, int index)
@@ -1149,25 +1151,27 @@ namespace SongsOfConquestAccess.Adapters
                 Index = index;
             }
 
-            private QueueItem(string id, string roundLabel)
+            private QueueItem(int roundNumber)
             {
-                Id = id;
-                _roundLabel = roundLabel;
+                _roundNumber = roundNumber;
                 _isRoundMarker = true;
             }
 
-            public static QueueItem RoundMarker(string id, string label)
+            public static QueueItem RoundMarker(int roundNumber)
             {
-                return new QueueItem(id, label);
+                return new QueueItem(roundNumber);
             }
 
             public int Index { get; private set; }
 
-            public string Id { get; private set; }
-
             public bool IsRoundMarker
             {
                 get { return _isRoundMarker; }
+            }
+
+            public int RoundNumber
+            {
+                get { return _roundNumber; }
             }
 
             public int TroopId
@@ -1180,17 +1184,9 @@ namespace SongsOfConquestAccess.Adapters
                 get { return _entry != null; }
             }
 
-            public string Label
+            public TroopInfo Troop
             {
-                get
-                {
-                    if (IsRoundMarker)
-                    {
-                        return _roundLabel;
-                    }
-
-                    return _adapter.GetTroopLabel(TroopId, includePosition: false);
-                }
+                get { return IsRoundMarker ? TroopInfo.Unknown() : _adapter.GetTroopInfo(TroopId); }
             }
 
             public bool IsVisible
@@ -1223,6 +1219,32 @@ namespace SongsOfConquestAccess.Adapters
             public Tooltip Tooltip
             {
                 get { return IsRoundMarker || _entry == null ? null : Tooltip.ForComponent(_adapter.GetQueueEntryButton(_entry), _adapter._localization); }
+            }
+        }
+
+        internal sealed class TroopInfo
+        {
+            public TroopInfo(string name, int size, bool hasSize)
+            {
+                Name = name ?? string.Empty;
+                Size = size;
+                HasSize = hasSize;
+                IsKnown = true;
+            }
+
+            private TroopInfo()
+            {
+                Name = string.Empty;
+            }
+
+            public string Name { get; private set; }
+            public int Size { get; private set; }
+            public bool HasSize { get; private set; }
+            public bool IsKnown { get; private set; }
+
+            public static TroopInfo Unknown()
+            {
+                return new TroopInfo();
             }
         }
     }

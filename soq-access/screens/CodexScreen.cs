@@ -110,11 +110,11 @@ namespace SongsOfConquestAccess.Screens
                 CodexMenuAdapter.TabItem captured = tab;
                 if (captured.IsActive)
                 {
-                    activeId = captured.Id;
+                    activeId = BuildTabId(captured);
                 }
 
                 menu.AddItem(new MenuItemWidget(
-                    captured.Id,
+                    BuildTabId(captured),
                     () => captured.Label,
                     () => captured.IsActive ? "selected" : string.Empty,
                     () => adapter.FocusTab(captured.Index),
@@ -149,11 +149,11 @@ namespace SongsOfConquestAccess.Screens
                 CodexMenuAdapter.ArticleItem captured = article;
                 if (captured.IsSelected)
                 {
-                    selectedId = captured.Id;
+                    selectedId = BuildArticleId(i);
                 }
 
                 menu.AddItem(new MenuItemWidget(
-                    captured.Id,
+                    BuildArticleId(i),
                     () => captured.Label,
                     null,
                     () => adapter.ActivateArticle(captured),
@@ -163,6 +163,16 @@ namespace SongsOfConquestAccess.Screens
 
             menu.SetFocusedItemById(selectedId);
             return menu;
+        }
+
+        private static string BuildTabId(CodexMenuAdapter.TabItem tab)
+        {
+            return "codex-tab-" + (tab != null ? tab.Index : 0);
+        }
+
+        private static string BuildArticleId(int index)
+        {
+            return "codex-article-" + index;
         }
 
         private static IReadOnlyList<T> SafeGet<T>(string section, Func<IReadOnlyList<T>> getter)

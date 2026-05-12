@@ -11,7 +11,7 @@ namespace SongsOfConquestAccess.Adapters
             UIButton button,
             Func<bool> isVisible = null,
             Func<bool> activate = null)
-            : base("options", button, isVisible, activate)
+            : base(button, isVisible, activate)
         {
         }
 

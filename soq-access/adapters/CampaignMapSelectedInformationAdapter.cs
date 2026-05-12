@@ -35,8 +35,8 @@ namespace SongsOfConquestAccess.Adapters
         {
             _view = view;
             _settings = view != null ? SettingsRef(view) : null;
-            StartButton = _settings != null ? new StandardMenuButtonAdapter("start-mission", _settings.StartGameButton) : null;
-            ReplayButton = _settings != null ? new StandardMenuButtonAdapter("replay-cutscene", _settings.ReplayOutroButton) : null;
+            StartButton = _settings != null ? new StandardMenuButtonAdapter(_settings.StartGameButton) : null;
+            ReplayButton = _settings != null ? new StandardMenuButtonAdapter(_settings.ReplayOutroButton) : null;
         }
 
         public object SourceKey

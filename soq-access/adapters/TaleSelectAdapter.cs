@@ -41,7 +41,6 @@ namespace SongsOfConquestAccess.Adapters
 
             MainMenuManager.Settings settings = GetMainMenuSettings(_taleButtons);
             BackButton = settings != null ? new StandardMenuButtonAdapter(
-                "back",
                 settings.BackButton,
                 () => settings.BackButton != null && MenuButtonAdapterBase.IsButtonVisible(settings.BackButton),
                 null) : null;

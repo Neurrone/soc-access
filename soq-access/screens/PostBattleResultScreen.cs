@@ -64,7 +64,7 @@ namespace SongsOfConquestAccess.Screens
                         adapter.HideNativeTooltip();
                     }
                 },
-                () => attackerPortrait != null ? attackerPortrait.Tooltip : adapter.AttackerCommanderTooltip));
+                () => BuildPortraitTooltip(attackerPortrait)));
 
             if (adapter.XpBelongsToAttacker)
             {
@@ -95,7 +95,7 @@ namespace SongsOfConquestAccess.Screens
                         adapter.HideNativeTooltip();
                     }
                 },
-                () => defenderPortrait != null ? defenderPortrait.Tooltip : adapter.DefenderCommanderTooltip));
+                () => BuildPortraitTooltip(defenderPortrait)));
 
             if (!adapter.XpBelongsToAttacker)
             {
@@ -113,8 +113,23 @@ namespace SongsOfConquestAccess.Screens
 
             AddEntryMenu(root, "post-battle-loot", "Loot", adapter.Loot, adapter, addNoneWhenEmpty: false);
 
-            root.AddChild(adapter.BuildAcceptButton());
-            root.AddChild(adapter.BuildRedoManualBattleButton());
+            root.AddChild(new ButtonWidget(
+                "post-battle-accept",
+                adapter.AcceptButtonLabel,
+                adapter.Accept,
+                adapter.HideNativeTooltip,
+                adapter.IsAcceptButtonEnabled,
+                adapter.IsAcceptButtonVisible,
+                adapter.AcceptButtonTooltip));
+
+            root.AddChild(new ButtonWidget(
+                "post-battle-redo-manual-battle",
+                adapter.RedoManualBattleButtonLabel,
+                adapter.RedoManualBattle,
+                adapter.HideNativeTooltip,
+                adapter.IsRedoManualBattleButtonEnabled,
+                adapter.IsRedoManualBattleButtonVisible,
+                adapter.RedoManualBattleButtonTooltip));
             return root;
         }
 
@@ -126,6 +141,16 @@ namespace SongsOfConquestAccess.Screens
                 adapter.HideNativeTooltip,
                 includeParentLabelInAnnouncement: false,
                 isVisible: () => adapter.XpVisible));
+        }
+
+        private static Tooltip BuildPortraitTooltip(CommanderHudPortraitAdapter portrait)
+        {
+            return portrait != null
+                ? Portrait.BuildNativeTooltip(
+                    () => portrait.TooltipTarget,
+                    portrait.Localization,
+                    portrait.RefreshTooltip)
+                : null;
         }
 
         private static void AddEntryMenu(
@@ -169,8 +194,8 @@ namespace SongsOfConquestAccess.Screens
                 }
 
                 menu.AddItem(new MenuItemWidget(
-                    entry.Id,
-                    () => entry.Label,
+                    id + "-" + i,
+                    () => BuildResultEntryLabel(entry),
                     getStatus: null,
                     activate: null,
                     onFocus: adapter.HideNativeTooltip,
@@ -179,6 +204,35 @@ namespace SongsOfConquestAccess.Screens
             }
 
             root.AddChild(menu);
+        }
+
+        private static string BuildResultEntryLabel(PostBattleResultAdapter.ResultEntry entry)
+        {
+            if (entry == null)
+            {
+                return string.Empty;
+            }
+
+            if (!entry.IsLostTroop)
+            {
+                return entry.Name;
+            }
+
+            string label;
+            if (string.IsNullOrWhiteSpace(entry.Amount))
+            {
+                label = entry.Name;
+            }
+            else if (string.IsNullOrWhiteSpace(entry.Name))
+            {
+                label = entry.Amount;
+            }
+            else
+            {
+                label = entry.Amount + " " + entry.Name;
+            }
+
+            return string.IsNullOrWhiteSpace(label) ? string.Empty : label + " lost";
         }
     }
 }

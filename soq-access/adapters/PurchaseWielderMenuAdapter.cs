@@ -220,24 +220,16 @@ namespace SongsOfConquestAccess.Adapters
                 && IsVisible(entries[index] as Component);
         }
 
-        public string GetTroopLabel(int index)
+        public string GetTroopName(int index)
+        {
+            return FirstTooltipLine(GetTroopTooltip(index));
+        }
+
+        public int GetTroopAmount(int index)
         {
             IReadOnlyList<TroopHUDEntry> entries = GetTroopEntries();
             TroopHUDEntry entry = index >= 0 && index < entries.Count ? entries[index] : null;
-            Tooltip tooltip = GetTroopTooltip(index);
-            string name = string.Empty;
-            if (tooltip != null && tooltip.TextLines.Count > 0)
-            {
-                name = SpeechTextSanitizer.Normalize(tooltip.TextLines[0]);
-            }
-
-            if (string.IsNullOrWhiteSpace(name))
-            {
-                name = "Troop slot " + (index + 1);
-            }
-
-            int amount = GetTroopAmount(entry);
-            return amount > 0 ? amount + " " + name : name;
+            return GetTroopAmount(entry);
         }
 
         public Tooltip GetTroopTooltip(int index)
@@ -272,7 +264,7 @@ namespace SongsOfConquestAccess.Adapters
             return index >= 0 && index < entries.Count && IsVisible(entries[index] as Component);
         }
 
-        public string GetSkillLabel(int index)
+        public string GetSkillName(int index)
         {
             IReadOnlyList<PurchaseWielderSkillEntry> entries = GetSkillEntries();
             if (index < 0 || index >= entries.Count)
@@ -280,9 +272,7 @@ namespace SongsOfConquestAccess.Adapters
                 return string.Empty;
             }
 
-            Tooltip tooltip = GetSkillTooltip(index);
-            string name = FirstTooltipLine(tooltip);
-            return string.IsNullOrWhiteSpace(name) ? "Skill " + (index + 1) : name;
+            return FirstTooltipLine(GetSkillTooltip(index));
         }
 
         public Tooltip GetSkillTooltip(int index)

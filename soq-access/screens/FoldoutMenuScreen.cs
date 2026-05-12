@@ -10,7 +10,7 @@ namespace SongsOfConquestAccess.Screens
         private readonly MainMenuAdapter _owner;
 
         public FoldoutMenuScreen(MainMenuAdapter owner, MainMenuAdapter.NativeFoldoutAdapter foldout)
-            : base(BuildRootWidget(foldout))
+            : base(BuildRootWidget(owner, foldout))
         {
             _owner = owner;
             _foldout = foldout;
@@ -41,11 +41,12 @@ namespace SongsOfConquestAccess.Screens
             return base.OnActionJustPressed(action);
         }
 
-        private static ContainerWidget BuildRootWidget(MainMenuAdapter.NativeFoldoutAdapter foldout)
+        private static ContainerWidget BuildRootWidget(MainMenuAdapter owner, MainMenuAdapter.NativeFoldoutAdapter foldout)
         {
             string label = foldout != null ? foldout.GetLabel() : string.Empty;
-            ContainerWidget root = new ContainerWidget((foldout != null ? foldout.Id : "foldout-menu") + "-screen", label + " menu");
-            MenuWidget menu = new MenuWidget((foldout != null ? foldout.Id : "foldout-menu") + "-menu", label);
+            string id = BuildFoldoutId(owner, foldout);
+            ContainerWidget root = new ContainerWidget(id + "-screen", label + " menu");
+            MenuWidget menu = new MenuWidget(id + "-menu", label);
             if (foldout == null)
             {
                 root.AddChild(menu);
@@ -61,9 +62,9 @@ namespace SongsOfConquestAccess.Screens
                 }
 
                 menu.AddItem(new MenuItemWidget(
-                    item.Id,
+                    id + "-item-" + i,
                     item.GetLabel,
-                    item.GetStatus,
+                    () => BuildMenuButtonStatus(item),
                     item.Activate,
                     null,
                     item.IsVisible));
@@ -71,6 +72,40 @@ namespace SongsOfConquestAccess.Screens
 
             root.AddChild(menu);
             return root;
+        }
+
+        private static string BuildFoldoutId(MainMenuAdapter owner, MainMenuAdapter.NativeFoldoutAdapter foldout)
+        {
+            if (owner != null && foldout != null)
+            {
+                if (ReferenceEquals(foldout, owner.ExtrasFoldout))
+                {
+                    return "extras";
+                }
+
+                if (ReferenceEquals(foldout, owner.MultiplayerFoldout))
+                {
+                    return "multiplayer";
+                }
+            }
+
+            return "foldout-menu";
+        }
+
+        private static string BuildMenuButtonStatus(IMenuButtonAdapter item)
+        {
+            if (item == null)
+            {
+                return string.Empty;
+            }
+
+            string nativeStatus = item.GetStatus();
+            if (item.IsEnabled())
+            {
+                return nativeStatus;
+            }
+
+            return string.IsNullOrWhiteSpace(nativeStatus) ? "disabled" : "disabled. " + nativeStatus;
         }
     }
 }

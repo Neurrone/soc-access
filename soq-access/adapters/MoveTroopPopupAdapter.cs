@@ -6,7 +6,6 @@ using SongsOfConquest.Client.Adventure.UI;
 using SongsOfConquest.Client.UI;
 using SongsOfConquest.Common.Localization;
 using SongsOfConquestAccess.Speech;
-using SongsOfConquestAccess.UI;
 using UnityEngine;
 
 namespace SongsOfConquestAccess.Adapters
@@ -66,54 +65,50 @@ namespace SongsOfConquestAccess.Adapters
                 && GetStateName() == "Deciding";
         }
 
-        public ButtonWidget BuildMoveAllLeftButton()
+        public bool MoveAllLeft()
+        {
+            return Invoke(HandleMoveAllLeftMethod);
+        }
+
+        public bool IsMoveAllLeftEnabled()
         {
             UIButton button = GetField<UIButton>(MoveAllButtonLeftField);
-            return new ButtonWidget(
-                "move-troop-move-all-left",
-                "Move all left",
-                () => Invoke(HandleMoveAllLeftMethod),
-                null,
-                () => IsButtonEnabled(button),
-                tooltip: Tooltip.ForComponent(button, _localization));
+            return IsButtonEnabled(button);
         }
 
-        public ButtonWidget BuildSplitButton()
+        public Tooltip MoveAllLeftTooltip
         {
-            UIButton button = GetField<UIButton>(SplitHalfButtonField);
-            return new ButtonWidget(
-                "move-troop-split-equal",
-                "Split equally",
-                () => Invoke(HandleSplitMethod),
-                null,
-                () => IsButtonEnabled(button),
-                tooltip: Tooltip.ForComponent(button, _localization));
+            get { return Tooltip.ForComponent(GetField<UIButton>(MoveAllButtonLeftField), _localization); }
         }
 
-        public ButtonWidget BuildMoveAllRightButton()
+        public bool SplitEqual()
         {
-            UIButton button = GetField<UIButton>(MoveAllButtonRightField);
-            return new ButtonWidget(
-                "move-troop-move-all-right",
-                "Move all right",
-                () => Invoke(HandleMoveAllRightMethod),
-                null,
-                () => IsButtonEnabled(button),
-                tooltip: Tooltip.ForComponent(button, _localization));
+            return Invoke(HandleSplitMethod);
         }
 
-        public SliderWidget BuildDistributionSlider()
+        public bool IsSplitEqualEnabled()
         {
-            return new SliderWidget(
-                "move-troop-distribution",
-                "troop distribution",
-                GetDistributionText,
-                GetSliderValue,
-                GetSliderMinimum,
-                GetSliderMaximum,
-                () => 1,
-                SetSliderValue,
-                IsSliderEnabled);
+            return IsButtonEnabled(GetField<UIButton>(SplitHalfButtonField));
+        }
+
+        public Tooltip SplitEqualTooltip
+        {
+            get { return Tooltip.ForComponent(GetField<UIButton>(SplitHalfButtonField), _localization); }
+        }
+
+        public bool MoveAllRight()
+        {
+            return Invoke(HandleMoveAllRightMethod);
+        }
+
+        public bool IsMoveAllRightEnabled()
+        {
+            return IsButtonEnabled(GetField<UIButton>(MoveAllButtonRightField));
+        }
+
+        public Tooltip MoveAllRightTooltip
+        {
+            get { return Tooltip.ForComponent(GetField<UIButton>(MoveAllButtonRightField), _localization); }
         }
 
         public bool Confirm()
@@ -145,7 +140,7 @@ namespace SongsOfConquestAccess.Adapters
             NativeTooltipUtility.HideTooltip();
         }
 
-        private string GetDistributionText()
+        public string GetDistributionText()
         {
             string left = GetText(GetField<IUITextMesh>(LeftPortraitAmountField));
             string right = GetText(GetField<IUITextMesh>(RightPortraitAmountField));
@@ -153,25 +148,30 @@ namespace SongsOfConquestAccess.Adapters
                 + ", right: " + (string.IsNullOrWhiteSpace(right) ? "0" : right);
         }
 
-        private int GetSliderValue()
+        public int GetSliderValue()
         {
             UISlider slider = GetSlider();
             return slider != null ? Mathf.RoundToInt(slider.SliderValue) : 0;
         }
 
-        private int GetSliderMinimum()
+        public int GetSliderMinimum()
         {
             UISlider slider = GetSlider();
             return slider != null ? Mathf.RoundToInt(slider.SliderMinLimit) : 0;
         }
 
-        private int GetSliderMaximum()
+        public int GetSliderMaximum()
         {
             UISlider slider = GetSlider();
             return slider != null ? Mathf.RoundToInt(slider.SliderMaxLimit) : 0;
         }
 
-        private bool SetSliderValue(int value)
+        public int GetSliderStep()
+        {
+            return 1;
+        }
+
+        public bool SetSliderValue(int value)
         {
             UISlider slider = GetSlider();
             if (slider == null || HandleSliderChangedMethod == null)
@@ -190,7 +190,7 @@ namespace SongsOfConquestAccess.Adapters
             return true;
         }
 
-        private bool IsSliderEnabled()
+        public bool IsSliderEnabled()
         {
             UISlider slider = GetSlider();
             return slider != null && slider.Interactable;

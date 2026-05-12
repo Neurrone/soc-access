@@ -51,10 +51,7 @@ namespace SongsOfConquestAccess.Adapters
         {
             _taleButton = taleButton;
             Button = taleButton != null ? MainButtonRef(taleButton) : null;
-            Id = BuildId(taleButton);
         }
-
-        public string Id { get; private set; }
 
         public UIButton Button { get; private set; }
 
@@ -73,11 +70,6 @@ namespace SongsOfConquestAccess.Adapters
         public string GetStatus()
         {
             List<string> parts = new List<string>();
-            if (Button != null && !Button.Interactable)
-            {
-                parts.Add("disabled");
-            }
-
             string nativeState = BuildNativeStateText();
             if (!string.IsNullOrWhiteSpace(nativeState))
             {
@@ -98,6 +90,11 @@ namespace SongsOfConquestAccess.Adapters
             return _taleButton != null
                 && IsLiveSceneObject(((Component)_taleButton).gameObject)
                 && MenuButtonAdapterBase.IsButtonVisible(Button);
+        }
+
+        public bool IsEnabled()
+        {
+            return Button != null && Button.Interactable;
         }
 
         public bool Activate()
@@ -196,22 +193,6 @@ namespace SongsOfConquestAccess.Adapters
         private UITextMesh GetPartOfDLCLabel()
         {
             return _taleButton != null ? PartOfDLCLabelRef(_taleButton) : null;
-        }
-
-        private static string BuildId(TaleButton taleButton)
-        {
-            if (taleButton == null)
-            {
-                return "tale";
-            }
-
-            string identifier = CampaignIdentifierRef(taleButton);
-            if (!string.IsNullOrWhiteSpace(identifier))
-            {
-                return "tale-" + identifier;
-            }
-
-            return "tale-" + taleButton.GetInstanceID();
         }
 
         private static string GetText(UITextMesh textMesh)

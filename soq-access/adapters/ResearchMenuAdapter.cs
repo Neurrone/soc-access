@@ -96,9 +96,9 @@ namespace SongsOfConquestAccess.Adapters
                 string description = GetBuildingDescription(tab);
                 int mapEntityId = BuildingTabMapEntityIdField != null ? (int)BuildingTabMapEntityIdField.GetValue(tab) : 0;
                 items.Add(new BuildingItem(
-                    "research-building-" + index,
                     label,
-                    BuildBuildingStatus(description, mapEntityId < 0),
+                    description,
+                    mapEntityId < 0,
                     () => FocusBuilding(index, button),
                     () => ActivateBuilding(button)));
             }
@@ -143,9 +143,11 @@ namespace SongsOfConquestAccess.Adapters
                     UIButton button = stackButton.Button;
                     int itemIndex = j;
                     Func<bool> activate = () => NativeSelectionUtility.Click(button);
+                    string name = Localize(stack != null ? stack.NameKey : null, "Research " + (itemIndex + 1));
                     researchItems.Add(new ResearchItem(
-                        "research-item-" + i + "-" + itemIndex,
-                        BuildResearchLabel(stack, itemIndex),
+                        name,
+                        GetOwnedTier(stack),
+                        GetTierHeader(),
                         () => FocusResearch(button),
                         activate,
                         BuildResearchTooltip(button, activate)));
@@ -154,7 +156,6 @@ namespace SongsOfConquestAccess.Adapters
                 if (researchItems.Count > 0)
                 {
                     items.Add(new CategoryItem(
-                        "research-category-" + i,
                         GetCategoryLabel(category, i),
                         researchItems));
                 }
@@ -215,38 +216,11 @@ namespace SongsOfConquestAccess.Adapters
             return SpeechTextSanitizer.Normalize(UITextMeshTextUtility.GetEffectiveText(description));
         }
 
-        private static string BuildBuildingStatus(string description, bool missingBuilding)
-        {
-            if (missingBuilding && !string.IsNullOrWhiteSpace(description))
-            {
-                return description + ". missing building";
-            }
-
-            if (missingBuilding)
-            {
-                return "missing building";
-            }
-
-            return description ?? string.Empty;
-        }
-
         private string GetCategoryLabel(ResearchMenuCategory category, int index)
         {
             UITextMesh name = GetField<UITextMesh>(category, CategoryNameField);
             string label = SpeechTextSanitizer.Normalize(UITextMeshTextUtility.GetEffectiveText(name));
             return string.IsNullOrWhiteSpace(label) ? "Research category " + (index + 1) : label;
-        }
-
-        private string BuildResearchLabel(ResearchStack stack, int index)
-        {
-            string label = Localize(stack != null ? stack.NameKey : null, "Research " + (index + 1));
-            int ownedTier = GetOwnedTier(stack);
-            if (ownedTier <= 0)
-            {
-                return label;
-            }
-
-            return label + " (" + GetTierHeader() + " " + ownedTier + ")";
         }
 
         private int GetOwnedTier(ResearchStack stack)
@@ -394,49 +368,49 @@ namespace SongsOfConquestAccess.Adapters
 
         internal sealed class BuildingItem
         {
-            public BuildingItem(string id, string label, string status, Func<bool> focus, Func<bool> activate)
+            public BuildingItem(string label, string description, bool missingBuilding, Func<bool> focus, Func<bool> activate)
             {
-                Id = id;
                 Label = label ?? string.Empty;
-                Status = status ?? string.Empty;
+                Description = description ?? string.Empty;
+                MissingBuilding = missingBuilding;
                 Focus = focus;
                 Activate = activate;
             }
 
-            public string Id { get; private set; }
             public string Label { get; private set; }
-            public string Status { get; private set; }
+            public string Description { get; private set; }
+            public bool MissingBuilding { get; private set; }
             public Func<bool> Focus { get; private set; }
             public Func<bool> Activate { get; private set; }
         }
 
         internal sealed class CategoryItem
         {
-            public CategoryItem(string id, string label, IReadOnlyList<ResearchItem> items)
+            public CategoryItem(string label, IReadOnlyList<ResearchItem> items)
             {
-                Id = id;
                 Label = label ?? string.Empty;
                 Items = items ?? new ResearchItem[0];
             }
 
-            public string Id { get; private set; }
             public string Label { get; private set; }
             public IReadOnlyList<ResearchItem> Items { get; private set; }
         }
 
         internal sealed class ResearchItem
         {
-            public ResearchItem(string id, string label, Func<bool> focus, Func<bool> activate, Tooltip tooltip)
+            public ResearchItem(string label, int ownedTier, string tierHeader, Func<bool> focus, Func<bool> activate, Tooltip tooltip)
             {
-                Id = id;
                 Label = label ?? string.Empty;
+                OwnedTier = ownedTier;
+                TierHeader = tierHeader ?? string.Empty;
                 Focus = focus;
                 Activate = activate;
                 Tooltip = tooltip;
             }
 
-            public string Id { get; private set; }
             public string Label { get; private set; }
+            public int OwnedTier { get; private set; }
+            public string TierHeader { get; private set; }
             public Func<bool> Focus { get; private set; }
             public Func<bool> Activate { get; private set; }
             public Tooltip Tooltip { get; private set; }

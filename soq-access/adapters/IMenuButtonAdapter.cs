@@ -4,8 +4,6 @@ namespace SongsOfConquestAccess.Adapters
 {
     internal interface IMenuButtonAdapter
     {
-        string Id { get; }
-
         UIButton Button { get; }
 
         string GetLabel();
@@ -13,6 +11,8 @@ namespace SongsOfConquestAccess.Adapters
         string GetStatus();
 
         bool IsVisible();
+
+        bool IsEnabled();
 
         bool Activate();
     }

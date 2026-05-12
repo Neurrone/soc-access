@@ -340,12 +340,12 @@ namespace SongsOfConquestAccess.Adapters
 
         public IReadOnlyList<DefenceSlotListAdapter.Slot> GetGarrisonSlots()
         {
-            return new DefenceSlotListAdapter(GetField<List<TroopHUDEntry>>(GetDefencePanelTroops(), GarrisonTroopsField), "garrison", _localization).GetSlots();
+            return new DefenceSlotListAdapter(GetField<List<TroopHUDEntry>>(GetDefencePanelTroops(), GarrisonTroopsField), _localization).GetSlots();
         }
 
         public IReadOnlyList<DefenceSlotListAdapter.Slot> GetBallistaSlots()
         {
-            return new DefenceSlotListAdapter(GetField<List<TroopHUDEntry>>(GetDefencePanelTroops(), BallistaTroopsField), "ballista", _localization).GetSlots();
+            return new DefenceSlotListAdapter(GetField<List<TroopHUDEntry>>(GetDefencePanelTroops(), BallistaTroopsField), _localization).GetSlots();
         }
 
         public void HideNativeTooltip()

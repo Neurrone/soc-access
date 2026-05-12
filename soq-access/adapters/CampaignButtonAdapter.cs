@@ -37,10 +37,7 @@ namespace SongsOfConquestAccess.Adapters
             _campaignButton = campaignButton;
             _campaignNumber = campaignNumber;
             Button = campaignButton != null ? ButtonRef(campaignButton) : null;
-            Id = BuildId(campaignButton);
         }
-
-        public string Id { get; private set; }
 
         public UIButton Button { get; private set; }
 
@@ -56,19 +53,7 @@ namespace SongsOfConquestAccess.Adapters
 
         public string GetStatus()
         {
-            List<string> parts = new List<string>();
-            if (Button != null && !Button.Interactable)
-            {
-                parts.Add("disabled");
-            }
-
-            string status = BuildProgressStatus();
-            if (!string.IsNullOrWhiteSpace(status))
-            {
-                parts.Add(status);
-            }
-
-            return parts.Count == 0 ? string.Empty : string.Join(". ", parts.ToArray());
+            return BuildProgressStatus();
         }
 
         public bool IsVisible()
@@ -79,6 +64,11 @@ namespace SongsOfConquestAccess.Adapters
         public bool IsReady()
         {
             return IsVisible() && Button != null && Button.OnClicked != null;
+        }
+
+        public bool IsEnabled()
+        {
+            return Button != null && Button.Interactable;
         }
 
         public bool Activate()
@@ -108,22 +98,6 @@ namespace SongsOfConquestAccess.Adapters
             {
                 HandleBeginHoverMethod.Invoke(_campaignButton, new object[] { null });
             }
-        }
-
-        private static string BuildId(CampaignButton campaignButton)
-        {
-            if (campaignButton == null)
-            {
-                return "campaign";
-            }
-
-            ICampaignDefinition definition = DefinitionRef(campaignButton);
-            if (definition != null && !string.IsNullOrWhiteSpace(definition.Identifier))
-            {
-                return "campaign-" + definition.Identifier.ToLowerInvariant();
-            }
-
-            return "campaign-" + campaignButton.GetInstanceID();
         }
 
         private static string PrefixCampaignNumber(int number)

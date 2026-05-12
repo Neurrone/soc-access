@@ -64,48 +64,44 @@ namespace SongsOfConquestAccess.Adapters
         {
             _mainMenu = mainMenu;
             ExtrasFoldout = new NativeFoldoutAdapter(
-                "extras",
                 new StandardMenuButtonAdapter(
-                    "extras",
                     GetFoldoutButton(ExtrasFoldoutRef(_mainMenu)),
                     () => MenuButtonAdapterBase.IsButtonVisible(GetFoldoutButton(ExtrasFoldoutRef(_mainMenu))),
                     () => ExtrasFoldout != null && ExtrasFoldout.Open()),
                 ExtrasFoldoutRef(_mainMenu),
                 new[]
                 {
-                    CreateMainMenuButton("tutorial-and-codex", TutorialAndCodexButtonRef(_mainMenu)),
-                    CreateMainMenuButton("player-stats", PlayerStatsButtonRef(_mainMenu)),
-                    CreateMainMenuButton("credits", CreditsButtonRef(_mainMenu)),
-                    CreateMainMenuButton("battlegrounds", BattlegroundsButtonRef(_mainMenu)),
-                    CreateMainMenuButton("digital-artbook", DigitalArtbookButtonRef(_mainMenu))
+                    CreateMainMenuButton(TutorialAndCodexButtonRef(_mainMenu)),
+                    CreateMainMenuButton(PlayerStatsButtonRef(_mainMenu)),
+                    CreateMainMenuButton(CreditsButtonRef(_mainMenu)),
+                    CreateMainMenuButton(BattlegroundsButtonRef(_mainMenu)),
+                    CreateMainMenuButton(DigitalArtbookButtonRef(_mainMenu))
                 });
             MultiplayerFoldout = new NativeFoldoutAdapter(
-                "multiplayer",
                 new StandardMenuButtonAdapter(
-                    "multiplayer",
                     GetFoldoutButton(MultiplayerFoldoutRef(_mainMenu)),
                     () => MenuButtonAdapterBase.IsButtonVisible(GetFoldoutButton(MultiplayerFoldoutRef(_mainMenu))),
                     () => MultiplayerFoldout != null && MultiplayerFoldout.Open()),
                 MultiplayerFoldoutRef(_mainMenu),
                 new[]
                 {
-                    CreateMainMenuButton("host-online", HostOnlineButtonRef(_mainMenu)),
-                    CreateMainMenuButton("join-with-code", JoinWithCodeButtonRef(_mainMenu)),
-                    CreateMainMenuButton("find-online", FindOnlineButtonRef(_mainMenu)),
-                    CreateMainMenuButton("start-hotseat", StartHotseatButtonRef(_mainMenu))
+                    CreateMainMenuButton(HostOnlineButtonRef(_mainMenu)),
+                    CreateMainMenuButton(JoinWithCodeButtonRef(_mainMenu)),
+                    CreateMainMenuButton(FindOnlineButtonRef(_mainMenu)),
+                    CreateMainMenuButton(StartHotseatButtonRef(_mainMenu))
                 });
 
             _topLevelItems = new List<IMenuButtonAdapter>
             {
-                new ContinueMenuButtonAdapter("continue", ContinueButtonRef(_mainMenu), IsContinueVisible, () => NativeSelectionUtility.Click(ContinueButtonRef(_mainMenu))),
-                CreateMainMenuButton("campaign", CampaignButtonRef(_mainMenu)),
-                CreateMainMenuButton("skirmish", SkirmishButtonRef(_mainMenu)),
-                CreateMainMenuButton("load-game", LoadGameButtonRef(_mainMenu)),
-                CreateMainMenuButton("quit", QuitButtonRef(_mainMenu)),
-                CreateMainMenuButton("map-editor", MapEditorButtonRef(_mainMenu)),
-                CreateMainMenuButton("community-maps", CommunityMapsButtonRef(_mainMenu)),
+                new ContinueMenuButtonAdapter(ContinueButtonRef(_mainMenu), IsContinueVisible, () => NativeSelectionUtility.Click(ContinueButtonRef(_mainMenu))),
+                CreateMainMenuButton(CampaignButtonRef(_mainMenu)),
+                CreateMainMenuButton(SkirmishButtonRef(_mainMenu)),
+                CreateMainMenuButton(LoadGameButtonRef(_mainMenu)),
+                CreateMainMenuButton(QuitButtonRef(_mainMenu)),
+                CreateMainMenuButton(MapEditorButtonRef(_mainMenu)),
+                CreateMainMenuButton(CommunityMapsButtonRef(_mainMenu)),
                 ExtrasFoldout.TriggerButton,
-                CreateMainMenuButton("hotseat", HotseatButtonRef(_mainMenu)),
+                CreateMainMenuButton(HotseatButtonRef(_mainMenu)),
                 MultiplayerFoldout.TriggerButton
             };
         }
@@ -136,9 +132,9 @@ namespace SongsOfConquestAccess.Adapters
             return IsGameObjectActive(ContinueContainerRef(_mainMenu)) && MenuButtonAdapterBase.IsButtonVisible(ContinueButtonRef(_mainMenu));
         }
 
-        private static IMenuButtonAdapter CreateMainMenuButton(string id, UIButton button)
+        private static IMenuButtonAdapter CreateMainMenuButton(UIButton button)
         {
-            return new StandardMenuButtonAdapter(id, button, null, () => NativeSelectionUtility.Click(button));
+            return new StandardMenuButtonAdapter(button, null, () => NativeSelectionUtility.Click(button));
         }
 
         private static UIButton GetFoldoutButton(FoldoutUIButton foldout)
@@ -161,15 +157,12 @@ namespace SongsOfConquestAccess.Adapters
             private readonly FoldoutUIButton _foldout;
             private readonly List<IMenuButtonAdapter> _items;
 
-            public NativeFoldoutAdapter(string id, IMenuButtonAdapter triggerButton, FoldoutUIButton foldout, IEnumerable<IMenuButtonAdapter> items)
+            public NativeFoldoutAdapter(IMenuButtonAdapter triggerButton, FoldoutUIButton foldout, IEnumerable<IMenuButtonAdapter> items)
             {
-                Id = id ?? string.Empty;
                 TriggerButton = triggerButton;
                 _foldout = foldout;
                 _items = new List<IMenuButtonAdapter>(items ?? new IMenuButtonAdapter[0]);
             }
-
-            public string Id { get; private set; }
 
             public IMenuButtonAdapter TriggerButton { get; private set; }
 

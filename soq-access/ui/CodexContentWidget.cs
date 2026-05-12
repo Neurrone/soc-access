@@ -2,6 +2,8 @@ using System;
 using System.Collections.Generic;
 using SongsOfConquestAccess.Input;
 using SongsOfConquestAccess.Speech;
+using CodexContentItem = SongsOfConquestAccess.Adapters.CodexMenuAdapter.CodexContentItem;
+using CodexContentItemKind = SongsOfConquestAccess.Adapters.CodexMenuAdapter.CodexContentItemKind;
 
 namespace SongsOfConquestAccess.UI
 {

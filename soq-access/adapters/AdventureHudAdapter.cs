@@ -290,43 +290,6 @@ namespace SongsOfConquestAccess.Adapters
             return entry != null && entry.IsUnlocked && IsGameObjectVisible(entry);
         }
 
-        public string GetTroopSlotLabel(int index)
-        {
-            TroopHUDEntry entry = GetTroopSlot(index);
-            if (entry == null)
-            {
-                return string.Empty;
-            }
-
-            if (entry.Troop == null)
-            {
-                return "Empty troop slot " + (index + 1);
-            }
-
-            string name = SpeechTextSanitizer.Normalize(Facade != null ? Facade.Troops.GetName(entry.Troop.Id) : string.Empty);
-            if (string.IsNullOrWhiteSpace(name))
-            {
-                name = GetFirstTooltipLine(Tooltip.ForComponent(entry, LocalizationHandler));
-            }
-
-            string amount = entry.Troop.Stats != null ? entry.Troop.Stats.Size.ToString() : string.Empty;
-            string maxAmount = entry.Troop.Stats != null && entry.Troop.Stats.MaxTroopSize != null
-                ? entry.Troop.Stats.MaxTroopSize.GetValue().ToString()
-                : string.Empty;
-            string slot = "slot " + (index + 1);
-            if (string.IsNullOrWhiteSpace(name))
-            {
-                return string.IsNullOrWhiteSpace(amount) ? "Troop " + slot : "Troop, " + amount + ", " + slot;
-            }
-
-            if (!string.IsNullOrWhiteSpace(amount) && !string.IsNullOrWhiteSpace(maxAmount))
-            {
-                return name + ", " + amount + " / " + maxAmount + ", " + slot;
-            }
-
-            return string.IsNullOrWhiteSpace(amount) ? name + ", " + slot : name + ", " + amount + ", " + slot;
-        }
-
         public void FocusTroopSlot(int index)
         {
             TroopHUDEntry entry = GetTroopSlot(index);

@@ -143,9 +143,9 @@ namespace SongsOfConquestAccess.Screens
             {
                 ResearchMenuAdapter.BuildingItem building = buildings[i];
                 menu.AddItem(new MenuItemWidget(
-                    building.Id,
+                    "research-building-" + i,
                     () => building.Label,
-                    () => building.Status,
+                    () => BuildBuildingStatus(building),
                     building.Activate,
                     () => building.Focus(),
                     () => true));
@@ -175,13 +175,13 @@ namespace SongsOfConquestAccess.Screens
             for (int i = 0; i < categories.Count; i++)
             {
                 ResearchMenuAdapter.CategoryItem category = categories[i];
-                MenuWidget menu = new MenuWidget(category.Id, category.Label);
+                MenuWidget menu = new MenuWidget("research-category-" + i, category.Label);
                 for (int j = 0; j < category.Items.Count; j++)
                 {
                     ResearchMenuAdapter.ResearchItem item = category.Items[j];
                     menu.AddItem(new MenuItemWidget(
-                        item.Id,
-                        () => item.Label,
+                        "research-item-" + i + "-" + j,
+                        () => BuildResearchLabel(item),
                         null,
                         item.Activate,
                         () => item.Focus(),
@@ -191,6 +191,42 @@ namespace SongsOfConquestAccess.Screens
 
                 root.AddChild(menu);
             }
+        }
+
+        private static string BuildBuildingStatus(ResearchMenuAdapter.BuildingItem building)
+        {
+            if (building == null)
+            {
+                return string.Empty;
+            }
+
+            if (building.MissingBuilding && !string.IsNullOrWhiteSpace(building.Description))
+            {
+                return building.Description + ". missing building";
+            }
+
+            if (building.MissingBuilding)
+            {
+                return "missing building";
+            }
+
+            return building.Description;
+        }
+
+        private static string BuildResearchLabel(ResearchMenuAdapter.ResearchItem item)
+        {
+            if (item == null)
+            {
+                return string.Empty;
+            }
+
+            if (item.OwnedTier <= 0)
+            {
+                return item.Label;
+            }
+
+            string tierHeader = string.IsNullOrWhiteSpace(item.TierHeader) ? "Tier" : item.TierHeader;
+            return item.Label + " (" + tierHeader + " " + item.OwnedTier + ")";
         }
     }
 }

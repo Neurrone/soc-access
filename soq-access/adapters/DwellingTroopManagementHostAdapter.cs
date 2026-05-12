@@ -2,7 +2,6 @@ using SongsOfConquest.Client.Gamestate;
 using SongsOfConquest.Client.Gamestate.Facade;
 using SongsOfConquest.Common;
 using SongsOfConquest.Common.Gamestate.Facade;
-using SongsOfConquestAccess.UI;
 
 namespace SongsOfConquestAccess.Adapters
 {

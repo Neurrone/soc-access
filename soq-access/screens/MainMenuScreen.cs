@@ -6,6 +6,20 @@ namespace SongsOfConquestAccess.Screens
 {
     internal sealed class MainMenuScreen : Screen
     {
+        private static readonly string[] TopLevelItemIds =
+        {
+            "continue",
+            "campaign",
+            "skirmish",
+            "load-game",
+            "quit",
+            "map-editor",
+            "community-maps",
+            "extras",
+            "hotseat",
+            "multiplayer"
+        };
+
         private readonly MainMenuAdapter _adapter;
 
         public MainMenuScreen(MainMenuAdapter adapter)
@@ -50,13 +64,36 @@ namespace SongsOfConquestAccess.Screens
                 }
 
                 root.AddItem(new MenuItemWidget(
-                    item.Id,
+                    GetTopLevelItemId(i),
                     item.GetLabel,
-                    item.GetStatus,
+                    () => BuildMenuButtonStatus(item),
                     item.Activate,
                     null,
                     item.IsVisible));
             }
+        }
+
+        private static string GetTopLevelItemId(int index)
+        {
+            return index >= 0 && index < TopLevelItemIds.Length
+                ? TopLevelItemIds[index]
+                : "main-menu-item-" + index;
+        }
+
+        private static string BuildMenuButtonStatus(IMenuButtonAdapter item)
+        {
+            if (item == null)
+            {
+                return string.Empty;
+            }
+
+            string nativeStatus = item.GetStatus();
+            if (item.IsEnabled())
+            {
+                return nativeStatus;
+            }
+
+            return string.IsNullOrWhiteSpace(nativeStatus) ? "disabled" : "disabled. " + nativeStatus;
         }
     }
 }

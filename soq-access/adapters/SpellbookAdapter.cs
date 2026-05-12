@@ -812,18 +812,16 @@ namespace SongsOfConquestAccess.Adapters
 
             public SpellbookQuickbarEntry Entry { get { return _entry; } }
 
-            public string Id { get { return "spellbook-quickbar-" + (Index + 1); } }
-
             public bool CanDrag { get { return _entry != null && _entry.Spell != null && !_adapter.IsAutoPopulateChecked(); } }
 
-            public string Label
+            public bool HasSpell
             {
-                get
-                {
-                    return _entry != null && _entry.Spell != null
-                        ? "Slot " + (Index + 1) + ": " + _adapter.GetSpellLabel(_entry.Spell)
-                        : "Slot " + (Index + 1) + ": empty";
-                }
+                get { return _entry != null && _entry.Spell != null; }
+            }
+
+            public string SpellName
+            {
+                get { return HasSpell ? _adapter.GetSpellLabel(_entry.Spell) : string.Empty; }
             }
 
             public bool Activate() { return _entry != null && _adapter.ActivateQuickbar(_entry); }

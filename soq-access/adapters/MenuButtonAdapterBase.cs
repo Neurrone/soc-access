@@ -11,18 +11,14 @@ namespace SongsOfConquestAccess.Adapters
         private readonly Func<bool> _activate;
 
         protected MenuButtonAdapterBase(
-            string id,
             UIButton button,
             Func<bool> isVisible,
             Func<bool> activate)
         {
-            Id = id ?? string.Empty;
             Button = button;
             _isVisible = isVisible;
             _activate = activate;
         }
-
-        public string Id { get; private set; }
 
         public UIButton Button { get; private set; }
 
@@ -33,12 +29,17 @@ namespace SongsOfConquestAccess.Adapters
 
         public virtual string GetStatus()
         {
-            return Button != null && !Button.Interactable ? "disabled" : string.Empty;
+            return string.Empty;
         }
 
         public bool IsVisible()
         {
             return (_isVisible == null || _isVisible()) && IsButtonVisible(Button);
+        }
+
+        public bool IsEnabled()
+        {
+            return Button != null && Button.Interactable;
         }
 
         public bool Activate()

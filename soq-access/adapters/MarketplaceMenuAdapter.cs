@@ -113,8 +113,9 @@ namespace SongsOfConquestAccess.Adapters
         public TradeActionItem GetTradeAction(bool isBuyButton, int amount)
         {
             return new TradeActionItem(
-                "marketplace-" + (isBuyButton ? "buy" : "sell") + "-" + amount,
-                () => BuildTradeLabel(_selectedResourceType, isBuyButton, amount),
+                this,
+                isBuyButton,
+                amount,
                 () => FindButton(_selectedResourceType, isBuyButton, amount) != null,
                 () => IsButtonEnabled(FindButton(_selectedResourceType, isBuyButton, amount)),
                 () => ActivateButton(FindButton(_selectedResourceType, isBuyButton, amount)),
@@ -165,28 +166,21 @@ namespace SongsOfConquestAccess.Adapters
             string name = FormatResource(resourceType);
             int amount = GetResourceAmount(resourceType);
             return new ResourceItem(
-                "marketplace-resource-" + resourceType,
                 resourceType,
-                name + ": " + FormatAmount(amount));
+                name,
+                amount);
         }
 
-        private string BuildTradeLabel(ResourceType resourceType, bool isBuyButton, int amount)
+        public string GetResourceName(ResourceType resourceType)
         {
-            MarketplaceButton button = FindButton(resourceType, isBuyButton, amount);
-            if (button == null)
-            {
-                return isBuyButton ? "Buy" : "Sell";
-            }
+            return FormatResource(resourceType);
+        }
 
+        public int GetTradeGoldAmount(ResourceType resourceType, bool isBuyButton, int amount)
+        {
             ResourceType from = isBuyButton ? ResourceType.Gold : resourceType;
             ResourceType to = isBuyButton ? resourceType : ResourceType.Gold;
-            int goldAmount = GetGoldAmount(from, to, amount);
-            string resourceName = FormatResource(resourceType).ToLowerInvariant();
-            string formattedAmount = FormatAmount(amount);
-            string formattedGold = FormatAmount(goldAmount);
-            return isBuyButton
-                ? "Buy " + formattedAmount + " " + resourceName + " for " + formattedGold + " gold"
-                : "Sell " + formattedAmount + " " + resourceName + " for " + formattedGold + " gold";
+            return GetGoldAmount(from, to, amount);
         }
 
         private int GetGoldAmount(ResourceType from, ResourceType to, int amount)
@@ -309,38 +303,45 @@ namespace SongsOfConquestAccess.Adapters
 
         internal sealed class ResourceItem
         {
-            public ResourceItem(string id, ResourceType resourceType, string label)
+            public ResourceItem(ResourceType resourceType, string resourceName, int amount)
             {
-                Id = id ?? string.Empty;
                 ResourceType = resourceType;
-                Label = label ?? string.Empty;
+                ResourceName = resourceName ?? string.Empty;
+                Amount = amount;
             }
 
-            public string Id { get; private set; }
             public ResourceType ResourceType { get; private set; }
-            public string Label { get; private set; }
+            public string ResourceName { get; private set; }
+            public int Amount { get; private set; }
         }
 
         internal sealed class TradeActionItem
         {
+            private readonly MarketplaceMenuAdapter _adapter;
+
             public TradeActionItem(
-                string id,
-                Func<string> getLabel,
+                MarketplaceMenuAdapter adapter,
+                bool isBuyButton,
+                int amount,
                 Func<bool> isVisible,
                 Func<bool> isEnabled,
                 Func<bool> activate,
                 Action focus)
             {
-                Id = id ?? string.Empty;
-                GetLabel = getLabel;
+                _adapter = adapter;
+                IsBuyButton = isBuyButton;
+                Amount = amount;
                 IsVisible = isVisible;
                 IsEnabled = isEnabled;
                 Activate = activate;
                 Focus = focus;
             }
 
-            public string Id { get; private set; }
-            public Func<string> GetLabel { get; private set; }
+            public bool IsBuyButton { get; private set; }
+            public int Amount { get; private set; }
+            public ResourceType ResourceType { get { return _adapter != null ? _adapter.SelectedResourceType : ResourceType.Gold; } }
+            public string ResourceName { get { return _adapter != null ? _adapter.GetResourceName(ResourceType) : string.Empty; } }
+            public int GoldAmount { get { return _adapter != null ? _adapter.GetTradeGoldAmount(ResourceType, IsBuyButton, Amount) : 0; } }
             public Func<bool> IsVisible { get; private set; }
             public Func<bool> IsEnabled { get; private set; }
             public Func<bool> Activate { get; private set; }

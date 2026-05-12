@@ -125,16 +125,11 @@ namespace SongsOfConquestAccess.Adapters
             bool hasParent = GetParent(entry) != null;
             string title = MenuButtonTextUtility.JoinParts(category, tier);
             string label = hasParent ? GetShortCategoryLabel(category) : category;
-            if (string.IsNullOrWhiteSpace(label))
-            {
-                label = "Group " + (index + 1);
-            }
 
             List<RowItem> rows = new List<RowItem>();
             if (hasParent && !string.IsNullOrWhiteSpace(title))
             {
                 rows.Add(new RowItem(
-                    "owned-entities-group-" + index + "-title",
                     title,
                     string.Empty,
                     () => ClickCategory(entry),
@@ -145,7 +140,6 @@ namespace SongsOfConquestAccess.Adapters
             if (!string.IsNullOrWhiteSpace(income))
             {
                 rows.Add(new RowItem(
-                    "owned-entities-group-" + index + "-income",
                     income,
                     string.Empty,
                     () => false,
@@ -169,16 +163,14 @@ namespace SongsOfConquestAccess.Adapters
                 }
 
                 string status = NormalizeText(GetText(building, LevelTextField));
-                int capturedIndex = i;
                 rows.Add(new RowItem(
-                    "owned-entities-group-" + index + "-building-" + capturedIndex,
                     labelText,
                     status,
                     () => ClickBuilding(building),
                     () => FocusBuilding(building)));
             }
 
-            return rows.Count > 0 ? new GroupItem("owned-entities-group-" + index, label, rows) : null;
+            return rows.Count > 0 ? new GroupItem(label, rows) : null;
         }
 
         private static string BuildIncomeSummary(KingdomEntityOverviewCategoryEntry entry)
@@ -328,30 +320,26 @@ namespace SongsOfConquestAccess.Adapters
 
         internal sealed class GroupItem
         {
-            public GroupItem(string id, string label, IReadOnlyList<RowItem> rows)
+            public GroupItem(string label, IReadOnlyList<RowItem> rows)
             {
-                Id = id ?? string.Empty;
                 Label = label ?? string.Empty;
                 Rows = rows ?? new RowItem[0];
             }
 
-            public string Id { get; private set; }
             public string Label { get; private set; }
             public IReadOnlyList<RowItem> Rows { get; private set; }
         }
 
         internal sealed class RowItem
         {
-            public RowItem(string id, string label, string status, Func<bool> activate, Func<bool> focus)
+            public RowItem(string label, string status, Func<bool> activate, Func<bool> focus)
             {
-                Id = id ?? string.Empty;
                 Label = label ?? string.Empty;
                 Status = status ?? string.Empty;
                 Activate = activate;
                 Focus = focus;
             }
 
-            public string Id { get; private set; }
             public string Label { get; private set; }
             public string Status { get; private set; }
             public Func<bool> Activate { get; private set; }

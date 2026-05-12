@@ -4,7 +4,6 @@ using HarmonyLib;
 using SongsOfConquest.Client.Adventure.UI;
 using SongsOfConquest.Client.UI;
 using SongsOfConquest.Common.Localization;
-using SongsOfConquestAccess.UI;
 using UnityEngine;
 
 namespace SongsOfConquestAccess.Adapters
@@ -73,22 +72,20 @@ namespace SongsOfConquestAccess.Adapters
             get { return _button != null && _button.Active && _button.Interactable; }
         }
 
-        public Tooltip Tooltip
+        public Component TooltipTarget
         {
-            get
-            {
-                if (_button == null)
-                {
-                    return null;
-                }
+            get { return _button as Component; }
+        }
 
-                return Portrait.BuildNativeTooltip(() => _button, _localization, () => RefreshTooltip(_portrait));
-            }
+        public ILocalizationHandler Localization
+        {
+            get { return _localization; }
         }
 
         public void Focus()
         {
-            Portrait.FocusNative(() => _button, () => RefreshTooltip(_portrait));
+            RefreshTooltip();
+            NativeSelectionUtility.Select(_button as Component);
         }
 
         public bool Click()
@@ -118,6 +115,11 @@ namespace SongsOfConquestAccess.Adapters
             {
                 SoqAccessPlugin.Instance?.LogWarning("CommanderHudPortraitAdapter failed to refresh commander tooltip: " + exception.Message);
             }
+        }
+
+        public void RefreshTooltip()
+        {
+            RefreshTooltip(_portrait);
         }
 
         private static bool IsButtonVisible(UIButton button)

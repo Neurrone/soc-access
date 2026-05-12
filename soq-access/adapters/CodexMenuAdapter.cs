@@ -7,7 +7,6 @@ using SongsOfConquest.Client.Menu;
 using SongsOfConquest.Client.UI;
 using SongsOfConquest.Common.Localization;
 using SongsOfConquestAccess.Speech;
-using SongsOfConquestAccess.UI;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
@@ -83,7 +82,7 @@ namespace SongsOfConquestAccess.Adapters
             {
                 ICodexProvider provider = providers[i];
                 string label = GetLocalizedText(provider != null ? provider.NameKey : null, provider != null ? provider.NameKey : "Tab " + (i + 1));
-                items.Add(new TabItem("codex-tab-" + i, label, i, i == activeIndex));
+                items.Add(new TabItem(label, i, i == activeIndex));
             }
 
             return items;
@@ -119,7 +118,6 @@ namespace SongsOfConquestAccess.Adapters
             List<ArticleItem> items = new List<ArticleItem>();
             IList sections = GetActivePoolEntries(CategorySectionPoolField);
             GameObject selected = EventSystem.current != null ? EventSystem.current.currentSelectedGameObject : null;
-            int articleIndex = 0;
             for (int sectionIndex = 0; sectionIndex < sections.Count; sectionIndex++)
             {
                 CodexCategorySection section = sections[sectionIndex] as CodexCategorySection;
@@ -152,8 +150,7 @@ namespace SongsOfConquestAccess.Adapters
                         : label;
                     announcedSection = true;
                     bool isSelected = selected != null && selected == ((Component)button).gameObject;
-                    items.Add(new ArticleItem("codex-article-" + articleIndex, fullLabel, button, isSelected));
-                    articleIndex++;
+                    items.Add(new ArticleItem(fullLabel, button, isSelected));
                 }
             }
 
@@ -572,15 +569,13 @@ namespace SongsOfConquestAccess.Adapters
 
         internal sealed class TabItem
         {
-            public TabItem(string id, string label, int index, bool isActive)
+            public TabItem(string label, int index, bool isActive)
             {
-                Id = id;
                 Label = label;
                 Index = index;
                 IsActive = isActive;
             }
 
-            public string Id { get; private set; }
             public string Label { get; private set; }
             public int Index { get; private set; }
             public bool IsActive { get; private set; }
@@ -588,18 +583,36 @@ namespace SongsOfConquestAccess.Adapters
 
         internal sealed class ArticleItem
         {
-            public ArticleItem(string id, string label, CodexContentButton button, bool isSelected)
+            public ArticleItem(string label, CodexContentButton button, bool isSelected)
             {
-                Id = id;
                 Label = label;
                 Button = button;
                 IsSelected = isSelected;
             }
 
-            public string Id { get; private set; }
             public string Label { get; private set; }
             public CodexContentButton Button { get; private set; }
             public bool IsSelected { get; private set; }
+        }
+
+        internal enum CodexContentItemKind
+        {
+            Heading,
+            Text
+        }
+
+        internal sealed class CodexContentItem
+        {
+            public CodexContentItem(CodexContentItemKind kind, string text, RectTransform sourceTransform = null)
+            {
+                Kind = kind;
+                Text = text ?? string.Empty;
+                SourceTransform = sourceTransform;
+            }
+
+            public CodexContentItemKind Kind { get; private set; }
+            public string Text { get; private set; }
+            public RectTransform SourceTransform { get; private set; }
         }
     }
 }

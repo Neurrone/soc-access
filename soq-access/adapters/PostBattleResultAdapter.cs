@@ -8,7 +8,6 @@ using SongsOfConquest.Client.UI;
 using SongsOfConquest.Common.Battle;
 using SongsOfConquest.Common.Localization;
 using SongsOfConquestAccess.Speech;
-using SongsOfConquestAccess.UI;
 using UnityEngine;
 
 namespace SongsOfConquestAccess.Adapters
@@ -75,16 +74,6 @@ namespace SongsOfConquestAccess.Adapters
             get { return GetText(DefenderNameField); }
         }
 
-        public Tooltip AttackerCommanderTooltip
-        {
-            get { return BuildCommanderTooltip("AttackerCommanderHudPortrait"); }
-        }
-
-        public Tooltip DefenderCommanderTooltip
-        {
-            get { return BuildCommanderTooltip("DefenderCommanderHudPortrait"); }
-        }
-
         public CommanderHudPortraitAdapter AttackerCommanderPortrait
         {
             get
@@ -144,12 +133,12 @@ namespace SongsOfConquestAccess.Adapters
 
         public IReadOnlyList<ResultEntry> AttackerTroopsLost
         {
-            get { return BuildTroopEntries(AttackerTroopsParentField, "post-battle-attacker-troop-lost-"); }
+            get { return BuildTroopEntries(AttackerTroopsParentField); }
         }
 
         public IReadOnlyList<ResultEntry> DefenderTroopsLost
         {
-            get { return BuildTroopEntries(DefenderTroopsParentField, "post-battle-defender-troop-lost-"); }
+            get { return BuildTroopEntries(DefenderTroopsParentField); }
         }
 
         public IReadOnlyList<ResultEntry> Loot
@@ -157,30 +146,54 @@ namespace SongsOfConquestAccess.Adapters
             get { return BuildLootEntries(); }
         }
 
-        public ButtonWidget BuildAcceptButton()
+        public string AcceptButtonLabel
         {
-            UIButton button = GetField<UIButton>(ConfirmButtonField);
-            return new ButtonWidget(
-                "post-battle-accept",
-                GetButtonLabel(button),
-                () => NativeSelectionUtility.Click(button),
-                HideNativeTooltip,
-                () => IsButtonEnabled(button),
-                () => IsButtonVisible(button),
-                Tooltip.ForComponent(button, _localization));
+            get { return GetButtonLabel(GetField<UIButton>(ConfirmButtonField)); }
         }
 
-        public ButtonWidget BuildRedoManualBattleButton()
+        public bool Accept()
         {
-            UIButton button = GetField<UIButton>(RedoManualBattleButtonField);
-            return new ButtonWidget(
-                "post-battle-redo-manual-battle",
-                GetButtonLabel(button),
-                () => NativeSelectionUtility.Click(button),
-                HideNativeTooltip,
-                () => IsButtonEnabled(button),
-                () => IsButtonVisible(button),
-                Tooltip.ForComponent(button, _localization));
+            return NativeSelectionUtility.Click(GetField<UIButton>(ConfirmButtonField));
+        }
+
+        public bool IsAcceptButtonEnabled()
+        {
+            return IsButtonEnabled(GetField<UIButton>(ConfirmButtonField));
+        }
+
+        public bool IsAcceptButtonVisible()
+        {
+            return IsButtonVisible(GetField<UIButton>(ConfirmButtonField));
+        }
+
+        public Tooltip AcceptButtonTooltip
+        {
+            get { return Tooltip.ForComponent(GetField<UIButton>(ConfirmButtonField), _localization); }
+        }
+
+        public string RedoManualBattleButtonLabel
+        {
+            get { return GetButtonLabel(GetField<UIButton>(RedoManualBattleButtonField)); }
+        }
+
+        public bool RedoManualBattle()
+        {
+            return NativeSelectionUtility.Click(GetField<UIButton>(RedoManualBattleButtonField));
+        }
+
+        public bool IsRedoManualBattleButtonEnabled()
+        {
+            return IsButtonEnabled(GetField<UIButton>(RedoManualBattleButtonField));
+        }
+
+        public bool IsRedoManualBattleButtonVisible()
+        {
+            return IsButtonVisible(GetField<UIButton>(RedoManualBattleButtonField));
+        }
+
+        public Tooltip RedoManualBattleButtonTooltip
+        {
+            get { return Tooltip.ForComponent(GetField<UIButton>(RedoManualBattleButtonField), _localization); }
         }
 
         public void HideNativeTooltip()
@@ -205,12 +218,6 @@ namespace SongsOfConquestAccess.Adapters
         private IBattleResult GetResult()
         {
             return GetField<IBattleResult>(PostBattleMenuResultField);
-        }
-
-        private Tooltip BuildCommanderTooltip(string settingsFieldName)
-        {
-            CommanderHudPortraitAdapter portrait = BuildCommanderPortrait("post-battle-commander", () => string.Empty, settingsFieldName);
-            return portrait != null ? portrait.Tooltip : null;
         }
 
         private CommanderHudPortraitAdapter BuildCommanderPortrait(string id, Func<string> getName, string settingsFieldName)
@@ -274,7 +281,7 @@ namespace SongsOfConquestAccess.Adapters
             return candidates[0];
         }
 
-        private IReadOnlyList<ResultEntry> BuildTroopEntries(FieldInfo parentField, string idPrefix)
+        private IReadOnlyList<ResultEntry> BuildTroopEntries(FieldInfo parentField)
         {
             Transform parent = GetField<Transform>(parentField);
             if (parent == null)
@@ -294,10 +301,12 @@ namespace SongsOfConquestAccess.Adapters
 
                 Component tooltipComponent = GetField<Component>(entry, TroopEntryTooltipAreaField);
                 Tooltip tooltip = Tooltip.ForComponent(tooltipComponent, _localization);
-                string label = BuildLostTroopLabel(
+                result.Add(new ResultEntry(
                     GetText(GetField<UITextMesh>(entry, TroopEntryAmountField)),
-                    tooltip);
-                result.Add(new ResultEntry(idPrefix + i, label, tooltip, () => entry != null && entry.gameObject.activeInHierarchy));
+                    GetFirstTooltipLine(tooltip),
+                    isLostTroop: true,
+                    tooltip,
+                    () => entry != null && entry.gameObject.activeInHierarchy));
             }
 
             return result.ToArray();
@@ -306,12 +315,12 @@ namespace SongsOfConquestAccess.Adapters
         private IReadOnlyList<ResultEntry> BuildLootEntries()
         {
             List<ResultEntry> result = new List<ResultEntry>();
-            AddLootEntries(result, GetField<PostBattleLootContainer>(AttackerLootContainerField), "post-battle-attacker-loot-");
-            AddLootEntries(result, GetField<PostBattleLootContainer>(DefenderLootContainerField), "post-battle-defender-loot-");
+            AddLootEntries(result, GetField<PostBattleLootContainer>(AttackerLootContainerField));
+            AddLootEntries(result, GetField<PostBattleLootContainer>(DefenderLootContainerField));
             return result.ToArray();
         }
 
-        private void AddLootEntries(List<ResultEntry> result, PostBattleLootContainer container, string idPrefix)
+        private void AddLootEntries(List<ResultEntry> result, PostBattleLootContainer container)
         {
             if (result == null || container == null || !container.gameObject.activeInHierarchy)
             {
@@ -329,29 +338,13 @@ namespace SongsOfConquestAccess.Adapters
 
                 Component tooltipComponent = GetField<Component>(entry, LootEntryMainTransformField);
                 Tooltip tooltip = Tooltip.ForComponent(tooltipComponent, _localization);
-                string label = GetFirstTooltipLine(tooltip);
-                result.Add(new ResultEntry(idPrefix + i, label, tooltip, () => entry != null && entry.gameObject.activeInHierarchy));
+                result.Add(new ResultEntry(
+                    string.Empty,
+                    GetFirstTooltipLine(tooltip),
+                    isLostTroop: false,
+                    tooltip,
+                    () => entry != null && entry.gameObject.activeInHierarchy));
             }
-        }
-
-        private static string BuildLostTroopLabel(string amount, Tooltip tooltip)
-        {
-            string name = GetFirstTooltipLine(tooltip);
-            string label;
-            if (string.IsNullOrWhiteSpace(amount))
-            {
-                label = name;
-            }
-            else if (string.IsNullOrWhiteSpace(name))
-            {
-                label = amount;
-            }
-            else
-            {
-                label = amount + " " + name;
-            }
-
-            return string.IsNullOrWhiteSpace(label) ? string.Empty : label + " lost";
         }
 
         private string BuildXpText()
@@ -485,17 +478,20 @@ namespace SongsOfConquestAccess.Adapters
         {
             private readonly Func<bool> _isVisible;
 
-            public ResultEntry(string id, string label, Tooltip tooltip, Func<bool> isVisible)
+            public ResultEntry(string amount, string name, bool isLostTroop, Tooltip tooltip, Func<bool> isVisible)
             {
-                Id = id ?? string.Empty;
-                Label = label ?? string.Empty;
+                Amount = amount ?? string.Empty;
+                Name = name ?? string.Empty;
+                IsLostTroop = isLostTroop;
                 Tooltip = tooltip;
                 _isVisible = isVisible;
             }
 
-            public string Id { get; private set; }
+            public string Amount { get; private set; }
 
-            public string Label { get; private set; }
+            public string Name { get; private set; }
+
+            public bool IsLostTroop { get; private set; }
 
             public Tooltip Tooltip { get; private set; }
 

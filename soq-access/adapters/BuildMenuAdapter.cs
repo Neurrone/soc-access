@@ -188,9 +188,9 @@ namespace SongsOfConquestAccess.Adapters
         {
             return new[]
             {
-                new CategoryItem("build-category-small", BuildCategoryLabel("Small", BuildSiteSize.Small), 0, BuildSiteSize.Small, IsButtonEnabled(GetSmallTabButton())),
-                new CategoryItem("build-category-medium", BuildCategoryLabel("Medium", BuildSiteSize.Medium), 1, BuildSiteSize.Medium, IsButtonEnabled(GetMediumTabButton())),
-                new CategoryItem("build-category-large", BuildCategoryLabel("Large", BuildSiteSize.Large), 2, BuildSiteSize.Large, IsButtonEnabled(GetLargeTabButton()))
+                new CategoryItem(BuildCategoryLabel("Small", BuildSiteSize.Small), 0, BuildSiteSize.Small, IsButtonEnabled(GetSmallTabButton())),
+                new CategoryItem(BuildCategoryLabel("Medium", BuildSiteSize.Medium), 1, BuildSiteSize.Medium, IsButtonEnabled(GetMediumTabButton())),
+                new CategoryItem(BuildCategoryLabel("Large", BuildSiteSize.Large), 2, BuildSiteSize.Large, IsButtonEnabled(GetLargeTabButton()))
             };
         }
 
@@ -235,11 +235,9 @@ namespace SongsOfConquestAccess.Adapters
                     : "Building " + (i + 1);
                 BuildMenuButton captured = button;
                 BuildOnBuildSiteAction capturedAction = action;
-                int capturedIndex = i;
                 items.Add(new BuildingItem(
-                    "build-building-" + capturedIndex,
                     label,
-                    () => capturedAction != null && !capturedAction.CanExecute() ? "unavailable" : string.Empty,
+                    () => capturedAction == null || capturedAction.CanExecute(),
                     () => FocusBuilding(captured),
                     () => Tooltip.ForComponent(GetBuildButton(captured) as Component, _localization)));
             }
@@ -316,7 +314,6 @@ namespace SongsOfConquestAccess.Adapters
                 }
 
                 items.Add(new TierItem(
-                    "build-tier-" + level,
                     label,
                     level,
                     () => FocusTier(level),
@@ -340,7 +337,7 @@ namespace SongsOfConquestAccess.Adapters
 
         public IReadOnlyList<SectionItem> GetAvailableResearchItems()
         {
-            return GetVisibleSectionItems("Adventure/BuildMenu/AvailableResearch", "available-research");
+            return GetVisibleSectionItems("Adventure/BuildMenu/AvailableResearch");
         }
 
         public string AvailableResearchHeader
@@ -369,13 +366,13 @@ namespace SongsOfConquestAccess.Adapters
                     continue;
                 }
 
-                IReadOnlyList<SectionItem> items = GetSectionItems(section, "build-info-section-" + index);
+                IReadOnlyList<SectionItem> items = GetSectionItems(section);
                 if (items.Count == 0)
                 {
                     continue;
                 }
 
-                menus.Add(new SectionMenu("build-info-section-" + index, header, items));
+                menus.Add(new SectionMenu(header, items));
                 index++;
             }
 
@@ -408,8 +405,8 @@ namespace SongsOfConquestAccess.Adapters
                         && _buildingRequirementValidator != null
                         && _buildingRequirementValidator.Validate(requirement, buildSiteId);
                     items.Add(new RequirementItem(
-                        "build-requirement-building-" + i,
-                        PrefixMissing(label, met),
+                        label,
+                        met,
                         null));
                     nativeIndex++;
                 }
@@ -427,8 +424,8 @@ namespace SongsOfConquestAccess.Adapters
                         && ValidateResearchRequirement(requirement, buildSiteId);
                     BuildMenuDescriptionEntry nativeEntry = nativeIndex >= 0 && nativeIndex < nativeEntries.Length ? nativeEntries[nativeIndex] : null;
                     items.Add(new RequirementItem(
-                        "build-requirement-research-" + i,
-                        PrefixMissing(label, met),
+                        label,
+                        met,
                         GetEntryTooltip(nativeEntry)));
                     nativeIndex++;
                 }
@@ -491,13 +488,13 @@ namespace SongsOfConquestAccess.Adapters
         public IReadOnlyList<DetailItem> GetDetailItems()
         {
             List<DetailItem> items = new List<DetailItem>();
-            AddIfNotEmpty(items, "build-detail-summary", string.Empty, SelectedBuildingSummary);
+            AddIfNotEmpty(items, string.Empty, SelectedBuildingSummary);
             AddVisibleDescriptionSections(items);
-            AddIfNotEmpty(items, "build-detail-cost", "Cost", CurrentTierCostText);
-            AddIfNotEmpty(items, "build-detail-warning", "Warning", CannotBuyText);
+            AddIfNotEmpty(items, "Cost", CurrentTierCostText);
+            AddIfNotEmpty(items, "Warning", CannotBuyText);
             if (items.Count == 0)
             {
-                items.Add(new DetailItem("build-detail-none", "Details", "No details"));
+                items.Add(new DetailItem("Details", "No details"));
             }
 
             return items;
@@ -762,18 +759,18 @@ namespace SongsOfConquestAccess.Adapters
                 }
 
                 string body = string.Join(". ", lines.ToArray());
-                AddIfNotEmpty(items, "build-detail-section-" + detailIndex, header, body);
+                AddIfNotEmpty(items, header, body);
                 detailIndex++;
             }
         }
 
-        private IReadOnlyList<SectionItem> GetVisibleSectionItems(string localizationKey, string idPrefix)
+        private IReadOnlyList<SectionItem> GetVisibleSectionItems(string localizationKey)
         {
             BuildMenuDescriptionSection section = GetVisibleSection(localizationKey, null);
-            return section != null ? GetSectionItems(section, idPrefix) : new SectionItem[0];
+            return section != null ? GetSectionItems(section) : new SectionItem[0];
         }
 
-        private IReadOnlyList<SectionItem> GetSectionItems(BuildMenuDescriptionSection section, string idPrefix)
+        private IReadOnlyList<SectionItem> GetSectionItems(BuildMenuDescriptionSection section)
         {
             List<SectionItem> items = new List<SectionItem>();
             if (section == null)
@@ -793,7 +790,6 @@ namespace SongsOfConquestAccess.Adapters
 
                 BuildMenuDescriptionEntry captured = entry;
                 items.Add(new SectionItem(
-                    idPrefix + "-" + items.Count,
                     text,
                     () => FocusEntry(captured),
                     () => GetEntryTooltip(captured)));
@@ -1218,11 +1214,6 @@ namespace SongsOfConquestAccess.Adapters
             }
         }
 
-        private static string PrefixMissing(string label, bool met)
-        {
-            return met ? label : "Missing " + label;
-        }
-
         private string GetLocalizedText(string key, string fallback)
         {
             if (_localization == null || string.IsNullOrWhiteSpace(key))
@@ -1234,14 +1225,14 @@ namespace SongsOfConquestAccess.Adapters
             return string.IsNullOrWhiteSpace(text) ? fallback ?? string.Empty : text;
         }
 
-        private static void AddIfNotEmpty(List<DetailItem> items, string id, string header, string body)
+        private static void AddIfNotEmpty(List<DetailItem> items, string header, string body)
         {
             if (string.IsNullOrWhiteSpace(body))
             {
                 return;
             }
 
-            items.Add(new DetailItem(id, header, body));
+            items.Add(new DetailItem(header, body));
         }
 
         private static string JoinParts(string first, string second)
@@ -1339,16 +1330,14 @@ namespace SongsOfConquestAccess.Adapters
 
         internal sealed class CategoryItem
         {
-            public CategoryItem(string id, string label, int index, BuildSiteSize size, bool enabled)
+            public CategoryItem(string label, int index, BuildSiteSize size, bool enabled)
             {
-                Id = id;
                 Label = label;
                 Index = index;
                 Size = size;
                 Enabled = enabled;
             }
 
-            public string Id { get; private set; }
             public string Label { get; private set; }
             public int Index { get; private set; }
             public BuildSiteSize Size { get; private set; }
@@ -1357,34 +1346,36 @@ namespace SongsOfConquestAccess.Adapters
 
         internal sealed class BuildingItem
         {
-            public BuildingItem(string id, string label, Func<string> getStatus, Func<bool> focus, Func<Tooltip> tooltip)
+            private readonly Func<bool> _isAvailable;
+
+            public BuildingItem(string label, Func<bool> isAvailable, Func<bool> focus, Func<Tooltip> tooltip)
             {
-                Id = id;
                 Label = label;
-                GetStatus = getStatus;
+                _isAvailable = isAvailable;
                 Focus = focus;
                 Tooltip = tooltip;
             }
 
-            public string Id { get; private set; }
             public string Label { get; private set; }
-            public Func<string> GetStatus { get; private set; }
             public Func<bool> Focus { get; private set; }
             public Func<Tooltip> Tooltip { get; private set; }
+
+            public bool IsAvailable
+            {
+                get { return _isAvailable == null || _isAvailable(); }
+            }
         }
 
         internal sealed class TierItem
         {
-            public TierItem(string id, string label, int level, Func<bool> focus, Func<Tooltip> tooltip)
+            public TierItem(string label, int level, Func<bool> focus, Func<Tooltip> tooltip)
             {
-                Id = id;
                 Label = label;
                 Level = level;
                 Focus = focus;
                 Tooltip = tooltip;
             }
 
-            public string Id { get; private set; }
             public string Label { get; private set; }
             public int Level { get; private set; }
             public Func<bool> Focus { get; private set; }
@@ -1393,29 +1384,25 @@ namespace SongsOfConquestAccess.Adapters
 
         internal sealed class SectionMenu
         {
-            public SectionMenu(string id, string label, IReadOnlyList<SectionItem> items)
+            public SectionMenu(string label, IReadOnlyList<SectionItem> items)
             {
-                Id = id;
                 Label = label ?? string.Empty;
                 Items = items ?? new SectionItem[0];
             }
 
-            public string Id { get; private set; }
             public string Label { get; private set; }
             public IReadOnlyList<SectionItem> Items { get; private set; }
         }
 
         internal sealed class SectionItem
         {
-            public SectionItem(string id, string label, Action focus, Func<Tooltip> tooltip)
+            public SectionItem(string label, Action focus, Func<Tooltip> tooltip)
             {
-                Id = id;
                 Label = label ?? string.Empty;
                 Focus = focus;
                 Tooltip = tooltip;
             }
 
-            public string Id { get; private set; }
             public string Label { get; private set; }
             public Action Focus { get; private set; }
             public Func<Tooltip> Tooltip { get; private set; }
@@ -1423,28 +1410,26 @@ namespace SongsOfConquestAccess.Adapters
 
         internal sealed class RequirementItem
         {
-            public RequirementItem(string id, string label, Tooltip tooltip)
+            public RequirementItem(string label, bool isMet, Tooltip tooltip)
             {
-                Id = id;
                 Label = label ?? string.Empty;
+                IsMet = isMet;
                 Tooltip = tooltip;
             }
 
-            public string Id { get; private set; }
             public string Label { get; private set; }
+            public bool IsMet { get; private set; }
             public Tooltip Tooltip { get; private set; }
         }
 
         internal sealed class DetailItem
         {
-            public DetailItem(string id, string header, string body)
+            public DetailItem(string header, string body)
             {
-                Id = id;
                 Header = header ?? string.Empty;
                 Body = body ?? string.Empty;
             }
 
-            public string Id { get; private set; }
             public string Header { get; private set; }
             public string Body { get; private set; }
 

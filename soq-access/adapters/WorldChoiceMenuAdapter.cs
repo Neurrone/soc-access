@@ -161,9 +161,9 @@ namespace SongsOfConquestAccess.Adapters
                 int capturedIndex = i;
                 Selectable selectable = button.Button != null ? button.Button.GetSelectable() : null;
                 choices.Add(new ChoiceItem(
-                    "reward-" + i,
+                    isPenalty: false,
                     BuildChoiceLabel(button),
-                    button.Interactable ? string.Empty : "disabled",
+                    button.Interactable,
                     () => FocusReward(capturedIndex),
                     () => true,
                     Tooltip.ForComponent(
@@ -183,9 +183,9 @@ namespace SongsOfConquestAccess.Adapters
                 int capturedIndex = i;
                 Selectable selectable = button.Button != null ? button.Button.GetSelectable() : null;
                 choices.Add(new ChoiceItem(
-                    "penalty-" + i,
+                    isPenalty: true,
                     BuildChoiceLabel(button),
-                    button.Interactable ? string.Empty : "disabled",
+                    button.Interactable,
                     () => FocusPenalty(capturedIndex),
                     () => true,
                     Tooltip.ForComponent(
@@ -315,19 +315,19 @@ namespace SongsOfConquestAccess.Adapters
 
         internal sealed class ChoiceItem
         {
-            public ChoiceItem(string id, string label, string status, Action onFocus, Func<bool> isVisible, Tooltip tooltip = null)
+            public ChoiceItem(bool isPenalty, string label, bool isEnabled, Action onFocus, Func<bool> isVisible, Tooltip tooltip = null)
             {
-                Id = id ?? string.Empty;
+                IsPenalty = isPenalty;
                 Label = label ?? string.Empty;
-                Status = status ?? string.Empty;
+                IsEnabled = isEnabled;
                 OnFocus = onFocus;
                 IsVisible = isVisible;
                 Tooltip = tooltip;
             }
 
-            public string Id { get; private set; }
+            public bool IsPenalty { get; private set; }
             public string Label { get; private set; }
-            public string Status { get; private set; }
+            public bool IsEnabled { get; private set; }
             public Action OnFocus { get; private set; }
             public Func<bool> IsVisible { get; private set; }
             public Tooltip Tooltip { get; private set; }

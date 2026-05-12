@@ -35,7 +35,7 @@ namespace SongsOfConquestAccess.UI
                 DraggableMenuItemWidget widget = null;
                 widget = new DraggableMenuItemWidget(
                     id + "-slot-" + item.SlotNumber,
-                    () => item.Label,
+                    () => BuildSlotLabel(item),
                     null,
                     null,
                     item.Focus,
@@ -48,6 +48,27 @@ namespace SongsOfConquestAccess.UI
             }
 
             return menu;
+        }
+
+        private static string BuildSlotLabel(TroopHudAdapter.SlotItem item)
+        {
+            if (item == null)
+            {
+                return string.Empty;
+            }
+
+            string slotLabel = "slot " + item.SlotNumber;
+            if (!item.IsOccupied)
+            {
+                return "Empty troop " + slotLabel;
+            }
+
+            if (item.CurrentSize > 0 && item.MaxSize > 0)
+            {
+                return item.TroopName + ", " + item.CurrentSize + " / " + item.MaxSize + ", " + slotLabel;
+            }
+
+            return item.TroopName + ", " + slotLabel;
         }
     }
 }

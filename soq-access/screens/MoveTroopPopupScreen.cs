@@ -44,9 +44,29 @@ namespace SongsOfConquestAccess.Screens
                 adapter.HideNativeTooltip,
                 includeParentLabelInAnnouncement: false));
 
-            root.AddChild(adapter.BuildMoveAllLeftButton());
-            root.AddChild(adapter.BuildSplitButton());
-            root.AddChild(adapter.BuildMoveAllRightButton());
+            root.AddChild(new ButtonWidget(
+                "move-troop-move-all-left",
+                "Move all left",
+                adapter.MoveAllLeft,
+                adapter.HideNativeTooltip,
+                adapter.IsMoveAllLeftEnabled,
+                tooltip: adapter.MoveAllLeftTooltip));
+
+            root.AddChild(new ButtonWidget(
+                "move-troop-split-equal",
+                "Split equally",
+                adapter.SplitEqual,
+                adapter.HideNativeTooltip,
+                adapter.IsSplitEqualEnabled,
+                tooltip: adapter.SplitEqualTooltip));
+
+            root.AddChild(new ButtonWidget(
+                "move-troop-move-all-right",
+                "Move all right",
+                adapter.MoveAllRight,
+                adapter.HideNativeTooltip,
+                adapter.IsMoveAllRightEnabled,
+                tooltip: adapter.MoveAllRightTooltip));
 
             // Known minor issue: native TroopHUDEntryMovable stores SliderValue as the
             // right-side balance size, then remaps visible left/right amounts based on
@@ -54,7 +74,16 @@ namespace SongsOfConquestAccess.Screens
             // increases the native value but can visually move the slider left. We keep
             // this native behavior for now because speech reports the resulting
             // "Left: X, right: Y" distribution.
-            root.AddChild(adapter.BuildDistributionSlider());
+            root.AddChild(new SliderWidget(
+                "move-troop-distribution",
+                "troop distribution",
+                adapter.GetDistributionText,
+                adapter.GetSliderValue,
+                adapter.GetSliderMinimum,
+                adapter.GetSliderMaximum,
+                adapter.GetSliderStep,
+                adapter.SetSliderValue,
+                adapter.IsSliderEnabled));
 
             root.AddChild(new ButtonWidget(
                 "move-troop-ok",

@@ -222,7 +222,10 @@ namespace SongsOfConquestAccess.Screens
                 () => portrait.Name,
                 portrait.Click,
                 portrait.Focus,
-                () => portrait.Tooltip,
+                () => Portrait.BuildNativeTooltip(
+                    () => portrait.TooltipTarget,
+                    portrait.Localization,
+                    portrait.RefreshTooltip),
                 () => portrait.IsEnabled,
                 () => portrait.IsVisible));
 

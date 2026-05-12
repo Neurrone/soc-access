@@ -74,7 +74,7 @@ namespace SongsOfConquestAccess.Screens
             {
                 PostAdventureResultAdapter.ObjectiveEntry objective = objectives[i];
                 menu.AddItem(new MenuItemWidget(
-                    objective.Id,
+                    "post-adventure-objective-" + i,
                     () => objective.Label,
                     () => objective.Status,
                     activate: null,

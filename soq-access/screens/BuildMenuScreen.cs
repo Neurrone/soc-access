@@ -160,7 +160,7 @@ namespace SongsOfConquestAccess.Screens
             {
                 BuildMenuAdapter.TierItem tier = tiers[i];
                 menu.AddItem(new MenuItemWidget(
-                    tier.Id,
+                    BuildTierId(tier),
                     () => tier.Label,
                     null,
                     tier.Focus,
@@ -181,7 +181,7 @@ namespace SongsOfConquestAccess.Screens
             {
                 BuildMenuAdapter.SectionItem item = items[i];
                 menu.AddItem(new MenuItemWidget(
-                    item.Id,
+                    "build-available-research-" + i,
                     () => item.Label,
                     null,
                     () => false,
@@ -199,12 +199,13 @@ namespace SongsOfConquestAccess.Screens
             for (int i = 0; i < menus.Count; i++)
             {
                 BuildMenuAdapter.SectionMenu section = menus[i];
-                MenuWidget menu = new MenuWidget(section.Id, section.Label);
+                string sectionId = "build-info-section-" + i;
+                MenuWidget menu = new MenuWidget(sectionId, section.Label);
                 for (int j = 0; j < section.Items.Count; j++)
                 {
                     BuildMenuAdapter.SectionItem item = section.Items[j];
                     menu.AddItem(new MenuItemWidget(
-                        item.Id,
+                        sectionId + "-" + j,
                         () => item.Label,
                         null,
                         () => false,
@@ -225,9 +226,9 @@ namespace SongsOfConquestAccess.Screens
             {
                 BuildMenuAdapter.RequirementItem requirement = requirements[i];
                 menu.AddItem(new MenuItemWidget(
-                    requirement.Id,
-                    () => requirement.Label,
-                    null,
+                    "build-requirement-" + i,
+                    () => BuildRequirementLabel(requirement),
+                    () => requirement.IsMet ? string.Empty : "missing",
                     () => false,
                     adapter.HideNativeTooltip,
                     () => true,
@@ -246,13 +247,14 @@ namespace SongsOfConquestAccess.Screens
             {
                 BuildMenuAdapter.CategoryItem category = categories[i];
                 BuildMenuAdapter.CategoryItem captured = category;
+                string id = BuildCategoryId(captured);
                 if (captured.Index == adapter.SelectedCategoryIndex)
                 {
-                    activeId = captured.Id;
+                    activeId = id;
                 }
 
                 menu.AddItem(new MenuItemWidget(
-                    captured.Id,
+                    id,
                     () => captured.Label,
                     () => captured.Enabled ? string.Empty : "unavailable",
                     () => captured.Enabled && adapter.FocusCategory(captured.Size),
@@ -281,9 +283,9 @@ namespace SongsOfConquestAccess.Screens
             {
                 BuildMenuAdapter.BuildingItem building = buildings[i];
                 menu.AddItem(new MenuItemWidget(
-                    building.Id,
+                    "build-building-" + i,
                     () => building.Label,
-                    building.GetStatus,
+                    () => building.IsAvailable ? string.Empty : "unavailable",
                     building.Focus,
                     () => building.Focus(),
                     () => true,
@@ -306,6 +308,26 @@ namespace SongsOfConquestAccess.Screens
             }
 
             return menu;
+        }
+
+        private static string BuildTierId(BuildMenuAdapter.TierItem tier)
+        {
+            return tier != null ? "build-tier-" + tier.Level : "build-tier";
+        }
+
+        private static string BuildCategoryId(BuildMenuAdapter.CategoryItem category)
+        {
+            return category != null ? "build-category-" + category.Index : "build-category";
+        }
+
+        private static string BuildRequirementLabel(BuildMenuAdapter.RequirementItem requirement)
+        {
+            if (requirement == null)
+            {
+                return string.Empty;
+            }
+
+            return requirement.IsMet ? requirement.Label : "Missing " + requirement.Label;
         }
 
     }

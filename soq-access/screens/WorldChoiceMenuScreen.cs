@@ -97,9 +97,9 @@ namespace SongsOfConquestAccess.Screens
             {
                 WorldChoiceMenuAdapter.ChoiceItem choice = choices[i];
                 menu.AddItem(new MenuItemWidget(
-                    choice.Id,
+                    BuildChoiceId(choice, i),
                     () => choice.Label,
-                    () => choice.Status,
+                    () => choice.IsEnabled ? string.Empty : "disabled",
                     () => false,
                     choice.OnFocus,
                     choice.IsVisible,
@@ -107,6 +107,12 @@ namespace SongsOfConquestAccess.Screens
             }
 
             return menu;
+        }
+
+        private static string BuildChoiceId(WorldChoiceMenuAdapter.ChoiceItem choice, int index)
+        {
+            string prefix = choice != null && choice.IsPenalty ? "penalty" : "reward";
+            return prefix + "-" + index;
         }
     }
 }

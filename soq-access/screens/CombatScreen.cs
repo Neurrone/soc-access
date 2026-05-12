@@ -245,7 +245,7 @@ namespace SongsOfConquestAccess.Screens
             root.AddChild(BuildQuickbarMenu(adapter));
             root.AddChild(new ButtonWidget(
                 "combat-current-troop",
-                () => adapter.Hud.CurrentTroopLabel,
+                () => "Current troop, " + BuildTroopLabel(adapter.Hud.GetCurrentTroopInfo()),
                 () => ActivateCurrentTroop(adapter),
                 null,
                 () => adapter.Hud.GetCurrentTroopId() >= 0,
@@ -304,7 +304,7 @@ namespace SongsOfConquestAccess.Screens
                 int capturedIndex = i;
                 menu.AddItem(new MenuItemWidget(
                     "combat-quickbar-" + capturedIndex,
-                    () => GetQuickbarItem(adapter, capturedIndex)?.Label,
+                    () => BuildQuickbarItemLabel(GetQuickbarItem(adapter, capturedIndex)),
                     null,
                     () => ActivateQuickbarItem(adapter, capturedIndex),
                     () => GetQuickbarItem(adapter, capturedIndex)?.Focus(),
@@ -360,7 +360,7 @@ namespace SongsOfConquestAccess.Screens
                 int capturedIndex = i;
                 menu.AddItem(new MenuItemWidget(
                     "combat-queue-" + capturedIndex,
-                    () => GetQueueItem(adapter, capturedIndex)?.Label,
+                    () => BuildQueueItemLabel(GetQueueItem(adapter, capturedIndex)),
                     null,
                     () => ActivateQueueItem(adapter, capturedIndex),
                     () => GetQueueItem(adapter, capturedIndex)?.Focus(),
@@ -375,6 +375,41 @@ namespace SongsOfConquestAccess.Screens
         private static BattleHudAdapter.QueueItem GetQueueItem(CombatAdapter adapter, int index)
         {
             return adapter != null ? adapter.Hud.GetQueueItem(index) : null;
+        }
+
+        private static string BuildQuickbarItemLabel(BattleHudAdapter.QuickbarItem item)
+        {
+            if (item == null || !item.HasSpell)
+            {
+                return string.Empty;
+            }
+
+            return item.SpellName + ", tier " + item.SpellTier;
+        }
+
+        private static string BuildQueueItemLabel(BattleHudAdapter.QueueItem item)
+        {
+            if (item == null)
+            {
+                return string.Empty;
+            }
+
+            return item.IsRoundMarker ? "Round " + item.RoundNumber : BuildTroopLabel(item.Troop);
+        }
+
+        private static string BuildTroopLabel(BattleHudAdapter.TroopInfo troop)
+        {
+            if (troop == null || !troop.IsKnown)
+            {
+                return "unknown troop";
+            }
+
+            if (troop.HasSize)
+            {
+                return troop.Size + " " + troop.Name;
+            }
+
+            return string.IsNullOrWhiteSpace(troop.Name) ? "troop" : troop.Name;
         }
 
         private static bool ActivateQueueItem(CombatAdapter adapter, int index)

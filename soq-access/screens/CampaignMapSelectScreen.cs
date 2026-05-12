@@ -64,16 +64,16 @@ namespace SongsOfConquestAccess.Screens
             AddMissionItems(missions, adapter);
             if (adapter != null)
             {
-                missions.SetFocusedItemById(adapter.SelectedMissionId);
+                missions.SetFocusedItemById(BuildMissionId(adapter.SelectedMissionIndex));
             }
 
             root.AddChild(missions);
             AddDetails(root, adapter);
             AddDifficultyMenu(root, adapter);
-            AddOptionalButton(root, adapter != null ? adapter.Information.StartButton : null, adapter);
-            AddOptionalButton(root, adapter != null ? adapter.Information.ReplayButton : null, adapter);
-            AddOptionalButton(root, adapter != null ? adapter.OptionsButton : null, adapter);
-            AddOptionalButton(root, adapter != null ? adapter.BackButton : null, adapter);
+            AddOptionalButton(root, "start-mission", adapter != null ? adapter.Information.StartButton : null, adapter);
+            AddOptionalButton(root, "replay-cutscene", adapter != null ? adapter.Information.ReplayButton : null, adapter);
+            AddOptionalButton(root, "options", adapter != null ? adapter.OptionsButton : null, adapter);
+            AddOptionalButton(root, "back", adapter != null ? adapter.BackButton : null, adapter);
             if (focusDifficulty)
             {
                 root.SetFocusedChildById(DifficultyMenuId);
@@ -98,7 +98,7 @@ namespace SongsOfConquestAccess.Screens
                 }
 
                 menu.AddItem(new MenuItemWidget(
-                    item.Id,
+                    BuildMissionId(i),
                     () => GetMissionLabel(adapter, item),
                     item.GetStatus,
                     item.Activate,
@@ -135,6 +135,11 @@ namespace SongsOfConquestAccess.Screens
                 information.GetDescription(),
                 information.GetCompletedStatus(),
                 information.GetWinConditions());
+        }
+
+        private static string BuildMissionId(int index)
+        {
+            return index >= 0 ? "campaign-map-mission-" + index : string.Empty;
         }
 
         private static string GetMissionLabel(CampaignMapSelectAdapter adapter, CampaignMapButtonAdapter item)
@@ -184,7 +189,7 @@ namespace SongsOfConquestAccess.Screens
             root.AddChild(difficultyMenu);
         }
 
-        private static void AddOptionalButton(ContainerWidget root, IMenuButtonAdapter button, CampaignMapSelectAdapter adapter)
+        private static void AddOptionalButton(ContainerWidget root, string id, IMenuButtonAdapter button, CampaignMapSelectAdapter adapter)
         {
             if (root == null || button == null || !button.IsVisible())
             {
@@ -198,7 +203,7 @@ namespace SongsOfConquestAccess.Screens
             }
 
             root.AddChild(new ButtonWidget(
-                button.Id,
+                id,
                 label,
                 button.Activate,
                 () => FocusNativeButton(adapter, button.Button),

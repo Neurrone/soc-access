@@ -297,25 +297,6 @@ namespace SongsOfConquestAccess.Adapters
                 get { return IsOccupied && Entry.Troop.Stats != null && Entry.Troop.Stats.MaxTroopSize != null ? Entry.Troop.Stats.MaxTroopSize.GetValue() : 0; }
             }
 
-            public string Label
-            {
-                get
-                {
-                    string slotLabel = "slot " + SlotNumber;
-                    if (!IsOccupied)
-                    {
-                        return "Empty troop " + slotLabel;
-                    }
-
-                    if (CurrentSize > 0 && MaxSize > 0)
-                    {
-                        return TroopName + ", " + CurrentSize + " / " + MaxSize + ", " + slotLabel;
-                    }
-
-                    return TroopName + ", " + slotLabel;
-                }
-            }
-
             public Tooltip Tooltip
             {
                 get { return _adapter.BuildTroopTooltip(Entry); }

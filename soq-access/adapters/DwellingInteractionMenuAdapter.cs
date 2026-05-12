@@ -7,7 +7,6 @@ using SongsOfConquest.Client.Gamestate;
 using SongsOfConquest.Client.UI;
 using SongsOfConquest.Common.Localization;
 using SongsOfConquestAccess.Speech;
-using SongsOfConquestAccess.UI;
 using UnityEngine;
 
 namespace SongsOfConquestAccess.Adapters
