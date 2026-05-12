@@ -12,12 +12,12 @@ namespace SongsOfConquestAccess.Screens
             "campaign",
             "skirmish",
             "load-game",
-            "quit",
             "map-editor",
             "community-maps",
             "extras",
             "hotseat",
-            "multiplayer"
+            "multiplayer",
+            "quit"
         };
 
         private readonly MainMenuAdapter _adapter;
@@ -36,7 +36,7 @@ namespace SongsOfConquestAccess.Screens
         private static ContainerWidget BuildRootWidget(MainMenuAdapter adapter)
         {
             ContainerWidget root = new ContainerWidget("main-menu-screen", "Main menu");
-            MenuWidget menu = new MenuWidget("main-menu", "Main");
+            MenuWidget menu = new MenuWidget("main-menu", "Main menu");
             if (adapter == null)
             {
                 root.AddChild(menu);
@@ -45,6 +45,7 @@ namespace SongsOfConquestAccess.Screens
 
             AddItems(menu, adapter.TopLevelItems);
             root.AddChild(menu);
+            AddOptionalButton(root, "options", adapter.OptionsButton);
             return root;
         }
 
@@ -78,6 +79,22 @@ namespace SongsOfConquestAccess.Screens
             return index >= 0 && index < TopLevelItemIds.Length
                 ? TopLevelItemIds[index]
                 : "main-menu-item-" + index;
+        }
+
+        private static void AddOptionalButton(ContainerWidget root, string id, IMenuButtonAdapter button)
+        {
+            if (root == null || button == null)
+            {
+                return;
+            }
+
+            root.AddChild(new ButtonWidget(
+                "main-menu-" + id,
+                button.GetLabel,
+                button.Activate,
+                null,
+                button.IsEnabled,
+                button.IsVisible));
         }
 
         private static string BuildMenuButtonStatus(IMenuButtonAdapter item)

@@ -4,6 +4,7 @@ using HarmonyLib;
 using SongsOfConquest.Client.Menu.Main;
 using SongsOfConquest.Client.Menu.Utils;
 using SongsOfConquest.Client.UI;
+using SongsOfConquestAccess.Speech;
 using UnityEngine;
 
 namespace SongsOfConquestAccess.Adapters
@@ -16,6 +17,16 @@ namespace SongsOfConquestAccess.Adapters
             AccessTools.FieldRefAccess<MainMenu, GameObject>("_continueContainer");
         private static readonly AccessTools.FieldRef<MainMenu, UIButton> ContinueButtonRef =
             AccessTools.FieldRefAccess<MainMenu, UIButton>("_continueButton");
+        private static readonly AccessTools.FieldRef<MainMenu, UITextMesh> ContinueHeaderTextRef =
+            AccessTools.FieldRefAccess<MainMenu, UITextMesh>("_continueHeaderText");
+        private static readonly AccessTools.FieldRef<MainMenu, UITextMesh> ContinueDetailsTextRef =
+            AccessTools.FieldRefAccess<MainMenu, UITextMesh>("_continueDetailsText");
+        private static readonly AccessTools.FieldRef<MainMenu, UITextMesh> CampaignCompletedTextRef =
+            AccessTools.FieldRefAccess<MainMenu, UITextMesh>("_campaignCompletedText");
+        private static readonly AccessTools.FieldRef<MainMenu, MainMenuManagerContainer> ManagerContainerRef =
+            AccessTools.FieldRefAccess<MainMenu, MainMenuManagerContainer>("_managerContainer");
+        private static readonly AccessTools.FieldRef<MainMenuManager, MainMenuManager.Settings> MainMenuSettingsRef =
+            AccessTools.FieldRefAccess<MainMenuManager, MainMenuManager.Settings>("_settings");
         private static readonly AccessTools.FieldRef<MainMenu, UIButton> CampaignButtonRef =
             AccessTools.FieldRefAccess<MainMenu, UIButton>("_campaignButton");
         private static readonly AccessTools.FieldRef<MainMenu, UIButton> SkirmishButtonRef =
@@ -93,17 +104,27 @@ namespace SongsOfConquestAccess.Adapters
 
             _topLevelItems = new List<IMenuButtonAdapter>
             {
-                new ContinueMenuButtonAdapter(ContinueButtonRef(_mainMenu), IsContinueVisible, () => NativeSelectionUtility.Click(ContinueButtonRef(_mainMenu))),
+                new MainMenuButtonAdapter(
+                    ContinueButtonRef(_mainMenu),
+                    GetContinueLabel,
+                    IsContinueVisible,
+                    () => NativeSelectionUtility.Click(ContinueButtonRef(_mainMenu))),
                 CreateMainMenuButton(CampaignButtonRef(_mainMenu)),
                 CreateMainMenuButton(SkirmishButtonRef(_mainMenu)),
                 CreateMainMenuButton(LoadGameButtonRef(_mainMenu)),
-                CreateMainMenuButton(QuitButtonRef(_mainMenu)),
                 CreateMainMenuButton(MapEditorButtonRef(_mainMenu)),
                 CreateMainMenuButton(CommunityMapsButtonRef(_mainMenu)),
                 ExtrasFoldout.TriggerButton,
                 CreateMainMenuButton(HotseatButtonRef(_mainMenu)),
-                MultiplayerFoldout.TriggerButton
+                MultiplayerFoldout.TriggerButton,
+                CreateMainMenuButton(QuitButtonRef(_mainMenu))
             };
+
+            MainMenuManager.Settings settings = GetMainMenuSettings();
+            OptionsButton = settings != null ? new OptionsMenuButtonAdapter(
+                settings.OptionsButton,
+                () => settings.OptionsButton != null && MenuButtonAdapterBase.IsButtonVisible(settings.OptionsButton),
+                () => NativeSelectionUtility.Click(settings.OptionsButton)) : null;
         }
 
         public object SourceKey
@@ -120,6 +141,8 @@ namespace SongsOfConquestAccess.Adapters
 
         public NativeFoldoutAdapter MultiplayerFoldout { get; private set; }
 
+        public IMenuButtonAdapter OptionsButton { get; private set; }
+
         public bool IsPresent()
         {
             return _mainMenu != null
@@ -130,6 +153,14 @@ namespace SongsOfConquestAccess.Adapters
         private bool IsContinueVisible()
         {
             return IsGameObjectActive(ContinueContainerRef(_mainMenu)) && MenuButtonAdapterBase.IsButtonVisible(ContinueButtonRef(_mainMenu));
+        }
+
+        private string GetContinueLabel()
+        {
+            return MenuButtonTextUtility.JoinParts(
+                GetVisibleText(CampaignCompletedTextRef(_mainMenu)),
+                GetVisibleText(ContinueHeaderTextRef(_mainMenu)),
+                GetVisibleText(ContinueDetailsTextRef(_mainMenu)));
         }
 
         private static IMenuButtonAdapter CreateMainMenuButton(UIButton button)
@@ -147,9 +178,46 @@ namespace SongsOfConquestAccess.Adapters
             return gameObject != null && gameObject.activeInHierarchy;
         }
 
+        private MainMenuManager.Settings GetMainMenuSettings()
+        {
+            MainMenuManagerContainer container = _mainMenu != null ? ManagerContainerRef(_mainMenu) : null;
+            MainMenuManager manager = container != null ? container.CurrentManager as MainMenuManager : null;
+            return manager != null ? MainMenuSettingsRef(manager) : null;
+        }
+
+        private static string GetVisibleText(UITextMesh textMesh)
+        {
+            if (textMesh == null || !textMesh.gameObject.activeInHierarchy)
+            {
+                return string.Empty;
+            }
+
+            return SpeechTextSanitizer.Normalize(UITextMeshTextUtility.GetEffectiveText(textMesh));
+        }
+
         private static bool IsLiveSceneObject(GameObject gameObject)
         {
             return gameObject != null && gameObject.scene.IsValid() && gameObject.scene.isLoaded;
+        }
+
+        private sealed class MainMenuButtonAdapter : MenuButtonAdapterBase
+        {
+            private readonly Func<string> _getLabel;
+
+            public MainMenuButtonAdapter(
+                UIButton button,
+                Func<string> getLabel,
+                Func<bool> isVisible,
+                Func<bool> activate)
+                : base(button, isVisible, activate)
+            {
+                _getLabel = getLabel;
+            }
+
+            protected override string BuildLabel()
+            {
+                return _getLabel != null ? _getLabel() : string.Empty;
+            }
         }
 
         internal sealed class NativeFoldoutAdapter
