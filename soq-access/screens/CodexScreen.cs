@@ -66,7 +66,9 @@ namespace SongsOfConquestAccess.Screens
                 return root;
             }
 
+            adapter.EnsureFocusedCategory();
             root.AddChild(BuildTabMenu(adapter));
+            root.AddChild(BuildCategoryMenu(adapter));
             root.AddChild(BuildArticleMenu(adapter));
             root.AddChild(new CodexContentWidget(
                 "codex-content",
@@ -101,7 +103,7 @@ namespace SongsOfConquestAccess.Screens
 
         private static MenuWidget BuildTabMenu(CodexMenuAdapter adapter)
         {
-            MenuWidget menu = new MenuWidget("codex-tabs", "Categories");
+            MenuWidget menu = new MenuWidget("codex-tabs", "Tabs");
             IReadOnlyList<CodexMenuAdapter.TabItem> tabs = SafeGet("codex tabs", adapter.GetTabs);
             string activeId = null;
             for (int i = 0; i < tabs.Count; i++)
@@ -126,12 +128,49 @@ namespace SongsOfConquestAccess.Screens
             return menu;
         }
 
+        private static MenuWidget BuildCategoryMenu(CodexMenuAdapter adapter)
+        {
+            MenuWidget menu = new MenuWidget("codex-categories", "Categories");
+            IReadOnlyList<CodexMenuAdapter.ArticleGroupItem> groups = SafeGet("codex categories", adapter.GetArticleGroups);
+            if (groups.Count == 0)
+            {
+                menu.AddItem(new MenuItemWidget(
+                    "codex-categories-none",
+                    () => "No categories",
+                    null,
+                    () => false,
+                    null,
+                    () => true));
+                return menu;
+            }
+
+            for (int i = 0; i < groups.Count; i++)
+            {
+                CodexMenuAdapter.ArticleGroupItem group = groups[i];
+                CodexMenuAdapter.ArticleGroupItem captured = group;
+                menu.AddItem(new MenuItemWidget(
+                    BuildCategoryId(captured),
+                    () => captured.Label,
+                    () => captured.Index == adapter.FocusedCategoryIndex ? "selected" : string.Empty,
+                    () =>
+                    {
+                        adapter.FocusCategory(captured.Index);
+                        return true;
+                    },
+                    () => adapter.FocusCategory(captured.Index),
+                    () => true));
+            }
+
+            menu.SetFocusedItemById(BuildCategoryId(adapter.FocusedCategoryIndex));
+            return menu;
+        }
+
         private static MenuWidget BuildArticleMenu(CodexMenuAdapter adapter)
         {
             MenuWidget menu = new MenuWidget("codex-articles", "Articles");
-            IReadOnlyList<CodexMenuAdapter.ArticleItem> articles = SafeGet("codex articles", adapter.GetArticles);
+            IReadOnlyList<CodexMenuAdapter.ArticleGroupItem> groups = SafeGet("codex articles", adapter.GetArticleGroups);
             string selectedId = null;
-            if (articles.Count == 0)
+            if (groups.Count == 0)
             {
                 menu.AddItem(new MenuItemWidget(
                     "codex-articles-none",
@@ -143,22 +182,45 @@ namespace SongsOfConquestAccess.Screens
                 return menu;
             }
 
-            for (int i = 0; i < articles.Count; i++)
+            bool addedArticle = false;
+            for (int groupIndex = 0; groupIndex < groups.Count; groupIndex++)
             {
-                CodexMenuAdapter.ArticleItem article = articles[i];
-                CodexMenuAdapter.ArticleItem captured = article;
-                if (captured.IsSelected)
+                CodexMenuAdapter.ArticleGroupItem group = groups[groupIndex];
+                if (group == null || group.Articles == null)
                 {
-                    selectedId = BuildArticleId(i);
+                    continue;
                 }
 
+                for (int articleIndex = 0; articleIndex < group.Articles.Count; articleIndex++)
+                {
+                    CodexMenuAdapter.ArticleItem article = group.Articles[articleIndex];
+                    CodexMenuAdapter.ArticleItem captured = article;
+                    if (captured.IsSelected)
+                    {
+                        selectedId = BuildArticleId(captured);
+                    }
+
+                    menu.AddItem(new MenuItemWidget(
+                        BuildArticleId(captured),
+                        () => captured.Label,
+                        null,
+                        () => adapter.ActivateArticle(captured),
+                        () => adapter.FocusArticle(captured),
+                        () => captured.CategoryIndex == adapter.FocusedCategoryIndex));
+                    addedArticle = true;
+                }
+            }
+
+            if (!addedArticle)
+            {
                 menu.AddItem(new MenuItemWidget(
-                    BuildArticleId(i),
-                    () => captured.Label,
+                    "codex-articles-none",
+                    () => "No articles",
                     null,
-                    () => adapter.ActivateArticle(captured),
-                    () => adapter.FocusArticle(captured),
+                    () => false,
+                    null,
                     () => true));
+                return menu;
             }
 
             menu.SetFocusedItemById(selectedId);
@@ -170,9 +232,24 @@ namespace SongsOfConquestAccess.Screens
             return "codex-tab-" + (tab != null ? tab.Index : 0);
         }
 
-        private static string BuildArticleId(int index)
+        private static string BuildCategoryId(CodexMenuAdapter.ArticleGroupItem group)
         {
-            return "codex-article-" + index;
+            return BuildCategoryId(group != null ? group.Index : 0);
+        }
+
+        private static string BuildCategoryId(int index)
+        {
+            return "codex-category-" + index;
+        }
+
+        private static string BuildArticleId(CodexMenuAdapter.ArticleItem article)
+        {
+            if (article == null)
+            {
+                return "codex-article-0-0";
+            }
+
+            return "codex-article-" + article.CategoryIndex + "-" + article.ArticleIndex;
         }
 
         private static IReadOnlyList<T> SafeGet<T>(string section, Func<IReadOnlyList<T>> getter)

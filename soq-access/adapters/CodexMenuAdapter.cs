@@ -5,6 +5,9 @@ using System.Reflection;
 using HarmonyLib;
 using SongsOfConquest.Client.Menu;
 using SongsOfConquest.Client.UI;
+using SongsOfConquest.Common;
+using SongsOfConquest.Common.Gamestate;
+using SongsOfConquest.Common.Gamestate.Unit;
 using SongsOfConquest.Common.Localization;
 using SongsOfConquestAccess.Speech;
 using UnityEngine;
@@ -43,6 +46,10 @@ namespace SongsOfConquestAccess.Adapters
         private static readonly FieldInfo WielderSpecializationField = AccessTools.Field(typeof(WielderCodexContent), "_specialization");
         private static readonly FieldInfo WielderInfoHeaderField = AccessTools.Field(typeof(WielderCodexContentInfoSection), "_header");
         private static readonly FieldInfo WielderInfoDescriptionField = AccessTools.Field(typeof(WielderCodexContentInfoSection), "_description");
+        private static readonly FieldInfo UnitContentSectionHeaderField = AccessTools.Field(typeof(UnitCodexContentSection), "_header");
+        private static readonly FieldInfo UnitContentSectionDescriptionField = AccessTools.Field(typeof(UnitCodexContentSection), "_description");
+        private static readonly FieldInfo UnitContentSectionEssenceControllerField = AccessTools.Field(typeof(UnitCodexContentSection), "_essenceController");
+        private static readonly FieldInfo UnitInfoHeaderField = AccessTools.Field(typeof(UnitCodexContentInfoSection), "_header");
         private static readonly FieldInfo UnitInfoDescriptionField = AccessTools.Field(typeof(UnitCodexContentInfoSection), "_description");
 
         private static readonly FieldInfo TutorialToggleField = AccessTools.Field(typeof(CodexTutorialSettings), "_tutorialsToggle");
@@ -50,6 +57,7 @@ namespace SongsOfConquestAccess.Adapters
 
         private readonly CodexMenu _menu;
         private readonly ILocalizationHandler _localization;
+        private int _focusedCategoryIndex = -1;
 
         public CodexMenuAdapter(CodexMenu menu)
         {
@@ -113,9 +121,61 @@ namespace SongsOfConquestAccess.Adapters
             return NativeSelectionUtility.PointerClick(tabComponent);
         }
 
-        public IReadOnlyList<ArticleItem> GetArticles()
+        public int FocusedCategoryIndex
         {
-            List<ArticleItem> items = new List<ArticleItem>();
+            get { return _focusedCategoryIndex; }
+        }
+
+        public void FocusCategory(int index)
+        {
+            IReadOnlyList<ArticleGroupItem> groups = GetArticleGroups();
+            if (groups.Count == 0)
+            {
+                _focusedCategoryIndex = -1;
+                return;
+            }
+
+            if (index < 0)
+            {
+                index = 0;
+            }
+            else if (index >= groups.Count)
+            {
+                index = groups.Count - 1;
+            }
+
+            _focusedCategoryIndex = index;
+        }
+
+        public void EnsureFocusedCategory()
+        {
+            IReadOnlyList<ArticleGroupItem> groups = GetArticleGroups();
+            if (groups.Count == 0)
+            {
+                _focusedCategoryIndex = -1;
+                return;
+            }
+
+            if (_focusedCategoryIndex >= 0 && _focusedCategoryIndex < groups.Count)
+            {
+                return;
+            }
+
+            for (int i = 0; i < groups.Count; i++)
+            {
+                if (groups[i].ContainsSelectedArticle)
+                {
+                    _focusedCategoryIndex = i;
+                    return;
+                }
+            }
+
+            _focusedCategoryIndex = 0;
+        }
+
+        public IReadOnlyList<ArticleGroupItem> GetArticleGroups()
+        {
+            List<ArticleGroupItem> groups = new List<ArticleGroupItem>();
             IList sections = GetActivePoolEntries(CategorySectionPoolField);
             GameObject selected = EventSystem.current != null ? EventSystem.current.currentSelectedGameObject : null;
             for (int sectionIndex = 0; sectionIndex < sections.Count; sectionIndex++)
@@ -128,7 +188,8 @@ namespace SongsOfConquestAccess.Adapters
 
                 string sectionLabel = SpeechTextSanitizer.Normalize(UITextMeshTextUtility.GetEffectiveText(GetField<UITextMesh>(section, CategorySectionTextField)));
                 List<CodexContentButton> buttons = section.Buttons;
-                bool announcedSection = false;
+                List<ArticleItem> articles = new List<ArticleItem>();
+                bool containsSelectedArticle = false;
                 for (int buttonIndex = 0; buttonIndex < buttons.Count; buttonIndex++)
                 {
                     CodexContentButton button = buttons[buttonIndex];
@@ -145,16 +206,22 @@ namespace SongsOfConquestAccess.Adapters
                     }
 
                     label = FormatContentButtonLabel(label, button);
-                    string fullLabel = !announcedSection && !string.IsNullOrWhiteSpace(sectionLabel)
-                        ? sectionLabel + ", " + label
-                        : label;
-                    announcedSection = true;
                     bool isSelected = selected != null && selected == ((Component)button).gameObject;
-                    items.Add(new ArticleItem(fullLabel, button, isSelected));
+                    containsSelectedArticle = containsSelectedArticle || isSelected;
+                    articles.Add(new ArticleItem(label, button, isSelected, groups.Count, articles.Count));
+                }
+
+                if (articles.Count > 0)
+                {
+                    groups.Add(new ArticleGroupItem(
+                        string.IsNullOrWhiteSpace(sectionLabel) ? "Category " + (groups.Count + 1) : sectionLabel,
+                        groups.Count,
+                        articles,
+                        containsSelectedArticle));
                 }
             }
 
-            return items;
+            return groups;
         }
 
         public bool FocusArticle(ArticleItem item)
@@ -201,6 +268,11 @@ namespace SongsOfConquestAccess.Adapters
             }
 
             if (TryAddWielderContentItems(contentParent, items))
+            {
+                return items;
+            }
+
+            if (TryAddUnitContentItems(contentParent, items))
             {
                 return items;
             }
@@ -401,14 +473,16 @@ namespace SongsOfConquestAccess.Adapters
             return index >= 0 && index < entries.Count ? entries[index] : null;
         }
 
-        private string GetLocalizedText(string key, string fallback)
+        private string GetLocalizedText(string key, string fallback, params object[] parameters)
         {
             if (_localization == null || string.IsNullOrWhiteSpace(key))
             {
                 return SpeechTextSanitizer.Normalize(fallback);
             }
 
-            string text = _localization.GetText(key);
+            string text = parameters != null && parameters.Length > 0
+                ? _localization.GetText(key, parameters)
+                : _localization.GetText(key);
             return SpeechTextSanitizer.Normalize(string.IsNullOrWhiteSpace(text) || text == key ? fallback : text);
         }
 
@@ -471,6 +545,128 @@ namespace SongsOfConquestAccess.Adapters
             AddWielderInfoSection(items, GetField<WielderCodexContentInfoSection>(content, WielderSkillsField));
             AddWielderInfoSection(items, GetField<WielderCodexContentInfoSection>(content, WielderSpecializationField));
             return true;
+        }
+
+        private bool TryAddUnitContentItems(Transform contentParent, List<CodexContentItem> items)
+        {
+            UnitCodexContent content = contentParent.GetComponentInChildren<UnitCodexContent>(false);
+            if (content == null)
+            {
+                return false;
+            }
+
+            UnitCodexContentSection[] sections = content.GetComponentsInChildren<UnitCodexContentSection>(false);
+            if (sections == null || sections.Length == 0)
+            {
+                return false;
+            }
+
+            IReadOnlyList<IUnitDefinition> definitions = GetCurrentUnitDefinitions();
+            for (int i = 0; i < sections.Length; i++)
+            {
+                UnitCodexContentSection section = sections[i];
+                if (section == null || !((Component)section).gameObject.activeInHierarchy)
+                {
+                    continue;
+                }
+
+                AddTextMeshItems(items, CodexContentItemKind.Heading, GetField<UITextMesh>(section, UnitContentSectionHeaderField));
+                if (i < definitions.Count)
+                {
+                    AddUnitEssenceItem(items, section, definitions[i]);
+                }
+
+                AddTextMeshItems(items, CodexContentItemKind.Text, GetField<UITextMesh>(section, UnitContentSectionDescriptionField));
+
+                UnitCodexContentInfoSection[] infoSections = section.GetComponentsInChildren<UnitCodexContentInfoSection>(false);
+                for (int j = 0; j < infoSections.Length; j++)
+                {
+                    AddUnitInfoSectionItems(items, infoSections[j]);
+                }
+            }
+
+            return items.Count > 0;
+        }
+
+        private IReadOnlyList<IUnitDefinition> GetCurrentUnitDefinitions()
+        {
+            List<IUnitDefinition> definitions = new List<IUnitDefinition>();
+            CodexCategoryContentDefinition selectedDefinition = GetSelectedArticleDefinition();
+            if (selectedDefinition == null || !(selectedDefinition.UniqueIdentifier is TroopReference))
+            {
+                return definitions;
+            }
+
+            IFactionLookup factionLookup = GetCurrentProviderField<IFactionLookup>("_factionLookup");
+            if (factionLookup == null)
+            {
+                return definitions;
+            }
+
+            TroopReference selectedTroop = (TroopReference)selectedDefinition.UniqueIdentifier;
+            TroopUpgradeType[] upgradeTypes = (TroopUpgradeType[])Enum.GetValues(typeof(TroopUpgradeType));
+            for (int i = 0; i < upgradeTypes.Length; i++)
+            {
+                TroopReference troop = new TroopReference(selectedTroop.FactionIndex, selectedTroop.UnitIndex, upgradeTypes[i]);
+                bool isFallback;
+                IUnitDefinition unit = factionLookup.GetUnit(troop, out isFallback);
+                if (unit != null && !isFallback)
+                {
+                    definitions.Add(unit);
+                }
+            }
+
+            return definitions;
+        }
+
+        private CodexCategoryContentDefinition GetSelectedArticleDefinition()
+        {
+            GameObject selected = EventSystem.current != null ? EventSystem.current.currentSelectedGameObject : null;
+            CodexContentButton button = selected != null ? selected.GetComponent<CodexContentButton>() : null;
+            return GetField<CodexCategoryContentDefinition>(button, ContentButtonDefinitionField);
+        }
+
+        private void AddUnitEssenceItem(List<CodexContentItem> items, UnitCodexContentSection section, IUnitDefinition definition)
+        {
+            if (definition == null || definition.Stats == null || definition.Stats.Essences == null)
+            {
+                return;
+            }
+
+            List<ValueTuple<EssenceType, int>> allEssences = definition.Stats.Essences.GetAllEssences();
+            if (allEssences == null || allEssences.Count == 0)
+            {
+                return;
+            }
+
+            TroopViewEssenceController essenceController = GetField<TroopViewEssenceController>(section, UnitContentSectionEssenceControllerField);
+            RectTransform sourceTransform = essenceController != null
+                ? ((Component)essenceController).GetComponent<RectTransform>()
+                : ((Component)section).GetComponent<RectTransform>();
+            List<EssenceAmount> amounts = new List<EssenceAmount>();
+            for (int i = 0; i < allEssences.Count; i++)
+            {
+                amounts.Add(new EssenceAmount(GetEssenceAmountText(allEssences[i].Item1, allEssences[i].Item2)));
+            }
+
+            items.Add(new CodexContentItem(GetLocalizedText("Units/Types/EssenceIntro", "Essence"), amounts, sourceTransform));
+        }
+
+        private static void AddUnitInfoSectionItems(List<CodexContentItem> items, UnitCodexContentInfoSection section)
+        {
+            if (section == null || !((Component)section).gameObject.activeInHierarchy)
+            {
+                return;
+            }
+
+            UITextMesh header = GetField<UITextMesh>(section, UnitInfoHeaderField);
+            UITextMesh description = GetField<UITextMesh>(section, UnitInfoDescriptionField);
+            string descriptionText = GetVisibleText(description);
+            AddTextMeshItems(
+                items,
+                string.IsNullOrWhiteSpace(descriptionText) ? CodexContentItemKind.Text : CodexContentItemKind.Heading,
+                header);
+            AddTextMeshItems(items, CodexContentItemKind.Text, description);
         }
 
         private void AddStatItem(List<CodexContentItem> items, string labelKey, string fallbackLabel, UITextMesh valueText)
@@ -562,6 +758,53 @@ namespace SongsOfConquestAccess.Adapters
             return rect != null && (rect.rect.width <= 0.1f || rect.rect.height <= 0.1f);
         }
 
+        private string GetEssenceName(EssenceType essenceType)
+        {
+            return GetLocalizedText("Units/Types/" + essenceType, FormatEnumName(essenceType.ToString()));
+        }
+
+        private string GetEssenceAmountText(EssenceType essenceType, int count)
+        {
+            if (count <= 1)
+            {
+                return GetEssenceName(essenceType);
+            }
+
+            string essenceName = GetEssenceName(essenceType);
+            return GetLocalizedText("Units/Types/" + essenceType + "Multiple", count + " " + essenceName, count);
+        }
+
+        private static string FormatEnumName(string value)
+        {
+            if (string.IsNullOrWhiteSpace(value))
+            {
+                return string.Empty;
+            }
+
+            List<char> chars = new List<char>();
+            for (int i = 0; i < value.Length; i++)
+            {
+                char c = value[i];
+                if (i > 0 && char.IsUpper(c))
+                {
+                    chars.Add(' ');
+                }
+
+                chars.Add(c);
+            }
+
+            return new string(chars.ToArray());
+        }
+
+        private T GetCurrentProviderField<T>(string fieldName) where T : class
+        {
+            ICodexProvider provider = CurrentProviderField != null && _menu != null
+                ? CurrentProviderField.GetValue(_menu) as ICodexProvider
+                : null;
+            FieldInfo field = provider != null ? AccessTools.Field(provider.GetType(), fieldName) : null;
+            return field != null ? field.GetValue(provider) as T : null;
+        }
+
         private static T GetField<T>(object owner, FieldInfo field) where T : class
         {
             return owner != null && field != null ? field.GetValue(owner) as T : null;
@@ -581,24 +824,55 @@ namespace SongsOfConquestAccess.Adapters
             public bool IsActive { get; private set; }
         }
 
+        internal sealed class ArticleGroupItem
+        {
+            public ArticleGroupItem(string label, int index, IReadOnlyList<ArticleItem> articles, bool containsSelectedArticle)
+            {
+                Label = label ?? string.Empty;
+                Index = index;
+                Articles = articles ?? new ArticleItem[0];
+                ContainsSelectedArticle = containsSelectedArticle;
+            }
+
+            public string Label { get; private set; }
+            public int Index { get; private set; }
+            public IReadOnlyList<ArticleItem> Articles { get; private set; }
+            public bool ContainsSelectedArticle { get; private set; }
+        }
+
         internal sealed class ArticleItem
         {
-            public ArticleItem(string label, CodexContentButton button, bool isSelected)
+            public ArticleItem(string label, CodexContentButton button, bool isSelected, int categoryIndex, int articleIndex)
             {
                 Label = label;
                 Button = button;
                 IsSelected = isSelected;
+                CategoryIndex = categoryIndex;
+                ArticleIndex = articleIndex;
             }
 
             public string Label { get; private set; }
             public CodexContentButton Button { get; private set; }
             public bool IsSelected { get; private set; }
+            public int CategoryIndex { get; private set; }
+            public int ArticleIndex { get; private set; }
         }
 
         internal enum CodexContentItemKind
         {
             Heading,
-            Text
+            Text,
+            Essence
+        }
+
+        internal sealed class EssenceAmount
+        {
+            public EssenceAmount(string text)
+            {
+                Text = text ?? string.Empty;
+            }
+
+            public string Text { get; private set; }
         }
 
         internal sealed class CodexContentItem
@@ -608,11 +882,21 @@ namespace SongsOfConquestAccess.Adapters
                 Kind = kind;
                 Text = text ?? string.Empty;
                 SourceTransform = sourceTransform;
+                Essences = new EssenceAmount[0];
+            }
+
+            public CodexContentItem(string essenceLabel, IReadOnlyList<EssenceAmount> essences, RectTransform sourceTransform = null)
+            {
+                Kind = CodexContentItemKind.Essence;
+                Text = essenceLabel ?? string.Empty;
+                SourceTransform = sourceTransform;
+                Essences = essences ?? new EssenceAmount[0];
             }
 
             public CodexContentItemKind Kind { get; private set; }
             public string Text { get; private set; }
             public RectTransform SourceTransform { get; private set; }
+            public IReadOnlyList<EssenceAmount> Essences { get; private set; }
         }
     }
 }

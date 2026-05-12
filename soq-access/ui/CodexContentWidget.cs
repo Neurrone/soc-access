@@ -220,7 +220,17 @@ namespace SongsOfConquestAccess.UI
 
         private static string FormatItem(CodexContentItem item)
         {
-            if (item == null || string.IsNullOrWhiteSpace(item.Text))
+            if (item == null)
+            {
+                return string.Empty;
+            }
+
+            if (item.Kind == CodexContentItemKind.Essence)
+            {
+                return FormatEssenceItem(item);
+            }
+
+            if (string.IsNullOrWhiteSpace(item.Text))
             {
                 return string.Empty;
             }
@@ -228,6 +238,33 @@ namespace SongsOfConquestAccess.UI
             return item.Kind == CodexContentItemKind.Heading
                 ? item.Text + " heading"
                 : item.Text;
+        }
+
+        private static string FormatEssenceItem(CodexContentItem item)
+        {
+            if (item == null || item.Essences == null || item.Essences.Count == 0)
+            {
+                return string.Empty;
+            }
+
+            List<string> parts = new List<string>();
+            for (int i = 0; i < item.Essences.Count; i++)
+            {
+                if (item.Essences[i] == null || string.IsNullOrWhiteSpace(item.Essences[i].Text))
+                {
+                    continue;
+                }
+
+                parts.Add(item.Essences[i].Text);
+            }
+
+            if (parts.Count == 0)
+            {
+                return string.Empty;
+            }
+
+            string values = string.Join(", ", parts.ToArray());
+            return string.IsNullOrWhiteSpace(item.Text) ? values : item.Text + ": " + values;
         }
     }
 }
