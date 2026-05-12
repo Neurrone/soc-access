@@ -70,7 +70,6 @@ namespace SongsOfConquestAccess
             _inputRouter = null;
             _screenDetector = null;
             _screenManager = null;
-            StoryMapSuppression.Reset();
             StoryCameraFocusPatches.ResetDedupe();
             CombatPatches.Reset();
             TooltipPatches.Reset();

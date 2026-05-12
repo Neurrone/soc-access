@@ -15,7 +15,6 @@ namespace SongsOfConquestAccess
         [HarmonyPostfix]
         private static void DialogueMenuTypingTextEnterPostfix(DialogueMenu __instance)
         {
-            StoryMapSuppression.Activate(__instance);
             SoqAccessPlugin plugin = SoqAccessPlugin.Instance;
             if (plugin != null)
             {
@@ -27,9 +26,7 @@ namespace SongsOfConquestAccess
         [HarmonyPostfix]
         private static void DialogueMenuNoneEnterPostfix(DialogueMenu __instance)
         {
-            StoryMapSuppression.Clear(__instance);
             StoryCameraFocusPatches.ResetDedupe();
-            DialogueMenuAdvanceGuard.ClearPending(__instance);
             if (__instance == null || !ActiveMenus.Remove(__instance))
             {
                 return;
@@ -52,7 +49,6 @@ namespace SongsOfConquestAccess
                 if (adapter.IsPresent())
                 {
                     ActiveMenus.Add(dialogueMenu);
-                    DialogueMenuAdvanceGuard.ClearPending(dialogueMenu);
                     SoqAccessPlugin.Instance?.ScreenDetector?.OnDialogueMenuChanged(dialogueMenu);
                     yield break;
                 }

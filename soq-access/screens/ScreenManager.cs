@@ -176,6 +176,19 @@ namespace SongsOfConquestAccess.Screens
             return false;
         }
 
+        public bool Contains<TScreen>() where TScreen : Screen
+        {
+            for (int i = _stack.Count - 1; i >= 0; i--)
+            {
+                if (_stack[i] is TScreen)
+                {
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
         public void Clear()
         {
             if (_stack.Count == 0)

@@ -15,7 +15,6 @@ namespace SongsOfConquestAccess
         [HarmonyPostfix]
         private static void LetterboxStoryTextShowPostfix(LetterboxStoryText __instance)
         {
-            StoryMapSuppression.Activate(__instance);
             SoqAccessPlugin plugin = SoqAccessPlugin.Instance;
             if (plugin != null)
             {
@@ -34,7 +33,6 @@ namespace SongsOfConquestAccess
         [HarmonyPostfix]
         private static void LetterboxStoryTextForceHidePostfix(LetterboxStoryText __instance, bool __state)
         {
-            StoryMapSuppression.Clear(__instance);
             if (__state)
             {
                 SoqAccessPlugin.Instance?.ScreenDetector?.OnLetterboxStoryTextClosed(__instance);

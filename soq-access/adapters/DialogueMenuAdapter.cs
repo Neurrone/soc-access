@@ -80,20 +80,11 @@ namespace SongsOfConquestAccess.Adapters
 
         public bool AdvanceNow()
         {
-            // While the native dialogue is swapping entries, keep swallowing
-            // repeated activations on the old accessibility page. The next
-            // page is announced only after its body text has been assigned.
-            if (DialogueMenuAdvanceGuard.IsPending(_dialogueMenu))
-            {
-                return true;
-            }
-
             if (!IsPresent() || HandlePrimaryClickedMethod == null)
             {
                 return false;
             }
 
-            DialogueMenuAdvanceGuard.MarkPending(_dialogueMenu);
             bool wasTyping = IsTypingText();
             HandlePrimaryClickedMethod.Invoke(_dialogueMenu, null);
             if (wasTyping && IsWaitingForInput())

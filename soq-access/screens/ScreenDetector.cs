@@ -7,12 +7,15 @@ using SongsOfConquest.Client.Adventure.UI.Trading;
 using SongsOfConquest.Client.Adventure.View;
 using SongsOfConquest.Client.Battle;
 using SongsOfConquest.Client.Battle.Facade;
+using SongsOfConquest.Client.Gamestate;
 using SongsOfConquest.Client.Menu;
 using SongsOfConquest.Client.Menu.Loading;
 using SongsOfConquest.Client.Menu.Main;
 using SongsOfConquest.Client.Menu.Options;
 using SongsOfConquest.Client.Menu.Popup;
 using SongsOfConquest.Client.UI;
+using SongsOfConquest.Common.Entities.Adventure;
+using SongsOfConquest.Common.Gamestate.Facade;
 using SongsOfConquestAccess.Adapters;
 using SongsOfConquestAccess.Events;
 
@@ -24,6 +27,7 @@ namespace SongsOfConquestAccess.Screens
         private readonly List<IRuntimeScreenProbe> _runtimeScreenProbes;
         private AdventureViewInstaller _adventureViewInstaller;
         private BattleSceneInstaller _battleSceneInstaller;
+        private bool _storySequenceActive;
 
         public ScreenDetector(ScreenManager screenManager)
         {
@@ -58,6 +62,7 @@ namespace SongsOfConquestAccess.Screens
                 new LevelUpRuntimeScreenProbe(),
                 new CommanderSheetRuntimeScreenProbe(),
                 new TradingMenuRuntimeScreenProbe(),
+                new StoryFocusBlockerRuntimeScreenProbe(() => _storySequenceActive),
                 new LetterboxStoryTextRuntimeScreenProbe(),
                 new StoryTextRuntimeScreenProbe(),
                 new DialogueMenuRuntimeScreenProbe(),
@@ -71,6 +76,36 @@ namespace SongsOfConquestAccess.Screens
                 new CodexRuntimeScreenProbe(),
                 new TutorialRuntimeScreenProbe()
             };
+        }
+
+        public void OnStorySequenceTrigger(OnTriggerPayload payload, IClientAdventureFacade facade)
+        {
+            if (!IsLocalStoryTrigger(payload, facade))
+            {
+                return;
+            }
+
+            _storySequenceActive = true;
+            if (!_screenManager.Contains<StoryFocusBlockerScreen>())
+            {
+                _screenManager.Push(
+                    new StoryFocusBlockerScreen(() => _storySequenceActive),
+                    "story sequence focus blocker ready");
+            }
+        }
+
+        public void OnStorySequenceCompleted()
+        {
+            _storySequenceActive = false;
+            if (_screenManager.Contains<StoryTextScreen>())
+            {
+                _screenManager.Remove<StoryTextScreen>("story sequence completed");
+            }
+
+            if (_screenManager.Contains<StoryFocusBlockerScreen>())
+            {
+                _screenManager.Remove<StoryFocusBlockerScreen>("story sequence completed");
+            }
         }
 
         public void OnPauseMenuReady(PauseMenu pauseMenu)
@@ -415,16 +450,8 @@ namespace SongsOfConquestAccess.Screens
             Push(new StoryTextScreen(new LetterboxStoryTextAdapter(storyText)), "letterbox story text ready");
         }
 
-        public void OnLetterboxStoryTextChanged(LetterboxStoryText storyText)
-        {
-            _screenManager.RefreshTop<StoryTextScreen>(
-                new StoryTextScreen(new LetterboxStoryTextAdapter(storyText)),
-                "letterbox story text changed");
-        }
-
         public void OnLetterboxStoryTextClosed(LetterboxStoryText storyText)
         {
-            StoryMapSuppression.Clear(storyText);
             _screenManager.Pop<StoryTextScreen>("letterbox story text closed");
         }
 
@@ -433,28 +460,13 @@ namespace SongsOfConquestAccess.Screens
             Push(new StoryTextScreen(new StoryTextAdapter(storyText)), "story text ready");
         }
 
-        public void OnStoryTextChanged(StoryText storyText)
-        {
-            _screenManager.RefreshTop<StoryTextScreen>(
-                new StoryTextScreen(new StoryTextAdapter(storyText)),
-                "story text changed");
-        }
-
         public void OnStoryTextClosed(StoryText storyText)
         {
-            StoryMapSuppression.Clear(storyText);
             _screenManager.Pop<StoryTextScreen>("story text closed");
-        }
-
-        public void OnDialogueMenuReady(DialogueMenu dialogueMenu)
-        {
-            DialogueMenuAdvanceGuard.ClearPending(dialogueMenu);
-            Push(new StoryTextScreen(new DialogueMenuAdapter(dialogueMenu)), "dialogue menu ready");
         }
 
         public void OnDialogueMenuChanged(DialogueMenu dialogueMenu)
         {
-            DialogueMenuAdvanceGuard.ClearPending(dialogueMenu);
             StoryTextScreen screen = new StoryTextScreen(new DialogueMenuAdapter(dialogueMenu));
             if (_screenManager.CurrentScreen is StoryTextScreen)
             {
@@ -467,7 +479,6 @@ namespace SongsOfConquestAccess.Screens
 
         public void OnDialogueMenuClosed(DialogueMenu dialogueMenu)
         {
-            StoryMapSuppression.Clear(dialogueMenu);
             _screenManager.Pop<StoryTextScreen>("dialogue menu closed");
         }
 
@@ -1285,6 +1296,30 @@ namespace SongsOfConquestAccess.Screens
 
             _screenManager.PushBelowTop(screen, reason);
             return true;
+        }
+
+        private static bool IsLocalStoryTrigger(OnTriggerPayload payload, IClientAdventureFacade facade)
+        {
+            if (payload == null || facade == null || payload.TriggerData == null)
+            {
+                return false;
+            }
+
+            TriggerType type = payload.TriggerData.Type;
+            if (type != TriggerType.Message && type != TriggerType.Dialogue)
+            {
+                return false;
+            }
+
+            if (!facade.Teams.GetIsRemoteOrAI(payload.InteractingCommanderTeamId))
+            {
+                return true;
+            }
+
+            int sourceValue = (int)payload.Source;
+            return sourceValue >= 2
+                && sourceValue <= 8
+                && !facade.Teams.GetIsRemoteOrAI(payload.TriggerCommanderTeamId);
         }
 
         private bool IsTutorialTopScreen()
