@@ -15,6 +15,8 @@ namespace SongsOfConquestAccess.Adapters
 {
     internal sealed class CampaignMapSelectedInformationAdapter
     {
+        private const string MissionCounterLocalizationKey = "Campaign/MapSelect/InformationView/MissionCounter";
+
         private static readonly AccessTools.FieldRef<CampaignMapSelectedInformationView, CampaignMapSelectedInformationView.Settings> SettingsRef =
             AccessTools.FieldRefAccess<CampaignMapSelectedInformationView, CampaignMapSelectedInformationView.Settings>("_settings");
         private static readonly AccessTools.FieldRef<CampaignMapSelectedInformationView, ILocalizationHandler> LocalizationRef =
@@ -117,6 +119,17 @@ namespace SongsOfConquestAccess.Adapters
         public string GetMissionCounter()
         {
             return GetText(_settings != null ? _settings.MissionCounterText : null);
+        }
+
+        public string GetMissionCounter(string displayName)
+        {
+            ILocalizationHandler localization = GetLocalization();
+            if (localization == null || string.IsNullOrWhiteSpace(displayName))
+            {
+                return string.Empty;
+            }
+
+            return SpeechTextSanitizer.Normalize(localization.GetText(MissionCounterLocalizationKey, displayName));
         }
 
         public string GetCompletedStatus()

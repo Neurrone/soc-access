@@ -35,6 +35,11 @@ namespace SongsOfConquestAccess.Adapters
 
         public string GetLabel()
         {
+            return GetDisplayName();
+        }
+
+        public string GetDisplayName()
+        {
             ICampaignMapDefinition definition = Definition;
             return SpeechTextSanitizer.Normalize(definition != null ? definition.DisplayName : string.Empty);
         }

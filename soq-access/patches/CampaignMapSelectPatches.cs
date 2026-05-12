@@ -12,6 +12,8 @@ namespace SongsOfConquestAccess
     {
         private static readonly FieldInfo InformationViewField =
             AccessTools.Field(typeof(CampaignMapSelectMenu), "_informationView");
+        private static readonly FieldInfo SelectedButtonField =
+            AccessTools.Field(typeof(CampaignMapSelectMenu), "_selectedButton");
         private static readonly Dictionary<CampaignMapSelectedInformationView, CampaignMapSelectMenu> MenusByInformationView =
             new Dictionary<CampaignMapSelectedInformationView, CampaignMapSelectMenu>();
 
@@ -50,6 +52,36 @@ namespace SongsOfConquestAccess
             SoqAccessPlugin.Instance?.ScreenDetector?.OnCampaignMapSelectShown(menu, __instance);
         }
 
+        [HarmonyPatch(typeof(CampaignMapSelectMenu), "HandleMapButtonClicked")]
+        [HarmonyPrefix]
+        private static void CampaignMapSelectMenuHandleMapButtonClickedPrefix(
+            CampaignMapSelectMenu __instance,
+            CampaignMapButton button,
+            ref bool __state)
+        {
+            __state = IsSelectedButton(__instance, button);
+        }
+
+        [HarmonyPatch(typeof(CampaignMapSelectMenu), "HandleMapButtonClicked")]
+        [HarmonyPostfix]
+        private static void CampaignMapSelectMenuHandleMapButtonClickedPostfix(
+            CampaignMapSelectMenu __instance,
+            bool __state)
+        {
+            if (__state)
+            {
+                return;
+            }
+
+            CampaignMapSelectedInformationView informationView = GetInformationView(__instance);
+            if (informationView == null)
+            {
+                return;
+            }
+
+            SoqAccessPlugin.Instance?.ScreenDetector?.OnCampaignMapSelectShown(__instance, informationView);
+        }
+
         [HarmonyPatch(typeof(CampaignMapSelectedInformationView), "Dispose")]
         [HarmonyPostfix]
         private static void CampaignMapSelectedInformationViewDisposePostfix(CampaignMapSelectedInformationView __instance)
@@ -65,6 +97,16 @@ namespace SongsOfConquestAccess
             }
 
             return InformationViewField.GetValue(menu) as CampaignMapSelectedInformationView;
+        }
+
+        private static bool IsSelectedButton(CampaignMapSelectMenu menu, CampaignMapButton button)
+        {
+            if (menu == null || button == null || SelectedButtonField == null)
+            {
+                return false;
+            }
+
+            return ReferenceEquals(SelectedButtonField.GetValue(menu), button);
         }
     }
 }

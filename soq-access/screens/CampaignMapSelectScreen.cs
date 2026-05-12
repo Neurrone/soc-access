@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System;
 using SongsOfConquest.Client.UI;
 using SongsOfConquest.Common.Campaign;
 using SongsOfConquestAccess.Adapters;
@@ -60,7 +61,7 @@ namespace SongsOfConquestAccess.Screens
                 "campaign-map-select-screen",
                 adapter != null ? adapter.GetCampaignTitle() : string.Empty);
 
-            MenuWidget missions = new MenuWidget("campaign-map-missions", "Missions");
+            MenuWidget missions = new MenuWidget("campaign-map-missions", string.Empty);
             AddMissionItems(missions, adapter);
             if (adapter != null)
             {
@@ -70,8 +71,8 @@ namespace SongsOfConquestAccess.Screens
             root.AddChild(missions);
             AddDetails(root, adapter);
             AddDifficultyMenu(root, adapter);
-            AddOptionalButton(root, "start-mission", adapter != null ? adapter.Information.StartButton : null, adapter);
             AddOptionalButton(root, "replay-cutscene", adapter != null ? adapter.Information.ReplayButton : null, adapter);
+            AddOptionalButton(root, "start-mission", adapter != null ? adapter.Information.StartButton : null, adapter);
             AddOptionalButton(root, "options", adapter != null ? adapter.OptionsButton : null, adapter);
             AddOptionalButton(root, "back", adapter != null ? adapter.BackButton : null, adapter);
             if (focusDifficulty)
@@ -129,12 +130,21 @@ namespace SongsOfConquestAccess.Screens
                 return string.Empty;
             }
 
-            return MenuButtonTextUtility.JoinParts(
+            string main = JoinSentences(
                 information.GetMissionCounter(),
                 information.GetTitle(),
                 information.GetDescription(),
-                information.GetCompletedStatus(),
                 information.GetWinConditions());
+            string completed = EnsureSentenceTerminated(information.GetCompletedStatus());
+
+            if (string.IsNullOrWhiteSpace(completed))
+            {
+                return main;
+            }
+
+            return string.IsNullOrWhiteSpace(main)
+                ? completed
+                : main + Environment.NewLine + completed;
         }
 
         private static string BuildMissionId(int index)
@@ -156,6 +166,15 @@ namespace SongsOfConquestAccess.Screens
                 if (!string.IsNullOrWhiteSpace(selectedLabel))
                 {
                     return selectedLabel;
+                }
+            }
+
+            if (adapter != null && adapter.Information != null && item != null)
+            {
+                string missionCounter = adapter.Information.GetMissionCounter(item.GetDisplayName());
+                if (!string.IsNullOrWhiteSpace(missionCounter))
+                {
+                    return missionCounter;
                 }
             }
 
@@ -224,6 +243,40 @@ namespace SongsOfConquestAccess.Screens
         private static string BuildDifficultyId(CampaignDifficulty difficulty)
         {
             return "difficulty-" + difficulty.ToString().ToLowerInvariant();
+        }
+
+        private static string JoinSentences(params string[] parts)
+        {
+            if (parts == null || parts.Length == 0)
+            {
+                return string.Empty;
+            }
+
+            List<string> cleaned = new List<string>();
+            for (int i = 0; i < parts.Length; i++)
+            {
+                string part = EnsureSentenceTerminated(parts[i]);
+                if (!string.IsNullOrWhiteSpace(part))
+                {
+                    cleaned.Add(part);
+                }
+            }
+
+            return cleaned.Count == 0 ? string.Empty : string.Join(" ", cleaned.ToArray());
+        }
+
+        private static string EnsureSentenceTerminated(string value)
+        {
+            value = value != null ? value.Trim() : string.Empty;
+            if (value.Length == 0)
+            {
+                return string.Empty;
+            }
+
+            char last = value[value.Length - 1];
+            return last == '.' || last == '!' || last == '?' || last == ':' || last == ';'
+                ? value
+                : value + ".";
         }
 
         private static bool ActivateDifficultyOption(CampaignMapSelectedInformationAdapter information, CampaignDifficulty difficulty)
