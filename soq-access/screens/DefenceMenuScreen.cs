@@ -180,7 +180,10 @@ namespace SongsOfConquestAccess.Screens
 
             if (defendingWielder.IsStoredWielderVisible)
             {
-                root.AddChild(adapter.BuildArmyExchangeGrid());
+                root.AddChild(BuildArmyExchangeGrid(
+                    "defences-army-exchange-grid",
+                    defendingWielder.Troops,
+                    adapter.SettlementTroops));
             }
             else
             {
@@ -228,6 +231,35 @@ namespace SongsOfConquestAccess.Screens
                 () => adapter.IsTopLevelPresent()));
 
             return root;
+        }
+
+        private static ArmyExchangeGridWidget BuildArmyExchangeGrid(
+            string id,
+            TroopHudAdapter left,
+            TroopHudAdapter right)
+        {
+            IReadOnlyList<TroopHudAdapter.SlotItem> leftSlots = left != null
+                ? left.GetSlots()
+                : new TroopHudAdapter.SlotItem[0];
+            IReadOnlyList<TroopHudAdapter.SlotItem> rightSlots = right != null
+                ? right.GetSlots()
+                : new TroopHudAdapter.SlotItem[0];
+            return new ArmyExchangeGridWidget(
+                id,
+                GetArmyLabel(leftSlots),
+                leftSlots,
+                rightSlots,
+                DropArmySlot);
+        }
+
+        private static string GetArmyLabel(IReadOnlyList<TroopHudAdapter.SlotItem> slots)
+        {
+            return slots != null && slots.Count > 0 ? slots[0].ArmyLabel : string.Empty;
+        }
+
+        private static bool DropArmySlot(TroopHudAdapter.SlotItem source, TroopHudAdapter.SlotItem target)
+        {
+            return source != null && source.DropTo(target);
         }
 
         private static MenuWidget BuildTowerMenu(DefenceMenuAdapter adapter)

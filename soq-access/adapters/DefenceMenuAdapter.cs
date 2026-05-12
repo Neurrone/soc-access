@@ -12,7 +12,6 @@ using SongsOfConquest.Common.Entities;
 using SongsOfConquest.Common.Gamestate;
 using SongsOfConquest.Common.Localization;
 using SongsOfConquestAccess.Speech;
-using SongsOfConquestAccess.UI;
 using UnityEngine;
 
 namespace SongsOfConquestAccess.Adapters
@@ -266,17 +265,6 @@ namespace SongsOfConquestAccess.Adapters
             get { return new UpgradeTroopsSubMenuAdapter(GetUpgradeSubMenu(), _localization); }
         }
 
-        public ArmyExchangeGridWidget BuildArmyExchangeGrid()
-        {
-            DefencePanelWielderAdapter defendingWielder = DefendingWielder;
-            return new ArmyExchangeGridWidget(
-                "defences-army-exchange-grid",
-                defendingWielder.ArmyLabel,
-                defendingWielder.Troops.BuildArmyExchangeSlots(),
-                SettlementTroops.BuildArmyExchangeSlots(),
-                Drop);
-        }
-
         public string TowerSummary
         {
             get
@@ -323,13 +311,6 @@ namespace SongsOfConquestAccess.Adapters
         public void HideNativeTooltip()
         {
             NativeTooltipUtility.HideTooltip();
-        }
-
-        private bool Drop(ArmyExchangeGridWidget.SlotWidget source, ArmyExchangeGridWidget.SlotWidget target)
-        {
-            TroopHudAdapter.SlotItem sourceItem = source != null ? source.NativeSource as TroopHudAdapter.SlotItem : null;
-            TroopHudAdapter.SlotItem targetItem = target != null ? target.NativeSource as TroopHudAdapter.SlotItem : null;
-            return sourceItem != null && sourceItem.DropTo(targetItem);
         }
 
         private bool IsMenuOpen()

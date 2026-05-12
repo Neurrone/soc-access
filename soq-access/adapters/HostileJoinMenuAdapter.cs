@@ -12,7 +12,6 @@ using SongsOfConquest.Common;
 using SongsOfConquest.Common.Gamestate;
 using SongsOfConquest.Common.Localization;
 using SongsOfConquestAccess.Speech;
-using SongsOfConquestAccess.UI;
 
 namespace SongsOfConquestAccess.Adapters
 {
@@ -99,16 +98,14 @@ namespace SongsOfConquestAccess.Adapters
                 && _settings.JoinStageContainer.activeInHierarchy;
         }
 
-        public ArmyExchangeGridWidget BuildArmyExchangeGrid()
+        public TroopHudAdapter WielderTroops
         {
-            TroopHudAdapter wielderTroops = new TroopHudAdapter(GetWielderTroopHud(), _facade, _localization, GetWielderArmyLabel());
-            TroopHudAdapter joiningTroops = new TroopHudAdapter(_settings != null ? _settings.TroopHUD : null, _facade, _localization, "joining army");
-            return new ArmyExchangeGridWidget(
-                "hostile-join-army-exchange-grid",
-                GetWielderArmyLabel(),
-                wielderTroops.BuildArmyExchangeSlots(),
-                joiningTroops.BuildArmyExchangeSlots(),
-                Drop);
+            get { return new TroopHudAdapter(GetWielderTroopHud(), _facade, _localization, GetWielderArmyLabel()); }
+        }
+
+        public TroopHudAdapter JoiningTroops
+        {
+            get { return new TroopHudAdapter(_settings != null ? _settings.TroopHUD : null, _facade, _localization, "joining army"); }
         }
 
         public bool ActivateDiscard()
@@ -154,13 +151,6 @@ namespace SongsOfConquestAccess.Adapters
             }
 
             _disposed = true;
-        }
-
-        private bool Drop(ArmyExchangeGridWidget.SlotWidget source, ArmyExchangeGridWidget.SlotWidget target)
-        {
-            TroopHudAdapter.SlotItem sourceItem = source != null ? source.NativeSource as TroopHudAdapter.SlotItem : null;
-            TroopHudAdapter.SlotItem targetItem = target != null ? target.NativeSource as TroopHudAdapter.SlotItem : null;
-            return sourceItem != null && sourceItem.DropTo(targetItem);
         }
 
         private TroopHUD GetWielderTroopHud()

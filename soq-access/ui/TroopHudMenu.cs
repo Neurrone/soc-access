@@ -34,7 +34,7 @@ namespace SongsOfConquestAccess.UI
                 TroopHudAdapter.SlotItem item = slots[i];
                 DraggableMenuItemWidget widget = null;
                 widget = new DraggableMenuItemWidget(
-                    item.Id,
+                    id + "-slot-" + item.SlotNumber,
                     () => item.Label,
                     null,
                     null,

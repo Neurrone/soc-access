@@ -13,7 +13,6 @@ using SongsOfConquest.Common.Gamestate;
 using SongsOfConquest.Common.Localization;
 using SongsOfConquestAccess.Events;
 using SongsOfConquestAccess.Speech;
-using SongsOfConquestAccess.UI;
 using UnityEngine;
 
 namespace SongsOfConquestAccess.Adapters
@@ -63,31 +62,6 @@ namespace SongsOfConquestAccess.Adapters
             return result;
         }
 
-        public IEnumerable<ArmyExchangeGridWidget.SlotData> BuildArmyExchangeSlots()
-        {
-            IReadOnlyList<SlotItem> slots = GetSlots();
-            for (int i = 0; i < slots.Count; i++)
-            {
-                SlotItem slot = slots[i];
-                yield return new ArmyExchangeGridWidget.SlotData(
-                    slot.Id,
-                    slot.ArmyLabel,
-                    slot.SlotNumber,
-                    slot.TroopName,
-                    slot.CurrentSize,
-                    slot.MaxSize,
-                    slot.IsOccupied,
-                    slot,
-                    slot.Focus,
-                    slot.IsOccupied ? slot.Tooltip : null);
-            }
-        }
-
-        public bool Drop(ArmyExchangeGridWidget.SlotWidget source, ArmyExchangeGridWidget.SlotWidget target)
-        {
-            return Drop(source != null ? source.NativeSource as SlotItem : null, target != null ? target.NativeSource as SlotItem : null);
-        }
-
         public bool Drop(SlotItem source, SlotItem target)
         {
             TroopHUDEntry sourceEntry = source != null ? source.Entry : null;
@@ -119,7 +93,9 @@ namespace SongsOfConquestAccess.Adapters
                 if (!InvokeBool(CanDropHereMethod, movable))
                 {
                     movable.Reset();
-                    AccessibilityEventBus.Publish(new ArmyExchangeInvalidDestinationEvent(source.Id, target.Id));
+                    AccessibilityEventBus.Publish(new ArmyExchangeInvalidDestinationEvent(
+                        BuildSlotReference(source),
+                        BuildSlotReference(target)));
                     return false;
                 }
 
@@ -138,6 +114,16 @@ namespace SongsOfConquestAccess.Adapters
             }
 
             return true;
+        }
+
+        private static string BuildSlotReference(SlotItem slot)
+        {
+            if (slot == null)
+            {
+                return string.Empty;
+            }
+
+            return slot.ArmyLabel + " slot " + slot.SlotNumber;
         }
 
         private TroopHUDEntryMovable GetMovable()
@@ -289,11 +275,6 @@ namespace SongsOfConquestAccess.Adapters
             public int SlotNumber
             {
                 get { return Entry != null ? Entry.FormationIndex + 1 : 0; }
-            }
-
-            public string Id
-            {
-                get { return ArmyLabel.Replace(" ", "-").Replace("'", string.Empty).ToLowerInvariant() + "-slot-" + SlotNumber; }
             }
 
             public bool IsOccupied

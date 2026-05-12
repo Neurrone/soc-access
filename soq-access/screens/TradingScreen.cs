@@ -219,7 +219,10 @@ namespace SongsOfConquestAccess.Screens
                 adapter.BuildInventoryGridColumns(),
                 adapter.DropInventoryGridArtifact));
 
-            root.AddChild(adapter.BuildArmyExchangeGrid());
+            root.AddChild(BuildArmyExchangeGrid(
+                "trade-army-exchange-grid",
+                adapter.LeftTroops,
+                adapter.RightTroops));
 
             root.AddChild(BuildPortrait(adapter, left: false));
             root.AddChild(BuildMenu("trade-right-stats", adapter.RightCommanderName + "'s stats", GetItemsSafely("Right stats", () => adapter.GetStats(left: false)), adapter.HideNativeTooltip));
@@ -234,6 +237,35 @@ namespace SongsOfConquestAccess.Screens
                 () => true));
 
             return root;
+        }
+
+        private static ArmyExchangeGridWidget BuildArmyExchangeGrid(
+            string id,
+            TroopHudAdapter left,
+            TroopHudAdapter right)
+        {
+            IReadOnlyList<TroopHudAdapter.SlotItem> leftSlots = left != null
+                ? left.GetSlots()
+                : new TroopHudAdapter.SlotItem[0];
+            IReadOnlyList<TroopHudAdapter.SlotItem> rightSlots = right != null
+                ? right.GetSlots()
+                : new TroopHudAdapter.SlotItem[0];
+            return new ArmyExchangeGridWidget(
+                id,
+                GetArmyLabel(leftSlots),
+                leftSlots,
+                rightSlots,
+                DropArmySlot);
+        }
+
+        private static string GetArmyLabel(IReadOnlyList<TroopHudAdapter.SlotItem> slots)
+        {
+            return slots != null && slots.Count > 0 ? slots[0].ArmyLabel : string.Empty;
+        }
+
+        private static bool DropArmySlot(TroopHudAdapter.SlotItem source, TroopHudAdapter.SlotItem target)
+        {
+            return source != null && source.DropTo(target);
         }
 
         private static Widget BuildPortrait(TradingMenuAdapter adapter, bool left)

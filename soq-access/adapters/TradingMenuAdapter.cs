@@ -114,6 +114,16 @@ namespace SongsOfConquestAccess.Adapters
             get { return GetCommanderName(RightCommanderId); }
         }
 
+        public TroopHudAdapter LeftTroops
+        {
+            get { return new TroopHudAdapter(_settings != null ? _settings.leftTroopHud : null, _facade, _localization, GetArmyLabel(LeftCommanderId)); }
+        }
+
+        public TroopHudAdapter RightTroops
+        {
+            get { return new TroopHudAdapter(_settings != null ? _settings.rightTroopHud : null, _facade, _localization, GetArmyLabel(RightCommanderId)); }
+        }
+
         public bool Close()
         {
             if (_menu == null)
@@ -134,18 +144,6 @@ namespace SongsOfConquestAccess.Adapters
                 BuildEquipmentColumn("trade-right-equipment", _settings.rightInventory, RightCommanderId),
                 BuildBackpackColumn("trade-right-inventory", _settings.rightInventory, RightCommanderId)
             };
-        }
-
-        public ArmyExchangeGridWidget BuildArmyExchangeGrid()
-        {
-            TroopHudAdapter leftTroops = new TroopHudAdapter(_settings.leftTroopHud, _facade, _localization, GetArmyLabel(LeftCommanderId));
-            TroopHudAdapter rightTroops = new TroopHudAdapter(_settings.rightTroopHud, _facade, _localization, GetArmyLabel(RightCommanderId));
-            return new ArmyExchangeGridWidget(
-                "trade-army-exchange-grid",
-                GetArmyLabel(LeftCommanderId),
-                leftTroops.BuildArmyExchangeSlots(),
-                rightTroops.BuildArmyExchangeSlots(),
-                DropTroop);
         }
 
         public string GetPortraitLabel(bool left)
@@ -342,13 +340,6 @@ namespace SongsOfConquestAccess.Adapters
             }
 
             return cells;
-        }
-
-        private bool DropTroop(ArmyExchangeGridWidget.SlotWidget source, ArmyExchangeGridWidget.SlotWidget target)
-        {
-            TroopHudAdapter.SlotItem sourceItem = source != null ? source.NativeSource as TroopHudAdapter.SlotItem : null;
-            TroopHudAdapter.SlotItem targetItem = target != null ? target.NativeSource as TroopHudAdapter.SlotItem : null;
-            return sourceItem != null && sourceItem.DropTo(targetItem);
         }
 
         private void AddStat(List<LabeledItem> items, CommanderStatsInfo statsInfo, StatEntryType type, string label, int value)

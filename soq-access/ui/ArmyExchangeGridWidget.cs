@@ -12,7 +12,7 @@ namespace SongsOfConquestAccess.UI
     {
         private readonly List<SlotWidget> _wielderSlots = new List<SlotWidget>();
         private readonly List<SlotWidget> _joiningSlots = new List<SlotWidget>();
-        private readonly Func<SlotWidget, SlotWidget, bool> _drop;
+        private readonly Func<TroopHudAdapter.SlotItem, TroopHudAdapter.SlotItem, bool> _drop;
         private int _focusedColumn;
         private int _focusedRow;
         private SlotWidget _dragSource;
@@ -20,9 +20,9 @@ namespace SongsOfConquestAccess.UI
         public ArmyExchangeGridWidget(
             string id,
             string wielderArmyLabel,
-            IEnumerable<SlotData> wielderSlots,
-            IEnumerable<SlotData> joiningSlots,
-            Func<SlotWidget, SlotWidget, bool> drop)
+            IEnumerable<TroopHudAdapter.SlotItem> wielderSlots,
+            IEnumerable<TroopHudAdapter.SlotItem> joiningSlots,
+            Func<TroopHudAdapter.SlotItem, TroopHudAdapter.SlotItem, bool> drop)
             : base(id)
         {
             WielderArmyLabel = string.IsNullOrWhiteSpace(wielderArmyLabel) ? "wielder's army" : wielderArmyLabel;
@@ -211,23 +211,25 @@ namespace SongsOfConquestAccess.UI
             }
         }
 
-        private void AddSlots(List<SlotWidget> target, IEnumerable<SlotData> slots)
+        private void AddSlots(List<SlotWidget> target, IEnumerable<TroopHudAdapter.SlotItem> slots)
         {
             if (slots == null)
             {
                 return;
             }
 
-            foreach (SlotData slot in slots)
+            int index = 0;
+            foreach (TroopHudAdapter.SlotItem slot in slots)
             {
                 if (slot == null)
                 {
                     continue;
                 }
 
-                SlotWidget widget = new SlotWidget(this, slot);
+                SlotWidget widget = new SlotWidget(this, BuildSlotId(target, slot, index), slot);
                 widget.Parent = this;
                 target.Add(widget);
+                index++;
             }
         }
 
@@ -333,7 +335,7 @@ namespace SongsOfConquestAccess.UI
             SlotWidget source = _dragSource;
             if (_drop != null)
             {
-                if (_drop(source, target))
+                if (_drop(source.Slot, target.Slot))
                 {
                     _dragSource = null;
                 }
@@ -382,6 +384,13 @@ namespace SongsOfConquestAccess.UI
             return false;
         }
 
+        private string BuildSlotId(List<SlotWidget> target, TroopHudAdapter.SlotItem slot, int index)
+        {
+            string side = ReferenceEquals(target, _wielderSlots) ? "left" : "right";
+            int slotNumber = slot != null && slot.SlotNumber > 0 ? slot.SlotNumber : index + 1;
+            return Id + "-" + side + "-slot-" + slotNumber;
+        }
+
         private static int Clamp(int value, int min, int max)
         {
             if (value < min)
@@ -397,83 +406,36 @@ namespace SongsOfConquestAccess.UI
             SpeechPipeline.Output(new SpeechRequest(text, interrupt: false));
         }
 
-        internal sealed class SlotData
-        {
-            public SlotData(
-                string id,
-                string armyLabel,
-                int slotNumber,
-                string troopName,
-                int currentSize,
-                int maxSize,
-                bool isOccupied,
-                object nativeSource,
-                Action onFocus,
-                Tooltip tooltip = null)
-            {
-                Id = id ?? string.Empty;
-                ArmyLabel = armyLabel ?? string.Empty;
-                SlotNumber = slotNumber;
-                TroopName = troopName ?? string.Empty;
-                CurrentSize = currentSize;
-                MaxSize = maxSize;
-                IsOccupied = isOccupied;
-                NativeSource = nativeSource;
-                OnFocus = onFocus;
-                Tooltip = tooltip;
-            }
-
-            public string Id { get; private set; }
-
-            public string ArmyLabel { get; private set; }
-
-            public int SlotNumber { get; private set; }
-
-            public string TroopName { get; private set; }
-
-            public int CurrentSize { get; private set; }
-
-            public int MaxSize { get; private set; }
-
-            public bool IsOccupied { get; private set; }
-
-            public object NativeSource { get; private set; }
-
-            public Action OnFocus { get; private set; }
-
-            public Tooltip Tooltip { get; private set; }
-        }
-
         internal sealed class SlotWidget : Widget
         {
             private readonly ArmyExchangeGridWidget _grid;
-            private readonly SlotData _data;
+            private readonly TroopHudAdapter.SlotItem _slot;
 
-            public SlotWidget(ArmyExchangeGridWidget grid, SlotData data)
-                : base(data != null ? data.Id : string.Empty)
+            public SlotWidget(ArmyExchangeGridWidget grid, string id, TroopHudAdapter.SlotItem slot)
+                : base(id)
             {
                 _grid = grid;
-                _data = data;
+                _slot = slot;
+            }
+
+            public TroopHudAdapter.SlotItem Slot
+            {
+                get { return _slot; }
             }
 
             public string ArmyLabel
             {
-                get { return _data != null ? _data.ArmyLabel : string.Empty; }
+                get { return _slot != null ? _slot.ArmyLabel : string.Empty; }
             }
 
             public int SlotNumber
             {
-                get { return _data != null ? _data.SlotNumber : 0; }
+                get { return _slot != null ? _slot.SlotNumber : 0; }
             }
 
             public bool IsOccupied
             {
-                get { return _data != null && _data.IsOccupied; }
-            }
-
-            public object NativeSource
-            {
-                get { return _data != null ? _data.NativeSource : null; }
+                get { return _slot != null && _slot.IsOccupied; }
             }
 
             public override string GetFocusMessage()
@@ -483,18 +445,18 @@ namespace SongsOfConquestAccess.UI
 
             public override string GetLabel()
             {
-                if (_data == null)
+                if (_slot == null)
                 {
                     return string.Empty;
                 }
 
-                string slotLabel = _data.ArmyLabel + " slot " + _data.SlotNumber;
-                if (!_data.IsOccupied)
+                string slotLabel = _slot.ArmyLabel + " slot " + _slot.SlotNumber;
+                if (!_slot.IsOccupied)
                 {
                     return "Empty, " + slotLabel;
                 }
 
-                return _data.TroopName + ", " + _data.CurrentSize + " / " + _data.MaxSize + ", " + slotLabel;
+                return _slot.TroopName + ", " + _slot.CurrentSize + " / " + _slot.MaxSize + ", " + slotLabel;
             }
 
             public override string GetStatus()
@@ -524,12 +486,12 @@ namespace SongsOfConquestAccess.UI
 
             public override Tooltip GetTooltip()
             {
-                return _data != null ? _data.Tooltip : null;
+                return _slot != null && _slot.IsOccupied ? _slot.Tooltip : null;
             }
 
             protected override void OnFocus()
             {
-                _data?.OnFocus?.Invoke();
+                _slot?.Focus();
             }
         }
     }
