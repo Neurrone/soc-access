@@ -18,7 +18,6 @@ using SongsOfConquest.Common.Gamestate;
 using SongsOfConquest.Common.Localization;
 using SongsOfConquest.Common.Skills;
 using SongsOfConquestAccess.Speech;
-using SongsOfConquestAccess.UI;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
@@ -309,71 +308,14 @@ namespace SongsOfConquestAccess.Adapters
             return items;
         }
 
-        public IReadOnlyList<LabeledItem> GetEquipmentSlots()
+        public string EquipmentLabel
         {
-            List<LabeledItem> items = new List<LabeledItem>();
-            InventorySlot[] slots =
-            {
-                InventorySlot.Head,
-                InventorySlot.Chest,
-                InventorySlot.Hands,
-                InventorySlot.MainHand,
-                InventorySlot.OffHand,
-                InventorySlot.Feet,
-                InventorySlot.Trinket1,
-                InventorySlot.Trinket2,
-                InventorySlot.Trinket3
-            };
-
-            for (int i = 0; i < slots.Length; i++)
-            {
-                InventorySlot slot = slots[i];
-                IArtifactState artifact = GetArtifactsForSlot(slot).FirstOrDefault();
-                string slotName = GetInventorySlotName(slot);
-                string label = artifact == null
-                    ? slotName + ", empty"
-                    : MenuButtonTextUtility.JoinParts(slotName, GetArtifactName(artifact));
-                InventorySlot capturedSlot = slot;
-                items.Add(new LabeledItem(
-                    "equipment-" + slot,
-                    label,
-                    onFocus: () => SelectEquipmentSlot(capturedSlot),
-                    tooltip: BuildEquipmentTooltip(artifact, GetEquipmentSlotSelectable(slot))));
-            }
-
-            return items;
+            get { return GetLocalizedText("Common/CommanderInventory/Equipment", "Equipment"); }
         }
 
-        public IReadOnlyList<LabeledItem> GetInventoryItems()
+        public string InventoryLabel
         {
-            return GetArtifactsForSlot(InventorySlot.None)
-                .OrderBy(artifact => artifact.PositionIndex)
-                .Select((artifact, index) =>
-                {
-                    InventoryArtifactMovable movable = GetArtifactMovable(artifact);
-                    InventoryArtifactMovable capturedMovable = movable;
-                    return new LabeledItem(
-                        "inventory-" + index,
-                        GetArtifactName(artifact),
-                        onFocus: () => SelectArtifact(capturedMovable),
-                        tooltip: BuildEquipmentTooltip(artifact, movable != null ? movable.GetSelectable() : null));
-                })
-                .ToArray();
-        }
-
-        public IReadOnlyList<InventoryGridWidget.Column> BuildInventoryGridColumns(bool includeOwnerName)
-        {
-            return new[]
-            {
-                new InventoryGridWidget.Column(
-                    "commander-sheet-inventory-equipped",
-                    GetLocalizedText("Common/CommanderInventory/Equipment", "Equipment"),
-                    BuildEquipmentCells(includeOwnerName)),
-                new InventoryGridWidget.Column(
-                    "commander-sheet-inventory-backpack",
-                    GetInventoryLabel(),
-                    BuildBackpackCells(includeOwnerName))
-            };
+            get { return GetInventoryLabel(); }
         }
 
         public IReadOnlyList<LabeledItem> GetSkills(bool powers)
@@ -455,18 +397,9 @@ namespace SongsOfConquestAccess.Adapters
             return tooltipImage as Component;
         }
 
-        private void SelectEquipmentSlot(InventorySlot slot)
+        public IReadOnlyList<InventorySlotInfo> GetEquipmentSlots()
         {
-            Selectable selectable = GetEquipmentSlotSelectable(slot);
-            if (selectable != null)
-            {
-                NativeSelectionUtility.Select(selectable);
-            }
-        }
-
-        private IReadOnlyList<InventoryGridWidget.Cell> BuildEquipmentCells(bool includeOwnerName)
-        {
-            List<InventoryGridWidget.Cell> cells = new List<InventoryGridWidget.Cell>();
+            List<InventorySlotInfo> slotsInfo = new List<InventorySlotInfo>();
             InventorySlot[] slots =
             {
                 InventorySlot.Head,
@@ -480,7 +413,7 @@ namespace SongsOfConquestAccess.Adapters
                 InventorySlot.Trinket3
             };
 
-            string ownerName = includeOwnerName ? GetCommanderName() : string.Empty;
+            string ownerName = GetCommanderName();
             for (int i = 0; i < slots.Length; i++)
             {
                 InventorySlot slot = slots[i];
@@ -490,24 +423,29 @@ namespace SongsOfConquestAccess.Adapters
                 InventorySlot capturedSlot = slot;
                 InventoryHUDSlot capturedNativeSlot = nativeSlot;
                 InventoryArtifactMovable capturedMovable = movable;
-                cells.Add(new InventoryGridWidget.Cell(
-                    "equipment-" + slot,
-                    BuildEquipmentCellLabel(artifact, slot, ownerName),
-                    nativeSlot,
+                slotsInfo.Add(new InventorySlotInfo(
+                    CommanderId,
+                    ownerName,
+                    slot,
                     0,
+                    isBackpackSlot: false,
+                    GetInventorySlotName(slot),
+                    GetInventoryLabel(),
+                    artifact != null ? GetArtifactName(artifact) : string.Empty,
                     movable,
-                    () => SelectInventoryCell(capturedNativeSlot, capturedMovable, 0),
-                    BuildEquipmentTooltip(artifact, movable != null ? movable.GetSelectable() : GetEquipmentSlotSelectable(capturedSlot))));
+                    nativeSlot,
+                    BuildEquipmentTooltip(artifact, movable != null ? movable.GetSelectable() : GetEquipmentSlotSelectable(capturedSlot)),
+                    () => SelectInventoryCell(capturedNativeSlot, capturedMovable, 0)));
             }
 
-            return cells;
+            return slotsInfo;
         }
 
-        private IReadOnlyList<InventoryGridWidget.Cell> BuildBackpackCells(bool includeOwnerName)
+        public IReadOnlyList<InventorySlotInfo> GetBackpackSlots()
         {
-            List<InventoryGridWidget.Cell> cells = new List<InventoryGridWidget.Cell>();
+            List<InventorySlotInfo> slotsInfo = new List<InventorySlotInfo>();
             InventoryHUDSlot nativeSlot = _inventory != null ? _inventory.GetSlot(InventorySlot.None) : null;
-            string ownerName = includeOwnerName ? GetCommanderName() : string.Empty;
+            string ownerName = GetCommanderName();
             int cellCount = nativeSlot != null ? nativeSlot.CellsCount : 0;
             for (int i = 0; i < cellCount; i++)
             {
@@ -515,17 +453,22 @@ namespace SongsOfConquestAccess.Adapters
                 InventoryArtifactMovable movable = GetArtifactMovable(artifact);
                 int capturedIndex = i;
                 InventoryArtifactMovable capturedMovable = movable;
-                cells.Add(new InventoryGridWidget.Cell(
-                    "inventory-" + i,
-                    BuildBackpackCellLabel(artifact, i + 1, ownerName),
-                    nativeSlot,
+                slotsInfo.Add(new InventorySlotInfo(
+                    CommanderId,
+                    ownerName,
+                    InventorySlot.None,
                     i,
+                    isBackpackSlot: true,
+                    string.Empty,
+                    GetInventoryLabel(),
+                    artifact != null ? GetArtifactName(artifact) : string.Empty,
                     movable,
-                    () => SelectInventoryCell(nativeSlot, capturedMovable, capturedIndex),
-                    BuildEquipmentTooltip(artifact, movable != null ? movable.GetSelectable() : GetInventorySlotSelectable(nativeSlot, i))));
+                    nativeSlot,
+                    BuildEquipmentTooltip(artifact, movable != null ? movable.GetSelectable() : GetInventorySlotSelectable(nativeSlot, i)),
+                    () => SelectInventoryCell(nativeSlot, capturedMovable, capturedIndex)));
             }
 
-            return cells;
+            return slotsInfo;
         }
 
         private void SelectInventoryCell(InventoryHUDSlot nativeSlot, InventoryArtifactMovable movable, int positionIndex)
@@ -555,17 +498,9 @@ namespace SongsOfConquestAccess.Adapters
             return entry != null ? (Selectable)entry : null;
         }
 
-        public DropResult DropInventoryGridArtifact(InventoryGridWidget.CellWidget source, InventoryGridWidget.CellWidget target)
+        public DropResult DropInventoryArtifact(InventorySlotInfo source, InventorySlotInfo target)
         {
-            return ArtifactDropUtility.DropInventoryGridArtifact(_facade, source, target, "CommanderSheetAdapter artifact grid drop");
-        }
-
-        private void SelectArtifact(InventoryArtifactMovable movable)
-        {
-            if (movable != null)
-            {
-                NativeSelectionUtility.Select(movable.GetSelectable());
-            }
+            return ArtifactDropUtility.DropInventoryArtifact(_facade, source, target, "CommanderSheetAdapter artifact grid drop");
         }
 
         private Tooltip BuildEquipmentTooltip(IArtifactState artifact, Selectable selectable)
@@ -777,31 +712,6 @@ namespace SongsOfConquestAccess.Adapters
             return _facade.Artifacts.GetForOwner(CommanderId, slot) ?? new IArtifactState[0];
         }
 
-        private string GetArtifactLabel(IArtifactState artifact)
-        {
-            if (artifact == null)
-            {
-                return string.Empty;
-            }
-
-            string name = GetArtifactName(artifact);
-            string details = string.Empty;
-            if (_artifactLookup != null)
-            {
-                try
-                {
-                    IDetails artifactDetails = _artifactLookup.GetDetails(artifact.Type, GetField<Lavapotion.Networking.Commands.ICommandProcessor>(_inventory, InventoryCommandProcessorField), _facade.Artifacts.GetArtifactSetDetailsData(artifact.OwnerId, artifact.Type));
-                    details = DetailsTextUtility.ToText(artifactDetails, _localization);
-                }
-                catch (Exception ex)
-                {
-                    SoqAccessPlugin.Instance?.LogWarning("CommanderSheetAdapter could not build artifact details: " + ex.Message);
-                }
-            }
-
-            return MenuButtonTextUtility.JoinParts(name, details);
-        }
-
         private string GetArtifactName(IArtifactState artifact)
         {
             if (artifact == null)
@@ -827,18 +737,6 @@ namespace SongsOfConquestAccess.Adapters
                 SoqAccessPlugin.Instance?.LogWarning("CommanderSheetAdapter could not get artifact rarity color: " + ex.Message);
                 return name;
             }
-        }
-
-        private string BuildEquipmentCellLabel(IArtifactState artifact, InventorySlot slot, string ownerName)
-        {
-            string name = artifact != null ? GetArtifactName(artifact) : "empty";
-            return MenuButtonTextUtility.JoinParts(name, GetInventorySlotName(slot), ownerName);
-        }
-
-        private string BuildBackpackCellLabel(IArtifactState artifact, int slotNumber, string ownerName)
-        {
-            string name = artifact != null ? GetArtifactName(artifact) : "empty";
-            return MenuButtonTextUtility.JoinParts(name, GetInventoryLabel() + " slot " + slotNumber, ownerName);
         }
 
         private string GetCommanderName()

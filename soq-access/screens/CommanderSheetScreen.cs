@@ -203,8 +203,8 @@ namespace SongsOfConquestAccess.Screens
 
             root.AddChild(new InventoryGridWidget(
                 "commander-sheet-inventory-grid",
-                adapter.BuildInventoryGridColumns(includeOwnerName: false),
-                adapter.DropInventoryGridArtifact));
+                BuildInventoryGridColumns(adapter),
+                adapter.DropInventoryArtifact));
 
             IReadOnlyList<CommanderSheetAdapter.LabeledItem> skills = GetItemsSafely("Skills", () => adapter.GetSkills(powers: false));
             root.AddChild(BuildMenu("commander-sheet-skills", "Skills", skills));
@@ -219,6 +219,59 @@ namespace SongsOfConquestAccess.Screens
                 adapter.HideNativeTooltip,
                 () => true));
             return root;
+        }
+
+        private static IReadOnlyList<InventoryGridWidget.Column> BuildInventoryGridColumns(CommanderSheetAdapter adapter)
+        {
+            return new[]
+            {
+                new InventoryGridWidget.Column(
+                    "commander-sheet-inventory-equipped",
+                    adapter.EquipmentLabel,
+                    BuildInventoryCells("equipment", adapter.GetEquipmentSlots(), includeOwnerName: false)),
+                new InventoryGridWidget.Column(
+                    "commander-sheet-inventory-backpack",
+                    adapter.InventoryLabel,
+                    BuildInventoryCells("inventory", adapter.GetBackpackSlots(), includeOwnerName: false))
+            };
+        }
+
+        private static IReadOnlyList<InventoryGridWidget.Cell> BuildInventoryCells(
+            string idPrefix,
+            IReadOnlyList<InventorySlotInfo> slots,
+            bool includeOwnerName)
+        {
+            List<InventoryGridWidget.Cell> cells = new List<InventoryGridWidget.Cell>();
+            if (slots == null)
+            {
+                return cells;
+            }
+
+            for (int i = 0; i < slots.Count; i++)
+            {
+                InventorySlotInfo slot = slots[i];
+                if (slot == null)
+                {
+                    continue;
+                }
+
+                cells.Add(new InventoryGridWidget.Cell(
+                    idPrefix + "-" + i,
+                    BuildInventorySlotLabel(slot, includeOwnerName),
+                    slot));
+            }
+
+            return cells;
+        }
+
+        private static string BuildInventorySlotLabel(InventorySlotInfo slot, bool includeOwnerName)
+        {
+            string name = !slot.IsEmpty ? slot.ArtifactName : "empty";
+            string location = slot.IsBackpackSlot
+                ? slot.InventoryName + " slot " + (slot.PositionIndex + 1)
+                : slot.SlotName;
+            string ownerName = includeOwnerName ? slot.OwnerName : string.Empty;
+            return MenuButtonTextUtility.JoinParts(name, location, ownerName);
         }
 
         private static IReadOnlyList<CommanderSheetAdapter.LabeledItem> GetItemsSafely(

@@ -216,8 +216,8 @@ namespace SongsOfConquestAccess.Screens
 
             root.AddChild(new InventoryGridWidget(
                 "trade-inventory-grid",
-                adapter.BuildInventoryGridColumns(),
-                adapter.DropInventoryGridArtifact));
+                BuildInventoryGridColumns(adapter),
+                adapter.DropInventoryArtifact));
 
             root.AddChild(BuildArmyExchangeGrid(
                 "trade-army-exchange-grid",
@@ -237,6 +237,67 @@ namespace SongsOfConquestAccess.Screens
                 () => true));
 
             return root;
+        }
+
+        private static IReadOnlyList<InventoryGridWidget.Column> BuildInventoryGridColumns(TradingMenuAdapter adapter)
+        {
+            return new[]
+            {
+                new InventoryGridWidget.Column(
+                    "trade-left-equipment",
+                    MenuButtonTextUtility.JoinParts(adapter.LeftCommanderName, adapter.EquipmentLabel),
+                    BuildInventoryCells("trade-left-equipment", adapter.GetEquipmentSlots(left: true), includeOwnerName: true)),
+                new InventoryGridWidget.Column(
+                    "trade-left-inventory",
+                    MenuButtonTextUtility.JoinParts(adapter.LeftCommanderName, adapter.InventoryLabel),
+                    BuildInventoryCells("trade-left-inventory", adapter.GetBackpackSlots(left: true), includeOwnerName: true)),
+                new InventoryGridWidget.Column(
+                    "trade-right-equipment",
+                    MenuButtonTextUtility.JoinParts(adapter.RightCommanderName, adapter.EquipmentLabel),
+                    BuildInventoryCells("trade-right-equipment", adapter.GetEquipmentSlots(left: false), includeOwnerName: true)),
+                new InventoryGridWidget.Column(
+                    "trade-right-inventory",
+                    MenuButtonTextUtility.JoinParts(adapter.RightCommanderName, adapter.InventoryLabel),
+                    BuildInventoryCells("trade-right-inventory", adapter.GetBackpackSlots(left: false), includeOwnerName: true))
+            };
+        }
+
+        private static IReadOnlyList<InventoryGridWidget.Cell> BuildInventoryCells(
+            string idPrefix,
+            IReadOnlyList<InventorySlotInfo> slots,
+            bool includeOwnerName)
+        {
+            List<InventoryGridWidget.Cell> cells = new List<InventoryGridWidget.Cell>();
+            if (slots == null)
+            {
+                return cells;
+            }
+
+            for (int i = 0; i < slots.Count; i++)
+            {
+                InventorySlotInfo slot = slots[i];
+                if (slot == null)
+                {
+                    continue;
+                }
+
+                cells.Add(new InventoryGridWidget.Cell(
+                    idPrefix + "-" + i,
+                    BuildInventorySlotLabel(slot, includeOwnerName),
+                    slot));
+            }
+
+            return cells;
+        }
+
+        private static string BuildInventorySlotLabel(InventorySlotInfo slot, bool includeOwnerName)
+        {
+            string name = !slot.IsEmpty ? slot.ArtifactName : "empty";
+            string location = slot.IsBackpackSlot
+                ? slot.InventoryName + " slot " + (slot.PositionIndex + 1)
+                : slot.SlotName;
+            string ownerName = includeOwnerName ? slot.OwnerName : string.Empty;
+            return MenuButtonTextUtility.JoinParts(name, location, ownerName);
         }
 
         private static ArmyExchangeGridWidget BuildArmyExchangeGrid(

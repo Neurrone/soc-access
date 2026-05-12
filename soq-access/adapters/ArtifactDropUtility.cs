@@ -1,8 +1,6 @@
 using System;
 using SongsOfConquest.Client.Adventure.UI;
 using SongsOfConquest.Client.Gamestate;
-using SongsOfConquest.Common;
-using SongsOfConquestAccess.UI;
 
 namespace SongsOfConquestAccess.Adapters
 {
@@ -18,10 +16,10 @@ namespace SongsOfConquestAccess.Adapters
     {
         private const byte NativeFeedbackErrorCode = 10;
 
-        public static DropResult DropInventoryGridArtifact(
+        public static DropResult DropInventoryArtifact(
             IClientAdventureFacade facade,
-            InventoryGridWidget.CellWidget source,
-            InventoryGridWidget.CellWidget target,
+            InventorySlotInfo source,
+            InventorySlotInfo target,
             string logContext)
         {
             InventoryArtifactMovable movable = source != null ? source.Movable : null;

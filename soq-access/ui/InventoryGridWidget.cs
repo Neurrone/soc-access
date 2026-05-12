@@ -1,7 +1,5 @@
 using System;
 using System.Collections.Generic;
-using SongsOfConquest.Client.Adventure.UI;
-using SongsOfConquest.Common;
 using SongsOfConquestAccess.Adapters;
 using SongsOfConquestAccess.Input;
 using SongsOfConquestAccess.Speech;
@@ -11,12 +9,12 @@ namespace SongsOfConquestAccess.UI
     internal sealed class InventoryGridWidget : Widget
     {
         private readonly List<Column> _columns = new List<Column>();
-        private readonly Func<CellWidget, CellWidget, DropResult> _drop;
+        private readonly Func<InventorySlotInfo, InventorySlotInfo, DropResult> _drop;
         private int _focusedColumn;
         private int _focusedRow;
         private CellWidget _dragSource;
 
-        public InventoryGridWidget(string id, IEnumerable<Column> columns, Func<CellWidget, CellWidget, DropResult> drop = null)
+        public InventoryGridWidget(string id, IEnumerable<Column> columns, Func<InventorySlotInfo, InventorySlotInfo, DropResult> drop = null)
             : base(id)
         {
             _drop = drop;
@@ -397,28 +395,16 @@ namespace SongsOfConquestAccess.UI
             public Cell(
                 string id,
                 string label,
-                InventoryHUDSlot nativeSlot,
-                int positionIndex,
-                InventoryArtifactMovable movable,
-                Action onFocus,
-                Tooltip tooltip)
+                InventorySlotInfo slot)
             {
                 Id = id ?? string.Empty;
                 Label = label ?? string.Empty;
-                NativeSlot = nativeSlot;
-                PositionIndex = positionIndex;
-                Movable = movable;
-                OnFocus = onFocus;
-                Tooltip = tooltip;
+                Slot = slot;
             }
 
             public string Id { get; private set; }
             public string Label { get; private set; }
-            public InventoryHUDSlot NativeSlot { get; private set; }
-            public int PositionIndex { get; private set; }
-            public InventoryArtifactMovable Movable { get; private set; }
-            public Action OnFocus { get; private set; }
-            public Tooltip Tooltip { get; private set; }
+            public InventorySlotInfo Slot { get; private set; }
             public CellWidget Widget { get; set; }
         }
 
@@ -436,22 +422,7 @@ namespace SongsOfConquestAccess.UI
 
             public bool IsOccupied
             {
-                get { return _cell != null && _cell.Movable != null; }
-            }
-
-            public InventoryArtifactMovable Movable
-            {
-                get { return _cell != null ? _cell.Movable : null; }
-            }
-
-            public InventoryHUDSlot NativeSlot
-            {
-                get { return _cell != null ? _cell.NativeSlot : null; }
-            }
-
-            public int PositionIndex
-            {
-                get { return _cell != null ? _cell.PositionIndex : 0; }
+                get { return _cell != null && _cell.Slot != null && !_cell.Slot.IsEmpty; }
             }
 
             public override string GetLabel()
@@ -486,29 +457,32 @@ namespace SongsOfConquestAccess.UI
 
             public override Tooltip GetTooltip()
             {
-                return _cell != null ? _cell.Tooltip : null;
+                return _cell != null && _cell.Slot != null ? _cell.Slot.Tooltip : null;
             }
 
             protected override void OnFocus()
             {
-                _cell?.OnFocus?.Invoke();
+                if (_cell != null && _cell.Slot != null)
+                {
+                    _cell.Slot.FocusNative();
+                }
             }
 
             public DropResult DropTo(CellWidget target)
             {
-                if (_cell == null || target == null || target._cell == null)
+                if (_cell == null || _cell.Slot == null || target == null || target._cell == null || target._cell.Slot == null)
                 {
                     return DropResult.Invalid;
                 }
 
-                if (_cell.Movable == null || target._cell.NativeSlot == null)
+                if (_cell.Slot.Movable == null || target._cell.Slot.NativeSlot == null)
                 {
                     return DropResult.Invalid;
                 }
 
                 if (_grid != null && _grid._drop != null)
                 {
-                    return _grid._drop(this, target);
+                    return _grid._drop(_cell.Slot, target._cell.Slot);
                 }
 
                 return DropResult.Invalid;
