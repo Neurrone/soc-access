@@ -37,15 +37,6 @@ namespace SongsOfConquestAccess.UI
 
         public string JoiningArmyLabel { get; private set; }
 
-        public string FocusedSlotId
-        {
-            get
-            {
-                SlotWidget slot = FocusedSlot;
-                return slot != null ? slot.Id : string.Empty;
-            }
-        }
-
         public int FocusedColumnIndex
         {
             get { return _focusedColumn; }
@@ -75,21 +66,6 @@ namespace SongsOfConquestAccess.UI
         {
             SlotWidget focusedSlot = FocusedSlot;
             return focusedSlot != null ? (Widget)focusedSlot : this;
-        }
-
-        public bool SetFocusedSlotById(string id)
-        {
-            if (string.IsNullOrWhiteSpace(id))
-            {
-                return false;
-            }
-
-            if (SetFocusedSlotById(_wielderSlots, 0, id))
-            {
-                return true;
-            }
-
-            return SetFocusedSlotById(_joiningSlots, 1, id);
         }
 
         public bool SetFocusedCell(int columnIndex, int rowIndex)
@@ -375,22 +351,6 @@ namespace SongsOfConquestAccess.UI
         private List<SlotWidget> GetColumn(int column)
         {
             return column == 0 ? _wielderSlots : _joiningSlots;
-        }
-
-        private bool SetFocusedSlotById(List<SlotWidget> slots, int column, string id)
-        {
-            for (int i = 0; i < slots.Count; i++)
-            {
-                SlotWidget slot = slots[i];
-                if (slot != null && slot.Id == id)
-                {
-                    _focusedColumn = column;
-                    _focusedRow = i;
-                    return true;
-                }
-            }
-
-            return false;
         }
 
         private string BuildSlotId(List<SlotWidget> target, TroopHudAdapter.SlotItem slot, int index)

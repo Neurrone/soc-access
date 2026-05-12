@@ -14,6 +14,7 @@ namespace SongsOfConquestAccess.Screens
 {
     internal sealed class RallyPointScreen : Screen
     {
+        private const int TroopMenuIndex = 3;
         private const int SourceMenuIndex = 4;
 
         private readonly RallyPointInteractionMenuAdapter _adapter;
@@ -73,9 +74,11 @@ namespace SongsOfConquestAccess.Screens
             }
 
             int focusedIndex = RootWidget != null ? RootWidget.FocusedIndex : -1;
+            int troopMenuFocusedIndex = GetTroopMenuFocusedIndex();
             string focusedSourceId = GetFocusedSourceId();
 
             RootWidget = BuildRoot();
+            RestoreTroopMenuFocus(troopMenuFocusedIndex);
             RestoreSourceFocus(focusedSourceId);
 
             if (!focusAfterRefresh)
@@ -169,6 +172,23 @@ namespace SongsOfConquestAccess.Screens
             {
                 Refresh(true);
             }
+        }
+
+        private int GetTroopMenuFocusedIndex()
+        {
+            MenuWidget menu = RootWidget != null ? RootWidget.GetChildAt(TroopMenuIndex) as MenuWidget : null;
+            return menu != null ? menu.FocusedIndex : -1;
+        }
+
+        private void RestoreTroopMenuFocus(int focusedIndex)
+        {
+            if (focusedIndex < 0 || RootWidget == null)
+            {
+                return;
+            }
+
+            MenuWidget menu = RootWidget.GetChildAt(TroopMenuIndex) as MenuWidget;
+            menu?.SetFocusByIndex(focusedIndex);
         }
 
         private string GetFocusedSourceId()

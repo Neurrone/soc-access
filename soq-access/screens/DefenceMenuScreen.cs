@@ -11,6 +11,8 @@ namespace SongsOfConquestAccess.Screens
 {
     internal sealed class DefenceMenuScreen : Screen
     {
+        private const int ArmyWidgetIndex = 7;
+
         private readonly DefenceMenuAdapter _adapter;
         private Action<OnTroopsUpdatedPayload> _troopsUpdatedHandler;
 
@@ -65,11 +67,52 @@ namespace SongsOfConquestAccess.Screens
             }
 
             int focusedIndex = RootWidget != null ? RootWidget.FocusedIndex : -1;
+            GridFocus gridFocus = CaptureArmyGridFocus();
+            int troopMenuFocusedIndex = CaptureTroopMenuFocus();
+
             RootWidget = BuildRoot(_adapter);
+            RestoreArmyGridFocus(gridFocus);
+            RestoreTroopMenuFocus(troopMenuFocusedIndex);
             if (focusAfterRefresh)
             {
                 RootWidget?.SetFocusByIndex(focusedIndex);
             }
+        }
+
+        private GridFocus CaptureArmyGridFocus()
+        {
+            ArmyExchangeGridWidget grid = RootWidget != null
+                ? RootWidget.GetChildAt(ArmyWidgetIndex) as ArmyExchangeGridWidget
+                : null;
+            return grid != null ? new GridFocus(grid.FocusedColumnIndex, grid.FocusedRowIndex) : null;
+        }
+
+        private int CaptureTroopMenuFocus()
+        {
+            MenuWidget menu = RootWidget != null ? RootWidget.GetChildAt(ArmyWidgetIndex) as MenuWidget : null;
+            return menu != null ? menu.FocusedIndex : -1;
+        }
+
+        private void RestoreArmyGridFocus(GridFocus focus)
+        {
+            if (focus == null || RootWidget == null)
+            {
+                return;
+            }
+
+            ArmyExchangeGridWidget grid = RootWidget.GetChildAt(ArmyWidgetIndex) as ArmyExchangeGridWidget;
+            grid?.SetFocusedCell(focus.ColumnIndex, focus.RowIndex);
+        }
+
+        private void RestoreTroopMenuFocus(int focusedIndex)
+        {
+            if (focusedIndex < 0 || RootWidget == null)
+            {
+                return;
+            }
+
+            MenuWidget menu = RootWidget.GetChildAt(ArmyWidgetIndex) as MenuWidget;
+            menu?.SetFocusByIndex(focusedIndex);
         }
 
         private void AttachListeners()
@@ -337,6 +380,18 @@ namespace SongsOfConquestAccess.Screens
             }
 
             return "Empty, slot " + slot.SlotNumber;
+        }
+
+        private sealed class GridFocus
+        {
+            public GridFocus(int columnIndex, int rowIndex)
+            {
+                ColumnIndex = columnIndex;
+                RowIndex = rowIndex;
+            }
+
+            public int ColumnIndex { get; private set; }
+            public int RowIndex { get; private set; }
         }
     }
 }

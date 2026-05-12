@@ -11,6 +11,8 @@ namespace SongsOfConquestAccess.Screens
 {
     internal abstract class TroopManagementScreenBase : Screen
     {
+        private const int WielderTroopMenuIndex = 3;
+
         private Action<OnTroopsUpdatedPayload> _troopsUpdatedHandler;
         private Action<ResourceUpdatedPayload> _resourceUpdatedHandler;
         private Action _recruitmentPoolUpdatedHandler;
@@ -84,7 +86,9 @@ namespace SongsOfConquestAccess.Screens
             }
 
             int focusedIndex = RootWidget != null ? RootWidget.FocusedIndex : -1;
+            int troopMenuFocusedIndex = GetWielderTroopMenuFocusedIndex();
             RootWidget = BuildRoot();
+            RestoreWielderTroopMenuFocus(troopMenuFocusedIndex);
 
             if (!focusAfterRefresh)
             {
@@ -95,6 +99,23 @@ namespace SongsOfConquestAccess.Screens
             {
                 RootWidget?.Focus();
             }
+        }
+
+        private int GetWielderTroopMenuFocusedIndex()
+        {
+            MenuWidget menu = RootWidget != null ? RootWidget.GetChildAt(WielderTroopMenuIndex) as MenuWidget : null;
+            return menu != null ? menu.FocusedIndex : -1;
+        }
+
+        private void RestoreWielderTroopMenuFocus(int focusedIndex)
+        {
+            if (focusedIndex < 0 || RootWidget == null)
+            {
+                return;
+            }
+
+            MenuWidget menu = RootWidget.GetChildAt(WielderTroopMenuIndex) as MenuWidget;
+            menu?.SetFocusByIndex(focusedIndex);
         }
 
         private void AttachListeners()
