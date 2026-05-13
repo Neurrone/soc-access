@@ -1,10 +1,12 @@
 using System;
 using System.Collections.Generic;
+using SongsOfConquest.Client.Adventure;
 using SongsOfConquest.Common;
 using SongsOfConquest.Common.Economy;
 using SongsOfConquest.Common.Localization;
 using SongsOfConquestAccess.Adapters;
 using SongsOfConquestAccess.UI;
+using UnityEngine;
 
 namespace SongsOfConquestAccess.Screens
 {
@@ -13,6 +15,51 @@ namespace SongsOfConquestAccess.Screens
         public DraftTroopsScreen(ITroopManagementHostAdapter host)
             : base(host)
         {
+        }
+
+        public static Screen TryBuildActiveDwellingScreen()
+        {
+            DwellingInteractionMenu[] menus = Resources.FindObjectsOfTypeAll<DwellingInteractionMenu>();
+            for (int i = 0; i < menus.Length; i++)
+            {
+                DwellingInteractionMenuAdapter adapter = new DwellingInteractionMenuAdapter(menus[i]);
+                if (adapter.IsDraftPresent())
+                {
+                    return new DraftTroopsScreen(new DwellingTroopManagementHostAdapter(adapter));
+                }
+            }
+
+            return null;
+        }
+
+        public static Screen TryBuildActiveSettlementScreen()
+        {
+            TownInteractionMenu[] menus = Resources.FindObjectsOfTypeAll<TownInteractionMenu>();
+            for (int i = 0; i < menus.Length; i++)
+            {
+                TownInteractionMenuAdapter adapter = new TownInteractionMenuAdapter(menus[i]);
+                if (adapter.IsDraftPresent())
+                {
+                    return new DraftTroopsScreen(new SettlementTroopManagementHostAdapter(adapter));
+                }
+            }
+
+            return null;
+        }
+
+        public static Screen TryBuildActiveDefenceScreen()
+        {
+            DefenceMenu[] menus = Resources.FindObjectsOfTypeAll<DefenceMenu>();
+            for (int i = 0; i < menus.Length; i++)
+            {
+                DefenceMenuAdapter adapter = new DefenceMenuAdapter(menus[i]);
+                if (adapter.IsDraftPresent())
+                {
+                    return new DraftTroopsScreen(new DefenceTroopManagementHostAdapter(adapter));
+                }
+            }
+
+            return null;
         }
 
         protected override string ScreenSuffix { get { return "draft-troops"; } }

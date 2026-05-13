@@ -1,10 +1,15 @@
 using System;
 using System.Collections.Generic;
+using System.Reflection;
+using HarmonyLib;
+using SongsOfConquest.Client.Adventure.UI.Trading;
 using SongsOfConquest.Client.Gamestate.Facade;
 using SongsOfConquest.Common.Gamestate.Facade;
 using SongsOfConquestAccess.Adapters;
 using SongsOfConquestAccess.Input;
 using SongsOfConquestAccess.UI;
+using UnityEngine;
+using Zenject;
 
 namespace SongsOfConquestAccess.Screens
 {
@@ -12,6 +17,8 @@ namespace SongsOfConquestAccess.Screens
     {
         private const int InventoryGridIndex = 4;
         private const int ArmyExchangeGridIndex = 5;
+        private static readonly PropertyInfo InstallerContainerProperty =
+            AccessTools.Property(typeof(TradingMenuInstaller), "Container");
 
         private readonly TradingMenuAdapter _adapter;
         private Action<int, bool> _artifactChangedHandler;
@@ -22,6 +29,23 @@ namespace SongsOfConquestAccess.Screens
             : base(BuildRoot(adapter))
         {
             _adapter = adapter;
+        }
+
+        public static Screen TryBuildActiveScreen()
+        {
+            TradingMenuInstaller[] installers = Resources.FindObjectsOfTypeAll<TradingMenuInstaller>();
+            for (int i = 0; i < installers.Length; i++)
+            {
+                TradingMenu menu = TryResolveTradingMenu(installers[i]);
+                TradingMenuAdapter adapter = new TradingMenuAdapter(menu);
+                if (adapter.IsPresent())
+                {
+                    SoqAccessPlugin.Instance?.LogInfo("Trading menu probe found ready trading menu");
+                    return new TradingScreen(adapter);
+                }
+            }
+
+            return null;
         }
 
         public TradingMenuAdapter Adapter
@@ -437,6 +461,31 @@ namespace SongsOfConquestAccess.Screens
             }
 
             return menu;
+        }
+
+        private static TradingMenu TryResolveTradingMenu(TradingMenuInstaller installer)
+        {
+            if (installer == null || installer.gameObject == null || !installer.gameObject.scene.IsValid() || !installer.gameObject.scene.isLoaded)
+            {
+                return null;
+            }
+
+            DiContainer container = InstallerContainerProperty != null
+                ? InstallerContainerProperty.GetValue(installer, null) as DiContainer
+                : null;
+            if (container == null)
+            {
+                return null;
+            }
+
+            try
+            {
+                return container.Resolve<TradingMenu>();
+            }
+            catch
+            {
+                return null;
+            }
         }
 
         private sealed class GridFocus

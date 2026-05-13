@@ -23,8 +23,10 @@ namespace SongsOfConquestAccess.Screens
 {
     internal sealed class ScreenDetector
     {
+        private delegate Screen RuntimeScreenFactory();
+
         private readonly ScreenManager _screenManager;
-        private readonly List<IRuntimeScreenProbe> _runtimeScreenProbes;
+        private readonly List<RuntimeScreenFactory> _runtimeScreenFactories;
         private AdventureViewInstaller _adventureViewInstaller;
         private BattleSceneInstaller _battleSceneInstaller;
         private bool _storySequenceActive;
@@ -32,51 +34,58 @@ namespace SongsOfConquestAccess.Screens
         public ScreenDetector(ScreenManager screenManager)
         {
             _screenManager = screenManager;
-            _runtimeScreenProbes = new List<IRuntimeScreenProbe>
+            _runtimeScreenFactories = new List<RuntimeScreenFactory>
             {
-                new MainMenuRuntimeScreenProbe(),
-                new CampaignMenuRuntimeScreenProbe(),
-                new TaleSelectRuntimeScreenProbe(),
-                new CampaignMapSelectRuntimeScreenProbe(),
-                new AdventureMapRuntimeScreenProbe(),
-                new OwnedEntitiesRuntimeScreenProbe(),
-                new TroopOverviewRuntimeScreenProbe(),
-                new MarketplaceRuntimeScreenProbe(),
-                new MapEntityMiniMenuRuntimeScreenProbe(),
-                new CombatRuntimeScreenProbe(),
-                new SpellbookRuntimeScreenProbe(),
-                new PostAdventureResultRuntimeScreenProbe(),
-                new PostAdventureStatsRuntimeScreenProbe(),
-                new PostBattleResultRuntimeScreenProbe(),
-                new PreBattleMenuRuntimeScreenProbe(),
-                new DwellingInteractionRuntimeScreenProbe(),
-                new RallyPointRuntimeScreenProbe(),
-                new SettlementRuntimeScreenProbe(),
-                new DefenceMenuRuntimeScreenProbe(),
-                new BuildMenuRuntimeScreenProbe(),
-                new ResearchMenuRuntimeScreenProbe(),
-                new PurchaseWielderRuntimeScreenProbe(),
-                new HostileJoinMenuRuntimeScreenProbe(),
-                new MoveTroopPopupRuntimeScreenProbe(),
-                new WorldChoiceMenuRuntimeScreenProbe(),
-                new WorldConfirmMenuRuntimeScreenProbe(),
-                new LevelUpRuntimeScreenProbe(),
-                new CommanderSheetRuntimeScreenProbe(),
-                new TradingMenuRuntimeScreenProbe(),
-                new StoryFocusBlockerRuntimeScreenProbe(() => _storySequenceActive),
-                new LetterboxStoryTextRuntimeScreenProbe(),
-                new StoryTextRuntimeScreenProbe(),
-                new DialogueMenuRuntimeScreenProbe(),
-                new OptionsMenuRuntimeScreenProbe(),
-                new PauseMenuRuntimeScreenProbe(),
-                new MapMessagePopupRuntimeScreenProbe(),
-                new PopupMenuRuntimeScreenProbe(),
-                new ConfirmPopupRuntimeScreenProbe(),
-                new SystemPopupRuntimeScreenProbe(),
-                new QuitToDesktopPopupRuntimeScreenProbe(),
-                new CodexRuntimeScreenProbe(),
-                new TutorialRuntimeScreenProbe(),
-                new LoadingCompleteRuntimeScreenProbe()
+                MainMenuScreen.TryBuildActiveScreen,
+                FoldoutMenuScreen.TryBuildActiveScreen,
+                CampaignMenuScreen.TryBuildActiveScreen,
+                TaleSelectScreen.TryBuildActiveScreen,
+                CampaignMapSelectScreen.TryBuildActiveScreen,
+                AdventureMapScreen.TryBuildActiveScreen,
+                OwnedEntitiesScreen.TryBuildActiveScreen,
+                TroopOverviewScreen.TryBuildActiveScreen,
+                MarketplaceScreen.TryBuildActiveScreen,
+                MapEntityMiniMenuScreen.TryBuildActiveScreen,
+                CombatScreen.TryBuildActiveScreen,
+                SpellbookScreen.TryBuildActiveScreen,
+                PostAdventureResultScreen.TryBuildActiveScreen,
+                PostAdventureStatsScreen.TryBuildActiveScreen,
+                PostBattleResultScreen.TryBuildActiveScreen,
+                PreBattleMenuScreen.TryBuildActiveScreen,
+                UpgradeTroopsScreen.TryBuildActiveDwellingScreen,
+                DraftTroopsScreen.TryBuildActiveDwellingScreen,
+                RallyPointScreen.TryBuildActiveScreen,
+                DraftTroopsScreen.TryBuildActiveSettlementScreen,
+                UpgradeTroopsScreen.TryBuildActiveSettlementScreen,
+                SettlementScreen.TryBuildActiveScreen,
+                DraftTroopsScreen.TryBuildActiveDefenceScreen,
+                UpgradeTroopsScreen.TryBuildActiveDefenceScreen,
+                DefenceMenuScreen.TryBuildActiveScreen,
+                BuildMenuScreen.TryBuildActiveScreen,
+                ResearchScreen.TryBuildActiveScreen,
+                PurchaseWielderScreen.TryBuildActiveScreen,
+                HostileJoinMenuScreen.TryBuildActiveScreen,
+                MoveTroopPopupScreen.TryBuildActiveScreen,
+                WorldChoiceMenuScreen.TryBuildActiveScreen,
+                WorldConfirmMenuScreen.TryBuildActiveScreen,
+                LevelUpScreen.TryBuildActiveScreen,
+                CommanderSheetScreen.TryBuildActiveScreen,
+                TradingScreen.TryBuildActiveScreen,
+                () => StoryFocusBlockerScreen.TryBuildActiveScreen(() => _storySequenceActive),
+                StoryTextScreen.TryBuildActiveLetterboxScreen,
+                StoryTextScreen.TryBuildActiveScreen,
+                StoryTextScreen.TryBuildActiveDialogueScreen,
+                OptionsScreen.TryBuildActiveScreen,
+                PauseMenuScreen.TryBuildActiveScreen,
+                MessageDialogScreen.TryBuildActiveMapMessagePopupScreen,
+                MessageDialogScreen.TryBuildActivePopupMenuScreen,
+                MessageDialogScreen.TryBuildActiveConfirmPopupScreen,
+                MessageDialogScreen.TryBuildActiveSystemPopupScreen,
+                QuitToDesktopPopupScreen.TryBuildActiveScreen,
+                CodexScreen.TryBuildActiveScreen,
+                TutorialSlideshowScreen.TryBuildActiveScreen,
+                TutorialSimpleScreen.TryBuildActiveScreen,
+                LoadingCompleteScreen.TryBuildActiveScreen
             };
         }
 
@@ -1297,9 +1306,13 @@ namespace SongsOfConquestAccess.Screens
         public void ResyncFromRuntimeState()
         {
             List<Screen> activeScreens = new List<Screen>();
-            for (int i = 0; i < _runtimeScreenProbes.Count; i++)
+            for (int i = 0; i < _runtimeScreenFactories.Count; i++)
             {
-                _runtimeScreenProbes[i].AddActiveScreens(activeScreens);
+                Screen screen = _runtimeScreenFactories[i]();
+                if (screen != null && screen.IsPresent())
+                {
+                    activeScreens.Add(screen);
+                }
             }
 
             _screenManager.Clear();

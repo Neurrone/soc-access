@@ -1,6 +1,8 @@
+using SongsOfConquest.Client.Menu;
 using SongsOfConquestAccess.Adapters;
 using SongsOfConquestAccess.Input;
 using SongsOfConquestAccess.UI;
+using UnityEngine;
 
 namespace SongsOfConquestAccess.Screens
 {
@@ -12,6 +14,35 @@ namespace SongsOfConquestAccess.Screens
             : base(BuildRoot(adapter))
         {
             _adapter = adapter;
+        }
+
+        public static Screen TryBuildActiveScreen()
+        {
+            TutorialMenu[] menus = Resources.FindObjectsOfTypeAll<TutorialMenu>();
+            for (int i = 0; i < menus.Length; i++)
+            {
+                TutorialMenu menu = menus[i];
+                if (!IsLiveSceneMenu(menu))
+                {
+                    continue;
+                }
+
+                TutorialSlideshowAdapter adapter = new TutorialSlideshowAdapter(menu);
+                if (adapter.IsPresent())
+                {
+                    return new TutorialSlideshowScreen(adapter);
+                }
+            }
+
+            return null;
+        }
+
+        internal static bool IsLiveSceneMenu(TutorialMenu menu)
+        {
+            return menu != null
+                && menu.gameObject != null
+                && menu.gameObject.scene.IsValid()
+                && menu.gameObject.scene.isLoaded;
         }
 
         public override bool IsPresent()

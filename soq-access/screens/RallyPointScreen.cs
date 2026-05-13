@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using SongsOfConquest.Client.Adventure;
 using SongsOfConquest.Client.Gamestate;
 using SongsOfConquest.Client.Gamestate.Facade;
 using SongsOfConquest.Common;
@@ -9,6 +10,7 @@ using SongsOfConquest.Common.Localization;
 using SongsOfConquestAccess.Adapters;
 using SongsOfConquestAccess.Input;
 using SongsOfConquestAccess.UI;
+using UnityEngine;
 
 namespace SongsOfConquestAccess.Screens
 {
@@ -27,6 +29,21 @@ namespace SongsOfConquestAccess.Screens
         {
             _adapter = adapter;
             RootWidget = BuildRoot();
+        }
+
+        public static Screen TryBuildActiveScreen()
+        {
+            RallyPointInteractionMenu[] menus = Resources.FindObjectsOfTypeAll<RallyPointInteractionMenu>();
+            for (int i = 0; i < menus.Length; i++)
+            {
+                RallyPointInteractionMenuAdapter adapter = new RallyPointInteractionMenuAdapter(menus[i]);
+                if (adapter.IsPresent())
+                {
+                    return new RallyPointScreen(adapter);
+                }
+            }
+
+            return null;
         }
 
         public override bool IsPresent()

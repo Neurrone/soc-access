@@ -1,17 +1,165 @@
+using System;
+using HarmonyLib;
+using SongsOfConquest.Client;
+using SongsOfConquest.Client.Adventure;
+using SongsOfConquest.Client.Menu;
+using SongsOfConquest.Client.Menu.Popup;
 using SongsOfConquestAccess.Input;
 using SongsOfConquestAccess.Adapters;
 using SongsOfConquestAccess.UI;
+using UnityEngine;
+using Zenject;
 
 namespace SongsOfConquestAccess.Screens
 {
     internal sealed class MessageDialogScreen : Screen
     {
+        private static readonly AccessTools.FieldRef<PopupMenu, PopupMenu.Settings> PopupSettingsRef =
+            AccessTools.FieldRefAccess<PopupMenu, PopupMenu.Settings>("_settings");
+        private static readonly System.Reflection.PropertyInfo PopupInstallerContainerProperty =
+            AccessTools.Property(typeof(PopupMenuInstaller), "Container");
+
         private readonly IMessageDialogAdapter _adapter;
 
         public MessageDialogScreen(IMessageDialogAdapter adapter)
             : base(BuildRootWidget(adapter))
         {
             _adapter = adapter;
+        }
+
+        public static Screen TryBuildActiveMapMessagePopupScreen()
+        {
+            MapMessagePopup[] popups = Resources.FindObjectsOfTypeAll<MapMessagePopup>();
+            for (int i = 0; i < popups.Length; i++)
+            {
+                MapMessagePopup popup = popups[i];
+                if (!IsLiveScenePopup(popup))
+                {
+                    continue;
+                }
+
+                MapMessagePopupAdapter adapter = new MapMessagePopupAdapter(popup);
+                if (adapter.IsPresent())
+                {
+                    return new MessageDialogScreen(adapter);
+                }
+            }
+
+            return null;
+        }
+
+        public static Screen TryBuildActivePopupMenuScreen()
+        {
+            PopupMenuInstaller[] installers = Resources.FindObjectsOfTypeAll<PopupMenuInstaller>();
+            PopupMenuAdapter bestAdapter = null;
+            int bestSiblingIndex = int.MinValue;
+
+            for (int i = 0; i < installers.Length; i++)
+            {
+                PopupMenuInstaller installer = installers[i];
+                if (!IsLiveSceneInstaller(installer))
+                {
+                    continue;
+                }
+
+                PopupMenu popupMenu = TryResolvePopupMenu(installer);
+                if (popupMenu == null)
+                {
+                    continue;
+                }
+
+                PopupMenu.Settings settings = null;
+                try
+                {
+                    settings = PopupSettingsRef(popupMenu);
+                }
+                catch (Exception)
+                {
+                    settings = null;
+                }
+
+                if (settings == null)
+                {
+                    continue;
+                }
+
+                PopupMenuAdapter adapter = new PopupMenuAdapter(popupMenu, settings);
+                if (!adapter.IsPresent())
+                {
+                    continue;
+                }
+
+                int siblingIndex = GetPopupSiblingIndex(settings);
+                if (bestAdapter == null || siblingIndex > bestSiblingIndex)
+                {
+                    bestAdapter = adapter;
+                    bestSiblingIndex = siblingIndex;
+                }
+            }
+
+            return bestAdapter != null ? new MessageDialogScreen(bestAdapter) : null;
+        }
+
+        public static Screen TryBuildActiveConfirmPopupScreen()
+        {
+            ConfirmPopup[] popups = Resources.FindObjectsOfTypeAll<ConfirmPopup>();
+            ConfirmPopupAdapter bestAdapter = null;
+            int bestSiblingIndex = int.MinValue;
+
+            for (int i = 0; i < popups.Length; i++)
+            {
+                ConfirmPopup popup = popups[i];
+                if (!IsLiveScenePopup(popup))
+                {
+                    continue;
+                }
+
+                ConfirmPopupAdapter adapter = new ConfirmPopupAdapter(popup);
+                if (!adapter.IsPresent())
+                {
+                    continue;
+                }
+
+                int siblingIndex = popup.transform != null ? popup.transform.GetSiblingIndex() : 0;
+                if (bestAdapter == null || siblingIndex > bestSiblingIndex)
+                {
+                    bestAdapter = adapter;
+                    bestSiblingIndex = siblingIndex;
+                }
+            }
+
+            return bestAdapter != null ? new MessageDialogScreen(bestAdapter) : null;
+        }
+
+        public static Screen TryBuildActiveSystemPopupScreen()
+        {
+            SystemPopup[] popups = Resources.FindObjectsOfTypeAll<SystemPopup>();
+            SystemPopupAdapter bestAdapter = null;
+            int bestSiblingIndex = int.MinValue;
+
+            for (int i = 0; i < popups.Length; i++)
+            {
+                SystemPopup popup = popups[i];
+                if (!IsLiveScenePopup(popup))
+                {
+                    continue;
+                }
+
+                SystemPopupAdapter adapter = new SystemPopupAdapter(popup);
+                if (!adapter.IsPresent())
+                {
+                    continue;
+                }
+
+                int siblingIndex = popup.transform != null ? popup.transform.GetSiblingIndex() : 0;
+                if (bestAdapter == null || siblingIndex > bestSiblingIndex)
+                {
+                    bestAdapter = adapter;
+                    bestSiblingIndex = siblingIndex;
+                }
+            }
+
+            return bestAdapter != null ? new MessageDialogScreen(bestAdapter) : null;
         }
 
         public override bool IsPresent()
@@ -81,6 +229,83 @@ namespace SongsOfConquestAccess.Screens
                 () => adapter != null && adapter.HasNegativeAction));
 
             return root;
+        }
+
+        private static bool IsLiveScenePopup(MapMessagePopup popup)
+        {
+            if (popup == null)
+            {
+                return false;
+            }
+
+            GameObject gameObject = popup.gameObject;
+            return gameObject != null && gameObject.scene.IsValid() && gameObject.scene.isLoaded;
+        }
+
+        private static bool IsLiveScenePopup(ConfirmPopup popup)
+        {
+            if (popup == null)
+            {
+                return false;
+            }
+
+            GameObject gameObject = popup.gameObject;
+            return gameObject != null && gameObject.scene.IsValid() && gameObject.scene.isLoaded;
+        }
+
+        private static bool IsLiveScenePopup(SystemPopup popup)
+        {
+            if (popup == null)
+            {
+                return false;
+            }
+
+            GameObject gameObject = popup.gameObject;
+            return gameObject != null && gameObject.scene.IsValid() && gameObject.scene.isLoaded;
+        }
+
+        private static bool IsLiveSceneInstaller(PopupMenuInstaller installer)
+        {
+            if (installer == null)
+            {
+                return false;
+            }
+
+            GameObject gameObject = installer.gameObject;
+            return gameObject != null && gameObject.scene.IsValid() && gameObject.scene.isLoaded;
+        }
+
+        private static PopupMenu TryResolvePopupMenu(PopupMenuInstaller installer)
+        {
+            if (installer == null || PopupInstallerContainerProperty == null)
+            {
+                return null;
+            }
+
+            DiContainer container = PopupInstallerContainerProperty.GetValue(installer, null) as DiContainer;
+            if (container == null)
+            {
+                return null;
+            }
+
+            try
+            {
+                return container.Resolve<PopupMenu>();
+            }
+            catch (Exception)
+            {
+                return null;
+            }
+        }
+
+        private static int GetPopupSiblingIndex(PopupMenu.Settings settings)
+        {
+            if (settings == null || settings.TopContainer == null)
+            {
+                return int.MinValue;
+            }
+
+            return settings.TopContainer.GetSiblingIndex();
         }
     }
 }

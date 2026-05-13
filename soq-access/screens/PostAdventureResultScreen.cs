@@ -1,7 +1,9 @@
 using System.Collections.Generic;
+using SongsOfConquest.Client.Menu;
 using SongsOfConquest.Client.UI;
 using SongsOfConquestAccess.Adapters;
 using SongsOfConquestAccess.UI;
+using UnityEngine;
 
 namespace SongsOfConquestAccess.Screens
 {
@@ -13,6 +15,21 @@ namespace SongsOfConquestAccess.Screens
             : base(BuildRoot(adapter))
         {
             _adapter = adapter;
+        }
+
+        public static Screen TryBuildActiveScreen()
+        {
+            PostAdventureMenu[] menus = Resources.FindObjectsOfTypeAll<PostAdventureMenu>();
+            for (int i = 0; i < menus.Length; i++)
+            {
+                PostAdventureResultAdapter adapter = new PostAdventureResultAdapter(menus[i]);
+                if (adapter.IsPresent())
+                {
+                    return new PostAdventureResultScreen(adapter);
+                }
+            }
+
+            return null;
         }
 
         public override bool IsPresent()

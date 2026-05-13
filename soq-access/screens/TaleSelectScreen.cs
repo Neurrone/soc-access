@@ -16,6 +16,12 @@ namespace SongsOfConquestAccess.Screens
             _adapter = adapter;
         }
 
+        public static Screen TryBuildActiveScreen()
+        {
+            TaleSelectAdapter adapter = FindActiveTaleSelect();
+            return adapter != null ? new TaleSelectScreen(adapter) : null;
+        }
+
         public override bool IsPresent()
         {
             return _adapter != null && _adapter.IsPresent();
@@ -124,6 +130,38 @@ namespace SongsOfConquestAccess.Screens
             }
 
             return string.IsNullOrWhiteSpace(nativeStatus) ? "disabled" : "disabled. " + nativeStatus;
+        }
+
+        private static TaleSelectAdapter FindActiveTaleSelect()
+        {
+            TaleButtonLayoutCoordinator[] coordinators = Resources.FindObjectsOfTypeAll<TaleButtonLayoutCoordinator>();
+            for (int i = 0; i < coordinators.Length; i++)
+            {
+                TaleButtonLayoutCoordinator coordinator = coordinators[i];
+                if (!IsLiveSceneCoordinator(coordinator))
+                {
+                    continue;
+                }
+
+                TaleSelectAdapter adapter = new TaleSelectAdapter(coordinator);
+                if (adapter.IsPresent())
+                {
+                    return adapter;
+                }
+            }
+
+            return null;
+        }
+
+        private static bool IsLiveSceneCoordinator(TaleButtonLayoutCoordinator coordinator)
+        {
+            if (coordinator == null)
+            {
+                return false;
+            }
+
+            GameObject gameObject = ((Component)coordinator).gameObject;
+            return gameObject != null && gameObject.scene.IsValid() && gameObject.scene.isLoaded;
         }
     }
 }

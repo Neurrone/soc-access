@@ -1,19 +1,42 @@
 using System;
 using System.Collections.Generic;
+using System.Reflection;
+using HarmonyLib;
+using SongsOfConquest.Client.Menu;
 using SongsOfConquestAccess.Adapters;
 using SongsOfConquestAccess.Input;
 using SongsOfConquestAccess.UI;
+using UnityEngine;
+using Zenject;
 
 namespace SongsOfConquestAccess.Screens
 {
     internal sealed class CodexScreen : Screen
     {
+        private static readonly PropertyInfo ContainerProperty = AccessTools.Property(typeof(MonoInstallerBase), "Container");
+        private static readonly FieldInfo ContainerField = AccessTools.Field(typeof(MonoInstallerBase), "_container");
+
         private readonly CodexMenuAdapter _adapter;
 
         public CodexScreen(CodexMenuAdapter adapter)
             : base(BuildRoot(adapter))
         {
             _adapter = adapter;
+        }
+
+        public static Screen TryBuildActiveScreen()
+        {
+            CodexMenuInstaller[] installers = Resources.FindObjectsOfTypeAll<CodexMenuInstaller>();
+            for (int i = 0; i < installers.Length; i++)
+            {
+                CodexMenuAdapter adapter = new CodexMenuAdapter(ResolveCodexMenu(installers[i]));
+                if (adapter.IsPresent())
+                {
+                    return new CodexScreen(adapter);
+                }
+            }
+
+            return null;
         }
 
         public override bool IsPresent()
@@ -264,6 +287,34 @@ namespace SongsOfConquestAccess.Screens
                 SoqAccessPlugin.Instance?.LogWarning("CodexScreen failed to build " + section + ": " + ex);
                 return new T[0];
             }
+        }
+
+        private static CodexMenu ResolveCodexMenu(CodexMenuInstaller installer)
+        {
+            DiContainer container = GetContainer(installer);
+            if (container == null)
+            {
+                return null;
+            }
+
+            return container.HasBinding<CodexMenu>()
+                ? container.Resolve<CodexMenu>()
+                : null;
+        }
+
+        private static DiContainer GetContainer(CodexMenuInstaller installer)
+        {
+            if (installer == null)
+            {
+                return null;
+            }
+
+            if (ContainerProperty != null)
+            {
+                return ContainerProperty.GetValue(installer, null) as DiContainer;
+            }
+
+            return ContainerField != null ? ContainerField.GetValue(installer) as DiContainer : null;
         }
     }
 }

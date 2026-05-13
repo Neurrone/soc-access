@@ -1,9 +1,11 @@
 using System;
 using System.Collections.Generic;
+using SongsOfConquest.Client.Adventure.UI;
 using SongsOfConquest.Client.Gamestate.Facade;
 using SongsOfConquest.Common.Gamestate.Facade;
 using SongsOfConquestAccess.Adapters;
 using SongsOfConquestAccess.UI;
+using UnityEngine;
 
 namespace SongsOfConquestAccess.Screens
 {
@@ -16,6 +18,21 @@ namespace SongsOfConquestAccess.Screens
             : base(BuildRoot(adapter))
         {
             _adapter = adapter;
+        }
+
+        public static Screen TryBuildActiveScreen()
+        {
+            ResearchMenu[] menus = Resources.FindObjectsOfTypeAll<ResearchMenu>();
+            for (int i = 0; i < menus.Length; i++)
+            {
+                ResearchMenuAdapter adapter = new ResearchMenuAdapter(menus[i]);
+                if (adapter.IsPresent())
+                {
+                    return new ResearchScreen(adapter);
+                }
+            }
+
+            return null;
         }
 
         public override bool IsPresent()

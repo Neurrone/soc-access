@@ -1,8 +1,10 @@
 using System;
 using System.Collections.Generic;
+using SongsOfConquest.Client.UI;
 using SongsOfConquestAccess.Adapters;
 using SongsOfConquestAccess.Input;
 using SongsOfConquestAccess.UI;
+using UnityEngine;
 
 namespace SongsOfConquestAccess.Screens
 {
@@ -14,6 +16,27 @@ namespace SongsOfConquestAccess.Screens
             : base(BuildRoot(adapter))
         {
             _adapter = adapter;
+        }
+
+        public static Screen TryBuildActiveScreen()
+        {
+            SpellBook[] spellbooks = Resources.FindObjectsOfTypeAll<SpellBook>();
+            for (int i = 0; i < spellbooks.Length; i++)
+            {
+                SpellBook spellbook = spellbooks[i];
+                if (spellbook == null)
+                {
+                    continue;
+                }
+
+                SpellbookAdapter adapter = new SpellbookAdapter(spellbook);
+                if (adapter.IsPresent())
+                {
+                    return new SpellbookScreen(adapter);
+                }
+            }
+
+            return null;
         }
 
         public override bool IsPresent()

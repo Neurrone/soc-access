@@ -1,16 +1,23 @@
 using System.Collections.Generic;
 using System;
+using System.Reflection;
+using HarmonyLib;
+using SongsOfConquest.Client.Menu;
 using SongsOfConquest.Client.UI;
 using SongsOfConquest.Common.Campaign;
 using SongsOfConquestAccess.Adapters;
 using SongsOfConquestAccess.Input;
 using SongsOfConquestAccess.UI;
+using UnityEngine;
+using Zenject;
 
 namespace SongsOfConquestAccess.Screens
 {
     internal sealed class CampaignMapSelectScreen : Screen
     {
         private const string DifficultyMenuId = "campaign-map-difficulty";
+        private static readonly PropertyInfo InstallerContainerProperty =
+            AccessTools.Property(typeof(CampaignMapSelectMenuInstaller), "Container");
 
         // Moving through the difficulty menu immediately changes the native dropdown.
         // The game responds by redrawing the selected mission details and calling Show(...)
@@ -29,6 +36,12 @@ namespace SongsOfConquestAccess.Screens
             : base(BuildRootWidget(adapter, focusDifficulty))
         {
             _adapter = adapter;
+        }
+
+        public static Screen TryBuildActiveScreen()
+        {
+            CampaignMapSelectAdapter adapter = FindActiveCampaignMapSelect(null);
+            return adapter != null ? new CampaignMapSelectScreen(adapter) : null;
         }
 
         public static bool ConsumeFocusDifficultyAfterNextRebuild()
@@ -314,6 +327,73 @@ namespace SongsOfConquestAccess.Screens
             if (information.CurrentDifficulty != difficulty)
             {
                 ActivateDifficultyOption(information, difficulty);
+            }
+        }
+
+        private static CampaignMapSelectAdapter FindActiveCampaignMapSelect(CampaignMapSelectedInformationView targetInformationView)
+        {
+            CampaignMapSelectMenuInstaller[] installers = Resources.FindObjectsOfTypeAll<CampaignMapSelectMenuInstaller>();
+            for (int i = 0; i < installers.Length; i++)
+            {
+                CampaignMapSelectMenuInstaller installer = installers[i];
+                if (!IsLiveSceneInstaller(installer))
+                {
+                    continue;
+                }
+
+                CampaignMapSelectMenu menu = TryResolve<CampaignMapSelectMenu>(installer);
+                CampaignMapSelectedInformationView informationView = TryResolve<CampaignMapSelectedInformationView>(installer);
+                if (menu == null || informationView == null)
+                {
+                    continue;
+                }
+
+                if (targetInformationView != null && !ReferenceEquals(targetInformationView, informationView))
+                {
+                    continue;
+                }
+
+                CampaignMapSelectAdapter adapter = new CampaignMapSelectAdapter(menu, informationView);
+                if (adapter.IsPresent())
+                {
+                    return adapter;
+                }
+            }
+
+            return null;
+        }
+
+        private static bool IsLiveSceneInstaller(CampaignMapSelectMenuInstaller installer)
+        {
+            if (installer == null)
+            {
+                return false;
+            }
+
+            GameObject gameObject = installer.gameObject;
+            return gameObject != null && gameObject.scene.IsValid() && gameObject.scene.isLoaded;
+        }
+
+        private static T TryResolve<T>(CampaignMapSelectMenuInstaller installer) where T : class
+        {
+            if (installer == null || InstallerContainerProperty == null)
+            {
+                return null;
+            }
+
+            DiContainer container = InstallerContainerProperty.GetValue(installer, null) as DiContainer;
+            if (container == null)
+            {
+                return null;
+            }
+
+            try
+            {
+                return container.Resolve<T>();
+            }
+            catch (Exception)
+            {
+                return null;
             }
         }
     }

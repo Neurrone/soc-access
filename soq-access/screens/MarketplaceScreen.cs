@@ -1,10 +1,12 @@
 using System;
 using System.Collections.Generic;
 using System.Globalization;
+using SongsOfConquest.Client.Adventure;
 using SongsOfConquest.Client.Gamestate.Facade;
 using SongsOfConquest.Common.Economy;
 using SongsOfConquestAccess.Adapters;
 using SongsOfConquestAccess.UI;
+using UnityEngine;
 
 namespace SongsOfConquestAccess.Screens
 {
@@ -19,6 +21,21 @@ namespace SongsOfConquestAccess.Screens
             : base(BuildRoot(adapter))
         {
             _adapter = adapter;
+        }
+
+        public static Screen TryBuildActiveScreen()
+        {
+            MarketplaceMenu[] menus = Resources.FindObjectsOfTypeAll<MarketplaceMenu>();
+            for (int i = 0; i < menus.Length; i++)
+            {
+                MarketplaceMenuAdapter adapter = new MarketplaceMenuAdapter(menus[i]);
+                if (adapter.IsPresent())
+                {
+                    return new MarketplaceScreen(adapter);
+                }
+            }
+
+            return null;
         }
 
         public override bool IsPresent()

@@ -1,18 +1,47 @@
+using System;
 using System.Collections.Generic;
+using HarmonyLib;
+using SongsOfConquest.Client.Adventure;
 using SongsOfConquestAccess.Adapters;
 using SongsOfConquestAccess.Input;
 using SongsOfConquestAccess.UI;
+using UnityEngine;
+using Zenject;
 
 namespace SongsOfConquestAccess.Screens
 {
     internal sealed class WorldChoiceMenuScreen : Screen
     {
+        private static readonly System.Reflection.PropertyInfo InstallerContainerProperty =
+            AccessTools.Property(typeof(WorldChoiceMenuInstaller), "Container");
+
         private readonly WorldChoiceMenuAdapter _adapter;
 
         public WorldChoiceMenuScreen(WorldChoiceMenuAdapter adapter)
             : base(BuildRoot(adapter))
         {
             _adapter = adapter;
+        }
+
+        public static Screen TryBuildActiveScreen()
+        {
+            WorldChoiceMenuInstaller[] installers = Resources.FindObjectsOfTypeAll<WorldChoiceMenuInstaller>();
+            for (int i = 0; i < installers.Length; i++)
+            {
+                WorldChoiceMenu menu = TryResolveWorldChoiceMenu(installers[i]);
+                if (menu == null)
+                {
+                    continue;
+                }
+
+                WorldChoiceMenuAdapter adapter = new WorldChoiceMenuAdapter(menu);
+                if (adapter.IsPresent())
+                {
+                    return new WorldChoiceMenuScreen(adapter);
+                }
+            }
+
+            return null;
         }
 
         public override bool IsPresent()
@@ -113,6 +142,40 @@ namespace SongsOfConquestAccess.Screens
         {
             string prefix = choice != null && choice.IsPenalty ? "penalty" : "reward";
             return prefix + "-" + index;
+        }
+
+        private static WorldChoiceMenu TryResolveWorldChoiceMenu(WorldChoiceMenuInstaller installer)
+        {
+            if (!IsLiveSceneInstaller(installer) || InstallerContainerProperty == null)
+            {
+                return null;
+            }
+
+            DiContainer container = InstallerContainerProperty.GetValue(installer, null) as DiContainer;
+            if (container == null)
+            {
+                return null;
+            }
+
+            try
+            {
+                return container.Resolve<WorldChoiceMenu>();
+            }
+            catch (Exception)
+            {
+                return null;
+            }
+        }
+
+        private static bool IsLiveSceneInstaller(WorldChoiceMenuInstaller installer)
+        {
+            if (installer == null)
+            {
+                return false;
+            }
+
+            GameObject gameObject = installer.gameObject;
+            return gameObject != null && gameObject.scene.IsValid() && gameObject.scene.isLoaded;
         }
     }
 }

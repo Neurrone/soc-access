@@ -1,17 +1,52 @@
+using System;
+using HarmonyLib;
+using SongsOfConquest.Client.Menu.Popup;
 using SongsOfConquestAccess.Adapters;
 using SongsOfConquestAccess.Input;
 using SongsOfConquestAccess.UI;
+using UnityEngine;
+using Zenject;
 
 namespace SongsOfConquestAccess.Screens
 {
     internal sealed class QuitToDesktopPopupScreen : Screen
     {
+        private static readonly System.Reflection.PropertyInfo InstallerContainerProperty =
+            AccessTools.Property(typeof(QuitToDesktopPopupInstaller), "Container");
+
         private readonly QuitToDesktopPopupAdapter _adapter;
 
         public QuitToDesktopPopupScreen(QuitToDesktopPopupAdapter adapter)
             : base(BuildRootWidget(adapter))
         {
             _adapter = adapter;
+        }
+
+        public static Screen TryBuildActiveScreen()
+        {
+            QuitToDesktopPopupInstaller[] installers = Resources.FindObjectsOfTypeAll<QuitToDesktopPopupInstaller>();
+            for (int i = 0; i < installers.Length; i++)
+            {
+                QuitToDesktopPopupInstaller installer = installers[i];
+                if (!IsLiveSceneInstaller(installer))
+                {
+                    continue;
+                }
+
+                QuitToDesktopPopup popup = TryResolvePopup(installer);
+                if (popup == null)
+                {
+                    continue;
+                }
+
+                QuitToDesktopPopupAdapter adapter = new QuitToDesktopPopupAdapter(popup);
+                if (adapter.IsPresent())
+                {
+                    return new QuitToDesktopPopupScreen(adapter);
+                }
+            }
+
+            return null;
         }
 
         public override bool IsPresent()
@@ -102,6 +137,40 @@ namespace SongsOfConquestAccess.Screens
                 () => adapter != null && adapter.HasCancel));
 
             return root;
+        }
+
+        private static bool IsLiveSceneInstaller(QuitToDesktopPopupInstaller installer)
+        {
+            if (installer == null)
+            {
+                return false;
+            }
+
+            GameObject gameObject = installer.gameObject;
+            return gameObject != null && gameObject.scene.IsValid() && gameObject.scene.isLoaded;
+        }
+
+        private static QuitToDesktopPopup TryResolvePopup(QuitToDesktopPopupInstaller installer)
+        {
+            if (installer == null || InstallerContainerProperty == null)
+            {
+                return null;
+            }
+
+            DiContainer container = InstallerContainerProperty.GetValue(installer, null) as DiContainer;
+            if (container == null)
+            {
+                return null;
+            }
+
+            try
+            {
+                return container.Resolve<QuitToDesktopPopup>();
+            }
+            catch (Exception)
+            {
+                return null;
+            }
         }
     }
 }

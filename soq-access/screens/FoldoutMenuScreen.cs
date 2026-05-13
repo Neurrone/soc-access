@@ -16,6 +16,27 @@ namespace SongsOfConquestAccess.Screens
             _foldout = foldout;
         }
 
+        public static Screen TryBuildActiveScreen()
+        {
+            MainMenuAdapter adapter = MainMenuScreen.FindActiveMainMenu();
+            if (adapter == null)
+            {
+                return null;
+            }
+
+            if (adapter.ExtrasFoldout != null && adapter.ExtrasFoldout.IsOpen())
+            {
+                return new FoldoutMenuScreen(adapter, adapter.ExtrasFoldout);
+            }
+
+            if (adapter.MultiplayerFoldout != null && adapter.MultiplayerFoldout.IsOpen())
+            {
+                return new FoldoutMenuScreen(adapter, adapter.MultiplayerFoldout);
+            }
+
+            return null;
+        }
+
         public override bool IsPresent()
         {
             return _owner != null

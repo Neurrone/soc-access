@@ -16,6 +16,16 @@ namespace SongsOfConquestAccess.Screens
             _isPresent = isPresent;
         }
 
+        public static Screen TryBuildActiveScreen(Func<bool> isStorySequenceActive)
+        {
+            if (isStorySequenceActive == null || !isStorySequenceActive())
+            {
+                return null;
+            }
+
+            return new StoryFocusBlockerScreen(isStorySequenceActive);
+        }
+
         public override bool IsPresent()
         {
             return _isPresent == null || _isPresent();

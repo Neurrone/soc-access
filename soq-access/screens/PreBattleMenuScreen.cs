@@ -1,6 +1,8 @@
+using SongsOfConquest.Client.Menu;
 using SongsOfConquestAccess.Adapters;
 using SongsOfConquestAccess.UI;
 using SongsOfConquest.Client.Deployment;
+using UnityEngine;
 
 namespace SongsOfConquestAccess.Screens
 {
@@ -13,6 +15,27 @@ namespace SongsOfConquestAccess.Screens
         public PreBattleMenuScreen(PreBattleMenuAdapter adapter)
             : this(adapter, new TroopPlacementHexGrid(adapter))
         {
+        }
+
+        public static Screen TryBuildActiveScreen()
+        {
+            PreBattleMenu[] menus = Resources.FindObjectsOfTypeAll<PreBattleMenu>();
+            for (int i = 0; i < menus.Length; i++)
+            {
+                PreBattleMenu menu = menus[i];
+                if (menu == null || menu.gameObject == null || !menu.gameObject.scene.IsValid() || !menu.gameObject.scene.isLoaded)
+                {
+                    continue;
+                }
+
+                PreBattleMenuAdapter adapter = new PreBattleMenuAdapter(menu);
+                if (adapter.IsPresent())
+                {
+                    return new PreBattleMenuScreen(adapter);
+                }
+            }
+
+            return null;
         }
 
         private PreBattleMenuScreen(PreBattleMenuAdapter adapter, TroopPlacementHexGrid hexGrid)

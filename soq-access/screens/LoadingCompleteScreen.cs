@@ -1,17 +1,47 @@
+using System.Reflection;
+using HarmonyLib;
+using SongsOfConquest.Client.Menu;
 using SongsOfConquestAccess.Adapters;
 using SongsOfConquestAccess.Input;
 using SongsOfConquestAccess.UI;
+using UnityEngine;
+using Zenject;
 
 namespace SongsOfConquestAccess.Screens
 {
     internal sealed class LoadingCompleteScreen : Screen
     {
+        private static readonly PropertyInfo InstallerContainerProperty =
+            AccessTools.Property(typeof(LoadingScreenMenuInstaller), "Container");
+
         private readonly LoadingScreenAdapter _adapter;
 
         public LoadingCompleteScreen(LoadingScreenAdapter adapter)
             : base(BuildRoot(adapter))
         {
             _adapter = adapter;
+        }
+
+        public static Screen TryBuildActiveScreen()
+        {
+            LoadingScreenMenuInstaller[] installers = Resources.FindObjectsOfTypeAll<LoadingScreenMenuInstaller>();
+            for (int i = 0; i < installers.Length; i++)
+            {
+                LoadingScreenMenuInstaller installer = installers[i];
+                if (!IsLiveSceneInstaller(installer))
+                {
+                    continue;
+                }
+
+                LoadingScreenMenu menu = TryResolve<LoadingScreenMenu>(GetContainer(installer));
+                LoadingScreenAdapter adapter = new LoadingScreenAdapter(menu);
+                if (adapter.IsPresent())
+                {
+                    return new LoadingCompleteScreen(adapter);
+                }
+            }
+
+            return null;
         }
 
         public LoadingScreenAdapter Adapter
@@ -46,6 +76,44 @@ namespace SongsOfConquestAccess.Screens
                 "loading-complete-continue",
                 () => adapter != null ? adapter.PromptText : string.Empty));
             return root;
+        }
+
+        private static bool IsLiveSceneInstaller(LoadingScreenMenuInstaller installer)
+        {
+            if (installer == null)
+            {
+                return false;
+            }
+
+            GameObject gameObject = installer.gameObject;
+            return gameObject != null && gameObject.scene.IsValid() && gameObject.scene.isLoaded;
+        }
+
+        private static DiContainer GetContainer(LoadingScreenMenuInstaller installer)
+        {
+            if (installer == null || InstallerContainerProperty == null)
+            {
+                return null;
+            }
+
+            return InstallerContainerProperty.GetValue(installer, null) as DiContainer;
+        }
+
+        private static T TryResolve<T>(DiContainer container) where T : class
+        {
+            if (container == null)
+            {
+                return null;
+            }
+
+            try
+            {
+                return container.Resolve<T>();
+            }
+            catch (System.Exception)
+            {
+                return null;
+            }
         }
 
         private sealed class PassiveButtonWidget : Widget

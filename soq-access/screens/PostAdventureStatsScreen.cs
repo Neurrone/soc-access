@@ -1,18 +1,40 @@
 using System.Collections.Generic;
+using System.Reflection;
+using HarmonyLib;
+using SongsOfConquest.Client.Menu;
 using SongsOfConquestAccess.Adapters;
 using SongsOfConquestAccess.Input;
 using SongsOfConquestAccess.UI;
+using UnityEngine;
 
 namespace SongsOfConquestAccess.Screens
 {
     internal sealed class PostAdventureStatsScreen : Screen
     {
+        private static readonly FieldInfo StatsMenuField = AccessTools.Field(typeof(PostAdventureMenu), "_statsMenu");
+
         private readonly PostAdventureStatsAdapter _adapter;
 
         public PostAdventureStatsScreen(PostAdventureStatsAdapter adapter)
             : base(BuildRoot(adapter))
         {
             _adapter = adapter;
+        }
+
+        public static Screen TryBuildActiveScreen()
+        {
+            PostAdventureMenu[] resultMenus = Resources.FindObjectsOfTypeAll<PostAdventureMenu>();
+            for (int i = 0; i < resultMenus.Length; i++)
+            {
+                PostAdventureStatsMenu statsMenu = GetStatsMenu(resultMenus[i]);
+                PostAdventureStatsAdapter adapter = new PostAdventureStatsAdapter(statsMenu);
+                if (adapter.IsPresent())
+                {
+                    return new PostAdventureStatsScreen(adapter);
+                }
+            }
+
+            return null;
         }
 
         public override bool IsPresent()
@@ -39,6 +61,13 @@ namespace SongsOfConquestAccess.Screens
             }
 
             return base.OnActionJustPressed(action);
+        }
+
+        private static PostAdventureStatsMenu GetStatsMenu(PostAdventureMenu resultMenu)
+        {
+            return resultMenu != null && StatsMenuField != null
+                ? StatsMenuField.GetValue(resultMenu) as PostAdventureStatsMenu
+                : null;
         }
 
         private static ContainerWidget BuildRoot(PostAdventureStatsAdapter adapter)

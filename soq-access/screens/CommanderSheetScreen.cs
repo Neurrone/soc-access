@@ -1,11 +1,13 @@
 using System;
 using System.Collections.Generic;
+using SongsOfConquest.Client.Adventure.UI;
 using SongsOfConquest.Client.Gamestate.Facade;
 using SongsOfConquest.Common.Gamestate;
 using SongsOfConquest.Common.Skills;
 using SongsOfConquestAccess.Adapters;
 using SongsOfConquestAccess.Input;
 using SongsOfConquestAccess.UI;
+using UnityEngine;
 
 namespace SongsOfConquestAccess.Screens
 {
@@ -20,6 +22,21 @@ namespace SongsOfConquestAccess.Screens
             : base(BuildRoot(adapter))
         {
             _adapter = adapter;
+        }
+
+        public static Screen TryBuildActiveScreen()
+        {
+            CommanderSheet[] sheets = Resources.FindObjectsOfTypeAll<CommanderSheet>();
+            for (int i = 0; i < sheets.Length; i++)
+            {
+                CommanderSheetAdapter adapter = new CommanderSheetAdapter(sheets[i]);
+                if (adapter.IsPresent())
+                {
+                    return new CommanderSheetScreen(adapter);
+                }
+            }
+
+            return null;
         }
 
         public override bool IsPresent()

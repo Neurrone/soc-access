@@ -1,7 +1,9 @@
 using System.Collections.Generic;
+using SongsOfConquest.Client.UI;
 using SongsOfConquestAccess.Adapters;
 using SongsOfConquestAccess.Input;
 using SongsOfConquestAccess.UI;
+using UnityEngine;
 
 namespace SongsOfConquestAccess.Screens
 {
@@ -13,6 +15,21 @@ namespace SongsOfConquestAccess.Screens
             : base(BuildRoot(adapter))
         {
             _adapter = adapter;
+        }
+
+        public static Screen TryBuildActiveScreen()
+        {
+            PurchaseWielderMenu[] menus = Resources.FindObjectsOfTypeAll<PurchaseWielderMenu>();
+            for (int i = 0; i < menus.Length; i++)
+            {
+                PurchaseWielderMenuAdapter adapter = new PurchaseWielderMenuAdapter(menus[i]);
+                if (adapter.IsPresent())
+                {
+                    return new PurchaseWielderScreen(adapter);
+                }
+            }
+
+            return null;
         }
 
         public PurchaseWielderMenuAdapter Adapter

@@ -1,16 +1,37 @@
+using HarmonyLib;
+using SongsOfConquest.Client.Adventure.UI;
 using SongsOfConquestAccess.Adapters;
 using SongsOfConquestAccess.UI;
+using UnityEngine;
 
 namespace SongsOfConquestAccess.Screens
 {
     internal sealed class MoveTroopPopupScreen : Screen
     {
+        private static readonly System.Reflection.FieldInfo CurrentStateField =
+            AccessTools.Field(typeof(TroopHUDEntryMovable), "_currentState");
+
         private readonly MoveTroopPopupAdapter _adapter;
 
         public MoveTroopPopupScreen(MoveTroopPopupAdapter adapter)
             : base(BuildRoot(adapter))
         {
             _adapter = adapter;
+        }
+
+        public static Screen TryBuildActiveScreen()
+        {
+            TroopHUDEntryMovable[] movables = Resources.FindObjectsOfTypeAll<TroopHUDEntryMovable>();
+            for (int i = 0; i < movables.Length; i++)
+            {
+                TroopHUDEntryMovable movable = movables[i];
+                if (IsPresent(movable))
+                {
+                    return new MoveTroopPopupScreen(new MoveTroopPopupAdapter(movable));
+                }
+            }
+
+            return null;
         }
 
         public override bool IsPresent()
@@ -22,6 +43,17 @@ namespace SongsOfConquestAccess.Screens
         {
             _adapter?.HideNativeTooltip();
             RootWidget?.Unfocus();
+        }
+
+        private static bool IsPresent(TroopHUDEntryMovable movable)
+        {
+            if (movable == null || !((Component)movable).gameObject.activeInHierarchy)
+            {
+                return false;
+            }
+
+            object value = CurrentStateField != null ? CurrentStateField.GetValue(movable) : null;
+            return value != null && value.ToString() == "Deciding";
         }
 
         private static ContainerWidget BuildRoot(MoveTroopPopupAdapter adapter)

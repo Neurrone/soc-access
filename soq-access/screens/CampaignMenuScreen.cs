@@ -1,3 +1,4 @@
+using SongsOfConquest.Client.Menu;
 using SongsOfConquest.Client.UI;
 using SongsOfConquestAccess.Input;
 using SongsOfConquestAccess.Adapters;
@@ -15,6 +16,12 @@ namespace SongsOfConquestAccess.Screens
             : base(BuildRootWidget(adapter))
         {
             _adapter = adapter;
+        }
+
+        public static Screen TryBuildActiveScreen()
+        {
+            CampaignMenuAdapter adapter = FindActiveCampaignMenu();
+            return adapter != null ? new CampaignMenuScreen(adapter) : null;
         }
 
         public override bool IsPresent()
@@ -130,6 +137,38 @@ namespace SongsOfConquestAccess.Screens
             }
 
             return string.IsNullOrWhiteSpace(nativeStatus) ? "disabled" : "disabled. " + nativeStatus;
+        }
+
+        private static CampaignMenuAdapter FindActiveCampaignMenu()
+        {
+            CampaignMenu[] campaignMenus = Resources.FindObjectsOfTypeAll<CampaignMenu>();
+            for (int i = 0; i < campaignMenus.Length; i++)
+            {
+                CampaignMenu campaignMenu = campaignMenus[i];
+                if (!IsLiveSceneCampaignMenu(campaignMenu))
+                {
+                    continue;
+                }
+
+                CampaignMenuAdapter adapter = new CampaignMenuAdapter(campaignMenu);
+                if (adapter.IsPresent())
+                {
+                    return adapter;
+                }
+            }
+
+            return null;
+        }
+
+        private static bool IsLiveSceneCampaignMenu(CampaignMenu campaignMenu)
+        {
+            if (campaignMenu == null)
+            {
+                return false;
+            }
+
+            GameObject gameObject = campaignMenu.gameObject;
+            return gameObject != null && gameObject.scene.IsValid() && gameObject.scene.isLoaded;
         }
     }
 }

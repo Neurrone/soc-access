@@ -1,11 +1,13 @@
 using System;
 using System.Collections.Generic;
+using SongsOfConquest.Client.Adventure;
 using SongsOfConquest.Client.Gamestate.Facade;
 using SongsOfConquest.Common.Gamestate.Facade;
 using SongsOfConquestAccess.Adapters;
 using SongsOfConquestAccess.Input;
 using SongsOfConquestAccess.Speech;
 using SongsOfConquestAccess.UI;
+using UnityEngine;
 
 namespace SongsOfConquestAccess.Screens
 {
@@ -20,6 +22,21 @@ namespace SongsOfConquestAccess.Screens
             : base(BuildRoot(adapter))
         {
             _adapter = adapter;
+        }
+
+        public static Screen TryBuildActiveScreen()
+        {
+            TownInteractionMenu[] menus = Resources.FindObjectsOfTypeAll<TownInteractionMenu>();
+            for (int i = 0; i < menus.Length; i++)
+            {
+                TownInteractionMenuAdapter adapter = new TownInteractionMenuAdapter(menus[i]);
+                if (adapter.IsTopLevelPresent())
+                {
+                    return new SettlementScreen(adapter);
+                }
+            }
+
+            return null;
         }
 
         public override bool IsPresent()

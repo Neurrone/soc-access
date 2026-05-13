@@ -1,6 +1,8 @@
 using System.Collections.Generic;
+using SongsOfConquest.Client.Adventure;
 using SongsOfConquestAccess.Adapters;
 using SongsOfConquestAccess.UI;
+using UnityEngine;
 
 namespace SongsOfConquestAccess.Screens
 {
@@ -12,6 +14,21 @@ namespace SongsOfConquestAccess.Screens
             : base(BuildRoot(adapter))
         {
             _adapter = adapter;
+        }
+
+        public static Screen TryBuildActiveScreen()
+        {
+            KingdomEntityOverviewMenu[] menus = Resources.FindObjectsOfTypeAll<KingdomEntityOverviewMenu>();
+            for (int i = 0; i < menus.Length; i++)
+            {
+                KingdomEntityOverviewAdapter adapter = new KingdomEntityOverviewAdapter(menus[i]);
+                if (adapter.IsPresent())
+                {
+                    return new OwnedEntitiesScreen(adapter);
+                }
+            }
+
+            return null;
         }
 
         public override bool IsPresent()

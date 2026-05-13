@@ -1,6 +1,8 @@
+using SongsOfConquest.Client.Menu.Main;
 using SongsOfConquestAccess.Input;
 using SongsOfConquestAccess.Adapters;
 using SongsOfConquestAccess.UI;
+using UnityEngine;
 
 namespace SongsOfConquestAccess.Screens
 {
@@ -28,6 +30,33 @@ namespace SongsOfConquestAccess.Screens
             _adapter = adapter;
         }
 
+        public static Screen TryBuildActiveScreen()
+        {
+            MainMenuAdapter adapter = FindActiveMainMenu();
+            return adapter != null ? new MainMenuScreen(adapter) : null;
+        }
+
+        internal static MainMenuAdapter FindActiveMainMenu()
+        {
+            MainMenu[] mainMenus = Resources.FindObjectsOfTypeAll<MainMenu>();
+            for (int i = 0; i < mainMenus.Length; i++)
+            {
+                MainMenu mainMenu = mainMenus[i];
+                if (!IsLiveSceneMainMenu(mainMenu))
+                {
+                    continue;
+                }
+
+                MainMenuAdapter adapter = new MainMenuAdapter(mainMenu);
+                if (adapter.IsPresent())
+                {
+                    return adapter;
+                }
+            }
+
+            return null;
+        }
+
         public override bool IsPresent()
         {
             return _adapter != null && _adapter.IsPresent();
@@ -47,6 +76,17 @@ namespace SongsOfConquestAccess.Screens
             root.AddChild(menu);
             AddOptionalButton(root, "options", adapter.OptionsButton);
             return root;
+        }
+
+        private static bool IsLiveSceneMainMenu(MainMenu mainMenu)
+        {
+            if (mainMenu == null)
+            {
+                return false;
+            }
+
+            GameObject gameObject = mainMenu.gameObject;
+            return gameObject != null && gameObject.scene.IsValid() && gameObject.scene.isLoaded;
         }
 
         private static void AddItems(MenuWidget root, System.Collections.Generic.IReadOnlyList<IMenuButtonAdapter> items)

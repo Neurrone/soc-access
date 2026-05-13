@@ -1,14 +1,20 @@
 using System;
+using HarmonyLib;
+using SongsOfConquest.Client.Adventure;
 using SongsOfConquest.Client.Gamestate.Facade;
 using SongsOfConquest.Common.Gamestate.Facade;
 using SongsOfConquestAccess.Adapters;
 using SongsOfConquestAccess.UI;
+using UnityEngine;
+using Zenject;
 
 namespace SongsOfConquestAccess.Screens
 {
     internal sealed class HostileJoinMenuScreen : Screen
     {
         private const int ArmyExchangeGridIndex = 2;
+        private static readonly System.Reflection.PropertyInfo InstallerContainerProperty =
+            AccessTools.Property(typeof(HostileJoinMenuInstaller), "Container");
 
         private readonly HostileJoinMenuAdapter _adapter;
         private Action<OnTroopsUpdatedPayload> _troopsUpdatedHandler;
@@ -17,6 +23,29 @@ namespace SongsOfConquestAccess.Screens
             : base(BuildRoot(adapter))
         {
             _adapter = adapter;
+        }
+
+        public static Screen TryBuildActiveScreen()
+        {
+            HostileJoinMenuInstaller[] installers = Resources.FindObjectsOfTypeAll<HostileJoinMenuInstaller>();
+            for (int i = 0; i < installers.Length; i++)
+            {
+                HostileJoinMenu menu = TryResolveHostileJoinMenu(installers[i]);
+                if (menu == null)
+                {
+                    continue;
+                }
+
+                HostileJoinMenuAdapter adapter = new HostileJoinMenuAdapter(menu);
+                if (adapter.IsPresent())
+                {
+                    return new HostileJoinMenuScreen(adapter);
+                }
+
+                adapter.Dispose();
+            }
+
+            return null;
         }
 
         public override bool IsPresent()
@@ -204,6 +233,40 @@ namespace SongsOfConquestAccess.Screens
         private static TroopHudAdapter.DropResult DropArmySlot(TroopHudAdapter.SlotItem source, TroopHudAdapter.SlotItem target)
         {
             return source != null ? source.DropTo(target) : TroopHudAdapter.DropResult.None;
+        }
+
+        private static HostileJoinMenu TryResolveHostileJoinMenu(HostileJoinMenuInstaller installer)
+        {
+            if (!IsLiveSceneInstaller(installer) || InstallerContainerProperty == null)
+            {
+                return null;
+            }
+
+            DiContainer container = InstallerContainerProperty.GetValue(installer, null) as DiContainer;
+            if (container == null)
+            {
+                return null;
+            }
+
+            try
+            {
+                return container.Resolve<HostileJoinMenu>();
+            }
+            catch (Exception)
+            {
+                return null;
+            }
+        }
+
+        private static bool IsLiveSceneInstaller(HostileJoinMenuInstaller installer)
+        {
+            if (installer == null)
+            {
+                return false;
+            }
+
+            GameObject gameObject = installer.gameObject;
+            return gameObject != null && gameObject.scene.IsValid() && gameObject.scene.isLoaded;
         }
 
         private sealed class GridFocus
