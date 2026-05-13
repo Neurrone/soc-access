@@ -75,8 +75,33 @@ namespace SongsOfConquestAccess.Screens
                 new SystemPopupRuntimeScreenProbe(),
                 new QuitToDesktopPopupRuntimeScreenProbe(),
                 new CodexRuntimeScreenProbe(),
-                new TutorialRuntimeScreenProbe()
+                new TutorialRuntimeScreenProbe(),
+                new LoadingCompleteRuntimeScreenProbe()
             };
+        }
+
+        public void OnLoadingScreenReady(LoadingScreenMenu menu)
+        {
+            LoadingScreenAdapter adapter = new LoadingScreenAdapter(menu);
+            if (!adapter.IsPresent())
+            {
+                return;
+            }
+
+            if (_screenManager.CurrentScreen is LoadingCompleteScreen)
+            {
+                return;
+            }
+
+            Push(new LoadingCompleteScreen(adapter), "loading screen complete");
+        }
+
+        public void OnLoadingScreenClosed(LoadingScreenMenu menu)
+        {
+            if (_screenManager.CurrentScreen is LoadingCompleteScreen)
+            {
+                _screenManager.Pop<LoadingCompleteScreen>("loading screen closed");
+            }
         }
 
         public void OnStorySequenceTrigger(OnTriggerPayload payload, IClientAdventureFacade facade)
