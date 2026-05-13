@@ -130,11 +130,13 @@ namespace SongsOfConquestAccess.Input
                 // presses do not cut off the current announcement.
                 SpeechPipeline.Silence();
                 _screenManager.HandleGlobalAction(match.Action);
+
+                ActiveBindingState bindingState = new ActiveBindingState(match.Action, match.Binding);
+                _activeBindings[match.Binding.Id] = bindingState;
+                return true;
             }
 
-            ActiveBindingState bindingState = new ActiveBindingState(match.Action, match.Binding);
-            _activeBindings[match.Binding.Id] = bindingState;
-            return true;
+            return false;
         }
 
         private ActiveBindingState FindActiveBindingForKey(Key key)
