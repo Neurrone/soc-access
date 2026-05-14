@@ -166,8 +166,19 @@ namespace SongsOfConquestAccess.Adapters
 
         public void AddTextWithDivider(string symbol, string text)
         {
-            Add(symbol);
-            Add(text);
+            string left = symbol ?? string.Empty;
+            string right = text ?? string.Empty;
+            // Research stack tooltips use this for tier headings, passing
+            // "TIER" and "1" separately. Speech should expose that visual row
+            // as one review line, e.g. "TIER 1", not two unrelated lines.
+            if (!string.IsNullOrWhiteSpace(left) && !string.IsNullOrWhiteSpace(right))
+            {
+                Add(left.Trim() + " " + right.Trim());
+                return;
+            }
+
+            Add(left);
+            Add(right);
         }
 
         public (IUITextMesh headerText, IUITextMesh descriptionText) AddTextWithHeader(string header, string details)
