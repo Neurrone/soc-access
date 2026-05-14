@@ -41,6 +41,10 @@ namespace SongsOfConquestAccess.Screens
         {
         }
 
+        public virtual void Update()
+        {
+        }
+
         public virtual bool HasClaimed(string actionKey)
         {
             return RootWidget.HasClaimInTree(actionKey);

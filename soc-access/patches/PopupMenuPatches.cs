@@ -1,5 +1,7 @@
 using HarmonyLib;
 using SongsOfConquest.Client.Menu.Popup;
+using SongsOfConquest.Client.UI;
+using SongsOfConquest.Common;
 using SongsOfConquestAccess.Adapters;
 
 namespace SongsOfConquestAccess
@@ -10,17 +12,57 @@ namespace SongsOfConquestAccess
         private static readonly AccessTools.FieldRef<PopupMenu, PopupMenu.Settings> SettingsRef =
             AccessTools.FieldRefAccess<PopupMenu, PopupMenu.Settings>("_settings");
 
-        [HarmonyPatch(typeof(PopupMenu), "OnOpened")]
-        [HarmonyPostfix]
-        private static void PopupMenuOnOpenedPostfix(PopupMenu __instance)
+        [HarmonyPatch(typeof(PopupMenu), "ShowMessage", new[]
         {
-            PopupMenu.Settings settings = null;
-            if (__instance != null)
-            {
-                settings = SettingsRef(__instance);
-            }
+            typeof(string),
+            typeof(string),
+            typeof(string),
+            typeof(int),
+            typeof(int),
+            typeof(string),
+            typeof(string)
+        })]
+        [HarmonyPostfix]
+        private static void PopupMenuShowMessagePostfix(PopupMenu __instance)
+        {
+            NotifyReady(__instance);
+        }
 
-            SocAccessPlugin.Instance?.ScreenDetector?.OnPopupMenuReady(__instance, settings);
+        [HarmonyPatch(typeof(PopupMenu), "AskQuestion", new[]
+        {
+            typeof(string),
+            typeof(string),
+            typeof(string),
+            typeof(string),
+            typeof(int),
+            typeof(int),
+            typeof(string),
+            typeof(string),
+            typeof(TroopReference[])
+        })]
+        [HarmonyPostfix]
+        private static void PopupMenuAskQuestionPostfix(PopupMenu __instance)
+        {
+            NotifyReady(__instance);
+        }
+
+        [HarmonyPatch(typeof(PopupMenu), "AskForInput", new[]
+        {
+            typeof(string),
+            typeof(string),
+            typeof(string),
+            typeof(string),
+            typeof(string),
+            typeof(InputFieldContentType),
+            typeof(int),
+            typeof(int),
+            typeof(string),
+            typeof(string)
+        })]
+        [HarmonyPostfix]
+        private static void PopupMenuAskForInputPostfix(PopupMenu __instance)
+        {
+            NotifyReady(__instance);
         }
 
         [HarmonyPatch(typeof(PopupMenu), "OnClosed")]
@@ -28,6 +70,17 @@ namespace SongsOfConquestAccess
         private static void PopupMenuOnClosedPostfix(PopupMenu __instance)
         {
             SocAccessPlugin.Instance?.ScreenDetector?.OnPopupMenuClosed(__instance);
+        }
+
+        private static void NotifyReady(PopupMenu popup)
+        {
+            PopupMenu.Settings settings = null;
+            if (popup != null)
+            {
+                settings = SettingsRef(popup);
+            }
+
+            SocAccessPlugin.Instance?.ScreenDetector?.OnPopupMenuReady(popup, settings);
         }
     }
 }

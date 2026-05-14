@@ -78,6 +78,7 @@ namespace SongsOfConquestAccess.Screens
                 StoryTextScreen.TryBuildActiveDialogueScreen,
                 OptionsScreen.TryBuildActiveScreen,
                 PauseMenuScreen.TryBuildActiveScreen,
+                SaveLoadGameScreen.TryBuildActiveScreen,
                 MessageDialogScreen.TryBuildActiveMapMessagePopupScreen,
                 MessageDialogScreen.TryBuildActivePopupMenuScreen,
                 MessageDialogScreen.TryBuildActiveConfirmPopupScreen,
@@ -199,6 +200,47 @@ namespace SongsOfConquestAccess.Screens
         public void OnPauseMenuClosed(PauseMenu pauseMenu)
         {
             _screenManager.Pop<PauseMenuScreen>("pause menu closed");
+        }
+
+        public void OnSaveLoadGameMenuReady(SaveLoadGameMenu menu)
+        {
+            SaveLoadGameMenuAdapter adapter = new SaveLoadGameMenuAdapter(menu);
+            if (!adapter.IsPresent())
+            {
+                return;
+            }
+
+            SaveLoadGameScreen current = _screenManager.CurrentScreen as SaveLoadGameScreen;
+            if (current != null && current.Matches(menu))
+            {
+                return;
+            }
+
+            Push(new SaveLoadGameScreen(adapter), "save/load game menu ready");
+        }
+
+        public void OnSaveLoadGameMenuChanged(SaveLoadGameMenu menu)
+        {
+            SaveLoadGameMenuAdapter adapter = new SaveLoadGameMenuAdapter(menu);
+            if (!adapter.IsPresent())
+            {
+                return;
+            }
+
+            SaveLoadGameScreen current = _screenManager.Get<SaveLoadGameScreen>();
+            if (current != null && current.Matches(menu))
+            {
+                current.Refresh();
+            }
+        }
+
+        public void OnSaveLoadGameMenuClosed(SaveLoadGameMenu menu)
+        {
+            SaveLoadGameScreen current = _screenManager.CurrentScreen as SaveLoadGameScreen;
+            if (current != null && current.Matches(menu))
+            {
+                _screenManager.Pop<SaveLoadGameScreen>("save/load game menu closed");
+            }
         }
 
         public void OnOwnedEntitiesReady(KingdomEntityOverviewMenu menu)

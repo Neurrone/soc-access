@@ -101,6 +101,7 @@ namespace SongsOfConquestAccess
         private void Update()
         {
             _inputRouter?.Update();
+            _screenManager?.Update();
             UIManager.Update();
         }
 

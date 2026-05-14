@@ -228,6 +228,11 @@ namespace SongsOfConquestAccess.Screens
             ApplyVisibleReviewBuffers();
         }
 
+        public void Update()
+        {
+            CurrentScreen?.Update();
+        }
+
         public bool DispatchAction(InputAction action)
         {
             if (action == null)
