@@ -34,7 +34,6 @@ namespace SongsOfConquestAccess.Screens
         private readonly CombatAdapter _adapter;
         private readonly CombatHexGrid _grid;
         private Action<TroopAbilityTargeting> _abilityTargetingBeginHandler;
-        private bool _suppressInitialAutoFocus = true;
 
         public CombatScreen(CombatAdapter adapter)
             : this(adapter, new CombatHexGrid(adapter))
@@ -85,19 +84,6 @@ namespace SongsOfConquestAccess.Screens
             _adapter?.AttachAbilityTargetingBegin(_abilityTargetingBeginHandler);
             _adapter?.AttachAbilityTargetingEnd(HandleAbilityTargetingEnd);
             _adapter?.AnnounceVisibleSpellTargetInstruction();
-        }
-
-        public override void OnFocus()
-        {
-            if (_suppressInitialAutoFocus)
-            {
-                // Prevent an extra readout of the combat grid's initial focused tile.
-                // Focus is already set when it is the player's turn.
-                _suppressInitialAutoFocus = false;
-                return;
-            }
-
-            base.OnFocus();
         }
 
         public void MoveCursorToLocalActingTroop(int troopId)
