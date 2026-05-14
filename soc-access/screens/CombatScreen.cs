@@ -435,7 +435,7 @@ namespace SongsOfConquestAccess.Screens
                 return string.Empty;
             }
 
-            return item.SpellName + ", tier " + item.SpellTier;
+            return item.SpellName + " tier " + item.SpellTier;
         }
 
         private static string BuildQueueItemLabel(BattleHudAdapter.QueueItem item)
