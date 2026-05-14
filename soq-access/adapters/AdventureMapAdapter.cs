@@ -428,18 +428,18 @@ namespace SongsOfConquestAccess.Adapters
         public ScannerSnapshot BuildScannerSnapshot(Vector2Int origin)
         {
             ScannerSnapshot snapshot = new ScannerSnapshot();
+            InitializeAdventureScannerCategories(snapshot);
             Dictionary<Vector2Int, AdventureMapTile> tileCache = new Dictionary<Vector2Int, AdventureMapTile>();
             int localTeamId = GetLocalTeamId();
-            AddWielderScannerResults(snapshot, tileCache);
-            AddStructuralScannerResults(snapshot, localTeamId, tileCache, MapEntityCategory.Town, MapEntityCategory.Settlement);
-            AddStructuralScannerResults(snapshot, localTeamId, tileCache, MapEntityCategory.Building);
-            AddStructuralScannerResults(snapshot, localTeamId, tileCache, MapEntityCategory.BuildSite);
-            AddTroopSourceScannerResults(snapshot, localTeamId, tileCache);
             AddPickupScannerResults(snapshot, tileCache);
-            AddArtifactMarketScannerResults(snapshot, tileCache);
+            AddWielderScannerResults(snapshot, tileCache);
+            AddStructuralScannerResults(snapshot, localTeamId, tileCache, MapEntityCategory.Town, MapEntityCategory.Settlement, MapEntityCategory.BuildSite);
+            AddTroopSourceScannerResults(snapshot, localTeamId, tileCache);
+            AddStructuralScannerResults(snapshot, localTeamId, tileCache, MapEntityCategory.Building);
             AddObjectiveScannerResults(snapshot, tileCache);
-            AddTeleportScannerResults(snapshot, tileCache);
             AddObstacleScannerResults(snapshot, localTeamId, origin, tileCache);
+            AddArtifactMarketScannerResults(snapshot, tileCache);
+            AddTeleportScannerResults(snapshot, tileCache);
             AddAdventureTerrainScannerResults(snapshot, origin, tileCache);
             snapshot.SortByDistance(origin);
             return snapshot;
@@ -531,9 +531,45 @@ namespace SongsOfConquestAccess.Adapters
 
                 AddStructuralMapEntityResult(snapshot, entity, relationship, result);
                 AddTroopSourceResult(snapshot, entity, relationship, result);
-                AddPickupResult(snapshot, entity, result);
+                if (IsScannerPickupEntity(entity))
+                {
+                    AddPickupResult(snapshot, entity, result);
+                }
+
                 AddSpecialMapEntityResult(snapshot, entity, result);
             }
+        }
+
+        private static void InitializeAdventureScannerCategories(ScannerSnapshot snapshot)
+        {
+            ScannerCategory pickups = snapshot.GetOrAddCategory("Pickups");
+            pickups.GetOrAddSubcategory("Unvisited");
+            pickups.GetOrAddSubcategory("All");
+            pickups.GetOrAddSubcategory("Knowledge");
+            pickups.GetOrAddSubcategory("Power");
+            pickups.GetOrAddSubcategory("Riches");
+
+            snapshot.GetOrAddCategory("Wielders").GetOrAddSubcategory("All");
+            AddRelationshipSubcategories(snapshot.GetOrAddCategory("Settlements and Build sites"));
+            AddRelationshipSubcategories(snapshot.GetOrAddCategory("Troop sources"));
+            AddRelationshipSubcategories(snapshot.GetOrAddCategory("Buildings"));
+            snapshot.GetOrAddCategory("Objectives").GetOrAddSubcategory("All");
+            snapshot.GetOrAddCategory("Obstacles").GetOrAddSubcategory("All");
+            snapshot.GetOrAddCategory("Artifact markets").GetOrAddSubcategory("All");
+            snapshot.GetOrAddCategory("Teleport").GetOrAddSubcategory("All");
+
+            ScannerCategory terrain = snapshot.GetOrAddCategory("Terrain");
+            terrain.GetOrAddSubcategory("Roads");
+            terrain.GetOrAddSubcategory("Bridges");
+            terrain.GetOrAddSubcategory("Water");
+            terrain.GetOrAddSubcategory("Impassable");
+        }
+
+        private static void AddRelationshipSubcategories(ScannerCategory category)
+        {
+            category.GetOrAddSubcategory("Neutral");
+            category.GetOrAddSubcategory("Friendly");
+            category.GetOrAddSubcategory("Enemy");
         }
 
         private void AddStructuralScannerResults(ScannerSnapshot snapshot, int localTeamId, Dictionary<Vector2Int, AdventureMapTile> tileCache, params MapEntityCategory[] categories)
@@ -577,12 +613,13 @@ namespace SongsOfConquestAccess.Adapters
 
         private void AddPickupScannerResults(ScannerSnapshot snapshot, Dictionary<Vector2Int, AdventureMapTile> tileCache)
         {
-            ScannerCategory pickups = snapshot.GetOrAddCategory("Pickups");
-            pickups.GetOrAddSubcategory("All");
-            pickups.GetOrAddSubcategory("Unvisited");
-
             ForEachScannerEntity(tileCache, entity =>
             {
+                if (!IsScannerPickupEntity(entity))
+                {
+                    return;
+                }
+
                 AdventureMapTile tile = GetScannerTile(tileCache, entity.Position);
                 ScannerResult result = CreateMapEntityScannerResult(entity, tile);
                 if (result != null)
@@ -910,13 +947,11 @@ namespace SongsOfConquestAccess.Adapters
             {
                 case MapEntityCategory.Town:
                 case MapEntityCategory.Settlement:
-                    snapshot.Add("Settlements", relationship, CloneResult(result));
+                case MapEntityCategory.BuildSite:
+                    snapshot.Add("Settlements and Build sites", relationship, CloneResult(result));
                     break;
                 case MapEntityCategory.Building:
                     snapshot.Add("Buildings", relationship, CloneResult(result));
-                    break;
-                case MapEntityCategory.BuildSite:
-                    snapshot.Add("Build sites", relationship, CloneResult(result));
                     break;
             }
         }
@@ -958,6 +993,20 @@ namespace SongsOfConquestAccess.Adapters
             }
 
             snapshot.Add("Pickups", subcategory, CloneResult(result));
+        }
+
+        private static bool IsScannerPickupEntity(IMapEntity entity)
+        {
+            if (entity == null)
+            {
+                return false;
+            }
+
+            return entity.Category == MapEntityCategory.Pickup
+                || entity.Category == MapEntityCategory.Artifact
+                || entity.Category == MapEntityCategory.Experience
+                || entity.Category == MapEntityCategory.Spell
+                || entity.Category == MapEntityCategory.Effect;
         }
 
         private bool IsUnvisited(IMapEntity entity)

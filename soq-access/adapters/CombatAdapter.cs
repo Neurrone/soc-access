@@ -520,7 +520,10 @@ namespace SongsOfConquestAccess.Adapters
                         if (tile.Elevation == elevation)
                         {
                             snapshot.Add("Terrain", "Elevated ground " + elevation,
-                                new ScannerResult("elevated ground, height " + elevation, point));
+                                new ScannerResult("elevated ground, height " + elevation, point)
+                                {
+                                    Kind = ScannerResultKind.TerrainPoint
+                                });
                         }
                     }
                 }
@@ -540,7 +543,10 @@ namespace SongsOfConquestAccess.Adapters
                     if (!tile.IsWalkable)
                     {
                         snapshot.Add("Terrain", "Impassable terrain",
-                            new ScannerResult("impassable", point));
+                            new ScannerResult("impassable", point)
+                            {
+                                Kind = ScannerResultKind.TerrainPoint
+                            });
                     }
                 }
             }

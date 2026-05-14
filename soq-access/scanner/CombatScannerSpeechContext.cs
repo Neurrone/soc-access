@@ -38,7 +38,7 @@ namespace SongsOfConquestAccess.Scanner
             {
                 ScannerSpeechUtility.AddIfPresent(parts, _result.Label);
             }
-            else
+            else if (_result == null || _result.Kind != ScannerResultKind.TerrainPoint)
             {
                 ScannerSpeechUtility.AddIfPresent(parts, formatter.DescribePrimaryContent(_tile));
                 ScannerSpeechUtility.AddIfPresent(parts, formatter.DescribeTileContext(_tile));

@@ -6,6 +6,7 @@ namespace SongsOfConquestAccess.Scanner
     internal enum ScannerResultKind
     {
         Point,
+        TerrainPoint,
         TerrainGroup,
         CommanderZoneOfControl
     }
