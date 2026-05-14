@@ -65,21 +65,18 @@ namespace SongsOfConquestAccess.UI
             AddIfNotEmpty(parts, GetLabel());
             AddIfNotEmpty(parts, GetRole());
             AddIfNotEmpty(parts, GetStatus());
-            string focusText = string.Join(" ", parts.ToArray());
-            Tooltip tooltip = GetTooltip();
-            IReadOnlyList<string> tooltipLines = GetTooltipSpeechLines(tooltip);
-            if (tooltipLines.Count > 0)
-            {
-                return TerminateSentence(focusText) + "\nTooltip: " + BuildTooltipSpeechText(tooltipLines, tooltip).Trim();
-            }
-
-            return AppendAvailableActions(TerminateSentence(focusText), tooltip);
+            return TerminateSentence(string.Join(" ", parts.ToArray()));
         }
 
         public IReadOnlyList<string> GetTooltipTextLines()
         {
             Tooltip tooltip = GetTooltip();
             return tooltip != null && tooltip.TextLines != null ? tooltip.TextLines : EmptyTooltipLines;
+        }
+
+        public string GetTooltipActionsText()
+        {
+            return BuildAvailableActionsText(GetTooltip());
         }
 
         public virtual bool ClaimsAction(string actionKey)
@@ -162,48 +159,6 @@ namespace SongsOfConquestAccess.UI
             return last == '.' || last == '!' || last == '?' || last == ':' || last == ';'
                 ? value
                 : value + ".";
-        }
-
-        protected static IReadOnlyList<string> GetTooltipSpeechLines(Tooltip tooltip)
-        {
-            if (tooltip == null || tooltip.TextLines == null)
-            {
-                return EmptyTooltipLines;
-            }
-
-            List<string> lines = new List<string>();
-            for (int i = 0; i < tooltip.TextLines.Count; i++)
-            {
-                string line = SpeechTextSanitizer.Normalize(tooltip.TextLines[i]);
-                if (!string.IsNullOrWhiteSpace(line))
-                {
-                    lines.Add(line);
-                }
-            }
-
-            return lines.Count == 0 ? EmptyTooltipLines : lines;
-        }
-
-        protected static string BuildTooltipSpeechText(IReadOnlyList<string> tooltipLines, Tooltip tooltip)
-        {
-            string tooltipText = tooltipLines != null ? string.Join("\n", tooltipLines).Trim() : string.Empty;
-            return AppendAvailableActions(tooltipText, tooltip);
-        }
-
-        private static string AppendAvailableActions(string text, Tooltip tooltip)
-        {
-            string actionsText = BuildAvailableActionsText(tooltip);
-            if (string.IsNullOrWhiteSpace(actionsText))
-            {
-                return text;
-            }
-
-            if (string.IsNullOrWhiteSpace(text))
-            {
-                return actionsText;
-            }
-
-            return text.TrimEnd() + "\n" + actionsText;
         }
 
         private static string BuildAvailableActionsText(Tooltip tooltip)

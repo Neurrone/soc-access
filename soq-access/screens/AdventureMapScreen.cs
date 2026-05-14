@@ -10,6 +10,7 @@ using SongsOfConquest.Client.Gamestate;
 using SongsOfConquest.Client.Grid;
 using SongsOfConquest.Client.InputManagement;
 using SongsOfConquestAccess.Adapters;
+using SongsOfConquestAccess.Buffers;
 using SongsOfConquestAccess.Events;
 using SongsOfConquestAccess.UI;
 using SongsOfConquest.Common.Economy;
@@ -56,6 +57,19 @@ namespace SongsOfConquestAccess.Screens
         public override bool IsPresent()
         {
             return _adapter != null && _adapter.IsPresent();
+        }
+
+        public override System.Collections.Generic.IEnumerable<ReviewBufferKind> VisibleReviewBuffers
+        {
+            get
+            {
+                foreach (ReviewBufferKind kind in base.VisibleReviewBuffers)
+                {
+                    yield return kind;
+                }
+
+                yield return ReviewBufferKind.AdventureMapNotifications;
+            }
         }
 
         public override void OnPush()

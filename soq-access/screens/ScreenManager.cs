@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using SongsOfConquestAccess.Adapters;
+using SongsOfConquestAccess.Buffers;
 using SongsOfConquestAccess.Input;
 using SongsOfConquestAccess.UI;
 
@@ -8,6 +9,15 @@ namespace SongsOfConquestAccess.Screens
     internal sealed class ScreenManager
     {
         private readonly List<Screen> _stack = new List<Screen>();
+        private readonly ReviewBufferManager _reviewBuffers;
+        private readonly ReviewBufferController _reviewBufferController;
+
+        public ScreenManager(ReviewBufferManager reviewBuffers, ReviewBufferController reviewBufferController)
+        {
+            _reviewBuffers = reviewBuffers;
+            _reviewBufferController = reviewBufferController;
+            ApplyVisibleReviewBuffers();
+        }
 
         public Screen CurrentScreen
         {
@@ -43,6 +53,7 @@ namespace SongsOfConquestAccess.Screens
             UIManager.Reset();
             _stack.Add(screen);
             screen.OnPush();
+            ApplyVisibleReviewBuffers();
             screen.OnFocus();
         }
 
@@ -83,6 +94,7 @@ namespace SongsOfConquestAccess.Screens
             UIManager.Reset();
             _stack[_stack.Count - 1] = replacement;
             replacement.OnPush();
+            ApplyVisibleReviewBuffers();
             replacement.OnFocus();
             return true;
         }
@@ -102,6 +114,7 @@ namespace SongsOfConquestAccess.Screens
 
             _stack.Insert(_stack.Count - 1, screen);
             screen.OnPush();
+            ApplyVisibleReviewBuffers();
         }
 
         public bool Pop<TScreen>(string reason) where TScreen : Screen
@@ -135,6 +148,7 @@ namespace SongsOfConquestAccess.Screens
             UIManager.Reset();
             _stack.RemoveAt(lastIndex);
             removed.OnPop();
+            ApplyVisibleReviewBuffers();
             CurrentScreen?.OnFocus();
             return true;
         }
@@ -158,6 +172,7 @@ namespace SongsOfConquestAccess.Screens
 
                 _stack.RemoveAt(i);
                 removed.OnPop();
+                ApplyVisibleReviewBuffers();
 
                 if (wasTop)
                 {
@@ -204,6 +219,7 @@ namespace SongsOfConquestAccess.Screens
             }
 
             _stack.Clear();
+            ApplyVisibleReviewBuffers();
         }
 
         public bool DispatchAction(InputAction action)
@@ -253,6 +269,45 @@ namespace SongsOfConquestAccess.Screens
                 return true;
             }
 
+            if (_reviewBufferController != null)
+            {
+                if (action.Key == AccessibilityActions.PreviousBuffer.Key)
+                {
+                    _reviewBufferController.PreviousBuffer();
+                    return true;
+                }
+
+                if (action.Key == AccessibilityActions.NextBuffer.Key)
+                {
+                    _reviewBufferController.NextBuffer();
+                    return true;
+                }
+
+                if (action.Key == AccessibilityActions.PreviousBufferLine.Key)
+                {
+                    _reviewBufferController.PreviousBufferLine();
+                    return true;
+                }
+
+                if (action.Key == AccessibilityActions.NextBufferLine.Key)
+                {
+                    _reviewBufferController.NextBufferLine();
+                    return true;
+                }
+
+                if (action.Key == AccessibilityActions.FirstBufferLine.Key)
+                {
+                    _reviewBufferController.FirstBufferLine();
+                    return true;
+                }
+
+                if (action.Key == AccessibilityActions.LastBufferLine.Key)
+                {
+                    _reviewBufferController.LastBufferLine();
+                    return true;
+                }
+            }
+
             return false;
         }
 
@@ -276,7 +331,32 @@ namespace SongsOfConquestAccess.Screens
                     && tooltip.Actions.Count > 0;
             }
 
+            if (IsReviewBufferAction(action))
+            {
+                return _reviewBufferController != null;
+            }
+
             return false;
+        }
+
+        public HashSet<ReviewBufferKind> GetVisibleReviewBuffers()
+        {
+            HashSet<ReviewBufferKind> result = new HashSet<ReviewBufferKind>();
+            for (int i = 0; i < _stack.Count; i++)
+            {
+                Screen screen = _stack[i];
+                if (screen == null || screen.VisibleReviewBuffers == null)
+                {
+                    continue;
+                }
+
+                foreach (ReviewBufferKind kind in screen.VisibleReviewBuffers)
+                {
+                    result.Add(kind);
+                }
+            }
+
+            return result;
         }
 
         public bool CurrentScreenClaimsAction(InputAction action)
@@ -295,6 +375,29 @@ namespace SongsOfConquestAccess.Screens
         private static string DescribeScreen(Screen screen)
         {
             return screen != null ? screen.GetType().Name : "<null>";
+        }
+
+        private void ApplyVisibleReviewBuffers()
+        {
+            if (_reviewBuffers != null)
+            {
+                _reviewBuffers.SetVisibleBuffers(GetVisibleReviewBuffers());
+            }
+        }
+
+        private static bool IsReviewBufferAction(InputAction action)
+        {
+            if (action == null)
+            {
+                return false;
+            }
+
+            return action.Key == AccessibilityActions.PreviousBuffer.Key
+                || action.Key == AccessibilityActions.NextBuffer.Key
+                || action.Key == AccessibilityActions.PreviousBufferLine.Key
+                || action.Key == AccessibilityActions.NextBufferLine.Key
+                || action.Key == AccessibilityActions.FirstBufferLine.Key
+                || action.Key == AccessibilityActions.LastBufferLine.Key;
         }
     }
 }

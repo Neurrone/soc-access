@@ -13,9 +13,33 @@ namespace SongsOfConquestAccess.Input
         public static readonly InputAction TooltipActionsMenu = OneShot("tooltip_actions_menu", "Tooltip Actions Menu", InputClaimScope.Screen)
             .AddBinding(new KeyboardBinding(Key.F10, shift: true));
 
+        public static readonly InputAction PreviousBuffer = OneShot("previous_buffer", "Previous Buffer", InputClaimScope.Screen)
+            .AddBinding(new KeyboardBinding(Key.LeftArrow, ctrl: true));
+
+        public static readonly InputAction NextBuffer = OneShot("next_buffer", "Next Buffer", InputClaimScope.Screen)
+            .AddBinding(new KeyboardBinding(Key.RightArrow, ctrl: true));
+
+        public static readonly InputAction PreviousBufferLine = OneShot("previous_buffer_line", "Previous Buffer Line", InputClaimScope.Screen)
+            .AddBinding(new KeyboardBinding(Key.UpArrow, ctrl: true));
+
+        public static readonly InputAction NextBufferLine = OneShot("next_buffer_line", "Next Buffer Line", InputClaimScope.Screen)
+            .AddBinding(new KeyboardBinding(Key.DownArrow, ctrl: true));
+
+        public static readonly InputAction FirstBufferLine = OneShot("first_buffer_line", "First Buffer Line", InputClaimScope.Screen)
+            .AddBinding(new KeyboardBinding(Key.Home, ctrl: true));
+
+        public static readonly InputAction LastBufferLine = OneShot("last_buffer_line", "Last Buffer Line", InputClaimScope.Screen)
+            .AddBinding(new KeyboardBinding(Key.End, ctrl: true));
+
         public static readonly InputAction[] GLOBAL_ACTIONS =
         {
-            TooltipActionsMenu
+            TooltipActionsMenu,
+            PreviousBuffer,
+            NextBuffer,
+            PreviousBufferLine,
+            NextBufferLine,
+            FirstBufferLine,
+            LastBufferLine
         };
 
         public static bool IsGlobalAction(InputAction action)

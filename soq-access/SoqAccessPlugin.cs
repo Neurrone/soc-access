@@ -1,5 +1,6 @@
 using BepInEx;
 using HarmonyLib;
+using SongsOfConquestAccess.Buffers;
 using SongsOfConquestAccess.Events;
 using SongsOfConquestAccess.Input;
 using SongsOfConquestAccess.Screens;
@@ -21,6 +22,9 @@ namespace SongsOfConquestAccess
         private Harmony _harmony;
         private SpeechService _speechService;
         private SpeechEventAnnouncer _speechEventAnnouncer;
+        private BufferEventRecorder _bufferEventRecorder;
+        private ReviewBufferManager _reviewBufferManager;
+        private ReviewBufferController _reviewBufferController;
         private ScreenManager _screenManager;
         private ScreenDetector _screenDetector;
         private AccessibilityInputRouter _inputRouter;
@@ -34,9 +38,13 @@ namespace SongsOfConquestAccess
             bool speechInitialized = _speechService.Initialize();
             Logger.LogInfo("Speech initialization result: " + speechInitialized);
             SpeechPipeline.Initialize(_speechService);
+            _reviewBufferManager = new ReviewBufferManager();
+            _reviewBufferController = new ReviewBufferController(_reviewBufferManager);
             _speechEventAnnouncer = new SpeechEventAnnouncer();
             _speechEventAnnouncer.Attach();
-            _screenManager = new ScreenManager();
+            _bufferEventRecorder = new BufferEventRecorder(_reviewBufferManager);
+            _bufferEventRecorder.Attach();
+            _screenManager = new ScreenManager(_reviewBufferManager, _reviewBufferController);
             _screenDetector = new ScreenDetector(_screenManager);
             _inputRouter = new AccessibilityInputRouter(_screenManager);
             _harmony = new Harmony(PluginGuid);
@@ -74,9 +82,13 @@ namespace SongsOfConquestAccess
             CombatPatches.Reset();
             TooltipPatches.Reset();
             UIManager.Reset();
+            _bufferEventRecorder?.Detach();
+            _bufferEventRecorder = null;
             _speechEventAnnouncer?.Detach();
             _speechEventAnnouncer = null;
             AccessibilityEventBus.Reset();
+            _reviewBufferController = null;
+            _reviewBufferManager = null;
             SpeechPipeline.Shutdown();
             _speechService?.Dispose();
             _speechService = null;
@@ -105,6 +117,11 @@ namespace SongsOfConquestAccess
         internal ScreenManager ScreenManager
         {
             get { return _screenManager; }
+        }
+
+        internal ReviewBufferManager ReviewBuffers
+        {
+            get { return _reviewBufferManager; }
         }
 
         internal void LogInfo(string message)

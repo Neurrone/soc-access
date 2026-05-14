@@ -1,3 +1,5 @@
+using System.Collections.Generic;
+using SongsOfConquestAccess.Buffers;
 using SongsOfConquestAccess.Input;
 using SongsOfConquestAccess.UI;
 
@@ -13,6 +15,14 @@ namespace SongsOfConquestAccess.Screens
         public ContainerWidget RootWidget { get; protected set; }
 
         public abstract bool IsPresent();
+
+        public virtual IEnumerable<ReviewBufferKind> VisibleReviewBuffers
+        {
+            get
+            {
+                yield return ReviewBufferKind.Ui;
+            }
+        }
 
         public virtual void OnPush()
         {

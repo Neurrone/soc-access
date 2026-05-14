@@ -13,6 +13,7 @@ using SongsOfConquest.Common.Gamestate;
 using SongsOfConquest.Common.Localization;
 using SongsOfConquest.Utilities;
 using SongsOfConquestAccess.Adapters;
+using SongsOfConquestAccess.Buffers;
 using SongsOfConquestAccess.Events;
 using SongsOfConquestAccess.Events.Combat;
 using SongsOfConquestAccess.Speech;
@@ -60,6 +61,19 @@ namespace SongsOfConquestAccess.Screens
         public CombatAdapter Adapter
         {
             get { return _adapter; }
+        }
+
+        public override System.Collections.Generic.IEnumerable<ReviewBufferKind> VisibleReviewBuffers
+        {
+            get
+            {
+                foreach (ReviewBufferKind kind in base.VisibleReviewBuffers)
+                {
+                    yield return kind;
+                }
+
+                yield return ReviewBufferKind.CombatEvents;
+            }
         }
 
         public override void OnPush()

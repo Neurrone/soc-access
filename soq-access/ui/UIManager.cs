@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using SongsOfConquestAccess.Adapters;
+using SongsOfConquestAccess.Buffers;
 using SongsOfConquestAccess.Speech;
 
 namespace SongsOfConquestAccess.UI
@@ -97,6 +98,7 @@ namespace SongsOfConquestAccess.UI
             {
                 _lastFocusedWidget = target;
                 _lastAnnouncement = announcement;
+                PopulateUiReviewBuffer(target);
                 ShowNativeTooltip(target);
                 return;
             }
@@ -112,8 +114,7 @@ namespace SongsOfConquestAccess.UI
             SoqAccessPlugin.Instance?.LogInfo("UIManager speaking focused widget: \"" + announcement + "\"");
             SpeechPipeline.Output(new SpeechRequest(announcement, interrupt: false));
 
-            // Future buffer hook: populate the UI review buffer here from the
-            // same label/status/tooltip lines used for the focus announcement.
+            PopulateUiReviewBuffer(target);
             ShowNativeTooltip(target);
         }
 
@@ -141,6 +142,50 @@ namespace SongsOfConquestAccess.UI
         {
             Tooltip tooltip = widget != null ? widget.GetTooltip() : null;
             NativeTooltipUtility.ShowVisualTooltip(tooltip != null ? tooltip.VisualMetadata : null);
+        }
+
+        private static void PopulateUiReviewBuffer(Widget widget)
+        {
+            ReviewBufferManager buffers = SoqAccessPlugin.Instance?.ReviewBuffers;
+            if (buffers == null)
+            {
+                return;
+            }
+
+            List<string> lines = new List<string>();
+            if (widget != null)
+            {
+                string label = SpeechTextSanitizer.Normalize(widget.GetLabel());
+                AddIfNotEmpty(lines, label);
+                AddIfNotEmpty(lines, widget.GetStatus());
+
+                IReadOnlyList<string> tooltipLines = widget.GetTooltipTextLines();
+                if (tooltipLines != null)
+                {
+                    for (int i = 0; i < tooltipLines.Count; i++)
+                    {
+                        string tooltipLine = SpeechTextSanitizer.Normalize(tooltipLines[i]);
+                        // Many native tooltips repeat the focused control name
+                        // as their first line. If the control label already says
+                        // "Order Magic", do not add a duplicate first tooltip
+                        // line before the useful description.
+                        if (i == 0
+                            && !string.IsNullOrWhiteSpace(label)
+                            && !string.IsNullOrWhiteSpace(tooltipLine)
+                            && label.IndexOf(tooltipLine, System.StringComparison.OrdinalIgnoreCase) >= 0)
+                        {
+                            continue;
+                        }
+
+                        AddIfNotEmpty(lines, tooltipLine);
+                    }
+                }
+
+                AddIfNotEmpty(lines, widget.GetTooltipActionsText());
+            }
+
+            buffers.ReplaceLines(ReviewBufferKind.Ui, lines);
+            buffers.SetCurrentBuffer(ReviewBufferKind.Ui);
         }
 
         private static Widget ResolveFocusedWidget(Widget widget)

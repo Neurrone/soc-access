@@ -17,6 +17,7 @@ using SongsOfConquest.Client.UI;
 using SongsOfConquest.Common.Entities.Adventure;
 using SongsOfConquest.Common.Gamestate.Facade;
 using SongsOfConquestAccess.Adapters;
+using SongsOfConquestAccess.Buffers;
 using SongsOfConquestAccess.Events;
 
 namespace SongsOfConquestAccess.Screens
@@ -604,6 +605,11 @@ namespace SongsOfConquestAccess.Screens
 
         public void OnMainMenuSceneLoaded(MainMenuSceneType loadedScene)
         {
+            if (loadedScene == MainMenuSceneType.MainMenu)
+            {
+                SoqAccessPlugin.Instance?.ReviewBuffers?.Clear(ReviewBufferKind.AdventureMapNotifications);
+            }
+
             if (loadedScene != MainMenuSceneType.Campaign && _screenManager.CurrentScreen is CampaignMenuScreen)
             {
                 _screenManager.Pop<CampaignMenuScreen>("main menu scene changed away from campaign");
@@ -669,6 +675,7 @@ namespace SongsOfConquestAccess.Screens
             }
 
             CombatEventNarrator.SetActiveAdapter(adapter);
+            SoqAccessPlugin.Instance?.ReviewBuffers?.Clear(ReviewBufferKind.CombatEvents);
             CombatScreen screen = new CombatScreen(adapter);
             if (IsTutorialTopScreen())
             {
