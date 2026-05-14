@@ -11,7 +11,7 @@ namespace SongsOfConquestAccess.Input
         // router checks screen-claimed actions first, then global actions, so
         // screens can own keys before global fallbacks see them.
         public static readonly InputAction TooltipActionsMenu = OneShot("tooltip_actions_menu", "Tooltip Actions Menu", InputClaimScope.Screen)
-            .AddBinding(new KeyboardBinding(Key.F10, shift: true));
+            .AddBinding(new KeyboardBinding(Key.Backquote));
 
         public static readonly InputAction PreviousBuffer = OneShot("previous_buffer", "Previous Buffer", InputClaimScope.Screen)
             .AddBinding(new KeyboardBinding(Key.LeftArrow, ctrl: true));
