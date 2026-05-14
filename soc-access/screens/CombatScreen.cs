@@ -334,6 +334,14 @@ namespace SongsOfConquestAccess.Screens
                 adapter.Hud.IsEndTurnButtonEnabled,
                 adapter.Hud.IsEndTurnButtonVisible,
                 () => adapter.Hud.EndTurnButtonTooltip));
+            root.AddChild(new ButtonWidget(
+                "combat-options",
+                () => adapter.Hud.OptionsButtonLabel,
+                adapter.Hud.ClickOptionsButton,
+                adapter.Hud.FocusOptionsButton,
+                adapter.Hud.IsOptionsButtonEnabled,
+                adapter.Hud.IsOptionsButtonVisible,
+                () => adapter.Hud.OptionsButtonTooltip));
             root.AddChild(BuildBattleLogMenu(adapter));
             return root;
         }

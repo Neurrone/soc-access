@@ -3,11 +3,14 @@ using System.Collections.Generic;
 using System.Reflection;
 using System.Text.RegularExpressions;
 using HarmonyLib;
+using SongsOfConquest;
 using SongsOfConquest.Client.Battle;
 using SongsOfConquest.Client.Battle.HUD;
 using SongsOfConquest.Client.Battle.UI;
 using SongsOfConquest.Client.UI;
 using SongsOfConquest.Common;
+using SongsOfConquest.Common.Ai;
+using SongsOfConquest.Common.Game;
 using SongsOfConquest.Common.Gamestate;
 using SongsOfConquest.Common.Localization;
 using SongsOfConquestAccess.Speech;
@@ -215,6 +218,11 @@ namespace SongsOfConquestAccess.Adapters
 
         private UIButton GetAiControlButton(CombatHudSide side)
         {
+            if (!IsAiControlSideActive(side))
+            {
+                return null;
+            }
+
             UIButton[] buttons = GetField<UIButton[]>(GetCommanderHud(side), AiAutoBattleButtonsField);
             if (buttons == null)
             {
@@ -230,6 +238,49 @@ namespace SongsOfConquestAccess.Adapters
             }
 
             return null;
+        }
+
+        private bool IsAiControlSideActive(CombatHudSide side)
+        {
+            if (!HudGroupVisible(GetAiAutoBattleContainer(side))
+                || _facade == null
+                || _facade.Teams == null)
+            {
+                return false;
+            }
+
+            try
+            {
+                ITeamState current = _facade.Teams.Current;
+                if (current == null
+                    || _facade.GameMode != GameMode.Adventure
+                    || !_facade.Teams.GetIsLocal(current.Id)
+                    || current.AiMode != AiMode.Off)
+                {
+                    return false;
+                }
+
+                ITeamState sideTeam = side == CombatHudSide.Attacker
+                    ? _facade.Teams.AttackingTeam
+                    : _facade.Teams.DefendingTeam;
+                return sideTeam != null && current.Id == sideTeam.Id;
+            }
+            catch
+            {
+                return false;
+            }
+        }
+
+        private GameObject GetAiAutoBattleContainer(CombatHudSide side)
+        {
+            if (_settings == null)
+            {
+                return null;
+            }
+
+            return side == CombatHudSide.Attacker
+                ? _settings.AttackerAIAutoBattleContainer
+                : _settings.DefenderAIAutoBattleContainer;
         }
 
         private int GetEssenceAmount(CombatHudSide side, EssenceType essenceType)
@@ -353,6 +404,17 @@ namespace SongsOfConquestAccess.Adapters
         private static bool IsGameObjectVisible(Component component)
         {
             return component != null && IsGameObjectVisible(component.gameObject);
+        }
+
+        private static bool HudGroupVisible(GameObject gameObject)
+        {
+            if (gameObject == null || !gameObject.activeInHierarchy)
+            {
+                return false;
+            }
+
+            CanvasGroup canvasGroup = gameObject.GetComponent<CanvasGroup>();
+            return canvasGroup == null || canvasGroup.alpha > 0.01f;
         }
 
         private static string GetFirstTooltipLine(Tooltip tooltip)

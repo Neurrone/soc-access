@@ -8,6 +8,7 @@ using SongsOfConquest.Client.Battle.HUD;
 using SongsOfConquest.Client.Battle.UI;
 using SongsOfConquest.Client.Battle.View;
 using SongsOfConquest.Client.Logging;
+using SongsOfConquest.Client.Menu.Options;
 using SongsOfConquest.Client.UI;
 using SongsOfConquest.Common;
 using SongsOfConquest.Common.Battle;
@@ -143,6 +144,37 @@ namespace SongsOfConquestAccess.Adapters
         public Tooltip EndTurnButtonTooltip
         {
             get { return Tooltip.ForComponent(GetEndTurnButton(), _localization); }
+        }
+
+        public bool IsOptionsButtonVisible()
+        {
+            return HudGroupVisible(_settings != null ? _settings.OptionsButtonsContainer : null)
+                && IsButtonVisible(GetOptionsButton());
+        }
+
+        public bool IsOptionsButtonEnabled()
+        {
+            return IsButtonInteractable(GetOptionsButton());
+        }
+
+        public string OptionsButtonLabel
+        {
+            get { return FirstNonEmpty(GetFirstTooltipLine(OptionsButtonTooltip), "Options"); }
+        }
+
+        public void FocusOptionsButton()
+        {
+            NativeSelectionUtility.Select(GetOptionsButton());
+        }
+
+        public bool ClickOptionsButton()
+        {
+            return NativeSelectionUtility.Click(GetOptionsButton());
+        }
+
+        public Tooltip OptionsButtonTooltip
+        {
+            get { return Tooltip.ForComponent(GetOptionsButton(), _localization); }
         }
 
         public bool IsTargetingInstructionVisible()
@@ -622,6 +654,18 @@ namespace SongsOfConquestAccess.Adapters
             return GetField<UIButton>(hud, BattleEndTurnButtonField);
         }
 
+        private UIButton GetOptionsButton()
+        {
+            GameObject container = _settings != null ? _settings.OptionsButtonsContainer : null;
+            OptionsButtonInstaller installer = container != null ? container.GetComponentInChildren<OptionsButtonInstaller>(false) : null;
+            if (installer != null)
+            {
+                return installer.GetComponent<UIButton>();
+            }
+
+            return container != null ? container.GetComponentInChildren<UIButton>(false) : null;
+        }
+
         private QueueHUD GetQueueHud()
         {
             return _stateHandler != null ? _stateHandler.QueueHUD : null;
@@ -1004,9 +1048,44 @@ namespace SongsOfConquestAccess.Adapters
             return component != null && IsGameObjectVisible(component.gameObject);
         }
 
+        private static bool HudGroupVisible(GameObject gameObject)
+        {
+            if (gameObject == null || !gameObject.activeInHierarchy)
+            {
+                return false;
+            }
+
+            CanvasGroup canvasGroup = gameObject.GetComponent<CanvasGroup>();
+            return canvasGroup == null || canvasGroup.alpha > 0.01f;
+        }
+
         private static string GetText(UITextMesh text)
         {
             return SpeechTextSanitizer.Normalize(UITextMeshTextUtility.GetEffectiveText(text));
+        }
+
+        private static string GetFirstTooltipLine(Tooltip tooltip)
+        {
+            if (tooltip == null || tooltip.TextLines == null)
+            {
+                return string.Empty;
+            }
+
+            for (int i = 0; i < tooltip.TextLines.Count; i++)
+            {
+                string line = SpeechTextSanitizer.Normalize(tooltip.TextLines[i]);
+                if (!string.IsNullOrWhiteSpace(line))
+                {
+                    return line;
+                }
+            }
+
+            return string.Empty;
+        }
+
+        private static string FirstNonEmpty(string preferred, string fallback)
+        {
+            return string.IsNullOrWhiteSpace(preferred) ? fallback : preferred;
         }
 
         private static T Resolve<T>(DiContainer container) where T : class
