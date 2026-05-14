@@ -1,0 +1,516 @@
+using System;
+using System.Collections.Generic;
+using System.Reflection;
+using HarmonyLib;
+using SongsOfConquest.Client.Adventure.UI.Trading;
+using SongsOfConquest.Client.Gamestate.Facade;
+using SongsOfConquest.Common.Gamestate.Facade;
+using SongsOfConquestAccess.Adapters;
+using SongsOfConquestAccess.Input;
+using SongsOfConquestAccess.UI;
+using UnityEngine;
+using Zenject;
+
+namespace SongsOfConquestAccess.Screens
+{
+    internal sealed class TradingScreen : Screen
+    {
+        private const int InventoryGridIndex = 4;
+        private const int ArmyExchangeGridIndex = 5;
+        private static readonly PropertyInfo InstallerContainerProperty =
+            AccessTools.Property(typeof(TradingMenuInstaller), "Container");
+
+        private readonly TradingMenuAdapter _adapter;
+        private Action<int, bool> _artifactChangedHandler;
+        private Action<int> _statisticsChangedHandler;
+        private Action<OnTroopsUpdatedPayload> _troopsUpdatedHandler;
+
+        public TradingScreen(TradingMenuAdapter adapter)
+            : base(new ContainerWidget("trade-screen", adapter != null ? adapter.Title : "Trade"))
+        {
+            _adapter = adapter;
+            RootWidget = BuildRoot(_adapter, RefreshAndAnnounceFocus);
+        }
+
+        public static Screen TryBuildActiveScreen()
+        {
+            TradingMenuInstaller[] installers = Resources.FindObjectsOfTypeAll<TradingMenuInstaller>();
+            for (int i = 0; i < installers.Length; i++)
+            {
+                TradingMenu menu = TryResolveTradingMenu(installers[i]);
+                TradingMenuAdapter adapter = new TradingMenuAdapter(menu);
+                if (adapter.IsPresent())
+                {
+                    SocAccessPlugin.Instance?.LogInfo("Trading menu probe found ready trading menu");
+                    return new TradingScreen(adapter);
+                }
+            }
+
+            return null;
+        }
+
+        public TradingMenuAdapter Adapter
+        {
+            get { return _adapter; }
+        }
+
+        public override bool IsPresent()
+        {
+            return _adapter != null && _adapter.IsPresent();
+        }
+
+        public override void OnPush()
+        {
+            AttachListeners();
+        }
+
+        public override void OnUnfocus()
+        {
+            _adapter?.HideNativeTooltip();
+            RootWidget?.Unfocus();
+        }
+
+        public override void OnPop()
+        {
+            DetachListeners();
+            _adapter?.HideNativeTooltip();
+        }
+
+        public override bool OnActionJustPressed(InputAction action)
+        {
+            if (action != null && action.Key == AccessibilityActions.Cancel.Key)
+            {
+                if (RootWidget != null && RootWidget.HandleAction(action))
+                {
+                    return true;
+                }
+
+                return _adapter != null && _adapter.Close();
+            }
+
+            return base.OnActionJustPressed(action);
+        }
+
+        public void Refresh()
+        {
+            Refresh(announceFocus: false);
+        }
+
+        private void RefreshAndAnnounceFocus()
+        {
+            Refresh(announceFocus: true);
+        }
+
+        private void Refresh(bool announceFocus)
+        {
+            if (!IsPresent())
+            {
+                return;
+            }
+
+            int focusedIndex = RootWidget != null ? RootWidget.FocusedIndex : -1;
+            GridFocus inventoryFocus = CaptureInventoryGridFocus();
+            GridFocus armyFocus = CaptureArmyGridFocus();
+            RootWidget = BuildRoot(_adapter, RefreshAndAnnounceFocus);
+            RestoreInventoryGridFocus(inventoryFocus);
+            RestoreArmyGridFocus(armyFocus);
+            if (announceFocus)
+            {
+                RootWidget?.SetFocusByIndex(focusedIndex);
+            }
+            else
+            {
+                RootWidget?.SetFocusByIndexSilently(focusedIndex);
+            }
+        }
+
+        private void AttachListeners()
+        {
+            if (_adapter == null || _adapter.Facade == null || _adapter.Facade.Commands == null)
+            {
+                return;
+            }
+
+            IClientCommandsFacade commands = _adapter.Facade.Commands;
+            _artifactChangedHandler = HandleArtifactChanged;
+            _statisticsChangedHandler = HandleStatisticsChanged;
+            _troopsUpdatedHandler = HandleTroopsUpdated;
+            commands.OnArtifactChanged = (Action<int, bool>)Delegate.Combine(commands.OnArtifactChanged, _artifactChangedHandler);
+            commands.OnCommanderStatisticsChanged = (Action<int>)Delegate.Combine(commands.OnCommanderStatisticsChanged, _statisticsChangedHandler);
+            commands.OnTroopsUpdated = (Action<OnTroopsUpdatedPayload>)Delegate.Combine(commands.OnTroopsUpdated, _troopsUpdatedHandler);
+        }
+
+        private void DetachListeners()
+        {
+            if (_adapter == null || _adapter.Facade == null || _adapter.Facade.Commands == null)
+            {
+                return;
+            }
+
+            IClientCommandsFacade commands = _adapter.Facade.Commands;
+            if (_artifactChangedHandler != null)
+            {
+                commands.OnArtifactChanged = (Action<int, bool>)Delegate.Remove(commands.OnArtifactChanged, _artifactChangedHandler);
+                _artifactChangedHandler = null;
+            }
+
+            if (_statisticsChangedHandler != null)
+            {
+                commands.OnCommanderStatisticsChanged = (Action<int>)Delegate.Remove(commands.OnCommanderStatisticsChanged, _statisticsChangedHandler);
+                _statisticsChangedHandler = null;
+            }
+
+            if (_troopsUpdatedHandler != null)
+            {
+                commands.OnTroopsUpdated = (Action<OnTroopsUpdatedPayload>)Delegate.Remove(commands.OnTroopsUpdated, _troopsUpdatedHandler);
+                _troopsUpdatedHandler = null;
+            }
+        }
+
+        private void HandleArtifactChanged(int artifactId, bool isNewArtifact)
+        {
+            RequestDetectorRefresh();
+        }
+
+        private void HandleStatisticsChanged(int commanderId)
+        {
+            if (_adapter != null && (commanderId == _adapter.LeftCommanderId || commanderId == _adapter.RightCommanderId))
+            {
+                RequestDetectorRefresh();
+            }
+        }
+
+        private void HandleTroopsUpdated(OnTroopsUpdatedPayload payload)
+        {
+            if (payload == null)
+            {
+                return;
+            }
+
+            if (payload.ParentId != _adapter.LeftCommanderId && payload.ParentId != _adapter.RightCommanderId)
+            {
+                return;
+            }
+
+            RequestDetectorRefresh();
+        }
+
+        private void RequestDetectorRefresh()
+        {
+            SocAccessPlugin.Instance?.ScreenDetector?.OnTradingMenuChanged();
+        }
+
+        private GridFocus CaptureInventoryGridFocus()
+        {
+            InventoryGridWidget grid = RootWidget != null ? RootWidget.GetChildAt(InventoryGridIndex) as InventoryGridWidget : null;
+            return grid != null ? new GridFocus(grid.FocusedColumnIndex, grid.FocusedRowIndex) : null;
+        }
+
+        private GridFocus CaptureArmyGridFocus()
+        {
+            ArmyExchangeGridWidget grid = RootWidget != null ? RootWidget.GetChildAt(ArmyExchangeGridIndex) as ArmyExchangeGridWidget : null;
+            return grid != null ? new GridFocus(grid.FocusedColumnIndex, grid.FocusedRowIndex) : null;
+        }
+
+        private void RestoreInventoryGridFocus(GridFocus focus)
+        {
+            if (focus == null || RootWidget == null)
+            {
+                return;
+            }
+
+            InventoryGridWidget grid = RootWidget.GetChildAt(InventoryGridIndex) as InventoryGridWidget;
+            grid?.SetFocusedCell(focus.ColumnIndex, focus.RowIndex);
+        }
+
+        private void RestoreArmyGridFocus(GridFocus focus)
+        {
+            if (focus == null || RootWidget == null)
+            {
+                return;
+            }
+
+            ArmyExchangeGridWidget grid = RootWidget.GetChildAt(ArmyExchangeGridIndex) as ArmyExchangeGridWidget;
+            grid?.SetFocusedCell(focus.ColumnIndex, focus.RowIndex);
+        }
+
+        private static ContainerWidget BuildRoot(TradingMenuAdapter adapter, Action onCompletedDrop)
+        {
+            ContainerWidget root = new ContainerWidget("trade-screen", adapter != null ? adapter.Title : "Trade");
+            if (adapter == null)
+            {
+                return root;
+            }
+
+            root.AddChild(BuildPortrait(adapter, left: true));
+            root.AddChild(BuildMenu("trade-left-stats", adapter.LeftCommanderName + "'s stats", GetItemsSafely("Left stats", () => adapter.GetStats(left: true)), adapter.HideNativeTooltip));
+            root.AddChild(BuildModifierCategoryMenu(adapter, left: true));
+            root.AddChild(BuildMenu("trade-left-active-modifiers", adapter.GetActiveModifierListLabel(left: true), GetItemsSafely("Left active modifiers", () => adapter.GetActiveModifiers(left: true)), adapter.HideNativeTooltip));
+
+            root.AddChild(new InventoryGridWidget(
+                "trade-inventory-grid",
+                BuildInventoryGridColumns(adapter),
+                adapter.DropInventoryArtifact,
+                onCompletedDrop));
+
+            root.AddChild(BuildArmyExchangeGrid(
+                "trade-army-exchange-grid",
+                BuildArmyLabel(adapter.LeftCommanderName),
+                BuildArmyLabel(adapter.RightCommanderName),
+                adapter.LeftTroops,
+                adapter.RightTroops,
+                onCompletedDrop));
+
+            root.AddChild(BuildPortrait(adapter, left: false));
+            root.AddChild(BuildMenu("trade-right-stats", adapter.RightCommanderName + "'s stats", GetItemsSafely("Right stats", () => adapter.GetStats(left: false)), adapter.HideNativeTooltip));
+            root.AddChild(BuildModifierCategoryMenu(adapter, left: false));
+            root.AddChild(BuildMenu("trade-right-active-modifiers", adapter.GetActiveModifierListLabel(left: false), GetItemsSafely("Right active modifiers", () => adapter.GetActiveModifiers(left: false)), adapter.HideNativeTooltip));
+
+            root.AddChild(new ButtonWidget(
+                "trade-close",
+                "Close",
+                adapter.Close,
+                adapter.HideNativeTooltip,
+                () => true));
+
+            return root;
+        }
+
+        private static IReadOnlyList<InventoryGridWidget.Column> BuildInventoryGridColumns(TradingMenuAdapter adapter)
+        {
+            return new[]
+            {
+                new InventoryGridWidget.Column(
+                    "trade-left-equipment",
+                    MenuButtonTextUtility.JoinParts(adapter.LeftCommanderName, adapter.EquipmentLabel),
+                    BuildInventoryCells("trade-left-equipment", adapter.GetEquipmentSlots(left: true), includeOwnerName: true)),
+                new InventoryGridWidget.Column(
+                    "trade-left-inventory",
+                    MenuButtonTextUtility.JoinParts(adapter.LeftCommanderName, adapter.InventoryLabel),
+                    BuildInventoryCells("trade-left-inventory", adapter.GetBackpackSlots(left: true), includeOwnerName: true)),
+                new InventoryGridWidget.Column(
+                    "trade-right-equipment",
+                    MenuButtonTextUtility.JoinParts(adapter.RightCommanderName, adapter.EquipmentLabel),
+                    BuildInventoryCells("trade-right-equipment", adapter.GetEquipmentSlots(left: false), includeOwnerName: true)),
+                new InventoryGridWidget.Column(
+                    "trade-right-inventory",
+                    MenuButtonTextUtility.JoinParts(adapter.RightCommanderName, adapter.InventoryLabel),
+                    BuildInventoryCells("trade-right-inventory", adapter.GetBackpackSlots(left: false), includeOwnerName: true))
+            };
+        }
+
+        private static IReadOnlyList<InventoryGridWidget.Cell> BuildInventoryCells(
+            string idPrefix,
+            IReadOnlyList<InventorySlotInfo> slots,
+            bool includeOwnerName)
+        {
+            List<InventoryGridWidget.Cell> cells = new List<InventoryGridWidget.Cell>();
+            if (slots == null)
+            {
+                return cells;
+            }
+
+            for (int i = 0; i < slots.Count; i++)
+            {
+                InventorySlotInfo slot = slots[i];
+                if (slot == null)
+                {
+                    continue;
+                }
+
+                cells.Add(new InventoryGridWidget.Cell(
+                    idPrefix + "-" + i,
+                    BuildInventorySlotLabel(slot, includeOwnerName),
+                    slot));
+            }
+
+            return cells;
+        }
+
+        private static string BuildInventorySlotLabel(InventorySlotInfo slot, bool includeOwnerName)
+        {
+            string name = !slot.IsEmpty ? slot.ArtifactName : "empty";
+            string location = slot.IsBackpackSlot
+                ? slot.InventoryName + " slot " + (slot.PositionIndex + 1)
+                : slot.SlotName;
+            string ownerName = includeOwnerName ? slot.OwnerName : string.Empty;
+            return MenuButtonTextUtility.JoinParts(name, location, ownerName);
+        }
+
+        private static ArmyExchangeGridWidget BuildArmyExchangeGrid(
+            string id,
+            string leftArmyLabel,
+            string rightArmyLabel,
+            TroopHudAdapter left,
+            TroopHudAdapter right,
+            Action onCompletedDrop)
+        {
+            IReadOnlyList<TroopHudAdapter.SlotItem> leftSlots = left != null
+                ? left.GetSlots()
+                : new TroopHudAdapter.SlotItem[0];
+            IReadOnlyList<TroopHudAdapter.SlotItem> rightSlots = right != null
+                ? right.GetSlots()
+                : new TroopHudAdapter.SlotItem[0];
+            return new ArmyExchangeGridWidget(
+                id,
+                leftArmyLabel,
+                rightArmyLabel,
+                leftSlots,
+                rightSlots,
+                DropArmySlot,
+                onCompletedDrop);
+        }
+
+        private static string BuildArmyLabel(string commanderName)
+        {
+            return string.IsNullOrWhiteSpace(commanderName) ? "army" : commanderName + " army";
+        }
+
+        private static TroopHudAdapter.DropResult DropArmySlot(TroopHudAdapter.SlotItem source, TroopHudAdapter.SlotItem target)
+        {
+            return source != null ? source.DropTo(target) : TroopHudAdapter.DropResult.None;
+        }
+
+        private static Widget BuildPortrait(TradingMenuAdapter adapter, bool left)
+        {
+            string side = left ? "left" : "right";
+            return Portrait.StaticNative(
+                "trade-" + side + "-portrait",
+                () => adapter.GetPortraitLabel(left),
+                () => adapter.GetPortraitTooltipTarget(left),
+                adapter.Localization);
+        }
+
+        private static IReadOnlyList<TradingMenuAdapter.LabeledItem> GetItemsSafely(
+            string section,
+            Func<IReadOnlyList<TradingMenuAdapter.LabeledItem>> getter)
+        {
+            try
+            {
+                IReadOnlyList<TradingMenuAdapter.LabeledItem> items = getter != null ? getter() : null;
+                return items ?? new TradingMenuAdapter.LabeledItem[0];
+            }
+            catch (Exception ex)
+            {
+                SocAccessPlugin.Instance?.LogWarning("TradingScreen section " + section + " failed to build: " + ex);
+                return new TradingMenuAdapter.LabeledItem[]
+                {
+                    new TradingMenuAdapter.LabeledItem(section.ToLowerInvariant() + "-error", "Unavailable")
+                };
+            }
+        }
+
+        private static MenuWidget BuildModifierCategoryMenu(TradingMenuAdapter adapter, bool left)
+        {
+            string side = left ? "left" : "right";
+            MenuWidget menu = new MenuWidget(
+                "trade-" + side + "-modifier-tabs",
+                (left ? adapter.LeftCommanderName : adapter.RightCommanderName) + "'s modifier categories");
+            string activeId = null;
+            foreach (TradingMenuAdapter.ModifierCategory category in adapter.GetModifierCategories(left))
+            {
+                TradingMenuAdapter.ModifierCategory captured = category;
+                if (captured.Index == adapter.GetActiveModifierCategoryIndex(left))
+                {
+                    activeId = captured.Id;
+                }
+
+                menu.AddItem(new MenuItemWidget(
+                    captured.Id,
+                    () => captured.Label,
+                    null,
+                    () => FocusModifierCategory(adapter, left, captured.Index),
+                    () => FocusModifierCategory(adapter, left, captured.Index),
+                    () => true,
+                    captured.Tooltip));
+            }
+
+            menu.SetFocusedItemById(activeId);
+            return menu;
+        }
+
+        private static bool FocusModifierCategory(TradingMenuAdapter adapter, bool left, int categoryIndex)
+        {
+            int previousCategoryIndex = adapter.GetActiveModifierCategoryIndex(left);
+            bool result = adapter.FocusModifierCategory(left, categoryIndex);
+            if (result && previousCategoryIndex != adapter.GetActiveModifierCategoryIndex(left))
+            {
+                SocAccessPlugin.Instance?.ScreenDetector?.OnTradingMenuChanged();
+            }
+
+            return result;
+        }
+
+        private static MenuWidget BuildMenu(
+            string id,
+            string label,
+            IReadOnlyList<TradingMenuAdapter.LabeledItem> items,
+            Action emptyItemFocus = null)
+        {
+            MenuWidget menu = new MenuWidget(id, label);
+            if (items == null || items.Count == 0)
+            {
+                menu.AddItem(new MenuItemWidget(
+                    id + "-none",
+                    () => "None",
+                    null,
+                    () => false,
+                    emptyItemFocus,
+                    () => true));
+                return menu;
+            }
+
+            for (int i = 0; i < items.Count; i++)
+            {
+                TradingMenuAdapter.LabeledItem item = items[i];
+                menu.AddItem(new MenuItemWidget(
+                    item.Id,
+                    () => item.Label,
+                    () => item.Status,
+                    item.Activate ?? (() => false),
+                    item.OnFocus ?? emptyItemFocus,
+                    () => true,
+                    item.Tooltip));
+            }
+
+            return menu;
+        }
+
+        private static TradingMenu TryResolveTradingMenu(TradingMenuInstaller installer)
+        {
+            if (installer == null || installer.gameObject == null || !installer.gameObject.scene.IsValid() || !installer.gameObject.scene.isLoaded)
+            {
+                return null;
+            }
+
+            DiContainer container = InstallerContainerProperty != null
+                ? InstallerContainerProperty.GetValue(installer, null) as DiContainer
+                : null;
+            if (container == null)
+            {
+                return null;
+            }
+
+            try
+            {
+                return container.Resolve<TradingMenu>();
+            }
+            catch
+            {
+                return null;
+            }
+        }
+
+        private sealed class GridFocus
+        {
+            public GridFocus(int columnIndex, int rowIndex)
+            {
+                ColumnIndex = columnIndex;
+                RowIndex = rowIndex;
+            }
+
+            public int ColumnIndex { get; private set; }
+            public int RowIndex { get; private set; }
+        }
+    }
+}

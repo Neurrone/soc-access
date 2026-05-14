@@ -1,0 +1,23 @@
+using HarmonyLib;
+using SongsOfConquest.Client.Adventure;
+
+namespace SongsOfConquestAccess.Patches
+{
+    [HarmonyPatch]
+    internal static class MapMessagePopupPatches
+    {
+        [HarmonyPatch(typeof(MapMessagePopup), "Show")]
+        [HarmonyPostfix]
+        private static void ShowPostfix(MapMessagePopup __instance)
+        {
+            SocAccessPlugin.Instance?.ScreenDetector?.OnMapMessagePopupReady(__instance);
+        }
+
+        [HarmonyPatch(typeof(MapMessagePopup), "Hide", new[] { typeof(bool) })]
+        [HarmonyPrefix]
+        private static void HidePrefix(MapMessagePopup __instance)
+        {
+            SocAccessPlugin.Instance?.ScreenDetector?.OnMapMessagePopupClosed(__instance);
+        }
+    }
+}
