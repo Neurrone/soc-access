@@ -10,14 +10,20 @@ namespace SongsOfConquestAccess.UI
     {
         private readonly List<Column> _columns = new List<Column>();
         private readonly Func<InventorySlotInfo, InventorySlotInfo, DropResult> _drop;
+        private readonly Action _onCompletedDrop;
         private int _focusedColumn;
         private int _focusedRow;
         private CellWidget _dragSource;
 
-        public InventoryGridWidget(string id, IEnumerable<Column> columns, Func<InventorySlotInfo, InventorySlotInfo, DropResult> drop = null)
+        public InventoryGridWidget(
+            string id,
+            IEnumerable<Column> columns,
+            Func<InventorySlotInfo, InventorySlotInfo, DropResult> drop = null,
+            Action onCompletedDrop = null)
             : base(id)
         {
             _drop = drop;
+            _onCompletedDrop = onCompletedDrop;
             if (columns == null)
             {
                 return;
@@ -162,6 +168,16 @@ namespace SongsOfConquestAccess.UI
 
         protected override void OnFocus()
         {
+            EnsureFocus();
+        }
+
+        protected override void OnUnfocus()
+        {
+            ClearDrag();
+        }
+
+        public override bool EnsureFocus()
+        {
             if (FocusedCell == null)
             {
                 _focusedColumn = 0;
@@ -169,14 +185,7 @@ namespace SongsOfConquestAccess.UI
                 ClampFocus();
             }
 
-            FocusedCell?.Focus();
-            UIManager.SetFocusedWidget(GetFocusedWidget());
-        }
-
-        protected override void OnUnfocus()
-        {
-            ClearDrag();
-            FocusedCell?.Unfocus();
+            return FocusedCell != null;
         }
 
         private CellWidget FocusedCell
@@ -250,7 +259,6 @@ namespace SongsOfConquestAccess.UI
 
         private bool SetFocus(int column, int row)
         {
-            CellWidget previous = FocusedCell;
             _focusedColumn = column;
             _focusedRow = row;
             ClampFocus();
@@ -260,13 +268,7 @@ namespace SongsOfConquestAccess.UI
                 return false;
             }
 
-            if (previous != null && !ReferenceEquals(previous, next))
-            {
-                previous.Unfocus();
-            }
-
-            next.Focus();
-            UIManager.SetFocusedWidget(next);
+            UIManager.RequestFocus(next);
             return true;
         }
 
@@ -320,7 +322,12 @@ namespace SongsOfConquestAccess.UI
 
             CellWidget source = _dragSource;
             DropResult result = source.DropTo(target);
-            if (result == DropResult.Dropped || result == DropResult.DeniedWithFeedback)
+            if (result == DropResult.Dropped)
+            {
+                _dragSource = null;
+                _onCompletedDrop?.Invoke();
+            }
+            else if (result == DropResult.DeniedWithFeedback)
             {
                 _dragSource = null;
             }

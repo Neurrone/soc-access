@@ -59,7 +59,7 @@ namespace SongsOfConquestAccess.Screens
             return base.OnActionJustPressed(action);
         }
 
-        public void Refresh(bool focusAfterRefresh)
+        public void Refresh()
         {
             if (!IsPresent())
             {
@@ -68,17 +68,7 @@ namespace SongsOfConquestAccess.Screens
 
             int focusedIndex = RootWidget != null ? RootWidget.FocusedIndex : -1;
             RootWidget = BuildRoot(_adapter);
-            if (focusAfterRefresh)
-            {
-                if (RootWidget == null || !RootWidget.SetFocusByIndex(focusedIndex))
-                {
-                    RootWidget?.Focus();
-                }
-            }
-            else
-            {
-                RootWidget?.SetFocusByIndexSilently(focusedIndex);
-            }
+            RootWidget?.SetFocusByIndexSilently(focusedIndex);
         }
 
         private static ContainerWidget BuildRoot(CodexMenuAdapter adapter)

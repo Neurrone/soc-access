@@ -70,7 +70,7 @@ namespace SongsOfConquestAccess.Screens
             _adapter?.Dispose();
         }
 
-        public void Refresh(bool focusAfterRefresh)
+        public void Refresh()
         {
             if (!IsPresent())
             {
@@ -82,16 +82,7 @@ namespace SongsOfConquestAccess.Screens
 
             RootWidget = BuildRoot(_adapter);
             RestoreArmyGridFocus(gridFocus);
-
-            if (!focusAfterRefresh)
-            {
-                return;
-            }
-
-            if (RootWidget == null || !RootWidget.SetFocusByIndex(focusedIndex))
-            {
-                RootWidget?.Focus();
-            }
+            RootWidget?.SetFocusByIndexSilently(focusedIndex);
         }
 
         private void AttachListeners()
@@ -134,8 +125,7 @@ namespace SongsOfConquestAccess.Screens
                 return;
             }
 
-            bool focusAfterRefresh = ReferenceEquals(SoqAccessPlugin.Instance?.ScreenManager?.CurrentScreen, this);
-            Refresh(focusAfterRefresh);
+            Refresh();
         }
 
         private GridFocus CaptureArmyGridFocus()

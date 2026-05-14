@@ -13,6 +13,7 @@ namespace SongsOfConquestAccess.UI
         private readonly List<SlotWidget> _wielderSlots = new List<SlotWidget>();
         private readonly List<SlotWidget> _joiningSlots = new List<SlotWidget>();
         private readonly Func<TroopHudAdapter.SlotItem, TroopHudAdapter.SlotItem, TroopHudAdapter.DropResult> _drop;
+        private readonly Action _onCompletedDrop;
         private int _focusedColumn;
         private int _focusedRow;
         private SlotWidget _dragSource;
@@ -23,12 +24,14 @@ namespace SongsOfConquestAccess.UI
             string joiningArmyLabel,
             IEnumerable<TroopHudAdapter.SlotItem> wielderSlots,
             IEnumerable<TroopHudAdapter.SlotItem> joiningSlots,
-            Func<TroopHudAdapter.SlotItem, TroopHudAdapter.SlotItem, TroopHudAdapter.DropResult> drop)
+            Func<TroopHudAdapter.SlotItem, TroopHudAdapter.SlotItem, TroopHudAdapter.DropResult> drop,
+            Action onCompletedDrop = null)
             : base(id)
         {
             WielderArmyLabel = string.IsNullOrWhiteSpace(wielderArmyLabel) ? "wielder's army" : wielderArmyLabel;
             JoiningArmyLabel = string.IsNullOrWhiteSpace(joiningArmyLabel) ? "joining army" : joiningArmyLabel;
             _drop = drop;
+            _onCompletedDrop = onCompletedDrop;
             AddSlots(_wielderSlots, wielderSlots, WielderArmyLabel);
             AddSlots(_joiningSlots, joiningSlots, JoiningArmyLabel);
         }
@@ -157,6 +160,16 @@ namespace SongsOfConquestAccess.UI
 
         protected override void OnFocus()
         {
+            EnsureFocus();
+        }
+
+        protected override void OnUnfocus()
+        {
+            ClearDrag();
+        }
+
+        public override bool EnsureFocus()
+        {
             if (FocusedSlot == null)
             {
                 _focusedColumn = 0;
@@ -164,14 +177,7 @@ namespace SongsOfConquestAccess.UI
                 ClampFocus();
             }
 
-            FocusedSlot?.Focus();
-            UIManager.SetFocusedWidget(GetFocusedWidget());
-        }
-
-        protected override void OnUnfocus()
-        {
-            ClearDrag();
-            FocusedSlot?.Unfocus();
+            return FocusedSlot != null;
         }
 
         private SlotWidget FocusedSlot
@@ -248,7 +254,6 @@ namespace SongsOfConquestAccess.UI
 
         private bool SetFocus(int column, int row)
         {
-            SlotWidget previous = FocusedSlot;
             _focusedColumn = column;
             _focusedRow = row;
             ClampFocus();
@@ -258,13 +263,7 @@ namespace SongsOfConquestAccess.UI
                 return false;
             }
 
-            if (previous != null && !ReferenceEquals(previous, next))
-            {
-                previous.Unfocus();
-            }
-
-            next.Focus();
-            UIManager.SetFocusedWidget(next);
+            UIManager.RequestFocus(next);
             return true;
         }
 
@@ -319,8 +318,12 @@ namespace SongsOfConquestAccess.UI
                     return true;
                 }
 
-                if (result == TroopHudAdapter.DropResult.Completed
-                    || result == TroopHudAdapter.DropResult.MoveAmountPopupOpened)
+                if (result == TroopHudAdapter.DropResult.Completed)
+                {
+                    _dragSource = null;
+                    _onCompletedDrop?.Invoke();
+                }
+                else if (result == TroopHudAdapter.DropResult.MoveAmountPopupOpened)
                 {
                     _dragSource = null;
                 }

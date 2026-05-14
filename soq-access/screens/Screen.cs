@@ -20,7 +20,7 @@ namespace SongsOfConquestAccess.Screens
 
         public virtual void OnFocus()
         {
-            RootWidget.Focus();
+            UIManager.RequestFocus(RootWidget);
         }
 
         public virtual void OnUnfocus()

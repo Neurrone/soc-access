@@ -68,7 +68,7 @@ namespace SongsOfConquestAccess.Screens
             return new BuildMenuScreen(_adapter);
         }
 
-        public void Refresh(bool focusAfterRefresh)
+        public void Refresh()
         {
             if (!IsPresent())
             {
@@ -77,10 +77,7 @@ namespace SongsOfConquestAccess.Screens
 
             int focusedIndex = RootWidget != null ? RootWidget.FocusedIndex : -1;
             RootWidget = BuildRoot(_adapter);
-            if (focusAfterRefresh)
-            {
-                RootWidget?.SetFocusByIndexSilently(focusedIndex);
-            }
+            RootWidget?.SetFocusByIndexSilently(focusedIndex);
         }
 
         private static ContainerWidget BuildRoot(BuildMenuAdapter adapter)

@@ -60,7 +60,7 @@ namespace SongsOfConquestAccess.Screens
             _adapter?.HideNativeTooltip();
         }
 
-        public void Refresh(bool focusAfterRefresh)
+        public void Refresh()
         {
             if (!IsPresent())
             {
@@ -71,16 +71,7 @@ namespace SongsOfConquestAccess.Screens
             int resourceFocusedIndex = GetFocusedResourceIndex();
             RootWidget = BuildRoot(_adapter);
             RestoreResourceFocus(resourceFocusedIndex);
-
-            if (!focusAfterRefresh)
-            {
-                return;
-            }
-
-            if (RootWidget == null || !RootWidget.SetFocusByIndex(focusedIndex))
-            {
-                RootWidget?.Focus();
-            }
+            RootWidget?.SetFocusByIndexSilently(focusedIndex);
         }
 
         private void AttachListeners()
@@ -121,7 +112,7 @@ namespace SongsOfConquestAccess.Screens
         private void RestoreResourceFocus(int resourceFocusedIndex)
         {
             MenuWidget menu = RootWidget != null ? RootWidget.GetChildAt(ResourcesMenuIndex) as MenuWidget : null;
-            menu?.SetFocusByIndex(resourceFocusedIndex);
+            menu?.SetFocusByIndexSilently(resourceFocusedIndex);
         }
 
         private static ContainerWidget BuildRoot(MarketplaceMenuAdapter adapter)

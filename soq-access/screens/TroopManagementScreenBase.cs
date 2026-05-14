@@ -78,7 +78,7 @@ namespace SongsOfConquestAccess.Screens
             return base.OnActionJustPressed(action);
         }
 
-        public void Refresh(bool focusAfterRefresh)
+        public void Refresh()
         {
             if (!IsPresent())
             {
@@ -89,16 +89,7 @@ namespace SongsOfConquestAccess.Screens
             int troopMenuFocusedIndex = GetWielderTroopMenuFocusedIndex();
             RootWidget = BuildRoot();
             RestoreWielderTroopMenuFocus(troopMenuFocusedIndex);
-
-            if (!focusAfterRefresh)
-            {
-                return;
-            }
-
-            if (RootWidget == null || !RootWidget.SetFocusByIndex(focusedIndex))
-            {
-                RootWidget?.Focus();
-            }
+            RootWidget?.SetFocusByIndexSilently(focusedIndex);
         }
 
         private int GetWielderTroopMenuFocusedIndex()
@@ -115,7 +106,7 @@ namespace SongsOfConquestAccess.Screens
             }
 
             MenuWidget menu = RootWidget.GetChildAt(WielderTroopMenuIndex) as MenuWidget;
-            menu?.SetFocusByIndex(focusedIndex);
+            menu?.SetFocusByIndexSilently(focusedIndex);
         }
 
         private void AttachListeners()
@@ -192,7 +183,7 @@ namespace SongsOfConquestAccess.Screens
         {
             if (ReferenceEquals(SoqAccessPlugin.Instance?.ScreenManager?.CurrentScreen, this))
             {
-                Refresh(true);
+                Refresh();
             }
         }
 

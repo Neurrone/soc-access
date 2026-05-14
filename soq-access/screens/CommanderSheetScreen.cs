@@ -70,7 +70,7 @@ namespace SongsOfConquestAccess.Screens
             return base.OnActionJustPressed(action);
         }
 
-        public void Refresh(bool focusAfterRefresh)
+        public void Refresh()
         {
             if (!IsPresent())
             {
@@ -81,16 +81,7 @@ namespace SongsOfConquestAccess.Screens
             InventoryGridFocus inventoryGridFocus = CaptureInventoryGridFocus();
             RootWidget = BuildRoot(_adapter);
             RestoreInventoryGridFocus(focusedIndex, inventoryGridFocus);
-
-            if (!focusAfterRefresh)
-            {
-                return;
-            }
-
-            if (RootWidget == null || !RootWidget.SetFocusByIndex(focusedIndex))
-            {
-                RootWidget?.Focus();
-            }
+            RootWidget?.SetFocusByIndexSilently(focusedIndex);
         }
 
         private InventoryGridFocus CaptureInventoryGridFocus()

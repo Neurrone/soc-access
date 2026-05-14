@@ -51,6 +51,18 @@ namespace SongsOfConquestAccess.Screens
             return base.OnActionJustPressed(action);
         }
 
+        public void Refresh()
+        {
+            if (!IsPresent())
+            {
+                return;
+            }
+
+            int focusedIndex = RootWidget != null ? RootWidget.FocusedIndex : -1;
+            RootWidget = BuildRoot(_adapter);
+            RootWidget?.SetFocusByIndexSilently(focusedIndex);
+        }
+
         private static ContainerWidget BuildRoot(OptionsMenuAdapter adapter)
         {
             ContainerWidget root = new ContainerWidget("options-screen", "Options");

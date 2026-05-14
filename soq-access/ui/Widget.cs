@@ -17,6 +17,8 @@ namespace SongsOfConquestAccess.UI
 
         public Widget Parent { get; internal set; }
 
+        public bool IsFocused { get; private set; }
+
         public virtual bool IsVisible
         {
             get { return true; }
@@ -105,13 +107,30 @@ namespace SongsOfConquestAccess.UI
             return this;
         }
 
+        public virtual bool EnsureFocus()
+        {
+            return IsVisible;
+        }
+
         public void Focus()
         {
+            if (IsFocused)
+            {
+                return;
+            }
+
+            IsFocused = true;
             OnFocus();
         }
 
         public void Unfocus()
         {
+            if (!IsFocused)
+            {
+                return;
+            }
+
+            IsFocused = false;
             OnUnfocus();
         }
 

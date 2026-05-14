@@ -109,24 +109,17 @@ namespace SongsOfConquestAccess.UI
 
         public bool SetFocusByIndex(int index)
         {
-            return SetFocus(ClampToVisibleIndex(index), updateUiManager: true);
+            return SetFocus(ClampToVisibleIndex(index), announce: true);
         }
 
         public bool SetFocusByIndexSilently(int index)
         {
-            return SetFocus(ClampToVisibleIndex(index), updateUiManager: false);
+            return SetFocus(ClampToVisibleIndex(index), announce: false);
         }
 
         protected override void OnFocus()
         {
-            if (FocusedChild != null && FocusedChild.IsVisible)
-            {
-                FocusedChild.Focus();
-                UIManager.SetFocusedWidget(FocusedChild.GetFocusedWidget());
-                return;
-            }
-
-            SetFocus(FindFirstVisibleIndex(), updateUiManager: true);
+            EnsureFocus();
         }
 
         protected override void OnUnfocus()
@@ -137,6 +130,17 @@ namespace SongsOfConquestAccess.UI
         public override Widget GetFocusedWidget()
         {
             return FocusedChild != null ? FocusedChild.GetFocusedWidget() : this;
+        }
+
+        public override bool EnsureFocus()
+        {
+            if (FocusedChild == null || !FocusedChild.IsVisible)
+            {
+                _focusedIndex = FindFirstVisibleIndex();
+            }
+
+            Widget focusedChild = FocusedChild;
+            return focusedChild != null && focusedChild.EnsureFocus();
         }
 
         public override bool ClaimsAction(string actionKey)
@@ -213,7 +217,7 @@ namespace SongsOfConquestAccess.UI
             Widget focusedChild = FocusedChild;
             if (focusedChild != null && !focusedChild.IsVisible)
             {
-                return SetFocus(ClampToVisibleIndex(_focusedIndex), updateUiManager: true);
+                return SetFocus(ClampToVisibleIndex(_focusedIndex), announce: true);
             }
 
             int nextIndex = _focusedIndex;
@@ -227,7 +231,7 @@ namespace SongsOfConquestAccess.UI
             {
                 if (_children[nextIndex].IsVisible)
                 {
-                    return SetFocus(nextIndex, updateUiManager: true);
+                    return SetFocus(nextIndex, announce: true);
                 }
 
                 nextIndex += delta;
@@ -303,7 +307,7 @@ namespace SongsOfConquestAccess.UI
             return -1;
         }
 
-        private bool SetFocus(int index, bool updateUiManager)
+        private bool SetFocus(int index, bool announce)
         {
             if (index < 0 || index >= _children.Count)
             {
@@ -316,17 +320,15 @@ namespace SongsOfConquestAccess.UI
                 return false;
             }
 
-            Widget previous = FocusedChild;
-            if (previous != null && !ReferenceEquals(previous, next))
-            {
-                previous.Unfocus();
-            }
-
             _focusedIndex = index;
-            next.Focus();
-            if (updateUiManager)
+            next.EnsureFocus();
+            if (announce)
             {
-                UIManager.SetFocusedWidget(next.GetFocusedWidget());
+                UIManager.RequestFocus(next);
+            }
+            else
+            {
+                UIManager.RequestFocusSilently(next);
             }
 
             return true;

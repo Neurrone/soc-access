@@ -26,9 +26,10 @@ namespace SongsOfConquestAccess.Screens
         private Action<OnTroopsUpdatedPayload> _troopsUpdatedHandler;
 
         public TradingScreen(TradingMenuAdapter adapter)
-            : base(BuildRoot(adapter))
+            : base(new ContainerWidget("trade-screen", adapter != null ? adapter.Title : "Trade"))
         {
             _adapter = adapter;
+            RootWidget = BuildRoot(_adapter, RefreshAndAnnounceFocus);
         }
 
         public static Screen TryBuildActiveScreen()
@@ -90,7 +91,17 @@ namespace SongsOfConquestAccess.Screens
             return base.OnActionJustPressed(action);
         }
 
-        public void Refresh(bool focusAfterRefresh)
+        public void Refresh()
+        {
+            Refresh(announceFocus: false);
+        }
+
+        private void RefreshAndAnnounceFocus()
+        {
+            Refresh(announceFocus: true);
+        }
+
+        private void Refresh(bool announceFocus)
         {
             if (!IsPresent())
             {
@@ -100,18 +111,16 @@ namespace SongsOfConquestAccess.Screens
             int focusedIndex = RootWidget != null ? RootWidget.FocusedIndex : -1;
             GridFocus inventoryFocus = CaptureInventoryGridFocus();
             GridFocus armyFocus = CaptureArmyGridFocus();
-            RootWidget = BuildRoot(_adapter);
+            RootWidget = BuildRoot(_adapter, RefreshAndAnnounceFocus);
             RestoreInventoryGridFocus(inventoryFocus);
             RestoreArmyGridFocus(armyFocus);
-
-            if (!focusAfterRefresh)
+            if (announceFocus)
             {
-                return;
+                RootWidget?.SetFocusByIndex(focusedIndex);
             }
-
-            if (RootWidget == null || !RootWidget.SetFocusByIndex(focusedIndex))
+            else
             {
-                RootWidget?.Focus();
+                RootWidget?.SetFocusByIndexSilently(focusedIndex);
             }
         }
 
@@ -225,7 +234,7 @@ namespace SongsOfConquestAccess.Screens
             grid?.SetFocusedCell(focus.ColumnIndex, focus.RowIndex);
         }
 
-        private static ContainerWidget BuildRoot(TradingMenuAdapter adapter)
+        private static ContainerWidget BuildRoot(TradingMenuAdapter adapter, Action onCompletedDrop)
         {
             ContainerWidget root = new ContainerWidget("trade-screen", adapter != null ? adapter.Title : "Trade");
             if (adapter == null)
@@ -241,14 +250,16 @@ namespace SongsOfConquestAccess.Screens
             root.AddChild(new InventoryGridWidget(
                 "trade-inventory-grid",
                 BuildInventoryGridColumns(adapter),
-                adapter.DropInventoryArtifact));
+                adapter.DropInventoryArtifact,
+                onCompletedDrop));
 
             root.AddChild(BuildArmyExchangeGrid(
                 "trade-army-exchange-grid",
                 BuildArmyLabel(adapter.LeftCommanderName),
                 BuildArmyLabel(adapter.RightCommanderName),
                 adapter.LeftTroops,
-                adapter.RightTroops));
+                adapter.RightTroops,
+                onCompletedDrop));
 
             root.AddChild(BuildPortrait(adapter, left: false));
             root.AddChild(BuildMenu("trade-right-stats", adapter.RightCommanderName + "'s stats", GetItemsSafely("Right stats", () => adapter.GetStats(left: false)), adapter.HideNativeTooltip));
@@ -331,7 +342,8 @@ namespace SongsOfConquestAccess.Screens
             string leftArmyLabel,
             string rightArmyLabel,
             TroopHudAdapter left,
-            TroopHudAdapter right)
+            TroopHudAdapter right,
+            Action onCompletedDrop)
         {
             IReadOnlyList<TroopHudAdapter.SlotItem> leftSlots = left != null
                 ? left.GetSlots()
@@ -345,7 +357,8 @@ namespace SongsOfConquestAccess.Screens
                 rightArmyLabel,
                 leftSlots,
                 rightSlots,
-                DropArmySlot);
+                DropArmySlot,
+                onCompletedDrop);
         }
 
         private static string BuildArmyLabel(string commanderName)

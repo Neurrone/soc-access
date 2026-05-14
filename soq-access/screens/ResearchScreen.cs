@@ -57,7 +57,7 @@ namespace SongsOfConquestAccess.Screens
             _adapter?.HideNativeTooltip();
         }
 
-        public void Refresh(bool focusAfterRefresh)
+        public void Refresh()
         {
             if (!IsPresent())
             {
@@ -68,22 +68,12 @@ namespace SongsOfConquestAccess.Screens
             int focusedMenuIndex = GetFocusedMenuIndex(focusedIndex);
 
             RootWidget = BuildRoot(_adapter);
-
-            if (!focusAfterRefresh)
-            {
-                return;
-            }
-
-            if (RootWidget == null || !RootWidget.SetFocusByIndex(focusedIndex))
-            {
-                RootWidget?.Focus();
-                return;
-            }
+            RootWidget?.SetFocusByIndexSilently(focusedIndex);
 
             MenuWidget menu = RootWidget.GetChildAt(focusedIndex) as MenuWidget;
             if (menu != null && menu.Id != "research-buildings" && focusedMenuIndex >= 0)
             {
-                menu.SetFocusByIndex(focusedMenuIndex);
+                menu.SetFocusByIndexSilently(focusedMenuIndex);
             }
         }
 
@@ -122,7 +112,7 @@ namespace SongsOfConquestAccess.Screens
                 return;
             }
 
-            Refresh(focusAfterRefresh: true);
+            Refresh();
         }
 
         private int GetFocusedMenuIndex(int focusedIndex)
@@ -180,7 +170,7 @@ namespace SongsOfConquestAccess.Screens
             }
             else
             {
-                menu.SetFocusByIndex(adapter.SelectedBuildingIndex);
+                menu.SetFocusByIndexSilently(adapter.SelectedBuildingIndex);
             }
 
             return menu;

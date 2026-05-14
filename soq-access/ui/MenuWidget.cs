@@ -100,7 +100,25 @@ namespace SongsOfConquestAccess.UI
 
         public bool SetFocusByIndex(int index)
         {
-            return SetFocus(ClampToVisibleIndex(index));
+            return SetFocus(ClampToVisibleIndex(index), announce: true);
+        }
+
+        public bool SetFocusByIndexSilently(int index)
+        {
+            index = ClampToVisibleIndex(index);
+            if (index < 0 || index >= _items.Count)
+            {
+                return false;
+            }
+
+            MenuItemWidget item = _items[index];
+            if (item == null || !item.IsVisible)
+            {
+                return false;
+            }
+
+            _focusedIndex = index;
+            return true;
         }
 
         public override Widget GetFocusedWidget()
@@ -110,14 +128,7 @@ namespace SongsOfConquestAccess.UI
 
         protected override void OnFocus()
         {
-            if (FocusedItem != null && FocusedItem.IsVisible)
-            {
-                FocusedItem.Focus();
-                UIManager.SetFocusedWidget(FocusedItem.GetFocusedWidget());
-                return;
-            }
-
-            SetFocus(FindFirstVisibleIndex());
+            EnsureFocus();
         }
 
         protected override void OnUnfocus()
@@ -128,6 +139,16 @@ namespace SongsOfConquestAccess.UI
         public override bool ClaimsAction(string actionKey)
         {
             return ClaimsMenuNavigationAction(actionKey);
+        }
+
+        public override bool EnsureFocus()
+        {
+            if (FocusedItem == null || !FocusedItem.IsVisible)
+            {
+                _focusedIndex = FindFirstVisibleIndex();
+            }
+
+            return FocusedItem != null;
         }
 
         public override bool HasClaimInTree(string actionKey)
@@ -194,9 +215,9 @@ namespace SongsOfConquestAccess.UI
                 case "previous_menu_item":
                     return MoveRelative(-1);
                 case "first_menu_item":
-                    return SetFocus(FindFirstVisibleIndex());
+                    return SetFocus(FindFirstVisibleIndex(), announce: true);
                 case "last_menu_item":
-                    return SetFocus(FindLastVisibleIndex());
+                    return SetFocus(FindLastVisibleIndex(), announce: true);
                 default:
                     return false;
             }
@@ -212,7 +233,7 @@ namespace SongsOfConquestAccess.UI
             MenuItemWidget focusedItem = FocusedItem;
             if (focusedItem != null && !focusedItem.IsVisible)
             {
-                return SetFocus(ClampToVisibleIndex(_focusedIndex));
+                return SetFocus(ClampToVisibleIndex(_focusedIndex), announce: true);
             }
 
             int nextIndex = _focusedIndex;
@@ -226,7 +247,7 @@ namespace SongsOfConquestAccess.UI
             {
                 if (_items[nextIndex].IsVisible)
                 {
-                    return SetFocus(nextIndex);
+                    return SetFocus(nextIndex, announce: true);
                 }
 
                 nextIndex += delta;
@@ -302,7 +323,7 @@ namespace SongsOfConquestAccess.UI
             return -1;
         }
 
-        protected bool SetFocus(int index)
+        protected bool SetFocus(int index, bool announce)
         {
             if (index < 0 || index >= _items.Count)
             {
@@ -315,15 +336,16 @@ namespace SongsOfConquestAccess.UI
                 return false;
             }
 
-            MenuItemWidget previous = FocusedItem;
-            if (previous != null && !ReferenceEquals(previous, next))
+            _focusedIndex = index;
+            if (announce)
             {
-                previous.Unfocus();
+                UIManager.RequestFocus(next);
+            }
+            else
+            {
+                UIManager.RequestFocusSilently(next);
             }
 
-            _focusedIndex = index;
-            next.Focus();
-            UIManager.SetFocusedWidget(next.GetFocusedWidget());
             return true;
         }
     }

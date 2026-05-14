@@ -163,13 +163,14 @@ namespace SongsOfConquestAccess.Screens
                 return;
             }
 
-            OptionsScreen screen = new OptionsScreen(adapter);
-            if (_screenManager.CurrentScreen is OptionsScreen)
+            OptionsScreen current = _screenManager.CurrentScreen as OptionsScreen;
+            if (current != null)
             {
-                _screenManager.RefreshTop<OptionsScreen>(screen, "options menu changed");
+                current.Refresh();
                 return;
             }
 
+            OptionsScreen screen = new OptionsScreen(adapter);
             Push(screen, "options menu ready");
         }
 
@@ -181,10 +182,10 @@ namespace SongsOfConquestAccess.Screens
                 return;
             }
 
-            OptionsScreen screen = new OptionsScreen(adapter);
-            if (_screenManager.CurrentScreen is OptionsScreen)
+            OptionsScreen current = _screenManager.CurrentScreen as OptionsScreen;
+            if (current != null)
             {
-                _screenManager.RefreshTop<OptionsScreen>(screen, "options content changed");
+                current.Refresh();
                 return;
             }
         }
@@ -288,7 +289,7 @@ namespace SongsOfConquestAccess.Screens
                 return;
             }
 
-            screen.Refresh(focusAfterRefresh: true);
+            screen.Refresh();
         }
 
         public void OnCodexReady(CodexMenu codexMenu)
@@ -319,10 +320,10 @@ namespace SongsOfConquestAccess.Screens
                 return;
             }
 
-            CodexScreen screen = new CodexScreen(adapter);
-            if (_screenManager.CurrentScreen is CodexScreen)
+            CodexScreen current = _screenManager.CurrentScreen as CodexScreen;
+            if (current != null)
             {
-                _screenManager.RefreshTop<CodexScreen>(screen, "codex tab changed");
+                current.Refresh();
                 return;
             }
         }
@@ -332,7 +333,7 @@ namespace SongsOfConquestAccess.Screens
             CodexScreen screen = _screenManager.CurrentScreen as CodexScreen;
             if (screen != null)
             {
-                screen.Refresh(focusAfterRefresh: true);
+                screen.Refresh();
             }
         }
 
@@ -890,7 +891,7 @@ namespace SongsOfConquestAccess.Screens
                 return;
             }
 
-            current.Refresh(focusAfterRefresh: true);
+            current.Refresh();
         }
 
         public void OnRallyPointClosed(RallyPointInteractionMenu menu)
@@ -1146,7 +1147,7 @@ namespace SongsOfConquestAccess.Screens
                 return;
             }
 
-            screen.Refresh(focusAfterRefresh: true);
+            screen.Refresh();
         }
 
         private void RefreshCurrentResearchMenu()
@@ -1157,7 +1158,7 @@ namespace SongsOfConquestAccess.Screens
                 return;
             }
 
-            screen.Refresh(focusAfterRefresh: true);
+            screen.Refresh();
         }
 
         public void OnLevelUpMenuReady(CommanderLevelUpMenu menu)
@@ -1186,6 +1187,7 @@ namespace SongsOfConquestAccess.Screens
             if (!adapter.IsPresent())
             {
                 adapter.Dispose();
+                return;
             }
 
             Push(new HostileJoinMenuScreen(adapter), "hostile join menu ready");
@@ -1197,15 +1199,18 @@ namespace SongsOfConquestAccess.Screens
             if (!adapter.IsPresent())
             {
                 adapter.Dispose();
-            }
-
-            HostileJoinMenuScreen screen = new HostileJoinMenuScreen(adapter);
-            if (_screenManager.CurrentScreen is HostileJoinMenuScreen)
-            {
-                _screenManager.RefreshTop<HostileJoinMenuScreen>(screen, "hostile join menu changed");
                 return;
             }
 
+            HostileJoinMenuScreen current = _screenManager.CurrentScreen as HostileJoinMenuScreen;
+            if (current != null)
+            {
+                adapter.Dispose();
+                current.Refresh();
+                return;
+            }
+
+            HostileJoinMenuScreen screen = new HostileJoinMenuScreen(adapter);
             Push(screen, "hostile join menu ready");
         }
 
@@ -1253,7 +1258,7 @@ namespace SongsOfConquestAccess.Screens
                 return;
             }
 
-            screen.Refresh(true);
+            screen.Refresh();
         }
 
         public void OnCommanderSheetComponentChanged(UnityEngine.Component component)
@@ -1268,13 +1273,14 @@ namespace SongsOfConquestAccess.Screens
 
         public void OnTradingMenuReady(TradingMenu menu)
         {
-            TradingScreen screen = new TradingScreen(new TradingMenuAdapter(menu));
-            if (_screenManager.CurrentScreen is TradingScreen)
+            TradingScreen current = _screenManager.CurrentScreen as TradingScreen;
+            if (current != null)
             {
-                _screenManager.RefreshTop<TradingScreen>(screen, "trading menu changed");
+                current.Refresh();
                 return;
             }
 
+            TradingScreen screen = new TradingScreen(new TradingMenuAdapter(menu));
             Push(screen, "trading menu ready");
         }
 
@@ -1300,7 +1306,7 @@ namespace SongsOfConquestAccess.Screens
                 return;
             }
 
-            screen.Refresh(true);
+            screen.Refresh();
         }
 
         public void ResyncFromRuntimeState()

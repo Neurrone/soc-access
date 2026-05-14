@@ -76,7 +76,7 @@ namespace SongsOfConquestAccess.Screens
             return base.OnActionJustPressed(action);
         }
 
-        public void Refresh(bool focusAfterRefresh)
+        public void Refresh()
         {
             if (!IsPresent())
             {
@@ -90,10 +90,7 @@ namespace SongsOfConquestAccess.Screens
             RootWidget = BuildRoot(_adapter);
             RestoreArmyGridFocus(gridFocus);
             RestoreTroopMenuFocus(troopMenuFocusedIndex);
-            if (focusAfterRefresh)
-            {
-                RootWidget?.SetFocusByIndex(focusedIndex);
-            }
+            RootWidget?.SetFocusByIndexSilently(focusedIndex);
         }
 
         private GridFocus CaptureArmyGridFocus()
@@ -129,7 +126,7 @@ namespace SongsOfConquestAccess.Screens
             }
 
             MenuWidget menu = RootWidget.GetChildAt(ArmyWidgetIndex) as MenuWidget;
-            menu?.SetFocusByIndex(focusedIndex);
+            menu?.SetFocusByIndexSilently(focusedIndex);
         }
 
         private void AttachListeners()
@@ -173,8 +170,7 @@ namespace SongsOfConquestAccess.Screens
                 return;
             }
 
-            bool focusAfterRefresh = ReferenceEquals(SoqAccessPlugin.Instance?.ScreenManager?.CurrentScreen, this);
-            Refresh(focusAfterRefresh);
+            Refresh();
         }
 
         private static ContainerWidget BuildRoot(DefenceMenuAdapter adapter)
