@@ -25,7 +25,7 @@ namespace SongsOfConquestAccess.Events
 
         public string GetSpeechText()
         {
-            return SpeechTextSanitizer.Normalize(NotificationSpeechText.JoinNonEmpty(null, Header, Body));
+            return SpeechTextSanitizer.Normalize(NotificationSpeechText.JoinNonEmpty(Header, Body));
         }
     }
 
@@ -67,7 +67,7 @@ namespace SongsOfConquestAccess.Events
 
         public string GetSpeechText()
         {
-            return SpeechTextSanitizer.Normalize(NotificationSpeechText.JoinNonEmpty(null, WielderName, LevelText));
+            return SpeechTextSanitizer.Normalize(WielderName + " leveled up to " + LevelText);
         }
     }
 
@@ -156,7 +156,7 @@ namespace SongsOfConquestAccess.Events
 
         public string GetSpeechText()
         {
-            return SpeechTextSanitizer.Normalize(NotificationSpeechText.JoinNonEmpty("Notification", Header, Body, Effects));
+            return SpeechTextSanitizer.Normalize(NotificationSpeechText.JoinNonEmpty(Header, Body, Effects));
         }
 
     }
@@ -208,9 +208,9 @@ namespace SongsOfConquestAccess.Events
 
     internal static class NotificationSpeechText
     {
-        public static string JoinNonEmpty(string prefix, params string[] values)
+        public static string JoinNonEmpty(params string[] values)
         {
-            StringBuilder builder = new StringBuilder(prefix ?? string.Empty);
+            StringBuilder builder = new StringBuilder();
             if (values == null)
             {
                 return builder.ToString();
