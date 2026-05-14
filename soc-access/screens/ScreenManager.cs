@@ -193,15 +193,21 @@ namespace SongsOfConquestAccess.Screens
 
         public bool Contains<TScreen>() where TScreen : Screen
         {
+            return Get<TScreen>() != null;
+        }
+
+        public TScreen Get<TScreen>() where TScreen : Screen
+        {
             for (int i = _stack.Count - 1; i >= 0; i--)
             {
-                if (_stack[i] is TScreen)
+                TScreen screen = _stack[i] as TScreen;
+                if (screen != null)
                 {
-                    return true;
+                    return screen;
                 }
             }
 
-            return false;
+            return null;
         }
 
         public void Clear()
@@ -269,6 +275,24 @@ namespace SongsOfConquestAccess.Screens
                 return true;
             }
 
+            if (action.Key == AccessibilityActions.SummarizeResources.Key)
+            {
+                CombatScreen combatScreen = Get<CombatScreen>();
+                if (combatScreen != null)
+                {
+                    return combatScreen.SummarizeResources();
+                }
+
+                AdventureMapScreen adventureMapScreen = Get<AdventureMapScreen>();
+                return adventureMapScreen != null && adventureMapScreen.SummarizeResources();
+            }
+
+            if (action.Key == AccessibilityActions.SummarizeEnemyResources.Key)
+            {
+                CombatScreen combatScreen = Get<CombatScreen>();
+                return combatScreen != null && combatScreen.SummarizeEnemyResources();
+            }
+
             if (_reviewBufferController != null)
             {
                 if (action.Key == AccessibilityActions.PreviousBuffer.Key)
@@ -329,6 +353,16 @@ namespace SongsOfConquestAccess.Screens
                 return tooltip != null
                     && tooltip.Actions != null
                     && tooltip.Actions.Count > 0;
+            }
+
+            if (action.Key == AccessibilityActions.SummarizeResources.Key)
+            {
+                return Get<CombatScreen>() != null || Get<AdventureMapScreen>() != null;
+            }
+
+            if (action.Key == AccessibilityActions.SummarizeEnemyResources.Key)
+            {
+                return Get<CombatScreen>() != null;
             }
 
             if (IsReviewBufferAction(action))

@@ -13,6 +13,12 @@ namespace SongsOfConquestAccess.Input
         public static readonly InputAction TooltipActionsMenu = OneShot("tooltip_actions_menu", "Tooltip Actions Menu", InputClaimScope.Screen)
             .AddBinding(new KeyboardBinding(Key.Backquote));
 
+        public static readonly InputAction SummarizeResources = OneShot("summarize_resources", "Summarize Resources", InputClaimScope.Screen)
+            .AddBinding(new KeyboardBinding(Key.R, ctrl: true));
+
+        public static readonly InputAction SummarizeEnemyResources = OneShot("summarize_enemy_resources", "Summarize Enemy Resources", InputClaimScope.Screen)
+            .AddBinding(new KeyboardBinding(Key.R, alt: true));
+
         public static readonly InputAction PreviousBuffer = OneShot("previous_buffer", "Previous Buffer", InputClaimScope.Screen)
             .AddBinding(new KeyboardBinding(Key.LeftArrow, ctrl: true));
 
@@ -34,6 +40,8 @@ namespace SongsOfConquestAccess.Input
         public static readonly InputAction[] GLOBAL_ACTIONS =
         {
             TooltipActionsMenu,
+            SummarizeResources,
+            SummarizeEnemyResources,
             PreviousBuffer,
             NextBuffer,
             PreviousBufferLine,
@@ -200,12 +208,6 @@ namespace SongsOfConquestAccess.Input
         public static readonly InputAction CombatPreviousRelevantTile = OneShot("combat_previous_relevant_tile", "Previous Relevant Combat Tile", InputClaimScope.FocusedWidget)
             .AddBinding(new KeyboardBinding(Key.W, shift: true));
 
-        public static readonly InputAction CombatSummarizeEssence = OneShot("combat_summarize_essence", "Summarize Essence", InputClaimScope.FocusedWidget)
-            .AddBinding(new KeyboardBinding(Key.S));
-
-        public static readonly InputAction CombatSummarizeEnemyEssence = OneShot("combat_summarize_enemy_essence", "Summarize Enemy Essence", InputClaimScope.FocusedWidget)
-            .AddBinding(new KeyboardBinding(Key.S, alt: true));
-
         public static readonly InputAction CombatFocusTimeline = OneShot("combat_focus_timeline", "Focus Timeline", InputClaimScope.FocusedWidget)
             .AddBinding(new KeyboardBinding(Key.T));
 
@@ -254,8 +256,6 @@ namespace SongsOfConquestAccess.Input
             CombatInspect,
             CombatNextRelevantTile,
             CombatPreviousRelevantTile,
-            CombatSummarizeEssence,
-            CombatSummarizeEnemyEssence,
             CombatFocusTimeline,
             StartDrag,
             Activate,

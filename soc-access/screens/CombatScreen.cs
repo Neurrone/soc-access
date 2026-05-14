@@ -152,6 +152,29 @@ namespace SongsOfConquestAccess.Screens
             return focusedTimeline || focusedFirstItem;
         }
 
+        public bool SummarizeResources()
+        {
+            string summary = _adapter != null ? _adapter.BuildLocalEssenceSummary() : string.Empty;
+            if (string.IsNullOrWhiteSpace(summary))
+            {
+                summary = "No essence";
+            }
+
+            SpeechPipeline.Output(new SpeechRequest(summary, interrupt: false));
+            return true;
+        }
+
+        public bool SummarizeEnemyResources()
+        {
+            string summary = _adapter != null ? _adapter.BuildEnemyEssenceSummary() : string.Empty;
+            if (!string.IsNullOrWhiteSpace(summary))
+            {
+                SpeechPipeline.Output(new SpeechRequest(summary, interrupt: false));
+            }
+
+            return true;
+        }
+
         public override void OnUnfocus()
         {
             RootWidget?.Unfocus();

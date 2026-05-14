@@ -415,6 +415,18 @@ namespace SongsOfConquestAccess.Adapters
             return string.IsNullOrWhiteSpace(income) ? label : label + ", income " + income;
         }
 
+        public int GetResourceAmount(ResourceType resourceType)
+        {
+            ITeamState team = Facade != null && Facade.Teams != null ? Facade.Teams.LocalTeamInControl : null;
+            Resource resource = team != null && team.Resources != null ? team.Resources.GetResource(resourceType) : null;
+            return resource != null ? resource.Amount : 0;
+        }
+
+        public string GetResourceName(ResourceType resourceType)
+        {
+            return Localize("Common/Resource/" + resourceType, FormatEnumName(resourceType.ToString()));
+        }
+
         public void FocusResource(ResourceType resourceType)
         {
             Component component = GetResourceTooltipComponent(resourceType);
@@ -1207,11 +1219,6 @@ namespace SongsOfConquestAccess.Adapters
 
             Component tooltipImage = entry != null ? entry.TooltipImage as Component : null;
             return tooltipImage != null ? tooltipImage.GetComponent<RectTransform>() : null;
-        }
-
-        private string GetResourceName(ResourceType resourceType)
-        {
-            return Localize("Common/Resource/" + resourceType, FormatEnumName(resourceType.ToString()));
         }
 
         private int GetObjectiveEntryCount()

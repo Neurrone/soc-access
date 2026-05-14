@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Reflection;
 using HarmonyLib;
 using Lavapotion.Cartography;
@@ -16,6 +17,7 @@ using SongsOfConquestAccess.UI;
 using SongsOfConquest.Common.Economy;
 using SongsOfConquest.Common.Gamestate;
 using SongsOfConquest.Common.Localization;
+using SongsOfConquestAccess.Speech;
 using UnityEngine;
 using Zenject;
 
@@ -25,6 +27,15 @@ namespace SongsOfConquestAccess.Screens
     {
         private static readonly PropertyInfo InstallerContainerProperty =
             AccessTools.Property(typeof(AdventureViewInstaller), "Container");
+        private static readonly ResourceType[] ResourceSummaryOrder =
+        {
+            ResourceType.Gold,
+            ResourceType.Wood,
+            ResourceType.Stone,
+            ResourceType.Glimmerweave,
+            ResourceType.AncientAmber,
+            ResourceType.CelestialOre
+        };
         private static string _lastProbeDiagnostic;
 
         private const int GridIndex = 0;
@@ -115,6 +126,36 @@ namespace SongsOfConquestAccess.Screens
             }
 
             FocusGrid();
+        }
+
+        public bool SummarizeResources()
+        {
+            AdventureHudAdapter hud = _adapter != null ? _adapter.Hud : null;
+            if (hud == null)
+            {
+                return false;
+            }
+
+            List<string> parts = new List<string>();
+            for (int i = 0; i < ResourceSummaryOrder.Length; i++)
+            {
+                ResourceType resourceType = ResourceSummaryOrder[i];
+                string name = hud.GetResourceName(resourceType);
+                if (string.IsNullOrWhiteSpace(name))
+                {
+                    continue;
+                }
+
+                parts.Add(hud.GetResourceAmount(resourceType) + " " + name.ToLowerInvariant());
+            }
+
+            if (parts.Count == 0)
+            {
+                return false;
+            }
+
+            SpeechPipeline.Output(new SpeechRequest(string.Join(", ", parts.ToArray()), interrupt: false));
+            return true;
         }
 
         private void HandleAccessibilityEvent(IAccessibilityEvent accessibilityEvent)
