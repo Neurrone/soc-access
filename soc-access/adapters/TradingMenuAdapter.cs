@@ -321,7 +321,7 @@ namespace SongsOfConquestAccess.Adapters
                     artifact != null ? GetArtifactName(artifact) : string.Empty,
                     movable,
                     nativeSlot,
-                    BuildArtifactTooltip(artifact, movable != null ? movable.GetSelectable() : GetEquipmentSlotSelectable(capturedNativeSlot, capturedSlot)),
+                    BuildArtifactTooltip(inventory, artifact, movable, movable != null ? movable.GetSelectable() : GetEquipmentSlotSelectable(capturedNativeSlot, capturedSlot)),
                     () => SelectInventoryCell(capturedNativeSlot, capturedMovable, 0)));
             }
 
@@ -351,7 +351,7 @@ namespace SongsOfConquestAccess.Adapters
                     artifact != null ? GetArtifactName(artifact) : string.Empty,
                     movable,
                     nativeSlot,
-                    BuildArtifactTooltip(artifact, movable != null ? movable.GetSelectable() : GetInventorySlotSelectable(nativeSlot, i)),
+                    BuildArtifactTooltip(inventory, artifact, movable, movable != null ? movable.GetSelectable() : GetInventorySlotSelectable(nativeSlot, i)),
                     () => SelectInventoryCell(nativeSlot, capturedMovable, capturedIndex)));
             }
 
@@ -508,9 +508,99 @@ namespace SongsOfConquestAccess.Adapters
             return entry != null ? (Selectable)entry : null;
         }
 
-        private Tooltip BuildArtifactTooltip(IArtifactState artifact, Selectable selectable)
+        private Tooltip BuildArtifactTooltip(InventoryHUD inventory, IArtifactState artifact, InventoryArtifactMovable movable, Selectable selectable)
         {
-            return Tooltip.ForComponent(selectable as Component, _localization);
+            Tooltip tooltip = Tooltip.ForComponent(selectable as Component, _localization);
+            if (tooltip == null || inventory == null || artifact == null || movable == null || _localization == null)
+            {
+                return tooltip;
+            }
+
+            if (artifact.IsImportant)
+            {
+                return tooltip;
+            }
+
+            List<TooltipAction> actions = new List<TooltipAction>();
+            List<string> instructionLines = new List<string>();
+
+            AddLocalizedLine(instructionLines, "Adventure/TooltipInstruction/Trade");
+            actions.Add(new TooltipAction(
+                GetLocalizedText("Adventure/TooltipInstruction/Trade", "Trade"),
+                () => InvokeArtifactAction(movable, inventory.EquipArtifact)));
+
+            AddLocalizedLine(instructionLines, "Adventure/TooltipInstruction/Destroy");
+            AddLocalizedLine(instructionLines, "Adventure/TooltipInstruction/Destroy.Gamepad");
+            actions.Add(new TooltipAction(
+                GetLocalizedText("Adventure/TooltipInstruction/Destroy.Gamepad", "Destroy"),
+                () => InvokeArtifactAction(movable, inventory.DestroyArtifact)));
+
+            AddLocalizedLine(instructionLines, "Adventure/TooltipInstruction/Drop");
+            AddLocalizedLine(instructionLines, "Adventure/TooltipInstruction/Drop.Gamepad");
+            actions.Add(new TooltipAction(
+                GetLocalizedText("Adventure/TooltipInstruction/Drop.Gamepad", "Drop"),
+                () => InvokeArtifactAction(movable, inventory.DropArtifact)));
+
+            AddLocalizedLine(instructionLines, "Adventure/TooltipInstruction/AutoArrange");
+            AddLocalizedLine(instructionLines, "Adventure/TooltipInstruction/AutoArrange.Gamepad");
+            actions.Add(new TooltipAction(
+                GetLocalizedText("Adventure/TooltipInstruction/AutoArrange.Gamepad", "Auto Arrange"),
+                () => InvokeArtifactAction(movable, inventory.AutoArrangeArtifacts)));
+
+            return new Tooltip(() => RemoveExactLines(tooltip.TextLines, instructionLines), tooltip.VisualMetadata, actions);
+        }
+
+        private static bool InvokeArtifactAction(InventoryArtifactMovable movable, Action<InventoryArtifactMovable> action)
+        {
+            if (movable == null || action == null)
+            {
+                return false;
+            }
+
+            action(movable);
+            return true;
+        }
+
+        private void AddLocalizedLine(List<string> lines, string key)
+        {
+            string line = _localization != null ? _localization.GetText(key) : string.Empty;
+            if (!string.IsNullOrWhiteSpace(line) && !lines.Contains(line))
+            {
+                lines.Add(line);
+            }
+        }
+
+        private static IReadOnlyList<string> RemoveExactLines(IReadOnlyList<string> lines, IReadOnlyList<string> linesToRemove)
+        {
+            if (lines == null || lines.Count == 0 || linesToRemove == null || linesToRemove.Count == 0)
+            {
+                return lines ?? new string[0];
+            }
+
+            List<string> result = new List<string>();
+            for (int i = 0; i < lines.Count; i++)
+            {
+                string line = lines[i];
+                if (!ContainsExact(linesToRemove, line))
+                {
+                    result.Add(line);
+                }
+            }
+
+            return result;
+        }
+
+        private static bool ContainsExact(IReadOnlyList<string> lines, string candidate)
+        {
+            for (int i = 0; i < lines.Count; i++)
+            {
+                if (string.Equals(lines[i], candidate, StringComparison.Ordinal))
+                {
+                    return true;
+                }
+            }
+
+            return false;
         }
 
         private string GetArtifactName(IArtifactState artifact)
