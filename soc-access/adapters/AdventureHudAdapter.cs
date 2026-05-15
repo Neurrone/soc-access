@@ -994,6 +994,10 @@ namespace SongsOfConquestAccess.Adapters
                 if (_notificationHud == null)
                 {
                     _notificationHud = Resolve<NotificationHUD>();
+                    if (_notificationHud == null)
+                    {
+                        _notificationHud = ResolveFromInstaller<NotificationHUD>(FindSameSceneComponent<NotificationHUDInstaller>());
+                    }
                 }
 
                 return _notificationHud;
