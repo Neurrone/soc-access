@@ -295,7 +295,7 @@ namespace SongsOfConquestAccess.UI
         private bool StartDrag()
         {
             CellWidget cell = FocusedCell;
-            if (cell == null || !cell.IsOccupied)
+            if (cell == null || !cell.CanDrag)
             {
                 return false;
             }
@@ -432,6 +432,11 @@ namespace SongsOfConquestAccess.UI
                 get { return _cell != null && _cell.Slot != null && !_cell.Slot.IsEmpty; }
             }
 
+            public bool CanDrag
+            {
+                get { return _cell != null && _cell.Slot != null && _cell.Slot.CanDrag; }
+            }
+
             public override string GetLabel()
             {
                 return _cell != null ? _cell.Label : string.Empty;
@@ -439,7 +444,7 @@ namespace SongsOfConquestAccess.UI
 
             public override string GetStatus()
             {
-                if (!IsOccupied || _grid == null)
+                if (!CanDrag || _grid == null)
                 {
                     return string.Empty;
                 }

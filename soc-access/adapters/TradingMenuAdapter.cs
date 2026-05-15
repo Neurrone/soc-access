@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Reflection;
 using HarmonyLib;
 using SongsOfConquest.Client.Adventure;
@@ -305,11 +306,19 @@ namespace SongsOfConquestAccess.Adapters
             {
                 InventorySlot slot = slots[i];
                 InventoryHUDSlot nativeSlot = inventory != null ? inventory.GetSlot(slot) : null;
-                InventoryArtifactMovable movable = nativeSlot != null ? nativeSlot.TryGetArtifact(0) : null;
-                IArtifactState artifact = movable != null ? movable.State : null;
+                IArtifactState artifact = GetDisplayArtifactForEquipmentSlot(commanderId, slot);
+                bool displayOnly = IsDisplayOnlyEquipmentArtifact(slot, artifact);
+                InventoryArtifactMovable nativeMovable = nativeSlot != null ? nativeSlot.TryGetArtifact(0) : null;
+                InventoryArtifactMovable artifactMovable = nativeMovable ?? GetArtifactMovable(inventory, artifact);
+                InventoryArtifactMovable movable = displayOnly ? null : artifactMovable;
                 InventorySlot capturedSlot = slot;
                 InventoryHUDSlot capturedNativeSlot = nativeSlot;
                 InventoryArtifactMovable capturedMovable = movable;
+                Selectable tooltipSelectable = movable != null
+                    ? movable.GetSelectable()
+                    : displayOnly && artifactMovable != null
+                        ? artifactMovable.GetSelectable()
+                        : GetEquipmentSlotSelectable(capturedNativeSlot, capturedSlot);
                 slotsInfo.Add(new InventorySlotInfo(
                     commanderId,
                     ownerName,
@@ -321,7 +330,7 @@ namespace SongsOfConquestAccess.Adapters
                     artifact != null ? GetArtifactName(artifact) : string.Empty,
                     movable,
                     nativeSlot,
-                    BuildArtifactTooltip(inventory, artifact, movable, movable != null ? movable.GetSelectable() : GetEquipmentSlotSelectable(capturedNativeSlot, capturedSlot)),
+                    BuildArtifactTooltip(inventory, artifact, artifactMovable, tooltipSelectable),
                     () => SelectInventoryCell(capturedNativeSlot, capturedMovable, 0)));
             }
 
@@ -506,6 +515,36 @@ namespace SongsOfConquestAccess.Adapters
         {
             InventoryHUDGridEntry entry = nativeSlot != null ? nativeSlot.TryGetEntry(positionIndex) : null;
             return entry != null ? (Selectable)entry : null;
+        }
+
+        private IArtifactState GetDisplayArtifactForEquipmentSlot(int commanderId, InventorySlot slot)
+        {
+            if (_facade == null || commanderId < 0)
+            {
+                return null;
+            }
+
+            if (slot == InventorySlot.OffHand)
+            {
+                return _facade.Artifacts.GetForOwner(commanderId, ArtifactSlot.OffHand).FirstOrDefault();
+            }
+
+            return _facade.Artifacts.GetForOwner(commanderId, slot).FirstOrDefault();
+        }
+
+        private static bool IsDisplayOnlyEquipmentArtifact(InventorySlot slot, IArtifactState artifact)
+        {
+            return slot == InventorySlot.OffHand
+                && artifact != null
+                && artifact.EquippedInSlot == InventorySlot.MainHand;
+        }
+
+        private static InventoryArtifactMovable GetArtifactMovable(InventoryHUD inventory, IArtifactState artifact)
+        {
+            InventoryHUDSlot nativeSlot = inventory != null && artifact != null
+                ? inventory.GetSlot(artifact.EquippedInSlot)
+                : null;
+            return nativeSlot != null ? nativeSlot.TryGetArtifact(artifact.PositionIndex) : null;
         }
 
         private Tooltip BuildArtifactTooltip(InventoryHUD inventory, IArtifactState artifact, InventoryArtifactMovable movable, Selectable selectable)

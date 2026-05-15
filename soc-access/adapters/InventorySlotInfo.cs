@@ -50,7 +50,12 @@ namespace SongsOfConquestAccess.Adapters
 
         public bool IsEmpty
         {
-            get { return Movable == null; }
+            get { return Movable == null && string.IsNullOrWhiteSpace(ArtifactName); }
+        }
+
+        public bool CanDrag
+        {
+            get { return Movable != null; }
         }
 
         public void FocusNative()

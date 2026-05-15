@@ -418,11 +418,18 @@ namespace SongsOfConquestAccess.Adapters
             {
                 InventorySlot slot = slots[i];
                 InventoryHUDSlot nativeSlot = _inventory != null ? _inventory.GetSlot(slot) : null;
-                IArtifactState artifact = GetArtifactsForSlot(slot).FirstOrDefault();
-                InventoryArtifactMovable movable = GetArtifactMovable(artifact);
+                IArtifactState artifact = GetDisplayArtifactForEquipmentSlot(slot);
+                bool displayOnly = IsDisplayOnlyEquipmentArtifact(slot, artifact);
+                InventoryArtifactMovable artifactMovable = GetArtifactMovable(artifact);
+                InventoryArtifactMovable movable = displayOnly ? null : artifactMovable;
                 InventorySlot capturedSlot = slot;
                 InventoryHUDSlot capturedNativeSlot = nativeSlot;
                 InventoryArtifactMovable capturedMovable = movable;
+                Selectable tooltipSelectable = movable != null
+                    ? movable.GetSelectable()
+                    : displayOnly && artifactMovable != null
+                        ? artifactMovable.GetSelectable()
+                        : GetEquipmentSlotSelectable(capturedSlot);
                 slotsInfo.Add(new InventorySlotInfo(
                     CommanderId,
                     ownerName,
@@ -434,7 +441,7 @@ namespace SongsOfConquestAccess.Adapters
                     artifact != null ? GetArtifactName(artifact) : string.Empty,
                     movable,
                     nativeSlot,
-                    BuildEquipmentTooltip(artifact, movable != null ? movable.GetSelectable() : GetEquipmentSlotSelectable(capturedSlot)),
+                    BuildEquipmentTooltip(artifact, tooltipSelectable, artifactMovable),
                     () => SelectInventoryCell(capturedNativeSlot, capturedMovable, 0)));
             }
 
@@ -464,7 +471,7 @@ namespace SongsOfConquestAccess.Adapters
                     artifact != null ? GetArtifactName(artifact) : string.Empty,
                     movable,
                     nativeSlot,
-                    BuildEquipmentTooltip(artifact, movable != null ? movable.GetSelectable() : GetInventorySlotSelectable(nativeSlot, i)),
+                    BuildEquipmentTooltip(artifact, movable != null ? movable.GetSelectable() : GetInventorySlotSelectable(nativeSlot, i), movable),
                     () => SelectInventoryCell(nativeSlot, capturedMovable, capturedIndex)));
             }
 
@@ -503,10 +510,9 @@ namespace SongsOfConquestAccess.Adapters
             return ArtifactDropUtility.DropInventoryArtifact(_facade, source, target, "CommanderSheetAdapter artifact grid drop");
         }
 
-        private Tooltip BuildEquipmentTooltip(IArtifactState artifact, Selectable selectable)
+        private Tooltip BuildEquipmentTooltip(IArtifactState artifact, Selectable selectable, InventoryArtifactMovable movable)
         {
             Tooltip tooltip = Tooltip.ForComponent(selectable, _localization);
-            InventoryArtifactMovable movable = GetArtifactMovable(artifact);
             if (tooltip == null || artifact == null || movable == null || _localization == null)
             {
                 return tooltip;
@@ -710,6 +716,28 @@ namespace SongsOfConquestAccess.Adapters
             }
 
             return _facade.Artifacts.GetForOwner(CommanderId, slot) ?? new IArtifactState[0];
+        }
+
+        private IArtifactState GetDisplayArtifactForEquipmentSlot(InventorySlot slot)
+        {
+            if (_facade == null || CommanderId < 0)
+            {
+                return null;
+            }
+
+            if (slot == InventorySlot.OffHand)
+            {
+                return _facade.Artifacts.GetForOwner(CommanderId, ArtifactSlot.OffHand).FirstOrDefault();
+            }
+
+            return GetArtifactsForSlot(slot).FirstOrDefault();
+        }
+
+        private static bool IsDisplayOnlyEquipmentArtifact(InventorySlot slot, IArtifactState artifact)
+        {
+            return slot == InventorySlot.OffHand
+                && artifact != null
+                && artifact.EquippedInSlot == InventorySlot.MainHand;
         }
 
         private string GetArtifactName(IArtifactState artifact)
