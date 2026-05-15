@@ -1,5 +1,9 @@
 # Changelog
 
+## V0.1.2
+
+Emergency release because I left out a critical config file, so this wasn't working for anyone else. Woops.
+
 ## V0.1.1
 
 - Fixed regression that broke support for popup dialogs
