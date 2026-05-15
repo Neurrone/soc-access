@@ -490,7 +490,14 @@ namespace SongsOfConquestAccess.Screens
             }
 
             object resolvedSourceKey = sourceKey ?? (settings != null ? (object)settings.ContainerTransform : null);
-            Push(new MessageDialogScreen(new PopupMenuAdapter(resolvedSourceKey, settings)), "popup menu ready");
+            MessageDialogScreen screen = new MessageDialogScreen(new PopupMenuAdapter(resolvedSourceKey, settings));
+            if (IsCurrentMessageDialogSource(resolvedSourceKey))
+            {
+                _screenManager.RefreshTop<MessageDialogScreen>(screen, "popup menu refreshed");
+                return;
+            }
+
+            Push(screen, "popup menu ready");
         }
 
         public void OnPopupMenuClosed(object sourceKey)

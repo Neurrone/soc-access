@@ -1,3 +1,4 @@
+using System.Collections;
 using HarmonyLib;
 using SongsOfConquest.Client.Menu.Popup;
 using SongsOfConquest.Client.UI;
@@ -9,6 +10,8 @@ namespace SongsOfConquestAccess
     [HarmonyPatch]
     internal static class PopupMenuPatches
     {
+        private const int MaxReadyWaitFrames = 30;
+
         private static readonly AccessTools.FieldRef<PopupMenu, PopupMenu.Settings> SettingsRef =
             AccessTools.FieldRefAccess<PopupMenu, PopupMenu.Settings>("_settings");
 
@@ -80,7 +83,52 @@ namespace SongsOfConquestAccess
                 settings = SettingsRef(popup);
             }
 
+            if (settings == null)
+            {
+                SocAccessPlugin.Instance?.ScreenDetector?.OnPopupMenuReady(popup, settings);
+                return;
+            }
+
+            if (TryNotifyReady(popup, settings))
+            {
+                return;
+            }
+
+            SocAccessPlugin plugin = SocAccessPlugin.Instance;
+            if (plugin != null)
+            {
+                plugin.StartCoroutine(NotifyReadyWhenPresent(popup, settings));
+            }
+        }
+
+        private static IEnumerator NotifyReadyWhenPresent(PopupMenu popup, PopupMenu.Settings settings)
+        {
+            for (int i = 0; i < MaxReadyWaitFrames; i++)
+            {
+                yield return null;
+
+                if (TryNotifyReady(popup, settings))
+                {
+                    yield break;
+                }
+            }
+        }
+
+        private static bool TryNotifyReady(PopupMenu popup, PopupMenu.Settings settings)
+        {
+            if (settings == null)
+            {
+                return false;
+            }
+
+            PopupMenuAdapter adapter = new PopupMenuAdapter(popup, settings);
+            if (!adapter.IsPresent())
+            {
+                return false;
+            }
+
             SocAccessPlugin.Instance?.ScreenDetector?.OnPopupMenuReady(popup, settings);
+            return true;
         }
     }
 }
