@@ -53,6 +53,7 @@ namespace SongsOfConquestAccess.Screens
                 PostAdventureStatsScreen.TryBuildActiveScreen,
                 PostBattleResultScreen.TryBuildActiveScreen,
                 PreBattleMenuScreen.TryBuildActiveScreen,
+                ClaimMenuScreen.TryBuildActiveScreen,
                 UpgradeTroopsScreen.TryBuildActiveDwellingScreen,
                 DraftTroopsScreen.TryBuildActiveDwellingScreen,
                 RallyPointScreen.TryBuildActiveScreen,
@@ -841,6 +842,32 @@ namespace SongsOfConquestAccess.Screens
         public void OnPreBattleMenuClosed(PreBattleMenu menu)
         {
             _screenManager.Pop<PreBattleMenuScreen>("pre battle menu closed");
+        }
+
+        public void OnClaimMenuReady(ClaimMenu menu)
+        {
+            ClaimMenuAdapter adapter = new ClaimMenuAdapter(menu);
+            if (!adapter.IsPresent())
+            {
+                return;
+            }
+
+            ClaimMenuScreen current = _screenManager.CurrentScreen as ClaimMenuScreen;
+            if (current != null && current.Matches(menu))
+            {
+                return;
+            }
+
+            Push(new ClaimMenuScreen(adapter), "claim menu ready");
+        }
+
+        public void OnClaimMenuClosed(ClaimMenu menu)
+        {
+            ClaimMenuScreen current = _screenManager.CurrentScreen as ClaimMenuScreen;
+            if (current != null && (menu == null || current.Matches(menu)))
+            {
+                _screenManager.Pop<ClaimMenuScreen>("claim menu closed");
+            }
         }
 
         public void OnWorldChoiceMenuReady(WorldChoiceMenu menu)
