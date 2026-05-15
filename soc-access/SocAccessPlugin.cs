@@ -142,7 +142,7 @@ namespace SongsOfConquestAccess
                 return;
             }
 
-            string message = "Songs of Conquest Access v0.1 ready";
+            string message = "Songs of Conquest Access v0.1.1 ready";
             _speechService.Speak(message, interrupt: true);
             _announcedReady = true;
             Logger.LogInfo(message);
