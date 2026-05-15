@@ -18,6 +18,8 @@
     <ScriptOutputDir>$(GameDir)\BepInEx\scripts</ScriptOutputDir>
     <DeployDllPath>$(ScriptOutputDir)\$(AssemblyName).dll</DeployDllPath>
     <DeployPdbPath>$(ScriptOutputDir)\$(AssemblyName).pdb</DeployPdbPath>
+    <ReleaseTemplatePluginsDir>$(MSBuildProjectDirectory)\..\release-template\BepInEx\plugins</ReleaseTemplatePluginsDir>
+    <ReleaseTemplatePluginDllPath>$(ReleaseTemplatePluginsDir)\$(AssemblyName).dll</ReleaseTemplatePluginDllPath>
   </PropertyGroup>
 
   <ItemGroup>
@@ -131,6 +133,16 @@
           DestinationFiles="$(DeployPdbPath)"
           SkipUnchangedFiles="false"
           Condition="Exists('$(TargetDir)$(AssemblyName).pdb')" />
+  </Target>
+
+  <Target Name="CopyReleaseDllToTemplatePlugins"
+          AfterTargets="Build"
+          Condition="'$(Configuration)' == 'Release'">
+    <Message Text="Copying release DLL to $(ReleaseTemplatePluginDllPath)" Importance="High" />
+    <MakeDir Directories="$(ReleaseTemplatePluginsDir)" />
+    <Copy SourceFiles="$(TargetPath)"
+          DestinationFiles="$(ReleaseTemplatePluginDllPath)"
+          SkipUnchangedFiles="false" />
   </Target>
 
 </Project>
