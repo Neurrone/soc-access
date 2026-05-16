@@ -28,10 +28,16 @@ namespace SongsOfConquestAccess.Events
     internal sealed class MapWielderMovedEvent : IAccessibilityEvent
     {
         public MapWielderMovedEvent(int wielderId, string wielderName, Vector2Int tile)
+            : this(wielderId, wielderName, tile, isLocalWielder: false)
+        {
+        }
+
+        public MapWielderMovedEvent(int wielderId, string wielderName, Vector2Int tile, bool isLocalWielder)
         {
             WielderId = wielderId;
             WielderName = string.IsNullOrWhiteSpace(wielderName) ? "wielder" : wielderName;
             Tile = tile;
+            IsLocalWielder = isLocalWielder;
         }
 
         public string Kind { get { return AccessibilityEvents.Map.WielderMoved; } }
@@ -41,9 +47,41 @@ namespace SongsOfConquestAccess.Events
 
         public Vector2Int Tile { get; private set; }
 
+        public bool IsLocalWielder { get; private set; }
+
         public string GetSpeechText()
         {
             return WielderName + " moved to " + FormatTile(Tile);
+        }
+
+        private static string FormatTile(Vector2Int tile)
+        {
+            return tile.x + ", " + tile.y;
+        }
+    }
+
+    internal sealed class MapWielderTeleportedEvent : IAccessibilityEvent
+    {
+        public MapWielderTeleportedEvent(int wielderId, string wielderName, Vector2Int tile, TeleportSource source)
+        {
+            WielderId = wielderId;
+            WielderName = string.IsNullOrWhiteSpace(wielderName) ? "wielder" : wielderName;
+            Tile = tile;
+            Source = source;
+        }
+
+        public string Kind { get { return AccessibilityEvents.Map.WielderTeleported; } }
+        public int WielderId { get; private set; }
+
+        public string WielderName { get; private set; }
+
+        public Vector2Int Tile { get; private set; }
+
+        public TeleportSource Source { get; private set; }
+
+        public string GetSpeechText()
+        {
+            return WielderName + " teleported to " + FormatTile(Tile);
         }
 
         private static string FormatTile(Vector2Int tile)

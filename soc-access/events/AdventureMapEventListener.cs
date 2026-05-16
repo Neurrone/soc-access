@@ -2,6 +2,7 @@ using System;
 using SongsOfConquest.Client.Adventure;
 using SongsOfConquest.Client.Gamestate;
 using SongsOfConquest.Client.Gamestate.Facade;
+using SongsOfConquest.Common.Adventure;
 using SongsOfConquest.Common.Entities;
 using SongsOfConquest.Common.Entities.Adventure;
 using SongsOfConquest.Common.Gamestate;
@@ -16,18 +17,21 @@ namespace SongsOfConquestAccess.Events
         private readonly ISelectionHandler _selectionHandler;
         private readonly IHumanAdventureControllerFacade _humanAdventureControllerFacade;
         private readonly ILocalizationHandler _localizationHandler;
+        private readonly IFogManager _fogManager;
         private bool _attached;
 
         public AdventureMapEventListener(
             IClientAdventureFacade facade,
             ISelectionHandler selectionHandler,
             IHumanAdventureControllerFacade humanAdventureControllerFacade,
-            ILocalizationHandler localizationHandler)
+            ILocalizationHandler localizationHandler,
+            IFogManager fogManager)
         {
             _facade = facade;
             _selectionHandler = selectionHandler;
             _humanAdventureControllerFacade = humanAdventureControllerFacade;
             _localizationHandler = localizationHandler;
+            _fogManager = fogManager;
         }
 
         public void Attach()
@@ -63,6 +67,10 @@ namespace SongsOfConquestAccess.Events
                     (Action<OnCommanderMovedPayload>)Delegate.Combine(
                         _facade.Commands.OnCommanderMoved,
                         new Action<OnCommanderMovedPayload>(HandleCommanderMoved));
+                _facade.Commands.OnCommanderTeleported =
+                    (Action<TeleportCommanderCommand.Response>)Delegate.Combine(
+                        _facade.Commands.OnCommanderTeleported,
+                        new Action<TeleportCommanderCommand.Response>(HandleCommanderTeleported));
             }
 
             _attached = true;
@@ -101,6 +109,10 @@ namespace SongsOfConquestAccess.Events
                     (Action<OnCommanderMovedPayload>)Delegate.Remove(
                         _facade.Commands.OnCommanderMoved,
                         new Action<OnCommanderMovedPayload>(HandleCommanderMoved));
+                _facade.Commands.OnCommanderTeleported =
+                    (Action<TeleportCommanderCommand.Response>)Delegate.Remove(
+                        _facade.Commands.OnCommanderTeleported,
+                        new Action<TeleportCommanderCommand.Response>(HandleCommanderTeleported));
             }
 
             _attached = false;
@@ -177,10 +189,59 @@ namespace SongsOfConquestAccess.Events
                 return;
             }
 
+            // TeleportCommanderCommand also raises OnCommanderMoved, but marks
+            // that payload cameraIgnore so camera-follow systems do not treat it
+            // as ordinary path movement. Teleports are published separately.
+            if (payload.cameraIgnore || !ShouldPublishCommanderPositionEvent(commander, commander.Position))
+            {
+                return;
+            }
+
             AccessibilityEventBus.Publish(new MapWielderMovedEvent(
                 commander.Id,
                 GetCommanderName(commander),
-                commander.Position));
+                commander.Position,
+                IsLocalCommander(commander)));
+        }
+
+        private void HandleCommanderTeleported(TeleportCommanderCommand.Response response)
+        {
+            ICommanderState commander = response != null && _facade != null && _facade.Commanders != null
+                ? _facade.Commanders.Get(response.CommanderId)
+                : null;
+            if (commander == null || !ShouldPublishCommanderPositionEvent(commander, response.ToLocation))
+            {
+                return;
+            }
+
+            AccessibilityEventBus.Publish(new MapWielderTeleportedEvent(
+                commander.Id,
+                GetCommanderName(commander),
+                response.ToLocation,
+                response.Source));
+        }
+
+        private bool ShouldPublishCommanderPositionEvent(ICommanderState commander, UnityEngine.Vector2Int tile)
+        {
+            if (commander == null || _facade == null || _facade.Teams == null)
+            {
+                return false;
+            }
+
+            if (IsLocalCommander(commander))
+            {
+                return true;
+            }
+
+            return _fogManager != null && _fogManager.IsVisible(tile);
+        }
+
+        private bool IsLocalCommander(ICommanderState commander)
+        {
+            return commander != null
+                && _facade != null
+                && _facade.Teams != null
+                && _facade.Teams.GetIsLocal(commander.TeamId);
         }
 
         private string GetCommanderName(ICommanderState commander)

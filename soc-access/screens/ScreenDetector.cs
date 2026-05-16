@@ -679,7 +679,8 @@ namespace SongsOfConquestAccess.Screens
                     adapter.Facade,
                     adapter.SelectionHandler,
                     adapter.HumanAdventureControllerFacade,
-                    adapter.LocalizationHandler)
+                    adapter.LocalizationHandler,
+                    adapter.FogManager)
                 : null;
             Push(new AdventureMapScreen(adapter, eventListener), "adventure map ready");
         }

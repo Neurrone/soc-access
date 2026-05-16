@@ -152,6 +152,11 @@ namespace SongsOfConquestAccess.Adapters
             get { return _selectionHandler; }
         }
 
+        public IFogManager FogManager
+        {
+            get { return _fogManager; }
+        }
+
         public IHumanAdventureControllerFacade HumanAdventureControllerFacade
         {
             get { return _humanAdventureControllerFacade; }

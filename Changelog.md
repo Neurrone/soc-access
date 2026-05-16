@@ -5,6 +5,9 @@
 - Remove brackets around coordinate announcements, so `x, y` instead of `(x, y)`. This shortens speech when the screen reader is configured to announce more punctuation
 - Tab and shift+tab now wrap for convenience. A sound is played to indicate when this happens
 - When focus is not on the grid in the adventure map or combat screens, pressing escape now moves focus back to the grid
+- Enemy wielders moving outside your view range will no longer be announced, woops
+- Teleports are now announced as teleports instead of move. The accessibility cursor also follows the wielder to the teleport destination
+- Teleports and movement events from wielders that don't belong to you are now saved to the notifications buffer
 
 ## V0.1.2
 

@@ -48,7 +48,7 @@ namespace SongsOfConquestAccess.Buffers
                 return;
             }
 
-            if (IsNotification(accessibilityEvent.Kind))
+            if (IsAdventureMapNotification(accessibilityEvent))
             {
                 _buffers.AppendLine(ReviewBufferKind.AdventureMapNotifications, text);
                 return;
@@ -60,10 +60,14 @@ namespace SongsOfConquestAccess.Buffers
             }
         }
 
-        private static bool IsNotification(string kind)
+        private static bool IsAdventureMapNotification(IAccessibilityEvent accessibilityEvent)
         {
+            string kind = accessibilityEvent != null ? accessibilityEvent.Kind : null;
+            MapWielderMovedEvent moved = accessibilityEvent as MapWielderMovedEvent;
             return !string.IsNullOrWhiteSpace(kind)
-                && kind.StartsWith("notification.");
+                && (kind.StartsWith("notification.")
+                    || kind == AccessibilityEvents.Map.WielderTeleported
+                    || (moved != null && !moved.IsLocalWielder));
         }
 
         private static bool IsCombatEvent(string kind)

@@ -208,18 +208,28 @@ namespace SongsOfConquestAccess.Screens
             }
 
             MapCameraFocusEvent cameraFocus = accessibilityEvent as MapCameraFocusEvent;
-            if (cameraFocus == null)
+            if (cameraFocus != null)
             {
+                FocusMapTileFromEvent(cameraFocus.Tile);
                 return;
             }
 
+            MapWielderTeleportedEvent teleport = accessibilityEvent as MapWielderTeleportedEvent;
+            if (teleport != null)
+            {
+                FocusMapTileFromEvent(teleport.Tile);
+            }
+        }
+
+        private void FocusMapTileFromEvent(Vector2Int tile)
+        {
             if (_isTopScreen)
             {
-                FocusGridTile(cameraFocus.Tile);
+                FocusGridTile(tile);
                 return;
             }
 
-            if (_grid != null && _grid.FocusTileSilently(cameraFocus.Tile))
+            if (_grid != null && _grid.FocusTileSilently(tile))
             {
                 RootWidget?.SetFocusByIndexSilently(GridIndex);
                 return;
@@ -657,7 +667,8 @@ namespace SongsOfConquestAccess.Screens
                         facade,
                         selectionHandler,
                         humanAdventureControllerFacade,
-                        localizationHandler);
+                        localizationHandler,
+                        fogManager);
                     return new AdventureMapScreen(adapter, eventListener);
                 }
 
