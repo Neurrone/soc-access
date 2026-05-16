@@ -8,6 +8,7 @@
 - Enemy wielders moving outside your view range will no longer be announced, woops
 - Teleports are now announced as teleports instead of move. The accessibility cursor also follows the wielder to the teleport destination
 - Teleports and movement events from wielders that don't belong to you are now saved to the notifications buffer
+- Shortened "Not visible" indicator for fog of war tiles to "unseen" for brevity. Also added documentation about fog of war
 
 ## V0.1.2
 

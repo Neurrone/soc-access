@@ -32,7 +32,7 @@ namespace SongsOfConquestAccess.Speech.Spatial
 
             if (!tile.IsVisible)
             {
-                parts.Add("Not visible");
+                parts.Add("Unseen");
             }
 
             string primary = DescribePrimaryContent(tile);

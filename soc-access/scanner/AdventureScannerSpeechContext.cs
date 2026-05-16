@@ -41,7 +41,7 @@ namespace SongsOfConquestAccess.Scanner
                 string primary = formatter.DescribePrimaryContent(_tile);
                 if (_result != null && _result.NotVisible && !string.IsNullOrWhiteSpace(primary))
                 {
-                    primary += ", not visible";
+                    primary += ", unseen";
                 }
 
                 ScannerSpeechUtility.AddIfPresent(parts, primary);

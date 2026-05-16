@@ -15,7 +15,7 @@ namespace SongsOfConquestAccess.Scanner
             string label = result.Label ?? string.Empty;
             if (result.NotVisible)
             {
-                label += ", not visible";
+                label += ", unseen";
             }
 
             string direction = directionMode == ScannerDirectionMode.Hex
