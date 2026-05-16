@@ -3,6 +3,7 @@
 - [Introduction](intro.md)
 - [Installation](installation.md)
 - [Getting Started](getting-started.md)
+- [Tooltips](tooltips.md)
 - [Buffers](buffers.md)
 - [Actions Menu](actions-menu.md)
 - [Adventure Map](adventure-map.md)
@@ -12,4 +13,5 @@
 - [Combat](combat.md)
 - [Codex](codex.md)
 - [Command Reference](command-reference.md)
+- [Changelog]](changelog.md)
 - [Known Issues](known-issues.md)

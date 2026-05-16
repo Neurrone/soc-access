@@ -11,6 +11,11 @@
 - Shortened "Not visible" indicator for fog of war tiles to "unseen" for brevity. Also added documentation about fog of war
 - Added sound indicator when cancelling a drag
 - When unchecking the auto populate quickvar option in the spellbook, fix add to quickbar action not being exposed unless the spellbook was reopened
+- Documentation updates:
+  - Move changelog to documentation site
+  - Add development status and list of known issues
+  - Add a separate section for tooltips
+  - Clarify the 3 tile visibility states and "fog" is a decorative terrain feature, not an indication of fog of war
 
 ## V0.1.2
 

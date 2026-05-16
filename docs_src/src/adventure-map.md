@@ -10,13 +10,21 @@ Use the arrow keys to move the map cursor.
 
 The mod keeps the focused tile in view and reads the tile as you move.
 
-A tile can be in one of three states:
+Tiles within the movement range of the currently selected wielder are indicated as reachable.
+
+Tiles that are impassable due to terrain are announced as being blocked.
+
+A tile can be in one of three visibility states:
 
 - Currently visible: in view radius of your wielder or building
 - Unseen: explored but there are no eyes on the tile (i.e, fog of war). Such tiles show their last seen state
 - Unexplored
 
 The mod mentions if a tile is unexplored or currently unseen.
+
+### Fog Tiles
+
+Some tiles may read as "fog". This is a terrain / decorative feature, not an indication of tiles in the fog of war, which the mod indicates as being unseen.
 
 ### Actions
 
