@@ -158,7 +158,7 @@ namespace SongsOfConquestAccess.Screens
                     item.Activate,
                     item.Focus,
                     () => true,
-                    item.Tooltip,
+                    () => item.Tooltip,
                     item.Unfocus));
             }
 

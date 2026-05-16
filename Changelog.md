@@ -10,6 +10,7 @@
 - Teleports and movement events from wielders that don't belong to you are now saved to the notifications buffer
 - Shortened "Not visible" indicator for fog of war tiles to "unseen" for brevity. Also added documentation about fog of war
 - Added sound indicator when cancelling a drag
+- When unchecking the auto populate quickvar option in the spellbook, fix add to quickbar action not being exposed unless the spellbook was reopened
 
 ## V0.1.2
 
