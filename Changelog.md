@@ -4,6 +4,7 @@
 
 - Remove brackets around coordinate announcements, so `x, y` instead of `(x, y)`. This shortens speech when the screen reader is configured to announce more punctuation
 - Tab and shift+tab now wrap for convenience. A sound is played to indicate when this happens
+- When focus is not on the grid in the adventure map or combat screens, pressing escape now moves focus back to the grid
 
 ## V0.1.2
 

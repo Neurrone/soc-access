@@ -22,7 +22,9 @@ The mod keeps the focused tile in view and reads the tile as you move.
 
 The HUD provides various controls for the currently selected wielder such as the wielder portrait, resources and objectives. Visibility is toggled with `h`. These controls are visible by default, and I recommend leaving it that way.
 
-Press tab from the adventure map to cycle through the HUD controls.
+Press tab from the map grid to cycle through HUD controls.
+
+When focus is in the HUD controls, pressing escape moves focus back to the grid.
 
 The game provides the following hotkeys:
 

@@ -13,6 +13,7 @@ using SongsOfConquest.Client.InputManagement;
 using SongsOfConquestAccess.Adapters;
 using SongsOfConquestAccess.Buffers;
 using SongsOfConquestAccess.Events;
+using SongsOfConquestAccess.Input;
 using SongsOfConquestAccess.UI;
 using SongsOfConquest.Common.Economy;
 using SongsOfConquest.Common.Gamestate;
@@ -38,6 +39,7 @@ namespace SongsOfConquestAccess.Screens
         };
         private static string _lastProbeDiagnostic;
 
+        private const string ReturnToGridSoundKey = "Common_ClosePauseMenu";
         private const int GridIndex = 0;
         private const int TroopSlotsIndex = 8;
         private readonly AdventureMapAdapter _adapter;
@@ -117,6 +119,40 @@ namespace SongsOfConquestAccess.Screens
             RootWidget?.SetFocusByIndex(GridIndex);
         }
 
+        public override bool HasClaimed(string actionKey)
+        {
+            if (actionKey != AccessibilityActions.Cancel.Key)
+            {
+                return base.HasClaimed(actionKey);
+            }
+
+            return base.HasClaimed(actionKey) || !IsGridFocused();
+        }
+
+        public override bool OnActionJustPressed(InputAction action)
+        {
+            if (action == null || action.Key != AccessibilityActions.Cancel.Key)
+            {
+                return base.OnActionJustPressed(action);
+            }
+
+            // Let focused controls cancel their own state first. Otherwise Escape
+            // returns HUD focus to the grid; on the grid, native pause owns it.
+            if (RootWidget != null && RootWidget.HandleAction(action))
+            {
+                return true;
+            }
+
+            if (IsGridFocused())
+            {
+                return false;
+            }
+
+            FocusGrid();
+            NativeSoundUtility.PostEvent(ReturnToGridSoundKey);
+            return true;
+        }
+
         public void FocusGridTile(Vector2Int tile)
         {
             if (_grid != null && _grid.FocusTile(tile))
@@ -190,6 +226,12 @@ namespace SongsOfConquestAccess.Screens
             }
 
             RootWidget?.SetFocusByIndexSilently(GridIndex);
+        }
+
+        private bool IsGridFocused()
+        {
+            return ReferenceEquals(RootWidget?.FocusedChild, _grid)
+                && ReferenceEquals(UIManager.CurrentWidget, _grid);
         }
 
         private void AttachListeners()

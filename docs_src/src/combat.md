@@ -54,6 +54,8 @@ Visibility is toggled with `h`. These controls are visible by default, and I rec
 
 Press tab from the combat grid to cycle through HUD controls.
 
+When focus is in the HUD controls, pressing escape moves focus back to the grid.
+
 For convenience, press T from the combat grid to move focus to the turn order. Press Enter on a troop in the turn order to focus that troop in the combat grid.
 
 The game provides the following hotkeys:
@@ -62,4 +64,4 @@ The game provides the following hotkeys:
 - E: end turn
 - V: open spellbook
 
-Since Q and E conflict with hex grid movement keys, press tab to move focus out of the grid to use those keys.
+Since Q and E conflict with hex grid movement keys, move focus out of the grid first before using those keys.

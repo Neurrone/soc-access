@@ -16,6 +16,7 @@ using SongsOfConquestAccess.Adapters;
 using SongsOfConquestAccess.Buffers;
 using SongsOfConquestAccess.Events;
 using SongsOfConquestAccess.Events.Combat;
+using SongsOfConquestAccess.Input;
 using SongsOfConquestAccess.Speech;
 using SongsOfConquestAccess.UI;
 using UnityEngine;
@@ -29,6 +30,7 @@ namespace SongsOfConquestAccess.Screens
             AccessTools.Property(typeof(BattleSceneInstaller), "Container");
         private static string _lastProbeDiagnostic;
 
+        private const string ReturnToGridSoundKey = "Common_ClosePauseMenu";
         private const int GridIndex = 0;
         private const int TimelineIndex = 7;
         private readonly CombatAdapter _adapter;
@@ -117,12 +119,46 @@ namespace SongsOfConquestAccess.Screens
 
         public void FocusGridIfNeeded()
         {
-            if (ReferenceEquals(RootWidget?.FocusedChild, _grid) && ReferenceEquals(UIManager.CurrentWidget, _grid))
+            if (IsGridFocused())
             {
                 return;
             }
 
             RootWidget?.SetFocusByIndex(GridIndex);
+        }
+
+        public override bool HasClaimed(string actionKey)
+        {
+            if (actionKey != AccessibilityActions.Cancel.Key)
+            {
+                return base.HasClaimed(actionKey);
+            }
+
+            return base.HasClaimed(actionKey) || !IsGridFocused();
+        }
+
+        public override bool OnActionJustPressed(InputAction action)
+        {
+            if (action == null || action.Key != AccessibilityActions.Cancel.Key)
+            {
+                return base.OnActionJustPressed(action);
+            }
+
+            // Let focused controls cancel their own state first. Otherwise Escape
+            // returns HUD focus to the grid; on the grid, combat cancel or native pause owns it.
+            if (RootWidget != null && RootWidget.HandleAction(action))
+            {
+                return true;
+            }
+
+            if (IsGridFocused())
+            {
+                return false;
+            }
+
+            FocusGridIfNeeded();
+            NativeSoundUtility.PostEvent(ReturnToGridSoundKey);
+            return true;
         }
 
         public bool FocusTimeline()
@@ -180,6 +216,12 @@ namespace SongsOfConquestAccess.Screens
             _adapter?.Hud.ClearAbilityTargetInstructionText();
             _adapter?.ClearNativeTooltip();
             _adapter?.ClearFocusedTileOverlay();
+        }
+
+        private bool IsGridFocused()
+        {
+            return ReferenceEquals(RootWidget?.FocusedChild, _grid)
+                && ReferenceEquals(UIManager.CurrentWidget, _grid);
         }
 
         private void HandleSpellCastBegin()
