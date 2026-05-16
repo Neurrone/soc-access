@@ -2,7 +2,7 @@
 
 ## Moving Between Widgets
 
-Use Tab to move to the next major widget on the current screen. Use Shift+Tab to move to the previous widget.
+Use Tab to move to the next major widget on the current screen. Use Shift+Tab to move to the previous widget. Navigation wraps for convenience, with a sound being played to indicate when this happened.
 
 A widget is a UI element like a menu, button, the adventure map grid or the combat hex grid.
 

@@ -1,10 +1,13 @@
 using System.Collections.Generic;
+using SongsOfConquestAccess.Adapters;
 using SongsOfConquestAccess.Input;
 
 namespace SongsOfConquestAccess.UI
 {
     internal class ContainerWidget : Widget
     {
+        private const string FocusWrapCueKey = "Common_ClickUnfold";
+
         private readonly List<Widget> _children = new List<Widget>();
         private int _focusedIndex = -1;
 
@@ -237,6 +240,18 @@ namespace SongsOfConquestAccess.UI
                 nextIndex += delta;
             }
 
+            if (CountVisibleChildren() <= 1)
+            {
+                return false;
+            }
+
+            int wrappedIndex = delta > 0 ? FindFirstVisibleIndex() : FindLastVisibleIndex();
+            if (SetFocus(wrappedIndex, announce: true))
+            {
+                NativeSoundUtility.PostEvent(FocusWrapCueKey);
+                return true;
+            }
+
             return false;
         }
 
@@ -264,6 +279,20 @@ namespace SongsOfConquestAccess.UI
             }
 
             return -1;
+        }
+
+        private int CountVisibleChildren()
+        {
+            int count = 0;
+            for (int i = 0; i < _children.Count; i++)
+            {
+                if (_children[i] != null && _children[i].IsVisible)
+                {
+                    count++;
+                }
+            }
+
+            return count;
         }
 
         private int ClampToVisibleIndex(int index)
