@@ -10,6 +10,14 @@ Use the arrow keys to move the map cursor.
 
 The mod keeps the focused tile in view and reads the tile as you move.
 
+A tile can be in one of three states:
+
+- Currently visible: in view radius of your wielder or building
+- Unseen: explored but there are no eyes on the tile (i.e, fog of war). Such tiles show their last seen state
+- Unexplored
+
+The mod mentions if a tile is unexplored or currently unseen.
+
 ### Actions
 
 - Enter: perform the primary action on the focused tile, corresponding to a left-click. If the tile has a selectable entity such as a building, this brings up the entity's menu for further interaction. Otherwise, this clears the wielder's destination.
