@@ -1554,7 +1554,7 @@ namespace SongsOfConquestAccess.Adapters
                 || screenPosition.x > Screen.width
                 || screenPosition.y > Screen.height)
             {
-                SocAccessPlugin.Instance?.LogWarning("CombatAdapter could not target tile " + FormatPoint(tilePosition) + " because its screen position is outside the current view: " + screenPosition);
+                SocAccessPlugin.Instance?.LogWarning("CombatAdapter could not target tile " + FormatDiagnosticPoint(tilePosition) + " because its screen position is outside the current view: " + screenPosition);
                 return false;
             }
 
@@ -2816,7 +2816,12 @@ namespace SongsOfConquestAccess.Adapters
 
         public static string FormatPoint(Vector2Int point)
         {
-            return "(" + point.x + ", " + point.y + ")";
+            return point.x + ", " + point.y;
+        }
+
+        private static string FormatDiagnosticPoint(Vector2Int point)
+        {
+            return point.x + ", " + point.y;
         }
 
     }

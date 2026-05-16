@@ -191,7 +191,7 @@ namespace SongsOfConquestAccess.Speech.Spatial
 
         public string DescribeCoordinates(AdventureMapTile tile)
         {
-            return tile == null ? string.Empty : "(" + tile.Position.x + ", " + tile.Position.y + ")";
+            return tile == null ? string.Empty : tile.Position.x + ", " + tile.Position.y;
         }
 
         private static List<string> GetMovementDetails(AdventureMapTile tile)
@@ -241,7 +241,7 @@ namespace SongsOfConquestAccess.Speech.Spatial
 
         private static string FormatPoint(UnityEngine.Vector2Int point)
         {
-            return "(" + point.x + ", " + point.y + ")";
+            return point.x + ", " + point.y;
         }
 
         private static string AppendDetails(string name, List<string> details)

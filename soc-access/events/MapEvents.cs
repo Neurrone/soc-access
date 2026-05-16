@@ -48,7 +48,7 @@ namespace SongsOfConquestAccess.Events
 
         private static string FormatTile(Vector2Int tile)
         {
-            return "(" + tile.x + ", " + tile.y + ")";
+            return tile.x + ", " + tile.y;
         }
     }
 
@@ -80,7 +80,7 @@ namespace SongsOfConquestAccess.Events
 
         private static string FormatTile(Vector2Int tile)
         {
-            return "(" + tile.x + ", " + tile.y + ")";
+            return tile.x + ", " + tile.y;
         }
     }
 
@@ -107,7 +107,7 @@ namespace SongsOfConquestAccess.Events
 
         private static string FormatTile(Vector2Int tile)
         {
-            return "(" + tile.x + ", " + tile.y + ")";
+            return tile.x + ", " + tile.y;
         }
     }
 
@@ -190,7 +190,7 @@ namespace SongsOfConquestAccess.Events
 
         public string GetSpeechText()
         {
-            return Announce ? "Map camera focuses on (" + Tile.x + ", " + Tile.y + ")" : string.Empty;
+            return Announce ? "Map camera focuses on " + Tile.x + ", " + Tile.y : string.Empty;
         }
     }
 

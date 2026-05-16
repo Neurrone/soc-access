@@ -412,7 +412,7 @@ namespace SongsOfConquestAccess.UI
 
         private static string FormatPoint(Vector2Int point)
         {
-            return "(" + point.x + ", " + point.y + ")";
+            return point.x + ", " + point.y;
         }
 
         private static void Speak(string text)

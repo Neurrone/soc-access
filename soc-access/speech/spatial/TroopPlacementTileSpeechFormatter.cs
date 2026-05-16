@@ -79,7 +79,7 @@ namespace SongsOfConquestAccess.Speech.Spatial
 
         public string DescribeCoordinates(TroopPlacementTile tile)
         {
-            return tile == null ? string.Empty : "(" + tile.Point.x + ", " + tile.Point.y + ")";
+            return tile == null ? string.Empty : tile.Point.x + ", " + tile.Point.y;
         }
 
         private static void AddIfPresent(List<string> parts, string text)

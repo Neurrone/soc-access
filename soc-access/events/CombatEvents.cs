@@ -747,7 +747,7 @@ namespace SongsOfConquestAccess.Events.Combat
     {
         public static string FormatPoint(Vector2Int point)
         {
-            return "(" + point.x + ", " + point.y + ")";
+            return point.x + ", " + point.y;
         }
 
         public static List<Vector2Int> Copy(IList<Vector2Int> path)
