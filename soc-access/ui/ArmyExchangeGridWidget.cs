@@ -165,6 +165,11 @@ namespace SongsOfConquestAccess.UI
 
         protected override void OnUnfocus()
         {
+            if (_dragSource != null)
+            {
+                NativeSoundUtility.PostEvent("Common_SpellbookEndDragCancel");
+            }
+
             ClearDrag();
         }
 
@@ -342,6 +347,7 @@ namespace SongsOfConquestAccess.UI
             }
 
             ClearDrag();
+            NativeSoundUtility.PostEvent("Common_SpellbookEndDragCancel");
             Speak("Drag cancelled.");
             return true;
         }

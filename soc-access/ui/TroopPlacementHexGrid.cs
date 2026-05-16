@@ -178,6 +178,11 @@ namespace SongsOfConquestAccess.UI
 
         protected override void OnUnfocus()
         {
+            if (_dragSource.HasValue)
+            {
+                NativeSoundUtility.PostEvent("Common_SpellbookEndDragCancel");
+            }
+
             ClearDrag();
             _adapter?.HideNativeTooltip();
             _adapter?.ClearFocusedTileOverlay();
@@ -245,6 +250,7 @@ namespace SongsOfConquestAccess.UI
             }
 
             ClearDrag();
+            NativeSoundUtility.PostEvent("Common_SpellbookEndDragCancel");
             Speak("Drag cancelled.");
             return true;
         }

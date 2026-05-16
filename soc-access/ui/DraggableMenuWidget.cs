@@ -1,4 +1,5 @@
 using System;
+using SongsOfConquestAccess.Adapters;
 using SongsOfConquestAccess.Input;
 using SongsOfConquestAccess.Speech;
 
@@ -77,6 +78,11 @@ namespace SongsOfConquestAccess.UI
 
         protected override void OnUnfocus()
         {
+            if (_dragSource != null)
+            {
+                NativeSoundUtility.PostEvent("Common_SpellbookEndDragCancel");
+            }
+
             ClearDrag();
             base.OnUnfocus();
         }
@@ -131,6 +137,7 @@ namespace SongsOfConquestAccess.UI
             }
 
             ClearDrag();
+            NativeSoundUtility.PostEvent("Common_SpellbookEndDragCancel");
             Speak("Drag cancelled.");
             return true;
         }
