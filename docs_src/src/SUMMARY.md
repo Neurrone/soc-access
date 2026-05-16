@@ -13,5 +13,5 @@
 - [Combat](combat.md)
 - [Codex](codex.md)
 - [Command Reference](command-reference.md)
-- [Changelog]](changelog.md)
+- [Changelog](changelog.md)
 - [Known Issues](known-issues.md)
