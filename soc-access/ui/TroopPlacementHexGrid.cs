@@ -220,7 +220,7 @@ namespace SongsOfConquestAccess.UI
             }
 
             _dragSource = _cursor;
-            Speak("Started drag for " + tile.TroopLabel + " at " + FormatPoint(_cursor) + ". Press enter to drop on destination spawn point, or press escape to cancel.");
+            Speak("Started drag for " + tile.TroopLabel + " at " + HexCoordinateFormatter.Format(_cursor) + ". Press enter to drop on destination spawn point, or press escape to cancel.");
             return true;
         }
 
@@ -427,11 +427,6 @@ namespace SongsOfConquestAccess.UI
             }
 
             return tile.TroopSide.Value == _snapshot.OwnSide.Value;
-        }
-
-        private static string FormatPoint(Vector2Int point)
-        {
-            return point.x + ", " + point.y;
         }
 
         private static void Speak(string text)

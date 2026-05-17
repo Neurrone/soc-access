@@ -9,6 +9,7 @@ using SongsOfConquest.Common.Battle.Bacterias;
 using SongsOfConquest.Common.Entities.Battle;
 using SongsOfConquest.Common.Spells;
 using SongsOfConquestAccess.Speech;
+using SongsOfConquestAccess.Speech.Spatial;
 using UnityEngine;
 using static SongsOfConquestAccess.Events.Combat.CombatText;
 
@@ -747,7 +748,7 @@ namespace SongsOfConquestAccess.Events.Combat
     {
         public static string FormatPoint(Vector2Int point)
         {
-            return point.x + ", " + point.y;
+            return HexCoordinateFormatter.Format(point);
         }
 
         public static List<Vector2Int> Copy(IList<Vector2Int> path)

@@ -2898,7 +2898,7 @@ namespace SongsOfConquestAccess.Adapters
 
         public static string FormatPoint(Vector2Int point)
         {
-            return point.x + ", " + point.y;
+            return HexCoordinateFormatter.Format(point);
         }
 
         private static string FormatDiagnosticPoint(Vector2Int point)
