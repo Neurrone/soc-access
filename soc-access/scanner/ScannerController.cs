@@ -36,153 +36,450 @@ namespace SongsOfConquestAccess.Scanner
 
         public bool Refresh()
         {
+            Output(ExecuteRefresh());
+            return true;
+        }
+
+        internal ScannerCommandResult ExecuteRefresh()
+        {
+            return ExecuteRefreshCore();
+        }
+
+        private ScannerCommandResult ExecuteRefreshCore()
+        {
             Vector2Int origin = GetCursor();
-            _snapshot = _snapshotBuilder != null ? _snapshotBuilder(origin) : null;
+            _snapshot = BuildSnapshot(origin);
             if (_snapshot == null || _snapshot.IsEmpty)
             {
                 _snapshot = null;
-                Speak("No scanner results");
-                return true;
+                return NoResults();
             }
 
             _snapshot.SortByDistance(origin);
             _categoryIndex = 0;
             _subcategoryIndex = 0;
             _resultIndex = 0;
-            SpeakCurrent(includePath: true);
-            return true;
+            return BuildCommandResult(includePath: true);
         }
 
         public bool MoveCategory(int delta)
         {
+            Output(ExecuteMoveCategory(delta));
+            return true;
+        }
+
+        internal ScannerCommandResult ExecuteMoveCategory(int delta)
+        {
+            return ExecuteMoveCategoryCore(delta);
+        }
+
+        private ScannerCommandResult ExecuteMoveCategoryCore(int delta)
+        {
+            RebuildFromCursorPreservingScope();
             if (_snapshot == null || _snapshot.IsEmpty)
             {
-                return true;
+                return NoResults();
             }
 
-            int nextIndex = _categoryIndex + delta;
-            if (nextIndex < 0 || nextIndex >= _snapshot.Categories.Count)
+            bool wrapped;
+            int nextIndex = FindNextCategoryIndex(delta, out wrapped);
+            if (nextIndex < 0)
             {
-                return true;
+                return NoResults();
             }
 
             _categoryIndex = nextIndex;
-            _subcategoryIndex = 0;
+            _subcategoryIndex = FirstNonEmptySubcategoryIndex(CurrentCategory());
             _resultIndex = 0;
-            SpeakCurrent(includePath: true);
-            return true;
+            ScannerCommandResult result = BuildCommandResult(includePath: true);
+            result.Wrapped = wrapped;
+            return result;
         }
 
         public bool MoveSubcategory(int delta)
         {
+            Output(ExecuteMoveSubcategory(delta));
+            return true;
+        }
+
+        internal ScannerCommandResult ExecuteMoveSubcategory(int delta)
+        {
+            return ExecuteMoveSubcategoryCore(delta);
+        }
+
+        private ScannerCommandResult ExecuteMoveSubcategoryCore(int delta)
+        {
+            RebuildFromCursorPreservingScope();
             if (_snapshot == null || _snapshot.IsEmpty)
             {
-                return true;
+                return NoResults();
             }
 
             ScannerCategory category = CurrentCategory();
-            if (category == null || category.Subcategories.Count <= 1)
+            if (category == null)
             {
-                Speak("No subcategories");
-                return true;
+                return NoResults();
             }
 
-            int nextIndex = _subcategoryIndex + delta;
-            if (nextIndex < 0 || nextIndex >= category.Subcategories.Count)
+            bool wrapped;
+            int nextIndex = NextIndexMatching(category.Subcategories, _subcategoryIndex, delta, SubcategoryHasResults, out wrapped);
+            if (nextIndex < 0)
             {
-                return true;
+                return NoResults();
             }
 
             _subcategoryIndex = nextIndex;
             _resultIndex = 0;
-            SpeakCurrent(includePath: true);
-            return true;
+            ScannerCommandResult result = BuildCommandResult(includePath: true);
+            result.Wrapped = wrapped;
+            return result;
         }
 
         public bool MoveResult(int delta)
         {
+            Output(ExecuteMoveResult(delta));
+            return true;
+        }
+
+        internal ScannerCommandResult ExecuteMoveResult(int delta)
+        {
+            return ExecuteMoveResultCore(delta);
+        }
+
+        private ScannerCommandResult ExecuteMoveResultCore(int delta)
+        {
+            bool locatedCurrent = RebuildForResultNavigation();
             if (_snapshot == null || _snapshot.IsEmpty)
             {
-                return true;
+                return NoResults();
             }
 
             ScannerSubcategory subcategory = CurrentSubcategory();
             if (subcategory == null || subcategory.Results.Count == 0)
             {
-                Speak("No scanner results");
-                return true;
+                return NoResults();
             }
 
-            int nextIndex = _resultIndex + delta;
-            if (nextIndex < 0 || nextIndex >= subcategory.Results.Count)
+            if (!locatedCurrent)
             {
-                return true;
+                _resultIndex = delta < 0 ? subcategory.Results.Count : -1;
             }
 
-            _resultIndex = nextIndex;
-            SpeakCurrent(includePath: false);
-            return true;
+            subcategory = CurrentSubcategory();
+            if (subcategory == null || subcategory.Results.Count == 0)
+            {
+                return NoResults();
+            }
+
+            bool wrapped = false;
+            int previousIndex = _resultIndex;
+            _resultIndex = WrapIndex(_resultIndex, subcategory.Results.Count, delta, out wrapped);
+            if (!locatedCurrent)
+            {
+                wrapped = false;
+            }
+            else if (delta != 0 && subcategory.Results.Count == 1 && previousIndex == _resultIndex)
+            {
+                wrapped = true;
+            }
+
+            ScannerCommandResult result = BuildCommandResult(includePath: false);
+            result.Wrapped = wrapped;
+            return result;
         }
 
         public bool JumpToCurrent()
         {
+            Output(ExecuteJumpToCurrent());
+            return true;
+        }
+
+        internal ScannerCommandResult ExecuteJumpToCurrent()
+        {
+            return ExecuteJumpToCurrentCore();
+        }
+
+        private ScannerCommandResult ExecuteJumpToCurrentCore()
+        {
+            if (!RebuildForCurrentResultAction())
+            {
+                return NoResults();
+            }
+
             ScannerResult result = CurrentValidResult();
             if (result == null)
             {
-                Speak("No scanner results");
-                return true;
+                return NoResults();
             }
 
             if (_jumpTo != null && _jumpTo(result.Position))
             {
-                SpeakCurrent(includePath: false);
+                return BuildCommandResult(includePath: false);
             }
 
-            return true;
+            return null;
         }
 
         public bool SpeakOrientation()
         {
-            ScannerResult result = CurrentValidResult();
-            if (result == null)
-            {
-                Speak("No scanner results");
-                return true;
-            }
-
-            SpeakCurrent(includePath: false);
+            Output(ExecuteSpeakOrientation());
             return true;
         }
 
-        private void SpeakCurrent(bool includePath)
+        internal ScannerCommandResult ExecuteSpeakOrientation()
+        {
+            return ExecuteSpeakOrientationCore();
+        }
+
+        private ScannerCommandResult ExecuteSpeakOrientationCore()
+        {
+            if (!RebuildForCurrentResultAction())
+            {
+                return NoResults();
+            }
+
+            ScannerResult result = CurrentValidResult();
+            if (result == null)
+            {
+                return NoResults();
+            }
+
+            return BuildCommandResult(includePath: false);
+        }
+
+        private ScannerCommandResult BuildCommandResult(bool includePath)
         {
             ScannerResult result = CurrentValidResult();
             if (result == null)
             {
-                Speak("No scanner results");
+                return NoResults();
+            }
+
+            ScannerSubcategory subcategory = CurrentSubcategory();
+            Vector2Int cursor = GetCursor();
+            IReadOnlyList<ScannerDirectionStep> directions = BuildDirections(cursor, result.Position);
+            return new ScannerCommandResult(ScannerCommandStatus.Result)
+            {
+                Result = result,
+                CategoryLabel = CurrentCategory() != null ? CurrentCategory().Label : null,
+                SubcategoryLabel = subcategory != null ? subcategory.Label : null,
+                ResultIndex = _resultIndex + 1,
+                ResultCount = subcategory != null ? subcategory.Results.Count : 1,
+                Directions = directions,
+                IncludePath = includePath
+            };
+        }
+
+        internal void Output(ScannerCommandResult result)
+        {
+            if (result == null)
+            {
                 return;
             }
 
-            SpeechRequest request = BuildSpeechRequest(result);
-            if (includePath)
+            SpeechPipeline.Output(result.ToSpeechRequest(_speechContextProvider));
+        }
+
+        private bool RebuildForResultNavigation()
+        {
+            ReseatResultState state = RebuildAndReseatCurrentResult();
+            if (state.LocatedCurrent)
             {
-                ScannerCategory category = CurrentCategory();
-                ScannerSubcategory subcategory = CurrentSubcategory();
-                if (category != null && subcategory != null)
+                return true;
+            }
+
+            if (state.HadCurrent)
+            {
+                RestoreScope(state.CategoryHint, state.SubcategoryHint);
+            }
+            else
+            {
+                LandOnFirstNonEmptyScope();
+            }
+
+            return false;
+        }
+
+        private bool RebuildForCurrentResultAction()
+        {
+            ReseatResultState state = RebuildAndReseatCurrentResult();
+            if (state.LocatedCurrent)
+            {
+                return true;
+            }
+
+            if (state.HadCurrent)
+            {
+                RestoreScope(state.CategoryHint, state.SubcategoryHint);
+                return false;
+            }
+
+            LandOnFirstNonEmptyScope();
+            return CurrentSubcategory() != null && CurrentSubcategory().Results.Count > 0;
+        }
+
+        private ReseatResultState RebuildAndReseatCurrentResult()
+        {
+            string key = null;
+            int categoryHint = _categoryIndex;
+            int subcategoryHint = _subcategoryIndex;
+            bool hadCurrent = false;
+            if (_snapshot != null && !_snapshot.IsEmpty)
+            {
+                ScannerResult current = CurrentValidResult();
+                if (current != null)
                 {
-                    request = new SpeechRequest(category.Label + ", " + subcategory.Label + ". " + request.Text, interrupt: false);
+                    key = current.Key;
+                    categoryHint = _categoryIndex;
+                    subcategoryHint = _subcategoryIndex;
+                    hadCurrent = true;
                 }
             }
 
-            SpeechPipeline.Output(request);
+            Vector2Int origin = _snapshot != null && _snapshot.HasSortOrigin ? _snapshot.SortOrigin : GetCursor();
+            _snapshot = BuildSnapshot(origin);
+
+            if (_snapshot == null || _snapshot.IsEmpty)
+            {
+                _snapshot = null;
+                _categoryIndex = 0;
+                _subcategoryIndex = 0;
+                _resultIndex = 0;
+                return new ReseatResultState(false, hadCurrent, categoryHint, subcategoryHint);
+            }
+
+            _snapshot.SortByDistance(origin);
+
+            if (!string.IsNullOrWhiteSpace(key)
+                && _snapshot.TryLocateByKey(key, categoryHint, subcategoryHint, allowFallback: false, out ScannerSnapshotLocation location))
+            {
+                _categoryIndex = location.CategoryIndex;
+                _subcategoryIndex = location.SubcategoryIndex;
+                _resultIndex = location.ResultIndex;
+                return new ReseatResultState(true, hadCurrent, categoryHint, subcategoryHint);
+            }
+
+            return new ReseatResultState(false, hadCurrent, categoryHint, subcategoryHint);
         }
 
-        private SpeechRequest BuildSpeechRequest(ScannerResult result)
+        private void RebuildFromCursorPreservingScope()
         {
-            ScannerSubcategory subcategory = CurrentSubcategory();
-            int resultCount = subcategory != null ? subcategory.Results.Count : 1;
-            IReadOnlyList<ScannerDirectionStep> directions = BuildDirections(GetCursor(), result.Position);
-            return _speechContextProvider(result, directions, _resultIndex + 1, resultCount).ToSpeechRequest();
+            int categoryHint = _categoryIndex;
+            int subcategoryHint = _subcategoryIndex;
+            Vector2Int origin = GetCursor();
+            _snapshot = BuildSnapshot(origin);
+
+            if (_snapshot == null || _snapshot.IsEmpty)
+            {
+                _snapshot = null;
+                _categoryIndex = 0;
+                _subcategoryIndex = 0;
+                _resultIndex = 0;
+                return;
+            }
+
+            _snapshot.SortByDistance(origin);
+            RestoreScope(categoryHint, subcategoryHint);
+        }
+
+        private bool RestoreScope(int categoryIndex, int subcategoryIndex)
+        {
+            if (_snapshot == null || _snapshot.Categories.Count == 0)
+            {
+                return false;
+            }
+
+            if (categoryIndex < 0)
+            {
+                categoryIndex = 0;
+            }
+            else if (categoryIndex >= _snapshot.Categories.Count)
+            {
+                categoryIndex = _snapshot.Categories.Count - 1;
+            }
+
+            ScannerCategory category = _snapshot.Categories[categoryIndex];
+            if (category.Subcategories.Count == 0)
+            {
+                _categoryIndex = categoryIndex;
+                _subcategoryIndex = 0;
+                _resultIndex = 0;
+                return false;
+            }
+
+            if (subcategoryIndex < 0)
+            {
+                subcategoryIndex = 0;
+            }
+            else if (subcategoryIndex >= category.Subcategories.Count)
+            {
+                subcategoryIndex = category.Subcategories.Count - 1;
+            }
+
+            _categoryIndex = categoryIndex;
+            _subcategoryIndex = subcategoryIndex;
+            _resultIndex = 0;
+            return true;
+        }
+
+        private int FindNextCategoryIndex(int delta, out bool wrapped)
+        {
+            wrapped = false;
+            if (_snapshot == null || _snapshot.Categories.Count == 0)
+            {
+                return -1;
+            }
+
+            return NextIndexMatching(_snapshot.Categories, _categoryIndex, delta, CategoryHasResults, out wrapped);
+        }
+
+        private void LandOnFirstNonEmptyScope()
+        {
+            if (_snapshot == null)
+            {
+                _categoryIndex = 0;
+                _subcategoryIndex = 0;
+                _resultIndex = 0;
+                return;
+            }
+
+            for (int categoryIndex = 0; categoryIndex < _snapshot.Categories.Count; categoryIndex++)
+            {
+                ScannerCategory category = _snapshot.Categories[categoryIndex];
+                for (int subcategoryIndex = 0; subcategoryIndex < category.Subcategories.Count; subcategoryIndex++)
+                {
+                    if (SubcategoryHasResults(category.Subcategories[subcategoryIndex]))
+                    {
+                        _categoryIndex = categoryIndex;
+                        _subcategoryIndex = subcategoryIndex;
+                        _resultIndex = 0;
+                        return;
+                    }
+                }
+            }
+
+            _categoryIndex = 0;
+            _subcategoryIndex = 0;
+            _resultIndex = 0;
+        }
+
+        private struct ReseatResultState
+        {
+            public ReseatResultState(bool locatedCurrent, bool hadCurrent, int categoryHint, int subcategoryHint)
+            {
+                LocatedCurrent = locatedCurrent;
+                HadCurrent = hadCurrent;
+                CategoryHint = categoryHint;
+                SubcategoryHint = subcategoryHint;
+            }
+
+            public bool LocatedCurrent { get; private set; }
+
+            public bool HadCurrent { get; private set; }
+
+            public int CategoryHint { get; private set; }
+
+            public int SubcategoryHint { get; private set; }
         }
 
         private IReadOnlyList<ScannerDirectionStep> BuildDirections(Vector2Int origin, Vector2Int target)
@@ -190,6 +487,122 @@ namespace SongsOfConquestAccess.Scanner
             return _directionMode == ScannerDirectionMode.Hex
                 ? BuildHexDirections(origin, target)
                 : BuildSquareDirections(origin, target);
+        }
+
+        private static ScannerCommandResult NoResults()
+        {
+            return new ScannerCommandResult(ScannerCommandStatus.NoResults);
+        }
+
+        private static int WrapIndex(int index, int count, int delta)
+        {
+            bool wrapped;
+            return WrapIndex(index, count, delta, out wrapped);
+        }
+
+        private static int WrapIndex(int index, int count, int delta, out bool wrapped)
+        {
+            wrapped = false;
+            if (count <= 0)
+            {
+                return 0;
+            }
+
+            if (delta == 0)
+            {
+                if (index < 0)
+                {
+                    return 0;
+                }
+
+                return index >= count ? count - 1 : index;
+            }
+
+            int next = index + delta;
+            int wrappedIndex = next % count;
+            if (wrappedIndex < 0)
+            {
+                wrappedIndex += count;
+            }
+
+            wrapped = next < 0 || next >= count || count == 1;
+            return wrappedIndex;
+        }
+
+        private static int NextIndexMatching<T>(IReadOnlyList<T> list, int startIndex, int delta, Func<T, bool> predicate, out bool wrapped)
+        {
+            wrapped = false;
+            if (list == null || list.Count == 0 || predicate == null)
+            {
+                return -1;
+            }
+
+            if (delta == 0)
+            {
+                return startIndex >= 0 && startIndex < list.Count && predicate(list[startIndex])
+                    ? startIndex
+                    : -1;
+            }
+
+            int index = startIndex;
+            if (index < 0 || index >= list.Count)
+            {
+                index = delta > 0 ? list.Count - 1 : 0;
+            }
+
+            for (int i = 0; i < list.Count; i++)
+            {
+                bool stepWrapped;
+                index = WrapIndex(index, list.Count, delta, out stepWrapped);
+                wrapped = wrapped || stepWrapped;
+                if (predicate(list[index]))
+                {
+                    return index;
+                }
+            }
+
+            return -1;
+        }
+
+        private static bool CategoryHasResults(ScannerCategory category)
+        {
+            if (category == null)
+            {
+                return false;
+            }
+
+            for (int i = 0; i < category.Subcategories.Count; i++)
+            {
+                if (SubcategoryHasResults(category.Subcategories[i]))
+                {
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
+        private static bool SubcategoryHasResults(ScannerSubcategory subcategory)
+        {
+            return subcategory != null && subcategory.Results.Count > 0;
+        }
+
+        private static int FirstNonEmptySubcategoryIndex(ScannerCategory category)
+        {
+            if (category == null)
+            {
+                return 0;
+            }
+
+            for (int i = 0; i < category.Subcategories.Count; i++)
+            {
+                if (SubcategoryHasResults(category.Subcategories[i]))
+                {
+                    return i;
+                }
+            }
+
+            return 0;
         }
 
         private static IReadOnlyList<ScannerDirectionStep> BuildSquareDirections(Vector2Int origin, Vector2Int target)
@@ -327,7 +740,6 @@ namespace SongsOfConquestAccess.Scanner
                 return null;
             }
 
-            _snapshot.PruneEmpty();
             if (_snapshot.IsEmpty)
             {
                 _snapshot = null;
@@ -345,8 +757,14 @@ namespace SongsOfConquestAccess.Scanner
                     return result;
                 }
 
-                subcategory.Results.RemoveAt(_resultIndex);
-                _snapshot.PruneEmpty();
+                if (!string.IsNullOrWhiteSpace(result.Key))
+                {
+                    _snapshot.PruneByKey(result.Key);
+                }
+                else
+                {
+                    subcategory.Results.RemoveAt(_resultIndex);
+                }
                 if (_snapshot == null || _snapshot.IsEmpty)
                 {
                     _snapshot = null;
@@ -408,9 +826,10 @@ namespace SongsOfConquestAccess.Scanner
             return _cursorProvider != null ? _cursorProvider() : Vector2Int.zero;
         }
 
-        private static void Speak(string text)
+        private ScannerSnapshot BuildSnapshot(Vector2Int origin)
         {
-            SpeechPipeline.Output(new SpeechRequest(text, interrupt: false));
+            return _snapshotBuilder != null ? _snapshotBuilder(origin) : null;
         }
+
     }
 }

@@ -353,11 +353,6 @@ namespace SongsOfConquestAccess.Adapters
 
         public AdventureMapTile GetTile(Vector2Int position)
         {
-            return GetTile(position, logDiagnostic: true);
-        }
-
-        private AdventureMapTile GetTile(Vector2Int position, bool logDiagnostic)
-        {
             Vector2Int clamped = ClampToMap(position);
             AdventureMapTile tile = new AdventureMapTile(clamped);
             int localTeamId = GetLocalTeamId();
@@ -370,11 +365,6 @@ namespace SongsOfConquestAccess.Adapters
 
             if (!tile.IsExplored)
             {
-                if (logDiagnostic)
-                {
-                    LogTileDiagnostic(tile, fog, "skipped entity lookup because tile is unexplored");
-                }
-
                 return tile;
             }
 
@@ -396,17 +386,14 @@ namespace SongsOfConquestAccess.Adapters
                 }
             }
 
-            string entityResolutionDiagnostic;
-            IMapEntity entity = GetRawMapEntityAt(clamped, out entityResolutionDiagnostic);
+            IMapEntity entity = GetRawMapEntityAt(clamped);
             if (entity != null && !entity.IsVisibleInGame)
             {
-                entityResolutionDiagnostic += "; filtered because visibleInGame=False";
                 entity = null;
             }
 
             if (entity != null && entity.Category == MapEntityCategory.Artistic)
             {
-                entityResolutionDiagnostic += "; filtered because category=Artistic";
                 entity = null;
             }
 
@@ -426,11 +413,6 @@ namespace SongsOfConquestAccess.Adapters
             }
 
             tile.PathIndicator = BuildPathIndicatorForTile(clamped, selectedCommander, localTeamId);
-
-            if (logDiagnostic)
-            {
-                LogTileDiagnostic(tile, fog, entityResolutionDiagnostic);
-            }
 
             return tile;
         }
@@ -847,7 +829,6 @@ namespace SongsOfConquestAccess.Adapters
             AddArtifactMarketScannerResults(snapshot, tileCache);
             AddTeleportScannerResults(snapshot, tileCache);
             AddAdventureTerrainScannerResults(snapshot, origin, tileCache);
-            snapshot.SortByDistance(origin);
             return snapshot;
         }
 
@@ -905,7 +886,10 @@ namespace SongsOfConquestAccess.Adapters
 
                 string name = FirstNonEmpty(tile.Commander.Name, "wielder");
                 snapshot.Add("Wielders", "All",
-                    new ScannerResult(name, commander.Position) { StableReference = commander.Id });
+                    new ScannerResult(ScannerKey("commander", commander.Id), name, commander.Position)
+                    {
+                        StableReference = commander.Id
+                    });
             }
         }
 
@@ -933,7 +917,11 @@ namespace SongsOfConquestAccess.Adapters
                 string name = FirstNonEmpty(tile.MapEntityName, GetMapEntityName(entity));
                 bool notVisible = !tile.IsVisible;
                 string relationship = ToTitleCase(GetMapEntityRelationship(entity, localTeamId));
-                ScannerResult result = new ScannerResult(name, entity.Position) { NotVisible = notVisible, StableReference = entity.Id };
+                ScannerResult result = new ScannerResult(ScannerKey("entity", entity.Id), name, entity.Position)
+                {
+                    NotVisible = notVisible,
+                    StableReference = entity.Id
+                };
 
                 AddStructuralMapEntityResult(snapshot, entity, relationship, result);
                 AddTroopSourceResult(snapshot, entity, relationship, result);
@@ -973,6 +961,7 @@ namespace SongsOfConquestAccess.Adapters
 
         private static void AddRelationshipSubcategories(ScannerCategory category)
         {
+            category.GetOrAddSubcategory("All");
             category.GetOrAddSubcategory("Neutral");
             category.GetOrAddSubcategory("Friendly");
             category.GetOrAddSubcategory("Enemy");
@@ -1140,8 +1129,10 @@ namespace SongsOfConquestAccess.Adapters
 
                 Vector2Int representative = ClosestPoint(points, origin);
                 string name = FirstNonEmpty(GetCommanderName(commander), "commander");
-                string tileWord = points.Count == 1 ? " tile" : " tiles";
-                ScannerResult result = new ScannerResult(points.Count + tileWord + " within " + FormatPossessive(name) + " zone of control", representative)
+                ScannerResult result = new ScannerResult(
+                    ScannerKey("zoc", commander.Id),
+                    ScannerResultLabels.ZoneOfControl(points.Count, name),
+                    representative)
                 {
                     Kind = ScannerResultKind.CommanderZoneOfControl,
                     StableReference = commander.Id
@@ -1326,7 +1317,11 @@ namespace SongsOfConquestAccess.Adapters
             }
 
             string name = FirstNonEmpty(tile.MapEntityName, GetMapEntityName(entity));
-            return new ScannerResult(name, entity.Position) { NotVisible = !tile.IsVisible, StableReference = entity.Id };
+            return new ScannerResult(ScannerKey("entity", entity.Id), name, entity.Position)
+            {
+                NotVisible = !tile.IsVisible,
+                StableReference = entity.Id
+            };
         }
 
         private static bool IsCategory(IMapEntity entity, MapEntityCategory[] categories)
@@ -1354,9 +1349,11 @@ namespace SongsOfConquestAccess.Adapters
                 case MapEntityCategory.Town:
                 case MapEntityCategory.Settlement:
                 case MapEntityCategory.BuildSite:
+                    snapshot.Add("Settlements and Build sites", "All", CloneResult(result));
                     snapshot.Add("Settlements and Build sites", relationship, CloneResult(result));
                     break;
                 case MapEntityCategory.Building:
+                    snapshot.Add("Buildings", "All", CloneResult(result));
                     snapshot.Add("Buildings", relationship, CloneResult(result));
                     break;
             }
@@ -1366,6 +1363,7 @@ namespace SongsOfConquestAccess.Adapters
         {
             if (entity.HasComponent<IRecruitmentPoolComponent>() || entity.HasComponent<ITroopDwellingComponent>())
             {
+                snapshot.Add("Troop sources", "All", CloneResult(result));
                 snapshot.Add("Troop sources", relationship, CloneResult(result));
             }
         }
@@ -1481,14 +1479,14 @@ namespace SongsOfConquestAccess.Adapters
         {
             if (tileCache == null)
             {
-                return GetTile(position, logDiagnostic: false);
+                return GetTile(position);
             }
 
             Vector2Int clamped = ClampToMap(position);
             AdventureMapTile tile;
             if (!tileCache.TryGetValue(clamped, out tile))
             {
-                tile = GetTile(clamped, logDiagnostic: false);
+                tile = GetTile(clamped);
                 tileCache.Add(clamped, tile);
             }
 
@@ -1502,7 +1500,7 @@ namespace SongsOfConquestAccess.Adapters
                 return;
             }
 
-            TerrainScanCell[,] terrain = BuildTerrainScan(tileCache);
+            TerrainScanCell[,] terrain = BuildTerrainScan(GetLocalTeamId());
             AddTerrainGroups(snapshot, terrain, "Roads", "road", origin, cell => cell.Road);
             AddTerrainGroups(snapshot, terrain, "Bridges", "bridge", origin, cell => cell.Bridge);
             AddTerrainGroups(snapshot, terrain, "Water", "water", origin, cell => cell.Water);
@@ -1510,29 +1508,118 @@ namespace SongsOfConquestAccess.Adapters
             AddScannerGroups(snapshot, "Obstacles", "All", terrain, "blocked", origin, cell => cell.Blocked);
         }
 
-        private TerrainScanCell[,] BuildTerrainScan(Dictionary<Vector2Int, AdventureMapTile> tileCache)
+        private TerrainScanCell[,] BuildTerrainScan(int localTeamId)
         {
             int width = _facade.Level.Width;
             int height = _facade.Level.Height;
+            byte[] exploration = localTeamId >= 0 ? _facade.Level.GetExplorationForTeam(localTeamId) : null;
             TerrainScanCell[,] terrain = new TerrainScanCell[width, height];
             for (int y = 0; y < height; y++)
             {
                 for (int x = 0; x < width; x++)
                 {
-                    AdventureMapTile tile = GetScannerTile(tileCache, new Vector2Int(x, y));
+                    int index = y * width + x;
+                    Vector2Int point = new Vector2Int(x, y);
+                    bool explored = IsExplored(exploration, index);
+                    bool visible = false;
+                    if (!explored && _fogManager != null)
+                    {
+                        visible = GetFog(point) == byte.MaxValue || _fogManager.IsVisible(point);
+                    }
+
+                    bool eligible = explored || visible;
+                    bool impassable = eligible && IsImpassableTerrain(localTeamId, point);
                     terrain[x, y] = new TerrainScanCell
                     {
-                        Explored = tile != null && tile.IsExplored,
-                        Road = tile != null && tile.IsExplored && HasEnvironment(tile, "road"),
-                        Bridge = tile != null && tile.IsExplored && HasEnvironment(tile, "bridge"),
-                        Water = tile != null && tile.IsExplored && HasEnvironment(tile, "water"),
-                        Impassable = tile != null && tile.IsExplored && tile.IsImpassable,
-                        Blocked = tile != null && tile.IsExplored && tile.IsBlocked
+                        Explored = eligible,
+                        Road = eligible && SafeGetRoad(index) > 0,
+                        Bridge = eligible && SafeGetBridge(index) > 0,
+                        Water = eligible && SafeGetWater(index) > 0,
+                        Impassable = impassable,
+                        Blocked = eligible && !impassable && IsBlockedTerrain(localTeamId, point)
                     };
                 }
             }
 
             return terrain;
+        }
+
+        private static bool IsExplored(byte[] exploration, int index)
+        {
+            return exploration != null
+                && index >= 0
+                && index < exploration.Length
+                && exploration[index] == ExploredButNotVisibleFogValue;
+        }
+
+        private bool IsImpassableTerrain(int localTeamId, Vector2Int point)
+        {
+            if (localTeamId < 0)
+            {
+                return false;
+            }
+
+            try
+            {
+                return float.IsPositiveInfinity(_facade.Level.GetStaticTravelCost(localTeamId, point));
+            }
+            catch
+            {
+                return false;
+            }
+        }
+
+        private bool IsBlockedTerrain(int localTeamId, Vector2Int point)
+        {
+            if (localTeamId < 0)
+            {
+                return false;
+            }
+
+            try
+            {
+                return !_facade.Level.IsValidMoveDestination(localTeamId, point);
+            }
+            catch
+            {
+                return false;
+            }
+        }
+
+        private byte SafeGetRoad(int index)
+        {
+            try
+            {
+                return _facade.Level.GetRoad(index);
+            }
+            catch
+            {
+                return 0;
+            }
+        }
+
+        private byte SafeGetBridge(int index)
+        {
+            try
+            {
+                return _facade.Level.GetBridge(index);
+            }
+            catch
+            {
+                return 0;
+            }
+        }
+
+        private byte SafeGetWater(int index)
+        {
+            try
+            {
+                return _facade.Level.GetWater(index);
+            }
+            catch
+            {
+                return 0;
+            }
         }
 
         private void AddTerrainGroups(ScannerSnapshot snapshot, TerrainScanCell[,] terrain, string subcategory, string label, Vector2Int origin, Func<TerrainScanCell, bool> predicate)
@@ -1570,7 +1657,10 @@ namespace SongsOfConquestAccess.Adapters
 
                     List<Vector2Int> group = FloodTerrainGroup(start, terrain, visited, predicate);
                     Vector2Int representative = ClosestPoint(group, origin);
-                    ScannerResult result = new ScannerResult(group.Count + " " + label, representative)
+                    ScannerResult result = new ScannerResult(
+                        ScannerGroupKey(category, subcategory, label, group),
+                        group.Count + " " + label,
+                        representative)
                     {
                         Kind = category == "Terrain" ? ScannerResultKind.TerrainGroup : ScannerResultKind.AreaGroup
                     };
@@ -1689,7 +1779,7 @@ namespace SongsOfConquestAccess.Adapters
 
         private static ScannerResult CloneResult(ScannerResult result)
         {
-            ScannerResult clone = new ScannerResult(result.Label, result.Position)
+            ScannerResult clone = new ScannerResult(result.Key, result.Label, result.Position)
             {
                 NotVisible = result.NotVisible,
                 StableReference = result.StableReference,
@@ -1697,6 +1787,36 @@ namespace SongsOfConquestAccess.Adapters
             };
             clone.Points.AddRange(result.Points);
             return clone;
+        }
+
+        private static string ScannerKey(string prefix, int id)
+        {
+            return prefix + ":" + id;
+        }
+
+        private static string ScannerGroupKey(string category, string subcategory, string label, List<Vector2Int> points)
+        {
+            List<Vector2Int> sorted = points != null ? new List<Vector2Int>(points) : new List<Vector2Int>();
+            sorted.Sort((left, right) =>
+            {
+                int xCompare = left.x.CompareTo(right.x);
+                return xCompare != 0 ? xCompare : left.y.CompareTo(right.y);
+            });
+
+            List<string> parts = new List<string>
+            {
+                "group",
+                category ?? string.Empty,
+                subcategory ?? string.Empty,
+                label ?? string.Empty,
+                sorted.Count.ToString()
+            };
+            for (int i = 0; i < sorted.Count; i++)
+            {
+                parts.Add(sorted[i].x + "," + sorted[i].y);
+            }
+
+            return string.Join(":", parts.ToArray());
         }
 
         private static string ToTitleCase(string value)
@@ -1984,15 +2104,8 @@ namespace SongsOfConquestAccess.Adapters
                     "Could not target tile.",
                     delegate(object inputModule, ScreenInputOverride screenInputOverride)
                     {
-                        ICommanderState selectedCommander = _selectionHandler.SelectedCommander;
-                        bool hadDestination = selectedCommander != null && selectedCommander.Destination.HasDestination;
-                        Vector2Int previousDestination = hadDestination ? selectedCommander.Destination.Destination : Vector2Int.zero;
-                        HumanAdventureController.State previousState = _humanAdventureControllerFacade.StateMachine.CurrentStateType;
-
                         InvokeNativeInputModuleAction(inputModule, "HandleSecondaryInputStart");
                         InvokeNativeInputModuleAction(inputModule, "HandleSecondaryInputEnded");
-
-                        LogNativeSecondaryDiagnostic(tilePosition, selectedCommander, previousState, hadDestination, previousDestination);
                     });
                 return true;
             }
@@ -2075,7 +2188,6 @@ namespace SongsOfConquestAccess.Adapters
             try
             {
                 InvokeNativeInputModuleAction(inputModule, "UpdateCurrentTile");
-                LogNativeHoverDiagnostic(tilePosition, screenInputOverride.ScreenPosition);
                 invoke?.Invoke(inputModule, screenInputOverride);
             }
             finally
@@ -2155,17 +2267,6 @@ namespace SongsOfConquestAccess.Adapters
             }
 
             return null;
-        }
-
-        private void LogNativeHoverDiagnostic(Vector2Int tilePosition, Vector2 screenPosition)
-        {
-            SocAccessPlugin.Instance?.LogInfo(
-                "AdventureMap native hover updated from synthetic screen input: tile="
-                + FormatTile(tilePosition)
-                + "; screenPosition="
-                + screenPosition
-                + "; currentDestination="
-                + FormatTile(_humanAdventureControllerFacade.CurrentDestinationTile));
         }
 
         private sealed class ScreenInputOverride
@@ -2288,32 +2389,6 @@ namespace SongsOfConquestAccess.Adapters
             }
 
             method.Invoke(inputModule, null);
-        }
-
-        private void LogNativeSecondaryDiagnostic(
-            Vector2Int tilePosition,
-            ICommanderState selectedCommander,
-            HumanAdventureController.State previousState,
-            bool hadDestination,
-            Vector2Int previousDestination)
-        {
-            string previousDestinationText = hadDestination ? FormatTile(previousDestination) : "<none>";
-            string currentDestinationText = selectedCommander != null && selectedCommander.Destination.HasDestination
-                ? FormatTile(selectedCommander.Destination.Destination)
-                : "<none>";
-            SocAccessPlugin.Instance?.LogInfo(
-                "AdventureMap native secondary result: tile="
-                + FormatTile(tilePosition)
-                + "; previousState="
-                + previousState
-                + "; currentState="
-                + _humanAdventureControllerFacade.StateMachine.CurrentStateType
-                + "; previousDestination="
-                + previousDestinationText
-                + "; currentDestination="
-                + currentDestinationText
-                + "; selectedCommander="
-                + DescribeCommanderForDiagnostics(selectedCommander));
         }
 
         private void PublishDenied(Vector2Int tilePosition, string message)
@@ -2721,17 +2796,14 @@ namespace SongsOfConquestAccess.Adapters
             return _facade.Teams.IsInPartnership(localTeamId, owningTeamId) ? "friendly" : "enemy";
         }
 
-        private IMapEntity GetRawMapEntityAt(Vector2Int position, out string diagnostic)
+        private IMapEntity GetRawMapEntityAt(Vector2Int position)
         {
             try
             {
-                IMapEntity entity = _facade.MapEntities.GetAt(position);
-                diagnostic = "GetAt=" + DescribeMapEntity(entity);
-                return entity;
+                return _facade.MapEntities.GetAt(position);
             }
-            catch (Exception exception)
+            catch (Exception)
             {
-                diagnostic = "GetAt threw " + exception.GetType().Name + ": " + exception.Message;
                 return null;
             }
         }
@@ -2762,183 +2834,6 @@ namespace SongsOfConquestAccess.Adapters
             }
 
             return false;
-        }
-
-        private IMapEntity ResolveHoverParent(IMapEntity entity, List<string> details, string source)
-        {
-            if (entity == null)
-            {
-                return null;
-            }
-
-            if (entity.CanHover())
-            {
-                if (details != null)
-                {
-                    details.Add(source + " hoverable=" + DescribeMapEntity(entity));
-                }
-
-                return entity;
-            }
-
-            try
-            {
-                IMapEntity parent = _facade.MapEntities.GetParentEntity(entity);
-                if (details != null)
-                {
-                    details.Add(source + " parent=" + DescribeMapEntity(parent));
-                }
-
-                if (parent != null && parent.CanHover())
-                {
-                    return parent;
-                }
-            }
-            catch (Exception exception)
-            {
-                if (details != null)
-                {
-                    details.Add(source + " parent lookup threw " + exception.GetType().Name + ": " + exception.Message);
-                }
-            }
-
-            return null;
-        }
-
-        private void LogTileDiagnostic(AdventureMapTile tile, byte fog, string entityResolutionDiagnostic)
-        {
-            if (tile == null)
-            {
-                return;
-            }
-
-            ICommanderState selectedCommander = _selectionHandler.SelectedCommander;
-            ICommanderState nativeCommanderAtPoint = null;
-            int localTeamId = GetLocalTeamId();
-            if (tile.IsVisible && localTeamId != -1)
-            {
-                try
-                {
-                    nativeCommanderAtPoint = _facade.Commanders.GetAtPoint(localTeamId, tile.Position);
-                }
-                catch (Exception exception)
-                {
-                    SocAccessPlugin.Instance?.LogWarning("AdventureMapTile diagnostic failed native GetAtPoint lookup: " + exception.Message);
-                }
-            }
-
-            string message = "AdventureMapTile diagnostic: position="
-                + tile.Position.x
-                + ","
-                + tile.Position.y
-                + "; fog="
-                + fog
-                + "; visible="
-                + tile.IsVisible
-                + "; explored="
-                + tile.IsExplored
-                + "; selectedCommander="
-                + DescribeCommanderForDiagnostics(selectedCommander)
-                + "; selectedCommanderState="
-                + DescribeCommanderStateForDiagnostics(selectedCommander)
-                + "; commander="
-                + DescribeCommander(tile.Commander != null ? tile.Commander.Raw : null)
-                + "; nativeCommanderAtPoint="
-                + DescribeCommander(nativeCommanderAtPoint)
-                + "; mapEntity="
-                + DescribeMapEntity(tile.MapEntity)
-                + "; mapEntityName="
-                + (tile.MapEntityName ?? string.Empty)
-                + "; interactionPoint="
-                + tile.IsInteractionPoint
-                + "; reachable="
-                + tile.IsReachable
-                + "; impassable="
-                + tile.IsImpassable
-                + "; blocked="
-                + tile.IsBlocked
-                + "; environment="
-                + string.Join("|", tile.Environment.ToArray())
-                + "; terrain="
-                + (tile.Terrain.HasValue ? tile.Terrain.Value.ToString() : string.Empty)
-                + "; entityResolution="
-                + (entityResolutionDiagnostic ?? string.Empty)
-                + "; speech=\""
-                + new AdventureMapTileSpeechFormatter().DescribeTile(tile)
-                + "\"";
-            SocAccessPlugin.Instance?.LogInfo(message);
-        }
-
-        private static string DescribeCommanderForDiagnostics(ICommanderState commander)
-        {
-            return DescribeCommander(commander);
-        }
-
-        private static string DescribeCommanderStateForDiagnostics(ICommanderState commander)
-        {
-            if (commander == null)
-            {
-                return "<null>";
-            }
-
-            string destination = "<none>";
-            if (commander.Destination != null && commander.Destination.HasDestination)
-            {
-                destination = FormatTile(commander.Destination.Destination);
-            }
-
-            return "internalState="
-                + commander.InternalState
-                + ",storedBuildingId="
-                + commander.StoredBuildingId
-                + ",movesLeft="
-                + commander.MovesLeft
-                + ",destination="
-                + destination;
-        }
-
-        private static string DescribeMapEntity(IMapEntity entity)
-        {
-            if (entity == null)
-            {
-                return "<null>";
-            }
-
-            return "id="
-                + entity.Id
-                + ",name="
-                + FirstNonEmpty(entity.Name, entity.NameKey)
-                + ",category="
-                + entity.Category
-                + ",position="
-                + entity.Position.x
-                + ","
-                + entity.Position.y
-                + ",canHover="
-                + entity.CanHover()
-                + ",disposed="
-                + entity.IsDisposed
-                + ",visibleInGame="
-                + entity.IsVisibleInGame;
-        }
-
-        private static string DescribeCommander(ICommanderState commander)
-        {
-            if (commander == null)
-            {
-                return "<null>";
-            }
-
-            return "id="
-                + commander.Id
-                + ",team="
-                + commander.TeamId
-                + ",position="
-                + commander.Position.x
-                + ","
-                + commander.Position.y
-                + ",alive="
-                + commander.IsAlive;
         }
 
         private static string FormatTile(Vector2Int tile)

@@ -4,6 +4,27 @@ using UnityEngine;
 
 namespace SongsOfConquestAccess.Scanner
 {
+    internal struct ScannerSnapshotLocation
+    {
+        public ScannerSnapshotLocation(int categoryIndex, int subcategoryIndex, int resultIndex)
+        {
+            CategoryIndex = categoryIndex;
+            SubcategoryIndex = subcategoryIndex;
+            ResultIndex = resultIndex;
+        }
+
+        public int CategoryIndex { get; private set; }
+
+        public int SubcategoryIndex { get; private set; }
+
+        public int ResultIndex { get; private set; }
+
+        public static ScannerSnapshotLocation NotFound
+        {
+            get { return new ScannerSnapshotLocation(-1, -1, -1); }
+        }
+    }
+
     internal sealed class ScannerSnapshot
     {
         private readonly List<ScannerCategory> _categories = new List<ScannerCategory>();
@@ -31,6 +52,10 @@ namespace SongsOfConquestAccess.Scanner
                 return true;
             }
         }
+
+        public bool HasSortOrigin { get; private set; }
+
+        public Vector2Int SortOrigin { get; private set; }
 
         public ScannerCategory GetOrAddCategory(string label)
         {
@@ -64,6 +89,9 @@ namespace SongsOfConquestAccess.Scanner
 
         public void SortByDistance(Vector2Int origin)
         {
+            SortOrigin = origin;
+            HasSortOrigin = true;
+
             for (int i = 0; i < _categories.Count; i++)
             {
                 ScannerCategory category = _categories[i];
@@ -90,6 +118,83 @@ namespace SongsOfConquestAccess.Scanner
             }
         }
 
+        public bool TryLocateByKey(
+            string key,
+            int categoryHint,
+            int subcategoryHint,
+            bool allowFallback,
+            out ScannerSnapshotLocation location)
+        {
+            location = ScannerSnapshotLocation.NotFound;
+            if (string.IsNullOrWhiteSpace(key))
+            {
+                return false;
+            }
+
+            if (TryLocateInSubcategory(key, categoryHint, subcategoryHint, out location))
+            {
+                return true;
+            }
+
+            if (!allowFallback)
+            {
+                location = ScannerSnapshotLocation.NotFound;
+                return false;
+            }
+
+            for (int categoryIndex = 0; categoryIndex < _categories.Count; categoryIndex++)
+            {
+                ScannerCategory category = _categories[categoryIndex];
+                for (int subcategoryIndex = 0; subcategoryIndex < category.Subcategories.Count; subcategoryIndex++)
+                {
+                    if (categoryIndex == categoryHint && subcategoryIndex == subcategoryHint)
+                    {
+                        continue;
+                    }
+
+                    if (TryLocateInSubcategory(key, categoryIndex, subcategoryIndex, out location))
+                    {
+                        return true;
+                    }
+                }
+            }
+
+            location = ScannerSnapshotLocation.NotFound;
+            return false;
+        }
+
+        private bool TryLocateInSubcategory(
+            string key,
+            int categoryIndex,
+            int subcategoryIndex,
+            out ScannerSnapshotLocation location)
+        {
+            location = ScannerSnapshotLocation.NotFound;
+            if (categoryIndex < 0 || categoryIndex >= _categories.Count)
+            {
+                return false;
+            }
+
+            ScannerCategory category = _categories[categoryIndex];
+            if (subcategoryIndex < 0 || subcategoryIndex >= category.Subcategories.Count)
+            {
+                return false;
+            }
+
+            ScannerSubcategory subcategory = category.Subcategories[subcategoryIndex];
+            for (int resultIndex = 0; resultIndex < subcategory.Results.Count; resultIndex++)
+            {
+                ScannerResult result = subcategory.Results[resultIndex];
+                if (result != null && result.Key == key)
+                {
+                    location = new ScannerSnapshotLocation(categoryIndex, subcategoryIndex, resultIndex);
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
         public void PruneEmpty()
         {
             for (int i = _categories.Count - 1; i >= 0; i--)
@@ -106,6 +211,31 @@ namespace SongsOfConquestAccess.Scanner
                 if (category.Subcategories.Count == 0)
                 {
                     _categories.RemoveAt(i);
+                }
+            }
+        }
+
+        public void PruneByKey(string key)
+        {
+            if (string.IsNullOrWhiteSpace(key))
+            {
+                return;
+            }
+
+            for (int i = 0; i < _categories.Count; i++)
+            {
+                ScannerCategory category = _categories[i];
+                for (int j = 0; j < category.Subcategories.Count; j++)
+                {
+                    ScannerSubcategory subcategory = category.Subcategories[j];
+                    for (int k = subcategory.Results.Count - 1; k >= 0; k--)
+                    {
+                        ScannerResult result = subcategory.Results[k];
+                        if (result != null && result.Key == key)
+                        {
+                            subcategory.Results.RemoveAt(k);
+                        }
+                    }
                 }
             }
         }

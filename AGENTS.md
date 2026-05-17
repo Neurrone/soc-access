@@ -14,7 +14,7 @@ Layout:
 - `soc-access/speech/` for Tolk and output plumbing
 - `soc-access/screens/` for accessible screen models. Screens can depend on adaptors and use widgets
 - `soc-access/ui/` for UI widgets in the accessibility tree
-- `soc-access/tests/` for any offline tests introduced later
+- `soc-access/tests/` for tests
 - `soc-access/soc-access.csproj` is the live mod project and currently targets `.NET Framework 4.7.2`
 
 Adapter label rule: ask whether a string is authored by the game or composed for the accessibility widget tree. Game-authored/native text can come from adapters. Accessibility wording and composition belongs in screens/widgets.
@@ -25,7 +25,7 @@ Useful commands:
 
 - `dotnet build soc-access\soc-access.csproj` to build the mod locally
 - `dotnet build soc-access\soc-access.csproj /p:DeployToGame=true` to build and copy the DLL to `BepInEx\scripts` for Script Engine hot reload
-- `dotnet test <path-to-test.csproj>` to run automated tests once test projects are added
+- `dotnet test soc-access\tests\SongsOfConquestAccess.Tests.csproj` to run unit tests
 
 Prefer fast text search over manual browsing when tracing the game code. Do not change deployment to `BepInEx\plugins`; Script Engine loads the mod from `BepInEx\scripts`.
 

@@ -23,6 +23,10 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="tests\**\*.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
     <Reference Include="BepInEx">
       <HintPath>$(BepInExCoreDir)\BepInEx.dll</HintPath>
       <Private>false</Private>
@@ -123,7 +127,7 @@
 
   <Target Name="DeployToScriptFolder"
           AfterTargets="Build"
-          Condition="'$(GameDir)' != ''">
+          Condition="'$(GameDir)' != '' and '$(DeployToGame)' == 'true'">
     <Message Text="Deploying $(TargetPath) to $(DeployDllPath)" Importance="High" />
     <MakeDir Directories="$(ScriptOutputDir)" />
     <Copy SourceFiles="$(TargetPath)"

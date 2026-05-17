@@ -14,11 +14,11 @@ The scanner is available in the following screens:
 
 On the adventure map, scanner results will only show you what you have explored.
 
-Currently visible things are read normally. Explored tiles that are not currently visible are read as `not visible` (i.e, fog of war).
+Currently visible things are read normally. Explored tiles that are not currently visible are read as `Unseen` (i.e, fog of war).
 
 ## Controls
 
-- `End`: refresh scanner results
+- `End`: refresh and repeat scanner results
 - `Ctrl+Page Down`: next category
 - `Ctrl+Page Up`: previous category
 - `Shift+Page Down`: next subcategory
@@ -30,5 +30,7 @@ Currently visible things are read normally. Explored tiles that are not currentl
 
 ## Notes
 
-- Results are not refreshed automatically, use end to refresh the scan.
+- Scanner commands refresh results automatically as you navigate through them.
+- `End` can still be used to explicitly refresh and re-announce scanner results.
+- Category, subcategory, and result navigation wraps.
 - Directions are relative to the current accessibility cursor.

@@ -11,6 +11,8 @@ namespace SongsOfConquestAccess.UI
 {
     internal sealed class TroopPlacementHexGrid : Widget
     {
+        private const string ScannerWrapCueKey = "Common_ClickUnfold";
+
         private readonly PreBattleMenuAdapter _adapter;
         private TroopPlacementSnapshot _snapshot;
         private Vector2Int _cursor;
@@ -306,32 +308,32 @@ namespace SongsOfConquestAccess.UI
 
             if (action.Key == AccessibilityActions.ScannerPreviousCategory.Key)
             {
-                return _scanner.MoveCategory(-1);
+                return HandleScannerNavigationResult(_scanner.ExecuteMoveCategory(-1));
             }
 
             if (action.Key == AccessibilityActions.ScannerNextCategory.Key)
             {
-                return _scanner.MoveCategory(1);
+                return HandleScannerNavigationResult(_scanner.ExecuteMoveCategory(1));
             }
 
             if (action.Key == AccessibilityActions.ScannerPreviousSubcategory.Key)
             {
-                return _scanner.MoveSubcategory(-1);
+                return HandleScannerNavigationResult(_scanner.ExecuteMoveSubcategory(-1));
             }
 
             if (action.Key == AccessibilityActions.ScannerNextSubcategory.Key)
             {
-                return _scanner.MoveSubcategory(1);
+                return HandleScannerNavigationResult(_scanner.ExecuteMoveSubcategory(1));
             }
 
             if (action.Key == AccessibilityActions.ScannerPreviousResult.Key)
             {
-                return _scanner.MoveResult(-1);
+                return HandleScannerNavigationResult(_scanner.ExecuteMoveResult(-1));
             }
 
             if (action.Key == AccessibilityActions.ScannerNextResult.Key)
             {
-                return _scanner.MoveResult(1);
+                return HandleScannerNavigationResult(_scanner.ExecuteMoveResult(1));
             }
 
             if (action.Key == AccessibilityActions.ScannerJumpToResult.Key)
@@ -345,6 +347,17 @@ namespace SongsOfConquestAccess.UI
             }
 
             return false;
+        }
+
+        private bool HandleScannerNavigationResult(ScannerCommandResult result)
+        {
+            if (result != null && result.Status == ScannerCommandStatus.Result && result.Wrapped)
+            {
+                NativeSoundUtility.PostEvent(ScannerWrapCueKey);
+            }
+
+            _scanner.Output(result);
+            return true;
         }
 
         private static bool IsScannerAction(string actionKey)

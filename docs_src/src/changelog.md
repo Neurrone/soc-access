@@ -5,6 +5,12 @@
 - Don't announce a story camera focus event if it is identical to the last announced camera movement
 - When setting a destination, the route preview indicators on tiles from the wielder to the destination are now indicated
 - When reading tiles, "impassable" now describes impassable terrain. "Blocked" now indicates tiles that can't be accessed due to dynamic game state like an occupying or blocking entity, and no longer describes impassable terrain.
+- Scanner improvements:
+  - Scanner results now refresh automatically when using scanner commands, so a separate refresh step is no longer required
+  - Scanner navigation now wraps between results, subcategories, and categories
+  - Scanner results are now tracked by stable identity, so stale results are pruned more reliably after the game state changes
+  - Added `All` subcategories to all categories with more than one subcategory for adventure map, troop placement, and combat
+  - Improved adventure map terrain scanning performance
 
 ## V0.1.3
 

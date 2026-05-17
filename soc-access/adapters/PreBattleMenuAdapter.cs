@@ -199,11 +199,31 @@ namespace SongsOfConquestAccess.Adapters
         {
             TroopPlacementSnapshot placement = BuildSnapshot();
             ScannerSnapshot snapshot = new ScannerSnapshot();
+            InitializeTroopPlacementScannerCategories(snapshot);
             AddTroopPlacementTroopScannerResults(snapshot, placement);
             AddTroopPlacementSpawnScannerResults(snapshot, placement);
             AddTroopPlacementTerrainScannerResults(snapshot, placement);
-            snapshot.SortByDistance(origin);
             return snapshot;
+        }
+
+        private static void InitializeTroopPlacementScannerCategories(ScannerSnapshot snapshot)
+        {
+            ScannerCategory troops = snapshot.GetOrAddCategory("Troops");
+            troops.GetOrAddSubcategory("All");
+            troops.GetOrAddSubcategory("Friendly");
+            troops.GetOrAddSubcategory("Enemy");
+
+            ScannerCategory spawnPoints = snapshot.GetOrAddCategory("Spawn points");
+            spawnPoints.GetOrAddSubcategory("All");
+            spawnPoints.GetOrAddSubcategory("Friendly");
+            spawnPoints.GetOrAddSubcategory("Enemy");
+
+            ScannerCategory terrain = snapshot.GetOrAddCategory("Terrain");
+            terrain.GetOrAddSubcategory("All");
+            terrain.GetOrAddSubcategory("Elevated ground 1");
+            terrain.GetOrAddSubcategory("Elevated ground 2");
+            terrain.GetOrAddSubcategory("Elevated ground 3");
+            terrain.GetOrAddSubcategory("Impassable terrain");
         }
 
         private void AddTroopPlacementTroopScannerResults(ScannerSnapshot snapshot, TroopPlacementSnapshot placement)
@@ -226,11 +246,15 @@ namespace SongsOfConquestAccess.Adapters
                 {
                     if (tile.Elevation == elevation)
                     {
-                        snapshot.Add("Terrain", "Elevated ground " + elevation,
-                            new ScannerResult("elevated ground, height " + elevation, tile.Point)
-                            {
-                                Kind = ScannerResultKind.TerrainPoint
-                            });
+                        ScannerResult result = new ScannerResult(
+                            ScannerTileKey("terrain:elevated:" + elevation, tile.Point),
+                            "elevated ground, height " + elevation,
+                            tile.Point)
+                        {
+                            Kind = ScannerResultKind.TerrainPoint
+                        };
+                        snapshot.Add("Terrain", "All", CloneResult(result));
+                        snapshot.Add("Terrain", "Elevated ground " + elevation, result);
                     }
                 }
             }
@@ -239,11 +263,15 @@ namespace SongsOfConquestAccess.Adapters
             {
                 if (tile.IsImpassable)
                 {
-                    snapshot.Add("Terrain", "Impassable terrain",
-                        new ScannerResult("impassable", tile.Point)
-                        {
-                            Kind = ScannerResultKind.TerrainPoint
-                        });
+                    ScannerResult result = new ScannerResult(
+                        ScannerTileKey("terrain:impassable", tile.Point),
+                        "impassable",
+                        tile.Point)
+                    {
+                        Kind = ScannerResultKind.TerrainPoint
+                    };
+                    snapshot.Add("Terrain", "All", CloneResult(result));
+                    snapshot.Add("Terrain", "Impassable terrain", result);
                 }
             }
         }
@@ -254,8 +282,12 @@ namespace SongsOfConquestAccess.Adapters
             {
                 if (tile.TroopSide.HasValue && IsOwnSide(placement, tile.TroopSide.Value) == own)
                 {
-                    snapshot.Add("Troops", own ? "Friendly" : "Enemy",
-                        new ScannerResult(FirstNonEmpty(tile.TroopLabel, "Unknown troop"), tile.Point));
+                    ScannerResult result = new ScannerResult(
+                        ScannerTileKey(own ? "troop:friendly" : "troop:enemy", tile.Point),
+                        FirstNonEmpty(tile.TroopLabel, "Unknown troop"),
+                        tile.Point);
+                    snapshot.Add("Troops", "All", CloneResult(result));
+                    snapshot.Add("Troops", own ? "Friendly" : "Enemy", result);
                 }
             }
         }
@@ -266,10 +298,31 @@ namespace SongsOfConquestAccess.Adapters
             {
                 if (tile.SpawnSide.HasValue && IsOwnSide(placement, tile.SpawnSide.Value) == own)
                 {
-                    snapshot.Add("Spawn points", own ? "Friendly" : "Enemy",
-                        new ScannerResult("spawn point", tile.Point));
+                    ScannerResult result = new ScannerResult(
+                        ScannerTileKey(own ? "spawn:friendly" : "spawn:enemy", tile.Point),
+                        "spawn point",
+                        tile.Point);
+                    snapshot.Add("Spawn points", "All", CloneResult(result));
+                    snapshot.Add("Spawn points", own ? "Friendly" : "Enemy", result);
                 }
             }
+        }
+
+        private static string ScannerTileKey(string prefix, Vector2Int point)
+        {
+            return prefix + ":" + point.x + ":" + point.y;
+        }
+
+        private static ScannerResult CloneResult(ScannerResult result)
+        {
+            ScannerResult clone = new ScannerResult(result.Key, result.Label, result.Position)
+            {
+                NotVisible = result.NotVisible,
+                StableReference = result.StableReference,
+                Kind = result.Kind
+            };
+            clone.Points.AddRange(result.Points);
+            return clone;
         }
 
         public bool ValidateScannerResult(ScannerResult result)

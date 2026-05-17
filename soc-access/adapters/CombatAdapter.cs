@@ -432,11 +432,35 @@ namespace SongsOfConquestAccess.Adapters
                 return snapshot;
             }
 
+            InitializeCombatScannerCategories(snapshot);
             AddCombatTroopScannerResults(snapshot);
             AddCombatEntityScannerResults(snapshot);
             AddCombatTerrainScannerResults(snapshot);
-            snapshot.SortByDistance(origin);
             return snapshot;
+        }
+
+        private static void InitializeCombatScannerCategories(ScannerSnapshot snapshot)
+        {
+            ScannerCategory troops = snapshot.GetOrAddCategory("Troops");
+            troops.GetOrAddSubcategory("All");
+            troops.GetOrAddSubcategory("Friendly");
+            troops.GetOrAddSubcategory("Enemy");
+
+            ScannerCategory entities = snapshot.GetOrAddCategory("Entities");
+            entities.GetOrAddSubcategory("All");
+            entities.GetOrAddSubcategory("Friendly gates");
+            entities.GetOrAddSubcategory("Enemy gates");
+            entities.GetOrAddSubcategory("Attackable");
+            entities.GetOrAddSubcategory("Dangerous");
+
+            ScannerCategory terrain = snapshot.GetOrAddCategory("Terrain");
+            terrain.GetOrAddSubcategory("All");
+            terrain.GetOrAddSubcategory("Elevated ground 1");
+            terrain.GetOrAddSubcategory("Elevated ground 2");
+            terrain.GetOrAddSubcategory("Elevated ground 3");
+            terrain.GetOrAddSubcategory("Impassable terrain");
+
+            snapshot.GetOrAddCategory("Obstacles").GetOrAddSubcategory("Blocked");
         }
 
         private void AddCombatTroopScannerResults(ScannerSnapshot snapshot)
@@ -460,8 +484,12 @@ namespace SongsOfConquestAccess.Adapters
 
                     if (tile.Troop != null && IsFriendlyTroop(tile.Troop) == friendly)
                     {
-                        snapshot.Add("Troops", friendly ? "Friendly" : "Enemy",
-                            new ScannerResult(FormatTroopGridLabel(tile.Troop), point));
+                        ScannerResult result = new ScannerResult(
+                            ScannerTileKey(friendly ? "troop:friendly" : "troop:enemy", point),
+                            FormatTroopGridLabel(tile.Troop),
+                            point);
+                        snapshot.Add("Troops", "All", CloneResult(result));
+                        snapshot.Add("Troops", friendly ? "Friendly" : "Enemy", result);
                     }
                 }
             }
@@ -485,18 +513,30 @@ namespace SongsOfConquestAccess.Adapters
                     {
                         if (mapEntity.Category == MapEntityCategory.TownWallGate)
                         {
-                            snapshot.Add("Entities", IsFriendlyMapEntity(mapEntity) ? "Friendly gates" : "Enemy gates",
-                                new ScannerResult(GetMapEntityName(mapEntity), point));
+                            ScannerResult result = new ScannerResult(
+                                ScannerTileKey(IsFriendlyMapEntity(mapEntity) ? "gate:friendly" : "gate:enemy", point),
+                                GetMapEntityName(mapEntity),
+                                point);
+                            snapshot.Add("Entities", "All", CloneResult(result));
+                            snapshot.Add("Entities", IsFriendlyMapEntity(mapEntity) ? "Friendly gates" : "Enemy gates", result);
                         }
                         else if (tile.Entity != null)
                         {
-                            snapshot.Add("Entities", "Attackable",
-                                new ScannerResult(GetMapEntityName(tile.Entity), point));
+                            ScannerResult result = new ScannerResult(
+                                ScannerTileKey("entity:attackable", point),
+                                GetMapEntityName(tile.Entity),
+                                point);
+                            snapshot.Add("Entities", "All", CloneResult(result));
+                            snapshot.Add("Entities", "Attackable", result);
                         }
                         else if (IsDangerousMapEntity(mapEntity))
                         {
-                            snapshot.Add("Entities", "Dangerous",
-                                new ScannerResult(GetMapEntityName(mapEntity), point));
+                            ScannerResult result = new ScannerResult(
+                                ScannerTileKey("entity:dangerous", point),
+                                GetMapEntityName(mapEntity),
+                                point);
+                            snapshot.Add("Entities", "All", CloneResult(result));
+                            snapshot.Add("Entities", "Dangerous", result);
                         }
                     }
                 }
@@ -520,11 +560,15 @@ namespace SongsOfConquestAccess.Adapters
 
                         if (tile.Elevation == elevation)
                         {
-                            snapshot.Add("Terrain", "Elevated ground " + elevation,
-                                new ScannerResult("elevated ground, height " + elevation, point)
-                                {
-                                    Kind = ScannerResultKind.TerrainPoint
-                                });
+                            ScannerResult result = new ScannerResult(
+                                ScannerTileKey("terrain:elevated:" + elevation, point),
+                                "elevated ground, height " + elevation,
+                                point)
+                            {
+                                Kind = ScannerResultKind.TerrainPoint
+                            };
+                            snapshot.Add("Terrain", "All", CloneResult(result));
+                            snapshot.Add("Terrain", "Elevated ground " + elevation, result);
                         }
                     }
                 }
@@ -543,20 +587,41 @@ namespace SongsOfConquestAccess.Adapters
 
                     if (tile.IsImpassable)
                     {
-                        snapshot.Add("Terrain", "Impassable terrain",
-                            new ScannerResult("impassable", point)
-                            {
-                                Kind = ScannerResultKind.TerrainPoint
-                            });
+                        ScannerResult result = new ScannerResult(
+                            ScannerTileKey("terrain:impassable", point),
+                            "impassable",
+                            point)
+                        {
+                            Kind = ScannerResultKind.TerrainPoint
+                        };
+                        snapshot.Add("Terrain", "All", CloneResult(result));
+                        snapshot.Add("Terrain", "Impassable terrain", result);
                     }
 
                     if (tile.IsBlocked)
                     {
                         snapshot.Add("Obstacles", "Blocked",
-                            new ScannerResult("blocked", point));
+                            new ScannerResult(ScannerTileKey("obstacle:blocked", point), "blocked", point));
                     }
                 }
             }
+        }
+
+        private static string ScannerTileKey(string prefix, Vector2Int point)
+        {
+            return prefix + ":" + point.x + ":" + point.y;
+        }
+
+        private static ScannerResult CloneResult(ScannerResult result)
+        {
+            ScannerResult clone = new ScannerResult(result.Key, result.Label, result.Position)
+            {
+                NotVisible = result.NotVisible,
+                StableReference = result.StableReference,
+                Kind = result.Kind
+            };
+            clone.Points.AddRange(result.Points);
+            return clone;
         }
 
         public bool ValidateScannerResult(ScannerResult result)
