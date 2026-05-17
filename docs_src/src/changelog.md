@@ -11,6 +11,8 @@
   - Scanner results are now tracked by stable identity, so stale results are pruned more reliably after the game state changes
   - Added `All` subcategories to all categories with more than one subcategory for adventure map, troop placement, and combat
   - Improved adventure map terrain scanning performance
+- For hex grids, the mod now uses a half-x hex coordinate system. Diagonal movement changes x by 0.5 instead of exposing the game's staggered raw grid coordinates
+- The scanner now recognizes beacons of power, results will be in a beacons category
 
 ## V0.1.3
 

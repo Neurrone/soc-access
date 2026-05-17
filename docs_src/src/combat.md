@@ -1,10 +1,27 @@
 # Combat
 
+The battlefield is always the same size. What changes are the spawn points and terrain features.
+
+## Hex Grid Coordinates
+
+The battlefield is a hex grid. Each tile has six neighbors: west, east, northwest, northeast, southwest and southeast. There is no single north or south step. To move straight north, move northeast and then northwest. To move straight south, move southeast and then southwest.
+
+Coordinates are spoken from the bottom-left origin, `0, 0`. The first number `x` is the horizontal position and the second number `y` is the vertical position. Because hex rows are staggered, diagonal moves change the horizontal position by half a step:
+
+- East adds `1` to x.
+- West subtracts `1` from x.
+- Northeast adds `0.5` to x and `1` to y.
+- Northwest subtracts `0.5` from x and adds `1` to y.
+- Southeast adds `0.5` to x and subtracts `1` from y.
+- Southwest subtracts `0.5` from x and subtracts `1` from y.
+
+For example, from `0, 0`, moving northeast lands at `0.5, 1`. Moving southeast from there lands at `1, 0`, so one west move returns to `0, 0`.
+
 ## Troop Deployment
 
 Before combat, the troop deployment screen allows placement of your troops in spawn points, representing their starting location in combat.
 
-The battlefield is a hex grid. Move with:
+Move through the hex grid with:
 
 - A: west
 - D: east

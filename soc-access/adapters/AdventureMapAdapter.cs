@@ -35,6 +35,8 @@ namespace SongsOfConquestAccess.Adapters
     internal sealed class AdventureMapAdapter
     {
         private const byte ExploredButNotVisibleFogValue = 128;
+        private const ushort ObjectiveBeaconBlueprintId = 50;
+        private const ushort FallenBeaconBlueprintId = 158;
         private static readonly PropertyInfo InstallerContainerProperty =
             AccessTools.Property(typeof(AdventureViewInstaller), "Container");
 
@@ -820,6 +822,7 @@ namespace SongsOfConquestAccess.Adapters
             Dictionary<Vector2Int, AdventureMapTile> tileCache = new Dictionary<Vector2Int, AdventureMapTile>();
             int localTeamId = GetLocalTeamId();
             AddPickupScannerResults(snapshot, tileCache);
+            AddBeaconScannerResults(snapshot, tileCache);
             AddWielderScannerResults(snapshot, tileCache);
             AddStructuralScannerResults(snapshot, localTeamId, tileCache, MapEntityCategory.Town, MapEntityCategory.Settlement, MapEntityCategory.BuildSite);
             AddTroopSourceScannerResults(snapshot, localTeamId, tileCache);
@@ -943,6 +946,7 @@ namespace SongsOfConquestAccess.Adapters
             pickups.GetOrAddSubcategory("Power");
             pickups.GetOrAddSubcategory("Riches");
 
+            snapshot.GetOrAddCategory("Beacons").GetOrAddSubcategory("All");
             snapshot.GetOrAddCategory("Wielders").GetOrAddSubcategory("All");
             AddRelationshipSubcategories(snapshot.GetOrAddCategory("Settlements and Build sites"));
             AddRelationshipSubcategories(snapshot.GetOrAddCategory("Troop sources"));
@@ -1020,6 +1024,24 @@ namespace SongsOfConquestAccess.Adapters
                 if (result != null)
                 {
                     AddPickupResult(snapshot, entity, result);
+                }
+            });
+        }
+
+        private void AddBeaconScannerResults(ScannerSnapshot snapshot, Dictionary<Vector2Int, AdventureMapTile> tileCache)
+        {
+            ForEachScannerEntity(tileCache, entity =>
+            {
+                if (!IsBeaconOfPowerEntity(entity))
+                {
+                    return;
+                }
+
+                AdventureMapTile tile = GetScannerTile(tileCache, entity.Position);
+                ScannerResult result = CreateMapEntityScannerResult(entity, tile);
+                if (result != null)
+                {
+                    snapshot.Add("Beacons", "All", result);
                 }
             });
         }
@@ -1411,6 +1433,13 @@ namespace SongsOfConquestAccess.Adapters
                 || entity.Category == MapEntityCategory.Experience
                 || entity.Category == MapEntityCategory.Spell
                 || entity.Category == MapEntityCategory.Effect;
+        }
+
+        private static bool IsBeaconOfPowerEntity(IMapEntity entity)
+        {
+            return entity != null
+                && (entity.BlueprintId == ObjectiveBeaconBlueprintId
+                    || entity.BlueprintId == FallenBeaconBlueprintId);
         }
 
         private bool IsUnvisited(IMapEntity entity)
