@@ -13,6 +13,8 @@
   - Improved adventure map terrain scanning performance
 - For hex grids, the mod now uses a half-x hex coordinate system. Diagonal movement changes x by 0.5 instead of exposing the game's staggered raw grid coordinates
 - The scanner now recognizes beacons of power, results will be in a beacons category
+- Add mod settings screen accessed by `ctrl+m`. It currently contains a setting that controls whether enemy influence (attack, deadly, movement range and zone of control information) is read on tiles in combat. If disabled, such threatened tiles are indicated by "threatened"
+- Introduce an `s` hotkey in combat to read enemy influence
 
 ## V0.1.3
 

@@ -34,6 +34,7 @@ namespace SongsOfConquestAccess
         {
             Instance = this;
             Logger.LogInfo("Accessibility plugin Awake");
+            ModSettings.Bind(Config);
             _speechService = new SpeechService(Logger);
             bool speechInitialized = _speechService.Initialize();
             Logger.LogInfo("Speech initialization result: " + speechInitialized);
@@ -92,6 +93,7 @@ namespace SongsOfConquestAccess
             SpeechPipeline.Shutdown();
             _speechService?.Dispose();
             _speechService = null;
+            ModSettings.Reset();
             if (Instance == this)
             {
                 Instance = null;

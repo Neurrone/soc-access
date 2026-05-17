@@ -1923,9 +1923,18 @@ namespace SongsOfConquestAccess.Adapters
 
         internal void AddEnemyInfluenceForSpeech(Vector2Int point, IBattleTroopState occupyingTroop, List<string> parts)
         {
+            string influence = DescribeEnemyInfluenceForSpeech(point, occupyingTroop);
+            if (!string.IsNullOrWhiteSpace(influence))
+            {
+                parts.Add(influence);
+            }
+        }
+
+        internal string DescribeEnemyInfluenceForSpeech(Vector2Int point, IBattleTroopState occupyingTroop)
+        {
             if (_facade == null || _facade.Troops == null || _facade.Teams == null || _facade.Teams.Current == null)
             {
-                return;
+                return string.Empty;
             }
 
             List<string> influences = new List<string>();
@@ -1949,8 +1958,38 @@ namespace SongsOfConquestAccess.Adapters
 
             if (influences.Count > 0)
             {
-                parts.Add("in " + string.Join(", ", influences.ToArray()));
+                return "in " + string.Join(", ", influences.ToArray());
             }
+
+            return string.Empty;
+        }
+
+        internal bool IsThreatenedByEnemy(Vector2Int point, IBattleTroopState occupyingTroop)
+        {
+            if (_facade == null || _facade.Troops == null || _facade.Teams == null || _facade.Teams.Current == null)
+            {
+                return false;
+            }
+
+            foreach (IBattleTroopState troop in _facade.Troops.All)
+            {
+                if (troop == null
+                    || troop.TeamId == _facade.Teams.Current.Id
+                    || !troop.GetIsAlive()
+                    || (occupyingTroop != null && troop.Id == occupyingTroop.Id)
+                    || troop.Position == point)
+                {
+                    continue;
+                }
+
+                string rangeText = CombatInspectContext.FormatRangeIndicators(BuildInfluenceIndicators(troop, point));
+                if (!string.IsNullOrWhiteSpace(rangeText))
+                {
+                    return true;
+                }
+            }
+
+            return false;
         }
 
         private PathNode[] GetPathToEntity(IMapEntity entity)

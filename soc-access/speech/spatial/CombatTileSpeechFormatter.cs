@@ -70,7 +70,14 @@ namespace SongsOfConquestAccess.Speech.Spatial
             }
             else if (_includeEnemyInfluence)
             {
-                _adapter.AddEnemyInfluenceForSpeech(tile.Point, tile.Troop, parts);
+                if (ModSettings.ReadEnemyInfluence)
+                {
+                    _adapter.AddEnemyInfluenceForSpeech(tile.Point, tile.Troop, parts);
+                }
+                else if (_adapter.IsThreatenedByEnemy(tile.Point, tile.Troop))
+                {
+                    parts.Add("Threatened");
+                }
             }
 
             return string.Join(", ", parts.ToArray());

@@ -38,17 +38,24 @@ The deployment grid also supports the [Scanner](scanner.md) for finding enemy tr
 
 The combat hex grid uses the same keys for navigation and also supports the [Scanner](scanner.md).
 
-To assist with movement, focusing a tile will indicate if it is within an enemy troop stack's movement, attack or deadly range, or their zone of control.
-
 Every troop stack has a tooltip which can be reviewed with the UI buffer.
 
 If focus is on a tile with an enemy or destructable entity, the tooltip shows an attack preview if it is possible for your acting troop to attack it.
 
 If focused on a tile in movement range, the tooltip shows the movement cost.
 
+### Threatened Tiles
+
+Units have a zone of control, attack and movement range. Ranged units also have a deadly range.
+
+The mod uses the terminology threatened tiles to refer to tiles that are within these ranges for enemy troop stacks.
+
+By default, focusing a tile will indicate if it is threatened by an enemy troop stack. However, this can be very spammy. To help with this, turn off the option to read detailed threat info on each tile in the mod settings screen, which just indicates if a tile is threatened by saying "threatened". Press `s` to get the detailed threat information for the focused tile.
+
 ### Combat Actions
 
 - Backslash: performs the secondary action on the focused tile, corresponding to a right-click. Use this to move to a tile or perform an attack
+- S: read detailed threat information for the focused tile. Nothing is spoken if the tile is not threatened.
 - T: move focus to the timeline
 - Ctrl+R: read your essence
 - Alt+R: read enemy essence

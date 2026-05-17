@@ -280,6 +280,12 @@ namespace SongsOfConquestAccess.Screens
                 return true;
             }
 
+            if (action.Key == AccessibilityActions.OpenModSettings.Key)
+            {
+                Push(new ModSettingsScreen(() => Pop<ModSettingsScreen>("mod settings closed")), "mod settings opened");
+                return true;
+            }
+
             if (action.Key == AccessibilityActions.SummarizeResources.Key)
             {
                 CombatScreen combatScreen = Get<CombatScreen>();
@@ -358,6 +364,11 @@ namespace SongsOfConquestAccess.Screens
                 return tooltip != null
                     && tooltip.Actions != null
                     && tooltip.Actions.Count > 0;
+            }
+
+            if (action.Key == AccessibilityActions.OpenModSettings.Key)
+            {
+                return !(CurrentScreen is ModSettingsScreen);
             }
 
             if (action.Key == AccessibilityActions.SummarizeResources.Key)

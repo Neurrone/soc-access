@@ -81,6 +81,7 @@ namespace SongsOfConquestAccess.UI
                 || actionKey == AccessibilityActions.CombatNextRelevantTile.Key
                 || actionKey == AccessibilityActions.CombatPreviousRelevantTile.Key
                 || actionKey == AccessibilityActions.CombatFocusTimeline.Key
+                || actionKey == AccessibilityActions.ReadThreat.Key
                 || (_adapter != null && _adapter.GetTargetingMode() != CombatTargetingMode.None && actionKey == AccessibilityActions.Activate.Key)
                 || actionKey == AccessibilityActions.MapSecondaryAction.Key
                 || IsScannerAction(actionKey)
@@ -158,6 +159,11 @@ namespace SongsOfConquestAccess.UI
             {
                 CombatScreen screen = SocAccessPlugin.Instance?.ScreenManager?.CurrentScreen as CombatScreen;
                 return screen != null && screen.FocusTimeline();
+            }
+
+            if (action.Key == AccessibilityActions.ReadThreat.Key)
+            {
+                return ReadThreat();
             }
 
             if (action.Key == AccessibilityActions.MapSecondaryAction.Key)
@@ -249,6 +255,20 @@ namespace SongsOfConquestAccess.UI
             }
 
             return Move(xDelta, yDelta);
+        }
+
+        private bool ReadThreat()
+        {
+            CombatTile tile = GetFocusedTile();
+            string text = _adapter != null && tile != null
+                ? _adapter.DescribeEnemyInfluenceForSpeech(tile.Point, tile.Troop)
+                : string.Empty;
+            if (!string.IsNullOrWhiteSpace(text))
+            {
+                SpeechPipeline.Output(new SpeechRequest(text, interrupt: false));
+            }
+
+            return true;
         }
 
         private bool EnterInspect()

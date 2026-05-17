@@ -19,6 +19,9 @@ namespace SongsOfConquestAccess.Input
         public static readonly InputAction SummarizeEnemyResources = OneShot("summarize_enemy_resources", "Summarize Enemy Resources", InputClaimScope.Screen)
             .AddBinding(new KeyboardBinding(Key.R, alt: true));
 
+        public static readonly InputAction OpenModSettings = OneShot("open_mod_settings", "Open Mod Settings", InputClaimScope.Screen)
+            .AddBinding(new KeyboardBinding(Key.M, ctrl: true));
+
         public static readonly InputAction PreviousBuffer = OneShot("previous_buffer", "Previous Buffer", InputClaimScope.Screen)
             .AddBinding(new KeyboardBinding(Key.LeftArrow, ctrl: true));
 
@@ -42,6 +45,7 @@ namespace SongsOfConquestAccess.Input
             TooltipActionsMenu,
             SummarizeResources,
             SummarizeEnemyResources,
+            OpenModSettings,
             PreviousBuffer,
             NextBuffer,
             PreviousBufferLine,
@@ -211,6 +215,9 @@ namespace SongsOfConquestAccess.Input
         public static readonly InputAction CombatFocusTimeline = OneShot("combat_focus_timeline", "Focus Timeline", InputClaimScope.FocusedWidget)
             .AddBinding(new KeyboardBinding(Key.T));
 
+        public static readonly InputAction ReadThreat = OneShot("read_threat", "Read Threat", InputClaimScope.FocusedWidget)
+            .AddBinding(new KeyboardBinding(Key.S));
+
         public static readonly InputAction[] NON_GLOBAL_ACTIONS =
         {
             NextWidget,
@@ -257,6 +264,7 @@ namespace SongsOfConquestAccess.Input
             CombatNextRelevantTile,
             CombatPreviousRelevantTile,
             CombatFocusTimeline,
+            ReadThreat,
             StartDrag,
             Activate,
             Cancel
