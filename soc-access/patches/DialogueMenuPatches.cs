@@ -26,7 +26,6 @@ namespace SongsOfConquestAccess
         [HarmonyPostfix]
         private static void DialogueMenuNoneEnterPostfix(DialogueMenu __instance)
         {
-            StoryCameraFocusPatches.ResetDedupe();
             if (__instance == null || !ActiveMenus.Remove(__instance))
             {
                 return;

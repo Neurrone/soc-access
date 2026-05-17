@@ -1,5 +1,9 @@
 # Changelog
 
+## V0.1.4
+
+- Don't announce a story camera focus event if it is identical to the last announced camera movement
+
 ## V0.1.3
 
 - Remove brackets around coordinate announcements, so `x, y` instead of `(x, y)`. This shortens speech when the screen reader is configured to announce more punctuation

@@ -23,10 +23,7 @@ namespace SongsOfConquestAccess
         private static readonly ConditionalWeakTable<AdventureDialogueCameraManager, ConversationTargets> DialogueTargets =
             new ConditionalWeakTable<AdventureDialogueCameraManager, ConversationTargets>();
 
-        private static readonly Dictionary<object, StoryCameraFocusKey> LastFocusBySource =
-            new Dictionary<object, StoryCameraFocusKey>(ReferenceEqualityComparer.Instance);
-
-        private static readonly object MessageFocusSource = new object();
+        private static StoryCameraFocusKey LastEmittedFocus;
 
         private static readonly FieldInfo DialogueFacadeField =
             AccessTools.Field(typeof(AdventureDialogueCameraManager), "_facade");
@@ -65,7 +62,6 @@ namespace SongsOfConquestAccess
             }
 
             PublishCameraFocusForIdentifier(
-                MessageFocusSource,
                 messageData.Camera,
                 adventureFacade,
                 converter,
@@ -105,7 +101,7 @@ namespace SongsOfConquestAccess
 
             if (entry.Camera.TargetType == CameraFocusPointTargetType.Point)
             {
-                PublishCameraFocusForIdentifier(__instance, entry.Camera, facade, converter, localizationHandler, null);
+                PublishCameraFocusForIdentifier(entry.Camera, facade, converter, localizationHandler, null);
                 return;
             }
 
@@ -113,19 +109,18 @@ namespace SongsOfConquestAccess
             {
                 ICommanderState commander = ResolveInteractingCommander(facade, __instance);
                 StoryCameraFocusTarget target = StoryCameraFocusResolver.ResolveWielderTarget(facade, commander);
-                PublishIfTarget(__instance, StoryCameraFocusKind.Wielder, target, entry.Camera.reference);
+                PublishIfTarget(StoryCameraFocusKind.Wielder, target, entry.Camera.reference);
                 return;
             }
 
             ConversationTargets targets;
             if (DialogueTargets.TryGetValue(__instance, out targets) && targets != null && targets.Targets.Count > 0)
             {
-                PublishIfTargets(__instance, StoryCameraFocusKind.ConversationArea, targets.Targets, entry.Camera.reference);
+                PublishIfTargets(StoryCameraFocusKind.ConversationArea, targets.Targets, entry.Camera.reference);
             }
         }
 
         private static void PublishCameraFocusForIdentifier(
-            object source,
             CameraFocusPointIdentifier camera,
             IClientAdventureFacade facade,
             object converter,
@@ -139,28 +134,28 @@ namespace SongsOfConquestAccess
                     converter,
                     localizationHandler,
                     camera);
-                PublishIfTarget(source, StoryCameraFocusKind.Point, target, camera.reference);
+                PublishIfTarget(StoryCameraFocusKind.Point, target, camera.reference);
                 return;
             }
 
             if (camera.TargetType == CameraFocusPointTargetType.Wielder)
             {
                 StoryCameraFocusTarget target = StoryCameraFocusResolver.ResolveWielderTarget(facade, interactingCommanderState);
-                PublishIfTarget(source, StoryCameraFocusKind.Wielder, target, camera.reference);
+                PublishIfTarget(StoryCameraFocusKind.Wielder, target, camera.reference);
             }
         }
 
-        private static void PublishIfTarget(object source, StoryCameraFocusKind kind, StoryCameraFocusTarget target, string reference)
+        private static void PublishIfTarget(StoryCameraFocusKind kind, StoryCameraFocusTarget target, string reference)
         {
             if (target == null)
             {
                 return;
             }
 
-            PublishIfTargets(source, kind, new[] { target }, reference);
+            PublishIfTargets(kind, new[] { target }, reference);
         }
 
-        private static void PublishIfTargets(object source, StoryCameraFocusKind kind, IEnumerable<StoryCameraFocusTarget> targets, string reference)
+        private static void PublishIfTargets(StoryCameraFocusKind kind, IEnumerable<StoryCameraFocusTarget> targets, string reference)
         {
             List<StoryCameraFocusTarget> targetList = targets != null
                 ? targets.Where(target => target != null).ToList()
@@ -171,24 +166,22 @@ namespace SongsOfConquestAccess
             }
 
             StoryCameraFocusKey key = StoryCameraFocusKey.Create(kind, reference, targetList);
-            object resolvedSource = source ?? MessageFocusSource;
-            StoryCameraFocusKey previous;
             // Native dialogue pages can re-apply the same conversation-area
             // camera focus on each page, and trigger-driven story pages can
             // close/reopen within one trigger series. Announce only real focus
             // changes until the native sequence completion hook resets this.
-            if (LastFocusBySource.TryGetValue(resolvedSource, out previous) && key.Equals(previous))
+            if (key.Equals(LastEmittedFocus))
             {
                 return;
             }
 
-            LastFocusBySource[resolvedSource] = key;
+            LastEmittedFocus = key;
             AccessibilityEventBus.Publish(new StoryCameraFocusStartedEvent(kind, targetList, reference));
         }
 
         public static void ResetDedupe()
         {
-            LastFocusBySource.Clear();
+            LastEmittedFocus = null;
         }
 
         private static ConversationTargets BuildConversationTargets(
@@ -307,16 +300,13 @@ namespace SongsOfConquestAccess
 
         private sealed class StoryCameraFocusKey
         {
-            private StoryCameraFocusKey(StoryCameraFocusKind kind, string reference, List<string> targets)
+            private StoryCameraFocusKey(StoryCameraFocusKind kind, List<string> targets)
             {
                 Kind = kind;
-                Reference = reference ?? string.Empty;
                 Targets = targets ?? new List<string>();
             }
 
             private StoryCameraFocusKind Kind { get; set; }
-
-            private string Reference { get; set; }
 
             private List<string> Targets { get; set; }
 
@@ -335,13 +325,14 @@ namespace SongsOfConquestAccess
                     }
                 }
 
-                return new StoryCameraFocusKey(kind, reference, targetKeys);
+                targetKeys.Sort(StringComparer.Ordinal);
+                return new StoryCameraFocusKey(kind, targetKeys);
             }
 
             public override bool Equals(object obj)
             {
                 StoryCameraFocusKey other = obj as StoryCameraFocusKey;
-                if (other == null || Kind != other.Kind || Reference != other.Reference || Targets.Count != other.Targets.Count)
+                if (other == null || Kind != other.Kind || Targets.Count != other.Targets.Count)
                 {
                     return false;
                 }
@@ -362,7 +353,6 @@ namespace SongsOfConquestAccess
                 unchecked
                 {
                     int hash = (int)Kind;
-                    hash = (hash * 397) ^ Reference.GetHashCode();
                     for (int i = 0; i < Targets.Count; i++)
                     {
                         hash = (hash * 397) ^ Targets[i].GetHashCode();
@@ -370,21 +360,6 @@ namespace SongsOfConquestAccess
 
                     return hash;
                 }
-            }
-        }
-
-        private sealed class ReferenceEqualityComparer : IEqualityComparer<object>
-        {
-            public static readonly ReferenceEqualityComparer Instance = new ReferenceEqualityComparer();
-
-            public new bool Equals(object x, object y)
-            {
-                return ReferenceEquals(x, y);
-            }
-
-            public int GetHashCode(object obj)
-            {
-                return RuntimeHelpers.GetHashCode(obj);
             }
         }
     }
