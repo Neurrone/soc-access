@@ -8,6 +8,29 @@ namespace SongsOfConquestAccess.Adapters
 {
     internal sealed class AdventureMapTile
     {
+        public enum PathIndicatorKind
+        {
+            OnRoute,
+            Destination
+        }
+
+        public sealed class PathIndicatorInfo
+        {
+            public PathIndicatorKind Kind { get; set; }
+
+            public int TravelTurns { get; set; }
+
+            public int? FurthestReachableTurns { get; set; }
+
+            public bool IsInteractable { get; set; }
+
+            public bool CanInteractThisTurn { get; set; }
+
+            public int? CostMark { get; set; }
+
+            public bool HasRoutePreview { get; set; }
+        }
+
         public sealed class CommanderInfo
         {
             public ICommanderState Raw { get; set; }
@@ -51,6 +74,8 @@ namespace SongsOfConquestAccess.Adapters
         public bool IsBlocked { get; set; }
 
         public bool IsInteractionPoint { get; set; }
+
+        public PathIndicatorInfo PathIndicator { get; set; }
 
         public MapGroundType? Terrain { get; set; }
 

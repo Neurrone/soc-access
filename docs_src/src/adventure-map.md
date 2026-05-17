@@ -34,6 +34,21 @@ Some tiles may read as "fog". This is a terrain / decorative feature, not an ind
 - S: select the next settlement
 - Space: move focus to the selected wielder's tile
 
+### Route Previews
+
+After setting a destination, the game draws a route preview. When focus is on a tile with a route preview marker, the mod speaks the following information:
+
+- `On route`: part of the planned route.
+- `On route, furthest reachable this turn`: furthest point the wielder can reach this turn.
+- `On route, in n turns`: the tile is on the route, but can only be reached on a later turn.
+- `On route, furthest reachable in n turns`: furthest point the wielder can reach by that later turn.
+- `Destination`: the tile is the selected destination.
+- `Destination, in n turns`: the destination cannot be reached this turn.
+- `Destination, interactable`: the destination has an interactable object.
+- `Destination, interactable next turn`: the destination is reachable this turn, but there is not enough movement left to interact with it this turn.
+- `Destination, no route preview`: the destination is set, but the game is not showing route preview markers for it.
+- `cost n`: the route has crossed the indicated movement cost marker.
+
 ## HUD
 
 The HUD provides various controls for the currently selected wielder such as the wielder portrait, resources and objectives. Visibility is toggled with `h`. These controls are visible by default, and I recommend leaving it that way.

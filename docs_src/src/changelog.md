@@ -3,6 +3,7 @@
 ## V0.1.4
 
 - Don't announce a story camera focus event if it is identical to the last announced camera movement
+- When setting a destination, the route preview indicators on tiles from the wielder to the destination are now indicated
 
 ## V0.1.3
 

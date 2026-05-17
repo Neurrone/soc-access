@@ -197,6 +197,13 @@ namespace SongsOfConquestAccess.Speech.Spatial
         private static List<string> GetMovementDetails(AdventureMapTile tile)
         {
             List<string> details = new List<string>();
+            string pathIndicator = DescribePathIndicator(tile != null ? tile.PathIndicator : null);
+            if (!string.IsNullOrWhiteSpace(pathIndicator))
+            {
+                details.Add(pathIndicator);
+                return details;
+            }
+
             if (tile.IsReachable)
             {
                 details.Add("reachable");
@@ -207,6 +214,57 @@ namespace SongsOfConquestAccess.Speech.Spatial
             }
 
             return details;
+        }
+
+        private static string DescribePathIndicator(AdventureMapTile.PathIndicatorInfo indicator)
+        {
+            if (indicator == null)
+            {
+                return string.Empty;
+            }
+
+            List<string> details = new List<string>();
+            if (indicator.Kind == AdventureMapTile.PathIndicatorKind.Destination)
+            {
+                details.Add("Destination");
+                if (!indicator.HasRoutePreview)
+                {
+                    details.Add("no route preview");
+                    return string.Join(", ", details.ToArray());
+                }
+
+                if (indicator.TravelTurns > 1)
+                {
+                    details.Add("in " + indicator.TravelTurns + " turns");
+                }
+
+                if (indicator.IsInteractable)
+                {
+                    details.Add(indicator.TravelTurns <= 1 && !indicator.CanInteractThisTurn
+                        ? "interactable next turn"
+                        : "interactable");
+                }
+            }
+            else
+            {
+                details.Add("On route");
+                if (indicator.FurthestReachableTurns.HasValue)
+                {
+                    int turns = indicator.FurthestReachableTurns.Value;
+                    details.Add(turns <= 1 ? "furthest reachable this turn" : "furthest reachable in " + turns + " turns");
+                }
+                else if (indicator.TravelTurns > 1)
+                {
+                    details.Add("in " + indicator.TravelTurns + " turns");
+                }
+            }
+
+            if (indicator.CostMark.HasValue)
+            {
+                details.Add("cost " + indicator.CostMark.Value);
+            }
+
+            return string.Join(", ", details.ToArray());
         }
 
         private static void AddCommanderMovementDetails(AdventureMapTile.CommanderInfo commander, List<string> details)
