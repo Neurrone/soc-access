@@ -416,7 +416,8 @@ namespace SongsOfConquestAccess.Adapters
             CombatTile tile = new CombatTile(point);
             tile.Elevation = SafeGetElevation(point);
             tile.IsReachable = IsReachable(point);
-            tile.IsWalkable = IsWalkable(point);
+            tile.IsImpassable = IsImpassable(point);
+            tile.IsBlocked = IsBlocked(point);
             tile.Troop = GetTroopAt(point);
             tile.Entity = GetAttackableEntityAt(point);
             tile.DecorativeFeature = GetDecorativeFeatureAt(point, tile.Entity);
@@ -540,13 +541,19 @@ namespace SongsOfConquestAccess.Adapters
                         continue;
                     }
 
-                    if (!tile.IsWalkable)
+                    if (tile.IsImpassable)
                     {
                         snapshot.Add("Terrain", "Impassable terrain",
                             new ScannerResult("impassable", point)
                             {
                                 Kind = ScannerResultKind.TerrainPoint
                             });
+                    }
+
+                    if (tile.IsBlocked)
+                    {
+                        snapshot.Add("Obstacles", "Blocked",
+                            new ScannerResult("blocked", point));
                     }
                 }
             }
@@ -1370,7 +1377,7 @@ namespace SongsOfConquestAccess.Adapters
             _humanBattleController.TroopToInspect = tile.Troop;
             _humanBattleController.EntityToInspect = tile.Entity;
             _humanBattleController.TileToInspect = new int2(point.x, point.y);
-            _humanBattleController.PathToCurrentTile = tile.IsWalkable ? path : null;
+            _humanBattleController.PathToCurrentTile = (!tile.IsImpassable && !tile.IsBlocked) ? path : null;
             _humanBattleController.EnemiesWithinMeleeReach = _facade.Level.AllEnemiesWithinMeleeReach(_facade.Troops.Current).ToList();
             _humanBattleController.MapEntitiesWithinMeleeReach = _facade.Level.AllMapEntitiesWithinMeleeReach(_facade.Troops.Current).ToList();
 
@@ -1920,7 +1927,17 @@ namespace SongsOfConquestAccess.Adapters
             return current != null && _facade.Commands != null && _facade.Commands.CanMove(current.Id, point);
         }
 
-        private bool IsWalkable(Vector2Int point)
+        private bool IsImpassable(Vector2Int point)
+        {
+            if (_facade == null || _facade.Level == null)
+            {
+                return false;
+            }
+
+            return !_facade.Level.IsWalkableStatic(point);
+        }
+
+        private bool IsBlocked(Vector2Int point)
         {
             IBattleTroopState current = GetCurrentTroop();
             if (current == null || _facade == null || _facade.Level == null)
@@ -1928,7 +1945,7 @@ namespace SongsOfConquestAccess.Adapters
                 return false;
             }
 
-            return _facade.Level.IsWalkable(current.TeamId, point);
+            return !IsImpassable(point) && !_facade.Level.IsWalkable(current.TeamId, point);
         }
 
         private byte SafeGetElevation(Vector2Int point)
@@ -2862,7 +2879,9 @@ namespace SongsOfConquestAccess.Adapters
 
         public bool IsReachable { get; set; }
 
-        public bool IsWalkable { get; set; }
+        public bool IsImpassable { get; set; }
+
+        public bool IsBlocked { get; set; }
 
         public IBattleTroopState Troop { get; set; }
 

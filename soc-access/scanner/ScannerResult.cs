@@ -8,6 +8,7 @@ namespace SongsOfConquestAccess.Scanner
         Point,
         TerrainPoint,
         TerrainGroup,
+        AreaGroup,
         CommanderZoneOfControl
     }
 

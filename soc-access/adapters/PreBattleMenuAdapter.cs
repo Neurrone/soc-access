@@ -237,7 +237,7 @@ namespace SongsOfConquestAccess.Adapters
 
             foreach (TroopPlacementTile tile in placement.Tiles)
             {
-                if (tile.IsBlocked)
+                if (tile.IsImpassable)
                 {
                     snapshot.Add("Terrain", "Impassable terrain",
                         new ScannerResult("impassable", tile.Point)
@@ -549,7 +549,7 @@ namespace SongsOfConquestAccess.Adapters
                     byte[] decorations = map.Contents.DecorationsArray;
                     byte[] water = map.Contents.WaterArray;
                     tile.Elevation = elevations != null && index < elevations.Length ? elevations[index] : (byte)0;
-                    tile.IsBlocked = (water != null && index < water.Length && water[index] != 0)
+                    tile.IsImpassable = (water != null && index < water.Length && water[index] != 0)
                         || (decorations != null && index < decorations.Length && IsBlocker(decorations[index]));
                 }
             }
@@ -1171,7 +1171,7 @@ namespace SongsOfConquestAccess.Adapters
 
         public byte Elevation { get; set; }
 
-        public bool IsBlocked { get; set; }
+        public bool IsImpassable { get; set; }
 
         public BattleSide? SpawnSide { get; set; }
 

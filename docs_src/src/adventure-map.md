@@ -12,7 +12,7 @@ The mod keeps the focused tile in view and reads the tile as you move.
 
 Tiles within the movement range of the currently selected wielder are indicated as reachable.
 
-Tiles that are impassable due to terrain are announced as being blocked.
+Tiles that cannot be entered because of terrain are announced as impassable. Tiles that are otherwise blocked by game state, such as an occupying unit or blocking map entity, are announced as blocked.
 
 A tile can be in one of three visibility states:
 

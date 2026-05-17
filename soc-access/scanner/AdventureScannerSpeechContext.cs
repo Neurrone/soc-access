@@ -32,7 +32,10 @@ namespace SongsOfConquestAccess.Scanner
             List<string> parts = new List<string>();
             AdventureMapTileSpeechFormatter formatter = new AdventureMapTileSpeechFormatter();
 
-            if (_result != null && (_result.Kind == ScannerResultKind.TerrainGroup || _result.Kind == ScannerResultKind.CommanderZoneOfControl))
+            if (_result != null
+                && (_result.Kind == ScannerResultKind.TerrainGroup
+                    || _result.Kind == ScannerResultKind.AreaGroup
+                    || _result.Kind == ScannerResultKind.CommanderZoneOfControl))
             {
                 ScannerSpeechUtility.AddIfPresent(parts, _result.Label);
             }

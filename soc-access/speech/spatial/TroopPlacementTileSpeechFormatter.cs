@@ -64,9 +64,9 @@ namespace SongsOfConquestAccess.Speech.Spatial
             }
 
             List<string> parts = new List<string>();
-            if (tile.IsBlocked)
+            if (tile.IsImpassable)
             {
-                parts.Add("Blocked");
+                parts.Add("impassable");
             }
 
             if (tile.Elevation > 0)

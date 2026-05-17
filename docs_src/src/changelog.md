@@ -4,6 +4,7 @@
 
 - Don't announce a story camera focus event if it is identical to the last announced camera movement
 - When setting a destination, the route preview indicators on tiles from the wielder to the destination are now indicated
+- When reading tiles, "impassable" now describes impassable terrain. "Blocked" now indicates tiles that can't be accessed due to dynamic game state like an occupying or blocking entity, and no longer describes impassable terrain.
 
 ## V0.1.3
 

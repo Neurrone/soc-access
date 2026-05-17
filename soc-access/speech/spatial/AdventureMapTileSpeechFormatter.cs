@@ -208,6 +208,10 @@ namespace SongsOfConquestAccess.Speech.Spatial
             {
                 details.Add("reachable");
             }
+            else if (tile.IsImpassable)
+            {
+                details.Add("impassable");
+            }
             else if (tile.IsBlocked)
             {
                 details.Add("blocked");

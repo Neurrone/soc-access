@@ -381,7 +381,8 @@ namespace SongsOfConquestAccess.Adapters
             tile.Terrain = _facade.Level.GetGroundType(clamped);
             PopulateEnvironment(tile, clamped);
             ICommanderState selectedCommander = _selectionHandler.SelectedCommander;
-            tile.IsBlocked = float.IsPositiveInfinity(_facade.Level.GetTravelCost(localTeamId, clamped, addExplorationCost: false));
+            tile.IsImpassable = float.IsPositiveInfinity(_facade.Level.GetStaticTravelCost(localTeamId, clamped));
+            tile.IsBlocked = !tile.IsImpassable && !_facade.Level.IsValidMoveDestination(localTeamId, clamped);
             tile.IsReachable = selectedCommander != null
                 && selectedCommander.IsAlive
                 && _facade.Level.IsPointWithinReach(localTeamId, selectedCommander.Position, clamped, selectedCommander.MovesLeft);
@@ -1506,6 +1507,7 @@ namespace SongsOfConquestAccess.Adapters
             AddTerrainGroups(snapshot, terrain, "Bridges", "bridge", origin, cell => cell.Bridge);
             AddTerrainGroups(snapshot, terrain, "Water", "water", origin, cell => cell.Water);
             AddTerrainGroups(snapshot, terrain, "Impassable", "impassable", origin, cell => cell.Impassable);
+            AddScannerGroups(snapshot, "Obstacles", "All", terrain, "blocked", origin, cell => cell.Blocked);
         }
 
         private TerrainScanCell[,] BuildTerrainScan(Dictionary<Vector2Int, AdventureMapTile> tileCache)
@@ -1524,7 +1526,8 @@ namespace SongsOfConquestAccess.Adapters
                         Road = tile != null && tile.IsExplored && HasEnvironment(tile, "road"),
                         Bridge = tile != null && tile.IsExplored && HasEnvironment(tile, "bridge"),
                         Water = tile != null && tile.IsExplored && HasEnvironment(tile, "water"),
-                        Impassable = tile != null && tile.IsExplored && tile.IsBlocked
+                        Impassable = tile != null && tile.IsExplored && tile.IsImpassable,
+                        Blocked = tile != null && tile.IsExplored && tile.IsBlocked
                     };
                 }
             }
@@ -1533,6 +1536,18 @@ namespace SongsOfConquestAccess.Adapters
         }
 
         private void AddTerrainGroups(ScannerSnapshot snapshot, TerrainScanCell[,] terrain, string subcategory, string label, Vector2Int origin, Func<TerrainScanCell, bool> predicate)
+        {
+            AddScannerGroups(snapshot, "Terrain", subcategory, terrain, label, origin, predicate);
+        }
+
+        private void AddScannerGroups(
+            ScannerSnapshot snapshot,
+            string category,
+            string subcategory,
+            TerrainScanCell[,] terrain,
+            string label,
+            Vector2Int origin,
+            Func<TerrainScanCell, bool> predicate)
         {
             int width = _facade.Level.Width;
             int height = _facade.Level.Height;
@@ -1557,10 +1572,10 @@ namespace SongsOfConquestAccess.Adapters
                     Vector2Int representative = ClosestPoint(group, origin);
                     ScannerResult result = new ScannerResult(group.Count + " " + label, representative)
                     {
-                        Kind = ScannerResultKind.TerrainGroup
+                        Kind = category == "Terrain" ? ScannerResultKind.TerrainGroup : ScannerResultKind.AreaGroup
                     };
                     result.Points.AddRange(group);
-                    snapshot.Add("Terrain", subcategory, result);
+                    snapshot.Add(category, subcategory, result);
                 }
             }
         }
@@ -1598,6 +1613,8 @@ namespace SongsOfConquestAccess.Adapters
             public bool Water;
 
             public bool Impassable;
+
+            public bool Blocked;
         }
 
         private void EnqueueTerrainNeighbors(Queue<Vector2Int> queue, bool[,] visited, Vector2Int point)
@@ -2836,6 +2853,8 @@ namespace SongsOfConquestAccess.Adapters
                 + tile.IsInteractionPoint
                 + "; reachable="
                 + tile.IsReachable
+                + "; impassable="
+                + tile.IsImpassable
                 + "; blocked="
                 + tile.IsBlocked
                 + "; environment="
@@ -3086,7 +3105,7 @@ namespace SongsOfConquestAccess.Adapters
                     return "Mountains";
                 case 4:
                     // Generic blocker brushes are editor/pathing markers rather than player-facing objects.
-                    // The tile still announces "blocked" from the game's travel-cost result.
+                    // The tile still announces "impassable" from the game's static travel-cost result.
                     return string.Empty;
                 case 5:
                     return "Light";
@@ -3100,7 +3119,7 @@ namespace SongsOfConquestAccess.Adapters
                 case 10:
                 case 11:
                     // Generic blocker brushes are editor/pathing markers rather than player-facing objects.
-                    // The tile still announces "blocked" from the game's travel-cost result.
+                    // The tile still announces "impassable" from the game's static travel-cost result.
                     return string.Empty;
             }
 
