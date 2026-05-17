@@ -219,7 +219,6 @@ namespace SongsOfConquestAccess.Adapters
             spawnPoints.GetOrAddSubcategory("Enemy");
 
             ScannerCategory terrain = snapshot.GetOrAddCategory("Terrain");
-            terrain.GetOrAddSubcategory("All");
             terrain.GetOrAddSubcategory("Elevated ground 1");
             terrain.GetOrAddSubcategory("Elevated ground 2");
             terrain.GetOrAddSubcategory("Elevated ground 3");
@@ -253,7 +252,6 @@ namespace SongsOfConquestAccess.Adapters
                         {
                             Kind = ScannerResultKind.TerrainPoint
                         };
-                        snapshot.Add("Terrain", "All", CloneResult(result));
                         snapshot.Add("Terrain", "Elevated ground " + elevation, result);
                     }
                 }
@@ -270,7 +268,6 @@ namespace SongsOfConquestAccess.Adapters
                     {
                         Kind = ScannerResultKind.TerrainPoint
                     };
-                    snapshot.Add("Terrain", "All", CloneResult(result));
                     snapshot.Add("Terrain", "Impassable terrain", result);
                 }
             }
