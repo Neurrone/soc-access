@@ -49,11 +49,16 @@ After setting a destination, the game draws a route preview. When focus is on a 
 
 The HUD provides various controls for the currently selected wielder such as the wielder portrait, resources and objectives. Visibility is toggled with `h`. These controls are visible by default, and I recommend leaving it that way.
 
-Press tab from the map grid to cycle through HUD controls.
+Press tab from the map grid to cycle through HUD controls. When on the adventure map, press the following keys to move focus to the following HUD controls:
+
+- `N`: notifications
+- `O`: objectives
+- `R`: resources
+- `T`: troops
 
 When focus is in the HUD controls, pressing escape moves focus back to the grid.
 
-The game provides the following hotkeys:
+Additionally, the game provides the following hotkeys that work anywhere on the adventure map screen:
 
 - C: open character sheet
 - V: open spellbook
@@ -75,4 +80,4 @@ When focus is on a draggable troop stack, press Space to start dragging it, move
 
 ## Reading Resources
 
-Press Ctrl+R to hear a summary of your current resources, this works in all non-combat situations. You can also Tab to the resources widget and review individual resource entries and tooltips.
+Press Ctrl+R to hear a summary of your current resources, this works in all non-combat situations. You can also Tab to the resources widget and review individual resource entries and tooltips. From the adventure map, `R` moves focus to the resources widget.

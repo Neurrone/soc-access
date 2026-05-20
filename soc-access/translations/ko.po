@@ -952,6 +952,26 @@ msgctxt "Actions.FirstRow"
 msgid "First Row"
 msgstr "ì²˜ìŒ í–‰"
 
+#. Actions.FocusHudNotifications
+msgctxt "Actions.FocusHudNotifications"
+msgid "Focus HUD Notifications"
+msgstr "HUD 알림으로 포커스 이동"
+
+#. Actions.FocusHudObjectives
+msgctxt "Actions.FocusHudObjectives"
+msgid "Focus HUD Objectives"
+msgstr "HUD 목표로 포커스 이동"
+
+#. Actions.FocusHudResources
+msgctxt "Actions.FocusHudResources"
+msgid "Focus HUD Resources"
+msgstr "HUD 자원으로 포커스 이동"
+
+#. Actions.FocusHudTroops
+msgctxt "Actions.FocusHudTroops"
+msgid "Focus HUD Troops"
+msgstr "HUD 병력으로 포커스 이동"
+
 #. Actions.HexGridEast
 msgctxt "Actions.HexGridEast"
 msgid "Hex Grid East"

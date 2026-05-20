@@ -962,6 +962,26 @@ msgctxt "Actions.FirstRow"
 msgid "First Row"
 msgstr "Pierwszy rzÄ…d"
 
+#. Actions.FocusHudNotifications
+msgctxt "Actions.FocusHudNotifications"
+msgid "Focus HUD Notifications"
+msgstr "Przenieś fokus na powiadomienia HUD"
+
+#. Actions.FocusHudObjectives
+msgctxt "Actions.FocusHudObjectives"
+msgid "Focus HUD Objectives"
+msgstr "Przenieś fokus na cele HUD"
+
+#. Actions.FocusHudResources
+msgctxt "Actions.FocusHudResources"
+msgid "Focus HUD Resources"
+msgstr "Przenieś fokus na zasoby HUD"
+
+#. Actions.FocusHudTroops
+msgctxt "Actions.FocusHudTroops"
+msgid "Focus HUD Troops"
+msgstr "Przenieś fokus na oddziały HUD"
+
 #. Actions.HexGridEast
 msgctxt "Actions.HexGridEast"
 msgid "Hex Grid East"

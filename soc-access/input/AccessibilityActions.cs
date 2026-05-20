@@ -119,6 +119,18 @@ namespace SongsOfConquestAccess.Input
         public static readonly InputAction NextSettlement = OneShot("next_settlement", ModStrings.Actions.NextSettlement, InputClaimScope.FocusedWidget)
             .AddBinding(new KeyboardBinding(Key.S));
 
+        public static readonly InputAction FocusHudTroops = OneShot("focus_hud_troops", ModStrings.Actions.FocusHudTroops, InputClaimScope.Screen)
+            .AddBinding(new KeyboardBinding(Key.T));
+
+        public static readonly InputAction FocusHudResources = OneShot("focus_hud_resources", ModStrings.Actions.FocusHudResources, InputClaimScope.Screen)
+            .AddBinding(new KeyboardBinding(Key.R));
+
+        public static readonly InputAction FocusHudObjectives = OneShot("focus_hud_objectives", ModStrings.Actions.FocusHudObjectives, InputClaimScope.Screen)
+            .AddBinding(new KeyboardBinding(Key.O));
+
+        public static readonly InputAction FocusHudNotifications = OneShot("focus_hud_notifications", ModStrings.Actions.FocusHudNotifications, InputClaimScope.Screen)
+            .AddBinding(new KeyboardBinding(Key.N));
+
         public static readonly InputAction ScannerRefresh = OneShot("scanner_refresh", ModStrings.Actions.ScannerRefresh, InputClaimScope.FocusedWidget)
             .AddBinding(new KeyboardBinding(Key.End));
 
@@ -251,6 +263,10 @@ namespace SongsOfConquestAccess.Input
             MapSecondaryAction,
             NextWielder,
             NextSettlement,
+            FocusHudTroops,
+            FocusHudResources,
+            FocusHudObjectives,
+            FocusHudNotifications,
             ScannerRefresh,
             ScannerPreviousCategory,
             ScannerNextCategory,

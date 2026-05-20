@@ -131,6 +131,10 @@ namespace SongsOfConquestAccess.Localization
             public static readonly ModString FirstBufferLine = new ModString("Actions.FirstBufferLine", "First Buffer Line");
             public static readonly ModString FirstMenuItem = new ModString("Actions.FirstMenuItem", "First Menu Item");
             public static readonly ModString FirstRow = new ModString("Actions.FirstRow", "First Row");
+            public static readonly ModString FocusHudNotifications = new ModString("Actions.FocusHudNotifications", "Focus HUD Notifications");
+            public static readonly ModString FocusHudObjectives = new ModString("Actions.FocusHudObjectives", "Focus HUD Objectives");
+            public static readonly ModString FocusHudResources = new ModString("Actions.FocusHudResources", "Focus HUD Resources");
+            public static readonly ModString FocusHudTroops = new ModString("Actions.FocusHudTroops", "Focus HUD Troops");
             public static readonly ModString HexGridEast = new ModString("Actions.HexGridEast", "Hex Grid East");
             public static readonly ModString HexGridNorthEast = new ModString("Actions.HexGridNorthEast", "Hex Grid Northeast");
             public static readonly ModString HexGridNorthWest = new ModString("Actions.HexGridNorthWest", "Hex Grid Northwest");

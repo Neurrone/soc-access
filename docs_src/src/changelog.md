@@ -9,6 +9,11 @@
 - Added `,` and `shift+,` hotkeys on the combat grid to move focus between your troops in initiative order
 - Added `space` hotkey to move focus to your currently acting troop
 - Added `.` and `shift+.` hotkeys on the combat grid to move focus between enemy troops in initiative order
+- Added the following hotkeys for the adventure map to move focus to various HUD controls:
+  - `O`: objectives
+  - `N`: notifications
+  - `R`: resources
+  - `T`: troops
 - Fixed wrong label for spellbook screen checkbox
 - Add missing label for the wielder list menu in adventure map HUD
 

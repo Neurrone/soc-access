@@ -43,6 +43,9 @@ namespace SongsOfConquestAccess.Screens
         private const string ReturnToGridSoundKey = "Common_ClosePauseMenu";
         private const int GridIndex = 0;
         private const int TroopSlotsIndex = 8;
+        private const int ResourcesIndex = 9;
+        private const int ObjectivesIndex = 10;
+        private const int NotificationsIndex = 11;
         private readonly AdventureMapAdapter _adapter;
         private readonly AdventureMapEventListener _eventListener;
         private readonly AdventureMapGrid _grid;
@@ -122,6 +125,26 @@ namespace SongsOfConquestAccess.Screens
 
         public override bool HasClaimed(string actionKey)
         {
+            if (actionKey == AccessibilityActions.FocusHudTroops.Key)
+            {
+                return CanFocusHudWidget(TroopSlotsIndex);
+            }
+
+            if (actionKey == AccessibilityActions.FocusHudResources.Key)
+            {
+                return CanFocusHudWidget(ResourcesIndex);
+            }
+
+            if (actionKey == AccessibilityActions.FocusHudObjectives.Key)
+            {
+                return CanFocusHudWidget(ObjectivesIndex);
+            }
+
+            if (actionKey == AccessibilityActions.FocusHudNotifications.Key)
+            {
+                return CanFocusHudWidget(NotificationsIndex);
+            }
+
             if (actionKey != AccessibilityActions.Cancel.Key)
             {
                 return base.HasClaimed(actionKey);
@@ -132,7 +155,32 @@ namespace SongsOfConquestAccess.Screens
 
         public override bool OnActionJustPressed(InputAction action)
         {
-            if (action == null || action.Key != AccessibilityActions.Cancel.Key)
+            if (action == null)
+            {
+                return base.OnActionJustPressed(action);
+            }
+
+            if (action.Key == AccessibilityActions.FocusHudResources.Key)
+            {
+                return FocusHudResources();
+            }
+
+            if (action.Key == AccessibilityActions.FocusHudTroops.Key)
+            {
+                return FocusHudTroops();
+            }
+
+            if (action.Key == AccessibilityActions.FocusHudObjectives.Key)
+            {
+                return FocusHudObjectives();
+            }
+
+            if (action.Key == AccessibilityActions.FocusHudNotifications.Key)
+            {
+                return FocusHudNotifications();
+            }
+
+            if (action.Key != AccessibilityActions.Cancel.Key)
             {
                 return base.OnActionJustPressed(action);
             }
@@ -152,6 +200,26 @@ namespace SongsOfConquestAccess.Screens
             FocusGrid();
             NativeSoundUtility.PostEvent(ReturnToGridSoundKey);
             return true;
+        }
+
+        public bool FocusHudResources()
+        {
+            return FocusHudWidget(ResourcesIndex);
+        }
+
+        public bool FocusHudTroops()
+        {
+            return FocusHudWidget(TroopSlotsIndex);
+        }
+
+        public bool FocusHudObjectives()
+        {
+            return FocusHudWidget(ObjectivesIndex);
+        }
+
+        public bool FocusHudNotifications()
+        {
+            return FocusHudWidget(NotificationsIndex);
         }
 
         public void FocusGridTile(Vector2Int tile)
@@ -243,6 +311,17 @@ namespace SongsOfConquestAccess.Screens
         {
             return ReferenceEquals(RootWidget?.FocusedChild, _grid)
                 && ReferenceEquals(UIManager.CurrentWidget, _grid);
+        }
+
+        private bool CanFocusHudWidget(int index)
+        {
+            Widget widget = RootWidget != null ? RootWidget.GetChildAt(index) : null;
+            return widget != null && widget.IsVisible;
+        }
+
+        private bool FocusHudWidget(int index)
+        {
+            return CanFocusHudWidget(index) && RootWidget != null && RootWidget.SetFocusByIndex(index);
         }
 
         private void AttachListeners()
