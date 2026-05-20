@@ -207,6 +207,21 @@ namespace SongsOfConquestAccess.Input
         public static readonly InputAction CombatInspect = OneShot("combat_inspect", ModStrings.Actions.CombatInspect, InputClaimScope.FocusedWidget)
             .AddBinding(new KeyboardBinding(Key.I));
 
+        public static readonly InputAction CombatNextActingTroop = OneShot("combat_next_acting_troop", ModStrings.Actions.CombatNextActingTroop, InputClaimScope.FocusedWidget)
+            .AddBinding(new KeyboardBinding(Key.Comma));
+
+        public static readonly InputAction CombatPreviousActingTroop = OneShot("combat_previous_acting_troop", ModStrings.Actions.CombatPreviousActingTroop, InputClaimScope.FocusedWidget)
+            .AddBinding(new KeyboardBinding(Key.Comma, shift: true));
+
+        public static readonly InputAction CombatFocusActingTroop = OneShot("combat_focus_acting_troop", ModStrings.Actions.CombatFocusActingTroop, InputClaimScope.FocusedWidget)
+            .AddBinding(new KeyboardBinding(Key.Space));
+
+        public static readonly InputAction CombatNextEnemyTroop = OneShot("combat_next_enemy_troop", ModStrings.Actions.CombatNextEnemyTroop, InputClaimScope.FocusedWidget)
+            .AddBinding(new KeyboardBinding(Key.Period));
+
+        public static readonly InputAction CombatPreviousEnemyTroop = OneShot("combat_previous_enemy_troop", ModStrings.Actions.CombatPreviousEnemyTroop, InputClaimScope.FocusedWidget)
+            .AddBinding(new KeyboardBinding(Key.Period, shift: true));
+
         public static readonly InputAction CombatNextRelevantTile = OneShot("combat_next_relevant_tile", ModStrings.Actions.CombatNextRelevantTile, InputClaimScope.FocusedWidget)
             .AddBinding(new KeyboardBinding(Key.W));
 
@@ -262,6 +277,11 @@ namespace SongsOfConquestAccess.Input
             HexGridSouthWest,
             HexGridSouthEast,
             CombatInspect,
+            CombatNextActingTroop,
+            CombatPreviousActingTroop,
+            CombatFocusActingTroop,
+            CombatNextEnemyTroop,
+            CombatPreviousEnemyTroop,
             CombatNextRelevantTile,
             CombatPreviousRelevantTile,
             CombatFocusTimeline,

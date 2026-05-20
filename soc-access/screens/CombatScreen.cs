@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Reflection;
 using HarmonyLib;
 using SongsOfConquest.Client;
@@ -32,10 +33,14 @@ namespace SongsOfConquestAccess.Screens
         private static string _lastProbeDiagnostic;
 
         private const string ReturnToGridSoundKey = "Common_ClosePauseMenu";
+        private const string FocusWrapCueKey = "Common_ClickUnfold";
         private const int GridIndex = 0;
         private const int TimelineIndex = 7;
         private readonly CombatAdapter _adapter;
         private readonly CombatHexGrid _grid;
+        private readonly CombatTroopCycle _localActingTroopCycle = new CombatTroopCycle();
+        private readonly CombatTroopCycle _enemyActingTroopCycle = new CombatTroopCycle();
+        private int _lastCycleCurrentTroopId = -1;
         private Action<TroopAbilityTargeting> _abilityTargetingBeginHandler;
 
         public CombatScreen(CombatAdapter adapter)
@@ -116,6 +121,39 @@ namespace SongsOfConquestAccess.Screens
             }
 
             return moved;
+        }
+
+        public bool CanFocusActingTroop()
+        {
+            return HasActingTroops(enemy: false);
+        }
+
+        public bool CanNavigateLocalActingTroops()
+        {
+            return HasActingTroops(enemy: false);
+        }
+
+        public bool CanNavigateEnemyActingTroops()
+        {
+            return HasActingTroops(enemy: true);
+        }
+
+        public bool FocusActingTroop()
+        {
+            SyncTroopCyclesWithCurrent();
+            IReadOnlyList<int> troopIds = GetActingTroopIds(enemy: false);
+            CombatTroopCycleResult result = _localActingTroopCycle.AnchorFirst(troopIds);
+            return ApplyCycleResult(_localActingTroopCycle, result);
+        }
+
+        public bool NavigateLocalActingTroop(int delta)
+        {
+            return NavigateActingTroop(_localActingTroopCycle, enemy: false, delta: delta);
+        }
+
+        public bool NavigateEnemyActingTroop(int delta)
+        {
+            return NavigateActingTroop(_enemyActingTroopCycle, enemy: true, delta: delta);
         }
 
         public void FocusGridIfNeeded()
@@ -223,6 +261,74 @@ namespace SongsOfConquestAccess.Screens
         {
             return ReferenceEquals(RootWidget?.FocusedChild, _grid)
                 && ReferenceEquals(UIManager.CurrentWidget, _grid);
+        }
+
+        private bool HasActingTroops(bool enemy)
+        {
+            if (_adapter == null || !_adapter.IsLocalTurn())
+            {
+                return false;
+            }
+
+            IReadOnlyList<int> troopIds = GetActingTroopIds(enemy);
+            return troopIds != null && troopIds.Count > 0;
+        }
+
+        private bool NavigateActingTroop(CombatTroopCycle cycle, bool enemy, int delta)
+        {
+            if (cycle == null)
+            {
+                return false;
+            }
+
+            SyncTroopCyclesWithCurrent();
+            CombatTroopCycleResult result = cycle.Move(GetActingTroopIds(enemy), delta);
+            return ApplyCycleResult(cycle, result);
+        }
+
+        private bool ApplyCycleResult(CombatTroopCycle cycle, CombatTroopCycleResult result)
+        {
+            if (!result.Moved)
+            {
+                return true;
+            }
+
+            bool moved = MoveCursorToTroop(result.TroopId, focusGrid: true, requireLocalCurrentTurn: false);
+            if (!moved)
+            {
+                cycle?.Reset();
+                return true;
+            }
+
+            if (result.Wrapped)
+            {
+                NativeSoundUtility.PostEvent(FocusWrapCueKey);
+            }
+
+            return true;
+        }
+
+        private IReadOnlyList<int> GetActingTroopIds(bool enemy)
+        {
+            if (_adapter == null || !_adapter.IsLocalTurn())
+            {
+                return new int[0];
+            }
+
+            return enemy ? _adapter.GetEnemyActingTroopIds() : _adapter.GetLocalActingTroopIds();
+        }
+
+        private void SyncTroopCyclesWithCurrent()
+        {
+            int currentTroopId = _adapter != null ? _adapter.GetCurrentTroopId() : -1;
+            if (currentTroopId == _lastCycleCurrentTroopId)
+            {
+                return;
+            }
+
+            _lastCycleCurrentTroopId = currentTroopId;
+            _localActingTroopCycle.Reset();
+            _enemyActingTroopCycle.Reset();
         }
 
         private void HandleSpellCastBegin()

@@ -301,6 +301,18 @@ namespace SongsOfConquestAccess.Adapters
             }
         }
 
+        public bool IsLocalTurn()
+        {
+            try
+            {
+                return _facade != null && _facade.Teams != null && _facade.Teams.IsCurrentLocal;
+            }
+            catch
+            {
+                return false;
+            }
+        }
+
         public string GetReadinessDiagnostic()
         {
             if (_sourceKey == null)
@@ -2564,6 +2576,82 @@ namespace SongsOfConquestAccess.Adapters
             {
                 return 0;
             }
+        }
+
+        public IReadOnlyList<int> GetLocalActingTroopIds()
+        {
+            return GetActingTroopIds(enemy: false);
+        }
+
+        public IReadOnlyList<int> GetEnemyActingTroopIds()
+        {
+            return GetActingTroopIds(enemy: true);
+        }
+
+        private IReadOnlyList<int> GetActingTroopIds(bool enemy)
+        {
+            List<int> troopIds = new List<int>();
+            try
+            {
+                if (_facade == null
+                    || _facade.Queue == null
+                    || _facade.Troops == null
+                    || _facade.Teams == null
+                    || !_facade.Teams.IsCurrentLocal
+                    || _facade.Queue.Count <= 0)
+                {
+                    return troopIds;
+                }
+
+                int localTeamId = GetLocalTeamId();
+                if (localTeamId < 0)
+                {
+                    return troopIds;
+                }
+
+                int currentTroopId = _facade.Queue[0].Id;
+                if (currentTroopId < 0)
+                {
+                    currentTroopId = GetCurrentTroopId();
+                }
+
+                if (currentTroopId < 0)
+                {
+                    return troopIds;
+                }
+
+                for (int i = 0; i < _facade.Queue.Count; i++)
+                {
+                    QueuedTroop queuedTroop = _facade.Queue[i];
+                    if (i > 0 && queuedTroop.Id == currentTroopId)
+                    {
+                        break;
+                    }
+
+                    if (queuedTroop.Id < 0)
+                    {
+                        continue;
+                    }
+
+                    IBattleTroopState troop = GetTroop(queuedTroop.Id);
+                    if (troop == null || !troop.GetIsAlive() || !IsValidTile(troop.Position))
+                    {
+                        continue;
+                    }
+
+                    bool isEnemy = troop.TeamId != localTeamId;
+                    if (isEnemy == enemy)
+                    {
+                        troopIds.Add(troop.Id);
+                    }
+                }
+            }
+            catch
+            {
+                return troopIds;
+            }
+
+            return troopIds;
         }
 
         public bool TryGetLocalActingTroopPosition(int troopId, out Vector2Int position)

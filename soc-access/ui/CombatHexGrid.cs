@@ -79,6 +79,13 @@ namespace SongsOfConquestAccess.UI
                 || actionKey == AccessibilityActions.HexGridSouthWest.Key
                 || actionKey == AccessibilityActions.HexGridSouthEast.Key
                 || actionKey == AccessibilityActions.CombatInspect.Key
+                || (CanNavigateLocalActingTroops()
+                    && (actionKey == AccessibilityActions.CombatNextActingTroop.Key
+                        || actionKey == AccessibilityActions.CombatPreviousActingTroop.Key
+                        || actionKey == AccessibilityActions.CombatFocusActingTroop.Key))
+                || (CanNavigateEnemyActingTroops()
+                    && (actionKey == AccessibilityActions.CombatNextEnemyTroop.Key
+                        || actionKey == AccessibilityActions.CombatPreviousEnemyTroop.Key))
                 || actionKey == AccessibilityActions.CombatNextRelevantTile.Key
                 || actionKey == AccessibilityActions.CombatPreviousRelevantTile.Key
                 || actionKey == AccessibilityActions.CombatFocusTimeline.Key
@@ -146,6 +153,36 @@ namespace SongsOfConquestAccess.UI
                 return EnterInspect();
             }
 
+            if (action.Key == AccessibilityActions.CombatNextActingTroop.Key)
+            {
+                CombatScreen screen = SocAccessPlugin.Instance?.ScreenManager?.CurrentScreen as CombatScreen;
+                return screen != null && screen.NavigateLocalActingTroop(1);
+            }
+
+            if (action.Key == AccessibilityActions.CombatPreviousActingTroop.Key)
+            {
+                CombatScreen screen = SocAccessPlugin.Instance?.ScreenManager?.CurrentScreen as CombatScreen;
+                return screen != null && screen.NavigateLocalActingTroop(-1);
+            }
+
+            if (action.Key == AccessibilityActions.CombatFocusActingTroop.Key)
+            {
+                CombatScreen screen = SocAccessPlugin.Instance?.ScreenManager?.CurrentScreen as CombatScreen;
+                return screen != null && screen.FocusActingTroop();
+            }
+
+            if (action.Key == AccessibilityActions.CombatNextEnemyTroop.Key)
+            {
+                CombatScreen screen = SocAccessPlugin.Instance?.ScreenManager?.CurrentScreen as CombatScreen;
+                return screen != null && screen.NavigateEnemyActingTroop(1);
+            }
+
+            if (action.Key == AccessibilityActions.CombatPreviousEnemyTroop.Key)
+            {
+                CombatScreen screen = SocAccessPlugin.Instance?.ScreenManager?.CurrentScreen as CombatScreen;
+                return screen != null && screen.NavigateEnemyActingTroop(-1);
+            }
+
             if (action.Key == AccessibilityActions.CombatNextRelevantTile.Key)
             {
                 return MoveOrdered(1);
@@ -202,6 +239,18 @@ namespace SongsOfConquestAccess.UI
             }
 
             return false;
+        }
+
+        private bool CanNavigateLocalActingTroops()
+        {
+            CombatScreen screen = SocAccessPlugin.Instance?.ScreenManager?.CurrentScreen as CombatScreen;
+            return screen != null && screen.CanNavigateLocalActingTroops();
+        }
+
+        private bool CanNavigateEnemyActingTroops()
+        {
+            CombatScreen screen = SocAccessPlugin.Instance?.ScreenManager?.CurrentScreen as CombatScreen;
+            return screen != null && screen.CanNavigateEnemyActingTroops();
         }
 
         protected override void OnFocus()

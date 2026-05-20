@@ -119,9 +119,14 @@ namespace SongsOfConquestAccess.Localization
         {
             public static readonly ModString Activate = new ModString("Actions.Activate", "Activate");
             public static readonly ModString Cancel = new ModString("Actions.Cancel", "Cancel");
+            public static readonly ModString CombatFocusActingTroop = new ModString("Actions.CombatFocusActingTroop", "Focus Acting Troop");
             public static readonly ModString CombatFocusTimeline = new ModString("Actions.CombatFocusTimeline", "Focus Timeline");
             public static readonly ModString CombatInspect = new ModString("Actions.CombatInspect", "Inspect Combat Hex");
+            public static readonly ModString CombatNextActingTroop = new ModString("Actions.CombatNextActingTroop", "Next Acting Troop");
+            public static readonly ModString CombatNextEnemyTroop = new ModString("Actions.CombatNextEnemyTroop", "Next Enemy Troop");
             public static readonly ModString CombatNextRelevantTile = new ModString("Actions.CombatNextRelevantTile", "Next Relevant Combat Tile");
+            public static readonly ModString CombatPreviousActingTroop = new ModString("Actions.CombatPreviousActingTroop", "Previous Acting Troop");
+            public static readonly ModString CombatPreviousEnemyTroop = new ModString("Actions.CombatPreviousEnemyTroop", "Previous Enemy Troop");
             public static readonly ModString CombatPreviousRelevantTile = new ModString("Actions.CombatPreviousRelevantTile", "Previous Relevant Combat Tile");
             public static readonly ModString FirstBufferLine = new ModString("Actions.FirstBufferLine", "First Buffer Line");
             public static readonly ModString FirstMenuItem = new ModString("Actions.FirstMenuItem", "First Menu Item");

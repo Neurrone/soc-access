@@ -6,6 +6,9 @@
 - Fix move troop amount dialog not being detected when troops are looking to join your army, and made escape only cancel the move instead of also exiting from the "troops are looking to join" screen
 - Stop reading effect and decorative features on adventure map tiles to reduce verbosity, since they have no gameplay effect
 - Objectives now indicate approximate direction and distance relative to the currently selected wielder. This provides information similar to objective markers rendered on the minimap.
+- Added `,` and `shift+,` hotkeys on the combat grid to move focus between your troops in initiative order
+- Added `space` hotkey to move focus to your currently acting troop
+- Added `.` and `shift+.` hotkeys on the combat grid to move focus between enemy troops in initiative order
 
 ## V0.1.4
 

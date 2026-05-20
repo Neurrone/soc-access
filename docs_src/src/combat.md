@@ -54,13 +54,21 @@ By default, focusing a tile will indicate if it is threatened by an enemy troop 
 
 ### Combat Actions
 
-- Backslash: performs the secondary action on the focused tile, corresponding to a right-click. Use this to move to a tile or perform an attack
-- S: read detailed threat information for the focused tile. Nothing is spoken if the tile is not threatened.
-- T: move focus to the timeline
-- Ctrl+R: read your essence
-- Alt+R: read enemy essence
+The following hotkeys work when on the hex grid:
+
+- `\`: performs the secondary action on the focused tile, corresponding to a right-click. Use this to move to a tile or perform an attack
+- `S`: read detailed threat information for the focused tile. Nothing is spoken if the tile is not threatened.
+- `T`: move focus to the timeline
 - Enter: performs the primary action on the focused tile, corresponding to a left-click. Use to select a target for spells
 - Escape: cancels spellcasting
+- `,` and `Shift+,`: move focus between your troops in initiative order
+- `Space`: move focus to your currently acting troop
+- `.` and `Shift+.`: move focus between enemy troops in initiative order
+
+The following hotkeys work anywhere on the combat screen:
+
+- `Ctrl+R`: read your essence
+- `Alt+R`: read enemy essence
 
 ### Inspect Mode
 
