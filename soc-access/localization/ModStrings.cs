@@ -371,6 +371,9 @@ namespace SongsOfConquestAccess.Localization
             public static readonly ModString None = new ModString("Screens.None", "None");
             public static readonly ModString Notifications = new ModString("Screens.Notifications", "Notifications");
             public static readonly ModString Objectives = new ModString("Screens.Objectives", "Objectives");
+            public static readonly ModString ObjectiveMarkerFarAway = new ModString("Screens.ObjectiveMarkerFarAway", "far away");
+            public static readonly ModString ObjectiveMarkerNearby = new ModString("Screens.ObjectiveMarkerNearby", "nearby");
+            public static readonly ModString ObjectiveMarkerSomeDistance = new ModString("Screens.ObjectiveMarkerSomeDistance", "some distance");
             public static readonly ModString Ok = new ModString("Screens.Ok", "OK");
             public static readonly ModString OrderSpells = new ModString("Screens.OrderSpells", "Order spells");
             public static readonly ModString PostAdventureResult = new ModString("Screens.PostAdventureResult", "Post adventure result");

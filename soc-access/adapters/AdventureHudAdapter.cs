@@ -486,7 +486,133 @@ namespace SongsOfConquestAccess.Adapters
                 }
             }
             parts.Add(label);
+            AddObjectiveMarkerDetails(parts, snapshot);
             return string.Join(", ", parts.ToArray());
+        }
+
+        private void AddObjectiveMarkerDetails(List<string> parts, ObjectiveEntrySnapshot snapshot)
+        {
+            Objective objective;
+            if (!TryGetSingleObjectiveMarker(snapshot, out objective))
+            {
+                return;
+            }
+
+            ICommanderState selectedCommander = SelectionHandler != null ? SelectionHandler.SelectedCommander : null;
+            if (selectedCommander == null || !selectedCommander.IsAlive)
+            {
+                return;
+            }
+
+            int mapWidth = _map != null && _map.Facade != null && _map.Facade.Level != null ? _map.Facade.Level.Width : 0;
+            int mapHeight = _map != null && _map.Facade != null && _map.Facade.Level != null ? _map.Facade.Level.Height : 0;
+            if (mapWidth <= 0 || mapHeight <= 0)
+            {
+                return;
+            }
+
+            int x = objective.location.x - selectedCommander.Position.x;
+            int y = objective.location.y - selectedCommander.Position.y;
+            string descriptor = GetObjectiveMarkerDistanceDescriptor(x, y, mapWidth, mapHeight);
+            string direction = GetObjectiveMarkerDirection(x, y);
+            if (!string.IsNullOrWhiteSpace(descriptor))
+            {
+                parts.Add(descriptor);
+            }
+
+            if (!string.IsNullOrWhiteSpace(direction))
+            {
+                parts.Add(direction);
+            }
+        }
+
+        private static bool TryGetSingleObjectiveMarker(ObjectiveEntrySnapshot snapshot, out Objective objective)
+        {
+            objective = null;
+            IReadOnlyList<Objective> objectives = snapshot != null && snapshot.Entry != null ? snapshot.Entry.Objectives : null;
+            if (objectives == null)
+            {
+                return false;
+            }
+
+            for (int i = 0; i < objectives.Count; i++)
+            {
+                Objective candidate = objectives[i];
+                if (candidate == null || !candidate.hasLocation || candidate.progress >= 1f)
+                {
+                    continue;
+                }
+
+                if (objective != null)
+                {
+                    objective = null;
+                    return false;
+                }
+
+                objective = candidate;
+            }
+
+            return objective != null;
+        }
+
+        private static string GetObjectiveMarkerDistanceDescriptor(int x, int y, int mapWidth, int mapHeight)
+        {
+            float normalizedX = x / (float)mapWidth;
+            float normalizedY = y / (float)mapHeight;
+            float distance = Mathf.Sqrt(normalizedX * normalizedX + normalizedY * normalizedY);
+            if (distance <= 0.10f)
+            {
+                return ModText.Get(ModStrings.Screens.ObjectiveMarkerNearby);
+            }
+
+            if (distance <= 0.25f)
+            {
+                return ModText.Get(ModStrings.Screens.ObjectiveMarkerSomeDistance);
+            }
+
+            return ModText.Get(ModStrings.Screens.ObjectiveMarkerFarAway);
+        }
+
+        private static string GetObjectiveMarkerDirection(int x, int y)
+        {
+            if (x == 0 && y == 0)
+            {
+                return ModText.Get(ModStrings.Spatial.Here);
+            }
+
+            if (y > 0)
+            {
+                if (x > 0)
+                {
+                    return ModText.Get(ModStrings.Scanner.Northeast);
+                }
+
+                if (x < 0)
+                {
+                    return ModText.Get(ModStrings.Scanner.Northwest);
+                }
+
+                return ModText.Get(ModStrings.Scanner.North);
+            }
+
+            if (y < 0)
+            {
+                if (x > 0)
+                {
+                    return ModText.Get(ModStrings.Scanner.Southeast);
+                }
+
+                if (x < 0)
+                {
+                    return ModText.Get(ModStrings.Scanner.Southwest);
+                }
+
+                return ModText.Get(ModStrings.Scanner.South);
+            }
+
+            return x > 0
+                ? ModText.Get(ModStrings.Scanner.East)
+                : ModText.Get(ModStrings.Scanner.West);
         }
 
         public void FocusObjective(int index)

@@ -1689,6 +1689,21 @@ msgctxt "Screens.Objectives"
 msgid "Objectives"
 msgstr ""
 
+#. Screens.ObjectiveMarkerFarAway
+msgctxt "Screens.ObjectiveMarkerFarAway"
+msgid "far away"
+msgstr ""
+
+#. Screens.ObjectiveMarkerNearby
+msgctxt "Screens.ObjectiveMarkerNearby"
+msgid "nearby"
+msgstr ""
+
+#. Screens.ObjectiveMarkerSomeDistance
+msgctxt "Screens.ObjectiveMarkerSomeDistance"
+msgid "some distance"
+msgstr ""
+
 #. Screens.Ok
 msgctxt "Screens.Ok"
 msgid "OK"

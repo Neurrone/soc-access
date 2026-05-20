@@ -1,4 +1,4 @@
-msgid ""
+﻿msgid ""
 msgstr ""
 "Project-Id-Version: SongsOfConquestAccess\n"
 "Language: ko\n"
@@ -8,12 +8,12 @@ msgstr ""
 #. Common.ListFinal
 msgctxt "Common.ListFinal"
 msgid "{0}, and {1}"
-msgstr "{0} 및 {1}"
+msgstr "{0} ë° {1}"
 
 #. Common.ListPair
 msgctxt "Common.ListPair"
 msgid "{0} and {1}"
-msgstr "{0} 및 {1}"
+msgstr "{0} ë° {1}"
 
 #. Common.ListSeparator
 msgctxt "Common.ListSeparator"
@@ -23,7 +23,7 @@ msgstr "{0}, {1}"
 #. Common.Quantity
 msgctxt "Common.Quantity"
 msgid "quantity"
-msgstr "수량"
+msgstr "ìˆ˜ëŸ‰"
 
 #. Common.ResourceAmount
 msgctxt "Common.ResourceAmount"
@@ -33,262 +33,262 @@ msgstr "{0} {1}"
 #. Common.TileCount_0
 msgctxt "Common.TileCount_0"
 msgid "{0} tile"
-msgstr "{0}칸"
+msgstr "{0}ì¹¸"
 
 #. Draft.EssenceVariants
 msgctxt "Draft.EssenceVariants"
 msgid "Essence variants"
-msgstr "정수 변형"
+msgstr "ì •ìˆ˜ ë³€í˜•"
 
 #. Draft.Purchase
 msgctxt "Draft.Purchase"
 msgid "Purchase"
-msgstr "구매"
+msgstr "êµ¬ë§¤"
 
 #. Draft.PurchaseForResources
 msgctxt "Draft.PurchaseForResources"
 msgid "Purchase for {0}"
-msgstr "{0}(으)로 구매"
+msgstr "{0}(ìœ¼)ë¡œ êµ¬ë§¤"
 
 #. Draft.UpgradeAvailableTroops
 msgctxt "Draft.UpgradeAvailableTroops"
 msgid "Upgrade available troops"
-msgstr "사용 가능한 부대 업그레이드"
+msgstr "ì‚¬ìš© ê°€ëŠ¥í•œ ë¶€ëŒ€ ì—…ê·¸ë ˆì´ë“œ"
 
 #. Events.BuildSiteLarge
 msgctxt "Events.BuildSiteLarge"
 msgid "large"
-msgstr "대형"
+msgstr "ëŒ€í˜•"
 
 #. Events.BuildSiteLargeSettlement
 msgctxt "Events.BuildSiteLargeSettlement"
 msgid "large settlement"
-msgstr "대형 정착지"
+msgstr "ëŒ€í˜• ì •ì°©ì§€"
 
 #. Events.BuildSiteMedium
 msgctxt "Events.BuildSiteMedium"
 msgid "medium"
-msgstr "중형"
+msgstr "ì¤‘í˜•"
 
 #. Events.BuildSiteSmall
 msgctxt "Events.BuildSiteSmall"
 msgid "small"
-msgstr "소형"
+msgstr "ì†Œí˜•"
 
 #. Events.BuildSiteSmallSettlement
 msgctxt "Events.BuildSiteSmallSettlement"
 msgid "small settlement"
-msgstr "소형 정착지"
+msgstr "ì†Œí˜• ì •ì°©ì§€"
 
 #. Events.BuildSiteTown
 msgctxt "Events.BuildSiteTown"
 msgid "town"
-msgstr "마을"
+msgstr "ë§ˆì„"
 
 #. Events.DestinationCleared
 msgctxt "Events.DestinationCleared"
 msgid "{0}'s destination cleared."
-msgstr "{0}의 목적지가 지워졌습니다."
+msgstr "{0}ì˜ ëª©ì ì§€ê°€ ì§€ì›Œì¡ŒìŠµë‹ˆë‹¤."
 
 #. Events.DestinationSet
 msgctxt "Events.DestinationSet"
 msgid "{0}'s destination set to {1}"
-msgstr "{0}의 목적지가 {1}(으)로 설정되었습니다"
+msgstr "{0}ì˜ ëª©ì ì§€ê°€ {1}(ìœ¼)ë¡œ ì„¤ì •ë˜ì—ˆìŠµë‹ˆë‹¤"
 
 #. Events.HudClosed
 msgctxt "Events.HudClosed"
 msgid "HUD closed"
-msgstr "HUD 닫힘"
+msgstr "HUD ë‹«íž˜"
 
 #. Events.HudOpen
 msgctxt "Events.HudOpen"
 msgid "HUD open"
-msgstr "HUD 열림"
+msgstr "HUD ì—´ë¦¼"
 
 #. Events.LeveledUpTo
 msgctxt "Events.LeveledUpTo"
 msgid "{0} leveled up to {1}"
-msgstr "{0}이(가) 레벨 {1}로 올랐습니다"
+msgstr "{0}ì´(ê°€) ë ˆë²¨ {1}ë¡œ ì˜¬ëžìŠµë‹ˆë‹¤"
 
 #. Events.MapCameraFocus
 msgctxt "Events.MapCameraFocus"
 msgid "Map camera focuses on {0}"
-msgstr "지도 카메라가 {0}에 초점을 맞춥니다"
+msgstr "ì§€ë„ ì¹´ë©”ë¼ê°€ {0}ì— ì´ˆì ì„ ë§žì¶¥ë‹ˆë‹¤"
 
 #. Events.ModError
 msgctxt "Events.ModError"
 msgid "Mod error: {0}"
-msgstr "모드 오류: {0}"
+msgstr "ëª¨ë“œ ì˜¤ë¥˜: {0}"
 
 #. Events.SelectedBuildSite
 msgctxt "Events.SelectedBuildSite"
 msgid "Selected {0} build site at {1}"
-msgstr "{1}의 {0} 건설 부지를 선택했습니다"
+msgstr "{1}ì˜ {0} ê±´ì„¤ ë¶€ì§€ë¥¼ ì„ íƒí–ˆìŠµë‹ˆë‹¤"
 
 #. Events.SelectedWielder
 msgctxt "Events.SelectedWielder"
 msgid "Selected wielder {0}"
-msgstr "위더 {0} 선택됨"
+msgstr "ìœ„ë” {0} ì„ íƒë¨"
 
 #. Events.Wielder
 msgctxt "Events.Wielder"
 msgid "wielder"
-msgstr "위더"
+msgstr "ìœ„ë”"
 
 #. Events.WielderMoved
 msgctxt "Events.WielderMoved"
 msgid "{0} moved to {1}"
-msgstr "{0}이(가) {1}(으)로 이동했습니다"
+msgstr "{0}ì´(ê°€) {1}(ìœ¼)ë¡œ ì´ë™í–ˆìŠµë‹ˆë‹¤"
 
 #. Events.WielderTeleported
 msgctxt "Events.WielderTeleported"
 msgid "{0} teleported to {1}"
-msgstr "{0}이(가) {1}(으)로 순간이동했습니다"
+msgstr "{0}ì´(ê°€) {1}(ìœ¼)ë¡œ ìˆœê°„ì´ë™í–ˆìŠµë‹ˆë‹¤"
 
 #. UI.ArmyExchangeGrid
 msgctxt "UI.ArmyExchangeGrid"
 msgid "Army exchange grid"
-msgstr "군대 교환 격자"
+msgstr "êµ°ëŒ€ êµí™˜ ê²©ìž"
 
 #. UI.AvailableActions
 msgctxt "UI.AvailableActions"
 msgid "Available actions: {0}."
-msgstr "사용 가능한 동작: {0}."
+msgstr "ì‚¬ìš© ê°€ëŠ¥í•œ ë™ìž‘: {0}."
 
 #. UI.Blank
 msgctxt "UI.Blank"
 msgid "blank"
-msgstr "빈칸"
+msgstr "ë¹ˆì¹¸"
 
 #. UI.CancelledEditing
 msgctxt "UI.CancelledEditing"
 msgid "Cancelled, {0}"
-msgstr "취소됨, {0}"
+msgstr "ì·¨ì†Œë¨, {0}"
 
 #. UI.CannotDropThere
 msgctxt "UI.CannotDropThere"
 msgid "Cannot drop there."
-msgstr "거기에 놓을 수 없습니다."
+msgstr "ê±°ê¸°ì— ë†“ì„ ìˆ˜ ì—†ìŠµë‹ˆë‹¤."
 
 #. UI.CharacterColon
 msgctxt "UI.CharacterColon"
 msgid "colon"
-msgstr "콜론"
+msgstr "ì½œë¡ "
 
 #. UI.CharacterComma
 msgctxt "UI.CharacterComma"
 msgid "comma"
-msgstr "쉼표"
+msgstr "ì‰¼í‘œ"
 
 #. UI.CharacterDash
 msgctxt "UI.CharacterDash"
 msgid "dash"
-msgstr "대시"
+msgstr "ëŒ€ì‹œ"
 
 #. UI.CharacterDot
 msgctxt "UI.CharacterDot"
 msgid "dot"
-msgstr "점"
+msgstr "ì "
 
 #. UI.CharacterSemicolon
 msgctxt "UI.CharacterSemicolon"
 msgid "semicolon"
-msgstr "세미콜론"
+msgstr "ì„¸ë¯¸ì½œë¡ "
 
 #. UI.CharacterSpace
 msgctxt "UI.CharacterSpace"
 msgid "space"
-msgstr "공백"
+msgstr "ê³µë°±"
 
 #. UI.CharacterTab
 msgctxt "UI.CharacterTab"
 msgid "tab"
-msgstr "탭"
+msgstr "íƒ­"
 
 #. UI.CharacterUnderscore
 msgctxt "UI.CharacterUnderscore"
 msgid "underscore"
-msgstr "밑줄"
+msgstr "ë°‘ì¤„"
 
 #. UI.CombatDisconnectedTiles
 msgctxt "UI.CombatDisconnectedTiles"
 msgid "Some shown tiles are separated. Use W and Shift W to reach all range tiles."
-msgstr "표시된 일부 칸이 서로 떨어져 있습니다. 모든 사거리 칸에 도달하려면 W와 Shift W를 사용하세요."
+msgstr "í‘œì‹œëœ ì¼ë¶€ ì¹¸ì´ ì„œë¡œ ë–¨ì–´ì ¸ ìžˆìŠµë‹ˆë‹¤. ëª¨ë“  ì‚¬ê±°ë¦¬ ì¹¸ì— ë„ë‹¬í•˜ë ¤ë©´ Wì™€ Shift Wë¥¼ ì‚¬ìš©í•˜ì„¸ìš”."
 
 #. UI.CombatGrid
 msgctxt "UI.CombatGrid"
 msgid "Combat grid"
-msgstr "전투 격자"
+msgstr "ì „íˆ¬ ê²©ìž"
 
 #. UI.DoneEditing
 msgctxt "UI.DoneEditing"
 msgid "Done editing, {0}"
-msgstr "편집 완료, {0}"
+msgstr "íŽ¸ì§‘ ì™„ë£Œ, {0}"
 
 #. UI.DragCancelled
 msgctxt "UI.DragCancelled"
 msgid "Drag cancelled."
-msgstr "끌기가 취소되었습니다."
+msgstr "ëŒê¸°ê°€ ì·¨ì†Œë˜ì—ˆìŠµë‹ˆë‹¤."
 
 #. UI.DragComplete
 msgctxt "UI.DragComplete"
 msgid "Drag complete."
-msgstr "끌기 완료."
+msgstr "ëŒê¸° ì™„ë£Œ."
 
 #. UI.DragStarted
 msgctxt "UI.DragStarted"
 msgid "Started drag. Move to destination and press enter to drop."
-msgstr "끌기를 시작했습니다. 목적지로 이동한 뒤 Enter를 눌러 놓으세요."
+msgstr "ëŒê¸°ë¥¼ ì‹œìž‘í–ˆìŠµë‹ˆë‹¤. ëª©ì ì§€ë¡œ ì´ë™í•œ ë’¤ Enterë¥¼ ëˆŒëŸ¬ ë†“ìœ¼ì„¸ìš”."
 
 #. UI.DragStartedTroopPlacement
 msgctxt "UI.DragStartedTroopPlacement"
 msgid "Started drag for {0} at {1}. Press enter to drop on destination spawn point, or press escape to cancel."
-msgstr "{1}의 {0} 끌기를 시작했습니다. 대상 배치 지점에서 Enter를 눌러 놓거나 Escape로 취소하세요."
+msgstr "{1}ì˜ {0} ëŒê¸°ë¥¼ ì‹œìž‘í–ˆìŠµë‹ˆë‹¤. ëŒ€ìƒ ë°°ì¹˜ ì§€ì ì—ì„œ Enterë¥¼ ëˆŒëŸ¬ ë†“ê±°ë‚˜ Escapeë¡œ ì·¨ì†Œí•˜ì„¸ìš”."
 
 #. UI.Editing
 msgctxt "UI.Editing"
 msgid "Editing, {0}"
-msgstr "편집 중, {0}"
+msgstr "íŽ¸ì§‘ ì¤‘, {0}"
 
 #. UI.Empty
 msgctxt "UI.Empty"
 msgid "Empty"
-msgstr "비어 있음"
+msgstr "ë¹„ì–´ ìžˆìŒ"
 
 #. UI.EmptyTroopSlot
 msgctxt "UI.EmptyTroopSlot"
 msgid "Empty troop {0}"
-msgstr "빈 부대 {0}"
+msgstr "ë¹ˆ ë¶€ëŒ€ {0}"
 
 #. UI.ExitedInspectMode
 msgctxt "UI.ExitedInspectMode"
 msgid "Exited inspect mode"
-msgstr "검사 모드 종료"
+msgstr "ê²€ì‚¬ ëª¨ë“œ ì¢…ë£Œ"
 
 #. UI.Heading
 msgctxt "UI.Heading"
 msgid "{0} heading"
-msgstr "{0} 제목"
+msgstr "{0} ì œëª©"
 
 #. UI.Inspecting
 msgctxt "UI.Inspecting"
 msgid "Inspecting {0}"
-msgstr "{0} 검사 중"
+msgstr "{0} ê²€ì‚¬ ì¤‘"
 
 #. UI.InventoryGrid
 msgctxt "UI.InventoryGrid"
 msgid "Inventory grid"
-msgstr "인벤토리 격자"
+msgstr "ì¸ë²¤í† ë¦¬ ê²©ìž"
 
 #. UI.InvalidDestination
 msgctxt "UI.InvalidDestination"
 msgid "Invalid destination."
-msgstr "잘못된 목적지입니다."
+msgstr "ìž˜ëª»ëœ ëª©ì ì§€ìž…ë‹ˆë‹¤."
 
 #. UI.JoiningArmy
 msgctxt "UI.JoiningArmy"
 msgid "joining army"
-msgstr "합류하는 군대"
+msgstr "í•©ë¥˜í•˜ëŠ” êµ°ëŒ€"
 
 #. UI.LabelValue
 msgctxt "UI.LabelValue"
@@ -298,92 +298,92 @@ msgstr "{0}: {1}"
 #. UI.PressSpaceSelectItemToDrag
 msgctxt "UI.PressSpaceSelectItemToDrag"
 msgid "Press space to select an item to drag."
-msgstr "끌 항목을 선택하려면 Space를 누르세요."
+msgstr "ëŒ í•­ëª©ì„ ì„ íƒí•˜ë ¤ë©´ Spaceë¥¼ ëˆ„ë¥´ì„¸ìš”."
 
 #. UI.PressSpaceToDrag
 msgctxt "UI.PressSpaceToDrag"
 msgid "Press space to drag."
-msgstr "끌려면 Space를 누르세요."
+msgstr "ëŒë ¤ë©´ Spaceë¥¼ ëˆ„ë¥´ì„¸ìš”."
 
 #. UI.RoleButton
 msgctxt "UI.RoleButton"
 msgid "button"
-msgstr "버튼"
+msgstr "ë²„íŠ¼"
 
 #. UI.RoleCheckBox
 msgctxt "UI.RoleCheckBox"
 msgid "check box"
-msgstr "체크 상자"
+msgstr "ì²´í¬ ìƒìž"
 
 #. UI.RoleDocument
 msgctxt "UI.RoleDocument"
 msgid "document"
-msgstr "문서"
+msgstr "ë¬¸ì„œ"
 
 #. UI.RoleEdit
 msgctxt "UI.RoleEdit"
 msgid "edit"
-msgstr "편집"
+msgstr "íŽ¸ì§‘"
 
 #. UI.RoleGrid
 msgctxt "UI.RoleGrid"
 msgid "grid"
-msgstr "격자"
+msgstr "ê²©ìž"
 
 #. UI.RoleMenu
 msgctxt "UI.RoleMenu"
 msgid "menu"
-msgstr "메뉴"
+msgstr "ë©”ë‰´"
 
 #. UI.RoleSlider
 msgctxt "UI.RoleSlider"
 msgid "slider"
-msgstr "슬라이더"
+msgstr "ìŠ¬ë¼ì´ë”"
 
 #. UI.Selected
 msgctxt "UI.Selected"
 msgid "selected"
-msgstr "선택됨"
+msgstr "ì„ íƒë¨"
 
 #. UI.Slot
 msgctxt "UI.Slot"
 msgid "slot {0}"
-msgstr "슬롯 {0}"
+msgstr "ìŠ¬ë¡¯ {0}"
 
 #. UI.SlotInGroup
 msgctxt "UI.SlotInGroup"
 msgid "{0} slot {1}"
-msgstr "{0} 슬롯 {1}"
+msgstr "{0} ìŠ¬ë¡¯ {1}"
 
 #. UI.StatusChecked
 msgctxt "UI.StatusChecked"
 msgid "checked"
-msgstr "선택됨"
+msgstr "ì„ íƒë¨"
 
 #. UI.StatusDisabled
 msgctxt "UI.StatusDisabled"
 msgid "disabled"
-msgstr "비활성화됨"
+msgstr "ë¹„í™œì„±í™”ë¨"
 
 #. UI.StatusDraggable
 msgctxt "UI.StatusDraggable"
 msgid "draggable"
-msgstr "끌 수 있음"
+msgstr "ëŒ ìˆ˜ ìžˆìŒ"
 
 #. UI.StatusDragging
 msgctxt "UI.StatusDragging"
 msgid "dragging"
-msgstr "끌고 있음"
+msgstr "ëŒê³  ìžˆìŒ"
 
 #. UI.StatusUnchecked
 msgctxt "UI.StatusUnchecked"
 msgid "unchecked"
-msgstr "선택 안 됨"
+msgstr "ì„ íƒ ì•ˆ ë¨"
 
 #. UI.Target
 msgctxt "UI.Target"
 msgid "target"
-msgstr "대상"
+msgstr "ëŒ€ìƒ"
 
 #. UI.TroopSlot
 msgctxt "UI.TroopSlot"
@@ -398,42 +398,42 @@ msgstr "{0}, {1} / {2}, {3}"
 #. UI.WielderArmy
 msgctxt "UI.WielderArmy"
 msgid "wielder's army"
-msgstr "위더의 군대"
+msgstr "ìœ„ë”ì˜ êµ°ëŒ€"
 
 #. UI.StatusCorrupt
 msgctxt "UI.StatusCorrupt"
 msgid "corrupt"
-msgstr "손상됨"
+msgstr "ì†ìƒë¨"
 
 #. UI.StatusMissing
 msgctxt "UI.StatusMissing"
 msgid "missing"
-msgstr "부족함"
+msgstr "ë¶€ì¡±í•¨"
 
 #. UI.StatusUnavailable
 msgctxt "UI.StatusUnavailable"
 msgid "unavailable"
-msgstr "사용 불가"
+msgstr "ì‚¬ìš© ë¶ˆê°€"
 
 #. UI.BufferEmpty
 msgctxt "UI.BufferEmpty"
 msgid "Buffer empty"
-msgstr "버퍼가 비어 있음"
+msgstr "ë²„í¼ê°€ ë¹„ì–´ ìžˆìŒ"
 
 #. UI.NoScannerResults
 msgctxt "UI.NoScannerResults"
 msgid "No scanner results"
-msgstr "스캐너 결과 없음"
+msgstr "ìŠ¤ìºë„ˆ ê²°ê³¼ ì—†ìŒ"
 
 #. UI.NotInMovementRange
 msgctxt "UI.NotInMovementRange"
 msgid "Not in movement range"
-msgstr "이동 범위 밖"
+msgstr "ì´ë™ ë²”ìœ„ ë°–"
 
 #. UI.ReviewBufferEvents
 msgctxt "UI.ReviewBufferEvents"
 msgid "Events"
-msgstr "이벤트"
+msgstr "ì´ë²¤íŠ¸"
 
 #. UI.ReviewBufferLine
 msgctxt "UI.ReviewBufferLine"
@@ -443,7 +443,7 @@ msgstr "{0}. {1}"
 #. UI.ReviewBufferNotifications
 msgctxt "UI.ReviewBufferNotifications"
 msgid "Notifications"
-msgstr "알림"
+msgstr "ì•Œë¦¼"
 
 #. UI.ReviewBufferUi
 msgctxt "UI.ReviewBufferUi"
@@ -458,112 +458,112 @@ msgstr "{0}, {1}. {2}"
 #. UI.SelectedCount
 msgctxt "UI.SelectedCount"
 msgid "selected {0}x"
-msgstr "{0}개 선택됨"
+msgstr "{0}ê°œ ì„ íƒë¨"
 
 #. UI.Unselected
 msgctxt "UI.Unselected"
 msgid "unselected"
-msgstr "선택 해제됨"
+msgstr "ì„ íƒ í•´ì œë¨"
 
 #. Screens.AdventureMap
 msgctxt "Screens.AdventureMap"
 msgid "Adventure map"
-msgstr "모험 지도"
+msgstr "ëª¨í—˜ ì§€ë„"
 
 #. Screens.ArcanaSpells
 msgctxt "Screens.ArcanaSpells"
 msgid "Arcana spells"
-msgstr "비전 주문"
+msgstr "ë¹„ì „ ì£¼ë¬¸"
 
 #. Screens.Army
 msgctxt "Screens.Army"
 msgid "army"
-msgstr "군대"
+msgstr "êµ°ëŒ€"
 
 #. Screens.Articles
 msgctxt "Screens.Articles"
 msgid "Articles"
-msgstr "문서"
+msgstr "ë¬¸ì„œ"
 
 #. Screens.AttackerEssence
 msgctxt "Screens.AttackerEssence"
 msgid "Attacker essence"
-msgstr "공격자 정수"
+msgstr "ê³µê²©ìž ì •ìˆ˜"
 
 #. Screens.Back
 msgctxt "Screens.Back"
 msgid "Back"
-msgstr "뒤로"
+msgstr "ë’¤ë¡œ"
 
 #. Screens.BattleLog
 msgctxt "Screens.BattleLog"
 msgid "Battle log"
-msgstr "전투 기록"
+msgstr "ì „íˆ¬ ê¸°ë¡"
 
 #. Screens.BattleResult
 msgctxt "Screens.BattleResult"
 msgid "Battle result"
-msgstr "전투 결과"
+msgstr "ì „íˆ¬ ê²°ê³¼"
 
 #. Screens.Categories
 msgctxt "Screens.Categories"
 msgid "Categories"
-msgstr "범주"
+msgstr "ë²”ì£¼"
 
 #. Screens.ChaosSpells
 msgctxt "Screens.ChaosSpells"
 msgid "Chaos spells"
-msgstr "혼돈 주문"
+msgstr "í˜¼ëˆ ì£¼ë¬¸"
 
 #. Screens.Choices
 msgctxt "Screens.Choices"
 msgid "Choices"
-msgstr "선택지"
+msgstr "ì„ íƒì§€"
 
 #. Screens.Close
 msgctxt "Screens.Close"
 msgid "Close"
-msgstr "닫기"
+msgstr "ë‹«ê¸°"
 
 #. Screens.Combat
 msgctxt "Screens.Combat"
 msgid "Combat"
-msgstr "전투"
+msgstr "ì „íˆ¬"
 
 #. Screens.CreationSpells
 msgctxt "Screens.CreationSpells"
 msgid "Creation spells"
-msgstr "창조 주문"
+msgstr "ì°½ì¡° ì£¼ë¬¸"
 
 #. Screens.CurrentTroop
 msgctxt "Screens.CurrentTroop"
 msgid "Current troop, {0}"
-msgstr "현재 부대, {0}"
+msgstr "í˜„ìž¬ ë¶€ëŒ€, {0}"
 
 #. Screens.DefenderEssence
 msgctxt "Screens.DefenderEssence"
 msgid "Defender essence"
-msgstr "방어자 정수"
+msgstr "ë°©ì–´ìž ì •ìˆ˜"
 
 #. Screens.DefendingWielderArmy
 msgctxt "Screens.DefendingWielderArmy"
 msgid "defending wielder army"
-msgstr "방어 중인 위더 군대"
+msgstr "ë°©ì–´ ì¤‘ì¸ ìœ„ë” êµ°ëŒ€"
 
 #. Screens.Description
 msgctxt "Screens.Description"
 msgid "Description"
-msgstr "설명"
+msgstr "ì„¤ëª…"
 
 #. Screens.DescriptionWithMissingBuilding
 msgctxt "Screens.DescriptionWithMissingBuilding"
 msgid "{0}. missing building"
-msgstr "{0}. 건물 부족"
+msgstr "{0}. ê±´ë¬¼ ë¶€ì¡±"
 
 #. Screens.DestructionSpells
 msgctxt "Screens.DestructionSpells"
 msgid "Destruction spells"
-msgstr "파괴 주문"
+msgstr "íŒŒê´´ ì£¼ë¬¸"
 
 #. Screens.DisabledWithReason
 msgctxt "Screens.DisabledWithReason"
@@ -573,142 +573,157 @@ msgstr "{0}. {1}"
 #. Screens.Empty
 msgctxt "Screens.Empty"
 msgid "empty"
-msgstr "비어 있음"
+msgstr "ë¹„ì–´ ìžˆìŒ"
 
 #. Screens.EmptySlot
 msgctxt "Screens.EmptySlot"
 msgid "Empty, slot {0}"
-msgstr "비어 있음, 슬롯 {0}"
+msgstr "ë¹„ì–´ ìžˆìŒ, ìŠ¬ë¡¯ {0}"
 
 #. Screens.EjectWielder
 msgctxt "Screens.EjectWielder"
 msgid "Eject wielder"
-msgstr "위더 내보내기"
+msgstr "ìœ„ë” ë‚´ë³´ë‚´ê¸°"
 
 #. Screens.GraphAccessibilityTodo
 msgctxt "Screens.GraphAccessibilityTodo"
 msgid "TODO: implement accessibility for graph"
-msgstr "TODO: 그래프 접근성 구현"
+msgstr "TODO: ê·¸ëž˜í”„ ì ‘ê·¼ì„± êµ¬í˜„"
 
 #. Screens.GraphType
 msgctxt "Screens.GraphType"
 msgid "Graph type"
-msgstr "그래프 유형"
+msgstr "ê·¸ëž˜í”„ ìœ í˜•"
 
 #. Screens.Group
 msgctxt "Screens.Group"
 msgid "Group {0}"
-msgstr "그룹 {0}"
+msgstr "ê·¸ë£¹ {0}"
 
 #. Screens.MainMenu
 msgctxt "Screens.MainMenu"
 msgid "Main menu"
-msgstr "주 메뉴"
+msgstr "ì£¼ ë©”ë‰´"
 
 #. Screens.Missing
 msgctxt "Screens.Missing"
 msgid "Missing {0}"
-msgstr "{0} 부족"
+msgstr "{0} ë¶€ì¡±"
 
 #. Screens.MissingBuilding
 msgctxt "Screens.MissingBuilding"
 msgid "missing building"
-msgstr "건물 부족"
+msgstr "ê±´ë¬¼ ë¶€ì¡±"
 
 #. Screens.ModSettings
 msgctxt "Screens.ModSettings"
 msgid "Mod settings"
-msgstr "모드 설정"
+msgstr "ëª¨ë“œ ì„¤ì •"
 
 #. Screens.ModifierCategoryTabs
 msgctxt "Screens.ModifierCategoryTabs"
 msgid "Modifier category tabs"
-msgstr "수정치 범주 탭"
+msgstr "ìˆ˜ì •ì¹˜ ë²”ì£¼ íƒ­"
 
 #. Screens.MultiEssenceSpells
 msgctxt "Screens.MultiEssenceSpells"
 msgid "Multi-essence spells"
-msgstr "다중 정수 주문"
+msgstr "ë‹¤ì¤‘ ì •ìˆ˜ ì£¼ë¬¸"
 
 #. Screens.NamedArmy
 msgctxt "Screens.NamedArmy"
 msgid "{0} army"
-msgstr "{0} 군대"
+msgstr "{0} êµ°ëŒ€"
 
 #. Screens.NamedLevel
 msgctxt "Screens.NamedLevel"
 msgid "{0}, level {1}"
-msgstr "{0}, 레벨 {1}"
+msgstr "{0}, ë ˆë²¨ {1}"
 
 #. Screens.NamedMenu
 msgctxt "Screens.NamedMenu"
 msgid "{0} menu"
-msgstr "{0} 메뉴"
+msgstr "{0} ë©”ë‰´"
 
 #. Screens.Next
 msgctxt "Screens.Next"
 msgid "Next"
-msgstr "다음"
+msgstr "ë‹¤ìŒ"
 
 #. Screens.None
 msgctxt "Screens.None"
 msgid "None"
-msgstr "없음"
+msgstr "ì—†ìŒ"
 
 #. Screens.Notifications
 msgctxt "Screens.Notifications"
 msgid "Notifications"
-msgstr "알림"
+msgstr "ì•Œë¦¼"
 
 #. Screens.Objectives
 msgctxt "Screens.Objectives"
 msgid "Objectives"
-msgstr "목표"
+msgstr "ëª©í‘œ"
+
+#. Screens.ObjectiveMarkerFarAway
+msgctxt "Screens.ObjectiveMarkerFarAway"
+msgid "far away"
+msgstr "멀리"
+
+#. Screens.ObjectiveMarkerNearby
+msgctxt "Screens.ObjectiveMarkerNearby"
+msgid "nearby"
+msgstr "가까이"
+
+#. Screens.ObjectiveMarkerSomeDistance
+msgctxt "Screens.ObjectiveMarkerSomeDistance"
+msgid "some distance"
+msgstr "어느 정도 떨어짐"
 
 #. Screens.Ok
 msgctxt "Screens.Ok"
 msgid "OK"
-msgstr "확인"
+msgstr "í™•ì¸"
 
 #. Screens.OrderSpells
 msgctxt "Screens.OrderSpells"
 msgid "Order spells"
-msgstr "질서 주문"
+msgstr "ì§ˆì„œ ì£¼ë¬¸"
 
 #. Screens.PostAdventureResult
 msgctxt "Screens.PostAdventureResult"
 msgid "Post adventure result"
-msgstr "모험 후 결과"
+msgstr "ëª¨í—˜ í›„ ê²°ê³¼"
 
 #. Screens.PostAdventureStats
 msgctxt "Screens.PostAdventureStats"
 msgid "Post adventure stats"
-msgstr "모험 후 통계"
+msgstr "ëª¨í—˜ í›„ í†µê³„"
 
 #. Screens.Previous
 msgctxt "Screens.Previous"
 msgid "Previous"
-msgstr "이전"
+msgstr "ì´ì „"
 
 #. Screens.Quickbar
 msgctxt "Screens.Quickbar"
 msgid "Quickbar"
-msgstr "빠른바"
+msgstr "ë¹ ë¥¸ë°”"
 
 #. Screens.ReadEnemyInfluence
 msgctxt "Screens.ReadEnemyInfluence"
 msgid "Read attack, deadly and movement range for enemies on tiles in combat"
-msgstr "전투 중 칸 위 적의 공격, 치명 및 이동 범위 읽기"
+msgstr "ì „íˆ¬ ì¤‘ ì¹¸ ìœ„ ì ì˜ ê³µê²©, ì¹˜ëª… ë° ì´ë™ ë²”ìœ„ ì½ê¸°"
 
 #. Screens.RecruitFrom
 msgctxt "Screens.RecruitFrom"
 msgid "Recruit from"
-msgstr "모집 출처"
+msgstr "ëª¨ì§‘ ì¶œì²˜"
 
 #. Screens.RecruitingFrom
 msgctxt "Screens.RecruitingFrom"
 msgid "Recruiting from {0}"
-msgstr "{0}에서 모집 중"
+msgstr "{0}ì—ì„œ ëª¨ì§‘ ì¤‘"
 
 #. Screens.ResearchTier
 msgctxt "Screens.ResearchTier"
@@ -718,724 +733,724 @@ msgstr "{0} ({1} {2})"
 #. Screens.Resources
 msgctxt "Screens.Resources"
 msgid "Resources"
-msgstr "자원"
+msgstr "ìžì›"
 
 #. Screens.Round
 msgctxt "Screens.Round"
 msgid "Round {0}"
-msgstr "{0}라운드"
+msgstr "{0}ë¼ìš´ë“œ"
 
 #. Screens.SettlementTroops
 msgctxt "Screens.SettlementTroops"
 msgid "settlement troops"
-msgstr "정착지 부대"
+msgstr "ì •ì°©ì§€ ë¶€ëŒ€"
 
 #. Screens.Skill
 msgctxt "Screens.Skill"
 msgid "Skill {0}"
-msgstr "기술 {0}"
+msgstr "ê¸°ìˆ  {0}"
 
 #. Screens.SlotValue
 msgctxt "Screens.SlotValue"
 msgid "Slot {0}: {1}"
-msgstr "슬롯 {0}: {1}"
+msgstr "ìŠ¬ë¡¯ {0}: {1}"
 
 #. Screens.SpellTier
 msgctxt "Screens.SpellTier"
 msgid "{0} tier {1}"
-msgstr "{0} 티어 {1}"
+msgstr "{0} í‹°ì–´ {1}"
 
 #. Screens.Tabs
 msgctxt "Screens.Tabs"
 msgid "Tabs"
-msgstr "탭"
+msgstr "íƒ­"
 
 #. Screens.Teams
 msgctxt "Screens.Teams"
 msgid "Teams"
-msgstr "팀"
+msgstr "íŒ€"
 
 #. Screens.TooltipActions
 msgctxt "Screens.TooltipActions"
 msgid "Tooltip actions"
-msgstr "툴팁 동작"
+msgstr "íˆ´íŒ ë™ìž‘"
 
 #. Screens.Tier
 msgctxt "Screens.Tier"
 msgid "Tier"
-msgstr "티어"
+msgstr "í‹°ì–´"
 
 #. Screens.Tower
 msgctxt "Screens.Tower"
 msgid "Tower {0}"
-msgstr "탑 {0}"
+msgstr "íƒ‘ {0}"
 
 #. Screens.TroopLost
 msgctxt "Screens.TroopLost"
 msgid "{0} lost"
-msgstr "{0} 손실"
+msgstr "{0} ì†ì‹¤"
 
 #. Screens.TroopManagement
 msgctxt "Screens.TroopManagement"
 msgid "Troop management"
-msgstr "부대 관리"
+msgstr "ë¶€ëŒ€ ê´€ë¦¬"
 
 #. Screens.TroopDistribution
 msgctxt "Screens.TroopDistribution"
 msgid "troop distribution"
-msgstr "부대 분배"
+msgstr "ë¶€ëŒ€ ë¶„ë°°"
 
 #. Screens.TroopPlacement
 msgctxt "Screens.TroopPlacement"
 msgid "Troop placement"
-msgstr "부대 배치"
+msgstr "ë¶€ëŒ€ ë°°ì¹˜"
 
 #. Screens.TroopSlot
 msgctxt "Screens.TroopSlot"
 msgid "Troop slot {0}"
-msgstr "부대 슬롯 {0}"
+msgstr "ë¶€ëŒ€ ìŠ¬ë¡¯ {0}"
 
 #. Screens.TurnOrder
 msgctxt "Screens.TurnOrder"
 msgid "Turn order"
-msgstr "턴 순서"
+msgstr "í„´ ìˆœì„œ"
 
 #. Screens.Unavailable
 msgctxt "Screens.Unavailable"
 msgid "Unavailable"
-msgstr "사용 불가"
+msgstr "ì‚¬ìš© ë¶ˆê°€"
 
 #. Screens.VisitingWielderArmy
 msgctxt "Screens.VisitingWielderArmy"
 msgid "visiting wielder army"
-msgstr "방문 중인 위더 군대"
+msgstr "ë°©ë¬¸ ì¤‘ì¸ ìœ„ë” êµ°ëŒ€"
 
 #. Screens.WielderArmyPossessive
 msgctxt "Screens.WielderArmyPossessive"
 msgid "{0}'s army"
-msgstr "{0}의 군대"
+msgstr "{0}ì˜ êµ°ëŒ€"
 
 #. Screens.WielderArmy
 msgctxt "Screens.WielderArmy"
 msgid "wielder army"
-msgstr "위더 군대"
+msgstr "ìœ„ë” êµ°ëŒ€"
 
 #. Screens.Wielders
 msgctxt "Screens.Wielders"
 msgid "Wielders"
-msgstr "위더"
+msgstr "ìœ„ë”"
 
 #. Screens.WielderStats
 msgctxt "Screens.WielderStats"
 msgid "{0}'s stats"
-msgstr "{0}의 능력치"
+msgstr "{0}ì˜ ëŠ¥ë ¥ì¹˜"
 
 #. Screens.WielderModifierCategories
 msgctxt "Screens.WielderModifierCategories"
 msgid "{0}'s modifier categories"
-msgstr "{0}의 수정치 범주"
+msgstr "{0}ì˜ ìˆ˜ì •ì¹˜ ë²”ì£¼"
 
 #. Screens.WorldChoiceMenu
 msgctxt "Screens.WorldChoiceMenu"
 msgid "World choice menu"
-msgstr "세계 선택 메뉴"
+msgstr "ì„¸ê³„ ì„ íƒ ë©”ë‰´"
 
 #. Screens.WorldConfirmationMenu
 msgctxt "Screens.WorldConfirmationMenu"
 msgid "World confirmation menu"
-msgstr "세계 확인 메뉴"
+msgstr "ì„¸ê³„ í™•ì¸ ë©”ë‰´"
 
 #. Screens.RemoveFromQuickbar
 msgctxt "Screens.RemoveFromQuickbar"
 msgid "Remove from quickbar"
-msgstr "빠른 표시줄에서 제거"
+msgstr "ë¹ ë¥¸ í‘œì‹œì¤„ì—ì„œ ì œê±°"
 
 #. Screens.AmountToUpgrade
 msgctxt "Screens.AmountToUpgrade"
 msgid "Amount to upgrade, {0}"
-msgstr "{0} 업그레이드 수량"
+msgstr "{0} ì—…ê·¸ë ˆì´ë“œ ìˆ˜ëŸ‰"
 
 #. Screens.UnknownSpell
 msgctxt "Screens.UnknownSpell"
 msgid "unknown spell"
-msgstr "알 수 없는 주문"
+msgstr "ì•Œ ìˆ˜ ì—†ëŠ” ì£¼ë¬¸"
 
 
 #. Screens.EnemyWielder
 msgctxt "Screens.EnemyWielder"
 msgid "enemy wielder {0}"
-msgstr "적 위더 {0}"
+msgstr "ì  ìœ„ë” {0}"
 
 
 #. Actions.Activate
 msgctxt "Actions.Activate"
 msgid "Activate"
-msgstr "실행"
+msgstr "ì‹¤í–‰"
 
 #. Actions.Cancel
 msgctxt "Actions.Cancel"
 msgid "Cancel"
-msgstr "취소"
+msgstr "ì·¨ì†Œ"
 
 #. Actions.CombatFocusTimeline
 msgctxt "Actions.CombatFocusTimeline"
 msgid "Focus Timeline"
-msgstr "타임라인에 초점"
+msgstr "íƒ€ìž„ë¼ì¸ì— ì´ˆì "
 
 #. Actions.CombatInspect
 msgctxt "Actions.CombatInspect"
 msgid "Inspect Combat Hex"
-msgstr "전투 육각 조사"
+msgstr "ì „íˆ¬ ìœ¡ê° ì¡°ì‚¬"
 
 #. Actions.CombatNextRelevantTile
 msgctxt "Actions.CombatNextRelevantTile"
 msgid "Next Relevant Combat Tile"
-msgstr "다음 관련 전투 칸"
+msgstr "ë‹¤ìŒ ê´€ë ¨ ì „íˆ¬ ì¹¸"
 
 #. Actions.CombatPreviousRelevantTile
 msgctxt "Actions.CombatPreviousRelevantTile"
 msgid "Previous Relevant Combat Tile"
-msgstr "이전 관련 전투 칸"
+msgstr "ì´ì „ ê´€ë ¨ ì „íˆ¬ ì¹¸"
 
 #. Actions.FirstBufferLine
 msgctxt "Actions.FirstBufferLine"
 msgid "First Buffer Line"
-msgstr "처음 버퍼 줄"
+msgstr "ì²˜ìŒ ë²„í¼ ì¤„"
 
 #. Actions.FirstMenuItem
 msgctxt "Actions.FirstMenuItem"
 msgid "First Menu Item"
-msgstr "처음 메뉴 항목"
+msgstr "ì²˜ìŒ ë©”ë‰´ í•­ëª©"
 
 #. Actions.FirstRow
 msgctxt "Actions.FirstRow"
 msgid "First Row"
-msgstr "처음 행"
+msgstr "ì²˜ìŒ í–‰"
 
 #. Actions.HexGridEast
 msgctxt "Actions.HexGridEast"
 msgid "Hex Grid East"
-msgstr "육각 격자 동쪽"
+msgstr "ìœ¡ê° ê²©ìž ë™ìª½"
 
 #. Actions.HexGridNorthEast
 msgctxt "Actions.HexGridNorthEast"
 msgid "Hex Grid Northeast"
-msgstr "육각 격자 북동쪽"
+msgstr "ìœ¡ê° ê²©ìž ë¶ë™ìª½"
 
 #. Actions.HexGridNorthWest
 msgctxt "Actions.HexGridNorthWest"
 msgid "Hex Grid Northwest"
-msgstr "육각 격자 북서쪽"
+msgstr "ìœ¡ê° ê²©ìž ë¶ì„œìª½"
 
 #. Actions.HexGridSouthEast
 msgctxt "Actions.HexGridSouthEast"
 msgid "Hex Grid Southeast"
-msgstr "육각 격자 남동쪽"
+msgstr "ìœ¡ê° ê²©ìž ë‚¨ë™ìª½"
 
 #. Actions.HexGridSouthWest
 msgctxt "Actions.HexGridSouthWest"
 msgid "Hex Grid Southwest"
-msgstr "육각 격자 남서쪽"
+msgstr "ìœ¡ê° ê²©ìž ë‚¨ì„œìª½"
 
 #. Actions.HexGridWest
 msgctxt "Actions.HexGridWest"
 msgid "Hex Grid West"
-msgstr "육각 격자 서쪽"
+msgstr "ìœ¡ê° ê²©ìž ì„œìª½"
 
 #. Actions.LastBufferLine
 msgctxt "Actions.LastBufferLine"
 msgid "Last Buffer Line"
-msgstr "마지막 버퍼 줄"
+msgstr "ë§ˆì§€ë§‰ ë²„í¼ ì¤„"
 
 #. Actions.LastMenuItem
 msgctxt "Actions.LastMenuItem"
 msgid "Last Menu Item"
-msgstr "마지막 메뉴 항목"
+msgstr "ë§ˆì§€ë§‰ ë©”ë‰´ í•­ëª©"
 
 #. Actions.LastRow
 msgctxt "Actions.LastRow"
 msgid "Last Row"
-msgstr "마지막 행"
+msgstr "ë§ˆì§€ë§‰ í–‰"
 
 #. Actions.MapMoveEast
 msgctxt "Actions.MapMoveEast"
 msgid "Map Move East"
-msgstr "지도를 동쪽으로 이동"
+msgstr "ì§€ë„ë¥¼ ë™ìª½ìœ¼ë¡œ ì´ë™"
 
 #. Actions.MapMoveNorth
 msgctxt "Actions.MapMoveNorth"
 msgid "Map Move North"
-msgstr "지도를 북쪽으로 이동"
+msgstr "ì§€ë„ë¥¼ ë¶ìª½ìœ¼ë¡œ ì´ë™"
 
 #. Actions.MapMoveSouth
 msgctxt "Actions.MapMoveSouth"
 msgid "Map Move South"
-msgstr "지도를 남쪽으로 이동"
+msgstr "ì§€ë„ë¥¼ ë‚¨ìª½ìœ¼ë¡œ ì´ë™"
 
 #. Actions.MapMoveWest
 msgctxt "Actions.MapMoveWest"
 msgid "Map Move West"
-msgstr "지도를 서쪽으로 이동"
+msgstr "ì§€ë„ë¥¼ ì„œìª½ìœ¼ë¡œ ì´ë™"
 
 #. Actions.MapSecondaryAction
 msgctxt "Actions.MapSecondaryAction"
 msgid "Map Secondary Action"
-msgstr "지도 보조 동작"
+msgstr "ì§€ë„ ë³´ì¡° ë™ìž‘"
 
 #. Actions.NextBuffer
 msgctxt "Actions.NextBuffer"
 msgid "Next Buffer"
-msgstr "다음 버퍼"
+msgstr "ë‹¤ìŒ ë²„í¼"
 
 #. Actions.NextBufferLine
 msgctxt "Actions.NextBufferLine"
 msgid "Next Buffer Line"
-msgstr "다음 버퍼 줄"
+msgstr "ë‹¤ìŒ ë²„í¼ ì¤„"
 
 #. Actions.NextColumn
 msgctxt "Actions.NextColumn"
 msgid "Next Column"
-msgstr "다음 열"
+msgstr "ë‹¤ìŒ ì—´"
 
 #. Actions.NextHeading
 msgctxt "Actions.NextHeading"
 msgid "Next Heading"
-msgstr "다음 제목"
+msgstr "ë‹¤ìŒ ì œëª©"
 
 #. Actions.NextMenuItem
 msgctxt "Actions.NextMenuItem"
 msgid "Next Menu Item"
-msgstr "다음 메뉴 항목"
+msgstr "ë‹¤ìŒ ë©”ë‰´ í•­ëª©"
 
 #. Actions.NextRow
 msgctxt "Actions.NextRow"
 msgid "Next Row"
-msgstr "다음 행"
+msgstr "ë‹¤ìŒ í–‰"
 
 #. Actions.NextSettlement
 msgctxt "Actions.NextSettlement"
 msgid "Next Settlement"
-msgstr "다음 정착지"
+msgstr "ë‹¤ìŒ ì •ì°©ì§€"
 
 #. Actions.NextWidget
 msgctxt "Actions.NextWidget"
 msgid "Next Widget"
-msgstr "다음 위젯"
+msgstr "ë‹¤ìŒ ìœ„ì ¯"
 
 #. Actions.NextWielder
 msgctxt "Actions.NextWielder"
 msgid "Next Wielder"
-msgstr "다음 위더"
+msgstr "ë‹¤ìŒ ìœ„ë”"
 
 #. Actions.OpenModSettings
 msgctxt "Actions.OpenModSettings"
 msgid "Open Mod Settings"
-msgstr "모드 설정 열기"
+msgstr "ëª¨ë“œ ì„¤ì • ì—´ê¸°"
 
 #. Actions.PreviousBuffer
 msgctxt "Actions.PreviousBuffer"
 msgid "Previous Buffer"
-msgstr "이전 버퍼"
+msgstr "ì´ì „ ë²„í¼"
 
 #. Actions.PreviousBufferLine
 msgctxt "Actions.PreviousBufferLine"
 msgid "Previous Buffer Line"
-msgstr "이전 버퍼 줄"
+msgstr "ì´ì „ ë²„í¼ ì¤„"
 
 #. Actions.PreviousColumn
 msgctxt "Actions.PreviousColumn"
 msgid "Previous Column"
-msgstr "이전 열"
+msgstr "ì´ì „ ì—´"
 
 #. Actions.PreviousHeading
 msgctxt "Actions.PreviousHeading"
 msgid "Previous Heading"
-msgstr "이전 제목"
+msgstr "ì´ì „ ì œëª©"
 
 #. Actions.PreviousMenuItem
 msgctxt "Actions.PreviousMenuItem"
 msgid "Previous Menu Item"
-msgstr "이전 메뉴 항목"
+msgstr "ì´ì „ ë©”ë‰´ í•­ëª©"
 
 #. Actions.PreviousRow
 msgctxt "Actions.PreviousRow"
 msgid "Previous Row"
-msgstr "이전 행"
+msgstr "ì´ì „ í–‰"
 
 #. Actions.PreviousWidget
 msgctxt "Actions.PreviousWidget"
 msgid "Previous Widget"
-msgstr "이전 위젯"
+msgstr "ì´ì „ ìœ„ì ¯"
 
 #. Actions.ReadThreat
 msgctxt "Actions.ReadThreat"
 msgid "Read Threat"
-msgstr "위협 읽기"
+msgstr "ìœ„í˜‘ ì½ê¸°"
 
 #. Actions.ScannerJumpToResult
 msgctxt "Actions.ScannerJumpToResult"
 msgid "Jump To Scanner Result"
-msgstr "스캐너 결과로 이동"
+msgstr "ìŠ¤ìºë„ˆ ê²°ê³¼ë¡œ ì´ë™"
 
 #. Actions.ScannerNextCategory
 msgctxt "Actions.ScannerNextCategory"
 msgid "Next Scanner Category"
-msgstr "다음 스캐너 범주"
+msgstr "ë‹¤ìŒ ìŠ¤ìºë„ˆ ë²”ì£¼"
 
 #. Actions.ScannerNextResult
 msgctxt "Actions.ScannerNextResult"
 msgid "Next Scanner Result"
-msgstr "다음 스캐너 결과"
+msgstr "ë‹¤ìŒ ìŠ¤ìºë„ˆ ê²°ê³¼"
 
 #. Actions.ScannerNextSubcategory
 msgctxt "Actions.ScannerNextSubcategory"
 msgid "Next Scanner Subcategory"
-msgstr "다음 스캐너 하위 범주"
+msgstr "ë‹¤ìŒ ìŠ¤ìºë„ˆ í•˜ìœ„ ë²”ì£¼"
 
 #. Actions.ScannerPreviousCategory
 msgctxt "Actions.ScannerPreviousCategory"
 msgid "Previous Scanner Category"
-msgstr "이전 스캐너 범주"
+msgstr "ì´ì „ ìŠ¤ìºë„ˆ ë²”ì£¼"
 
 #. Actions.ScannerPreviousResult
 msgctxt "Actions.ScannerPreviousResult"
 msgid "Previous Scanner Result"
-msgstr "이전 스캐너 결과"
+msgstr "ì´ì „ ìŠ¤ìºë„ˆ ê²°ê³¼"
 
 #. Actions.ScannerPreviousSubcategory
 msgctxt "Actions.ScannerPreviousSubcategory"
 msgid "Previous Scanner Subcategory"
-msgstr "이전 스캐너 하위 범주"
+msgstr "ì´ì „ ìŠ¤ìºë„ˆ í•˜ìœ„ ë²”ì£¼"
 
 #. Actions.ScannerRefresh
 msgctxt "Actions.ScannerRefresh"
 msgid "Refresh Scanner"
-msgstr "스캐너 새로고침"
+msgstr "ìŠ¤ìºë„ˆ ìƒˆë¡œê³ ì¹¨"
 
 #. Actions.ScannerSpeakOrientation
 msgctxt "Actions.ScannerSpeakOrientation"
 msgid "Scanner Result Orientation"
-msgstr "스캐너 결과 방향"
+msgstr "ìŠ¤ìºë„ˆ ê²°ê³¼ ë°©í–¥"
 
 #. Actions.SliderDecrease
 msgctxt "Actions.SliderDecrease"
 msgid "Slider Decrease"
-msgstr "슬라이더 감소"
+msgstr "ìŠ¬ë¼ì´ë” ê°ì†Œ"
 
 #. Actions.SliderIncrease
 msgctxt "Actions.SliderIncrease"
 msgid "Slider Increase"
-msgstr "슬라이더 증가"
+msgstr "ìŠ¬ë¼ì´ë” ì¦ê°€"
 
 #. Actions.SliderMaximum
 msgctxt "Actions.SliderMaximum"
 msgid "Slider Maximum"
-msgstr "슬라이더 최대"
+msgstr "ìŠ¬ë¼ì´ë” ìµœëŒ€"
 
 #. Actions.SliderMinimum
 msgctxt "Actions.SliderMinimum"
 msgid "Slider Minimum"
-msgstr "슬라이더 최소"
+msgstr "ìŠ¬ë¼ì´ë” ìµœì†Œ"
 
 #. Actions.StartDrag
 msgctxt "Actions.StartDrag"
 msgid "Start Drag"
-msgstr "드래그 시작"
+msgstr "ë“œëž˜ê·¸ ì‹œìž‘"
 
 #. Actions.SummarizeEnemyResources
 msgctxt "Actions.SummarizeEnemyResources"
 msgid "Summarize Enemy Resources"
-msgstr "적 자원 요약"
+msgstr "ì  ìžì› ìš”ì•½"
 
 #. Actions.SummarizeResources
 msgctxt "Actions.SummarizeResources"
 msgid "Summarize Resources"
-msgstr "자원 요약"
+msgstr "ìžì› ìš”ì•½"
 
 #. Actions.TooltipActionsMenu
 msgctxt "Actions.TooltipActionsMenu"
 msgid "Tooltip Actions Menu"
-msgstr "툴팁 동작 메뉴"
+msgstr "íˆ´íŒ ë™ìž‘ ë©”ë‰´"
 
 #. Combat.AbilityUsed
 msgctxt "Combat.AbilityUsed"
 msgid "{0} uses {1}"
-msgstr "{0}이(가) {1} 사용"
+msgstr "{0}ì´(ê°€) {1} ì‚¬ìš©"
 
 #. Combat.Affects
 msgctxt "Combat.Affects"
 msgid "{0} affects {1}"
-msgstr "{0}이(가) {1}에 영향"
+msgstr "{0}ì´(ê°€) {1}ì— ì˜í–¥"
 
 #. Combat.Appears
 msgctxt "Combat.Appears"
 msgid "{0} appears"
-msgstr "{0} 등장"
+msgstr "{0} ë“±ìž¥"
 
 #. Combat.ArcanaEssence
 msgctxt "Combat.ArcanaEssence"
 msgid "arcana"
-msgstr "비전"
+msgstr "ë¹„ì „"
 
 #. Combat.Attack
 msgctxt "Combat.Attack"
 msgid "{0} {1} {2}"
-msgstr "{0}이(가) {2}에게 {1}"
+msgstr "{0}ì´(ê°€) {2}ì—ê²Œ {1}"
 
 #. Combat.AttackableEntity
 msgctxt "Combat.AttackableEntity"
 msgid "attackable entity"
-msgstr "공격 가능한 엔티티"
+msgstr "ê³µê²© ê°€ëŠ¥í•œ ì—”í‹°í‹°"
 
 #. Combat.AttackVerbDefault
 msgctxt "Combat.AttackVerbDefault"
 msgid "attacks"
-msgstr "공격"
+msgstr "ê³µê²©"
 
 #. Combat.AttackVerbOpportunity
 msgctxt "Combat.AttackVerbOpportunity"
 msgid "makes an opportunity attack against"
-msgstr "기회 공격"
+msgstr "ê¸°íšŒ ê³µê²©"
 
 #. Combat.AttackVerbOverwatch
 msgctxt "Combat.AttackVerbOverwatch"
 msgid "makes an overwatch attack against"
-msgstr "감시 공격"
+msgstr "ê°ì‹œ ê³µê²©"
 
 #. Combat.AttackVerbRetaliation
 msgctxt "Combat.AttackVerbRetaliation"
 msgid "retaliates against"
-msgstr "반격"
+msgstr "ë°˜ê²©"
 
 #. Combat.AttackVerbSpearwall
 msgctxt "Combat.AttackVerbSpearwall"
 msgid "makes a spearwall attack against"
-msgstr "창벽 공격"
+msgstr "ì°½ë²½ ê³µê²©"
 
 #. Combat.BattleOver
 msgctxt "Combat.BattleOver"
 msgid "Battle over"
-msgstr "전투 종료"
+msgstr "ì „íˆ¬ ì¢…ë£Œ"
 
 #. Combat.BlindFury
 msgctxt "Combat.BlindFury"
 msgid "blind fury"
-msgstr "눈먼 분노"
+msgstr "ëˆˆë¨¼ ë¶„ë…¸"
 
 #. Combat.BurrowsUp
 msgctxt "Combat.BurrowsUp"
 msgid "{0} burrows up"
-msgstr "{0}이(가) 땅에서 나옴"
+msgstr "{0}ì´(ê°€) ë•…ì—ì„œ ë‚˜ì˜´"
 
 #. Combat.CastsSpell
 msgctxt "Combat.CastsSpell"
 msgid "{0} casts {1}"
-msgstr "{0}이(가) {1} 시전"
+msgstr "{0}ì´(ê°€) {1} ì‹œì „"
 
 #. Combat.CastsSpellAt
 msgctxt "Combat.CastsSpellAt"
 msgid "{0} casts {1} at {2}"
-msgstr "{0}이(가) {2}에 {1} 시전"
+msgstr "{0}ì´(ê°€) {2}ì— {1} ì‹œì „"
 
 #. Combat.Challenge
 msgctxt "Combat.Challenge"
 msgid "challenge"
-msgstr "도전"
+msgstr "ë„ì „"
 
 #. Combat.ChaosEssence
 msgctxt "Combat.ChaosEssence"
 msgid "chaos"
-msgstr "혼돈"
+msgstr "í˜¼ëˆ"
 
 #. Combat.Created
 msgctxt "Combat.Created"
 msgid "{0} created"
-msgstr "{0} 생성됨"
+msgstr "{0} ìƒì„±ë¨"
 
 #. Combat.CreationEssence
 msgctxt "Combat.CreationEssence"
 msgid "creation"
-msgstr "창조"
+msgstr "ì°½ì¡°"
 
 #. Combat.DamageDestroyingItSuffix
 msgctxt "Combat.DamageDestroyingItSuffix"
 msgid ", destroying it"
-msgstr ", 파괴"
+msgstr ", íŒŒê´´"
 
 #. Combat.DamageKillsSuffix
 msgctxt "Combat.DamageKillsSuffix"
 msgid ", killing {0}"
-msgstr ", {0} 처치"
+msgstr ", {0} ì²˜ì¹˜"
 
 #. Combat.DealsDamage
 msgctxt "Combat.DealsDamage"
 msgid "{0} deals {1} {2} damage to {3}{4}"
-msgstr "{0}이(가) {3}에게 {1} {2} 피해를 줌{4}"
+msgstr "{0}ì´(ê°€) {3}ì—ê²Œ {1} {2} í”¼í•´ë¥¼ ì¤Œ{4}"
 
 #. Combat.Defeat
 msgctxt "Combat.Defeat"
 msgid "Defeat"
-msgstr "패배"
+msgstr "íŒ¨ë°°"
 
 #. Combat.Destroyed
 msgctxt "Combat.Destroyed"
 msgid "{0} destroyed"
-msgstr "{0} 파괴됨"
+msgstr "{0} íŒŒê´´ë¨"
 
 #. Combat.DestructionEssence
 msgctxt "Combat.DestructionEssence"
 msgid "destruction"
-msgstr "파괴"
+msgstr "íŒŒê´´"
 
 #. Combat.Draw
 msgctxt "Combat.Draw"
 msgid "Draw"
-msgstr "무승부"
+msgstr "ë¬´ìŠ¹ë¶€"
 
 #. Combat.Effect
 msgctxt "Combat.Effect"
 msgid "effect"
-msgstr "효과"
+msgstr "íš¨ê³¼"
 
 #. Combat.EnemyTroop
 msgctxt "Combat.EnemyTroop"
 msgid "{0} enemy {1}"
-msgstr "{0} 적 {1}"
+msgstr "{0} ì  {1}"
 
 #. Combat.EnemyTroops
 msgctxt "Combat.EnemyTroops"
 msgid "enemy troops"
-msgstr "적 부대"
+msgstr "ì  ë¶€ëŒ€"
 
 #. Combat.EssenceAmount
 msgctxt "Combat.EssenceAmount"
 msgid "+{0} {1} essence"
-msgstr "+{0} {1} 정수"
+msgstr "+{0} {1} ì •ìˆ˜"
 
 #. Combat.ExplosiveBarrel
 msgctxt "Combat.ExplosiveBarrel"
 msgid "explosive barrel"
-msgstr "폭발 통"
+msgstr "í­ë°œ í†µ"
 
 #. Combat.FailedBurrow
 msgctxt "Combat.FailedBurrow"
 msgid "{0}, failed burrow"
-msgstr "{0}, 굴파기 실패"
+msgstr "{0}, êµ´íŒŒê¸° ì‹¤íŒ¨"
 
 #. Combat.FaeyFire
 msgctxt "Combat.FaeyFire"
 msgid "Faey Fire"
-msgstr "페이 불꽃"
+msgstr "íŽ˜ì´ ë¶ˆê½ƒ"
 
 #. Combat.FaeyFireWithBolts
 msgctxt "Combat.FaeyFireWithBolts"
 msgid "{0} casts {1}, {2}"
-msgstr "{0}이(가) {1} 시전, {2}"
+msgstr "{0}ì´(ê°€) {1} ì‹œì „, {2}"
 
 #. Combat.Lunge
 msgctxt "Combat.Lunge"
 msgid "lunge"
-msgstr "돌진"
+msgstr "ëŒì§„"
 
 #. Combat.MapEntityDamage
 msgctxt "Combat.MapEntityDamage"
 msgid "map entity"
-msgstr "지도 엔티티"
+msgstr "ì§€ë„ ì—”í‹°í‹°"
 
 #. Combat.MeleeDamage
 msgctxt "Combat.MeleeDamage"
 msgid "melee"
-msgstr "근접"
+msgstr "ê·¼ì ‘"
 
 #. Combat.MothersLove
 msgctxt "Combat.MothersLove"
 msgid "mother's love"
-msgstr "어머니의 사랑"
+msgstr "ì–´ë¨¸ë‹ˆì˜ ì‚¬ëž‘"
 
 #. Combat.NewTurn
 msgctxt "Combat.NewTurn"
 msgid "It is {0}'s turn"
-msgstr "{0}의 턴"
+msgstr "{0}ì˜ í„´"
 
 #. Combat.OpportunityAttack
 msgctxt "Combat.OpportunityAttack"
 msgid "opportunity attack"
-msgstr "기회 공격"
+msgstr "ê¸°íšŒ ê³µê²©"
 
 #. Combat.OrderEssence
 msgctxt "Combat.OrderEssence"
 msgid "order"
-msgstr "질서"
+msgstr "ì§ˆì„œ"
 
 #. Combat.Overwatch
 msgctxt "Combat.Overwatch"
 msgid "overwatch"
-msgstr "감시"
+msgstr "ê°ì‹œ"
 
 #. Combat.PushedTo
 msgctxt "Combat.PushedTo"
 msgid "{0} pushed to {1}"
-msgstr "{0}이(가) {1}(으)로 밀림"
+msgstr "{0}ì´(ê°€) {1}(ìœ¼)ë¡œ ë°€ë¦¼"
 
 #. Combat.RangedDamage
 msgctxt "Combat.RangedDamage"
 msgid "ranged"
-msgstr "원거리"
+msgstr "ì›ê±°ë¦¬"
 
 #. Combat.RavenformsTo
 msgctxt "Combat.RavenformsTo"
 msgid "{0} ravenforms to {1}"
-msgstr "{0}이(가) 까마귀 형상으로 {1}(으)로 이동"
+msgstr "{0}ì´(ê°€) ê¹Œë§ˆê·€ í˜•ìƒìœ¼ë¡œ {1}(ìœ¼)ë¡œ ì´ë™"
 
 #. Combat.RemovedFrom
 msgctxt "Combat.RemovedFrom"
 msgid "{0} removed from {1}"
-msgstr "{0}이(가) {1}에서 제거됨"
+msgstr "{0}ì´(ê°€) {1}ì—ì„œ ì œê±°ë¨"
 
 #. Combat.Retaliation
 msgctxt "Combat.Retaliation"
 msgid "retaliation"
-msgstr "반격"
+msgstr "ë°˜ê²©"
 
 #. Combat.Spearwall
 msgctxt "Combat.Spearwall"
 msgid "spearwall"
-msgstr "창벽"
+msgstr "ì°½ë²½"
 
 #. Combat.SpellDamage
 msgctxt "Combat.SpellDamage"
 msgid "spell"
-msgstr "주문"
+msgstr "ì£¼ë¬¸"
 
 #. Combat.Splash
 msgctxt "Combat.Splash"
 msgid "splash"
-msgstr "범위"
+msgstr "ë²”ìœ„"
 
 #. Combat.Summoned
 msgctxt "Combat.Summoned"
 msgid "{0} summoned"
-msgstr "{0} 소환됨"
+msgstr "{0} ì†Œí™˜ë¨"
 
 #. Combat.TakesDamage
 msgctxt "Combat.TakesDamage"
 msgid "{0} takes {1} {2} damage{3}"
-msgstr "{0}이(가) {1} {2} 피해를 받음{3}"
+msgstr "{0}ì´(ê°€) {1} {2} í”¼í•´ë¥¼ ë°›ìŒ{3}"
 
 #. Combat.TeleportsTo
 msgctxt "Combat.TeleportsTo"
 msgid "{0} teleports to {1}"
-msgstr "{0}이(가) {1}(으)로 순간이동"
+msgstr "{0}ì´(ê°€) {1}(ìœ¼)ë¡œ ìˆœê°„ì´ë™"
 
 #. Combat.Tile
 msgctxt "Combat.Tile"
 msgid "tile {0}"
-msgstr "칸 {0}"
+msgstr "ì¹¸ {0}"
 
 #. Combat.Troop
 msgctxt "Combat.Troop"
 msgid "troop"
-msgstr "부대"
+msgstr "ë¶€ëŒ€"
 
 #. Combat.TroopAt
 msgctxt "Combat.TroopAt"
@@ -1445,7 +1460,7 @@ msgstr "{0}, {1}"
 #. Combat.TroopMoved
 msgctxt "Combat.TroopMoved"
 msgid "{0} moves to {1}"
-msgstr "{0}이(가) {1}(으)로 이동"
+msgstr "{0}ì´(ê°€) {1}(ìœ¼)ë¡œ ì´ë™"
 
 #. Combat.TroopQuantity
 msgctxt "Combat.TroopQuantity"
@@ -1455,662 +1470,662 @@ msgstr "{0} {1}"
 #. Combat.Unknown
 msgctxt "Combat.Unknown"
 msgid "unknown"
-msgstr "알 수 없음"
+msgstr "ì•Œ ìˆ˜ ì—†ìŒ"
 
 #. Combat.UnknownEntity
 msgctxt "Combat.UnknownEntity"
 msgid "unknown entity"
-msgstr "알 수 없는 엔티티"
+msgstr "ì•Œ ìˆ˜ ì—†ëŠ” ì—”í‹°í‹°"
 
 #. Combat.UnknownTarget
 msgctxt "Combat.UnknownTarget"
 msgid "unknown target"
-msgstr "알 수 없는 대상"
+msgstr "ì•Œ ìˆ˜ ì—†ëŠ” ëŒ€ìƒ"
 
 #. Combat.UnknownTroop
 msgctxt "Combat.UnknownTroop"
 msgid "unknown troop"
-msgstr "알 수 없는 부대"
+msgstr "ì•Œ ìˆ˜ ì—†ëŠ” ë¶€ëŒ€"
 
 #. Combat.Victory
 msgctxt "Combat.Victory"
 msgid "Victory"
-msgstr "승리"
+msgstr "ìŠ¹ë¦¬"
 
 #. Combat.Walkover
 msgctxt "Combat.Walkover"
 msgid "Walkover"
-msgstr "부전승"
+msgstr "ë¶€ì „ìŠ¹"
 
 #. Combat.Wielder
 msgctxt "Combat.Wielder"
 msgid "wielder"
-msgstr "위더"
+msgstr "ìœ„ë”"
 
 #. Combat.YourTroops
 msgctxt "Combat.YourTroops"
 msgid "your troops"
-msgstr "아군 부대"
+msgstr "ì•„êµ° ë¶€ëŒ€"
 
 #. Combat.BoltAt_0
 msgctxt "Combat.BoltAt_0"
 msgid "{0} bolt at {1}"
-msgstr "{0}발이 {1}에"
+msgstr "{0}ë°œì´ {1}ì—"
 
 #. Common.In
 msgctxt "Common.In"
 msgid "in {0}"
-msgstr "{0} 안"
+msgstr "{0} ì•ˆ"
 
 #. Common.CountOf
 msgctxt "Common.CountOf"
 msgid "{0} of {1}"
-msgstr "{1} 중 {0}"
+msgstr "{1} ì¤‘ {0}"
 
 #. Common.NamePossessive
 msgctxt "Common.NamePossessive"
 msgid "{0}'s"
-msgstr "{0}의"
+msgstr "{0}ì˜"
 
 #. Spatial.Acting
 msgctxt "Spatial.Acting"
 msgid "acting"
-msgstr "행동 중"
+msgstr "í–‰ë™ ì¤‘"
 
 #. Spatial.Attack
 msgctxt "Spatial.Attack"
 msgid "attack"
-msgstr "공격"
+msgstr "ê³µê²©"
 
 #. Spatial.AttackPreview
 msgctxt "Spatial.AttackPreview"
 msgid "Attack preview:"
-msgstr "공격 미리보기:"
+msgstr "ê³µê²© ë¯¸ë¦¬ë³´ê¸°:"
 
 #. Spatial.AttackRange
 msgctxt "Spatial.AttackRange"
 msgid "attack range"
-msgstr "공격 범위"
+msgstr "ê³µê²© ë²”ìœ„"
 
 #. Spatial.Blocked
 msgctxt "Spatial.Blocked"
 msgid "blocked"
-msgstr "막힘"
+msgstr "ë§‰íž˜"
 
 #. Spatial.Commander
 msgctxt "Spatial.Commander"
 msgid "Commander"
-msgstr "지휘관"
+msgstr "ì§€íœ˜ê´€"
 
 #. Spatial.CommanderPossessive
 msgctxt "Spatial.CommanderPossessive"
 msgid "commander's"
-msgstr "지휘관의"
+msgstr "ì§€íœ˜ê´€ì˜"
 
 #. Spatial.Cost
 msgctxt "Spatial.Cost"
 msgid "cost {0}"
-msgstr "비용 {0}"
+msgstr "ë¹„ìš© {0}"
 
 #. Spatial.DamagePreview
 msgctxt "Spatial.DamagePreview"
 msgid "{0}damage {1}"
-msgstr "{0}피해 {1}"
+msgstr "{0}í”¼í•´ {1}"
 
 #. Spatial.DeadlyRange
 msgctxt "Spatial.DeadlyRange"
 msgid "deadly range"
-msgstr "치명 범위"
+msgstr "ì¹˜ëª… ë²”ìœ„"
 
 #. Spatial.Deadly
 msgctxt "Spatial.Deadly"
 msgid "deadly"
-msgstr "치명적"
+msgstr "ì¹˜ëª…ì "
 
 #. Spatial.Debris
 msgctxt "Spatial.Debris"
 msgid "debris"
-msgstr "잔해"
+msgstr "ìž”í•´"
 
 #. Spatial.Destination
 msgctxt "Spatial.Destination"
 msgid "Destination"
-msgstr "목적지"
+msgstr "ëª©ì ì§€"
 
 #. Spatial.DestinationAt
 msgctxt "Spatial.DestinationAt"
 msgid "Destination: {0}"
-msgstr "목적지: {0}"
+msgstr "ëª©ì ì§€: {0}"
 
 #. Spatial.Destroys
 msgctxt "Spatial.Destroys"
 msgid "destroys"
-msgstr "파괴함"
+msgstr "íŒŒê´´í•¨"
 
 #. Spatial.ElevatedGroundHeight
 msgctxt "Spatial.ElevatedGroundHeight"
 msgid "elevated ground, height {0}"
-msgstr "고지대, 높이 {0}"
+msgstr "ê³ ì§€ëŒ€, ë†’ì´ {0}"
 
 #. Spatial.EnemySpawnPoint
 msgctxt "Spatial.EnemySpawnPoint"
 msgid "enemy spawn point"
-msgstr "적 출현 지점"
+msgstr "ì  ì¶œí˜„ ì§€ì "
 
 #. Spatial.Enemy
 msgctxt "Spatial.Enemy"
 msgid "enemy"
-msgstr "적"
+msgstr "ì "
 
 #. Spatial.ExtraTargetPrefix
 msgctxt "Spatial.ExtraTargetPrefix"
 msgid "extra target "
-msgstr "추가 대상 "
+msgstr "ì¶”ê°€ ëŒ€ìƒ "
 
 #. Spatial.Friendly
 msgctxt "Spatial.Friendly"
 msgid "friendly"
-msgstr "아군"
+msgstr "ì•„êµ°"
 
 #. Spatial.FurthestReachableInTurns
 msgctxt "Spatial.FurthestReachableInTurns"
 msgid "furthest reachable in {0} turns"
-msgstr "{0}턴 후 도달 가능한 최원 지점"
+msgstr "{0}í„´ í›„ ë„ë‹¬ ê°€ëŠ¥í•œ ìµœì› ì§€ì "
 
 #. Spatial.FurthestReachableThisTurn
 msgctxt "Spatial.FurthestReachableThisTurn"
 msgid "furthest reachable this turn"
-msgstr "이번 턴 도달 가능한 최원 지점"
+msgstr "ì´ë²ˆ í„´ ë„ë‹¬ ê°€ëŠ¥í•œ ìµœì› ì§€ì "
 
 #. Spatial.Health
 msgctxt "Spatial.Health"
 msgid "{0} / {1} health"
-msgstr "체력 {0} / {1}"
+msgstr "ì²´ë ¥ {0} / {1}"
 
 #. Spatial.Here
 msgctxt "Spatial.Here"
 msgid "here"
-msgstr "여기"
+msgstr "ì—¬ê¸°"
 
 #. Spatial.Impassable
 msgctxt "Spatial.Impassable"
 msgid "impassable"
-msgstr "통행 불가"
+msgstr "í†µí–‰ ë¶ˆê°€"
 
 #. Spatial.InteractionPoint
 msgctxt "Spatial.InteractionPoint"
 msgid "Interaction point"
-msgstr "상호작용 지점"
+msgstr "ìƒí˜¸ìž‘ìš© ì§€ì "
 
 #. Spatial.Interactable
 msgctxt "Spatial.Interactable"
 msgid "interactable"
-msgstr "상호작용 가능"
+msgstr "ìƒí˜¸ìž‘ìš© ê°€ëŠ¥"
 
 #. Spatial.InteractableNextTurn
 msgctxt "Spatial.InteractableNextTurn"
 msgid "interactable next turn"
-msgstr "다음 턴 상호작용 가능"
+msgstr "ë‹¤ìŒ í„´ ìƒí˜¸ìž‘ìš© ê°€ëŠ¥"
 
 #. Spatial.Kills
 msgctxt "Spatial.Kills"
 msgid "kills {0}"
-msgstr "{0} 처치"
+msgstr "{0} ì²˜ì¹˜"
 
 #. Spatial.MayDestroy
 msgctxt "Spatial.MayDestroy"
 msgid "may destroy"
-msgstr "파괴할 수 있음"
+msgstr "íŒŒê´´í•  ìˆ˜ ìžˆìŒ"
 
 #. Spatial.Movement
 msgctxt "Spatial.Movement"
 msgid "Movement"
-msgstr "이동"
+msgstr "ì´ë™"
 
 #. Spatial.MovementRange
 msgctxt "Spatial.MovementRange"
 msgid "movement range"
-msgstr "이동 범위"
+msgstr "ì´ë™ ë²”ìœ„"
 
 #. Spatial.Neutral
 msgctxt "Spatial.Neutral"
 msgid "neutral"
-msgstr "중립"
+msgstr "ì¤‘ë¦½"
 
 #. Spatial.NoRoutePreview
 msgctxt "Spatial.NoRoutePreview"
 msgid "no route preview"
-msgstr "경로 미리보기 없음"
+msgstr "ê²½ë¡œ ë¯¸ë¦¬ë³´ê¸° ì—†ìŒ"
 
 #. Spatial.OnRoute
 msgctxt "Spatial.OnRoute"
 msgid "On route"
-msgstr "경로상"
+msgstr "ê²½ë¡œìƒ"
 
 #. Spatial.PrimaryPrefix
 msgctxt "Spatial.PrimaryPrefix"
 msgid "primary "
-msgstr "주 대상 "
+msgstr "ì£¼ ëŒ€ìƒ "
 
 #. Spatial.RangeAndMovement
 msgctxt "Spatial.RangeAndMovement"
 msgid "{0} and movement range"
-msgstr "{0} 및 이동 범위"
+msgstr "{0} ë° ì´ë™ ë²”ìœ„"
 
 #. Spatial.Reachable
 msgctxt "Spatial.Reachable"
 msgid "reachable"
-msgstr "도달 가능"
+msgstr "ë„ë‹¬ ê°€ëŠ¥"
 
 #. Spatial.SpawnPoint
 msgctxt "Spatial.SpawnPoint"
 msgid "spawn point"
-msgstr "출현 지점"
+msgstr "ì¶œí˜„ ì§€ì "
 
 #. Spatial.Threatened
 msgctxt "Spatial.Threatened"
 msgid "Threatened"
-msgstr "위협받음"
+msgstr "ìœ„í˜‘ë°›ìŒ"
 
 #. Spatial.ThisTurnAt
 msgctxt "Spatial.ThisTurnAt"
 msgid "This turn: {0}"
-msgstr "이번 턴: {0}"
+msgstr "ì´ë²ˆ í„´: {0}"
 
 #. Spatial.TurnsIn
 msgctxt "Spatial.TurnsIn"
 msgid "in {0} turns"
-msgstr "{0}턴 후"
+msgstr "{0}í„´ í›„"
 
 #. Spatial.Unexplored
 msgctxt "Spatial.Unexplored"
 msgid "Unexplored"
-msgstr "미탐험"
+msgstr "ë¯¸íƒí—˜"
 
 #. Spatial.Unseen
 msgctxt "Spatial.Unseen"
 msgid "Unseen"
-msgstr "보이지 않음"
+msgstr "ë³´ì´ì§€ ì•ŠìŒ"
 
 #. Spatial.VisitedSuffix
 msgctxt "Spatial.VisitedSuffix"
 msgid "{0} (visited)"
-msgstr "{0} (방문함)"
+msgstr "{0} (ë°©ë¬¸í•¨)"
 
 #. Spatial.WithinZoneOfControl
 msgctxt "Spatial.WithinZoneOfControl"
 msgid "Within {0} zone of control"
-msgstr "{0} 통제 구역 안"
+msgstr "{0} í†µì œ êµ¬ì—­ ì•ˆ"
 
 #. Spatial.ZoneOfControl
 msgctxt "Spatial.ZoneOfControl"
 msgid "zone of control"
-msgstr "통제 구역"
+msgstr "í†µì œ êµ¬ì—­"
 
 #. Spatial.ZoneOfControlTiles
 msgctxt "Spatial.ZoneOfControlTiles"
 msgid "{0} within {1} zone of control"
-msgstr "{1} 통제 구역 안의 {0}"
+msgstr "{1} í†µì œ êµ¬ì—­ ì•ˆì˜ {0}"
 
 #. Screens.AiControl
 msgctxt "Screens.AiControl"
 msgid "AI control"
-msgstr "인공지능 제어"
+msgstr "ì¸ê³µì§€ëŠ¥ ì œì–´"
 
 #. Screens.Attacker
 msgctxt "Screens.Attacker"
 msgid "Attacker"
-msgstr "공격자"
+msgstr "ê³µê²©ìž"
 
 #. Screens.AttackerPortrait
 msgctxt "Screens.AttackerPortrait"
 msgid "Attacker portrait"
-msgstr "공격자 초상화"
+msgstr "ê³µê²©ìž ì´ˆìƒí™”"
 
 #. Screens.CombatPortraitDetail
 msgctxt "Screens.CombatPortraitDetail"
 msgid "{0}, {1}, level {2}"
-msgstr "{0}, {1}, 레벨 {2}"
+msgstr "{0}, {1}, ë ˆë²¨ {2}"
 
 #. Screens.Defender
 msgctxt "Screens.Defender"
 msgid "Defender"
-msgstr "방어자"
+msgstr "ë°©ì–´ìž"
 
 #. Screens.DefenderPortrait
 msgctxt "Screens.DefenderPortrait"
 msgid "Defender portrait"
-msgstr "방어자 초상화"
+msgstr "ë°©ì–´ìž ì´ˆìƒí™”"
 
 #. Screens.LevelValue
 msgctxt "Screens.LevelValue"
 msgid "level {0}"
-msgstr "레벨 {0}"
+msgstr "ë ˆë²¨ {0}"
 
 #. Screens.Opponent
 msgctxt "Screens.Opponent"
 msgid "Opponent"
-msgstr "상대"
+msgstr "ìƒëŒ€"
 
 #. Screens.YourWielder
 msgctxt "Screens.YourWielder"
 msgid "Your wielder"
-msgstr "내 소유자"
+msgstr "ë‚´ ì†Œìœ ìž"
 
 #. Scanner.All
 msgctxt "Scanner.All"
 msgid "All"
-msgstr "전체"
+msgstr "ì „ì²´"
 
 #. Scanner.ArtifactMarkets
 msgctxt "Scanner.ArtifactMarkets"
 msgid "Artifact markets"
-msgstr "유물 시장"
+msgstr "ìœ ë¬¼ ì‹œìž¥"
 
 #. Scanner.Attackable
 msgctxt "Scanner.Attackable"
 msgid "Attackable"
-msgstr "공격 가능"
+msgstr "ê³µê²© ê°€ëŠ¥"
 
 #. Scanner.Beacons
 msgctxt "Scanner.Beacons"
 msgid "Beacons"
-msgstr "봉화"
+msgstr "ë´‰í™”"
 
 #. Scanner.Blocked
 msgctxt "Scanner.Blocked"
 msgid "Blocked"
-msgstr "막힘"
+msgstr "ë§‰íž˜"
 
 #. Scanner.Bridges
 msgctxt "Scanner.Bridges"
 msgid "Bridges"
-msgstr "다리"
+msgstr "ë‹¤ë¦¬"
 
 #. Scanner.Buildings
 msgctxt "Scanner.Buildings"
 msgid "Buildings"
-msgstr "건물"
+msgstr "ê±´ë¬¼"
 
 #. Scanner.Dangerous
 msgctxt "Scanner.Dangerous"
 msgid "Dangerous"
-msgstr "위험"
+msgstr "ìœ„í—˜"
 
 #. Scanner.East
 msgctxt "Scanner.East"
 msgid "east"
-msgstr "동쪽"
+msgstr "ë™ìª½"
 
 #. Scanner.ElevatedGround
 msgctxt "Scanner.ElevatedGround"
 msgid "Elevated ground {0}"
-msgstr "고지대 {0}"
+msgstr "ê³ ì§€ëŒ€ {0}"
 
 #. Scanner.Enemy
 msgctxt "Scanner.Enemy"
 msgid "Enemy"
-msgstr "적"
+msgstr "ì "
 
 #. Scanner.EnemyGates
 msgctxt "Scanner.EnemyGates"
 msgid "Enemy gates"
-msgstr "적 관문"
+msgstr "ì  ê´€ë¬¸"
 
 #. Scanner.Entities
 msgctxt "Scanner.Entities"
 msgid "Entities"
-msgstr "개체"
+msgstr "ê°œì²´"
 
 #. Scanner.Friendly
 msgctxt "Scanner.Friendly"
 msgid "Friendly"
-msgstr "아군"
+msgstr "ì•„êµ°"
 
 #. Scanner.FriendlyGates
 msgctxt "Scanner.FriendlyGates"
 msgid "Friendly gates"
-msgstr "아군 관문"
+msgstr "ì•„êµ° ê´€ë¬¸"
 
 #. Scanner.Impassable
 msgctxt "Scanner.Impassable"
 msgid "Impassable"
-msgstr "통행 불가"
+msgstr "í†µí–‰ ë¶ˆê°€"
 
 #. Scanner.ImpassableTerrain
 msgctxt "Scanner.ImpassableTerrain"
 msgid "Impassable terrain"
-msgstr "통행 불가 지형"
+msgstr "í†µí–‰ ë¶ˆê°€ ì§€í˜•"
 
 #. Scanner.Knowledge
 msgctxt "Scanner.Knowledge"
 msgid "Knowledge"
-msgstr "지식"
+msgstr "ì§€ì‹"
 
 #. Scanner.Neutral
 msgctxt "Scanner.Neutral"
 msgid "Neutral"
-msgstr "중립"
+msgstr "ì¤‘ë¦½"
 
 #. Scanner.North
 msgctxt "Scanner.North"
 msgid "north"
-msgstr "북쪽"
+msgstr "ë¶ìª½"
 
 #. Scanner.Northeast
 msgctxt "Scanner.Northeast"
 msgid "northeast"
-msgstr "북동쪽"
+msgstr "ë¶ë™ìª½"
 
 #. Scanner.Northwest
 msgctxt "Scanner.Northwest"
 msgid "northwest"
-msgstr "북서쪽"
+msgstr "ë¶ì„œìª½"
 
 #. Scanner.Objectives
 msgctxt "Scanner.Objectives"
 msgid "Objectives"
-msgstr "목표"
+msgstr "ëª©í‘œ"
 
 #. Scanner.Obstacles
 msgctxt "Scanner.Obstacles"
 msgid "Obstacles"
-msgstr "장애물"
+msgstr "ìž¥ì• ë¬¼"
 
 #. Scanner.Pickups
 msgctxt "Scanner.Pickups"
 msgid "Pickups"
-msgstr "획득물"
+msgstr "íšë“ë¬¼"
 
 #. Scanner.Power
 msgctxt "Scanner.Power"
 msgid "Power"
-msgstr "힘"
+msgstr "íž˜"
 
 #. Scanner.Riches
 msgctxt "Scanner.Riches"
 msgid "Riches"
-msgstr "부"
+msgstr "ë¶€"
 
 #. Scanner.Roads
 msgctxt "Scanner.Roads"
 msgid "Roads"
-msgstr "도로"
+msgstr "ë„ë¡œ"
 
 #. Scanner.SettlementsAndBuildSites
 msgctxt "Scanner.SettlementsAndBuildSites"
 msgid "Settlements and Build sites"
-msgstr "정착지 및 건설 부지"
+msgstr "ì •ì°©ì§€ ë° ê±´ì„¤ ë¶€ì§€"
 
 #. Scanner.South
 msgctxt "Scanner.South"
 msgid "south"
-msgstr "남쪽"
+msgstr "ë‚¨ìª½"
 
 #. Scanner.Southeast
 msgctxt "Scanner.Southeast"
 msgid "southeast"
-msgstr "남동쪽"
+msgstr "ë‚¨ë™ìª½"
 
 #. Scanner.Southwest
 msgctxt "Scanner.Southwest"
 msgid "southwest"
-msgstr "남서쪽"
+msgstr "ë‚¨ì„œìª½"
 
 #. Scanner.Teleport
 msgctxt "Scanner.Teleport"
 msgid "Teleport"
-msgstr "순간이동"
+msgstr "ìˆœê°„ì´ë™"
 
 #. Scanner.Terrain
 msgctxt "Scanner.Terrain"
 msgid "Terrain"
-msgstr "지형"
+msgstr "ì§€í˜•"
 
 #. Scanner.TroopSources
 msgctxt "Scanner.TroopSources"
 msgid "Troop sources"
-msgstr "부대 공급원"
+msgstr "ë¶€ëŒ€ ê³µê¸‰ì›"
 
 #. Scanner.Troops
 msgctxt "Scanner.Troops"
 msgid "Troops"
-msgstr "부대"
+msgstr "ë¶€ëŒ€"
 
 #. Scanner.Unvisited
 msgctxt "Scanner.Unvisited"
 msgid "Unvisited"
-msgstr "방문 안 함"
+msgstr "ë°©ë¬¸ ì•ˆ í•¨"
 
 #. Scanner.Water
 msgctxt "Scanner.Water"
 msgid "Water"
-msgstr "물"
+msgstr "ë¬¼"
 
 #. Scanner.West
 msgctxt "Scanner.West"
 msgid "west"
-msgstr "서쪽"
+msgstr "ì„œìª½"
 
 #. Scanner.Wielders
 msgctxt "Scanner.Wielders"
 msgid "Wielders"
-msgstr "소유자"
+msgstr "ì†Œìœ ìž"
 
 #. Scanner.BlockedTileCount_0
 msgctxt "Scanner.BlockedTileCount_0"
 msgid "{0} blocked tile"
-msgstr "막힌 타일 {0}개"
+msgstr "ë§‰ížŒ íƒ€ì¼ {0}ê°œ"
 
 #. Scanner.BridgeTileCount_0
 msgctxt "Scanner.BridgeTileCount_0"
 msgid "{0} bridge tile"
-msgstr "다리 타일 {0}개"
+msgstr "ë‹¤ë¦¬ íƒ€ì¼ {0}ê°œ"
 
 #. Scanner.ImpassableTileCount_0
 msgctxt "Scanner.ImpassableTileCount_0"
 msgid "{0} impassable tile"
-msgstr "통행 불가 타일 {0}개"
+msgstr "í†µí–‰ ë¶ˆê°€ íƒ€ì¼ {0}ê°œ"
 
 #. Scanner.RoadTileCount_0
 msgctxt "Scanner.RoadTileCount_0"
 msgid "{0} road tile"
-msgstr "도로 타일 {0}개"
+msgstr "ë„ë¡œ íƒ€ì¼ {0}ê°œ"
 
 #. Scanner.WaterTileCount_0
 msgctxt "Scanner.WaterTileCount_0"
 msgid "{0} water tile"
-msgstr "물 타일 {0}개"
+msgstr "ë¬¼ íƒ€ì¼ {0}ê°œ"
 
 #. Spatial.AridTrees
 msgctxt "Spatial.AridTrees"
 msgid "Arid trees"
-msgstr "건조 지대 나무"
+msgstr "ê±´ì¡° ì§€ëŒ€ ë‚˜ë¬´"
 
 #. Spatial.Bridge
 msgctxt "Spatial.Bridge"
 msgid "Bridge"
-msgstr "다리"
+msgstr "ë‹¤ë¦¬"
 
 #. Spatial.CobblestoneRoad
 msgctxt "Spatial.CobblestoneRoad"
 msgid "Cobblestone road"
-msgstr "자갈길"
+msgstr "ìžê°ˆê¸¸"
 
 #. Spatial.DeepWater
 msgctxt "Spatial.DeepWater"
 msgid "Deep water"
-msgstr "깊은 물"
+msgstr "ê¹Šì€ ë¬¼"
 
 #. Spatial.Deforestation
 msgctxt "Spatial.Deforestation"
 msgid "Deforestation"
-msgstr "벌목지"
+msgstr "ë²Œëª©ì§€"
 
 #. Spatial.Decoration
 msgctxt "Spatial.Decoration"
 msgid "Decoration"
-msgstr "장식"
+msgstr "ìž¥ì‹"
 
 #. Spatial.DirtRoad
 msgctxt "Spatial.DirtRoad"
 msgid "Dirt road"
-msgstr "흙길"
+msgstr "í™ê¸¸"
 
 #. Spatial.Effect
 msgctxt "Spatial.Effect"
 msgid "Effect"
-msgstr "효과"
+msgstr "íš¨ê³¼"
 
 #. Spatial.Farmland
 msgctxt "Spatial.Farmland"
 msgid "Farmland"
-msgstr "농지"
+msgstr "ë†ì§€"
 
 #. Spatial.Fog
 msgctxt "Spatial.Fog"
 msgid "Fog"
-msgstr "안개"
+msgstr "ì•ˆê°œ"
 
 #. Spatial.Light
 msgctxt "Spatial.Light"
 msgid "Light"
-msgstr "빛"
+msgstr "ë¹›"
 
 #. Spatial.Mountains
 msgctxt "Spatial.Mountains"
 msgid "Mountains"
-msgstr "산"
+msgstr "ì‚°"
 
 #. Spatial.Road
 msgctxt "Spatial.Road"
 msgid "Road"
-msgstr "길"
+msgstr "ê¸¸"
 
 #. Spatial.ShallowWater
 msgctxt "Spatial.ShallowWater"
 msgid "Shallow water"
-msgstr "얕은 물"
+msgstr "ì–•ì€ ë¬¼"
 
 #. Spatial.Trees
 msgctxt "Spatial.Trees"
 msgid "Trees"
-msgstr "나무"
+msgstr "ë‚˜ë¬´"
 
 #. Spatial.Wall
 msgctxt "Spatial.Wall"
 msgid "Wall"
-msgstr "벽"
+msgstr "ë²½"
 
 #. Spatial.Water
 msgctxt "Spatial.Water"
 msgid "Water"
-msgstr "물"
+msgstr "ë¬¼"
 
 #. Spatial.WaterEdge
 msgctxt "Spatial.WaterEdge"
 msgid "Water edge"
-msgstr "물가"
+msgstr "ë¬¼ê°€"
 
 #. Screens.MoveAllLeft
 msgctxt "Screens.MoveAllLeft"

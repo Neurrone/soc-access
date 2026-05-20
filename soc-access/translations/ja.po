@@ -1,4 +1,4 @@
-msgid ""
+﻿msgid ""
 msgstr ""
 "Project-Id-Version: SongsOfConquestAccess\n"
 "Language: ja\n"
@@ -8,22 +8,22 @@ msgstr ""
 #. Common.ListFinal
 msgctxt "Common.ListFinal"
 msgid "{0}, and {1}"
-msgstr "{0}、{1}"
+msgstr "{0}ã€{1}"
 
 #. Common.ListPair
 msgctxt "Common.ListPair"
 msgid "{0} and {1}"
-msgstr "{0}と{1}"
+msgstr "{0}ã¨{1}"
 
 #. Common.ListSeparator
 msgctxt "Common.ListSeparator"
 msgid "{0}, {1}"
-msgstr "{0}、{1}"
+msgstr "{0}ã€{1}"
 
 #. Common.Quantity
 msgctxt "Common.Quantity"
 msgid "quantity"
-msgstr "数量"
+msgstr "æ•°é‡"
 
 #. Common.ResourceAmount
 msgctxt "Common.ResourceAmount"
@@ -33,262 +33,262 @@ msgstr "{0} {1}"
 #. Common.TileCount_0
 msgctxt "Common.TileCount_0"
 msgid "{0} tile"
-msgstr "{0} タイル"
+msgstr "{0} ã‚¿ã‚¤ãƒ«"
 
 #. Draft.EssenceVariants
 msgctxt "Draft.EssenceVariants"
 msgid "Essence variants"
-msgstr "エッセンスのバリエーション"
+msgstr "ã‚¨ãƒƒã‚»ãƒ³ã‚¹ã®ãƒãƒªã‚¨ãƒ¼ã‚·ãƒ§ãƒ³"
 
 #. Draft.Purchase
 msgctxt "Draft.Purchase"
 msgid "Purchase"
-msgstr "購入"
+msgstr "è³¼å…¥"
 
 #. Draft.PurchaseForResources
 msgctxt "Draft.PurchaseForResources"
 msgid "Purchase for {0}"
-msgstr "{0}で購入"
+msgstr "{0}ã§è³¼å…¥"
 
 #. Draft.UpgradeAvailableTroops
 msgctxt "Draft.UpgradeAvailableTroops"
 msgid "Upgrade available troops"
-msgstr "利用可能な部隊をアップグレード"
+msgstr "åˆ©ç”¨å¯èƒ½ãªéƒ¨éšŠã‚’ã‚¢ãƒƒãƒ—ã‚°ãƒ¬ãƒ¼ãƒ‰"
 
 #. Events.BuildSiteLarge
 msgctxt "Events.BuildSiteLarge"
 msgid "large"
-msgstr "大"
+msgstr "å¤§"
 
 #. Events.BuildSiteLargeSettlement
 msgctxt "Events.BuildSiteLargeSettlement"
 msgid "large settlement"
-msgstr "大きな集落"
+msgstr "å¤§ããªé›†è½"
 
 #. Events.BuildSiteMedium
 msgctxt "Events.BuildSiteMedium"
 msgid "medium"
-msgstr "中"
+msgstr "ä¸­"
 
 #. Events.BuildSiteSmall
 msgctxt "Events.BuildSiteSmall"
 msgid "small"
-msgstr "小"
+msgstr "å°"
 
 #. Events.BuildSiteSmallSettlement
 msgctxt "Events.BuildSiteSmallSettlement"
 msgid "small settlement"
-msgstr "小さな集落"
+msgstr "å°ã•ãªé›†è½"
 
 #. Events.BuildSiteTown
 msgctxt "Events.BuildSiteTown"
 msgid "town"
-msgstr "町"
+msgstr "ç”º"
 
 #. Events.DestinationCleared
 msgctxt "Events.DestinationCleared"
 msgid "{0}'s destination cleared."
-msgstr "{0}の目的地を消去しました。"
+msgstr "{0}ã®ç›®çš„åœ°ã‚’æ¶ˆåŽ»ã—ã¾ã—ãŸã€‚"
 
 #. Events.DestinationSet
 msgctxt "Events.DestinationSet"
 msgid "{0}'s destination set to {1}"
-msgstr "{0}の目的地を{1}に設定しました"
+msgstr "{0}ã®ç›®çš„åœ°ã‚’{1}ã«è¨­å®šã—ã¾ã—ãŸ"
 
 #. Events.HudClosed
 msgctxt "Events.HudClosed"
 msgid "HUD closed"
-msgstr "HUDを閉じました"
+msgstr "HUDã‚’é–‰ã˜ã¾ã—ãŸ"
 
 #. Events.HudOpen
 msgctxt "Events.HudOpen"
 msgid "HUD open"
-msgstr "HUDを開きました"
+msgstr "HUDã‚’é–‹ãã¾ã—ãŸ"
 
 #. Events.LeveledUpTo
 msgctxt "Events.LeveledUpTo"
 msgid "{0} leveled up to {1}"
-msgstr "{0}がレベル{1}に上がりました"
+msgstr "{0}ãŒãƒ¬ãƒ™ãƒ«{1}ã«ä¸ŠãŒã‚Šã¾ã—ãŸ"
 
 #. Events.MapCameraFocus
 msgctxt "Events.MapCameraFocus"
 msgid "Map camera focuses on {0}"
-msgstr "マップカメラが{0}にフォーカスしました"
+msgstr "ãƒžãƒƒãƒ—ã‚«ãƒ¡ãƒ©ãŒ{0}ã«ãƒ•ã‚©ãƒ¼ã‚«ã‚¹ã—ã¾ã—ãŸ"
 
 #. Events.ModError
 msgctxt "Events.ModError"
 msgid "Mod error: {0}"
-msgstr "Modエラー: {0}"
+msgstr "Modã‚¨ãƒ©ãƒ¼: {0}"
 
 #. Events.SelectedBuildSite
 msgctxt "Events.SelectedBuildSite"
 msgid "Selected {0} build site at {1}"
-msgstr "{1}の{0}建設地を選択しました"
+msgstr "{1}ã®{0}å»ºè¨­åœ°ã‚’é¸æŠžã—ã¾ã—ãŸ"
 
 #. Events.SelectedWielder
 msgctxt "Events.SelectedWielder"
 msgid "Selected wielder {0}"
-msgstr "ウィールダー {0} を選択しました"
+msgstr "ã‚¦ã‚£ãƒ¼ãƒ«ãƒ€ãƒ¼ {0} ã‚’é¸æŠžã—ã¾ã—ãŸ"
 
 #. Events.Wielder
 msgctxt "Events.Wielder"
 msgid "wielder"
-msgstr "ウィールダー"
+msgstr "ã‚¦ã‚£ãƒ¼ãƒ«ãƒ€ãƒ¼"
 
 #. Events.WielderMoved
 msgctxt "Events.WielderMoved"
 msgid "{0} moved to {1}"
-msgstr "{0}が{1}に移動しました"
+msgstr "{0}ãŒ{1}ã«ç§»å‹•ã—ã¾ã—ãŸ"
 
 #. Events.WielderTeleported
 msgctxt "Events.WielderTeleported"
 msgid "{0} teleported to {1}"
-msgstr "{0}が{1}にテレポートしました"
+msgstr "{0}ãŒ{1}ã«ãƒ†ãƒ¬ãƒãƒ¼ãƒˆã—ã¾ã—ãŸ"
 
 #. UI.ArmyExchangeGrid
 msgctxt "UI.ArmyExchangeGrid"
 msgid "Army exchange grid"
-msgstr "軍交換グリッド"
+msgstr "è»äº¤æ›ã‚°ãƒªãƒƒãƒ‰"
 
 #. UI.AvailableActions
 msgctxt "UI.AvailableActions"
 msgid "Available actions: {0}."
-msgstr "利用可能な操作: {0}。"
+msgstr "åˆ©ç”¨å¯èƒ½ãªæ“ä½œ: {0}ã€‚"
 
 #. UI.Blank
 msgctxt "UI.Blank"
 msgid "blank"
-msgstr "空白"
+msgstr "ç©ºç™½"
 
 #. UI.CancelledEditing
 msgctxt "UI.CancelledEditing"
 msgid "Cancelled, {0}"
-msgstr "キャンセルしました、{0}"
+msgstr "ã‚­ãƒ£ãƒ³ã‚»ãƒ«ã—ã¾ã—ãŸã€{0}"
 
 #. UI.CannotDropThere
 msgctxt "UI.CannotDropThere"
 msgid "Cannot drop there."
-msgstr "そこにはドロップできません。"
+msgstr "ãã“ã«ã¯ãƒ‰ãƒ­ãƒƒãƒ—ã§ãã¾ã›ã‚“ã€‚"
 
 #. UI.CharacterColon
 msgctxt "UI.CharacterColon"
 msgid "colon"
-msgstr "コロン"
+msgstr "ã‚³ãƒ­ãƒ³"
 
 #. UI.CharacterComma
 msgctxt "UI.CharacterComma"
 msgid "comma"
-msgstr "コンマ"
+msgstr "ã‚³ãƒ³ãƒž"
 
 #. UI.CharacterDash
 msgctxt "UI.CharacterDash"
 msgid "dash"
-msgstr "ダッシュ"
+msgstr "ãƒ€ãƒƒã‚·ãƒ¥"
 
 #. UI.CharacterDot
 msgctxt "UI.CharacterDot"
 msgid "dot"
-msgstr "ドット"
+msgstr "ãƒ‰ãƒƒãƒˆ"
 
 #. UI.CharacterSemicolon
 msgctxt "UI.CharacterSemicolon"
 msgid "semicolon"
-msgstr "セミコロン"
+msgstr "ã‚»ãƒŸã‚³ãƒ­ãƒ³"
 
 #. UI.CharacterSpace
 msgctxt "UI.CharacterSpace"
 msgid "space"
-msgstr "スペース"
+msgstr "ã‚¹ãƒšãƒ¼ã‚¹"
 
 #. UI.CharacterTab
 msgctxt "UI.CharacterTab"
 msgid "tab"
-msgstr "タブ"
+msgstr "ã‚¿ãƒ–"
 
 #. UI.CharacterUnderscore
 msgctxt "UI.CharacterUnderscore"
 msgid "underscore"
-msgstr "アンダースコア"
+msgstr "ã‚¢ãƒ³ãƒ€ãƒ¼ã‚¹ã‚³ã‚¢"
 
 #. UI.CombatDisconnectedTiles
 msgctxt "UI.CombatDisconnectedTiles"
 msgid "Some shown tiles are separated. Use W and Shift W to reach all range tiles."
-msgstr "表示されている一部のタイルは離れています。すべての射程タイルに移動するには W と Shift W を使ってください。"
+msgstr "è¡¨ç¤ºã•ã‚Œã¦ã„ã‚‹ä¸€éƒ¨ã®ã‚¿ã‚¤ãƒ«ã¯é›¢ã‚Œã¦ã„ã¾ã™ã€‚ã™ã¹ã¦ã®å°„ç¨‹ã‚¿ã‚¤ãƒ«ã«ç§»å‹•ã™ã‚‹ã«ã¯ W ã¨ Shift W ã‚’ä½¿ã£ã¦ãã ã•ã„ã€‚"
 
 #. UI.CombatGrid
 msgctxt "UI.CombatGrid"
 msgid "Combat grid"
-msgstr "戦闘グリッド"
+msgstr "æˆ¦é—˜ã‚°ãƒªãƒƒãƒ‰"
 
 #. UI.DoneEditing
 msgctxt "UI.DoneEditing"
 msgid "Done editing, {0}"
-msgstr "編集完了、{0}"
+msgstr "ç·¨é›†å®Œäº†ã€{0}"
 
 #. UI.DragCancelled
 msgctxt "UI.DragCancelled"
 msgid "Drag cancelled."
-msgstr "ドラッグをキャンセルしました。"
+msgstr "ãƒ‰ãƒ©ãƒƒã‚°ã‚’ã‚­ãƒ£ãƒ³ã‚»ãƒ«ã—ã¾ã—ãŸã€‚"
 
 #. UI.DragComplete
 msgctxt "UI.DragComplete"
 msgid "Drag complete."
-msgstr "ドラッグ完了。"
+msgstr "ãƒ‰ãƒ©ãƒƒã‚°å®Œäº†ã€‚"
 
 #. UI.DragStarted
 msgctxt "UI.DragStarted"
 msgid "Started drag. Move to destination and press enter to drop."
-msgstr "ドラッグを開始しました。目的地へ移動し、Enter でドロップします。"
+msgstr "ãƒ‰ãƒ©ãƒƒã‚°ã‚’é–‹å§‹ã—ã¾ã—ãŸã€‚ç›®çš„åœ°ã¸ç§»å‹•ã—ã€Enter ã§ãƒ‰ãƒ­ãƒƒãƒ—ã—ã¾ã™ã€‚"
 
 #. UI.DragStartedTroopPlacement
 msgctxt "UI.DragStartedTroopPlacement"
 msgid "Started drag for {0} at {1}. Press enter to drop on destination spawn point, or press escape to cancel."
-msgstr "{1} の {0} のドラッグを開始しました。目的の配置地点で Enter を押すか、Escape でキャンセルします。"
+msgstr "{1} ã® {0} ã®ãƒ‰ãƒ©ãƒƒã‚°ã‚’é–‹å§‹ã—ã¾ã—ãŸã€‚ç›®çš„ã®é…ç½®åœ°ç‚¹ã§ Enter ã‚’æŠ¼ã™ã‹ã€Escape ã§ã‚­ãƒ£ãƒ³ã‚»ãƒ«ã—ã¾ã™ã€‚"
 
 #. UI.Editing
 msgctxt "UI.Editing"
 msgid "Editing, {0}"
-msgstr "編集中、{0}"
+msgstr "ç·¨é›†ä¸­ã€{0}"
 
 #. UI.Empty
 msgctxt "UI.Empty"
 msgid "Empty"
-msgstr "空"
+msgstr "ç©º"
 
 #. UI.EmptyTroopSlot
 msgctxt "UI.EmptyTroopSlot"
 msgid "Empty troop {0}"
-msgstr "空の部隊 {0}"
+msgstr "ç©ºã®éƒ¨éšŠ {0}"
 
 #. UI.ExitedInspectMode
 msgctxt "UI.ExitedInspectMode"
 msgid "Exited inspect mode"
-msgstr "調査モードを終了しました"
+msgstr "èª¿æŸ»ãƒ¢ãƒ¼ãƒ‰ã‚’çµ‚äº†ã—ã¾ã—ãŸ"
 
 #. UI.Heading
 msgctxt "UI.Heading"
 msgid "{0} heading"
-msgstr "{0} 見出し"
+msgstr "{0} è¦‹å‡ºã—"
 
 #. UI.Inspecting
 msgctxt "UI.Inspecting"
 msgid "Inspecting {0}"
-msgstr "{0} を調査中"
+msgstr "{0} ã‚’èª¿æŸ»ä¸­"
 
 #. UI.InventoryGrid
 msgctxt "UI.InventoryGrid"
 msgid "Inventory grid"
-msgstr "インベントリグリッド"
+msgstr "ã‚¤ãƒ³ãƒ™ãƒ³ãƒˆãƒªã‚°ãƒªãƒƒãƒ‰"
 
 #. UI.InvalidDestination
 msgctxt "UI.InvalidDestination"
 msgid "Invalid destination."
-msgstr "無効な目的地です。"
+msgstr "ç„¡åŠ¹ãªç›®çš„åœ°ã§ã™ã€‚"
 
 #. UI.JoiningArmy
 msgctxt "UI.JoiningArmy"
 msgid "joining army"
-msgstr "合流する軍"
+msgstr "åˆæµã™ã‚‹è»"
 
 #. UI.LabelValue
 msgctxt "UI.LabelValue"
@@ -298,152 +298,152 @@ msgstr "{0}: {1}"
 #. UI.PressSpaceSelectItemToDrag
 msgctxt "UI.PressSpaceSelectItemToDrag"
 msgid "Press space to select an item to drag."
-msgstr "ドラッグする項目を選択するにはスペースを押します。"
+msgstr "ãƒ‰ãƒ©ãƒƒã‚°ã™ã‚‹é …ç›®ã‚’é¸æŠžã™ã‚‹ã«ã¯ã‚¹ãƒšãƒ¼ã‚¹ã‚’æŠ¼ã—ã¾ã™ã€‚"
 
 #. UI.PressSpaceToDrag
 msgctxt "UI.PressSpaceToDrag"
 msgid "Press space to drag."
-msgstr "ドラッグするにはスペースを押します。"
+msgstr "ãƒ‰ãƒ©ãƒƒã‚°ã™ã‚‹ã«ã¯ã‚¹ãƒšãƒ¼ã‚¹ã‚’æŠ¼ã—ã¾ã™ã€‚"
 
 #. UI.RoleButton
 msgctxt "UI.RoleButton"
 msgid "button"
-msgstr "ボタン"
+msgstr "ãƒœã‚¿ãƒ³"
 
 #. UI.RoleCheckBox
 msgctxt "UI.RoleCheckBox"
 msgid "check box"
-msgstr "チェックボックス"
+msgstr "ãƒã‚§ãƒƒã‚¯ãƒœãƒƒã‚¯ã‚¹"
 
 #. UI.RoleDocument
 msgctxt "UI.RoleDocument"
 msgid "document"
-msgstr "ドキュメント"
+msgstr "ãƒ‰ã‚­ãƒ¥ãƒ¡ãƒ³ãƒˆ"
 
 #. UI.RoleEdit
 msgctxt "UI.RoleEdit"
 msgid "edit"
-msgstr "編集"
+msgstr "ç·¨é›†"
 
 #. UI.RoleGrid
 msgctxt "UI.RoleGrid"
 msgid "grid"
-msgstr "グリッド"
+msgstr "ã‚°ãƒªãƒƒãƒ‰"
 
 #. UI.RoleMenu
 msgctxt "UI.RoleMenu"
 msgid "menu"
-msgstr "メニュー"
+msgstr "ãƒ¡ãƒ‹ãƒ¥ãƒ¼"
 
 #. UI.RoleSlider
 msgctxt "UI.RoleSlider"
 msgid "slider"
-msgstr "スライダー"
+msgstr "ã‚¹ãƒ©ã‚¤ãƒ€ãƒ¼"
 
 #. UI.Selected
 msgctxt "UI.Selected"
 msgid "selected"
-msgstr "選択中"
+msgstr "é¸æŠžä¸­"
 
 #. UI.Slot
 msgctxt "UI.Slot"
 msgid "slot {0}"
-msgstr "スロット {0}"
+msgstr "ã‚¹ãƒ­ãƒƒãƒˆ {0}"
 
 #. UI.SlotInGroup
 msgctxt "UI.SlotInGroup"
 msgid "{0} slot {1}"
-msgstr "{0} スロット {1}"
+msgstr "{0} ã‚¹ãƒ­ãƒƒãƒˆ {1}"
 
 #. UI.StatusChecked
 msgctxt "UI.StatusChecked"
 msgid "checked"
-msgstr "チェック済み"
+msgstr "ãƒã‚§ãƒƒã‚¯æ¸ˆã¿"
 
 #. UI.StatusDisabled
 msgctxt "UI.StatusDisabled"
 msgid "disabled"
-msgstr "無効"
+msgstr "ç„¡åŠ¹"
 
 #. UI.StatusDraggable
 msgctxt "UI.StatusDraggable"
 msgid "draggable"
-msgstr "ドラッグ可能"
+msgstr "ãƒ‰ãƒ©ãƒƒã‚°å¯èƒ½"
 
 #. UI.StatusDragging
 msgctxt "UI.StatusDragging"
 msgid "dragging"
-msgstr "ドラッグ中"
+msgstr "ãƒ‰ãƒ©ãƒƒã‚°ä¸­"
 
 #. UI.StatusUnchecked
 msgctxt "UI.StatusUnchecked"
 msgid "unchecked"
-msgstr "未チェック"
+msgstr "æœªãƒã‚§ãƒƒã‚¯"
 
 #. UI.Target
 msgctxt "UI.Target"
 msgid "target"
-msgstr "対象"
+msgstr "å¯¾è±¡"
 
 #. UI.TroopSlot
 msgctxt "UI.TroopSlot"
 msgid "{0}, {1}"
-msgstr "{0}、{1}"
+msgstr "{0}ã€{1}"
 
 #. UI.TroopSlotWithSize
 msgctxt "UI.TroopSlotWithSize"
 msgid "{0}, {1} / {2}, {3}"
-msgstr "{0}、{1} / {2}、{3}"
+msgstr "{0}ã€{1} / {2}ã€{3}"
 
 #. UI.WielderArmy
 msgctxt "UI.WielderArmy"
 msgid "wielder's army"
-msgstr "ウィールダーの軍"
+msgstr "ã‚¦ã‚£ãƒ¼ãƒ«ãƒ€ãƒ¼ã®è»"
 
 #. UI.StatusCorrupt
 msgctxt "UI.StatusCorrupt"
 msgid "corrupt"
-msgstr "破損"
+msgstr "ç ´æ"
 
 #. UI.StatusMissing
 msgctxt "UI.StatusMissing"
 msgid "missing"
-msgstr "不足"
+msgstr "ä¸è¶³"
 
 #. UI.StatusUnavailable
 msgctxt "UI.StatusUnavailable"
 msgid "unavailable"
-msgstr "利用不可"
+msgstr "åˆ©ç”¨ä¸å¯"
 
 #. UI.BufferEmpty
 msgctxt "UI.BufferEmpty"
 msgid "Buffer empty"
-msgstr "バッファは空です"
+msgstr "ãƒãƒƒãƒ•ã‚¡ã¯ç©ºã§ã™"
 
 #. UI.NoScannerResults
 msgctxt "UI.NoScannerResults"
 msgid "No scanner results"
-msgstr "スキャナー結果なし"
+msgstr "ã‚¹ã‚­ãƒ£ãƒŠãƒ¼çµæžœãªã—"
 
 #. UI.NotInMovementRange
 msgctxt "UI.NotInMovementRange"
 msgid "Not in movement range"
-msgstr "移動範囲外"
+msgstr "ç§»å‹•ç¯„å›²å¤–"
 
 #. UI.ReviewBufferEvents
 msgctxt "UI.ReviewBufferEvents"
 msgid "Events"
-msgstr "イベント"
+msgstr "ã‚¤ãƒ™ãƒ³ãƒˆ"
 
 #. UI.ReviewBufferLine
 msgctxt "UI.ReviewBufferLine"
 msgid "{0}. {1}"
-msgstr "{0}。{1}"
+msgstr "{0}ã€‚{1}"
 
 #. UI.ReviewBufferNotifications
 msgctxt "UI.ReviewBufferNotifications"
 msgid "Notifications"
-msgstr "通知"
+msgstr "é€šçŸ¥"
 
 #. UI.ReviewBufferUi
 msgctxt "UI.ReviewBufferUi"
@@ -453,217 +453,232 @@ msgstr "UI"
 #. UI.ScannerPath
 msgctxt "UI.ScannerPath"
 msgid "{0}, {1}. {2}"
-msgstr "{0}、{1}。{2}"
+msgstr "{0}ã€{1}ã€‚{2}"
 
 #. UI.SelectedCount
 msgctxt "UI.SelectedCount"
 msgid "selected {0}x"
-msgstr "{0}個選択"
+msgstr "{0}å€‹é¸æŠž"
 
 #. UI.Unselected
 msgctxt "UI.Unselected"
 msgid "unselected"
-msgstr "未選択"
+msgstr "æœªé¸æŠž"
 
 #. Screens.AdventureMap
 msgctxt "Screens.AdventureMap"
 msgid "Adventure map"
-msgstr "冒険マップ"
+msgstr "å†’é™ºãƒžãƒƒãƒ—"
 
 #. Screens.ArcanaSpells
 msgctxt "Screens.ArcanaSpells"
 msgid "Arcana spells"
-msgstr "アルカナ呪文"
+msgstr "ã‚¢ãƒ«ã‚«ãƒŠå‘ªæ–‡"
 
 #. Screens.Army
 msgctxt "Screens.Army"
 msgid "army"
-msgstr "軍"
+msgstr "è»"
 
 #. Screens.Articles
 msgctxt "Screens.Articles"
 msgid "Articles"
-msgstr "記事"
+msgstr "è¨˜äº‹"
 
 #. Screens.AttackerEssence
 msgctxt "Screens.AttackerEssence"
 msgid "Attacker essence"
-msgstr "攻撃側エッセンス"
+msgstr "æ”»æ’ƒå´ã‚¨ãƒƒã‚»ãƒ³ã‚¹"
 
 #. Screens.Back
 msgctxt "Screens.Back"
 msgid "Back"
-msgstr "戻る"
+msgstr "æˆ»ã‚‹"
 
 #. Screens.BattleLog
 msgctxt "Screens.BattleLog"
 msgid "Battle log"
-msgstr "戦闘ログ"
+msgstr "æˆ¦é—˜ãƒ­ã‚°"
 
 #. Screens.BattleResult
 msgctxt "Screens.BattleResult"
 msgid "Battle result"
-msgstr "戦闘結果"
+msgstr "æˆ¦é—˜çµæžœ"
 
 #. Screens.Categories
 msgctxt "Screens.Categories"
 msgid "Categories"
-msgstr "カテゴリ"
+msgstr "ã‚«ãƒ†ã‚´ãƒª"
 
 #. Screens.ChaosSpells
 msgctxt "Screens.ChaosSpells"
 msgid "Chaos spells"
-msgstr "混沌呪文"
+msgstr "æ··æ²Œå‘ªæ–‡"
 
 #. Screens.Choices
 msgctxt "Screens.Choices"
 msgid "Choices"
-msgstr "選択肢"
+msgstr "é¸æŠžè‚¢"
 
 #. Screens.Close
 msgctxt "Screens.Close"
 msgid "Close"
-msgstr "閉じる"
+msgstr "é–‰ã˜ã‚‹"
 
 #. Screens.Combat
 msgctxt "Screens.Combat"
 msgid "Combat"
-msgstr "戦闘"
+msgstr "æˆ¦é—˜"
 
 #. Screens.CreationSpells
 msgctxt "Screens.CreationSpells"
 msgid "Creation spells"
-msgstr "創造呪文"
+msgstr "å‰µé€ å‘ªæ–‡"
 
 #. Screens.CurrentTroop
 msgctxt "Screens.CurrentTroop"
 msgid "Current troop, {0}"
-msgstr "現在の部隊、{0}"
+msgstr "ç¾åœ¨ã®éƒ¨éšŠã€{0}"
 
 #. Screens.DefenderEssence
 msgctxt "Screens.DefenderEssence"
 msgid "Defender essence"
-msgstr "防御側エッセンス"
+msgstr "é˜²å¾¡å´ã‚¨ãƒƒã‚»ãƒ³ã‚¹"
 
 #. Screens.DefendingWielderArmy
 msgctxt "Screens.DefendingWielderArmy"
 msgid "defending wielder army"
-msgstr "防御中のウィールダー軍"
+msgstr "é˜²å¾¡ä¸­ã®ã‚¦ã‚£ãƒ¼ãƒ«ãƒ€ãƒ¼è»"
 
 #. Screens.Description
 msgctxt "Screens.Description"
 msgid "Description"
-msgstr "説明"
+msgstr "èª¬æ˜Ž"
 
 #. Screens.DescriptionWithMissingBuilding
 msgctxt "Screens.DescriptionWithMissingBuilding"
 msgid "{0}. missing building"
-msgstr "{0}。建物が不足"
+msgstr "{0}ã€‚å»ºç‰©ãŒä¸è¶³"
 
 #. Screens.DestructionSpells
 msgctxt "Screens.DestructionSpells"
 msgid "Destruction spells"
-msgstr "破壊呪文"
+msgstr "ç ´å£Šå‘ªæ–‡"
 
 #. Screens.DisabledWithReason
 msgctxt "Screens.DisabledWithReason"
 msgid "{0}. {1}"
-msgstr "{0}。{1}"
+msgstr "{0}ã€‚{1}"
 
 #. Screens.Empty
 msgctxt "Screens.Empty"
 msgid "empty"
-msgstr "空"
+msgstr "ç©º"
 
 #. Screens.EmptySlot
 msgctxt "Screens.EmptySlot"
 msgid "Empty, slot {0}"
-msgstr "空、スロット {0}"
+msgstr "ç©ºã€ã‚¹ãƒ­ãƒƒãƒˆ {0}"
 
 #. Screens.EjectWielder
 msgctxt "Screens.EjectWielder"
 msgid "Eject wielder"
-msgstr "ウィールダーを追い出す"
+msgstr "ã‚¦ã‚£ãƒ¼ãƒ«ãƒ€ãƒ¼ã‚’è¿½ã„å‡ºã™"
 
 #. Screens.GraphAccessibilityTodo
 msgctxt "Screens.GraphAccessibilityTodo"
 msgid "TODO: implement accessibility for graph"
-msgstr "TODO: グラフのアクセシビリティを実装"
+msgstr "TODO: ã‚°ãƒ©ãƒ•ã®ã‚¢ã‚¯ã‚»ã‚·ãƒ“ãƒªãƒ†ã‚£ã‚’å®Ÿè£…"
 
 #. Screens.GraphType
 msgctxt "Screens.GraphType"
 msgid "Graph type"
-msgstr "グラフ種別"
+msgstr "ã‚°ãƒ©ãƒ•ç¨®åˆ¥"
 
 #. Screens.Group
 msgctxt "Screens.Group"
 msgid "Group {0}"
-msgstr "グループ {0}"
+msgstr "ã‚°ãƒ«ãƒ¼ãƒ— {0}"
 
 #. Screens.MainMenu
 msgctxt "Screens.MainMenu"
 msgid "Main menu"
-msgstr "メインメニュー"
+msgstr "ãƒ¡ã‚¤ãƒ³ãƒ¡ãƒ‹ãƒ¥ãƒ¼"
 
 #. Screens.Missing
 msgctxt "Screens.Missing"
 msgid "Missing {0}"
-msgstr "{0} が不足"
+msgstr "{0} ãŒä¸è¶³"
 
 #. Screens.MissingBuilding
 msgctxt "Screens.MissingBuilding"
 msgid "missing building"
-msgstr "建物が不足"
+msgstr "å»ºç‰©ãŒä¸è¶³"
 
 #. Screens.ModSettings
 msgctxt "Screens.ModSettings"
 msgid "Mod settings"
-msgstr "Mod 設定"
+msgstr "Mod è¨­å®š"
 
 #. Screens.ModifierCategoryTabs
 msgctxt "Screens.ModifierCategoryTabs"
 msgid "Modifier category tabs"
-msgstr "修正カテゴリタブ"
+msgstr "ä¿®æ­£ã‚«ãƒ†ã‚´ãƒªã‚¿ãƒ–"
 
 #. Screens.MultiEssenceSpells
 msgctxt "Screens.MultiEssenceSpells"
 msgid "Multi-essence spells"
-msgstr "複数エッセンス呪文"
+msgstr "è¤‡æ•°ã‚¨ãƒƒã‚»ãƒ³ã‚¹å‘ªæ–‡"
 
 #. Screens.NamedArmy
 msgctxt "Screens.NamedArmy"
 msgid "{0} army"
-msgstr "{0} の軍"
+msgstr "{0} ã®è»"
 
 #. Screens.NamedLevel
 msgctxt "Screens.NamedLevel"
 msgid "{0}, level {1}"
-msgstr "{0}、レベル {1}"
+msgstr "{0}ã€ãƒ¬ãƒ™ãƒ« {1}"
 
 #. Screens.NamedMenu
 msgctxt "Screens.NamedMenu"
 msgid "{0} menu"
-msgstr "{0} メニュー"
+msgstr "{0} ãƒ¡ãƒ‹ãƒ¥ãƒ¼"
 
 #. Screens.Next
 msgctxt "Screens.Next"
 msgid "Next"
-msgstr "次へ"
+msgstr "æ¬¡ã¸"
 
 #. Screens.None
 msgctxt "Screens.None"
 msgid "None"
-msgstr "なし"
+msgstr "ãªã—"
 
 #. Screens.Notifications
 msgctxt "Screens.Notifications"
 msgid "Notifications"
-msgstr "通知"
+msgstr "é€šçŸ¥"
 
 #. Screens.Objectives
 msgctxt "Screens.Objectives"
 msgid "Objectives"
-msgstr "目標"
+msgstr "ç›®æ¨™"
+
+#. Screens.ObjectiveMarkerFarAway
+msgctxt "Screens.ObjectiveMarkerFarAway"
+msgid "far away"
+msgstr "遠く"
+
+#. Screens.ObjectiveMarkerNearby
+msgctxt "Screens.ObjectiveMarkerNearby"
+msgid "nearby"
+msgstr "近く"
+
+#. Screens.ObjectiveMarkerSomeDistance
+msgctxt "Screens.ObjectiveMarkerSomeDistance"
+msgid "some distance"
+msgstr "少し離れた場所"
 
 #. Screens.Ok
 msgctxt "Screens.Ok"
@@ -673,779 +688,779 @@ msgstr "OK"
 #. Screens.OrderSpells
 msgctxt "Screens.OrderSpells"
 msgid "Order spells"
-msgstr "秩序呪文"
+msgstr "ç§©åºå‘ªæ–‡"
 
 #. Screens.PostAdventureResult
 msgctxt "Screens.PostAdventureResult"
 msgid "Post adventure result"
-msgstr "冒険後の結果"
+msgstr "å†’é™ºå¾Œã®çµæžœ"
 
 #. Screens.PostAdventureStats
 msgctxt "Screens.PostAdventureStats"
 msgid "Post adventure stats"
-msgstr "冒険後の統計"
+msgstr "å†’é™ºå¾Œã®çµ±è¨ˆ"
 
 #. Screens.Previous
 msgctxt "Screens.Previous"
 msgid "Previous"
-msgstr "前へ"
+msgstr "å‰ã¸"
 
 #. Screens.Quickbar
 msgctxt "Screens.Quickbar"
 msgid "Quickbar"
-msgstr "クイックバー"
+msgstr "ã‚¯ã‚¤ãƒƒã‚¯ãƒãƒ¼"
 
 #. Screens.ReadEnemyInfluence
 msgctxt "Screens.ReadEnemyInfluence"
 msgid "Read attack, deadly and movement range for enemies on tiles in combat"
-msgstr "戦闘中、タイル上の敵の攻撃範囲、致死範囲、移動範囲を読み上げる"
+msgstr "æˆ¦é—˜ä¸­ã€ã‚¿ã‚¤ãƒ«ä¸Šã®æ•µã®æ”»æ’ƒç¯„å›²ã€è‡´æ­»ç¯„å›²ã€ç§»å‹•ç¯„å›²ã‚’èª­ã¿ä¸Šã’ã‚‹"
 
 #. Screens.RecruitFrom
 msgctxt "Screens.RecruitFrom"
 msgid "Recruit from"
-msgstr "募集元"
+msgstr "å‹Ÿé›†å…ƒ"
 
 #. Screens.RecruitingFrom
 msgctxt "Screens.RecruitingFrom"
 msgid "Recruiting from {0}"
-msgstr "{0} から募集"
+msgstr "{0} ã‹ã‚‰å‹Ÿé›†"
 
 #. Screens.ResearchTier
 msgctxt "Screens.ResearchTier"
 msgid "{0} ({1} {2})"
-msgstr "{0}（{1} {2}）"
+msgstr "{0}ï¼ˆ{1} {2}ï¼‰"
 
 #. Screens.Resources
 msgctxt "Screens.Resources"
 msgid "Resources"
-msgstr "資源"
+msgstr "è³‡æº"
 
 #. Screens.Round
 msgctxt "Screens.Round"
 msgid "Round {0}"
-msgstr "ラウンド{0}"
+msgstr "ãƒ©ã‚¦ãƒ³ãƒ‰{0}"
 
 #. Screens.SettlementTroops
 msgctxt "Screens.SettlementTroops"
 msgid "settlement troops"
-msgstr "集落の部隊"
+msgstr "é›†è½ã®éƒ¨éšŠ"
 
 #. Screens.Skill
 msgctxt "Screens.Skill"
 msgid "Skill {0}"
-msgstr "スキル {0}"
+msgstr "ã‚¹ã‚­ãƒ« {0}"
 
 #. Screens.SlotValue
 msgctxt "Screens.SlotValue"
 msgid "Slot {0}: {1}"
-msgstr "スロット {0}: {1}"
+msgstr "ã‚¹ãƒ­ãƒƒãƒˆ {0}: {1}"
 
 #. Screens.SpellTier
 msgctxt "Screens.SpellTier"
 msgid "{0} tier {1}"
-msgstr "{0} ティア {1}"
+msgstr "{0} ãƒ†ã‚£ã‚¢ {1}"
 
 #. Screens.Tabs
 msgctxt "Screens.Tabs"
 msgid "Tabs"
-msgstr "タブ"
+msgstr "ã‚¿ãƒ–"
 
 #. Screens.Teams
 msgctxt "Screens.Teams"
 msgid "Teams"
-msgstr "チーム"
+msgstr "ãƒãƒ¼ãƒ "
 
 #. Screens.TooltipActions
 msgctxt "Screens.TooltipActions"
 msgid "Tooltip actions"
-msgstr "ツールチップ操作"
+msgstr "ãƒ„ãƒ¼ãƒ«ãƒãƒƒãƒ—æ“ä½œ"
 
 #. Screens.Tier
 msgctxt "Screens.Tier"
 msgid "Tier"
-msgstr "ティア"
+msgstr "ãƒ†ã‚£ã‚¢"
 
 #. Screens.Tower
 msgctxt "Screens.Tower"
 msgid "Tower {0}"
-msgstr "塔 {0}"
+msgstr "å¡” {0}"
 
 #. Screens.TroopLost
 msgctxt "Screens.TroopLost"
 msgid "{0} lost"
-msgstr "{0} 喪失"
+msgstr "{0} å–ªå¤±"
 
 #. Screens.TroopManagement
 msgctxt "Screens.TroopManagement"
 msgid "Troop management"
-msgstr "部隊管理"
+msgstr "éƒ¨éšŠç®¡ç†"
 
 #. Screens.TroopDistribution
 msgctxt "Screens.TroopDistribution"
 msgid "troop distribution"
-msgstr "部隊配分"
+msgstr "éƒ¨éšŠé…åˆ†"
 
 #. Screens.TroopPlacement
 msgctxt "Screens.TroopPlacement"
 msgid "Troop placement"
-msgstr "部隊配置"
+msgstr "éƒ¨éšŠé…ç½®"
 
 #. Screens.TroopSlot
 msgctxt "Screens.TroopSlot"
 msgid "Troop slot {0}"
-msgstr "部隊スロット {0}"
+msgstr "éƒ¨éšŠã‚¹ãƒ­ãƒƒãƒˆ {0}"
 
 #. Screens.TurnOrder
 msgctxt "Screens.TurnOrder"
 msgid "Turn order"
-msgstr "ターン順"
+msgstr "ã‚¿ãƒ¼ãƒ³é †"
 
 #. Screens.Unavailable
 msgctxt "Screens.Unavailable"
 msgid "Unavailable"
-msgstr "利用不可"
+msgstr "åˆ©ç”¨ä¸å¯"
 
 #. Screens.VisitingWielderArmy
 msgctxt "Screens.VisitingWielderArmy"
 msgid "visiting wielder army"
-msgstr "訪問中のウィールダー軍"
+msgstr "è¨ªå•ä¸­ã®ã‚¦ã‚£ãƒ¼ãƒ«ãƒ€ãƒ¼è»"
 
 #. Screens.WielderArmyPossessive
 msgctxt "Screens.WielderArmyPossessive"
 msgid "{0}'s army"
-msgstr "{0} の軍"
+msgstr "{0} ã®è»"
 
 #. Screens.WielderArmy
 msgctxt "Screens.WielderArmy"
 msgid "wielder army"
-msgstr "ウィールダー軍"
+msgstr "ã‚¦ã‚£ãƒ¼ãƒ«ãƒ€ãƒ¼è»"
 
 #. Screens.Wielders
 msgctxt "Screens.Wielders"
 msgid "Wielders"
-msgstr "ウィールダー"
+msgstr "ã‚¦ã‚£ãƒ¼ãƒ«ãƒ€ãƒ¼"
 
 #. Screens.WielderStats
 msgctxt "Screens.WielderStats"
 msgid "{0}'s stats"
-msgstr "{0} の能力値"
+msgstr "{0} ã®èƒ½åŠ›å€¤"
 
 #. Screens.WielderModifierCategories
 msgctxt "Screens.WielderModifierCategories"
 msgid "{0}'s modifier categories"
-msgstr "{0} の修正カテゴリ"
+msgstr "{0} ã®ä¿®æ­£ã‚«ãƒ†ã‚´ãƒª"
 
 #. Screens.WorldChoiceMenu
 msgctxt "Screens.WorldChoiceMenu"
 msgid "World choice menu"
-msgstr "ワールド選択メニュー"
+msgstr "ãƒ¯ãƒ¼ãƒ«ãƒ‰é¸æŠžãƒ¡ãƒ‹ãƒ¥ãƒ¼"
 
 #. Screens.WorldConfirmationMenu
 msgctxt "Screens.WorldConfirmationMenu"
 msgid "World confirmation menu"
-msgstr "ワールド確認メニュー"
+msgstr "ãƒ¯ãƒ¼ãƒ«ãƒ‰ç¢ºèªãƒ¡ãƒ‹ãƒ¥ãƒ¼"
 
 #. Screens.RemoveFromQuickbar
 msgctxt "Screens.RemoveFromQuickbar"
 msgid "Remove from quickbar"
-msgstr "クイックバーから削除"
+msgstr "ã‚¯ã‚¤ãƒƒã‚¯ãƒãƒ¼ã‹ã‚‰å‰Šé™¤"
 
 #. Screens.AmountToUpgrade
 msgctxt "Screens.AmountToUpgrade"
 msgid "Amount to upgrade, {0}"
-msgstr "{0}のアップグレード数"
+msgstr "{0}ã®ã‚¢ãƒƒãƒ—ã‚°ãƒ¬ãƒ¼ãƒ‰æ•°"
 
 #. Screens.UnknownSpell
 msgctxt "Screens.UnknownSpell"
 msgid "unknown spell"
-msgstr "不明な呪文"
+msgstr "ä¸æ˜Žãªå‘ªæ–‡"
 
 
 #. Screens.EnemyWielder
 msgctxt "Screens.EnemyWielder"
 msgid "enemy wielder {0}"
-msgstr "敵ウィールダー {0}"
+msgstr "æ•µã‚¦ã‚£ãƒ¼ãƒ«ãƒ€ãƒ¼ {0}"
 
 
 #. Actions.Activate
 msgctxt "Actions.Activate"
 msgid "Activate"
-msgstr "実行"
+msgstr "å®Ÿè¡Œ"
 
 #. Actions.Cancel
 msgctxt "Actions.Cancel"
 msgid "Cancel"
-msgstr "キャンセル"
+msgstr "ã‚­ãƒ£ãƒ³ã‚»ãƒ«"
 
 #. Actions.CombatFocusTimeline
 msgctxt "Actions.CombatFocusTimeline"
 msgid "Focus Timeline"
-msgstr "タイムラインにフォーカス"
+msgstr "ã‚¿ã‚¤ãƒ ãƒ©ã‚¤ãƒ³ã«ãƒ•ã‚©ãƒ¼ã‚«ã‚¹"
 
 #. Actions.CombatInspect
 msgctxt "Actions.CombatInspect"
 msgid "Inspect Combat Hex"
-msgstr "戦闘ヘックスを調査"
+msgstr "æˆ¦é—˜ãƒ˜ãƒƒã‚¯ã‚¹ã‚’èª¿æŸ»"
 
 #. Actions.CombatNextRelevantTile
 msgctxt "Actions.CombatNextRelevantTile"
 msgid "Next Relevant Combat Tile"
-msgstr "次の関連戦闘マス"
+msgstr "æ¬¡ã®é–¢é€£æˆ¦é—˜ãƒžã‚¹"
 
 #. Actions.CombatPreviousRelevantTile
 msgctxt "Actions.CombatPreviousRelevantTile"
 msgid "Previous Relevant Combat Tile"
-msgstr "前の関連戦闘マス"
+msgstr "å‰ã®é–¢é€£æˆ¦é—˜ãƒžã‚¹"
 
 #. Actions.FirstBufferLine
 msgctxt "Actions.FirstBufferLine"
 msgid "First Buffer Line"
-msgstr "最初 バッファ 行"
+msgstr "æœ€åˆ ãƒãƒƒãƒ•ã‚¡ è¡Œ"
 
 #. Actions.FirstMenuItem
 msgctxt "Actions.FirstMenuItem"
 msgid "First Menu Item"
-msgstr "最初 メニュー 項目"
+msgstr "æœ€åˆ ãƒ¡ãƒ‹ãƒ¥ãƒ¼ é …ç›®"
 
 #. Actions.FirstRow
 msgctxt "Actions.FirstRow"
 msgid "First Row"
-msgstr "最初 行"
+msgstr "æœ€åˆ è¡Œ"
 
 #. Actions.HexGridEast
 msgctxt "Actions.HexGridEast"
 msgid "Hex Grid East"
-msgstr "ヘックスグリッド東"
+msgstr "ãƒ˜ãƒƒã‚¯ã‚¹ã‚°ãƒªãƒƒãƒ‰æ±"
 
 #. Actions.HexGridNorthEast
 msgctxt "Actions.HexGridNorthEast"
 msgid "Hex Grid Northeast"
-msgstr "ヘックスグリッド北東"
+msgstr "ãƒ˜ãƒƒã‚¯ã‚¹ã‚°ãƒªãƒƒãƒ‰åŒ—æ±"
 
 #. Actions.HexGridNorthWest
 msgctxt "Actions.HexGridNorthWest"
 msgid "Hex Grid Northwest"
-msgstr "ヘックスグリッド北西"
+msgstr "ãƒ˜ãƒƒã‚¯ã‚¹ã‚°ãƒªãƒƒãƒ‰åŒ—è¥¿"
 
 #. Actions.HexGridSouthEast
 msgctxt "Actions.HexGridSouthEast"
 msgid "Hex Grid Southeast"
-msgstr "ヘックスグリッド南東"
+msgstr "ãƒ˜ãƒƒã‚¯ã‚¹ã‚°ãƒªãƒƒãƒ‰å—æ±"
 
 #. Actions.HexGridSouthWest
 msgctxt "Actions.HexGridSouthWest"
 msgid "Hex Grid Southwest"
-msgstr "ヘックスグリッド南西"
+msgstr "ãƒ˜ãƒƒã‚¯ã‚¹ã‚°ãƒªãƒƒãƒ‰å—è¥¿"
 
 #. Actions.HexGridWest
 msgctxt "Actions.HexGridWest"
 msgid "Hex Grid West"
-msgstr "ヘックスグリッド西"
+msgstr "ãƒ˜ãƒƒã‚¯ã‚¹ã‚°ãƒªãƒƒãƒ‰è¥¿"
 
 #. Actions.LastBufferLine
 msgctxt "Actions.LastBufferLine"
 msgid "Last Buffer Line"
-msgstr "最後 バッファ 行"
+msgstr "æœ€å¾Œ ãƒãƒƒãƒ•ã‚¡ è¡Œ"
 
 #. Actions.LastMenuItem
 msgctxt "Actions.LastMenuItem"
 msgid "Last Menu Item"
-msgstr "最後 メニュー 項目"
+msgstr "æœ€å¾Œ ãƒ¡ãƒ‹ãƒ¥ãƒ¼ é …ç›®"
 
 #. Actions.LastRow
 msgctxt "Actions.LastRow"
 msgid "Last Row"
-msgstr "最後 行"
+msgstr "æœ€å¾Œ è¡Œ"
 
 #. Actions.MapMoveEast
 msgctxt "Actions.MapMoveEast"
 msgid "Map Move East"
-msgstr "マップを東へ移動"
+msgstr "ãƒžãƒƒãƒ—ã‚’æ±ã¸ç§»å‹•"
 
 #. Actions.MapMoveNorth
 msgctxt "Actions.MapMoveNorth"
 msgid "Map Move North"
-msgstr "マップを北へ移動"
+msgstr "ãƒžãƒƒãƒ—ã‚’åŒ—ã¸ç§»å‹•"
 
 #. Actions.MapMoveSouth
 msgctxt "Actions.MapMoveSouth"
 msgid "Map Move South"
-msgstr "マップを南へ移動"
+msgstr "ãƒžãƒƒãƒ—ã‚’å—ã¸ç§»å‹•"
 
 #. Actions.MapMoveWest
 msgctxt "Actions.MapMoveWest"
 msgid "Map Move West"
-msgstr "マップを西へ移動"
+msgstr "ãƒžãƒƒãƒ—ã‚’è¥¿ã¸ç§»å‹•"
 
 #. Actions.MapSecondaryAction
 msgctxt "Actions.MapSecondaryAction"
 msgid "Map Secondary Action"
-msgstr "マップ副操作"
+msgstr "ãƒžãƒƒãƒ—å‰¯æ“ä½œ"
 
 #. Actions.NextBuffer
 msgctxt "Actions.NextBuffer"
 msgid "Next Buffer"
-msgstr "次 バッファ"
+msgstr "æ¬¡ ãƒãƒƒãƒ•ã‚¡"
 
 #. Actions.NextBufferLine
 msgctxt "Actions.NextBufferLine"
 msgid "Next Buffer Line"
-msgstr "次 バッファ 行"
+msgstr "æ¬¡ ãƒãƒƒãƒ•ã‚¡ è¡Œ"
 
 #. Actions.NextColumn
 msgctxt "Actions.NextColumn"
 msgid "Next Column"
-msgstr "次 列"
+msgstr "æ¬¡ åˆ—"
 
 #. Actions.NextHeading
 msgctxt "Actions.NextHeading"
 msgid "Next Heading"
-msgstr "次 見出し"
+msgstr "æ¬¡ è¦‹å‡ºã—"
 
 #. Actions.NextMenuItem
 msgctxt "Actions.NextMenuItem"
 msgid "Next Menu Item"
-msgstr "次 メニュー 項目"
+msgstr "æ¬¡ ãƒ¡ãƒ‹ãƒ¥ãƒ¼ é …ç›®"
 
 #. Actions.NextRow
 msgctxt "Actions.NextRow"
 msgid "Next Row"
-msgstr "次 行"
+msgstr "æ¬¡ è¡Œ"
 
 #. Actions.NextSettlement
 msgctxt "Actions.NextSettlement"
 msgid "Next Settlement"
-msgstr "次の集落"
+msgstr "æ¬¡ã®é›†è½"
 
 #. Actions.NextWidget
 msgctxt "Actions.NextWidget"
 msgid "Next Widget"
-msgstr "次 ウィジェット"
+msgstr "æ¬¡ ã‚¦ã‚£ã‚¸ã‚§ãƒƒãƒˆ"
 
 #. Actions.NextWielder
 msgctxt "Actions.NextWielder"
 msgid "Next Wielder"
-msgstr "次のウィールダー"
+msgstr "æ¬¡ã®ã‚¦ã‚£ãƒ¼ãƒ«ãƒ€ãƒ¼"
 
 #. Actions.OpenModSettings
 msgctxt "Actions.OpenModSettings"
 msgid "Open Mod Settings"
-msgstr "Mod設定を開く"
+msgstr "Modè¨­å®šã‚’é–‹ã"
 
 #. Actions.PreviousBuffer
 msgctxt "Actions.PreviousBuffer"
 msgid "Previous Buffer"
-msgstr "前 バッファ"
+msgstr "å‰ ãƒãƒƒãƒ•ã‚¡"
 
 #. Actions.PreviousBufferLine
 msgctxt "Actions.PreviousBufferLine"
 msgid "Previous Buffer Line"
-msgstr "前 バッファ 行"
+msgstr "å‰ ãƒãƒƒãƒ•ã‚¡ è¡Œ"
 
 #. Actions.PreviousColumn
 msgctxt "Actions.PreviousColumn"
 msgid "Previous Column"
-msgstr "前 列"
+msgstr "å‰ åˆ—"
 
 #. Actions.PreviousHeading
 msgctxt "Actions.PreviousHeading"
 msgid "Previous Heading"
-msgstr "前 見出し"
+msgstr "å‰ è¦‹å‡ºã—"
 
 #. Actions.PreviousMenuItem
 msgctxt "Actions.PreviousMenuItem"
 msgid "Previous Menu Item"
-msgstr "前 メニュー 項目"
+msgstr "å‰ ãƒ¡ãƒ‹ãƒ¥ãƒ¼ é …ç›®"
 
 #. Actions.PreviousRow
 msgctxt "Actions.PreviousRow"
 msgid "Previous Row"
-msgstr "前 行"
+msgstr "å‰ è¡Œ"
 
 #. Actions.PreviousWidget
 msgctxt "Actions.PreviousWidget"
 msgid "Previous Widget"
-msgstr "前 ウィジェット"
+msgstr "å‰ ã‚¦ã‚£ã‚¸ã‚§ãƒƒãƒˆ"
 
 #. Actions.ReadThreat
 msgctxt "Actions.ReadThreat"
 msgid "Read Threat"
-msgstr "脅威を読み上げ"
+msgstr "è„…å¨ã‚’èª­ã¿ä¸Šã’"
 
 #. Actions.ScannerJumpToResult
 msgctxt "Actions.ScannerJumpToResult"
 msgid "Jump To Scanner Result"
-msgstr "スキャナー結果へ移動"
+msgstr "ã‚¹ã‚­ãƒ£ãƒŠãƒ¼çµæžœã¸ç§»å‹•"
 
 #. Actions.ScannerNextCategory
 msgctxt "Actions.ScannerNextCategory"
 msgid "Next Scanner Category"
-msgstr "次 スキャナー カテゴリ"
+msgstr "æ¬¡ ã‚¹ã‚­ãƒ£ãƒŠãƒ¼ ã‚«ãƒ†ã‚´ãƒª"
 
 #. Actions.ScannerNextResult
 msgctxt "Actions.ScannerNextResult"
 msgid "Next Scanner Result"
-msgstr "次 スキャナー 結果"
+msgstr "æ¬¡ ã‚¹ã‚­ãƒ£ãƒŠãƒ¼ çµæžœ"
 
 #. Actions.ScannerNextSubcategory
 msgctxt "Actions.ScannerNextSubcategory"
 msgid "Next Scanner Subcategory"
-msgstr "次 スキャナー サブカテゴリ"
+msgstr "æ¬¡ ã‚¹ã‚­ãƒ£ãƒŠãƒ¼ ã‚µãƒ–ã‚«ãƒ†ã‚´ãƒª"
 
 #. Actions.ScannerPreviousCategory
 msgctxt "Actions.ScannerPreviousCategory"
 msgid "Previous Scanner Category"
-msgstr "前 スキャナー カテゴリ"
+msgstr "å‰ ã‚¹ã‚­ãƒ£ãƒŠãƒ¼ ã‚«ãƒ†ã‚´ãƒª"
 
 #. Actions.ScannerPreviousResult
 msgctxt "Actions.ScannerPreviousResult"
 msgid "Previous Scanner Result"
-msgstr "前 スキャナー 結果"
+msgstr "å‰ ã‚¹ã‚­ãƒ£ãƒŠãƒ¼ çµæžœ"
 
 #. Actions.ScannerPreviousSubcategory
 msgctxt "Actions.ScannerPreviousSubcategory"
 msgid "Previous Scanner Subcategory"
-msgstr "前 スキャナー サブカテゴリ"
+msgstr "å‰ ã‚¹ã‚­ãƒ£ãƒŠãƒ¼ ã‚µãƒ–ã‚«ãƒ†ã‚´ãƒª"
 
 #. Actions.ScannerRefresh
 msgctxt "Actions.ScannerRefresh"
 msgid "Refresh Scanner"
-msgstr "スキャナーを更新"
+msgstr "ã‚¹ã‚­ãƒ£ãƒŠãƒ¼ã‚’æ›´æ–°"
 
 #. Actions.ScannerSpeakOrientation
 msgctxt "Actions.ScannerSpeakOrientation"
 msgid "Scanner Result Orientation"
-msgstr "スキャナー結果の方向"
+msgstr "ã‚¹ã‚­ãƒ£ãƒŠãƒ¼çµæžœã®æ–¹å‘"
 
 #. Actions.SliderDecrease
 msgctxt "Actions.SliderDecrease"
 msgid "Slider Decrease"
-msgstr "スライダーを減少"
+msgstr "ã‚¹ãƒ©ã‚¤ãƒ€ãƒ¼ã‚’æ¸›å°‘"
 
 #. Actions.SliderIncrease
 msgctxt "Actions.SliderIncrease"
 msgid "Slider Increase"
-msgstr "スライダーを増加"
+msgstr "ã‚¹ãƒ©ã‚¤ãƒ€ãƒ¼ã‚’å¢—åŠ "
 
 #. Actions.SliderMaximum
 msgctxt "Actions.SliderMaximum"
 msgid "Slider Maximum"
-msgstr "スライダー最大"
+msgstr "ã‚¹ãƒ©ã‚¤ãƒ€ãƒ¼æœ€å¤§"
 
 #. Actions.SliderMinimum
 msgctxt "Actions.SliderMinimum"
 msgid "Slider Minimum"
-msgstr "スライダー最小"
+msgstr "ã‚¹ãƒ©ã‚¤ãƒ€ãƒ¼æœ€å°"
 
 #. Actions.StartDrag
 msgctxt "Actions.StartDrag"
 msgid "Start Drag"
-msgstr "ドラッグ開始"
+msgstr "ãƒ‰ãƒ©ãƒƒã‚°é–‹å§‹"
 
 #. Actions.SummarizeEnemyResources
 msgctxt "Actions.SummarizeEnemyResources"
 msgid "Summarize Enemy Resources"
-msgstr "敵の資源を要約"
+msgstr "æ•µã®è³‡æºã‚’è¦ç´„"
 
 #. Actions.SummarizeResources
 msgctxt "Actions.SummarizeResources"
 msgid "Summarize Resources"
-msgstr "資源を要約"
+msgstr "è³‡æºã‚’è¦ç´„"
 
 #. Actions.TooltipActionsMenu
 msgctxt "Actions.TooltipActionsMenu"
 msgid "Tooltip Actions Menu"
-msgstr "ツールチップ操作メニュー"
+msgstr "ãƒ„ãƒ¼ãƒ«ãƒãƒƒãƒ—æ“ä½œãƒ¡ãƒ‹ãƒ¥ãƒ¼"
 
 #. Combat.AbilityUsed
 msgctxt "Combat.AbilityUsed"
 msgid "{0} uses {1}"
-msgstr "{0}が{1}を使用"
+msgstr "{0}ãŒ{1}ã‚’ä½¿ç”¨"
 
 #. Combat.Affects
 msgctxt "Combat.Affects"
 msgid "{0} affects {1}"
-msgstr "{0}が{1}に影響"
+msgstr "{0}ãŒ{1}ã«å½±éŸ¿"
 
 #. Combat.Appears
 msgctxt "Combat.Appears"
 msgid "{0} appears"
-msgstr "{0}が出現"
+msgstr "{0}ãŒå‡ºç¾"
 
 #. Combat.ArcanaEssence
 msgctxt "Combat.ArcanaEssence"
 msgid "arcana"
-msgstr "秘術"
+msgstr "ç§˜è¡“"
 
 #. Combat.Attack
 msgctxt "Combat.Attack"
 msgid "{0} {1} {2}"
-msgstr "{0}が{2}に{1}"
+msgstr "{0}ãŒ{2}ã«{1}"
 
 #. Combat.AttackableEntity
 msgctxt "Combat.AttackableEntity"
 msgid "attackable entity"
-msgstr "攻撃可能なエンティティ"
+msgstr "æ”»æ’ƒå¯èƒ½ãªã‚¨ãƒ³ãƒ†ã‚£ãƒ†ã‚£"
 
 #. Combat.AttackVerbDefault
 msgctxt "Combat.AttackVerbDefault"
 msgid "attacks"
-msgstr "攻撃"
+msgstr "æ”»æ’ƒ"
 
 #. Combat.AttackVerbOpportunity
 msgctxt "Combat.AttackVerbOpportunity"
 msgid "makes an opportunity attack against"
-msgstr "機会攻撃"
+msgstr "æ©Ÿä¼šæ”»æ’ƒ"
 
 #. Combat.AttackVerbOverwatch
 msgctxt "Combat.AttackVerbOverwatch"
 msgid "makes an overwatch attack against"
-msgstr "監視攻撃"
+msgstr "ç›£è¦–æ”»æ’ƒ"
 
 #. Combat.AttackVerbRetaliation
 msgctxt "Combat.AttackVerbRetaliation"
 msgid "retaliates against"
-msgstr "反撃"
+msgstr "åæ’ƒ"
 
 #. Combat.AttackVerbSpearwall
 msgctxt "Combat.AttackVerbSpearwall"
 msgid "makes a spearwall attack against"
-msgstr "槍壁攻撃"
+msgstr "æ§å£æ”»æ’ƒ"
 
 #. Combat.BattleOver
 msgctxt "Combat.BattleOver"
 msgid "Battle over"
-msgstr "戦闘終了"
+msgstr "æˆ¦é—˜çµ‚äº†"
 
 #. Combat.BlindFury
 msgctxt "Combat.BlindFury"
 msgid "blind fury"
-msgstr "盲目の怒り"
+msgstr "ç›²ç›®ã®æ€’ã‚Š"
 
 #. Combat.BurrowsUp
 msgctxt "Combat.BurrowsUp"
 msgid "{0} burrows up"
-msgstr "{0}が地中から出現"
+msgstr "{0}ãŒåœ°ä¸­ã‹ã‚‰å‡ºç¾"
 
 #. Combat.CastsSpell
 msgctxt "Combat.CastsSpell"
 msgid "{0} casts {1}"
-msgstr "{0}が{1}を詠唱"
+msgstr "{0}ãŒ{1}ã‚’è© å”±"
 
 #. Combat.CastsSpellAt
 msgctxt "Combat.CastsSpellAt"
 msgid "{0} casts {1} at {2}"
-msgstr "{0}が{2}に{1}を詠唱"
+msgstr "{0}ãŒ{2}ã«{1}ã‚’è© å”±"
 
 #. Combat.Challenge
 msgctxt "Combat.Challenge"
 msgid "challenge"
-msgstr "挑発"
+msgstr "æŒ‘ç™º"
 
 #. Combat.ChaosEssence
 msgctxt "Combat.ChaosEssence"
 msgid "chaos"
-msgstr "混沌"
+msgstr "æ··æ²Œ"
 
 #. Combat.Created
 msgctxt "Combat.Created"
 msgid "{0} created"
-msgstr "{0}が作成された"
+msgstr "{0}ãŒä½œæˆã•ã‚ŒãŸ"
 
 #. Combat.CreationEssence
 msgctxt "Combat.CreationEssence"
 msgid "creation"
-msgstr "創造"
+msgstr "å‰µé€ "
 
 #. Combat.DamageDestroyingItSuffix
 msgctxt "Combat.DamageDestroyingItSuffix"
 msgid ", destroying it"
-msgstr "、破壊"
+msgstr "ã€ç ´å£Š"
 
 #. Combat.DamageKillsSuffix
 msgctxt "Combat.DamageKillsSuffix"
 msgid ", killing {0}"
-msgstr "、{0}を撃破"
+msgstr "ã€{0}ã‚’æ’ƒç ´"
 
 #. Combat.DealsDamage
 msgctxt "Combat.DealsDamage"
 msgid "{0} deals {1} {2} damage to {3}{4}"
-msgstr "{0}が{3}に{1}の{2}ダメージを与える{4}"
+msgstr "{0}ãŒ{3}ã«{1}ã®{2}ãƒ€ãƒ¡ãƒ¼ã‚¸ã‚’ä¸Žãˆã‚‹{4}"
 
 #. Combat.Defeat
 msgctxt "Combat.Defeat"
 msgid "Defeat"
-msgstr "敗北"
+msgstr "æ•—åŒ—"
 
 #. Combat.Destroyed
 msgctxt "Combat.Destroyed"
 msgid "{0} destroyed"
-msgstr "{0}が破壊された"
+msgstr "{0}ãŒç ´å£Šã•ã‚ŒãŸ"
 
 #. Combat.DestructionEssence
 msgctxt "Combat.DestructionEssence"
 msgid "destruction"
-msgstr "破壊"
+msgstr "ç ´å£Š"
 
 #. Combat.Draw
 msgctxt "Combat.Draw"
 msgid "Draw"
-msgstr "引き分け"
+msgstr "å¼•ãåˆ†ã‘"
 
 #. Combat.Effect
 msgctxt "Combat.Effect"
 msgid "effect"
-msgstr "効果"
+msgstr "åŠ¹æžœ"
 
 #. Combat.EnemyTroop
 msgctxt "Combat.EnemyTroop"
 msgid "{0} enemy {1}"
-msgstr "{0} 敵 {1}"
+msgstr "{0} æ•µ {1}"
 
 #. Combat.EnemyTroops
 msgctxt "Combat.EnemyTroops"
 msgid "enemy troops"
-msgstr "敵部隊"
+msgstr "æ•µéƒ¨éšŠ"
 
 #. Combat.EssenceAmount
 msgctxt "Combat.EssenceAmount"
 msgid "+{0} {1} essence"
-msgstr "+{0} {1}エッセンス"
+msgstr "+{0} {1}ã‚¨ãƒƒã‚»ãƒ³ã‚¹"
 
 #. Combat.ExplosiveBarrel
 msgctxt "Combat.ExplosiveBarrel"
 msgid "explosive barrel"
-msgstr "爆発樽"
+msgstr "çˆ†ç™ºæ¨½"
 
 #. Combat.FailedBurrow
 msgctxt "Combat.FailedBurrow"
 msgid "{0}, failed burrow"
-msgstr "{0}、潜行失敗"
+msgstr "{0}ã€æ½œè¡Œå¤±æ•—"
 
 #. Combat.FaeyFire
 msgctxt "Combat.FaeyFire"
 msgid "Faey Fire"
-msgstr "フェイの火"
+msgstr "ãƒ•ã‚§ã‚¤ã®ç«"
 
 #. Combat.FaeyFireWithBolts
 msgctxt "Combat.FaeyFireWithBolts"
 msgid "{0} casts {1}, {2}"
-msgstr "{0}が{1}を詠唱、{2}"
+msgstr "{0}ãŒ{1}ã‚’è© å”±ã€{2}"
 
 #. Combat.Lunge
 msgctxt "Combat.Lunge"
 msgid "lunge"
-msgstr "突進"
+msgstr "çªé€²"
 
 #. Combat.MapEntityDamage
 msgctxt "Combat.MapEntityDamage"
 msgid "map entity"
-msgstr "マップエンティティ"
+msgstr "ãƒžãƒƒãƒ—ã‚¨ãƒ³ãƒ†ã‚£ãƒ†ã‚£"
 
 #. Combat.MeleeDamage
 msgctxt "Combat.MeleeDamage"
 msgid "melee"
-msgstr "近接"
+msgstr "è¿‘æŽ¥"
 
 #. Combat.MothersLove
 msgctxt "Combat.MothersLove"
 msgid "mother's love"
-msgstr "母の愛"
+msgstr "æ¯ã®æ„›"
 
 #. Combat.NewTurn
 msgctxt "Combat.NewTurn"
 msgid "It is {0}'s turn"
-msgstr "{0}のターン"
+msgstr "{0}ã®ã‚¿ãƒ¼ãƒ³"
 
 #. Combat.OpportunityAttack
 msgctxt "Combat.OpportunityAttack"
 msgid "opportunity attack"
-msgstr "機会攻撃"
+msgstr "æ©Ÿä¼šæ”»æ’ƒ"
 
 #. Combat.OrderEssence
 msgctxt "Combat.OrderEssence"
 msgid "order"
-msgstr "秩序"
+msgstr "ç§©åº"
 
 #. Combat.Overwatch
 msgctxt "Combat.Overwatch"
 msgid "overwatch"
-msgstr "監視"
+msgstr "ç›£è¦–"
 
 #. Combat.PushedTo
 msgctxt "Combat.PushedTo"
 msgid "{0} pushed to {1}"
-msgstr "{0}が{1}へ押し出された"
+msgstr "{0}ãŒ{1}ã¸æŠ¼ã—å‡ºã•ã‚ŒãŸ"
 
 #. Combat.RangedDamage
 msgctxt "Combat.RangedDamage"
 msgid "ranged"
-msgstr "遠隔"
+msgstr "é éš”"
 
 #. Combat.RavenformsTo
 msgctxt "Combat.RavenformsTo"
 msgid "{0} ravenforms to {1}"
-msgstr "{0}が烏形態で{1}へ移動"
+msgstr "{0}ãŒçƒå½¢æ…‹ã§{1}ã¸ç§»å‹•"
 
 #. Combat.RemovedFrom
 msgctxt "Combat.RemovedFrom"
 msgid "{0} removed from {1}"
-msgstr "{0}が{1}から除去"
+msgstr "{0}ãŒ{1}ã‹ã‚‰é™¤åŽ»"
 
 #. Combat.Retaliation
 msgctxt "Combat.Retaliation"
 msgid "retaliation"
-msgstr "反撃"
+msgstr "åæ’ƒ"
 
 #. Combat.Spearwall
 msgctxt "Combat.Spearwall"
 msgid "spearwall"
-msgstr "槍壁"
+msgstr "æ§å£"
 
 #. Combat.SpellDamage
 msgctxt "Combat.SpellDamage"
 msgid "spell"
-msgstr "呪文"
+msgstr "å‘ªæ–‡"
 
 #. Combat.Splash
 msgctxt "Combat.Splash"
 msgid "splash"
-msgstr "範囲"
+msgstr "ç¯„å›²"
 
 #. Combat.Summoned
 msgctxt "Combat.Summoned"
 msgid "{0} summoned"
-msgstr "{0}が召喚された"
+msgstr "{0}ãŒå¬å–šã•ã‚ŒãŸ"
 
 #. Combat.TakesDamage
 msgctxt "Combat.TakesDamage"
 msgid "{0} takes {1} {2} damage{3}"
-msgstr "{0}が{1}の{2}ダメージを受ける{3}"
+msgstr "{0}ãŒ{1}ã®{2}ãƒ€ãƒ¡ãƒ¼ã‚¸ã‚’å—ã‘ã‚‹{3}"
 
 #. Combat.TeleportsTo
 msgctxt "Combat.TeleportsTo"
 msgid "{0} teleports to {1}"
-msgstr "{0}が{1}へテレポート"
+msgstr "{0}ãŒ{1}ã¸ãƒ†ãƒ¬ãƒãƒ¼ãƒˆ"
 
 #. Combat.Tile
 msgctxt "Combat.Tile"
 msgid "tile {0}"
-msgstr "マス {0}"
+msgstr "ãƒžã‚¹ {0}"
 
 #. Combat.Troop
 msgctxt "Combat.Troop"
 msgid "troop"
-msgstr "部隊"
+msgstr "éƒ¨éšŠ"
 
 #. Combat.TroopAt
 msgctxt "Combat.TroopAt"
 msgid "{0} at {1}"
-msgstr "{0}、{1}"
+msgstr "{0}ã€{1}"
 
 #. Combat.TroopMoved
 msgctxt "Combat.TroopMoved"
 msgid "{0} moves to {1}"
-msgstr "{0}が{1}へ移動"
+msgstr "{0}ãŒ{1}ã¸ç§»å‹•"
 
 #. Combat.TroopQuantity
 msgctxt "Combat.TroopQuantity"
@@ -1455,662 +1470,662 @@ msgstr "{0} {1}"
 #. Combat.Unknown
 msgctxt "Combat.Unknown"
 msgid "unknown"
-msgstr "不明"
+msgstr "ä¸æ˜Ž"
 
 #. Combat.UnknownEntity
 msgctxt "Combat.UnknownEntity"
 msgid "unknown entity"
-msgstr "不明なエンティティ"
+msgstr "ä¸æ˜Žãªã‚¨ãƒ³ãƒ†ã‚£ãƒ†ã‚£"
 
 #. Combat.UnknownTarget
 msgctxt "Combat.UnknownTarget"
 msgid "unknown target"
-msgstr "不明な対象"
+msgstr "ä¸æ˜Žãªå¯¾è±¡"
 
 #. Combat.UnknownTroop
 msgctxt "Combat.UnknownTroop"
 msgid "unknown troop"
-msgstr "不明な部隊"
+msgstr "ä¸æ˜Žãªéƒ¨éšŠ"
 
 #. Combat.Victory
 msgctxt "Combat.Victory"
 msgid "Victory"
-msgstr "勝利"
+msgstr "å‹åˆ©"
 
 #. Combat.Walkover
 msgctxt "Combat.Walkover"
 msgid "Walkover"
-msgstr "不戦勝"
+msgstr "ä¸æˆ¦å‹"
 
 #. Combat.Wielder
 msgctxt "Combat.Wielder"
 msgid "wielder"
-msgstr "ウィールダー"
+msgstr "ã‚¦ã‚£ãƒ¼ãƒ«ãƒ€ãƒ¼"
 
 #. Combat.YourTroops
 msgctxt "Combat.YourTroops"
 msgid "your troops"
-msgstr "味方部隊"
+msgstr "å‘³æ–¹éƒ¨éšŠ"
 
 #. Combat.BoltAt_0
 msgctxt "Combat.BoltAt_0"
 msgid "{0} bolt at {1}"
-msgstr "{0}本の矢が{1}へ"
+msgstr "{0}æœ¬ã®çŸ¢ãŒ{1}ã¸"
 
 #. Common.In
 msgctxt "Common.In"
 msgid "in {0}"
-msgstr "{0}内"
+msgstr "{0}å†…"
 
 #. Common.CountOf
 msgctxt "Common.CountOf"
 msgid "{0} of {1}"
-msgstr "{1}中{0}"
+msgstr "{1}ä¸­{0}"
 
 #. Common.NamePossessive
 msgctxt "Common.NamePossessive"
 msgid "{0}'s"
-msgstr "{0}の"
+msgstr "{0}ã®"
 
 #. Spatial.Acting
 msgctxt "Spatial.Acting"
 msgid "acting"
-msgstr "行動中"
+msgstr "è¡Œå‹•ä¸­"
 
 #. Spatial.Attack
 msgctxt "Spatial.Attack"
 msgid "attack"
-msgstr "攻撃"
+msgstr "æ”»æ’ƒ"
 
 #. Spatial.AttackPreview
 msgctxt "Spatial.AttackPreview"
 msgid "Attack preview:"
-msgstr "攻撃プレビュー:"
+msgstr "æ”»æ’ƒãƒ—ãƒ¬ãƒ“ãƒ¥ãƒ¼:"
 
 #. Spatial.AttackRange
 msgctxt "Spatial.AttackRange"
 msgid "attack range"
-msgstr "攻撃範囲"
+msgstr "æ”»æ’ƒç¯„å›²"
 
 #. Spatial.Blocked
 msgctxt "Spatial.Blocked"
 msgid "blocked"
-msgstr "ブロック済み"
+msgstr "ãƒ–ãƒ­ãƒƒã‚¯æ¸ˆã¿"
 
 #. Spatial.Commander
 msgctxt "Spatial.Commander"
 msgid "Commander"
-msgstr "指揮官"
+msgstr "æŒ‡æ®å®˜"
 
 #. Spatial.CommanderPossessive
 msgctxt "Spatial.CommanderPossessive"
 msgid "commander's"
-msgstr "指揮官の"
+msgstr "æŒ‡æ®å®˜ã®"
 
 #. Spatial.Cost
 msgctxt "Spatial.Cost"
 msgid "cost {0}"
-msgstr "コスト {0}"
+msgstr "ã‚³ã‚¹ãƒˆ {0}"
 
 #. Spatial.DamagePreview
 msgctxt "Spatial.DamagePreview"
 msgid "{0}damage {1}"
-msgstr "{0}ダメージ {1}"
+msgstr "{0}ãƒ€ãƒ¡ãƒ¼ã‚¸ {1}"
 
 #. Spatial.DeadlyRange
 msgctxt "Spatial.DeadlyRange"
 msgid "deadly range"
-msgstr "致命範囲"
+msgstr "è‡´å‘½ç¯„å›²"
 
 #. Spatial.Deadly
 msgctxt "Spatial.Deadly"
 msgid "deadly"
-msgstr "致命"
+msgstr "è‡´å‘½"
 
 #. Spatial.Debris
 msgctxt "Spatial.Debris"
 msgid "debris"
-msgstr "残骸"
+msgstr "æ®‹éª¸"
 
 #. Spatial.Destination
 msgctxt "Spatial.Destination"
 msgid "Destination"
-msgstr "目的地"
+msgstr "ç›®çš„åœ°"
 
 #. Spatial.DestinationAt
 msgctxt "Spatial.DestinationAt"
 msgid "Destination: {0}"
-msgstr "目的地: {0}"
+msgstr "ç›®çš„åœ°: {0}"
 
 #. Spatial.Destroys
 msgctxt "Spatial.Destroys"
 msgid "destroys"
-msgstr "破壊する"
+msgstr "ç ´å£Šã™ã‚‹"
 
 #. Spatial.ElevatedGroundHeight
 msgctxt "Spatial.ElevatedGroundHeight"
 msgid "elevated ground, height {0}"
-msgstr "高所、高さ {0}"
+msgstr "é«˜æ‰€ã€é«˜ã• {0}"
 
 #. Spatial.EnemySpawnPoint
 msgctxt "Spatial.EnemySpawnPoint"
 msgid "enemy spawn point"
-msgstr "敵出現地点"
+msgstr "æ•µå‡ºç¾åœ°ç‚¹"
 
 #. Spatial.Enemy
 msgctxt "Spatial.Enemy"
 msgid "enemy"
-msgstr "敵"
+msgstr "æ•µ"
 
 #. Spatial.ExtraTargetPrefix
 msgctxt "Spatial.ExtraTargetPrefix"
 msgid "extra target "
-msgstr "追加対象 "
+msgstr "è¿½åŠ å¯¾è±¡ "
 
 #. Spatial.Friendly
 msgctxt "Spatial.Friendly"
 msgid "friendly"
-msgstr "味方"
+msgstr "å‘³æ–¹"
 
 #. Spatial.FurthestReachableInTurns
 msgctxt "Spatial.FurthestReachableInTurns"
 msgid "furthest reachable in {0} turns"
-msgstr "{0}ターン後に到達できる最遠地点"
+msgstr "{0}ã‚¿ãƒ¼ãƒ³å¾Œã«åˆ°é”ã§ãã‚‹æœ€é åœ°ç‚¹"
 
 #. Spatial.FurthestReachableThisTurn
 msgctxt "Spatial.FurthestReachableThisTurn"
 msgid "furthest reachable this turn"
-msgstr "このターンに到達できる最遠地点"
+msgstr "ã“ã®ã‚¿ãƒ¼ãƒ³ã«åˆ°é”ã§ãã‚‹æœ€é åœ°ç‚¹"
 
 #. Spatial.Health
 msgctxt "Spatial.Health"
 msgid "{0} / {1} health"
-msgstr "体力 {0} / {1}"
+msgstr "ä½“åŠ› {0} / {1}"
 
 #. Spatial.Here
 msgctxt "Spatial.Here"
 msgid "here"
-msgstr "ここ"
+msgstr "ã“ã“"
 
 #. Spatial.Impassable
 msgctxt "Spatial.Impassable"
 msgid "impassable"
-msgstr "通行不可"
+msgstr "é€šè¡Œä¸å¯"
 
 #. Spatial.InteractionPoint
 msgctxt "Spatial.InteractionPoint"
 msgid "Interaction point"
-msgstr "インタラクション地点"
+msgstr "ã‚¤ãƒ³ã‚¿ãƒ©ã‚¯ã‚·ãƒ§ãƒ³åœ°ç‚¹"
 
 #. Spatial.Interactable
 msgctxt "Spatial.Interactable"
 msgid "interactable"
-msgstr "操作可能"
+msgstr "æ“ä½œå¯èƒ½"
 
 #. Spatial.InteractableNextTurn
 msgctxt "Spatial.InteractableNextTurn"
 msgid "interactable next turn"
-msgstr "次のターンに操作可能"
+msgstr "æ¬¡ã®ã‚¿ãƒ¼ãƒ³ã«æ“ä½œå¯èƒ½"
 
 #. Spatial.Kills
 msgctxt "Spatial.Kills"
 msgid "kills {0}"
-msgstr "{0}を倒す"
+msgstr "{0}ã‚’å€’ã™"
 
 #. Spatial.MayDestroy
 msgctxt "Spatial.MayDestroy"
 msgid "may destroy"
-msgstr "破壊可能"
+msgstr "ç ´å£Šå¯èƒ½"
 
 #. Spatial.Movement
 msgctxt "Spatial.Movement"
 msgid "Movement"
-msgstr "移動"
+msgstr "ç§»å‹•"
 
 #. Spatial.MovementRange
 msgctxt "Spatial.MovementRange"
 msgid "movement range"
-msgstr "移動範囲"
+msgstr "ç§»å‹•ç¯„å›²"
 
 #. Spatial.Neutral
 msgctxt "Spatial.Neutral"
 msgid "neutral"
-msgstr "中立"
+msgstr "ä¸­ç«‹"
 
 #. Spatial.NoRoutePreview
 msgctxt "Spatial.NoRoutePreview"
 msgid "no route preview"
-msgstr "経路プレビューなし"
+msgstr "çµŒè·¯ãƒ—ãƒ¬ãƒ“ãƒ¥ãƒ¼ãªã—"
 
 #. Spatial.OnRoute
 msgctxt "Spatial.OnRoute"
 msgid "On route"
-msgstr "経路上"
+msgstr "çµŒè·¯ä¸Š"
 
 #. Spatial.PrimaryPrefix
 msgctxt "Spatial.PrimaryPrefix"
 msgid "primary "
-msgstr "主対象 "
+msgstr "ä¸»å¯¾è±¡ "
 
 #. Spatial.RangeAndMovement
 msgctxt "Spatial.RangeAndMovement"
 msgid "{0} and movement range"
-msgstr "{0}と移動範囲"
+msgstr "{0}ã¨ç§»å‹•ç¯„å›²"
 
 #. Spatial.Reachable
 msgctxt "Spatial.Reachable"
 msgid "reachable"
-msgstr "到達可能"
+msgstr "åˆ°é”å¯èƒ½"
 
 #. Spatial.SpawnPoint
 msgctxt "Spatial.SpawnPoint"
 msgid "spawn point"
-msgstr "出現地点"
+msgstr "å‡ºç¾åœ°ç‚¹"
 
 #. Spatial.Threatened
 msgctxt "Spatial.Threatened"
 msgid "Threatened"
-msgstr "脅威あり"
+msgstr "è„…å¨ã‚ã‚Š"
 
 #. Spatial.ThisTurnAt
 msgctxt "Spatial.ThisTurnAt"
 msgid "This turn: {0}"
-msgstr "このターン: {0}"
+msgstr "ã“ã®ã‚¿ãƒ¼ãƒ³: {0}"
 
 #. Spatial.TurnsIn
 msgctxt "Spatial.TurnsIn"
 msgid "in {0} turns"
-msgstr "{0}ターン後"
+msgstr "{0}ã‚¿ãƒ¼ãƒ³å¾Œ"
 
 #. Spatial.Unexplored
 msgctxt "Spatial.Unexplored"
 msgid "Unexplored"
-msgstr "未探索"
+msgstr "æœªæŽ¢ç´¢"
 
 #. Spatial.Unseen
 msgctxt "Spatial.Unseen"
 msgid "Unseen"
-msgstr "見えない"
+msgstr "è¦‹ãˆãªã„"
 
 #. Spatial.VisitedSuffix
 msgctxt "Spatial.VisitedSuffix"
 msgid "{0} (visited)"
-msgstr "{0} (訪問済み)"
+msgstr "{0} (è¨ªå•æ¸ˆã¿)"
 
 #. Spatial.WithinZoneOfControl
 msgctxt "Spatial.WithinZoneOfControl"
 msgid "Within {0} zone of control"
-msgstr "{0}支配領域内"
+msgstr "{0}æ”¯é…é ˜åŸŸå†…"
 
 #. Spatial.ZoneOfControl
 msgctxt "Spatial.ZoneOfControl"
 msgid "zone of control"
-msgstr "支配領域"
+msgstr "æ”¯é…é ˜åŸŸ"
 
 #. Spatial.ZoneOfControlTiles
 msgctxt "Spatial.ZoneOfControlTiles"
 msgid "{0} within {1} zone of control"
-msgstr "{1}支配領域内の{0}"
+msgstr "{1}æ”¯é…é ˜åŸŸå†…ã®{0}"
 
 #. Screens.AiControl
 msgctxt "Screens.AiControl"
 msgid "AI control"
-msgstr "人工知能操作"
+msgstr "äººå·¥çŸ¥èƒ½æ“ä½œ"
 
 #. Screens.Attacker
 msgctxt "Screens.Attacker"
 msgid "Attacker"
-msgstr "攻撃側"
+msgstr "æ”»æ’ƒå´"
 
 #. Screens.AttackerPortrait
 msgctxt "Screens.AttackerPortrait"
 msgid "Attacker portrait"
-msgstr "攻撃側の肖像"
+msgstr "æ”»æ’ƒå´ã®è‚–åƒ"
 
 #. Screens.CombatPortraitDetail
 msgctxt "Screens.CombatPortraitDetail"
 msgid "{0}, {1}, level {2}"
-msgstr "{0}, {1}, レベル {2}"
+msgstr "{0}, {1}, ãƒ¬ãƒ™ãƒ« {2}"
 
 #. Screens.Defender
 msgctxt "Screens.Defender"
 msgid "Defender"
-msgstr "防御側"
+msgstr "é˜²å¾¡å´"
 
 #. Screens.DefenderPortrait
 msgctxt "Screens.DefenderPortrait"
 msgid "Defender portrait"
-msgstr "防御側の肖像"
+msgstr "é˜²å¾¡å´ã®è‚–åƒ"
 
 #. Screens.LevelValue
 msgctxt "Screens.LevelValue"
 msgid "level {0}"
-msgstr "レベル {0}"
+msgstr "ãƒ¬ãƒ™ãƒ« {0}"
 
 #. Screens.Opponent
 msgctxt "Screens.Opponent"
 msgid "Opponent"
-msgstr "相手"
+msgstr "ç›¸æ‰‹"
 
 #. Screens.YourWielder
 msgctxt "Screens.YourWielder"
 msgid "Your wielder"
-msgstr "あなたのウィールダー"
+msgstr "ã‚ãªãŸã®ã‚¦ã‚£ãƒ¼ãƒ«ãƒ€ãƒ¼"
 
 #. Scanner.All
 msgctxt "Scanner.All"
 msgid "All"
-msgstr "すべて"
+msgstr "ã™ã¹ã¦"
 
 #. Scanner.ArtifactMarkets
 msgctxt "Scanner.ArtifactMarkets"
 msgid "Artifact markets"
-msgstr "アーティファクト市場"
+msgstr "ã‚¢ãƒ¼ãƒ†ã‚£ãƒ•ã‚¡ã‚¯ãƒˆå¸‚å ´"
 
 #. Scanner.Attackable
 msgctxt "Scanner.Attackable"
 msgid "Attackable"
-msgstr "攻撃可能"
+msgstr "æ”»æ’ƒå¯èƒ½"
 
 #. Scanner.Beacons
 msgctxt "Scanner.Beacons"
 msgid "Beacons"
-msgstr "ビーコン"
+msgstr "ãƒ“ãƒ¼ã‚³ãƒ³"
 
 #. Scanner.Blocked
 msgctxt "Scanner.Blocked"
 msgid "Blocked"
-msgstr "ブロック済み"
+msgstr "ãƒ–ãƒ­ãƒƒã‚¯æ¸ˆã¿"
 
 #. Scanner.Bridges
 msgctxt "Scanner.Bridges"
 msgid "Bridges"
-msgstr "橋"
+msgstr "æ©‹"
 
 #. Scanner.Buildings
 msgctxt "Scanner.Buildings"
 msgid "Buildings"
-msgstr "建物"
+msgstr "å»ºç‰©"
 
 #. Scanner.Dangerous
 msgctxt "Scanner.Dangerous"
 msgid "Dangerous"
-msgstr "危険"
+msgstr "å±é™º"
 
 #. Scanner.East
 msgctxt "Scanner.East"
 msgid "east"
-msgstr "東"
+msgstr "æ±"
 
 #. Scanner.ElevatedGround
 msgctxt "Scanner.ElevatedGround"
 msgid "Elevated ground {0}"
-msgstr "高所 {0}"
+msgstr "é«˜æ‰€ {0}"
 
 #. Scanner.Enemy
 msgctxt "Scanner.Enemy"
 msgid "Enemy"
-msgstr "敵"
+msgstr "æ•µ"
 
 #. Scanner.EnemyGates
 msgctxt "Scanner.EnemyGates"
 msgid "Enemy gates"
-msgstr "敵の門"
+msgstr "æ•µã®é–€"
 
 #. Scanner.Entities
 msgctxt "Scanner.Entities"
 msgid "Entities"
-msgstr "エンティティ"
+msgstr "ã‚¨ãƒ³ãƒ†ã‚£ãƒ†ã‚£"
 
 #. Scanner.Friendly
 msgctxt "Scanner.Friendly"
 msgid "Friendly"
-msgstr "味方"
+msgstr "å‘³æ–¹"
 
 #. Scanner.FriendlyGates
 msgctxt "Scanner.FriendlyGates"
 msgid "Friendly gates"
-msgstr "味方の門"
+msgstr "å‘³æ–¹ã®é–€"
 
 #. Scanner.Impassable
 msgctxt "Scanner.Impassable"
 msgid "Impassable"
-msgstr "通行不可"
+msgstr "é€šè¡Œä¸å¯"
 
 #. Scanner.ImpassableTerrain
 msgctxt "Scanner.ImpassableTerrain"
 msgid "Impassable terrain"
-msgstr "通行不可地形"
+msgstr "é€šè¡Œä¸å¯åœ°å½¢"
 
 #. Scanner.Knowledge
 msgctxt "Scanner.Knowledge"
 msgid "Knowledge"
-msgstr "知識"
+msgstr "çŸ¥è­˜"
 
 #. Scanner.Neutral
 msgctxt "Scanner.Neutral"
 msgid "Neutral"
-msgstr "中立"
+msgstr "ä¸­ç«‹"
 
 #. Scanner.North
 msgctxt "Scanner.North"
 msgid "north"
-msgstr "北"
+msgstr "åŒ—"
 
 #. Scanner.Northeast
 msgctxt "Scanner.Northeast"
 msgid "northeast"
-msgstr "北東"
+msgstr "åŒ—æ±"
 
 #. Scanner.Northwest
 msgctxt "Scanner.Northwest"
 msgid "northwest"
-msgstr "北西"
+msgstr "åŒ—è¥¿"
 
 #. Scanner.Objectives
 msgctxt "Scanner.Objectives"
 msgid "Objectives"
-msgstr "目標"
+msgstr "ç›®æ¨™"
 
 #. Scanner.Obstacles
 msgctxt "Scanner.Obstacles"
 msgid "Obstacles"
-msgstr "障害物"
+msgstr "éšœå®³ç‰©"
 
 #. Scanner.Pickups
 msgctxt "Scanner.Pickups"
 msgid "Pickups"
-msgstr "取得物"
+msgstr "å–å¾—ç‰©"
 
 #. Scanner.Power
 msgctxt "Scanner.Power"
 msgid "Power"
-msgstr "力"
+msgstr "åŠ›"
 
 #. Scanner.Riches
 msgctxt "Scanner.Riches"
 msgid "Riches"
-msgstr "富"
+msgstr "å¯Œ"
 
 #. Scanner.Roads
 msgctxt "Scanner.Roads"
 msgid "Roads"
-msgstr "道路"
+msgstr "é“è·¯"
 
 #. Scanner.SettlementsAndBuildSites
 msgctxt "Scanner.SettlementsAndBuildSites"
 msgid "Settlements and Build sites"
-msgstr "集落と建設地"
+msgstr "é›†è½ã¨å»ºè¨­åœ°"
 
 #. Scanner.South
 msgctxt "Scanner.South"
 msgid "south"
-msgstr "南"
+msgstr "å—"
 
 #. Scanner.Southeast
 msgctxt "Scanner.Southeast"
 msgid "southeast"
-msgstr "南東"
+msgstr "å—æ±"
 
 #. Scanner.Southwest
 msgctxt "Scanner.Southwest"
 msgid "southwest"
-msgstr "南西"
+msgstr "å—è¥¿"
 
 #. Scanner.Teleport
 msgctxt "Scanner.Teleport"
 msgid "Teleport"
-msgstr "テレポート"
+msgstr "ãƒ†ãƒ¬ãƒãƒ¼ãƒˆ"
 
 #. Scanner.Terrain
 msgctxt "Scanner.Terrain"
 msgid "Terrain"
-msgstr "地形"
+msgstr "åœ°å½¢"
 
 #. Scanner.TroopSources
 msgctxt "Scanner.TroopSources"
 msgid "Troop sources"
-msgstr "部隊供給源"
+msgstr "éƒ¨éšŠä¾›çµ¦æº"
 
 #. Scanner.Troops
 msgctxt "Scanner.Troops"
 msgid "Troops"
-msgstr "部隊"
+msgstr "éƒ¨éšŠ"
 
 #. Scanner.Unvisited
 msgctxt "Scanner.Unvisited"
 msgid "Unvisited"
-msgstr "未訪問"
+msgstr "æœªè¨ªå•"
 
 #. Scanner.Water
 msgctxt "Scanner.Water"
 msgid "Water"
-msgstr "水"
+msgstr "æ°´"
 
 #. Scanner.West
 msgctxt "Scanner.West"
 msgid "west"
-msgstr "西"
+msgstr "è¥¿"
 
 #. Scanner.Wielders
 msgctxt "Scanner.Wielders"
 msgid "Wielders"
-msgstr "ウィールダー"
+msgstr "ã‚¦ã‚£ãƒ¼ãƒ«ãƒ€ãƒ¼"
 
 #. Scanner.BlockedTileCount_0
 msgctxt "Scanner.BlockedTileCount_0"
 msgid "{0} blocked tile"
-msgstr "{0}個のブロック済みタイル"
+msgstr "{0}å€‹ã®ãƒ–ãƒ­ãƒƒã‚¯æ¸ˆã¿ã‚¿ã‚¤ãƒ«"
 
 #. Scanner.BridgeTileCount_0
 msgctxt "Scanner.BridgeTileCount_0"
 msgid "{0} bridge tile"
-msgstr "{0}個の橋タイル"
+msgstr "{0}å€‹ã®æ©‹ã‚¿ã‚¤ãƒ«"
 
 #. Scanner.ImpassableTileCount_0
 msgctxt "Scanner.ImpassableTileCount_0"
 msgid "{0} impassable tile"
-msgstr "{0}個の通行不可タイル"
+msgstr "{0}å€‹ã®é€šè¡Œä¸å¯ã‚¿ã‚¤ãƒ«"
 
 #. Scanner.RoadTileCount_0
 msgctxt "Scanner.RoadTileCount_0"
 msgid "{0} road tile"
-msgstr "{0}個の道路タイル"
+msgstr "{0}å€‹ã®é“è·¯ã‚¿ã‚¤ãƒ«"
 
 #. Scanner.WaterTileCount_0
 msgctxt "Scanner.WaterTileCount_0"
 msgid "{0} water tile"
-msgstr "{0}個の水タイル"
+msgstr "{0}å€‹ã®æ°´ã‚¿ã‚¤ãƒ«"
 
 #. Spatial.AridTrees
 msgctxt "Spatial.AridTrees"
 msgid "Arid trees"
-msgstr "乾燥地の木々"
+msgstr "ä¹¾ç‡¥åœ°ã®æœ¨ã€…"
 
 #. Spatial.Bridge
 msgctxt "Spatial.Bridge"
 msgid "Bridge"
-msgstr "橋"
+msgstr "æ©‹"
 
 #. Spatial.CobblestoneRoad
 msgctxt "Spatial.CobblestoneRoad"
 msgid "Cobblestone road"
-msgstr "石畳の道"
+msgstr "çŸ³ç•³ã®é“"
 
 #. Spatial.DeepWater
 msgctxt "Spatial.DeepWater"
 msgid "Deep water"
-msgstr "深い水域"
+msgstr "æ·±ã„æ°´åŸŸ"
 
 #. Spatial.Deforestation
 msgctxt "Spatial.Deforestation"
 msgid "Deforestation"
-msgstr "森林伐採"
+msgstr "æ£®æž—ä¼æŽ¡"
 
 #. Spatial.Decoration
 msgctxt "Spatial.Decoration"
 msgid "Decoration"
-msgstr "装飾"
+msgstr "è£…é£¾"
 
 #. Spatial.DirtRoad
 msgctxt "Spatial.DirtRoad"
 msgid "Dirt road"
-msgstr "土の道"
+msgstr "åœŸã®é“"
 
 #. Spatial.Effect
 msgctxt "Spatial.Effect"
 msgid "Effect"
-msgstr "効果"
+msgstr "åŠ¹æžœ"
 
 #. Spatial.Farmland
 msgctxt "Spatial.Farmland"
 msgid "Farmland"
-msgstr "農地"
+msgstr "è¾²åœ°"
 
 #. Spatial.Fog
 msgctxt "Spatial.Fog"
 msgid "Fog"
-msgstr "霧"
+msgstr "éœ§"
 
 #. Spatial.Light
 msgctxt "Spatial.Light"
 msgid "Light"
-msgstr "光"
+msgstr "å…‰"
 
 #. Spatial.Mountains
 msgctxt "Spatial.Mountains"
 msgid "Mountains"
-msgstr "山"
+msgstr "å±±"
 
 #. Spatial.Road
 msgctxt "Spatial.Road"
 msgid "Road"
-msgstr "道"
+msgstr "é“"
 
 #. Spatial.ShallowWater
 msgctxt "Spatial.ShallowWater"
 msgid "Shallow water"
-msgstr "浅い水域"
+msgstr "æµ…ã„æ°´åŸŸ"
 
 #. Spatial.Trees
 msgctxt "Spatial.Trees"
 msgid "Trees"
-msgstr "木々"
+msgstr "æœ¨ã€…"
 
 #. Spatial.Wall
 msgctxt "Spatial.Wall"
 msgid "Wall"
-msgstr "壁"
+msgstr "å£"
 
 #. Spatial.Water
 msgctxt "Spatial.Water"
 msgid "Water"
-msgstr "水"
+msgstr "æ°´"
 
 #. Spatial.WaterEdge
 msgctxt "Spatial.WaterEdge"
 msgid "Water edge"
-msgstr "水辺"
+msgstr "æ°´è¾º"
 
 #. Screens.MoveAllLeft
 msgctxt "Screens.MoveAllLeft"

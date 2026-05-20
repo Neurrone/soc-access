@@ -1,4 +1,4 @@
-msgid ""
+﻿msgid ""
 msgstr ""
 "Project-Id-Version: SongsOfConquestAccess\n"
 "Language: it\n"
@@ -23,7 +23,7 @@ msgstr "{0}, {1}"
 #. Common.Quantity
 msgctxt "Common.Quantity"
 msgid "quantity"
-msgstr "quantità"
+msgstr "quantitÃ "
 
 #. Common.ResourceAmount
 msgctxt "Common.ResourceAmount"
@@ -78,7 +78,7 @@ msgstr "insediamento piccolo"
 #. Events.BuildSiteTown
 msgctxt "Events.BuildSiteTown"
 msgid "town"
-msgstr "città"
+msgstr "cittÃ "
 
 #. Events.DestinationCleared
 msgctxt "Events.DestinationCleared"
@@ -133,12 +133,12 @@ msgstr "portatore"
 #. Events.WielderMoved
 msgctxt "Events.WielderMoved"
 msgid "{0} moved to {1}"
-msgstr "{0} si è spostato a {1}"
+msgstr "{0} si Ã¨ spostato a {1}"
 
 #. Events.WielderTeleported
 msgctxt "Events.WielderTeleported"
 msgid "{0} teleported to {1}"
-msgstr "{0} si è teletrasportato a {1}"
+msgstr "{0} si Ã¨ teletrasportato a {1}"
 
 #. UI.ArmyExchangeGrid
 msgctxt "UI.ArmyExchangeGrid"
@@ -163,7 +163,7 @@ msgstr "Annullato, {0}"
 #. UI.CannotDropThere
 msgctxt "UI.CannotDropThere"
 msgid "Cannot drop there."
-msgstr "Non puoi lasciare lì."
+msgstr "Non puoi lasciare lÃ¬."
 
 #. UI.CharacterColon
 msgctxt "UI.CharacterColon"
@@ -258,7 +258,7 @@ msgstr "Slot truppa vuoto {0}"
 #. UI.ExitedInspectMode
 msgctxt "UI.ExitedInspectMode"
 msgid "Exited inspect mode"
-msgstr "Modalità ispezione chiusa"
+msgstr "ModalitÃ  ispezione chiusa"
 
 #. UI.Heading
 msgctxt "UI.Heading"
@@ -583,7 +583,7 @@ msgstr "Espelli portatore"
 #. Screens.GraphAccessibilityTodo
 msgctxt "Screens.GraphAccessibilityTodo"
 msgid "TODO: implement accessibility for graph"
-msgstr "TODO: implementare accessibilità del grafico"
+msgstr "TODO: implementare accessibilitÃ  del grafico"
 
 #. Screens.GraphType
 msgctxt "Screens.GraphType"
@@ -660,6 +660,21 @@ msgctxt "Screens.Objectives"
 msgid "Objectives"
 msgstr "Obiettivi"
 
+#. Screens.ObjectiveMarkerFarAway
+msgctxt "Screens.ObjectiveMarkerFarAway"
+msgid "far away"
+msgstr "lontano"
+
+#. Screens.ObjectiveMarkerNearby
+msgctxt "Screens.ObjectiveMarkerNearby"
+msgid "nearby"
+msgstr "nelle vicinanze"
+
+#. Screens.ObjectiveMarkerSomeDistance
+msgctxt "Screens.ObjectiveMarkerSomeDistance"
+msgid "some distance"
+msgstr "a una certa distanza"
+
 #. Screens.Ok
 msgctxt "Screens.Ok"
 msgid "OK"
@@ -728,7 +743,7 @@ msgstr "truppe insediamento"
 #. Screens.Skill
 msgctxt "Screens.Skill"
 msgid "Skill {0}"
-msgstr "Abilità {0}"
+msgstr "AbilitÃ  {0}"
 
 #. Screens.SlotValue
 msgctxt "Screens.SlotValue"
@@ -858,7 +873,7 @@ msgstr "Rimuovi dalla barra rapida"
 #. Screens.AmountToUpgrade
 msgctxt "Screens.AmountToUpgrade"
 msgid "Amount to upgrade, {0}"
-msgstr "Quantità da migliorare, {0}"
+msgstr "QuantitÃ  da migliorare, {0}"
 
 #. Screens.UnknownSpell
 msgctxt "Screens.UnknownSpell"
@@ -1190,7 +1205,7 @@ msgstr "{0} {1} {2}"
 #. Combat.AttackableEntity
 msgctxt "Combat.AttackableEntity"
 msgid "attackable entity"
-msgstr "entità attaccabile"
+msgstr "entitÃ  attaccabile"
 
 #. Combat.AttackVerbDefault
 msgctxt "Combat.AttackVerbDefault"
@@ -1200,7 +1215,7 @@ msgstr "attacca"
 #. Combat.AttackVerbOpportunity
 msgctxt "Combat.AttackVerbOpportunity"
 msgid "makes an opportunity attack against"
-msgstr "esegue un attacco di opportunità contro"
+msgstr "esegue un attacco di opportunitÃ  contro"
 
 #. Combat.AttackVerbOverwatch
 msgctxt "Combat.AttackVerbOverwatch"
@@ -1345,7 +1360,7 @@ msgstr "affondo"
 #. Combat.MapEntityDamage
 msgctxt "Combat.MapEntityDamage"
 msgid "map entity"
-msgstr "entità della mappa"
+msgstr "entitÃ  della mappa"
 
 #. Combat.MeleeDamage
 msgctxt "Combat.MeleeDamage"
@@ -1360,12 +1375,12 @@ msgstr "amore materno"
 #. Combat.NewTurn
 msgctxt "Combat.NewTurn"
 msgid "It is {0}'s turn"
-msgstr "È il turno di {0}"
+msgstr "Ãˆ il turno di {0}"
 
 #. Combat.OpportunityAttack
 msgctxt "Combat.OpportunityAttack"
 msgid "opportunity attack"
-msgstr "attacco di opportunità"
+msgstr "attacco di opportunitÃ "
 
 #. Combat.OrderEssence
 msgctxt "Combat.OrderEssence"
@@ -1465,7 +1480,7 @@ msgstr "sconosciuto"
 #. Combat.UnknownEntity
 msgctxt "Combat.UnknownEntity"
 msgid "unknown entity"
-msgstr "entità sconosciuta"
+msgstr "entitÃ  sconosciuta"
 
 #. Combat.UnknownTarget
 msgctxt "Combat.UnknownTarget"
@@ -1625,12 +1640,12 @@ msgstr "alleato"
 #. Spatial.FurthestReachableInTurns
 msgctxt "Spatial.FurthestReachableInTurns"
 msgid "furthest reachable in {0} turns"
-msgstr "più lontano raggiungibile tra {0} turni"
+msgstr "piÃ¹ lontano raggiungibile tra {0} turni"
 
 #. Spatial.FurthestReachableThisTurn
 msgctxt "Spatial.FurthestReachableThisTurn"
 msgid "furthest reachable this turn"
-msgstr "più lontano raggiungibile in questo turno"
+msgstr "piÃ¹ lontano raggiungibile in questo turno"
 
 #. Spatial.Health
 msgctxt "Spatial.Health"
@@ -1670,7 +1685,7 @@ msgstr "uccide {0}"
 #. Spatial.MayDestroy
 msgctxt "Spatial.MayDestroy"
 msgid "may destroy"
-msgstr "può distruggere"
+msgstr "puÃ² distruggere"
 
 #. Spatial.Movement
 msgctxt "Spatial.Movement"
@@ -1870,7 +1885,7 @@ msgstr "Cancelli nemici"
 #. Scanner.Entities
 msgctxt "Scanner.Entities"
 msgid "Entities"
-msgstr "Entità"
+msgstr "EntitÃ "
 
 #. Scanner.Friendly
 msgctxt "Scanner.Friendly"
