@@ -5,6 +5,7 @@ using SongsOfConquest.Client.Adventure;
 using SongsOfConquest.Client.Gamestate.Facade;
 using SongsOfConquest.Common.Economy;
 using SongsOfConquestAccess.Adapters;
+using SongsOfConquestAccess.Localization;
 using SongsOfConquestAccess.UI;
 using UnityEngine;
 
@@ -117,7 +118,7 @@ namespace SongsOfConquestAccess.Screens
 
         private static ContainerWidget BuildRoot(MarketplaceMenuAdapter adapter)
         {
-            ContainerWidget root = new ContainerWidget("marketplace", adapter != null ? adapter.Title : "Marketplace");
+            ContainerWidget root = new ContainerWidget("marketplace", adapter != null ? adapter.Title : string.Empty);
             if (adapter == null)
             {
                 return root;
@@ -144,7 +145,7 @@ namespace SongsOfConquestAccess.Screens
 
             root.AddChild(new ButtonWidget(
                 "marketplace-close",
-                "Close",
+                ModText.Get(ModStrings.Screens.Close),
                 adapter.Close,
                 adapter.HideNativeTooltip,
                 () => true));
@@ -154,7 +155,7 @@ namespace SongsOfConquestAccess.Screens
 
         private static MenuWidget BuildResourcesMenu(MarketplaceMenuAdapter adapter)
         {
-            MenuWidget menu = new MenuWidget("marketplace-resources", "Resources");
+            MenuWidget menu = new MenuWidget("marketplace-resources", ModText.Get(ModStrings.Screens.Resources));
             IReadOnlyList<MarketplaceMenuAdapter.ResourceItem> resources = adapter.GetResources();
             for (int i = 0; i < resources.Count; i++)
             {
@@ -190,7 +191,7 @@ namespace SongsOfConquestAccess.Screens
                 return string.Empty;
             }
 
-            return resource.ResourceName + ": " + FormatAmount(resource.Amount);
+            return ModText.Get(ModStrings.UI.LabelValue, resource.ResourceName, FormatAmount(resource.Amount));
         }
 
         private static string BuildTradeActionId(MarketplaceMenuAdapter.TradeActionItem action)
@@ -209,15 +210,10 @@ namespace SongsOfConquestAccess.Screens
 
             if (action.ResourceType == ResourceType.Gold || action.IsVisible == null || !action.IsVisible())
             {
-                return action.IsBuyButton ? "Buy" : "Sell";
+                return string.Empty;
             }
 
-            string resourceName = action.ResourceName.ToLowerInvariant();
-            string formattedAmount = FormatAmount(action.Amount);
-            string formattedGold = FormatAmount(action.GoldAmount);
-            return action.IsBuyButton
-                ? "Buy " + formattedAmount + " " + resourceName + " for " + formattedGold + " gold"
-                : "Sell " + formattedAmount + " " + resourceName + " for " + formattedGold + " gold";
+            return action.GetLabel != null ? action.GetLabel() : string.Empty;
         }
 
         private static string FormatAmount(int amount)

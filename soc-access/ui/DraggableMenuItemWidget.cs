@@ -1,5 +1,6 @@
 using System;
 using SongsOfConquestAccess.Adapters;
+using SongsOfConquestAccess.Localization;
 
 namespace SongsOfConquestAccess.UI
 {
@@ -52,10 +53,10 @@ namespace SongsOfConquestAccess.UI
             string status = base.GetStatus();
             if (_isDragging != null && _isDragging())
             {
-                return JoinStatus(status, "dragging");
+                return JoinStatus(status, ModText.Get(ModStrings.UI.StatusDragging));
             }
 
-            return CanDrag ? JoinStatus(status, "draggable") : status;
+            return CanDrag ? JoinStatus(status, ModText.Get(ModStrings.UI.StatusDraggable)) : status;
         }
 
         private static string JoinStatus(string first, string second)
@@ -70,7 +71,7 @@ namespace SongsOfConquestAccess.UI
                 return first;
             }
 
-            return first + ", " + second;
+            return ModText.Get(ModStrings.Common.ListSeparator, first, second);
         }
     }
 }

@@ -3,8 +3,8 @@ using System.Collections.Generic;
 using SongsOfConquest.Client.Adventure;
 using SongsOfConquest.Common;
 using SongsOfConquest.Common.Economy;
-using SongsOfConquest.Common.Localization;
 using SongsOfConquestAccess.Adapters;
+using SongsOfConquestAccess.Localization;
 using SongsOfConquestAccess.UI;
 using UnityEngine;
 
@@ -63,7 +63,7 @@ namespace SongsOfConquestAccess.Screens
         }
 
         protected override string ScreenSuffix { get { return "draft-troops"; } }
-        protected override string ScreenTitle { get { return Host != null ? Host.DraftScreenTitle : "Draft troops"; } }
+        protected override string ScreenTitle { get { return Host != null ? Host.DraftScreenTitle : string.Empty; } }
         protected override bool IsContentPresent() { return Host != null && Host.IsDraftPresent(); }
 
         protected override void AddContentWidgets(ContainerWidget root)
@@ -108,7 +108,7 @@ namespace SongsOfConquestAccess.Screens
 
             root.AddChild(new SliderWidget(
                 entry.IdPrefix + "-quantity",
-                "quantity",
+                () => ModText.Get(ModStrings.Common.Quantity),
                 () => entry.SliderLabel,
                 () => entry.SliderValue,
                 () => entry.SliderMinimum,
@@ -129,7 +129,7 @@ namespace SongsOfConquestAccess.Screens
 
             root.AddChild(new ButtonWidget(
                 entry.IdPrefix + "-upgrade-in-pool",
-                () => "Upgrade available troops",
+                () => ModText.Get(ModStrings.Draft.UpgradeAvailableTroops),
                 entry.UpgradeInPool,
                 entry.Focus,
                 () => entry.IsUpgradeInPoolEnabled,
@@ -139,10 +139,12 @@ namespace SongsOfConquestAccess.Screens
 
         private static MenuWidget BuildEssenceMenu(PurchaseTroopsSubMenuAdapter.RecruitEntry entry)
         {
-            MenuWidget menu = new MenuWidget(entry.IdPrefix + "-essence", "Essence variants");
-            AddEssenceItem(menu, entry, TroopUpgradeType.ArcanaUpgraded, "Arcana");
-            AddEssenceItem(menu, entry, TroopUpgradeType.CreationUpgraded, "Creation");
-            AddEssenceItem(menu, entry, TroopUpgradeType.OrderUpgraded, "Order");
+            MenuWidget menu = new MenuWidget(
+                entry.IdPrefix + "-essence",
+                ModText.Get(ModStrings.Draft.EssenceVariants));
+            AddEssenceItem(menu, entry, TroopUpgradeType.ArcanaUpgraded, GameText.Get("Units/Types/Arcana", "Arcana"));
+            AddEssenceItem(menu, entry, TroopUpgradeType.CreationUpgraded, GameText.Get("Units/Types/Creation", "Creation"));
+            AddEssenceItem(menu, entry, TroopUpgradeType.OrderUpgraded, GameText.Get("Units/Types/Order", "Order"));
             menu.SetFocusedItemById(entry.IdPrefix + "-essence-" + entry.CurrentEssenceVariant.ToString().ToLowerInvariant());
             return menu;
         }
@@ -172,41 +174,25 @@ namespace SongsOfConquestAccess.Screens
                     PurchaseTroopsSubMenuAdapter.ResourceCostLine cost = costs[i];
                     if (cost != null)
                     {
-                        parts.Add(cost.Amount + " " + GetResourceName(cost.ResourceType));
+                        parts.Add(ModText.Get(
+                            ModStrings.Common.ResourceAmount,
+                            cost.Amount,
+                            GetResourceName(cost.ResourceType)));
                     }
                 }
             }
 
-            return parts.Count == 0 ? "Purchase" : "Purchase for " + JoinWithAnd(parts);
+            return parts.Count == 0
+                ? ModText.Get(ModStrings.Draft.Purchase)
+                : ModText.Get(
+                    ModStrings.Draft.PurchaseForResources,
+                    ModText.JoinList(parts));
         }
 
         private static string GetResourceName(ResourceType resourceType)
         {
-            ILocalizationHandler localization = GlobalLocalizationVariables.LocalizationHandler;
             string fallback = FormatEnumName(resourceType.ToString());
-            if (localization == null)
-            {
-                return fallback;
-            }
-
-            string key = "Common/Resource/" + resourceType;
-            string text = localization.GetText(key);
-            return string.IsNullOrWhiteSpace(text) || text == key ? fallback : text;
-        }
-
-        private static string JoinWithAnd(List<string> parts)
-        {
-            if (parts.Count == 1)
-            {
-                return parts[0];
-            }
-
-            if (parts.Count == 2)
-            {
-                return parts[0] + " and " + parts[1];
-            }
-
-            return string.Join(", ", parts.GetRange(0, parts.Count - 1).ToArray()) + ", and " + parts[parts.Count - 1];
+            return GameText.Get("Common/Resource/" + resourceType, fallback);
         }
 
         private static string FormatEnumName(string value)

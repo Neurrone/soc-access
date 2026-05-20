@@ -1,6 +1,7 @@
 using SongsOfConquest.Client.Menu;
 using SongsOfConquestAccess.Adapters;
 using SongsOfConquestAccess.Input;
+using SongsOfConquestAccess.Localization;
 using SongsOfConquestAccess.UI;
 using UnityEngine;
 
@@ -65,7 +66,7 @@ namespace SongsOfConquestAccess.Screens
 
         private static ContainerWidget BuildRoot(TutorialSimpleAdapter adapter)
         {
-            ContainerWidget root = new ContainerWidget("tutorial-simple-screen", "Tutorial");
+            ContainerWidget root = new ContainerWidget("tutorial-simple-screen", adapter != null ? adapter.Header : string.Empty);
             root.AddChild(new TextWidget(
                 "tutorial-simple-header",
                 () => adapter != null ? adapter.Header : string.Empty,
@@ -78,13 +79,13 @@ namespace SongsOfConquestAccess.Screens
                 includeParentLabelInAnnouncement: false));
             root.AddChild(new CheckboxWidget(
                 "tutorial-simple-tutorials-toggle",
-                adapter != null ? adapter.TutorialsToggleLabel : "Show tutorials",
+                adapter != null ? adapter.TutorialsToggleLabel : string.Empty,
                 () => { if (adapter != null) adapter.ToggleTutorials(); },
                 () => adapter != null && adapter.IsTutorialsChecked(),
                 () => adapter != null));
             root.AddChild(new ButtonWidget(
                 "tutorial-simple-ok",
-                adapter != null ? adapter.OkLabel : "OK",
+                adapter != null ? adapter.OkLabel : ModText.Get(ModStrings.Screens.Ok),
                 () => adapter != null && adapter.ActivateOk(),
                 null,
                 () => adapter != null && adapter.IsOkAvailable(),

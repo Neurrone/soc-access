@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using SongsOfConquestAccess.Input;
+using SongsOfConquestAccess.Localization;
 using SongsOfConquestAccess.Speech;
 using CodexContentItem = SongsOfConquestAccess.Adapters.CodexMenuAdapter.CodexContentItem;
 using CodexContentItemKind = SongsOfConquestAccess.Adapters.CodexMenuAdapter.CodexContentItemKind;
@@ -31,7 +32,7 @@ namespace SongsOfConquestAccess.UI
             IReadOnlyList<CodexContentItem> items = Items;
             if (items.Count == 0)
             {
-                return "No codex content";
+                return string.Empty;
             }
 
             CodexContentItem item = CurrentItem;
@@ -40,7 +41,7 @@ namespace SongsOfConquestAccess.UI
 
         public override string GetRole()
         {
-            return "document";
+            return ModText.Get(ModStrings.UI.RoleDocument);
         }
 
         public override bool ClaimsAction(string actionKey)
@@ -236,7 +237,7 @@ namespace SongsOfConquestAccess.UI
             }
 
             return item.Kind == CodexContentItemKind.Heading
-                ? item.Text + " heading"
+                ? ModText.Get(ModStrings.UI.Heading, item.Text)
                 : item.Text;
         }
 
@@ -263,8 +264,10 @@ namespace SongsOfConquestAccess.UI
                 return string.Empty;
             }
 
-            string values = string.Join(", ", parts.ToArray());
-            return string.IsNullOrWhiteSpace(item.Text) ? values : item.Text + ": " + values;
+            string values = ModText.JoinList(parts);
+            return string.IsNullOrWhiteSpace(item.Text)
+                ? values
+                : ModText.Get(ModStrings.UI.LabelValue, item.Text, values);
         }
     }
 }

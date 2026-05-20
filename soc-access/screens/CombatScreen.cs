@@ -17,6 +17,7 @@ using SongsOfConquestAccess.Buffers;
 using SongsOfConquestAccess.Events;
 using SongsOfConquestAccess.Events.Combat;
 using SongsOfConquestAccess.Input;
+using SongsOfConquestAccess.Localization;
 using SongsOfConquestAccess.Speech;
 using SongsOfConquestAccess.UI;
 using UnityEngine;
@@ -179,7 +180,7 @@ namespace SongsOfConquestAccess.Screens
             string summary = _adapter != null ? _adapter.BuildLocalEssenceSummary() : string.Empty;
             if (string.IsNullOrWhiteSpace(summary))
             {
-                summary = "No essence";
+                return false;
             }
 
             SpeechPipeline.Output(new SpeechRequest(summary, interrupt: false));
@@ -298,7 +299,7 @@ namespace SongsOfConquestAccess.Screens
 
         private static ContainerWidget BuildRoot(CombatAdapter adapter, CombatHexGrid grid)
         {
-            ContainerWidget root = new ContainerWidget("combat-screen", "Combat");
+            ContainerWidget root = new ContainerWidget("combat-screen", ModText.Get(ModStrings.Screens.Combat));
             root.AddChild(grid);
             if (adapter == null)
             {
@@ -330,7 +331,7 @@ namespace SongsOfConquestAccess.Screens
             root.AddChild(BuildQuickbarMenu(adapter));
             root.AddChild(new ButtonWidget(
                 "combat-current-troop",
-                () => "Current troop, " + BuildTroopLabel(adapter.Hud.GetCurrentTroopInfo()),
+                () => ModText.Get(ModStrings.Screens.CurrentTroop, BuildTroopLabel(adapter.Hud.GetCurrentTroopInfo())),
                 () => ActivateCurrentTroop(adapter),
                 null,
                 () => adapter.Hud.GetCurrentTroopId() >= 0,
@@ -350,7 +351,7 @@ namespace SongsOfConquestAccess.Screens
                 () => adapter.Hud.Commanders.GetPortraitButton(CombatHudSide.Attacker),
                 adapter.Hud.Commanders.Localization,
                 isVisible: () => adapter.Hud.Commanders.IsPortraitVisible(CombatHudSide.Attacker)));
-            root.AddChild(BuildEssenceMenu(adapter, CombatHudSide.Attacker, "combat-attacker-essence", "Attacker essence"));
+            root.AddChild(BuildEssenceMenu(adapter, CombatHudSide.Attacker, "combat-attacker-essence", ModText.Get(ModStrings.Screens.AttackerEssence)));
             root.AddChild(BuildAiControlButton(adapter, CombatHudSide.Attacker, "combat-attacker-ai-control"));
             root.AddChild(Portrait.StaticNative(
                 "combat-defender-portrait",
@@ -358,7 +359,7 @@ namespace SongsOfConquestAccess.Screens
                 () => adapter.Hud.Commanders.GetPortraitButton(CombatHudSide.Defender),
                 adapter.Hud.Commanders.Localization,
                 isVisible: () => adapter.Hud.Commanders.IsPortraitVisible(CombatHudSide.Defender)));
-            root.AddChild(BuildEssenceMenu(adapter, CombatHudSide.Defender, "combat-defender-essence", "Defender essence"));
+            root.AddChild(BuildEssenceMenu(adapter, CombatHudSide.Defender, "combat-defender-essence", ModText.Get(ModStrings.Screens.DefenderEssence)));
             root.AddChild(BuildAiControlButton(adapter, CombatHudSide.Defender, "combat-defender-ai-control"));
             root.AddChild(new ButtonWidget(
                 "combat-spellbook",
@@ -390,7 +391,7 @@ namespace SongsOfConquestAccess.Screens
 
         private static MenuWidget BuildQuickbarMenu(CombatAdapter adapter)
         {
-            MenuWidget menu = new MenuWidget("combat-quickbar", "Quickbar", adapter.Hud.IsQuickbarMenuVisible);
+            MenuWidget menu = new MenuWidget("combat-quickbar", ModText.Get(ModStrings.Screens.Quickbar), adapter.Hud.IsQuickbarMenuVisible);
             int slotCount = SafeGetCount("quickbar slots", adapter.Hud.GetQuickbarSlotCount);
             for (int i = 0; i < slotCount; i++)
             {
@@ -446,7 +447,7 @@ namespace SongsOfConquestAccess.Screens
 
         private static MenuWidget BuildQueueMenu(CombatAdapter adapter)
         {
-            MenuWidget menu = new MenuWidget("combat-queue", "Turn order", adapter.Hud.IsQueueMenuVisible);
+            MenuWidget menu = new MenuWidget("combat-queue", ModText.Get(ModStrings.Screens.TurnOrder), adapter.Hud.IsQueueMenuVisible);
             const int MaxQueueItems = 32;
             for (int i = 0; i < MaxQueueItems; i++)
             {
@@ -477,7 +478,7 @@ namespace SongsOfConquestAccess.Screens
                 return string.Empty;
             }
 
-            return item.SpellName + " tier " + item.SpellTier;
+            return ModText.Get(ModStrings.Screens.SpellTier, item.SpellName, item.SpellTier);
         }
 
         private static string BuildQueueItemLabel(BattleHudAdapter.QueueItem item)
@@ -487,22 +488,22 @@ namespace SongsOfConquestAccess.Screens
                 return string.Empty;
             }
 
-            return item.IsRoundMarker ? "Round " + item.RoundNumber : BuildTroopLabel(item.Troop);
+            return item.IsRoundMarker ? ModText.Get(ModStrings.Screens.Round, item.RoundNumber) : BuildTroopLabel(item.Troop);
         }
 
         private static string BuildTroopLabel(BattleHudAdapter.TroopInfo troop)
         {
-            if (troop == null || !troop.IsKnown)
+            if (troop == null || !troop.IsKnown || string.IsNullOrWhiteSpace(troop.Name))
             {
-                return "unknown troop";
+                return string.Empty;
             }
 
             if (troop.HasSize)
             {
-                return troop.Size + " " + troop.Name;
+                return ModText.Get(ModStrings.Common.ResourceAmount, troop.Size, troop.Name);
             }
 
-            return string.IsNullOrWhiteSpace(troop.Name) ? "troop" : troop.Name;
+            return troop.Name;
         }
 
         private static bool ActivateQueueItem(CombatAdapter adapter, int index)
@@ -530,7 +531,7 @@ namespace SongsOfConquestAccess.Screens
 
         private static MenuWidget BuildBattleLogMenu(CombatAdapter adapter)
         {
-            MenuWidget menu = new MenuWidget("combat-battle-log", "Battle log", adapter.Hud.IsBattleLogMenuVisible);
+            MenuWidget menu = new MenuWidget("combat-battle-log", ModText.Get(ModStrings.Screens.BattleLog), adapter.Hud.IsBattleLogMenuVisible);
             const int MaxBattleLogEntries = 32;
             for (int i = 0; i < MaxBattleLogEntries; i++)
             {

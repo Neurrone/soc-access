@@ -1,6 +1,7 @@
 using System;
 using SongsOfConquestAccess.Adapters;
 using SongsOfConquestAccess.Input;
+using SongsOfConquestAccess.Localization;
 
 namespace SongsOfConquestAccess.UI
 {
@@ -48,12 +49,12 @@ namespace SongsOfConquestAccess.UI
 
         public override string GetRole()
         {
-            return "button";
+            return ModText.Get(ModStrings.UI.RoleButton);
         }
 
         public override string GetStatus()
         {
-            return IsEnabled() ? string.Empty : "disabled";
+            return IsEnabled() ? string.Empty : ModText.Get(ModStrings.UI.StatusDisabled);
         }
 
         public override Tooltip GetTooltip()

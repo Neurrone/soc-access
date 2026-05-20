@@ -4,6 +4,7 @@ using SongsOfConquest.Client.Adventure;
 using SongsOfConquest.Client.Gamestate.Facade;
 using SongsOfConquest.Common.Gamestate.Facade;
 using SongsOfConquestAccess.Adapters;
+using SongsOfConquestAccess.Localization;
 using SongsOfConquestAccess.UI;
 using UnityEngine;
 using Zenject;
@@ -149,7 +150,7 @@ namespace SongsOfConquestAccess.Screens
 
         private static ContainerWidget BuildRoot(HostileJoinMenuAdapter adapter)
         {
-            ContainerWidget root = new ContainerWidget("hostile-join-menu", "Troops want to join");
+            ContainerWidget root = new ContainerWidget("hostile-join-menu", adapter != null ? adapter.Title : string.Empty);
             if (adapter == null)
             {
                 return root;
@@ -170,7 +171,7 @@ namespace SongsOfConquestAccess.Screens
             root.AddChild(BuildArmyExchangeGrid(
                 "hostile-join-army-exchange-grid",
                 BuildWielderArmyLabel(adapter),
-                "joining army",
+                ModText.Get(ModStrings.UI.JoiningArmy),
                 adapter.WielderTroops,
                 adapter.JoiningTroops));
 
@@ -217,7 +218,9 @@ namespace SongsOfConquestAccess.Screens
         private static string BuildWielderArmyLabel(HostileJoinMenuAdapter adapter)
         {
             string name = adapter != null ? adapter.AttackingCommanderName : string.Empty;
-            return string.IsNullOrWhiteSpace(name) ? "wielder army" : name + "'s army";
+            return string.IsNullOrWhiteSpace(name)
+                ? ModText.Get(ModStrings.Screens.WielderArmy)
+                : ModText.Get(ModStrings.Screens.WielderArmyPossessive, name);
         }
 
         private static TroopHudAdapter.DropResult DropArmySlot(TroopHudAdapter.SlotItem source, TroopHudAdapter.SlotItem target)

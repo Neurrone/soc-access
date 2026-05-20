@@ -1,6 +1,7 @@
 using SongsOfConquest.Client.Menu;
 using SongsOfConquestAccess.Adapters;
 using SongsOfConquestAccess.Input;
+using SongsOfConquestAccess.Localization;
 using SongsOfConquestAccess.UI;
 using UnityEngine;
 
@@ -67,7 +68,7 @@ namespace SongsOfConquestAccess.Screens
 
         private static ContainerWidget BuildRoot(TutorialSlideshowAdapter adapter)
         {
-            ContainerWidget root = new ContainerWidget("tutorial-slideshow-screen", "Tutorial");
+            ContainerWidget root = new ContainerWidget("tutorial-slideshow-screen", adapter != null ? adapter.Header : string.Empty);
             root.AddChild(new TextWidget(
                 "tutorial-slideshow-header",
                 () => adapter != null ? adapter.Header : string.Empty,
@@ -80,27 +81,27 @@ namespace SongsOfConquestAccess.Screens
                 includeParentLabelInAnnouncement: false));
             root.AddChild(new ButtonWidget(
                 "tutorial-slideshow-previous",
-                "Previous",
+                ModText.Get(ModStrings.Screens.Previous),
                 () => adapter != null && adapter.ActivatePrevious(),
                 null,
                 () => adapter != null && adapter.IsPreviousAvailable(),
                 () => adapter != null && adapter.IsPreviousAvailable()));
             root.AddChild(new ButtonWidget(
                 "tutorial-slideshow-next",
-                "Next",
+                ModText.Get(ModStrings.Screens.Next),
                 () => adapter != null && adapter.ActivateNext(),
                 null,
                 () => adapter != null && adapter.IsNextAvailable(),
                 () => adapter != null && adapter.IsNextAvailable()));
             root.AddChild(new CheckboxWidget(
                 "tutorial-slideshow-tutorials-toggle",
-                adapter != null ? adapter.TutorialsToggleLabel : "Show tutorials",
+                adapter != null ? adapter.TutorialsToggleLabel : string.Empty,
                 () => { if (adapter != null) adapter.ToggleTutorials(); },
                 () => adapter != null && adapter.IsTutorialsChecked(),
                 () => adapter != null));
             root.AddChild(new ButtonWidget(
                 "tutorial-slideshow-close",
-                adapter != null ? adapter.CloseLabel : "Close",
+                adapter != null ? adapter.CloseLabel : ModText.Get(ModStrings.Screens.Close),
                 () => adapter != null && adapter.ActivateClose(),
                 null,
                 () => adapter != null && adapter.IsCloseAvailable(),

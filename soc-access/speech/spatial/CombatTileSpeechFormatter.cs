@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using SongsOfConquestAccess.Adapters;
+using SongsOfConquestAccess.Localization;
 
 namespace SongsOfConquestAccess.Speech.Spatial
 {
@@ -20,7 +21,7 @@ namespace SongsOfConquestAccess.Speech.Spatial
         {
             if (tile == null)
             {
-                return "Combat grid";
+                return ModText.Get(ModStrings.UI.CombatGrid);
             }
 
             List<string> parts = new List<string>();
@@ -41,7 +42,7 @@ namespace SongsOfConquestAccess.Speech.Spatial
             List<string> parts = new List<string>();
             if (_context == null && tile.IsReachable)
             {
-                parts.Add("reachable");
+                parts.Add(ModText.Get(ModStrings.Spatial.Reachable));
             }
 
             if (tile.Troop != null)
@@ -76,7 +77,7 @@ namespace SongsOfConquestAccess.Speech.Spatial
                 }
                 else if (_adapter.IsThreatenedByEnemy(tile.Point, tile.Troop))
                 {
-                    parts.Add("Threatened");
+                    parts.Add(ModText.Get(ModStrings.Spatial.Threatened));
                 }
             }
 
@@ -93,16 +94,16 @@ namespace SongsOfConquestAccess.Speech.Spatial
             List<string> parts = new List<string>();
             if (tile.IsImpassable)
             {
-                parts.Add("impassable");
+                parts.Add(ModText.Get(ModStrings.Spatial.Impassable));
             }
             else if (tile.IsBlocked)
             {
-                parts.Add("blocked");
+                parts.Add(ModText.Get(ModStrings.Spatial.Blocked));
             }
 
             if (tile.Elevation > 0)
             {
-                parts.Add("elevated ground, height " + tile.Elevation);
+                parts.Add(ModText.Get(ModStrings.Spatial.ElevatedGroundHeight, tile.Elevation));
             }
 
             if (!string.IsNullOrWhiteSpace(tile.DecorativeFeature))

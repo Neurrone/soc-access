@@ -7,6 +7,7 @@ using SongsOfConquest.Client.Adventure;
 using SongsOfConquest.Client.Menu.Tooltip;
 using SongsOfConquest.Client.UI;
 using SongsOfConquest.Common.Localization;
+using SongsOfConquestAccess.Localization;
 using SongsOfConquestAccess.Speech;
 using UnityEngine;
 
@@ -104,11 +105,11 @@ namespace SongsOfConquestAccess.Adapters
         {
             List<StatItem> items = new List<StatItem>();
             CommanderStatsInfo statsInfo = _settings != null ? _settings.StatsInfo : null;
-            AddStat(items, "offense", "Offence", statsInfo, OffenseTextField, OffenseTooltipImageField);
-            AddStat(items, "defense", "Defence", statsInfo, DefenceTextField, DefenceTooltipImageField);
-            AddStat(items, "movement", "Movement", statsInfo, MovementTextField, MovementTooltipImageField);
-            AddStat(items, "view", "View Radius", statsInfo, ViewTextField, ViewTooltipImageField);
-            AddStat(items, "spell-damage-power", "Spell Damage Power", statsInfo, SpellDamagePowerTextField, SpellDamagePowerTooltipImageField);
+            AddStat(items, "offense", GameText.Get(_localization, "Commanders/Tooltip/Offense", "Offence"), statsInfo, OffenseTextField, OffenseTooltipImageField);
+            AddStat(items, "defense", GameText.Get(_localization, "Commanders/Tooltip/Defense", "Defence"), statsInfo, DefenceTextField, DefenceTooltipImageField);
+            AddStat(items, "movement", GameText.Get(_localization, "Commanders/Tooltip/Movement", "Movement"), statsInfo, MovementTextField, MovementTooltipImageField);
+            AddStat(items, "view", GameText.Get(_localization, "Commanders/Tooltip/ViewRadius", "View Radius"), statsInfo, ViewTextField, ViewTooltipImageField);
+            AddStat(items, "spell-damage-power", GameText.Get(_localization, "Commanders/Tooltip/SpellDamagePower", "Spell Damage Power"), statsInfo, SpellDamagePowerTextField, SpellDamagePowerTooltipImageField);
             return items;
         }
 

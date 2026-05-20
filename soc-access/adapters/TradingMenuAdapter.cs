@@ -13,6 +13,7 @@ using SongsOfConquest.Common;
 using SongsOfConquest.Common.Artifacts;
 using SongsOfConquest.Common.Gamestate;
 using SongsOfConquest.Common.Localization;
+using SongsOfConquestAccess.Localization;
 using SongsOfConquestAccess.Speech;
 using UnityEngine.EventSystems;
 using UnityEngine;
@@ -155,7 +156,7 @@ namespace SongsOfConquestAccess.Adapters
                 return name;
             }
 
-            return MenuButtonTextUtility.JoinParts(name, "level " + commander.Level);
+            return MenuButtonTextUtility.JoinParts(name, ModText.Get(ModStrings.Screens.LevelValue, commander.Level));
         }
 
         public Component GetPortraitTooltipTarget(bool left)
@@ -175,10 +176,10 @@ namespace SongsOfConquestAccess.Adapters
                 return items;
             }
 
-            AddStat(items, statsInfo, StatEntryType.Offense, "Offence", commander.Stats.Offense.GetValue());
-            AddStat(items, statsInfo, StatEntryType.Defense, "Defence", commander.Stats.Defense.GetValue());
-            AddStat(items, statsInfo, StatEntryType.Movement, "Movement", (int)commander.Stats.Movement.GetValue());
-            AddStat(items, statsInfo, StatEntryType.View, "View Radius", (int)commander.Stats.ViewRadius.GetValue());
+            AddStat(items, statsInfo, StatEntryType.Offense, GameText.Get(_localization, "Commanders/Tooltip/Offense", "Offence"), commander.Stats.Offense.GetValue());
+            AddStat(items, statsInfo, StatEntryType.Defense, GameText.Get(_localization, "Commanders/Tooltip/Defense", "Defence"), commander.Stats.Defense.GetValue());
+            AddStat(items, statsInfo, StatEntryType.Movement, GameText.Get(_localization, "Commanders/Tooltip/Movement", "Movement"), (int)commander.Stats.Movement.GetValue());
+            AddStat(items, statsInfo, StatEntryType.View, GameText.Get(_localization, "Commanders/Tooltip/ViewRadius", "View Radius"), (int)commander.Stats.ViewRadius.GetValue());
             return items;
         }
 
@@ -187,9 +188,9 @@ namespace SongsOfConquestAccess.Adapters
             CommanderSheetModifierTabNavigation tabs = GetModifierTabs(left);
             return new[]
             {
-                new ModifierCategory("trade-" + GetSideId(left) + "-modifier-category-troop", "Troop modifiers", 0, Tooltip.ForComponent(GetModifierCategoryButton(tabs, 0) as Component, _localization)),
-                new ModifierCategory("trade-" + GetSideId(left) + "-modifier-category-temporary", "Temporary modifiers", 1, Tooltip.ForComponent(GetModifierCategoryButton(tabs, 1) as Component, _localization)),
-                new ModifierCategory("trade-" + GetSideId(left) + "-modifier-category-gear", "Gear modifiers", 2, Tooltip.ForComponent(GetModifierCategoryButton(tabs, 2) as Component, _localization))
+                new ModifierCategory("trade-" + GetSideId(left) + "-modifier-category-troop", GetModifierTitle(0), 0, Tooltip.ForComponent(GetModifierCategoryButton(tabs, 0) as Component, _localization)),
+                new ModifierCategory("trade-" + GetSideId(left) + "-modifier-category-temporary", GetModifierTitle(1), 1, Tooltip.ForComponent(GetModifierCategoryButton(tabs, 1) as Component, _localization)),
+                new ModifierCategory("trade-" + GetSideId(left) + "-modifier-category-gear", GetModifierTitle(2), 2, Tooltip.ForComponent(GetModifierCategoryButton(tabs, 2) as Component, _localization))
             };
         }
 
@@ -706,8 +707,7 @@ namespace SongsOfConquestAccess.Adapters
 
         private string GetLocalizedText(string key, string fallback)
         {
-            string text = _localization != null ? _localization.GetText(key) : string.Empty;
-            return string.IsNullOrWhiteSpace(text) || text == key ? fallback : SpeechTextSanitizer.Normalize(text);
+            return SpeechTextSanitizer.Normalize(GameText.Get(_localization, key, fallback));
         }
 
         private static string FormatSlotName(InventorySlot slot)

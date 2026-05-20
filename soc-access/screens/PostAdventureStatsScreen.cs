@@ -4,6 +4,7 @@ using HarmonyLib;
 using SongsOfConquest.Client.Menu;
 using SongsOfConquestAccess.Adapters;
 using SongsOfConquestAccess.Input;
+using SongsOfConquestAccess.Localization;
 using SongsOfConquestAccess.UI;
 using UnityEngine;
 
@@ -72,7 +73,7 @@ namespace SongsOfConquestAccess.Screens
 
         private static ContainerWidget BuildRoot(PostAdventureStatsAdapter adapter)
         {
-            ContainerWidget root = new ContainerWidget("post-adventure-stats", "Post adventure stats");
+            ContainerWidget root = new ContainerWidget("post-adventure-stats", ModText.Get(ModStrings.Screens.PostAdventureStats));
             if (adapter == null)
             {
                 return root;
@@ -103,7 +104,7 @@ namespace SongsOfConquestAccess.Screens
 
             root.AddChild(new TextWidget(
                 "post-adventure-stats-graph-todo",
-                () => "TODO: implement accessibility for graph",
+                () => ModText.Get(ModStrings.Screens.GraphAccessibilityTodo),
                 adapter.HideNativeTooltip,
                 includeParentLabelInAnnouncement: false));
 
@@ -119,7 +120,7 @@ namespace SongsOfConquestAccess.Screens
 
         private static MenuWidget BuildGraphTypeMenu(PostAdventureStatsAdapter adapter)
         {
-            MenuWidget menu = new MenuWidget("post-adventure-stats-graph-types", "Graph type");
+            MenuWidget menu = new MenuWidget("post-adventure-stats-graph-types", ModText.Get(ModStrings.Screens.GraphType));
             IReadOnlyList<PostAdventureStatsAdapter.GraphOption> options = adapter.GetGraphOptions();
             for (int i = 0; i < options.Count; i++)
             {
@@ -127,7 +128,7 @@ namespace SongsOfConquestAccess.Screens
                 menu.AddItem(new MenuItemWidget(
                     option.Id,
                     () => option.Label,
-                    () => adapter.SelectedGraphIndex == option.Index ? "selected" : string.Empty,
+                    () => adapter.SelectedGraphIndex == option.Index ? ModText.Get(ModStrings.UI.Selected) : string.Empty,
                     () => adapter.SelectGraph(option.Index),
                     () => adapter.FocusGraphDropdown(),
                     () => true));
@@ -141,7 +142,7 @@ namespace SongsOfConquestAccess.Screens
         {
             MenuWidget menu = new MenuWidget(
                 "post-adventure-stats-teams",
-                "Teams",
+                ModText.Get(ModStrings.Screens.Teams),
                 () => adapter.GetTeamOptions().Count > 0);
 
             IReadOnlyList<PostAdventureStatsAdapter.TeamOption> teams = adapter.GetTeamOptions();
@@ -151,7 +152,7 @@ namespace SongsOfConquestAccess.Screens
                 menu.AddItem(new MenuItemWidget(
                     team.Id,
                     () => team.Label,
-                    () => adapter.IsTeamSelected(team.Entry) ? "selected" : string.Empty,
+                    () => adapter.IsTeamSelected(team.Entry) ? ModText.Get(ModStrings.UI.Selected) : string.Empty,
                     () => adapter.ToggleTeam(team.Entry),
                     () => adapter.FocusTeam(team.Entry),
                     () => team.Entry != null && team.Entry.gameObject != null && team.Entry.gameObject.activeInHierarchy));

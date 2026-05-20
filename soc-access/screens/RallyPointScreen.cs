@@ -9,6 +9,7 @@ using SongsOfConquest.Common.Gamestate.Facade;
 using SongsOfConquest.Common.Localization;
 using SongsOfConquestAccess.Adapters;
 using SongsOfConquestAccess.Input;
+using SongsOfConquestAccess.Localization;
 using SongsOfConquestAccess.UI;
 using UnityEngine;
 
@@ -25,7 +26,7 @@ namespace SongsOfConquestAccess.Screens
         private Action _recruitmentPoolUpdatedHandler;
 
         public RallyPointScreen(RallyPointInteractionMenuAdapter adapter)
-            : base(new ContainerWidget("rally-point", adapter != null ? adapter.Title : "Rally point"))
+            : base(new ContainerWidget("rally-point", adapter != null ? adapter.Title : string.Empty))
         {
             _adapter = adapter;
             RootWidget = BuildRoot();
@@ -221,7 +222,7 @@ namespace SongsOfConquestAccess.Screens
 
         private ContainerWidget BuildRoot()
         {
-            ContainerWidget root = new ContainerWidget("rally-point", _adapter != null ? _adapter.Title : "Rally point");
+            ContainerWidget root = new ContainerWidget("rally-point", _adapter != null ? _adapter.Title : string.Empty);
             if (_adapter == null)
             {
                 return root;
@@ -268,30 +269,34 @@ namespace SongsOfConquestAccess.Screens
         private string BuildSelectedSourceLabel()
         {
             string source = _adapter != null ? _adapter.SelectedSourceName : string.Empty;
-            return string.IsNullOrWhiteSpace(source) ? string.Empty : "Recruiting from " + source;
+            return string.IsNullOrWhiteSpace(source)
+                ? string.Empty
+                : ModText.Get(ModStrings.Screens.RecruitingFrom, source);
         }
 
         private string BuildWielderName()
         {
             string name = _adapter != null ? _adapter.WielderName : string.Empty;
-            return string.IsNullOrWhiteSpace(name) ? "Wielder" : name;
+            return name;
         }
 
         private string BuildWielderArmyLabel()
         {
             string name = _adapter != null ? _adapter.WielderName : string.Empty;
-            return string.IsNullOrWhiteSpace(name) ? "wielder army" : name + "'s army";
+            return string.IsNullOrWhiteSpace(name)
+                ? ModText.Get(ModStrings.Screens.WielderArmy)
+                : ModText.Get(ModStrings.Screens.WielderArmyPossessive, name);
         }
 
         private string BuildCloseLabel()
         {
             string label = _adapter != null ? _adapter.CloseLabel : string.Empty;
-            return string.IsNullOrWhiteSpace(label) ? "Close" : label;
+            return string.IsNullOrWhiteSpace(label) ? ModText.Get(ModStrings.Screens.Close) : label;
         }
 
         private MenuWidget BuildSourceMenu()
         {
-            MenuWidget menu = new MenuWidget("rally-point-sources", "Recruit from");
+            MenuWidget menu = new MenuWidget("rally-point-sources", ModText.Get(ModStrings.Screens.RecruitFrom));
             IReadOnlyList<RallyPointInteractionMenuAdapter.SourceItem> sources = _adapter.GetSourceItems();
             for (int i = 0; i < sources.Count; i++)
             {
@@ -303,7 +308,7 @@ namespace SongsOfConquestAccess.Screens
                 menu.AddItem(new MenuItemWidget(
                     BuildSourceId(source),
                     () => BuildSourceLabel(source),
-                    () => source.IsSelected ? "selected" : string.Empty,
+                    () => source.IsSelected ? ModText.Get(ModStrings.UI.Selected) : string.Empty,
                     () => SelectSource(source),
                     source.Focus,
                     () => true,
@@ -374,7 +379,7 @@ namespace SongsOfConquestAccess.Screens
                 return BuildSourceName(source);
             }
 
-            return BuildSourceName(source) + ", level " + source.Level;
+            return ModText.Get(ModStrings.Screens.NamedLevel, BuildSourceName(source), source.Level);
         }
 
         private static string BuildSourceName(RallyPointInteractionMenuAdapter.SourceItem source)
@@ -389,7 +394,7 @@ namespace SongsOfConquestAccess.Screens
                 return source.Name;
             }
 
-            return source.IsAllSources ? "All settlements" : "Settlement";
+            return string.Empty;
         }
 
         private void AddRecruitWidgets(ContainerWidget root)
@@ -434,7 +439,7 @@ namespace SongsOfConquestAccess.Screens
 
             root.AddChild(new SliderWidget(
                 entry.IdPrefix + "-quantity",
-                "quantity",
+                ModText.Get(ModStrings.Common.Quantity),
                 () => entry.SliderLabel,
                 () => entry.SliderValue,
                 () => entry.SliderMinimum,
@@ -455,7 +460,7 @@ namespace SongsOfConquestAccess.Screens
 
             root.AddChild(new ButtonWidget(
                 entry.IdPrefix + "-upgrade-in-pool",
-                () => "Upgrade available troops",
+                () => ModText.Get(ModStrings.Draft.UpgradeAvailableTroops),
                 entry.UpgradeInPool,
                 entry.Focus,
                 () => entry.IsUpgradeInPoolEnabled,
@@ -465,10 +470,10 @@ namespace SongsOfConquestAccess.Screens
 
         private static MenuWidget BuildEssenceMenu(PurchaseTroopsSubMenuAdapter.RecruitEntry entry)
         {
-            MenuWidget menu = new MenuWidget(entry.IdPrefix + "-essence", "Essence variants");
-            AddEssenceItem(menu, entry, TroopUpgradeType.ArcanaUpgraded, "Arcana");
-            AddEssenceItem(menu, entry, TroopUpgradeType.CreationUpgraded, "Creation");
-            AddEssenceItem(menu, entry, TroopUpgradeType.OrderUpgraded, "Order");
+            MenuWidget menu = new MenuWidget(entry.IdPrefix + "-essence", ModText.Get(ModStrings.Draft.EssenceVariants));
+            AddEssenceItem(menu, entry, TroopUpgradeType.ArcanaUpgraded, GameText.Get("Units/Types/Arcana", "Arcana"));
+            AddEssenceItem(menu, entry, TroopUpgradeType.CreationUpgraded, GameText.Get("Units/Types/Creation", "Creation"));
+            AddEssenceItem(menu, entry, TroopUpgradeType.OrderUpgraded, GameText.Get("Units/Types/Order", "Order"));
             menu.SetFocusedItemById(entry.IdPrefix + "-essence-" + entry.CurrentEssenceVariant.ToString().ToLowerInvariant());
             return menu;
         }
@@ -498,41 +503,23 @@ namespace SongsOfConquestAccess.Screens
                     PurchaseTroopsSubMenuAdapter.ResourceCostLine cost = costs[i];
                     if (cost != null)
                     {
-                        parts.Add(cost.Amount + " " + GetResourceName(cost.ResourceType));
+                        parts.Add(ModText.Get(
+                            ModStrings.Common.ResourceAmount,
+                            cost.Amount,
+                            GetResourceName(cost.ResourceType)));
                     }
                 }
             }
 
-            return parts.Count == 0 ? "Purchase" : "Purchase for " + JoinWithAnd(parts);
+            return parts.Count == 0
+                ? ModText.Get(ModStrings.Draft.Purchase)
+                : ModText.Get(ModStrings.Draft.PurchaseForResources, ModText.JoinList(parts));
         }
 
         private static string GetResourceName(ResourceType resourceType)
         {
-            ILocalizationHandler localization = GlobalLocalizationVariables.LocalizationHandler;
             string fallback = FormatEnumName(resourceType.ToString());
-            if (localization == null)
-            {
-                return fallback;
-            }
-
-            string key = "Common/Resource/" + resourceType;
-            string text = localization.GetText(key);
-            return string.IsNullOrWhiteSpace(text) || text == key ? fallback : text;
-        }
-
-        private static string JoinWithAnd(List<string> parts)
-        {
-            if (parts.Count == 1)
-            {
-                return parts[0];
-            }
-
-            if (parts.Count == 2)
-            {
-                return parts[0] + " and " + parts[1];
-            }
-
-            return string.Join(", ", parts.GetRange(0, parts.Count - 1).ToArray()) + ", and " + parts[parts.Count - 1];
+            return GameText.Get("Common/Resource/" + resourceType, fallback);
         }
 
         private static string FormatEnumName(string value)

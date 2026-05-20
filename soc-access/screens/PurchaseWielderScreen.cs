@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using SongsOfConquest.Client.UI;
 using SongsOfConquestAccess.Adapters;
 using SongsOfConquestAccess.Input;
+using SongsOfConquestAccess.Localization;
 using SongsOfConquestAccess.UI;
 using UnityEngine;
 
@@ -82,7 +83,7 @@ namespace SongsOfConquestAccess.Screens
 
         private static ContainerWidget BuildRoot(PurchaseWielderMenuAdapter adapter)
         {
-            ContainerWidget root = new ContainerWidget("purchase-wielder", "Purchase wielders");
+            ContainerWidget root = new ContainerWidget("purchase-wielder", adapter != null ? adapter.Title : string.Empty);
             if (adapter == null)
             {
                 return root;
@@ -131,7 +132,7 @@ namespace SongsOfConquestAccess.Screens
 
             root.AddChild(new ButtonWidget(
                 "purchase-wielder-close",
-                "Close",
+                ModText.Get(ModStrings.Screens.Close),
                 adapter.Close,
                 adapter.HideNativeTooltip,
                 () => true));
@@ -141,7 +142,7 @@ namespace SongsOfConquestAccess.Screens
 
         private static MenuWidget BuildWielderMenu(PurchaseWielderMenuAdapter adapter)
         {
-            MenuWidget menu = new MenuWidget("purchase-wielder-list", "Wielders");
+            MenuWidget menu = new MenuWidget("purchase-wielder-list", adapter.Title);
             IReadOnlyList<PurchaseWielderMenuAdapter.EntryItem> entries = adapter.GetEntries();
             for (int i = 0; i < entries.Count; i++)
             {
@@ -157,18 +158,10 @@ namespace SongsOfConquestAccess.Screens
 
             if (entries.Count == 0)
             {
-                menu.AddItem(new MenuItemWidget(
-                    "purchase-wielder-list-empty",
-                    () => "No wielders",
-                    null,
-                    () => false,
-                    adapter.HideNativeTooltip,
-                    () => true));
+                return menu;
             }
-            else
-            {
-                menu.SetFocusedItemById(adapter.SelectedEntryId);
-            }
+
+            menu.SetFocusedItemById(adapter.SelectedEntryId);
 
             return menu;
         }
@@ -213,7 +206,7 @@ namespace SongsOfConquestAccess.Screens
             string name = adapter.GetTroopName(index);
             if (string.IsNullOrWhiteSpace(name))
             {
-                name = "Troop slot " + (index + 1);
+                name = string.Empty;
             }
 
             int amount = adapter.GetTroopAmount(index);
@@ -248,7 +241,7 @@ namespace SongsOfConquestAccess.Screens
             }
 
             string name = adapter.GetSkillName(index);
-            return string.IsNullOrWhiteSpace(name) ? "Skill " + (index + 1) : name;
+            return string.IsNullOrWhiteSpace(name) ? ModText.Get(ModStrings.Screens.Skill, index + 1) : name;
         }
 
         private static bool HasVisibleSkills(PurchaseWielderMenuAdapter adapter)

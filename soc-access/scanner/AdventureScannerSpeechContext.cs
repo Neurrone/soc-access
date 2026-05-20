@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using SongsOfConquestAccess.Adapters;
+using SongsOfConquestAccess.Localization;
 using SongsOfConquestAccess.Speech;
 using SongsOfConquestAccess.Speech.Spatial;
 
@@ -44,7 +45,7 @@ namespace SongsOfConquestAccess.Scanner
                 string primary = formatter.DescribePrimaryContent(_tile);
                 if (_result != null && _result.NotVisible && !string.IsNullOrWhiteSpace(primary))
                 {
-                    primary += ", unseen";
+                    primary += ", " + ModText.Get(ModStrings.Spatial.Unseen);
                 }
 
                 ScannerSpeechUtility.AddIfPresent(parts, primary);

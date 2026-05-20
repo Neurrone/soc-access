@@ -157,7 +157,7 @@ namespace SongsOfConquestAccess.Adapters
 
             public string SliderLabel
             {
-                get { return "Amount to upgrade, " + TargetTroopText; }
+                get { return TargetTroopText; }
             }
 
             public int SliderValue

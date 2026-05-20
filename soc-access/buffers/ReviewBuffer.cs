@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using SongsOfConquestAccess.Localization;
 
 namespace SongsOfConquestAccess.Buffers
 {
@@ -171,11 +172,11 @@ namespace SongsOfConquestAccess.Buffers
             switch (kind)
             {
                 case ReviewBufferKind.Ui:
-                    return "UI";
+                    return ModText.Get(ModStrings.UI.ReviewBufferUi);
                 case ReviewBufferKind.AdventureMapNotifications:
-                    return "Notifications";
+                    return ModText.Get(ModStrings.UI.ReviewBufferNotifications);
                 case ReviewBufferKind.CombatEvents:
-                    return "Events";
+                    return ModText.Get(ModStrings.UI.ReviewBufferEvents);
                 default:
                     return kind.ToString();
             }

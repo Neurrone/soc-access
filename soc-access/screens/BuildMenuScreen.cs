@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using SongsOfConquest.Client.Adventure;
 using SongsOfConquestAccess.Adapters;
 using SongsOfConquestAccess.Input;
+using SongsOfConquestAccess.Localization;
 using SongsOfConquestAccess.UI;
 using UnityEngine;
 
@@ -82,7 +83,7 @@ namespace SongsOfConquestAccess.Screens
 
         private static ContainerWidget BuildRoot(BuildMenuAdapter adapter)
         {
-            ContainerWidget root = new ContainerWidget("build-menu", "Build");
+            ContainerWidget root = new ContainerWidget("build-menu", adapter != null ? adapter.BuildButtonLabel : string.Empty);
             if (adapter == null)
             {
                 return root;
@@ -118,7 +119,7 @@ namespace SongsOfConquestAccess.Screens
 
             root.AddChild(new CheckboxWidget(
                 "build-auto-select-site",
-                "Autoselect buildsite",
+                adapter.AutoSelectLabel,
                 adapter.ToggleAutoSelect,
                 adapter.IsAutoSelectChecked,
                 adapter.IsAutoSelectVisible));
@@ -158,7 +159,7 @@ namespace SongsOfConquestAccess.Screens
 
             root.AddChild(new ButtonWidget(
                 "build-close",
-                "Close",
+                ModText.Get(ModStrings.Screens.Close),
                 adapter.Close,
                 adapter.HideNativeTooltip,
                 () => true));
@@ -168,7 +169,7 @@ namespace SongsOfConquestAccess.Screens
 
         private static MenuWidget BuildTierMenu(BuildMenuAdapter adapter)
         {
-            MenuWidget menu = new MenuWidget("build-tiers", "Tier", () => adapter.GetTiers().Count > 0);
+            MenuWidget menu = new MenuWidget("build-tiers", ModText.Get(ModStrings.Screens.Tier), () => adapter.GetTiers().Count > 0);
             IReadOnlyList<BuildMenuAdapter.TierItem> tiers = adapter.GetTiers();
             for (int i = 0; i < tiers.Count; i++)
             {
@@ -242,7 +243,7 @@ namespace SongsOfConquestAccess.Screens
                 menu.AddItem(new MenuItemWidget(
                     "build-requirement-" + i,
                     () => BuildRequirementLabel(requirement),
-                    () => requirement.IsMet ? string.Empty : "missing",
+                    () => requirement.IsMet ? string.Empty : ModText.Get(ModStrings.UI.StatusMissing),
                     () => false,
                     adapter.HideNativeTooltip,
                     () => true,
@@ -254,7 +255,7 @@ namespace SongsOfConquestAccess.Screens
 
         private static MenuWidget BuildCategoryMenu(BuildMenuAdapter adapter)
         {
-            MenuWidget menu = new MenuWidget("build-size-tabs", "Building size");
+            MenuWidget menu = new MenuWidget("build-size-tabs", adapter.BuildSizeHeader);
             IReadOnlyList<BuildMenuAdapter.CategoryItem> categories = adapter.GetCategories();
             string activeId = null;
             for (int i = 0; i < categories.Count; i++)
@@ -270,7 +271,7 @@ namespace SongsOfConquestAccess.Screens
                 menu.AddItem(new MenuItemWidget(
                     id,
                     () => captured.Label,
-                    () => captured.Enabled ? string.Empty : "unavailable",
+                    () => captured.Enabled ? string.Empty : ModText.Get(ModStrings.UI.StatusUnavailable),
                     () => captured.Enabled && adapter.FocusCategory(captured.Size),
                     () =>
                     {
@@ -299,7 +300,7 @@ namespace SongsOfConquestAccess.Screens
                 menu.AddItem(new MenuItemWidget(
                     "build-building-" + i,
                     () => building.Label,
-                    () => building.IsAvailable ? string.Empty : "unavailable",
+                    () => building.IsAvailable ? string.Empty : ModText.Get(ModStrings.UI.StatusUnavailable),
                     building.Focus,
                     () => building.Focus(),
                     () => true,
@@ -308,18 +309,10 @@ namespace SongsOfConquestAccess.Screens
 
             if (buildings.Count == 0)
             {
-                menu.AddItem(new MenuItemWidget(
-                    "build-buildings-none",
-                    () => "No buildings",
-                    null,
-                    () => false,
-                    adapter.HideNativeTooltip,
-                    () => true));
+                return menu;
             }
-            else
-            {
-                menu.SetFocusedItemById("build-building-" + adapter.SelectedBuildingIndex);
-            }
+
+            menu.SetFocusedItemById("build-building-" + adapter.SelectedBuildingIndex);
 
             return menu;
         }
@@ -341,7 +334,7 @@ namespace SongsOfConquestAccess.Screens
                 return string.Empty;
             }
 
-            return requirement.IsMet ? requirement.Label : "Missing " + requirement.Label;
+            return requirement.IsMet ? requirement.Label : ModText.Get(ModStrings.Screens.Missing, requirement.Label);
         }
 
     }

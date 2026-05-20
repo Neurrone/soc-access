@@ -5,6 +5,7 @@ using SongsOfConquest.Client.Gamestate.Facade;
 using SongsOfConquest.Common.Gamestate.Facade;
 using SongsOfConquestAccess.Adapters;
 using SongsOfConquestAccess.Input;
+using SongsOfConquestAccess.Localization;
 using SongsOfConquestAccess.Speech;
 using SongsOfConquestAccess.UI;
 using UnityEngine;
@@ -175,7 +176,7 @@ namespace SongsOfConquestAccess.Screens
 
         private static ContainerWidget BuildRoot(DefenceMenuAdapter adapter)
         {
-            ContainerWidget root = new ContainerWidget("defences", adapter != null ? adapter.Title : "Defences");
+            ContainerWidget root = new ContainerWidget("defences", adapter != null ? adapter.Title : string.Empty);
             if (adapter == null)
             {
                 return root;
@@ -279,8 +280,8 @@ namespace SongsOfConquestAccess.Screens
                 isVisible: adapter.HasTowerSummary));
 
             root.AddChild(BuildTowerMenu(adapter));
-            root.AddChild(BuildDefenseMenu("defences-garrison", "Garrison", adapter.GetGarrisonSlots()));
-            root.AddChild(BuildDefenseMenu("defences-ballista", "Ballista", adapter.GetBallistaSlots()));
+            root.AddChild(BuildDefenseMenu("defences-garrison", GameText.Get("Adventure/BuildMenu/Garrison", string.Empty), adapter.GetGarrisonSlots()));
+            root.AddChild(BuildDefenseMenu("defences-ballista", string.Empty, adapter.GetBallistaSlots()));
 
             root.AddChild(new ButtonWidget(
                 "defences-close",
@@ -317,7 +318,9 @@ namespace SongsOfConquestAccess.Screens
         private static string BuildDefendingWielderArmyLabel(DefencePanelWielderAdapter wielder)
         {
             string name = wielder != null ? wielder.StoredWielderName : string.Empty;
-            return string.IsNullOrWhiteSpace(name) ? "defending wielder army" : name + "'s army";
+            return string.IsNullOrWhiteSpace(name)
+                ? ModText.Get(ModStrings.Screens.DefendingWielderArmy)
+                : ModText.Get(ModStrings.Screens.WielderArmyPossessive, name);
         }
 
         private static TroopHudAdapter.DropResult DropArmySlot(TroopHudAdapter.SlotItem source, TroopHudAdapter.SlotItem target)
@@ -328,7 +331,7 @@ namespace SongsOfConquestAccess.Screens
         private static MenuWidget BuildTowerMenu(DefenceMenuAdapter adapter)
         {
             IReadOnlyList<DefenceMenuAdapter.TowerItem> towers = adapter.GetTowerItems();
-            MenuWidget menu = new MenuWidget("defences-towers", "Towers", () => towers.Count > 0);
+            MenuWidget menu = new MenuWidget("defences-towers", adapter.TowerSummary, () => towers.Count > 0);
             for (int i = 0; i < towers.Count; i++)
             {
                 DefenceMenuAdapter.TowerItem tower = towers[i];
@@ -353,13 +356,6 @@ namespace SongsOfConquestAccess.Screens
             MenuWidget menu = new MenuWidget(id, label);
             if (slots == null || slots.Count == 0)
             {
-                menu.AddItem(new MenuItemWidget(
-                    id + "-none",
-                    () => "No slots",
-                    null,
-                    () => false,
-                    null,
-                    () => true));
                 return menu;
             }
 
@@ -392,7 +388,7 @@ namespace SongsOfConquestAccess.Screens
                 return SpeechTextSanitizer.Normalize(string.Join(". ", tooltip.TextLines));
             }
 
-            return "Empty, slot " + slot.SlotNumber;
+            return ModText.Get(ModStrings.Screens.EmptySlot, slot.SlotNumber);
         }
 
         private sealed class GridFocus

@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using SongsOfConquestAccess.Localization;
 using UnityEngine;
 
 namespace SongsOfConquestAccess.Scanner
@@ -46,18 +47,13 @@ namespace SongsOfConquestAccess.Scanner
     {
         public static string ZoneOfControl(int tileCount, string name)
         {
-            string tileWord = tileCount == 1 ? " tile" : " tiles";
-            return tileCount + tileWord + " within " + FormatPossessive(name) + " zone of control";
+            string tileText = ModText.Plural(ModStrings.Common.TileCount, tileCount, tileCount);
+            return ModText.Get(ModStrings.Spatial.ZoneOfControlTiles, tileText, FormatPossessive(name));
         }
 
         private static string FormatPossessive(string name)
         {
-            if (string.IsNullOrWhiteSpace(name))
-            {
-                return "commander's";
-            }
-
-            return name.EndsWith("s") || name.EndsWith("S") ? name + "'" : name + "'s";
+            return ModText.FormatPossessiveName(name, ModStrings.Spatial.CommanderPossessive);
         }
     }
 }

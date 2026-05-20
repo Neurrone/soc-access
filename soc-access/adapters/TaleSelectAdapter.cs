@@ -66,7 +66,7 @@ namespace SongsOfConquestAccess.Adapters
 
         public string GetTitle()
         {
-            return "Choose campaign or tale";
+            return string.Empty;
         }
 
         public bool IsPresent()

@@ -19,6 +19,7 @@ using SongsOfConquest.Common.Gamestate.Commander;
 using SongsOfConquest.Common.Levels;
 using SongsOfConquest.Common.Localization;
 using SongsOfConquest.Common.Objectives;
+using SongsOfConquestAccess.Localization;
 using SongsOfConquestAccess.Speech;
 using UnityEngine;
 using UnityEngine.UI;
@@ -1696,8 +1697,7 @@ namespace SongsOfConquestAccess.Adapters
 
         private string Localize(string key, string fallback)
         {
-            string localized = Localize(key);
-            return string.IsNullOrWhiteSpace(localized) ? fallback : localized;
+            return GameText.Get(LocalizationHandler, key, fallback);
         }
 
         private string Localize(string key)

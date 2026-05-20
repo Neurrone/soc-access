@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using SongsOfConquestAccess.Localization;
 
 namespace SongsOfConquestAccess.Scanner
 {
@@ -8,7 +9,7 @@ namespace SongsOfConquestAccess.Scanner
         {
             if (directions == null || directions.Count == 0)
             {
-                return "here";
+                return ModText.Get(ModStrings.Spatial.Here);
             }
 
             List<string> parts = new List<string>();
@@ -21,12 +22,12 @@ namespace SongsOfConquestAccess.Scanner
                 }
             }
 
-            return parts.Count == 0 ? "here" : string.Join(", ", parts.ToArray());
+            return parts.Count == 0 ? ModText.Get(ModStrings.Spatial.Here) : string.Join(", ", parts.ToArray());
         }
 
         public static string FormatResultCount(int index, int count)
         {
-            return index + " of " + count;
+            return ModText.Get(ModStrings.Common.CountOf, index, count);
         }
 
         public static void AddIfPresent(List<string> parts, string text)

@@ -8,6 +8,7 @@ using SongsOfConquest.Common.Entities.Adventure;
 using SongsOfConquest.Common.Gamestate;
 using SongsOfConquest.Common.Gamestate.Facade;
 using SongsOfConquest.Common.Localization;
+using SongsOfConquestAccess.Localization;
 
 namespace SongsOfConquestAccess.Events
 {
@@ -248,11 +249,11 @@ namespace SongsOfConquestAccess.Events
         {
             if (commander == null || _facade == null || _facade.Commanders == null)
             {
-                return "wielder";
+                return ModText.Get(ModStrings.Events.Wielder);
             }
 
             string name = _facade.Commanders.GetName(commander.Id);
-            return string.IsNullOrWhiteSpace(name) ? "wielder" : name;
+            return string.IsNullOrWhiteSpace(name) ? ModText.Get(ModStrings.Events.Wielder) : name;
         }
 
         private string GetMapEntityName(IMapEntity entity)

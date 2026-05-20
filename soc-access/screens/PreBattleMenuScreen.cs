@@ -1,5 +1,6 @@
 using SongsOfConquest.Client.Menu;
 using SongsOfConquestAccess.Adapters;
+using SongsOfConquestAccess.Localization;
 using SongsOfConquestAccess.UI;
 using SongsOfConquest.Client.Deployment;
 using UnityEngine;
@@ -82,7 +83,7 @@ namespace SongsOfConquestAccess.Screens
 
         private static ContainerWidget BuildRoot(PreBattleMenuAdapter adapter, TroopPlacementHexGrid hexGrid)
         {
-            ContainerWidget root = new ContainerWidget("pre-battle-menu", "Troop placement");
+            ContainerWidget root = new ContainerWidget("pre-battle-menu", ModText.Get(ModStrings.Screens.TroopPlacement));
             if (adapter == null)
             {
                 return root;

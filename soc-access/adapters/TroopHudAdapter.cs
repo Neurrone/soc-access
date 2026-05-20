@@ -11,6 +11,7 @@ using SongsOfConquest.Client.UI;
 using SongsOfConquest.Common.Details;
 using SongsOfConquest.Common.Gamestate;
 using SongsOfConquest.Common.Localization;
+using SongsOfConquestAccess.Localization;
 using SongsOfConquestAccess.Speech;
 using UnityEngine;
 
@@ -173,8 +174,7 @@ namespace SongsOfConquestAccess.Adapters
 
         private string GetLocalizedText(string key, string fallback)
         {
-            string text = _localization != null ? _localization.GetText(key) : string.Empty;
-            return string.IsNullOrWhiteSpace(text) || text == key ? fallback : text;
+            return GameText.Get(_localization, key, fallback);
         }
 
         private static bool InvokeBool(MethodInfo method, object instance)

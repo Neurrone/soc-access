@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using SongsOfConquest.Common;
 using SongsOfConquest.Common.Campaign;
 using SongsOfConquest.Common.Localization;
-using SongsOfConquestAccess.Speech;
+using SongsOfConquestAccess.Localization;
 
 namespace SongsOfConquestAccess.Adapters
 {
@@ -67,17 +67,7 @@ namespace SongsOfConquestAccess.Adapters
 
         public static string GetLocalizedText(string localizationKey, string fallback)
         {
-            if (!string.IsNullOrWhiteSpace(localizationKey) && GlobalLocalizationVariables.LocalizationHandler != null)
-            {
-                string localized = SpeechTextSanitizer.Normalize(
-                    GlobalLocalizationVariables.LocalizationHandler.GetText(localizationKey));
-                if (!string.IsNullOrWhiteSpace(localized))
-                {
-                    return localized;
-                }
-            }
-
-            return fallback;
+            return GameText.Get(GlobalLocalizationVariables.LocalizationHandler, localizationKey, fallback);
         }
     }
 }

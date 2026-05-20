@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using SongsOfConquest.Common.Entities.Adventure;
 using SongsOfConquestAccess.Adapters;
 using SongsOfConquestAccess.Input;
+using SongsOfConquestAccess.Localization;
 using SongsOfConquestAccess.Scanner;
 using SongsOfConquestAccess.Speech;
 using SongsOfConquestAccess.Speech.Spatial;
@@ -66,10 +67,10 @@ namespace SongsOfConquestAccess.UI
 
             if (_dragSource.HasValue)
             {
-                return tile.Point == _dragSource.Value ? "dragging" : string.Empty;
+                return tile.Point == _dragSource.Value ? ModText.Get(ModStrings.UI.StatusDragging) : string.Empty;
             }
 
-            return IsOwnTroop(tile) ? "draggable" : string.Empty;
+            return IsOwnTroop(tile) ? ModText.Get(ModStrings.UI.StatusDraggable) : string.Empty;
         }
 
         public override Tooltip GetTooltip()
@@ -220,7 +221,7 @@ namespace SongsOfConquestAccess.UI
             }
 
             _dragSource = _cursor;
-            Speak("Started drag for " + tile.TroopLabel + " at " + HexCoordinateFormatter.Format(_cursor) + ". Press enter to drop on destination spawn point, or press escape to cancel.");
+            Speak(ModText.Get(ModStrings.UI.DragStartedTroopPlacement, tile.TroopLabel, HexCoordinateFormatter.Format(_cursor)));
             return true;
         }
 
@@ -228,7 +229,7 @@ namespace SongsOfConquestAccess.UI
         {
             if (!_dragSource.HasValue)
             {
-                Speak("Press space to drag.");
+                Speak(ModText.Get(ModStrings.UI.PressSpaceToDrag));
                 return true;
             }
 
@@ -236,11 +237,11 @@ namespace SongsOfConquestAccess.UI
             if (_adapter != null && _adapter.TryMoveTroop(source, _cursor))
             {
                 _dragSource = null;
-                Speak("Drag complete.");
+                Speak(ModText.Get(ModStrings.UI.DragComplete));
                 return true;
             }
 
-            Speak("Invalid destination.");
+            Speak(ModText.Get(ModStrings.UI.InvalidDestination));
             return true;
         }
 
@@ -253,7 +254,7 @@ namespace SongsOfConquestAccess.UI
 
             ClearDrag();
             NativeSoundUtility.PostEvent("Common_SpellbookEndDragCancel");
-            Speak("Drag cancelled.");
+            Speak(ModText.Get(ModStrings.UI.DragCancelled));
             return true;
         }
 

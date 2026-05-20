@@ -5,6 +5,7 @@ using _8_UILayer.ClientView.Menu.Paus;
 using HarmonyLib;
 using SongsOfConquestAccess.Adapters;
 using SongsOfConquestAccess.Input;
+using SongsOfConquestAccess.Localization;
 using SongsOfConquestAccess.UI;
 using UnityEngine;
 using Zenject;
@@ -45,9 +46,9 @@ namespace SongsOfConquestAccess.Screens
         {
             string title = adapter != null && !string.IsNullOrWhiteSpace(adapter.Title)
                 ? adapter.Title
-                : "Pause menu";
+                : string.Empty;
             ContainerWidget root = new ContainerWidget("pause-menu-screen", title);
-            MenuWidget menu = new MenuWidget("pause-menu", "Pause menu");
+            MenuWidget menu = new MenuWidget("pause-menu", title);
 
             if (adapter != null)
             {

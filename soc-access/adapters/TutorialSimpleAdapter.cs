@@ -2,6 +2,7 @@ using HarmonyLib;
 using SongsOfConquest.Client.Menu;
 using SongsOfConquest.Client.UI;
 using SongsOfConquest.Common.Localization;
+using SongsOfConquestAccess.Localization;
 using SongsOfConquestAccess.Speech;
 using UnityEngine;
 
@@ -129,16 +130,7 @@ namespace SongsOfConquestAccess.Adapters
 
         private static string GetLocalizedText(string key, string fallback)
         {
-            if (!string.IsNullOrWhiteSpace(key) && GlobalLocalizationVariables.LocalizationHandler != null)
-            {
-                string localized = SpeechTextSanitizer.Normalize(GlobalLocalizationVariables.LocalizationHandler.GetText(key));
-                if (!string.IsNullOrWhiteSpace(localized))
-                {
-                    return localized;
-                }
-            }
-
-            return fallback ?? string.Empty;
+            return SpeechTextSanitizer.Normalize(GameText.Get(key, fallback ?? string.Empty));
         }
     }
 }

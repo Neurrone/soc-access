@@ -4,6 +4,7 @@ using HarmonyLib;
 using SongsOfConquest.Client.Adventure;
 using SongsOfConquestAccess.Adapters;
 using SongsOfConquestAccess.Input;
+using SongsOfConquestAccess.Localization;
 using SongsOfConquestAccess.UI;
 using UnityEngine;
 using Zenject;
@@ -72,7 +73,7 @@ namespace SongsOfConquestAccess.Screens
 
         private static ContainerWidget BuildRoot(LevelUpMenuAdapter adapter)
         {
-            ContainerWidget root = new ContainerWidget("level-up-screen", "Level up");
+            ContainerWidget root = new ContainerWidget("level-up-screen", adapter != null ? adapter.GetTitle() : string.Empty);
             if (adapter == null)
             {
                 return root;
@@ -102,7 +103,7 @@ namespace SongsOfConquestAccess.Screens
 
             root.AddChild(new ButtonWidget(
                 "level-up-close",
-                "Close",
+                ModText.Get(ModStrings.Screens.Close),
                 adapter.Close,
                 null,
                 () => true));
@@ -112,7 +113,7 @@ namespace SongsOfConquestAccess.Screens
 
         private static MenuWidget BuildStatsMenu(LevelUpMenuAdapter adapter)
         {
-            MenuWidget menu = new MenuWidget("level-up-stats", "Stats");
+            MenuWidget menu = new MenuWidget("level-up-stats", GameText.Get("Common/CommanderInventory/Stats", string.Empty));
             IReadOnlyList<LevelUpMenuAdapter.StatItem> stats = adapter.GetStats();
             for (int i = 0; i < stats.Count; i++)
             {
@@ -131,7 +132,7 @@ namespace SongsOfConquestAccess.Screens
             {
                 menu.AddItem(new MenuItemWidget(
                     "level-up-stats-none",
-                    () => "Unavailable",
+                    () => ModText.Get(ModStrings.Screens.Unavailable),
                     null,
                     () => false,
                     null,
@@ -143,7 +144,7 @@ namespace SongsOfConquestAccess.Screens
 
         private static MenuWidget BuildSkillMenu(LevelUpMenuAdapter adapter)
         {
-            MenuWidget menu = new MenuWidget("level-up-skills", "Skills");
+            MenuWidget menu = new MenuWidget("level-up-skills", GameText.Get("Commanders/Tooltip/Skills", string.Empty));
             IReadOnlyList<LevelUpMenuAdapter.SkillChoice> choices = adapter.GetSkillChoices();
             for (int i = 0; i < choices.Count; i++)
             {
@@ -160,13 +161,7 @@ namespace SongsOfConquestAccess.Screens
 
             if (choices.Count == 0)
             {
-                menu.AddItem(new MenuItemWidget(
-                    "level-up-skills-none",
-                    () => "No skill choices",
-                    null,
-                    () => false,
-                    null,
-                    () => true));
+                return menu;
             }
 
             return menu;

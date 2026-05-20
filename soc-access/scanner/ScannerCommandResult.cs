@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using SongsOfConquestAccess.Localization;
 using SongsOfConquestAccess.Speech;
 
 namespace SongsOfConquestAccess.Scanner
@@ -40,25 +41,32 @@ namespace SongsOfConquestAccess.Scanner
         {
             if (Status == ScannerCommandStatus.NoResults)
             {
-                return new SpeechRequest("No scanner results", interrupt: false);
+                return NoResults();
             }
 
             if (speechContextProvider == null || Result == null)
             {
-                return new SpeechRequest("No scanner results", interrupt: false);
+                return NoResults();
             }
 
             IScannerSpeechContext context = speechContextProvider(Result, Directions, ResultIndex, ResultCount);
             SpeechRequest request = context != null
                 ? context.ToSpeechRequest()
-                : new SpeechRequest("No scanner results", interrupt: false);
+                : NoResults();
 
             if (IncludePath && !string.IsNullOrWhiteSpace(CategoryLabel) && !string.IsNullOrWhiteSpace(SubcategoryLabel))
             {
-                return new SpeechRequest(CategoryLabel + ", " + SubcategoryLabel + ". " + request.Text, request.Interrupt);
+                return new SpeechRequest(
+                    ModText.Get(ModStrings.UI.ScannerPath, CategoryLabel, SubcategoryLabel, request.Text),
+                    request.Interrupt);
             }
 
             return request;
+        }
+
+        private static SpeechRequest NoResults()
+        {
+            return new SpeechRequest(ModText.Get(ModStrings.UI.NoScannerResults), interrupt: false);
         }
     }
 }

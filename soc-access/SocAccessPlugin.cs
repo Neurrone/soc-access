@@ -1,8 +1,10 @@
 using BepInEx;
 using HarmonyLib;
+using SongsOfConquest.Common.Localization;
 using SongsOfConquestAccess.Buffers;
 using SongsOfConquestAccess.Events;
 using SongsOfConquestAccess.Input;
+using SongsOfConquestAccess.Localization;
 using SongsOfConquestAccess.Screens;
 using SongsOfConquestAccess.Speech;
 using SongsOfConquestAccess.UI;
@@ -28,7 +30,9 @@ namespace SongsOfConquestAccess
         private ScreenManager _screenManager;
         private ScreenDetector _screenDetector;
         private AccessibilityInputRouter _inputRouter;
+        private ILocalizationHandler _localizationHandler;
         private bool _announcedReady;
+        private bool _reportedLocalizationUnavailable;
 
         private void Awake()
         {
@@ -65,6 +69,7 @@ namespace SongsOfConquestAccess
         private void Start()
         {
             Logger.LogInfo("Accessibility plugin Start");
+            AttachLocalizationHandler();
             TryAnnounceReady();
             _screenDetector?.ResyncFromRuntimeState();
         }
@@ -77,6 +82,12 @@ namespace SongsOfConquestAccess
             _harmony = null;
             _inputRouter?.Dispose();
             _inputRouter = null;
+            if (_localizationHandler != null)
+            {
+                _localizationHandler.OnLanguageChanged -= HandleLanguageChanged;
+                _localizationHandler = null;
+            }
+            ModTranslationLoader.Reset();
             _screenDetector = null;
             _screenManager = null;
             StoryCameraFocusPatches.ResetDedupe();
@@ -102,6 +113,7 @@ namespace SongsOfConquestAccess
 
         private void Update()
         {
+            AttachLocalizationHandler();
             _inputRouter?.Update();
             _screenManager?.Update();
             UIManager.Update();
@@ -135,6 +147,44 @@ namespace SongsOfConquestAccess
         internal void LogWarning(string message)
         {
             Logger.LogWarning(message);
+        }
+
+        private void AttachLocalizationHandler()
+        {
+            ILocalizationHandler localizationHandler = GlobalLocalizationVariables.LocalizationHandler;
+            if (ReferenceEquals(_localizationHandler, localizationHandler))
+            {
+                return;
+            }
+
+            if (_localizationHandler != null)
+            {
+                _localizationHandler.OnLanguageChanged -= HandleLanguageChanged;
+                _localizationHandler = null;
+            }
+
+            if (localizationHandler == null)
+            {
+                if (!_reportedLocalizationUnavailable)
+                {
+                    Logger.LogWarning("Game localization handler is not available; using mod string fallbacks");
+                    _reportedLocalizationUnavailable = true;
+                }
+
+                ModTranslationLoader.Reset();
+                return;
+            }
+
+            _reportedLocalizationUnavailable = false;
+            _localizationHandler = localizationHandler;
+            ModTranslationLoader.LoadCurrentLanguage(_localizationHandler);
+            _localizationHandler.OnLanguageChanged -= HandleLanguageChanged;
+            _localizationHandler.OnLanguageChanged += HandleLanguageChanged;
+        }
+
+        private void HandleLanguageChanged()
+        {
+            ModTranslationLoader.LoadCurrentLanguage(_localizationHandler);
         }
 
         private void TryAnnounceReady()

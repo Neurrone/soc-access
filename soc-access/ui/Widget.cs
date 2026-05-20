@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using SongsOfConquestAccess.Adapters;
+using SongsOfConquestAccess.Localization;
 using SongsOfConquestAccess.Speech;
 
 namespace SongsOfConquestAccess.UI
@@ -188,7 +189,7 @@ namespace SongsOfConquestAccess.UI
             // as "CTRL + Drop" and replace them with structured actions. Announce
             // the action labels here so the player knows the Applications menu
             // has commands.
-            return "Available actions: " + string.Join(", ", labels.ToArray()) + ".";
+            return ModText.Get(ModStrings.UI.AvailableActions, ModText.JoinList(labels));
         }
     }
 }

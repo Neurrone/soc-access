@@ -13,6 +13,7 @@ using SongsOfConquest.Common.Details;
 using SongsOfConquest.Common.Gamestate;
 using SongsOfConquest.Common.Localization;
 using SongsOfConquest.Common.Spells;
+using SongsOfConquestAccess.Localization;
 using SongsOfConquestAccess.Speech;
 using TMPro;
 using UnityEngine;
@@ -101,7 +102,9 @@ namespace SongsOfConquestAccess.Adapters
         {
             UIButton button = GetTutorialButton();
             string label = MenuButtonTextUtility.GetAllVisibleText(button);
-            return string.IsNullOrWhiteSpace(label) ? "Tutorial available" : label;
+            return string.IsNullOrWhiteSpace(label)
+                ? GameText.Get(GetLocalization(), "Tutorial/CodexCategory/Tutorials", "Tutorials")
+                : label;
         }
 
         public bool ActivateTutorial()
@@ -169,8 +172,7 @@ namespace SongsOfConquestAccess.Adapters
         public string GetAutoPopulateLabel()
         {
             UIToggle toggle = GetAutoPopulateToggle();
-            string label = SpeechTextSanitizer.Normalize(toggle != null ? toggle.Text : null);
-            return string.IsNullOrWhiteSpace(label) ? "Auto-populate quickbar" : label;
+            return SpeechTextSanitizer.Normalize(toggle != null ? toggle.Text : null);
         }
 
         public bool IsAutoPopulateChecked()
@@ -323,7 +325,7 @@ namespace SongsOfConquestAccess.Adapters
         {
             if (spell == null)
             {
-                return "Unknown spell";
+                return ModText.Get(ModStrings.Screens.UnknownSpell);
             }
 
             string name = Localize(spell.NameKey);
@@ -355,7 +357,7 @@ namespace SongsOfConquestAccess.Adapters
                 ? null
                 : new[]
                 {
-                    new TooltipAction("Add to quickbar", () => AddSpellToQuickbar(capturedEntry))
+                    new TooltipAction(GameText.Get(GetLocalization(), "Spells/Spellbook/AddToQuickbar", "Add to quickbar"), () => AddSpellToQuickbar(capturedEntry))
                 };
             return new Tooltip(
                 () => BuildSpellTooltipLines(capturedEntry.SpellDefinition),
@@ -403,7 +405,7 @@ namespace SongsOfConquestAccess.Adapters
                 null,
                 new[]
                 {
-                    new TooltipAction("Remove from quickbar", () => ClearQuickbarSlot(capturedIndex))
+                    new TooltipAction(ModText.Get(ModStrings.Screens.RemoveFromQuickbar), () => ClearQuickbarSlot(capturedIndex))
                 });
         }
 

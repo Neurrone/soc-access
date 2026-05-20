@@ -17,6 +17,7 @@ using SongsOfConquest.Common.GameActions;
 using SongsOfConquest.Common.Gamestate;
 using SongsOfConquest.Common.Localization;
 using SongsOfConquest.Common.Research;
+using SongsOfConquestAccess.Localization;
 using SongsOfConquestAccess.Speech;
 using UnityEngine;
 
@@ -176,7 +177,9 @@ namespace SongsOfConquestAccess.Adapters
         public string GetTutorialButtonLabel()
         {
             string label = GetButtonLabel(GetTutorialButton());
-            return string.IsNullOrWhiteSpace(label) ? "Tutorial available" : label;
+            return string.IsNullOrWhiteSpace(label)
+                ? GameText.Get(_localization, "Tutorial/CodexCategory/Tutorials", "Tutorials")
+                : label;
         }
 
         public bool ActivateTutorial()
@@ -600,6 +603,11 @@ namespace SongsOfConquestAccess.Adapters
         public bool IsAutoSelectVisible()
         {
             return IsVisible(GetAutoSelectToggle() as Component);
+        }
+
+        public string AutoSelectLabel
+        {
+            get { return GetLocalizedText("Options/AutoSelectBuildSite", string.Empty); }
         }
 
         public bool IsAutoSelectChecked()
@@ -1216,13 +1224,7 @@ namespace SongsOfConquestAccess.Adapters
 
         private string GetLocalizedText(string key, string fallback)
         {
-            if (_localization == null || string.IsNullOrWhiteSpace(key))
-            {
-                return fallback ?? string.Empty;
-            }
-
-            string text = SpeechTextSanitizer.Normalize(_localization.GetText(key));
-            return string.IsNullOrWhiteSpace(text) ? fallback ?? string.Empty : text;
+            return SpeechTextSanitizer.Normalize(GameText.Get(_localization, key, fallback ?? string.Empty));
         }
 
         private static void AddIfNotEmpty(List<DetailItem> items, string header, string body)

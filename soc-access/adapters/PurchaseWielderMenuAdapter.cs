@@ -10,6 +10,7 @@ using SongsOfConquest.Client.Adventure.UI;
 using SongsOfConquest.Client.Menu;
 using SongsOfConquest.Client.UI;
 using SongsOfConquest.Common.Localization;
+using SongsOfConquestAccess.Localization;
 using SongsOfConquestAccess.Speech;
 using UnityEngine;
 
@@ -124,7 +125,7 @@ namespace SongsOfConquestAccess.Adapters
                 AddIfNotEmpty(parts, name);
                 if (!string.IsNullOrWhiteSpace(level))
                 {
-                    parts.Add("Level " + level);
+                    parts.Add(ModText.Get(ModStrings.Screens.LevelValue, level));
                 }
 
                 AddIfNotEmpty(parts, description);
@@ -490,13 +491,7 @@ namespace SongsOfConquestAccess.Adapters
 
         private string GetLocalizedText(string key, string fallback)
         {
-            if (_localization == null || string.IsNullOrWhiteSpace(key))
-            {
-                return fallback ?? string.Empty;
-            }
-
-            string text = SpeechTextSanitizer.Normalize(_localization.GetText(key));
-            return string.IsNullOrWhiteSpace(text) || text == key ? fallback ?? string.Empty : text;
+            return SpeechTextSanitizer.Normalize(GameText.Get(_localization, key, fallback ?? string.Empty));
         }
 
         private static string FirstTooltipLine(Tooltip tooltip)

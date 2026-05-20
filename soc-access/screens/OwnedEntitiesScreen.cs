@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using SongsOfConquest.Client.Adventure;
 using SongsOfConquestAccess.Adapters;
+using SongsOfConquestAccess.Localization;
 using SongsOfConquestAccess.UI;
 using UnityEngine;
 
@@ -49,7 +50,7 @@ namespace SongsOfConquestAccess.Screens
 
         private static ContainerWidget BuildRoot(KingdomEntityOverviewAdapter adapter)
         {
-            ContainerWidget root = new ContainerWidget("owned-entities", "Owned entities");
+            ContainerWidget root = new ContainerWidget("owned-entities", adapter != null ? adapter.Title : string.Empty);
             if (adapter == null)
             {
                 return root;
@@ -105,7 +106,7 @@ namespace SongsOfConquestAccess.Screens
                 return group.Label;
             }
 
-            return "Group " + (groupIndex + 1);
+            return ModText.Get(ModStrings.Screens.Group, groupIndex + 1);
         }
     }
 }

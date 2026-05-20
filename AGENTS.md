@@ -19,13 +19,25 @@ Layout:
 
 Adapter label rule: ask whether a string is authored by the game or composed for the accessibility widget tree. Game-authored/native text can come from adapters. Accessibility wording and composition belongs in screens/widgets.
 
+## Localization
+
+All user-facing text that the mod authors must be localizable. Do not add hard-coded English for spoken text, widget labels, status text, review-buffer labels, scanner messages, or accessibility-only composition.
+
+Use the game's localized text whenever the wording is authored by the game: native UI labels, tooltips, entity names, resource names, troop names, spell names, building names, and other text that already exists in the game localization tables or UI components. Use `GameText.Get(...)` only after verifying the localization key in decompiled source or reading the native UI component text through an adapter.
+
+Use `ModText.Get(ModStrings...)`, `ModText.Plural(...)`, and `ModText.JoinList(...)` for mod-authored accessibility wording. Avoid splitting phrases into fragments when word order could vary by language; prefer a single `ModString` with placeholders, for example `"{0}, {1}. {2}"`, instead of concatenating `", "` and `". "`.
+
+English source text lives in `ModStrings.cs`. Non-English `.po` files live in `soc-access/translations/` and are deployed to `BepInEx/config/SongsOfConquestAccess/translations`. The `.po` filenames must match the game's `CurrentLanguage.LanguageCode` values: `de`, `es`, `fr`, `it`, `ja`, `ko`, `pl`, `ru`, `tr`, `uk`, `pt-BR`, `zh-CN`, and `zh-TW`.
+
+After adding, removing, or changing a `ModString` or `ModPluralString`, run `dotnet run --project soc-access\tools\Localization -- update-pot`, update every `.po` file, then run `dotnet run --project soc-access\tools\Localization -- validate`. The validator must pass; it catches missing, stale, duplicate, changed-source, empty, and placeholder-mismatched translations.
+
 ## Build, Test, and Development Commands
 
-Useful commands:
-
 - `dotnet build soc-access\soc-access.csproj` to build the mod locally
-- `dotnet build soc-access\soc-access.csproj /p:DeployToGame=true` to build and copy the DLL to `BepInEx\scripts` for Script Engine hot reload
+- `dotnet build soc-access\soc-access.csproj /p:DeployToGame=true` to build and copy the DLL to `BepInEx\scripts` for Script Engine hot reload. Default to using this to build
 - `dotnet test soc-access\tests\SongsOfConquestAccess.Tests.csproj` to run unit tests
+- `dotnet run --project soc-access\tools\Localization -- update-pot` to regenerate `soc-access\translations\strings_template.pot` from `ModStrings.cs`
+- `dotnet run --project soc-access\tools\Localization -- validate` to check `.po` files for missing, stale, empty, duplicate, changed-source, or placeholder-mismatched translations
 
 Prefer fast text search over manual browsing when tracing the game code. Do not change deployment to `BepInEx\plugins`; Script Engine loads the mod from `BepInEx\scripts`.
 

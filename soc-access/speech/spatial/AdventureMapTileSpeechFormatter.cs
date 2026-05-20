@@ -2,6 +2,7 @@ using System;
 using System.Globalization;
 using System.Collections.Generic;
 using SongsOfConquestAccess.Adapters;
+using SongsOfConquestAccess.Localization;
 
 namespace SongsOfConquestAccess.Speech.Spatial
 {
@@ -11,18 +12,18 @@ namespace SongsOfConquestAccess.Speech.Spatial
         {
             if (tile == null)
             {
-                return "Adventure map";
+                return ModText.Get(ModStrings.Screens.AdventureMap);
             }
 
             List<string> parts = new List<string>();
             if (!tile.IsExplored)
             {
-                parts.Add("Unexplored");
+                parts.Add(ModText.Get(ModStrings.Spatial.Unexplored));
                 for (int i = 0; i < tile.ZoneOfControlNames.Count; i++)
                 {
                     if (!string.IsNullOrWhiteSpace(tile.ZoneOfControlNames[i]))
                     {
-                        parts.Add("Within " + FormatPossessive(tile.ZoneOfControlNames[i]) + " zone of control");
+                        parts.Add(ModText.Get(ModStrings.Spatial.WithinZoneOfControl, FormatPossessive(tile.ZoneOfControlNames[i])));
                     }
                 }
 
@@ -32,7 +33,7 @@ namespace SongsOfConquestAccess.Speech.Spatial
 
             if (!tile.IsVisible)
             {
-                parts.Add("Unseen");
+                parts.Add(ModText.Get(ModStrings.Spatial.Unseen));
             }
 
             string primary = DescribePrimaryContent(tile);
@@ -47,7 +48,7 @@ namespace SongsOfConquestAccess.Speech.Spatial
             {
                 if (!string.IsNullOrWhiteSpace(tile.ZoneOfControlNames[i]))
                 {
-                    parts.Add("Within " + FormatPossessive(tile.ZoneOfControlNames[i]) + " zone of control");
+                    parts.Add(ModText.Get(ModStrings.Spatial.WithinZoneOfControl, FormatPossessive(tile.ZoneOfControlNames[i])));
                 }
             }
 
@@ -105,20 +106,20 @@ namespace SongsOfConquestAccess.Speech.Spatial
 
                 if (commander.IsSelected)
                 {
-                    details.Add("selected");
+                    details.Add(ModText.Get(ModStrings.UI.Selected));
                 }
 
                 AddCommanderMovementDetails(commander, details);
                 details.AddRange(GetMovementDetails(tile));
-                return AppendDetails(FirstNonEmpty(commander.Name, "Commander"), details);
+                return AppendDetails(FirstNonEmpty(commander.Name, ModText.Get(ModStrings.Spatial.Commander)), details);
             }
 
             if (tile.MapEntity != null)
             {
-                string mapEntityName = FirstNonEmpty(tile.MapEntityName, "Map entity");
+                string mapEntityName = FirstNonEmpty(tile.MapEntityName, string.Empty);
                 if (tile.MapEntityVisited)
                 {
-                    mapEntityName += " (visited)";
+                    mapEntityName = ModText.Get(ModStrings.Spatial.VisitedSuffix, mapEntityName);
                 }
 
                 List<string> details = new List<string>();
@@ -141,7 +142,7 @@ namespace SongsOfConquestAccess.Speech.Spatial
 
             if (tile.IsInteractionPoint && tile.IsVisible)
             {
-                return AppendDetails("Interaction point", GetMovementDetails(tile));
+                return AppendDetails(ModText.Get(ModStrings.Spatial.InteractionPoint), GetMovementDetails(tile));
             }
 
             return string.Empty;
@@ -159,7 +160,7 @@ namespace SongsOfConquestAccess.Speech.Spatial
             {
                 if (!string.IsNullOrWhiteSpace(tile.ZoneOfControlNames[i]))
                 {
-                    parts.Add("Within " + FormatPossessive(tile.ZoneOfControlNames[i]) + " zone of control");
+                    parts.Add(ModText.Get(ModStrings.Spatial.WithinZoneOfControl, FormatPossessive(tile.ZoneOfControlNames[i])));
                 }
             }
 
@@ -181,12 +182,7 @@ namespace SongsOfConquestAccess.Speech.Spatial
 
         private static string FormatPossessive(string name)
         {
-            if (string.IsNullOrWhiteSpace(name))
-            {
-                return "commander's";
-            }
-
-            return name.EndsWith("s") || name.EndsWith("S") ? name + "'" : name + "'s";
+            return ModText.FormatPossessiveName(name, ModStrings.Spatial.CommanderPossessive);
         }
 
         public string DescribeCoordinates(AdventureMapTile tile)
@@ -206,15 +202,15 @@ namespace SongsOfConquestAccess.Speech.Spatial
 
             if (tile.IsReachable)
             {
-                details.Add("reachable");
+                details.Add(ModText.Get(ModStrings.Spatial.Reachable));
             }
             else if (tile.IsImpassable)
             {
-                details.Add("impassable");
+                details.Add(ModText.Get(ModStrings.Spatial.Impassable));
             }
             else if (tile.IsBlocked)
             {
-                details.Add("blocked");
+                details.Add(ModText.Get(ModStrings.Spatial.Blocked));
             }
 
             return details;
@@ -230,42 +226,44 @@ namespace SongsOfConquestAccess.Speech.Spatial
             List<string> details = new List<string>();
             if (indicator.Kind == AdventureMapTile.PathIndicatorKind.Destination)
             {
-                details.Add("Destination");
+                details.Add(ModText.Get(ModStrings.Spatial.Destination));
                 if (!indicator.HasRoutePreview)
                 {
-                    details.Add("no route preview");
+                    details.Add(ModText.Get(ModStrings.Spatial.NoRoutePreview));
                     return string.Join(", ", details.ToArray());
                 }
 
                 if (indicator.TravelTurns > 1)
                 {
-                    details.Add("in " + indicator.TravelTurns + " turns");
+                    details.Add(ModText.Get(ModStrings.Spatial.TurnsIn, indicator.TravelTurns));
                 }
 
                 if (indicator.IsInteractable)
                 {
                     details.Add(indicator.TravelTurns <= 1 && !indicator.CanInteractThisTurn
-                        ? "interactable next turn"
-                        : "interactable");
+                        ? ModText.Get(ModStrings.Spatial.InteractableNextTurn)
+                        : ModText.Get(ModStrings.Spatial.Interactable));
                 }
             }
             else
             {
-                details.Add("On route");
+                details.Add(ModText.Get(ModStrings.Spatial.OnRoute));
                 if (indicator.FurthestReachableTurns.HasValue)
                 {
                     int turns = indicator.FurthestReachableTurns.Value;
-                    details.Add(turns <= 1 ? "furthest reachable this turn" : "furthest reachable in " + turns + " turns");
+                    details.Add(turns <= 1
+                        ? ModText.Get(ModStrings.Spatial.FurthestReachableThisTurn)
+                        : ModText.Get(ModStrings.Spatial.FurthestReachableInTurns, turns));
                 }
                 else if (indicator.TravelTurns > 1)
                 {
-                    details.Add("in " + indicator.TravelTurns + " turns");
+                    details.Add(ModText.Get(ModStrings.Spatial.TurnsIn, indicator.TravelTurns));
                 }
             }
 
             if (indicator.CostMark.HasValue)
             {
-                details.Add("cost " + indicator.CostMark.Value);
+                details.Add(ModText.Get(ModStrings.Spatial.Cost, indicator.CostMark.Value));
             }
 
             return string.Join(", ", details.ToArray());
@@ -278,20 +276,20 @@ namespace SongsOfConquestAccess.Speech.Spatial
                 return;
             }
 
-            details.Add(FirstNonEmpty(commander.MovementLabel, "Movement") + ": "
-                + FormatMovementValue(commander.MovesLeft)
-                + " / "
-                + FormatMovementValue(commander.MaxMovement));
+            details.Add(ModText.Get(
+                ModStrings.UI.LabelValue,
+                FirstNonEmpty(commander.MovementLabel, ModText.Get(ModStrings.Spatial.Movement)),
+                FormatMovementValue(commander.MovesLeft) + " / " + FormatMovementValue(commander.MaxMovement)));
 
             if (!commander.HasDestination)
             {
                 return;
             }
 
-            details.Add("Destination: " + FormatPoint(commander.Destination));
+            details.Add(ModText.Get(ModStrings.Spatial.DestinationAt, FormatPoint(commander.Destination)));
             if (commander.HasThisTurnDestination && commander.ThisTurnDestination != commander.Destination)
             {
-                details.Add("This turn: " + FormatPoint(commander.ThisTurnDestination));
+                details.Add(ModText.Get(ModStrings.Spatial.ThisTurnAt, FormatPoint(commander.ThisTurnDestination)));
             }
         }
 

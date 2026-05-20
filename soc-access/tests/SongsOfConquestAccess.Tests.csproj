@@ -25,6 +25,10 @@
       <HintPath>$(GameManagedDir)\UnityEngine.CoreModule.dll</HintPath>
       <Private>true</Private>
     </Reference>
+    <Reference Include="Lavapotion.SongsOfConquest.UtilitiesLayer.Runtime">
+      <HintPath>$(GameManagedDir)\Lavapotion.SongsOfConquest.UtilitiesLayer.Runtime.dll</HintPath>
+      <Private>true</Private>
+    </Reference>
   </ItemGroup>
 
 </Project>

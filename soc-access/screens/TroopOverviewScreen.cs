@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using SongsOfConquest.Client.Adventure;
 using SongsOfConquestAccess.Adapters;
+using SongsOfConquestAccess.Localization;
 using SongsOfConquestAccess.UI;
 using UnityEngine;
 
@@ -49,8 +50,8 @@ namespace SongsOfConquestAccess.Screens
 
         private static ContainerWidget BuildRoot(KingdomTroopOverviewAdapter adapter)
         {
-            ContainerWidget root = new ContainerWidget("troop-overview", "Troop overview");
-            string title = adapter != null ? adapter.Title : "Troop overview";
+            ContainerWidget root = new ContainerWidget("troop-overview", adapter != null ? adapter.Title : string.Empty);
+            string title = adapter != null ? adapter.Title : string.Empty;
             root.AddChild(new TextWidget(
                 "troop-overview-title",
                 () => title,
@@ -104,7 +105,7 @@ namespace SongsOfConquestAccess.Screens
                 return group.Label;
             }
 
-            return "Group " + (groupIndex + 1);
+            return ModText.Get(ModStrings.Screens.Group, groupIndex + 1);
         }
     }
 }

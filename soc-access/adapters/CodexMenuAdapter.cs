@@ -9,6 +9,7 @@ using SongsOfConquest.Common;
 using SongsOfConquest.Common.Gamestate;
 using SongsOfConquest.Common.Gamestate.Unit;
 using SongsOfConquest.Common.Localization;
+using SongsOfConquestAccess.Localization;
 using SongsOfConquestAccess.Speech;
 using UnityEngine;
 using UnityEngine.EventSystems;
@@ -475,15 +476,7 @@ namespace SongsOfConquestAccess.Adapters
 
         private string GetLocalizedText(string key, string fallback, params object[] parameters)
         {
-            if (_localization == null || string.IsNullOrWhiteSpace(key))
-            {
-                return SpeechTextSanitizer.Normalize(fallback);
-            }
-
-            string text = parameters != null && parameters.Length > 0
-                ? _localization.GetText(key, parameters)
-                : _localization.GetText(key);
-            return SpeechTextSanitizer.Normalize(string.IsNullOrWhiteSpace(text) || text == key ? fallback : text);
+            return SpeechTextSanitizer.Normalize(GameText.Get(_localization, key, fallback, parameters));
         }
 
         private static bool IsHeadingTextMesh(UITextMesh textMesh)

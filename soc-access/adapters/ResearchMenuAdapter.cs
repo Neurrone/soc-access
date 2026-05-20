@@ -11,6 +11,7 @@ using SongsOfConquest.Common.GameActions;
 using SongsOfConquest.Common.Gamestate.Facade;
 using SongsOfConquest.Common.Localization;
 using SongsOfConquest.Common.Research;
+using SongsOfConquestAccess.Localization;
 using SongsOfConquestAccess.Speech;
 using UnityEngine;
 
@@ -70,7 +71,9 @@ namespace SongsOfConquestAccess.Adapters
         public string GetTutorialButtonLabel()
         {
             string label = MenuButtonTextUtility.GetAllVisibleText(GetTutorialButton());
-            return string.IsNullOrWhiteSpace(label) ? "Tutorial available" : label;
+            return string.IsNullOrWhiteSpace(label)
+                ? GameText.Get(GetLocalization(), "Tutorial/CodexCategory/Tutorials", "Tutorials")
+                : label;
         }
 
         public bool ActivateTutorial()
@@ -347,13 +350,7 @@ namespace SongsOfConquestAccess.Adapters
         private string Localize(string key, string fallback)
         {
             ILocalizationHandler localization = GetLocalization();
-            if (localization == null || string.IsNullOrWhiteSpace(key))
-            {
-                return fallback ?? string.Empty;
-            }
-
-            string text = SpeechTextSanitizer.Normalize(localization.GetText(key));
-            return string.IsNullOrWhiteSpace(text) || text == key ? fallback ?? key : text;
+            return SpeechTextSanitizer.Normalize(GameText.Get(localization, key, fallback ?? string.Empty));
         }
 
         private static bool IsVisible(Component component)

@@ -89,7 +89,7 @@ namespace SongsOfConquestAccess.Adapters
         {
             if (GlobalLocalizationVariables.LocalizationHandler == null)
             {
-                return "Campaign select";
+                return string.Empty;
             }
 
             return SpeechTextSanitizer.Normalize(

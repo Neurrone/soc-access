@@ -1,4 +1,5 @@
 using System.Text;
+using SongsOfConquestAccess.Localization;
 using SongsOfConquestAccess.Speech;
 
 namespace SongsOfConquestAccess.Events
@@ -67,7 +68,7 @@ namespace SongsOfConquestAccess.Events
 
         public string GetSpeechText()
         {
-            return SpeechTextSanitizer.Normalize(WielderName + " leveled up to " + LevelText);
+            return SpeechTextSanitizer.Normalize(ModText.Get(ModStrings.Events.LeveledUpTo, WielderName, LevelText));
         }
     }
 

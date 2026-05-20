@@ -2,6 +2,7 @@ using SongsOfConquest.Client.Menu;
 using SongsOfConquest.Client.UI;
 using SongsOfConquestAccess.Input;
 using SongsOfConquestAccess.Adapters;
+using SongsOfConquestAccess.Localization;
 using SongsOfConquestAccess.UI;
 using UnityEngine;
 using UnityEngine.EventSystems;
@@ -52,7 +53,7 @@ namespace SongsOfConquestAccess.Screens
                 null,
                 includeParentLabelInAnnouncement: false));
 
-            MenuWidget menu = new MenuWidget("campaign-select-menu", "Campaigns");
+            MenuWidget menu = new MenuWidget("campaign-select-menu", adapter != null ? adapter.GetTitle() : string.Empty);
             if (adapter == null)
             {
                 root.AddChild(menu);
@@ -136,7 +137,9 @@ namespace SongsOfConquestAccess.Screens
                 return nativeStatus;
             }
 
-            return string.IsNullOrWhiteSpace(nativeStatus) ? "disabled" : "disabled. " + nativeStatus;
+            return string.IsNullOrWhiteSpace(nativeStatus)
+                ? ModText.Get(ModStrings.UI.StatusDisabled)
+                : ModText.Get(ModStrings.Screens.DisabledWithReason, ModText.Get(ModStrings.UI.StatusDisabled), nativeStatus);
         }
 
         private static CampaignMenuAdapter FindActiveCampaignMenu()

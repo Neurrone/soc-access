@@ -1,5 +1,6 @@
 using UnityEngine;
 using SongsOfConquest.Common.Entities.Adventure;
+using SongsOfConquestAccess.Localization;
 
 namespace SongsOfConquestAccess.Events
 {
@@ -8,7 +9,7 @@ namespace SongsOfConquestAccess.Events
         public MapWielderSelectedEvent(int wielderId, string wielderName, Vector2Int tile)
         {
             WielderId = wielderId;
-            WielderName = string.IsNullOrWhiteSpace(wielderName) ? "wielder" : wielderName;
+            WielderName = string.IsNullOrWhiteSpace(wielderName) ? ModText.Get(ModStrings.Events.Wielder) : wielderName;
             Tile = tile;
         }
 
@@ -21,7 +22,7 @@ namespace SongsOfConquestAccess.Events
 
         public string GetSpeechText()
         {
-            return "Selected wielder " + WielderName;
+            return ModText.Get(ModStrings.Events.SelectedWielder, WielderName);
         }
     }
 
@@ -35,7 +36,7 @@ namespace SongsOfConquestAccess.Events
         public MapWielderMovedEvent(int wielderId, string wielderName, Vector2Int tile, bool isLocalWielder)
         {
             WielderId = wielderId;
-            WielderName = string.IsNullOrWhiteSpace(wielderName) ? "wielder" : wielderName;
+            WielderName = string.IsNullOrWhiteSpace(wielderName) ? ModText.Get(ModStrings.Events.Wielder) : wielderName;
             Tile = tile;
             IsLocalWielder = isLocalWielder;
         }
@@ -51,7 +52,7 @@ namespace SongsOfConquestAccess.Events
 
         public string GetSpeechText()
         {
-            return WielderName + " moved to " + FormatTile(Tile);
+            return ModText.Get(ModStrings.Events.WielderMoved, WielderName, FormatTile(Tile));
         }
 
         private static string FormatTile(Vector2Int tile)
@@ -65,7 +66,7 @@ namespace SongsOfConquestAccess.Events
         public MapWielderTeleportedEvent(int wielderId, string wielderName, Vector2Int tile, TeleportSource source)
         {
             WielderId = wielderId;
-            WielderName = string.IsNullOrWhiteSpace(wielderName) ? "wielder" : wielderName;
+            WielderName = string.IsNullOrWhiteSpace(wielderName) ? ModText.Get(ModStrings.Events.Wielder) : wielderName;
             Tile = tile;
             Source = source;
         }
@@ -81,7 +82,7 @@ namespace SongsOfConquestAccess.Events
 
         public string GetSpeechText()
         {
-            return WielderName + " teleported to " + FormatTile(Tile);
+            return ModText.Get(ModStrings.Events.WielderTeleported, WielderName, FormatTile(Tile));
         }
 
         private static string FormatTile(Vector2Int tile)
@@ -108,12 +109,26 @@ namespace SongsOfConquestAccess.Events
 
         public string GetSpeechText()
         {
-            return "Selected " + FormatSize(Size) + " build site at " + FormatTile(Tile);
+            return ModText.Get(ModStrings.Events.SelectedBuildSite, FormatSize(Size), FormatTile(Tile));
         }
 
         private static string FormatSize(BuildSiteSize size)
         {
-            return size.ToString().ToLowerInvariant();
+            switch (size)
+            {
+                case BuildSiteSize.Large:
+                    return ModText.Get(ModStrings.Events.BuildSiteLarge);
+                case BuildSiteSize.LargeSettlement:
+                    return ModText.Get(ModStrings.Events.BuildSiteLargeSettlement);
+                case BuildSiteSize.Medium:
+                    return ModText.Get(ModStrings.Events.BuildSiteMedium);
+                case BuildSiteSize.SmallSettlement:
+                    return ModText.Get(ModStrings.Events.BuildSiteSmallSettlement);
+                case BuildSiteSize.Town:
+                    return ModText.Get(ModStrings.Events.BuildSiteTown);
+                default:
+                    return ModText.Get(ModStrings.Events.BuildSiteSmall);
+            }
         }
 
         private static string FormatTile(Vector2Int tile)
@@ -127,7 +142,7 @@ namespace SongsOfConquestAccess.Events
         public MapDestinationSetEvent(int wielderId, string wielderName, Vector2Int destination)
         {
             WielderId = wielderId;
-            WielderName = string.IsNullOrWhiteSpace(wielderName) ? "wielder" : wielderName;
+            WielderName = string.IsNullOrWhiteSpace(wielderName) ? ModText.Get(ModStrings.Events.Wielder) : wielderName;
             Destination = destination;
         }
 
@@ -140,7 +155,7 @@ namespace SongsOfConquestAccess.Events
 
         public string GetSpeechText()
         {
-            return WielderName + "'s destination set to " + FormatTile(Destination);
+            return ModText.Get(ModStrings.Events.DestinationSet, WielderName, FormatTile(Destination));
         }
 
         private static string FormatTile(Vector2Int tile)
@@ -154,7 +169,7 @@ namespace SongsOfConquestAccess.Events
         public MapDestinationClearedEvent(int wielderId, string wielderName)
         {
             WielderId = wielderId;
-            WielderName = string.IsNullOrWhiteSpace(wielderName) ? "wielder" : wielderName;
+            WielderName = string.IsNullOrWhiteSpace(wielderName) ? ModText.Get(ModStrings.Events.Wielder) : wielderName;
         }
 
         public string Kind { get { return AccessibilityEvents.Map.DestinationCleared; } }
@@ -164,7 +179,7 @@ namespace SongsOfConquestAccess.Events
 
         public string GetSpeechText()
         {
-            return WielderName + "'s destination cleared.";
+            return ModText.Get(ModStrings.Events.DestinationCleared, WielderName);
         }
     }
 
@@ -186,7 +201,7 @@ namespace SongsOfConquestAccess.Events
 
         public string GetSpeechText()
         {
-            return "Mod error: " + Message;
+            return ModText.Get(ModStrings.Events.ModError, Message);
         }
     }
 
@@ -203,7 +218,7 @@ namespace SongsOfConquestAccess.Events
 
         public string GetSpeechText()
         {
-            return IsVisible ? "HUD open" : "HUD closed";
+            return IsVisible ? ModText.Get(ModStrings.Events.HudOpen) : ModText.Get(ModStrings.Events.HudClosed);
         }
     }
 
@@ -228,7 +243,9 @@ namespace SongsOfConquestAccess.Events
 
         public string GetSpeechText()
         {
-            return Announce ? "Map camera focuses on " + Tile.x + ", " + Tile.y : string.Empty;
+            return Announce
+                ? ModText.Get(ModStrings.Events.MapCameraFocus, Tile.x + ", " + Tile.y)
+                : string.Empty;
         }
     }
 

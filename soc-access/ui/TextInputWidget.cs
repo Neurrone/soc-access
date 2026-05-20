@@ -1,6 +1,7 @@
 using System;
 using SongsOfConquest.Client.UI;
 using SongsOfConquestAccess.Input;
+using SongsOfConquestAccess.Localization;
 
 namespace SongsOfConquestAccess.UI
 {
@@ -40,17 +41,19 @@ namespace SongsOfConquestAccess.UI
         {
             IUITextMeshInputField field = _getField != null ? _getField() : null;
             string value = field != null ? field.InputFieldValue : string.Empty;
-            return string.IsNullOrWhiteSpace(value) ? _label : _label + ", " + value;
+            return string.IsNullOrWhiteSpace(value)
+                ? _label
+                : ModText.Get(ModStrings.Common.ListSeparator, _label, value);
         }
 
         public override string GetRole()
         {
-            return "edit";
+            return ModText.Get(ModStrings.UI.RoleEdit);
         }
 
         public override string GetStatus()
         {
-            return IsEnabled() ? string.Empty : "disabled";
+            return IsEnabled() ? string.Empty : ModText.Get(ModStrings.UI.StatusDisabled);
         }
 
         public override bool ClaimsAction(string actionKey)

@@ -14,6 +14,7 @@ using SongsOfConquestAccess.Adapters;
 using SongsOfConquestAccess.Buffers;
 using SongsOfConquestAccess.Events;
 using SongsOfConquestAccess.Input;
+using SongsOfConquestAccess.Localization;
 using SongsOfConquestAccess.UI;
 using SongsOfConquest.Common.Economy;
 using SongsOfConquest.Common.Gamestate;
@@ -182,7 +183,7 @@ namespace SongsOfConquestAccess.Screens
                     continue;
                 }
 
-                parts.Add(hud.GetResourceAmount(resourceType) + " " + name.ToLowerInvariant());
+                parts.Add(ModText.Get(ModStrings.Common.ResourceAmount, hud.GetResourceAmount(resourceType), name));
             }
 
             if (parts.Count == 0)
@@ -190,7 +191,7 @@ namespace SongsOfConquestAccess.Screens
                 return false;
             }
 
-            SpeechPipeline.Output(new SpeechRequest(string.Join(", ", parts.ToArray()), interrupt: false));
+            SpeechPipeline.Output(new SpeechRequest(ModText.JoinList(parts), interrupt: false));
             return true;
         }
 
@@ -335,7 +336,7 @@ namespace SongsOfConquestAccess.Screens
 
         private static ContainerWidget BuildRoot(AdventureMapAdapter adapter, AdventureMapGrid grid)
         {
-            ContainerWidget root = new ContainerWidget("adventure_map_screen", "Adventure map");
+            ContainerWidget root = new ContainerWidget("adventure_map_screen", ModText.Get(ModStrings.Screens.AdventureMap));
             root.AddChild(grid);
             // TODO: minimap accessibility is deferred; keep the adventure map grid as the first tab stop.
             if (adapter == null)
@@ -439,7 +440,7 @@ namespace SongsOfConquestAccess.Screens
 
         private static MenuWidget BuildEssenceMenu(AdventureHudAdapter adapter)
         {
-            MenuWidget menu = new MenuWidget("adventure-essence", "Essence", adapter.IsEssenceMenuVisible);
+            MenuWidget menu = new MenuWidget("adventure-essence", GameText.Get("Common/CommanderInventory/Essences", string.Empty), adapter.IsEssenceMenuVisible);
             AddEssenceItem(menu, adapter, EssenceType.Order);
             AddEssenceItem(menu, adapter, EssenceType.Creation);
             AddEssenceItem(menu, adapter, EssenceType.Chaos);
@@ -465,14 +466,14 @@ namespace SongsOfConquestAccess.Screens
         {
             return TroopHudMenu.Build(
                 "adventure-troop-slots",
-                "Troops",
+                GameText.Get("Commanders/Tooltip/Troops", string.Empty),
                 adapter != null ? adapter.Troops : null,
                 adapter != null ? adapter.IsTroopMenuVisible : (Func<bool>)null);
         }
 
         private static MenuWidget BuildResourcesMenu(AdventureHudAdapter adapter)
         {
-            MenuWidget menu = new MenuWidget("adventure-resources", "Resources", adapter.IsResourcesMenuVisible);
+            MenuWidget menu = new MenuWidget("adventure-resources", ModText.Get(ModStrings.Screens.Resources), adapter.IsResourcesMenuVisible);
             AddResourceItem(menu, adapter, ResourceType.Gold);
             AddResourceItem(menu, adapter, ResourceType.Stone);
             AddResourceItem(menu, adapter, ResourceType.Wood);
@@ -497,7 +498,7 @@ namespace SongsOfConquestAccess.Screens
 
         private static MenuWidget BuildObjectivesMenu(AdventureHudAdapter adapter)
         {
-            MenuWidget menu = new MenuWidget("adventure-objectives", "Objectives", adapter.IsObjectivesMenuVisible);
+            MenuWidget menu = new MenuWidget("adventure-objectives", ModText.Get(ModStrings.Screens.Objectives), adapter.IsObjectivesMenuVisible);
             for (int i = 0; i < 16; i++)
             {
                 int capturedIndex = i;
@@ -517,7 +518,7 @@ namespace SongsOfConquestAccess.Screens
 
         private static MenuWidget BuildNotificationsMenu(AdventureHudAdapter adapter)
         {
-            MenuWidget menu = new MenuWidget("adventure-notifications", "Notifications", adapter.IsNotificationsMenuVisible);
+            MenuWidget menu = new MenuWidget("adventure-notifications", ModText.Get(ModStrings.Screens.Notifications), adapter.IsNotificationsMenuVisible);
             for (int i = 0; i < 5; i++)
             {
                 int capturedIndex = i;
@@ -536,7 +537,7 @@ namespace SongsOfConquestAccess.Screens
 
         private static MenuWidget BuildTownListMenu(AdventureHudAdapter adapter)
         {
-            MenuWidget menu = new MenuWidget("adventure-town-list", "Towns", adapter.IsTownListMenuVisible);
+            MenuWidget menu = new MenuWidget("adventure-town-list", string.Empty, adapter.IsTownListMenuVisible);
             for (int i = 0; i < 32; i++)
             {
                 int capturedIndex = i;
@@ -555,7 +556,7 @@ namespace SongsOfConquestAccess.Screens
 
         private static MenuWidget BuildWielderListMenu(AdventureHudAdapter adapter)
         {
-            MenuWidget menu = new MenuWidget("adventure-wielder-list", "Wielders", adapter.IsWielderListMenuVisible);
+            MenuWidget menu = new MenuWidget("adventure-wielder-list", string.Empty, adapter.IsWielderListMenuVisible);
             for (int i = 0; i < 32; i++)
             {
                 int capturedIndex = i;
@@ -574,7 +575,7 @@ namespace SongsOfConquestAccess.Screens
 
         private static MenuWidget BuildKingdomOverviewMenu(AdventureHudAdapter adapter)
         {
-            MenuWidget menu = new MenuWidget("adventure-kingdom-overview", "Kingdom overview", adapter.IsKingdomOverviewMenuVisible);
+            MenuWidget menu = new MenuWidget("adventure-kingdom-overview", string.Empty, adapter.IsKingdomOverviewMenuVisible);
             for (int i = 0; i < 5; i++)
             {
                 int capturedIndex = i;
@@ -595,7 +596,7 @@ namespace SongsOfConquestAccess.Screens
 
         private static MenuWidget BuildTeamQueueMenu(AdventureHudAdapter adapter)
         {
-            MenuWidget menu = new MenuWidget("adventure-team-queue", "Turn order", adapter.IsTeamQueueMenuVisible);
+            MenuWidget menu = new MenuWidget("adventure-team-queue", ModText.Get(ModStrings.Screens.TurnOrder), adapter.IsTeamQueueMenuVisible);
             for (int i = 0; i < 16; i++)
             {
                 int capturedIndex = i;

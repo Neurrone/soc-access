@@ -17,6 +17,7 @@ using SongsOfConquest.Common.Details;
 using SongsOfConquest.Common.Gamestate;
 using SongsOfConquest.Common.Localization;
 using SongsOfConquest.Common.Skills;
+using SongsOfConquestAccess.Localization;
 using SongsOfConquestAccess.Speech;
 using UnityEngine;
 using UnityEngine.EventSystems;
@@ -144,7 +145,9 @@ namespace SongsOfConquestAccess.Adapters
         {
             UIButton button = GetField<UIButton>(_sheet, TutorialButtonField);
             string label = MenuButtonTextUtility.GetAllVisibleText(button);
-            return string.IsNullOrWhiteSpace(label) ? "Tutorial available" : label;
+            return string.IsNullOrWhiteSpace(label)
+                ? GameText.Get(_localization, "Tutorial/CodexCategory/Tutorials", "Tutorials")
+                : label;
         }
 
         public bool ActivateTutorial()
@@ -178,10 +181,10 @@ namespace SongsOfConquestAccess.Adapters
                 return items;
             }
 
-            AddStat(items, commander, StatEntryType.Offense, "Offence", commander.Stats.Offense.GetValue(), commander.Stats.Offense.OriginalValue);
-            AddStat(items, commander, StatEntryType.Defense, "Defence", commander.Stats.Defense.GetValue(), commander.Stats.Defense.OriginalValue);
-            AddStat(items, commander, StatEntryType.Movement, "Movement", (int)commander.Stats.Movement.GetValue(), (int)commander.Stats.Movement.OriginalValue);
-            AddStat(items, commander, StatEntryType.View, "View Radius", (int)commander.Stats.ViewRadius.GetValue(), (int)commander.Stats.ViewRadius.OriginalValue);
+            AddStat(items, commander, StatEntryType.Offense, GameText.Get(_localization, "Commanders/Tooltip/Offense", "Offence"), commander.Stats.Offense.GetValue(), commander.Stats.Offense.OriginalValue);
+            AddStat(items, commander, StatEntryType.Defense, GameText.Get(_localization, "Commanders/Tooltip/Defense", "Defence"), commander.Stats.Defense.GetValue(), commander.Stats.Defense.OriginalValue);
+            AddStat(items, commander, StatEntryType.Movement, GameText.Get(_localization, "Commanders/Tooltip/Movement", "Movement"), (int)commander.Stats.Movement.GetValue(), (int)commander.Stats.Movement.OriginalValue);
+            AddStat(items, commander, StatEntryType.View, GameText.Get(_localization, "Commanders/Tooltip/ViewRadius", "View Radius"), (int)commander.Stats.ViewRadius.GetValue(), (int)commander.Stats.ViewRadius.OriginalValue);
             return items;
         }
 
@@ -611,8 +614,7 @@ namespace SongsOfConquestAccess.Adapters
 
         private string GetLocalizedText(string key, string fallback)
         {
-            string text = _localization != null ? _localization.GetText(key) : string.Empty;
-            return string.IsNullOrWhiteSpace(text) || text == key ? fallback : text;
+            return GameText.Get(_localization, key, fallback);
         }
 
         private static IReadOnlyList<string> RemoveExactLines(IReadOnlyList<string> lines, IReadOnlyList<string> linesToRemove)

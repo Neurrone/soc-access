@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using SongsOfConquestAccess.Adapters;
 using SongsOfConquestAccess.Input;
+using SongsOfConquestAccess.Localization;
 using SongsOfConquestAccess.Scanner;
 using SongsOfConquestAccess.Screens;
 using SongsOfConquestAccess.Speech;
@@ -53,12 +54,12 @@ namespace SongsOfConquestAccess.UI
         public override string GetLabel()
         {
             CombatTile tile = GetFocusedTile();
-            string label = _adapter != null ? _adapter.DescribeTile(tile, GetEffectiveInspectContext()) : "Combat grid";
+            string label = _adapter != null ? _adapter.DescribeTile(tile, GetEffectiveInspectContext()) : ModText.Get(ModStrings.UI.CombatGrid);
             if (_adapter != null
                 && _adapter.GetTargetingMode() == CombatTargetingMode.Spell
                 && _adapter.IsSpellTargetSelected(_cursor))
             {
-                return "selected, " + label;
+                return ModText.Get(ModStrings.Common.ListSeparator, ModText.Get(ModStrings.UI.Selected), label);
             }
 
             return label;
@@ -310,7 +311,7 @@ namespace SongsOfConquestAccess.UI
             _inspectContext = null;
             _componentWarningSpoken = false;
             _adapter?.ExitInspect(_cursor);
-            SpeechPipeline.Output(new SpeechRequest("Exited inspect mode", interrupt: false));
+            SpeechPipeline.Output(new SpeechRequest(ModText.Get(ModStrings.UI.ExitedInspectMode), interrupt: false));
             FocusCurrentTile(updateNativeFocus: true);
             return true;
         }
@@ -487,7 +488,7 @@ namespace SongsOfConquestAccess.UI
 
             if (_inspectContext.CountConnectedComponents() > 1)
             {
-                SpeechPipeline.Output(new SpeechRequest("Some shown tiles are separated. Use W and Shift W to reach all range tiles.", interrupt: false));
+                SpeechPipeline.Output(new SpeechRequest(ModText.Get(ModStrings.UI.CombatDisconnectedTiles), interrupt: false));
                 _componentWarningSpoken = true;
             }
         }
@@ -497,10 +498,10 @@ namespace SongsOfConquestAccess.UI
             string target = context != null ? context.TargetLabel : null;
             if (string.IsNullOrWhiteSpace(target))
             {
-                target = "target";
+                target = ModText.Get(ModStrings.UI.Target);
             }
 
-            SpeechPipeline.Output(new SpeechRequest("Inspecting " + target, interrupt: false));
+            SpeechPipeline.Output(new SpeechRequest(ModText.Get(ModStrings.UI.Inspecting, target), interrupt: false));
         }
 
         private void RefreshSnapshot()

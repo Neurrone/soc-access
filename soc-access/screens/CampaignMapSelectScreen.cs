@@ -7,6 +7,7 @@ using SongsOfConquest.Client.UI;
 using SongsOfConquest.Common.Campaign;
 using SongsOfConquestAccess.Adapters;
 using SongsOfConquestAccess.Input;
+using SongsOfConquestAccess.Localization;
 using SongsOfConquestAccess.UI;
 using UnityEngine;
 using Zenject;
@@ -202,7 +203,7 @@ namespace SongsOfConquestAccess.Screens
                 return;
             }
 
-            MenuWidget difficultyMenu = new MenuWidget(DifficultyMenuId, "Difficulty");
+            MenuWidget difficultyMenu = new MenuWidget(DifficultyMenuId, GameText.Get("Campaign/Difficulty/Prefix", string.Empty));
             IReadOnlyList<CampaignDifficulty> difficulties = information.CurrentDifficulties;
             for (int i = 0; i < difficulties.Count; i++)
             {

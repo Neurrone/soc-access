@@ -1,6 +1,7 @@
 using SongsOfConquest.Client.UI;
 using SongsOfConquestAccess.Adapters;
 using SongsOfConquestAccess.Input;
+using SongsOfConquestAccess.Localization;
 using SongsOfConquestAccess.UI;
 using UnityEngine;
 
@@ -50,7 +51,7 @@ namespace SongsOfConquestAccess.Screens
                 null,
                 includeParentLabelInAnnouncement: false));
 
-            MenuWidget menu = new MenuWidget("tale-select-menu", "Campaigns and tales");
+            MenuWidget menu = new MenuWidget("tale-select-menu", adapter != null ? adapter.GetTitle() : string.Empty);
             if (adapter == null)
             {
                 root.AddChild(menu);
@@ -129,7 +130,9 @@ namespace SongsOfConquestAccess.Screens
                 return nativeStatus;
             }
 
-            return string.IsNullOrWhiteSpace(nativeStatus) ? "disabled" : "disabled. " + nativeStatus;
+            return string.IsNullOrWhiteSpace(nativeStatus)
+                ? ModText.Get(ModStrings.UI.StatusDisabled)
+                : ModText.Get(ModStrings.Screens.DisabledWithReason, ModText.Get(ModStrings.UI.StatusDisabled), nativeStatus);
         }
 
         private static TaleSelectAdapter FindActiveTaleSelect()

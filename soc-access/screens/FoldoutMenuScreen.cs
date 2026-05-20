@@ -1,5 +1,6 @@
 using SongsOfConquestAccess.Adapters;
 using SongsOfConquestAccess.Input;
+using SongsOfConquestAccess.Localization;
 using SongsOfConquestAccess.UI;
 
 namespace SongsOfConquestAccess.Screens
@@ -66,7 +67,7 @@ namespace SongsOfConquestAccess.Screens
         {
             string label = foldout != null ? foldout.GetLabel() : string.Empty;
             string id = BuildFoldoutId(owner, foldout);
-            ContainerWidget root = new ContainerWidget(id + "-screen", label + " menu");
+            ContainerWidget root = new ContainerWidget(id + "-screen", ModText.Get(ModStrings.Screens.NamedMenu, label));
             MenuWidget menu = new MenuWidget(id + "-menu", label);
             if (foldout == null)
             {
@@ -126,7 +127,9 @@ namespace SongsOfConquestAccess.Screens
                 return nativeStatus;
             }
 
-            return string.IsNullOrWhiteSpace(nativeStatus) ? "disabled" : "disabled. " + nativeStatus;
+            return string.IsNullOrWhiteSpace(nativeStatus)
+                ? ModText.Get(ModStrings.UI.StatusDisabled)
+                : ModText.Get(ModStrings.Screens.DisabledWithReason, ModText.Get(ModStrings.UI.StatusDisabled), nativeStatus);
         }
     }
 }

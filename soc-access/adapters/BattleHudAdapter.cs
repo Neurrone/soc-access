@@ -16,6 +16,7 @@ using SongsOfConquest.Common.Details;
 using SongsOfConquest.Common.Gamestate;
 using SongsOfConquest.Common.Localization;
 using SongsOfConquest.Common.Spells;
+using SongsOfConquestAccess.Localization;
 using SongsOfConquestAccess.Speech;
 using UnityEngine;
 using UnityEngine.EventSystems;
@@ -811,7 +812,7 @@ namespace SongsOfConquestAccess.Adapters
                 string name = SpeechTextSanitizer.Normalize(_facade.Troops.GetName(troop.Id, size));
                 if (string.IsNullOrWhiteSpace(name))
                 {
-                    name = "troop";
+                    name = string.Empty;
                 }
 
                 return new TroopInfo(name, size, troop.Stats != null);
@@ -1011,15 +1012,7 @@ namespace SongsOfConquestAccess.Adapters
 
         private string Localize(string key, string fallback)
         {
-            if (_localization == null || string.IsNullOrWhiteSpace(key))
-            {
-                return fallback;
-            }
-
-            string localized = _localization.GetText(key);
-            return string.IsNullOrWhiteSpace(localized) || localized == key
-                ? fallback
-                : SpeechTextSanitizer.Normalize(localized);
+            return SpeechTextSanitizer.Normalize(GameText.Get(_localization, key, fallback));
         }
 
         private static bool IsButtonVisible(UIButton button)

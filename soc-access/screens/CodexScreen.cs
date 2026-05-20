@@ -5,6 +5,7 @@ using HarmonyLib;
 using SongsOfConquest.Client.Menu;
 using SongsOfConquestAccess.Adapters;
 using SongsOfConquestAccess.Input;
+using SongsOfConquestAccess.Localization;
 using SongsOfConquestAccess.UI;
 using UnityEngine;
 using Zenject;
@@ -73,7 +74,7 @@ namespace SongsOfConquestAccess.Screens
 
         private static ContainerWidget BuildRoot(CodexMenuAdapter adapter)
         {
-            ContainerWidget root = new ContainerWidget("codex-screen", "Tutorials and Codex");
+            ContainerWidget root = new ContainerWidget("codex-screen", string.Empty);
             if (adapter == null)
             {
                 return root;
@@ -91,7 +92,7 @@ namespace SongsOfConquestAccess.Screens
 
             root.AddChild(new ButtonWidget(
                 "codex-reset-tutorials",
-                "Reset tutorials",
+                GameText.Get("Options/ResetTutorials", string.Empty),
                 adapter.ResetTutorials,
                 null,
                 adapter.IsTutorialSettingsVisible,
@@ -106,7 +107,7 @@ namespace SongsOfConquestAccess.Screens
 
             root.AddChild(new ButtonWidget(
                 "codex-close",
-                "Close",
+                ModText.Get(ModStrings.Screens.Close),
                 adapter.Close,
                 null,
                 () => true));
@@ -116,7 +117,7 @@ namespace SongsOfConquestAccess.Screens
 
         private static MenuWidget BuildTabMenu(CodexMenuAdapter adapter)
         {
-            MenuWidget menu = new MenuWidget("codex-tabs", "Tabs");
+            MenuWidget menu = new MenuWidget("codex-tabs", ModText.Get(ModStrings.Screens.Tabs));
             IReadOnlyList<CodexMenuAdapter.TabItem> tabs = SafeGet("codex tabs", adapter.GetTabs);
             string activeId = null;
             for (int i = 0; i < tabs.Count; i++)
@@ -131,7 +132,7 @@ namespace SongsOfConquestAccess.Screens
                 menu.AddItem(new MenuItemWidget(
                     BuildTabId(captured),
                     () => captured.Label,
-                    () => captured.IsActive ? "selected" : string.Empty,
+                    () => captured.IsActive ? ModText.Get(ModStrings.UI.Selected) : string.Empty,
                     () => adapter.FocusTab(captured.Index),
                     () => adapter.FocusTab(captured.Index),
                     () => true));
@@ -143,17 +144,10 @@ namespace SongsOfConquestAccess.Screens
 
         private static MenuWidget BuildCategoryMenu(CodexMenuAdapter adapter)
         {
-            MenuWidget menu = new MenuWidget("codex-categories", "Categories");
+            MenuWidget menu = new MenuWidget("codex-categories", ModText.Get(ModStrings.Screens.Categories));
             IReadOnlyList<CodexMenuAdapter.ArticleGroupItem> groups = SafeGet("codex categories", adapter.GetArticleGroups);
             if (groups.Count == 0)
             {
-                menu.AddItem(new MenuItemWidget(
-                    "codex-categories-none",
-                    () => "No categories",
-                    null,
-                    () => false,
-                    null,
-                    () => true));
                 return menu;
             }
 
@@ -164,7 +158,7 @@ namespace SongsOfConquestAccess.Screens
                 menu.AddItem(new MenuItemWidget(
                     BuildCategoryId(captured),
                     () => captured.Label,
-                    () => captured.Index == adapter.FocusedCategoryIndex ? "selected" : string.Empty,
+                    () => captured.Index == adapter.FocusedCategoryIndex ? ModText.Get(ModStrings.UI.Selected) : string.Empty,
                     () =>
                     {
                         adapter.FocusCategory(captured.Index);
@@ -180,18 +174,11 @@ namespace SongsOfConquestAccess.Screens
 
         private static MenuWidget BuildArticleMenu(CodexMenuAdapter adapter)
         {
-            MenuWidget menu = new MenuWidget("codex-articles", "Articles");
+            MenuWidget menu = new MenuWidget("codex-articles", ModText.Get(ModStrings.Screens.Articles));
             IReadOnlyList<CodexMenuAdapter.ArticleGroupItem> groups = SafeGet("codex articles", adapter.GetArticleGroups);
             string selectedId = null;
             if (groups.Count == 0)
             {
-                menu.AddItem(new MenuItemWidget(
-                    "codex-articles-none",
-                    () => "No articles",
-                    null,
-                    () => false,
-                    null,
-                    () => true));
                 return menu;
             }
 
@@ -226,13 +213,6 @@ namespace SongsOfConquestAccess.Screens
 
             if (!addedArticle)
             {
-                menu.AddItem(new MenuItemWidget(
-                    "codex-articles-none",
-                    () => "No articles",
-                    null,
-                    () => false,
-                    null,
-                    () => true));
                 return menu;
             }
 

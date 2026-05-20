@@ -5,6 +5,7 @@ using HarmonyLib;
 using SongsOfConquest.Client.Menu;
 using SongsOfConquestAccess.Adapters;
 using SongsOfConquestAccess.Input;
+using SongsOfConquestAccess.Localization;
 using SongsOfConquestAccess.UI;
 using UnityEngine;
 using Zenject;
@@ -114,7 +115,7 @@ namespace SongsOfConquestAccess.Screens
         {
             ContainerWidget root = new ContainerWidget(
                 "save-load-game-screen",
-                adapter != null ? adapter.Title : "Save/load game");
+                adapter != null ? adapter.Title : string.Empty);
 
             root.AddChild(BuildTabs(adapter));
             root.AddChild(new TextWidget(
@@ -127,7 +128,7 @@ namespace SongsOfConquestAccess.Screens
                     && !string.IsNullOrWhiteSpace(adapter.GetSaveDescriptionText())));
             root.AddChild(new TextInputWidget(
                 "save-load-name",
-                "Save name",
+                string.Empty,
                 () => adapter != null ? adapter.InputField : null,
                 () => textEdit != null && adapter != null && textEdit.Begin(adapter.InputField),
                 () => adapter?.FocusInput(),
@@ -154,7 +155,7 @@ namespace SongsOfConquestAccess.Screens
         {
             MenuWidget menu = new MenuWidget(
                 TabsMenuId,
-                "Categories",
+                ModText.Get(ModStrings.Screens.Categories),
                 () => adapter != null
                     && adapter.Mode == SaveLoadGameMenu.Mode.Load
                     && adapter.GetTabs().Count > 0);
@@ -171,7 +172,7 @@ namespace SongsOfConquestAccess.Screens
                 menu.AddItem(new MenuItemWidget(
                     tab.Id,
                     tab.GetLabel,
-                    () => tab.IsSelected() ? "selected" : string.Empty,
+                    () => tab.IsSelected() ? ModText.Get(ModStrings.UI.Selected) : string.Empty,
                     tab.Activate,
                     tab.Focus,
                     tab.IsVisible,
@@ -239,15 +240,15 @@ namespace SongsOfConquestAccess.Screens
             List<string> parts = new List<string>();
             if (entry.IsSelected)
             {
-                parts.Add("selected");
+                parts.Add(ModText.Get(ModStrings.UI.Selected));
             }
 
             if (entry.IsCorrupt)
             {
-                parts.Add("corrupt");
+                parts.Add(ModText.Get(ModStrings.UI.StatusCorrupt));
             }
 
-            return parts.Count == 0 ? string.Empty : string.Join(", ", parts.ToArray());
+            return parts.Count == 0 ? string.Empty : ModText.JoinList(parts);
         }
 
         private static void AddButton(ContainerWidget root, SaveLoadGameMenuAdapter.ButtonItem button)

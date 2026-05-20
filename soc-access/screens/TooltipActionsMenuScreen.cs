@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using SongsOfConquestAccess.Adapters;
 using SongsOfConquestAccess.Input;
+using SongsOfConquestAccess.Localization;
 using SongsOfConquestAccess.UI;
 
 namespace SongsOfConquestAccess.Screens
@@ -42,8 +43,8 @@ namespace SongsOfConquestAccess.Screens
 
         private static ContainerWidget BuildRoot(IReadOnlyList<TooltipAction> actions, Func<bool> close)
         {
-            ContainerWidget root = new ContainerWidget("tooltip-actions-menu-screen", "Tooltip actions");
-            MenuWidget menu = new MenuWidget("tooltip-actions-menu", "Tooltip actions");
+            ContainerWidget root = new ContainerWidget("tooltip-actions-menu-screen", ModText.Get(ModStrings.Screens.TooltipActions));
+            MenuWidget menu = new MenuWidget("tooltip-actions-menu", ModText.Get(ModStrings.Screens.TooltipActions));
 
             if (actions != null)
             {
@@ -72,7 +73,7 @@ namespace SongsOfConquestAccess.Screens
 
             menu.AddItem(new MenuItemWidget(
                 "tooltip-actions-cancel",
-                () => "Cancel",
+                () => ModText.Get(ModStrings.Actions.Cancel),
                 null,
                 () => close != null && close(),
                 null,

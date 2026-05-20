@@ -6,6 +6,7 @@ using SongsOfConquest.Common.Gamestate;
 using SongsOfConquest.Common.Skills;
 using SongsOfConquestAccess.Adapters;
 using SongsOfConquestAccess.Input;
+using SongsOfConquestAccess.Localization;
 using SongsOfConquestAccess.UI;
 using UnityEngine;
 
@@ -174,7 +175,7 @@ namespace SongsOfConquestAccess.Screens
 
         private static ContainerWidget BuildRoot(CommanderSheetAdapter adapter)
         {
-            ContainerWidget root = new ContainerWidget("commander-sheet-screen", "Character sheet");
+            ContainerWidget root = new ContainerWidget("commander-sheet-screen", adapter != null ? adapter.GetCommanderIdentity() : string.Empty);
             if (adapter == null)
             {
                 return root;
@@ -198,10 +199,10 @@ namespace SongsOfConquestAccess.Screens
                 includeParentLabelInAnnouncement: false));
 
             IReadOnlyList<CommanderSheetAdapter.LabeledItem> stats = GetItemsSafely("Stats", adapter.GetStats);
-            root.AddChild(BuildMenu("commander-sheet-stats", "Stats", stats));
+            root.AddChild(BuildMenu("commander-sheet-stats", GameText.Get("Common/CommanderInventory/Stats", string.Empty), stats));
 
             IReadOnlyList<CommanderSheetAdapter.LabeledItem> specializations = GetItemsSafely("Specializations", adapter.GetSpecializations);
-            root.AddChild(BuildMenu("commander-sheet-specializations", "Specializations", specializations, adapter.HideNativeTooltip));
+            root.AddChild(BuildMenu("commander-sheet-specializations", GameText.Get("Commanders/Tooltip/Specializations", string.Empty), specializations, adapter.HideNativeTooltip));
 
             root.AddChild(BuildModifierCategoryMenu(adapter));
 
@@ -215,14 +216,14 @@ namespace SongsOfConquestAccess.Screens
                 adapter.DropInventoryArtifact));
 
             IReadOnlyList<CommanderSheetAdapter.LabeledItem> skills = GetItemsSafely("Skills", () => adapter.GetSkills(powers: false));
-            root.AddChild(BuildMenu("commander-sheet-skills", "Skills", skills));
+            root.AddChild(BuildMenu("commander-sheet-skills", GameText.Get("Commanders/Tooltip/Skills", string.Empty), skills));
 
             IReadOnlyList<CommanderSheetAdapter.LabeledItem> powers = GetItemsSafely("Powers", () => adapter.GetSkills(powers: true));
-            root.AddChild(BuildMenu("commander-sheet-powers", "Powers", powers, adapter.HideNativeTooltip));
+            root.AddChild(BuildMenu("commander-sheet-powers", GameText.Get("Commanders/Tooltip/Powers", string.Empty), powers, adapter.HideNativeTooltip));
 
             root.AddChild(new ButtonWidget(
                 "commander-sheet-close",
-                "Close",
+                ModText.Get(ModStrings.Screens.Close),
                 adapter.Close,
                 adapter.HideNativeTooltip,
                 () => true));
@@ -274,7 +275,7 @@ namespace SongsOfConquestAccess.Screens
 
         private static string BuildInventorySlotLabel(InventorySlotInfo slot, bool includeOwnerName)
         {
-            string name = !slot.IsEmpty ? slot.ArtifactName : "empty";
+            string name = !slot.IsEmpty ? slot.ArtifactName : ModText.Get(ModStrings.Screens.Empty);
             string location = slot.IsBackpackSlot
                 ? slot.InventoryName + " slot " + (slot.PositionIndex + 1)
                 : slot.SlotName;
@@ -296,14 +297,14 @@ namespace SongsOfConquestAccess.Screens
                 SocAccessPlugin.Instance?.LogWarning("CommanderSheetScreen section " + section + " failed to build: " + ex);
                 return new CommanderSheetAdapter.LabeledItem[]
                 {
-                    new CommanderSheetAdapter.LabeledItem(section.ToLowerInvariant() + "-error", "Unavailable")
+                    new CommanderSheetAdapter.LabeledItem(section.ToLowerInvariant() + "-error", ModText.Get(ModStrings.Screens.Unavailable))
                 };
             }
         }
 
         private static MenuWidget BuildModifierCategoryMenu(CommanderSheetAdapter adapter)
         {
-            MenuWidget menu = new MenuWidget("commander-sheet-modifier-tabs", "Modifier category tabs");
+            MenuWidget menu = new MenuWidget("commander-sheet-modifier-tabs", ModText.Get(ModStrings.Screens.ModifierCategoryTabs));
             string activeId = null;
             foreach (CommanderSheetAdapter.ModifierCategory category in adapter.GetModifierCategories())
             {
@@ -338,7 +339,7 @@ namespace SongsOfConquestAccess.Screens
             {
                 menu.AddItem(new MenuItemWidget(
                     id + "-none",
-                    () => "None",
+                    () => ModText.Get(ModStrings.Screens.None),
                     null,
                     () => false,
                     emptyItemFocus,

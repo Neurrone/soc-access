@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using System;
 using SongsOfConquestAccess.Input;
+using SongsOfConquestAccess.Localization;
 
 namespace SongsOfConquestAccess.UI
 {
@@ -64,7 +65,7 @@ namespace SongsOfConquestAccess.UI
 
         public override string GetRole()
         {
-            return "menu";
+            return ModText.Get(ModStrings.UI.RoleMenu);
         }
 
         public void AddItem(MenuItemWidget item)

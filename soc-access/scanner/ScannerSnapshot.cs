@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using SongsOfConquestAccess.Localization;
 using UnityEngine;
 
 namespace SongsOfConquestAccess.Scanner
@@ -81,7 +82,7 @@ namespace SongsOfConquestAccess.Scanner
 
             if (string.IsNullOrWhiteSpace(subcategory))
             {
-                subcategory = "All";
+                subcategory = ModText.Get(ModStrings.Scanner.All);
             }
 
             GetOrAddCategory(category).GetOrAddSubcategory(subcategory).Results.Add(result);

@@ -4,6 +4,7 @@ using HarmonyLib;
 using SongsOfConquest.Client.Adventure;
 using SongsOfConquestAccess.Adapters;
 using SongsOfConquestAccess.Input;
+using SongsOfConquestAccess.Localization;
 using SongsOfConquestAccess.UI;
 using UnityEngine;
 using Zenject;
@@ -75,7 +76,7 @@ namespace SongsOfConquestAccess.Screens
             string title = adapter != null ? adapter.Title : string.Empty;
             ContainerWidget root = new ContainerWidget(
                 "world-choice-menu",
-                string.IsNullOrWhiteSpace(title) ? "World choice menu" : title);
+                string.IsNullOrWhiteSpace(title) ? ModText.Get(ModStrings.Screens.WorldChoiceMenu) : title);
             if (adapter == null)
             {
                 return root;
@@ -89,7 +90,7 @@ namespace SongsOfConquestAccess.Screens
 
             root.AddChild(TroopHudMenu.Build(
                 "world-choice-troops",
-                "Troops",
+                GameText.Get("Commanders/Tooltip/Troops", string.Empty),
                 adapter.Troops,
                 () => true));
 
@@ -128,7 +129,7 @@ namespace SongsOfConquestAccess.Screens
                 menu.AddItem(new MenuItemWidget(
                     BuildChoiceId(choice, i),
                     () => choice.Label,
-                    () => choice.IsEnabled ? string.Empty : "disabled",
+                    () => choice.IsEnabled ? string.Empty : ModText.Get(ModStrings.UI.StatusDisabled),
                     () => false,
                     choice.OnFocus,
                     choice.IsVisible,

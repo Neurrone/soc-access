@@ -8,6 +8,7 @@ using SongsOfConquest.Common.Battle;
 using SongsOfConquest.Common.Battle.Bacterias;
 using SongsOfConquest.Common.Entities.Battle;
 using SongsOfConquest.Common.Spells;
+using SongsOfConquestAccess.Localization;
 using SongsOfConquestAccess.Speech;
 using SongsOfConquestAccess.Speech.Spatial;
 using UnityEngine;
@@ -37,7 +38,7 @@ namespace SongsOfConquestAccess.Events.Combat
             TroopId = troopId;
             TeamId = teamId;
             LocalTeamId = localTeamId;
-            Name = string.IsNullOrWhiteSpace(name) ? "troop" : SpeechTextSanitizer.Normalize(name);
+            Name = string.IsNullOrWhiteSpace(name) ? ModText.Get(ModStrings.Combat.Troop) : SpeechTextSanitizer.Normalize(name);
             Count = count;
             Position = position;
         }
@@ -52,8 +53,10 @@ namespace SongsOfConquestAccess.Events.Combat
 
         public string Format(bool includePosition)
         {
-            string text = Count + (IsEnemy ? " enemy " : " ") + Name;
-            return includePosition ? text + " at " + FormatPoint(Position) : text;
+            string text = IsEnemy
+                ? ModText.Get(ModStrings.Combat.EnemyTroop, Count, Name)
+                : ModText.Get(ModStrings.Combat.TroopQuantity, Count, Name);
+            return includePosition ? ModText.Get(ModStrings.Combat.TroopAt, text, FormatPoint(Position)) : text;
         }
     }
 
@@ -72,7 +75,7 @@ namespace SongsOfConquestAccess.Events.Combat
         {
             return IsActingOnItsTurn && Troop != null
                 ? Troop.Name
-                : Troop != null ? Troop.Format(includePosition: true) : "unknown troop";
+                : Troop != null ? Troop.Format(includePosition: true) : ModText.Get(ModStrings.Combat.UnknownTroop);
         }
     }
 
@@ -81,7 +84,7 @@ namespace SongsOfConquestAccess.Events.Combat
         public EntityRef(int entityId, string name, Vector2Int position)
         {
             EntityId = entityId;
-            Name = string.IsNullOrWhiteSpace(name) ? "attackable entity" : SpeechTextSanitizer.Normalize(name);
+            Name = string.IsNullOrWhiteSpace(name) ? ModText.Get(ModStrings.Combat.AttackableEntity) : SpeechTextSanitizer.Normalize(name);
             Position = position;
         }
 
@@ -91,7 +94,7 @@ namespace SongsOfConquestAccess.Events.Combat
 
         public string Format()
         {
-            return Name + " at " + FormatPoint(Position);
+            return ModText.Get(ModStrings.Combat.TroopAt, Name, FormatPoint(Position));
         }
     }
 
@@ -102,7 +105,7 @@ namespace SongsOfConquestAccess.Events.Combat
             CommanderId = commanderId;
             TeamId = teamId;
             LocalTeamId = localTeamId;
-            Name = string.IsNullOrWhiteSpace(name) ? "wielder" : SpeechTextSanitizer.Normalize(name);
+            Name = string.IsNullOrWhiteSpace(name) ? ModText.Get(ModStrings.Combat.Wielder) : SpeechTextSanitizer.Normalize(name);
         }
 
         public int CommanderId { get; private set; }
@@ -113,7 +116,7 @@ namespace SongsOfConquestAccess.Events.Combat
 
         public string Format()
         {
-            return IsEnemy ? "enemy wielder " + Name : Name;
+            return IsEnemy ? ModText.Get(ModStrings.Screens.EnemyWielder, Name) : Name;
         }
     }
 
@@ -155,15 +158,15 @@ namespace SongsOfConquestAccess.Events.Combat
             switch (TargetKind)
             {
                 case TargetKind.Troop:
-                    return Troop != null ? Troop.Format(includePosition: true) : "unknown troop";
+                    return Troop != null ? Troop.Format(includePosition: true) : ModText.Get(ModStrings.Combat.UnknownTroop);
                 case TargetKind.MapEntity:
-                    return Entity != null ? Entity.Format() : "unknown entity";
+                    return Entity != null ? Entity.Format() : ModText.Get(ModStrings.Combat.UnknownEntity);
                 case TargetKind.Commander:
-                    return Commander != null ? Commander.Format() : "wielder";
+                    return Commander != null ? Commander.Format() : ModText.Get(ModStrings.Combat.Wielder);
                 case TargetKind.Tile:
-                    return "tile " + FormatPoint(Tile);
+                    return ModText.Get(ModStrings.Combat.Tile, FormatPoint(Tile));
                 default:
-                    return "unknown target";
+                    return ModText.Get(ModStrings.Combat.UnknownTarget);
             }
         }
     }
@@ -250,9 +253,9 @@ namespace SongsOfConquestAccess.Events.Combat
             switch (kind)
             {
                 case EffectTargetSummaryKind.YourTroops:
-                    return "your troops";
+                    return ModText.Get(ModStrings.Combat.YourTroops);
                 case EffectTargetSummaryKind.EnemyTroops:
-                    return "enemy troops";
+                    return ModText.Get(ModStrings.Combat.EnemyTroops);
                 default:
                     return FormatExplicitTargets(targets);
             }
@@ -261,7 +264,7 @@ namespace SongsOfConquestAccess.Events.Combat
         public static string FormatExplicitTargets(IList<TroopRef> targets)
         {
             return FormatList(targets != null
-                ? targets.Select(t => t != null ? t.Format(includePosition: true) : "unknown troop").ToList()
+                ? targets.Select(t => t != null ? t.Format(includePosition: true) : ModText.Get(ModStrings.Combat.UnknownTroop)).ToList()
                 : new List<string>());
         }
     }
@@ -283,9 +286,7 @@ namespace SongsOfConquestAccess.Events.Combat
 
         public string FormatBoltText()
         {
-            return BoltCount == 1
-                ? "1 bolt at " + Target.Format()
-                : BoltCount + " bolts at " + Target.Format();
+            return ModText.Plural(ModStrings.Combat.BoltAt, BoltCount, BoltCount, Target.Format());
         }
     }
 
@@ -294,7 +295,7 @@ namespace SongsOfConquestAccess.Events.Combat
         public NewTurnEvent(TroopRef troop) { Troop = troop; }
         public string Kind { get { return AccessibilityEvents.Combat.NewTurn; } }
         public TroopRef Troop { get; private set; }
-        public string GetSpeechText() { return "It is " + Troop.Format(includePosition: true) + "'s turn"; }
+        public string GetSpeechText() { return ModText.Get(ModStrings.Combat.NewTurn, Troop.Format(includePosition: true)); }
     }
 
     internal sealed class NewRoundEvent : IAccessibilityEvent
@@ -302,7 +303,7 @@ namespace SongsOfConquestAccess.Events.Combat
         public NewRoundEvent(int roundNumber) { RoundNumber = roundNumber; }
         public string Kind { get { return AccessibilityEvents.Combat.NewRound; } }
         public int RoundNumber { get; private set; }
-        public string GetSpeechText() { return RoundNumber > 0 ? "Round " + RoundNumber : string.Empty; }
+        public string GetSpeechText() { return RoundNumber > 0 ? ModText.Get(ModStrings.Screens.Round, RoundNumber) : string.Empty; }
     }
 
     internal sealed class QueueChangedEvent : IAccessibilityEvent
@@ -326,7 +327,7 @@ namespace SongsOfConquestAccess.Events.Combat
         public Vector2Int From { get; private set; }
         public Vector2Int To { get; private set; }
         public IReadOnlyList<Vector2Int> Path { get; private set; }
-        public string GetSpeechText() { return Actor.Format() + " moves to " + FormatPoint(To); }
+        public string GetSpeechText() { return ModText.Get(ModStrings.Combat.TroopMoved, Actor.Format(), FormatPoint(To)); }
     }
 
     internal sealed class AttackEvent : IAccessibilityEvent
@@ -342,7 +343,7 @@ namespace SongsOfConquestAccess.Events.Combat
         public ActorRef Attacker { get; private set; }
         public TargetRef Target { get; private set; }
         public AttackTrigger AttackTrigger { get; private set; }
-        public string GetSpeechText() { return Attacker.Format() + " " + FormatAttackVerb(AttackTrigger) + " " + Target.Format(); }
+        public string GetSpeechText() { return ModText.Get(ModStrings.Combat.Attack, Attacker.Format(), FormatAttackVerb(AttackTrigger), Target.Format()); }
     }
 
     internal sealed class DamageEvent : IAccessibilityEvent
@@ -379,19 +380,19 @@ namespace SongsOfConquestAccess.Events.Combat
             string suffix = string.Empty;
             if (Target.TargetKind == TargetKind.Troop && Kills > 0)
             {
-                suffix = ", killing " + Kills;
+                suffix = ModText.Get(ModStrings.Combat.DamageKillsSuffix, Kills);
             }
             else if (Target.TargetKind == TargetKind.MapEntity && SizeAfter <= 0)
             {
-                suffix = ", destroying it";
+                suffix = ModText.Get(ModStrings.Combat.DamageDestroyingItSuffix);
             }
 
             if (Attacker == null)
             {
-                return Target.Format() + " takes " + Damage + " " + kind + " damage" + suffix;
+                return ModText.Get(ModStrings.Combat.TakesDamage, Target.Format(), Damage, kind, suffix);
             }
 
-            return Attacker.Format() + " deals " + Damage + " " + kind + " damage to " + Target.Format() + suffix;
+            return ModText.Get(ModStrings.Combat.DealsDamage, Attacker.Format(), Damage, kind, Target.Format(), suffix);
         }
     }
 
@@ -413,10 +414,14 @@ namespace SongsOfConquestAccess.Events.Combat
 
         public string GetSpeechText()
         {
-            string text = Caster.Format() + " casts " + Spell.Name;
+            string text = ModText.Get(ModStrings.Combat.CastsSpell, Caster.Format(), Spell.Name);
             if (SelectedTargetPoints.Count > 0)
             {
-                text += " at " + FormatList(SelectedTargetPoints.Select(FormatPoint).ToList());
+                text = ModText.Get(
+                    ModStrings.Combat.CastsSpellAt,
+                    Caster.Format(),
+                    Spell.Name,
+                    FormatList(SelectedTargetPoints.Select(FormatPoint).ToList()));
             }
 
             return text;
@@ -439,10 +444,14 @@ namespace SongsOfConquestAccess.Events.Combat
         {
             if (DamageSummaries.Count == 0)
             {
-                return Attacker.Format() + " casts Faey Fire";
+                return ModText.Get(ModStrings.Combat.CastsSpell, Attacker.Format(), ModText.Get(ModStrings.Combat.FaeyFire));
             }
 
-            return Attacker.Format() + " casts Faey Fire, " + FormatList(DamageSummaries.Select(s => s.FormatBoltText()).ToList());
+            return ModText.Get(
+                ModStrings.Combat.FaeyFireWithBolts,
+                Attacker.Format(),
+                ModText.Get(ModStrings.Combat.FaeyFire),
+                FormatList(DamageSummaries.Select(s => s.FormatBoltText()).ToList()));
         }
     }
 
@@ -452,7 +461,7 @@ namespace SongsOfConquestAccess.Events.Combat
         public string Kind { get { return AccessibilityEvents.Combat.BacteriaRemoved; } }
         public TroopRef Target { get; private set; }
         public BacteriaRef Bacteria { get; private set; }
-        public string GetSpeechText() { return Bacteria.Name + " removed from " + Target.Format(includePosition: true); }
+        public string GetSpeechText() { return ModText.Get(ModStrings.Combat.RemovedFrom, Bacteria.Name, Target.Format(includePosition: true)); }
     }
 
     internal sealed class BacteriaModifierAppliedEvent : IAccessibilityEvent
@@ -471,7 +480,7 @@ namespace SongsOfConquestAccess.Events.Combat
 
         public string GetSpeechText()
         {
-            string text = Bacteria.Name + " affects " + Target.Format(includePosition: true);
+            string text = ModText.Get(ModStrings.Combat.Affects, Bacteria.Name, Target.Format(includePosition: true));
             if (Changes.Count > 0)
             {
                 text += ", " + FormatList(Changes.Select(c => c.Format()).ToList());
@@ -497,8 +506,8 @@ namespace SongsOfConquestAccess.Events.Combat
 
         public string GetSpeechText()
         {
-            string name = Bacteria != null ? Bacteria.Name : "Effect";
-            return name + " removed from " + EffectTargetSummary.FormatTargets(Targets.ToList(), TargetSummaryKind);
+            string name = Bacteria != null ? Bacteria.Name : ModText.Get(ModStrings.Combat.Effect);
+            return ModText.Get(ModStrings.Combat.RemovedFrom, name, EffectTargetSummary.FormatTargets(Targets.ToList(), TargetSummaryKind));
         }
     }
 
@@ -551,8 +560,8 @@ namespace SongsOfConquestAccess.Events.Combat
                 parts.Add(string.IsNullOrWhiteSpace(group.Key) ? targets : targets + ", " + group.Key);
             }
 
-            string name = Bacteria != null ? Bacteria.Name : "Effect";
-            return name + " affects " + FormatList(parts);
+            string name = Bacteria != null ? Bacteria.Name : ModText.Get(ModStrings.Combat.Effect);
+            return ModText.Get(ModStrings.Combat.Affects, name, FormatList(parts));
         }
 
         private static string FormatChanges(IReadOnlyList<ModifierChange> changes)
@@ -586,11 +595,11 @@ namespace SongsOfConquestAccess.Events.Combat
         public string GetSpeechText()
         {
             List<string> parts = new List<string>();
-            AddEssenceAmount(parts, Order, "order");
-            AddEssenceAmount(parts, Creation, "creation");
-            AddEssenceAmount(parts, Chaos, "chaos");
-            AddEssenceAmount(parts, Arcana, "arcana");
-            AddEssenceAmount(parts, Destruction, "destruction");
+            AddEssenceAmount(parts, Order, ModText.Get(ModStrings.Combat.OrderEssence));
+            AddEssenceAmount(parts, Creation, ModText.Get(ModStrings.Combat.CreationEssence));
+            AddEssenceAmount(parts, Chaos, ModText.Get(ModStrings.Combat.ChaosEssence));
+            AddEssenceAmount(parts, Arcana, ModText.Get(ModStrings.Combat.ArcanaEssence));
+            AddEssenceAmount(parts, Destruction, ModText.Get(ModStrings.Combat.DestructionEssence));
             return FormatList(parts);
         }
 
@@ -598,7 +607,7 @@ namespace SongsOfConquestAccess.Events.Combat
         {
             if (amount > 0)
             {
-                parts.Add("+" + amount + " " + name + " essence");
+                parts.Add(ModText.Get(ModStrings.Combat.EssenceAmount, amount, name));
             }
         }
     }
@@ -609,7 +618,12 @@ namespace SongsOfConquestAccess.Events.Combat
         public string Kind { get { return AccessibilityEvents.Combat.TroopCreated; } }
         public TroopRef Troop { get; private set; }
         public bool IsSummon { get; private set; }
-        public string GetSpeechText() { return Troop.Format(includePosition: true) + (IsSummon ? " summoned" : " created"); }
+        public string GetSpeechText()
+        {
+            return IsSummon
+                ? ModText.Get(ModStrings.Combat.Summoned, Troop.Format(includePosition: true))
+                : ModText.Get(ModStrings.Combat.Created, Troop.Format(includePosition: true));
+        }
     }
 
     internal sealed class MapEntityCreatedEvent : IAccessibilityEvent
@@ -617,7 +631,7 @@ namespace SongsOfConquestAccess.Events.Combat
         public MapEntityCreatedEvent(EntityRef entity) { Entity = entity; }
         public string Kind { get { return AccessibilityEvents.Combat.MapEntityCreated; } }
         public EntityRef Entity { get; private set; }
-        public string GetSpeechText() { return Entity.Format() + " appears"; }
+        public string GetSpeechText() { return ModText.Get(ModStrings.Combat.Appears, Entity.Format()); }
     }
 
     internal sealed class MapEntityDestroyedEvent : IAccessibilityEvent
@@ -625,7 +639,7 @@ namespace SongsOfConquestAccess.Events.Combat
         public MapEntityDestroyedEvent(EntityRef entity) { Entity = entity; }
         public string Kind { get { return AccessibilityEvents.Combat.MapEntityDestroyed; } }
         public EntityRef Entity { get; private set; }
-        public string GetSpeechText() { return Entity.Format() + " destroyed"; }
+        public string GetSpeechText() { return ModText.Get(ModStrings.Combat.Destroyed, Entity.Format()); }
     }
 
     internal sealed class TroopPushedEvent : IAccessibilityEvent
@@ -643,7 +657,7 @@ namespace SongsOfConquestAccess.Events.Combat
         public Vector2Int From { get; private set; }
         public Vector2Int To { get; private set; }
         public IReadOnlyList<Vector2Int> Path { get; private set; }
-        public string GetSpeechText() { return Troop.Format(includePosition: true) + " pushed to " + FormatPoint(To); }
+        public string GetSpeechText() { return ModText.Get(ModStrings.Combat.PushedTo, Troop.Format(includePosition: true), FormatPoint(To)); }
     }
 
     internal sealed class AbilityUsedEvent : IAccessibilityEvent
@@ -661,7 +675,7 @@ namespace SongsOfConquestAccess.Events.Combat
         public AbilityRef Ability { get; private set; }
         public Vector2Int? TargetingPosition { get; private set; }
         public IReadOnlyList<Vector2Int> MovementPath { get; private set; }
-        public string GetSpeechText() { return Actor.Format() + " uses " + Ability.Name; }
+        public string GetSpeechText() { return ModText.Get(ModStrings.Combat.AbilityUsed, Actor.Format(), Ability.Name); }
     }
 
     internal sealed class TeleportEvent : IAccessibilityEvent
@@ -679,7 +693,12 @@ namespace SongsOfConquestAccess.Events.Combat
         public Vector2Int From { get; private set; }
         public Vector2Int To { get; private set; }
         public TeleportBattleTroopCommand.Source Source { get; private set; }
-        public string GetSpeechText() { return Actor.Format() + " " + (Source == TeleportBattleTroopCommand.Source.Ravenform ? "ravenforms to " : "teleports to ") + FormatPoint(To); }
+        public string GetSpeechText()
+        {
+            return Source == TeleportBattleTroopCommand.Source.Ravenform
+                ? ModText.Get(ModStrings.Combat.RavenformsTo, Actor.Format(), FormatPoint(To))
+                : ModText.Get(ModStrings.Combat.TeleportsTo, Actor.Format(), FormatPoint(To));
+        }
     }
 
     internal sealed class BurrowUpEvent : IAccessibilityEvent
@@ -688,7 +707,12 @@ namespace SongsOfConquestAccess.Events.Combat
         public string Kind { get { return AccessibilityEvents.Combat.BurrowUp; } }
         public ActorRef Actor { get; private set; }
         public bool Succeeded { get; private set; }
-        public string GetSpeechText() { return Succeeded ? Actor.Format() + " burrows up" : Actor.Format() + ", failed burrow"; }
+        public string GetSpeechText()
+        {
+            return Succeeded
+                ? ModText.Get(ModStrings.Combat.BurrowsUp, Actor.Format())
+                : ModText.Get(ModStrings.Combat.FailedBurrow, Actor.Format());
+        }
     }
 
     internal sealed class BattleResultEvent : IAccessibilityEvent
@@ -716,15 +740,15 @@ namespace SongsOfConquestAccess.Events.Combat
             switch (LocalOutcome)
             {
                 case BattleOutcome.Victory:
-                    return "Victory";
+                    return ModText.Get(ModStrings.Combat.Victory);
                 case BattleOutcome.Defeat:
-                    return "Defeat";
+                    return ModText.Get(ModStrings.Combat.Defeat);
                 case BattleOutcome.Draw:
-                    return "Draw";
+                    return ModText.Get(ModStrings.Combat.Draw);
                 case BattleOutcome.Walkover:
-                    return "Walkover";
+                    return ModText.Get(ModStrings.Combat.Walkover);
                 default:
-                    return "Battle over";
+                    return ModText.Get(ModStrings.Combat.BattleOver);
             }
         }
     }
@@ -778,10 +802,10 @@ namespace SongsOfConquestAccess.Events.Combat
 
             if (values.Count == 2)
             {
-                return values[0] + " and " + values[1];
+                return ModText.JoinList(values.ToList());
             }
 
-            return string.Join(", ", values.Take(values.Count - 1).ToArray()) + ", and " + values[values.Count - 1];
+            return ModText.JoinList(values.ToList());
         }
 
         public static string FormatAttackVerb(AttackTrigger trigger)
@@ -789,15 +813,15 @@ namespace SongsOfConquestAccess.Events.Combat
             switch (trigger)
             {
                 case AttackTrigger.Retaliation:
-                    return "retaliates against";
+                    return ModText.Get(ModStrings.Combat.AttackVerbRetaliation);
                 case AttackTrigger.Overwatch:
-                    return "makes an overwatch attack against";
+                    return ModText.Get(ModStrings.Combat.AttackVerbOverwatch);
                 case AttackTrigger.Opportunity:
-                    return "makes an opportunity attack against";
+                    return ModText.Get(ModStrings.Combat.AttackVerbOpportunity);
                 case AttackTrigger.Spearwall:
-                    return "makes a spearwall attack against";
+                    return ModText.Get(ModStrings.Combat.AttackVerbSpearwall);
                 default:
-                    return "attacks";
+                    return ModText.Get(ModStrings.Combat.AttackVerbDefault);
             }
         }
 
@@ -806,7 +830,7 @@ namespace SongsOfConquestAccess.Events.Combat
             List<string> parts = new List<string>();
             if (isSplashDamage)
             {
-                parts.Add("splash");
+                parts.Add(ModText.Get(ModStrings.Combat.Splash));
             }
 
             string attackTrigger = FormatAttackTrigger(trigger);
@@ -824,19 +848,19 @@ namespace SongsOfConquestAccess.Events.Combat
             switch (trigger)
             {
                 case AttackTrigger.Retaliation:
-                    return "retaliation";
+                    return ModText.Get(ModStrings.Combat.Retaliation);
                 case AttackTrigger.Overwatch:
-                    return "overwatch";
+                    return ModText.Get(ModStrings.Combat.Overwatch);
                 case AttackTrigger.Opportunity:
-                    return "opportunity attack";
+                    return ModText.Get(ModStrings.Combat.OpportunityAttack);
                 case AttackTrigger.Spearwall:
-                    return "spearwall";
+                    return ModText.Get(ModStrings.Combat.Spearwall);
                 case AttackTrigger.BlindFury:
-                    return "blind fury";
+                    return ModText.Get(ModStrings.Combat.BlindFury);
                 case AttackTrigger.Lunge:
-                    return "lunge";
+                    return ModText.Get(ModStrings.Combat.Lunge);
                 case AttackTrigger.Challenge:
-                    return "challenge";
+                    return ModText.Get(ModStrings.Combat.Challenge);
                 default:
                     return string.Empty;
             }
@@ -847,22 +871,22 @@ namespace SongsOfConquestAccess.Events.Combat
             switch (type)
             {
                 case DamageType.Melee:
-                    return "melee";
+                    return ModText.Get(ModStrings.Combat.MeleeDamage);
                 case DamageType.Ranged:
-                    return "ranged";
+                    return ModText.Get(ModStrings.Combat.RangedDamage);
                 case DamageType.Spell:
-                    return "spell";
+                    return ModText.Get(ModStrings.Combat.SpellDamage);
                 case DamageType.MapEntity:
-                    return "map entity";
+                    return ModText.Get(ModStrings.Combat.MapEntityDamage);
                 case DamageType.ExplosiveBarrel:
                 case DamageType.ExplosiveBarrelViaSpell:
-                    return "explosive barrel";
+                    return ModText.Get(ModStrings.Combat.ExplosiveBarrel);
                 case DamageType.MothersLove:
-                    return "mother's love";
+                    return ModText.Get(ModStrings.Combat.MothersLove);
                 case DamageType.Bacteria:
-                    return "effect";
+                    return ModText.Get(ModStrings.Combat.Effect);
                 default:
-                    return "unknown";
+                    return ModText.Get(ModStrings.Combat.Unknown);
             }
         }
 

@@ -1,5 +1,9 @@
 # Changelog
 
+## V0.2.0
+
+- Localization support for all languages supported by the game
+
 ## V0.1.4
 
 - Don't announce a story camera focus event if it is identical to the last announced camera movement

@@ -1,4 +1,5 @@
 using UnityEngine.InputSystem;
+using SongsOfConquestAccess.Localization;
 
 namespace SongsOfConquestAccess.Input
 {
@@ -10,34 +11,34 @@ namespace SongsOfConquestAccess.Input
         // Global actions are available on every accessibility screen. The input
         // router checks screen-claimed actions first, then global actions, so
         // screens can own keys before global fallbacks see them.
-        public static readonly InputAction TooltipActionsMenu = OneShot("tooltip_actions_menu", "Tooltip Actions Menu", InputClaimScope.Screen)
+        public static readonly InputAction TooltipActionsMenu = OneShot("tooltip_actions_menu", ModStrings.Actions.TooltipActionsMenu, InputClaimScope.Screen)
             .AddBinding(new KeyboardBinding(Key.Backquote));
 
-        public static readonly InputAction SummarizeResources = OneShot("summarize_resources", "Summarize Resources", InputClaimScope.Screen)
+        public static readonly InputAction SummarizeResources = OneShot("summarize_resources", ModStrings.Actions.SummarizeResources, InputClaimScope.Screen)
             .AddBinding(new KeyboardBinding(Key.R, ctrl: true));
 
-        public static readonly InputAction SummarizeEnemyResources = OneShot("summarize_enemy_resources", "Summarize Enemy Resources", InputClaimScope.Screen)
+        public static readonly InputAction SummarizeEnemyResources = OneShot("summarize_enemy_resources", ModStrings.Actions.SummarizeEnemyResources, InputClaimScope.Screen)
             .AddBinding(new KeyboardBinding(Key.R, alt: true));
 
-        public static readonly InputAction OpenModSettings = OneShot("open_mod_settings", "Open Mod Settings", InputClaimScope.Screen)
+        public static readonly InputAction OpenModSettings = OneShot("open_mod_settings", ModStrings.Actions.OpenModSettings, InputClaimScope.Screen)
             .AddBinding(new KeyboardBinding(Key.M, ctrl: true));
 
-        public static readonly InputAction PreviousBuffer = OneShot("previous_buffer", "Previous Buffer", InputClaimScope.Screen)
+        public static readonly InputAction PreviousBuffer = OneShot("previous_buffer", ModStrings.Actions.PreviousBuffer, InputClaimScope.Screen)
             .AddBinding(new KeyboardBinding(Key.LeftArrow, ctrl: true));
 
-        public static readonly InputAction NextBuffer = OneShot("next_buffer", "Next Buffer", InputClaimScope.Screen)
+        public static readonly InputAction NextBuffer = OneShot("next_buffer", ModStrings.Actions.NextBuffer, InputClaimScope.Screen)
             .AddBinding(new KeyboardBinding(Key.RightArrow, ctrl: true));
 
-        public static readonly InputAction PreviousBufferLine = OneShot("previous_buffer_line", "Previous Buffer Line", InputClaimScope.Screen)
+        public static readonly InputAction PreviousBufferLine = OneShot("previous_buffer_line", ModStrings.Actions.PreviousBufferLine, InputClaimScope.Screen)
             .AddBinding(new KeyboardBinding(Key.UpArrow, ctrl: true));
 
-        public static readonly InputAction NextBufferLine = OneShot("next_buffer_line", "Next Buffer Line", InputClaimScope.Screen)
+        public static readonly InputAction NextBufferLine = OneShot("next_buffer_line", ModStrings.Actions.NextBufferLine, InputClaimScope.Screen)
             .AddBinding(new KeyboardBinding(Key.DownArrow, ctrl: true));
 
-        public static readonly InputAction FirstBufferLine = OneShot("first_buffer_line", "First Buffer Line", InputClaimScope.Screen)
+        public static readonly InputAction FirstBufferLine = OneShot("first_buffer_line", ModStrings.Actions.FirstBufferLine, InputClaimScope.Screen)
             .AddBinding(new KeyboardBinding(Key.Home, ctrl: true));
 
-        public static readonly InputAction LastBufferLine = OneShot("last_buffer_line", "Last Buffer Line", InputClaimScope.Screen)
+        public static readonly InputAction LastBufferLine = OneShot("last_buffer_line", ModStrings.Actions.LastBufferLine, InputClaimScope.Screen)
             .AddBinding(new KeyboardBinding(Key.End, ctrl: true));
 
         public static readonly InputAction[] GLOBAL_ACTIONS =
@@ -73,149 +74,149 @@ namespace SongsOfConquestAccess.Input
             return false;
         }
 
-        public static readonly InputAction NextWidget = OneShot("next_widget", "Next Widget", InputClaimScope.Screen)
+        public static readonly InputAction NextWidget = OneShot("next_widget", ModStrings.Actions.NextWidget, InputClaimScope.Screen)
             .AddBinding(new KeyboardBinding(Key.Tab));
 
-        public static readonly InputAction PreviousWidget = OneShot("previous_widget", "Previous Widget", InputClaimScope.Screen)
+        public static readonly InputAction PreviousWidget = OneShot("previous_widget", ModStrings.Actions.PreviousWidget, InputClaimScope.Screen)
             .AddBinding(new KeyboardBinding(Key.Tab, shift: true));
 
-        public static readonly InputAction NextMenuItem = OneShot("next_menu_item", "Next Menu Item", InputClaimScope.Screen)
+        public static readonly InputAction NextMenuItem = OneShot("next_menu_item", ModStrings.Actions.NextMenuItem, InputClaimScope.Screen)
             .AddBinding(new KeyboardBinding(Key.DownArrow));
 
-        public static readonly InputAction PreviousMenuItem = OneShot("previous_menu_item", "Previous Menu Item", InputClaimScope.Screen)
+        public static readonly InputAction PreviousMenuItem = OneShot("previous_menu_item", ModStrings.Actions.PreviousMenuItem, InputClaimScope.Screen)
             .AddBinding(new KeyboardBinding(Key.UpArrow));
 
-        public static readonly InputAction FirstMenuItem = OneShot("first_menu_item", "First Menu Item", InputClaimScope.Screen)
+        public static readonly InputAction FirstMenuItem = OneShot("first_menu_item", ModStrings.Actions.FirstMenuItem, InputClaimScope.Screen)
             .AddBinding(new KeyboardBinding(Key.Home));
 
-        public static readonly InputAction LastMenuItem = OneShot("last_menu_item", "Last Menu Item", InputClaimScope.Screen)
+        public static readonly InputAction LastMenuItem = OneShot("last_menu_item", ModStrings.Actions.LastMenuItem, InputClaimScope.Screen)
             .AddBinding(new KeyboardBinding(Key.End));
 
-        public static readonly InputAction NextHeading = OneShot("next_heading", "Next Heading", InputClaimScope.FocusedWidget)
+        public static readonly InputAction NextHeading = OneShot("next_heading", ModStrings.Actions.NextHeading, InputClaimScope.FocusedWidget)
             .AddBinding(new KeyboardBinding(Key.H));
 
-        public static readonly InputAction PreviousHeading = OneShot("previous_heading", "Previous Heading", InputClaimScope.FocusedWidget)
+        public static readonly InputAction PreviousHeading = OneShot("previous_heading", ModStrings.Actions.PreviousHeading, InputClaimScope.FocusedWidget)
             .AddBinding(new KeyboardBinding(Key.H, shift: true));
 
-        public static readonly InputAction MapMoveNorth = OneShot("map_move_north", "Map Move North", InputClaimScope.Screen)
+        public static readonly InputAction MapMoveNorth = OneShot("map_move_north", ModStrings.Actions.MapMoveNorth, InputClaimScope.Screen)
             .AddBinding(new KeyboardBinding(Key.UpArrow));
 
-        public static readonly InputAction MapMoveSouth = OneShot("map_move_south", "Map Move South", InputClaimScope.Screen)
+        public static readonly InputAction MapMoveSouth = OneShot("map_move_south", ModStrings.Actions.MapMoveSouth, InputClaimScope.Screen)
             .AddBinding(new KeyboardBinding(Key.DownArrow));
 
-        public static readonly InputAction MapMoveWest = OneShot("map_move_west", "Map Move West", InputClaimScope.Screen)
+        public static readonly InputAction MapMoveWest = OneShot("map_move_west", ModStrings.Actions.MapMoveWest, InputClaimScope.Screen)
             .AddBinding(new KeyboardBinding(Key.LeftArrow));
 
-        public static readonly InputAction MapMoveEast = OneShot("map_move_east", "Map Move East", InputClaimScope.Screen)
+        public static readonly InputAction MapMoveEast = OneShot("map_move_east", ModStrings.Actions.MapMoveEast, InputClaimScope.Screen)
             .AddBinding(new KeyboardBinding(Key.RightArrow));
 
-        public static readonly InputAction MapSecondaryAction = OneShot("map_secondary_action", "Map Secondary Action", InputClaimScope.FocusedWidget)
+        public static readonly InputAction MapSecondaryAction = OneShot("map_secondary_action", ModStrings.Actions.MapSecondaryAction, InputClaimScope.FocusedWidget)
             .AddBinding(new KeyboardBinding(Key.Backslash));
 
-        public static readonly InputAction NextWielder = OneShot("next_wielder", "Next Wielder", InputClaimScope.FocusedWidget)
+        public static readonly InputAction NextWielder = OneShot("next_wielder", ModStrings.Actions.NextWielder, InputClaimScope.FocusedWidget)
             .AddBinding(new KeyboardBinding(Key.W));
 
-        public static readonly InputAction NextSettlement = OneShot("next_settlement", "Next Settlement", InputClaimScope.FocusedWidget)
+        public static readonly InputAction NextSettlement = OneShot("next_settlement", ModStrings.Actions.NextSettlement, InputClaimScope.FocusedWidget)
             .AddBinding(new KeyboardBinding(Key.S));
 
-        public static readonly InputAction ScannerRefresh = OneShot("scanner_refresh", "Refresh Scanner", InputClaimScope.FocusedWidget)
+        public static readonly InputAction ScannerRefresh = OneShot("scanner_refresh", ModStrings.Actions.ScannerRefresh, InputClaimScope.FocusedWidget)
             .AddBinding(new KeyboardBinding(Key.End));
 
-        public static readonly InputAction ScannerPreviousCategory = OneShot("scanner_previous_category", "Previous Scanner Category", InputClaimScope.FocusedWidget)
+        public static readonly InputAction ScannerPreviousCategory = OneShot("scanner_previous_category", ModStrings.Actions.ScannerPreviousCategory, InputClaimScope.FocusedWidget)
             .AddBinding(new KeyboardBinding(Key.PageUp, ctrl: true));
 
-        public static readonly InputAction ScannerNextCategory = OneShot("scanner_next_category", "Next Scanner Category", InputClaimScope.FocusedWidget)
+        public static readonly InputAction ScannerNextCategory = OneShot("scanner_next_category", ModStrings.Actions.ScannerNextCategory, InputClaimScope.FocusedWidget)
             .AddBinding(new KeyboardBinding(Key.PageDown, ctrl: true));
 
-        public static readonly InputAction ScannerPreviousSubcategory = OneShot("scanner_previous_subcategory", "Previous Scanner Subcategory", InputClaimScope.FocusedWidget)
+        public static readonly InputAction ScannerPreviousSubcategory = OneShot("scanner_previous_subcategory", ModStrings.Actions.ScannerPreviousSubcategory, InputClaimScope.FocusedWidget)
             .AddBinding(new KeyboardBinding(Key.PageUp, shift: true));
 
-        public static readonly InputAction ScannerNextSubcategory = OneShot("scanner_next_subcategory", "Next Scanner Subcategory", InputClaimScope.FocusedWidget)
+        public static readonly InputAction ScannerNextSubcategory = OneShot("scanner_next_subcategory", ModStrings.Actions.ScannerNextSubcategory, InputClaimScope.FocusedWidget)
             .AddBinding(new KeyboardBinding(Key.PageDown, shift: true));
 
-        public static readonly InputAction ScannerPreviousResult = OneShot("scanner_previous_result", "Previous Scanner Result", InputClaimScope.FocusedWidget)
+        public static readonly InputAction ScannerPreviousResult = OneShot("scanner_previous_result", ModStrings.Actions.ScannerPreviousResult, InputClaimScope.FocusedWidget)
             .AddBinding(new KeyboardBinding(Key.PageUp));
 
-        public static readonly InputAction ScannerNextResult = OneShot("scanner_next_result", "Next Scanner Result", InputClaimScope.FocusedWidget)
+        public static readonly InputAction ScannerNextResult = OneShot("scanner_next_result", ModStrings.Actions.ScannerNextResult, InputClaimScope.FocusedWidget)
             .AddBinding(new KeyboardBinding(Key.PageDown));
 
-        public static readonly InputAction ScannerJumpToResult = OneShot("scanner_jump_to_result", "Jump To Scanner Result", InputClaimScope.FocusedWidget)
+        public static readonly InputAction ScannerJumpToResult = OneShot("scanner_jump_to_result", ModStrings.Actions.ScannerJumpToResult, InputClaimScope.FocusedWidget)
             .AddBinding(new KeyboardBinding(Key.Home));
 
-        public static readonly InputAction ScannerSpeakOrientation = OneShot("scanner_speak_orientation", "Scanner Result Orientation", InputClaimScope.FocusedWidget)
+        public static readonly InputAction ScannerSpeakOrientation = OneShot("scanner_speak_orientation", ModStrings.Actions.ScannerSpeakOrientation, InputClaimScope.FocusedWidget)
             .AddBinding(new KeyboardBinding(Key.Home, shift: true));
 
-        public static readonly InputAction SliderDecrease = OneShot("slider_decrease", "Slider Decrease", InputClaimScope.FocusedWidget)
+        public static readonly InputAction SliderDecrease = OneShot("slider_decrease", ModStrings.Actions.SliderDecrease, InputClaimScope.FocusedWidget)
             .AddBinding(new KeyboardBinding(Key.LeftArrow));
 
-        public static readonly InputAction SliderIncrease = OneShot("slider_increase", "Slider Increase", InputClaimScope.FocusedWidget)
+        public static readonly InputAction SliderIncrease = OneShot("slider_increase", ModStrings.Actions.SliderIncrease, InputClaimScope.FocusedWidget)
             .AddBinding(new KeyboardBinding(Key.RightArrow));
 
-        public static readonly InputAction SliderMinimum = OneShot("slider_minimum", "Slider Minimum", InputClaimScope.FocusedWidget)
+        public static readonly InputAction SliderMinimum = OneShot("slider_minimum", ModStrings.Actions.SliderMinimum, InputClaimScope.FocusedWidget)
             .AddBinding(new KeyboardBinding(Key.Home));
 
-        public static readonly InputAction SliderMaximum = OneShot("slider_maximum", "Slider Maximum", InputClaimScope.FocusedWidget)
+        public static readonly InputAction SliderMaximum = OneShot("slider_maximum", ModStrings.Actions.SliderMaximum, InputClaimScope.FocusedWidget)
             .AddBinding(new KeyboardBinding(Key.End));
 
-        public static readonly InputAction PreviousRow = OneShot("previous_row", "Previous Row", InputClaimScope.FocusedWidget)
+        public static readonly InputAction PreviousRow = OneShot("previous_row", ModStrings.Actions.PreviousRow, InputClaimScope.FocusedWidget)
             .AddBinding(new KeyboardBinding(Key.UpArrow));
 
-        public static readonly InputAction NextRow = OneShot("next_row", "Next Row", InputClaimScope.FocusedWidget)
+        public static readonly InputAction NextRow = OneShot("next_row", ModStrings.Actions.NextRow, InputClaimScope.FocusedWidget)
             .AddBinding(new KeyboardBinding(Key.DownArrow));
 
-        public static readonly InputAction PreviousColumn = OneShot("previous_column", "Previous Column", InputClaimScope.FocusedWidget)
+        public static readonly InputAction PreviousColumn = OneShot("previous_column", ModStrings.Actions.PreviousColumn, InputClaimScope.FocusedWidget)
             .AddBinding(new KeyboardBinding(Key.LeftArrow));
 
-        public static readonly InputAction NextColumn = OneShot("next_column", "Next Column", InputClaimScope.FocusedWidget)
+        public static readonly InputAction NextColumn = OneShot("next_column", ModStrings.Actions.NextColumn, InputClaimScope.FocusedWidget)
             .AddBinding(new KeyboardBinding(Key.RightArrow));
 
-        public static readonly InputAction FirstRow = OneShot("first_row", "First Row", InputClaimScope.FocusedWidget)
+        public static readonly InputAction FirstRow = OneShot("first_row", ModStrings.Actions.FirstRow, InputClaimScope.FocusedWidget)
             .AddBinding(new KeyboardBinding(Key.Home));
 
-        public static readonly InputAction LastRow = OneShot("last_row", "Last Row", InputClaimScope.FocusedWidget)
+        public static readonly InputAction LastRow = OneShot("last_row", ModStrings.Actions.LastRow, InputClaimScope.FocusedWidget)
             .AddBinding(new KeyboardBinding(Key.End));
 
-        public static readonly InputAction Activate = OneShot("activate", "Activate", InputClaimScope.Screen)
+        public static readonly InputAction Activate = OneShot("activate", ModStrings.Actions.Activate, InputClaimScope.Screen)
             .AddBinding(new KeyboardBinding(Key.Enter))
             .AddBinding(new KeyboardBinding(Key.NumpadEnter));
 
-        public static readonly InputAction StartDrag = OneShot("start_drag", "Start Drag", InputClaimScope.FocusedWidget)
+        public static readonly InputAction StartDrag = OneShot("start_drag", ModStrings.Actions.StartDrag, InputClaimScope.FocusedWidget)
             .AddBinding(new KeyboardBinding(Key.Space));
 
-        public static readonly InputAction Cancel = OneShot("cancel", "Cancel", InputClaimScope.Screen)
+        public static readonly InputAction Cancel = OneShot("cancel", ModStrings.Actions.Cancel, InputClaimScope.Screen)
             .AddBinding(new KeyboardBinding(Key.Escape));
 
-        public static readonly InputAction HexGridWest = OneShot("hex_grid_west", "Hex Grid West", InputClaimScope.FocusedWidget)
+        public static readonly InputAction HexGridWest = OneShot("hex_grid_west", ModStrings.Actions.HexGridWest, InputClaimScope.FocusedWidget)
             .AddBinding(new KeyboardBinding(Key.A));
 
-        public static readonly InputAction HexGridEast = OneShot("hex_grid_east", "Hex Grid East", InputClaimScope.FocusedWidget)
+        public static readonly InputAction HexGridEast = OneShot("hex_grid_east", ModStrings.Actions.HexGridEast, InputClaimScope.FocusedWidget)
             .AddBinding(new KeyboardBinding(Key.D));
 
-        public static readonly InputAction HexGridNorthWest = OneShot("hex_grid_north_west", "Hex Grid Northwest", InputClaimScope.FocusedWidget)
+        public static readonly InputAction HexGridNorthWest = OneShot("hex_grid_north_west", ModStrings.Actions.HexGridNorthWest, InputClaimScope.FocusedWidget)
             .AddBinding(new KeyboardBinding(Key.Q));
 
-        public static readonly InputAction HexGridNorthEast = OneShot("hex_grid_north_east", "Hex Grid Northeast", InputClaimScope.FocusedWidget)
+        public static readonly InputAction HexGridNorthEast = OneShot("hex_grid_north_east", ModStrings.Actions.HexGridNorthEast, InputClaimScope.FocusedWidget)
             .AddBinding(new KeyboardBinding(Key.E));
 
-        public static readonly InputAction HexGridSouthWest = OneShot("hex_grid_south_west", "Hex Grid Southwest", InputClaimScope.FocusedWidget)
+        public static readonly InputAction HexGridSouthWest = OneShot("hex_grid_south_west", ModStrings.Actions.HexGridSouthWest, InputClaimScope.FocusedWidget)
             .AddBinding(new KeyboardBinding(Key.Z));
 
-        public static readonly InputAction HexGridSouthEast = OneShot("hex_grid_south_east", "Hex Grid Southeast", InputClaimScope.FocusedWidget)
+        public static readonly InputAction HexGridSouthEast = OneShot("hex_grid_south_east", ModStrings.Actions.HexGridSouthEast, InputClaimScope.FocusedWidget)
             .AddBinding(new KeyboardBinding(Key.C));
 
-        public static readonly InputAction CombatInspect = OneShot("combat_inspect", "Inspect Combat Hex", InputClaimScope.FocusedWidget)
+        public static readonly InputAction CombatInspect = OneShot("combat_inspect", ModStrings.Actions.CombatInspect, InputClaimScope.FocusedWidget)
             .AddBinding(new KeyboardBinding(Key.I));
 
-        public static readonly InputAction CombatNextRelevantTile = OneShot("combat_next_relevant_tile", "Next Relevant Combat Tile", InputClaimScope.FocusedWidget)
+        public static readonly InputAction CombatNextRelevantTile = OneShot("combat_next_relevant_tile", ModStrings.Actions.CombatNextRelevantTile, InputClaimScope.FocusedWidget)
             .AddBinding(new KeyboardBinding(Key.W));
 
-        public static readonly InputAction CombatPreviousRelevantTile = OneShot("combat_previous_relevant_tile", "Previous Relevant Combat Tile", InputClaimScope.FocusedWidget)
+        public static readonly InputAction CombatPreviousRelevantTile = OneShot("combat_previous_relevant_tile", ModStrings.Actions.CombatPreviousRelevantTile, InputClaimScope.FocusedWidget)
             .AddBinding(new KeyboardBinding(Key.W, shift: true));
 
-        public static readonly InputAction CombatFocusTimeline = OneShot("combat_focus_timeline", "Focus Timeline", InputClaimScope.FocusedWidget)
+        public static readonly InputAction CombatFocusTimeline = OneShot("combat_focus_timeline", ModStrings.Actions.CombatFocusTimeline, InputClaimScope.FocusedWidget)
             .AddBinding(new KeyboardBinding(Key.T));
 
-        public static readonly InputAction ReadThreat = OneShot("read_threat", "Read Threat", InputClaimScope.FocusedWidget)
+        public static readonly InputAction ReadThreat = OneShot("read_threat", ModStrings.Actions.ReadThreat, InputClaimScope.FocusedWidget)
             .AddBinding(new KeyboardBinding(Key.S));
 
         public static readonly InputAction[] NON_GLOBAL_ACTIONS =
@@ -270,9 +271,9 @@ namespace SongsOfConquestAccess.Input
             Cancel
         };
 
-        private static InputAction OneShot(string key, string label, InputClaimScope claimScope)
+        private static InputAction OneShot(string key, ModString label, InputClaimScope claimScope)
         {
-            return new InputAction(key, label, claimScope, InputRepeatPolicy.OneShotUntilRelease());
+            return new InputAction(key, () => ModText.Get(label), claimScope, InputRepeatPolicy.OneShotUntilRelease());
         }
     }
 }

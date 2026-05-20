@@ -4,6 +4,7 @@ using HarmonyLib;
 using SongsOfConquest.Client.Menu;
 using SongsOfConquest.Common.Battle;
 using SongsOfConquestAccess.Adapters;
+using SongsOfConquestAccess.Localization;
 using SongsOfConquestAccess.UI;
 using UnityEngine;
 
@@ -65,7 +66,7 @@ namespace SongsOfConquestAccess.Screens
 
         private static ContainerWidget BuildRoot(PostBattleResultAdapter adapter)
         {
-            ContainerWidget root = new ContainerWidget("post-battle-result", "Battle result");
+            ContainerWidget root = new ContainerWidget("post-battle-result", ModText.Get(ModStrings.Screens.BattleResult));
             if (adapter == null)
             {
                 return root;
@@ -99,7 +100,7 @@ namespace SongsOfConquestAccess.Screens
                 AddXpWidget(root, adapter);
             }
 
-            AddEntryMenu(root, "post-battle-attacker-troops-lost", "Attacker troops lost", adapter.AttackerTroopsLost, adapter, addNoneWhenEmpty: true);
+            AddEntryMenu(root, "post-battle-attacker-troops-lost", adapter.AttackerCommanderText, adapter.AttackerTroopsLost, adapter, addNoneWhenEmpty: true);
 
             root.AddChild(new TextWidget(
                 "post-battle-attacker-returned-troops",
@@ -130,7 +131,7 @@ namespace SongsOfConquestAccess.Screens
                 AddXpWidget(root, adapter);
             }
 
-            AddEntryMenu(root, "post-battle-defender-troops-lost", "Defender troops lost", adapter.DefenderTroopsLost, adapter, addNoneWhenEmpty: true);
+            AddEntryMenu(root, "post-battle-defender-troops-lost", adapter.DefenderCommanderText, adapter.DefenderTroopsLost, adapter, addNoneWhenEmpty: true);
 
             root.AddChild(new TextWidget(
                 "post-battle-defender-returned-troops",
@@ -139,7 +140,7 @@ namespace SongsOfConquestAccess.Screens
                 includeParentLabelInAnnouncement: false,
                 isVisible: () => adapter.DefenderReturnedTroopsVisible));
 
-            AddEntryMenu(root, "post-battle-loot", "Loot", adapter.Loot, adapter, addNoneWhenEmpty: false);
+            AddEntryMenu(root, "post-battle-loot", GameText.Get("Adventure/AdventurePostBattleMenu/BattleLoot", string.Empty), adapter.Loot, adapter, addNoneWhenEmpty: false);
 
             root.AddChild(new ButtonWidget(
                 "post-battle-accept",
@@ -204,7 +205,7 @@ namespace SongsOfConquestAccess.Screens
 
                 menu.AddItem(new MenuItemWidget(
                     id + "-none",
-                    () => "None",
+                    () => ModText.Get(ModStrings.Screens.None),
                     getStatus: null,
                     activate: null,
                     onFocus: adapter.HideNativeTooltip,
@@ -260,7 +261,7 @@ namespace SongsOfConquestAccess.Screens
                 label = entry.Amount + " " + entry.Name;
             }
 
-            return string.IsNullOrWhiteSpace(label) ? string.Empty : label + " lost";
+            return string.IsNullOrWhiteSpace(label) ? string.Empty : ModText.Get(ModStrings.Screens.TroopLost, label);
         }
 
         private static PostBattleMenu FindActivePostBattleMenu()

@@ -1,6 +1,7 @@
 using System;
 using SongsOfConquestAccess.Adapters;
 using SongsOfConquestAccess.Input;
+using SongsOfConquestAccess.Localization;
 
 namespace SongsOfConquestAccess.UI
 {
@@ -65,7 +66,7 @@ namespace SongsOfConquestAccess.UI
         {
             if (!IsEnabled())
             {
-                return "disabled";
+                return ModText.Get(ModStrings.UI.StatusDisabled);
             }
 
             return _getStatus != null ? _getStatus() ?? string.Empty : string.Empty;

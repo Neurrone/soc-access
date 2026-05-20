@@ -1,11 +1,10 @@
+using SongsOfConquestAccess.Localization;
 using SongsOfConquestAccess.Speech;
 
 namespace SongsOfConquestAccess.Buffers
 {
     internal sealed class ReviewBufferController
     {
-        private const string BufferEmpty = "Buffer empty";
-
         private readonly ReviewBufferManager _buffers;
 
         public ReviewBufferController(ReviewBufferManager buffers)
@@ -53,11 +52,11 @@ namespace SongsOfConquestAccess.Buffers
             string line = buffer.CurrentLine;
             if (string.IsNullOrWhiteSpace(line))
             {
-                Speak(buffer.Label + ". " + BufferEmpty);
+                Speak(ModText.Get(ModStrings.UI.ReviewBufferLine, buffer.Label, ModText.Get(ModStrings.UI.BufferEmpty)));
                 return;
             }
 
-            Speak(buffer.Label + ". " + line);
+            Speak(ModText.Get(ModStrings.UI.ReviewBufferLine, buffer.Label, line));
         }
 
         private static void SpeakMove(ReviewBufferLineMove move)
@@ -70,7 +69,7 @@ namespace SongsOfConquestAccess.Buffers
             string line = move.Buffer.CurrentLine;
             if (string.IsNullOrWhiteSpace(line))
             {
-                Speak(BufferEmpty);
+                Speak(ModText.Get(ModStrings.UI.BufferEmpty));
                 return;
             }
 

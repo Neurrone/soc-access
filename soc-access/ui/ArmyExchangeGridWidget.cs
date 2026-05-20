@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using SongsOfConquestAccess.Adapters;
 using SongsOfConquestAccess.Input;
+using SongsOfConquestAccess.Localization;
 using SongsOfConquestAccess.Speech;
 
 namespace SongsOfConquestAccess.UI
@@ -28,8 +29,8 @@ namespace SongsOfConquestAccess.UI
             Action onCompletedDrop = null)
             : base(id)
         {
-            WielderArmyLabel = string.IsNullOrWhiteSpace(wielderArmyLabel) ? "wielder's army" : wielderArmyLabel;
-            JoiningArmyLabel = string.IsNullOrWhiteSpace(joiningArmyLabel) ? "joining army" : joiningArmyLabel;
+            WielderArmyLabel = string.IsNullOrWhiteSpace(wielderArmyLabel) ? ModText.Get(ModStrings.UI.WielderArmy) : wielderArmyLabel;
+            JoiningArmyLabel = string.IsNullOrWhiteSpace(joiningArmyLabel) ? ModText.Get(ModStrings.UI.JoiningArmy) : joiningArmyLabel;
             _drop = drop;
             _onCompletedDrop = onCompletedDrop;
             AddSlots(_wielderSlots, wielderSlots, WielderArmyLabel);
@@ -57,12 +58,12 @@ namespace SongsOfConquestAccess.UI
 
         public override string GetLabel()
         {
-            return "Army exchange grid";
+            return ModText.Get(ModStrings.UI.ArmyExchangeGrid);
         }
 
         public override string GetRole()
         {
-            return "grid";
+            return ModText.Get(ModStrings.UI.RoleGrid);
         }
 
         public override Widget GetFocusedWidget()
@@ -294,7 +295,7 @@ namespace SongsOfConquestAccess.UI
             }
 
             _dragSource = slot;
-            Speak("Started drag. Move to destination and press enter to drop.");
+            Speak(ModText.Get(ModStrings.UI.DragStarted));
             return true;
         }
 
@@ -303,13 +304,13 @@ namespace SongsOfConquestAccess.UI
             SlotWidget target = FocusedSlot;
             if (_dragSource == null)
             {
-                Speak("Press space to drag.");
+                Speak(ModText.Get(ModStrings.UI.PressSpaceToDrag));
                 return true;
             }
 
             if (target == null || ReferenceEquals(target, _dragSource))
             {
-                Speak("Invalid destination.");
+                Speak(ModText.Get(ModStrings.UI.InvalidDestination));
                 return true;
             }
 
@@ -319,7 +320,7 @@ namespace SongsOfConquestAccess.UI
                 TroopHudAdapter.DropResult result = _drop(source.Slot, target.Slot);
                 if (result == TroopHudAdapter.DropResult.InvalidDestination)
                 {
-                    Speak("Cannot drop there.");
+                    Speak(ModText.Get(ModStrings.UI.CannotDropThere));
                     return true;
                 }
 
@@ -348,7 +349,7 @@ namespace SongsOfConquestAccess.UI
 
             ClearDrag();
             NativeSoundUtility.PostEvent("Common_SpellbookEndDragCancel");
-            Speak("Drag cancelled.");
+            Speak(ModText.Get(ModStrings.UI.DragCancelled));
             return true;
         }
 
@@ -430,13 +431,13 @@ namespace SongsOfConquestAccess.UI
                     return string.Empty;
                 }
 
-                string slotLabel = _armyLabel + " slot " + _slot.SlotNumber;
+                string slotLabel = ModText.Get(ModStrings.UI.SlotInGroup, _armyLabel, _slot.SlotNumber);
                 if (!_slot.IsOccupied)
                 {
-                    return "Empty, " + slotLabel;
+                    return ModText.Get(ModStrings.Common.ListSeparator, ModText.Get(ModStrings.UI.Empty), slotLabel);
                 }
 
-                return _slot.TroopName + ", " + _slot.CurrentSize + " / " + _slot.MaxSize + ", " + slotLabel;
+                return ModText.Get(ModStrings.UI.TroopSlotWithSize, _slot.TroopName, _slot.CurrentSize, _slot.MaxSize, slotLabel);
             }
 
             public override string GetStatus()
@@ -448,10 +449,10 @@ namespace SongsOfConquestAccess.UI
 
                 if (_grid._dragSource != null)
                 {
-                    return ReferenceEquals(_grid._dragSource, this) ? "dragging" : string.Empty;
+                    return ReferenceEquals(_grid._dragSource, this) ? ModText.Get(ModStrings.UI.StatusDragging) : string.Empty;
                 }
 
-                return "draggable";
+                return ModText.Get(ModStrings.UI.StatusDraggable);
             }
 
             public override bool ClaimsAction(string actionKey)

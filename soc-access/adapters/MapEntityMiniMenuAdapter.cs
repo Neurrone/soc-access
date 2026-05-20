@@ -9,6 +9,7 @@ using SongsOfConquest.Common.Entities;
 using SongsOfConquest.Common.GameActions;
 using SongsOfConquest.Common.Gamestate;
 using SongsOfConquest.Common.Localization;
+using SongsOfConquestAccess.Localization;
 using SongsOfConquestAccess.Speech;
 using UnityEngine;
 using UnityEngine.UI;
@@ -300,13 +301,7 @@ namespace SongsOfConquestAccess.Adapters
         private string GetLocalizedText(string key, string fallback)
         {
             ILocalizationHandler localization = Localization;
-            if (localization == null || string.IsNullOrWhiteSpace(key))
-            {
-                return fallback ?? string.Empty;
-            }
-
-            string text = SpeechTextSanitizer.Normalize(localization.GetText(key));
-            return string.IsNullOrWhiteSpace(text) ? fallback ?? string.Empty : text;
+            return SpeechTextSanitizer.Normalize(GameText.Get(localization, key, fallback ?? string.Empty));
         }
 
         private void GetUpgradeCounts(out int used, out int total)

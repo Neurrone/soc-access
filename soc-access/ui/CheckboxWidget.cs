@@ -1,6 +1,7 @@
 using System;
 using SongsOfConquestAccess.Adapters;
 using SongsOfConquestAccess.Input;
+using SongsOfConquestAccess.Localization;
 using SongsOfConquestAccess.Speech;
 
 namespace SongsOfConquestAccess.UI
@@ -54,17 +55,19 @@ namespace SongsOfConquestAccess.UI
 
         public override string GetRole()
         {
-            return "check box";
+            return ModText.Get(ModStrings.UI.RoleCheckBox);
         }
 
         public override string GetStatus()
         {
             if (!IsEnabled())
             {
-                return "disabled";
+                return ModText.Get(ModStrings.UI.StatusDisabled);
             }
 
-            return IsChecked() ? "checked" : "unchecked";
+            return IsChecked()
+                ? ModText.Get(ModStrings.UI.StatusChecked)
+                : ModText.Get(ModStrings.UI.StatusUnchecked);
         }
 
         public override Tooltip GetTooltip()

@@ -60,7 +60,7 @@ namespace SongsOfConquestAccess.Adapters
                 string name = _facade != null && _facade.Commanders != null && commanderId >= 0
                     ? _facade.Commanders.GetName(commanderId)
                     : string.Empty;
-                return string.IsNullOrWhiteSpace(name) ? "Wielder" : SpeechTextSanitizer.Normalize(name);
+                return SpeechTextSanitizer.Normalize(name);
             }
         }
 
@@ -131,7 +131,7 @@ namespace SongsOfConquestAccess.Adapters
 
         public string CloseLabel
         {
-            get { return "Close"; }
+            get { return string.Empty; }
         }
 
         public bool BackToTop()

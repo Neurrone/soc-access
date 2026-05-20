@@ -10,5 +10,4 @@ In rough order of descending priority:
 - Withdrawing from battle may leave the mod stuck on the troop placement screen, instead of returning to the adventure map. I've not been able to reproduce this though.
 - In the options menu, changing the game's keybindings and the bug report screen is currently not supported
 - The minimap on the adventure map screen showing objectives relative to you is currently not exposed. This is pending me figuring out how to do so without directly giving coordinates away
-- Strings in the mod don't localize to other languages
 - Multiplayer is currently not supported

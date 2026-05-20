@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using SongsOfConquestAccess.Adapters;
+using SongsOfConquestAccess.Localization;
 using SongsOfConquestAccess.Speech;
 
 namespace SongsOfConquestAccess.UI
@@ -27,7 +28,7 @@ namespace SongsOfConquestAccess.UI
                     TroopHudAdapter.DropResult result = sourceSlot.DropTo(targetSlot);
                     if (result == TroopHudAdapter.DropResult.InvalidDestination)
                     {
-                        Speak("Cannot drop there.");
+                        Speak(ModText.Get(ModStrings.UI.CannotDropThere));
                     }
 
                     return result == TroopHudAdapter.DropResult.Completed
@@ -65,18 +66,18 @@ namespace SongsOfConquestAccess.UI
                 return string.Empty;
             }
 
-            string slotLabel = "slot " + item.SlotNumber;
+            string slotLabel = ModText.Get(ModStrings.UI.Slot, item.SlotNumber);
             if (!item.IsOccupied)
             {
-                return "Empty troop " + slotLabel;
+                return ModText.Get(ModStrings.UI.EmptyTroopSlot, slotLabel);
             }
 
             if (item.CurrentSize > 0 && item.MaxSize > 0)
             {
-                return item.TroopName + ", " + item.CurrentSize + " / " + item.MaxSize + ", " + slotLabel;
+                return ModText.Get(ModStrings.UI.TroopSlotWithSize, item.TroopName, item.CurrentSize, item.MaxSize, slotLabel);
             }
 
-            return item.TroopName + ", " + slotLabel;
+            return ModText.Get(ModStrings.UI.TroopSlot, item.TroopName, slotLabel);
         }
 
         private static void Speak(string text)

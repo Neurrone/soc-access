@@ -11,6 +11,7 @@ using SongsOfConquest.Client.UI;
 using SongsOfConquest.Common.Entities;
 using SongsOfConquest.Common.Gamestate;
 using SongsOfConquest.Common.Localization;
+using SongsOfConquestAccess.Localization;
 using SongsOfConquestAccess.Speech;
 using UnityEngine;
 
@@ -142,7 +143,7 @@ namespace SongsOfConquestAccess.Adapters
         public string GetTutorialButtonLabel()
         {
             string label = GetButtonLabel(GetTutorialButton());
-            return string.IsNullOrWhiteSpace(label) ? "Tutorial available" : label;
+            return label;
         }
 
         public bool IsTutorialButtonVisible()
@@ -160,8 +161,7 @@ namespace SongsOfConquestAccess.Adapters
         {
             get
             {
-                string label = GetButtonLabel(GetDraftButton());
-                return string.IsNullOrWhiteSpace(label) ? "Draft troops" : label;
+                return GetButtonLabel(GetDraftButton());
             }
         }
 
@@ -169,8 +169,7 @@ namespace SongsOfConquestAccess.Adapters
         {
             get
             {
-                string label = GetButtonLabel(GetUpgradeButton());
-                return string.IsNullOrWhiteSpace(label) ? "Upgrade troops" : label;
+                return GetButtonLabel(GetUpgradeButton());
             }
         }
 
@@ -251,7 +250,7 @@ namespace SongsOfConquestAccess.Adapters
             get
             {
                 string label = GetButtonLabel(GetField<UIButton>(_menu, CloseButtonField));
-                return string.IsNullOrWhiteSpace(label) ? "Close" : label;
+                return label;
             }
         }
 
@@ -373,8 +372,7 @@ namespace SongsOfConquestAccess.Adapters
 
         private string GetLocalizedText(string key, string fallback)
         {
-            string text = _localization != null ? _localization.GetText(key) : string.Empty;
-            return string.IsNullOrWhiteSpace(text) || text == key ? fallback : SpeechTextSanitizer.Normalize(text);
+            return SpeechTextSanitizer.Normalize(GameText.Get(_localization, key, fallback));
         }
 
         private static bool IsButtonEnabled(UIButton button)
@@ -423,7 +421,7 @@ namespace SongsOfConquestAccess.Adapters
                         return SpeechTextSanitizer.Normalize(string.Join(". ", tooltip.TextLines));
                     }
 
-                    return "Tower " + _number;
+                    return ModText.Get(ModStrings.Screens.Tower, _number);
                 }
             }
 

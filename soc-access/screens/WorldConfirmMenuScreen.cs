@@ -4,6 +4,7 @@ using HarmonyLib;
 using SongsOfConquest.Client.Adventure;
 using SongsOfConquestAccess.Adapters;
 using SongsOfConquestAccess.Input;
+using SongsOfConquestAccess.Localization;
 using SongsOfConquestAccess.UI;
 using UnityEngine;
 using Zenject;
@@ -64,7 +65,7 @@ namespace SongsOfConquestAccess.Screens
             string title = adapter != null ? adapter.Title : string.Empty;
             ContainerWidget root = new ContainerWidget(
                 "world-confirm-menu",
-                string.IsNullOrWhiteSpace(title) ? "World confirmation menu" : title);
+                string.IsNullOrWhiteSpace(title) ? ModText.Get(ModStrings.Screens.WorldConfirmationMenu) : title);
 
             if (adapter == null)
             {

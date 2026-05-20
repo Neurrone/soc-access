@@ -7,6 +7,7 @@ using SongsOfConquest.Client.Gamestate.Facade;
 using SongsOfConquest.Common.Gamestate.Facade;
 using SongsOfConquestAccess.Adapters;
 using SongsOfConquestAccess.Input;
+using SongsOfConquestAccess.Localization;
 using SongsOfConquestAccess.UI;
 using UnityEngine;
 using Zenject;
@@ -26,7 +27,7 @@ namespace SongsOfConquestAccess.Screens
         private Action<OnTroopsUpdatedPayload> _troopsUpdatedHandler;
 
         public TradingScreen(TradingMenuAdapter adapter)
-            : base(new ContainerWidget("trade-screen", adapter != null ? adapter.Title : "Trade"))
+            : base(new ContainerWidget("trade-screen", adapter != null ? adapter.Title : string.Empty))
         {
             _adapter = adapter;
             RootWidget = BuildRoot(_adapter, RefreshAndAnnounceFocus);
@@ -236,14 +237,14 @@ namespace SongsOfConquestAccess.Screens
 
         private static ContainerWidget BuildRoot(TradingMenuAdapter adapter, Action onCompletedDrop)
         {
-            ContainerWidget root = new ContainerWidget("trade-screen", adapter != null ? adapter.Title : "Trade");
+            ContainerWidget root = new ContainerWidget("trade-screen", adapter != null ? adapter.Title : string.Empty);
             if (adapter == null)
             {
                 return root;
             }
 
             root.AddChild(BuildPortrait(adapter, left: true));
-            root.AddChild(BuildMenu("trade-left-stats", adapter.LeftCommanderName + "'s stats", GetItemsSafely("Left stats", () => adapter.GetStats(left: true)), adapter.HideNativeTooltip));
+            root.AddChild(BuildMenu("trade-left-stats", ModText.Get(ModStrings.Screens.WielderStats, adapter.LeftCommanderName), GetItemsSafely("Left stats", () => adapter.GetStats(left: true)), adapter.HideNativeTooltip));
             root.AddChild(BuildModifierCategoryMenu(adapter, left: true));
             root.AddChild(BuildMenu("trade-left-active-modifiers", adapter.GetActiveModifierListLabel(left: true), GetItemsSafely("Left active modifiers", () => adapter.GetActiveModifiers(left: true)), adapter.HideNativeTooltip));
 
@@ -262,13 +263,13 @@ namespace SongsOfConquestAccess.Screens
                 onCompletedDrop));
 
             root.AddChild(BuildPortrait(adapter, left: false));
-            root.AddChild(BuildMenu("trade-right-stats", adapter.RightCommanderName + "'s stats", GetItemsSafely("Right stats", () => adapter.GetStats(left: false)), adapter.HideNativeTooltip));
+            root.AddChild(BuildMenu("trade-right-stats", ModText.Get(ModStrings.Screens.WielderStats, adapter.RightCommanderName), GetItemsSafely("Right stats", () => adapter.GetStats(left: false)), adapter.HideNativeTooltip));
             root.AddChild(BuildModifierCategoryMenu(adapter, left: false));
             root.AddChild(BuildMenu("trade-right-active-modifiers", adapter.GetActiveModifierListLabel(left: false), GetItemsSafely("Right active modifiers", () => adapter.GetActiveModifiers(left: false)), adapter.HideNativeTooltip));
 
             root.AddChild(new ButtonWidget(
                 "trade-close",
-                "Close",
+                ModText.Get(ModStrings.Screens.Close),
                 adapter.Close,
                 adapter.HideNativeTooltip,
                 () => true));
@@ -329,9 +330,9 @@ namespace SongsOfConquestAccess.Screens
 
         private static string BuildInventorySlotLabel(InventorySlotInfo slot, bool includeOwnerName)
         {
-            string name = !slot.IsEmpty ? slot.ArtifactName : "empty";
+            string name = !slot.IsEmpty ? slot.ArtifactName : ModText.Get(ModStrings.Screens.Empty);
             string location = slot.IsBackpackSlot
-                ? slot.InventoryName + " slot " + (slot.PositionIndex + 1)
+                ? ModText.Get(ModStrings.UI.SlotInGroup, slot.InventoryName, slot.PositionIndex + 1)
                 : slot.SlotName;
             string ownerName = includeOwnerName ? slot.OwnerName : string.Empty;
             return MenuButtonTextUtility.JoinParts(name, location, ownerName);
@@ -363,7 +364,9 @@ namespace SongsOfConquestAccess.Screens
 
         private static string BuildArmyLabel(string commanderName)
         {
-            return string.IsNullOrWhiteSpace(commanderName) ? "army" : commanderName + " army";
+            return string.IsNullOrWhiteSpace(commanderName)
+                ? ModText.Get(ModStrings.Screens.Army)
+                : ModText.Get(ModStrings.Screens.NamedArmy, commanderName);
         }
 
         private static TroopHudAdapter.DropResult DropArmySlot(TroopHudAdapter.SlotItem source, TroopHudAdapter.SlotItem target)
@@ -395,7 +398,7 @@ namespace SongsOfConquestAccess.Screens
                 SocAccessPlugin.Instance?.LogWarning("TradingScreen section " + section + " failed to build: " + ex);
                 return new TradingMenuAdapter.LabeledItem[]
                 {
-                    new TradingMenuAdapter.LabeledItem(section.ToLowerInvariant() + "-error", "Unavailable")
+                    new TradingMenuAdapter.LabeledItem(section.ToLowerInvariant() + "-error", ModText.Get(ModStrings.Screens.Unavailable))
                 };
             }
         }
@@ -405,7 +408,7 @@ namespace SongsOfConquestAccess.Screens
             string side = left ? "left" : "right";
             MenuWidget menu = new MenuWidget(
                 "trade-" + side + "-modifier-tabs",
-                (left ? adapter.LeftCommanderName : adapter.RightCommanderName) + "'s modifier categories");
+                ModText.Get(ModStrings.Screens.WielderModifierCategories, left ? adapter.LeftCommanderName : adapter.RightCommanderName));
             string activeId = null;
             foreach (TradingMenuAdapter.ModifierCategory category in adapter.GetModifierCategories(left))
             {
@@ -452,7 +455,7 @@ namespace SongsOfConquestAccess.Screens
             {
                 menu.AddItem(new MenuItemWidget(
                     id + "-none",
-                    () => "None",
+                    () => ModText.Get(ModStrings.Screens.None),
                     null,
                     () => false,
                     emptyItemFocus,

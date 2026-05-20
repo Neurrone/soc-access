@@ -1,6 +1,7 @@
 using HarmonyLib;
 using SongsOfConquest.Client.Adventure.UI;
 using SongsOfConquestAccess.Adapters;
+using SongsOfConquestAccess.Localization;
 using SongsOfConquestAccess.UI;
 using UnityEngine;
 
@@ -58,7 +59,7 @@ namespace SongsOfConquestAccess.Screens
 
         private static ContainerWidget BuildRoot(MoveTroopPopupAdapter adapter)
         {
-            ContainerWidget root = new ContainerWidget("move-troop-popup", "Move troops");
+            ContainerWidget root = new ContainerWidget("move-troop-popup", adapter != null ? adapter.Title : string.Empty);
             if (adapter == null)
             {
                 return root;
@@ -78,7 +79,7 @@ namespace SongsOfConquestAccess.Screens
 
             root.AddChild(new ButtonWidget(
                 "move-troop-move-all-left",
-                "Move all left",
+                adapter.MoveAllLeftLabel,
                 adapter.MoveAllLeft,
                 adapter.HideNativeTooltip,
                 adapter.IsMoveAllLeftEnabled,
@@ -86,7 +87,7 @@ namespace SongsOfConquestAccess.Screens
 
             root.AddChild(new ButtonWidget(
                 "move-troop-split-equal",
-                "Split equally",
+                adapter.SplitEqualLabel,
                 adapter.SplitEqual,
                 adapter.HideNativeTooltip,
                 adapter.IsSplitEqualEnabled,
@@ -94,7 +95,7 @@ namespace SongsOfConquestAccess.Screens
 
             root.AddChild(new ButtonWidget(
                 "move-troop-move-all-right",
-                "Move all right",
+                adapter.MoveAllRightLabel,
                 adapter.MoveAllRight,
                 adapter.HideNativeTooltip,
                 adapter.IsMoveAllRightEnabled,
@@ -108,7 +109,7 @@ namespace SongsOfConquestAccess.Screens
             // "Left: X, right: Y" distribution.
             root.AddChild(new SliderWidget(
                 "move-troop-distribution",
-                "troop distribution",
+                ModText.Get(ModStrings.Screens.TroopDistribution),
                 adapter.GetDistributionText,
                 adapter.GetSliderValue,
                 adapter.GetSliderMinimum,
@@ -119,14 +120,14 @@ namespace SongsOfConquestAccess.Screens
 
             root.AddChild(new ButtonWidget(
                 "move-troop-ok",
-                "OK",
+                ModText.Get(ModStrings.Screens.Ok),
                 adapter.Confirm,
                 adapter.HideNativeTooltip,
                 () => adapter.IsPresent()));
 
             root.AddChild(new ButtonWidget(
                 "move-troop-cancel",
-                "Cancel",
+                ModText.Get(ModStrings.Actions.Cancel),
                 adapter.Cancel,
                 adapter.HideNativeTooltip,
                 () => adapter.IsPresent()));

@@ -1,4 +1,5 @@
 using SongsOfConquest.Client.UI;
+using SongsOfConquestAccess.Localization;
 using SongsOfConquestAccess.Speech;
 using TMPro;
 
@@ -36,7 +37,7 @@ namespace SongsOfConquestAccess.UI
             field.Select();
             field.ActivateInputField();
             ResetBaseline();
-            Speak("Editing, " + FormatValue(_cachedValue));
+            Speak(ModText.Get(ModStrings.UI.Editing, FormatValue(_cachedValue)));
             return true;
         }
 
@@ -98,7 +99,7 @@ namespace SongsOfConquestAccess.UI
                 _inputField.DeactivateInputField();
             }
 
-            Speak("Done editing, " + FormatValue(_field != null ? _field.InputFieldValue : null));
+            Speak(ModText.Get(ModStrings.UI.DoneEditing, FormatValue(_field != null ? _field.InputFieldValue : null)));
             Clear();
         }
 
@@ -120,7 +121,7 @@ namespace SongsOfConquestAccess.UI
                 _inputField.DeactivateInputField();
             }
 
-            Speak("Cancelled, " + FormatValue(_cachedValue));
+            Speak(ModText.Get(ModStrings.UI.CancelledEditing, FormatValue(_cachedValue)));
             Clear();
         }
 
@@ -215,7 +216,7 @@ namespace SongsOfConquestAccess.UI
         {
             if (string.IsNullOrEmpty(text) || caret < 0 || caret >= text.Length)
             {
-                Speak("blank");
+                Speak(ModText.Get(ModStrings.UI.Blank));
                 return;
             }
 
@@ -247,14 +248,14 @@ namespace SongsOfConquestAccess.UI
 
         private static string FormatValue(string value)
         {
-            return string.IsNullOrEmpty(value) ? "blank" : value;
+            return string.IsNullOrEmpty(value) ? ModText.Get(ModStrings.UI.Blank) : value;
         }
 
         private static string FormatSubstring(string value)
         {
             if (string.IsNullOrEmpty(value))
             {
-                return "blank";
+                return ModText.Get(ModStrings.UI.Blank);
             }
 
             return value.Length == 1 ? FormatCharacter(value[0]) : value;
@@ -265,21 +266,21 @@ namespace SongsOfConquestAccess.UI
             switch (value)
             {
                 case ' ':
-                    return "space";
+                    return ModText.Get(ModStrings.UI.CharacterSpace);
                 case '\t':
-                    return "tab";
+                    return ModText.Get(ModStrings.UI.CharacterTab);
                 case '_':
-                    return "underscore";
+                    return ModText.Get(ModStrings.UI.CharacterUnderscore);
                 case '-':
-                    return "dash";
+                    return ModText.Get(ModStrings.UI.CharacterDash);
                 case '.':
-                    return "dot";
+                    return ModText.Get(ModStrings.UI.CharacterDot);
                 case ',':
-                    return "comma";
+                    return ModText.Get(ModStrings.UI.CharacterComma);
                 case ':':
-                    return "colon";
+                    return ModText.Get(ModStrings.UI.CharacterColon);
                 case ';':
-                    return "semicolon";
+                    return ModText.Get(ModStrings.UI.CharacterSemicolon);
                 default:
                     return value.ToString();
             }

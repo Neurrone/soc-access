@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using SongsOfConquestAccess.Localization;
 using SongsOfConquestAccess.Speech;
 using UnityEngine;
 
@@ -612,20 +613,20 @@ namespace SongsOfConquestAccess.Scanner
             int y = target.y - origin.y;
             if (y > 0)
             {
-                result.Add(new ScannerDirectionStep(y, "north"));
+                result.Add(new ScannerDirectionStep(y, ModText.Get(ModStrings.Scanner.North)));
             }
             else if (y < 0)
             {
-                result.Add(new ScannerDirectionStep(-y, "south"));
+                result.Add(new ScannerDirectionStep(-y, ModText.Get(ModStrings.Scanner.South)));
             }
 
             if (x > 0)
             {
-                result.Add(new ScannerDirectionStep(x, "east"));
+                result.Add(new ScannerDirectionStep(x, ModText.Get(ModStrings.Scanner.East)));
             }
             else if (x < 0)
             {
-                result.Add(new ScannerDirectionStep(-x, "west"));
+                result.Add(new ScannerDirectionStep(-x, ModText.Get(ModStrings.Scanner.West)));
             }
 
             return result;
@@ -664,12 +665,12 @@ namespace SongsOfConquestAccess.Scanner
             };
             string[] directions =
             {
-                "east",
-                "west",
-                "northeast",
-                "northwest",
-                "southeast",
-                "southwest"
+                ModText.Get(ModStrings.Scanner.East),
+                ModText.Get(ModStrings.Scanner.West),
+                ModText.Get(ModStrings.Scanner.Northeast),
+                ModText.Get(ModStrings.Scanner.Northwest),
+                ModText.Get(ModStrings.Scanner.Southeast),
+                ModText.Get(ModStrings.Scanner.Southwest)
             };
 
             int bestIndex = 0;

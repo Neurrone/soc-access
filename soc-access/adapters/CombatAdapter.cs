@@ -27,6 +27,7 @@ using SongsOfConquest.Common.Spells;
 using SongsOfConquest.Server.Bacterias;
 using SongsOfConquest.Server.Battle;
 using SongsOfConquestAccess.Events.Combat;
+using SongsOfConquestAccess.Localization;
 using SongsOfConquestAccess.Scanner;
 using SongsOfConquestAccess.Speech;
 using SongsOfConquestAccess.Speech.Spatial;
@@ -441,25 +442,26 @@ namespace SongsOfConquestAccess.Adapters
 
         private static void InitializeCombatScannerCategories(ScannerSnapshot snapshot)
         {
-            ScannerCategory troops = snapshot.GetOrAddCategory("Troops");
-            troops.GetOrAddSubcategory("All");
-            troops.GetOrAddSubcategory("Friendly");
-            troops.GetOrAddSubcategory("Enemy");
+            ScannerCategory troops = snapshot.GetOrAddCategory(ModText.Get(ModStrings.Scanner.Troops));
+            troops.GetOrAddSubcategory(ModText.Get(ModStrings.Scanner.All));
+            troops.GetOrAddSubcategory(ModText.Get(ModStrings.Scanner.Friendly));
+            troops.GetOrAddSubcategory(ModText.Get(ModStrings.Scanner.Enemy));
 
-            ScannerCategory entities = snapshot.GetOrAddCategory("Entities");
-            entities.GetOrAddSubcategory("All");
-            entities.GetOrAddSubcategory("Friendly gates");
-            entities.GetOrAddSubcategory("Enemy gates");
-            entities.GetOrAddSubcategory("Attackable");
-            entities.GetOrAddSubcategory("Dangerous");
+            ScannerCategory entities = snapshot.GetOrAddCategory(ModText.Get(ModStrings.Scanner.Entities));
+            entities.GetOrAddSubcategory(ModText.Get(ModStrings.Scanner.All));
+            entities.GetOrAddSubcategory(ModText.Get(ModStrings.Scanner.FriendlyGates));
+            entities.GetOrAddSubcategory(ModText.Get(ModStrings.Scanner.EnemyGates));
+            entities.GetOrAddSubcategory(ModText.Get(ModStrings.Scanner.Attackable));
+            entities.GetOrAddSubcategory(ModText.Get(ModStrings.Scanner.Dangerous));
 
-            ScannerCategory terrain = snapshot.GetOrAddCategory("Terrain");
-            terrain.GetOrAddSubcategory("Elevated ground 1");
-            terrain.GetOrAddSubcategory("Elevated ground 2");
-            terrain.GetOrAddSubcategory("Elevated ground 3");
-            terrain.GetOrAddSubcategory("Impassable terrain");
+            ScannerCategory terrain = snapshot.GetOrAddCategory(ModText.Get(ModStrings.Scanner.Terrain));
+            terrain.GetOrAddSubcategory(ModText.Get(ModStrings.Scanner.ElevatedGround, 1));
+            terrain.GetOrAddSubcategory(ModText.Get(ModStrings.Scanner.ElevatedGround, 2));
+            terrain.GetOrAddSubcategory(ModText.Get(ModStrings.Scanner.ElevatedGround, 3));
+            terrain.GetOrAddSubcategory(ModText.Get(ModStrings.Scanner.ImpassableTerrain));
 
-            snapshot.GetOrAddCategory("Obstacles").GetOrAddSubcategory("Blocked");
+            snapshot.GetOrAddCategory(ModText.Get(ModStrings.Scanner.Obstacles))
+                .GetOrAddSubcategory(ModText.Get(ModStrings.Scanner.Blocked));
         }
 
         private void AddCombatTroopScannerResults(ScannerSnapshot snapshot)
@@ -487,8 +489,8 @@ namespace SongsOfConquestAccess.Adapters
                             ScannerTileKey(friendly ? "troop:friendly" : "troop:enemy", point),
                             FormatTroopGridLabel(tile.Troop),
                             point);
-                        snapshot.Add("Troops", "All", CloneResult(result));
-                        snapshot.Add("Troops", friendly ? "Friendly" : "Enemy", result);
+                        snapshot.Add(ModText.Get(ModStrings.Scanner.Troops), ModText.Get(ModStrings.Scanner.All), CloneResult(result));
+                        snapshot.Add(ModText.Get(ModStrings.Scanner.Troops), friendly ? ModText.Get(ModStrings.Scanner.Friendly) : ModText.Get(ModStrings.Scanner.Enemy), result);
                     }
                 }
             }
@@ -516,8 +518,8 @@ namespace SongsOfConquestAccess.Adapters
                                 ScannerTileKey(IsFriendlyMapEntity(mapEntity) ? "gate:friendly" : "gate:enemy", point),
                                 GetMapEntityName(mapEntity),
                                 point);
-                            snapshot.Add("Entities", "All", CloneResult(result));
-                            snapshot.Add("Entities", IsFriendlyMapEntity(mapEntity) ? "Friendly gates" : "Enemy gates", result);
+                            snapshot.Add(ModText.Get(ModStrings.Scanner.Entities), ModText.Get(ModStrings.Scanner.All), CloneResult(result));
+                            snapshot.Add(ModText.Get(ModStrings.Scanner.Entities), IsFriendlyMapEntity(mapEntity) ? ModText.Get(ModStrings.Scanner.FriendlyGates) : ModText.Get(ModStrings.Scanner.EnemyGates), result);
                         }
                         else if (tile.Entity != null)
                         {
@@ -525,8 +527,8 @@ namespace SongsOfConquestAccess.Adapters
                                 ScannerTileKey("entity:attackable", point),
                                 GetMapEntityName(tile.Entity),
                                 point);
-                            snapshot.Add("Entities", "All", CloneResult(result));
-                            snapshot.Add("Entities", "Attackable", result);
+                            snapshot.Add(ModText.Get(ModStrings.Scanner.Entities), ModText.Get(ModStrings.Scanner.All), CloneResult(result));
+                            snapshot.Add(ModText.Get(ModStrings.Scanner.Entities), ModText.Get(ModStrings.Scanner.Attackable), result);
                         }
                         else if (IsDangerousMapEntity(mapEntity))
                         {
@@ -534,8 +536,8 @@ namespace SongsOfConquestAccess.Adapters
                                 ScannerTileKey("entity:dangerous", point),
                                 GetMapEntityName(mapEntity),
                                 point);
-                            snapshot.Add("Entities", "All", CloneResult(result));
-                            snapshot.Add("Entities", "Dangerous", result);
+                            snapshot.Add(ModText.Get(ModStrings.Scanner.Entities), ModText.Get(ModStrings.Scanner.All), CloneResult(result));
+                            snapshot.Add(ModText.Get(ModStrings.Scanner.Entities), ModText.Get(ModStrings.Scanner.Dangerous), result);
                         }
                     }
                 }
@@ -561,12 +563,12 @@ namespace SongsOfConquestAccess.Adapters
                         {
                             ScannerResult result = new ScannerResult(
                                 ScannerTileKey("terrain:elevated:" + elevation, point),
-                                "elevated ground, height " + elevation,
+                                ModText.Get(ModStrings.Spatial.ElevatedGroundHeight, elevation),
                                 point)
                             {
                                 Kind = ScannerResultKind.TerrainPoint
                             };
-                            snapshot.Add("Terrain", "Elevated ground " + elevation, result);
+                            snapshot.Add(ModText.Get(ModStrings.Scanner.Terrain), ModText.Get(ModStrings.Scanner.ElevatedGround, elevation), result);
                         }
                     }
                 }
@@ -587,18 +589,18 @@ namespace SongsOfConquestAccess.Adapters
                     {
                         ScannerResult result = new ScannerResult(
                             ScannerTileKey("terrain:impassable", point),
-                            "impassable",
+                            ModText.Get(ModStrings.Spatial.Impassable),
                             point)
                         {
                             Kind = ScannerResultKind.TerrainPoint
                         };
-                        snapshot.Add("Terrain", "Impassable terrain", result);
+                        snapshot.Add(ModText.Get(ModStrings.Scanner.Terrain), ModText.Get(ModStrings.Scanner.ImpassableTerrain), result);
                     }
 
                     if (tile.IsBlocked)
                     {
-                        snapshot.Add("Obstacles", "Blocked",
-                            new ScannerResult(ScannerTileKey("obstacle:blocked", point), "blocked", point));
+                        snapshot.Add(ModText.Get(ModStrings.Scanner.Obstacles), ModText.Get(ModStrings.Scanner.Blocked),
+                            new ScannerResult(ScannerTileKey("obstacle:blocked", point), ModText.Get(ModStrings.Spatial.Blocked), point));
                     }
                 }
             }
@@ -926,11 +928,19 @@ namespace SongsOfConquestAccess.Adapters
             int selectionCount = CountSpellTargetSelections(point);
             if (selectionCount > previousSelectionCount)
             {
-                SpeechPipeline.Output(new SpeechRequest(selectionCount > 1 ? "selected " + selectionCount + "x" : "selected", interrupt: false));
+                SpeechPipeline.Output(new SpeechRequest(
+                    selectionCount > 1
+                        ? ModText.Get(ModStrings.UI.SelectedCount, selectionCount)
+                        : ModText.Get(ModStrings.UI.Selected),
+                    interrupt: false));
             }
             else if (selectionCount < previousSelectionCount && GetTargetingMode() == CombatTargetingMode.Spell)
             {
-                SpeechPipeline.Output(new SpeechRequest(selectionCount > 0 ? "selected " + selectionCount + "x" : "unselected", interrupt: false));
+                SpeechPipeline.Output(new SpeechRequest(
+                    selectionCount > 0
+                        ? ModText.Get(ModStrings.UI.SelectedCount, selectionCount)
+                        : ModText.Get(ModStrings.UI.Unselected),
+                    interrupt: false));
             }
 
             return true;
@@ -1108,7 +1118,7 @@ namespace SongsOfConquestAccess.Adapters
             }
 
             List<string> lines = new List<string>();
-            lines.Add("Attack preview:");
+            lines.Add(ModText.Get(ModStrings.Spatial.AttackPreview));
             lines.AddRange(previewLines);
             if (detailsLines != null)
             {
@@ -1144,16 +1154,16 @@ namespace SongsOfConquestAccess.Adapters
 
                 List<string> parts = new List<string>();
                 string prefix = previews.Count > 1
-                    ? (i == 0 ? "primary " : "extra target ")
+                    ? (i == 0 ? ModText.Get(ModStrings.Spatial.PrimaryPrefix) : ModText.Get(ModStrings.Spatial.ExtraTargetPrefix))
                     : string.Empty;
                 if (hasDamage)
                 {
-                    parts.Add(prefix + "damage " + damage);
+                    parts.Add(ModText.Get(ModStrings.Spatial.DamagePreview, prefix, damage));
                 }
 
                 if (hasKills)
                 {
-                    parts.Add(targetIsEntity ? FormatEntityDestruction(kills) : "kills " + kills);
+                    parts.Add(targetIsEntity ? FormatEntityDestruction(kills) : ModText.Get(ModStrings.Spatial.Kills, kills));
                 }
 
                 if (parts.Count > 0)
@@ -1236,10 +1246,12 @@ namespace SongsOfConquestAccess.Adapters
             int max;
             if (TryParseRange(killsText, out min, out max))
             {
-                return min <= 0 && max > 0 ? "may destroy" : "destroys";
+            return min <= 0 && max > 0
+                ? ModText.Get(ModStrings.Spatial.MayDestroy)
+                : ModText.Get(ModStrings.Spatial.Destroys);
             }
 
-            return "destroys";
+            return ModText.Get(ModStrings.Spatial.Destroys);
         }
 
         private static bool TryParseRange(string text, out int min, out int max)
@@ -1692,7 +1704,7 @@ namespace SongsOfConquestAccess.Adapters
         {
             if (!IsReachable(point))
             {
-                SpeechPipeline.Output(new SpeechRequest("Not in movement range", interrupt: false));
+                SpeechPipeline.Output(new SpeechRequest(ModText.Get(ModStrings.UI.NotInMovementRange), interrupt: false));
                 return null;
             }
 
@@ -1958,7 +1970,7 @@ namespace SongsOfConquestAccess.Adapters
 
             if (influences.Count > 0)
             {
-                return "in " + string.Join(", ", influences.ToArray());
+                return ModText.Get(ModStrings.Common.In, string.Join(", ", influences.ToArray()));
             }
 
             return string.Empty;
@@ -2174,7 +2186,7 @@ namespace SongsOfConquestAccess.Adapters
                 return string.Empty;
             }
 
-            return IsDebris(entity) ? "debris" : string.Empty;
+            return IsDebris(entity) ? ModText.Get(ModStrings.Spatial.Debris) : string.Empty;
         }
 
         internal string DescribeTroopForSpeech(IBattleTroopState troop)
@@ -2187,7 +2199,7 @@ namespace SongsOfConquestAccess.Adapters
             string name = GetMapEntityName(entity);
             if (string.IsNullOrWhiteSpace(name))
             {
-                name = "attackable entity";
+                name = ModText.Get(ModStrings.Combat.AttackableEntity);
             }
 
             IHealthComponent health = entity.GetComponent<IHealthComponent>();
@@ -2196,7 +2208,9 @@ namespace SongsOfConquestAccess.Adapters
                 return name;
             }
 
-            return name + ", " + health.HealthLeft + " / " + health.MaxHealth.GetValue() + " health";
+            return MenuButtonTextUtility.JoinParts(
+                name,
+                ModText.Get(ModStrings.Spatial.Health, health.HealthLeft, health.MaxHealth.GetValue()));
         }
 
         public string FormatTroopGridLabel(IBattleTroopState troop)
@@ -2208,14 +2222,16 @@ namespace SongsOfConquestAccess.Adapters
 
             string label = FormatTroopLabel(troop, troop.Stats.Size, includeHealth: true, includePosition: false);
             IBattleTroopState current = GetCurrentTroop();
-            return current != null && current.Id == troop.Id ? "acting, " + label : label;
+            return current != null && current.Id == troop.Id
+                ? MenuButtonTextUtility.JoinParts(ModText.Get(ModStrings.Spatial.Acting), label)
+                : label;
         }
 
         public string FormatTroopEventLabel(IBattleTroopState troop)
         {
             if (troop == null)
             {
-                return "unknown troop";
+                return ModText.Get(ModStrings.Combat.UnknownTroop);
             }
 
             return FormatTroopLabel(troop, troop.Stats.Size, includeHealth: false, includePosition: true);
@@ -2225,7 +2241,7 @@ namespace SongsOfConquestAccess.Adapters
         {
             if (troop == null)
             {
-                return "unknown troop";
+                return ModText.Get(ModStrings.Combat.UnknownTroop);
             }
 
             return FormatTroopLabel(troop, sizeOverride, includeHealth: false, includePosition: true);
@@ -2235,27 +2251,27 @@ namespace SongsOfConquestAccess.Adapters
         {
             if (troop == null)
             {
-                return "unknown troop";
+                return ModText.Get(ModStrings.Combat.UnknownTroop);
             }
 
             string label = FormatTroopLabel(troop, sizeOverride, includeHealth: false, includePosition: false);
-            return label + " at " + FormatPoint(positionOverride);
+            return ModText.Get(ModStrings.Combat.TroopAt, label, FormatPoint(positionOverride));
         }
 
         public string FormatEntityEventLabel(IMapEntity entity)
         {
             if (entity == null)
             {
-                return "unknown entity";
+                return ModText.Get(ModStrings.Combat.UnknownEntity);
             }
 
             string name = GetMapEntityName(entity);
             if (string.IsNullOrWhiteSpace(name))
             {
-                name = "attackable entity";
+                name = ModText.Get(ModStrings.Combat.AttackableEntity);
             }
 
-            return name + " at " + FormatPoint(entity.Position);
+            return ModText.Get(ModStrings.Combat.TroopAt, name, FormatPoint(entity.Position));
         }
 
         public TroopRef CreateTroopRef(IBattleTroopState troop)
@@ -2272,7 +2288,7 @@ namespace SongsOfConquestAccess.Adapters
         {
             if (troop == null)
             {
-                return new TroopRef(-1, -1, GetLocalTeamId(), "unknown troop", sizeOverride, positionOverride);
+                return new TroopRef(-1, -1, GetLocalTeamId(), ModText.Get(ModStrings.Combat.UnknownTroop), sizeOverride, positionOverride);
             }
 
             string name = SpeechTextSanitizer.Normalize(_facade.Troops.GetName(troop.Id, sizeOverride));
@@ -2283,7 +2299,7 @@ namespace SongsOfConquestAccess.Adapters
         {
             if (entity == null)
             {
-                return new EntityRef(-1, "unknown entity", Vector2Int.zero);
+                return new EntityRef(-1, ModText.Get(ModStrings.Combat.UnknownEntity), Vector2Int.zero);
             }
 
             string name = GetMapEntityName(entity);
@@ -2300,7 +2316,7 @@ namespace SongsOfConquestAccess.Adapters
             }
             catch
             {
-                return new CommanderRef(commanderId, -1, GetLocalTeamId(), "wielder");
+                return new CommanderRef(commanderId, -1, GetLocalTeamId(), ModText.Get(ModStrings.Combat.Wielder));
             }
         }
 
@@ -2407,27 +2423,27 @@ namespace SongsOfConquestAccess.Adapters
             {
                 if (_facade == null || _facade.Commanders == null)
                 {
-                    return "wielder";
+                    return ModText.Get(ModStrings.Combat.Wielder);
                 }
 
                 ICommanderState commander = _facade.Commanders.Get(commanderId);
                 string name = _facade.Commanders.GetName(commanderId);
                 if (string.IsNullOrWhiteSpace(name))
                 {
-                    name = "wielder";
+                    name = ModText.Get(ModStrings.Combat.Wielder);
                 }
 
                 int localTeamId = GetLocalTeamId();
                 if (commander != null && localTeamId >= 0 && commander.TeamId != localTeamId)
                 {
-                    return "enemy wielder " + SpeechTextSanitizer.Normalize(name);
+                    return ModText.Get(ModStrings.Screens.EnemyWielder, SpeechTextSanitizer.Normalize(name));
                 }
 
                 return SpeechTextSanitizer.Normalize(name);
             }
             catch
             {
-                return "wielder";
+                return ModText.Get(ModStrings.Combat.Wielder);
             }
         }
 
@@ -2436,17 +2452,19 @@ namespace SongsOfConquestAccess.Adapters
             string name = SpeechTextSanitizer.Normalize(_facade.Troops.GetName(troop.Id, size));
             int localTeamId = GetLocalTeamId();
             string label = localTeamId < 0 || troop.TeamId == localTeamId
-                ? size + " " + name
-                : size + " enemy " + name;
+                ? ModText.Get(ModStrings.Combat.TroopQuantity, size, name)
+                : ModText.Get(ModStrings.Combat.EnemyTroop, size, name);
 
             if (includeHealth)
             {
-                label += ", " + troop.CurrentHealth + " / " + troop.Stats.MaxHealth.GetValue() + " health";
+                label = MenuButtonTextUtility.JoinParts(
+                    label,
+                    ModText.Get(ModStrings.Spatial.Health, troop.CurrentHealth, troop.Stats.MaxHealth.GetValue()));
             }
 
             if (includePosition)
             {
-                label += " at " + FormatPoint(troop.Position);
+                label = ModText.Get(ModStrings.Combat.TroopAt, label, FormatPoint(troop.Position));
             }
 
             return label;
@@ -2596,7 +2614,7 @@ namespace SongsOfConquestAccess.Adapters
 
             if (IsDebris(entity))
             {
-                return "debris";
+                return ModText.Get(ModStrings.Spatial.Debris);
             }
 
             string customNameKey;
@@ -3177,15 +3195,15 @@ namespace SongsOfConquestAccess.Adapters
             string attackRangeText = string.Empty;
             if (hasZoneOfControl)
             {
-                attackRangeText = "zone of control";
+                attackRangeText = ModText.Get(ModStrings.Spatial.ZoneOfControl);
             }
             else if (indicators.Contains(CombatRangeIndicator.Deadly))
             {
-                attackRangeText = "deadly range";
+                attackRangeText = ModText.Get(ModStrings.Spatial.DeadlyRange);
             }
             else if (indicators.Contains(CombatRangeIndicator.Attack) || indicators.Contains(CombatRangeIndicator.Melee))
             {
-                attackRangeText = "attack range";
+                attackRangeText = ModText.Get(ModStrings.Spatial.AttackRange);
             }
 
             bool hasMovement = indicators.Contains(CombatRangeIndicator.Movement);
@@ -3196,15 +3214,15 @@ namespace SongsOfConquestAccess.Adapters
 
             if (!hasZoneOfControl && !string.IsNullOrWhiteSpace(attackRangeText))
             {
-                string compactAttackText = attackRangeText.EndsWith(" range")
-                    ? attackRangeText.Substring(0, attackRangeText.Length - " range".Length)
-                    : attackRangeText;
-                return compactAttackText + " and movement range";
+                string compactAttackText = indicators.Contains(CombatRangeIndicator.Deadly)
+                    ? ModText.Get(ModStrings.Spatial.Deadly)
+                    : ModText.Get(ModStrings.Spatial.Attack);
+                return ModText.Get(ModStrings.Spatial.RangeAndMovement, compactAttackText);
             }
 
             return string.IsNullOrWhiteSpace(attackRangeText)
-                ? "movement range"
-                : attackRangeText + " and movement range";
+                ? ModText.Get(ModStrings.Spatial.MovementRange)
+                : ModText.Get(ModStrings.Spatial.RangeAndMovement, attackRangeText);
         }
 
         private static string FormatList(List<string> values)
@@ -3219,9 +3237,7 @@ namespace SongsOfConquestAccess.Adapters
                 return values[0];
             }
 
-            return string.Join(", ", values.GetRange(0, values.Count - 1).ToArray())
-                + " and "
-                + values[values.Count - 1];
+            return ModText.JoinList(values);
         }
     }
 

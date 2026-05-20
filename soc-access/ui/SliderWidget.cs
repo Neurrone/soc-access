@@ -1,6 +1,7 @@
 using System;
 using SongsOfConquestAccess.Adapters;
 using SongsOfConquestAccess.Input;
+using SongsOfConquestAccess.Localization;
 using SongsOfConquestAccess.Speech;
 
 namespace SongsOfConquestAccess.UI
@@ -133,13 +134,13 @@ namespace SongsOfConquestAccess.UI
 
         public override string GetRole()
         {
-            return "slider";
+            return ModText.Get(ModStrings.UI.RoleSlider);
         }
 
         public override string GetStatus()
         {
             string valueText = GetValueText();
-            string disabledText = IsEnabled() ? string.Empty : "disabled";
+            string disabledText = IsEnabled() ? string.Empty : ModText.Get(ModStrings.UI.StatusDisabled);
             if (string.IsNullOrWhiteSpace(valueText))
             {
                 return disabledText;

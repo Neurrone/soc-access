@@ -16,9 +16,9 @@ namespace SongsOfConquestAccess.Adapters
         }
 
         public string IdPrefix { get { return "settlement"; } }
-        public string Title { get { return _adapter != null ? _adapter.Title : "Settlement"; } }
-        public string DraftScreenTitle { get { return "Draft troops"; } }
-        public string UpgradeScreenTitle { get { return "Upgrade troops"; } }
+        public string Title { get { return _adapter != null ? _adapter.Title : string.Empty; } }
+        public string DraftScreenTitle { get { return _adapter != null ? _adapter.DraftLabel : string.Empty; } }
+        public string UpgradeScreenTitle { get { return _adapter != null ? _adapter.UpgradeLabel : string.Empty; } }
         public IClientAdventureFacade Facade { get { return _adapter != null ? _adapter.Facade : null; } }
         public PurchaseTroopsSubMenuAdapter PurchaseTroops { get { return _adapter != null ? _adapter.PurchaseTroops : null; } }
         public UpgradeTroopsSubMenuAdapter UpgradeTroops { get { return _adapter != null ? _adapter.UpgradeTroops : null; } }
@@ -28,17 +28,17 @@ namespace SongsOfConquestAccess.Adapters
         public void HideNativeTooltip() { _adapter?.HideNativeTooltip(); }
 
         public bool IsTutorialVisible() { return _adapter != null && _adapter.IsTutorialButtonVisible(); }
-        public string TutorialLabel { get { return _adapter != null ? _adapter.GetTutorialButtonLabel() : "Tutorial available"; } }
+        public string TutorialLabel { get { return _adapter != null ? _adapter.GetTutorialButtonLabel() : string.Empty; } }
         public bool ActivateTutorial() { return _adapter != null && _adapter.ActivateTutorial(); }
 
         public bool IsBackVisible() { return IsDraftPresent() || IsUpgradePresent(); }
         public bool Back() { return _adapter != null && _adapter.BackToTop(); }
 
-        public string CloseLabel { get { return _adapter != null ? _adapter.CloseLabel : "Close"; } }
+        public string CloseLabel { get { return _adapter != null ? _adapter.CloseLabel : string.Empty; } }
         public bool Close() { return _adapter != null && _adapter.Close(); }
 
         public bool HasWielderArmy { get { return true; } }
-        public string WielderName { get { return _adapter != null ? _adapter.VisitingWielderName : "Wielder"; } }
+        public string WielderName { get { return _adapter != null ? _adapter.VisitingWielderName : string.Empty; } }
         public Tooltip WielderTooltip { get { return _adapter != null ? _adapter.VisitingWielderTooltip : null; } }
         public TroopHudAdapter WielderTroops { get { return _adapter != null ? _adapter.VisitingTroops : null; } }
 

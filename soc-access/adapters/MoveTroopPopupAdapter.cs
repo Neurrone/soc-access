@@ -49,6 +49,27 @@ namespace SongsOfConquestAccess.Adapters
             get { return GetText(GetField<IUITextMesh>(HeaderTextField)); }
         }
 
+        public string MoveAllLeftLabel
+        {
+            get { return GetButtonLabel(GetField<UIButton>(MoveAllButtonLeftField)); }
+        }
+
+        public string MoveAllRightLabel
+        {
+            get { return GetButtonLabel(GetField<UIButton>(MoveAllButtonRightField)); }
+        }
+
+        public string SplitEqualLabel
+        {
+            get
+            {
+                string label = GetButtonLabel(GetField<UIButton>(SplitHalfButtonField));
+                return string.IsNullOrWhiteSpace(label)
+                    ? Localize("Common/MoveTroops/SplitHalf")
+                    : label;
+            }
+        }
+
         public string MaxTroopSize
         {
             get
@@ -226,6 +247,24 @@ namespace SongsOfConquestAccess.Adapters
         private static string GetText(IUITextMesh textMesh)
         {
             return SpeechTextSanitizer.Normalize(UITextMeshTextUtility.GetEffectiveText(textMesh));
+        }
+
+        private static string GetButtonLabel(UIButton button)
+        {
+            return SpeechTextSanitizer.Normalize(MenuButtonTextUtility.GetAllVisibleText(button));
+        }
+
+        private string Localize(string key)
+        {
+            if (_localization == null || string.IsNullOrWhiteSpace(key))
+            {
+                return string.Empty;
+            }
+
+            string text = _localization.GetText(key);
+            return string.IsNullOrWhiteSpace(text) || text == key
+                ? string.Empty
+                : SpeechTextSanitizer.Normalize(text);
         }
 
         private static bool IsButtonEnabled(UIButton button)

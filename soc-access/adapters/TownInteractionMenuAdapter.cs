@@ -129,8 +129,7 @@ namespace SongsOfConquestAccess.Adapters
 
         public string GetTutorialButtonLabel()
         {
-            string label = GetButtonLabel(GetTutorialButton());
-            return string.IsNullOrWhiteSpace(label) ? "Tutorial available" : label;
+            return GetButtonLabel(GetTutorialButton());
         }
 
         public bool ActivateTutorial()
@@ -224,7 +223,7 @@ namespace SongsOfConquestAccess.Adapters
             get
             {
                 string label = GetButtonLabel(GetField<UIButton>(GetHeader(), HeaderCloseButtonField));
-                return string.IsNullOrWhiteSpace(label) ? "Close" : label;
+                return label;
             }
         }
 

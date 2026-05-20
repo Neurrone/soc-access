@@ -5,6 +5,7 @@ using SongsOfConquest.Client.Gamestate.Facade;
 using SongsOfConquest.Common.Gamestate.Facade;
 using SongsOfConquestAccess.Adapters;
 using SongsOfConquestAccess.Input;
+using SongsOfConquestAccess.Localization;
 using SongsOfConquestAccess.Speech;
 using SongsOfConquestAccess.UI;
 using UnityEngine;
@@ -155,7 +156,7 @@ namespace SongsOfConquestAccess.Screens
 
         private static ContainerWidget BuildRoot(TownInteractionMenuAdapter adapter)
         {
-            ContainerWidget root = new ContainerWidget("settlement", adapter != null ? adapter.Title : "Settlement");
+            ContainerWidget root = new ContainerWidget("settlement", adapter != null ? adapter.Title : string.Empty);
             if (adapter == null)
             {
                 return root;
@@ -241,11 +242,11 @@ namespace SongsOfConquestAccess.Screens
             root.AddChild(BuildArmyExchangeGrid(
                 "settlement-army-exchange-grid",
                 BuildVisitingArmyLabel(adapter),
-                "settlement troops",
+                ModText.Get(ModStrings.Screens.SettlementTroops),
                 adapter.VisitingTroops,
                 adapter.SettlementTroops));
-            root.AddChild(BuildDefenseMenu("settlement-garrison", "Garrison", adapter.GetGarrisonSlots()));
-            root.AddChild(BuildDefenseMenu("settlement-ballista", "Ballista", adapter.GetBallistaSlots()));
+            root.AddChild(BuildDefenseMenu("settlement-garrison", GameText.Get("Adventure/BuildMenu/Garrison", string.Empty), adapter.GetGarrisonSlots()));
+            root.AddChild(BuildDefenseMenu("settlement-ballista", string.Empty, adapter.GetBallistaSlots()));
 
             root.AddChild(new ButtonWidget(
                 "settlement-close",
@@ -282,7 +283,9 @@ namespace SongsOfConquestAccess.Screens
         private static string BuildVisitingArmyLabel(TownInteractionMenuAdapter adapter)
         {
             string name = adapter != null ? adapter.VisitingWielderName : string.Empty;
-            return string.IsNullOrWhiteSpace(name) ? "visiting wielder army" : name + "'s army";
+            return string.IsNullOrWhiteSpace(name)
+                ? ModText.Get(ModStrings.Screens.VisitingWielderArmy)
+                : ModText.Get(ModStrings.Screens.WielderArmyPossessive, name);
         }
 
         private static TroopHudAdapter.DropResult DropArmySlot(TroopHudAdapter.SlotItem source, TroopHudAdapter.SlotItem target)
@@ -298,13 +301,6 @@ namespace SongsOfConquestAccess.Screens
             MenuWidget menu = new MenuWidget(id, label);
             if (slots == null || slots.Count == 0)
             {
-                menu.AddItem(new MenuItemWidget(
-                    id + "-none",
-                    () => "No slots",
-                    null,
-                    () => false,
-                    null,
-                    () => true));
                 return menu;
             }
 
@@ -337,7 +333,7 @@ namespace SongsOfConquestAccess.Screens
                 return SpeechTextSanitizer.Normalize(string.Join(". ", tooltip.TextLines));
             }
 
-            return "Empty, slot " + slot.SlotNumber;
+            return ModText.Get(ModStrings.Screens.EmptySlot, slot.SlotNumber);
         }
 
         private sealed class GridFocus

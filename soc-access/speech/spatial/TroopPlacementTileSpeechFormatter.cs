@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using SongsOfConquest.Common.Entities.Adventure;
 using SongsOfConquestAccess.Adapters;
+using SongsOfConquestAccess.Localization;
 
 namespace SongsOfConquestAccess.Speech.Spatial
 {
@@ -17,7 +18,7 @@ namespace SongsOfConquestAccess.Speech.Spatial
         {
             if (tile == null)
             {
-                return "Troop placement grid";
+                return ModText.Get(ModStrings.Screens.TroopPlacement);
             }
 
             List<string> parts = new List<string>();
@@ -45,7 +46,9 @@ namespace SongsOfConquestAccess.Speech.Spatial
                 bool enemySpawn = _snapshot != null
                     && _snapshot.OwnSide.HasValue
                     && tile.SpawnSide.Value != _snapshot.OwnSide.Value;
-                parts.Add(enemySpawn ? "enemy spawn point" : "spawn point");
+                parts.Add(enemySpawn
+                    ? ModText.Get(ModStrings.Spatial.EnemySpawnPoint)
+                    : ModText.Get(ModStrings.Spatial.SpawnPoint));
             }
 
             if (!string.IsNullOrWhiteSpace(tile.EntityLabel))
@@ -66,12 +69,12 @@ namespace SongsOfConquestAccess.Speech.Spatial
             List<string> parts = new List<string>();
             if (tile.IsImpassable)
             {
-                parts.Add("impassable");
+                parts.Add(ModText.Get(ModStrings.Spatial.Impassable));
             }
 
             if (tile.Elevation > 0)
             {
-                parts.Add("elevated ground, height " + tile.Elevation);
+                parts.Add(ModText.Get(ModStrings.Spatial.ElevatedGroundHeight, tile.Elevation));
             }
 
             return string.Join(", ", parts.ToArray());

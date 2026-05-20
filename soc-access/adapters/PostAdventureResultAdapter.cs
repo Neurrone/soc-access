@@ -4,6 +4,7 @@ using System.Reflection;
 using HarmonyLib;
 using SongsOfConquest.Client.Menu;
 using SongsOfConquest.Client.UI;
+using SongsOfConquestAccess.Localization;
 using SongsOfConquestAccess.Speech;
 using UnityEngine;
 
@@ -47,15 +48,15 @@ namespace SongsOfConquestAccess.Adapters
 
                 if (IsVictory)
                 {
-                    return "Victory";
+                    return ModText.Get(ModStrings.Combat.Victory);
                 }
 
                 if (IsDefeat)
                 {
-                    return "Defeat";
+                    return ModText.Get(ModStrings.Combat.Defeat);
                 }
 
-                return "Post adventure result";
+                return ModText.Get(ModStrings.Screens.PostAdventureResult);
             }
         }
 

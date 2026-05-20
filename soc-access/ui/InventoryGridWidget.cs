@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using SongsOfConquestAccess.Adapters;
 using SongsOfConquestAccess.Input;
+using SongsOfConquestAccess.Localization;
 using SongsOfConquestAccess.Speech;
 
 namespace SongsOfConquestAccess.UI
@@ -66,12 +67,12 @@ namespace SongsOfConquestAccess.UI
 
         public override string GetLabel()
         {
-            return "Inventory grid";
+            return ModText.Get(ModStrings.UI.InventoryGrid);
         }
 
         public override string GetRole()
         {
-            return "grid";
+            return ModText.Get(ModStrings.UI.RoleGrid);
         }
 
         public override Widget GetFocusedWidget()
@@ -306,7 +307,7 @@ namespace SongsOfConquestAccess.UI
             }
 
             _dragSource = cell;
-            Speak("Started drag. Move to destination and press enter to drop.");
+            Speak(ModText.Get(ModStrings.UI.DragStarted));
             return true;
         }
 
@@ -315,13 +316,13 @@ namespace SongsOfConquestAccess.UI
             CellWidget target = FocusedCell;
             if (_dragSource == null)
             {
-                Speak("Press space to drag.");
+                Speak(ModText.Get(ModStrings.UI.PressSpaceToDrag));
                 return true;
             }
 
             if (target == null || ReferenceEquals(target, _dragSource))
             {
-                Speak("Invalid destination.");
+                Speak(ModText.Get(ModStrings.UI.InvalidDestination));
                 return true;
             }
 
@@ -338,7 +339,7 @@ namespace SongsOfConquestAccess.UI
             }
             else
             {
-                Speak("Cannot drop there.");
+                Speak(ModText.Get(ModStrings.UI.CannotDropThere));
             }
 
             return true;
@@ -353,7 +354,7 @@ namespace SongsOfConquestAccess.UI
 
             ClearDrag();
             NativeSoundUtility.PostEvent("Common_SpellbookEndDragCancel");
-            Speak("Drag cancelled.");
+            Speak(ModText.Get(ModStrings.UI.DragCancelled));
             return true;
         }
 
@@ -457,10 +458,10 @@ namespace SongsOfConquestAccess.UI
 
                 if (_grid._dragSource != null)
                 {
-                    return ReferenceEquals(_grid._dragSource, this) ? "dragging" : string.Empty;
+                    return ReferenceEquals(_grid._dragSource, this) ? ModText.Get(ModStrings.UI.StatusDragging) : string.Empty;
                 }
 
-                return "draggable";
+                return ModText.Get(ModStrings.UI.StatusDraggable);
             }
 
             public override bool ClaimsAction(string actionKey)

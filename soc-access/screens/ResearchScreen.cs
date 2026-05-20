@@ -4,6 +4,7 @@ using SongsOfConquest.Client.Adventure.UI;
 using SongsOfConquest.Client.Gamestate.Facade;
 using SongsOfConquest.Common.Gamestate.Facade;
 using SongsOfConquestAccess.Adapters;
+using SongsOfConquestAccess.Localization;
 using SongsOfConquestAccess.UI;
 using UnityEngine;
 
@@ -123,7 +124,7 @@ namespace SongsOfConquestAccess.Screens
 
         private static ContainerWidget BuildRoot(ResearchMenuAdapter adapter)
         {
-            ContainerWidget root = new ContainerWidget("research", "Research");
+            ContainerWidget root = new ContainerWidget("research", GameText.Get("Adventure/KingdomResearchOverview/Header", string.Empty));
             if (adapter == null)
             {
                 return root;
@@ -144,7 +145,7 @@ namespace SongsOfConquestAccess.Screens
 
         private static MenuWidget BuildBuildingMenu(ResearchMenuAdapter adapter)
         {
-            MenuWidget menu = new MenuWidget("research-buildings", "Research building");
+            MenuWidget menu = new MenuWidget("research-buildings", string.Empty);
             IReadOnlyList<ResearchMenuAdapter.BuildingItem> buildings = adapter.GetBuildings();
             for (int i = 0; i < buildings.Count; i++)
             {
@@ -160,18 +161,10 @@ namespace SongsOfConquestAccess.Screens
 
             if (buildings.Count == 0)
             {
-                menu.AddItem(new MenuItemWidget(
-                    "research-buildings-none",
-                    () => "No research buildings",
-                    null,
-                    () => false,
-                    adapter.HideNativeTooltip,
-                    () => true));
+                return menu;
             }
-            else
-            {
-                menu.SetFocusByIndexSilently(adapter.SelectedBuildingIndex);
-            }
+
+            menu.SetFocusByIndexSilently(adapter.SelectedBuildingIndex);
 
             return menu;
         }
@@ -209,12 +202,12 @@ namespace SongsOfConquestAccess.Screens
 
             if (building.MissingBuilding && !string.IsNullOrWhiteSpace(building.Description))
             {
-                return building.Description + ". missing building";
+                return ModText.Get(ModStrings.Screens.DescriptionWithMissingBuilding, building.Description);
             }
 
             if (building.MissingBuilding)
             {
-                return "missing building";
+                return ModText.Get(ModStrings.Screens.MissingBuilding);
             }
 
             return building.Description;
@@ -232,8 +225,8 @@ namespace SongsOfConquestAccess.Screens
                 return item.Label;
             }
 
-            string tierHeader = string.IsNullOrWhiteSpace(item.TierHeader) ? "Tier" : item.TierHeader;
-            return item.Label + " (" + tierHeader + " " + item.OwnedTier + ")";
+            string tierHeader = string.IsNullOrWhiteSpace(item.TierHeader) ? ModText.Get(ModStrings.Screens.Tier) : item.TierHeader;
+            return ModText.Get(ModStrings.Screens.ResearchTier, item.Label, tierHeader, item.OwnedTier);
         }
     }
 }

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using SongsOfConquest.Client.UI;
 using SongsOfConquestAccess.Adapters;
 using SongsOfConquestAccess.Input;
+using SongsOfConquestAccess.Localization;
 using SongsOfConquestAccess.UI;
 using UnityEngine;
 
@@ -71,7 +72,7 @@ namespace SongsOfConquestAccess.Screens
 
         private static ContainerWidget BuildRoot(SpellbookAdapter adapter)
         {
-            ContainerWidget root = new ContainerWidget("spellbook-screen", "Spellbook");
+            ContainerWidget root = new ContainerWidget("spellbook-screen", GameText.Get("Common/HUD/SpellbookButton", string.Empty));
             if (adapter == null)
             {
                 return root;
@@ -96,16 +97,16 @@ namespace SongsOfConquestAccess.Screens
                 adapter.IsAutoPopulateChecked,
                 adapter.IsAutoPopulateVisible));
             root.AddChild(BuildSchoolSummary(adapter));
-            root.AddChild(BuildSpellMenu(adapter, SpellbookSpellGroup.Order, "Order spells"));
-            root.AddChild(BuildSpellMenu(adapter, SpellbookSpellGroup.Chaos, "Chaos spells"));
-            root.AddChild(BuildSpellMenu(adapter, SpellbookSpellGroup.Destruction, "Destruction spells"));
-            root.AddChild(BuildSpellMenu(adapter, SpellbookSpellGroup.Creation, "Creation spells"));
-            root.AddChild(BuildSpellMenu(adapter, SpellbookSpellGroup.Arcana, "Arcana spells"));
-            root.AddChild(BuildSpellMenu(adapter, SpellbookSpellGroup.Multi, "Multi-essence spells"));
+            root.AddChild(BuildSpellMenu(adapter, SpellbookSpellGroup.Order, ModText.Get(ModStrings.Screens.OrderSpells)));
+            root.AddChild(BuildSpellMenu(adapter, SpellbookSpellGroup.Chaos, ModText.Get(ModStrings.Screens.ChaosSpells)));
+            root.AddChild(BuildSpellMenu(adapter, SpellbookSpellGroup.Destruction, ModText.Get(ModStrings.Screens.DestructionSpells)));
+            root.AddChild(BuildSpellMenu(adapter, SpellbookSpellGroup.Creation, ModText.Get(ModStrings.Screens.CreationSpells)));
+            root.AddChild(BuildSpellMenu(adapter, SpellbookSpellGroup.Arcana, ModText.Get(ModStrings.Screens.ArcanaSpells)));
+            root.AddChild(BuildSpellMenu(adapter, SpellbookSpellGroup.Multi, ModText.Get(ModStrings.Screens.MultiEssenceSpells)));
 
             root.AddChild(new ButtonWidget(
                 "spellbook-close",
-                "Close",
+                ModText.Get(ModStrings.Screens.Close),
                 adapter.Close,
                 adapter.HideNativeTooltip,
                 () => true));
@@ -114,7 +115,7 @@ namespace SongsOfConquestAccess.Screens
 
         private static MenuWidget BuildSchoolSummary(SpellbookAdapter adapter)
         {
-            MenuWidget menu = new MenuWidget("spellbook-school-summary", "Schools");
+            MenuWidget menu = new MenuWidget("spellbook-school-summary", string.Empty);
             IReadOnlyList<SpellbookAdapter.SchoolSummaryItem> items = SafeGet("school summary", adapter.GetSchoolSummary);
             for (int i = 0; i < items.Count; i++)
             {
@@ -140,7 +141,7 @@ namespace SongsOfConquestAccess.Screens
             {
                 menu.AddItem(new MenuItemWidget(
                     menu.Id + "-none",
-                    () => "None",
+                    () => ModText.Get(ModStrings.Screens.None),
                     null,
                     () => false,
                     adapter.HideNativeTooltip,
@@ -171,7 +172,7 @@ namespace SongsOfConquestAccess.Screens
             DraggableMenuWidget menu = null;
             menu = new DraggableMenuWidget(
                 "spellbook-quickbar",
-                "Quickbar",
+                ModText.Get(ModStrings.Screens.Quickbar),
                 (source, target) =>
                 {
                     SpellbookAdapter.QuickbarItem sourceItem;
@@ -202,13 +203,7 @@ namespace SongsOfConquestAccess.Screens
 
             if (items.Count == 0)
             {
-                menu.AddItem(new MenuItemWidget(
-                    "spellbook-quickbar-none",
-                    () => "No quickbar slots",
-                    null,
-                    () => false,
-                    adapter.HideNativeTooltip,
-                    () => true));
+                return menu;
             }
 
             return menu;
@@ -221,8 +216,10 @@ namespace SongsOfConquestAccess.Screens
                 return string.Empty;
             }
 
-            string slot = "Slot " + (item.Index + 1) + ": ";
-            return item.HasSpell ? slot + item.SpellName : slot + "empty";
+            return ModText.Get(
+                ModStrings.Screens.SlotValue,
+                item.Index + 1,
+                item.HasSpell ? item.SpellName : ModText.Get(ModStrings.Screens.Empty));
         }
 
         private static IReadOnlyList<T> SafeGet<T>(string section, Func<IReadOnlyList<T>> getter)

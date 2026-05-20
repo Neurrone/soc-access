@@ -5,6 +5,7 @@ using SongsOfConquest.Client.Adventure;
 using SongsOfConquest.Client.Menu;
 using SongsOfConquestAccess.Adapters;
 using SongsOfConquestAccess.Input;
+using SongsOfConquestAccess.Localization;
 using SongsOfConquestAccess.UI;
 using UnityEngine;
 using Zenject;
@@ -69,7 +70,7 @@ namespace SongsOfConquestAccess.Screens
 
             root.AddChild(new ButtonWidget(
                 "next",
-                "Next",
+                ModText.Get(ModStrings.Screens.Next),
                 () => adapter != null && adapter.AdvanceNow(),
                 null,
                 () => adapter != null && adapter.IsPresent()));

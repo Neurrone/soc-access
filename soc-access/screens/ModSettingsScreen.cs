@@ -1,12 +1,12 @@
 using System;
 using SongsOfConquestAccess.Input;
+using SongsOfConquestAccess.Localization;
 using SongsOfConquestAccess.UI;
 
 namespace SongsOfConquestAccess.Screens
 {
     internal sealed class ModSettingsScreen : Screen
     {
-        private const string ReadEnemyInfluenceLabel = "Read attack, deadly and movement range for enemies on tiles in combat";
         private readonly Func<bool> _close;
 
         public ModSettingsScreen(Func<bool> close)
@@ -38,15 +38,15 @@ namespace SongsOfConquestAccess.Screens
 
         private static ContainerWidget BuildRoot(Func<bool> close)
         {
-            ContainerWidget root = new ContainerWidget("mod-settings-screen", "Mod settings");
+            ContainerWidget root = new ContainerWidget("mod-settings-screen", ModText.Get(ModStrings.Screens.ModSettings));
             root.AddChild(new CheckboxWidget(
                 "mod-settings-read-enemy-influence",
-                ReadEnemyInfluenceLabel,
+                ModText.Get(ModStrings.Screens.ReadEnemyInfluence),
                 ToggleReadEnemyInfluence,
                 () => ModSettings.ReadEnemyInfluence));
             root.AddChild(new ButtonWidget(
                 "mod-settings-close",
-                "Close",
+                ModText.Get(ModStrings.Screens.Close),
                 () => close != null && close(),
                 null,
                 () => true));

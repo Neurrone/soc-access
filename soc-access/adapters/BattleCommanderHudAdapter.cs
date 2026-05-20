@@ -13,6 +13,7 @@ using SongsOfConquest.Common.Ai;
 using SongsOfConquest.Common.Game;
 using SongsOfConquest.Common.Gamestate;
 using SongsOfConquest.Common.Localization;
+using SongsOfConquestAccess.Localization;
 using SongsOfConquestAccess.Speech;
 using UnityEngine;
 
@@ -83,10 +84,11 @@ namespace SongsOfConquestAccess.Adapters
         {
             BattleCommanderHUD hud = GetCommanderHud(side);
             ICommanderState commander = GetCommander(hud);
-            string sideLabel = side == CombatHudSide.Attacker ? "Attacker" : "Defender";
             if (commander == null || commander.GetIsEmpty())
             {
-                return sideLabel + " portrait";
+                return side == CombatHudSide.Attacker
+                    ? ModText.Get(ModStrings.Screens.AttackerPortrait)
+                    : ModText.Get(ModStrings.Screens.DefenderPortrait);
             }
 
             string name = string.Empty;
@@ -104,10 +106,16 @@ namespace SongsOfConquestAccess.Adapters
             name = SpeechTextSanitizer.Normalize(name);
             if (string.IsNullOrWhiteSpace(name))
             {
-                name = "wielder";
+                name = ModText.Get(ModStrings.Combat.Wielder);
             }
 
-            return sideLabel + ", " + name + ", level " + commander.GetLevel();
+            return ModText.Get(
+                ModStrings.Screens.CombatPortraitDetail,
+                side == CombatHudSide.Attacker
+                    ? ModText.Get(ModStrings.Screens.Attacker)
+                    : ModText.Get(ModStrings.Screens.Defender),
+                name,
+                commander.GetLevel());
         }
 
         public UIButton GetPortraitButton(CombatHudSide side)
@@ -128,7 +136,7 @@ namespace SongsOfConquestAccess.Adapters
         public string GetAiControlButtonLabel(CombatHudSide side)
         {
             string label = GetFirstTooltipLine(GetAiControlButtonTooltip(side));
-            return string.IsNullOrWhiteSpace(label) ? "AI control" : label;
+            return string.IsNullOrWhiteSpace(label) ? ModText.Get(ModStrings.Screens.AiControl) : label;
         }
 
         public void FocusAiControlButton(CombatHudSide side)
@@ -345,13 +353,7 @@ namespace SongsOfConquestAccess.Adapters
 
         private string Localize(string key, string fallback)
         {
-            if (_localization == null || string.IsNullOrWhiteSpace(key))
-            {
-                return fallback;
-            }
-
-            string localized = _localization.GetText(key);
-            return string.IsNullOrWhiteSpace(localized) ? fallback : SpeechTextSanitizer.Normalize(localized);
+            return SpeechTextSanitizer.Normalize(GameText.Get(_localization, key, fallback));
         }
 
         private static string FormatEnumName(string name)

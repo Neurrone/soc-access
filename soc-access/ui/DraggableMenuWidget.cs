@@ -1,6 +1,7 @@
 using System;
 using SongsOfConquestAccess.Adapters;
 using SongsOfConquestAccess.Input;
+using SongsOfConquestAccess.Localization;
 using SongsOfConquestAccess.Speech;
 
 namespace SongsOfConquestAccess.UI
@@ -63,7 +64,7 @@ namespace SongsOfConquestAccess.UI
                 DraggableMenuItemWidget item = FocusedItemOrNull as DraggableMenuItemWidget;
                 if (item != null && item.CanDrag && !item.HasActivateBehavior)
                 {
-                    Speak("Press space to drag.");
+                    Speak(ModText.Get(ModStrings.UI.PressSpaceToDrag));
                     return true;
                 }
             }
@@ -96,7 +97,7 @@ namespace SongsOfConquestAccess.UI
             }
 
             _dragSource = source;
-            Speak("Started drag. Move to destination and press enter to drop.");
+            Speak(ModText.Get(ModStrings.UI.DragStarted));
             return true;
         }
 
@@ -104,14 +105,14 @@ namespace SongsOfConquestAccess.UI
         {
             if (_dragSource == null)
             {
-                Speak("Press space to select an item to drag.");
+                Speak(ModText.Get(ModStrings.UI.PressSpaceSelectItemToDrag));
                 return true;
             }
 
             MenuItemWidget target = FocusedItemOrNull;
             if (target == null)
             {
-                Speak("Invalid destination.");
+                Speak(ModText.Get(ModStrings.UI.InvalidDestination));
                 return true;
             }
 
@@ -138,7 +139,7 @@ namespace SongsOfConquestAccess.UI
 
             ClearDrag();
             NativeSoundUtility.PostEvent("Common_SpellbookEndDragCancel");
-            Speak("Drag cancelled.");
+            Speak(ModText.Get(ModStrings.UI.DragCancelled));
             return true;
         }
 

@@ -5,6 +5,7 @@ using SongsOfConquest.Common;
 using SongsOfConquest.Common.Gamestate.Facade;
 using SongsOfConquestAccess.Adapters;
 using SongsOfConquestAccess.Input;
+using SongsOfConquestAccess.Localization;
 using SongsOfConquestAccess.UI;
 
 namespace SongsOfConquestAccess.Screens
@@ -18,7 +19,7 @@ namespace SongsOfConquestAccess.Screens
         private Action _recruitmentPoolUpdatedHandler;
 
         protected TroopManagementScreenBase(ITroopManagementHostAdapter host)
-            : base(new ContainerWidget(host != null ? host.IdPrefix : "troop-management", host != null ? host.Title : "Troop management"))
+            : base(new ContainerWidget(host != null ? host.IdPrefix : "troop-management", host != null ? host.Title : string.Empty))
         {
             Host = host;
             RootWidget = BuildRoot();
@@ -220,7 +221,7 @@ namespace SongsOfConquestAccess.Screens
 
                 root.AddChild(TroopHudMenu.Build(
                     prefix + "-troops",
-                    "Troops",
+                    GameText.Get("Commanders/Tooltip/Troops", string.Empty),
                     Host.WielderTroops,
                     () => true));
             }
@@ -229,7 +230,7 @@ namespace SongsOfConquestAccess.Screens
 
             root.AddChild(new ButtonWidget(
                 prefix + "-back",
-                "Back",
+                ModText.Get(ModStrings.Screens.Back),
                 Host.Back,
                 Host.HideNativeTooltip,
                 Host.IsBackVisible,

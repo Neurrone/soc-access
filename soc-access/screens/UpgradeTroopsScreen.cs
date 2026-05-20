@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using SongsOfConquest.Client.Adventure;
 using SongsOfConquestAccess.Adapters;
+using SongsOfConquestAccess.Localization;
 using SongsOfConquestAccess.UI;
 using UnityEngine;
 
@@ -59,7 +60,7 @@ namespace SongsOfConquestAccess.Screens
         }
 
         protected override string ScreenSuffix { get { return "upgrade-troops"; } }
-        protected override string ScreenTitle { get { return Host != null ? Host.UpgradeScreenTitle : "Upgrade troops"; } }
+        protected override string ScreenTitle { get { return Host != null ? Host.UpgradeScreenTitle : string.Empty; } }
         protected override bool IsContentPresent() { return Host != null && Host.IsUpgradePresent(); }
 
         protected override void AddContentWidgets(ContainerWidget root)
@@ -107,8 +108,8 @@ namespace SongsOfConquestAccess.Screens
 
             root.AddChild(new SliderWidget(
                 entry.IdPrefix + "-quantity",
-                "quantity",
-                () => entry.SliderLabel,
+                ModText.Get(ModStrings.Common.Quantity),
+                () => ModText.Get(ModStrings.Screens.AmountToUpgrade, entry.SliderLabel),
                 () => entry.SliderValue,
                 () => entry.SliderMinimum,
                 () => entry.SliderMaximum,

@@ -67,7 +67,7 @@ namespace SongsOfConquestAccess.Adapters
             get
             {
                 string title = GetText(GetField<UITextMesh>(_menu, TitleTextField));
-                return string.IsNullOrWhiteSpace(title) ? "Marketplace" : title;
+                return string.IsNullOrWhiteSpace(title) ? string.Empty : title;
             }
         }
 
@@ -119,7 +119,8 @@ namespace SongsOfConquestAccess.Adapters
                 () => FindButton(_selectedResourceType, isBuyButton, amount) != null,
                 () => IsButtonEnabled(FindButton(_selectedResourceType, isBuyButton, amount)),
                 () => ActivateButton(FindButton(_selectedResourceType, isBuyButton, amount)),
-                () => FocusButton(FindButton(_selectedResourceType, isBuyButton, amount)));
+                () => FocusButton(FindButton(_selectedResourceType, isBuyButton, amount)),
+                () => GetButtonLabel(FindButton(_selectedResourceType, isBuyButton, amount)));
         }
 
         public string TipText
@@ -202,6 +203,11 @@ namespace SongsOfConquestAccess.Adapters
         private bool FocusButton(MarketplaceButton button)
         {
             return NativeSelectionUtility.Select(button as Component);
+        }
+
+        private static string GetButtonLabel(MarketplaceButton button)
+        {
+            return SpeechTextSanitizer.Normalize(MenuButtonTextUtility.GetAllVisibleText(button as UIButton));
         }
 
         private MarketplaceButton FindButton(ResourceType resourceType, bool isBuyButton, int amount)
@@ -326,7 +332,8 @@ namespace SongsOfConquestAccess.Adapters
                 Func<bool> isVisible,
                 Func<bool> isEnabled,
                 Func<bool> activate,
-                Action focus)
+                Action focus,
+                Func<string> getLabel)
             {
                 _adapter = adapter;
                 IsBuyButton = isBuyButton;
@@ -335,6 +342,7 @@ namespace SongsOfConquestAccess.Adapters
                 IsEnabled = isEnabled;
                 Activate = activate;
                 Focus = focus;
+                GetLabel = getLabel;
             }
 
             public bool IsBuyButton { get; private set; }
@@ -342,6 +350,7 @@ namespace SongsOfConquestAccess.Adapters
             public ResourceType ResourceType { get { return _adapter != null ? _adapter.SelectedResourceType : ResourceType.Gold; } }
             public string ResourceName { get { return _adapter != null ? _adapter.GetResourceName(ResourceType) : string.Empty; } }
             public int GoldAmount { get { return _adapter != null ? _adapter.GetTradeGoldAmount(ResourceType, IsBuyButton, Amount) : 0; } }
+            public Func<string> GetLabel { get; private set; }
             public Func<bool> IsVisible { get; private set; }
             public Func<bool> IsEnabled { get; private set; }
             public Func<bool> Activate { get; private set; }

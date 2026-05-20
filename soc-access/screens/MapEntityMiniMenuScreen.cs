@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using SongsOfConquest.Client.Adventure;
 using SongsOfConquestAccess.Adapters;
 using SongsOfConquestAccess.Input;
+using SongsOfConquestAccess.Localization;
 using SongsOfConquestAccess.UI;
 using UnityEngine;
 
@@ -70,7 +71,7 @@ namespace SongsOfConquestAccess.Screens
 
         private static ContainerWidget BuildRoot(MapEntityMiniMenuAdapter adapter)
         {
-            ContainerWidget root = new ContainerWidget("map-entity-mini-menu", adapter != null ? adapter.EntityName : "Map entity");
+            ContainerWidget root = new ContainerWidget("map-entity-mini-menu", adapter != null ? adapter.EntityName : string.Empty);
             if (adapter == null)
             {
                 return root;
@@ -106,7 +107,7 @@ namespace SongsOfConquestAccess.Screens
 
             root.AddChild(new ButtonWidget(
                 "map-entity-eject-wielder",
-                "Eject wielder",
+                ModText.Get(ModStrings.Screens.EjectWielder),
                 adapter.ActivateEjectWielder,
                 adapter.HideNativeTooltip,
                 adapter.IsEjectWielderEnabled,
@@ -139,7 +140,7 @@ namespace SongsOfConquestAccess.Screens
 
             root.AddChild(new ButtonWidget(
                 "map-entity-close",
-                "Close",
+                ModText.Get(ModStrings.Screens.Close),
                 adapter.Close,
                 adapter.HideNativeTooltip,
                 () => true));
@@ -150,7 +151,7 @@ namespace SongsOfConquestAccess.Screens
         private static MenuWidget BuildDescriptionRowsMenu(MapEntityMiniMenuAdapter adapter)
         {
             IReadOnlyList<MapEntityMiniMenuAdapter.DescriptionRow> rows = adapter.GetDescriptionRows();
-            MenuWidget menu = new MenuWidget("map-entity-description-rows", "Description", () => adapter.GetDescriptionRows().Count > 0);
+            MenuWidget menu = new MenuWidget("map-entity-description-rows", ModText.Get(ModStrings.Screens.Description), () => adapter.GetDescriptionRows().Count > 0);
             for (int i = 0; i < rows.Count; i++)
             {
                 MapEntityMiniMenuAdapter.DescriptionRow row = rows[i];

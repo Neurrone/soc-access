@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using SongsOfConquest.Client.Menu;
 using SongsOfConquest.Client.UI;
 using SongsOfConquestAccess.Adapters;
+using SongsOfConquestAccess.Localization;
 using SongsOfConquestAccess.UI;
 using UnityEngine;
 
@@ -50,7 +51,7 @@ namespace SongsOfConquestAccess.Screens
 
         private static ContainerWidget BuildRoot(PostAdventureResultAdapter adapter)
         {
-            ContainerWidget root = new ContainerWidget("post-adventure-result", "Post adventure result");
+            ContainerWidget root = new ContainerWidget("post-adventure-result", ModText.Get(ModStrings.Screens.PostAdventureResult));
             if (adapter == null)
             {
                 return root;
@@ -83,7 +84,7 @@ namespace SongsOfConquestAccess.Screens
         {
             MenuWidget menu = new MenuWidget(
                 "post-adventure-objectives",
-                "Objectives",
+                ModText.Get(ModStrings.Screens.Objectives),
                 () => adapter.GetObjectives().Count > 0);
 
             IReadOnlyList<PostAdventureResultAdapter.ObjectiveEntry> objectives = adapter.GetObjectives();

@@ -11,6 +11,7 @@ using SongsOfConquest.Client.UI;
 using SongsOfConquest.Common.Entities;
 using SongsOfConquest.Common.Entities.Adventure;
 using SongsOfConquest.Common.Localization;
+using SongsOfConquestAccess.Localization;
 using SongsOfConquestAccess.Speech;
 using UnityEngine;
 using UnityEngine.UI;
@@ -215,8 +216,7 @@ namespace SongsOfConquestAccess.Adapters
 
         private string GetLocalizedText(string key)
         {
-            string text = _localization != null ? _localization.GetText(key) : string.Empty;
-            return string.IsNullOrWhiteSpace(text) || text == key ? string.Empty : SpeechTextSanitizer.Normalize(text);
+            return SpeechTextSanitizer.Normalize(GameText.Get(_localization, key, string.Empty));
         }
 
         private string GetTownName(IMapEntity entity)

@@ -18,6 +18,7 @@ using SongsOfConquest.Common.Gamestate.Facade;
 using SongsOfConquest.Common.Localization;
 using SongsOfConquest.Common.Map;
 using SongsOfConquest.Server.Map;
+using SongsOfConquestAccess.Localization;
 using SongsOfConquestAccess.Scanner;
 using SongsOfConquestAccess.Speech;
 using Unity.Mathematics;
@@ -103,7 +104,9 @@ namespace SongsOfConquestAccess.Adapters
                 ICommanderState commander = ownSide == BattleSide.Right_Defender
                     ? GetField<ICommanderState>(DefendingCommanderField)
                     : GetField<ICommanderState>(AttackingCommanderField);
-                return commander != null ? GetCommanderName(commander, "Your wielder") : "Your wielder";
+                return commander != null
+                    ? GetCommanderName(commander, ModText.Get(ModStrings.Screens.YourWielder))
+                    : ModText.Get(ModStrings.Screens.YourWielder);
             }
         }
 
@@ -117,7 +120,9 @@ namespace SongsOfConquestAccess.Adapters
                     ? GetField<ICommanderState>(AttackingCommanderField)
                     : GetField<ICommanderState>(DefendingCommanderField);
 
-                string name = commander != null ? GetCommanderName(commander, "Opponent") : "Opponent";
+                string name = commander != null
+                    ? GetCommanderName(commander, ModText.Get(ModStrings.Screens.Opponent))
+                    : ModText.Get(ModStrings.Screens.Opponent);
                 string scouting = opponentIsAttacker
                     ? GetUIText(AttackerScoutingInformationField)
                     : GetUIText(DefenderScoutingInformationField);

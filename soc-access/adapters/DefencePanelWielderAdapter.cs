@@ -8,6 +8,7 @@ using SongsOfConquest.Client.Gamestate.Facade;
 using SongsOfConquest.Client.UI;
 using SongsOfConquest.Common.Gamestate;
 using SongsOfConquest.Common.Localization;
+using SongsOfConquestAccess.Localization;
 using SongsOfConquestAccess.Speech;
 using UnityEngine;
 
@@ -218,8 +219,7 @@ namespace SongsOfConquestAccess.Adapters
 
         private string GetLocalizedText(string key, string fallback)
         {
-            string text = _localization != null ? _localization.GetText(key) : string.Empty;
-            return string.IsNullOrWhiteSpace(text) || text == key ? fallback : SpeechTextSanitizer.Normalize(text);
+            return SpeechTextSanitizer.Normalize(GameText.Get(_localization, key, fallback));
         }
 
         private static string GetText(IUITextMesh textMesh)
