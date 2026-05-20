@@ -556,7 +556,7 @@ namespace SongsOfConquestAccess.Screens
 
         private static MenuWidget BuildWielderListMenu(AdventureHudAdapter adapter)
         {
-            MenuWidget menu = new MenuWidget("adventure-wielder-list", string.Empty, adapter.IsWielderListMenuVisible);
+            MenuWidget menu = new MenuWidget("adventure-wielder-list", ModText.Get(ModStrings.Screens.Wielders), adapter.IsWielderListMenuVisible);
             for (int i = 0; i < 32; i++)
             {
                 int capturedIndex = i;
