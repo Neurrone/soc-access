@@ -2181,3 +2181,13 @@ msgstr "Вода"
 msgctxt "Spatial.WaterEdge"
 msgid "Water edge"
 msgstr "Край воды"
+
+#. Screens.MoveAllLeft
+msgctxt "Screens.MoveAllLeft"
+msgid "Move all left"
+msgstr "Move all left"
+
+#. Screens.MoveAllRight
+msgctxt "Screens.MoveAllRight"
+msgid "Move all right"
+msgstr "Move all right"

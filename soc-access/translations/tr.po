@@ -2111,3 +2111,13 @@ msgstr "Su"
 msgctxt "Spatial.WaterEdge"
 msgid "Water edge"
 msgstr "Su kenarı"
+
+#. Screens.MoveAllLeft
+msgctxt "Screens.MoveAllLeft"
+msgid "Move all left"
+msgstr "Move all left"
+
+#. Screens.MoveAllRight
+msgctxt "Screens.MoveAllRight"
+msgid "Move all right"
+msgstr "Move all right"

@@ -290,7 +290,7 @@ namespace SongsOfConquestAccess.Screens
 
         private static TroopHudAdapter.DropResult DropArmySlot(TroopHudAdapter.SlotItem source, TroopHudAdapter.SlotItem target)
         {
-            return source != null ? source.DropTo(target) : TroopHudAdapter.DropResult.None;
+            return source != null ? source.CompleteDropTo(target) : TroopHudAdapter.DropResult.None;
         }
 
         private static MenuWidget BuildDefenseMenu(

@@ -3,6 +3,7 @@
 ## V0.2.0
 
 - Localization support for all languages supported by the game
+- Fix move troop amount dialog not being detected when troops are looking to join your army, and made escape only cancel the move instead of also exiting from the "troops are looking to join" screen
 
 ## V0.1.4
 

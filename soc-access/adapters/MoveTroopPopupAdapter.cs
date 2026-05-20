@@ -1,10 +1,12 @@
 using System;
+using System.Collections.Generic;
 using System.Reflection;
 using HarmonyLib;
 using SongsOfConquest.Client;
 using SongsOfConquest.Client.Adventure.UI;
 using SongsOfConquest.Client.UI;
 using SongsOfConquest.Common.Localization;
+using SongsOfConquestAccess.Localization;
 using SongsOfConquestAccess.Speech;
 using UnityEngine;
 
@@ -16,6 +18,11 @@ namespace SongsOfConquestAccess.Adapters
         private static readonly FieldInfo HeaderTextField = AccessTools.Field(typeof(TroopHUDEntryMovable), "_headerText");
         private static readonly FieldInfo AmountTextField = AccessTools.Field(typeof(TroopHUDEntryMovable), "_amountText");
         private static readonly FieldInfo SliderField = AccessTools.Field(typeof(TroopHUDEntryMovable), "_slider");
+        private static readonly FieldInfo NonPortraitContainerField = AccessTools.Field(typeof(TroopHUDEntryMovable), "_nonPortraitContainer");
+        private static readonly FieldInfo PortraitContainerField = AccessTools.Field(typeof(TroopHUDEntryMovable), "_portraitContainer");
+        private static readonly FieldInfo DraggableContainerField = AccessTools.Field(typeof(TroopHUDEntryMovable), "_draggableContainer");
+        private static readonly FieldInfo LeftContainerField = AccessTools.Field(typeof(TroopHUDEntryMovable), "_leftContainer");
+        private static readonly FieldInfo RightContainerField = AccessTools.Field(typeof(TroopHUDEntryMovable), "_rightContainer");
         private static readonly FieldInfo MoveAllButtonLeftField = AccessTools.Field(typeof(TroopHUDEntryMovable), "_moveAllButtonLeft");
         private static readonly FieldInfo MoveAllButtonRightField = AccessTools.Field(typeof(TroopHUDEntryMovable), "_moveAllButtonRight");
         private static readonly FieldInfo SplitHalfButtonField = AccessTools.Field(typeof(TroopHUDEntryMovable), "_splitHalfButton");
@@ -51,23 +58,17 @@ namespace SongsOfConquestAccess.Adapters
 
         public string MoveAllLeftLabel
         {
-            get { return GetButtonLabel(GetField<UIButton>(MoveAllButtonLeftField)); }
+            get { return ModText.Get(ModStrings.Screens.MoveAllLeft); }
         }
 
         public string MoveAllRightLabel
         {
-            get { return GetButtonLabel(GetField<UIButton>(MoveAllButtonRightField)); }
+            get { return ModText.Get(ModStrings.Screens.MoveAllRight); }
         }
 
         public string SplitEqualLabel
         {
-            get
-            {
-                string label = GetButtonLabel(GetField<UIButton>(SplitHalfButtonField));
-                return string.IsNullOrWhiteSpace(label)
-                    ? Localize("Common/MoveTroops/SplitHalf")
-                    : label;
-            }
+            get { return GetFirstTooltipLine(SplitEqualTooltip); }
         }
 
         public string MaxTroopSize
@@ -81,9 +82,19 @@ namespace SongsOfConquestAccess.Adapters
 
         public bool IsPresent()
         {
-            return _movable != null
-                && ((Component)_movable).gameObject.activeInHierarchy
-                && GetStateName() == "Deciding";
+            if (!IsMovableActive())
+            {
+                return false;
+            }
+
+            if (GetStateName() == "Deciding")
+            {
+                return true;
+            }
+
+            return IsDialogContainerActive()
+                && GetSlider() != null
+                && !IsGameObjectActive(GetField<Component>(DraggableContainerField));
         }
 
         public bool MoveAllLeft()
@@ -144,6 +155,13 @@ namespace SongsOfConquestAccess.Adapters
             return true;
         }
 
+        public bool CanConfirm()
+        {
+            return IsMovableActive()
+                && GetSlider() != null
+                && HandleSliderPointerUpMethod != null;
+        }
+
         public bool Cancel()
         {
             if (AnimateTroopsUIsToDestinationsMethod == null)
@@ -154,6 +172,12 @@ namespace SongsOfConquestAccess.Adapters
             AnimateTroopsUIsToDestinationsMethod.Invoke(_movable, null);
             DecideTargetTroopEntryField?.SetValue(_movable, null);
             return true;
+        }
+
+        public bool CanCancel()
+        {
+            return IsMovableActive()
+                && AnimateTroopsUIsToDestinationsMethod != null;
         }
 
         public void HideNativeTooltip()
@@ -222,6 +246,31 @@ namespace SongsOfConquestAccess.Adapters
             return GetField<UISlider>(SliderField);
         }
 
+        private bool IsMovableActive()
+        {
+            return _movable != null
+                && ((Component)_movable).gameObject != null
+                && ((Component)_movable).gameObject.activeInHierarchy;
+        }
+
+        private bool IsDialogContainerActive()
+        {
+            return IsGameObjectActive(GetField<GameObject>(NonPortraitContainerField))
+                || IsGameObjectActive(GetField<GameObject>(PortraitContainerField))
+                || IsGameObjectActive(GetField<Component>(LeftContainerField))
+                || IsGameObjectActive(GetField<Component>(RightContainerField));
+        }
+
+        private static bool IsGameObjectActive(GameObject gameObject)
+        {
+            return gameObject != null && gameObject.activeInHierarchy;
+        }
+
+        private static bool IsGameObjectActive(Component component)
+        {
+            return component != null && component.gameObject != null && component.gameObject.activeInHierarchy;
+        }
+
         private bool Invoke(MethodInfo method)
         {
             if (method == null)
@@ -249,22 +298,24 @@ namespace SongsOfConquestAccess.Adapters
             return SpeechTextSanitizer.Normalize(UITextMeshTextUtility.GetEffectiveText(textMesh));
         }
 
-        private static string GetButtonLabel(UIButton button)
+        private static string GetFirstTooltipLine(Tooltip tooltip)
         {
-            return SpeechTextSanitizer.Normalize(MenuButtonTextUtility.GetAllVisibleText(button));
-        }
-
-        private string Localize(string key)
-        {
-            if (_localization == null || string.IsNullOrWhiteSpace(key))
+            IReadOnlyList<string> lines = tooltip != null ? tooltip.TextLines : null;
+            if (lines == null)
             {
                 return string.Empty;
             }
 
-            string text = _localization.GetText(key);
-            return string.IsNullOrWhiteSpace(text) || text == key
-                ? string.Empty
-                : SpeechTextSanitizer.Normalize(text);
+            for (int i = 0; i < lines.Count; i++)
+            {
+                string line = SpeechTextSanitizer.Normalize(lines[i]);
+                if (!string.IsNullOrWhiteSpace(line))
+                {
+                    return line;
+                }
+            }
+
+            return string.Empty;
         }
 
         private static bool IsButtonEnabled(UIButton button)

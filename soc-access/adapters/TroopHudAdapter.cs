@@ -77,6 +77,60 @@ namespace SongsOfConquestAccess.Adapters
                 return DropResult.None;
             }
 
+            if (!BeginNativeDrag(sourceEntry))
+            {
+                return DropResult.None;
+            }
+
+            return CompleteNativeDrop(sourceEntry, targetEntry);
+        }
+
+        public bool BeginDrag(SlotItem source)
+        {
+            TroopHUDEntry sourceEntry = source != null ? source.Entry : null;
+            return BeginNativeDrag(sourceEntry);
+        }
+
+        public DropResult CompleteDrop(SlotItem source, SlotItem target)
+        {
+            TroopHUDEntry sourceEntry = source != null ? source.Entry : null;
+            TroopHUDEntry targetEntry = target != null ? target.Entry : null;
+            if (sourceEntry == null || targetEntry == null || ReferenceEquals(sourceEntry, targetEntry))
+            {
+                return DropResult.None;
+            }
+
+            return CompleteNativeDrop(sourceEntry, targetEntry);
+        }
+
+        public void CancelDrag()
+        {
+            TroopHUDEntryMovable movable = GetMovable();
+            if (movable != null)
+            {
+                movable.Reset();
+            }
+        }
+
+        private bool BeginNativeDrag(TroopHUDEntry sourceEntry)
+        {
+            TroopHUDEntryMovable movable = GetMovable();
+            if (sourceEntry == null || movable == null || sourceEntry.Troop == null)
+            {
+                return false;
+            }
+
+            using (NativeScreenInputPositionOverride.Apply(GetScreenCenter(sourceEntry)))
+            {
+                Vector3 sourceContainerPosition = sourceEntry.Container.Position;
+                movable.BeginDrag(sourceEntry, new Vector2(sourceContainerPosition.x, sourceContainerPosition.y));
+            }
+
+            return true;
+        }
+
+        private DropResult CompleteNativeDrop(TroopHUDEntry sourceEntry, TroopHUDEntry targetEntry)
+        {
             TroopHUDEntryMovable movable = GetMovable();
             if (movable == null || sourceEntry.Troop == null)
             {
@@ -87,11 +141,8 @@ namespace SongsOfConquestAccess.Adapters
             Vector3 targetPosition = ((Component)targetEntry).transform.position;
             Vector3 dragDirection = targetPosition - sourcePosition;
 
-            using (NativeScreenInputPositionOverride inputOverride = NativeScreenInputPositionOverride.Apply(GetScreenCenter(sourceEntry)))
+            using (NativeScreenInputPositionOverride.Apply(GetScreenCenter(targetEntry)))
             {
-                Vector3 sourceContainerPosition = sourceEntry.Container.Position;
-                movable.BeginDrag(sourceEntry, new Vector2(sourceContainerPosition.x, sourceContainerPosition.y));
-                inputOverride?.SetPosition(GetScreenCenter(targetEntry));
                 CurrentHoverEntryField?.SetValue(movable, targetEntry);
                 IsDraggingRightField?.SetValue(movable, sourcePosition.x < targetPosition.x);
                 DragDirectionField?.SetValue(movable, new Vector2(dragDirection.x, dragDirection.y));
@@ -105,7 +156,6 @@ namespace SongsOfConquestAccess.Adapters
                 if (InvokeBool(CanMergeMethod, movable) || InvokeBool(IsEmptyAndUnlockedMethod, movable))
                 {
                     DecideAmountMethod?.Invoke(movable, new object[] { targetEntry.FormationIndex });
-                    PushMoveTroopPopupIfPresent(movable);
                     return DropResult.MoveAmountPopupOpened;
                 }
 
@@ -181,20 +231,6 @@ namespace SongsOfConquestAccess.Adapters
         {
             object value = method != null ? method.Invoke(instance, null) : null;
             return value is bool && (bool)value;
-        }
-
-        private static void PushMoveTroopPopupIfPresent(TroopHUDEntryMovable movable)
-        {
-            if (movable == null)
-            {
-                return;
-            }
-
-            MoveTroopPopupAdapter adapter = new MoveTroopPopupAdapter(movable);
-            if (adapter.IsPresent())
-            {
-                SocAccessPlugin.Instance?.ScreenDetector?.OnMoveTroopPopupReady(movable);
-            }
         }
 
         private static Vector2 GetScreenCenter(TroopHUDEntry entry)
@@ -302,6 +338,24 @@ namespace SongsOfConquestAccess.Adapters
             public DropResult DropTo(SlotItem target)
             {
                 return _adapter != null ? _adapter.Drop(this, target) : DropResult.None;
+            }
+
+            public bool BeginDrag()
+            {
+                return _adapter != null && _adapter.BeginDrag(this);
+            }
+
+            public DropResult CompleteDropTo(SlotItem target)
+            {
+                return _adapter != null ? _adapter.CompleteDrop(this, target) : DropResult.None;
+            }
+
+            public void CancelDrag()
+            {
+                if (_adapter != null)
+                {
+                    _adapter.CancelDrag();
+                }
             }
         }
 

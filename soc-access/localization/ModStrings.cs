@@ -360,6 +360,8 @@ namespace SongsOfConquestAccess.Localization
             public static readonly ModString MissingBuilding = new ModString("Screens.MissingBuilding", "missing building");
             public static readonly ModString ModSettings = new ModString("Screens.ModSettings", "Mod settings");
             public static readonly ModString ModifierCategoryTabs = new ModString("Screens.ModifierCategoryTabs", "Modifier category tabs");
+            public static readonly ModString MoveAllLeft = new ModString("Screens.MoveAllLeft", "Move all left");
+            public static readonly ModString MoveAllRight = new ModString("Screens.MoveAllRight", "Move all right");
             public static readonly ModString MultiEssenceSpells = new ModString("Screens.MultiEssenceSpells", "Multi-essence spells");
             public static readonly ModString NamedArmy = new ModString("Screens.NamedArmy", "{0} army");
             public static readonly ModString NamedLevel = new ModString("Screens.NamedLevel", "{0}, level {1}");

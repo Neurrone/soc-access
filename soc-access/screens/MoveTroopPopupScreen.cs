@@ -1,6 +1,6 @@
-using HarmonyLib;
 using SongsOfConquest.Client.Adventure.UI;
 using SongsOfConquestAccess.Adapters;
+using SongsOfConquestAccess.Input;
 using SongsOfConquestAccess.Localization;
 using SongsOfConquestAccess.UI;
 using UnityEngine;
@@ -9,9 +9,6 @@ namespace SongsOfConquestAccess.Screens
 {
     internal sealed class MoveTroopPopupScreen : Screen
     {
-        private static readonly System.Reflection.FieldInfo CurrentStateField =
-            AccessTools.Field(typeof(TroopHUDEntryMovable), "_currentState");
-
         private readonly MoveTroopPopupAdapter _adapter;
 
         public MoveTroopPopupScreen(MoveTroopPopupAdapter adapter)
@@ -26,9 +23,10 @@ namespace SongsOfConquestAccess.Screens
             for (int i = 0; i < movables.Length; i++)
             {
                 TroopHUDEntryMovable movable = movables[i];
-                if (IsPresent(movable))
+                MoveTroopPopupAdapter adapter = new MoveTroopPopupAdapter(movable);
+                if (adapter.IsPresent())
                 {
-                    return new MoveTroopPopupScreen(new MoveTroopPopupAdapter(movable));
+                    return new MoveTroopPopupScreen(adapter);
                 }
             }
 
@@ -46,15 +44,26 @@ namespace SongsOfConquestAccess.Screens
             RootWidget?.Unfocus();
         }
 
-        private static bool IsPresent(TroopHUDEntryMovable movable)
+        public override bool HasClaimed(string actionKey)
         {
-            if (movable == null || !((Component)movable).gameObject.activeInHierarchy)
+            return actionKey == AccessibilityActions.Cancel.Key
+                || base.HasClaimed(actionKey);
+        }
+
+        public override bool HasFocusedWidgetClaimed(string actionKey)
+        {
+            return actionKey == AccessibilityActions.Cancel.Key
+                || base.HasFocusedWidgetClaimed(actionKey);
+        }
+
+        public override bool OnActionJustPressed(InputAction action)
+        {
+            if (action != null && action.Key == AccessibilityActions.Cancel.Key)
             {
-                return false;
+                return _adapter != null && _adapter.CanCancel() && _adapter.Cancel();
             }
 
-            object value = CurrentStateField != null ? CurrentStateField.GetValue(movable) : null;
-            return value != null && value.ToString() == "Deciding";
+            return base.OnActionJustPressed(action);
         }
 
         private static ContainerWidget BuildRoot(MoveTroopPopupAdapter adapter)
@@ -79,27 +88,27 @@ namespace SongsOfConquestAccess.Screens
 
             root.AddChild(new ButtonWidget(
                 "move-troop-move-all-left",
-                adapter.MoveAllLeftLabel,
+                () => adapter.MoveAllLeftLabel,
                 adapter.MoveAllLeft,
                 adapter.HideNativeTooltip,
                 adapter.IsMoveAllLeftEnabled,
-                tooltip: adapter.MoveAllLeftTooltip));
+                getTooltip: () => adapter.MoveAllLeftTooltip));
 
             root.AddChild(new ButtonWidget(
                 "move-troop-split-equal",
-                adapter.SplitEqualLabel,
+                () => adapter.SplitEqualLabel,
                 adapter.SplitEqual,
                 adapter.HideNativeTooltip,
                 adapter.IsSplitEqualEnabled,
-                tooltip: adapter.SplitEqualTooltip));
+                getTooltip: () => adapter.SplitEqualTooltip));
 
             root.AddChild(new ButtonWidget(
                 "move-troop-move-all-right",
-                adapter.MoveAllRightLabel,
+                () => adapter.MoveAllRightLabel,
                 adapter.MoveAllRight,
                 adapter.HideNativeTooltip,
                 adapter.IsMoveAllRightEnabled,
-                tooltip: adapter.MoveAllRightTooltip));
+                getTooltip: () => adapter.MoveAllRightTooltip));
 
             // Known minor issue: native TroopHUDEntryMovable stores SliderValue as the
             // right-side balance size, then remaps visible left/right amounts based on
@@ -123,14 +132,14 @@ namespace SongsOfConquestAccess.Screens
                 ModText.Get(ModStrings.Screens.Ok),
                 adapter.Confirm,
                 adapter.HideNativeTooltip,
-                () => adapter.IsPresent()));
+                adapter.CanConfirm));
 
             root.AddChild(new ButtonWidget(
                 "move-troop-cancel",
                 ModText.Get(ModStrings.Actions.Cancel),
                 adapter.Cancel,
                 adapter.HideNativeTooltip,
-                () => adapter.IsPresent()));
+                adapter.CanCancel));
 
             return root;
         }

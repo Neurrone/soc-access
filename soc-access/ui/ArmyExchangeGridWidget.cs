@@ -168,6 +168,7 @@ namespace SongsOfConquestAccess.UI
         {
             if (_dragSource != null)
             {
+                _dragSource.Slot.CancelDrag();
                 NativeSoundUtility.PostEvent("Common_SpellbookEndDragCancel");
             }
 
@@ -294,6 +295,17 @@ namespace SongsOfConquestAccess.UI
                 return false;
             }
 
+            if (_dragSource != null)
+            {
+                _dragSource.Slot.CancelDrag();
+                _dragSource = null;
+            }
+
+            if (!slot.Slot.BeginDrag())
+            {
+                return false;
+            }
+
             _dragSource = slot;
             Speak(ModText.Get(ModStrings.UI.DragStarted));
             return true;
@@ -320,6 +332,7 @@ namespace SongsOfConquestAccess.UI
                 TroopHudAdapter.DropResult result = _drop(source.Slot, target.Slot);
                 if (result == TroopHudAdapter.DropResult.InvalidDestination)
                 {
+                    _dragSource = null;
                     Speak(ModText.Get(ModStrings.UI.CannotDropThere));
                     return true;
                 }
@@ -333,10 +346,17 @@ namespace SongsOfConquestAccess.UI
                 {
                     _dragSource = null;
                 }
+                else if (result == TroopHudAdapter.DropResult.None)
+                {
+                    source.Slot.CancelDrag();
+                    _dragSource = null;
+                }
 
                 return true;
             }
 
+            source.Slot.CancelDrag();
+            _dragSource = null;
             return true;
         }
 
@@ -347,6 +367,7 @@ namespace SongsOfConquestAccess.UI
                 return false;
             }
 
+            _dragSource.Slot.CancelDrag();
             ClearDrag();
             NativeSoundUtility.PostEvent("Common_SpellbookEndDragCancel");
             Speak(ModText.Get(ModStrings.UI.DragCancelled));

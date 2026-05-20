@@ -1634,6 +1634,16 @@ msgctxt "Screens.ModifierCategoryTabs"
 msgid "Modifier category tabs"
 msgstr ""
 
+#. Screens.MoveAllLeft
+msgctxt "Screens.MoveAllLeft"
+msgid "Move all left"
+msgstr ""
+
+#. Screens.MoveAllRight
+msgctxt "Screens.MoveAllRight"
+msgid "Move all right"
+msgstr ""
+
 #. Screens.MultiEssenceSpells
 msgctxt "Screens.MultiEssenceSpells"
 msgid "Multi-essence spells"
