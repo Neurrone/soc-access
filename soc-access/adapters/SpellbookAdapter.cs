@@ -172,7 +172,7 @@ namespace SongsOfConquestAccess.Adapters
         public string GetAutoPopulateLabel()
         {
             UIToggle toggle = GetAutoPopulateToggle();
-            return SpeechTextSanitizer.Normalize(toggle != null ? toggle.Text : null);
+            return GetFirstTooltipLabel(toggle);
         }
 
         public bool IsAutoPopulateChecked()
@@ -739,6 +739,53 @@ namespace SongsOfConquestAccess.Adapters
             return quickbar != null && QuickbarAutoPopulateToggleField != null
                 ? QuickbarAutoPopulateToggleField.GetValue(quickbar) as UIToggle
                 : null;
+        }
+
+        private string GetTooltipLabel(Component component)
+        {
+            IReadOnlyList<string> lines = NativeTooltipUtility.GetTooltipLinesForComponent(component, GetLocalization());
+            if (lines == null || lines.Count == 0)
+            {
+                return string.Empty;
+            }
+
+            List<string> parts = new List<string>();
+            for (int i = 0; i < lines.Count; i++)
+            {
+                string part = SpeechTextSanitizer.Normalize(lines[i]);
+                if (!string.IsNullOrWhiteSpace(part))
+                {
+                    parts.Add(part);
+                }
+            }
+
+            return parts.Count == 0 ? string.Empty : string.Join(". ", parts.ToArray());
+        }
+
+        private string GetFirstTooltipLabel(Component root)
+        {
+            if (root == null)
+            {
+                return string.Empty;
+            }
+
+            Component[] components = root.GetComponentsInChildren<Component>(true);
+            for (int i = 0; i < components.Length; i++)
+            {
+                Component component = components[i];
+                if (component == null || ReferenceEquals(component, root))
+                {
+                    continue;
+                }
+
+                string label = GetTooltipLabel(component);
+                if (!string.IsNullOrWhiteSpace(label))
+                {
+                    return label;
+                }
+            }
+
+            return string.Empty;
         }
 
         private UIButton GetTutorialButton()

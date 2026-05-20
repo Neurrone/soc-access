@@ -9,6 +9,7 @@
 - Added `,` and `shift+,` hotkeys on the combat grid to move focus between your troops in initiative order
 - Added `space` hotkey to move focus to your currently acting troop
 - Added `.` and `shift+.` hotkeys on the combat grid to move focus between enemy troops in initiative order
+- Fixed wrong label for spellbook screen checkbox
 
 ## V0.1.4
 
