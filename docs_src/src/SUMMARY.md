@@ -11,6 +11,7 @@
 - [Army Exchange](army-exchange.md)
 - [Character Sheet and Trading](character-sheet-and-trading.md)
 - [Combat](combat.md)
+- [Mod settings](mod-settings.md)
 - [Codex](codex.md)
 - [Command Reference](command-reference.md)
 - [Changelog](changelog.md)

@@ -44,14 +44,6 @@ If focus is on a tile with an enemy or destructable entity, the tooltip shows an
 
 If focused on a tile in movement range, the tooltip shows the movement cost.
 
-### Threatened Tiles
-
-Units have a zone of control, attack and movement range. Ranged units also have a deadly range.
-
-The mod uses the terminology threatened tiles to refer to tiles that are within these ranges for enemy troop stacks.
-
-By default, focusing a tile will indicate if it is threatened by an enemy troop stack. However, this can be very spammy. To help with this, turn off the option to read detailed threat info on each tile in the mod settings screen, which just indicates if a tile is threatened by saying "threatened". Press `s` to get the detailed threat information for the focused tile.
-
 ### Combat Actions
 
 The following hotkeys work when on the hex grid:
