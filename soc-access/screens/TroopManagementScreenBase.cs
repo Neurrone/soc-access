@@ -238,7 +238,7 @@ namespace SongsOfConquestAccess.Screens
 
             root.AddChild(new ButtonWidget(
                 prefix + "-close",
-                () => Host.CloseLabel,
+                ModText.Get(ModStrings.Screens.Close),
                 Host.Close,
                 Host.HideNativeTooltip,
                 IsContentPresent));

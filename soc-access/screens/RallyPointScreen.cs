@@ -258,7 +258,7 @@ namespace SongsOfConquestAccess.Screens
 
             root.AddChild(new ButtonWidget(
                 "rally-point-close",
-                () => BuildCloseLabel(),
+                ModText.Get(ModStrings.Screens.Close),
                 _adapter.Close,
                 _adapter.HideNativeTooltip,
                 () => _adapter.IsPresent()));
@@ -286,12 +286,6 @@ namespace SongsOfConquestAccess.Screens
             return string.IsNullOrWhiteSpace(name)
                 ? ModText.Get(ModStrings.Screens.WielderArmy)
                 : ModText.Get(ModStrings.Screens.WielderArmyPossessive, name);
-        }
-
-        private string BuildCloseLabel()
-        {
-            string label = _adapter != null ? _adapter.CloseLabel : string.Empty;
-            return string.IsNullOrWhiteSpace(label) ? ModText.Get(ModStrings.Screens.Close) : label;
         }
 
         private MenuWidget BuildSourceMenu()

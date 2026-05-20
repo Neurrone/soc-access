@@ -250,7 +250,7 @@ namespace SongsOfConquestAccess.Screens
 
             root.AddChild(new ButtonWidget(
                 "settlement-close",
-                () => adapter.CloseLabel,
+                ModText.Get(ModStrings.Screens.Close),
                 adapter.Close,
                 adapter.HideNativeTooltip,
                 () => adapter.IsTopLevelPresent()));
