@@ -1,4 +1,4 @@
-﻿msgid ""
+msgid ""
 msgstr ""
 "Project-Id-Version: SongsOfConquestAccess\n"
 "Language: tr\n"
@@ -495,6 +495,11 @@ msgctxt "Screens.Back"
 msgid "Back"
 msgstr "Geri"
 
+#. Screens.Ballista
+msgctxt "Screens.Ballista"
+msgid "Ballista"
+msgstr "Balista"
+
 #. Screens.BattleLog
 msgctxt "Screens.BattleLog"
 msgid "Battle log"
@@ -789,6 +794,11 @@ msgstr "Kademe"
 msgctxt "Screens.Tower"
 msgid "Tower {0}"
 msgstr "Kule {0}"
+
+#. Screens.Towers
+msgctxt "Screens.Towers"
+msgid "Towers"
+msgstr "Kuleler"
 
 #. Screens.TroopLost
 msgctxt "Screens.TroopLost"

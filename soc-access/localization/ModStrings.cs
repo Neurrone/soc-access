@@ -338,6 +338,7 @@ namespace SongsOfConquestAccess.Localization
             public static readonly ModString AttackerEssence = new ModString("Screens.AttackerEssence", "Attacker essence");
             public static readonly ModString AttackerPortrait = new ModString("Screens.AttackerPortrait", "Attacker portrait");
             public static readonly ModString Back = new ModString("Screens.Back", "Back");
+            public static readonly ModString Ballista = new ModString("Screens.Ballista", "Ballista");
             public static readonly ModString BattleLog = new ModString("Screens.BattleLog", "Battle log");
             public static readonly ModString BattleResult = new ModString("Screens.BattleResult", "Battle result");
             public static readonly ModString Categories = new ModString("Screens.Categories", "Categories");
@@ -406,6 +407,7 @@ namespace SongsOfConquestAccess.Localization
             public static readonly ModString TooltipActions = new ModString("Screens.TooltipActions", "Tooltip actions");
             public static readonly ModString Tier = new ModString("Screens.Tier", "Tier");
             public static readonly ModString Tower = new ModString("Screens.Tower", "Tower {0}");
+            public static readonly ModString Towers = new ModString("Screens.Towers", "Towers");
             public static readonly ModString TroopLost = new ModString("Screens.TroopLost", "{0} lost");
             public static readonly ModString TroopManagement = new ModString("Screens.TroopManagement", "Troop management");
             public static readonly ModString TroopDistribution = new ModString("Screens.TroopDistribution", "troop distribution");

@@ -1,6 +1,9 @@
 using System.Collections.Generic;
 using SongsOfConquest.Client.Adventure.UI;
+using SongsOfConquest.Client.Gamestate.Facade;
+using SongsOfConquest.Common.Details;
 using SongsOfConquest.Common.Localization;
+using SongsOfConquestAccess.Speech;
 using UnityEngine;
 
 namespace SongsOfConquestAccess.Adapters
@@ -44,7 +47,46 @@ namespace SongsOfConquestAccess.Adapters
 
             public bool IsOccupied
             {
-                get { return _entry != null && _entry.Troop != null; }
+                get { return IsVisible(_entry as Component) && GetDetails() != null; }
+            }
+
+            public string TroopName
+            {
+                get
+                {
+                    AdventureTroopDetails details = GetDetails();
+                    string nameKey = details != null ? details.TroopDetails.Description.NameKey : string.Empty;
+                    return !string.IsNullOrWhiteSpace(nameKey) && _localization != null
+                        ? SpeechTextSanitizer.Normalize(_localization.GetPluralTextGeneric(nameKey, CurrentSize))
+                        : string.Empty;
+                }
+            }
+
+            public int CurrentSize
+            {
+                get
+                {
+                    AdventureTroopDetails details = GetDetails();
+                    if (details != null && details.TroopDetails.Description.Amount > 0)
+                    {
+                        return details.TroopDetails.Description.Amount;
+                    }
+
+                    return ParseAmount(_entry != null ? _entry.AmountText : null);
+                }
+            }
+
+            public int MaxSize
+            {
+                get
+                {
+                    AdventureTroopDetails details = GetDetails();
+                    return details != null
+                        && details.TroopDetails.Stats != null
+                        && details.TroopDetails.Stats.MaxTroopSize != null
+                        ? details.TroopDetails.Stats.MaxTroopSize.GetValue()
+                        : 0;
+                }
             }
 
             public Tooltip Tooltip
@@ -71,6 +113,33 @@ namespace SongsOfConquestAccess.Adapters
             private static bool IsVisible(Component component)
             {
                 return component != null && component.gameObject != null && component.gameObject.activeInHierarchy;
+            }
+
+            private AdventureTroopDetails GetDetails()
+            {
+                IDetails nativeDetails;
+                return _entry != null
+                    && NativeTooltipUtility.TryGetUiDetails(_entry.GetSelectable(), out nativeDetails)
+                    ? nativeDetails as AdventureTroopDetails
+                    : null;
+            }
+
+            private static int ParseAmount(string amountText)
+            {
+                string normalized = SpeechTextSanitizer.Normalize(amountText);
+                if (string.IsNullOrWhiteSpace(normalized))
+                {
+                    return 0;
+                }
+
+                int separatorIndex = normalized.IndexOf('/');
+                if (separatorIndex >= 0)
+                {
+                    normalized = normalized.Substring(0, separatorIndex);
+                }
+
+                int amount;
+                return int.TryParse(normalized.Trim(), out amount) ? amount : 0;
             }
         }
     }

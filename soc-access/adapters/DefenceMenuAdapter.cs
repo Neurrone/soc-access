@@ -9,6 +9,7 @@ using SongsOfConquest.Client.Gamestate;
 using SongsOfConquest.Client.Gamestate.Facade;
 using SongsOfConquest.Client.UI;
 using SongsOfConquest.Common.Entities;
+using SongsOfConquest.Common.Details;
 using SongsOfConquest.Common.Gamestate;
 using SongsOfConquest.Common.Localization;
 using SongsOfConquestAccess.Localization;
@@ -20,7 +21,6 @@ namespace SongsOfConquestAccess.Adapters
     internal sealed class DefenceMenuAdapter
     {
         private static readonly FieldInfo AsyncField = AccessTools.Field(typeof(DefenceMenu), "_async");
-        private static readonly FieldInfo CloseButtonField = AccessTools.Field(typeof(DefenceMenu), "_closeButton");
         private static readonly FieldInfo TutorialButtonField = AccessTools.Field(typeof(DefenceMenu), "_tutorialButton");
         private static readonly FieldInfo MainTitleField = AccessTools.Field(typeof(DefenceMenu), "_mainTitle");
         private static readonly FieldInfo SubTitleField = AccessTools.Field(typeof(DefenceMenu), "_subTitle");
@@ -44,6 +44,7 @@ namespace SongsOfConquestAccess.Adapters
         private static readonly FieldInfo TowerInfoTextField = AccessTools.Field(typeof(DefencePanelTroops), "_towerInfoText");
         private static readonly FieldInfo TowersLevelTextField = AccessTools.Field(typeof(DefencePanelTroops), "_towersLevelText");
         private static readonly FieldInfo TowerContainerField = AccessTools.Field(typeof(DefencePanelTroops), "_towerContainer");
+        private static readonly FieldInfo TowerInfoContainerField = AccessTools.Field(typeof(DefencePanelTroops), "_towerInfoContainer");
 
         private static readonly FieldInfo TowerTooltipAreaField = AccessTools.Field(typeof(DefenceTowerEntry), "_tooltipArea");
 
@@ -245,15 +246,6 @@ namespace SongsOfConquestAccess.Adapters
             return true;
         }
 
-        public string CloseLabel
-        {
-            get
-            {
-                string label = GetButtonLabel(GetField<UIButton>(_menu, CloseButtonField));
-                return label;
-            }
-        }
-
         public PurchaseTroopsSubMenuAdapter PurchaseTroops
         {
             get { return new PurchaseTroopsSubMenuAdapter(GetPurchaseSubMenu(), _facade, _localization); }
@@ -268,15 +260,25 @@ namespace SongsOfConquestAccess.Adapters
         {
             get
             {
-                string levels = GetText(GetField<UITextMesh>(GetDefencePanelTroops(), TowersLevelTextField));
-                string info = GetText(GetField<UITextMesh>(GetDefencePanelTroops(), TowerInfoTextField));
-                return MenuButtonTextUtility.JoinParts(levels, info);
+                return GetText(GetField<UITextMesh>(GetDefencePanelTroops(), TowersLevelTextField));
             }
         }
 
         public bool HasTowerSummary()
         {
             return !string.IsNullOrWhiteSpace(TowerSummary);
+        }
+
+        public string TowerInfoText
+        {
+            get { return GetText(GetField<UITextMesh>(GetDefencePanelTroops(), TowerInfoTextField)); }
+        }
+
+        public bool HasVisibleTowerInfo()
+        {
+            return IsVisible(GetField<GameObject>(GetDefencePanelTroops(), TowerInfoContainerField))
+                && IsVisible(GetField<UITextMesh>(GetDefencePanelTroops(), TowerInfoTextField) as Component)
+                && !string.IsNullOrWhiteSpace(TowerInfoText);
         }
 
         public IReadOnlyList<TowerItem> GetTowerItems()
@@ -415,10 +417,11 @@ namespace SongsOfConquestAccess.Adapters
             {
                 get
                 {
-                    Tooltip tooltip = Tooltip;
-                    if (tooltip != null && tooltip.TextLines != null && tooltip.TextLines.Count > 0)
+                    Component tooltipArea = GetField<Component>(_entry, TowerTooltipAreaField);
+                    IDetails details;
+                    if (NativeTooltipUtility.TryGetUiDetails(tooltipArea, out details) && details is DefenceTowerDetails towerDetails)
                     {
-                        return SpeechTextSanitizer.Normalize(string.Join(". ", tooltip.TextLines));
+                        return SpeechTextSanitizer.Normalize(towerDetails.Header);
                     }
 
                     return ModText.Get(ModStrings.Screens.Tower, _number);

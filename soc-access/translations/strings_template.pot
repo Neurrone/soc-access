@@ -1524,6 +1524,11 @@ msgctxt "Screens.Back"
 msgid "Back"
 msgstr ""
 
+#. Screens.Ballista
+msgctxt "Screens.Ballista"
+msgid "Ballista"
+msgstr ""
+
 #. Screens.BattleLog
 msgctxt "Screens.BattleLog"
 msgid "Battle log"
@@ -1862,6 +1867,11 @@ msgstr ""
 #. Screens.Tower
 msgctxt "Screens.Tower"
 msgid "Tower {0}"
+msgstr ""
+
+#. Screens.Towers
+msgctxt "Screens.Towers"
+msgid "Towers"
 msgstr ""
 
 #. Screens.TroopLost

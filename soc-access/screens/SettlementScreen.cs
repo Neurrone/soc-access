@@ -246,7 +246,7 @@ namespace SongsOfConquestAccess.Screens
                 adapter.VisitingTroops,
                 adapter.SettlementTroops));
             root.AddChild(BuildDefenseMenu("settlement-garrison", GameText.Get("Adventure/BuildMenu/Garrison", string.Empty), adapter.GetGarrisonSlots()));
-            root.AddChild(BuildDefenseMenu("settlement-ballista", string.Empty, adapter.GetBallistaSlots()));
+            root.AddChild(BuildDefenseMenu("settlement-ballista", ModText.Get(ModStrings.Screens.Ballista), adapter.GetBallistaSlots()));
 
             root.AddChild(new ButtonWidget(
                 "settlement-close",
@@ -327,13 +327,18 @@ namespace SongsOfConquestAccess.Screens
                 return string.Empty;
             }
 
-            Tooltip tooltip = slot.Tooltip;
-            if (tooltip != null && tooltip.TextLines != null && tooltip.TextLines.Count > 0)
+            string slotLabel = ModText.Get(ModStrings.UI.Slot, slot.SlotNumber);
+            if (!slot.IsOccupied)
             {
-                return SpeechTextSanitizer.Normalize(string.Join(". ", tooltip.TextLines));
+                return ModText.Get(ModStrings.UI.EmptyTroopSlot, slotLabel);
             }
 
-            return ModText.Get(ModStrings.Screens.EmptySlot, slot.SlotNumber);
+            if (slot.CurrentSize > 0 && slot.MaxSize > 0)
+            {
+                return ModText.Get(ModStrings.UI.TroopSlotWithSize, slot.TroopName, slot.CurrentSize, slot.MaxSize, slotLabel);
+            }
+
+            return ModText.Get(ModStrings.UI.TroopSlot, slot.TroopName, slotLabel);
         }
 
         private sealed class GridFocus

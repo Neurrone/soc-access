@@ -272,6 +272,7 @@ namespace SongsOfConquestAccess.Screens
                 adapter.IsUpgradeVisible,
                 () => adapter.UpgradeTooltip));
 
+            root.AddChild(BuildTowerMenu(adapter));
             root.AddChild(new TextWidget(
                 "defences-tower-summary",
                 () => adapter.TowerSummary,
@@ -279,13 +280,19 @@ namespace SongsOfConquestAccess.Screens
                 includeParentLabelInAnnouncement: false,
                 isVisible: adapter.HasTowerSummary));
 
-            root.AddChild(BuildTowerMenu(adapter));
+            root.AddChild(new TextWidget(
+                "defences-tower-info",
+                () => adapter.TowerInfoText,
+                adapter.HideNativeTooltip,
+                includeParentLabelInAnnouncement: false,
+                isVisible: adapter.HasVisibleTowerInfo));
+
             root.AddChild(BuildDefenseMenu("defences-garrison", GameText.Get("Adventure/BuildMenu/Garrison", string.Empty), adapter.GetGarrisonSlots()));
-            root.AddChild(BuildDefenseMenu("defences-ballista", string.Empty, adapter.GetBallistaSlots()));
+            root.AddChild(BuildDefenseMenu("defences-ballista", ModText.Get(ModStrings.Screens.Ballista), adapter.GetBallistaSlots()));
 
             root.AddChild(new ButtonWidget(
                 "defences-close",
-                () => adapter.CloseLabel,
+                ModText.Get(ModStrings.Screens.Close),
                 adapter.Close,
                 adapter.HideNativeTooltip,
                 () => adapter.IsTopLevelPresent()));
@@ -331,7 +338,7 @@ namespace SongsOfConquestAccess.Screens
         private static MenuWidget BuildTowerMenu(DefenceMenuAdapter adapter)
         {
             IReadOnlyList<DefenceMenuAdapter.TowerItem> towers = adapter.GetTowerItems();
-            MenuWidget menu = new MenuWidget("defences-towers", adapter.TowerSummary, () => towers.Count > 0);
+            MenuWidget menu = new MenuWidget("defences-towers", ModText.Get(ModStrings.Screens.Towers), () => towers.Count > 0);
             for (int i = 0; i < towers.Count; i++)
             {
                 DefenceMenuAdapter.TowerItem tower = towers[i];
@@ -382,13 +389,18 @@ namespace SongsOfConquestAccess.Screens
                 return string.Empty;
             }
 
-            Tooltip tooltip = slot.Tooltip;
-            if (tooltip != null && tooltip.TextLines != null && tooltip.TextLines.Count > 0)
+            string slotLabel = ModText.Get(ModStrings.UI.Slot, slot.SlotNumber);
+            if (!slot.IsOccupied)
             {
-                return SpeechTextSanitizer.Normalize(string.Join(". ", tooltip.TextLines));
+                return ModText.Get(ModStrings.UI.EmptyTroopSlot, slotLabel);
             }
 
-            return ModText.Get(ModStrings.Screens.EmptySlot, slot.SlotNumber);
+            if (slot.CurrentSize > 0 && slot.MaxSize > 0)
+            {
+                return ModText.Get(ModStrings.UI.TroopSlotWithSize, slot.TroopName, slot.CurrentSize, slot.MaxSize, slotLabel);
+            }
+
+            return ModText.Get(ModStrings.UI.TroopSlot, slot.TroopName, slotLabel);
         }
 
         private sealed class GridFocus
