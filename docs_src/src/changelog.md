@@ -15,6 +15,7 @@
   - `N`: notifications
   - `R`: resources
   - `T`: troops
+- Added new setting to control whether story camera focus events are read. This is enabled by default
 - Fixed wrong label for spellbook screen checkbox
 - Add missing label for the wielder list menu in adventure map HUD
 

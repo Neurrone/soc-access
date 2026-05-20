@@ -390,6 +390,7 @@ namespace SongsOfConquestAccess.Localization
             public static readonly ModString Previous = new ModString("Screens.Previous", "Previous");
             public static readonly ModString Quickbar = new ModString("Screens.Quickbar", "Quickbar");
             public static readonly ModString ReadEnemyInfluence = new ModString("Screens.ReadEnemyInfluence", "Read attack, deadly and movement range for enemies on tiles in combat");
+            public static readonly ModString ReadStoryCameraFocusChanges = new ModString("Screens.ReadStoryCameraFocusChanges", "Read story camera focus change events");
             public static readonly ModString RecruitFrom = new ModString("Screens.RecruitFrom", "Recruit from");
             public static readonly ModString RecruitingFrom = new ModString("Screens.RecruitingFrom", "Recruiting from {0}");
             public static readonly ModString RemoveFromQuickbar = new ModString("Screens.RemoveFromQuickbar", "Remove from quickbar");

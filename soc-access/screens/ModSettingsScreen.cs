@@ -44,6 +44,11 @@ namespace SongsOfConquestAccess.Screens
                 ModText.Get(ModStrings.Screens.ReadEnemyInfluence),
                 ToggleReadEnemyInfluence,
                 () => ModSettings.ReadEnemyInfluence));
+            root.AddChild(new CheckboxWidget(
+                "mod-settings-read-story-camera-focus-changes",
+                ModText.Get(ModStrings.Screens.ReadStoryCameraFocusChanges),
+                ToggleReadStoryCameraFocusChanges,
+                () => ModSettings.ReadStoryCameraFocusChanges));
             root.AddChild(new ButtonWidget(
                 "mod-settings-close",
                 ModText.Get(ModStrings.Screens.Close),
@@ -56,6 +61,11 @@ namespace SongsOfConquestAccess.Screens
         private static void ToggleReadEnemyInfluence()
         {
             ModSettings.SetReadEnemyInfluence(!ModSettings.ReadEnemyInfluence);
+        }
+
+        private static void ToggleReadStoryCameraFocusChanges()
+        {
+            ModSettings.SetReadStoryCameraFocusChanges(!ModSettings.ReadStoryCameraFocusChanges);
         }
     }
 }

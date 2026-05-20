@@ -715,6 +715,11 @@ msgctxt "Screens.ReadEnemyInfluence"
 msgid "Read attack, deadly and movement range for enemies on tiles in combat"
 msgstr "ì „íˆ¬ ì¤‘ ì¹¸ ìœ„ ì ì˜ ê³µê²©, ì¹˜ëª… ë° ì´ë™ ë²”ìœ„ ì½ê¸°"
 
+#. Screens.ReadStoryCameraFocusChanges
+msgctxt "Screens.ReadStoryCameraFocusChanges"
+msgid "Read story camera focus change events"
+msgstr "스토리 카메라 초점 변경 이벤트 읽기"
+
 #. Screens.RecruitFrom
 msgctxt "Screens.RecruitFrom"
 msgid "Recruit from"

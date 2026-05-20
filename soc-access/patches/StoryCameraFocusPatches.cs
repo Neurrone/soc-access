@@ -157,6 +157,11 @@ namespace SongsOfConquestAccess
 
         private static void PublishIfTargets(StoryCameraFocusKind kind, IEnumerable<StoryCameraFocusTarget> targets, string reference)
         {
+            if (!ModSettings.ReadStoryCameraFocusChanges)
+            {
+                return;
+            }
+
             List<StoryCameraFocusTarget> targetList = targets != null
                 ? targets.Where(target => target != null).ToList()
                 : new List<StoryCameraFocusTarget>();

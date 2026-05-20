@@ -725,6 +725,11 @@ msgctxt "Screens.ReadEnemyInfluence"
 msgid "Read attack, deadly and movement range for enemies on tiles in combat"
 msgstr "Ð§Ð¸Ñ‚Ð°Ñ‚Ð¸ Ñ€Ð°Ð´Ñ–ÑƒÑÐ¸ Ð°Ñ‚Ð°ÐºÐ¸, ÑÐ¼ÐµÑ€Ñ‚ÐµÐ»ÑŒÐ½Ð¾Ñ— Ð·Ð°Ð³Ñ€Ð¾Ð·Ð¸ Ñ‚Ð° Ñ€ÑƒÑ…Ñƒ Ð²Ð¾Ñ€Ð¾Ð³Ñ–Ð² Ð½Ð° ÐºÐ»Ñ–Ñ‚Ð¸Ð½ÐºÐ°Ñ… Ñƒ Ð±Ð¾ÑŽ"
 
+#. Screens.ReadStoryCameraFocusChanges
+msgctxt "Screens.ReadStoryCameraFocusChanges"
+msgid "Read story camera focus change events"
+msgstr "Читати події зміни фокуса сюжетної камери"
+
 #. Screens.RecruitFrom
 msgctxt "Screens.RecruitFrom"
 msgid "Recruit from"
