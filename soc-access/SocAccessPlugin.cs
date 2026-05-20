@@ -17,7 +17,7 @@ namespace SongsOfConquestAccess
     {
         public const string PluginGuid = "songs.of.conquest.access";
         public const string PluginName = "Songs of Conquest Access";
-        public const string PluginVersion = "0.1.4";
+        public const string PluginVersion = "0.2.0";
 
         internal static SocAccessPlugin Instance { get; private set; }
 
