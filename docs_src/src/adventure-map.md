@@ -22,10 +22,6 @@ A tile can be in one of three visibility states:
 
 The mod mentions if a tile is unexplored or currently unseen.
 
-### Fog Tiles
-
-Some tiles may read as "fog". This is a terrain / decorative feature, not an indication of tiles in the fog of war, which the mod indicates as being unseen.
-
 ### Actions
 
 - Enter: perform the primary action on the focused tile, corresponding to a left-click. If the tile has a selectable entity such as a building, this brings up the entity's menu for further interaction. Otherwise, this clears the wielder's destination.

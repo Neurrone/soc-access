@@ -2969,9 +2969,6 @@ namespace SongsOfConquestAccess.Adapters
             AddEnvironment(tile, GetRoadName(GetLayerValue(position, LayerKind.Road)));
             AddEnvironment(tile, GetBridgeName(GetLayerValue(position, LayerKind.Bridge)));
             AddEnvironment(tile, GetWaterName(GetLayerValue(position, LayerKind.Water)));
-            AddEnvironment(tile, GetDecorationName(position, GetLayerValue(position, LayerKind.Decoration)));
-            AddEnvironment(tile, GetStandaloneDecorationName(GetLayerValue(position, LayerKind.StandaloneDecoration)));
-            AddEnvironment(tile, GetEffectName(GetLayerValue(position, LayerKind.Effect)));
         }
 
         private void AddEnvironment(AdventureMapTile tile, string value)
@@ -2996,12 +2993,6 @@ namespace SongsOfConquestAccess.Adapters
                         return _facade.Level.GetBridge(position);
                     case LayerKind.Water:
                         return _facade.Level.GetWater(position);
-                    case LayerKind.Decoration:
-                        return _facade.Level.GetDecoration(position);
-                    case LayerKind.StandaloneDecoration:
-                        return _facade.Level.GetStandaloneDecoration(position);
-                    case LayerKind.Effect:
-                        return _facade.Level.GetEffect(position);
                     default:
                         return 0;
                 }
@@ -3049,75 +3040,6 @@ namespace SongsOfConquestAccess.Adapters
                 default:
                     return water > 0 ? ModText.Get(ModStrings.Spatial.Water) : string.Empty;
             }
-        }
-
-        private string GetDecorationName(Vector2Int position, byte decoration)
-        {
-            if (decoration == 0)
-            {
-                return string.Empty;
-            }
-
-            switch (decoration)
-            {
-                case 1:
-                    return ModText.Get(ModStrings.Spatial.AridTrees);
-                case 2:
-                    return ModText.Get(ModStrings.Spatial.Trees);
-                case 3:
-                    return ModText.Get(ModStrings.Spatial.Mountains);
-                case 4:
-                    // Generic blocker brushes are editor/pathing markers rather than player-facing objects.
-                    // The tile still announces "impassable" from the game's static travel-cost result.
-                    return string.Empty;
-                case 5:
-                    return ModText.Get(ModStrings.Spatial.Light);
-                case 6:
-                    return ModText.Get(ModStrings.Spatial.Wall);
-                case 7:
-                    return ModText.Get(ModStrings.Spatial.Deforestation);
-                case 8:
-                    return ModText.Get(ModStrings.Spatial.Farmland);
-                case 9:
-                case 10:
-                case 11:
-                    // Generic blocker brushes are editor/pathing markers rather than player-facing objects.
-                    // The tile still announces "impassable" from the game's static travel-cost result.
-                    return string.Empty;
-            }
-
-            try
-            {
-                byte theme = _facade.Level.GetTheme(position);
-                IDecorationVisualManifest manifest = _cartographyVisualManifest.GetTheme(theme).GetDecoration(decoration);
-                return FormatBrushName(manifest.SoundKey, ModStrings.Spatial.Decoration);
-            }
-            catch (Exception)
-            {
-                return ModText.Get(ModStrings.Spatial.Decoration);
-            }
-        }
-
-        private string GetStandaloneDecorationName(byte decoration)
-        {
-            if (decoration == 0)
-            {
-                return string.Empty;
-            }
-
-            BrushSet brush = _cartographyVisualManifest.GetStandaloneDecorationBrush(decoration);
-            return FormatBrushName(brush.name, ModStrings.Spatial.Decoration);
-        }
-
-        private string GetEffectName(byte effect)
-        {
-            if (effect == 0)
-            {
-                return string.Empty;
-            }
-
-            BrushSet brush = _cartographyVisualManifest.GetEffectBrush(effect);
-            return FormatBrushName(brush.name, ModStrings.Spatial.Effect);
         }
 
         private static string FormatBrushName(string value, ModString fallback)
@@ -3322,10 +3244,7 @@ namespace SongsOfConquestAccess.Adapters
         {
             Road,
             Bridge,
-            Water,
-            Decoration,
-            StandaloneDecoration,
-            Effect
+            Water
         }
 
     }
