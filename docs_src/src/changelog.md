@@ -1,5 +1,9 @@
 # Changelog
 
+## V0.2.1
+
+- The troop purchase and upgrade screens have been rewritten to work similar to the marketplace. Instead of being a faithful translation of the game's UI, the number of tab stops no longer scales with the available troops. Instead, a troops menu shows how many troops are available. When focused, additional controls are added after the menu depending on troop availability
+
 ## V0.2.0
 
 - Localization support for all languages supported by the game

@@ -55,6 +55,26 @@ msgctxt "Draft.PurchaseForResources"
 msgid "Purchase for {0}"
 msgstr "Comprar por {0}"
 
+#. Draft.AvailableTroops_0
+msgctxt "Draft.AvailableTroops_0"
+msgid "{0} available"
+msgstr "{0} disponível"
+
+#. Draft.AvailableTroops_1
+msgctxt "Draft.AvailableTroops_1"
+msgid "{0} available"
+msgstr "{0} disponíveis"
+
+#. Draft.Upgrade
+msgctxt "Draft.Upgrade"
+msgid "Upgrade"
+msgstr "Aprimorar"
+
+#. Draft.UpgradeForResources
+msgctxt "Draft.UpgradeForResources"
+msgid "Upgrade for {0}"
+msgstr "Aprimorar por {0}"
+
 #. Draft.UpgradeAvailableTroops
 msgctxt "Draft.UpgradeAvailableTroops"
 msgid "Upgrade available troops"

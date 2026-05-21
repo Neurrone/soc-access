@@ -17,10 +17,13 @@ namespace SongsOfConquestAccess.Localization
 
         public static class Draft
         {
+            public static readonly ModPluralString AvailableTroops = new ModPluralString("Draft.AvailableTroops", "{0} available", "{0} available");
             public static readonly ModString EssenceVariants = new ModString("Draft.EssenceVariants", "Essence variants");
             public static readonly ModString Purchase = new ModString("Draft.Purchase", "Purchase");
             public static readonly ModString PurchaseForResources = new ModString("Draft.PurchaseForResources", "Purchase for {0}");
+            public static readonly ModString Upgrade = new ModString("Draft.Upgrade", "Upgrade");
             public static readonly ModString UpgradeAvailableTroops = new ModString("Draft.UpgradeAvailableTroops", "Upgrade available troops");
+            public static readonly ModString UpgradeForResources = new ModString("Draft.UpgradeForResources", "Upgrade for {0}");
         }
 
         public static class Events

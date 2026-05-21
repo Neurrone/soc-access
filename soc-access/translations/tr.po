@@ -50,6 +50,21 @@ msgctxt "Draft.PurchaseForResources"
 msgid "Purchase for {0}"
 msgstr "{0} karÅŸÄ±lÄ±ÄŸÄ±nda satÄ±n al"
 
+#. Draft.AvailableTroops_0
+msgctxt "Draft.AvailableTroops_0"
+msgid "{0} available"
+msgstr "{0} mevcut"
+
+#. Draft.Upgrade
+msgctxt "Draft.Upgrade"
+msgid "Upgrade"
+msgstr "Yükselt"
+
+#. Draft.UpgradeForResources
+msgctxt "Draft.UpgradeForResources"
+msgid "Upgrade for {0}"
+msgstr "{0} karşılığında yükselt"
+
 #. Draft.UpgradeAvailableTroops
 msgctxt "Draft.UpgradeAvailableTroops"
 msgid "Upgrade available troops"

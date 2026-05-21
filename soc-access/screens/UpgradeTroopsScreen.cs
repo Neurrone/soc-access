@@ -9,6 +9,8 @@ namespace SongsOfConquestAccess.Screens
 {
     internal sealed class UpgradeTroopsScreen : TroopManagementScreenBase
     {
+        private string _selectedUpgradeId;
+
         public UpgradeTroopsScreen(ITroopManagementHostAdapter host)
             : base(host)
         {
@@ -71,6 +73,9 @@ namespace SongsOfConquestAccess.Screens
             }
 
             UpgradeTroopsSubMenuAdapter subMenu = Host.UpgradeTroops;
+            IReadOnlyList<UpgradeTroopsSubMenuAdapter.UpgradeEntry> entries = subMenu.GetEntries();
+            EnsureSelectedUpgrade(entries);
+
             root.AddChild(new TextWidget(
                 Host.IdPrefix + "-upgrade-none",
                 () => subMenu.NoUpgradableTroopsText,
@@ -78,14 +83,49 @@ namespace SongsOfConquestAccess.Screens
                 includeParentLabelInAnnouncement: false,
                 isVisible: () => subMenu.IsNoUpgradableTroopsVisible));
 
-            IReadOnlyList<UpgradeTroopsSubMenuAdapter.UpgradeEntry> entries = subMenu.GetEntries();
+            root.AddChild(BuildTroopsMenu(entries));
             for (int i = 0; i < entries.Count; i++)
             {
                 AddUpgradeWidgets(root, entries[i]);
             }
         }
 
-        private static void AddUpgradeWidgets(ContainerWidget root, UpgradeTroopsSubMenuAdapter.UpgradeEntry entry)
+        private MenuWidget BuildTroopsMenu(IReadOnlyList<UpgradeTroopsSubMenuAdapter.UpgradeEntry> entries)
+        {
+            string idPrefix = Host != null ? Host.IdPrefix + "-" + ScreenSuffix : "upgrade-troops";
+            MenuWidget menu = new MenuWidget(
+                idPrefix + "-troops",
+                GameText.Get("Commanders/Tooltip/Troops", string.Empty),
+                () => entries != null && entries.Count > 0);
+            if (entries == null)
+            {
+                return menu;
+            }
+
+            for (int i = 0; i < entries.Count; i++)
+            {
+                UpgradeTroopsSubMenuAdapter.UpgradeEntry entry = entries[i];
+                if (entry == null)
+                {
+                    continue;
+                }
+
+                UpgradeTroopsSubMenuAdapter.UpgradeEntry capturedEntry = entry;
+                menu.AddItem(new MenuItemWidget(
+                    capturedEntry.IdPrefix + "-menu-item",
+                    () => capturedEntry.CurrentTroopName,
+                    () => BuildUpgradeStatus(capturedEntry),
+                    () => SelectUpgrade(capturedEntry, playSound: true),
+                    () => SelectUpgrade(capturedEntry, playSound: true),
+                    () => true,
+                    () => capturedEntry.CurrentTooltip));
+            }
+
+            menu.SetFocusedItemById(_selectedUpgradeId + "-menu-item");
+            return menu;
+        }
+
+        private void AddUpgradeWidgets(ContainerWidget root, UpgradeTroopsSubMenuAdapter.UpgradeEntry entry)
         {
             if (root == null || entry == null)
             {
@@ -93,18 +133,12 @@ namespace SongsOfConquestAccess.Screens
             }
 
             root.AddChild(new TextWidget(
-                entry.IdPrefix + "-current",
-                () => entry.CurrentTroopText,
-                entry.Focus,
-                includeParentLabelInAnnouncement: false,
-                () => entry.CurrentTooltip));
-
-            root.AddChild(new TextWidget(
                 entry.IdPrefix + "-target",
                 () => entry.TargetTroopText,
-                entry.Focus,
+                entry.FocusTarget,
                 includeParentLabelInAnnouncement: false,
-                () => entry.TargetTooltip));
+                () => entry.TargetTooltip,
+                () => IsSelectedUpgrade(entry)));
 
             root.AddChild(new SliderWidget(
                 entry.IdPrefix + "-quantity",
@@ -115,7 +149,8 @@ namespace SongsOfConquestAccess.Screens
                 () => entry.SliderMaximum,
                 () => 1,
                 entry.SetSliderValue,
-                () => entry.IsSliderEnabled));
+                () => entry.IsSliderEnabled,
+                () => IsSelectedUpgrade(entry) && entry.IsSliderVisible));
 
             root.AddChild(new ButtonWidget(
                 entry.IdPrefix + "-upgrade",
@@ -123,8 +158,71 @@ namespace SongsOfConquestAccess.Screens
                 entry.Upgrade,
                 entry.Focus,
                 () => entry.IsUpgradeEnabled,
-                () => entry.IsUpgradeVisible,
+                () => IsSelectedUpgrade(entry) && entry.IsUpgradeVisible,
                 () => entry.UpgradeTooltip));
+        }
+
+        private void EnsureSelectedUpgrade(IReadOnlyList<UpgradeTroopsSubMenuAdapter.UpgradeEntry> entries)
+        {
+            if (FindUpgrade(entries, _selectedUpgradeId) != null)
+            {
+                return;
+            }
+
+            _selectedUpgradeId = entries != null && entries.Count > 0 && entries[0] != null
+                ? entries[0].IdPrefix
+                : null;
+        }
+
+        private static UpgradeTroopsSubMenuAdapter.UpgradeEntry FindUpgrade(
+            IReadOnlyList<UpgradeTroopsSubMenuAdapter.UpgradeEntry> entries,
+            string id)
+        {
+            if (entries == null || string.IsNullOrWhiteSpace(id))
+            {
+                return null;
+            }
+
+            for (int i = 0; i < entries.Count; i++)
+            {
+                UpgradeTroopsSubMenuAdapter.UpgradeEntry entry = entries[i];
+                if (entry != null && entry.IdPrefix == id)
+                {
+                    return entry;
+                }
+            }
+
+            return null;
+        }
+
+        private bool IsSelectedUpgrade(UpgradeTroopsSubMenuAdapter.UpgradeEntry entry)
+        {
+            return entry != null && entry.IdPrefix == _selectedUpgradeId;
+        }
+
+        private bool SelectUpgrade(UpgradeTroopsSubMenuAdapter.UpgradeEntry entry, bool playSound)
+        {
+            if (entry == null)
+            {
+                return false;
+            }
+
+            bool changed = _selectedUpgradeId != entry.IdPrefix;
+            _selectedUpgradeId = entry.IdPrefix;
+            entry.Focus();
+            if (changed && playSound)
+            {
+                NativeSoundUtility.PostEvent("Common_DefaultClick");
+            }
+
+            return true;
+        }
+
+        private static string BuildUpgradeStatus(UpgradeTroopsSubMenuAdapter.UpgradeEntry entry)
+        {
+            return entry != null
+                ? ModText.Plural(ModStrings.Draft.AvailableTroops, entry.AvailableTroops, entry.AvailableTroops)
+                : string.Empty;
         }
     }
 }

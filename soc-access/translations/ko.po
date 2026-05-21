@@ -50,6 +50,21 @@ msgctxt "Draft.PurchaseForResources"
 msgid "Purchase for {0}"
 msgstr "{0}(ìœ¼)ë¡œ êµ¬ë§¤"
 
+#. Draft.AvailableTroops_0
+msgctxt "Draft.AvailableTroops_0"
+msgid "{0} available"
+msgstr "{0} 사용 가능"
+
+#. Draft.Upgrade
+msgctxt "Draft.Upgrade"
+msgid "Upgrade"
+msgstr "업그레이드"
+
+#. Draft.UpgradeForResources
+msgctxt "Draft.UpgradeForResources"
+msgid "Upgrade for {0}"
+msgstr "{0}(으)로 업그레이드"
+
 #. Draft.UpgradeAvailableTroops
 msgctxt "Draft.UpgradeAvailableTroops"
 msgid "Upgrade available troops"

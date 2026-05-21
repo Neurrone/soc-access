@@ -12,6 +12,7 @@ using SongsOfConquest.Common.Economy;
 using SongsOfConquest.Common.Entities.Adventure;
 using SongsOfConquest.Common.Gamestate;
 using SongsOfConquest.Common.Localization;
+using SongsOfConquestAccess.Localization;
 using SongsOfConquestAccess.Speech;
 using UnityEngine;
 
@@ -150,9 +151,19 @@ namespace SongsOfConquestAccess.Adapters
                 get { return MenuButtonTextUtility.JoinParts(GetText(GetField<UITextMesh>(_entry, CurrentTextField)), GetText(GetField<UITextMesh>(_entry, CurrentAmountTextField))); }
             }
 
+            public string CurrentTroopName
+            {
+                get { return GetText(GetField<UITextMesh>(_entry, CurrentTextField)); }
+            }
+
             public string TargetTroopText
             {
                 get { return MenuButtonTextUtility.JoinParts(GetText(GetField<UITextMesh>(_entry, TargetTextField)), GetText(GetField<UITextMesh>(_entry, TargetAmountTextField))); }
+            }
+
+            public string TargetTroopName
+            {
+                get { return GetText(GetField<UITextMesh>(_entry, TargetTextField)); }
             }
 
             public string SliderLabel
@@ -179,9 +190,24 @@ namespace SongsOfConquestAccess.Adapters
                 get { UISlider slider = GetSlider(); return slider != null ? Mathf.RoundToInt(slider.SliderMaxValue) : 0; }
             }
 
+            public int AvailableTroops
+            {
+                get { return SliderMaximum; }
+            }
+
             public bool IsSliderEnabled
             {
                 get { UISlider slider = GetSlider(); return slider != null && slider.Interactable; }
+            }
+
+            public bool IsSliderVisible
+            {
+                get
+                {
+                    UISlider slider = GetSlider();
+                    Component component = slider as Component;
+                    return component != null && component.gameObject.activeInHierarchy;
+                }
             }
 
             public bool SetSliderValue(int value)
@@ -235,7 +261,12 @@ namespace SongsOfConquestAccess.Adapters
                     }
 
                     IReadOnlyList<ResourceCostLine> costs = UpgradeCosts;
-                    return costs.Count == 0 ? "Upgrade" : "Upgrade for " + FormatCostLines(costs);
+                    return costs.Count == 0
+                        ? ModText.Get(_localization, ModStrings.Draft.Upgrade)
+                        : ModText.Get(
+                            _localization,
+                            ModStrings.Draft.UpgradeForResources,
+                            FormatCostLines(costs));
                 }
             }
 
@@ -289,6 +320,11 @@ namespace SongsOfConquestAccess.Adapters
                 NativeSelectionUtility.Select(_entry != null ? _entry.GetSelectable() : null);
             }
 
+            public void FocusTarget()
+            {
+                NativeSelectionUtility.Select(GetField<UIButton>(_entry, TargetButtonField));
+            }
+
             public bool Upgrade()
             {
                 if (!IsUpgradeEnabled || HandlePurchaseClickedMethod == null)
@@ -339,11 +375,15 @@ namespace SongsOfConquestAccess.Adapters
                     ResourceCostLine cost = costs[i];
                     if (cost != null)
                     {
-                        parts.Add(cost.Amount + " " + GetResourceName(cost.ResourceType));
+                        parts.Add(ModText.Get(
+                            _localization,
+                            ModStrings.Common.ResourceAmount,
+                            cost.Amount,
+                            GetResourceName(cost.ResourceType)));
                     }
                 }
 
-                return JoinWithAnd(parts);
+                return ModText.JoinList(_localization, parts);
             }
 
             private string GetResourceName(ResourceType resourceType)
@@ -357,26 +397,6 @@ namespace SongsOfConquestAccess.Adapters
                 string key = "Common/Resource/" + resourceType;
                 string text = _localization.GetText(key);
                 return string.IsNullOrWhiteSpace(text) || text == key ? fallback : text;
-            }
-
-            private static string JoinWithAnd(List<string> parts)
-            {
-                if (parts.Count == 0)
-                {
-                    return string.Empty;
-                }
-
-                if (parts.Count == 1)
-                {
-                    return parts[0];
-                }
-
-                if (parts.Count == 2)
-                {
-                    return parts[0] + " and " + parts[1];
-                }
-
-                return string.Join(", ", parts.GetRange(0, parts.Count - 1).ToArray()) + ", and " + parts[parts.Count - 1];
             }
 
             private static string FormatEnumName(string value)

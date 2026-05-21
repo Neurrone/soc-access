@@ -59,9 +59,19 @@ msgctxt "Draft.PurchaseForResources"
 msgid "Purchase for {0}"
 msgstr ""
 
+#. Draft.Upgrade
+msgctxt "Draft.Upgrade"
+msgid "Upgrade"
+msgstr ""
+
 #. Draft.UpgradeAvailableTroops
 msgctxt "Draft.UpgradeAvailableTroops"
 msgid "Upgrade available troops"
+msgstr ""
+
+#. Draft.UpgradeForResources
+msgctxt "Draft.UpgradeForResources"
+msgid "Upgrade for {0}"
 msgstr ""
 
 #. Events.BuildSiteLarge
@@ -2172,6 +2182,21 @@ msgstr ""
 #. Common.TileCount_2
 msgctxt "Common.TileCount_2"
 msgid "{0} tiles"
+msgstr ""
+
+#. Draft.AvailableTroops_0
+msgctxt "Draft.AvailableTroops_0"
+msgid "{0} available"
+msgstr ""
+
+#. Draft.AvailableTroops_1
+msgctxt "Draft.AvailableTroops_1"
+msgid "{0} available"
+msgstr ""
+
+#. Draft.AvailableTroops_2
+msgctxt "Draft.AvailableTroops_2"
+msgid "{0} available"
 msgstr ""
 
 #. Combat.BoltAt_0

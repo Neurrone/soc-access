@@ -60,6 +60,31 @@ msgctxt "Draft.PurchaseForResources"
 msgid "Purchase for {0}"
 msgstr "ÐšÑƒÐ¿Ð¸Ñ‚Ð¸ Ð·Ð° {0}"
 
+#. Draft.AvailableTroops_0
+msgctxt "Draft.AvailableTroops_0"
+msgid "{0} available"
+msgstr "{0} доступний"
+
+#. Draft.AvailableTroops_1
+msgctxt "Draft.AvailableTroops_1"
+msgid "{0} available"
+msgstr "{0} доступно"
+
+#. Draft.AvailableTroops_2
+msgctxt "Draft.AvailableTroops_2"
+msgid "{0} available"
+msgstr "{0} доступні"
+
+#. Draft.Upgrade
+msgctxt "Draft.Upgrade"
+msgid "Upgrade"
+msgstr "Поліпшити"
+
+#. Draft.UpgradeForResources
+msgctxt "Draft.UpgradeForResources"
+msgid "Upgrade for {0}"
+msgstr "Поліпшити за {0}"
+
 #. Draft.UpgradeAvailableTroops
 msgctxt "Draft.UpgradeAvailableTroops"
 msgid "Upgrade available troops"

@@ -107,6 +107,7 @@ namespace SongsOfConquestAccess.Adapters
             public virtual int SliderValue { get { return 0; } }
             public virtual int SliderMinimum { get { return 0; } }
             public virtual int SliderMaximum { get { return 0; } }
+            public virtual int AvailableTroops { get { return SliderMaximum; } }
             public virtual bool SetSliderValue(int value) { return false; }
             public virtual bool IsPurchaseVisible { get { return false; } }
             public virtual bool IsPurchaseEnabled { get { return false; } }
