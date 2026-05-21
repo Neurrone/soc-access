@@ -101,6 +101,14 @@ namespace SongsOfConquestAccess.Speech.Spatial
                 parts.Add(ModText.Get(ModStrings.Spatial.Blocked));
             }
 
+            foreach (string mapEffect in tile.MapEffects)
+            {
+                if (!string.IsNullOrWhiteSpace(mapEffect))
+                {
+                    parts.Add(mapEffect);
+                }
+            }
+
             if (tile.Elevation > 0)
             {
                 parts.Add(ModText.Get(ModStrings.Spatial.ElevatedGroundHeight, tile.Elevation));

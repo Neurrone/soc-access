@@ -5,6 +5,7 @@
 - The troop purchase and upgrade screens have been rewritten to work similar to the marketplace instead of being a faithful translation of the game's UI. The number of tab stops no longer scales with the available troops
 - Fix enemy names on the troop deployment screen reading as the underlying map entity type instead of the visible battle UI name
 - Fix being stuck on the victory screen after successfully laying siege to a settlement
+- In combat, tile effects like Acid Clouds are now read
 
 ## V0.2.0
 

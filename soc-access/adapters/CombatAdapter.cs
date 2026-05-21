@@ -24,7 +24,6 @@ using SongsOfConquest.Common.Entities;
 using SongsOfConquest.Common.Gamestate;
 using SongsOfConquest.Common.Localization;
 using SongsOfConquest.Common.Spells;
-using SongsOfConquest.Server.Bacterias;
 using SongsOfConquest.Server.Battle;
 using SongsOfConquestAccess.Events.Combat;
 using SongsOfConquestAccess.Localization;
@@ -433,6 +432,7 @@ namespace SongsOfConquestAccess.Adapters
             tile.IsBlocked = IsBlocked(point);
             tile.Troop = GetTroopAt(point);
             tile.Entity = GetAttackableEntityAt(point);
+            AddDangerousMapEffects(point, tile);
             tile.DecorativeFeature = GetDecorativeFeatureAt(point, tile.Entity);
             return tile;
         }
@@ -542,7 +542,7 @@ namespace SongsOfConquestAccess.Adapters
                             snapshot.Add(ModText.Get(ModStrings.Scanner.Entities), ModText.Get(ModStrings.Scanner.All), CloneResult(result));
                             snapshot.Add(ModText.Get(ModStrings.Scanner.Entities), ModText.Get(ModStrings.Scanner.Attackable), result);
                         }
-                        else if (IsDangerousMapEntity(mapEntity))
+                        else if (tile.MapEffects.Count > 0)
                         {
                             ScannerResult result = new ScannerResult(
                                 ScannerTileKey("entity:dangerous", point),
@@ -2115,45 +2115,6 @@ namespace SongsOfConquestAccess.Adapters
             }
         }
 
-        private bool IsDangerousMapEntity(IMapEntity entity)
-        {
-            if (entity == null || entity.Bacterias == null || entity.Bacterias.Count == 0 || _container == null)
-            {
-                return false;
-            }
-
-            try
-            {
-                IBacteriaLookup bacteriaLookup = Resolve<IBacteriaLookup>(_container);
-                if (bacteriaLookup == null)
-                {
-                    return false;
-                }
-
-                foreach (BacteriaReference bacteriaReference in entity.Bacterias)
-                {
-                    BacteriaInformation bacteria = bacteriaLookup.GetInformation(bacteriaReference.BacteriaType);
-                    if (bacteria == null || bacteria.CustomEffectData.CustomEffect != GenericBacteriaCustomEffect.Aura)
-                    {
-                        continue;
-                    }
-
-                    BacteriaInformation auraBacteria = bacteriaLookup.GetInformation(bacteria.AuraSettings.BacteriaToAdd.BacteriaType);
-                    if (auraBacteria != null
-                        && (auraBacteria.CustomEffectData.CustomEffect == GenericBacteriaCustomEffect.Damage
-                            || auraBacteria.CustomEffectData.CustomEffect == GenericBacteriaCustomEffect.KillAmount))
-                    {
-                        return true;
-                    }
-                }
-            }
-            catch
-            {
-            }
-
-            return false;
-        }
-
         private int GetCurrentMovesLeft()
         {
             IBattleTroopState current = GetCurrentTroop();
@@ -2181,6 +2142,42 @@ namespace SongsOfConquestAccess.Adapters
         {
             IMapEntity entity = _facade != null && _facade.MapEntities != null ? _facade.MapEntities.GetAt(point) : null;
             return entity != null && entity.IsEnabled && entity.HasComponent<IHealthComponent>() ? entity : null;
+        }
+
+        private bool HasDangerousMapEntityEffect(Vector2Int point)
+        {
+            try
+            {
+                return _facade != null
+                    && _facade.MapEntities != null
+                    && _facade.MapEntities.GetDangerousAuraMapEntityEffects(point).Any();
+            }
+            catch
+            {
+                return false;
+            }
+        }
+
+        private void AddDangerousMapEffects(Vector2Int point, CombatTile tile)
+        {
+            if (tile == null || !HasDangerousMapEntityEffect(point))
+            {
+                return;
+            }
+
+            IMapEntity entity = _facade != null && _facade.MapEntities != null
+                ? _facade.MapEntities.GetAtIncludingNonBlockers(point)
+                : null;
+            if (entity == null || !entity.IsEnabled || !entity.IsVisibleInGame)
+            {
+                return;
+            }
+
+            string name = GetMapEntityName(entity);
+            if (!string.IsNullOrWhiteSpace(name) && !tile.MapEffects.Contains(name))
+            {
+                tile.MapEffects.Add(name);
+            }
         }
 
         private string GetDecorativeFeatureAt(Vector2Int point, IMapEntity attackableEntity)
@@ -3093,6 +3090,8 @@ namespace SongsOfConquestAccess.Adapters
         public IBattleTroopState Troop { get; set; }
 
         public IMapEntity Entity { get; set; }
+
+        public List<string> MapEffects { get; private set; } = new List<string>();
 
         public string DecorativeFeature { get; set; }
     }
