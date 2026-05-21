@@ -780,7 +780,11 @@ namespace SongsOfConquestAccess.Screens
 
         public void OnPostBattleResultClosed()
         {
-            _screenManager.Pop<PostBattleResultScreen>("post battle result closed");
+            // PostBattleMenu invokes its completion callback before it hides itself.
+            // If a victorious town attack opens the claim menu from that callback,
+            // ClaimMenuScreen is already top when PostBattleMenu.Hide runs, so this
+            // must remove the victory screen from below the claim menu.
+            _screenManager.Remove<PostBattleResultScreen>("post battle result closed");
         }
 
         public void OnPostAdventureResultReady(PostAdventureMenu menu)
