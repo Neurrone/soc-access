@@ -52,6 +52,8 @@ namespace SongsOfConquestAccess.Adapters
         private static readonly FieldInfo StateMachineField = AccessTools.Field(typeof(PreBattleMenu), "_stateMachine");
         private static readonly FieldInfo AttackingCommanderField = AccessTools.Field(typeof(PreBattleMenu), "_attackingCommander");
         private static readonly FieldInfo DefendingCommanderField = AccessTools.Field(typeof(PreBattleMenu), "_defendingCommander");
+        private static readonly FieldInfo AdventureBattleMenuSettingsField =
+            AccessTools.Field(typeof(AdventureBattleMenuInstaller), "_settings");
 
         private static readonly FieldInfo DeploymentControllerField = AccessTools.Field(typeof(DeploymentMenu), "_deploymentUIController");
         private static readonly FieldInfo CurrentContainerField = AccessTools.Field(typeof(DeploymentUIController), "_currentContainer");
@@ -101,12 +103,8 @@ namespace SongsOfConquestAccess.Adapters
             get
             {
                 BattleSide? ownSide = GetOwnSide();
-                ICommanderState commander = ownSide == BattleSide.Right_Defender
-                    ? GetField<ICommanderState>(DefendingCommanderField)
-                    : GetField<ICommanderState>(AttackingCommanderField);
-                return commander != null
-                    ? GetCommanderName(commander, ModText.Get(ModStrings.Screens.YourWielder))
-                    : ModText.Get(ModStrings.Screens.YourWielder);
+                bool useAttacker = ownSide != BattleSide.Right_Defender;
+                return GetParticipantNameText(useAttacker);
             }
         }
 
@@ -120,9 +118,7 @@ namespace SongsOfConquestAccess.Adapters
                     ? GetField<ICommanderState>(AttackingCommanderField)
                     : GetField<ICommanderState>(DefendingCommanderField);
 
-                string name = commander != null
-                    ? GetCommanderName(commander, ModText.Get(ModStrings.Screens.Opponent))
-                    : ModText.Get(ModStrings.Screens.Opponent);
+                string name = commander != null ? GetParticipantNameText(opponentIsAttacker) : string.Empty;
                 string scouting = opponentIsAttacker
                     ? GetUIText(AttackerScoutingInformationField)
                     : GetUIText(DefenderScoutingInformationField);
@@ -849,31 +845,40 @@ namespace SongsOfConquestAccess.Adapters
             return GetField<ILocalizationHandler>(LocalizationField);
         }
 
-        private string GetCommanderName(ICommanderState commander, string fallback)
+        private string GetParticipantNameText(bool useAttacker)
         {
-            if (commander == null)
+            AdventureBattleMenu.Settings settings = GetAdventureBattleMenuSettings();
+            UITextMesh text = settings != null
+                ? (useAttacker ? settings.AttackerNameText : settings.DefenderNameText)
+                : null;
+            if (!IsVisibleText(text))
             {
-                return fallback;
+                return string.Empty;
             }
 
-            try
+            return UITextMeshTextUtility.GetEffectiveText(text);
+        }
+
+        private AdventureBattleMenu.Settings GetAdventureBattleMenuSettings()
+        {
+            if (AdventureBattleMenuSettingsField == null || _menu == null)
             {
-                IClientAdventureFacade facade = GetField<IClientAdventureFacade>(AdventureFacadeField);
-                string name = facade != null && facade.Commanders != null
-                    ? facade.Commanders.GetName(commander.Id)
-                    : string.Empty;
-                name = SpeechTextSanitizer.Normalize(name);
-                if (!string.IsNullOrWhiteSpace(name))
+                return null;
+            }
+
+            AdventureBattleMenuInstaller[] installers = Resources.FindObjectsOfTypeAll<AdventureBattleMenuInstaller>();
+            for (int i = 0; i < installers.Length; i++)
+            {
+                AdventureBattleMenuInstaller installer = installers[i];
+                AdventureBattleMenu.Settings settings =
+                    installer != null ? AdventureBattleMenuSettingsField.GetValue(installer) as AdventureBattleMenu.Settings : null;
+                if (settings != null && settings.PreBattleMenu == _menu)
                 {
-                    return name;
+                    return settings;
                 }
             }
-            catch (Exception ex)
-            {
-                SocAccessPlugin.Instance?.LogWarning("PreBattleMenuAdapter failed to resolve commander name: " + ex.Message);
-            }
 
-            return fallback;
+            return null;
         }
 
         private IDetails GetTroopDetails(int troopId)
