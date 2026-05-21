@@ -21,6 +21,7 @@ namespace SongsOfConquestAccess.Screens
         private const int SourceMenuIndex = 4;
 
         private readonly RallyPointInteractionMenuAdapter _adapter;
+        private string _selectedRecruitId;
         private Action<OnTroopsUpdatedPayload> _troopsUpdatedHandler;
         private Action<ResourceUpdatedPayload> _resourceUpdatedHandler;
         private Action _recruitmentPoolUpdatedHandler;
@@ -399,10 +400,46 @@ namespace SongsOfConquestAccess.Screens
             }
 
             IReadOnlyList<PurchaseTroopsSubMenuAdapter.RecruitEntry> entries = _adapter.PurchaseTroops.GetRecruitEntries();
+            EnsureSelectedRecruit(entries);
+            root.AddChild(BuildTroopsMenu(entries));
+
             for (int i = 0; i < entries.Count; i++)
             {
                 AddRecruitWidgets(root, entries[i]);
             }
+        }
+
+        private MenuWidget BuildTroopsMenu(IReadOnlyList<PurchaseTroopsSubMenuAdapter.RecruitEntry> entries)
+        {
+            MenuWidget menu = new MenuWidget(
+                "rally-point-recruits",
+                GameText.Get("Commanders/Tooltip/Troops", string.Empty));
+            if (entries == null)
+            {
+                return menu;
+            }
+
+            for (int i = 0; i < entries.Count; i++)
+            {
+                PurchaseTroopsSubMenuAdapter.RecruitEntry entry = entries[i];
+                if (entry == null)
+                {
+                    continue;
+                }
+
+                PurchaseTroopsSubMenuAdapter.RecruitEntry capturedEntry = entry;
+                menu.AddItem(new MenuItemWidget(
+                    capturedEntry.IdPrefix + "-menu-item",
+                    () => capturedEntry.TroopName,
+                    () => BuildRecruitStatus(capturedEntry),
+                    () => SelectRecruit(capturedEntry, playSound: true),
+                    () => SelectRecruit(capturedEntry, playSound: true),
+                    () => true,
+                    () => capturedEntry.Tooltip));
+            }
+
+            menu.SetFocusedItemById(_selectedRecruitId + "-menu-item");
+            return menu;
         }
 
         private void AddRecruitWidgets(ContainerWidget root, PurchaseTroopsSubMenuAdapter.RecruitEntry entry)
@@ -412,24 +449,7 @@ namespace SongsOfConquestAccess.Screens
                 return;
             }
 
-            root.AddChild(new TextWidget(
-                entry.IdPrefix + "-name",
-                () => entry.TroopName,
-                entry.Focus,
-                includeParentLabelInAnnouncement: false,
-                () => entry.Tooltip));
-
-            if (entry.IsEssenceMenuVisible)
-            {
-                root.AddChild(BuildEssenceMenu(entry));
-            }
-
-            root.AddChild(new TextWidget(
-                entry.IdPrefix + "-no-troops",
-                () => entry.NoTroopsText,
-                _adapter.HideNativeTooltip,
-                includeParentLabelInAnnouncement: false,
-                isVisible: () => entry.IsNoTroopsVisible));
+            root.AddChild(BuildEssenceMenu(entry));
 
             root.AddChild(new SliderWidget(
                 entry.IdPrefix + "-quantity",
@@ -441,7 +461,7 @@ namespace SongsOfConquestAccess.Screens
                 () => 1,
                 entry.SetSliderValue,
                 () => entry.IsSliderEnabled,
-                () => entry.IsSliderVisible));
+                () => IsSelectedRecruit(entry) && entry.IsSliderVisible));
 
             root.AddChild(new ButtonWidget(
                 entry.IdPrefix + "-purchase",
@@ -449,7 +469,7 @@ namespace SongsOfConquestAccess.Screens
                 entry.Purchase,
                 entry.Focus,
                 () => entry.IsPurchaseEnabled,
-                () => entry.IsPurchaseVisible,
+                () => IsSelectedRecruit(entry) && entry.IsPurchaseVisible,
                 () => entry.PurchaseTooltip));
 
             root.AddChild(new ButtonWidget(
@@ -458,13 +478,84 @@ namespace SongsOfConquestAccess.Screens
                 entry.UpgradeInPool,
                 entry.Focus,
                 () => entry.IsUpgradeInPoolEnabled,
-                () => entry.IsUpgradeInPoolVisible,
+                () => IsSelectedRecruit(entry) && entry.IsUpgradeInPoolVisible,
                 () => entry.UpgradeInPoolTooltip));
         }
 
-        private static MenuWidget BuildEssenceMenu(PurchaseTroopsSubMenuAdapter.RecruitEntry entry)
+        private void EnsureSelectedRecruit(IReadOnlyList<PurchaseTroopsSubMenuAdapter.RecruitEntry> entries)
         {
-            MenuWidget menu = new MenuWidget(entry.IdPrefix + "-essence", ModText.Get(ModStrings.Draft.EssenceVariants));
+            if (FindRecruit(entries, _selectedRecruitId) != null)
+            {
+                return;
+            }
+
+            _selectedRecruitId = entries != null && entries.Count > 0 && entries[0] != null
+                ? entries[0].IdPrefix
+                : null;
+        }
+
+        private static PurchaseTroopsSubMenuAdapter.RecruitEntry FindRecruit(
+            IReadOnlyList<PurchaseTroopsSubMenuAdapter.RecruitEntry> entries,
+            string id)
+        {
+            if (entries == null || string.IsNullOrWhiteSpace(id))
+            {
+                return null;
+            }
+
+            for (int i = 0; i < entries.Count; i++)
+            {
+                PurchaseTroopsSubMenuAdapter.RecruitEntry entry = entries[i];
+                if (entry != null && entry.IdPrefix == id)
+                {
+                    return entry;
+                }
+            }
+
+            return null;
+        }
+
+        private bool IsSelectedRecruit(PurchaseTroopsSubMenuAdapter.RecruitEntry entry)
+        {
+            return entry != null && entry.IdPrefix == _selectedRecruitId;
+        }
+
+        private bool SelectRecruit(PurchaseTroopsSubMenuAdapter.RecruitEntry entry, bool playSound)
+        {
+            if (entry == null)
+            {
+                return false;
+            }
+
+            bool changed = _selectedRecruitId != entry.IdPrefix;
+            _selectedRecruitId = entry.IdPrefix;
+            entry.Focus();
+            if (changed && playSound)
+            {
+                NativeSoundUtility.PostEvent("Common_DefaultClick");
+            }
+
+            return true;
+        }
+
+        private static string BuildRecruitStatus(PurchaseTroopsSubMenuAdapter.RecruitEntry entry)
+        {
+            if (entry == null)
+            {
+                return string.Empty;
+            }
+
+            return entry.IsSliderVisible
+                ? ModText.Plural(ModStrings.Draft.AvailableTroops, entry.AvailableTroops, entry.AvailableTroops)
+                : entry.NoTroopsText;
+        }
+
+        private MenuWidget BuildEssenceMenu(PurchaseTroopsSubMenuAdapter.RecruitEntry entry)
+        {
+            MenuWidget menu = new MenuWidget(
+                entry.IdPrefix + "-essence",
+                ModText.Get(ModStrings.Draft.EssenceVariants),
+                () => IsSelectedRecruit(entry) && entry.IsEssenceMenuVisible);
             AddEssenceItem(menu, entry, TroopUpgradeType.ArcanaUpgraded, GameText.Get("Units/Types/Arcana", "Arcana"));
             AddEssenceItem(menu, entry, TroopUpgradeType.CreationUpgraded, GameText.Get("Units/Types/Creation", "Creation"));
             AddEssenceItem(menu, entry, TroopUpgradeType.OrderUpgraded, GameText.Get("Units/Types/Order", "Order"));
