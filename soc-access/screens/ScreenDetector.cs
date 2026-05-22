@@ -19,6 +19,7 @@ using SongsOfConquest.Common.Gamestate.Facade;
 using SongsOfConquestAccess.Adapters;
 using SongsOfConquestAccess.Buffers;
 using SongsOfConquestAccess.Events;
+using SongsOfConquestAccess.Scanner;
 
 namespace SongsOfConquestAccess.Screens
 {
@@ -673,14 +674,16 @@ namespace SongsOfConquestAccess.Screens
 
         public void OnAdventureMapReady()
         {
-            AdventureMapAdapter adapter = new AdventureMapAdapter(_adventureViewInstaller);
+            AdventureMapRevealedRegistry revealedRegistry = new AdventureMapRevealedRegistry();
+            AdventureMapAdapter adapter = new AdventureMapAdapter(_adventureViewInstaller, revealedRegistry);
             AdventureMapEventListener eventListener = adapter.IsPresent()
                 ? new AdventureMapEventListener(
                     adapter.Facade,
                     adapter.SelectionHandler,
                     adapter.HumanAdventureControllerFacade,
                     adapter.LocalizationHandler,
-                    adapter.FogManager)
+                    adapter.FogManager,
+                    revealedRegistry)
                 : null;
             Push(new AdventureMapScreen(adapter, eventListener), "adventure map ready");
         }

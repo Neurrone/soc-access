@@ -38,6 +38,53 @@ namespace SongsOfConquestAccess.Tests
         }
 
         [TestMethod]
+        public void SortByDistancePreservesOrderForPreservedCategories()
+        {
+            ScannerSnapshot snapshot = new ScannerSnapshot();
+            ScannerCategory revealed = snapshot.GetOrAddCategory("Revealed");
+            revealed.PreserveResultOrder = true;
+            revealed.GetOrAddSubcategory("All").Results.Add(new ScannerResult("entity:far", "Far", new Vector2Int(10, 0)));
+            revealed.GetOrAddSubcategory("All").Results.Add(new ScannerResult("entity:near", "Near", new Vector2Int(1, 0)));
+
+            snapshot.SortByDistance(Vector2Int.zero);
+
+            ScannerSubcategory subcategory = snapshot.Categories[0].Subcategories[0];
+            Assert.AreEqual("Far", subcategory.Results[0].Label);
+            Assert.AreEqual("Near", subcategory.Results[1].Label);
+        }
+
+        [TestMethod]
+        public void AdventureMapRevealedRegistryAppendsAndUpdatesByKey()
+        {
+            AdventureMapRevealedRegistry registry = new AdventureMapRevealedRegistry();
+
+            registry.AddOrUpdate("entity:1", "Old Gold", new Vector2Int(1, 0), 1, AdventureMapRevealedKind.MapEntity);
+            registry.AddOrUpdate("commander:2", "Wielder", new Vector2Int(2, 0), 2, AdventureMapRevealedKind.Wielder);
+            registry.AddOrUpdate("entity:1", "Gold", new Vector2Int(3, 0), 1, AdventureMapRevealedKind.MapEntity);
+
+            Assert.AreEqual(2, registry.Entries.Count);
+            Assert.AreEqual("entity:1", registry.Entries[0].Key);
+            Assert.AreEqual("Gold", registry.Entries[0].Label);
+            Assert.AreEqual(new Vector2Int(3, 0), registry.Entries[0].Position);
+            Assert.AreEqual(0, registry.Entries[0].Sequence);
+            Assert.AreEqual("commander:2", registry.Entries[1].Key);
+            Assert.AreEqual(1, registry.Entries[1].Sequence);
+        }
+
+        [TestMethod]
+        public void AdventureMapRevealedRegistryRemovesEntries()
+        {
+            AdventureMapRevealedRegistry registry = new AdventureMapRevealedRegistry();
+            registry.AddOrUpdate("entity:1", "Gold", new Vector2Int(1, 0), 1, AdventureMapRevealedKind.MapEntity);
+            registry.AddOrUpdate("commander:2", "Wielder", new Vector2Int(2, 0), 2, AdventureMapRevealedKind.Wielder);
+
+            Assert.IsTrue(registry.Remove("entity:1"));
+
+            Assert.AreEqual(1, registry.Entries.Count);
+            Assert.AreEqual("commander:2", registry.Entries[0].Key);
+        }
+
+        [TestMethod]
         public void PruneEmptyRemovesEmptySubcategoriesAndCategories()
         {
             ScannerSnapshot snapshot = new ScannerSnapshot();

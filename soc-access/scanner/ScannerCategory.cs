@@ -13,6 +13,8 @@ namespace SongsOfConquestAccess.Scanner
 
         public string Label { get; private set; }
 
+        public bool PreserveResultOrder { get; set; }
+
         public List<ScannerSubcategory> Subcategories
         {
             get { return _subcategories; }

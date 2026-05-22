@@ -10,6 +10,8 @@
 - In combat, tile effects like Acid Clouds are now read
 - Edit fields no longer require pressing enter to edit them, just type text into them when focused
 - Added `Ctrl+f` command on the adventure map grid to search all scanner categories
+- Newly revealed entities will now be announced. This includes entities spawning in areas visible to the player, although this is subject to change in case this provides information typically not available to a sighted player
+- The scanner now has a Revealed category where revealed entities are placed
 
 ## V0.2.0
 

@@ -10,6 +10,8 @@ namespace SongsOfConquestAccess.Events
             public const string BuildSiteSelected = "map.build_site.selected";
             public const string DestinationSet = "map.destination.set";
             public const string DestinationCleared = "map.destination.cleared";
+            public const string DiscoveryRevealed = "map.discovery.revealed";
+            public const string WieldersNoLongerVisible = "map.wielders.no_longer_visible";
             public const string ActionFailed = "map.action.failed";
             public const string HudVisibilityChanged = "map.hud.visibility_changed";
             public const string CameraFocus = "map.camera_focus";

@@ -45,6 +45,10 @@ After setting a destination, the game draws a route preview. When focus is on a 
 - `Destination, no route preview`: the destination is set, but the game is not showing route preview markers for it.
 - `cost n`: the route has crossed the indicated movement cost marker.
 
+### Revealed Entity Announcements
+
+Entities revealed during exploration are announced. They can also be found in a separate category in the [scanner](scanner.md).
+
 ## HUD
 
 The HUD provides various controls for the currently selected wielder such as the wielder portrait, resources and objectives. Visibility is toggled with `h`. These controls are visible by default, and I recommend leaving it that way.

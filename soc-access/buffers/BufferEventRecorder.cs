@@ -67,6 +67,8 @@ namespace SongsOfConquestAccess.Buffers
             return !string.IsNullOrWhiteSpace(kind)
                 && (kind.StartsWith("notification.")
                     || kind == AccessibilityEvents.Map.WielderTeleported
+                    || kind == AccessibilityEvents.Map.DiscoveryRevealed
+                    || kind == AccessibilityEvents.Map.WieldersNoLongerVisible
                     || (moved != null && !moved.IsLocalWielder));
         }
 

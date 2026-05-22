@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using UnityEngine;
 using SongsOfConquest.Common.Entities.Adventure;
 using SongsOfConquestAccess.Localization;
@@ -134,6 +135,74 @@ namespace SongsOfConquestAccess.Events
         private static string FormatTile(Vector2Int tile)
         {
             return tile.x + ", " + tile.y;
+        }
+    }
+
+    internal sealed class MapDiscoveryRevealedEvent : IAccessibilityEvent
+    {
+        private readonly List<string> _items;
+
+        public MapDiscoveryRevealedEvent(IReadOnlyList<string> items)
+        {
+            _items = new List<string>();
+            if (items == null)
+            {
+                return;
+            }
+
+            for (int i = 0; i < items.Count; i++)
+            {
+                if (!string.IsNullOrWhiteSpace(items[i]))
+                {
+                    _items.Add(items[i]);
+                }
+            }
+        }
+
+        public string Kind { get { return AccessibilityEvents.Map.DiscoveryRevealed; } }
+
+        public string GetSpeechText()
+        {
+            if (_items.Count == 0)
+            {
+                return string.Empty;
+            }
+
+            return ModText.Get(ModStrings.Events.Revealed, ModText.JoinList(_items));
+        }
+    }
+
+    internal sealed class MapWieldersNoLongerVisibleEvent : IAccessibilityEvent
+    {
+        private readonly List<string> _wielderNames;
+
+        public MapWieldersNoLongerVisibleEvent(IReadOnlyList<string> wielderNames)
+        {
+            _wielderNames = new List<string>();
+            if (wielderNames == null)
+            {
+                return;
+            }
+
+            for (int i = 0; i < wielderNames.Count; i++)
+            {
+                if (!string.IsNullOrWhiteSpace(wielderNames[i]))
+                {
+                    _wielderNames.Add(wielderNames[i]);
+                }
+            }
+        }
+
+        public string Kind { get { return AccessibilityEvents.Map.WieldersNoLongerVisible; } }
+
+        public string GetSpeechText()
+        {
+            if (_wielderNames.Count == 0)
+            {
+                return string.Empty;
+            }
+
+            return ModText.Get(ModStrings.Events.WieldersNoLongerVisible, ModText.JoinList(_wielderNames));
         }
     }
 

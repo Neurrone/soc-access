@@ -128,6 +128,11 @@ namespace SongsOfConquestAccess.Scanner
             for (int i = 0; i < _categories.Count; i++)
             {
                 ScannerCategory category = _categories[i];
+                if (category.PreserveResultOrder)
+                {
+                    continue;
+                }
+
                 for (int j = 0; j < category.Subcategories.Count; j++)
                 {
                     category.Subcategories[j].Results.Sort(comparison);

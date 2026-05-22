@@ -41,9 +41,11 @@ namespace SongsOfConquestAccess.Localization
             public static readonly ModString LeveledUpTo = new ModString("Events.LeveledUpTo", "{0} leveled up to {1}");
             public static readonly ModString MapCameraFocus = new ModString("Events.MapCameraFocus", "Map camera focuses on {0}");
             public static readonly ModString ModError = new ModString("Events.ModError", "Mod error: {0}");
+            public static readonly ModString Revealed = new ModString("Events.Revealed", "Revealed {0}");
             public static readonly ModString SelectedBuildSite = new ModString("Events.SelectedBuildSite", "Selected {0} build site at {1}");
             public static readonly ModString SelectedWielder = new ModString("Events.SelectedWielder", "Selected wielder {0}");
             public static readonly ModString Wielder = new ModString("Events.Wielder", "wielder");
+            public static readonly ModString WieldersNoLongerVisible = new ModString("Events.WieldersNoLongerVisible", "{0} no longer visible");
             public static readonly ModString WielderMoved = new ModString("Events.WielderMoved", "{0} moved to {1}");
             public static readonly ModString WielderTeleported = new ModString("Events.WielderTeleported", "{0} teleported to {1}");
         }
@@ -461,6 +463,7 @@ namespace SongsOfConquestAccess.Localization
             public static readonly ModString Obstacles = new ModString("Scanner.Obstacles", "Obstacles");
             public static readonly ModString Pickups = new ModString("Scanner.Pickups", "Pickups");
             public static readonly ModString Power = new ModString("Scanner.Power", "Power");
+            public static readonly ModString Revealed = new ModString("Scanner.Revealed", "Revealed");
             public static readonly ModString Riches = new ModString("Scanner.Riches", "Riches");
             public static readonly ModString Roads = new ModString("Scanner.Roads", "Roads");
             public static readonly ModPluralString RoadTileCount = new ModPluralString("Scanner.RoadTileCount", "{0} road tile", "{0} road tiles");

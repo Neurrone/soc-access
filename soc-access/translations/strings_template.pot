@@ -139,6 +139,11 @@ msgctxt "Events.ModError"
 msgid "Mod error: {0}"
 msgstr ""
 
+#. Events.Revealed
+msgctxt "Events.Revealed"
+msgid "Revealed {0}"
+msgstr ""
+
 #. Events.SelectedBuildSite
 msgctxt "Events.SelectedBuildSite"
 msgid "Selected {0} build site at {1}"
@@ -152,6 +157,11 @@ msgstr ""
 #. Events.Wielder
 msgctxt "Events.Wielder"
 msgid "wielder"
+msgstr ""
+
+#. Events.WieldersNoLongerVisible
+msgctxt "Events.WieldersNoLongerVisible"
+msgid "{0} no longer visible"
 msgstr ""
 
 #. Events.WielderMoved
@@ -2097,6 +2107,11 @@ msgstr ""
 #. Scanner.Power
 msgctxt "Scanner.Power"
 msgid "Power"
+msgstr ""
+
+#. Scanner.Revealed
+msgctxt "Scanner.Revealed"
+msgid "Revealed"
 msgstr ""
 
 #. Scanner.Riches

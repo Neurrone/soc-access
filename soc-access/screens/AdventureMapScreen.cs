@@ -15,6 +15,7 @@ using SongsOfConquestAccess.Buffers;
 using SongsOfConquestAccess.Events;
 using SongsOfConquestAccess.Input;
 using SongsOfConquestAccess.Localization;
+using SongsOfConquestAccess.Scanner;
 using SongsOfConquestAccess.UI;
 using SongsOfConquest.Common.Economy;
 using SongsOfConquest.Common.Gamestate;
@@ -116,6 +117,12 @@ namespace SongsOfConquestAccess.Screens
             _isTopScreen = false;
             _eventListener?.Detach();
             _adapter?.ClearFocusedTileOverlay();
+        }
+
+        public override void Update()
+        {
+            base.Update();
+            _eventListener?.Update();
         }
 
         public void FocusGrid()
@@ -726,6 +733,7 @@ namespace SongsOfConquestAccess.Screens
                 ISystemPopups systemPopups = TryResolve<ISystemPopups>(container);
                 object cartographyConverter = TryResolveByTypeName(container, "Lavapotion.Cartography.ICartographyConverter");
 
+                AdventureMapRevealedRegistry revealedRegistry = new AdventureMapRevealedRegistry();
                 AdventureMapAdapter adapter = new AdventureMapAdapter(
                     installer,
                     container,
@@ -741,7 +749,8 @@ namespace SongsOfConquestAccess.Screens
                     humanAdventureController,
                     humanAdventureControllerFacade,
                     inputManager,
-                    systemPopups);
+                    systemPopups,
+                    revealedRegistry);
                 if (adapter.IsPresent())
                 {
                     LogProbeDiagnostic("Adventure map probe found ready adventure map");
@@ -750,7 +759,8 @@ namespace SongsOfConquestAccess.Screens
                         selectionHandler,
                         humanAdventureControllerFacade,
                         localizationHandler,
-                        fogManager);
+                        fogManager,
+                        revealedRegistry);
                     return new AdventureMapScreen(adapter, eventListener);
                 }
 

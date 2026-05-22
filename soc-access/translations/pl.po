@@ -155,6 +155,11 @@ msgctxt "Events.Wielder"
 msgid "wielder"
 msgstr "bohater"
 
+#. Events.WieldersNoLongerVisible
+msgctxt "Events.WieldersNoLongerVisible"
+msgid "{0} no longer visible"
+msgstr "{0} nie jest juz widoczny"
+
 #. Events.WielderMoved
 msgctxt "Events.WielderMoved"
 msgid "{0} moved to {1}"
@@ -2047,6 +2052,11 @@ msgctxt "Scanner.Power"
 msgid "Power"
 msgstr "Moc"
 
+#. Scanner.Revealed
+msgctxt "Scanner.Revealed"
+msgid "Revealed"
+msgstr "Odkryte"
+
 #. Scanner.Riches
 msgctxt "Scanner.Riches"
 msgid "Riches"
@@ -2306,3 +2316,8 @@ msgstr "Move all left"
 msgctxt "Screens.MoveAllRight"
 msgid "Move all right"
 msgstr "Move all right"
+
+#. Events.Revealed
+msgctxt "Events.Revealed"
+msgid "Revealed {0}"
+msgstr "Odkryto {0}"

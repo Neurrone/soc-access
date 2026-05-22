@@ -56,6 +56,7 @@ namespace SongsOfConquestAccess.Adapters
         private readonly IHumanAdventureControllerFacade _humanAdventureControllerFacade;
         private readonly IInputManager _inputManager;
         private readonly ISystemPopups _systemPopups;
+        private readonly AdventureMapRevealedRegistry _revealedRegistry;
         private readonly MethodInfo _worldToPointMethod;
         private readonly MethodInfo _pointToWorldMethod;
         private readonly MethodInfo _getTooltipForTilePositionMethod;
@@ -68,7 +69,7 @@ namespace SongsOfConquestAccess.Adapters
         private RectTransform[] _cursorOverlaySegments;
         private Vector2Int? _focusedOverlayTile;
 
-        public AdventureMapAdapter(AdventureViewInstaller installer)
+        public AdventureMapAdapter(AdventureViewInstaller installer, AdventureMapRevealedRegistry revealedRegistry = null)
             : this(
                 installer,
                 GetContainer(installer),
@@ -84,7 +85,8 @@ namespace SongsOfConquestAccess.Adapters
                 Resolve<IHumanAdventureController>(GetContainer(installer)),
                 Resolve<IHumanAdventureControllerFacade>(GetContainer(installer)),
                 Resolve<IInputManager>(GetContainer(installer)),
-                Resolve<ISystemPopups>(GetContainer(installer)))
+                Resolve<ISystemPopups>(GetContainer(installer)),
+                revealedRegistry)
         {
         }
 
@@ -103,7 +105,8 @@ namespace SongsOfConquestAccess.Adapters
             IHumanAdventureController humanAdventureController,
             IHumanAdventureControllerFacade humanAdventureControllerFacade,
             IInputManager inputManager,
-            ISystemPopups systemPopups)
+            ISystemPopups systemPopups,
+            AdventureMapRevealedRegistry revealedRegistry = null)
         {
             SourceKey = sourceKey;
             _container = container;
@@ -120,6 +123,7 @@ namespace SongsOfConquestAccess.Adapters
             _humanAdventureControllerFacade = humanAdventureControllerFacade;
             _inputManager = inputManager;
             _systemPopups = systemPopups;
+            _revealedRegistry = revealedRegistry;
             _worldToPointMethod = cartographyConverter != null
                 ? AccessTools.Method(cartographyConverter.GetType(), "WorldToPoint", new[] { typeof(float3) })
                 : null;
@@ -843,6 +847,7 @@ namespace SongsOfConquestAccess.Adapters
             AddArtifactMarketScannerResults(snapshot, tileCache);
             AddTeleportScannerResults(snapshot, tileCache);
             AddAdventureTerrainScannerResults(snapshot, origin, tileCache);
+            AddRevealedScannerResults(snapshot);
             return snapshot;
         }
 
@@ -850,17 +855,25 @@ namespace SongsOfConquestAccess.Adapters
         {
             if (result == null || !IsWithinMap(result.Position))
             {
+                RemoveRevealedScannerResult(result);
                 return false;
             }
 
             if (result.Kind == ScannerResultKind.CommanderZoneOfControl)
             {
-                return ValidateCommanderZoneOfControlResult(result);
+                bool validZone = ValidateCommanderZoneOfControlResult(result);
+                if (!validZone)
+                {
+                    RemoveRevealedScannerResult(result);
+                }
+
+                return validZone;
             }
 
             AdventureMapTile tile = GetTile(result.Position);
             if (tile == null || !tile.IsExplored)
             {
+                RemoveRevealedScannerResult(result);
                 return false;
             }
 
@@ -871,10 +884,26 @@ namespace SongsOfConquestAccess.Adapters
                     return true;
                 }
 
-                return tile.MapEntity != null && tile.MapEntity.Id == stableId;
+                if (tile.MapEntity != null && tile.MapEntity.Id == stableId)
+                {
+                    return true;
+                }
+
+                RemoveRevealedScannerResult(result);
+                return false;
             }
 
             return true;
+        }
+
+        private void RemoveRevealedScannerResult(ScannerResult result)
+        {
+            if (result == null || _revealedRegistry == null)
+            {
+                return;
+            }
+
+            _revealedRegistry.Remove(result.Key);
         }
 
         private void AddWielderScannerResults(ScannerSnapshot snapshot, Dictionary<Vector2Int, AdventureMapTile> tileCache)
@@ -973,6 +1002,10 @@ namespace SongsOfConquestAccess.Adapters
             terrain.GetOrAddSubcategory(ModText.Get(ModStrings.Scanner.Bridges));
             terrain.GetOrAddSubcategory(ModText.Get(ModStrings.Scanner.Water));
             terrain.GetOrAddSubcategory(ModText.Get(ModStrings.Scanner.Impassable));
+
+            ScannerCategory revealed = snapshot.GetOrAddCategory(ModText.Get(ModStrings.Scanner.Revealed));
+            revealed.PreserveResultOrder = true;
+            revealed.GetOrAddSubcategory(all);
         }
 
         private static void AddRelationshipSubcategories(ScannerCategory category)
@@ -1110,6 +1143,39 @@ namespace SongsOfConquestAccess.Adapters
                     snapshot.Add(ModText.Get(ModStrings.Scanner.Teleport), ModText.Get(ModStrings.Scanner.All), result);
                 }
             });
+        }
+
+        private void AddRevealedScannerResults(ScannerSnapshot snapshot)
+        {
+            if (_revealedRegistry == null || snapshot == null)
+            {
+                return;
+            }
+
+            IReadOnlyList<AdventureMapRevealedEntry> entries = _revealedRegistry.Entries;
+            if (entries == null || entries.Count == 0)
+            {
+                return;
+            }
+
+            ScannerCategory category = snapshot.GetOrAddCategory(ModText.Get(ModStrings.Scanner.Revealed));
+            category.PreserveResultOrder = true;
+            ScannerSubcategory all = category.GetOrAddSubcategory(ModText.Get(ModStrings.Scanner.All));
+            for (int i = 0; i < entries.Count; i++)
+            {
+                AdventureMapRevealedEntry entry = entries[i];
+                if (entry == null || string.IsNullOrWhiteSpace(entry.Key) || string.IsNullOrWhiteSpace(entry.Label))
+                {
+                    continue;
+                }
+
+                AdventureMapTile tile = IsWithinMap(entry.Position) ? GetTile(entry.Position) : null;
+                all.Results.Add(new ScannerResult(entry.Key, entry.Label, entry.Position)
+                {
+                    NotVisible = tile != null && !tile.IsVisible,
+                    StableReference = entry.StableReference
+                });
+            }
         }
 
         private void AddObstacleScannerResults(ScannerSnapshot snapshot, int localTeamId, Vector2Int origin, Dictionary<Vector2Int, AdventureMapTile> tileCache)
