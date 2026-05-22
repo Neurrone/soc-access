@@ -18,6 +18,7 @@
   - `Shift+number`: jump to bookmarked position
   - `Alt+number`: read directions from the currently focused tile to the bookmarked position
   - `Ctrl+shift+number`: toggle playback of an audio beacon at the bookmarked position
+- Add setting to control playback of a positional beep when moving through scanner result entries. This is turned off by default
 
 ## V0.2.0
 

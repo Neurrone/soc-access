@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using SongsOfConquest.Common.Entities.Adventure;
 using SongsOfConquestAccess.Adapters;
+using SongsOfConquestAccess.Audio;
 using SongsOfConquestAccess.Input;
 using SongsOfConquestAccess.Localization;
 using SongsOfConquestAccess.Scanner;
@@ -304,7 +305,7 @@ namespace SongsOfConquestAccess.UI
         {
             if (action.Key == AccessibilityActions.ScannerRefresh.Key)
             {
-                return _scanner.Refresh();
+                return HandleScannerNavigationResult(_scanner.ExecuteRefresh());
             }
 
             if (action.Key == AccessibilityActions.ScannerPreviousCategory.Key)
@@ -344,7 +345,7 @@ namespace SongsOfConquestAccess.UI
 
             if (action.Key == AccessibilityActions.ScannerSpeakOrientation.Key)
             {
-                return _scanner.SpeakOrientation();
+                return HandleScannerNavigationResult(_scanner.ExecuteSpeakOrientation());
             }
 
             return false;
@@ -355,6 +356,11 @@ namespace SongsOfConquestAccess.UI
             if (result != null && result.Status == ScannerCommandStatus.Result && result.Wrapped)
             {
                 NativeSoundUtility.PostEvent(ScannerWrapCueKey);
+            }
+
+            if (result != null && result.Status == ScannerCommandStatus.Result && result.Result != null)
+            {
+                ScannerDirectionalBeepAudio.Play(_cursor, result.Result.Position, DirectionalBeepGridGeometry.Hex);
             }
 
             _scanner.Output(result);

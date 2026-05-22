@@ -49,6 +49,11 @@ namespace SongsOfConquestAccess.Screens
                 ModText.Get(ModStrings.Screens.ReadStoryCameraFocusChanges),
                 ToggleReadStoryCameraFocusChanges,
                 () => ModSettings.ReadStoryCameraFocusChanges));
+            root.AddChild(new CheckboxWidget(
+                "mod-settings-scanner-plays-directional-beep",
+                ModText.Get(ModStrings.Screens.ScannerPlaysDirectionalBeep),
+                ToggleScannerPlaysDirectionalBeep,
+                () => ModSettings.ScannerPlaysDirectionalBeep));
             root.AddChild(new ButtonWidget(
                 "mod-settings-close",
                 ModText.Get(ModStrings.Screens.Close),
@@ -66,6 +71,11 @@ namespace SongsOfConquestAccess.Screens
         private static void ToggleReadStoryCameraFocusChanges()
         {
             ModSettings.SetReadStoryCameraFocusChanges(!ModSettings.ReadStoryCameraFocusChanges);
+        }
+
+        private static void ToggleScannerPlaysDirectionalBeep()
+        {
+            ModSettings.SetScannerPlaysDirectionalBeep(!ModSettings.ScannerPlaysDirectionalBeep);
         }
     }
 }

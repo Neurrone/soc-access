@@ -38,3 +38,4 @@ On the adventure map, use `Ctrl+f` to perform a search across all categories of 
 - `End` can still be used to explicitly refresh and re-announce scanner results.
 - Category, subcategory, and result navigation wraps.
 - Directions are relative to the current accessibility cursor.
+- The mod setting `Scanner plays directional beep` can add a short spatial audio cue to scanner result readouts. It is off by default.

@@ -1864,6 +1864,11 @@ msgctxt "Screens.Round"
 msgid "Round {0}"
 msgstr ""
 
+#. Screens.ScannerPlaysDirectionalBeep
+msgctxt "Screens.ScannerPlaysDirectionalBeep"
+msgid "Scanner plays directional beep"
+msgstr ""
+
 #. Screens.SettlementTroops
 msgctxt "Screens.SettlementTroops"
 msgid "settlement troops"

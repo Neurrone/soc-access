@@ -411,6 +411,7 @@ namespace SongsOfConquestAccess.Localization
             public static readonly ModString ResearchTier = new ModString("Screens.ResearchTier", "{0} ({1} {2})");
             public static readonly ModString Resources = new ModString("Screens.Resources", "Resources");
             public static readonly ModString Round = new ModString("Screens.Round", "Round {0}");
+            public static readonly ModString ScannerPlaysDirectionalBeep = new ModString("Screens.ScannerPlaysDirectionalBeep", "Scanner plays directional beep");
             public static readonly ModString SettlementTroops = new ModString("Screens.SettlementTroops", "settlement troops");
             public static readonly ModString Skill = new ModString("Screens.Skill", "Skill {0}");
             public static readonly ModString SlotValue = new ModString("Screens.SlotValue", "Slot {0}: {1}");

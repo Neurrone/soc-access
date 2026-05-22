@@ -239,7 +239,7 @@ namespace SongsOfConquestAccess.UI
         {
             if (action.Key == AccessibilityActions.ScannerRefresh.Key)
             {
-                return _scanner.Refresh();
+                return HandleScannerNavigationResult(_scanner.ExecuteRefresh());
             }
 
             if (action.Key == AccessibilityActions.ScannerSearch.Key)
@@ -284,7 +284,7 @@ namespace SongsOfConquestAccess.UI
 
             if (action.Key == AccessibilityActions.ScannerSpeakOrientation.Key)
             {
-                return _scanner.SpeakOrientation();
+                return HandleScannerNavigationResult(_scanner.ExecuteSpeakOrientation());
             }
 
             return false;
@@ -395,7 +395,7 @@ namespace SongsOfConquestAccess.UI
                 return;
             }
 
-            _scanner.Output(_scanner.ExecuteSearch(response.Message));
+            HandleScannerNavigationResult(_scanner.ExecuteSearch(response.Message));
         }
 
         private bool HandleScannerNavigationResult(ScannerCommandResult result)
@@ -403,6 +403,11 @@ namespace SongsOfConquestAccess.UI
             if (result != null && result.Status == ScannerCommandStatus.Result && result.Wrapped)
             {
                 NativeSoundUtility.PostEvent(ScannerWrapCueKey);
+            }
+
+            if (result != null && result.Status == ScannerCommandStatus.Result && result.Result != null)
+            {
+                ScannerDirectionalBeepAudio.Play(_cursorTile, result.Result.Position, DirectionalBeepGridGeometry.Square);
             }
 
             _scanner.Output(result);
