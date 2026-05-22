@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Reflection;
 using HarmonyLib;
+using SongsOfConquest.Client.Adventure.UI;
 using SongsOfConquest.Client.Deployment;
 using SongsOfConquest.Client.Gamestate;
 using SongsOfConquest.Client.Gamestate.Facade;
@@ -38,8 +39,6 @@ namespace SongsOfConquestAccess.Adapters
         private static readonly FieldInfo InstructionsTextField = AccessTools.Field(typeof(PreBattleMenu), "_instructionsText");
         private static readonly FieldInfo DeploymentRawImageField = AccessTools.Field(typeof(PreBattleMenu), "_deploymentRawImage");
         private static readonly FieldInfo TooltipField = AccessTools.Field(typeof(PreBattleMenu), "_tooltip");
-        private static readonly FieldInfo AttackerBannerField = AccessTools.Field(typeof(PreBattleMenu), "_attackerBanner");
-        private static readonly FieldInfo DefenderBannerField = AccessTools.Field(typeof(PreBattleMenu), "_defenderBanner");
         private static readonly FieldInfo AttackerScoutingInformationField = AccessTools.Field(typeof(PreBattleMenu), "_attackerScoutingInformation");
         private static readonly FieldInfo AttackerThreatLevelField = AccessTools.Field(typeof(PreBattleMenu), "_attackerThreatLevel");
         private static readonly FieldInfo DefenderScoutingInformationField = AccessTools.Field(typeof(PreBattleMenu), "_defenderScoutingInformation");
@@ -50,8 +49,6 @@ namespace SongsOfConquestAccess.Adapters
         private static readonly FieldInfo DeploymentMenuField = AccessTools.Field(typeof(PreBattleMenu), "_deploymentMenu");
         private static readonly FieldInfo MapFormatField = AccessTools.Field(typeof(PreBattleMenu), "_mapFormat");
         private static readonly FieldInfo StateMachineField = AccessTools.Field(typeof(PreBattleMenu), "_stateMachine");
-        private static readonly FieldInfo AttackingCommanderField = AccessTools.Field(typeof(PreBattleMenu), "_attackingCommander");
-        private static readonly FieldInfo DefendingCommanderField = AccessTools.Field(typeof(PreBattleMenu), "_defendingCommander");
         private static readonly FieldInfo AdventureBattleMenuSettingsField =
             AccessTools.Field(typeof(AdventureBattleMenuInstaller), "_settings");
 
@@ -70,6 +67,12 @@ namespace SongsOfConquestAccess.Adapters
         private readonly PreBattleMenu _menu;
         private GameObject _cursorOverlay;
         private RectTransform[] _cursorOverlaySegments;
+
+        private enum BattleParticipantSide
+        {
+            Attacker,
+            Defender
+        }
 
         public PreBattleMenuAdapter(PreBattleMenu menu)
         {
@@ -98,35 +101,14 @@ namespace SongsOfConquestAccess.Adapters
                 && GetMap() != null;
         }
 
-        public string OurWielderText
+        public string LeftPortraitText
         {
-            get
-            {
-                BattleSide? ownSide = GetOwnSide();
-                bool useAttacker = ownSide != BattleSide.Right_Defender;
-                return GetParticipantNameText(useAttacker);
-            }
+            get { return GetParticipantText(BattleParticipantSide.Attacker); }
         }
 
-        public string OpponentText
+        public string RightPortraitText
         {
-            get
-            {
-                BattleSide? ownSide = GetOwnSide();
-                bool opponentIsAttacker = ownSide == BattleSide.Right_Defender;
-                ICommanderState commander = opponentIsAttacker
-                    ? GetField<ICommanderState>(AttackingCommanderField)
-                    : GetField<ICommanderState>(DefendingCommanderField);
-
-                string name = commander != null ? GetParticipantNameText(opponentIsAttacker) : string.Empty;
-                string scouting = opponentIsAttacker
-                    ? GetUIText(AttackerScoutingInformationField)
-                    : GetUIText(DefenderScoutingInformationField);
-                string threat = opponentIsAttacker
-                    ? GetUIText(AttackerThreatLevelField)
-                    : GetUIText(DefenderThreatLevelField);
-                return MenuButtonTextUtility.JoinParts(name, scouting, threat);
-            }
+            get { return GetParticipantText(BattleParticipantSide.Defender); }
         }
 
         public string InstructionText
@@ -134,19 +116,24 @@ namespace SongsOfConquestAccess.Adapters
             get { return GetUIText(InstructionsTextField); }
         }
 
-        public void FocusOurWielder()
+        public void FocusLeftPortrait()
         {
-            FocusTile(null);
+            FocusCommanderPortrait(BattleParticipantSide.Attacker);
         }
 
-        public void FocusOpponent()
+        public void FocusRightPortrait()
         {
-            FocusTile(null);
+            FocusCommanderPortrait(BattleParticipantSide.Defender);
         }
 
-        public Tooltip OurWielderTooltip
+        public Tooltip LeftPortraitTooltip
         {
-            get { return GetCommanderTooltip(own: true); }
+            get { return GetCommanderPortraitTooltip(BattleParticipantSide.Attacker); }
+        }
+
+        public Tooltip RightPortraitTooltip
+        {
+            get { return GetCommanderPortraitTooltip(BattleParticipantSide.Defender); }
         }
 
         public string WithdrawButtonLabel { get { return GetButtonLabel(CancelButtonField, "Withdraw"); } }
@@ -482,58 +469,63 @@ namespace SongsOfConquestAccess.Adapters
                 new VisualTooltipMetadata(tooltipBehaviour, screenPoint, details));
         }
 
-        private Tooltip GetCommanderTooltip(bool own)
+        private void FocusCommanderPortrait(BattleParticipantSide side)
         {
-            ICommanderState commander = GetCommanderForParticipant(own);
-            IClientAdventureFacade facade = GetField<IClientAdventureFacade>(AdventureFacadeField);
-            TooltipBehaviour tooltipBehaviour = GetField<TooltipBehaviour>(TooltipField);
+            FocusTile(null);
+
+            CommanderHUDPortrait portrait = GetCommanderPortrait(side);
+            UIButton button = GetCommanderPortraitButton(portrait);
+            if (button == null)
+            {
+                return;
+            }
+
+            CommanderHudPortraitAdapter.RefreshTooltip(portrait);
+            NativeSelectionUtility.Select(button as Component);
+        }
+
+        private Tooltip GetCommanderPortraitTooltip(BattleParticipantSide side)
+        {
+            CommanderHUDPortrait portrait = GetCommanderPortrait(side);
+            UIButton button = GetCommanderPortraitButton(portrait);
             ILocalizationHandler localization = GetLocalization();
-            if (commander == null || commander.GetIsEmpty() || facade == null || tooltipBehaviour == null || localization == null)
+            if (button == null || localization == null)
             {
                 return null;
             }
 
-            IDetails details;
-            try
-            {
-                details = facade.Commanders.GetDetails(commander.Id);
-            }
-            catch (Exception ex)
-            {
-                SocAccessPlugin.Instance?.LogWarning("PreBattleMenuAdapter failed to resolve commander tooltip: " + ex.Message);
-                return null;
-            }
-
-            if (details == null)
-            {
-                return null;
-            }
-
-            Component anchor = GetCommanderBannerComponent(own);
-            Vector2 screenPoint = GetComponentCenterScreenPoint(anchor);
-            return new Tooltip(
-                () => NativeTooltipUtility.ToSpeechLines(details, localization),
-                new VisualTooltipMetadata(tooltipBehaviour, screenPoint, details));
+            CommanderHudPortraitAdapter.RefreshTooltip(portrait);
+            return Tooltip.ForComponent(button, localization);
         }
 
-        private ICommanderState GetCommanderForParticipant(bool own)
+        private CommanderHUDPortrait GetCommanderPortrait(BattleParticipantSide side)
         {
-            BattleSide? ownSide = GetOwnSide();
-            bool useAttacker = own
-                ? ownSide != BattleSide.Right_Defender
-                : ownSide == BattleSide.Right_Defender;
-            return useAttacker
-                ? GetField<ICommanderState>(AttackingCommanderField)
-                : GetField<ICommanderState>(DefendingCommanderField);
+            AdventureBattleMenu.Settings settings = GetAdventureBattleMenuSettings();
+            if (settings == null)
+            {
+                return null;
+            }
+
+            return side == BattleParticipantSide.Attacker
+                ? settings.AttackerCommanderHudPortrait
+                : settings.DefenderCommanderHudPortrait;
         }
 
-        private Component GetCommanderBannerComponent(bool own)
+        private UIButton GetCommanderPortraitButton(CommanderHUDPortrait portrait)
         {
-            BattleSide? ownSide = GetOwnSide();
-            bool useAttacker = own
-                ? ownSide != BattleSide.Right_Defender
-                : ownSide == BattleSide.Right_Defender;
-            return GetField<Banner>(useAttacker ? AttackerBannerField : DefenderBannerField);
+            UIButton button = CommanderHudPortraitAdapter.GetButton(portrait);
+            return IsNativeButtonVisible(button) ? button : null;
+        }
+
+        private static bool IsNativeButtonVisible(UIButton button)
+        {
+            if (button == null || !button.Active)
+            {
+                return false;
+            }
+
+            GameObject gameObject = ((Component)button).gameObject;
+            return gameObject != null && gameObject.activeInHierarchy;
         }
 
         public bool CanResolveTile(Vector2Int tile)
@@ -845,11 +837,19 @@ namespace SongsOfConquestAccess.Adapters
             return GetField<ILocalizationHandler>(LocalizationField);
         }
 
-        private string GetParticipantNameText(bool useAttacker)
+        private string GetParticipantText(BattleParticipantSide side)
+        {
+            string name = GetParticipantNameText(side);
+            string scouting = GetParticipantScoutingText(side);
+            string threat = GetParticipantThreatText(side);
+            return MenuButtonTextUtility.JoinParts(name, scouting, threat);
+        }
+
+        private string GetParticipantNameText(BattleParticipantSide side)
         {
             AdventureBattleMenu.Settings settings = GetAdventureBattleMenuSettings();
             UITextMesh text = settings != null
-                ? (useAttacker ? settings.AttackerNameText : settings.DefenderNameText)
+                ? (side == BattleParticipantSide.Attacker ? settings.AttackerNameText : settings.DefenderNameText)
                 : null;
             if (!IsVisibleText(text))
             {
@@ -857,6 +857,20 @@ namespace SongsOfConquestAccess.Adapters
             }
 
             return UITextMeshTextUtility.GetEffectiveText(text);
+        }
+
+        private string GetParticipantScoutingText(BattleParticipantSide side)
+        {
+            return GetUIText(side == BattleParticipantSide.Attacker
+                ? AttackerScoutingInformationField
+                : DefenderScoutingInformationField);
+        }
+
+        private string GetParticipantThreatText(BattleParticipantSide side)
+        {
+            return GetUIText(side == BattleParticipantSide.Attacker
+                ? AttackerThreatLevelField
+                : DefenderThreatLevelField);
         }
 
         private AdventureBattleMenu.Settings GetAdventureBattleMenuSettings()
@@ -1082,23 +1096,6 @@ namespace SongsOfConquestAccess.Adapters
             return new Vector2(
                 Mathf.Lerp(bottomLeft.x, topRight.x, viewport.x),
                 Mathf.Lerp(bottomLeft.y, topRight.y, viewport.y));
-        }
-
-        private static Vector2 GetComponentCenterScreenPoint(Component component)
-        {
-            RectTransform rectTransform = component != null ? component.GetComponent<RectTransform>() : null;
-            if (rectTransform == null)
-            {
-                return new Vector2(Screen.width * 0.5f, Screen.height * 0.5f);
-            }
-
-            Vector3[] corners = new Vector3[4];
-            rectTransform.GetWorldCorners(corners);
-            Vector2 bottomLeft = RectTransformUtility.WorldToScreenPoint(null, corners[0]);
-            Vector2 topRight = RectTransformUtility.WorldToScreenPoint(null, corners[2]);
-            return new Vector2(
-                Mathf.Lerp(bottomLeft.x, topRight.x, 0.5f),
-                Mathf.Lerp(bottomLeft.y, topRight.y, 0.5f));
         }
 
         private static Vector2 GetRawImageCenterScreenPoint(RawImage rawImage)
