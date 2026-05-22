@@ -1,14 +1,7 @@
 # Changelog
 
-## V0.2.1
+## V0.3.0
 
-- The troop purchase and upgrade screens have been rewritten to work similar to the marketplace instead of being a faithful translation of the game's UI. The number of tab stops no longer scales with the available troops
-- On the troop deployment screen:
-  - Fix wrong enemy names
-  - Fix opponent wielder portrait tooltips not being reliably shown in cases where you are the defender
-- Fix being stuck on the victory screen after successfully laying siege to a settlement
-- In combat, tile effects like Acid Clouds are now read
-- Edit fields no longer require pressing enter to edit them, just type text into them when focused
 - Added `Ctrl+f` command on the adventure map grid to search all scanner categories
 - Newly revealed entities will now be announced. This includes entities spawning in areas visible to the player, although this is subject to change in case this provides information typically not available to a sighted player
 - The scanner now has a Revealed category where revealed entities are placed
@@ -19,6 +12,13 @@
   - `Alt+number`: read directions from the currently focused tile to the bookmarked position
   - `Ctrl+shift+number`: toggle playback of an audio beacon at the bookmarked position
 - Add setting to control playback of a positional beep when moving through scanner result entries. This is turned off by default
+- The troop purchase and upgrade screens have been rewritten to work similar to the marketplace instead of being a faithful translation of the game's UI. The number of tab stops no longer scales with the available troops
+- On the troop deployment screen:
+  - Fix wrong enemy names
+  - Fix opponent wielder portrait tooltips not being reliably shown in cases where you are the defender
+- Fix being stuck on the victory screen after successfully laying siege to a settlement
+- In combat, tile effects like Acid Clouds are now read
+- Edit fields no longer require pressing enter to edit them, just type text into them when focused
 
 ## V0.2.0
 
