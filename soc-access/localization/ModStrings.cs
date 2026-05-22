@@ -464,6 +464,9 @@ namespace SongsOfConquestAccess.Localization
             public static readonly ModString Riches = new ModString("Scanner.Riches", "Riches");
             public static readonly ModString Roads = new ModString("Scanner.Roads", "Roads");
             public static readonly ModPluralString RoadTileCount = new ModPluralString("Scanner.RoadTileCount", "{0} road tile", "{0} road tiles");
+            public static readonly ModString Search = new ModString("Scanner.Search", "Search");
+            public static readonly ModString SearchNoResults = new ModString("Scanner.SearchNoResults", "No results");
+            public static readonly ModString SearchResults = new ModString("Scanner.SearchResults", "Search Results");
             public static readonly ModString SettlementsAndBuildSites = new ModString("Scanner.SettlementsAndBuildSites", "Settlements and Build sites");
             public static readonly ModString South = new ModString("Scanner.South", "south");
             public static readonly ModString Southeast = new ModString("Scanner.Southeast", "southeast");

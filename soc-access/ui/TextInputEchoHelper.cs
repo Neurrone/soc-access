@@ -5,74 +5,50 @@ using TMPro;
 
 namespace SongsOfConquestAccess.UI
 {
-    internal sealed class TextEditHelper
+    internal sealed class TextInputEchoHelper
     {
         private IUITextMeshInputField _field;
         private TMP_InputField _inputField;
-        private string _cachedValue;
         private string _lastText;
         private int _lastCaret;
         private int _lastAnchor;
         private bool _suppressNextDiff;
 
-        public bool IsEditing { get; private set; }
-
-        public bool Begin(IUITextMeshInputField field)
+        public void Begin(IUITextMeshInputField field)
         {
-            if (field == null || !field.Interactable)
+            TMP_InputField inputField = GetNativeInputField(field);
+            if (field == null || inputField == null)
             {
-                return false;
+                Clear();
+                return;
             }
 
-            TMP_InputField inputField = GetNativeInputField(field);
-            if (inputField == null)
+            if (ReferenceEquals(_field, field) && ReferenceEquals(_inputField, inputField))
             {
-                return false;
+                ResetBaseline();
+                return;
             }
 
             _field = field;
             _inputField = inputField;
-            _cachedValue = field.InputFieldValue ?? string.Empty;
-            IsEditing = true;
-            field.Select();
-            field.ActivateInputField();
             ResetBaseline();
-            Speak(ModText.Get(ModStrings.UI.Editing, FormatValue(_cachedValue)));
-            return true;
         }
 
-        public bool HandleAction(Input.InputAction action)
+        public void Stop()
         {
-            if (!IsEditing || action == null)
-            {
-                return false;
-            }
-
-            if (action.Key == Input.AccessibilityActions.Activate.Key)
-            {
-                Confirm();
-                return true;
-            }
-
-            if (action.Key == Input.AccessibilityActions.Cancel.Key)
-            {
-                Cancel();
-                return true;
-            }
-
-            return false;
+            Clear();
         }
 
         public void Update()
         {
-            if (!IsEditing)
+            if (_field == null || _inputField == null)
             {
                 return;
             }
 
-            if (_field == null || _inputField == null)
+            if (!_inputField.isFocused)
             {
-                IsEditing = false;
+                CaptureBaseline();
                 return;
             }
 
@@ -86,55 +62,10 @@ namespace SongsOfConquestAccess.UI
             DiffAndAnnounce();
         }
 
-        public void Confirm()
-        {
-            if (!IsEditing)
-            {
-                return;
-            }
-
-            IsEditing = false;
-            if (_inputField != null)
-            {
-                _inputField.DeactivateInputField();
-            }
-
-            Speak(ModText.Get(ModStrings.UI.DoneEditing, FormatValue(_field != null ? _field.InputFieldValue : null)));
-            Clear();
-        }
-
-        public void Cancel()
-        {
-            if (!IsEditing)
-            {
-                return;
-            }
-
-            IsEditing = false;
-            if (_field != null)
-            {
-                _field.InputFieldValue = _cachedValue ?? string.Empty;
-            }
-
-            if (_inputField != null)
-            {
-                _inputField.DeactivateInputField();
-            }
-
-            Speak(ModText.Get(ModStrings.UI.CancelledEditing, FormatValue(_cachedValue)));
-            Clear();
-        }
-
         private static TMP_InputField GetNativeInputField(IUITextMeshInputField field)
         {
             UITextMeshInputField concrete = field as UITextMeshInputField;
             return concrete != null ? concrete.GetInputField() : null;
-        }
-
-        private void ResetBaseline()
-        {
-            CaptureBaseline();
-            _suppressNextDiff = true;
         }
 
         private void CaptureBaseline()
@@ -142,6 +73,12 @@ namespace SongsOfConquestAccess.UI
             _lastText = _inputField != null ? _inputField.text ?? string.Empty : string.Empty;
             _lastCaret = _inputField != null ? _inputField.caretPosition : 0;
             _lastAnchor = _inputField != null ? _inputField.selectionAnchorPosition : 0;
+        }
+
+        private void ResetBaseline()
+        {
+            CaptureBaseline();
+            _suppressNextDiff = true;
         }
 
         private void DiffAndAnnounce()
@@ -188,6 +125,13 @@ namespace SongsOfConquestAccess.UI
             int maxSuffix = System.Math.Min(previous.Length - prefix, current.Length - prefix);
             int suffix = CommonSuffixLength(previous, current, maxSuffix);
             int removedLength = previous.Length - prefix - suffix;
+            int insertedLength = current.Length - prefix - suffix;
+
+            if (insertedLength > 0)
+            {
+                Speak(FormatSubstring(current.Substring(prefix, insertedLength)));
+                return;
+            }
 
             if (removedLength > 0)
             {
@@ -246,11 +190,6 @@ namespace SongsOfConquestAccess.UI
             return index;
         }
 
-        private static string FormatValue(string value)
-        {
-            return string.IsNullOrEmpty(value) ? ModText.Get(ModStrings.UI.Blank) : value;
-        }
-
         private static string FormatSubstring(string value)
         {
             if (string.IsNullOrEmpty(value))
@@ -295,7 +234,6 @@ namespace SongsOfConquestAccess.UI
         {
             _field = null;
             _inputField = null;
-            _cachedValue = null;
             _lastText = null;
             _lastCaret = 0;
             _lastAnchor = 0;

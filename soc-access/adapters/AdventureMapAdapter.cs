@@ -15,6 +15,7 @@ using SongsOfConquest.Client.Gamestate.Facade;
 using SongsOfConquest.Client.Grid;
 using SongsOfConquest.Client.InputManagement;
 using SongsOfConquest.Client.Menu.Tooltip;
+using SongsOfConquest.Client.UI;
 using SongsOfConquest.Common.Details;
 using SongsOfConquest.Common.Entities;
 using SongsOfConquest.Common.Entities.Adventure;
@@ -54,6 +55,7 @@ namespace SongsOfConquestAccess.Adapters
         private readonly IHumanAdventureController _humanAdventureController;
         private readonly IHumanAdventureControllerFacade _humanAdventureControllerFacade;
         private readonly IInputManager _inputManager;
+        private readonly ISystemPopups _systemPopups;
         private readonly MethodInfo _worldToPointMethod;
         private readonly MethodInfo _pointToWorldMethod;
         private readonly MethodInfo _getTooltipForTilePositionMethod;
@@ -81,7 +83,8 @@ namespace SongsOfConquestAccess.Adapters
                 Resolve<ICartographyVisualManifest>(GetContainer(installer)),
                 Resolve<IHumanAdventureController>(GetContainer(installer)),
                 Resolve<IHumanAdventureControllerFacade>(GetContainer(installer)),
-                Resolve<IInputManager>(GetContainer(installer)))
+                Resolve<IInputManager>(GetContainer(installer)),
+                Resolve<ISystemPopups>(GetContainer(installer)))
         {
         }
 
@@ -99,7 +102,8 @@ namespace SongsOfConquestAccess.Adapters
             ICartographyVisualManifest cartographyVisualManifest,
             IHumanAdventureController humanAdventureController,
             IHumanAdventureControllerFacade humanAdventureControllerFacade,
-            IInputManager inputManager)
+            IInputManager inputManager,
+            ISystemPopups systemPopups)
         {
             SourceKey = sourceKey;
             _container = container;
@@ -115,6 +119,7 @@ namespace SongsOfConquestAccess.Adapters
             _humanAdventureController = humanAdventureController;
             _humanAdventureControllerFacade = humanAdventureControllerFacade;
             _inputManager = inputManager;
+            _systemPopups = systemPopups;
             _worldToPointMethod = cartographyConverter != null
                 ? AccessTools.Method(cartographyConverter.GetType(), "WorldToPoint", new[] { typeof(float3) })
                 : null;
@@ -170,6 +175,11 @@ namespace SongsOfConquestAccess.Adapters
         public ILocalizationHandler LocalizationHandler
         {
             get { return _localizationHandler; }
+        }
+
+        public ISystemPopups SystemPopups
+        {
+            get { return _systemPopups; }
         }
 
         private static T Resolve<T>(DiContainer container) where T : class

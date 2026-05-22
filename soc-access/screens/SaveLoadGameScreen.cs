@@ -21,13 +21,11 @@ namespace SongsOfConquestAccess.Screens
             AccessTools.Property(typeof(SaveLoadGameMenuInstaller), "Container");
 
         private readonly SaveLoadGameMenuAdapter _adapter;
-        private readonly TextEditHelper _textEdit = new TextEditHelper();
 
         public SaveLoadGameScreen(SaveLoadGameMenuAdapter adapter)
-            : base(BuildRoot(adapter, null))
+            : base(BuildRoot(adapter))
         {
             _adapter = adapter;
-            RootWidget = BuildRoot(adapter, _textEdit);
         }
 
         public object SourceKey
@@ -57,40 +55,8 @@ namespace SongsOfConquestAccess.Screens
             return _adapter != null && _adapter.IsPresent();
         }
 
-        public override void Update()
-        {
-            _textEdit.Update();
-        }
-
-        public override bool HasClaimed(string actionKey)
-        {
-            if (_textEdit.IsEditing)
-            {
-                return actionKey == AccessibilityActions.Activate.Key
-                    || actionKey == AccessibilityActions.Cancel.Key;
-            }
-
-            return base.HasClaimed(actionKey);
-        }
-
-        public override bool HasFocusedWidgetClaimed(string actionKey)
-        {
-            if (_textEdit.IsEditing)
-            {
-                return actionKey == AccessibilityActions.Activate.Key
-                    || actionKey == AccessibilityActions.Cancel.Key;
-            }
-
-            return base.HasFocusedWidgetClaimed(actionKey);
-        }
-
         public override bool OnActionJustPressed(InputAction action)
         {
-            if (_textEdit.IsEditing)
-            {
-                return _textEdit.HandleAction(action);
-            }
-
             if (action != null && action.Key == AccessibilityActions.Cancel.Key)
             {
                 return _adapter != null && _adapter.Close();
@@ -107,11 +73,11 @@ namespace SongsOfConquestAccess.Screens
             }
 
             int focusedIndex = RootWidget != null ? RootWidget.FocusedIndex : -1;
-            RootWidget = BuildRoot(_adapter, _textEdit);
+            RootWidget = BuildRoot(_adapter);
             RootWidget?.SetFocusByIndexSilently(focusedIndex);
         }
 
-        private static ContainerWidget BuildRoot(SaveLoadGameMenuAdapter adapter, TextEditHelper textEdit)
+        private static ContainerWidget BuildRoot(SaveLoadGameMenuAdapter adapter)
         {
             ContainerWidget root = new ContainerWidget(
                 "save-load-game-screen",
@@ -130,7 +96,7 @@ namespace SongsOfConquestAccess.Screens
                 "save-load-name",
                 string.Empty,
                 () => adapter != null ? adapter.InputField : null,
-                () => textEdit != null && adapter != null && textEdit.Begin(adapter.InputField),
+                null,
                 () => adapter?.FocusInput(),
                 () => adapter != null && adapter.IsInputEnabled(),
                 () => adapter != null && adapter.IsInputVisible()));

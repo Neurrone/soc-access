@@ -28,6 +28,10 @@ Currently visible things are read normally. Explored tiles that are not currentl
 - `Home`: move the accessibility cursor to the current scanner result
 - `Shift+Home`: repeat the current scanner result
 
+## Search
+
+On the adventure map, use `Ctrl+f` to perform a search across all categories of the scanner. This is useful for finding specific things quickly.
+
 ## Notes
 
 - Scanner commands refresh results automatically as you navigate through them.

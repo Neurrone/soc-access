@@ -8,6 +8,8 @@
   - Fix opponent wielder portrait tooltips not being reliably shown in cases where you are the defender
 - Fix being stuck on the victory screen after successfully laying siege to a settlement
 - In combat, tile effects like Acid Clouds are now read
+- Edit fields no longer require pressing enter to edit them, just type text into them when focused
+- Added `Ctrl+f` command on the adventure map grid to search all scanner categories
 
 ## V0.2.0
 

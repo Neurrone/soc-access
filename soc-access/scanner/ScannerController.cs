@@ -18,6 +18,7 @@ namespace SongsOfConquestAccess.Scanner
         private int _categoryIndex;
         private int _subcategoryIndex;
         private int _resultIndex;
+        private int _preSearchCategoryIndex;
 
         public ScannerController(
             Func<Vector2Int, ScannerSnapshot> snapshotBuilder,
@@ -46,6 +47,11 @@ namespace SongsOfConquestAccess.Scanner
             return ExecuteRefreshCore();
         }
 
+        internal ScannerCommandResult ExecuteSearch(string query)
+        {
+            return ExecuteSearchCore(query);
+        }
+
         private ScannerCommandResult ExecuteRefreshCore()
         {
             Vector2Int origin = GetCursor();
@@ -63,6 +69,47 @@ namespace SongsOfConquestAccess.Scanner
             return BuildCommandResult(includePath: true);
         }
 
+        private ScannerCommandResult ExecuteSearchCore(string query)
+        {
+            if (string.IsNullOrWhiteSpace(query))
+            {
+                ClearSearchSnapshot();
+                return SearchNoResults();
+            }
+
+            Vector2Int origin = GetCursor();
+            ScannerSnapshot source = BuildSnapshot(origin);
+            ScannerSnapshot search = ScannerSearch.Build(source, query, origin);
+            if (search == null || search.IsEmpty)
+            {
+                ClearSearchSnapshot();
+                return SearchNoResults();
+            }
+
+            if (_snapshot == null || !_snapshot.IsSearchSnapshot)
+            {
+                _preSearchCategoryIndex = _categoryIndex;
+            }
+
+            _snapshot = search;
+            _categoryIndex = 0;
+            _subcategoryIndex = 0;
+            _resultIndex = 0;
+            return BuildCommandResult(includePath: true);
+        }
+
+        private void ClearSearchSnapshot()
+        {
+            if (_snapshot != null && _snapshot.IsSearchSnapshot)
+            {
+                _categoryIndex = _preSearchCategoryIndex;
+            }
+
+            _snapshot = null;
+            _subcategoryIndex = 0;
+            _resultIndex = 0;
+        }
+
         public bool MoveCategory(int delta)
         {
             Output(ExecuteMoveCategory(delta));
@@ -76,6 +123,14 @@ namespace SongsOfConquestAccess.Scanner
 
         private ScannerCommandResult ExecuteMoveCategoryCore(int delta)
         {
+            if (_snapshot != null && _snapshot.IsSearchSnapshot)
+            {
+                _categoryIndex = _preSearchCategoryIndex;
+                _subcategoryIndex = 0;
+                _resultIndex = 0;
+                _snapshot = null;
+            }
+
             RebuildFromCursorPreservingScope();
             if (_snapshot == null || _snapshot.IsEmpty)
             {
@@ -110,7 +165,11 @@ namespace SongsOfConquestAccess.Scanner
 
         private ScannerCommandResult ExecuteMoveSubcategoryCore(int delta)
         {
-            RebuildFromCursorPreservingScope();
+            if (_snapshot == null || !_snapshot.IsSearchSnapshot)
+            {
+                RebuildFromCursorPreservingScope();
+            }
+
             if (_snapshot == null || _snapshot.IsEmpty)
             {
                 return NoResults();
@@ -149,7 +208,9 @@ namespace SongsOfConquestAccess.Scanner
 
         private ScannerCommandResult ExecuteMoveResultCore(int delta)
         {
-            bool locatedCurrent = RebuildForResultNavigation();
+            bool locatedCurrent = _snapshot != null && _snapshot.IsSearchSnapshot
+                ? CurrentValidResult() != null
+                : RebuildForResultNavigation();
             if (_snapshot == null || _snapshot.IsEmpty)
             {
                 return NoResults();
@@ -303,6 +364,11 @@ namespace SongsOfConquestAccess.Scanner
 
         private bool RebuildForCurrentResultAction()
         {
+            if (_snapshot != null && _snapshot.IsSearchSnapshot)
+            {
+                return CurrentValidResult() != null;
+            }
+
             ReseatResultState state = RebuildAndReseatCurrentResult();
             if (state.LocatedCurrent)
             {
@@ -493,6 +559,14 @@ namespace SongsOfConquestAccess.Scanner
         private static ScannerCommandResult NoResults()
         {
             return new ScannerCommandResult(ScannerCommandStatus.NoResults);
+        }
+
+        private static ScannerCommandResult SearchNoResults()
+        {
+            return new ScannerCommandResult(ScannerCommandStatus.NoResults)
+            {
+                NoResultsText = ModText.Get(ModStrings.Scanner.SearchNoResults)
+            };
         }
 
         private static int WrapIndex(int index, int count, int delta)

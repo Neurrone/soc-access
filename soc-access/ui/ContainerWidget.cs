@@ -210,6 +210,15 @@ namespace SongsOfConquestAccess.UI
             return false;
         }
 
+        public override void Update()
+        {
+            Widget focusedChild = FocusedChild;
+            if (focusedChild != null && focusedChild.IsVisible)
+            {
+                focusedChild.Update();
+            }
+        }
+
         private bool MoveRelative(int delta)
         {
             if (_children.Count == 0)

@@ -2027,6 +2027,21 @@ msgctxt "Scanner.Roads"
 msgid "Roads"
 msgstr "ë„ë¡œ"
 
+#. Scanner.Search
+msgctxt "Scanner.Search"
+msgid "Search"
+msgstr "검색"
+
+#. Scanner.SearchNoResults
+msgctxt "Scanner.SearchNoResults"
+msgid "No results"
+msgstr "결과 없음"
+
+#. Scanner.SearchResults
+msgctxt "Scanner.SearchResults"
+msgid "Search Results"
+msgstr "검색 결과"
+
 #. Scanner.SettlementsAndBuildSites
 msgctxt "Scanner.SettlementsAndBuildSites"
 msgid "Settlements and Build sites"

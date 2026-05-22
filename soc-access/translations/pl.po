@@ -2057,6 +2057,21 @@ msgctxt "Scanner.Roads"
 msgid "Roads"
 msgstr "Drogi"
 
+#. Scanner.Search
+msgctxt "Scanner.Search"
+msgid "Search"
+msgstr "Szukaj"
+
+#. Scanner.SearchNoResults
+msgctxt "Scanner.SearchNoResults"
+msgid "No results"
+msgstr "Brak wyników"
+
+#. Scanner.SearchResults
+msgctxt "Scanner.SearchResults"
+msgid "Search Results"
+msgstr "Wyniki wyszukiwania"
+
 #. Scanner.SettlementsAndBuildSites
 msgctxt "Scanner.SettlementsAndBuildSites"
 msgid "Settlements and Build sites"

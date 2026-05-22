@@ -4,6 +4,7 @@ using SongsOfConquest.Client;
 using SongsOfConquest.Client.Adventure;
 using SongsOfConquest.Client.Menu;
 using SongsOfConquest.Client.Menu.Popup;
+using SongsOfConquest.Client.UI;
 using SongsOfConquestAccess.Input;
 using SongsOfConquestAccess.Adapters;
 using SongsOfConquestAccess.UI;
@@ -20,11 +21,19 @@ namespace SongsOfConquestAccess.Screens
             AccessTools.Property(typeof(PopupMenuInstaller), "Container");
 
         private readonly IMessageDialogAdapter _adapter;
+        private readonly IInputDialogAdapter _inputAdapter;
+        private readonly Action<IUITextMeshInputField, string> _inputSubmitHandler;
 
         public MessageDialogScreen(IMessageDialogAdapter adapter)
             : base(BuildRootWidget(adapter))
         {
             _adapter = adapter;
+            _inputAdapter = adapter as IInputDialogAdapter;
+            if (_inputAdapter != null)
+            {
+                _inputSubmitHandler = HandleInputSubmit;
+                _inputAdapter.AttachInputSubmit(_inputSubmitHandler);
+            }
         }
 
         public static Screen TryBuildActiveMapMessagePopupScreen()
@@ -167,6 +176,24 @@ namespace SongsOfConquestAccess.Screens
             return _adapter != null && _adapter.IsPresent();
         }
 
+        public override bool HasClaimed(string actionKey)
+        {
+            if (actionKey == AccessibilityActions.Cancel.Key)
+            {
+                return _adapter != null && _adapter.HasNegativeAction;
+            }
+
+            return base.HasClaimed(actionKey);
+        }
+
+        public override void OnPop()
+        {
+            if (_inputAdapter != null && _inputSubmitHandler != null)
+            {
+                _inputAdapter.DetachInputSubmit(_inputSubmitHandler);
+            }
+        }
+
         public object SourceKey
         {
             get { return _adapter != null ? _adapter.SourceKey : null; }
@@ -182,11 +209,29 @@ namespace SongsOfConquestAccess.Screens
             return base.OnActionJustPressed(action);
         }
 
+        private void HandleInputSubmit(IUITextMeshInputField inputField, string text)
+        {
+            if (_adapter != null && _adapter.HasPositiveAction)
+            {
+                _adapter.ActivateAction(DialogAction.Positive);
+            }
+        }
+
         private static ContainerWidget BuildRootWidget(IMessageDialogAdapter adapter)
         {
             string title = adapter != null ? adapter.Title : string.Empty;
             string dialogLabel = string.IsNullOrWhiteSpace(title) ? "dialog" : title + " dialog";
             ContainerWidget root = new ContainerWidget("message-dialog", dialogLabel);
+            IInputDialogAdapter inputAdapter = adapter as IInputDialogAdapter;
+
+            root.AddChild(new TextInputWidget(
+                "input",
+                FirstNonEmpty(title, adapter != null ? adapter.Body : string.Empty),
+                () => inputAdapter != null ? inputAdapter.InputField : null,
+                null,
+                null,
+                () => inputAdapter != null && inputAdapter.HasInputField,
+                () => inputAdapter != null && inputAdapter.HasInputField));
 
             root.AddChild(new TextWidget(
                 "body",
@@ -198,7 +243,8 @@ namespace SongsOfConquestAccess.Screens
                         adapter.SyncNativeSelection(DialogAction.Body);
                     }
                 },
-                includeParentLabelInAnnouncement: true));
+                includeParentLabelInAnnouncement: true,
+                isVisible: () => adapter != null && !string.IsNullOrWhiteSpace(adapter.Body)));
 
             root.AddChild(new ButtonWidget(
                 "positive",
@@ -306,6 +352,11 @@ namespace SongsOfConquestAccess.Screens
             }
 
             return settings.TopContainer.GetSiblingIndex();
+        }
+
+        private static string FirstNonEmpty(string first, string second)
+        {
+            return string.IsNullOrWhiteSpace(first) ? second ?? string.Empty : first;
         }
     }
 }

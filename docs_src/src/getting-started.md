@@ -44,6 +44,4 @@ To drag an item:
 
 Text fields are announced as edit controls.
 
-Press Enter on an edit field to begin editing. The mod announces that editing has started and reads the current value. While editing, use the normal text editing keys provided by the game and text field. The mod announces typed or selected text as it changes.
-
-Press Enter to finish editing. Press Escape to cancel and restore the value from before editing began.
+Type text normally like you would in a form. The text field receives characters when focused.

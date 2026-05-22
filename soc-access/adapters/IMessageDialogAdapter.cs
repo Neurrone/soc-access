@@ -1,3 +1,6 @@
+using System;
+using SongsOfConquest.Client.UI;
+
 namespace SongsOfConquestAccess.Adapters
 {
     internal enum DialogAction
@@ -28,5 +31,16 @@ namespace SongsOfConquestAccess.Adapters
         void SyncNativeSelection(DialogAction action);
 
         bool ActivateAction(DialogAction action);
+    }
+
+    internal interface IInputDialogAdapter
+    {
+        bool HasInputField { get; }
+
+        IUITextMeshInputField InputField { get; }
+
+        void AttachInputSubmit(Action<IUITextMeshInputField, string> handler);
+
+        void DetachInputSubmit(Action<IUITextMeshInputField, string> handler);
     }
 }

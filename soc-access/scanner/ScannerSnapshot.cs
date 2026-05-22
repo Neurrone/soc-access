@@ -58,6 +58,13 @@ namespace SongsOfConquestAccess.Scanner
 
         public Vector2Int SortOrigin { get; private set; }
 
+        public bool IsSearchSnapshot { get; private set; }
+
+        public void MarkAsSearchSnapshot()
+        {
+            IsSearchSnapshot = true;
+        }
+
         public ScannerCategory GetOrAddCategory(string label)
         {
             for (int i = 0; i < _categories.Count; i++)
@@ -90,31 +97,40 @@ namespace SongsOfConquestAccess.Scanner
 
         public void SortByDistance(Vector2Int origin)
         {
+            SortBy(origin, (left, right) =>
+            {
+                int distanceCompare = DistanceSquared(origin, left.Position).CompareTo(DistanceSquared(origin, right.Position));
+                if (distanceCompare != 0)
+                {
+                    return distanceCompare;
+                }
+
+                int labelCompare = string.Compare(left.Label, right.Label, StringComparison.OrdinalIgnoreCase);
+                if (labelCompare != 0)
+                {
+                    return labelCompare;
+                }
+
+                int xCompare = left.Position.x.CompareTo(right.Position.x);
+                return xCompare != 0 ? xCompare : left.Position.y.CompareTo(right.Position.y);
+            });
+        }
+
+        public void SortBy(Vector2Int origin, Comparison<ScannerResult> comparison)
+        {
+            if (comparison == null)
+            {
+                return;
+            }
+
             SortOrigin = origin;
             HasSortOrigin = true;
-
             for (int i = 0; i < _categories.Count; i++)
             {
                 ScannerCategory category = _categories[i];
                 for (int j = 0; j < category.Subcategories.Count; j++)
                 {
-                    category.Subcategories[j].Results.Sort((left, right) =>
-                    {
-                        int distanceCompare = DistanceSquared(origin, left.Position).CompareTo(DistanceSquared(origin, right.Position));
-                        if (distanceCompare != 0)
-                        {
-                            return distanceCompare;
-                        }
-
-                        int labelCompare = string.Compare(left.Label, right.Label, StringComparison.OrdinalIgnoreCase);
-                        if (labelCompare != 0)
-                        {
-                            return labelCompare;
-                        }
-
-                        int xCompare = left.Position.x.CompareTo(right.Position.x);
-                        return xCompare != 0 ? xCompare : left.Position.y.CompareTo(right.Position.y);
-                    });
+                    category.Subcategories[j].Results.Sort(comparison);
                 }
             }
         }

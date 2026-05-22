@@ -100,6 +100,10 @@ namespace SongsOfConquestAccess.UI
             return false;
         }
 
+        public virtual void Update()
+        {
+        }
+
         public virtual Widget GetFocusedWidget()
         {
             return this;

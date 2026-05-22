@@ -43,6 +43,7 @@ namespace SongsOfConquestAccess.Screens
 
         public virtual void Update()
         {
+            RootWidget?.Update();
         }
 
         public virtual bool HasClaimed(string actionKey)

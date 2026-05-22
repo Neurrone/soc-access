@@ -36,23 +36,25 @@ namespace SongsOfConquestAccess.Scanner
 
         public bool Wrapped { get; set; }
 
+        public string NoResultsText { get; set; }
+
         public SpeechRequest ToSpeechRequest(
             Func<ScannerResult, IReadOnlyList<ScannerDirectionStep>, int, int, IScannerSpeechContext> speechContextProvider)
         {
             if (Status == ScannerCommandStatus.NoResults)
             {
-                return NoResults();
+                return BuildNoResults();
             }
 
             if (speechContextProvider == null || Result == null)
             {
-                return NoResults();
+                return BuildNoResults();
             }
 
             IScannerSpeechContext context = speechContextProvider(Result, Directions, ResultIndex, ResultCount);
             SpeechRequest request = context != null
                 ? context.ToSpeechRequest()
-                : NoResults();
+                : BuildNoResults();
 
             if (IncludePath && !string.IsNullOrWhiteSpace(CategoryLabel) && !string.IsNullOrWhiteSpace(SubcategoryLabel))
             {
@@ -64,9 +66,13 @@ namespace SongsOfConquestAccess.Scanner
             return request;
         }
 
-        private static SpeechRequest NoResults()
+        private SpeechRequest BuildNoResults()
         {
-            return new SpeechRequest(ModText.Get(ModStrings.UI.NoScannerResults), interrupt: false);
+            return new SpeechRequest(
+                string.IsNullOrWhiteSpace(NoResultsText)
+                    ? ModText.Get(ModStrings.UI.NoScannerResults)
+                    : NoResultsText,
+                interrupt: false);
         }
     }
 }

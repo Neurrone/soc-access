@@ -1,5 +1,11 @@
+using System;
+using Lavapotion.Utilities;
+using SongsOfConquest.Client;
+using SongsOfConquest.Client.InputManagement;
+using SongsOfConquest.Client.UI;
 using SongsOfConquestAccess.Adapters;
 using SongsOfConquestAccess.Input;
+using SongsOfConquestAccess.Localization;
 using SongsOfConquestAccess.Scanner;
 using SongsOfConquestAccess.Speech.Spatial;
 using UnityEngine;
@@ -193,6 +199,11 @@ namespace SongsOfConquestAccess.UI
                 return _scanner.Refresh();
             }
 
+            if (action.Key == AccessibilityActions.ScannerSearch.Key)
+            {
+                return OpenScannerSearch();
+            }
+
             if (action.Key == AccessibilityActions.ScannerPreviousCategory.Key)
             {
                 return HandleScannerNavigationResult(_scanner.ExecuteMoveCategory(-1));
@@ -236,6 +247,40 @@ namespace SongsOfConquestAccess.UI
             return false;
         }
 
+        private bool OpenScannerSearch()
+        {
+            ISystemPopups systemPopups = _adapter != null ? _adapter.SystemPopups : null;
+            if (systemPopups == null)
+            {
+                SocAccessPlugin.Instance?.LogWarning("Scanner search could not open because system popups are unavailable");
+                return false;
+            }
+
+            string search = ModText.Get(ModStrings.Scanner.Search);
+            string cancel = GameText.Get(_adapter.LocalizationHandler, "Common/Cancel", "Cancel");
+            systemPopups
+                .AskForInput(
+                    search,
+                    string.Empty,
+                    search,
+                    cancel,
+                    null,
+                    InputFieldContentType.Standard,
+                    InputLevel.Popup)
+                .Then((Action<AsyncResponse>)HandleScannerSearchResponse);
+            return true;
+        }
+
+        private void HandleScannerSearchResponse(AsyncResponse response)
+        {
+            if (!response.Success)
+            {
+                return;
+            }
+
+            _scanner.Output(_scanner.ExecuteSearch(response.Message));
+        }
+
         private bool HandleScannerNavigationResult(ScannerCommandResult result)
         {
             if (result != null && result.Status == ScannerCommandStatus.Result && result.Wrapped)
@@ -250,6 +295,7 @@ namespace SongsOfConquestAccess.UI
         private static bool IsScannerAction(string actionKey)
         {
             return actionKey == AccessibilityActions.ScannerRefresh.Key
+                || actionKey == AccessibilityActions.ScannerSearch.Key
                 || actionKey == AccessibilityActions.ScannerPreviousCategory.Key
                 || actionKey == AccessibilityActions.ScannerNextCategory.Key
                 || actionKey == AccessibilityActions.ScannerPreviousSubcategory.Key

@@ -723,6 +723,7 @@ namespace SongsOfConquestAccess.Screens
                 IHumanAdventureController humanAdventureController = TryResolve<IHumanAdventureController>(container);
                 IHumanAdventureControllerFacade humanAdventureControllerFacade = TryResolve<IHumanAdventureControllerFacade>(container);
                 IInputManager inputManager = TryResolve<IInputManager>(container);
+                ISystemPopups systemPopups = TryResolve<ISystemPopups>(container);
                 object cartographyConverter = TryResolveByTypeName(container, "Lavapotion.Cartography.ICartographyConverter");
 
                 AdventureMapAdapter adapter = new AdventureMapAdapter(
@@ -739,7 +740,8 @@ namespace SongsOfConquestAccess.Screens
                     cartographyVisualManifest,
                     humanAdventureController,
                     humanAdventureControllerFacade,
-                    inputManager);
+                    inputManager,
+                    systemPopups);
                 if (adapter.IsPresent())
                 {
                     LogProbeDiagnostic("Adventure map probe found ready adventure map");

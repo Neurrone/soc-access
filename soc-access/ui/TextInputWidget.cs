@@ -2,6 +2,7 @@ using System;
 using SongsOfConquest.Client.UI;
 using SongsOfConquestAccess.Input;
 using SongsOfConquestAccess.Localization;
+using TMPro;
 
 namespace SongsOfConquestAccess.UI
 {
@@ -9,10 +10,10 @@ namespace SongsOfConquestAccess.UI
     {
         private readonly string _label;
         private readonly Func<IUITextMeshInputField> _getField;
-        private readonly Func<bool> _activate;
         private readonly Action _onFocus;
         private readonly Func<bool> _isEnabled;
         private readonly Func<bool> _isVisible;
+        private readonly TextInputEchoHelper _echo = new TextInputEchoHelper();
 
         public TextInputWidget(
             string id,
@@ -26,7 +27,6 @@ namespace SongsOfConquestAccess.UI
         {
             _label = label ?? string.Empty;
             _getField = getField;
-            _activate = activate;
             _onFocus = onFocus;
             _isEnabled = isEnabled;
             _isVisible = isVisible;
@@ -58,27 +58,64 @@ namespace SongsOfConquestAccess.UI
 
         public override bool ClaimsAction(string actionKey)
         {
-            return IsVisible && IsEnabled() && actionKey == AccessibilityActions.Activate.Key;
+            return false;
         }
 
         public override bool HandleAction(InputAction action)
         {
-            if (!IsVisible || !IsEnabled() || action == null || action.Key != AccessibilityActions.Activate.Key)
-            {
-                return false;
-            }
+            return false;
+        }
 
-            return _activate != null && _activate();
+        public override void Update()
+        {
+            _echo.Update();
         }
 
         protected override void OnFocus()
         {
             _onFocus?.Invoke();
+            IUITextMeshInputField field = ActivateNativeField();
+            _echo.Begin(field);
+        }
+
+        protected override void OnUnfocus()
+        {
+            _echo.Stop();
+            DeactivateNativeField();
         }
 
         private bool IsEnabled()
         {
             return _isEnabled == null || _isEnabled();
+        }
+
+        private IUITextMeshInputField ActivateNativeField()
+        {
+            if (!IsVisible || !IsEnabled())
+            {
+                return null;
+            }
+
+            IUITextMeshInputField field = _getField != null ? _getField() : null;
+            if (field == null || !field.Interactable)
+            {
+                return null;
+            }
+
+            field.Select();
+            field.ActivateInputField();
+            return field;
+        }
+
+        private void DeactivateNativeField()
+        {
+            IUITextMeshInputField field = _getField != null ? _getField() : null;
+            UITextMeshInputField concrete = field as UITextMeshInputField;
+            TMP_InputField inputField = concrete != null ? concrete.GetInputField() : null;
+            if (inputField != null)
+            {
+                inputField.DeactivateInputField();
+            }
         }
     }
 }

@@ -1,3 +1,4 @@
+using System;
 using HarmonyLib;
 using SongsOfConquest.Client;
 using SongsOfConquest.Client.UI;
@@ -8,7 +9,7 @@ using UnityEngine.UI;
 
 namespace SongsOfConquestAccess.Adapters
 {
-    internal sealed class SystemPopupAdapter : IMessageDialogAdapter
+    internal sealed class SystemPopupAdapter : IMessageDialogAdapter, IInputDialogAdapter
     {
         private static readonly AccessTools.FieldRef<SystemPopup, UITextMesh> HeaderTextRef =
             AccessTools.FieldRefAccess<SystemPopup, UITextMesh>("_headerText");
@@ -63,6 +64,20 @@ namespace SongsOfConquestAccess.Adapters
             get { return IsButtonActive(GetCancelButton()); }
         }
 
+        public bool HasInputField
+        {
+            get
+            {
+                UITextMeshInputField inputField = GetInputField();
+                return inputField != null && inputField.Active && inputField.Interactable;
+            }
+        }
+
+        public IUITextMeshInputField InputField
+        {
+            get { return HasInputField ? GetInputField() : null; }
+        }
+
         public bool IsPresent()
         {
             if (_popup == null)
@@ -76,9 +91,25 @@ namespace SongsOfConquestAccess.Adapters
                 return false;
             }
 
+            return HasPositiveAction || HasNegativeAction;
+        }
+
+        public void AttachInputSubmit(Action<IUITextMeshInputField, string> handler)
+        {
             UITextMeshInputField inputField = GetInputField();
-            return (inputField == null || !inputField.Active)
-                && (HasPositiveAction || HasNegativeAction);
+            if (inputField != null && handler != null)
+            {
+                inputField.OnSubmit = (Action<IUITextMeshInputField, string>)Delegate.Combine(inputField.OnSubmit, handler);
+            }
+        }
+
+        public void DetachInputSubmit(Action<IUITextMeshInputField, string> handler)
+        {
+            UITextMeshInputField inputField = GetInputField();
+            if (inputField != null && handler != null)
+            {
+                inputField.OnSubmit = (Action<IUITextMeshInputField, string>)Delegate.Remove(inputField.OnSubmit, handler);
+            }
         }
 
         public void SyncNativeSelection(DialogAction action)

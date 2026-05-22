@@ -134,6 +134,9 @@ namespace SongsOfConquestAccess.Input
         public static readonly InputAction ScannerRefresh = OneShot("scanner_refresh", ModStrings.Actions.ScannerRefresh, InputClaimScope.FocusedWidget)
             .AddBinding(new KeyboardBinding(Key.End));
 
+        public static readonly InputAction ScannerSearch = OneShot("scanner_search", ModStrings.Scanner.Search, InputClaimScope.FocusedWidget)
+            .AddBinding(new KeyboardBinding(Key.F, ctrl: true));
+
         public static readonly InputAction ScannerPreviousCategory = OneShot("scanner_previous_category", ModStrings.Actions.ScannerPreviousCategory, InputClaimScope.FocusedWidget)
             .AddBinding(new KeyboardBinding(Key.PageUp, ctrl: true));
 
@@ -268,6 +271,7 @@ namespace SongsOfConquestAccess.Input
             FocusHudObjectives,
             FocusHudNotifications,
             ScannerRefresh,
+            ScannerSearch,
             ScannerPreviousCategory,
             ScannerNextCategory,
             ScannerPreviousSubcategory,
