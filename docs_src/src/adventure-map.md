@@ -59,6 +59,18 @@ Bookmarks let you save adventure map locations and return to them later. There a
 
 Saving to an existing slot overwrites it. There is no separate delete command.
 
+### Beacons
+
+Beacons are looping sounds that allow bookmarks to serve as spatial audio markers.
+
+Use `Ctrl+Shift+number` to toggle the beacon for that bookmark slot
+
+The beacon sound changes relative to the currently focused tile:
+
+- east and west changes stereo position
+- north and south changes pitch
+- distance changes volume
+
 ## HUD
 
 The HUD provides various controls for the currently selected wielder such as the wielder portrait, resources and objectives. Visibility is toggled with `h`. These controls are visible by default, and I recommend leaving it that way.

@@ -2323,6 +2323,17 @@ msgid "Revealed {0}"
 msgstr "Открыто {0}"
 
 #. Bookmarks.BookmarkSaved
+#. Bookmarks.BeaconActivated
+msgctxt "Bookmarks.BeaconActivated"
+msgid "Beacon {0} activated"
+msgstr "Маяк {0} включен"
+
+#. Bookmarks.BeaconDeactivated
+msgctxt "Bookmarks.BeaconDeactivated"
+msgid "Beacon {0} deactivated"
+msgstr "Маяк {0} выключен"
+
+#. Bookmarks.BookmarkSaved
 msgctxt "Bookmarks.BookmarkSaved"
 msgid "Bookmark saved"
 msgstr "Закладка сохранена"

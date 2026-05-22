@@ -2283,6 +2283,17 @@ msgid "Revealed {0}"
 msgstr "{0} rivelato"
 
 #. Bookmarks.BookmarkSaved
+#. Bookmarks.BeaconActivated
+msgctxt "Bookmarks.BeaconActivated"
+msgid "Beacon {0} activated"
+msgstr "Beacon {0} attivato"
+
+#. Bookmarks.BeaconDeactivated
+msgctxt "Bookmarks.BeaconDeactivated"
+msgid "Beacon {0} deactivated"
+msgstr "Beacon {0} disattivato"
+
+#. Bookmarks.BookmarkSaved
 msgctxt "Bookmarks.BookmarkSaved"
 msgid "Bookmark saved"
 msgstr "Segnalibro salvato"

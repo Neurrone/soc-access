@@ -64,6 +64,10 @@
       <HintPath>$(GameManagedDir)\UnityEngine.InputLegacyModule.dll</HintPath>
       <Private>false</Private>
     </Reference>
+    <Reference Include="UnityEngine.AudioModule">
+      <HintPath>$(GameManagedDir)\UnityEngine.AudioModule.dll</HintPath>
+      <Private>false</Private>
+    </Reference>
     <Reference Include="Unity.Mathematics">
       <HintPath>$(GameManagedDir)\Unity.Mathematics.dll</HintPath>
       <Private>false</Private>

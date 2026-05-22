@@ -4,6 +4,7 @@ using SongsOfConquest.Client;
 using SongsOfConquest.Client.InputManagement;
 using SongsOfConquest.Client.UI;
 using SongsOfConquestAccess.Adapters;
+using SongsOfConquestAccess.Audio;
 using SongsOfConquestAccess.Bookmarks;
 using SongsOfConquestAccess.Input;
 using SongsOfConquestAccess.Localization;
@@ -22,6 +23,7 @@ namespace SongsOfConquestAccess.UI
         private Vector2Int _cursorTile;
         private readonly ScannerController _scanner;
         private readonly AdventureBookmarkManager _bookmarks;
+        private readonly AdventureBeaconAudio _beacons;
 
         public AdventureMapGrid(AdventureMapAdapter adapter)
             : base("adventure_map_grid")
@@ -29,6 +31,7 @@ namespace SongsOfConquestAccess.UI
             _adapter = adapter;
             _cursorTile = adapter != null ? adapter.GetInitialTile() : Vector2Int.zero;
             _bookmarks = new AdventureBookmarkManager(new AdventureBookmarkStore());
+            _beacons = new AdventureBeaconAudio();
             HydrateBookmarks();
             _scanner = new ScannerController(
                 origin => _adapter != null ? _adapter.BuildScannerSnapshot(origin) : null,
@@ -74,6 +77,7 @@ namespace SongsOfConquestAccess.UI
                 || actionKey == AccessibilityActions.NextWielder.Key
                 || actionKey == AccessibilityActions.NextSettlement.Key
                 || IsBookmarkAction(actionKey)
+                || IsBeaconAction(actionKey)
                 || IsScannerAction(actionKey);
         }
 
@@ -147,6 +151,16 @@ namespace SongsOfConquestAccess.UI
             _adapter?.ClearFocusedTileOverlay();
         }
 
+        public void SetBeaconAudible(bool isAudible)
+        {
+            _beacons.SetAudible(isAudible, _cursorTile);
+        }
+
+        public void DisposeAudio()
+        {
+            _beacons.Dispose();
+        }
+
         public bool FocusTile(Vector2Int tile)
         {
             return FocusTile(tile, updateUiManager: true);
@@ -171,6 +185,7 @@ namespace SongsOfConquestAccess.UI
                 UIManager.SetFocusedWidget(this);
             }
 
+            _beacons.UpdateListener(_cursorTile);
             return true;
         }
 
@@ -186,6 +201,7 @@ namespace SongsOfConquestAccess.UI
             _adapter.EnsureTileInView(_cursorTile);
             _adapter.SetFocusedTileOverlay(_cursorTile);
             UIManager.SetFocusedWidget(this);
+            _beacons.UpdateListener(_cursorTile);
             return true;
         }
 
@@ -200,6 +216,7 @@ namespace SongsOfConquestAccess.UI
             _adapter.MoveCameraToTile(_cursorTile);
             _adapter.SetFocusedTileOverlay(_cursorTile);
             UIManager.SetFocusedWidget(this);
+            _beacons.UpdateListener(_cursorTile);
             return true;
         }
 
@@ -214,6 +231,7 @@ namespace SongsOfConquestAccess.UI
             _adapter.MoveCameraToTile(_cursorTile);
             _adapter.SetFocusedTileOverlay(_cursorTile);
             UIManager.SetFocusedWidget(this);
+            _beacons.UpdateListener(_cursorTile);
             return true;
         }
 
@@ -275,10 +293,33 @@ namespace SongsOfConquestAccess.UI
         private bool HandleBookmarkAction(InputAction action)
         {
             string slot;
+            if (TryGetBookmarkSlot(action, AccessibilityActions.ToggleBookmarkBeacons, out slot))
+            {
+                HydrateBookmarks();
+                Vector2Int point;
+                if (!_bookmarks.TryGet(slot, out point) || _adapter == null || !_adapter.IsValidMapTile(point))
+                {
+                    SpeakNoBookmark();
+                    return true;
+                }
+
+                bool activated = _beacons.Toggle(slot, point, _cursorTile);
+                ModString message = activated
+                    ? ModStrings.Bookmarks.BeaconActivated
+                    : ModStrings.Bookmarks.BeaconDeactivated;
+                SpeechPipeline.Output(new SpeechRequest(ModText.Get(message, slot), interrupt: false));
+                return true;
+            }
+
             if (TryGetBookmarkSlot(action, AccessibilityActions.SaveBookmarks, out slot))
             {
                 HydrateBookmarks();
                 SpeechPipeline.Output(new SpeechRequest(_bookmarks.Save(slot, _cursorTile), interrupt: false));
+                if (_beacons.IsActive(slot))
+                {
+                    _beacons.Start(slot, _cursorTile, _cursorTile);
+                }
+
                 return true;
             }
 
@@ -387,6 +428,11 @@ namespace SongsOfConquestAccess.UI
             return ContainsActionKey(AccessibilityActions.SaveBookmarks, actionKey)
                 || ContainsActionKey(AccessibilityActions.JumpToBookmarks, actionKey)
                 || ContainsActionKey(AccessibilityActions.SpeakBookmarkDirections, actionKey);
+        }
+
+        private static bool IsBeaconAction(string actionKey)
+        {
+            return ContainsActionKey(AccessibilityActions.ToggleBookmarkBeacons, actionKey);
         }
 
         private static bool TryGetBookmarkSlot(InputAction action, InputAction[] actions, out string slot)

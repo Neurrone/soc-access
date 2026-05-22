@@ -193,6 +193,8 @@ namespace SongsOfConquestAccess.Localization
 
         public static class Bookmarks
         {
+            public static readonly ModString BeaconActivated = new ModString("Bookmarks.BeaconActivated", "Beacon {0} activated");
+            public static readonly ModString BeaconDeactivated = new ModString("Bookmarks.BeaconDeactivated", "Beacon {0} deactivated");
             public static readonly ModString BookmarkSaved = new ModString("Bookmarks.BookmarkSaved", "Bookmark saved");
             public static readonly ModString NoBookmark = new ModString("Bookmarks.NoBookmark", "No bookmark");
         }

@@ -2243,6 +2243,17 @@ msgid "Revealed {0}"
 msgstr "{0} ortaya çıkarıldı"
 
 #. Bookmarks.BookmarkSaved
+#. Bookmarks.BeaconActivated
+msgctxt "Bookmarks.BeaconActivated"
+msgid "Beacon {0} activated"
+msgstr "{0}. işaret sesi etkinleştirildi"
+
+#. Bookmarks.BeaconDeactivated
+msgctxt "Bookmarks.BeaconDeactivated"
+msgid "Beacon {0} deactivated"
+msgstr "{0}. işaret sesi devre dışı bırakıldı"
+
+#. Bookmarks.BookmarkSaved
 msgctxt "Bookmarks.BookmarkSaved"
 msgid "Bookmark saved"
 msgstr "Yer imi kaydedildi"

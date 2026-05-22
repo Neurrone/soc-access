@@ -17,6 +17,7 @@
   - `Ctrl+number`: saves a bookmark at that slot
   - `Shift+number`: jump to bookmarked position
   - `Alt+number`: read directions from the currently focused tile to the bookmarked position
+  - `Ctrl+shift+number`: toggle playback of an audio beacon at the bookmarked position
 
 ## V0.2.0
 

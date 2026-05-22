@@ -260,6 +260,9 @@ namespace SongsOfConquestAccess.Input
         public static readonly InputAction[] SpeakBookmarkDirections =
             CreateBookmarkActions("speak_bookmark_direction", "SpeakBookmarkDirection", ctrl: false, shift: false, alt: true);
 
+        public static readonly InputAction[] ToggleBookmarkBeacons =
+            CreateBookmarkActions("toggle_bookmark_beacon", "ToggleBookmarkBeacon", ctrl: true, shift: true, alt: false);
+
         public static readonly InputAction[] NON_GLOBAL_ACTIONS = BuildNonGlobalActions();
 
         private static InputAction OneShot(string key, ModString label, InputClaimScope claimScope)
@@ -365,6 +368,7 @@ namespace SongsOfConquestAccess.Input
             actions.AddRange(SaveBookmarks);
             actions.AddRange(JumpToBookmarks);
             actions.AddRange(SpeakBookmarkDirections);
+            actions.AddRange(ToggleBookmarkBeacons);
             return actions.ToArray();
         }
     }

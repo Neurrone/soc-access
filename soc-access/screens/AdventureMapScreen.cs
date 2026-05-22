@@ -101,11 +101,13 @@ namespace SongsOfConquestAccess.Screens
         {
             _isTopScreen = true;
             base.OnFocus();
+            _grid?.SetBeaconAudible(true);
         }
 
         public override void OnUnfocus()
         {
             _isTopScreen = false;
+            _grid?.SetBeaconAudible(false);
             _adapter?.ClearFocusedTileOverlay();
             RootWidget?.Unfocus();
         }
@@ -115,6 +117,7 @@ namespace SongsOfConquestAccess.Screens
             AccessibilityEventBus.Unsubscribe(HandleAccessibilityEvent);
             DetachListeners();
             _isTopScreen = false;
+            _grid?.DisposeAudio();
             _eventListener?.Detach();
             _adapter?.ClearFocusedTileOverlay();
         }

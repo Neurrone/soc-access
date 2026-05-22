@@ -1,6 +1,7 @@
 using BepInEx;
 using HarmonyLib;
 using SongsOfConquest.Common.Localization;
+using SongsOfConquestAccess.Audio;
 using SongsOfConquestAccess.Buffers;
 using SongsOfConquestAccess.Events;
 using SongsOfConquestAccess.Input;
@@ -78,6 +79,7 @@ namespace SongsOfConquestAccess
         {
             Logger.LogInfo("Accessibility plugin OnDestroy");
             _screenManager?.Clear();
+            AdventureBeaconAudio.DisposeAll();
             _harmony?.UnpatchSelf();
             _harmony = null;
             _inputRouter?.Dispose();
