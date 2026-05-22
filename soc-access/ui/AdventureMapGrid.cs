@@ -4,9 +4,11 @@ using SongsOfConquest.Client;
 using SongsOfConquest.Client.InputManagement;
 using SongsOfConquest.Client.UI;
 using SongsOfConquestAccess.Adapters;
+using SongsOfConquestAccess.Bookmarks;
 using SongsOfConquestAccess.Input;
 using SongsOfConquestAccess.Localization;
 using SongsOfConquestAccess.Scanner;
+using SongsOfConquestAccess.Speech;
 using SongsOfConquestAccess.Speech.Spatial;
 using UnityEngine;
 
@@ -19,12 +21,15 @@ namespace SongsOfConquestAccess.UI
         private readonly AdventureMapAdapter _adapter;
         private Vector2Int _cursorTile;
         private readonly ScannerController _scanner;
+        private readonly AdventureBookmarkManager _bookmarks;
 
         public AdventureMapGrid(AdventureMapAdapter adapter)
             : base("adventure_map_grid")
         {
             _adapter = adapter;
             _cursorTile = adapter != null ? adapter.GetInitialTile() : Vector2Int.zero;
+            _bookmarks = new AdventureBookmarkManager(new AdventureBookmarkStore());
+            HydrateBookmarks();
             _scanner = new ScannerController(
                 origin => _adapter != null ? _adapter.BuildScannerSnapshot(origin) : null,
                 () => _cursorTile,
@@ -68,6 +73,7 @@ namespace SongsOfConquestAccess.UI
                 || actionKey == AccessibilityActions.MapSecondaryAction.Key
                 || actionKey == AccessibilityActions.NextWielder.Key
                 || actionKey == AccessibilityActions.NextSettlement.Key
+                || IsBookmarkAction(actionKey)
                 || IsScannerAction(actionKey);
         }
 
@@ -79,6 +85,11 @@ namespace SongsOfConquestAccess.UI
             }
 
             if (HandleScannerAction(action))
+            {
+                return true;
+            }
+
+            if (HandleBookmarkAction(action))
             {
                 return true;
             }
@@ -192,6 +203,20 @@ namespace SongsOfConquestAccess.UI
             return true;
         }
 
+        private bool JumpToBookmark(Vector2Int point)
+        {
+            if (_adapter == null || !_adapter.IsValidMapTile(point))
+            {
+                return false;
+            }
+
+            _cursorTile = point;
+            _adapter.MoveCameraToTile(_cursorTile);
+            _adapter.SetFocusedTileOverlay(_cursorTile);
+            UIManager.SetFocusedWidget(this);
+            return true;
+        }
+
         private bool HandleScannerAction(InputAction action)
         {
             if (action.Key == AccessibilityActions.ScannerRefresh.Key)
@@ -245,6 +270,57 @@ namespace SongsOfConquestAccess.UI
             }
 
             return false;
+        }
+
+        private bool HandleBookmarkAction(InputAction action)
+        {
+            string slot;
+            if (TryGetBookmarkSlot(action, AccessibilityActions.SaveBookmarks, out slot))
+            {
+                HydrateBookmarks();
+                SpeechPipeline.Output(new SpeechRequest(_bookmarks.Save(slot, _cursorTile), interrupt: false));
+                return true;
+            }
+
+            if (TryGetBookmarkSlot(action, AccessibilityActions.JumpToBookmarks, out slot))
+            {
+                HydrateBookmarks();
+                Vector2Int point;
+                if (!_bookmarks.TryGet(slot, out point) || !JumpToBookmark(point))
+                {
+                    SpeakNoBookmark();
+                }
+
+                return true;
+            }
+
+            if (TryGetBookmarkSlot(action, AccessibilityActions.SpeakBookmarkDirections, out slot))
+            {
+                HydrateBookmarks();
+                Vector2Int point;
+                if (!_bookmarks.TryGet(slot, out point) || _adapter == null || !_adapter.IsValidMapTile(point))
+                {
+                    SpeakNoBookmark();
+                    return true;
+                }
+
+                string directions = ScannerSpeechUtility.FormatDirections(
+                    ScannerDirectionUtility.BuildSquareDirections(_cursorTile, point));
+                SpeechPipeline.Output(new SpeechRequest(directions, interrupt: false));
+                return true;
+            }
+
+            return false;
+        }
+
+        private void HydrateBookmarks()
+        {
+            _bookmarks.EnsureLoaded(_adapter != null ? _adapter.GetBookmarkGameIdentity() : null);
+        }
+
+        private static void SpeakNoBookmark()
+        {
+            SpeechPipeline.Output(new SpeechRequest(ModText.Get(ModStrings.Bookmarks.NoBookmark), interrupt: false));
         }
 
         private bool OpenScannerSearch()
@@ -304,6 +380,51 @@ namespace SongsOfConquestAccess.UI
                 || actionKey == AccessibilityActions.ScannerNextResult.Key
                 || actionKey == AccessibilityActions.ScannerJumpToResult.Key
                 || actionKey == AccessibilityActions.ScannerSpeakOrientation.Key;
+        }
+
+        private static bool IsBookmarkAction(string actionKey)
+        {
+            return ContainsActionKey(AccessibilityActions.SaveBookmarks, actionKey)
+                || ContainsActionKey(AccessibilityActions.JumpToBookmarks, actionKey)
+                || ContainsActionKey(AccessibilityActions.SpeakBookmarkDirections, actionKey);
+        }
+
+        private static bool TryGetBookmarkSlot(InputAction action, InputAction[] actions, out string slot)
+        {
+            slot = null;
+            if (action == null || actions == null)
+            {
+                return false;
+            }
+
+            for (int i = 0; i < actions.Length && i < AdventureBookmarkSlots.All.Length; i++)
+            {
+                if (actions[i] != null && action.Key == actions[i].Key)
+                {
+                    slot = AdventureBookmarkSlots.All[i];
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
+        private static bool ContainsActionKey(InputAction[] actions, string actionKey)
+        {
+            if (actions == null || string.IsNullOrWhiteSpace(actionKey))
+            {
+                return false;
+            }
+
+            for (int i = 0; i < actions.Length; i++)
+            {
+                if (actions[i] != null && actions[i].Key == actionKey)
+                {
+                    return true;
+                }
+            }
+
+            return false;
         }
     }
 }

@@ -23,6 +23,7 @@ using SongsOfConquest.Common.Gamestate;
 using SongsOfConquest.Common.Gamestate.Commander;
 using SongsOfConquest.Common.Localization;
 using SongsOfConquestAccess.Localization;
+using SongsOfConquestAccess.Bookmarks;
 using SongsOfConquestAccess.Events;
 using SongsOfConquestAccess.Scanner;
 using SongsOfConquestAccess.Speech;
@@ -184,6 +185,48 @@ namespace SongsOfConquestAccess.Adapters
         public ISystemPopups SystemPopups
         {
             get { return _systemPopups; }
+        }
+
+        public int LocalTeamId
+        {
+            get { return _facade != null && _facade.Teams != null ? _facade.Teams.LocalTeamInControlId : -1; }
+        }
+
+        public AdventureBookmarkGameIdentity GetBookmarkGameIdentity()
+        {
+            if (_facade == null || _facade.Level == null || _facade.Teams == null)
+            {
+                return null;
+            }
+
+            LevelStartInfo startInfo = _facade.Level.StartInfo;
+            string mode = startInfo != null ? startInfo.Mode.ToString() : null;
+            string campaignIdentifier = startInfo != null && startInfo.Campaign != null
+                ? startInfo.Campaign.CampaignIdentifier
+                : null;
+            string mapFile = null;
+            try
+            {
+                mapFile = _facade.Level.GetFileName();
+            }
+            catch (Exception exception)
+            {
+                SocAccessPlugin.Instance?.LogWarning("AdventureMapAdapter failed to read map file name for bookmarks: " + exception.Message);
+            }
+
+            uint mapRandomSeed = _facade.MapSettings != null ? _facade.MapSettings.RandomSeed : 0;
+            return AdventureBookmarkGameIdentity.Create(
+                mode,
+                mapFile,
+                campaignIdentifier,
+                mapRandomSeed,
+                _facade.InstanceRandomSeed,
+                LocalTeamId);
+        }
+
+        public bool IsValidMapTile(Vector2Int position)
+        {
+            return IsWithinMap(position);
         }
 
         private static T Resolve<T>(DiContainer container) where T : class

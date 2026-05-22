@@ -2321,3 +2321,13 @@ msgstr "Move all right"
 msgctxt "Events.Revealed"
 msgid "Revealed {0}"
 msgstr "Открыто {0}"
+
+#. Bookmarks.BookmarkSaved
+msgctxt "Bookmarks.BookmarkSaved"
+msgid "Bookmark saved"
+msgstr "Закладка сохранена"
+
+#. Bookmarks.NoBookmark
+msgctxt "Bookmarks.NoBookmark"
+msgid "No bookmark"
+msgstr "Нет закладки"

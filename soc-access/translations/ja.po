@@ -2241,3 +2241,13 @@ msgstr "Move all right"
 msgctxt "Events.Revealed"
 msgid "Revealed {0}"
 msgstr "{0}を発見しました"
+
+#. Bookmarks.BookmarkSaved
+msgctxt "Bookmarks.BookmarkSaved"
+msgid "Bookmark saved"
+msgstr "ブックマークを保存しました"
+
+#. Bookmarks.NoBookmark
+msgctxt "Bookmarks.NoBookmark"
+msgid "No bookmark"
+msgstr "ブックマークがありません"

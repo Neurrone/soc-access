@@ -12,6 +12,11 @@
 - Added `Ctrl+f` command on the adventure map grid to search all scanner categories
 - Newly revealed entities will now be announced. This includes entities spawning in areas visible to the player, although this is subject to change in case this provides information typically not available to a sighted player
 - The scanner now has a Revealed category where revealed entities are placed
+- Added support for bookmarking specific positions on the adventure map:
+  - There are 10 bookmark slots, 1 through 0
+  - `Ctrl+number`: saves a bookmark at that slot
+  - `Shift+number`: jump to bookmarked position
+  - `Alt+number`: read directions from the currently focused tile to the bookmarked position
 
 ## V0.2.0
 

@@ -2241,3 +2241,13 @@ msgstr "Move all right"
 msgctxt "Events.Revealed"
 msgid "Revealed {0}"
 msgstr "已发现{0}"
+
+#. Bookmarks.BookmarkSaved
+msgctxt "Bookmarks.BookmarkSaved"
+msgid "Bookmark saved"
+msgstr "书签已保存"
+
+#. Bookmarks.NoBookmark
+msgctxt "Bookmarks.NoBookmark"
+msgid "No bookmark"
+msgstr "没有书签"

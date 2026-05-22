@@ -49,6 +49,16 @@ After setting a destination, the game draws a route preview. When focus is on a 
 
 Entities revealed during exploration are announced. They can also be found in a separate category in the [scanner](scanner.md).
 
+### Bookmarks
+
+Bookmarks let you save adventure map locations and return to them later. There are ten bookmark slots, using the number keys `1` through `9` and `0`.
+
+- `Ctrl+number`: saves the current position to that bookmark slot
+- `Shift+number`: jump to that bookmark slot
+- `Alt+number`: read directions from the currently focused tile to the bookmarked position
+
+Saving to an existing slot overwrites it. There is no separate delete command.
+
 ## HUD
 
 The HUD provides various controls for the currently selected wielder such as the wielder portrait, resources and objectives. Visibility is toggled with `h`. These controls are visible by default, and I recommend leaving it that way.

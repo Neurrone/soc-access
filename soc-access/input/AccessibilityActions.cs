@@ -1,4 +1,6 @@
 using UnityEngine.InputSystem;
+using System.Collections.Generic;
+using SongsOfConquestAccess.Bookmarks;
 using SongsOfConquestAccess.Localization;
 
 namespace SongsOfConquestAccess.Input
@@ -249,71 +251,121 @@ namespace SongsOfConquestAccess.Input
         public static readonly InputAction ReadThreat = OneShot("read_threat", ModStrings.Actions.ReadThreat, InputClaimScope.FocusedWidget)
             .AddBinding(new KeyboardBinding(Key.S));
 
-        public static readonly InputAction[] NON_GLOBAL_ACTIONS =
-        {
-            NextWidget,
-            PreviousWidget,
-            NextMenuItem,
-            PreviousMenuItem,
-            FirstMenuItem,
-            LastMenuItem,
-            NextHeading,
-            PreviousHeading,
-            MapMoveNorth,
-            MapMoveSouth,
-            MapMoveWest,
-            MapMoveEast,
-            MapSecondaryAction,
-            NextWielder,
-            NextSettlement,
-            FocusHudTroops,
-            FocusHudResources,
-            FocusHudObjectives,
-            FocusHudNotifications,
-            ScannerRefresh,
-            ScannerSearch,
-            ScannerPreviousCategory,
-            ScannerNextCategory,
-            ScannerPreviousSubcategory,
-            ScannerNextSubcategory,
-            ScannerPreviousResult,
-            ScannerNextResult,
-            ScannerJumpToResult,
-            ScannerSpeakOrientation,
-            SliderDecrease,
-            SliderIncrease,
-            SliderMinimum,
-            SliderMaximum,
-            PreviousRow,
-            NextRow,
-            PreviousColumn,
-            NextColumn,
-            FirstRow,
-            LastRow,
-            HexGridWest,
-            HexGridEast,
-            HexGridNorthWest,
-            HexGridNorthEast,
-            HexGridSouthWest,
-            HexGridSouthEast,
-            CombatInspect,
-            CombatNextActingTroop,
-            CombatPreviousActingTroop,
-            CombatFocusActingTroop,
-            CombatNextEnemyTroop,
-            CombatPreviousEnemyTroop,
-            CombatNextRelevantTile,
-            CombatPreviousRelevantTile,
-            CombatFocusTimeline,
-            ReadThreat,
-            StartDrag,
-            Activate,
-            Cancel
-        };
+        public static readonly InputAction[] SaveBookmarks =
+            CreateBookmarkActions("save_bookmark", "SaveBookmark", ctrl: true, shift: false, alt: false);
+
+        public static readonly InputAction[] JumpToBookmarks =
+            CreateBookmarkActions("jump_to_bookmark", "JumpToBookmark", ctrl: false, shift: true, alt: false);
+
+        public static readonly InputAction[] SpeakBookmarkDirections =
+            CreateBookmarkActions("speak_bookmark_direction", "SpeakBookmarkDirection", ctrl: false, shift: false, alt: true);
+
+        public static readonly InputAction[] NON_GLOBAL_ACTIONS = BuildNonGlobalActions();
 
         private static InputAction OneShot(string key, ModString label, InputClaimScope claimScope)
         {
             return new InputAction(key, () => ModText.Get(label), claimScope, InputRepeatPolicy.OneShotUntilRelease());
+        }
+
+        private static InputAction OneShot(string key, string label, InputClaimScope claimScope)
+        {
+            return new InputAction(key, label, claimScope, InputRepeatPolicy.OneShotUntilRelease());
+        }
+
+        private static InputAction[] CreateBookmarkActions(string keyPrefix, string labelPrefix, bool ctrl, bool shift, bool alt)
+        {
+            Key[] digitKeys =
+            {
+                Key.Digit1,
+                Key.Digit2,
+                Key.Digit3,
+                Key.Digit4,
+                Key.Digit5,
+                Key.Digit6,
+                Key.Digit7,
+                Key.Digit8,
+                Key.Digit9,
+                Key.Digit0
+            };
+            InputAction[] actions = new InputAction[AdventureBookmarkSlots.All.Length];
+            for (int i = 0; i < AdventureBookmarkSlots.All.Length; i++)
+            {
+                string slot = AdventureBookmarkSlots.All[i];
+                actions[i] = OneShot(keyPrefix + "_" + slot, labelPrefix + slot, InputClaimScope.FocusedWidget)
+                    .AddBinding(new KeyboardBinding(digitKeys[i], ctrl, shift, alt));
+            }
+
+            return actions;
+        }
+
+        private static InputAction[] BuildNonGlobalActions()
+        {
+            List<InputAction> actions = new List<InputAction>
+            {
+                NextWidget,
+                PreviousWidget,
+                NextMenuItem,
+                PreviousMenuItem,
+                FirstMenuItem,
+                LastMenuItem,
+                NextHeading,
+                PreviousHeading,
+                MapMoveNorth,
+                MapMoveSouth,
+                MapMoveWest,
+                MapMoveEast,
+                MapSecondaryAction,
+                NextWielder,
+                NextSettlement,
+                FocusHudTroops,
+                FocusHudResources,
+                FocusHudObjectives,
+                FocusHudNotifications,
+                ScannerRefresh,
+                ScannerSearch,
+                ScannerPreviousCategory,
+                ScannerNextCategory,
+                ScannerPreviousSubcategory,
+                ScannerNextSubcategory,
+                ScannerPreviousResult,
+                ScannerNextResult,
+                ScannerJumpToResult,
+                ScannerSpeakOrientation,
+                SliderDecrease,
+                SliderIncrease,
+                SliderMinimum,
+                SliderMaximum,
+                PreviousRow,
+                NextRow,
+                PreviousColumn,
+                NextColumn,
+                FirstRow,
+                LastRow,
+                HexGridWest,
+                HexGridEast,
+                HexGridNorthWest,
+                HexGridNorthEast,
+                HexGridSouthWest,
+                HexGridSouthEast,
+                CombatInspect,
+                CombatNextActingTroop,
+                CombatPreviousActingTroop,
+                CombatFocusActingTroop,
+                CombatNextEnemyTroop,
+                CombatPreviousEnemyTroop,
+                CombatNextRelevantTile,
+                CombatPreviousRelevantTile,
+                CombatFocusTimeline,
+                ReadThreat,
+                StartDrag,
+                Activate,
+                Cancel
+            };
+
+            actions.AddRange(SaveBookmarks);
+            actions.AddRange(JumpToBookmarks);
+            actions.AddRange(SpeakBookmarkDirections);
+            return actions.ToArray();
         }
     }
 }

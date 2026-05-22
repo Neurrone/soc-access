@@ -191,6 +191,12 @@ namespace SongsOfConquestAccess.Localization
             public static readonly ModString TooltipActionsMenu = new ModString("Actions.TooltipActionsMenu", "Tooltip Actions Menu");
         }
 
+        public static class Bookmarks
+        {
+            public static readonly ModString BookmarkSaved = new ModString("Bookmarks.BookmarkSaved", "Bookmark saved");
+            public static readonly ModString NoBookmark = new ModString("Bookmarks.NoBookmark", "No bookmark");
+        }
+
         public static class Combat
         {
             public static readonly ModString AbilityUsed = new ModString("Combat.AbilityUsed", "{0} uses {1}");
