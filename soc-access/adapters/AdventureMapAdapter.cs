@@ -880,6 +880,7 @@ namespace SongsOfConquestAccess.Adapters
             Dictionary<Vector2Int, AdventureMapTile> tileCache = new Dictionary<Vector2Int, AdventureMapTile>();
             int localTeamId = GetLocalTeamId();
             AddPickupScannerResults(snapshot, tileCache);
+            AddResourceGeneratorScannerResults(snapshot, localTeamId, tileCache);
             AddBeaconScannerResults(snapshot, tileCache);
             AddWielderScannerResults(snapshot, tileCache);
             AddStructuralScannerResults(snapshot, localTeamId, tileCache, MapEntityCategory.Town, MapEntityCategory.Settlement, MapEntityCategory.BuildSite);
@@ -1030,6 +1031,7 @@ namespace SongsOfConquestAccess.Adapters
             pickups.GetOrAddSubcategory(ModText.Get(ModStrings.Scanner.Power));
             pickups.GetOrAddSubcategory(ModText.Get(ModStrings.Scanner.Riches));
 
+            AddRelationshipSubcategories(snapshot.GetOrAddCategory(ModText.Get(ModStrings.Scanner.ResourceGenerators)));
             snapshot.GetOrAddCategory(ModText.Get(ModStrings.Scanner.Beacons)).GetOrAddSubcategory(all);
             snapshot.GetOrAddCategory(ModText.Get(ModStrings.Scanner.Wielders)).GetOrAddSubcategory(all);
             AddRelationshipSubcategories(snapshot.GetOrAddCategory(ModText.Get(ModStrings.Scanner.SettlementsAndBuildSites)));
@@ -1112,6 +1114,24 @@ namespace SongsOfConquestAccess.Adapters
                 if (result != null)
                 {
                     AddPickupResult(snapshot, entity, result);
+                }
+            });
+        }
+
+        private void AddResourceGeneratorScannerResults(ScannerSnapshot snapshot, int localTeamId, Dictionary<Vector2Int, AdventureMapTile> tileCache)
+        {
+            ForEachScannerEntity(tileCache, entity =>
+            {
+                if (entity.Category != MapEntityCategory.ResourceGenerator)
+                {
+                    return;
+                }
+
+                AdventureMapTile tile = GetScannerTile(tileCache, entity.Position);
+                ScannerResult result = CreateMapEntityScannerResult(entity, tile);
+                if (result != null)
+                {
+                    AddResourceGeneratorResult(snapshot, FormatScannerRelationship(GetMapEntityRelationship(entity, localTeamId)), result);
                 }
             });
         }
@@ -1500,6 +1520,12 @@ namespace SongsOfConquestAccess.Adapters
                     snapshot.Add(ModText.Get(ModStrings.Scanner.Buildings), relationship, CloneResult(result));
                     break;
             }
+        }
+
+        private void AddResourceGeneratorResult(ScannerSnapshot snapshot, string relationship, ScannerResult result)
+        {
+            snapshot.Add(ModText.Get(ModStrings.Scanner.ResourceGenerators), ModText.Get(ModStrings.Scanner.All), CloneResult(result));
+            snapshot.Add(ModText.Get(ModStrings.Scanner.ResourceGenerators), relationship, CloneResult(result));
         }
 
         private void AddTroopSourceResult(ScannerSnapshot snapshot, IMapEntity entity, string relationship, ScannerResult result)

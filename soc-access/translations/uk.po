@@ -2067,6 +2067,11 @@ msgctxt "Scanner.Revealed"
 msgid "Revealed"
 msgstr "Виявлено"
 
+#. Scanner.ResourceGenerators
+msgctxt "Scanner.ResourceGenerators"
+msgid "Resource generators"
+msgstr "Генератори ресурсів"
+
 #. Scanner.Riches
 msgctxt "Scanner.Riches"
 msgid "Riches"

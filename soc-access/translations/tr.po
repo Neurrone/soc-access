@@ -2037,6 +2037,11 @@ msgctxt "Scanner.Revealed"
 msgid "Revealed"
 msgstr "Ortaya cikarilanlar"
 
+#. Scanner.ResourceGenerators
+msgctxt "Scanner.ResourceGenerators"
+msgid "Resource generators"
+msgstr "Kaynak üreticileri"
+
 #. Scanner.Riches
 msgctxt "Scanner.Riches"
 msgid "Riches"

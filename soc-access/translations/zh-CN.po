@@ -2037,6 +2037,11 @@ msgctxt "Scanner.Revealed"
 msgid "Revealed"
 msgstr "已揭示"
 
+#. Scanner.ResourceGenerators
+msgctxt "Scanner.ResourceGenerators"
+msgid "Resource generators"
+msgstr "资源生成器"
+
 #. Scanner.Riches
 msgctxt "Scanner.Riches"
 msgid "Riches"

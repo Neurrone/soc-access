@@ -474,6 +474,7 @@ namespace SongsOfConquestAccess.Localization
             public static readonly ModString Pickups = new ModString("Scanner.Pickups", "Pickups");
             public static readonly ModString Power = new ModString("Scanner.Power", "Power");
             public static readonly ModString Revealed = new ModString("Scanner.Revealed", "Revealed");
+            public static readonly ModString ResourceGenerators = new ModString("Scanner.ResourceGenerators", "Resource generators");
             public static readonly ModString Riches = new ModString("Scanner.Riches", "Riches");
             public static readonly ModString Roads = new ModString("Scanner.Roads", "Roads");
             public static readonly ModPluralString RoadTileCount = new ModPluralString("Scanner.RoadTileCount", "{0} road tile", "{0} road tiles");
