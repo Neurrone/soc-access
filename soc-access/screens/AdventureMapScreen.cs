@@ -736,7 +736,7 @@ namespace SongsOfConquestAccess.Screens
                 ISystemPopups systemPopups = TryResolve<ISystemPopups>(container);
                 object cartographyConverter = TryResolveByTypeName(container, "Lavapotion.Cartography.ICartographyConverter");
 
-                AdventureMapRevealedRegistry revealedRegistry = new AdventureMapRevealedRegistry();
+                AdventureMapRevealedRegistry revealedRegistry = GetAdventureMapRevealedRegistry();
                 AdventureMapAdapter adapter = new AdventureMapAdapter(
                     installer,
                     container,
@@ -776,6 +776,12 @@ namespace SongsOfConquestAccess.Screens
             }
 
             return null;
+        }
+
+        private static AdventureMapRevealedRegistry GetAdventureMapRevealedRegistry()
+        {
+            AdventureMapScannerState scannerState = SocAccessPlugin.Instance?.AdventureMapScannerState;
+            return scannerState != null ? scannerState.RevealedRegistry : new AdventureMapRevealedRegistry();
         }
 
         private static bool IsLiveSceneInstaller(AdventureViewInstaller installer)

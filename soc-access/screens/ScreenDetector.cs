@@ -659,6 +659,7 @@ namespace SongsOfConquestAccess.Screens
             if (loadedScene == MainMenuSceneType.MainMenu)
             {
                 SocAccessPlugin.Instance?.ReviewBuffers?.Clear(ReviewBufferKind.AdventureMapNotifications);
+                SocAccessPlugin.Instance?.AdventureMapScannerState?.Clear();
             }
 
             if (loadedScene != MainMenuSceneType.Campaign && _screenManager.CurrentScreen is CampaignMenuScreen)
@@ -674,7 +675,7 @@ namespace SongsOfConquestAccess.Screens
 
         public void OnAdventureMapReady()
         {
-            AdventureMapRevealedRegistry revealedRegistry = new AdventureMapRevealedRegistry();
+            AdventureMapRevealedRegistry revealedRegistry = GetAdventureMapRevealedRegistry();
             AdventureMapAdapter adapter = new AdventureMapAdapter(_adventureViewInstaller, revealedRegistry);
             AdventureMapEventListener eventListener = adapter.IsPresent()
                 ? new AdventureMapEventListener(
@@ -1463,6 +1464,12 @@ namespace SongsOfConquestAccess.Screens
 
             _screenManager.PushBelowTop(screen, reason);
             return true;
+        }
+
+        private static AdventureMapRevealedRegistry GetAdventureMapRevealedRegistry()
+        {
+            AdventureMapScannerState scannerState = SocAccessPlugin.Instance?.AdventureMapScannerState;
+            return scannerState != null ? scannerState.RevealedRegistry : new AdventureMapRevealedRegistry();
         }
 
         private static bool IsLocalStoryTrigger(OnTriggerPayload payload, IClientAdventureFacade facade)

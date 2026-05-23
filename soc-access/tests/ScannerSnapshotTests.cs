@@ -85,6 +85,30 @@ namespace SongsOfConquestAccess.Tests
         }
 
         [TestMethod]
+        public void AdventureMapScannerStateKeepsSameRevealedRegistry()
+        {
+            AdventureMapScannerState state = new AdventureMapScannerState();
+
+            AdventureMapRevealedRegistry first = state.RevealedRegistry;
+            AdventureMapRevealedRegistry second = state.RevealedRegistry;
+
+            Assert.AreSame(first, second);
+        }
+
+        [TestMethod]
+        public void AdventureMapScannerStateClearEmptiesRevealedRegistryWithoutReplacingIt()
+        {
+            AdventureMapScannerState state = new AdventureMapScannerState();
+            AdventureMapRevealedRegistry registry = state.RevealedRegistry;
+            registry.AddOrUpdate("entity:1", "Gold", new Vector2Int(1, 0), 1, AdventureMapRevealedKind.MapEntity);
+
+            state.Clear();
+
+            Assert.AreSame(registry, state.RevealedRegistry);
+            Assert.AreEqual(0, state.RevealedRegistry.Entries.Count);
+        }
+
+        [TestMethod]
         public void PruneEmptyRemovesEmptySubcategoriesAndCategories()
         {
             ScannerSnapshot snapshot = new ScannerSnapshot();

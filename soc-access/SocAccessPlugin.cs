@@ -6,6 +6,7 @@ using SongsOfConquestAccess.Buffers;
 using SongsOfConquestAccess.Events;
 using SongsOfConquestAccess.Input;
 using SongsOfConquestAccess.Localization;
+using SongsOfConquestAccess.Scanner;
 using SongsOfConquestAccess.Screens;
 using SongsOfConquestAccess.Speech;
 using SongsOfConquestAccess.UI;
@@ -28,6 +29,7 @@ namespace SongsOfConquestAccess
         private BufferEventRecorder _bufferEventRecorder;
         private ReviewBufferManager _reviewBufferManager;
         private ReviewBufferController _reviewBufferController;
+        private AdventureMapScannerState _adventureMapScannerState;
         private ScreenManager _screenManager;
         private ScreenDetector _screenDetector;
         private AccessibilityInputRouter _inputRouter;
@@ -46,6 +48,7 @@ namespace SongsOfConquestAccess
             SpeechPipeline.Initialize(_speechService);
             _reviewBufferManager = new ReviewBufferManager();
             _reviewBufferController = new ReviewBufferController(_reviewBufferManager);
+            _adventureMapScannerState = new AdventureMapScannerState();
             _speechEventAnnouncer = new SpeechEventAnnouncer();
             _speechEventAnnouncer.Attach();
             _bufferEventRecorder = new BufferEventRecorder(_reviewBufferManager);
@@ -104,6 +107,7 @@ namespace SongsOfConquestAccess
             AccessibilityEventBus.Reset();
             _reviewBufferController = null;
             _reviewBufferManager = null;
+            _adventureMapScannerState = null;
             SpeechPipeline.Shutdown();
             _speechService?.Dispose();
             _speechService = null;
@@ -140,6 +144,11 @@ namespace SongsOfConquestAccess
         internal ReviewBufferManager ReviewBuffers
         {
             get { return _reviewBufferManager; }
+        }
+
+        internal AdventureMapScannerState AdventureMapScannerState
+        {
+            get { return _adventureMapScannerState; }
         }
 
         internal void LogInfo(string message)

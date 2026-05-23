@@ -3,6 +3,7 @@
 ## V0.3.1
 
 - Wielders being recruited are now announced. This is mainly for situations where they join via story events
+- Fixed the revealed buffer being reset after combat
 
 ## V0.3.0
 
