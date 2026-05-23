@@ -41,6 +41,7 @@ namespace SongsOfConquestAccess.Localization
             public static readonly ModString LeveledUpTo = new ModString("Events.LeveledUpTo", "{0} leveled up to {1}");
             public static readonly ModString MapCameraFocus = new ModString("Events.MapCameraFocus", "Map camera focuses on {0}");
             public static readonly ModString ModError = new ModString("Events.ModError", "Mod error: {0}");
+            public static readonly ModString RecruitedWielder = new ModString("Events.RecruitedWielder", "Recruited wielder {0}");
             public static readonly ModString Revealed = new ModString("Events.Revealed", "Revealed {0}");
             public static readonly ModString SelectedBuildSite = new ModString("Events.SelectedBuildSite", "Selected {0} build site at {1}");
             public static readonly ModString SelectedWielder = new ModString("Events.SelectedWielder", "Selected wielder {0}");

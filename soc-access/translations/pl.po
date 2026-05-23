@@ -140,6 +140,11 @@ msgctxt "Events.ModError"
 msgid "Mod error: {0}"
 msgstr "BÅ‚Ä…d moda: {0}"
 
+#. Events.RecruitedWielder
+msgctxt "Events.RecruitedWielder"
+msgid "Recruited wielder {0}"
+msgstr "Zrekrutowano bohatera {0}"
+
 #. Events.SelectedBuildSite
 msgctxt "Events.SelectedBuildSite"
 msgid "Selected {0} build site at {1}"

@@ -139,6 +139,11 @@ msgctxt "Events.ModError"
 msgid "Mod error: {0}"
 msgstr ""
 
+#. Events.RecruitedWielder
+msgctxt "Events.RecruitedWielder"
+msgid "Recruited wielder {0}"
+msgstr ""
+
 #. Events.Revealed
 msgctxt "Events.Revealed"
 msgid "Revealed {0}"

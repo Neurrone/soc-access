@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using Lavapotion.Networking;
 using SongsOfConquest.Client.Adventure;
 using SongsOfConquest.Client.Gamestate;
 using SongsOfConquest.Client.Gamestate.Facade;
@@ -37,6 +38,7 @@ namespace SongsOfConquestAccess.Events
         private readonly Dictionary<string, string> _pendingHiddenWielderLabelsByKey = new Dictionary<string, string>();
         private readonly List<string> _pendingHiddenWielderOrder = new List<string>();
         private readonly HashSet<int> _discoveredMapEntityIds = new HashSet<int>();
+        private readonly HashSet<int> _knownLocalCommanderIds = new HashSet<int>();
         private byte[] _lastExploration;
         private bool _attached;
 
@@ -63,6 +65,8 @@ namespace SongsOfConquestAccess.Events
                 return;
             }
 
+            CaptureKnownLocalCommanders();
+
             if (_selectionHandler != null)
             {
                 _selectionHandler.OnCommanderChanged =
@@ -85,6 +89,10 @@ namespace SongsOfConquestAccess.Events
 
             if (_facade != null && _facade.Commands != null)
             {
+                _facade.Commands.OnCommand =
+                    (Action<ICommandResponse>)Delegate.Combine(
+                        _facade.Commands.OnCommand,
+                        new Action<ICommandResponse>(HandleCommand));
                 _facade.Commands.OnCommanderMoved =
                     (Action<OnCommanderMovedPayload>)Delegate.Combine(
                         _facade.Commands.OnCommanderMoved,
@@ -140,6 +148,10 @@ namespace SongsOfConquestAccess.Events
 
             if (_facade != null && _facade.Commands != null)
             {
+                _facade.Commands.OnCommand =
+                    (Action<ICommandResponse>)Delegate.Remove(
+                        _facade.Commands.OnCommand,
+                        new Action<ICommandResponse>(HandleCommand));
                 _facade.Commands.OnCommanderMoved =
                     (Action<OnCommanderMovedPayload>)Delegate.Remove(
                         _facade.Commands.OnCommanderMoved,
@@ -167,12 +179,49 @@ namespace SongsOfConquestAccess.Events
             _lastVisibleNonLocalCommanders.Clear();
             _announcedVisibleNonLocalCommanders.Clear();
             _discoveredMapEntityIds.Clear();
+            _knownLocalCommanderIds.Clear();
             _attached = false;
         }
 
         public void Update()
         {
             FlushPendingDiscoveriesIfReady();
+        }
+
+        private void CaptureKnownLocalCommanders()
+        {
+            _knownLocalCommanderIds.Clear();
+
+            if (_facade == null || _facade.Commanders == null)
+            {
+                return;
+            }
+
+            IEnumerable<ICommanderState> commanders = _facade.Commanders.All;
+            if (commanders == null)
+            {
+                return;
+            }
+
+            foreach (ICommanderState commander in commanders)
+            {
+                if (IsLocalCommander(commander))
+                {
+                    _knownLocalCommanderIds.Add(commander.Id);
+                }
+            }
+        }
+
+        private void HandleCommand(ICommandResponse response)
+        {
+            SpawnCommanderCommand.Response spawned = response as SpawnCommanderCommand.Response;
+            ICommanderState commander = spawned != null ? spawned.commander : null;
+            if (!IsLocalCommander(commander) || !_knownLocalCommanderIds.Add(commander.Id))
+            {
+                return;
+            }
+
+            AccessibilityEventBus.Publish(new WielderRecruitedEvent(commander.Id, GetCommanderName(commander)));
         }
 
         private void HandleCommanderChanged(CommanderChangedPayload payload)

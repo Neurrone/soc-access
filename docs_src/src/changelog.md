@@ -1,5 +1,9 @@
 # Changelog
 
+## V0.3.1
+
+- Wielders being recruited are now announced. This is mainly for situations where they join via story events
+
 ## V0.3.0
 
 - Added `Ctrl+f` command on the adventure map grid to search all scanner categories

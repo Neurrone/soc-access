@@ -23,6 +23,7 @@ namespace SongsOfConquestAccess.Events
             public const string AdventureIcon = "notification.adventure.icon";
             public const string AdventureSimple = "notification.adventure.simple";
             public const string CommanderLevelUp = "notification.adventure.commander_level_up";
+            public const string WielderRecruited = "notification.adventure.wielder_recruited";
             public const string AdventureHud = "notification.adventure.hud";
             public const string Objective = "notification.adventure.objective";
             public const string AdventureNewTurn = "notification.adventure.new_turn";

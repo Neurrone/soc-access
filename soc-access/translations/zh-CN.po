@@ -135,6 +135,11 @@ msgctxt "Events.ModError"
 msgid "Mod error: {0}"
 msgstr "æ¨¡ç»„é”™è¯¯ï¼š{0}"
 
+#. Events.RecruitedWielder
+msgctxt "Events.RecruitedWielder"
+msgid "Recruited wielder {0}"
+msgstr "已招募持有者{0}"
+
 #. Events.SelectedBuildSite
 msgctxt "Events.SelectedBuildSite"
 msgid "Selected {0} build site at {1}"

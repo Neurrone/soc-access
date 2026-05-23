@@ -27,6 +27,26 @@ namespace SongsOfConquestAccess.Events
         }
     }
 
+    internal sealed class WielderRecruitedEvent : IAccessibilityEvent
+    {
+        public WielderRecruitedEvent(int wielderId, string wielderName)
+        {
+            WielderId = wielderId;
+            WielderName = string.IsNullOrWhiteSpace(wielderName) ? ModText.Get(ModStrings.Events.Wielder) : wielderName;
+        }
+
+        public string Kind { get { return AccessibilityEvents.Notification.WielderRecruited; } }
+
+        public int WielderId { get; private set; }
+
+        public string WielderName { get; private set; }
+
+        public string GetSpeechText()
+        {
+            return ModText.Get(ModStrings.Events.RecruitedWielder, WielderName);
+        }
+    }
+
     internal sealed class MapWielderMovedEvent : IAccessibilityEvent
     {
         public MapWielderMovedEvent(int wielderId, string wielderName, Vector2Int tile)
