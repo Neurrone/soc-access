@@ -5,6 +5,8 @@
 - Wielders being recruited are now announced. This is mainly for situations where they join via story events
 - Fixed the revealed buffer being reset after combat
 - Fixed resource generating buildings not appearing in the scanner. They have a dedicated "Resource generators" category
+- Fixed multi-tile entities being read even though they aren't fully revealed. In these situations, the entity will no longer be considered to be revealed
+- Fixed artifact names not being announced when revealed
 
 ## V0.3.0
 

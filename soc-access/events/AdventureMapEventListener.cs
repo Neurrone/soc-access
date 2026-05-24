@@ -5,11 +5,13 @@ using SongsOfConquest.Client.Adventure;
 using SongsOfConquest.Client.Gamestate;
 using SongsOfConquest.Client.Gamestate.Facade;
 using SongsOfConquest.Common.Adventure;
+using SongsOfConquest.Common.Details;
 using SongsOfConquest.Common.Entities;
 using SongsOfConquest.Common.Entities.Adventure;
 using SongsOfConquest.Common.Gamestate;
 using SongsOfConquest.Common.Gamestate.Facade;
 using SongsOfConquest.Common.Localization;
+using SongsOfConquestAccess.Adapters;
 using SongsOfConquestAccess.Localization;
 using SongsOfConquestAccess.Scanner;
 using UnityEngine;
@@ -420,7 +422,7 @@ namespace SongsOfConquestAccess.Events
                     continue;
                 }
 
-                if (IsMapEntityVisible(entity) || IsMapEntityExplored(entity, _lastExploration))
+                if (IsMapEntityVisible(entity))
                 {
                     _discoveredMapEntityIds.Add(entity.Id);
                 }
@@ -451,9 +453,14 @@ namespace SongsOfConquestAccess.Events
 
         private bool AddVisibleMapEntityDiscovery(IMapEntity entity)
         {
+            Vector2Int revealTile;
             if (!ShouldConsiderMapEntityDiscovery(entity)
                 || _discoveredMapEntityIds.Contains(entity.Id)
-                || !IsMapEntityVisible(entity))
+                || !AdventureMapVisibility.TryGetFullyVisibleMapEntityIdentityTile(
+                    _facade,
+                    _fogManager,
+                    entity,
+                    out revealTile))
             {
                 return false;
             }
@@ -463,7 +470,7 @@ namespace SongsOfConquestAccess.Events
             return AddPendingDiscovery(
                 EntityDiscoveryKey(entity.Id),
                 label,
-                entity.Position,
+                revealTile,
                 entity.Id,
                 AdventureMapRevealedKind.MapEntity);
         }
@@ -478,52 +485,8 @@ namespace SongsOfConquestAccess.Events
 
         private bool IsMapEntityVisible(IMapEntity entity)
         {
-            foreach (Vector2Int point in GetMapEntityRevealTiles(entity))
-            {
-                if (IsPointVisible(point))
-                {
-                    return true;
-                }
-            }
-
-            return false;
-        }
-
-        private bool IsMapEntityExplored(IMapEntity entity, byte[] exploration)
-        {
-            foreach (Vector2Int point in GetMapEntityRevealTiles(entity))
-            {
-                if (IsPointExplored(point, exploration))
-                {
-                    return true;
-                }
-            }
-
-            return false;
-        }
-
-        private IEnumerable<Vector2Int> GetMapEntityRevealTiles(IMapEntity entity)
-        {
-            if (entity == null)
-            {
-                yield break;
-            }
-
-            ILocationComponent location;
-            if (entity.TryGetComponent<ILocationComponent>(out location)
-                && location.CalculatedBlockingPoints != null
-                && location.CalculatedBlockingPoints.Length != 0)
-            {
-                Vector2Int[] points = location.CalculatedBlockingPoints;
-                for (int i = 0; i < points.Length; i++)
-                {
-                    yield return points[i];
-                }
-
-                yield break;
-            }
-
-            yield return entity.Position;
+            Vector2Int ignored;
+            return AdventureMapVisibility.TryGetFullyVisibleMapEntityIdentityTile(_facade, _fogManager, entity, out ignored);
         }
 
         private void RefreshNonLocalCommanderVisibilityBaseline()
@@ -795,6 +758,12 @@ namespace SongsOfConquestAccess.Events
                 return;
             }
 
+            RevalidatePendingMapEntityDiscoveries();
+            if (_pendingDiscoveryOrder.Count == 0 && _pendingHiddenWielderOrder.Count == 0)
+            {
+                return;
+            }
+
             List<string> discoveredItems = BuildPendingItems(_pendingDiscoveryOrder, _pendingDiscoveryCounts);
             List<string> hiddenWielders = BuildPendingItems(_pendingHiddenWielderOrder, _pendingHiddenWielderCounts);
             AddPendingDiscoveriesToRevealedRegistry();
@@ -808,6 +777,44 @@ namespace SongsOfConquestAccess.Events
             if (hiddenWielders.Count != 0)
             {
                 AccessibilityEventBus.Publish(new MapWieldersNoLongerVisibleEvent(hiddenWielders));
+            }
+        }
+
+        private void RevalidatePendingMapEntityDiscoveries()
+        {
+            for (int i = _pendingDiscoveryKeyOrder.Count - 1; i >= 0; i--)
+            {
+                string key = _pendingDiscoveryKeyOrder[i];
+                PendingRevealedEntry entry;
+                if (!_pendingRevealedEntriesByKey.TryGetValue(key, out entry)
+                    || entry.Kind != AdventureMapRevealedKind.MapEntity)
+                {
+                    continue;
+                }
+
+                IMapEntity entity = TryGetMapEntity(entry.StableReference);
+                Vector2Int revealTile;
+                if (entity == null
+                    || !AdventureMapVisibility.TryGetFullyVisibleMapEntityIdentityTile(
+                        _facade,
+                        _fogManager,
+                        entity,
+                        out revealTile))
+                {
+                    RemovePendingDiscovery(key);
+                    _discoveredMapEntityIds.Remove(entry.StableReference);
+                    continue;
+                }
+
+                if (revealTile != entry.Position)
+                {
+                    _pendingRevealedEntriesByKey[key] = new PendingRevealedEntry(
+                        entry.Key,
+                        entry.Label,
+                        revealTile,
+                        entry.StableReference,
+                        entry.Kind);
+                }
             }
         }
 
@@ -898,6 +905,18 @@ namespace SongsOfConquestAccess.Events
             return "entity:" + entityId;
         }
 
+        private IMapEntity TryGetMapEntity(int id)
+        {
+            try
+            {
+                return _facade != null && _facade.MapEntities != null ? _facade.MapEntities.Get(id) : null;
+            }
+            catch
+            {
+                return null;
+            }
+        }
+
         private static string CommanderDiscoveryKey(int commanderId)
         {
             return "commander:" + commanderId;
@@ -958,18 +977,6 @@ namespace SongsOfConquestAccess.Events
             }
 
             return _facade.Teams.LocalTeamInControlId;
-        }
-
-        private bool IsPointExplored(Vector2Int point, byte[] exploration)
-        {
-            int width = _fogManager != null ? _fogManager.width : 0;
-            if (exploration == null || width <= 0 || point.x < 0 || point.y < 0)
-            {
-                return false;
-            }
-
-            int index = point.y * width + point.x;
-            return index >= 0 && index < exploration.Length && exploration[index] != 0;
         }
 
         private bool IsPointVisible(Vector2Int point)
@@ -1040,6 +1047,12 @@ namespace SongsOfConquestAccess.Events
                 }
             }
 
+            string preVisitName = GetPreVisitMapEntityName(entity);
+            if (!string.IsNullOrWhiteSpace(preVisitName))
+            {
+                return preVisitName;
+            }
+
             string localizedName = Localize(entity.NameKey);
             if (!string.IsNullOrWhiteSpace(localizedName))
             {
@@ -1052,6 +1065,28 @@ namespace SongsOfConquestAccess.Events
             }
 
             return entity.NameKey;
+        }
+
+        private string GetPreVisitMapEntityName(IMapEntity entity)
+        {
+            try
+            {
+                ICommanderState selectedCommander = _selectionHandler != null ? _selectionHandler.SelectedCommander : null;
+                IDetails details = entity.GetPreVisitDetails(
+                    selectedCommander != null ? selectedCommander.Id : -1,
+                    false,
+                    ScoutingDetailLevel.VeryFar,
+                    null,
+                    selectedCommander != null && selectedCommander.IsAlive);
+
+                MapEntityPreVisitDetails preVisitDetails = details as MapEntityPreVisitDetails;
+                return preVisitDetails != null ? Localize(preVisitDetails.NameKey) : string.Empty;
+            }
+            catch (Exception exception)
+            {
+                SocAccessPlugin.Instance?.LogWarning("AdventureMapEventListener failed to read map entity pre-visit name: " + exception.Message);
+                return string.Empty;
+            }
         }
 
         private string Localize(string key)

@@ -457,7 +457,13 @@ namespace SongsOfConquestAccess.Adapters
                 entity = null;
             }
 
-            if (entity != null && (tile.IsVisible || fog == ExploredButNotVisibleFogValue))
+            bool canExposeMapEntityIdentity = entity != null && CanExposeMapEntityIdentity(entity, clamped);
+            if (entity != null && !canExposeMapEntityIdentity && tile.IsBlocked && !tile.IsImpassable)
+            {
+                tile.IsBlocked = false;
+            }
+
+            if (canExposeMapEntityIdentity)
             {
                 tile.MapEntity = entity;
                 tile.MapEntityName = GetMapEntityName(entity);
@@ -928,7 +934,9 @@ namespace SongsOfConquestAccess.Adapters
                     return true;
                 }
 
-                if (tile.MapEntity != null && tile.MapEntity.Id == stableId)
+                IMapEntity entity = TryGetMapEntity(stableId);
+                AdventureMapTile identityTile;
+                if (entity != null && TryGetMapEntityIdentityTile(entity, null, out identityTile))
                 {
                     return true;
                 }
@@ -995,8 +1003,8 @@ namespace SongsOfConquestAccess.Adapters
                     continue;
                 }
 
-                AdventureMapTile tile = GetScannerTile(tileCache, entity.Position);
-                if (tile == null || tile.MapEntity == null || tile.MapEntity.Id != entity.Id)
+                AdventureMapTile tile;
+                if (!TryGetMapEntityIdentityTile(entity, tileCache, out tile))
                 {
                     continue;
                 }
@@ -1004,7 +1012,7 @@ namespace SongsOfConquestAccess.Adapters
                 string name = FirstNonEmpty(tile.MapEntityName, GetMapEntityName(entity));
                 bool notVisible = !tile.IsVisible;
                 string relationship = FormatScannerRelationship(GetMapEntityRelationship(entity, localTeamId));
-                ScannerResult result = new ScannerResult(ScannerKey("entity", entity.Id), name, entity.Position)
+                ScannerResult result = new ScannerResult(ScannerKey("entity", entity.Id), name, tile.Position)
                 {
                     NotVisible = notVisible,
                     StableReference = entity.Id
@@ -1070,7 +1078,12 @@ namespace SongsOfConquestAccess.Adapters
                     return;
                 }
 
-                AdventureMapTile tile = GetScannerTile(tileCache, entity.Position);
+                AdventureMapTile tile;
+                if (!TryGetMapEntityIdentityTile(entity, tileCache, out tile))
+                {
+                    return;
+                }
+
                 ScannerResult result = CreateMapEntityScannerResult(entity, tile);
                 if (result == null)
                 {
@@ -1091,7 +1104,12 @@ namespace SongsOfConquestAccess.Adapters
                     return;
                 }
 
-                AdventureMapTile tile = GetScannerTile(tileCache, entity.Position);
+                AdventureMapTile tile;
+                if (!TryGetMapEntityIdentityTile(entity, tileCache, out tile))
+                {
+                    return;
+                }
+
                 ScannerResult result = CreateMapEntityScannerResult(entity, tile);
                 if (result != null)
                 {
@@ -1109,7 +1127,12 @@ namespace SongsOfConquestAccess.Adapters
                     return;
                 }
 
-                AdventureMapTile tile = GetScannerTile(tileCache, entity.Position);
+                AdventureMapTile tile;
+                if (!TryGetMapEntityIdentityTile(entity, tileCache, out tile))
+                {
+                    return;
+                }
+
                 ScannerResult result = CreateMapEntityScannerResult(entity, tile);
                 if (result != null)
                 {
@@ -1127,7 +1150,12 @@ namespace SongsOfConquestAccess.Adapters
                     return;
                 }
 
-                AdventureMapTile tile = GetScannerTile(tileCache, entity.Position);
+                AdventureMapTile tile;
+                if (!TryGetMapEntityIdentityTile(entity, tileCache, out tile))
+                {
+                    return;
+                }
+
                 ScannerResult result = CreateMapEntityScannerResult(entity, tile);
                 if (result != null)
                 {
@@ -1145,7 +1173,12 @@ namespace SongsOfConquestAccess.Adapters
                     return;
                 }
 
-                AdventureMapTile tile = GetScannerTile(tileCache, entity.Position);
+                AdventureMapTile tile;
+                if (!TryGetMapEntityIdentityTile(entity, tileCache, out tile))
+                {
+                    return;
+                }
+
                 ScannerResult result = CreateMapEntityScannerResult(entity, tile);
                 if (result != null)
                 {
@@ -1163,7 +1196,12 @@ namespace SongsOfConquestAccess.Adapters
                     return;
                 }
 
-                AdventureMapTile tile = GetScannerTile(tileCache, entity.Position);
+                AdventureMapTile tile;
+                if (!TryGetMapEntityIdentityTile(entity, tileCache, out tile))
+                {
+                    return;
+                }
+
                 ScannerResult result = CreateMapEntityScannerResult(entity, tile);
                 if (result != null)
                 {
@@ -1181,7 +1219,12 @@ namespace SongsOfConquestAccess.Adapters
                     return;
                 }
 
-                AdventureMapTile tile = GetScannerTile(tileCache, entity.Position);
+                AdventureMapTile tile;
+                if (!TryGetMapEntityIdentityTile(entity, tileCache, out tile))
+                {
+                    return;
+                }
+
                 ScannerResult result = CreateMapEntityScannerResult(entity, tile);
                 if (result != null)
                 {
@@ -1199,7 +1242,12 @@ namespace SongsOfConquestAccess.Adapters
                     return;
                 }
 
-                AdventureMapTile tile = GetScannerTile(tileCache, entity.Position);
+                AdventureMapTile tile;
+                if (!TryGetMapEntityIdentityTile(entity, tileCache, out tile))
+                {
+                    return;
+                }
+
                 ScannerResult result = CreateMapEntityScannerResult(entity, tile);
                 if (result != null)
                 {
@@ -1233,7 +1281,26 @@ namespace SongsOfConquestAccess.Adapters
                 }
 
                 AdventureMapTile tile = IsWithinMap(entry.Position) ? GetTile(entry.Position) : null;
-                all.Results.Add(new ScannerResult(entry.Key, entry.Label, entry.Position)
+                Vector2Int position = entry.Position;
+                if (entry.Kind == AdventureMapRevealedKind.MapEntity)
+                {
+                    IMapEntity entity = TryGetMapEntity(entry.StableReference);
+                    if (entity == null)
+                    {
+                        RemoveStaleRevealedMapEntityEntry(entry);
+                        continue;
+                    }
+
+                    if (!TryGetMapEntityIdentityTile(entity, null, out tile))
+                    {
+                        RemoveStaleRevealedMapEntityEntry(entry);
+                        continue;
+                    }
+
+                    position = tile.Position;
+                }
+
+                all.Results.Add(new ScannerResult(entry.Key, entry.Label, position)
                 {
                     NotVisible = tile != null && !tile.IsVisible,
                     StableReference = entry.StableReference
@@ -1245,25 +1312,24 @@ namespace SongsOfConquestAccess.Adapters
         {
             ForEachScannerEntity(tileCache, entity =>
             {
-                AdventureMapTile tile = GetScannerTile(tileCache, entity.Position);
+                if (!IsScannerObstacleEntity(entity))
+                {
+                    return;
+                }
+
+                AdventureMapTile tile;
+                if (!TryGetMapEntityIdentityTile(entity, tileCache, out tile))
+                {
+                    return;
+                }
+
                 ScannerResult result = CreateMapEntityScannerResult(entity, tile);
                 if (result == null)
                 {
                     return;
                 }
 
-                if (entity.Category == MapEntityCategory.Hostile)
-                {
-                    snapshot.Add(ModText.Get(ModStrings.Scanner.Obstacles), ModText.Get(ModStrings.Scanner.All), result);
-                }
-                else if (entity.HasComponent<IMagicGateCommonComponent>() || entity.HasComponent<IUnlockWithArtifactComponent>())
-                {
-                    snapshot.Add(ModText.Get(ModStrings.Scanner.Obstacles), ModText.Get(ModStrings.Scanner.All), result);
-                }
-                else if (entity.Category == MapEntityCategory.Obstacle)
-                {
-                    snapshot.Add(ModText.Get(ModStrings.Scanner.Obstacles), ModText.Get(ModStrings.Scanner.All), result);
-                }
+                snapshot.Add(ModText.Get(ModStrings.Scanner.Obstacles), ModText.Get(ModStrings.Scanner.All), result);
             });
 
             AddHostileZoneOfControlScannerResults(snapshot, localTeamId, origin);
@@ -1462,14 +1528,46 @@ namespace SongsOfConquestAccess.Adapters
                     continue;
                 }
 
-                AdventureMapTile tile = GetScannerTile(tileCache, entity.Position);
-                if (tile == null || tile.MapEntity == null || tile.MapEntity.Id != entity.Id)
-                {
-                    continue;
-                }
-
                 action(entity);
             }
+        }
+
+        private IMapEntity TryGetMapEntity(int id)
+        {
+            try
+            {
+                return _facade != null && _facade.MapEntities != null ? _facade.MapEntities.Get(id) : null;
+            }
+            catch
+            {
+                return null;
+            }
+        }
+
+        private bool TryGetMapEntityIdentityTile(
+            IMapEntity entity,
+            Dictionary<Vector2Int, AdventureMapTile> tileCache,
+            out AdventureMapTile tile)
+        {
+            tile = null;
+            Vector2Int identityTile;
+            if (!AdventureMapVisibility.TryGetFullyVisibleMapEntityIdentityTile(
+                _facade,
+                _fogManager,
+                entity,
+                out identityTile))
+            {
+                return false;
+            }
+
+            AdventureMapTile candidate = GetScannerTile(tileCache, identityTile);
+            if (candidate == null || candidate.MapEntity == null || candidate.MapEntity.Id != entity.Id)
+            {
+                return false;
+            }
+
+            tile = candidate;
+            return true;
         }
 
         private ScannerResult CreateMapEntityScannerResult(IMapEntity entity, AdventureMapTile tile)
@@ -1480,7 +1578,7 @@ namespace SongsOfConquestAccess.Adapters
             }
 
             string name = FirstNonEmpty(tile.MapEntityName, GetMapEntityName(entity));
-            return new ScannerResult(ScannerKey("entity", entity.Id), name, entity.Position)
+            return new ScannerResult(ScannerKey("entity", entity.Id), name, tile.Position)
             {
                 NotVisible = !tile.IsVisible,
                 StableReference = entity.Id
@@ -1587,6 +1685,23 @@ namespace SongsOfConquestAccess.Adapters
             return entity != null
                 && (entity.BlueprintId == ObjectiveBeaconBlueprintId
                     || entity.BlueprintId == FallenBeaconBlueprintId);
+        }
+
+        private static bool IsScannerObstacleEntity(IMapEntity entity)
+        {
+            return entity != null
+                && (entity.Category == MapEntityCategory.Hostile
+                    || entity.Category == MapEntityCategory.Obstacle
+                    || entity.HasComponent<IMagicGateCommonComponent>()
+                    || entity.HasComponent<IUnlockWithArtifactComponent>());
+        }
+
+        private void RemoveStaleRevealedMapEntityEntry(AdventureMapRevealedEntry entry)
+        {
+            if (entry != null && _revealedRegistry != null)
+            {
+                _revealedRegistry.Remove(entry.Key);
+            }
         }
 
         private bool IsUnvisited(IMapEntity entity)
@@ -2783,9 +2898,10 @@ namespace SongsOfConquestAccess.Adapters
             int localTeamId = GetLocalTeamId();
             try
             {
-                if (_facade.MapEntities.GetAt(tile) != null)
+                IMapEntity entity = _facade.MapEntities.GetAt(tile);
+                if (entity != null)
                 {
-                    return true;
+                    return CanExposeMapEntityIdentity(entity, tile);
                 }
             }
             catch (Exception)
@@ -2888,6 +3004,11 @@ namespace SongsOfConquestAccess.Adapters
             {
                 return 0;
             }
+        }
+
+        private bool CanExposeMapEntityIdentity(IMapEntity entity, Vector2Int position)
+        {
+            return AdventureMapVisibility.IsFullyVisibleMapEntityIdentityTile(_facade, _fogManager, entity, position);
         }
 
         private string GetCommanderRelationship(ICommanderState commander, int localTeamId)
