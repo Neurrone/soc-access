@@ -15,6 +15,16 @@ namespace SongsOfConquestAccess.Localization
             public static readonly ModPluralString TileCount = new ModPluralString("Common.TileCount", "{0} tile", "{0} tiles");
         }
 
+        public static class Artifacts
+        {
+            public static readonly ModString ColorBlue = new ModString("Artifacts.ColorBlue", "blue");
+            public static readonly ModString ColorGreen = new ModString("Artifacts.ColorGreen", "green");
+            public static readonly ModString ColorGrey = new ModString("Artifacts.ColorGrey", "grey");
+            public static readonly ModString ColorOrange = new ModString("Artifacts.ColorOrange", "orange");
+            public static readonly ModString ColorViolet = new ModString("Artifacts.ColorViolet", "violet");
+            public static readonly ModString NameWithColor = new ModString("Artifacts.NameWithColor", "{0} ({1})");
+        }
+
         public static class Draft
         {
             public static readonly ModPluralString AvailableTroops = new ModPluralString("Draft.AvailableTroops", "{0} available", "{0} available");

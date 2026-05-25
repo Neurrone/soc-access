@@ -650,23 +650,14 @@ namespace SongsOfConquestAccess.Adapters
                 return string.Empty;
             }
 
-            string name = _artifactLookup != null
-                ? _artifactLookup.GetLocalizedName(artifact.Type)
-                : artifact.Type.ToString();
-
-            if (_artifactLookup == null)
-            {
-                return name;
-            }
-
             try
             {
-                return ArtifactSpeechFormatter.FormatName(name, _artifactLookup.GetPowerLevelColor(artifact.Type));
+                return ArtifactSpeechFormatter.FormatName(artifact, _artifactLookup, _localization);
             }
             catch (Exception ex)
             {
                 SocAccessPlugin.Instance?.LogWarning("TradingMenuAdapter could not get artifact rarity color: " + ex.Message);
-                return name;
+                return _artifactLookup != null ? _artifactLookup.GetLocalizedName(artifact.Type) : artifact.Type.ToString();
             }
         }
 

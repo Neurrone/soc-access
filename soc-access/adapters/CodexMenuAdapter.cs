@@ -251,11 +251,11 @@ namespace SongsOfConquestAccess.Adapters
             return NativeSelectionUtility.PointerClick(item.Button as Component);
         }
 
-        private static string FormatContentButtonLabel(string label, CodexContentButton button)
+        private string FormatContentButtonLabel(string label, CodexContentButton button)
         {
             CodexCategoryContentDefinition definition = GetField<CodexCategoryContentDefinition>(button, ContentButtonDefinitionField);
             return definition != null && definition.HasContentColor
-                ? ArtifactSpeechFormatter.FormatName(label, definition.ContentColor)
+                ? ArtifactSpeechFormatter.FormatName(_localization, label, definition.ContentColor)
                 : label;
         }
 

@@ -25,6 +25,7 @@
 - Fixed combat screens not being properly cleaned up if doing a quick battle, followed by a manual battle. This was causing the hotkey to read resources out of combat to fail
 - Fixed regression in V0.2.0 that broke reading of marketplace screen button labels
 - Fixed placeholder titles being read on story screens when no title was actually visually shown
+- Artifact colours should now be read everywhere
 
 ## V0.3.0
 

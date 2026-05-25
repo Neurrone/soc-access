@@ -246,7 +246,32 @@ namespace SongsOfConquestAccess.Adapters
 
         private string BuildChoiceLabel(IWorldMapChoiceButton button)
         {
+            string artifactName;
+            if (TryGetArtifactChoiceLabel(button, out artifactName))
+            {
+                return artifactName;
+            }
+
             return NormalizeChoiceText(GetText(button != null ? button.TypeTextMesh : null));
+        }
+
+        private bool TryGetArtifactChoiceLabel(IWorldMapChoiceButton button, out string artifactName)
+        {
+            artifactName = string.Empty;
+            if (button == null)
+            {
+                return false;
+            }
+
+            Component component = button.Button as Component;
+            if (component == null && button.Button != null)
+            {
+                component = button.Button.GetSelectable();
+            }
+
+            IDetails details;
+            return NativeTooltipUtility.TryGetUiDetails(component, out details)
+                && ArtifactSpeechFormatter.TryFormatName(details, _localization, out artifactName);
         }
 
         private List<IWorldMapChoiceButton> GetRewardButtons()

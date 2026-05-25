@@ -30,6 +30,36 @@ msgctxt "Common.ResourceAmount"
 msgid "{0} {1}"
 msgstr "{0} {1}"
 
+#. Artifacts.ColorBlue
+msgctxt "Artifacts.ColorBlue"
+msgid "blue"
+msgstr "синій"
+
+#. Artifacts.ColorGreen
+msgctxt "Artifacts.ColorGreen"
+msgid "green"
+msgstr "зелений"
+
+#. Artifacts.ColorGrey
+msgctxt "Artifacts.ColorGrey"
+msgid "grey"
+msgstr "сірий"
+
+#. Artifacts.ColorOrange
+msgctxt "Artifacts.ColorOrange"
+msgid "orange"
+msgstr "помаранчевий"
+
+#. Artifacts.ColorViolet
+msgctxt "Artifacts.ColorViolet"
+msgid "violet"
+msgstr "фіолетовий"
+
+#. Artifacts.NameWithColor
+msgctxt "Artifacts.NameWithColor"
+msgid "{0} ({1})"
+msgstr "{0} ({1})"
+
 #. Common.TileCount_0
 msgctxt "Common.TileCount_0"
 msgid "{0} tile"

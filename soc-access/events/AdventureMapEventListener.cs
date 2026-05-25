@@ -14,6 +14,7 @@ using SongsOfConquest.Common.Localization;
 using SongsOfConquestAccess.Adapters;
 using SongsOfConquestAccess.Localization;
 using SongsOfConquestAccess.Scanner;
+using SongsOfConquestAccess.Speech;
 using UnityEngine;
 
 namespace SongsOfConquestAccess.Events
@@ -1104,6 +1105,12 @@ namespace SongsOfConquestAccess.Events
                     ScoutingDetailLevel.VeryFar,
                     null,
                     selectedCommander != null && selectedCommander.IsAlive);
+
+                string artifactName;
+                if (ArtifactSpeechFormatter.TryFormatName(details, _localizationHandler, out artifactName))
+                {
+                    return artifactName;
+                }
 
                 MapEntityPreVisitDetails preVisitDetails = details as MapEntityPreVisitDetails;
                 return preVisitDetails != null ? Localize(preVisitDetails.NameKey) : string.Empty;

@@ -44,6 +44,36 @@ msgctxt "Common.ResourceAmount"
 msgid "{0} {1}"
 msgstr ""
 
+#. Artifacts.ColorBlue
+msgctxt "Artifacts.ColorBlue"
+msgid "blue"
+msgstr ""
+
+#. Artifacts.ColorGreen
+msgctxt "Artifacts.ColorGreen"
+msgid "green"
+msgstr ""
+
+#. Artifacts.ColorGrey
+msgctxt "Artifacts.ColorGrey"
+msgid "grey"
+msgstr ""
+
+#. Artifacts.ColorOrange
+msgctxt "Artifacts.ColorOrange"
+msgid "orange"
+msgstr ""
+
+#. Artifacts.ColorViolet
+msgctxt "Artifacts.ColorViolet"
+msgid "violet"
+msgstr ""
+
+#. Artifacts.NameWithColor
+msgctxt "Artifacts.NameWithColor"
+msgid "{0} ({1})"
+msgstr ""
+
 #. Draft.EssenceVariants
 msgctxt "Draft.EssenceVariants"
 msgid "Essence variants"

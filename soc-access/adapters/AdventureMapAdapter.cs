@@ -2229,7 +2229,7 @@ namespace SongsOfConquestAccess.Adapters
             {
                 ArtifactDetails artifact = artifactDetails.Artifacts[i];
                 string name = Localize(artifact.NameKey);
-                string formattedName = ArtifactSpeechFormatter.FormatName(name, artifact.PowerLevelColor);
+                string formattedName = ArtifactSpeechFormatter.FormatName(_localizationHandler, name, artifact.PowerLevelColor);
                 if (string.IsNullOrWhiteSpace(name) || name == formattedName)
                 {
                     continue;
@@ -3439,10 +3439,19 @@ namespace SongsOfConquestAccess.Adapters
                     return;
                 }
 
-                string name = Localize(preVisitDetails.NameKey);
-                if (!string.IsNullOrWhiteSpace(name))
+                string name;
+                ArtifactPreVisitDetails artifactDetails = preVisitDetails as ArtifactPreVisitDetails;
+                if (artifactDetails != null && ArtifactSpeechFormatter.TryFormatName(artifactDetails, _localizationHandler, out name))
                 {
                     tile.MapEntityName = name;
+                }
+                else
+                {
+                    name = Localize(preVisitDetails.NameKey);
+                    if (!string.IsNullOrWhiteSpace(name))
+                    {
+                        tile.MapEntityName = name;
+                    }
                 }
 
                 if (preVisitDetails.Hint != MapEntityPreVisitDetails.PreVisitHint.None)

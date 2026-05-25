@@ -6,6 +6,7 @@ using SongsOfConquest.Client.Adventure.UI;
 using SongsOfConquest.Client.Menu;
 using SongsOfConquest.Client.UI;
 using SongsOfConquest.Common.Battle;
+using SongsOfConquest.Common.Details;
 using SongsOfConquest.Common.Localization;
 using SongsOfConquestAccess.Speech;
 using UnityEngine;
@@ -340,11 +341,24 @@ namespace SongsOfConquestAccess.Adapters
                 Tooltip tooltip = Tooltip.ForComponent(tooltipComponent, _localization);
                 result.Add(new ResultEntry(
                     string.Empty,
-                    GetFirstTooltipLine(tooltip),
+                    GetLootEntryName(tooltipComponent, tooltip),
                     isLostTroop: false,
                     tooltip,
                     () => entry != null && entry.gameObject.activeInHierarchy));
             }
+        }
+
+        private string GetLootEntryName(Component tooltipComponent, Tooltip tooltip)
+        {
+            IDetails details;
+            string artifactName;
+            if (NativeTooltipUtility.TryGetUiDetails(tooltipComponent, out details)
+                && ArtifactSpeechFormatter.TryFormatName(details, _localization, out artifactName))
+            {
+                return artifactName;
+            }
+
+            return GetFirstTooltipLine(tooltip);
         }
 
         private string BuildXpText()
