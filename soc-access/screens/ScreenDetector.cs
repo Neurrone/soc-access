@@ -1328,6 +1328,13 @@ namespace SongsOfConquestAccess.Screens
 
         public void OnMoveTroopPopupClosed(TroopHUDEntryMovable movable)
         {
+            // The game calls TroopHUDEntryMovable.Reset even when the troop move
+            // popup is not open, such as during HUD teardown and refresh.
+            if (!_screenManager.Contains<MoveTroopPopupScreen>())
+            {
+                return;
+            }
+
             _screenManager.Pop<MoveTroopPopupScreen>("move troop popup closed");
         }
 
