@@ -2375,12 +2375,42 @@ msgstr "ÐšÑ€Ð°Ð¹ Ð²Ð¾Ð´Ð¸"
 #. Screens.MoveAllLeft
 msgctxt "Screens.MoveAllLeft"
 msgid "Move all left"
-msgstr "Move all left"
+msgstr "Перемістити всіх ліворуч"
 
 #. Screens.MoveAllRight
 msgctxt "Screens.MoveAllRight"
 msgid "Move all right"
-msgstr "Move all right"
+msgstr "Перемістити всіх праворуч"
+
+#. Screens.CancelAbility
+msgctxt "Screens.CancelAbility"
+msgid "Cancel ability"
+msgstr "Скасувати здібність"
+
+#. Screens.CancelSpell
+msgctxt "Screens.CancelSpell"
+msgid "Cancel spell"
+msgstr "Скасувати закляття"
+
+#. Screens.MaxTroopSize
+msgctxt "Screens.MaxTroopSize"
+msgid "Max troop size {0}"
+msgstr "Максимальний розмір загону {0}"
+
+#. Screens.LeftRightDistribution
+msgctxt "Screens.LeftRightDistribution"
+msgid "Left: {0}, right: {1}"
+msgstr "Ліворуч: {0}, праворуч: {1}"
+
+#. Screens.Options
+msgctxt "Screens.Options"
+msgid "Options"
+msgstr "Параметри"
+
+#. Scanner.SpawnPoints
+msgctxt "Scanner.SpawnPoints"
+msgid "Spawn points"
+msgstr "Точки розміщення"
 
 #. Events.Revealed
 msgctxt "Events.Revealed"

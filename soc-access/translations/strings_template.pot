@@ -1709,6 +1709,16 @@ msgctxt "Screens.CreationSpells"
 msgid "Creation spells"
 msgstr ""
 
+#. Screens.CancelAbility
+msgctxt "Screens.CancelAbility"
+msgid "Cancel ability"
+msgstr ""
+
+#. Screens.CancelSpell
+msgctxt "Screens.CancelSpell"
+msgid "Cancel spell"
+msgstr ""
+
 #. Screens.CurrentTroop
 msgctxt "Screens.CurrentTroop"
 msgid "Current troop, {0}"
@@ -1824,6 +1834,11 @@ msgctxt "Screens.ModifierCategoryTabs"
 msgid "Modifier category tabs"
 msgstr ""
 
+#. Screens.MaxTroopSize
+msgctxt "Screens.MaxTroopSize"
+msgid "Max troop size {0}"
+msgstr ""
+
 #. Screens.MoveAllLeft
 msgctxt "Screens.MoveAllLeft"
 msgid "Move all left"
@@ -1832,6 +1847,11 @@ msgstr ""
 #. Screens.MoveAllRight
 msgctxt "Screens.MoveAllRight"
 msgid "Move all right"
+msgstr ""
+
+#. Screens.LeftRightDistribution
+msgctxt "Screens.LeftRightDistribution"
+msgid "Left: {0}, right: {1}"
 msgstr ""
 
 #. Screens.MultiEssenceSpells
@@ -1902,6 +1922,11 @@ msgstr ""
 #. Screens.OrderSpells
 msgctxt "Screens.OrderSpells"
 msgid "Order spells"
+msgstr ""
+
+#. Screens.Options
+msgctxt "Screens.Options"
+msgid "Options"
 msgstr ""
 
 #. Screens.PostAdventureResult
@@ -2357,6 +2382,11 @@ msgstr ""
 #. Scanner.Southwest
 msgctxt "Scanner.Southwest"
 msgid "southwest"
+msgstr ""
+
+#. Scanner.SpawnPoints
+msgctxt "Scanner.SpawnPoints"
+msgid "Spawn points"
 msgstr ""
 
 #. Scanner.Teleport

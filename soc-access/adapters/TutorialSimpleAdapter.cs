@@ -69,15 +69,6 @@ namespace SongsOfConquestAccess.Adapters
             get { return GetLocalizedText("Tutorial/TutorialPopup/ShowTutorialCheckbox", "Show tutorials"); }
         }
 
-        public string OkLabel
-        {
-            get
-            {
-                string label = MenuButtonTextUtility.GetDirectButtonText(OkButtonRef(SimplePopup));
-                return string.IsNullOrWhiteSpace(label) ? "OK" : label;
-            }
-        }
-
         public bool IsOkAvailable()
         {
             return IsButtonAvailable(OkButtonRef(SimplePopup));

@@ -101,7 +101,7 @@ namespace SongsOfConquestAccess.Screens
                 () => adapter != null));
             root.AddChild(new ButtonWidget(
                 "tutorial-slideshow-close",
-                adapter != null ? adapter.CloseLabel : ModText.Get(ModStrings.Screens.Close),
+                ModText.Get(ModStrings.Screens.Close),
                 () => adapter != null && adapter.ActivateClose(),
                 null,
                 () => adapter != null && adapter.IsCloseAvailable(),

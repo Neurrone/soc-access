@@ -82,13 +82,13 @@ namespace SongsOfConquestAccess.Screens
 
             root.AddChild(new TextWidget(
                 "move-troop-max-size",
-                () => adapter.MaxTroopSize,
+                () => BuildMaxTroopSize(adapter),
                 adapter.HideNativeTooltip,
                 includeParentLabelInAnnouncement: false));
 
             root.AddChild(new ButtonWidget(
                 "move-troop-move-all-left",
-                () => adapter.MoveAllLeftLabel,
+                () => ModText.Get(ModStrings.Screens.MoveAllLeft),
                 adapter.MoveAllLeft,
                 adapter.HideNativeTooltip,
                 adapter.IsMoveAllLeftEnabled,
@@ -104,7 +104,7 @@ namespace SongsOfConquestAccess.Screens
 
             root.AddChild(new ButtonWidget(
                 "move-troop-move-all-right",
-                () => adapter.MoveAllRightLabel,
+                () => ModText.Get(ModStrings.Screens.MoveAllRight),
                 adapter.MoveAllRight,
                 adapter.HideNativeTooltip,
                 adapter.IsMoveAllRightEnabled,
@@ -119,7 +119,7 @@ namespace SongsOfConquestAccess.Screens
             root.AddChild(new SliderWidget(
                 "move-troop-distribution",
                 ModText.Get(ModStrings.Screens.TroopDistribution),
-                adapter.GetDistributionText,
+                () => BuildDistributionText(adapter),
                 adapter.GetSliderValue,
                 adapter.GetSliderMinimum,
                 adapter.GetSliderMaximum,
@@ -142,6 +142,24 @@ namespace SongsOfConquestAccess.Screens
                 adapter.CanCancel));
 
             return root;
+        }
+
+        private static string BuildMaxTroopSize(MoveTroopPopupAdapter adapter)
+        {
+            string amount = adapter != null ? adapter.MaxTroopSizeAmount : string.Empty;
+            return string.IsNullOrWhiteSpace(amount)
+                ? string.Empty
+                : ModText.Get(ModStrings.Screens.MaxTroopSize, amount);
+        }
+
+        private static string BuildDistributionText(MoveTroopPopupAdapter adapter)
+        {
+            string left = adapter != null ? adapter.LeftAmount : string.Empty;
+            string right = adapter != null ? adapter.RightAmount : string.Empty;
+            return ModText.Get(
+                ModStrings.Screens.LeftRightDistribution,
+                string.IsNullOrWhiteSpace(left) ? "0" : left,
+                string.IsNullOrWhiteSpace(right) ? "0" : right);
         }
     }
 }

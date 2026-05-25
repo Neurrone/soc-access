@@ -85,7 +85,7 @@ namespace SongsOfConquestAccess.Screens
                 () => adapter != null));
             root.AddChild(new ButtonWidget(
                 "tutorial-simple-ok",
-                adapter != null ? adapter.OkLabel : ModText.Get(ModStrings.Screens.Ok),
+                ModText.Get(ModStrings.Screens.Ok),
                 () => adapter != null && adapter.ActivateOk(),
                 null,
                 () => adapter != null && adapter.IsOkAvailable(),

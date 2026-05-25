@@ -2295,12 +2295,42 @@ msgstr "æ°´è¾¹"
 #. Screens.MoveAllLeft
 msgctxt "Screens.MoveAllLeft"
 msgid "Move all left"
-msgstr "Move all left"
+msgstr "全部移到左侧"
 
 #. Screens.MoveAllRight
 msgctxt "Screens.MoveAllRight"
 msgid "Move all right"
-msgstr "Move all right"
+msgstr "全部移到右侧"
+
+#. Screens.CancelAbility
+msgctxt "Screens.CancelAbility"
+msgid "Cancel ability"
+msgstr "取消能力"
+
+#. Screens.CancelSpell
+msgctxt "Screens.CancelSpell"
+msgid "Cancel spell"
+msgstr "取消法术"
+
+#. Screens.MaxTroopSize
+msgctxt "Screens.MaxTroopSize"
+msgid "Max troop size {0}"
+msgstr "最大部队规模 {0}"
+
+#. Screens.LeftRightDistribution
+msgctxt "Screens.LeftRightDistribution"
+msgid "Left: {0}, right: {1}"
+msgstr "左侧：{0}，右侧：{1}"
+
+#. Screens.Options
+msgctxt "Screens.Options"
+msgid "Options"
+msgstr "选项"
+
+#. Scanner.SpawnPoints
+msgctxt "Scanner.SpawnPoints"
+msgid "Spawn points"
+msgstr "部署点"
 
 #. Events.Revealed
 msgctxt "Events.Revealed"

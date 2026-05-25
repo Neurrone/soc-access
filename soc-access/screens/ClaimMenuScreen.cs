@@ -2,6 +2,7 @@ using System;
 using HarmonyLib;
 using SongsOfConquest.Client.Adventure;
 using SongsOfConquestAccess.Adapters;
+using SongsOfConquestAccess.Localization;
 using SongsOfConquestAccess.UI;
 using UnityEngine;
 using Zenject;
@@ -90,7 +91,7 @@ namespace SongsOfConquestAccess.Screens
 
         private static MenuWidget BuildChoiceMenu(ClaimMenuAdapter adapter)
         {
-            MenuWidget menu = new MenuWidget("claim-menu-choices", "Choices");
+            MenuWidget menu = new MenuWidget("claim-menu-choices", ModText.Get(ModStrings.Screens.Choices));
             System.Collections.Generic.IReadOnlyList<ClaimMenuAdapter.ChoiceItem> choices = adapter.GetChoices();
             for (int i = 0; i < choices.Count; i++)
             {

@@ -160,7 +160,7 @@ namespace SongsOfConquestAccess.Adapters
 
         public string OptionsButtonLabel
         {
-            get { return FirstNonEmpty(GetFirstTooltipLine(OptionsButtonTooltip), "Options"); }
+            get { return GetFirstTooltipLine(OptionsButtonTooltip); }
         }
 
         public void FocusOptionsButton()
@@ -231,11 +231,6 @@ namespace SongsOfConquestAccess.Adapters
             return IsButtonInteractable(GetCancelSpellButton());
         }
 
-        public string CancelSpellButtonLabel
-        {
-            get { return "Cancel spell"; }
-        }
-
         public void FocusCancelSpellButton()
         {
             NativeSelectionUtility.Select(GetCancelSpellButton());
@@ -270,7 +265,7 @@ namespace SongsOfConquestAccess.Adapters
                     ? _abilityUtility.GetAbilityDefinition(current)
                     : null;
                 string label = ability != null ? Localize(ability.NameKey, null) : null;
-                return !string.IsNullOrWhiteSpace(label) ? label : "Ability";
+                return !string.IsNullOrWhiteSpace(label) ? label : string.Empty;
             }
         }
 
@@ -297,11 +292,6 @@ namespace SongsOfConquestAccess.Adapters
         public bool IsCancelAbilityButtonEnabled()
         {
             return IsButtonInteractable(GetCancelAbilityButton());
-        }
-
-        public string CancelAbilityButtonLabel
-        {
-            get { return "Cancel ability"; }
         }
 
         public void FocusCancelAbilityButton()
@@ -1074,11 +1064,6 @@ namespace SongsOfConquestAccess.Adapters
             }
 
             return string.Empty;
-        }
-
-        private static string FirstNonEmpty(string preferred, string fallback)
-        {
-            return string.IsNullOrWhiteSpace(preferred) ? fallback : preferred;
         }
 
         private static T Resolve<T>(DiContainer container) where T : class

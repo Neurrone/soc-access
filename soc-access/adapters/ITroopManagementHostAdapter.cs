@@ -26,7 +26,6 @@ namespace SongsOfConquestAccess.Adapters
         bool IsBackVisible();
         bool Back();
 
-        string CloseLabel { get; }
         bool Close();
 
         bool HasWielderArmy { get; }

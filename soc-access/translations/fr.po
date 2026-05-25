@@ -2335,12 +2335,42 @@ msgstr "Bord de l'eau"
 #. Screens.MoveAllLeft
 msgctxt "Screens.MoveAllLeft"
 msgid "Move all left"
-msgstr "Move all left"
+msgstr "Tout déplacer à gauche"
 
 #. Screens.MoveAllRight
 msgctxt "Screens.MoveAllRight"
 msgid "Move all right"
-msgstr "Move all right"
+msgstr "Tout déplacer à droite"
+
+#. Screens.CancelAbility
+msgctxt "Screens.CancelAbility"
+msgid "Cancel ability"
+msgstr "Annuler la capacité"
+
+#. Screens.CancelSpell
+msgctxt "Screens.CancelSpell"
+msgid "Cancel spell"
+msgstr "Annuler le sort"
+
+#. Screens.MaxTroopSize
+msgctxt "Screens.MaxTroopSize"
+msgid "Max troop size {0}"
+msgstr "Taille max. de la troupe {0}"
+
+#. Screens.LeftRightDistribution
+msgctxt "Screens.LeftRightDistribution"
+msgid "Left: {0}, right: {1}"
+msgstr "Gauche : {0}, droite : {1}"
+
+#. Screens.Options
+msgctxt "Screens.Options"
+msgid "Options"
+msgstr "Options"
+
+#. Scanner.SpawnPoints
+msgctxt "Scanner.SpawnPoints"
+msgid "Spawn points"
+msgstr "Points d’apparition"
 
 #. Events.Revealed
 msgctxt "Events.Revealed"

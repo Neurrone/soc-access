@@ -28,7 +28,8 @@
 - Artifact colours should now be read everywhere
 - On the adventure map, revealed announcements and reading the focused tile now respect scouting level and no longer reads full artifact names unless the game would actually show it
 - Restored reading of some decorative and effect types on tiles. This fixes walls being only read as "impassable"
-- Fix missing localizations and close button label for a reward choice screen
+- Fix missing close button label for a reward choice screen
+- Many translation string fixes
 
 ## V0.3.0
 

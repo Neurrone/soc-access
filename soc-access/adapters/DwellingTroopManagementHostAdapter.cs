@@ -33,7 +33,6 @@ namespace SongsOfConquestAccess.Adapters
         public bool IsBackVisible() { return IsUpgradePresent(); }
         public bool Back() { return _adapter != null && _adapter.BackToTop(); }
 
-        public string CloseLabel { get { return _adapter != null ? _adapter.CloseLabel : string.Empty; } }
         public bool Close() { return _adapter != null && _adapter.Close(); }
 
         public bool HasWielderArmy { get { return true; } }

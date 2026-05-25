@@ -346,7 +346,7 @@ namespace SongsOfConquestAccess.Adapters
 
         public string MoveToDestinationButtonLabel
         {
-            get { return FirstNonEmpty(GetFirstTooltipLine(MoveToDestinationButtonTooltip), "Move to destination"); }
+            get { return GetFirstTooltipLine(MoveToDestinationButtonTooltip); }
         }
 
         public void FocusMoveToDestinationButton()
@@ -803,7 +803,7 @@ namespace SongsOfConquestAccess.Adapters
 
         public string OptionsButtonLabel
         {
-            get { return FirstNonEmpty(GetFirstTooltipLine(OptionsButtonTooltip), "Options"); }
+            get { return GetFirstTooltipLine(OptionsButtonTooltip); }
         }
 
         public void FocusOptionsButton()
@@ -829,7 +829,7 @@ namespace SongsOfConquestAccess.Adapters
 
         public string GetKingdomOverviewLabel(int index)
         {
-            return FirstNonEmpty(GetFirstTooltipLine(GetKingdomOverviewTooltip(index)), GetKingdomOverviewFallbackLabel(index));
+            return GetFirstTooltipLine(GetKingdomOverviewTooltip(index));
         }
 
         public bool IsKingdomOverviewItemVisible(int index)
@@ -869,7 +869,7 @@ namespace SongsOfConquestAccess.Adapters
 
         public string BugReportButtonLabel
         {
-            get { return FirstNonEmpty(GetFirstTooltipLine(BugReportButtonTooltip), "Bug report"); }
+            get { return GetFirstTooltipLine(BugReportButtonTooltip); }
         }
 
         public void FocusBugReportButton()
@@ -1605,25 +1605,6 @@ namespace SongsOfConquestAccess.Adapters
             }
         }
 
-        private static string GetKingdomOverviewFallbackLabel(int index)
-        {
-            switch (index)
-            {
-                case 0:
-                    return "Owned entities";
-                case 1:
-                    return "Troop income";
-                case 2:
-                    return "Research";
-                case 3:
-                    return "Marketplace";
-                case 4:
-                    return "Player";
-                default:
-                    return string.Empty;
-            }
-        }
-
         private int GetTeamQueueEntryCount()
         {
             List<TeamQueueEntryBehaviour> entries = GetField<List<TeamQueueEntryBehaviour>>(TeamQueueHud, TeamQueueEntriesField);
@@ -1903,11 +1884,6 @@ namespace SongsOfConquestAccess.Adapters
             }
 
             return string.Empty;
-        }
-
-        private static string FirstNonEmpty(string preferred, string fallback)
-        {
-            return string.IsNullOrWhiteSpace(preferred) ? fallback : preferred;
         }
 
         private static IReadOnlyList<string> RemoveExactLines(IReadOnlyList<string> lines, IReadOnlyList<string> linesToRemove)

@@ -5,6 +5,7 @@ using HarmonyLib;
 using SongsOfConquest.Client.Menu.Options;
 using SongsOfConquestAccess.Adapters;
 using SongsOfConquestAccess.Input;
+using SongsOfConquestAccess.Localization;
 using SongsOfConquestAccess.UI;
 using UnityEngine;
 using Zenject;
@@ -65,7 +66,7 @@ namespace SongsOfConquestAccess.Screens
 
         private static ContainerWidget BuildRoot(OptionsMenuAdapter adapter)
         {
-            ContainerWidget root = new ContainerWidget("options-screen", "Options");
+            ContainerWidget root = new ContainerWidget("options-screen", ModText.Get(ModStrings.Screens.Options));
             if (adapter == null)
             {
                 return root;
@@ -85,7 +86,7 @@ namespace SongsOfConquestAccess.Screens
 
         private static MenuWidget BuildTabs(OptionsMenuAdapter adapter)
         {
-            MenuWidget menu = new MenuWidget("options-tabs", "Categories");
+            MenuWidget menu = new MenuWidget("options-tabs", ModText.Get(ModStrings.Screens.Categories));
             IReadOnlyList<OptionsMenuAdapter.TabItem> tabs = adapter.GetTabs();
             for (int i = 0; i < tabs.Count; i++)
             {
@@ -186,7 +187,7 @@ namespace SongsOfConquestAccess.Screens
                 menu.AddItem(new MenuItemWidget(
                     dropdown.Id + "-option-" + index,
                     () => options[index],
-                    () => dropdown.GetValue() == index ? "selected" : string.Empty,
+                    () => dropdown.GetValue() == index ? ModText.Get(ModStrings.UI.Selected) : string.Empty,
                     () => dropdown.SetValue(index),
                     () =>
                     {

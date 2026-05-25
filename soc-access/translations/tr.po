@@ -2295,12 +2295,42 @@ msgstr "Su kenarÄ±"
 #. Screens.MoveAllLeft
 msgctxt "Screens.MoveAllLeft"
 msgid "Move all left"
-msgstr "Move all left"
+msgstr "Tümünü sola taşı"
 
 #. Screens.MoveAllRight
 msgctxt "Screens.MoveAllRight"
 msgid "Move all right"
-msgstr "Move all right"
+msgstr "Tümünü sağa taşı"
+
+#. Screens.CancelAbility
+msgctxt "Screens.CancelAbility"
+msgid "Cancel ability"
+msgstr "Yeteneği iptal et"
+
+#. Screens.CancelSpell
+msgctxt "Screens.CancelSpell"
+msgid "Cancel spell"
+msgstr "Büyüyü iptal et"
+
+#. Screens.MaxTroopSize
+msgctxt "Screens.MaxTroopSize"
+msgid "Max troop size {0}"
+msgstr "Azami birlik boyutu {0}"
+
+#. Screens.LeftRightDistribution
+msgctxt "Screens.LeftRightDistribution"
+msgid "Left: {0}, right: {1}"
+msgstr "Sol: {0}, sağ: {1}"
+
+#. Screens.Options
+msgctxt "Screens.Options"
+msgid "Options"
+msgstr "Seçenekler"
+
+#. Scanner.SpawnPoints
+msgctxt "Scanner.SpawnPoints"
+msgid "Spawn points"
+msgstr "Yerleştirme noktaları"
 
 #. Events.Revealed
 msgctxt "Events.Revealed"

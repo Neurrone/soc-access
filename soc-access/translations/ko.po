@@ -2295,12 +2295,42 @@ msgstr "ë¬¼ê°€"
 #. Screens.MoveAllLeft
 msgctxt "Screens.MoveAllLeft"
 msgid "Move all left"
-msgstr "Move all left"
+msgstr "모두 왼쪽으로 이동"
 
 #. Screens.MoveAllRight
 msgctxt "Screens.MoveAllRight"
 msgid "Move all right"
-msgstr "Move all right"
+msgstr "모두 오른쪽으로 이동"
+
+#. Screens.CancelAbility
+msgctxt "Screens.CancelAbility"
+msgid "Cancel ability"
+msgstr "능력 취소"
+
+#. Screens.CancelSpell
+msgctxt "Screens.CancelSpell"
+msgid "Cancel spell"
+msgstr "주문 취소"
+
+#. Screens.MaxTroopSize
+msgctxt "Screens.MaxTroopSize"
+msgid "Max troop size {0}"
+msgstr "최대 병력 크기 {0}"
+
+#. Screens.LeftRightDistribution
+msgctxt "Screens.LeftRightDistribution"
+msgid "Left: {0}, right: {1}"
+msgstr "왼쪽: {0}, 오른쪽: {1}"
+
+#. Screens.Options
+msgctxt "Screens.Options"
+msgid "Options"
+msgstr "옵션"
+
+#. Scanner.SpawnPoints
+msgctxt "Scanner.SpawnPoints"
+msgid "Spawn points"
+msgstr "배치 지점"
 
 #. Events.Revealed
 msgctxt "Events.Revealed"

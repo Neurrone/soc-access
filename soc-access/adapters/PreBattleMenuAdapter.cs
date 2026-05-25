@@ -136,28 +136,28 @@ namespace SongsOfConquestAccess.Adapters
             get { return GetCommanderPortraitTooltip(BattleParticipantSide.Defender); }
         }
 
-        public string WithdrawButtonLabel { get { return GetButtonLabel(CancelButtonField, "Withdraw"); } }
+        public string WithdrawButtonLabel { get { return GetButtonLabel(CancelButtonField); } }
         public bool Withdraw() { return ActivateButton(CancelButtonField); }
         public void FocusWithdrawButton() { FocusButton(CancelButtonField); }
         public bool IsWithdrawButtonEnabled() { return IsButtonEnabled(CancelButtonField); }
         public bool IsWithdrawButtonVisible() { return IsButtonVisible(CancelButtonField); }
         public Tooltip WithdrawButtonTooltip { get { return GetButtonTooltip(CancelButtonField); } }
 
-        public string ManualBattleButtonLabel { get { return GetButtonLabel(BattleButtonField, "Manual battle"); } }
+        public string ManualBattleButtonLabel { get { return GetButtonLabel(BattleButtonField); } }
         public bool ManualBattle() { return ActivateButton(BattleButtonField); }
         public void FocusManualBattleButton() { FocusButton(BattleButtonField); }
         public bool IsManualBattleButtonEnabled() { return IsButtonEnabled(BattleButtonField); }
         public bool IsManualBattleButtonVisible() { return IsButtonVisible(BattleButtonField); }
         public Tooltip ManualBattleButtonTooltip { get { return GetButtonTooltip(BattleButtonField); } }
 
-        public string QuickBattleButtonLabel { get { return GetButtonLabel(QuickButtonField, "Quick battle"); } }
+        public string QuickBattleButtonLabel { get { return GetButtonLabel(QuickButtonField); } }
         public bool QuickBattle() { return ActivateButton(QuickButtonField); }
         public void FocusQuickBattleButton() { FocusButton(QuickButtonField); }
         public bool IsQuickBattleButtonEnabled() { return IsButtonEnabled(QuickButtonField); }
         public bool IsQuickBattleButtonVisible() { return IsButtonVisible(QuickButtonField); }
         public Tooltip QuickBattleButtonTooltip { get { return GetButtonTooltip(QuickButtonField); } }
 
-        public string ReadyButtonLabel { get { return GetButtonLabel(ReadyButtonField, "Ready"); } }
+        public string ReadyButtonLabel { get { return GetButtonLabel(ReadyButtonField); } }
         public bool Ready() { return ActivateButton(ReadyButtonField); }
         public void FocusReadyButton() { FocusButton(ReadyButtonField); }
         public bool IsReadyButtonEnabled() { return IsButtonEnabled(ReadyButtonField); }
@@ -196,21 +196,21 @@ namespace SongsOfConquestAccess.Adapters
 
         private static void InitializeTroopPlacementScannerCategories(ScannerSnapshot snapshot)
         {
-            ScannerCategory troops = snapshot.GetOrAddCategory("Troops");
-            troops.GetOrAddSubcategory("All");
-            troops.GetOrAddSubcategory("Friendly");
-            troops.GetOrAddSubcategory("Enemy");
+            ScannerCategory troops = snapshot.GetOrAddCategory(ModText.Get(ModStrings.Scanner.Troops));
+            troops.GetOrAddSubcategory(ModText.Get(ModStrings.Scanner.All));
+            troops.GetOrAddSubcategory(ModText.Get(ModStrings.Scanner.Friendly));
+            troops.GetOrAddSubcategory(ModText.Get(ModStrings.Scanner.Enemy));
 
-            ScannerCategory spawnPoints = snapshot.GetOrAddCategory("Spawn points");
-            spawnPoints.GetOrAddSubcategory("All");
-            spawnPoints.GetOrAddSubcategory("Friendly");
-            spawnPoints.GetOrAddSubcategory("Enemy");
+            ScannerCategory spawnPoints = snapshot.GetOrAddCategory(ModText.Get(ModStrings.Scanner.SpawnPoints));
+            spawnPoints.GetOrAddSubcategory(ModText.Get(ModStrings.Scanner.All));
+            spawnPoints.GetOrAddSubcategory(ModText.Get(ModStrings.Scanner.Friendly));
+            spawnPoints.GetOrAddSubcategory(ModText.Get(ModStrings.Scanner.Enemy));
 
-            ScannerCategory terrain = snapshot.GetOrAddCategory("Terrain");
-            terrain.GetOrAddSubcategory("Elevated ground 1");
-            terrain.GetOrAddSubcategory("Elevated ground 2");
-            terrain.GetOrAddSubcategory("Elevated ground 3");
-            terrain.GetOrAddSubcategory("Impassable terrain");
+            ScannerCategory terrain = snapshot.GetOrAddCategory(ModText.Get(ModStrings.Scanner.Terrain));
+            terrain.GetOrAddSubcategory(ModText.Get(ModStrings.Scanner.ElevatedGround, 1));
+            terrain.GetOrAddSubcategory(ModText.Get(ModStrings.Scanner.ElevatedGround, 2));
+            terrain.GetOrAddSubcategory(ModText.Get(ModStrings.Scanner.ElevatedGround, 3));
+            terrain.GetOrAddSubcategory(ModText.Get(ModStrings.Scanner.ImpassableTerrain));
         }
 
         private void AddTroopPlacementTroopScannerResults(ScannerSnapshot snapshot, TroopPlacementSnapshot placement)
@@ -235,12 +235,15 @@ namespace SongsOfConquestAccess.Adapters
                     {
                         ScannerResult result = new ScannerResult(
                             ScannerTileKey("terrain:elevated:" + elevation, tile.Point),
-                            "elevated ground, height " + elevation,
+                            ModText.Get(ModStrings.Spatial.ElevatedGroundHeight, elevation),
                             tile.Point)
                         {
                             Kind = ScannerResultKind.TerrainPoint
                         };
-                        snapshot.Add("Terrain", "Elevated ground " + elevation, result);
+                        snapshot.Add(
+                            ModText.Get(ModStrings.Scanner.Terrain),
+                            ModText.Get(ModStrings.Scanner.ElevatedGround, elevation),
+                            result);
                     }
                 }
             }
@@ -251,12 +254,15 @@ namespace SongsOfConquestAccess.Adapters
                 {
                     ScannerResult result = new ScannerResult(
                         ScannerTileKey("terrain:impassable", tile.Point),
-                        "impassable",
+                        ModText.Get(ModStrings.Spatial.Impassable),
                         tile.Point)
                     {
                         Kind = ScannerResultKind.TerrainPoint
                     };
-                    snapshot.Add("Terrain", "Impassable terrain", result);
+                    snapshot.Add(
+                        ModText.Get(ModStrings.Scanner.Terrain),
+                        ModText.Get(ModStrings.Scanner.ImpassableTerrain),
+                        result);
                 }
             }
         }
@@ -269,10 +275,16 @@ namespace SongsOfConquestAccess.Adapters
                 {
                     ScannerResult result = new ScannerResult(
                         ScannerTileKey(own ? "troop:friendly" : "troop:enemy", tile.Point),
-                        FirstNonEmpty(tile.TroopLabel, "Unknown troop"),
+                        string.IsNullOrWhiteSpace(tile.TroopLabel) ? ModText.Get(ModStrings.Combat.UnknownTroop) : tile.TroopLabel,
                         tile.Point);
-                    snapshot.Add("Troops", "All", CloneResult(result));
-                    snapshot.Add("Troops", own ? "Friendly" : "Enemy", result);
+                    snapshot.Add(
+                        ModText.Get(ModStrings.Scanner.Troops),
+                        ModText.Get(ModStrings.Scanner.All),
+                        CloneResult(result));
+                    snapshot.Add(
+                        ModText.Get(ModStrings.Scanner.Troops),
+                        ModText.Get(own ? ModStrings.Scanner.Friendly : ModStrings.Scanner.Enemy),
+                        result);
                 }
             }
         }
@@ -285,10 +297,16 @@ namespace SongsOfConquestAccess.Adapters
                 {
                     ScannerResult result = new ScannerResult(
                         ScannerTileKey(own ? "spawn:friendly" : "spawn:enemy", tile.Point),
-                        "spawn point",
+                        ModText.Get(ModStrings.Spatial.SpawnPoint),
                         tile.Point);
-                    snapshot.Add("Spawn points", "All", CloneResult(result));
-                    snapshot.Add("Spawn points", own ? "Friendly" : "Enemy", result);
+                    snapshot.Add(
+                        ModText.Get(ModStrings.Scanner.SpawnPoints),
+                        ModText.Get(ModStrings.Scanner.All),
+                        CloneResult(result));
+                    snapshot.Add(
+                        ModText.Get(ModStrings.Scanner.SpawnPoints),
+                        ModText.Get(own ? ModStrings.Scanner.Friendly : ModStrings.Scanner.Enemy),
+                        result);
                 }
             }
         }
@@ -540,10 +558,9 @@ namespace SongsOfConquestAccess.Adapters
             return renderer.PointToWorld(new int2(tile.x, tile.y), out ignored);
         }
 
-        private string GetButtonLabel(FieldInfo field, string fallbackLabel)
+        private string GetButtonLabel(FieldInfo field)
         {
-            string label = MenuButtonTextUtility.GetStandardButtonLabel(GetField<UIButton>(field));
-            return string.IsNullOrWhiteSpace(label) ? fallbackLabel : label;
+            return MenuButtonTextUtility.GetStandardButtonLabel(GetField<UIButton>(field));
         }
 
         private bool ActivateButton(FieldInfo field)
@@ -726,11 +743,6 @@ namespace SongsOfConquestAccess.Adapters
         private static bool IsOwnSide(TroopPlacementSnapshot snapshot, BattleSide side)
         {
             return snapshot != null && snapshot.OwnSide.HasValue && snapshot.OwnSide.Value == side;
-        }
-
-        private static string FirstNonEmpty(string preferred, string fallback)
-        {
-            return string.IsNullOrWhiteSpace(preferred) ? fallback : preferred;
         }
 
         private bool ShouldShowSide(BattleSide side)

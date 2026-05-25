@@ -64,7 +64,7 @@ namespace SongsOfConquestAccess.Adapters
                 int index = i;
                 result.Add(new TabItem(
                     "options-tab-" + index,
-                    () => GetButtonLabel(button, "Category " + (index + 1)),
+                    () => GetButtonLabel(button),
                     () => SelectTab(index),
                     () => IsActive(button as Component)));
             }
@@ -132,7 +132,7 @@ namespace SongsOfConquestAccess.Adapters
 
             return new ButtonItem(
                 "options-ok",
-                () => GetButtonLabel(button, "OK"),
+                () => GetButtonLabel(button),
                 () => NativeSelectionUtility.Click(button),
                 () => NativeSelectionUtility.Select(button as Component),
                 () => button.Active && button.Interactable,
@@ -285,7 +285,7 @@ namespace SongsOfConquestAccess.Adapters
                     component.transform,
                     new ButtonItem(
                         "options-button-" + index,
-                        () => GetButtonLabel(button, "Button"),
+                        () => GetButtonLabel(button),
                         () => NativeSelectionUtility.Click(button),
                         () => NativeSelectionUtility.Select(component),
                         () => button.Active && button.Interactable,
@@ -309,13 +309,13 @@ namespace SongsOfConquestAccess.Adapters
             return owner != null && field != null ? field.GetValue(owner) as T : null;
         }
 
-        private static string GetButtonLabel(IUIButton button, string fallback)
+        private static string GetButtonLabel(IUIButton button)
         {
             UIButton concrete = button as UIButton;
             string label = concrete != null
                 ? MenuButtonTextUtility.GetAllVisibleText(concrete)
                 : SpeechTextSanitizer.Normalize(button != null ? button.Text : null);
-            return string.IsNullOrWhiteSpace(label) ? fallback : label;
+            return label;
         }
 
         private static string GetToggleLabel(IUIToggle toggle)

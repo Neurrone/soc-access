@@ -56,27 +56,16 @@ namespace SongsOfConquestAccess.Adapters
             get { return GetText(GetField<IUITextMesh>(HeaderTextField)); }
         }
 
-        public string MoveAllLeftLabel
-        {
-            get { return ModText.Get(ModStrings.Screens.MoveAllLeft); }
-        }
-
-        public string MoveAllRightLabel
-        {
-            get { return ModText.Get(ModStrings.Screens.MoveAllRight); }
-        }
-
         public string SplitEqualLabel
         {
             get { return GetFirstTooltipLine(SplitEqualTooltip); }
         }
 
-        public string MaxTroopSize
+        public string MaxTroopSizeAmount
         {
             get
             {
-                string amount = GetText(GetField<IUITextMesh>(AmountTextField));
-                return string.IsNullOrWhiteSpace(amount) ? string.Empty : "Max troop size " + amount;
+                return GetText(GetField<IUITextMesh>(AmountTextField));
             }
         }
 
@@ -185,12 +174,14 @@ namespace SongsOfConquestAccess.Adapters
             NativeTooltipUtility.HideTooltip();
         }
 
-        public string GetDistributionText()
+        public string LeftAmount
         {
-            string left = GetText(GetField<IUITextMesh>(LeftPortraitAmountField));
-            string right = GetText(GetField<IUITextMesh>(RightPortraitAmountField));
-            return "Left: " + (string.IsNullOrWhiteSpace(left) ? "0" : left)
-                + ", right: " + (string.IsNullOrWhiteSpace(right) ? "0" : right);
+            get { return GetText(GetField<IUITextMesh>(LeftPortraitAmountField)); }
+        }
+
+        public string RightAmount
+        {
+            get { return GetText(GetField<IUITextMesh>(RightPortraitAmountField)); }
         }
 
         public int GetSliderValue()

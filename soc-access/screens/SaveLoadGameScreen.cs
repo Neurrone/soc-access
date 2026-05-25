@@ -16,6 +16,7 @@ namespace SongsOfConquestAccess.Screens
     {
         private const string EntriesMenuId = "save-load-entries";
         private const string TabsMenuId = "save-load-tabs";
+        private const string CancelButtonId = "save-load-cancel";
 
         private static readonly PropertyInfo InstallerContainerProperty =
             AccessTools.Property(typeof(SaveLoadGameMenuInstaller), "Container");
@@ -224,9 +225,13 @@ namespace SongsOfConquestAccess.Screens
                 return;
             }
 
+            Func<string> getLabel = button.Id == CancelButtonId
+                ? (Func<string>)(() => ModText.Get(ModStrings.Actions.Cancel))
+                : button.GetLabel;
+
             root.AddChild(new ButtonWidget(
                 button.Id,
-                button.GetLabel,
+                getLabel,
                 button.Activate,
                 button.Focus,
                 button.IsEnabled,

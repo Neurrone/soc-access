@@ -384,6 +384,8 @@ namespace SongsOfConquestAccess.Localization
             public static readonly ModString Close = new ModString("Screens.Close", "Close");
             public static readonly ModString Combat = new ModString("Screens.Combat", "Combat");
             public static readonly ModString CreationSpells = new ModString("Screens.CreationSpells", "Creation spells");
+            public static readonly ModString CancelAbility = new ModString("Screens.CancelAbility", "Cancel ability");
+            public static readonly ModString CancelSpell = new ModString("Screens.CancelSpell", "Cancel spell");
             public static readonly ModString CurrentTroop = new ModString("Screens.CurrentTroop", "Current troop, {0}");
             public static readonly ModString CombatPortraitDetail = new ModString("Screens.CombatPortraitDetail", "{0}, {1}, level {2}");
             public static readonly ModString Defender = new ModString("Screens.Defender", "Defender");
@@ -407,8 +409,10 @@ namespace SongsOfConquestAccess.Localization
             public static readonly ModString MissingBuilding = new ModString("Screens.MissingBuilding", "missing building");
             public static readonly ModString ModSettings = new ModString("Screens.ModSettings", "Mod settings");
             public static readonly ModString ModifierCategoryTabs = new ModString("Screens.ModifierCategoryTabs", "Modifier category tabs");
+            public static readonly ModString MaxTroopSize = new ModString("Screens.MaxTroopSize", "Max troop size {0}");
             public static readonly ModString MoveAllLeft = new ModString("Screens.MoveAllLeft", "Move all left");
             public static readonly ModString MoveAllRight = new ModString("Screens.MoveAllRight", "Move all right");
+            public static readonly ModString LeftRightDistribution = new ModString("Screens.LeftRightDistribution", "Left: {0}, right: {1}");
             public static readonly ModString MultiEssenceSpells = new ModString("Screens.MultiEssenceSpells", "Multi-essence spells");
             public static readonly ModString NamedArmy = new ModString("Screens.NamedArmy", "{0} army");
             public static readonly ModString NamedLevel = new ModString("Screens.NamedLevel", "{0}, level {1}");
@@ -423,6 +427,7 @@ namespace SongsOfConquestAccess.Localization
             public static readonly ModString ObjectiveMarkerSomeDistance = new ModString("Screens.ObjectiveMarkerSomeDistance", "some distance");
             public static readonly ModString Ok = new ModString("Screens.Ok", "OK");
             public static readonly ModString OrderSpells = new ModString("Screens.OrderSpells", "Order spells");
+            public static readonly ModString Options = new ModString("Screens.Options", "Options");
             public static readonly ModString PostAdventureResult = new ModString("Screens.PostAdventureResult", "Post adventure result");
             public static readonly ModString PostAdventureStats = new ModString("Screens.PostAdventureStats", "Post adventure stats");
             public static readonly ModString Penalties = new ModString("Screens.Penalties", "Penalties");
@@ -533,6 +538,7 @@ namespace SongsOfConquestAccess.Localization
             public static readonly ModString South = new ModString("Scanner.South", "south");
             public static readonly ModString Southeast = new ModString("Scanner.Southeast", "southeast");
             public static readonly ModString Southwest = new ModString("Scanner.Southwest", "southwest");
+            public static readonly ModString SpawnPoints = new ModString("Scanner.SpawnPoints", "Spawn points");
             public static readonly ModString Teleport = new ModString("Scanner.Teleport", "Teleport");
             public static readonly ModString TemperateTrees = new ModString("Scanner.TemperateTrees", "Temperate trees");
             public static readonly ModPluralString TemperateTreeTileCount = new ModPluralString("Scanner.TemperateTreeTileCount", "{0} temperate tree tile", "{0} temperate tree tiles");

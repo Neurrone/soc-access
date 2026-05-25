@@ -63,7 +63,7 @@ namespace SongsOfConquestAccess.Adapters
                     return title;
                 }
 
-                return Mode == SaveLoadGameMenu.Mode.Save ? "Save game" : "Load game";
+                return string.Empty;
             }
         }
 
@@ -230,7 +230,7 @@ namespace SongsOfConquestAccess.Adapters
             get
             {
                 SaveLoadGameMenu.Settings settings = Settings;
-                return BuildButton("save-load-save", settings != null ? settings.SaveGameButton : null, "Save");
+                return BuildButton("save-load-save", settings != null ? settings.SaveGameButton : null);
             }
         }
 
@@ -239,7 +239,7 @@ namespace SongsOfConquestAccess.Adapters
             get
             {
                 SaveLoadGameMenu.Settings settings = Settings;
-                return BuildEnabledOnlyButton("save-load-load", settings != null ? settings.LoadGameButton : null, "Load");
+                return BuildEnabledOnlyButton("save-load-load", settings != null ? settings.LoadGameButton : null);
             }
         }
 
@@ -248,7 +248,7 @@ namespace SongsOfConquestAccess.Adapters
             get
             {
                 SaveLoadGameMenu.Settings settings = Settings;
-                return BuildEnabledOnlyButton("save-load-load-hotseat", settings != null ? settings.LoadAsHotseatGameButton : null, "Load as hotseat");
+                return BuildEnabledOnlyButton("save-load-load-hotseat", settings != null ? settings.LoadAsHotseatGameButton : null);
             }
         }
 
@@ -257,7 +257,7 @@ namespace SongsOfConquestAccess.Adapters
             get
             {
                 SaveLoadGameMenu.Settings settings = Settings;
-                return BuildEnabledOnlyButton("save-load-load-online", settings != null ? settings.LoadAsOnlineGameButton : null, "Load as online");
+                return BuildEnabledOnlyButton("save-load-load-online", settings != null ? settings.LoadAsOnlineGameButton : null);
             }
         }
 
@@ -266,7 +266,7 @@ namespace SongsOfConquestAccess.Adapters
             get
             {
                 SaveLoadGameMenu.Settings settings = Settings;
-                return BuildButton("save-load-delete", settings != null ? settings.DeleteSaveButton : null, "Delete save");
+                return BuildButton("save-load-delete", settings != null ? settings.DeleteSaveButton : null);
             }
         }
 
@@ -278,7 +278,7 @@ namespace SongsOfConquestAccess.Adapters
                 UIButton button = settings != null ? settings.ExitButton : null;
                 return new ButtonItem(
                     "save-load-cancel",
-                    () => GetButtonLabel(button, "Cancel"),
+                    () => GetButtonLabel(button),
                     Close,
                     () => FocusButton(button),
                     () => true,
@@ -291,22 +291,22 @@ namespace SongsOfConquestAccess.Adapters
             get { return SettingsField != null && _menu != null ? SettingsField.GetValue(_menu) as SaveLoadGameMenu.Settings : null; }
         }
 
-        private ButtonItem BuildButton(string id, UIButton button, string fallback)
+        private ButtonItem BuildButton(string id, UIButton button)
         {
             return new ButtonItem(
                 id,
-                () => GetButtonLabel(button, fallback),
+                () => GetButtonLabel(button),
                 () => ActivateButton(button),
                 () => FocusButton(button),
                 () => button != null && button.Active && button.Interactable,
                 () => MenuButtonAdapterBase.IsButtonVisible(button));
         }
 
-        private ButtonItem BuildEnabledOnlyButton(string id, UIButton button, string fallback)
+        private ButtonItem BuildEnabledOnlyButton(string id, UIButton button)
         {
             return new ButtonItem(
                 id,
-                () => GetButtonLabel(button, fallback),
+                () => GetButtonLabel(button),
                 () => ActivateButton(button),
                 () => FocusButton(button),
                 () => button != null && button.Active && button.Interactable,
@@ -316,31 +316,14 @@ namespace SongsOfConquestAccess.Adapters
                     && MenuButtonAdapterBase.IsButtonVisible(button));
         }
 
-        private static string GetButtonLabel(UIButton button, string fallback)
+        private static string GetButtonLabel(UIButton button)
         {
-            string label = MenuButtonTextUtility.GetAllVisibleText(button);
-            return string.IsNullOrWhiteSpace(label) ? fallback : label;
+            return MenuButtonTextUtility.GetAllVisibleText(button);
         }
 
         private static string GetTabLabel(int index, UIButton button)
         {
-            string label = GetButtonLabel(button, string.Empty);
-            if (!string.IsNullOrWhiteSpace(label))
-            {
-                return label;
-            }
-
-            switch (index)
-            {
-                case 0:
-                    return "Single player";
-                case 1:
-                    return "Online";
-                case 2:
-                    return "Hotseat";
-                default:
-                    return "Category " + (index + 1);
-            }
+            return GetButtonLabel(button);
         }
 
         private static bool ActivateButton(UIButton button)

@@ -3,7 +3,6 @@ using SongsOfConquest.Client.Gamestate.Facade;
 using SongsOfConquest.Common;
 using SongsOfConquest.Common.Gamestate;
 using SongsOfConquest.Common.Gamestate.Facade;
-using SongsOfConquestAccess.Localization;
 
 namespace SongsOfConquestAccess.Adapters
 {
@@ -35,7 +34,6 @@ namespace SongsOfConquestAccess.Adapters
         public bool IsBackVisible() { return IsDraftPresent() || IsUpgradePresent(); }
         public bool Back() { return _adapter != null && _adapter.BackToTop(); }
 
-        public string CloseLabel { get { return ModText.Get(ModStrings.Screens.Close); } }
         public bool Close() { return _adapter != null && _adapter.Close(); }
 
         public bool HasWielderArmy { get { return false; } }

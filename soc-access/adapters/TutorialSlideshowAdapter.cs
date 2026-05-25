@@ -73,15 +73,6 @@ namespace SongsOfConquestAccess.Adapters
             get { return GetLocalizedText("Tutorial/TutorialPopup/ShowTutorialCheckbox", "Show tutorials"); }
         }
 
-        public string CloseLabel
-        {
-            get
-            {
-                string label = MenuButtonTextUtility.GetDirectButtonText(CloseButtonRef(_menu));
-                return string.IsNullOrWhiteSpace(label) ? "Close" : label;
-            }
-        }
-
         public bool IsPreviousAvailable()
         {
             return IsButtonAvailable(PageLeftButtonRef(_menu));

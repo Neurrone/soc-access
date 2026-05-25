@@ -420,7 +420,7 @@ namespace SongsOfConquestAccess.Screens
                 isVisible: adapter.Hud.IsTargetingInstructionVisible));
             root.AddChild(new ButtonWidget(
                 "combat-cancel-spell",
-                () => adapter.Hud.CancelSpellButtonLabel,
+                () => ModText.Get(ModStrings.Screens.CancelSpell),
                 adapter.Hud.ClickCancelSpellButton,
                 adapter.Hud.FocusCancelSpellButton,
                 adapter.Hud.IsCancelSpellButtonEnabled,
@@ -428,7 +428,7 @@ namespace SongsOfConquestAccess.Screens
                 () => adapter.Hud.CancelSpellButtonTooltip));
             root.AddChild(new ButtonWidget(
                 "combat-cancel-ability",
-                () => adapter.Hud.CancelAbilityButtonLabel,
+                () => ModText.Get(ModStrings.Screens.CancelAbility),
                 () => ActivateCancelAbilityButton(adapter),
                 adapter.Hud.FocusCancelAbilityButton,
                 adapter.Hud.IsCancelAbilityButtonEnabled,
