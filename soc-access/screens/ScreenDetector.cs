@@ -740,13 +740,6 @@ namespace SongsOfConquestAccess.Screens
             return Push(screen, "combat ready");
         }
 
-        public void OnCombatClosed()
-        {
-            _battleSceneInstaller = null;
-            _screenManager.Pop<CombatScreen>("combat closed");
-            CombatEventNarrator.Reset();
-        }
-
         public void OnSpellbookReady(SpellBook spellbook)
         {
             SpellbookScreen screen = new SpellbookScreen(new SpellbookAdapter(spellbook));
@@ -762,6 +755,18 @@ namespace SongsOfConquestAccess.Screens
         public void OnSpellbookClosed(SpellBook spellbook)
         {
             _screenManager.Pop<SpellbookScreen>("spellbook closed");
+        }
+
+        public void OnPostBattleResultOpening()
+        {
+            _battleSceneInstaller = null;
+            if (_screenManager.Contains<CombatScreen>())
+            {
+                _screenManager.Remove<CombatScreen>("post battle result opening");
+                SocAccessPlugin.Instance?.LogInfo("ScreenDetector removed CombatScreen before post battle result");
+            }
+
+            CombatEventNarrator.Reset();
         }
 
         public void OnPostBattleResultReady(AdventureBattleMenu battleMenu)

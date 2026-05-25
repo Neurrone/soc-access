@@ -20,6 +20,8 @@
 
   After: Zone of control: 15 Oathbound at 9, 6. Movement range: 59 Plague Rats at 6, 8, 19 Oathbound at 7, 4, 5 Spectres at 11.5, 3."
 
+- Fixed combat screens not being properly cleaned up if doing a quick battle, followed by a manual battle. This was causing the hotkey to read resources out of combat to fail
+
 ## V0.3.0
 
 - Added `Ctrl+f` command on the adventure map grid to search all scanner categories

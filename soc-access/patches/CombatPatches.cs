@@ -99,14 +99,11 @@ namespace SongsOfConquestAccess
             CombatEventNarrator.NotifyBacteriaAddedStarted(troopId, localizedText);
         }
 
-        [HarmonyPatch(typeof(BattleResultMenu), "HandleOutcome")]
+        [HarmonyPatch(typeof(AdventureBattleMenu), "Open", new[] { typeof(IBattleResult) })]
         [HarmonyPrefix]
-        private static void BattleResultMenuHandleOutcomePrefix(BattleOutcome outcome)
+        private static void AdventureBattleMenuOpenPostBattlePrefix()
         {
-            if (outcome != BattleOutcome.Inconclusive)
-            {
-                SocAccessPlugin.Instance?.ScreenDetector?.OnCombatClosed();
-            }
+            SocAccessPlugin.Instance?.ScreenDetector?.OnPostBattleResultOpening();
         }
 
         [HarmonyPatch(typeof(AdventureBattleMenu), "Open", new[] { typeof(IBattleResult) })]
