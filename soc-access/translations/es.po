@@ -1467,6 +1467,16 @@ msgctxt "Combat.EssenceAmount"
 msgid "+{0} {1} essence"
 msgstr "+{0} esencia de {1}"
 
+#. Combat.EssenceAmountCompact
+msgctxt "Combat.EssenceAmountCompact"
+msgid "+{0} {1}"
+msgstr "+{0} {1}"
+
+#. Combat.EssenceAmounts
+msgctxt "Combat.EssenceAmounts"
+msgid "{0} essence"
+msgstr "{0} de esencia"
+
 #. Combat.ExplosiveBarrel
 msgctxt "Combat.ExplosiveBarrel"
 msgid "explosive barrel"
@@ -2422,6 +2432,11 @@ msgstr "tropas enemigas cuerpo a cuerpo"
 msgctxt "Combat.EnemyRangedTroops"
 msgid "enemy ranged troops"
 msgstr "tropas enemigas a distancia"
+
+#. Combat.WielderEssenceGenerated
+msgctxt "Combat.WielderEssenceGenerated"
+msgid "{0}: {1}"
+msgstr "{0}: {1}"
 
 #. Combat.YourMeleeTroops
 msgctxt "Combat.YourMeleeTroops"

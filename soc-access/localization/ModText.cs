@@ -129,6 +129,41 @@ namespace SongsOfConquestAccess.Localization
             return Get(localization, ModStrings.Common.ListFinal, text, nonEmptyParts[nonEmptyParts.Count - 1]);
         }
 
+        public static string JoinListWithCommas(IReadOnlyList<string> parts)
+        {
+            return JoinListWithCommas(GetCurrentLocalization(), parts);
+        }
+
+        public static string JoinListWithCommas(ILocalizationHandler localization, IReadOnlyList<string> parts)
+        {
+            if (parts == null || parts.Count == 0)
+            {
+                return string.Empty;
+            }
+
+            List<string> nonEmptyParts = new List<string>();
+            for (int i = 0; i < parts.Count; i++)
+            {
+                if (!string.IsNullOrWhiteSpace(parts[i]))
+                {
+                    nonEmptyParts.Add(parts[i]);
+                }
+            }
+
+            if (nonEmptyParts.Count == 0)
+            {
+                return string.Empty;
+            }
+
+            string text = nonEmptyParts[0];
+            for (int i = 1; i < nonEmptyParts.Count; i++)
+            {
+                text = Get(localization, ModStrings.Common.ListSeparator, text, nonEmptyParts[i]);
+            }
+
+            return text;
+        }
+
         public static string FormatPossessiveName(string name, ModString emptyFallback)
         {
             return FormatPossessiveName(GetCurrentLocalization(), name, emptyFallback);

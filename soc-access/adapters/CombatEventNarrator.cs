@@ -33,6 +33,9 @@ namespace SongsOfConquestAccess.Adapters
         private static bool _flushPendingEventsScheduled;
         private static CombatAdapter _activeAdapter;
         private static int _bacteriaDiagnosticLogCount;
+        private static bool _wielderEssenceCaptureActive;
+        private static readonly Dictionary<int, WielderEssenceGeneration> CapturedWielderEssence =
+            new Dictionary<int, WielderEssenceGeneration>();
 
         public static void HandleResponse(ICommandResponse response)
         {
@@ -103,6 +106,8 @@ namespace SongsOfConquestAccess.Adapters
             _flushPendingEventsScheduled = false;
             _activeAdapter = null;
             _bacteriaDiagnosticLogCount = 0;
+            _wielderEssenceCaptureActive = false;
+            CapturedWielderEssence.Clear();
         }
 
         public static void SetActiveAdapter(CombatAdapter adapter)
@@ -142,6 +147,12 @@ namespace SongsOfConquestAccess.Adapters
 
         private static void EnqueueResponse(ICommandResponse response, CombatAdapter adapter)
         {
+            if (response is InitiateBattleCommand.Response)
+            {
+                BeginWielderEssenceCapture();
+                return;
+            }
+
             MoveBattleTroopCommand.Response move = response as MoveBattleTroopCommand.Response;
             if (move != null)
             {
@@ -180,6 +191,7 @@ namespace SongsOfConquestAccess.Adapters
             if (response is NewBattleRoundCommand.Response)
             {
                 int round = adapter.GetCurrentRound() + 1;
+                BeginWielderEssenceCapture();
                 Enqueue(CombatNarrationItem.Create(
                     CombatNarrationItemKind.NewRound,
                     new NewRoundEvent(round)));
@@ -264,6 +276,13 @@ namespace SongsOfConquestAccess.Adapters
             if (modifier != null)
             {
                 EnqueueBacteriaModifierApplied(modifier, adapter);
+                return;
+            }
+
+            AddEssenceToWalletCommand.Response addEssence = response as AddEssenceToWalletCommand.Response;
+            if (addEssence != null)
+            {
+                TryCaptureWielderEssence(addEssence, adapter);
                 return;
             }
 
@@ -607,6 +626,70 @@ namespace SongsOfConquestAccess.Adapters
             Planner.Enqueue(pending);
         }
 
+        private static void BeginWielderEssenceCapture()
+        {
+            _wielderEssenceCaptureActive = true;
+            CapturedWielderEssence.Clear();
+        }
+
+        private static void TryCaptureWielderEssence(AddEssenceToWalletCommand.Response response, CombatAdapter adapter)
+        {
+            if (!_wielderEssenceCaptureActive || response == null || adapter == null)
+            {
+                return;
+            }
+
+            int expectedAmount = adapter.GetCommanderGeneratedEssenceAmount(response.CommanderId, response.EssenceType);
+            if (expectedAmount <= 0 || expectedAmount != response.EssenceAmount)
+            {
+                return;
+            }
+
+            WielderEssenceGeneration generation;
+            if (!CapturedWielderEssence.TryGetValue(response.CommanderId, out generation))
+            {
+                generation = new WielderEssenceGeneration(response.CommanderId);
+                CapturedWielderEssence[response.CommanderId] = generation;
+            }
+
+            generation.Add(response.EssenceType, response.EssenceAmount);
+        }
+
+        private static void FlushCapturedWielderEssence(CombatAdapter adapter)
+        {
+            if (!_wielderEssenceCaptureActive)
+            {
+                return;
+            }
+
+            _wielderEssenceCaptureActive = false;
+            if (adapter == null || CapturedWielderEssence.Count == 0)
+            {
+                CapturedWielderEssence.Clear();
+                return;
+            }
+
+            foreach (WielderEssenceGeneration generation in CapturedWielderEssence.Values)
+            {
+                if (!generation.HasEssence)
+                {
+                    continue;
+                }
+
+                Enqueue(CombatNarrationItem.Direct(
+                    CombatNarrationItemKind.WielderEssenceGenerated,
+                    new WielderEssenceGeneratedEvent(
+                        adapter.CreateCommanderRef(generation.CommanderId),
+                        generation.Order,
+                        generation.Creation,
+                        generation.Chaos,
+                        generation.Arcana,
+                        generation.Destruction)));
+            }
+
+            CapturedWielderEssence.Clear();
+        }
+
         private static void EnqueueBacteriaSummary(CombatNarrationItem pending, CombatAdapter adapter)
         {
             Planner.EnqueueBacteriaSummary(pending, CreateNarrationSnapshot(adapter));
@@ -639,6 +722,7 @@ namespace SongsOfConquestAccess.Adapters
 
         private static void FlushPendingEvents()
         {
+            FlushCapturedWielderEssence(GetAdapter());
             if (!Planner.HasPendingEvents)
             {
                 return;
@@ -884,6 +968,54 @@ namespace SongsOfConquestAccess.Adapters
             }
 
             AccessibilityEventBus.Publish(accessibilityEvent);
+        }
+
+        private sealed class WielderEssenceGeneration
+        {
+            private readonly HashSet<EssenceType> _capturedTypes = new HashSet<EssenceType>();
+
+            public WielderEssenceGeneration(int commanderId)
+            {
+                CommanderId = commanderId;
+            }
+
+            public int CommanderId { get; private set; }
+            public int Order { get; private set; }
+            public int Creation { get; private set; }
+            public int Chaos { get; private set; }
+            public int Arcana { get; private set; }
+            public int Destruction { get; private set; }
+            public bool HasEssence
+            {
+                get { return Order > 0 || Creation > 0 || Chaos > 0 || Arcana > 0 || Destruction > 0; }
+            }
+
+            public void Add(EssenceType essenceType, int amount)
+            {
+                if (!_capturedTypes.Add(essenceType))
+                {
+                    return;
+                }
+
+                switch (essenceType)
+                {
+                    case EssenceType.Order:
+                        Order = amount;
+                        break;
+                    case EssenceType.Creation:
+                        Creation = amount;
+                        break;
+                    case EssenceType.Chaos:
+                        Chaos = amount;
+                        break;
+                    case EssenceType.Arcana:
+                        Arcana = amount;
+                        break;
+                    case EssenceType.Destruction:
+                        Destruction = amount;
+                        break;
+                }
+            }
         }
 
     }

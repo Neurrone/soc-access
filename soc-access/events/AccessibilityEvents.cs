@@ -57,6 +57,7 @@ namespace SongsOfConquestAccess.Events
             public const string BacteriaRemovedSummary = "combat.bacteria.removed_summary";
             public const string BacteriaModifierSummary = "combat.bacteria.modifier_summary";
             public const string EssenceGenerated = "combat.essence.generated";
+            public const string WielderEssenceGenerated = "combat.wielder.essence.generated";
             public const string TroopCreated = "combat.troop.created";
             public const string MapEntityCreated = "combat.map_entity.created";
             public const string MapEntityDestroyed = "combat.map_entity.destroyed";

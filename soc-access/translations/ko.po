@@ -1457,6 +1457,16 @@ msgctxt "Combat.EssenceAmount"
 msgid "+{0} {1} essence"
 msgstr "+{0} {1} ì •ìˆ˜"
 
+#. Combat.EssenceAmountCompact
+msgctxt "Combat.EssenceAmountCompact"
+msgid "+{0} {1}"
+msgstr "+{0} {1}"
+
+#. Combat.EssenceAmounts
+msgctxt "Combat.EssenceAmounts"
+msgid "{0} essence"
+msgstr "{0} 정수"
+
 #. Combat.ExplosiveBarrel
 msgctxt "Combat.ExplosiveBarrel"
 msgid "explosive barrel"
@@ -2382,6 +2392,11 @@ msgstr "적 근접 부대"
 msgctxt "Combat.EnemyRangedTroops"
 msgid "enemy ranged troops"
 msgstr "적 원거리 부대"
+
+#. Combat.WielderEssenceGenerated
+msgctxt "Combat.WielderEssenceGenerated"
+msgid "{0}: {1}"
+msgstr "{0}: {1}"
 
 #. Combat.YourMeleeTroops
 msgctxt "Combat.YourMeleeTroops"

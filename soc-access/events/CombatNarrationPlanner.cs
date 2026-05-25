@@ -699,6 +699,7 @@ namespace SongsOfConquestAccess.Events
         BacteriaRemoved,
         BacteriaModifierApplied,
         EssenceGenerated,
+        WielderEssenceGenerated,
         TroopCreated,
         MapEntityCreated,
         MapEntityDestroyed,

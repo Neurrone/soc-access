@@ -16,6 +16,8 @@
   - When moving from a high ground tile to another tile that is on high ground, don't say that the high ground effect was added and then removed
   - When casting Acid Cloud, don't announce individual acid clouds appearing on each tile
   - Fixed more cases where the casting of the spell was read after narration of its effects
+  - Shorten essence gain notifications for units that generate multiple types of essence. "+1 order essence and +1 arcana essence" would now be read as "+1 order, +1 arcana essence"
+  - Read wielder essence generation at the start of their turn. Due to game limitations, this works from the second round.
 - Shorten combat influence readouts.
 
   Before: "in movement range of 59 enemy Plague Rats at 6, 8, zone of control and movement range of 15 enemy Oathbound at 9, 6, movement range of 19 enemy Oathbound at 7, 4, movement range of 5 enemy Spectres at 11.5, 3."

@@ -1099,6 +1099,16 @@ msgctxt "Combat.EssenceAmount"
 msgid "+{0} {1} essence"
 msgstr ""
 
+#. Combat.EssenceAmountCompact
+msgctxt "Combat.EssenceAmountCompact"
+msgid "+{0} {1}"
+msgstr ""
+
+#. Combat.EssenceAmounts
+msgctxt "Combat.EssenceAmounts"
+msgid "{0} essence"
+msgstr ""
+
 #. Combat.ExplosiveBarrel
 msgctxt "Combat.ExplosiveBarrel"
 msgid "explosive barrel"
@@ -1272,6 +1282,11 @@ msgstr ""
 #. Combat.Wielder
 msgctxt "Combat.Wielder"
 msgid "wielder"
+msgstr ""
+
+#. Combat.WielderEssenceGenerated
+msgctxt "Combat.WielderEssenceGenerated"
+msgid "{0}: {1}"
 msgstr ""
 
 #. Combat.YourMeleeTroops

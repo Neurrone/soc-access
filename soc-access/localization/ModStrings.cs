@@ -253,6 +253,8 @@ namespace SongsOfConquestAccess.Localization
             public static readonly ModString EnemyTroop = new ModString("Combat.EnemyTroop", "{0} enemy {1}");
             public static readonly ModString EnemyTroops = new ModString("Combat.EnemyTroops", "enemy troops");
             public static readonly ModString EssenceAmount = new ModString("Combat.EssenceAmount", "+{0} {1} essence");
+            public static readonly ModString EssenceAmountCompact = new ModString("Combat.EssenceAmountCompact", "+{0} {1}");
+            public static readonly ModString EssenceAmounts = new ModString("Combat.EssenceAmounts", "{0} essence");
             public static readonly ModString ExplosiveBarrel = new ModString("Combat.ExplosiveBarrel", "explosive barrel");
             public static readonly ModString FailedBurrow = new ModString("Combat.FailedBurrow", "{0}, failed burrow");
             public static readonly ModString FaeyFire = new ModString("Combat.FaeyFire", "Faey Fire");
@@ -288,6 +290,7 @@ namespace SongsOfConquestAccess.Localization
             public static readonly ModString Victory = new ModString("Combat.Victory", "Victory");
             public static readonly ModString Walkover = new ModString("Combat.Walkover", "Walkover");
             public static readonly ModString Wielder = new ModString("Combat.Wielder", "wielder");
+            public static readonly ModString WielderEssenceGenerated = new ModString("Combat.WielderEssenceGenerated", "{0}: {1}");
             public static readonly ModString YourMeleeTroops = new ModString("Combat.YourMeleeTroops", "your melee troops");
             public static readonly ModString YourRangedTroops = new ModString("Combat.YourRangedTroops", "your ranged troops");
             public static readonly ModString YourTroops = new ModString("Combat.YourTroops", "your troops");

@@ -773,21 +773,39 @@ namespace SongsOfConquestAccess.Events.Combat
 
         public string GetSpeechText()
         {
-            List<string> parts = new List<string>();
-            AddEssenceAmount(parts, Order, ModText.Get(ModStrings.Combat.OrderEssence));
-            AddEssenceAmount(parts, Creation, ModText.Get(ModStrings.Combat.CreationEssence));
-            AddEssenceAmount(parts, Chaos, ModText.Get(ModStrings.Combat.ChaosEssence));
-            AddEssenceAmount(parts, Arcana, ModText.Get(ModStrings.Combat.ArcanaEssence));
-            AddEssenceAmount(parts, Destruction, ModText.Get(ModStrings.Combat.DestructionEssence));
-            return FormatList(parts);
+            return FormatEssenceAmounts(Order, Creation, Chaos, Arcana, Destruction);
+        }
+    }
+
+    internal sealed class WielderEssenceGeneratedEvent : IAccessibilityEvent
+    {
+        public WielderEssenceGeneratedEvent(CommanderRef wielder, int order, int creation, int chaos, int arcana, int destruction)
+        {
+            Wielder = wielder;
+            Order = order;
+            Creation = creation;
+            Chaos = chaos;
+            Arcana = arcana;
+            Destruction = destruction;
         }
 
-        private static void AddEssenceAmount(List<string> parts, int amount, string name)
+        public string Kind { get { return AccessibilityEvents.Combat.WielderEssenceGenerated; } }
+        public CommanderRef Wielder { get; private set; }
+        public int Order { get; private set; }
+        public int Creation { get; private set; }
+        public int Chaos { get; private set; }
+        public int Arcana { get; private set; }
+        public int Destruction { get; private set; }
+
+        public string GetSpeechText()
         {
-            if (amount > 0)
-            {
-                parts.Add(ModText.Get(ModStrings.Combat.EssenceAmount, amount, name));
-            }
+            string amounts = FormatEssenceAmounts(Order, Creation, Chaos, Arcana, Destruction);
+            return string.IsNullOrWhiteSpace(amounts)
+                ? string.Empty
+                : ModText.Get(
+                    ModStrings.Combat.WielderEssenceGenerated,
+                    Wielder != null ? Wielder.Format() : ModText.Get(ModStrings.Combat.Wielder),
+                    amounts);
         }
     }
 
@@ -985,6 +1003,29 @@ namespace SongsOfConquestAccess.Events.Combat
             }
 
             return ModText.JoinList(values.ToList());
+        }
+
+        public static string FormatEssenceAmounts(int order, int creation, int chaos, int arcana, int destruction)
+        {
+            List<string> parts = new List<string>();
+            AddEssenceAmount(parts, order, ModText.Get(ModStrings.Combat.OrderEssence));
+            AddEssenceAmount(parts, creation, ModText.Get(ModStrings.Combat.CreationEssence));
+            AddEssenceAmount(parts, chaos, ModText.Get(ModStrings.Combat.ChaosEssence));
+            AddEssenceAmount(parts, arcana, ModText.Get(ModStrings.Combat.ArcanaEssence));
+            AddEssenceAmount(parts, destruction, ModText.Get(ModStrings.Combat.DestructionEssence));
+
+            string amounts = ModText.JoinListWithCommas(parts);
+            return string.IsNullOrWhiteSpace(amounts)
+                ? string.Empty
+                : ModText.Get(ModStrings.Combat.EssenceAmounts, amounts);
+        }
+
+        private static void AddEssenceAmount(List<string> parts, int amount, string name)
+        {
+            if (amount > 0)
+            {
+                parts.Add(ModText.Get(ModStrings.Combat.EssenceAmountCompact, amount, name));
+            }
         }
 
         public static string FormatAttackVerb(AttackTrigger trigger)

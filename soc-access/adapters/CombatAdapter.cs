@@ -2307,6 +2307,21 @@ namespace SongsOfConquestAccess.Adapters
             }
         }
 
+        public int GetCommanderGeneratedEssenceAmount(int commanderId, EssenceType essenceType)
+        {
+            try
+            {
+                ICommanderState commander = _facade != null && _facade.Commanders != null ? _facade.Commanders.Get(commanderId) : null;
+                return commander != null && commander.Stats != null && commander.Stats.Essences != null
+                    ? commander.Stats.Essences.GetValue(essenceType)
+                    : 0;
+            }
+            catch
+            {
+                return 0;
+            }
+        }
+
         public SpellRef CreateSpellRef(SpellTypes spellType, int tier)
         {
             string name = LocalizeText("Spells/" + spellType);
