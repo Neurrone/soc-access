@@ -963,7 +963,7 @@ namespace SongsOfConquestAccess.Adapters
 
         private static bool IsBlocker(byte value)
         {
-            return value == 4 || value == 9 || value == 10;
+            return value == 4 || value == 9 || value == 10 || value == 11;
         }
 
         private void EnsureCursorOverlay()
