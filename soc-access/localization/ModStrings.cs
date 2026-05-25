@@ -56,7 +56,7 @@ namespace SongsOfConquestAccess.Localization
             public static readonly ModString Acting = new ModString("Spatial.Acting", "acting");
             public static readonly ModString Attack = new ModString("Spatial.Attack", "attack");
             public static readonly ModString AttackPreview = new ModString("Spatial.AttackPreview", "Attack preview:");
-            public static readonly ModString AttackRange = new ModString("Spatial.AttackRange", "attack range");
+            public static readonly ModString AttackRange = new ModString("Spatial.AttackRange", "Attack range");
             public static readonly ModString AridTrees = new ModString("Spatial.AridTrees", "Arid trees");
             public static readonly ModString Blocked = new ModString("Spatial.Blocked", "blocked");
             public static readonly ModString Bridge = new ModString("Spatial.Bridge", "Bridge");
@@ -65,7 +65,7 @@ namespace SongsOfConquestAccess.Localization
             public static readonly ModString CobblestoneRoad = new ModString("Spatial.CobblestoneRoad", "Cobblestone road");
             public static readonly ModString Cost = new ModString("Spatial.Cost", "cost {0}");
             public static readonly ModString DamagePreview = new ModString("Spatial.DamagePreview", "{0}damage {1}");
-            public static readonly ModString DeadlyRange = new ModString("Spatial.DeadlyRange", "deadly range");
+            public static readonly ModString DeadlyRange = new ModString("Spatial.DeadlyRange", "Deadly range");
             public static readonly ModString Deadly = new ModString("Spatial.Deadly", "deadly");
             public static readonly ModString DeepWater = new ModString("Spatial.DeepWater", "Deep water");
             public static readonly ModString Deforestation = new ModString("Spatial.Deforestation", "Deforestation");
@@ -95,7 +95,7 @@ namespace SongsOfConquestAccess.Localization
             public static readonly ModString Light = new ModString("Spatial.Light", "Light");
             public static readonly ModString MayDestroy = new ModString("Spatial.MayDestroy", "may destroy");
             public static readonly ModString Movement = new ModString("Spatial.Movement", "Movement");
-            public static readonly ModString MovementRange = new ModString("Spatial.MovementRange", "movement range");
+            public static readonly ModString MovementRange = new ModString("Spatial.MovementRange", "Movement range");
             public static readonly ModString Mountains = new ModString("Spatial.Mountains", "Mountains");
             public static readonly ModString Neutral = new ModString("Spatial.Neutral", "neutral");
             public static readonly ModString NoRoutePreview = new ModString("Spatial.NoRoutePreview", "no route preview");
@@ -117,7 +117,7 @@ namespace SongsOfConquestAccess.Localization
             public static readonly ModString Water = new ModString("Spatial.Water", "Water");
             public static readonly ModString WaterEdge = new ModString("Spatial.WaterEdge", "Water edge");
             public static readonly ModString WithinZoneOfControl = new ModString("Spatial.WithinZoneOfControl", "Within {0} zone of control");
-            public static readonly ModString ZoneOfControl = new ModString("Spatial.ZoneOfControl", "zone of control");
+            public static readonly ModString ZoneOfControl = new ModString("Spatial.ZoneOfControl", "Zone of control");
             public static readonly ModString ZoneOfControlTiles = new ModString("Spatial.ZoneOfControlTiles", "{0} within {1} zone of control");
         }
 

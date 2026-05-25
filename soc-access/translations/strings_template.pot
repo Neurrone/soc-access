@@ -196,7 +196,7 @@ msgstr ""
 
 #. Spatial.AttackRange
 msgctxt "Spatial.AttackRange"
-msgid "attack range"
+msgid "Attack range"
 msgstr ""
 
 #. Spatial.AridTrees
@@ -241,7 +241,7 @@ msgstr ""
 
 #. Spatial.DeadlyRange
 msgctxt "Spatial.DeadlyRange"
-msgid "deadly range"
+msgid "Deadly range"
 msgstr ""
 
 #. Spatial.Deadly
@@ -391,7 +391,7 @@ msgstr ""
 
 #. Spatial.MovementRange
 msgctxt "Spatial.MovementRange"
-msgid "movement range"
+msgid "Movement range"
 msgstr ""
 
 #. Spatial.Mountains
@@ -501,7 +501,7 @@ msgstr ""
 
 #. Spatial.ZoneOfControl
 msgctxt "Spatial.ZoneOfControl"
-msgid "zone of control"
+msgid "Zone of control"
 msgstr ""
 
 #. Spatial.ZoneOfControlTiles

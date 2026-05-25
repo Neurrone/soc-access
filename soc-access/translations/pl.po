@@ -1664,8 +1664,8 @@ msgstr "PodglÄ…d ataku:"
 
 #. Spatial.AttackRange
 msgctxt "Spatial.AttackRange"
-msgid "attack range"
-msgstr "zasiÄ™g ataku"
+msgid "Attack range"
+msgstr "Zasięg ataku"
 
 #. Spatial.Blocked
 msgctxt "Spatial.Blocked"
@@ -1694,8 +1694,8 @@ msgstr "{0}obraÅ¼enia {1}"
 
 #. Spatial.DeadlyRange
 msgctxt "Spatial.DeadlyRange"
-msgid "deadly range"
-msgstr "Å›miertelny zasiÄ™g"
+msgid "Deadly range"
+msgstr "Zabójczy zasięg"
 
 #. Spatial.Deadly
 msgctxt "Spatial.Deadly"
@@ -1804,8 +1804,8 @@ msgstr "Ruch"
 
 #. Spatial.MovementRange
 msgctxt "Spatial.MovementRange"
-msgid "movement range"
-msgstr "zasiÄ™g ruchu"
+msgid "Movement range"
+msgstr "Zasięg ruchu"
 
 #. Spatial.Neutral
 msgctxt "Spatial.Neutral"
@@ -1879,8 +1879,8 @@ msgstr "W strefie kontroli {0}"
 
 #. Spatial.ZoneOfControl
 msgctxt "Spatial.ZoneOfControl"
-msgid "zone of control"
-msgstr "strefa kontroli"
+msgid "Zone of control"
+msgstr "Strefa kontroli"
 
 #. Spatial.ZoneOfControlTiles
 msgctxt "Spatial.ZoneOfControlTiles"

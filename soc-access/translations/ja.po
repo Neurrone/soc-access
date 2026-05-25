@@ -1634,7 +1634,7 @@ msgstr "æ”»æ’ƒãƒ—ãƒ¬ãƒ“ãƒ¥ãƒ¼:"
 
 #. Spatial.AttackRange
 msgctxt "Spatial.AttackRange"
-msgid "attack range"
+msgid "Attack range"
 msgstr "æ”»æ’ƒç¯„å›²"
 
 #. Spatial.Blocked
@@ -1664,7 +1664,7 @@ msgstr "{0}ãƒ€ãƒ¡ãƒ¼ã‚¸ {1}"
 
 #. Spatial.DeadlyRange
 msgctxt "Spatial.DeadlyRange"
-msgid "deadly range"
+msgid "Deadly range"
 msgstr "è‡´å‘½ç¯„å›²"
 
 #. Spatial.Deadly
@@ -1774,7 +1774,7 @@ msgstr "ç§»å‹•"
 
 #. Spatial.MovementRange
 msgctxt "Spatial.MovementRange"
-msgid "movement range"
+msgid "Movement range"
 msgstr "ç§»å‹•ç¯„å›²"
 
 #. Spatial.Neutral
@@ -1849,7 +1849,7 @@ msgstr "{0}æ”¯é…é ˜åŸŸå†…"
 
 #. Spatial.ZoneOfControl
 msgctxt "Spatial.ZoneOfControl"
-msgid "zone of control"
+msgid "Zone of control"
 msgstr "æ”¯é…é ˜åŸŸ"
 
 #. Spatial.ZoneOfControlTiles

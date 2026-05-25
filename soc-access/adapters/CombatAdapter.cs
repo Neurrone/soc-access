@@ -1956,49 +1956,27 @@ namespace SongsOfConquestAccess.Adapters
 
         internal string DescribeEnemyInfluenceForSpeech(Vector2Int point, IBattleTroopState occupyingTroop)
         {
-            if (_facade == null || _facade.Troops == null || _facade.Teams == null || _facade.Teams.Current == null)
-            {
-                return string.Empty;
-            }
-
-            List<string> influences = new List<string>();
-            foreach (IBattleTroopState troop in _facade.Troops.All)
-            {
-                if (troop == null
-                    || troop.TeamId == _facade.Teams.Current.Id
-                    || !troop.GetIsAlive()
-                    || (occupyingTroop != null && troop.Id == occupyingTroop.Id)
-                    || troop.Position == point)
-                {
-                    continue;
-                }
-
-                string rangeText = CombatInspectContext.FormatRangeIndicators(BuildInfluenceIndicators(troop, point));
-                if (!string.IsNullOrWhiteSpace(rangeText))
-                {
-                    influences.Add(rangeText + " of " + FormatTroopEventLabel(troop));
-                }
-            }
-
-            if (influences.Count > 0)
-            {
-                return ModText.Get(ModStrings.Common.In, string.Join(", ", influences.ToArray()));
-            }
-
-            return string.Empty;
+            return CombatInfluenceFormatter.Format(BuildEnemyInfluenceSources(point, occupyingTroop));
         }
 
         internal bool IsThreatenedByEnemy(Vector2Int point, IBattleTroopState occupyingTroop)
         {
-            if (_facade == null || _facade.Troops == null || _facade.Teams == null || _facade.Teams.Current == null)
+            return BuildEnemyInfluenceSources(point, occupyingTroop).Count > 0;
+        }
+
+        private List<CombatInfluenceSource> BuildEnemyInfluenceSources(Vector2Int point, IBattleTroopState occupyingTroop)
+        {
+            int perspectiveTeamId = GetLocalTeamId();
+            if (_facade == null || _facade.Troops == null || _facade.Teams == null || perspectiveTeamId < 0)
             {
-                return false;
+                return new List<CombatInfluenceSource>();
             }
 
+            List<CombatInfluenceSource> sources = new List<CombatInfluenceSource>();
             foreach (IBattleTroopState troop in _facade.Troops.All)
             {
                 if (troop == null
-                    || troop.TeamId == _facade.Teams.Current.Id
+                    || troop.TeamId == perspectiveTeamId
                     || !troop.GetIsAlive()
                     || (occupyingTroop != null && troop.Id == occupyingTroop.Id)
                     || troop.Position == point)
@@ -2006,14 +1984,14 @@ namespace SongsOfConquestAccess.Adapters
                     continue;
                 }
 
-                string rangeText = CombatInspectContext.FormatRangeIndicators(BuildInfluenceIndicators(troop, point));
-                if (!string.IsNullOrWhiteSpace(rangeText))
+                HashSet<CombatRangeIndicator> indicators = BuildInfluenceIndicators(troop, point);
+                if (indicators.Count > 0)
                 {
-                    return true;
+                    sources.Add(new CombatInfluenceSource(CreateTroopRef(troop), indicators));
                 }
             }
 
-            return false;
+            return sources;
         }
 
         private PathNode[] GetPathToEntity(IMapEntity entity)

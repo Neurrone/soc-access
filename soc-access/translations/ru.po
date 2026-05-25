@@ -1664,8 +1664,8 @@ msgstr "ÐŸÑ€ÐµÐ´Ð¿Ñ€Ð¾ÑÐ¼Ð¾Ñ‚Ñ€ Ð°Ñ‚Ð°ÐºÐ
 
 #. Spatial.AttackRange
 msgctxt "Spatial.AttackRange"
-msgid "attack range"
-msgstr "Ð´Ð°Ð»ÑŒÐ½Ð¾ÑÑ‚ÑŒ Ð°Ñ‚Ð°ÐºÐ¸"
+msgid "Attack range"
+msgstr "Дальность атаки"
 
 #. Spatial.Blocked
 msgctxt "Spatial.Blocked"
@@ -1694,8 +1694,8 @@ msgstr "{0}ÑƒÑ€Ð¾Ð½ {1}"
 
 #. Spatial.DeadlyRange
 msgctxt "Spatial.DeadlyRange"
-msgid "deadly range"
-msgstr "ÑÐ¼ÐµÑ€Ñ‚ÐµÐ»ÑŒÐ½Ð°Ñ Ð´Ð°Ð»ÑŒÐ½Ð¾ÑÑ‚ÑŒ"
+msgid "Deadly range"
+msgstr "Смертельная дальность"
 
 #. Spatial.Deadly
 msgctxt "Spatial.Deadly"
@@ -1804,8 +1804,8 @@ msgstr "ÐŸÐµÑ€ÐµÐ´Ð²Ð¸Ð¶ÐµÐ½Ð¸Ðµ"
 
 #. Spatial.MovementRange
 msgctxt "Spatial.MovementRange"
-msgid "movement range"
-msgstr "Ð´Ð°Ð»ÑŒÐ½Ð¾ÑÑ‚ÑŒ Ð¿ÐµÑ€ÐµÐ´Ð²Ð¸Ð¶ÐµÐ½Ð¸Ñ"
+msgid "Movement range"
+msgstr "Дальность передвижения"
 
 #. Spatial.Neutral
 msgctxt "Spatial.Neutral"
@@ -1879,8 +1879,8 @@ msgstr "Ð’ Ð·Ð¾Ð½Ðµ ÐºÐ¾Ð½Ñ‚Ñ€Ð¾Ð»Ñ {0}"
 
 #. Spatial.ZoneOfControl
 msgctxt "Spatial.ZoneOfControl"
-msgid "zone of control"
-msgstr "Ð·Ð¾Ð½Ð° ÐºÐ¾Ð½Ñ‚Ñ€Ð¾Ð»Ñ"
+msgid "Zone of control"
+msgstr "Зона контроля"
 
 #. Spatial.ZoneOfControlTiles
 msgctxt "Spatial.ZoneOfControlTiles"

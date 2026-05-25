@@ -4,9 +4,21 @@
 
 - Wielders being recruited are now announced. This is mainly for situations where they join via story events
 - Fixed the revealed buffer being reset after combat
-- Fixed resource generating buildings not appearing in the scanner. They have a dedicated "Resource generators" category
+- Fixed resource generating buildings not appearing in the scanner. Results are in a dedicated "Resource generators" category
 - Fixed multi-tile entities being read even though they aren't fully revealed. In these situations, the entity will no longer be considered to be revealed
 - Fixed artifact names not being announced when revealed
+- Combat narration:
+  - Effects being removed from a destroyed troop stack are no longer announced
+  - If a spell is cast multiple times on the same tile, that tile is now only announced once
+  - Recognize situations where your / enemy melee / ranged troops are affected by effects to avoid announcing each troop individually
+  - When moving from a high ground tile to another tile that is on high ground, don't say that the high ground effect was added and then removed
+  - When casting Acid Cloud, don't announce individual acid clouds appearing on each tile
+  - Fixed more cases where the casting of the spell was read after narration of its effects
+- Shorten combat influence readouts.
+
+  Before: "in movement range of 59 enemy Plague Rats at 6, 8, zone of control and movement range of 15 enemy Oathbound at 9, 6, movement range of 19 enemy Oathbound at 7, 4, movement range of 5 enemy Spectres at 11.5, 3."
+
+  After: Zone of control: 15 Oathbound at 9, 6. Movement range: 59 Plague Rats at 6, 8, 19 Oathbound at 7, 4, 5 Spectres at 11.5, 3."
 
 ## V0.3.0
 

@@ -1649,7 +1649,7 @@ msgstr "Angriffsvorschau:"
 
 #. Spatial.AttackRange
 msgctxt "Spatial.AttackRange"
-msgid "attack range"
+msgid "Attack range"
 msgstr "Angriffsreichweite"
 
 #. Spatial.Blocked
@@ -1679,8 +1679,8 @@ msgstr "{0}Schaden {1}"
 
 #. Spatial.DeadlyRange
 msgctxt "Spatial.DeadlyRange"
-msgid "deadly range"
-msgstr "tÃ¶dliche Reichweite"
+msgid "Deadly range"
+msgstr "Tödliche Reichweite"
 
 #. Spatial.Deadly
 msgctxt "Spatial.Deadly"
@@ -1789,7 +1789,7 @@ msgstr "Bewegung"
 
 #. Spatial.MovementRange
 msgctxt "Spatial.MovementRange"
-msgid "movement range"
+msgid "Movement range"
 msgstr "Bewegungsreichweite"
 
 #. Spatial.Neutral
@@ -1864,7 +1864,7 @@ msgstr "In der Kontrollzone {0}"
 
 #. Spatial.ZoneOfControl
 msgctxt "Spatial.ZoneOfControl"
-msgid "zone of control"
+msgid "Zone of control"
 msgstr "Kontrollzone"
 
 #. Spatial.ZoneOfControlTiles

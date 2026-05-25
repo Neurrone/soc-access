@@ -1634,8 +1634,8 @@ msgstr "SaldÄ±rÄ± Ã¶nizlemesi:"
 
 #. Spatial.AttackRange
 msgctxt "Spatial.AttackRange"
-msgid "attack range"
-msgstr "saldÄ±rÄ± menzili"
+msgid "Attack range"
+msgstr "Saldırı menzili"
 
 #. Spatial.Blocked
 msgctxt "Spatial.Blocked"
@@ -1664,8 +1664,8 @@ msgstr "{0}hasar {1}"
 
 #. Spatial.DeadlyRange
 msgctxt "Spatial.DeadlyRange"
-msgid "deadly range"
-msgstr "Ã¶lÃ¼mcÃ¼l menzil"
+msgid "Deadly range"
+msgstr "Ölümcül menzil"
 
 #. Spatial.Deadly
 msgctxt "Spatial.Deadly"
@@ -1774,8 +1774,8 @@ msgstr "Hareket"
 
 #. Spatial.MovementRange
 msgctxt "Spatial.MovementRange"
-msgid "movement range"
-msgstr "hareket menzili"
+msgid "Movement range"
+msgstr "Hareket menzili"
 
 #. Spatial.Neutral
 msgctxt "Spatial.Neutral"
@@ -1849,8 +1849,8 @@ msgstr "{0} kontrol bÃ¶lgesi iÃ§inde"
 
 #. Spatial.ZoneOfControl
 msgctxt "Spatial.ZoneOfControl"
-msgid "zone of control"
-msgstr "kontrol bÃ¶lgesi"
+msgid "Zone of control"
+msgstr "Kontrol bölgesi"
 
 #. Spatial.ZoneOfControlTiles
 msgctxt "Spatial.ZoneOfControlTiles"
