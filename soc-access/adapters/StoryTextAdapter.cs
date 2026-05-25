@@ -20,6 +20,9 @@ namespace SongsOfConquestAccess.Adapters
         private static readonly AccessTools.FieldRef<StoryText, UITextMesh> TitleTextRef =
             AccessTools.FieldRefAccess<StoryText, UITextMesh>("_titleText");
 
+        private static readonly AccessTools.FieldRef<StoryText, CanvasGroup> HeaderCanvasGroupRef =
+            AccessTools.FieldRefAccess<StoryText, CanvasGroup>("_headerCanvasGroup");
+
         private static readonly AccessTools.FieldRef<StoryText, UITextMesh> LoreTextRef =
             AccessTools.FieldRefAccess<StoryText, UITextMesh>("_loreText");
 
@@ -43,7 +46,7 @@ namespace SongsOfConquestAccess.Adapters
 
         public string Title
         {
-            get { return SpeechTextSanitizer.Normalize(GetText(TitleTextRef)); }
+            get { return IsTitleVisible() ? SpeechTextSanitizer.Normalize(GetText(TitleTextRef)) : string.Empty; }
         }
 
         public string Body
@@ -102,6 +105,22 @@ namespace SongsOfConquestAccess.Adapters
             return !IsTyping()
                 || tmpText == null
                 || tmpText.maxVisibleCharacters > 0;
+        }
+
+        private bool IsTitleVisible()
+        {
+            if (_storyText == null || HeaderCanvasGroupRef == null)
+            {
+                return false;
+            }
+
+            CanvasGroup header = HeaderCanvasGroupRef(_storyText);
+            Component component = header as Component;
+            return header != null
+                && header.alpha > 0.001f
+                && component != null
+                && component.gameObject != null
+                && component.gameObject.activeInHierarchy;
         }
 
         private string GetText(AccessTools.FieldRef<StoryText, UITextMesh> textRef)

@@ -3,12 +3,12 @@
 ## V0.3.1
 
 - Wielders being recruited are now announced. This is mainly for situations where they join via story events
-- Fixed the revealed buffer being reset after combat
 - Fixed resource generating buildings not appearing in the scanner. Results are in a dedicated "Resource generators" category
 - Revealed entity readouts:
   - Multi-tile entities are no longer considered as revealed unless they are fully revealed
   - Artifact names are now announced
   - Dead wielders are no longer announced as no longer being visible
+  - The revealed buffer is no longer being reset after combat
 - Combat narration:
   - Effects being removed from a destroyed troop stack are no longer announced
   - If a spell is cast multiple times on the same tile, that tile is now only announced once
@@ -24,6 +24,7 @@
 
 - Fixed combat screens not being properly cleaned up if doing a quick battle, followed by a manual battle. This was causing the hotkey to read resources out of combat to fail
 - Fixed regression in V0.2.0 that broke reading of marketplace screen button labels
+- Fixed placeholder titles being read on story screens when no title was actually visually shown
 
 ## V0.3.0
 

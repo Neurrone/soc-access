@@ -53,7 +53,7 @@ namespace SongsOfConquestAccess.Adapters
 
         public string Title
         {
-            get { return SpeechTextSanitizer.Normalize(GetText(TitleTextRef)); }
+            get { return IsTitleVisible() ? SpeechTextSanitizer.Normalize(GetText(TitleTextRef)) : string.Empty; }
         }
 
         public string Body
@@ -113,6 +113,22 @@ namespace SongsOfConquestAccess.Adapters
             return !IsTyping()
                 || tmpText == null
                 || tmpText.maxVisibleCharacters > 0;
+        }
+
+        private bool IsTitleVisible()
+        {
+            if (_storyText == null || TitleTextRef == null)
+            {
+                return false;
+            }
+
+            UITextMesh titleText = TitleTextRef(_storyText);
+            Component component = titleText as Component;
+            return titleText != null
+                && titleText.Active
+                && component != null
+                && component.gameObject != null
+                && component.gameObject.activeInHierarchy;
         }
 
         private void CompleteVisibleTextTweens()
