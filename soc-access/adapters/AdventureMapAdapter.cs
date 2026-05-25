@@ -22,6 +22,7 @@ using SongsOfConquest.Common.Entities.Adventure;
 using SongsOfConquest.Common.Gamestate;
 using SongsOfConquest.Common.Gamestate.Commander;
 using SongsOfConquest.Common.Localization;
+using SongsOfConquest.Common.Map;
 using SongsOfConquestAccess.Localization;
 using SongsOfConquestAccess.Bookmarks;
 using SongsOfConquestAccess.Events;
@@ -428,8 +429,7 @@ namespace SongsOfConquestAccess.Adapters
                 return tile;
             }
 
-            tile.Terrain = _facade.Level.GetGroundType(clamped);
-            PopulateEnvironment(tile, clamped);
+            tile.Terrain = GetTerrain(clamped);
             ICommanderState selectedCommander = _selectionHandler.SelectedCommander;
             tile.IsImpassable = float.IsPositiveInfinity(_facade.Level.GetStaticTravelCost(localTeamId, clamped));
             tile.IsBlocked = !tile.IsImpassable && !_facade.Level.IsValidMoveDestination(localTeamId, clamped);
@@ -1052,8 +1052,22 @@ namespace SongsOfConquestAccess.Adapters
 
             ScannerCategory terrain = snapshot.GetOrAddCategory(ModText.Get(ModStrings.Scanner.Terrain));
             terrain.GetOrAddSubcategory(ModText.Get(ModStrings.Scanner.Roads));
+            terrain.GetOrAddSubcategory(ModText.Get(ModStrings.Scanner.DirtRoads));
+            terrain.GetOrAddSubcategory(ModText.Get(ModStrings.Scanner.CobblestoneRoads));
+            terrain.GetOrAddSubcategory(ModText.Get(ModStrings.Scanner.Walls));
+            terrain.GetOrAddSubcategory(ModText.Get(ModStrings.Scanner.Grass));
+            terrain.GetOrAddSubcategory(ModText.Get(ModStrings.Scanner.Sand));
+            terrain.GetOrAddSubcategory(ModText.Get(ModStrings.Scanner.Dirt));
             terrain.GetOrAddSubcategory(ModText.Get(ModStrings.Scanner.Bridges));
             terrain.GetOrAddSubcategory(ModText.Get(ModStrings.Scanner.Water));
+            terrain.GetOrAddSubcategory(ModText.Get(ModStrings.Scanner.ShallowWater));
+            terrain.GetOrAddSubcategory(ModText.Get(ModStrings.Scanner.DeepWater));
+            terrain.GetOrAddSubcategory(ModText.Get(ModStrings.Scanner.WaterEdge));
+            terrain.GetOrAddSubcategory(ModText.Get(ModStrings.Scanner.AridTrees));
+            terrain.GetOrAddSubcategory(ModText.Get(ModStrings.Scanner.TemperateTrees));
+            terrain.GetOrAddSubcategory(ModText.Get(ModStrings.Scanner.Mountains));
+            terrain.GetOrAddSubcategory(ModText.Get(ModStrings.Scanner.Deforestation));
+            terrain.GetOrAddSubcategory(ModText.Get(ModStrings.Scanner.Farmland));
             terrain.GetOrAddSubcategory(ModText.Get(ModStrings.Scanner.Impassable));
 
             ScannerCategory revealed = snapshot.GetOrAddCategory(ModText.Get(ModStrings.Scanner.Revealed));
@@ -1792,9 +1806,23 @@ namespace SongsOfConquestAccess.Adapters
             }
 
             TerrainScanCell[,] terrain = BuildTerrainScan(GetLocalTeamId());
-            AddTerrainGroups(snapshot, terrain, ModText.Get(ModStrings.Scanner.Roads), "road", ModStrings.Scanner.RoadTileCount, origin, cell => cell.Road);
-            AddTerrainGroups(snapshot, terrain, ModText.Get(ModStrings.Scanner.Bridges), "bridge", ModStrings.Scanner.BridgeTileCount, origin, cell => cell.Bridge);
-            AddTerrainGroups(snapshot, terrain, ModText.Get(ModStrings.Scanner.Water), "water", ModStrings.Scanner.WaterTileCount, origin, cell => cell.Water);
+            AddTerrainGroups(snapshot, terrain, ModText.Get(ModStrings.Scanner.Roads), "road", ModStrings.Scanner.RoadTileCount, origin, cell => cell.Terrain == AdventureTerrainKind.Road);
+            AddTerrainGroups(snapshot, terrain, ModText.Get(ModStrings.Scanner.DirtRoads), "dirt-road", ModStrings.Scanner.DirtRoadTileCount, origin, cell => cell.Terrain == AdventureTerrainKind.DirtRoad);
+            AddTerrainGroups(snapshot, terrain, ModText.Get(ModStrings.Scanner.CobblestoneRoads), "cobblestone-road", ModStrings.Scanner.CobblestoneRoadTileCount, origin, cell => cell.Terrain == AdventureTerrainKind.CobblestoneRoad);
+            AddTerrainGroups(snapshot, terrain, ModText.Get(ModStrings.Scanner.Walls), "wall", ModStrings.Scanner.WallTileCount, origin, cell => cell.Terrain == AdventureTerrainKind.Wall);
+            AddTerrainGroups(snapshot, terrain, ModText.Get(ModStrings.Scanner.Grass), "grass", ModStrings.Scanner.GrassTileCount, origin, cell => cell.Terrain == AdventureTerrainKind.Grass);
+            AddTerrainGroups(snapshot, terrain, ModText.Get(ModStrings.Scanner.Sand), "sand", ModStrings.Scanner.SandTileCount, origin, cell => cell.Terrain == AdventureTerrainKind.Sand);
+            AddTerrainGroups(snapshot, terrain, ModText.Get(ModStrings.Scanner.Dirt), "dirt", ModStrings.Scanner.DirtTileCount, origin, cell => cell.Terrain == AdventureTerrainKind.Dirt);
+            AddTerrainGroups(snapshot, terrain, ModText.Get(ModStrings.Scanner.Bridges), "bridge", ModStrings.Scanner.BridgeTileCount, origin, cell => cell.Terrain == AdventureTerrainKind.Bridge);
+            AddTerrainGroups(snapshot, terrain, ModText.Get(ModStrings.Scanner.Water), "water", ModStrings.Scanner.WaterTileCount, origin, cell => cell.Terrain == AdventureTerrainKind.Water);
+            AddTerrainGroups(snapshot, terrain, ModText.Get(ModStrings.Scanner.ShallowWater), "shallow-water", ModStrings.Scanner.ShallowWaterTileCount, origin, cell => cell.Terrain == AdventureTerrainKind.ShallowWater);
+            AddTerrainGroups(snapshot, terrain, ModText.Get(ModStrings.Scanner.DeepWater), "deep-water", ModStrings.Scanner.DeepWaterTileCount, origin, cell => cell.Terrain == AdventureTerrainKind.DeepWater);
+            AddTerrainGroups(snapshot, terrain, ModText.Get(ModStrings.Scanner.WaterEdge), "water-edge", ModStrings.Scanner.WaterEdgeTileCount, origin, cell => cell.Terrain == AdventureTerrainKind.WaterEdge);
+            AddTerrainGroups(snapshot, terrain, ModText.Get(ModStrings.Scanner.AridTrees), "arid-trees", ModStrings.Scanner.AridTreeTileCount, origin, cell => cell.Terrain == AdventureTerrainKind.AridTrees);
+            AddTerrainGroups(snapshot, terrain, ModText.Get(ModStrings.Scanner.TemperateTrees), "temperate-trees", ModStrings.Scanner.TemperateTreeTileCount, origin, cell => cell.Terrain == AdventureTerrainKind.TemperateTrees);
+            AddTerrainGroups(snapshot, terrain, ModText.Get(ModStrings.Scanner.Mountains), "mountain", ModStrings.Scanner.MountainTileCount, origin, cell => cell.Terrain == AdventureTerrainKind.Mountain);
+            AddTerrainGroups(snapshot, terrain, ModText.Get(ModStrings.Scanner.Deforestation), "deforestation", ModStrings.Scanner.DeforestationTileCount, origin, cell => cell.Terrain == AdventureTerrainKind.Deforestation);
+            AddTerrainGroups(snapshot, terrain, ModText.Get(ModStrings.Scanner.Farmland), "farmland", ModStrings.Scanner.FarmlandTileCount, origin, cell => cell.Terrain == AdventureTerrainKind.Farmland);
             AddTerrainGroups(snapshot, terrain, ModText.Get(ModStrings.Scanner.Impassable), "impassable", ModStrings.Scanner.ImpassableTileCount, origin, cell => cell.Impassable);
             AddScannerGroups(
                 snapshot,
@@ -1804,6 +1832,7 @@ namespace SongsOfConquestAccess.Adapters
                 "blocked",
                 ModStrings.Scanner.BlockedTileCount,
                 origin,
+                ScannerResultKind.AreaGroup,
                 cell => cell.Blocked);
         }
 
@@ -1831,9 +1860,7 @@ namespace SongsOfConquestAccess.Adapters
                     terrain[x, y] = new TerrainScanCell
                     {
                         Explored = eligible,
-                        Road = eligible && SafeGetRoad(index) > 0,
-                        Bridge = eligible && SafeGetBridge(index) > 0,
-                        Water = eligible && SafeGetWater(index) > 0,
+                        Terrain = eligible ? GetTerrain(point) : AdventureTerrainKind.Unknown,
                         Impassable = impassable,
                         Blocked = eligible && !impassable && IsBlockedTerrain(localTeamId, point)
                     };
@@ -1885,42 +1912,6 @@ namespace SongsOfConquestAccess.Adapters
             }
         }
 
-        private byte SafeGetRoad(int index)
-        {
-            try
-            {
-                return _facade.Level.GetRoad(index);
-            }
-            catch
-            {
-                return 0;
-            }
-        }
-
-        private byte SafeGetBridge(int index)
-        {
-            try
-            {
-                return _facade.Level.GetBridge(index);
-            }
-            catch
-            {
-                return 0;
-            }
-        }
-
-        private byte SafeGetWater(int index)
-        {
-            try
-            {
-                return _facade.Level.GetWater(index);
-            }
-            catch
-            {
-                return 0;
-            }
-        }
-
         private void AddTerrainGroups(
             ScannerSnapshot snapshot,
             TerrainScanCell[,] terrain,
@@ -1930,7 +1921,7 @@ namespace SongsOfConquestAccess.Adapters
             Vector2Int origin,
             Func<TerrainScanCell, bool> predicate)
         {
-            AddScannerGroups(snapshot, ModText.Get(ModStrings.Scanner.Terrain), subcategory, terrain, label, labelText, origin, predicate);
+            AddScannerGroups(snapshot, ModText.Get(ModStrings.Scanner.Terrain), subcategory, terrain, label, labelText, origin, ScannerResultKind.TerrainGroup, predicate);
         }
 
         private void AddScannerGroups(
@@ -1941,6 +1932,7 @@ namespace SongsOfConquestAccess.Adapters
             string label,
             ModPluralString labelText,
             Vector2Int origin,
+            ScannerResultKind kind,
             Func<TerrainScanCell, bool> predicate)
         {
             int width = _facade.Level.Width;
@@ -1969,7 +1961,7 @@ namespace SongsOfConquestAccess.Adapters
                         ModText.Plural(labelText, group.Count, group.Count),
                         representative)
                     {
-                        Kind = category == "Terrain" ? ScannerResultKind.TerrainGroup : ScannerResultKind.AreaGroup
+                        Kind = kind
                     };
                     result.Points.AddRange(group);
                     snapshot.Add(category, subcategory, result);
@@ -2003,11 +1995,7 @@ namespace SongsOfConquestAccess.Adapters
         {
             public bool Explored;
 
-            public bool Road;
-
-            public bool Bridge;
-
-            public bool Water;
+            public AdventureTerrainKind Terrain;
 
             public bool Impassable;
 
@@ -2035,24 +2023,6 @@ namespace SongsOfConquestAccess.Adapters
 
             visited[x, y] = true;
             queue.Enqueue(new Vector2Int(x, y));
-        }
-
-        private static bool HasEnvironment(AdventureMapTile tile, string text)
-        {
-            if (tile == null || tile.Environment == null)
-            {
-                return false;
-            }
-
-            for (int i = 0; i < tile.Environment.Count; i++)
-            {
-                if (!string.IsNullOrWhiteSpace(tile.Environment[i]) && tile.Environment[i].ToLowerInvariant().Contains(text))
-                {
-                    return true;
-                }
-            }
-
-            return false;
         }
 
         private static Vector2Int ClosestPoint(List<Vector2Int> points, Vector2Int origin)
@@ -3225,28 +3195,6 @@ namespace SongsOfConquestAccess.Adapters
             return ModText.FormatPossessiveName(name, ModStrings.Spatial.CommanderPossessive);
         }
 
-        private void PopulateEnvironment(AdventureMapTile tile, Vector2Int position)
-        {
-            if (tile == null)
-            {
-                return;
-            }
-
-            AddEnvironment(tile, GetRoadName(GetLayerValue(position, LayerKind.Road)));
-            AddEnvironment(tile, GetBridgeName(GetLayerValue(position, LayerKind.Bridge)));
-            AddEnvironment(tile, GetWaterName(GetLayerValue(position, LayerKind.Water)));
-        }
-
-        private void AddEnvironment(AdventureMapTile tile, string value)
-        {
-            if (tile == null || string.IsNullOrWhiteSpace(value) || tile.Environment.Contains(value))
-            {
-                return;
-            }
-
-            tile.Environment.Add(value);
-        }
-
         private byte GetLayerValue(Vector2Int position, LayerKind kind)
         {
             try
@@ -3269,146 +3217,112 @@ namespace SongsOfConquestAccess.Adapters
             }
         }
 
-        private string GetRoadName(byte road)
+        private AdventureTerrainKind GetTerrain(Vector2Int position)
         {
+            AdventureTerrainKind decorationTerrain = GetDecorationTerrain(GetDecorationValue(position));
+            if (decorationTerrain != AdventureTerrainKind.Unknown)
+            {
+                return decorationTerrain;
+            }
+
+            byte bridge = GetLayerValue(position, LayerKind.Bridge);
+            if (bridge > 0)
+            {
+                return AdventureTerrainKind.Bridge;
+            }
+
+            byte road = GetLayerValue(position, LayerKind.Road);
             switch (road)
             {
                 case 1:
-                    return ModText.Get(ModStrings.Spatial.DirtRoad);
+                    return AdventureTerrainKind.DirtRoad;
                 case 2:
-                    return ModText.Get(ModStrings.Spatial.CobblestoneRoad);
+                    return AdventureTerrainKind.CobblestoneRoad;
                 default:
-                    return road > 0 ? ModText.Get(ModStrings.Spatial.Road) : string.Empty;
-            }
-        }
+                    if (road > 0)
+                    {
+                        return AdventureTerrainKind.Road;
+                    }
 
-        private string GetBridgeName(byte bridge)
-        {
-            if (bridge == 0)
-            {
-                return string.Empty;
+                    break;
             }
 
-            BrushSet brush = _cartographyVisualManifest.GetBridgeBrush(bridge);
-            return FormatBrushName(brush.name, ModStrings.Spatial.Bridge);
-        }
-
-        private string GetWaterName(byte water)
-        {
+            byte water = GetLayerValue(position, LayerKind.Water);
             switch (water)
             {
                 case 1:
-                    return ModText.Get(ModStrings.Spatial.ShallowWater);
+                    return AdventureTerrainKind.ShallowWater;
                 case 2:
-                    return ModText.Get(ModStrings.Spatial.DeepWater);
+                    return AdventureTerrainKind.DeepWater;
                 case 3:
-                    return ModText.Get(ModStrings.Spatial.WaterEdge);
+                    return AdventureTerrainKind.WaterEdge;
                 default:
-                    return water > 0 ? ModText.Get(ModStrings.Spatial.Water) : string.Empty;
+                    if (water > 0)
+                    {
+                        return AdventureTerrainKind.Water;
+                    }
+
+                    break;
+            }
+
+            try
+            {
+                return GetGroundTerrain(_facade.Level.GetGroundType(position));
+            }
+            catch
+            {
+                return AdventureTerrainKind.Unknown;
             }
         }
 
-        private static string FormatBrushName(string value, ModString fallback)
+        private byte GetDecorationValue(Vector2Int position)
         {
-            if (string.IsNullOrWhiteSpace(value) || string.Equals(value, "none", StringComparison.OrdinalIgnoreCase))
+            try
             {
-                return ModText.Get(fallback);
+                return _facade.Level.GetDecoration(position);
             }
-
-            string normalized = value.Replace('_', ' ').Replace('-', ' ').Replace('/', ' ');
-            ModString localized;
-            return TryGetKnownBrushString(normalized, out localized)
-                ? ModText.Get(localized)
-                : ModText.Get(fallback);
+            catch
+            {
+                return 0;
+            }
         }
 
-        private static bool TryGetKnownBrushString(string value, out ModString localized)
+        private static AdventureTerrainKind GetDecorationTerrain(byte decoration)
         {
-            switch (FormatEnumName(value).ToLowerInvariant())
+            switch (decoration)
             {
-                case "arid trees":
-                case "arid tree":
-                    localized = ModStrings.Spatial.AridTrees;
-                    return true;
-                case "bridge":
-                    localized = ModStrings.Spatial.Bridge;
-                    return true;
-                case "cobblestone road":
-                    localized = ModStrings.Spatial.CobblestoneRoad;
-                    return true;
-                case "deep water":
-                    localized = ModStrings.Spatial.DeepWater;
-                    return true;
-                case "deforestation":
-                    localized = ModStrings.Spatial.Deforestation;
-                    return true;
-                case "dirt road":
-                    localized = ModStrings.Spatial.DirtRoad;
-                    return true;
-                case "farmland":
-                    localized = ModStrings.Spatial.Farmland;
-                    return true;
-                case "fog":
-                    localized = ModStrings.Spatial.Fog;
-                    return true;
-                case "light":
-                    localized = ModStrings.Spatial.Light;
-                    return true;
-                case "mountain":
-                case "mountains":
-                    localized = ModStrings.Spatial.Mountains;
-                    return true;
-                case "road":
-                    localized = ModStrings.Spatial.Road;
-                    return true;
-                case "shallow water":
-                    localized = ModStrings.Spatial.ShallowWater;
-                    return true;
-                case "tree":
-                case "trees":
-                    localized = ModStrings.Spatial.Trees;
-                    return true;
-                case "wall":
-                    localized = ModStrings.Spatial.Wall;
-                    return true;
-                case "water":
-                    localized = ModStrings.Spatial.Water;
-                    return true;
-                case "water edge":
-                    localized = ModStrings.Spatial.WaterEdge;
-                    return true;
+                case 1:
+                    return AdventureTerrainKind.AridTrees;
+                case 2:
+                    return AdventureTerrainKind.TemperateTrees;
+                case 3:
+                    return AdventureTerrainKind.Mountain;
+                case 6:
+                    return AdventureTerrainKind.Wall;
+                case 7:
+                    return AdventureTerrainKind.Deforestation;
+                case 8:
+                    return AdventureTerrainKind.Farmland;
                 default:
-                    localized = default(ModString);
-                    return false;
+                    return AdventureTerrainKind.Unknown;
             }
         }
 
-        private static string FormatEnumName(string value)
+        private static AdventureTerrainKind GetGroundTerrain(MapGroundType groundType)
         {
-            if (string.IsNullOrWhiteSpace(value))
+            switch (groundType)
             {
-                return string.Empty;
+                case MapGroundType.Grass:
+                    return AdventureTerrainKind.Grass;
+                case MapGroundType.Sand:
+                    return AdventureTerrainKind.Sand;
+                case MapGroundType.Dirt:
+                    return AdventureTerrainKind.Dirt;
+                case MapGroundType.Water:
+                    return AdventureTerrainKind.Water;
+                default:
+                    return AdventureTerrainKind.Unknown;
             }
-
-            List<char> chars = new List<char>(value.Length + 4);
-            for (int i = 0; i < value.Length; i++)
-            {
-                char current = value[i];
-                if (i > 0 && char.IsUpper(current) && !char.IsUpper(value[i - 1]) && value[i - 1] != ' ')
-                {
-                    chars.Add(' ');
-                }
-
-                chars.Add(current);
-            }
-
-            string formatted = new string(chars.ToArray()).Trim();
-            if (formatted.Length == 0)
-            {
-                return string.Empty;
-            }
-
-            return char.ToUpperInvariant(formatted[0]) + (formatted.Length > 1 ? formatted.Substring(1) : string.Empty);
         }
 
         private void PopulateMapEntityTooltipSpeech(AdventureMapTile tile, IMapEntity entity, ICommanderState selectedCommander)

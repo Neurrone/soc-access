@@ -1,7 +1,6 @@
 using System.Collections.Generic;
 using SongsOfConquest.Common.Entities;
 using SongsOfConquest.Common.Gamestate;
-using SongsOfConquest.Common.Map;
 using UnityEngine;
 
 namespace SongsOfConquestAccess.Adapters
@@ -79,9 +78,7 @@ namespace SongsOfConquestAccess.Adapters
 
         public PathIndicatorInfo PathIndicator { get; set; }
 
-        public MapGroundType? Terrain { get; set; }
-
-        public List<string> Environment { get; private set; } = new List<string>();
+        public AdventureTerrainKind Terrain { get; set; }
 
         public CommanderInfo Commander { get; set; }
 

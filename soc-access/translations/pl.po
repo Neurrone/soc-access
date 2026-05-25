@@ -2432,3 +2432,308 @@ msgstr "twoje oddzialy wrecz"
 msgctxt "Combat.YourRangedTroops"
 msgid "your ranged troops"
 msgstr "twoje oddzialy dystansowe"
+
+#. Scanner.AridTrees
+msgctxt "Scanner.AridTrees"
+msgid "Arid trees"
+msgstr "Drzewa suchego klimatu"
+
+#. Scanner.CobblestoneRoads
+msgctxt "Scanner.CobblestoneRoads"
+msgid "Cobblestone roads"
+msgstr "Drogi brukowane"
+
+#. Scanner.DeepWater
+msgctxt "Scanner.DeepWater"
+msgid "Deep water"
+msgstr "Gleboka woda"
+
+#. Scanner.Deforestation
+msgctxt "Scanner.Deforestation"
+msgid "Deforestation"
+msgstr "Wylesienie"
+
+#. Scanner.Dirt
+msgctxt "Scanner.Dirt"
+msgid "Dirt"
+msgstr "Ziemia"
+
+#. Scanner.DirtRoads
+msgctxt "Scanner.DirtRoads"
+msgid "Dirt roads"
+msgstr "Drogi gruntowe"
+
+#. Scanner.Farmland
+msgctxt "Scanner.Farmland"
+msgid "Farmland"
+msgstr "Pola uprawne"
+
+#. Scanner.Grass
+msgctxt "Scanner.Grass"
+msgid "Grass"
+msgstr "Trawa"
+
+#. Scanner.Mountains
+msgctxt "Scanner.Mountains"
+msgid "Mountains"
+msgstr "Gory"
+
+#. Scanner.Sand
+msgctxt "Scanner.Sand"
+msgid "Sand"
+msgstr "Piasek"
+
+#. Scanner.ShallowWater
+msgctxt "Scanner.ShallowWater"
+msgid "Shallow water"
+msgstr "Plytka woda"
+
+#. Scanner.TemperateTrees
+msgctxt "Scanner.TemperateTrees"
+msgid "Temperate trees"
+msgstr "Drzewa klimatu umiarkowanego"
+
+#. Scanner.Walls
+msgctxt "Scanner.Walls"
+msgid "Walls"
+msgstr "Mury"
+
+#. Scanner.WaterEdge
+msgctxt "Scanner.WaterEdge"
+msgid "Water edge"
+msgstr "Brzeg wody"
+
+#. Spatial.Dirt
+msgctxt "Spatial.Dirt"
+msgid "Dirt"
+msgstr "Ziemia"
+
+#. Spatial.Grass
+msgctxt "Spatial.Grass"
+msgid "Grass"
+msgstr "Trawa"
+
+#. Spatial.Mountain
+msgctxt "Spatial.Mountain"
+msgid "Mountain"
+msgstr "Gora"
+
+#. Spatial.Sand
+msgctxt "Spatial.Sand"
+msgid "Sand"
+msgstr "Piasek"
+
+#. Spatial.TemperateTrees
+msgctxt "Spatial.TemperateTrees"
+msgid "Temperate trees"
+msgstr "Drzewa klimatu umiarkowanego"
+
+#. Scanner.AridTreeTileCount_0
+msgctxt "Scanner.AridTreeTileCount_0"
+msgid "{0} arid tree tile"
+msgstr "{0} pole: Drzewa suchego klimatu"
+
+#. Scanner.AridTreeTileCount_1
+msgctxt "Scanner.AridTreeTileCount_1"
+msgid "{0} arid tree tiles"
+msgstr "{0} pola: Drzewa suchego klimatu"
+
+#. Scanner.AridTreeTileCount_2
+msgctxt "Scanner.AridTreeTileCount_2"
+msgid "{0} arid tree tiles"
+msgstr "{0} pola: Drzewa suchego klimatu"
+
+#. Scanner.CobblestoneRoadTileCount_0
+msgctxt "Scanner.CobblestoneRoadTileCount_0"
+msgid "{0} cobblestone road tile"
+msgstr "{0} pole: Drogi brukowane"
+
+#. Scanner.CobblestoneRoadTileCount_1
+msgctxt "Scanner.CobblestoneRoadTileCount_1"
+msgid "{0} cobblestone road tiles"
+msgstr "{0} pola: Drogi brukowane"
+
+#. Scanner.CobblestoneRoadTileCount_2
+msgctxt "Scanner.CobblestoneRoadTileCount_2"
+msgid "{0} cobblestone road tiles"
+msgstr "{0} pola: Drogi brukowane"
+
+#. Scanner.DeepWaterTileCount_0
+msgctxt "Scanner.DeepWaterTileCount_0"
+msgid "{0} deep water tile"
+msgstr "{0} pole: Gleboka woda"
+
+#. Scanner.DeepWaterTileCount_1
+msgctxt "Scanner.DeepWaterTileCount_1"
+msgid "{0} deep water tiles"
+msgstr "{0} pola: Gleboka woda"
+
+#. Scanner.DeepWaterTileCount_2
+msgctxt "Scanner.DeepWaterTileCount_2"
+msgid "{0} deep water tiles"
+msgstr "{0} pola: Gleboka woda"
+
+#. Scanner.DeforestationTileCount_0
+msgctxt "Scanner.DeforestationTileCount_0"
+msgid "{0} deforestation tile"
+msgstr "{0} pole: Wylesienie"
+
+#. Scanner.DeforestationTileCount_1
+msgctxt "Scanner.DeforestationTileCount_1"
+msgid "{0} deforestation tiles"
+msgstr "{0} pola: Wylesienie"
+
+#. Scanner.DeforestationTileCount_2
+msgctxt "Scanner.DeforestationTileCount_2"
+msgid "{0} deforestation tiles"
+msgstr "{0} pola: Wylesienie"
+
+#. Scanner.DirtRoadTileCount_0
+msgctxt "Scanner.DirtRoadTileCount_0"
+msgid "{0} dirt road tile"
+msgstr "{0} pole: Drogi gruntowe"
+
+#. Scanner.DirtRoadTileCount_1
+msgctxt "Scanner.DirtRoadTileCount_1"
+msgid "{0} dirt road tiles"
+msgstr "{0} pola: Drogi gruntowe"
+
+#. Scanner.DirtRoadTileCount_2
+msgctxt "Scanner.DirtRoadTileCount_2"
+msgid "{0} dirt road tiles"
+msgstr "{0} pola: Drogi gruntowe"
+
+#. Scanner.DirtTileCount_0
+msgctxt "Scanner.DirtTileCount_0"
+msgid "{0} dirt tile"
+msgstr "{0} pole: Ziemia"
+
+#. Scanner.DirtTileCount_1
+msgctxt "Scanner.DirtTileCount_1"
+msgid "{0} dirt tiles"
+msgstr "{0} pola: Ziemia"
+
+#. Scanner.DirtTileCount_2
+msgctxt "Scanner.DirtTileCount_2"
+msgid "{0} dirt tiles"
+msgstr "{0} pola: Ziemia"
+
+#. Scanner.FarmlandTileCount_0
+msgctxt "Scanner.FarmlandTileCount_0"
+msgid "{0} farmland tile"
+msgstr "{0} pole: Pola uprawne"
+
+#. Scanner.FarmlandTileCount_1
+msgctxt "Scanner.FarmlandTileCount_1"
+msgid "{0} farmland tiles"
+msgstr "{0} pola: Pola uprawne"
+
+#. Scanner.FarmlandTileCount_2
+msgctxt "Scanner.FarmlandTileCount_2"
+msgid "{0} farmland tiles"
+msgstr "{0} pola: Pola uprawne"
+
+#. Scanner.GrassTileCount_0
+msgctxt "Scanner.GrassTileCount_0"
+msgid "{0} grass tile"
+msgstr "{0} pole: Trawa"
+
+#. Scanner.GrassTileCount_1
+msgctxt "Scanner.GrassTileCount_1"
+msgid "{0} grass tiles"
+msgstr "{0} pola: Trawa"
+
+#. Scanner.GrassTileCount_2
+msgctxt "Scanner.GrassTileCount_2"
+msgid "{0} grass tiles"
+msgstr "{0} pola: Trawa"
+
+#. Scanner.MountainTileCount_0
+msgctxt "Scanner.MountainTileCount_0"
+msgid "{0} mountain tile"
+msgstr "{0} pole: Gory"
+
+#. Scanner.MountainTileCount_1
+msgctxt "Scanner.MountainTileCount_1"
+msgid "{0} mountain tiles"
+msgstr "{0} pola: Gory"
+
+#. Scanner.MountainTileCount_2
+msgctxt "Scanner.MountainTileCount_2"
+msgid "{0} mountain tiles"
+msgstr "{0} pola: Gory"
+
+#. Scanner.SandTileCount_0
+msgctxt "Scanner.SandTileCount_0"
+msgid "{0} sand tile"
+msgstr "{0} pole: Piasek"
+
+#. Scanner.SandTileCount_1
+msgctxt "Scanner.SandTileCount_1"
+msgid "{0} sand tiles"
+msgstr "{0} pola: Piasek"
+
+#. Scanner.SandTileCount_2
+msgctxt "Scanner.SandTileCount_2"
+msgid "{0} sand tiles"
+msgstr "{0} pola: Piasek"
+
+#. Scanner.ShallowWaterTileCount_0
+msgctxt "Scanner.ShallowWaterTileCount_0"
+msgid "{0} shallow water tile"
+msgstr "{0} pole: Plytka woda"
+
+#. Scanner.ShallowWaterTileCount_1
+msgctxt "Scanner.ShallowWaterTileCount_1"
+msgid "{0} shallow water tiles"
+msgstr "{0} pola: Plytka woda"
+
+#. Scanner.ShallowWaterTileCount_2
+msgctxt "Scanner.ShallowWaterTileCount_2"
+msgid "{0} shallow water tiles"
+msgstr "{0} pola: Plytka woda"
+
+#. Scanner.TemperateTreeTileCount_0
+msgctxt "Scanner.TemperateTreeTileCount_0"
+msgid "{0} temperate tree tile"
+msgstr "{0} pole: Drzewa klimatu umiarkowanego"
+
+#. Scanner.TemperateTreeTileCount_1
+msgctxt "Scanner.TemperateTreeTileCount_1"
+msgid "{0} temperate tree tiles"
+msgstr "{0} pola: Drzewa klimatu umiarkowanego"
+
+#. Scanner.TemperateTreeTileCount_2
+msgctxt "Scanner.TemperateTreeTileCount_2"
+msgid "{0} temperate tree tiles"
+msgstr "{0} pola: Drzewa klimatu umiarkowanego"
+
+#. Scanner.WallTileCount_0
+msgctxt "Scanner.WallTileCount_0"
+msgid "{0} wall tile"
+msgstr "{0} pole: Mury"
+
+#. Scanner.WallTileCount_1
+msgctxt "Scanner.WallTileCount_1"
+msgid "{0} wall tiles"
+msgstr "{0} pola: Mury"
+
+#. Scanner.WallTileCount_2
+msgctxt "Scanner.WallTileCount_2"
+msgid "{0} wall tiles"
+msgstr "{0} pola: Mury"
+
+#. Scanner.WaterEdgeTileCount_0
+msgctxt "Scanner.WaterEdgeTileCount_0"
+msgid "{0} water edge tile"
+msgstr "{0} pole: Brzeg wody"
+
+#. Scanner.WaterEdgeTileCount_1
+msgctxt "Scanner.WaterEdgeTileCount_1"
+msgid "{0} water edge tiles"
+msgstr "{0} pola: Brzeg wody"
+
+#. Scanner.WaterEdgeTileCount_2
+msgctxt "Scanner.WaterEdgeTileCount_2"
+msgid "{0} water edge tiles"
+msgstr "{0} pola: Brzeg wody"

@@ -2392,3 +2392,238 @@ msgstr "tes troupes de melee"
 msgctxt "Combat.YourRangedTroops"
 msgid "your ranged troops"
 msgstr "tes troupes a distance"
+
+#. Scanner.AridTrees
+msgctxt "Scanner.AridTrees"
+msgid "Arid trees"
+msgstr "Arbres arides"
+
+#. Scanner.CobblestoneRoads
+msgctxt "Scanner.CobblestoneRoads"
+msgid "Cobblestone roads"
+msgstr "Routes pavees"
+
+#. Scanner.DeepWater
+msgctxt "Scanner.DeepWater"
+msgid "Deep water"
+msgstr "Eau profonde"
+
+#. Scanner.Deforestation
+msgctxt "Scanner.Deforestation"
+msgid "Deforestation"
+msgstr "Deforestation"
+
+#. Scanner.Dirt
+msgctxt "Scanner.Dirt"
+msgid "Dirt"
+msgstr "Terre"
+
+#. Scanner.DirtRoads
+msgctxt "Scanner.DirtRoads"
+msgid "Dirt roads"
+msgstr "Chemins de terre"
+
+#. Scanner.Farmland
+msgctxt "Scanner.Farmland"
+msgid "Farmland"
+msgstr "Terres agricoles"
+
+#. Scanner.Grass
+msgctxt "Scanner.Grass"
+msgid "Grass"
+msgstr "Herbe"
+
+#. Scanner.Mountains
+msgctxt "Scanner.Mountains"
+msgid "Mountains"
+msgstr "Montagnes"
+
+#. Scanner.Sand
+msgctxt "Scanner.Sand"
+msgid "Sand"
+msgstr "Sable"
+
+#. Scanner.ShallowWater
+msgctxt "Scanner.ShallowWater"
+msgid "Shallow water"
+msgstr "Eau peu profonde"
+
+#. Scanner.TemperateTrees
+msgctxt "Scanner.TemperateTrees"
+msgid "Temperate trees"
+msgstr "Arbres temperes"
+
+#. Scanner.Walls
+msgctxt "Scanner.Walls"
+msgid "Walls"
+msgstr "Murs"
+
+#. Scanner.WaterEdge
+msgctxt "Scanner.WaterEdge"
+msgid "Water edge"
+msgstr "Bord de eau"
+
+#. Spatial.Dirt
+msgctxt "Spatial.Dirt"
+msgid "Dirt"
+msgstr "Terre"
+
+#. Spatial.Grass
+msgctxt "Spatial.Grass"
+msgid "Grass"
+msgstr "Herbe"
+
+#. Spatial.Mountain
+msgctxt "Spatial.Mountain"
+msgid "Mountain"
+msgstr "Montagne"
+
+#. Spatial.Sand
+msgctxt "Spatial.Sand"
+msgid "Sand"
+msgstr "Sable"
+
+#. Spatial.TemperateTrees
+msgctxt "Spatial.TemperateTrees"
+msgid "Temperate trees"
+msgstr "Arbres temperes"
+
+#. Scanner.AridTreeTileCount_0
+msgctxt "Scanner.AridTreeTileCount_0"
+msgid "{0} arid tree tile"
+msgstr "{0} case: Arbres arides"
+
+#. Scanner.AridTreeTileCount_1
+msgctxt "Scanner.AridTreeTileCount_1"
+msgid "{0} arid tree tiles"
+msgstr "{0} cases: Arbres arides"
+
+#. Scanner.CobblestoneRoadTileCount_0
+msgctxt "Scanner.CobblestoneRoadTileCount_0"
+msgid "{0} cobblestone road tile"
+msgstr "{0} case: Routes pavees"
+
+#. Scanner.CobblestoneRoadTileCount_1
+msgctxt "Scanner.CobblestoneRoadTileCount_1"
+msgid "{0} cobblestone road tiles"
+msgstr "{0} cases: Routes pavees"
+
+#. Scanner.DeepWaterTileCount_0
+msgctxt "Scanner.DeepWaterTileCount_0"
+msgid "{0} deep water tile"
+msgstr "{0} case: Eau profonde"
+
+#. Scanner.DeepWaterTileCount_1
+msgctxt "Scanner.DeepWaterTileCount_1"
+msgid "{0} deep water tiles"
+msgstr "{0} cases: Eau profonde"
+
+#. Scanner.DeforestationTileCount_0
+msgctxt "Scanner.DeforestationTileCount_0"
+msgid "{0} deforestation tile"
+msgstr "{0} case: Deforestation"
+
+#. Scanner.DeforestationTileCount_1
+msgctxt "Scanner.DeforestationTileCount_1"
+msgid "{0} deforestation tiles"
+msgstr "{0} cases: Deforestation"
+
+#. Scanner.DirtRoadTileCount_0
+msgctxt "Scanner.DirtRoadTileCount_0"
+msgid "{0} dirt road tile"
+msgstr "{0} case: Chemins de terre"
+
+#. Scanner.DirtRoadTileCount_1
+msgctxt "Scanner.DirtRoadTileCount_1"
+msgid "{0} dirt road tiles"
+msgstr "{0} cases: Chemins de terre"
+
+#. Scanner.DirtTileCount_0
+msgctxt "Scanner.DirtTileCount_0"
+msgid "{0} dirt tile"
+msgstr "{0} case: Terre"
+
+#. Scanner.DirtTileCount_1
+msgctxt "Scanner.DirtTileCount_1"
+msgid "{0} dirt tiles"
+msgstr "{0} cases: Terre"
+
+#. Scanner.FarmlandTileCount_0
+msgctxt "Scanner.FarmlandTileCount_0"
+msgid "{0} farmland tile"
+msgstr "{0} case: Terres agricoles"
+
+#. Scanner.FarmlandTileCount_1
+msgctxt "Scanner.FarmlandTileCount_1"
+msgid "{0} farmland tiles"
+msgstr "{0} cases: Terres agricoles"
+
+#. Scanner.GrassTileCount_0
+msgctxt "Scanner.GrassTileCount_0"
+msgid "{0} grass tile"
+msgstr "{0} case: Herbe"
+
+#. Scanner.GrassTileCount_1
+msgctxt "Scanner.GrassTileCount_1"
+msgid "{0} grass tiles"
+msgstr "{0} cases: Herbe"
+
+#. Scanner.MountainTileCount_0
+msgctxt "Scanner.MountainTileCount_0"
+msgid "{0} mountain tile"
+msgstr "{0} case: Montagnes"
+
+#. Scanner.MountainTileCount_1
+msgctxt "Scanner.MountainTileCount_1"
+msgid "{0} mountain tiles"
+msgstr "{0} cases: Montagnes"
+
+#. Scanner.SandTileCount_0
+msgctxt "Scanner.SandTileCount_0"
+msgid "{0} sand tile"
+msgstr "{0} case: Sable"
+
+#. Scanner.SandTileCount_1
+msgctxt "Scanner.SandTileCount_1"
+msgid "{0} sand tiles"
+msgstr "{0} cases: Sable"
+
+#. Scanner.ShallowWaterTileCount_0
+msgctxt "Scanner.ShallowWaterTileCount_0"
+msgid "{0} shallow water tile"
+msgstr "{0} case: Eau peu profonde"
+
+#. Scanner.ShallowWaterTileCount_1
+msgctxt "Scanner.ShallowWaterTileCount_1"
+msgid "{0} shallow water tiles"
+msgstr "{0} cases: Eau peu profonde"
+
+#. Scanner.TemperateTreeTileCount_0
+msgctxt "Scanner.TemperateTreeTileCount_0"
+msgid "{0} temperate tree tile"
+msgstr "{0} case: Arbres temperes"
+
+#. Scanner.TemperateTreeTileCount_1
+msgctxt "Scanner.TemperateTreeTileCount_1"
+msgid "{0} temperate tree tiles"
+msgstr "{0} cases: Arbres temperes"
+
+#. Scanner.WallTileCount_0
+msgctxt "Scanner.WallTileCount_0"
+msgid "{0} wall tile"
+msgstr "{0} case: Murs"
+
+#. Scanner.WallTileCount_1
+msgctxt "Scanner.WallTileCount_1"
+msgid "{0} wall tiles"
+msgstr "{0} cases: Murs"
+
+#. Scanner.WaterEdgeTileCount_0
+msgctxt "Scanner.WaterEdgeTileCount_0"
+msgid "{0} water edge tile"
+msgstr "{0} case: Bord de eau"
+
+#. Scanner.WaterEdgeTileCount_1
+msgctxt "Scanner.WaterEdgeTileCount_1"
+msgid "{0} water edge tiles"
+msgstr "{0} cases: Bord de eau"

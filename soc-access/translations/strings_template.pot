@@ -314,6 +314,11 @@ msgctxt "Spatial.Destroys"
 msgid "destroys"
 msgstr ""
 
+#. Spatial.Dirt
+msgctxt "Spatial.Dirt"
+msgid "Dirt"
+msgstr ""
+
 #. Spatial.DirtRoad
 msgctxt "Spatial.DirtRoad"
 msgid "Dirt road"
@@ -367,6 +372,11 @@ msgstr ""
 #. Spatial.FurthestReachableThisTurn
 msgctxt "Spatial.FurthestReachableThisTurn"
 msgid "furthest reachable this turn"
+msgstr ""
+
+#. Spatial.Grass
+msgctxt "Spatial.Grass"
+msgid "Grass"
 msgstr ""
 
 #. Spatial.Health
@@ -424,6 +434,11 @@ msgctxt "Spatial.MovementRange"
 msgid "Movement range"
 msgstr ""
 
+#. Spatial.Mountain
+msgctxt "Spatial.Mountain"
+msgid "Mountain"
+msgstr ""
+
 #. Spatial.Mountains
 msgctxt "Spatial.Mountains"
 msgid "Mountains"
@@ -464,6 +479,11 @@ msgctxt "Spatial.Road"
 msgid "Road"
 msgstr ""
 
+#. Spatial.Sand
+msgctxt "Spatial.Sand"
+msgid "Sand"
+msgstr ""
+
 #. Spatial.ShallowWater
 msgctxt "Spatial.ShallowWater"
 msgid "Shallow water"
@@ -472,6 +492,11 @@ msgstr ""
 #. Spatial.SpawnPoint
 msgctxt "Spatial.SpawnPoint"
 msgid "spawn point"
+msgstr ""
+
+#. Spatial.TemperateTrees
+msgctxt "Spatial.TemperateTrees"
+msgid "Temperate trees"
 msgstr ""
 
 #. Spatial.Threatened
@@ -2149,6 +2174,41 @@ msgctxt "Scanner.Entities"
 msgid "Entities"
 msgstr ""
 
+#. Scanner.AridTrees
+msgctxt "Scanner.AridTrees"
+msgid "Arid trees"
+msgstr ""
+
+#. Scanner.CobblestoneRoads
+msgctxt "Scanner.CobblestoneRoads"
+msgid "Cobblestone roads"
+msgstr ""
+
+#. Scanner.DeepWater
+msgctxt "Scanner.DeepWater"
+msgid "Deep water"
+msgstr ""
+
+#. Scanner.Deforestation
+msgctxt "Scanner.Deforestation"
+msgid "Deforestation"
+msgstr ""
+
+#. Scanner.Dirt
+msgctxt "Scanner.Dirt"
+msgid "Dirt"
+msgstr ""
+
+#. Scanner.DirtRoads
+msgctxt "Scanner.DirtRoads"
+msgid "Dirt roads"
+msgstr ""
+
+#. Scanner.Farmland
+msgctxt "Scanner.Farmland"
+msgid "Farmland"
+msgstr ""
+
 #. Scanner.Friendly
 msgctxt "Scanner.Friendly"
 msgid "Friendly"
@@ -2157,6 +2217,11 @@ msgstr ""
 #. Scanner.FriendlyGates
 msgctxt "Scanner.FriendlyGates"
 msgid "Friendly gates"
+msgstr ""
+
+#. Scanner.Grass
+msgctxt "Scanner.Grass"
+msgid "Grass"
 msgstr ""
 
 #. Scanner.Impassable
@@ -2172,6 +2237,11 @@ msgstr ""
 #. Scanner.Knowledge
 msgctxt "Scanner.Knowledge"
 msgid "Knowledge"
+msgstr ""
+
+#. Scanner.Mountains
+msgctxt "Scanner.Mountains"
+msgid "Mountains"
 msgstr ""
 
 #. Scanner.Neutral
@@ -2234,6 +2304,11 @@ msgctxt "Scanner.Roads"
 msgid "Roads"
 msgstr ""
 
+#. Scanner.Sand
+msgctxt "Scanner.Sand"
+msgid "Sand"
+msgstr ""
+
 #. Scanner.Search
 msgctxt "Scanner.Search"
 msgid "Search"
@@ -2254,6 +2329,11 @@ msgctxt "Scanner.SettlementsAndBuildSites"
 msgid "Settlements and Build sites"
 msgstr ""
 
+#. Scanner.ShallowWater
+msgctxt "Scanner.ShallowWater"
+msgid "Shallow water"
+msgstr ""
+
 #. Scanner.South
 msgctxt "Scanner.South"
 msgid "south"
@@ -2272,6 +2352,11 @@ msgstr ""
 #. Scanner.Teleport
 msgctxt "Scanner.Teleport"
 msgid "Teleport"
+msgstr ""
+
+#. Scanner.TemperateTrees
+msgctxt "Scanner.TemperateTrees"
+msgid "Temperate trees"
 msgstr ""
 
 #. Scanner.Terrain
@@ -2299,9 +2384,19 @@ msgctxt "Scanner.Water"
 msgid "Water"
 msgstr ""
 
+#. Scanner.WaterEdge
+msgctxt "Scanner.WaterEdge"
+msgid "Water edge"
+msgstr ""
+
 #. Scanner.West
 msgctxt "Scanner.West"
 msgid "west"
+msgstr ""
+
+#. Scanner.Walls
+msgctxt "Scanner.Walls"
+msgid "Walls"
 msgstr ""
 
 #. Scanner.Wielders
@@ -2384,6 +2479,126 @@ msgctxt "Scanner.BridgeTileCount_2"
 msgid "{0} bridge tiles"
 msgstr ""
 
+#. Scanner.AridTreeTileCount_0
+msgctxt "Scanner.AridTreeTileCount_0"
+msgid "{0} arid tree tile"
+msgstr ""
+
+#. Scanner.AridTreeTileCount_1
+msgctxt "Scanner.AridTreeTileCount_1"
+msgid "{0} arid tree tiles"
+msgstr ""
+
+#. Scanner.AridTreeTileCount_2
+msgctxt "Scanner.AridTreeTileCount_2"
+msgid "{0} arid tree tiles"
+msgstr ""
+
+#. Scanner.CobblestoneRoadTileCount_0
+msgctxt "Scanner.CobblestoneRoadTileCount_0"
+msgid "{0} cobblestone road tile"
+msgstr ""
+
+#. Scanner.CobblestoneRoadTileCount_1
+msgctxt "Scanner.CobblestoneRoadTileCount_1"
+msgid "{0} cobblestone road tiles"
+msgstr ""
+
+#. Scanner.CobblestoneRoadTileCount_2
+msgctxt "Scanner.CobblestoneRoadTileCount_2"
+msgid "{0} cobblestone road tiles"
+msgstr ""
+
+#. Scanner.DeepWaterTileCount_0
+msgctxt "Scanner.DeepWaterTileCount_0"
+msgid "{0} deep water tile"
+msgstr ""
+
+#. Scanner.DeepWaterTileCount_1
+msgctxt "Scanner.DeepWaterTileCount_1"
+msgid "{0} deep water tiles"
+msgstr ""
+
+#. Scanner.DeepWaterTileCount_2
+msgctxt "Scanner.DeepWaterTileCount_2"
+msgid "{0} deep water tiles"
+msgstr ""
+
+#. Scanner.DeforestationTileCount_0
+msgctxt "Scanner.DeforestationTileCount_0"
+msgid "{0} deforestation tile"
+msgstr ""
+
+#. Scanner.DeforestationTileCount_1
+msgctxt "Scanner.DeforestationTileCount_1"
+msgid "{0} deforestation tiles"
+msgstr ""
+
+#. Scanner.DeforestationTileCount_2
+msgctxt "Scanner.DeforestationTileCount_2"
+msgid "{0} deforestation tiles"
+msgstr ""
+
+#. Scanner.DirtTileCount_0
+msgctxt "Scanner.DirtTileCount_0"
+msgid "{0} dirt tile"
+msgstr ""
+
+#. Scanner.DirtTileCount_1
+msgctxt "Scanner.DirtTileCount_1"
+msgid "{0} dirt tiles"
+msgstr ""
+
+#. Scanner.DirtTileCount_2
+msgctxt "Scanner.DirtTileCount_2"
+msgid "{0} dirt tiles"
+msgstr ""
+
+#. Scanner.DirtRoadTileCount_0
+msgctxt "Scanner.DirtRoadTileCount_0"
+msgid "{0} dirt road tile"
+msgstr ""
+
+#. Scanner.DirtRoadTileCount_1
+msgctxt "Scanner.DirtRoadTileCount_1"
+msgid "{0} dirt road tiles"
+msgstr ""
+
+#. Scanner.DirtRoadTileCount_2
+msgctxt "Scanner.DirtRoadTileCount_2"
+msgid "{0} dirt road tiles"
+msgstr ""
+
+#. Scanner.FarmlandTileCount_0
+msgctxt "Scanner.FarmlandTileCount_0"
+msgid "{0} farmland tile"
+msgstr ""
+
+#. Scanner.FarmlandTileCount_1
+msgctxt "Scanner.FarmlandTileCount_1"
+msgid "{0} farmland tiles"
+msgstr ""
+
+#. Scanner.FarmlandTileCount_2
+msgctxt "Scanner.FarmlandTileCount_2"
+msgid "{0} farmland tiles"
+msgstr ""
+
+#. Scanner.GrassTileCount_0
+msgctxt "Scanner.GrassTileCount_0"
+msgid "{0} grass tile"
+msgstr ""
+
+#. Scanner.GrassTileCount_1
+msgctxt "Scanner.GrassTileCount_1"
+msgid "{0} grass tiles"
+msgstr ""
+
+#. Scanner.GrassTileCount_2
+msgctxt "Scanner.GrassTileCount_2"
+msgid "{0} grass tiles"
+msgstr ""
+
 #. Scanner.ImpassableTileCount_0
 msgctxt "Scanner.ImpassableTileCount_0"
 msgid "{0} impassable tile"
@@ -2397,6 +2612,21 @@ msgstr ""
 #. Scanner.ImpassableTileCount_2
 msgctxt "Scanner.ImpassableTileCount_2"
 msgid "{0} impassable tiles"
+msgstr ""
+
+#. Scanner.MountainTileCount_0
+msgctxt "Scanner.MountainTileCount_0"
+msgid "{0} mountain tile"
+msgstr ""
+
+#. Scanner.MountainTileCount_1
+msgctxt "Scanner.MountainTileCount_1"
+msgid "{0} mountain tiles"
+msgstr ""
+
+#. Scanner.MountainTileCount_2
+msgctxt "Scanner.MountainTileCount_2"
+msgid "{0} mountain tiles"
 msgstr ""
 
 #. Scanner.RoadTileCount_0
@@ -2414,6 +2644,66 @@ msgctxt "Scanner.RoadTileCount_2"
 msgid "{0} road tiles"
 msgstr ""
 
+#. Scanner.SandTileCount_0
+msgctxt "Scanner.SandTileCount_0"
+msgid "{0} sand tile"
+msgstr ""
+
+#. Scanner.SandTileCount_1
+msgctxt "Scanner.SandTileCount_1"
+msgid "{0} sand tiles"
+msgstr ""
+
+#. Scanner.SandTileCount_2
+msgctxt "Scanner.SandTileCount_2"
+msgid "{0} sand tiles"
+msgstr ""
+
+#. Scanner.ShallowWaterTileCount_0
+msgctxt "Scanner.ShallowWaterTileCount_0"
+msgid "{0} shallow water tile"
+msgstr ""
+
+#. Scanner.ShallowWaterTileCount_1
+msgctxt "Scanner.ShallowWaterTileCount_1"
+msgid "{0} shallow water tiles"
+msgstr ""
+
+#. Scanner.ShallowWaterTileCount_2
+msgctxt "Scanner.ShallowWaterTileCount_2"
+msgid "{0} shallow water tiles"
+msgstr ""
+
+#. Scanner.TemperateTreeTileCount_0
+msgctxt "Scanner.TemperateTreeTileCount_0"
+msgid "{0} temperate tree tile"
+msgstr ""
+
+#. Scanner.TemperateTreeTileCount_1
+msgctxt "Scanner.TemperateTreeTileCount_1"
+msgid "{0} temperate tree tiles"
+msgstr ""
+
+#. Scanner.TemperateTreeTileCount_2
+msgctxt "Scanner.TemperateTreeTileCount_2"
+msgid "{0} temperate tree tiles"
+msgstr ""
+
+#. Scanner.WaterEdgeTileCount_0
+msgctxt "Scanner.WaterEdgeTileCount_0"
+msgid "{0} water edge tile"
+msgstr ""
+
+#. Scanner.WaterEdgeTileCount_1
+msgctxt "Scanner.WaterEdgeTileCount_1"
+msgid "{0} water edge tiles"
+msgstr ""
+
+#. Scanner.WaterEdgeTileCount_2
+msgctxt "Scanner.WaterEdgeTileCount_2"
+msgid "{0} water edge tiles"
+msgstr ""
+
 #. Scanner.WaterTileCount_0
 msgctxt "Scanner.WaterTileCount_0"
 msgid "{0} water tile"
@@ -2427,5 +2717,20 @@ msgstr ""
 #. Scanner.WaterTileCount_2
 msgctxt "Scanner.WaterTileCount_2"
 msgid "{0} water tiles"
+msgstr ""
+
+#. Scanner.WallTileCount_0
+msgctxt "Scanner.WallTileCount_0"
+msgid "{0} wall tile"
+msgstr ""
+
+#. Scanner.WallTileCount_1
+msgctxt "Scanner.WallTileCount_1"
+msgid "{0} wall tiles"
+msgstr ""
+
+#. Scanner.WallTileCount_2
+msgctxt "Scanner.WallTileCount_2"
+msgid "{0} wall tiles"
 msgstr ""
 

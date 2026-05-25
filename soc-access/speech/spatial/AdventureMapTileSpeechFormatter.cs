@@ -52,21 +52,17 @@ namespace SongsOfConquestAccess.Speech.Spatial
                 }
             }
 
-            for (int i = 0; i < tile.Environment.Count; i++)
+            string terrain = DescribeTerrain(tile.Terrain);
+            if (!string.IsNullOrWhiteSpace(terrain))
             {
-                if (string.IsNullOrWhiteSpace(tile.Environment[i]))
-                {
-                    continue;
-                }
-
                 if (!addedMovementStatus)
                 {
-                    parts.Add(AppendDetails(tile.Environment[i], GetMovementDetails(tile)));
+                    parts.Add(AppendDetails(terrain, GetMovementDetails(tile)));
                     addedMovementStatus = true;
                 }
                 else
                 {
-                    parts.Add(tile.Environment[i]);
+                    parts.Add(terrain);
                 }
             }
 
@@ -77,11 +73,6 @@ namespace SongsOfConquestAccess.Speech.Spatial
                 {
                     parts.Add(string.Join(", ", movementDetails.ToArray()));
                 }
-            }
-
-            if (tile.Terrain.HasValue)
-            {
-                parts.Add(FormatEnumName(tile.Terrain.Value.ToString()));
             }
 
             parts.Add(DescribeCoordinates(tile));
@@ -164,17 +155,10 @@ namespace SongsOfConquestAccess.Speech.Spatial
                 }
             }
 
-            for (int i = 0; i < tile.Environment.Count; i++)
+            string terrain = DescribeTerrain(tile.Terrain);
+            if (!string.IsNullOrWhiteSpace(terrain))
             {
-                if (!string.IsNullOrWhiteSpace(tile.Environment[i]))
-                {
-                    parts.Add(tile.Environment[i]);
-                }
-            }
-
-            if (tile.Terrain.HasValue)
-            {
-                parts.Add(FormatEnumName(tile.Terrain.Value.ToString()));
+                parts.Add(terrain);
             }
 
             return string.Join(". ", parts.ToArray());
@@ -319,26 +303,47 @@ namespace SongsOfConquestAccess.Speech.Spatial
             return string.IsNullOrWhiteSpace(preferred) ? fallback : preferred;
         }
 
-        private static string FormatEnumName(string value)
+        private static string DescribeTerrain(AdventureTerrainKind terrain)
         {
-            if (string.IsNullOrWhiteSpace(value))
+            switch (terrain)
             {
-                return string.Empty;
+                case AdventureTerrainKind.Road:
+                    return ModText.Get(ModStrings.Spatial.Road);
+                case AdventureTerrainKind.DirtRoad:
+                    return ModText.Get(ModStrings.Spatial.DirtRoad);
+                case AdventureTerrainKind.CobblestoneRoad:
+                    return ModText.Get(ModStrings.Spatial.CobblestoneRoad);
+                case AdventureTerrainKind.Wall:
+                    return ModText.Get(ModStrings.Spatial.Wall);
+                case AdventureTerrainKind.Grass:
+                    return ModText.Get(ModStrings.Spatial.Grass);
+                case AdventureTerrainKind.Sand:
+                    return ModText.Get(ModStrings.Spatial.Sand);
+                case AdventureTerrainKind.Dirt:
+                    return ModText.Get(ModStrings.Spatial.Dirt);
+                case AdventureTerrainKind.Bridge:
+                    return ModText.Get(ModStrings.Spatial.Bridge);
+                case AdventureTerrainKind.Water:
+                    return ModText.Get(ModStrings.Spatial.Water);
+                case AdventureTerrainKind.ShallowWater:
+                    return ModText.Get(ModStrings.Spatial.ShallowWater);
+                case AdventureTerrainKind.DeepWater:
+                    return ModText.Get(ModStrings.Spatial.DeepWater);
+                case AdventureTerrainKind.WaterEdge:
+                    return ModText.Get(ModStrings.Spatial.WaterEdge);
+                case AdventureTerrainKind.AridTrees:
+                    return ModText.Get(ModStrings.Spatial.AridTrees);
+                case AdventureTerrainKind.TemperateTrees:
+                    return ModText.Get(ModStrings.Spatial.TemperateTrees);
+                case AdventureTerrainKind.Mountain:
+                    return ModText.Get(ModStrings.Spatial.Mountain);
+                case AdventureTerrainKind.Deforestation:
+                    return ModText.Get(ModStrings.Spatial.Deforestation);
+                case AdventureTerrainKind.Farmland:
+                    return ModText.Get(ModStrings.Spatial.Farmland);
+                default:
+                    return string.Empty;
             }
-
-            List<char> chars = new List<char>(value.Length + 4);
-            for (int i = 0; i < value.Length; i++)
-            {
-                char current = value[i];
-                if (i > 0 && char.IsUpper(current) && !char.IsUpper(value[i - 1]))
-                {
-                    chars.Add(' ');
-                }
-
-                chars.Add(current);
-            }
-
-            return new string(chars.ToArray());
         }
     }
 }

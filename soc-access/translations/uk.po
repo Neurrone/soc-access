@@ -2432,3 +2432,308 @@ msgstr "ваші загони ближнього бою"
 msgctxt "Combat.YourRangedTroops"
 msgid "your ranged troops"
 msgstr "ваші далекобійні загони"
+
+#. Scanner.AridTrees
+msgctxt "Scanner.AridTrees"
+msgid "Arid trees"
+msgstr "Posushlyvi dereva"
+
+#. Scanner.CobblestoneRoads
+msgctxt "Scanner.CobblestoneRoads"
+msgid "Cobblestone roads"
+msgstr "Brukovani dorohy"
+
+#. Scanner.DeepWater
+msgctxt "Scanner.DeepWater"
+msgid "Deep water"
+msgstr "Hlyboka voda"
+
+#. Scanner.Deforestation
+msgctxt "Scanner.Deforestation"
+msgid "Deforestation"
+msgstr "Vyrubka lisu"
+
+#. Scanner.Dirt
+msgctxt "Scanner.Dirt"
+msgid "Dirt"
+msgstr "Zemlia"
+
+#. Scanner.DirtRoads
+msgctxt "Scanner.DirtRoads"
+msgid "Dirt roads"
+msgstr "Gruntovi dorohy"
+
+#. Scanner.Farmland
+msgctxt "Scanner.Farmland"
+msgid "Farmland"
+msgstr "Silskohospodarski zemli"
+
+#. Scanner.Grass
+msgctxt "Scanner.Grass"
+msgid "Grass"
+msgstr "Trava"
+
+#. Scanner.Mountains
+msgctxt "Scanner.Mountains"
+msgid "Mountains"
+msgstr "Hory"
+
+#. Scanner.Sand
+msgctxt "Scanner.Sand"
+msgid "Sand"
+msgstr "Pisok"
+
+#. Scanner.ShallowWater
+msgctxt "Scanner.ShallowWater"
+msgid "Shallow water"
+msgstr "Milkovoddia"
+
+#. Scanner.TemperateTrees
+msgctxt "Scanner.TemperateTrees"
+msgid "Temperate trees"
+msgstr "Dereva pomirnoho klimatu"
+
+#. Scanner.Walls
+msgctxt "Scanner.Walls"
+msgid "Walls"
+msgstr "Mury"
+
+#. Scanner.WaterEdge
+msgctxt "Scanner.WaterEdge"
+msgid "Water edge"
+msgstr "Krai vody"
+
+#. Spatial.Dirt
+msgctxt "Spatial.Dirt"
+msgid "Dirt"
+msgstr "Zemlia"
+
+#. Spatial.Grass
+msgctxt "Spatial.Grass"
+msgid "Grass"
+msgstr "Trava"
+
+#. Spatial.Mountain
+msgctxt "Spatial.Mountain"
+msgid "Mountain"
+msgstr "Hora"
+
+#. Spatial.Sand
+msgctxt "Spatial.Sand"
+msgid "Sand"
+msgstr "Pisok"
+
+#. Spatial.TemperateTrees
+msgctxt "Spatial.TemperateTrees"
+msgid "Temperate trees"
+msgstr "Dereva pomirnoho klimatu"
+
+#. Scanner.AridTreeTileCount_0
+msgctxt "Scanner.AridTreeTileCount_0"
+msgid "{0} arid tree tile"
+msgstr "{0} klitynka: Posushlyvi dereva"
+
+#. Scanner.AridTreeTileCount_1
+msgctxt "Scanner.AridTreeTileCount_1"
+msgid "{0} arid tree tiles"
+msgstr "{0} klitynky: Posushlyvi dereva"
+
+#. Scanner.AridTreeTileCount_2
+msgctxt "Scanner.AridTreeTileCount_2"
+msgid "{0} arid tree tiles"
+msgstr "{0} klitynky: Posushlyvi dereva"
+
+#. Scanner.CobblestoneRoadTileCount_0
+msgctxt "Scanner.CobblestoneRoadTileCount_0"
+msgid "{0} cobblestone road tile"
+msgstr "{0} klitynka: Brukovani dorohy"
+
+#. Scanner.CobblestoneRoadTileCount_1
+msgctxt "Scanner.CobblestoneRoadTileCount_1"
+msgid "{0} cobblestone road tiles"
+msgstr "{0} klitynky: Brukovani dorohy"
+
+#. Scanner.CobblestoneRoadTileCount_2
+msgctxt "Scanner.CobblestoneRoadTileCount_2"
+msgid "{0} cobblestone road tiles"
+msgstr "{0} klitynky: Brukovani dorohy"
+
+#. Scanner.DeepWaterTileCount_0
+msgctxt "Scanner.DeepWaterTileCount_0"
+msgid "{0} deep water tile"
+msgstr "{0} klitynka: Hlyboka voda"
+
+#. Scanner.DeepWaterTileCount_1
+msgctxt "Scanner.DeepWaterTileCount_1"
+msgid "{0} deep water tiles"
+msgstr "{0} klitynky: Hlyboka voda"
+
+#. Scanner.DeepWaterTileCount_2
+msgctxt "Scanner.DeepWaterTileCount_2"
+msgid "{0} deep water tiles"
+msgstr "{0} klitynky: Hlyboka voda"
+
+#. Scanner.DeforestationTileCount_0
+msgctxt "Scanner.DeforestationTileCount_0"
+msgid "{0} deforestation tile"
+msgstr "{0} klitynka: Vyrubka lisu"
+
+#. Scanner.DeforestationTileCount_1
+msgctxt "Scanner.DeforestationTileCount_1"
+msgid "{0} deforestation tiles"
+msgstr "{0} klitynky: Vyrubka lisu"
+
+#. Scanner.DeforestationTileCount_2
+msgctxt "Scanner.DeforestationTileCount_2"
+msgid "{0} deforestation tiles"
+msgstr "{0} klitynky: Vyrubka lisu"
+
+#. Scanner.DirtRoadTileCount_0
+msgctxt "Scanner.DirtRoadTileCount_0"
+msgid "{0} dirt road tile"
+msgstr "{0} klitynka: Gruntovi dorohy"
+
+#. Scanner.DirtRoadTileCount_1
+msgctxt "Scanner.DirtRoadTileCount_1"
+msgid "{0} dirt road tiles"
+msgstr "{0} klitynky: Gruntovi dorohy"
+
+#. Scanner.DirtRoadTileCount_2
+msgctxt "Scanner.DirtRoadTileCount_2"
+msgid "{0} dirt road tiles"
+msgstr "{0} klitynky: Gruntovi dorohy"
+
+#. Scanner.DirtTileCount_0
+msgctxt "Scanner.DirtTileCount_0"
+msgid "{0} dirt tile"
+msgstr "{0} klitynka: Zemlia"
+
+#. Scanner.DirtTileCount_1
+msgctxt "Scanner.DirtTileCount_1"
+msgid "{0} dirt tiles"
+msgstr "{0} klitynky: Zemlia"
+
+#. Scanner.DirtTileCount_2
+msgctxt "Scanner.DirtTileCount_2"
+msgid "{0} dirt tiles"
+msgstr "{0} klitynky: Zemlia"
+
+#. Scanner.FarmlandTileCount_0
+msgctxt "Scanner.FarmlandTileCount_0"
+msgid "{0} farmland tile"
+msgstr "{0} klitynka: Silskohospodarski zemli"
+
+#. Scanner.FarmlandTileCount_1
+msgctxt "Scanner.FarmlandTileCount_1"
+msgid "{0} farmland tiles"
+msgstr "{0} klitynky: Silskohospodarski zemli"
+
+#. Scanner.FarmlandTileCount_2
+msgctxt "Scanner.FarmlandTileCount_2"
+msgid "{0} farmland tiles"
+msgstr "{0} klitynky: Silskohospodarski zemli"
+
+#. Scanner.GrassTileCount_0
+msgctxt "Scanner.GrassTileCount_0"
+msgid "{0} grass tile"
+msgstr "{0} klitynka: Trava"
+
+#. Scanner.GrassTileCount_1
+msgctxt "Scanner.GrassTileCount_1"
+msgid "{0} grass tiles"
+msgstr "{0} klitynky: Trava"
+
+#. Scanner.GrassTileCount_2
+msgctxt "Scanner.GrassTileCount_2"
+msgid "{0} grass tiles"
+msgstr "{0} klitynky: Trava"
+
+#. Scanner.MountainTileCount_0
+msgctxt "Scanner.MountainTileCount_0"
+msgid "{0} mountain tile"
+msgstr "{0} klitynka: Hory"
+
+#. Scanner.MountainTileCount_1
+msgctxt "Scanner.MountainTileCount_1"
+msgid "{0} mountain tiles"
+msgstr "{0} klitynky: Hory"
+
+#. Scanner.MountainTileCount_2
+msgctxt "Scanner.MountainTileCount_2"
+msgid "{0} mountain tiles"
+msgstr "{0} klitynky: Hory"
+
+#. Scanner.SandTileCount_0
+msgctxt "Scanner.SandTileCount_0"
+msgid "{0} sand tile"
+msgstr "{0} klitynka: Pisok"
+
+#. Scanner.SandTileCount_1
+msgctxt "Scanner.SandTileCount_1"
+msgid "{0} sand tiles"
+msgstr "{0} klitynky: Pisok"
+
+#. Scanner.SandTileCount_2
+msgctxt "Scanner.SandTileCount_2"
+msgid "{0} sand tiles"
+msgstr "{0} klitynky: Pisok"
+
+#. Scanner.ShallowWaterTileCount_0
+msgctxt "Scanner.ShallowWaterTileCount_0"
+msgid "{0} shallow water tile"
+msgstr "{0} klitynka: Milkovoddia"
+
+#. Scanner.ShallowWaterTileCount_1
+msgctxt "Scanner.ShallowWaterTileCount_1"
+msgid "{0} shallow water tiles"
+msgstr "{0} klitynky: Milkovoddia"
+
+#. Scanner.ShallowWaterTileCount_2
+msgctxt "Scanner.ShallowWaterTileCount_2"
+msgid "{0} shallow water tiles"
+msgstr "{0} klitynky: Milkovoddia"
+
+#. Scanner.TemperateTreeTileCount_0
+msgctxt "Scanner.TemperateTreeTileCount_0"
+msgid "{0} temperate tree tile"
+msgstr "{0} klitynka: Dereva pomirnoho klimatu"
+
+#. Scanner.TemperateTreeTileCount_1
+msgctxt "Scanner.TemperateTreeTileCount_1"
+msgid "{0} temperate tree tiles"
+msgstr "{0} klitynky: Dereva pomirnoho klimatu"
+
+#. Scanner.TemperateTreeTileCount_2
+msgctxt "Scanner.TemperateTreeTileCount_2"
+msgid "{0} temperate tree tiles"
+msgstr "{0} klitynky: Dereva pomirnoho klimatu"
+
+#. Scanner.WallTileCount_0
+msgctxt "Scanner.WallTileCount_0"
+msgid "{0} wall tile"
+msgstr "{0} klitynka: Mury"
+
+#. Scanner.WallTileCount_1
+msgctxt "Scanner.WallTileCount_1"
+msgid "{0} wall tiles"
+msgstr "{0} klitynky: Mury"
+
+#. Scanner.WallTileCount_2
+msgctxt "Scanner.WallTileCount_2"
+msgid "{0} wall tiles"
+msgstr "{0} klitynky: Mury"
+
+#. Scanner.WaterEdgeTileCount_0
+msgctxt "Scanner.WaterEdgeTileCount_0"
+msgid "{0} water edge tile"
+msgstr "{0} klitynka: Krai vody"
+
+#. Scanner.WaterEdgeTileCount_1
+msgctxt "Scanner.WaterEdgeTileCount_1"
+msgid "{0} water edge tiles"
+msgstr "{0} klitynky: Krai vody"
+
+#. Scanner.WaterEdgeTileCount_2
+msgctxt "Scanner.WaterEdgeTileCount_2"
+msgid "{0} water edge tiles"
+msgstr "{0} klitynky: Krai vody"
