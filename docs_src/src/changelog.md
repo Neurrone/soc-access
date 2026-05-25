@@ -26,6 +26,7 @@
 - Fixed regression in V0.2.0 that broke reading of marketplace screen button labels
 - Fixed placeholder titles being read on story screens when no title was actually visually shown
 - Artifact colours should now be read everywhere
+- On the adventure map, revealed announcements and reading the focused tile now respect scouting level and no longer reads full artifact names unless the game would actually show it
 
 ## V0.3.0
 

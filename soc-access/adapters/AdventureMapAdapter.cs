@@ -3439,21 +3439,6 @@ namespace SongsOfConquestAccess.Adapters
                     return;
                 }
 
-                string name;
-                ArtifactPreVisitDetails artifactDetails = preVisitDetails as ArtifactPreVisitDetails;
-                if (artifactDetails != null && ArtifactSpeechFormatter.TryFormatName(artifactDetails, _localizationHandler, out name))
-                {
-                    tile.MapEntityName = name;
-                }
-                else
-                {
-                    name = Localize(preVisitDetails.NameKey);
-                    if (!string.IsNullOrWhiteSpace(name))
-                    {
-                        tile.MapEntityName = name;
-                    }
-                }
-
                 if (preVisitDetails.Hint != MapEntityPreVisitDetails.PreVisitHint.None)
                 {
                     tile.MapEntityHint = Localize("Adventure/Tooltips/PreVisitHint/" + preVisitDetails.Hint);
@@ -3468,33 +3453,7 @@ namespace SongsOfConquestAccess.Adapters
 
         private string GetMapEntityName(IMapEntity entity)
         {
-            if (entity == null)
-            {
-                return string.Empty;
-            }
-
-            string customNameKey = string.Empty;
-            if (entity.TryGetCustomNameKey(out customNameKey))
-            {
-                string customName = Localize(customNameKey);
-                if (!string.IsNullOrWhiteSpace(customName))
-                {
-                    return customName;
-                }
-            }
-
-            string localizedName = Localize(entity.NameKey);
-            if (!string.IsNullOrWhiteSpace(localizedName))
-            {
-                return localizedName;
-            }
-
-            if (!string.IsNullOrWhiteSpace(entity.Name))
-            {
-                return entity.Name;
-            }
-
-            return entity.NameKey;
+            return AdventureMapEntityLabel.GetMapEntityName(_facade, _selectionHandler, _localizationHandler, entity);
         }
 
         private string Localize(string key)

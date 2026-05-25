@@ -14,7 +14,6 @@ using SongsOfConquest.Common.Localization;
 using SongsOfConquestAccess.Adapters;
 using SongsOfConquestAccess.Localization;
 using SongsOfConquestAccess.Scanner;
-using SongsOfConquestAccess.Speech;
 using UnityEngine;
 
 namespace SongsOfConquestAccess.Events
@@ -41,6 +40,7 @@ namespace SongsOfConquestAccess.Events
         private readonly Dictionary<string, string> _pendingHiddenWielderLabelsByKey = new Dictionary<string, string>();
         private readonly List<string> _pendingHiddenWielderOrder = new List<string>();
         private readonly HashSet<int> _discoveredMapEntityIds = new HashSet<int>();
+        private readonly Dictionary<int, string> _discoveredMapEntityLabelsById = new Dictionary<int, string>();
         private readonly HashSet<int> _knownLocalCommanderIds = new HashSet<int>();
         private byte[] _lastExploration;
         private bool _attached;
@@ -182,6 +182,7 @@ namespace SongsOfConquestAccess.Events
             _lastVisibleNonLocalCommanders.Clear();
             _announcedVisibleNonLocalCommanders.Clear();
             _discoveredMapEntityIds.Clear();
+            _discoveredMapEntityLabelsById.Clear();
             _knownLocalCommanderIds.Clear();
             _attached = false;
         }
@@ -322,6 +323,11 @@ namespace SongsOfConquestAccess.Events
 
             bool revealedNonLocalCommander = !IsLocalCommander(commander)
                 && TrackNonLocalCommanderVisibility(commander, announceTransitions: true);
+            if (IsLocalCommander(commander))
+            {
+                AddVisibleMapEntityDiscoveries();
+            }
+
             if (!ShouldPublishCommanderPositionEvent(commander, commander.Position))
             {
                 return;
@@ -352,6 +358,11 @@ namespace SongsOfConquestAccess.Events
 
             bool revealedNonLocalCommander = !IsLocalCommander(commander)
                 && TrackNonLocalCommanderVisibility(commander, announceTransitions: true);
+            if (IsLocalCommander(commander))
+            {
+                AddVisibleMapEntityDiscoveries();
+            }
+
             if (!ShouldPublishCommanderPositionEvent(commander, response.ToLocation))
             {
                 return;
@@ -440,6 +451,7 @@ namespace SongsOfConquestAccess.Events
                 if (IsMapEntityVisible(entity))
                 {
                     _discoveredMapEntityIds.Add(entity.Id);
+                    _discoveredMapEntityLabelsById[entity.Id] = GetMapEntityName(entity);
                 }
             }
         }
@@ -470,7 +482,6 @@ namespace SongsOfConquestAccess.Events
         {
             Vector2Int revealTile;
             if (!ShouldConsiderMapEntityDiscovery(entity)
-                || _discoveredMapEntityIds.Contains(entity.Id)
                 || !AdventureMapVisibility.TryGetFullyVisibleMapEntityIdentityTile(
                     _facade,
                     _fogManager,
@@ -480,10 +491,31 @@ namespace SongsOfConquestAccess.Events
                 return false;
             }
 
-            _discoveredMapEntityIds.Add(entity.Id);
             string label = GetMapEntityName(entity);
+            if (string.IsNullOrWhiteSpace(label))
+            {
+                return false;
+            }
+
+            bool alreadyDiscovered = _discoveredMapEntityIds.Contains(entity.Id);
+            string previousLabel;
+            if (alreadyDiscovered
+                && _discoveredMapEntityLabelsById.TryGetValue(entity.Id, out previousLabel)
+                && LabelsMatch(previousLabel, label))
+            {
+                return false;
+            }
+
+            _discoveredMapEntityIds.Add(entity.Id);
+            _discoveredMapEntityLabelsById[entity.Id] = label;
+            string discoveryKey = EntityDiscoveryKey(entity.Id);
+            if (alreadyDiscovered)
+            {
+                RemovePendingDiscovery(discoveryKey);
+            }
+
             return AddPendingDiscovery(
-                EntityDiscoveryKey(entity.Id),
+                discoveryKey,
                 label,
                 revealTile,
                 entity.Id,
@@ -830,17 +862,26 @@ namespace SongsOfConquestAccess.Events
                 {
                     RemovePendingDiscovery(key);
                     _discoveredMapEntityIds.Remove(entry.StableReference);
+                    _discoveredMapEntityLabelsById.Remove(entry.StableReference);
                     continue;
                 }
 
-                if (revealTile != entry.Position)
+                string label = GetMapEntityName(entity);
+                bool labelChanged = !string.IsNullOrWhiteSpace(label) && !LabelsMatch(entry.Label, label);
+                if (revealTile != entry.Position || labelChanged)
                 {
                     _pendingRevealedEntriesByKey[key] = new PendingRevealedEntry(
                         entry.Key,
-                        entry.Label,
+                        labelChanged ? label : entry.Label,
                         revealTile,
                         entry.StableReference,
                         entry.Kind);
+                }
+
+                if (labelChanged)
+                {
+                    ReplacePendingDiscoveryLabel(key, label);
+                    _discoveredMapEntityLabelsById[entry.StableReference] = label;
                 }
             }
         }
@@ -879,6 +920,55 @@ namespace SongsOfConquestAccess.Events
             _pendingHiddenWielderCounts.Clear();
             _pendingHiddenWielderLabelsByKey.Clear();
             _pendingHiddenWielderOrder.Clear();
+        }
+
+        private bool ReplacePendingDiscoveryLabel(string objectKey, string newLabel)
+        {
+            if (string.IsNullOrWhiteSpace(objectKey) || string.IsNullOrWhiteSpace(newLabel))
+            {
+                return false;
+            }
+
+            string oldLabel;
+            if (!_pendingDiscoveryLabelsByKey.TryGetValue(objectKey, out oldLabel)
+                || LabelsMatch(oldLabel, newLabel))
+            {
+                return false;
+            }
+
+            DecrementPendingDiscoveryCount(oldLabel);
+            _pendingDiscoveryLabelsByKey[objectKey] = newLabel;
+
+            DiscoveryCount count;
+            if (_pendingDiscoveryCounts.TryGetValue(newLabel, out count))
+            {
+                _pendingDiscoveryCounts[newLabel] = new DiscoveryCount(newLabel, count.Count + 1);
+            }
+            else
+            {
+                _pendingDiscoveryCounts[newLabel] = new DiscoveryCount(newLabel, 1);
+                _pendingDiscoveryOrder.Add(newLabel);
+            }
+
+            return true;
+        }
+
+        private void DecrementPendingDiscoveryCount(string label)
+        {
+            DiscoveryCount count;
+            if (string.IsNullOrWhiteSpace(label) || !_pendingDiscoveryCounts.TryGetValue(label, out count))
+            {
+                return;
+            }
+
+            if (count.Count <= 1)
+            {
+                _pendingDiscoveryCounts.Remove(label);
+                _pendingDiscoveryOrder.Remove(label);
+                return;
+            }
+
+            _pendingDiscoveryCounts[label] = new DiscoveryCount(label, count.Count - 1);
         }
 
         private void AddPendingDiscoveriesToRevealedRegistry()
@@ -930,6 +1020,14 @@ namespace SongsOfConquestAccess.Events
         private static string EntityDiscoveryKey(int entityId)
         {
             return "entity:" + entityId;
+        }
+
+        private static bool LabelsMatch(string left, string right)
+        {
+            return string.Equals(
+                (left ?? string.Empty).Trim(),
+                (right ?? string.Empty).Trim(),
+                StringComparison.Ordinal);
         }
 
         private IMapEntity TryGetMapEntity(int id)
@@ -1059,67 +1157,7 @@ namespace SongsOfConquestAccess.Events
 
         private string GetMapEntityName(IMapEntity entity)
         {
-            if (entity == null)
-            {
-                return string.Empty;
-            }
-
-            string customNameKey = string.Empty;
-            if (entity.TryGetCustomNameKey(out customNameKey))
-            {
-                string customName = Localize(customNameKey);
-                if (!string.IsNullOrWhiteSpace(customName))
-                {
-                    return customName;
-                }
-            }
-
-            string preVisitName = GetPreVisitMapEntityName(entity);
-            if (!string.IsNullOrWhiteSpace(preVisitName))
-            {
-                return preVisitName;
-            }
-
-            string localizedName = Localize(entity.NameKey);
-            if (!string.IsNullOrWhiteSpace(localizedName))
-            {
-                return localizedName;
-            }
-
-            if (!string.IsNullOrWhiteSpace(entity.Name))
-            {
-                return entity.Name;
-            }
-
-            return entity.NameKey;
-        }
-
-        private string GetPreVisitMapEntityName(IMapEntity entity)
-        {
-            try
-            {
-                ICommanderState selectedCommander = _selectionHandler != null ? _selectionHandler.SelectedCommander : null;
-                IDetails details = entity.GetPreVisitDetails(
-                    selectedCommander != null ? selectedCommander.Id : -1,
-                    false,
-                    ScoutingDetailLevel.VeryFar,
-                    null,
-                    selectedCommander != null && selectedCommander.IsAlive);
-
-                string artifactName;
-                if (ArtifactSpeechFormatter.TryFormatName(details, _localizationHandler, out artifactName))
-                {
-                    return artifactName;
-                }
-
-                MapEntityPreVisitDetails preVisitDetails = details as MapEntityPreVisitDetails;
-                return preVisitDetails != null ? Localize(preVisitDetails.NameKey) : string.Empty;
-            }
-            catch (Exception exception)
-            {
-                SocAccessPlugin.Instance?.LogWarning("AdventureMapEventListener failed to read map entity pre-visit name: " + exception.Message);
-                return string.Empty;
-            }
+            return AdventureMapEntityLabel.GetMapEntityName(_facade, _selectionHandler, _localizationHandler, entity);
         }
 
         private string Localize(string key)
