@@ -1914,6 +1914,11 @@ msgctxt "Screens.PostAdventureStats"
 msgid "Post adventure stats"
 msgstr ""
 
+#. Screens.Penalties
+msgctxt "Screens.Penalties"
+msgid "Penalties"
+msgstr ""
+
 #. Screens.Previous
 msgctxt "Screens.Previous"
 msgid "Previous"
@@ -1957,6 +1962,11 @@ msgstr ""
 #. Screens.Resources
 msgctxt "Screens.Resources"
 msgid "Resources"
+msgstr ""
+
+#. Screens.Rewards
+msgctxt "Screens.Rewards"
+msgid "Rewards"
 msgstr ""
 
 #. Screens.Round

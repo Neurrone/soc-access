@@ -111,7 +111,7 @@ namespace SongsOfConquestAccess.Screens
 
             root.AddChild(new ButtonWidget(
                 "world-choice-cancel",
-                () => adapter.CancelLabel,
+                ModText.Get(ModStrings.Screens.Close),
                 adapter.Close,
                 adapter.HideNativeTooltip,
                 () => true));
@@ -121,8 +121,8 @@ namespace SongsOfConquestAccess.Screens
 
         private static MenuWidget BuildChoiceMenu(WorldChoiceMenuAdapter adapter)
         {
-            MenuWidget menu = new MenuWidget("world-choice-choices", adapter.ChoiceMenuLabel);
             IReadOnlyList<WorldChoiceMenuAdapter.ChoiceItem> choices = adapter.GetChoices();
+            MenuWidget menu = new MenuWidget("world-choice-choices", BuildChoiceMenuLabel(choices));
             for (int i = 0; i < choices.Count; i++)
             {
                 WorldChoiceMenuAdapter.ChoiceItem choice = choices[i];
@@ -137,6 +137,38 @@ namespace SongsOfConquestAccess.Screens
             }
 
             return menu;
+        }
+
+        private static string BuildChoiceMenuLabel(IReadOnlyList<WorldChoiceMenuAdapter.ChoiceItem> choices)
+        {
+            bool hasRewards = false;
+            bool hasPenalties = false;
+            for (int i = 0; choices != null && i < choices.Count; i++)
+            {
+                WorldChoiceMenuAdapter.ChoiceItem choice = choices[i];
+                if (choice == null)
+                {
+                    continue;
+                }
+
+                if (choice.IsPenalty)
+                {
+                    hasPenalties = true;
+                }
+                else
+                {
+                    hasRewards = true;
+                }
+            }
+
+            if (hasRewards && hasPenalties)
+            {
+                return ModText.Get(ModStrings.Screens.Choices);
+            }
+
+            return hasPenalties
+                ? ModText.Get(ModStrings.Screens.Penalties)
+                : ModText.Get(ModStrings.Screens.Rewards);
         }
 
         private static string BuildChoiceId(WorldChoiceMenuAdapter.ChoiceItem choice, int index)

@@ -425,6 +425,7 @@ namespace SongsOfConquestAccess.Localization
             public static readonly ModString OrderSpells = new ModString("Screens.OrderSpells", "Order spells");
             public static readonly ModString PostAdventureResult = new ModString("Screens.PostAdventureResult", "Post adventure result");
             public static readonly ModString PostAdventureStats = new ModString("Screens.PostAdventureStats", "Post adventure stats");
+            public static readonly ModString Penalties = new ModString("Screens.Penalties", "Penalties");
             public static readonly ModString Previous = new ModString("Screens.Previous", "Previous");
             public static readonly ModString Quickbar = new ModString("Screens.Quickbar", "Quickbar");
             public static readonly ModString ReadEnemyInfluence = new ModString("Screens.ReadEnemyInfluence", "Read attack, deadly and movement range for enemies on tiles in combat");
@@ -434,6 +435,7 @@ namespace SongsOfConquestAccess.Localization
             public static readonly ModString RemoveFromQuickbar = new ModString("Screens.RemoveFromQuickbar", "Remove from quickbar");
             public static readonly ModString ResearchTier = new ModString("Screens.ResearchTier", "{0} ({1} {2})");
             public static readonly ModString Resources = new ModString("Screens.Resources", "Resources");
+            public static readonly ModString Rewards = new ModString("Screens.Rewards", "Rewards");
             public static readonly ModString Round = new ModString("Screens.Round", "Round {0}");
             public static readonly ModString ScannerPlaysDirectionalBeep = new ModString("Screens.ScannerPlaysDirectionalBeep", "Scanner plays directional beep");
             public static readonly ModString SettlementTroops = new ModString("Screens.SettlementTroops", "settlement troops");

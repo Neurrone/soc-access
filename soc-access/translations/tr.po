@@ -760,6 +760,11 @@ msgctxt "Screens.PostAdventureStats"
 msgid "Post adventure stats"
 msgstr "Macera sonrasÄ± istatistikler"
 
+#. Screens.Penalties
+msgctxt "Screens.Penalties"
+msgid "Penalties"
+msgstr "Cezalar"
+
 #. Screens.Previous
 msgctxt "Screens.Previous"
 msgid "Previous"
@@ -804,6 +809,11 @@ msgstr "{0} ({1} {2})"
 msgctxt "Screens.Resources"
 msgid "Resources"
 msgstr "Kaynaklar"
+
+#. Screens.Rewards
+msgctxt "Screens.Rewards"
+msgid "Rewards"
+msgstr "Ödüller"
 
 #. Screens.Round
 msgctxt "Screens.Round"

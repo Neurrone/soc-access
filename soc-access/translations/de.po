@@ -760,6 +760,11 @@ msgctxt "Screens.PostAdventureStats"
 msgid "Post adventure stats"
 msgstr "Statistiken nach dem Abenteuer"
 
+#. Screens.Penalties
+msgctxt "Screens.Penalties"
+msgid "Penalties"
+msgstr "Strafen"
+
 #. Screens.Previous
 msgctxt "Screens.Previous"
 msgid "Previous"
@@ -804,6 +809,11 @@ msgstr "{0} ({1} {2})"
 msgctxt "Screens.Resources"
 msgid "Resources"
 msgstr "Ressourcen"
+
+#. Screens.Rewards
+msgctxt "Screens.Rewards"
+msgid "Rewards"
+msgstr "Belohnungen"
 
 #. Screens.Round
 msgctxt "Screens.Round"

@@ -27,8 +27,6 @@ namespace SongsOfConquestAccess.Adapters
         private static readonly FieldInfo LocalizationField = AccessTools.Field(typeof(WorldChoiceMenu), "_localization");
         private static readonly FieldInfo AdventureFacadeField = AccessTools.Field(typeof(WorldChoiceMenu), "_adventureFacade");
         private static readonly FieldInfo HeaderTroopHudField = AccessTools.Field(typeof(WielderInteractHeader), "_troopHUD");
-        private static readonly FieldInfo HeaderCloseButtonField = AccessTools.Field(typeof(WielderInteractHeader), "_closeButton");
-        private static readonly FieldInfo BackgroundCloseButtonField = AccessTools.Field(typeof(AdventureMenuBackground), "_closeButton");
 
         private readonly WorldChoiceMenu _menu;
         private readonly WorldChoiceMenu.Settings _settings;
@@ -61,40 +59,6 @@ namespace SongsOfConquestAccess.Adapters
         public string ConfirmLabel
         {
             get { return GetButtonText(_settings != null ? _settings.OkButton : null); }
-        }
-
-        public string CancelLabel
-        {
-            get
-            {
-                string label = GetButtonText(GetBackgroundCloseButton());
-                if (!string.IsNullOrWhiteSpace(label))
-                {
-                    return label;
-                }
-
-                return GetButtonText(GetHeaderCloseButton());
-            }
-        }
-
-        public string ChoiceMenuLabel
-        {
-            get
-            {
-                int rewardCount = GetRewardButtons().Count;
-                int penaltyCount = GetPenaltyButtons().Count;
-                if (rewardCount > 0 && penaltyCount > 0)
-                {
-                    return "Choices";
-                }
-
-                if (penaltyCount > 0)
-                {
-                    return "Penalties";
-                }
-
-                return "Rewards";
-            }
         }
 
         public TroopHudAdapter Troops
@@ -290,20 +254,6 @@ namespace SongsOfConquestAccess.Adapters
         {
             return _settings != null && _settings.WielderInteractHeader != null
                 ? GetField<TroopHUD>(_settings.WielderInteractHeader, HeaderTroopHudField)
-                : null;
-        }
-
-        private UIButton GetHeaderCloseButton()
-        {
-            return _settings != null && _settings.WielderInteractHeader != null
-                ? GetField<UIButton>(_settings.WielderInteractHeader, HeaderCloseButtonField)
-                : null;
-        }
-
-        private UIButton GetBackgroundCloseButton()
-        {
-            return _settings != null && _settings.AdventureMenuBackground != null
-                ? GetField<UIButton>(_settings.AdventureMenuBackground, BackgroundCloseButtonField)
                 : null;
         }
 
