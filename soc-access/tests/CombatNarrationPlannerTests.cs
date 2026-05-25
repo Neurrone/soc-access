@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using SongsOfConquest;
 using SongsOfConquest.Common.Bacterias;
+using SongsOfConquest.Common.Battle;
 using SongsOfConquestAccess.Events;
 using SongsOfConquestAccess.Events.Combat;
 using UnityEngine;
@@ -44,6 +45,59 @@ namespace SongsOfConquestAccess.Tests
             Assert.AreSame(attack, result[0].Event);
             Assert.AreSame(spell, result[1].Event);
             Assert.AreSame(damage, result[2].Event);
+        }
+
+        [TestMethod]
+        public void FlushMovesSpellBeforeBlindFuryExchange()
+        {
+            CombatNarrationPlanner planner = new CombatNarrationPlanner();
+            TestEvent removal = new TestEvent("removal");
+            AttackEvent blindFuryAttack = Attack(AttackTrigger.BlindFury);
+            TestEvent blindFuryDamage = new TestEvent("blind fury damage");
+            AttackEvent retaliationAttack = Attack(AttackTrigger.Retaliation);
+            TestEvent retaliationDamage = new TestEvent("retaliation damage");
+            TestEvent spell = new TestEvent("spell");
+
+            planner.Enqueue(CombatNarrationItem.Create(CombatNarrationItemKind.BacteriaRemoved, removal));
+            planner.Enqueue(CombatNarrationItem.Create(CombatNarrationItemKind.Attack, blindFuryAttack));
+            planner.Enqueue(CombatNarrationItem.Create(CombatNarrationItemKind.Damage, blindFuryDamage));
+            planner.Enqueue(CombatNarrationItem.Create(CombatNarrationItemKind.Attack, retaliationAttack));
+            planner.Enqueue(CombatNarrationItem.Create(CombatNarrationItemKind.Damage, retaliationDamage));
+            planner.Enqueue(CombatNarrationItem.Create(CombatNarrationItemKind.Spell, spell));
+
+            IReadOnlyList<CombatNarrationItem> result = planner.Flush();
+
+            Assert.AreSame(spell, result[0].Event);
+            Assert.AreSame(removal, result[1].Event);
+            Assert.AreSame(blindFuryAttack, result[2].Event);
+            Assert.AreSame(blindFuryDamage, result[3].Event);
+            Assert.AreSame(retaliationAttack, result[4].Event);
+            Assert.AreSame(retaliationDamage, result[5].Event);
+        }
+
+        [TestMethod]
+        public void FlushDoesNotMoveSpellBeforeOrdinaryRetaliationExchange()
+        {
+            CombatNarrationPlanner planner = new CombatNarrationPlanner();
+            AttackEvent attack = Attack(AttackTrigger.Player);
+            TestEvent damage = new TestEvent("damage");
+            AttackEvent retaliationAttack = Attack(AttackTrigger.Retaliation);
+            TestEvent retaliationDamage = new TestEvent("retaliation damage");
+            TestEvent spell = new TestEvent("spell");
+
+            planner.Enqueue(CombatNarrationItem.Create(CombatNarrationItemKind.Attack, attack));
+            planner.Enqueue(CombatNarrationItem.Create(CombatNarrationItemKind.Damage, damage));
+            planner.Enqueue(CombatNarrationItem.Create(CombatNarrationItemKind.Attack, retaliationAttack));
+            planner.Enqueue(CombatNarrationItem.Create(CombatNarrationItemKind.Damage, retaliationDamage));
+            planner.Enqueue(CombatNarrationItem.Create(CombatNarrationItemKind.Spell, spell));
+
+            IReadOnlyList<CombatNarrationItem> result = planner.Flush();
+
+            Assert.AreSame(attack, result[0].Event);
+            Assert.AreSame(damage, result[1].Event);
+            Assert.AreSame(retaliationAttack, result[2].Event);
+            Assert.AreSame(spell, result[3].Event);
+            Assert.AreSame(retaliationDamage, result[4].Event);
         }
 
         [TestMethod]
@@ -380,6 +434,13 @@ namespace SongsOfConquestAccess.Tests
         private static BacteriaRef Bacteria(string name)
         {
             return Bacteria(name, 1);
+        }
+
+        private static AttackEvent Attack(AttackTrigger trigger)
+        {
+            TroopRef attacker = Troop(10, 1, "Footmen");
+            TroopRef target = Troop(20, 2, "Militia");
+            return new AttackEvent(new ActorRef(attacker, false), TargetRef.FromTroop(target), trigger);
         }
 
         private static BacteriaRef Bacteria(string name, int bacteriaType)

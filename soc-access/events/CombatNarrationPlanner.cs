@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using SongsOfConquest.Common.Bacterias;
+using SongsOfConquest.Common.Battle;
 using SongsOfConquestAccess.Events.Combat;
 using UnityEngine;
 
@@ -270,11 +271,7 @@ namespace SongsOfConquestAccess.Events
                     continue;
                 }
 
-                int insertIndex = i;
-                while (insertIndex > 0 && IsLikelySpellEffect(events[insertIndex - 1]))
-                {
-                    insertIndex--;
-                }
+                int insertIndex = FindSpellInsertIndex(events, i);
 
                 if (insertIndex == i)
                 {
@@ -287,6 +284,66 @@ namespace SongsOfConquestAccess.Events
             }
 
             return events;
+        }
+
+        private static int FindSpellInsertIndex(List<CombatNarrationItem> events, int spellIndex)
+        {
+            int blindFuryExchangeStart = FindBlindFuryExchangeStart(events, spellIndex);
+            if (blindFuryExchangeStart < spellIndex)
+            {
+                return blindFuryExchangeStart;
+            }
+
+            int insertIndex = spellIndex;
+            while (insertIndex > 0 && IsLikelySpellEffect(events[insertIndex - 1]))
+            {
+                insertIndex--;
+            }
+
+            return insertIndex;
+        }
+
+        private static int FindBlindFuryExchangeStart(List<CombatNarrationItem> events, int spellIndex)
+        {
+            int insertIndex = spellIndex;
+            bool foundBlindFuryAttack = false;
+            while (insertIndex > 0)
+            {
+                CombatNarrationItem previous = events[insertIndex - 1];
+                if (IsLikelySpellEffect(previous))
+                {
+                    insertIndex--;
+                    continue;
+                }
+
+                if (IsBlindFuryExchangeAttack(previous))
+                {
+                    foundBlindFuryAttack |= IsAttackWithTrigger(previous, AttackTrigger.BlindFury);
+                    insertIndex--;
+                    continue;
+                }
+
+                break;
+            }
+
+            return foundBlindFuryAttack ? insertIndex : spellIndex;
+        }
+
+        private static bool IsBlindFuryExchangeAttack(CombatNarrationItem pending)
+        {
+            return IsAttackWithTrigger(pending, AttackTrigger.BlindFury)
+                || IsAttackWithTrigger(pending, AttackTrigger.Retaliation);
+        }
+
+        private static bool IsAttackWithTrigger(CombatNarrationItem pending, AttackTrigger trigger)
+        {
+            if (pending == null || pending.Kind != CombatNarrationItemKind.Attack)
+            {
+                return false;
+            }
+
+            AttackEvent attack = pending.Event as AttackEvent;
+            return attack != null && attack.AttackTrigger == trigger;
         }
 
         private static bool IsLikelySpellEffect(CombatNarrationItem pending)

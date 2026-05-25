@@ -25,11 +25,14 @@ namespace SongsOfConquestAccess.Adapters
 {
     internal static class CombatEventNarrator
     {
+        private const int BacteriaDiagnosticLogLimit = 200;
+
         private static readonly CombatNarrationPlanner Planner = new CombatNarrationPlanner();
         private static readonly Queue<string> SuppressedNativeNotifications = new Queue<string>();
         private static int _currentTurnTroopId = -1;
         private static bool _flushPendingEventsScheduled;
         private static CombatAdapter _activeAdapter;
+        private static int _bacteriaDiagnosticLogCount;
 
         public static void HandleResponse(ICommandResponse response)
         {
@@ -99,6 +102,7 @@ namespace SongsOfConquestAccess.Adapters
             _currentTurnTroopId = -1;
             _flushPendingEventsScheduled = false;
             _activeAdapter = null;
+            _bacteriaDiagnosticLogCount = 0;
         }
 
         public static void SetActiveAdapter(CombatAdapter adapter)
@@ -393,6 +397,22 @@ namespace SongsOfConquestAccess.Adapters
 
         private static void EnqueueBacteriaAdded(AddBattleBacteriaCommand.Response response, CombatAdapter adapter)
         {
+            if (response.Entries == null)
+            {
+                return;
+            }
+
+            for (int i = 0; i < response.Entries.Length; i++)
+            {
+                AddBattleBacteriaCommand.ResponseEntry entry = response.Entries[i];
+                if (entry == null)
+                {
+                    continue;
+                }
+
+                LogBacteriaDiagnostic("added", entry.BacteriaReference, entry.StateId, entry.StateTypeName, adapter);
+            }
+
             // Bacteria applications are intentionally quiet for now. The useful
             // effect details are emitted by the follow-up modifier events.
         }
@@ -413,6 +433,7 @@ namespace SongsOfConquestAccess.Adapters
                 }
 
                 IBattleTroopState troop = adapter.GetTroop(entry.StateId);
+                LogBacteriaDiagnostic("removed", entry.BacteriaReference, entry.StateId, entry.StateTypeName, adapter);
                 EnqueueBacteriaSummary(CombatNarrationItem.CreateBacteriaRemovalSummary(
                     adapter.CreateBacteriaRef(entry.BacteriaReference),
                     adapter.CreateTroopRef(troop),
@@ -465,6 +486,7 @@ namespace SongsOfConquestAccess.Adapters
                     }
 
                     IBattleTroopState troop = adapter.GetTroop(changeSet.TargetId);
+                    LogBacteriaDiagnostic("modifier applied", bacteria, changeSet.TargetId, changeSet.TargetTypeName, adapter);
                     EnqueueBacteriaSummary(CombatNarrationItem.CreateBacteriaModifierSummary(
                         adapter.CreateBacteriaRef(bacteria),
                         adapter.CreateTroopRef(troop),
@@ -489,6 +511,65 @@ namespace SongsOfConquestAccess.Adapters
             }
 
             return null;
+        }
+
+        private static void LogBacteriaDiagnostic(string action, BacteriaReference bacteria, int stateId, string stateTypeName, CombatAdapter adapter)
+        {
+            if (bacteria == null || _bacteriaDiagnosticLogCount >= BacteriaDiagnosticLogLimit)
+            {
+                return;
+            }
+
+            _bacteriaDiagnosticLogCount++;
+            SocAccessPlugin.Instance?.LogInfo(
+                "Combat bacteria diagnostic "
+                + action
+                + ": type="
+                + bacteria.BacteriaType
+                + " ("
+                + (int)bacteria.BacteriaType
+                + "), id="
+                + bacteria.Id
+                + ", name=\""
+                + ResolveBacteriaName(adapter, bacteria)
+                + "\", stateId="
+                + stateId
+                + ", stateType="
+                + FormatStateTypeName(stateTypeName));
+
+            if (_bacteriaDiagnosticLogCount == BacteriaDiagnosticLogLimit)
+            {
+                SocAccessPlugin.Instance?.LogInfo("Combat bacteria diagnostic log limit reached; further bacteria diagnostics suppressed until combat narrator reset.");
+            }
+        }
+
+        private static string ResolveBacteriaName(CombatAdapter adapter, BacteriaReference bacteria)
+        {
+            if (adapter == null || bacteria == null)
+            {
+                return string.Empty;
+            }
+
+            try
+            {
+                BacteriaRef bacteriaRef = adapter.CreateBacteriaRef(bacteria);
+                return bacteriaRef != null ? bacteriaRef.Name : string.Empty;
+            }
+            catch (Exception exception)
+            {
+                return "unavailable: " + exception.Message;
+            }
+        }
+
+        private static string FormatStateTypeName(string stateTypeName)
+        {
+            if (string.IsNullOrWhiteSpace(stateTypeName))
+            {
+                return string.Empty;
+            }
+
+            Type type = Type.GetType(stateTypeName);
+            return type != null ? type.Name : stateTypeName;
         }
 
         private static ActorRef CreateActor(CombatAdapter adapter, IBattleTroopState troop)
