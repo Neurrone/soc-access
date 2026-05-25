@@ -2152,6 +2152,16 @@ msgctxt "Scanner.West"
 msgid "west"
 msgstr "zachÃ³d"
 
+#. Screens.BuyResourceForGold
+msgctxt "Screens.BuyResourceForGold"
+msgid "Buy {0} for {1}"
+msgstr "Kup {0} za {1}"
+
+#. Screens.SellResourceForGold
+msgctxt "Screens.SellResourceForGold"
+msgid "Sell {0} for {1}"
+msgstr "Sprzedaj {0} za {1}"
+
 #. Scanner.Wielders
 msgctxt "Scanner.Wielders"
 msgid "Wielders"

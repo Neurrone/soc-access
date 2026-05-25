@@ -213,7 +213,18 @@ namespace SongsOfConquestAccess.Screens
                 return string.Empty;
             }
 
-            return action.GetLabel != null ? action.GetLabel() : string.Empty;
+            string resourceAmount = ModText.Get(
+                ModStrings.Common.ResourceAmount,
+                FormatAmount(action.Amount),
+                action.ResourceName);
+            string goldAmount = ModText.Get(
+                ModStrings.Common.ResourceAmount,
+                FormatAmount(action.GoldAmount),
+                action.GoldResourceName);
+
+            return action.IsBuyButton
+                ? ModText.Get(ModStrings.Screens.BuyResourceForGold, resourceAmount, goldAmount)
+                : ModText.Get(ModStrings.Screens.SellResourceForGold, resourceAmount, goldAmount);
         }
 
         private static string FormatAmount(int amount)
