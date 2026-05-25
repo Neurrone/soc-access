@@ -27,8 +27,15 @@ namespace SongsOfConquestAccess.Events.Combat
     internal enum EffectTargetSummaryKind
     {
         ExplicitTargets,
+        AllTroops,
         YourTroops,
-        EnemyTroops
+        EnemyTroops,
+        AllMeleeTroops,
+        YourMeleeTroops,
+        EnemyMeleeTroops,
+        AllRangedTroops,
+        YourRangedTroops,
+        EnemyRangedTroops
     }
 
     internal sealed class TroopRef
@@ -82,13 +89,20 @@ namespace SongsOfConquestAccess.Events.Combat
     internal sealed class EntityRef
     {
         public EntityRef(int entityId, string name, Vector2Int position)
+            : this(entityId, -1, name, position)
+        {
+        }
+
+        public EntityRef(int entityId, int blueprintId, string name, Vector2Int position)
         {
             EntityId = entityId;
+            BlueprintId = blueprintId;
             Name = string.IsNullOrWhiteSpace(name) ? ModText.Get(ModStrings.Combat.AttackableEntity) : SpeechTextSanitizer.Normalize(name);
             Position = position;
         }
 
         public int EntityId { get; private set; }
+        public int BlueprintId { get; private set; }
         public string Name { get; private set; }
         public Vector2Int Position { get; private set; }
 
@@ -252,10 +266,24 @@ namespace SongsOfConquestAccess.Events.Combat
         {
             switch (kind)
             {
+                case EffectTargetSummaryKind.AllTroops:
+                    return ModText.Get(ModStrings.Combat.AllTroops);
                 case EffectTargetSummaryKind.YourTroops:
                     return ModText.Get(ModStrings.Combat.YourTroops);
                 case EffectTargetSummaryKind.EnemyTroops:
                     return ModText.Get(ModStrings.Combat.EnemyTroops);
+                case EffectTargetSummaryKind.AllMeleeTroops:
+                    return ModText.Get(ModStrings.Combat.AllMeleeTroops);
+                case EffectTargetSummaryKind.YourMeleeTroops:
+                    return ModText.Get(ModStrings.Combat.YourMeleeTroops);
+                case EffectTargetSummaryKind.EnemyMeleeTroops:
+                    return ModText.Get(ModStrings.Combat.EnemyMeleeTroops);
+                case EffectTargetSummaryKind.AllRangedTroops:
+                    return ModText.Get(ModStrings.Combat.AllRangedTroops);
+                case EffectTargetSummaryKind.YourRangedTroops:
+                    return ModText.Get(ModStrings.Combat.YourRangedTroops);
+                case EffectTargetSummaryKind.EnemyRangedTroops:
+                    return ModText.Get(ModStrings.Combat.EnemyRangedTroops);
                 default:
                     return FormatExplicitTargets(targets);
             }
@@ -266,6 +294,129 @@ namespace SongsOfConquestAccess.Events.Combat
             return FormatList(targets != null
                 ? targets.Select(t => t != null ? t.Format(includePosition: true) : ModText.Get(ModStrings.Combat.UnknownTroop)).ToList()
                 : new List<string>());
+        }
+    }
+
+    internal sealed class EffectTargetSummaryContext
+    {
+        public EffectTargetSummaryContext(
+            int localTeamId,
+            IEnumerable<int> yourTroops,
+            IEnumerable<int> enemyTroops,
+            IEnumerable<int> yourMeleeTroops,
+            IEnumerable<int> enemyMeleeTroops,
+            IEnumerable<int> yourRangedTroops,
+            IEnumerable<int> enemyRangedTroops)
+        {
+            LocalTeamId = localTeamId;
+            YourTroops = CopySet(yourTroops);
+            EnemyTroops = CopySet(enemyTroops);
+            YourMeleeTroops = CopySet(yourMeleeTroops);
+            EnemyMeleeTroops = CopySet(enemyMeleeTroops);
+            YourRangedTroops = CopySet(yourRangedTroops);
+            EnemyRangedTroops = CopySet(enemyRangedTroops);
+        }
+
+        public int LocalTeamId { get; private set; }
+        public HashSet<int> YourTroops { get; private set; }
+        public HashSet<int> EnemyTroops { get; private set; }
+        public HashSet<int> YourMeleeTroops { get; private set; }
+        public HashSet<int> EnemyMeleeTroops { get; private set; }
+        public HashSet<int> YourRangedTroops { get; private set; }
+        public HashSet<int> EnemyRangedTroops { get; private set; }
+
+        public static EffectTargetSummaryContext Empty
+        {
+            get { return new EffectTargetSummaryContext(-1, null, null, null, null, null, null); }
+        }
+
+        public EffectTargetSummaryKind Determine(IList<TroopRef> targets)
+        {
+            if (targets == null || targets.Count == 0 || LocalTeamId < 0)
+            {
+                return EffectTargetSummaryKind.ExplicitTargets;
+            }
+
+            HashSet<int> affected = new HashSet<int>();
+            for (int i = 0; i < targets.Count; i++)
+            {
+                TroopRef target = targets[i];
+                if (target == null || target.TroopId < 0)
+                {
+                    return EffectTargetSummaryKind.ExplicitTargets;
+                }
+
+                affected.Add(target.TroopId);
+            }
+
+            if (MatchesUnion(affected, YourTroops, EnemyTroops))
+            {
+                return EffectTargetSummaryKind.AllTroops;
+            }
+
+            if (Matches(affected, YourTroops))
+            {
+                return EffectTargetSummaryKind.YourTroops;
+            }
+
+            if (Matches(affected, EnemyTroops))
+            {
+                return EffectTargetSummaryKind.EnemyTroops;
+            }
+
+            if (MatchesUnion(affected, YourMeleeTroops, EnemyMeleeTroops))
+            {
+                return EffectTargetSummaryKind.AllMeleeTroops;
+            }
+
+            if (Matches(affected, YourMeleeTroops))
+            {
+                return EffectTargetSummaryKind.YourMeleeTroops;
+            }
+
+            if (Matches(affected, EnemyMeleeTroops))
+            {
+                return EffectTargetSummaryKind.EnemyMeleeTroops;
+            }
+
+            if (MatchesUnion(affected, YourRangedTroops, EnemyRangedTroops))
+            {
+                return EffectTargetSummaryKind.AllRangedTroops;
+            }
+
+            if (Matches(affected, YourRangedTroops))
+            {
+                return EffectTargetSummaryKind.YourRangedTroops;
+            }
+
+            if (Matches(affected, EnemyRangedTroops))
+            {
+                return EffectTargetSummaryKind.EnemyRangedTroops;
+            }
+
+            return EffectTargetSummaryKind.ExplicitTargets;
+        }
+
+        private static bool Matches(HashSet<int> affected, HashSet<int> expected)
+        {
+            return expected != null && expected.Count > 0 && affected.SetEquals(expected);
+        }
+
+        private static bool MatchesUnion(HashSet<int> affected, HashSet<int> left, HashSet<int> right)
+        {
+            if (left == null || right == null || left.Count == 0 || right.Count == 0)
+            {
+                return false;
+            }
+
+            HashSet<int> combined = new HashSet<int>(left);
+            combined.UnionWith(right);
+            return affected.SetEquals(combined);
+        }
+
+        private static HashSet<int> CopySet(IEnumerable<int> values)
+        {
+            return values != null ? new HashSet<int>(values) : new HashSet<int>();
         }
     }
 
@@ -402,7 +553,7 @@ namespace SongsOfConquestAccess.Events.Combat
         {
             Caster = caster;
             Spell = spell;
-            SelectedTargetPoints = Copy(selectedTargetPoints);
+            SelectedTargetPoints = CopyDistinct(selectedTargetPoints);
             AffectedTargets = affectedTargets != null ? new List<TargetRef>(affectedTargets) : new List<TargetRef>();
         }
 
@@ -425,6 +576,27 @@ namespace SongsOfConquestAccess.Events.Combat
             }
 
             return text;
+        }
+
+        private static List<Vector2Int> CopyDistinct(IList<Vector2Int> points)
+        {
+            List<Vector2Int> result = new List<Vector2Int>();
+            if (points == null)
+            {
+                return result;
+            }
+
+            HashSet<Vector2Int> seen = new HashSet<Vector2Int>();
+            for (int i = 0; i < points.Count; i++)
+            {
+                Vector2Int point = points[i];
+                if (seen.Add(point))
+                {
+                    result.Add(point);
+                }
+            }
+
+            return result;
         }
     }
 
@@ -514,16 +686,23 @@ namespace SongsOfConquestAccess.Events.Combat
     internal sealed class BacteriaModifierSummaryEvent : IAccessibilityEvent
     {
         public BacteriaModifierSummaryEvent(BacteriaRef bacteria, IList<BacteriaModifierTargetSummary> targets, EffectTargetSummaryKind targetSummaryKind)
+            : this(bacteria, targets, targetSummaryKind, EffectTargetSummaryContext.Empty)
+        {
+        }
+
+        public BacteriaModifierSummaryEvent(BacteriaRef bacteria, IList<BacteriaModifierTargetSummary> targets, EffectTargetSummaryKind targetSummaryKind, EffectTargetSummaryContext targetSummaryContext)
         {
             Bacteria = bacteria;
             Targets = targets != null ? new List<BacteriaModifierTargetSummary>(targets) : new List<BacteriaModifierTargetSummary>();
             TargetSummaryKind = targetSummaryKind;
+            TargetSummaryContext = targetSummaryContext ?? EffectTargetSummaryContext.Empty;
         }
 
         public string Kind { get { return AccessibilityEvents.Combat.BacteriaModifierSummary; } }
         public BacteriaRef Bacteria { get; private set; }
         public IReadOnlyList<BacteriaModifierTargetSummary> Targets { get; private set; }
         public EffectTargetSummaryKind TargetSummaryKind { get; private set; }
+        public EffectTargetSummaryContext TargetSummaryContext { get; private set; }
 
         public string GetSpeechText()
         {
@@ -555,7 +734,7 @@ namespace SongsOfConquestAccess.Events.Combat
                 KeyValuePair<string, List<BacteriaModifierTargetSummary>> group =
                     new KeyValuePair<string, List<BacteriaModifierTargetSummary>>(changeKeys[i], byChanges[changeKeys[i]]);
                 List<TroopRef> groupTargets = group.Value.Select(t => t.Target).ToList();
-                EffectTargetSummaryKind kind = byChanges.Count == 1 ? TargetSummaryKind : EffectTargetSummaryKind.ExplicitTargets;
+                EffectTargetSummaryKind kind = byChanges.Count == 1 ? TargetSummaryKind : TargetSummaryContext.Determine(groupTargets);
                 string targets = EffectTargetSummary.FormatTargets(groupTargets, kind);
                 parts.Add(string.IsNullOrWhiteSpace(group.Key) ? targets : targets + ", " + group.Key);
             }

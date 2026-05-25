@@ -2277,3 +2277,38 @@ msgstr "书签已保存"
 msgctxt "Bookmarks.NoBookmark"
 msgid "No bookmark"
 msgstr "没有书签"
+
+#. Combat.AllMeleeTroops
+msgctxt "Combat.AllMeleeTroops"
+msgid "all melee troops"
+msgstr "所有近战部队"
+
+#. Combat.AllRangedTroops
+msgctxt "Combat.AllRangedTroops"
+msgid "all ranged troops"
+msgstr "所有远程部队"
+
+#. Combat.AllTroops
+msgctxt "Combat.AllTroops"
+msgid "all troops"
+msgstr "所有部队"
+
+#. Combat.EnemyMeleeTroops
+msgctxt "Combat.EnemyMeleeTroops"
+msgid "enemy melee troops"
+msgstr "敌方近战部队"
+
+#. Combat.EnemyRangedTroops
+msgctxt "Combat.EnemyRangedTroops"
+msgid "enemy ranged troops"
+msgstr "敌方远程部队"
+
+#. Combat.YourMeleeTroops
+msgctxt "Combat.YourMeleeTroops"
+msgid "your melee troops"
+msgstr "你的近战部队"
+
+#. Combat.YourRangedTroops
+msgctxt "Combat.YourRangedTroops"
+msgid "your ranged troops"
+msgstr "你的远程部队"

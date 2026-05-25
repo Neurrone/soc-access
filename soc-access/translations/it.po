@@ -2317,3 +2317,38 @@ msgstr "Segnalibro salvato"
 msgctxt "Bookmarks.NoBookmark"
 msgid "No bookmark"
 msgstr "Nessun segnalibro"
+
+#. Combat.AllMeleeTroops
+msgctxt "Combat.AllMeleeTroops"
+msgid "all melee troops"
+msgstr "tutte le truppe da mischia"
+
+#. Combat.AllRangedTroops
+msgctxt "Combat.AllRangedTroops"
+msgid "all ranged troops"
+msgstr "tutte le truppe a distanza"
+
+#. Combat.AllTroops
+msgctxt "Combat.AllTroops"
+msgid "all troops"
+msgstr "tutte le truppe"
+
+#. Combat.EnemyMeleeTroops
+msgctxt "Combat.EnemyMeleeTroops"
+msgid "enemy melee troops"
+msgstr "truppe nemiche da mischia"
+
+#. Combat.EnemyRangedTroops
+msgctxt "Combat.EnemyRangedTroops"
+msgid "enemy ranged troops"
+msgstr "truppe nemiche a distanza"
+
+#. Combat.YourMeleeTroops
+msgctxt "Combat.YourMeleeTroops"
+msgid "your melee troops"
+msgstr "le tue truppe da mischia"
+
+#. Combat.YourRangedTroops
+msgctxt "Combat.YourRangedTroops"
+msgid "your ranged troops"
+msgstr "le tue truppe a distanza"

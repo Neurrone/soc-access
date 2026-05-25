@@ -2277,3 +2277,38 @@ msgstr "Yer imi kaydedildi"
 msgctxt "Bookmarks.NoBookmark"
 msgid "No bookmark"
 msgstr "Yer imi yok"
+
+#. Combat.AllMeleeTroops
+msgctxt "Combat.AllMeleeTroops"
+msgid "all melee troops"
+msgstr "tum yakin dovus birlikleri"
+
+#. Combat.AllRangedTroops
+msgctxt "Combat.AllRangedTroops"
+msgid "all ranged troops"
+msgstr "tum menzilli birlikler"
+
+#. Combat.AllTroops
+msgctxt "Combat.AllTroops"
+msgid "all troops"
+msgstr "tum birlikler"
+
+#. Combat.EnemyMeleeTroops
+msgctxt "Combat.EnemyMeleeTroops"
+msgid "enemy melee troops"
+msgstr "dusman yakin dovus birlikleri"
+
+#. Combat.EnemyRangedTroops
+msgctxt "Combat.EnemyRangedTroops"
+msgid "enemy ranged troops"
+msgstr "dusman menzilli birlikleri"
+
+#. Combat.YourMeleeTroops
+msgctxt "Combat.YourMeleeTroops"
+msgid "your melee troops"
+msgstr "yakin dovus birliklerin"
+
+#. Combat.YourRangedTroops
+msgctxt "Combat.YourRangedTroops"
+msgid "your ranged troops"
+msgstr "menzilli birliklerin"

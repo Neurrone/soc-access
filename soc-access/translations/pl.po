@@ -2357,3 +2357,38 @@ msgstr "Zakładka zapisana"
 msgctxt "Bookmarks.NoBookmark"
 msgid "No bookmark"
 msgstr "Brak zakładki"
+
+#. Combat.AllMeleeTroops
+msgctxt "Combat.AllMeleeTroops"
+msgid "all melee troops"
+msgstr "wszystkie oddzialy wrecz"
+
+#. Combat.AllRangedTroops
+msgctxt "Combat.AllRangedTroops"
+msgid "all ranged troops"
+msgstr "wszystkie oddzialy dystansowe"
+
+#. Combat.AllTroops
+msgctxt "Combat.AllTroops"
+msgid "all troops"
+msgstr "wszystkie oddzialy"
+
+#. Combat.EnemyMeleeTroops
+msgctxt "Combat.EnemyMeleeTroops"
+msgid "enemy melee troops"
+msgstr "wrogie oddzialy wrecz"
+
+#. Combat.EnemyRangedTroops
+msgctxt "Combat.EnemyRangedTroops"
+msgid "enemy ranged troops"
+msgstr "wrogie oddzialy dystansowe"
+
+#. Combat.YourMeleeTroops
+msgctxt "Combat.YourMeleeTroops"
+msgid "your melee troops"
+msgstr "twoje oddzialy wrecz"
+
+#. Combat.YourRangedTroops
+msgctxt "Combat.YourRangedTroops"
+msgid "your ranged troops"
+msgstr "twoje oddzialy dystansowe"

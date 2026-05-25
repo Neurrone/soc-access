@@ -2308,11 +2308,11 @@ namespace SongsOfConquestAccess.Adapters
         {
             if (entity == null)
             {
-                return new EntityRef(-1, ModText.Get(ModStrings.Combat.UnknownEntity), Vector2Int.zero);
+                return new EntityRef(-1, -1, ModText.Get(ModStrings.Combat.UnknownEntity), Vector2Int.zero);
             }
 
             string name = GetMapEntityName(entity);
-            return new EntityRef(entity.Id, name, entity.Position);
+            return new EntityRef(entity.Id, entity.BlueprintId, name, entity.Position);
         }
 
         public CommanderRef CreateCommanderRef(int commanderId)
@@ -2388,6 +2388,53 @@ namespace SongsOfConquestAccess.Adapters
 
                     bool isEnemy = troop.TeamId != localTeamId;
                     if (isEnemy == enemySide)
+                    {
+                        ids.Add(troop.Id);
+                    }
+                }
+            }
+            catch
+            {
+            }
+
+            return ids;
+        }
+
+        public IReadOnlyList<int> GetAliveMeleeBattleTroopIdsForSide(bool enemySide)
+        {
+            return GetAliveBattleTroopIdsForSide(enemySide, troop => troop.HasMeleeAttack() && !troop.HasRangedAttack());
+        }
+
+        public IReadOnlyList<int> GetAliveRangedBattleTroopIdsForSide(bool enemySide)
+        {
+            return GetAliveBattleTroopIdsForSide(enemySide, troop => troop.HasRangedAttack());
+        }
+
+        private IReadOnlyList<int> GetAliveBattleTroopIdsForSide(bool enemySide, Func<IBattleTroopState, bool> predicate)
+        {
+            List<int> ids = new List<int>();
+            try
+            {
+                if (_facade == null || _facade.Troops == null || _facade.Troops.All == null)
+                {
+                    return ids;
+                }
+
+                int localTeamId = GetLocalTeamId();
+                if (localTeamId < 0)
+                {
+                    return ids;
+                }
+
+                foreach (IBattleTroopState troop in _facade.Troops.All)
+                {
+                    if (troop == null || !troop.GetIsAlive())
+                    {
+                        continue;
+                    }
+
+                    bool isEnemy = troop.TeamId != localTeamId;
+                    if (isEnemy == enemySide && (predicate == null || predicate(troop)))
                     {
                         ids.Add(troop.Id);
                     }

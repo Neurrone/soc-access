@@ -2277,3 +2277,38 @@ msgstr "ブックマークを保存しました"
 msgctxt "Bookmarks.NoBookmark"
 msgid "No bookmark"
 msgstr "ブックマークがありません"
+
+#. Combat.AllMeleeTroops
+msgctxt "Combat.AllMeleeTroops"
+msgid "all melee troops"
+msgstr "全近接部隊"
+
+#. Combat.AllRangedTroops
+msgctxt "Combat.AllRangedTroops"
+msgid "all ranged troops"
+msgstr "全遠隔部隊"
+
+#. Combat.AllTroops
+msgctxt "Combat.AllTroops"
+msgid "all troops"
+msgstr "全部隊"
+
+#. Combat.EnemyMeleeTroops
+msgctxt "Combat.EnemyMeleeTroops"
+msgid "enemy melee troops"
+msgstr "敵近接部隊"
+
+#. Combat.EnemyRangedTroops
+msgctxt "Combat.EnemyRangedTroops"
+msgid "enemy ranged troops"
+msgstr "敵遠隔部隊"
+
+#. Combat.YourMeleeTroops
+msgctxt "Combat.YourMeleeTroops"
+msgid "your melee troops"
+msgstr "味方近接部隊"
+
+#. Combat.YourRangedTroops
+msgctxt "Combat.YourRangedTroops"
+msgid "your ranged troops"
+msgstr "味方遠隔部隊"

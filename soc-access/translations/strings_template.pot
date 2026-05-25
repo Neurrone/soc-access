@@ -919,6 +919,21 @@ msgctxt "Combat.AttackVerbSpearwall"
 msgid "makes a spearwall attack against"
 msgstr ""
 
+#. Combat.AllMeleeTroops
+msgctxt "Combat.AllMeleeTroops"
+msgid "all melee troops"
+msgstr ""
+
+#. Combat.AllRangedTroops
+msgctxt "Combat.AllRangedTroops"
+msgid "all ranged troops"
+msgstr ""
+
+#. Combat.AllTroops
+msgctxt "Combat.AllTroops"
+msgid "all troops"
+msgstr ""
+
 #. Combat.BattleOver
 msgctxt "Combat.BattleOver"
 msgid "Battle over"
@@ -1002,6 +1017,16 @@ msgstr ""
 #. Combat.Effect
 msgctxt "Combat.Effect"
 msgid "effect"
+msgstr ""
+
+#. Combat.EnemyMeleeTroops
+msgctxt "Combat.EnemyMeleeTroops"
+msgid "enemy melee troops"
+msgstr ""
+
+#. Combat.EnemyRangedTroops
+msgctxt "Combat.EnemyRangedTroops"
+msgid "enemy ranged troops"
 msgstr ""
 
 #. Combat.EnemyTroop
@@ -1192,6 +1217,16 @@ msgstr ""
 #. Combat.Wielder
 msgctxt "Combat.Wielder"
 msgid "wielder"
+msgstr ""
+
+#. Combat.YourMeleeTroops
+msgctxt "Combat.YourMeleeTroops"
+msgid "your melee troops"
+msgstr ""
+
+#. Combat.YourRangedTroops
+msgctxt "Combat.YourRangedTroops"
+msgid "your ranged troops"
 msgstr ""
 
 #. Combat.YourTroops
