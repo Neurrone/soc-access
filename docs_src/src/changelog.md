@@ -5,8 +5,10 @@
 - Wielders being recruited are now announced. This is mainly for situations where they join via story events
 - Fixed the revealed buffer being reset after combat
 - Fixed resource generating buildings not appearing in the scanner. Results are in a dedicated "Resource generators" category
-- Fixed multi-tile entities being read even though they aren't fully revealed. In these situations, the entity will no longer be considered to be revealed
-- Fixed artifact names not being announced when revealed
+- Revealed entity readouts:
+  - Multi-tile entities are no longer considered as revealed unless they are fully revealed
+  - Artifact names are now announced
+  - Dead wielders are no longer announced as no longer being visible
 - Combat narration:
   - Effects being removed from a destroyed troop stack are no longer announced
   - If a spell is cast multiple times on the same tile, that tile is now only announced once

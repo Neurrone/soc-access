@@ -216,6 +216,20 @@ namespace SongsOfConquestAccess.Events
 
         private void HandleCommand(ICommandResponse response)
         {
+            KillCommanderCommand.Response killed = response as KillCommanderCommand.Response;
+            if (killed != null)
+            {
+                ForgetNonLocalCommanderVisibility(killed.CommanderId);
+                return;
+            }
+
+            RemoveCommanderCommand.Response removed = response as RemoveCommanderCommand.Response;
+            if (removed != null)
+            {
+                ForgetNonLocalCommanderVisibility(removed.CommanderId);
+                return;
+            }
+
             SpawnCommanderCommand.Response spawned = response as SpawnCommanderCommand.Response;
             ICommanderState commander = spawned != null ? spawned.commander : null;
             if (!IsLocalCommander(commander) || !_knownLocalCommanderIds.Add(commander.Id))
@@ -531,7 +545,13 @@ namespace SongsOfConquestAccess.Events
                 return false;
             }
 
-            bool visible = commander.IsAlive && IsPointVisible(commander.Position);
+            if (!commander.IsAlive)
+            {
+                ForgetNonLocalCommanderVisibility(commander.Id);
+                return false;
+            }
+
+            bool visible = IsPointVisible(commander.Position);
             bool wasVisible;
             _lastVisibleNonLocalCommanders.TryGetValue(commander.Id, out wasVisible);
             _lastVisibleNonLocalCommanders[commander.Id] = visible;
@@ -596,12 +616,18 @@ namespace SongsOfConquestAccess.Events
 
             for (int i = 0; i < stale.Count; i++)
             {
-                _lastVisibleNonLocalCommanders.Remove(stale[i]);
-                _announcedVisibleNonLocalCommanders.Remove(stale[i]);
-                RemovePendingDiscovery(CommanderDiscoveryKey(stale[i]));
-                RemovePendingHiddenWielder(CommanderDiscoveryKey(stale[i]));
-                _revealedRegistry?.Remove(CommanderDiscoveryKey(stale[i]));
+                ForgetNonLocalCommanderVisibility(stale[i]);
             }
+        }
+
+        private void ForgetNonLocalCommanderVisibility(int commanderId)
+        {
+            string discoveryKey = CommanderDiscoveryKey(commanderId);
+            _lastVisibleNonLocalCommanders.Remove(commanderId);
+            _announcedVisibleNonLocalCommanders.Remove(commanderId);
+            RemovePendingDiscovery(discoveryKey);
+            RemovePendingHiddenWielder(discoveryKey);
+            _revealedRegistry?.Remove(discoveryKey);
         }
 
         private bool AddPendingDiscovery(
