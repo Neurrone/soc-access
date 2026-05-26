@@ -121,6 +121,7 @@ namespace SongsOfConquestAccess
         private void Update()
         {
             AttachLocalizationHandler();
+            _screenDetector?.Update();
             _inputRouter?.Update();
             _screenManager?.Update();
             UIManager.Update();

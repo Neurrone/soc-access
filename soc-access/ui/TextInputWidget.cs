@@ -1,5 +1,6 @@
 using System;
 using SongsOfConquest.Client.UI;
+using SongsOfConquestAccess.Adapters;
 using SongsOfConquestAccess.Input;
 using SongsOfConquestAccess.Localization;
 using TMPro;
@@ -13,6 +14,7 @@ namespace SongsOfConquestAccess.UI
         private readonly Action _onFocus;
         private readonly Func<bool> _isEnabled;
         private readonly Func<bool> _isVisible;
+        private readonly Func<Tooltip> _getTooltip;
         private readonly TextInputEchoHelper _echo = new TextInputEchoHelper();
 
         public TextInputWidget(
@@ -22,7 +24,8 @@ namespace SongsOfConquestAccess.UI
             Func<bool> activate,
             Action onFocus,
             Func<bool> isEnabled,
-            Func<bool> isVisible)
+            Func<bool> isVisible,
+            Func<Tooltip> getTooltip = null)
             : base(id)
         {
             _label = label ?? string.Empty;
@@ -30,6 +33,7 @@ namespace SongsOfConquestAccess.UI
             _onFocus = onFocus;
             _isEnabled = isEnabled;
             _isVisible = isVisible;
+            _getTooltip = getTooltip;
         }
 
         public override bool IsVisible
@@ -54,6 +58,11 @@ namespace SongsOfConquestAccess.UI
         public override string GetStatus()
         {
             return IsEnabled() ? string.Empty : ModText.Get(ModStrings.UI.StatusDisabled);
+        }
+
+        public override Tooltip GetTooltip()
+        {
+            return _getTooltip != null ? _getTooltip() : null;
         }
 
         public override bool ClaimsAction(string actionKey)

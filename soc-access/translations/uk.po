@@ -30,6 +30,61 @@ msgctxt "Common.ResourceAmount"
 msgid "{0} {1}"
 msgstr "{0} {1}"
 
+#. TeamColors.Black
+msgctxt "TeamColors.Black"
+msgid "black"
+msgstr "чорний"
+
+#. TeamColors.Blue
+msgctxt "TeamColors.Blue"
+msgid "blue"
+msgstr "синій"
+
+#. TeamColors.DarkRed
+msgctxt "TeamColors.DarkRed"
+msgid "dark red"
+msgstr "темно-червоний"
+
+#. TeamColors.Green
+msgctxt "TeamColors.Green"
+msgid "green"
+msgstr "зелений"
+
+#. TeamColors.Neutral
+msgctxt "TeamColors.Neutral"
+msgid "neutral"
+msgstr "нейтральний"
+
+#. TeamColors.Orange
+msgctxt "TeamColors.Orange"
+msgid "orange"
+msgstr "помаранчевий"
+
+#. TeamColors.Pink
+msgctxt "TeamColors.Pink"
+msgid "pink"
+msgstr "рожевий"
+
+#. TeamColors.Purple
+msgctxt "TeamColors.Purple"
+msgid "purple"
+msgstr "фіолетовий"
+
+#. TeamColors.Red
+msgctxt "TeamColors.Red"
+msgid "red"
+msgstr "червоний"
+
+#. TeamColors.Teal
+msgctxt "TeamColors.Teal"
+msgid "teal"
+msgstr "бірюзовий"
+
+#. TeamColors.Yellow
+msgctxt "TeamColors.Yellow"
+msgid "yellow"
+msgstr "жовтий"
+
 #. Artifacts.ColorBlue
 msgctxt "Artifacts.ColorBlue"
 msgid "blue"
@@ -884,6 +939,11 @@ msgstr "{0}, Ñ€Ð°Ð½Ð³ {1}"
 msgctxt "Screens.Tabs"
 msgid "Tabs"
 msgstr "Ð’ÐºÐ»Ð°Ð´ÐºÐ¸"
+
+#. Screens.TeamValue
+msgctxt "Screens.TeamValue"
+msgid "Team {0}"
+msgstr "Команда {0}"
 
 #. Screens.Teams
 msgctxt "Screens.Teams"

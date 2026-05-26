@@ -178,7 +178,7 @@ namespace SongsOfConquestAccess.UI
                             continue;
                         }
 
-                        AddIfNotEmpty(lines, tooltipLine);
+                        AddNormalizedTextLines(lines, tooltipLines[i]);
                     }
                 }
 

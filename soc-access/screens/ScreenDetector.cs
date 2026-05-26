@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using _8_UILayer.ClientView.Menu.Paus;
 using SongsOfConquest.Client;
 using SongsOfConquest.Client.Adventure;
+using SongsOfConquest.Client.Adventure.Menu.Lobby;
 using SongsOfConquest.Client.Adventure.UI;
 using SongsOfConquest.Client.Adventure.UI.Trading;
 using SongsOfConquest.Client.Adventure.View;
@@ -31,6 +32,9 @@ namespace SongsOfConquestAccess.Screens
         private readonly List<RuntimeScreenFactory> _runtimeScreenFactories;
         private AdventureViewInstaller _adventureViewInstaller;
         private BattleSceneInstaller _battleSceneInstaller;
+        private IconDropdown _deferredAdventureLobbyDropdownClose;
+        private bool _deferredAdventureLobbyDropdownHidden;
+        private float _deferredAdventureLobbyDropdownDeadline;
         private bool _storySequenceActive;
 
         public ScreenDetector(ScreenManager screenManager)
@@ -44,6 +48,11 @@ namespace SongsOfConquestAccess.Screens
                 TaleSelectScreen.TryBuildActiveScreen,
                 AdventureLobbyMapTypeScreen.TryBuildActiveScreen,
                 AdventureLobbyMapSelectScreen.TryBuildActiveScreen,
+                AdventureLobbyPlayersScreen.TryBuildActiveScreen,
+                AdventureLobbyGameSettingsScreen.TryBuildActiveScreen,
+                AdventureLobbyPlayerSettingsScreen.TryBuildActiveScreen,
+                AdventureLobbyIconDropdownScreen.TryBuildActiveScreen,
+                PlatformUserMenuScreen.TryBuildActiveScreen,
                 CampaignMapSelectScreen.TryBuildActiveScreen,
                 AdventureMapScreen.TryBuildActiveScreen,
                 OwnedEntitiesScreen.TryBuildActiveScreen,
@@ -93,6 +102,19 @@ namespace SongsOfConquestAccess.Screens
                 TutorialSimpleScreen.TryBuildActiveScreen,
                 LoadingCompleteScreen.TryBuildActiveScreen
             };
+        }
+
+        public void Update()
+        {
+            if (_deferredAdventureLobbyDropdownClose == null || !_deferredAdventureLobbyDropdownHidden)
+            {
+                return;
+            }
+
+            if (UnityEngine.Time.realtimeSinceStartup >= _deferredAdventureLobbyDropdownDeadline)
+            {
+                CompleteDeferredAdventureLobbyDropdownClose("adventure lobby icon dropdown deferred timeout");
+            }
         }
 
         public void OnLoadingScreenReady(LoadingScreenMenu menu)
@@ -756,6 +778,271 @@ namespace SongsOfConquestAccess.Screens
             }
         }
 
+        public void OnAdventureLobbyPlayersReady(LobbyMenu menu)
+        {
+            AdventureLobbyPlayersAdapter adapter = new AdventureLobbyPlayersAdapter(menu);
+            if (!adapter.IsPresent())
+            {
+                return;
+            }
+
+            AdventureLobbyPlayersScreen screen = new AdventureLobbyPlayersScreen(adapter);
+            if (_screenManager.CurrentScreen is AdventureLobbyPlayersScreen)
+            {
+                _screenManager.RefreshTop<AdventureLobbyPlayersScreen>(screen, "adventure lobby players shown");
+                return;
+            }
+
+            Push(screen, "adventure lobby players ready");
+        }
+
+        public void OnAdventureLobbyPlayersChanged()
+        {
+            AdventureLobbyPlayersScreen screen = _screenManager.Get<AdventureLobbyPlayersScreen>();
+            if (screen == null)
+            {
+                return;
+            }
+
+            if (!screen.IsPresent())
+            {
+                _screenManager.Remove<AdventureLobbyPlayersScreen>("adventure lobby players no longer present");
+                return;
+            }
+
+            screen.Refresh();
+            CompleteDeferredAdventureLobbyDropdownClose();
+        }
+
+        public void OnAdventureLobbyPlayersClosed(LobbyMenu menu)
+        {
+            if (_screenManager.Contains<AdventureLobbyGameSettingsScreen>())
+            {
+                _screenManager.Remove<AdventureLobbyGameSettingsScreen>("adventure lobby players closed");
+            }
+
+            if (_screenManager.Contains<AdventureLobbyPlayerSettingsScreen>())
+            {
+                _screenManager.Remove<AdventureLobbyPlayerSettingsScreen>("adventure lobby players closed");
+            }
+
+            if (_screenManager.Contains<AdventureLobbyIconDropdownScreen>())
+            {
+                _screenManager.Remove<AdventureLobbyIconDropdownScreen>("adventure lobby players closed");
+            }
+
+            ClearDeferredAdventureLobbyDropdownClose();
+
+            if (_screenManager.Contains<AdventureLobbyPlayersScreen>())
+            {
+                _screenManager.Remove<AdventureLobbyPlayersScreen>("adventure lobby players closed");
+            }
+        }
+
+        public void OnAdventureLobbyGameSettingsReady(LobbyMapSettingsMenu menu)
+        {
+            AdventureLobbyGameSettingsAdapter adapter = new AdventureLobbyGameSettingsAdapter(menu);
+            if (!adapter.IsPresent())
+            {
+                return;
+            }
+
+            AdventureLobbyGameSettingsScreen screen = new AdventureLobbyGameSettingsScreen(adapter);
+            AdventureLobbyGameSettingsScreen current = _screenManager.CurrentScreen as AdventureLobbyGameSettingsScreen;
+            if (current != null && current.Matches(menu))
+            {
+                _screenManager.RefreshTop<AdventureLobbyGameSettingsScreen>(screen, "adventure lobby game settings shown");
+                return;
+            }
+
+            Push(screen, "adventure lobby game settings ready");
+        }
+
+        public void OnAdventureLobbyGameSettingsChanged(LobbyMapSettingsMenu menu)
+        {
+            AdventureLobbyGameSettingsScreen current = _screenManager.CurrentScreen as AdventureLobbyGameSettingsScreen;
+            if (current == null || !current.Matches(menu))
+            {
+                return;
+            }
+
+            if (!current.IsPresent())
+            {
+                _screenManager.Pop<AdventureLobbyGameSettingsScreen>("adventure lobby game settings no longer present");
+                return;
+            }
+
+            current.Refresh();
+        }
+
+        public void OnAdventureLobbyGameSettingsClosed(LobbyMapSettingsMenu menu)
+        {
+            AdventureLobbyGameSettingsScreen current = _screenManager.CurrentScreen as AdventureLobbyGameSettingsScreen;
+            if (current != null && (menu == null || current.Matches(menu)))
+            {
+                _screenManager.Pop<AdventureLobbyGameSettingsScreen>("adventure lobby game settings closed");
+                return;
+            }
+
+            if (_screenManager.Contains<AdventureLobbyGameSettingsScreen>())
+            {
+                _screenManager.Remove<AdventureLobbyGameSettingsScreen>("adventure lobby game settings closed");
+            }
+        }
+
+        public void OnAdventureLobbyPlayerSettingsReady(LobbyPlayerSettingsMenu menu)
+        {
+            AdventureLobbyPlayerSettingsAdapter adapter = new AdventureLobbyPlayerSettingsAdapter(menu);
+            if (!adapter.IsPresent())
+            {
+                return;
+            }
+
+            AdventureLobbyPlayerSettingsScreen screen = new AdventureLobbyPlayerSettingsScreen(adapter);
+            AdventureLobbyPlayerSettingsScreen current = _screenManager.CurrentScreen as AdventureLobbyPlayerSettingsScreen;
+            if (current != null && current.Matches(menu))
+            {
+                _screenManager.RefreshTop<AdventureLobbyPlayerSettingsScreen>(screen, "adventure lobby player settings shown");
+                return;
+            }
+
+            Push(screen, "adventure lobby player settings ready");
+        }
+
+        public void OnAdventureLobbyPlayerSettingsClosed(LobbyPlayerSettingsMenu menu)
+        {
+            AdventureLobbyPlayerSettingsScreen current = _screenManager.CurrentScreen as AdventureLobbyPlayerSettingsScreen;
+            if (current != null && (menu == null || current.Matches(menu)))
+            {
+                _screenManager.Pop<AdventureLobbyPlayerSettingsScreen>("adventure lobby player settings closed");
+                return;
+            }
+
+            if (_screenManager.Contains<AdventureLobbyPlayerSettingsScreen>())
+            {
+                _screenManager.Remove<AdventureLobbyPlayerSettingsScreen>("adventure lobby player settings closed");
+            }
+        }
+
+        public void OnAdventureLobbyIconDropdownReady(IconDropdown dropdown)
+        {
+            AdventureLobbyIconDropdownAdapter adapter = new AdventureLobbyIconDropdownAdapter(dropdown);
+            if (!adapter.IsPresent())
+            {
+                return;
+            }
+
+            AdventureLobbyIconDropdownScreen screen = new AdventureLobbyIconDropdownScreen(adapter);
+            if (_screenManager.CurrentScreen is AdventureLobbyIconDropdownScreen)
+            {
+                _screenManager.RefreshTop<AdventureLobbyIconDropdownScreen>(screen, "adventure lobby icon dropdown shown");
+                return;
+            }
+
+            Push(screen, "adventure lobby icon dropdown ready");
+        }
+
+        public void OnAdventureLobbyIconDropdownClosed(IconDropdown dropdown)
+        {
+            if (_deferredAdventureLobbyDropdownClose != null
+                && (dropdown == null || ReferenceEquals(_deferredAdventureLobbyDropdownClose, dropdown)))
+            {
+                _deferredAdventureLobbyDropdownHidden = true;
+                _deferredAdventureLobbyDropdownDeadline = UnityEngine.Time.realtimeSinceStartup + 1f;
+                return;
+            }
+
+            AdventureLobbyIconDropdownScreen current = _screenManager.CurrentScreen as AdventureLobbyIconDropdownScreen;
+            if (current != null && (dropdown == null || current.Matches(dropdown)))
+            {
+                _screenManager.Pop<AdventureLobbyIconDropdownScreen>("adventure lobby icon dropdown closed");
+            }
+        }
+
+        public void OnAdventureLobbyIconDropdownOptionActivating(IconDropdown dropdown, string optionType)
+        {
+            if (dropdown == null || optionType == "Color")
+            {
+                ClearDeferredAdventureLobbyDropdownClose();
+                return;
+            }
+
+            _deferredAdventureLobbyDropdownClose = dropdown;
+            _deferredAdventureLobbyDropdownHidden = false;
+            _deferredAdventureLobbyDropdownDeadline = 0f;
+        }
+
+        public void OnAdventureLobbyIconDropdownOptionActivationFailed(IconDropdown dropdown)
+        {
+            if (_deferredAdventureLobbyDropdownClose == null
+                || dropdown == null
+                || ReferenceEquals(_deferredAdventureLobbyDropdownClose, dropdown))
+            {
+                ClearDeferredAdventureLobbyDropdownClose();
+            }
+        }
+
+        private void CompleteDeferredAdventureLobbyDropdownClose()
+        {
+            CompleteDeferredAdventureLobbyDropdownClose("adventure lobby icon dropdown changed");
+        }
+
+        private void CompleteDeferredAdventureLobbyDropdownClose(string reason)
+        {
+            if (_deferredAdventureLobbyDropdownClose == null)
+            {
+                return;
+            }
+
+            AdventureLobbyIconDropdownScreen current = _screenManager.CurrentScreen as AdventureLobbyIconDropdownScreen;
+            if (current != null && current.Matches(_deferredAdventureLobbyDropdownClose))
+            {
+                _screenManager.Pop<AdventureLobbyIconDropdownScreen>(reason);
+            }
+
+            ClearDeferredAdventureLobbyDropdownClose();
+        }
+
+        private void ClearDeferredAdventureLobbyDropdownClose()
+        {
+            _deferredAdventureLobbyDropdownClose = null;
+            _deferredAdventureLobbyDropdownHidden = false;
+            _deferredAdventureLobbyDropdownDeadline = 0f;
+        }
+
+        public void OnPlatformUserMenuReady(PlatformUserMenu menu)
+        {
+            PlatformUserMenuAdapter adapter = new PlatformUserMenuAdapter(menu);
+            if (!adapter.IsPresent())
+            {
+                return;
+            }
+
+            PlatformUserMenuScreen screen = new PlatformUserMenuScreen(adapter);
+            if (_screenManager.CurrentScreen is PlatformUserMenuScreen)
+            {
+                _screenManager.RefreshTop<PlatformUserMenuScreen>(screen, "platform user menu shown");
+                return;
+            }
+
+            Push(screen, "platform user menu ready");
+        }
+
+        public void OnPlatformUserMenuClosed(PlatformUserMenu menu)
+        {
+            PlatformUserMenuScreen current = _screenManager.CurrentScreen as PlatformUserMenuScreen;
+            if (current != null && (menu == null || current.Matches(menu)))
+            {
+                _screenManager.Pop<PlatformUserMenuScreen>("platform user menu closed");
+                return;
+            }
+
+            if (_screenManager.Contains<PlatformUserMenuScreen>())
+            {
+                _screenManager.Remove<PlatformUserMenuScreen>("platform user menu closed");
+            }
+        }
+
         public void OnMainMenuSceneLoaded(MainMenuSceneType loadedScene)
         {
             if (loadedScene == MainMenuSceneType.MainMenu)
@@ -777,6 +1064,31 @@ namespace SongsOfConquestAccess.Screens
             if (loadedScene != MainMenuSceneType.AdventureLobby && _screenManager.Contains<AdventureLobbyMapSelectScreen>())
             {
                 _screenManager.Remove<AdventureLobbyMapSelectScreen>("main menu scene changed away from adventure lobby");
+            }
+
+            if (loadedScene != MainMenuSceneType.AdventureLobby && _screenManager.Contains<AdventureLobbyIconDropdownScreen>())
+            {
+                _screenManager.Remove<AdventureLobbyIconDropdownScreen>("main menu scene changed away from adventure lobby");
+            }
+
+            if (loadedScene != MainMenuSceneType.AdventureLobby && _screenManager.Contains<AdventureLobbyGameSettingsScreen>())
+            {
+                _screenManager.Remove<AdventureLobbyGameSettingsScreen>("main menu scene changed away from adventure lobby");
+            }
+
+            if (loadedScene != MainMenuSceneType.AdventureLobby && _screenManager.Contains<AdventureLobbyPlayerSettingsScreen>())
+            {
+                _screenManager.Remove<AdventureLobbyPlayerSettingsScreen>("main menu scene changed away from adventure lobby");
+            }
+
+            if (loadedScene != MainMenuSceneType.AdventureLobby && _screenManager.Contains<PlatformUserMenuScreen>())
+            {
+                _screenManager.Remove<PlatformUserMenuScreen>("main menu scene changed away from adventure lobby");
+            }
+
+            if (loadedScene != MainMenuSceneType.AdventureLobby && _screenManager.Contains<AdventureLobbyPlayersScreen>())
+            {
+                _screenManager.Remove<AdventureLobbyPlayersScreen>("main menu scene changed away from adventure lobby");
             }
         }
 

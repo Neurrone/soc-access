@@ -15,6 +15,21 @@ namespace SongsOfConquestAccess.Localization
             public static readonly ModPluralString TileCount = new ModPluralString("Common.TileCount", "{0} tile", "{0} tiles");
         }
 
+        public static class TeamColors
+        {
+            public static readonly ModString Black = new ModString("TeamColors.Black", "black");
+            public static readonly ModString Blue = new ModString("TeamColors.Blue", "blue");
+            public static readonly ModString DarkRed = new ModString("TeamColors.DarkRed", "dark red");
+            public static readonly ModString Green = new ModString("TeamColors.Green", "green");
+            public static readonly ModString Neutral = new ModString("TeamColors.Neutral", "neutral");
+            public static readonly ModString Orange = new ModString("TeamColors.Orange", "orange");
+            public static readonly ModString Pink = new ModString("TeamColors.Pink", "pink");
+            public static readonly ModString Purple = new ModString("TeamColors.Purple", "purple");
+            public static readonly ModString Red = new ModString("TeamColors.Red", "red");
+            public static readonly ModString Teal = new ModString("TeamColors.Teal", "teal");
+            public static readonly ModString Yellow = new ModString("TeamColors.Yellow", "yellow");
+        }
+
         public static class Artifacts
         {
             public static readonly ModString ColorBlue = new ModString("Artifacts.ColorBlue", "blue");
@@ -456,6 +471,7 @@ namespace SongsOfConquestAccess.Localization
             public static readonly ModString SpellTier = new ModString("Screens.SpellTier", "{0} tier {1}");
             public static readonly ModString SellResourceForGold = new ModString("Screens.SellResourceForGold", "Sell {0} for {1}");
             public static readonly ModString Tabs = new ModString("Screens.Tabs", "Tabs");
+            public static readonly ModString TeamValue = new ModString("Screens.TeamValue", "Team {0}");
             public static readonly ModString Teams = new ModString("Screens.Teams", "Teams");
             public static readonly ModString TooltipActions = new ModString("Screens.TooltipActions", "Tooltip actions");
             public static readonly ModString Tier = new ModString("Screens.Tier", "Tier");

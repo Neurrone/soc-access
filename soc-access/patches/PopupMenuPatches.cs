@@ -1,5 +1,6 @@
 using System.Collections;
 using HarmonyLib;
+using SongsOfConquest.Client;
 using SongsOfConquest.Client.Menu.Popup;
 using SongsOfConquest.Client.UI;
 using SongsOfConquest.Common;
@@ -65,6 +66,11 @@ namespace SongsOfConquestAccess
         [HarmonyPostfix]
         private static void PopupMenuAskForInputPostfix(PopupMenu __instance)
         {
+            if (PlatformUserMenuPatches.HasRecentActivity)
+            {
+                LogPlatformUserInputPopup(__instance);
+            }
+
             NotifyReady(__instance);
         }
 
@@ -129,6 +135,31 @@ namespace SongsOfConquestAccess
 
             SocAccessPlugin.Instance?.ScreenDetector?.OnPopupMenuReady(popup, settings);
             return true;
+        }
+
+        private static void LogPlatformUserInputPopup(PopupMenu popup)
+        {
+            PopupMenu.Settings settings = popup != null ? SettingsRef(popup) : null;
+            SocAccessPlugin.Instance?.LogInfo(
+                "PlatformUserMenuDebug input popup opened: header=\""
+                + GetText(settings != null ? settings.HeaderText : null)
+                + "\", message=\""
+                + GetText(settings != null ? settings.MessageText : null)
+                + "\", positive=\""
+                + GetButtonText(settings != null ? settings.PositiveButton : null)
+                + "\", negative=\""
+                + GetButtonText(settings != null ? settings.NegativeButton : null)
+                + "\"");
+        }
+
+        private static string GetText(IUITextMesh text)
+        {
+            return text != null ? SongsOfConquestAccess.Speech.SpeechTextSanitizer.Normalize(UITextMeshTextUtility.GetEffectiveText(text)) : string.Empty;
+        }
+
+        private static string GetButtonText(IUIButton button)
+        {
+            return SongsOfConquestAccess.Speech.SpeechTextSanitizer.Normalize(UITextMeshTextUtility.GetEffectiveButtonText(button));
         }
     }
 }
