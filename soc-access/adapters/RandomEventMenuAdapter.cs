@@ -1,3 +1,4 @@
+using System.Text.RegularExpressions;
 using HarmonyLib;
 using SongsOfConquest.Client;
 using SongsOfConquest.Client.Adventure;
@@ -13,6 +14,8 @@ namespace SongsOfConquestAccess.Adapters
 {
     internal sealed class RandomEventMenuAdapter : IMessageDialogAdapter
     {
+        private static readonly Regex RichTextTagRegex = new Regex("<.*?>", RegexOptions.Compiled);
+
         private static readonly AccessTools.FieldRef<RandomEventMenu, RandomEventMenu.Settings> SettingsRef =
             AccessTools.FieldRefAccess<RandomEventMenu, RandomEventMenu.Settings>("_settings");
         private static readonly AccessTools.FieldRef<RandomEventMenu, ILocalizationHandler> LocalizationHandlerRef =
@@ -50,8 +53,8 @@ namespace SongsOfConquestAccess.Adapters
                 }
 
                 return JoinNonEmpty(
-                    GetActiveText(settings.ChainNameText),
-                    GetActiveText(settings.DescriptionText));
+                    GetActiveMultilineText(settings.ChainNameText),
+                    GetActiveMultilineText(settings.DescriptionText));
             }
         }
 
@@ -164,7 +167,7 @@ namespace SongsOfConquestAccess.Adapters
             return SpeechTextSanitizer.Normalize(UITextMeshTextUtility.GetEffectiveText(textMesh));
         }
 
-        private static string GetActiveText(IUITextMesh textMesh)
+        private static string GetActiveMultilineText(IUITextMesh textMesh)
         {
             IUITransform transform = textMesh as IUITransform;
             if (transform != null && !transform.Active)
@@ -172,7 +175,7 @@ namespace SongsOfConquestAccess.Adapters
                 return string.Empty;
             }
 
-            return GetText(textMesh);
+            return StripRichTextPreservingLines(UITextMeshTextUtility.GetEffectiveText(textMesh));
         }
 
         private static string GetButtonText(IUIButton button)
@@ -183,6 +186,17 @@ namespace SongsOfConquestAccess.Adapters
         private string GetLocalizedText(string key)
         {
             return SpeechTextSanitizer.Normalize(GameText.Get(GetLocalizationHandler(), key, string.Empty));
+        }
+
+        private static string StripRichTextPreservingLines(string value)
+        {
+            if (string.IsNullOrWhiteSpace(value))
+            {
+                return string.Empty;
+            }
+
+            string withoutTags = RichTextTagRegex.Replace(value, string.Empty);
+            return withoutTags.Trim();
         }
 
         private static string JoinNonEmpty(string first, string second)
