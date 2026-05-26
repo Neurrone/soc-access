@@ -424,6 +424,7 @@ namespace SongsOfConquestAccess.Localization
             public static readonly ModString GraphAccessibilityTodo = new ModString("Screens.GraphAccessibilityTodo", "TODO: implement accessibility for graph");
             public static readonly ModString GraphType = new ModString("Screens.GraphType", "Graph type");
             public static readonly ModString Group = new ModString("Screens.Group", "Group {0}");
+            public static readonly ModString Layout = new ModString("Screens.Layout", "Layout");
             public static readonly ModString LevelValue = new ModString("Screens.LevelValue", "level {0}");
             public static readonly ModString MainMenu = new ModString("Screens.MainMenu", "Main menu");
             public static readonly ModString Missing = new ModString("Screens.Missing", "Missing {0}");

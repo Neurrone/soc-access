@@ -730,6 +730,11 @@ msgctxt "Screens.Group"
 msgid "Group {0}"
 msgstr "ê·¸ë£¹ {0}"
 
+#. Screens.Layout
+msgctxt "Screens.Layout"
+msgid "Layout"
+msgstr "레이아웃"
+
 #. Screens.MainMenu
 msgctxt "Screens.MainMenu"
 msgid "Main menu"

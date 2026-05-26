@@ -1889,6 +1889,11 @@ msgctxt "Screens.Group"
 msgid "Group {0}"
 msgstr ""
 
+#. Screens.Layout
+msgctxt "Screens.Layout"
+msgid "Layout"
+msgstr ""
+
 #. Screens.LevelValue
 msgctxt "Screens.LevelValue"
 msgid "level {0}"

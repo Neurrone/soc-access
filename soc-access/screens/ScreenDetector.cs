@@ -47,6 +47,7 @@ namespace SongsOfConquestAccess.Screens
                 CampaignMenuScreen.TryBuildActiveScreen,
                 TaleSelectScreen.TryBuildActiveScreen,
                 AdventureLobbyMapTypeScreen.TryBuildActiveScreen,
+                AdventureLobbyRandomLayoutScreen.TryBuildActiveScreen,
                 AdventureLobbyMapSelectScreen.TryBuildActiveScreen,
                 AdventureLobbyChallengeMapSelectScreen.TryBuildActiveScreen,
                 AdventureLobbyPlayersScreen.TryBuildActiveScreen,
@@ -709,6 +710,79 @@ namespace SongsOfConquestAccess.Screens
             }
         }
 
+        public void OnAdventureLobbyRandomLayoutReady(LobbyRandomMapSelectionMenu menu)
+        {
+            AdventureLobbyRandomLayoutAdapter adapter = new AdventureLobbyRandomLayoutAdapter(menu);
+            if (!adapter.IsPresent())
+            {
+                return;
+            }
+
+            AdventureLobbyRandomLayoutScreen screen = new AdventureLobbyRandomLayoutScreen(adapter);
+            AdventureLobbyRandomLayoutScreen current = _screenManager.CurrentScreen as AdventureLobbyRandomLayoutScreen;
+            if (current != null && current.Matches(menu))
+            {
+                _screenManager.RefreshTop<AdventureLobbyRandomLayoutScreen>(screen, "adventure lobby random layout shown");
+                return;
+            }
+
+            Push(screen, "adventure lobby random layout ready");
+        }
+
+        public void OnAdventureLobbyRandomLayoutSelectionChanged(LobbyRandomMapSelectionMenu menu)
+        {
+            AdventureLobbyRandomLayoutScreen current = _screenManager.CurrentScreen as AdventureLobbyRandomLayoutScreen;
+            if (current != null && current.Matches(menu))
+            {
+                if (current.IsPresent())
+                {
+                    current.Refresh(announceFocus: false);
+                    return;
+                }
+
+                _screenManager.Pop<AdventureLobbyRandomLayoutScreen>("adventure lobby random layout no longer present");
+                return;
+            }
+
+            AdventureLobbyRandomLayoutAdapter adapter = new AdventureLobbyRandomLayoutAdapter(menu);
+            if (adapter.IsPresent() && _screenManager.CurrentScreen is AdventureLobbyMapTypeScreen)
+            {
+                Push(new AdventureLobbyRandomLayoutScreen(adapter), "adventure lobby random layout selection changed ready");
+            }
+        }
+
+        public void OnAdventureLobbyRandomLayoutEntryChanged(LobbyRandomMapPreviewEntry entry)
+        {
+            AdventureLobbyRandomLayoutScreen current = _screenManager.CurrentScreen as AdventureLobbyRandomLayoutScreen;
+            if (current == null)
+            {
+                return;
+            }
+
+            if (!current.IsPresent())
+            {
+                _screenManager.Pop<AdventureLobbyRandomLayoutScreen>("adventure lobby random layout no longer present");
+                return;
+            }
+
+            current.Refresh(announceFocus: false);
+        }
+
+        public void OnAdventureLobbyRandomLayoutClosed(LobbyRandomMapSelectionMenu menu)
+        {
+            AdventureLobbyRandomLayoutScreen current = _screenManager.CurrentScreen as AdventureLobbyRandomLayoutScreen;
+            if (current != null && (menu == null || current.Matches(menu)))
+            {
+                _screenManager.Pop<AdventureLobbyRandomLayoutScreen>("adventure lobby random layout closed");
+                return;
+            }
+
+            if (_screenManager.Contains<AdventureLobbyRandomLayoutScreen>())
+            {
+                _screenManager.Remove<AdventureLobbyRandomLayoutScreen>("adventure lobby random layout closed");
+            }
+        }
+
         public void OnAdventureLobbyMapSelectReady(MapSelectMenu menu)
         {
             AdventureLobbyMapSelectAdapter adapter = new AdventureLobbyMapSelectAdapter(menu);
@@ -1108,6 +1182,11 @@ namespace SongsOfConquestAccess.Screens
             if (loadedScene != MainMenuSceneType.AdventureLobby && _screenManager.Contains<AdventureLobbyMapTypeScreen>())
             {
                 _screenManager.Remove<AdventureLobbyMapTypeScreen>("main menu scene changed away from adventure lobby");
+            }
+
+            if (loadedScene != MainMenuSceneType.AdventureLobby && _screenManager.Contains<AdventureLobbyRandomLayoutScreen>())
+            {
+                _screenManager.Remove<AdventureLobbyRandomLayoutScreen>("main menu scene changed away from adventure lobby");
             }
 
             if (loadedScene != MainMenuSceneType.AdventureLobby && _screenManager.Contains<AdventureLobbyMapSelectScreen>())
