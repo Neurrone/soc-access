@@ -43,6 +43,7 @@ namespace SongsOfConquestAccess.Screens
                 CampaignMenuScreen.TryBuildActiveScreen,
                 TaleSelectScreen.TryBuildActiveScreen,
                 AdventureLobbyMapTypeScreen.TryBuildActiveScreen,
+                AdventureLobbyMapSelectScreen.TryBuildActiveScreen,
                 CampaignMapSelectScreen.TryBuildActiveScreen,
                 AdventureMapScreen.TryBuildActiveScreen,
                 OwnedEntitiesScreen.TryBuildActiveScreen,
@@ -685,6 +686,76 @@ namespace SongsOfConquestAccess.Screens
             }
         }
 
+        public void OnAdventureLobbyMapSelectReady(MapSelectMenu menu)
+        {
+            AdventureLobbyMapSelectAdapter adapter = new AdventureLobbyMapSelectAdapter(menu);
+            if (!adapter.IsPresent())
+            {
+                return;
+            }
+
+            AdventureLobbyMapSelectScreen screen = new AdventureLobbyMapSelectScreen(adapter);
+            if (_screenManager.CurrentScreen is AdventureLobbyMapSelectScreen)
+            {
+                _screenManager.RefreshTop<AdventureLobbyMapSelectScreen>(screen, "adventure lobby map select shown");
+                return;
+            }
+
+            Push(screen, "adventure lobby map select ready");
+        }
+
+        public void OnAdventureLobbyMapSelectChanged(MapSelectMenu menu)
+        {
+            AdventureLobbyMapSelectScreen current = _screenManager.CurrentScreen as AdventureLobbyMapSelectScreen;
+            if (current != null && current.Matches(menu))
+            {
+                if (current.IsPresent())
+                {
+                    current.Refresh();
+                    return;
+                }
+
+                _screenManager.Pop<AdventureLobbyMapSelectScreen>("adventure lobby map select no longer present");
+                return;
+            }
+
+            AdventureLobbyMapSelectAdapter adapter = new AdventureLobbyMapSelectAdapter(menu);
+            if (adapter.IsPresent() && _screenManager.CurrentScreen is AdventureLobbyMapTypeScreen)
+            {
+                Push(new AdventureLobbyMapSelectScreen(adapter), "adventure lobby map select changed ready");
+            }
+        }
+
+        public void OnAdventureLobbyMapSelectSelectionChanged(MapSelectMenu menu)
+        {
+            AdventureLobbyMapSelectScreen current = _screenManager.CurrentScreen as AdventureLobbyMapSelectScreen;
+            if (current != null && current.Matches(menu))
+            {
+                if (current.IsPresent())
+                {
+                    current.Refresh(announceFocus: false);
+                    return;
+                }
+
+                _screenManager.Pop<AdventureLobbyMapSelectScreen>("adventure lobby map select no longer present");
+                return;
+            }
+
+            AdventureLobbyMapSelectAdapter adapter = new AdventureLobbyMapSelectAdapter(menu);
+            if (adapter.IsPresent() && _screenManager.CurrentScreen is AdventureLobbyMapTypeScreen)
+            {
+                Push(new AdventureLobbyMapSelectScreen(adapter), "adventure lobby map select selection changed ready");
+            }
+        }
+
+        public void OnAdventureLobbyMapSelectClosed(MapSelectMenu menu)
+        {
+            if (_screenManager.Contains<AdventureLobbyMapSelectScreen>())
+            {
+                _screenManager.Remove<AdventureLobbyMapSelectScreen>("adventure lobby map select closed");
+            }
+        }
+
         public void OnMainMenuSceneLoaded(MainMenuSceneType loadedScene)
         {
             if (loadedScene == MainMenuSceneType.MainMenu)
@@ -698,9 +769,14 @@ namespace SongsOfConquestAccess.Screens
                 _screenManager.Pop<CampaignMenuScreen>("main menu scene changed away from campaign");
             }
 
-            if (loadedScene != MainMenuSceneType.AdventureLobby && _screenManager.CurrentScreen is AdventureLobbyMapTypeScreen)
+            if (loadedScene != MainMenuSceneType.AdventureLobby && _screenManager.Contains<AdventureLobbyMapTypeScreen>())
             {
-                _screenManager.Pop<AdventureLobbyMapTypeScreen>("main menu scene changed away from adventure lobby");
+                _screenManager.Remove<AdventureLobbyMapTypeScreen>("main menu scene changed away from adventure lobby");
+            }
+
+            if (loadedScene != MainMenuSceneType.AdventureLobby && _screenManager.Contains<AdventureLobbyMapSelectScreen>())
+            {
+                _screenManager.Remove<AdventureLobbyMapSelectScreen>("main menu scene changed away from adventure lobby");
             }
         }
 

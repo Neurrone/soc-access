@@ -1,4 +1,4 @@
-msgid ""
+﻿msgid ""
 msgstr ""
 "Project-Id-Version: SongsOfConquestAccess\n"
 "Language: ru\n"
@@ -370,6 +370,11 @@ msgctxt "UI.LabelValue"
 msgid "{0}: {1}"
 msgstr "{0}: {1}"
 
+#. UI.MapsTable
+msgctxt "UI.MapsTable"
+msgid "Maps table"
+msgstr "Таблица карт"
+
 #. UI.PressSpaceSelectItemToDrag
 msgctxt "UI.PressSpaceSelectItemToDrag"
 msgid "Press space to select an item to drag."
@@ -389,6 +394,11 @@ msgstr "ÐºÐ½Ð¾Ð¿ÐºÐ°"
 msgctxt "UI.RoleCheckBox"
 msgid "check box"
 msgstr "Ñ„Ð»Ð°Ð¶Ð¾Ðº"
+
+#. UI.RoleColumnHeader
+msgctxt "UI.RoleColumnHeader"
+msgid "column header"
+msgstr "заголовок столбца"
 
 #. UI.RoleDocument
 msgctxt "UI.RoleDocument"
@@ -454,6 +464,16 @@ msgstr "Ð¿ÐµÑ€ÐµÑ‚Ð°ÑÐºÐ¸Ð²Ð°ÐµÑ‚ÑÑ"
 msgctxt "UI.StatusUnchecked"
 msgid "unchecked"
 msgstr "Ð½Ðµ Ð¾Ñ‚Ð¼ÐµÑ‡ÐµÐ½Ð¾"
+
+#. UI.SortAscending
+msgctxt "UI.SortAscending"
+msgid "ascending"
+msgstr "по возрастанию"
+
+#. UI.SortDescending
+msgctxt "UI.SortDescending"
+msgid "descending"
+msgstr "по убыванию"
 
 #. UI.Target
 msgctxt "UI.Target"

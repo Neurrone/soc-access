@@ -330,6 +330,7 @@ namespace SongsOfConquestAccess.Localization
             public static readonly ModString InvalidDestination = new ModString("UI.InvalidDestination", "Invalid destination.");
             public static readonly ModString JoiningArmy = new ModString("UI.JoiningArmy", "joining army");
             public static readonly ModString LabelValue = new ModString("UI.LabelValue", "{0}: {1}");
+            public static readonly ModString MapsTable = new ModString("UI.MapsTable", "Maps table");
             public static readonly ModString NoScannerResults = new ModString("UI.NoScannerResults", "No scanner results");
             public static readonly ModString NotInMovementRange = new ModString("UI.NotInMovementRange", "Not in movement range");
             public static readonly ModString PressSpaceSelectItemToDrag = new ModString("UI.PressSpaceSelectItemToDrag", "Press space to select an item to drag.");
@@ -340,6 +341,7 @@ namespace SongsOfConquestAccess.Localization
             public static readonly ModString ReviewBufferUi = new ModString("UI.ReviewBufferUi", "UI");
             public static readonly ModString RoleButton = new ModString("UI.RoleButton", "button");
             public static readonly ModString RoleCheckBox = new ModString("UI.RoleCheckBox", "check box");
+            public static readonly ModString RoleColumnHeader = new ModString("UI.RoleColumnHeader", "column header");
             public static readonly ModString RoleDocument = new ModString("UI.RoleDocument", "document");
             public static readonly ModString RoleEdit = new ModString("UI.RoleEdit", "edit");
             public static readonly ModString RoleGrid = new ModString("UI.RoleGrid", "grid");
@@ -358,6 +360,8 @@ namespace SongsOfConquestAccess.Localization
             public static readonly ModString StatusMissing = new ModString("UI.StatusMissing", "missing");
             public static readonly ModString StatusUnchecked = new ModString("UI.StatusUnchecked", "unchecked");
             public static readonly ModString StatusUnavailable = new ModString("UI.StatusUnavailable", "unavailable");
+            public static readonly ModString SortAscending = new ModString("UI.SortAscending", "ascending");
+            public static readonly ModString SortDescending = new ModString("UI.SortDescending", "descending");
             public static readonly ModString Target = new ModString("UI.Target", "target");
             public static readonly ModString TroopSlot = new ModString("UI.TroopSlot", "{0}, {1}");
             public static readonly ModString TroopSlotWithSize = new ModString("UI.TroopSlotWithSize", "{0}, {1} / {2}, {3}");

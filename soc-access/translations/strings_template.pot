@@ -1459,6 +1459,11 @@ msgctxt "UI.LabelValue"
 msgid "{0}: {1}"
 msgstr ""
 
+#. UI.MapsTable
+msgctxt "UI.MapsTable"
+msgid "Maps table"
+msgstr ""
+
 #. UI.NoScannerResults
 msgctxt "UI.NoScannerResults"
 msgid "No scanner results"
@@ -1507,6 +1512,11 @@ msgstr ""
 #. UI.RoleCheckBox
 msgctxt "UI.RoleCheckBox"
 msgid "check box"
+msgstr ""
+
+#. UI.RoleColumnHeader
+msgctxt "UI.RoleColumnHeader"
+msgid "column header"
 msgstr ""
 
 #. UI.RoleDocument
@@ -1597,6 +1607,16 @@ msgstr ""
 #. UI.StatusUnavailable
 msgctxt "UI.StatusUnavailable"
 msgid "unavailable"
+msgstr ""
+
+#. UI.SortAscending
+msgctxt "UI.SortAscending"
+msgid "ascending"
+msgstr ""
+
+#. UI.SortDescending
+msgctxt "UI.SortDescending"
+msgid "descending"
 msgstr ""
 
 #. UI.Target
