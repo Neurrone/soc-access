@@ -84,7 +84,7 @@ namespace SongsOfConquestAccess.Screens
         {
             MenuWidget menu = new MenuWidget(
                 "post-adventure-objectives",
-                ModText.Get(ModStrings.Screens.Objectives),
+                adapter.ObjectivesTitle,
                 () => adapter.GetObjectives().Count > 0);
 
             IReadOnlyList<PostAdventureResultAdapter.ObjectiveEntry> objectives = adapter.GetObjectives();
@@ -94,7 +94,7 @@ namespace SongsOfConquestAccess.Screens
                 menu.AddItem(new MenuItemWidget(
                     "post-adventure-objective-" + i,
                     () => objective.Label,
-                    () => objective.Status,
+                    getStatus: null,
                     activate: null,
                     onFocus: adapter.HideNativeTooltip,
                     isVisible: () => objective.IsVisible));

@@ -13,6 +13,7 @@ namespace SongsOfConquestAccess.Adapters
     internal sealed class PostAdventureResultAdapter
     {
         private static readonly FieldInfo DescriptionField = AccessTools.Field(typeof(PostAdventureMenu), "_description");
+        private static readonly FieldInfo DescriptionTitleField = AccessTools.Field(typeof(PostAdventureMenu), "_descriptionTitle");
         private static readonly FieldInfo VictoryCanvasGroupField = AccessTools.Field(typeof(PostAdventureMenu), "_victoryCanvasgroup");
         private static readonly FieldInfo DefeatCanvasGroupField = AccessTools.Field(typeof(PostAdventureMenu), "_defeatCanvasgroup");
         private static readonly FieldInfo ButtonCanvasGroupField = AccessTools.Field(typeof(PostAdventureMenu), "_buttonCanvasGroup");
@@ -24,8 +25,6 @@ namespace SongsOfConquestAccess.Adapters
         private static readonly FieldInfo QuitToMainButtonField = AccessTools.Field(typeof(PostAdventureMenu), "_quitToMainButton");
         private static readonly FieldInfo PlayerStatsButtonField = AccessTools.Field(typeof(PostAdventureMenu), "_playerStatsButton");
 
-        private static readonly FieldInfo ObjectiveIconTickField = AccessTools.Field(typeof(PostAdventureMenuObjectiveEntry), "_objectiveIconTick");
-        private static readonly FieldInfo LoseConditionIconField = AccessTools.Field(typeof(PostAdventureMenuObjectiveEntry), "_loseConditionIcon");
         private static readonly FieldInfo ObjectiveTextField = AccessTools.Field(typeof(PostAdventureMenuObjectiveEntry), "_objectiveText");
 
         private readonly PostAdventureMenu _menu;
@@ -63,6 +62,15 @@ namespace SongsOfConquestAccess.Adapters
         public string Description
         {
             get { return GetText(GetField<UITextMesh>(DescriptionField)); }
+        }
+
+        public string ObjectivesTitle
+        {
+            get
+            {
+                string title = GetText(GetField<UITextMesh>(DescriptionTitleField));
+                return !string.IsNullOrWhiteSpace(title) ? title : ModText.Get(ModStrings.Screens.Objectives);
+            }
         }
 
         public bool DescriptionVisible
@@ -120,7 +128,6 @@ namespace SongsOfConquestAccess.Adapters
 
                 result.Add(new ObjectiveEntry(
                     label,
-                    GetObjectiveStatus(entry),
                     entry));
             }
 
@@ -218,40 +225,20 @@ namespace SongsOfConquestAccess.Adapters
 
         private PostAdventureMenuObjectiveEntry[] GetObjectiveEntries()
         {
-            Transform container = GetField<Transform>(ObjectiveEntryContainerField);
-            if (container == null)
+            UITransform container = GetField<UITransform>(ObjectiveEntryContainerField);
+            Transform transform = container != null ? container.MonoTransform : null;
+            if (transform == null)
             {
                 return new PostAdventureMenuObjectiveEntry[0];
             }
 
-            return container.GetComponentsInChildren<PostAdventureMenuObjectiveEntry>(false);
+            return transform.GetComponentsInChildren<PostAdventureMenuObjectiveEntry>(false);
         }
 
         private static string GetObjectiveText(PostAdventureMenuObjectiveEntry entry)
         {
             UITextMesh text = GetField<UITextMesh>(entry, ObjectiveTextField);
             return GetText(text);
-        }
-
-        private static string GetObjectiveStatus(PostAdventureMenuObjectiveEntry entry)
-        {
-            if (IsImageActive(entry, LoseConditionIconField))
-            {
-                return "failed";
-            }
-
-            if (IsImageActive(entry, ObjectiveIconTickField))
-            {
-                return "completed";
-            }
-
-            return "incomplete";
-        }
-
-        private static bool IsImageActive(PostAdventureMenuObjectiveEntry entry, FieldInfo field)
-        {
-            Component component = GetField<Component>(entry, field);
-            return component != null && component.gameObject != null && component.gameObject.activeInHierarchy;
         }
 
         private static string GetFirstVisibleText(CanvasGroup canvasGroup)
@@ -303,16 +290,13 @@ namespace SongsOfConquestAccess.Adapters
         {
             private readonly PostAdventureMenuObjectiveEntry _entry;
 
-            public ObjectiveEntry(string label, string status, PostAdventureMenuObjectiveEntry entry)
+            public ObjectiveEntry(string label, PostAdventureMenuObjectiveEntry entry)
             {
                 Label = label ?? string.Empty;
-                Status = status ?? string.Empty;
                 _entry = entry;
             }
 
             public string Label { get; private set; }
-
-            public string Status { get; private set; }
 
             public bool IsVisible
             {
