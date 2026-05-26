@@ -4,9 +4,9 @@ Songs of Conquest Access is a screen reader accessibility mod for Songs of Conqu
 
 ## Status
 
-Campaigns are well supported. All gameplay screens I'm aware of are accessible.
+All single player modes are supported.
 
-DLCs should be working, as they add new content but not new screens to the game. I have not yet verified this though, since my priority has been supporting the base campaigns first.
+DLCs should be working, as they add new content but not new screens to the game.
 
 See this [list of known Issues](known-issues.md).
 

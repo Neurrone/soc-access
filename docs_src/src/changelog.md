@@ -1,12 +1,13 @@
 # Changelog
 
-## V0.3.1
+## V0.4.0
 
+- Add support for conquest, challenge and random maps
 - Wielders being recruited are now announced. This is mainly for situations where they join via story events
 - Fixed resource generating buildings not appearing in the scanner. Results are in a dedicated "Resource generators" category
 - Revealed entity readouts:
   - Multi-tile entities are no longer considered as revealed unless they are fully revealed
-  - Artifact names are now announced
+  - Artifact names are now announced when visible
   - Dead wielders are no longer announced as no longer being visible
   - The revealed buffer is no longer being reset after combat
 - Combat narration:
@@ -17,6 +18,7 @@
   - Fixed more cases where the casting of the spell was read after narration of its effects
   - Shorten essence gain notifications for units that generate multiple types of essence. "+1 order essence and +1 arcana essence" would now be read as "+1 order, +1 arcana essence"
   - Read wielder essence generation at the start of their turn. Due to game limitations, this works from the second round.
+  - Don't announce individual tiles spawning Acid cloudss when casting the acid cloud spell
 - Shorten combat influence readouts.
 
   Before: "in movement range of 59 enemy Plague Rats at 6, 8, zone of control and movement range of 15 enemy Oathbound at 9, 6, movement range of 19 enemy Oathbound at 7, 4, movement range of 5 enemy Spectres at 11.5, 3."
@@ -29,7 +31,8 @@
 - Artifact colours should now be read everywhere
 - On the adventure map, revealed announcements and reading the focused tile now respect scouting level and no longer reads full artifact names unless the game would actually show it
 - Restored reading of some decorative and effect types on tiles. This fixes walls being only read as "impassable"
-- Fix missing close button label for a reward choice screen
+- Fix missing close button label for options and a reward choice screen
+- Support random events popup
 - Many translation string fixes
 
 ## V0.3.0

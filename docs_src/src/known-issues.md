@@ -2,11 +2,12 @@
 
 In rough order of descending priority:
 
+- Artifact markets are not supported yet, pending me finding one on a map
+- In the players menu, the gift settlement and resource subscreens are not yet supported
 - The scanner works for finding things on the map, but is still not ideal for optimal pathing for wielders. I'm looking for suggestions to improve this.
 - Combat narration is still quite verbose
-- Tiles with dangerous effects such as those caused by the acid cloud spell currently don't indicate that dangerous effect
-- The screen for selecting conquest mode maps is currently not supported
-- The screen for selecting community maps is currently not supported
+- The screens for selecting community maps and campaigns are currently not supported
 - Withdrawing from battle may leave the mod stuck on the troop placement screen, instead of returning to the adventure map. I've not been able to reproduce this though.
 - In the options menu, changing the game's keybindings and the bug report screen is currently not supported
+- The post-game stats screen is not supported
 - Multiplayer is currently not supported
