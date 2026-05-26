@@ -94,8 +94,6 @@ namespace SongsOfConquestAccess.Adapters
             AccessTools.Field(typeof(UIFilterDropdown), "_toggles");
         private static readonly FieldInfo FilterDropdownToggleContainerField =
             AccessTools.Field(typeof(UIFilterDropdown), "_toggleContainer");
-        private static readonly FieldInfo PreviewFactionLookupField =
-            AccessTools.Field(typeof(LobbyMapPreview), "_factionLookup");
         private static readonly MethodInfo SetSelectedEntryMethod =
             AccessTools.Method(typeof(MapSelectMenu), "SetSelectedEntry");
         private static readonly MethodInfo SortSiblingsMethod =
@@ -339,57 +337,12 @@ namespace SongsOfConquestAccess.Adapters
 
         public string GetMapInfoText(LobbyMapSelectMenuEntry entry)
         {
-            if (_menu == null || entry == null || entry.MetaData == null)
+            if (_menu == null || entry == null || !ReferenceEquals(SelectedEntryRef(_menu), entry))
             {
                 return string.Empty;
             }
 
-            LobbyMapPreview preview = PreviewRef(_menu);
-            IFactionLookup factionLookup = preview != null && PreviewFactionLookupField != null
-                ? PreviewFactionLookupField.GetValue(preview) as IFactionLookup
-                : null;
-            if (factionLookup == null)
-            {
-                return string.Empty;
-            }
-
-            return NormalizeMultilineText(MapSelectMenu.GetMapInfoText(entry.MapData, entry.MetaData, _localization, factionLookup));
-        }
-
-        private static string NormalizeMultilineText(string value)
-        {
-            if (string.IsNullOrWhiteSpace(value))
-            {
-                return string.Empty;
-            }
-
-            string[] rawLines = value.Replace("\r\n", "\n").Replace('\r', '\n').Split('\n');
-            List<string> lines = new List<string>();
-            bool lastWasBlank = false;
-            for (int i = 0; i < rawLines.Length; i++)
-            {
-                string line = SpeechTextSanitizer.Normalize(rawLines[i]);
-                if (string.IsNullOrWhiteSpace(line))
-                {
-                    if (lines.Count > 0 && !lastWasBlank)
-                    {
-                        lines.Add(string.Empty);
-                        lastWasBlank = true;
-                    }
-
-                    continue;
-                }
-
-                lines.Add(line);
-                lastWasBlank = false;
-            }
-
-            while (lines.Count > 0 && string.IsNullOrWhiteSpace(lines[lines.Count - 1]))
-            {
-                lines.RemoveAt(lines.Count - 1);
-            }
-
-            return string.Join(Environment.NewLine, lines.ToArray());
+            return LobbyMapPreviewText.GetInfo(PreviewRef(_menu));
         }
 
         private MapSelectSortButtonAdapter GetSortButton(int columnIndex)

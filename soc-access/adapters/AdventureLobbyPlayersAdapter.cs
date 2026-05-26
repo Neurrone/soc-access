@@ -57,11 +57,6 @@ namespace SongsOfConquestAccess.Adapters
             AccessTools.Field(typeof(LobbyMapSettings), "_mixedFactionsClientONButton");
         private static readonly FieldInfo MapSettingsMixedFactionsClientOffButtonField =
             AccessTools.Field(typeof(LobbyMapSettings), "_mixedFactionsClientOFFButton");
-        private static readonly FieldInfo MapPreviewMapNameField =
-            AccessTools.Field(typeof(LobbyMapPreview), "_mapNameHeader");
-        private static readonly FieldInfo MapPreviewInfoField =
-            AccessTools.Field(typeof(LobbyMapPreview), "_mpInfo");
-
         private readonly LobbyMenu _menu;
         private readonly LobbyNavigation _navigation;
         private readonly IClientLobbyFacade _facade;
@@ -125,9 +120,7 @@ namespace SongsOfConquestAccess.Adapters
             get
             {
                 LobbyMapPreview preview = _menu != null ? MapPreviewRef(_menu) : null;
-                string title = GetText(GetField<UITextMesh>(preview, MapPreviewMapNameField));
-                string info = GetText(GetField<UITextMesh>(preview, MapPreviewInfoField));
-                return MenuButtonTextUtility.JoinParts(title, info);
+                return LobbyMapPreviewText.GetSummary(preview);
             }
         }
 
