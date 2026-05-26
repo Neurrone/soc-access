@@ -57,6 +57,7 @@ namespace SongsOfConquestAccess.Screens
                 PlatformUserMenuScreen.TryBuildActiveScreen,
                 CampaignMapSelectScreen.TryBuildActiveScreen,
                 AdventureMapScreen.TryBuildActiveScreen,
+                AdventurePlayerMenuScreen.TryBuildActiveScreen,
                 OwnedEntitiesScreen.TryBuildActiveScreen,
                 TroopOverviewScreen.TryBuildActiveScreen,
                 MarketplaceScreen.TryBuildActiveScreen,
@@ -321,6 +322,57 @@ namespace SongsOfConquestAccess.Screens
             if (_screenManager.CurrentScreen is TroopOverviewScreen)
             {
                 _screenManager.Pop<TroopOverviewScreen>("troop overview closed");
+            }
+        }
+
+        public void OnAdventurePlayerMenuReady(AdventurePlayerMenu menu)
+        {
+            AdventurePlayerMenuAdapter adapter = new AdventurePlayerMenuAdapter(menu);
+            if (!adapter.IsPresent())
+            {
+                return;
+            }
+
+            AdventurePlayerMenuScreen screen = new AdventurePlayerMenuScreen(adapter);
+            AdventurePlayerMenuScreen current = _screenManager.CurrentScreen as AdventurePlayerMenuScreen;
+            if (current != null && current.Matches(menu))
+            {
+                _screenManager.RefreshTop<AdventurePlayerMenuScreen>(screen, "adventure players menu shown");
+                return;
+            }
+
+            Push(screen, "adventure players menu ready");
+        }
+
+        public void OnAdventurePlayerMenuChanged()
+        {
+            AdventurePlayerMenuScreen screen = _screenManager.CurrentScreen as AdventurePlayerMenuScreen;
+            if (screen == null)
+            {
+                return;
+            }
+
+            if (!screen.IsPresent())
+            {
+                _screenManager.Pop<AdventurePlayerMenuScreen>("adventure players menu no longer present");
+                return;
+            }
+
+            screen.Refresh();
+        }
+
+        public void OnAdventurePlayerMenuClosed(AdventurePlayerMenu menu)
+        {
+            AdventurePlayerMenuScreen current = _screenManager.CurrentScreen as AdventurePlayerMenuScreen;
+            if (current != null && (menu == null || current.Matches(menu)))
+            {
+                _screenManager.Pop<AdventurePlayerMenuScreen>("adventure players menu closed");
+                return;
+            }
+
+            if (_screenManager.Contains<AdventurePlayerMenuScreen>())
+            {
+                _screenManager.Remove<AdventurePlayerMenuScreen>("adventure players menu closed");
             }
         }
 
