@@ -9,6 +9,8 @@ namespace SongsOfConquestAccess.UI
     {
         private readonly List<MenuItemWidget> _items = new List<MenuItemWidget>();
         private readonly Func<bool> _isVisible;
+        private readonly Action _onFocus;
+        private readonly Action _onUnfocus;
         private int _focusedIndex = -1;
 
         public MenuWidget(string id, string label)
@@ -17,10 +19,17 @@ namespace SongsOfConquestAccess.UI
         }
 
         public MenuWidget(string id, string label, Func<bool> isVisible)
+            : this(id, label, isVisible, null, null)
+        {
+        }
+
+        public MenuWidget(string id, string label, Func<bool> isVisible, Action onFocus, Action onUnfocus)
             : base(id)
         {
             Label = label ?? string.Empty;
             _isVisible = isVisible;
+            _onFocus = onFocus;
+            _onUnfocus = onUnfocus;
         }
 
         public string Label { get; private set; }
@@ -129,12 +138,14 @@ namespace SongsOfConquestAccess.UI
 
         protected override void OnFocus()
         {
+            _onFocus?.Invoke();
             EnsureFocus();
         }
 
         protected override void OnUnfocus()
         {
             FocusedItem?.Unfocus();
+            _onUnfocus?.Invoke();
         }
 
         public override bool ClaimsAction(string actionKey)
