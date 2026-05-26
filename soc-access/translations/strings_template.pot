@@ -1514,11 +1514,6 @@ msgctxt "UI.LabelValue"
 msgid "{0}: {1}"
 msgstr ""
 
-#. UI.MapsTable
-msgctxt "UI.MapsTable"
-msgid "Maps table"
-msgstr ""
-
 #. UI.NoScannerResults
 msgctxt "UI.NoScannerResults"
 msgid "No scanner results"

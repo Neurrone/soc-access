@@ -48,6 +48,7 @@ namespace SongsOfConquestAccess.Screens
                 TaleSelectScreen.TryBuildActiveScreen,
                 AdventureLobbyMapTypeScreen.TryBuildActiveScreen,
                 AdventureLobbyMapSelectScreen.TryBuildActiveScreen,
+                AdventureLobbyChallengeMapSelectScreen.TryBuildActiveScreen,
                 AdventureLobbyPlayersScreen.TryBuildActiveScreen,
                 AdventureLobbyGameSettingsScreen.TryBuildActiveScreen,
                 AdventureLobbyPlayerSettingsScreen.TryBuildActiveScreen,
@@ -778,6 +779,54 @@ namespace SongsOfConquestAccess.Screens
             }
         }
 
+        public void OnAdventureLobbyChallengeMapSelectReady(ChallengeMapsMenu menu)
+        {
+            AdventureLobbyChallengeMapSelectAdapter adapter = new AdventureLobbyChallengeMapSelectAdapter(menu);
+            if (!adapter.IsPresent())
+            {
+                return;
+            }
+
+            AdventureLobbyChallengeMapSelectScreen screen = new AdventureLobbyChallengeMapSelectScreen(adapter);
+            if (_screenManager.CurrentScreen is AdventureLobbyChallengeMapSelectScreen)
+            {
+                _screenManager.RefreshTop<AdventureLobbyChallengeMapSelectScreen>(screen, "adventure lobby challenge map select shown");
+                return;
+            }
+
+            Push(screen, "adventure lobby challenge map select ready");
+        }
+
+        public void OnAdventureLobbyChallengeMapSelectSelectionChanged(ChallengeMapsMenu menu)
+        {
+            AdventureLobbyChallengeMapSelectScreen current = _screenManager.CurrentScreen as AdventureLobbyChallengeMapSelectScreen;
+            if (current != null && current.Matches(menu))
+            {
+                if (current.IsPresent())
+                {
+                    current.Refresh(announceFocus: false);
+                    return;
+                }
+
+                _screenManager.Pop<AdventureLobbyChallengeMapSelectScreen>("adventure lobby challenge map select no longer present");
+                return;
+            }
+
+            AdventureLobbyChallengeMapSelectAdapter adapter = new AdventureLobbyChallengeMapSelectAdapter(menu);
+            if (adapter.IsPresent() && _screenManager.CurrentScreen is AdventureLobbyMapTypeScreen)
+            {
+                Push(new AdventureLobbyChallengeMapSelectScreen(adapter), "adventure lobby challenge map select selection changed ready");
+            }
+        }
+
+        public void OnAdventureLobbyChallengeMapSelectClosed(ChallengeMapsMenu menu)
+        {
+            if (_screenManager.Contains<AdventureLobbyChallengeMapSelectScreen>())
+            {
+                _screenManager.Remove<AdventureLobbyChallengeMapSelectScreen>("adventure lobby challenge map select closed");
+            }
+        }
+
         public void OnAdventureLobbyPlayersReady(LobbyMenu menu)
         {
             AdventureLobbyPlayersAdapter adapter = new AdventureLobbyPlayersAdapter(menu);
@@ -1064,6 +1113,11 @@ namespace SongsOfConquestAccess.Screens
             if (loadedScene != MainMenuSceneType.AdventureLobby && _screenManager.Contains<AdventureLobbyMapSelectScreen>())
             {
                 _screenManager.Remove<AdventureLobbyMapSelectScreen>("main menu scene changed away from adventure lobby");
+            }
+
+            if (loadedScene != MainMenuSceneType.AdventureLobby && _screenManager.Contains<AdventureLobbyChallengeMapSelectScreen>())
+            {
+                _screenManager.Remove<AdventureLobbyChallengeMapSelectScreen>("main menu scene changed away from adventure lobby");
             }
 
             if (loadedScene != MainMenuSceneType.AdventureLobby && _screenManager.Contains<AdventureLobbyIconDropdownScreen>())

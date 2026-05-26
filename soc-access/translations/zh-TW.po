@@ -405,11 +405,6 @@ msgctxt "UI.LabelValue"
 msgid "{0}: {1}"
 msgstr "{0}ï¼š{1}"
 
-#. UI.MapsTable
-msgctxt "UI.MapsTable"
-msgid "Maps table"
-msgstr "地圖表格"
-
 #. UI.PressSpaceSelectItemToDrag
 msgctxt "UI.PressSpaceSelectItemToDrag"
 msgid "Press space to select an item to drag."

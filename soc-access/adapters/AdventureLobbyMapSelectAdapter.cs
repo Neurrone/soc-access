@@ -149,7 +149,7 @@ namespace SongsOfConquestAccess.Adapters
 
         public string MapsLabel
         {
-            get { return ModText.Get(ModStrings.UI.MapsTable); }
+            get { return ModText.Get(ModStrings.Common.ListSeparator, Title, ModText.Get(ModStrings.UI.RoleGrid)); }
         }
 
         public AdventureLobbyMapSelectRowAdapter SelectedRow

@@ -345,7 +345,6 @@ namespace SongsOfConquestAccess.Localization
             public static readonly ModString InvalidDestination = new ModString("UI.InvalidDestination", "Invalid destination.");
             public static readonly ModString JoiningArmy = new ModString("UI.JoiningArmy", "joining army");
             public static readonly ModString LabelValue = new ModString("UI.LabelValue", "{0}: {1}");
-            public static readonly ModString MapsTable = new ModString("UI.MapsTable", "Maps table");
             public static readonly ModString NoScannerResults = new ModString("UI.NoScannerResults", "No scanner results");
             public static readonly ModString NotInMovementRange = new ModString("UI.NotInMovementRange", "Not in movement range");
             public static readonly ModString PressSpaceSelectItemToDrag = new ModString("UI.PressSpaceSelectItemToDrag", "Press space to select an item to drag.");
