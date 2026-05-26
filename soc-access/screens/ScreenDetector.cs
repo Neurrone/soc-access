@@ -106,6 +106,8 @@ namespace SongsOfConquestAccess.Screens
                 return;
             }
 
+            // The loading-complete prompt is a root screen; nothing from the previous game state should remain beneath it.
+            _screenManager.Clear();
             Push(new LoadingCompleteScreen(adapter), "loading screen complete");
         }
 
@@ -572,6 +574,8 @@ namespace SongsOfConquestAccess.Screens
 
         public void OnMainMenuReady(MainMenu mainMenu)
         {
+            // The main menu is a root screen; clearing avoids stale screens from a previous game/load state.
+            _screenManager.Clear();
             Push(new MainMenuScreen(new MainMenuAdapter(mainMenu)), "main menu ready");
         }
 
