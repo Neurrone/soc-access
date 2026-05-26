@@ -155,8 +155,9 @@ namespace SongsOfConquestAccess.UI
             List<string> lines = new List<string>();
             if (widget != null)
             {
-                string label = SpeechTextSanitizer.Normalize(widget.GetLabel());
-                AddIfNotEmpty(lines, label);
+                string rawLabel = widget.GetLabel();
+                string label = SpeechTextSanitizer.Normalize(rawLabel);
+                AddNormalizedTextLines(lines, rawLabel);
                 AddIfNotEmpty(lines, widget.GetStatus());
 
                 IReadOnlyList<string> tooltipLines = widget.GetTooltipTextLines();
@@ -203,6 +204,20 @@ namespace SongsOfConquestAccess.UI
             }
 
             return focusedWidget;
+        }
+
+        private static void AddNormalizedTextLines(List<string> lines, string value)
+        {
+            if (string.IsNullOrWhiteSpace(value))
+            {
+                return;
+            }
+
+            string[] rawLines = value.Replace("\r\n", "\n").Replace('\r', '\n').Split('\n');
+            for (int i = 0; i < rawLines.Length; i++)
+            {
+                AddIfNotEmpty(lines, SpeechTextSanitizer.Normalize(rawLines[i]));
+            }
         }
 
         private static void CommitFocus(Widget widget)
