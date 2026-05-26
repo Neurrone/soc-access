@@ -524,17 +524,20 @@ namespace SongsOfConquestAccess.Tests
         [TestMethod]
         public void FlushSuppressesAcidCloudCreation()
         {
-            CombatNarrationPlanner planner = new CombatNarrationPlanner();
-            EntityRef acidCloud = new EntityRef(100, 6, "Acid Cloud", new Vector2Int(8, 8));
+            for (int blueprintId = 4; blueprintId <= 6; blueprintId++)
+            {
+                CombatNarrationPlanner planner = new CombatNarrationPlanner();
+                EntityRef acidCloud = new EntityRef(100 + blueprintId, blueprintId, "Acid Cloud", new Vector2Int(8, 8));
 
-            planner.Enqueue(CombatNarrationItem.Create(
-                CombatNarrationItemKind.MapEntityCreated,
-                new MapEntityCreatedEvent(acidCloud),
-                entityId: acidCloud.EntityId));
+                planner.Enqueue(CombatNarrationItem.Create(
+                    CombatNarrationItemKind.MapEntityCreated,
+                    new MapEntityCreatedEvent(acidCloud),
+                    entityId: acidCloud.EntityId));
 
-            IReadOnlyList<CombatNarrationItem> result = planner.Flush();
+                IReadOnlyList<CombatNarrationItem> result = planner.Flush();
 
-            Assert.AreEqual(0, result.Count);
+                Assert.AreEqual(0, result.Count);
+            }
         }
 
         [TestMethod]

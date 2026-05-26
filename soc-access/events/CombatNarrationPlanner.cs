@@ -58,7 +58,7 @@ namespace SongsOfConquestAccess.Events
 
     internal sealed class CombatNarrationPlanner
     {
-        private const int AcidCloudBattleMapEntityBlueprintId = 6;
+        private static readonly HashSet<int> AcidCloudBattleMapEntityBlueprintIds = new HashSet<int> { 4, 5, 6 };
         // Verified from the runtime bacteria table diagnostic.
         private const int SpellRepel1BacteriaType = 258;
         private const int SpellRepel2BacteriaType = 259;
@@ -144,7 +144,7 @@ namespace SongsOfConquestAccess.Events
             MapEntityCreatedEvent created = item.Event as MapEntityCreatedEvent;
             return created != null
                 && created.Entity != null
-                && created.Entity.BlueprintId == AcidCloudBattleMapEntityBlueprintId;
+                && AcidCloudBattleMapEntityBlueprintIds.Contains(created.Entity.BlueprintId);
         }
 
         private static List<CombatNarrationItem> CoalesceBacteriaLifecycleEvents(List<CombatNarrationItem> events)
