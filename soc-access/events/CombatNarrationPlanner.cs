@@ -59,6 +59,10 @@ namespace SongsOfConquestAccess.Events
     internal sealed class CombatNarrationPlanner
     {
         private const int AcidCloudBattleMapEntityBlueprintId = 6;
+        // Verified from the runtime bacteria table diagnostic.
+        private const int SpellRepel1BacteriaType = 258;
+        private const int SpellRepel2BacteriaType = 259;
+        private const int SpellRepel3BacteriaType = 260;
 
         private readonly Queue<CombatNarrationItem> _pendingEvents = new Queue<CombatNarrationItem>();
 
@@ -114,6 +118,7 @@ namespace SongsOfConquestAccess.Events
 
             List<CombatNarrationItem> events = SuppressNonNarratableMapEntityCreations(_pendingEvents.ToList());
             events = CoalesceBacteriaLifecycleEvents(events);
+            events = SuppressInternalBacteriaRemovals(events);
             events = ReorderSpellEvents(events);
             _pendingEvents.Clear();
             return events;
@@ -191,6 +196,126 @@ namespace SongsOfConquestAccess.Events
             }
 
             return result;
+        }
+
+        private static List<CombatNarrationItem> SuppressInternalBacteriaRemovals(List<CombatNarrationItem> events)
+        {
+            if (events == null || events.Count == 0)
+            {
+                return events ?? new List<CombatNarrationItem>();
+            }
+
+            HashSet<int> damageBacteriaTypes = new HashSet<int>();
+            HashSet<int> spellDamageTargetIds = new HashSet<int>();
+            bool hasRepelRemoval = false;
+            for (int i = 0; i < events.Count; i++)
+            {
+                CombatNarrationItem item = events[i];
+                if (item == null)
+                {
+                    continue;
+                }
+
+                hasRepelRemoval |= item.Kind == CombatNarrationItemKind.BacteriaRemoved && IsSpellRepelBacteria(item.BacteriaRef);
+
+                DamageEvent damage = item.Event as DamageEvent;
+                if (damage != null && damage.Bacteria != null)
+                {
+                    damageBacteriaTypes.Add((int)damage.Bacteria.BacteriaType);
+                }
+
+                if (IsSpellDamage(damage))
+                {
+                    int targetTroopId = GetDamageTargetTroopId(damage);
+                    if (targetTroopId >= 0)
+                    {
+                        spellDamageTargetIds.Add(targetTroopId);
+                    }
+                }
+            }
+
+            if (damageBacteriaTypes.Count == 0 && spellDamageTargetIds.Count == 0 && !hasRepelRemoval)
+            {
+                return events;
+            }
+
+            List<CombatNarrationItem> result = new List<CombatNarrationItem>();
+            for (int i = 0; i < events.Count; i++)
+            {
+                CombatNarrationItem item = events[i];
+                if (IsDamageBacteriaRemoval(item, damageBacteriaTypes))
+                {
+                    continue;
+                }
+
+                SuppressInternalBacteriaRemovalTargets(item, spellDamageTargetIds);
+                if (item == null || !item.HasNarratableBacteriaTargets)
+                {
+                    continue;
+                }
+
+                result.Add(item);
+            }
+
+            return result;
+        }
+
+        private static bool IsDamageBacteriaRemoval(CombatNarrationItem item, HashSet<int> damageBacteriaTypes)
+        {
+            return item != null
+                && item.Kind == CombatNarrationItemKind.BacteriaRemoved
+                && item.BacteriaRef != null
+                && damageBacteriaTypes.Contains((int)item.BacteriaRef.BacteriaType);
+        }
+
+        private static bool IsSpellDamage(DamageEvent damage)
+        {
+            return damage != null && damage.DamageType == DamageType.Spell && damage.Bacteria == null;
+        }
+
+        private static int GetDamageTargetTroopId(DamageEvent damage)
+        {
+            return damage != null
+                && damage.Target != null
+                && damage.Target.TargetKind == TargetKind.Troop
+                && damage.Target.Troop != null
+                    ? damage.Target.Troop.TroopId
+                    : -1;
+        }
+
+        private static void SuppressInternalBacteriaRemovalTargets(
+            CombatNarrationItem item,
+            HashSet<int> spellDamageTargetIds)
+        {
+            if (item == null || item.Kind != CombatNarrationItemKind.BacteriaRemoved || item.BacteriaTargets == null)
+            {
+                return;
+            }
+
+            List<int> targetIds = item.GetBacteriaTargetIds();
+            for (int i = 0; i < targetIds.Count; i++)
+            {
+                int targetId = targetIds[i];
+                if (spellDamageTargetIds.Contains(targetId) || IsSpellRepelBacteria(item.BacteriaRef))
+                {
+                    item.RemoveBacteriaTarget(targetId);
+                }
+            }
+
+            item.RefreshBacteriaSummaryEvent(item.SummarySnapshot ?? CombatNarrationSnapshot.Empty);
+        }
+
+        private static bool IsSpellRepelBacteria(BacteriaRef bacteria)
+        {
+            if (bacteria == null)
+            {
+                return false;
+            }
+
+            int bacteriaType = (int)bacteria.BacteriaType;
+            return bacteriaType == SpellRepel1BacteriaType
+                || bacteriaType == SpellRepel2BacteriaType
+                || bacteriaType == SpellRepel3BacteriaType;
         }
 
         private static void CoalesceBacteriaTargets(CombatNarrationItem left, CombatNarrationItem right)

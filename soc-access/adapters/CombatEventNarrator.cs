@@ -26,6 +26,8 @@ namespace SongsOfConquestAccess.Adapters
     internal static class CombatEventNarrator
     {
         private const int BacteriaDiagnosticLogLimit = 200;
+        private const int MapEntityCreationNarrationDiagnosticLogLimit = 100;
+        private const int CombatNarrationBatchFrames = 5;
 
         private static readonly CombatNarrationPlanner Planner = new CombatNarrationPlanner();
         private static readonly Queue<string> SuppressedNativeNotifications = new Queue<string>();
@@ -33,6 +35,7 @@ namespace SongsOfConquestAccess.Adapters
         private static bool _flushPendingEventsScheduled;
         private static CombatAdapter _activeAdapter;
         private static int _bacteriaDiagnosticLogCount;
+        private static int _mapEntityCreationNarrationDiagnosticLogCount;
         private static bool _wielderEssenceCaptureActive;
         private static readonly Dictionary<int, WielderEssenceGeneration> CapturedWielderEssence =
             new Dictionary<int, WielderEssenceGeneration>();
@@ -106,6 +109,7 @@ namespace SongsOfConquestAccess.Adapters
             _flushPendingEventsScheduled = false;
             _activeAdapter = null;
             _bacteriaDiagnosticLogCount = 0;
+            _mapEntityCreationNarrationDiagnosticLogCount = 0;
             _wielderEssenceCaptureActive = false;
             CapturedWielderEssence.Clear();
         }
@@ -315,9 +319,12 @@ namespace SongsOfConquestAccess.Adapters
             if (createdEntity != null && createdEntity.State != null)
             {
                 IMapEntity entity = adapter.GetMapEntity(createdEntity.State.Id);
+                EntityRef entityRef = adapter.CreateEntityRef(entity);
+                MapEntityCreatedEvent mapEntityCreatedEvent = new MapEntityCreatedEvent(entityRef);
+                LogMapEntityCreationResponseDiagnostic(createdEntity, entity, mapEntityCreatedEvent);
                 Enqueue(CombatNarrationItem.Create(
                     CombatNarrationItemKind.MapEntityCreated,
-                    new MapEntityCreatedEvent(adapter.CreateEntityRef(entity)),
+                    mapEntityCreatedEvent,
                     entityId: createdEntity.State.Id));
                 return;
             }
@@ -591,6 +598,83 @@ namespace SongsOfConquestAccess.Adapters
             return type != null ? type.Name : stateTypeName;
         }
 
+        private static void LogMapEntityCreationResponseDiagnostic(
+            CreateBattleMapEntityCommand.Response response,
+            IMapEntity resolvedEntity,
+            MapEntityCreatedEvent narrationEvent)
+        {
+            if (response == null || response.State == null || !TryBeginMapEntityCreationNarrationDiagnostic())
+            {
+                return;
+            }
+
+            EntityRef entity = narrationEvent != null ? narrationEvent.Entity : null;
+            SocAccessPlugin.Instance?.LogInfo(
+                "Combat map entity creation response: stateId="
+                + response.State.Id
+                + ", stateBlueprintId="
+                + response.State.BlueprintId
+                + ", statePosition="
+                + FormatDiagnosticPoint(response.State.Position)
+                + ", resolvedId="
+                + (resolvedEntity != null ? resolvedEntity.Id : -1)
+                + ", resolvedBlueprintId="
+                + (resolvedEntity != null ? resolvedEntity.BlueprintId : -1)
+                + ", resolvedPosition="
+                + (resolvedEntity != null ? FormatDiagnosticPoint(resolvedEntity.Position) : string.Empty)
+                + ", resolvedNameKey=\""
+                + (resolvedEntity != null ? resolvedEntity.NameKey : string.Empty)
+                + "\", resolvedName=\""
+                + (entity != null ? entity.Name : string.Empty)
+                + "\", pendingSpeech=\""
+                + (narrationEvent != null ? narrationEvent.GetSpeechText() : string.Empty)
+                + "\"");
+        }
+
+        private static void LogMapEntityCreationNarrationDiagnostic(IAccessibilityEvent accessibilityEvent)
+        {
+            MapEntityCreatedEvent created = accessibilityEvent as MapEntityCreatedEvent;
+            if (created == null || !TryBeginMapEntityCreationNarrationDiagnostic())
+            {
+                return;
+            }
+
+            EntityRef entity = created.Entity;
+            SocAccessPlugin.Instance?.LogInfo(
+                "Combat map entity creation narration: entityId="
+                + (entity != null ? entity.EntityId : -1)
+                + ", blueprintId="
+                + (entity != null ? entity.BlueprintId : -1)
+                + ", position="
+                + (entity != null ? FormatDiagnosticPoint(entity.Position) : string.Empty)
+                + ", name=\""
+                + (entity != null ? entity.Name : string.Empty)
+                + "\", speech=\""
+                + created.GetSpeechText()
+                + "\"");
+        }
+
+        private static bool TryBeginMapEntityCreationNarrationDiagnostic()
+        {
+            if (_mapEntityCreationNarrationDiagnosticLogCount >= MapEntityCreationNarrationDiagnosticLogLimit)
+            {
+                return false;
+            }
+
+            _mapEntityCreationNarrationDiagnosticLogCount++;
+            if (_mapEntityCreationNarrationDiagnosticLogCount == MapEntityCreationNarrationDiagnosticLogLimit)
+            {
+                SocAccessPlugin.Instance?.LogInfo("Combat map entity creation narration diagnostic log limit reached.");
+            }
+
+            return true;
+        }
+
+        private static string FormatDiagnosticPoint(Vector2Int point)
+        {
+            return point.x + ", " + point.y;
+        }
+
         private static ActorRef CreateActor(CombatAdapter adapter, IBattleTroopState troop)
         {
             return CreateActor(adapter, troop, troop != null ? troop.Stats.Size : 0, troop != null ? troop.Position : Vector2Int.zero);
@@ -710,12 +794,16 @@ namespace SongsOfConquestAccess.Adapters
             }
 
             _flushPendingEventsScheduled = true;
-            plugin.StartCoroutine(FlushPendingEventsNextFrame());
+            plugin.StartCoroutine(FlushPendingEventsAfterResponseBatch());
         }
 
-        private static IEnumerator FlushPendingEventsNextFrame()
+        private static IEnumerator FlushPendingEventsAfterResponseBatch()
         {
-            yield return null;
+            for (int i = 0; i < CombatNarrationBatchFrames; i++)
+            {
+                yield return null;
+            }
+
             _flushPendingEventsScheduled = false;
             FlushPendingEvents();
         }
@@ -967,6 +1055,7 @@ namespace SongsOfConquestAccess.Adapters
                 return;
             }
 
+            LogMapEntityCreationNarrationDiagnostic(accessibilityEvent);
             AccessibilityEventBus.Publish(accessibilityEvent);
         }
 
