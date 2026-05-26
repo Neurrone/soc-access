@@ -42,6 +42,7 @@ namespace SongsOfConquestAccess.Screens
                 FoldoutMenuScreen.TryBuildActiveScreen,
                 CampaignMenuScreen.TryBuildActiveScreen,
                 TaleSelectScreen.TryBuildActiveScreen,
+                AdventureLobbyMapTypeScreen.TryBuildActiveScreen,
                 CampaignMapSelectScreen.TryBuildActiveScreen,
                 AdventureMapScreen.TryBuildActiveScreen,
                 OwnedEntitiesScreen.TryBuildActiveScreen,
@@ -658,6 +659,32 @@ namespace SongsOfConquestAccess.Screens
             _screenManager.Pop<CampaignMapSelectScreen>("campaign map select closed");
         }
 
+        public void OnAdventureLobbyMapTypeReady(MapTypeMenu menu)
+        {
+            AdventureLobbyMapTypeAdapter adapter = new AdventureLobbyMapTypeAdapter(menu);
+            if (!adapter.IsPresent())
+            {
+                return;
+            }
+
+            AdventureLobbyMapTypeScreen screen = new AdventureLobbyMapTypeScreen(adapter);
+            if (_screenManager.CurrentScreen is AdventureLobbyMapTypeScreen)
+            {
+                _screenManager.RefreshTop<AdventureLobbyMapTypeScreen>(screen, "adventure lobby map type shown");
+                return;
+            }
+
+            Push(screen, "adventure lobby map type ready");
+        }
+
+        public void OnAdventureLobbyMapTypeClosed(MapTypeMenu menu)
+        {
+            if (_screenManager.CurrentScreen is AdventureLobbyMapTypeScreen)
+            {
+                _screenManager.Pop<AdventureLobbyMapTypeScreen>("adventure lobby map type closed");
+            }
+        }
+
         public void OnMainMenuSceneLoaded(MainMenuSceneType loadedScene)
         {
             if (loadedScene == MainMenuSceneType.MainMenu)
@@ -669,6 +696,11 @@ namespace SongsOfConquestAccess.Screens
             if (loadedScene != MainMenuSceneType.Campaign && _screenManager.CurrentScreen is CampaignMenuScreen)
             {
                 _screenManager.Pop<CampaignMenuScreen>("main menu scene changed away from campaign");
+            }
+
+            if (loadedScene != MainMenuSceneType.AdventureLobby && _screenManager.CurrentScreen is AdventureLobbyMapTypeScreen)
+            {
+                _screenManager.Pop<AdventureLobbyMapTypeScreen>("main menu scene changed away from adventure lobby");
             }
         }
 

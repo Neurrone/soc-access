@@ -145,9 +145,15 @@ namespace SongsOfConquestAccess.Adapters
 
         public static string GetAllVisibleText(UIButton button)
         {
+            List<string> parts = GetDistinctParts(GetAllVisibleTextParts(button));
+            return parts.Count == 0 ? string.Empty : string.Join(". ", parts.ToArray());
+        }
+
+        public static List<string> GetAllVisibleTextParts(UIButton button)
+        {
             if (button == null)
             {
-                return string.Empty;
+                return new List<string>();
             }
 
             List<string> parts = new List<string>();
@@ -161,7 +167,7 @@ namespace SongsOfConquestAccess.Adapters
                 }
 
                 string candidate = GetResolvedText(textMesh);
-                if (!string.IsNullOrWhiteSpace(candidate) && !parts.Contains(candidate))
+                if (!string.IsNullOrWhiteSpace(candidate))
                 {
                     parts.Add(candidate);
                 }
@@ -177,13 +183,33 @@ namespace SongsOfConquestAccess.Adapters
                 }
 
                 string candidate = SpeechTextSanitizer.Normalize(text.text);
-                if (!string.IsNullOrWhiteSpace(candidate) && !parts.Contains(candidate))
+                if (!string.IsNullOrWhiteSpace(candidate))
                 {
                     parts.Add(candidate);
                 }
             }
 
-            return parts.Count == 0 ? string.Empty : string.Join(". ", parts.ToArray());
+            return parts;
+        }
+
+        private static List<string> GetDistinctParts(List<string> parts)
+        {
+            List<string> distinctParts = new List<string>();
+            if (parts == null)
+            {
+                return distinctParts;
+            }
+
+            for (int i = 0; i < parts.Count; i++)
+            {
+                string part = parts[i];
+                if (!distinctParts.Contains(part))
+                {
+                    distinctParts.Add(part);
+                }
+            }
+
+            return distinctParts;
         }
 
         public static string JoinParts(params string[] parts)
