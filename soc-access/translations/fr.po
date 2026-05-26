@@ -655,6 +655,11 @@ msgctxt "Screens.Close"
 msgid "Close"
 msgstr "Fermer"
 
+#. Screens.CampaignMissionProgress
+msgctxt "Screens.CampaignMissionProgress"
+msgid "Completed: {0} / {1} missions"
+msgstr "Terminées : {0} / {1} missions"
+
 #. Screens.Combat
 msgctxt "Screens.Combat"
 msgid "Combat"

@@ -45,12 +45,6 @@ namespace SongsOfConquestAccess.Screens
             ContainerWidget root = new ContainerWidget(
                 "tale-select-screen",
                 adapter != null ? adapter.GetTitle() : string.Empty);
-            root.AddChild(new TextWidget(
-                "title",
-                () => adapter != null ? adapter.GetTitle() : string.Empty,
-                null,
-                includeParentLabelInAnnouncement: false));
-
             MenuWidget menu = new MenuWidget("tale-select-menu", adapter != null ? adapter.GetTitle() : string.Empty);
             if (adapter == null)
             {

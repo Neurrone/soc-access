@@ -4,6 +4,8 @@ using SongsOfConquest.Client.Menu;
 using SongsOfConquest.Client.Menu.Loading;
 using SongsOfConquest.Client.Menu.Main;
 using SongsOfConquest.Client.UI;
+using SongsOfConquest.Common.Localization;
+using SongsOfConquestAccess.Speech;
 using UnityEngine;
 
 namespace SongsOfConquestAccess.Adapters
@@ -66,7 +68,13 @@ namespace SongsOfConquestAccess.Adapters
 
         public string GetTitle()
         {
-            return string.Empty;
+            if (GlobalLocalizationVariables.LocalizationHandler == null)
+            {
+                return string.Empty;
+            }
+
+            return SpeechTextSanitizer.Normalize(
+                GlobalLocalizationVariables.LocalizationHandler.GetText("Campaign/CampaignSelect/Header"));
         }
 
         public bool IsPresent()

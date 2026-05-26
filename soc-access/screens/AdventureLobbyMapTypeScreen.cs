@@ -54,8 +54,8 @@ namespace SongsOfConquestAccess.Screens
             }
 
             AddMenuItem(menu, "all-maps", adapter.AllMapsButton);
-            AddMenuItem(menu, "random-maps", adapter.RandomMapsButton);
             AddMenuItem(menu, "challenge-maps", adapter.ChallengeMapsButton);
+            AddMenuItem(menu, "random-maps", adapter.RandomMapsButton);
             root.AddChild(menu);
             AddOptionalButton(root, "options", adapter.OptionsButton);
             AddOptionalButton(root, "back", adapter.BackButton);

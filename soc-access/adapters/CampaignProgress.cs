@@ -1,5 +1,4 @@
 using System;
-using System.Collections.Generic;
 using SongsOfConquest.Common;
 using SongsOfConquest.Common.Campaign;
 using SongsOfConquest.Common.Localization;
@@ -20,7 +19,6 @@ namespace SongsOfConquestAccess.Adapters
             }
 
             int total = 0;
-            int available = 0;
             int completed = 0;
             for (int i = 0; i < definition.Maps.Count; i++)
             {
@@ -32,13 +30,7 @@ namespace SongsOfConquestAccess.Adapters
 
                 total++;
                 CampaignLevelState level = state.GetLevel(map);
-                bool unlocked = i == 0 || (level != null && !level.IsLocked);
                 bool isCompleted = level != null && level.IsCompleted;
-                if (unlocked || isCompleted)
-                {
-                    available++;
-                }
-
                 if (isCompleted)
                 {
                     completed++;
@@ -50,19 +42,7 @@ namespace SongsOfConquestAccess.Adapters
                 return string.Empty;
             }
 
-            if (completed >= total)
-            {
-                return GetLocalizedText("Common/CampaignSelectMenu/CampaignCompleted", "campaign completed");
-            }
-
-            List<string> parts = new List<string>();
-            parts.Add(completed + " of " + total + " missions completed");
-            if (available > 0)
-            {
-                parts.Add(available + " available");
-            }
-
-            return string.Join(". ", parts.ToArray());
+            return ModText.Get(ModStrings.Screens.CampaignMissionProgress, completed, total);
         }
 
         public static string GetLocalizedText(string localizationKey, string fallback)

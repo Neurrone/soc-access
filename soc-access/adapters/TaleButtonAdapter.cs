@@ -32,8 +32,6 @@ namespace SongsOfConquestAccess.Adapters
             AccessTools.FieldRefAccess<TaleButton, GameObject>("_comingSoonContainer");
         private static readonly AccessTools.FieldRef<TaleButton, GameObject> ProgressContainerRef =
             AccessTools.FieldRefAccess<TaleButton, GameObject>("_progressContainer");
-        private static readonly AccessTools.FieldRef<TaleButton, UITextMesh> CampaignStatusTextRef =
-            AccessTools.FieldRefAccess<TaleButton, UITextMesh>("_campaignStatusText");
         private static readonly AccessTools.FieldRef<TaleButton, UITextMesh> PartOfDLCLabelRef =
             AccessTools.FieldRefAccess<TaleButton, UITextMesh>("_partOfDLCLabel");
         private static readonly AccessTools.FieldRef<TaleButton, ICampaignDefinition> DefinitionRef =
@@ -135,7 +133,7 @@ namespace SongsOfConquestAccess.Adapters
 
             if (IsActive(GetProgressContainer()))
             {
-                return GetText(GetCampaignStatusText());
+                return string.Empty;
             }
 
             return string.Empty;
@@ -183,11 +181,6 @@ namespace SongsOfConquestAccess.Adapters
         private GameObject GetProgressContainer()
         {
             return _taleButton != null ? ProgressContainerRef(_taleButton) : null;
-        }
-
-        private UITextMesh GetCampaignStatusText()
-        {
-            return _taleButton != null ? CampaignStatusTextRef(_taleButton) : null;
         }
 
         private UITextMesh GetPartOfDLCLabel()

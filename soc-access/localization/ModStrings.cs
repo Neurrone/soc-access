@@ -403,6 +403,7 @@ namespace SongsOfConquestAccess.Localization
             public static readonly ModString ChaosSpells = new ModString("Screens.ChaosSpells", "Chaos spells");
             public static readonly ModString Choices = new ModString("Screens.Choices", "Choices");
             public static readonly ModString Close = new ModString("Screens.Close", "Close");
+            public static readonly ModString CampaignMissionProgress = new ModString("Screens.CampaignMissionProgress", "Completed: {0} / {1} missions");
             public static readonly ModString Combat = new ModString("Screens.Combat", "Combat");
             public static readonly ModString CreationSpells = new ModString("Screens.CreationSpells", "Creation spells");
             public static readonly ModString CancelAbility = new ModString("Screens.CancelAbility", "Cancel ability");

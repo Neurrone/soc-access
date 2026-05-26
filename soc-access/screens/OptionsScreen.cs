@@ -78,7 +78,7 @@ namespace SongsOfConquestAccess.Screens
             OptionsMenuAdapter.ButtonItem okButton = adapter.GetOkButton();
             if (okButton != null)
             {
-                root.AddChild(BuildButton(okButton));
+                root.AddChild(BuildButton(okButton, () => ModText.Get(ModStrings.Screens.Close)));
             }
 
             return root;
@@ -209,9 +209,14 @@ namespace SongsOfConquestAccess.Screens
 
         private static ButtonWidget BuildButton(OptionsMenuAdapter.ButtonItem button)
         {
+            return BuildButton(button, button.GetLabel);
+        }
+
+        private static ButtonWidget BuildButton(OptionsMenuAdapter.ButtonItem button, Func<string> getLabel)
+        {
             return new ButtonWidget(
                 button.Id,
-                button.GetLabel,
+                getLabel,
                 button.Activate,
                 button.Focus,
                 button.IsEnabled,
