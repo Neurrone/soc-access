@@ -1,5 +1,12 @@
 # Changelog
 
+## V0.4.1
+
+- Fixed adventure map fog handling for explored-but-not-currently-visible entities:
+  - Resource generators and other remembered entities are now read on focused tiles and kept in revealed/scanner results while in explored fog.
+  - Tooltip-derived details are only exposed when part of the entity is actively visible.
+  - Enemy wielder visibility announcements continue to distinguish wielders that are no longer actively visible.
+
 ## V0.4.0
 
 - Add support for conquest, challenge and random maps

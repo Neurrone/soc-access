@@ -325,7 +325,7 @@ namespace SongsOfConquestAccess.Events
                 && TrackNonLocalCommanderVisibility(commander, announceTransitions: true);
             if (IsLocalCommander(commander))
             {
-                AddVisibleMapEntityDiscoveries();
+                AddKnownMapEntityDiscoveries();
             }
 
             if (!ShouldPublishCommanderPositionEvent(commander, commander.Position))
@@ -360,7 +360,7 @@ namespace SongsOfConquestAccess.Events
                 && TrackNonLocalCommanderVisibility(commander, announceTransitions: true);
             if (IsLocalCommander(commander))
             {
-                AddVisibleMapEntityDiscoveries();
+                AddKnownMapEntityDiscoveries();
             }
 
             if (!ShouldPublishCommanderPositionEvent(commander, response.ToLocation))
@@ -386,7 +386,7 @@ namespace SongsOfConquestAccess.Events
             IMapEntity entity = _facade != null && _facade.MapEntities != null
                 ? _facade.MapEntities.Get(entityId)
                 : null;
-            if (AddVisibleMapEntityDiscovery(entity))
+            if (AddKnownMapEntityDiscovery(entity))
             {
                 FlushPendingDiscoveriesIfReady();
             }
@@ -413,7 +413,7 @@ namespace SongsOfConquestAccess.Events
 
             _lastExploration = currentExploration;
 
-            bool added = AddVisibleMapEntityDiscoveries();
+            bool added = AddKnownMapEntityDiscoveries();
             added = RefreshNonLocalCommanderVisibility(announceTransitions: true) || added;
             if (added)
             {
@@ -448,7 +448,7 @@ namespace SongsOfConquestAccess.Events
                     continue;
                 }
 
-                if (IsMapEntityVisible(entity))
+                if (IsMapEntityKnown(entity))
                 {
                     _discoveredMapEntityIds.Add(entity.Id);
                     _discoveredMapEntityLabelsById[entity.Id] = GetMapEntityName(entity);
@@ -456,7 +456,7 @@ namespace SongsOfConquestAccess.Events
             }
         }
 
-        private bool AddVisibleMapEntityDiscoveries()
+        private bool AddKnownMapEntityDiscoveries()
         {
             if (_facade == null || _facade.MapEntities == null)
             {
@@ -472,17 +472,17 @@ namespace SongsOfConquestAccess.Events
             bool added = false;
             foreach (IMapEntity entity in entities)
             {
-                added = AddVisibleMapEntityDiscovery(entity) || added;
+                added = AddKnownMapEntityDiscovery(entity) || added;
             }
 
             return added;
         }
 
-        private bool AddVisibleMapEntityDiscovery(IMapEntity entity)
+        private bool AddKnownMapEntityDiscovery(IMapEntity entity)
         {
             Vector2Int revealTile;
             if (!ShouldConsiderMapEntityDiscovery(entity)
-                || !AdventureMapVisibility.TryGetFullyVisibleMapEntityIdentityTile(
+                || !AdventureMapVisibility.TryGetKnownMapEntityIdentityTile(
                     _facade,
                     _fogManager,
                     entity,
@@ -530,10 +530,10 @@ namespace SongsOfConquestAccess.Events
                 && entity.Category != MapEntityCategory.Artistic;
         }
 
-        private bool IsMapEntityVisible(IMapEntity entity)
+        private bool IsMapEntityKnown(IMapEntity entity)
         {
             Vector2Int ignored;
-            return AdventureMapVisibility.TryGetFullyVisibleMapEntityIdentityTile(_facade, _fogManager, entity, out ignored);
+            return AdventureMapVisibility.TryGetKnownMapEntityIdentityTile(_facade, _fogManager, entity, out ignored);
         }
 
         private void RefreshNonLocalCommanderVisibilityBaseline()
@@ -854,7 +854,7 @@ namespace SongsOfConquestAccess.Events
                 IMapEntity entity = TryGetMapEntity(entry.StableReference);
                 Vector2Int revealTile;
                 if (entity == null
-                    || !AdventureMapVisibility.TryGetFullyVisibleMapEntityIdentityTile(
+                    || !AdventureMapVisibility.TryGetKnownMapEntityIdentityTile(
                         _facade,
                         _fogManager,
                         entity,

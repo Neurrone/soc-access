@@ -457,7 +457,7 @@ namespace SongsOfConquestAccess.Adapters
                 entity = null;
             }
 
-            bool canExposeMapEntityIdentity = entity != null && CanExposeMapEntityIdentity(entity, clamped);
+            bool canExposeMapEntityIdentity = entity != null && CanExposeKnownMapEntityIdentity(entity, clamped);
             if (entity != null && !canExposeMapEntityIdentity && tile.IsBlocked && !tile.IsImpassable)
             {
                 tile.IsBlocked = false;
@@ -467,7 +467,11 @@ namespace SongsOfConquestAccess.Adapters
             {
                 tile.MapEntity = entity;
                 tile.MapEntityName = GetMapEntityName(entity);
-                PopulateMapEntityTooltipSpeech(tile, entity, selectedCommander);
+                if (CanExposeMapEntityTooltipDetails(entity))
+                {
+                    PopulateMapEntityTooltipSpeech(tile, entity, selectedCommander);
+                }
+
                 tile.MapEntityRelationship = FormatSpatialRelationship(GetMapEntityRelationship(entity, localTeamId));
                 tile.IsReachable = tile.IsReachable
                     || (selectedCommander != null && _facade.Level.CanMoveToAndInteract(entity.Id, selectedCommander.Id));
@@ -1565,7 +1569,7 @@ namespace SongsOfConquestAccess.Adapters
         {
             tile = null;
             Vector2Int identityTile;
-            if (!AdventureMapVisibility.TryGetFullyVisibleMapEntityIdentityTile(
+            if (!AdventureMapVisibility.TryGetKnownMapEntityIdentityTile(
                 _facade,
                 _fogManager,
                 entity,
@@ -2164,7 +2168,8 @@ namespace SongsOfConquestAccess.Adapters
                 return null;
             }
 
-            IDetails details = GetTooltipDetailsForTile(tile);
+            Vector2Int detailsTile = GetTooltipDetailsTile(tile);
+            IDetails details = GetTooltipDetailsForTile(detailsTile);
             if (details == null)
             {
                 return null;
@@ -2839,7 +2844,8 @@ namespace SongsOfConquestAccess.Adapters
                 return;
             }
 
-            IDetails details = GetTooltipDetailsForTile(tile);
+            Vector2Int detailsTile = GetTooltipDetailsTile(tile);
+            IDetails details = GetTooltipDetailsForTile(detailsTile);
             if (details == null)
             {
                 return;
@@ -2871,7 +2877,7 @@ namespace SongsOfConquestAccess.Adapters
                 IMapEntity entity = _facade.MapEntities.GetAt(tile);
                 if (entity != null)
                 {
-                    return CanExposeMapEntityIdentity(entity, tile);
+                    return CanExposeMapEntityTooltipDetails(entity);
                 }
             }
             catch (Exception)
@@ -2886,6 +2892,29 @@ namespace SongsOfConquestAccess.Adapters
             {
                 return false;
             }
+        }
+
+        private Vector2Int GetTooltipDetailsTile(Vector2Int focusedTile)
+        {
+            try
+            {
+                IMapEntity entity = _facade.MapEntities.GetAt(focusedTile);
+                Vector2Int detailsTile;
+                if (entity != null
+                    && AdventureMapVisibility.TryGetActivelyVisibleMapEntityIdentityTile(
+                        _facade,
+                        _fogManager,
+                        entity,
+                        out detailsTile))
+                {
+                    return detailsTile;
+                }
+            }
+            catch (Exception)
+            {
+            }
+
+            return focusedTile;
         }
 
         private IDetails GetTooltipDetailsForTile(Vector2Int tile)
@@ -2976,9 +3005,14 @@ namespace SongsOfConquestAccess.Adapters
             }
         }
 
-        private bool CanExposeMapEntityIdentity(IMapEntity entity, Vector2Int position)
+        private bool CanExposeKnownMapEntityIdentity(IMapEntity entity, Vector2Int position)
         {
-            return AdventureMapVisibility.IsFullyVisibleMapEntityIdentityTile(_facade, _fogManager, entity, position);
+            return AdventureMapVisibility.IsKnownMapEntityIdentityTile(_facade, _fogManager, entity, position);
+        }
+
+        private bool CanExposeMapEntityTooltipDetails(IMapEntity entity)
+        {
+            return AdventureMapVisibility.HasAnyActivelyVisibleMapEntityTile(_fogManager, entity);
         }
 
         private string GetCommanderRelationship(ICommanderState commander, int localTeamId)
