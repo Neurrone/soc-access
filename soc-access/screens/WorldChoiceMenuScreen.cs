@@ -133,7 +133,7 @@ namespace SongsOfConquestAccess.Screens
                     () => false,
                     choice.OnFocus,
                     choice.IsVisible,
-                    choice.Tooltip));
+                    () => choice.Tooltip));
             }
 
             return menu;

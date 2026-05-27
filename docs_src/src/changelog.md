@@ -1,5 +1,9 @@
 # Changelog
 
+## V0.4.2
+
+- Fix troop rewards being unselectable when your army has no slots, even after you disband a troop to make room
+
 ## V0.4.1
 
 - Fixed adventure map fog handling for explored-but-not-currently-visible entities:

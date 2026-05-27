@@ -116,49 +116,53 @@ namespace SongsOfConquestAccess.Adapters
 
             for (int i = 0; i < rewardButtons.Count; i++)
             {
-                IWorldMapChoiceButton button = rewardButtons[i];
-                if (button == null)
-                {
-                    continue;
-                }
-
                 int capturedIndex = i;
-                Selectable selectable = button.Button != null ? button.Button.GetSelectable() : null;
                 choices.Add(new ChoiceItem(
                     isPenalty: false,
-                    BuildChoiceLabel(button),
-                    button.Interactable,
+                    () => BuildChoiceLabel(GetRewardButton(capturedIndex)),
+                    () => IsRewardEnabled(capturedIndex),
                     () => FocusReward(capturedIndex),
                     () => true,
-                    Tooltip.ForComponent(
-                        selectable,
-                        selectable != null ? selectable.GetComponent<RectTransform>() : null,
-                        _localization)));
+                    () => GetChoiceTooltip(GetRewardButton(capturedIndex))));
             }
 
             for (int i = 0; i < penaltyButtons.Count; i++)
             {
-                IWorldMapChoiceButton button = penaltyButtons[i];
-                if (button == null)
-                {
-                    continue;
-                }
-
                 int capturedIndex = i;
-                Selectable selectable = button.Button != null ? button.Button.GetSelectable() : null;
                 choices.Add(new ChoiceItem(
                     isPenalty: true,
-                    BuildChoiceLabel(button),
-                    button.Interactable,
+                    () => BuildChoiceLabel(GetPenaltyButton(capturedIndex)),
+                    () => IsPenaltyEnabled(capturedIndex),
                     () => FocusPenalty(capturedIndex),
                     () => true,
-                    Tooltip.ForComponent(
-                        selectable,
-                        selectable != null ? selectable.GetComponent<RectTransform>() : null,
-                        _localization)));
+                    () => GetChoiceTooltip(GetPenaltyButton(capturedIndex))));
             }
 
             return choices;
+        }
+
+        private IWorldMapChoiceButton GetRewardButton(int index)
+        {
+            List<IWorldMapChoiceButton> buttons = GetRewardButtons();
+            return index >= 0 && index < buttons.Count ? buttons[index] : null;
+        }
+
+        private IWorldMapChoiceButton GetPenaltyButton(int index)
+        {
+            List<IWorldMapChoiceButton> buttons = GetPenaltyButtons();
+            return index >= 0 && index < buttons.Count ? buttons[index] : null;
+        }
+
+        private bool IsRewardEnabled(int index)
+        {
+            IWorldMapChoiceButton button = GetRewardButton(index);
+            return button != null && button.Interactable;
+        }
+
+        private bool IsPenaltyEnabled(int index)
+        {
+            IWorldMapChoiceButton button = GetPenaltyButton(index);
+            return button != null && button.Interactable;
         }
 
         private bool FocusReward(int index)
@@ -217,6 +221,15 @@ namespace SongsOfConquestAccess.Adapters
             }
 
             return NormalizeChoiceText(GetText(button != null ? button.TypeTextMesh : null));
+        }
+
+        private Tooltip GetChoiceTooltip(IWorldMapChoiceButton button)
+        {
+            Selectable selectable = button != null && button.Button != null ? button.Button.GetSelectable() : null;
+            return Tooltip.ForComponent(
+                selectable,
+                selectable != null ? selectable.GetComponent<RectTransform>() : null,
+                _localization);
         }
 
         private bool TryGetArtifactChoiceLabel(IWorldMapChoiceButton button, out string artifactName)
@@ -290,22 +303,41 @@ namespace SongsOfConquestAccess.Adapters
 
         internal sealed class ChoiceItem
         {
-            public ChoiceItem(bool isPenalty, string label, bool isEnabled, Action onFocus, Func<bool> isVisible, Tooltip tooltip = null)
+            private readonly Func<string> _getLabel;
+            private readonly Func<bool> _isEnabled;
+            private readonly Func<Tooltip> _getTooltip;
+
+            public ChoiceItem(
+                bool isPenalty,
+                Func<string> getLabel,
+                Func<bool> isEnabled,
+                Action onFocus,
+                Func<bool> isVisible,
+                Func<Tooltip> getTooltip = null)
             {
                 IsPenalty = isPenalty;
-                Label = label ?? string.Empty;
-                IsEnabled = isEnabled;
+                _getLabel = getLabel;
+                _isEnabled = isEnabled;
                 OnFocus = onFocus;
                 IsVisible = isVisible;
-                Tooltip = tooltip;
+                _getTooltip = getTooltip;
             }
 
             public bool IsPenalty { get; private set; }
-            public string Label { get; private set; }
-            public bool IsEnabled { get; private set; }
+            public string Label
+            {
+                get { return _getLabel != null ? _getLabel() ?? string.Empty : string.Empty; }
+            }
+            public bool IsEnabled
+            {
+                get { return _isEnabled != null && _isEnabled(); }
+            }
             public Action OnFocus { get; private set; }
             public Func<bool> IsVisible { get; private set; }
-            public Tooltip Tooltip { get; private set; }
+            public Tooltip Tooltip
+            {
+                get { return _getTooltip != null ? _getTooltip() : null; }
+            }
         }
     }
 }
