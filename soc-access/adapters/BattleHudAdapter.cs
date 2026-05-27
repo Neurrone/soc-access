@@ -805,11 +805,36 @@ namespace SongsOfConquestAccess.Adapters
                     name = string.Empty;
                 }
 
-                return new TroopInfo(name, size, troop.Stats != null);
+                int localTeamId = GetLocalTeamId();
+                bool isEnemy = localTeamId >= 0 && troop.TeamId != localTeamId;
+                return new TroopInfo(name, size, troop.Stats != null, isEnemy);
             }
             catch
             {
                 return TroopInfo.Unknown();
+            }
+        }
+
+        private int GetLocalTeamId()
+        {
+            try
+            {
+                if (_facade == null || _facade.Teams == null)
+                {
+                    return -1;
+                }
+
+                int localTeamId = _facade.Teams.LocalTeamIdInControl;
+                if (localTeamId >= 0)
+                {
+                    return localTeamId;
+                }
+
+                return _facade.Teams.Current != null ? _facade.Teams.Current.Id : -1;
+            }
+            catch
+            {
+                return -1;
             }
         }
 
@@ -1281,11 +1306,12 @@ namespace SongsOfConquestAccess.Adapters
 
         internal sealed class TroopInfo
         {
-            public TroopInfo(string name, int size, bool hasSize)
+            public TroopInfo(string name, int size, bool hasSize, bool isEnemy)
             {
                 Name = name ?? string.Empty;
                 Size = size;
                 HasSize = hasSize;
+                IsEnemy = isEnemy;
                 IsKnown = true;
             }
 
@@ -1297,6 +1323,7 @@ namespace SongsOfConquestAccess.Adapters
             public string Name { get; private set; }
             public int Size { get; private set; }
             public bool HasSize { get; private set; }
+            public bool IsEnemy { get; private set; }
             public bool IsKnown { get; private set; }
 
             public static TroopInfo Unknown()

@@ -606,7 +606,9 @@ namespace SongsOfConquestAccess.Screens
 
             if (troop.HasSize)
             {
-                return ModText.Get(ModStrings.Common.ResourceAmount, troop.Size, troop.Name);
+                return troop.IsEnemy
+                    ? ModText.Get(ModStrings.Combat.EnemyTroop, troop.Size, troop.Name)
+                    : ModText.Get(ModStrings.Combat.TroopQuantity, troop.Size, troop.Name);
             }
 
             return troop.Name;
