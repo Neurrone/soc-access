@@ -17,7 +17,7 @@ namespace SongsOfConquestAccess.Screens
         private readonly PostAdventureStatsAdapter _adapter;
 
         public PostAdventureStatsScreen(PostAdventureStatsAdapter adapter)
-            : base(BuildRoot(adapter))
+            : base(BuildRoot(adapter, null))
         {
             _adapter = adapter;
         }
@@ -64,16 +64,37 @@ namespace SongsOfConquestAccess.Screens
             return base.OnActionJustPressed(action);
         }
 
-        public void Refresh()
+        public void Refresh(bool announceFocus = false)
         {
             if (!IsPresent())
             {
                 return;
             }
 
-            int focusedIndex = RootWidget != null ? RootWidget.FocusedIndex : -1;
-            RootWidget = BuildRoot(_adapter);
-            RootWidget?.SetFocusByIndexSilently(focusedIndex);
+            FocusState focusState = CaptureFocusState();
+            RootWidget = BuildRoot(_adapter, focusState);
+            if (announceFocus)
+            {
+                UIManager.RequestFocus(RootWidget);
+            }
+            else
+            {
+                UIManager.RequestFocusSilently(RootWidget);
+            }
+        }
+
+        private FocusState CaptureFocusState()
+        {
+            Widget focusedChild = RootWidget != null ? RootWidget.FocusedChild : null;
+            MenuWidget menu = focusedChild as MenuWidget;
+            MenuItemWidget menuItem = menu != null ? menu.FocusedItem : null;
+            TableWidget table = focusedChild as TableWidget;
+            return new FocusState(
+                focusedChild != null ? focusedChild.Id : null,
+                menuItem != null ? menuItem.Id : null,
+                table != null,
+                table != null ? table.FocusedRowIndex : 0,
+                table != null ? table.FocusedColumnIndex : 0);
         }
 
         private static PostAdventureStatsMenu GetStatsMenu(PostAdventureMenu resultMenu)
@@ -83,7 +104,7 @@ namespace SongsOfConquestAccess.Screens
                 : null;
         }
 
-        private static ContainerWidget BuildRoot(PostAdventureStatsAdapter adapter)
+        private static ContainerWidget BuildRoot(PostAdventureStatsAdapter adapter, FocusState focusState)
         {
             ContainerWidget root = new ContainerWidget("post-adventure-stats", ModText.Get(ModStrings.Screens.PostAdventureStats));
             if (adapter == null)
@@ -111,9 +132,9 @@ namespace SongsOfConquestAccess.Screens
                 includeParentLabelInAnnouncement: false,
                 isVisible: () => !string.IsNullOrWhiteSpace(adapter.TotalRounds)));
 
-            root.AddChild(BuildGraphTypeMenu(adapter));
-            root.AddChild(BuildTeamsMenu(adapter));
-            root.AddChild(BuildGraphTable(adapter));
+            root.AddChild(BuildGraphTypeMenu(adapter, focusState));
+            root.AddChild(BuildTeamsMenu(adapter, focusState));
+            root.AddChild(BuildGraphTable(adapter, focusState));
 
             root.AddChild(new ButtonWidget(
                 "post-adventure-stats-close",
@@ -122,10 +143,15 @@ namespace SongsOfConquestAccess.Screens
                 adapter.HideNativeTooltip,
                 adapter.IsCloseButtonEnabled));
 
+            if (focusState != null && !string.IsNullOrWhiteSpace(focusState.RootChildId))
+            {
+                root.SetFocusedChildById(focusState.RootChildId);
+            }
+
             return root;
         }
 
-        private static MenuWidget BuildGraphTypeMenu(PostAdventureStatsAdapter adapter)
+        private static MenuWidget BuildGraphTypeMenu(PostAdventureStatsAdapter adapter, FocusState focusState)
         {
             MenuWidget menu = new MenuWidget("post-adventure-stats-graph-types", ModText.Get(ModStrings.Screens.GraphType));
             IReadOnlyList<PostAdventureStatsAdapter.GraphOption> options = adapter.GetGraphOptions();
@@ -146,15 +172,32 @@ namespace SongsOfConquestAccess.Screens
                         SocAccessPlugin.Instance?.ScreenDetector?.OnPostAdventureStatsChanged();
                         return true;
                     },
-                    () => adapter.FocusGraphDropdown(),
+                    () =>
+                    {
+                        adapter.FocusGraphDropdown();
+                        if (adapter.SelectedGraphIndex != option.Index && adapter.SelectGraph(option.Index))
+                        {
+                            SocAccessPlugin.Instance?.ScreenDetector?.OnPostAdventureStatsChanged();
+                        }
+                    },
                     () => true));
             }
 
-            menu.SetFocusedItemById("post-adventure-stats-graph-" + adapter.SelectedGraphIndex);
+            if (focusState != null
+                && focusState.RootChildId == menu.Id
+                && !string.IsNullOrWhiteSpace(focusState.MenuItemId))
+            {
+                menu.SetFocusedItemById(focusState.MenuItemId);
+            }
+            else
+            {
+                menu.SetFocusedItemById("post-adventure-stats-graph-" + adapter.SelectedGraphIndex);
+            }
+
             return menu;
         }
 
-        private static MenuWidget BuildTeamsMenu(PostAdventureStatsAdapter adapter)
+        private static MenuWidget BuildTeamsMenu(PostAdventureStatsAdapter adapter, FocusState focusState)
         {
             MenuWidget menu = new MenuWidget(
                 "post-adventure-stats-teams",
@@ -168,7 +211,9 @@ namespace SongsOfConquestAccess.Screens
                 menu.AddItem(new MenuItemWidget(
                     team.Id,
                     () => team.Label,
-                    () => adapter.IsTeamSelected(team.Entry) ? ModText.Get(ModStrings.UI.Selected) : string.Empty,
+                    () => adapter.IsTeamSelected(team.Entry)
+                        ? ModText.Get(ModStrings.UI.StatusChecked)
+                        : ModText.Get(ModStrings.UI.StatusUnchecked),
                     () =>
                     {
                         if (!adapter.ToggleTeam(team.Entry))
@@ -176,23 +221,37 @@ namespace SongsOfConquestAccess.Screens
                             return false;
                         }
 
-                        SocAccessPlugin.Instance?.ScreenDetector?.OnPostAdventureStatsChanged();
+                        SocAccessPlugin.Instance?.ScreenDetector?.OnPostAdventureStatsChanged(announceFocus: true);
                         return true;
                     },
                     () => adapter.FocusTeam(team.Entry),
                     () => team.Entry != null && team.Entry.gameObject != null && team.Entry.gameObject.activeInHierarchy));
             }
 
+            if (focusState != null
+                && focusState.RootChildId == menu.Id
+                && !string.IsNullOrWhiteSpace(focusState.MenuItemId))
+            {
+                menu.SetFocusedItemById(focusState.MenuItemId);
+            }
+
             return menu;
         }
 
-        private static TableWidget BuildGraphTable(PostAdventureStatsAdapter adapter)
+        private static TableWidget BuildGraphTable(PostAdventureStatsAdapter adapter, FocusState focusState)
         {
-            return new TableWidget(
+            TableWidget table = new TableWidget(
                 "post-adventure-stats-graph-table",
                 adapter != null ? adapter.GraphTitle : string.Empty,
                 BuildGraphColumns(adapter),
                 BuildGraphRows(adapter));
+
+            if (focusState != null && focusState.RootChildId == table.Id && focusState.IsTable)
+            {
+                table.SetFocusedCell(focusState.TableRowIndex, focusState.TableColumnIndex);
+            }
+
+            return table;
         }
 
         private static IEnumerable<TableWidget.Column> BuildGraphColumns(PostAdventureStatsAdapter adapter)
@@ -261,6 +320,33 @@ namespace SongsOfConquestAccess.Screens
             }
 
             return string.Empty;
+        }
+
+        private sealed class FocusState
+        {
+            public FocusState(
+                string rootChildId,
+                string menuItemId,
+                bool isTable,
+                int tableRowIndex,
+                int tableColumnIndex)
+            {
+                RootChildId = rootChildId;
+                MenuItemId = menuItemId;
+                IsTable = isTable;
+                TableRowIndex = tableRowIndex;
+                TableColumnIndex = tableColumnIndex;
+            }
+
+            public string RootChildId { get; private set; }
+
+            public string MenuItemId { get; private set; }
+
+            public bool IsTable { get; private set; }
+
+            public int TableRowIndex { get; private set; }
+
+            public int TableColumnIndex { get; private set; }
         }
     }
 }

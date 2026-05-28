@@ -1529,7 +1529,7 @@ namespace SongsOfConquestAccess.Screens
             }
         }
 
-        public void OnPostAdventureStatsChanged()
+        public void OnPostAdventureStatsChanged(bool announceFocus = false)
         {
             PostAdventureStatsScreen screen = _screenManager.CurrentScreen as PostAdventureStatsScreen;
             if (screen == null)
@@ -1543,7 +1543,7 @@ namespace SongsOfConquestAccess.Screens
                 return;
             }
 
-            screen.Refresh();
+            screen.Refresh(announceFocus);
         }
 
         public void OnPlayerStatsReady(PlayerStatsMenuNavigation menu)
