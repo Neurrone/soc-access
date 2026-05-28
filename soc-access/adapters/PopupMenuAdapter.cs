@@ -1,3 +1,4 @@
+using System;
 using SongsOfConquest.Client;
 using SongsOfConquest.Client.Menu.Popup;
 using SongsOfConquest.Client.UI;
@@ -8,7 +9,7 @@ using UnityEngine.UI;
 
 namespace SongsOfConquestAccess.Adapters
 {
-    internal sealed class PopupMenuAdapter : IMessageDialogAdapter
+    internal sealed class PopupMenuAdapter : IMessageDialogAdapter, IInputDialogAdapter
     {
         private readonly object _sourceKey;
         private readonly IUITransform _containerTransform;
@@ -50,8 +51,8 @@ namespace SongsOfConquestAccess.Adapters
                 // Read popup text through UITextMeshTextUtility rather than the raw public
                 // Text properties. On hot reload, PopupMenu can remain visible while those
                 // public values revert to prefab placeholder content.
-                GetText(settings != null ? settings.HeaderText : null),
-                GetText(settings != null ? settings.MessageText : null),
+                GetActiveText(settings != null ? settings.HeaderText : null),
+                GetActiveText(settings != null ? settings.MessageText : null),
                 GetButtonText(settings != null ? settings.PositiveButton : null),
                 GetButtonText(settings != null ? settings.NegativeButton : null))
         {
@@ -92,6 +93,26 @@ namespace SongsOfConquestAccess.Adapters
             get { return IsButtonActive(_negativeButton); }
         }
 
+        public bool IsPositiveActionEnabled
+        {
+            get { return IsButtonEnabled(_positiveButton); }
+        }
+
+        public bool IsNegativeActionEnabled
+        {
+            get { return IsButtonEnabled(_negativeButton); }
+        }
+
+        public bool HasInputField
+        {
+            get { return _inputField != null && _inputField.Active && _inputField.Interactable; }
+        }
+
+        public IUITextMeshInputField InputField
+        {
+            get { return HasInputField ? _inputField : null; }
+        }
+
         public bool IsPresent()
         {
             if (_containerTransform == null)
@@ -100,9 +121,23 @@ namespace SongsOfConquestAccess.Adapters
             }
 
             return _containerTransform.Active
-                && (HasPositiveAction || HasNegativeAction)
-                && _inputField != null
-                && !_inputField.Active;
+                && (HasPositiveAction || HasNegativeAction);
+        }
+
+        public void AttachInputSubmit(Action<IUITextMeshInputField, string> handler)
+        {
+            if (_inputField != null && handler != null)
+            {
+                _inputField.OnSubmit = (Action<IUITextMeshInputField, string>)Delegate.Combine(_inputField.OnSubmit, handler);
+            }
+        }
+
+        public void DetachInputSubmit(Action<IUITextMeshInputField, string> handler)
+        {
+            if (_inputField != null && handler != null)
+            {
+                _inputField.OnSubmit = (Action<IUITextMeshInputField, string>)Delegate.Remove(_inputField.OnSubmit, handler);
+            }
         }
 
         public void SyncNativeSelection(DialogAction action)
@@ -160,6 +195,11 @@ namespace SongsOfConquestAccess.Adapters
             return button != null && button.Active;
         }
 
+        private static bool IsButtonEnabled(IUIButton button)
+        {
+            return IsButtonActive(button) && button.Interactable;
+        }
+
         private static Selectable GetSelectable(IUIButton button)
         {
             if (button == null)
@@ -199,6 +239,17 @@ namespace SongsOfConquestAccess.Adapters
         private static string GetText(IUITextMesh textMesh)
         {
             return UITextMeshTextUtility.GetEffectiveText(textMesh);
+        }
+
+        private static string GetActiveText(IUITextMesh textMesh)
+        {
+            IUITransform transform = textMesh as IUITransform;
+            if (transform != null && !transform.Active)
+            {
+                return string.Empty;
+            }
+
+            return GetText(textMesh);
         }
 
     }

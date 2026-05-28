@@ -64,6 +64,16 @@ namespace SongsOfConquestAccess.Adapters
             get { return IsButtonActive(GetCancelButton()); }
         }
 
+        public bool IsPositiveActionEnabled
+        {
+            get { return IsButtonEnabled(GetConfirmButton()); }
+        }
+
+        public bool IsNegativeActionEnabled
+        {
+            get { return IsButtonEnabled(GetCancelButton()); }
+        }
+
         public bool HasInputField
         {
             get
@@ -173,6 +183,11 @@ namespace SongsOfConquestAccess.Adapters
         private static bool IsButtonActive(UIButton button)
         {
             return button != null && button.Active && MenuButtonAdapterBase.IsButtonVisible(button);
+        }
+
+        private static bool IsButtonEnabled(UIButton button)
+        {
+            return IsButtonActive(button) && button.Interactable;
         }
 
         private static bool InvokeButton(UIButton button)

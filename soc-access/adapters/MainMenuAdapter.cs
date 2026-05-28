@@ -41,10 +41,14 @@ namespace SongsOfConquestAccess.Adapters
             AccessTools.FieldRefAccess<MainMenu, UIButton>("_communityMapsButton");
         private static readonly AccessTools.FieldRef<MainMenu, FoldoutUIButton> ExtrasFoldoutRef =
             AccessTools.FieldRefAccess<MainMenu, FoldoutUIButton>("_extrasFoldoutButton");
+        private static readonly AccessTools.FieldRef<MainMenu, GameObject> ExtrasFoldoutContainerRef =
+            AccessTools.FieldRefAccess<MainMenu, GameObject>("_extrasFoldoutContainer");
         private static readonly AccessTools.FieldRef<MainMenu, UIButton> HotseatButtonRef =
             AccessTools.FieldRefAccess<MainMenu, UIButton>("_hotseatButton");
         private static readonly AccessTools.FieldRef<MainMenu, FoldoutUIButton> MultiplayerFoldoutRef =
             AccessTools.FieldRefAccess<MainMenu, FoldoutUIButton>("_multiplayerFoldoutButton");
+        private static readonly AccessTools.FieldRef<MainMenu, GameObject> MultiplayerFoldoutContainerRef =
+            AccessTools.FieldRefAccess<MainMenu, GameObject>("_foldoutContainer");
         private static readonly AccessTools.FieldRef<MainMenu, UIButton> TutorialAndCodexButtonRef =
             AccessTools.FieldRefAccess<MainMenu, UIButton>("_tutorialAndCodexButton");
         private static readonly AccessTools.FieldRef<MainMenu, UIButton> PlayerStatsButtonRef =
@@ -87,7 +91,8 @@ namespace SongsOfConquestAccess.Adapters
                     CreateMainMenuButton(CreditsButtonRef(_mainMenu)),
                     CreateMainMenuButton(BattlegroundsButtonRef(_mainMenu)),
                     CreateMainMenuButton(DigitalArtbookButtonRef(_mainMenu))
-                });
+                },
+                ExtrasFoldoutContainerRef(_mainMenu));
             MultiplayerFoldout = new NativeFoldoutAdapter(
                 new StandardMenuButtonAdapter(
                     GetFoldoutButton(MultiplayerFoldoutRef(_mainMenu)),
@@ -100,7 +105,8 @@ namespace SongsOfConquestAccess.Adapters
                     CreateMainMenuButton(JoinWithCodeButtonRef(_mainMenu)),
                     CreateMainMenuButton(FindOnlineButtonRef(_mainMenu)),
                     CreateMainMenuButton(StartHotseatButtonRef(_mainMenu))
-                });
+                },
+                MultiplayerFoldoutContainerRef(_mainMenu));
 
             _topLevelItems = new List<IMenuButtonAdapter>
             {
@@ -224,12 +230,14 @@ namespace SongsOfConquestAccess.Adapters
         {
             private readonly FoldoutUIButton _foldout;
             private readonly List<IMenuButtonAdapter> _items;
+            private readonly GameObject _itemContainer;
 
-            public NativeFoldoutAdapter(IMenuButtonAdapter triggerButton, FoldoutUIButton foldout, IEnumerable<IMenuButtonAdapter> items)
+            public NativeFoldoutAdapter(IMenuButtonAdapter triggerButton, FoldoutUIButton foldout, IEnumerable<IMenuButtonAdapter> items, GameObject itemContainer)
             {
                 TriggerButton = triggerButton;
                 _foldout = foldout;
                 _items = new List<IMenuButtonAdapter>(items ?? new IMenuButtonAdapter[0]);
+                _itemContainer = itemContainer;
             }
 
             public IMenuButtonAdapter TriggerButton { get; private set; }
@@ -262,7 +270,9 @@ namespace SongsOfConquestAccess.Adapters
             public bool IsOpen()
             {
                 HoverEventsImage background = GetBackground();
-                return background != null && background.gameObject.activeSelf;
+                return background != null
+                    && background.gameObject.activeSelf
+                    && IsGameObjectActive(_itemContainer);
             }
 
             public bool Open()

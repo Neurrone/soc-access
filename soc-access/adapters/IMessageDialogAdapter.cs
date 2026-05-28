@@ -26,6 +26,10 @@ namespace SongsOfConquestAccess.Adapters
 
         bool HasNegativeAction { get; }
 
+        bool IsPositiveActionEnabled { get; }
+
+        bool IsNegativeActionEnabled { get; }
+
         bool IsPresent();
 
         void SyncNativeSelection(DialogAction action);

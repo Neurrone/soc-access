@@ -209,7 +209,7 @@ namespace SongsOfConquestAccess.Screens
         {
             if (actionKey == AccessibilityActions.Cancel.Key)
             {
-                return _adapter != null && _adapter.HasNegativeAction;
+                return _adapter != null && _adapter.IsNegativeActionEnabled;
             }
 
             return base.HasClaimed(actionKey);
@@ -232,7 +232,7 @@ namespace SongsOfConquestAccess.Screens
         {
             if (action != null && action.Key == AccessibilityActions.Cancel.Key)
             {
-                return _adapter != null && _adapter.HasNegativeAction && _adapter.ActivateAction(DialogAction.Negative);
+                return _adapter != null && _adapter.IsNegativeActionEnabled && _adapter.ActivateAction(DialogAction.Negative);
             }
 
             return base.OnActionJustPressed(action);
@@ -240,7 +240,7 @@ namespace SongsOfConquestAccess.Screens
 
         private void HandleInputSubmit(IUITextMeshInputField inputField, string text)
         {
-            if (_adapter != null && _adapter.HasPositiveAction)
+            if (_adapter != null && _adapter.IsPositiveActionEnabled)
             {
                 _adapter.ActivateAction(DialogAction.Positive);
             }
@@ -252,15 +252,6 @@ namespace SongsOfConquestAccess.Screens
             string dialogLabel = string.IsNullOrWhiteSpace(title) ? "dialog" : title + " dialog";
             ContainerWidget root = new ContainerWidget("message-dialog", dialogLabel);
             IInputDialogAdapter inputAdapter = adapter as IInputDialogAdapter;
-
-            root.AddChild(new TextInputWidget(
-                "input",
-                FirstNonEmpty(title, adapter != null ? adapter.Body : string.Empty),
-                () => inputAdapter != null ? inputAdapter.InputField : null,
-                null,
-                null,
-                () => inputAdapter != null && inputAdapter.HasInputField,
-                () => inputAdapter != null && inputAdapter.HasInputField));
 
             root.AddChild(new TextWidget(
                 "body",
@@ -275,6 +266,15 @@ namespace SongsOfConquestAccess.Screens
                 includeParentLabelInAnnouncement: true,
                 isVisible: () => adapter != null && !string.IsNullOrWhiteSpace(adapter.Body)));
 
+            root.AddChild(new TextInputWidget(
+                "input",
+                FirstNonEmpty(title, adapter != null ? adapter.Body : string.Empty),
+                () => inputAdapter != null ? inputAdapter.InputField : null,
+                null,
+                null,
+                () => inputAdapter != null && inputAdapter.HasInputField,
+                () => inputAdapter != null && inputAdapter.HasInputField));
+
             root.AddChild(new ButtonWidget(
                 "positive",
                 adapter != null ? adapter.PositiveLabel : string.Empty,
@@ -286,7 +286,7 @@ namespace SongsOfConquestAccess.Screens
                         adapter.SyncNativeSelection(DialogAction.Positive);
                     }
                 },
-                () => adapter != null && adapter.HasPositiveAction,
+                () => adapter != null && adapter.IsPositiveActionEnabled,
                 () => adapter != null && adapter.HasPositiveAction));
 
             root.AddChild(new ButtonWidget(
@@ -300,7 +300,7 @@ namespace SongsOfConquestAccess.Screens
                         adapter.SyncNativeSelection(DialogAction.Negative);
                     }
                 },
-                () => adapter != null && adapter.HasNegativeAction,
+                () => adapter != null && adapter.IsNegativeActionEnabled,
                 () => adapter != null && adapter.HasNegativeAction));
 
             return root;

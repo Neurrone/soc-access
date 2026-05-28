@@ -1,8 +1,9 @@
 # Changelog
 
-## V0.4.2
+## V0.5.0
 
-- On non-campaign games, the post-game player stats screen is now accessible
+- The post-game player stats screen is now accessible
+- Preliminary multiplayer support for starting an online and hotseat game as well as entering a join code
 - Fix troop rewards being unselectable when your army has no slots, even after you disband a troop to make room
 - Pressing shift with a movement key skips to the next interesting tile in that direction
 - Fixed an edge case where cycling through your own stacks with `,` would miss some if initiative buffs cause the current stack to act sooner next round

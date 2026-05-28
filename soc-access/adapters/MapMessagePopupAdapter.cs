@@ -62,6 +62,16 @@ namespace SongsOfConquestAccess.Adapters
             get { return false; }
         }
 
+        public bool IsPositiveActionEnabled
+        {
+            get { return IsButtonEnabled(GetOkButton()); }
+        }
+
+        public bool IsNegativeActionEnabled
+        {
+            get { return false; }
+        }
+
         public bool IsPresent()
         {
             if (_popup == null)
@@ -131,6 +141,11 @@ namespace SongsOfConquestAccess.Adapters
         private static bool IsButtonActive(UIButton button)
         {
             return button != null && button.Active && MenuButtonAdapterBase.IsButtonVisible(button);
+        }
+
+        private static bool IsButtonEnabled(UIButton button)
+        {
+            return IsButtonActive(button) && button.Interactable;
         }
 
         private static bool InvokeButton(UIButton button)

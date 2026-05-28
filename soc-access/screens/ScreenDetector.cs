@@ -575,6 +575,7 @@ namespace SongsOfConquestAccess.Screens
             }
 
             object resolvedSourceKey = sourceKey ?? (settings != null ? (object)settings.ContainerTransform : null);
+            PopStaleMainMenuFoldoutBeforePopup();
             MessageDialogScreen screen = new MessageDialogScreen(new PopupMenuAdapter(resolvedSourceKey, settings));
             if (IsCurrentMessageDialogSource(resolvedSourceKey))
             {
@@ -583,6 +584,21 @@ namespace SongsOfConquestAccess.Screens
             }
 
             Push(screen, "popup menu ready");
+        }
+
+        private void PopStaleMainMenuFoldoutBeforePopup()
+        {
+            FoldoutMenuScreen foldoutScreen = _screenManager.CurrentScreen as FoldoutMenuScreen;
+            if (foldoutScreen == null || foldoutScreen.IsPresent())
+            {
+                return;
+            }
+
+            // MainMenu.HandleJoinWithCodeClicked hides the multiplayer foldout item
+            // container directly instead of calling FoldoutUIButton.ForceClose(), so
+            // our normal foldout close hook does not run. Pop the now-stale foldout
+            // before stacking the popup above it.
+            _screenManager.Pop<FoldoutMenuScreen>("main menu foldout hidden before popup");
         }
 
         public void OnPopupMenuClosed(object sourceKey)
