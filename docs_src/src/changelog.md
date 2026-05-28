@@ -4,6 +4,7 @@
 
 - Fix troop rewards being unselectable when your army has no slots, even after you disband a troop to make room
 - To help with fighting enemies with the same units as you, the battle timeline now specifically indicates if something is an enemy
+- In combat, abbreviations like enemy ranged troops are only used when the group has two or more stacks
 
 ## V0.4.1
 

@@ -204,7 +204,7 @@ namespace SongsOfConquestAccess.Tests
             IReadOnlyList<CombatNarrationItem> result = planner.Flush();
 
             Assert.AreEqual(1, result.Count);
-            Assert.AreEqual("Momentum affects your troops, melee offense +10", result[0].Event.GetSpeechText());
+            Assert.AreEqual("Momentum affects 10 Footmen at 0, 0, melee offense +10", result[0].Event.GetSpeechText());
         }
 
         [TestMethod]
@@ -228,7 +228,7 @@ namespace SongsOfConquestAccess.Tests
 
             Assert.AreEqual(2, result.Count);
             Assert.AreSame(spell, result[0].Event);
-            Assert.AreEqual("Lethargy affects your troops, movement -1 and initiative -10", result[1].Event.GetSpeechText());
+            Assert.AreEqual("Lethargy affects 10 Rangers at 0, 0, movement -1 and initiative -10", result[1].Event.GetSpeechText());
         }
 
         [TestMethod]
@@ -289,6 +289,48 @@ namespace SongsOfConquestAccess.Tests
         }
 
         [TestMethod]
+        public void BacteriaModifierSummaryUsesExplicitTargetForSingleEnemyRangedTroop()
+        {
+            CombatNarrationPlanner planner = new CombatNarrationPlanner();
+            CombatNarrationSnapshot snapshot = Snapshot(
+                your: new[] { 10 },
+                enemy: new[] { 30 },
+                yourMelee: new[] { 10 },
+                enemyMelee: new int[0],
+                yourRanged: new int[0],
+                enemyRanged: new[] { 30 });
+            BacteriaRef highGround = Bacteria("High Ground");
+
+            planner.EnqueueBacteriaSummary(CombatNarrationItem.CreateBacteriaModifierSummary(highGround, Troop(30, 2, "Militia"), new[] { Modifier(BacteriaModifierType.TroopRangedRange, 1) }, 30), snapshot);
+
+            IReadOnlyList<CombatNarrationItem> result = planner.Flush();
+
+            Assert.AreEqual(1, result.Count);
+            Assert.AreEqual("High Ground affects 10 enemy Militia at 0, 0, ranged range +1", result[0].Event.GetSpeechText());
+        }
+
+        [TestMethod]
+        public void BacteriaRemovalSummaryUsesExplicitTargetForSingleEnemyRangedTroop()
+        {
+            CombatNarrationPlanner planner = new CombatNarrationPlanner();
+            CombatNarrationSnapshot snapshot = Snapshot(
+                your: new[] { 10 },
+                enemy: new[] { 30 },
+                yourMelee: new[] { 10 },
+                enemyMelee: new int[0],
+                yourRanged: new int[0],
+                enemyRanged: new[] { 30 });
+            BacteriaRef highGround = Bacteria("High Ground");
+
+            planner.EnqueueBacteriaSummary(CombatNarrationItem.CreateBacteriaRemovalSummary(highGround, Troop(30, 2, "Militia"), 30), snapshot);
+
+            IReadOnlyList<CombatNarrationItem> result = planner.Flush();
+
+            Assert.AreEqual(1, result.Count);
+            Assert.AreEqual("High Ground removed from 10 enemy Militia at 0, 0", result[0].Event.GetSpeechText());
+        }
+
+        [TestMethod]
         public void BacteriaModifierSummaryPrefersYourTroopsWhenAllYourTroopsAreMelee()
         {
             CombatNarrationPlanner planner = new CombatNarrationPlanner();
@@ -337,11 +379,11 @@ namespace SongsOfConquestAccess.Tests
         {
             CombatNarrationPlanner planner = new CombatNarrationPlanner();
             CombatNarrationSnapshot snapshot = Snapshot(
-                your: new[] { 10, 20 },
+                your: new[] { 10, 15, 20, 25 },
                 enemy: new int[0],
-                yourMelee: new[] { 10 },
+                yourMelee: new[] { 10, 15 },
                 enemyMelee: new int[0],
-                yourRanged: new[] { 20 },
+                yourRanged: new[] { 20, 25 },
                 enemyRanged: new int[0]);
             BacteriaRef momentum = Bacteria("Momentum");
 
@@ -355,9 +397,23 @@ namespace SongsOfConquestAccess.Tests
             planner.EnqueueBacteriaSummary(
                 CombatNarrationItem.CreateBacteriaModifierSummary(
                     momentum,
+                    Troop(15, 1, "Knights"),
+                    new[] { Modifier(BacteriaModifierType.TroopMeleeOffense, 10), Modifier(BacteriaModifierType.TroopDefense, 10) },
+                    15),
+                snapshot);
+            planner.EnqueueBacteriaSummary(
+                CombatNarrationItem.CreateBacteriaModifierSummary(
+                    momentum,
                     Troop(20, 1, "Rangers"),
                     new[] { Modifier(BacteriaModifierType.TroopMeleeOffense, 10), Modifier(BacteriaModifierType.TroopRangedOffense, 10), Modifier(BacteriaModifierType.TroopDefense, 10) },
                     20),
+                snapshot);
+            planner.EnqueueBacteriaSummary(
+                CombatNarrationItem.CreateBacteriaModifierSummary(
+                    momentum,
+                    Troop(25, 1, "Sappers"),
+                    new[] { Modifier(BacteriaModifierType.TroopMeleeOffense, 10), Modifier(BacteriaModifierType.TroopRangedOffense, 10), Modifier(BacteriaModifierType.TroopDefense, 10) },
+                    25),
                 snapshot);
 
             IReadOnlyList<CombatNarrationItem> result = planner.Flush();
@@ -398,7 +454,7 @@ namespace SongsOfConquestAccess.Tests
             IReadOnlyList<CombatNarrationItem> result = planner.Flush();
 
             Assert.AreEqual(1, result.Count);
-            Assert.AreEqual("High Ground affects your troops, ranged range +1", result[0].Event.GetSpeechText());
+            Assert.AreEqual("High Ground affects 10 Militia at 0, 0, ranged range +1", result[0].Event.GetSpeechText());
         }
 
         [TestMethod]
@@ -421,7 +477,7 @@ namespace SongsOfConquestAccess.Tests
             IReadOnlyList<CombatNarrationItem> result = planner.Flush();
 
             Assert.AreEqual(1, result.Count);
-            Assert.AreEqual("High Ground affects your troops, ranged range +1", result[0].Event.GetSpeechText());
+            Assert.AreEqual("High Ground affects 10 Militia at 0, 0, ranged range +1", result[0].Event.GetSpeechText());
         }
 
         [TestMethod]
@@ -474,7 +530,7 @@ namespace SongsOfConquestAccess.Tests
             IReadOnlyList<CombatNarrationItem> result = planner.Flush();
 
             Assert.AreEqual(2, result.Count);
-            Assert.AreEqual("High Ground removed from your troops", result[0].Event.GetSpeechText());
+            Assert.AreEqual("High Ground removed from 3 Faey Ragers at 0, 0", result[0].Event.GetSpeechText());
             Assert.AreSame(damage, result[1].Event);
         }
 

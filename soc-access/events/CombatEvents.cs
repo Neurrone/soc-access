@@ -349,6 +349,11 @@ namespace SongsOfConquestAccess.Events.Combat
                 affected.Add(target.TroopId);
             }
 
+            if (affected.Count < 2)
+            {
+                return EffectTargetSummaryKind.ExplicitTargets;
+            }
+
             if (MatchesUnion(affected, YourTroops, EnemyTroops))
             {
                 return EffectTargetSummaryKind.AllTroops;
