@@ -38,13 +38,6 @@ namespace SongsOfConquestAccess
             NotifyClosedIfTopScreen(__instance);
         }
 
-        [HarmonyPatch(typeof(PostAdventureMenu), "HandleLoadClicked")]
-        [HarmonyPrefix]
-        private static void PostAdventureMenuLoadPrefix(PostAdventureMenu __instance)
-        {
-            NotifyClosedIfTopScreen(__instance);
-        }
-
         [HarmonyPatch(typeof(PostAdventureMenu), "HandleQuitToMainClicked")]
         [HarmonyPrefix]
         private static void PostAdventureMenuQuitToMainPrefix(PostAdventureMenu __instance)

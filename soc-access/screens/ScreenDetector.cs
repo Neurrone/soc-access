@@ -1498,6 +1498,15 @@ namespace SongsOfConquestAccess.Screens
                 return;
             }
 
+            // The post-adventure result is a root screen for the ended game.
+            // Clearing avoids briefly returning focus to the adventure map while
+            // transitioning away from victory/defeat.
+            if (!screen.IsPresent())
+            {
+                return;
+            }
+
+            _screenManager.Clear();
             Push(screen, "post adventure result ready");
         }
 
