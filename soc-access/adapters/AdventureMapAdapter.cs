@@ -466,6 +466,7 @@ namespace SongsOfConquestAccess.Adapters
             if (canExposeMapEntityIdentity)
             {
                 tile.MapEntity = entity;
+                tile.MapEntityId = entity.Id;
                 tile.MapEntityName = GetMapEntityName(entity);
                 if (CanExposeMapEntityTooltipDetails(entity))
                 {
@@ -3042,6 +3043,7 @@ namespace SongsOfConquestAccess.Adapters
         {
             AdventureMapTile.CommanderInfo info = new AdventureMapTile.CommanderInfo
             {
+                Id = commander != null ? commander.Id : -1,
                 Raw = commander,
                 Name = GetCommanderName(commander),
                 IsSelected = ReferenceEquals(commander, selectedCommander),

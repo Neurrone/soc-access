@@ -72,6 +72,10 @@ namespace SongsOfConquestAccess.UI
                 || actionKey == AccessibilityActions.MapMoveSouth.Key
                 || actionKey == AccessibilityActions.MapMoveWest.Key
                 || actionKey == AccessibilityActions.MapMoveEast.Key
+                || actionKey == AccessibilityActions.MapSkipNorth.Key
+                || actionKey == AccessibilityActions.MapSkipSouth.Key
+                || actionKey == AccessibilityActions.MapSkipWest.Key
+                || actionKey == AccessibilityActions.MapSkipEast.Key
                 || actionKey == AccessibilityActions.Activate.Key
                 || actionKey == AccessibilityActions.MapSecondaryAction.Key
                 || actionKey == AccessibilityActions.NextWielder.Key
@@ -103,9 +107,19 @@ namespace SongsOfConquestAccess.UI
                 return Move(0, 1);
             }
 
+            if (action.Key == AccessibilityActions.MapSkipNorth.Key)
+            {
+                return SkipMove(0, 1);
+            }
+
             if (action.Key == AccessibilityActions.MapMoveSouth.Key)
             {
                 return Move(0, -1);
+            }
+
+            if (action.Key == AccessibilityActions.MapSkipSouth.Key)
+            {
+                return SkipMove(0, -1);
             }
 
             if (action.Key == AccessibilityActions.MapMoveWest.Key)
@@ -113,9 +127,19 @@ namespace SongsOfConquestAccess.UI
                 return Move(-1, 0);
             }
 
+            if (action.Key == AccessibilityActions.MapSkipWest.Key)
+            {
+                return SkipMove(-1, 0);
+            }
+
             if (action.Key == AccessibilityActions.MapMoveEast.Key)
             {
                 return Move(1, 0);
+            }
+
+            if (action.Key == AccessibilityActions.MapSkipEast.Key)
+            {
+                return SkipMove(1, 0);
             }
 
             if (action.Key == AccessibilityActions.Activate.Key)
@@ -198,6 +222,28 @@ namespace SongsOfConquestAccess.UI
             }
 
             _cursorTile = nextTile;
+            _adapter.EnsureTileInView(_cursorTile);
+            _adapter.SetFocusedTileOverlay(_cursorTile);
+            UIManager.SetFocusedWidget(this);
+            _beacons.UpdateListener(_cursorTile);
+            return true;
+        }
+
+        private bool SkipMove(int xDelta, int yDelta)
+        {
+            HydrateBookmarks();
+            TileSkipResult result = TileSkipNavigator.FindTarget(
+                _cursorTile,
+                point => new Vector2Int(point.x + xDelta, point.y + yDelta),
+                point => _adapter != null && _adapter.IsValidMapTile(point),
+                point => AdventureTileSkipSignature.FromTile(_adapter.GetTile(point), HasBookmark(point)));
+            if (result.Target == _cursorTile)
+            {
+                return true;
+            }
+
+            SpeakSkipped(result.SkippedCount);
+            _cursorTile = result.Target;
             _adapter.EnsureTileInView(_cursorTile);
             _adapter.SetFocusedTileOverlay(_cursorTile);
             UIManager.SetFocusedWidget(this);
@@ -412,6 +458,32 @@ namespace SongsOfConquestAccess.UI
 
             _scanner.Output(result);
             return true;
+        }
+
+        private bool HasBookmark(Vector2Int point)
+        {
+            Vector2Int bookmark;
+            for (int i = 0; i < AdventureBookmarkSlots.All.Length; i++)
+            {
+                if (_bookmarks.TryGet(AdventureBookmarkSlots.All[i], out bookmark) && bookmark == point)
+                {
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
+        private static void SpeakSkipped(int skippedCount)
+        {
+            if (skippedCount <= 0)
+            {
+                return;
+            }
+
+            SpeechPipeline.Output(new SpeechRequest(
+                ModText.Plural(ModStrings.Spatial.SkippedTileCount, skippedCount, skippedCount),
+                interrupt: false));
         }
 
         private static bool IsScannerAction(string actionKey)

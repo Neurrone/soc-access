@@ -112,6 +112,18 @@ namespace SongsOfConquestAccess.Input
         public static readonly InputAction MapMoveEast = OneShot("map_move_east", ModStrings.Actions.MapMoveEast, InputClaimScope.Screen)
             .AddBinding(new KeyboardBinding(Key.RightArrow));
 
+        public static readonly InputAction MapSkipNorth = OneShot("map_skip_north", ModStrings.Actions.MapMoveNorth, InputClaimScope.Screen)
+            .AddBinding(new KeyboardBinding(Key.UpArrow, shift: true));
+
+        public static readonly InputAction MapSkipSouth = OneShot("map_skip_south", ModStrings.Actions.MapMoveSouth, InputClaimScope.Screen)
+            .AddBinding(new KeyboardBinding(Key.DownArrow, shift: true));
+
+        public static readonly InputAction MapSkipWest = OneShot("map_skip_west", ModStrings.Actions.MapMoveWest, InputClaimScope.Screen)
+            .AddBinding(new KeyboardBinding(Key.LeftArrow, shift: true));
+
+        public static readonly InputAction MapSkipEast = OneShot("map_skip_east", ModStrings.Actions.MapMoveEast, InputClaimScope.Screen)
+            .AddBinding(new KeyboardBinding(Key.RightArrow, shift: true));
+
         public static readonly InputAction MapSecondaryAction = OneShot("map_secondary_action", ModStrings.Actions.MapSecondaryAction, InputClaimScope.FocusedWidget)
             .AddBinding(new KeyboardBinding(Key.Backslash));
 
@@ -221,6 +233,24 @@ namespace SongsOfConquestAccess.Input
         public static readonly InputAction HexGridSouthEast = OneShot("hex_grid_south_east", ModStrings.Actions.HexGridSouthEast, InputClaimScope.FocusedWidget)
             .AddBinding(new KeyboardBinding(Key.C));
 
+        public static readonly InputAction HexGridSkipWest = OneShot("hex_grid_skip_west", ModStrings.Actions.HexGridWest, InputClaimScope.FocusedWidget)
+            .AddBinding(new KeyboardBinding(Key.A, shift: true));
+
+        public static readonly InputAction HexGridSkipEast = OneShot("hex_grid_skip_east", ModStrings.Actions.HexGridEast, InputClaimScope.FocusedWidget)
+            .AddBinding(new KeyboardBinding(Key.D, shift: true));
+
+        public static readonly InputAction HexGridSkipNorthWest = OneShot("hex_grid_skip_north_west", ModStrings.Actions.HexGridNorthWest, InputClaimScope.FocusedWidget)
+            .AddBinding(new KeyboardBinding(Key.Q, shift: true));
+
+        public static readonly InputAction HexGridSkipNorthEast = OneShot("hex_grid_skip_north_east", ModStrings.Actions.HexGridNorthEast, InputClaimScope.FocusedWidget)
+            .AddBinding(new KeyboardBinding(Key.E, shift: true));
+
+        public static readonly InputAction HexGridSkipSouthWest = OneShot("hex_grid_skip_south_west", ModStrings.Actions.HexGridSouthWest, InputClaimScope.FocusedWidget)
+            .AddBinding(new KeyboardBinding(Key.Z, shift: true));
+
+        public static readonly InputAction HexGridSkipSouthEast = OneShot("hex_grid_skip_south_east", ModStrings.Actions.HexGridSouthEast, InputClaimScope.FocusedWidget)
+            .AddBinding(new KeyboardBinding(Key.C, shift: true));
+
         public static readonly InputAction CombatInspect = OneShot("combat_inspect", ModStrings.Actions.CombatInspect, InputClaimScope.FocusedWidget)
             .AddBinding(new KeyboardBinding(Key.I));
 
@@ -317,6 +347,10 @@ namespace SongsOfConquestAccess.Input
                 MapMoveSouth,
                 MapMoveWest,
                 MapMoveEast,
+                MapSkipNorth,
+                MapSkipSouth,
+                MapSkipWest,
+                MapSkipEast,
                 MapSecondaryAction,
                 NextWielder,
                 NextSettlement,
@@ -350,6 +384,12 @@ namespace SongsOfConquestAccess.Input
                 HexGridNorthEast,
                 HexGridSouthWest,
                 HexGridSouthEast,
+                HexGridSkipWest,
+                HexGridSkipEast,
+                HexGridSkipNorthWest,
+                HexGridSkipNorthEast,
+                HexGridSkipSouthWest,
+                HexGridSkipSouthEast,
                 CombatInspect,
                 CombatNextActingTroop,
                 CombatPreviousActingTroop,

@@ -79,6 +79,12 @@ namespace SongsOfConquestAccess.UI
                 || actionKey == AccessibilityActions.HexGridNorthEast.Key
                 || actionKey == AccessibilityActions.HexGridSouthWest.Key
                 || actionKey == AccessibilityActions.HexGridSouthEast.Key
+                || actionKey == AccessibilityActions.HexGridSkipWest.Key
+                || actionKey == AccessibilityActions.HexGridSkipEast.Key
+                || actionKey == AccessibilityActions.HexGridSkipNorthWest.Key
+                || actionKey == AccessibilityActions.HexGridSkipNorthEast.Key
+                || actionKey == AccessibilityActions.HexGridSkipSouthWest.Key
+                || actionKey == AccessibilityActions.HexGridSkipSouthEast.Key
                 || actionKey == AccessibilityActions.CombatInspect.Key
                 || (CanNavigateLocalActingTroops()
                     && (actionKey == AccessibilityActions.CombatNextActingTroop.Key
@@ -119,9 +125,19 @@ namespace SongsOfConquestAccess.UI
                 return Move(-1, 0);
             }
 
+            if (action.Key == AccessibilityActions.HexGridSkipWest.Key)
+            {
+                return SkipMove(point => new Vector2Int(point.x - 1, point.y));
+            }
+
             if (action.Key == AccessibilityActions.HexGridEast.Key)
             {
                 return Move(1, 0);
+            }
+
+            if (action.Key == AccessibilityActions.HexGridSkipEast.Key)
+            {
+                return SkipMove(point => new Vector2Int(point.x + 1, point.y));
             }
 
             if (action.Key == AccessibilityActions.HexGridNorthWest.Key)
@@ -129,9 +145,19 @@ namespace SongsOfConquestAccess.UI
                 return MoveDiagonal(north: true, east: false);
             }
 
+            if (action.Key == AccessibilityActions.HexGridSkipNorthWest.Key)
+            {
+                return SkipMove(point => GetDiagonalNeighbor(point, north: true, east: false));
+            }
+
             if (action.Key == AccessibilityActions.HexGridNorthEast.Key)
             {
                 return MoveDiagonal(north: true, east: true);
+            }
+
+            if (action.Key == AccessibilityActions.HexGridSkipNorthEast.Key)
+            {
+                return SkipMove(point => GetDiagonalNeighbor(point, north: true, east: true));
             }
 
             if (action.Key == AccessibilityActions.HexGridSouthWest.Key)
@@ -139,9 +165,19 @@ namespace SongsOfConquestAccess.UI
                 return MoveDiagonal(north: false, east: false);
             }
 
+            if (action.Key == AccessibilityActions.HexGridSkipSouthWest.Key)
+            {
+                return SkipMove(point => GetDiagonalNeighbor(point, north: false, east: false));
+            }
+
             if (action.Key == AccessibilityActions.HexGridSouthEast.Key)
             {
                 return MoveDiagonal(north: false, east: true);
+            }
+
+            if (action.Key == AccessibilityActions.HexGridSkipSouthEast.Key)
+            {
+                return SkipMove(point => GetDiagonalNeighbor(point, north: false, east: true));
             }
 
             if (action.Key == AccessibilityActions.CombatInspect.Key)
@@ -294,9 +330,41 @@ namespace SongsOfConquestAccess.UI
 
         private bool MoveDiagonal(bool north, bool east)
         {
+            return SetCursor(GetDiagonalNeighbor(_cursor, north, east));
+        }
+
+        private bool SkipMove(System.Func<Vector2Int, Vector2Int> step)
+        {
+            RefreshSnapshot();
+            TileSkipResult result = TileSkipNavigator.FindTarget(
+                _cursor,
+                step,
+                IsValidSkipTile,
+                point => CombatTileSkipSignature.FromTile(_snapshot != null ? _snapshot.Get(point) : null));
+            if (result.Target == _cursor)
+            {
+                return true;
+            }
+
+            SpeakSkipped(result.SkippedCount);
+            return SetCursor(result.Target);
+        }
+
+        private bool IsValidSkipTile(Vector2Int point)
+        {
+            if (_snapshot == null || !_snapshot.IsValidTile(point))
+            {
+                return false;
+            }
+
+            return _inspectContext == null || _inspectContext.Contains(point);
+        }
+
+        private static Vector2Int GetDiagonalNeighbor(Vector2Int point, bool north, bool east)
+        {
             int yDelta = north ? 1 : -1;
             int xDelta;
-            if ((_cursor.y & 1) == 0)
+            if ((point.y & 1) == 0)
             {
                 xDelta = east ? 0 : -1;
             }
@@ -305,7 +373,7 @@ namespace SongsOfConquestAccess.UI
                 xDelta = east ? 1 : 0;
             }
 
-            return Move(xDelta, yDelta);
+            return new Vector2Int(point.x + xDelta, point.y + yDelta);
         }
 
         private bool ReadThreat()
@@ -557,6 +625,18 @@ namespace SongsOfConquestAccess.UI
             }
 
             SpeechPipeline.Output(new SpeechRequest(ModText.Get(ModStrings.UI.Inspecting, target), interrupt: false));
+        }
+
+        private static void SpeakSkipped(int skippedCount)
+        {
+            if (skippedCount <= 0)
+            {
+                return;
+            }
+
+            SpeechPipeline.Output(new SpeechRequest(
+                ModText.Plural(ModStrings.Spatial.SkippedTileCount, skippedCount, skippedCount),
+                interrupt: false));
         }
 
         private void RefreshSnapshot()

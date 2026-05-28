@@ -29,6 +29,7 @@ Move through the hex grid with:
 - E: northeast
 - Z: southwest
 - C: southeast
+- Use with shift to move to the next interesting tile, where interesting means it differs from the current tile
 
 Use drag and drop to rearrange your troops.
 

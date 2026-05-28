@@ -2767,3 +2767,13 @@ msgstr "{0} casa: Margem da agua"
 msgctxt "Scanner.WaterEdgeTileCount_1"
 msgid "{0} water edge tiles"
 msgstr "{0} casas: Margem da agua"
+
+#. Spatial.SkippedTileCount_0
+msgctxt "Spatial.SkippedTileCount_0"
+msgid "Skipped {0} tile"
+msgstr "Pulou {0} casa"
+
+#. Spatial.SkippedTileCount_1
+msgctxt "Spatial.SkippedTileCount_1"
+msgid "Skipped {0} tiles"
+msgstr "Pulou {0} casas"

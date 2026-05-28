@@ -431,7 +431,9 @@ namespace SongsOfConquestAccess.Adapters
             tile.IsImpassable = IsImpassable(point);
             tile.IsBlocked = IsBlocked(point);
             tile.Troop = GetTroopAt(point);
+            tile.TroopId = tile.Troop != null ? tile.Troop.Id : -1;
             tile.Entity = GetAttackableEntityAt(point);
+            tile.EntityId = tile.Entity != null ? tile.Entity.Id : -1;
             AddDangerousMapEffects(point, tile);
             tile.DecorativeFeature = GetDecorativeFeatureAt(point, tile.Entity);
             return tile;
@@ -2156,6 +2158,11 @@ namespace SongsOfConquestAccess.Adapters
             {
                 tile.MapEffects.Add(name);
             }
+
+            if (!tile.DangerousMapEffectEntityIds.Contains(entity.Id))
+            {
+                tile.DangerousMapEffectEntityIds.Add(entity.Id);
+            }
         }
 
         private string GetDecorativeFeatureAt(Vector2Int point, IMapEntity attackableEntity)
@@ -3129,9 +3136,15 @@ namespace SongsOfConquestAccess.Adapters
 
         public IBattleTroopState Troop { get; set; }
 
+        public int TroopId { get; set; } = -1;
+
         public IMapEntity Entity { get; set; }
 
+        public int EntityId { get; set; } = -1;
+
         public List<string> MapEffects { get; private set; } = new List<string>();
+
+        public List<int> DangerousMapEffectEntityIds { get; private set; } = new List<int>();
 
         public string DecorativeFeature { get; set; }
     }

@@ -704,7 +704,9 @@ namespace SongsOfConquestAccess.Adapters
                     continue;
                 }
 
-                snapshot.GetOrCreate(point).EntityLabel = name;
+                TroopPlacementTile tile = snapshot.GetOrCreate(point);
+                tile.EntityId = entity.Id;
+                tile.EntityLabel = name;
             }
         }
 
@@ -1234,6 +1236,7 @@ namespace SongsOfConquestAccess.Adapters
             SpawnPointId = -1;
             GlobalSpawnPointId = -1;
             TroopId = -1;
+            EntityId = -1;
         }
 
         public Vector2Int Point { get; private set; }
@@ -1257,6 +1260,8 @@ namespace SongsOfConquestAccess.Adapters
         public bool TroopDetailsHidden { get; set; }
 
         public string TroopLabel { get; set; }
+
+        public int EntityId { get; set; }
 
         public string EntityLabel { get; set; }
     }

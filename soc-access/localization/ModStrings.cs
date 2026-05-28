@@ -134,6 +134,7 @@ namespace SongsOfConquestAccess.Localization
             public static readonly ModString Road = new ModString("Spatial.Road", "Road");
             public static readonly ModString Sand = new ModString("Spatial.Sand", "Sand");
             public static readonly ModString ShallowWater = new ModString("Spatial.ShallowWater", "Shallow water");
+            public static readonly ModPluralString SkippedTileCount = new ModPluralString("Spatial.SkippedTileCount", "Skipped {0} tile", "Skipped {0} tiles");
             public static readonly ModString SpawnPoint = new ModString("Spatial.SpawnPoint", "spawn point");
             public static readonly ModString TemperateTrees = new ModString("Spatial.TemperateTrees", "Temperate trees");
             public static readonly ModString Threatened = new ModString("Spatial.Threatened", "Threatened");

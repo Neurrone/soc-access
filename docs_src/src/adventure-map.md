@@ -6,7 +6,7 @@ The adventure map has an accessibility cursor. The mod speaks the tile under the
 
 ### Moving Around
 
-Use the arrow keys to move the map cursor.
+Use the arrow keys to move the map cursor. Use the shift+arrow keys to move to the next interesting tile, where interesting means it differs from the current tile.
 
 The mod keeps the focused tile in view and reads the tile as you move.
 

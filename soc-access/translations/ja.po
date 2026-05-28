@@ -2657,3 +2657,8 @@ msgstr "{0} tile: Kabe"
 msgctxt "Scanner.WaterEdgeTileCount_0"
 msgid "{0} water edge tile"
 msgstr "{0} tile: Mizugiwa"
+
+#. Spatial.SkippedTileCount_0
+msgctxt "Spatial.SkippedTileCount_0"
+msgid "Skipped {0} tile"
+msgstr "{0} タイルをスキップしました"

@@ -32,6 +32,8 @@ namespace SongsOfConquestAccess.Adapters
 
         public sealed class CommanderInfo
         {
+            public int Id { get; set; }
+
             public ICommanderState Raw { get; set; }
 
             public string Name { get; set; }
@@ -85,6 +87,8 @@ namespace SongsOfConquestAccess.Adapters
         public List<string> ZoneOfControlNames { get; private set; } = new List<string>();
 
         public IMapEntity MapEntity { get; set; }
+
+        public int? MapEntityId { get; set; }
 
         public string MapEntityName { get; set; }
 

@@ -2767,3 +2767,13 @@ msgstr "{0} case: Bord de eau"
 msgctxt "Scanner.WaterEdgeTileCount_1"
 msgid "{0} water edge tiles"
 msgstr "{0} cases: Bord de eau"
+
+#. Spatial.SkippedTileCount_0
+msgctxt "Spatial.SkippedTileCount_0"
+msgid "Skipped {0} tile"
+msgstr "{0} case ignorée"
+
+#. Spatial.SkippedTileCount_1
+msgctxt "Spatial.SkippedTileCount_1"
+msgid "Skipped {0} tiles"
+msgstr "{0} cases ignorées"

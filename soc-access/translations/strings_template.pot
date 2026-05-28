@@ -2574,6 +2574,21 @@ msgctxt "Draft.AvailableTroops_2"
 msgid "{0} available"
 msgstr ""
 
+#. Spatial.SkippedTileCount_0
+msgctxt "Spatial.SkippedTileCount_0"
+msgid "Skipped {0} tile"
+msgstr ""
+
+#. Spatial.SkippedTileCount_1
+msgctxt "Spatial.SkippedTileCount_1"
+msgid "Skipped {0} tiles"
+msgstr ""
+
+#. Spatial.SkippedTileCount_2
+msgctxt "Spatial.SkippedTileCount_2"
+msgid "Skipped {0} tiles"
+msgstr ""
+
 #. Combat.BoltAt_0
 msgctxt "Combat.BoltAt_0"
 msgid "{0} bolt at {1}"

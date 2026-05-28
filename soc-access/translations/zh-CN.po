@@ -2657,3 +2657,8 @@ msgstr "{0} di kuai: Qiang"
 msgctxt "Scanner.WaterEdgeTileCount_0"
 msgid "{0} water edge tile"
 msgstr "{0} di kuai: Shui bian"
+
+#. Spatial.SkippedTileCount_0
+msgctxt "Spatial.SkippedTileCount_0"
+msgid "Skipped {0} tile"
+msgstr "已跳过 {0} 个地块"

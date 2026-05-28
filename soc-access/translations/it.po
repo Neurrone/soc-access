@@ -2767,3 +2767,13 @@ msgstr "{0} casella: Riva acqua"
 msgctxt "Scanner.WaterEdgeTileCount_1"
 msgid "{0} water edge tiles"
 msgstr "{0} caselle: Riva acqua"
+
+#. Spatial.SkippedTileCount_0
+msgctxt "Spatial.SkippedTileCount_0"
+msgid "Skipped {0} tile"
+msgstr "Saltata {0} casella"
+
+#. Spatial.SkippedTileCount_1
+msgctxt "Spatial.SkippedTileCount_1"
+msgid "Skipped {0} tiles"
+msgstr "Saltate {0} caselle"
