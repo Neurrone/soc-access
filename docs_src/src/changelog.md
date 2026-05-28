@@ -6,6 +6,7 @@
 - To help with fighting enemies with the same units as you, the battle timeline now specifically indicates if something is an enemy
 - In combat, abbreviations like enemy ranged troops are only used when the group has two or more stacks
 - Pressing shift with a movement key skips to the next interesting tile in that direction
+- Fixed an edge case where cycling through your own stacks with `,` would miss some if initiative buffs cause the current stack to act sooner next round
 
 ## V0.4.1
 

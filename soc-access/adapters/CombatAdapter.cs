@@ -45,6 +45,12 @@ namespace SongsOfConquestAccess.Adapters
         Ability
     }
 
+    internal enum CombatTroopSideFilter
+    {
+        CurrentPlayer,
+        Enemy
+    }
+
     internal sealed class CombatAdapter
     {
         private static readonly PropertyInfo InstallerContainerProperty =
@@ -2624,15 +2630,15 @@ namespace SongsOfConquestAccess.Adapters
 
         public IReadOnlyList<int> GetLocalActingTroopIds()
         {
-            return GetActingTroopIds(enemy: false);
+            return GetActingTroopIds(CombatTroopSideFilter.CurrentPlayer);
         }
 
         public IReadOnlyList<int> GetEnemyActingTroopIds()
         {
-            return GetActingTroopIds(enemy: true);
+            return GetActingTroopIds(CombatTroopSideFilter.Enemy);
         }
 
-        private IReadOnlyList<int> GetActingTroopIds(bool enemy)
+        private IReadOnlyList<int> GetActingTroopIds(CombatTroopSideFilter side)
         {
             List<int> troopIds = new List<int>();
             try
@@ -2653,25 +2659,9 @@ namespace SongsOfConquestAccess.Adapters
                     return troopIds;
                 }
 
-                int currentTroopId = _facade.Queue[0].Id;
-                if (currentTroopId < 0)
-                {
-                    currentTroopId = GetCurrentTroopId();
-                }
-
-                if (currentTroopId < 0)
-                {
-                    return troopIds;
-                }
-
                 for (int i = 0; i < _facade.Queue.Count; i++)
                 {
                     QueuedTroop queuedTroop = _facade.Queue[i];
-                    if (i > 0 && queuedTroop.Id == currentTroopId)
-                    {
-                        break;
-                    }
-
                     if (queuedTroop.Id < 0)
                     {
                         continue;
@@ -2684,7 +2674,8 @@ namespace SongsOfConquestAccess.Adapters
                     }
 
                     bool isEnemy = troop.TeamId != localTeamId;
-                    if (isEnemy == enemy)
+                    bool include = side == CombatTroopSideFilter.Enemy ? isEnemy : !isEnemy;
+                    if (include && !troopIds.Contains(troop.Id))
                     {
                         troopIds.Add(troop.Id);
                     }
