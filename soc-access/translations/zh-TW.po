@@ -2777,3 +2777,28 @@ msgstr "熱門地圖，#遊戲"
 msgctxt "Screens.PlayerStatsTopWieldersAndTroops"
 msgid "Top wielder* and troops**"
 msgstr "熱門持有者*與部隊**"
+
+#. Screens.CopiedGameCodeToClipboard
+msgctxt "Screens.CopiedGameCodeToClipboard"
+msgid "Copied game code to clipboard."
+msgstr "遊戲代碼已複製到剪貼簿。"
+
+#. Screens.CopyGameCodeToClipboard
+msgctxt "Screens.CopyGameCodeToClipboard"
+msgid "Copy game code to clipboard: {0}"
+msgstr "將遊戲代碼複製到剪貼簿：{0}"
+
+#. Screens.InviteFriend
+msgctxt "Screens.InviteFriend"
+msgid "Invite friend"
+msgstr "邀請好友"
+
+#. Screens.NotReady
+msgctxt "Screens.NotReady"
+msgid "Not ready"
+msgstr "尚未準備"
+
+#. Screens.Ready
+msgctxt "Screens.Ready"
+msgid "Ready"
+msgstr "已準備"

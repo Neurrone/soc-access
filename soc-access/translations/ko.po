@@ -2777,3 +2777,28 @@ msgstr "상위 지도, #게임"
 msgctxt "Screens.PlayerStatsTopWieldersAndTroops"
 msgid "Top wielder* and troops**"
 msgstr "상위 위더* 및 병력**"
+
+#. Screens.CopiedGameCodeToClipboard
+msgctxt "Screens.CopiedGameCodeToClipboard"
+msgid "Copied game code to clipboard."
+msgstr "게임 코드가 클립보드에 복사되었습니다."
+
+#. Screens.CopyGameCodeToClipboard
+msgctxt "Screens.CopyGameCodeToClipboard"
+msgid "Copy game code to clipboard: {0}"
+msgstr "게임 코드를 클립보드에 복사: {0}"
+
+#. Screens.InviteFriend
+msgctxt "Screens.InviteFriend"
+msgid "Invite friend"
+msgstr "친구 초대"
+
+#. Screens.NotReady
+msgctxt "Screens.NotReady"
+msgid "Not ready"
+msgstr "준비 안 됨"
+
+#. Screens.Ready
+msgctxt "Screens.Ready"
+msgid "Ready"
+msgstr "준비 완료"

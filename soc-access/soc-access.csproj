@@ -88,6 +88,10 @@
       <HintPath>$(GameManagedDir)\UnityEngine.UIModule.dll</HintPath>
       <Private>false</Private>
     </Reference>
+    <Reference Include="UnityEngine.IMGUIModule">
+      <HintPath>$(GameManagedDir)\UnityEngine.IMGUIModule.dll</HintPath>
+      <Private>false</Private>
+    </Reference>
     <Reference Include="DOTween">
       <HintPath>$(GameManagedDir)\DOTween.dll</HintPath>
       <Private>false</Private>

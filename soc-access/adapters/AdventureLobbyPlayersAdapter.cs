@@ -57,6 +57,19 @@ namespace SongsOfConquestAccess.Adapters
             AccessTools.Field(typeof(LobbyMapSettings), "_mixedFactionsClientONButton");
         private static readonly FieldInfo MapSettingsMixedFactionsClientOffButtonField =
             AccessTools.Field(typeof(LobbyMapSettings), "_mixedFactionsClientOFFButton");
+        private static readonly FieldInfo MultiplayerInviteFriendButtonField =
+            AccessTools.Field(typeof(LobbyMultiplayerPanel), "_inviteFriendButton");
+        private static readonly FieldInfo MultiplayerGameCodeInputField =
+            AccessTools.Field(typeof(LobbyMultiplayerPanel), "_gameCodeInputField");
+        private static readonly FieldInfo MultiplayerGameNameLabelField =
+            AccessTools.Field(typeof(LobbyMultiplayerPanel), "_gameNameLabel");
+        private static readonly FieldInfo MultiplayerPublicGameToggleField =
+            AccessTools.Field(typeof(LobbyMultiplayerPanel), "_publicGameToggle");
+        private static readonly FieldInfo MultiplayerCrossplayToggleField =
+            AccessTools.Field(typeof(LobbyMultiplayerPanel), "_crossplayToggle");
+        private static readonly FieldInfo MultiplayerXboxCrossplayInformationField =
+            AccessTools.Field(typeof(LobbyMultiplayerPanel), "_xboxCrossplayInformation");
+
         private readonly LobbyMenu _menu;
         private readonly LobbyNavigation _navigation;
         private readonly IClientLobbyFacade _facade;
@@ -64,6 +77,7 @@ namespace SongsOfConquestAccess.Adapters
         private List<PlayerSlotItem> _playerSlots;
         private LobbyMapSettings _mapSettings;
         private LobbyMenuButtons.Settings _lobbyButtonsSettings;
+        private MultiplayerPanelItem _multiplayerPanel;
 
         public AdventureLobbyPlayersAdapter(LobbyMenu menu)
         {
@@ -91,6 +105,7 @@ namespace SongsOfConquestAccess.Adapters
             _playerSlots = null;
             _mapSettings = null;
             _lobbyButtonsSettings = null;
+            _multiplayerPanel = null;
         }
 
         public bool IsPresent()
@@ -221,6 +236,18 @@ namespace SongsOfConquestAccess.Adapters
             return settings != null ? LobbyButtonItem.ForButton(settings.StartGameButton, _localization) : null;
         }
 
+        public MultiplayerPanelItem GetMultiplayerPanel()
+        {
+            if (_multiplayerPanel != null && _multiplayerPanel.IsPresent)
+            {
+                return _multiplayerPanel;
+            }
+
+            LobbyMultiplayerPanel panel = FindMultiplayerPanel();
+            _multiplayerPanel = panel != null ? new MultiplayerPanelItem(panel, _localization) : null;
+            return _multiplayerPanel;
+        }
+
         public Tooltip GetButtonTooltip(IMenuButtonAdapter button)
         {
             return button != null ? Tooltip.ForComponent(button.Button as Component, _localization) : null;
@@ -272,6 +299,35 @@ namespace SongsOfConquestAccess.Adapters
                     _mapSettings = item;
                     return _mapSettings;
                 }
+            }
+
+            return null;
+        }
+
+        private LobbyMultiplayerPanel FindMultiplayerPanel()
+        {
+            GameObject menuObject = _menu != null ? ((Component)_menu).gameObject : null;
+            LobbyMultiplayerPanel[] panels = Resources.FindObjectsOfTypeAll<LobbyMultiplayerPanel>();
+            for (int i = 0; i < panels.Length; i++)
+            {
+                LobbyMultiplayerPanel panel = panels[i];
+                if (panel == null)
+                {
+                    continue;
+                }
+
+                GameObject panelObject = ((Component)panel).gameObject;
+                if (!IsLiveSceneObject(panelObject) || !panelObject.activeInHierarchy)
+                {
+                    continue;
+                }
+
+                if (menuObject != null && panelObject.scene != menuObject.scene)
+                {
+                    continue;
+                }
+
+                return panel;
             }
 
             return null;
@@ -515,6 +571,7 @@ namespace SongsOfConquestAccess.Adapters
                 AddIfNotEmpty(parts, GetStartingWielderLabel());
                 AddIfNotEmpty(parts, ModText.Get(ModStrings.Screens.TeamValue, GetPartnershipNumber()));
                 AddIfNotEmpty(parts, GetAiDifficultyLabel());
+                AddIfNotEmpty(parts, GetReadyStatusLabel());
                 return ModText.JoinListWithCommas(parts);
             }
 
@@ -527,6 +584,19 @@ namespace SongsOfConquestAccess.Adapters
                         && ((team.AiMode != AiMode.Off)
                             || (_adapter != null && _adapter._facade != null && _adapter._facade.HasClient(team.Id)));
                 }
+            }
+
+            private string GetReadyStatusLabel()
+            {
+                ILobbyTeamState team = _entry != null ? _entry.LobbyTeamState : null;
+                if (team == null || _adapter == null || _adapter.GetMultiplayerPanel() == null)
+                {
+                    return string.Empty;
+                }
+
+                return team.IsReadyToStart
+                    ? ModText.Get(ModStrings.Screens.Ready)
+                    : ModText.Get(ModStrings.Screens.NotReady);
             }
 
             private string GetName()
@@ -723,6 +793,182 @@ namespace SongsOfConquestAccess.Adapters
             }
         }
 
+        internal sealed class MultiplayerPanelItem
+        {
+            private readonly LobbyMultiplayerPanel _panel;
+            private readonly ILocalizationHandler _localization;
+
+            public MultiplayerPanelItem(LobbyMultiplayerPanel panel, ILocalizationHandler localization)
+            {
+                _panel = panel;
+                _localization = localization;
+            }
+
+            public object SourceKey
+            {
+                get { return _panel; }
+            }
+
+            public bool IsPresent
+            {
+                get
+                {
+                    GameObject gameObject = _panel != null ? ((Component)_panel).gameObject : null;
+                    return IsLiveSceneObject(gameObject) && gameObject.activeInHierarchy;
+                }
+            }
+
+            public string GameName
+            {
+                get { return GetText(GetField<UITextMesh>(MultiplayerGameNameLabelField)); }
+            }
+
+            public bool IsGameNameVisible
+            {
+                get { return IsVisible(GetField<Component>(MultiplayerGameNameLabelField)) && !string.IsNullOrWhiteSpace(GameName); }
+            }
+
+            public string GameCode
+            {
+                get
+                {
+                    UITextMeshInputField field = GetField<UITextMeshInputField>(MultiplayerGameCodeInputField);
+                    return field != null ? field.InputFieldValue : string.Empty;
+                }
+            }
+
+            public bool IsGameCodeVisible
+            {
+                get { return IsVisible(GetField<Component>(MultiplayerGameCodeInputField)) && !string.IsNullOrWhiteSpace(GameCode); }
+            }
+
+            public string CopyGameCodeLabel
+            {
+                get { return ModText.Get(ModStrings.Screens.CopyGameCodeToClipboard, GameCode); }
+            }
+
+            public bool CopyGameCodeToClipboard()
+            {
+                string code = GameCode;
+                if (string.IsNullOrWhiteSpace(code))
+                {
+                    return false;
+                }
+
+                GUIUtility.systemCopyBuffer = code;
+                SpeechPipeline.Output(new SpeechRequest(ModText.Get(ModStrings.Screens.CopiedGameCodeToClipboard), interrupt: false));
+                return true;
+            }
+
+            public void FocusGameCode()
+            {
+                UITextMeshInputField field = GetField<UITextMeshInputField>(MultiplayerGameCodeInputField);
+                NativeSelectionUtility.Select(field != null ? field.GetSelectable() : null);
+            }
+
+            public Tooltip GameCodeTooltip
+            {
+                get { return Tooltip.ForComponent(GetField<Component>(MultiplayerGameCodeInputField), _localization); }
+            }
+
+            public ToggleItem InvitesOnly
+            {
+                get
+                {
+                    UIToggle toggle = GetField<UIToggle>(MultiplayerPublicGameToggleField);
+                    return toggle != null ? new ToggleItem(toggle, _localization) : null;
+                }
+            }
+
+            public LobbyButtonItem InviteFriendButton
+            {
+                get { return LobbyButtonItem.ForButton(GetField<UIButton>(MultiplayerInviteFriendButtonField), _localization); }
+            }
+
+            public ToggleItem Crossplay
+            {
+                get
+                {
+                    UIToggle toggle = GetField<UIToggle>(MultiplayerCrossplayToggleField);
+                    return toggle != null ? new ToggleItem(toggle, _localization) : null;
+                }
+            }
+
+            public string XboxCrossplayInformation
+            {
+                get { return GetText(GetField<UITextMesh>(MultiplayerXboxCrossplayInformationField)); }
+            }
+
+            public bool IsXboxCrossplayInformationVisible
+            {
+                get
+                {
+                    return IsVisible(GetField<Component>(MultiplayerXboxCrossplayInformationField))
+                        && !string.IsNullOrWhiteSpace(XboxCrossplayInformation);
+                }
+            }
+
+            private T GetField<T>(FieldInfo field) where T : class
+            {
+                return _panel != null && field != null ? field.GetValue(_panel) as T : null;
+            }
+
+            private static string GetText(IUITextMesh textMesh)
+            {
+                return SpeechTextSanitizer.Normalize(UITextMeshTextUtility.GetEffectiveText(textMesh));
+            }
+        }
+
+        internal sealed class ToggleItem
+        {
+            private readonly UIToggle _toggle;
+            private readonly ILocalizationHandler _localization;
+
+            public ToggleItem(UIToggle toggle, ILocalizationHandler localization)
+            {
+                _toggle = toggle;
+                _localization = localization;
+            }
+
+            public bool IsVisible
+            {
+                get { return IsVisibleComponent(_toggle as Component); }
+            }
+
+            public bool IsEnabled
+            {
+                get { return _toggle != null && _toggle.Interactable; }
+            }
+
+            public bool IsChecked
+            {
+                get { return _toggle != null && _toggle.ToggleValue; }
+            }
+
+            public string Label
+            {
+                get { return SpeechTextSanitizer.Normalize(_toggle != null ? _toggle.Text : string.Empty); }
+            }
+
+            public Tooltip Tooltip
+            {
+                get { return Tooltip.ForComponent(_toggle as Component, _localization); }
+            }
+
+            public void Focus()
+            {
+                NativeSelectionUtility.Select(_toggle != null ? _toggle.GetSelectable() : null);
+            }
+
+            public void Toggle()
+            {
+                if (_toggle != null && _toggle.Interactable)
+                {
+                    _toggle.ToggleValue = !_toggle.ToggleValue;
+                }
+            }
+        }
+
         internal sealed class LobbyButtonItem
         {
             private readonly UIButton _button;
@@ -907,6 +1153,18 @@ namespace SongsOfConquestAccess.Adapters
                     _toggle.ToggleValue = !_toggle.ToggleValue;
                 }
             }
+        }
+
+        private static bool IsVisible(Component component)
+        {
+            return IsVisibleComponent(component);
+        }
+
+        private static bool IsVisibleComponent(Component component)
+        {
+            return component != null
+                && component.gameObject != null
+                && component.gameObject.activeInHierarchy;
         }
     }
 }

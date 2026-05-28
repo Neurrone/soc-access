@@ -2892,3 +2892,28 @@ msgstr "Top-Karten, #Spiele"
 msgctxt "Screens.PlayerStatsTopWieldersAndTroops"
 msgid "Top wielder* and troops**"
 msgstr "Top-Träger* und Truppen**"
+
+#. Screens.CopiedGameCodeToClipboard
+msgctxt "Screens.CopiedGameCodeToClipboard"
+msgid "Copied game code to clipboard."
+msgstr "Spielcode in die Zwischenablage kopiert."
+
+#. Screens.CopyGameCodeToClipboard
+msgctxt "Screens.CopyGameCodeToClipboard"
+msgid "Copy game code to clipboard: {0}"
+msgstr "Spielcode in die Zwischenablage kopieren: {0}"
+
+#. Screens.InviteFriend
+msgctxt "Screens.InviteFriend"
+msgid "Invite friend"
+msgstr "Freund einladen"
+
+#. Screens.NotReady
+msgctxt "Screens.NotReady"
+msgid "Not ready"
+msgstr "Nicht bereit"
+
+#. Screens.Ready
+msgctxt "Screens.Ready"
+msgid "Ready"
+msgstr "Bereit"

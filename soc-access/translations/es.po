@@ -2892,3 +2892,28 @@ msgstr "Mapas principales, #partidas"
 msgctxt "Screens.PlayerStatsTopWieldersAndTroops"
 msgid "Top wielder* and troops**"
 msgstr "Principales portadores* y tropas**"
+
+#. Screens.CopiedGameCodeToClipboard
+msgctxt "Screens.CopiedGameCodeToClipboard"
+msgid "Copied game code to clipboard."
+msgstr "Código de partida copiado al portapapeles."
+
+#. Screens.CopyGameCodeToClipboard
+msgctxt "Screens.CopyGameCodeToClipboard"
+msgid "Copy game code to clipboard: {0}"
+msgstr "Copiar código de partida al portapapeles: {0}"
+
+#. Screens.InviteFriend
+msgctxt "Screens.InviteFriend"
+msgid "Invite friend"
+msgstr "Invitar amigo"
+
+#. Screens.NotReady
+msgctxt "Screens.NotReady"
+msgid "Not ready"
+msgstr "No listo"
+
+#. Screens.Ready
+msgctxt "Screens.Ready"
+msgid "Ready"
+msgstr "Listo"

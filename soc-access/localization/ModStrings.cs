@@ -421,6 +421,8 @@ namespace SongsOfConquestAccess.Localization
             public static readonly ModString Choices = new ModString("Screens.Choices", "Choices");
             public static readonly ModString Close = new ModString("Screens.Close", "Close");
             public static readonly ModString CampaignMissionProgress = new ModString("Screens.CampaignMissionProgress", "Completed: {0} / {1} missions");
+            public static readonly ModString CopiedGameCodeToClipboard = new ModString("Screens.CopiedGameCodeToClipboard", "Copied game code to clipboard.");
+            public static readonly ModString CopyGameCodeToClipboard = new ModString("Screens.CopyGameCodeToClipboard", "Copy game code to clipboard: {0}");
             public static readonly ModString Combat = new ModString("Screens.Combat", "Combat");
             public static readonly ModString CreationSpells = new ModString("Screens.CreationSpells", "Creation spells");
             public static readonly ModString CancelAbility = new ModString("Screens.CancelAbility", "Cancel ability");
@@ -440,6 +442,7 @@ namespace SongsOfConquestAccess.Localization
             public static readonly ModString EjectWielder = new ModString("Screens.EjectWielder", "Eject wielder");
             public static readonly ModString GraphType = new ModString("Screens.GraphType", "Graph type");
             public static readonly ModString Group = new ModString("Screens.Group", "Group {0}");
+            public static readonly ModString InviteFriend = new ModString("Screens.InviteFriend", "Invite friend");
             public static readonly ModString Layout = new ModString("Screens.Layout", "Layout");
             public static readonly ModString LevelValue = new ModString("Screens.LevelValue", "level {0}");
             public static readonly ModString MainMenu = new ModString("Screens.MainMenu", "Main menu");
@@ -459,6 +462,7 @@ namespace SongsOfConquestAccess.Localization
             public static readonly ModString Opponent = new ModString("Screens.Opponent", "Opponent");
             public static readonly ModString Next = new ModString("Screens.Next", "Next");
             public static readonly ModString None = new ModString("Screens.None", "None");
+            public static readonly ModString NotReady = new ModString("Screens.NotReady", "Not ready");
             public static readonly ModString Notifications = new ModString("Screens.Notifications", "Notifications");
             public static readonly ModString Objectives = new ModString("Screens.Objectives", "Objectives");
             public static readonly ModString ObjectiveMarkerFarAway = new ModString("Screens.ObjectiveMarkerFarAway", "far away");
@@ -480,6 +484,7 @@ namespace SongsOfConquestAccess.Localization
             public static readonly ModString Penalties = new ModString("Screens.Penalties", "Penalties");
             public static readonly ModString Previous = new ModString("Screens.Previous", "Previous");
             public static readonly ModString Quickbar = new ModString("Screens.Quickbar", "Quickbar");
+            public static readonly ModString Ready = new ModString("Screens.Ready", "Ready");
             public static readonly ModString ReadEnemyInfluence = new ModString("Screens.ReadEnemyInfluence", "Read attack, deadly and movement range for enemies on tiles in combat");
             public static readonly ModString ReadStoryCameraFocusChanges = new ModString("Screens.ReadStoryCameraFocusChanges", "Read story camera focus change events");
             public static readonly ModString RecruitFrom = new ModString("Screens.RecruitFrom", "Recruit from");

@@ -46,6 +46,31 @@ namespace SongsOfConquestAccess
             SocAccessPlugin.Instance?.ScreenDetector?.OnAdventureLobbyPlayersChanged();
         }
 
+        [HarmonyPatch(typeof(LobbyMultiplayerPanel), "Refresh")]
+        [HarmonyPostfix]
+        private static void LobbyMultiplayerPanelRefreshPostfix()
+        {
+            SocAccessPlugin.Instance?.ScreenDetector?.OnAdventureLobbyPlayersChanged();
+        }
+
+        [HarmonyPatch(typeof(LobbyMultiplayerPanel), "HandleInviteFriendButtonClicked")]
+        [HarmonyPostfix]
+        private static void LobbyMultiplayerPanelInviteFriendPostfix(LobbyMultiplayerPanel __instance)
+        {
+            SocAccessPlugin plugin = SocAccessPlugin.Instance;
+            if (plugin != null)
+            {
+                plugin.StartCoroutine(WaitForInviteProvidersReady(__instance));
+            }
+        }
+
+        [HarmonyPatch(typeof(LobbyMultiplayerPanel), "HandleCancelInvitePopup")]
+        [HarmonyPostfix]
+        private static void LobbyMultiplayerPanelCancelInvitePostfix(LobbyMultiplayerPanel __instance)
+        {
+            SocAccessPlugin.Instance?.ScreenDetector?.OnAdventureLobbyInviteProvidersClosed(__instance);
+        }
+
         private static IEnumerator WaitForLobbyPlayersReady(LobbyMenu menu)
         {
             float deadline = Time.realtimeSinceStartup + 5f;
@@ -59,6 +84,17 @@ namespace SongsOfConquestAccess
                 }
 
                 yield return null;
+            }
+        }
+
+        private static IEnumerator WaitForInviteProvidersReady(LobbyMultiplayerPanel panel)
+        {
+            yield return null;
+
+            AdventureLobbyInviteProvidersAdapter adapter = new AdventureLobbyInviteProvidersAdapter(panel);
+            if (adapter.IsPresent())
+            {
+                SocAccessPlugin.Instance?.ScreenDetector?.OnAdventureLobbyInviteProvidersReady(panel);
             }
         }
     }

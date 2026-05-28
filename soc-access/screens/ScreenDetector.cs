@@ -54,6 +54,7 @@ namespace SongsOfConquestAccess.Screens
                 AdventureLobbyGameSettingsScreen.TryBuildActiveScreen,
                 AdventureLobbyPlayerSettingsScreen.TryBuildActiveScreen,
                 AdventureLobbyIconDropdownScreen.TryBuildActiveScreen,
+                AdventureLobbyInviteProvidersScreen.TryBuildActiveScreen,
                 PlatformUserMenuScreen.TryBuildActiveScreen,
                 CampaignMapSelectScreen.TryBuildActiveScreen,
                 AdventureMapScreen.TryBuildActiveScreen,
@@ -1012,8 +1013,47 @@ namespace SongsOfConquestAccess.Screens
             CompleteDeferredAdventureLobbyDropdownClose();
         }
 
+        public void OnAdventureLobbyInviteProvidersReady(LobbyMultiplayerPanel panel)
+        {
+            AdventureLobbyInviteProvidersAdapter adapter = new AdventureLobbyInviteProvidersAdapter(panel);
+            if (!adapter.IsPresent())
+            {
+                return;
+            }
+
+            AdventureLobbyInviteProvidersScreen screen = new AdventureLobbyInviteProvidersScreen(adapter);
+            AdventureLobbyInviteProvidersScreen current = _screenManager.CurrentScreen as AdventureLobbyInviteProvidersScreen;
+            if (current != null && current.Matches(panel))
+            {
+                _screenManager.RefreshTop<AdventureLobbyInviteProvidersScreen>(screen, "adventure lobby invite providers shown");
+                return;
+            }
+
+            Push(screen, "adventure lobby invite providers ready");
+        }
+
+        public void OnAdventureLobbyInviteProvidersClosed(LobbyMultiplayerPanel panel)
+        {
+            AdventureLobbyInviteProvidersScreen current = _screenManager.CurrentScreen as AdventureLobbyInviteProvidersScreen;
+            if (current != null && (panel == null || current.Matches(panel)))
+            {
+                _screenManager.Pop<AdventureLobbyInviteProvidersScreen>("adventure lobby invite providers closed");
+                return;
+            }
+
+            if (_screenManager.Contains<AdventureLobbyInviteProvidersScreen>())
+            {
+                _screenManager.Remove<AdventureLobbyInviteProvidersScreen>("adventure lobby invite providers closed");
+            }
+        }
+
         public void OnAdventureLobbyPlayersClosed(LobbyMenu menu)
         {
+            if (_screenManager.Contains<AdventureLobbyInviteProvidersScreen>())
+            {
+                _screenManager.Remove<AdventureLobbyInviteProvidersScreen>("adventure lobby players closed");
+            }
+
             if (_screenManager.Contains<AdventureLobbyGameSettingsScreen>())
             {
                 _screenManager.Remove<AdventureLobbyGameSettingsScreen>("adventure lobby players closed");
@@ -1277,6 +1317,11 @@ namespace SongsOfConquestAccess.Screens
             if (loadedScene != MainMenuSceneType.AdventureLobby && _screenManager.Contains<AdventureLobbyIconDropdownScreen>())
             {
                 _screenManager.Remove<AdventureLobbyIconDropdownScreen>("main menu scene changed away from adventure lobby");
+            }
+
+            if (loadedScene != MainMenuSceneType.AdventureLobby && _screenManager.Contains<AdventureLobbyInviteProvidersScreen>())
+            {
+                _screenManager.Remove<AdventureLobbyInviteProvidersScreen>("main menu scene changed away from adventure lobby");
             }
 
             if (loadedScene != MainMenuSceneType.AdventureLobby && _screenManager.Contains<AdventureLobbyGameSettingsScreen>())

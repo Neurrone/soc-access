@@ -102,6 +102,8 @@ namespace SongsOfConquestAccess.Screens
                 includeParentLabelInAnnouncement: false,
                 isVisible: () => !string.IsNullOrWhiteSpace(adapter.MapSummary)));
 
+            AddMultiplayerPanel(root, adapter);
+
             MenuWidget slots = BuildPlayerSlotsMenu(adapter);
             if (focusedSlotIndex >= 0)
             {
@@ -130,6 +132,42 @@ namespace SongsOfConquestAccess.Screens
             AddOptionalButton(root, "options", adapter.OptionsButton, adapter);
             AddOptionalButton(root, "back", adapter.BackButton, adapter);
             return root;
+        }
+
+        private static void AddMultiplayerPanel(ContainerWidget root, AdventureLobbyPlayersAdapter adapter)
+        {
+            AdventureLobbyPlayersAdapter.MultiplayerPanelItem panel = adapter != null ? adapter.GetMultiplayerPanel() : null;
+            if (panel == null)
+            {
+                return;
+            }
+
+            root.AddChild(new TextWidget(
+                "multiplayer-game-name",
+                () => panel.GameName,
+                adapter.HideNativeTooltip,
+                includeParentLabelInAnnouncement: false,
+                isVisible: () => panel.IsGameNameVisible));
+
+            root.AddChild(new ButtonWidget(
+                "copy-game-code",
+                () => panel.CopyGameCodeLabel,
+                panel.CopyGameCodeToClipboard,
+                panel.FocusGameCode,
+                () => panel.IsGameCodeVisible,
+                () => panel.IsGameCodeVisible,
+                () => panel.GameCodeTooltip));
+
+            AddToggle(root, "invites-only", panel.InvitesOnly);
+            AddLobbyButton(root, "invite-friend", panel.InviteFriendButton);
+            AddToggle(root, "crossplay", panel.Crossplay);
+
+            root.AddChild(new TextWidget(
+                "xbox-crossplay-information",
+                () => panel.XboxCrossplayInformation,
+                adapter.HideNativeTooltip,
+                includeParentLabelInAnnouncement: false,
+                isVisible: () => panel.IsXboxCrossplayInformationVisible));
         }
 
         private static MenuWidget BuildPlayerSlotsMenu(AdventureLobbyPlayersAdapter adapter)
@@ -254,6 +292,23 @@ namespace SongsOfConquestAccess.Screens
                 item.Focus,
                 () => item.IsEnabled,
                 () => item.IsVisible,
+                () => item.Tooltip));
+        }
+
+        private static void AddToggle(ContainerWidget root, string id, AdventureLobbyPlayersAdapter.ToggleItem item)
+        {
+            if (item == null)
+            {
+                return;
+            }
+
+            root.AddChild(new CheckboxWidget(
+                id,
+                () => item.Label,
+                item.Toggle,
+                () => item.IsChecked,
+                () => item.IsVisible,
+                () => item.IsEnabled,
                 () => item.Tooltip));
         }
 

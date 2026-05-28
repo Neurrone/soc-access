@@ -1869,6 +1869,16 @@ msgctxt "Screens.CampaignMissionProgress"
 msgid "Completed: {0} / {1} missions"
 msgstr ""
 
+#. Screens.CopiedGameCodeToClipboard
+msgctxt "Screens.CopiedGameCodeToClipboard"
+msgid "Copied game code to clipboard."
+msgstr ""
+
+#. Screens.CopyGameCodeToClipboard
+msgctxt "Screens.CopyGameCodeToClipboard"
+msgid "Copy game code to clipboard: {0}"
+msgstr ""
+
 #. Screens.Combat
 msgctxt "Screens.Combat"
 msgid "Combat"
@@ -1964,6 +1974,11 @@ msgctxt "Screens.Group"
 msgid "Group {0}"
 msgstr ""
 
+#. Screens.InviteFriend
+msgctxt "Screens.InviteFriend"
+msgid "Invite friend"
+msgstr ""
+
 #. Screens.Layout
 msgctxt "Screens.Layout"
 msgid "Layout"
@@ -2057,6 +2072,11 @@ msgstr ""
 #. Screens.None
 msgctxt "Screens.None"
 msgid "None"
+msgstr ""
+
+#. Screens.NotReady
+msgctxt "Screens.NotReady"
+msgid "Not ready"
 msgstr ""
 
 #. Screens.Notifications
@@ -2162,6 +2182,11 @@ msgstr ""
 #. Screens.Quickbar
 msgctxt "Screens.Quickbar"
 msgid "Quickbar"
+msgstr ""
+
+#. Screens.Ready
+msgctxt "Screens.Ready"
+msgid "Ready"
 msgstr ""
 
 #. Screens.ReadEnemyInfluence
