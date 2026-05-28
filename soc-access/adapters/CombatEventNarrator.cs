@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using Lavapotion.Networking;
 using Lavapotion.Pathfinding;
@@ -27,6 +28,7 @@ namespace SongsOfConquestAccess.Adapters
     {
         private const int BacteriaDiagnosticLogLimit = 200;
         private const int MapEntityCreationNarrationDiagnosticLogLimit = 100;
+        private const int CombatNarrationTimingDiagnosticLogLimit = 400;
         private const int CombatNarrationBatchFrames = 5;
 
         private static readonly CombatNarrationPlanner Planner = new CombatNarrationPlanner();
@@ -36,6 +38,11 @@ namespace SongsOfConquestAccess.Adapters
         private static CombatAdapter _activeAdapter;
         private static int _bacteriaDiagnosticLogCount;
         private static int _mapEntityCreationNarrationDiagnosticLogCount;
+        private static int _combatNarrationTimingDiagnosticLogCount;
+        private static int _lastCombatNarrationTimingDiagnosticFrame = -1;
+        private static float _lastCombatNarrationTimingDiagnosticTime = -1f;
+        private static int _flushScheduledFrame = -1;
+        private static float _flushScheduledTime = -1f;
         private static bool _wielderEssenceCaptureActive;
         private static readonly Dictionary<int, WielderEssenceGeneration> CapturedWielderEssence =
             new Dictionary<int, WielderEssenceGeneration>();
@@ -55,6 +62,7 @@ namespace SongsOfConquestAccess.Adapters
 
             try
             {
+                LogCombatNarrationTimingDiagnostic("response", DescribeResponse(response));
                 EnqueueResponse(response, adapter);
                 ScheduleFlushPendingEvents();
             }
@@ -110,6 +118,11 @@ namespace SongsOfConquestAccess.Adapters
             _activeAdapter = null;
             _bacteriaDiagnosticLogCount = 0;
             _mapEntityCreationNarrationDiagnosticLogCount = 0;
+            _combatNarrationTimingDiagnosticLogCount = 0;
+            _lastCombatNarrationTimingDiagnosticFrame = -1;
+            _lastCombatNarrationTimingDiagnosticTime = -1f;
+            _flushScheduledFrame = -1;
+            _flushScheduledTime = -1f;
             _wielderEssenceCaptureActive = false;
             CapturedWielderEssence.Clear();
         }
@@ -783,17 +796,22 @@ namespace SongsOfConquestAccess.Adapters
         {
             if (_flushPendingEventsScheduled)
             {
+                LogCombatNarrationTimingDiagnostic("flush_already_scheduled", "waitFrames=" + CombatNarrationBatchFrames);
                 return;
             }
 
             SocAccessPlugin plugin = SocAccessPlugin.Instance;
             if (plugin == null)
             {
+                LogCombatNarrationTimingDiagnostic("flush_immediate_no_plugin", null);
                 FlushPendingEvents();
                 return;
             }
 
             _flushPendingEventsScheduled = true;
+            _flushScheduledFrame = Time.frameCount;
+            _flushScheduledTime = Time.realtimeSinceStartup;
+            LogCombatNarrationTimingDiagnostic("flush_scheduled", "waitFrames=" + CombatNarrationBatchFrames);
             plugin.StartCoroutine(FlushPendingEventsAfterResponseBatch());
         }
 
@@ -804,6 +822,11 @@ namespace SongsOfConquestAccess.Adapters
                 yield return null;
             }
 
+            LogCombatNarrationTimingDiagnostic(
+                "flush_wait_complete",
+                "scheduledFrame=" + _flushScheduledFrame
+                + ", elapsedFrames=" + GetElapsedScheduledFrames()
+                + ", elapsedSeconds=" + FormatSeconds(GetElapsedScheduledSeconds()));
             _flushPendingEventsScheduled = false;
             FlushPendingEvents();
         }
@@ -813,10 +836,13 @@ namespace SongsOfConquestAccess.Adapters
             FlushCapturedWielderEssence(GetAdapter());
             if (!Planner.HasPendingEvents)
             {
+                LogCombatNarrationTimingDiagnostic("flush_skipped_no_pending", null);
                 return;
             }
 
+            LogCombatNarrationTimingDiagnostic("flush_begin", "pending=" + Planner.PendingCount);
             IReadOnlyList<CombatNarrationItem> events = Planner.Flush();
+            LogCombatNarrationTimingDiagnostic("flush_publish_batch", "count=" + events.Count);
             for (int i = 0; i < events.Count; i++)
             {
                 CombatNarrationItem pending = events[i];
@@ -835,6 +861,7 @@ namespace SongsOfConquestAccess.Adapters
                     _currentTurnTroopId = -1;
                 }
 
+                LogCombatNarrationTimingDiagnostic("publish", "kind=" + pending.Kind);
                 PublishEvent(pending.Event);
             }
         }
@@ -1057,6 +1084,68 @@ namespace SongsOfConquestAccess.Adapters
 
             LogMapEntityCreationNarrationDiagnostic(accessibilityEvent);
             AccessibilityEventBus.Publish(accessibilityEvent);
+        }
+
+        private static void LogCombatNarrationTimingDiagnostic(string phase, string detail)
+        {
+            if (_combatNarrationTimingDiagnosticLogCount >= CombatNarrationTimingDiagnosticLogLimit)
+            {
+                return;
+            }
+
+            _combatNarrationTimingDiagnosticLogCount++;
+            int frame = Time.frameCount;
+            float time = Time.realtimeSinceStartup;
+            string frameDelta = _lastCombatNarrationTimingDiagnosticFrame >= 0
+                ? (frame - _lastCombatNarrationTimingDiagnosticFrame).ToString(CultureInfo.InvariantCulture)
+                : "n/a";
+            string secondsDelta = _lastCombatNarrationTimingDiagnosticTime >= 0f
+                ? FormatSeconds(time - _lastCombatNarrationTimingDiagnosticTime)
+                : "n/a";
+
+            SocAccessPlugin.Instance?.LogInfo(
+                "Combat narration timing: phase=" + phase
+                + ", frame=" + frame
+                + ", deltaFrames=" + frameDelta
+                + ", time=" + FormatSeconds(time)
+                + ", deltaSeconds=" + secondsDelta
+                + ", flushScheduled=" + _flushPendingEventsScheduled
+                + ", pending=" + Planner.PendingCount
+                + (string.IsNullOrWhiteSpace(detail) ? string.Empty : ", " + detail));
+
+            _lastCombatNarrationTimingDiagnosticFrame = frame;
+            _lastCombatNarrationTimingDiagnosticTime = time;
+
+            if (_combatNarrationTimingDiagnosticLogCount == CombatNarrationTimingDiagnosticLogLimit)
+            {
+                SocAccessPlugin.Instance?.LogInfo("Combat narration timing diagnostic reached log limit");
+            }
+        }
+
+        private static string DescribeResponse(ICommandResponse response)
+        {
+            if (response == null)
+            {
+                return "response=null";
+            }
+
+            Type type = response.GetType();
+            return "response=" + (type.FullName ?? type.Name);
+        }
+
+        private static int GetElapsedScheduledFrames()
+        {
+            return _flushScheduledFrame >= 0 ? Time.frameCount - _flushScheduledFrame : -1;
+        }
+
+        private static float GetElapsedScheduledSeconds()
+        {
+            return _flushScheduledTime >= 0f ? Time.realtimeSinceStartup - _flushScheduledTime : -1f;
+        }
+
+        private static string FormatSeconds(float seconds)
+        {
+            return seconds.ToString("0.000", CultureInfo.InvariantCulture);
         }
 
         private sealed class WielderEssenceGeneration

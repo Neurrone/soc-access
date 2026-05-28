@@ -71,6 +71,11 @@ namespace SongsOfConquestAccess.Events
             get { return _pendingEvents.Count > 0; }
         }
 
+        public int PendingCount
+        {
+            get { return _pendingEvents.Count; }
+        }
+
         public void Reset()
         {
             _pendingEvents.Clear();
