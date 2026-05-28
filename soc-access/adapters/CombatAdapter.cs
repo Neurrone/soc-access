@@ -2479,36 +2479,6 @@ namespace SongsOfConquestAccess.Adapters
                 : string.Empty;
         }
 
-        public string FormatCommanderEventLabel(int commanderId)
-        {
-            try
-            {
-                if (_facade == null || _facade.Commanders == null)
-                {
-                    return ModText.Get(ModStrings.Combat.Wielder);
-                }
-
-                ICommanderState commander = _facade.Commanders.Get(commanderId);
-                string name = _facade.Commanders.GetName(commanderId);
-                if (string.IsNullOrWhiteSpace(name))
-                {
-                    name = ModText.Get(ModStrings.Combat.Wielder);
-                }
-
-                int localTeamId = GetLocalTeamId();
-                if (commander != null && localTeamId >= 0 && commander.TeamId != localTeamId)
-                {
-                    return ModText.Get(ModStrings.Screens.EnemyWielder, SpeechTextSanitizer.Normalize(name));
-                }
-
-                return SpeechTextSanitizer.Normalize(name);
-            }
-            catch
-            {
-                return ModText.Get(ModStrings.Combat.Wielder);
-            }
-        }
-
         private string FormatTroopLabel(IBattleTroopState troop, int size, bool includeHealth, bool includePosition)
         {
             string name = SpeechTextSanitizer.Normalize(_facade.Troops.GetName(troop.Id, size));

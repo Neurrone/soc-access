@@ -604,14 +604,21 @@ namespace SongsOfConquestAccess.Screens
                 return string.Empty;
             }
 
+            string label;
             if (troop.HasSize)
             {
-                return troop.IsEnemy
+                label = troop.IsEnemy
                     ? ModText.Get(ModStrings.Combat.EnemyTroop, troop.Size, troop.Name)
                     : ModText.Get(ModStrings.Combat.TroopQuantity, troop.Size, troop.Name);
             }
+            else
+            {
+                label = troop.Name;
+            }
 
-            return troop.Name;
+            return troop.HasPosition
+                ? ModText.Get(ModStrings.Combat.TroopAt, label, CombatAdapter.FormatPoint(troop.Position))
+                : label;
         }
 
         private static bool ActivateQueueItem(CombatAdapter adapter, int index)

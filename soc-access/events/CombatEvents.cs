@@ -130,7 +130,7 @@ namespace SongsOfConquestAccess.Events.Combat
 
         public string Format()
         {
-            return IsEnemy ? ModText.Get(ModStrings.Screens.EnemyWielder, Name) : Name;
+            return IsEnemy ? ModText.Get(ModStrings.Combat.EnemyCommander, Name) : Name;
         }
     }
 

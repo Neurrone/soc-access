@@ -1056,11 +1056,6 @@ msgid "unknown spell"
 msgstr "unbekannter Zauber"
 
 
-#. Screens.EnemyWielder
-msgctxt "Screens.EnemyWielder"
-msgid "enemy wielder {0}"
-msgstr "gegnerischer MachttrÃ¤ger {0}"
-
 
 #. Actions.Activate
 msgctxt "Actions.Activate"
@@ -2512,6 +2507,11 @@ msgstr "alle Truppen"
 msgctxt "Combat.EnemyMeleeTroops"
 msgid "enemy melee troops"
 msgstr "feindliche Nahkampftruppen"
+
+#. Combat.EnemyCommander
+msgctxt "Combat.EnemyCommander"
+msgid "enemy {0}"
+msgstr "Feind {0}"
 
 #. Combat.EnemyRangedTroops
 msgctxt "Combat.EnemyRangedTroops"

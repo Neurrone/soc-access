@@ -1046,11 +1046,6 @@ msgid "unknown spell"
 msgstr "bilinmeyen bÃ¼yÃ¼"
 
 
-#. Screens.EnemyWielder
-msgctxt "Screens.EnemyWielder"
-msgid "enemy wielder {0}"
-msgstr "dÃ¼ÅŸman wielder {0}"
-
 
 #. Actions.Activate
 msgctxt "Actions.Activate"
@@ -2472,6 +2467,11 @@ msgstr "tum birlikler"
 msgctxt "Combat.EnemyMeleeTroops"
 msgid "enemy melee troops"
 msgstr "dusman yakin dovus birlikleri"
+
+#. Combat.EnemyCommander
+msgctxt "Combat.EnemyCommander"
+msgid "enemy {0}"
+msgstr "dusman {0}"
 
 #. Combat.EnemyRangedTroops
 msgctxt "Combat.EnemyRangedTroops"

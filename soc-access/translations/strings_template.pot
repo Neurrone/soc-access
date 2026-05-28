@@ -1134,6 +1134,11 @@ msgctxt "Combat.EnemyMeleeTroops"
 msgid "enemy melee troops"
 msgstr ""
 
+#. Combat.EnemyCommander
+msgctxt "Combat.EnemyCommander"
+msgid "enemy {0}"
+msgstr ""
+
 #. Combat.EnemyRangedTroops
 msgctxt "Combat.EnemyRangedTroops"
 msgid "enemy ranged troops"
@@ -1867,11 +1872,6 @@ msgstr ""
 #. Screens.EmptySlot
 msgctxt "Screens.EmptySlot"
 msgid "Empty, slot {0}"
-msgstr ""
-
-#. Screens.EnemyWielder
-msgctxt "Screens.EnemyWielder"
-msgid "enemy wielder {0}"
 msgstr ""
 
 #. Screens.EjectWielder

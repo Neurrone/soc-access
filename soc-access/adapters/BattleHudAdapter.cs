@@ -807,7 +807,7 @@ namespace SongsOfConquestAccess.Adapters
 
                 int localTeamId = GetLocalTeamId();
                 bool isEnemy = localTeamId >= 0 && troop.TeamId != localTeamId;
-                return new TroopInfo(name, size, troop.Stats != null, isEnemy);
+                return new TroopInfo(name, size, troop.Stats != null, isEnemy, troop.Position);
             }
             catch
             {
@@ -1306,12 +1306,14 @@ namespace SongsOfConquestAccess.Adapters
 
         internal sealed class TroopInfo
         {
-            public TroopInfo(string name, int size, bool hasSize, bool isEnemy)
+            public TroopInfo(string name, int size, bool hasSize, bool isEnemy, Vector2Int position)
             {
                 Name = name ?? string.Empty;
                 Size = size;
                 HasSize = hasSize;
                 IsEnemy = isEnemy;
+                Position = position;
+                HasPosition = true;
                 IsKnown = true;
             }
 
@@ -1324,6 +1326,8 @@ namespace SongsOfConquestAccess.Adapters
             public int Size { get; private set; }
             public bool HasSize { get; private set; }
             public bool IsEnemy { get; private set; }
+            public Vector2Int Position { get; private set; }
+            public bool HasPosition { get; private set; }
             public bool IsKnown { get; private set; }
 
             public static TroopInfo Unknown()

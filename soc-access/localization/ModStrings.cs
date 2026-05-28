@@ -265,6 +265,7 @@ namespace SongsOfConquestAccess.Localization
             public static readonly ModString Draw = new ModString("Combat.Draw", "Draw");
             public static readonly ModString Effect = new ModString("Combat.Effect", "effect");
             public static readonly ModString EnemyMeleeTroops = new ModString("Combat.EnemyMeleeTroops", "enemy melee troops");
+            public static readonly ModString EnemyCommander = new ModString("Combat.EnemyCommander", "enemy {0}");
             public static readonly ModString EnemyRangedTroops = new ModString("Combat.EnemyRangedTroops", "enemy ranged troops");
             public static readonly ModString EnemyTroop = new ModString("Combat.EnemyTroop", "{0} enemy {1}");
             public static readonly ModString EnemyTroops = new ModString("Combat.EnemyTroops", "enemy troops");
@@ -421,7 +422,6 @@ namespace SongsOfConquestAccess.Localization
             public static readonly ModString DisabledWithReason = new ModString("Screens.DisabledWithReason", "{0}. {1}");
             public static readonly ModString Empty = new ModString("Screens.Empty", "empty");
             public static readonly ModString EmptySlot = new ModString("Screens.EmptySlot", "Empty, slot {0}");
-            public static readonly ModString EnemyWielder = new ModString("Screens.EnemyWielder", "enemy wielder {0}");
             public static readonly ModString EjectWielder = new ModString("Screens.EjectWielder", "Eject wielder");
             public static readonly ModString GraphAccessibilityTodo = new ModString("Screens.GraphAccessibilityTodo", "TODO: implement accessibility for graph");
             public static readonly ModString GraphType = new ModString("Screens.GraphType", "Graph type");

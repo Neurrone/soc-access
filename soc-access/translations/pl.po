@@ -1066,11 +1066,6 @@ msgid "unknown spell"
 msgstr "nieznane zaklÄ™cie"
 
 
-#. Screens.EnemyWielder
-msgctxt "Screens.EnemyWielder"
-msgid "enemy wielder {0}"
-msgstr "wrogi bohater {0}"
-
 
 #. Actions.Activate
 msgctxt "Actions.Activate"
@@ -2552,6 +2547,11 @@ msgstr "wszystkie oddzialy"
 msgctxt "Combat.EnemyMeleeTroops"
 msgid "enemy melee troops"
 msgstr "wrogie oddzialy wrecz"
+
+#. Combat.EnemyCommander
+msgctxt "Combat.EnemyCommander"
+msgid "enemy {0}"
+msgstr "wrog {0}"
 
 #. Combat.EnemyRangedTroops
 msgctxt "Combat.EnemyRangedTroops"

@@ -3,10 +3,12 @@
 ## V0.4.2
 
 - Fix troop rewards being unselectable when your army has no slots, even after you disband a troop to make room
-- To help with fighting enemies with the same units as you, the battle timeline now specifically indicates if something is an enemy
-- In combat, abbreviations like enemy ranged troops are only used when the group has two or more stacks
 - Pressing shift with a movement key skips to the next interesting tile in that direction
 - Fixed an edge case where cycling through your own stacks with `,` would miss some if initiative buffs cause the current stack to act sooner next round
+- In combat, abbreviations like enemy ranged troops are only used when the group has two or more stacks
+- To help with fighting enemies with the same units as you, the battle timeline now specifically indicates if a troop is an enemy
+- The current troop indicator and timeline entries now include the troop's coordinates
+- When narrating enemy spellcasting, just say "Enemy" instead of "Enemy wielder"
 
 ## V0.4.1
 

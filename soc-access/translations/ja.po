@@ -1046,11 +1046,6 @@ msgid "unknown spell"
 msgstr "ä¸æ˜Žãªå‘ªæ–‡"
 
 
-#. Screens.EnemyWielder
-msgctxt "Screens.EnemyWielder"
-msgid "enemy wielder {0}"
-msgstr "æ•µã‚¦ã‚£ãƒ¼ãƒ«ãƒ€ãƒ¼ {0}"
-
 
 #. Actions.Activate
 msgctxt "Actions.Activate"
@@ -2472,6 +2467,11 @@ msgstr "全部隊"
 msgctxt "Combat.EnemyMeleeTroops"
 msgid "enemy melee troops"
 msgstr "敵近接部隊"
+
+#. Combat.EnemyCommander
+msgctxt "Combat.EnemyCommander"
+msgid "enemy {0}"
+msgstr "敵 {0}"
 
 #. Combat.EnemyRangedTroops
 msgctxt "Combat.EnemyRangedTroops"

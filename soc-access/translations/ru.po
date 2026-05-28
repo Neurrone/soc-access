@@ -1066,11 +1066,6 @@ msgid "unknown spell"
 msgstr "Ð½ÐµÐ¸Ð·Ð²ÐµÑÑ‚Ð½Ð¾Ðµ Ð·Ð°ÐºÐ»Ð¸Ð½Ð°Ð½Ð¸Ðµ"
 
 
-#. Screens.EnemyWielder
-msgctxt "Screens.EnemyWielder"
-msgid "enemy wielder {0}"
-msgstr "Ð²Ñ€Ð°Ð¶ÐµÑÐºÐ¸Ð¹ Ð³ÐµÑ€Ð¾Ð¹ {0}"
-
 
 #. Actions.Activate
 msgctxt "Actions.Activate"
@@ -2552,6 +2547,11 @@ msgstr "все отряды"
 msgctxt "Combat.EnemyMeleeTroops"
 msgid "enemy melee troops"
 msgstr "вражеские отряды ближнего боя"
+
+#. Combat.EnemyCommander
+msgctxt "Combat.EnemyCommander"
+msgid "enemy {0}"
+msgstr "враг {0}"
 
 #. Combat.EnemyRangedTroops
 msgctxt "Combat.EnemyRangedTroops"

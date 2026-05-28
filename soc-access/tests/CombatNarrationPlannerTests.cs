@@ -578,6 +578,18 @@ namespace SongsOfConquestAccess.Tests
         }
 
         [TestMethod]
+        public void SpellCastEventShortensEnemyCommanderPrefix()
+        {
+            SpellCastEvent spell = new SpellCastEvent(
+                new CommanderRef(1, 2, 1, "Merkoth"),
+                new SpellRef((SpellTypes)24, "Fireball", 1),
+                null,
+                null);
+
+            Assert.AreEqual("enemy Merkoth casts Fireball", spell.GetSpeechText());
+        }
+
+        [TestMethod]
         public void FlushSuppressesAcidCloudCreation()
         {
             for (int blueprintId = 4; blueprintId <= 6; blueprintId++)
