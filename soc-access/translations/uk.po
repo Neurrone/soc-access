@@ -740,11 +740,6 @@ msgctxt "Screens.EjectWielder"
 msgid "Eject wielder"
 msgstr "Ð’Ð¸Ð²ÐµÑÑ‚Ð¸ Ð³ÐµÑ€Ð¾Ñ"
 
-#. Screens.GraphAccessibilityTodo
-msgctxt "Screens.GraphAccessibilityTodo"
-msgid "TODO: implement accessibility for graph"
-msgstr "TODO: Ñ€ÐµÐ°Ð»Ñ–Ð·ÑƒÐ²Ð°Ñ‚Ð¸ Ð´Ð¾ÑÑ‚ÑƒÐ¿Ð½Ñ–ÑÑ‚ÑŒ Ð³Ñ€Ð°Ñ„Ñ–ÐºÐ°"
-
 #. Screens.GraphType
 msgctxt "Screens.GraphType"
 msgid "Graph type"
@@ -804,6 +799,11 @@ msgstr "{0}, Ñ€Ñ–Ð²ÐµÐ½ÑŒ {1}"
 msgctxt "Screens.NamedMenu"
 msgid "{0} menu"
 msgstr "Ð¼ÐµÐ½ÑŽ {0}"
+
+#. Screens.NamedTabs
+msgctxt "Screens.NamedTabs"
+msgid "{0} {1}"
+msgstr "{0} {1}"
 
 #. Screens.Next
 msgctxt "Screens.Next"
@@ -2892,3 +2892,118 @@ msgstr "Пропущено {0} клітинки"
 msgctxt "Spatial.SkippedTileCount_2"
 msgid "Skipped {0} tiles"
 msgstr "Пропущено {0} клітинок"
+
+#. UI.ColumnDetails
+msgctxt "UI.ColumnDetails"
+msgid "Details"
+msgstr "Подробиці"
+
+#. UI.ColumnFaction
+msgctxt "UI.ColumnFaction"
+msgid "Faction"
+msgstr "Фракція"
+
+#. UI.ColumnGames
+msgctxt "UI.ColumnGames"
+msgid "Games"
+msgstr "Ігри"
+
+#. UI.ColumnKills
+msgctxt "UI.ColumnKills"
+msgid "Kills"
+msgstr "Вбивства"
+
+#. UI.ColumnMap
+msgctxt "UI.ColumnMap"
+msgid "Map"
+msgstr "Мапа"
+
+#. UI.ColumnPlayDistribution
+msgctxt "UI.ColumnPlayDistribution"
+msgid "Play distribution"
+msgstr "Розподіл ігор"
+
+#. UI.ColumnRank
+msgctxt "UI.ColumnRank"
+msgid "Rank"
+msgstr "Ранг"
+
+#. UI.ColumnRound
+msgctxt "UI.ColumnRound"
+msgid "Round"
+msgstr "Раунд"
+
+#. UI.ColumnSpell
+msgctxt "UI.ColumnSpell"
+msgid "Spell"
+msgstr "Закляття"
+
+#. UI.ColumnTimesCast
+msgctxt "UI.ColumnTimesCast"
+msgid "Times cast"
+msgstr "Разів застосовано"
+
+#. UI.ColumnTimesRecruited
+msgctxt "UI.ColumnTimesRecruited"
+msgid "Times recruited or started with"
+msgstr "Разів найнято або почато з ним"
+
+#. UI.ColumnTimesTrained
+msgctxt "UI.ColumnTimesTrained"
+msgid "Times trained"
+msgstr "Разів навчено"
+
+#. UI.ColumnTroop
+msgctxt "UI.ColumnTroop"
+msgid "Troop"
+msgstr "Загін"
+
+#. UI.ColumnWielder
+msgctxt "UI.ColumnWielder"
+msgid "Wielder"
+msgstr "Носій"
+
+#. UI.StatusBattleLost
+msgctxt "UI.StatusBattleLost"
+msgid "battle lost"
+msgstr "битву програно"
+
+#. Screens.PlayerStats
+msgctxt "Screens.PlayerStats"
+msgid "Player stats"
+msgstr "Статистика гравця"
+
+#. Screens.PlayerStatsBattle
+msgctxt "Screens.PlayerStatsBattle"
+msgid "Conquest - Battle"
+msgstr "Завоювання - Битва"
+
+#. Screens.PlayerStatsFactionsPlayDistribution
+msgctxt "Screens.PlayerStatsFactionsPlayDistribution"
+msgid "Factions, play distribution"
+msgstr "Фракції, розподіл ігор"
+
+#. Screens.PlayerStatsGeneral
+msgctxt "Screens.PlayerStatsGeneral"
+msgid "General"
+msgstr "Загальне"
+
+#. Screens.PlayerStatsOverall
+msgctxt "Screens.PlayerStatsOverall"
+msgid "Conquest - Overall"
+msgstr "Завоювання - Загалом"
+
+#. Screens.PlayerStatsSpells
+msgctxt "Screens.PlayerStatsSpells"
+msgid "Spells"
+msgstr "Закляття"
+
+#. Screens.PlayerStatsTopMapsGames
+msgctxt "Screens.PlayerStatsTopMapsGames"
+msgid "Top maps, #games"
+msgstr "Найкращі мапи, #ігор"
+
+#. Screens.PlayerStatsTopWieldersAndTroops
+msgctxt "Screens.PlayerStatsTopWieldersAndTroops"
+msgid "Top wielder* and troops**"
+msgstr "Найкращі носії* та загони**"

@@ -1434,6 +1434,76 @@ msgctxt "UI.CharacterUnderscore"
 msgid "underscore"
 msgstr ""
 
+#. UI.ColumnDetails
+msgctxt "UI.ColumnDetails"
+msgid "Details"
+msgstr ""
+
+#. UI.ColumnFaction
+msgctxt "UI.ColumnFaction"
+msgid "Faction"
+msgstr ""
+
+#. UI.ColumnGames
+msgctxt "UI.ColumnGames"
+msgid "Games"
+msgstr ""
+
+#. UI.ColumnKills
+msgctxt "UI.ColumnKills"
+msgid "Kills"
+msgstr ""
+
+#. UI.ColumnMap
+msgctxt "UI.ColumnMap"
+msgid "Map"
+msgstr ""
+
+#. UI.ColumnPlayDistribution
+msgctxt "UI.ColumnPlayDistribution"
+msgid "Play distribution"
+msgstr ""
+
+#. UI.ColumnRank
+msgctxt "UI.ColumnRank"
+msgid "Rank"
+msgstr ""
+
+#. UI.ColumnRound
+msgctxt "UI.ColumnRound"
+msgid "Round"
+msgstr ""
+
+#. UI.ColumnSpell
+msgctxt "UI.ColumnSpell"
+msgid "Spell"
+msgstr ""
+
+#. UI.ColumnTimesCast
+msgctxt "UI.ColumnTimesCast"
+msgid "Times cast"
+msgstr ""
+
+#. UI.ColumnTimesRecruited
+msgctxt "UI.ColumnTimesRecruited"
+msgid "Times recruited or started with"
+msgstr ""
+
+#. UI.ColumnTimesTrained
+msgctxt "UI.ColumnTimesTrained"
+msgid "Times trained"
+msgstr ""
+
+#. UI.ColumnTroop
+msgctxt "UI.ColumnTroop"
+msgid "Troop"
+msgstr ""
+
+#. UI.ColumnWielder
+msgctxt "UI.ColumnWielder"
+msgid "Wielder"
+msgstr ""
+
 #. UI.CombatDisconnectedTiles
 msgctxt "UI.CombatDisconnectedTiles"
 msgid "Some shown tiles are separated. Use W and Shift W to reach all range tiles."
@@ -1647,6 +1717,11 @@ msgstr ""
 #. UI.StatusDragging
 msgctxt "UI.StatusDragging"
 msgid "dragging"
+msgstr ""
+
+#. UI.StatusBattleLost
+msgctxt "UI.StatusBattleLost"
+msgid "battle lost"
 msgstr ""
 
 #. UI.StatusMissing
@@ -1879,11 +1954,6 @@ msgctxt "Screens.EjectWielder"
 msgid "Eject wielder"
 msgstr ""
 
-#. Screens.GraphAccessibilityTodo
-msgctxt "Screens.GraphAccessibilityTodo"
-msgid "TODO: implement accessibility for graph"
-msgstr ""
-
 #. Screens.GraphType
 msgctxt "Screens.GraphType"
 msgid "Graph type"
@@ -1969,6 +2039,11 @@ msgctxt "Screens.NamedMenu"
 msgid "{0} menu"
 msgstr ""
 
+#. Screens.NamedTabs
+msgctxt "Screens.NamedTabs"
+msgid "{0} {1}"
+msgstr ""
+
 #. Screens.Opponent
 msgctxt "Screens.Opponent"
 msgid "Opponent"
@@ -2022,6 +2097,46 @@ msgstr ""
 #. Screens.Options
 msgctxt "Screens.Options"
 msgid "Options"
+msgstr ""
+
+#. Screens.PlayerStats
+msgctxt "Screens.PlayerStats"
+msgid "Player stats"
+msgstr ""
+
+#. Screens.PlayerStatsBattle
+msgctxt "Screens.PlayerStatsBattle"
+msgid "Conquest - Battle"
+msgstr ""
+
+#. Screens.PlayerStatsFactionsPlayDistribution
+msgctxt "Screens.PlayerStatsFactionsPlayDistribution"
+msgid "Factions, play distribution"
+msgstr ""
+
+#. Screens.PlayerStatsGeneral
+msgctxt "Screens.PlayerStatsGeneral"
+msgid "General"
+msgstr ""
+
+#. Screens.PlayerStatsOverall
+msgctxt "Screens.PlayerStatsOverall"
+msgid "Conquest - Overall"
+msgstr ""
+
+#. Screens.PlayerStatsSpells
+msgctxt "Screens.PlayerStatsSpells"
+msgid "Spells"
+msgstr ""
+
+#. Screens.PlayerStatsTopMapsGames
+msgctxt "Screens.PlayerStatsTopMapsGames"
+msgid "Top maps, #games"
+msgstr ""
+
+#. Screens.PlayerStatsTopWieldersAndTroops
+msgctxt "Screens.PlayerStatsTopWieldersAndTroops"
+msgid "Top wielder* and troops**"
 msgstr ""
 
 #. Screens.PostAdventureResult

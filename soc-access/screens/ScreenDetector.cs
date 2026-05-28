@@ -66,6 +66,7 @@ namespace SongsOfConquestAccess.Screens
                 SpellbookScreen.TryBuildActiveScreen,
                 PostAdventureResultScreen.TryBuildActiveScreen,
                 PostAdventureStatsScreen.TryBuildActiveScreen,
+                PlayerStatsScreen.TryBuildActiveScreen,
                 PostBattleResultScreen.TryBuildActiveScreen,
                 PreBattleMenuScreen.TryBuildActiveScreen,
                 ClaimMenuScreen.TryBuildActiveScreen,
@@ -1464,6 +1465,72 @@ namespace SongsOfConquestAccess.Screens
             if (_screenManager.CurrentScreen is PostAdventureStatsScreen)
             {
                 _screenManager.Pop<PostAdventureStatsScreen>("post adventure stats closed");
+            }
+        }
+
+        public void OnPostAdventureStatsChanged()
+        {
+            PostAdventureStatsScreen screen = _screenManager.CurrentScreen as PostAdventureStatsScreen;
+            if (screen == null)
+            {
+                return;
+            }
+
+            if (!screen.IsPresent())
+            {
+                _screenManager.Pop<PostAdventureStatsScreen>("post adventure stats no longer present");
+                return;
+            }
+
+            screen.Refresh();
+        }
+
+        public void OnPlayerStatsReady(PlayerStatsMenuNavigation menu)
+        {
+            PlayerStatsAdapter adapter = new PlayerStatsAdapter(menu);
+            if (!adapter.IsPresent())
+            {
+                return;
+            }
+
+            PlayerStatsScreen screen = new PlayerStatsScreen(adapter);
+            if (_screenManager.CurrentScreen is PlayerStatsScreen)
+            {
+                _screenManager.RefreshTop<PlayerStatsScreen>(screen, "player stats ready");
+                return;
+            }
+
+            Push(screen, "player stats ready");
+        }
+
+        public void OnPlayerStatsChanged()
+        {
+            PlayerStatsScreen screen = _screenManager.CurrentScreen as PlayerStatsScreen;
+            if (screen == null)
+            {
+                return;
+            }
+
+            if (!screen.IsPresent())
+            {
+                _screenManager.Pop<PlayerStatsScreen>("player stats no longer present");
+                return;
+            }
+
+            screen.Refresh();
+        }
+
+        public void OnPlayerStatsClosed(PlayerStatsMenuNavigation menu)
+        {
+            if (_screenManager.CurrentScreen is PlayerStatsScreen)
+            {
+                _screenManager.Pop<PlayerStatsScreen>("player stats closed");
+                return;
+            }
+
+            if (_screenManager.Contains<PlayerStatsScreen>())
+            {
+                _screenManager.Remove<PlayerStatsScreen>("player stats closed");
             }
         }
 

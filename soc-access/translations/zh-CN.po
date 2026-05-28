@@ -720,11 +720,6 @@ msgctxt "Screens.EjectWielder"
 msgid "Eject wielder"
 msgstr "ç§»å‡ºæŒæœ‰è€…"
 
-#. Screens.GraphAccessibilityTodo
-msgctxt "Screens.GraphAccessibilityTodo"
-msgid "TODO: implement accessibility for graph"
-msgstr "å¾…åŠžï¼šå®žçŽ°å›¾è¡¨æ— éšœç¢"
-
 #. Screens.GraphType
 msgctxt "Screens.GraphType"
 msgid "Graph type"
@@ -784,6 +779,11 @@ msgstr "{0}ï¼Œç­‰çº§ {1}"
 msgctxt "Screens.NamedMenu"
 msgid "{0} menu"
 msgstr "{0} èœå•"
+
+#. Screens.NamedTabs
+msgctxt "Screens.NamedTabs"
+msgid "{0} {1}"
+msgstr "{0} {1}"
 
 #. Screens.Next
 msgctxt "Screens.Next"
@@ -2662,3 +2662,118 @@ msgstr "{0} di kuai: Shui bian"
 msgctxt "Spatial.SkippedTileCount_0"
 msgid "Skipped {0} tile"
 msgstr "已跳过 {0} 个地块"
+
+#. UI.ColumnDetails
+msgctxt "UI.ColumnDetails"
+msgid "Details"
+msgstr "详情"
+
+#. UI.ColumnFaction
+msgctxt "UI.ColumnFaction"
+msgid "Faction"
+msgstr "派系"
+
+#. UI.ColumnGames
+msgctxt "UI.ColumnGames"
+msgid "Games"
+msgstr "游戏数"
+
+#. UI.ColumnKills
+msgctxt "UI.ColumnKills"
+msgid "Kills"
+msgstr "击杀"
+
+#. UI.ColumnMap
+msgctxt "UI.ColumnMap"
+msgid "Map"
+msgstr "地图"
+
+#. UI.ColumnPlayDistribution
+msgctxt "UI.ColumnPlayDistribution"
+msgid "Play distribution"
+msgstr "游玩分布"
+
+#. UI.ColumnRank
+msgctxt "UI.ColumnRank"
+msgid "Rank"
+msgstr "排名"
+
+#. UI.ColumnRound
+msgctxt "UI.ColumnRound"
+msgid "Round"
+msgstr "回合"
+
+#. UI.ColumnSpell
+msgctxt "UI.ColumnSpell"
+msgid "Spell"
+msgstr "法术"
+
+#. UI.ColumnTimesCast
+msgctxt "UI.ColumnTimesCast"
+msgid "Times cast"
+msgstr "施放次数"
+
+#. UI.ColumnTimesRecruited
+msgctxt "UI.ColumnTimesRecruited"
+msgid "Times recruited or started with"
+msgstr "招募或初始拥有次数"
+
+#. UI.ColumnTimesTrained
+msgctxt "UI.ColumnTimesTrained"
+msgid "Times trained"
+msgstr "训练次数"
+
+#. UI.ColumnTroop
+msgctxt "UI.ColumnTroop"
+msgid "Troop"
+msgstr "部队"
+
+#. UI.ColumnWielder
+msgctxt "UI.ColumnWielder"
+msgid "Wielder"
+msgstr "持有者"
+
+#. UI.StatusBattleLost
+msgctxt "UI.StatusBattleLost"
+msgid "battle lost"
+msgstr "战斗失败"
+
+#. Screens.PlayerStats
+msgctxt "Screens.PlayerStats"
+msgid "Player stats"
+msgstr "玩家统计"
+
+#. Screens.PlayerStatsBattle
+msgctxt "Screens.PlayerStatsBattle"
+msgid "Conquest - Battle"
+msgstr "征服 - 战斗"
+
+#. Screens.PlayerStatsFactionsPlayDistribution
+msgctxt "Screens.PlayerStatsFactionsPlayDistribution"
+msgid "Factions, play distribution"
+msgstr "派系，游玩分布"
+
+#. Screens.PlayerStatsGeneral
+msgctxt "Screens.PlayerStatsGeneral"
+msgid "General"
+msgstr "通用"
+
+#. Screens.PlayerStatsOverall
+msgctxt "Screens.PlayerStatsOverall"
+msgid "Conquest - Overall"
+msgstr "征服 - 总览"
+
+#. Screens.PlayerStatsSpells
+msgctxt "Screens.PlayerStatsSpells"
+msgid "Spells"
+msgstr "法术"
+
+#. Screens.PlayerStatsTopMapsGames
+msgctxt "Screens.PlayerStatsTopMapsGames"
+msgid "Top maps, #games"
+msgstr "热门地图，#游戏"
+
+#. Screens.PlayerStatsTopWieldersAndTroops
+msgctxt "Screens.PlayerStatsTopWieldersAndTroops"
+msgid "Top wielder* and troops**"
+msgstr "热门持有者*与部队**"

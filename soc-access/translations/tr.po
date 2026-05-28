@@ -720,11 +720,6 @@ msgctxt "Screens.EjectWielder"
 msgid "Eject wielder"
 msgstr "WielderÄ± Ã§Ä±kar"
 
-#. Screens.GraphAccessibilityTodo
-msgctxt "Screens.GraphAccessibilityTodo"
-msgid "TODO: implement accessibility for graph"
-msgstr "YAPILACAK: grafik iÃ§in eriÅŸilebilirlik uygula"
-
 #. Screens.GraphType
 msgctxt "Screens.GraphType"
 msgid "Graph type"
@@ -784,6 +779,11 @@ msgstr "{0}, seviye {1}"
 msgctxt "Screens.NamedMenu"
 msgid "{0} menu"
 msgstr "{0} menÃ¼sÃ¼"
+
+#. Screens.NamedTabs
+msgctxt "Screens.NamedTabs"
+msgid "{0} {1}"
+msgstr "{0} {1}"
 
 #. Screens.Next
 msgctxt "Screens.Next"
@@ -2662,3 +2662,118 @@ msgstr "{0} kare: Su kenari"
 msgctxt "Spatial.SkippedTileCount_0"
 msgid "Skipped {0} tile"
 msgstr "{0} kare atlandı"
+
+#. UI.ColumnDetails
+msgctxt "UI.ColumnDetails"
+msgid "Details"
+msgstr "Ayrıntılar"
+
+#. UI.ColumnFaction
+msgctxt "UI.ColumnFaction"
+msgid "Faction"
+msgstr "Fraksiyon"
+
+#. UI.ColumnGames
+msgctxt "UI.ColumnGames"
+msgid "Games"
+msgstr "Oyunlar"
+
+#. UI.ColumnKills
+msgctxt "UI.ColumnKills"
+msgid "Kills"
+msgstr "Öldürme"
+
+#. UI.ColumnMap
+msgctxt "UI.ColumnMap"
+msgid "Map"
+msgstr "Harita"
+
+#. UI.ColumnPlayDistribution
+msgctxt "UI.ColumnPlayDistribution"
+msgid "Play distribution"
+msgstr "Oynama dağılımı"
+
+#. UI.ColumnRank
+msgctxt "UI.ColumnRank"
+msgid "Rank"
+msgstr "Sıra"
+
+#. UI.ColumnRound
+msgctxt "UI.ColumnRound"
+msgid "Round"
+msgstr "Tur"
+
+#. UI.ColumnSpell
+msgctxt "UI.ColumnSpell"
+msgid "Spell"
+msgstr "Büyü"
+
+#. UI.ColumnTimesCast
+msgctxt "UI.ColumnTimesCast"
+msgid "Times cast"
+msgstr "Kullanım sayısı"
+
+#. UI.ColumnTimesRecruited
+msgctxt "UI.ColumnTimesRecruited"
+msgid "Times recruited or started with"
+msgstr "Toplanma veya başlangıç sayısı"
+
+#. UI.ColumnTimesTrained
+msgctxt "UI.ColumnTimesTrained"
+msgid "Times trained"
+msgstr "Eğitilme sayısı"
+
+#. UI.ColumnTroop
+msgctxt "UI.ColumnTroop"
+msgid "Troop"
+msgstr "Birlik"
+
+#. UI.ColumnWielder
+msgctxt "UI.ColumnWielder"
+msgid "Wielder"
+msgstr "Taşıyıcı"
+
+#. UI.StatusBattleLost
+msgctxt "UI.StatusBattleLost"
+msgid "battle lost"
+msgstr "savaş kaybedildi"
+
+#. Screens.PlayerStats
+msgctxt "Screens.PlayerStats"
+msgid "Player stats"
+msgstr "Oyuncu istatistikleri"
+
+#. Screens.PlayerStatsBattle
+msgctxt "Screens.PlayerStatsBattle"
+msgid "Conquest - Battle"
+msgstr "Fetih - Savaş"
+
+#. Screens.PlayerStatsFactionsPlayDistribution
+msgctxt "Screens.PlayerStatsFactionsPlayDistribution"
+msgid "Factions, play distribution"
+msgstr "Fraksiyonlar, oynama dağılımı"
+
+#. Screens.PlayerStatsGeneral
+msgctxt "Screens.PlayerStatsGeneral"
+msgid "General"
+msgstr "Genel"
+
+#. Screens.PlayerStatsOverall
+msgctxt "Screens.PlayerStatsOverall"
+msgid "Conquest - Overall"
+msgstr "Fetih - Genel"
+
+#. Screens.PlayerStatsSpells
+msgctxt "Screens.PlayerStatsSpells"
+msgid "Spells"
+msgstr "Büyüler"
+
+#. Screens.PlayerStatsTopMapsGames
+msgctxt "Screens.PlayerStatsTopMapsGames"
+msgid "Top maps, #games"
+msgstr "En iyi haritalar, #oyun"
+
+#. Screens.PlayerStatsTopWieldersAndTroops
+msgctxt "Screens.PlayerStatsTopWieldersAndTroops"
+msgid "Top wielder* and troops**"
+msgstr "En iyi taşıyıcılar* ve birlikler**"

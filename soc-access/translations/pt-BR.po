@@ -730,11 +730,6 @@ msgctxt "Screens.EjectWielder"
 msgid "Eject wielder"
 msgstr "Expulsar portador"
 
-#. Screens.GraphAccessibilityTodo
-msgctxt "Screens.GraphAccessibilityTodo"
-msgid "TODO: implement accessibility for graph"
-msgstr "TODO: implementar acessibilidade para o grÃ¡fico"
-
 #. Screens.GraphType
 msgctxt "Screens.GraphType"
 msgid "Graph type"
@@ -794,6 +789,11 @@ msgstr "{0}, nÃ­vel {1}"
 msgctxt "Screens.NamedMenu"
 msgid "{0} menu"
 msgstr "menu {0}"
+
+#. Screens.NamedTabs
+msgctxt "Screens.NamedTabs"
+msgid "{0} {1}"
+msgstr "{0} {1}"
 
 #. Screens.Next
 msgctxt "Screens.Next"
@@ -2777,3 +2777,118 @@ msgstr "Pulou {0} casa"
 msgctxt "Spatial.SkippedTileCount_1"
 msgid "Skipped {0} tiles"
 msgstr "Pulou {0} casas"
+
+#. UI.ColumnDetails
+msgctxt "UI.ColumnDetails"
+msgid "Details"
+msgstr "Detalhes"
+
+#. UI.ColumnFaction
+msgctxt "UI.ColumnFaction"
+msgid "Faction"
+msgstr "Facção"
+
+#. UI.ColumnGames
+msgctxt "UI.ColumnGames"
+msgid "Games"
+msgstr "Jogos"
+
+#. UI.ColumnKills
+msgctxt "UI.ColumnKills"
+msgid "Kills"
+msgstr "Abates"
+
+#. UI.ColumnMap
+msgctxt "UI.ColumnMap"
+msgid "Map"
+msgstr "Mapa"
+
+#. UI.ColumnPlayDistribution
+msgctxt "UI.ColumnPlayDistribution"
+msgid "Play distribution"
+msgstr "Distribuição de jogo"
+
+#. UI.ColumnRank
+msgctxt "UI.ColumnRank"
+msgid "Rank"
+msgstr "Classificação"
+
+#. UI.ColumnRound
+msgctxt "UI.ColumnRound"
+msgid "Round"
+msgstr "Rodada"
+
+#. UI.ColumnSpell
+msgctxt "UI.ColumnSpell"
+msgid "Spell"
+msgstr "Feitiço"
+
+#. UI.ColumnTimesCast
+msgctxt "UI.ColumnTimesCast"
+msgid "Times cast"
+msgstr "Vezes conjurado"
+
+#. UI.ColumnTimesRecruited
+msgctxt "UI.ColumnTimesRecruited"
+msgid "Times recruited or started with"
+msgstr "Vezes recrutado ou inicial"
+
+#. UI.ColumnTimesTrained
+msgctxt "UI.ColumnTimesTrained"
+msgid "Times trained"
+msgstr "Vezes treinado"
+
+#. UI.ColumnTroop
+msgctxt "UI.ColumnTroop"
+msgid "Troop"
+msgstr "Tropa"
+
+#. UI.ColumnWielder
+msgctxt "UI.ColumnWielder"
+msgid "Wielder"
+msgstr "Portador"
+
+#. UI.StatusBattleLost
+msgctxt "UI.StatusBattleLost"
+msgid "battle lost"
+msgstr "batalha perdida"
+
+#. Screens.PlayerStats
+msgctxt "Screens.PlayerStats"
+msgid "Player stats"
+msgstr "Estatísticas do jogador"
+
+#. Screens.PlayerStatsBattle
+msgctxt "Screens.PlayerStatsBattle"
+msgid "Conquest - Battle"
+msgstr "Conquista - Batalha"
+
+#. Screens.PlayerStatsFactionsPlayDistribution
+msgctxt "Screens.PlayerStatsFactionsPlayDistribution"
+msgid "Factions, play distribution"
+msgstr "Facções, distribuição de jogo"
+
+#. Screens.PlayerStatsGeneral
+msgctxt "Screens.PlayerStatsGeneral"
+msgid "General"
+msgstr "Geral"
+
+#. Screens.PlayerStatsOverall
+msgctxt "Screens.PlayerStatsOverall"
+msgid "Conquest - Overall"
+msgstr "Conquista - Geral"
+
+#. Screens.PlayerStatsSpells
+msgctxt "Screens.PlayerStatsSpells"
+msgid "Spells"
+msgstr "Feitiços"
+
+#. Screens.PlayerStatsTopMapsGames
+msgctxt "Screens.PlayerStatsTopMapsGames"
+msgid "Top maps, #games"
+msgstr "Mapas principais, #jogos"
+
+#. Screens.PlayerStatsTopWieldersAndTroops
+msgctxt "Screens.PlayerStatsTopWieldersAndTroops"
+msgid "Top wielder* and troops**"
+msgstr "Principais portadores* e tropas**"

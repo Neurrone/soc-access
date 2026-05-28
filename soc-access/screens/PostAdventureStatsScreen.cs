@@ -64,6 +64,18 @@ namespace SongsOfConquestAccess.Screens
             return base.OnActionJustPressed(action);
         }
 
+        public void Refresh()
+        {
+            if (!IsPresent())
+            {
+                return;
+            }
+
+            int focusedIndex = RootWidget != null ? RootWidget.FocusedIndex : -1;
+            RootWidget = BuildRoot(_adapter);
+            RootWidget?.SetFocusByIndexSilently(focusedIndex);
+        }
+
         private static PostAdventureStatsMenu GetStatsMenu(PostAdventureMenu resultMenu)
         {
             return resultMenu != null && StatsMenuField != null
@@ -101,12 +113,7 @@ namespace SongsOfConquestAccess.Screens
 
             root.AddChild(BuildGraphTypeMenu(adapter));
             root.AddChild(BuildTeamsMenu(adapter));
-
-            root.AddChild(new TextWidget(
-                "post-adventure-stats-graph-todo",
-                () => ModText.Get(ModStrings.Screens.GraphAccessibilityTodo),
-                adapter.HideNativeTooltip,
-                includeParentLabelInAnnouncement: false));
+            root.AddChild(BuildGraphTable(adapter));
 
             root.AddChild(new ButtonWidget(
                 "post-adventure-stats-close",
@@ -129,7 +136,16 @@ namespace SongsOfConquestAccess.Screens
                     option.Id,
                     () => option.Label,
                     () => adapter.SelectedGraphIndex == option.Index ? ModText.Get(ModStrings.UI.Selected) : string.Empty,
-                    () => adapter.SelectGraph(option.Index),
+                    () =>
+                    {
+                        if (!adapter.SelectGraph(option.Index))
+                        {
+                            return false;
+                        }
+
+                        SocAccessPlugin.Instance?.ScreenDetector?.OnPostAdventureStatsChanged();
+                        return true;
+                    },
                     () => adapter.FocusGraphDropdown(),
                     () => true));
             }
@@ -153,12 +169,98 @@ namespace SongsOfConquestAccess.Screens
                     team.Id,
                     () => team.Label,
                     () => adapter.IsTeamSelected(team.Entry) ? ModText.Get(ModStrings.UI.Selected) : string.Empty,
-                    () => adapter.ToggleTeam(team.Entry),
+                    () =>
+                    {
+                        if (!adapter.ToggleTeam(team.Entry))
+                        {
+                            return false;
+                        }
+
+                        SocAccessPlugin.Instance?.ScreenDetector?.OnPostAdventureStatsChanged();
+                        return true;
+                    },
                     () => adapter.FocusTeam(team.Entry),
                     () => team.Entry != null && team.Entry.gameObject != null && team.Entry.gameObject.activeInHierarchy));
             }
 
             return menu;
+        }
+
+        private static TableWidget BuildGraphTable(PostAdventureStatsAdapter adapter)
+        {
+            return new TableWidget(
+                "post-adventure-stats-graph-table",
+                adapter != null ? adapter.GraphTitle : string.Empty,
+                BuildGraphColumns(adapter),
+                BuildGraphRows(adapter));
+        }
+
+        private static IEnumerable<TableWidget.Column> BuildGraphColumns(PostAdventureStatsAdapter adapter)
+        {
+            yield return new TableWidget.Column("round", ModText.Get(ModStrings.UI.ColumnRound), null, null);
+            IReadOnlyList<PostAdventureStatsAdapter.GraphTeamColumn> teams = adapter != null
+                ? adapter.GetEnabledGraphTeams()
+                : new PostAdventureStatsAdapter.GraphTeamColumn[0];
+            for (int i = 0; i < teams.Count; i++)
+            {
+                PostAdventureStatsAdapter.GraphTeamColumn team = teams[i];
+                yield return new TableWidget.Column(team.Id, team.Label, null, null);
+            }
+        }
+
+        private static IReadOnlyList<TableWidget.Row> BuildGraphRows(PostAdventureStatsAdapter adapter)
+        {
+            List<TableWidget.Row> rows = new List<TableWidget.Row>();
+            if (adapter == null)
+            {
+                return rows;
+            }
+
+            IReadOnlyList<PostAdventureStatsAdapter.GraphTeamColumn> teams = adapter.GetEnabledGraphTeams();
+            IReadOnlyList<PostAdventureStatsAdapter.GraphRoundRow> graphRows = adapter.GetGraphRows();
+            for (int i = 0; i < graphRows.Count; i++)
+            {
+                PostAdventureStatsAdapter.GraphRoundRow graphRow = graphRows[i];
+                rows.Add(new TableWidget.Row(
+                    graphRow.Id,
+                    graphRow.Round.ToString(),
+                    columnId => GetGraphCellValue(graphRow, teams, columnId),
+                    null,
+                    adapter.HideNativeTooltip,
+                    null));
+            }
+
+            return rows;
+        }
+
+        private static string GetGraphCellValue(
+            PostAdventureStatsAdapter.GraphRoundRow row,
+            IReadOnlyList<PostAdventureStatsAdapter.GraphTeamColumn> teams,
+            string columnId)
+        {
+            if (row == null)
+            {
+                return string.Empty;
+            }
+
+            if (columnId == "round")
+            {
+                return row.Round.ToString();
+            }
+
+            if (teams != null)
+            {
+                for (int i = 0; i < teams.Count; i++)
+                {
+                    PostAdventureStatsAdapter.GraphTeamColumn team = teams[i];
+                    if (team != null && team.Id == columnId)
+                    {
+                        return row.GetValue(team.TeamId);
+                    }
+                }
+            }
+
+            return string.Empty;
         }
     }
 }

@@ -2,8 +2,13 @@ using System;
 using System.Collections.Generic;
 using System.Reflection;
 using HarmonyLib;
+using SongsOfConquest.Client.Gamestate;
 using SongsOfConquest.Client.Menu;
 using SongsOfConquest.Client.UI;
+using SongsOfConquest.Common;
+using SongsOfConquest.Common.Economy;
+using SongsOfConquest.Common.Gamestate;
+using SongsOfConquestAccess.Localization;
 using SongsOfConquestAccess.Speech;
 using TMPro;
 using UnityEngine;
@@ -20,6 +25,7 @@ namespace SongsOfConquestAccess.Adapters
         private static readonly FieldInfo TeamEntriesField = AccessTools.Field(typeof(PostAdventureStatsMenuGraphView), "_spawnedTeamEntries");
         private static readonly FieldInfo TeamNameTextField = AccessTools.Field(typeof(PostAdventureStatsMenuTeamEntry), "_teamNameText");
         private static readonly FieldInfo TeamToggleField = AccessTools.Field(typeof(PostAdventureStatsMenuTeamEntry), "_enabledToggle");
+        private static readonly FieldInfo FacadeField = AccessTools.Field(typeof(PostAdventureStatsMenuGraphView), "_facade");
 
         private readonly PostAdventureStatsMenu _menu;
 
@@ -182,7 +188,7 @@ namespace SongsOfConquestAccess.Adapters
         public string GetCloseButtonLabel()
         {
             string label = MenuButtonTextUtility.GetStandardButtonLabel(Settings != null ? Settings.CloseButton : null);
-            return !string.IsNullOrWhiteSpace(label) ? label : "Close";
+            return !string.IsNullOrWhiteSpace(label) ? label : ModText.Get(ModStrings.Screens.Close);
         }
 
         public bool IsCloseButtonEnabled()
@@ -194,6 +200,37 @@ namespace SongsOfConquestAccess.Adapters
         public bool Close()
         {
             return NativeSelectionUtility.Click(Settings != null ? Settings.CloseButton : null);
+        }
+
+        public IReadOnlyList<GraphTeamColumn> GetEnabledGraphTeams()
+        {
+            List<GraphTeamColumn> teams = new List<GraphTeamColumn>();
+            IReadOnlyList<TeamOption> options = GetTeamOptions();
+            for (int i = 0; i < options.Count; i++)
+            {
+                TeamOption option = options[i];
+                if (option == null || option.Entry == null || option.Entry.Team == null || !IsTeamSelected(option.Entry))
+                {
+                    continue;
+                }
+
+                teams.Add(new GraphTeamColumn("team-" + option.Entry.Team.Id, option.Entry.Team.Id, option.Label));
+            }
+
+            return teams.ToArray();
+        }
+
+        public IReadOnlyList<GraphRoundRow> GetGraphRows()
+        {
+            Dictionary<int, Dictionary<int, GraphPoint>> values = BuildGraphValues();
+            SortedSet<int> rounds = new SortedSet<int>(values.Keys);
+            List<GraphRoundRow> rows = new List<GraphRoundRow>();
+            foreach (int round in rounds)
+            {
+                rows.Add(new GraphRoundRow("round-" + round, round, values[round]));
+            }
+
+            return rows.ToArray();
         }
 
         public void HideNativeTooltip()
@@ -209,6 +246,11 @@ namespace SongsOfConquestAccess.Adapters
         private PostAdventureStatsMenuGraphView GraphView
         {
             get { return Settings != null ? Settings.GraphView : null; }
+        }
+
+        private IClientAdventureFacade Facade
+        {
+            get { return GetField<IClientAdventureFacade>(GraphView, FacadeField); }
         }
 
         private UITextMeshDropdown GraphDropdown
@@ -259,6 +301,119 @@ namespace SongsOfConquestAccess.Adapters
             return GetField<UIToggle>(entry, TeamToggleField);
         }
 
+        private Dictionary<int, Dictionary<int, GraphPoint>> BuildGraphValues()
+        {
+            Dictionary<int, Dictionary<int, GraphPoint>> values = new Dictionary<int, Dictionary<int, GraphPoint>>();
+            IClientAdventureFacade facade = Facade;
+            if (facade == null || facade.Teams == null)
+            {
+                return values;
+            }
+
+            PostAdventureStatsGraphType graphType = GetSelectedGraphType();
+            ITeamState[] teams = facade.Teams.All;
+            for (int i = 0; teams != null && i < teams.Length; i++)
+            {
+                ITeamState team = teams[i];
+                if (team == null || team.GetIsNeutral())
+                {
+                    continue;
+                }
+
+                TeamStatisticsRoundState[] rounds = team.Statistics != null ? team.Statistics.All : null;
+                for (int j = 0; rounds != null && j < rounds.Length; j++)
+                {
+                    TeamStatisticsRoundState round = rounds[j];
+                    if (round.Round == 0)
+                    {
+                        continue;
+                    }
+
+                    int? value = GetGraphValue(round, graphType);
+                    if (!value.HasValue)
+                    {
+                        continue;
+                    }
+
+                    Dictionary<int, GraphPoint> roundValues;
+                    if (!values.TryGetValue(round.Round, out roundValues))
+                    {
+                        roundValues = new Dictionary<int, GraphPoint>();
+                        values[round.Round] = roundValues;
+                    }
+
+                    roundValues[team.Id] = new GraphPoint(value.Value, round.LostBattles > 0);
+                }
+            }
+
+            return values;
+        }
+
+        private PostAdventureStatsGraphType GetSelectedGraphType()
+        {
+            Array values = Enum.GetValues(typeof(PostAdventureStatsGraphType));
+            int selected = SelectedGraphIndex;
+            if (selected < 0 || selected >= values.Length)
+            {
+                return PostAdventureStatsGraphType.ArmyValue;
+            }
+
+            return (PostAdventureStatsGraphType)values.GetValue(selected);
+        }
+
+        private static int? GetGraphValue(TeamStatisticsRoundState round, PostAdventureStatsGraphType graphType)
+        {
+            switch (graphType)
+            {
+                case PostAdventureStatsGraphType.ArmyValue:
+                    return round.ArmyValue;
+                case PostAdventureStatsGraphType.GoldIncome:
+                    return GetResourceAmount(round.Income, ResourceType.Gold);
+                case PostAdventureStatsGraphType.WoodIncome:
+                    return GetResourceAmount(round.Income, ResourceType.Wood);
+                case PostAdventureStatsGraphType.StoneIncome:
+                    return GetResourceAmount(round.Income, ResourceType.Stone);
+                case PostAdventureStatsGraphType.GlimmerweaveIncome:
+                    return GetResourceAmount(round.Income, ResourceType.Glimmerweave);
+                case PostAdventureStatsGraphType.CelestialOreIncome:
+                    return GetResourceAmount(round.Income, ResourceType.CelestialOre);
+                case PostAdventureStatsGraphType.AncientAmberIncome:
+                    return GetResourceAmount(round.Income, ResourceType.AncientAmber);
+                case PostAdventureStatsGraphType.CollectedGold:
+                    return GetResourceAmount(round.UnspentResources, ResourceType.Gold);
+                case PostAdventureStatsGraphType.CollectedWood:
+                    return GetResourceAmount(round.UnspentResources, ResourceType.Wood);
+                case PostAdventureStatsGraphType.CollectedStone:
+                    return GetResourceAmount(round.UnspentResources, ResourceType.Stone);
+                case PostAdventureStatsGraphType.CollectedGlimmerweave:
+                    return GetResourceAmount(round.UnspentResources, ResourceType.Glimmerweave);
+                case PostAdventureStatsGraphType.CollectedCelestialOre:
+                    return GetResourceAmount(round.UnspentResources, ResourceType.CelestialOre);
+                case PostAdventureStatsGraphType.CollectedAncientAmber:
+                    return GetResourceAmount(round.UnspentResources, ResourceType.AncientAmber);
+                default:
+                    return null;
+            }
+        }
+
+        private static int? GetResourceAmount(IEnumerable<Resource> resources, ResourceType type)
+        {
+            if (resources == null)
+            {
+                return null;
+            }
+
+            foreach (Resource resource in resources)
+            {
+                if (resource != null && resource.Type == type)
+                {
+                    return resource.Amount;
+                }
+            }
+
+            return null;
+        }
+
         private static string GetText(UITextMesh text)
         {
             return SpeechTextSanitizer.Normalize(UITextMeshTextUtility.GetEffectiveText(text));
@@ -304,6 +459,65 @@ namespace SongsOfConquestAccess.Adapters
             public PostAdventureStatsMenuTeamEntry Entry { get; private set; }
 
             public string Label { get; private set; }
+        }
+
+        internal sealed class GraphTeamColumn
+        {
+            public GraphTeamColumn(string id, int teamId, string label)
+            {
+                Id = id ?? string.Empty;
+                TeamId = teamId;
+                Label = label ?? string.Empty;
+            }
+
+            public string Id { get; private set; }
+
+            public int TeamId { get; private set; }
+
+            public string Label { get; private set; }
+        }
+
+        internal sealed class GraphRoundRow
+        {
+            private readonly Dictionary<int, GraphPoint> _values;
+
+            public GraphRoundRow(string id, int round, Dictionary<int, GraphPoint> values)
+            {
+                Id = id ?? string.Empty;
+                Round = round;
+                _values = values ?? new Dictionary<int, GraphPoint>();
+            }
+
+            public string Id { get; private set; }
+
+            public int Round { get; private set; }
+
+            public string GetValue(int teamId)
+            {
+                GraphPoint point;
+                if (!_values.TryGetValue(teamId, out point))
+                {
+                    return string.Empty;
+                }
+
+                string value = point.Value.ToString();
+                return point.BattleLost
+                    ? ModText.Get(ModStrings.UI.LabelValue, value, ModText.Get(ModStrings.UI.StatusBattleLost))
+                    : value;
+            }
+        }
+
+        internal sealed class GraphPoint
+        {
+            public GraphPoint(int value, bool battleLost)
+            {
+                Value = value;
+                BattleLost = battleLost;
+            }
+
+            public int Value { get; private set; }
+
+            public bool BattleLost { get; private set; }
         }
     }
 }
