@@ -85,7 +85,7 @@ namespace SongsOfConquestAccess.Screens
             }
 
             int focusedIndex = RootWidget != null ? RootWidget.FocusedIndex : -1;
-            GridFocus gridFocus = CaptureArmyGridFocus();
+            ArmyExchangeGridWidget.FocusState gridFocus = CaptureArmyGridFocus();
             int troopMenuFocusedIndex = CaptureTroopMenuFocus();
 
             RootWidget = BuildRoot(_adapter);
@@ -94,12 +94,12 @@ namespace SongsOfConquestAccess.Screens
             RootWidget?.SetFocusByIndexSilently(focusedIndex);
         }
 
-        private GridFocus CaptureArmyGridFocus()
+        private ArmyExchangeGridWidget.FocusState CaptureArmyGridFocus()
         {
             ArmyExchangeGridWidget grid = RootWidget != null
                 ? RootWidget.GetChildAt(ArmyWidgetIndex) as ArmyExchangeGridWidget
                 : null;
-            return grid != null ? new GridFocus(grid.FocusedColumnIndex, grid.FocusedRowIndex) : null;
+            return grid != null ? grid.CaptureFocusState() : null;
         }
 
         private int CaptureTroopMenuFocus()
@@ -108,7 +108,7 @@ namespace SongsOfConquestAccess.Screens
             return menu != null ? menu.FocusedIndex : -1;
         }
 
-        private void RestoreArmyGridFocus(GridFocus focus)
+        private void RestoreArmyGridFocus(ArmyExchangeGridWidget.FocusState focus)
         {
             if (focus == null || RootWidget == null)
             {
@@ -116,7 +116,7 @@ namespace SongsOfConquestAccess.Screens
             }
 
             ArmyExchangeGridWidget grid = RootWidget.GetChildAt(ArmyWidgetIndex) as ArmyExchangeGridWidget;
-            grid?.SetFocusedCell(focus.ColumnIndex, focus.RowIndex);
+            grid?.RestoreFocusState(focus);
         }
 
         private void RestoreTroopMenuFocus(int focusedIndex)
@@ -401,18 +401,6 @@ namespace SongsOfConquestAccess.Screens
             }
 
             return ModText.Get(ModStrings.UI.TroopSlot, slot.TroopName, slotLabel);
-        }
-
-        private sealed class GridFocus
-        {
-            public GridFocus(int columnIndex, int rowIndex)
-            {
-                ColumnIndex = columnIndex;
-                RowIndex = rowIndex;
-            }
-
-            public int ColumnIndex { get; private set; }
-            public int RowIndex { get; private set; }
         }
     }
 }

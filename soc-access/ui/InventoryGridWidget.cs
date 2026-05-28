@@ -10,6 +10,7 @@ namespace SongsOfConquestAccess.UI
     internal sealed class InventoryGridWidget : Widget
     {
         private readonly List<Column> _columns = new List<Column>();
+        private readonly List<int> _focusedRowsByColumn = new List<int>();
         private readonly Func<InventorySlotInfo, InventorySlotInfo, DropResult> _drop;
         private readonly Action _onCompletedDrop;
         private int _focusedColumn;
@@ -38,6 +39,7 @@ namespace SongsOfConquestAccess.UI
                 }
 
                 _columns.Add(column);
+                _focusedRowsByColumn.Add(0);
                 for (int i = 0; i < column.Cells.Count; i++)
                 {
                     Cell cell = column.Cells[i];
@@ -91,7 +93,32 @@ namespace SongsOfConquestAccess.UI
             _focusedColumn = Clamp(columnIndex, 0, _columns.Count - 1);
             _focusedRow = Clamp(rowIndex, 0, Math.Max(0, _columns[_focusedColumn].Cells.Count - 1));
             ClampFocus();
+            RememberFocusedRow();
             return FocusedCell != null;
+        }
+
+        public FocusState CaptureFocusState()
+        {
+            RememberFocusedRow();
+            return new FocusState(_focusedColumn, _focusedRow, _focusedRowsByColumn.ToArray());
+        }
+
+        public bool RestoreFocusState(FocusState state)
+        {
+            if (state == null)
+            {
+                return false;
+            }
+
+            for (int i = 0; i < _focusedRowsByColumn.Count; i++)
+            {
+                _focusedRowsByColumn[i] = Clamp(
+                    state.GetRememberedRow(i),
+                    0,
+                    Math.Max(0, _columns[i].Cells.Count - 1));
+            }
+
+            return SetFocusedCell(state.ColumnIndex, state.RowIndex);
         }
 
         public override bool ClaimsAction(string actionKey)
@@ -189,6 +216,7 @@ namespace SongsOfConquestAccess.UI
                 _focusedColumn = 0;
                 _focusedRow = 0;
                 ClampFocus();
+                RememberFocusedRow();
             }
 
             return FocusedCell != null;
@@ -244,7 +272,7 @@ namespace SongsOfConquestAccess.UI
                 return false;
             }
 
-            return SetFocus(nextColumn, Clamp(_focusedRow, 0, column.Cells.Count - 1));
+            return SetFocus(nextColumn, GetRememberedRow(nextColumn, column.Cells.Count));
         }
 
         private bool MoveToRowEdge(bool first)
@@ -268,6 +296,7 @@ namespace SongsOfConquestAccess.UI
             _focusedColumn = column;
             _focusedRow = row;
             ClampFocus();
+            RememberFocusedRow();
             CellWidget next = FocusedCell;
             if (next == null)
             {
@@ -296,6 +325,35 @@ namespace SongsOfConquestAccess.UI
             }
 
             _focusedRow = Clamp(_focusedRow, 0, column.Cells.Count - 1);
+        }
+
+        private int GetRememberedRow(int columnIndex, int rowCount)
+        {
+            if (rowCount <= 0)
+            {
+                return -1;
+            }
+
+            int rememberedRow = columnIndex >= 0 && columnIndex < _focusedRowsByColumn.Count
+                ? _focusedRowsByColumn[columnIndex]
+                : 0;
+            return Clamp(rememberedRow, 0, rowCount - 1);
+        }
+
+        private void RememberFocusedRow()
+        {
+            if (_focusedColumn < 0 || _focusedColumn >= _focusedRowsByColumn.Count)
+            {
+                return;
+            }
+
+            if (_focusedColumn >= _columns.Count || _columns[_focusedColumn].Cells.Count == 0 || _focusedRow < 0)
+            {
+                _focusedRowsByColumn[_focusedColumn] = 0;
+                return;
+            }
+
+            _focusedRowsByColumn[_focusedColumn] = Clamp(_focusedRow, 0, _columns[_focusedColumn].Cells.Count - 1);
         }
 
         private bool StartDrag()
@@ -402,6 +460,30 @@ namespace SongsOfConquestAccess.UI
             public string Id { get; private set; }
             public string Label { get; private set; }
             public List<Cell> Cells { get; private set; }
+        }
+
+        internal sealed class FocusState
+        {
+            private readonly int[] _rememberedRowsByColumn;
+
+            public FocusState(int columnIndex, int rowIndex, int[] rememberedRowsByColumn)
+            {
+                ColumnIndex = columnIndex;
+                RowIndex = rowIndex;
+                _rememberedRowsByColumn = rememberedRowsByColumn != null
+                    ? (int[])rememberedRowsByColumn.Clone()
+                    : new int[0];
+            }
+
+            public int ColumnIndex { get; private set; }
+            public int RowIndex { get; private set; }
+
+            public int GetRememberedRow(int columnIndex)
+            {
+                return columnIndex >= 0 && columnIndex < _rememberedRowsByColumn.Length
+                    ? _rememberedRowsByColumn[columnIndex]
+                    : 0;
+            }
         }
 
         internal sealed class Cell

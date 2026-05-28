@@ -10,6 +10,7 @@
 - In combat, abbreviations like enemy ranged troops are only used when the group has two or more stacks
 - To help with fighting enemies with the same units as you, the battle timeline now specifically indicates if a troop is an enemy
 - The current troop indicator and timeline entries now include the troop's coordinates
+- Navigating back to a previously visited column in the army exchange and inventory grids restores focus to the last visited row
 - When narrating enemy spellcasting, just say "Enemy" instead of "Enemy wielder"
 
 ## V0.4.1

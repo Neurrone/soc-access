@@ -110,8 +110,8 @@ namespace SongsOfConquestAccess.Screens
             }
 
             int focusedIndex = RootWidget != null ? RootWidget.FocusedIndex : -1;
-            GridFocus inventoryFocus = CaptureInventoryGridFocus();
-            GridFocus armyFocus = CaptureArmyGridFocus();
+            InventoryGridWidget.FocusState inventoryFocus = CaptureInventoryGridFocus();
+            ArmyExchangeGridWidget.FocusState armyFocus = CaptureArmyGridFocus();
             RootWidget = BuildRoot(_adapter, RefreshAndAnnounceFocus);
             RestoreInventoryGridFocus(inventoryFocus);
             RestoreArmyGridFocus(armyFocus);
@@ -201,19 +201,19 @@ namespace SongsOfConquestAccess.Screens
             SocAccessPlugin.Instance?.ScreenDetector?.OnTradingMenuChanged();
         }
 
-        private GridFocus CaptureInventoryGridFocus()
+        private InventoryGridWidget.FocusState CaptureInventoryGridFocus()
         {
             InventoryGridWidget grid = RootWidget != null ? RootWidget.GetChildAt(InventoryGridIndex) as InventoryGridWidget : null;
-            return grid != null ? new GridFocus(grid.FocusedColumnIndex, grid.FocusedRowIndex) : null;
+            return grid != null ? grid.CaptureFocusState() : null;
         }
 
-        private GridFocus CaptureArmyGridFocus()
+        private ArmyExchangeGridWidget.FocusState CaptureArmyGridFocus()
         {
             ArmyExchangeGridWidget grid = RootWidget != null ? RootWidget.GetChildAt(ArmyExchangeGridIndex) as ArmyExchangeGridWidget : null;
-            return grid != null ? new GridFocus(grid.FocusedColumnIndex, grid.FocusedRowIndex) : null;
+            return grid != null ? grid.CaptureFocusState() : null;
         }
 
-        private void RestoreInventoryGridFocus(GridFocus focus)
+        private void RestoreInventoryGridFocus(InventoryGridWidget.FocusState focus)
         {
             if (focus == null || RootWidget == null)
             {
@@ -221,10 +221,10 @@ namespace SongsOfConquestAccess.Screens
             }
 
             InventoryGridWidget grid = RootWidget.GetChildAt(InventoryGridIndex) as InventoryGridWidget;
-            grid?.SetFocusedCell(focus.ColumnIndex, focus.RowIndex);
+            grid?.RestoreFocusState(focus);
         }
 
-        private void RestoreArmyGridFocus(GridFocus focus)
+        private void RestoreArmyGridFocus(ArmyExchangeGridWidget.FocusState focus)
         {
             if (focus == null || RootWidget == null)
             {
@@ -232,7 +232,7 @@ namespace SongsOfConquestAccess.Screens
             }
 
             ArmyExchangeGridWidget grid = RootWidget.GetChildAt(ArmyExchangeGridIndex) as ArmyExchangeGridWidget;
-            grid?.SetFocusedCell(focus.ColumnIndex, focus.RowIndex);
+            grid?.RestoreFocusState(focus);
         }
 
         private static ContainerWidget BuildRoot(TradingMenuAdapter adapter, Action onCompletedDrop)
@@ -502,18 +502,6 @@ namespace SongsOfConquestAccess.Screens
             {
                 return null;
             }
-        }
-
-        private sealed class GridFocus
-        {
-            public GridFocus(int columnIndex, int rowIndex)
-            {
-                ColumnIndex = columnIndex;
-                RowIndex = rowIndex;
-            }
-
-            public int ColumnIndex { get; private set; }
-            public int RowIndex { get; private set; }
         }
     }
 }

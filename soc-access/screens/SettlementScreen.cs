@@ -85,7 +85,7 @@ namespace SongsOfConquestAccess.Screens
             }
 
             int focusedIndex = RootWidget != null ? RootWidget.FocusedIndex : -1;
-            GridFocus gridFocus = CaptureArmyGridFocus();
+            ArmyExchangeGridWidget.FocusState gridFocus = CaptureArmyGridFocus();
 
             RootWidget = BuildRoot(_adapter);
             RestoreArmyGridFocus(gridFocus);
@@ -135,15 +135,15 @@ namespace SongsOfConquestAccess.Screens
             Refresh();
         }
 
-        private GridFocus CaptureArmyGridFocus()
+        private ArmyExchangeGridWidget.FocusState CaptureArmyGridFocus()
         {
             ArmyExchangeGridWidget grid = RootWidget != null
                 ? RootWidget.GetChildAt(ArmyExchangeGridIndex) as ArmyExchangeGridWidget
                 : null;
-            return grid != null ? new GridFocus(grid.FocusedColumnIndex, grid.FocusedRowIndex) : null;
+            return grid != null ? grid.CaptureFocusState() : null;
         }
 
-        private void RestoreArmyGridFocus(GridFocus focus)
+        private void RestoreArmyGridFocus(ArmyExchangeGridWidget.FocusState focus)
         {
             if (focus == null || RootWidget == null)
             {
@@ -151,7 +151,7 @@ namespace SongsOfConquestAccess.Screens
             }
 
             ArmyExchangeGridWidget grid = RootWidget.GetChildAt(ArmyExchangeGridIndex) as ArmyExchangeGridWidget;
-            grid?.SetFocusedCell(focus.ColumnIndex, focus.RowIndex);
+            grid?.RestoreFocusState(focus);
         }
 
         private static ContainerWidget BuildRoot(TownInteractionMenuAdapter adapter)
@@ -339,18 +339,6 @@ namespace SongsOfConquestAccess.Screens
             }
 
             return ModText.Get(ModStrings.UI.TroopSlot, slot.TroopName, slotLabel);
-        }
-
-        private sealed class GridFocus
-        {
-            public GridFocus(int columnIndex, int rowIndex)
-            {
-                ColumnIndex = columnIndex;
-                RowIndex = rowIndex;
-            }
-
-            public int ColumnIndex { get; private set; }
-            public int RowIndex { get; private set; }
         }
     }
 }

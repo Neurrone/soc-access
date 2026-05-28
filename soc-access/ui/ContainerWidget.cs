@@ -65,6 +65,25 @@ namespace SongsOfConquestAccess.UI
             return _children[index];
         }
 
+        public Widget GetChildById(string id)
+        {
+            if (string.IsNullOrWhiteSpace(id))
+            {
+                return null;
+            }
+
+            for (int i = 0; i < _children.Count; i++)
+            {
+                Widget child = _children[i];
+                if (child != null && child.Id == id)
+                {
+                    return child;
+                }
+            }
+
+            return null;
+        }
+
         public bool ReplaceChildAt(int index, Widget child)
         {
             if (child == null || index < 0 || index >= _children.Count)

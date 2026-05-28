@@ -15,6 +15,7 @@ namespace SongsOfConquestAccess.UI
         private readonly List<SlotWidget> _joiningSlots = new List<SlotWidget>();
         private readonly Func<TroopHudAdapter.SlotItem, TroopHudAdapter.SlotItem, TroopHudAdapter.DropResult> _drop;
         private readonly Action _onCompletedDrop;
+        private readonly int[] _focusedRowsByColumn = new int[2];
         private int _focusedColumn;
         private int _focusedRow;
         private SlotWidget _dragSource;
@@ -79,11 +80,38 @@ namespace SongsOfConquestAccess.UI
             if (column.Count == 0)
             {
                 ClampFocus();
+                RememberFocusedRow();
                 return FocusedSlot != null;
             }
 
             _focusedRow = Clamp(rowIndex, 0, column.Count - 1);
+            RememberFocusedRow();
             return FocusedSlot != null;
+        }
+
+        public FocusState CaptureFocusState()
+        {
+            RememberFocusedRow();
+            return new FocusState(_focusedColumn, _focusedRow, _focusedRowsByColumn);
+        }
+
+        public bool RestoreFocusState(FocusState state)
+        {
+            if (state == null)
+            {
+                return false;
+            }
+
+            for (int i = 0; i < _focusedRowsByColumn.Length; i++)
+            {
+                List<SlotWidget> column = GetColumn(i);
+                _focusedRowsByColumn[i] = Clamp(
+                    state.GetRememberedRow(i),
+                    0,
+                    Math.Max(0, column.Count - 1));
+            }
+
+            return SetFocusedCell(state.ColumnIndex, state.RowIndex);
         }
 
         public override bool ClaimsAction(string actionKey)
@@ -182,6 +210,7 @@ namespace SongsOfConquestAccess.UI
                 _focusedColumn = 0;
                 _focusedRow = 0;
                 ClampFocus();
+                RememberFocusedRow();
             }
 
             return FocusedSlot != null;
@@ -244,7 +273,7 @@ namespace SongsOfConquestAccess.UI
                 return false;
             }
 
-            int nextRow = Clamp(_focusedRow, 0, column.Count - 1);
+            int nextRow = GetRememberedRow(nextColumn, column.Count);
             return SetFocus(nextColumn, nextRow);
         }
 
@@ -264,6 +293,7 @@ namespace SongsOfConquestAccess.UI
             _focusedColumn = column;
             _focusedRow = row;
             ClampFocus();
+            RememberFocusedRow();
             SlotWidget next = FocusedSlot;
             if (next == null)
             {
@@ -285,6 +315,36 @@ namespace SongsOfConquestAccess.UI
             }
 
             _focusedRow = column.Count == 0 ? -1 : Clamp(_focusedRow, 0, column.Count - 1);
+        }
+
+        private int GetRememberedRow(int columnIndex, int rowCount)
+        {
+            if (rowCount <= 0)
+            {
+                return -1;
+            }
+
+            int rememberedRow = columnIndex >= 0 && columnIndex < _focusedRowsByColumn.Length
+                ? _focusedRowsByColumn[columnIndex]
+                : 0;
+            return Clamp(rememberedRow, 0, rowCount - 1);
+        }
+
+        private void RememberFocusedRow()
+        {
+            if (_focusedColumn < 0 || _focusedColumn >= _focusedRowsByColumn.Length)
+            {
+                return;
+            }
+
+            List<SlotWidget> column = GetColumn(_focusedColumn);
+            if (column.Count == 0 || _focusedRow < 0)
+            {
+                _focusedRowsByColumn[_focusedColumn] = 0;
+                return;
+            }
+
+            _focusedRowsByColumn[_focusedColumn] = Clamp(_focusedRow, 0, column.Count - 1);
         }
 
         private bool StartDrag()
@@ -404,6 +464,30 @@ namespace SongsOfConquestAccess.UI
         private static void Speak(string text)
         {
             SpeechPipeline.Output(new SpeechRequest(text, interrupt: false));
+        }
+
+        internal sealed class FocusState
+        {
+            private readonly int[] _rememberedRowsByColumn;
+
+            public FocusState(int columnIndex, int rowIndex, int[] rememberedRowsByColumn)
+            {
+                ColumnIndex = columnIndex;
+                RowIndex = rowIndex;
+                _rememberedRowsByColumn = rememberedRowsByColumn != null
+                    ? (int[])rememberedRowsByColumn.Clone()
+                    : new int[0];
+            }
+
+            public int ColumnIndex { get; private set; }
+            public int RowIndex { get; private set; }
+
+            public int GetRememberedRow(int columnIndex)
+            {
+                return columnIndex >= 0 && columnIndex < _rememberedRowsByColumn.Length
+                    ? _rememberedRowsByColumn[columnIndex]
+                    : 0;
+            }
         }
 
         internal sealed class SlotWidget : Widget

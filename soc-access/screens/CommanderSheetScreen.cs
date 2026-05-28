@@ -14,6 +14,8 @@ namespace SongsOfConquestAccess.Screens
 {
     internal sealed class CommanderSheetScreen : Screen
     {
+        private const string InventoryGridId = "commander-sheet-inventory-grid";
+
         private readonly CommanderSheetAdapter _adapter;
         private Action<int, bool> _artifactChangedHandler;
         private Action<int> _statisticsChangedHandler;
@@ -79,29 +81,27 @@ namespace SongsOfConquestAccess.Screens
             }
 
             int focusedIndex = RootWidget != null ? RootWidget.FocusedIndex : -1;
-            InventoryGridFocus inventoryGridFocus = CaptureInventoryGridFocus();
+            InventoryGridWidget.FocusState inventoryGridFocus = CaptureInventoryGridFocus();
             RootWidget = BuildRoot(_adapter);
-            RestoreInventoryGridFocus(focusedIndex, inventoryGridFocus);
+            RestoreInventoryGridFocus(inventoryGridFocus);
             RootWidget?.SetFocusByIndexSilently(focusedIndex);
         }
 
-        private InventoryGridFocus CaptureInventoryGridFocus()
+        private InventoryGridWidget.FocusState CaptureInventoryGridFocus()
         {
-            InventoryGridWidget grid = RootWidget != null ? RootWidget.FocusedChild as InventoryGridWidget : null;
-            return grid != null
-                ? new InventoryGridFocus(grid.FocusedColumnIndex, grid.FocusedRowIndex)
-                : null;
+            InventoryGridWidget grid = RootWidget != null ? RootWidget.GetChildById(InventoryGridId) as InventoryGridWidget : null;
+            return grid != null ? grid.CaptureFocusState() : null;
         }
 
-        private void RestoreInventoryGridFocus(int rootChildIndex, InventoryGridFocus focus)
+        private void RestoreInventoryGridFocus(InventoryGridWidget.FocusState focus)
         {
             if (focus == null || RootWidget == null)
             {
                 return;
             }
 
-            InventoryGridWidget grid = RootWidget.GetChildAt(rootChildIndex) as InventoryGridWidget;
-            grid?.SetFocusedCell(focus.ColumnIndex, focus.RowIndex);
+            InventoryGridWidget grid = RootWidget.GetChildById(InventoryGridId) as InventoryGridWidget;
+            grid?.RestoreFocusState(focus);
         }
 
         private void AttachListeners()
@@ -211,7 +211,7 @@ namespace SongsOfConquestAccess.Screens
             root.AddChild(BuildMenu("commander-sheet-active-modifiers", activeModifierLabel, activeModifiers, adapter.HideNativeTooltip));
 
             root.AddChild(new InventoryGridWidget(
-                "commander-sheet-inventory-grid",
+                InventoryGridId,
                 BuildInventoryGridColumns(adapter),
                 adapter.DropInventoryArtifact));
 
@@ -361,18 +361,6 @@ namespace SongsOfConquestAccess.Screens
             }
 
             return menu;
-        }
-
-        private sealed class InventoryGridFocus
-        {
-            public InventoryGridFocus(int columnIndex, int rowIndex)
-            {
-                ColumnIndex = columnIndex;
-                RowIndex = rowIndex;
-            }
-
-            public int ColumnIndex { get; private set; }
-            public int RowIndex { get; private set; }
         }
     }
 }
