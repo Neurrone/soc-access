@@ -44,6 +44,7 @@ namespace SongsOfConquestAccess.Adapters
         private static int _flushScheduleGeneration;
         private static int _flushScheduledFrame = -1;
         private static float _flushScheduledTime = -1f;
+        private static bool _abilityBatchActive;
         private static bool _wielderEssenceCaptureActive;
         private static readonly Dictionary<int, WielderEssenceGeneration> CapturedWielderEssence =
             new Dictionary<int, WielderEssenceGeneration>();
@@ -63,13 +64,33 @@ namespace SongsOfConquestAccess.Adapters
 
             try
             {
-                bool flushImmediately = response is CastBattleSpellCommand.Response;
-                bool bufferForSpell = !flushImmediately && ShouldBufferForSpellResponse(response, adapter);
+                bool isSpellResponse = response is CastBattleSpellCommand.Response;
+                bool isAbilityBegin = response is TroopAbilityActivationBeginCommand.Response;
+                bool isAbilityComplete = response is TroopAbilityActivationCompleteCommand.Response;
+                bool bufferForSpell = !isSpellResponse && ShouldBufferForSpellResponse(response, adapter);
                 LogCombatNarrationTimingDiagnostic("response", DescribeResponse(response));
                 EnqueueResponse(response, adapter);
-                if (flushImmediately)
+                // Spell and ability effects arrive as separate follow-up responses.
+                // Batch them so repeated effect applications can be condensed into
+                // summaries, using the spell response or ability begin/complete as
+                // the available command boundary.
+                if (isAbilityBegin)
+                {
+                    _abilityBatchActive = true;
+                    ScheduleFlushPendingEvents();
+                }
+                else if (isAbilityComplete)
+                {
+                    _abilityBatchActive = false;
+                    FlushPendingEventsImmediately("ability_complete");
+                }
+                else if (isSpellResponse)
                 {
                     FlushPendingEventsImmediately("spell_response");
+                }
+                else if (_abilityBatchActive)
+                {
+                    ScheduleFlushPendingEvents();
                 }
                 else if (bufferForSpell || _flushPendingEventsScheduled)
                 {
@@ -138,6 +159,7 @@ namespace SongsOfConquestAccess.Adapters
             _flushScheduleGeneration = 0;
             _flushScheduledFrame = -1;
             _flushScheduledTime = -1f;
+            _abilityBatchActive = false;
             _wielderEssenceCaptureActive = false;
             CapturedWielderEssence.Clear();
         }
@@ -977,6 +999,7 @@ namespace SongsOfConquestAccess.Adapters
                 + ", elapsedFrames=" + GetElapsedFrames(scheduledFrame)
                 + ", elapsedSeconds=" + FormatSeconds(GetElapsedSeconds(scheduledTime)));
             _flushPendingEventsScheduled = false;
+            _abilityBatchActive = false;
             FlushPendingEvents();
         }
 
@@ -1271,6 +1294,7 @@ namespace SongsOfConquestAccess.Adapters
                 + ", time=" + FormatSeconds(time)
                 + ", deltaSeconds=" + secondsDelta
                 + ", flushScheduled=" + _flushPendingEventsScheduled
+                + ", abilityBatchActive=" + _abilityBatchActive
                 + ", pending=" + Planner.PendingCount
                 + (string.IsNullOrWhiteSpace(detail) ? string.Empty : ", " + detail));
 

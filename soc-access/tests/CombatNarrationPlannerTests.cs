@@ -452,6 +452,43 @@ namespace SongsOfConquestAccess.Tests
         }
 
         [TestMethod]
+        public void BacteriaModifierSummariesMergeAfterAbilityEvent()
+        {
+            CombatNarrationPlanner planner = new CombatNarrationPlanner();
+            CombatNarrationSnapshot snapshot = Snapshot(new[] { 10, 20 }, new int[0]);
+            BacteriaRef protectedEffect = Bacteria("Protected", 410);
+
+            planner.Enqueue(CombatNarrationItem.Create(
+                CombatNarrationItemKind.Ability,
+                new AbilityUsedEvent(
+                    new ActorRef(Troop(5, 1, "Shield of Order"), true),
+                    new AbilityRef((TroopAbilityType)8, "Protect"),
+                    null,
+                    null),
+                5));
+            planner.EnqueueBacteriaSummary(
+                CombatNarrationItem.CreateBacteriaModifierSummary(
+                    protectedEffect,
+                    Troop(10, 1, "Archers"),
+                    new[] { Modifier(BacteriaModifierType.TroopDefense, 25) },
+                    10),
+                snapshot);
+            planner.EnqueueBacteriaSummary(
+                CombatNarrationItem.CreateBacteriaModifierSummary(
+                    protectedEffect,
+                    Troop(20, 1, "Footmen"),
+                    new[] { Modifier(BacteriaModifierType.TroopDefense, 25) },
+                    20),
+                snapshot);
+
+            IReadOnlyList<CombatNarrationItem> result = planner.Flush();
+
+            Assert.AreEqual(2, result.Count);
+            Assert.AreEqual("Shield of Order uses Protect", result[0].Event.GetSpeechText());
+            Assert.AreEqual("Protected affects your troops, defense +25", result[1].Event.GetSpeechText());
+        }
+
+        [TestMethod]
         public void BacteriaSummaryDropsZeroCountTargets()
         {
             CombatNarrationPlanner planner = new CombatNarrationPlanner();
