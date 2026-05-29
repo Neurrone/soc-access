@@ -232,6 +232,35 @@ namespace SongsOfConquestAccess.Tests
         }
 
         [TestMethod]
+        public void FlushMovesSpellBeforeBacteriaModifierSummaryAcrossQueueChanged()
+        {
+            CombatNarrationPlanner planner = new CombatNarrationPlanner();
+            CombatNarrationSnapshot snapshot = Snapshot(new int[0], new[] { 10 });
+            TestEvent spell = new TestEvent("spell");
+            BacteriaRef insectSwarm = Bacteria("Insect Swarm", 265);
+            DamageEvent damage = Damage(Troop(10, 2, "Ravagers", 3), insectSwarm);
+
+            planner.EnqueueBacteriaSummary(
+                CombatNarrationItem.CreateBacteriaModifierSummary(
+                    insectSwarm,
+                    Troop(10, 2, "Ravagers", 3),
+                    new[] { Modifier(BacteriaModifierType.TroopInitiative, -15) },
+                    10),
+                snapshot);
+            planner.Enqueue(CombatNarrationItem.Direct(CombatNarrationItemKind.QueueChanged, new QueueChangedEvent()));
+            planner.Enqueue(CombatNarrationItem.Create(CombatNarrationItemKind.Damage, damage, 10));
+            planner.Enqueue(CombatNarrationItem.Create(CombatNarrationItemKind.Spell, spell));
+
+            IReadOnlyList<CombatNarrationItem> result = planner.Flush();
+
+            Assert.AreEqual(4, result.Count);
+            Assert.AreSame(spell, result[0].Event);
+            Assert.AreEqual("Insect Swarm affects 3 enemy Ravagers at 0, 0, initiative -15", result[1].Event.GetSpeechText());
+            Assert.IsInstanceOfType(result[2].Event, typeof(QueueChangedEvent));
+            Assert.AreSame(damage, result[3].Event);
+        }
+
+        [TestMethod]
         public void BacteriaSummariesDoNotMergeAcrossNonSummaryEvent()
         {
             CombatNarrationPlanner planner = new CombatNarrationPlanner();

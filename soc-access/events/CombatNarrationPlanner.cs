@@ -485,6 +485,7 @@ namespace SongsOfConquestAccess.Events
 
             switch (pending.Kind)
             {
+                case CombatNarrationItemKind.QueueChanged:
                 case CombatNarrationItemKind.Damage:
                 case CombatNarrationItemKind.BacteriaRemoved:
                 case CombatNarrationItemKind.BacteriaModifierApplied:

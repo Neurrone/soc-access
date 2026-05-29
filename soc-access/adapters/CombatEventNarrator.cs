@@ -29,7 +29,7 @@ namespace SongsOfConquestAccess.Adapters
         private const int BacteriaDiagnosticLogLimit = 200;
         private const int MapEntityCreationNarrationDiagnosticLogLimit = 100;
         private const int CombatNarrationTimingDiagnosticLogLimit = 400;
-        private const int CombatNarrationBatchFrames = 5;
+        private const int CombatNarrationBatchFrames = 30;
 
         private static readonly CombatNarrationPlanner Planner = new CombatNarrationPlanner();
         private static readonly Queue<string> SuppressedNativeNotifications = new Queue<string>();
@@ -41,6 +41,7 @@ namespace SongsOfConquestAccess.Adapters
         private static int _combatNarrationTimingDiagnosticLogCount;
         private static int _lastCombatNarrationTimingDiagnosticFrame = -1;
         private static float _lastCombatNarrationTimingDiagnosticTime = -1f;
+        private static int _flushScheduleGeneration;
         private static int _flushScheduledFrame = -1;
         private static float _flushScheduledTime = -1f;
         private static bool _wielderEssenceCaptureActive;
@@ -62,9 +63,22 @@ namespace SongsOfConquestAccess.Adapters
 
             try
             {
+                bool flushImmediately = response is CastBattleSpellCommand.Response;
+                bool bufferForSpell = !flushImmediately && ShouldBufferForSpellResponse(response, adapter);
                 LogCombatNarrationTimingDiagnostic("response", DescribeResponse(response));
                 EnqueueResponse(response, adapter);
-                ScheduleFlushPendingEvents();
+                if (flushImmediately)
+                {
+                    FlushPendingEventsImmediately("spell_response");
+                }
+                else if (bufferForSpell || _flushPendingEventsScheduled)
+                {
+                    ScheduleFlushPendingEvents();
+                }
+                else
+                {
+                    FlushPendingEventsImmediately("non_spell_response");
+                }
             }
             catch (Exception exception)
             {
@@ -121,6 +135,7 @@ namespace SongsOfConquestAccess.Adapters
             _combatNarrationTimingDiagnosticLogCount = 0;
             _lastCombatNarrationTimingDiagnosticFrame = -1;
             _lastCombatNarrationTimingDiagnosticTime = -1f;
+            _flushScheduleGeneration = 0;
             _flushScheduledFrame = -1;
             _flushScheduledTime = -1f;
             _wielderEssenceCaptureActive = false;
@@ -536,6 +551,128 @@ namespace SongsOfConquestAccess.Adapters
             }
         }
 
+        private static bool ShouldBufferForSpellResponse(ICommandResponse response, CombatAdapter adapter)
+        {
+            AddBattleBacteriaCommand.Response addBacteria = response as AddBattleBacteriaCommand.Response;
+            if (addBacteria != null)
+            {
+                return ContainsSpellBacteria(addBacteria);
+            }
+
+            RemoveBattleBacteriaCommand.Response removeBacteria = response as RemoveBattleBacteriaCommand.Response;
+            if (removeBacteria != null)
+            {
+                return ContainsSpellBacteria(removeBacteria);
+            }
+
+            ChangeBattleBacteriaModifierCommand.Response modifier = response as ChangeBattleBacteriaModifierCommand.Response;
+            if (modifier != null)
+            {
+                return ContainsSpellBacteriaModifier(modifier, adapter);
+            }
+
+            DamageBattleTroopCommand.Response troopDamage = response as DamageBattleTroopCommand.Response;
+            if (troopDamage != null)
+            {
+                return troopDamage.Damage != null
+                    && (troopDamage.Damage.Type == DamageType.Spell || IsSpellBacteriaType(troopDamage.BacteriaType));
+            }
+
+            DamageBattleMapEntityCommand.Response entityDamage = response as DamageBattleMapEntityCommand.Response;
+            if (entityDamage != null)
+            {
+                return entityDamage.Damage != null && entityDamage.Damage.Type == DamageType.Spell;
+            }
+
+            return false;
+        }
+
+        private static bool ContainsSpellBacteria(AddBattleBacteriaCommand.Response response)
+        {
+            if (response == null || response.Entries == null)
+            {
+                return false;
+            }
+
+            for (int i = 0; i < response.Entries.Length; i++)
+            {
+                AddBattleBacteriaCommand.ResponseEntry entry = response.Entries[i];
+                if (entry != null && IsSpellBacteriaReference(entry.BacteriaReference))
+                {
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
+        private static bool ContainsSpellBacteria(RemoveBattleBacteriaCommand.Response response)
+        {
+            if (response == null || response.Entries == null)
+            {
+                return false;
+            }
+
+            for (int i = 0; i < response.Entries.Length; i++)
+            {
+                RemoveBattleBacteriaCommand.Entry entry = response.Entries[i];
+                if (entry != null && IsSpellBacteriaReference(entry.BacteriaReference))
+                {
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
+        private static bool ContainsSpellBacteriaModifier(ChangeBattleBacteriaModifierCommand.Response response, CombatAdapter adapter)
+        {
+            if (response == null || response.ChangeSets == null)
+            {
+                return false;
+            }
+
+            for (int i = 0; i < response.ChangeSets.Length; i++)
+            {
+                ModifierChangeSet changeSet = response.ChangeSets[i];
+                if (changeSet == null || changeSet.Changes == null)
+                {
+                    continue;
+                }
+
+                for (int j = 0; j < changeSet.Changes.Length; j++)
+                {
+                    ModifierChangeSet.Change change = changeSet.Changes[j];
+                    if (change == null || change.Modifier == null)
+                    {
+                        continue;
+                    }
+
+                    if (IsSpellBacteriaReference(FindBacteriaReference(adapter, change.Modifier)))
+                    {
+                        return true;
+                    }
+                }
+            }
+
+            return false;
+        }
+
+        private static bool IsSpellBacteriaReference(BacteriaReference bacteria)
+        {
+            return bacteria != null && IsSpellBacteriaType(bacteria.BacteriaType);
+        }
+
+        private static bool IsSpellBacteriaType(int bacteriaType)
+        {
+            return bacteriaType >= 0 && IsSpellBacteriaType((BacteriaTypes)bacteriaType);
+        }
+
+        private static bool IsSpellBacteriaType(BacteriaTypes bacteriaType)
+        {
+            return bacteriaType.ToString().StartsWith("Spell", StringComparison.Ordinal);
+        }
+
         private static BacteriaReference FindBacteriaReference(CombatAdapter adapter, BacteriaModifier modifier)
         {
             if (modifier == null)
@@ -809,25 +946,49 @@ namespace SongsOfConquestAccess.Adapters
             }
 
             _flushPendingEventsScheduled = true;
+            _flushScheduleGeneration++;
             _flushScheduledFrame = Time.frameCount;
             _flushScheduledTime = Time.realtimeSinceStartup;
             LogCombatNarrationTimingDiagnostic("flush_scheduled", "waitFrames=" + CombatNarrationBatchFrames);
-            plugin.StartCoroutine(FlushPendingEventsAfterResponseBatch());
+            plugin.StartCoroutine(FlushPendingEventsAfterResponseBatch(_flushScheduleGeneration, _flushScheduledFrame, _flushScheduledTime));
         }
 
-        private static IEnumerator FlushPendingEventsAfterResponseBatch()
+        private static IEnumerator FlushPendingEventsAfterResponseBatch(int generation, int scheduledFrame, float scheduledTime)
         {
             for (int i = 0; i < CombatNarrationBatchFrames; i++)
             {
                 yield return null;
             }
 
+            if (!_flushPendingEventsScheduled || generation != _flushScheduleGeneration)
+            {
+                LogCombatNarrationTimingDiagnostic(
+                    "flush_wait_stale",
+                    "scheduledGeneration=" + generation
+                    + ", currentGeneration=" + _flushScheduleGeneration
+                    + ", elapsedFrames=" + GetElapsedFrames(scheduledFrame)
+                    + ", elapsedSeconds=" + FormatSeconds(GetElapsedSeconds(scheduledTime)));
+                yield break;
+            }
+
             LogCombatNarrationTimingDiagnostic(
                 "flush_wait_complete",
-                "scheduledFrame=" + _flushScheduledFrame
-                + ", elapsedFrames=" + GetElapsedScheduledFrames()
-                + ", elapsedSeconds=" + FormatSeconds(GetElapsedScheduledSeconds()));
+                "scheduledFrame=" + scheduledFrame
+                + ", elapsedFrames=" + GetElapsedFrames(scheduledFrame)
+                + ", elapsedSeconds=" + FormatSeconds(GetElapsedSeconds(scheduledTime)));
             _flushPendingEventsScheduled = false;
+            FlushPendingEvents();
+        }
+
+        private static void FlushPendingEventsImmediately(string reason)
+        {
+            if (_flushPendingEventsScheduled)
+            {
+                _flushScheduleGeneration++;
+                _flushPendingEventsScheduled = false;
+            }
+
+            LogCombatNarrationTimingDiagnostic("flush_immediate", "reason=" + reason);
             FlushPendingEvents();
         }
 
@@ -1133,14 +1294,14 @@ namespace SongsOfConquestAccess.Adapters
             return "response=" + (type.FullName ?? type.Name);
         }
 
-        private static int GetElapsedScheduledFrames()
+        private static int GetElapsedFrames(int scheduledFrame)
         {
-            return _flushScheduledFrame >= 0 ? Time.frameCount - _flushScheduledFrame : -1;
+            return scheduledFrame >= 0 ? Time.frameCount - scheduledFrame : -1;
         }
 
-        private static float GetElapsedScheduledSeconds()
+        private static float GetElapsedSeconds(float scheduledTime)
         {
-            return _flushScheduledTime >= 0f ? Time.realtimeSinceStartup - _flushScheduledTime : -1f;
+            return scheduledTime >= 0f ? Time.realtimeSinceStartup - scheduledTime : -1f;
         }
 
         private static string FormatSeconds(float seconds)

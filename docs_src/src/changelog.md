@@ -13,6 +13,7 @@
 - Navigating back to a previously visited column in the army exchange and inventory grids restores focus to the last visited row
 - When narrating enemy spellcasting, just say "Enemy" instead of "Enemy wielder"
 - In the post-game victory / defeat screen, clear all other screens in the stack to prevent the adventure map from being heard after the game ends
+- More spellcast narration fixes
 
 ## V0.4.1
 
