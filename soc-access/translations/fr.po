@@ -2922,3 +2922,23 @@ msgstr "Pas prêt"
 msgctxt "Screens.Ready"
 msgid "Ready"
 msgstr "Prêt"
+
+#. Actions.SummarizeReachableEntities
+msgctxt "Actions.SummarizeReachableEntities"
+msgid "Summarize Reachable Entities"
+msgstr "Résumer les entités atteignables"
+
+#. Scanner.ReachableSummary
+msgctxt "Scanner.ReachableSummary"
+msgid "Reachable: {0}"
+msgstr "Atteignable : {0}"
+
+#. Scanner.ReachableSummaryCount
+msgctxt "Scanner.ReachableSummaryCount"
+msgid "{0} {1}"
+msgstr "{0} {1}"
+
+#. Scanner.ReachableSummaryNone
+msgctxt "Scanner.ReachableSummaryNone"
+msgid "Reachable: none"
+msgstr "Atteignable : aucune"

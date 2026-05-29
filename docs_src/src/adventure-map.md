@@ -24,11 +24,12 @@ The mod mentions if a tile is unexplored or currently unseen.
 
 ### Actions
 
-- Enter: perform the primary action on the focused tile, corresponding to a left-click. If the tile has a selectable entity such as a building, this brings up the entity's menu for further interaction. Otherwise, this clears the wielder's destination.
-- Backslash: perform the secondary action on the focused tile, corresponding to a right-click. Press once on a tile to set it as the destination. Press again to actually move. If the tile has an interactable entity and the wielder is nearby, this causes your wielder to interact with the entity.
-- W: select the next wielder
-- S: select the next settlement
-- Space: move focus to the selected wielder's tile
+- `Enter`: perform the primary action on the focused tile, corresponding to a left-click. If the tile has a selectable entity such as a building, this brings up the entity's menu for further interaction. Otherwise, this clears the wielder's destination.
+- `\`: perform the secondary action on the focused tile, corresponding to a right-click. Press once on a tile to set it as the destination. Press again to actually move. If the tile has an interactable entity and the wielder is nearby, this causes your wielder to interact with the entity.
+- `A`: get a summary of entities reachable by the current wielder excluding visited pickups or friendly resource generators
+- `W`: select the next wielder
+- `S`: select the next settlement
+- `Space`: move focus to the selected wielder's tile
 
 ### Route Previews
 
@@ -86,24 +87,25 @@ When focus is in the HUD controls, pressing escape moves focus back to the grid.
 
 Additionally, the game provides the following hotkeys that work anywhere on the adventure map screen:
 
-- C: open character sheet
-- V: open spellbook
-- E: end turn
-- Q: move wielder to selected destination
-- F5: quick save
-- F9: quick load
-- X: build menu
-- F1: owned entities
-- F2: troop income
-- F3: research
-- F4: marketplace
+- `C`: open character sheet
+- `V`: open spellbook
+- `E`: end turn
+- `Q`: move wielder to selected destination
+- `F5`: quick save
+- `F6`: players menu
+- `F9`: quick load
+- `X`: build menu
+- `F1`: owned entities
+- `F2`: troop income
+- `F3`: research
+- `F4`: marketplace
 
 ### Troop Management
 
-The selected wielder's troop slots are exposed as a menu. Use Tab until you reach the troop widget, then use Up, Down, Home, and End to move through slots.
+The selected wielder's troop slots are exposed as a menu. From the adventure map grid, press `T` to focus the troops widget, then use `Up`, `Down`, `Home`, and `End` to move through slots.
 
-When focus is on a draggable troop stack, press Space to start dragging it, move to the destination slot, and press Enter to drop. Press Escape to cancel.
+When focus is on a draggable troop stack, press `Space` to start dragging it, move to the destination slot, and press `Enter` to drop. Press `Escape` to cancel dragging.
 
 ## Reading Resources
 
-Press Ctrl+R to hear a summary of your current resources, this works in all non-combat situations. You can also Tab to the resources widget and review individual resource entries and tooltips. From the adventure map, `R` moves focus to the resources widget.
+Press `Ctrl+R` to hear a summary of your current resources, this works in all non-combat situations. You can also Tab to the resources widget and review individual resource entries and tooltips. From the adventure map, `R` moves focus to the resources widget.

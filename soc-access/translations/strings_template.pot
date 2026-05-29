@@ -939,6 +939,11 @@ msgctxt "Actions.StartDrag"
 msgid "Start Drag"
 msgstr ""
 
+#. Actions.SummarizeReachableEntities
+msgctxt "Actions.SummarizeReachableEntities"
+msgid "Summarize Reachable Entities"
+msgstr ""
+
 #. Actions.SummarizeEnemyResources
 msgctxt "Actions.SummarizeEnemyResources"
 msgid "Summarize Enemy Resources"
@@ -2567,6 +2572,21 @@ msgstr ""
 #. Scanner.Revealed
 msgctxt "Scanner.Revealed"
 msgid "Revealed"
+msgstr ""
+
+#. Scanner.ReachableSummary
+msgctxt "Scanner.ReachableSummary"
+msgid "Reachable: {0}"
+msgstr ""
+
+#. Scanner.ReachableSummaryCount
+msgctxt "Scanner.ReachableSummaryCount"
+msgid "{0} {1}"
+msgstr ""
+
+#. Scanner.ReachableSummaryNone
+msgctxt "Scanner.ReachableSummaryNone"
+msgid "Reachable: none"
 msgstr ""
 
 #. Scanner.ResourceGenerators

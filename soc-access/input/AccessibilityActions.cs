@@ -133,6 +133,9 @@ namespace SongsOfConquestAccess.Input
         public static readonly InputAction NextSettlement = OneShot("next_settlement", ModStrings.Actions.NextSettlement, InputClaimScope.FocusedWidget)
             .AddBinding(new KeyboardBinding(Key.S));
 
+        public static readonly InputAction SummarizeReachableEntities = OneShot("summarize_reachable_entities", ModStrings.Actions.SummarizeReachableEntities, InputClaimScope.FocusedWidget)
+            .AddBinding(new KeyboardBinding(Key.A));
+
         public static readonly InputAction FocusHudTroops = OneShot("focus_hud_troops", ModStrings.Actions.FocusHudTroops, InputClaimScope.Screen)
             .AddBinding(new KeyboardBinding(Key.T));
 
@@ -354,6 +357,7 @@ namespace SongsOfConquestAccess.Input
                 MapSecondaryAction,
                 NextWielder,
                 NextSettlement,
+                SummarizeReachableEntities,
                 FocusHudTroops,
                 FocusHudResources,
                 FocusHudObjectives,

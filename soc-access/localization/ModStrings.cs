@@ -218,6 +218,7 @@ namespace SongsOfConquestAccess.Localization
             public static readonly ModString SliderMaximum = new ModString("Actions.SliderMaximum", "Slider Maximum");
             public static readonly ModString SliderMinimum = new ModString("Actions.SliderMinimum", "Slider Minimum");
             public static readonly ModString StartDrag = new ModString("Actions.StartDrag", "Start Drag");
+            public static readonly ModString SummarizeReachableEntities = new ModString("Actions.SummarizeReachableEntities", "Summarize Reachable Entities");
             public static readonly ModString SummarizeEnemyResources = new ModString("Actions.SummarizeEnemyResources", "Summarize Enemy Resources");
             public static readonly ModString SummarizeResources = new ModString("Actions.SummarizeResources", "Summarize Resources");
             public static readonly ModString TooltipActionsMenu = new ModString("Actions.TooltipActionsMenu", "Tooltip Actions Menu");
@@ -577,6 +578,9 @@ namespace SongsOfConquestAccess.Localization
             public static readonly ModString Pickups = new ModString("Scanner.Pickups", "Pickups");
             public static readonly ModString Power = new ModString("Scanner.Power", "Power");
             public static readonly ModString Revealed = new ModString("Scanner.Revealed", "Revealed");
+            public static readonly ModString ReachableSummary = new ModString("Scanner.ReachableSummary", "Reachable: {0}");
+            public static readonly ModString ReachableSummaryCount = new ModString("Scanner.ReachableSummaryCount", "{0} {1}");
+            public static readonly ModString ReachableSummaryNone = new ModString("Scanner.ReachableSummaryNone", "Reachable: none");
             public static readonly ModString ResourceGenerators = new ModString("Scanner.ResourceGenerators", "Resource generators");
             public static readonly ModString Riches = new ModString("Scanner.Riches", "Riches");
             public static readonly ModString Roads = new ModString("Scanner.Roads", "Roads");

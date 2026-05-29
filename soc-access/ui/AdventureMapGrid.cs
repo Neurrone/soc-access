@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using Lavapotion.Utilities;
 using SongsOfConquest.Client;
 using SongsOfConquest.Client.InputManagement;
@@ -80,6 +81,7 @@ namespace SongsOfConquestAccess.UI
                 || actionKey == AccessibilityActions.MapSecondaryAction.Key
                 || actionKey == AccessibilityActions.NextWielder.Key
                 || actionKey == AccessibilityActions.NextSettlement.Key
+                || actionKey == AccessibilityActions.SummarizeReachableEntities.Key
                 || IsBookmarkAction(actionKey)
                 || IsBeaconAction(actionKey)
                 || IsScannerAction(actionKey);
@@ -160,6 +162,11 @@ namespace SongsOfConquestAccess.UI
             if (action.Key == AccessibilityActions.NextSettlement.Key)
             {
                 return _adapter.TrySelectNextSettlement();
+            }
+
+            if (action.Key == AccessibilityActions.SummarizeReachableEntities.Key)
+            {
+                return SpeakReachableEntities();
             }
 
             return false;
@@ -457,6 +464,13 @@ namespace SongsOfConquestAccess.UI
             }
 
             _scanner.Output(result);
+            return true;
+        }
+
+        private bool SpeakReachableEntities()
+        {
+            IReadOnlyList<ReachableAdventureEntity> entities = _adapter.GetReachableAdventureEntities();
+            SpeechPipeline.Output(new SpeechRequest(ReachableAdventureEntitySummaryFormatter.Format(entities), interrupt: false));
             return true;
         }
 

@@ -906,6 +906,143 @@ namespace SongsOfConquestAccess.Adapters
             return snapshot;
         }
 
+        public IReadOnlyList<ReachableAdventureEntity> GetReachableAdventureEntities()
+        {
+            List<ReachableAdventureEntity> results = new List<ReachableAdventureEntity>();
+            if (_facade == null || _facade.MapEntities == null || _facade.Level == null || _selectionHandler == null)
+            {
+                return results;
+            }
+
+            ICommanderState selectedCommander = _selectionHandler.SelectedCommander;
+            if (selectedCommander == null || !selectedCommander.IsAlive)
+            {
+                return results;
+            }
+
+            IEnumerable<IMapEntity> entities = _facade.MapEntities.All;
+            if (entities == null)
+            {
+                return results;
+            }
+
+            int teamId = selectedCommander.TeamId;
+            if (teamId < 0)
+            {
+                return results;
+            }
+
+            Dictionary<Vector2Int, AdventureMapTile> tileCache = new Dictionary<Vector2Int, AdventureMapTile>();
+            AddReachableCommanderResults(results, selectedCommander, teamId, tileCache);
+            AddReachableMapEntityResults(results, selectedCommander, teamId, tileCache);
+            return results;
+        }
+
+        private void AddReachableMapEntityResults(
+            List<ReachableAdventureEntity> results,
+            ICommanderState selectedCommander,
+            int teamId,
+            Dictionary<Vector2Int, AdventureMapTile> tileCache)
+        {
+            if (results == null || selectedCommander == null || _facade == null || _facade.MapEntities == null || _facade.Level == null)
+            {
+                return;
+            }
+
+            IEnumerable<IMapEntity> entities = _facade.MapEntities.All;
+            if (entities == null)
+            {
+                return;
+            }
+
+            foreach (IMapEntity entity in entities)
+            {
+                if (entity == null || !entity.IsEnabled || !IsWithinMap(entity.Position))
+                {
+                    continue;
+                }
+
+                if (ShouldExcludeReachableMapEntity(entity, selectedCommander, teamId))
+                {
+                    continue;
+                }
+
+                AdventureMapTile tile;
+                if (!TryGetMapEntityIdentityTile(entity, tileCache, out tile))
+                {
+                    continue;
+                }
+
+                if (!_facade.Level.CanMoveToAndInteract(entity.Id, selectedCommander.Id))
+                {
+                    continue;
+                }
+
+                float distance;
+                if (!TryGetReachableMapEntityDistance(entity, selectedCommander, teamId, out distance))
+                {
+                    distance = _facade.Level.Distance(selectedCommander.Position, tile.Position);
+                }
+
+                string name = FirstNonEmpty(tile.MapEntityName, GetMapEntityName(entity));
+                if (string.IsNullOrWhiteSpace(name))
+                {
+                    continue;
+                }
+
+                results.Add(new ReachableAdventureEntity(entity.Id, name, tile.Position, distance));
+            }
+        }
+
+        private void AddReachableCommanderResults(
+            List<ReachableAdventureEntity> results,
+            ICommanderState selectedCommander,
+            int teamId,
+            Dictionary<Vector2Int, AdventureMapTile> tileCache)
+        {
+            if (results == null || selectedCommander == null || _facade == null || _facade.Commanders == null || _facade.Level == null)
+            {
+                return;
+            }
+
+            IEnumerable<ICommanderState> commanders = _facade.Commanders.All;
+            if (commanders == null)
+            {
+                return;
+            }
+
+            foreach (ICommanderState commander in commanders)
+            {
+                if (commander == null
+                    || !commander.IsAlive
+                    || commander.Id == selectedCommander.Id
+                    || !IsWithinMap(commander.Position))
+                {
+                    continue;
+                }
+
+                AdventureMapTile tile = GetScannerTile(tileCache, commander.Position);
+                if (tile == null || tile.Commander == null || tile.Commander.Raw == null || tile.Commander.Raw.Id != commander.Id)
+                {
+                    continue;
+                }
+
+                float distance;
+                if (!TryGetReachableCommanderDistance(commander, selectedCommander, teamId, out distance))
+                {
+                    continue;
+                }
+
+                string name = FirstNonEmpty(tile.Commander.Name, GetCommanderName(commander));
+                if (string.IsNullOrWhiteSpace(name))
+                {
+                    continue;
+                }
+
+                results.Add(new ReachableAdventureEntity(commander.Id, name, commander.Position, distance));
+            }
+        }
+
         public bool ValidateScannerResult(ScannerResult result)
         {
             if (result == null || !IsWithinMap(result.Position))
@@ -951,6 +1088,137 @@ namespace SongsOfConquestAccess.Adapters
             }
 
             return true;
+        }
+
+        private bool TryGetReachableMapEntityDistance(
+            IMapEntity entity,
+            ICommanderState selectedCommander,
+            int teamId,
+            out float distance)
+        {
+            distance = 0f;
+            if (entity == null || selectedCommander == null || _facade == null || _facade.Level == null)
+            {
+                return false;
+            }
+
+            IInteractableComponent component;
+            if (!entity.TryGetComponent<IInteractableComponent>(out component)
+                || component.LocalInteractionPoints == null
+                || component.LocalInteractionPoints.Length == 0
+                || component.CalculatedInteractionPoints == null
+                || component.CalculatedInteractionPoints.Length == 0)
+            {
+                return false;
+            }
+
+            Vector2Int destination;
+            PathNode[] path;
+            if (!_facade.Level.TryGetShortestPathToPoints(
+                teamId,
+                selectedCommander.Position,
+                component.CalculatedInteractionPoints,
+                out destination,
+                out path,
+                (PathfinderCacheType)0))
+            {
+                return false;
+            }
+
+            float movementCost = path != null && path.Length > 1
+                ? path[path.Length - 2].travelCost
+                : 0f;
+            distance = movementCost + entity.GetInteractionCost(selectedCommander.Id);
+            return true;
+        }
+
+        private bool TryGetReachableCommanderDistance(
+            ICommanderState commander,
+            ICommanderState selectedCommander,
+            int teamId,
+            out float distance)
+        {
+            distance = 0f;
+            if (commander == null || selectedCommander == null || _facade == null || _facade.Level == null || _facade.Teams == null)
+            {
+                return false;
+            }
+
+            List<Vector2Int> destinations = new List<Vector2Int>();
+            if (_facade.Teams.IsInPartnership(commander.TeamId, teamId))
+            {
+                destinations.Add(commander.Position);
+            }
+            else
+            {
+                IEnumerable<int2> zoneOfControl = _facade.Commanders.GetZoneOfControlPoints(teamId, commander.Id);
+                if (zoneOfControl != null)
+                {
+                    foreach (int2 point in zoneOfControl)
+                    {
+                        destinations.Add(new Vector2Int(point.x, point.y));
+                    }
+                }
+            }
+
+            if (destinations.Count == 0)
+            {
+                return false;
+            }
+
+            Vector2Int destination;
+            PathNode[] path;
+            if (!_facade.Level.TryGetShortestPathToPoints(
+                teamId,
+                selectedCommander.Position,
+                destinations,
+                out destination,
+                out path,
+                (PathfinderCacheType)0))
+            {
+                return false;
+            }
+
+            return TryGetLastFinitePathCost(path, out distance)
+                && distance <= selectedCommander.MovesLeft;
+        }
+
+        private static bool TryGetLastFinitePathCost(PathNode[] path, out float distance)
+        {
+            distance = 0f;
+            if (path == null || path.Length == 0)
+            {
+                return false;
+            }
+
+            for (int i = path.Length - 1; i >= 0; i--)
+            {
+                if (!float.IsInfinity(path[i].travelCost))
+                {
+                    distance = path[i].travelCost;
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
+        private bool ShouldExcludeReachableMapEntity(IMapEntity entity, ICommanderState selectedCommander, int teamId)
+        {
+            if (entity == null)
+            {
+                return true;
+            }
+
+            if (IsScannerPickupEntity(entity)
+                && selectedCommander != null
+                && entity.DidVisit(selectedCommander.Id))
+            {
+                return true;
+            }
+
+            return entity.Category == MapEntityCategory.ResourceGenerator
+                && GetMapEntityRelationship(entity, teamId) == "friendly";
         }
 
         private void RemoveRevealedScannerResult(ScannerResult result)

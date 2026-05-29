@@ -2807,3 +2807,23 @@ msgstr "준비 안 됨"
 msgctxt "Screens.Ready"
 msgid "Ready"
 msgstr "준비 완료"
+
+#. Actions.SummarizeReachableEntities
+msgctxt "Actions.SummarizeReachableEntities"
+msgid "Summarize Reachable Entities"
+msgstr "도달 가능한 개체 요약"
+
+#. Scanner.ReachableSummary
+msgctxt "Scanner.ReachableSummary"
+msgid "Reachable: {0}"
+msgstr "도달 가능: {0}"
+
+#. Scanner.ReachableSummaryCount
+msgctxt "Scanner.ReachableSummaryCount"
+msgid "{0} {1}"
+msgstr "{0} {1}"
+
+#. Scanner.ReachableSummaryNone
+msgctxt "Scanner.ReachableSummaryNone"
+msgid "Reachable: none"
+msgstr "도달 가능: 없음"

@@ -3037,3 +3037,23 @@ msgstr "Не готовий"
 msgctxt "Screens.Ready"
 msgid "Ready"
 msgstr "Готовий"
+
+#. Actions.SummarizeReachableEntities
+msgctxt "Actions.SummarizeReachableEntities"
+msgid "Summarize Reachable Entities"
+msgstr "Підсумувати досяжні об’єкти"
+
+#. Scanner.ReachableSummary
+msgctxt "Scanner.ReachableSummary"
+msgid "Reachable: {0}"
+msgstr "Досяжно: {0}"
+
+#. Scanner.ReachableSummaryCount
+msgctxt "Scanner.ReachableSummaryCount"
+msgid "{0} {1}"
+msgstr "{0} {1}"
+
+#. Scanner.ReachableSummaryNone
+msgctxt "Scanner.ReachableSummaryNone"
+msgid "Reachable: none"
+msgstr "Досяжно: немає"

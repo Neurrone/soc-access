@@ -2807,3 +2807,23 @@ msgstr "未准备"
 msgctxt "Screens.Ready"
 msgid "Ready"
 msgstr "已准备"
+
+#. Actions.SummarizeReachableEntities
+msgctxt "Actions.SummarizeReachableEntities"
+msgid "Summarize Reachable Entities"
+msgstr "汇总可到达实体"
+
+#. Scanner.ReachableSummary
+msgctxt "Scanner.ReachableSummary"
+msgid "Reachable: {0}"
+msgstr "可到达：{0}"
+
+#. Scanner.ReachableSummaryCount
+msgctxt "Scanner.ReachableSummaryCount"
+msgid "{0} {1}"
+msgstr "{0}个{1}"
+
+#. Scanner.ReachableSummaryNone
+msgctxt "Scanner.ReachableSummaryNone"
+msgid "Reachable: none"
+msgstr "可到达：无"
