@@ -278,14 +278,14 @@ namespace SongsOfConquestAccess.Screens
                 () => adapter.TowerSummary,
                 adapter.HideNativeTooltip,
                 includeParentLabelInAnnouncement: false,
-                isVisible: adapter.HasTowerSummary));
+                isVisible: adapter.HasVisibleTowerSummary));
 
             root.AddChild(new TextWidget(
-                "defences-tower-info",
+                "defences-no-towers-help",
                 () => adapter.TowerInfoText,
                 adapter.HideNativeTooltip,
                 includeParentLabelInAnnouncement: false,
-                isVisible: adapter.HasVisibleTowerInfo));
+                isVisible: adapter.HasVisibleNoTowersHelp));
 
             root.AddChild(BuildDefenseMenu("defences-garrison", GameText.Get("Adventure/BuildMenu/Garrison", string.Empty), adapter.GetGarrisonSlots()));
             root.AddChild(BuildDefenseMenu("defences-ballista", ModText.Get(ModStrings.Screens.Ballista), adapter.GetBallistaSlots()));

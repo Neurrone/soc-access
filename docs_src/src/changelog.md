@@ -14,6 +14,7 @@
 - When narrating enemy spellcasting, just say "Enemy" instead of "Enemy wielder"
 - In the post-game victory / defeat screen, clear all other screens in the stack to prevent the adventure map from being heard after the game ends
 - More spellcast narration fixes
+- Fixed some help text not reading on defences screen
 
 ## V0.4.1
 

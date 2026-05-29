@@ -44,6 +44,7 @@ namespace SongsOfConquestAccess.Adapters
         private static readonly FieldInfo TowerInfoTextField = AccessTools.Field(typeof(DefencePanelTroops), "_towerInfoText");
         private static readonly FieldInfo TowersLevelTextField = AccessTools.Field(typeof(DefencePanelTroops), "_towersLevelText");
         private static readonly FieldInfo TowerContainerField = AccessTools.Field(typeof(DefencePanelTroops), "_towerContainer");
+        private static readonly FieldInfo NoTowersContainerField = AccessTools.Field(typeof(DefencePanelTroops), "_noTowersContainer");
         private static readonly FieldInfo TowerInfoContainerField = AccessTools.Field(typeof(DefencePanelTroops), "_towerInfoContainer");
 
         private static readonly FieldInfo TowerTooltipAreaField = AccessTools.Field(typeof(DefenceTowerEntry), "_tooltipArea");
@@ -264,9 +265,11 @@ namespace SongsOfConquestAccess.Adapters
             }
         }
 
-        public bool HasTowerSummary()
+        public bool HasVisibleTowerSummary()
         {
-            return !string.IsNullOrWhiteSpace(TowerSummary);
+            return IsVisible(GetField<GameObject>(GetDefencePanelTroops(), TowerInfoContainerField))
+                && IsVisible(GetField<UITextMesh>(GetDefencePanelTroops(), TowersLevelTextField) as Component)
+                && !string.IsNullOrWhiteSpace(TowerSummary);
         }
 
         public string TowerInfoText
@@ -274,9 +277,9 @@ namespace SongsOfConquestAccess.Adapters
             get { return GetText(GetField<UITextMesh>(GetDefencePanelTroops(), TowerInfoTextField)); }
         }
 
-        public bool HasVisibleTowerInfo()
+        public bool HasVisibleNoTowersHelp()
         {
-            return IsVisible(GetField<GameObject>(GetDefencePanelTroops(), TowerInfoContainerField))
+            return IsVisible(GetField<GameObject>(GetDefencePanelTroops(), NoTowersContainerField))
                 && IsVisible(GetField<UITextMesh>(GetDefencePanelTroops(), TowerInfoTextField) as Component)
                 && !string.IsNullOrWhiteSpace(TowerInfoText);
         }
