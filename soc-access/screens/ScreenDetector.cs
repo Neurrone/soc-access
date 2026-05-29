@@ -47,6 +47,7 @@ namespace SongsOfConquestAccess.Screens
                 FoldoutMenuScreen.TryBuildActiveScreen,
                 CampaignMenuScreen.TryBuildActiveScreen,
                 TaleSelectScreen.TryBuildActiveScreen,
+                CustomCampaignSelectScreen.TryBuildActiveScreen,
                 OnlineGameListScreen.TryBuildActiveScreen,
                 OnlineHostGameScreen.TryBuildActiveScreen,
                 AdventureLobbyMapTypeScreen.TryBuildActiveScreen,
@@ -853,6 +854,44 @@ namespace SongsOfConquestAccess.Screens
             _screenManager.Pop<TaleSelectScreen>("tale select closed");
         }
 
+        public void OnCustomCampaignSelectRepopulated(CustomCampaignSelectMenuBehavior behavior)
+        {
+            CustomCampaignSelectAdapter adapter = new CustomCampaignSelectAdapter(behavior);
+            if (!adapter.IsPresent())
+            {
+                return;
+            }
+
+            CustomCampaignSelectScreen screen = new CustomCampaignSelectScreen(adapter);
+            if (_screenManager.CurrentScreen is CustomCampaignSelectScreen)
+            {
+                _screenManager.RefreshTop<CustomCampaignSelectScreen>(screen, "custom campaign select repopulated");
+                return;
+            }
+
+            Push(screen, "custom campaign select ready");
+        }
+
+        public void OnCustomCampaignSelectClosed(CustomCampaignSelectMenuBehavior behavior)
+        {
+            if (_screenManager.CurrentScreen is CustomCampaignSelectScreen)
+            {
+                _screenManager.Pop<CustomCampaignSelectScreen>("custom campaign select closed");
+                return;
+            }
+
+            if (_screenManager.Contains<CustomCampaignSelectScreen>())
+            {
+                _screenManager.Remove<CustomCampaignSelectScreen>("custom campaign select closed");
+            }
+        }
+
+        public void OnCustomCampaignEntryStatusChanged(CustomCampaignEntry entry)
+        {
+            CustomCampaignSelectScreen screen = _screenManager.CurrentScreen as CustomCampaignSelectScreen;
+            screen?.AnnounceStatusChanged(entry);
+        }
+
         public void OnCampaignMapSelectShown(CampaignMapSelectMenu menu, CampaignMapSelectedInformationView informationView)
         {
             CampaignMapSelectScreen screen = new CampaignMapSelectScreen(
@@ -1396,6 +1435,7 @@ namespace SongsOfConquestAccess.Screens
 
         public void OnMainMenuSceneLoaded(MainMenuSceneType loadedScene)
         {
+            CustomCampaignSelectScreen customCampaignSelect = _screenManager.Get<CustomCampaignSelectScreen>();
             if (loadedScene == MainMenuSceneType.MainMenu)
             {
                 SocAccessPlugin.Instance?.ReviewBuffers?.Clear(ReviewBufferKind.AdventureMapNotifications);
@@ -1405,6 +1445,13 @@ namespace SongsOfConquestAccess.Screens
             if (loadedScene != MainMenuSceneType.Campaign && _screenManager.CurrentScreen is CampaignMenuScreen)
             {
                 _screenManager.Pop<CampaignMenuScreen>("main menu scene changed away from campaign");
+            }
+
+            if (loadedScene != MainMenuSceneType.CustomCampaign
+                && customCampaignSelect != null
+                && !customCampaignSelect.IsPresent())
+            {
+                _screenManager.Remove<CustomCampaignSelectScreen>("main menu scene changed away from custom campaign");
             }
 
             if (loadedScene != MainMenuSceneType.OnlineGameList && _screenManager.Contains<OnlineHostGameScreen>())

@@ -80,6 +80,10 @@
       <HintPath>$(GameManagedDir)\Unity.Addressables.dll</HintPath>
       <Private>false</Private>
     </Reference>
+    <Reference Include="UniTask">
+      <HintPath>$(GameManagedDir)\UniTask.dll</HintPath>
+      <Private>false</Private>
+    </Reference>
     <Reference Include="UnityEngine.UI">
       <HintPath>$(GameManagedDir)\UnityEngine.UI.dll</HintPath>
       <Private>false</Private>
