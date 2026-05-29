@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using _8_UILayer.ClientView.Menu.Paus;
 using SongsOfConquest.Client;
 using SongsOfConquest.Client.Adventure;
+using SongsOfConquest.Client.Adventure.Menu;
 using SongsOfConquest.Client.Adventure.Menu.Lobby;
 using SongsOfConquest.Client.Adventure.UI;
 using SongsOfConquest.Client.Adventure.UI.Trading;
@@ -46,6 +47,8 @@ namespace SongsOfConquestAccess.Screens
                 FoldoutMenuScreen.TryBuildActiveScreen,
                 CampaignMenuScreen.TryBuildActiveScreen,
                 TaleSelectScreen.TryBuildActiveScreen,
+                OnlineGameListScreen.TryBuildActiveScreen,
+                OnlineHostGameScreen.TryBuildActiveScreen,
                 AdventureLobbyMapTypeScreen.TryBuildActiveScreen,
                 AdventureLobbyRandomLayoutScreen.TryBuildActiveScreen,
                 AdventureLobbyMapSelectScreen.TryBuildActiveScreen,
@@ -739,6 +742,100 @@ namespace SongsOfConquestAccess.Screens
             _screenManager.Pop<CampaignMenuScreen>("campaign menu closed");
         }
 
+        public void OnOnlineGameListReady(GameListMenu menu)
+        {
+            OnlineGameListAdapter adapter = new OnlineGameListAdapter(menu);
+            if (!adapter.IsPresent())
+            {
+                return;
+            }
+
+            OnlineGameListScreen screen = new OnlineGameListScreen(adapter);
+            if (_screenManager.CurrentScreen is OnlineGameListScreen)
+            {
+                _screenManager.RefreshTop<OnlineGameListScreen>(screen, "online game list shown");
+                return;
+            }
+
+            Push(screen, "online game list ready");
+        }
+
+        public void OnOnlineGameListChanged()
+        {
+            OnlineGameListScreen screen = _screenManager.Get<OnlineGameListScreen>();
+            if (screen == null)
+            {
+                return;
+            }
+
+            if (!screen.IsPresent())
+            {
+                _screenManager.Remove<OnlineGameListScreen>("online game list no longer present");
+                return;
+            }
+
+            screen.Refresh(announceFocus: false);
+        }
+
+        public void OnOnlineGameListChanged(GameListMenu menu)
+        {
+            OnlineGameListScreen current = _screenManager.Get<OnlineGameListScreen>();
+            if (current != null && current.Matches(menu))
+            {
+                if (current.IsPresent())
+                {
+                    current.Refresh(announceFocus: false);
+                    return;
+                }
+
+                _screenManager.Remove<OnlineGameListScreen>("online game list no longer present");
+                return;
+            }
+
+            OnOnlineGameListReady(menu);
+        }
+
+        public void OnOnlineGameListClosed(GameListMenu menu)
+        {
+            if (_screenManager.Contains<OnlineGameListScreen>())
+            {
+                _screenManager.Remove<OnlineGameListScreen>("online game list closed");
+            }
+        }
+
+        public void OnOnlineHostGameReady(GameListMenu menu)
+        {
+            OnlineHostGameAdapter adapter = new OnlineHostGameAdapter(menu);
+            if (!adapter.IsPresent())
+            {
+                return;
+            }
+
+            OnlineHostGameScreen screen = new OnlineHostGameScreen(adapter);
+            if (_screenManager.CurrentScreen is OnlineHostGameScreen)
+            {
+                _screenManager.RefreshTop<OnlineHostGameScreen>(screen, "online host game shown");
+                return;
+            }
+
+            Push(screen, "online host game ready");
+        }
+
+        public void OnOnlineHostGameClosed(GameListMenu menu)
+        {
+            OnlineHostGameScreen current = _screenManager.CurrentScreen as OnlineHostGameScreen;
+            if (current != null && (menu == null || current.Matches(menu)))
+            {
+                _screenManager.Pop<OnlineHostGameScreen>("online host game closed");
+                return;
+            }
+
+            if (_screenManager.Contains<OnlineHostGameScreen>())
+            {
+                _screenManager.Remove<OnlineHostGameScreen>("online host game closed");
+            }
+        }
+
         public void OnTaleSelectLayoutRebuilt(TaleButtonLayoutCoordinator coordinator)
         {
             TaleSelectScreen screen = new TaleSelectScreen(new TaleSelectAdapter(coordinator));
@@ -1308,6 +1405,16 @@ namespace SongsOfConquestAccess.Screens
             if (loadedScene != MainMenuSceneType.Campaign && _screenManager.CurrentScreen is CampaignMenuScreen)
             {
                 _screenManager.Pop<CampaignMenuScreen>("main menu scene changed away from campaign");
+            }
+
+            if (loadedScene != MainMenuSceneType.OnlineGameList && _screenManager.Contains<OnlineHostGameScreen>())
+            {
+                _screenManager.Remove<OnlineHostGameScreen>("main menu scene changed away from online game list");
+            }
+
+            if (loadedScene != MainMenuSceneType.OnlineGameList && _screenManager.Contains<OnlineGameListScreen>())
+            {
+                _screenManager.Remove<OnlineGameListScreen>("main menu scene changed away from online game list");
             }
 
             if (loadedScene != MainMenuSceneType.AdventureLobby && _screenManager.Contains<AdventureLobbyMapTypeScreen>())

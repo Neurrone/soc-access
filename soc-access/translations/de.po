@@ -470,6 +470,11 @@ msgctxt "UI.SlotInGroup"
 msgid "{0} slot {1}"
 msgstr "{0}, Slot {1}"
 
+#. UI.Status
+msgctxt "UI.Status"
+msgid "status"
+msgstr "Status"
+
 #. UI.StatusChecked
 msgctxt "UI.StatusChecked"
 msgid "checked"

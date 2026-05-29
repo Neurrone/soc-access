@@ -382,6 +382,7 @@ namespace SongsOfConquestAccess.Localization
             public static readonly ModString SelectedCount = new ModString("UI.SelectedCount", "selected {0}x");
             public static readonly ModString Slot = new ModString("UI.Slot", "slot {0}");
             public static readonly ModString SlotInGroup = new ModString("UI.SlotInGroup", "{0} slot {1}");
+            public static readonly ModString Status = new ModString("UI.Status", "status");
             public static readonly ModString StatusChecked = new ModString("UI.StatusChecked", "checked");
             public static readonly ModString StatusCorrupt = new ModString("UI.StatusCorrupt", "corrupt");
             public static readonly ModString StatusDisabled = new ModString("UI.StatusDisabled", "disabled");
