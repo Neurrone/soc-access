@@ -1302,10 +1302,25 @@ msgctxt "Actions.ReadThreat"
 msgid "Read Threat"
 msgstr "è¯»å–å¨èƒ"
 
+#. Actions.ScannerDecreaseLookAroundRadius
+msgctxt "Actions.ScannerDecreaseLookAroundRadius"
+msgid "Decrease Look Around Radius"
+msgstr "减小环顾半径"
+
+#. Actions.ScannerIncreaseLookAroundRadius
+msgctxt "Actions.ScannerIncreaseLookAroundRadius"
+msgid "Increase Look Around Radius"
+msgstr "增大环顾半径"
+
 #. Actions.ScannerJumpToResult
 msgctxt "Actions.ScannerJumpToResult"
 msgid "Jump To Scanner Result"
 msgstr "è·³åˆ°æ‰«æå™¨ç»“æžœ"
+
+#. Actions.ScannerLookAround
+msgctxt "Actions.ScannerLookAround"
+msgid "Look Around"
+msgstr "环顾四周"
 
 #. Actions.ScannerNextCategory
 msgctxt "Actions.ScannerNextCategory"
@@ -2126,6 +2141,16 @@ msgstr "ä¸å¯é€šè¡Œåœ°å½¢"
 msgctxt "Scanner.Knowledge"
 msgid "Knowledge"
 msgstr "çŸ¥è¯†"
+
+#. Scanner.LookAround
+msgctxt "Scanner.LookAround"
+msgid "Look around"
+msgstr "环顾四周"
+
+#. Scanner.LookAroundRadius
+msgctxt "Scanner.LookAroundRadius"
+msgid "Look around radius {0}"
+msgstr "环顾半径 {0}"
 
 #. Scanner.Neutral
 msgctxt "Scanner.Neutral"

@@ -178,6 +178,15 @@ namespace SongsOfConquestAccess.Input
         public static readonly InputAction ScannerSpeakOrientation = OneShot("scanner_speak_orientation", ModStrings.Actions.ScannerSpeakOrientation, InputClaimScope.FocusedWidget)
             .AddBinding(new KeyboardBinding(Key.Home, shift: true));
 
+        public static readonly InputAction ScannerLookAround = OneShot("scanner_look_around", ModStrings.Actions.ScannerLookAround, InputClaimScope.FocusedWidget)
+            .AddBinding(new KeyboardBinding(Key.L));
+
+        public static readonly InputAction ScannerIncreaseLookAroundRadius = OneShot("scanner_increase_look_around_radius", ModStrings.Actions.ScannerIncreaseLookAroundRadius, InputClaimScope.FocusedWidget)
+            .AddBinding(new KeyboardBinding(Key.K));
+
+        public static readonly InputAction ScannerDecreaseLookAroundRadius = OneShot("scanner_decrease_look_around_radius", ModStrings.Actions.ScannerDecreaseLookAroundRadius, InputClaimScope.FocusedWidget)
+            .AddBinding(new KeyboardBinding(Key.K, shift: true));
+
         public static readonly InputAction SliderDecrease = OneShot("slider_decrease", ModStrings.Actions.SliderDecrease, InputClaimScope.FocusedWidget)
             .AddBinding(new KeyboardBinding(Key.LeftArrow));
 
@@ -372,6 +381,9 @@ namespace SongsOfConquestAccess.Input
                 ScannerNextResult,
                 ScannerJumpToResult,
                 ScannerSpeakOrientation,
+                ScannerLookAround,
+                ScannerIncreaseLookAroundRadius,
+                ScannerDecreaseLookAroundRadius,
                 SliderDecrease,
                 SliderIncrease,
                 SliderMinimum,

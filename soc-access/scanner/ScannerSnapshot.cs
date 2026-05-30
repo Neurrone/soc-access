@@ -60,9 +60,24 @@ namespace SongsOfConquestAccess.Scanner
 
         public bool IsSearchSnapshot { get; private set; }
 
+        public bool IsLookAroundSnapshot { get; private set; }
+
+        public bool IsTemporarySnapshot
+        {
+            get { return IsSearchSnapshot || IsLookAroundSnapshot; }
+        }
+
+        public bool UseSortOriginForDirections { get; private set; }
+
         public void MarkAsSearchSnapshot()
         {
             IsSearchSnapshot = true;
+        }
+
+        public void MarkAsLookAroundSnapshot()
+        {
+            IsLookAroundSnapshot = true;
+            UseSortOriginForDirections = true;
         }
 
         public ScannerCategory GetOrAddCategory(string label)

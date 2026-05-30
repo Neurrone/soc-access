@@ -19,12 +19,17 @@ namespace SongsOfConquestAccess.UI
     internal sealed class AdventureMapGrid : Widget
     {
         private const string ScannerWrapCueKey = "Common_ClickUnfold";
+        private const int DefaultLookAroundRadius = 15;
+        private const int MinimumLookAroundRadius = 5;
+        private const int MaximumLookAroundRadius = 30;
+        private const int LookAroundRadiusStep = 5;
 
         private readonly AdventureMapAdapter _adapter;
         private Vector2Int _cursorTile;
         private readonly ScannerController _scanner;
         private readonly AdventureBookmarkManager _bookmarks;
         private readonly AdventureBeaconAudio _beacons;
+        private int _lookAroundRadius = DefaultLookAroundRadius;
 
         public AdventureMapGrid(AdventureMapAdapter adapter)
             : base("adventure_map_grid")
@@ -340,7 +345,37 @@ namespace SongsOfConquestAccess.UI
                 return HandleScannerNavigationResult(_scanner.ExecuteSpeakOrientation());
             }
 
+            if (action.Key == AccessibilityActions.ScannerLookAround.Key)
+            {
+                return HandleScannerNavigationResult(_scanner.ExecuteLookAround(_lookAroundRadius));
+            }
+
+            if (action.Key == AccessibilityActions.ScannerIncreaseLookAroundRadius.Key)
+            {
+                return ChangeLookAroundRadius(LookAroundRadiusStep);
+            }
+
+            if (action.Key == AccessibilityActions.ScannerDecreaseLookAroundRadius.Key)
+            {
+                return ChangeLookAroundRadius(-LookAroundRadiusStep);
+            }
+
             return false;
+        }
+
+        private bool ChangeLookAroundRadius(int delta)
+        {
+            int next = _lookAroundRadius + delta;
+            if (next < MinimumLookAroundRadius || next > MaximumLookAroundRadius)
+            {
+                return true;
+            }
+
+            _lookAroundRadius = next;
+            SpeechPipeline.Output(new SpeechRequest(
+                ModText.Get(ModStrings.Scanner.LookAroundRadius, _lookAroundRadius),
+                interrupt: false));
+            return true;
         }
 
         private bool HandleBookmarkAction(InputAction action)
@@ -460,7 +495,8 @@ namespace SongsOfConquestAccess.UI
 
             if (result != null && result.Status == ScannerCommandStatus.Result && result.Result != null)
             {
-                ScannerDirectionalBeepAudio.Play(_cursorTile, result.Result.Position, DirectionalBeepGridGeometry.Square);
+                Vector2Int origin = result.HasOrigin ? result.Origin : _cursorTile;
+                ScannerDirectionalBeepAudio.Play(origin, result.Result.Position, DirectionalBeepGridGeometry.Square);
             }
 
             _scanner.Output(result);
@@ -511,7 +547,10 @@ namespace SongsOfConquestAccess.UI
                 || actionKey == AccessibilityActions.ScannerPreviousResult.Key
                 || actionKey == AccessibilityActions.ScannerNextResult.Key
                 || actionKey == AccessibilityActions.ScannerJumpToResult.Key
-                || actionKey == AccessibilityActions.ScannerSpeakOrientation.Key;
+                || actionKey == AccessibilityActions.ScannerSpeakOrientation.Key
+                || actionKey == AccessibilityActions.ScannerLookAround.Key
+                || actionKey == AccessibilityActions.ScannerIncreaseLookAroundRadius.Key
+                || actionKey == AccessibilityActions.ScannerDecreaseLookAroundRadius.Key;
         }
 
         private static bool IsBookmarkAction(string actionKey)

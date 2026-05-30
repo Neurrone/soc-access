@@ -204,7 +204,10 @@ namespace SongsOfConquestAccess.Localization
             public static readonly ModString PreviousRow = new ModString("Actions.PreviousRow", "Previous Row");
             public static readonly ModString PreviousWidget = new ModString("Actions.PreviousWidget", "Previous Widget");
             public static readonly ModString ReadThreat = new ModString("Actions.ReadThreat", "Read Threat");
+            public static readonly ModString ScannerDecreaseLookAroundRadius = new ModString("Actions.ScannerDecreaseLookAroundRadius", "Decrease Look Around Radius");
+            public static readonly ModString ScannerIncreaseLookAroundRadius = new ModString("Actions.ScannerIncreaseLookAroundRadius", "Increase Look Around Radius");
             public static readonly ModString ScannerJumpToResult = new ModString("Actions.ScannerJumpToResult", "Jump To Scanner Result");
+            public static readonly ModString ScannerLookAround = new ModString("Actions.ScannerLookAround", "Look Around");
             public static readonly ModString ScannerNextCategory = new ModString("Actions.ScannerNextCategory", "Next Scanner Category");
             public static readonly ModString ScannerNextResult = new ModString("Actions.ScannerNextResult", "Next Scanner Result");
             public static readonly ModString ScannerNextSubcategory = new ModString("Actions.ScannerNextSubcategory", "Next Scanner Subcategory");
@@ -567,6 +570,8 @@ namespace SongsOfConquestAccess.Localization
             public static readonly ModPluralString ImpassableTileCount = new ModPluralString("Scanner.ImpassableTileCount", "{0} impassable tile", "{0} impassable tiles");
             public static readonly ModString ImpassableTerrain = new ModString("Scanner.ImpassableTerrain", "Impassable terrain");
             public static readonly ModString Knowledge = new ModString("Scanner.Knowledge", "Knowledge");
+            public static readonly ModString LookAround = new ModString("Scanner.LookAround", "Look around");
+            public static readonly ModString LookAroundRadius = new ModString("Scanner.LookAroundRadius", "Look around radius {0}");
             public static readonly ModString Mountains = new ModString("Scanner.Mountains", "Mountains");
             public static readonly ModPluralString MountainTileCount = new ModPluralString("Scanner.MountainTileCount", "{0} mountain tile", "{0} mountain tiles");
             public static readonly ModString Neutral = new ModString("Scanner.Neutral", "Neutral");

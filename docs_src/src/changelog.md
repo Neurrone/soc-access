@@ -2,10 +2,11 @@
 
 ## V0.5.0
 
-- The post-game player stats screen is now accessible
-- Added support for starting multiplayer games
-- Fix troop rewards being unselectable when your army has no slots, even after you disband a troop to make room
 - Pressing shift with a movement key skips to the next interesting tile in that direction
+- Added two new commands on the adventure map grid:
+  - `A` summarizes entities reachable by the current wielder. This excludes visited pickups or claimed resource generators
+  - `L` looks around from the current tile and places results into a temporary `Look around` scanner category. `K` and `Shift+K` adjust the look radius. Results are sorted clockwise, starting from the north.
+- Fix troop rewards being unselectable when your army has no slots, even after you disband a troop to make room
 - Fixed an edge case where cycling through your own stacks with `,` would miss some if initiative buffs cause the current stack to act sooner next round
 - In combat, abbreviations like enemy ranged troops are only used when the group has two or more stacks
 - To help with fighting enemies with the same units as you, the battle timeline now specifically indicates if a troop is an enemy
@@ -15,8 +16,9 @@
 - In the post-game victory / defeat screen, clear all other screens in the stack to prevent the adventure map from being heard after the game ends
 - More spellcast narration fixes
 - Condense effects applied to troops when abilities like protect are used, similar to how effects from spells are already being read
-- On the adventure map grid, the `A` key summarizes entities reachable by the current wielder. This excludes visited pickups or claimed resource generators
 - Fixed some help text not reading on defences screen
+- The post-game player stats screen is now accessible
+- Added support for starting multiplayer games
 
 ## V0.4.1
 

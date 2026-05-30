@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using SongsOfConquestAccess.Localization;
 using SongsOfConquestAccess.Speech;
+using UnityEngine;
 
 namespace SongsOfConquestAccess.Scanner
 {
@@ -31,6 +32,10 @@ namespace SongsOfConquestAccess.Scanner
         public int ResultCount { get; set; }
 
         public IReadOnlyList<ScannerDirectionStep> Directions { get; set; }
+
+        public bool HasOrigin { get; set; }
+
+        public Vector2Int Origin { get; set; }
 
         public bool IncludePath { get; set; }
 

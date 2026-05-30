@@ -28,10 +28,6 @@ Currently visible things are read normally. Explored tiles that are not currentl
 - `Home`: move the accessibility cursor to the current scanner result
 - `Shift+Home`: repeat the current scanner result
 
-## Search
-
-On the adventure map, use `Ctrl+f` to perform a search across all categories of the scanner. This is useful for finding specific things quickly.
-
 ## Notes
 
 - Scanner commands refresh results automatically as you navigate through them.
@@ -39,3 +35,17 @@ On the adventure map, use `Ctrl+f` to perform a search across all categories of 
 - Category, subcategory, and result navigation wraps.
 - Directions are relative to the current accessibility cursor.
 - The mod setting `Scanner plays directional beep` can add a short spatial audio cue to scanner result readouts. It is off by default.
+
+## Adventure Map Features
+
+On the adventure map grid, the following additional features are supported.
+
+### Search
+
+Use `Ctrl+f` to perform a search across all categories of the scanner. This is useful for finding specific things quickly. Results are placed in a temporary scanner category.
+
+### Look Around
+
+Use `L` to look around from the currently focused tile. Results are placed in a temporary category, similar to the search command. Results start north of the cursor and continue clockwise.
+
+Use `K` to increase the look radius and `Shift+K` to decrease it. The default radius is 15 tiles. Changing the radius does not refresh existing results; press `L` again to scan with the new radius.

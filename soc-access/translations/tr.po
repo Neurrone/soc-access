@@ -1302,10 +1302,25 @@ msgctxt "Actions.ReadThreat"
 msgid "Read Threat"
 msgstr "Tehdidi oku"
 
+#. Actions.ScannerDecreaseLookAroundRadius
+msgctxt "Actions.ScannerDecreaseLookAroundRadius"
+msgid "Decrease Look Around Radius"
+msgstr "Etrafa bakma yarıçapını azalt"
+
+#. Actions.ScannerIncreaseLookAroundRadius
+msgctxt "Actions.ScannerIncreaseLookAroundRadius"
+msgid "Increase Look Around Radius"
+msgstr "Etrafa bakma yarıçapını artır"
+
 #. Actions.ScannerJumpToResult
 msgctxt "Actions.ScannerJumpToResult"
 msgid "Jump To Scanner Result"
 msgstr "TarayÄ±cÄ± sonucuna git"
+
+#. Actions.ScannerLookAround
+msgctxt "Actions.ScannerLookAround"
+msgid "Look Around"
+msgstr "Etrafa bak"
 
 #. Actions.ScannerNextCategory
 msgctxt "Actions.ScannerNextCategory"
@@ -2126,6 +2141,16 @@ msgstr "GeÃ§ilemez arazi"
 msgctxt "Scanner.Knowledge"
 msgid "Knowledge"
 msgstr "Bilgi"
+
+#. Scanner.LookAround
+msgctxt "Scanner.LookAround"
+msgid "Look around"
+msgstr "Etrafa bak"
+
+#. Scanner.LookAroundRadius
+msgctxt "Scanner.LookAroundRadius"
+msgid "Look around radius {0}"
+msgstr "Etrafa bakma yarıçapı {0}"
 
 #. Scanner.Neutral
 msgctxt "Scanner.Neutral"

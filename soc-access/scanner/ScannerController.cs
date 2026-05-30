@@ -18,7 +18,7 @@ namespace SongsOfConquestAccess.Scanner
         private int _categoryIndex;
         private int _subcategoryIndex;
         private int _resultIndex;
-        private int _preSearchCategoryIndex;
+        private int _preTemporaryCategoryIndex;
 
         public ScannerController(
             Func<Vector2Int, ScannerSnapshot> snapshotBuilder,
@@ -52,6 +52,11 @@ namespace SongsOfConquestAccess.Scanner
             return ExecuteSearchCore(query);
         }
 
+        internal ScannerCommandResult ExecuteLookAround(int radius)
+        {
+            return ExecuteLookAroundCore(radius);
+        }
+
         private ScannerCommandResult ExecuteRefreshCore()
         {
             Vector2Int origin = GetCursor();
@@ -73,7 +78,7 @@ namespace SongsOfConquestAccess.Scanner
         {
             if (string.IsNullOrWhiteSpace(query))
             {
-                ClearSearchSnapshot();
+                ClearTemporarySnapshot();
                 return SearchNoResults();
             }
 
@@ -82,13 +87,13 @@ namespace SongsOfConquestAccess.Scanner
             ScannerSnapshot search = ScannerSearch.Build(source, query, origin);
             if (search == null || search.IsEmpty)
             {
-                ClearSearchSnapshot();
+                ClearTemporarySnapshot();
                 return SearchNoResults();
             }
 
-            if (_snapshot == null || !_snapshot.IsSearchSnapshot)
+            if (_snapshot == null || !_snapshot.IsTemporarySnapshot)
             {
-                _preSearchCategoryIndex = _categoryIndex;
+                _preTemporaryCategoryIndex = _categoryIndex;
             }
 
             _snapshot = search;
@@ -98,11 +103,34 @@ namespace SongsOfConquestAccess.Scanner
             return BuildCommandResult(includePath: true);
         }
 
-        private void ClearSearchSnapshot()
+        private ScannerCommandResult ExecuteLookAroundCore(int radius)
         {
-            if (_snapshot != null && _snapshot.IsSearchSnapshot)
+            Vector2Int origin = GetCursor();
+            ScannerSnapshot source = BuildSnapshot(origin);
+            ScannerSnapshot lookAround = ScannerLookAround.Build(source, origin, radius);
+            if (lookAround == null || lookAround.IsEmpty)
             {
-                _categoryIndex = _preSearchCategoryIndex;
+                ClearTemporarySnapshot();
+                return NoResults();
+            }
+
+            if (_snapshot == null || !_snapshot.IsTemporarySnapshot)
+            {
+                _preTemporaryCategoryIndex = _categoryIndex;
+            }
+
+            _snapshot = lookAround;
+            _categoryIndex = 0;
+            _subcategoryIndex = 0;
+            _resultIndex = 0;
+            return BuildCommandResult(includePath: true);
+        }
+
+        private void ClearTemporarySnapshot()
+        {
+            if (_snapshot != null && _snapshot.IsTemporarySnapshot)
+            {
+                _categoryIndex = _preTemporaryCategoryIndex;
             }
 
             _snapshot = null;
@@ -123,9 +151,9 @@ namespace SongsOfConquestAccess.Scanner
 
         private ScannerCommandResult ExecuteMoveCategoryCore(int delta)
         {
-            if (_snapshot != null && _snapshot.IsSearchSnapshot)
+            if (_snapshot != null && _snapshot.IsTemporarySnapshot)
             {
-                _categoryIndex = _preSearchCategoryIndex;
+                _categoryIndex = _preTemporaryCategoryIndex;
                 _subcategoryIndex = 0;
                 _resultIndex = 0;
                 _snapshot = null;
@@ -165,7 +193,7 @@ namespace SongsOfConquestAccess.Scanner
 
         private ScannerCommandResult ExecuteMoveSubcategoryCore(int delta)
         {
-            if (_snapshot == null || !_snapshot.IsSearchSnapshot)
+            if (_snapshot == null || !_snapshot.IsTemporarySnapshot)
             {
                 RebuildFromCursorPreservingScope();
             }
@@ -208,7 +236,7 @@ namespace SongsOfConquestAccess.Scanner
 
         private ScannerCommandResult ExecuteMoveResultCore(int delta)
         {
-            bool locatedCurrent = _snapshot != null && _snapshot.IsSearchSnapshot
+            bool locatedCurrent = _snapshot != null && _snapshot.IsTemporarySnapshot
                 ? CurrentValidResult() != null
                 : RebuildForResultNavigation();
             if (_snapshot == null || _snapshot.IsEmpty)
@@ -318,8 +346,8 @@ namespace SongsOfConquestAccess.Scanner
             }
 
             ScannerSubcategory subcategory = CurrentSubcategory();
-            Vector2Int cursor = GetCursor();
-            IReadOnlyList<ScannerDirectionStep> directions = BuildDirections(cursor, result.Position);
+            Vector2Int origin = GetSpeechOrigin();
+            IReadOnlyList<ScannerDirectionStep> directions = BuildDirections(origin, result.Position);
             return new ScannerCommandResult(ScannerCommandStatus.Result)
             {
                 Result = result,
@@ -328,6 +356,8 @@ namespace SongsOfConquestAccess.Scanner
                 ResultIndex = _resultIndex + 1,
                 ResultCount = subcategory != null ? subcategory.Results.Count : 1,
                 Directions = directions,
+                HasOrigin = true,
+                Origin = origin,
                 IncludePath = includePath
             };
         }
@@ -364,7 +394,7 @@ namespace SongsOfConquestAccess.Scanner
 
         private bool RebuildForCurrentResultAction()
         {
-            if (_snapshot != null && _snapshot.IsSearchSnapshot)
+            if (_snapshot != null && _snapshot.IsTemporarySnapshot)
             {
                 return CurrentValidResult() != null;
             }
@@ -878,6 +908,13 @@ namespace SongsOfConquestAccess.Scanner
         private Vector2Int GetCursor()
         {
             return _cursorProvider != null ? _cursorProvider() : Vector2Int.zero;
+        }
+
+        private Vector2Int GetSpeechOrigin()
+        {
+            return _snapshot != null && _snapshot.UseSortOriginForDirections && _snapshot.HasSortOrigin
+                ? _snapshot.SortOrigin
+                : GetCursor();
         }
 
         private ScannerSnapshot BuildSnapshot(Vector2Int origin)

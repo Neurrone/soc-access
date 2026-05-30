@@ -1302,10 +1302,25 @@ msgctxt "Actions.ReadThreat"
 msgid "Read Threat"
 msgstr "è„…å¨ã‚’èª­ã¿ä¸Šã’"
 
+#. Actions.ScannerDecreaseLookAroundRadius
+msgctxt "Actions.ScannerDecreaseLookAroundRadius"
+msgid "Decrease Look Around Radius"
+msgstr "周囲確認の半径を縮小"
+
+#. Actions.ScannerIncreaseLookAroundRadius
+msgctxt "Actions.ScannerIncreaseLookAroundRadius"
+msgid "Increase Look Around Radius"
+msgstr "周囲確認の半径を拡大"
+
 #. Actions.ScannerJumpToResult
 msgctxt "Actions.ScannerJumpToResult"
 msgid "Jump To Scanner Result"
 msgstr "ã‚¹ã‚­ãƒ£ãƒŠãƒ¼çµæžœã¸ç§»å‹•"
+
+#. Actions.ScannerLookAround
+msgctxt "Actions.ScannerLookAround"
+msgid "Look Around"
+msgstr "周囲を確認"
 
 #. Actions.ScannerNextCategory
 msgctxt "Actions.ScannerNextCategory"
@@ -2126,6 +2141,16 @@ msgstr "é€šè¡Œä¸å¯åœ°å½¢"
 msgctxt "Scanner.Knowledge"
 msgid "Knowledge"
 msgstr "çŸ¥è­˜"
+
+#. Scanner.LookAround
+msgctxt "Scanner.LookAround"
+msgid "Look around"
+msgstr "周囲を確認"
+
+#. Scanner.LookAroundRadius
+msgctxt "Scanner.LookAroundRadius"
+msgid "Look around radius {0}"
+msgstr "周囲確認の半径 {0}"
 
 #. Scanner.Neutral
 msgctxt "Scanner.Neutral"

@@ -1312,10 +1312,25 @@ msgctxt "Actions.ReadThreat"
 msgid "Read Threat"
 msgstr "Ler ameaÃ§a"
 
+#. Actions.ScannerDecreaseLookAroundRadius
+msgctxt "Actions.ScannerDecreaseLookAroundRadius"
+msgid "Decrease Look Around Radius"
+msgstr "Diminuir raio de observação"
+
+#. Actions.ScannerIncreaseLookAroundRadius
+msgctxt "Actions.ScannerIncreaseLookAroundRadius"
+msgid "Increase Look Around Radius"
+msgstr "Aumentar raio de observação"
+
 #. Actions.ScannerJumpToResult
 msgctxt "Actions.ScannerJumpToResult"
 msgid "Jump To Scanner Result"
 msgstr "Ir para resultado do scanner"
+
+#. Actions.ScannerLookAround
+msgctxt "Actions.ScannerLookAround"
+msgid "Look Around"
+msgstr "Olhar ao redor"
 
 #. Actions.ScannerNextCategory
 msgctxt "Actions.ScannerNextCategory"
@@ -2141,6 +2156,16 @@ msgstr "Terreno intransponÃ­vel"
 msgctxt "Scanner.Knowledge"
 msgid "Knowledge"
 msgstr "Conhecimento"
+
+#. Scanner.LookAround
+msgctxt "Scanner.LookAround"
+msgid "Look around"
+msgstr "Olhar ao redor"
+
+#. Scanner.LookAroundRadius
+msgctxt "Scanner.LookAroundRadius"
+msgid "Look around radius {0}"
+msgstr "Raio de observação {0}"
 
 #. Scanner.Neutral
 msgctxt "Scanner.Neutral"

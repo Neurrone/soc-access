@@ -1322,10 +1322,25 @@ msgctxt "Actions.ReadThreat"
 msgid "Read Threat"
 msgstr "ÐŸÑ€Ð¾Ñ‡Ð¸Ñ‚Ð°Ñ‚Ð¸ Ð·Ð°Ð³Ñ€Ð¾Ð·Ñƒ"
 
+#. Actions.ScannerDecreaseLookAroundRadius
+msgctxt "Actions.ScannerDecreaseLookAroundRadius"
+msgid "Decrease Look Around Radius"
+msgstr "Зменшити радіус огляду"
+
+#. Actions.ScannerIncreaseLookAroundRadius
+msgctxt "Actions.ScannerIncreaseLookAroundRadius"
+msgid "Increase Look Around Radius"
+msgstr "Збільшити радіус огляду"
+
 #. Actions.ScannerJumpToResult
 msgctxt "Actions.ScannerJumpToResult"
 msgid "Jump To Scanner Result"
 msgstr "ÐŸÐµÑ€ÐµÐ¹Ñ‚Ð¸ Ð´Ð¾ Ñ€ÐµÐ·ÑƒÐ»ÑŒÑ‚Ð°Ñ‚Ñƒ ÑÐºÐ°Ð½ÐµÑ€Ð°"
+
+#. Actions.ScannerLookAround
+msgctxt "Actions.ScannerLookAround"
+msgid "Look Around"
+msgstr "Озирнутися"
 
 #. Actions.ScannerNextCategory
 msgctxt "Actions.ScannerNextCategory"
@@ -2156,6 +2171,16 @@ msgstr "ÐÐµÐ¿Ñ€Ð¾Ñ…Ñ–Ð´Ð½Ð° Ð¼Ñ–ÑÑ†ÐµÐ²Ñ
 msgctxt "Scanner.Knowledge"
 msgid "Knowledge"
 msgstr "Ð—Ð½Ð°Ð½Ð½Ñ"
+
+#. Scanner.LookAround
+msgctxt "Scanner.LookAround"
+msgid "Look around"
+msgstr "Озирнутися"
+
+#. Scanner.LookAroundRadius
+msgctxt "Scanner.LookAroundRadius"
+msgid "Look around radius {0}"
+msgstr "Радіус огляду {0}"
 
 #. Scanner.Neutral
 msgctxt "Scanner.Neutral"
