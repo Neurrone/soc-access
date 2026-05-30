@@ -67,13 +67,20 @@ namespace SongsOfConquestAccess.Adapters
                 bool isSpellResponse = response is CastBattleSpellCommand.Response;
                 bool isAbilityBegin = response is TroopAbilityActivationBeginCommand.Response;
                 bool isAbilityComplete = response is TroopAbilityActivationCompleteCommand.Response;
+                bool isEndTurnResponse = response is EndBattleTurnCommand.Response;
                 bool bufferForSpell = !isSpellResponse && ShouldBufferForSpellResponse(response, adapter);
                 LogCombatNarrationTimingDiagnostic("response", DescribeResponse(response));
+                if (_abilityBatchActive && isEndTurnResponse)
+                {
+                    _abilityBatchActive = false;
+                    FlushPendingEventsImmediately("ability_end_turn");
+                }
+
                 EnqueueResponse(response, adapter);
                 // Spell and ability effects arrive as separate follow-up responses.
                 // Batch them so repeated effect applications can be condensed into
-                // summaries, using the spell response or ability begin/complete as
-                // the available command boundary.
+                // summaries. Ability effects can arrive after activation complete,
+                // so complete restarts the bounded wait instead of flushing.
                 if (isAbilityBegin)
                 {
                     _abilityBatchActive = true;
@@ -81,8 +88,8 @@ namespace SongsOfConquestAccess.Adapters
                 }
                 else if (isAbilityComplete)
                 {
-                    _abilityBatchActive = false;
-                    FlushPendingEventsImmediately("ability_complete");
+                    _abilityBatchActive = true;
+                    RestartScheduledFlushPendingEvents();
                 }
                 else if (isSpellResponse)
                 {
@@ -973,6 +980,17 @@ namespace SongsOfConquestAccess.Adapters
             _flushScheduledTime = Time.realtimeSinceStartup;
             LogCombatNarrationTimingDiagnostic("flush_scheduled", "waitFrames=" + CombatNarrationBatchFrames);
             plugin.StartCoroutine(FlushPendingEventsAfterResponseBatch(_flushScheduleGeneration, _flushScheduledFrame, _flushScheduledTime));
+        }
+
+        private static void RestartScheduledFlushPendingEvents()
+        {
+            if (_flushPendingEventsScheduled)
+            {
+                _flushScheduleGeneration++;
+                _flushPendingEventsScheduled = false;
+            }
+
+            ScheduleFlushPendingEvents();
         }
 
         private static IEnumerator FlushPendingEventsAfterResponseBatch(int generation, int scheduledFrame, float scheduledTime)
