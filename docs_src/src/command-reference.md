@@ -4,115 +4,133 @@ This page summarizes the mod hotkeys used across the documentation.
 
 ## Global
 
-| Key          | Action                                               |
-| ------------ | ---------------------------------------------------- |
-| Tab          | Next widget                                          |
-| Shift+Tab    | Previous widget                                      |
-| Enter        | Activate or confirm                                  |
-| Numpad Enter | Activate or confirm                                  |
-| Escape       | Cancel or close when supported                       |
-| `            | Open tooltip actions menu when actions are available |
-| Ctrl+R       | Read your resources or essence                       |
-| Alt+R        | Read enemy essence in combat                         |
+| Key            | Action                                               |
+| -------------- | ---------------------------------------------------- |
+| `Tab`          | Next widget                                          |
+| `Shift+Tab`    | Previous widget                                      |
+| `Enter`        | Activate or confirm                                  |
+| `Numpad Enter` | Activate or confirm                                  |
+| `Escape`       | Cancel or close when supported                       |
+| `` ` ``        | Open tooltip actions menu when actions are available |
+| `Ctrl+R`       | Read your resources or essence                       |
+| `Alt+R`        | Read enemy essence in combat                         |
+| `Ctrl+M`       | Open mod settings                                    |
 
 ## Menus
 
-| Key   | Action                 |
-| ----- | ---------------------- |
-| Down  | Next menu item         |
-| Up    | Previous menu item     |
-| Home  | First menu item        |
-| End   | Last menu item         |
-| Enter | Activate selected item |
+| Key     | Action                 |
+| ------- | ---------------------- |
+| `Down`  | Next menu item         |
+| `Up`    | Previous menu item     |
+| `Home`  | First menu item        |
+| `End`   | Last menu item         |
+| `Enter` | Activate selected item |
 
 ## Review Buffers
 
-| Key        | Action          |
-| ---------- | --------------- |
-| Ctrl+Left  | Previous buffer |
-| Ctrl+Right | Next buffer     |
-| Ctrl+Up    | Previous line   |
-| Ctrl+Down  | Next line       |
-| Ctrl+Home  | First line      |
-| Ctrl+End   | Last line       |
+| Key          | Action          |
+| ------------ | --------------- |
+| `Ctrl+Left`  | Previous buffer |
+| `Ctrl+Right` | Next buffer     |
+| `Ctrl+Up`    | Previous line   |
+| `Ctrl+Down`  | Next line       |
+| `Ctrl+Home`  | First line      |
+| `Ctrl+End`   | Last line       |
 
 ## Grids
 
-| Key    | Action                      |
-| ------ | --------------------------- |
-| Up     | Previous row                |
-| Down   | Next row                    |
-| Left   | Previous column             |
-| Right  | Next column                 |
-| Home   | First row in current column |
-| End    | Last row in current column  |
-| Space  | Start drag                  |
-| Enter  | Drop dragged item           |
-| Escape | Cancel drag                 |
-
-## Text Editing
-
-| Key                  | Action                                    |
-| -------------------- | ----------------------------------------- |
-| Enter on edit field  | Start editing                             |
-| Enter while editing  | Finish editing                            |
-| Escape while editing | Cancel editing and restore previous value |
+| Key      | Action                      |
+| -------- | --------------------------- |
+| `Up`     | Previous row                |
+| `Down`   | Next row                    |
+| `Left`   | Previous column             |
+| `Right`  | Next column                 |
+| `Home`   | First row in current column |
+| `End`    | Last row in current column  |
+| `Space`  | Start drag                  |
+| `Enter`  | Drop dragged item           |
+| `Escape` | Cancel drag                 |
 
 ## Adventure Map
 
-| Key       | Action                 |
-| --------- | ---------------------- |
-| Up        | Move north             |
-| Down      | Move south             |
-| Left      | Move west              |
-| Right     | Move east              |
-| Enter     | Primary tile action    |
-| Backslash | Secondary tile action  |
-| W         | Select next wielder    |
-| S         | Select next settlement |
+| Key                 | Action                              |
+| ------------------- | ----------------------------------- |
+| `Up`                | Move north                          |
+| `Down`              | Move south                          |
+| `Left`              | Move west                           |
+| `Right`             | Move east                           |
+| `Shift+Arrow keys`  | Move to next interesting tile       |
+| `Enter`             | Primary tile action                 |
+| `Backslash`         | Secondary tile action               |
+| `A`                 | Summarize reachable entities        |
+| `W`                 | Select next wielder                 |
+| `S`                 | Select next settlement              |
+| `Space`             | Move focus to selected wielder tile |
+| `H`                 | Toggle HUD visibility               |
+| `N`                 | Focus notifications                 |
+| `O`                 | Focus objectives                    |
+| `R`                 | Focus resources                     |
+| `T`                 | Focus troops                        |
+| `Ctrl+number`       | Save bookmark                       |
+| `Shift+number`      | Jump to bookmark                    |
+| `Alt+number`        | Read directions to bookmark         |
+| `Ctrl+Shift+number` | Toggle bookmark beacon              |
 
 ## Scanner
 
-| Key            | Action                             |
-| -------------- | ---------------------------------- |
-| End            | Refresh scanner results            |
-| PageUp         | Previous result                    |
-| PageDown       | Next result                        |
-| Home           | Jump to current result             |
-| Shift+Home     | Read orientation to current result |
-| Ctrl+PageUp    | Previous category                  |
-| Ctrl+PageDown  | Next category                      |
-| Shift+PageUp   | Previous subcategory               |
-| Shift+PageDown | Next subcategory                   |
+| Key              | Action                        |
+| ---------------- | ----------------------------- |
+| `End`            | Refresh scanner results       |
+| `PageUp`         | Previous result               |
+| `PageDown`       | Next result                   |
+| `Home`           | Jump to current result        |
+| `Shift+Home`     | Repeat current scanner result |
+| `Ctrl+PageUp`    | Previous category             |
+| `Ctrl+PageDown`  | Next category                 |
+| `Shift+PageUp`   | Previous subcategory          |
+| `Shift+PageDown` | Next subcategory              |
+| `Ctrl+F`         | Search scanner categories     |
+| `L`              | Look around from current tile |
+| `K`              | Increase look radius          |
+| `Shift+K`        | Decrease look radius          |
 
 ## Hex Grids
 
-| Key | Action    |
-| --- | --------- |
-| A   | West      |
-| D   | East      |
-| Q   | Northwest |
-| E   | Northeast |
-| Z   | Southwest |
-| C   | Southeast |
+| Key                 | Action                        |
+| ------------------- | ----------------------------- |
+| `A`                 | West                          |
+| `D`                 | East                          |
+| `Q`                 | Northwest                     |
+| `E`                 | Northeast                     |
+| `Z`                 | Southwest                     |
+| `C`                 | Southeast                     |
+| `Shift+A/D/Q/E/Z/C` | Move to next interesting tile |
 
 ## Combat
 
-| Key                    | Action                          |
-| ---------------------- | ------------------------------- |
-| I                      | Enter inspect mode              |
-| T                      | Focus turn order                |
-| Backslash              | Secondary combat hex action     |
-| Enter while targeting  | Confirm spell or ability target |
-| Escape while targeting | Cancel targeting                |
+| Key                      | Action                           |
+| ------------------------ | -------------------------------- |
+| `I`                      | Enter inspect mode               |
+| `S`                      | Read detailed threat information |
+| `T`                      | Focus turn order                 |
+| `H`                      | Toggle HUD visibility            |
+| `Backslash`              | Secondary combat hex action      |
+| `Enter while targeting`  | Confirm spell or ability target  |
+| `Escape while targeting` | Cancel targeting                 |
+| `Escape in inspect mode` | Exit inspect mode                |
+| `,`                      | Focus next friendly troop        |
+| `Shift+,`                | Focus previous friendly troop    |
+| `Space`                  | Focus currently acting troop     |
+| `.`                      | Focus next enemy troop           |
+| `Shift+.`                | Focus previous enemy troop       |
 
 ## Codex
 
 When focused on an article
 
-| Key         | Action                          |
-| ----------- | ------------------------------- |
-| Up or Down  | Previous or next paragraph item |
-| Home or End | First or last article paragraph |
-| H           | Next heading                    |
-| Shift+H     | Previous heading                |
+| Key             | Action                          |
+| --------------- | ------------------------------- |
+| `Up` or `Down`  | Previous or next paragraph item |
+| `Home` or `End` | First or last article paragraph |
+| `H`             | Next heading                    |
+| `Shift+H`       | Previous heading                |
