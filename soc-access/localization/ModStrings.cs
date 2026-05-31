@@ -413,6 +413,7 @@ namespace SongsOfConquestAccess.Localization
             public static readonly ModString Army = new ModString("Screens.Army", "army");
             public static readonly ModString Articles = new ModString("Screens.Articles", "Articles");
             public static readonly ModString AiControl = new ModString("Screens.AiControl", "AI control");
+            public static readonly ModString AiDifficulty = new ModString("Screens.AiDifficulty", "{0} AI");
             public static readonly ModString Attacker = new ModString("Screens.Attacker", "Attacker");
             public static readonly ModString AttackerEssence = new ModString("Screens.AttackerEssence", "Attacker essence");
             public static readonly ModString AttackerPortrait = new ModString("Screens.AttackerPortrait", "Attacker portrait");

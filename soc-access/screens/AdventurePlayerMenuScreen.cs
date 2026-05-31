@@ -3,6 +3,7 @@ using SongsOfConquest.Client.Adventure;
 using SongsOfConquestAccess.Adapters;
 using SongsOfConquestAccess.Localization;
 using SongsOfConquestAccess.UI;
+using SongsOfConquest.Common.Economy;
 using UnityEngine;
 
 namespace SongsOfConquestAccess.Screens
@@ -10,6 +11,15 @@ namespace SongsOfConquestAccess.Screens
     internal sealed class AdventurePlayerMenuScreen : Screen
     {
         private const int PlayersMenuIndex = 0;
+        private static readonly ResourceType[] ResourceSummaryOrder =
+        {
+            ResourceType.Gold,
+            ResourceType.Stone,
+            ResourceType.Wood,
+            ResourceType.Glimmerweave,
+            ResourceType.AncientAmber,
+            ResourceType.CelestialOre
+        };
 
         private readonly AdventurePlayerMenuAdapter _adapter;
 
@@ -94,6 +104,7 @@ namespace SongsOfConquestAccess.Screens
             AddSelectedPlayerAction(root, "selected-player-towns", adapter, player => player.Towns);
             AddSelectedPlayerAction(root, "selected-player-platform-actions", adapter, player => player.PlatformActions);
             AddSelectedPlayerAction(root, "selected-player-spectate-battle", adapter, player => player.SpectateBattle);
+            root.AddChild(BuildSelectedPlayerResourcesMenu(adapter));
             root.AddChild(new ButtonWidget(
                 "adventure-players-close",
                 ModText.Get(ModStrings.Screens.Close),
@@ -131,6 +142,46 @@ namespace SongsOfConquestAccess.Screens
             }
 
             return menu;
+        }
+
+        private static MenuWidget BuildSelectedPlayerResourcesMenu(AdventurePlayerMenuAdapter adapter)
+        {
+            MenuWidget menu = new MenuWidget(
+                "selected-player-resources-summary",
+                ModText.Get(ModStrings.Screens.Resources),
+                () => adapter != null && adapter.SelectedPlayer != null && adapter.SelectedPlayer.HasResourceSummary);
+            for (int i = 0; i < ResourceSummaryOrder.Length; i++)
+            {
+                AddSelectedPlayerResourceItem(menu, adapter, ResourceSummaryOrder[i]);
+            }
+
+            return menu;
+        }
+
+        private static void AddSelectedPlayerResourceItem(
+            MenuWidget menu,
+            AdventurePlayerMenuAdapter adapter,
+            ResourceType resourceType)
+        {
+            ResourceType capturedType = resourceType;
+            menu.AddItem(new MenuItemWidget(
+                "selected-player-resource-" + capturedType.ToString().ToLowerInvariant(),
+                () => adapter != null && adapter.SelectedPlayer != null
+                    ? adapter.SelectedPlayer.GetResourceLabel(capturedType)
+                    : string.Empty,
+                null,
+                null,
+                () =>
+                {
+                    if (adapter != null && adapter.SelectedPlayer != null)
+                    {
+                        adapter.SelectedPlayer.FocusResource(capturedType);
+                    }
+                },
+                () => adapter != null && adapter.SelectedPlayer != null && adapter.SelectedPlayer.HasResourceSummary,
+                () => adapter != null && adapter.SelectedPlayer != null
+                    ? adapter.SelectedPlayer.GetResourceTooltip(capturedType)
+                    : null));
         }
 
         private static string BuildPlayerLabel(AdventurePlayerMenuAdapter.PlayerItem player)

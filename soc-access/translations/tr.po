@@ -2017,6 +2017,11 @@ msgctxt "Screens.AiControl"
 msgid "AI control"
 msgstr "YZ kontrolÃ¼"
 
+#. Screens.AiDifficulty
+msgctxt "Screens.AiDifficulty"
+msgid "{0} AI"
+msgstr "{0} YZ"
+
 #. Screens.Attacker
 msgctxt "Screens.Attacker"
 msgid "Attacker"

@@ -14,6 +14,7 @@ using SongsOfConquest.Common.Localization;
 using SongsOfConquestAccess.Localization;
 using SongsOfConquestAccess.Speech;
 using SongsOfConquestAccess.UI;
+using SongsOfConquest.Common.Economy;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -208,6 +209,32 @@ namespace SongsOfConquestAccess.Adapters
                 AccessTools.Field(typeof(AdventurePlayerMenuEntry), "_nameButton");
             private static readonly FieldInfo ResourceButtonField =
                 AccessTools.Field(typeof(AdventurePlayerMenuEntry), "_resourceButton");
+            private static readonly FieldInfo ResourcesContainerField =
+                AccessTools.Field(typeof(AdventurePlayerMenuEntry), "_resourcesContainer");
+            private static readonly FieldInfo GoldAmountField =
+                AccessTools.Field(typeof(AdventurePlayerMenuEntry), "_goldAmount");
+            private static readonly FieldInfo GoldIncomeField =
+                AccessTools.Field(typeof(AdventurePlayerMenuEntry), "_goldIncome");
+            private static readonly FieldInfo StoneAmountField =
+                AccessTools.Field(typeof(AdventurePlayerMenuEntry), "_stoneAmount");
+            private static readonly FieldInfo StoneIncomeField =
+                AccessTools.Field(typeof(AdventurePlayerMenuEntry), "_stoneIncome");
+            private static readonly FieldInfo WoodAmountField =
+                AccessTools.Field(typeof(AdventurePlayerMenuEntry), "_woodAmount");
+            private static readonly FieldInfo WoodIncomeField =
+                AccessTools.Field(typeof(AdventurePlayerMenuEntry), "_woodIncome");
+            private static readonly FieldInfo WeaveAmountField =
+                AccessTools.Field(typeof(AdventurePlayerMenuEntry), "_weaveAmount");
+            private static readonly FieldInfo WeaveIncomeField =
+                AccessTools.Field(typeof(AdventurePlayerMenuEntry), "_weaveIncome");
+            private static readonly FieldInfo AmberAmountField =
+                AccessTools.Field(typeof(AdventurePlayerMenuEntry), "_amberAmount");
+            private static readonly FieldInfo AmberIncomeField =
+                AccessTools.Field(typeof(AdventurePlayerMenuEntry), "_amberIncome");
+            private static readonly FieldInfo OreAmountField =
+                AccessTools.Field(typeof(AdventurePlayerMenuEntry), "_oreAmount");
+            private static readonly FieldInfo OreIncomeField =
+                AccessTools.Field(typeof(AdventurePlayerMenuEntry), "_oreIncome");
             private static readonly FieldInfo TownsButtonField =
                 AccessTools.Field(typeof(AdventurePlayerMenuEntry), "_townsButton");
             private static readonly FieldInfo NonAggressionPactButtonField =
@@ -309,7 +336,10 @@ namespace SongsOfConquestAccess.Adapters
                         return string.Empty;
                     }
 
-                    return SpeechTextSanitizer.Normalize(GameText.Get(_adapter != null ? _adapter._localization : null, "Common/AiMode/" + team.AiDifficulty, string.Empty));
+                    string difficulty = SpeechTextSanitizer.Normalize(GameText.Get(_adapter != null ? _adapter._localization : null, "Common/AiMode/" + team.AiDifficulty, string.Empty));
+                    return string.IsNullOrWhiteSpace(difficulty)
+                        ? string.Empty
+                        : ModText.Get(ModStrings.Screens.AiDifficulty, difficulty);
                 }
             }
 
@@ -325,6 +355,47 @@ namespace SongsOfConquestAccess.Adapters
 
                     return GetText(GetField<UITextMesh>(_entry, ScoreTextField));
                 }
+            }
+
+            public bool HasResourceSummary
+            {
+                get
+                {
+                    ITeamState team = Team;
+                    IClientAdventureFacade facade = _adapter != null ? _adapter._facade : null;
+                    return team != null
+                        && facade != null
+                        && facade.Teams != null
+                        && team.IsAlive
+                        && team.Id != facade.Teams.LocalTeamInControlId
+                        && facade.Teams.IsInPartnership(facade.Teams.LocalTeamInControlId, team.Id);
+                }
+            }
+
+            public string GetResourceLabel(ResourceType resourceType)
+            {
+                string name = SpeechTextSanitizer.Normalize(GameText.Get(_adapter != null ? _adapter._localization : null, "Common/Resource/" + resourceType, string.Empty));
+                string amount = GetText(GetResourceAmountText(resourceType));
+                string income = IsGameObjectVisible(GetResourceIncomeText(resourceType))
+                    ? GetText(GetResourceIncomeText(resourceType))
+                    : string.Empty;
+
+                string label = string.IsNullOrWhiteSpace(amount) ? name : name + " " + amount;
+                return string.IsNullOrWhiteSpace(income) ? label : label + ", income " + income;
+            }
+
+            public void FocusResource(ResourceType resourceType)
+            {
+                Component component = GetResourceTooltipComponent(resourceType);
+                if (component != null)
+                {
+                    NativeSelectionUtility.Select(component);
+                }
+            }
+
+            public Tooltip GetResourceTooltip(ResourceType resourceType)
+            {
+                return Tooltip.ForComponent(GetResourceTooltipComponent(resourceType), _adapter != null ? _adapter._localization : null);
             }
 
             public Tooltip Tooltip
@@ -392,6 +463,75 @@ namespace SongsOfConquestAccess.Adapters
             private ITeamState Team
             {
                 get { return GetField<ITeamState>(_entry, TeamField); }
+            }
+
+            private UITextMesh GetResourceAmountText(ResourceType resourceType)
+            {
+                return GetField<UITextMesh>(_entry, GetResourceAmountField(resourceType));
+            }
+
+            private UITextMesh GetResourceIncomeText(ResourceType resourceType)
+            {
+                return GetField<UITextMesh>(_entry, GetResourceIncomeField(resourceType));
+            }
+
+            private Component GetResourceTooltipComponent(ResourceType resourceType)
+            {
+                UITextMesh amountText = GetResourceAmountText(resourceType);
+                if (IsGameObjectVisible(amountText))
+                {
+                    return amountText as Component;
+                }
+
+                UITextMesh incomeText = GetResourceIncomeText(resourceType);
+                return IsGameObjectVisible(incomeText) ? incomeText as Component : null;
+            }
+
+            private static FieldInfo GetResourceAmountField(ResourceType resourceType)
+            {
+                switch (resourceType)
+                {
+                    case ResourceType.Gold:
+                        return GoldAmountField;
+                    case ResourceType.Stone:
+                        return StoneAmountField;
+                    case ResourceType.Wood:
+                        return WoodAmountField;
+                    case ResourceType.Glimmerweave:
+                        return WeaveAmountField;
+                    case ResourceType.AncientAmber:
+                        return AmberAmountField;
+                    case ResourceType.CelestialOre:
+                        return OreAmountField;
+                    default:
+                        return null;
+                }
+            }
+
+            private static FieldInfo GetResourceIncomeField(ResourceType resourceType)
+            {
+                switch (resourceType)
+                {
+                    case ResourceType.Gold:
+                        return GoldIncomeField;
+                    case ResourceType.Stone:
+                        return StoneIncomeField;
+                    case ResourceType.Wood:
+                        return WoodIncomeField;
+                    case ResourceType.Glimmerweave:
+                        return WeaveIncomeField;
+                    case ResourceType.AncientAmber:
+                        return AmberIncomeField;
+                    case ResourceType.CelestialOre:
+                        return OreIncomeField;
+                    default:
+                        return null;
+                }
+            }
+
+            private static bool IsGameObjectVisible(Component component)
+            {
+                return component != null && component.gameObject != null && component.gameObject.activeInHierarchy;
             }
 
             private ActionItem BuildAction(string idSuffix, UIButton button, Func<string> fallbackLabel)

@@ -2047,6 +2047,11 @@ msgctxt "Screens.AiControl"
 msgid "AI control"
 msgstr "Sterowanie SI"
 
+#. Screens.AiDifficulty
+msgctxt "Screens.AiDifficulty"
+msgid "{0} AI"
+msgstr "SI {0}"
+
 #. Screens.Attacker
 msgctxt "Screens.Attacker"
 msgid "Attacker"

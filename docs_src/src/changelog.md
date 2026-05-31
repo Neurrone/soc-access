@@ -2,6 +2,9 @@
 
 ## V0.5.0
 
+- Experimental support for starting multiplayer games. Will need other players to test actual games with to ensure this works properly
+- Support screens for trading resources and settlements in the players menu
+- Added support for community campaigns
 - Pressing shift with a movement key skips to the next interesting tile in that direction
 - Added two new commands on the adventure map grid:
   - `A` summarizes entities reachable by the current wielder. This excludes visited pickups or claimed resource generators
@@ -18,7 +21,6 @@
 - Condense effects applied to troops when abilities like protect are used, similar to how effects from spells are already being read
 - Fixed some help text not reading on defences screen
 - The post-game player stats screen is now accessible
-- Added support for starting multiplayer games
 
 ## V0.4.1
 

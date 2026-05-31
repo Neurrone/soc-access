@@ -71,6 +71,8 @@ namespace SongsOfConquestAccess.Screens
                 CampaignMapSelectScreen.TryBuildActiveScreen,
                 AdventureMapScreen.TryBuildActiveScreen,
                 AdventurePlayerMenuScreen.TryBuildActiveScreen,
+                SendResourcePopupScreen.TryBuildActiveScreen,
+                GiftTownPopupScreen.TryBuildActiveScreen,
                 OwnedEntitiesScreen.TryBuildActiveScreen,
                 TroopOverviewScreen.TryBuildActiveScreen,
                 MarketplaceScreen.TryBuildActiveScreen,
@@ -387,6 +389,66 @@ namespace SongsOfConquestAccess.Screens
             if (_screenManager.Contains<AdventurePlayerMenuScreen>())
             {
                 _screenManager.Remove<AdventurePlayerMenuScreen>("adventure players menu closed");
+            }
+        }
+
+        public void OnSendResourcePopupReady(SendResourcePopup popup)
+        {
+            SendResourcePopupAdapter adapter = new SendResourcePopupAdapter(popup);
+            if (!adapter.IsPresent())
+            {
+                return;
+            }
+
+            SendResourcePopupScreen screen = new SendResourcePopupScreen(adapter);
+            if (_screenManager.CurrentScreen is SendResourcePopupScreen)
+            {
+                _screenManager.RefreshTop<SendResourcePopupScreen>(screen, "send resource popup shown");
+                return;
+            }
+
+            Push(screen, "send resource popup ready");
+        }
+
+        public void OnSendResourcePopupHidden()
+        {
+            // SendResourcePopup.Hide is not a reliable close signal by itself:
+            // the game also calls it during injection-time initialization and can
+            // call it redundantly when the popup is already inactive. Only pop
+            // when the corresponding accessibility screen is currently on top.
+            if (_screenManager.CurrentScreen is SendResourcePopupScreen)
+            {
+                _screenManager.Pop<SendResourcePopupScreen>("send resource popup hidden");
+            }
+        }
+
+        public void OnGiftTownPopupReady(GiftTownPopup popup)
+        {
+            GiftTownPopupAdapter adapter = new GiftTownPopupAdapter(popup);
+            if (!adapter.IsPresent())
+            {
+                return;
+            }
+
+            GiftTownPopupScreen screen = new GiftTownPopupScreen(adapter);
+            if (_screenManager.CurrentScreen is GiftTownPopupScreen)
+            {
+                _screenManager.RefreshTop<GiftTownPopupScreen>(screen, "gift town popup shown");
+                return;
+            }
+
+            Push(screen, "gift town popup ready");
+        }
+
+        public void OnGiftTownPopupHidden()
+        {
+            // GiftTownPopup.Hide is not a reliable close signal by itself:
+            // the game also calls it during injection-time initialization and can
+            // call it redundantly when the popup is already inactive. Only pop
+            // when the corresponding accessibility screen is currently on top.
+            if (_screenManager.CurrentScreen is GiftTownPopupScreen)
+            {
+                _screenManager.Pop<GiftTownPopupScreen>("gift town popup hidden");
             }
         }
 
