@@ -15,7 +15,8 @@ namespace SongsOfConquestAccess.Screens
             "campaign",
             "skirmish",
             "load-game",
-            "map-editor",
+            // Map editor is not accessible yet, so do not expose it in the main menu.
+            // "map-editor",
             "community-maps",
             "extras",
             "hotseat",

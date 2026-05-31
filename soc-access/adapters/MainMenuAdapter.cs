@@ -118,7 +118,8 @@ namespace SongsOfConquestAccess.Adapters
                 CreateMainMenuButton(CampaignButtonRef(_mainMenu)),
                 CreateMainMenuButton(SkirmishButtonRef(_mainMenu)),
                 CreateMainMenuButton(LoadGameButtonRef(_mainMenu)),
-                CreateMainMenuButton(MapEditorButtonRef(_mainMenu)),
+                // Map editor is not accessible yet, so do not expose it in the main menu.
+                // CreateMainMenuButton(MapEditorButtonRef(_mainMenu)),
                 CreateMainMenuButton(CommunityMapsButtonRef(_mainMenu)),
                 ExtrasFoldout.TriggerButton,
                 CreateMainMenuButton(HotseatButtonRef(_mainMenu)),

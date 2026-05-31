@@ -21,6 +21,7 @@
 - Condense effects applied to troops when abilities like protect are used, similar to how effects from spells are already being read
 - Fixed some help text not reading on defences screen
 - The post-game player stats screen is now accessible
+- Hide the map editor option in the main menu, since that isn't supported
 
 ## V0.4.1
 
