@@ -442,6 +442,7 @@ namespace SongsOfConquestAccess.Localization
             public static readonly ModString DescriptionWithMissingBuilding = new ModString("Screens.DescriptionWithMissingBuilding", "{0}. missing building");
             public static readonly ModString DestructionSpells = new ModString("Screens.DestructionSpells", "Destruction spells");
             public static readonly ModString DisabledWithReason = new ModString("Screens.DisabledWithReason", "{0}. {1}");
+            public static readonly ModString Downloads = new ModString("Screens.Downloads", "Downloads");
             public static readonly ModString Empty = new ModString("Screens.Empty", "empty");
             public static readonly ModString EmptySlot = new ModString("Screens.EmptySlot", "Empty, slot {0}");
             public static readonly ModString EjectWielder = new ModString("Screens.EjectWielder", "Eject wielder");

@@ -34,6 +34,25 @@ namespace SongsOfConquestAccess.UI
             ResetBaseline();
         }
 
+        public void Begin(TMP_InputField inputField)
+        {
+            if (inputField == null)
+            {
+                Clear();
+                return;
+            }
+
+            if (ReferenceEquals(_inputField, inputField))
+            {
+                ResetBaseline();
+                return;
+            }
+
+            _field = null;
+            _inputField = inputField;
+            ResetBaseline();
+        }
+
         public void Stop()
         {
             Clear();
@@ -41,7 +60,7 @@ namespace SongsOfConquestAccess.UI
 
         public void Update()
         {
-            if (_field == null || _inputField == null)
+            if (_inputField == null)
             {
                 return;
             }

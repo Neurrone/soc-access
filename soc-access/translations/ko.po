@@ -710,6 +710,11 @@ msgctxt "Screens.DisabledWithReason"
 msgid "{0}. {1}"
 msgstr "{0}. {1}"
 
+#. Screens.Downloads
+msgctxt "Screens.Downloads"
+msgid "Downloads"
+msgstr "다운로드"
+
 #. Screens.Empty
 msgctxt "Screens.Empty"
 msgid "empty"

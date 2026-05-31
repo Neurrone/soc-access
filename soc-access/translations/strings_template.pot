@@ -1974,6 +1974,11 @@ msgctxt "Screens.DisabledWithReason"
 msgid "{0}. {1}"
 msgstr ""
 
+#. Screens.Downloads
+msgctxt "Screens.Downloads"
+msgid "Downloads"
+msgstr ""
+
 #. Screens.Empty
 msgctxt "Screens.Empty"
 msgid "empty"

@@ -1,3 +1,4 @@
+using System.Collections;
 using System.Collections.Generic;
 using _8_UILayer.ClientView.Menu.Paus;
 using SongsOfConquest.Client;
@@ -37,6 +38,7 @@ namespace SongsOfConquestAccess.Screens
         private bool _deferredAdventureLobbyDropdownHidden;
         private float _deferredAdventureLobbyDropdownDeadline;
         private bool _storySequenceActive;
+        private bool _communityMapsHomeContentRefreshPending;
 
         public ScreenDetector(ScreenManager screenManager)
         {
@@ -50,6 +52,12 @@ namespace SongsOfConquestAccess.Screens
                 CustomCampaignSelectScreen.TryBuildActiveScreen,
                 OnlineGameListScreen.TryBuildActiveScreen,
                 OnlineHostGameScreen.TryBuildActiveScreen,
+                CommunityMapsHomeScreen.TryBuildActiveScreen,
+                CommunityMapsCollectionScreen.TryBuildActiveScreen,
+                CommunityMapsDetailsScreen.TryBuildActiveScreen,
+                CommunityMapsSearchFilterScreen.TryBuildActiveScreen,
+                CommunityMapsSearchResultsScreen.TryBuildActiveScreen,
+                CommunityMapsModalScreen.TryBuildActiveScreen,
                 AdventureLobbyMapTypeScreen.TryBuildActiveScreen,
                 AdventureLobbyRandomLayoutScreen.TryBuildActiveScreen,
                 AdventureLobbyMapSelectScreen.TryBuildActiveScreen,
@@ -466,6 +474,300 @@ namespace SongsOfConquestAccess.Screens
             if (screen != null)
             {
                 screen.Refresh();
+            }
+        }
+
+        public void OnCommunityMapsChanged()
+        {
+            CommunityMapsHomeScreen home = _screenManager.Get<CommunityMapsHomeScreen>();
+            CommunityMapsCollectionScreen collection = _screenManager.Get<CommunityMapsCollectionScreen>();
+            CommunityMapsDetailsScreen details = _screenManager.Get<CommunityMapsDetailsScreen>();
+            Screen newHome = CommunityMapsHomeScreen.TryBuildActiveScreen();
+            Screen newCollection = CommunityMapsCollectionScreen.TryBuildActiveScreen();
+            Screen newDetails = CommunityMapsDetailsScreen.TryBuildActiveScreen();
+
+            if (newHome != null)
+            {
+                if (home == null)
+                {
+                    if (_screenManager.CurrentScreen is CommunityMapsModalScreen)
+                    {
+                        PushBelowTop(newHome, "community maps home ready below modal");
+                    }
+                    else
+                    {
+                        Push(newHome, "community maps home ready");
+                    }
+                }
+                else
+                {
+                    home.Refresh();
+                }
+            }
+            else if (home != null)
+            {
+                _screenManager.Remove<CommunityMapsHomeScreen>("community maps home closed");
+            }
+
+            if (newCollection != null)
+            {
+                if (collection == null)
+                {
+                    if (_screenManager.CurrentScreen is CommunityMapsModalScreen)
+                    {
+                        PushBelowTop(newCollection, "community maps collection ready below modal");
+                    }
+                    else
+                    {
+                        Push(newCollection, "community maps collection ready");
+                    }
+                }
+                else
+                {
+                    collection.Refresh();
+                }
+            }
+            else if (collection != null)
+            {
+                _screenManager.Remove<CommunityMapsCollectionScreen>("community maps collection closed");
+            }
+
+            if (newDetails != null)
+            {
+                if (details == null)
+                {
+                    if (_screenManager.CurrentScreen is CommunityMapsModalScreen)
+                    {
+                        PushBelowTop(newDetails, "community maps details ready below modal");
+                    }
+                    else
+                    {
+                        Push(newDetails, "community maps details ready");
+                    }
+                }
+                else
+                {
+                    details.Refresh();
+                }
+            }
+            else if (details != null)
+            {
+                _screenManager.Remove<CommunityMapsDetailsScreen>("community maps details closed");
+            }
+        }
+
+        public void OnCommunityMapsHomeContentChanged()
+        {
+            if (_communityMapsHomeContentRefreshPending)
+            {
+                return;
+            }
+
+            SocAccessPlugin plugin = SocAccessPlugin.Instance;
+            if (plugin == null)
+            {
+                RefreshCommunityMapsHome("community maps home content changed");
+                return;
+            }
+
+            _communityMapsHomeContentRefreshPending = true;
+            plugin.StartCoroutine(RefreshCommunityMapsHomeContentNextFrame());
+        }
+
+        private IEnumerator RefreshCommunityMapsHomeContentNextFrame()
+        {
+            yield return null;
+            _communityMapsHomeContentRefreshPending = false;
+            RefreshCommunityMapsHome("community maps home content changed");
+        }
+
+        private void RefreshCommunityMapsHome(string reason)
+        {
+            CommunityMapsHomeScreen home = _screenManager.Get<CommunityMapsHomeScreen>();
+            Screen newHome = CommunityMapsHomeScreen.TryBuildActiveScreen();
+
+            if (newHome != null)
+            {
+                if (home == null)
+                {
+                    if (_screenManager.CurrentScreen is CommunityMapsModalScreen)
+                    {
+                        PushBelowTop(newHome, reason + " below modal");
+                    }
+                    else
+                    {
+                        Push(newHome, reason);
+                    }
+                }
+                else
+                {
+                    home.Refresh();
+                }
+            }
+            else if (home != null)
+            {
+                _screenManager.Remove<CommunityMapsHomeScreen>("community maps home closed");
+            }
+        }
+
+        public void OnCommunityMapsCollectionChanged()
+        {
+            CommunityMapsCollectionScreen collection = _screenManager.Get<CommunityMapsCollectionScreen>();
+            if (collection != null && collection.IsPresent() && collection.IsSearchInputFocused())
+            {
+                collection.DeferRefreshUntilSearchInputUnfocused();
+                return;
+            }
+
+            Screen newCollection = CommunityMapsCollectionScreen.TryBuildActiveScreen();
+
+            if (newCollection != null)
+            {
+                if (collection == null)
+                {
+                    if (_screenManager.CurrentScreen is CommunityMapsModalScreen)
+                    {
+                        PushBelowTop(newCollection, "community maps collection ready below modal");
+                    }
+                    else
+                    {
+                        Push(newCollection, "community maps collection ready");
+                    }
+                }
+                else
+                {
+                    collection.Refresh();
+                }
+            }
+            else if (collection != null)
+            {
+                _screenManager.Remove<CommunityMapsCollectionScreen>("community maps collection closed");
+            }
+        }
+
+        public void OnCommunityMapsModalChanged()
+        {
+            CommunityMapsModalScreen modal = _screenManager.CurrentScreen as CommunityMapsModalScreen;
+            Screen newModal = CommunityMapsModalScreen.TryBuildActiveScreen();
+
+            if (newModal != null)
+            {
+                if (modal == null)
+                {
+                    Push(newModal, "community maps modal ready");
+                }
+                else
+                {
+                    CommunityMapsModalScreen newModalScreen = newModal as CommunityMapsModalScreen;
+                    if (newModalScreen != null && modal.State != newModalScreen.State)
+                    {
+                        _screenManager.RefreshTop<CommunityMapsModalScreen>(newModal, "community maps modal changed");
+                    }
+                    else
+                    {
+                        modal.Refresh();
+                    }
+                }
+            }
+            else if (_screenManager.CurrentScreen is CommunityMapsModalScreen)
+            {
+                _screenManager.Pop<CommunityMapsModalScreen>("community maps modal closed");
+            }
+        }
+
+        public void OnCommunityMapsSearchFilterChanged()
+        {
+            CommunityMapsSearchFilterScreen searchFilter = _screenManager.CurrentScreen as CommunityMapsSearchFilterScreen;
+            Screen newSearchFilter = CommunityMapsSearchFilterScreen.TryBuildActiveScreen();
+
+            if (newSearchFilter != null)
+            {
+                if (searchFilter == null)
+                {
+                    Push(newSearchFilter, "community maps search filter ready");
+                }
+                else
+                {
+                    searchFilter.Refresh();
+                }
+            }
+            else if (_screenManager.CurrentScreen is CommunityMapsSearchFilterScreen)
+            {
+                _screenManager.Pop<CommunityMapsSearchFilterScreen>("community maps search filter closed");
+            }
+            else if (_screenManager.Contains<CommunityMapsSearchFilterScreen>())
+            {
+                _screenManager.Remove<CommunityMapsSearchFilterScreen>("community maps search filter closed below current screen");
+            }
+        }
+
+        public void OnCommunityMapsSearchFilterContentsChanged()
+        {
+            CommunityMapsSearchFilterScreen searchFilter = _screenManager.CurrentScreen as CommunityMapsSearchFilterScreen;
+            if (searchFilter != null && searchFilter.IsPresent())
+            {
+                searchFilter.Refresh();
+            }
+        }
+
+        public void OnCommunityMapsSearchResultsChanged()
+        {
+            CommunityMapsSearchResultsScreen searchResults = _screenManager.Get<CommunityMapsSearchResultsScreen>();
+            CommunityMapsSearchResultsScreen newSearchResults =
+                CommunityMapsSearchResultsScreen.TryBuildActiveScreen() as CommunityMapsSearchResultsScreen;
+
+            if (newSearchResults != null)
+            {
+                if (_screenManager.Contains<CommunityMapsSearchFilterScreen>())
+                {
+                    _screenManager.Remove<CommunityMapsSearchFilterScreen>("community maps search results opened");
+                }
+
+                if (searchResults == null)
+                {
+                    Push(newSearchResults, "community maps search results ready");
+                }
+                else
+                {
+                    searchResults.Refresh(newSearchResults.Adapter);
+                }
+            }
+            else if (searchResults != null)
+            {
+                _screenManager.Remove<CommunityMapsSearchResultsScreen>("community maps search results closed");
+            }
+        }
+
+        public void OnCommunityMapsClosed()
+        {
+            if (_screenManager.CurrentScreen is CommunityMapsSearchFilterScreen)
+            {
+                _screenManager.Pop<CommunityMapsSearchFilterScreen>("community maps browser closed with search filter open");
+            }
+
+            if (_screenManager.CurrentScreen is CommunityMapsSearchResultsScreen)
+            {
+                _screenManager.Pop<CommunityMapsSearchResultsScreen>("community maps browser closed with search results open");
+            }
+
+            if (_screenManager.CurrentScreen is CommunityMapsModalScreen)
+            {
+                _screenManager.Pop<CommunityMapsModalScreen>("community maps browser closed with modal open");
+            }
+
+            if (_screenManager.Contains<CommunityMapsHomeScreen>())
+            {
+                _screenManager.Remove<CommunityMapsHomeScreen>("community maps browser closed");
+            }
+
+            if (_screenManager.Contains<CommunityMapsCollectionScreen>())
+            {
+                _screenManager.Remove<CommunityMapsCollectionScreen>("community maps browser closed");
+            }
+
+            if (_screenManager.Contains<CommunityMapsDetailsScreen>())
+            {
+                _screenManager.Remove<CommunityMapsDetailsScreen>("community maps browser closed");
             }
         }
 

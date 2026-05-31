@@ -104,6 +104,14 @@
       <HintPath>$(GameManagedDir)\Unity.TextMeshPro.dll</HintPath>
       <Private>false</Private>
     </Reference>
+    <Reference Include="modio.UI">
+      <HintPath>$(GameManagedDir)\modio.UI.dll</HintPath>
+      <Private>false</Private>
+    </Reference>
+    <Reference Include="modio.UnityPlugin">
+      <HintPath>$(GameManagedDir)\modio.UnityPlugin.dll</HintPath>
+      <Private>false</Private>
+    </Reference>
     <Reference Include="Assembly-CSharp">
       <HintPath>$(GameManagedDir)\Assembly-CSharp.dll</HintPath>
       <Private>false</Private>
