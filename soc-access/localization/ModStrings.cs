@@ -5,7 +5,6 @@ namespace SongsOfConquestAccess.Localization
         public static class Common
         {
             public static readonly ModString CountOf = new ModString("Common.CountOf", "{0} of {1}");
-            public static readonly ModString In = new ModString("Common.In", "in {0}");
             public static readonly ModString ListFinal = new ModString("Common.ListFinal", "{0}, and {1}");
             public static readonly ModString ListPair = new ModString("Common.ListPair", "{0} and {1}");
             public static readonly ModString ListSeparator = new ModString("Common.ListSeparator", "{0}, {1}");
@@ -95,7 +94,6 @@ namespace SongsOfConquestAccess.Localization
             public static readonly ModString DeepWater = new ModString("Spatial.DeepWater", "Deep water");
             public static readonly ModString Deforestation = new ModString("Spatial.Deforestation", "Deforestation");
             public static readonly ModString Debris = new ModString("Spatial.Debris", "debris");
-            public static readonly ModString Decoration = new ModString("Spatial.Decoration", "Decoration");
             public static readonly ModString Destination = new ModString("Spatial.Destination", "Destination");
             public static readonly ModString DestinationAt = new ModString("Spatial.DestinationAt", "Destination: {0}");
             public static readonly ModString Destroys = new ModString("Spatial.Destroys", "destroys");
@@ -104,9 +102,7 @@ namespace SongsOfConquestAccess.Localization
             public static readonly ModString ElevatedGroundHeight = new ModString("Spatial.ElevatedGroundHeight", "elevated ground, height {0}");
             public static readonly ModString EnemySpawnPoint = new ModString("Spatial.EnemySpawnPoint", "enemy spawn point");
             public static readonly ModString Enemy = new ModString("Spatial.Enemy", "enemy");
-            public static readonly ModString Effect = new ModString("Spatial.Effect", "Effect");
             public static readonly ModString Farmland = new ModString("Spatial.Farmland", "Farmland");
-            public static readonly ModString Fog = new ModString("Spatial.Fog", "Fog");
             public static readonly ModString ExtraTargetPrefix = new ModString("Spatial.ExtraTargetPrefix", "extra target ");
             public static readonly ModString Friendly = new ModString("Spatial.Friendly", "friendly");
             public static readonly ModString FurthestReachableInTurns = new ModString("Spatial.FurthestReachableInTurns", "furthest reachable in {0} turns");
@@ -119,12 +115,10 @@ namespace SongsOfConquestAccess.Localization
             public static readonly ModString Interactable = new ModString("Spatial.Interactable", "interactable");
             public static readonly ModString InteractableNextTurn = new ModString("Spatial.InteractableNextTurn", "interactable next turn");
             public static readonly ModString Kills = new ModString("Spatial.Kills", "kills {0}");
-            public static readonly ModString Light = new ModString("Spatial.Light", "Light");
             public static readonly ModString MayDestroy = new ModString("Spatial.MayDestroy", "may destroy");
             public static readonly ModString Movement = new ModString("Spatial.Movement", "Movement");
             public static readonly ModString MovementRange = new ModString("Spatial.MovementRange", "Movement range");
             public static readonly ModString Mountain = new ModString("Spatial.Mountain", "Mountain");
-            public static readonly ModString Mountains = new ModString("Spatial.Mountains", "Mountains");
             public static readonly ModString Neutral = new ModString("Spatial.Neutral", "neutral");
             public static readonly ModString NoRoutePreview = new ModString("Spatial.NoRoutePreview", "no route preview");
             public static readonly ModString OnRoute = new ModString("Spatial.OnRoute", "On route");
@@ -140,7 +134,6 @@ namespace SongsOfConquestAccess.Localization
             public static readonly ModString Threatened = new ModString("Spatial.Threatened", "Threatened");
             public static readonly ModString ThisTurnAt = new ModString("Spatial.ThisTurnAt", "This turn: {0}");
             public static readonly ModString TurnsIn = new ModString("Spatial.TurnsIn", "in {0} turns");
-            public static readonly ModString Trees = new ModString("Spatial.Trees", "Trees");
             public static readonly ModString Unexplored = new ModString("Spatial.Unexplored", "Unexplored");
             public static readonly ModString Unseen = new ModString("Spatial.Unseen", "Unseen");
             public static readonly ModString VisitedSuffix = new ModString("Spatial.VisitedSuffix", "{0} (visited)");
@@ -273,7 +266,6 @@ namespace SongsOfConquestAccess.Localization
             public static readonly ModString EnemyRangedTroops = new ModString("Combat.EnemyRangedTroops", "enemy ranged troops");
             public static readonly ModString EnemyTroop = new ModString("Combat.EnemyTroop", "{0} enemy {1}");
             public static readonly ModString EnemyTroops = new ModString("Combat.EnemyTroops", "enemy troops");
-            public static readonly ModString EssenceAmount = new ModString("Combat.EssenceAmount", "+{0} {1} essence");
             public static readonly ModString EssenceAmountCompact = new ModString("Combat.EssenceAmountCompact", "+{0} {1}");
             public static readonly ModString EssenceAmounts = new ModString("Combat.EssenceAmounts", "{0} essence");
             public static readonly ModString ExplosiveBarrel = new ModString("Combat.ExplosiveBarrel", "explosive barrel");
@@ -324,7 +316,6 @@ namespace SongsOfConquestAccess.Localization
             public static readonly ModString AvailableActions = new ModString("UI.AvailableActions", "Available actions: {0}.");
             public static readonly ModString Blank = new ModString("UI.Blank", "blank");
             public static readonly ModString BufferEmpty = new ModString("UI.BufferEmpty", "Buffer empty");
-            public static readonly ModString CancelledEditing = new ModString("UI.CancelledEditing", "Cancelled, {0}");
             public static readonly ModString CannotDropThere = new ModString("UI.CannotDropThere", "Cannot drop there.");
             public static readonly ModString CharacterColon = new ModString("UI.CharacterColon", "colon");
             public static readonly ModString CharacterComma = new ModString("UI.CharacterComma", "comma");
@@ -350,12 +341,10 @@ namespace SongsOfConquestAccess.Localization
             public static readonly ModString ColumnWielder = new ModString("UI.ColumnWielder", "Wielder");
             public static readonly ModString CombatDisconnectedTiles = new ModString("UI.CombatDisconnectedTiles", "Some shown tiles are separated. Use W and Shift W to reach all range tiles.");
             public static readonly ModString CombatGrid = new ModString("UI.CombatGrid", "Combat grid");
-            public static readonly ModString DoneEditing = new ModString("UI.DoneEditing", "Done editing, {0}");
             public static readonly ModString DragCancelled = new ModString("UI.DragCancelled", "Drag cancelled.");
             public static readonly ModString DragComplete = new ModString("UI.DragComplete", "Drag complete.");
             public static readonly ModString DragStarted = new ModString("UI.DragStarted", "Started drag. Move to destination and press enter to drop.");
             public static readonly ModString DragStartedTroopPlacement = new ModString("UI.DragStartedTroopPlacement", "Started drag for {0} at {1}. Press enter to drop on destination spawn point, or press escape to cancel.");
-            public static readonly ModString Editing = new ModString("UI.Editing", "Editing, {0}");
             public static readonly ModString Empty = new ModString("UI.Empty", "Empty");
             public static readonly ModString EmptyTroopSlot = new ModString("UI.EmptyTroopSlot", "Empty troop {0}");
             public static readonly ModString ExitedInspectMode = new ModString("UI.ExitedInspectMode", "Exited inspect mode");
@@ -445,7 +434,6 @@ namespace SongsOfConquestAccess.Localization
             public static readonly ModString DisabledWithReason = new ModString("Screens.DisabledWithReason", "{0}. {1}");
             public static readonly ModString Downloads = new ModString("Screens.Downloads", "Downloads");
             public static readonly ModString Empty = new ModString("Screens.Empty", "empty");
-            public static readonly ModString EmptySlot = new ModString("Screens.EmptySlot", "Empty, slot {0}");
             public static readonly ModString EjectWielder = new ModString("Screens.EjectWielder", "Eject wielder");
             public static readonly ModString GraphType = new ModString("Screens.GraphType", "Graph type");
             public static readonly ModString Group = new ModString("Screens.Group", "Group {0}");
@@ -466,7 +454,6 @@ namespace SongsOfConquestAccess.Localization
             public static readonly ModString NamedLevel = new ModString("Screens.NamedLevel", "{0}, level {1}");
             public static readonly ModString NamedMenu = new ModString("Screens.NamedMenu", "{0} menu");
             public static readonly ModString NamedTabs = new ModString("Screens.NamedTabs", "{0} {1}");
-            public static readonly ModString Opponent = new ModString("Screens.Opponent", "Opponent");
             public static readonly ModString Next = new ModString("Screens.Next", "Next");
             public static readonly ModString None = new ModString("Screens.None", "None");
             public static readonly ModString NotReady = new ModString("Screens.NotReady", "Not ready");
@@ -480,12 +467,7 @@ namespace SongsOfConquestAccess.Localization
             public static readonly ModString Options = new ModString("Screens.Options", "Options");
             public static readonly ModString PlayerStats = new ModString("Screens.PlayerStats", "Player stats");
             public static readonly ModString PlayerStatsBattle = new ModString("Screens.PlayerStatsBattle", "Conquest - Battle");
-            public static readonly ModString PlayerStatsFactionsPlayDistribution = new ModString("Screens.PlayerStatsFactionsPlayDistribution", "Factions, play distribution");
-            public static readonly ModString PlayerStatsGeneral = new ModString("Screens.PlayerStatsGeneral", "General");
             public static readonly ModString PlayerStatsOverall = new ModString("Screens.PlayerStatsOverall", "Conquest - Overall");
-            public static readonly ModString PlayerStatsSpells = new ModString("Screens.PlayerStatsSpells", "Spells");
-            public static readonly ModString PlayerStatsTopMapsGames = new ModString("Screens.PlayerStatsTopMapsGames", "Top maps, #games");
-            public static readonly ModString PlayerStatsTopWieldersAndTroops = new ModString("Screens.PlayerStatsTopWieldersAndTroops", "Top wielder* and troops**");
             public static readonly ModString PostAdventureResult = new ModString("Screens.PostAdventureResult", "Post adventure result");
             public static readonly ModString PostAdventureStats = new ModString("Screens.PostAdventureStats", "Post adventure stats");
             public static readonly ModString Penalties = new ModString("Screens.Penalties", "Penalties");
@@ -515,10 +497,8 @@ namespace SongsOfConquestAccess.Localization
             public static readonly ModString Tower = new ModString("Screens.Tower", "Tower {0}");
             public static readonly ModString Towers = new ModString("Screens.Towers", "Towers");
             public static readonly ModString TroopLost = new ModString("Screens.TroopLost", "{0} lost");
-            public static readonly ModString TroopManagement = new ModString("Screens.TroopManagement", "Troop management");
             public static readonly ModString TroopDistribution = new ModString("Screens.TroopDistribution", "troop distribution");
             public static readonly ModString TroopPlacement = new ModString("Screens.TroopPlacement", "Troop placement");
-            public static readonly ModString TroopSlot = new ModString("Screens.TroopSlot", "Troop slot {0}");
             public static readonly ModString TurnOrder = new ModString("Screens.TurnOrder", "Turn order");
             public static readonly ModString Unavailable = new ModString("Screens.Unavailable", "Unavailable");
             public static readonly ModString UnknownSpell = new ModString("Screens.UnknownSpell", "unknown spell");
@@ -528,7 +508,6 @@ namespace SongsOfConquestAccess.Localization
             public static readonly ModString Wielders = new ModString("Screens.Wielders", "Wielders");
             public static readonly ModString WielderStats = new ModString("Screens.WielderStats", "{0}'s stats");
             public static readonly ModString WielderModifierCategories = new ModString("Screens.WielderModifierCategories", "{0}'s modifier categories");
-            public static readonly ModString YourWielder = new ModString("Screens.YourWielder", "Your wielder");
             public static readonly ModString WorldChoiceMenu = new ModString("Screens.WorldChoiceMenu", "World choice menu");
             public static readonly ModString WorldConfirmationMenu = new ModString("Screens.WorldConfirmationMenu", "World confirmation menu");
         }

@@ -270,11 +270,6 @@ msgctxt "UI.Blank"
 msgid "blank"
 msgstr "ë¹ˆì¹¸"
 
-#. UI.CancelledEditing
-msgctxt "UI.CancelledEditing"
-msgid "Cancelled, {0}"
-msgstr "ì·¨ì†Œë¨, {0}"
-
 #. UI.CannotDropThere
 msgctxt "UI.CannotDropThere"
 msgid "Cannot drop there."
@@ -330,11 +325,6 @@ msgctxt "UI.CombatGrid"
 msgid "Combat grid"
 msgstr "ì „íˆ¬ ê²©ìž"
 
-#. UI.DoneEditing
-msgctxt "UI.DoneEditing"
-msgid "Done editing, {0}"
-msgstr "íŽ¸ì§‘ ì™„ë£Œ, {0}"
-
 #. UI.DragCancelled
 msgctxt "UI.DragCancelled"
 msgid "Drag cancelled."
@@ -354,11 +344,6 @@ msgstr "ëŒê¸°ë¥¼ ì‹œìž‘í–ˆìŠµë‹ˆë‹¤. ëª©ì 
 msgctxt "UI.DragStartedTroopPlacement"
 msgid "Started drag for {0} at {1}. Press enter to drop on destination spawn point, or press escape to cancel."
 msgstr "{1}ì˜ {0} ëŒê¸°ë¥¼ ì‹œìž‘í–ˆìŠµë‹ˆë‹¤. ëŒ€ìƒ ë°°ì¹˜ ì§€ì ì—ì„œ Enterë¥¼ ëˆŒëŸ¬ ë†“ê±°ë‚˜ Escapeë¡œ ì·¨ì†Œí•˜ì„¸ìš”."
-
-#. UI.Editing
-msgctxt "UI.Editing"
-msgid "Editing, {0}"
-msgstr "íŽ¸ì§‘ ì¤‘, {0}"
 
 #. UI.Empty
 msgctxt "UI.Empty"
@@ -720,11 +705,6 @@ msgctxt "Screens.Empty"
 msgid "empty"
 msgstr "ë¹„ì–´ ìžˆìŒ"
 
-#. Screens.EmptySlot
-msgctxt "Screens.EmptySlot"
-msgid "Empty, slot {0}"
-msgstr "ë¹„ì–´ ìžˆìŒ, ìŠ¬ë¡¯ {0}"
-
 #. Screens.EjectWielder
 msgctxt "Screens.EjectWielder"
 msgid "Eject wielder"
@@ -970,11 +950,6 @@ msgctxt "Screens.TroopLost"
 msgid "{0} lost"
 msgstr "{0} ì†ì‹¤"
 
-#. Screens.TroopManagement
-msgctxt "Screens.TroopManagement"
-msgid "Troop management"
-msgstr "ë¶€ëŒ€ ê´€ë¦¬"
-
 #. Screens.TroopDistribution
 msgctxt "Screens.TroopDistribution"
 msgid "troop distribution"
@@ -984,11 +959,6 @@ msgstr "ë¶€ëŒ€ ë¶„ë°°"
 msgctxt "Screens.TroopPlacement"
 msgid "Troop placement"
 msgstr "ë¶€ëŒ€ ë°°ì¹˜"
-
-#. Screens.TroopSlot
-msgctxt "Screens.TroopSlot"
-msgid "Troop slot {0}"
-msgstr "ë¶€ëŒ€ ìŠ¬ë¡¯ {0}"
 
 #. Screens.TurnOrder
 msgctxt "Screens.TurnOrder"
@@ -1054,8 +1024,6 @@ msgstr "{0} ì—…ê·¸ë ˆì´ë“œ ìˆ˜ëŸ‰"
 msgctxt "Screens.UnknownSpell"
 msgid "unknown spell"
 msgstr "ì•Œ ìˆ˜ ì—†ëŠ” ì£¼ë¬¸"
-
-
 
 #. Actions.Activate
 msgctxt "Actions.Activate"
@@ -1557,11 +1525,6 @@ msgctxt "Combat.EnemyTroops"
 msgid "enemy troops"
 msgstr "ì  ë¶€ëŒ€"
 
-#. Combat.EssenceAmount
-msgctxt "Combat.EssenceAmount"
-msgid "+{0} {1} essence"
-msgstr "+{0} {1} ì •ìˆ˜"
-
 #. Combat.EssenceAmountCompact
 msgctxt "Combat.EssenceAmountCompact"
 msgid "+{0} {1}"
@@ -1756,11 +1719,6 @@ msgstr "ì•„êµ° ë¶€ëŒ€"
 msgctxt "Combat.BoltAt_0"
 msgid "{0} bolt at {1}"
 msgstr "{0}ë°œì´ {1}ì—"
-
-#. Common.In
-msgctxt "Common.In"
-msgid "in {0}"
-msgstr "{0} ì•ˆ"
 
 #. Common.CountOf
 msgctxt "Common.CountOf"
@@ -2051,16 +2009,6 @@ msgstr "ë°©ì–´ìž ì´ˆìƒí™”"
 msgctxt "Screens.LevelValue"
 msgid "level {0}"
 msgstr "ë ˆë²¨ {0}"
-
-#. Screens.Opponent
-msgctxt "Screens.Opponent"
-msgid "Opponent"
-msgstr "ìƒëŒ€"
-
-#. Screens.YourWielder
-msgctxt "Screens.YourWielder"
-msgid "Your wielder"
-msgstr "ë‚´ ì†Œìœ ìž"
 
 #. Scanner.All
 msgctxt "Scanner.All"
@@ -2357,40 +2305,15 @@ msgctxt "Spatial.Deforestation"
 msgid "Deforestation"
 msgstr "ë²Œëª©ì§€"
 
-#. Spatial.Decoration
-msgctxt "Spatial.Decoration"
-msgid "Decoration"
-msgstr "ìž¥ì‹"
-
 #. Spatial.DirtRoad
 msgctxt "Spatial.DirtRoad"
 msgid "Dirt road"
 msgstr "í™ê¸¸"
 
-#. Spatial.Effect
-msgctxt "Spatial.Effect"
-msgid "Effect"
-msgstr "íš¨ê³¼"
-
 #. Spatial.Farmland
 msgctxt "Spatial.Farmland"
 msgid "Farmland"
 msgstr "ë†ì§€"
-
-#. Spatial.Fog
-msgctxt "Spatial.Fog"
-msgid "Fog"
-msgstr "ì•ˆê°œ"
-
-#. Spatial.Light
-msgctxt "Spatial.Light"
-msgid "Light"
-msgstr "ë¹›"
-
-#. Spatial.Mountains
-msgctxt "Spatial.Mountains"
-msgid "Mountains"
-msgstr "ì‚°"
 
 #. Spatial.Road
 msgctxt "Spatial.Road"
@@ -2401,11 +2324,6 @@ msgstr "ê¸¸"
 msgctxt "Spatial.ShallowWater"
 msgid "Shallow water"
 msgstr "ì–•ì€ ë¬¼"
-
-#. Spatial.Trees
-msgctxt "Spatial.Trees"
-msgid "Trees"
-msgstr "ë‚˜ë¬´"
 
 #. Spatial.Wall
 msgctxt "Spatial.Wall"
@@ -2788,35 +2706,10 @@ msgctxt "Screens.PlayerStatsBattle"
 msgid "Conquest - Battle"
 msgstr "정복 - 전투"
 
-#. Screens.PlayerStatsFactionsPlayDistribution
-msgctxt "Screens.PlayerStatsFactionsPlayDistribution"
-msgid "Factions, play distribution"
-msgstr "세력, 플레이 분포"
-
-#. Screens.PlayerStatsGeneral
-msgctxt "Screens.PlayerStatsGeneral"
-msgid "General"
-msgstr "일반"
-
 #. Screens.PlayerStatsOverall
 msgctxt "Screens.PlayerStatsOverall"
 msgid "Conquest - Overall"
 msgstr "정복 - 전체"
-
-#. Screens.PlayerStatsSpells
-msgctxt "Screens.PlayerStatsSpells"
-msgid "Spells"
-msgstr "주문"
-
-#. Screens.PlayerStatsTopMapsGames
-msgctxt "Screens.PlayerStatsTopMapsGames"
-msgid "Top maps, #games"
-msgstr "상위 지도, #게임"
-
-#. Screens.PlayerStatsTopWieldersAndTroops
-msgctxt "Screens.PlayerStatsTopWieldersAndTroops"
-msgid "Top wielder* and troops**"
-msgstr "상위 위더* 및 병력**"
 
 #. Screens.CopiedGameCodeToClipboard
 msgctxt "Screens.CopiedGameCodeToClipboard"

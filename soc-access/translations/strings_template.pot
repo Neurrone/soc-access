@@ -9,11 +9,6 @@ msgctxt "Common.CountOf"
 msgid "{0} of {1}"
 msgstr ""
 
-#. Common.In
-msgctxt "Common.In"
-msgid "in {0}"
-msgstr ""
-
 #. Common.ListFinal
 msgctxt "Common.ListFinal"
 msgid "{0}, and {1}"
@@ -349,11 +344,6 @@ msgctxt "Spatial.Debris"
 msgid "debris"
 msgstr ""
 
-#. Spatial.Decoration
-msgctxt "Spatial.Decoration"
-msgid "Decoration"
-msgstr ""
-
 #. Spatial.Destination
 msgctxt "Spatial.Destination"
 msgid "Destination"
@@ -394,19 +384,9 @@ msgctxt "Spatial.Enemy"
 msgid "enemy"
 msgstr ""
 
-#. Spatial.Effect
-msgctxt "Spatial.Effect"
-msgid "Effect"
-msgstr ""
-
 #. Spatial.Farmland
 msgctxt "Spatial.Farmland"
 msgid "Farmland"
-msgstr ""
-
-#. Spatial.Fog
-msgctxt "Spatial.Fog"
-msgid "Fog"
 msgstr ""
 
 #. Spatial.ExtraTargetPrefix
@@ -469,11 +449,6 @@ msgctxt "Spatial.Kills"
 msgid "kills {0}"
 msgstr ""
 
-#. Spatial.Light
-msgctxt "Spatial.Light"
-msgid "Light"
-msgstr ""
-
 #. Spatial.MayDestroy
 msgctxt "Spatial.MayDestroy"
 msgid "may destroy"
@@ -492,11 +467,6 @@ msgstr ""
 #. Spatial.Mountain
 msgctxt "Spatial.Mountain"
 msgid "Mountain"
-msgstr ""
-
-#. Spatial.Mountains
-msgctxt "Spatial.Mountains"
-msgid "Mountains"
 msgstr ""
 
 #. Spatial.Neutral
@@ -567,11 +537,6 @@ msgstr ""
 #. Spatial.TurnsIn
 msgctxt "Spatial.TurnsIn"
 msgid "in {0} turns"
-msgstr ""
-
-#. Spatial.Trees
-msgctxt "Spatial.Trees"
-msgid "Trees"
 msgstr ""
 
 #. Spatial.Unexplored
@@ -1174,11 +1139,6 @@ msgctxt "Combat.EnemyTroops"
 msgid "enemy troops"
 msgstr ""
 
-#. Combat.EssenceAmount
-msgctxt "Combat.EssenceAmount"
-msgid "+{0} {1} essence"
-msgstr ""
-
 #. Combat.EssenceAmountCompact
 msgctxt "Combat.EssenceAmountCompact"
 msgid "+{0} {1}"
@@ -1404,11 +1364,6 @@ msgctxt "UI.BufferEmpty"
 msgid "Buffer empty"
 msgstr ""
 
-#. UI.CancelledEditing
-msgctxt "UI.CancelledEditing"
-msgid "Cancelled, {0}"
-msgstr ""
-
 #. UI.CannotDropThere
 msgctxt "UI.CannotDropThere"
 msgid "Cannot drop there."
@@ -1534,11 +1489,6 @@ msgctxt "UI.CombatGrid"
 msgid "Combat grid"
 msgstr ""
 
-#. UI.DoneEditing
-msgctxt "UI.DoneEditing"
-msgid "Done editing, {0}"
-msgstr ""
-
 #. UI.DragCancelled
 msgctxt "UI.DragCancelled"
 msgid "Drag cancelled."
@@ -1557,11 +1507,6 @@ msgstr ""
 #. UI.DragStartedTroopPlacement
 msgctxt "UI.DragStartedTroopPlacement"
 msgid "Started drag for {0} at {1}. Press enter to drop on destination spawn point, or press escape to cancel."
-msgstr ""
-
-#. UI.Editing
-msgctxt "UI.Editing"
-msgid "Editing, {0}"
 msgstr ""
 
 #. UI.Empty
@@ -1989,11 +1934,6 @@ msgctxt "Screens.Empty"
 msgid "empty"
 msgstr ""
 
-#. Screens.EmptySlot
-msgctxt "Screens.EmptySlot"
-msgid "Empty, slot {0}"
-msgstr ""
-
 #. Screens.EjectWielder
 msgctxt "Screens.EjectWielder"
 msgid "Eject wielder"
@@ -2094,11 +2034,6 @@ msgctxt "Screens.NamedTabs"
 msgid "{0} {1}"
 msgstr ""
 
-#. Screens.Opponent
-msgctxt "Screens.Opponent"
-msgid "Opponent"
-msgstr ""
-
 #. Screens.Next
 msgctxt "Screens.Next"
 msgid "Next"
@@ -2164,34 +2099,9 @@ msgctxt "Screens.PlayerStatsBattle"
 msgid "Conquest - Battle"
 msgstr ""
 
-#. Screens.PlayerStatsFactionsPlayDistribution
-msgctxt "Screens.PlayerStatsFactionsPlayDistribution"
-msgid "Factions, play distribution"
-msgstr ""
-
-#. Screens.PlayerStatsGeneral
-msgctxt "Screens.PlayerStatsGeneral"
-msgid "General"
-msgstr ""
-
 #. Screens.PlayerStatsOverall
 msgctxt "Screens.PlayerStatsOverall"
 msgid "Conquest - Overall"
-msgstr ""
-
-#. Screens.PlayerStatsSpells
-msgctxt "Screens.PlayerStatsSpells"
-msgid "Spells"
-msgstr ""
-
-#. Screens.PlayerStatsTopMapsGames
-msgctxt "Screens.PlayerStatsTopMapsGames"
-msgid "Top maps, #games"
-msgstr ""
-
-#. Screens.PlayerStatsTopWieldersAndTroops
-msgctxt "Screens.PlayerStatsTopWieldersAndTroops"
-msgid "Top wielder* and troops**"
 msgstr ""
 
 #. Screens.PostAdventureResult
@@ -2339,11 +2249,6 @@ msgctxt "Screens.TroopLost"
 msgid "{0} lost"
 msgstr ""
 
-#. Screens.TroopManagement
-msgctxt "Screens.TroopManagement"
-msgid "Troop management"
-msgstr ""
-
 #. Screens.TroopDistribution
 msgctxt "Screens.TroopDistribution"
 msgid "troop distribution"
@@ -2352,11 +2257,6 @@ msgstr ""
 #. Screens.TroopPlacement
 msgctxt "Screens.TroopPlacement"
 msgid "Troop placement"
-msgstr ""
-
-#. Screens.TroopSlot
-msgctxt "Screens.TroopSlot"
-msgid "Troop slot {0}"
 msgstr ""
 
 #. Screens.TurnOrder
@@ -2402,11 +2302,6 @@ msgstr ""
 #. Screens.WielderModifierCategories
 msgctxt "Screens.WielderModifierCategories"
 msgid "{0}'s modifier categories"
-msgstr ""
-
-#. Screens.YourWielder
-msgctxt "Screens.YourWielder"
-msgid "Your wielder"
 msgstr ""
 
 #. Screens.WorldChoiceMenu

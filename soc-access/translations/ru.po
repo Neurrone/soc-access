@@ -290,11 +290,6 @@ msgctxt "UI.Blank"
 msgid "blank"
 msgstr "Ð¿ÑƒÑÑ‚Ð¾"
 
-#. UI.CancelledEditing
-msgctxt "UI.CancelledEditing"
-msgid "Cancelled, {0}"
-msgstr "ÐžÑ‚Ð¼ÐµÐ½ÐµÐ½Ð¾, {0}"
-
 #. UI.CannotDropThere
 msgctxt "UI.CannotDropThere"
 msgid "Cannot drop there."
@@ -350,11 +345,6 @@ msgctxt "UI.CombatGrid"
 msgid "Combat grid"
 msgstr "Ð‘Ð¾ÐµÐ²Ð°Ñ ÑÐµÑ‚ÐºÐ°"
 
-#. UI.DoneEditing
-msgctxt "UI.DoneEditing"
-msgid "Done editing, {0}"
-msgstr "Ð ÐµÐ´Ð°ÐºÑ‚Ð¸Ñ€Ð¾Ð²Ð°Ð½Ð¸Ðµ Ð·Ð°Ð²ÐµÑ€ÑˆÐµÐ½Ð¾, {0}"
-
 #. UI.DragCancelled
 msgctxt "UI.DragCancelled"
 msgid "Drag cancelled."
@@ -374,11 +364,6 @@ msgstr "ÐŸÐµÑ€ÐµÑ‚Ð°ÑÐºÐ¸Ð²Ð°Ð½Ð¸Ðµ Ð½Ð°Ñ‡
 msgctxt "UI.DragStartedTroopPlacement"
 msgid "Started drag for {0} at {1}. Press enter to drop on destination spawn point, or press escape to cancel."
 msgstr "ÐÐ°Ñ‡Ð°Ñ‚Ð¾ Ð¿ÐµÑ€ÐµÑ‚Ð°ÑÐºÐ¸Ð²Ð°Ð½Ð¸Ðµ {0} Ð½Ð° {1}. ÐÐ°Ð¶Ð¼Ð¸Ñ‚Ðµ Enter, Ñ‡Ñ‚Ð¾Ð±Ñ‹ Ð¿Ð¾Ð¼ÐµÑÑ‚Ð¸Ñ‚ÑŒ Ð² Ñ‚Ð¾Ñ‡ÐºÑƒ Ñ€Ð°Ð·Ð¼ÐµÑ‰ÐµÐ½Ð¸Ñ, Ð¸Ð»Ð¸ Escape Ð´Ð»Ñ Ð¾Ñ‚Ð¼ÐµÐ½Ñ‹."
-
-#. UI.Editing
-msgctxt "UI.Editing"
-msgid "Editing, {0}"
-msgstr "Ð ÐµÐ´Ð°ÐºÑ‚Ð¸Ñ€Ð¾Ð²Ð°Ð½Ð¸Ðµ, {0}"
 
 #. UI.Empty
 msgctxt "UI.Empty"
@@ -740,11 +725,6 @@ msgctxt "Screens.Empty"
 msgid "empty"
 msgstr "Ð¿ÑƒÑÑ‚Ð¾"
 
-#. Screens.EmptySlot
-msgctxt "Screens.EmptySlot"
-msgid "Empty, slot {0}"
-msgstr "ÐŸÑƒÑÑ‚Ð¾, ÑÐ»Ð¾Ñ‚ {0}"
-
 #. Screens.EjectWielder
 msgctxt "Screens.EjectWielder"
 msgid "Eject wielder"
@@ -990,11 +970,6 @@ msgctxt "Screens.TroopLost"
 msgid "{0} lost"
 msgstr "{0} Ð¿Ð¾Ñ‚ÐµÑ€ÑÐ½Ð¾"
 
-#. Screens.TroopManagement
-msgctxt "Screens.TroopManagement"
-msgid "Troop management"
-msgstr "Ð£Ð¿Ñ€Ð°Ð²Ð»ÐµÐ½Ð¸Ðµ Ð¾Ñ‚Ñ€ÑÐ´Ð°Ð¼Ð¸"
-
 #. Screens.TroopDistribution
 msgctxt "Screens.TroopDistribution"
 msgid "troop distribution"
@@ -1004,11 +979,6 @@ msgstr "Ñ€Ð°ÑÐ¿Ñ€ÐµÐ´ÐµÐ»ÐµÐ½Ð¸Ðµ Ð¾Ñ‚Ñ€Ñ�
 msgctxt "Screens.TroopPlacement"
 msgid "Troop placement"
 msgstr "Ð Ð°Ð·Ð¼ÐµÑ‰ÐµÐ½Ð¸Ðµ Ð¾Ñ‚Ñ€ÑÐ´Ð¾Ð²"
-
-#. Screens.TroopSlot
-msgctxt "Screens.TroopSlot"
-msgid "Troop slot {0}"
-msgstr "Ð¡Ð»Ð¾Ñ‚ Ð¾Ñ‚Ñ€ÑÐ´Ð° {0}"
 
 #. Screens.TurnOrder
 msgctxt "Screens.TurnOrder"
@@ -1074,8 +1044,6 @@ msgstr "ÐšÐ¾Ð»Ð¸Ñ‡ÐµÑÑ‚Ð²Ð¾ Ð´Ð»Ñ ÑƒÐ»ÑƒÑ�
 msgctxt "Screens.UnknownSpell"
 msgid "unknown spell"
 msgstr "Ð½ÐµÐ¸Ð·Ð²ÐµÑÑ‚Ð½Ð¾Ðµ Ð·Ð°ÐºÐ»Ð¸Ð½Ð°Ð½Ð¸Ðµ"
-
-
 
 #. Actions.Activate
 msgctxt "Actions.Activate"
@@ -1577,11 +1545,6 @@ msgctxt "Combat.EnemyTroops"
 msgid "enemy troops"
 msgstr "Ð²Ñ€Ð°Ð¶ÐµÑÐºÐ¸Ðµ Ð¾Ñ‚Ñ€ÑÐ´Ñ‹"
 
-#. Combat.EssenceAmount
-msgctxt "Combat.EssenceAmount"
-msgid "+{0} {1} essence"
-msgstr "+{0} ÑÑÑÐµÐ½Ñ†Ð¸Ð¸ {1}"
-
 #. Combat.EssenceAmountCompact
 msgctxt "Combat.EssenceAmountCompact"
 msgid "+{0} {1}"
@@ -1786,11 +1749,6 @@ msgstr "{0} ÑÐ½Ð°Ñ€ÑÐ´Ð° Ð² {1}"
 msgctxt "Combat.BoltAt_2"
 msgid "{0} bolts at {1}"
 msgstr "{0} ÑÐ½Ð°Ñ€ÑÐ´Ð¾Ð² Ð² {1}"
-
-#. Common.In
-msgctxt "Common.In"
-msgid "in {0}"
-msgstr "Ð² {0}"
 
 #. Common.CountOf
 msgctxt "Common.CountOf"
@@ -2081,16 +2039,6 @@ msgstr "ÐŸÐ¾Ñ€Ñ‚Ñ€ÐµÑ‚ Ð·Ð°Ñ‰Ð¸Ñ‚Ð½Ð¸ÐºÐ°"
 msgctxt "Screens.LevelValue"
 msgid "level {0}"
 msgstr "ÑƒÑ€Ð¾Ð²ÐµÐ½ÑŒ {0}"
-
-#. Screens.Opponent
-msgctxt "Screens.Opponent"
-msgid "Opponent"
-msgstr "ÐŸÑ€Ð¾Ñ‚Ð¸Ð²Ð½Ð¸Ðº"
-
-#. Screens.YourWielder
-msgctxt "Screens.YourWielder"
-msgid "Your wielder"
-msgstr "Ð’Ð°Ñˆ Ð²Ð»Ð°Ð´ÐµÐ»ÐµÑ†"
 
 #. Scanner.All
 msgctxt "Scanner.All"
@@ -2437,40 +2385,15 @@ msgctxt "Spatial.Deforestation"
 msgid "Deforestation"
 msgstr "Ð’Ñ‹Ñ€ÑƒÐ±ÐºÐ° Ð»ÐµÑÐ°"
 
-#. Spatial.Decoration
-msgctxt "Spatial.Decoration"
-msgid "Decoration"
-msgstr "Ð”ÐµÐºÐ¾Ñ€Ð°Ñ†Ð¸Ñ"
-
 #. Spatial.DirtRoad
 msgctxt "Spatial.DirtRoad"
 msgid "Dirt road"
 msgstr "Ð“Ñ€ÑƒÐ½Ñ‚Ð¾Ð²Ð°Ñ Ð´Ð¾Ñ€Ð¾Ð³Ð°"
 
-#. Spatial.Effect
-msgctxt "Spatial.Effect"
-msgid "Effect"
-msgstr "Ð­Ñ„Ñ„ÐµÐºÑ‚"
-
 #. Spatial.Farmland
 msgctxt "Spatial.Farmland"
 msgid "Farmland"
 msgstr "ÐŸÐ°ÑˆÐ½Ñ"
-
-#. Spatial.Fog
-msgctxt "Spatial.Fog"
-msgid "Fog"
-msgstr "Ð¢ÑƒÐ¼Ð°Ð½"
-
-#. Spatial.Light
-msgctxt "Spatial.Light"
-msgid "Light"
-msgstr "Ð¡Ð²ÐµÑ‚"
-
-#. Spatial.Mountains
-msgctxt "Spatial.Mountains"
-msgid "Mountains"
-msgstr "Ð“Ð¾Ñ€Ñ‹"
 
 #. Spatial.Road
 msgctxt "Spatial.Road"
@@ -2481,11 +2404,6 @@ msgstr "Ð”Ð¾Ñ€Ð¾Ð³Ð°"
 msgctxt "Spatial.ShallowWater"
 msgid "Shallow water"
 msgstr "ÐœÐµÐ»ÐºÐ¾Ð²Ð¾Ð´ÑŒÐµ"
-
-#. Spatial.Trees
-msgctxt "Spatial.Trees"
-msgid "Trees"
-msgstr "Ð”ÐµÑ€ÐµÐ²ÑŒÑ"
 
 #. Spatial.Wall
 msgctxt "Spatial.Wall"
@@ -3018,35 +2936,10 @@ msgctxt "Screens.PlayerStatsBattle"
 msgid "Conquest - Battle"
 msgstr "Завоевание - Битва"
 
-#. Screens.PlayerStatsFactionsPlayDistribution
-msgctxt "Screens.PlayerStatsFactionsPlayDistribution"
-msgid "Factions, play distribution"
-msgstr "Фракции, распределение игр"
-
-#. Screens.PlayerStatsGeneral
-msgctxt "Screens.PlayerStatsGeneral"
-msgid "General"
-msgstr "Общее"
-
 #. Screens.PlayerStatsOverall
 msgctxt "Screens.PlayerStatsOverall"
 msgid "Conquest - Overall"
 msgstr "Завоевание - Общее"
-
-#. Screens.PlayerStatsSpells
-msgctxt "Screens.PlayerStatsSpells"
-msgid "Spells"
-msgstr "Заклинания"
-
-#. Screens.PlayerStatsTopMapsGames
-msgctxt "Screens.PlayerStatsTopMapsGames"
-msgid "Top maps, #games"
-msgstr "Лучшие карты, #игр"
-
-#. Screens.PlayerStatsTopWieldersAndTroops
-msgctxt "Screens.PlayerStatsTopWieldersAndTroops"
-msgid "Top wielder* and troops**"
-msgstr "Лучшие владельцы* и отряды**"
 
 #. Screens.CopiedGameCodeToClipboard
 msgctxt "Screens.CopiedGameCodeToClipboard"
