@@ -122,6 +122,7 @@ namespace SongsOfConquestAccess.Events
             }
 
             List<CombatNarrationItem> events = SuppressNonNarratableMapEntityCreations(_pendingEvents.ToList());
+            events = SuppressTransientBacteriaAddRemovals(events);
             events = CoalesceBacteriaLifecycleEvents(events);
             events = SuppressInternalBacteriaRemovals(events);
             events = ReorderSpellEvents(events);
@@ -150,6 +151,75 @@ namespace SongsOfConquestAccess.Events
             return created != null
                 && created.Entity != null
                 && AcidCloudBattleMapEntityBlueprintIds.Contains(created.Entity.BlueprintId);
+        }
+
+        private static List<CombatNarrationItem> SuppressTransientBacteriaAddRemovals(List<CombatNarrationItem> events)
+        {
+            if (events == null || events.Count == 0)
+            {
+                return events ?? new List<CombatNarrationItem>();
+            }
+
+            HashSet<BacteriaTargetKey> added = new HashSet<BacteriaTargetKey>();
+            for (int i = 0; i < events.Count; i++)
+            {
+                CombatNarrationItem item = events[i];
+                if (item == null || item.Kind != CombatNarrationItemKind.BacteriaAdded)
+                {
+                    continue;
+                }
+
+                BacteriaTargetKey key;
+                if (TryCreateBacteriaTargetKey(item.BacteriaRef, item.TroopId, out key))
+                {
+                    added.Add(key);
+                }
+            }
+
+            List<CombatNarrationItem> result = new List<CombatNarrationItem>();
+            for (int i = 0; i < events.Count; i++)
+            {
+                CombatNarrationItem item = events[i];
+                if (item == null || item.Kind == CombatNarrationItemKind.BacteriaAdded)
+                {
+                    continue;
+                }
+
+                if (item.Kind == CombatNarrationItemKind.BacteriaRemoved && item.BacteriaTargets != null)
+                {
+                    List<int> targetIds = item.GetBacteriaTargetIds();
+                    for (int j = 0; j < targetIds.Count; j++)
+                    {
+                        BacteriaTargetKey key;
+                        if (TryCreateBacteriaTargetKey(item.BacteriaRef, targetIds[j], out key) && added.Contains(key))
+                        {
+                            item.RemoveBacteriaTarget(targetIds[j]);
+                        }
+                    }
+
+                    item.RefreshBacteriaSummaryEvent(item.SummarySnapshot ?? CombatNarrationSnapshot.Empty);
+                    if (!item.HasNarratableBacteriaTargets)
+                    {
+                        continue;
+                    }
+                }
+
+                result.Add(item);
+            }
+
+            return result;
+        }
+
+        private static bool TryCreateBacteriaTargetKey(BacteriaRef bacteria, int troopId, out BacteriaTargetKey key)
+        {
+            key = new BacteriaTargetKey();
+            if (bacteria == null || bacteria.BacteriaId < 0 || troopId < 0)
+            {
+                return false;
+            }
+
+            key = new BacteriaTargetKey(bacteria.BacteriaId, (int)bacteria.BacteriaType, troopId);
+            return true;
         }
 
         private static List<CombatNarrationItem> CoalesceBacteriaLifecycleEvents(List<CombatNarrationItem> events)
@@ -378,6 +448,11 @@ namespace SongsOfConquestAccess.Events
                     return existing;
                 }
 
+                if (existing.Kind == CombatNarrationItemKind.BacteriaAdded)
+                {
+                    continue;
+                }
+
                 if (!existing.IsBacteriaSummary)
                 {
                     return null;
@@ -572,6 +647,16 @@ namespace SongsOfConquestAccess.Events
 
             pending.AddUniqueBacteriaTarget(target);
             return pending;
+        }
+
+        public static CombatNarrationItem CreateBacteriaAddedMarker(BacteriaRef bacteriaRef, int troopId)
+        {
+            return new CombatNarrationItem
+            {
+                Kind = CombatNarrationItemKind.BacteriaAdded,
+                TroopId = troopId,
+                BacteriaRef = bacteriaRef
+            };
         }
 
         public static CombatNarrationItem CreateBacteriaModifierSummary(BacteriaRef bacteriaRef, TroopRef target, IList<ModifierChange> changes, int troopId)
@@ -827,6 +912,7 @@ namespace SongsOfConquestAccess.Events
         Damage,
         Spell,
         FaeyFire,
+        BacteriaAdded,
         BacteriaRemoved,
         BacteriaModifierApplied,
         EssenceGenerated,
@@ -839,5 +925,43 @@ namespace SongsOfConquestAccess.Events
         Teleport,
         BurrowUp,
         BattleResult
+    }
+
+    internal struct BacteriaTargetKey : IEquatable<BacteriaTargetKey>
+    {
+        private readonly int _bacteriaId;
+        private readonly int _bacteriaType;
+        private readonly int _troopId;
+
+        public BacteriaTargetKey(int bacteriaId, int bacteriaType, int troopId)
+        {
+            _bacteriaId = bacteriaId;
+            _bacteriaType = bacteriaType;
+            _troopId = troopId;
+        }
+
+        public bool Equals(BacteriaTargetKey other)
+        {
+            return _bacteriaId == other._bacteriaId
+                && _bacteriaType == other._bacteriaType
+                && _troopId == other._troopId;
+        }
+
+        public override bool Equals(object obj)
+        {
+            return obj is BacteriaTargetKey && Equals((BacteriaTargetKey)obj);
+        }
+
+        public override int GetHashCode()
+        {
+            unchecked
+            {
+                int hash = 17;
+                hash = hash * 31 + _bacteriaId;
+                hash = hash * 31 + _bacteriaType;
+                hash = hash * 31 + _troopId;
+                return hash;
+            }
+        }
     }
 }

@@ -502,6 +502,82 @@ namespace SongsOfConquestAccess.Tests
         }
 
         [TestMethod]
+        public void FlushSuppressesBacteriaRemovalWhenSameBacteriaWasAddedInBatch()
+        {
+            CombatNarrationPlanner planner = new CombatNarrationPlanner();
+            CombatNarrationSnapshot snapshot = Snapshot(new[] { 25 }, new int[0]);
+            BacteriaRef rejuvenation = Bacteria("Rejuvenation", 2354, 53);
+            TestEvent spell = new TestEvent("Ravenfayre casts Rejuvenation at 3.5, 3");
+
+            planner.Enqueue(CombatNarrationItem.CreateBacteriaAddedMarker(rejuvenation, 25));
+            planner.EnqueueBacteriaSummary(
+                CombatNarrationItem.CreateBacteriaRemovalSummary(
+                    rejuvenation,
+                    Troop(25, 1, "Faey Ragers", 13),
+                    25),
+                snapshot);
+            planner.Enqueue(CombatNarrationItem.Create(CombatNarrationItemKind.Spell, spell));
+
+            IReadOnlyList<CombatNarrationItem> result = planner.Flush();
+
+            Assert.AreEqual(1, result.Count);
+            Assert.AreSame(spell, result[0].Event);
+        }
+
+        [TestMethod]
+        public void FlushKeepsBacteriaRemovalWhenOnlyDifferentBacteriaInstanceWasAdded()
+        {
+            CombatNarrationPlanner planner = new CombatNarrationPlanner();
+            CombatNarrationSnapshot snapshot = Snapshot(new[] { 25 }, new int[0]);
+            BacteriaRef added = Bacteria("Rejuvenation", 2354, 53);
+            BacteriaRef removed = Bacteria("Rejuvenation", 2355, 53);
+
+            planner.Enqueue(CombatNarrationItem.CreateBacteriaAddedMarker(added, 25));
+            planner.EnqueueBacteriaSummary(
+                CombatNarrationItem.CreateBacteriaRemovalSummary(
+                    removed,
+                    Troop(25, 1, "Faey Ragers", 13),
+                    25),
+                snapshot);
+
+            IReadOnlyList<CombatNarrationItem> result = planner.Flush();
+
+            Assert.AreEqual(1, result.Count);
+            Assert.AreEqual("Rejuvenation removed from 13 Faey Ragers at 0, 0", result[0].Event.GetSpeechText());
+        }
+
+        [TestMethod]
+        public void BacteriaAddedMarkerDoesNotBlockModifierSummaryMerging()
+        {
+            CombatNarrationPlanner planner = new CombatNarrationPlanner();
+            CombatNarrationSnapshot snapshot = Snapshot(new[] { 10, 20 }, new int[0]);
+            BacteriaRef firstProtected = Bacteria("Protected", 2199, 410);
+            BacteriaRef secondProtected = Bacteria("Protected", 2200, 410);
+
+            planner.Enqueue(CombatNarrationItem.CreateBacteriaAddedMarker(firstProtected, 10));
+            planner.EnqueueBacteriaSummary(
+                CombatNarrationItem.CreateBacteriaModifierSummary(
+                    firstProtected,
+                    Troop(10, 1, "Archers"),
+                    new[] { Modifier(BacteriaModifierType.TroopDefense, 25) },
+                    10),
+                snapshot);
+            planner.Enqueue(CombatNarrationItem.CreateBacteriaAddedMarker(secondProtected, 20));
+            planner.EnqueueBacteriaSummary(
+                CombatNarrationItem.CreateBacteriaModifierSummary(
+                    secondProtected,
+                    Troop(20, 1, "Footmen"),
+                    new[] { Modifier(BacteriaModifierType.TroopDefense, 25) },
+                    20),
+                snapshot);
+
+            IReadOnlyList<CombatNarrationItem> result = planner.Flush();
+
+            Assert.AreEqual(1, result.Count);
+            Assert.AreEqual("Protected affects your troops, defense +25", result[0].Event.GetSpeechText());
+        }
+
+        [TestMethod]
         public void FlushSuppressesSameEffectRemovalWhenEffectIsAppliedToSameTarget()
         {
             CombatNarrationPlanner planner = new CombatNarrationPlanner();
@@ -706,6 +782,11 @@ namespace SongsOfConquestAccess.Tests
         private static BacteriaRef Bacteria(string name, int bacteriaType)
         {
             return new BacteriaRef(1, (BacteriaTypes)bacteriaType, name);
+        }
+
+        private static BacteriaRef Bacteria(string name, int bacteriaId, int bacteriaType)
+        {
+            return new BacteriaRef(bacteriaId, (BacteriaTypes)bacteriaType, name);
         }
 
         private static TroopRef Troop(int troopId, int teamId, string name)

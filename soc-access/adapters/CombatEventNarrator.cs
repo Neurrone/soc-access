@@ -494,6 +494,12 @@ namespace SongsOfConquestAccess.Adapters
                 }
 
                 LogBacteriaDiagnostic("added", entry.BacteriaReference, entry.StateId, entry.StateTypeName, adapter);
+                if (IsBattleTroopType(entry.StateTypeName) && entry.BacteriaReference != null)
+                {
+                    Enqueue(CombatNarrationItem.CreateBacteriaAddedMarker(
+                        adapter.CreateBacteriaRef(entry.BacteriaReference),
+                        entry.StateId));
+                }
             }
 
             // Bacteria applications are intentionally quiet for now. The useful
