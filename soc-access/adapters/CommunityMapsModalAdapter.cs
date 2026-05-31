@@ -13,8 +13,6 @@ namespace SongsOfConquestAccess.Adapters
 {
     internal sealed class CommunityMapsModalAdapter
     {
-        private static readonly HashSet<string> LoggedMissingAuthButtonLabels = new HashSet<string>();
-
         private readonly AuthenticationPanels _authPanels;
         private readonly GameObject _panel;
         private readonly CommunityMapsModalState? _cachedState;
@@ -785,25 +783,24 @@ namespace SongsOfConquestAccess.Adapters
             AddButtonAction(
                 result,
                 _authPanels.AuthenticationPanelBackButton,
-                CleanText(_authPanels.AuthenticationPanelBackButtonText != null ? _authPanels.AuthenticationPanelBackButtonText.text : string.Empty),
-                "AuthenticationPanelBackButton");
-            AddButtonAction(result, _authPanels.AuthenticationPanelConnectViaSteamButton, null, "AuthenticationPanelConnectViaSteamButton");
-            AddButtonAction(result, _authPanels.AuthenticationPanelConnectViaEmailButton, null, "AuthenticationPanelConnectViaEmailButton");
-            AddButtonAction(result, _authPanels.AuthenticationPanelConnectViaExternalButton, null, "AuthenticationPanelConnectViaExternalButton");
-            AddButtonAction(result, _authPanels.AuthenticationPanelConnectViaEpicButton, null, "AuthenticationPanelConnectViaEpicButton");
-            AddButtonAction(result, _authPanels.AuthenticationPanelConnectViaGOGButton, null, "AuthenticationPanelConnectViaGOGButton");
-            AddButtonAction(result, _authPanels.AuthenticationPanelConnectViaXboxButton, null, "AuthenticationPanelConnectViaXboxButton");
-            AddButtonAction(result, _authPanels.AuthenticationPanelConnectViaSwitchButton, null, "AuthenticationPanelConnectViaSwitchButton");
-            AddButtonAction(result, _authPanels.AuthenticationPanelConnectViaPlayStationButton, null, "AuthenticationPanelConnectViaPlayStationButton");
-            AddButtonAction(result, _authPanels.AuthenticationPanelAgreeButton, null, "AuthenticationPanelAgreeButton");
-            AddButtonAction(result, _authPanels.AuthenticationPanelSendCodeButton, null, "AuthenticationPanelSendCodeButton");
-            AddButtonAction(result, _authPanels.AuthenticationPanelSubmitButton, null, "AuthenticationPanelSubmitButton");
-            AddButtonAction(result, _authPanels.AuthenticationPanelCompletedButton, null, "AuthenticationPanelCompletedButton");
-            AddButtonAction(result, _authPanels.AuthenticationPanelLogoutButton, null, "AuthenticationPanelLogoutButton");
-            AddButtonAction(result, _authPanels.AuthenticationPanelTOSButton, null, "AuthenticationPanelTOSButton");
-            AddButtonAction(result, _authPanels.AuthenticationPanelPrivacyPolicyButton, null, "AuthenticationPanelPrivacyPolicyButton");
-            AddButtonAction(result, _authPanels.AuthenticationPanelCancelButton, null, "AuthenticationPanelCancelButton");
-            AddButtonAction(result, _authPanels.AuthenticationPanelExternalCancelButton, null, "AuthenticationPanelExternalCancelButton");
+                CleanText(_authPanels.AuthenticationPanelBackButtonText != null ? _authPanels.AuthenticationPanelBackButtonText.text : string.Empty));
+            AddButtonAction(result, _authPanels.AuthenticationPanelConnectViaSteamButton);
+            AddButtonAction(result, _authPanels.AuthenticationPanelConnectViaEmailButton);
+            AddButtonAction(result, _authPanels.AuthenticationPanelConnectViaExternalButton);
+            AddButtonAction(result, _authPanels.AuthenticationPanelConnectViaEpicButton);
+            AddButtonAction(result, _authPanels.AuthenticationPanelConnectViaGOGButton);
+            AddButtonAction(result, _authPanels.AuthenticationPanelConnectViaXboxButton);
+            AddButtonAction(result, _authPanels.AuthenticationPanelConnectViaSwitchButton);
+            AddButtonAction(result, _authPanels.AuthenticationPanelConnectViaPlayStationButton);
+            AddButtonAction(result, _authPanels.AuthenticationPanelAgreeButton);
+            AddButtonAction(result, _authPanels.AuthenticationPanelSendCodeButton);
+            AddButtonAction(result, _authPanels.AuthenticationPanelSubmitButton);
+            AddButtonAction(result, _authPanels.AuthenticationPanelCompletedButton);
+            AddButtonAction(result, _authPanels.AuthenticationPanelLogoutButton);
+            AddButtonAction(result, _authPanels.AuthenticationPanelTOSButton);
+            AddButtonAction(result, _authPanels.AuthenticationPanelPrivacyPolicyButton);
+            AddButtonAction(result, _authPanels.AuthenticationPanelCancelButton);
+            AddButtonAction(result, _authPanels.AuthenticationPanelExternalCancelButton);
             return result;
         }
 
@@ -870,7 +867,7 @@ namespace SongsOfConquestAccess.Adapters
             result.Add(new TextItem(result.Count, value));
         }
 
-        private static void AddButtonAction(List<ActionItem> result, Button button, string fallbackLabel = null, string diagnosticName = null)
+        private static void AddButtonAction(List<ActionItem> result, Button button, string fallbackLabel = null)
         {
             if (button == null || !button.gameObject.activeInHierarchy)
             {
@@ -885,7 +882,6 @@ namespace SongsOfConquestAccess.Adapters
 
             if (string.IsNullOrWhiteSpace(label))
             {
-                LogMissingAuthButtonLabel(button, diagnosticName);
                 return;
             }
 
@@ -998,69 +994,6 @@ namespace SongsOfConquestAccess.Adapters
             }
 
             return string.Empty;
-        }
-
-        private static void LogMissingAuthButtonLabel(Button button, string diagnosticName)
-        {
-            if (button == null)
-            {
-                return;
-            }
-
-            string key = !string.IsNullOrWhiteSpace(diagnosticName) ? diagnosticName : button.name;
-            if (!LoggedMissingAuthButtonLabels.Add(key))
-            {
-                return;
-            }
-
-            List<string> parts = new List<string>();
-            TMP_Text[] texts = button.GetComponentsInChildren<TMP_Text>(true);
-            for (int i = 0; i < texts.Length; i++)
-            {
-                TMP_Text text = texts[i];
-                if (text == null)
-                {
-                    continue;
-                }
-
-                parts.Add(
-                    GetTransformPath(text.transform)
-                    + " active="
-                    + text.gameObject.activeInHierarchy
-                    + " text=\""
-                    + CleanText(text.text)
-                    + "\"");
-            }
-
-            SocAccessPlugin.Instance?.LogWarning(
-                "CommunityMapsModalAdapter could not extract auth button label for "
-                + key
-                + " object="
-                + button.name
-                + " path="
-                + GetTransformPath(button.transform)
-                + " textChildren=["
-                + string.Join("; ", parts.ToArray())
-                + "]");
-        }
-
-        private static string GetTransformPath(Transform transform)
-        {
-            if (transform == null)
-            {
-                return string.Empty;
-            }
-
-            List<string> names = new List<string>();
-            Transform current = transform;
-            while (current != null)
-            {
-                names.Add(current.name);
-                current = current.parent;
-            }
-
-            names.Reverse();
-            return string.Join("/", names.ToArray());
         }
 
         private static string GetInputLabel(TMP_InputField field)

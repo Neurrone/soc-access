@@ -81,28 +81,6 @@ namespace SongsOfConquestAccess.Adapters
                 && (_home.BrowserPanel.activeInHierarchy || Collection.IsOn());
         }
 
-        public bool HasPrimaryContent
-        {
-            get
-            {
-                if (HasFeatured)
-                {
-                    return true;
-                }
-
-                IReadOnlyList<RowItem> rows = GetRows();
-                for (int i = 0; i < rows.Count; i++)
-                {
-                    if (rows[i].Items.Count > 0)
-                    {
-                        return true;
-                    }
-                }
-
-                return false;
-            }
-        }
-
         public string Title
         {
             get { return _browseLabel; }

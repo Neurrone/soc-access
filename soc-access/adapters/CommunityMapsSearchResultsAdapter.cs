@@ -29,7 +29,6 @@ namespace SongsOfConquestAccess.Adapters
         private static readonly FieldInfo EndOfResultsHeaderField = AccessTools.Field(typeof(SearchResults), "SearchResultsEndOfResultsHeader");
         private static readonly FieldInfo EndOfResultsTextField = AccessTools.Field(typeof(SearchResults), "SearchResultsEndOfResultsText");
         private static readonly FieldInfo RefineFilterField = AccessTools.Field(typeof(SearchResults), "SearchResultsRefineFilter");
-        private static readonly MethodInfo RefreshMethod = AccessTools.Method(typeof(SearchResults), "Refresh");
         private static readonly MethodInfo OpenDetailsMethod = AccessTools.Method(SearchResultListItemType, "OpenModDetailsForThisProfile");
         private static readonly MethodInfo OverlaySubscribeMethod = AccessTools.Method(SearchResultOverlayType, "SubscribeButton");
         private static readonly MethodInfo OverlayMoreOptionsMethod = AccessTools.Method(SearchResultOverlayType, "ShowMoreOptions");
@@ -64,7 +63,7 @@ namespace SongsOfConquestAccess.Adapters
             _footerText = BuildFooterText();
             _refineFilter = GetField<Selectable>(RefineFilterField);
             _refineFilterLabel = GetSelectableLabel(_refineFilter);
-            _sort = new SortDropdown(GetField<TMP_Dropdown>(SortDropdownField), Refresh);
+            _sort = new SortDropdown(GetField<TMP_Dropdown>(SortDropdownField));
             _resultsSnapshot = BuildResults();
             _activeOverlay = FindActiveOverlay();
             _hasSelectedResult = GetOverlayItem(_activeOverlay) != null;
@@ -263,17 +262,6 @@ namespace SongsOfConquestAccess.Adapters
             }
 
             OpenDetailsMethod.Invoke(item.NativeComponent, null);
-            return true;
-        }
-
-        public bool Refresh()
-        {
-            if (_results == null || RefreshMethod == null)
-            {
-                return false;
-            }
-
-            RefreshMethod.Invoke(_results, null);
             return true;
         }
 
@@ -628,16 +616,14 @@ namespace SongsOfConquestAccess.Adapters
         internal sealed class SortDropdown
         {
             private readonly TMP_Dropdown _dropdown;
-            private readonly Func<bool> _refresh;
             private readonly string _label;
             private readonly bool _isVisible;
             private readonly int _value;
             private readonly IReadOnlyList<string> _options;
 
-            public SortDropdown(TMP_Dropdown dropdown, Func<bool> refresh)
+            public SortDropdown(TMP_Dropdown dropdown)
             {
                 _dropdown = dropdown;
-                _refresh = refresh;
                 _label = FindDropdownLabel(dropdown);
                 _isVisible = dropdown != null && dropdown.gameObject.activeInHierarchy;
                 _value = dropdown != null ? dropdown.value : -1;
