@@ -1,5 +1,9 @@
 # Changelog
 
+## V0.6.2
+
+- Downgrade Prism from 0.16.5 to 0.16.1 to fix a [Prism regression](https://github.com/ethindp/prism/issues/49) causing other screen readers besides NVDA not to be properly detected
+
 ## V0.6.1
 
 - Fixed language translations using mojibake accents or ASCII fallbacks
