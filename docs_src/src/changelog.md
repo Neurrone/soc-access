@@ -1,5 +1,9 @@
 # Changelog
 
+## V0.6.3
+
+- Fixed scanner bug where hitting `End` would say "No scanner results" if there are no pickups in view, but there are other scan result category results
+
 ## V0.6.2
 
 - Downgrade Prism from 0.16.5 to 0.16.1 to fix a [Prism regression](https://github.com/ethindp/prism/issues/49) causing other screen readers besides NVDA not to be properly detected

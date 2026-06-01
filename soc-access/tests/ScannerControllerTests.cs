@@ -26,6 +26,26 @@ namespace SongsOfConquestAccess.Tests
         }
 
         [TestMethod]
+        public void ExecuteRefreshSkipsInitializedEmptyFirstScope()
+        {
+            ScannerSnapshot snapshot = new ScannerSnapshot();
+            snapshot.GetOrAddCategory("Pickups").GetOrAddSubcategory("Unvisited");
+            snapshot.GetOrAddCategory("Terrain").GetOrAddSubcategory("Roads").Results.Add(
+                new ScannerResult("terrain:road", "Road", new Vector2Int(2, 0)));
+            ScannerController controller = CreateController(snapshot);
+
+            ScannerCommandResult result = controller.ExecuteRefresh();
+
+            Assert.AreEqual(ScannerCommandStatus.Result, result.Status);
+            Assert.AreEqual("Terrain", result.CategoryLabel);
+            Assert.AreEqual("Roads", result.SubcategoryLabel);
+            Assert.AreEqual("Road", result.Result.Label);
+            Assert.AreEqual(1, result.ResultIndex);
+            Assert.AreEqual(1, result.ResultCount);
+            Assert.IsTrue(result.IncludePath);
+        }
+
+        [TestMethod]
         public void ExecuteMoveResultWrapsForwardWithinSubcategory()
         {
             ScannerController controller = CreateController(BuildSnapshot(

@@ -68,9 +68,7 @@ namespace SongsOfConquestAccess.Scanner
             }
 
             _snapshot.SortByDistance(origin);
-            _categoryIndex = 0;
-            _subcategoryIndex = 0;
-            _resultIndex = 0;
+            LandOnFirstNonEmptyScope();
             return BuildCommandResult(includePath: true);
         }
 
