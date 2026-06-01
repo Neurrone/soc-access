@@ -1,4 +1,4 @@
-﻿msgid ""
+msgid ""
 msgstr ""
 "Project-Id-Version: SongsOfConquestAccess\n"
 "Language: fr\n"
@@ -23,7 +23,7 @@ msgstr "{0}, {1}"
 #. Common.Quantity
 msgctxt "Common.Quantity"
 msgid "quantity"
-msgstr "quantitÃ©"
+msgstr "quantité"
 
 #. Common.ResourceAmount
 msgctxt "Common.ResourceAmount"
@@ -153,7 +153,7 @@ msgstr "Améliorer pour {0}"
 #. Draft.UpgradeAvailableTroops
 msgctxt "Draft.UpgradeAvailableTroops"
 msgid "Upgrade available troops"
-msgstr "AmÃ©liorer les troupes disponibles"
+msgstr "Améliorer les troupes disponibles"
 
 #. Events.BuildSiteLarge
 msgctxt "Events.BuildSiteLarge"
@@ -188,17 +188,17 @@ msgstr "ville"
 #. Events.DestinationCleared
 msgctxt "Events.DestinationCleared"
 msgid "{0}'s destination cleared."
-msgstr "Destination de {0} effacÃ©e."
+msgstr "Destination de {0} effacée."
 
 #. Events.DestinationSet
 msgctxt "Events.DestinationSet"
 msgid "{0}'s destination set to {1}"
-msgstr "Destination de {0} dÃ©finie sur {1}"
+msgstr "Destination de {0} définie sur {1}"
 
 #. Events.HudClosed
 msgctxt "Events.HudClosed"
 msgid "HUD closed"
-msgstr "HUD fermÃ©"
+msgstr "HUD fermé"
 
 #. Events.HudOpen
 msgctxt "Events.HudOpen"
@@ -213,7 +213,7 @@ msgstr "{0} a atteint le niveau {1}"
 #. Events.MapCameraFocus
 msgctxt "Events.MapCameraFocus"
 msgid "Map camera focuses on {0}"
-msgstr "La camÃ©ra de la carte se concentre sur {0}"
+msgstr "La caméra de la carte se concentre sur {0}"
 
 #. Events.ModError
 msgctxt "Events.ModError"
@@ -228,12 +228,12 @@ msgstr "Porteur recruté {0}"
 #. Events.SelectedBuildSite
 msgctxt "Events.SelectedBuildSite"
 msgid "Selected {0} build site at {1}"
-msgstr "Site de construction {0} sÃ©lectionnÃ© Ã  {1}"
+msgstr "Site de construction {0} sélectionné à {1}"
 
 #. Events.SelectedWielder
 msgctxt "Events.SelectedWielder"
 msgid "Selected wielder {0}"
-msgstr "Porteur sÃ©lectionnÃ© : {0}"
+msgstr "Porteur sélectionné : {0}"
 
 #. Events.Wielder
 msgctxt "Events.Wielder"
@@ -248,17 +248,17 @@ msgstr "{0} n'est plus visible"
 #. Events.WielderMoved
 msgctxt "Events.WielderMoved"
 msgid "{0} moved to {1}"
-msgstr "{0} s'est dÃ©placÃ© vers {1}"
+msgstr "{0} s'est déplacé vers {1}"
 
 #. Events.WielderTeleported
 msgctxt "Events.WielderTeleported"
 msgid "{0} teleported to {1}"
-msgstr "{0} s'est tÃ©lÃ©portÃ© vers {1}"
+msgstr "{0} s'est téléporté vers {1}"
 
 #. UI.ArmyExchangeGrid
 msgctxt "UI.ArmyExchangeGrid"
 msgid "Army exchange grid"
-msgstr "Grille Ã©change armÃ©es"
+msgstr "Grille échange armées"
 
 #. UI.AvailableActions
 msgctxt "UI.AvailableActions"
@@ -273,7 +273,7 @@ msgstr "vide"
 #. UI.CannotDropThere
 msgctxt "UI.CannotDropThere"
 msgid "Cannot drop there."
-msgstr "Impossible de dÃ©poser ici."
+msgstr "Impossible de déposer ici."
 
 #. UI.CharacterColon
 msgctxt "UI.CharacterColon"
@@ -318,7 +318,7 @@ msgstr "tiret bas"
 #. UI.CombatDisconnectedTiles
 msgctxt "UI.CombatDisconnectedTiles"
 msgid "Some shown tiles are separated. Use W and Shift W to reach all range tiles."
-msgstr "Certaines cases affichÃ©es sont sÃ©parÃ©es. Utilisez W et Maj W pour atteindre toutes les cases Ã  portÃ©e."
+msgstr "Certaines cases affichées sont séparées. Utilisez W et Maj W pour atteindre toutes les cases à portée."
 
 #. UI.CombatGrid
 msgctxt "UI.CombatGrid"
@@ -328,22 +328,22 @@ msgstr "Grille de combat"
 #. UI.DragCancelled
 msgctxt "UI.DragCancelled"
 msgid "Drag cancelled."
-msgstr "Glisser annulÃ©."
+msgstr "Glisser annulé."
 
 #. UI.DragComplete
 msgctxt "UI.DragComplete"
 msgid "Drag complete."
-msgstr "Glisser terminÃ©."
+msgstr "Glisser terminé."
 
 #. UI.DragStarted
 msgctxt "UI.DragStarted"
 msgid "Started drag. Move to destination and press enter to drop."
-msgstr "Glisser commencÃ©. Allez Ã  la destination et appuyez sur EntrÃ©e pour dÃ©poser."
+msgstr "Glisser commencé. Allez à la destination et appuyez sur Entrée pour déposer."
 
 #. UI.DragStartedTroopPlacement
 msgctxt "UI.DragStartedTroopPlacement"
 msgid "Started drag for {0} at {1}. Press enter to drop on destination spawn point, or press escape to cancel."
-msgstr "Glisser de {0} vers {1} commencÃ©. Appuyez sur EntrÃ©e pour dÃ©poser sur la cible de placement, ou Ã‰chap pour annuler."
+msgstr "Glisser de {0} vers {1} commencé. Appuyez sur Entrée pour déposer sur la cible de placement, ou Échap pour annuler."
 
 #. UI.Empty
 msgctxt "UI.Empty"
@@ -358,7 +358,7 @@ msgstr "Emplacement de troupe vide {0}"
 #. UI.ExitedInspectMode
 msgctxt "UI.ExitedInspectMode"
 msgid "Exited inspect mode"
-msgstr "Mode inspection fermÃ©"
+msgstr "Mode inspection fermé"
 
 #. UI.Heading
 msgctxt "UI.Heading"
@@ -383,7 +383,7 @@ msgstr "Destination invalide."
 #. UI.JoiningArmy
 msgctxt "UI.JoiningArmy"
 msgid "joining army"
-msgstr "armÃ©e qui rejoint"
+msgstr "armée qui rejoint"
 
 #. UI.LabelValue
 msgctxt "UI.LabelValue"
@@ -393,7 +393,7 @@ msgstr "{0} : {1}"
 #. UI.PressSpaceSelectItemToDrag
 msgctxt "UI.PressSpaceSelectItemToDrag"
 msgid "Press space to select an item to drag."
-msgstr "Appuyez sur espace pour sÃ©lectionner un objet Ã  glisser."
+msgstr "Appuyez sur espace pour sélectionner un objet à glisser."
 
 #. UI.PressSpaceToDrag
 msgctxt "UI.PressSpaceToDrag"
@@ -408,12 +408,12 @@ msgstr "bouton"
 #. UI.RoleCheckBox
 msgctxt "UI.RoleCheckBox"
 msgid "check box"
-msgstr "case Ã  cocher"
+msgstr "case à cocher"
 
 #. UI.RoleColumnHeader
 msgctxt "UI.RoleColumnHeader"
 msgid "column header"
-msgstr "en-tete de colonne"
+msgstr "en-tête de colonne"
 
 #. UI.RoleDocument
 msgctxt "UI.RoleDocument"
@@ -443,7 +443,7 @@ msgstr "curseur"
 #. UI.Selected
 msgctxt "UI.Selected"
 msgid "selected"
-msgstr "sÃ©lectionnÃ©"
+msgstr "sélectionné"
 
 #. UI.Slot
 msgctxt "UI.Slot"
@@ -463,7 +463,7 @@ msgstr "statut"
 #. UI.StatusChecked
 msgctxt "UI.StatusChecked"
 msgid "checked"
-msgstr "cochÃ©"
+msgstr "coché"
 
 #. UI.StatusCorrupt
 msgctxt "UI.StatusCorrupt"
@@ -473,12 +473,12 @@ msgstr "corrompu"
 #. UI.StatusDisabled
 msgctxt "UI.StatusDisabled"
 msgid "disabled"
-msgstr "dÃ©sactivÃ©"
+msgstr "désactivé"
 
 #. UI.StatusDraggable
 msgctxt "UI.StatusDraggable"
 msgid "draggable"
-msgstr "dÃ©plaÃ§able"
+msgstr "déplaçable"
 
 #. UI.StatusDragging
 msgctxt "UI.StatusDragging"
@@ -493,7 +493,7 @@ msgstr "manquant"
 #. UI.StatusUnchecked
 msgctxt "UI.StatusUnchecked"
 msgid "unchecked"
-msgstr "non cochÃ©"
+msgstr "non coché"
 
 #. UI.StatusUnavailable
 msgctxt "UI.StatusUnavailable"
@@ -508,7 +508,7 @@ msgstr "croissant"
 #. UI.SortDescending
 msgctxt "UI.SortDescending"
 msgid "descending"
-msgstr "decroissant"
+msgstr "décroissant"
 
 #. UI.Target
 msgctxt "UI.Target"
@@ -528,7 +528,7 @@ msgstr "{0}, {1} / {2}, {3}"
 #. UI.WielderArmy
 msgctxt "UI.WielderArmy"
 msgid "wielder's army"
-msgstr "armÃ©e du porteur"
+msgstr "armée du porteur"
 
 #. UI.BufferEmpty
 msgctxt "UI.BufferEmpty"
@@ -538,17 +538,17 @@ msgstr "Tampon vide"
 #. UI.NoScannerResults
 msgctxt "UI.NoScannerResults"
 msgid "No scanner results"
-msgstr "Aucun rÃ©sultat du scanner"
+msgstr "Aucun résultat du scanner"
 
 #. UI.NotInMovementRange
 msgctxt "UI.NotInMovementRange"
 msgid "Not in movement range"
-msgstr "Hors de portÃ©e de dÃ©placement"
+msgstr "Hors de portée de déplacement"
 
 #. UI.ReviewBufferEvents
 msgctxt "UI.ReviewBufferEvents"
 msgid "Events"
-msgstr "Ã‰vÃ©nements"
+msgstr "Événements"
 
 #. UI.ReviewBufferLine
 msgctxt "UI.ReviewBufferLine"
@@ -573,12 +573,12 @@ msgstr "{0}, {1}. {2}"
 #. UI.SelectedCount
 msgctxt "UI.SelectedCount"
 msgid "selected {0}x"
-msgstr "{0}x sÃ©lectionnÃ©"
+msgstr "{0}x sélectionné"
 
 #. UI.Unselected
 msgctxt "UI.Unselected"
 msgid "unselected"
-msgstr "non sÃ©lectionnÃ©"
+msgstr "non sélectionné"
 
 #. Screens.AdventureMap
 msgctxt "Screens.AdventureMap"
@@ -593,7 +593,7 @@ msgstr "Sorts Arcana"
 #. Screens.Army
 msgctxt "Screens.Army"
 msgid "army"
-msgstr "armÃ©e"
+msgstr "armée"
 
 #. Screens.Articles
 msgctxt "Screens.Articles"
@@ -623,12 +623,12 @@ msgstr "Journal de combat"
 #. Screens.BattleResult
 msgctxt "Screens.BattleResult"
 msgid "Battle result"
-msgstr "RÃ©sultat de bataille"
+msgstr "Résultat de bataille"
 
 #. Screens.Categories
 msgctxt "Screens.Categories"
 msgid "Categories"
-msgstr "CatÃ©gories"
+msgstr "Catégories"
 
 #. Screens.ChaosSpells
 msgctxt "Screens.ChaosSpells"
@@ -658,7 +658,7 @@ msgstr "Combat"
 #. Screens.CreationSpells
 msgctxt "Screens.CreationSpells"
 msgid "Creation spells"
-msgstr "Sorts CrÃ©ation"
+msgstr "Sorts Création"
 
 #. Screens.CurrentTroop
 msgctxt "Screens.CurrentTroop"
@@ -668,12 +668,12 @@ msgstr "Troupe actuelle, {0}"
 #. Screens.DefenderEssence
 msgctxt "Screens.DefenderEssence"
 msgid "Defender essence"
-msgstr "Essence dÃ©fenseur"
+msgstr "Essence défenseur"
 
 #. Screens.DefendingWielderArmy
 msgctxt "Screens.DefendingWielderArmy"
 msgid "defending wielder army"
-msgstr "armÃ©e du porteur dÃ©fenseur"
+msgstr "armée du porteur défenseur"
 
 #. Screens.Description
 msgctxt "Screens.Description"
@@ -683,7 +683,7 @@ msgstr "Description"
 #. Screens.DescriptionWithMissingBuilding
 msgctxt "Screens.DescriptionWithMissingBuilding"
 msgid "{0}. missing building"
-msgstr "{0}. bÃ¢timent manquant"
+msgstr "{0}. bâtiment manquant"
 
 #. Screens.DestructionSpells
 msgctxt "Screens.DestructionSpells"
@@ -708,7 +708,7 @@ msgstr "vide"
 #. Screens.EjectWielder
 msgctxt "Screens.EjectWielder"
 msgid "Eject wielder"
-msgstr "Ã‰jecter le porteur"
+msgstr "Éjecter le porteur"
 
 #. Screens.GraphType
 msgctxt "Screens.GraphType"
@@ -738,17 +738,17 @@ msgstr "{0} manquant"
 #. Screens.MissingBuilding
 msgctxt "Screens.MissingBuilding"
 msgid "missing building"
-msgstr "bÃ¢timent manquant"
+msgstr "bâtiment manquant"
 
 #. Screens.ModSettings
 msgctxt "Screens.ModSettings"
 msgid "Mod settings"
-msgstr "ParamÃ¨tres du mod"
+msgstr "Paramètres du mod"
 
 #. Screens.ModifierCategoryTabs
 msgctxt "Screens.ModifierCategoryTabs"
 msgid "Modifier category tabs"
-msgstr "Onglets catÃ©gories modificateurs"
+msgstr "Onglets catégories modificateurs"
 
 #. Screens.MultiEssenceSpells
 msgctxt "Screens.MultiEssenceSpells"
@@ -758,7 +758,7 @@ msgstr "Sorts multi-essence"
 #. Screens.NamedArmy
 msgctxt "Screens.NamedArmy"
 msgid "{0} army"
-msgstr "armÃ©e {0}"
+msgstr "armée {0}"
 
 #. Screens.NamedLevel
 msgctxt "Screens.NamedLevel"
@@ -823,12 +823,12 @@ msgstr "Sorts Ordre"
 #. Screens.PostAdventureResult
 msgctxt "Screens.PostAdventureResult"
 msgid "Post adventure result"
-msgstr "RÃ©sultat aprÃ¨s aventure"
+msgstr "Résultat après aventure"
 
 #. Screens.PostAdventureStats
 msgctxt "Screens.PostAdventureStats"
 msgid "Post adventure stats"
-msgstr "Statistiques aprÃ¨s aventure"
+msgstr "Statistiques après aventure"
 
 #. Screens.Penalties
 msgctxt "Screens.Penalties"
@@ -838,7 +838,7 @@ msgstr "Pénalités"
 #. Screens.Previous
 msgctxt "Screens.Previous"
 msgid "Previous"
-msgstr "PrÃ©cÃ©dent"
+msgstr "Précédent"
 
 #. Screens.Quickbar
 msgctxt "Screens.Quickbar"
@@ -848,7 +848,7 @@ msgstr "Barre rapide"
 #. Screens.ReadEnemyInfluence
 msgctxt "Screens.ReadEnemyInfluence"
 msgid "Read attack, deadly and movement range for enemies on tiles in combat"
-msgstr "Lire les portÃ©es ennemies attaque, menace mortelle et mouvement sur les cases de combat"
+msgstr "Lire les portées ennemies attaque, menace mortelle et mouvement sur les cases de combat"
 
 #. Screens.ReadStoryCameraFocusChanges
 msgctxt "Screens.ReadStoryCameraFocusChanges"
@@ -898,7 +898,7 @@ msgstr "troupes de colonie"
 #. Screens.Skill
 msgctxt "Screens.Skill"
 msgid "Skill {0}"
-msgstr "CompÃ©tence {0}"
+msgstr "Compétence {0}"
 
 #. Screens.SlotValue
 msgctxt "Screens.SlotValue"
@@ -923,7 +923,7 @@ msgstr "Équipe {0}"
 #. Screens.Teams
 msgctxt "Screens.Teams"
 msgid "Teams"
-msgstr "Ã‰quipes"
+msgstr "Équipes"
 
 #. Screens.TooltipActions
 msgctxt "Screens.TooltipActions"
@@ -953,7 +953,7 @@ msgstr "{0} perdu"
 #. Screens.TroopDistribution
 msgctxt "Screens.TroopDistribution"
 msgid "troop distribution"
-msgstr "rÃ©partition des troupes"
+msgstr "répartition des troupes"
 
 #. Screens.TroopPlacement
 msgctxt "Screens.TroopPlacement"
@@ -973,17 +973,17 @@ msgstr "Indisponible"
 #. Screens.VisitingWielderArmy
 msgctxt "Screens.VisitingWielderArmy"
 msgid "visiting wielder army"
-msgstr "armÃ©e du porteur visiteur"
+msgstr "armée du porteur visiteur"
 
 #. Screens.WielderArmyPossessive
 msgctxt "Screens.WielderArmyPossessive"
 msgid "{0}'s army"
-msgstr "armÃ©e de {0}"
+msgstr "armée de {0}"
 
 #. Screens.WielderArmy
 msgctxt "Screens.WielderArmy"
 msgid "wielder army"
-msgstr "armÃ©e du porteur"
+msgstr "armée du porteur"
 
 #. Screens.Wielders
 msgctxt "Screens.Wielders"
@@ -998,7 +998,7 @@ msgstr "statistiques de {0}"
 #. Screens.WielderModifierCategories
 msgctxt "Screens.WielderModifierCategories"
 msgid "{0}'s modifier categories"
-msgstr "catÃ©gories modificateurs de {0}"
+msgstr "catégories modificateurs de {0}"
 
 #. Screens.WorldChoiceMenu
 msgctxt "Screens.WorldChoiceMenu"
@@ -1028,7 +1028,7 @@ msgstr "Retirer de la barre rapide"
 #. Screens.AmountToUpgrade
 msgctxt "Screens.AmountToUpgrade"
 msgid "Amount to upgrade, {0}"
-msgstr "QuantitÃ© Ã  amÃ©liorer, {0}"
+msgstr "Quantité à améliorer, {0}"
 
 #. Screens.UnknownSpell
 msgctxt "Screens.UnknownSpell"
@@ -1088,7 +1088,7 @@ msgstr "Case de combat pertinente suivante"
 #. Actions.CombatPreviousRelevantTile
 msgctxt "Actions.CombatPreviousRelevantTile"
 msgid "Previous Relevant Combat Tile"
-msgstr "Case de combat pertinente prÃ©cÃ©dente"
+msgstr "Case de combat pertinente précédente"
 
 #. Actions.FirstBufferLine
 msgctxt "Actions.FirstBufferLine"
@@ -1098,7 +1098,7 @@ msgstr "Premier tampon ligne"
 #. Actions.FirstMenuItem
 msgctxt "Actions.FirstMenuItem"
 msgid "First Menu Item"
-msgstr "Premier menu Ã©lÃ©ment"
+msgstr "Premier menu élément"
 
 #. Actions.FirstRow
 msgctxt "Actions.FirstRow"
@@ -1163,7 +1163,7 @@ msgstr "Dernier tampon ligne"
 #. Actions.LastMenuItem
 msgctxt "Actions.LastMenuItem"
 msgid "Last Menu Item"
-msgstr "Dernier menu Ã©lÃ©ment"
+msgstr "Dernier menu élément"
 
 #. Actions.LastRow
 msgctxt "Actions.LastRow"
@@ -1173,22 +1173,22 @@ msgstr "Dernier ligne"
 #. Actions.MapMoveEast
 msgctxt "Actions.MapMoveEast"
 msgid "Map Move East"
-msgstr "DÃ©placer la carte vers l'est"
+msgstr "Déplacer la carte vers l'est"
 
 #. Actions.MapMoveNorth
 msgctxt "Actions.MapMoveNorth"
 msgid "Map Move North"
-msgstr "DÃ©placer la carte vers le nord"
+msgstr "Déplacer la carte vers le nord"
 
 #. Actions.MapMoveSouth
 msgctxt "Actions.MapMoveSouth"
 msgid "Map Move South"
-msgstr "DÃ©placer la carte vers le sud"
+msgstr "Déplacer la carte vers le sud"
 
 #. Actions.MapMoveWest
 msgctxt "Actions.MapMoveWest"
 msgid "Map Move West"
-msgstr "DÃ©placer la carte vers l'ouest"
+msgstr "Déplacer la carte vers l'ouest"
 
 #. Actions.MapSecondaryAction
 msgctxt "Actions.MapSecondaryAction"
@@ -1218,7 +1218,7 @@ msgstr "Suivant titre"
 #. Actions.NextMenuItem
 msgctxt "Actions.NextMenuItem"
 msgid "Next Menu Item"
-msgstr "Suivant menu Ã©lÃ©ment"
+msgstr "Suivant menu élément"
 
 #. Actions.NextRow
 msgctxt "Actions.NextRow"
@@ -1243,42 +1243,42 @@ msgstr "Porteur suivant"
 #. Actions.OpenModSettings
 msgctxt "Actions.OpenModSettings"
 msgid "Open Mod Settings"
-msgstr "Ouvrir les paramÃ¨tres du mod"
+msgstr "Ouvrir les paramètres du mod"
 
 #. Actions.PreviousBuffer
 msgctxt "Actions.PreviousBuffer"
 msgid "Previous Buffer"
-msgstr "PrÃ©cÃ©dent tampon"
+msgstr "Précédent tampon"
 
 #. Actions.PreviousBufferLine
 msgctxt "Actions.PreviousBufferLine"
 msgid "Previous Buffer Line"
-msgstr "PrÃ©cÃ©dent tampon ligne"
+msgstr "Précédent tampon ligne"
 
 #. Actions.PreviousColumn
 msgctxt "Actions.PreviousColumn"
 msgid "Previous Column"
-msgstr "PrÃ©cÃ©dent colonne"
+msgstr "Précédent colonne"
 
 #. Actions.PreviousHeading
 msgctxt "Actions.PreviousHeading"
 msgid "Previous Heading"
-msgstr "PrÃ©cÃ©dent titre"
+msgstr "Précédent titre"
 
 #. Actions.PreviousMenuItem
 msgctxt "Actions.PreviousMenuItem"
 msgid "Previous Menu Item"
-msgstr "PrÃ©cÃ©dent menu Ã©lÃ©ment"
+msgstr "Précédent menu élément"
 
 #. Actions.PreviousRow
 msgctxt "Actions.PreviousRow"
 msgid "Previous Row"
-msgstr "PrÃ©cÃ©dent ligne"
+msgstr "Précédent ligne"
 
 #. Actions.PreviousWidget
 msgctxt "Actions.PreviousWidget"
 msgid "Previous Widget"
-msgstr "PrÃ©cÃ©dent widget"
+msgstr "Précédent widget"
 
 #. Actions.ReadThreat
 msgctxt "Actions.ReadThreat"
@@ -1298,7 +1298,7 @@ msgstr "Augmenter le rayon d'observation"
 #. Actions.ScannerJumpToResult
 msgctxt "Actions.ScannerJumpToResult"
 msgid "Jump To Scanner Result"
-msgstr "Aller au rÃ©sultat du scanner"
+msgstr "Aller au résultat du scanner"
 
 #. Actions.ScannerLookAround
 msgctxt "Actions.ScannerLookAround"
@@ -1308,32 +1308,32 @@ msgstr "Observer les environs"
 #. Actions.ScannerNextCategory
 msgctxt "Actions.ScannerNextCategory"
 msgid "Next Scanner Category"
-msgstr "Suivant scanner catÃ©gorie"
+msgstr "Suivant scanner catégorie"
 
 #. Actions.ScannerNextResult
 msgctxt "Actions.ScannerNextResult"
 msgid "Next Scanner Result"
-msgstr "Suivant scanner rÃ©sultat"
+msgstr "Suivant scanner résultat"
 
 #. Actions.ScannerNextSubcategory
 msgctxt "Actions.ScannerNextSubcategory"
 msgid "Next Scanner Subcategory"
-msgstr "Suivant scanner sous-catÃ©gorie"
+msgstr "Suivant scanner sous-catégorie"
 
 #. Actions.ScannerPreviousCategory
 msgctxt "Actions.ScannerPreviousCategory"
 msgid "Previous Scanner Category"
-msgstr "PrÃ©cÃ©dent scanner catÃ©gorie"
+msgstr "Précédent scanner catégorie"
 
 #. Actions.ScannerPreviousResult
 msgctxt "Actions.ScannerPreviousResult"
 msgid "Previous Scanner Result"
-msgstr "PrÃ©cÃ©dent scanner rÃ©sultat"
+msgstr "Précédent scanner résultat"
 
 #. Actions.ScannerPreviousSubcategory
 msgctxt "Actions.ScannerPreviousSubcategory"
 msgid "Previous Scanner Subcategory"
-msgstr "PrÃ©cÃ©dent scanner sous-catÃ©gorie"
+msgstr "Précédent scanner sous-catégorie"
 
 #. Actions.ScannerRefresh
 msgctxt "Actions.ScannerRefresh"
@@ -1343,7 +1343,7 @@ msgstr "Actualiser le scanner"
 #. Actions.ScannerSpeakOrientation
 msgctxt "Actions.ScannerSpeakOrientation"
 msgid "Scanner Result Orientation"
-msgstr "Orientation du rÃ©sultat du scanner"
+msgstr "Orientation du résultat du scanner"
 
 #. Actions.SliderDecrease
 msgctxt "Actions.SliderDecrease"
@@ -1373,12 +1373,12 @@ msgstr "Commencer le glissement"
 #. Actions.SummarizeEnemyResources
 msgctxt "Actions.SummarizeEnemyResources"
 msgid "Summarize Enemy Resources"
-msgstr "RÃ©sumer les ressources ennemies"
+msgstr "Résumer les ressources ennemies"
 
 #. Actions.SummarizeResources
 msgctxt "Actions.SummarizeResources"
 msgid "Summarize Resources"
-msgstr "RÃ©sumer les ressources"
+msgstr "Résumer les ressources"
 
 #. Actions.TooltipActionsMenu
 msgctxt "Actions.TooltipActionsMenu"
@@ -1398,7 +1398,7 @@ msgstr "{0} affecte {1}"
 #. Combat.Appears
 msgctxt "Combat.Appears"
 msgid "{0} appears"
-msgstr "{0} apparaÃ®t"
+msgstr "{0} apparaît"
 
 #. Combat.ArcanaEssence
 msgctxt "Combat.ArcanaEssence"
@@ -1413,7 +1413,7 @@ msgstr "{0} {1} {2}"
 #. Combat.AttackableEntity
 msgctxt "Combat.AttackableEntity"
 msgid "attackable entity"
-msgstr "entitÃ© attaquable"
+msgstr "entité attaquable"
 
 #. Combat.AttackVerbDefault
 msgctxt "Combat.AttackVerbDefault"
@@ -1423,7 +1423,7 @@ msgstr "attaque"
 #. Combat.AttackVerbOpportunity
 msgctxt "Combat.AttackVerbOpportunity"
 msgid "makes an opportunity attack against"
-msgstr "effectue une attaque d'opportunitÃ© contre"
+msgstr "effectue une attaque d'opportunité contre"
 
 #. Combat.AttackVerbOverwatch
 msgctxt "Combat.AttackVerbOverwatch"
@@ -1443,7 +1443,7 @@ msgstr "effectue une attaque de mur de lances contre"
 #. Combat.BattleOver
 msgctxt "Combat.BattleOver"
 msgid "Battle over"
-msgstr "Combat terminÃ©"
+msgstr "Combat terminé"
 
 #. Combat.BlindFury
 msgctxt "Combat.BlindFury"
@@ -1453,7 +1453,7 @@ msgstr "fureur aveugle"
 #. Combat.BurrowsUp
 msgctxt "Combat.BurrowsUp"
 msgid "{0} burrows up"
-msgstr "{0} Ã©merge"
+msgstr "{0} émerge"
 
 #. Combat.CastsSpell
 msgctxt "Combat.CastsSpell"
@@ -1468,7 +1468,7 @@ msgstr "{0} lance {1} sur {2}"
 #. Combat.Challenge
 msgctxt "Combat.Challenge"
 msgid "challenge"
-msgstr "dÃ©fi"
+msgstr "défi"
 
 #. Combat.ChaosEssence
 msgctxt "Combat.ChaosEssence"
@@ -1478,17 +1478,17 @@ msgstr "chaos"
 #. Combat.Created
 msgctxt "Combat.Created"
 msgid "{0} created"
-msgstr "{0} crÃ©Ã©"
+msgstr "{0} créé"
 
 #. Combat.CreationEssence
 msgctxt "Combat.CreationEssence"
 msgid "creation"
-msgstr "crÃ©ation"
+msgstr "création"
 
 #. Combat.DamageDestroyingItSuffix
 msgctxt "Combat.DamageDestroyingItSuffix"
 msgid ", destroying it"
-msgstr ", en la dÃ©truisant"
+msgstr ", en la détruisant"
 
 #. Combat.DamageKillsSuffix
 msgctxt "Combat.DamageKillsSuffix"
@@ -1498,17 +1498,17 @@ msgstr ", tuant {0}"
 #. Combat.DealsDamage
 msgctxt "Combat.DealsDamage"
 msgid "{0} deals {1} {2} damage to {3}{4}"
-msgstr "{0} inflige {1} dÃ©gÃ¢ts {2} Ã  {3}{4}"
+msgstr "{0} inflige {1} dégâts {2} à {3}{4}"
 
 #. Combat.Defeat
 msgctxt "Combat.Defeat"
 msgid "Defeat"
-msgstr "DÃ©faite"
+msgstr "Défaite"
 
 #. Combat.Destroyed
 msgctxt "Combat.Destroyed"
 msgid "{0} destroyed"
-msgstr "{0} dÃ©truit"
+msgstr "{0} détruit"
 
 #. Combat.DestructionEssence
 msgctxt "Combat.DestructionEssence"
@@ -1553,7 +1553,7 @@ msgstr "baril explosif"
 #. Combat.FailedBurrow
 msgctxt "Combat.FailedBurrow"
 msgid "{0}, failed burrow"
-msgstr "{0}, terrier Ã©chouÃ©"
+msgstr "{0}, terrier échoué"
 
 #. Combat.FaeyFire
 msgctxt "Combat.FaeyFire"
@@ -1573,12 +1573,12 @@ msgstr "fente"
 #. Combat.MapEntityDamage
 msgctxt "Combat.MapEntityDamage"
 msgid "map entity"
-msgstr "entitÃ© de carte"
+msgstr "entité de carte"
 
 #. Combat.MeleeDamage
 msgctxt "Combat.MeleeDamage"
 msgid "melee"
-msgstr "corps Ã  corps"
+msgstr "corps à corps"
 
 #. Combat.MothersLove
 msgctxt "Combat.MothersLove"
@@ -1593,7 +1593,7 @@ msgstr "C'est au tour de {0}"
 #. Combat.OpportunityAttack
 msgctxt "Combat.OpportunityAttack"
 msgid "opportunity attack"
-msgstr "attaque d'opportunitÃ©"
+msgstr "attaque d'opportunité"
 
 #. Combat.OrderEssence
 msgctxt "Combat.OrderEssence"
@@ -1608,12 +1608,12 @@ msgstr "surveillance"
 #. Combat.PushedTo
 msgctxt "Combat.PushedTo"
 msgid "{0} pushed to {1}"
-msgstr "{0} poussÃ© vers {1}"
+msgstr "{0} poussé vers {1}"
 
 #. Combat.RangedDamage
 msgctxt "Combat.RangedDamage"
 msgid "ranged"
-msgstr "Ã  distance"
+msgstr "à distance"
 
 #. Combat.RavenformsTo
 msgctxt "Combat.RavenformsTo"
@@ -1623,7 +1623,7 @@ msgstr "{0} prend forme de corbeau vers {1}"
 #. Combat.RemovedFrom
 msgctxt "Combat.RemovedFrom"
 msgid "{0} removed from {1}"
-msgstr "{0} retirÃ© de {1}"
+msgstr "{0} retiré de {1}"
 
 #. Combat.Retaliation
 msgctxt "Combat.Retaliation"
@@ -1648,17 +1648,17 @@ msgstr "de zone"
 #. Combat.Summoned
 msgctxt "Combat.Summoned"
 msgid "{0} summoned"
-msgstr "{0} invoquÃ©"
+msgstr "{0} invoqué"
 
 #. Combat.TakesDamage
 msgctxt "Combat.TakesDamage"
 msgid "{0} takes {1} {2} damage{3}"
-msgstr "{0} subit {1} dÃ©gÃ¢ts {2}{3}"
+msgstr "{0} subit {1} dégâts {2}{3}"
 
 #. Combat.TeleportsTo
 msgctxt "Combat.TeleportsTo"
 msgid "{0} teleports to {1}"
-msgstr "{0} se tÃ©lÃ©porte vers {1}"
+msgstr "{0} se téléporte vers {1}"
 
 #. Combat.Tile
 msgctxt "Combat.Tile"
@@ -1673,12 +1673,12 @@ msgstr "troupe"
 #. Combat.TroopAt
 msgctxt "Combat.TroopAt"
 msgid "{0} at {1}"
-msgstr "{0} Ã  {1}"
+msgstr "{0} à {1}"
 
 #. Combat.TroopMoved
 msgctxt "Combat.TroopMoved"
 msgid "{0} moves to {1}"
-msgstr "{0} se dÃ©place vers {1}"
+msgstr "{0} se déplace vers {1}"
 
 #. Combat.TroopQuantity
 msgctxt "Combat.TroopQuantity"
@@ -1693,7 +1693,7 @@ msgstr "inconnu"
 #. Combat.UnknownEntity
 msgctxt "Combat.UnknownEntity"
 msgid "unknown entity"
-msgstr "entitÃ© inconnue"
+msgstr "entité inconnue"
 
 #. Combat.UnknownTarget
 msgctxt "Combat.UnknownTarget"
@@ -1758,7 +1758,7 @@ msgstr "attaque"
 #. Spatial.AttackPreview
 msgctxt "Spatial.AttackPreview"
 msgid "Attack preview:"
-msgstr "AperÃ§u de l'attaque :"
+msgstr "Aperçu de l'attaque :"
 
 #. Spatial.AttackRange
 msgctxt "Spatial.AttackRange"
@@ -1768,7 +1768,7 @@ msgstr "Portée d'attaque"
 #. Spatial.Blocked
 msgctxt "Spatial.Blocked"
 msgid "blocked"
-msgstr "bloquÃ©"
+msgstr "bloqué"
 
 #. Spatial.Commander
 msgctxt "Spatial.Commander"
@@ -1783,12 +1783,12 @@ msgstr "du commandant"
 #. Spatial.Cost
 msgctxt "Spatial.Cost"
 msgid "cost {0}"
-msgstr "coÃ»t {0}"
+msgstr "coût {0}"
 
 #. Spatial.DamagePreview
 msgctxt "Spatial.DamagePreview"
 msgid "{0}damage {1}"
-msgstr "{0}dÃ©gÃ¢ts {1}"
+msgstr "{0}dégâts {1}"
 
 #. Spatial.DeadlyRange
 msgctxt "Spatial.DeadlyRange"
@@ -1803,7 +1803,7 @@ msgstr "mortelle"
 #. Spatial.Debris
 msgctxt "Spatial.Debris"
 msgid "debris"
-msgstr "dÃ©bris"
+msgstr "débris"
 
 #. Spatial.Destination
 msgctxt "Spatial.Destination"
@@ -1818,17 +1818,17 @@ msgstr "Destination : {0}"
 #. Spatial.Destroys
 msgctxt "Spatial.Destroys"
 msgid "destroys"
-msgstr "dÃ©truit"
+msgstr "détruit"
 
 #. Spatial.ElevatedGroundHeight
 msgctxt "Spatial.ElevatedGroundHeight"
 msgid "elevated ground, height {0}"
-msgstr "terrain Ã©levÃ©, hauteur {0}"
+msgstr "terrain élevé, hauteur {0}"
 
 #. Spatial.EnemySpawnPoint
 msgctxt "Spatial.EnemySpawnPoint"
 msgid "enemy spawn point"
-msgstr "point de dÃ©ploiement ennemi"
+msgstr "point de déploiement ennemi"
 
 #. Spatial.Enemy
 msgctxt "Spatial.Enemy"
@@ -1838,12 +1838,12 @@ msgstr "ennemi"
 #. Spatial.ExtraTargetPrefix
 msgctxt "Spatial.ExtraTargetPrefix"
 msgid "extra target "
-msgstr "cible supplÃ©mentaire "
+msgstr "cible supplémentaire "
 
 #. Spatial.Friendly
 msgctxt "Spatial.Friendly"
 msgid "friendly"
-msgstr "alliÃ©"
+msgstr "allié"
 
 #. Spatial.FurthestReachableInTurns
 msgctxt "Spatial.FurthestReachableInTurns"
@@ -1893,7 +1893,7 @@ msgstr "tue {0}"
 #. Spatial.MayDestroy
 msgctxt "Spatial.MayDestroy"
 msgid "may destroy"
-msgstr "peut dÃ©truire"
+msgstr "peut détruire"
 
 #. Spatial.Movement
 msgctxt "Spatial.Movement"
@@ -1913,12 +1913,12 @@ msgstr "neutre"
 #. Spatial.NoRoutePreview
 msgctxt "Spatial.NoRoutePreview"
 msgid "no route preview"
-msgstr "aucun aperÃ§u d'itinÃ©raire"
+msgstr "aucun aperçu d'itinéraire"
 
 #. Spatial.OnRoute
 msgctxt "Spatial.OnRoute"
 msgid "On route"
-msgstr "Sur l'itinÃ©raire"
+msgstr "Sur l'itinéraire"
 
 #. Spatial.PrimaryPrefix
 msgctxt "Spatial.PrimaryPrefix"
@@ -1928,7 +1928,7 @@ msgstr "principale "
 #. Spatial.RangeAndMovement
 msgctxt "Spatial.RangeAndMovement"
 msgid "{0} and movement range"
-msgstr "{0} et portÃ©e de dÃ©placement"
+msgstr "{0} et portée de déplacement"
 
 #. Spatial.Reachable
 msgctxt "Spatial.Reachable"
@@ -1938,12 +1938,12 @@ msgstr "atteignable"
 #. Spatial.SpawnPoint
 msgctxt "Spatial.SpawnPoint"
 msgid "spawn point"
-msgstr "point de dÃ©ploiement"
+msgstr "point de déploiement"
 
 #. Spatial.Threatened
 msgctxt "Spatial.Threatened"
 msgid "Threatened"
-msgstr "MenacÃ©"
+msgstr "Menacé"
 
 #. Spatial.ThisTurnAt
 msgctxt "Spatial.ThisTurnAt"
@@ -1958,7 +1958,7 @@ msgstr "dans {0} tours"
 #. Spatial.Unexplored
 msgctxt "Spatial.Unexplored"
 msgid "Unexplored"
-msgstr "InexplorÃ©"
+msgstr "Inexploré"
 
 #. Spatial.Unseen
 msgctxt "Spatial.Unseen"
@@ -1968,12 +1968,12 @@ msgstr "Non visible"
 #. Spatial.VisitedSuffix
 msgctxt "Spatial.VisitedSuffix"
 msgid "{0} (visited)"
-msgstr "{0} (visitÃ©)"
+msgstr "{0} (visité)"
 
 #. Spatial.WithinZoneOfControl
 msgctxt "Spatial.WithinZoneOfControl"
 msgid "Within {0} zone of control"
-msgstr "Dans la zone de contrÃ´le {0}"
+msgstr "Dans la zone de contrôle {0}"
 
 #. Spatial.ZoneOfControl
 msgctxt "Spatial.ZoneOfControl"
@@ -1983,12 +1983,12 @@ msgstr "Zone de contrôle"
 #. Spatial.ZoneOfControlTiles
 msgctxt "Spatial.ZoneOfControlTiles"
 msgid "{0} within {1} zone of control"
-msgstr "{0} dans la zone de contrÃ´le {1}"
+msgstr "{0} dans la zone de contrôle {1}"
 
 #. Screens.AiControl
 msgctxt "Screens.AiControl"
 msgid "AI control"
-msgstr "ContrÃ´le par l'IA"
+msgstr "Contrôle par l'IA"
 
 #. Screens.AiDifficulty
 msgctxt "Screens.AiDifficulty"
@@ -2013,12 +2013,12 @@ msgstr "{0}, {1}, niveau {2}"
 #. Screens.Defender
 msgctxt "Screens.Defender"
 msgid "Defender"
-msgstr "DÃ©fenseur"
+msgstr "Défenseur"
 
 #. Screens.DefenderPortrait
 msgctxt "Screens.DefenderPortrait"
 msgid "Defender portrait"
-msgstr "Portrait du dÃ©fenseur"
+msgstr "Portrait du défenseur"
 
 #. Screens.LevelValue
 msgctxt "Screens.LevelValue"
@@ -2033,7 +2033,7 @@ msgstr "Tous"
 #. Scanner.ArtifactMarkets
 msgctxt "Scanner.ArtifactMarkets"
 msgid "Artifact markets"
-msgstr "MarchÃ©s d'artefacts"
+msgstr "Marchés d'artefacts"
 
 #. Scanner.Attackable
 msgctxt "Scanner.Attackable"
@@ -2048,7 +2048,7 @@ msgstr "Balises"
 #. Scanner.Blocked
 msgctxt "Scanner.Blocked"
 msgid "Blocked"
-msgstr "BloquÃ©"
+msgstr "Bloqué"
 
 #. Scanner.Bridges
 msgctxt "Scanner.Bridges"
@@ -2058,7 +2058,7 @@ msgstr "Ponts"
 #. Scanner.Buildings
 msgctxt "Scanner.Buildings"
 msgid "Buildings"
-msgstr "BÃ¢timents"
+msgstr "Bâtiments"
 
 #. Scanner.Dangerous
 msgctxt "Scanner.Dangerous"
@@ -2073,7 +2073,7 @@ msgstr "est"
 #. Scanner.ElevatedGround
 msgctxt "Scanner.ElevatedGround"
 msgid "Elevated ground {0}"
-msgstr "Terrain Ã©levÃ© {0}"
+msgstr "Terrain élevé {0}"
 
 #. Scanner.Enemy
 msgctxt "Scanner.Enemy"
@@ -2088,17 +2088,17 @@ msgstr "Portes ennemies"
 #. Scanner.Entities
 msgctxt "Scanner.Entities"
 msgid "Entities"
-msgstr "EntitÃ©s"
+msgstr "Entités"
 
 #. Scanner.Friendly
 msgctxt "Scanner.Friendly"
 msgid "Friendly"
-msgstr "AlliÃ©"
+msgstr "Allié"
 
 #. Scanner.FriendlyGates
 msgctxt "Scanner.FriendlyGates"
 msgid "Friendly gates"
-msgstr "Portes alliÃ©es"
+msgstr "Portes alliées"
 
 #. Scanner.Impassable
 msgctxt "Scanner.Impassable"
@@ -2158,7 +2158,7 @@ msgstr "Obstacles"
 #. Scanner.Pickups
 msgctxt "Scanner.Pickups"
 msgid "Pickups"
-msgstr "Objets Ã  ramasser"
+msgstr "Objets à ramasser"
 
 #. Scanner.Power
 msgctxt "Scanner.Power"
@@ -2223,7 +2223,7 @@ msgstr "sud-ouest"
 #. Scanner.Teleport
 msgctxt "Scanner.Teleport"
 msgid "Teleport"
-msgstr "TÃ©lÃ©portation"
+msgstr "Téléportation"
 
 #. Scanner.Terrain
 msgctxt "Scanner.Terrain"
@@ -2243,7 +2243,7 @@ msgstr "Troupes"
 #. Scanner.Unvisited
 msgctxt "Scanner.Unvisited"
 msgid "Unvisited"
-msgstr "Non visitÃ©"
+msgstr "Non visité"
 
 #. Scanner.Water
 msgctxt "Scanner.Water"
@@ -2273,12 +2273,12 @@ msgstr "Porteurs"
 #. Scanner.BlockedTileCount_0
 msgctxt "Scanner.BlockedTileCount_0"
 msgid "{0} blocked tile"
-msgstr "{0} case bloquÃ©e"
+msgstr "{0} case bloquée"
 
 #. Scanner.BlockedTileCount_1
 msgctxt "Scanner.BlockedTileCount_1"
 msgid "{0} blocked tiles"
-msgstr "{0} cases bloquÃ©es"
+msgstr "{0} cases bloquées"
 
 #. Scanner.BridgeTileCount_0
 msgctxt "Scanner.BridgeTileCount_0"
@@ -2333,7 +2333,7 @@ msgstr "Pont"
 #. Spatial.CobblestoneRoad
 msgctxt "Spatial.CobblestoneRoad"
 msgid "Cobblestone road"
-msgstr "Route pavÃ©e"
+msgstr "Route pavée"
 
 #. Spatial.DeepWater
 msgctxt "Spatial.DeepWater"
@@ -2343,7 +2343,7 @@ msgstr "Eau profonde"
 #. Spatial.Deforestation
 msgctxt "Spatial.Deforestation"
 msgid "Deforestation"
-msgstr "DÃ©forestation"
+msgstr "Déforestation"
 
 #. Spatial.DirtRoad
 msgctxt "Spatial.DirtRoad"
@@ -2449,12 +2449,12 @@ msgstr "Aucun signet"
 #. Combat.AllMeleeTroops
 msgctxt "Combat.AllMeleeTroops"
 msgid "all melee troops"
-msgstr "toutes les troupes de melee"
+msgstr "toutes les troupes de mêlée"
 
 #. Combat.AllRangedTroops
 msgctxt "Combat.AllRangedTroops"
 msgid "all ranged troops"
-msgstr "toutes les troupes a distance"
+msgstr "toutes les troupes à distance"
 
 #. Combat.AllTroops
 msgctxt "Combat.AllTroops"
@@ -2464,7 +2464,7 @@ msgstr "toutes les troupes"
 #. Combat.EnemyMeleeTroops
 msgctxt "Combat.EnemyMeleeTroops"
 msgid "enemy melee troops"
-msgstr "troupes de melee ennemies"
+msgstr "troupes de mêlée ennemies"
 
 #. Combat.EnemyCommander
 msgctxt "Combat.EnemyCommander"
@@ -2474,7 +2474,7 @@ msgstr "ennemi {0}"
 #. Combat.EnemyRangedTroops
 msgctxt "Combat.EnemyRangedTroops"
 msgid "enemy ranged troops"
-msgstr "troupes a distance ennemies"
+msgstr "troupes à distance ennemies"
 
 #. Combat.WielderEssenceGenerated
 msgctxt "Combat.WielderEssenceGenerated"
@@ -2484,12 +2484,12 @@ msgstr "{0}: {1}"
 #. Combat.YourMeleeTroops
 msgctxt "Combat.YourMeleeTroops"
 msgid "your melee troops"
-msgstr "tes troupes de melee"
+msgstr "tes troupes de mêlée"
 
 #. Combat.YourRangedTroops
 msgctxt "Combat.YourRangedTroops"
 msgid "your ranged troops"
-msgstr "tes troupes a distance"
+msgstr "tes troupes à distance"
 
 #. Scanner.AridTrees
 msgctxt "Scanner.AridTrees"
@@ -2499,7 +2499,7 @@ msgstr "Arbres arides"
 #. Scanner.CobblestoneRoads
 msgctxt "Scanner.CobblestoneRoads"
 msgid "Cobblestone roads"
-msgstr "Routes pavees"
+msgstr "Routes pavées"
 
 #. Scanner.DeepWater
 msgctxt "Scanner.DeepWater"
@@ -2509,7 +2509,7 @@ msgstr "Eau profonde"
 #. Scanner.Deforestation
 msgctxt "Scanner.Deforestation"
 msgid "Deforestation"
-msgstr "Deforestation"
+msgstr "Déforestation"
 
 #. Scanner.Dirt
 msgctxt "Scanner.Dirt"
@@ -2549,7 +2549,7 @@ msgstr "Eau peu profonde"
 #. Scanner.TemperateTrees
 msgctxt "Scanner.TemperateTrees"
 msgid "Temperate trees"
-msgstr "Arbres temperes"
+msgstr "Arbres tempérés"
 
 #. Scanner.Walls
 msgctxt "Scanner.Walls"
@@ -2559,7 +2559,7 @@ msgstr "Murs"
 #. Scanner.WaterEdge
 msgctxt "Scanner.WaterEdge"
 msgid "Water edge"
-msgstr "Bord de eau"
+msgstr "Bord de l'eau"
 
 #. Spatial.Dirt
 msgctxt "Spatial.Dirt"
@@ -2584,7 +2584,7 @@ msgstr "Sable"
 #. Spatial.TemperateTrees
 msgctxt "Spatial.TemperateTrees"
 msgid "Temperate trees"
-msgstr "Arbres temperes"
+msgstr "Arbres tempérés"
 
 #. Scanner.AridTreeTileCount_0
 msgctxt "Scanner.AridTreeTileCount_0"
@@ -2599,12 +2599,12 @@ msgstr "{0} cases: Arbres arides"
 #. Scanner.CobblestoneRoadTileCount_0
 msgctxt "Scanner.CobblestoneRoadTileCount_0"
 msgid "{0} cobblestone road tile"
-msgstr "{0} case: Routes pavees"
+msgstr "{0} case: Routes pavées"
 
 #. Scanner.CobblestoneRoadTileCount_1
 msgctxt "Scanner.CobblestoneRoadTileCount_1"
 msgid "{0} cobblestone road tiles"
-msgstr "{0} cases: Routes pavees"
+msgstr "{0} cases: Routes pavées"
 
 #. Scanner.DeepWaterTileCount_0
 msgctxt "Scanner.DeepWaterTileCount_0"
@@ -2619,12 +2619,12 @@ msgstr "{0} cases: Eau profonde"
 #. Scanner.DeforestationTileCount_0
 msgctxt "Scanner.DeforestationTileCount_0"
 msgid "{0} deforestation tile"
-msgstr "{0} case: Deforestation"
+msgstr "{0} case: Déforestation"
 
 #. Scanner.DeforestationTileCount_1
 msgctxt "Scanner.DeforestationTileCount_1"
 msgid "{0} deforestation tiles"
-msgstr "{0} cases: Deforestation"
+msgstr "{0} cases: Déforestation"
 
 #. Scanner.DirtRoadTileCount_0
 msgctxt "Scanner.DirtRoadTileCount_0"
@@ -2699,12 +2699,12 @@ msgstr "{0} cases: Eau peu profonde"
 #. Scanner.TemperateTreeTileCount_0
 msgctxt "Scanner.TemperateTreeTileCount_0"
 msgid "{0} temperate tree tile"
-msgstr "{0} case: Arbres temperes"
+msgstr "{0} case: Arbres tempérés"
 
 #. Scanner.TemperateTreeTileCount_1
 msgctxt "Scanner.TemperateTreeTileCount_1"
 msgid "{0} temperate tree tiles"
-msgstr "{0} cases: Arbres temperes"
+msgstr "{0} cases: Arbres tempérés"
 
 #. Scanner.WallTileCount_0
 msgctxt "Scanner.WallTileCount_0"
@@ -2719,12 +2719,12 @@ msgstr "{0} cases: Murs"
 #. Scanner.WaterEdgeTileCount_0
 msgctxt "Scanner.WaterEdgeTileCount_0"
 msgid "{0} water edge tile"
-msgstr "{0} case: Bord de eau"
+msgstr "{0} case: Bord de l'eau"
 
 #. Scanner.WaterEdgeTileCount_1
 msgctxt "Scanner.WaterEdgeTileCount_1"
 msgid "{0} water edge tiles"
-msgstr "{0} cases: Bord de eau"
+msgstr "{0} cases: Bord de l'eau"
 
 #. Spatial.SkippedTileCount_0
 msgctxt "Spatial.SkippedTileCount_0"

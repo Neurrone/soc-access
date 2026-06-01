@@ -21,6 +21,252 @@ internal static class Program
 
     private static readonly Regex PlaceholderRegex = new Regex(@"\{(?<index>\d+)(?:[^}]*)\}", RegexOptions.Compiled);
 
+    private static readonly Regex C1ControlCharacterRegex = new Regex(@"[\u0080-\u009F]", RegexOptions.Compiled);
+
+    private static readonly Regex LatinWordRegex = new Regex(@"[A-Za-z]{4,}", RegexOptions.Compiled);
+
+    private static readonly Regex AllowedLatinTokenRegex = new Regex(
+        @"\b(?:AI|BepInEx|Ctrl|Enter|Escape|Faey|HUD|Mod|OK|Shift|Space|Steam|UI|W)\b",
+        RegexOptions.Compiled | RegexOptions.IgnoreCase);
+
+    private static readonly Regex SingleLetterTokenRegex = new Regex(@"\b[A-Za-z]\b", RegexOptions.Compiled);
+
+    private static readonly string[] CommonSuspiciousTextPatterns =
+    {
+        "Ã",
+        "Â",
+        "Ð",
+        "Ò",
+        "�"
+    };
+
+    private static readonly string[] GermanSuspiciousTextPatterns =
+    {
+        "Ã¤",
+        "Ã¶",
+        "Ã¼",
+        "Ã„",
+        "Ã–",
+        "Ãœ",
+        "ÃŸ",
+        "Spaltenueberschrift",
+        "Baeume",
+        "Gemaessigt",
+        "Kopfsteinpflasterstrasse",
+        "Kopfsteinpflasterstrassen"
+    };
+
+    private static readonly Dictionary<string, string[]> LanguageSuspiciousTextPatterns =
+        new Dictionary<string, string[]>(StringComparer.OrdinalIgnoreCase)
+        {
+            ["de"] = GermanSuspiciousTextPatterns,
+            ["es"] = new[]
+            {
+                "Arbol",
+                "Arboles",
+                "arido",
+                "aridos",
+                "Deforestacion",
+                "Montana",
+                "Montanas",
+                "menu",
+                "escaner",
+                "bufer",
+                "ejercito",
+                "dano",
+                "vacio",
+                "maximo",
+                "minimo",
+                "cronologia",
+                "hexagono",
+                "orientacion",
+                "informacion",
+                "aparicion",
+                "codigo",
+                "faccion"
+            },
+            ["fr"] = new[]
+            {
+                "en-tete",
+                "decroissant",
+                "melee",
+                "a distance",
+                "pavee",
+                "pavees",
+                "tempere",
+                "temperes",
+                "Deforestation",
+                "Bord de eau"
+            },
+            ["it"] = new[]
+            {
+                "piu",
+                "perche",
+                "citta",
+                "qualita",
+                "quantita",
+                "modalita",
+                "entita"
+            },
+            ["pt-BR"] = new[]
+            {
+                "nao",
+                "cabecalho",
+                "Arvores",
+                "arvores",
+                "Agua",
+                "agua",
+                "paralelepipedos",
+                "agricolas"
+            },
+            ["tr"] = new[]
+            {
+                "Ä",
+                "Å",
+                "artik",
+                "gorunmuyor",
+                "sutun",
+                "basligi",
+                "tum",
+                "yakin",
+                "dovus",
+                "dusman",
+                "cikarilanlar",
+                "agaclar",
+                "kaldirimi",
+                "Ormansizlasma",
+                "Tarim",
+                "Cimen",
+                "Dag",
+                "Daglar",
+                "Sig",
+                "Iliman",
+                "kenari"
+            },
+            ["pl"] = new[]
+            {
+                "Ä",
+                "Å",
+                "juz",
+                "naglowek",
+                "rosnaco",
+                "malejaco",
+                "Gleboka",
+                "Gory",
+                "Gora",
+                "Plytka",
+                "wrecz",
+                "wrog {0}"
+            },
+            ["ru"] = new[]
+            {
+                "Ñ",
+                "Zasushlivye",
+                "Moshchenye",
+                "Glubokaya",
+                "Vyrubka",
+                "derevya",
+                "dorogi"
+            },
+            ["uk"] = new[]
+            {
+                "Ñ",
+                "Posushlyvi",
+                "Brukovani",
+                "Hlyboka",
+                "Vyrubka",
+                "dereva",
+                "dorohy"
+            },
+            ["ja"] = new[]
+            {
+                "ã",
+                "æ",
+                "å",
+                "ç",
+                "è",
+                "é",
+                "Kansouchi",
+                "Ishidatami",
+                "Fukai mizu",
+                "Bassai",
+                "Tsuchi",
+                "Nochi",
+                "Kusachi",
+                "Yama",
+                "Suna",
+                "Asai mizu",
+                "Ontai",
+                "Kabe",
+                "Mizugiwa",
+                " tile:"
+            },
+            ["ko"] = new[]
+            {
+                "ì",
+                "ë",
+                "ê",
+                "í",
+                "Geonjo",
+                "Jagalgil",
+                "Gipeun",
+                "Beolmokji",
+                "Heuk",
+                "Nongji",
+                "Pulbat",
+                "Morae",
+                "Yateun",
+                "Ondae",
+                "Byeok",
+                "Mulga",
+                " tile:"
+            },
+            ["zh-CN"] = new[]
+            {
+                "ã",
+                "æ",
+                "å",
+                "ç",
+                "è",
+                "é",
+                "ï¼",
+                "Han di",
+                "E luan",
+                "Shen shui",
+                "Kan fa",
+                "Ni di",
+                "Nong tian",
+                "Cao di",
+                "Shan di",
+                "Sha di",
+                "Qian shui",
+                "Wen dai",
+                "di kuai"
+            },
+            ["zh-TW"] = new[]
+            {
+                "ã",
+                "æ",
+                "å",
+                "ç",
+                "è",
+                "é",
+                "ï¼",
+                "Han di",
+                "E luan",
+                "Shen shui",
+                "Kan fa",
+                "Ni di",
+                "Nong tian",
+                "Cao di",
+                "Shan di",
+                "Sha di",
+                "Qian shui",
+                "Wen dai",
+                "di ge"
+            }
+        };
+
     public static int Main(string[] args)
     {
         if (args.Length != 1 || (args[0] != "update-pot" && args[0] != "validate"))
@@ -223,6 +469,29 @@ internal static class Program
                 {
                     failures.Add(Path.GetFileName(poFile) + ": placeholder mismatch for " + source.Key);
                 }
+
+                foreach (string suspiciousPattern in GetSuspiciousTextPatterns(Path.GetFileNameWithoutExtension(poFile)))
+                {
+                    if (translation.Value.IndexOf(suspiciousPattern, StringComparison.Ordinal) >= 0)
+                    {
+                        failures.Add(
+                            Path.GetFileName(poFile)
+                            + ": suspicious text '"
+                            + suspiciousPattern
+                            + "' in "
+                            + source.Key);
+                    }
+                }
+
+                if (C1ControlCharacterRegex.IsMatch(translation.Value))
+                {
+                    failures.Add(Path.GetFileName(poFile) + ": suspicious control character in " + source.Key);
+                }
+
+                if (HasSuspiciousLatinOnlyText(Path.GetFileNameWithoutExtension(poFile), translation.Value))
+                {
+                    failures.Add(Path.GetFileName(poFile) + ": suspicious Latin-only text in " + source.Key);
+                }
             }
 
             foreach (string key in catalog.Entries.Keys.OrderBy(key => key, StringComparer.Ordinal))
@@ -268,6 +537,88 @@ internal static class Program
             .OrderBy(value => value, StringComparer.Ordinal)
             .ToArray();
         return sourcePlaceholders.SequenceEqual(translatedPlaceholders);
+    }
+
+    private static IEnumerable<string> GetSuspiciousTextPatterns(string languageCode)
+    {
+        foreach (string pattern in CommonSuspiciousTextPatterns)
+        {
+            yield return pattern;
+        }
+
+        if (!LanguageSuspiciousTextPatterns.TryGetValue(languageCode, out string[]? languagePatterns))
+        {
+            yield break;
+        }
+
+        foreach (string pattern in languagePatterns)
+        {
+            yield return pattern;
+        }
+    }
+
+    private static bool HasSuspiciousLatinOnlyText(string languageCode, string value)
+    {
+        if (!RequiresNativeScript(languageCode))
+        {
+            return false;
+        }
+
+        string stripped = PlaceholderRegex.Replace(value, " ");
+        stripped = AllowedLatinTokenRegex.Replace(stripped, " ");
+        stripped = SingleLetterTokenRegex.Replace(stripped, " ");
+
+        return !HasNativeScript(languageCode, stripped) && LatinWordRegex.IsMatch(stripped);
+    }
+
+    private static bool RequiresNativeScript(string languageCode)
+    {
+        string code = languageCode.ToLowerInvariant();
+        return code == "ru"
+            || code == "uk"
+            || code == "ja"
+            || code == "ko"
+            || code.StartsWith("zh", StringComparison.Ordinal);
+    }
+
+    private static bool HasNativeScript(string languageCode, string value)
+    {
+        string code = languageCode.ToLowerInvariant();
+        foreach (char character in value)
+        {
+            int codepoint = character;
+            if (code == "ru" || code == "uk")
+            {
+                if (codepoint >= 0x0400 && codepoint <= 0x04FF)
+                {
+                    return true;
+                }
+            }
+            else if (code == "ja")
+            {
+                if ((codepoint >= 0x3040 && codepoint <= 0x30FF)
+                    || (codepoint >= 0x3400 && codepoint <= 0x9FFF))
+                {
+                    return true;
+                }
+            }
+            else if (code == "ko")
+            {
+                if (codepoint >= 0xAC00 && codepoint <= 0xD7AF)
+                {
+                    return true;
+                }
+            }
+            else if (code.StartsWith("zh", StringComparison.Ordinal))
+            {
+                if (codepoint >= 0x3400 && codepoint <= 0x9FFF)
+                {
+                    return true;
+                }
+            }
+        }
+
+        return false;
     }
 
     private static string DecodeCSharpString(string literal)

@@ -8,12 +8,12 @@ msgstr ""
 #. Common.ListFinal
 msgctxt "Common.ListFinal"
 msgid "{0}, and {1}"
-msgstr "{0} Ð¸ {1}"
+msgstr "{0} и {1}"
 
 #. Common.ListPair
 msgctxt "Common.ListPair"
 msgid "{0} and {1}"
-msgstr "{0} Ð¸ {1}"
+msgstr "{0} и {1}"
 
 #. Common.ListSeparator
 msgctxt "Common.ListSeparator"
@@ -23,7 +23,7 @@ msgstr "{0}, {1}"
 #. Common.Quantity
 msgctxt "Common.Quantity"
 msgid "quantity"
-msgstr "ÐºÐ¾Ð»Ð¸Ñ‡ÐµÑÑ‚Ð²Ð¾"
+msgstr "количество"
 
 #. Common.ResourceAmount
 msgctxt "Common.ResourceAmount"
@@ -118,32 +118,32 @@ msgstr "{0} ({1})"
 #. Common.TileCount_0
 msgctxt "Common.TileCount_0"
 msgid "{0} tile"
-msgstr "{0} ÐºÐ»ÐµÑ‚ÐºÐ°"
+msgstr "{0} клетка"
 
 #. Common.TileCount_1
 msgctxt "Common.TileCount_1"
 msgid "{0} tiles"
-msgstr "{0} ÐºÐ»ÐµÑ‚ÐºÐ¸"
+msgstr "{0} клетки"
 
 #. Common.TileCount_2
 msgctxt "Common.TileCount_2"
 msgid "{0} tiles"
-msgstr "{0} ÐºÐ»ÐµÑ‚Ð¾Ðº"
+msgstr "{0} клеток"
 
 #. Draft.EssenceVariants
 msgctxt "Draft.EssenceVariants"
 msgid "Essence variants"
-msgstr "Ð’Ð°Ñ€Ð¸Ð°Ð½Ñ‚Ñ‹ ÑÑÑÐµÐ½Ñ†Ð¸Ð¸"
+msgstr "Варианты эссенции"
 
 #. Draft.Purchase
 msgctxt "Draft.Purchase"
 msgid "Purchase"
-msgstr "ÐšÑƒÐ¿Ð¸Ñ‚ÑŒ"
+msgstr "Купить"
 
 #. Draft.PurchaseForResources
 msgctxt "Draft.PurchaseForResources"
 msgid "Purchase for {0}"
-msgstr "ÐšÑƒÐ¿Ð¸Ñ‚ÑŒ Ð·Ð° {0}"
+msgstr "Купить за {0}"
 
 #. Draft.AvailableTroops_0
 msgctxt "Draft.AvailableTroops_0"
@@ -173,72 +173,72 @@ msgstr "Улучшить за {0}"
 #. Draft.UpgradeAvailableTroops
 msgctxt "Draft.UpgradeAvailableTroops"
 msgid "Upgrade available troops"
-msgstr "Ð£Ð»ÑƒÑ‡ÑˆÐ¸Ñ‚ÑŒ Ð´Ð¾ÑÑ‚ÑƒÐ¿Ð½Ñ‹Ðµ Ð¾Ñ‚Ñ€ÑÐ´Ñ‹"
+msgstr "Улучшить доступные отряды"
 
 #. Events.BuildSiteLarge
 msgctxt "Events.BuildSiteLarge"
 msgid "large"
-msgstr "Ð±Ð¾Ð»ÑŒÑˆÐ°Ñ"
+msgstr "большая"
 
 #. Events.BuildSiteLargeSettlement
 msgctxt "Events.BuildSiteLargeSettlement"
 msgid "large settlement"
-msgstr "Ð±Ð¾Ð»ÑŒÑˆÐ¾Ðµ Ð¿Ð¾ÑÐµÐ»ÐµÐ½Ð¸Ðµ"
+msgstr "большое поселение"
 
 #. Events.BuildSiteMedium
 msgctxt "Events.BuildSiteMedium"
 msgid "medium"
-msgstr "ÑÑ€ÐµÐ´Ð½ÑÑ"
+msgstr "средняя"
 
 #. Events.BuildSiteSmall
 msgctxt "Events.BuildSiteSmall"
 msgid "small"
-msgstr "Ð¼Ð°Ð»ÐµÐ½ÑŒÐºÐ°Ñ"
+msgstr "маленькая"
 
 #. Events.BuildSiteSmallSettlement
 msgctxt "Events.BuildSiteSmallSettlement"
 msgid "small settlement"
-msgstr "Ð¼Ð°Ð»Ð¾Ðµ Ð¿Ð¾ÑÐµÐ»ÐµÐ½Ð¸Ðµ"
+msgstr "малое поселение"
 
 #. Events.BuildSiteTown
 msgctxt "Events.BuildSiteTown"
 msgid "town"
-msgstr "Ð³Ð¾Ñ€Ð¾Ð´"
+msgstr "город"
 
 #. Events.DestinationCleared
 msgctxt "Events.DestinationCleared"
 msgid "{0}'s destination cleared."
-msgstr "ÐŸÑƒÐ½ÐºÑ‚ Ð½Ð°Ð·Ð½Ð°Ñ‡ÐµÐ½Ð¸Ñ Ð³ÐµÑ€Ð¾Ñ {0} Ð¾Ñ‡Ð¸Ñ‰ÐµÐ½."
+msgstr "Пункт назначения героя {0} очищен."
 
 #. Events.DestinationSet
 msgctxt "Events.DestinationSet"
 msgid "{0}'s destination set to {1}"
-msgstr "ÐŸÑƒÐ½ÐºÑ‚ Ð½Ð°Ð·Ð½Ð°Ñ‡ÐµÐ½Ð¸Ñ Ð³ÐµÑ€Ð¾Ñ {0}: {1}"
+msgstr "Пункт назначения героя {0}: {1}"
 
 #. Events.HudClosed
 msgctxt "Events.HudClosed"
 msgid "HUD closed"
-msgstr "HUD Ð·Ð°ÐºÑ€Ñ‹Ñ‚"
+msgstr "HUD закрыт"
 
 #. Events.HudOpen
 msgctxt "Events.HudOpen"
 msgid "HUD open"
-msgstr "HUD Ð¾Ñ‚ÐºÑ€Ñ‹Ñ‚"
+msgstr "HUD открыт"
 
 #. Events.LeveledUpTo
 msgctxt "Events.LeveledUpTo"
 msgid "{0} leveled up to {1}"
-msgstr "{0} Ð¿Ð¾Ð»ÑƒÑ‡Ð¸Ð» ÑƒÑ€Ð¾Ð²ÐµÐ½ÑŒ {1}"
+msgstr "{0} получил уровень {1}"
 
 #. Events.MapCameraFocus
 msgctxt "Events.MapCameraFocus"
 msgid "Map camera focuses on {0}"
-msgstr "ÐšÐ°Ð¼ÐµÑ€Ð° ÐºÐ°Ñ€Ñ‚Ñ‹ Ñ„Ð¾ÐºÑƒÑÐ¸Ñ€ÑƒÐµÑ‚ÑÑ Ð½Ð° {0}"
+msgstr "Камера карты фокусируется на {0}"
 
 #. Events.ModError
 msgctxt "Events.ModError"
 msgid "Mod error: {0}"
-msgstr "ÐžÑˆÐ¸Ð±ÐºÐ° Ð¼Ð¾Ð´Ð°: {0}"
+msgstr "Ошибка мода: {0}"
 
 #. Events.RecruitedWielder
 msgctxt "Events.RecruitedWielder"
@@ -248,17 +248,17 @@ msgstr "Нанят герой {0}"
 #. Events.SelectedBuildSite
 msgctxt "Events.SelectedBuildSite"
 msgid "Selected {0} build site at {1}"
-msgstr "Ð’Ñ‹Ð±Ñ€Ð°Ð½Ð¾ {0} Ð¼ÐµÑÑ‚Ð¾ ÑÑ‚Ñ€Ð¾Ð¸Ñ‚ÐµÐ»ÑŒÑÑ‚Ð²Ð° Ð² {1}"
+msgstr "Выбрано {0} место строительства в {1}"
 
 #. Events.SelectedWielder
 msgctxt "Events.SelectedWielder"
 msgid "Selected wielder {0}"
-msgstr "Ð’Ñ‹Ð±Ñ€Ð°Ð½ Ð³ÐµÑ€Ð¾Ð¹ {0}"
+msgstr "Выбран герой {0}"
 
 #. Events.Wielder
 msgctxt "Events.Wielder"
 msgid "wielder"
-msgstr "Ð³ÐµÑ€Ð¾Ð¹"
+msgstr "герой"
 
 #. Events.WieldersNoLongerVisible
 msgctxt "Events.WieldersNoLongerVisible"
@@ -268,142 +268,142 @@ msgstr "{0} больше не видно"
 #. Events.WielderMoved
 msgctxt "Events.WielderMoved"
 msgid "{0} moved to {1}"
-msgstr "{0} Ð¿ÐµÑ€ÐµÐ¼ÐµÑÑ‚Ð¸Ð»ÑÑ Ð² {1}"
+msgstr "{0} переместился в {1}"
 
 #. Events.WielderTeleported
 msgctxt "Events.WielderTeleported"
 msgid "{0} teleported to {1}"
-msgstr "{0} Ñ‚ÐµÐ»ÐµÐ¿Ð¾Ñ€Ñ‚Ð¸Ñ€Ð¾Ð²Ð°Ð»ÑÑ Ð² {1}"
+msgstr "{0} телепортировался в {1}"
 
 #. UI.ArmyExchangeGrid
 msgctxt "UI.ArmyExchangeGrid"
 msgid "Army exchange grid"
-msgstr "Ð¡ÐµÑ‚ÐºÐ° Ð¾Ð±Ð¼ÐµÐ½Ð° Ð°Ñ€Ð¼Ð¸ÑÐ¼Ð¸"
+msgstr "Сетка обмена армиями"
 
 #. UI.AvailableActions
 msgctxt "UI.AvailableActions"
 msgid "Available actions: {0}."
-msgstr "Ð”Ð¾ÑÑ‚ÑƒÐ¿Ð½Ñ‹Ðµ Ð´ÐµÐ¹ÑÑ‚Ð²Ð¸Ñ: {0}."
+msgstr "Доступные действия: {0}."
 
 #. UI.Blank
 msgctxt "UI.Blank"
 msgid "blank"
-msgstr "Ð¿ÑƒÑÑ‚Ð¾"
+msgstr "пусто"
 
 #. UI.CannotDropThere
 msgctxt "UI.CannotDropThere"
 msgid "Cannot drop there."
-msgstr "ÐÐµÐ»ÑŒÐ·Ñ Ð¿Ð¾Ð¼ÐµÑÑ‚Ð¸Ñ‚ÑŒ Ñ‚ÑƒÐ´Ð°."
+msgstr "Нельзя поместить туда."
 
 #. UI.CharacterColon
 msgctxt "UI.CharacterColon"
 msgid "colon"
-msgstr "Ð´Ð²Ð¾ÐµÑ‚Ð¾Ñ‡Ð¸Ðµ"
+msgstr "двоеточие"
 
 #. UI.CharacterComma
 msgctxt "UI.CharacterComma"
 msgid "comma"
-msgstr "Ð·Ð°Ð¿ÑÑ‚Ð°Ñ"
+msgstr "запятая"
 
 #. UI.CharacterDash
 msgctxt "UI.CharacterDash"
 msgid "dash"
-msgstr "Ð´ÐµÑ„Ð¸Ñ"
+msgstr "дефис"
 
 #. UI.CharacterDot
 msgctxt "UI.CharacterDot"
 msgid "dot"
-msgstr "Ñ‚Ð¾Ñ‡ÐºÐ°"
+msgstr "точка"
 
 #. UI.CharacterSemicolon
 msgctxt "UI.CharacterSemicolon"
 msgid "semicolon"
-msgstr "Ñ‚Ð¾Ñ‡ÐºÐ° Ñ Ð·Ð°Ð¿ÑÑ‚Ð¾Ð¹"
+msgstr "точка с запятой"
 
 #. UI.CharacterSpace
 msgctxt "UI.CharacterSpace"
 msgid "space"
-msgstr "Ð¿Ñ€Ð¾Ð±ÐµÐ»"
+msgstr "пробел"
 
 #. UI.CharacterTab
 msgctxt "UI.CharacterTab"
 msgid "tab"
-msgstr "Ñ‚Ð°Ð±ÑƒÐ»ÑÑ†Ð¸Ñ"
+msgstr "табуляция"
 
 #. UI.CharacterUnderscore
 msgctxt "UI.CharacterUnderscore"
 msgid "underscore"
-msgstr "Ð½Ð¸Ð¶Ð½ÐµÐµ Ð¿Ð¾Ð´Ñ‡ÐµÑ€ÐºÐ¸Ð²Ð°Ð½Ð¸Ðµ"
+msgstr "нижнее подчеркивание"
 
 #. UI.CombatDisconnectedTiles
 msgctxt "UI.CombatDisconnectedTiles"
 msgid "Some shown tiles are separated. Use W and Shift W to reach all range tiles."
-msgstr "ÐÐµÐºÐ¾Ñ‚Ð¾Ñ€Ñ‹Ðµ Ð¿Ð¾ÐºÐ°Ð·Ð°Ð½Ð½Ñ‹Ðµ ÐºÐ»ÐµÑ‚ÐºÐ¸ Ð¾Ñ‚Ð´ÐµÐ»ÐµÐ½Ñ‹. Ð˜ÑÐ¿Ð¾Ð»ÑŒÐ·ÑƒÐ¹Ñ‚Ðµ W Ð¸ Shift W, Ñ‡Ñ‚Ð¾Ð±Ñ‹ Ð´Ð¾Ð±Ñ€Ð°Ñ‚ÑŒÑÑ Ð´Ð¾ Ð²ÑÐµÑ… ÐºÐ»ÐµÑ‚Ð¾Ðº Ð² Ñ€Ð°Ð´Ð¸ÑƒÑÐµ."
+msgstr "Некоторые показанные клетки отделены. Используйте W и Shift W, чтобы добраться до всех клеток в радиусе."
 
 #. UI.CombatGrid
 msgctxt "UI.CombatGrid"
 msgid "Combat grid"
-msgstr "Ð‘Ð¾ÐµÐ²Ð°Ñ ÑÐµÑ‚ÐºÐ°"
+msgstr "Боевая сетка"
 
 #. UI.DragCancelled
 msgctxt "UI.DragCancelled"
 msgid "Drag cancelled."
-msgstr "ÐŸÐµÑ€ÐµÑ‚Ð°ÑÐºÐ¸Ð²Ð°Ð½Ð¸Ðµ Ð¾Ñ‚Ð¼ÐµÐ½ÐµÐ½Ð¾."
+msgstr "Перетаскивание отменено."
 
 #. UI.DragComplete
 msgctxt "UI.DragComplete"
 msgid "Drag complete."
-msgstr "ÐŸÐµÑ€ÐµÑ‚Ð°ÑÐºÐ¸Ð²Ð°Ð½Ð¸Ðµ Ð·Ð°Ð²ÐµÑ€ÑˆÐµÐ½Ð¾."
+msgstr "Перетаскивание завершено."
 
 #. UI.DragStarted
 msgctxt "UI.DragStarted"
 msgid "Started drag. Move to destination and press enter to drop."
-msgstr "ÐŸÐµÑ€ÐµÑ‚Ð°ÑÐºÐ¸Ð²Ð°Ð½Ð¸Ðµ Ð½Ð°Ñ‡Ð°Ñ‚Ð¾. ÐŸÐµÑ€ÐµÐ¹Ð´Ð¸Ñ‚Ðµ Ðº Ð¼ÐµÑÑ‚Ñƒ Ð½Ð°Ð·Ð½Ð°Ñ‡ÐµÐ½Ð¸Ñ Ð¸ Ð½Ð°Ð¶Ð¼Ð¸Ñ‚Ðµ Enter, Ñ‡Ñ‚Ð¾Ð±Ñ‹ Ð¿Ð¾Ð¼ÐµÑÑ‚Ð¸Ñ‚ÑŒ."
+msgstr "Перетаскивание начато. Перейдите к месту назначения и нажмите Enter, чтобы поместить."
 
 #. UI.DragStartedTroopPlacement
 msgctxt "UI.DragStartedTroopPlacement"
 msgid "Started drag for {0} at {1}. Press enter to drop on destination spawn point, or press escape to cancel."
-msgstr "ÐÐ°Ñ‡Ð°Ñ‚Ð¾ Ð¿ÐµÑ€ÐµÑ‚Ð°ÑÐºÐ¸Ð²Ð°Ð½Ð¸Ðµ {0} Ð½Ð° {1}. ÐÐ°Ð¶Ð¼Ð¸Ñ‚Ðµ Enter, Ñ‡Ñ‚Ð¾Ð±Ñ‹ Ð¿Ð¾Ð¼ÐµÑÑ‚Ð¸Ñ‚ÑŒ Ð² Ñ‚Ð¾Ñ‡ÐºÑƒ Ñ€Ð°Ð·Ð¼ÐµÑ‰ÐµÐ½Ð¸Ñ, Ð¸Ð»Ð¸ Escape Ð´Ð»Ñ Ð¾Ñ‚Ð¼ÐµÐ½Ñ‹."
+msgstr "Начато перетаскивание {0} на {1}. Нажмите Enter, чтобы поместить в точку размещения, или Escape для отмены."
 
 #. UI.Empty
 msgctxt "UI.Empty"
 msgid "Empty"
-msgstr "ÐŸÑƒÑÑ‚Ð¾"
+msgstr "Пусто"
 
 #. UI.EmptyTroopSlot
 msgctxt "UI.EmptyTroopSlot"
 msgid "Empty troop {0}"
-msgstr "ÐŸÑƒÑÑ‚Ð¾Ð¹ ÑÐ»Ð¾Ñ‚ Ð¾Ñ‚Ñ€ÑÐ´Ð° {0}"
+msgstr "Пустой слот отряда {0}"
 
 #. UI.ExitedInspectMode
 msgctxt "UI.ExitedInspectMode"
 msgid "Exited inspect mode"
-msgstr "Ð ÐµÐ¶Ð¸Ð¼ Ð¾ÑÐ¼Ð¾Ñ‚Ñ€Ð° Ð·Ð°ÐºÑ€Ñ‹Ñ‚"
+msgstr "Режим осмотра закрыт"
 
 #. UI.Heading
 msgctxt "UI.Heading"
 msgid "{0} heading"
-msgstr "{0}, Ð·Ð°Ð³Ð¾Ð»Ð¾Ð²Ð¾Ðº"
+msgstr "{0}, заголовок"
 
 #. UI.Inspecting
 msgctxt "UI.Inspecting"
 msgid "Inspecting {0}"
-msgstr "ÐžÑÐ¼Ð¾Ñ‚Ñ€ {0}"
+msgstr "Осмотр {0}"
 
 #. UI.InventoryGrid
 msgctxt "UI.InventoryGrid"
 msgid "Inventory grid"
-msgstr "Ð¡ÐµÑ‚ÐºÐ° Ð¸Ð½Ð²ÐµÐ½Ñ‚Ð°Ñ€Ñ"
+msgstr "Сетка инвентаря"
 
 #. UI.InvalidDestination
 msgctxt "UI.InvalidDestination"
 msgid "Invalid destination."
-msgstr "ÐÐµÐ´Ð¾Ð¿ÑƒÑÑ‚Ð¸Ð¼Ð¾Ðµ Ð¼ÐµÑÑ‚Ð¾ Ð½Ð°Ð·Ð½Ð°Ñ‡ÐµÐ½Ð¸Ñ."
+msgstr "Недопустимое место назначения."
 
 #. UI.JoiningArmy
 msgctxt "UI.JoiningArmy"
 msgid "joining army"
-msgstr "Ð¿Ñ€Ð¸ÑÐ¾ÐµÐ´Ð¸Ð½ÑÑŽÑ‰Ð°ÑÑÑ Ð°Ñ€Ð¼Ð¸Ñ"
+msgstr "присоединяющаяся армия"
 
 #. UI.LabelValue
 msgctxt "UI.LabelValue"
@@ -413,22 +413,22 @@ msgstr "{0}: {1}"
 #. UI.PressSpaceSelectItemToDrag
 msgctxt "UI.PressSpaceSelectItemToDrag"
 msgid "Press space to select an item to drag."
-msgstr "ÐÐ°Ð¶Ð¼Ð¸Ñ‚Ðµ Ð¿Ñ€Ð¾Ð±ÐµÐ», Ñ‡Ñ‚Ð¾Ð±Ñ‹ Ð²Ñ‹Ð±Ñ€Ð°Ñ‚ÑŒ Ð¿Ñ€ÐµÐ´Ð¼ÐµÑ‚ Ð´Ð»Ñ Ð¿ÐµÑ€ÐµÑ‚Ð°ÑÐºÐ¸Ð²Ð°Ð½Ð¸Ñ."
+msgstr "Нажмите пробел, чтобы выбрать предмет для перетаскивания."
 
 #. UI.PressSpaceToDrag
 msgctxt "UI.PressSpaceToDrag"
 msgid "Press space to drag."
-msgstr "ÐÐ°Ð¶Ð¼Ð¸Ñ‚Ðµ Ð¿Ñ€Ð¾Ð±ÐµÐ», Ñ‡Ñ‚Ð¾Ð±Ñ‹ Ð¿ÐµÑ€ÐµÑ‚Ð°Ñ‰Ð¸Ñ‚ÑŒ."
+msgstr "Нажмите пробел, чтобы перетащить."
 
 #. UI.RoleButton
 msgctxt "UI.RoleButton"
 msgid "button"
-msgstr "ÐºÐ½Ð¾Ð¿ÐºÐ°"
+msgstr "кнопка"
 
 #. UI.RoleCheckBox
 msgctxt "UI.RoleCheckBox"
 msgid "check box"
-msgstr "Ñ„Ð»Ð°Ð¶Ð¾Ðº"
+msgstr "флажок"
 
 #. UI.RoleColumnHeader
 msgctxt "UI.RoleColumnHeader"
@@ -438,42 +438,42 @@ msgstr "заголовок столбца"
 #. UI.RoleDocument
 msgctxt "UI.RoleDocument"
 msgid "document"
-msgstr "Ð´Ð¾ÐºÑƒÐ¼ÐµÐ½Ñ‚"
+msgstr "документ"
 
 #. UI.RoleEdit
 msgctxt "UI.RoleEdit"
 msgid "edit"
-msgstr "Ð¿Ð¾Ð»Ðµ Ð²Ð²Ð¾Ð´Ð°"
+msgstr "поле ввода"
 
 #. UI.RoleGrid
 msgctxt "UI.RoleGrid"
 msgid "grid"
-msgstr "ÑÐµÑ‚ÐºÐ°"
+msgstr "сетка"
 
 #. UI.RoleMenu
 msgctxt "UI.RoleMenu"
 msgid "menu"
-msgstr "Ð¼ÐµÐ½ÑŽ"
+msgstr "меню"
 
 #. UI.RoleSlider
 msgctxt "UI.RoleSlider"
 msgid "slider"
-msgstr "Ð¿Ð¾Ð»Ð·ÑƒÐ½Ð¾Ðº"
+msgstr "ползунок"
 
 #. UI.Selected
 msgctxt "UI.Selected"
 msgid "selected"
-msgstr "Ð²Ñ‹Ð±Ñ€Ð°Ð½Ð¾"
+msgstr "выбрано"
 
 #. UI.Slot
 msgctxt "UI.Slot"
 msgid "slot {0}"
-msgstr "ÑÐ»Ð¾Ñ‚ {0}"
+msgstr "слот {0}"
 
 #. UI.SlotInGroup
 msgctxt "UI.SlotInGroup"
 msgid "{0} slot {1}"
-msgstr "{0}, ÑÐ»Ð¾Ñ‚ {1}"
+msgstr "{0}, слот {1}"
 
 #. UI.Status
 msgctxt "UI.Status"
@@ -483,27 +483,27 @@ msgstr "статус"
 #. UI.StatusChecked
 msgctxt "UI.StatusChecked"
 msgid "checked"
-msgstr "Ð¾Ñ‚Ð¼ÐµÑ‡ÐµÐ½Ð¾"
+msgstr "отмечено"
 
 #. UI.StatusDisabled
 msgctxt "UI.StatusDisabled"
 msgid "disabled"
-msgstr "Ð¾Ñ‚ÐºÐ»ÑŽÑ‡ÐµÐ½Ð¾"
+msgstr "отключено"
 
 #. UI.StatusDraggable
 msgctxt "UI.StatusDraggable"
 msgid "draggable"
-msgstr "Ð¼Ð¾Ð¶Ð½Ð¾ Ð¿ÐµÑ€ÐµÑ‚Ð°Ñ‰Ð¸Ñ‚ÑŒ"
+msgstr "можно перетащить"
 
 #. UI.StatusDragging
 msgctxt "UI.StatusDragging"
 msgid "dragging"
-msgstr "Ð¿ÐµÑ€ÐµÑ‚Ð°ÑÐºÐ¸Ð²Ð°ÐµÑ‚ÑÑ"
+msgstr "перетаскивается"
 
 #. UI.StatusUnchecked
 msgctxt "UI.StatusUnchecked"
 msgid "unchecked"
-msgstr "Ð½Ðµ Ð¾Ñ‚Ð¼ÐµÑ‡ÐµÐ½Ð¾"
+msgstr "не отмечено"
 
 #. UI.SortAscending
 msgctxt "UI.SortAscending"
@@ -518,7 +518,7 @@ msgstr "по убыванию"
 #. UI.Target
 msgctxt "UI.Target"
 msgid "target"
-msgstr "Ñ†ÐµÐ»ÑŒ"
+msgstr "цель"
 
 #. UI.TroopSlot
 msgctxt "UI.TroopSlot"
@@ -533,42 +533,42 @@ msgstr "{0}, {1} / {2}, {3}"
 #. UI.WielderArmy
 msgctxt "UI.WielderArmy"
 msgid "wielder's army"
-msgstr "Ð°Ñ€Ð¼Ð¸Ñ Ð³ÐµÑ€Ð¾Ñ"
+msgstr "армия героя"
 
 #. UI.StatusCorrupt
 msgctxt "UI.StatusCorrupt"
 msgid "corrupt"
-msgstr "Ð¿Ð¾Ð²Ñ€ÐµÐ¶Ð´ÐµÐ½Ð¾"
+msgstr "повреждено"
 
 #. UI.StatusMissing
 msgctxt "UI.StatusMissing"
 msgid "missing"
-msgstr "Ð½Ðµ Ñ…Ð²Ð°Ñ‚Ð°ÐµÑ‚"
+msgstr "не хватает"
 
 #. UI.StatusUnavailable
 msgctxt "UI.StatusUnavailable"
 msgid "unavailable"
-msgstr "Ð½ÐµÐ´Ð¾ÑÑ‚ÑƒÐ¿Ð½Ð¾"
+msgstr "недоступно"
 
 #. UI.BufferEmpty
 msgctxt "UI.BufferEmpty"
 msgid "Buffer empty"
-msgstr "Ð‘ÑƒÑ„ÐµÑ€ Ð¿ÑƒÑÑ‚"
+msgstr "Буфер пуст"
 
 #. UI.NoScannerResults
 msgctxt "UI.NoScannerResults"
 msgid "No scanner results"
-msgstr "ÐÐµÑ‚ Ñ€ÐµÐ·ÑƒÐ»ÑŒÑ‚Ð°Ñ‚Ð¾Ð² ÑÐºÐ°Ð½ÐµÑ€Ð°"
+msgstr "Нет результатов сканера"
 
 #. UI.NotInMovementRange
 msgctxt "UI.NotInMovementRange"
 msgid "Not in movement range"
-msgstr "Ð’Ð½Ðµ Ñ€Ð°Ð´Ð¸ÑƒÑÐ° Ð´Ð²Ð¸Ð¶ÐµÐ½Ð¸Ñ"
+msgstr "Вне радиуса движения"
 
 #. UI.ReviewBufferEvents
 msgctxt "UI.ReviewBufferEvents"
 msgid "Events"
-msgstr "Ð¡Ð¾Ð±Ñ‹Ñ‚Ð¸Ñ"
+msgstr "События"
 
 #. UI.ReviewBufferLine
 msgctxt "UI.ReviewBufferLine"
@@ -578,12 +578,12 @@ msgstr "{0}. {1}"
 #. UI.ReviewBufferNotifications
 msgctxt "UI.ReviewBufferNotifications"
 msgid "Notifications"
-msgstr "Ð£Ð²ÐµÐ´Ð¾Ð¼Ð»ÐµÐ½Ð¸Ñ"
+msgstr "Уведомления"
 
 #. UI.ReviewBufferUi
 msgctxt "UI.ReviewBufferUi"
 msgid "UI"
-msgstr "Ð˜Ð½Ñ‚ÐµÑ€Ñ„ÐµÐ¹Ñ"
+msgstr "Интерфейс"
 
 #. UI.ScannerPath
 msgctxt "UI.ScannerPath"
@@ -593,42 +593,42 @@ msgstr "{0}, {1}. {2}"
 #. UI.SelectedCount
 msgctxt "UI.SelectedCount"
 msgid "selected {0}x"
-msgstr "Ð²Ñ‹Ð±Ñ€Ð°Ð½Ð¾ {0}x"
+msgstr "выбрано {0}x"
 
 #. UI.Unselected
 msgctxt "UI.Unselected"
 msgid "unselected"
-msgstr "Ð½Ðµ Ð²Ñ‹Ð±Ñ€Ð°Ð½Ð¾"
+msgstr "не выбрано"
 
 #. Screens.AdventureMap
 msgctxt "Screens.AdventureMap"
 msgid "Adventure map"
-msgstr "ÐšÐ°Ñ€Ñ‚Ð° Ð¿Ñ€Ð¸ÐºÐ»ÑŽÑ‡ÐµÐ½Ð¸Ñ"
+msgstr "Карта приключения"
 
 #. Screens.ArcanaSpells
 msgctxt "Screens.ArcanaSpells"
 msgid "Arcana spells"
-msgstr "Ð—Ð°ÐºÐ»Ð¸Ð½Ð°Ð½Ð¸Ñ ÐÑ€ÐºÐ°Ð½Ñ‹"
+msgstr "Заклинания Арканы"
 
 #. Screens.Army
 msgctxt "Screens.Army"
 msgid "army"
-msgstr "Ð°Ñ€Ð¼Ð¸Ñ"
+msgstr "армия"
 
 #. Screens.Articles
 msgctxt "Screens.Articles"
 msgid "Articles"
-msgstr "Ð¡Ñ‚Ð°Ñ‚ÑŒÐ¸"
+msgstr "Статьи"
 
 #. Screens.AttackerEssence
 msgctxt "Screens.AttackerEssence"
 msgid "Attacker essence"
-msgstr "Ð­ÑÑÐµÐ½Ñ†Ð¸Ñ Ð°Ñ‚Ð°ÐºÑƒÑŽÑ‰ÐµÐ³Ð¾"
+msgstr "Эссенция атакующего"
 
 #. Screens.Back
 msgctxt "Screens.Back"
 msgid "Back"
-msgstr "ÐÐ°Ð·Ð°Ð´"
+msgstr "Назад"
 
 #. Screens.Ballista
 msgctxt "Screens.Ballista"
@@ -638,32 +638,32 @@ msgstr "Баллиста"
 #. Screens.BattleLog
 msgctxt "Screens.BattleLog"
 msgid "Battle log"
-msgstr "Ð–ÑƒÑ€Ð½Ð°Ð» Ð±Ð¾Ñ"
+msgstr "Журнал боя"
 
 #. Screens.BattleResult
 msgctxt "Screens.BattleResult"
 msgid "Battle result"
-msgstr "Ð˜Ñ‚Ð¾Ð³ Ð±Ð¾Ñ"
+msgstr "Итог боя"
 
 #. Screens.Categories
 msgctxt "Screens.Categories"
 msgid "Categories"
-msgstr "ÐšÐ°Ñ‚ÐµÐ³Ð¾Ñ€Ð¸Ð¸"
+msgstr "Категории"
 
 #. Screens.ChaosSpells
 msgctxt "Screens.ChaosSpells"
 msgid "Chaos spells"
-msgstr "Ð—Ð°ÐºÐ»Ð¸Ð½Ð°Ð½Ð¸Ñ Ð¥Ð°Ð¾ÑÐ°"
+msgstr "Заклинания Хаоса"
 
 #. Screens.Choices
 msgctxt "Screens.Choices"
 msgid "Choices"
-msgstr "Ð’Ð°Ñ€Ð¸Ð°Ð½Ñ‚Ñ‹"
+msgstr "Варианты"
 
 #. Screens.Close
 msgctxt "Screens.Close"
 msgid "Close"
-msgstr "Ð—Ð°ÐºÑ€Ñ‹Ñ‚ÑŒ"
+msgstr "Закрыть"
 
 #. Screens.CampaignMissionProgress
 msgctxt "Screens.CampaignMissionProgress"
@@ -673,42 +673,42 @@ msgstr "Завершено: {0} / {1} миссий"
 #. Screens.Combat
 msgctxt "Screens.Combat"
 msgid "Combat"
-msgstr "Ð‘Ð¾Ð¹"
+msgstr "Бой"
 
 #. Screens.CreationSpells
 msgctxt "Screens.CreationSpells"
 msgid "Creation spells"
-msgstr "Ð—Ð°ÐºÐ»Ð¸Ð½Ð°Ð½Ð¸Ñ Ð¡Ð¾Ð·Ð¸Ð´Ð°Ð½Ð¸Ñ"
+msgstr "Заклинания Созидания"
 
 #. Screens.CurrentTroop
 msgctxt "Screens.CurrentTroop"
 msgid "Current troop, {0}"
-msgstr "Ð¢ÐµÐºÑƒÑ‰Ð¸Ð¹ Ð¾Ñ‚Ñ€ÑÐ´, {0}"
+msgstr "Текущий отряд, {0}"
 
 #. Screens.DefenderEssence
 msgctxt "Screens.DefenderEssence"
 msgid "Defender essence"
-msgstr "Ð­ÑÑÐµÐ½Ñ†Ð¸Ñ Ð·Ð°Ñ‰Ð¸Ñ‚Ð½Ð¸ÐºÐ°"
+msgstr "Эссенция защитника"
 
 #. Screens.DefendingWielderArmy
 msgctxt "Screens.DefendingWielderArmy"
 msgid "defending wielder army"
-msgstr "Ð°Ñ€Ð¼Ð¸Ñ Ð·Ð°Ñ‰Ð¸Ñ‰Ð°ÑŽÑ‰ÐµÐ³Ð¾ÑÑ Ð³ÐµÑ€Ð¾Ñ"
+msgstr "армия защищающегося героя"
 
 #. Screens.Description
 msgctxt "Screens.Description"
 msgid "Description"
-msgstr "ÐžÐ¿Ð¸ÑÐ°Ð½Ð¸Ðµ"
+msgstr "Описание"
 
 #. Screens.DescriptionWithMissingBuilding
 msgctxt "Screens.DescriptionWithMissingBuilding"
 msgid "{0}. missing building"
-msgstr "{0}. Ð½Ðµ Ñ…Ð²Ð°Ñ‚Ð°ÐµÑ‚ Ð·Ð´Ð°Ð½Ð¸Ñ"
+msgstr "{0}. не хватает здания"
 
 #. Screens.DestructionSpells
 msgctxt "Screens.DestructionSpells"
 msgid "Destruction spells"
-msgstr "Ð—Ð°ÐºÐ»Ð¸Ð½Ð°Ð½Ð¸Ñ Ð Ð°Ð·Ñ€ÑƒÑˆÐµÐ½Ð¸Ñ"
+msgstr "Заклинания Разрушения"
 
 #. Screens.DisabledWithReason
 msgctxt "Screens.DisabledWithReason"
@@ -723,22 +723,22 @@ msgstr "Загрузки"
 #. Screens.Empty
 msgctxt "Screens.Empty"
 msgid "empty"
-msgstr "Ð¿ÑƒÑÑ‚Ð¾"
+msgstr "пусто"
 
 #. Screens.EjectWielder
 msgctxt "Screens.EjectWielder"
 msgid "Eject wielder"
-msgstr "Ð’Ñ‹Ð²ÐµÑÑ‚Ð¸ Ð³ÐµÑ€Ð¾Ñ"
+msgstr "Вывести героя"
 
 #. Screens.GraphType
 msgctxt "Screens.GraphType"
 msgid "Graph type"
-msgstr "Ð¢Ð¸Ð¿ Ð³Ñ€Ð°Ñ„Ð¸ÐºÐ°"
+msgstr "Тип графика"
 
 #. Screens.Group
 msgctxt "Screens.Group"
 msgid "Group {0}"
-msgstr "Ð“Ñ€ÑƒÐ¿Ð¿Ð° {0}"
+msgstr "Группа {0}"
 
 #. Screens.Layout
 msgctxt "Screens.Layout"
@@ -748,47 +748,47 @@ msgstr "Макет"
 #. Screens.MainMenu
 msgctxt "Screens.MainMenu"
 msgid "Main menu"
-msgstr "Ð“Ð»Ð°Ð²Ð½Ð¾Ðµ Ð¼ÐµÐ½ÑŽ"
+msgstr "Главное меню"
 
 #. Screens.Missing
 msgctxt "Screens.Missing"
 msgid "Missing {0}"
-msgstr "ÐÐµ Ñ…Ð²Ð°Ñ‚Ð°ÐµÑ‚ {0}"
+msgstr "Не хватает {0}"
 
 #. Screens.MissingBuilding
 msgctxt "Screens.MissingBuilding"
 msgid "missing building"
-msgstr "Ð½Ðµ Ñ…Ð²Ð°Ñ‚Ð°ÐµÑ‚ Ð·Ð´Ð°Ð½Ð¸Ñ"
+msgstr "не хватает здания"
 
 #. Screens.ModSettings
 msgctxt "Screens.ModSettings"
 msgid "Mod settings"
-msgstr "ÐÐ°ÑÑ‚Ñ€Ð¾Ð¹ÐºÐ¸ Ð¼Ð¾Ð´Ð°"
+msgstr "Настройки мода"
 
 #. Screens.ModifierCategoryTabs
 msgctxt "Screens.ModifierCategoryTabs"
 msgid "Modifier category tabs"
-msgstr "Ð’ÐºÐ»Ð°Ð´ÐºÐ¸ ÐºÐ°Ñ‚ÐµÐ³Ð¾Ñ€Ð¸Ð¹ Ð¼Ð¾Ð´Ð¸Ñ„Ð¸ÐºÐ°Ñ‚Ð¾Ñ€Ð¾Ð²"
+msgstr "Вкладки категорий модификаторов"
 
 #. Screens.MultiEssenceSpells
 msgctxt "Screens.MultiEssenceSpells"
 msgid "Multi-essence spells"
-msgstr "Ð—Ð°ÐºÐ»Ð¸Ð½Ð°Ð½Ð¸Ñ Ð½ÐµÑÐºÐ¾Ð»ÑŒÐºÐ¸Ñ… ÑÑÑÐµÐ½Ñ†Ð¸Ð¹"
+msgstr "Заклинания нескольких эссенций"
 
 #. Screens.NamedArmy
 msgctxt "Screens.NamedArmy"
 msgid "{0} army"
-msgstr "Ð°Ñ€Ð¼Ð¸Ñ {0}"
+msgstr "армия {0}"
 
 #. Screens.NamedLevel
 msgctxt "Screens.NamedLevel"
 msgid "{0}, level {1}"
-msgstr "{0}, ÑƒÑ€Ð¾Ð²ÐµÐ½ÑŒ {1}"
+msgstr "{0}, уровень {1}"
 
 #. Screens.NamedMenu
 msgctxt "Screens.NamedMenu"
 msgid "{0} menu"
-msgstr "Ð¼ÐµÐ½ÑŽ {0}"
+msgstr "меню {0}"
 
 #. Screens.NamedTabs
 msgctxt "Screens.NamedTabs"
@@ -798,22 +798,22 @@ msgstr "{0} {1}"
 #. Screens.Next
 msgctxt "Screens.Next"
 msgid "Next"
-msgstr "Ð”Ð°Ð»ÐµÐµ"
+msgstr "Далее"
 
 #. Screens.None
 msgctxt "Screens.None"
 msgid "None"
-msgstr "ÐÐµÑ‚"
+msgstr "Нет"
 
 #. Screens.Notifications
 msgctxt "Screens.Notifications"
 msgid "Notifications"
-msgstr "Ð£Ð²ÐµÐ´Ð¾Ð¼Ð»ÐµÐ½Ð¸Ñ"
+msgstr "Уведомления"
 
 #. Screens.Objectives
 msgctxt "Screens.Objectives"
 msgid "Objectives"
-msgstr "Ð¦ÐµÐ»Ð¸"
+msgstr "Цели"
 
 #. Screens.ObjectiveMarkerFarAway
 msgctxt "Screens.ObjectiveMarkerFarAway"
@@ -838,17 +838,17 @@ msgstr "OK"
 #. Screens.OrderSpells
 msgctxt "Screens.OrderSpells"
 msgid "Order spells"
-msgstr "Ð—Ð°ÐºÐ»Ð¸Ð½Ð°Ð½Ð¸Ñ ÐŸÐ¾Ñ€ÑÐ´ÐºÐ°"
+msgstr "Заклинания Порядка"
 
 #. Screens.PostAdventureResult
 msgctxt "Screens.PostAdventureResult"
 msgid "Post adventure result"
-msgstr "Ð˜Ñ‚Ð¾Ð³ Ð¿Ð¾ÑÐ»Ðµ Ð¿Ñ€Ð¸ÐºÐ»ÑŽÑ‡ÐµÐ½Ð¸Ñ"
+msgstr "Итог после приключения"
 
 #. Screens.PostAdventureStats
 msgctxt "Screens.PostAdventureStats"
 msgid "Post adventure stats"
-msgstr "Ð¡Ñ‚Ð°Ñ‚Ð¸ÑÑ‚Ð¸ÐºÐ° Ð¿Ð¾ÑÐ»Ðµ Ð¿Ñ€Ð¸ÐºÐ»ÑŽÑ‡ÐµÐ½Ð¸Ñ"
+msgstr "Статистика после приключения"
 
 #. Screens.Penalties
 msgctxt "Screens.Penalties"
@@ -858,17 +858,17 @@ msgstr "Штрафы"
 #. Screens.Previous
 msgctxt "Screens.Previous"
 msgid "Previous"
-msgstr "ÐÐ°Ð·Ð°Ð´"
+msgstr "Назад"
 
 #. Screens.Quickbar
 msgctxt "Screens.Quickbar"
 msgid "Quickbar"
-msgstr "ÐŸÐ°Ð½ÐµÐ»ÑŒ Ð±Ñ‹ÑÑ‚Ñ€Ð¾Ð³Ð¾ Ð´Ð¾ÑÑ‚ÑƒÐ¿Ð°"
+msgstr "Панель быстрого доступа"
 
 #. Screens.ReadEnemyInfluence
 msgctxt "Screens.ReadEnemyInfluence"
 msgid "Read attack, deadly and movement range for enemies on tiles in combat"
-msgstr "Ð§Ð¸Ñ‚Ð°Ñ‚ÑŒ Ñ€Ð°Ð´Ð¸ÑƒÑÑ‹ Ð°Ñ‚Ð°ÐºÐ¸, ÑÐ¼ÐµÑ€Ñ‚ÐµÐ»ÑŒÐ½Ð¾Ð¹ ÑƒÐ³Ñ€Ð¾Ð·Ñ‹ Ð¸ Ð´Ð²Ð¸Ð¶ÐµÐ½Ð¸Ñ Ð²Ñ€Ð°Ð³Ð¾Ð² Ð½Ð° ÐºÐ»ÐµÑ‚ÐºÐ°Ñ… Ð² Ð±Ð¾ÑŽ"
+msgstr "Читать радиусы атаки, смертельной угрозы и движения врагов на клетках в бою"
 
 #. Screens.ReadStoryCameraFocusChanges
 msgctxt "Screens.ReadStoryCameraFocusChanges"
@@ -883,12 +883,12 @@ msgstr "Сканер воспроизводит направленный зву�
 #. Screens.RecruitFrom
 msgctxt "Screens.RecruitFrom"
 msgid "Recruit from"
-msgstr "ÐÐ°Ð½ÑÑ‚ÑŒ Ð¸Ð·"
+msgstr "Нанять из"
 
 #. Screens.RecruitingFrom
 msgctxt "Screens.RecruitingFrom"
 msgid "Recruiting from {0}"
-msgstr "ÐÐ°Ð¹Ð¼ Ð¸Ð· {0}"
+msgstr "Найм из {0}"
 
 #. Screens.ResearchTier
 msgctxt "Screens.ResearchTier"
@@ -898,7 +898,7 @@ msgstr "{0} ({1} {2})"
 #. Screens.Resources
 msgctxt "Screens.Resources"
 msgid "Resources"
-msgstr "Ð ÐµÑÑƒÑ€ÑÑ‹"
+msgstr "Ресурсы"
 
 #. Screens.Rewards
 msgctxt "Screens.Rewards"
@@ -908,32 +908,32 @@ msgstr "Награды"
 #. Screens.Round
 msgctxt "Screens.Round"
 msgid "Round {0}"
-msgstr "Ð Ð°ÑƒÐ½Ð´ {0}"
+msgstr "Раунд {0}"
 
 #. Screens.SettlementTroops
 msgctxt "Screens.SettlementTroops"
 msgid "settlement troops"
-msgstr "Ð¾Ñ‚Ñ€ÑÐ´Ñ‹ Ð¿Ð¾ÑÐµÐ»ÐµÐ½Ð¸Ñ"
+msgstr "отряды поселения"
 
 #. Screens.Skill
 msgctxt "Screens.Skill"
 msgid "Skill {0}"
-msgstr "ÐÐ°Ð²Ñ‹Ðº {0}"
+msgstr "Навык {0}"
 
 #. Screens.SlotValue
 msgctxt "Screens.SlotValue"
 msgid "Slot {0}: {1}"
-msgstr "Ð¡Ð»Ð¾Ñ‚ {0}: {1}"
+msgstr "Слот {0}: {1}"
 
 #. Screens.SpellTier
 msgctxt "Screens.SpellTier"
 msgid "{0} tier {1}"
-msgstr "{0}, Ñ€Ð°Ð½Ð³ {1}"
+msgstr "{0}, ранг {1}"
 
 #. Screens.Tabs
 msgctxt "Screens.Tabs"
 msgid "Tabs"
-msgstr "Ð’ÐºÐ»Ð°Ð´ÐºÐ¸"
+msgstr "Вкладки"
 
 #. Screens.TeamValue
 msgctxt "Screens.TeamValue"
@@ -943,22 +943,22 @@ msgstr "Команда {0}"
 #. Screens.Teams
 msgctxt "Screens.Teams"
 msgid "Teams"
-msgstr "ÐšÐ¾Ð¼Ð°Ð½Ð´Ñ‹"
+msgstr "Команды"
 
 #. Screens.TooltipActions
 msgctxt "Screens.TooltipActions"
 msgid "Tooltip actions"
-msgstr "Ð”ÐµÐ¹ÑÑ‚Ð²Ð¸Ñ Ð¿Ð¾Ð´ÑÐºÐ°Ð·ÐºÐ¸"
+msgstr "Действия подсказки"
 
 #. Screens.Tier
 msgctxt "Screens.Tier"
 msgid "Tier"
-msgstr "Ð Ð°Ð½Ð³"
+msgstr "Ранг"
 
 #. Screens.Tower
 msgctxt "Screens.Tower"
 msgid "Tower {0}"
-msgstr "Ð‘Ð°ÑˆÐ½Ñ {0}"
+msgstr "Башня {0}"
 
 #. Screens.Towers
 msgctxt "Screens.Towers"
@@ -968,92 +968,92 @@ msgstr "Башни"
 #. Screens.TroopLost
 msgctxt "Screens.TroopLost"
 msgid "{0} lost"
-msgstr "{0} Ð¿Ð¾Ñ‚ÐµÑ€ÑÐ½Ð¾"
+msgstr "{0} потеряно"
 
 #. Screens.TroopDistribution
 msgctxt "Screens.TroopDistribution"
 msgid "troop distribution"
-msgstr "Ñ€Ð°ÑÐ¿Ñ€ÐµÐ´ÐµÐ»ÐµÐ½Ð¸Ðµ Ð¾Ñ‚Ñ€ÑÐ´Ð¾Ð²"
+msgstr "распределение отрядов"
 
 #. Screens.TroopPlacement
 msgctxt "Screens.TroopPlacement"
 msgid "Troop placement"
-msgstr "Ð Ð°Ð·Ð¼ÐµÑ‰ÐµÐ½Ð¸Ðµ Ð¾Ñ‚Ñ€ÑÐ´Ð¾Ð²"
+msgstr "Размещение отрядов"
 
 #. Screens.TurnOrder
 msgctxt "Screens.TurnOrder"
 msgid "Turn order"
-msgstr "ÐŸÐ¾Ñ€ÑÐ´Ð¾Ðº Ñ…Ð¾Ð´Ð¾Ð²"
+msgstr "Порядок ходов"
 
 #. Screens.Unavailable
 msgctxt "Screens.Unavailable"
 msgid "Unavailable"
-msgstr "ÐÐµÐ´Ð¾ÑÑ‚ÑƒÐ¿Ð½Ð¾"
+msgstr "Недоступно"
 
 #. Screens.VisitingWielderArmy
 msgctxt "Screens.VisitingWielderArmy"
 msgid "visiting wielder army"
-msgstr "Ð°Ñ€Ð¼Ð¸Ñ Ð¿Ð¾ÑÐµÑ‰Ð°ÑŽÑ‰ÐµÐ³Ð¾ Ð³ÐµÑ€Ð¾Ñ"
+msgstr "армия посещающего героя"
 
 #. Screens.WielderArmyPossessive
 msgctxt "Screens.WielderArmyPossessive"
 msgid "{0}'s army"
-msgstr "Ð°Ñ€Ð¼Ð¸Ñ {0}"
+msgstr "армия {0}"
 
 #. Screens.WielderArmy
 msgctxt "Screens.WielderArmy"
 msgid "wielder army"
-msgstr "Ð°Ñ€Ð¼Ð¸Ñ Ð³ÐµÑ€Ð¾Ñ"
+msgstr "армия героя"
 
 #. Screens.Wielders
 msgctxt "Screens.Wielders"
 msgid "Wielders"
-msgstr "Ð“ÐµÑ€Ð¾Ð¸"
+msgstr "Герои"
 
 #. Screens.WielderStats
 msgctxt "Screens.WielderStats"
 msgid "{0}'s stats"
-msgstr "Ñ…Ð°Ñ€Ð°ÐºÑ‚ÐµÑ€Ð¸ÑÑ‚Ð¸ÐºÐ¸ {0}"
+msgstr "характеристики {0}"
 
 #. Screens.WielderModifierCategories
 msgctxt "Screens.WielderModifierCategories"
 msgid "{0}'s modifier categories"
-msgstr "ÐºÐ°Ñ‚ÐµÐ³Ð¾Ñ€Ð¸Ð¸ Ð¼Ð¾Ð´Ð¸Ñ„Ð¸ÐºÐ°Ñ‚Ð¾Ñ€Ð¾Ð² {0}"
+msgstr "категории модификаторов {0}"
 
 #. Screens.WorldChoiceMenu
 msgctxt "Screens.WorldChoiceMenu"
 msgid "World choice menu"
-msgstr "ÐœÐµÐ½ÑŽ Ð²Ñ‹Ð±Ð¾Ñ€Ð° Ð¼Ð¸Ñ€Ð°"
+msgstr "Меню выбора мира"
 
 #. Screens.WorldConfirmationMenu
 msgctxt "Screens.WorldConfirmationMenu"
 msgid "World confirmation menu"
-msgstr "ÐœÐµÐ½ÑŽ Ð¿Ð¾Ð´Ñ‚Ð²ÐµÑ€Ð¶Ð´ÐµÐ½Ð¸Ñ Ð¼Ð¸Ñ€Ð°"
+msgstr "Меню подтверждения мира"
 
 #. Screens.RemoveFromQuickbar
 msgctxt "Screens.RemoveFromQuickbar"
 msgid "Remove from quickbar"
-msgstr "Ð£Ð´Ð°Ð»Ð¸Ñ‚ÑŒ Ñ Ð¿Ð°Ð½ÐµÐ»Ð¸ Ð±Ñ‹ÑÑ‚Ñ€Ð¾Ð³Ð¾ Ð´Ð¾ÑÑ‚ÑƒÐ¿Ð°"
+msgstr "Удалить с панели быстрого доступа"
 
 #. Screens.AmountToUpgrade
 msgctxt "Screens.AmountToUpgrade"
 msgid "Amount to upgrade, {0}"
-msgstr "ÐšÐ¾Ð»Ð¸Ñ‡ÐµÑÑ‚Ð²Ð¾ Ð´Ð»Ñ ÑƒÐ»ÑƒÑ‡ÑˆÐµÐ½Ð¸Ñ, {0}"
+msgstr "Количество для улучшения, {0}"
 
 #. Screens.UnknownSpell
 msgctxt "Screens.UnknownSpell"
 msgid "unknown spell"
-msgstr "Ð½ÐµÐ¸Ð·Ð²ÐµÑÑ‚Ð½Ð¾Ðµ Ð·Ð°ÐºÐ»Ð¸Ð½Ð°Ð½Ð¸Ðµ"
+msgstr "неизвестное заклинание"
 
 #. Actions.Activate
 msgctxt "Actions.Activate"
 msgid "Activate"
-msgstr "ÐÐºÑ‚Ð¸Ð²Ð¸Ñ€Ð¾Ð²Ð°Ñ‚ÑŒ"
+msgstr "Активировать"
 
 #. Actions.Cancel
 msgctxt "Actions.Cancel"
 msgid "Cancel"
-msgstr "ÐžÑ‚Ð¼ÐµÐ½Ð°"
+msgstr "Отмена"
 
 #. Actions.CombatFocusActingTroop
 msgctxt "Actions.CombatFocusActingTroop"
@@ -1083,37 +1083,37 @@ msgstr "Предыдущий вражеский отряд"
 #. Actions.CombatFocusTimeline
 msgctxt "Actions.CombatFocusTimeline"
 msgid "Focus Timeline"
-msgstr "Ð¤Ð¾ÐºÑƒÑ Ð½Ð° ÑˆÐºÐ°Ð»Ñƒ Ñ…Ð¾Ð´Ð°"
+msgstr "Фокус на шкалу хода"
 
 #. Actions.CombatInspect
 msgctxt "Actions.CombatInspect"
 msgid "Inspect Combat Hex"
-msgstr "ÐžÑÐ¼Ð¾Ñ‚Ñ€ÐµÑ‚ÑŒ Ð±Ð¾ÐµÐ²Ð¾Ð¹ Ð³ÐµÐºÑ"
+msgstr "Осмотреть боевой гекс"
 
 #. Actions.CombatNextRelevantTile
 msgctxt "Actions.CombatNextRelevantTile"
 msgid "Next Relevant Combat Tile"
-msgstr "Ð¡Ð»ÐµÐ´ÑƒÑŽÑ‰Ð°Ñ Ð²Ð°Ð¶Ð½Ð°Ñ Ð±Ð¾ÐµÐ²Ð°Ñ ÐºÐ»ÐµÑ‚ÐºÐ°"
+msgstr "Следующая важная боевая клетка"
 
 #. Actions.CombatPreviousRelevantTile
 msgctxt "Actions.CombatPreviousRelevantTile"
 msgid "Previous Relevant Combat Tile"
-msgstr "ÐŸÑ€ÐµÐ´Ñ‹Ð´ÑƒÑ‰Ð°Ñ Ð²Ð°Ð¶Ð½Ð°Ñ Ð±Ð¾ÐµÐ²Ð°Ñ ÐºÐ»ÐµÑ‚ÐºÐ°"
+msgstr "Предыдущая важная боевая клетка"
 
 #. Actions.FirstBufferLine
 msgctxt "Actions.FirstBufferLine"
 msgid "First Buffer Line"
-msgstr "ÐŸÐµÑ€Ð²Ñ‹Ð¹ Ð±ÑƒÑ„ÐµÑ€ ÑÑ‚Ñ€Ð¾ÐºÐ°"
+msgstr "Первый буфер строка"
 
 #. Actions.FirstMenuItem
 msgctxt "Actions.FirstMenuItem"
 msgid "First Menu Item"
-msgstr "ÐŸÐµÑ€Ð²Ñ‹Ð¹ Ð¼ÐµÐ½ÑŽ ÑÐ»ÐµÐ¼ÐµÐ½Ñ‚"
+msgstr "Первый меню элемент"
 
 #. Actions.FirstRow
 msgctxt "Actions.FirstRow"
 msgid "First Row"
-msgstr "ÐŸÐµÑ€Ð²Ñ‹Ð¹ Ñ€ÑÐ´"
+msgstr "Первый ряд"
 
 #. Actions.FocusHudNotifications
 msgctxt "Actions.FocusHudNotifications"
@@ -1138,162 +1138,162 @@ msgstr "Перейти к войскам HUD"
 #. Actions.HexGridEast
 msgctxt "Actions.HexGridEast"
 msgid "Hex Grid East"
-msgstr "Ð“ÐµÐºÑ-ÑÐµÑ‚ÐºÐ° Ð²Ð¾ÑÑ‚Ð¾Ðº"
+msgstr "Гекс-сетка восток"
 
 #. Actions.HexGridNorthEast
 msgctxt "Actions.HexGridNorthEast"
 msgid "Hex Grid Northeast"
-msgstr "Ð“ÐµÐºÑ-ÑÐµÑ‚ÐºÐ° ÑÐµÐ²ÐµÑ€Ð¾-Ð²Ð¾ÑÑ‚Ð¾Ðº"
+msgstr "Гекс-сетка северо-восток"
 
 #. Actions.HexGridNorthWest
 msgctxt "Actions.HexGridNorthWest"
 msgid "Hex Grid Northwest"
-msgstr "Ð“ÐµÐºÑ-ÑÐµÑ‚ÐºÐ° ÑÐµÐ²ÐµÑ€Ð¾-Ð·Ð°Ð¿Ð°Ð´"
+msgstr "Гекс-сетка северо-запад"
 
 #. Actions.HexGridSouthEast
 msgctxt "Actions.HexGridSouthEast"
 msgid "Hex Grid Southeast"
-msgstr "Ð“ÐµÐºÑ-ÑÐµÑ‚ÐºÐ° ÑŽÐ³Ð¾-Ð²Ð¾ÑÑ‚Ð¾Ðº"
+msgstr "Гекс-сетка юго-восток"
 
 #. Actions.HexGridSouthWest
 msgctxt "Actions.HexGridSouthWest"
 msgid "Hex Grid Southwest"
-msgstr "Ð“ÐµÐºÑ-ÑÐµÑ‚ÐºÐ° ÑŽÐ³Ð¾-Ð·Ð°Ð¿Ð°Ð´"
+msgstr "Гекс-сетка юго-запад"
 
 #. Actions.HexGridWest
 msgctxt "Actions.HexGridWest"
 msgid "Hex Grid West"
-msgstr "Ð“ÐµÐºÑ-ÑÐµÑ‚ÐºÐ° Ð·Ð°Ð¿Ð°Ð´"
+msgstr "Гекс-сетка запад"
 
 #. Actions.LastBufferLine
 msgctxt "Actions.LastBufferLine"
 msgid "Last Buffer Line"
-msgstr "ÐŸÐ¾ÑÐ»ÐµÐ´Ð½Ð¸Ð¹ Ð±ÑƒÑ„ÐµÑ€ ÑÑ‚Ñ€Ð¾ÐºÐ°"
+msgstr "Последний буфер строка"
 
 #. Actions.LastMenuItem
 msgctxt "Actions.LastMenuItem"
 msgid "Last Menu Item"
-msgstr "ÐŸÐ¾ÑÐ»ÐµÐ´Ð½Ð¸Ð¹ Ð¼ÐµÐ½ÑŽ ÑÐ»ÐµÐ¼ÐµÐ½Ñ‚"
+msgstr "Последний меню элемент"
 
 #. Actions.LastRow
 msgctxt "Actions.LastRow"
 msgid "Last Row"
-msgstr "ÐŸÐ¾ÑÐ»ÐµÐ´Ð½Ð¸Ð¹ Ñ€ÑÐ´"
+msgstr "Последний ряд"
 
 #. Actions.MapMoveEast
 msgctxt "Actions.MapMoveEast"
 msgid "Map Move East"
-msgstr "Ð¡Ð´Ð²Ð¸Ð½ÑƒÑ‚ÑŒ ÐºÐ°Ñ€Ñ‚Ñƒ Ð½Ð° Ð²Ð¾ÑÑ‚Ð¾Ðº"
+msgstr "Сдвинуть карту на восток"
 
 #. Actions.MapMoveNorth
 msgctxt "Actions.MapMoveNorth"
 msgid "Map Move North"
-msgstr "Ð¡Ð´Ð²Ð¸Ð½ÑƒÑ‚ÑŒ ÐºÐ°Ñ€Ñ‚Ñƒ Ð½Ð° ÑÐµÐ²ÐµÑ€"
+msgstr "Сдвинуть карту на север"
 
 #. Actions.MapMoveSouth
 msgctxt "Actions.MapMoveSouth"
 msgid "Map Move South"
-msgstr "Ð¡Ð´Ð²Ð¸Ð½ÑƒÑ‚ÑŒ ÐºÐ°Ñ€Ñ‚Ñƒ Ð½Ð° ÑŽÐ³"
+msgstr "Сдвинуть карту на юг"
 
 #. Actions.MapMoveWest
 msgctxt "Actions.MapMoveWest"
 msgid "Map Move West"
-msgstr "Ð¡Ð´Ð²Ð¸Ð½ÑƒÑ‚ÑŒ ÐºÐ°Ñ€Ñ‚Ñƒ Ð½Ð° Ð·Ð°Ð¿Ð°Ð´"
+msgstr "Сдвинуть карту на запад"
 
 #. Actions.MapSecondaryAction
 msgctxt "Actions.MapSecondaryAction"
 msgid "Map Secondary Action"
-msgstr "Ð’Ñ‚Ð¾Ñ€Ð¸Ñ‡Ð½Ð¾Ðµ Ð´ÐµÐ¹ÑÑ‚Ð²Ð¸Ðµ ÐºÐ°Ñ€Ñ‚Ñ‹"
+msgstr "Вторичное действие карты"
 
 #. Actions.NextBuffer
 msgctxt "Actions.NextBuffer"
 msgid "Next Buffer"
-msgstr "Ð¡Ð»ÐµÐ´ÑƒÑŽÑ‰Ð¸Ð¹ Ð±ÑƒÑ„ÐµÑ€"
+msgstr "Следующий буфер"
 
 #. Actions.NextBufferLine
 msgctxt "Actions.NextBufferLine"
 msgid "Next Buffer Line"
-msgstr "Ð¡Ð»ÐµÐ´ÑƒÑŽÑ‰Ð¸Ð¹ Ð±ÑƒÑ„ÐµÑ€ ÑÑ‚Ñ€Ð¾ÐºÐ°"
+msgstr "Следующий буфер строка"
 
 #. Actions.NextColumn
 msgctxt "Actions.NextColumn"
 msgid "Next Column"
-msgstr "Ð¡Ð»ÐµÐ´ÑƒÑŽÑ‰Ð¸Ð¹ ÑÑ‚Ð¾Ð»Ð±ÐµÑ†"
+msgstr "Следующий столбец"
 
 #. Actions.NextHeading
 msgctxt "Actions.NextHeading"
 msgid "Next Heading"
-msgstr "Ð¡Ð»ÐµÐ´ÑƒÑŽÑ‰Ð¸Ð¹ Ð·Ð°Ð³Ð¾Ð»Ð¾Ð²Ð¾Ðº"
+msgstr "Следующий заголовок"
 
 #. Actions.NextMenuItem
 msgctxt "Actions.NextMenuItem"
 msgid "Next Menu Item"
-msgstr "Ð¡Ð»ÐµÐ´ÑƒÑŽÑ‰Ð¸Ð¹ Ð¼ÐµÐ½ÑŽ ÑÐ»ÐµÐ¼ÐµÐ½Ñ‚"
+msgstr "Следующий меню элемент"
 
 #. Actions.NextRow
 msgctxt "Actions.NextRow"
 msgid "Next Row"
-msgstr "Ð¡Ð»ÐµÐ´ÑƒÑŽÑ‰Ð¸Ð¹ Ñ€ÑÐ´"
+msgstr "Следующий ряд"
 
 #. Actions.NextSettlement
 msgctxt "Actions.NextSettlement"
 msgid "Next Settlement"
-msgstr "Ð¡Ð»ÐµÐ´ÑƒÑŽÑ‰ÐµÐµ Ð¿Ð¾ÑÐµÐ»ÐµÐ½Ð¸Ðµ"
+msgstr "Следующее поселение"
 
 #. Actions.NextWidget
 msgctxt "Actions.NextWidget"
 msgid "Next Widget"
-msgstr "Ð¡Ð»ÐµÐ´ÑƒÑŽÑ‰Ð¸Ð¹ Ð²Ð¸Ð´Ð¶ÐµÑ‚"
+msgstr "Следующий виджет"
 
 #. Actions.NextWielder
 msgctxt "Actions.NextWielder"
 msgid "Next Wielder"
-msgstr "Ð¡Ð»ÐµÐ´ÑƒÑŽÑ‰Ð¸Ð¹ Ð³ÐµÑ€Ð¾Ð¹"
+msgstr "Следующий герой"
 
 #. Actions.OpenModSettings
 msgctxt "Actions.OpenModSettings"
 msgid "Open Mod Settings"
-msgstr "ÐžÑ‚ÐºÑ€Ñ‹Ñ‚ÑŒ Ð½Ð°ÑÑ‚Ñ€Ð¾Ð¹ÐºÐ¸ Ð¼Ð¾Ð´Ð°"
+msgstr "Открыть настройки мода"
 
 #. Actions.PreviousBuffer
 msgctxt "Actions.PreviousBuffer"
 msgid "Previous Buffer"
-msgstr "ÐŸÑ€ÐµÐ´Ñ‹Ð´ÑƒÑ‰Ð¸Ð¹ Ð±ÑƒÑ„ÐµÑ€"
+msgstr "Предыдущий буфер"
 
 #. Actions.PreviousBufferLine
 msgctxt "Actions.PreviousBufferLine"
 msgid "Previous Buffer Line"
-msgstr "ÐŸÑ€ÐµÐ´Ñ‹Ð´ÑƒÑ‰Ð¸Ð¹ Ð±ÑƒÑ„ÐµÑ€ ÑÑ‚Ñ€Ð¾ÐºÐ°"
+msgstr "Предыдущий буфер строка"
 
 #. Actions.PreviousColumn
 msgctxt "Actions.PreviousColumn"
 msgid "Previous Column"
-msgstr "ÐŸÑ€ÐµÐ´Ñ‹Ð´ÑƒÑ‰Ð¸Ð¹ ÑÑ‚Ð¾Ð»Ð±ÐµÑ†"
+msgstr "Предыдущий столбец"
 
 #. Actions.PreviousHeading
 msgctxt "Actions.PreviousHeading"
 msgid "Previous Heading"
-msgstr "ÐŸÑ€ÐµÐ´Ñ‹Ð´ÑƒÑ‰Ð¸Ð¹ Ð·Ð°Ð³Ð¾Ð»Ð¾Ð²Ð¾Ðº"
+msgstr "Предыдущий заголовок"
 
 #. Actions.PreviousMenuItem
 msgctxt "Actions.PreviousMenuItem"
 msgid "Previous Menu Item"
-msgstr "ÐŸÑ€ÐµÐ´Ñ‹Ð´ÑƒÑ‰Ð¸Ð¹ Ð¼ÐµÐ½ÑŽ ÑÐ»ÐµÐ¼ÐµÐ½Ñ‚"
+msgstr "Предыдущий меню элемент"
 
 #. Actions.PreviousRow
 msgctxt "Actions.PreviousRow"
 msgid "Previous Row"
-msgstr "ÐŸÑ€ÐµÐ´Ñ‹Ð´ÑƒÑ‰Ð¸Ð¹ Ñ€ÑÐ´"
+msgstr "Предыдущий ряд"
 
 #. Actions.PreviousWidget
 msgctxt "Actions.PreviousWidget"
 msgid "Previous Widget"
-msgstr "ÐŸÑ€ÐµÐ´Ñ‹Ð´ÑƒÑ‰Ð¸Ð¹ Ð²Ð¸Ð´Ð¶ÐµÑ‚"
+msgstr "Предыдущий виджет"
 
 #. Actions.ReadThreat
 msgctxt "Actions.ReadThreat"
 msgid "Read Threat"
-msgstr "ÐŸÑ€Ð¾Ñ‡Ð¸Ñ‚Ð°Ñ‚ÑŒ ÑƒÐ³Ñ€Ð¾Ð·Ñƒ"
+msgstr "Прочитать угрозу"
 
 #. Actions.ScannerDecreaseLookAroundRadius
 msgctxt "Actions.ScannerDecreaseLookAroundRadius"
@@ -1308,7 +1308,7 @@ msgstr "Увеличить радиус осмотра"
 #. Actions.ScannerJumpToResult
 msgctxt "Actions.ScannerJumpToResult"
 msgid "Jump To Scanner Result"
-msgstr "ÐŸÐµÑ€ÐµÐ¹Ñ‚Ð¸ Ðº Ñ€ÐµÐ·ÑƒÐ»ÑŒÑ‚Ð°Ñ‚Ñƒ ÑÐºÐ°Ð½ÐµÑ€Ð°"
+msgstr "Перейти к результату сканера"
 
 #. Actions.ScannerLookAround
 msgctxt "Actions.ScannerLookAround"
@@ -1318,102 +1318,102 @@ msgstr "Осмотреться"
 #. Actions.ScannerNextCategory
 msgctxt "Actions.ScannerNextCategory"
 msgid "Next Scanner Category"
-msgstr "Ð¡Ð»ÐµÐ´ÑƒÑŽÑ‰Ð¸Ð¹ ÑÐºÐ°Ð½ÐµÑ€ ÐºÐ°Ñ‚ÐµÐ³Ð¾Ñ€Ð¸Ñ"
+msgstr "Следующий сканер категория"
 
 #. Actions.ScannerNextResult
 msgctxt "Actions.ScannerNextResult"
 msgid "Next Scanner Result"
-msgstr "Ð¡Ð»ÐµÐ´ÑƒÑŽÑ‰Ð¸Ð¹ ÑÐºÐ°Ð½ÐµÑ€ Ñ€ÐµÐ·ÑƒÐ»ÑŒÑ‚Ð°Ñ‚"
+msgstr "Следующий сканер результат"
 
 #. Actions.ScannerNextSubcategory
 msgctxt "Actions.ScannerNextSubcategory"
 msgid "Next Scanner Subcategory"
-msgstr "Ð¡Ð»ÐµÐ´ÑƒÑŽÑ‰Ð¸Ð¹ ÑÐºÐ°Ð½ÐµÑ€ Ð¿Ð¾Ð´ÐºÐ°Ñ‚ÐµÐ³Ð¾Ñ€Ð¸Ñ"
+msgstr "Следующий сканер подкатегория"
 
 #. Actions.ScannerPreviousCategory
 msgctxt "Actions.ScannerPreviousCategory"
 msgid "Previous Scanner Category"
-msgstr "ÐŸÑ€ÐµÐ´Ñ‹Ð´ÑƒÑ‰Ð¸Ð¹ ÑÐºÐ°Ð½ÐµÑ€ ÐºÐ°Ñ‚ÐµÐ³Ð¾Ñ€Ð¸Ñ"
+msgstr "Предыдущий сканер категория"
 
 #. Actions.ScannerPreviousResult
 msgctxt "Actions.ScannerPreviousResult"
 msgid "Previous Scanner Result"
-msgstr "ÐŸÑ€ÐµÐ´Ñ‹Ð´ÑƒÑ‰Ð¸Ð¹ ÑÐºÐ°Ð½ÐµÑ€ Ñ€ÐµÐ·ÑƒÐ»ÑŒÑ‚Ð°Ñ‚"
+msgstr "Предыдущий сканер результат"
 
 #. Actions.ScannerPreviousSubcategory
 msgctxt "Actions.ScannerPreviousSubcategory"
 msgid "Previous Scanner Subcategory"
-msgstr "ÐŸÑ€ÐµÐ´Ñ‹Ð´ÑƒÑ‰Ð¸Ð¹ ÑÐºÐ°Ð½ÐµÑ€ Ð¿Ð¾Ð´ÐºÐ°Ñ‚ÐµÐ³Ð¾Ñ€Ð¸Ñ"
+msgstr "Предыдущий сканер подкатегория"
 
 #. Actions.ScannerRefresh
 msgctxt "Actions.ScannerRefresh"
 msgid "Refresh Scanner"
-msgstr "ÐžÐ±Ð½Ð¾Ð²Ð¸Ñ‚ÑŒ ÑÐºÐ°Ð½ÐµÑ€"
+msgstr "Обновить сканер"
 
 #. Actions.ScannerSpeakOrientation
 msgctxt "Actions.ScannerSpeakOrientation"
 msgid "Scanner Result Orientation"
-msgstr "ÐžÑ€Ð¸ÐµÐ½Ñ‚Ð°Ñ†Ð¸Ñ Ñ€ÐµÐ·ÑƒÐ»ÑŒÑ‚Ð°Ñ‚Ð° ÑÐºÐ°Ð½ÐµÑ€Ð°"
+msgstr "Ориентация результата сканера"
 
 #. Actions.SliderDecrease
 msgctxt "Actions.SliderDecrease"
 msgid "Slider Decrease"
-msgstr "Ð£Ð¼ÐµÐ½ÑŒÑˆÐ¸Ñ‚ÑŒ Ð¿Ð¾Ð»Ð·ÑƒÐ½Ð¾Ðº"
+msgstr "Уменьшить ползунок"
 
 #. Actions.SliderIncrease
 msgctxt "Actions.SliderIncrease"
 msgid "Slider Increase"
-msgstr "Ð£Ð²ÐµÐ»Ð¸Ñ‡Ð¸Ñ‚ÑŒ Ð¿Ð¾Ð»Ð·ÑƒÐ½Ð¾Ðº"
+msgstr "Увеличить ползунок"
 
 #. Actions.SliderMaximum
 msgctxt "Actions.SliderMaximum"
 msgid "Slider Maximum"
-msgstr "ÐœÐ°ÐºÑÐ¸Ð¼ÑƒÐ¼ Ð¿Ð¾Ð»Ð·ÑƒÐ½ÐºÐ°"
+msgstr "Максимум ползунка"
 
 #. Actions.SliderMinimum
 msgctxt "Actions.SliderMinimum"
 msgid "Slider Minimum"
-msgstr "ÐœÐ¸Ð½Ð¸Ð¼ÑƒÐ¼ Ð¿Ð¾Ð»Ð·ÑƒÐ½ÐºÐ°"
+msgstr "Минимум ползунка"
 
 #. Actions.StartDrag
 msgctxt "Actions.StartDrag"
 msgid "Start Drag"
-msgstr "ÐÐ°Ñ‡Ð°Ñ‚ÑŒ Ð¿ÐµÑ€ÐµÑ‚Ð°ÑÐºÐ¸Ð²Ð°Ð½Ð¸Ðµ"
+msgstr "Начать перетаскивание"
 
 #. Actions.SummarizeEnemyResources
 msgctxt "Actions.SummarizeEnemyResources"
 msgid "Summarize Enemy Resources"
-msgstr "Ð¡Ð²Ð¾Ð´ÐºÐ° Ñ€ÐµÑÑƒÑ€ÑÐ¾Ð² Ð²Ñ€Ð°Ð³Ð°"
+msgstr "Сводка ресурсов врага"
 
 #. Actions.SummarizeResources
 msgctxt "Actions.SummarizeResources"
 msgid "Summarize Resources"
-msgstr "Ð¡Ð²Ð¾Ð´ÐºÐ° Ñ€ÐµÑÑƒÑ€ÑÐ¾Ð²"
+msgstr "Сводка ресурсов"
 
 #. Actions.TooltipActionsMenu
 msgctxt "Actions.TooltipActionsMenu"
 msgid "Tooltip Actions Menu"
-msgstr "ÐœÐµÐ½ÑŽ Ð´ÐµÐ¹ÑÑ‚Ð²Ð¸Ð¹ Ð¿Ð¾Ð´ÑÐºÐ°Ð·ÐºÐ¸"
+msgstr "Меню действий подсказки"
 
 #. Combat.AbilityUsed
 msgctxt "Combat.AbilityUsed"
 msgid "{0} uses {1}"
-msgstr "{0} Ð¸ÑÐ¿Ð¾Ð»ÑŒÐ·ÑƒÐµÑ‚ {1}"
+msgstr "{0} использует {1}"
 
 #. Combat.Affects
 msgctxt "Combat.Affects"
 msgid "{0} affects {1}"
-msgstr "{0} Ð²Ð»Ð¸ÑÐµÑ‚ Ð½Ð° {1}"
+msgstr "{0} влияет на {1}"
 
 #. Combat.Appears
 msgctxt "Combat.Appears"
 msgid "{0} appears"
-msgstr "{0} Ð¿Ð¾ÑÐ²Ð»ÑÐµÑ‚ÑÑ"
+msgstr "{0} появляется"
 
 #. Combat.ArcanaEssence
 msgctxt "Combat.ArcanaEssence"
 msgid "arcana"
-msgstr "Ð°Ñ€ÐºÐ°Ð½Ð¾Ð²"
+msgstr "арканов"
 
 #. Combat.Attack
 msgctxt "Combat.Attack"
@@ -1423,127 +1423,127 @@ msgstr "{0} {1} {2}"
 #. Combat.AttackableEntity
 msgctxt "Combat.AttackableEntity"
 msgid "attackable entity"
-msgstr "Ð°Ñ‚Ð°ÐºÑƒÐµÐ¼Ñ‹Ð¹ Ð¾Ð±ÑŠÐµÐºÑ‚"
+msgstr "атакуемый объект"
 
 #. Combat.AttackVerbDefault
 msgctxt "Combat.AttackVerbDefault"
 msgid "attacks"
-msgstr "Ð°Ñ‚Ð°ÐºÑƒÐµÑ‚"
+msgstr "атакует"
 
 #. Combat.AttackVerbOpportunity
 msgctxt "Combat.AttackVerbOpportunity"
 msgid "makes an opportunity attack against"
-msgstr "ÑÐ¾Ð²ÐµÑ€ÑˆÐ°ÐµÑ‚ Ð°Ñ‚Ð°ÐºÑƒ Ð²Ð¾Ð·Ð¼Ð¾Ð¶Ð½Ð¾ÑÑ‚Ð¸ Ð¿Ñ€Ð¾Ñ‚Ð¸Ð²"
+msgstr "совершает атаку возможности против"
 
 #. Combat.AttackVerbOverwatch
 msgctxt "Combat.AttackVerbOverwatch"
 msgid "makes an overwatch attack against"
-msgstr "ÑÐ¾Ð²ÐµÑ€ÑˆÐ°ÐµÑ‚ ÑÑ‚Ð¾Ñ€Ð¾Ð¶ÐµÐ²ÑƒÑŽ Ð°Ñ‚Ð°ÐºÑƒ Ð¿Ñ€Ð¾Ñ‚Ð¸Ð²"
+msgstr "совершает сторожевую атаку против"
 
 #. Combat.AttackVerbRetaliation
 msgctxt "Combat.AttackVerbRetaliation"
 msgid "retaliates against"
-msgstr "ÐºÐ¾Ð½Ñ‚Ñ€Ð°Ñ‚Ð°ÐºÑƒÐµÑ‚"
+msgstr "контратакует"
 
 #. Combat.AttackVerbSpearwall
 msgctxt "Combat.AttackVerbSpearwall"
 msgid "makes a spearwall attack against"
-msgstr "ÑÐ¾Ð²ÐµÑ€ÑˆÐ°ÐµÑ‚ Ð°Ñ‚Ð°ÐºÑƒ ÑÑ‚ÐµÐ½Ð¾Ð¹ ÐºÐ¾Ð¿Ð¸Ð¹ Ð¿Ñ€Ð¾Ñ‚Ð¸Ð²"
+msgstr "совершает атаку стеной копий против"
 
 #. Combat.BattleOver
 msgctxt "Combat.BattleOver"
 msgid "Battle over"
-msgstr "Ð‘Ð¾Ð¹ Ð¾ÐºÐ¾Ð½Ñ‡ÐµÐ½"
+msgstr "Бой окончен"
 
 #. Combat.BlindFury
 msgctxt "Combat.BlindFury"
 msgid "blind fury"
-msgstr "ÑÐ»ÐµÐ¿Ð°Ñ ÑÑ€Ð¾ÑÑ‚ÑŒ"
+msgstr "слепая ярость"
 
 #. Combat.BurrowsUp
 msgctxt "Combat.BurrowsUp"
 msgid "{0} burrows up"
-msgstr "{0} Ð²Ñ‹ÐºÐ°Ð¿Ñ‹Ð²Ð°ÐµÑ‚ÑÑ"
+msgstr "{0} выкапывается"
 
 #. Combat.CastsSpell
 msgctxt "Combat.CastsSpell"
 msgid "{0} casts {1}"
-msgstr "{0} Ð¿Ñ€Ð¸Ð¼ÐµÐ½ÑÐµÑ‚ {1}"
+msgstr "{0} применяет {1}"
 
 #. Combat.CastsSpellAt
 msgctxt "Combat.CastsSpellAt"
 msgid "{0} casts {1} at {2}"
-msgstr "{0} Ð¿Ñ€Ð¸Ð¼ÐµÐ½ÑÐµÑ‚ {1} Ð¿Ð¾ {2}"
+msgstr "{0} применяет {1} по {2}"
 
 #. Combat.Challenge
 msgctxt "Combat.Challenge"
 msgid "challenge"
-msgstr "Ð²Ñ‹Ð·Ð¾Ð²"
+msgstr "вызов"
 
 #. Combat.ChaosEssence
 msgctxt "Combat.ChaosEssence"
 msgid "chaos"
-msgstr "Ñ…Ð°Ð¾ÑÐ°"
+msgstr "хаоса"
 
 #. Combat.Created
 msgctxt "Combat.Created"
 msgid "{0} created"
-msgstr "{0} ÑÐ¾Ð·Ð´Ð°Ð½"
+msgstr "{0} создан"
 
 #. Combat.CreationEssence
 msgctxt "Combat.CreationEssence"
 msgid "creation"
-msgstr "ÑÐ¾Ð·Ð¸Ð´Ð°Ð½Ð¸Ñ"
+msgstr "созидания"
 
 #. Combat.DamageDestroyingItSuffix
 msgctxt "Combat.DamageDestroyingItSuffix"
 msgid ", destroying it"
-msgstr ", ÑƒÐ½Ð¸Ñ‡Ñ‚Ð¾Ð¶Ð°Ñ ÑÑ‚Ð¾"
+msgstr ", уничтожая это"
 
 #. Combat.DamageKillsSuffix
 msgctxt "Combat.DamageKillsSuffix"
 msgid ", killing {0}"
-msgstr ", ÑƒÐ±Ð¸Ð²Ð°Ñ {0}"
+msgstr ", убивая {0}"
 
 #. Combat.DealsDamage
 msgctxt "Combat.DealsDamage"
 msgid "{0} deals {1} {2} damage to {3}{4}"
-msgstr "{0} Ð½Ð°Ð½Ð¾ÑÐ¸Ñ‚ {1} {2} ÑƒÑ€Ð¾Ð½Ð° Ñ†ÐµÐ»Ð¸ {3}{4}"
+msgstr "{0} наносит {1} {2} урона цели {3}{4}"
 
 #. Combat.Defeat
 msgctxt "Combat.Defeat"
 msgid "Defeat"
-msgstr "ÐŸÐ¾Ñ€Ð°Ð¶ÐµÐ½Ð¸Ðµ"
+msgstr "Поражение"
 
 #. Combat.Destroyed
 msgctxt "Combat.Destroyed"
 msgid "{0} destroyed"
-msgstr "{0} ÑƒÐ½Ð¸Ñ‡Ñ‚Ð¾Ð¶ÐµÐ½"
+msgstr "{0} уничтожен"
 
 #. Combat.DestructionEssence
 msgctxt "Combat.DestructionEssence"
 msgid "destruction"
-msgstr "Ñ€Ð°Ð·Ñ€ÑƒÑˆÐµÐ½Ð¸Ñ"
+msgstr "разрушения"
 
 #. Combat.Draw
 msgctxt "Combat.Draw"
 msgid "Draw"
-msgstr "ÐÐ¸Ñ‡ÑŒÑ"
+msgstr "Ничья"
 
 #. Combat.Effect
 msgctxt "Combat.Effect"
 msgid "effect"
-msgstr "ÑÑ„Ñ„ÐµÐºÑ‚"
+msgstr "эффект"
 
 #. Combat.EnemyTroop
 msgctxt "Combat.EnemyTroop"
 msgid "{0} enemy {1}"
-msgstr "{0} Ð²Ñ€Ð°Ð¶ÐµÑÐºÐ¸Ð¹ {1}"
+msgstr "{0} вражеский {1}"
 
 #. Combat.EnemyTroops
 msgctxt "Combat.EnemyTroops"
 msgid "enemy troops"
-msgstr "Ð²Ñ€Ð°Ð¶ÐµÑÐºÐ¸Ðµ Ð¾Ñ‚Ñ€ÑÐ´Ñ‹"
+msgstr "вражеские отряды"
 
 #. Combat.EssenceAmountCompact
 msgctxt "Combat.EssenceAmountCompact"
@@ -1558,137 +1558,137 @@ msgstr "{0} эссенции"
 #. Combat.ExplosiveBarrel
 msgctxt "Combat.ExplosiveBarrel"
 msgid "explosive barrel"
-msgstr "Ð²Ð·Ñ€Ñ‹Ð²Ð½Ð°Ñ Ð±Ð¾Ñ‡ÐºÐ°"
+msgstr "взрывная бочка"
 
 #. Combat.FailedBurrow
 msgctxt "Combat.FailedBurrow"
 msgid "{0}, failed burrow"
-msgstr "{0}, Ð½Ðµ ÑƒÐ´Ð°Ð»Ð¾ÑÑŒ Ð²Ñ‹ÐºÐ¾Ð¿Ð°Ñ‚ÑŒÑÑ"
+msgstr "{0}, не удалось выкопаться"
 
 #. Combat.FaeyFire
 msgctxt "Combat.FaeyFire"
 msgid "Faey Fire"
-msgstr "ÐžÐ³Ð¾Ð½ÑŒ Ñ„ÑÐ¹"
+msgstr "Огонь фэй"
 
 #. Combat.FaeyFireWithBolts
 msgctxt "Combat.FaeyFireWithBolts"
 msgid "{0} casts {1}, {2}"
-msgstr "{0} Ð¿Ñ€Ð¸Ð¼ÐµÐ½ÑÐµÑ‚ {1}, {2}"
+msgstr "{0} применяет {1}, {2}"
 
 #. Combat.Lunge
 msgctxt "Combat.Lunge"
 msgid "lunge"
-msgstr "Ð²Ñ‹Ð¿Ð°Ð´"
+msgstr "выпад"
 
 #. Combat.MapEntityDamage
 msgctxt "Combat.MapEntityDamage"
 msgid "map entity"
-msgstr "Ð¾Ð±ÑŠÐµÐºÑ‚ ÐºÐ°Ñ€Ñ‚Ñ‹"
+msgstr "объект карты"
 
 #. Combat.MeleeDamage
 msgctxt "Combat.MeleeDamage"
 msgid "melee"
-msgstr "Ð±Ð»Ð¸Ð¶Ð½Ð¸Ð¹ Ð±Ð¾Ð¹"
+msgstr "ближний бой"
 
 #. Combat.MothersLove
 msgctxt "Combat.MothersLove"
 msgid "mother's love"
-msgstr "Ð¼Ð°Ñ‚ÐµÑ€Ð¸Ð½ÑÐºÐ°Ñ Ð»ÑŽÐ±Ð¾Ð²ÑŒ"
+msgstr "материнская любовь"
 
 #. Combat.NewTurn
 msgctxt "Combat.NewTurn"
 msgid "It is {0}'s turn"
-msgstr "Ð¥Ð¾Ð´Ð¸Ñ‚ {0}"
+msgstr "Ходит {0}"
 
 #. Combat.OpportunityAttack
 msgctxt "Combat.OpportunityAttack"
 msgid "opportunity attack"
-msgstr "Ð°Ñ‚Ð°ÐºÐ° Ð²Ð¾Ð·Ð¼Ð¾Ð¶Ð½Ð¾ÑÑ‚Ð¸"
+msgstr "атака возможности"
 
 #. Combat.OrderEssence
 msgctxt "Combat.OrderEssence"
 msgid "order"
-msgstr "Ð¿Ð¾Ñ€ÑÐ´ÐºÐ°"
+msgstr "порядка"
 
 #. Combat.Overwatch
 msgctxt "Combat.Overwatch"
 msgid "overwatch"
-msgstr "ÑÑ‚Ñ€Ð°Ð¶Ð°"
+msgstr "стража"
 
 #. Combat.PushedTo
 msgctxt "Combat.PushedTo"
 msgid "{0} pushed to {1}"
-msgstr "{0} Ð¾Ñ‚Ñ‚ÐµÑÐ½Ñ‘Ð½ Ð² {1}"
+msgstr "{0} оттеснён в {1}"
 
 #. Combat.RangedDamage
 msgctxt "Combat.RangedDamage"
 msgid "ranged"
-msgstr "Ð´Ð°Ð»ÑŒÐ½Ð¸Ð¹ Ð±Ð¾Ð¹"
+msgstr "дальний бой"
 
 #. Combat.RavenformsTo
 msgctxt "Combat.RavenformsTo"
 msgid "{0} ravenforms to {1}"
-msgstr "{0} Ð¿Ñ€Ð¸Ð½Ð¸Ð¼Ð°ÐµÑ‚ Ñ„Ð¾Ñ€Ð¼Ñƒ Ð²Ð¾Ñ€Ð¾Ð½Ð° Ð¸ Ð¿ÐµÑ€ÐµÐ¼ÐµÑ‰Ð°ÐµÑ‚ÑÑ Ð² {1}"
+msgstr "{0} принимает форму ворона и перемещается в {1}"
 
 #. Combat.RemovedFrom
 msgctxt "Combat.RemovedFrom"
 msgid "{0} removed from {1}"
-msgstr "{0} ÑƒÐ´Ð°Ð»ÐµÐ½Ð¾ Ñ {1}"
+msgstr "{0} удалено с {1}"
 
 #. Combat.Retaliation
 msgctxt "Combat.Retaliation"
 msgid "retaliation"
-msgstr "ÐºÐ¾Ð½Ñ‚Ñ€Ð°Ñ‚Ð°ÐºÐ°"
+msgstr "контратака"
 
 #. Combat.Spearwall
 msgctxt "Combat.Spearwall"
 msgid "spearwall"
-msgstr "ÑÑ‚ÐµÐ½Ð° ÐºÐ¾Ð¿Ð¸Ð¹"
+msgstr "стена копий"
 
 #. Combat.SpellDamage
 msgctxt "Combat.SpellDamage"
 msgid "spell"
-msgstr "Ð·Ð°ÐºÐ»Ð¸Ð½Ð°Ð½Ð¸Ðµ"
+msgstr "заклинание"
 
 #. Combat.Splash
 msgctxt "Combat.Splash"
 msgid "splash"
-msgstr "Ð¾Ð±Ð»Ð°ÑÑ‚ÑŒ"
+msgstr "область"
 
 #. Combat.Summoned
 msgctxt "Combat.Summoned"
 msgid "{0} summoned"
-msgstr "{0} Ð¿Ñ€Ð¸Ð·Ð²Ð°Ð½"
+msgstr "{0} призван"
 
 #. Combat.TakesDamage
 msgctxt "Combat.TakesDamage"
 msgid "{0} takes {1} {2} damage{3}"
-msgstr "{0} Ð¿Ð¾Ð»ÑƒÑ‡Ð°ÐµÑ‚ {1} {2} ÑƒÑ€Ð¾Ð½Ð°{3}"
+msgstr "{0} получает {1} {2} урона{3}"
 
 #. Combat.TeleportsTo
 msgctxt "Combat.TeleportsTo"
 msgid "{0} teleports to {1}"
-msgstr "{0} Ñ‚ÐµÐ»ÐµÐ¿Ð¾Ñ€Ñ‚Ð¸Ñ€ÑƒÐµÑ‚ÑÑ Ð² {1}"
+msgstr "{0} телепортируется в {1}"
 
 #. Combat.Tile
 msgctxt "Combat.Tile"
 msgid "tile {0}"
-msgstr "ÐºÐ»ÐµÑ‚ÐºÐ° {0}"
+msgstr "клетка {0}"
 
 #. Combat.Troop
 msgctxt "Combat.Troop"
 msgid "troop"
-msgstr "Ð¾Ñ‚Ñ€ÑÐ´"
+msgstr "отряд"
 
 #. Combat.TroopAt
 msgctxt "Combat.TroopAt"
 msgid "{0} at {1}"
-msgstr "{0} Ð² {1}"
+msgstr "{0} в {1}"
 
 #. Combat.TroopMoved
 msgctxt "Combat.TroopMoved"
 msgid "{0} moves to {1}"
-msgstr "{0} Ð¿ÐµÑ€ÐµÐ¼ÐµÑ‰Ð°ÐµÑ‚ÑÑ Ð² {1}"
+msgstr "{0} перемещается в {1}"
 
 #. Combat.TroopQuantity
 msgctxt "Combat.TroopQuantity"
@@ -1698,62 +1698,62 @@ msgstr "{0} {1}"
 #. Combat.Unknown
 msgctxt "Combat.Unknown"
 msgid "unknown"
-msgstr "Ð½ÐµÐ¸Ð·Ð²ÐµÑÑ‚Ð½Ð¾"
+msgstr "неизвестно"
 
 #. Combat.UnknownEntity
 msgctxt "Combat.UnknownEntity"
 msgid "unknown entity"
-msgstr "Ð½ÐµÐ¸Ð·Ð²ÐµÑÑ‚Ð½Ñ‹Ð¹ Ð¾Ð±ÑŠÐµÐºÑ‚"
+msgstr "неизвестный объект"
 
 #. Combat.UnknownTarget
 msgctxt "Combat.UnknownTarget"
 msgid "unknown target"
-msgstr "Ð½ÐµÐ¸Ð·Ð²ÐµÑÑ‚Ð½Ð°Ñ Ñ†ÐµÐ»ÑŒ"
+msgstr "неизвестная цель"
 
 #. Combat.UnknownTroop
 msgctxt "Combat.UnknownTroop"
 msgid "unknown troop"
-msgstr "Ð½ÐµÐ¸Ð·Ð²ÐµÑÑ‚Ð½Ñ‹Ð¹ Ð¾Ñ‚Ñ€ÑÐ´"
+msgstr "неизвестный отряд"
 
 #. Combat.Victory
 msgctxt "Combat.Victory"
 msgid "Victory"
-msgstr "ÐŸÐ¾Ð±ÐµÐ´Ð°"
+msgstr "Победа"
 
 #. Combat.Walkover
 msgctxt "Combat.Walkover"
 msgid "Walkover"
-msgstr "ÐŸÐ¾Ð±ÐµÐ´Ð° Ð±ÐµÐ· Ð±Ð¾Ñ"
+msgstr "Победа без боя"
 
 #. Combat.Wielder
 msgctxt "Combat.Wielder"
 msgid "wielder"
-msgstr "Ð³ÐµÑ€Ð¾Ð¹"
+msgstr "герой"
 
 #. Combat.YourTroops
 msgctxt "Combat.YourTroops"
 msgid "your troops"
-msgstr "Ð²Ð°ÑˆÐ¸ Ð¾Ñ‚Ñ€ÑÐ´Ñ‹"
+msgstr "ваши отряды"
 
 #. Combat.BoltAt_0
 msgctxt "Combat.BoltAt_0"
 msgid "{0} bolt at {1}"
-msgstr "{0} ÑÐ½Ð°Ñ€ÑÐ´ Ð² {1}"
+msgstr "{0} снаряд в {1}"
 
 #. Combat.BoltAt_1
 msgctxt "Combat.BoltAt_1"
 msgid "{0} bolts at {1}"
-msgstr "{0} ÑÐ½Ð°Ñ€ÑÐ´Ð° Ð² {1}"
+msgstr "{0} снаряда в {1}"
 
 #. Combat.BoltAt_2
 msgctxt "Combat.BoltAt_2"
 msgid "{0} bolts at {1}"
-msgstr "{0} ÑÐ½Ð°Ñ€ÑÐ´Ð¾Ð² Ð² {1}"
+msgstr "{0} снарядов в {1}"
 
 #. Common.CountOf
 msgctxt "Common.CountOf"
 msgid "{0} of {1}"
-msgstr "{0} Ð¸Ð· {1}"
+msgstr "{0} из {1}"
 
 #. Common.NamePossessive
 msgctxt "Common.NamePossessive"
@@ -1763,17 +1763,17 @@ msgstr "{0}"
 #. Spatial.Acting
 msgctxt "Spatial.Acting"
 msgid "acting"
-msgstr "Ð´ÐµÐ¹ÑÑ‚Ð²ÑƒÐµÑ‚"
+msgstr "действует"
 
 #. Spatial.Attack
 msgctxt "Spatial.Attack"
 msgid "attack"
-msgstr "Ð°Ñ‚Ð°ÐºÐ°"
+msgstr "атака"
 
 #. Spatial.AttackPreview
 msgctxt "Spatial.AttackPreview"
 msgid "Attack preview:"
-msgstr "ÐŸÑ€ÐµÐ´Ð¿Ñ€Ð¾ÑÐ¼Ð¾Ñ‚Ñ€ Ð°Ñ‚Ð°ÐºÐ¸:"
+msgstr "Предпросмотр атаки:"
 
 #. Spatial.AttackRange
 msgctxt "Spatial.AttackRange"
@@ -1783,27 +1783,27 @@ msgstr "Дальность атаки"
 #. Spatial.Blocked
 msgctxt "Spatial.Blocked"
 msgid "blocked"
-msgstr "Ð·Ð°Ð±Ð»Ð¾ÐºÐ¸Ñ€Ð¾Ð²Ð°Ð½Ð¾"
+msgstr "заблокировано"
 
 #. Spatial.Commander
 msgctxt "Spatial.Commander"
 msgid "Commander"
-msgstr "ÐšÐ¾Ð¼Ð°Ð½Ð´Ð¸Ñ€"
+msgstr "Командир"
 
 #. Spatial.CommanderPossessive
 msgctxt "Spatial.CommanderPossessive"
 msgid "commander's"
-msgstr "ÐºÐ¾Ð¼Ð°Ð½Ð´Ð¸Ñ€Ð°"
+msgstr "командира"
 
 #. Spatial.Cost
 msgctxt "Spatial.Cost"
 msgid "cost {0}"
-msgstr "ÑÑ‚Ð¾Ð¸Ð¼Ð¾ÑÑ‚ÑŒ {0}"
+msgstr "стоимость {0}"
 
 #. Spatial.DamagePreview
 msgctxt "Spatial.DamagePreview"
 msgid "{0}damage {1}"
-msgstr "{0}ÑƒÑ€Ð¾Ð½ {1}"
+msgstr "{0}урон {1}"
 
 #. Spatial.DeadlyRange
 msgctxt "Spatial.DeadlyRange"
@@ -1813,107 +1813,107 @@ msgstr "Смертельная дальность"
 #. Spatial.Deadly
 msgctxt "Spatial.Deadly"
 msgid "deadly"
-msgstr "ÑÐ¼ÐµÑ€Ñ‚ÐµÐ»ÑŒÐ½Ð¾"
+msgstr "смертельно"
 
 #. Spatial.Debris
 msgctxt "Spatial.Debris"
 msgid "debris"
-msgstr "Ð¾Ð±Ð»Ð¾Ð¼ÐºÐ¸"
+msgstr "обломки"
 
 #. Spatial.Destination
 msgctxt "Spatial.Destination"
 msgid "Destination"
-msgstr "ÐÐ°Ð·Ð½Ð°Ñ‡ÐµÐ½Ð¸Ðµ"
+msgstr "Назначение"
 
 #. Spatial.DestinationAt
 msgctxt "Spatial.DestinationAt"
 msgid "Destination: {0}"
-msgstr "ÐÐ°Ð·Ð½Ð°Ñ‡ÐµÐ½Ð¸Ðµ: {0}"
+msgstr "Назначение: {0}"
 
 #. Spatial.Destroys
 msgctxt "Spatial.Destroys"
 msgid "destroys"
-msgstr "ÑƒÐ½Ð¸Ñ‡Ñ‚Ð¾Ð¶Ð°ÐµÑ‚"
+msgstr "уничтожает"
 
 #. Spatial.ElevatedGroundHeight
 msgctxt "Spatial.ElevatedGroundHeight"
 msgid "elevated ground, height {0}"
-msgstr "Ð²Ð¾Ð·Ð²Ñ‹ÑˆÐµÐ½Ð½Ð¾ÑÑ‚ÑŒ, Ð²Ñ‹ÑÐ¾Ñ‚Ð° {0}"
+msgstr "возвышенность, высота {0}"
 
 #. Spatial.EnemySpawnPoint
 msgctxt "Spatial.EnemySpawnPoint"
 msgid "enemy spawn point"
-msgstr "Ñ‚Ð¾Ñ‡ÐºÐ° Ð¿Ð¾ÑÐ²Ð»ÐµÐ½Ð¸Ñ Ð²Ñ€Ð°Ð³Ð°"
+msgstr "точка появления врага"
 
 #. Spatial.Enemy
 msgctxt "Spatial.Enemy"
 msgid "enemy"
-msgstr "Ð²Ñ€Ð°Ð¶ÐµÑÐºÐ¸Ð¹"
+msgstr "вражеский"
 
 #. Spatial.ExtraTargetPrefix
 msgctxt "Spatial.ExtraTargetPrefix"
 msgid "extra target "
-msgstr "Ð´Ð¾Ð¿Ð¾Ð»Ð½Ð¸Ñ‚ÐµÐ»ÑŒÐ½Ð°Ñ Ñ†ÐµÐ»ÑŒ "
+msgstr "дополнительная цель "
 
 #. Spatial.Friendly
 msgctxt "Spatial.Friendly"
 msgid "friendly"
-msgstr "Ð´Ñ€ÑƒÐ¶ÐµÑÑ‚Ð²ÐµÐ½Ð½Ñ‹Ð¹"
+msgstr "дружественный"
 
 #. Spatial.FurthestReachableInTurns
 msgctxt "Spatial.FurthestReachableInTurns"
 msgid "furthest reachable in {0} turns"
-msgstr "ÑÐ°Ð¼Ð°Ñ Ð´Ð°Ð»ÑŒÐ½ÑÑ Ð´Ð¾ÑÑ‚Ð¸Ð¶Ð¸Ð¼Ð°Ñ Ñ‚Ð¾Ñ‡ÐºÐ° Ñ‡ÐµÑ€ÐµÐ· {0} Ñ…Ð¾Ð´Ð°"
+msgstr "самая дальняя достижимая точка через {0} хода"
 
 #. Spatial.FurthestReachableThisTurn
 msgctxt "Spatial.FurthestReachableThisTurn"
 msgid "furthest reachable this turn"
-msgstr "ÑÐ°Ð¼Ð°Ñ Ð´Ð°Ð»ÑŒÐ½ÑÑ Ð´Ð¾ÑÑ‚Ð¸Ð¶Ð¸Ð¼Ð°Ñ Ñ‚Ð¾Ñ‡ÐºÐ° Ð² ÑÑ‚Ð¾Ñ‚ Ñ…Ð¾Ð´"
+msgstr "самая дальняя достижимая точка в этот ход"
 
 #. Spatial.Health
 msgctxt "Spatial.Health"
 msgid "{0} / {1} health"
-msgstr "{0} / {1} Ð·Ð´Ð¾Ñ€Ð¾Ð²ÑŒÑ"
+msgstr "{0} / {1} здоровья"
 
 #. Spatial.Here
 msgctxt "Spatial.Here"
 msgid "here"
-msgstr "Ð·Ð´ÐµÑÑŒ"
+msgstr "здесь"
 
 #. Spatial.Impassable
 msgctxt "Spatial.Impassable"
 msgid "impassable"
-msgstr "Ð½ÐµÐ¿Ñ€Ð¾Ñ…Ð¾Ð´Ð¸Ð¼Ð¾"
+msgstr "непроходимо"
 
 #. Spatial.InteractionPoint
 msgctxt "Spatial.InteractionPoint"
 msgid "Interaction point"
-msgstr "Ð¢Ð¾Ñ‡ÐºÐ° Ð²Ð·Ð°Ð¸Ð¼Ð¾Ð´ÐµÐ¹ÑÑ‚Ð²Ð¸Ñ"
+msgstr "Точка взаимодействия"
 
 #. Spatial.Interactable
 msgctxt "Spatial.Interactable"
 msgid "interactable"
-msgstr "Ð´Ð¾ÑÑ‚ÑƒÐ¿Ð½Ð¾ Ð´Ð»Ñ Ð²Ð·Ð°Ð¸Ð¼Ð¾Ð´ÐµÐ¹ÑÑ‚Ð²Ð¸Ñ"
+msgstr "доступно для взаимодействия"
 
 #. Spatial.InteractableNextTurn
 msgctxt "Spatial.InteractableNextTurn"
 msgid "interactable next turn"
-msgstr "Ð´Ð¾ÑÑ‚ÑƒÐ¿Ð½Ð¾ Ð´Ð»Ñ Ð²Ð·Ð°Ð¸Ð¼Ð¾Ð´ÐµÐ¹ÑÑ‚Ð²Ð¸Ñ Ð² ÑÐ»ÐµÐ´ÑƒÑŽÑ‰Ð¸Ð¹ Ñ…Ð¾Ð´"
+msgstr "доступно для взаимодействия в следующий ход"
 
 #. Spatial.Kills
 msgctxt "Spatial.Kills"
 msgid "kills {0}"
-msgstr "ÑƒÐ±Ð¸Ð²Ð°ÐµÑ‚ {0}"
+msgstr "убивает {0}"
 
 #. Spatial.MayDestroy
 msgctxt "Spatial.MayDestroy"
 msgid "may destroy"
-msgstr "Ð¼Ð¾Ð¶ÐµÑ‚ ÑƒÐ½Ð¸Ñ‡Ñ‚Ð¾Ð¶Ð¸Ñ‚ÑŒ"
+msgstr "может уничтожить"
 
 #. Spatial.Movement
 msgctxt "Spatial.Movement"
 msgid "Movement"
-msgstr "ÐŸÐµÑ€ÐµÐ´Ð²Ð¸Ð¶ÐµÐ½Ð¸Ðµ"
+msgstr "Передвижение"
 
 #. Spatial.MovementRange
 msgctxt "Spatial.MovementRange"
@@ -1923,72 +1923,72 @@ msgstr "Дальность передвижения"
 #. Spatial.Neutral
 msgctxt "Spatial.Neutral"
 msgid "neutral"
-msgstr "Ð½ÐµÐ¹Ñ‚Ñ€Ð°Ð»ÑŒÐ½Ñ‹Ð¹"
+msgstr "нейтральный"
 
 #. Spatial.NoRoutePreview
 msgctxt "Spatial.NoRoutePreview"
 msgid "no route preview"
-msgstr "Ð½ÐµÑ‚ Ð¿Ñ€ÐµÐ´Ð¿Ñ€Ð¾ÑÐ¼Ð¾Ñ‚Ñ€Ð° Ð¼Ð°Ñ€ÑˆÑ€ÑƒÑ‚Ð°"
+msgstr "нет предпросмотра маршрута"
 
 #. Spatial.OnRoute
 msgctxt "Spatial.OnRoute"
 msgid "On route"
-msgstr "ÐÐ° Ð¼Ð°Ñ€ÑˆÑ€ÑƒÑ‚Ðµ"
+msgstr "На маршруте"
 
 #. Spatial.PrimaryPrefix
 msgctxt "Spatial.PrimaryPrefix"
 msgid "primary "
-msgstr "Ð¾ÑÐ½Ð¾Ð²Ð½Ð°Ñ "
+msgstr "основная "
 
 #. Spatial.RangeAndMovement
 msgctxt "Spatial.RangeAndMovement"
 msgid "{0} and movement range"
-msgstr "{0} Ð¸ Ð´Ð°Ð»ÑŒÐ½Ð¾ÑÑ‚ÑŒ Ð¿ÐµÑ€ÐµÐ´Ð²Ð¸Ð¶ÐµÐ½Ð¸Ñ"
+msgstr "{0} и дальность передвижения"
 
 #. Spatial.Reachable
 msgctxt "Spatial.Reachable"
 msgid "reachable"
-msgstr "Ð´Ð¾ÑÑ‚Ð¸Ð¶Ð¸Ð¼Ð¾"
+msgstr "достижимо"
 
 #. Spatial.SpawnPoint
 msgctxt "Spatial.SpawnPoint"
 msgid "spawn point"
-msgstr "Ñ‚Ð¾Ñ‡ÐºÐ° Ð¿Ð¾ÑÐ²Ð»ÐµÐ½Ð¸Ñ"
+msgstr "точка появления"
 
 #. Spatial.Threatened
 msgctxt "Spatial.Threatened"
 msgid "Threatened"
-msgstr "ÐŸÐ¾Ð´ ÑƒÐ³Ñ€Ð¾Ð·Ð¾Ð¹"
+msgstr "Под угрозой"
 
 #. Spatial.ThisTurnAt
 msgctxt "Spatial.ThisTurnAt"
 msgid "This turn: {0}"
-msgstr "Ð’ ÑÑ‚Ð¾Ñ‚ Ñ…Ð¾Ð´: {0}"
+msgstr "В этот ход: {0}"
 
 #. Spatial.TurnsIn
 msgctxt "Spatial.TurnsIn"
 msgid "in {0} turns"
-msgstr "Ñ‡ÐµÑ€ÐµÐ· {0} Ñ…Ð¾Ð´Ð°"
+msgstr "через {0} хода"
 
 #. Spatial.Unexplored
 msgctxt "Spatial.Unexplored"
 msgid "Unexplored"
-msgstr "ÐÐµ Ð¸ÑÑÐ»ÐµÐ´Ð¾Ð²Ð°Ð½Ð¾"
+msgstr "Не исследовано"
 
 #. Spatial.Unseen
 msgctxt "Spatial.Unseen"
 msgid "Unseen"
-msgstr "ÐÐµ Ð²Ð¸Ð´Ð½Ð¾"
+msgstr "Не видно"
 
 #. Spatial.VisitedSuffix
 msgctxt "Spatial.VisitedSuffix"
 msgid "{0} (visited)"
-msgstr "{0} (Ð¿Ð¾ÑÐµÑ‰ÐµÐ½Ð¾)"
+msgstr "{0} (посещено)"
 
 #. Spatial.WithinZoneOfControl
 msgctxt "Spatial.WithinZoneOfControl"
 msgid "Within {0} zone of control"
-msgstr "Ð’ Ð·Ð¾Ð½Ðµ ÐºÐ¾Ð½Ñ‚Ñ€Ð¾Ð»Ñ {0}"
+msgstr "В зоне контроля {0}"
 
 #. Spatial.ZoneOfControl
 msgctxt "Spatial.ZoneOfControl"
@@ -1998,12 +1998,12 @@ msgstr "Зона контроля"
 #. Spatial.ZoneOfControlTiles
 msgctxt "Spatial.ZoneOfControlTiles"
 msgid "{0} within {1} zone of control"
-msgstr "{0} Ð² Ð·Ð¾Ð½Ðµ ÐºÐ¾Ð½Ñ‚Ñ€Ð¾Ð»Ñ {1}"
+msgstr "{0} в зоне контроля {1}"
 
 #. Screens.AiControl
 msgctxt "Screens.AiControl"
 msgid "AI control"
-msgstr "Ð£Ð¿Ñ€Ð°Ð²Ð»ÐµÐ½Ð¸Ðµ Ð˜Ð˜"
+msgstr "Управление ИИ"
 
 #. Screens.AiDifficulty
 msgctxt "Screens.AiDifficulty"
@@ -2013,122 +2013,122 @@ msgstr "ИИ {0}"
 #. Screens.Attacker
 msgctxt "Screens.Attacker"
 msgid "Attacker"
-msgstr "ÐÑ‚Ð°ÐºÑƒÑŽÑ‰Ð¸Ð¹"
+msgstr "Атакующий"
 
 #. Screens.AttackerPortrait
 msgctxt "Screens.AttackerPortrait"
 msgid "Attacker portrait"
-msgstr "ÐŸÐ¾Ñ€Ñ‚Ñ€ÐµÑ‚ Ð°Ñ‚Ð°ÐºÑƒÑŽÑ‰ÐµÐ³Ð¾"
+msgstr "Портрет атакующего"
 
 #. Screens.CombatPortraitDetail
 msgctxt "Screens.CombatPortraitDetail"
 msgid "{0}, {1}, level {2}"
-msgstr "{0}, {1}, ÑƒÑ€Ð¾Ð²ÐµÐ½ÑŒ {2}"
+msgstr "{0}, {1}, уровень {2}"
 
 #. Screens.Defender
 msgctxt "Screens.Defender"
 msgid "Defender"
-msgstr "Ð—Ð°Ñ‰Ð¸Ñ‚Ð½Ð¸Ðº"
+msgstr "Защитник"
 
 #. Screens.DefenderPortrait
 msgctxt "Screens.DefenderPortrait"
 msgid "Defender portrait"
-msgstr "ÐŸÐ¾Ñ€Ñ‚Ñ€ÐµÑ‚ Ð·Ð°Ñ‰Ð¸Ñ‚Ð½Ð¸ÐºÐ°"
+msgstr "Портрет защитника"
 
 #. Screens.LevelValue
 msgctxt "Screens.LevelValue"
 msgid "level {0}"
-msgstr "ÑƒÑ€Ð¾Ð²ÐµÐ½ÑŒ {0}"
+msgstr "уровень {0}"
 
 #. Scanner.All
 msgctxt "Scanner.All"
 msgid "All"
-msgstr "Ð’ÑÐµ"
+msgstr "Все"
 
 #. Scanner.ArtifactMarkets
 msgctxt "Scanner.ArtifactMarkets"
 msgid "Artifact markets"
-msgstr "Ð Ñ‹Ð½ÐºÐ¸ Ð°Ñ€Ñ‚ÐµÑ„Ð°ÐºÑ‚Ð¾Ð²"
+msgstr "Рынки артефактов"
 
 #. Scanner.Attackable
 msgctxt "Scanner.Attackable"
 msgid "Attackable"
-msgstr "ÐœÐ¾Ð¶Ð½Ð¾ Ð°Ñ‚Ð°ÐºÐ¾Ð²Ð°Ñ‚ÑŒ"
+msgstr "Можно атаковать"
 
 #. Scanner.Beacons
 msgctxt "Scanner.Beacons"
 msgid "Beacons"
-msgstr "ÐœÐ°ÑÐºÐ¸"
+msgstr "Маяки"
 
 #. Scanner.Blocked
 msgctxt "Scanner.Blocked"
 msgid "Blocked"
-msgstr "Ð—Ð°Ð±Ð»Ð¾ÐºÐ¸Ñ€Ð¾Ð²Ð°Ð½Ð¾"
+msgstr "Заблокировано"
 
 #. Scanner.Bridges
 msgctxt "Scanner.Bridges"
 msgid "Bridges"
-msgstr "ÐœÐ¾ÑÑ‚Ñ‹"
+msgstr "Мосты"
 
 #. Scanner.Buildings
 msgctxt "Scanner.Buildings"
 msgid "Buildings"
-msgstr "Ð—Ð´Ð°Ð½Ð¸Ñ"
+msgstr "Здания"
 
 #. Scanner.Dangerous
 msgctxt "Scanner.Dangerous"
 msgid "Dangerous"
-msgstr "ÐžÐ¿Ð°ÑÐ½Ð¾"
+msgstr "Опасно"
 
 #. Scanner.East
 msgctxt "Scanner.East"
 msgid "east"
-msgstr "Ð²Ð¾ÑÑ‚Ð¾Ðº"
+msgstr "восток"
 
 #. Scanner.ElevatedGround
 msgctxt "Scanner.ElevatedGround"
 msgid "Elevated ground {0}"
-msgstr "Ð’Ð¾Ð·Ð²Ñ‹ÑˆÐµÐ½Ð½Ð¾ÑÑ‚ÑŒ {0}"
+msgstr "Возвышенность {0}"
 
 #. Scanner.Enemy
 msgctxt "Scanner.Enemy"
 msgid "Enemy"
-msgstr "Ð’Ñ€Ð°Ð³"
+msgstr "Враг"
 
 #. Scanner.EnemyGates
 msgctxt "Scanner.EnemyGates"
 msgid "Enemy gates"
-msgstr "Ð’Ñ€Ð°Ð¶ÐµÑÐºÐ¸Ðµ Ð²Ð¾Ñ€Ð¾Ñ‚Ð°"
+msgstr "Вражеские ворота"
 
 #. Scanner.Entities
 msgctxt "Scanner.Entities"
 msgid "Entities"
-msgstr "ÐžÐ±ÑŠÐµÐºÑ‚Ñ‹"
+msgstr "Объекты"
 
 #. Scanner.Friendly
 msgctxt "Scanner.Friendly"
 msgid "Friendly"
-msgstr "Ð”Ñ€ÑƒÐ¶ÐµÑÑ‚Ð²ÐµÐ½Ð½Ñ‹Ð¹"
+msgstr "Дружественный"
 
 #. Scanner.FriendlyGates
 msgctxt "Scanner.FriendlyGates"
 msgid "Friendly gates"
-msgstr "Ð”Ñ€ÑƒÐ¶ÐµÑÑ‚Ð²ÐµÐ½Ð½Ñ‹Ðµ Ð²Ð¾Ñ€Ð¾Ñ‚Ð°"
+msgstr "Дружественные ворота"
 
 #. Scanner.Impassable
 msgctxt "Scanner.Impassable"
 msgid "Impassable"
-msgstr "ÐÐµÐ¿Ñ€Ð¾Ñ…Ð¾Ð´Ð¸Ð¼Ð¾"
+msgstr "Непроходимо"
 
 #. Scanner.ImpassableTerrain
 msgctxt "Scanner.ImpassableTerrain"
 msgid "Impassable terrain"
-msgstr "ÐÐµÐ¿Ñ€Ð¾Ñ…Ð¾Ð´Ð¸Ð¼Ð°Ñ Ð¼ÐµÑÑ‚Ð½Ð¾ÑÑ‚ÑŒ"
+msgstr "Непроходимая местность"
 
 #. Scanner.Knowledge
 msgctxt "Scanner.Knowledge"
 msgid "Knowledge"
-msgstr "Ð—Ð½Ð°Ð½Ð¸Ðµ"
+msgstr "Знание"
 
 #. Scanner.LookAround
 msgctxt "Scanner.LookAround"
@@ -2143,42 +2143,42 @@ msgstr "Радиус осмотра {0}"
 #. Scanner.Neutral
 msgctxt "Scanner.Neutral"
 msgid "Neutral"
-msgstr "ÐÐµÐ¹Ñ‚Ñ€Ð°Ð»ÑŒÐ½Ñ‹Ð¹"
+msgstr "Нейтральный"
 
 #. Scanner.North
 msgctxt "Scanner.North"
 msgid "north"
-msgstr "ÑÐµÐ²ÐµÑ€"
+msgstr "север"
 
 #. Scanner.Northeast
 msgctxt "Scanner.Northeast"
 msgid "northeast"
-msgstr "ÑÐµÐ²ÐµÑ€Ð¾-Ð²Ð¾ÑÑ‚Ð¾Ðº"
+msgstr "северо-восток"
 
 #. Scanner.Northwest
 msgctxt "Scanner.Northwest"
 msgid "northwest"
-msgstr "ÑÐµÐ²ÐµÑ€Ð¾-Ð·Ð°Ð¿Ð°Ð´"
+msgstr "северо-запад"
 
 #. Scanner.Objectives
 msgctxt "Scanner.Objectives"
 msgid "Objectives"
-msgstr "Ð¦ÐµÐ»Ð¸"
+msgstr "Цели"
 
 #. Scanner.Obstacles
 msgctxt "Scanner.Obstacles"
 msgid "Obstacles"
-msgstr "ÐŸÑ€ÐµÐ¿ÑÑ‚ÑÑ‚Ð²Ð¸Ñ"
+msgstr "Препятствия"
 
 #. Scanner.Pickups
 msgctxt "Scanner.Pickups"
 msgid "Pickups"
-msgstr "ÐŸÐ¾Ð´Ð±Ð¸Ñ€Ð°ÐµÐ¼Ð¾Ðµ"
+msgstr "Подбираемое"
 
 #. Scanner.Power
 msgctxt "Scanner.Power"
 msgid "Power"
-msgstr "Ð¡Ð¸Ð»Ð°"
+msgstr "Сила"
 
 #. Scanner.Revealed
 msgctxt "Scanner.Revealed"
@@ -2193,12 +2193,12 @@ msgstr "Генераторы ресурсов"
 #. Scanner.Riches
 msgctxt "Scanner.Riches"
 msgid "Riches"
-msgstr "Ð‘Ð¾Ð³Ð°Ñ‚ÑÑ‚Ð²Ð°"
+msgstr "Богатства"
 
 #. Scanner.Roads
 msgctxt "Scanner.Roads"
 msgid "Roads"
-msgstr "Ð”Ð¾Ñ€Ð¾Ð³Ð¸"
+msgstr "Дороги"
 
 #. Scanner.Search
 msgctxt "Scanner.Search"
@@ -2218,57 +2218,57 @@ msgstr "Результаты поиска"
 #. Scanner.SettlementsAndBuildSites
 msgctxt "Scanner.SettlementsAndBuildSites"
 msgid "Settlements and Build sites"
-msgstr "ÐŸÐ¾ÑÐµÐ»ÐµÐ½Ð¸Ñ Ð¸ ÑÑ‚Ñ€Ð¾Ð¹Ð¿Ð»Ð¾Ñ‰Ð°Ð´ÐºÐ¸"
+msgstr "Поселения и стройплощадки"
 
 #. Scanner.South
 msgctxt "Scanner.South"
 msgid "south"
-msgstr "ÑŽÐ³"
+msgstr "юг"
 
 #. Scanner.Southeast
 msgctxt "Scanner.Southeast"
 msgid "southeast"
-msgstr "ÑŽÐ³Ð¾-Ð²Ð¾ÑÑ‚Ð¾Ðº"
+msgstr "юго-восток"
 
 #. Scanner.Southwest
 msgctxt "Scanner.Southwest"
 msgid "southwest"
-msgstr "ÑŽÐ³Ð¾-Ð·Ð°Ð¿Ð°Ð´"
+msgstr "юго-запад"
 
 #. Scanner.Teleport
 msgctxt "Scanner.Teleport"
 msgid "Teleport"
-msgstr "Ð¢ÐµÐ»ÐµÐ¿Ð¾Ñ€Ñ‚"
+msgstr "Телепорт"
 
 #. Scanner.Terrain
 msgctxt "Scanner.Terrain"
 msgid "Terrain"
-msgstr "ÐœÐµÑÑ‚Ð½Ð¾ÑÑ‚ÑŒ"
+msgstr "Местность"
 
 #. Scanner.TroopSources
 msgctxt "Scanner.TroopSources"
 msgid "Troop sources"
-msgstr "Ð˜ÑÑ‚Ð¾Ñ‡Ð½Ð¸ÐºÐ¸ Ð²Ð¾Ð¹ÑÐº"
+msgstr "Источники войск"
 
 #. Scanner.Troops
 msgctxt "Scanner.Troops"
 msgid "Troops"
-msgstr "Ð’Ð¾Ð¹ÑÐºÐ°"
+msgstr "Войска"
 
 #. Scanner.Unvisited
 msgctxt "Scanner.Unvisited"
 msgid "Unvisited"
-msgstr "ÐÐµ Ð¿Ð¾ÑÐµÑ‰ÐµÐ½Ð¾"
+msgstr "Не посещено"
 
 #. Scanner.Water
 msgctxt "Scanner.Water"
 msgid "Water"
-msgstr "Ð’Ð¾Ð´Ð°"
+msgstr "Вода"
 
 #. Scanner.West
 msgctxt "Scanner.West"
 msgid "west"
-msgstr "Ð·Ð°Ð¿Ð°Ð´"
+msgstr "запад"
 
 #. Screens.BuyResourceForGold
 msgctxt "Screens.BuyResourceForGold"
@@ -2283,142 +2283,142 @@ msgstr "Продать {0} за {1}"
 #. Scanner.Wielders
 msgctxt "Scanner.Wielders"
 msgid "Wielders"
-msgstr "Ð’Ð»Ð°Ð´ÐµÐ»ÑŒÑ†Ñ‹"
+msgstr "Владельцы"
 
 #. Scanner.BlockedTileCount_0
 msgctxt "Scanner.BlockedTileCount_0"
 msgid "{0} blocked tile"
-msgstr "{0} Ð·Ð°Ð±Ð»Ð¾ÐºÐ¸Ñ€Ð¾Ð²Ð°Ð½Ð½Ð°Ñ ÐºÐ»ÐµÑ‚ÐºÐ°"
+msgstr "{0} заблокированная клетка"
 
 #. Scanner.BlockedTileCount_1
 msgctxt "Scanner.BlockedTileCount_1"
 msgid "{0} blocked tiles"
-msgstr "{0} Ð·Ð°Ð±Ð»Ð¾ÐºÐ¸Ñ€Ð¾Ð²Ð°Ð½Ð½Ñ‹Ðµ ÐºÐ»ÐµÑ‚ÐºÐ¸"
+msgstr "{0} заблокированные клетки"
 
 #. Scanner.BlockedTileCount_2
 msgctxt "Scanner.BlockedTileCount_2"
 msgid "{0} blocked tiles"
-msgstr "{0} Ð·Ð°Ð±Ð»Ð¾ÐºÐ¸Ñ€Ð¾Ð²Ð°Ð½Ð½Ñ‹Ñ… ÐºÐ»ÐµÑ‚Ð¾Ðº"
+msgstr "{0} заблокированных клеток"
 
 #. Scanner.BridgeTileCount_0
 msgctxt "Scanner.BridgeTileCount_0"
 msgid "{0} bridge tile"
-msgstr "{0} ÐºÐ»ÐµÑ‚ÐºÐ° Ð¼Ð¾ÑÑ‚Ð°"
+msgstr "{0} клетка моста"
 
 #. Scanner.BridgeTileCount_1
 msgctxt "Scanner.BridgeTileCount_1"
 msgid "{0} bridge tiles"
-msgstr "{0} ÐºÐ»ÐµÑ‚ÐºÐ¸ Ð¼Ð¾ÑÑ‚Ð°"
+msgstr "{0} клетки моста"
 
 #. Scanner.BridgeTileCount_2
 msgctxt "Scanner.BridgeTileCount_2"
 msgid "{0} bridge tiles"
-msgstr "{0} ÐºÐ»ÐµÑ‚Ð¾Ðº Ð¼Ð¾ÑÑ‚Ð°"
+msgstr "{0} клеток моста"
 
 #. Scanner.ImpassableTileCount_0
 msgctxt "Scanner.ImpassableTileCount_0"
 msgid "{0} impassable tile"
-msgstr "{0} Ð½ÐµÐ¿Ñ€Ð¾Ñ…Ð¾Ð´Ð¸Ð¼Ð°Ñ ÐºÐ»ÐµÑ‚ÐºÐ°"
+msgstr "{0} непроходимая клетка"
 
 #. Scanner.ImpassableTileCount_1
 msgctxt "Scanner.ImpassableTileCount_1"
 msgid "{0} impassable tiles"
-msgstr "{0} Ð½ÐµÐ¿Ñ€Ð¾Ñ…Ð¾Ð´Ð¸Ð¼Ñ‹Ðµ ÐºÐ»ÐµÑ‚ÐºÐ¸"
+msgstr "{0} непроходимые клетки"
 
 #. Scanner.ImpassableTileCount_2
 msgctxt "Scanner.ImpassableTileCount_2"
 msgid "{0} impassable tiles"
-msgstr "{0} Ð½ÐµÐ¿Ñ€Ð¾Ñ…Ð¾Ð´Ð¸Ð¼Ñ‹Ñ… ÐºÐ»ÐµÑ‚Ð¾Ðº"
+msgstr "{0} непроходимых клеток"
 
 #. Scanner.RoadTileCount_0
 msgctxt "Scanner.RoadTileCount_0"
 msgid "{0} road tile"
-msgstr "{0} ÐºÐ»ÐµÑ‚ÐºÐ° Ð´Ð¾Ñ€Ð¾Ð³Ð¸"
+msgstr "{0} клетка дороги"
 
 #. Scanner.RoadTileCount_1
 msgctxt "Scanner.RoadTileCount_1"
 msgid "{0} road tiles"
-msgstr "{0} ÐºÐ»ÐµÑ‚ÐºÐ¸ Ð´Ð¾Ñ€Ð¾Ð³Ð¸"
+msgstr "{0} клетки дороги"
 
 #. Scanner.RoadTileCount_2
 msgctxt "Scanner.RoadTileCount_2"
 msgid "{0} road tiles"
-msgstr "{0} ÐºÐ»ÐµÑ‚Ð¾Ðº Ð´Ð¾Ñ€Ð¾Ð³Ð¸"
+msgstr "{0} клеток дороги"
 
 #. Scanner.WaterTileCount_0
 msgctxt "Scanner.WaterTileCount_0"
 msgid "{0} water tile"
-msgstr "{0} ÐºÐ»ÐµÑ‚ÐºÐ° Ð²Ð¾Ð´Ñ‹"
+msgstr "{0} клетка воды"
 
 #. Scanner.WaterTileCount_1
 msgctxt "Scanner.WaterTileCount_1"
 msgid "{0} water tiles"
-msgstr "{0} ÐºÐ»ÐµÑ‚ÐºÐ¸ Ð²Ð¾Ð´Ñ‹"
+msgstr "{0} клетки воды"
 
 #. Scanner.WaterTileCount_2
 msgctxt "Scanner.WaterTileCount_2"
 msgid "{0} water tiles"
-msgstr "{0} ÐºÐ»ÐµÑ‚Ð¾Ðº Ð²Ð¾Ð´Ñ‹"
+msgstr "{0} клеток воды"
 
 #. Spatial.AridTrees
 msgctxt "Spatial.AridTrees"
 msgid "Arid trees"
-msgstr "Ð—Ð°ÑÑƒÑˆÐ»Ð¸Ð²Ñ‹Ðµ Ð´ÐµÑ€ÐµÐ²ÑŒÑ"
+msgstr "Засушливые деревья"
 
 #. Spatial.Bridge
 msgctxt "Spatial.Bridge"
 msgid "Bridge"
-msgstr "ÐœÐ¾ÑÑ‚"
+msgstr "Мост"
 
 #. Spatial.CobblestoneRoad
 msgctxt "Spatial.CobblestoneRoad"
 msgid "Cobblestone road"
-msgstr "ÐœÐ¾Ñ‰Ñ‘Ð½Ð°Ñ Ð´Ð¾Ñ€Ð¾Ð³Ð°"
+msgstr "Мощёная дорога"
 
 #. Spatial.DeepWater
 msgctxt "Spatial.DeepWater"
 msgid "Deep water"
-msgstr "Ð“Ð»ÑƒÐ±Ð¾ÐºÐ°Ñ Ð²Ð¾Ð´Ð°"
+msgstr "Глубокая вода"
 
 #. Spatial.Deforestation
 msgctxt "Spatial.Deforestation"
 msgid "Deforestation"
-msgstr "Ð’Ñ‹Ñ€ÑƒÐ±ÐºÐ° Ð»ÐµÑÐ°"
+msgstr "Вырубка леса"
 
 #. Spatial.DirtRoad
 msgctxt "Spatial.DirtRoad"
 msgid "Dirt road"
-msgstr "Ð“Ñ€ÑƒÐ½Ñ‚Ð¾Ð²Ð°Ñ Ð´Ð¾Ñ€Ð¾Ð³Ð°"
+msgstr "Грунтовая дорога"
 
 #. Spatial.Farmland
 msgctxt "Spatial.Farmland"
 msgid "Farmland"
-msgstr "ÐŸÐ°ÑˆÐ½Ñ"
+msgstr "Пашня"
 
 #. Spatial.Road
 msgctxt "Spatial.Road"
 msgid "Road"
-msgstr "Ð”Ð¾Ñ€Ð¾Ð³Ð°"
+msgstr "Дорога"
 
 #. Spatial.ShallowWater
 msgctxt "Spatial.ShallowWater"
 msgid "Shallow water"
-msgstr "ÐœÐµÐ»ÐºÐ¾Ð²Ð¾Ð´ÑŒÐµ"
+msgstr "Мелководье"
 
 #. Spatial.Wall
 msgctxt "Spatial.Wall"
 msgid "Wall"
-msgstr "Ð¡Ñ‚ÐµÐ½Ð°"
+msgstr "Стена"
 
 #. Spatial.Water
 msgctxt "Spatial.Water"
 msgid "Water"
-msgstr "Ð’Ð¾Ð´Ð°"
+msgstr "Вода"
 
 #. Spatial.WaterEdge
 msgctxt "Spatial.WaterEdge"
 msgid "Water edge"
-msgstr "ÐšÑ€Ð°Ð¹ Ð²Ð¾Ð´Ñ‹"
+msgstr "Край воды"
 
 #. Screens.MoveAllLeft
 msgctxt "Screens.MoveAllLeft"
@@ -2534,307 +2534,307 @@ msgstr "ваши стрелковые отряды"
 #. Scanner.AridTrees
 msgctxt "Scanner.AridTrees"
 msgid "Arid trees"
-msgstr "Zasushlivye derevya"
+msgstr "Засушливые деревья"
 
 #. Scanner.CobblestoneRoads
 msgctxt "Scanner.CobblestoneRoads"
 msgid "Cobblestone roads"
-msgstr "Moshchenye dorogi"
+msgstr "Мощеные дороги"
 
 #. Scanner.DeepWater
 msgctxt "Scanner.DeepWater"
 msgid "Deep water"
-msgstr "Glubokaya voda"
+msgstr "Глубокая вода"
 
 #. Scanner.Deforestation
 msgctxt "Scanner.Deforestation"
 msgid "Deforestation"
-msgstr "Vyrubka lesa"
+msgstr "Вырубка леса"
 
 #. Scanner.Dirt
 msgctxt "Scanner.Dirt"
 msgid "Dirt"
-msgstr "Zemlya"
+msgstr "Земля"
 
 #. Scanner.DirtRoads
 msgctxt "Scanner.DirtRoads"
 msgid "Dirt roads"
-msgstr "Gruntovye dorogi"
+msgstr "Грунтовые дороги"
 
 #. Scanner.Farmland
 msgctxt "Scanner.Farmland"
 msgid "Farmland"
-msgstr "Selkhozugodya"
+msgstr "Сельхозугодья"
 
 #. Scanner.Grass
 msgctxt "Scanner.Grass"
 msgid "Grass"
-msgstr "Trava"
+msgstr "Трава"
 
 #. Scanner.Mountains
 msgctxt "Scanner.Mountains"
 msgid "Mountains"
-msgstr "Gory"
+msgstr "Горы"
 
 #. Scanner.Sand
 msgctxt "Scanner.Sand"
 msgid "Sand"
-msgstr "Pesok"
+msgstr "Песок"
 
 #. Scanner.ShallowWater
 msgctxt "Scanner.ShallowWater"
 msgid "Shallow water"
-msgstr "Melkovode"
+msgstr "Мелководье"
 
 #. Scanner.TemperateTrees
 msgctxt "Scanner.TemperateTrees"
 msgid "Temperate trees"
-msgstr "Derevya umerennogo klimata"
+msgstr "Деревья умеренного климата"
 
 #. Scanner.Walls
 msgctxt "Scanner.Walls"
 msgid "Walls"
-msgstr "Steny"
+msgstr "Стены"
 
 #. Scanner.WaterEdge
 msgctxt "Scanner.WaterEdge"
 msgid "Water edge"
-msgstr "Krai vody"
+msgstr "Край воды"
 
 #. Spatial.Dirt
 msgctxt "Spatial.Dirt"
 msgid "Dirt"
-msgstr "Zemlya"
+msgstr "Земля"
 
 #. Spatial.Grass
 msgctxt "Spatial.Grass"
 msgid "Grass"
-msgstr "Trava"
+msgstr "Трава"
 
 #. Spatial.Mountain
 msgctxt "Spatial.Mountain"
 msgid "Mountain"
-msgstr "Gora"
+msgstr "Гора"
 
 #. Spatial.Sand
 msgctxt "Spatial.Sand"
 msgid "Sand"
-msgstr "Pesok"
+msgstr "Песок"
 
 #. Spatial.TemperateTrees
 msgctxt "Spatial.TemperateTrees"
 msgid "Temperate trees"
-msgstr "Derevya umerennogo klimata"
+msgstr "Деревья умеренного климата"
 
 #. Scanner.AridTreeTileCount_0
 msgctxt "Scanner.AridTreeTileCount_0"
 msgid "{0} arid tree tile"
-msgstr "{0} kletka: Zasushlivye derevya"
+msgstr "{0} клетка: засушливые деревья"
 
 #. Scanner.AridTreeTileCount_1
 msgctxt "Scanner.AridTreeTileCount_1"
 msgid "{0} arid tree tiles"
-msgstr "{0} kletki: Zasushlivye derevya"
+msgstr "{0} клетки: засушливые деревья"
 
 #. Scanner.AridTreeTileCount_2
 msgctxt "Scanner.AridTreeTileCount_2"
 msgid "{0} arid tree tiles"
-msgstr "{0} kletki: Zasushlivye derevya"
+msgstr "{0} клетки: засушливые деревья"
 
 #. Scanner.CobblestoneRoadTileCount_0
 msgctxt "Scanner.CobblestoneRoadTileCount_0"
 msgid "{0} cobblestone road tile"
-msgstr "{0} kletka: Moshchenye dorogi"
+msgstr "{0} клетка: мощеные дороги"
 
 #. Scanner.CobblestoneRoadTileCount_1
 msgctxt "Scanner.CobblestoneRoadTileCount_1"
 msgid "{0} cobblestone road tiles"
-msgstr "{0} kletki: Moshchenye dorogi"
+msgstr "{0} клетки: мощеные дороги"
 
 #. Scanner.CobblestoneRoadTileCount_2
 msgctxt "Scanner.CobblestoneRoadTileCount_2"
 msgid "{0} cobblestone road tiles"
-msgstr "{0} kletki: Moshchenye dorogi"
+msgstr "{0} клетки: мощеные дороги"
 
 #. Scanner.DeepWaterTileCount_0
 msgctxt "Scanner.DeepWaterTileCount_0"
 msgid "{0} deep water tile"
-msgstr "{0} kletka: Glubokaya voda"
+msgstr "{0} клетка: глубокая вода"
 
 #. Scanner.DeepWaterTileCount_1
 msgctxt "Scanner.DeepWaterTileCount_1"
 msgid "{0} deep water tiles"
-msgstr "{0} kletki: Glubokaya voda"
+msgstr "{0} клетки: глубокая вода"
 
 #. Scanner.DeepWaterTileCount_2
 msgctxt "Scanner.DeepWaterTileCount_2"
 msgid "{0} deep water tiles"
-msgstr "{0} kletki: Glubokaya voda"
+msgstr "{0} клетки: глубокая вода"
 
 #. Scanner.DeforestationTileCount_0
 msgctxt "Scanner.DeforestationTileCount_0"
 msgid "{0} deforestation tile"
-msgstr "{0} kletka: Vyrubka lesa"
+msgstr "{0} клетка: вырубка леса"
 
 #. Scanner.DeforestationTileCount_1
 msgctxt "Scanner.DeforestationTileCount_1"
 msgid "{0} deforestation tiles"
-msgstr "{0} kletki: Vyrubka lesa"
+msgstr "{0} клетки: вырубка леса"
 
 #. Scanner.DeforestationTileCount_2
 msgctxt "Scanner.DeforestationTileCount_2"
 msgid "{0} deforestation tiles"
-msgstr "{0} kletki: Vyrubka lesa"
+msgstr "{0} клетки: вырубка леса"
 
 #. Scanner.DirtRoadTileCount_0
 msgctxt "Scanner.DirtRoadTileCount_0"
 msgid "{0} dirt road tile"
-msgstr "{0} kletka: Gruntovye dorogi"
+msgstr "{0} клетка: грунтовые дороги"
 
 #. Scanner.DirtRoadTileCount_1
 msgctxt "Scanner.DirtRoadTileCount_1"
 msgid "{0} dirt road tiles"
-msgstr "{0} kletki: Gruntovye dorogi"
+msgstr "{0} клетки: грунтовые дороги"
 
 #. Scanner.DirtRoadTileCount_2
 msgctxt "Scanner.DirtRoadTileCount_2"
 msgid "{0} dirt road tiles"
-msgstr "{0} kletki: Gruntovye dorogi"
+msgstr "{0} клетки: грунтовые дороги"
 
 #. Scanner.DirtTileCount_0
 msgctxt "Scanner.DirtTileCount_0"
 msgid "{0} dirt tile"
-msgstr "{0} kletka: Zemlya"
+msgstr "{0} клетка: земля"
 
 #. Scanner.DirtTileCount_1
 msgctxt "Scanner.DirtTileCount_1"
 msgid "{0} dirt tiles"
-msgstr "{0} kletki: Zemlya"
+msgstr "{0} клетки: земля"
 
 #. Scanner.DirtTileCount_2
 msgctxt "Scanner.DirtTileCount_2"
 msgid "{0} dirt tiles"
-msgstr "{0} kletki: Zemlya"
+msgstr "{0} клетки: земля"
 
 #. Scanner.FarmlandTileCount_0
 msgctxt "Scanner.FarmlandTileCount_0"
 msgid "{0} farmland tile"
-msgstr "{0} kletka: Selkhozugodya"
+msgstr "{0} клетка: сельхозугодья"
 
 #. Scanner.FarmlandTileCount_1
 msgctxt "Scanner.FarmlandTileCount_1"
 msgid "{0} farmland tiles"
-msgstr "{0} kletki: Selkhozugodya"
+msgstr "{0} клетки: сельхозугодья"
 
 #. Scanner.FarmlandTileCount_2
 msgctxt "Scanner.FarmlandTileCount_2"
 msgid "{0} farmland tiles"
-msgstr "{0} kletki: Selkhozugodya"
+msgstr "{0} клетки: сельхозугодья"
 
 #. Scanner.GrassTileCount_0
 msgctxt "Scanner.GrassTileCount_0"
 msgid "{0} grass tile"
-msgstr "{0} kletka: Trava"
+msgstr "{0} клетка: трава"
 
 #. Scanner.GrassTileCount_1
 msgctxt "Scanner.GrassTileCount_1"
 msgid "{0} grass tiles"
-msgstr "{0} kletki: Trava"
+msgstr "{0} клетки: трава"
 
 #. Scanner.GrassTileCount_2
 msgctxt "Scanner.GrassTileCount_2"
 msgid "{0} grass tiles"
-msgstr "{0} kletki: Trava"
+msgstr "{0} клетки: трава"
 
 #. Scanner.MountainTileCount_0
 msgctxt "Scanner.MountainTileCount_0"
 msgid "{0} mountain tile"
-msgstr "{0} kletka: Gory"
+msgstr "{0} клетка: горы"
 
 #. Scanner.MountainTileCount_1
 msgctxt "Scanner.MountainTileCount_1"
 msgid "{0} mountain tiles"
-msgstr "{0} kletki: Gory"
+msgstr "{0} клетки: горы"
 
 #. Scanner.MountainTileCount_2
 msgctxt "Scanner.MountainTileCount_2"
 msgid "{0} mountain tiles"
-msgstr "{0} kletki: Gory"
+msgstr "{0} клетки: горы"
 
 #. Scanner.SandTileCount_0
 msgctxt "Scanner.SandTileCount_0"
 msgid "{0} sand tile"
-msgstr "{0} kletka: Pesok"
+msgstr "{0} клетка: песок"
 
 #. Scanner.SandTileCount_1
 msgctxt "Scanner.SandTileCount_1"
 msgid "{0} sand tiles"
-msgstr "{0} kletki: Pesok"
+msgstr "{0} клетки: песок"
 
 #. Scanner.SandTileCount_2
 msgctxt "Scanner.SandTileCount_2"
 msgid "{0} sand tiles"
-msgstr "{0} kletki: Pesok"
+msgstr "{0} клетки: песок"
 
 #. Scanner.ShallowWaterTileCount_0
 msgctxt "Scanner.ShallowWaterTileCount_0"
 msgid "{0} shallow water tile"
-msgstr "{0} kletka: Melkovode"
+msgstr "{0} клетка: мелководье"
 
 #. Scanner.ShallowWaterTileCount_1
 msgctxt "Scanner.ShallowWaterTileCount_1"
 msgid "{0} shallow water tiles"
-msgstr "{0} kletki: Melkovode"
+msgstr "{0} клетки: мелководье"
 
 #. Scanner.ShallowWaterTileCount_2
 msgctxt "Scanner.ShallowWaterTileCount_2"
 msgid "{0} shallow water tiles"
-msgstr "{0} kletki: Melkovode"
+msgstr "{0} клетки: мелководье"
 
 #. Scanner.TemperateTreeTileCount_0
 msgctxt "Scanner.TemperateTreeTileCount_0"
 msgid "{0} temperate tree tile"
-msgstr "{0} kletka: Derevya umerennogo klimata"
+msgstr "{0} клетка: деревья умеренного климата"
 
 #. Scanner.TemperateTreeTileCount_1
 msgctxt "Scanner.TemperateTreeTileCount_1"
 msgid "{0} temperate tree tiles"
-msgstr "{0} kletki: Derevya umerennogo klimata"
+msgstr "{0} клетки: деревья умеренного климата"
 
 #. Scanner.TemperateTreeTileCount_2
 msgctxt "Scanner.TemperateTreeTileCount_2"
 msgid "{0} temperate tree tiles"
-msgstr "{0} kletki: Derevya umerennogo klimata"
+msgstr "{0} клетки: деревья умеренного климата"
 
 #. Scanner.WallTileCount_0
 msgctxt "Scanner.WallTileCount_0"
 msgid "{0} wall tile"
-msgstr "{0} kletka: Steny"
+msgstr "{0} клетка: стены"
 
 #. Scanner.WallTileCount_1
 msgctxt "Scanner.WallTileCount_1"
 msgid "{0} wall tiles"
-msgstr "{0} kletki: Steny"
+msgstr "{0} клетки: стены"
 
 #. Scanner.WallTileCount_2
 msgctxt "Scanner.WallTileCount_2"
 msgid "{0} wall tiles"
-msgstr "{0} kletki: Steny"
+msgstr "{0} клетки: стены"
 
 #. Scanner.WaterEdgeTileCount_0
 msgctxt "Scanner.WaterEdgeTileCount_0"
 msgid "{0} water edge tile"
-msgstr "{0} kletka: Krai vody"
+msgstr "{0} клетка: край воды"
 
 #. Scanner.WaterEdgeTileCount_1
 msgctxt "Scanner.WaterEdgeTileCount_1"
 msgid "{0} water edge tiles"
-msgstr "{0} kletki: Krai vody"
+msgstr "{0} клетки: край воды"
 
 #. Scanner.WaterEdgeTileCount_2
 msgctxt "Scanner.WaterEdgeTileCount_2"
 msgid "{0} water edge tiles"
-msgstr "{0} kletki: Krai vody"
+msgstr "{0} клетки: край воды"
 
 #. Spatial.SkippedTileCount_0
 msgctxt "Spatial.SkippedTileCount_0"

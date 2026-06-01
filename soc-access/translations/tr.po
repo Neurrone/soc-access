@@ -1,4 +1,4 @@
-﻿msgid ""
+msgid ""
 msgstr ""
 "Project-Id-Version: SongsOfConquestAccess\n"
 "Language: tr\n"
@@ -123,17 +123,17 @@ msgstr "{0} kare"
 #. Draft.EssenceVariants
 msgctxt "Draft.EssenceVariants"
 msgid "Essence variants"
-msgstr "Ã–z varyantlarÄ±"
+msgstr "Öz varyantları"
 
 #. Draft.Purchase
 msgctxt "Draft.Purchase"
 msgid "Purchase"
-msgstr "SatÄ±n al"
+msgstr "Satın al"
 
 #. Draft.PurchaseForResources
 msgctxt "Draft.PurchaseForResources"
 msgid "Purchase for {0}"
-msgstr "{0} karÅŸÄ±lÄ±ÄŸÄ±nda satÄ±n al"
+msgstr "{0} karşılığında satın al"
 
 #. Draft.AvailableTroops_0
 msgctxt "Draft.AvailableTroops_0"
@@ -153,17 +153,17 @@ msgstr "{0} karşılığında yükselt"
 #. Draft.UpgradeAvailableTroops
 msgctxt "Draft.UpgradeAvailableTroops"
 msgid "Upgrade available troops"
-msgstr "Mevcut birlikleri yÃ¼kselt"
+msgstr "Mevcut birlikleri yükselt"
 
 #. Events.BuildSiteLarge
 msgctxt "Events.BuildSiteLarge"
 msgid "large"
-msgstr "bÃ¼yÃ¼k"
+msgstr "büyük"
 
 #. Events.BuildSiteLargeSettlement
 msgctxt "Events.BuildSiteLargeSettlement"
 msgid "large settlement"
-msgstr "bÃ¼yÃ¼k yerleÅŸim"
+msgstr "büyük yerleşim"
 
 #. Events.BuildSiteMedium
 msgctxt "Events.BuildSiteMedium"
@@ -173,12 +173,12 @@ msgstr "orta"
 #. Events.BuildSiteSmall
 msgctxt "Events.BuildSiteSmall"
 msgid "small"
-msgstr "kÃ¼Ã§Ã¼k"
+msgstr "küçük"
 
 #. Events.BuildSiteSmallSettlement
 msgctxt "Events.BuildSiteSmallSettlement"
 msgid "small settlement"
-msgstr "kÃ¼Ã§Ã¼k yerleÅŸim"
+msgstr "küçük yerleşim"
 
 #. Events.BuildSiteTown
 msgctxt "Events.BuildSiteTown"
@@ -193,32 +193,32 @@ msgstr "{0} hedefi temizlendi."
 #. Events.DestinationSet
 msgctxt "Events.DestinationSet"
 msgid "{0}'s destination set to {1}"
-msgstr "{0} hedefi {1} olarak ayarlandÄ±"
+msgstr "{0} hedefi {1} olarak ayarlandı"
 
 #. Events.HudClosed
 msgctxt "Events.HudClosed"
 msgid "HUD closed"
-msgstr "HUD kapalÄ±"
+msgstr "HUD kapalı"
 
 #. Events.HudOpen
 msgctxt "Events.HudOpen"
 msgid "HUD open"
-msgstr "HUD aÃ§Ä±k"
+msgstr "HUD açık"
 
 #. Events.LeveledUpTo
 msgctxt "Events.LeveledUpTo"
 msgid "{0} leveled up to {1}"
-msgstr "{0}, {1}. seviyeye yÃ¼kseldi"
+msgstr "{0}, {1}. seviyeye yükseldi"
 
 #. Events.MapCameraFocus
 msgctxt "Events.MapCameraFocus"
 msgid "Map camera focuses on {0}"
-msgstr "Harita kamerasÄ± {0} konumuna odaklanÄ±yor"
+msgstr "Harita kamerası {0} konumuna odaklanıyor"
 
 #. Events.ModError
 msgctxt "Events.ModError"
 msgid "Mod error: {0}"
-msgstr "Mod hatasÄ±: {0}"
+msgstr "Mod hatası: {0}"
 
 #. Events.RecruitedWielder
 msgctxt "Events.RecruitedWielder"
@@ -228,12 +228,12 @@ msgstr "Kahraman {0} işe alındı"
 #. Events.SelectedBuildSite
 msgctxt "Events.SelectedBuildSite"
 msgid "Selected {0} build site at {1}"
-msgstr "{1} konumundaki {0} inÅŸaat alanÄ± seÃ§ildi"
+msgstr "{1} konumundaki {0} inşaat alanı seçildi"
 
 #. Events.SelectedWielder
 msgctxt "Events.SelectedWielder"
 msgid "Selected wielder {0}"
-msgstr "Wielder seÃ§ildi: {0}"
+msgstr "Wielder seçildi: {0}"
 
 #. Events.Wielder
 msgctxt "Events.Wielder"
@@ -243,7 +243,7 @@ msgstr "wielder"
 #. Events.WieldersNoLongerVisible
 msgctxt "Events.WieldersNoLongerVisible"
 msgid "{0} no longer visible"
-msgstr "{0} artik gorunmuyor"
+msgstr "{0} artık görünmüyor"
 
 #. Events.WielderMoved
 msgctxt "Events.WielderMoved"
@@ -253,27 +253,27 @@ msgstr "{0}, {1} konumuna hareket etti"
 #. Events.WielderTeleported
 msgctxt "Events.WielderTeleported"
 msgid "{0} teleported to {1}"
-msgstr "{0}, {1} konumuna Ä±ÅŸÄ±nlandÄ±"
+msgstr "{0}, {1} konumuna ışınlandı"
 
 #. UI.ArmyExchangeGrid
 msgctxt "UI.ArmyExchangeGrid"
 msgid "Army exchange grid"
-msgstr "Ordu deÄŸiÅŸim Ä±zgarasÄ±"
+msgstr "Ordu değişim ızgarası"
 
 #. UI.AvailableActions
 msgctxt "UI.AvailableActions"
 msgid "Available actions: {0}."
-msgstr "KullanÄ±labilir eylemler: {0}."
+msgstr "Kullanılabilir eylemler: {0}."
 
 #. UI.Blank
 msgctxt "UI.Blank"
 msgid "blank"
-msgstr "boÅŸ"
+msgstr "boş"
 
 #. UI.CannotDropThere
 msgctxt "UI.CannotDropThere"
 msgid "Cannot drop there."
-msgstr "Oraya bÄ±rakÄ±lamaz."
+msgstr "Oraya bırakılamaz."
 
 #. UI.CharacterColon
 msgctxt "UI.CharacterColon"
@@ -283,7 +283,7 @@ msgstr "iki nokta"
 #. UI.CharacterComma
 msgctxt "UI.CharacterComma"
 msgid "comma"
-msgstr "virgÃ¼l"
+msgstr "virgül"
 
 #. UI.CharacterDash
 msgctxt "UI.CharacterDash"
@@ -298,12 +298,12 @@ msgstr "nokta"
 #. UI.CharacterSemicolon
 msgctxt "UI.CharacterSemicolon"
 msgid "semicolon"
-msgstr "noktalÄ± virgÃ¼l"
+msgstr "noktalı virgül"
 
 #. UI.CharacterSpace
 msgctxt "UI.CharacterSpace"
 msgid "space"
-msgstr "boÅŸluk"
+msgstr "boşluk"
 
 #. UI.CharacterTab
 msgctxt "UI.CharacterTab"
@@ -313,57 +313,57 @@ msgstr "sekme"
 #. UI.CharacterUnderscore
 msgctxt "UI.CharacterUnderscore"
 msgid "underscore"
-msgstr "alt Ã§izgi"
+msgstr "alt çizgi"
 
 #. UI.CombatDisconnectedTiles
 msgctxt "UI.CombatDisconnectedTiles"
 msgid "Some shown tiles are separated. Use W and Shift W to reach all range tiles."
-msgstr "GÃ¶sterilen bazÄ± kareler ayrÄ±. TÃ¼m menzil karelerine ulaÅŸmak iÃ§in W ve Shift W kullanÄ±n."
+msgstr "Gösterilen bazı kareler ayrı. Tüm menzil karelerine ulaşmak için W ve Shift W kullanın."
 
 #. UI.CombatGrid
 msgctxt "UI.CombatGrid"
 msgid "Combat grid"
-msgstr "SavaÅŸ Ä±zgarasÄ±"
+msgstr "Savaş ızgarası"
 
 #. UI.DragCancelled
 msgctxt "UI.DragCancelled"
 msgid "Drag cancelled."
-msgstr "SÃ¼rÃ¼kleme iptal edildi."
+msgstr "Sürükleme iptal edildi."
 
 #. UI.DragComplete
 msgctxt "UI.DragComplete"
 msgid "Drag complete."
-msgstr "SÃ¼rÃ¼kleme tamamlandÄ±."
+msgstr "Sürükleme tamamlandı."
 
 #. UI.DragStarted
 msgctxt "UI.DragStarted"
 msgid "Started drag. Move to destination and press enter to drop."
-msgstr "SÃ¼rÃ¼kleme baÅŸladÄ±. Hedefe gidin ve bÄ±rakmak iÃ§in Enter tuÅŸuna basÄ±n."
+msgstr "Sürükleme başladı. Hedefe gidin ve bırakmak için Enter tuşuna basın."
 
 #. UI.DragStartedTroopPlacement
 msgctxt "UI.DragStartedTroopPlacement"
 msgid "Started drag for {0} at {1}. Press enter to drop on destination spawn point, or press escape to cancel."
-msgstr "{1} konumundaki {0} iÃ§in sÃ¼rÃ¼kleme baÅŸladÄ±. Hedef yerleÅŸtirme noktasÄ±na bÄ±rakmak iÃ§in Enter, iptal iÃ§in Escape tuÅŸuna basÄ±n."
+msgstr "{1} konumundaki {0} için sürükleme başladı. Hedef yerleştirme noktasına bırakmak için Enter, iptal için Escape tuşuna basın."
 
 #. UI.Empty
 msgctxt "UI.Empty"
 msgid "Empty"
-msgstr "BoÅŸ"
+msgstr "Boş"
 
 #. UI.EmptyTroopSlot
 msgctxt "UI.EmptyTroopSlot"
 msgid "Empty troop {0}"
-msgstr "BoÅŸ birlik {0}"
+msgstr "Boş birlik {0}"
 
 #. UI.ExitedInspectMode
 msgctxt "UI.ExitedInspectMode"
 msgid "Exited inspect mode"
-msgstr "Ä°nceleme modundan Ã§Ä±kÄ±ldÄ±"
+msgstr "İnceleme modundan çıkıldı"
 
 #. UI.Heading
 msgctxt "UI.Heading"
 msgid "{0} heading"
-msgstr "{0} baÅŸlÄ±ÄŸÄ±"
+msgstr "{0} başlığı"
 
 #. UI.Inspecting
 msgctxt "UI.Inspecting"
@@ -373,17 +373,17 @@ msgstr "{0} inceleniyor"
 #. UI.InventoryGrid
 msgctxt "UI.InventoryGrid"
 msgid "Inventory grid"
-msgstr "Envanter Ä±zgarasÄ±"
+msgstr "Envanter ızgarası"
 
 #. UI.InvalidDestination
 msgctxt "UI.InvalidDestination"
 msgid "Invalid destination."
-msgstr "GeÃ§ersiz hedef."
+msgstr "Geçersiz hedef."
 
 #. UI.JoiningArmy
 msgctxt "UI.JoiningArmy"
 msgid "joining army"
-msgstr "katÄ±lan ordu"
+msgstr "katılan ordu"
 
 #. UI.LabelValue
 msgctxt "UI.LabelValue"
@@ -393,17 +393,17 @@ msgstr "{0}: {1}"
 #. UI.PressSpaceSelectItemToDrag
 msgctxt "UI.PressSpaceSelectItemToDrag"
 msgid "Press space to select an item to drag."
-msgstr "SÃ¼rÃ¼klenecek bir Ã¶ÄŸe seÃ§mek iÃ§in Space tuÅŸuna basÄ±n."
+msgstr "Sürüklenecek bir öğe seçmek için Space tuşuna basın."
 
 #. UI.PressSpaceToDrag
 msgctxt "UI.PressSpaceToDrag"
 msgid "Press space to drag."
-msgstr "SÃ¼rÃ¼klemek iÃ§in Space tuÅŸuna basÄ±n."
+msgstr "Sürüklemek için Space tuşuna basın."
 
 #. UI.RoleButton
 msgctxt "UI.RoleButton"
 msgid "button"
-msgstr "dÃ¼ÄŸme"
+msgstr "düğme"
 
 #. UI.RoleCheckBox
 msgctxt "UI.RoleCheckBox"
@@ -413,7 +413,7 @@ msgstr "onay kutusu"
 #. UI.RoleColumnHeader
 msgctxt "UI.RoleColumnHeader"
 msgid "column header"
-msgstr "sutun basligi"
+msgstr "sütun başlığı"
 
 #. UI.RoleDocument
 msgctxt "UI.RoleDocument"
@@ -423,27 +423,27 @@ msgstr "belge"
 #. UI.RoleEdit
 msgctxt "UI.RoleEdit"
 msgid "edit"
-msgstr "dÃ¼zenleme"
+msgstr "düzenleme"
 
 #. UI.RoleGrid
 msgctxt "UI.RoleGrid"
 msgid "grid"
-msgstr "Ä±zgara"
+msgstr "ızgara"
 
 #. UI.RoleMenu
 msgctxt "UI.RoleMenu"
 msgid "menu"
-msgstr "menÃ¼"
+msgstr "menü"
 
 #. UI.RoleSlider
 msgctxt "UI.RoleSlider"
 msgid "slider"
-msgstr "kaydÄ±rÄ±cÄ±"
+msgstr "kaydırıcı"
 
 #. UI.Selected
 msgctxt "UI.Selected"
 msgid "selected"
-msgstr "seÃ§ili"
+msgstr "seçili"
 
 #. UI.Slot
 msgctxt "UI.Slot"
@@ -463,27 +463,27 @@ msgstr "durum"
 #. UI.StatusChecked
 msgctxt "UI.StatusChecked"
 msgid "checked"
-msgstr "iÅŸaretli"
+msgstr "işaretli"
 
 #. UI.StatusDisabled
 msgctxt "UI.StatusDisabled"
 msgid "disabled"
-msgstr "devre dÄ±ÅŸÄ±"
+msgstr "devre dışı"
 
 #. UI.StatusDraggable
 msgctxt "UI.StatusDraggable"
 msgid "draggable"
-msgstr "sÃ¼rÃ¼klenebilir"
+msgstr "sürüklenebilir"
 
 #. UI.StatusDragging
 msgctxt "UI.StatusDragging"
 msgid "dragging"
-msgstr "sÃ¼rÃ¼kleniyor"
+msgstr "sürükleniyor"
 
 #. UI.StatusUnchecked
 msgctxt "UI.StatusUnchecked"
 msgid "unchecked"
-msgstr "iÅŸaretsiz"
+msgstr "işaretsiz"
 
 #. UI.SortAscending
 msgctxt "UI.SortAscending"
@@ -528,22 +528,22 @@ msgstr "eksik"
 #. UI.StatusUnavailable
 msgctxt "UI.StatusUnavailable"
 msgid "unavailable"
-msgstr "kullanÄ±lamaz"
+msgstr "kullanılamaz"
 
 #. UI.BufferEmpty
 msgctxt "UI.BufferEmpty"
 msgid "Buffer empty"
-msgstr "Arabellek boÅŸ"
+msgstr "Arabellek boş"
 
 #. UI.NoScannerResults
 msgctxt "UI.NoScannerResults"
 msgid "No scanner results"
-msgstr "TarayÄ±cÄ± sonucu yok"
+msgstr "Tarayıcı sonucu yok"
 
 #. UI.NotInMovementRange
 msgctxt "UI.NotInMovementRange"
 msgid "Not in movement range"
-msgstr "Hareket menzili dÄ±ÅŸÄ±nda"
+msgstr "Hareket menzili dışında"
 
 #. UI.ReviewBufferEvents
 msgctxt "UI.ReviewBufferEvents"
@@ -563,7 +563,7 @@ msgstr "Bildirimler"
 #. UI.ReviewBufferUi
 msgctxt "UI.ReviewBufferUi"
 msgid "UI"
-msgstr "ArayÃ¼z"
+msgstr "Arayüz"
 
 #. UI.ScannerPath
 msgctxt "UI.ScannerPath"
@@ -573,22 +573,22 @@ msgstr "{0}, {1}. {2}"
 #. UI.SelectedCount
 msgctxt "UI.SelectedCount"
 msgid "selected {0}x"
-msgstr "{0}x seÃ§ildi"
+msgstr "{0}x seçildi"
 
 #. UI.Unselected
 msgctxt "UI.Unselected"
 msgid "unselected"
-msgstr "seÃ§ilmedi"
+msgstr "seçilmedi"
 
 #. Screens.AdventureMap
 msgctxt "Screens.AdventureMap"
 msgid "Adventure map"
-msgstr "Macera haritasÄ±"
+msgstr "Macera haritası"
 
 #. Screens.ArcanaSpells
 msgctxt "Screens.ArcanaSpells"
 msgid "Arcana spells"
-msgstr "Arcana bÃ¼yÃ¼leri"
+msgstr "Arcana büyüleri"
 
 #. Screens.Army
 msgctxt "Screens.Army"
@@ -603,7 +603,7 @@ msgstr "Makaleler"
 #. Screens.AttackerEssence
 msgctxt "Screens.AttackerEssence"
 msgid "Attacker essence"
-msgstr "SaldÄ±ran Ã¶zÃ¼"
+msgstr "Saldıran özü"
 
 #. Screens.Back
 msgctxt "Screens.Back"
@@ -618,12 +618,12 @@ msgstr "Balista"
 #. Screens.BattleLog
 msgctxt "Screens.BattleLog"
 msgid "Battle log"
-msgstr "SavaÅŸ gÃ¼nlÃ¼ÄŸÃ¼"
+msgstr "Savaş günlüğü"
 
 #. Screens.BattleResult
 msgctxt "Screens.BattleResult"
 msgid "Battle result"
-msgstr "SavaÅŸ sonucu"
+msgstr "Savaş sonucu"
 
 #. Screens.Categories
 msgctxt "Screens.Categories"
@@ -633,12 +633,12 @@ msgstr "Kategoriler"
 #. Screens.ChaosSpells
 msgctxt "Screens.ChaosSpells"
 msgid "Chaos spells"
-msgstr "Kaos bÃ¼yÃ¼leri"
+msgstr "Kaos büyüleri"
 
 #. Screens.Choices
 msgctxt "Screens.Choices"
 msgid "Choices"
-msgstr "SeÃ§enekler"
+msgstr "Seçenekler"
 
 #. Screens.Close
 msgctxt "Screens.Close"
@@ -653,22 +653,22 @@ msgstr "Tamamlandı: {0} / {1} görev"
 #. Screens.Combat
 msgctxt "Screens.Combat"
 msgid "Combat"
-msgstr "SavaÅŸ"
+msgstr "Savaş"
 
 #. Screens.CreationSpells
 msgctxt "Screens.CreationSpells"
 msgid "Creation spells"
-msgstr "YaratÄ±m bÃ¼yÃ¼leri"
+msgstr "Yaratım büyüleri"
 
 #. Screens.CurrentTroop
 msgctxt "Screens.CurrentTroop"
 msgid "Current troop, {0}"
-msgstr "GeÃ§erli birlik, {0}"
+msgstr "Geçerli birlik, {0}"
 
 #. Screens.DefenderEssence
 msgctxt "Screens.DefenderEssence"
 msgid "Defender essence"
-msgstr "Savunan Ã¶zÃ¼"
+msgstr "Savunan özü"
 
 #. Screens.DefendingWielderArmy
 msgctxt "Screens.DefendingWielderArmy"
@@ -678,7 +678,7 @@ msgstr "savunan wielder ordusu"
 #. Screens.Description
 msgctxt "Screens.Description"
 msgid "Description"
-msgstr "AÃ§Ä±klama"
+msgstr "Açıklama"
 
 #. Screens.DescriptionWithMissingBuilding
 msgctxt "Screens.DescriptionWithMissingBuilding"
@@ -688,7 +688,7 @@ msgstr "{0}. bina eksik"
 #. Screens.DestructionSpells
 msgctxt "Screens.DestructionSpells"
 msgid "Destruction spells"
-msgstr "YÄ±kÄ±m bÃ¼yÃ¼leri"
+msgstr "Yıkım büyüleri"
 
 #. Screens.DisabledWithReason
 msgctxt "Screens.DisabledWithReason"
@@ -703,17 +703,17 @@ msgstr "İndirmeler"
 #. Screens.Empty
 msgctxt "Screens.Empty"
 msgid "empty"
-msgstr "boÅŸ"
+msgstr "boş"
 
 #. Screens.EjectWielder
 msgctxt "Screens.EjectWielder"
 msgid "Eject wielder"
-msgstr "WielderÄ± Ã§Ä±kar"
+msgstr "Wielderı çıkar"
 
 #. Screens.GraphType
 msgctxt "Screens.GraphType"
 msgid "Graph type"
-msgstr "Grafik tÃ¼rÃ¼"
+msgstr "Grafik türü"
 
 #. Screens.Group
 msgctxt "Screens.Group"
@@ -728,7 +728,7 @@ msgstr "Düzen"
 #. Screens.MainMenu
 msgctxt "Screens.MainMenu"
 msgid "Main menu"
-msgstr "Ana menÃ¼"
+msgstr "Ana menü"
 
 #. Screens.Missing
 msgctxt "Screens.Missing"
@@ -743,17 +743,17 @@ msgstr "bina eksik"
 #. Screens.ModSettings
 msgctxt "Screens.ModSettings"
 msgid "Mod settings"
-msgstr "Mod ayarlarÄ±"
+msgstr "Mod ayarları"
 
 #. Screens.ModifierCategoryTabs
 msgctxt "Screens.ModifierCategoryTabs"
 msgid "Modifier category tabs"
-msgstr "DeÄŸiÅŸtirici kategori sekmeleri"
+msgstr "Değiştirici kategori sekmeleri"
 
 #. Screens.MultiEssenceSpells
 msgctxt "Screens.MultiEssenceSpells"
 msgid "Multi-essence spells"
-msgstr "Ã‡ok Ã¶zlÃ¼ bÃ¼yÃ¼ler"
+msgstr "Çok özlü büyüler"
 
 #. Screens.NamedArmy
 msgctxt "Screens.NamedArmy"
@@ -768,7 +768,7 @@ msgstr "{0}, seviye {1}"
 #. Screens.NamedMenu
 msgctxt "Screens.NamedMenu"
 msgid "{0} menu"
-msgstr "{0} menÃ¼sÃ¼"
+msgstr "{0} menüsü"
 
 #. Screens.NamedTabs
 msgctxt "Screens.NamedTabs"
@@ -818,17 +818,17 @@ msgstr "Tamam"
 #. Screens.OrderSpells
 msgctxt "Screens.OrderSpells"
 msgid "Order spells"
-msgstr "DÃ¼zen bÃ¼yÃ¼leri"
+msgstr "Düzen büyüleri"
 
 #. Screens.PostAdventureResult
 msgctxt "Screens.PostAdventureResult"
 msgid "Post adventure result"
-msgstr "Macera sonrasÄ± sonuÃ§"
+msgstr "Macera sonrası sonuç"
 
 #. Screens.PostAdventureStats
 msgctxt "Screens.PostAdventureStats"
 msgid "Post adventure stats"
-msgstr "Macera sonrasÄ± istatistikler"
+msgstr "Macera sonrası istatistikler"
 
 #. Screens.Penalties
 msgctxt "Screens.Penalties"
@@ -838,17 +838,17 @@ msgstr "Cezalar"
 #. Screens.Previous
 msgctxt "Screens.Previous"
 msgid "Previous"
-msgstr "Ã–nceki"
+msgstr "Önceki"
 
 #. Screens.Quickbar
 msgctxt "Screens.Quickbar"
 msgid "Quickbar"
-msgstr "HÄ±zlÄ± Ã§ubuk"
+msgstr "Hızlı çubuk"
 
 #. Screens.ReadEnemyInfluence
 msgctxt "Screens.ReadEnemyInfluence"
 msgid "Read attack, deadly and movement range for enemies on tiles in combat"
-msgstr "SavaÅŸta karelerdeki dÃ¼ÅŸmanlarÄ±n saldÄ±rÄ±, Ã¶lÃ¼mcÃ¼l ve hareket menzilini oku"
+msgstr "Savaşta karelerdeki düşmanların saldırı, ölümcül ve hareket menzilini oku"
 
 #. Screens.ReadStoryCameraFocusChanges
 msgctxt "Screens.ReadStoryCameraFocusChanges"
@@ -863,12 +863,12 @@ msgstr "Tarayıcı yönlü bip sesi çalar"
 #. Screens.RecruitFrom
 msgctxt "Screens.RecruitFrom"
 msgid "Recruit from"
-msgstr "Åžuradan askere al"
+msgstr "Şuradan askere al"
 
 #. Screens.RecruitingFrom
 msgctxt "Screens.RecruitingFrom"
 msgid "Recruiting from {0}"
-msgstr "{0} Ã¼zerinden askere alÄ±nÄ±yor"
+msgstr "{0} üzerinden askere alınıyor"
 
 #. Screens.ResearchTier
 msgctxt "Screens.ResearchTier"
@@ -893,7 +893,7 @@ msgstr "{0}. tur"
 #. Screens.SettlementTroops
 msgctxt "Screens.SettlementTroops"
 msgid "settlement troops"
-msgstr "yerleÅŸim birlikleri"
+msgstr "yerleşim birlikleri"
 
 #. Screens.Skill
 msgctxt "Screens.Skill"
@@ -923,12 +923,12 @@ msgstr "Takım {0}"
 #. Screens.Teams
 msgctxt "Screens.Teams"
 msgid "Teams"
-msgstr "TakÄ±mlar"
+msgstr "Takımlar"
 
 #. Screens.TooltipActions
 msgctxt "Screens.TooltipActions"
 msgid "Tooltip actions"
-msgstr "Ä°pucu eylemleri"
+msgstr "İpucu eylemleri"
 
 #. Screens.Tier
 msgctxt "Screens.Tier"
@@ -953,22 +953,22 @@ msgstr "{0} kaybedildi"
 #. Screens.TroopDistribution
 msgctxt "Screens.TroopDistribution"
 msgid "troop distribution"
-msgstr "birlik daÄŸÄ±lÄ±mÄ±"
+msgstr "birlik dağılımı"
 
 #. Screens.TroopPlacement
 msgctxt "Screens.TroopPlacement"
 msgid "Troop placement"
-msgstr "Birlik yerleÅŸtirme"
+msgstr "Birlik yerleştirme"
 
 #. Screens.TurnOrder
 msgctxt "Screens.TurnOrder"
 msgid "Turn order"
-msgstr "Tur sÄ±rasÄ±"
+msgstr "Tur sırası"
 
 #. Screens.Unavailable
 msgctxt "Screens.Unavailable"
 msgid "Unavailable"
-msgstr "KullanÄ±lamaz"
+msgstr "Kullanılamaz"
 
 #. Screens.VisitingWielderArmy
 msgctxt "Screens.VisitingWielderArmy"
@@ -998,42 +998,42 @@ msgstr "{0} istatistikleri"
 #. Screens.WielderModifierCategories
 msgctxt "Screens.WielderModifierCategories"
 msgid "{0}'s modifier categories"
-msgstr "{0} deÄŸiÅŸtirici kategorileri"
+msgstr "{0} değiştirici kategorileri"
 
 #. Screens.WorldChoiceMenu
 msgctxt "Screens.WorldChoiceMenu"
 msgid "World choice menu"
-msgstr "DÃ¼nya seÃ§im menÃ¼sÃ¼"
+msgstr "Dünya seçim menüsü"
 
 #. Screens.WorldConfirmationMenu
 msgctxt "Screens.WorldConfirmationMenu"
 msgid "World confirmation menu"
-msgstr "DÃ¼nya onay menÃ¼sÃ¼"
+msgstr "Dünya onay menüsü"
 
 #. Screens.RemoveFromQuickbar
 msgctxt "Screens.RemoveFromQuickbar"
 msgid "Remove from quickbar"
-msgstr "HÄ±zlÄ± Ã§ubuktan kaldÄ±r"
+msgstr "Hızlı çubuktan kaldır"
 
 #. Screens.AmountToUpgrade
 msgctxt "Screens.AmountToUpgrade"
 msgid "Amount to upgrade, {0}"
-msgstr "YÃ¼kseltilecek miktar, {0}"
+msgstr "Yükseltilecek miktar, {0}"
 
 #. Screens.UnknownSpell
 msgctxt "Screens.UnknownSpell"
 msgid "unknown spell"
-msgstr "bilinmeyen bÃ¼yÃ¼"
+msgstr "bilinmeyen büyü"
 
 #. Actions.Activate
 msgctxt "Actions.Activate"
 msgid "Activate"
-msgstr "EtkinleÅŸtir"
+msgstr "Etkinleştir"
 
 #. Actions.Cancel
 msgctxt "Actions.Cancel"
 msgid "Cancel"
-msgstr "Ä°ptal"
+msgstr "İptal"
 
 #. Actions.CombatFocusActingTroop
 msgctxt "Actions.CombatFocusActingTroop"
@@ -1063,37 +1063,37 @@ msgstr "Önceki düşman birliği"
 #. Actions.CombatFocusTimeline
 msgctxt "Actions.CombatFocusTimeline"
 msgid "Focus Timeline"
-msgstr "Zaman Ã§izelgesine odaklan"
+msgstr "Zaman çizelgesine odaklan"
 
 #. Actions.CombatInspect
 msgctxt "Actions.CombatInspect"
 msgid "Inspect Combat Hex"
-msgstr "SavaÅŸ altÄ±genini incele"
+msgstr "Savaş altıgenini incele"
 
 #. Actions.CombatNextRelevantTile
 msgctxt "Actions.CombatNextRelevantTile"
 msgid "Next Relevant Combat Tile"
-msgstr "Sonraki ilgili savaÅŸ karesi"
+msgstr "Sonraki ilgili savaş karesi"
 
 #. Actions.CombatPreviousRelevantTile
 msgctxt "Actions.CombatPreviousRelevantTile"
 msgid "Previous Relevant Combat Tile"
-msgstr "Ã–nceki ilgili savaÅŸ karesi"
+msgstr "Önceki ilgili savaş karesi"
 
 #. Actions.FirstBufferLine
 msgctxt "Actions.FirstBufferLine"
 msgid "First Buffer Line"
-msgstr "Ä°lk tampon satÄ±r"
+msgstr "İlk tampon satır"
 
 #. Actions.FirstMenuItem
 msgctxt "Actions.FirstMenuItem"
 msgid "First Menu Item"
-msgstr "Ä°lk menÃ¼ Ã¶ÄŸe"
+msgstr "İlk menü öğe"
 
 #. Actions.FirstRow
 msgctxt "Actions.FirstRow"
 msgid "First Row"
-msgstr "Ä°lk satÄ±r"
+msgstr "İlk satır"
 
 #. Actions.FocusHudNotifications
 msgctxt "Actions.FocusHudNotifications"
@@ -1118,67 +1118,67 @@ msgstr "HUD birliklerine odaklan"
 #. Actions.HexGridEast
 msgctxt "Actions.HexGridEast"
 msgid "Hex Grid East"
-msgstr "AltÄ±gen Ä±zgara doÄŸu"
+msgstr "Altıgen ızgara doğu"
 
 #. Actions.HexGridNorthEast
 msgctxt "Actions.HexGridNorthEast"
 msgid "Hex Grid Northeast"
-msgstr "AltÄ±gen Ä±zgara kuzeydoÄŸu"
+msgstr "Altıgen ızgara kuzeydoğu"
 
 #. Actions.HexGridNorthWest
 msgctxt "Actions.HexGridNorthWest"
 msgid "Hex Grid Northwest"
-msgstr "AltÄ±gen Ä±zgara kuzeybatÄ±"
+msgstr "Altıgen ızgara kuzeybatı"
 
 #. Actions.HexGridSouthEast
 msgctxt "Actions.HexGridSouthEast"
 msgid "Hex Grid Southeast"
-msgstr "AltÄ±gen Ä±zgara gÃ¼neydoÄŸu"
+msgstr "Altıgen ızgara güneydoğu"
 
 #. Actions.HexGridSouthWest
 msgctxt "Actions.HexGridSouthWest"
 msgid "Hex Grid Southwest"
-msgstr "AltÄ±gen Ä±zgara gÃ¼neybatÄ±"
+msgstr "Altıgen ızgara güneybatı"
 
 #. Actions.HexGridWest
 msgctxt "Actions.HexGridWest"
 msgid "Hex Grid West"
-msgstr "AltÄ±gen Ä±zgara batÄ±"
+msgstr "Altıgen ızgara batı"
 
 #. Actions.LastBufferLine
 msgctxt "Actions.LastBufferLine"
 msgid "Last Buffer Line"
-msgstr "Son tampon satÄ±r"
+msgstr "Son tampon satır"
 
 #. Actions.LastMenuItem
 msgctxt "Actions.LastMenuItem"
 msgid "Last Menu Item"
-msgstr "Son menÃ¼ Ã¶ÄŸe"
+msgstr "Son menü öğe"
 
 #. Actions.LastRow
 msgctxt "Actions.LastRow"
 msgid "Last Row"
-msgstr "Son satÄ±r"
+msgstr "Son satır"
 
 #. Actions.MapMoveEast
 msgctxt "Actions.MapMoveEast"
 msgid "Map Move East"
-msgstr "HaritayÄ± doÄŸuya taÅŸÄ±"
+msgstr "Haritayı doğuya taşı"
 
 #. Actions.MapMoveNorth
 msgctxt "Actions.MapMoveNorth"
 msgid "Map Move North"
-msgstr "HaritayÄ± kuzeye taÅŸÄ±"
+msgstr "Haritayı kuzeye taşı"
 
 #. Actions.MapMoveSouth
 msgctxt "Actions.MapMoveSouth"
 msgid "Map Move South"
-msgstr "HaritayÄ± gÃ¼neye taÅŸÄ±"
+msgstr "Haritayı güneye taşı"
 
 #. Actions.MapMoveWest
 msgctxt "Actions.MapMoveWest"
 msgid "Map Move West"
-msgstr "HaritayÄ± batÄ±ya taÅŸÄ±"
+msgstr "Haritayı batıya taşı"
 
 #. Actions.MapSecondaryAction
 msgctxt "Actions.MapSecondaryAction"
@@ -1193,32 +1193,32 @@ msgstr "Sonraki tampon"
 #. Actions.NextBufferLine
 msgctxt "Actions.NextBufferLine"
 msgid "Next Buffer Line"
-msgstr "Sonraki tampon satÄ±r"
+msgstr "Sonraki tampon satır"
 
 #. Actions.NextColumn
 msgctxt "Actions.NextColumn"
 msgid "Next Column"
-msgstr "Sonraki sÃ¼tun"
+msgstr "Sonraki sütun"
 
 #. Actions.NextHeading
 msgctxt "Actions.NextHeading"
 msgid "Next Heading"
-msgstr "Sonraki baÅŸlÄ±k"
+msgstr "Sonraki başlık"
 
 #. Actions.NextMenuItem
 msgctxt "Actions.NextMenuItem"
 msgid "Next Menu Item"
-msgstr "Sonraki menÃ¼ Ã¶ÄŸe"
+msgstr "Sonraki menü öğe"
 
 #. Actions.NextRow
 msgctxt "Actions.NextRow"
 msgid "Next Row"
-msgstr "Sonraki satÄ±r"
+msgstr "Sonraki satır"
 
 #. Actions.NextSettlement
 msgctxt "Actions.NextSettlement"
 msgid "Next Settlement"
-msgstr "Sonraki yerleÅŸim"
+msgstr "Sonraki yerleşim"
 
 #. Actions.NextWidget
 msgctxt "Actions.NextWidget"
@@ -1233,42 +1233,42 @@ msgstr "Sonraki wielder"
 #. Actions.OpenModSettings
 msgctxt "Actions.OpenModSettings"
 msgid "Open Mod Settings"
-msgstr "Mod ayarlarÄ±nÄ± aÃ§"
+msgstr "Mod ayarlarını aç"
 
 #. Actions.PreviousBuffer
 msgctxt "Actions.PreviousBuffer"
 msgid "Previous Buffer"
-msgstr "Ã–nceki tampon"
+msgstr "Önceki tampon"
 
 #. Actions.PreviousBufferLine
 msgctxt "Actions.PreviousBufferLine"
 msgid "Previous Buffer Line"
-msgstr "Ã–nceki tampon satÄ±r"
+msgstr "Önceki tampon satır"
 
 #. Actions.PreviousColumn
 msgctxt "Actions.PreviousColumn"
 msgid "Previous Column"
-msgstr "Ã–nceki sÃ¼tun"
+msgstr "Önceki sütun"
 
 #. Actions.PreviousHeading
 msgctxt "Actions.PreviousHeading"
 msgid "Previous Heading"
-msgstr "Ã–nceki baÅŸlÄ±k"
+msgstr "Önceki başlık"
 
 #. Actions.PreviousMenuItem
 msgctxt "Actions.PreviousMenuItem"
 msgid "Previous Menu Item"
-msgstr "Ã–nceki menÃ¼ Ã¶ÄŸe"
+msgstr "Önceki menü öğe"
 
 #. Actions.PreviousRow
 msgctxt "Actions.PreviousRow"
 msgid "Previous Row"
-msgstr "Ã–nceki satÄ±r"
+msgstr "Önceki satır"
 
 #. Actions.PreviousWidget
 msgctxt "Actions.PreviousWidget"
 msgid "Previous Widget"
-msgstr "Ã–nceki widget"
+msgstr "Önceki widget"
 
 #. Actions.ReadThreat
 msgctxt "Actions.ReadThreat"
@@ -1288,7 +1288,7 @@ msgstr "Etrafa bakma yarıçapını artır"
 #. Actions.ScannerJumpToResult
 msgctxt "Actions.ScannerJumpToResult"
 msgid "Jump To Scanner Result"
-msgstr "TarayÄ±cÄ± sonucuna git"
+msgstr "Tarayıcı sonucuna git"
 
 #. Actions.ScannerLookAround
 msgctxt "Actions.ScannerLookAround"
@@ -1298,92 +1298,92 @@ msgstr "Etrafa bak"
 #. Actions.ScannerNextCategory
 msgctxt "Actions.ScannerNextCategory"
 msgid "Next Scanner Category"
-msgstr "Sonraki tarayÄ±cÄ± kategori"
+msgstr "Sonraki tarayıcı kategori"
 
 #. Actions.ScannerNextResult
 msgctxt "Actions.ScannerNextResult"
 msgid "Next Scanner Result"
-msgstr "Sonraki tarayÄ±cÄ± sonuÃ§"
+msgstr "Sonraki tarayıcı sonuç"
 
 #. Actions.ScannerNextSubcategory
 msgctxt "Actions.ScannerNextSubcategory"
 msgid "Next Scanner Subcategory"
-msgstr "Sonraki tarayÄ±cÄ± alt kategori"
+msgstr "Sonraki tarayıcı alt kategori"
 
 #. Actions.ScannerPreviousCategory
 msgctxt "Actions.ScannerPreviousCategory"
 msgid "Previous Scanner Category"
-msgstr "Ã–nceki tarayÄ±cÄ± kategori"
+msgstr "Önceki tarayıcı kategori"
 
 #. Actions.ScannerPreviousResult
 msgctxt "Actions.ScannerPreviousResult"
 msgid "Previous Scanner Result"
-msgstr "Ã–nceki tarayÄ±cÄ± sonuÃ§"
+msgstr "Önceki tarayıcı sonuç"
 
 #. Actions.ScannerPreviousSubcategory
 msgctxt "Actions.ScannerPreviousSubcategory"
 msgid "Previous Scanner Subcategory"
-msgstr "Ã–nceki tarayÄ±cÄ± alt kategori"
+msgstr "Önceki tarayıcı alt kategori"
 
 #. Actions.ScannerRefresh
 msgctxt "Actions.ScannerRefresh"
 msgid "Refresh Scanner"
-msgstr "TarayÄ±cÄ±yÄ± yenile"
+msgstr "Tarayıcıyı yenile"
 
 #. Actions.ScannerSpeakOrientation
 msgctxt "Actions.ScannerSpeakOrientation"
 msgid "Scanner Result Orientation"
-msgstr "TarayÄ±cÄ± sonucu yÃ¶nelimi"
+msgstr "Tarayıcı sonucu yönelimi"
 
 #. Actions.SliderDecrease
 msgctxt "Actions.SliderDecrease"
 msgid "Slider Decrease"
-msgstr "KaydÄ±rÄ±cÄ±yÄ± azalt"
+msgstr "Kaydırıcıyı azalt"
 
 #. Actions.SliderIncrease
 msgctxt "Actions.SliderIncrease"
 msgid "Slider Increase"
-msgstr "KaydÄ±rÄ±cÄ±yÄ± artÄ±r"
+msgstr "Kaydırıcıyı artır"
 
 #. Actions.SliderMaximum
 msgctxt "Actions.SliderMaximum"
 msgid "Slider Maximum"
-msgstr "KaydÄ±rÄ±cÄ± maksimum"
+msgstr "Kaydırıcı maksimum"
 
 #. Actions.SliderMinimum
 msgctxt "Actions.SliderMinimum"
 msgid "Slider Minimum"
-msgstr "KaydÄ±rÄ±cÄ± minimum"
+msgstr "Kaydırıcı minimum"
 
 #. Actions.StartDrag
 msgctxt "Actions.StartDrag"
 msgid "Start Drag"
-msgstr "SÃ¼rÃ¼klemeyi baÅŸlat"
+msgstr "Sürüklemeyi başlat"
 
 #. Actions.SummarizeEnemyResources
 msgctxt "Actions.SummarizeEnemyResources"
 msgid "Summarize Enemy Resources"
-msgstr "DÃ¼ÅŸman kaynaklarÄ±nÄ± Ã¶zetle"
+msgstr "Düşman kaynaklarını özetle"
 
 #. Actions.SummarizeResources
 msgctxt "Actions.SummarizeResources"
 msgid "Summarize Resources"
-msgstr "KaynaklarÄ± Ã¶zetle"
+msgstr "Kaynakları özetle"
 
 #. Actions.TooltipActionsMenu
 msgctxt "Actions.TooltipActionsMenu"
 msgid "Tooltip Actions Menu"
-msgstr "Ä°pucu eylemleri menÃ¼sÃ¼"
+msgstr "İpucu eylemleri menüsü"
 
 #. Combat.AbilityUsed
 msgctxt "Combat.AbilityUsed"
 msgid "{0} uses {1}"
-msgstr "{0}, {1} kullanÄ±r"
+msgstr "{0}, {1} kullanır"
 
 #. Combat.Affects
 msgctxt "Combat.Affects"
 msgid "{0} affects {1}"
-msgstr "{0}, {1} Ã¼zerinde etkili olur"
+msgstr "{0}, {1} üzerinde etkili olur"
 
 #. Combat.Appears
 msgctxt "Combat.Appears"
@@ -1403,47 +1403,47 @@ msgstr "{0} {2} hedefine {1}"
 #. Combat.AttackableEntity
 msgctxt "Combat.AttackableEntity"
 msgid "attackable entity"
-msgstr "saldÄ±rÄ±labilir varlÄ±k"
+msgstr "saldırılabilir varlık"
 
 #. Combat.AttackVerbDefault
 msgctxt "Combat.AttackVerbDefault"
 msgid "attacks"
-msgstr "saldÄ±rÄ±r"
+msgstr "saldırır"
 
 #. Combat.AttackVerbOpportunity
 msgctxt "Combat.AttackVerbOpportunity"
 msgid "makes an opportunity attack against"
-msgstr "fÄ±rsat saldÄ±rÄ±sÄ± yapar"
+msgstr "fırsat saldırısı yapar"
 
 #. Combat.AttackVerbOverwatch
 msgctxt "Combat.AttackVerbOverwatch"
 msgid "makes an overwatch attack against"
-msgstr "gÃ¶zetleme saldÄ±rÄ±sÄ± yapar"
+msgstr "gözetleme saldırısı yapar"
 
 #. Combat.AttackVerbRetaliation
 msgctxt "Combat.AttackVerbRetaliation"
 msgid "retaliates against"
-msgstr "karÅŸÄ± saldÄ±rÄ±r"
+msgstr "karşı saldırır"
 
 #. Combat.AttackVerbSpearwall
 msgctxt "Combat.AttackVerbSpearwall"
 msgid "makes a spearwall attack against"
-msgstr "mÄ±zrak duvarÄ± saldÄ±rÄ±sÄ± yapar"
+msgstr "mızrak duvarı saldırısı yapar"
 
 #. Combat.BattleOver
 msgctxt "Combat.BattleOver"
 msgid "Battle over"
-msgstr "SavaÅŸ bitti"
+msgstr "Savaş bitti"
 
 #. Combat.BlindFury
 msgctxt "Combat.BlindFury"
 msgid "blind fury"
-msgstr "kÃ¶r Ã¶fke"
+msgstr "kör öfke"
 
 #. Combat.BurrowsUp
 msgctxt "Combat.BurrowsUp"
 msgid "{0} burrows up"
-msgstr "{0} yerden Ã§Ä±kar"
+msgstr "{0} yerden çıkar"
 
 #. Combat.CastsSpell
 msgctxt "Combat.CastsSpell"
@@ -1468,12 +1468,12 @@ msgstr "kaos"
 #. Combat.Created
 msgctxt "Combat.Created"
 msgid "{0} created"
-msgstr "{0} oluÅŸturuldu"
+msgstr "{0} oluşturuldu"
 
 #. Combat.CreationEssence
 msgctxt "Combat.CreationEssence"
 msgid "creation"
-msgstr "yaratÄ±m"
+msgstr "yaratım"
 
 #. Combat.DamageDestroyingItSuffix
 msgctxt "Combat.DamageDestroyingItSuffix"
@@ -1483,7 +1483,7 @@ msgstr ", onu yok eder"
 #. Combat.DamageKillsSuffix
 msgctxt "Combat.DamageKillsSuffix"
 msgid ", killing {0}"
-msgstr ", {0} Ã¶ldÃ¼rÃ¼r"
+msgstr ", {0} öldürür"
 
 #. Combat.DealsDamage
 msgctxt "Combat.DealsDamage"
@@ -1503,7 +1503,7 @@ msgstr "{0} yok edildi"
 #. Combat.DestructionEssence
 msgctxt "Combat.DestructionEssence"
 msgid "destruction"
-msgstr "yÄ±kÄ±m"
+msgstr "yıkım"
 
 #. Combat.Draw
 msgctxt "Combat.Draw"
@@ -1518,12 +1518,12 @@ msgstr "etki"
 #. Combat.EnemyTroop
 msgctxt "Combat.EnemyTroop"
 msgid "{0} enemy {1}"
-msgstr "{0} dÃ¼ÅŸman {1}"
+msgstr "{0} düşman {1}"
 
 #. Combat.EnemyTroops
 msgctxt "Combat.EnemyTroops"
 msgid "enemy troops"
-msgstr "dÃ¼ÅŸman birlikleri"
+msgstr "düşman birlikleri"
 
 #. Combat.EssenceAmountCompact
 msgctxt "Combat.EssenceAmountCompact"
@@ -1538,17 +1538,17 @@ msgstr "{0} özü"
 #. Combat.ExplosiveBarrel
 msgctxt "Combat.ExplosiveBarrel"
 msgid "explosive barrel"
-msgstr "patlayÄ±cÄ± varil"
+msgstr "patlayıcı varil"
 
 #. Combat.FailedBurrow
 msgctxt "Combat.FailedBurrow"
 msgid "{0}, failed burrow"
-msgstr "{0}, kazma baÅŸarÄ±sÄ±z"
+msgstr "{0}, kazma başarısız"
 
 #. Combat.FaeyFire
 msgctxt "Combat.FaeyFire"
 msgid "Faey Fire"
-msgstr "Faey AteÅŸi"
+msgstr "Faey Ateşi"
 
 #. Combat.FaeyFireWithBolts
 msgctxt "Combat.FaeyFireWithBolts"
@@ -1563,12 +1563,12 @@ msgstr "hamle"
 #. Combat.MapEntityDamage
 msgctxt "Combat.MapEntityDamage"
 msgid "map entity"
-msgstr "harita varlÄ±ÄŸÄ±"
+msgstr "harita varlığı"
 
 #. Combat.MeleeDamage
 msgctxt "Combat.MeleeDamage"
 msgid "melee"
-msgstr "yakÄ±n dÃ¶vÃ¼ÅŸ"
+msgstr "yakın dövüş"
 
 #. Combat.MothersLove
 msgctxt "Combat.MothersLove"
@@ -1578,22 +1578,22 @@ msgstr "anne sevgisi"
 #. Combat.NewTurn
 msgctxt "Combat.NewTurn"
 msgid "It is {0}'s turn"
-msgstr "SÄ±ra {0} Ã¼zerinde"
+msgstr "Sıra {0} üzerinde"
 
 #. Combat.OpportunityAttack
 msgctxt "Combat.OpportunityAttack"
 msgid "opportunity attack"
-msgstr "fÄ±rsat saldÄ±rÄ±sÄ±"
+msgstr "fırsat saldırısı"
 
 #. Combat.OrderEssence
 msgctxt "Combat.OrderEssence"
 msgid "order"
-msgstr "dÃ¼zen"
+msgstr "düzen"
 
 #. Combat.Overwatch
 msgctxt "Combat.Overwatch"
 msgid "overwatch"
-msgstr "gÃ¶zetleme"
+msgstr "gözetleme"
 
 #. Combat.PushedTo
 msgctxt "Combat.PushedTo"
@@ -1613,7 +1613,7 @@ msgstr "{0}, {1} konumuna kuzgun formunda gider"
 #. Combat.RemovedFrom
 msgctxt "Combat.RemovedFrom"
 msgid "{0} removed from {1}"
-msgstr "{0}, {1} Ã¼zerinden kaldÄ±rÄ±ldÄ±"
+msgstr "{0}, {1} üzerinden kaldırıldı"
 
 #. Combat.Retaliation
 msgctxt "Combat.Retaliation"
@@ -1623,32 +1623,32 @@ msgstr "misilleme"
 #. Combat.Spearwall
 msgctxt "Combat.Spearwall"
 msgid "spearwall"
-msgstr "mÄ±zrak duvarÄ±"
+msgstr "mızrak duvarı"
 
 #. Combat.SpellDamage
 msgctxt "Combat.SpellDamage"
 msgid "spell"
-msgstr "bÃ¼yÃ¼"
+msgstr "büyü"
 
 #. Combat.Splash
 msgctxt "Combat.Splash"
 msgid "splash"
-msgstr "sÄ±Ã§rama"
+msgstr "sıçrama"
 
 #. Combat.Summoned
 msgctxt "Combat.Summoned"
 msgid "{0} summoned"
-msgstr "{0} Ã§aÄŸrÄ±ldÄ±"
+msgstr "{0} çağrıldı"
 
 #. Combat.TakesDamage
 msgctxt "Combat.TakesDamage"
 msgid "{0} takes {1} {2} damage{3}"
-msgstr "{0}, {1} {2} hasar alÄ±r{3}"
+msgstr "{0}, {1} {2} hasar alır{3}"
 
 #. Combat.TeleportsTo
 msgctxt "Combat.TeleportsTo"
 msgid "{0} teleports to {1}"
-msgstr "{0}, {1} konumuna Ä±ÅŸÄ±nlanÄ±r"
+msgstr "{0}, {1} konumuna ışınlanır"
 
 #. Combat.Tile
 msgctxt "Combat.Tile"
@@ -1683,7 +1683,7 @@ msgstr "bilinmeyen"
 #. Combat.UnknownEntity
 msgctxt "Combat.UnknownEntity"
 msgid "unknown entity"
-msgstr "bilinmeyen varlÄ±k"
+msgstr "bilinmeyen varlık"
 
 #. Combat.UnknownTarget
 msgctxt "Combat.UnknownTarget"
@@ -1703,7 +1703,7 @@ msgstr "Zafer"
 #. Combat.Walkover
 msgctxt "Combat.Walkover"
 msgid "Walkover"
-msgstr "HÃ¼kmen zafer"
+msgstr "Hükmen zafer"
 
 #. Combat.Wielder
 msgctxt "Combat.Wielder"
@@ -1738,12 +1738,12 @@ msgstr "eylemde"
 #. Spatial.Attack
 msgctxt "Spatial.Attack"
 msgid "attack"
-msgstr "saldÄ±rÄ±"
+msgstr "saldırı"
 
 #. Spatial.AttackPreview
 msgctxt "Spatial.AttackPreview"
 msgid "Attack preview:"
-msgstr "SaldÄ±rÄ± Ã¶nizlemesi:"
+msgstr "Saldırı önizlemesi:"
 
 #. Spatial.AttackRange
 msgctxt "Spatial.AttackRange"
@@ -1763,7 +1763,7 @@ msgstr "Komutan"
 #. Spatial.CommanderPossessive
 msgctxt "Spatial.CommanderPossessive"
 msgid "commander's"
-msgstr "komutanÄ±n"
+msgstr "komutanın"
 
 #. Spatial.Cost
 msgctxt "Spatial.Cost"
@@ -1783,7 +1783,7 @@ msgstr "Ölümcül menzil"
 #. Spatial.Deadly
 msgctxt "Spatial.Deadly"
 msgid "deadly"
-msgstr "Ã¶lÃ¼mcÃ¼l"
+msgstr "ölümcül"
 
 #. Spatial.Debris
 msgctxt "Spatial.Debris"
@@ -1808,17 +1808,17 @@ msgstr "yok eder"
 #. Spatial.ElevatedGroundHeight
 msgctxt "Spatial.ElevatedGroundHeight"
 msgid "elevated ground, height {0}"
-msgstr "yÃ¼ksek zemin, yÃ¼kseklik {0}"
+msgstr "yüksek zemin, yükseklik {0}"
 
 #. Spatial.EnemySpawnPoint
 msgctxt "Spatial.EnemySpawnPoint"
 msgid "enemy spawn point"
-msgstr "dÃ¼ÅŸman Ã§Ä±kÄ±ÅŸ noktasÄ±"
+msgstr "düşman çıkış noktası"
 
 #. Spatial.Enemy
 msgctxt "Spatial.Enemy"
 msgid "enemy"
-msgstr "dÃ¼ÅŸman"
+msgstr "düşman"
 
 #. Spatial.ExtraTargetPrefix
 msgctxt "Spatial.ExtraTargetPrefix"
@@ -1833,17 +1833,17 @@ msgstr "dost"
 #. Spatial.FurthestReachableInTurns
 msgctxt "Spatial.FurthestReachableInTurns"
 msgid "furthest reachable in {0} turns"
-msgstr "{0} tur iÃ§inde ulaÅŸÄ±labilecek en uzak nokta"
+msgstr "{0} tur içinde ulaşılabilecek en uzak nokta"
 
 #. Spatial.FurthestReachableThisTurn
 msgctxt "Spatial.FurthestReachableThisTurn"
 msgid "furthest reachable this turn"
-msgstr "bu tur ulaÅŸÄ±labilecek en uzak nokta"
+msgstr "bu tur ulaşılabilecek en uzak nokta"
 
 #. Spatial.Health
 msgctxt "Spatial.Health"
 msgid "{0} / {1} health"
-msgstr "{0} / {1} saÄŸlÄ±k"
+msgstr "{0} / {1} sağlık"
 
 #. Spatial.Here
 msgctxt "Spatial.Here"
@@ -1853,27 +1853,27 @@ msgstr "burada"
 #. Spatial.Impassable
 msgctxt "Spatial.Impassable"
 msgid "impassable"
-msgstr "geÃ§ilemez"
+msgstr "geçilemez"
 
 #. Spatial.InteractionPoint
 msgctxt "Spatial.InteractionPoint"
 msgid "Interaction point"
-msgstr "EtkileÅŸim noktasÄ±"
+msgstr "Etkileşim noktası"
 
 #. Spatial.Interactable
 msgctxt "Spatial.Interactable"
 msgid "interactable"
-msgstr "etkileÅŸilebilir"
+msgstr "etkileşilebilir"
 
 #. Spatial.InteractableNextTurn
 msgctxt "Spatial.InteractableNextTurn"
 msgid "interactable next turn"
-msgstr "sonraki tur etkileÅŸilebilir"
+msgstr "sonraki tur etkileşilebilir"
 
 #. Spatial.Kills
 msgctxt "Spatial.Kills"
 msgid "kills {0}"
-msgstr "{0} Ã¶ldÃ¼rÃ¼r"
+msgstr "{0} öldürür"
 
 #. Spatial.MayDestroy
 msgctxt "Spatial.MayDestroy"
@@ -1893,12 +1893,12 @@ msgstr "Hareket menzili"
 #. Spatial.Neutral
 msgctxt "Spatial.Neutral"
 msgid "neutral"
-msgstr "tarafsÄ±z"
+msgstr "tarafsız"
 
 #. Spatial.NoRoutePreview
 msgctxt "Spatial.NoRoutePreview"
 msgid "no route preview"
-msgstr "rota Ã¶nizlemesi yok"
+msgstr "rota önizlemesi yok"
 
 #. Spatial.OnRoute
 msgctxt "Spatial.OnRoute"
@@ -1918,17 +1918,17 @@ msgstr "{0} ve hareket menzili"
 #. Spatial.Reachable
 msgctxt "Spatial.Reachable"
 msgid "reachable"
-msgstr "ulaÅŸÄ±labilir"
+msgstr "ulaşılabilir"
 
 #. Spatial.SpawnPoint
 msgctxt "Spatial.SpawnPoint"
 msgid "spawn point"
-msgstr "Ã§Ä±kÄ±ÅŸ noktasÄ±"
+msgstr "çıkış noktası"
 
 #. Spatial.Threatened
 msgctxt "Spatial.Threatened"
 msgid "Threatened"
-msgstr "Tehdit altÄ±nda"
+msgstr "Tehdit altında"
 
 #. Spatial.ThisTurnAt
 msgctxt "Spatial.ThisTurnAt"
@@ -1938,17 +1938,17 @@ msgstr "Bu tur: {0}"
 #. Spatial.TurnsIn
 msgctxt "Spatial.TurnsIn"
 msgid "in {0} turns"
-msgstr "{0} tur iÃ§inde"
+msgstr "{0} tur içinde"
 
 #. Spatial.Unexplored
 msgctxt "Spatial.Unexplored"
 msgid "Unexplored"
-msgstr "KeÅŸfedilmemiÅŸ"
+msgstr "Keşfedilmemiş"
 
 #. Spatial.Unseen
 msgctxt "Spatial.Unseen"
 msgid "Unseen"
-msgstr "GÃ¶rÃ¼nmÃ¼yor"
+msgstr "Görünmüyor"
 
 #. Spatial.VisitedSuffix
 msgctxt "Spatial.VisitedSuffix"
@@ -1958,7 +1958,7 @@ msgstr "{0} (ziyaret edildi)"
 #. Spatial.WithinZoneOfControl
 msgctxt "Spatial.WithinZoneOfControl"
 msgid "Within {0} zone of control"
-msgstr "{0} kontrol bÃ¶lgesi iÃ§inde"
+msgstr "{0} kontrol bölgesi içinde"
 
 #. Spatial.ZoneOfControl
 msgctxt "Spatial.ZoneOfControl"
@@ -1968,12 +1968,12 @@ msgstr "Kontrol bölgesi"
 #. Spatial.ZoneOfControlTiles
 msgctxt "Spatial.ZoneOfControlTiles"
 msgid "{0} within {1} zone of control"
-msgstr "{1} kontrol bÃ¶lgesinde {0}"
+msgstr "{1} kontrol bölgesinde {0}"
 
 #. Screens.AiControl
 msgctxt "Screens.AiControl"
 msgid "AI control"
-msgstr "YZ kontrolÃ¼"
+msgstr "YZ kontrolü"
 
 #. Screens.AiDifficulty
 msgctxt "Screens.AiDifficulty"
@@ -1983,12 +1983,12 @@ msgstr "{0} YZ"
 #. Screens.Attacker
 msgctxt "Screens.Attacker"
 msgid "Attacker"
-msgstr "SaldÄ±ran"
+msgstr "Saldıran"
 
 #. Screens.AttackerPortrait
 msgctxt "Screens.AttackerPortrait"
 msgid "Attacker portrait"
-msgstr "SaldÄ±ran portresi"
+msgstr "Saldıran portresi"
 
 #. Screens.CombatPortraitDetail
 msgctxt "Screens.CombatPortraitDetail"
@@ -2013,22 +2013,22 @@ msgstr "seviye {0}"
 #. Scanner.All
 msgctxt "Scanner.All"
 msgid "All"
-msgstr "TÃ¼mÃ¼"
+msgstr "Tümü"
 
 #. Scanner.ArtifactMarkets
 msgctxt "Scanner.ArtifactMarkets"
 msgid "Artifact markets"
-msgstr "Eser pazarlarÄ±"
+msgstr "Eser pazarları"
 
 #. Scanner.Attackable
 msgctxt "Scanner.Attackable"
 msgid "Attackable"
-msgstr "SaldÄ±rÄ±labilir"
+msgstr "Saldırılabilir"
 
 #. Scanner.Beacons
 msgctxt "Scanner.Beacons"
 msgid "Beacons"
-msgstr "Ä°ÅŸaretler"
+msgstr "İşaretler"
 
 #. Scanner.Blocked
 msgctxt "Scanner.Blocked"
@@ -2038,7 +2038,7 @@ msgstr "Engelli"
 #. Scanner.Bridges
 msgctxt "Scanner.Bridges"
 msgid "Bridges"
-msgstr "KÃ¶prÃ¼ler"
+msgstr "Köprüler"
 
 #. Scanner.Buildings
 msgctxt "Scanner.Buildings"
@@ -2053,27 +2053,27 @@ msgstr "Tehlikeli"
 #. Scanner.East
 msgctxt "Scanner.East"
 msgid "east"
-msgstr "doÄŸu"
+msgstr "doğu"
 
 #. Scanner.ElevatedGround
 msgctxt "Scanner.ElevatedGround"
 msgid "Elevated ground {0}"
-msgstr "YÃ¼ksek zemin {0}"
+msgstr "Yüksek zemin {0}"
 
 #. Scanner.Enemy
 msgctxt "Scanner.Enemy"
 msgid "Enemy"
-msgstr "DÃ¼ÅŸman"
+msgstr "Düşman"
 
 #. Scanner.EnemyGates
 msgctxt "Scanner.EnemyGates"
 msgid "Enemy gates"
-msgstr "DÃ¼ÅŸman kapÄ±larÄ±"
+msgstr "Düşman kapıları"
 
 #. Scanner.Entities
 msgctxt "Scanner.Entities"
 msgid "Entities"
-msgstr "VarlÄ±klar"
+msgstr "Varlıklar"
 
 #. Scanner.Friendly
 msgctxt "Scanner.Friendly"
@@ -2083,17 +2083,17 @@ msgstr "Dost"
 #. Scanner.FriendlyGates
 msgctxt "Scanner.FriendlyGates"
 msgid "Friendly gates"
-msgstr "Dost kapÄ±larÄ±"
+msgstr "Dost kapıları"
 
 #. Scanner.Impassable
 msgctxt "Scanner.Impassable"
 msgid "Impassable"
-msgstr "GeÃ§ilemez"
+msgstr "Geçilemez"
 
 #. Scanner.ImpassableTerrain
 msgctxt "Scanner.ImpassableTerrain"
 msgid "Impassable terrain"
-msgstr "GeÃ§ilemez arazi"
+msgstr "Geçilemez arazi"
 
 #. Scanner.Knowledge
 msgctxt "Scanner.Knowledge"
@@ -2113,7 +2113,7 @@ msgstr "Etrafa bakma yarıçapı {0}"
 #. Scanner.Neutral
 msgctxt "Scanner.Neutral"
 msgid "Neutral"
-msgstr "TarafsÄ±z"
+msgstr "Tarafsız"
 
 #. Scanner.North
 msgctxt "Scanner.North"
@@ -2123,12 +2123,12 @@ msgstr "kuzey"
 #. Scanner.Northeast
 msgctxt "Scanner.Northeast"
 msgid "northeast"
-msgstr "kuzeydoÄŸu"
+msgstr "kuzeydoğu"
 
 #. Scanner.Northwest
 msgctxt "Scanner.Northwest"
 msgid "northwest"
-msgstr "kuzeybatÄ±"
+msgstr "kuzeybatı"
 
 #. Scanner.Objectives
 msgctxt "Scanner.Objectives"
@@ -2143,17 +2143,17 @@ msgstr "Engeller"
 #. Scanner.Pickups
 msgctxt "Scanner.Pickups"
 msgid "Pickups"
-msgstr "AlÄ±nabilirler"
+msgstr "Alınabilirler"
 
 #. Scanner.Power
 msgctxt "Scanner.Power"
 msgid "Power"
-msgstr "GÃ¼Ã§"
+msgstr "Güç"
 
 #. Scanner.Revealed
 msgctxt "Scanner.Revealed"
 msgid "Revealed"
-msgstr "Ortaya cikarilanlar"
+msgstr "Ortaya çıkarılanlar"
 
 #. Scanner.ResourceGenerators
 msgctxt "Scanner.ResourceGenerators"
@@ -2188,27 +2188,27 @@ msgstr "Arama sonuçları"
 #. Scanner.SettlementsAndBuildSites
 msgctxt "Scanner.SettlementsAndBuildSites"
 msgid "Settlements and Build sites"
-msgstr "YerleÅŸimler ve inÅŸaat alanlarÄ±"
+msgstr "Yerleşimler ve inşaat alanları"
 
 #. Scanner.South
 msgctxt "Scanner.South"
 msgid "south"
-msgstr "gÃ¼ney"
+msgstr "güney"
 
 #. Scanner.Southeast
 msgctxt "Scanner.Southeast"
 msgid "southeast"
-msgstr "gÃ¼neydoÄŸu"
+msgstr "güneydoğu"
 
 #. Scanner.Southwest
 msgctxt "Scanner.Southwest"
 msgid "southwest"
-msgstr "gÃ¼neybatÄ±"
+msgstr "güneybatı"
 
 #. Scanner.Teleport
 msgctxt "Scanner.Teleport"
 msgid "Teleport"
-msgstr "IÅŸÄ±nlanma"
+msgstr "Işınlanma"
 
 #. Scanner.Terrain
 msgctxt "Scanner.Terrain"
@@ -2218,7 +2218,7 @@ msgstr "Arazi"
 #. Scanner.TroopSources
 msgctxt "Scanner.TroopSources"
 msgid "Troop sources"
-msgstr "Birlik kaynaklarÄ±"
+msgstr "Birlik kaynakları"
 
 #. Scanner.Troops
 msgctxt "Scanner.Troops"
@@ -2228,7 +2228,7 @@ msgstr "Birlikler"
 #. Scanner.Unvisited
 msgctxt "Scanner.Unvisited"
 msgid "Unvisited"
-msgstr "Ziyaret edilmemiÅŸ"
+msgstr "Ziyaret edilmemiş"
 
 #. Scanner.Water
 msgctxt "Scanner.Water"
@@ -2238,7 +2238,7 @@ msgstr "Su"
 #. Scanner.West
 msgctxt "Scanner.West"
 msgid "west"
-msgstr "batÄ±"
+msgstr "batı"
 
 #. Screens.BuyResourceForGold
 msgctxt "Screens.BuyResourceForGold"
@@ -2253,7 +2253,7 @@ msgstr "{0} öğesini {1} karşılığında sat"
 #. Scanner.Wielders
 msgctxt "Scanner.Wielders"
 msgid "Wielders"
-msgstr "TaÅŸÄ±yÄ±cÄ±lar"
+msgstr "Taşıyıcılar"
 
 #. Scanner.BlockedTileCount_0
 msgctxt "Scanner.BlockedTileCount_0"
@@ -2263,12 +2263,12 @@ msgstr "{0} engelli kare"
 #. Scanner.BridgeTileCount_0
 msgctxt "Scanner.BridgeTileCount_0"
 msgid "{0} bridge tile"
-msgstr "{0} kÃ¶prÃ¼ karesi"
+msgstr "{0} köprü karesi"
 
 #. Scanner.ImpassableTileCount_0
 msgctxt "Scanner.ImpassableTileCount_0"
 msgid "{0} impassable tile"
-msgstr "{0} geÃ§ilemez kare"
+msgstr "{0} geçilemez kare"
 
 #. Scanner.RoadTileCount_0
 msgctxt "Scanner.RoadTileCount_0"
@@ -2283,17 +2283,17 @@ msgstr "{0} su karesi"
 #. Spatial.AridTrees
 msgctxt "Spatial.AridTrees"
 msgid "Arid trees"
-msgstr "Kurak aÄŸaÃ§lar"
+msgstr "Kurak ağaçlar"
 
 #. Spatial.Bridge
 msgctxt "Spatial.Bridge"
 msgid "Bridge"
-msgstr "KÃ¶prÃ¼"
+msgstr "Köprü"
 
 #. Spatial.CobblestoneRoad
 msgctxt "Spatial.CobblestoneRoad"
 msgid "Cobblestone road"
-msgstr "Arnavut kaldÄ±rÄ±mlÄ± yol"
+msgstr "Arnavut kaldırımlı yol"
 
 #. Spatial.DeepWater
 msgctxt "Spatial.DeepWater"
@@ -2303,7 +2303,7 @@ msgstr "Derin su"
 #. Spatial.Deforestation
 msgctxt "Spatial.Deforestation"
 msgid "Deforestation"
-msgstr "OrmansÄ±zlaÅŸma"
+msgstr "Ormansızlaşma"
 
 #. Spatial.DirtRoad
 msgctxt "Spatial.DirtRoad"
@@ -2313,7 +2313,7 @@ msgstr "Toprak yol"
 #. Spatial.Farmland
 msgctxt "Spatial.Farmland"
 msgid "Farmland"
-msgstr "TarÄ±m arazisi"
+msgstr "Tarım arazisi"
 
 #. Spatial.Road
 msgctxt "Spatial.Road"
@@ -2323,7 +2323,7 @@ msgstr "Yol"
 #. Spatial.ShallowWater
 msgctxt "Spatial.ShallowWater"
 msgid "Shallow water"
-msgstr "SÄ±ÄŸ su"
+msgstr "Sığ su"
 
 #. Spatial.Wall
 msgctxt "Spatial.Wall"
@@ -2338,7 +2338,7 @@ msgstr "Su"
 #. Spatial.WaterEdge
 msgctxt "Spatial.WaterEdge"
 msgid "Water edge"
-msgstr "Su kenarÄ±"
+msgstr "Su kenarı"
 
 #. Screens.MoveAllLeft
 msgctxt "Screens.MoveAllLeft"
@@ -2409,32 +2409,32 @@ msgstr "Yer imi yok"
 #. Combat.AllMeleeTroops
 msgctxt "Combat.AllMeleeTroops"
 msgid "all melee troops"
-msgstr "tum yakin dovus birlikleri"
+msgstr "tüm yakın dövüş birlikleri"
 
 #. Combat.AllRangedTroops
 msgctxt "Combat.AllRangedTroops"
 msgid "all ranged troops"
-msgstr "tum menzilli birlikler"
+msgstr "tüm menzilli birlikler"
 
 #. Combat.AllTroops
 msgctxt "Combat.AllTroops"
 msgid "all troops"
-msgstr "tum birlikler"
+msgstr "tüm birlikler"
 
 #. Combat.EnemyMeleeTroops
 msgctxt "Combat.EnemyMeleeTroops"
 msgid "enemy melee troops"
-msgstr "dusman yakin dovus birlikleri"
+msgstr "düşman yakın dövüş birlikleri"
 
 #. Combat.EnemyCommander
 msgctxt "Combat.EnemyCommander"
 msgid "enemy {0}"
-msgstr "dusman {0}"
+msgstr "düşman {0}"
 
 #. Combat.EnemyRangedTroops
 msgctxt "Combat.EnemyRangedTroops"
 msgid "enemy ranged troops"
-msgstr "dusman menzilli birlikleri"
+msgstr "düşman menzilli birlikleri"
 
 #. Combat.WielderEssenceGenerated
 msgctxt "Combat.WielderEssenceGenerated"
@@ -2444,7 +2444,7 @@ msgstr "{0}: {1}"
 #. Combat.YourMeleeTroops
 msgctxt "Combat.YourMeleeTroops"
 msgid "your melee troops"
-msgstr "yakin dovus birliklerin"
+msgstr "yakın dövüş birliklerin"
 
 #. Combat.YourRangedTroops
 msgctxt "Combat.YourRangedTroops"
@@ -2454,12 +2454,12 @@ msgstr "menzilli birliklerin"
 #. Scanner.AridTrees
 msgctxt "Scanner.AridTrees"
 msgid "Arid trees"
-msgstr "Kurak agaclar"
+msgstr "Kurak ağaçlar"
 
 #. Scanner.CobblestoneRoads
 msgctxt "Scanner.CobblestoneRoads"
 msgid "Cobblestone roads"
-msgstr "Arnavut kaldirimi yollar"
+msgstr "Arnavut kaldırımı yollar"
 
 #. Scanner.DeepWater
 msgctxt "Scanner.DeepWater"
@@ -2469,7 +2469,7 @@ msgstr "Derin su"
 #. Scanner.Deforestation
 msgctxt "Scanner.Deforestation"
 msgid "Deforestation"
-msgstr "Ormansizlasma"
+msgstr "Ormansızlaşma"
 
 #. Scanner.Dirt
 msgctxt "Scanner.Dirt"
@@ -2484,17 +2484,17 @@ msgstr "Toprak yollar"
 #. Scanner.Farmland
 msgctxt "Scanner.Farmland"
 msgid "Farmland"
-msgstr "Tarim arazisi"
+msgstr "Tarım arazisi"
 
 #. Scanner.Grass
 msgctxt "Scanner.Grass"
 msgid "Grass"
-msgstr "Cimen"
+msgstr "Çimen"
 
 #. Scanner.Mountains
 msgctxt "Scanner.Mountains"
 msgid "Mountains"
-msgstr "Daglar"
+msgstr "Dağlar"
 
 #. Scanner.Sand
 msgctxt "Scanner.Sand"
@@ -2504,12 +2504,12 @@ msgstr "Kum"
 #. Scanner.ShallowWater
 msgctxt "Scanner.ShallowWater"
 msgid "Shallow water"
-msgstr "Sig su"
+msgstr "Sığ su"
 
 #. Scanner.TemperateTrees
 msgctxt "Scanner.TemperateTrees"
 msgid "Temperate trees"
-msgstr "Iliman agaclar"
+msgstr "Ilıman ağaçlar"
 
 #. Scanner.Walls
 msgctxt "Scanner.Walls"
@@ -2519,7 +2519,7 @@ msgstr "Duvarlar"
 #. Scanner.WaterEdge
 msgctxt "Scanner.WaterEdge"
 msgid "Water edge"
-msgstr "Su kenari"
+msgstr "Su kenarı"
 
 #. Spatial.Dirt
 msgctxt "Spatial.Dirt"
@@ -2529,12 +2529,12 @@ msgstr "Toprak"
 #. Spatial.Grass
 msgctxt "Spatial.Grass"
 msgid "Grass"
-msgstr "Cimen"
+msgstr "Çimen"
 
 #. Spatial.Mountain
 msgctxt "Spatial.Mountain"
 msgid "Mountain"
-msgstr "Dag"
+msgstr "Dağ"
 
 #. Spatial.Sand
 msgctxt "Spatial.Sand"
@@ -2544,17 +2544,17 @@ msgstr "Kum"
 #. Spatial.TemperateTrees
 msgctxt "Spatial.TemperateTrees"
 msgid "Temperate trees"
-msgstr "Iliman agaclar"
+msgstr "Ilıman ağaçlar"
 
 #. Scanner.AridTreeTileCount_0
 msgctxt "Scanner.AridTreeTileCount_0"
 msgid "{0} arid tree tile"
-msgstr "{0} kare: Kurak agaclar"
+msgstr "{0} kare: Kurak ağaçlar"
 
 #. Scanner.CobblestoneRoadTileCount_0
 msgctxt "Scanner.CobblestoneRoadTileCount_0"
 msgid "{0} cobblestone road tile"
-msgstr "{0} kare: Arnavut kaldirimi yollar"
+msgstr "{0} kare: Arnavut kaldırımı yollar"
 
 #. Scanner.DeepWaterTileCount_0
 msgctxt "Scanner.DeepWaterTileCount_0"
@@ -2564,7 +2564,7 @@ msgstr "{0} kare: Derin su"
 #. Scanner.DeforestationTileCount_0
 msgctxt "Scanner.DeforestationTileCount_0"
 msgid "{0} deforestation tile"
-msgstr "{0} kare: Ormansizlasma"
+msgstr "{0} kare: Ormansızlaşma"
 
 #. Scanner.DirtRoadTileCount_0
 msgctxt "Scanner.DirtRoadTileCount_0"
@@ -2579,17 +2579,17 @@ msgstr "{0} kare: Toprak"
 #. Scanner.FarmlandTileCount_0
 msgctxt "Scanner.FarmlandTileCount_0"
 msgid "{0} farmland tile"
-msgstr "{0} kare: Tarim arazisi"
+msgstr "{0} kare: Tarım arazisi"
 
 #. Scanner.GrassTileCount_0
 msgctxt "Scanner.GrassTileCount_0"
 msgid "{0} grass tile"
-msgstr "{0} kare: Cimen"
+msgstr "{0} kare: Çimen"
 
 #. Scanner.MountainTileCount_0
 msgctxt "Scanner.MountainTileCount_0"
 msgid "{0} mountain tile"
-msgstr "{0} kare: Daglar"
+msgstr "{0} kare: Dağlar"
 
 #. Scanner.SandTileCount_0
 msgctxt "Scanner.SandTileCount_0"
@@ -2599,12 +2599,12 @@ msgstr "{0} kare: Kum"
 #. Scanner.ShallowWaterTileCount_0
 msgctxt "Scanner.ShallowWaterTileCount_0"
 msgid "{0} shallow water tile"
-msgstr "{0} kare: Sig su"
+msgstr "{0} kare: Sığ su"
 
 #. Scanner.TemperateTreeTileCount_0
 msgctxt "Scanner.TemperateTreeTileCount_0"
 msgid "{0} temperate tree tile"
-msgstr "{0} kare: Iliman agaclar"
+msgstr "{0} kare: Ilıman ağaçlar"
 
 #. Scanner.WallTileCount_0
 msgctxt "Scanner.WallTileCount_0"
@@ -2614,7 +2614,7 @@ msgstr "{0} kare: Duvarlar"
 #. Scanner.WaterEdgeTileCount_0
 msgctxt "Scanner.WaterEdgeTileCount_0"
 msgid "{0} water edge tile"
-msgstr "{0} kare: Su kenari"
+msgstr "{0} kare: Su kenarı"
 
 #. Spatial.SkippedTileCount_0
 msgctxt "Spatial.SkippedTileCount_0"

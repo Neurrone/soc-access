@@ -1,5 +1,9 @@
 # Changelog
 
+## V0.6.1
+
+- Fixed language translations using mojibake accents or ASCII fallbacks
+
 ## V0.6.0
 
 - Switched from Tolk to Prism to support more screen readers
