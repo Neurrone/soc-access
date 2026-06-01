@@ -1,0 +1,2757 @@
+﻿msgid ""
+msgstr ""
+"Project-Id-Version: SongsOfConquestAccess\n"
+"Language: zh-TW\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#. Common.ListFinal
+msgctxt "Common.ListFinal"
+msgid "{0}, and {1}"
+msgstr "{0} å’Œ {1}"
+
+#. Common.ListPair
+msgctxt "Common.ListPair"
+msgid "{0} and {1}"
+msgstr "{0} å’Œ {1}"
+
+#. Common.ListSeparator
+msgctxt "Common.ListSeparator"
+msgid "{0}, {1}"
+msgstr "{0}ï¼Œ{1}"
+
+#. Common.Quantity
+msgctxt "Common.Quantity"
+msgid "quantity"
+msgstr "æ•¸é‡"
+
+#. Common.ResourceAmount
+msgctxt "Common.ResourceAmount"
+msgid "{0} {1}"
+msgstr "{0} {1}"
+
+#. TeamColors.Black
+msgctxt "TeamColors.Black"
+msgid "black"
+msgstr "黑色"
+
+#. TeamColors.Blue
+msgctxt "TeamColors.Blue"
+msgid "blue"
+msgstr "藍色"
+
+#. TeamColors.DarkRed
+msgctxt "TeamColors.DarkRed"
+msgid "dark red"
+msgstr "深紅色"
+
+#. TeamColors.Green
+msgctxt "TeamColors.Green"
+msgid "green"
+msgstr "綠色"
+
+#. TeamColors.Neutral
+msgctxt "TeamColors.Neutral"
+msgid "neutral"
+msgstr "中立"
+
+#. TeamColors.Orange
+msgctxt "TeamColors.Orange"
+msgid "orange"
+msgstr "橙色"
+
+#. TeamColors.Pink
+msgctxt "TeamColors.Pink"
+msgid "pink"
+msgstr "粉紅色"
+
+#. TeamColors.Purple
+msgctxt "TeamColors.Purple"
+msgid "purple"
+msgstr "紫色"
+
+#. TeamColors.Red
+msgctxt "TeamColors.Red"
+msgid "red"
+msgstr "紅色"
+
+#. TeamColors.Teal
+msgctxt "TeamColors.Teal"
+msgid "teal"
+msgstr "青綠色"
+
+#. TeamColors.Yellow
+msgctxt "TeamColors.Yellow"
+msgid "yellow"
+msgstr "黃色"
+
+#. Artifacts.ColorBlue
+msgctxt "Artifacts.ColorBlue"
+msgid "blue"
+msgstr "藍色"
+
+#. Artifacts.ColorGreen
+msgctxt "Artifacts.ColorGreen"
+msgid "green"
+msgstr "綠色"
+
+#. Artifacts.ColorGrey
+msgctxt "Artifacts.ColorGrey"
+msgid "grey"
+msgstr "灰色"
+
+#. Artifacts.ColorOrange
+msgctxt "Artifacts.ColorOrange"
+msgid "orange"
+msgstr "橙色"
+
+#. Artifacts.ColorViolet
+msgctxt "Artifacts.ColorViolet"
+msgid "violet"
+msgstr "紫色"
+
+#. Artifacts.NameWithColor
+msgctxt "Artifacts.NameWithColor"
+msgid "{0} ({1})"
+msgstr "{0} ({1})"
+
+#. Common.TileCount_0
+msgctxt "Common.TileCount_0"
+msgid "{0} tile"
+msgstr "{0} å€‹æ ¼å­"
+
+#. Draft.EssenceVariants
+msgctxt "Draft.EssenceVariants"
+msgid "Essence variants"
+msgstr "ç²¾è¯è®Šé«”"
+
+#. Draft.Purchase
+msgctxt "Draft.Purchase"
+msgid "Purchase"
+msgstr "è´­ä¹°"
+
+#. Draft.PurchaseForResources
+msgctxt "Draft.PurchaseForResources"
+msgid "Purchase for {0}"
+msgstr "èŠ±è´¹ {0} è´­ä¹°"
+
+#. Draft.AvailableTroops_0
+msgctxt "Draft.AvailableTroops_0"
+msgid "{0} available"
+msgstr "{0} 可用"
+
+#. Draft.Upgrade
+msgctxt "Draft.Upgrade"
+msgid "Upgrade"
+msgstr "升級"
+
+#. Draft.UpgradeForResources
+msgctxt "Draft.UpgradeForResources"
+msgid "Upgrade for {0}"
+msgstr "花費 {0} 升級"
+
+#. Draft.UpgradeAvailableTroops
+msgctxt "Draft.UpgradeAvailableTroops"
+msgid "Upgrade available troops"
+msgstr "å‡ç´šå¯ç”¨éƒ¨éšŠ"
+
+#. Events.BuildSiteLarge
+msgctxt "Events.BuildSiteLarge"
+msgid "large"
+msgstr "å¤§åž‹"
+
+#. Events.BuildSiteLargeSettlement
+msgctxt "Events.BuildSiteLargeSettlement"
+msgid "large settlement"
+msgstr "å¤§åž‹èšè½"
+
+#. Events.BuildSiteMedium
+msgctxt "Events.BuildSiteMedium"
+msgid "medium"
+msgstr "ä¸­åž‹"
+
+#. Events.BuildSiteSmall
+msgctxt "Events.BuildSiteSmall"
+msgid "small"
+msgstr "å°åž‹"
+
+#. Events.BuildSiteSmallSettlement
+msgctxt "Events.BuildSiteSmallSettlement"
+msgid "small settlement"
+msgstr "å°åž‹èšè½"
+
+#. Events.BuildSiteTown
+msgctxt "Events.BuildSiteTown"
+msgid "town"
+msgstr "åŸŽéŽ®"
+
+#. Events.DestinationCleared
+msgctxt "Events.DestinationCleared"
+msgid "{0}'s destination cleared."
+msgstr "{0}çš„ç›®çš„åœ°å·²æ¸…é™¤ã€‚"
+
+#. Events.DestinationSet
+msgctxt "Events.DestinationSet"
+msgid "{0}'s destination set to {1}"
+msgstr "{0}çš„ç›®çš„åœ°å·²è¨­ç‚º{1}"
+
+#. Events.HudClosed
+msgctxt "Events.HudClosed"
+msgid "HUD closed"
+msgstr "HUD å·²é—œé–‰"
+
+#. Events.HudOpen
+msgctxt "Events.HudOpen"
+msgid "HUD open"
+msgstr "HUD å·²é–‹å•Ÿ"
+
+#. Events.LeveledUpTo
+msgctxt "Events.LeveledUpTo"
+msgid "{0} leveled up to {1}"
+msgstr "{0}å‡åˆ°äº†{1}ç´š"
+
+#. Events.MapCameraFocus
+msgctxt "Events.MapCameraFocus"
+msgid "Map camera focuses on {0}"
+msgstr "åœ°åœ–é¡é ­èšç„¦åˆ°{0}"
+
+#. Events.ModError
+msgctxt "Events.ModError"
+msgid "Mod error: {0}"
+msgstr "æ¨¡çµ„éŒ¯èª¤ï¼š{0}"
+
+#. Events.RecruitedWielder
+msgctxt "Events.RecruitedWielder"
+msgid "Recruited wielder {0}"
+msgstr "已招募持有者{0}"
+
+#. Events.SelectedBuildSite
+msgctxt "Events.SelectedBuildSite"
+msgid "Selected {0} build site at {1}"
+msgstr "å·²é¸å–{1}çš„{0}å»ºé€ é»ž"
+
+#. Events.SelectedWielder
+msgctxt "Events.SelectedWielder"
+msgid "Selected wielder {0}"
+msgstr "å·²é¸å–æŒæœ‰è€… {0}"
+
+#. Events.Wielder
+msgctxt "Events.Wielder"
+msgid "wielder"
+msgstr "æŒæœ‰è€…"
+
+#. Events.WieldersNoLongerVisible
+msgctxt "Events.WieldersNoLongerVisible"
+msgid "{0} no longer visible"
+msgstr "{0}不再可見"
+
+#. Events.WielderMoved
+msgctxt "Events.WielderMoved"
+msgid "{0} moved to {1}"
+msgstr "{0}ç§»å‹•åˆ°{1}"
+
+#. Events.WielderTeleported
+msgctxt "Events.WielderTeleported"
+msgid "{0} teleported to {1}"
+msgstr "{0}å‚³é€åˆ°{1}"
+
+#. UI.ArmyExchangeGrid
+msgctxt "UI.ArmyExchangeGrid"
+msgid "Army exchange grid"
+msgstr "éƒ¨é˜Ÿäº¤æ¢ç½‘æ ¼"
+
+#. UI.AvailableActions
+msgctxt "UI.AvailableActions"
+msgid "Available actions: {0}."
+msgstr "å¯ç”¨æ“ä½œï¼š{0}ã€‚"
+
+#. UI.Blank
+msgctxt "UI.Blank"
+msgid "blank"
+msgstr "ç©ºç™½"
+
+#. UI.CannotDropThere
+msgctxt "UI.CannotDropThere"
+msgid "Cannot drop there."
+msgstr "ä¸èƒ½æ”¾åœ¨é‚£è£¡ã€‚"
+
+#. UI.CharacterColon
+msgctxt "UI.CharacterColon"
+msgid "colon"
+msgstr "å†’å·"
+
+#. UI.CharacterComma
+msgctxt "UI.CharacterComma"
+msgid "comma"
+msgstr "é€—è™Ÿ"
+
+#. UI.CharacterDash
+msgctxt "UI.CharacterDash"
+msgid "dash"
+msgstr "çŸ­æ©«ç·š"
+
+#. UI.CharacterDot
+msgctxt "UI.CharacterDot"
+msgid "dot"
+msgstr "ç‚¹"
+
+#. UI.CharacterSemicolon
+msgctxt "UI.CharacterSemicolon"
+msgid "semicolon"
+msgstr "åˆ†è™Ÿ"
+
+#. UI.CharacterSpace
+msgctxt "UI.CharacterSpace"
+msgid "space"
+msgstr "ç©ºæ ¼"
+
+#. UI.CharacterTab
+msgctxt "UI.CharacterTab"
+msgid "tab"
+msgstr "åˆ¶è¡¨ç¬¦"
+
+#. UI.CharacterUnderscore
+msgctxt "UI.CharacterUnderscore"
+msgid "underscore"
+msgstr "åº•ç·š"
+
+#. UI.CombatDisconnectedTiles
+msgctxt "UI.CombatDisconnectedTiles"
+msgid "Some shown tiles are separated. Use W and Shift W to reach all range tiles."
+msgstr "éƒ¨åˆ†é¡¯ç¤ºçš„æ ¼å­å½¼æ­¤ä¸ç›¸é€£ã€‚ä½¿ç”¨ W å’Œ Shift W å¯åˆ°é”æ‰€æœ‰å°„ç¨‹æ ¼å­ã€‚"
+
+#. UI.CombatGrid
+msgctxt "UI.CombatGrid"
+msgid "Combat grid"
+msgstr "æˆ°é¬¥ç¶²æ ¼"
+
+#. UI.DragCancelled
+msgctxt "UI.DragCancelled"
+msgid "Drag cancelled."
+msgstr "æ‹–æ›³å·²å–æ¶ˆã€‚"
+
+#. UI.DragComplete
+msgctxt "UI.DragComplete"
+msgid "Drag complete."
+msgstr "æ‹–æ›³å®Œæˆã€‚"
+
+#. UI.DragStarted
+msgctxt "UI.DragStarted"
+msgid "Started drag. Move to destination and press enter to drop."
+msgstr "å·²é–‹å§‹æ‹–æ›³ã€‚ç§»å‹•åˆ°ç›®æ¨™ä½ç½®ä¸¦æŒ‰ Enter æ”¾ä¸‹ã€‚"
+
+#. UI.DragStartedTroopPlacement
+msgctxt "UI.DragStartedTroopPlacement"
+msgid "Started drag for {0} at {1}. Press enter to drop on destination spawn point, or press escape to cancel."
+msgstr "å·²é–‹å§‹æ‹–æ›³ {1} çš„ {0}ã€‚æŒ‰ Enter æ”¾åˆ°ç›®æ¨™éƒ¨ç½²é»žï¼Œæˆ–æŒ‰ Escape å–æ¶ˆã€‚"
+
+#. UI.Empty
+msgctxt "UI.Empty"
+msgid "Empty"
+msgstr "ç©º"
+
+#. UI.EmptyTroopSlot
+msgctxt "UI.EmptyTroopSlot"
+msgid "Empty troop {0}"
+msgstr "ç©ºéƒ¨é˜Ÿ{0}"
+
+#. UI.ExitedInspectMode
+msgctxt "UI.ExitedInspectMode"
+msgid "Exited inspect mode"
+msgstr "å·²é€€å‡ºæª¢è¦–æ¨¡å¼"
+
+#. UI.Heading
+msgctxt "UI.Heading"
+msgid "{0} heading"
+msgstr "{0} æ¨™é¡Œ"
+
+#. UI.Inspecting
+msgctxt "UI.Inspecting"
+msgid "Inspecting {0}"
+msgstr "æ­£åœ¨æª¢è¦– {0}"
+
+#. UI.InventoryGrid
+msgctxt "UI.InventoryGrid"
+msgid "Inventory grid"
+msgstr "ç‰©å“æ¬„ç¶²æ ¼"
+
+#. UI.InvalidDestination
+msgctxt "UI.InvalidDestination"
+msgid "Invalid destination."
+msgstr "ç„¡æ•ˆç›®æ¨™ã€‚"
+
+#. UI.JoiningArmy
+msgctxt "UI.JoiningArmy"
+msgid "joining army"
+msgstr "åŠ å…¥çš„è»éšŠ"
+
+#. UI.LabelValue
+msgctxt "UI.LabelValue"
+msgid "{0}: {1}"
+msgstr "{0}ï¼š{1}"
+
+#. UI.PressSpaceSelectItemToDrag
+msgctxt "UI.PressSpaceSelectItemToDrag"
+msgid "Press space to select an item to drag."
+msgstr "æŒ‰ç©ºç™½éµé¸æ“‡è¦æ‹–æ›³çš„ç‰©å“ã€‚"
+
+#. UI.PressSpaceToDrag
+msgctxt "UI.PressSpaceToDrag"
+msgid "Press space to drag."
+msgstr "æŒ‰ç©ºç™½éµæ‹–æ›³ã€‚"
+
+#. UI.RoleButton
+msgctxt "UI.RoleButton"
+msgid "button"
+msgstr "æŒ‰é’®"
+
+#. UI.RoleCheckBox
+msgctxt "UI.RoleCheckBox"
+msgid "check box"
+msgstr "æ ¸å–æ–¹å¡Š"
+
+#. UI.RoleColumnHeader
+msgctxt "UI.RoleColumnHeader"
+msgid "column header"
+msgstr "欄標題"
+
+#. UI.RoleDocument
+msgctxt "UI.RoleDocument"
+msgid "document"
+msgstr "æ–‡æ¡£"
+
+#. UI.RoleEdit
+msgctxt "UI.RoleEdit"
+msgid "edit"
+msgstr "ç·¨è¼¯æ¡†"
+
+#. UI.RoleGrid
+msgctxt "UI.RoleGrid"
+msgid "grid"
+msgstr "ç½‘æ ¼"
+
+#. UI.RoleMenu
+msgctxt "UI.RoleMenu"
+msgid "menu"
+msgstr "èœå•"
+
+#. UI.RoleSlider
+msgctxt "UI.RoleSlider"
+msgid "slider"
+msgstr "æ»‘å—"
+
+#. UI.Selected
+msgctxt "UI.Selected"
+msgid "selected"
+msgstr "å·²é€‰ä¸­"
+
+#. UI.Slot
+msgctxt "UI.Slot"
+msgid "slot {0}"
+msgstr "æ§½ä½ {0}"
+
+#. UI.SlotInGroup
+msgctxt "UI.SlotInGroup"
+msgid "{0} slot {1}"
+msgstr "{0} æ§½ä½ {1}"
+
+#. UI.Status
+msgctxt "UI.Status"
+msgid "status"
+msgstr "狀態"
+
+#. UI.StatusChecked
+msgctxt "UI.StatusChecked"
+msgid "checked"
+msgstr "å·²å‹¾é¸"
+
+#. UI.StatusDisabled
+msgctxt "UI.StatusDisabled"
+msgid "disabled"
+msgstr "å·²åœç”¨"
+
+#. UI.StatusDraggable
+msgctxt "UI.StatusDraggable"
+msgid "draggable"
+msgstr "å¯æ‹–æ›³"
+
+#. UI.StatusDragging
+msgctxt "UI.StatusDragging"
+msgid "dragging"
+msgstr "æ­£åœ¨æ‹–æ›³"
+
+#. UI.StatusUnchecked
+msgctxt "UI.StatusUnchecked"
+msgid "unchecked"
+msgstr "æœªå‹¾é¸"
+
+#. UI.SortAscending
+msgctxt "UI.SortAscending"
+msgid "ascending"
+msgstr "遞增"
+
+#. UI.SortDescending
+msgctxt "UI.SortDescending"
+msgid "descending"
+msgstr "遞減"
+
+#. UI.Target
+msgctxt "UI.Target"
+msgid "target"
+msgstr "ç›®æ ‡"
+
+#. UI.TroopSlot
+msgctxt "UI.TroopSlot"
+msgid "{0}, {1}"
+msgstr "{0}ï¼Œ{1}"
+
+#. UI.TroopSlotWithSize
+msgctxt "UI.TroopSlotWithSize"
+msgid "{0}, {1} / {2}, {3}"
+msgstr "{0}ï¼Œ{1} / {2}ï¼Œ{3}"
+
+#. UI.WielderArmy
+msgctxt "UI.WielderArmy"
+msgid "wielder's army"
+msgstr "æŒæœ‰è€…çš„è»éšŠ"
+
+#. UI.StatusCorrupt
+msgctxt "UI.StatusCorrupt"
+msgid "corrupt"
+msgstr "å·²ææ¯€"
+
+#. UI.StatusMissing
+msgctxt "UI.StatusMissing"
+msgid "missing"
+msgstr "ç¼ºå¤±"
+
+#. UI.StatusUnavailable
+msgctxt "UI.StatusUnavailable"
+msgid "unavailable"
+msgstr "ä¸å¯ç”¨"
+
+#. UI.BufferEmpty
+msgctxt "UI.BufferEmpty"
+msgid "Buffer empty"
+msgstr "ç·©è¡å€ç‚ºç©º"
+
+#. UI.NoScannerResults
+msgctxt "UI.NoScannerResults"
+msgid "No scanner results"
+msgstr "æ²’æœ‰æŽƒæçµæžœ"
+
+#. UI.NotInMovementRange
+msgctxt "UI.NotInMovementRange"
+msgid "Not in movement range"
+msgstr "ä¸åœ¨ç§»å‹•ç¯„åœå…§"
+
+#. UI.ReviewBufferEvents
+msgctxt "UI.ReviewBufferEvents"
+msgid "Events"
+msgstr "äº‹ä»¶"
+
+#. UI.ReviewBufferLine
+msgctxt "UI.ReviewBufferLine"
+msgid "{0}. {1}"
+msgstr "{0}ã€‚{1}"
+
+#. UI.ReviewBufferNotifications
+msgctxt "UI.ReviewBufferNotifications"
+msgid "Notifications"
+msgstr "é€šçŸ¥"
+
+#. UI.ReviewBufferUi
+msgctxt "UI.ReviewBufferUi"
+msgid "UI"
+msgstr "ä»‹é¢"
+
+#. UI.ScannerPath
+msgctxt "UI.ScannerPath"
+msgid "{0}, {1}. {2}"
+msgstr "{0}ï¼Œ{1}ã€‚{2}"
+
+#. UI.SelectedCount
+msgctxt "UI.SelectedCount"
+msgid "selected {0}x"
+msgstr "å·²é¸å– {0} å€‹"
+
+#. UI.Unselected
+msgctxt "UI.Unselected"
+msgid "unselected"
+msgstr "æœªé¸å–"
+
+#. Screens.AdventureMap
+msgctxt "Screens.AdventureMap"
+msgid "Adventure map"
+msgstr "å†’é™©åœ°å›¾"
+
+#. Screens.ArcanaSpells
+msgctxt "Screens.ArcanaSpells"
+msgid "Arcana spells"
+msgstr "å¥§è¡“æ³•è¡“"
+
+#. Screens.Army
+msgctxt "Screens.Army"
+msgid "army"
+msgstr "å†›é˜Ÿ"
+
+#. Screens.Articles
+msgctxt "Screens.Articles"
+msgid "Articles"
+msgstr "æ¢ç›®"
+
+#. Screens.AttackerEssence
+msgctxt "Screens.AttackerEssence"
+msgid "Attacker essence"
+msgstr "æ”»æ“Šæ–¹ç²¾è¯"
+
+#. Screens.Back
+msgctxt "Screens.Back"
+msgid "Back"
+msgstr "è¿”å›ž"
+
+#. Screens.Ballista
+msgctxt "Screens.Ballista"
+msgid "Ballista"
+msgstr "弩炮"
+
+#. Screens.BattleLog
+msgctxt "Screens.BattleLog"
+msgid "Battle log"
+msgstr "æˆ°é¬¥æ—¥èªŒ"
+
+#. Screens.BattleResult
+msgctxt "Screens.BattleResult"
+msgid "Battle result"
+msgstr "æˆ˜æ–—ç»“æžœ"
+
+#. Screens.Categories
+msgctxt "Screens.Categories"
+msgid "Categories"
+msgstr "é¡žåˆ¥"
+
+#. Screens.ChaosSpells
+msgctxt "Screens.ChaosSpells"
+msgid "Chaos spells"
+msgstr "æ··æ²Œæ³•æœ¯"
+
+#. Screens.Choices
+msgctxt "Screens.Choices"
+msgid "Choices"
+msgstr "é€‰æ‹©"
+
+#. Screens.Close
+msgctxt "Screens.Close"
+msgid "Close"
+msgstr "å…³é—­"
+
+#. Screens.CampaignMissionProgress
+msgctxt "Screens.CampaignMissionProgress"
+msgid "Completed: {0} / {1} missions"
+msgstr "已完成：{0} / {1} 個任務"
+
+#. Screens.Combat
+msgctxt "Screens.Combat"
+msgid "Combat"
+msgstr "æˆ˜æ–—"
+
+#. Screens.CreationSpells
+msgctxt "Screens.CreationSpells"
+msgid "Creation spells"
+msgstr "å‰µé€ æ³•è¡“"
+
+#. Screens.CurrentTroop
+msgctxt "Screens.CurrentTroop"
+msgid "Current troop, {0}"
+msgstr "å½“å‰éƒ¨é˜Ÿï¼Œ{0}"
+
+#. Screens.DefenderEssence
+msgctxt "Screens.DefenderEssence"
+msgid "Defender essence"
+msgstr "é˜²å®ˆæ–¹ç²¾åŽ"
+
+#. Screens.DefendingWielderArmy
+msgctxt "Screens.DefendingWielderArmy"
+msgid "defending wielder army"
+msgstr "é˜²å®ˆæŒæœ‰è€…å†›é˜Ÿ"
+
+#. Screens.Description
+msgctxt "Screens.Description"
+msgid "Description"
+msgstr "æè¿°"
+
+#. Screens.DescriptionWithMissingBuilding
+msgctxt "Screens.DescriptionWithMissingBuilding"
+msgid "{0}. missing building"
+msgstr "{0}ã€‚ç¼ºå°‘å»ºç¯‰"
+
+#. Screens.DestructionSpells
+msgctxt "Screens.DestructionSpells"
+msgid "Destruction spells"
+msgstr "æ¯ç­æ³•æœ¯"
+
+#. Screens.DisabledWithReason
+msgctxt "Screens.DisabledWithReason"
+msgid "{0}. {1}"
+msgstr "{0}ã€‚{1}"
+
+#. Screens.Downloads
+msgctxt "Screens.Downloads"
+msgid "Downloads"
+msgstr "下載"
+
+#. Screens.Empty
+msgctxt "Screens.Empty"
+msgid "empty"
+msgstr "ç©º"
+
+#. Screens.EjectWielder
+msgctxt "Screens.EjectWielder"
+msgid "Eject wielder"
+msgstr "ç§»å‡ºæŒæœ‰è€…"
+
+#. Screens.GraphType
+msgctxt "Screens.GraphType"
+msgid "Graph type"
+msgstr "å›¾è¡¨ç±»åž‹"
+
+#. Screens.Group
+msgctxt "Screens.Group"
+msgid "Group {0}"
+msgstr "ç»„ {0}"
+
+#. Screens.Layout
+msgctxt "Screens.Layout"
+msgid "Layout"
+msgstr "佈局"
+
+#. Screens.MainMenu
+msgctxt "Screens.MainMenu"
+msgid "Main menu"
+msgstr "ä¸»èœå•"
+
+#. Screens.Missing
+msgctxt "Screens.Missing"
+msgid "Missing {0}"
+msgstr "ç¼ºå°‘ {0}"
+
+#. Screens.MissingBuilding
+msgctxt "Screens.MissingBuilding"
+msgid "missing building"
+msgstr "ç¼ºå°‘å»ºç­‘"
+
+#. Screens.ModSettings
+msgctxt "Screens.ModSettings"
+msgid "Mod settings"
+msgstr "æ¨¡ç»„è®¾ç½®"
+
+#. Screens.ModifierCategoryTabs
+msgctxt "Screens.ModifierCategoryTabs"
+msgid "Modifier category tabs"
+msgstr "ä¿®æ­£é¡žåˆ¥åˆ†é "
+
+#. Screens.MultiEssenceSpells
+msgctxt "Screens.MultiEssenceSpells"
+msgid "Multi-essence spells"
+msgstr "å¤šç²¾è¯æ³•è¡“"
+
+#. Screens.NamedArmy
+msgctxt "Screens.NamedArmy"
+msgid "{0} army"
+msgstr "{0} çš„å†›é˜Ÿ"
+
+#. Screens.NamedLevel
+msgctxt "Screens.NamedLevel"
+msgid "{0}, level {1}"
+msgstr "{0}ï¼Œç­‰çº§ {1}"
+
+#. Screens.NamedMenu
+msgctxt "Screens.NamedMenu"
+msgid "{0} menu"
+msgstr "{0} èœå•"
+
+#. Screens.NamedTabs
+msgctxt "Screens.NamedTabs"
+msgid "{0} {1}"
+msgstr "{0} {1}"
+
+#. Screens.Next
+msgctxt "Screens.Next"
+msgid "Next"
+msgstr "ä¸‹ä¸€é …"
+
+#. Screens.None
+msgctxt "Screens.None"
+msgid "None"
+msgstr "æ— "
+
+#. Screens.Notifications
+msgctxt "Screens.Notifications"
+msgid "Notifications"
+msgstr "é€šçŸ¥"
+
+#. Screens.Objectives
+msgctxt "Screens.Objectives"
+msgid "Objectives"
+msgstr "ç›®æ¨™"
+
+#. Screens.ObjectiveMarkerFarAway
+msgctxt "Screens.ObjectiveMarkerFarAway"
+msgid "far away"
+msgstr "很遠"
+
+#. Screens.ObjectiveMarkerNearby
+msgctxt "Screens.ObjectiveMarkerNearby"
+msgid "nearby"
+msgstr "附近"
+
+#. Screens.ObjectiveMarkerSomeDistance
+msgctxt "Screens.ObjectiveMarkerSomeDistance"
+msgid "some distance"
+msgstr "有一段距離"
+
+#. Screens.Ok
+msgctxt "Screens.Ok"
+msgid "OK"
+msgstr "ç¡®å®š"
+
+#. Screens.OrderSpells
+msgctxt "Screens.OrderSpells"
+msgid "Order spells"
+msgstr "ç§©åºæ³•æœ¯"
+
+#. Screens.PostAdventureResult
+msgctxt "Screens.PostAdventureResult"
+msgid "Post adventure result"
+msgstr "å†’é™©åŽç»“æžœ"
+
+#. Screens.PostAdventureStats
+msgctxt "Screens.PostAdventureStats"
+msgid "Post adventure stats"
+msgstr "å†’éšªå¾Œçµ±è¨ˆ"
+
+#. Screens.Penalties
+msgctxt "Screens.Penalties"
+msgid "Penalties"
+msgstr "懲罰"
+
+#. Screens.Previous
+msgctxt "Screens.Previous"
+msgid "Previous"
+msgstr "ä¸Šä¸€é …"
+
+#. Screens.Quickbar
+msgctxt "Screens.Quickbar"
+msgid "Quickbar"
+msgstr "å¿«æ·åˆ—"
+
+#. Screens.ReadEnemyInfluence
+msgctxt "Screens.ReadEnemyInfluence"
+msgid "Read attack, deadly and movement range for enemies on tiles in combat"
+msgstr "åœ¨æˆ°é¬¥ä¸­æœ—è®€æ•µäººåœ¨æ ¼å­ä¸Šçš„æ”»æ“Šã€è‡´å‘½å’Œç§»å‹•ç¯„åœ"
+
+#. Screens.ReadStoryCameraFocusChanges
+msgctxt "Screens.ReadStoryCameraFocusChanges"
+msgid "Read story camera focus change events"
+msgstr "朗讀劇情鏡頭焦點變更事件"
+
+#. Screens.ScannerPlaysDirectionalBeep
+msgctxt "Screens.ScannerPlaysDirectionalBeep"
+msgid "Scanner plays directional beep"
+msgstr "掃描器播放方向提示音"
+
+#. Screens.RecruitFrom
+msgctxt "Screens.RecruitFrom"
+msgid "Recruit from"
+msgstr "æ‹›å‹Ÿæ¥æº"
+
+#. Screens.RecruitingFrom
+msgctxt "Screens.RecruitingFrom"
+msgid "Recruiting from {0}"
+msgstr "ä»Ž {0} æ‹›å‹Ÿ"
+
+#. Screens.ResearchTier
+msgctxt "Screens.ResearchTier"
+msgid "{0} ({1} {2})"
+msgstr "{0}ï¼ˆ{1} {2}ï¼‰"
+
+#. Screens.Resources
+msgctxt "Screens.Resources"
+msgid "Resources"
+msgstr "è³‡æº"
+
+#. Screens.Rewards
+msgctxt "Screens.Rewards"
+msgid "Rewards"
+msgstr "獎勵"
+
+#. Screens.Round
+msgctxt "Screens.Round"
+msgid "Round {0}"
+msgstr "ç¬¬ {0} å›žåˆ"
+
+#. Screens.SettlementTroops
+msgctxt "Screens.SettlementTroops"
+msgid "settlement troops"
+msgstr "å®šå±…ç‚¹éƒ¨é˜Ÿ"
+
+#. Screens.Skill
+msgctxt "Screens.Skill"
+msgid "Skill {0}"
+msgstr "æŠ€èƒ½ {0}"
+
+#. Screens.SlotValue
+msgctxt "Screens.SlotValue"
+msgid "Slot {0}: {1}"
+msgstr "æ§½ä½ {0}ï¼š{1}"
+
+#. Screens.SpellTier
+msgctxt "Screens.SpellTier"
+msgid "{0} tier {1}"
+msgstr "{0} ç­‰çº§ {1}"
+
+#. Screens.Tabs
+msgctxt "Screens.Tabs"
+msgid "Tabs"
+msgstr "åˆ†é "
+
+#. Screens.TeamValue
+msgctxt "Screens.TeamValue"
+msgid "Team {0}"
+msgstr "隊伍 {0}"
+
+#. Screens.Teams
+msgctxt "Screens.Teams"
+msgid "Teams"
+msgstr "éšŠä¼"
+
+#. Screens.TooltipActions
+msgctxt "Screens.TooltipActions"
+msgid "Tooltip actions"
+msgstr "æç¤ºæ“ä½œ"
+
+#. Screens.Tier
+msgctxt "Screens.Tier"
+msgid "Tier"
+msgstr "é˜¶çº§"
+
+#. Screens.Tower
+msgctxt "Screens.Tower"
+msgid "Tower {0}"
+msgstr "å¡”æ¨“ {0}"
+
+#. Screens.Towers
+msgctxt "Screens.Towers"
+msgid "Towers"
+msgstr "塔樓"
+
+#. Screens.TroopLost
+msgctxt "Screens.TroopLost"
+msgid "{0} lost"
+msgstr "{0} æŸå¤±"
+
+#. Screens.TroopDistribution
+msgctxt "Screens.TroopDistribution"
+msgid "troop distribution"
+msgstr "éƒ¨éšŠåˆ†é…"
+
+#. Screens.TroopPlacement
+msgctxt "Screens.TroopPlacement"
+msgid "Troop placement"
+msgstr "éƒ¨éšŠéƒ¨ç½²"
+
+#. Screens.TurnOrder
+msgctxt "Screens.TurnOrder"
+msgid "Turn order"
+msgstr "å›žåˆé¡ºåº"
+
+#. Screens.Unavailable
+msgctxt "Screens.Unavailable"
+msgid "Unavailable"
+msgstr "ä¸å¯ç”¨"
+
+#. Screens.VisitingWielderArmy
+msgctxt "Screens.VisitingWielderArmy"
+msgid "visiting wielder army"
+msgstr "æ¥è®¿æŒæœ‰è€…å†›é˜Ÿ"
+
+#. Screens.WielderArmyPossessive
+msgctxt "Screens.WielderArmyPossessive"
+msgid "{0}'s army"
+msgstr "{0} çš„å†›é˜Ÿ"
+
+#. Screens.WielderArmy
+msgctxt "Screens.WielderArmy"
+msgid "wielder army"
+msgstr "æŒæœ‰è€…å†›é˜Ÿ"
+
+#. Screens.Wielders
+msgctxt "Screens.Wielders"
+msgid "Wielders"
+msgstr "æŒæœ‰è€…"
+
+#. Screens.WielderStats
+msgctxt "Screens.WielderStats"
+msgid "{0}'s stats"
+msgstr "{0} çš„å±¬æ€§"
+
+#. Screens.WielderModifierCategories
+msgctxt "Screens.WielderModifierCategories"
+msgid "{0}'s modifier categories"
+msgstr "{0} çš„ä¿®æ­£é¡žåˆ¥"
+
+#. Screens.WorldChoiceMenu
+msgctxt "Screens.WorldChoiceMenu"
+msgid "World choice menu"
+msgstr "ä¸–ç•Œé€‰æ‹©èœå•"
+
+#. Screens.WorldConfirmationMenu
+msgctxt "Screens.WorldConfirmationMenu"
+msgid "World confirmation menu"
+msgstr "ä¸–ç•Œç¢ºèªé¸å–®"
+
+#. Screens.RemoveFromQuickbar
+msgctxt "Screens.RemoveFromQuickbar"
+msgid "Remove from quickbar"
+msgstr "å¾žå¿«æ·åˆ—ç§»é™¤"
+
+#. Screens.AmountToUpgrade
+msgctxt "Screens.AmountToUpgrade"
+msgid "Amount to upgrade, {0}"
+msgstr "è¦å‡ç´šçš„æ•¸é‡ï¼Œ{0}"
+
+#. Screens.UnknownSpell
+msgctxt "Screens.UnknownSpell"
+msgid "unknown spell"
+msgstr "æœªçŸ¥æ³•è¡“"
+
+#. Actions.Activate
+msgctxt "Actions.Activate"
+msgid "Activate"
+msgstr "åŸ·è¡Œ"
+
+#. Actions.Cancel
+msgctxt "Actions.Cancel"
+msgid "Cancel"
+msgstr "å–æ¶ˆ"
+
+#. Actions.CombatFocusActingTroop
+msgctxt "Actions.CombatFocusActingTroop"
+msgid "Focus Acting Troop"
+msgstr "聚焦行動部隊"
+
+#. Actions.CombatNextActingTroop
+msgctxt "Actions.CombatNextActingTroop"
+msgid "Next Acting Troop"
+msgstr "下一個行動部隊"
+
+#. Actions.CombatNextEnemyTroop
+msgctxt "Actions.CombatNextEnemyTroop"
+msgid "Next Enemy Troop"
+msgstr "下一個敵方部隊"
+
+#. Actions.CombatPreviousActingTroop
+msgctxt "Actions.CombatPreviousActingTroop"
+msgid "Previous Acting Troop"
+msgstr "上一個行動部隊"
+
+#. Actions.CombatPreviousEnemyTroop
+msgctxt "Actions.CombatPreviousEnemyTroop"
+msgid "Previous Enemy Troop"
+msgstr "上一個敵方部隊"
+
+#. Actions.CombatFocusTimeline
+msgctxt "Actions.CombatFocusTimeline"
+msgid "Focus Timeline"
+msgstr "èšç„¦æ™‚é–“è»¸"
+
+#. Actions.CombatInspect
+msgctxt "Actions.CombatInspect"
+msgid "Inspect Combat Hex"
+msgstr "æª¢æŸ¥æˆ°é¬¥å…­è§’æ ¼"
+
+#. Actions.CombatNextRelevantTile
+msgctxt "Actions.CombatNextRelevantTile"
+msgid "Next Relevant Combat Tile"
+msgstr "ä¸‹ä¸€å€‹ç›¸é—œæˆ°é¬¥æ ¼"
+
+#. Actions.CombatPreviousRelevantTile
+msgctxt "Actions.CombatPreviousRelevantTile"
+msgid "Previous Relevant Combat Tile"
+msgstr "ä¸Šä¸€å€‹ç›¸é—œæˆ°é¬¥æ ¼"
+
+#. Actions.FirstBufferLine
+msgctxt "Actions.FirstBufferLine"
+msgid "First Buffer Line"
+msgstr "ç¬¬ä¸€å€‹ ç·©è¡å€ è¡Œ"
+
+#. Actions.FirstMenuItem
+msgctxt "Actions.FirstMenuItem"
+msgid "First Menu Item"
+msgstr "ç¬¬ä¸€å€‹ é¸å–® é …ç›®"
+
+#. Actions.FirstRow
+msgctxt "Actions.FirstRow"
+msgid "First Row"
+msgstr "ç¬¬ä¸€å€‹ åˆ—"
+
+#. Actions.FocusHudNotifications
+msgctxt "Actions.FocusHudNotifications"
+msgid "Focus HUD Notifications"
+msgstr "聚焦 HUD 通知"
+
+#. Actions.FocusHudObjectives
+msgctxt "Actions.FocusHudObjectives"
+msgid "Focus HUD Objectives"
+msgstr "聚焦 HUD 目標"
+
+#. Actions.FocusHudResources
+msgctxt "Actions.FocusHudResources"
+msgid "Focus HUD Resources"
+msgstr "聚焦 HUD 資源"
+
+#. Actions.FocusHudTroops
+msgctxt "Actions.FocusHudTroops"
+msgid "Focus HUD Troops"
+msgstr "聚焦 HUD 部隊"
+
+#. Actions.HexGridEast
+msgctxt "Actions.HexGridEast"
+msgid "Hex Grid East"
+msgstr "å…­è§’ç¶²æ ¼æ±"
+
+#. Actions.HexGridNorthEast
+msgctxt "Actions.HexGridNorthEast"
+msgid "Hex Grid Northeast"
+msgstr "å…­è§’ç¶²æ ¼æ±åŒ—"
+
+#. Actions.HexGridNorthWest
+msgctxt "Actions.HexGridNorthWest"
+msgid "Hex Grid Northwest"
+msgstr "å…­è§’ç¶²æ ¼è¥¿åŒ—"
+
+#. Actions.HexGridSouthEast
+msgctxt "Actions.HexGridSouthEast"
+msgid "Hex Grid Southeast"
+msgstr "å…­è§’ç¶²æ ¼æ±å—"
+
+#. Actions.HexGridSouthWest
+msgctxt "Actions.HexGridSouthWest"
+msgid "Hex Grid Southwest"
+msgstr "å…­è§’ç¶²æ ¼è¥¿å—"
+
+#. Actions.HexGridWest
+msgctxt "Actions.HexGridWest"
+msgid "Hex Grid West"
+msgstr "å…­è§’ç¶²æ ¼è¥¿"
+
+#. Actions.LastBufferLine
+msgctxt "Actions.LastBufferLine"
+msgid "Last Buffer Line"
+msgstr "æœ€å¾Œä¸€å€‹ ç·©è¡å€ è¡Œ"
+
+#. Actions.LastMenuItem
+msgctxt "Actions.LastMenuItem"
+msgid "Last Menu Item"
+msgstr "æœ€å¾Œä¸€å€‹ é¸å–® é …ç›®"
+
+#. Actions.LastRow
+msgctxt "Actions.LastRow"
+msgid "Last Row"
+msgstr "æœ€å¾Œä¸€å€‹ åˆ—"
+
+#. Actions.MapMoveEast
+msgctxt "Actions.MapMoveEast"
+msgid "Map Move East"
+msgstr "åœ°åœ–å‘æ±ç§»å‹•"
+
+#. Actions.MapMoveNorth
+msgctxt "Actions.MapMoveNorth"
+msgid "Map Move North"
+msgstr "åœ°åœ–å‘åŒ—ç§»å‹•"
+
+#. Actions.MapMoveSouth
+msgctxt "Actions.MapMoveSouth"
+msgid "Map Move South"
+msgstr "åœ°åœ–å‘å—ç§»å‹•"
+
+#. Actions.MapMoveWest
+msgctxt "Actions.MapMoveWest"
+msgid "Map Move West"
+msgstr "åœ°åœ–å‘è¥¿ç§»å‹•"
+
+#. Actions.MapSecondaryAction
+msgctxt "Actions.MapSecondaryAction"
+msgid "Map Secondary Action"
+msgstr "åœ°åœ–æ¬¡è¦æ“ä½œ"
+
+#. Actions.NextBuffer
+msgctxt "Actions.NextBuffer"
+msgid "Next Buffer"
+msgstr "ä¸‹ä¸€å€‹ ç·©è¡å€"
+
+#. Actions.NextBufferLine
+msgctxt "Actions.NextBufferLine"
+msgid "Next Buffer Line"
+msgstr "ä¸‹ä¸€å€‹ ç·©è¡å€ è¡Œ"
+
+#. Actions.NextColumn
+msgctxt "Actions.NextColumn"
+msgid "Next Column"
+msgstr "ä¸‹ä¸€å€‹ æ¬„"
+
+#. Actions.NextHeading
+msgctxt "Actions.NextHeading"
+msgid "Next Heading"
+msgstr "ä¸‹ä¸€å€‹ æ¨™é¡Œ"
+
+#. Actions.NextMenuItem
+msgctxt "Actions.NextMenuItem"
+msgid "Next Menu Item"
+msgstr "ä¸‹ä¸€å€‹ é¸å–® é …ç›®"
+
+#. Actions.NextRow
+msgctxt "Actions.NextRow"
+msgid "Next Row"
+msgstr "ä¸‹ä¸€å€‹ åˆ—"
+
+#. Actions.NextSettlement
+msgctxt "Actions.NextSettlement"
+msgid "Next Settlement"
+msgstr "ä¸‹ä¸€å€‹èšè½"
+
+#. Actions.NextWidget
+msgctxt "Actions.NextWidget"
+msgid "Next Widget"
+msgstr "ä¸‹ä¸€å€‹ æŽ§åˆ¶é …"
+
+#. Actions.NextWielder
+msgctxt "Actions.NextWielder"
+msgid "Next Wielder"
+msgstr "ä¸‹ä¸€å€‹æŒæœ‰è€…"
+
+#. Actions.OpenModSettings
+msgctxt "Actions.OpenModSettings"
+msgid "Open Mod Settings"
+msgstr "é–‹å•Ÿæ¨¡çµ„è¨­å®š"
+
+#. Actions.PreviousBuffer
+msgctxt "Actions.PreviousBuffer"
+msgid "Previous Buffer"
+msgstr "ä¸Šä¸€å€‹ ç·©è¡å€"
+
+#. Actions.PreviousBufferLine
+msgctxt "Actions.PreviousBufferLine"
+msgid "Previous Buffer Line"
+msgstr "ä¸Šä¸€å€‹ ç·©è¡å€ è¡Œ"
+
+#. Actions.PreviousColumn
+msgctxt "Actions.PreviousColumn"
+msgid "Previous Column"
+msgstr "ä¸Šä¸€å€‹ æ¬„"
+
+#. Actions.PreviousHeading
+msgctxt "Actions.PreviousHeading"
+msgid "Previous Heading"
+msgstr "ä¸Šä¸€å€‹ æ¨™é¡Œ"
+
+#. Actions.PreviousMenuItem
+msgctxt "Actions.PreviousMenuItem"
+msgid "Previous Menu Item"
+msgstr "ä¸Šä¸€å€‹ é¸å–® é …ç›®"
+
+#. Actions.PreviousRow
+msgctxt "Actions.PreviousRow"
+msgid "Previous Row"
+msgstr "ä¸Šä¸€å€‹ åˆ—"
+
+#. Actions.PreviousWidget
+msgctxt "Actions.PreviousWidget"
+msgid "Previous Widget"
+msgstr "ä¸Šä¸€å€‹ æŽ§åˆ¶é …"
+
+#. Actions.ReadThreat
+msgctxt "Actions.ReadThreat"
+msgid "Read Threat"
+msgstr "è®€å–å¨è„…"
+
+#. Actions.ScannerDecreaseLookAroundRadius
+msgctxt "Actions.ScannerDecreaseLookAroundRadius"
+msgid "Decrease Look Around Radius"
+msgstr "減小環顧半徑"
+
+#. Actions.ScannerIncreaseLookAroundRadius
+msgctxt "Actions.ScannerIncreaseLookAroundRadius"
+msgid "Increase Look Around Radius"
+msgstr "增加環顧半徑"
+
+#. Actions.ScannerJumpToResult
+msgctxt "Actions.ScannerJumpToResult"
+msgid "Jump To Scanner Result"
+msgstr "è·³åˆ°æŽƒæå™¨çµæžœ"
+
+#. Actions.ScannerLookAround
+msgctxt "Actions.ScannerLookAround"
+msgid "Look Around"
+msgstr "環顧四周"
+
+#. Actions.ScannerNextCategory
+msgctxt "Actions.ScannerNextCategory"
+msgid "Next Scanner Category"
+msgstr "ä¸‹ä¸€å€‹ æŽƒæå™¨ é¡žåˆ¥"
+
+#. Actions.ScannerNextResult
+msgctxt "Actions.ScannerNextResult"
+msgid "Next Scanner Result"
+msgstr "ä¸‹ä¸€å€‹ æŽƒæå™¨ çµæžœ"
+
+#. Actions.ScannerNextSubcategory
+msgctxt "Actions.ScannerNextSubcategory"
+msgid "Next Scanner Subcategory"
+msgstr "ä¸‹ä¸€å€‹ æŽƒæå™¨ å­é¡žåˆ¥"
+
+#. Actions.ScannerPreviousCategory
+msgctxt "Actions.ScannerPreviousCategory"
+msgid "Previous Scanner Category"
+msgstr "ä¸Šä¸€å€‹ æŽƒæå™¨ é¡žåˆ¥"
+
+#. Actions.ScannerPreviousResult
+msgctxt "Actions.ScannerPreviousResult"
+msgid "Previous Scanner Result"
+msgstr "ä¸Šä¸€å€‹ æŽƒæå™¨ çµæžœ"
+
+#. Actions.ScannerPreviousSubcategory
+msgctxt "Actions.ScannerPreviousSubcategory"
+msgid "Previous Scanner Subcategory"
+msgstr "ä¸Šä¸€å€‹ æŽƒæå™¨ å­é¡žåˆ¥"
+
+#. Actions.ScannerRefresh
+msgctxt "Actions.ScannerRefresh"
+msgid "Refresh Scanner"
+msgstr "é‡æ–°æ•´ç†æŽƒæå™¨"
+
+#. Actions.ScannerSpeakOrientation
+msgctxt "Actions.ScannerSpeakOrientation"
+msgid "Scanner Result Orientation"
+msgstr "æŽƒæå™¨çµæžœæ–¹å‘"
+
+#. Actions.SliderDecrease
+msgctxt "Actions.SliderDecrease"
+msgid "Slider Decrease"
+msgstr "æ¸›å°æ»‘æ¡¿"
+
+#. Actions.SliderIncrease
+msgctxt "Actions.SliderIncrease"
+msgid "Slider Increase"
+msgstr "å¢žå¤§æ»‘æ¡¿"
+
+#. Actions.SliderMaximum
+msgctxt "Actions.SliderMaximum"
+msgid "Slider Maximum"
+msgstr "æ»‘æ¡¿æœ€å¤§å€¼"
+
+#. Actions.SliderMinimum
+msgctxt "Actions.SliderMinimum"
+msgid "Slider Minimum"
+msgstr "æ»‘æ¡¿æœ€å°å€¼"
+
+#. Actions.StartDrag
+msgctxt "Actions.StartDrag"
+msgid "Start Drag"
+msgstr "é–‹å§‹æ‹–æ›³"
+
+#. Actions.SummarizeEnemyResources
+msgctxt "Actions.SummarizeEnemyResources"
+msgid "Summarize Enemy Resources"
+msgstr "å½™ç¸½æ•µæ–¹è³‡æº"
+
+#. Actions.SummarizeResources
+msgctxt "Actions.SummarizeResources"
+msgid "Summarize Resources"
+msgstr "å½™ç¸½è³‡æº"
+
+#. Actions.TooltipActionsMenu
+msgctxt "Actions.TooltipActionsMenu"
+msgid "Tooltip Actions Menu"
+msgstr "æç¤ºæ“ä½œé¸å–®"
+
+#. Combat.AbilityUsed
+msgctxt "Combat.AbilityUsed"
+msgid "{0} uses {1}"
+msgstr "{0}ä½¿ç”¨{1}"
+
+#. Combat.Affects
+msgctxt "Combat.Affects"
+msgid "{0} affects {1}"
+msgstr "{0}å½±éŸ¿{1}"
+
+#. Combat.Appears
+msgctxt "Combat.Appears"
+msgid "{0} appears"
+msgstr "{0}å‡ºç¾"
+
+#. Combat.ArcanaEssence
+msgctxt "Combat.ArcanaEssence"
+msgid "arcana"
+msgstr "å¥§è¡“"
+
+#. Combat.Attack
+msgctxt "Combat.Attack"
+msgid "{0} {1} {2}"
+msgstr "{0}å°{2}{1}"
+
+#. Combat.AttackableEntity
+msgctxt "Combat.AttackableEntity"
+msgid "attackable entity"
+msgstr "å¯æ”»æ“Šå¯¦é«”"
+
+#. Combat.AttackVerbDefault
+msgctxt "Combat.AttackVerbDefault"
+msgid "attacks"
+msgstr "æ”»æ“Š"
+
+#. Combat.AttackVerbOpportunity
+msgctxt "Combat.AttackVerbOpportunity"
+msgid "makes an opportunity attack against"
+msgstr "é€²è¡Œå€Ÿæ©Ÿæ”»æ“Š"
+
+#. Combat.AttackVerbOverwatch
+msgctxt "Combat.AttackVerbOverwatch"
+msgid "makes an overwatch attack against"
+msgstr "é€²è¡Œè­¦æˆ’æ”»æ“Š"
+
+#. Combat.AttackVerbRetaliation
+msgctxt "Combat.AttackVerbRetaliation"
+msgid "retaliates against"
+msgstr "åæ“Š"
+
+#. Combat.AttackVerbSpearwall
+msgctxt "Combat.AttackVerbSpearwall"
+msgid "makes a spearwall attack against"
+msgstr "é€²è¡ŒçŸ›ç‰†æ”»æ“Š"
+
+#. Combat.BattleOver
+msgctxt "Combat.BattleOver"
+msgid "Battle over"
+msgstr "æˆ°é¬¥çµæŸ"
+
+#. Combat.BlindFury
+msgctxt "Combat.BlindFury"
+msgid "blind fury"
+msgstr "ç›²æ€’"
+
+#. Combat.BurrowsUp
+msgctxt "Combat.BurrowsUp"
+msgid "{0} burrows up"
+msgstr "{0}é‘½å‡ºåœ°é¢"
+
+#. Combat.CastsSpell
+msgctxt "Combat.CastsSpell"
+msgid "{0} casts {1}"
+msgstr "{0}æ–½æ”¾{1}"
+
+#. Combat.CastsSpellAt
+msgctxt "Combat.CastsSpellAt"
+msgid "{0} casts {1} at {2}"
+msgstr "{0}å°{2}æ–½æ”¾{1}"
+
+#. Combat.Challenge
+msgctxt "Combat.Challenge"
+msgid "challenge"
+msgstr "æŒ‘æˆ°"
+
+#. Combat.ChaosEssence
+msgctxt "Combat.ChaosEssence"
+msgid "chaos"
+msgstr "æ··æ²Œ"
+
+#. Combat.Created
+msgctxt "Combat.Created"
+msgid "{0} created"
+msgstr "{0}å·²å»ºç«‹"
+
+#. Combat.CreationEssence
+msgctxt "Combat.CreationEssence"
+msgid "creation"
+msgstr "å‰µé€ "
+
+#. Combat.DamageDestroyingItSuffix
+msgctxt "Combat.DamageDestroyingItSuffix"
+msgid ", destroying it"
+msgstr "ï¼Œå°‡å…¶æ‘§æ¯€"
+
+#. Combat.DamageKillsSuffix
+msgctxt "Combat.DamageKillsSuffix"
+msgid ", killing {0}"
+msgstr "ï¼Œæ“Šæ®º{0}"
+
+#. Combat.DealsDamage
+msgctxt "Combat.DealsDamage"
+msgid "{0} deals {1} {2} damage to {3}{4}"
+msgstr "{0}å°{3}é€ æˆ{1}é»ž{2}å‚·å®³{4}"
+
+#. Combat.Defeat
+msgctxt "Combat.Defeat"
+msgid "Defeat"
+msgstr "å¤±æ•—"
+
+#. Combat.Destroyed
+msgctxt "Combat.Destroyed"
+msgid "{0} destroyed"
+msgstr "{0}å·²æ‘§æ¯€"
+
+#. Combat.DestructionEssence
+msgctxt "Combat.DestructionEssence"
+msgid "destruction"
+msgstr "æ¯€æ»…"
+
+#. Combat.Draw
+msgctxt "Combat.Draw"
+msgid "Draw"
+msgstr "å¹³æ‰‹"
+
+#. Combat.Effect
+msgctxt "Combat.Effect"
+msgid "effect"
+msgstr "æ•ˆæžœ"
+
+#. Combat.EnemyTroop
+msgctxt "Combat.EnemyTroop"
+msgid "{0} enemy {1}"
+msgstr "{0} æ•µæ–¹ {1}"
+
+#. Combat.EnemyTroops
+msgctxt "Combat.EnemyTroops"
+msgid "enemy troops"
+msgstr "æ•µæ–¹éƒ¨éšŠ"
+
+#. Combat.EssenceAmountCompact
+msgctxt "Combat.EssenceAmountCompact"
+msgid "+{0} {1}"
+msgstr "+{0} {1}"
+
+#. Combat.EssenceAmounts
+msgctxt "Combat.EssenceAmounts"
+msgid "{0} essence"
+msgstr "{0}精華"
+
+#. Combat.ExplosiveBarrel
+msgctxt "Combat.ExplosiveBarrel"
+msgid "explosive barrel"
+msgstr "çˆ†ç‚¸æ¡¶"
+
+#. Combat.FailedBurrow
+msgctxt "Combat.FailedBurrow"
+msgid "{0}, failed burrow"
+msgstr "{0}ï¼Œé‘½åœ°å¤±æ•—"
+
+#. Combat.FaeyFire
+msgctxt "Combat.FaeyFire"
+msgid "Faey Fire"
+msgstr "ä»™éˆä¹‹ç«"
+
+#. Combat.FaeyFireWithBolts
+msgctxt "Combat.FaeyFireWithBolts"
+msgid "{0} casts {1}, {2}"
+msgstr "{0}æ–½æ”¾{1}ï¼Œ{2}"
+
+#. Combat.Lunge
+msgctxt "Combat.Lunge"
+msgid "lunge"
+msgstr "çªåˆº"
+
+#. Combat.MapEntityDamage
+msgctxt "Combat.MapEntityDamage"
+msgid "map entity"
+msgstr "åœ°åœ–å¯¦é«”"
+
+#. Combat.MeleeDamage
+msgctxt "Combat.MeleeDamage"
+msgid "melee"
+msgstr "è¿‘æˆ°"
+
+#. Combat.MothersLove
+msgctxt "Combat.MothersLove"
+msgid "mother's love"
+msgstr "æ¯æ„›"
+
+#. Combat.NewTurn
+msgctxt "Combat.NewTurn"
+msgid "It is {0}'s turn"
+msgstr "è¼ªåˆ°{0}"
+
+#. Combat.OpportunityAttack
+msgctxt "Combat.OpportunityAttack"
+msgid "opportunity attack"
+msgstr "å€Ÿæ©Ÿæ”»æ“Š"
+
+#. Combat.OrderEssence
+msgctxt "Combat.OrderEssence"
+msgid "order"
+msgstr "ç§©åº"
+
+#. Combat.Overwatch
+msgctxt "Combat.Overwatch"
+msgid "overwatch"
+msgstr "è­¦æˆ’"
+
+#. Combat.PushedTo
+msgctxt "Combat.PushedTo"
+msgid "{0} pushed to {1}"
+msgstr "{0}è¢«æŽ¨åˆ°{1}"
+
+#. Combat.RangedDamage
+msgctxt "Combat.RangedDamage"
+msgid "ranged"
+msgstr "é ç¨‹"
+
+#. Combat.RavenformsTo
+msgctxt "Combat.RavenformsTo"
+msgid "{0} ravenforms to {1}"
+msgstr "{0}åŒ–ç‚ºæ¸¡é´‰å½¢æ…‹å‰å¾€{1}"
+
+#. Combat.RemovedFrom
+msgctxt "Combat.RemovedFrom"
+msgid "{0} removed from {1}"
+msgstr "{0}å·²å¾ž{1}ç§»é™¤"
+
+#. Combat.Retaliation
+msgctxt "Combat.Retaliation"
+msgid "retaliation"
+msgstr "åæ“Š"
+
+#. Combat.Spearwall
+msgctxt "Combat.Spearwall"
+msgid "spearwall"
+msgstr "çŸ›ç‰†"
+
+#. Combat.SpellDamage
+msgctxt "Combat.SpellDamage"
+msgid "spell"
+msgstr "æ³•è¡“"
+
+#. Combat.Splash
+msgctxt "Combat.Splash"
+msgid "splash"
+msgstr "æ¿ºå°„"
+
+#. Combat.Summoned
+msgctxt "Combat.Summoned"
+msgid "{0} summoned"
+msgstr "{0}å·²å¬å–š"
+
+#. Combat.TakesDamage
+msgctxt "Combat.TakesDamage"
+msgid "{0} takes {1} {2} damage{3}"
+msgstr "{0}å—åˆ°{1}é»ž{2}å‚·å®³{3}"
+
+#. Combat.TeleportsTo
+msgctxt "Combat.TeleportsTo"
+msgid "{0} teleports to {1}"
+msgstr "{0}å‚³é€åˆ°{1}"
+
+#. Combat.Tile
+msgctxt "Combat.Tile"
+msgid "tile {0}"
+msgstr "æ ¼å­ {0}"
+
+#. Combat.Troop
+msgctxt "Combat.Troop"
+msgid "troop"
+msgstr "éƒ¨éšŠ"
+
+#. Combat.TroopAt
+msgctxt "Combat.TroopAt"
+msgid "{0} at {1}"
+msgstr "{0}ï¼Œä½æ–¼ {1}"
+
+#. Combat.TroopMoved
+msgctxt "Combat.TroopMoved"
+msgid "{0} moves to {1}"
+msgstr "{0}ç§»å‹•åˆ°{1}"
+
+#. Combat.TroopQuantity
+msgctxt "Combat.TroopQuantity"
+msgid "{0} {1}"
+msgstr "{0} {1}"
+
+#. Combat.Unknown
+msgctxt "Combat.Unknown"
+msgid "unknown"
+msgstr "æœªçŸ¥"
+
+#. Combat.UnknownEntity
+msgctxt "Combat.UnknownEntity"
+msgid "unknown entity"
+msgstr "æœªçŸ¥å¯¦é«”"
+
+#. Combat.UnknownTarget
+msgctxt "Combat.UnknownTarget"
+msgid "unknown target"
+msgstr "æœªçŸ¥ç›®æ¨™"
+
+#. Combat.UnknownTroop
+msgctxt "Combat.UnknownTroop"
+msgid "unknown troop"
+msgstr "æœªçŸ¥éƒ¨éšŠ"
+
+#. Combat.Victory
+msgctxt "Combat.Victory"
+msgid "Victory"
+msgstr "å‹åˆ©"
+
+#. Combat.Walkover
+msgctxt "Combat.Walkover"
+msgid "Walkover"
+msgstr "ä¸æˆ°è€Œå‹"
+
+#. Combat.Wielder
+msgctxt "Combat.Wielder"
+msgid "wielder"
+msgstr "æŒæœ‰è€…"
+
+#. Combat.YourTroops
+msgctxt "Combat.YourTroops"
+msgid "your troops"
+msgstr "ä½ çš„éƒ¨éšŠ"
+
+#. Combat.BoltAt_0
+msgctxt "Combat.BoltAt_0"
+msgid "{0} bolt at {1}"
+msgstr "{0}æŸå°„å‘{1}"
+
+#. Common.CountOf
+msgctxt "Common.CountOf"
+msgid "{0} of {1}"
+msgstr "{0}/{1}"
+
+#. Common.NamePossessive
+msgctxt "Common.NamePossessive"
+msgid "{0}'s"
+msgstr "{0}çš„"
+
+#. Spatial.Acting
+msgctxt "Spatial.Acting"
+msgid "acting"
+msgstr "è¡Œå‹•ä¸­"
+
+#. Spatial.Attack
+msgctxt "Spatial.Attack"
+msgid "attack"
+msgstr "æ”»æ“Š"
+
+#. Spatial.AttackPreview
+msgctxt "Spatial.AttackPreview"
+msgid "Attack preview:"
+msgstr "æ”»æ“Šé è¦½ï¼š"
+
+#. Spatial.AttackRange
+msgctxt "Spatial.AttackRange"
+msgid "Attack range"
+msgstr "æ”»æ“Šç¯„åœ"
+
+#. Spatial.Blocked
+msgctxt "Spatial.Blocked"
+msgid "blocked"
+msgstr "è¢«é˜»æ“‹"
+
+#. Spatial.Commander
+msgctxt "Spatial.Commander"
+msgid "Commander"
+msgstr "æŒ‡æ®å®˜"
+
+#. Spatial.CommanderPossessive
+msgctxt "Spatial.CommanderPossessive"
+msgid "commander's"
+msgstr "æŒ‡æ®å®˜çš„"
+
+#. Spatial.Cost
+msgctxt "Spatial.Cost"
+msgid "cost {0}"
+msgstr "æ¶ˆè€— {0}"
+
+#. Spatial.DamagePreview
+msgctxt "Spatial.DamagePreview"
+msgid "{0}damage {1}"
+msgstr "{0}å‚·å®³ {1}"
+
+#. Spatial.DeadlyRange
+msgctxt "Spatial.DeadlyRange"
+msgid "Deadly range"
+msgstr "è‡´å‘½ç¯„åœ"
+
+#. Spatial.Deadly
+msgctxt "Spatial.Deadly"
+msgid "deadly"
+msgstr "è‡´å‘½"
+
+#. Spatial.Debris
+msgctxt "Spatial.Debris"
+msgid "debris"
+msgstr "æ®˜éª¸"
+
+#. Spatial.Destination
+msgctxt "Spatial.Destination"
+msgid "Destination"
+msgstr "ç›®çš„åœ°"
+
+#. Spatial.DestinationAt
+msgctxt "Spatial.DestinationAt"
+msgid "Destination: {0}"
+msgstr "ç›®çš„åœ°ï¼š{0}"
+
+#. Spatial.Destroys
+msgctxt "Spatial.Destroys"
+msgid "destroys"
+msgstr "æ‘§æ¯€"
+
+#. Spatial.ElevatedGroundHeight
+msgctxt "Spatial.ElevatedGroundHeight"
+msgid "elevated ground, height {0}"
+msgstr "é«˜åœ°ï¼Œé«˜åº¦ {0}"
+
+#. Spatial.EnemySpawnPoint
+msgctxt "Spatial.EnemySpawnPoint"
+msgid "enemy spawn point"
+msgstr "æ•µæ–¹ç”Ÿæˆé»ž"
+
+#. Spatial.Enemy
+msgctxt "Spatial.Enemy"
+msgid "enemy"
+msgstr "æ•µæ–¹"
+
+#. Spatial.ExtraTargetPrefix
+msgctxt "Spatial.ExtraTargetPrefix"
+msgid "extra target "
+msgstr "é¡å¤–ç›®æ¨™"
+
+#. Spatial.Friendly
+msgctxt "Spatial.Friendly"
+msgid "friendly"
+msgstr "å‹æ–¹"
+
+#. Spatial.FurthestReachableInTurns
+msgctxt "Spatial.FurthestReachableInTurns"
+msgid "furthest reachable in {0} turns"
+msgstr "{0} å›žåˆå¾Œå¯åˆ°é”çš„æœ€é è™•"
+
+#. Spatial.FurthestReachableThisTurn
+msgctxt "Spatial.FurthestReachableThisTurn"
+msgid "furthest reachable this turn"
+msgstr "æœ¬å›žåˆå¯åˆ°é”çš„æœ€é è™•"
+
+#. Spatial.Health
+msgctxt "Spatial.Health"
+msgid "{0} / {1} health"
+msgstr "{0} / {1} ç”Ÿå‘½å€¼"
+
+#. Spatial.Here
+msgctxt "Spatial.Here"
+msgid "here"
+msgstr "é€™è£¡"
+
+#. Spatial.Impassable
+msgctxt "Spatial.Impassable"
+msgid "impassable"
+msgstr "ä¸å¯é€šè¡Œ"
+
+#. Spatial.InteractionPoint
+msgctxt "Spatial.InteractionPoint"
+msgid "Interaction point"
+msgstr "äº’å‹•é»ž"
+
+#. Spatial.Interactable
+msgctxt "Spatial.Interactable"
+msgid "interactable"
+msgstr "å¯äº’å‹•"
+
+#. Spatial.InteractableNextTurn
+msgctxt "Spatial.InteractableNextTurn"
+msgid "interactable next turn"
+msgstr "ä¸‹å›žåˆå¯äº’å‹•"
+
+#. Spatial.Kills
+msgctxt "Spatial.Kills"
+msgid "kills {0}"
+msgstr "æ“Šæ®º {0}"
+
+#. Spatial.MayDestroy
+msgctxt "Spatial.MayDestroy"
+msgid "may destroy"
+msgstr "å¯èƒ½æ‘§æ¯€"
+
+#. Spatial.Movement
+msgctxt "Spatial.Movement"
+msgid "Movement"
+msgstr "ç§»å‹•"
+
+#. Spatial.MovementRange
+msgctxt "Spatial.MovementRange"
+msgid "Movement range"
+msgstr "ç§»å‹•ç¯„åœ"
+
+#. Spatial.Neutral
+msgctxt "Spatial.Neutral"
+msgid "neutral"
+msgstr "ä¸­ç«‹"
+
+#. Spatial.NoRoutePreview
+msgctxt "Spatial.NoRoutePreview"
+msgid "no route preview"
+msgstr "ç„¡è·¯ç·šé è¦½"
+
+#. Spatial.OnRoute
+msgctxt "Spatial.OnRoute"
+msgid "On route"
+msgstr "åœ¨è·¯ç·šä¸Š"
+
+#. Spatial.PrimaryPrefix
+msgctxt "Spatial.PrimaryPrefix"
+msgid "primary "
+msgstr "ä¸»è¦"
+
+#. Spatial.RangeAndMovement
+msgctxt "Spatial.RangeAndMovement"
+msgid "{0} and movement range"
+msgstr "{0}å’Œç§»å‹•ç¯„åœ"
+
+#. Spatial.Reachable
+msgctxt "Spatial.Reachable"
+msgid "reachable"
+msgstr "å¯åˆ°é”"
+
+#. Spatial.SpawnPoint
+msgctxt "Spatial.SpawnPoint"
+msgid "spawn point"
+msgstr "ç”Ÿæˆé»ž"
+
+#. Spatial.Threatened
+msgctxt "Spatial.Threatened"
+msgid "Threatened"
+msgstr "å—å¨è„…"
+
+#. Spatial.ThisTurnAt
+msgctxt "Spatial.ThisTurnAt"
+msgid "This turn: {0}"
+msgstr "æœ¬å›žåˆï¼š{0}"
+
+#. Spatial.TurnsIn
+msgctxt "Spatial.TurnsIn"
+msgid "in {0} turns"
+msgstr "{0} å›žåˆå¾Œ"
+
+#. Spatial.Unexplored
+msgctxt "Spatial.Unexplored"
+msgid "Unexplored"
+msgstr "æœªæŽ¢ç´¢"
+
+#. Spatial.Unseen
+msgctxt "Spatial.Unseen"
+msgid "Unseen"
+msgstr "ä¸å¯è¦‹"
+
+#. Spatial.VisitedSuffix
+msgctxt "Spatial.VisitedSuffix"
+msgid "{0} (visited)"
+msgstr "{0}ï¼ˆå·²é€ è¨ªï¼‰"
+
+#. Spatial.WithinZoneOfControl
+msgctxt "Spatial.WithinZoneOfControl"
+msgid "Within {0} zone of control"
+msgstr "åœ¨{0}æŽ§åˆ¶å€å…§"
+
+#. Spatial.ZoneOfControl
+msgctxt "Spatial.ZoneOfControl"
+msgid "Zone of control"
+msgstr "æŽ§åˆ¶å€"
+
+#. Spatial.ZoneOfControlTiles
+msgctxt "Spatial.ZoneOfControlTiles"
+msgid "{0} within {1} zone of control"
+msgstr "{1}æŽ§åˆ¶å€å…§çš„{0}"
+
+#. Screens.AiControl
+msgctxt "Screens.AiControl"
+msgid "AI control"
+msgstr "æ™ºæ…§æŽ§åˆ¶"
+
+#. Screens.AiDifficulty
+msgctxt "Screens.AiDifficulty"
+msgid "{0} AI"
+msgstr "{0} AI"
+
+#. Screens.Attacker
+msgctxt "Screens.Attacker"
+msgid "Attacker"
+msgstr "æ”»æ“Šæ–¹"
+
+#. Screens.AttackerPortrait
+msgctxt "Screens.AttackerPortrait"
+msgid "Attacker portrait"
+msgstr "æ”»æ“Šæ–¹è‚–åƒ"
+
+#. Screens.CombatPortraitDetail
+msgctxt "Screens.CombatPortraitDetail"
+msgid "{0}, {1}, level {2}"
+msgstr "{0}ï¼Œ{1}ï¼Œç­‰ç´š {2}"
+
+#. Screens.Defender
+msgctxt "Screens.Defender"
+msgid "Defender"
+msgstr "é˜²å®ˆæ–¹"
+
+#. Screens.DefenderPortrait
+msgctxt "Screens.DefenderPortrait"
+msgid "Defender portrait"
+msgstr "é˜²å®ˆæ–¹è‚–åƒ"
+
+#. Screens.LevelValue
+msgctxt "Screens.LevelValue"
+msgid "level {0}"
+msgstr "ç­‰ç´š {0}"
+
+#. Scanner.All
+msgctxt "Scanner.All"
+msgid "All"
+msgstr "å…¨éƒ¨"
+
+#. Scanner.ArtifactMarkets
+msgctxt "Scanner.ArtifactMarkets"
+msgid "Artifact markets"
+msgstr "ç¥žå™¨å¸‚å ´"
+
+#. Scanner.Attackable
+msgctxt "Scanner.Attackable"
+msgid "Attackable"
+msgstr "å¯æ”»æ“Š"
+
+#. Scanner.Beacons
+msgctxt "Scanner.Beacons"
+msgid "Beacons"
+msgstr "ä¿¡æ¨™"
+
+#. Scanner.Blocked
+msgctxt "Scanner.Blocked"
+msgid "Blocked"
+msgstr "è¢«é˜»æ“‹"
+
+#. Scanner.Bridges
+msgctxt "Scanner.Bridges"
+msgid "Bridges"
+msgstr "æ©‹æ¢"
+
+#. Scanner.Buildings
+msgctxt "Scanner.Buildings"
+msgid "Buildings"
+msgstr "å»ºç¯‰"
+
+#. Scanner.Dangerous
+msgctxt "Scanner.Dangerous"
+msgid "Dangerous"
+msgstr "å±éšª"
+
+#. Scanner.East
+msgctxt "Scanner.East"
+msgid "east"
+msgstr "æ±"
+
+#. Scanner.ElevatedGround
+msgctxt "Scanner.ElevatedGround"
+msgid "Elevated ground {0}"
+msgstr "é«˜åœ° {0}"
+
+#. Scanner.Enemy
+msgctxt "Scanner.Enemy"
+msgid "Enemy"
+msgstr "æ•µæ–¹"
+
+#. Scanner.EnemyGates
+msgctxt "Scanner.EnemyGates"
+msgid "Enemy gates"
+msgstr "æ•µæ–¹åŸŽé–€"
+
+#. Scanner.Entities
+msgctxt "Scanner.Entities"
+msgid "Entities"
+msgstr "å¯¦é«”"
+
+#. Scanner.Friendly
+msgctxt "Scanner.Friendly"
+msgid "Friendly"
+msgstr "å‹æ–¹"
+
+#. Scanner.FriendlyGates
+msgctxt "Scanner.FriendlyGates"
+msgid "Friendly gates"
+msgstr "å‹æ–¹åŸŽé–€"
+
+#. Scanner.Impassable
+msgctxt "Scanner.Impassable"
+msgid "Impassable"
+msgstr "ä¸å¯é€šè¡Œ"
+
+#. Scanner.ImpassableTerrain
+msgctxt "Scanner.ImpassableTerrain"
+msgid "Impassable terrain"
+msgstr "ä¸å¯é€šè¡Œåœ°å½¢"
+
+#. Scanner.Knowledge
+msgctxt "Scanner.Knowledge"
+msgid "Knowledge"
+msgstr "çŸ¥è­˜"
+
+#. Scanner.LookAround
+msgctxt "Scanner.LookAround"
+msgid "Look around"
+msgstr "環顧四周"
+
+#. Scanner.LookAroundRadius
+msgctxt "Scanner.LookAroundRadius"
+msgid "Look around radius {0}"
+msgstr "環顧半徑 {0}"
+
+#. Scanner.Neutral
+msgctxt "Scanner.Neutral"
+msgid "Neutral"
+msgstr "ä¸­ç«‹"
+
+#. Scanner.North
+msgctxt "Scanner.North"
+msgid "north"
+msgstr "åŒ—"
+
+#. Scanner.Northeast
+msgctxt "Scanner.Northeast"
+msgid "northeast"
+msgstr "æ±åŒ—"
+
+#. Scanner.Northwest
+msgctxt "Scanner.Northwest"
+msgid "northwest"
+msgstr "è¥¿åŒ—"
+
+#. Scanner.Objectives
+msgctxt "Scanner.Objectives"
+msgid "Objectives"
+msgstr "ç›®æ¨™"
+
+#. Scanner.Obstacles
+msgctxt "Scanner.Obstacles"
+msgid "Obstacles"
+msgstr "éšœç¤™"
+
+#. Scanner.Pickups
+msgctxt "Scanner.Pickups"
+msgid "Pickups"
+msgstr "å¯æ‹¾å–ç‰©"
+
+#. Scanner.Power
+msgctxt "Scanner.Power"
+msgid "Power"
+msgstr "åŠ›é‡"
+
+#. Scanner.Revealed
+msgctxt "Scanner.Revealed"
+msgid "Revealed"
+msgstr "已揭示"
+
+#. Scanner.ResourceGenerators
+msgctxt "Scanner.ResourceGenerators"
+msgid "Resource generators"
+msgstr "資源生成器"
+
+#. Scanner.Riches
+msgctxt "Scanner.Riches"
+msgid "Riches"
+msgstr "è²¡å¯Œ"
+
+#. Scanner.Roads
+msgctxt "Scanner.Roads"
+msgid "Roads"
+msgstr "é“è·¯"
+
+#. Scanner.Search
+msgctxt "Scanner.Search"
+msgid "Search"
+msgstr "搜尋"
+
+#. Scanner.SearchNoResults
+msgctxt "Scanner.SearchNoResults"
+msgid "No results"
+msgstr "沒有結果"
+
+#. Scanner.SearchResults
+msgctxt "Scanner.SearchResults"
+msgid "Search Results"
+msgstr "搜尋結果"
+
+#. Scanner.SettlementsAndBuildSites
+msgctxt "Scanner.SettlementsAndBuildSites"
+msgid "Settlements and Build sites"
+msgstr "èšè½å’Œå»ºç¯‰å·¥åœ°"
+
+#. Scanner.South
+msgctxt "Scanner.South"
+msgid "south"
+msgstr "å—"
+
+#. Scanner.Southeast
+msgctxt "Scanner.Southeast"
+msgid "southeast"
+msgstr "æ±å—"
+
+#. Scanner.Southwest
+msgctxt "Scanner.Southwest"
+msgid "southwest"
+msgstr "è¥¿å—"
+
+#. Scanner.Teleport
+msgctxt "Scanner.Teleport"
+msgid "Teleport"
+msgstr "å‚³é€"
+
+#. Scanner.Terrain
+msgctxt "Scanner.Terrain"
+msgid "Terrain"
+msgstr "åœ°å½¢"
+
+#. Scanner.TroopSources
+msgctxt "Scanner.TroopSources"
+msgid "Troop sources"
+msgstr "éƒ¨éšŠä¾†æº"
+
+#. Scanner.Troops
+msgctxt "Scanner.Troops"
+msgid "Troops"
+msgstr "éƒ¨éšŠ"
+
+#. Scanner.Unvisited
+msgctxt "Scanner.Unvisited"
+msgid "Unvisited"
+msgstr "æœªé€ è¨ª"
+
+#. Scanner.Water
+msgctxt "Scanner.Water"
+msgid "Water"
+msgstr "æ°´"
+
+#. Scanner.West
+msgctxt "Scanner.West"
+msgid "west"
+msgstr "è¥¿"
+
+#. Screens.BuyResourceForGold
+msgctxt "Screens.BuyResourceForGold"
+msgid "Buy {0} for {1}"
+msgstr "用 {1} 購買 {0}"
+
+#. Screens.SellResourceForGold
+msgctxt "Screens.SellResourceForGold"
+msgid "Sell {0} for {1}"
+msgstr "以 {1} 出售 {0}"
+
+#. Scanner.Wielders
+msgctxt "Scanner.Wielders"
+msgid "Wielders"
+msgstr "æŒæœ‰è€…"
+
+#. Scanner.BlockedTileCount_0
+msgctxt "Scanner.BlockedTileCount_0"
+msgid "{0} blocked tile"
+msgstr "{0} å€‹è¢«é˜»æ“‹æ ¼"
+
+#. Scanner.BridgeTileCount_0
+msgctxt "Scanner.BridgeTileCount_0"
+msgid "{0} bridge tile"
+msgstr "{0} å€‹æ©‹æ¢æ ¼"
+
+#. Scanner.ImpassableTileCount_0
+msgctxt "Scanner.ImpassableTileCount_0"
+msgid "{0} impassable tile"
+msgstr "{0} å€‹ä¸å¯é€šè¡Œæ ¼"
+
+#. Scanner.RoadTileCount_0
+msgctxt "Scanner.RoadTileCount_0"
+msgid "{0} road tile"
+msgstr "{0} å€‹é“è·¯æ ¼"
+
+#. Scanner.WaterTileCount_0
+msgctxt "Scanner.WaterTileCount_0"
+msgid "{0} water tile"
+msgstr "{0} å€‹æ°´åŸŸæ ¼"
+
+#. Spatial.AridTrees
+msgctxt "Spatial.AridTrees"
+msgid "Arid trees"
+msgstr "æ—±åœ°æ¨¹æœ¨"
+
+#. Spatial.Bridge
+msgctxt "Spatial.Bridge"
+msgid "Bridge"
+msgstr "æ©‹æ¨‘"
+
+#. Spatial.CobblestoneRoad
+msgctxt "Spatial.CobblestoneRoad"
+msgid "Cobblestone road"
+msgstr "éµåµçŸ³è·¯"
+
+#. Spatial.DeepWater
+msgctxt "Spatial.DeepWater"
+msgid "Deep water"
+msgstr "æ·±æ°´"
+
+#. Spatial.Deforestation
+msgctxt "Spatial.Deforestation"
+msgid "Deforestation"
+msgstr "ä¼æœ¨å€"
+
+#. Spatial.DirtRoad
+msgctxt "Spatial.DirtRoad"
+msgid "Dirt road"
+msgstr "åœŸè·¯"
+
+#. Spatial.Farmland
+msgctxt "Spatial.Farmland"
+msgid "Farmland"
+msgstr "è¾²ç”°"
+
+#. Spatial.Road
+msgctxt "Spatial.Road"
+msgid "Road"
+msgstr "é“è·¯"
+
+#. Spatial.ShallowWater
+msgctxt "Spatial.ShallowWater"
+msgid "Shallow water"
+msgstr "æ·ºæ°´"
+
+#. Spatial.Wall
+msgctxt "Spatial.Wall"
+msgid "Wall"
+msgstr "ç‰†"
+
+#. Spatial.Water
+msgctxt "Spatial.Water"
+msgid "Water"
+msgstr "æ°´"
+
+#. Spatial.WaterEdge
+msgctxt "Spatial.WaterEdge"
+msgid "Water edge"
+msgstr "æ°´é‚Š"
+
+#. Screens.MoveAllLeft
+msgctxt "Screens.MoveAllLeft"
+msgid "Move all left"
+msgstr "全部移到左側"
+
+#. Screens.MoveAllRight
+msgctxt "Screens.MoveAllRight"
+msgid "Move all right"
+msgstr "全部移到右側"
+
+#. Screens.CancelAbility
+msgctxt "Screens.CancelAbility"
+msgid "Cancel ability"
+msgstr "取消能力"
+
+#. Screens.CancelSpell
+msgctxt "Screens.CancelSpell"
+msgid "Cancel spell"
+msgstr "取消法術"
+
+#. Screens.MaxTroopSize
+msgctxt "Screens.MaxTroopSize"
+msgid "Max troop size {0}"
+msgstr "最大部隊規模 {0}"
+
+#. Screens.LeftRightDistribution
+msgctxt "Screens.LeftRightDistribution"
+msgid "Left: {0}, right: {1}"
+msgstr "左側：{0}，右側：{1}"
+
+#. Screens.Options
+msgctxt "Screens.Options"
+msgid "Options"
+msgstr "選項"
+
+#. Scanner.SpawnPoints
+msgctxt "Scanner.SpawnPoints"
+msgid "Spawn points"
+msgstr "部署點"
+
+#. Events.Revealed
+msgctxt "Events.Revealed"
+msgid "Revealed {0}"
+msgstr "已發現{0}"
+
+#. Bookmarks.BookmarkSaved
+#. Bookmarks.BeaconActivated
+msgctxt "Bookmarks.BeaconActivated"
+msgid "Beacon {0} activated"
+msgstr "信標 {0} 已啟用"
+
+#. Bookmarks.BeaconDeactivated
+msgctxt "Bookmarks.BeaconDeactivated"
+msgid "Beacon {0} deactivated"
+msgstr "信標 {0} 已停用"
+
+#. Bookmarks.BookmarkSaved
+msgctxt "Bookmarks.BookmarkSaved"
+msgid "Bookmark saved"
+msgstr "書籤已儲存"
+
+#. Bookmarks.NoBookmark
+msgctxt "Bookmarks.NoBookmark"
+msgid "No bookmark"
+msgstr "沒有書籤"
+
+#. Combat.AllMeleeTroops
+msgctxt "Combat.AllMeleeTroops"
+msgid "all melee troops"
+msgstr "所有近戰部隊"
+
+#. Combat.AllRangedTroops
+msgctxt "Combat.AllRangedTroops"
+msgid "all ranged troops"
+msgstr "所有遠程部隊"
+
+#. Combat.AllTroops
+msgctxt "Combat.AllTroops"
+msgid "all troops"
+msgstr "所有部隊"
+
+#. Combat.EnemyMeleeTroops
+msgctxt "Combat.EnemyMeleeTroops"
+msgid "enemy melee troops"
+msgstr "敵方近戰部隊"
+
+#. Combat.EnemyCommander
+msgctxt "Combat.EnemyCommander"
+msgid "enemy {0}"
+msgstr "敵方 {0}"
+
+#. Combat.EnemyRangedTroops
+msgctxt "Combat.EnemyRangedTroops"
+msgid "enemy ranged troops"
+msgstr "敵方遠程部隊"
+
+#. Combat.WielderEssenceGenerated
+msgctxt "Combat.WielderEssenceGenerated"
+msgid "{0}: {1}"
+msgstr "{0}: {1}"
+
+#. Combat.YourMeleeTroops
+msgctxt "Combat.YourMeleeTroops"
+msgid "your melee troops"
+msgstr "你的近戰部隊"
+
+#. Combat.YourRangedTroops
+msgctxt "Combat.YourRangedTroops"
+msgid "your ranged troops"
+msgstr "你的遠程部隊"
+
+#. Scanner.AridTrees
+msgctxt "Scanner.AridTrees"
+msgid "Arid trees"
+msgstr "Han di shu mu"
+
+#. Scanner.CobblestoneRoads
+msgctxt "Scanner.CobblestoneRoads"
+msgid "Cobblestone roads"
+msgstr "E luan shi dao lu"
+
+#. Scanner.DeepWater
+msgctxt "Scanner.DeepWater"
+msgid "Deep water"
+msgstr "Shen shui"
+
+#. Scanner.Deforestation
+msgctxt "Scanner.Deforestation"
+msgid "Deforestation"
+msgstr "Kan fa di"
+
+#. Scanner.Dirt
+msgctxt "Scanner.Dirt"
+msgid "Dirt"
+msgstr "Ni di"
+
+#. Scanner.DirtRoads
+msgctxt "Scanner.DirtRoads"
+msgid "Dirt roads"
+msgstr "Ni tu dao lu"
+
+#. Scanner.Farmland
+msgctxt "Scanner.Farmland"
+msgid "Farmland"
+msgstr "Nong tian"
+
+#. Scanner.Grass
+msgctxt "Scanner.Grass"
+msgid "Grass"
+msgstr "Cao di"
+
+#. Scanner.Mountains
+msgctxt "Scanner.Mountains"
+msgid "Mountains"
+msgstr "Shan di"
+
+#. Scanner.Sand
+msgctxt "Scanner.Sand"
+msgid "Sand"
+msgstr "Sha di"
+
+#. Scanner.ShallowWater
+msgctxt "Scanner.ShallowWater"
+msgid "Shallow water"
+msgstr "Qian shui"
+
+#. Scanner.TemperateTrees
+msgctxt "Scanner.TemperateTrees"
+msgid "Temperate trees"
+msgstr "Wen dai shu mu"
+
+#. Scanner.Walls
+msgctxt "Scanner.Walls"
+msgid "Walls"
+msgstr "Qiang"
+
+#. Scanner.WaterEdge
+msgctxt "Scanner.WaterEdge"
+msgid "Water edge"
+msgstr "Shui bian"
+
+#. Spatial.Dirt
+msgctxt "Spatial.Dirt"
+msgid "Dirt"
+msgstr "Ni di"
+
+#. Spatial.Grass
+msgctxt "Spatial.Grass"
+msgid "Grass"
+msgstr "Cao di"
+
+#. Spatial.Mountain
+msgctxt "Spatial.Mountain"
+msgid "Mountain"
+msgstr "Shan di"
+
+#. Spatial.Sand
+msgctxt "Spatial.Sand"
+msgid "Sand"
+msgstr "Sha di"
+
+#. Spatial.TemperateTrees
+msgctxt "Spatial.TemperateTrees"
+msgid "Temperate trees"
+msgstr "Wen dai shu mu"
+
+#. Scanner.AridTreeTileCount_0
+msgctxt "Scanner.AridTreeTileCount_0"
+msgid "{0} arid tree tile"
+msgstr "{0} di ge: Han di shu mu"
+
+#. Scanner.CobblestoneRoadTileCount_0
+msgctxt "Scanner.CobblestoneRoadTileCount_0"
+msgid "{0} cobblestone road tile"
+msgstr "{0} di ge: E luan shi dao lu"
+
+#. Scanner.DeepWaterTileCount_0
+msgctxt "Scanner.DeepWaterTileCount_0"
+msgid "{0} deep water tile"
+msgstr "{0} di ge: Shen shui"
+
+#. Scanner.DeforestationTileCount_0
+msgctxt "Scanner.DeforestationTileCount_0"
+msgid "{0} deforestation tile"
+msgstr "{0} di ge: Kan fa di"
+
+#. Scanner.DirtRoadTileCount_0
+msgctxt "Scanner.DirtRoadTileCount_0"
+msgid "{0} dirt road tile"
+msgstr "{0} di ge: Ni tu dao lu"
+
+#. Scanner.DirtTileCount_0
+msgctxt "Scanner.DirtTileCount_0"
+msgid "{0} dirt tile"
+msgstr "{0} di ge: Ni di"
+
+#. Scanner.FarmlandTileCount_0
+msgctxt "Scanner.FarmlandTileCount_0"
+msgid "{0} farmland tile"
+msgstr "{0} di ge: Nong tian"
+
+#. Scanner.GrassTileCount_0
+msgctxt "Scanner.GrassTileCount_0"
+msgid "{0} grass tile"
+msgstr "{0} di ge: Cao di"
+
+#. Scanner.MountainTileCount_0
+msgctxt "Scanner.MountainTileCount_0"
+msgid "{0} mountain tile"
+msgstr "{0} di ge: Shan di"
+
+#. Scanner.SandTileCount_0
+msgctxt "Scanner.SandTileCount_0"
+msgid "{0} sand tile"
+msgstr "{0} di ge: Sha di"
+
+#. Scanner.ShallowWaterTileCount_0
+msgctxt "Scanner.ShallowWaterTileCount_0"
+msgid "{0} shallow water tile"
+msgstr "{0} di ge: Qian shui"
+
+#. Scanner.TemperateTreeTileCount_0
+msgctxt "Scanner.TemperateTreeTileCount_0"
+msgid "{0} temperate tree tile"
+msgstr "{0} di ge: Wen dai shu mu"
+
+#. Scanner.WallTileCount_0
+msgctxt "Scanner.WallTileCount_0"
+msgid "{0} wall tile"
+msgstr "{0} di ge: Qiang"
+
+#. Scanner.WaterEdgeTileCount_0
+msgctxt "Scanner.WaterEdgeTileCount_0"
+msgid "{0} water edge tile"
+msgstr "{0} di ge: Shui bian"
+
+#. Spatial.SkippedTileCount_0
+msgctxt "Spatial.SkippedTileCount_0"
+msgid "Skipped {0} tile"
+msgstr "已跳過 {0} 個地格"
+
+#. UI.ColumnDetails
+msgctxt "UI.ColumnDetails"
+msgid "Details"
+msgstr "詳細資訊"
+
+#. UI.ColumnFaction
+msgctxt "UI.ColumnFaction"
+msgid "Faction"
+msgstr "陣營"
+
+#. UI.ColumnGames
+msgctxt "UI.ColumnGames"
+msgid "Games"
+msgstr "遊戲數"
+
+#. UI.ColumnKills
+msgctxt "UI.ColumnKills"
+msgid "Kills"
+msgstr "擊殺"
+
+#. UI.ColumnMap
+msgctxt "UI.ColumnMap"
+msgid "Map"
+msgstr "地圖"
+
+#. UI.ColumnPlayDistribution
+msgctxt "UI.ColumnPlayDistribution"
+msgid "Play distribution"
+msgstr "遊玩分布"
+
+#. UI.ColumnRank
+msgctxt "UI.ColumnRank"
+msgid "Rank"
+msgstr "排名"
+
+#. UI.ColumnRound
+msgctxt "UI.ColumnRound"
+msgid "Round"
+msgstr "回合"
+
+#. UI.ColumnSpell
+msgctxt "UI.ColumnSpell"
+msgid "Spell"
+msgstr "法術"
+
+#. UI.ColumnTimesCast
+msgctxt "UI.ColumnTimesCast"
+msgid "Times cast"
+msgstr "施放次數"
+
+#. UI.ColumnTimesRecruited
+msgctxt "UI.ColumnTimesRecruited"
+msgid "Times recruited or started with"
+msgstr "招募或初始擁有次數"
+
+#. UI.ColumnTimesTrained
+msgctxt "UI.ColumnTimesTrained"
+msgid "Times trained"
+msgstr "訓練次數"
+
+#. UI.ColumnTroop
+msgctxt "UI.ColumnTroop"
+msgid "Troop"
+msgstr "部隊"
+
+#. UI.ColumnWielder
+msgctxt "UI.ColumnWielder"
+msgid "Wielder"
+msgstr "持有者"
+
+#. UI.StatusBattleLost
+msgctxt "UI.StatusBattleLost"
+msgid "battle lost"
+msgstr "戰鬥失敗"
+
+#. Screens.PlayerStats
+msgctxt "Screens.PlayerStats"
+msgid "Player stats"
+msgstr "玩家統計"
+
+#. Screens.PlayerStatsBattle
+msgctxt "Screens.PlayerStatsBattle"
+msgid "Conquest - Battle"
+msgstr "征服 - 戰鬥"
+
+#. Screens.PlayerStatsOverall
+msgctxt "Screens.PlayerStatsOverall"
+msgid "Conquest - Overall"
+msgstr "征服 - 總覽"
+
+#. Screens.CopiedGameCodeToClipboard
+msgctxt "Screens.CopiedGameCodeToClipboard"
+msgid "Copied game code to clipboard."
+msgstr "遊戲代碼已複製到剪貼簿。"
+
+#. Screens.CopyGameCodeToClipboard
+msgctxt "Screens.CopyGameCodeToClipboard"
+msgid "Copy game code to clipboard: {0}"
+msgstr "將遊戲代碼複製到剪貼簿：{0}"
+
+#. Screens.InviteFriend
+msgctxt "Screens.InviteFriend"
+msgid "Invite friend"
+msgstr "邀請好友"
+
+#. Screens.NotReady
+msgctxt "Screens.NotReady"
+msgid "Not ready"
+msgstr "尚未準備"
+
+#. Screens.Ready
+msgctxt "Screens.Ready"
+msgid "Ready"
+msgstr "已準備"
+
+#. Actions.SummarizeReachableEntities
+msgctxt "Actions.SummarizeReachableEntities"
+msgid "Summarize Reachable Entities"
+msgstr "彙總可到達實體"
+
+#. Scanner.ReachableSummary
+msgctxt "Scanner.ReachableSummary"
+msgid "Reachable: {0}"
+msgstr "可到達：{0}"
+
+#. Scanner.ReachableSummaryCount
+msgctxt "Scanner.ReachableSummaryCount"
+msgid "{0} {1}"
+msgstr "{0}個{1}"
+
+#. Scanner.ReachableSummaryNone
+msgctxt "Scanner.ReachableSummaryNone"
+msgid "Reachable: none"
+msgstr "可到達：無"
