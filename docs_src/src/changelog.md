@@ -1,5 +1,11 @@
 # Changelog
 
+## V0.6.0
+
+- Switched from Tolk to Prism to support more screen readers
+- Added support for hostile join screen when hostiles propose to join for gold
+- Documentation updates to prepare for public release
+
 ## V0.5.0
 
 - Experimental support for starting multiplayer games. Will need other players to test actual games with to ensure this works properly

@@ -23,4 +23,6 @@ To move a troop:
 4. Press Enter to drop.
 5. Press Escape to cancel the drag.
 
-If the game needs an amount specified before completing the move, it may open the native move amount popup.
+If the game needs an amount specified before completing the move, the move amount popup opens.
+
+The slots of each army is rendered from left to right. The second army is usually positioned down and to the right of your wielder's army. Hence, when the game uses terminology to "move left" or "move right", it refers to the path the mouse moves when performing a drag and drop in the normal way.
