@@ -69,6 +69,11 @@ namespace SongsOfConquestAccess.UI
             return _adapter != null ? _adapter.GetTooltip(_cursorTile) : null;
         }
 
+        public Vector2Int CursorTile
+        {
+            get { return _cursorTile; }
+        }
+
         public override bool ClaimsAction(string actionKey)
         {
             // TODO: Enter on an already-selected wielder should eventually open an

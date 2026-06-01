@@ -2,8 +2,9 @@
 
 ## V0.6.3
 
-- Fixed scanner bug where hitting `End` would say "No scanner results" if there are no pickups in view, but there are other scan result category results
+- Fixed scanner bug where hitting `End` would say "No scanner results" if there are no pickups in view, but there are results in other categories
 - Add support for artifact market screen
+- Add support for portals that allow selection between multiple teleport destinations
 
 ## V0.6.2
 

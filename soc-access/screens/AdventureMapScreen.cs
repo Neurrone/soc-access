@@ -5,6 +5,7 @@ using HarmonyLib;
 using Lavapotion.Cartography;
 using SongsOfConquest.Client;
 using SongsOfConquest.Client.Adventure;
+using SongsOfConquest.Client.Adventure.Menu;
 using SongsOfConquest.Client.Adventure.Map;
 using SongsOfConquest.Client.Adventure.View;
 using SongsOfConquest.Client.Gamestate;
@@ -43,13 +44,14 @@ namespace SongsOfConquestAccess.Screens
 
         private const string ReturnToGridSoundKey = "Common_ClosePauseMenu";
         private const int GridIndex = 0;
-        private const int TroopSlotsIndex = 8;
-        private const int ResourcesIndex = 9;
-        private const int ObjectivesIndex = 10;
-        private const int NotificationsIndex = 11;
+        private const int TroopSlotsIndex = 14;
+        private const int ResourcesIndex = 15;
+        private const int ObjectivesIndex = 16;
+        private const int NotificationsIndex = 17;
         private readonly AdventureMapAdapter _adapter;
         private readonly AdventureMapEventListener _eventListener;
         private readonly AdventureMapGrid _grid;
+        private TeleportMenuAdapter _teleportMenuAdapter;
         private Action<int> _commanderStatisticsChangedHandler;
         private Action<CommanderChangedPayload> _commanderChangedHandler;
         private bool _isTopScreen;
@@ -65,11 +67,12 @@ namespace SongsOfConquestAccess.Screens
         }
 
         private AdventureMapScreen(AdventureMapAdapter adapter, AdventureMapEventListener eventListener, AdventureMapGrid grid)
-            : base(BuildRoot(adapter, grid))
+            : base(new ContainerWidget("adventure_map_screen", ModText.Get(ModStrings.Screens.AdventureMap)))
         {
             _adapter = adapter;
             _eventListener = eventListener;
             _grid = grid;
+            RootWidget = BuildRoot(adapter, grid);
         }
 
         public override bool IsPresent()
@@ -133,8 +136,51 @@ namespace SongsOfConquestAccess.Screens
             RootWidget?.SetFocusByIndex(GridIndex);
         }
 
+        public void EnterTeleportDestinationMode(TeleportMenuAdapter adapter)
+        {
+            if (adapter == null || !adapter.IsPresent())
+            {
+                return;
+            }
+
+            _teleportMenuAdapter = adapter;
+            FocusCurrentTeleportDestination(speakInstruction: true);
+        }
+
+        public void ExitTeleportDestinationMode(TeleportMenu menu)
+        {
+            if (_teleportMenuAdapter == null)
+            {
+                return;
+            }
+
+            if (menu != null && !ReferenceEquals(_teleportMenuAdapter.SourceKey, menu))
+            {
+                return;
+            }
+
+            _teleportMenuAdapter = null;
+            FocusGrid();
+        }
+
+        public bool MatchesTeleportMenu(TeleportMenu menu)
+        {
+            return _teleportMenuAdapter != null
+                && (menu == null || ReferenceEquals(_teleportMenuAdapter.SourceKey, menu));
+        }
+
         public override bool HasClaimed(string actionKey)
         {
+            if (IsTeleportDestinationModeActive() && actionKey == AccessibilityActions.Cancel.Key)
+            {
+                return true;
+            }
+
+            if (IsTeleportDestinationModeActive() && IsTeleportSuppressedScreenAction(actionKey))
+            {
+                return true;
+            }
+
             if (actionKey == AccessibilityActions.FocusHudTroops.Key)
             {
                 return CanFocusHudWidget(TroopSlotsIndex);
@@ -163,11 +209,44 @@ namespace SongsOfConquestAccess.Screens
             return base.HasClaimed(actionKey) || !IsGridFocused();
         }
 
+        public override bool HasFocusedWidgetClaimed(string actionKey)
+        {
+            if (IsTeleportDestinationModeActive() && IsTeleportSuppressedFocusedAction(actionKey))
+            {
+                return true;
+            }
+
+            return base.HasFocusedWidgetClaimed(actionKey);
+        }
+
         public override bool OnActionJustPressed(InputAction action)
         {
             if (action == null)
             {
                 return base.OnActionJustPressed(action);
+            }
+
+            if (IsTeleportDestinationModeActive())
+            {
+                if (action.Key == AccessibilityActions.Cancel.Key)
+                {
+                    return CancelTeleportDestination();
+                }
+
+                if (IsTeleportSuppressedAction(action.Key))
+                {
+                    return true;
+                }
+
+                if (IsGridFocused() && action.Key == AccessibilityActions.Activate.Key)
+                {
+                    return ConfirmTeleportDestinationFromGrid();
+                }
+
+                if (IsGridFocused() && action.Key == AccessibilityActions.MapSecondaryAction.Key)
+                {
+                    return true;
+                }
             }
 
             if (action.Key == AccessibilityActions.FocusHudResources.Key)
@@ -323,8 +402,158 @@ namespace SongsOfConquestAccess.Screens
                 && ReferenceEquals(UIManager.CurrentWidget, _grid);
         }
 
+        private bool IsTeleportDestinationModeActive()
+        {
+            return _teleportMenuAdapter != null && _teleportMenuAdapter.IsPresent();
+        }
+
+        private TeleportMenuAdapter GetTeleportMenuAdapter()
+        {
+            return IsTeleportDestinationModeActive() ? _teleportMenuAdapter : null;
+        }
+
+        private void FocusCurrentTeleportDestination(bool speakInstruction)
+        {
+            TeleportMenuAdapter teleport = GetTeleportMenuAdapter();
+            if (teleport == null)
+            {
+                return;
+            }
+
+            if (speakInstruction)
+            {
+                string instruction = teleport.InstructionText;
+                if (!string.IsNullOrWhiteSpace(instruction))
+                {
+                    SpeechPipeline.Output(new SpeechRequest(instruction, interrupt: true));
+                }
+            }
+
+            FocusGridTile(teleport.CurrentDestination);
+        }
+
+        private bool SelectPreviousTeleportDestination()
+        {
+            TeleportMenuAdapter teleport = GetTeleportMenuAdapter();
+            if (teleport == null || !teleport.SelectPrevious())
+            {
+                return false;
+            }
+
+            FocusCurrentTeleportDestination(speakInstruction: false);
+            return true;
+        }
+
+        private bool SelectNextTeleportDestination()
+        {
+            TeleportMenuAdapter teleport = GetTeleportMenuAdapter();
+            if (teleport == null || !teleport.SelectNext())
+            {
+                return false;
+            }
+
+            FocusCurrentTeleportDestination(speakInstruction: false);
+            return true;
+        }
+
+        private bool ConfirmTeleportDestinationFromGrid()
+        {
+            TeleportMenuAdapter teleport = GetTeleportMenuAdapter();
+            if (teleport == null)
+            {
+                return true;
+            }
+
+            if (_grid == null || _grid.CursorTile != teleport.CurrentDestination)
+            {
+                return true;
+            }
+
+            return teleport.Confirm();
+        }
+
+        private bool ConfirmTeleportDestination()
+        {
+            TeleportMenuAdapter teleport = GetTeleportMenuAdapter();
+            return teleport != null && teleport.Confirm();
+        }
+
+        private bool CancelTeleportDestination()
+        {
+            TeleportMenuAdapter teleport = GetTeleportMenuAdapter();
+            if (teleport == null)
+            {
+                return false;
+            }
+
+            bool cancelled = teleport.Cancel();
+            if (!cancelled)
+            {
+                return false;
+            }
+
+            FocusSelectedWielderTile();
+            SpeechPipeline.Output(new SpeechRequest(ModText.Get(ModStrings.UI.Cancelled), interrupt: true));
+
+            return true;
+        }
+
+        private void FocusSelectedWielderTile()
+        {
+            Vector2Int position;
+            if (_adapter != null && _adapter.TryGetSelectedWielderPosition(out position))
+            {
+                FocusGridTile(position);
+                return;
+            }
+
+            FocusGrid();
+        }
+
+        private string GetTeleportDestinationLabel()
+        {
+            TeleportMenuAdapter teleport = GetTeleportMenuAdapter();
+            if (teleport == null)
+            {
+                return string.Empty;
+            }
+
+            return ModText.Get(ModStrings.Spatial.DestinationAt, FormatTile(teleport.CurrentDestination));
+        }
+
+        private static string FormatTile(Vector2Int tile)
+        {
+            return "(" + tile.x + ", " + tile.y + ")";
+        }
+
+        private static bool IsTeleportSuppressedAction(string actionKey)
+        {
+            return IsTeleportSuppressedScreenAction(actionKey)
+                || IsTeleportSuppressedFocusedAction(actionKey);
+        }
+
+        private static bool IsTeleportSuppressedScreenAction(string actionKey)
+        {
+            return actionKey == AccessibilityActions.FocusHudTroops.Key
+                || actionKey == AccessibilityActions.FocusHudResources.Key
+                || actionKey == AccessibilityActions.FocusHudObjectives.Key
+                || actionKey == AccessibilityActions.FocusHudNotifications.Key;
+        }
+
+        private static bool IsTeleportSuppressedFocusedAction(string actionKey)
+        {
+            return actionKey == AccessibilityActions.NextWielder.Key
+                || actionKey == AccessibilityActions.NextSettlement.Key
+                || actionKey == AccessibilityActions.SummarizeReachableEntities.Key;
+        }
+
         private bool CanFocusHudWidget(int index)
         {
+            if (IsTeleportDestinationModeActive())
+            {
+                return false;
+            }
+
             Widget widget = RootWidget != null ? RootWidget.GetChildAt(index) : null;
             return widget != null && widget.IsVisible;
         }
@@ -411,7 +640,7 @@ namespace SongsOfConquestAccess.Screens
             MenuWidget previousMenu = RootWidget.GetChildAt(TroopSlotsIndex) as MenuWidget;
             int previousMenuIndex = previousMenu != null ? previousMenu.FocusedIndex : -1;
             bool wasTroopMenuFocused = RootWidget.FocusedIndex == TroopSlotsIndex;
-            MenuWidget newMenu = BuildTroopSlotsMenu(_adapter.Hud);
+            MenuWidget newMenu = BuildTroopSlotsMenu(_adapter.Hud, IsTeleportDestinationModeActive);
             if (!RootWidget.ReplaceChildAt(TroopSlotsIndex, newMenu))
             {
                 return;
@@ -423,10 +652,94 @@ namespace SongsOfConquestAccess.Screens
             }
         }
 
-        private static ContainerWidget BuildRoot(AdventureMapAdapter adapter, AdventureMapGrid grid)
+        private void AddTeleportDestinationModeWidgets(ContainerWidget root)
+        {
+            root.AddChild(new TextWidget(
+                "adventure-teleport-instruction",
+                () =>
+                {
+                    TeleportMenuAdapter teleport = GetTeleportMenuAdapter();
+                    return teleport != null ? teleport.InstructionText : string.Empty;
+                },
+                null,
+                includeParentLabelInAnnouncement: false,
+                tooltip: null,
+                isVisible: IsTeleportDestinationModeActive));
+
+            root.AddChild(new ButtonWidget(
+                "adventure-teleport-previous",
+                () =>
+                {
+                    TeleportMenuAdapter teleport = GetTeleportMenuAdapter();
+                    return teleport != null ? teleport.PreviousLabel : string.Empty;
+                },
+                SelectPreviousTeleportDestination,
+                null,
+                () => true,
+                IsTeleportDestinationModeActive));
+
+            root.AddChild(new TextWidget(
+                "adventure-teleport-current-destination",
+                GetTeleportDestinationLabel,
+                null,
+                includeParentLabelInAnnouncement: false,
+                tooltip: null,
+                isVisible: IsTeleportDestinationModeActive));
+
+            root.AddChild(new ButtonWidget(
+                "adventure-teleport-next",
+                () =>
+                {
+                    TeleportMenuAdapter teleport = GetTeleportMenuAdapter();
+                    return teleport != null ? teleport.NextLabel : string.Empty;
+                },
+                SelectNextTeleportDestination,
+                null,
+                () => true,
+                IsTeleportDestinationModeActive));
+
+            root.AddChild(new ButtonWidget(
+                "adventure-teleport-confirm",
+                () =>
+                {
+                    TeleportMenuAdapter teleport = GetTeleportMenuAdapter();
+                    return teleport != null ? teleport.ConfirmLabel : string.Empty;
+                },
+                ConfirmTeleportDestination,
+                null,
+                () => true,
+                IsTeleportDestinationModeActive));
+
+            root.AddChild(new ButtonWidget(
+                "adventure-teleport-cancel",
+                () =>
+                {
+                    TeleportMenuAdapter teleport = GetTeleportMenuAdapter();
+                    return teleport != null ? teleport.CancelLabel : string.Empty;
+                },
+                CancelTeleportDestination,
+                null,
+                () => true,
+                IsTeleportDestinationModeActive));
+        }
+
+        private Func<bool> VisibleWhenNotTeleport(Func<bool> isVisible)
+        {
+            return () => !IsTeleportDestinationModeActive()
+                && (isVisible == null || isVisible());
+        }
+
+        private static Func<bool> VisibleWhenNotTeleport(Func<bool> isTeleportDestinationModeActive, Func<bool> isVisible)
+        {
+            return () => (isTeleportDestinationModeActive == null || !isTeleportDestinationModeActive())
+                && (isVisible == null || isVisible());
+        }
+
+        private ContainerWidget BuildRoot(AdventureMapAdapter adapter, AdventureMapGrid grid)
         {
             ContainerWidget root = new ContainerWidget("adventure_map_screen", ModText.Get(ModStrings.Screens.AdventureMap));
             root.AddChild(grid);
+            AddTeleportDestinationModeWidgets(root);
             // TODO: minimap accessibility is deferred; keep the adventure map grid as the first tab stop.
             if (adapter == null)
             {
@@ -444,7 +757,7 @@ namespace SongsOfConquestAccess.Screens
                     portrait.Localization,
                     portrait.RefreshTooltip),
                 () => portrait.IsEnabled,
-                () => portrait.IsVisible));
+                VisibleWhenNotTeleport(() => portrait.IsVisible)));
 
             root.AddChild(new TextWidget(
                 "adventure-experience",
@@ -452,22 +765,22 @@ namespace SongsOfConquestAccess.Screens
                 adapter.Hud.FocusExperience,
                 false,
                 () => adapter.Hud.ExperienceTooltip,
-                adapter.Hud.IsExperienceVisible));
+                VisibleWhenNotTeleport(adapter.Hud.IsExperienceVisible)));
             root.AddChild(new ButtonWidget(
                 "adventure-level-up",
                 () => adapter.Hud.LevelUpButtonLabel,
                 adapter.Hud.ClickLevelUpButton,
                 adapter.Hud.FocusLevelUpButton,
                 adapter.Hud.IsLevelUpButtonEnabled,
-                adapter.Hud.IsLevelUpButtonVisible));
-            root.AddChild(BuildEssenceMenu(adapter.Hud));
+                VisibleWhenNotTeleport(adapter.Hud.IsLevelUpButtonVisible)));
+            root.AddChild(BuildEssenceMenu(adapter.Hud, IsTeleportDestinationModeActive));
             root.AddChild(new ButtonWidget(
                 "adventure-inventory",
                 () => adapter.Hud.InventoryButtonLabel,
                 adapter.Hud.ClickInventoryButton,
                 adapter.Hud.FocusInventoryButton,
                 adapter.Hud.IsInventoryButtonEnabled,
-                adapter.Hud.IsInventoryButtonVisible,
+                VisibleWhenNotTeleport(adapter.Hud.IsInventoryButtonVisible),
                 () => adapter.Hud.InventoryButtonTooltip));
             root.AddChild(new ButtonWidget(
                 "adventure-move-to-destination",
@@ -475,7 +788,7 @@ namespace SongsOfConquestAccess.Screens
                 adapter.Hud.ClickMoveToDestinationButton,
                 adapter.Hud.FocusMoveToDestinationButton,
                 adapter.Hud.IsMoveToDestinationButtonEnabled,
-                adapter.Hud.IsMoveToDestinationButtonVisible,
+                VisibleWhenNotTeleport(adapter.Hud.IsMoveToDestinationButtonVisible),
                 () => adapter.Hud.MoveToDestinationButtonTooltip));
             root.AddChild(new ButtonWidget(
                 "adventure-spellbook",
@@ -483,39 +796,39 @@ namespace SongsOfConquestAccess.Screens
                 adapter.Hud.ClickSpellbookButton,
                 adapter.Hud.FocusSpellbookButton,
                 adapter.Hud.IsSpellbookButtonEnabled,
-                adapter.Hud.IsSpellbookButtonVisible,
+                VisibleWhenNotTeleport(adapter.Hud.IsSpellbookButtonVisible),
                 () => adapter.Hud.SpellbookButtonTooltip));
-            root.AddChild(BuildTroopSlotsMenu(adapter.Hud));
-            root.AddChild(BuildResourcesMenu(adapter.Hud));
-            root.AddChild(BuildObjectivesMenu(adapter.Hud));
-            root.AddChild(BuildNotificationsMenu(adapter.Hud));
-            root.AddChild(BuildTownListMenu(adapter.Hud));
-            root.AddChild(BuildWielderListMenu(adapter.Hud));
+            root.AddChild(BuildTroopSlotsMenu(adapter.Hud, IsTeleportDestinationModeActive));
+            root.AddChild(BuildResourcesMenu(adapter.Hud, IsTeleportDestinationModeActive));
+            root.AddChild(BuildObjectivesMenu(adapter.Hud, IsTeleportDestinationModeActive));
+            root.AddChild(BuildNotificationsMenu(adapter.Hud, IsTeleportDestinationModeActive));
+            root.AddChild(BuildTownListMenu(adapter.Hud, IsTeleportDestinationModeActive));
+            root.AddChild(BuildWielderListMenu(adapter.Hud, IsTeleportDestinationModeActive));
             root.AddChild(new ButtonWidget(
                 "adventure-options",
                 () => adapter.Hud.OptionsButtonLabel,
                 adapter.Hud.ClickOptionsButton,
                 adapter.Hud.FocusOptionsButton,
                 adapter.Hud.IsOptionsButtonEnabled,
-                adapter.Hud.IsOptionsButtonVisible,
+                VisibleWhenNotTeleport(adapter.Hud.IsOptionsButtonVisible),
                 () => adapter.Hud.OptionsButtonTooltip));
-            root.AddChild(BuildKingdomOverviewMenu(adapter.Hud));
+            root.AddChild(BuildKingdomOverviewMenu(adapter.Hud, IsTeleportDestinationModeActive));
             root.AddChild(new ButtonWidget(
                 "adventure-bug-report",
                 () => adapter.Hud.BugReportButtonLabel,
                 adapter.Hud.ClickBugReportButton,
                 adapter.Hud.FocusBugReportButton,
                 adapter.Hud.IsBugReportButtonEnabled,
-                adapter.Hud.IsBugReportButtonVisible,
+                VisibleWhenNotTeleport(adapter.Hud.IsBugReportButtonVisible),
                 () => adapter.Hud.BugReportButtonTooltip));
-            root.AddChild(BuildTeamQueueMenu(adapter.Hud));
+            root.AddChild(BuildTeamQueueMenu(adapter.Hud, IsTeleportDestinationModeActive));
             root.AddChild(new ButtonWidget(
                 "adventure-end-turn",
                 () => adapter.Hud.EndTurnButtonLabel,
                 adapter.Hud.ClickEndTurnButton,
                 adapter.Hud.FocusEndTurnButton,
                 adapter.Hud.IsEndTurnButtonEnabled,
-                adapter.Hud.IsEndTurnButtonVisible,
+                VisibleWhenNotTeleport(adapter.Hud.IsEndTurnButtonVisible),
                 () => adapter.Hud.EndTurnButtonTooltip));
             root.AddChild(new TextWidget(
                 "adventure-round",
@@ -523,13 +836,16 @@ namespace SongsOfConquestAccess.Screens
                 null,
                 false,
                 (Tooltip)null,
-                adapter.Hud.IsRoundTextVisible));
+                VisibleWhenNotTeleport(adapter.Hud.IsRoundTextVisible)));
             return root;
         }
 
-        private static MenuWidget BuildEssenceMenu(AdventureHudAdapter adapter)
+        private static MenuWidget BuildEssenceMenu(AdventureHudAdapter adapter, Func<bool> isTeleportDestinationModeActive)
         {
-            MenuWidget menu = new MenuWidget("adventure-essence", GameText.Get("Common/CommanderInventory/Essences", string.Empty), adapter.IsEssenceMenuVisible);
+            MenuWidget menu = new MenuWidget(
+                "adventure-essence",
+                GameText.Get("Common/CommanderInventory/Essences", string.Empty),
+                VisibleWhenNotTeleport(isTeleportDestinationModeActive, adapter.IsEssenceMenuVisible));
             AddEssenceItem(menu, adapter, EssenceType.Order);
             AddEssenceItem(menu, adapter, EssenceType.Creation);
             AddEssenceItem(menu, adapter, EssenceType.Chaos);
@@ -551,18 +867,21 @@ namespace SongsOfConquestAccess.Screens
                 () => adapter.GetEssenceTooltip(capturedType)));
         }
 
-        private static MenuWidget BuildTroopSlotsMenu(AdventureHudAdapter adapter)
+        private static MenuWidget BuildTroopSlotsMenu(AdventureHudAdapter adapter, Func<bool> isTeleportDestinationModeActive)
         {
             return TroopHudMenu.Build(
                 "adventure-troop-slots",
                 GameText.Get("Commanders/Tooltip/Troops", string.Empty),
                 adapter != null ? adapter.Troops : null,
-                adapter != null ? adapter.IsTroopMenuVisible : (Func<bool>)null);
+                adapter != null ? VisibleWhenNotTeleport(isTeleportDestinationModeActive, adapter.IsTroopMenuVisible) : (Func<bool>)null);
         }
 
-        private static MenuWidget BuildResourcesMenu(AdventureHudAdapter adapter)
+        private static MenuWidget BuildResourcesMenu(AdventureHudAdapter adapter, Func<bool> isTeleportDestinationModeActive)
         {
-            MenuWidget menu = new MenuWidget("adventure-resources", ModText.Get(ModStrings.Screens.Resources), adapter.IsResourcesMenuVisible);
+            MenuWidget menu = new MenuWidget(
+                "adventure-resources",
+                ModText.Get(ModStrings.Screens.Resources),
+                VisibleWhenNotTeleport(isTeleportDestinationModeActive, adapter.IsResourcesMenuVisible));
             AddResourceItem(menu, adapter, ResourceType.Gold);
             AddResourceItem(menu, adapter, ResourceType.Stone);
             AddResourceItem(menu, adapter, ResourceType.Wood);
@@ -585,9 +904,12 @@ namespace SongsOfConquestAccess.Screens
                 () => adapter.GetResourceTooltip(capturedType)));
         }
 
-        private static MenuWidget BuildObjectivesMenu(AdventureHudAdapter adapter)
+        private static MenuWidget BuildObjectivesMenu(AdventureHudAdapter adapter, Func<bool> isTeleportDestinationModeActive)
         {
-            MenuWidget menu = new MenuWidget("adventure-objectives", ModText.Get(ModStrings.Screens.Objectives), adapter.IsObjectivesMenuVisible);
+            MenuWidget menu = new MenuWidget(
+                "adventure-objectives",
+                ModText.Get(ModStrings.Screens.Objectives),
+                VisibleWhenNotTeleport(isTeleportDestinationModeActive, adapter.IsObjectivesMenuVisible));
             for (int i = 0; i < 16; i++)
             {
                 int capturedIndex = i;
@@ -605,9 +927,12 @@ namespace SongsOfConquestAccess.Screens
             return menu;
         }
 
-        private static MenuWidget BuildNotificationsMenu(AdventureHudAdapter adapter)
+        private static MenuWidget BuildNotificationsMenu(AdventureHudAdapter adapter, Func<bool> isTeleportDestinationModeActive)
         {
-            MenuWidget menu = new MenuWidget("adventure-notifications", ModText.Get(ModStrings.Screens.Notifications), adapter.IsNotificationsMenuVisible);
+            MenuWidget menu = new MenuWidget(
+                "adventure-notifications",
+                ModText.Get(ModStrings.Screens.Notifications),
+                VisibleWhenNotTeleport(isTeleportDestinationModeActive, adapter.IsNotificationsMenuVisible));
             for (int i = 0; i < 5; i++)
             {
                 int capturedIndex = i;
@@ -624,9 +949,12 @@ namespace SongsOfConquestAccess.Screens
             return menu;
         }
 
-        private static MenuWidget BuildTownListMenu(AdventureHudAdapter adapter)
+        private static MenuWidget BuildTownListMenu(AdventureHudAdapter adapter, Func<bool> isTeleportDestinationModeActive)
         {
-            MenuWidget menu = new MenuWidget("adventure-town-list", string.Empty, adapter.IsTownListMenuVisible);
+            MenuWidget menu = new MenuWidget(
+                "adventure-town-list",
+                string.Empty,
+                VisibleWhenNotTeleport(isTeleportDestinationModeActive, adapter.IsTownListMenuVisible));
             for (int i = 0; i < 32; i++)
             {
                 int capturedIndex = i;
@@ -643,9 +971,12 @@ namespace SongsOfConquestAccess.Screens
             return menu;
         }
 
-        private static MenuWidget BuildWielderListMenu(AdventureHudAdapter adapter)
+        private static MenuWidget BuildWielderListMenu(AdventureHudAdapter adapter, Func<bool> isTeleportDestinationModeActive)
         {
-            MenuWidget menu = new MenuWidget("adventure-wielder-list", ModText.Get(ModStrings.Screens.Wielders), adapter.IsWielderListMenuVisible);
+            MenuWidget menu = new MenuWidget(
+                "adventure-wielder-list",
+                ModText.Get(ModStrings.Screens.Wielders),
+                VisibleWhenNotTeleport(isTeleportDestinationModeActive, adapter.IsWielderListMenuVisible));
             for (int i = 0; i < 32; i++)
             {
                 int capturedIndex = i;
@@ -662,9 +993,12 @@ namespace SongsOfConquestAccess.Screens
             return menu;
         }
 
-        private static MenuWidget BuildKingdomOverviewMenu(AdventureHudAdapter adapter)
+        private static MenuWidget BuildKingdomOverviewMenu(AdventureHudAdapter adapter, Func<bool> isTeleportDestinationModeActive)
         {
-            MenuWidget menu = new MenuWidget("adventure-kingdom-overview", string.Empty, adapter.IsKingdomOverviewMenuVisible);
+            MenuWidget menu = new MenuWidget(
+                "adventure-kingdom-overview",
+                string.Empty,
+                VisibleWhenNotTeleport(isTeleportDestinationModeActive, adapter.IsKingdomOverviewMenuVisible));
             for (int i = 0; i < 5; i++)
             {
                 int capturedIndex = i;
@@ -683,9 +1017,12 @@ namespace SongsOfConquestAccess.Screens
             return menu;
         }
 
-        private static MenuWidget BuildTeamQueueMenu(AdventureHudAdapter adapter)
+        private static MenuWidget BuildTeamQueueMenu(AdventureHudAdapter adapter, Func<bool> isTeleportDestinationModeActive)
         {
-            MenuWidget menu = new MenuWidget("adventure-team-queue", ModText.Get(ModStrings.Screens.TurnOrder), adapter.IsTeamQueueMenuVisible);
+            MenuWidget menu = new MenuWidget(
+                "adventure-team-queue",
+                ModText.Get(ModStrings.Screens.TurnOrder),
+                VisibleWhenNotTeleport(isTeleportDestinationModeActive, adapter.IsTeamQueueMenuVisible));
             for (int i = 0; i < 16; i++)
             {
                 int capturedIndex = i;

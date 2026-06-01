@@ -407,6 +407,19 @@ namespace SongsOfConquestAccess.Adapters
             return GetCameraCenterTile();
         }
 
+        public bool TryGetSelectedWielderPosition(out Vector2Int position)
+        {
+            ICommanderState selectedCommander = _selectionHandler != null ? _selectionHandler.SelectedCommander : null;
+            if (selectedCommander != null && selectedCommander.IsAlive && IsWithinMap(selectedCommander.Position))
+            {
+                position = selectedCommander.Position;
+                return true;
+            }
+
+            position = Vector2Int.zero;
+            return false;
+        }
+
         public Vector2Int Move(Vector2Int currentTile, int xDelta, int yDelta)
         {
             return ClampToMap(new Vector2Int(currentTile.x + xDelta, currentTile.y + yDelta));

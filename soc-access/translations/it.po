@@ -325,6 +325,11 @@ msgctxt "UI.CombatGrid"
 msgid "Combat grid"
 msgstr "Griglia combattimento"
 
+#. UI.Cancelled
+msgctxt "UI.Cancelled"
+msgid "Cancelled."
+msgstr "Annullato."
+
 #. UI.DragCancelled
 msgctxt "UI.DragCancelled"
 msgid "Drag cancelled."

@@ -2269,6 +2269,40 @@ namespace SongsOfConquestAccess.Screens
             }
         }
 
+        public void OnTeleportMenuReady(TeleportMenu menu)
+        {
+            TeleportMenuAdapter adapter = new TeleportMenuAdapter(menu);
+            if (!adapter.IsPresent())
+            {
+                return;
+            }
+
+            AdventureMapScreen screen = _screenManager.Get<AdventureMapScreen>();
+            if (screen == null)
+            {
+                return;
+            }
+
+            if (!ReferenceEquals(_screenManager.CurrentScreen, screen))
+            {
+                if (_screenManager.CurrentScreen is MapEntityMiniMenuScreen)
+                {
+                    _screenManager.Pop<MapEntityMiniMenuScreen>("teleport menu opened");
+                }
+            }
+
+            screen.EnterTeleportDestinationMode(adapter);
+        }
+
+        public void OnTeleportMenuClosed(TeleportMenu menu)
+        {
+            AdventureMapScreen screen = _screenManager.Get<AdventureMapScreen>();
+            if (screen != null && screen.MatchesTeleportMenu(menu))
+            {
+                screen.ExitTeleportDestinationMode(menu);
+            }
+        }
+
         public void OnDwellingInteractionReady(DwellingInteractionMenu menu)
         {
             DraftTroopsScreen screen = new DraftTroopsScreen(new DwellingTroopManagementHostAdapter(new DwellingInteractionMenuAdapter(menu)));

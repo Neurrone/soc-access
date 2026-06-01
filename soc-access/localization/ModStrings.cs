@@ -341,6 +341,7 @@ namespace SongsOfConquestAccess.Localization
             public static readonly ModString ColumnWielder = new ModString("UI.ColumnWielder", "Wielder");
             public static readonly ModString CombatDisconnectedTiles = new ModString("UI.CombatDisconnectedTiles", "Some shown tiles are separated. Use W and Shift W to reach all range tiles.");
             public static readonly ModString CombatGrid = new ModString("UI.CombatGrid", "Combat grid");
+            public static readonly ModString Cancelled = new ModString("UI.Cancelled", "Cancelled.");
             public static readonly ModString DragCancelled = new ModString("UI.DragCancelled", "Drag cancelled.");
             public static readonly ModString DragComplete = new ModString("UI.DragComplete", "Drag complete.");
             public static readonly ModString DragStarted = new ModString("UI.DragStarted", "Started drag. Move to destination and press enter to drop.");

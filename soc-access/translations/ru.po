@@ -345,6 +345,11 @@ msgctxt "UI.CombatGrid"
 msgid "Combat grid"
 msgstr "Боевая сетка"
 
+#. UI.Cancelled
+msgctxt "UI.Cancelled"
+msgid "Cancelled."
+msgstr "Отменено."
+
 #. UI.DragCancelled
 msgctxt "UI.DragCancelled"
 msgid "Drag cancelled."
