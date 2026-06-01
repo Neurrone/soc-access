@@ -3,6 +3,7 @@
 ## V0.6.3
 
 - Fixed scanner bug where hitting `End` would say "No scanner results" if there are no pickups in view, but there are other scan result category results
+- Add support for artifact market screen
 
 ## V0.6.2
 

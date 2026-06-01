@@ -39,6 +39,7 @@ namespace SongsOfConquestAccess.Screens
         private float _deferredAdventureLobbyDropdownDeadline;
         private bool _storySequenceActive;
         private bool _communityMapsHomeContentRefreshPending;
+        private bool _artifactMarketRefreshPending;
 
         public ScreenDetector(ScreenManager screenManager)
         {
@@ -76,6 +77,7 @@ namespace SongsOfConquestAccess.Screens
                 OwnedEntitiesScreen.TryBuildActiveScreen,
                 TroopOverviewScreen.TryBuildActiveScreen,
                 MarketplaceScreen.TryBuildActiveScreen,
+                ArtifactMarketScreen.TryBuildActiveScreen,
                 MapEntityMiniMenuScreen.TryBuildActiveScreen,
                 CombatScreen.TryBuildActiveScreen,
                 SpellbookScreen.TryBuildActiveScreen,
@@ -488,6 +490,78 @@ namespace SongsOfConquestAccess.Screens
             if (!screen.IsPresent())
             {
                 _screenManager.Pop<MarketplaceScreen>("marketplace no longer present");
+                return;
+            }
+
+            screen.Refresh();
+        }
+
+        public void OnArtifactMarketReady(ArtifactMarketMenu menu)
+        {
+            ArtifactMarketMenuAdapter adapter = new ArtifactMarketMenuAdapter(menu);
+            if (!adapter.IsPresent())
+            {
+                return;
+            }
+
+            ArtifactMarketScreen current = _screenManager.CurrentScreen as ArtifactMarketScreen;
+            if (current != null)
+            {
+                current.Refresh();
+                return;
+            }
+
+            Push(new ArtifactMarketScreen(adapter), "artifact market ready");
+        }
+
+        public void OnArtifactMarketClosed(ArtifactMarketMenu menu)
+        {
+            // ArtifactMarketMenu.Close is a possible-close signal, not proof
+            // that the window was open: the game also calls it from Start() and
+            // HideAll() while cleaning up inactive menus. Only pop when the
+            // artifact market accessibility screen is currently at the top.
+            if (_screenManager.CurrentScreen is ArtifactMarketScreen)
+            {
+                _screenManager.Pop<ArtifactMarketScreen>("artifact market closed");
+            }
+        }
+
+        public void OnArtifactMarketChanged()
+        {
+            if (_artifactMarketRefreshPending)
+            {
+                return;
+            }
+
+            SocAccessPlugin plugin = SocAccessPlugin.Instance;
+            if (plugin == null)
+            {
+                RefreshArtifactMarket("artifact market changed");
+                return;
+            }
+
+            _artifactMarketRefreshPending = true;
+            plugin.StartCoroutine(RefreshArtifactMarketNextFrame());
+        }
+
+        private IEnumerator RefreshArtifactMarketNextFrame()
+        {
+            yield return null;
+            _artifactMarketRefreshPending = false;
+            RefreshArtifactMarket("artifact market changed");
+        }
+
+        private void RefreshArtifactMarket(string reason)
+        {
+            ArtifactMarketScreen screen = _screenManager.CurrentScreen as ArtifactMarketScreen;
+            if (screen == null)
+            {
+                return;
+            }
+
+            if (!screen.IsPresent())
+            {
+                _screenManager.Pop<ArtifactMarketScreen>("artifact market no longer present");
                 return;
             }
 

@@ -2245,6 +2245,11 @@ msgctxt "Screens.BuyResourceForGold"
 msgid "Buy {0} for {1}"
 msgstr "用 {1} 購買 {0}"
 
+#. Screens.Sell
+msgctxt "Screens.Sell"
+msgid "Sell"
+msgstr "出售"
+
 #. Screens.SellResourceForGold
 msgctxt "Screens.SellResourceForGold"
 msgid "Sell {0} for {1}"
@@ -2755,3 +2760,13 @@ msgstr "{0}個{1}"
 msgctxt "Scanner.ReachableSummaryNone"
 msgid "Reachable: none"
 msgstr "可到達：無"
+
+#. Screens.BuyArtifact
+msgctxt "Screens.BuyArtifact"
+msgid "Buy"
+msgstr "購買"
+
+#. Screens.Buyback
+msgctxt "Screens.Buyback"
+msgid "Buyback"
+msgstr "回購"

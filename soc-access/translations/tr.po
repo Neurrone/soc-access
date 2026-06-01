@@ -2245,6 +2245,11 @@ msgctxt "Screens.BuyResourceForGold"
 msgid "Buy {0} for {1}"
 msgstr "{0} öğesini {1} karşılığında satın al"
 
+#. Screens.Sell
+msgctxt "Screens.Sell"
+msgid "Sell"
+msgstr "Sat"
+
 #. Screens.SellResourceForGold
 msgctxt "Screens.SellResourceForGold"
 msgid "Sell {0} for {1}"
@@ -2755,3 +2760,13 @@ msgstr "{0} {1}"
 msgctxt "Scanner.ReachableSummaryNone"
 msgid "Reachable: none"
 msgstr "Ulaşılabilir: yok"
+
+#. Screens.BuyArtifact
+msgctxt "Screens.BuyArtifact"
+msgid "Buy"
+msgstr "Satın al"
+
+#. Screens.Buyback
+msgctxt "Screens.Buyback"
+msgid "Buyback"
+msgstr "Geri satın alma"

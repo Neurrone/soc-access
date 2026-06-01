@@ -549,7 +549,7 @@ namespace SongsOfConquestAccess.Adapters
             {
                 AddLocalizedLine(instructionLines, "Adventure/TooltipInstruction/Sell");
                 actions.Add(new TooltipAction(
-                    GetLocalizedText("Adventure/TooltipInstruction/Sell", "Sell"),
+                    ModText.Get(_localization, ModStrings.Screens.Sell),
                     () => InvokeArtifactAction(movable, _inventory.SellArtifact)));
             }
             else

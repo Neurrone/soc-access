@@ -1819,6 +1819,16 @@ msgctxt "Screens.BuyResourceForGold"
 msgid "Buy {0} for {1}"
 msgstr ""
 
+#. Screens.BuyArtifact
+msgctxt "Screens.BuyArtifact"
+msgid "Buy"
+msgstr ""
+
+#. Screens.Buyback
+msgctxt "Screens.Buyback"
+msgid "Buyback"
+msgstr ""
+
 #. Screens.Categories
 msgctxt "Screens.Categories"
 msgid "Categories"
@@ -2202,6 +2212,11 @@ msgstr ""
 #. Screens.SpellTier
 msgctxt "Screens.SpellTier"
 msgid "{0} tier {1}"
+msgstr ""
+
+#. Screens.Sell
+msgctxt "Screens.Sell"
+msgid "Sell"
 msgstr ""
 
 #. Screens.SellResourceForGold

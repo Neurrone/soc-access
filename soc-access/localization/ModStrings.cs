@@ -411,6 +411,8 @@ namespace SongsOfConquestAccess.Localization
             public static readonly ModString BattleLog = new ModString("Screens.BattleLog", "Battle log");
             public static readonly ModString BattleResult = new ModString("Screens.BattleResult", "Battle result");
             public static readonly ModString BuyResourceForGold = new ModString("Screens.BuyResourceForGold", "Buy {0} for {1}");
+            public static readonly ModString BuyArtifact = new ModString("Screens.BuyArtifact", "Buy");
+            public static readonly ModString Buyback = new ModString("Screens.Buyback", "Buyback");
             public static readonly ModString Categories = new ModString("Screens.Categories", "Categories");
             public static readonly ModString ChaosSpells = new ModString("Screens.ChaosSpells", "Chaos spells");
             public static readonly ModString Choices = new ModString("Screens.Choices", "Choices");
@@ -488,6 +490,7 @@ namespace SongsOfConquestAccess.Localization
             public static readonly ModString Skill = new ModString("Screens.Skill", "Skill {0}");
             public static readonly ModString SlotValue = new ModString("Screens.SlotValue", "Slot {0}: {1}");
             public static readonly ModString SpellTier = new ModString("Screens.SpellTier", "{0} tier {1}");
+            public static readonly ModString Sell = new ModString("Screens.Sell", "Sell");
             public static readonly ModString SellResourceForGold = new ModString("Screens.SellResourceForGold", "Sell {0} for {1}");
             public static readonly ModString Tabs = new ModString("Screens.Tabs", "Tabs");
             public static readonly ModString TeamValue = new ModString("Screens.TeamValue", "Team {0}");
