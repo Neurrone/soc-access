@@ -7,5 +7,5 @@ Extract the zip file into the game's installation folder.
 When the game starts, you should hear
 
 ```text
-Songs of Conquest Access v0.1 ready
+Songs of Conquest Access <version> ready
 ```
