@@ -9,12 +9,21 @@ using SongsOfConquest.Client.Gamestate.Facade;
 using SongsOfConquest.Client.Menu.Tooltip;
 using SongsOfConquest.Client.UI;
 using SongsOfConquest.Common;
+using SongsOfConquest.Common.Economy;
 using SongsOfConquest.Common.Gamestate;
 using SongsOfConquest.Common.Localization;
+using SongsOfConquestAccess.Localization;
 using SongsOfConquestAccess.Speech;
 
 namespace SongsOfConquestAccess.Adapters
 {
+    internal enum HostileJoinMenuStage
+    {
+        None,
+        Choice,
+        Join
+    }
+
     internal sealed class HostileJoinMenuAdapter : IDisposable
     {
         private static readonly FieldInfo SettingsField = AccessTools.Field(typeof(HostileJoinMenu), "_settings");
@@ -78,6 +87,43 @@ namespace SongsOfConquestAccess.Adapters
             get { return GetText(_settings != null ? _settings.JoinText : null); }
         }
 
+        public string ChoiceBody
+        {
+            get { return GetText(_settings != null ? _settings.InformationText : null); }
+        }
+
+        public string AcceptLabel
+        {
+            get
+            {
+                if (_settings == null)
+                {
+                    return string.Empty;
+                }
+
+                string goldAmount = _settings.YesButtonGoldAmount != null && _settings.YesButtonGoldAmount.Active
+                    ? GetText(_settings.YesButtonGoldAmount)
+                    : string.Empty;
+                if (!string.IsNullOrWhiteSpace(goldAmount))
+                {
+                    return ModText.Get(ModStrings.Common.ResourceAmount, goldAmount, GetGoldName());
+                }
+
+                string label = GetButtonText(_settings.YesButton, string.Empty);
+                if (!string.IsNullOrWhiteSpace(label))
+                {
+                    return label;
+                }
+
+                return string.Empty;
+            }
+        }
+
+        public string RejectLabel
+        {
+            get { return GetButtonText(_settings != null ? _settings.NoButton : null, string.Empty); }
+        }
+
         public string DiscardLabel
         {
             get { return GetButtonText(_settings != null ? _settings.DoneButton : null, "Discard"); }
@@ -93,9 +139,34 @@ namespace SongsOfConquestAccess.Adapters
             return _menu != null
                 && _settings != null
                 && GetField<object>(_menu, AsyncField) != null
-                && IsJoinStage()
-                && _settings.JoinStageContainer != null
-                && _settings.JoinStageContainer.activeInHierarchy;
+                && Stage != HostileJoinMenuStage.None;
+        }
+
+        public HostileJoinMenuStage Stage
+        {
+            get
+            {
+                if (_menu == null || _settings == null)
+                {
+                    return HostileJoinMenuStage.None;
+                }
+
+                if (IsNativeStage("Choice")
+                    && _settings.ChoiceStageContainer != null
+                    && _settings.ChoiceStageContainer.activeInHierarchy)
+                {
+                    return HostileJoinMenuStage.Choice;
+                }
+
+                if (IsNativeStage("Join")
+                    && _settings.JoinStageContainer != null
+                    && _settings.JoinStageContainer.activeInHierarchy)
+                {
+                    return HostileJoinMenuStage.Join;
+                }
+
+                return HostileJoinMenuStage.None;
+            }
         }
 
         public TroopHudAdapter WielderTroops
@@ -121,6 +192,36 @@ namespace SongsOfConquestAccess.Adapters
         public bool ActivateDiscard()
         {
             return NativeSelectionUtility.Click(_settings != null ? _settings.DoneButton : null);
+        }
+
+        public bool ActivateAccept()
+        {
+            return NativeSelectionUtility.Click(_settings != null ? _settings.YesButton : null);
+        }
+
+        public bool IsAcceptEnabled()
+        {
+            return IsButtonEnabled(_settings != null ? _settings.YesButton : null);
+        }
+
+        public void FocusAccept()
+        {
+            NativeSelectionUtility.Select(_settings != null ? _settings.YesButton : null);
+        }
+
+        public bool ActivateReject()
+        {
+            return NativeSelectionUtility.Click(_settings != null ? _settings.NoButton : null);
+        }
+
+        public bool IsRejectEnabled()
+        {
+            return IsButtonEnabled(_settings != null ? _settings.NoButton : null);
+        }
+
+        public void FocusReject()
+        {
+            NativeSelectionUtility.Select(_settings != null ? _settings.NoButton : null);
         }
 
         public bool IsDiscardEnabled()
@@ -170,15 +271,20 @@ namespace SongsOfConquestAccess.Adapters
                 : null;
         }
 
-        private bool IsJoinStage()
+        private bool IsNativeStage(string stageName)
         {
             object value = StageField != null ? StageField.GetValue(_menu) : null;
-            return value != null && value.ToString() == "Join";
+            return value != null && value.ToString() == stageName;
         }
 
         private static string GetText(IUITextMesh textMesh)
         {
             return SpeechTextSanitizer.Normalize(UITextMeshTextUtility.GetEffectiveText(textMesh));
+        }
+
+        private string GetGoldName()
+        {
+            return GameText.Get(_localization, "Common/Resource/" + ResourceType.Gold, ResourceType.Gold.ToString());
         }
 
         private static string GetButtonText(UIButton button, string fallback)

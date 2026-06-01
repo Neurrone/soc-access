@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using SongsOfConquestAccess.Adapters;
+using SongsOfConquestAccess.Input;
 using SongsOfConquestAccess.Localization;
 using SongsOfConquestAccess.Speech;
 
@@ -8,7 +9,34 @@ namespace SongsOfConquestAccess.UI
 {
     internal static class TroopHudMenu
     {
-        public static MenuWidget Build(string id, string label, TroopHudAdapter adapter, Func<bool> isVisible)
+        public static MenuWidget Build(string id, string label, TroopHudAdapter adapter, Func<bool> isVisible, bool readOnly = false)
+        {
+            return readOnly
+                ? BuildReadOnly(id, label, adapter, isVisible)
+                : BuildDraggable(id, label, adapter, isVisible);
+        }
+
+        private static MenuWidget BuildReadOnly(string id, string label, TroopHudAdapter adapter, Func<bool> isVisible)
+        {
+            MenuWidget menu = new MenuWidget(id, label, isVisible);
+            IReadOnlyList<TroopHudAdapter.SlotItem> slots = adapter != null
+                ? adapter.GetSlots()
+                : new TroopHudAdapter.SlotItem[0];
+            for (int i = 0; i < slots.Count; i++)
+            {
+                TroopHudAdapter.SlotItem item = slots[i];
+                menu.AddItem(new ReadOnlyTroopSlotWidget(
+                    id + "-slot-" + item.SlotNumber,
+                    () => BuildSlotLabel(item),
+                    item.Focus,
+                    () => true,
+                    () => item.IsOccupied ? item.Tooltip : null));
+            }
+
+            return menu;
+        }
+
+        private static MenuWidget BuildDraggable(string id, string label, TroopHudAdapter adapter, Func<bool> isVisible)
         {
             Dictionary<MenuItemWidget, TroopHudAdapter.SlotItem> slotByWidget = new Dictionary<MenuItemWidget, TroopHudAdapter.SlotItem>();
             DraggableMenuWidget menu = null;
@@ -83,6 +111,29 @@ namespace SongsOfConquestAccess.UI
         private static void Speak(string text)
         {
             SpeechPipeline.Output(new SpeechRequest(text, interrupt: false));
+        }
+
+        private sealed class ReadOnlyTroopSlotWidget : MenuItemWidget
+        {
+            public ReadOnlyTroopSlotWidget(
+                string id,
+                Func<string> getLabel,
+                Action onFocus,
+                Func<bool> isVisible,
+                Func<Tooltip> getTooltip)
+                : base(id, getLabel, null, null, onFocus, isVisible, getTooltip)
+            {
+            }
+
+            public override bool ClaimsAction(string actionKey)
+            {
+                return false;
+            }
+
+            public override bool HandleAction(InputAction action)
+            {
+                return false;
+            }
         }
     }
 }
