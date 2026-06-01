@@ -9,3 +9,5 @@ In rough order of descending priority:
 - The scanner works for finding things on the map, but is still not ideal for optimal pathing for wielders. I'm looking for suggestions to improve this.
 - Combat narration is still quite verbose
 - In the options menu, changing the game's keybindings and the bug report screen is currently not supported
+- The map editor is not supported
+- The credits and digital artbook screens are not supported
