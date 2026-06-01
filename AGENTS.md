@@ -45,6 +45,8 @@ Prefer fast text search over manual browsing when tracing the game code. Do not 
 
 Use C# conventions: 4-space indentation, PascalCase for types and public members, camelCase for locals and private fields unless the surrounding code already uses underscore-prefixed fields. Avoid repeating words in file names. For example, use `adapters/ContinueMenuButton.cs` instead of `adapters/ContinueMenuButtonAdapter.cs` to avoid repeating adapter.
 
+Never use `SpeechTextSanitizer.Normalize` unless explicitly given approval to do so. It is problematic as it strips newlines.
+
 Keep engine-specific access isolated in patch or adapter classes; keep speech composition out of hook methods. Favor small, explicit wrappers around reflected or patched game objects. Avoid creating unneeded abstractions and change code sergically so that you never implement more than what is requested.
 
 Because the mod is hot-reloaded by Script Engine, every change must be reload-safe:
