@@ -2674,6 +2674,11 @@ msgctxt "Scanner.Troops"
 msgid "Troops"
 msgstr ""
 
+#. Scanner.Unexplored
+msgctxt "Scanner.Unexplored"
+msgid "Unexplored"
+msgstr ""
+
 #. Scanner.Unvisited
 msgctxt "Scanner.Unvisited"
 msgid "Unvisited"
@@ -3002,6 +3007,21 @@ msgstr ""
 #. Scanner.TemperateTreeTileCount_2
 msgctxt "Scanner.TemperateTreeTileCount_2"
 msgid "{0} temperate tree tiles"
+msgstr ""
+
+#. Scanner.UnexploredTileCount_0
+msgctxt "Scanner.UnexploredTileCount_0"
+msgid "{0} unexplored tile"
+msgstr ""
+
+#. Scanner.UnexploredTileCount_1
+msgctxt "Scanner.UnexploredTileCount_1"
+msgid "{0} unexplored tiles"
+msgstr ""
+
+#. Scanner.UnexploredTileCount_2
+msgctxt "Scanner.UnexploredTileCount_2"
+msgid "{0} unexplored tiles"
 msgstr ""
 
 #. Scanner.WaterEdgeTileCount_0

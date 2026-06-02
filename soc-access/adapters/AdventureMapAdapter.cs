@@ -915,6 +915,7 @@ namespace SongsOfConquestAccess.Adapters
             AddArtifactMarketScannerResults(snapshot, tileCache);
             AddTeleportScannerResults(snapshot, tileCache);
             AddAdventureTerrainScannerResults(snapshot, origin, tileCache);
+            AddUnexploredScannerResults(snapshot, origin);
             AddRevealedScannerResults(snapshot);
             return snapshot;
         }
@@ -1073,6 +1074,17 @@ namespace SongsOfConquestAccess.Adapters
                 }
 
                 return validZone;
+            }
+
+            if (result.Kind == ScannerResultKind.UnexploredGroup)
+            {
+                bool validUnexplored = ValidateUnexploredScannerResult(result);
+                if (!validUnexplored)
+                {
+                    RemoveRevealedScannerResult(result);
+                }
+
+                return validUnexplored;
             }
 
             AdventureMapTile tile = GetTile(result.Position);
@@ -1355,6 +1367,8 @@ namespace SongsOfConquestAccess.Adapters
             terrain.GetOrAddSubcategory(ModText.Get(ModStrings.Scanner.Deforestation));
             terrain.GetOrAddSubcategory(ModText.Get(ModStrings.Scanner.Farmland));
             terrain.GetOrAddSubcategory(ModText.Get(ModStrings.Scanner.Impassable));
+
+            snapshot.GetOrAddCategory(ModText.Get(ModStrings.Scanner.Unexplored)).GetOrAddSubcategory(all);
 
             ScannerCategory revealed = snapshot.GetOrAddCategory(ModText.Get(ModStrings.Scanner.Revealed));
             revealed.PreserveResultOrder = true;
@@ -2122,6 +2136,58 @@ namespace SongsOfConquestAccess.Adapters
                 cell => cell.Blocked);
         }
 
+        private void AddUnexploredScannerResults(ScannerSnapshot snapshot, Vector2Int origin)
+        {
+            if (_facade == null || _facade.Level == null || _selectionHandler == null)
+            {
+                return;
+            }
+
+            TerrainScanCell[,] unexplored = BuildUnexploredScan(GetLocalTeamId());
+            AddScannerGroups(
+                snapshot,
+                ModText.Get(ModStrings.Scanner.Unexplored),
+                ModText.Get(ModStrings.Scanner.All),
+                unexplored,
+                "unexplored",
+                ModStrings.Scanner.UnexploredTileCount,
+                origin,
+                ScannerResultKind.UnexploredGroup,
+                cell => true);
+        }
+
+        private TerrainScanCell[,] BuildUnexploredScan(int localTeamId)
+        {
+            int width = _facade.Level.Width;
+            int height = _facade.Level.Height;
+            TerrainScanCell[,] unexplored = new TerrainScanCell[width, height];
+            ICommanderState selectedCommander = _selectionHandler != null ? _selectionHandler.SelectedCommander : null;
+            if (selectedCommander == null || !selectedCommander.IsAlive || localTeamId < 0)
+            {
+                return unexplored;
+            }
+
+            int pathingTeamId = selectedCommander.TeamId;
+            byte[] exploration = _facade.Level.GetExplorationForTeam(localTeamId);
+            bool[,] reachable = BuildReachableMoveDestinationScan(selectedCommander, pathingTeamId);
+            for (int y = 0; y < height; y++)
+            {
+                for (int x = 0; x < width; x++)
+                {
+                    int index = y * width + x;
+                    Vector2Int point = new Vector2Int(x, y);
+                    bool eligible = IsUnexplored(exploration, index, point)
+                        && reachable[x, y];
+                    unexplored[x, y] = new TerrainScanCell
+                    {
+                        Explored = eligible
+                    };
+                }
+            }
+
+            return unexplored;
+        }
+
         private TerrainScanCell[,] BuildTerrainScan(int localTeamId)
         {
             int width = _facade.Level.Width;
@@ -2162,6 +2228,123 @@ namespace SongsOfConquestAccess.Adapters
                 && index >= 0
                 && index < exploration.Length
                 && exploration[index] == ExploredButNotVisibleFogValue;
+        }
+
+        private bool IsUnexplored(byte[] exploration, int index, Vector2Int point)
+        {
+            if (IsExplored(exploration, index))
+            {
+                return false;
+            }
+
+            try
+            {
+                return _fogManager == null || (GetFog(point) == 0 && !_fogManager.IsVisible(point));
+            }
+            catch
+            {
+                return false;
+            }
+        }
+
+        private bool ValidateUnexploredScannerResult(ScannerResult result)
+        {
+            if (result == null || _selectionHandler == null || _facade == null || _facade.Level == null)
+            {
+                return false;
+            }
+
+            ICommanderState selectedCommander = _selectionHandler.SelectedCommander;
+            if (selectedCommander == null || !selectedCommander.IsAlive)
+            {
+                return false;
+            }
+
+            int localTeamId = GetLocalTeamId();
+            if (localTeamId < 0)
+            {
+                return false;
+            }
+
+            byte[] exploration = _facade.Level.GetExplorationForTeam(localTeamId);
+            int index = result.Position.y * _facade.Level.Width + result.Position.x;
+            return IsUnexplored(exploration, index, result.Position)
+                && HasFiniteMovementPathToTile(selectedCommander, selectedCommander.TeamId, result.Position);
+        }
+
+        private bool[,] BuildReachableMoveDestinationScan(ICommanderState selectedCommander, int teamId)
+        {
+            int width = _facade.Level.Width;
+            int height = _facade.Level.Height;
+            bool[,] reachable = new bool[width, height];
+            if (selectedCommander == null || _facade == null || _facade.Level == null || teamId < 0)
+            {
+                return reachable;
+            }
+
+            Vector2Int start = selectedCommander.Position;
+            if (!IsWithinMap(start))
+            {
+                return reachable;
+            }
+
+            Queue<Vector2Int> queue = new Queue<Vector2Int>();
+            reachable[start.x, start.y] = true;
+            queue.Enqueue(start);
+            while (queue.Count > 0)
+            {
+                Vector2Int point = queue.Dequeue();
+                EnqueueReachableMoveNeighbor(queue, reachable, teamId, point.x + 1, point.y);
+                EnqueueReachableMoveNeighbor(queue, reachable, teamId, point.x - 1, point.y);
+                EnqueueReachableMoveNeighbor(queue, reachable, teamId, point.x, point.y + 1);
+                EnqueueReachableMoveNeighbor(queue, reachable, teamId, point.x, point.y - 1);
+                EnqueueReachableMoveNeighbor(queue, reachable, teamId, point.x + 1, point.y + 1);
+                EnqueueReachableMoveNeighbor(queue, reachable, teamId, point.x - 1, point.y + 1);
+                EnqueueReachableMoveNeighbor(queue, reachable, teamId, point.x + 1, point.y - 1);
+                EnqueueReachableMoveNeighbor(queue, reachable, teamId, point.x - 1, point.y - 1);
+            }
+
+            return reachable;
+        }
+
+        private void EnqueueReachableMoveNeighbor(Queue<Vector2Int> queue, bool[,] reachable, int teamId, int x, int y)
+        {
+            if (x < 0 || y < 0 || x >= _facade.Level.Width || y >= _facade.Level.Height || reachable[x, y])
+            {
+                return;
+            }
+
+            Vector2Int point = new Vector2Int(x, y);
+            if (!IsValidUnexploredMovementDestination(teamId, point))
+            {
+                return;
+            }
+
+            reachable[x, y] = true;
+            queue.Enqueue(point);
+        }
+
+        private bool HasFiniteMovementPathToTile(ICommanderState selectedCommander, int teamId, Vector2Int target)
+        {
+            if (selectedCommander == null || !IsWithinMap(target))
+            {
+                return false;
+            }
+
+            bool[,] reachable = BuildReachableMoveDestinationScan(selectedCommander, teamId);
+            return reachable[target.x, target.y];
+        }
+
+        private bool IsValidUnexploredMovementDestination(int teamId, Vector2Int point)
+        {
+            try
+            {
+                return _facade.Level.IsValidMoveDestination(teamId, point);
+            }
+            catch
+            {
+                return false;
+            }
         }
 
         private bool IsImpassableTerrain(int localTeamId, Vector2Int point)

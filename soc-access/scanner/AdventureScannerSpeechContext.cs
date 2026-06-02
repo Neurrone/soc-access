@@ -36,6 +36,7 @@ namespace SongsOfConquestAccess.Scanner
             if (_result != null
                 && (_result.Kind == ScannerResultKind.TerrainGroup
                     || _result.Kind == ScannerResultKind.AreaGroup
+                    || _result.Kind == ScannerResultKind.UnexploredGroup
                     || _result.Kind == ScannerResultKind.CommanderZoneOfControl))
             {
                 ScannerSpeechUtility.AddIfPresent(parts, _result.Label);

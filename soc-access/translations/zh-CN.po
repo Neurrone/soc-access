@@ -2275,6 +2275,16 @@ msgctxt "Scanner.Troops"
 msgid "Troops"
 msgstr "部队"
 
+#. Scanner.Unexplored
+msgctxt "Scanner.Unexplored"
+msgid "Unexplored"
+msgstr "未探索"
+
+#. Scanner.UnexploredTileCount_0
+msgctxt "Scanner.UnexploredTileCount_0"
+msgid "{0} unexplored tile"
+msgstr "{0} 个未探索地块"
+
 #. Scanner.Unvisited
 msgctxt "Scanner.Unvisited"
 msgid "Unvisited"

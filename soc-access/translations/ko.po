@@ -2275,6 +2275,16 @@ msgctxt "Scanner.Troops"
 msgid "Troops"
 msgstr "부대"
 
+#. Scanner.Unexplored
+msgctxt "Scanner.Unexplored"
+msgid "Unexplored"
+msgstr "미탐색"
+
+#. Scanner.UnexploredTileCount_0
+msgctxt "Scanner.UnexploredTileCount_0"
+msgid "{0} unexplored tile"
+msgstr "{0}개의 미탐색 타일"
+
 #. Scanner.Unvisited
 msgctxt "Scanner.Unvisited"
 msgid "Unvisited"

@@ -602,6 +602,8 @@ namespace SongsOfConquestAccess.Localization
             public static readonly ModString Terrain = new ModString("Scanner.Terrain", "Terrain");
             public static readonly ModString TroopSources = new ModString("Scanner.TroopSources", "Troop sources");
             public static readonly ModString Troops = new ModString("Scanner.Troops", "Troops");
+            public static readonly ModString Unexplored = new ModString("Scanner.Unexplored", "Unexplored");
+            public static readonly ModPluralString UnexploredTileCount = new ModPluralString("Scanner.UnexploredTileCount", "{0} unexplored tile", "{0} unexplored tiles");
             public static readonly ModString Unvisited = new ModString("Scanner.Unvisited", "Unvisited");
             public static readonly ModString Water = new ModString("Scanner.Water", "Water");
             public static readonly ModString WaterEdge = new ModString("Scanner.WaterEdge", "Water edge");

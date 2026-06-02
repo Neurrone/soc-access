@@ -2290,6 +2290,21 @@ msgctxt "Scanner.Troops"
 msgid "Troops"
 msgstr "Tropas"
 
+#. Scanner.Unexplored
+msgctxt "Scanner.Unexplored"
+msgid "Unexplored"
+msgstr "Sin explorar"
+
+#. Scanner.UnexploredTileCount_0
+msgctxt "Scanner.UnexploredTileCount_0"
+msgid "{0} unexplored tile"
+msgstr "{0} casilla sin explorar"
+
+#. Scanner.UnexploredTileCount_1
+msgctxt "Scanner.UnexploredTileCount_1"
+msgid "{0} unexplored tiles"
+msgstr "{0} casillas sin explorar"
+
 #. Scanner.Unvisited
 msgctxt "Scanner.Unvisited"
 msgid "Unvisited"

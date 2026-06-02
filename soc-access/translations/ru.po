@@ -2305,6 +2305,26 @@ msgctxt "Scanner.Troops"
 msgid "Troops"
 msgstr "Войска"
 
+#. Scanner.Unexplored
+msgctxt "Scanner.Unexplored"
+msgid "Unexplored"
+msgstr "Неизведанное"
+
+#. Scanner.UnexploredTileCount_0
+msgctxt "Scanner.UnexploredTileCount_0"
+msgid "{0} unexplored tile"
+msgstr "{0} неисследованная клетка"
+
+#. Scanner.UnexploredTileCount_1
+msgctxt "Scanner.UnexploredTileCount_1"
+msgid "{0} unexplored tiles"
+msgstr "{0} неисследованные клетки"
+
+#. Scanner.UnexploredTileCount_2
+msgctxt "Scanner.UnexploredTileCount_2"
+msgid "{0} unexplored tiles"
+msgstr "{0} неисследованных клеток"
+
 #. Scanner.Unvisited
 msgctxt "Scanner.Unvisited"
 msgid "Unvisited"

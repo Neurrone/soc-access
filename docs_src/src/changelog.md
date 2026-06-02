@@ -3,6 +3,7 @@
 ## V0.6.4
 
 - The mod now has an automated GUI-based installer
+- The scanner now identifies unexplored tiles
 - Translation fixes
 
 ## V0.6.3

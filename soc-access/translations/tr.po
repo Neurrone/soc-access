@@ -2275,6 +2275,16 @@ msgctxt "Scanner.Troops"
 msgid "Troops"
 msgstr "Birlikler"
 
+#. Scanner.Unexplored
+msgctxt "Scanner.Unexplored"
+msgid "Unexplored"
+msgstr "Keşfedilmemiş"
+
+#. Scanner.UnexploredTileCount_0
+msgctxt "Scanner.UnexploredTileCount_0"
+msgid "{0} unexplored tile"
+msgstr "{0} keşfedilmemiş karo"
+
 #. Scanner.Unvisited
 msgctxt "Scanner.Unvisited"
 msgid "Unvisited"
