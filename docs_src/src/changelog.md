@@ -2,6 +2,7 @@
 
 ## V0.6.4
 
+- The mod now has an automated GUI-based installer
 - Translation fixes
 
 ## V0.6.3
