@@ -16,7 +16,7 @@ After installation, start the game. You should hear
 Songs of Conquest Access <version> ready
 ```
 
-To update later, run the installer again. It will download the latest release and offer Update when a newer version is available.
+To update later, run the installer again. It will download the latest release and offer an update when a newer version is available.
 
 ## Manual Installation
 
