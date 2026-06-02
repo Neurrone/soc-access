@@ -1,4 +1,4 @@
-﻿msgid ""
+msgid ""
 msgstr ""
 "Project-Id-Version: SongsOfConquestAccess\n"
 "Language: zh-CN\n"
@@ -234,6 +234,31 @@ msgstr "已选择{1}的{0}建造点"
 msgctxt "Events.SelectedWielder"
 msgid "Selected wielder {0}"
 msgstr "已选择持有者 {0}"
+
+#. Events.StoryCameraFocusAreaAround
+msgctxt "Events.StoryCameraFocusAreaAround"
+msgid "Camera focuses on the area around {0}."
+msgstr "镜头聚焦在{0}周围的区域。"
+
+#. Events.StoryCameraFocusConversationArea
+msgctxt "Events.StoryCameraFocusConversationArea"
+msgid "Camera focuses on the conversation area: {0}."
+msgstr "镜头聚焦在对话区域：{0}。"
+
+#. Events.StoryCameraFocusMapEntity
+msgctxt "Events.StoryCameraFocusMapEntity"
+msgid "map entity"
+msgstr "地图实体"
+
+#. Events.StoryCameraFocusTargetAt
+msgctxt "Events.StoryCameraFocusTargetAt"
+msgid "{0} at {1}"
+msgstr "{0}，位于 {1}"
+
+#. Events.StoryCameraFocusTile
+msgctxt "Events.StoryCameraFocusTile"
+msgid "tile"
+msgstr "地块"
 
 #. Events.Wielder
 msgctxt "Events.Wielder"
@@ -799,6 +824,26 @@ msgstr "通知"
 msgctxt "Screens.Objectives"
 msgid "Objectives"
 msgstr "目标"
+
+#. Screens.ObjectiveCannotBeCompleted
+msgctxt "Screens.ObjectiveCannotBeCompleted"
+msgid "Cannot be completed"
+msgstr "无法完成"
+
+#. Screens.ObjectiveCompleted
+msgctxt "Screens.ObjectiveCompleted"
+msgid "Completed"
+msgstr "已完成"
+
+#. Screens.ObjectiveIncomplete
+msgctxt "Screens.ObjectiveIncomplete"
+msgid "Incomplete"
+msgstr "未完成"
+
+#. Screens.LoseCondition
+msgctxt "Screens.LoseCondition"
+msgid "Lose condition"
+msgstr "失败条件"
 
 #. Screens.ObjectiveMarkerFarAway
 msgctxt "Screens.ObjectiveMarkerFarAway"

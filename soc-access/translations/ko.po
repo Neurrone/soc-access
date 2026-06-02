@@ -1,4 +1,4 @@
-﻿msgid ""
+msgid ""
 msgstr ""
 "Project-Id-Version: SongsOfConquestAccess\n"
 "Language: ko\n"
@@ -234,6 +234,31 @@ msgstr "{1}의 {0} 건설 부지를 선택했습니다"
 msgctxt "Events.SelectedWielder"
 msgid "Selected wielder {0}"
 msgstr "위더 {0} 선택됨"
+
+#. Events.StoryCameraFocusAreaAround
+msgctxt "Events.StoryCameraFocusAreaAround"
+msgid "Camera focuses on the area around {0}."
+msgstr "카메라가 {0} 주변 지역에 초점을 맞춥니다."
+
+#. Events.StoryCameraFocusConversationArea
+msgctxt "Events.StoryCameraFocusConversationArea"
+msgid "Camera focuses on the conversation area: {0}."
+msgstr "카메라가 대화 지역에 초점을 맞춥니다: {0}."
+
+#. Events.StoryCameraFocusMapEntity
+msgctxt "Events.StoryCameraFocusMapEntity"
+msgid "map entity"
+msgstr "지도 개체"
+
+#. Events.StoryCameraFocusTargetAt
+msgctxt "Events.StoryCameraFocusTargetAt"
+msgid "{0} at {1}"
+msgstr "{1}의 {0}"
+
+#. Events.StoryCameraFocusTile
+msgctxt "Events.StoryCameraFocusTile"
+msgid "tile"
+msgstr "타일"
 
 #. Events.Wielder
 msgctxt "Events.Wielder"
@@ -799,6 +824,26 @@ msgstr "알림"
 msgctxt "Screens.Objectives"
 msgid "Objectives"
 msgstr "목표"
+
+#. Screens.ObjectiveCannotBeCompleted
+msgctxt "Screens.ObjectiveCannotBeCompleted"
+msgid "Cannot be completed"
+msgstr "완료할 수 없음"
+
+#. Screens.ObjectiveCompleted
+msgctxt "Screens.ObjectiveCompleted"
+msgid "Completed"
+msgstr "완료됨"
+
+#. Screens.ObjectiveIncomplete
+msgctxt "Screens.ObjectiveIncomplete"
+msgid "Incomplete"
+msgstr "미완료"
+
+#. Screens.LoseCondition
+msgctxt "Screens.LoseCondition"
+msgid "Lose condition"
+msgstr "패배 조건"
 
 #. Screens.ObjectiveMarkerFarAway
 msgctxt "Screens.ObjectiveMarkerFarAway"

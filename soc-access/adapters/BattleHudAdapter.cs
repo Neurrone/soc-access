@@ -884,7 +884,7 @@ namespace SongsOfConquestAccess.Adapters
             ICommanderState commander = _facade != null ? _facade.Commanders.Current : null;
             string name = Localize(spell.NameKey, "Spell");
             int tier = GetCurrentSpellTier(spell, commander);
-            lines.Add(tier > 0 ? name + " tier " + tier : name);
+            lines.Add(tier > 0 ? name + ", " + GetTierLabel(tier) : name);
 
             string lore = Localize(spell.DescriptionKey, string.Empty);
             if (!string.IsNullOrWhiteSpace(lore))
@@ -994,6 +994,11 @@ namespace SongsOfConquestAccess.Adapters
             return string.Join(", ", parts.ToArray());
         }
 
+        public string GetTierLabel(int tier)
+        {
+            return Localize("Spells/Spellbook/SpellTierHeader", "tier " + tier, tier);
+        }
+
         private string GetEssenceName(EssenceType type)
         {
             string key = "Units/Types/" + type;
@@ -1025,9 +1030,9 @@ namespace SongsOfConquestAccess.Adapters
             return GetField<UIButton>(entry, QueueEntryButtonField);
         }
 
-        private string Localize(string key, string fallback)
+        private string Localize(string key, string fallback, params object[] args)
         {
-            return SpeechTextSanitizer.Normalize(GameText.Get(_localization, key, fallback));
+            return SpeechTextSanitizer.Normalize(GameText.Get(_localization, key, fallback, args));
         }
 
         private static bool IsButtonVisible(UIButton button)

@@ -357,7 +357,7 @@ namespace SongsOfConquestAccess.Adapters
         {
             if (_localization == null)
             {
-                return FormatResource(resourceType);
+                return string.Empty;
             }
 
             int amount;
@@ -394,21 +394,6 @@ namespace SongsOfConquestAccess.Adapters
         private string GetCostHeader()
         {
             return _localization != null ? _localization.GetText("Adventure/BuildMenu/Cost") : "Cost";
-        }
-
-        private static string FormatResource(ResourceType type)
-        {
-            switch (type)
-            {
-                case ResourceType.AncientAmber:
-                    return "ancient amber";
-                case ResourceType.CelestialOre:
-                    return "celestial ore";
-                case ResourceType.Glimmerweave:
-                    return "glimmerweave";
-                default:
-                    return type.ToString().ToLowerInvariant();
-            }
         }
 
         private void AddInstruction(string text, InputType inputType)

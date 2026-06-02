@@ -69,6 +69,11 @@ namespace SongsOfConquestAccess.Localization
             public static readonly ModString Revealed = new ModString("Events.Revealed", "Revealed {0}");
             public static readonly ModString SelectedBuildSite = new ModString("Events.SelectedBuildSite", "Selected {0} build site at {1}");
             public static readonly ModString SelectedWielder = new ModString("Events.SelectedWielder", "Selected wielder {0}");
+            public static readonly ModString StoryCameraFocusAreaAround = new ModString("Events.StoryCameraFocusAreaAround", "Camera focuses on the area around {0}.");
+            public static readonly ModString StoryCameraFocusConversationArea = new ModString("Events.StoryCameraFocusConversationArea", "Camera focuses on the conversation area: {0}.");
+            public static readonly ModString StoryCameraFocusMapEntity = new ModString("Events.StoryCameraFocusMapEntity", "map entity");
+            public static readonly ModString StoryCameraFocusTargetAt = new ModString("Events.StoryCameraFocusTargetAt", "{0} at {1}");
+            public static readonly ModString StoryCameraFocusTile = new ModString("Events.StoryCameraFocusTile", "tile");
             public static readonly ModString Wielder = new ModString("Events.Wielder", "wielder");
             public static readonly ModString WieldersNoLongerVisible = new ModString("Events.WieldersNoLongerVisible", "{0} no longer visible");
             public static readonly ModString WielderMoved = new ModString("Events.WielderMoved", "{0} moved to {1}");
@@ -462,9 +467,13 @@ namespace SongsOfConquestAccess.Localization
             public static readonly ModString NotReady = new ModString("Screens.NotReady", "Not ready");
             public static readonly ModString Notifications = new ModString("Screens.Notifications", "Notifications");
             public static readonly ModString Objectives = new ModString("Screens.Objectives", "Objectives");
+            public static readonly ModString ObjectiveCannotBeCompleted = new ModString("Screens.ObjectiveCannotBeCompleted", "Cannot be completed");
+            public static readonly ModString ObjectiveCompleted = new ModString("Screens.ObjectiveCompleted", "Completed");
+            public static readonly ModString ObjectiveIncomplete = new ModString("Screens.ObjectiveIncomplete", "Incomplete");
             public static readonly ModString ObjectiveMarkerFarAway = new ModString("Screens.ObjectiveMarkerFarAway", "far away");
             public static readonly ModString ObjectiveMarkerNearby = new ModString("Screens.ObjectiveMarkerNearby", "nearby");
             public static readonly ModString ObjectiveMarkerSomeDistance = new ModString("Screens.ObjectiveMarkerSomeDistance", "some distance");
+            public static readonly ModString LoseCondition = new ModString("Screens.LoseCondition", "Lose condition");
             public static readonly ModString Ok = new ModString("Screens.Ok", "OK");
             public static readonly ModString OrderSpells = new ModString("Screens.OrderSpells", "Order spells");
             public static readonly ModString Options = new ModString("Screens.Options", "Options");

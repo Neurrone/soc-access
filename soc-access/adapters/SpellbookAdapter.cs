@@ -116,11 +116,11 @@ namespace SongsOfConquestAccess.Adapters
         {
             return new[]
             {
-                BuildSchool("order", "Order", EssenceType.Order, OrderTierValueField, OrderTierAreaField),
-                BuildSchool("chaos", "Chaos", EssenceType.Chaos, ChaosTierValueField, ChaosTierAreaField),
-                BuildSchool("destruction", "Destruction", EssenceType.Destruction, DestructionTierValueField, DestructionTierAreaField),
-                BuildSchool("creation", "Creation", EssenceType.Creation, CreationTierValueField, CreationTierAreaField),
-                BuildSchool("arcana", "Arcana", EssenceType.Arcana, ArcanaTierValueField, ArcanaTierAreaField)
+                BuildSchool("order", EssenceType.Order, OrderTierValueField, OrderTierAreaField),
+                BuildSchool("chaos", EssenceType.Chaos, ChaosTierValueField, ChaosTierAreaField),
+                BuildSchool("destruction", EssenceType.Destruction, DestructionTierValueField, DestructionTierAreaField),
+                BuildSchool("creation", EssenceType.Creation, CreationTierValueField, CreationTierAreaField),
+                BuildSchool("arcana", EssenceType.Arcana, ArcanaTierValueField, ArcanaTierAreaField)
             };
         }
 
@@ -334,7 +334,7 @@ namespace SongsOfConquestAccess.Adapters
             string result = name;
             if (tier > 0)
             {
-                result += ", tier " + tier;
+                result += ", " + GetTierLabel(tier);
             }
 
             if (!string.IsNullOrWhiteSpace(cost))
@@ -434,7 +434,7 @@ namespace SongsOfConquestAccess.Adapters
             ILocalizationHandler localization = GetLocalization();
             string name = Localize(spell.NameKey);
             int tier = GetCurrentTier(spell);
-            lines.Add(tier > 0 ? name + " tier " + tier : name);
+            lines.Add(tier > 0 ? name + ", " + GetTierLabel(tier) : name);
 
             string lore = Localize(spell.DescriptionKey);
             if (!string.IsNullOrWhiteSpace(lore))
@@ -520,15 +520,20 @@ namespace SongsOfConquestAccess.Adapters
                 : localization.GetText("Spells/Tooltip/Battle/ClickToBeginCast");
         }
 
-        private SchoolSummaryItem BuildSchool(string id, string label, EssenceType essence, FieldInfo tierField, FieldInfo tierAreaField)
+        private SchoolSummaryItem BuildSchool(string id, EssenceType essence, FieldInfo tierField, FieldInfo tierAreaField)
         {
             int tier = tierField != null ? (int)tierField.GetValue(_spellbook) : 0;
             int essenceAmount = GetEssenceAmount(essence);
-            string essenceLabel = IsInAdventure() ? "+" + essenceAmount + " per turn" : essenceAmount.ToString();
+            string essenceLabel = IsInAdventure() ? "+" + essenceAmount : essenceAmount.ToString();
             return new SchoolSummaryItem(
                 id,
-                label + ": tier " + tier + ", essence " + essenceLabel,
+                ModText.JoinList(GetLocalization(), new[] { GetEssenceName(essence), GetTierLabel(tier), essenceLabel }),
                 tierAreaField != null ? tierAreaField.GetValue(_spellbook) as Component : null);
+        }
+
+        private string GetTierLabel(int tier)
+        {
+            return GameText.Get(GetLocalization(), "Spells/Spellbook/SpellTierHeader", "tier " + tier, tier).Trim();
         }
 
         private int GetEssenceAmount(EssenceType essence)

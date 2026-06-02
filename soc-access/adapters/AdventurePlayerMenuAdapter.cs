@@ -381,7 +381,7 @@ namespace SongsOfConquestAccess.Adapters
                     : string.Empty;
 
                 string label = string.IsNullOrWhiteSpace(amount) ? name : name + " " + amount;
-                return string.IsNullOrWhiteSpace(income) ? label : label + ", income " + income;
+                return string.IsNullOrWhiteSpace(income) ? label : label + ", " + income;
             }
 
             public void FocusResource(ResourceType resourceType)

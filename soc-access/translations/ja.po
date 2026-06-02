@@ -1,4 +1,4 @@
-﻿msgid ""
+msgid ""
 msgstr ""
 "Project-Id-Version: SongsOfConquestAccess\n"
 "Language: ja\n"
@@ -234,6 +234,31 @@ msgstr "{1}の{0}建設地を選択しました"
 msgctxt "Events.SelectedWielder"
 msgid "Selected wielder {0}"
 msgstr "ウィールダー {0} を選択しました"
+
+#. Events.StoryCameraFocusAreaAround
+msgctxt "Events.StoryCameraFocusAreaAround"
+msgid "Camera focuses on the area around {0}."
+msgstr "カメラが{0}周辺にフォーカスします。"
+
+#. Events.StoryCameraFocusConversationArea
+msgctxt "Events.StoryCameraFocusConversationArea"
+msgid "Camera focuses on the conversation area: {0}."
+msgstr "カメラが会話エリアにフォーカスします: {0}。"
+
+#. Events.StoryCameraFocusMapEntity
+msgctxt "Events.StoryCameraFocusMapEntity"
+msgid "map entity"
+msgstr "マップエンティティ"
+
+#. Events.StoryCameraFocusTargetAt
+msgctxt "Events.StoryCameraFocusTargetAt"
+msgid "{0} at {1}"
+msgstr "{1}の{0}"
+
+#. Events.StoryCameraFocusTile
+msgctxt "Events.StoryCameraFocusTile"
+msgid "tile"
+msgstr "タイル"
 
 #. Events.Wielder
 msgctxt "Events.Wielder"
@@ -799,6 +824,26 @@ msgstr "通知"
 msgctxt "Screens.Objectives"
 msgid "Objectives"
 msgstr "目標"
+
+#. Screens.ObjectiveCannotBeCompleted
+msgctxt "Screens.ObjectiveCannotBeCompleted"
+msgid "Cannot be completed"
+msgstr "完了できません"
+
+#. Screens.ObjectiveCompleted
+msgctxt "Screens.ObjectiveCompleted"
+msgid "Completed"
+msgstr "完了"
+
+#. Screens.ObjectiveIncomplete
+msgctxt "Screens.ObjectiveIncomplete"
+msgid "Incomplete"
+msgstr "未完了"
+
+#. Screens.LoseCondition
+msgctxt "Screens.LoseCondition"
+msgid "Lose condition"
+msgstr "敗北条件"
 
 #. Screens.ObjectiveMarkerFarAway
 msgctxt "Screens.ObjectiveMarkerFarAway"

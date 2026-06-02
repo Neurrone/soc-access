@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using SongsOfConquestAccess.Localization;
 using SongsOfConquestAccess.Speech;
 using UnityEngine;
 
@@ -15,7 +16,7 @@ namespace SongsOfConquestAccess.Events
     {
         public StoryCameraFocusTarget(string label, Vector2Int tile)
         {
-            Label = string.IsNullOrWhiteSpace(label) ? "target" : label;
+            Label = string.IsNullOrWhiteSpace(label) ? ModText.Get(ModStrings.UI.Target) : label;
             Tile = tile;
         }
 
@@ -25,7 +26,7 @@ namespace SongsOfConquestAccess.Events
 
         public string ToSpeech()
         {
-            return Label + " at " + Tile.x + ", " + Tile.y;
+            return ModText.Get(ModStrings.Events.StoryCameraFocusTargetAt, Label, Tile.x + ", " + Tile.y);
         }
     }
 
@@ -57,10 +58,10 @@ namespace SongsOfConquestAccess.Events
             if (FocusKind == StoryCameraFocusKind.ConversationArea)
             {
                 return SpeechTextSanitizer.Normalize(
-                    "Camera focuses on the conversation area: " + JoinTargets() + ".");
+                    ModText.Get(ModStrings.Events.StoryCameraFocusConversationArea, JoinTargets()));
             }
 
-            return SpeechTextSanitizer.Normalize("Camera focuses on the area around " + Targets[0].ToSpeech() + ".");
+            return SpeechTextSanitizer.Normalize(ModText.Get(ModStrings.Events.StoryCameraFocusAreaAround, Targets[0].ToSpeech()));
         }
 
         private string JoinTargets()

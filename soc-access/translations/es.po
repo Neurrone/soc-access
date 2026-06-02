@@ -235,6 +235,31 @@ msgctxt "Events.SelectedWielder"
 msgid "Selected wielder {0}"
 msgstr "Portador seleccionado: {0}"
 
+#. Events.StoryCameraFocusAreaAround
+msgctxt "Events.StoryCameraFocusAreaAround"
+msgid "Camera focuses on the area around {0}."
+msgstr "La cámara enfoca el área alrededor de {0}."
+
+#. Events.StoryCameraFocusConversationArea
+msgctxt "Events.StoryCameraFocusConversationArea"
+msgid "Camera focuses on the conversation area: {0}."
+msgstr "La cámara enfoca el área de conversación: {0}."
+
+#. Events.StoryCameraFocusMapEntity
+msgctxt "Events.StoryCameraFocusMapEntity"
+msgid "map entity"
+msgstr "entidad del mapa"
+
+#. Events.StoryCameraFocusTargetAt
+msgctxt "Events.StoryCameraFocusTargetAt"
+msgid "{0} at {1}"
+msgstr "{0} en {1}"
+
+#. Events.StoryCameraFocusTile
+msgctxt "Events.StoryCameraFocusTile"
+msgid "tile"
+msgstr "casilla"
+
 #. Events.Wielder
 msgctxt "Events.Wielder"
 msgid "wielder"
@@ -799,6 +824,26 @@ msgstr "Notificaciones"
 msgctxt "Screens.Objectives"
 msgid "Objectives"
 msgstr "Objetivos"
+
+#. Screens.ObjectiveCannotBeCompleted
+msgctxt "Screens.ObjectiveCannotBeCompleted"
+msgid "Cannot be completed"
+msgstr "No se puede completar"
+
+#. Screens.ObjectiveCompleted
+msgctxt "Screens.ObjectiveCompleted"
+msgid "Completed"
+msgstr "Completado"
+
+#. Screens.ObjectiveIncomplete
+msgctxt "Screens.ObjectiveIncomplete"
+msgid "Incomplete"
+msgstr "Incompleto"
+
+#. Screens.LoseCondition
+msgctxt "Screens.LoseCondition"
+msgid "Lose condition"
+msgstr "Condición de derrota"
 
 #. Screens.ObjectiveMarkerFarAway
 msgctxt "Screens.ObjectiveMarkerFarAway"

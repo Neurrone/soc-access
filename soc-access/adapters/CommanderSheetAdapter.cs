@@ -225,9 +225,9 @@ namespace SongsOfConquestAccess.Adapters
         {
             return new[]
             {
-                new ModifierCategory("modifier-category-troop", "Troop modifiers", 0, Tooltip.ForComponent(GetModifierCategoryButton(0) as Component, _localization)),
-                new ModifierCategory("modifier-category-temporary", "Temporary modifiers", 1, Tooltip.ForComponent(GetModifierCategoryButton(1) as Component, _localization)),
-                new ModifierCategory("modifier-category-gear", "Gear modifiers", 2, Tooltip.ForComponent(GetModifierCategoryButton(2) as Component, _localization))
+                new ModifierCategory("modifier-category-troop", GetLocalizedText("Commanders/Details/Modifiers/TroopModTitle", "Troop modifiers"), 0, Tooltip.ForComponent(GetModifierCategoryButton(0) as Component, _localization)),
+                new ModifierCategory("modifier-category-temporary", GetLocalizedText("Commanders/Details/Modifiers/TemporaryModTitle", "Temporary modifiers"), 1, Tooltip.ForComponent(GetModifierCategoryButton(1) as Component, _localization)),
+                new ModifierCategory("modifier-category-gear", GetLocalizedText("Commanders/Details/Modifiers/GearModTitle", "Gear modifiers"), 2, Tooltip.ForComponent(GetModifierCategoryButton(2) as Component, _localization))
             };
         }
 

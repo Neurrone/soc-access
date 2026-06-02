@@ -156,15 +156,22 @@ namespace SongsOfConquestAccess.Adapters
                 IMapEntity site = CurrentBuildSite;
                 if (site == null)
                 {
-                    return "No build site selected";
+                    return string.Empty;
                 }
 
                 Vector2Int position = site.Position;
-                string size = FormatSize(site.GetSize().Value);
+                string size = GetBuildSiteLabel(site.GetSize().Value);
                 int index = SiblingIndex + 1;
                 int count = SiblingCount;
-                string ordinal = index > 0 && count > 0 ? ", " + index + " of " + count : string.Empty;
-                return size + " build site" + ordinal + ", at " + position.x + ", " + position.y;
+                List<string> parts = new List<string>();
+                parts.Add(size);
+                if (index > 0 && count > 0)
+                {
+                    parts.Add(ModText.Get(_localization, ModStrings.Common.CountOf, index, count));
+                }
+
+                parts.Add(position.x + ", " + position.y);
+                return ModText.JoinList(_localization, parts);
             }
         }
 
@@ -191,9 +198,9 @@ namespace SongsOfConquestAccess.Adapters
         {
             return new[]
             {
-                new CategoryItem(BuildCategoryLabel("Small", BuildSiteSize.Small), 0, BuildSiteSize.Small, IsButtonEnabled(GetSmallTabButton())),
-                new CategoryItem(BuildCategoryLabel("Medium", BuildSiteSize.Medium), 1, BuildSiteSize.Medium, IsButtonEnabled(GetMediumTabButton())),
-                new CategoryItem(BuildCategoryLabel("Large", BuildSiteSize.Large), 2, BuildSiteSize.Large, IsButtonEnabled(GetLargeTabButton()))
+                new CategoryItem(BuildCategoryLabel(GetCategoryButtonLabel(BuildSiteSize.Small), BuildSiteSize.Small), 0, BuildSiteSize.Small, IsButtonEnabled(GetSmallTabButton())),
+                new CategoryItem(BuildCategoryLabel(GetCategoryButtonLabel(BuildSiteSize.Medium), BuildSiteSize.Medium), 1, BuildSiteSize.Medium, IsButtonEnabled(GetMediumTabButton())),
+                new CategoryItem(BuildCategoryLabel(GetCategoryButtonLabel(BuildSiteSize.Large), BuildSiteSize.Large), 2, BuildSiteSize.Large, IsButtonEnabled(GetLargeTabButton()))
             };
         }
 
@@ -701,12 +708,12 @@ namespace SongsOfConquestAccess.Adapters
                 }
 
                 List<string> parts = new List<string>();
-                AddCostPart(parts, section, GoldCostEntryField, GoldAmountTextField, "gold");
-                AddCostPart(parts, section, StoneCostEntryField, StoneAmountTextField, "stone");
-                AddCostPart(parts, section, WoodCostEntryField, WoodAmountTextField, "wood");
-                AddCostPart(parts, section, GlimmerWeaveCostEntryField, GlimmerWeaveAmountTextField, "glimmerweave");
-                AddCostPart(parts, section, AncientAmberCostEntryField, AncientAmberAmountTextField, "ancient amber");
-                AddCostPart(parts, section, CelestialOreCostEntryField, CelestialOreAmountTextField, "celestial ore");
+                AddCostPart(parts, section, GoldCostEntryField, GoldAmountTextField, ResourceType.Gold);
+                AddCostPart(parts, section, StoneCostEntryField, StoneAmountTextField, ResourceType.Stone);
+                AddCostPart(parts, section, WoodCostEntryField, WoodAmountTextField, ResourceType.Wood);
+                AddCostPart(parts, section, GlimmerWeaveCostEntryField, GlimmerWeaveAmountTextField, ResourceType.Glimmerweave);
+                AddCostPart(parts, section, AncientAmberCostEntryField, AncientAmberAmountTextField, ResourceType.AncientAmber);
+                AddCostPart(parts, section, CelestialOreCostEntryField, CelestialOreAmountTextField, ResourceType.CelestialOre);
                 if (parts.Count > 0)
                 {
                     return string.Join(", ", parts.ToArray());
@@ -736,7 +743,7 @@ namespace SongsOfConquestAccess.Adapters
                     continue;
                 }
 
-                parts.Add(entry.Amount + " " + FormatResource(entry.Type));
+                parts.Add(FormatResourceAmount(entry.Type, entry.Amount));
             }
 
             return string.Join(", ", parts.ToArray());
@@ -1029,7 +1036,7 @@ namespace SongsOfConquestAccess.Adapters
             return GetField<UIButton>(_menu, PurchaseButtonField);
         }
 
-        private static void AddCostPart(List<string> parts, LargeCostSection section, FieldInfo entryField, FieldInfo textField, string resourceName)
+        private void AddCostPart(List<string> parts, LargeCostSection section, FieldInfo entryField, FieldInfo textField, ResourceType resourceType)
         {
             UITransform entry = GetField<UITransform>(section, entryField);
             if (entry == null || !entry.Active)
@@ -1038,9 +1045,36 @@ namespace SongsOfConquestAccess.Adapters
             }
 
             string amount = GetText(GetField<UITextMesh>(section, textField));
+            int parsedAmount;
+            if (!string.IsNullOrWhiteSpace(amount) && int.TryParse(amount, out parsedAmount))
+            {
+                parts.Add(FormatResourceAmount(resourceType, parsedAmount));
+                return;
+            }
+
             if (!string.IsNullOrWhiteSpace(amount))
             {
-                parts.Add(amount + " " + resourceName);
+                parts.Add(ModText.Get(_localization, ModStrings.Common.ResourceAmount, amount, GetResourceName(resourceType, 0)));
+            }
+        }
+
+        private string GetCategoryButtonLabel(BuildSiteSize size)
+        {
+            UIButton button = GetCategoryButton(size);
+            string label = GetButtonLabel(button);
+            if (!string.IsNullOrWhiteSpace(label))
+            {
+                return label;
+            }
+
+            switch (size)
+            {
+                case BuildSiteSize.Medium:
+                    return GetLocalizedText("Adventure/BuildMenu/Tabs/MediumBuildings", "Medium");
+                case BuildSiteSize.Large:
+                    return GetLocalizedText("Adventure/BuildMenu/Tabs/LargeBuildings", "Large");
+                default:
+                    return GetLocalizedText("Adventure/BuildMenu/Tabs/SmallBuildings", "Small");
             }
         }
 
@@ -1252,24 +1286,59 @@ namespace SongsOfConquestAccess.Adapters
             return first.TrimEnd('.') + ". " + second;
         }
 
-        private static string FormatSize(BuildSiteSize size)
+        private string GetBuildSiteLabel(BuildSiteSize size)
         {
-            return size.ToString().ToLowerInvariant();
+            switch (size)
+            {
+                case BuildSiteSize.Medium:
+                    return GetBuildSiteName("MapEntities/BuildSite/Medium", "medium build site");
+                case BuildSiteSize.Large:
+                    return GetBuildSiteName("MapEntities/BuildSite/Large", "large build site");
+                case BuildSiteSize.LargeSettlement:
+                    return GetBuildSiteName("MapEntities/BuildSite/Large", "large build site");
+                case BuildSiteSize.SmallSettlement:
+                    return GetBuildSiteName("MapEntities/BuildSite/Small", "small build site");
+                case BuildSiteSize.Town:
+                    return GetLocalizedText("MapEntities/Category/Town", "town");
+                default:
+                    return GetBuildSiteName("MapEntities/BuildSite/Small", "small build site");
+            }
         }
 
-        private static string FormatResource(ResourceType type)
+        private string GetBuildSiteName(string key, string fallback)
         {
-            switch (type)
+            if (_localization != null)
             {
-                case ResourceType.AncientAmber:
-                    return "ancient amber";
-                case ResourceType.CelestialOre:
-                    return "celestial ore";
-                case ResourceType.Glimmerweave:
-                    return "glimmerweave";
-                default:
-                    return type.ToString().ToLowerInvariant();
+                string localized = _localization.GetPluralText(key, 1);
+                localized = localized != null ? localized.Trim() : string.Empty;
+                if (!string.IsNullOrWhiteSpace(localized) && localized != key)
+                {
+                    return localized;
+                }
             }
+
+            return fallback;
+        }
+
+        private string FormatResourceAmount(ResourceType type, int amount)
+        {
+            return ModText.Get(_localization, ModStrings.Common.ResourceAmount, amount, GetResourceName(type, amount));
+        }
+
+        private string GetResourceName(ResourceType type, int amount)
+        {
+            string key = "Common/Resource/" + type;
+            if (_localization != null)
+            {
+                string localized = _localization.GetPluralText(key, amount);
+                localized = localized != null ? localized.Trim() : string.Empty;
+                if (!string.IsNullOrWhiteSpace(localized) && localized != key)
+                {
+                    return localized;
+                }
+            }
+
+            return type.ToString();
         }
 
         private static string GetButtonLabel(UIButton button)

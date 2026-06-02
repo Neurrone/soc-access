@@ -1,5 +1,9 @@
 # Changelog
 
+## V0.6.4
+
+- Translation fixes
+
 ## V0.6.3
 
 - Fixed scanner bug where hitting `End` would say "No scanner results" if there are no pickups in view, but there are results in other categories

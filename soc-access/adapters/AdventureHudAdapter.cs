@@ -181,8 +181,11 @@ namespace SongsOfConquestAccess.Adapters
 
                 int current = commander.Stats.Experience;
                 int nextLevelExperience = CommanderLevelUtility.GetExperienceForLevel(level + 1);
+                string levelLabel = Localize("Commanders/Tooltip/Level", "Level");
                 return Localize("Commanders/Tooltip/Experience", "Experience")
-                    + ", level "
+                    + ", "
+                    + levelLabel
+                    + " "
                     + level
                     + ", "
                     + current
@@ -475,19 +478,19 @@ namespace SongsOfConquestAccess.Adapters
             List<string> parts = new List<string>();
             if (snapshot.IsLoseCondition)
             {
-                parts.Add("Lose condition");
+                parts.Add(ModText.Get(ModStrings.Screens.LoseCondition));
             }
             else
             {
-                parts.Add(snapshot.IsComplete ? "Completed" : "Incomplete");
+                parts.Add(ModText.Get(snapshot.IsComplete ? ModStrings.Screens.ObjectiveCompleted : ModStrings.Screens.ObjectiveIncomplete));
                 if (!snapshot.CanBeCompleted)
                 {
-                    parts.Add("Cannot be completed");
+                    parts.Add(ModText.Get(ModStrings.Screens.ObjectiveCannotBeCompleted));
                 }
             }
             parts.Add(label);
             AddObjectiveMarkerDetails(parts, snapshot);
-            return string.Join(", ", parts.ToArray());
+            return ModText.JoinList(_map != null ? _map.LocalizationHandler : null, parts);
         }
 
         private void AddObjectiveMarkerDetails(List<string> parts, ObjectiveEntrySnapshot snapshot)

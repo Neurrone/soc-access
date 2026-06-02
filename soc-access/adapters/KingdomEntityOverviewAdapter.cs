@@ -18,18 +18,6 @@ namespace SongsOfConquestAccess.Adapters
             AccessTools.Field(typeof(KingdomEntityOverviewCategoryEntry), "_categoryText");
         private static readonly FieldInfo UpgradeTextField =
             AccessTools.Field(typeof(KingdomEntityOverviewCategoryEntry), "_upgradeText");
-        private static readonly FieldInfo GoldIncomeTextField =
-            AccessTools.Field(typeof(KingdomEntityOverviewCategoryEntry), "_goldIncomeText");
-        private static readonly FieldInfo StoneIncomeTextField =
-            AccessTools.Field(typeof(KingdomEntityOverviewCategoryEntry), "_stoneIncomeText");
-        private static readonly FieldInfo WoodIncomeTextField =
-            AccessTools.Field(typeof(KingdomEntityOverviewCategoryEntry), "_woodIncomeText");
-        private static readonly FieldInfo GlimmerWeaveIncomeTextField =
-            AccessTools.Field(typeof(KingdomEntityOverviewCategoryEntry), "_glimmerWeaveIncomeText");
-        private static readonly FieldInfo AncientAmberIncomeTextField =
-            AccessTools.Field(typeof(KingdomEntityOverviewCategoryEntry), "_ancientAmberIncomeText");
-        private static readonly FieldInfo CelestialOreIncomeTextField =
-            AccessTools.Field(typeof(KingdomEntityOverviewCategoryEntry), "_celestialOreIncomeText");
         private static readonly FieldInfo ParentField =
             AccessTools.Field(typeof(KingdomEntityOverviewCategoryEntry), "_parent");
         private static readonly FieldInfo AmountTextField =
@@ -136,16 +124,6 @@ namespace SongsOfConquestAccess.Adapters
                     () => true));
             }
 
-            string income = BuildIncomeSummary(entry);
-            if (!string.IsNullOrWhiteSpace(income))
-            {
-                rows.Add(new RowItem(
-                    income,
-                    string.Empty,
-                    () => false,
-                    () => true));
-            }
-
             KingdomEntityOverviewClaimedEntry[] buildingEntries =
                 entry.GetComponentsInChildren<KingdomEntityOverviewClaimedEntry>(includeInactive: false);
             for (int i = 0; i < buildingEntries.Length; i++)
@@ -173,18 +151,6 @@ namespace SongsOfConquestAccess.Adapters
             return rows.Count > 0 ? new GroupItem(label, rows) : null;
         }
 
-        private static string BuildIncomeSummary(KingdomEntityOverviewCategoryEntry entry)
-        {
-            List<string> parts = new List<string>();
-            AddIncomePart(parts, "gold", NormalizeText(GetText(entry, GoldIncomeTextField)));
-            AddIncomePart(parts, "stone", NormalizeText(GetText(entry, StoneIncomeTextField)));
-            AddIncomePart(parts, "wood", NormalizeText(GetText(entry, WoodIncomeTextField)));
-            AddIncomePart(parts, "glimmerweave", NormalizeText(GetText(entry, GlimmerWeaveIncomeTextField)));
-            AddIncomePart(parts, "ancient amber", NormalizeText(GetText(entry, AncientAmberIncomeTextField)));
-            AddIncomePart(parts, "celestial ore", NormalizeText(GetText(entry, CelestialOreIncomeTextField)));
-            return parts.Count > 0 ? "Income: " + string.Join(", ", parts.ToArray()) : string.Empty;
-        }
-
         private static string BuildBuildingLabel(KingdomEntityOverviewClaimedEntry entry)
         {
             string amount = NormalizeText(GetText(entry, AmountTextField));
@@ -200,16 +166,6 @@ namespace SongsOfConquestAccess.Adapters
             }
 
             return amount + " " + name;
-        }
-
-        private static void AddIncomePart(List<string> parts, string label, string amount)
-        {
-            if (parts == null || string.IsNullOrWhiteSpace(amount))
-            {
-                return;
-            }
-
-            parts.Add(label + " " + amount);
         }
 
         private static bool ClickCategory(KingdomEntityOverviewCategoryEntry entry)
