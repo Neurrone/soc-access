@@ -524,11 +524,23 @@ namespace SongsOfConquestAccess.Adapters
         {
             int tier = tierField != null ? (int)tierField.GetValue(_spellbook) : 0;
             int essenceAmount = GetEssenceAmount(essence);
-            string essenceLabel = IsInAdventure() ? "+" + essenceAmount : essenceAmount.ToString();
+            string essenceLabel = FormatSchoolEssenceAmount(essenceAmount, IsInAdventure());
             return new SchoolSummaryItem(
                 id,
-                ModText.JoinList(GetLocalization(), new[] { GetEssenceName(essence), GetTierLabel(tier), essenceLabel }),
+                GetEssenceName(essence) + ": " + GetTierLabel(tier) + ", " + essenceLabel,
                 tierAreaField != null ? tierAreaField.GetValue(_spellbook) as Component : null);
+        }
+
+        private string FormatSchoolEssenceAmount(int amount, bool perTurn)
+        {
+            string amountText = ModText.Get(GetLocalization(), ModStrings.Combat.EssenceAmounts, (perTurn ? "+" : string.Empty) + amount);
+            if (!perTurn)
+            {
+                return amountText;
+            }
+
+            string perTurnText = GameText.Get(GetLocalization(), "Common/PerTurn", "per turn").Trim();
+            return string.IsNullOrWhiteSpace(perTurnText) ? amountText : amountText + " " + perTurnText;
         }
 
         private string GetTierLabel(int tier)

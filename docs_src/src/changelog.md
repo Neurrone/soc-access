@@ -1,5 +1,10 @@
 # Changelog
 
+## V0.6.5
+
+- Fixed incorrect use of a helper to join strings, causing strange wording in objectives, build, spellbook and quickbar screens
+- Localize message on build screen for no build slot being selected
+
 ## V0.6.4
 
 - The mod now has an automated GUI-based installer

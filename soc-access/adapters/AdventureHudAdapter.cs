@@ -490,7 +490,7 @@ namespace SongsOfConquestAccess.Adapters
             }
             parts.Add(label);
             AddObjectiveMarkerDetails(parts, snapshot);
-            return ModText.JoinList(_map != null ? _map.LocalizationHandler : null, parts);
+            return string.Join(", ", parts.ToArray());
         }
 
         private void AddObjectiveMarkerDetails(List<string> parts, ObjectiveEntrySnapshot snapshot)

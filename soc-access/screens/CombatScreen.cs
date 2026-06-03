@@ -584,7 +584,7 @@ namespace SongsOfConquestAccess.Screens
                 return string.Empty;
             }
 
-            return ModText.JoinList(new[] { item.SpellName, GameText.Get("Spells/Spellbook/SpellTierHeader", "tier " + item.SpellTier, item.SpellTier) });
+            return item.SpellName + ", " + GameText.Get("Spells/Spellbook/SpellTierHeader", "tier " + item.SpellTier, item.SpellTier);
         }
 
         private static string BuildQueueItemLabel(BattleHudAdapter.QueueItem item)

@@ -463,6 +463,7 @@ namespace SongsOfConquestAccess.Localization
             public static readonly ModString NamedMenu = new ModString("Screens.NamedMenu", "{0} menu");
             public static readonly ModString NamedTabs = new ModString("Screens.NamedTabs", "{0} {1}");
             public static readonly ModString Next = new ModString("Screens.Next", "Next");
+            public static readonly ModString NoBuildSiteSelected = new ModString("Screens.NoBuildSiteSelected", "No build site selected");
             public static readonly ModString None = new ModString("Screens.None", "None");
             public static readonly ModString NotReady = new ModString("Screens.NotReady", "Not ready");
             public static readonly ModString Notifications = new ModString("Screens.Notifications", "Notifications");

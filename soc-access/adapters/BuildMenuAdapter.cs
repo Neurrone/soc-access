@@ -156,7 +156,7 @@ namespace SongsOfConquestAccess.Adapters
                 IMapEntity site = CurrentBuildSite;
                 if (site == null)
                 {
-                    return string.Empty;
+                    return ModText.Get(_localization, ModStrings.Screens.NoBuildSiteSelected);
                 }
 
                 Vector2Int position = site.Position;
@@ -171,7 +171,7 @@ namespace SongsOfConquestAccess.Adapters
                 }
 
                 parts.Add(position.x + ", " + position.y);
-                return ModText.JoinList(_localization, parts);
+                return string.Join(", ", parts.ToArray());
             }
         }
 

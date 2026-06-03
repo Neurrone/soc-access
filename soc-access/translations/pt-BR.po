@@ -820,6 +820,11 @@ msgctxt "Screens.Next"
 msgid "Next"
 msgstr "Próximo"
 
+#. Screens.NoBuildSiteSelected
+msgctxt "Screens.NoBuildSiteSelected"
+msgid "No build site selected"
+msgstr "Nenhum local de construção selecionado"
+
 #. Screens.None
 msgctxt "Screens.None"
 msgid "None"
