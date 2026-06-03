@@ -22,8 +22,6 @@
     <ReleaseTemplatePluginsDir>$(MSBuildProjectDirectory)\..\release-template\BepInEx\plugins</ReleaseTemplatePluginsDir>
     <ReleaseTemplateTranslationsDir>$(MSBuildProjectDirectory)\..\release-template\BepInEx\config\SongsOfConquestAccess\translations</ReleaseTemplateTranslationsDir>
     <ReleaseTemplatePluginDllPath>$(ReleaseTemplatePluginsDir)\$(AssemblyName).dll</ReleaseTemplatePluginDllPath>
-    <PrismDllPath>$(MSBuildProjectDirectory)\..\release-template\prism.dll</PrismDllPath>
-    <DeployPrismDllPath>$(GameDir)\prism.dll</DeployPrismDllPath>
   </PropertyGroup>
 
   <ItemGroup>
@@ -168,10 +166,6 @@
           DestinationFiles="$(DeployPdbPath)"
           SkipUnchangedFiles="false"
           Condition="Exists('$(TargetDir)$(AssemblyName).pdb')" />
-    <Copy SourceFiles="$(PrismDllPath)"
-          DestinationFiles="$(DeployPrismDllPath)"
-          SkipUnchangedFiles="false"
-          Condition="Exists('$(PrismDllPath)')" />
     <ItemGroup>
       <ModTranslationFiles Include="$(MSBuildProjectDirectory)\translations\*.po" />
     </ItemGroup>
