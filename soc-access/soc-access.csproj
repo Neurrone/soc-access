@@ -7,7 +7,7 @@
     <AssemblyName>SongsOfConquest.Access</AssemblyName>
     <RootNamespace>SongsOfConquestAccess</RootNamespace>
     <Description>Accessibility mod for Songs of Conquest</Description>
-    <Version>0.6.4</Version>
+    <Version>0.6.5</Version>
     <LangVersion>7.3</LangVersion>
     <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
   </PropertyGroup>
