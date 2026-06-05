@@ -913,7 +913,7 @@ msgstr "Barra rápida"
 #. Screens.ReadEnemyInfluence
 msgctxt "Screens.ReadEnemyInfluence"
 msgid "Read attack, deadly and movement range for enemies on tiles in combat"
-msgstr "Ler alcance de ataque, mortal e movimento dos inimigos nos blocos em combate"
+msgstr "Ler alcance de ataque, mortal e movimento de unidades hostis nos blocos em combate"
 
 #. Screens.ReadStoryCameraFocusChanges
 msgctxt "Screens.ReadStoryCameraFocusChanges"
@@ -1113,7 +1113,7 @@ msgstr "Próxima tropa ativa"
 #. Actions.CombatNextEnemyTroop
 msgctxt "Actions.CombatNextEnemyTroop"
 msgid "Next Enemy Troop"
-msgstr "Próxima tropa inimiga"
+msgstr "Próxima tropa hostil"
 
 #. Actions.CombatPreviousActingTroop
 msgctxt "Actions.CombatPreviousActingTroop"
@@ -1123,7 +1123,7 @@ msgstr "Tropa ativa anterior"
 #. Actions.CombatPreviousEnemyTroop
 msgctxt "Actions.CombatPreviousEnemyTroop"
 msgid "Previous Enemy Troop"
-msgstr "Tropa inimiga anterior"
+msgstr "Tropa hostil anterior"
 
 #. Actions.CombatFocusTimeline
 msgctxt "Actions.CombatFocusTimeline"
@@ -1428,7 +1428,7 @@ msgstr "Iniciar arraste"
 #. Actions.SummarizeEnemyResources
 msgctxt "Actions.SummarizeEnemyResources"
 msgid "Summarize Enemy Resources"
-msgstr "Resumir recursos inimigos"
+msgstr "Resumir recursos do oponente"
 
 #. Actions.SummarizeResources
 msgctxt "Actions.SummarizeResources"
@@ -1458,7 +1458,7 @@ msgstr "{0} aparece"
 #. Combat.ArcanaEssence
 msgctxt "Combat.ArcanaEssence"
 msgid "arcana"
-msgstr "arcano"
+msgstr "Arcana"
 
 #. Combat.Attack
 msgctxt "Combat.Attack"
@@ -1528,7 +1528,7 @@ msgstr "desafio"
 #. Combat.ChaosEssence
 msgctxt "Combat.ChaosEssence"
 msgid "chaos"
-msgstr "caos"
+msgstr "Caos"
 
 #. Combat.Created
 msgctxt "Combat.Created"
@@ -1538,7 +1538,7 @@ msgstr "{0} criada"
 #. Combat.CreationEssence
 msgctxt "Combat.CreationEssence"
 msgid "creation"
-msgstr "criação"
+msgstr "Criação"
 
 #. Combat.DamageDestroyingItSuffix
 msgctxt "Combat.DamageDestroyingItSuffix"
@@ -1568,7 +1568,7 @@ msgstr "{0} destruída"
 #. Combat.DestructionEssence
 msgctxt "Combat.DestructionEssence"
 msgid "destruction"
-msgstr "destruição"
+msgstr "Destruição"
 
 #. Combat.Draw
 msgctxt "Combat.Draw"
@@ -1583,22 +1583,22 @@ msgstr "efeito"
 #. Combat.EnemyTroop
 msgctxt "Combat.EnemyTroop"
 msgid "{0} enemy {1}"
-msgstr "{0} {1} inimiga"
+msgstr "tropa hostil: {0} {1}"
 
 #. Combat.EnemyTroops
 msgctxt "Combat.EnemyTroops"
 msgid "enemy troops"
-msgstr "tropas inimigas"
+msgstr "tropas hostis"
 
 #. Combat.EssenceAmountCompact
 msgctxt "Combat.EssenceAmountCompact"
 msgid "+{0} {1}"
-msgstr "+{0} {1}"
+msgstr "Essência de {1}: +{0}"
 
 #. Combat.EssenceAmounts
 msgctxt "Combat.EssenceAmounts"
 msgid "{0} essence"
-msgstr "{0} de essência"
+msgstr "{0}"
 
 #. Combat.ExplosiveBarrel
 msgctxt "Combat.ExplosiveBarrel"
@@ -1653,7 +1653,7 @@ msgstr "ataque de oportunidade"
 #. Combat.OrderEssence
 msgctxt "Combat.OrderEssence"
 msgid "order"
-msgstr "ordem"
+msgstr "Ordem"
 
 #. Combat.Overwatch
 msgctxt "Combat.Overwatch"
@@ -1883,12 +1883,12 @@ msgstr "terreno elevado, altura {0}"
 #. Spatial.EnemySpawnPoint
 msgctxt "Spatial.EnemySpawnPoint"
 msgid "enemy spawn point"
-msgstr "ponto de surgimento inimigo"
+msgstr "ponto de surgimento hostil"
 
 #. Spatial.Enemy
 msgctxt "Spatial.Enemy"
 msgid "enemy"
-msgstr "inimigo"
+msgstr "hostil"
 
 #. Spatial.ExtraTargetPrefix
 msgctxt "Spatial.ExtraTargetPrefix"
@@ -2133,12 +2133,12 @@ msgstr "Terreno elevado {0}"
 #. Scanner.Enemy
 msgctxt "Scanner.Enemy"
 msgid "Enemy"
-msgstr "Inimigo"
+msgstr "Hostil"
 
 #. Scanner.EnemyGates
 msgctxt "Scanner.EnemyGates"
 msgid "Enemy gates"
-msgstr "Portões inimigos"
+msgstr "Portões hostis"
 
 #. Scanner.Entities
 msgctxt "Scanner.Entities"
@@ -2539,17 +2539,17 @@ msgstr "todas as tropas"
 #. Combat.EnemyMeleeTroops
 msgctxt "Combat.EnemyMeleeTroops"
 msgid "enemy melee troops"
-msgstr "tropas inimigas corpo a corpo"
+msgstr "tropas corpo a corpo hostis"
 
 #. Combat.EnemyCommander
 msgctxt "Combat.EnemyCommander"
 msgid "enemy {0}"
-msgstr "inimigo {0}"
+msgstr "{0} hostil"
 
 #. Combat.EnemyRangedTroops
 msgctxt "Combat.EnemyRangedTroops"
 msgid "enemy ranged troops"
-msgstr "tropas inimigas de longo alcance"
+msgstr "tropas de longo alcance hostis"
 
 #. Combat.WielderEssenceGenerated
 msgctxt "Combat.WielderEssenceGenerated"

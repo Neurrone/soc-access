@@ -1,5 +1,9 @@
 # Changelog
 
+## V0.6.6
+
+- Improved Portuguese translations for generated essence and hostile troop labels
+
 ## V0.6.5
 
 - Fixed incorrect use of a helper to join strings, causing strange wording in objectives, build, spellbook and quickbar screens
