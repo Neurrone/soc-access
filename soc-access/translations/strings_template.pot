@@ -149,6 +149,11 @@ msgctxt "Draft.UpgradeAvailableTroops"
 msgid "Upgrade available troops"
 msgstr ""
 
+#. Draft.UpgradeChoice
+msgctxt "Draft.UpgradeChoice"
+msgid "{0} to {1}"
+msgstr ""
+
 #. Draft.UpgradeForResources
 msgctxt "Draft.UpgradeForResources"
 msgid "Upgrade for {0}"
@@ -612,6 +617,11 @@ msgstr ""
 #. Actions.Activate
 msgctxt "Actions.Activate"
 msgid "Activate"
+msgstr ""
+
+#. Actions.ActionVariant
+msgctxt "Actions.ActionVariant"
+msgid "{0}, {1}"
 msgstr ""
 
 #. Actions.Cancel

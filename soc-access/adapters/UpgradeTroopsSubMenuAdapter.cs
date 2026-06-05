@@ -128,6 +128,8 @@ namespace SongsOfConquestAccess.Adapters
             private static readonly FieldInfo RecruitmentPoolField = AccessTools.Field(typeof(UpgradeTroopsEntry), "_recruitmentPool");
             private static readonly FieldInfo FactionLookupField = AccessTools.Field(typeof(UpgradeTroopsEntry), "_factionLookup");
             private static readonly FieldInfo TeamStateField = AccessTools.Field(typeof(UpgradeTroopsEntry), "_teamState");
+            private static readonly FieldInfo TargetUpgradeLevelField = AccessTools.Field(typeof(UpgradeTroopsEntry), "_targetUpgradeLevel");
+            private static readonly PropertyInfo TargetUpgradeLevelProperty = AccessTools.Property(typeof(UpgradeTroopsEntry), "TargetUpgradeLevel");
 
             private static readonly MethodInfo HandleSliderChangedMethod = AccessTools.Method(typeof(UpgradeTroopsEntry), "HandleSliderChanged");
             private static readonly MethodInfo HandlePurchaseClickedMethod = AccessTools.Method(typeof(UpgradeTroopsEntry), "HandlePurchaseClicked");
@@ -358,13 +360,40 @@ namespace SongsOfConquestAccess.Adapters
                     return null;
                 }
 
-                Cost cost = factionLookup.GetBaseTroopUpgradeCost(troop.Reference, SliderValue, troop.Reference.UpgradeType + 1);
+                Cost cost = factionLookup.GetBaseTroopUpgradeCost(troop.Reference, SliderValue, TargetUpgradeLevel);
                 if (cost != null)
                 {
                     cost.Multiply(recruitmentPool.UnitCostMultiplier);
                 }
 
                 return cost;
+            }
+
+            private TroopUpgradeType TargetUpgradeLevel
+            {
+                get
+                {
+                    object propertyValue = TargetUpgradeLevelProperty != null && _entry != null
+                        ? TargetUpgradeLevelProperty.GetValue(_entry, null)
+                        : null;
+                    if (propertyValue is TroopUpgradeType)
+                    {
+                        return (TroopUpgradeType)propertyValue;
+                    }
+
+                    object fieldValue = TargetUpgradeLevelField != null && _entry != null
+                        ? TargetUpgradeLevelField.GetValue(_entry)
+                        : null;
+                    if (fieldValue is TroopUpgradeType)
+                    {
+                        return (TroopUpgradeType)fieldValue;
+                    }
+
+                    ITroopState troop = GetField<ITroopState>(_entry, CurrentTroopField);
+                    return troop != null && troop.Reference != null
+                        ? troop.Reference.UpgradeType + 1
+                        : TroopUpgradeType.Upgraded;
+                }
             }
 
             private string FormatCostLines(IReadOnlyList<ResourceCostLine> costs)

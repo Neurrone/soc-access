@@ -1,4 +1,5 @@
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Reflection;
 using HarmonyLib;
@@ -24,6 +25,7 @@ namespace SongsOfConquestAccess.Adapters
         private static readonly FieldInfo AsyncField = AccessTools.Field(typeof(WorldChoiceMenu), "_async");
         private static readonly FieldInfo RewardButtonsField = AccessTools.Field(typeof(WorldChoiceMenu), "_rewardButtons");
         private static readonly FieldInfo PenaltyButtonsField = AccessTools.Field(typeof(WorldChoiceMenu), "_penaltyButtons");
+        private static readonly FieldInfo ButtonPoolField = AccessTools.Field(typeof(WorldChoiceMenu), "_buttonPool");
         private static readonly FieldInfo LocalizationField = AccessTools.Field(typeof(WorldChoiceMenu), "_localization");
         private static readonly FieldInfo AdventureFacadeField = AccessTools.Field(typeof(WorldChoiceMenu), "_adventureFacade");
         private static readonly FieldInfo HeaderTroopHudField = AccessTools.Field(typeof(WielderInteractHeader), "_troopHUD");
@@ -72,7 +74,7 @@ namespace SongsOfConquestAccess.Adapters
                 && _settings != null
                 && AsyncField != null
                 && AsyncField.GetValue(_menu) != null
-                && (GetRewardButtons().Count > 0 || GetPenaltyButtons().Count > 0);
+                && (GetRewardButtons().Count > 0 || GetPenaltyButtons().Count > 0 || GetGenericChoiceButtons().Count > 0);
         }
 
         public bool IsConfirmEnabled()
@@ -112,6 +114,11 @@ namespace SongsOfConquestAccess.Adapters
         {
             List<IWorldMapChoiceButton> rewardButtons = GetRewardButtons();
             List<IWorldMapChoiceButton> penaltyButtons = GetPenaltyButtons();
+            if (rewardButtons.Count == 0 && penaltyButtons.Count == 0)
+            {
+                return GetGenericChoices();
+            }
+
             List<ChoiceItem> choices = new List<ChoiceItem>(rewardButtons.Count + penaltyButtons.Count);
 
             for (int i = 0; i < rewardButtons.Count; i++)
@@ -141,6 +148,26 @@ namespace SongsOfConquestAccess.Adapters
             return choices;
         }
 
+        private IReadOnlyList<ChoiceItem> GetGenericChoices()
+        {
+            List<IWorldMapChoiceButton> buttons = GetGenericChoiceButtons();
+            List<ChoiceItem> choices = new List<ChoiceItem>(buttons.Count);
+            for (int i = 0; i < buttons.Count; i++)
+            {
+                int capturedIndex = i;
+                choices.Add(new ChoiceItem(
+                    isPenalty: false,
+                    () => BuildChoiceLabel(GetGenericChoiceButton(capturedIndex)),
+                    () => IsGenericChoiceEnabled(capturedIndex),
+                    () => FocusGenericChoice(capturedIndex),
+                    () => true,
+                    () => GetChoiceTooltip(GetGenericChoiceButton(capturedIndex)),
+                    isGeneric: true));
+            }
+
+            return choices;
+        }
+
         private IWorldMapChoiceButton GetRewardButton(int index)
         {
             List<IWorldMapChoiceButton> buttons = GetRewardButtons();
@@ -153,6 +180,12 @@ namespace SongsOfConquestAccess.Adapters
             return index >= 0 && index < buttons.Count ? buttons[index] : null;
         }
 
+        private IWorldMapChoiceButton GetGenericChoiceButton(int index)
+        {
+            List<IWorldMapChoiceButton> buttons = GetGenericChoiceButtons();
+            return index >= 0 && index < buttons.Count ? buttons[index] : null;
+        }
+
         private bool IsRewardEnabled(int index)
         {
             IWorldMapChoiceButton button = GetRewardButton(index);
@@ -162,6 +195,12 @@ namespace SongsOfConquestAccess.Adapters
         private bool IsPenaltyEnabled(int index)
         {
             IWorldMapChoiceButton button = GetPenaltyButton(index);
+            return button != null && button.Interactable;
+        }
+
+        private bool IsGenericChoiceEnabled(int index)
+        {
+            IWorldMapChoiceButton button = GetGenericChoiceButton(index);
             return button != null && button.Interactable;
         }
 
@@ -209,6 +248,25 @@ namespace SongsOfConquestAccess.Adapters
 
             // Match the reward path: a pointer click selects the native penalty
             // choice, while the separate Confirm button commits it.
+            return !choice.Interactable || NativeSelectionUtility.Click(choice.Button);
+        }
+
+        private bool FocusGenericChoice(int index)
+        {
+            List<IWorldMapChoiceButton> buttons = GetGenericChoiceButtons();
+            if (index < 0 || index >= buttons.Count)
+            {
+                return false;
+            }
+
+            IWorldMapChoiceButton choice = buttons[index];
+            if (choice == null || choice.Button == null)
+            {
+                return false;
+            }
+
+            Selectable selectable = choice.Button.GetSelectable();
+            NativeSelectionUtility.Select(selectable);
             return !choice.Interactable || NativeSelectionUtility.Click(choice.Button);
         }
 
@@ -263,6 +321,29 @@ namespace SongsOfConquestAccess.Adapters
             return buttons ?? new List<IWorldMapChoiceButton>();
         }
 
+        private List<IWorldMapChoiceButton> GetGenericChoiceButtons()
+        {
+            object buttonPool = _menu != null && ButtonPoolField != null ? ButtonPoolField.GetValue(_menu) : null;
+            PropertyInfo activeItemsProperty = buttonPool != null ? buttonPool.GetType().GetProperty("ActiveItems") : null;
+            IEnumerable activeItems = activeItemsProperty != null ? activeItemsProperty.GetValue(buttonPool, null) as IEnumerable : null;
+            List<IWorldMapChoiceButton> buttons = new List<IWorldMapChoiceButton>();
+            if (activeItems == null)
+            {
+                return buttons;
+            }
+
+            foreach (object item in activeItems)
+            {
+                IWorldMapChoiceButton button = item as IWorldMapChoiceButton;
+                if (button != null && button.Button != null)
+                {
+                    buttons.Add(button);
+                }
+            }
+
+            return buttons;
+        }
+
         private TroopHUD GetWielderTroopHud()
         {
             return _settings != null && _settings.WielderInteractHeader != null
@@ -313,9 +394,11 @@ namespace SongsOfConquestAccess.Adapters
                 Func<bool> isEnabled,
                 Action onFocus,
                 Func<bool> isVisible,
-                Func<Tooltip> getTooltip = null)
+                Func<Tooltip> getTooltip = null,
+                bool isGeneric = false)
             {
                 IsPenalty = isPenalty;
+                IsGeneric = isGeneric;
                 _getLabel = getLabel;
                 _isEnabled = isEnabled;
                 OnFocus = onFocus;
@@ -324,6 +407,7 @@ namespace SongsOfConquestAccess.Adapters
             }
 
             public bool IsPenalty { get; private set; }
+            public bool IsGeneric { get; private set; }
             public string Label
             {
                 get { return _getLabel != null ? _getLabel() ?? string.Empty : string.Empty; }

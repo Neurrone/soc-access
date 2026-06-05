@@ -143,6 +143,7 @@ namespace SongsOfConquestAccess.Screens
         {
             bool hasRewards = false;
             bool hasPenalties = false;
+            bool hasGenericChoices = false;
             for (int i = 0; choices != null && i < choices.Count; i++)
             {
                 WorldChoiceMenuAdapter.ChoiceItem choice = choices[i];
@@ -151,7 +152,11 @@ namespace SongsOfConquestAccess.Screens
                     continue;
                 }
 
-                if (choice.IsPenalty)
+                if (choice.IsGeneric)
+                {
+                    hasGenericChoices = true;
+                }
+                else if (choice.IsPenalty)
                 {
                     hasPenalties = true;
                 }
@@ -161,7 +166,7 @@ namespace SongsOfConquestAccess.Screens
                 }
             }
 
-            if (hasRewards && hasPenalties)
+            if (hasGenericChoices || (hasRewards && hasPenalties))
             {
                 return ModText.Get(ModStrings.Screens.Choices);
             }
@@ -173,7 +178,9 @@ namespace SongsOfConquestAccess.Screens
 
         private static string BuildChoiceId(WorldChoiceMenuAdapter.ChoiceItem choice, int index)
         {
-            string prefix = choice != null && choice.IsPenalty ? "penalty" : "reward";
+            string prefix = choice != null && choice.IsGeneric
+                ? "choice"
+                : choice != null && choice.IsPenalty ? "penalty" : "reward";
             return prefix + "-" + index;
         }
 

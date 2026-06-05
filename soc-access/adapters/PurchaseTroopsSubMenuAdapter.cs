@@ -21,6 +21,8 @@ namespace SongsOfConquestAccess.Adapters
     internal sealed class PurchaseTroopsSubMenuAdapter
     {
         private static readonly FieldInfo CurrentEntriesField = AccessTools.Field(typeof(PurchaseTroopsSubMenu), "_currentEntries");
+        private static readonly FieldInfo FactionLookupField = AccessTools.Field(typeof(PurchaseTroopsSubMenu), "_factionLookup");
+        private static readonly HashSet<string> LoggedTroopNameFailures = new HashSet<string>();
 
         private readonly PurchaseTroopsSubMenu _subMenu;
         private readonly IClientAdventureFacade _facade;
@@ -46,6 +48,7 @@ namespace SongsOfConquestAccess.Adapters
                 return new RecruitEntry[0];
             }
 
+            IFactionLookup factionLookup = GetField<IFactionLookup>(_subMenu, FactionLookupField);
             List<RecruitEntry> result = new List<RecruitEntry>(entries.Count);
             for (int i = 0; i < entries.Count; i++)
             {
@@ -58,14 +61,14 @@ namespace SongsOfConquestAccess.Adapters
                 PurchaseTroopsEntry active = entry as PurchaseTroopsEntry;
                 if (active != null)
                 {
-                    result.Add(new ActiveRecruitEntry(active, _facade, _localization));
+                    result.Add(new ActiveRecruitEntry(active, _facade, _localization, factionLookup));
                     continue;
                 }
 
                 PurchaseTroopsInactiveEntry inactive = entry as PurchaseTroopsInactiveEntry;
                 if (inactive != null)
                 {
-                    result.Add(new InactiveRecruitEntry(inactive, _facade, _localization));
+                    result.Add(new InactiveRecruitEntry(inactive, _facade, _localization, factionLookup));
                 }
             }
 
@@ -84,16 +87,18 @@ namespace SongsOfConquestAccess.Adapters
 
         internal abstract class RecruitEntry
         {
-            protected RecruitEntry(IPurchaseTroopsEntry entry, IClientAdventureFacade facade, ILocalizationHandler localization)
+            protected RecruitEntry(IPurchaseTroopsEntry entry, IClientAdventureFacade facade, ILocalizationHandler localization, IFactionLookup factionLookup)
             {
                 Entry = entry;
                 Facade = facade;
                 Localization = localization;
+                FactionLookup = factionLookup;
             }
 
             protected IPurchaseTroopsEntry Entry { get; private set; }
             protected IClientAdventureFacade Facade { get; private set; }
             protected ILocalizationHandler Localization { get; private set; }
+            protected IFactionLookup FactionLookup { get; private set; }
 
             public abstract string IdPrefix { get; }
             public abstract string TroopName { get; }
@@ -140,24 +145,56 @@ namespace SongsOfConquestAccess.Adapters
                     + "-"
                     + reference.UnitIndex
                     + "-"
-                    + reference.UpgradeType.ToString().ToLowerInvariant();
+                    + BuildStableUpgradeId(reference.UpgradeType);
+            }
+
+            private static string BuildStableUpgradeId(TroopUpgradeType upgradeType)
+            {
+                if (upgradeType.IsEssenceUpgrade())
+                {
+                    return TroopUpgradeType.Upgraded.ToString().ToLowerInvariant();
+                }
+
+                return upgradeType.ToString().ToLowerInvariant();
             }
 
             protected string ResolveTroopName()
             {
                 try
                 {
-                    IUnitDefinition unit = GetNativeUnitDefinition();
-                    string name = unit != null && Localization != null
-                        ? Localization.GetText(unit.NameKey)
-                        : string.Empty;
-                    return string.IsNullOrWhiteSpace(name)
-                        ? TroopReference.UpgradeType + " troop"
-                        : SpeechTextSanitizer.Normalize(name);
+                    TroopReference reference = TroopReference;
+                    if (FactionLookup == null)
+                    {
+                        LogTroopNameFailure(reference, "native IFactionLookup is unavailable");
+                        return string.Empty;
+                    }
+
+                    IUnitDefinition unit = FactionLookup.GetUnit(reference);
+                    if (unit == null)
+                    {
+                        LogTroopNameFailure(reference, "native unit definition is unavailable");
+                        return string.Empty;
+                    }
+
+                    if (Localization == null)
+                    {
+                        LogTroopNameFailure(reference, "native localization handler is unavailable");
+                        return string.Empty;
+                    }
+
+                    string name = SpeechTextSanitizer.Normalize(Localization.GetText(unit.NameKey));
+                    if (string.IsNullOrWhiteSpace(name))
+                    {
+                        LogTroopNameFailure(reference, "localized unit name is empty for key " + unit.NameKey);
+                        return string.Empty;
+                    }
+
+                    return name;
                 }
-                catch (Exception)
+                catch (Exception exception)
                 {
-                    return "Troop";
+                    LogTroopNameFailure(TroopReference, "exception resolving unit name: " + exception.Message);
+                    return string.Empty;
                 }
             }
 
@@ -172,24 +209,29 @@ namespace SongsOfConquestAccess.Adapters
                 return component != null && component.gameObject != null && component.gameObject.activeInHierarchy;
             }
 
-            private IUnitDefinition GetNativeUnitDefinition()
+            private static void LogTroopNameFailure(TroopReference reference, string reason)
             {
-                PurchaseTroopsEntry active = Entry as PurchaseTroopsEntry;
-                if (active != null)
+                string key = reference.FactionIndex
+                    + ":"
+                    + reference.UnitIndex
+                    + ":"
+                    + reference.UpgradeType
+                    + ":"
+                    + reason;
+                if (!LoggedTroopNameFailures.Add(key))
                 {
-                    FieldInfo field = AccessTools.Field(typeof(PurchaseTroopsEntry), "_unitDefinition");
-                    return field != null ? field.GetValue(active) as IUnitDefinition : null;
+                    return;
                 }
 
-                PurchaseTroopsInactiveEntry inactive = Entry as PurchaseTroopsInactiveEntry;
-                if (inactive != null)
-                {
-                    FieldInfo field = AccessTools.Field(typeof(PurchaseTroopsInactiveEntry), "_factionLookup");
-                    IFactionLookup lookup = field != null ? field.GetValue(inactive) as IFactionLookup : null;
-                    return lookup != null ? lookup.GetUnit(TroopReference) : null;
-                }
-
-                return null;
+                SocAccessPlugin.Instance?.LogWarning(
+                    "PurchaseTroopsSubMenuAdapter failed to resolve troop name for faction "
+                    + reference.FactionIndex
+                    + ", unit "
+                    + reference.UnitIndex
+                    + ", upgrade "
+                    + reference.UpgradeType
+                    + ": "
+                    + reason);
             }
         }
 
@@ -215,8 +257,8 @@ namespace SongsOfConquestAccess.Adapters
 
             private readonly PurchaseTroopsEntry _entry;
 
-            public ActiveRecruitEntry(PurchaseTroopsEntry entry, IClientAdventureFacade facade, ILocalizationHandler localization)
-                : base(entry, facade, localization)
+            public ActiveRecruitEntry(PurchaseTroopsEntry entry, IClientAdventureFacade facade, ILocalizationHandler localization, IFactionLookup factionLookup)
+                : base(entry, facade, localization, factionLookup)
             {
                 _entry = entry;
             }
@@ -361,8 +403,8 @@ namespace SongsOfConquestAccess.Adapters
 
             private readonly PurchaseTroopsInactiveEntry _entry;
 
-            public InactiveRecruitEntry(PurchaseTroopsInactiveEntry entry, IClientAdventureFacade facade, ILocalizationHandler localization)
-                : base(entry, facade, localization)
+            public InactiveRecruitEntry(PurchaseTroopsInactiveEntry entry, IClientAdventureFacade facade, ILocalizationHandler localization, IFactionLookup factionLookup)
+                : base(entry, facade, localization, factionLookup)
             {
                 _entry = entry;
             }

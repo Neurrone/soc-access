@@ -113,7 +113,7 @@ namespace SongsOfConquestAccess.Screens
                 UpgradeTroopsSubMenuAdapter.UpgradeEntry capturedEntry = entry;
                 menu.AddItem(new MenuItemWidget(
                     capturedEntry.IdPrefix + "-menu-item",
-                    () => capturedEntry.CurrentTroopName,
+                    () => BuildUpgradeChoiceLabel(capturedEntry),
                     () => BuildUpgradeStatus(capturedEntry),
                     () => SelectUpgrade(capturedEntry, playSound: true),
                     () => SelectUpgrade(capturedEntry, playSound: true),
@@ -223,6 +223,23 @@ namespace SongsOfConquestAccess.Screens
             return entry != null
                 ? ModText.Plural(ModStrings.Draft.AvailableTroops, entry.AvailableTroops, entry.AvailableTroops)
                 : string.Empty;
+        }
+
+        private static string BuildUpgradeChoiceLabel(UpgradeTroopsSubMenuAdapter.UpgradeEntry entry)
+        {
+            if (entry == null)
+            {
+                return string.Empty;
+            }
+
+            string current = entry.CurrentTroopName;
+            string target = entry.TargetTroopName;
+            if (string.IsNullOrWhiteSpace(target) || target == current)
+            {
+                return current;
+            }
+
+            return ModText.Get(ModStrings.Draft.UpgradeChoice, current, target);
         }
     }
 }

@@ -115,6 +115,7 @@ namespace SongsOfConquestAccess.Screens
                 SaveLoadGameScreen.TryBuildActiveScreen,
                 MessageDialogScreen.TryBuildActiveMapMessagePopupScreen,
                 MessageDialogScreen.TryBuildActiveRandomEventMenuScreen,
+                MessageDialogScreen.TryBuildActiveCustomMessageMenuScreen,
                 MessageDialogScreen.TryBuildActivePopupMenuScreen,
                 MessageDialogScreen.TryBuildActiveConfirmPopupScreen,
                 MessageDialogScreen.TryBuildActiveSystemPopupScreen,
@@ -1093,6 +1094,27 @@ namespace SongsOfConquestAccess.Screens
             }
 
             _screenManager.Pop<MessageDialogScreen>("random event menu closed");
+        }
+
+        public void OnCustomMessageMenuReady(CustomMessageMenu menu)
+        {
+            CustomMessageMenuAdapter adapter = new CustomMessageMenuAdapter(menu);
+            if (!adapter.IsPresent())
+            {
+                return;
+            }
+
+            Push(new MessageDialogScreen(adapter), "custom message menu ready");
+        }
+
+        public void OnCustomMessageMenuClosed(CustomMessageMenu menu)
+        {
+            if (menu != null && !IsCurrentMessageDialogSource(menu))
+            {
+                return;
+            }
+
+            _screenManager.Pop<MessageDialogScreen>("custom message menu closed");
         }
 
         public void OnLetterboxStoryTextReady(LetterboxStoryText storyText)

@@ -145,6 +145,11 @@ msgctxt "Draft.Upgrade"
 msgid "Upgrade"
 msgstr "升級"
 
+#. Draft.UpgradeChoice
+msgctxt "Draft.UpgradeChoice"
+msgid "{0} to {1}"
+msgstr "從{0}到{1}"
+
 #. Draft.UpgradeForResources
 msgctxt "Draft.UpgradeForResources"
 msgid "Upgrade for {0}"
@@ -1084,6 +1089,11 @@ msgstr "未知法術"
 msgctxt "Actions.Activate"
 msgid "Activate"
 msgstr "執行"
+
+#. Actions.ActionVariant
+msgctxt "Actions.ActionVariant"
+msgid "{0}, {1}"
+msgstr "{0}, {1}"
 
 #. Actions.Cancel
 msgctxt "Actions.Cancel"

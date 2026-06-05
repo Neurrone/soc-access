@@ -150,6 +150,11 @@ msgctxt "Draft.Upgrade"
 msgid "Upgrade"
 msgstr "Ulepsz"
 
+#. Draft.UpgradeChoice
+msgctxt "Draft.UpgradeChoice"
+msgid "{0} to {1}"
+msgstr "Z {0} na {1}"
+
 #. Draft.UpgradeForResources
 msgctxt "Draft.UpgradeForResources"
 msgid "Upgrade for {0}"
@@ -1104,6 +1109,11 @@ msgstr "nieznane zaklęcie"
 msgctxt "Actions.Activate"
 msgid "Activate"
 msgstr "Aktywuj"
+
+#. Actions.ActionVariant
+msgctxt "Actions.ActionVariant"
+msgid "{0}, {1}"
+msgstr "{0}, {1}"
 
 #. Actions.Cancel
 msgctxt "Actions.Cancel"

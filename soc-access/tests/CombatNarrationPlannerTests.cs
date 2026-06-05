@@ -3,6 +3,7 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 using SongsOfConquest;
 using SongsOfConquest.Common.Bacterias;
 using SongsOfConquest.Common.Battle;
+using SongsOfConquestAccess.Adapters;
 using SongsOfConquestAccess.Events;
 using SongsOfConquestAccess.Events.Combat;
 using UnityEngine;
@@ -765,6 +766,18 @@ namespace SongsOfConquestAccess.Tests
 
             Assert.AreEqual(1, result.Count);
             Assert.AreEqual("Barrier at 8, 8 appears", result[0].Event.GetSpeechText());
+        }
+
+        [TestMethod]
+        public void LeapTeleportAbilityKeepsLeapAbilitySpeech()
+        {
+            AbilityUsedEvent leap = CombatEventNarrator.CreateLeapAbilityUsedEvent(
+                new ActorRef(Troop(10, 1, "Rider"), true),
+                new AbilityRef(TroopAbilityType.Leap, "Leap"),
+                new Vector2Int(3, 4),
+                new Vector2Int(5, 4));
+
+            Assert.AreEqual("Rider uses Leap", leap.GetSpeechText());
         }
 
         private static BacteriaRef Bacteria(string name)

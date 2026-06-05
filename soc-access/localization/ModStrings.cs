@@ -47,6 +47,7 @@ namespace SongsOfConquestAccess.Localization
             public static readonly ModString PurchaseForResources = new ModString("Draft.PurchaseForResources", "Purchase for {0}");
             public static readonly ModString Upgrade = new ModString("Draft.Upgrade", "Upgrade");
             public static readonly ModString UpgradeAvailableTroops = new ModString("Draft.UpgradeAvailableTroops", "Upgrade available troops");
+            public static readonly ModString UpgradeChoice = new ModString("Draft.UpgradeChoice", "{0} to {1}");
             public static readonly ModString UpgradeForResources = new ModString("Draft.UpgradeForResources", "Upgrade for {0}");
         }
 
@@ -153,6 +154,7 @@ namespace SongsOfConquestAccess.Localization
         public static class Actions
         {
             public static readonly ModString Activate = new ModString("Actions.Activate", "Activate");
+            public static readonly ModString ActionVariant = new ModString("Actions.ActionVariant", "{0}, {1}");
             public static readonly ModString Cancel = new ModString("Actions.Cancel", "Cancel");
             public static readonly ModString CombatFocusActingTroop = new ModString("Actions.CombatFocusActingTroop", "Focus Acting Troop");
             public static readonly ModString CombatFocusTimeline = new ModString("Actions.CombatFocusTimeline", "Focus Timeline");

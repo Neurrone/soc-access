@@ -145,6 +145,11 @@ msgctxt "Draft.Upgrade"
 msgid "Upgrade"
 msgstr "Améliorer"
 
+#. Draft.UpgradeChoice
+msgctxt "Draft.UpgradeChoice"
+msgid "{0} to {1}"
+msgstr "{0} vers {1}"
+
 #. Draft.UpgradeForResources
 msgctxt "Draft.UpgradeForResources"
 msgid "Upgrade for {0}"
@@ -1094,6 +1099,11 @@ msgstr "sort inconnu"
 msgctxt "Actions.Activate"
 msgid "Activate"
 msgstr "Activer"
+
+#. Actions.ActionVariant
+msgctxt "Actions.ActionVariant"
+msgid "{0}, {1}"
+msgstr "{0}, {1}"
 
 #. Actions.Cancel
 msgctxt "Actions.Cancel"

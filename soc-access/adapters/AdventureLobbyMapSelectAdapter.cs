@@ -711,6 +711,11 @@ namespace SongsOfConquestAccess.Adapters
                 return GetLocalizedText("MainMenu/RootsDLC/Title", "Roots");
             }
 
+            if (data.exclusiveAddon == Addon.Yulan || data.name == "FreeYulan")
+            {
+                return GetLocalizedText("MainMenu/YulanDLC/Title", "Yulan");
+            }
+
             return GetLocalizedText("DataTypes/MapProviderType/" + data.type, data.type.ToString());
         }
 

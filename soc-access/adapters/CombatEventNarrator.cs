@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
+using System.Reflection;
 using Lavapotion.Networking;
 using Lavapotion.Pathfinding;
 using SongsOfConquest;
@@ -419,14 +420,20 @@ namespace SongsOfConquestAccess.Adapters
                 return;
             }
 
-            LeapCommand.Response leap = response as LeapCommand.Response;
-            if (leap != null)
+            int leapTroopId;
+            Vector2Int leapOriginalPosition;
+            Vector2Int leapTargetPosition;
+            if (TryReadLeapAbilityResponse(response, out leapTroopId, out leapOriginalPosition, out leapTargetPosition))
             {
-                IBattleTroopState troop = adapter.GetTroop(leap.TroopId);
+                IBattleTroopState troop = adapter.GetTroop(leapTroopId);
                 Enqueue(CombatNarrationItem.Create(
                     CombatNarrationItemKind.Ability,
-                    new AbilityUsedEvent(CreateActor(adapter, troop, troop != null ? troop.Stats.Size : 0, leap.OriginalPosition), adapter.CreateAbilityRef(TroopAbilityType.Leap), leap.TargetPosition, new[] { leap.OriginalPosition, leap.TargetPosition }),
-                    leap.TroopId));
+                    CreateLeapAbilityUsedEvent(
+                        CreateActor(adapter, troop, troop != null ? troop.Stats.Size : 0, leapOriginalPosition),
+                        adapter.CreateAbilityRef(TroopAbilityType.Leap),
+                        leapOriginalPosition,
+                        leapTargetPosition),
+                    leapTroopId));
                 return;
             }
 
@@ -870,6 +877,68 @@ namespace SongsOfConquestAccess.Adapters
             TroopRef troopRef = adapter.CreateTroopRef(troop, sizeOverride, positionOverride);
             int currentTroopId = _currentTurnTroopId >= 0 ? _currentTurnTroopId : adapter.GetCurrentTroopId();
             return new ActorRef(troopRef, troopRef.TroopId == currentTroopId);
+        }
+
+        internal static AbilityUsedEvent CreateLeapAbilityUsedEvent(
+            ActorRef actor,
+            AbilityRef ability,
+            Vector2Int originalPosition,
+            Vector2Int targetPosition)
+        {
+            return new AbilityUsedEvent(actor, ability, targetPosition, new[] { originalPosition, targetPosition });
+        }
+
+        private static bool TryReadLeapAbilityResponse(
+            ICommandResponse response,
+            out int troopId,
+            out Vector2Int originalPosition,
+            out Vector2Int targetPosition)
+        {
+            troopId = -1;
+            originalPosition = Vector2Int.zero;
+            targetPosition = Vector2Int.zero;
+            if (response == null)
+            {
+                return false;
+            }
+
+            Type responseType = response.GetType();
+            string fullName = responseType.FullName ?? string.Empty;
+            bool isLegacyLeapResponse = fullName == "SongsOfConquest.Common.Battle.LeapCommand+Response";
+            bool isTeleportAbilityResponse = fullName == "SongsOfConquest.Common.Battle.TeleportAbilityCommand+Response";
+            if (!isLegacyLeapResponse && !isTeleportAbilityResponse)
+            {
+                return false;
+            }
+
+            if (isTeleportAbilityResponse)
+            {
+                object source = GetFieldValue(response, "AbilitySource");
+                if (!(source is TeleportBattleTroopCommand.Source)
+                    || (TeleportBattleTroopCommand.Source)source != TeleportBattleTroopCommand.Source.Leap)
+                {
+                    return false;
+                }
+            }
+
+            object id = GetFieldValue(response, "TroopId");
+            object original = GetFieldValue(response, "OriginalPosition");
+            object target = GetFieldValue(response, "TargetPosition");
+            if (!(id is int) || !(original is Vector2Int) || !(target is Vector2Int))
+            {
+                return false;
+            }
+
+            troopId = (int)id;
+            originalPosition = (Vector2Int)original;
+            targetPosition = (Vector2Int)target;
+            return true;
+        }
+
+        private static object GetFieldValue(object owner, string fieldName)
+        {
+            FieldInfo field = owner != null ? owner.GetType().GetField(fieldName) : null;
+            return field != null ? field.GetValue(owner) : null;
         }
 
         private static void EnqueueTeleport(TeleportBattleTroopCommand.Response response, CombatAdapter adapter)

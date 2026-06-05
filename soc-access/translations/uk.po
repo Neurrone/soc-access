@@ -165,6 +165,11 @@ msgctxt "Draft.Upgrade"
 msgid "Upgrade"
 msgstr "Поліпшити"
 
+#. Draft.UpgradeChoice
+msgctxt "Draft.UpgradeChoice"
+msgid "{0} to {1}"
+msgstr "{0} на {1}"
+
 #. Draft.UpgradeForResources
 msgctxt "Draft.UpgradeForResources"
 msgid "Upgrade for {0}"
@@ -1104,6 +1109,11 @@ msgstr "невідоме закляття"
 msgctxt "Actions.Activate"
 msgid "Activate"
 msgstr "Активувати"
+
+#. Actions.ActionVariant
+msgctxt "Actions.ActionVariant"
+msgid "{0}, {1}"
+msgstr "{0}, {1}"
 
 #. Actions.Cancel
 msgctxt "Actions.Cancel"

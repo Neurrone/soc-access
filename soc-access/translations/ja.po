@@ -145,6 +145,11 @@ msgctxt "Draft.Upgrade"
 msgid "Upgrade"
 msgstr "アップグレード"
 
+#. Draft.UpgradeChoice
+msgctxt "Draft.UpgradeChoice"
+msgid "{0} to {1}"
+msgstr "{0}から{1}へ"
+
 #. Draft.UpgradeForResources
 msgctxt "Draft.UpgradeForResources"
 msgid "Upgrade for {0}"
@@ -1084,6 +1089,11 @@ msgstr "不明な呪文"
 msgctxt "Actions.Activate"
 msgid "Activate"
 msgstr "実行"
+
+#. Actions.ActionVariant
+msgctxt "Actions.ActionVariant"
+msgid "{0}, {1}"
+msgstr "{0}, {1}"
 
 #. Actions.Cancel
 msgctxt "Actions.Cancel"

@@ -5,7 +5,9 @@ using SongsOfConquest.Client.Adventure;
 using SongsOfConquest.Client.Adventure.UI;
 using SongsOfConquest.Client.Gamestate;
 using SongsOfConquest.Client.UI;
+using SongsOfConquest.Common.Details;
 using SongsOfConquest.Common.Entities;
+using SongsOfConquest.Common.Entities.Adventure;
 using SongsOfConquest.Common.GameActions;
 using SongsOfConquest.Common.Gamestate;
 using SongsOfConquest.Common.Localization;
@@ -338,17 +340,57 @@ namespace SongsOfConquestAccess.Adapters
                 return string.Empty;
             }
 
-            IReadOnlyList<string> lines = NativeTooltipUtility.ToSpeechLines(action.GetDetails(), Localization);
+            IDetails details = action.GetDetails();
+            IReadOnlyList<string> lines = NativeTooltipUtility.ToSpeechLines(details, Localization);
             for (int i = 0; i < lines.Count; i++)
             {
                 string line = SpeechTextSanitizer.Normalize(lines[i]);
                 if (!string.IsNullOrWhiteSpace(line))
                 {
-                    return line;
+                    return BuildActionLabel(line, details);
                 }
             }
 
             return SpeechTextSanitizer.Normalize(action.ActionType.ToString());
+        }
+
+        private string BuildActionLabel(string baseLabel, IDetails details)
+        {
+            LevelUpBuildingDetails? levelUp = details is LevelUpBuildingDetails
+                ? (LevelUpBuildingDetails?)details
+                : null;
+            if (!levelUp.HasValue || !levelUp.Value.EssenceVariant.HasValue)
+            {
+                return baseLabel;
+            }
+
+            string essenceName = GetEssenceName(levelUp.Value.EssenceVariant.Value);
+            if (string.IsNullOrWhiteSpace(essenceName)
+                || (!string.IsNullOrWhiteSpace(baseLabel) && baseLabel.IndexOf(essenceName, System.StringComparison.OrdinalIgnoreCase) >= 0))
+            {
+                return baseLabel;
+            }
+
+            return ModText.Get(ModStrings.Actions.ActionVariant, baseLabel, essenceName);
+        }
+
+        private string GetEssenceName(EssenceType essenceType)
+        {
+            switch (essenceType)
+            {
+                case EssenceType.Order:
+                    return GetLocalizedText("Units/Types/Order", "Order");
+                case EssenceType.Creation:
+                    return GetLocalizedText("Units/Types/Creation", "Creation");
+                case EssenceType.Chaos:
+                    return GetLocalizedText("Units/Types/Chaos", "Chaos");
+                case EssenceType.Arcana:
+                    return GetLocalizedText("Units/Types/Arcana", "Arcana");
+                case EssenceType.Destruction:
+                    return GetLocalizedText("Units/Types/Destruction", "Destruction");
+                default:
+                    return SpeechTextSanitizer.Normalize(essenceType.ToString());
+            }
         }
 
         private Tooltip FirstTooltipWithLines(params Component[] components)

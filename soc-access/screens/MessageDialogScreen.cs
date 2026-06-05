@@ -21,6 +21,8 @@ namespace SongsOfConquestAccess.Screens
             AccessTools.Property(typeof(PopupMenuInstaller), "Container");
         private static readonly System.Reflection.PropertyInfo RandomEventInstallerContainerProperty =
             AccessTools.Property(typeof(RandomEventMenuInstaller), "Container");
+        private static readonly System.Reflection.PropertyInfo CustomMessageInstallerContainerProperty =
+            AccessTools.Property(typeof(CustomMessageMenuInstaller), "Container");
 
         private readonly IMessageDialogAdapter _adapter;
         private readonly IInputDialogAdapter _inputAdapter;
@@ -77,6 +79,33 @@ namespace SongsOfConquestAccess.Screens
                 }
 
                 RandomEventMenuAdapter adapter = new RandomEventMenuAdapter(menu);
+                if (adapter.IsPresent())
+                {
+                    return new MessageDialogScreen(adapter);
+                }
+            }
+
+            return null;
+        }
+
+        public static Screen TryBuildActiveCustomMessageMenuScreen()
+        {
+            CustomMessageMenuInstaller[] installers = Resources.FindObjectsOfTypeAll<CustomMessageMenuInstaller>();
+            for (int i = 0; i < installers.Length; i++)
+            {
+                CustomMessageMenuInstaller installer = installers[i];
+                if (!IsLiveSceneInstaller(installer))
+                {
+                    continue;
+                }
+
+                CustomMessageMenu menu = TryResolveCustomMessageMenu(installer);
+                if (menu == null)
+                {
+                    continue;
+                }
+
+                CustomMessageMenuAdapter adapter = new CustomMessageMenuAdapter(menu);
                 if (adapter.IsPresent())
                 {
                     return new MessageDialogScreen(adapter);
@@ -361,6 +390,17 @@ namespace SongsOfConquestAccess.Screens
             return gameObject != null && gameObject.scene.IsValid() && gameObject.scene.isLoaded;
         }
 
+        private static bool IsLiveSceneInstaller(CustomMessageMenuInstaller installer)
+        {
+            if (installer == null)
+            {
+                return false;
+            }
+
+            GameObject gameObject = installer.gameObject;
+            return gameObject != null && gameObject.scene.IsValid() && gameObject.scene.isLoaded;
+        }
+
         private static PopupMenu TryResolvePopupMenu(PopupMenuInstaller installer)
         {
             if (installer == null || PopupInstallerContainerProperty == null)
@@ -400,6 +440,29 @@ namespace SongsOfConquestAccess.Screens
             try
             {
                 return container.Resolve<RandomEventMenu>();
+            }
+            catch (Exception)
+            {
+                return null;
+            }
+        }
+
+        private static CustomMessageMenu TryResolveCustomMessageMenu(CustomMessageMenuInstaller installer)
+        {
+            if (installer == null || CustomMessageInstallerContainerProperty == null)
+            {
+                return null;
+            }
+
+            DiContainer container = CustomMessageInstallerContainerProperty.GetValue(installer, null) as DiContainer;
+            if (container == null)
+            {
+                return null;
+            }
+
+            try
+            {
+                return container.Resolve<CustomMessageMenu>();
             }
             catch (Exception)
             {

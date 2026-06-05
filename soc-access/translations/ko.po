@@ -145,6 +145,11 @@ msgctxt "Draft.Upgrade"
 msgid "Upgrade"
 msgstr "업그레이드"
 
+#. Draft.UpgradeChoice
+msgctxt "Draft.UpgradeChoice"
+msgid "{0} to {1}"
+msgstr "{0}에서 {1}로"
+
 #. Draft.UpgradeForResources
 msgctxt "Draft.UpgradeForResources"
 msgid "Upgrade for {0}"
@@ -1084,6 +1089,11 @@ msgstr "알 수 없는 주문"
 msgctxt "Actions.Activate"
 msgid "Activate"
 msgstr "실행"
+
+#. Actions.ActionVariant
+msgctxt "Actions.ActionVariant"
+msgid "{0}, {1}"
+msgstr "{0}, {1}"
 
 #. Actions.Cancel
 msgctxt "Actions.Cancel"
