@@ -2,6 +2,7 @@
 
 ## V0.6.6
 
+- Text on story screens are now buttons, allowing `Enter` to advance to the next screen. Fixes having to tab to the next button to advance to the next screen
 - Improved Portuguese translations for generated essence and hostile troop labels
 
 ## V0.6.5

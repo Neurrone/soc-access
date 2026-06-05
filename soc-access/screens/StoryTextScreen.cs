@@ -5,7 +5,6 @@ using SongsOfConquest.Client.Adventure;
 using SongsOfConquest.Client.Menu;
 using SongsOfConquestAccess.Adapters;
 using SongsOfConquestAccess.Input;
-using SongsOfConquestAccess.Localization;
 using SongsOfConquestAccess.UI;
 using UnityEngine;
 using Zenject;
@@ -62,17 +61,12 @@ namespace SongsOfConquestAccess.Screens
         {
             ContainerWidget root = new ContainerWidget("story-text", string.Empty);
 
-            root.AddChild(new TextWidget(
+            root.AddChild(new ButtonWidget(
                 "story-text",
                 () => BuildStoryText(adapter),
-                null,
-                includeParentLabelInAnnouncement: false));
-
-            root.AddChild(new ButtonWidget(
-                "next",
-                ModText.Get(ModStrings.Screens.Next),
                 () => adapter != null && adapter.AdvanceNow(),
                 null,
+                () => adapter != null && adapter.IsPresent(),
                 () => adapter != null && adapter.IsPresent()));
 
             return root;
