@@ -675,6 +675,26 @@ msgctxt "Screens.Choices"
 msgid "Choices"
 msgstr "Auswahl"
 
+#. Screens.Chat
+msgctxt "Screens.Chat"
+msgid "Chat"
+msgstr "Chat"
+
+#. Screens.ChatInput
+msgctxt "Screens.ChatInput"
+msgid "Message"
+msgstr "Nachricht"
+
+#. Screens.ChatSendTo
+msgctxt "Screens.ChatSendTo"
+msgid "Send to"
+msgstr "Senden an"
+
+#. Screens.ChatUnreadMessages
+msgctxt "Screens.ChatUnreadMessages"
+msgid "Chat, unread messages"
+msgstr "Chat, ungelesene Nachrichten"
+
 #. Screens.Close
 msgctxt "Screens.Close"
 msgid "Close"
@@ -779,6 +799,11 @@ msgstr "Gebäude fehlt"
 msgctxt "Screens.ModSettings"
 msgid "Mod settings"
 msgstr "Mod-Einstellungen"
+
+#. Screens.NewChatMessage
+msgctxt "Screens.NewChatMessage"
+msgid "New chat message"
+msgstr "Neue Chatnachricht"
 
 #. Screens.ModifierCategoryTabs
 msgctxt "Screens.ModifierCategoryTabs"

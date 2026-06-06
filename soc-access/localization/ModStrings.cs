@@ -424,6 +424,10 @@ namespace SongsOfConquestAccess.Localization
             public static readonly ModString Categories = new ModString("Screens.Categories", "Categories");
             public static readonly ModString ChaosSpells = new ModString("Screens.ChaosSpells", "Chaos spells");
             public static readonly ModString Choices = new ModString("Screens.Choices", "Choices");
+            public static readonly ModString Chat = new ModString("Screens.Chat", "Chat");
+            public static readonly ModString ChatInput = new ModString("Screens.ChatInput", "Message");
+            public static readonly ModString ChatSendTo = new ModString("Screens.ChatSendTo", "Send to");
+            public static readonly ModString ChatUnreadMessages = new ModString("Screens.ChatUnreadMessages", "Chat, unread messages");
             public static readonly ModString Close = new ModString("Screens.Close", "Close");
             public static readonly ModString CampaignMissionProgress = new ModString("Screens.CampaignMissionProgress", "Completed: {0} / {1} missions");
             public static readonly ModString CopiedGameCodeToClipboard = new ModString("Screens.CopiedGameCodeToClipboard", "Copied game code to clipboard.");
@@ -454,6 +458,7 @@ namespace SongsOfConquestAccess.Localization
             public static readonly ModString Missing = new ModString("Screens.Missing", "Missing {0}");
             public static readonly ModString MissingBuilding = new ModString("Screens.MissingBuilding", "missing building");
             public static readonly ModString ModSettings = new ModString("Screens.ModSettings", "Mod settings");
+            public static readonly ModString NewChatMessage = new ModString("Screens.NewChatMessage", "New chat message");
             public static readonly ModString ModifierCategoryTabs = new ModString("Screens.ModifierCategoryTabs", "Modifier category tabs");
             public static readonly ModString MaxTroopSize = new ModString("Screens.MaxTroopSize", "Max troop size {0}");
             public static readonly ModString MoveAllLeft = new ModString("Screens.MoveAllLeft", "Move all left");

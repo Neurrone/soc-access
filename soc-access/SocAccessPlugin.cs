@@ -98,6 +98,7 @@ namespace SongsOfConquestAccess
             _screenManager = null;
             StoryCameraFocusPatches.ResetDedupe();
             CombatPatches.Reset();
+            ChatPatches.Reset();
             TooltipPatches.Reset();
             UIManager.Reset();
             _bufferEventRecorder?.Detach();

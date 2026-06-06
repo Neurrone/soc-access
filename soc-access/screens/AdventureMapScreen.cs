@@ -805,6 +805,14 @@ namespace SongsOfConquestAccess.Screens
             root.AddChild(BuildTownListMenu(adapter.Hud, IsTeleportDestinationModeActive));
             root.AddChild(BuildWielderListMenu(adapter.Hud, IsTeleportDestinationModeActive));
             root.AddChild(new ButtonWidget(
+                "adventure-chat",
+                () => ChatPatches.CurrentAdapter != null ? ChatPatches.CurrentAdapter.ButtonLabel : ModText.Get(ModStrings.Screens.Chat),
+                () => ChatPatches.CurrentAdapter != null && ChatPatches.CurrentAdapter.Open(),
+                () => ChatPatches.CurrentAdapter?.FocusButton(),
+                () => ChatPatches.CurrentAdapter != null && ChatPatches.CurrentAdapter.IsButtonEnabled(),
+                VisibleWhenNotTeleport(() => ChatPatches.CurrentAdapter != null && ChatPatches.CurrentAdapter.IsButtonVisible()),
+                () => ChatPatches.CurrentAdapter != null ? ChatPatches.CurrentAdapter.ButtonTooltip : null));
+            root.AddChild(new ButtonWidget(
                 "adventure-options",
                 () => adapter.Hud.OptionsButtonLabel,
                 adapter.Hud.ClickOptionsButton,

@@ -675,6 +675,26 @@ msgctxt "Screens.Choices"
 msgid "Choices"
 msgstr "選択肢"
 
+#. Screens.Chat
+msgctxt "Screens.Chat"
+msgid "Chat"
+msgstr "チャット"
+
+#. Screens.ChatInput
+msgctxt "Screens.ChatInput"
+msgid "Message"
+msgstr "メッセージ"
+
+#. Screens.ChatSendTo
+msgctxt "Screens.ChatSendTo"
+msgid "Send to"
+msgstr "送信先"
+
+#. Screens.ChatUnreadMessages
+msgctxt "Screens.ChatUnreadMessages"
+msgid "Chat, unread messages"
+msgstr "チャット、未読メッセージ"
+
 #. Screens.Close
 msgctxt "Screens.Close"
 msgid "Close"
@@ -779,6 +799,11 @@ msgstr "建物が不足"
 msgctxt "Screens.ModSettings"
 msgid "Mod settings"
 msgstr "Mod 設定"
+
+#. Screens.NewChatMessage
+msgctxt "Screens.NewChatMessage"
+msgid "New chat message"
+msgstr "新しいチャットメッセージ"
 
 #. Screens.ModifierCategoryTabs
 msgctxt "Screens.ModifierCategoryTabs"

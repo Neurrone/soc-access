@@ -80,6 +80,7 @@ namespace SongsOfConquestAccess.Screens
                 ArtifactMarketScreen.TryBuildActiveScreen,
                 MapEntityMiniMenuScreen.TryBuildActiveScreen,
                 CombatScreen.TryBuildActiveScreen,
+                ChatScreen.TryBuildActiveScreen,
                 SpellbookScreen.TryBuildActiveScreen,
                 PostAdventureResultScreen.TryBuildActiveScreen,
                 PostAdventureStatsScreen.TryBuildActiveScreen,

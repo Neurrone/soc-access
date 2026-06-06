@@ -675,6 +675,26 @@ msgctxt "Screens.Choices"
 msgid "Choices"
 msgstr "선택지"
 
+#. Screens.Chat
+msgctxt "Screens.Chat"
+msgid "Chat"
+msgstr "채팅"
+
+#. Screens.ChatInput
+msgctxt "Screens.ChatInput"
+msgid "Message"
+msgstr "메시지"
+
+#. Screens.ChatSendTo
+msgctxt "Screens.ChatSendTo"
+msgid "Send to"
+msgstr "보낼 대상"
+
+#. Screens.ChatUnreadMessages
+msgctxt "Screens.ChatUnreadMessages"
+msgid "Chat, unread messages"
+msgstr "채팅, 읽지 않은 메시지"
+
 #. Screens.Close
 msgctxt "Screens.Close"
 msgid "Close"
@@ -779,6 +799,11 @@ msgstr "건물 부족"
 msgctxt "Screens.ModSettings"
 msgid "Mod settings"
 msgstr "모드 설정"
+
+#. Screens.NewChatMessage
+msgctxt "Screens.NewChatMessage"
+msgid "New chat message"
+msgstr "새 채팅 메시지"
 
 #. Screens.ModifierCategoryTabs
 msgctxt "Screens.ModifierCategoryTabs"

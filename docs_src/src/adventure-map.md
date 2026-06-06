@@ -88,6 +88,7 @@ When focus is in the HUD controls, pressing escape moves focus back to the grid.
 Additionally, the game provides the following hotkeys that work anywhere on the adventure map screen:
 
 - `C`: open character sheet
+- `O`: open chat
 - `V`: open spellbook
 - `E`: end turn
 - `Q`: move wielder to selected destination

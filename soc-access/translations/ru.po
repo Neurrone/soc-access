@@ -695,6 +695,26 @@ msgctxt "Screens.Choices"
 msgid "Choices"
 msgstr "Варианты"
 
+#. Screens.Chat
+msgctxt "Screens.Chat"
+msgid "Chat"
+msgstr "Чат"
+
+#. Screens.ChatInput
+msgctxt "Screens.ChatInput"
+msgid "Message"
+msgstr "Сообщение"
+
+#. Screens.ChatSendTo
+msgctxt "Screens.ChatSendTo"
+msgid "Send to"
+msgstr "Отправить"
+
+#. Screens.ChatUnreadMessages
+msgctxt "Screens.ChatUnreadMessages"
+msgid "Chat, unread messages"
+msgstr "Чат, непрочитанные сообщения"
+
 #. Screens.Close
 msgctxt "Screens.Close"
 msgid "Close"
@@ -799,6 +819,11 @@ msgstr "не хватает здания"
 msgctxt "Screens.ModSettings"
 msgid "Mod settings"
 msgstr "Настройки мода"
+
+#. Screens.NewChatMessage
+msgctxt "Screens.NewChatMessage"
+msgid "New chat message"
+msgstr "Новое сообщение чата"
 
 #. Screens.ModifierCategoryTabs
 msgctxt "Screens.ModifierCategoryTabs"

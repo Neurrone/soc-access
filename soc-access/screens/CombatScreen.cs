@@ -484,6 +484,14 @@ namespace SongsOfConquestAccess.Screens
                 adapter.Hud.IsEndTurnButtonVisible,
                 () => adapter.Hud.EndTurnButtonTooltip));
             root.AddChild(new ButtonWidget(
+                "combat-chat",
+                () => ChatPatches.CurrentAdapter != null ? ChatPatches.CurrentAdapter.ButtonLabel : ModText.Get(ModStrings.Screens.Chat),
+                () => ChatPatches.CurrentAdapter != null && ChatPatches.CurrentAdapter.Open(),
+                () => ChatPatches.CurrentAdapter?.FocusButton(),
+                () => ChatPatches.CurrentAdapter != null && ChatPatches.CurrentAdapter.IsButtonEnabled(),
+                () => ChatPatches.CurrentAdapter != null && ChatPatches.CurrentAdapter.IsButtonVisible(),
+                () => ChatPatches.CurrentAdapter != null ? ChatPatches.CurrentAdapter.ButtonTooltip : null));
+            root.AddChild(new ButtonWidget(
                 "combat-options",
                 () => adapter.Hud.OptionsButtonLabel,
                 adapter.Hud.ClickOptionsButton,

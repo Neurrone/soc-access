@@ -23,13 +23,13 @@ Before combat, the troop deployment screen allows placement of your troops in sp
 
 Move through the hex grid with:
 
-- A: west
-- D: east
-- Q: northwest
-- E: northeast
-- Z: southwest
-- C: southeast
-- Use with shift to move to the next interesting tile, where interesting means it differs from the current tile
+- `A`: west
+- `D`: east
+- `Q`: northwest
+- `E`: northeast
+- `Z`: southwest
+- `C`: southeast
+- Use with `shift` to move to the next interesting tile, where interesting means it differs from the current tile
 
 Use drag and drop to rearrange your troops.
 
@@ -53,7 +53,7 @@ The following hotkeys work when on the hex grid:
 - `S`: read detailed threat information for the focused tile. Nothing is spoken if the tile is not threatened.
 - `T`: move focus to the timeline
 - Enter: performs the primary action on the focused tile, corresponding to a left-click. Use to select a target for spells
-- Escape: cancels spellcasting
+- `Escape`: cancels spellcasting
 - `,` and `Shift+,`: move focus between your troops in initiative order
 - `Space`: move focus to your currently acting troop
 - `.` and `Shift+.`: move focus between enemy troops in initiative order
@@ -85,8 +85,9 @@ For convenience, press T from the combat grid to move focus to the turn order. P
 
 The game provides the following hotkeys:
 
-- Q: use ability
-- E: end turn
-- V: open spellbook
+- `Q`: use ability
+- `E`: end turn
+- `V`: open spellbook
+- `O`: open chat
 
-Since Q and E conflict with hex grid movement keys, move focus out of the grid first before using those keys.
+Since `Q` and `E` conflict with hex grid movement keys, move focus out of the grid first before using those keys.
