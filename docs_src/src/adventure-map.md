@@ -79,7 +79,7 @@ The HUD provides various controls for the currently selected wielder such as the
 Press tab from the map grid to cycle through HUD controls. When on the adventure map, press the following keys to move focus to the following HUD controls:
 
 - `N`: notifications
-- `O`: objectives
+- `B`: objectives
 - `R`: resources
 - `T`: troops
 

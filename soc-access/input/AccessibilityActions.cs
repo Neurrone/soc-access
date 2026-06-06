@@ -143,7 +143,7 @@ namespace SongsOfConquestAccess.Input
             .AddBinding(new KeyboardBinding(Key.R));
 
         public static readonly InputAction FocusHudObjectives = OneShot("focus_hud_objectives", ModStrings.Actions.FocusHudObjectives, InputClaimScope.Screen)
-            .AddBinding(new KeyboardBinding(Key.O));
+            .AddBinding(new KeyboardBinding(Key.B));
 
         public static readonly InputAction FocusHudNotifications = OneShot("focus_hud_notifications", ModStrings.Actions.FocusHudNotifications, InputClaimScope.Screen)
             .AddBinding(new KeyboardBinding(Key.N));

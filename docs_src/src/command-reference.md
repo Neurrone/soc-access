@@ -68,7 +68,7 @@ This page summarizes the mod hotkeys used across the documentation.
 | `Space`             | Move focus to selected wielder tile |
 | `H`                 | Toggle HUD visibility               |
 | `N`                 | Focus notifications                 |
-| `O`                 | Focus objectives                    |
+| `B`                 | Focus objectives                    |
 | `R`                 | Focus resources                     |
 | `T`                 | Focus troops                        |
 | `Ctrl+number`       | Save bookmark                       |
