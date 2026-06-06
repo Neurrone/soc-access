@@ -167,13 +167,13 @@ namespace SongsOfConquestAccess.UI
                     {
                         string tooltipLine = SpeechTextSanitizer.Normalize(tooltipLines[i]);
                         // Many native tooltips repeat the focused control name
-                        // as their first line. If the control label already says
-                        // "Order Magic", do not add a duplicate first tooltip
-                        // line before the useful description.
+                        // as their first line. Suppress only exact duplicates so
+                        // shorter tooltip headings still get announced when the
+                        // focused label contains additional context.
                         if (i == 0
                             && !string.IsNullOrWhiteSpace(label)
                             && !string.IsNullOrWhiteSpace(tooltipLine)
-                            && label.IndexOf(tooltipLine, System.StringComparison.OrdinalIgnoreCase) >= 0)
+                            && string.Equals(label, tooltipLine, System.StringComparison.OrdinalIgnoreCase))
                         {
                             continue;
                         }
