@@ -125,7 +125,11 @@ namespace SongsOfConquestAccess.Input
             .AddBinding(new KeyboardBinding(Key.RightArrow, shift: true));
 
         public static readonly InputAction MapSecondaryAction = OneShot("map_secondary_action", ModStrings.Actions.MapSecondaryAction, InputClaimScope.FocusedWidget)
-            .AddBinding(new KeyboardBinding(Key.Backslash));
+            .AddBinding(new KeyboardBinding(Key.Backslash))
+            // A reported keyboard produced a visible backslash but Unity exposed the key as OEM1:
+            // key=OEM1 displayName=\ ctrl=False shift=False alt=False. Match only this literal
+            // display name here instead of treating OEM1 as a universal backslash key.
+            .AddBinding(new KeyboardDisplayNameBinding("\\"));
 
         public static readonly InputAction NextWielder = OneShot("next_wielder", ModStrings.Actions.NextWielder, InputClaimScope.FocusedWidget)
             .AddBinding(new KeyboardBinding(Key.W));

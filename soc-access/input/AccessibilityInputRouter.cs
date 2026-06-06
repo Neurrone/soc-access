@@ -84,7 +84,7 @@ namespace SongsOfConquestAccess.Input
                 bool pressed = rawValue >= keyControl.pressPointOrDefault;
                 if (pressed)
                 {
-                    if (TryHandleKeyDown(keyControl.keyCode))
+                    if (TryHandleKeyDown(keyControl))
                     {
                         value.handled = true;
                     }
@@ -92,8 +92,9 @@ namespace SongsOfConquestAccess.Input
             }
         }
 
-        private bool TryHandleKeyDown(Key key)
+        private bool TryHandleKeyDown(KeyControl keyControl)
         {
+            Key key = keyControl.keyCode;
             ActiveBindingState activeForKey = FindActiveBindingForKey(key);
             if (activeForKey != null)
             {
@@ -105,18 +106,21 @@ namespace SongsOfConquestAccess.Input
             }
 
             KeyboardStateSnapshot state = KeyboardStateSnapshot.Capture();
-            List<BindingMatch> claimedMatches = ResolveClaimedMatches(key, state);
+            List<BindingMatch> claimedMatches = ResolveClaimedMatches(keyControl, state);
             if (claimedMatches.Count > 0)
             {
                 SpeechPipeline.Silence();
                 DispatchClaimedMatches(claimedMatches);
 
-                ActiveBindingState claimedBindingState = new ActiveBindingState(claimedMatches[0].Action, claimedMatches[0].Binding);
+                ActiveBindingState claimedBindingState = new ActiveBindingState(
+                    claimedMatches[0].Action,
+                    claimedMatches[0].Binding,
+                    claimedMatches[0].PressedKey);
                 _activeBindings[claimedMatches[0].Binding.Id] = claimedBindingState;
                 return true;
             }
 
-            BindingMatch match = ResolveGlobalMatch(key, state);
+            BindingMatch match = ResolveGlobalMatch(keyControl, state);
             if (match == null)
             {
                 return false;
@@ -131,7 +135,7 @@ namespace SongsOfConquestAccess.Input
                 SpeechPipeline.Silence();
                 _screenManager.HandleGlobalAction(match.Action);
 
-                ActiveBindingState bindingState = new ActiveBindingState(match.Action, match.Binding);
+                ActiveBindingState bindingState = new ActiveBindingState(match.Action, match.Binding, match.PressedKey);
                 _activeBindings[match.Binding.Id] = bindingState;
                 return true;
             }
@@ -143,7 +147,7 @@ namespace SongsOfConquestAccess.Input
         {
             foreach (ActiveBindingState state in _activeBindings.Values)
             {
-                if (state.Binding.UsesKey(key))
+                if (state.PressedKey == key)
                 {
                     return state;
                 }
@@ -152,7 +156,7 @@ namespace SongsOfConquestAccess.Input
             return null;
         }
 
-        private List<BindingMatch> ResolveClaimedMatches(Key key, KeyboardStateSnapshot state)
+        private List<BindingMatch> ResolveClaimedMatches(KeyControl keyControl, KeyboardStateSnapshot state)
         {
             List<BindingMatch> matches = new List<BindingMatch>();
             for (int i = 0; i < AccessibilityActions.NON_GLOBAL_ACTIONS.Length; i++)
@@ -163,10 +167,10 @@ namespace SongsOfConquestAccess.Input
                     continue;
                 }
 
-                KeyboardBinding binding = FindMatchingKeyboardBinding(action, key, state);
-                if (binding != null)
+                BindingMatch match = FindMatchingKeyboardBinding(action, keyControl, state);
+                if (match != null)
                 {
-                    matches.Add(new BindingMatch(action, binding));
+                    matches.Add(match);
                 }
             }
 
@@ -190,24 +194,24 @@ namespace SongsOfConquestAccess.Input
             }
         }
 
-        private BindingMatch ResolveGlobalMatch(Key key, KeyboardStateSnapshot state)
+        private BindingMatch ResolveGlobalMatch(KeyControl keyControl, KeyboardStateSnapshot state)
         {
             for (int i = 0; i < AccessibilityActions.GLOBAL_ACTIONS.Length; i++)
             {
                 InputAction action = AccessibilityActions.GLOBAL_ACTIONS[i];
-                KeyboardBinding binding = FindMatchingKeyboardBinding(action, key, state);
-                if (binding != null)
+                BindingMatch match = FindMatchingKeyboardBinding(action, keyControl, state);
+                if (match != null)
                 {
-                    return new BindingMatch(action, binding);
+                    return match;
                 }
             }
 
             return null;
         }
 
-        private static KeyboardBinding FindMatchingKeyboardBinding(
+        private static BindingMatch FindMatchingKeyboardBinding(
             InputAction action,
-            Key key,
+            KeyControl keyControl,
             KeyboardStateSnapshot state)
         {
             if (action == null || action.Bindings == null)
@@ -217,10 +221,11 @@ namespace SongsOfConquestAccess.Input
 
             for (int i = 0; i < action.Bindings.Count; i++)
             {
-                KeyboardBinding binding = action.Bindings[i] as KeyboardBinding;
-                if (binding != null && binding.MatchesKeyDown(key, state))
+                InputBinding binding = action.Bindings[i];
+                Key pressedKey;
+                if (binding != null && binding.MatchesKeyDown(keyControl, state, out pressedKey))
                 {
-                    return binding;
+                    return new BindingMatch(action, binding, pressedKey);
                 }
             }
 
@@ -251,7 +256,7 @@ namespace SongsOfConquestAccess.Input
                     continue;
                 }
 
-                if (keyboard[state.Binding.Key].isPressed)
+                if (keyboard[state.PressedKey].isPressed)
                 {
                     continue;
                 }
@@ -289,9 +294,9 @@ namespace SongsOfConquestAccess.Input
             }
         }
 
-        private static float GetReleasePollingDelaySeconds(KeyboardBinding binding)
+        private static float GetReleasePollingDelaySeconds(InputBinding binding)
         {
-            if (binding != null && (binding.Ctrl || binding.Shift || binding.Alt))
+            if (binding != null && binding.IsModified)
             {
                 return ModifiedReleasePollingDelaySeconds;
             }
@@ -308,31 +313,37 @@ namespace SongsOfConquestAccess.Input
 
         private sealed class ActiveBindingState
         {
-            public ActiveBindingState(InputAction action, KeyboardBinding binding)
+            public ActiveBindingState(InputAction action, InputBinding binding, Key pressedKey)
             {
                 Action = action;
                 Binding = binding;
+                PressedKey = pressedKey;
                 ActivatedAtSeconds = UnityEngine.Time.unscaledTime;
             }
 
             public InputAction Action { get; private set; }
 
-            public KeyboardBinding Binding { get; private set; }
+            public InputBinding Binding { get; private set; }
+
+            public Key PressedKey { get; private set; }
 
             public float ActivatedAtSeconds { get; private set; }
         }
 
         private sealed class BindingMatch
         {
-            public BindingMatch(InputAction action, KeyboardBinding binding)
+            public BindingMatch(InputAction action, InputBinding binding, Key pressedKey)
             {
                 Action = action;
                 Binding = binding;
+                PressedKey = pressedKey;
             }
 
             public InputAction Action { get; private set; }
 
-            public KeyboardBinding Binding { get; private set; }
+            public InputBinding Binding { get; private set; }
+
+            public Key PressedKey { get; private set; }
         }
 
         internal sealed class KeyboardStateSnapshot

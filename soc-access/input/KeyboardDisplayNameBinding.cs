@@ -1,18 +1,19 @@
 using UnityEngine.InputSystem;
+using UnityEngine.InputSystem.Controls;
 
 namespace SongsOfConquestAccess.Input
 {
-    internal sealed class KeyboardBinding : InputBinding
+    internal sealed class KeyboardDisplayNameBinding : InputBinding
     {
-        public KeyboardBinding(Key key, bool ctrl = false, bool shift = false, bool alt = false)
+        public KeyboardDisplayNameBinding(string displayName, bool ctrl = false, bool shift = false, bool alt = false)
         {
-            Key = key;
+            DisplayName = displayName ?? string.Empty;
             Ctrl = ctrl;
             Shift = shift;
             Alt = alt;
         }
 
-        public Key Key { get; private set; }
+        public string DisplayName { get; private set; }
 
         public bool Ctrl { get; private set; }
 
@@ -24,8 +25,8 @@ namespace SongsOfConquestAccess.Input
         {
             get
             {
-                return "keyboard:"
-                    + Key
+                return "keyboard-display:"
+                    + DisplayName
                     + ":ctrl="
                     + Ctrl
                     + ":shift="
@@ -41,13 +42,13 @@ namespace SongsOfConquestAccess.Input
         }
 
         public override bool MatchesKeyDown(
-            UnityEngine.InputSystem.Controls.KeyControl keyControl,
+            KeyControl keyControl,
             AccessibilityInputRouter.KeyboardStateSnapshot state,
             out Key pressedKey)
         {
-            pressedKey = Key;
+            pressedKey = keyControl != null ? keyControl.keyCode : Key.None;
             return keyControl != null
-                && Key == keyControl.keyCode
+                && keyControl.displayName == DisplayName
                 && state != null
                 && state.Ctrl == Ctrl
                 && state.Shift == Shift
