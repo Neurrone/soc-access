@@ -1,10 +1,10 @@
 # Changelog
 
-## V0.6.6
+## V0.7.0
 
 - Updates to support the Yulan DLC:
   - Fixed reading of Yulan troop upgrade costs and building upgrade choices
-  - Upgraded buildings now include the essence type on the adventure map
+  - Upgraded Yulan buildings now include the essence type if applicable on the adventure map
   - Add label for Yulan maps on the lobby screen
   - Fixed narration of leap ability
 - Changed command to focus the objectives widget from `O` to `B` to avoid overriding the game hotkey for opening the chat window
