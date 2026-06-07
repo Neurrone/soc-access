@@ -67,23 +67,14 @@ namespace SongsOfConquestAccess.Speech
             SupportsSpeakToMemorySsml = 1UL << 28
         }
 
-        [StructLayout(LayoutKind.Sequential)]
-        public struct PrismConfig
-        {
-            public byte Version;
-        }
-
-        [DllImport(Dll, EntryPoint = "prism_config_init", CallingConvention = CallingConvention.Cdecl)]
-        public static extern PrismConfig ConfigInit();
-
         [DllImport(Dll, EntryPoint = "prism_init", CallingConvention = CallingConvention.Cdecl)]
-        public static extern IntPtr Init(ref PrismConfig config);
+        public static extern IntPtr Init(IntPtr config);
 
         [DllImport(Dll, EntryPoint = "prism_shutdown", CallingConvention = CallingConvention.Cdecl)]
         public static extern void Shutdown(IntPtr context);
 
-        [DllImport(Dll, EntryPoint = "prism_registry_acquire_best", CallingConvention = CallingConvention.Cdecl)]
-        public static extern IntPtr RegistryAcquireBest(IntPtr context);
+        [DllImport(Dll, EntryPoint = "prism_registry_create_best", CallingConvention = CallingConvention.Cdecl)]
+        public static extern IntPtr RegistryCreateBest(IntPtr context);
 
         [DllImport(Dll, EntryPoint = "prism_backend_free", CallingConvention = CallingConvention.Cdecl)]
         public static extern void BackendFree(IntPtr backend);

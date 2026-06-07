@@ -11,7 +11,6 @@
 - Text on story screens are now buttons, allowing `Enter` to advance to the next screen. Fixes having to `tab` to the next button to advance to the next screen
 - The first line of tooltips is no longer suppressed in cases where doing so would cause confusion. Previously, the first line was hidden if it was a substring of the current widget's label. This is now done only if it is an exact match with the widget's label
 - Fix the secondary action command being impossible to use on misbehaving systems that don't send an actual `\` key code when pressing it on the keyboard
-- Change how Prism is initialized to hopefully support the Baoyi screen reader
 - Improved Portuguese translations for generated essence and hostile troop labels
 
 ## V0.6.5
