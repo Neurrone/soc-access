@@ -1490,6 +1490,16 @@ msgctxt "Combat.Attack"
 msgid "{0} {1} {2}"
 msgstr "{0}对{2}{1}"
 
+#. Combat.AttackLeft
+msgctxt "Combat.AttackLeft"
+msgid "{0} attacks left"
+msgstr "{0}向左攻击"
+
+#. Combat.AttackRight
+msgctxt "Combat.AttackRight"
+msgid "{0} attacks right"
+msgstr "{0}向右攻击"
+
 #. Combat.AttackableEntity
 msgctxt "Combat.AttackableEntity"
 msgid "attackable entity"
@@ -1644,6 +1654,16 @@ msgstr "仙灵之火"
 msgctxt "Combat.FaeyFireWithBolts"
 msgid "{0} casts {1}, {2}"
 msgstr "{0}施放{1}，{2}"
+
+#. Combat.FacingLeft
+msgctxt "Combat.FacingLeft"
+msgid "facing left"
+msgstr "面向左侧"
+
+#. Combat.FacingRight
+msgctxt "Combat.FacingRight"
+msgid "facing right"
+msgstr "面向右侧"
 
 #. Combat.Lunge
 msgctxt "Combat.Lunge"

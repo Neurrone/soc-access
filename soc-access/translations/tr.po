@@ -1490,6 +1490,16 @@ msgctxt "Combat.Attack"
 msgid "{0} {1} {2}"
 msgstr "{0} {2} hedefine {1}"
 
+#. Combat.AttackLeft
+msgctxt "Combat.AttackLeft"
+msgid "{0} attacks left"
+msgstr "{0} sola saldırır"
+
+#. Combat.AttackRight
+msgctxt "Combat.AttackRight"
+msgid "{0} attacks right"
+msgstr "{0} sağa saldırır"
+
 #. Combat.AttackableEntity
 msgctxt "Combat.AttackableEntity"
 msgid "attackable entity"
@@ -1644,6 +1654,16 @@ msgstr "Faey Ateşi"
 msgctxt "Combat.FaeyFireWithBolts"
 msgid "{0} casts {1}, {2}"
 msgstr "{0}, {1} yapar, {2}"
+
+#. Combat.FacingLeft
+msgctxt "Combat.FacingLeft"
+msgid "facing left"
+msgstr "sola bakıyor"
+
+#. Combat.FacingRight
+msgctxt "Combat.FacingRight"
+msgid "facing right"
+msgstr "sağa bakıyor"
 
 #. Combat.Lunge
 msgctxt "Combat.Lunge"

@@ -763,6 +763,7 @@ namespace SongsOfConquestAccess.Screens
                 IBattleGridManager gridManager = TryResolve<IBattleGridManager>(container);
                 IBattlePathManager pathManager = TryResolve<IBattlePathManager>(container);
                 IBattleHighlightManager highlightManager = TryResolve<IBattleHighlightManager>(container);
+                IBattleViewManager battleViewManager = TryResolve<IBattleViewManager>(container);
                 IBattleAttackPreviewHandler attackPreviewHandler = TryResolve<IBattleAttackPreviewHandler>(container);
                 IBattleTooltipUtility tooltipUtility = TryResolve<IBattleTooltipUtility>(container);
                 IInputManager inputManager = TryResolve<IInputManager>(container);
@@ -784,6 +785,7 @@ namespace SongsOfConquestAccess.Screens
                     gridManager,
                     pathManager,
                     highlightManager,
+                    battleViewManager,
                     attackPreviewHandler,
                     tooltipUtility,
                     inputManager,

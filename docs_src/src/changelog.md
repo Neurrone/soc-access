@@ -6,13 +6,16 @@
   - Fixed reading of Yulan troop upgrade costs and building upgrade choices
   - Upgraded Yulan buildings now include the essence type if applicable on the adventure map
   - Add label for Yulan maps on the lobby screen
-  - Fixed narration of leap ability
 - Changed command to focus the objectives widget from `O` to `B` to avoid overriding the game hotkey for opening the chat window
 - Added support for the chat window
 - Text on story screens are now buttons, allowing `Enter` to advance to the next screen. Fixes having to `tab` to the next button to advance to the next screen
 - The first line of tooltips is no longer suppressed in cases where doing so would cause confusion. Previously, the first line was hidden if it was a substring of the current widget's label. This is now done only if it is an exact match with the widget's label
-- In combat, enemies that are attackable by the current troop are indicated when focused
-- Fix the secondary action command being impossible to use on misbehaving systems that don't send an actual `\` key code when pressing it on the keyboard
+- Combat improvements:
+  - Enemies that are attackable by the current troop are indicated when focused
+  - Mention which direction beam troops face
+  - Improved narration of beam attacks
+  - Fixed narration of leap ability
+- Fixed the secondary action command being impossible to use on misbehaving systems that don't send an actual `\` key code when pressing it on the keyboard
 - Rewrote troop management section in the documentation to mention the disband tooltip action
 - Improved Portuguese translations for generated essence and hostile troop labels
 

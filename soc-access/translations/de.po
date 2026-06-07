@@ -1500,6 +1500,16 @@ msgctxt "Combat.Attack"
 msgid "{0} {1} {2}"
 msgstr "{0} {1} {2}"
 
+#. Combat.AttackLeft
+msgctxt "Combat.AttackLeft"
+msgid "{0} attacks left"
+msgstr "{0} greift nach links an"
+
+#. Combat.AttackRight
+msgctxt "Combat.AttackRight"
+msgid "{0} attacks right"
+msgstr "{0} greift nach rechts an"
+
 #. Combat.AttackableEntity
 msgctxt "Combat.AttackableEntity"
 msgid "attackable entity"
@@ -1654,6 +1664,16 @@ msgstr "Feenfeuer"
 msgctxt "Combat.FaeyFireWithBolts"
 msgid "{0} casts {1}, {2}"
 msgstr "{0} wirkt {1}, {2}"
+
+#. Combat.FacingLeft
+msgctxt "Combat.FacingLeft"
+msgid "facing left"
+msgstr "nach links ausgerichtet"
+
+#. Combat.FacingRight
+msgctxt "Combat.FacingRight"
+msgid "facing right"
+msgstr "nach rechts ausgerichtet"
 
 #. Combat.Lunge
 msgctxt "Combat.Lunge"

@@ -24,6 +24,12 @@ namespace SongsOfConquestAccess.Events.Combat
         Tile
     }
 
+    internal enum BeamFacing
+    {
+        Left,
+        Right
+    }
+
     internal enum EffectTargetSummaryKind
     {
         ExplicitTargets,
@@ -500,6 +506,25 @@ namespace SongsOfConquestAccess.Events.Combat
         public TargetRef Target { get; private set; }
         public AttackTrigger AttackTrigger { get; private set; }
         public string GetSpeechText() { return ModText.Get(ModStrings.Combat.Attack, Attacker.Format(), FormatAttackVerb(AttackTrigger), Target.Format()); }
+    }
+
+    internal sealed class DirectionalAttackEvent : IAccessibilityEvent
+    {
+        public DirectionalAttackEvent(ActorRef attacker, BeamFacing direction)
+        {
+            Attacker = attacker;
+            Direction = direction;
+        }
+
+        public string Kind { get { return AccessibilityEvents.Combat.Attack; } }
+        public ActorRef Attacker { get; private set; }
+        public BeamFacing Direction { get; private set; }
+        public string GetSpeechText()
+        {
+            return Direction == BeamFacing.Right
+                ? ModText.Get(ModStrings.Combat.AttackRight, Attacker.Format())
+                : ModText.Get(ModStrings.Combat.AttackLeft, Attacker.Format());
+        }
     }
 
     internal sealed class DamageEvent : IAccessibilityEvent
@@ -1048,6 +1073,13 @@ namespace SongsOfConquestAccess.Events.Combat
                 default:
                     return ModText.Get(ModStrings.Combat.AttackVerbDefault);
             }
+        }
+
+        public static string FormatBeamFacing(BeamFacing facing)
+        {
+            return facing == BeamFacing.Right
+                ? ModText.Get(ModStrings.Combat.FacingRight)
+                : ModText.Get(ModStrings.Combat.FacingLeft);
         }
 
         public static string FormatDamageKind(DamageType type, AttackTrigger trigger, bool isSplashDamage, BacteriaRef bacteria)

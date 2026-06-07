@@ -479,10 +479,48 @@ namespace SongsOfConquestAccess.Adapters
         private static void EnqueueAttack(int attackerId, bool targetIsMapEntity, DamageResult damage, CombatAdapter adapter)
         {
             IBattleTroopState attacker = adapter.GetTroop(attackerId);
+            if (IsSyntheticBeamReactAttack(attacker, targetIsMapEntity, damage, adapter))
+            {
+                if (damage.StateId < 0)
+                {
+                    BeamFacing? direction = adapter.GetTeamSideBeamDirection(attacker);
+                    if (direction.HasValue)
+                    {
+                        Enqueue(CombatNarrationItem.Create(
+                            CombatNarrationItemKind.Attack,
+                            new DirectionalAttackEvent(CreateActor(adapter, attacker), direction.Value),
+                            attackerId));
+                    }
+
+                    return;
+                }
+
+                IBattleTroopState beamTarget = adapter.GetTroop(damage.StateId);
+                int targetSize = beamTarget != null ? beamTarget.Stats.Size : Math.Max(damage.SizeAfter + damage.Kills, 0);
+                TargetRef beamTargetRef = TargetRef.FromTroop(adapter.CreateTroopRef(beamTarget, targetSize));
+                Enqueue(CombatNarrationItem.Create(
+                    CombatNarrationItemKind.Attack,
+                    new AttackEvent(CreateActor(adapter, attacker), beamTargetRef, damage.AttackTrigger),
+                    attackerId));
+                return;
+            }
+
             TargetRef target = targetIsMapEntity
                 ? TargetRef.FromEntity(adapter.CreateEntityRef(adapter.GetMapEntity(damage.StateId)))
                 : TargetRef.FromTroop(adapter.CreateTroopRef(adapter.GetTroop(damage.StateId), Math.Max(damage.SizeAfter + damage.Kills, 0)));
             Enqueue(CombatNarrationItem.Create(CombatNarrationItemKind.Attack, new AttackEvent(CreateActor(adapter, attacker), target, damage.AttackTrigger), attackerId));
+        }
+
+        private static bool IsSyntheticBeamReactAttack(
+            IBattleTroopState attacker,
+            bool targetIsMapEntity,
+            DamageResult damage,
+            CombatAdapter adapter)
+        {
+            return !targetIsMapEntity
+                && damage.AttackTrigger == AttackTrigger.Damage
+                && damage.Type == DamageType.Invalid
+                && adapter.PerformsBeamAttacks(attacker);
         }
 
         private static void EnqueueBacteriaAdded(AddBattleBacteriaCommand.Response response, CombatAdapter adapter)

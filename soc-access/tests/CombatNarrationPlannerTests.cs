@@ -733,6 +733,33 @@ namespace SongsOfConquestAccess.Tests
         }
 
         [TestMethod]
+        public void DirectionalAttackEventNarratesLeft()
+        {
+            DirectionalAttackEvent attack = new DirectionalAttackEvent(
+                new ActorRef(Troop(10, 2, "Hearts", 3), false),
+                BeamFacing.Left);
+
+            Assert.AreEqual("3 enemy Hearts at 0, 0 attacks left", attack.GetSpeechText());
+        }
+
+        [TestMethod]
+        public void DirectionalAttackEventNarratesRight()
+        {
+            DirectionalAttackEvent attack = new DirectionalAttackEvent(
+                new ActorRef(Troop(10, 2, "Hearts", 3), false),
+                BeamFacing.Right);
+
+            Assert.AreEqual("3 enemy Hearts at 0, 0 attacks right", attack.GetSpeechText());
+        }
+
+        [TestMethod]
+        public void BeamFacingFormatsForTileSpeech()
+        {
+            Assert.AreEqual("facing left", CombatText.FormatBeamFacing(BeamFacing.Left));
+            Assert.AreEqual("facing right", CombatText.FormatBeamFacing(BeamFacing.Right));
+        }
+
+        [TestMethod]
         public void FlushSuppressesAcidCloudCreation()
         {
             for (int blueprintId = 4; blueprintId <= 6; blueprintId++)

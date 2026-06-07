@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using SongsOfConquestAccess.Adapters;
+using SongsOfConquestAccess.Events.Combat;
 using SongsOfConquestAccess.Localization;
 
 namespace SongsOfConquestAccess.Speech.Spatial
@@ -48,6 +49,13 @@ namespace SongsOfConquestAccess.Speech.Spatial
             if (tile.Troop != null)
             {
                 parts.Add(FormatAttackablePrefix(_adapter.DescribeTroopForSpeech(tile.Troop), tile.IsTroopAttackable));
+                BeamFacing? facing = _adapter != null && _adapter.PerformsBeamAttacks(tile.Troop)
+                    ? _adapter.GetBeamFacing(tile.Troop)
+                    : null;
+                if (facing.HasValue)
+                {
+                    parts.Add(CombatText.FormatBeamFacing(facing.Value));
+                }
             }
             else if (tile.Entity != null)
             {

@@ -64,6 +64,7 @@ namespace SongsOfConquestAccess.Adapters
         private readonly IBattleGridManager _gridManager;
         private readonly IBattlePathManager _pathManager;
         private readonly IBattleHighlightManager _highlightManager;
+        private readonly IBattleViewManager _battleViewManager;
         private readonly IBattleAttackPreviewHandler _attackPreviewHandler;
         private readonly IBattleTooltipUtility _tooltipUtility;
         private readonly IInputManager _inputManager;
@@ -105,6 +106,7 @@ namespace SongsOfConquestAccess.Adapters
                 Resolve<IBattleGridManager>(GetContainer(installer)),
                 Resolve<IBattlePathManager>(GetContainer(installer)),
                 Resolve<IBattleHighlightManager>(GetContainer(installer)),
+                Resolve<IBattleViewManager>(GetContainer(installer)),
                 Resolve<IBattleAttackPreviewHandler>(GetContainer(installer)),
                 Resolve<IBattleTooltipUtility>(GetContainer(installer)),
                 Resolve<IInputManager>(GetContainer(installer)),
@@ -128,6 +130,7 @@ namespace SongsOfConquestAccess.Adapters
             IBattleGridManager gridManager,
             IBattlePathManager pathManager,
             IBattleHighlightManager highlightManager,
+            IBattleViewManager battleViewManager,
             IBattleAttackPreviewHandler attackPreviewHandler,
             IBattleTooltipUtility tooltipUtility,
             IInputManager inputManager,
@@ -148,6 +151,7 @@ namespace SongsOfConquestAccess.Adapters
             _gridManager = gridManager;
             _pathManager = pathManager;
             _highlightManager = highlightManager;
+            _battleViewManager = battleViewManager;
             _attackPreviewHandler = attackPreviewHandler;
             _tooltipUtility = tooltipUtility;
             _inputManager = inputManager;
@@ -2249,6 +2253,37 @@ namespace SongsOfConquestAccess.Adapters
         internal string DescribeTroopForSpeech(IBattleTroopState troop)
         {
             return FormatTroopGridLabel(troop);
+        }
+
+        internal bool PerformsBeamAttacks(IBattleTroopState troop)
+        {
+            return troop != null && troop.PerformsBeamAttacks();
+        }
+
+        internal BeamFacing? GetBeamFacing(IBattleTroopState troop)
+        {
+            if (!PerformsBeamAttacks(troop) || _battleViewManager == null)
+            {
+                return null;
+            }
+
+            IBattleTroopView view = _battleViewManager.GetTroopView(troop.Id);
+            if (view == null)
+            {
+                return null;
+            }
+
+            return view.IsLookingRight ? BeamFacing.Right : BeamFacing.Left;
+        }
+
+        internal BeamFacing? GetTeamSideBeamDirection(IBattleTroopState troop)
+        {
+            if (!PerformsBeamAttacks(troop) || _facade == null || _facade.Teams == null)
+            {
+                return null;
+            }
+
+            return troop.TeamId == _facade.Teams.AttackingTeam.Id ? BeamFacing.Right : BeamFacing.Left;
         }
 
         internal string DescribeEntityForSpeech(IMapEntity entity)

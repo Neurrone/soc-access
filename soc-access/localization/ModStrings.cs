@@ -242,6 +242,8 @@ namespace SongsOfConquestAccess.Localization
             public static readonly ModString Appears = new ModString("Combat.Appears", "{0} appears");
             public static readonly ModString ArcanaEssence = new ModString("Combat.ArcanaEssence", "arcana");
             public static readonly ModString Attack = new ModString("Combat.Attack", "{0} {1} {2}");
+            public static readonly ModString AttackLeft = new ModString("Combat.AttackLeft", "{0} attacks left");
+            public static readonly ModString AttackRight = new ModString("Combat.AttackRight", "{0} attacks right");
             public static readonly ModString AttackableEntity = new ModString("Combat.AttackableEntity", "attackable entity");
             public static readonly ModString AttackVerbDefault = new ModString("Combat.AttackVerbDefault", "attacks");
             public static readonly ModString AttackVerbOpportunity = new ModString("Combat.AttackVerbOpportunity", "makes an opportunity attack against");
@@ -279,6 +281,8 @@ namespace SongsOfConquestAccess.Localization
             public static readonly ModString FailedBurrow = new ModString("Combat.FailedBurrow", "{0}, failed burrow");
             public static readonly ModString FaeyFire = new ModString("Combat.FaeyFire", "Faey Fire");
             public static readonly ModString FaeyFireWithBolts = new ModString("Combat.FaeyFireWithBolts", "{0} casts {1}, {2}");
+            public static readonly ModString FacingLeft = new ModString("Combat.FacingLeft", "facing left");
+            public static readonly ModString FacingRight = new ModString("Combat.FacingRight", "facing right");
             public static readonly ModString Lunge = new ModString("Combat.Lunge", "lunge");
             public static readonly ModString MapEntityDamage = new ModString("Combat.MapEntityDamage", "map entity");
             public static readonly ModString MeleeDamage = new ModString("Combat.MeleeDamage", "melee");
