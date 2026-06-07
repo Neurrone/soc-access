@@ -8,7 +8,7 @@
 - [Actions Menu](actions-menu.md)
 - [Adventure Map](adventure-map.md)
 - [Scanner](scanner.md)
-- [Army Exchange](army-exchange.md)
+- [Troop Management](troop-management.md)
 - [Character Sheet and Trading](character-sheet-and-trading.md)
 - [Combat](combat.md)
 - [Mod settings](mod-settings.md)
