@@ -1,5 +1,6 @@
 using System;
 using System.IO;
+using System.Runtime.InteropServices;
 using BepInEx;
 using BepInEx.Logging;
 
@@ -7,9 +8,16 @@ namespace SongsOfConquestAccess.Speech
 {
     internal sealed class SpeechService : IDisposable
     {
+        [DllImport("kernel32.dll", SetLastError = true, CharSet = CharSet.Unicode)]
+        private static extern IntPtr LoadLibrary(string lpFileName);
+
+        [DllImport("kernel32.dll", SetLastError = true)]
+        private static extern bool FreeLibrary(IntPtr hModule);
+
         private readonly ManualLogSource _logger;
         private IntPtr _context = IntPtr.Zero;
         private IntPtr _backend = IntPtr.Zero;
+        private IntPtr _prismLibrary = IntPtr.Zero;
         private PrismNative.BackendFeatures _backendFeatures;
         private bool _initialized;
 
@@ -34,14 +42,26 @@ namespace SongsOfConquestAccess.Speech
 
             try
             {
-                _context = PrismNative.Init(IntPtr.Zero);
+                if (_prismLibrary == IntPtr.Zero)
+                {
+                    _prismLibrary = LoadLibrary(prismPath);
+                    if (_prismLibrary == IntPtr.Zero)
+                    {
+                        _logger.LogError("Failed to preload Prism.dll from: " + prismPath + " (Win32 error " + Marshal.GetLastWin32Error() + ")");
+                        return false;
+                    }
+                }
+
+                PrismNative.PrismConfig config = PrismNative.ConfigInit();
+                _context = PrismNative.Init(ref config);
                 if (_context == IntPtr.Zero)
                 {
                     _logger.LogError("Prism initialization failed: prism_init returned null");
+                    Dispose();
                     return false;
                 }
 
-                _backend = PrismNative.RegistryCreateBest(_context);
+                _backend = PrismNative.RegistryAcquireBest(_context);
                 if (_backend == IntPtr.Zero)
                 {
                     _logger.LogError("Prism initialization failed: no available speech backend");
@@ -183,6 +203,25 @@ namespace SongsOfConquestAccess.Speech
             _context = IntPtr.Zero;
             _backendFeatures = 0;
             _initialized = false;
+
+            if (_prismLibrary != IntPtr.Zero)
+            {
+                try
+                {
+                    if (!FreeLibrary(_prismLibrary))
+                    {
+                        _logger.LogWarning("Prism FreeLibrary failed with Win32 error " + Marshal.GetLastWin32Error());
+                    }
+                }
+                catch (Exception ex)
+                {
+                    _logger.LogWarning("Prism FreeLibrary failed: " + ex.Message);
+                }
+                finally
+                {
+                    _prismLibrary = IntPtr.Zero;
+                }
+            }
         }
 
         private static string FormatError(PrismNative.PrismError error)
