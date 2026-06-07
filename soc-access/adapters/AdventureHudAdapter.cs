@@ -1941,33 +1941,7 @@ namespace SongsOfConquestAccess.Adapters
 
         private string GetMapEntityName(IMapEntity entity)
         {
-            if (entity == null)
-            {
-                return string.Empty;
-            }
-
-            string customNameKey = string.Empty;
-            if (entity.TryGetCustomNameKey(out customNameKey))
-            {
-                string customName = Localize(customNameKey);
-                if (!string.IsNullOrWhiteSpace(customName))
-                {
-                    return customName;
-                }
-            }
-
-            string localizedName = Localize(entity.NameKey);
-            if (!string.IsNullOrWhiteSpace(localizedName))
-            {
-                return localizedName;
-            }
-
-            if (!string.IsNullOrWhiteSpace(entity.Name))
-            {
-                return entity.Name;
-            }
-
-            return entity.NameKey;
+            return AdventureMapEntityLabel.GetMapEntityName(Facade, SelectionHandler, LocalizationHandler, entity);
         }
 
         private static string FormatEnumName(string value)

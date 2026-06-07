@@ -24,6 +24,11 @@ msgctxt "Common.ListSeparator"
 msgid "{0}, {1}"
 msgstr ""
 
+#. Common.EssenceVariant
+msgctxt "Common.EssenceVariant"
+msgid "{0} ({1})"
+msgstr ""
+
 #. Common.NamePossessive
 msgctxt "Common.NamePossessive"
 msgid "{0}'s"
@@ -617,11 +622,6 @@ msgstr ""
 #. Actions.Activate
 msgctxt "Actions.Activate"
 msgid "Activate"
-msgstr ""
-
-#. Actions.ActionVariant
-msgctxt "Actions.ActionVariant"
-msgid "{0}, {1}"
 msgstr ""
 
 #. Actions.Cancel

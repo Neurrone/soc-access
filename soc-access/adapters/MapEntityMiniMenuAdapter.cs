@@ -371,7 +371,7 @@ namespace SongsOfConquestAccess.Adapters
                 return baseLabel;
             }
 
-            return ModText.Get(ModStrings.Actions.ActionVariant, baseLabel, essenceName);
+            return ModText.Get(ModStrings.Common.EssenceVariant, baseLabel, essenceName);
         }
 
         private string GetEssenceName(EssenceType essenceType)

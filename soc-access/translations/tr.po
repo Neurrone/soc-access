@@ -1115,10 +1115,10 @@ msgctxt "Actions.Activate"
 msgid "Activate"
 msgstr "Etkinleştir"
 
-#. Actions.ActionVariant
-msgctxt "Actions.ActionVariant"
-msgid "{0}, {1}"
-msgstr "{0}, {1}"
+#. Common.EssenceVariant
+msgctxt "Common.EssenceVariant"
+msgid "{0} ({1})"
+msgstr "{0} ({1})"
 
 #. Actions.Cancel
 msgctxt "Actions.Cancel"

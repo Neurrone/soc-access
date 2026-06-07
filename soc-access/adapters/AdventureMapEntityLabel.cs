@@ -34,28 +34,28 @@ namespace SongsOfConquestAccess.Adapters
                 string customName = Localize(localization, customNameKey);
                 if (!string.IsNullOrWhiteSpace(customName))
                 {
-                    return customName;
+                    return AddEssenceVariant(localization, entity, customName);
                 }
             }
 
             string preVisitName;
             if (TryGetPreVisitLabel(facade, selectionHandler, localization, entity, out preVisitName))
             {
-                return preVisitName;
+                return AddEssenceVariant(localization, entity, preVisitName);
             }
 
             string localizedName = Localize(localization, entity.NameKey);
             if (!string.IsNullOrWhiteSpace(localizedName))
             {
-                return localizedName;
+                return AddEssenceVariant(localization, entity, localizedName);
             }
 
             if (!string.IsNullOrWhiteSpace(entity.Name))
             {
-                return entity.Name;
+                return AddEssenceVariant(localization, entity, entity.Name);
             }
 
-            return entity.NameKey;
+            return AddEssenceVariant(localization, entity, entity.NameKey);
         }
 
         public static bool TryGetPreVisitLabel(
@@ -242,6 +242,57 @@ namespace SongsOfConquestAccess.Adapters
             catch
             {
                 return string.Empty;
+            }
+        }
+
+        private static string AddEssenceVariant(
+            ILocalizationHandler localization,
+            IMapEntity entity,
+            string baseName)
+        {
+            if (string.IsNullOrWhiteSpace(baseName) || entity == null)
+            {
+                return baseName ?? string.Empty;
+            }
+
+            EssenceType essence;
+            if (!TryGetSelectedEssenceVariant(entity, out essence))
+            {
+                return baseName;
+            }
+
+            string essenceName = GameText.Get(localization, "Units/Types/" + essence, essence.ToString());
+            return string.IsNullOrWhiteSpace(essenceName)
+                ? baseName
+                : ModText.Get(localization, ModStrings.Common.EssenceVariant, baseName, essenceName);
+        }
+
+        private static bool TryGetSelectedEssenceVariant(IMapEntity entity, out EssenceType essence)
+        {
+            essence = default(EssenceType);
+            if (entity == null)
+            {
+                return false;
+            }
+
+            try
+            {
+                ILevelComponent level;
+                if (!entity.TryGetComponent<ILevelComponent>(out level)
+                    || level == null
+                    || !level.IsEssenceOptions
+                    || level.Level <= 1)
+                {
+                    return false;
+                }
+
+                essence = level.GetDefinition(level.Level).AssociatedEssence;
+                return true;
+            }
+            catch (Exception exception)
+            {
+                SocAccessPlugin.Instance?.LogWarning("AdventureMapEntityLabel failed to read essence variant: " + exception.Message);
+                return false;
             }
         }
 

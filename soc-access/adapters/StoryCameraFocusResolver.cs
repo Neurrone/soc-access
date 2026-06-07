@@ -137,7 +137,7 @@ namespace SongsOfConquestAccess.Adapters
             IMapEntity entity = FindMeaningfulEntityAt(facade, tile, focusPoint);
             if (entity != null)
             {
-                return GetMapEntityName(entity, localizationHandler);
+                return GetMapEntityName(facade, entity, localizationHandler);
             }
 
             return ModText.Get(ModStrings.Events.StoryCameraFocusTile);
@@ -249,35 +249,18 @@ namespace SongsOfConquestAccess.Adapters
             }
         }
 
-        private static string GetMapEntityName(IMapEntity entity, ILocalizationHandler localizationHandler)
+        private static string GetMapEntityName(
+            IClientAdventureFacade facade,
+            IMapEntity entity,
+            ILocalizationHandler localizationHandler)
         {
             if (entity == null)
             {
                 return ModText.Get(ModStrings.Events.StoryCameraFocusMapEntity);
             }
 
-            string customNameKey;
-            if (entity.TryGetCustomNameKey(out customNameKey))
-            {
-                string customName = Localize(localizationHandler, customNameKey);
-                if (!string.IsNullOrWhiteSpace(customName))
-                {
-                    return customName;
-                }
-            }
-
-            string localizedName = Localize(localizationHandler, entity.NameKey);
-            if (!string.IsNullOrWhiteSpace(localizedName))
-            {
-                return localizedName;
-            }
-
-            if (!string.IsNullOrWhiteSpace(entity.Name))
-            {
-                return entity.Name;
-            }
-
-            return string.IsNullOrWhiteSpace(entity.NameKey) ? ModText.Get(ModStrings.Events.StoryCameraFocusMapEntity) : entity.NameKey;
+            string label = AdventureMapEntityLabel.GetMapEntityName(facade, null, localizationHandler, entity);
+            return string.IsNullOrWhiteSpace(label) ? ModText.Get(ModStrings.Events.StoryCameraFocusMapEntity) : label;
         }
 
         private static string Localize(ILocalizationHandler localizationHandler, string key)

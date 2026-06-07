@@ -8,6 +8,7 @@ namespace SongsOfConquestAccess.Localization
             public static readonly ModString ListFinal = new ModString("Common.ListFinal", "{0}, and {1}");
             public static readonly ModString ListPair = new ModString("Common.ListPair", "{0} and {1}");
             public static readonly ModString ListSeparator = new ModString("Common.ListSeparator", "{0}, {1}");
+            public static readonly ModString EssenceVariant = new ModString("Common.EssenceVariant", "{0} ({1})");
             public static readonly ModString NamePossessive = new ModString("Common.NamePossessive", "{0}'s");
             public static readonly ModString Quantity = new ModString("Common.Quantity", "quantity");
             public static readonly ModString ResourceAmount = new ModString("Common.ResourceAmount", "{0} {1}");
@@ -154,7 +155,6 @@ namespace SongsOfConquestAccess.Localization
         public static class Actions
         {
             public static readonly ModString Activate = new ModString("Actions.Activate", "Activate");
-            public static readonly ModString ActionVariant = new ModString("Actions.ActionVariant", "{0}, {1}");
             public static readonly ModString Cancel = new ModString("Actions.Cancel", "Cancel");
             public static readonly ModString CombatFocusActingTroop = new ModString("Actions.CombatFocusActingTroop", "Focus Acting Troop");
             public static readonly ModString CombatFocusTimeline = new ModString("Actions.CombatFocusTimeline", "Focus Timeline");
