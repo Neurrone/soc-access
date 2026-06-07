@@ -47,11 +47,11 @@ namespace SongsOfConquestAccess.Speech.Spatial
 
             if (tile.Troop != null)
             {
-                parts.Add(_adapter.DescribeTroopForSpeech(tile.Troop));
+                parts.Add(FormatAttackablePrefix(_adapter.DescribeTroopForSpeech(tile.Troop), tile.IsTroopAttackable));
             }
             else if (tile.Entity != null)
             {
-                parts.Add(_adapter.DescribeEntityForSpeech(tile.Entity));
+                parts.Add(FormatAttackablePrefix(_adapter.DescribeEntityForSpeech(tile.Entity), tile.IsEntityAttackable));
             }
 
             return string.Join(", ", parts.ToArray());
@@ -133,6 +133,16 @@ namespace SongsOfConquestAccess.Speech.Spatial
             {
                 parts.Add(text);
             }
+        }
+
+        internal static string FormatAttackablePrefix(string label, bool isAttackable)
+        {
+            if (!isAttackable || string.IsNullOrWhiteSpace(label))
+            {
+                return label;
+            }
+
+            return ModText.Get(ModStrings.Common.ListSeparator, ModText.Get(ModStrings.Scanner.Attackable), label);
         }
     }
 }

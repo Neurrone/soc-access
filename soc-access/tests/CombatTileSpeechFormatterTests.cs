@@ -24,6 +24,22 @@ namespace SongsOfConquestAccess.Tests
         }
 
         [TestMethod]
+        public void FormatAttackablePrefixAddsAttackableBeforeLabel()
+        {
+            string text = CombatTileSpeechFormatter.FormatAttackablePrefix("8 enemy Rats. 12 / 20 health", true);
+
+            Assert.AreEqual("Attackable, 8 enemy Rats. 12 / 20 health", text);
+        }
+
+        [TestMethod]
+        public void FormatAttackablePrefixLeavesNonAttackableLabelUnchanged()
+        {
+            string text = CombatTileSpeechFormatter.FormatAttackablePrefix("8 enemy Rats. 12 / 20 health", false);
+
+            Assert.AreEqual("8 enemy Rats. 12 / 20 health", text);
+        }
+
+        [TestMethod]
         public void InspectRangeIndicatorsFormatsAttackRangeWithoutTroopName()
         {
             string text = CombatInspectContext.FormatRangeIndicators(new HashSet<CombatRangeIndicator>

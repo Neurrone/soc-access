@@ -438,8 +438,10 @@ namespace SongsOfConquestAccess.Adapters
             tile.IsBlocked = IsBlocked(point);
             tile.Troop = GetTroopAt(point);
             tile.TroopId = tile.Troop != null ? tile.Troop.Id : -1;
+            tile.IsTroopAttackable = IsAttackable(tile.Troop);
             tile.Entity = GetAttackableEntityAt(point);
             tile.EntityId = tile.Entity != null ? tile.Entity.Id : -1;
+            tile.IsEntityAttackable = IsAttackable(tile.Entity);
             AddDangerousMapEffects(point, tile);
             tile.DecorativeFeature = GetDecorativeFeatureAt(point, tile.Entity);
             return tile;
@@ -2101,6 +2103,61 @@ namespace SongsOfConquestAccess.Adapters
             }
         }
 
+        private bool IsAttackable(IBattleTroopState troop)
+        {
+            try
+            {
+                IBattleTroopState current = GetCurrentTroop();
+                if (troop == null
+                    || current == null
+                    || _facade == null
+                    || _facade.Commands == null
+                    || _facade.Level == null
+                    || !IsLocalTurn()
+                    || !current.GetCanAttackOtherTroopAtAll(troop))
+                {
+                    return false;
+                }
+
+                return _facade.Commands.CanAttack(current.Id, troop.Position)
+                    || (IsMeleeOnly(current) && _facade.Level.AllEnemiesWithinMeleeReach(current).Contains(troop));
+            }
+            catch
+            {
+                return false;
+            }
+        }
+
+        private bool IsAttackable(IMapEntity entity)
+        {
+            try
+            {
+                IBattleTroopState current = GetCurrentTroop();
+                if (entity == null
+                    || current == null
+                    || _facade == null
+                    || _facade.Commands == null
+                    || _facade.Level == null
+                    || !IsLocalTurn()
+                    || !current.GetCanAttackMapEntityAtAll(entity))
+                {
+                    return false;
+                }
+
+                return _facade.Commands.CanAttack(current.Id, entity.Position)
+                    || (IsMeleeOnly(current) && _facade.Level.AllMapEntitiesWithinMeleeReach(current).Contains(entity));
+            }
+            catch
+            {
+                return false;
+            }
+        }
+
+        private static bool IsMeleeOnly(IBattleTroopState troop)
+        {
+            return troop != null && troop.GetCanAttackMelee() && !troop.GetCanAttackRanged();
+        }
+
         private int GetCurrentMovesLeft()
         {
             IBattleTroopState current = GetCurrentTroop();
@@ -3099,9 +3156,13 @@ namespace SongsOfConquestAccess.Adapters
 
         public int TroopId { get; set; } = -1;
 
+        public bool IsTroopAttackable { get; set; }
+
         public IMapEntity Entity { get; set; }
 
         public int EntityId { get; set; } = -1;
+
+        public bool IsEntityAttackable { get; set; }
 
         public List<string> MapEffects { get; private set; } = new List<string>();
 
