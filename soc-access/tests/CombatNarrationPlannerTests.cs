@@ -780,6 +780,36 @@ namespace SongsOfConquestAccess.Tests
             Assert.AreEqual("Rider uses Leap", leap.GetSpeechText());
         }
 
+        [TestMethod]
+        public void LeapTeleportNarratesAbilityThenDestination()
+        {
+            CombatNarrationPlanner planner = new CombatNarrationPlanner();
+            ActorRef piercers = new ActorRef(Troop(10, 2, "Piercers", 9), true);
+
+            planner.Enqueue(CombatNarrationItem.Create(
+                CombatNarrationItemKind.Ability,
+                new AbilityUsedEvent(
+                    piercers,
+                    new AbilityRef(TroopAbilityType.Leap, "Leap"),
+                    null,
+                    null),
+                10));
+            planner.Enqueue(CombatNarrationItem.Create(
+                CombatNarrationItemKind.Teleport,
+                new TeleportEvent(
+                    piercers,
+                    new Vector2Int(6, 4),
+                    new Vector2Int(1, 4),
+                    TeleportBattleTroopCommand.Source.Leap),
+                10));
+
+            IReadOnlyList<CombatNarrationItem> result = planner.Flush();
+
+            Assert.AreEqual(2, result.Count);
+            Assert.AreEqual("Piercers uses Leap", result[0].Event.GetSpeechText());
+            Assert.AreEqual("Piercers teleports to 1, 4", result[1].Event.GetSpeechText());
+        }
+
         private static BacteriaRef Bacteria(string name)
         {
             return Bacteria(name, 1);

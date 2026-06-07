@@ -905,20 +905,9 @@ namespace SongsOfConquestAccess.Adapters
             Type responseType = response.GetType();
             string fullName = responseType.FullName ?? string.Empty;
             bool isLegacyLeapResponse = fullName == "SongsOfConquest.Common.Battle.LeapCommand+Response";
-            bool isTeleportAbilityResponse = fullName == "SongsOfConquest.Common.Battle.TeleportAbilityCommand+Response";
-            if (!isLegacyLeapResponse && !isTeleportAbilityResponse)
+            if (!isLegacyLeapResponse)
             {
                 return false;
-            }
-
-            if (isTeleportAbilityResponse)
-            {
-                object source = GetFieldValue(response, "AbilitySource");
-                if (!(source is TeleportBattleTroopCommand.Source)
-                    || (TeleportBattleTroopCommand.Source)source != TeleportBattleTroopCommand.Source.Leap)
-                {
-                    return false;
-                }
             }
 
             object id = GetFieldValue(response, "TroopId");
@@ -943,7 +932,7 @@ namespace SongsOfConquestAccess.Adapters
 
         private static void EnqueueTeleport(TeleportBattleTroopCommand.Response response, CombatAdapter adapter)
         {
-            if (response.Entries == null || response.Source == TeleportBattleTroopCommand.Source.Leap)
+            if (response.Entries == null)
             {
                 return;
             }
