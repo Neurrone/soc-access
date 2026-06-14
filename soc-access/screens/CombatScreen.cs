@@ -12,6 +12,7 @@ using SongsOfConquest.Common.Battle;
 using SongsOfConquest.Common.Economy;
 using SongsOfConquest.Common.Gamestate;
 using SongsOfConquest.Common.Localization;
+using SongsOfConquest.Common.Spells;
 using SongsOfConquest.Utilities;
 using SongsOfConquestAccess.Adapters;
 using SongsOfConquestAccess.Buffers;
@@ -774,6 +775,7 @@ namespace SongsOfConquestAccess.Screens
                 IHumanBattleSpellController battleSpellController = TryResolve<IHumanBattleSpellController>(container);
                 MouseKeyboardHumanBattleSpellModule mouseKeyboardSpellInputModule = TryResolve<MouseKeyboardHumanBattleSpellModule>(container);
                 IBattleHudSignals battleHudSignals = TryResolve<IBattleHudSignals>(container);
+                ISpellsLookup spellsLookup = TryResolve<ISpellsLookup>(container);
                 ITroopAbilityUtility abilityUtility = TryResolve<ITroopAbilityUtility>(container);
                 object cartographyConverter = TryResolveByTypeName(container, "Lavapotion.Cartography.ICartographyConverter");
 
@@ -797,6 +799,7 @@ namespace SongsOfConquestAccess.Screens
                     battleSpellController,
                     mouseKeyboardSpellInputModule,
                     battleHudSignals,
+                    spellsLookup,
                     abilityUtility);
                 if (adapter.IsPresent())
                 {

@@ -3,6 +3,7 @@
 ## V0.7.1
 
 - Make the faction selector on the research screen accessible when playing in mixed factions mode
+- Fixed combat narration using untranslated spell, ability, and modifier names
 
 ## V0.7.0
 

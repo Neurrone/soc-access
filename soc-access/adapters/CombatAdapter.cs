@@ -76,6 +76,7 @@ namespace SongsOfConquestAccess.Adapters
         private readonly IHumanBattleSpellController _battleSpellController;
         private readonly MouseKeyboardHumanBattleSpellModule _mouseKeyboardSpellInputModule;
         private readonly IBattleHudSignals _battleHudSignals;
+        private readonly ISpellsLookup _spellsLookup;
         private readonly ITroopAbilityUtility _abilityUtility;
         private readonly MethodInfo _pointToWorldMethod;
         private readonly MethodInfo _primaryClickMethod;
@@ -118,6 +119,7 @@ namespace SongsOfConquestAccess.Adapters
                 Resolve<IHumanBattleSpellController>(GetContainer(installer)),
                 Resolve<MouseKeyboardHumanBattleSpellModule>(GetContainer(installer)),
                 Resolve<IBattleHudSignals>(GetContainer(installer)),
+                Resolve<ISpellsLookup>(GetContainer(installer)),
                 Resolve<ITroopAbilityUtility>(GetContainer(installer)))
         {
         }
@@ -142,6 +144,7 @@ namespace SongsOfConquestAccess.Adapters
             IHumanBattleSpellController battleSpellController,
             MouseKeyboardHumanBattleSpellModule mouseKeyboardSpellInputModule,
             IBattleHudSignals battleHudSignals,
+            ISpellsLookup spellsLookup,
             ITroopAbilityUtility abilityUtility)
         {
             _sourceKey = sourceKey;
@@ -163,6 +166,7 @@ namespace SongsOfConquestAccess.Adapters
             _battleSpellController = battleSpellController;
             _mouseKeyboardSpellInputModule = mouseKeyboardSpellInputModule;
             _battleHudSignals = battleHudSignals;
+            _spellsLookup = spellsLookup;
             _abilityUtility = abilityUtility;
             Hud = new BattleHudAdapter(container, facade, localization);
             _pointToWorldMethod = cartographyConverter != null
@@ -2429,14 +2433,19 @@ namespace SongsOfConquestAccess.Adapters
 
         public SpellRef CreateSpellRef(SpellTypes spellType, int tier)
         {
-            string name = LocalizeText("Spells/" + spellType);
+            string name = LocalizeSpellName(spellType);
             return new SpellRef(spellType, name, tier);
         }
 
         public AbilityRef CreateAbilityRef(TroopAbilityType abilityType)
         {
-            string name = LocalizeText("TroopAbilities/" + abilityType);
+            string name = LocalizeAbilityName(abilityType);
             return new AbilityRef(abilityType, name);
+        }
+
+        public string LocalizeModifierName(BacteriaModifierType modifierType)
+        {
+            return LocalizeText("Modifiers/" + modifierType.ToString().Replace("Troop", string.Empty));
         }
 
         public BacteriaRef CreateBacteriaRef(BacteriaReference bacteriaReference)
@@ -2788,6 +2797,42 @@ namespace SongsOfConquestAccess.Adapters
         public string LocalizeText(string key)
         {
             return Localize(key);
+        }
+
+        private string LocalizeSpellName(SpellTypes spellType)
+        {
+            try
+            {
+                ISpellDefinition definition = _spellsLookup != null ? _spellsLookup.GetSpellDefinition(spellType) : null;
+                string name = definition != null ? Localize(definition.NameKey) : string.Empty;
+                if (!string.IsNullOrWhiteSpace(name))
+                {
+                    return name;
+                }
+            }
+            catch
+            {
+            }
+
+            return LocalizeText("Spells/" + spellType);
+        }
+
+        private string LocalizeAbilityName(TroopAbilityType abilityType)
+        {
+            try
+            {
+                ITroopAbilityDefinition definition = _abilityUtility != null ? _abilityUtility.GetAbilityDefinition(abilityType) : null;
+                string name = definition != null ? Localize(definition.NameKey) : string.Empty;
+                if (!string.IsNullOrWhiteSpace(name))
+                {
+                    return name;
+                }
+            }
+            catch
+            {
+            }
+
+            return LocalizeText("TroopAbilities/" + abilityType);
         }
 
         private string GetMapEntityName(IMapEntity entity)

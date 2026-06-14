@@ -624,7 +624,7 @@ namespace SongsOfConquestAccess.Adapters
                     EnqueueBacteriaSummary(CombatNarrationItem.CreateBacteriaModifierSummary(
                         adapter.CreateBacteriaRef(bacteria),
                         adapter.CreateTroopRef(troop),
-                        CreateModifierChanges(group.Value),
+                        CreateModifierChanges(group.Value, adapter),
                         changeSet.TargetId),
                         adapter);
                 }
@@ -1303,7 +1303,7 @@ namespace SongsOfConquestAccess.Adapters
             return formatted;
         }
 
-        private static List<ModifierChange> CreateModifierChanges(IList<ModifierChangeSet.Change> changes)
+        private static List<ModifierChange> CreateModifierChanges(IList<ModifierChangeSet.Change> changes, CombatAdapter adapter)
         {
             List<ModifierChange> result = new List<ModifierChange>();
             if (changes == null)
@@ -1319,7 +1319,8 @@ namespace SongsOfConquestAccess.Adapters
                     continue;
                 }
 
-                result.Add(new ModifierChange(modifier.Type, modifier.ApplicationType, modifier.AmountToAdd));
+                string localizedName = adapter != null ? adapter.LocalizeModifierName(modifier.Type) : string.Empty;
+                result.Add(new ModifierChange(modifier.Type, modifier.ApplicationType, modifier.AmountToAdd, localizedName));
             }
 
             return result;

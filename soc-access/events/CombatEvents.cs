@@ -234,19 +234,26 @@ namespace SongsOfConquestAccess.Events.Combat
     internal sealed class ModifierChange
     {
         public ModifierChange(BacteriaModifierType modifierType, BacteriaModifierApplicationType applicationType, int amount)
+            : this(modifierType, applicationType, amount, string.Empty)
+        {
+        }
+
+        public ModifierChange(BacteriaModifierType modifierType, BacteriaModifierApplicationType applicationType, int amount, string localizedName)
         {
             ModifierType = modifierType;
             ApplicationType = applicationType;
             Amount = amount;
+            LocalizedName = localizedName ?? string.Empty;
         }
 
         public BacteriaModifierType ModifierType { get; private set; }
         public BacteriaModifierApplicationType ApplicationType { get; private set; }
         public int Amount { get; private set; }
+        public string LocalizedName { get; private set; }
 
         public string Format()
         {
-            string name = FormatModifierType(ModifierType);
+            string name = !string.IsNullOrWhiteSpace(LocalizedName) ? LocalizedName : FormatModifierType(ModifierType);
             string amount = (Amount > 0 ? "+" : string.Empty) + Amount;
             return ApplicationType == BacteriaModifierApplicationType.Percentage
                 ? name + " " + amount + "%"
