@@ -3,6 +3,7 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 using SongsOfConquest;
 using SongsOfConquest.Common.Bacterias;
 using SongsOfConquest.Common.Battle;
+using SongsOfConquest.Common.Battle.Bacterias;
 using SongsOfConquestAccess.Adapters;
 using SongsOfConquestAccess.Events;
 using SongsOfConquestAccess.Events.Combat;
@@ -490,6 +491,166 @@ namespace SongsOfConquestAccess.Tests
         }
 
         [TestMethod]
+        public void BacteriaModifierSummariesMergeAcrossQueueChanged()
+        {
+            CombatNarrationPlanner planner = new CombatNarrationPlanner();
+            CombatNarrationSnapshot snapshot = Snapshot(new[] { 12, 14, 16, 17, 20 }, new int[0]);
+            BacteriaRef inspiredFirst = Bacteria("Inspired", 1465, 63);
+            BacteriaRef inspiredSecond = Bacteria("Inspired", 1469, 63);
+
+            planner.EnqueueBacteriaSummary(
+                CombatNarrationItem.CreateBacteriaModifierSummary(
+                    inspiredFirst,
+                    TroopAt(14, 1, "Sheng Grenadier", 30, new Vector2Int(1, 5)),
+                    new[]
+                    {
+                        Modifier(BacteriaModifierType.TroopMeleeOffense, 5),
+                        Modifier(BacteriaModifierType.TroopRangedOffense, 5),
+                        Modifier(BacteriaModifierType.TroopInitiative, 5)
+                    },
+                    14),
+                snapshot);
+            planner.Enqueue(CombatNarrationItem.Direct(CombatNarrationItemKind.QueueChanged, new QueueChangedEvent()));
+            planner.EnqueueBacteriaSummary(
+                CombatNarrationItem.CreateBacteriaModifierSummary(
+                    inspiredSecond,
+                    TroopAt(16, 1, "Yi", 6, new Vector2Int(1, 6)),
+                    new[]
+                    {
+                        Modifier(BacteriaModifierType.TroopMeleeOffense, 5),
+                        Modifier(BacteriaModifierType.TroopRangedOffense, 5),
+                        Modifier(BacteriaModifierType.TroopInitiative, 5)
+                    },
+                    16),
+                snapshot);
+
+            IReadOnlyList<CombatNarrationItem> result = planner.Flush();
+
+            Assert.AreEqual(2, result.Count);
+            Assert.AreEqual("Inspired affects 30 Sheng Grenadier at 1.5, 5 and 6 Yi at 1, 6, melee offense +5, ranged offense +5, and initiative +5", result[0].Event.GetSpeechText());
+            Assert.IsInstanceOfType(result[1].Event, typeof(QueueChangedEvent));
+        }
+
+        [TestMethod]
+        public void FlushCondensesObservedFengMovePassiveTraitLogSequence()
+        {
+            CombatNarrationPlanner planner = new CombatNarrationPlanner();
+            CombatNarrationSnapshot snapshot = Snapshot(new[] { 12, 14, 16, 17, 20 }, new int[0]);
+            TroopRef feng = TroopAt(20, 1, "Feng", 5, new Vector2Int(2, 6));
+            TroopRef grenadier = TroopAt(14, 1, "Sheng Grenadier", 30, new Vector2Int(1, 5));
+            TroopRef yi = TroopAt(16, 1, "Yi", 6, new Vector2Int(1, 6));
+            BacteriaRef fortuneFirst = Bacteria("Fortune", 1461, 1721);
+            BacteriaRef fortuneSecond = Bacteria("Fortune", 1463, 1721);
+            BacteriaRef inspiredFirst = Bacteria("Inspired", 1465, 63);
+            BacteriaRef inspiredSecond = Bacteria("Inspired", 1469, 63);
+
+            planner.Enqueue(CombatNarrationItem.Create(
+                CombatNarrationItemKind.Move,
+                new TroopMovedEvent(new ActorRef(feng, true), new Vector2Int(3, 6), new Vector2Int(2, 6), null),
+                20));
+            planner.Enqueue(CombatNarrationItem.CreateBacteriaAddedMarker(fortuneFirst, 14));
+            planner.EnqueueBacteriaSummary(
+                CombatNarrationItem.CreateBacteriaModifierSummary(
+                    fortuneFirst,
+                    grenadier,
+                    new[] { Modifier(BacteriaModifierType.TroopBlessed, 1) },
+                    14),
+                snapshot);
+            planner.Enqueue(CombatNarrationItem.CreateBacteriaAddedMarker(fortuneSecond, 16));
+            planner.EnqueueBacteriaSummary(
+                CombatNarrationItem.CreateBacteriaModifierSummary(
+                    fortuneSecond,
+                    yi,
+                    new[] { Modifier(BacteriaModifierType.TroopBlessed, 1) },
+                    16),
+                snapshot);
+            planner.Enqueue(CombatNarrationItem.CreateBacteriaAddedMarker(inspiredFirst, 14));
+            planner.EnqueueBacteriaSummary(
+                CombatNarrationItem.CreateBacteriaModifierSummary(
+                    inspiredFirst,
+                    grenadier,
+                    new[]
+                    {
+                        Modifier(BacteriaModifierType.TroopMeleeOffense, 5),
+                        Modifier(BacteriaModifierType.TroopRangedOffense, 5),
+                        Modifier(BacteriaModifierType.TroopInitiative, 5)
+                    },
+                    14),
+                snapshot);
+            planner.Enqueue(CombatNarrationItem.Direct(CombatNarrationItemKind.QueueChanged, new QueueChangedEvent()));
+            planner.Enqueue(CombatNarrationItem.CreateBacteriaAddedMarker(inspiredSecond, 16));
+            planner.EnqueueBacteriaSummary(
+                CombatNarrationItem.CreateBacteriaModifierSummary(
+                    inspiredSecond,
+                    yi,
+                    new[]
+                    {
+                        Modifier(BacteriaModifierType.TroopMeleeOffense, 5),
+                        Modifier(BacteriaModifierType.TroopRangedOffense, 5),
+                        Modifier(BacteriaModifierType.TroopInitiative, 5)
+                    },
+                    16),
+                snapshot);
+
+            IReadOnlyList<CombatNarrationItem> result = planner.Flush();
+
+            Assert.AreEqual(4, result.Count);
+            Assert.AreEqual("Feng moves to 2, 6", result[0].Event.GetSpeechText());
+            Assert.AreEqual("Fortune affects 30 Sheng Grenadier at 1.5, 5 and 6 Yi at 1, 6, blessed +1", result[1].Event.GetSpeechText());
+            Assert.AreEqual("Inspired affects 30 Sheng Grenadier at 1.5, 5 and 6 Yi at 1, 6, melee offense +5, ranged offense +5, and initiative +5", result[2].Event.GetSpeechText());
+            Assert.IsInstanceOfType(result[3].Event, typeof(QueueChangedEvent));
+        }
+
+        [TestMethod]
+        public void FlushCondensesObservedFengMovePassiveTraitRemovalSequence()
+        {
+            CombatNarrationPlanner planner = new CombatNarrationPlanner();
+            CombatNarrationSnapshot snapshot = Snapshot(new[] { 12, 14, 16, 17, 20 }, new int[0]);
+            TroopRef feng = TroopAt(20, 1, "Feng", 5, new Vector2Int(2, 6));
+            TroopRef grenadier = TroopAt(14, 1, "Sheng Grenadier", 30, new Vector2Int(1, 5));
+            TroopRef yi = TroopAt(16, 1, "Yi", 6, new Vector2Int(1, 6));
+            BacteriaRef fortuneFirst = Bacteria("Fortune", 1461, 1721);
+            BacteriaRef fortuneSecond = Bacteria("Fortune", 1463, 1721);
+            BacteriaRef inspiredFirst = Bacteria("Inspired", 1465, 63);
+            BacteriaRef inspiredSecond = Bacteria("Inspired", 1469, 63);
+
+            planner.Enqueue(CombatNarrationItem.Create(
+                CombatNarrationItemKind.Move,
+                new TroopMovedEvent(new ActorRef(feng, true), new Vector2Int(3, 6), new Vector2Int(2, 6), null),
+                20));
+            planner.EnqueueBacteriaSummary(
+                CombatNarrationItem.CreateBacteriaRemovalSummary(fortuneFirst, grenadier, 14),
+                snapshot);
+            planner.EnqueueBacteriaSummary(
+                CombatNarrationItem.CreateBacteriaRemovalSummary(fortuneSecond, yi, 16),
+                snapshot);
+            planner.EnqueueBacteriaSummary(
+                CombatNarrationItem.CreateBacteriaRemovalSummary(inspiredFirst, grenadier, 14),
+                snapshot);
+            planner.Enqueue(CombatNarrationItem.Direct(CombatNarrationItemKind.QueueChanged, new QueueChangedEvent()));
+            planner.EnqueueBacteriaSummary(
+                CombatNarrationItem.CreateBacteriaRemovalSummary(inspiredSecond, yi, 16),
+                snapshot);
+
+            IReadOnlyList<CombatNarrationItem> result = planner.Flush();
+
+            Assert.AreEqual(4, result.Count);
+            Assert.AreEqual("Feng moves to 2, 6", result[0].Event.GetSpeechText());
+            Assert.AreEqual("Fortune removed from 30 Sheng Grenadier at 1.5, 5 and 6 Yi at 1, 6", result[1].Event.GetSpeechText());
+            Assert.AreEqual("Inspired removed from 30 Sheng Grenadier at 1.5, 5 and 6 Yi at 1, 6", result[2].Event.GetSpeechText());
+            Assert.IsInstanceOfType(result[3].Event, typeof(QueueChangedEvent));
+        }
+
+        [TestMethod]
+        public void CombatEventNarratorBatchesBacteriaAddAndModifierResponsesForSummaries()
+        {
+            Assert.IsTrue(CombatEventNarrator.ShouldBufferResponseTypeForBacteriaSummary(typeof(AddBattleBacteriaCommand.Response)));
+            Assert.IsTrue(CombatEventNarrator.ShouldBufferResponseTypeForBacteriaSummary(typeof(RemoveBattleBacteriaCommand.Response)));
+            Assert.IsTrue(CombatEventNarrator.ShouldBufferResponseTypeForBacteriaSummary(typeof(ChangeBattleBacteriaModifierCommand.Response)));
+            Assert.IsFalse(CombatEventNarrator.ShouldBufferResponseTypeForBacteriaSummary(typeof(QueueChangedEvent)));
+        }
+
+        [TestMethod]
         public void BacteriaSummaryDropsZeroCountTargets()
         {
             CombatNarrationPlanner planner = new CombatNarrationPlanner();
@@ -867,6 +1028,11 @@ namespace SongsOfConquestAccess.Tests
         private static TroopRef Troop(int troopId, int teamId, string name, int count)
         {
             return new TroopRef(troopId, teamId, 1, name, count, Vector2Int.zero);
+        }
+
+        private static TroopRef TroopAt(int troopId, int teamId, string name, int count, Vector2Int position)
+        {
+            return new TroopRef(troopId, teamId, 1, name, count, position);
         }
 
         private static DamageEvent Damage(TroopRef target, BacteriaRef bacteria)

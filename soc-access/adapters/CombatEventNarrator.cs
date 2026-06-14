@@ -30,7 +30,7 @@ namespace SongsOfConquestAccess.Adapters
         private const int BacteriaDiagnosticLogLimit = 200;
         private const int MapEntityCreationNarrationDiagnosticLogLimit = 100;
         private const int CombatNarrationTimingDiagnosticLogLimit = 400;
-        private const int CombatNarrationBatchFrames = 30;
+        private const int CombatNarrationBatchFrames = 15;
 
         private static readonly CombatNarrationPlanner Planner = new CombatNarrationPlanner();
         private static readonly Queue<string> SuppressedNativeNotifications = new Queue<string>();
@@ -70,6 +70,7 @@ namespace SongsOfConquestAccess.Adapters
                 bool isAbilityComplete = response is TroopAbilityActivationCompleteCommand.Response;
                 bool isEndTurnResponse = response is EndBattleTurnCommand.Response;
                 bool bufferForSpell = !isSpellResponse && ShouldBufferForSpellResponse(response, adapter);
+                bool bufferForBacteriaSummary = ShouldBufferForBacteriaSummary(response);
                 LogCombatNarrationTimingDiagnostic("response", DescribeResponse(response));
                 if (_abilityBatchActive && isEndTurnResponse)
                 {
@@ -100,7 +101,7 @@ namespace SongsOfConquestAccess.Adapters
                 {
                     ScheduleFlushPendingEvents();
                 }
-                else if (bufferForSpell || _flushPendingEventsScheduled)
+                else if (bufferForSpell || bufferForBacteriaSummary || _flushPendingEventsScheduled)
                 {
                     ScheduleFlushPendingEvents();
                 }
@@ -113,6 +114,18 @@ namespace SongsOfConquestAccess.Adapters
             {
                 SocAccessPlugin.Instance?.LogWarning("CombatEventNarrator failed to queue " + response.GetType().Name + ": " + exception.Message);
             }
+        }
+
+        internal static bool ShouldBufferForBacteriaSummary(ICommandResponse response)
+        {
+            return response != null && ShouldBufferResponseTypeForBacteriaSummary(response.GetType());
+        }
+
+        internal static bool ShouldBufferResponseTypeForBacteriaSummary(Type responseType)
+        {
+            return responseType == typeof(AddBattleBacteriaCommand.Response)
+                || responseType == typeof(RemoveBattleBacteriaCommand.Response)
+                || responseType == typeof(ChangeBattleBacteriaModifierCommand.Response);
         }
 
         public static void AnnounceNativeNotification(string localizedText)

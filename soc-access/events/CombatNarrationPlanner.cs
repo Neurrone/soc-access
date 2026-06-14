@@ -448,7 +448,8 @@ namespace SongsOfConquestAccess.Events
                     return existing;
                 }
 
-                if (existing.Kind == CombatNarrationItemKind.BacteriaAdded)
+                if (existing.Kind == CombatNarrationItemKind.BacteriaAdded
+                    || existing.Kind == CombatNarrationItemKind.QueueChanged)
                 {
                     continue;
                 }
