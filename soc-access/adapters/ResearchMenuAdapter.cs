@@ -6,6 +6,7 @@ using SongsOfConquest.Client.Adventure.UI;
 using SongsOfConquest.Client.Gamestate;
 using SongsOfConquest.Client.Menu.Tooltip;
 using SongsOfConquest.Client.UI;
+using SongsOfConquest.Common;
 using SongsOfConquest.Common.Details;
 using SongsOfConquest.Common.GameActions;
 using SongsOfConquest.Common.Gamestate.Facade;
@@ -33,7 +34,11 @@ namespace SongsOfConquestAccess.Adapters
         private static readonly FieldInfo BuildingsTabGroupField = AccessTools.Field(typeof(ResearchMenu), "_buildingsTabGroup");
         private static readonly FieldInfo CategoriesField = AccessTools.Field(typeof(ResearchMenu), "_categories");
         private static readonly FieldInfo FacadeField = AccessTools.Field(typeof(ResearchMenu), "_facade");
+        private static readonly FieldInfo FactionLookupField = AccessTools.Field(typeof(ResearchMenu), "_factionLookup");
         private static readonly FieldInfo LocalizationField = AccessTools.Field(typeof(ResearchMenu), "_localizationHandler");
+        private static readonly FieldInfo MixedFactionsContainerField = AccessTools.Field(typeof(ResearchMenu), "_mixedFactionsContainer");
+        private static readonly FieldInfo MixedFactionButtonsField = AccessTools.Field(typeof(ResearchMenu), "_mixedFactionButtons");
+        private static readonly FieldInfo SelectedFactionIndexField = AccessTools.Field(typeof(ResearchMenu), "_selectedFactionIndex");
         private static readonly FieldInfo BuildingTabNameField = AccessTools.Field(typeof(ResearchMenuBuildingTabButton), "_name");
         private static readonly FieldInfo BuildingTabDescriptionField = AccessTools.Field(typeof(ResearchMenuBuildingTabButton), "_description");
         private static readonly FieldInfo BuildingTabMapEntityIdField = AccessTools.Field(typeof(ResearchMenuBuildingTabButton), "_mapEntityId");
@@ -79,6 +84,63 @@ namespace SongsOfConquestAccess.Adapters
         public bool ActivateTutorial()
         {
             return NativeSelectionUtility.Click(GetTutorialButton());
+        }
+
+        public bool HasFactionSelector()
+        {
+            return IsVisible(GetField<RectTransform>(_menu, MixedFactionsContainerField) as Component)
+                && GetFactions().Count > 0;
+        }
+
+        public IReadOnlyList<FactionItem> GetFactions()
+        {
+            List<FactionItem> items = new List<FactionItem>();
+            UIButton[] buttons = GetFactionButtons();
+            IFactionLookup factionLookup = GetField<IFactionLookup>(_menu, FactionLookupField);
+            int selectedFactionIndex = SelectedFactionIndex;
+            for (int i = 0; i < buttons.Length; i++)
+            {
+                UIButton button = buttons[i];
+                if (!IsVisible(button as Component))
+                {
+                    continue;
+                }
+
+                int factionIndex = i + 1;
+                IFactionDefinition faction = factionLookup != null ? factionLookup.GetFaction(factionIndex) : null;
+                string label = Localize(faction != null ? faction.NameKey : null, string.Empty);
+                if (string.IsNullOrWhiteSpace(label))
+                {
+                    continue;
+                }
+
+                items.Add(new FactionItem(
+                    factionIndex,
+                    label,
+                    factionIndex == selectedFactionIndex,
+                    () => FocusFaction(factionIndex, button),
+                    () => ActivateFaction(factionIndex, button)));
+            }
+
+            return items;
+        }
+
+        public int SelectedFactionMenuIndex
+        {
+            get
+            {
+                int selectedFactionIndex = SelectedFactionIndex;
+                IReadOnlyList<FactionItem> factions = GetFactions();
+                for (int i = 0; i < factions.Count; i++)
+                {
+                    if (factions[i].FactionIndex == selectedFactionIndex)
+                    {
+                        return i;
+                    }
+                }
+
+                return 0;
+            }
         }
 
         public IReadOnlyList<BuildingItem> GetBuildings()
@@ -187,6 +249,25 @@ namespace SongsOfConquestAccess.Adapters
         private bool ActivateBuilding(UIButton button)
         {
             return ClickBuilding(button);
+        }
+
+        private bool FocusFaction(int factionIndex, UIButton button)
+        {
+            HideNativeTooltip();
+            NativeSelectionUtility.Select(button as Component);
+            if (SelectedFactionIndex == factionIndex)
+            {
+                return true;
+            }
+
+            return NativeSelectionUtility.Click(button);
+        }
+
+        private bool ActivateFaction(int factionIndex, UIButton button)
+        {
+            HideNativeTooltip();
+            NativeSelectionUtility.Select(button as Component);
+            return SelectedFactionIndex == factionIndex || NativeSelectionUtility.Click(button);
         }
 
         private static bool ClickBuilding(UIButton button)
@@ -315,6 +396,21 @@ namespace SongsOfConquestAccess.Adapters
                 : new ResearchMenuStackButton[0];
         }
 
+        private int SelectedFactionIndex
+        {
+            get
+            {
+                return _menu != null && SelectedFactionIndexField != null
+                    ? (int)SelectedFactionIndexField.GetValue(_menu)
+                    : 0;
+            }
+        }
+
+        private UIButton[] GetFactionButtons()
+        {
+            return GetField<UIButton[]>(_menu, MixedFactionButtonsField) ?? new UIButton[0];
+        }
+
         private IReadOnlyList<ResearchMenuBuildingTabButton> GetTabButtons()
         {
             return GetField<List<ResearchMenuBuildingTabButton>>(_menu, AllTabButtonsField)
@@ -361,6 +457,24 @@ namespace SongsOfConquestAccess.Adapters
         private static T GetField<T>(object owner, FieldInfo field) where T : class
         {
             return owner != null && field != null ? field.GetValue(owner) as T : null;
+        }
+
+        internal sealed class FactionItem
+        {
+            public FactionItem(int factionIndex, string label, bool isSelected, Func<bool> focus, Func<bool> activate)
+            {
+                FactionIndex = factionIndex;
+                Label = label ?? string.Empty;
+                IsSelected = isSelected;
+                Focus = focus;
+                Activate = activate;
+            }
+
+            public int FactionIndex { get; private set; }
+            public string Label { get; private set; }
+            public bool IsSelected { get; private set; }
+            public Func<bool> Focus { get; private set; }
+            public Func<bool> Activate { get; private set; }
         }
 
         internal sealed class BuildingItem

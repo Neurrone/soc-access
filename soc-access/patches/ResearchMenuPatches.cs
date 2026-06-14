@@ -26,5 +26,12 @@ namespace SongsOfConquestAccess
         {
             SocAccessPlugin.Instance?.ScreenDetector?.OnResearchMenuChanged(__instance);
         }
+
+        [HarmonyPatch(typeof(ResearchMenu), "HandleFactionButtonClicked", new[] { typeof(int), typeof(bool) })]
+        [HarmonyPostfix]
+        private static void ResearchMenuHandleFactionButtonClickedPostfix(ResearchMenu __instance)
+        {
+            SocAccessPlugin.Instance?.ScreenDetector?.OnResearchMenuChanged(__instance);
+        }
     }
 }

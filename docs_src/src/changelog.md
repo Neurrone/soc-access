@@ -1,5 +1,9 @@
 # Changelog
 
+## V0.7.1
+
+- Make the faction selector on the research screen accessible when playing in mixed factions mode
+
 ## V0.7.0
 
 - Updates to support the Yulan DLC:

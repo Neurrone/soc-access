@@ -12,6 +12,9 @@ namespace SongsOfConquestAccess.Screens
 {
     internal sealed class ResearchScreen : Screen
     {
+        private const string BuildingsMenuId = "research-buildings";
+        private const string FactionsMenuId = "research-factions";
+
         private readonly ResearchMenuAdapter _adapter;
         private Action<OnResearchPurchasedPayload> _researchPurchasedHandler;
 
@@ -66,15 +69,23 @@ namespace SongsOfConquestAccess.Screens
             }
 
             int focusedIndex = RootWidget != null ? RootWidget.FocusedIndex : -1;
+            string focusedChildId = GetFocusedChildId(focusedIndex);
             int focusedMenuIndex = GetFocusedMenuIndex(focusedIndex);
+            string focusedMenuItemId = GetFocusedMenuItemId(focusedIndex);
 
             RootWidget = BuildRoot(_adapter);
-            RootWidget?.SetFocusByIndexSilently(focusedIndex);
-
-            MenuWidget menu = RootWidget.GetChildAt(focusedIndex) as MenuWidget;
-            if (menu != null && menu.Id != "research-buildings" && focusedMenuIndex >= 0)
+            if (string.IsNullOrWhiteSpace(focusedChildId) || !RootWidget.SetFocusedChildById(focusedChildId))
             {
-                menu.SetFocusByIndexSilently(focusedMenuIndex);
+                RootWidget?.SetFocusByIndexSilently(focusedIndex);
+            }
+
+            MenuWidget menu = RootWidget?.FocusedChild as MenuWidget;
+            if (menu != null && menu.Id != BuildingsMenuId)
+            {
+                if (string.IsNullOrWhiteSpace(focusedMenuItemId) || !menu.SetFocusedItemById(focusedMenuItemId))
+                {
+                    menu.SetFocusByIndexSilently(focusedMenuIndex);
+                }
             }
         }
 
@@ -122,6 +133,18 @@ namespace SongsOfConquestAccess.Screens
             return menu != null ? menu.FocusedIndex : -1;
         }
 
+        private string GetFocusedChildId(int focusedIndex)
+        {
+            Widget widget = RootWidget != null ? RootWidget.GetChildAt(focusedIndex) : null;
+            return widget != null ? widget.Id : null;
+        }
+
+        private string GetFocusedMenuItemId(int focusedIndex)
+        {
+            MenuWidget menu = RootWidget != null ? RootWidget.GetChildAt(focusedIndex) as MenuWidget : null;
+            return menu != null && menu.FocusedItem != null ? menu.FocusedItem.Id : null;
+        }
+
         private static ContainerWidget BuildRoot(ResearchMenuAdapter adapter)
         {
             ContainerWidget root = new ContainerWidget("research", GameText.Get("Adventure/KingdomResearchOverview/Header", string.Empty));
@@ -138,14 +161,43 @@ namespace SongsOfConquestAccess.Screens
                 adapter.IsTutorialButtonVisible,
                 adapter.IsTutorialButtonVisible));
 
+            if (adapter.HasFactionSelector())
+            {
+                root.AddChild(BuildFactionMenu(adapter));
+            }
+
             root.AddChild(BuildBuildingMenu(adapter));
             AddCategoryMenus(root, adapter);
             return root;
         }
 
+        private static MenuWidget BuildFactionMenu(ResearchMenuAdapter adapter)
+        {
+            MenuWidget menu = new MenuWidget(FactionsMenuId, ModText.Get(ModStrings.UI.ColumnFaction));
+            IReadOnlyList<ResearchMenuAdapter.FactionItem> factions = adapter.GetFactions();
+            for (int i = 0; i < factions.Count; i++)
+            {
+                ResearchMenuAdapter.FactionItem faction = factions[i];
+                menu.AddItem(new MenuItemWidget(
+                    "research-faction-" + faction.FactionIndex,
+                    () => faction.Label,
+                    () => faction.IsSelected ? ModText.Get(ModStrings.UI.Selected) : string.Empty,
+                    faction.Activate,
+                    () => faction.Focus(),
+                    () => true));
+            }
+
+            if (factions.Count > 0)
+            {
+                menu.SetFocusByIndexSilently(adapter.SelectedFactionMenuIndex);
+            }
+
+            return menu;
+        }
+
         private static MenuWidget BuildBuildingMenu(ResearchMenuAdapter adapter)
         {
-            MenuWidget menu = new MenuWidget("research-buildings", string.Empty);
+            MenuWidget menu = new MenuWidget(BuildingsMenuId, string.Empty);
             IReadOnlyList<ResearchMenuAdapter.BuildingItem> buildings = adapter.GetBuildings();
             for (int i = 0; i < buildings.Count; i++)
             {
