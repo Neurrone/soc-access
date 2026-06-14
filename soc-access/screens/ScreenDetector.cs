@@ -1983,9 +1983,34 @@ namespace SongsOfConquestAccess.Screens
 
         public void OnAdventureMapReady()
         {
+            Push(BuildAdventureMapScreen("adventure map ready"), "adventure map ready");
+        }
+
+        private void EnsureAdventureMapBaseScreen(string reason)
+        {
+            if (_screenManager.Contains<AdventureMapScreen>())
+            {
+                return;
+            }
+
+            PushBottom(BuildAdventureMapScreen(reason), reason + " adventure map base");
+        }
+
+        private AdventureMapScreen BuildAdventureMapScreen(string reason)
+        {
             AdventureMapRevealedRegistry revealedRegistry = GetAdventureMapRevealedRegistry();
             AdventureMapAdapter adapter = new AdventureMapAdapter(_adventureViewInstaller, revealedRegistry);
-            AdventureMapEventListener eventListener = adapter.IsPresent()
+            string readinessDiagnostic = adapter.GetReadinessDiagnostic();
+            if (readinessDiagnostic != null)
+            {
+                SocAccessPlugin.Instance?.LogWarning(
+                    "ScreenDetector "
+                    + reason
+                    + " adventure map adapter is not present: "
+                    + readinessDiagnostic);
+            }
+
+            AdventureMapEventListener eventListener = readinessDiagnostic == null
                 ? new AdventureMapEventListener(
                     adapter.Facade,
                     adapter.SelectionHandler,
@@ -1994,7 +2019,7 @@ namespace SongsOfConquestAccess.Screens
                     adapter.FogManager,
                     revealedRegistry)
                 : null;
-            Push(new AdventureMapScreen(adapter, eventListener), "adventure map ready");
+            return new AdventureMapScreen(adapter, eventListener);
         }
 
         public void OnAdventureMapClosed()
@@ -2109,6 +2134,18 @@ namespace SongsOfConquestAccess.Screens
             // ClaimMenuScreen is already top when PostBattleMenu.Hide runs, so this
             // must remove the victory screen from below the claim menu.
             _screenManager.Remove<PostBattleResultScreen>("post battle result closed");
+
+            if (_screenManager.Contains<PostAdventureResultScreen>() || _screenManager.Contains<PostAdventureStatsScreen>())
+            {
+                return;
+            }
+
+            // Returning from manual combat can report SceneLoaderState.None before
+            // every adventure dependency is ready, causing the normal map creation
+            // hook to reject the screen. Once post-battle closes, the native battle
+            // menu has completed and any follow-up overlays, such as claim or story
+            // menus, should sit above the adventure map base screen.
+            EnsureAdventureMapBaseScreen("post battle result closed");
         }
 
         public void OnPostAdventureResultReady(PostAdventureMenu menu)
@@ -2899,6 +2936,29 @@ namespace SongsOfConquestAccess.Screens
             }
 
             _screenManager.PushBelowTop(screen, reason);
+            return true;
+        }
+
+        private bool PushBottom(Screen screen, string reason)
+        {
+            if (screen == null)
+            {
+                SocAccessPlugin.Instance?.LogWarning("ScreenDetector ignored " + reason + " because no screen could be built");
+                return false;
+            }
+
+            if (!screen.IsPresent())
+            {
+                SocAccessPlugin.Instance?.LogWarning(
+                    "ScreenDetector ignored "
+                    + reason
+                    + " because "
+                    + screen.GetType().Name
+                    + " is not present");
+                return false;
+            }
+
+            _screenManager.PushBottom(screen, reason);
             return true;
         }
 

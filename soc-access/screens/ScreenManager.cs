@@ -117,6 +117,26 @@ namespace SongsOfConquestAccess.Screens
             ApplyVisibleReviewBuffers();
         }
 
+        public void PushBottom(Screen screen, string reason)
+        {
+            if (screen == null)
+            {
+                return;
+            }
+
+            if (_stack.Count == 0)
+            {
+                Push(screen, reason);
+                return;
+            }
+
+            // Base screens can be restored below native follow-up overlays such
+            // as claim or story menus. Do not disturb the focused top screen.
+            _stack.Insert(0, screen);
+            screen.OnPush();
+            ApplyVisibleReviewBuffers();
+        }
+
         public bool Pop<TScreen>(string reason) where TScreen : Screen
         {
             if (_stack.Count == 0)

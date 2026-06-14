@@ -6,6 +6,7 @@
 - Fixed combat narration using untranslated spell, ability, and modifier names
 - Fixed combat grid tooltips lingering after combat ends or while loading another game. This was causing the game to hang if loading a game from the combat screen
 - Group announcements of effects caused by aura buffs like fortune together, instead of announcing it individually per stack
+- Try fixing edge cases where if combat ends in story text or level ups, the adventure map screen did not get initialized
 
 ## V0.7.0
 
