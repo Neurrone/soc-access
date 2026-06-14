@@ -172,6 +172,12 @@ namespace SongsOfConquestAccess.Adapters
             CapturedWielderEssence.Clear();
         }
 
+        public static void FlushPendingEventsForCombatEnd()
+        {
+            _abilityBatchActive = false;
+            FlushPendingEventsImmediately("combat_ended");
+        }
+
         public static void SetActiveAdapter(CombatAdapter adapter)
         {
             _activeAdapter = adapter;

@@ -1067,6 +1067,7 @@ namespace SongsOfConquestAccess.Adapters
 
         public void ClearNativeTooltip()
         {
+            NativeTooltipUtility.HideTooltip();
             _tooltipUtility?.ClearSpecific();
             _attackPreviewHandler?.Hide();
         }

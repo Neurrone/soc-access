@@ -2065,16 +2065,23 @@ namespace SongsOfConquestAccess.Screens
             _screenManager.Pop<SpellbookScreen>("spellbook closed");
         }
 
-        public void OnPostBattleResultOpening()
+        public void OnCombatEnded()
         {
             _battleSceneInstaller = null;
             if (_screenManager.Contains<CombatScreen>())
             {
-                _screenManager.Remove<CombatScreen>("post battle result opening");
-                SocAccessPlugin.Instance?.LogInfo("ScreenDetector removed CombatScreen before post battle result");
+                _screenManager.Remove<CombatScreen>("combat ended");
+                SocAccessPlugin.Instance?.LogInfo("ScreenDetector removed CombatScreen when combat ended");
             }
 
+            CombatEventNarrator.FlushPendingEventsForCombatEnd();
             CombatEventNarrator.Reset();
+        }
+
+        public void OnLoadingScreenOpening(LoadingScreenMenu menu)
+        {
+            NativeTooltipUtility.HideTooltip();
+            _screenManager.Clear();
         }
 
         public void OnPostBattleResultReady(AdventureBattleMenu battleMenu)

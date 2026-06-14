@@ -4,6 +4,7 @@
 
 - Make the faction selector on the research screen accessible when playing in mixed factions mode
 - Fixed combat narration using untranslated spell, ability, and modifier names
+- Fixed combat grid tooltips lingering after combat ends or while loading another game. This was causing the game to hang if loading a game from the combat screen
 
 ## V0.7.0
 

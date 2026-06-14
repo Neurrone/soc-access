@@ -6,6 +6,13 @@ namespace SongsOfConquestAccess
     [HarmonyPatch]
     internal static class LoadingScreenPatches
     {
+        [HarmonyPatch(typeof(LoadingScreenMenu), "Initialize")]
+        [HarmonyPrefix]
+        private static void InitializePrefix(LoadingScreenMenu __instance)
+        {
+            SocAccessPlugin.Instance?.ScreenDetector?.OnLoadingScreenOpening(__instance);
+        }
+
         [HarmonyPatch(typeof(LoadingScreenMenu), "HandleWaitForFinalizationEntered")]
         [HarmonyPostfix]
         private static void HandleWaitForFinalizationEnteredPostfix(LoadingScreenMenu __instance)

@@ -57,6 +57,10 @@ namespace SongsOfConquestAccess
         private static void ClientBattleCommandsFacadeOnResponseExecutedPrefix(ICommandResponse r)
         {
             CombatEventNarrator.HandleResponse(r);
+            if (r is BattleResultCommand.Response)
+            {
+                SocAccessPlugin.Instance?.ScreenDetector?.OnCombatEnded();
+            }
         }
 
         private static void AnnounceSpellCancelledIfTargeting(HumanBattleSpellController controller)
@@ -97,13 +101,6 @@ namespace SongsOfConquestAccess
             // Effect details, such as Momentum stat changes, are read from the
             // structured bacteria modifier events instead.
             CombatEventNarrator.NotifyBacteriaAddedStarted(troopId, localizedText);
-        }
-
-        [HarmonyPatch(typeof(AdventureBattleMenu), "Open", new[] { typeof(IBattleResult) })]
-        [HarmonyPrefix]
-        private static void AdventureBattleMenuOpenPostBattlePrefix()
-        {
-            SocAccessPlugin.Instance?.ScreenDetector?.OnPostBattleResultOpening();
         }
 
         [HarmonyPatch(typeof(AdventureBattleMenu), "Open", new[] { typeof(IBattleResult) })]
