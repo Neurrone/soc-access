@@ -674,6 +674,11 @@ msgctxt "Actions.CombatPreviousRelevantTile"
 msgid "Previous Relevant Combat Tile"
 msgstr ""
 
+#. Actions.Dismiss
+msgctxt "Actions.Dismiss"
+msgid "Dismiss"
+msgstr ""
+
 #. Actions.FirstBufferLine
 msgctxt "Actions.FirstBufferLine"
 msgid "First Buffer Line"
@@ -994,6 +999,11 @@ msgctxt "Bookmarks.NoBookmark"
 msgid "No bookmark"
 msgstr ""
 
+#. Combat.AbilityCancelled
+msgctxt "Combat.AbilityCancelled"
+msgid "Ability cancelled"
+msgstr ""
+
 #. Combat.AbilityUsed
 msgctxt "Combat.AbilityUsed"
 msgid "{0} uses {1}"
@@ -1292,6 +1302,11 @@ msgstr ""
 #. Combat.Spearwall
 msgctxt "Combat.Spearwall"
 msgid "spearwall"
+msgstr ""
+
+#. Combat.SpellCancelled
+msgctxt "Combat.SpellCancelled"
+msgid "Spell cancelled"
 msgstr ""
 
 #. Combat.SpellDamage

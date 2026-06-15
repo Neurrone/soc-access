@@ -2890,3 +2890,18 @@ msgstr "購入"
 msgctxt "Screens.Buyback"
 msgid "Buyback"
 msgstr "買い戻し"
+
+#. Actions.Dismiss
+msgctxt "Actions.Dismiss"
+msgid "Dismiss"
+msgstr "閉じる"
+
+#. Combat.AbilityCancelled
+msgctxt "Combat.AbilityCancelled"
+msgid "Ability cancelled"
+msgstr "アビリティをキャンセルしました"
+
+#. Combat.SpellCancelled
+msgctxt "Combat.SpellCancelled"
+msgid "Spell cancelled"
+msgstr "呪文をキャンセルしました"

@@ -798,14 +798,14 @@ namespace SongsOfConquestAccess.Adapters
                 (Action<TroopAbilityTargeting>)Delegate.Remove(_battleHudSignals.OnBeginAbilityTargeting, handler);
         }
 
-        public void AttachAbilityTargetingEnd(Action handler)
+        public void AttachAbilityTargetingEnd(Action<bool> handler)
         {
             if (_battleHudSignals == null || handler == null || _endAbilityTargetingHandler != null)
             {
                 return;
             }
 
-            _endAbilityTargetingHandler = _ => handler();
+            _endAbilityTargetingHandler = handler;
             _battleHudSignals.OnEndAbilityTargeting =
                 (Action<bool>)Delegate.Combine(_battleHudSignals.OnEndAbilityTargeting, _endAbilityTargetingHandler);
         }

@@ -686,14 +686,12 @@ namespace SongsOfConquestAccess.Adapters
             {
                 return new Tooltip(
                     () => new[] { GetNotificationLabel(index) },
-                    null,
-                    new[] { new TooltipAction("Dismiss", () => DismissNotification(index)) });
+                    null);
             }
 
             return new Tooltip(
                 () => tooltip.TextLines,
-                tooltip.VisualMetadata,
-                new[] { new TooltipAction("Dismiss", () => DismissNotification(index)) });
+                tooltip.VisualMetadata);
         }
 
         public bool DismissNotification(int index)

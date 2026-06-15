@@ -3010,3 +3010,18 @@ msgstr "Acheter"
 msgctxt "Screens.Buyback"
 msgid "Buyback"
 msgstr "Rachat"
+
+#. Actions.Dismiss
+msgctxt "Actions.Dismiss"
+msgid "Dismiss"
+msgstr "Ignorer"
+
+#. Combat.AbilityCancelled
+msgctxt "Combat.AbilityCancelled"
+msgid "Ability cancelled"
+msgstr "Capacité annulée"
+
+#. Combat.SpellCancelled
+msgctxt "Combat.SpellCancelled"
+msgid "Spell cancelled"
+msgstr "Sort annulé"

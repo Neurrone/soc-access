@@ -165,6 +165,7 @@ namespace SongsOfConquestAccess.Localization
             public static readonly ModString CombatPreviousActingTroop = new ModString("Actions.CombatPreviousActingTroop", "Previous Acting Troop");
             public static readonly ModString CombatPreviousEnemyTroop = new ModString("Actions.CombatPreviousEnemyTroop", "Previous Enemy Troop");
             public static readonly ModString CombatPreviousRelevantTile = new ModString("Actions.CombatPreviousRelevantTile", "Previous Relevant Combat Tile");
+            public static readonly ModString Dismiss = new ModString("Actions.Dismiss", "Dismiss");
             public static readonly ModString FirstBufferLine = new ModString("Actions.FirstBufferLine", "First Buffer Line");
             public static readonly ModString FirstMenuItem = new ModString("Actions.FirstMenuItem", "First Menu Item");
             public static readonly ModString FirstRow = new ModString("Actions.FirstRow", "First Row");
@@ -237,6 +238,7 @@ namespace SongsOfConquestAccess.Localization
 
         public static class Combat
         {
+            public static readonly ModString AbilityCancelled = new ModString("Combat.AbilityCancelled", "Ability cancelled");
             public static readonly ModString AbilityUsed = new ModString("Combat.AbilityUsed", "{0} uses {1}");
             public static readonly ModString Affects = new ModString("Combat.Affects", "{0} affects {1}");
             public static readonly ModString Appears = new ModString("Combat.Appears", "{0} appears");
@@ -297,6 +299,7 @@ namespace SongsOfConquestAccess.Localization
             public static readonly ModString RemovedFrom = new ModString("Combat.RemovedFrom", "{0} removed from {1}");
             public static readonly ModString Retaliation = new ModString("Combat.Retaliation", "retaliation");
             public static readonly ModString Spearwall = new ModString("Combat.Spearwall", "spearwall");
+            public static readonly ModString SpellCancelled = new ModString("Combat.SpellCancelled", "Spell cancelled");
             public static readonly ModString SpellDamage = new ModString("Combat.SpellDamage", "spell");
             public static readonly ModString Splash = new ModString("Combat.Splash", "splash");
             public static readonly ModString Summoned = new ModString("Combat.Summoned", "{0} summoned");

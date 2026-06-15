@@ -2890,3 +2890,18 @@ msgstr "구매"
 msgctxt "Screens.Buyback"
 msgid "Buyback"
 msgstr "재구매"
+
+#. Actions.Dismiss
+msgctxt "Actions.Dismiss"
+msgid "Dismiss"
+msgstr "닫기"
+
+#. Combat.AbilityCancelled
+msgctxt "Combat.AbilityCancelled"
+msgid "Ability cancelled"
+msgstr "능력이 취소됨"
+
+#. Combat.SpellCancelled
+msgctxt "Combat.SpellCancelled"
+msgid "Spell cancelled"
+msgstr "주문이 취소됨"

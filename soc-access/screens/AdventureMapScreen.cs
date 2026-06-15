@@ -951,10 +951,19 @@ namespace SongsOfConquestAccess.Screens
                     () => adapter.ClickNotification(capturedIndex),
                     () => adapter.FocusNotification(capturedIndex),
                     () => adapter.IsNotificationVisible(capturedIndex),
-                    () => adapter.GetNotificationTooltip(capturedIndex)));
+                    () => BuildNotificationTooltip(adapter, capturedIndex)));
             }
 
             return menu;
+        }
+
+        private static Tooltip BuildNotificationTooltip(AdventureHudAdapter adapter, int index)
+        {
+            Tooltip tooltip = adapter.GetNotificationTooltip(index);
+            return new Tooltip(
+                () => tooltip != null ? tooltip.TextLines : new string[0],
+                tooltip != null ? tooltip.VisualMetadata : null,
+                new[] { new TooltipAction(ModText.Get(ModStrings.Actions.Dismiss), () => adapter.DismissNotification(index)) });
         }
 
         private static MenuWidget BuildTownListMenu(AdventureHudAdapter adapter, Func<bool> isTeleportDestinationModeActive)

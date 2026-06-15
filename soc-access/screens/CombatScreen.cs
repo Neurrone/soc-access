@@ -363,9 +363,13 @@ namespace SongsOfConquestAccess.Screens
             }
         }
 
-        private void HandleAbilityTargetingEnd()
+        private void HandleAbilityTargetingEnd(bool usedAbility)
         {
             _adapter?.Hud.ClearAbilityTargetInstructionText();
+            if (!usedAbility)
+            {
+                SpeechPipeline.Output(new SpeechRequest(ModText.Get(ModStrings.Combat.AbilityCancelled), interrupt: false));
+            }
         }
 
         private void HandleAccessibilityEvent(IAccessibilityEvent accessibilityEvent)

@@ -13,6 +13,7 @@ using SongsOfConquest.Client.Battle.Menu;
 using SongsOfConquest.Client.Battle.View;
 using SongsOfConquest.Client.Menu;
 using SongsOfConquestAccess.Adapters;
+using SongsOfConquestAccess.Localization;
 using SongsOfConquestAccess.Speech;
 using System.Collections;
 using System.Collections.Generic;
@@ -75,7 +76,7 @@ namespace SongsOfConquestAccess
                 || state == HumanBattleSpellController.State.CastingTeleportSpell
                 || state == HumanBattleSpellController.State.CastingSummonSpell)
             {
-                SpeechPipeline.Output(new SpeechRequest("Spell cancelled", interrupt: false));
+                SpeechPipeline.Output(new SpeechRequest(ModText.Get(ModStrings.Combat.SpellCancelled), interrupt: false));
             }
         }
 

@@ -2890,3 +2890,18 @@ msgstr "购买"
 msgctxt "Screens.Buyback"
 msgid "Buyback"
 msgstr "回购"
+
+#. Actions.Dismiss
+msgctxt "Actions.Dismiss"
+msgid "Dismiss"
+msgstr "关闭"
+
+#. Combat.AbilityCancelled
+msgctxt "Combat.AbilityCancelled"
+msgid "Ability cancelled"
+msgstr "能力已取消"
+
+#. Combat.SpellCancelled
+msgctxt "Combat.SpellCancelled"
+msgid "Spell cancelled"
+msgstr "法术已取消"
