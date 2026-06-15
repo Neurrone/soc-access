@@ -30,10 +30,11 @@ Move through the hex grid with:
 - `Z`: southwest
 - `C`: southeast
 - Use with `shift` to move to the next interesting tile, where interesting means it differs from the current tile
+- `Ctrl+Space`: focus the centre tile
 
 Use drag and drop to rearrange your troops.
 
-The deployment grid also supports the [Scanner](scanner.md) for finding enemy troops, spawn points and terrain features.
+The deployment grid also supports the [Scanner](scanner.md) for finding enemy troops, spawn points and terrain features. Scan from the centre tile with audio beeps enabled to understand the position of troops and terrain features.
 
 ## Combat
 
@@ -53,7 +54,7 @@ The following hotkeys work when on the hex grid:
 - `S`: read detailed threat information for the focused tile. Nothing is spoken if the tile is not threatened.
 - `T`: move focus to the timeline
 - Enter: performs the primary action on the focused tile, corresponding to a left-click. Use to select a target for spells
-- `Escape`: cancels spellcasting
+- `Escape`: cancels spell or ability targeting
 - `,` and `Shift+,`: move focus between your troops in initiative order
 - `Space`: move focus to your currently acting troop
 - `.` and `Shift+.`: move focus between enemy troops in initiative order
@@ -65,23 +66,23 @@ The following hotkeys work anywhere on the combat screen:
 
 ### Inspect Mode
 
-Press I on the combat grid to enter inspect mode for the focused hex. In inspect mode, navigation keys are restricted to moving within the relevant tiles.
+Press `I` on the combat grid to enter inspect mode for the focused hex. In inspect mode, navigation keys are restricted to moving within the relevant tiles.
 
 If inspecting a tile within movement range of the acting troop, inspect mode shows you the path the stack would take to move there.
 
 If inspecting a troop stack, each tile will read whether it is within that stack's zone of control, attack, deadly or movement range.
 
-Press escape to exit inspect mode.
+Press `Escape` to exit inspect mode.
 
 ### HUD Controls
 
 Visibility is toggled with `h`. These controls are visible by default, and I recommend leaving it that way.
 
-Press tab from the combat grid to cycle through HUD controls.
+Use `tab` or `Shift+Tab` to cycle through controls.
 
 When focus is in the HUD controls, pressing escape moves focus back to the grid.
 
-For convenience, press T from the combat grid to move focus to the turn order. Press Enter on a troop in the turn order to focus that troop in the combat grid.
+For convenience, press `T` from the combat grid to move focus to the turn order. Press `Enter` on a troop in the turn order to focus that troop in the combat grid.
 
 The game provides the following hotkeys:
 

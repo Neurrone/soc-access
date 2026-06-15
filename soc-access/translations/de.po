@@ -1240,6 +1240,11 @@ msgctxt "Actions.HexGridSouthWest"
 msgid "Hex Grid Southwest"
 msgstr "Hexraster Südwesten"
 
+#. Actions.HexGridFocusCenterTile
+msgctxt "Actions.HexGridFocusCenterTile"
+msgid "Focus Center Tile"
+msgstr "Mittlere Kachel fokussieren"
+
 #. Actions.HexGridWest
 msgctxt "Actions.HexGridWest"
 msgid "Hex Grid West"

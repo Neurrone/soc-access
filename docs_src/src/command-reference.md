@@ -105,6 +105,7 @@ This page summarizes the mod hotkeys used across the documentation.
 | `Z`                 | Southwest                     |
 | `C`                 | Southeast                     |
 | `Shift+A/D/Q/E/Z/C` | Move to next interesting tile |
+| `Ctrl+Space`        | Focuses centre tile           |
 
 ## Combat
 

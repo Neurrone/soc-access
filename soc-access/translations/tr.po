@@ -1230,6 +1230,11 @@ msgctxt "Actions.HexGridSouthWest"
 msgid "Hex Grid Southwest"
 msgstr "Altıgen ızgara güneybatı"
 
+#. Actions.HexGridFocusCenterTile
+msgctxt "Actions.HexGridFocusCenterTile"
+msgid "Focus Center Tile"
+msgstr "Merkez kareye odaklan"
+
 #. Actions.HexGridWest
 msgctxt "Actions.HexGridWest"
 msgid "Hex Grid West"

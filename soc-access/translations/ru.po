@@ -1250,6 +1250,11 @@ msgctxt "Actions.HexGridSouthWest"
 msgid "Hex Grid Southwest"
 msgstr "Гекс-сетка юго-запад"
 
+#. Actions.HexGridFocusCenterTile
+msgctxt "Actions.HexGridFocusCenterTile"
+msgid "Focus Center Tile"
+msgstr "Перейти к центральной клетке"
+
 #. Actions.HexGridWest
 msgctxt "Actions.HexGridWest"
 msgid "Hex Grid West"

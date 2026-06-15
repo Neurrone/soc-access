@@ -13,6 +13,7 @@ namespace SongsOfConquestAccess.UI
     internal sealed class CombatHexGrid : Widget
     {
         private const string ScannerWrapCueKey = "Common_ClickUnfold";
+        private static readonly Vector2Int CenterTile = new Vector2Int(6, 4);
 
         private readonly CombatAdapter _adapter;
         private CombatSnapshot _snapshot;
@@ -79,6 +80,7 @@ namespace SongsOfConquestAccess.UI
                 || actionKey == AccessibilityActions.HexGridNorthEast.Key
                 || actionKey == AccessibilityActions.HexGridSouthWest.Key
                 || actionKey == AccessibilityActions.HexGridSouthEast.Key
+                || actionKey == AccessibilityActions.HexGridFocusCenterTile.Key
                 || actionKey == AccessibilityActions.HexGridSkipWest.Key
                 || actionKey == AccessibilityActions.HexGridSkipEast.Key
                 || actionKey == AccessibilityActions.HexGridSkipNorthWest.Key
@@ -173,6 +175,11 @@ namespace SongsOfConquestAccess.UI
             if (action.Key == AccessibilityActions.HexGridSouthEast.Key)
             {
                 return MoveDiagonal(north: false, east: true);
+            }
+
+            if (action.Key == AccessibilityActions.HexGridFocusCenterTile.Key)
+            {
+                return MoveToCenterTile();
             }
 
             if (action.Key == AccessibilityActions.HexGridSkipSouthEast.Key)
@@ -319,6 +326,30 @@ namespace SongsOfConquestAccess.UI
             }
 
             _cursor = point;
+            FocusCurrentTile(updateNativeFocus: true);
+            return true;
+        }
+
+        private bool MoveToCenterTile()
+        {
+            RefreshSnapshot();
+            if (_snapshot == null || !_snapshot.IsValidTile(CenterTile))
+            {
+                return true;
+            }
+
+            if (_inspectContext != null)
+            {
+                ExitInspect();
+            }
+
+            if (_cursor == CenterTile)
+            {
+                FocusCurrentTile(updateNativeFocus: true);
+                return true;
+            }
+
+            _cursor = CenterTile;
             FocusCurrentTile(updateNativeFocus: true);
             return true;
         }

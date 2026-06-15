@@ -739,6 +739,11 @@ msgctxt "Actions.HexGridSouthWest"
 msgid "Hex Grid Southwest"
 msgstr ""
 
+#. Actions.HexGridFocusCenterTile
+msgctxt "Actions.HexGridFocusCenterTile"
+msgid "Focus Center Tile"
+msgstr ""
+
 #. Actions.HexGridWest
 msgctxt "Actions.HexGridWest"
 msgid "Hex Grid West"

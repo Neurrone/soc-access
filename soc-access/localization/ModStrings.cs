@@ -178,6 +178,7 @@ namespace SongsOfConquestAccess.Localization
             public static readonly ModString HexGridNorthWest = new ModString("Actions.HexGridNorthWest", "Hex Grid Northwest");
             public static readonly ModString HexGridSouthEast = new ModString("Actions.HexGridSouthEast", "Hex Grid Southeast");
             public static readonly ModString HexGridSouthWest = new ModString("Actions.HexGridSouthWest", "Hex Grid Southwest");
+            public static readonly ModString HexGridFocusCenterTile = new ModString("Actions.HexGridFocusCenterTile", "Focus Center Tile");
             public static readonly ModString HexGridWest = new ModString("Actions.HexGridWest", "Hex Grid West");
             public static readonly ModString LastBufferLine = new ModString("Actions.LastBufferLine", "Last Buffer Line");
             public static readonly ModString LastMenuItem = new ModString("Actions.LastMenuItem", "Last Menu Item");

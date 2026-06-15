@@ -14,6 +14,7 @@ namespace SongsOfConquestAccess.UI
     internal sealed class TroopPlacementHexGrid : Widget
     {
         private const string ScannerWrapCueKey = "Common_ClickUnfold";
+        private static readonly Vector2Int CenterTile = new Vector2Int(6, 4);
 
         private readonly PreBattleMenuAdapter _adapter;
         private TroopPlacementSnapshot _snapshot;
@@ -87,6 +88,7 @@ namespace SongsOfConquestAccess.UI
                 || actionKey == AccessibilityActions.HexGridNorthEast.Key
                 || actionKey == AccessibilityActions.HexGridSouthWest.Key
                 || actionKey == AccessibilityActions.HexGridSouthEast.Key
+                || actionKey == AccessibilityActions.HexGridFocusCenterTile.Key
                 || actionKey == AccessibilityActions.HexGridSkipWest.Key
                 || actionKey == AccessibilityActions.HexGridSkipEast.Key
                 || actionKey == AccessibilityActions.HexGridSkipNorthWest.Key
@@ -169,6 +171,11 @@ namespace SongsOfConquestAccess.UI
             if (action.Key == AccessibilityActions.HexGridSouthEast.Key)
             {
                 return MoveDiagonal(north: false, east: true);
+            }
+
+            if (action.Key == AccessibilityActions.HexGridFocusCenterTile.Key)
+            {
+                return SetCursor(CenterTile);
             }
 
             if (action.Key == AccessibilityActions.HexGridSkipSouthEast.Key)

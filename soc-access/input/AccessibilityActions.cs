@@ -249,6 +249,9 @@ namespace SongsOfConquestAccess.Input
         public static readonly InputAction HexGridSouthEast = OneShot("hex_grid_south_east", ModStrings.Actions.HexGridSouthEast, InputClaimScope.FocusedWidget)
             .AddBinding(new KeyboardBinding(Key.C));
 
+        public static readonly InputAction HexGridFocusCenterTile = OneShot("hex_grid_focus_center_tile", ModStrings.Actions.HexGridFocusCenterTile, InputClaimScope.FocusedWidget)
+            .AddBinding(new KeyboardBinding(Key.Space, ctrl: true));
+
         public static readonly InputAction HexGridSkipWest = OneShot("hex_grid_skip_west", ModStrings.Actions.HexGridWest, InputClaimScope.FocusedWidget)
             .AddBinding(new KeyboardBinding(Key.A, shift: true));
 
@@ -404,6 +407,7 @@ namespace SongsOfConquestAccess.Input
                 HexGridNorthEast,
                 HexGridSouthWest,
                 HexGridSouthEast,
+                HexGridFocusCenterTile,
                 HexGridSkipWest,
                 HexGridSkipEast,
                 HexGridSkipNorthWest,
