@@ -2,6 +2,7 @@
 
 In rough order of descending priority:
 
+- `Shift+Tab`, which moves focus to the previous control, can sometimes be too sensitive and move back two controls from a single key press. This is caused by the Unity Input System version bundled with the game: it can report duplicate raw `Tab` press events for `Shift+Tab`, and the mod does not reliably receive the matching raw `Tab` release event. I've worked around this as best I can, but a complete fix requires the game to update its Unity Input System package to a newer version.
 - The scanner works for finding things on the map, but is still not ideal for optimal pathing for wielders. I'm looking for suggestions to improve this.
 - Combat narration is still quite verbose
 - The following features are experimental as they need more testing:

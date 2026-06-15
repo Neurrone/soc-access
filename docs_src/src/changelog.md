@@ -10,6 +10,7 @@
 - Added announcement when cancelling ability targeting
 - Fixed combat narration using untranslated spell, ability, and modifier names
 - Fixed use of untranslated text for dismissing adventure map notifications and cancelling spellcast messages
+- Update known issues to mention `Shift+Tab` being too responsive
 
 ## V0.7.0
 
