@@ -866,16 +866,11 @@ namespace SongsOfConquestAccess.Events
                     continue;
                 }
 
-                int index = result.FindIndex(existing => existing != null
-                    && existing.ModifierType == change.ModifierType
-                    && existing.ApplicationType == change.ApplicationType);
+                int index = result.FindIndex(existing => CanCombineModifierChanges(existing, change));
                 if (index >= 0)
                 {
                     ModifierChange existing = result[index];
-                    result[index] = new ModifierChange(
-                        existing.ModifierType,
-                        existing.ApplicationType,
-                        existing.Amount + change.Amount);
+                    result[index] = existing.WithAmount(existing.Amount + change.Amount);
                 }
                 else
                 {
@@ -888,6 +883,16 @@ namespace SongsOfConquestAccess.Events
                 .OrderBy(change => change.ModifierType.ToString())
                 .ThenBy(change => change.ApplicationType.ToString())
                 .ToList();
+        }
+
+        private static bool CanCombineModifierChanges(ModifierChange left, ModifierChange right)
+        {
+            return left != null
+                && right != null
+                && left.ModifierType != BacteriaModifierType.TroopBlessed
+                && right.ModifierType != BacteriaModifierType.TroopBlessed
+                && left.ModifierType == right.ModifierType
+                && left.ApplicationType == right.ApplicationType;
         }
     }
 

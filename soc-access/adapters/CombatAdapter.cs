@@ -2408,7 +2408,7 @@ namespace SongsOfConquestAccess.Adapters
             try
             {
                 ICommanderState commander = _facade != null && _facade.Commanders != null ? _facade.Commanders.Get(commanderId) : null;
-                string name = _facade != null && _facade.Commanders != null ? _facade.Commanders.GetName(commanderId) : string.Empty;
+                string name = _facade != null && _facade.Commanders != null ? _facade.Commanders.GetShortName(commanderId) : string.Empty;
                 return new CommanderRef(commanderId, commander != null ? commander.TeamId : -1, GetLocalTeamId(), name);
             }
             catch
@@ -2444,9 +2444,49 @@ namespace SongsOfConquestAccess.Adapters
             return new AbilityRef(abilityType, name);
         }
 
-        public string LocalizeModifierName(BacteriaModifierType modifierType)
+        public ModifierChange CreateModifierChange(BacteriaModifier modifier)
         {
-            return LocalizeText("Modifiers/" + modifierType.ToString().Replace("Troop", string.Empty));
+            if (modifier == null)
+            {
+                return null;
+            }
+
+            string localizedDescriptionFormat = LocalizeModifierDescriptionFormat(
+                modifier.Type,
+                modifier.ApplicationType,
+                modifier.AmountToAdd,
+                out bool formatAmount,
+                out int displayAmountMultiplier);
+            return new ModifierChange(
+                modifier.Type,
+                modifier.ApplicationType,
+                modifier.AmountToAdd,
+                localizedDescriptionFormat,
+                formatAmount,
+                displayAmountMultiplier);
+        }
+
+        private string LocalizeModifierDescriptionFormat(
+            BacteriaModifierType modifierType,
+            BacteriaModifierApplicationType applicationType,
+            int amount,
+            out bool formatAmount,
+            out int displayAmountMultiplier)
+        {
+            formatAmount = modifierType != BacteriaModifierType.TroopIgnoreZoneOfControl;
+            displayAmountMultiplier = 1;
+
+            string modifierName = modifierType.ToString().Replace("Troop", string.Empty);
+            if (modifierType == BacteriaModifierType.TroopBlessed
+                && amount < 0
+                && applicationType != BacteriaModifierApplicationType.Percentage
+                && !BacteriaModifierExtensions.IsPercentageBased(modifierType))
+            {
+                modifierName = "Cursed";
+                displayAmountMultiplier = -1;
+            }
+
+            return LocalizeText("Modifiers/" + modifierName + "/Description");
         }
 
         public BacteriaRef CreateBacteriaRef(BacteriaReference bacteriaReference)

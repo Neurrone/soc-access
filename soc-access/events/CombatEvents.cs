@@ -196,7 +196,7 @@ namespace SongsOfConquestAccess.Events.Combat
         public SpellRef(SpellTypes spellType, string name, int tier)
         {
             SpellType = spellType;
-            Name = string.IsNullOrWhiteSpace(name) ? SplitPascalCase(spellType.ToString()) : SpeechTextSanitizer.Normalize(name);
+            Name = string.IsNullOrWhiteSpace(name) ? string.Empty : SpeechTextSanitizer.Normalize(name);
             Tier = tier;
         }
 
@@ -210,7 +210,7 @@ namespace SongsOfConquestAccess.Events.Combat
         public AbilityRef(TroopAbilityType abilityType, string name)
         {
             AbilityType = abilityType;
-            Name = string.IsNullOrWhiteSpace(name) ? SplitPascalCase(abilityType.ToString()) : SpeechTextSanitizer.Normalize(name);
+            Name = string.IsNullOrWhiteSpace(name) ? string.Empty : SpeechTextSanitizer.Normalize(name);
         }
 
         public TroopAbilityType AbilityType { get; private set; }
@@ -223,7 +223,7 @@ namespace SongsOfConquestAccess.Events.Combat
         {
             BacteriaId = bacteriaId;
             BacteriaType = bacteriaType;
-            Name = string.IsNullOrWhiteSpace(name) ? SplitPascalCase(bacteriaType.ToString()) : SpeechTextSanitizer.Normalize(name);
+            Name = string.IsNullOrWhiteSpace(name) ? string.Empty : SpeechTextSanitizer.Normalize(name);
         }
 
         public int BacteriaId { get; private set; }
@@ -234,30 +234,86 @@ namespace SongsOfConquestAccess.Events.Combat
     internal sealed class ModifierChange
     {
         public ModifierChange(BacteriaModifierType modifierType, BacteriaModifierApplicationType applicationType, int amount)
-            : this(modifierType, applicationType, amount, string.Empty)
+            : this(modifierType, applicationType, amount, string.Empty, true, 1)
         {
         }
 
-        public ModifierChange(BacteriaModifierType modifierType, BacteriaModifierApplicationType applicationType, int amount, string localizedName)
+        public ModifierChange(
+            BacteriaModifierType modifierType,
+            BacteriaModifierApplicationType applicationType,
+            int amount,
+            string localizedDescriptionFormat,
+            bool formatAmount,
+            int displayAmountMultiplier)
         {
             ModifierType = modifierType;
             ApplicationType = applicationType;
             Amount = amount;
-            LocalizedName = localizedName ?? string.Empty;
+            LocalizedDescriptionFormat = localizedDescriptionFormat ?? string.Empty;
+            FormatAmount = formatAmount;
+            DisplayAmountMultiplier = displayAmountMultiplier == 0 ? 1 : displayAmountMultiplier;
         }
 
         public BacteriaModifierType ModifierType { get; private set; }
         public BacteriaModifierApplicationType ApplicationType { get; private set; }
         public int Amount { get; private set; }
-        public string LocalizedName { get; private set; }
+        public string LocalizedDescriptionFormat { get; private set; }
+        public bool FormatAmount { get; private set; }
+        public int DisplayAmountMultiplier { get; private set; }
 
         public string Format()
         {
-            string name = !string.IsNullOrWhiteSpace(LocalizedName) ? LocalizedName : FormatModifierType(ModifierType);
-            string amount = (Amount > 0 ? "+" : string.Empty) + Amount;
-            return ApplicationType == BacteriaModifierApplicationType.Percentage
-                ? name + " " + amount + "%"
-                : name + " " + amount;
+            if (!string.IsNullOrWhiteSpace(LocalizedDescriptionFormat))
+            {
+                if (!FormatAmount)
+                {
+                    return LocalizedDescriptionFormat;
+                }
+
+                return FormatLocalizedDescription(LocalizedDescriptionFormat, FormatAmountValue());
+            }
+
+            string name = FormatModifierType(ModifierType);
+            return FormatAmount
+                ? name + " " + FormatAmountValue()
+                : name;
+        }
+
+        public ModifierChange WithAmount(int amount)
+        {
+            return new ModifierChange(
+                ModifierType,
+                ApplicationType,
+                amount,
+                LocalizedDescriptionFormat,
+                FormatAmount,
+                DisplayAmountMultiplier);
+        }
+
+        public static bool IsPercentageBased(BacteriaModifierType modifierType)
+        {
+            return BacteriaModifierExtensions.IsPercentageBased(modifierType);
+        }
+
+        private string FormatAmountValue()
+        {
+            int displayAmount = Amount * DisplayAmountMultiplier;
+            string amount = (displayAmount > 0 ? "+" : string.Empty) + displayAmount;
+            return ApplicationType == BacteriaModifierApplicationType.Percentage || IsPercentageBased(ModifierType)
+                ? amount + "%"
+                : amount;
+        }
+
+        private static string FormatLocalizedDescription(string format, string amount)
+        {
+            try
+            {
+                return string.Format(format, amount);
+            }
+            catch
+            {
+                return format.Replace("{0}", amount);
+            }
         }
     }
 

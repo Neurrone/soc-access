@@ -1338,8 +1338,13 @@ namespace SongsOfConquestAccess.Adapters
                     continue;
                 }
 
-                string localizedName = adapter != null ? adapter.LocalizeModifierName(modifier.Type) : string.Empty;
-                result.Add(new ModifierChange(modifier.Type, modifier.ApplicationType, modifier.AmountToAdd, localizedName));
+                ModifierChange modifierChange = adapter != null
+                    ? adapter.CreateModifierChange(modifier)
+                    : new ModifierChange(modifier.Type, modifier.ApplicationType, modifier.AmountToAdd);
+                if (modifierChange != null)
+                {
+                    result.Add(modifierChange);
+                }
             }
 
             return result;

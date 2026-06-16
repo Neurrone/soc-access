@@ -1,5 +1,9 @@
 # Changelog
 
+## V0.7.2
+
+- Fixed untranslated caster and effect names being narrated in combat
+
 ## V0.7.1
 
 - Fixed combat grid tooltips lingering after combat ends or while loading another game. This caused the game to hang while loading a game from the combat screen

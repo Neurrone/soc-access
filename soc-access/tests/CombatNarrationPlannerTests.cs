@@ -15,6 +15,70 @@ namespace SongsOfConquestAccess.Tests
     public sealed class CombatNarrationPlannerTests
     {
         [TestMethod]
+        public void ModifierChangeFormatsLocalizedDescriptionWithLanguageSpecificAmountPosition()
+        {
+            ModifierChange change = new ModifierChange(
+                BacteriaModifierType.TroopRootSpread,
+                BacteriaModifierApplicationType.Value,
+                1,
+                "根茎蔓延 {0} 格",
+                true,
+                1);
+
+            Assert.AreEqual("根茎蔓延 +1 格", change.Format());
+        }
+
+        [TestMethod]
+        public void ModifierChangeDoesNotAppendAmountWhenLocalizedDescriptionHasNoAmount()
+        {
+            ModifierChange change = new ModifierChange(
+                BacteriaModifierType.TroopIgnoreZoneOfControl,
+                BacteriaModifierApplicationType.Value,
+                1,
+                "无视控制区域",
+                false,
+                1);
+
+            Assert.AreEqual("无视控制区域", change.Format());
+        }
+
+        [TestMethod]
+        public void ModifierChangeFormatsNegativeBlessedAsPositiveCursedAmount()
+        {
+            ModifierChange change = new ModifierChange(
+                BacteriaModifierType.TroopBlessed,
+                BacteriaModifierApplicationType.Value,
+                -2,
+                "{0} Misfortune",
+                true,
+                -1);
+
+            Assert.AreEqual("+2 Misfortune", change.Format());
+        }
+
+        [TestMethod]
+        public void ModifierChangeAddsPercentForPercentageBasedModifierTypes()
+        {
+            ModifierChange change = new ModifierChange(
+                BacteriaModifierType.TroopSpellDamageResistance,
+                BacteriaModifierApplicationType.Value,
+                10,
+                "{0} Spell Damage Resistance",
+                true,
+                1);
+
+            Assert.AreEqual("+10% Spell Damage Resistance", change.Format());
+        }
+
+        [TestMethod]
+        public void CombatRefsDoNotSynthesizeNamesFromEnums()
+        {
+            Assert.AreEqual(string.Empty, new SpellRef((SpellTypes)24, string.Empty, 1).Name);
+            Assert.AreEqual(string.Empty, new AbilityRef(TroopAbilityType.Leap, string.Empty).Name);
+            Assert.AreEqual(string.Empty, new BacteriaRef(1, (BacteriaTypes)248, string.Empty).Name);
+        }
+
+        [TestMethod]
         public void FlushMovesSpellBeforeImmediatelyPrecedingSpellEffect()
         {
             CombatNarrationPlanner planner = new CombatNarrationPlanner();
@@ -207,6 +271,63 @@ namespace SongsOfConquestAccess.Tests
 
             Assert.AreEqual(1, result.Count);
             Assert.AreEqual("Momentum affects 10 Footmen at 0, 0, melee offense +10", result[0].Event.GetSpeechText());
+        }
+
+        [TestMethod]
+        public void BacteriaModifierSummariesDoNotCombineBlessedChangesForSameTroop()
+        {
+            CombatNarrationPlanner planner = new CombatNarrationPlanner();
+            CombatNarrationSnapshot snapshot = Snapshot(new[] { 10 }, new int[0]);
+            BacteriaRef fortune = Bacteria("Fortune");
+            TroopRef footmen = Troop(10, 1, "Footmen");
+
+            planner.EnqueueBacteriaSummary(
+                CombatNarrationItem.CreateBacteriaModifierSummary(
+                    fortune,
+                    footmen,
+                    new[] { Modifier(BacteriaModifierType.TroopBlessed, -1) },
+                    10),
+                snapshot);
+            planner.EnqueueBacteriaSummary(
+                CombatNarrationItem.CreateBacteriaModifierSummary(
+                    fortune,
+                    footmen,
+                    new[] { Modifier(BacteriaModifierType.TroopBlessed, 1) },
+                    10),
+                snapshot);
+
+            IReadOnlyList<CombatNarrationItem> result = planner.Flush();
+
+            Assert.AreEqual(1, result.Count);
+            Assert.AreEqual("Fortune affects 10 Footmen at 0, 0, blessed -1 and blessed +1", result[0].Event.GetSpeechText());
+        }
+
+        [TestMethod]
+        public void BacteriaModifierSummariesStillGroupSameBlessedChangeAcrossTroops()
+        {
+            CombatNarrationPlanner planner = new CombatNarrationPlanner();
+            CombatNarrationSnapshot snapshot = Snapshot(new[] { 10, 20 }, new int[0]);
+            BacteriaRef fortune = Bacteria("Fortune");
+
+            planner.EnqueueBacteriaSummary(
+                CombatNarrationItem.CreateBacteriaModifierSummary(
+                    fortune,
+                    Troop(10, 1, "Footmen"),
+                    new[] { Modifier(BacteriaModifierType.TroopBlessed, 1) },
+                    10),
+                snapshot);
+            planner.EnqueueBacteriaSummary(
+                CombatNarrationItem.CreateBacteriaModifierSummary(
+                    fortune,
+                    Troop(20, 1, "Rangers"),
+                    new[] { Modifier(BacteriaModifierType.TroopBlessed, 1) },
+                    20),
+                snapshot);
+
+            IReadOnlyList<CombatNarrationItem> result = planner.Flush();
+
+            Assert.AreEqual(1, result.Count);
+            Assert.AreEqual("Fortune affects your troops, blessed +1", result[0].Event.GetSpeechText());
         }
 
         [TestMethod]
