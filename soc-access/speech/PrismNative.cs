@@ -7,6 +7,7 @@ namespace SongsOfConquestAccess.Speech
     internal static class PrismNative
     {
         private const string Dll = "prism";
+        public const ulong BackendBoyPcReader = 0x285aba1c16f3300fUL;
 
         public enum PrismError
         {
@@ -76,6 +77,30 @@ namespace SongsOfConquestAccess.Speech
         [DllImport(Dll, EntryPoint = "prism_registry_create_best", CallingConvention = CallingConvention.Cdecl)]
         public static extern IntPtr RegistryCreateBest(IntPtr context);
 
+        [DllImport(Dll, EntryPoint = "prism_registry_count", CallingConvention = CallingConvention.Cdecl)]
+        public static extern UIntPtr RegistryCount(IntPtr context);
+
+        [DllImport(Dll, EntryPoint = "prism_registry_id_at", CallingConvention = CallingConvention.Cdecl)]
+        public static extern ulong RegistryIdAt(IntPtr context, UIntPtr index);
+
+        [DllImport(Dll, EntryPoint = "prism_registry_name", CallingConvention = CallingConvention.Cdecl)]
+        private static extern IntPtr RegistryNameRaw(IntPtr context, ulong id);
+
+        public static string RegistryName(IntPtr context, ulong id)
+        {
+            return Utf8FromPtr(RegistryNameRaw(context, id));
+        }
+
+        [DllImport(Dll, EntryPoint = "prism_registry_priority", CallingConvention = CallingConvention.Cdecl)]
+        public static extern int RegistryPriority(IntPtr context, ulong id);
+
+        [DllImport(Dll, EntryPoint = "prism_registry_exists", CallingConvention = CallingConvention.Cdecl)]
+        [return: MarshalAs(UnmanagedType.I1)]
+        public static extern bool RegistryExists(IntPtr context, ulong id);
+
+        [DllImport(Dll, EntryPoint = "prism_registry_create", CallingConvention = CallingConvention.Cdecl)]
+        public static extern IntPtr RegistryCreate(IntPtr context, ulong id);
+
         [DllImport(Dll, EntryPoint = "prism_backend_free", CallingConvention = CallingConvention.Cdecl)]
         public static extern void BackendFree(IntPtr backend);
 
@@ -89,6 +114,9 @@ namespace SongsOfConquestAccess.Speech
 
         [DllImport(Dll, EntryPoint = "prism_backend_get_features", CallingConvention = CallingConvention.Cdecl)]
         public static extern ulong BackendGetFeatures(IntPtr backend);
+
+        [DllImport(Dll, EntryPoint = "prism_backend_initialize", CallingConvention = CallingConvention.Cdecl)]
+        public static extern PrismError BackendInitialize(IntPtr backend);
 
         [DllImport(Dll, EntryPoint = "prism_backend_output", CallingConvention = CallingConvention.Cdecl)]
         private static extern PrismError BackendOutputRaw(

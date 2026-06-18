@@ -3,6 +3,7 @@
 ## V0.7.2
 
 - Fixed untranslated caster and effect names being narrated in combat
+- Increase log verbosity to help with debug Prism issues when it doesn't detect screen readers properly
 
 ## V0.7.1
 
