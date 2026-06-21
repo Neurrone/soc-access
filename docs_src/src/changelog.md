@@ -2,6 +2,7 @@
 
 ## V0.7.2
 
+- The mod settings screen is now divided into several tabs in preparation for more settings
 - Fixed untranslated caster and effect names being narrated in combat
 - Increase log verbosity to help with debug Prism issues when it doesn't detect screen readers properly
 

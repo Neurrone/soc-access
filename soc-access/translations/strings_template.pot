@@ -2054,6 +2054,11 @@ msgctxt "Screens.GraphType"
 msgid "Graph type"
 msgstr ""
 
+#. Screens.General
+msgctxt "Screens.General"
+msgid "General"
+msgstr ""
+
 #. Screens.Group
 msgctxt "Screens.Group"
 msgid "Group {0}"

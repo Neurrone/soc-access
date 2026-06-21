@@ -458,6 +458,7 @@ namespace SongsOfConquestAccess.Localization
             public static readonly ModString Empty = new ModString("Screens.Empty", "empty");
             public static readonly ModString EjectWielder = new ModString("Screens.EjectWielder", "Eject wielder");
             public static readonly ModString GraphType = new ModString("Screens.GraphType", "Graph type");
+            public static readonly ModString General = new ModString("Screens.General", "General");
             public static readonly ModString Group = new ModString("Screens.Group", "Group {0}");
             public static readonly ModString InviteFriend = new ModString("Screens.InviteFriend", "Invite friend");
             public static readonly ModString Layout = new ModString("Screens.Layout", "Layout");

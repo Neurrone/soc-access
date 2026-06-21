@@ -770,6 +770,11 @@ msgctxt "Screens.GraphType"
 msgid "Graph type"
 msgstr "Tipo de gráfico"
 
+#. Screens.General
+msgctxt "Screens.General"
+msgid "General"
+msgstr "General"
+
 #. Screens.Group
 msgctxt "Screens.Group"
 msgid "Group {0}"
