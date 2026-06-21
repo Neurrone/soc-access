@@ -3,7 +3,6 @@
 ## V0.7.2
 
 - Information spoken on the focused tile or in scanner results are now a composable set of announcements that you can toggle, reorder, and customize individually from the mod settings screen
-- The mod settings screen now allows configuring announcements; whether parts of announcements are enabled and reordering items
 - Fixed untranslated caster and effect names being narrated in combat
 - Increase log verbosity to help with debug Prism issues when it doesn't detect screen readers properly
 
