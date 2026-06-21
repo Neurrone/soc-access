@@ -3035,3 +3035,305 @@ msgstr "Habilidad cancelada"
 msgctxt "Combat.SpellCancelled"
 msgid "Spell cancelled"
 msgstr "Hechizo cancelado"
+
+#. Screens.Configure
+msgctxt "Screens.Configure"
+msgid "Configure"
+msgstr "Configurar"
+
+#. Screens.ConfigureAnnouncementElement
+msgctxt "Screens.ConfigureAnnouncementElement"
+msgid "Configure {0}"
+msgstr "Configurar {0}"
+
+#. Screens.Enabled
+msgctxt "Screens.Enabled"
+msgid "Enabled"
+msgstr "Activado"
+
+#. Screens.EntityAnnouncements
+msgctxt "Screens.EntityAnnouncements"
+msgid "Entity announcements"
+msgstr "Anuncios de entidades"
+
+#. Screens.MoveDown
+msgctxt "Screens.MoveDown"
+msgid "Move down"
+msgstr "Mover abajo"
+
+#. Screens.MoveUp
+msgctxt "Screens.MoveUp"
+msgid "Move up"
+msgstr "Mover arriba"
+
+#. Screens.ResetAllToDefaults
+msgctxt "Screens.ResetAllToDefaults"
+msgid "Reset all to defaults"
+msgstr "Restablecer todo a valores predeterminados"
+
+#. Screens.ResetToDefaults
+msgctxt "Screens.ResetToDefaults"
+msgid "Reset to defaults"
+msgstr "Restablecer a valores predeterminados"
+
+#. Screens.Suffix
+msgctxt "Screens.Suffix"
+msgid "Include suffix punctuation"
+msgstr "Incluir puntuación de sufijo"
+
+#. Screens.TileAnnouncements
+msgctxt "Screens.TileAnnouncements"
+msgid "Tile announcements"
+msgstr "Anuncios de casillas"
+
+#. Screens.TroopAnnouncements
+msgctxt "Screens.TroopAnnouncements"
+msgid "Troop announcements"
+msgstr "Anuncios de tropas"
+
+#. Screens.AnnouncementActing
+msgctxt "Screens.AnnouncementActing"
+msgid "Acting"
+msgstr "En acción"
+
+#. Screens.AnnouncementAffiliation
+msgctxt "Screens.AnnouncementAffiliation"
+msgid "Affiliation"
+msgstr "Afiliación"
+
+#. Screens.AnnouncementAttackable
+msgctxt "Screens.AnnouncementAttackable"
+msgid "Attackable"
+msgstr "Atacable"
+
+#. Screens.AnnouncementCoordinates
+msgctxt "Screens.AnnouncementCoordinates"
+msgid "Coordinates"
+msgstr "Coordenadas"
+
+#. Screens.AnnouncementDecorativeFeatures
+msgctxt "Screens.AnnouncementDecorativeFeatures"
+msgid "Decorative features"
+msgstr "Rasgos decorativos"
+
+#. Screens.AnnouncementElevation
+msgctxt "Screens.AnnouncementElevation"
+msgid "Elevation"
+msgstr "Elevación"
+
+#. Screens.AnnouncementEntityName
+msgctxt "Screens.AnnouncementEntityName"
+msgid "Entity name"
+msgstr "Nombre de entidad"
+
+#. Screens.AnnouncementFacingDirectionForBeamAttacks
+msgctxt "Screens.AnnouncementFacingDirectionForBeamAttacks"
+msgid "Facing direction for troops with beam attacks"
+msgstr "Dirección de orientación para tropas con ataques de rayo"
+
+#. Screens.AnnouncementHealth
+msgctxt "Screens.AnnouncementHealth"
+msgid "Health"
+msgstr "Salud"
+
+#. Screens.AnnouncementImpassableOrBlocked
+msgctxt "Screens.AnnouncementImpassableOrBlocked"
+msgid "Impassable or blocked"
+msgstr "Intransitable o bloqueado"
+
+#. Screens.AnnouncementInfluence
+msgctxt "Screens.AnnouncementInfluence"
+msgid "Influence"
+msgstr "Influencia"
+
+#. Screens.AnnouncementOccupant
+msgctxt "Screens.AnnouncementOccupant"
+msgid "Occupant"
+msgstr "Ocupante"
+
+#. Screens.AnnouncementReachable
+msgctxt "Screens.AnnouncementReachable"
+msgid "Reachable"
+msgstr "Alcanzable"
+
+#. Screens.AnnouncementSelectedForSpellcast
+msgctxt "Screens.AnnouncementSelectedForSpellcast"
+msgid "Selected for spellcast"
+msgstr "Seleccionado para lanzar hechizo"
+
+#. Screens.AnnouncementStackSize
+msgctxt "Screens.AnnouncementStackSize"
+msgid "Stack size"
+msgstr "Tamaño de pila"
+
+#. Screens.AnnouncementTileEffects
+msgctxt "Screens.AnnouncementTileEffects"
+msgid "Tile effects"
+msgstr "Efectos de casilla"
+
+#. Screens.AnnouncementTroopName
+msgctxt "Screens.AnnouncementTroopName"
+msgid "Troop name"
+msgstr "Nombre de tropa"
+
+#. Screens.AnnouncementOrderRow
+msgctxt "Screens.AnnouncementOrderRow"
+msgid "{0} horizontal row"
+msgstr "{0} fila horizontal"
+
+#. Screens.MovedAfter
+msgctxt "Screens.MovedAfter"
+msgid "Moved after {0}"
+msgstr "Movido después de {0}"
+
+#. Screens.MovedBefore
+msgctxt "Screens.MovedBefore"
+msgid "Moved before {0}"
+msgstr "Movido antes de {0}"
+
+#. Screens.MovedBetween
+msgctxt "Screens.MovedBetween"
+msgid "Moved between {0} and {1}"
+msgstr "Movido entre {0} y {1}"
+
+#. Screens.Scanner
+msgctxt "Screens.Scanner"
+msgid "Scanner"
+msgstr "Escáner"
+
+#. Screens.ScannerContentAnnouncements
+msgctxt "Screens.ScannerContentAnnouncements"
+msgid "Scanner content announcements"
+msgstr "Anuncios de contenido del escáner"
+
+#. Screens.ScannerResultAnnouncements
+msgctxt "Screens.ScannerResultAnnouncements"
+msgid "Scanner result announcements"
+msgstr "Anuncios de resultados del escáner"
+
+#. Screens.TroopDeployment
+msgctxt "Screens.TroopDeployment"
+msgid "Troop deployment"
+msgstr "Despliegue de tropas"
+
+#. Screens.AnnouncementContent
+msgctxt "Screens.AnnouncementContent"
+msgid "Content"
+msgstr "Contenido"
+
+#. Screens.AnnouncementDirection
+msgctxt "Screens.AnnouncementDirection"
+msgid "Direction"
+msgstr "Dirección"
+
+#. Screens.AnnouncementImpassable
+msgctxt "Screens.AnnouncementImpassable"
+msgid "Impassable"
+msgstr "Intransitable"
+
+#. Screens.AnnouncementResultPosition
+msgctxt "Screens.AnnouncementResultPosition"
+msgid "Result position"
+msgstr "Posición del resultado"
+
+#. Screens.AnnouncementSpawnPoint
+msgctxt "Screens.AnnouncementSpawnPoint"
+msgid "Spawn point"
+msgstr "Punto de despliegue"
+
+#. Screens.AnnouncementTroop
+msgctxt "Screens.AnnouncementTroop"
+msgid "Troop"
+msgstr "Tropa"
+
+
+#. Spatial.Visited
+msgctxt "Spatial.Visited"
+msgid "visited"
+msgstr "visitado"
+
+#. Screens.WielderAnnouncements
+msgctxt "Screens.WielderAnnouncements"
+msgid "Wielder announcements"
+msgstr "Anuncios de portadores"
+
+#. Screens.MapEntityAnnouncements
+msgctxt "Screens.MapEntityAnnouncements"
+msgid "Map entity announcements"
+msgstr "Anuncios de entidades del mapa"
+
+#. Screens.AnnouncementDestination
+msgctxt "Screens.AnnouncementDestination"
+msgid "Destination"
+msgstr "Destino"
+
+#. Screens.AnnouncementExplorationState
+msgctxt "Screens.AnnouncementExplorationState"
+msgid "Exploration state"
+msgstr "Estado de exploración"
+
+#. Screens.AnnouncementGroupResult
+msgctxt "Screens.AnnouncementGroupResult"
+msgid "Group result"
+msgstr "Resultado de grupo"
+
+#. Screens.AnnouncementInteractionPoint
+msgctxt "Screens.AnnouncementInteractionPoint"
+msgid "Interaction point"
+msgstr "Punto de interacción"
+
+#. Screens.AnnouncementMapEntity
+msgctxt "Screens.AnnouncementMapEntity"
+msgid "Map entity"
+msgstr "Entidad del mapa"
+
+#. Screens.AnnouncementMovement
+msgctxt "Screens.AnnouncementMovement"
+msgid "Movement"
+msgstr "Movimiento"
+
+#. Screens.AnnouncementName
+msgctxt "Screens.AnnouncementName"
+msgid "Name"
+msgstr "Nombre"
+
+#. Screens.AnnouncementReachabilityOrRoutePreview
+msgctxt "Screens.AnnouncementReachabilityOrRoutePreview"
+msgid "Reachability or route preview"
+msgstr "Alcance o vista previa de ruta"
+
+#. Screens.AnnouncementRelationship
+msgctxt "Screens.AnnouncementRelationship"
+msgid "Relationship"
+msgstr "Relación"
+
+#. Screens.AnnouncementSelected
+msgctxt "Screens.AnnouncementSelected"
+msgid "Selected"
+msgstr "Seleccionado"
+
+#. Screens.AnnouncementTerrain
+msgctxt "Screens.AnnouncementTerrain"
+msgid "Terrain"
+msgstr "Terreno"
+
+#. Screens.AnnouncementThisTurnDestination
+msgctxt "Screens.AnnouncementThisTurnDestination"
+msgid "This turn destination"
+msgstr "Destino este turno"
+
+#. Screens.AnnouncementVisited
+msgctxt "Screens.AnnouncementVisited"
+msgid "Visited"
+msgstr "Visitado"
+
+#. Screens.AnnouncementWielder
+msgctxt "Screens.AnnouncementWielder"
+msgid "Wielder"
+msgstr "Portador"
+
+#. Screens.AnnouncementZoneOfControl
+msgctxt "Screens.AnnouncementZoneOfControl"
+msgid "Zone of control"
+msgstr "Zona de control"
+

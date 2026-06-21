@@ -2915,3 +2915,305 @@ msgstr "アビリティをキャンセルしました"
 msgctxt "Combat.SpellCancelled"
 msgid "Spell cancelled"
 msgstr "呪文をキャンセルしました"
+
+#. Screens.Configure
+msgctxt "Screens.Configure"
+msgid "Configure"
+msgstr "設定"
+
+#. Screens.ConfigureAnnouncementElement
+msgctxt "Screens.ConfigureAnnouncementElement"
+msgid "Configure {0}"
+msgstr "{0}を設定"
+
+#. Screens.Enabled
+msgctxt "Screens.Enabled"
+msgid "Enabled"
+msgstr "有効"
+
+#. Screens.EntityAnnouncements
+msgctxt "Screens.EntityAnnouncements"
+msgid "Entity announcements"
+msgstr "エンティティ通知"
+
+#. Screens.MoveDown
+msgctxt "Screens.MoveDown"
+msgid "Move down"
+msgstr "下へ移動"
+
+#. Screens.MoveUp
+msgctxt "Screens.MoveUp"
+msgid "Move up"
+msgstr "上へ移動"
+
+#. Screens.ResetAllToDefaults
+msgctxt "Screens.ResetAllToDefaults"
+msgid "Reset all to defaults"
+msgstr "すべて既定値に戻す"
+
+#. Screens.ResetToDefaults
+msgctxt "Screens.ResetToDefaults"
+msgid "Reset to defaults"
+msgstr "既定値に戻す"
+
+#. Screens.Suffix
+msgctxt "Screens.Suffix"
+msgid "Include suffix punctuation"
+msgstr "接尾辞の句読点を含める"
+
+#. Screens.TileAnnouncements
+msgctxt "Screens.TileAnnouncements"
+msgid "Tile announcements"
+msgstr "タイル通知"
+
+#. Screens.TroopAnnouncements
+msgctxt "Screens.TroopAnnouncements"
+msgid "Troop announcements"
+msgstr "部隊通知"
+
+#. Screens.AnnouncementActing
+msgctxt "Screens.AnnouncementActing"
+msgid "Acting"
+msgstr "行動中"
+
+#. Screens.AnnouncementAffiliation
+msgctxt "Screens.AnnouncementAffiliation"
+msgid "Affiliation"
+msgstr "所属"
+
+#. Screens.AnnouncementAttackable
+msgctxt "Screens.AnnouncementAttackable"
+msgid "Attackable"
+msgstr "攻撃可能"
+
+#. Screens.AnnouncementCoordinates
+msgctxt "Screens.AnnouncementCoordinates"
+msgid "Coordinates"
+msgstr "座標"
+
+#. Screens.AnnouncementDecorativeFeatures
+msgctxt "Screens.AnnouncementDecorativeFeatures"
+msgid "Decorative features"
+msgstr "装飾要素"
+
+#. Screens.AnnouncementElevation
+msgctxt "Screens.AnnouncementElevation"
+msgid "Elevation"
+msgstr "高低差"
+
+#. Screens.AnnouncementEntityName
+msgctxt "Screens.AnnouncementEntityName"
+msgid "Entity name"
+msgstr "エンティティ名"
+
+#. Screens.AnnouncementFacingDirectionForBeamAttacks
+msgctxt "Screens.AnnouncementFacingDirectionForBeamAttacks"
+msgid "Facing direction for troops with beam attacks"
+msgstr "ビーム攻撃を行う部隊の向き"
+
+#. Screens.AnnouncementHealth
+msgctxt "Screens.AnnouncementHealth"
+msgid "Health"
+msgstr "体力"
+
+#. Screens.AnnouncementImpassableOrBlocked
+msgctxt "Screens.AnnouncementImpassableOrBlocked"
+msgid "Impassable or blocked"
+msgstr "通行不可またはブロック"
+
+#. Screens.AnnouncementInfluence
+msgctxt "Screens.AnnouncementInfluence"
+msgid "Influence"
+msgstr "影響"
+
+#. Screens.AnnouncementOccupant
+msgctxt "Screens.AnnouncementOccupant"
+msgid "Occupant"
+msgstr "占有者"
+
+#. Screens.AnnouncementReachable
+msgctxt "Screens.AnnouncementReachable"
+msgid "Reachable"
+msgstr "到達可能"
+
+#. Screens.AnnouncementSelectedForSpellcast
+msgctxt "Screens.AnnouncementSelectedForSpellcast"
+msgid "Selected for spellcast"
+msgstr "呪文詠唱用に選択済み"
+
+#. Screens.AnnouncementStackSize
+msgctxt "Screens.AnnouncementStackSize"
+msgid "Stack size"
+msgstr "スタックサイズ"
+
+#. Screens.AnnouncementTileEffects
+msgctxt "Screens.AnnouncementTileEffects"
+msgid "Tile effects"
+msgstr "タイル効果"
+
+#. Screens.AnnouncementTroopName
+msgctxt "Screens.AnnouncementTroopName"
+msgid "Troop name"
+msgstr "部隊名"
+
+#. Screens.AnnouncementOrderRow
+msgctxt "Screens.AnnouncementOrderRow"
+msgid "{0} horizontal row"
+msgstr "{0} 横方向の行"
+
+#. Screens.MovedAfter
+msgctxt "Screens.MovedAfter"
+msgid "Moved after {0}"
+msgstr "{0}の後に移動"
+
+#. Screens.MovedBefore
+msgctxt "Screens.MovedBefore"
+msgid "Moved before {0}"
+msgstr "{0}の前に移動"
+
+#. Screens.MovedBetween
+msgctxt "Screens.MovedBetween"
+msgid "Moved between {0} and {1}"
+msgstr "{0}と{1}の間に移動"
+
+#. Screens.Scanner
+msgctxt "Screens.Scanner"
+msgid "Scanner"
+msgstr "スキャナー"
+
+#. Screens.ScannerContentAnnouncements
+msgctxt "Screens.ScannerContentAnnouncements"
+msgid "Scanner content announcements"
+msgstr "スキャナー内容の通知"
+
+#. Screens.ScannerResultAnnouncements
+msgctxt "Screens.ScannerResultAnnouncements"
+msgid "Scanner result announcements"
+msgstr "スキャナー結果の通知"
+
+#. Screens.TroopDeployment
+msgctxt "Screens.TroopDeployment"
+msgid "Troop deployment"
+msgstr "部隊配置"
+
+#. Screens.AnnouncementContent
+msgctxt "Screens.AnnouncementContent"
+msgid "Content"
+msgstr "内容"
+
+#. Screens.AnnouncementDirection
+msgctxt "Screens.AnnouncementDirection"
+msgid "Direction"
+msgstr "方向"
+
+#. Screens.AnnouncementImpassable
+msgctxt "Screens.AnnouncementImpassable"
+msgid "Impassable"
+msgstr "通行不可"
+
+#. Screens.AnnouncementResultPosition
+msgctxt "Screens.AnnouncementResultPosition"
+msgid "Result position"
+msgstr "結果の位置"
+
+#. Screens.AnnouncementSpawnPoint
+msgctxt "Screens.AnnouncementSpawnPoint"
+msgid "Spawn point"
+msgstr "配置地点"
+
+#. Screens.AnnouncementTroop
+msgctxt "Screens.AnnouncementTroop"
+msgid "Troop"
+msgstr "部隊"
+
+
+#. Spatial.Visited
+msgctxt "Spatial.Visited"
+msgid "visited"
+msgstr "訪問済み"
+
+#. Screens.WielderAnnouncements
+msgctxt "Screens.WielderAnnouncements"
+msgid "Wielder announcements"
+msgstr "ウィルダー通知"
+
+#. Screens.MapEntityAnnouncements
+msgctxt "Screens.MapEntityAnnouncements"
+msgid "Map entity announcements"
+msgstr "マップエンティティ通知"
+
+#. Screens.AnnouncementDestination
+msgctxt "Screens.AnnouncementDestination"
+msgid "Destination"
+msgstr "目的地"
+
+#. Screens.AnnouncementExplorationState
+msgctxt "Screens.AnnouncementExplorationState"
+msgid "Exploration state"
+msgstr "探索状態"
+
+#. Screens.AnnouncementGroupResult
+msgctxt "Screens.AnnouncementGroupResult"
+msgid "Group result"
+msgstr "グループ結果"
+
+#. Screens.AnnouncementInteractionPoint
+msgctxt "Screens.AnnouncementInteractionPoint"
+msgid "Interaction point"
+msgstr "インタラクション地点"
+
+#. Screens.AnnouncementMapEntity
+msgctxt "Screens.AnnouncementMapEntity"
+msgid "Map entity"
+msgstr "マップエンティティ"
+
+#. Screens.AnnouncementMovement
+msgctxt "Screens.AnnouncementMovement"
+msgid "Movement"
+msgstr "移動"
+
+#. Screens.AnnouncementName
+msgctxt "Screens.AnnouncementName"
+msgid "Name"
+msgstr "名前"
+
+#. Screens.AnnouncementReachabilityOrRoutePreview
+msgctxt "Screens.AnnouncementReachabilityOrRoutePreview"
+msgid "Reachability or route preview"
+msgstr "到達可能性またはルートプレビュー"
+
+#. Screens.AnnouncementRelationship
+msgctxt "Screens.AnnouncementRelationship"
+msgid "Relationship"
+msgstr "関係"
+
+#. Screens.AnnouncementSelected
+msgctxt "Screens.AnnouncementSelected"
+msgid "Selected"
+msgstr "選択済み"
+
+#. Screens.AnnouncementTerrain
+msgctxt "Screens.AnnouncementTerrain"
+msgid "Terrain"
+msgstr "地形"
+
+#. Screens.AnnouncementThisTurnDestination
+msgctxt "Screens.AnnouncementThisTurnDestination"
+msgid "This turn destination"
+msgstr "このターンの目的地"
+
+#. Screens.AnnouncementVisited
+msgctxt "Screens.AnnouncementVisited"
+msgid "Visited"
+msgstr "訪問済み"
+
+#. Screens.AnnouncementWielder
+msgctxt "Screens.AnnouncementWielder"
+msgid "Wielder"
+msgstr "ウィルダー"
+
+#. Screens.AnnouncementZoneOfControl
+msgctxt "Screens.AnnouncementZoneOfControl"
+msgid "Zone of control"
+msgstr "支配領域"
+

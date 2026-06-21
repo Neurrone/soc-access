@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using SongsOfConquestAccess.Adapters;
+using SongsOfConquestAccess.Localization;
 using SongsOfConquestAccess.Speech.Spatial;
 using UnityEngine;
 
@@ -9,36 +10,6 @@ namespace SongsOfConquestAccess.Tests
     [TestClass]
     public sealed class CombatTileSpeechFormatterTests
     {
-        [TestMethod]
-        public void DescribeTileContextPlacesMapEffectsBeforeElevation()
-        {
-            CombatTile tile = new CombatTile(new Vector2Int(2, 3))
-            {
-                Elevation = 1
-            };
-            tile.MapEffects.Add("Acid Cloud");
-
-            string text = new CombatTileSpeechFormatter(null, null, includeEnemyInfluence: false).DescribeTileContext(tile);
-
-            Assert.AreEqual("Acid Cloud, elevated ground, height 1", text);
-        }
-
-        [TestMethod]
-        public void FormatAttackablePrefixAddsAttackableBeforeLabel()
-        {
-            string text = CombatTileSpeechFormatter.FormatAttackablePrefix("8 enemy Rats. 12 / 20 health", true);
-
-            Assert.AreEqual("Attackable, 8 enemy Rats. 12 / 20 health", text);
-        }
-
-        [TestMethod]
-        public void FormatAttackablePrefixLeavesNonAttackableLabelUnchanged()
-        {
-            string text = CombatTileSpeechFormatter.FormatAttackablePrefix("8 enemy Rats. 12 / 20 health", false);
-
-            Assert.AreEqual("8 enemy Rats. 12 / 20 health", text);
-        }
-
         [TestMethod]
         public void InspectRangeIndicatorsFormatsAttackRangeWithoutTroopName()
         {
@@ -108,6 +79,64 @@ namespace SongsOfConquestAccess.Tests
             string text = new CombatTileSpeechFormatter(null, context).DescribeInfluence(tile);
 
             Assert.AreEqual("Attack range", text);
+        }
+
+        [TestMethod]
+        public void ConfigurableAnnouncementComposerUsesSuffixBetweenRenderedPartsOnly()
+        {
+            AnnouncementGroupDefinition group = new AnnouncementGroupDefinition(
+                "test",
+                "Test",
+                ModStrings.Screens.TileAnnouncements,
+                new AnnouncementElementDefinition("first", ModStrings.Screens.AnnouncementReachable),
+                new AnnouncementElementDefinition("second", ModStrings.Screens.AnnouncementCoordinates),
+                new AnnouncementElementDefinition("third", ModStrings.Screens.AnnouncementInfluence));
+
+            string text = ComposeWithDefaults(group, new[]
+            {
+                new AnnouncementPart("first", "one"),
+                new AnnouncementPart("second", "two")
+            });
+
+            Assert.AreEqual("one, two", text);
+        }
+
+        [TestMethod]
+        public void ConfigurableAnnouncementComposerHonorsDefaultSuffixOff()
+        {
+            AnnouncementGroupDefinition group = new AnnouncementGroupDefinition(
+                "test_no_suffix",
+                "Test",
+                ModStrings.Screens.TileAnnouncements,
+                new AnnouncementElementDefinition("first", ModStrings.Screens.AnnouncementReachable, defaultSuffix: false),
+                new AnnouncementElementDefinition("second", ModStrings.Screens.AnnouncementCoordinates));
+
+            string text = ComposeWithDefaults(group, new[]
+            {
+                new AnnouncementPart("first", "one"),
+                new AnnouncementPart("second", "two")
+            });
+
+            Assert.AreEqual("one two", text);
+        }
+
+        private static string ComposeWithDefaults(AnnouncementGroupDefinition group, IEnumerable<AnnouncementPart> parts)
+        {
+            return ConfigurableAnnouncementComposer.Compose(
+                group,
+                parts,
+                testGroup =>
+                {
+                    List<string> keys = new List<string>();
+                    for (int i = 0; i < testGroup.Elements.Count; i++)
+                    {
+                        keys.Add(testGroup.Elements[i].Key);
+                    }
+
+                    return keys;
+                },
+                (testGroup, element) => element.DefaultEnabled,
+                (testGroup, element) => element.DefaultSuffix);
         }
     }
 }

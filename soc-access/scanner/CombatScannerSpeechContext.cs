@@ -32,22 +32,23 @@ namespace SongsOfConquestAccess.Scanner
 
         public SpeechRequest ToSpeechRequest()
         {
-            List<string> parts = new List<string>();
             CombatTileSpeechFormatter formatter = new CombatTileSpeechFormatter(_adapter, null, includeEnemyInfluence: false);
+            string content;
             if (_result != null && _result.Kind == ScannerResultKind.TerrainGroup)
             {
-                ScannerSpeechUtility.AddIfPresent(parts, _result.Label);
+                content = _result.Label;
             }
-            else if (_result == null || _result.Kind != ScannerResultKind.TerrainPoint)
+            else
             {
-                ScannerSpeechUtility.AddIfPresent(parts, formatter.DescribePrimaryContent(_tile));
-                ScannerSpeechUtility.AddIfPresent(parts, formatter.DescribeTileContext(_tile));
+                content = formatter.DescribeScannerContent(_tile);
             }
 
-            ScannerSpeechUtility.AddIfPresent(parts, ScannerSpeechUtility.FormatDirections(_directions));
-            ScannerSpeechUtility.AddIfPresent(parts, formatter.DescribeCoordinates(_tile));
-            ScannerSpeechUtility.AddIfPresent(parts, ScannerSpeechUtility.FormatResultCount(_resultIndex, _resultCount));
-            return new SpeechRequest(string.Join(". ", parts.ToArray()), interrupt: false);
+            string text = ScannerResultSpeechFormatter.Compose(
+                content,
+                ScannerSpeechUtility.FormatDirections(_directions),
+                formatter.DescribeCoordinates(_tile),
+                ScannerSpeechUtility.FormatResultCount(_resultIndex, _resultCount));
+            return new SpeechRequest(text, interrupt: false);
         }
     }
 }

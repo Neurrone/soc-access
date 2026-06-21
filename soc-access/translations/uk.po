@@ -3155,3 +3155,305 @@ msgstr "Здібність скасовано"
 msgctxt "Combat.SpellCancelled"
 msgid "Spell cancelled"
 msgstr "Заклинання скасовано"
+
+#. Screens.Configure
+msgctxt "Screens.Configure"
+msgid "Configure"
+msgstr "Налаштувати"
+
+#. Screens.ConfigureAnnouncementElement
+msgctxt "Screens.ConfigureAnnouncementElement"
+msgid "Configure {0}"
+msgstr "Налаштувати {0}"
+
+#. Screens.Enabled
+msgctxt "Screens.Enabled"
+msgid "Enabled"
+msgstr "Увімкнено"
+
+#. Screens.EntityAnnouncements
+msgctxt "Screens.EntityAnnouncements"
+msgid "Entity announcements"
+msgstr "Оголошення сутностей"
+
+#. Screens.MoveDown
+msgctxt "Screens.MoveDown"
+msgid "Move down"
+msgstr "Перемістити вниз"
+
+#. Screens.MoveUp
+msgctxt "Screens.MoveUp"
+msgid "Move up"
+msgstr "Перемістити вгору"
+
+#. Screens.ResetAllToDefaults
+msgctxt "Screens.ResetAllToDefaults"
+msgid "Reset all to defaults"
+msgstr "Скинути все до стандартних значень"
+
+#. Screens.ResetToDefaults
+msgctxt "Screens.ResetToDefaults"
+msgid "Reset to defaults"
+msgstr "Скинути до стандартних значень"
+
+#. Screens.Suffix
+msgctxt "Screens.Suffix"
+msgid "Include suffix punctuation"
+msgstr "Включати пунктуацію суфікса"
+
+#. Screens.TileAnnouncements
+msgctxt "Screens.TileAnnouncements"
+msgid "Tile announcements"
+msgstr "Оголошення клітинок"
+
+#. Screens.TroopAnnouncements
+msgctxt "Screens.TroopAnnouncements"
+msgid "Troop announcements"
+msgstr "Оголошення загонів"
+
+#. Screens.AnnouncementActing
+msgctxt "Screens.AnnouncementActing"
+msgid "Acting"
+msgstr "Діючий"
+
+#. Screens.AnnouncementAffiliation
+msgctxt "Screens.AnnouncementAffiliation"
+msgid "Affiliation"
+msgstr "Приналежність"
+
+#. Screens.AnnouncementAttackable
+msgctxt "Screens.AnnouncementAttackable"
+msgid "Attackable"
+msgstr "Можна атакувати"
+
+#. Screens.AnnouncementCoordinates
+msgctxt "Screens.AnnouncementCoordinates"
+msgid "Coordinates"
+msgstr "Координати"
+
+#. Screens.AnnouncementDecorativeFeatures
+msgctxt "Screens.AnnouncementDecorativeFeatures"
+msgid "Decorative features"
+msgstr "Декоративні елементи"
+
+#. Screens.AnnouncementElevation
+msgctxt "Screens.AnnouncementElevation"
+msgid "Elevation"
+msgstr "Висота"
+
+#. Screens.AnnouncementEntityName
+msgctxt "Screens.AnnouncementEntityName"
+msgid "Entity name"
+msgstr "Назва сутності"
+
+#. Screens.AnnouncementFacingDirectionForBeamAttacks
+msgctxt "Screens.AnnouncementFacingDirectionForBeamAttacks"
+msgid "Facing direction for troops with beam attacks"
+msgstr "Напрямок для загонів із променевими атаками"
+
+#. Screens.AnnouncementHealth
+msgctxt "Screens.AnnouncementHealth"
+msgid "Health"
+msgstr "Здоров’я"
+
+#. Screens.AnnouncementImpassableOrBlocked
+msgctxt "Screens.AnnouncementImpassableOrBlocked"
+msgid "Impassable or blocked"
+msgstr "Непрохідно або заблоковано"
+
+#. Screens.AnnouncementInfluence
+msgctxt "Screens.AnnouncementInfluence"
+msgid "Influence"
+msgstr "Вплив"
+
+#. Screens.AnnouncementOccupant
+msgctxt "Screens.AnnouncementOccupant"
+msgid "Occupant"
+msgstr "Зайнято"
+
+#. Screens.AnnouncementReachable
+msgctxt "Screens.AnnouncementReachable"
+msgid "Reachable"
+msgstr "Досяжно"
+
+#. Screens.AnnouncementSelectedForSpellcast
+msgctxt "Screens.AnnouncementSelectedForSpellcast"
+msgid "Selected for spellcast"
+msgstr "Вибрано для заклинання"
+
+#. Screens.AnnouncementStackSize
+msgctxt "Screens.AnnouncementStackSize"
+msgid "Stack size"
+msgstr "Розмір стосу"
+
+#. Screens.AnnouncementTileEffects
+msgctxt "Screens.AnnouncementTileEffects"
+msgid "Tile effects"
+msgstr "Ефекти клітинки"
+
+#. Screens.AnnouncementTroopName
+msgctxt "Screens.AnnouncementTroopName"
+msgid "Troop name"
+msgstr "Назва загону"
+
+#. Screens.AnnouncementOrderRow
+msgctxt "Screens.AnnouncementOrderRow"
+msgid "{0} horizontal row"
+msgstr "{0} горизонтальний рядок"
+
+#. Screens.MovedAfter
+msgctxt "Screens.MovedAfter"
+msgid "Moved after {0}"
+msgstr "Переміщено після {0}"
+
+#. Screens.MovedBefore
+msgctxt "Screens.MovedBefore"
+msgid "Moved before {0}"
+msgstr "Переміщено перед {0}"
+
+#. Screens.MovedBetween
+msgctxt "Screens.MovedBetween"
+msgid "Moved between {0} and {1}"
+msgstr "Переміщено між {0} і {1}"
+
+#. Screens.Scanner
+msgctxt "Screens.Scanner"
+msgid "Scanner"
+msgstr "Сканер"
+
+#. Screens.ScannerContentAnnouncements
+msgctxt "Screens.ScannerContentAnnouncements"
+msgid "Scanner content announcements"
+msgstr "Оголошення вмісту сканера"
+
+#. Screens.ScannerResultAnnouncements
+msgctxt "Screens.ScannerResultAnnouncements"
+msgid "Scanner result announcements"
+msgstr "Оголошення результатів сканера"
+
+#. Screens.TroopDeployment
+msgctxt "Screens.TroopDeployment"
+msgid "Troop deployment"
+msgstr "Розміщення військ"
+
+#. Screens.AnnouncementContent
+msgctxt "Screens.AnnouncementContent"
+msgid "Content"
+msgstr "Вміст"
+
+#. Screens.AnnouncementDirection
+msgctxt "Screens.AnnouncementDirection"
+msgid "Direction"
+msgstr "Напрямок"
+
+#. Screens.AnnouncementImpassable
+msgctxt "Screens.AnnouncementImpassable"
+msgid "Impassable"
+msgstr "Непрохідно"
+
+#. Screens.AnnouncementResultPosition
+msgctxt "Screens.AnnouncementResultPosition"
+msgid "Result position"
+msgstr "Позиція результату"
+
+#. Screens.AnnouncementSpawnPoint
+msgctxt "Screens.AnnouncementSpawnPoint"
+msgid "Spawn point"
+msgstr "Точка розміщення"
+
+#. Screens.AnnouncementTroop
+msgctxt "Screens.AnnouncementTroop"
+msgid "Troop"
+msgstr "Загін"
+
+
+#. Spatial.Visited
+msgctxt "Spatial.Visited"
+msgid "visited"
+msgstr "відвідано"
+
+#. Screens.WielderAnnouncements
+msgctxt "Screens.WielderAnnouncements"
+msgid "Wielder announcements"
+msgstr "Оголошення володарів"
+
+#. Screens.MapEntityAnnouncements
+msgctxt "Screens.MapEntityAnnouncements"
+msgid "Map entity announcements"
+msgstr "Оголошення об'єктів мапи"
+
+#. Screens.AnnouncementDestination
+msgctxt "Screens.AnnouncementDestination"
+msgid "Destination"
+msgstr "Пункт призначення"
+
+#. Screens.AnnouncementExplorationState
+msgctxt "Screens.AnnouncementExplorationState"
+msgid "Exploration state"
+msgstr "Стан розвідки"
+
+#. Screens.AnnouncementGroupResult
+msgctxt "Screens.AnnouncementGroupResult"
+msgid "Group result"
+msgstr "Результат групи"
+
+#. Screens.AnnouncementInteractionPoint
+msgctxt "Screens.AnnouncementInteractionPoint"
+msgid "Interaction point"
+msgstr "Точка взаємодії"
+
+#. Screens.AnnouncementMapEntity
+msgctxt "Screens.AnnouncementMapEntity"
+msgid "Map entity"
+msgstr "Об'єкт мапи"
+
+#. Screens.AnnouncementMovement
+msgctxt "Screens.AnnouncementMovement"
+msgid "Movement"
+msgstr "Рух"
+
+#. Screens.AnnouncementName
+msgctxt "Screens.AnnouncementName"
+msgid "Name"
+msgstr "Ім'я"
+
+#. Screens.AnnouncementReachabilityOrRoutePreview
+msgctxt "Screens.AnnouncementReachabilityOrRoutePreview"
+msgid "Reachability or route preview"
+msgstr "Досяжність або попередній перегляд маршруту"
+
+#. Screens.AnnouncementRelationship
+msgctxt "Screens.AnnouncementRelationship"
+msgid "Relationship"
+msgstr "Відношення"
+
+#. Screens.AnnouncementSelected
+msgctxt "Screens.AnnouncementSelected"
+msgid "Selected"
+msgstr "Вибрано"
+
+#. Screens.AnnouncementTerrain
+msgctxt "Screens.AnnouncementTerrain"
+msgid "Terrain"
+msgstr "Місцевість"
+
+#. Screens.AnnouncementThisTurnDestination
+msgctxt "Screens.AnnouncementThisTurnDestination"
+msgid "This turn destination"
+msgstr "Пункт призначення цього ходу"
+
+#. Screens.AnnouncementVisited
+msgctxt "Screens.AnnouncementVisited"
+msgid "Visited"
+msgstr "Відвідано"
+
+#. Screens.AnnouncementWielder
+msgctxt "Screens.AnnouncementWielder"
+msgid "Wielder"
+msgstr "Володар"
+
+#. Screens.AnnouncementZoneOfControl
+msgctxt "Screens.AnnouncementZoneOfControl"
+msgid "Zone of control"
+msgstr "Зона контролю"
+

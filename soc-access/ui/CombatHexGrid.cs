@@ -56,15 +56,12 @@ namespace SongsOfConquestAccess.UI
         public override string GetLabel()
         {
             CombatTile tile = GetFocusedTile();
-            string label = _adapter != null ? _adapter.DescribeTile(tile, GetEffectiveInspectContext()) : ModText.Get(ModStrings.UI.CombatGrid);
-            if (_adapter != null
+            bool selectedForSpellcast = _adapter != null
                 && _adapter.GetTargetingMode() == CombatTargetingMode.Spell
-                && _adapter.IsSpellTargetSelected(_cursor))
-            {
-                return ModText.Get(ModStrings.Common.ListSeparator, ModText.Get(ModStrings.UI.Selected), label);
-            }
-
-            return label;
+                && _adapter.IsSpellTargetSelected(_cursor);
+            return _adapter != null
+                ? _adapter.DescribeTile(tile, GetEffectiveInspectContext(), selectedForSpellcast)
+                : ModText.Get(ModStrings.UI.CombatGrid);
         }
 
         public override Tooltip GetTooltip()

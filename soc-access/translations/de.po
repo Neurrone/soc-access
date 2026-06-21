@@ -3035,3 +3035,305 @@ msgstr "Fähigkeit abgebrochen"
 msgctxt "Combat.SpellCancelled"
 msgid "Spell cancelled"
 msgstr "Zauber abgebrochen"
+
+#. Screens.Configure
+msgctxt "Screens.Configure"
+msgid "Configure"
+msgstr "Konfigurieren"
+
+#. Screens.ConfigureAnnouncementElement
+msgctxt "Screens.ConfigureAnnouncementElement"
+msgid "Configure {0}"
+msgstr "{0} konfigurieren"
+
+#. Screens.Enabled
+msgctxt "Screens.Enabled"
+msgid "Enabled"
+msgstr "Aktiviert"
+
+#. Screens.EntityAnnouncements
+msgctxt "Screens.EntityAnnouncements"
+msgid "Entity announcements"
+msgstr "Entitätsansagen"
+
+#. Screens.MoveDown
+msgctxt "Screens.MoveDown"
+msgid "Move down"
+msgstr "Nach unten"
+
+#. Screens.MoveUp
+msgctxt "Screens.MoveUp"
+msgid "Move up"
+msgstr "Nach oben"
+
+#. Screens.ResetAllToDefaults
+msgctxt "Screens.ResetAllToDefaults"
+msgid "Reset all to defaults"
+msgstr "Alles auf Standardwerte zurücksetzen"
+
+#. Screens.ResetToDefaults
+msgctxt "Screens.ResetToDefaults"
+msgid "Reset to defaults"
+msgstr "Auf Standardwerte zurücksetzen"
+
+#. Screens.Suffix
+msgctxt "Screens.Suffix"
+msgid "Include suffix punctuation"
+msgstr "Suffix-Zeichensetzung einschließen"
+
+#. Screens.TileAnnouncements
+msgctxt "Screens.TileAnnouncements"
+msgid "Tile announcements"
+msgstr "Feldansagen"
+
+#. Screens.TroopAnnouncements
+msgctxt "Screens.TroopAnnouncements"
+msgid "Troop announcements"
+msgstr "Truppenansagen"
+
+#. Screens.AnnouncementActing
+msgctxt "Screens.AnnouncementActing"
+msgid "Acting"
+msgstr "Am Zug"
+
+#. Screens.AnnouncementAffiliation
+msgctxt "Screens.AnnouncementAffiliation"
+msgid "Affiliation"
+msgstr "Zugehörigkeit"
+
+#. Screens.AnnouncementAttackable
+msgctxt "Screens.AnnouncementAttackable"
+msgid "Attackable"
+msgstr "Angreifbar"
+
+#. Screens.AnnouncementCoordinates
+msgctxt "Screens.AnnouncementCoordinates"
+msgid "Coordinates"
+msgstr "Koordinaten"
+
+#. Screens.AnnouncementDecorativeFeatures
+msgctxt "Screens.AnnouncementDecorativeFeatures"
+msgid "Decorative features"
+msgstr "Dekorative Merkmale"
+
+#. Screens.AnnouncementElevation
+msgctxt "Screens.AnnouncementElevation"
+msgid "Elevation"
+msgstr "Höhe"
+
+#. Screens.AnnouncementEntityName
+msgctxt "Screens.AnnouncementEntityName"
+msgid "Entity name"
+msgstr "Entitätsname"
+
+#. Screens.AnnouncementFacingDirectionForBeamAttacks
+msgctxt "Screens.AnnouncementFacingDirectionForBeamAttacks"
+msgid "Facing direction for troops with beam attacks"
+msgstr "Blickrichtung für Truppen mit Strahlenangriffen"
+
+#. Screens.AnnouncementHealth
+msgctxt "Screens.AnnouncementHealth"
+msgid "Health"
+msgstr "Gesundheit"
+
+#. Screens.AnnouncementImpassableOrBlocked
+msgctxt "Screens.AnnouncementImpassableOrBlocked"
+msgid "Impassable or blocked"
+msgstr "Unpassierbar oder blockiert"
+
+#. Screens.AnnouncementInfluence
+msgctxt "Screens.AnnouncementInfluence"
+msgid "Influence"
+msgstr "Einfluss"
+
+#. Screens.AnnouncementOccupant
+msgctxt "Screens.AnnouncementOccupant"
+msgid "Occupant"
+msgstr "Belegung"
+
+#. Screens.AnnouncementReachable
+msgctxt "Screens.AnnouncementReachable"
+msgid "Reachable"
+msgstr "Erreichbar"
+
+#. Screens.AnnouncementSelectedForSpellcast
+msgctxt "Screens.AnnouncementSelectedForSpellcast"
+msgid "Selected for spellcast"
+msgstr "Für Zauber ausgewählt"
+
+#. Screens.AnnouncementStackSize
+msgctxt "Screens.AnnouncementStackSize"
+msgid "Stack size"
+msgstr "Stapelgröße"
+
+#. Screens.AnnouncementTileEffects
+msgctxt "Screens.AnnouncementTileEffects"
+msgid "Tile effects"
+msgstr "Feldeffekte"
+
+#. Screens.AnnouncementTroopName
+msgctxt "Screens.AnnouncementTroopName"
+msgid "Troop name"
+msgstr "Truppenname"
+
+#. Screens.AnnouncementOrderRow
+msgctxt "Screens.AnnouncementOrderRow"
+msgid "{0} horizontal row"
+msgstr "{0} horizontale Zeile"
+
+#. Screens.MovedAfter
+msgctxt "Screens.MovedAfter"
+msgid "Moved after {0}"
+msgstr "Nach {0} verschoben"
+
+#. Screens.MovedBefore
+msgctxt "Screens.MovedBefore"
+msgid "Moved before {0}"
+msgstr "Vor {0} verschoben"
+
+#. Screens.MovedBetween
+msgctxt "Screens.MovedBetween"
+msgid "Moved between {0} and {1}"
+msgstr "Zwischen {0} und {1} verschoben"
+
+#. Screens.Scanner
+msgctxt "Screens.Scanner"
+msgid "Scanner"
+msgstr "Scanner"
+
+#. Screens.ScannerContentAnnouncements
+msgctxt "Screens.ScannerContentAnnouncements"
+msgid "Scanner content announcements"
+msgstr "Scanner-Inhaltsansagen"
+
+#. Screens.ScannerResultAnnouncements
+msgctxt "Screens.ScannerResultAnnouncements"
+msgid "Scanner result announcements"
+msgstr "Scanner-Ergebnisansagen"
+
+#. Screens.TroopDeployment
+msgctxt "Screens.TroopDeployment"
+msgid "Troop deployment"
+msgstr "Truppenaufstellung"
+
+#. Screens.AnnouncementContent
+msgctxt "Screens.AnnouncementContent"
+msgid "Content"
+msgstr "Inhalt"
+
+#. Screens.AnnouncementDirection
+msgctxt "Screens.AnnouncementDirection"
+msgid "Direction"
+msgstr "Richtung"
+
+#. Screens.AnnouncementImpassable
+msgctxt "Screens.AnnouncementImpassable"
+msgid "Impassable"
+msgstr "Unpassierbar"
+
+#. Screens.AnnouncementResultPosition
+msgctxt "Screens.AnnouncementResultPosition"
+msgid "Result position"
+msgstr "Ergebnisposition"
+
+#. Screens.AnnouncementSpawnPoint
+msgctxt "Screens.AnnouncementSpawnPoint"
+msgid "Spawn point"
+msgstr "Aufstellungspunkt"
+
+#. Screens.AnnouncementTroop
+msgctxt "Screens.AnnouncementTroop"
+msgid "Troop"
+msgstr "Truppe"
+
+
+#. Spatial.Visited
+msgctxt "Spatial.Visited"
+msgid "visited"
+msgstr "besucht"
+
+#. Screens.WielderAnnouncements
+msgctxt "Screens.WielderAnnouncements"
+msgid "Wielder announcements"
+msgstr "Wielder-Ansagen"
+
+#. Screens.MapEntityAnnouncements
+msgctxt "Screens.MapEntityAnnouncements"
+msgid "Map entity announcements"
+msgstr "Kartenobjekt-Ansagen"
+
+#. Screens.AnnouncementDestination
+msgctxt "Screens.AnnouncementDestination"
+msgid "Destination"
+msgstr "Ziel"
+
+#. Screens.AnnouncementExplorationState
+msgctxt "Screens.AnnouncementExplorationState"
+msgid "Exploration state"
+msgstr "Erkundungsstatus"
+
+#. Screens.AnnouncementGroupResult
+msgctxt "Screens.AnnouncementGroupResult"
+msgid "Group result"
+msgstr "Gruppenergebnis"
+
+#. Screens.AnnouncementInteractionPoint
+msgctxt "Screens.AnnouncementInteractionPoint"
+msgid "Interaction point"
+msgstr "Interaktionspunkt"
+
+#. Screens.AnnouncementMapEntity
+msgctxt "Screens.AnnouncementMapEntity"
+msgid "Map entity"
+msgstr "Kartenobjekt"
+
+#. Screens.AnnouncementMovement
+msgctxt "Screens.AnnouncementMovement"
+msgid "Movement"
+msgstr "Bewegung"
+
+#. Screens.AnnouncementName
+msgctxt "Screens.AnnouncementName"
+msgid "Name"
+msgstr "Name"
+
+#. Screens.AnnouncementReachabilityOrRoutePreview
+msgctxt "Screens.AnnouncementReachabilityOrRoutePreview"
+msgid "Reachability or route preview"
+msgstr "Erreichbarkeit oder Routenvorschau"
+
+#. Screens.AnnouncementRelationship
+msgctxt "Screens.AnnouncementRelationship"
+msgid "Relationship"
+msgstr "Beziehung"
+
+#. Screens.AnnouncementSelected
+msgctxt "Screens.AnnouncementSelected"
+msgid "Selected"
+msgstr "Ausgewählt"
+
+#. Screens.AnnouncementTerrain
+msgctxt "Screens.AnnouncementTerrain"
+msgid "Terrain"
+msgstr "Gelände"
+
+#. Screens.AnnouncementThisTurnDestination
+msgctxt "Screens.AnnouncementThisTurnDestination"
+msgid "This turn destination"
+msgstr "Ziel in diesem Zug"
+
+#. Screens.AnnouncementVisited
+msgctxt "Screens.AnnouncementVisited"
+msgid "Visited"
+msgstr "Besucht"
+
+#. Screens.AnnouncementWielder
+msgctxt "Screens.AnnouncementWielder"
+msgid "Wielder"
+msgstr "Wielder"
+
+#. Screens.AnnouncementZoneOfControl
+msgctxt "Screens.AnnouncementZoneOfControl"
+msgid "Zone of control"
+msgstr "Kontrollzone"
+

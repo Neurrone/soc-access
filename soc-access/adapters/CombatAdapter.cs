@@ -1454,7 +1454,12 @@ namespace SongsOfConquestAccess.Adapters
 
         public string DescribeTile(CombatTile tile, CombatInspectContext context)
         {
-            return new CombatTileSpeechFormatter(this, context).DescribeTile(tile);
+            return DescribeTile(tile, context, selectedForSpellcast: false);
+        }
+
+        public string DescribeTile(CombatTile tile, CombatInspectContext context, bool selectedForSpellcast)
+        {
+            return new CombatTileSpeechFormatter(this, context, selectedForSpellcast: selectedForSpellcast).DescribeTile(tile);
         }
 
         private void SynchronizeNativeHoverForInput(Vector2Int point)
@@ -2642,6 +2647,53 @@ namespace SongsOfConquestAccess.Adapters
             }
 
             return label;
+        }
+
+        internal bool IsActingTroop(IBattleTroopState troop)
+        {
+            IBattleTroopState current = GetCurrentTroop();
+            return troop != null && current != null && troop.Id == current.Id;
+        }
+
+        internal bool IsEnemyTroop(IBattleTroopState troop)
+        {
+            int localTeamId = GetLocalTeamId();
+            return troop != null && localTeamId >= 0 && troop.TeamId != localTeamId;
+        }
+
+        internal int GetTroopStackSize(IBattleTroopState troop)
+        {
+            return troop != null ? troop.Stats.Size : 0;
+        }
+
+        internal string GetTroopNameForSpeech(IBattleTroopState troop)
+        {
+            return CreateTroopRef(troop).Name;
+        }
+
+        internal string GetTroopHealthForSpeech(IBattleTroopState troop)
+        {
+            return troop != null
+                ? ModText.Get(ModStrings.Spatial.Health, troop.CurrentHealth, troop.Stats.MaxHealth.GetValue())
+                : string.Empty;
+        }
+
+        internal string GetEntityNameForSpeech(IMapEntity entity)
+        {
+            return GetMapEntityName(entity);
+        }
+
+        internal string GetEntityHealthForSpeech(IMapEntity entity)
+        {
+            if (entity == null)
+            {
+                return string.Empty;
+            }
+
+            IHealthComponent health = entity.GetComponent<IHealthComponent>();
+            return health != null
+                ? ModText.Get(ModStrings.Spatial.Health, health.HealthLeft, health.MaxHealth.GetValue())
+                : string.Empty;
         }
 
         private int GetLocalTeamId()

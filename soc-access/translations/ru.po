@@ -3155,3 +3155,305 @@ msgstr "Способность отменена"
 msgctxt "Combat.SpellCancelled"
 msgid "Spell cancelled"
 msgstr "Заклинание отменено"
+
+#. Screens.Configure
+msgctxt "Screens.Configure"
+msgid "Configure"
+msgstr "Настроить"
+
+#. Screens.ConfigureAnnouncementElement
+msgctxt "Screens.ConfigureAnnouncementElement"
+msgid "Configure {0}"
+msgstr "Настроить {0}"
+
+#. Screens.Enabled
+msgctxt "Screens.Enabled"
+msgid "Enabled"
+msgstr "Включено"
+
+#. Screens.EntityAnnouncements
+msgctxt "Screens.EntityAnnouncements"
+msgid "Entity announcements"
+msgstr "Объявления сущностей"
+
+#. Screens.MoveDown
+msgctxt "Screens.MoveDown"
+msgid "Move down"
+msgstr "Переместить вниз"
+
+#. Screens.MoveUp
+msgctxt "Screens.MoveUp"
+msgid "Move up"
+msgstr "Переместить вверх"
+
+#. Screens.ResetAllToDefaults
+msgctxt "Screens.ResetAllToDefaults"
+msgid "Reset all to defaults"
+msgstr "Сбросить всё к значениям по умолчанию"
+
+#. Screens.ResetToDefaults
+msgctxt "Screens.ResetToDefaults"
+msgid "Reset to defaults"
+msgstr "Сбросить к значениям по умолчанию"
+
+#. Screens.Suffix
+msgctxt "Screens.Suffix"
+msgid "Include suffix punctuation"
+msgstr "Включать пунктуацию суффикса"
+
+#. Screens.TileAnnouncements
+msgctxt "Screens.TileAnnouncements"
+msgid "Tile announcements"
+msgstr "Объявления клеток"
+
+#. Screens.TroopAnnouncements
+msgctxt "Screens.TroopAnnouncements"
+msgid "Troop announcements"
+msgstr "Объявления отрядов"
+
+#. Screens.AnnouncementActing
+msgctxt "Screens.AnnouncementActing"
+msgid "Acting"
+msgstr "Действующий"
+
+#. Screens.AnnouncementAffiliation
+msgctxt "Screens.AnnouncementAffiliation"
+msgid "Affiliation"
+msgstr "Принадлежность"
+
+#. Screens.AnnouncementAttackable
+msgctxt "Screens.AnnouncementAttackable"
+msgid "Attackable"
+msgstr "Можно атаковать"
+
+#. Screens.AnnouncementCoordinates
+msgctxt "Screens.AnnouncementCoordinates"
+msgid "Coordinates"
+msgstr "Координаты"
+
+#. Screens.AnnouncementDecorativeFeatures
+msgctxt "Screens.AnnouncementDecorativeFeatures"
+msgid "Decorative features"
+msgstr "Декоративные элементы"
+
+#. Screens.AnnouncementElevation
+msgctxt "Screens.AnnouncementElevation"
+msgid "Elevation"
+msgstr "Высота"
+
+#. Screens.AnnouncementEntityName
+msgctxt "Screens.AnnouncementEntityName"
+msgid "Entity name"
+msgstr "Название сущности"
+
+#. Screens.AnnouncementFacingDirectionForBeamAttacks
+msgctxt "Screens.AnnouncementFacingDirectionForBeamAttacks"
+msgid "Facing direction for troops with beam attacks"
+msgstr "Направление для отрядов с лучевыми атаками"
+
+#. Screens.AnnouncementHealth
+msgctxt "Screens.AnnouncementHealth"
+msgid "Health"
+msgstr "Здоровье"
+
+#. Screens.AnnouncementImpassableOrBlocked
+msgctxt "Screens.AnnouncementImpassableOrBlocked"
+msgid "Impassable or blocked"
+msgstr "Непроходимо или заблокировано"
+
+#. Screens.AnnouncementInfluence
+msgctxt "Screens.AnnouncementInfluence"
+msgid "Influence"
+msgstr "Влияние"
+
+#. Screens.AnnouncementOccupant
+msgctxt "Screens.AnnouncementOccupant"
+msgid "Occupant"
+msgstr "Занято"
+
+#. Screens.AnnouncementReachable
+msgctxt "Screens.AnnouncementReachable"
+msgid "Reachable"
+msgstr "Достижимо"
+
+#. Screens.AnnouncementSelectedForSpellcast
+msgctxt "Screens.AnnouncementSelectedForSpellcast"
+msgid "Selected for spellcast"
+msgstr "Выбрано для заклинания"
+
+#. Screens.AnnouncementStackSize
+msgctxt "Screens.AnnouncementStackSize"
+msgid "Stack size"
+msgstr "Размер отряда"
+
+#. Screens.AnnouncementTileEffects
+msgctxt "Screens.AnnouncementTileEffects"
+msgid "Tile effects"
+msgstr "Эффекты клетки"
+
+#. Screens.AnnouncementTroopName
+msgctxt "Screens.AnnouncementTroopName"
+msgid "Troop name"
+msgstr "Название отряда"
+
+#. Screens.AnnouncementOrderRow
+msgctxt "Screens.AnnouncementOrderRow"
+msgid "{0} horizontal row"
+msgstr "{0} горизонтальная строка"
+
+#. Screens.MovedAfter
+msgctxt "Screens.MovedAfter"
+msgid "Moved after {0}"
+msgstr "Перемещено после {0}"
+
+#. Screens.MovedBefore
+msgctxt "Screens.MovedBefore"
+msgid "Moved before {0}"
+msgstr "Перемещено перед {0}"
+
+#. Screens.MovedBetween
+msgctxt "Screens.MovedBetween"
+msgid "Moved between {0} and {1}"
+msgstr "Перемещено между {0} и {1}"
+
+#. Screens.Scanner
+msgctxt "Screens.Scanner"
+msgid "Scanner"
+msgstr "Сканер"
+
+#. Screens.ScannerContentAnnouncements
+msgctxt "Screens.ScannerContentAnnouncements"
+msgid "Scanner content announcements"
+msgstr "Объявления содержимого сканера"
+
+#. Screens.ScannerResultAnnouncements
+msgctxt "Screens.ScannerResultAnnouncements"
+msgid "Scanner result announcements"
+msgstr "Объявления результатов сканера"
+
+#. Screens.TroopDeployment
+msgctxt "Screens.TroopDeployment"
+msgid "Troop deployment"
+msgstr "Размещение войск"
+
+#. Screens.AnnouncementContent
+msgctxt "Screens.AnnouncementContent"
+msgid "Content"
+msgstr "Содержимое"
+
+#. Screens.AnnouncementDirection
+msgctxt "Screens.AnnouncementDirection"
+msgid "Direction"
+msgstr "Направление"
+
+#. Screens.AnnouncementImpassable
+msgctxt "Screens.AnnouncementImpassable"
+msgid "Impassable"
+msgstr "Непроходимо"
+
+#. Screens.AnnouncementResultPosition
+msgctxt "Screens.AnnouncementResultPosition"
+msgid "Result position"
+msgstr "Позиция результата"
+
+#. Screens.AnnouncementSpawnPoint
+msgctxt "Screens.AnnouncementSpawnPoint"
+msgid "Spawn point"
+msgstr "Точка размещения"
+
+#. Screens.AnnouncementTroop
+msgctxt "Screens.AnnouncementTroop"
+msgid "Troop"
+msgstr "Отряд"
+
+
+#. Spatial.Visited
+msgctxt "Spatial.Visited"
+msgid "visited"
+msgstr "посещено"
+
+#. Screens.WielderAnnouncements
+msgctxt "Screens.WielderAnnouncements"
+msgid "Wielder announcements"
+msgstr "Объявления носителей"
+
+#. Screens.MapEntityAnnouncements
+msgctxt "Screens.MapEntityAnnouncements"
+msgid "Map entity announcements"
+msgstr "Объявления объектов карты"
+
+#. Screens.AnnouncementDestination
+msgctxt "Screens.AnnouncementDestination"
+msgid "Destination"
+msgstr "Назначение"
+
+#. Screens.AnnouncementExplorationState
+msgctxt "Screens.AnnouncementExplorationState"
+msgid "Exploration state"
+msgstr "Состояние разведки"
+
+#. Screens.AnnouncementGroupResult
+msgctxt "Screens.AnnouncementGroupResult"
+msgid "Group result"
+msgstr "Результат группы"
+
+#. Screens.AnnouncementInteractionPoint
+msgctxt "Screens.AnnouncementInteractionPoint"
+msgid "Interaction point"
+msgstr "Точка взаимодействия"
+
+#. Screens.AnnouncementMapEntity
+msgctxt "Screens.AnnouncementMapEntity"
+msgid "Map entity"
+msgstr "Объект карты"
+
+#. Screens.AnnouncementMovement
+msgctxt "Screens.AnnouncementMovement"
+msgid "Movement"
+msgstr "Передвижение"
+
+#. Screens.AnnouncementName
+msgctxt "Screens.AnnouncementName"
+msgid "Name"
+msgstr "Имя"
+
+#. Screens.AnnouncementReachabilityOrRoutePreview
+msgctxt "Screens.AnnouncementReachabilityOrRoutePreview"
+msgid "Reachability or route preview"
+msgstr "Достижимость или предпросмотр маршрута"
+
+#. Screens.AnnouncementRelationship
+msgctxt "Screens.AnnouncementRelationship"
+msgid "Relationship"
+msgstr "Отношение"
+
+#. Screens.AnnouncementSelected
+msgctxt "Screens.AnnouncementSelected"
+msgid "Selected"
+msgstr "Выбрано"
+
+#. Screens.AnnouncementTerrain
+msgctxt "Screens.AnnouncementTerrain"
+msgid "Terrain"
+msgstr "Местность"
+
+#. Screens.AnnouncementThisTurnDestination
+msgctxt "Screens.AnnouncementThisTurnDestination"
+msgid "This turn destination"
+msgstr "Назначение на этот ход"
+
+#. Screens.AnnouncementVisited
+msgctxt "Screens.AnnouncementVisited"
+msgid "Visited"
+msgstr "Посещено"
+
+#. Screens.AnnouncementWielder
+msgctxt "Screens.AnnouncementWielder"
+msgid "Wielder"
+msgstr "Носитель"
+
+#. Screens.AnnouncementZoneOfControl
+msgctxt "Screens.AnnouncementZoneOfControl"
+msgid "Zone of control"
+msgstr "Зона контроля"
+

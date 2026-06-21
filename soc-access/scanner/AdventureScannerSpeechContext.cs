@@ -1,6 +1,5 @@
 using System.Collections.Generic;
 using SongsOfConquestAccess.Adapters;
-using SongsOfConquestAccess.Localization;
 using SongsOfConquestAccess.Speech;
 using SongsOfConquestAccess.Speech.Spatial;
 
@@ -30,33 +29,13 @@ namespace SongsOfConquestAccess.Scanner
 
         public SpeechRequest ToSpeechRequest()
         {
-            List<string> parts = new List<string>();
             AdventureMapTileSpeechFormatter formatter = new AdventureMapTileSpeechFormatter();
-
-            if (_result != null
-                && (_result.Kind == ScannerResultKind.TerrainGroup
-                    || _result.Kind == ScannerResultKind.AreaGroup
-                    || _result.Kind == ScannerResultKind.UnexploredGroup
-                    || _result.Kind == ScannerResultKind.CommanderZoneOfControl))
-            {
-                ScannerSpeechUtility.AddIfPresent(parts, _result.Label);
-            }
-            else
-            {
-                string primary = formatter.DescribePrimaryContent(_tile);
-                if (_result != null && _result.NotVisible && !string.IsNullOrWhiteSpace(primary))
-                {
-                    primary += ", " + ModText.Get(ModStrings.Spatial.Unseen);
-                }
-
-                ScannerSpeechUtility.AddIfPresent(parts, primary);
-                ScannerSpeechUtility.AddIfPresent(parts, formatter.DescribeTileContext(_tile));
-            }
-
-            ScannerSpeechUtility.AddIfPresent(parts, ScannerSpeechUtility.FormatDirections(_directions));
-            ScannerSpeechUtility.AddIfPresent(parts, formatter.DescribeCoordinates(_tile));
-            ScannerSpeechUtility.AddIfPresent(parts, ScannerSpeechUtility.FormatResultCount(_resultIndex, _resultCount));
-            return new SpeechRequest(string.Join(". ", parts.ToArray()), interrupt: false);
+            string text = ScannerResultSpeechFormatter.Compose(
+                formatter.DescribeScannerContent(_result, _tile),
+                ScannerSpeechUtility.FormatDirections(_directions),
+                formatter.DescribeCoordinates(_tile),
+                ScannerSpeechUtility.FormatResultCount(_resultIndex, _resultCount));
+            return new SpeechRequest(text, interrupt: false);
         }
     }
 }

@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using SongsOfConquestAccess.Adapters;
 using SongsOfConquestAccess.Speech.Spatial;
@@ -19,9 +20,9 @@ namespace SongsOfConquestAccess.Tests
                 IsImpassable = true
             };
 
-            string text = new AdventureMapTileSpeechFormatter().DescribeTile(tile);
+            string text = CreateFormatter().DescribeTile(tile);
 
-            Assert.AreEqual("Wall, impassable. 12, 9.", text);
+            Assert.AreEqual("Wall, impassable, 12, 9.", text);
         }
 
         [TestMethod]
@@ -35,9 +36,9 @@ namespace SongsOfConquestAccess.Tests
                 IsReachable = true
             };
 
-            string text = new AdventureMapTileSpeechFormatter().DescribeTile(tile);
+            string text = CreateFormatter().DescribeTile(tile);
 
-            Assert.AreEqual("Dirt road, reachable. 4, 2.", text);
+            Assert.AreEqual("Dirt road, reachable, 4, 2.", text);
         }
 
         [TestMethod]
@@ -50,9 +51,28 @@ namespace SongsOfConquestAccess.Tests
                 Terrain = AdventureTerrainKind.Grass
             };
 
-            string text = new AdventureMapTileSpeechFormatter().DescribeTile(tile);
+            string text = CreateFormatter().DescribeTile(tile);
 
-            Assert.AreEqual("Grass. 7, 4.", text);
+            Assert.AreEqual("Grass, 7, 4.", text);
+        }
+
+        private static AdventureMapTileSpeechFormatter CreateFormatter()
+        {
+            return new AdventureMapTileSpeechFormatter(
+                GetDefaultOrder,
+                (group, element) => element.DefaultEnabled,
+                (group, element) => element.DefaultSuffix);
+        }
+
+        private static IReadOnlyList<string> GetDefaultOrder(AnnouncementGroupDefinition group)
+        {
+            List<string> keys = new List<string>();
+            for (int i = 0; i < group.Elements.Count; i++)
+            {
+                keys.Add(group.Elements[i].Key);
+            }
+
+            return keys;
         }
     }
 }

@@ -3,11 +3,34 @@ using System.Globalization;
 using System.Collections.Generic;
 using SongsOfConquestAccess.Adapters;
 using SongsOfConquestAccess.Localization;
+using SongsOfConquestAccess.Scanner;
 
 namespace SongsOfConquestAccess.Speech.Spatial
 {
-    internal sealed class AdventureMapTileSpeechFormatter : ISpatialTileSpeechFormatter<AdventureMapTile>
+    internal sealed class AdventureMapTileSpeechFormatter
     {
+        private readonly Func<AnnouncementGroupDefinition, IReadOnlyList<string>> _getOrder;
+        private readonly Func<AnnouncementGroupDefinition, AnnouncementElementDefinition, bool> _isEnabled;
+        private readonly Func<AnnouncementGroupDefinition, AnnouncementElementDefinition, bool> _includeSuffix;
+
+        public AdventureMapTileSpeechFormatter()
+            : this(
+                ModSettings.GetAnnouncementOrder,
+                ModSettings.GetAnnouncementElementEnabled,
+                ModSettings.GetAnnouncementElementSuffix)
+        {
+        }
+
+        internal AdventureMapTileSpeechFormatter(
+            Func<AnnouncementGroupDefinition, IReadOnlyList<string>> getOrder,
+            Func<AnnouncementGroupDefinition, AnnouncementElementDefinition, bool> isEnabled,
+            Func<AnnouncementGroupDefinition, AnnouncementElementDefinition, bool> includeSuffix)
+        {
+            _getOrder = getOrder;
+            _isEnabled = isEnabled;
+            _includeSuffix = includeSuffix;
+        }
+
         public string DescribeTile(AdventureMapTile tile)
         {
             if (tile == null)
@@ -15,153 +38,55 @@ namespace SongsOfConquestAccess.Speech.Spatial
                 return ModText.Get(ModStrings.Screens.AdventureMap);
             }
 
-            List<string> parts = new List<string>();
-            if (!tile.IsExplored)
-            {
-                parts.Add(ModText.Get(ModStrings.Spatial.Unexplored));
-                for (int i = 0; i < tile.ZoneOfControlNames.Count; i++)
-                {
-                    if (!string.IsNullOrWhiteSpace(tile.ZoneOfControlNames[i]))
-                    {
-                        parts.Add(ModText.Get(ModStrings.Spatial.WithinZoneOfControl, FormatPossessive(tile.ZoneOfControlNames[i])));
-                    }
-                }
-
-                parts.Add(DescribeCoordinates(tile));
-                return string.Join(". ", parts.ToArray()) + ".";
-            }
-
-            if (!tile.IsVisible)
-            {
-                parts.Add(ModText.Get(ModStrings.Spatial.Unseen));
-            }
-
-            string primary = DescribePrimaryContent(tile);
-            bool hasContent = !string.IsNullOrWhiteSpace(primary);
-            bool addedMovementStatus = hasContent;
-            if (hasContent)
-            {
-                parts.Add(primary);
-            }
-
-            for (int i = 0; i < tile.ZoneOfControlNames.Count; i++)
-            {
-                if (!string.IsNullOrWhiteSpace(tile.ZoneOfControlNames[i]))
-                {
-                    parts.Add(ModText.Get(ModStrings.Spatial.WithinZoneOfControl, FormatPossessive(tile.ZoneOfControlNames[i])));
-                }
-            }
-
-            string terrain = DescribeTerrain(tile.Terrain);
-            if (!string.IsNullOrWhiteSpace(terrain))
-            {
-                if (!addedMovementStatus)
-                {
-                    parts.Add(AppendDetails(terrain, GetMovementDetails(tile)));
-                    addedMovementStatus = true;
-                }
-                else
-                {
-                    parts.Add(terrain);
-                }
-            }
-
-            if (!addedMovementStatus)
-            {
-                List<string> movementDetails = GetMovementDetails(tile);
-                if (movementDetails.Count > 0)
-                {
-                    parts.Add(string.Join(", ", movementDetails.ToArray()));
-                }
-            }
-
-            parts.Add(DescribeCoordinates(tile));
-            return string.Join(". ", parts.ToArray()) + ".";
+            string text = Compose(
+                AdventureMapAnnouncementDefinitions.Tile,
+                BuildTileParts(tile, groupResult: null, includeCoordinates: true, appendRouteToTerrainWhenNoContent: true));
+            return string.IsNullOrWhiteSpace(text) ? string.Empty : text + ".";
         }
 
-        public string DescribePrimaryContent(AdventureMapTile tile)
+        public string DescribeScannerContent(ScannerResult result, AdventureMapTile tile)
         {
-            if (tile == null || !tile.IsExplored)
+            string groupResult = IsGroupResult(result) ? result.Label : null;
+            return Compose(
+                AdventureMapAnnouncementDefinitions.ScannerContent,
+                BuildTileParts(tile, groupResult, includeCoordinates: false, appendRouteToTerrainWhenNoContent: false));
+        }
+
+        private string DescribeWielder(AdventureMapTile tile)
+        {
+            if (tile == null || !tile.IsExplored || !tile.IsVisible || tile.Commander == null)
             {
                 return string.Empty;
             }
 
-            if (tile.Commander != null && tile.IsVisible)
-            {
-                List<string> details = new List<string>();
-                AdventureMapTile.CommanderInfo commander = tile.Commander;
-                if (!string.IsNullOrWhiteSpace(commander.Relationship))
-                {
-                    details.Add(commander.Relationship);
-                }
-
-                if (commander.IsSelected)
-                {
-                    details.Add(ModText.Get(ModStrings.UI.Selected));
-                }
-
-                AddCommanderMovementDetails(commander, details);
-                details.AddRange(GetMovementDetails(tile));
-                return AppendDetails(FirstNonEmpty(commander.Name, ModText.Get(ModStrings.Spatial.Commander)), details);
-            }
-
-            if (tile.MapEntity != null)
-            {
-                string mapEntityName = FirstNonEmpty(tile.MapEntityName, string.Empty);
-                if (tile.MapEntityVisited)
-                {
-                    mapEntityName = ModText.Get(ModStrings.Spatial.VisitedSuffix, mapEntityName);
-                }
-
-                List<string> details = new List<string>();
-                if (!string.IsNullOrWhiteSpace(tile.MapEntityRelationship))
-                {
-                    details.Add(tile.MapEntityRelationship);
-                }
-
-                for (int i = 0; i < tile.MapEntityDetails.Count; i++)
-                {
-                    if (!string.IsNullOrWhiteSpace(tile.MapEntityDetails[i]))
-                    {
-                        details.Add(SpeechTextSanitizer.Normalize(tile.MapEntityDetails[i]));
-                    }
-                }
-
-                details.AddRange(GetMovementDetails(tile));
-                return AppendDetails(mapEntityName, details);
-            }
-
-            if (tile.IsInteractionPoint && tile.IsVisible)
-            {
-                return AppendDetails(ModText.Get(ModStrings.Spatial.InteractionPoint), GetMovementDetails(tile));
-            }
-
-            return string.Empty;
+            AdventureMapTile.CommanderInfo commander = tile.Commander;
+            return Compose(
+                AdventureMapAnnouncementDefinitions.Wielder,
+                BuildWielderParts(commander));
         }
 
-        public string DescribeTileContext(AdventureMapTile tile)
+        private string DescribeMapEntity(AdventureMapTile tile)
         {
-            if (tile == null || !tile.IsExplored)
+            if (tile == null || !tile.IsExplored || tile.MapEntity == null)
             {
                 return string.Empty;
             }
 
-            List<string> parts = new List<string>();
-            for (int i = 0; i < tile.ZoneOfControlNames.Count; i++)
-            {
-                if (!string.IsNullOrWhiteSpace(tile.ZoneOfControlNames[i]))
-                {
-                    parts.Add(ModText.Get(ModStrings.Spatial.WithinZoneOfControl, FormatPossessive(tile.ZoneOfControlNames[i])));
-                }
-            }
+            return Compose(
+                AdventureMapAnnouncementDefinitions.MapEntity,
+                BuildMapEntityParts(tile));
+        }
 
-            string terrain = DescribeTerrain(tile.Terrain);
-            if (!string.IsNullOrWhiteSpace(terrain))
-            {
-                parts.Add(terrain);
-            }
+        private string Compose(AnnouncementGroupDefinition group, IEnumerable<AnnouncementPart> parts)
+        {
+            return ConfigurableAnnouncementComposer.Compose(group, parts, _getOrder, _isEnabled, _includeSuffix);
+        }
 
-            return string.Join(". ", parts.ToArray());
+        private string DescribeInteractionPoint(AdventureMapTile tile)
+        {
+            return tile != null && tile.IsExplored && tile.IsVisible && tile.IsInteractionPoint
+                ? ModText.Get(ModStrings.Spatial.InteractionPoint)
+                : string.Empty;
         }
 
         private static string FormatPossessive(string name)
@@ -174,9 +99,209 @@ namespace SongsOfConquestAccess.Speech.Spatial
             return tile == null ? string.Empty : tile.Position.x + ", " + tile.Position.y;
         }
 
+        private IEnumerable<AnnouncementPart> BuildTileParts(
+            AdventureMapTile tile,
+            string groupResult,
+            bool includeCoordinates,
+            bool appendRouteToTerrainWhenNoContent)
+        {
+            if (!string.IsNullOrWhiteSpace(groupResult))
+            {
+                yield return new AnnouncementPart(AdventureMapAnnouncementDefinitions.TileKeys.GroupResult, groupResult);
+                yield break;
+            }
+
+            if (tile == null)
+            {
+                yield break;
+            }
+
+            string explorationState = DescribeExplorationState(tile);
+            if (!string.IsNullOrWhiteSpace(explorationState))
+            {
+                yield return new AnnouncementPart(AdventureMapAnnouncementDefinitions.TileKeys.ExplorationState, explorationState);
+            }
+
+            string wielder = DescribeWielder(tile);
+            if (!string.IsNullOrWhiteSpace(wielder))
+            {
+                yield return new AnnouncementPart(AdventureMapAnnouncementDefinitions.TileKeys.Wielder, wielder);
+            }
+
+            string mapEntity = string.IsNullOrWhiteSpace(wielder) ? DescribeMapEntity(tile) : string.Empty;
+            if (!string.IsNullOrWhiteSpace(mapEntity))
+            {
+                yield return new AnnouncementPart(AdventureMapAnnouncementDefinitions.TileKeys.MapEntity, mapEntity);
+            }
+
+            string interactionPoint = string.IsNullOrWhiteSpace(wielder) && string.IsNullOrWhiteSpace(mapEntity)
+                ? DescribeInteractionPoint(tile)
+                : string.Empty;
+            if (!string.IsNullOrWhiteSpace(interactionPoint))
+            {
+                yield return new AnnouncementPart(AdventureMapAnnouncementDefinitions.TileKeys.InteractionPoint, interactionPoint);
+            }
+
+            string route = DescribeReachabilityOrRoutePreview(tile);
+            bool hasContent = !string.IsNullOrWhiteSpace(wielder)
+                || !string.IsNullOrWhiteSpace(mapEntity)
+                || !string.IsNullOrWhiteSpace(interactionPoint);
+            string terrain = DescribeTerrain(tile.Terrain);
+            bool appendRouteToTerrain = appendRouteToTerrainWhenNoContent
+                && tile.IsExplored
+                && !hasContent
+                && !string.IsNullOrWhiteSpace(terrain)
+                && !string.IsNullOrWhiteSpace(route);
+
+            if (!appendRouteToTerrain && !string.IsNullOrWhiteSpace(route))
+            {
+                yield return new AnnouncementPart(AdventureMapAnnouncementDefinitions.TileKeys.ReachabilityOrRoutePreview, route);
+            }
+
+            string zoneOfControl = DescribeZoneOfControl(tile);
+            if (!string.IsNullOrWhiteSpace(zoneOfControl))
+            {
+                yield return new AnnouncementPart(AdventureMapAnnouncementDefinitions.TileKeys.ZoneOfControl, zoneOfControl);
+            }
+
+            if (appendRouteToTerrain)
+            {
+                terrain += ", " + route;
+            }
+
+            if (!string.IsNullOrWhiteSpace(terrain))
+            {
+                yield return new AnnouncementPart(AdventureMapAnnouncementDefinitions.TileKeys.Terrain, terrain);
+            }
+
+            if (includeCoordinates)
+            {
+                yield return new AnnouncementPart(AdventureMapAnnouncementDefinitions.TileKeys.Coordinates, DescribeCoordinates(tile));
+            }
+        }
+
+        private IEnumerable<AnnouncementPart> BuildWielderParts(AdventureMapTile.CommanderInfo commander)
+        {
+            yield return new AnnouncementPart(
+                AdventureMapAnnouncementDefinitions.WielderKeys.Name,
+                FirstNonEmpty(commander.Name, ModText.Get(ModStrings.Events.Wielder)));
+
+            if (!string.IsNullOrWhiteSpace(commander.Relationship))
+            {
+                yield return new AnnouncementPart(AdventureMapAnnouncementDefinitions.WielderKeys.Affiliation, commander.Relationship);
+            }
+
+            if (commander.IsSelected)
+            {
+                yield return new AnnouncementPart(
+                    AdventureMapAnnouncementDefinitions.WielderKeys.Selected,
+                    ModText.Get(ModStrings.UI.Selected));
+            }
+
+            if (commander.IsOwnedByLocalTeam)
+            {
+                yield return new AnnouncementPart(
+                    AdventureMapAnnouncementDefinitions.WielderKeys.Movement,
+                    FormatWielderMovement(commander));
+            }
+
+            if (commander.IsOwnedByLocalTeam && commander.HasDestination)
+            {
+                yield return new AnnouncementPart(
+                    AdventureMapAnnouncementDefinitions.WielderKeys.Destination,
+                    ModText.Get(ModStrings.Spatial.DestinationAt, FormatPoint(commander.Destination)));
+            }
+
+            if (commander.IsOwnedByLocalTeam
+                && commander.HasThisTurnDestination
+                && commander.ThisTurnDestination != commander.Destination)
+            {
+                yield return new AnnouncementPart(
+                    AdventureMapAnnouncementDefinitions.WielderKeys.ThisTurnDestination,
+                    ModText.Get(ModStrings.Spatial.ThisTurnAt, FormatPoint(commander.ThisTurnDestination)));
+            }
+        }
+
+        private IEnumerable<AnnouncementPart> BuildMapEntityParts(AdventureMapTile tile)
+        {
+            string name = FirstNonEmpty(tile.MapEntityName, string.Empty);
+            if (!string.IsNullOrWhiteSpace(name))
+            {
+                yield return new AnnouncementPart(AdventureMapAnnouncementDefinitions.MapEntityKeys.Name, name);
+            }
+
+            if (tile.MapEntityVisited)
+            {
+                yield return new AnnouncementPart(
+                    AdventureMapAnnouncementDefinitions.MapEntityKeys.Visited,
+                    ModText.Get(ModStrings.Spatial.Visited));
+            }
+
+            if (!string.IsNullOrWhiteSpace(tile.MapEntityRelationship))
+            {
+                yield return new AnnouncementPart(
+                    AdventureMapAnnouncementDefinitions.MapEntityKeys.Affiliation,
+                    tile.MapEntityRelationship);
+            }
+        }
+
+        private static bool IsGroupResult(ScannerResult result)
+        {
+            return result != null
+                && (result.Kind == ScannerResultKind.TerrainGroup
+                    || result.Kind == ScannerResultKind.AreaGroup
+                    || result.Kind == ScannerResultKind.UnexploredGroup
+                    || result.Kind == ScannerResultKind.CommanderZoneOfControl);
+        }
+
+        private static string DescribeExplorationState(AdventureMapTile tile)
+        {
+            if (tile == null)
+            {
+                return string.Empty;
+            }
+
+            if (!tile.IsExplored)
+            {
+                return ModText.Get(ModStrings.Spatial.Unexplored);
+            }
+
+            return !tile.IsVisible ? ModText.Get(ModStrings.Spatial.Unseen) : string.Empty;
+        }
+
+        private static string DescribeZoneOfControl(AdventureMapTile tile)
+        {
+            if (tile == null || tile.ZoneOfControlNames.Count == 0)
+            {
+                return string.Empty;
+            }
+
+            List<string> parts = new List<string>();
+            for (int i = 0; i < tile.ZoneOfControlNames.Count; i++)
+            {
+                if (!string.IsNullOrWhiteSpace(tile.ZoneOfControlNames[i]))
+                {
+                    parts.Add(ModText.Get(ModStrings.Spatial.WithinZoneOfControl, FormatPossessive(tile.ZoneOfControlNames[i])));
+                }
+            }
+
+            return string.Join(". ", parts.ToArray());
+        }
+
+        private static string DescribeReachabilityOrRoutePreview(AdventureMapTile tile)
+        {
+            List<string> details = GetMovementDetails(tile);
+            return details.Count > 0 ? string.Join(", ", details.ToArray()) : string.Empty;
+        }
+
         private static List<string> GetMovementDetails(AdventureMapTile tile)
         {
             List<string> details = new List<string>();
+            if (tile == null)
+            {
+                return details;
+            }
+
             string pathIndicator = DescribePathIndicator(tile != null ? tile.PathIndicator : null);
             if (!string.IsNullOrWhiteSpace(pathIndicator))
             {
@@ -253,49 +378,23 @@ namespace SongsOfConquestAccess.Speech.Spatial
             return string.Join(", ", details.ToArray());
         }
 
-        private static void AddCommanderMovementDetails(AdventureMapTile.CommanderInfo commander, List<string> details)
-        {
-            if (commander == null || details == null || !commander.IsOwnedByLocalTeam)
-            {
-                return;
-            }
-
-            details.Add(ModText.Get(
-                ModStrings.UI.LabelValue,
-                FirstNonEmpty(commander.MovementLabel, ModText.Get(ModStrings.Spatial.Movement)),
-                FormatMovementValue(commander.MovesLeft) + " / " + FormatMovementValue(commander.MaxMovement)));
-
-            if (!commander.HasDestination)
-            {
-                return;
-            }
-
-            details.Add(ModText.Get(ModStrings.Spatial.DestinationAt, FormatPoint(commander.Destination)));
-            if (commander.HasThisTurnDestination && commander.ThisTurnDestination != commander.Destination)
-            {
-                details.Add(ModText.Get(ModStrings.Spatial.ThisTurnAt, FormatPoint(commander.ThisTurnDestination)));
-            }
-        }
-
         private static string FormatMovementValue(float value)
         {
             float normalized = value < 0.5f ? 0f : value;
             return Math.Round(normalized, 2).ToString("g2", CultureInfo.InvariantCulture);
         }
 
+        private static string FormatWielderMovement(AdventureMapTile.CommanderInfo commander)
+        {
+            return ModText.Get(
+                ModStrings.UI.LabelValue,
+                FirstNonEmpty(commander.MovementLabel, ModText.Get(ModStrings.Spatial.Movement)),
+                FormatMovementValue(commander.MovesLeft) + " / " + FormatMovementValue(commander.MaxMovement));
+        }
+
         private static string FormatPoint(UnityEngine.Vector2Int point)
         {
             return point.x + ", " + point.y;
-        }
-
-        private static string AppendDetails(string name, List<string> details)
-        {
-            if (details == null || details.Count == 0)
-            {
-                return name;
-            }
-
-            return name + ", " + string.Join(", ", details.ToArray());
         }
 
         private static string FirstNonEmpty(string preferred, string fallback)

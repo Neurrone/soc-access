@@ -5,7 +5,7 @@ using SongsOfConquestAccess.Localization;
 
 namespace SongsOfConquestAccess.Speech.Spatial
 {
-    internal sealed class TroopPlacementTileSpeechFormatter : ISpatialTileSpeechFormatter<TroopPlacementTile>
+    internal sealed class TroopPlacementTileSpeechFormatter
     {
         private readonly TroopPlacementSnapshot _snapshot;
 
@@ -21,63 +21,21 @@ namespace SongsOfConquestAccess.Speech.Spatial
                 return ModText.Get(ModStrings.Screens.TroopPlacement);
             }
 
-            List<string> parts = new List<string>();
-            AddIfPresent(parts, DescribePrimaryContent(tile));
-            AddIfPresent(parts, DescribeTileContext(tile));
-            AddIfPresent(parts, DescribeCoordinates(tile));
-            return string.Join(", ", parts.ToArray());
+            return ConfigurableAnnouncementComposer.Compose(
+                TroopDeploymentAnnouncementDefinitions.Tile,
+                BuildTileParts(tile, includeCoordinates: true));
         }
 
-        public string DescribePrimaryContent(TroopPlacementTile tile)
+        public string DescribeScannerContent(TroopPlacementTile tile)
         {
             if (tile == null)
             {
                 return string.Empty;
             }
 
-            List<string> parts = new List<string>();
-            if (!string.IsNullOrWhiteSpace(tile.TroopLabel))
-            {
-                parts.Add(tile.TroopLabel);
-            }
-
-            if (tile.SpawnSide.HasValue)
-            {
-                bool enemySpawn = _snapshot != null
-                    && _snapshot.OwnSide.HasValue
-                    && tile.SpawnSide.Value != _snapshot.OwnSide.Value;
-                parts.Add(enemySpawn
-                    ? ModText.Get(ModStrings.Spatial.EnemySpawnPoint)
-                    : ModText.Get(ModStrings.Spatial.SpawnPoint));
-            }
-
-            if (!string.IsNullOrWhiteSpace(tile.EntityLabel))
-            {
-                parts.Add(tile.EntityLabel);
-            }
-
-            return string.Join(", ", parts.ToArray());
-        }
-
-        public string DescribeTileContext(TroopPlacementTile tile)
-        {
-            if (tile == null)
-            {
-                return string.Empty;
-            }
-
-            List<string> parts = new List<string>();
-            if (tile.IsImpassable)
-            {
-                parts.Add(ModText.Get(ModStrings.Spatial.Impassable));
-            }
-
-            if (tile.Elevation > 0)
-            {
-                parts.Add(ModText.Get(ModStrings.Spatial.ElevatedGroundHeight, tile.Elevation));
-            }
-
-            return string.Join(", ", parts.ToArray());
+            return ConfigurableAnnouncementComposer.Compose(
+                TroopDeploymentAnnouncementDefinitions.ScannerContent,
+                BuildTileParts(tile, includeCoordinates: false));
         }
 
         public string DescribeCoordinates(TroopPlacementTile tile)
@@ -85,12 +43,58 @@ namespace SongsOfConquestAccess.Speech.Spatial
             return tile == null ? string.Empty : HexCoordinateFormatter.Format(tile.Point);
         }
 
-        private static void AddIfPresent(List<string> parts, string text)
+        private IEnumerable<AnnouncementPart> BuildTileParts(TroopPlacementTile tile, bool includeCoordinates)
         {
-            if (!string.IsNullOrWhiteSpace(text))
+            if (!string.IsNullOrWhiteSpace(tile.TroopLabel))
             {
-                parts.Add(text);
+                yield return new AnnouncementPart(
+                    TroopDeploymentAnnouncementDefinitions.TileKeys.Troop,
+                    tile.TroopLabel);
             }
+
+            string spawnPoint = DescribeSpawnPoint(tile);
+            if (!string.IsNullOrWhiteSpace(spawnPoint))
+            {
+                yield return new AnnouncementPart(
+                    TroopDeploymentAnnouncementDefinitions.TileKeys.SpawnPoint,
+                    spawnPoint);
+            }
+
+            if (tile.IsImpassable)
+            {
+                yield return new AnnouncementPart(
+                    TroopDeploymentAnnouncementDefinitions.TileKeys.Impassable,
+                    ModText.Get(ModStrings.Spatial.Impassable));
+            }
+
+            if (tile.Elevation > 0)
+            {
+                yield return new AnnouncementPart(
+                    TroopDeploymentAnnouncementDefinitions.TileKeys.Elevation,
+                    ModText.Get(ModStrings.Spatial.ElevatedGroundHeight, tile.Elevation));
+            }
+
+            if (includeCoordinates)
+            {
+                yield return new AnnouncementPart(
+                    TroopDeploymentAnnouncementDefinitions.TileKeys.Coordinates,
+                    DescribeCoordinates(tile));
+            }
+        }
+
+        private string DescribeSpawnPoint(TroopPlacementTile tile)
+        {
+            if (tile == null || !tile.SpawnSide.HasValue)
+            {
+                return string.Empty;
+            }
+
+            bool enemySpawn = _snapshot != null
+                && _snapshot.OwnSide.HasValue
+                && tile.SpawnSide.Value != _snapshot.OwnSide.Value;
+            return enemySpawn
+                ? ModText.Get(ModStrings.Spatial.EnemySpawnPoint)
+                : ModText.Get(ModStrings.Spatial.SpawnPoint);
         }
     }
 }
