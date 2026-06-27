@@ -72,6 +72,8 @@ namespace SongsOfConquestAccess.Adapters
 
         public bool IsReachable { get; set; }
 
+        public float? ReachableMovementCost { get; set; }
+
         public bool IsImpassable { get; set; }
 
         public bool IsBlocked { get; set; }

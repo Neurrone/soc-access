@@ -95,7 +95,7 @@ namespace SongsOfConquestAccess
             string orderCsv = config != null && config.Order != null
                 ? config.Order.Value
                 : group.DefaultOrderCsv;
-            return MergeOrder(group, orderCsv);
+            return MergeAnnouncementOrder(group, orderCsv);
         }
 
         public static bool GetAnnouncementElementEnabled(AnnouncementGroupDefinition group, AnnouncementElementDefinition element)
@@ -280,7 +280,7 @@ namespace SongsOfConquestAccess
             _config?.Save();
         }
 
-        private static IReadOnlyList<string> MergeOrder(AnnouncementGroupDefinition group, string orderCsv)
+        internal static IReadOnlyList<string> MergeAnnouncementOrder(AnnouncementGroupDefinition group, string orderCsv)
         {
             List<string> result = new List<string>();
             HashSet<string> seen = new HashSet<string>();
@@ -305,6 +305,13 @@ namespace SongsOfConquestAccess
                     continue;
                 }
 
+                if (ShouldAppendMissingAnnouncementElement(group, key))
+                {
+                    result.Add(key);
+                    seen.Add(key);
+                    continue;
+                }
+
                 int insertAt = 0;
                 for (int previous = i - 1; previous >= 0; previous--)
                 {
@@ -321,6 +328,17 @@ namespace SongsOfConquestAccess
             }
 
             return result;
+        }
+
+        private static bool ShouldAppendMissingAnnouncementElement(AnnouncementGroupDefinition group, string key)
+        {
+            if (group == null || key != Speech.Spatial.AdventureMapAnnouncementDefinitions.TileKeys.MovementCost)
+            {
+                return false;
+            }
+
+            return group == Speech.Spatial.AdventureMapAnnouncementDefinitions.Tile
+                || group == Speech.Spatial.AdventureMapAnnouncementDefinitions.ScannerContent;
         }
 
         private static string ToConfigKeyPrefix(string key)

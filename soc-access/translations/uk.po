@@ -2035,6 +2035,11 @@ msgctxt "Spatial.Movement"
 msgid "Movement"
 msgstr "Рух"
 
+#. Spatial.MovementCost
+msgctxt "Spatial.MovementCost"
+msgid "Movement cost: {0}"
+msgstr "Вартість пересування: {0}"
+
 #. Spatial.MovementRange
 msgctxt "Spatial.MovementRange"
 msgid "Movement range"
@@ -3411,6 +3416,11 @@ msgstr "Об'єкт мапи"
 msgctxt "Screens.AnnouncementMovement"
 msgid "Movement"
 msgstr "Рух"
+
+#. Screens.AnnouncementMovementCost
+msgctxt "Screens.AnnouncementMovementCost"
+msgid "Movement cost"
+msgstr "Вартість пересування"
 
 #. Screens.AnnouncementName
 msgctxt "Screens.AnnouncementName"

@@ -3,6 +3,7 @@
 ## V0.7.2
 
 - Information spoken on the focused tile or in scanner results are now a composable set of announcements that you can toggle, reorder, and customize individually from the mod settings screen
+- Using the composable announcements setting introduced above, added an option to read the movement cost on the adventure map. There are two settings for controlling whether it is read when focusing on adventure map tiles and on the scanner. This is disabled by default
 - Fixed untranslated caster and effect names being narrated in combat
 - Increase log verbosity to help with debug Prism issues when it doesn't detect screen readers properly
 - Update Prism to 0.16.7 to fix issues with Baoyi screen reader support

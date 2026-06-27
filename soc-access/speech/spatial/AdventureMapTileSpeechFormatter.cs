@@ -178,6 +178,12 @@ namespace SongsOfConquestAccess.Speech.Spatial
             {
                 yield return new AnnouncementPart(AdventureMapAnnouncementDefinitions.TileKeys.Coordinates, DescribeCoordinates(tile));
             }
+
+            string movementCost = DescribeMovementCost(tile);
+            if (!string.IsNullOrWhiteSpace(movementCost))
+            {
+                yield return new AnnouncementPart(AdventureMapAnnouncementDefinitions.TileKeys.MovementCost, movementCost);
+            }
         }
 
         private IEnumerable<AnnouncementPart> BuildWielderParts(AdventureMapTile.CommanderInfo commander)
@@ -382,6 +388,13 @@ namespace SongsOfConquestAccess.Speech.Spatial
         {
             float normalized = value < 0.5f ? 0f : value;
             return Math.Round(normalized, 2).ToString("g2", CultureInfo.InvariantCulture);
+        }
+
+        private static string DescribeMovementCost(AdventureMapTile tile)
+        {
+            return tile != null && tile.IsExplored && tile.ReachableMovementCost.HasValue
+                ? ModText.Get(ModStrings.Spatial.MovementCost, FormatMovementValue(tile.ReachableMovementCost.Value))
+                : string.Empty;
         }
 
         private static string FormatWielderMovement(AdventureMapTile.CommanderInfo commander)

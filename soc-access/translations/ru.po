@@ -2035,6 +2035,11 @@ msgctxt "Spatial.Movement"
 msgid "Movement"
 msgstr "Передвижение"
 
+#. Spatial.MovementCost
+msgctxt "Spatial.MovementCost"
+msgid "Movement cost: {0}"
+msgstr "Стоимость передвижения: {0}"
+
 #. Spatial.MovementRange
 msgctxt "Spatial.MovementRange"
 msgid "Movement range"
@@ -3411,6 +3416,11 @@ msgstr "Объект карты"
 msgctxt "Screens.AnnouncementMovement"
 msgid "Movement"
 msgstr "Передвижение"
+
+#. Screens.AnnouncementMovementCost
+msgctxt "Screens.AnnouncementMovementCost"
+msgid "Movement cost"
+msgstr "Стоимость передвижения"
 
 #. Screens.AnnouncementName
 msgctxt "Screens.AnnouncementName"

@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using SongsOfConquestAccess.Adapters;
+using SongsOfConquestAccess.Scanner;
 using SongsOfConquestAccess.Speech.Spatial;
 using UnityEngine;
 
@@ -56,11 +57,85 @@ namespace SongsOfConquestAccess.Tests
             Assert.AreEqual("Grass, 7, 4.", text);
         }
 
+        [TestMethod]
+        public void DescribeTileDoesNotReadMovementCostByDefault()
+        {
+            AdventureMapTile tile = new AdventureMapTile(new Vector2Int(4, 2))
+            {
+                IsExplored = true,
+                IsVisible = true,
+                IsReachable = true,
+                ReachableMovementCost = 3f,
+                Terrain = AdventureTerrainKind.DirtRoad
+            };
+
+            string text = CreateFormatter().DescribeTile(tile);
+
+            Assert.AreEqual("Dirt road, reachable, 4, 2.", text);
+        }
+
+        [TestMethod]
+        public void DescribeTileReadsEnabledMovementCostAtEnd()
+        {
+            AdventureMapTile tile = new AdventureMapTile(new Vector2Int(4, 2))
+            {
+                IsExplored = true,
+                IsVisible = true,
+                IsReachable = true,
+                ReachableMovementCost = 3f,
+                Terrain = AdventureTerrainKind.DirtRoad
+            };
+
+            string text = CreateFormatter(enableMovementCost: true).DescribeTile(tile);
+
+            Assert.AreEqual("Dirt road, reachable, 4, 2, Movement cost: 3.", text);
+        }
+
+        [TestMethod]
+        public void DescribeTileDoesNotReadMovementCostForUnexploredTile()
+        {
+            AdventureMapTile tile = new AdventureMapTile(new Vector2Int(4, 2))
+            {
+                IsExplored = false,
+                IsVisible = false,
+                ReachableMovementCost = 3f
+            };
+
+            string text = CreateFormatter(enableMovementCost: true).DescribeTile(tile);
+
+            Assert.AreEqual("Unexplored, 4, 2.", text);
+        }
+
+        [TestMethod]
+        public void DescribeScannerContentReadsEnabledMovementCostAtEnd()
+        {
+            AdventureMapTile tile = new AdventureMapTile(new Vector2Int(4, 2))
+            {
+                IsExplored = true,
+                IsVisible = true,
+                IsReachable = true,
+                ReachableMovementCost = 3f,
+                Terrain = AdventureTerrainKind.DirtRoad
+            };
+            ScannerResult result = new ScannerResult("terrain:road:4:2", "Dirt road", tile.Position);
+
+            string text = CreateFormatter(enableMovementCost: true).DescribeScannerContent(result, tile);
+
+            Assert.AreEqual("reachable, Dirt road, Movement cost: 3", text);
+        }
+
         private static AdventureMapTileSpeechFormatter CreateFormatter()
+        {
+            return CreateFormatter(enableMovementCost: false);
+        }
+
+        private static AdventureMapTileSpeechFormatter CreateFormatter(bool enableMovementCost)
         {
             return new AdventureMapTileSpeechFormatter(
                 GetDefaultOrder,
-                (group, element) => element.DefaultEnabled,
+                (group, element) => element.Key == AdventureMapAnnouncementDefinitions.TileKeys.MovementCost
+                    ? enableMovementCost
+                    : element.DefaultEnabled,
                 (group, element) => element.DefaultSuffix);
         }
 

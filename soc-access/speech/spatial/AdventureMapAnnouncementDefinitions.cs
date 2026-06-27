@@ -15,7 +15,8 @@ namespace SongsOfConquestAccess.Speech.Spatial
             new AnnouncementElementDefinition(TileKeys.ReachabilityOrRoutePreview, ModStrings.Screens.AnnouncementReachabilityOrRoutePreview),
             new AnnouncementElementDefinition(TileKeys.ZoneOfControl, ModStrings.Screens.AnnouncementZoneOfControl),
             new AnnouncementElementDefinition(TileKeys.Terrain, ModStrings.Screens.AnnouncementTerrain),
-            new AnnouncementElementDefinition(TileKeys.Coordinates, ModStrings.Screens.AnnouncementCoordinates));
+            new AnnouncementElementDefinition(TileKeys.Coordinates, ModStrings.Screens.AnnouncementCoordinates),
+            new AnnouncementElementDefinition(TileKeys.MovementCost, ModStrings.Screens.AnnouncementMovementCost, defaultEnabled: false));
 
         public static readonly AnnouncementGroupDefinition ScannerContent = new AnnouncementGroupDefinition(
             "adventure_map_scanner_content",
@@ -28,7 +29,8 @@ namespace SongsOfConquestAccess.Speech.Spatial
             new AnnouncementElementDefinition(TileKeys.InteractionPoint, ModStrings.Screens.AnnouncementInteractionPoint),
             new AnnouncementElementDefinition(TileKeys.ReachabilityOrRoutePreview, ModStrings.Screens.AnnouncementReachabilityOrRoutePreview),
             new AnnouncementElementDefinition(TileKeys.ZoneOfControl, ModStrings.Screens.AnnouncementZoneOfControl),
-            new AnnouncementElementDefinition(TileKeys.Terrain, ModStrings.Screens.AnnouncementTerrain));
+            new AnnouncementElementDefinition(TileKeys.Terrain, ModStrings.Screens.AnnouncementTerrain),
+            new AnnouncementElementDefinition(TileKeys.MovementCost, ModStrings.Screens.AnnouncementMovementCost, defaultEnabled: false));
 
         public static readonly AnnouncementGroupDefinition Wielder = new AnnouncementGroupDefinition(
             "adventure_map_wielder",
@@ -68,6 +70,7 @@ namespace SongsOfConquestAccess.Speech.Spatial
             public const string ZoneOfControl = "zone_of_control";
             public const string Terrain = "terrain";
             public const string Coordinates = "coordinates";
+            public const string MovementCost = "movement_cost";
         }
 
         public static class WielderKeys

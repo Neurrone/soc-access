@@ -446,9 +446,11 @@ namespace SongsOfConquestAccess.Adapters
             ICommanderState selectedCommander = _selectionHandler.SelectedCommander;
             tile.IsImpassable = float.IsPositiveInfinity(_facade.Level.GetStaticTravelCost(localTeamId, clamped));
             tile.IsBlocked = !tile.IsImpassable && !_facade.Level.IsValidMoveDestination(localTeamId, clamped);
-            tile.IsReachable = selectedCommander != null
-                && selectedCommander.IsAlive
-                && _facade.Level.IsPointWithinReach(localTeamId, selectedCommander.Position, clamped, selectedCommander.MovesLeft);
+            float reachableMovementCost;
+            if (TryGetReachableMovementCost(selectedCommander, localTeamId, clamped, out reachableMovementCost))
+            {
+                ApplyReachableMovementCost(tile, reachableMovementCost);
+            }
 
             if (tile.IsVisible)
             {
@@ -456,6 +458,13 @@ namespace SongsOfConquestAccess.Adapters
                 if (commander != null)
                 {
                     tile.Commander = CreateCommanderInfo(commander, selectedCommander, localTeamId);
+                    float commanderMovementCost;
+                    if (commander != selectedCommander
+                        && selectedCommander != null
+                        && TryGetReachableCommanderDistance(commander, selectedCommander, selectedCommander.TeamId, out commanderMovementCost))
+                    {
+                        ApplyReachableMovementCost(tile, commanderMovementCost);
+                    }
                 }
             }
 
@@ -487,8 +496,18 @@ namespace SongsOfConquestAccess.Adapters
                 }
 
                 tile.MapEntityRelationship = FormatSpatialRelationship(GetMapEntityRelationship(entity, localTeamId));
-                tile.IsReachable = tile.IsReachable
-                    || (selectedCommander != null && _facade.Level.CanMoveToAndInteract(entity.Id, selectedCommander.Id));
+                if (selectedCommander != null && _facade.Level.CanMoveToAndInteract(entity.Id, selectedCommander.Id))
+                {
+                    float mapEntityMovementCost;
+                    if (TryGetReachableMapEntityDistance(entity, selectedCommander, selectedCommander.TeamId, out mapEntityMovementCost))
+                    {
+                        ApplyReachableMovementCost(tile, mapEntityMovementCost);
+                    }
+                    else
+                    {
+                        tile.IsReachable = true;
+                    }
+                }
             }
 
             if (tile.IsVisible)
@@ -499,6 +518,68 @@ namespace SongsOfConquestAccess.Adapters
             tile.PathIndicator = BuildPathIndicatorForTile(clamped, selectedCommander, localTeamId);
 
             return tile;
+        }
+
+        private bool TryGetReachableMovementCost(
+            ICommanderState selectedCommander,
+            int teamId,
+            Vector2Int target,
+            out float cost)
+        {
+            cost = 0f;
+            if (selectedCommander == null
+                || !selectedCommander.IsAlive
+                || _facade == null
+                || _facade.Level == null
+                || teamId < 0
+                || !IsWithinMap(target))
+            {
+                return false;
+            }
+
+            PathNode[] reachable = _facade.Level.PointsWithinReach(
+                teamId,
+                selectedCommander.Position,
+                selectedCommander.MovesLeft,
+                (PathfinderCacheType)0);
+            return TryGetReachableMovementCost(reachable, target, out cost);
+        }
+
+        internal static bool TryGetReachableMovementCost(PathNode[] reachable, Vector2Int target, out float cost)
+        {
+            cost = 0f;
+            if (reachable == null)
+            {
+                return false;
+            }
+
+            for (int i = 0; i < reachable.Length; i++)
+            {
+                PathNode node = reachable[i];
+                if (node.point.x == target.x
+                    && node.point.y == target.y
+                    && !float.IsInfinity(node.travelCost))
+                {
+                    cost = node.travelCost;
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
+        internal static void ApplyReachableMovementCost(AdventureMapTile tile, float cost)
+        {
+            if (tile == null || float.IsInfinity(cost) || float.IsNaN(cost))
+            {
+                return;
+            }
+
+            tile.IsReachable = true;
+            if (!tile.ReachableMovementCost.HasValue)
+            {
+                tile.ReachableMovementCost = cost;
+            }
         }
 
         private AdventureMapTile.PathIndicatorInfo BuildPathIndicatorForTile(Vector2Int position, ICommanderState selectedCommander, int localTeamId)

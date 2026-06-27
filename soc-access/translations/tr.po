@@ -2005,6 +2005,11 @@ msgctxt "Spatial.Movement"
 msgid "Movement"
 msgstr "Hareket"
 
+#. Spatial.MovementCost
+msgctxt "Spatial.MovementCost"
+msgid "Movement cost: {0}"
+msgstr "Hareket maliyeti: {0}"
+
 #. Spatial.MovementRange
 msgctxt "Spatial.MovementRange"
 msgid "Movement range"
@@ -3171,6 +3176,11 @@ msgstr "Harita varlığı"
 msgctxt "Screens.AnnouncementMovement"
 msgid "Movement"
 msgstr "Hareket"
+
+#. Screens.AnnouncementMovementCost
+msgctxt "Screens.AnnouncementMovementCost"
+msgid "Movement cost"
+msgstr "Hareket maliyeti"
 
 #. Screens.AnnouncementName
 msgctxt "Screens.AnnouncementName"

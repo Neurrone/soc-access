@@ -6,6 +6,7 @@
     <TargetFramework>net472</TargetFramework>
     <LangVersion>7.3</LangVersion>
     <IsPackable>false</IsPackable>
+    <BepInExCoreDir>$(GameDir)\BepInEx\core</BepInExCoreDir>
     <GameManagedDir>$(GameDir)\SongsOfConquest_Data\Managed</GameManagedDir>
   </PropertyGroup>
 
@@ -23,6 +24,18 @@
   <ItemGroup>
     <Reference Include="UnityEngine.CoreModule">
       <HintPath>$(GameManagedDir)\UnityEngine.CoreModule.dll</HintPath>
+      <Private>true</Private>
+    </Reference>
+    <Reference Include="0Harmony">
+      <HintPath>$(BepInExCoreDir)\0Harmony.dll</HintPath>
+      <Private>true</Private>
+    </Reference>
+    <Reference Include="Unity.Mathematics">
+      <HintPath>$(GameManagedDir)\Unity.Mathematics.dll</HintPath>
+      <Private>true</Private>
+    </Reference>
+    <Reference Include="Lavapotion.Pathfinding">
+      <HintPath>$(GameManagedDir)\Lavapotion.Pathfinding.dll</HintPath>
       <Private>true</Private>
     </Reference>
     <Reference Include="Lavapotion.SongsOfConquest.UtilitiesLayer.Runtime">

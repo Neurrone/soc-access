@@ -2005,6 +2005,11 @@ msgctxt "Spatial.Movement"
 msgid "Movement"
 msgstr "移动"
 
+#. Spatial.MovementCost
+msgctxt "Spatial.MovementCost"
+msgid "Movement cost: {0}"
+msgstr "移动消耗：{0}"
+
 #. Spatial.MovementRange
 msgctxt "Spatial.MovementRange"
 msgid "Movement range"
@@ -3171,6 +3176,11 @@ msgstr "地图实体"
 msgctxt "Screens.AnnouncementMovement"
 msgid "Movement"
 msgstr "移动"
+
+#. Screens.AnnouncementMovementCost
+msgctxt "Screens.AnnouncementMovementCost"
+msgid "Movement cost"
+msgstr "移动消耗"
 
 #. Screens.AnnouncementName
 msgctxt "Screens.AnnouncementName"

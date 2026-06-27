@@ -2020,6 +2020,11 @@ msgctxt "Spatial.Movement"
 msgid "Movement"
 msgstr "Bewegung"
 
+#. Spatial.MovementCost
+msgctxt "Spatial.MovementCost"
+msgid "Movement cost: {0}"
+msgstr "Bewegungskosten: {0}"
+
 #. Spatial.MovementRange
 msgctxt "Spatial.MovementRange"
 msgid "Movement range"
@@ -3291,6 +3296,11 @@ msgstr "Kartenobjekt"
 msgctxt "Screens.AnnouncementMovement"
 msgid "Movement"
 msgstr "Bewegung"
+
+#. Screens.AnnouncementMovementCost
+msgctxt "Screens.AnnouncementMovementCost"
+msgid "Movement cost"
+msgstr "Bewegungskosten"
 
 #. Screens.AnnouncementName
 msgctxt "Screens.AnnouncementName"

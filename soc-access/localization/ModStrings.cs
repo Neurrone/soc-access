@@ -124,6 +124,7 @@ namespace SongsOfConquestAccess.Localization
             public static readonly ModString Kills = new ModString("Spatial.Kills", "kills {0}");
             public static readonly ModString MayDestroy = new ModString("Spatial.MayDestroy", "may destroy");
             public static readonly ModString Movement = new ModString("Spatial.Movement", "Movement");
+            public static readonly ModString MovementCost = new ModString("Spatial.MovementCost", "Movement cost: {0}");
             public static readonly ModString MovementRange = new ModString("Spatial.MovementRange", "Movement range");
             public static readonly ModString Mountain = new ModString("Spatial.Mountain", "Mountain");
             public static readonly ModString Neutral = new ModString("Spatial.Neutral", "neutral");
@@ -582,6 +583,7 @@ namespace SongsOfConquestAccess.Localization
             public static readonly ModString AnnouncementInteractionPoint = new ModString("Screens.AnnouncementInteractionPoint", "Interaction point");
             public static readonly ModString AnnouncementMapEntity = new ModString("Screens.AnnouncementMapEntity", "Map entity");
             public static readonly ModString AnnouncementMovement = new ModString("Screens.AnnouncementMovement", "Movement");
+            public static readonly ModString AnnouncementMovementCost = new ModString("Screens.AnnouncementMovementCost", "Movement cost");
             public static readonly ModString AnnouncementName = new ModString("Screens.AnnouncementName", "Name");
             public static readonly ModString AnnouncementOccupant = new ModString("Screens.AnnouncementOccupant", "Occupant");
             public static readonly ModString AnnouncementOrderRow = new ModString("Screens.AnnouncementOrderRow", "{0} horizontal row");

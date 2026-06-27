@@ -2005,6 +2005,11 @@ msgctxt "Spatial.Movement"
 msgid "Movement"
 msgstr "이동"
 
+#. Spatial.MovementCost
+msgctxt "Spatial.MovementCost"
+msgid "Movement cost: {0}"
+msgstr "이동 비용: {0}"
+
 #. Spatial.MovementRange
 msgctxt "Spatial.MovementRange"
 msgid "Movement range"
@@ -3171,6 +3176,11 @@ msgstr "지도 엔티티"
 msgctxt "Screens.AnnouncementMovement"
 msgid "Movement"
 msgstr "이동"
+
+#. Screens.AnnouncementMovementCost
+msgctxt "Screens.AnnouncementMovementCost"
+msgid "Movement cost"
+msgstr "이동 비용"
 
 #. Screens.AnnouncementName
 msgctxt "Screens.AnnouncementName"

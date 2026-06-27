@@ -494,6 +494,11 @@ msgctxt "Spatial.Movement"
 msgid "Movement"
 msgstr ""
 
+#. Spatial.MovementCost
+msgctxt "Spatial.MovementCost"
+msgid "Movement cost: {0}"
+msgstr ""
+
 #. Spatial.MovementRange
 msgctxt "Spatial.MovementRange"
 msgid "Movement range"
@@ -2667,6 +2672,11 @@ msgstr ""
 #. Screens.AnnouncementMovement
 msgctxt "Screens.AnnouncementMovement"
 msgid "Movement"
+msgstr ""
+
+#. Screens.AnnouncementMovementCost
+msgctxt "Screens.AnnouncementMovementCost"
+msgid "Movement cost"
 msgstr ""
 
 #. Screens.AnnouncementName
