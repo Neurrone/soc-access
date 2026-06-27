@@ -5,6 +5,7 @@
 - Information spoken on the focused tile or in scanner results are now a composable set of announcements that you can toggle, reorder, and customize individually from the mod settings screen
 - Fixed untranslated caster and effect names being narrated in combat
 - Increase log verbosity to help with debug Prism issues when it doesn't detect screen readers properly
+- Update Prism to 0.16.7 to fix issues with Baoyi screen reader support
 
 ## V0.7.1
 
