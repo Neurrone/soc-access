@@ -2060,6 +2060,11 @@ msgctxt "Spatial.OnRoute"
 msgid "On route"
 msgstr "На маршруте"
 
+#. Spatial.PositionAndMapSize
+msgctxt "Spatial.PositionAndMapSize"
+msgid "Position {0}, {1}. Map is {2} by {3}."
+msgstr "Позиция {0}, {1}. Размер карты {2} на {3}."
+
 #. Spatial.PrimaryPrefix
 msgctxt "Spatial.PrimaryPrefix"
 msgid "primary "
@@ -3145,6 +3150,11 @@ msgstr "Купить"
 msgctxt "Screens.Buyback"
 msgid "Buyback"
 msgstr "Обратный выкуп"
+
+#. Actions.DescribePosition
+msgctxt "Actions.DescribePosition"
+msgid "Describe Position"
+msgstr "Описать позицию"
 
 #. Actions.Dismiss
 msgctxt "Actions.Dismiss"

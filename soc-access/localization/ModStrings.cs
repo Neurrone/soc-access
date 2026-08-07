@@ -130,6 +130,7 @@ namespace SongsOfConquestAccess.Localization
             public static readonly ModString Neutral = new ModString("Spatial.Neutral", "neutral");
             public static readonly ModString NoRoutePreview = new ModString("Spatial.NoRoutePreview", "no route preview");
             public static readonly ModString OnRoute = new ModString("Spatial.OnRoute", "On route");
+            public static readonly ModString PositionAndMapSize = new ModString("Spatial.PositionAndMapSize", "Position {0}, {1}. Map is {2} by {3}.");
             public static readonly ModString PrimaryPrefix = new ModString("Spatial.PrimaryPrefix", "primary ");
             public static readonly ModString RangeAndMovement = new ModString("Spatial.RangeAndMovement", "{0} and movement range");
             public static readonly ModString Reachable = new ModString("Spatial.Reachable", "reachable");
@@ -167,6 +168,7 @@ namespace SongsOfConquestAccess.Localization
             public static readonly ModString CombatPreviousActingTroop = new ModString("Actions.CombatPreviousActingTroop", "Previous Acting Troop");
             public static readonly ModString CombatPreviousEnemyTroop = new ModString("Actions.CombatPreviousEnemyTroop", "Previous Enemy Troop");
             public static readonly ModString CombatPreviousRelevantTile = new ModString("Actions.CombatPreviousRelevantTile", "Previous Relevant Combat Tile");
+            public static readonly ModString DescribePosition = new ModString("Actions.DescribePosition", "Describe Position");
             public static readonly ModString Dismiss = new ModString("Actions.Dismiss", "Dismiss");
             public static readonly ModString FirstBufferLine = new ModString("Actions.FirstBufferLine", "First Buffer Line");
             public static readonly ModString FirstMenuItem = new ModString("Actions.FirstMenuItem", "First Menu Item");

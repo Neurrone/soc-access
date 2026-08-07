@@ -63,6 +63,7 @@ This page summarizes the mod hotkeys used across the documentation.
 | `Enter`             | Primary tile action                 |
 | `Backslash`         | Secondary tile action               |
 | `A`                 | Summarize reachable entities        |
+| `D`                 | Describe cursor position and map size |
 | `W`                 | Select next wielder                 |
 | `S`                 | Select next settlement              |
 | `Space`             | Move focus to selected wielder tile |

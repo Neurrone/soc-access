@@ -27,6 +27,7 @@ The mod mentions if a tile is unexplored or currently unseen.
 - `Enter`: perform the primary action on the focused tile, corresponding to a left-click. If the tile has a selectable entity such as a building, this brings up the entity's menu for further interaction. Otherwise, this clears the wielder's destination.
 - `\`: perform the secondary action on the focused tile, corresponding to a right-click. Press once on a tile to set it as the destination. Press again to actually move. If the tile has an interactable entity and the wielder is nearby, this causes your wielder to interact with the entity.
 - `A`: get a summary of entities reachable by the current wielder excluding visited pickups or friendly resource generators
+- `D`: describe the position of the cursor and the size of the map, for example "Position 12, 34. Map is 80 by 96."
 - `W`: select the next wielder
 - `S`: select the next settlement
 - `Space`: move focus to the selected wielder's tile

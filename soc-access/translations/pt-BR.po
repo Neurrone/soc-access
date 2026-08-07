@@ -2045,6 +2045,11 @@ msgctxt "Spatial.OnRoute"
 msgid "On route"
 msgstr "Na rota"
 
+#. Spatial.PositionAndMapSize
+msgctxt "Spatial.PositionAndMapSize"
+msgid "Position {0}, {1}. Map is {2} by {3}."
+msgstr "Posição {0}, {1}. O mapa é {2} por {3}."
+
 #. Spatial.PrimaryPrefix
 msgctxt "Spatial.PrimaryPrefix"
 msgid "primary "
@@ -3025,6 +3030,11 @@ msgstr "Comprar"
 msgctxt "Screens.Buyback"
 msgid "Buyback"
 msgstr "Recompra"
+
+#. Actions.DescribePosition
+msgctxt "Actions.DescribePosition"
+msgid "Describe Position"
+msgstr "Descrever posição"
 
 #. Actions.Dismiss
 msgctxt "Actions.Dismiss"

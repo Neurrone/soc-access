@@ -58,6 +58,11 @@ namespace SongsOfConquestAccess.UI
             return string.Empty;
         }
 
+        public override string GetAnnouncementKey()
+        {
+            return _cursorTile.ToString();
+        }
+
         public override string GetLabel()
         {
             AdventureMapTile tile = _adapter != null ? _adapter.GetTile(_cursorTile) : null;
@@ -92,6 +97,7 @@ namespace SongsOfConquestAccess.UI
                 || actionKey == AccessibilityActions.NextWielder.Key
                 || actionKey == AccessibilityActions.NextSettlement.Key
                 || actionKey == AccessibilityActions.SummarizeReachableEntities.Key
+                || actionKey == AccessibilityActions.DescribePosition.Key
                 || IsBookmarkAction(actionKey)
                 || IsBeaconAction(actionKey)
                 || IsScannerAction(actionKey);
@@ -177,6 +183,11 @@ namespace SongsOfConquestAccess.UI
             if (action.Key == AccessibilityActions.SummarizeReachableEntities.Key)
             {
                 return SpeakReachableEntities();
+            }
+
+            if (action.Key == AccessibilityActions.DescribePosition.Key)
+            {
+                return SpeakPosition();
             }
 
             return false;
@@ -505,6 +516,15 @@ namespace SongsOfConquestAccess.UI
             }
 
             _scanner.Output(result);
+            return true;
+        }
+
+        private bool SpeakPosition()
+        {
+            Vector2Int mapSize = _adapter.GetMapSize();
+            SpeechPipeline.Output(new SpeechRequest(
+                ModText.Get(ModStrings.Spatial.PositionAndMapSize, _cursorTile.x, _cursorTile.y, mapSize.x, mapSize.y),
+                interrupt: false));
             return true;
         }
 

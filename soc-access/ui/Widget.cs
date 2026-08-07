@@ -40,6 +40,15 @@ namespace SongsOfConquestAccess.UI
             return string.Empty;
         }
 
+        // Identifies the subject the announcement describes when a single widget
+        // presents many positions (for example a grid cursor tile). UIManager
+        // re-announces when this key changes even if the spoken text is
+        // identical, so moving between two same-content tiles is not silent.
+        public virtual string GetAnnouncementKey()
+        {
+            return null;
+        }
+
         public virtual string GetRole()
         {
             return string.Empty;

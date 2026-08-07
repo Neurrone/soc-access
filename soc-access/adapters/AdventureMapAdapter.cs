@@ -3493,6 +3493,16 @@ namespace SongsOfConquestAccess.Adapters
             return new Vector2(point.x, point.y);
         }
 
+        public Vector2Int GetMapSize()
+        {
+            if (_facade == null || _facade.Level == null)
+            {
+                return Vector2Int.zero;
+            }
+
+            return new Vector2Int(_facade.Level.Width, _facade.Level.Height);
+        }
+
         private Vector2Int ClampToMap(Vector2Int position)
         {
             int x = Math.Max(0, Math.Min(_facade.Level.Width - 1, position.x));

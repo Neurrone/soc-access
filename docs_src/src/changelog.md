@@ -1,5 +1,10 @@
 # Changelog
 
+## V0.7.3
+
+- Added `D` command on the adventure map that describes the position of the accessibility cursor and the size of the map
+- Fixed movement between two tiles on the adventure map and battlefield that announce identically being silent when coordinate announcements are disabled
+
 ## V0.7.2
 
 - Information spoken on the focused tile or in scanner results are now a composable set of announcements that you can toggle, reorder, and customize individually from the mod settings screen

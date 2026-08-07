@@ -2030,6 +2030,11 @@ msgctxt "Spatial.OnRoute"
 msgid "On route"
 msgstr "Rotada"
 
+#. Spatial.PositionAndMapSize
+msgctxt "Spatial.PositionAndMapSize"
+msgid "Position {0}, {1}. Map is {2} by {3}."
+msgstr "Konum {0}, {1}. Harita boyutu {2} çarpı {3}."
+
 #. Spatial.PrimaryPrefix
 msgctxt "Spatial.PrimaryPrefix"
 msgid "primary "
@@ -2905,6 +2910,11 @@ msgstr "Satın al"
 msgctxt "Screens.Buyback"
 msgid "Buyback"
 msgstr "Geri satın alma"
+
+#. Actions.DescribePosition
+msgctxt "Actions.DescribePosition"
+msgid "Describe Position"
+msgstr "Konumu Açıkla"
 
 #. Actions.Dismiss
 msgctxt "Actions.Dismiss"

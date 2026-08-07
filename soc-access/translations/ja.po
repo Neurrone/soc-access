@@ -2030,6 +2030,11 @@ msgctxt "Spatial.OnRoute"
 msgid "On route"
 msgstr "経路上"
 
+#. Spatial.PositionAndMapSize
+msgctxt "Spatial.PositionAndMapSize"
+msgid "Position {0}, {1}. Map is {2} by {3}."
+msgstr "位置 {0}、{1}。マップは横 {2}、縦 {3} です。"
+
 #. Spatial.PrimaryPrefix
 msgctxt "Spatial.PrimaryPrefix"
 msgid "primary "
@@ -2905,6 +2910,11 @@ msgstr "購入"
 msgctxt "Screens.Buyback"
 msgid "Buyback"
 msgstr "買い戻し"
+
+#. Actions.DescribePosition
+msgctxt "Actions.DescribePosition"
+msgid "Describe Position"
+msgstr "位置の説明"
 
 #. Actions.Dismiss
 msgctxt "Actions.Dismiss"

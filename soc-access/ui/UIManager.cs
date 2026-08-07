@@ -10,6 +10,7 @@ namespace SongsOfConquestAccess.UI
         private static Widget _currentWidget;
         private static Widget _lastFocusedWidget;
         private static string _lastAnnouncement;
+        private static string _lastAnnouncementKey;
         private static Widget _requestedWidget;
         private static bool _requestedAnnounce;
         private static bool _isCommittingFocus;
@@ -63,6 +64,7 @@ namespace SongsOfConquestAccess.UI
             _currentWidget = null;
             _lastFocusedWidget = null;
             _lastAnnouncement = null;
+            _lastAnnouncementKey = null;
             _requestedWidget = null;
             _requestedAnnounce = false;
             _dirty = false;
@@ -94,16 +96,20 @@ namespace SongsOfConquestAccess.UI
             }
 
             bool didFocusChange = !ReferenceEquals(target, _lastFocusedWidget);
+            string announcementKey = target.GetAnnouncementKey();
             if (!announce)
             {
                 _lastFocusedWidget = target;
                 _lastAnnouncement = announcement;
+                _lastAnnouncementKey = announcementKey;
                 PopulateUiReviewBuffer(target);
                 ShowNativeTooltip(target);
                 return;
             }
 
-            if (!didFocusChange && announcement == _lastAnnouncement)
+            if (!didFocusChange
+                && announcement == _lastAnnouncement
+                && announcementKey == _lastAnnouncementKey)
             {
                 ShowNativeTooltip(target);
                 return;
@@ -111,6 +117,7 @@ namespace SongsOfConquestAccess.UI
 
             _lastFocusedWidget = target;
             _lastAnnouncement = announcement;
+            _lastAnnouncementKey = announcementKey;
             SocAccessPlugin.Instance?.LogInfo("UIManager speaking focused widget: \"" + announcement + "\"");
             SpeechPipeline.Output(new SpeechRequest(announcement, interrupt: false));
 

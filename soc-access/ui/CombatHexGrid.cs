@@ -53,6 +53,11 @@ namespace SongsOfConquestAccess.UI
             return string.Empty;
         }
 
+        public override string GetAnnouncementKey()
+        {
+            return _cursor.ToString();
+        }
+
         public override string GetLabel()
         {
             CombatTile tile = GetFocusedTile();
