@@ -89,14 +89,19 @@ namespace SongsOfConquestAccess.UI
             _currentWidget = target;
 
             string announcement = BuildAnnouncement(target);
+            bool didFocusChange = !ReferenceEquals(target, _lastFocusedWidget);
+            string announcementKey = target.GetAnnouncementKey();
             if (string.IsNullOrWhiteSpace(announcement))
             {
+                // Still record what the empty announcement described. Otherwise
+                // returning to the previously spoken subject matches the stale
+                // text and key and is wrongly suppressed.
+                _lastFocusedWidget = target;
+                _lastAnnouncement = announcement;
+                _lastAnnouncementKey = announcementKey;
                 NativeTooltipUtility.HideTooltip();
                 return;
             }
-
-            bool didFocusChange = !ReferenceEquals(target, _lastFocusedWidget);
-            string announcementKey = target.GetAnnouncementKey();
             if (!announce)
             {
                 _lastFocusedWidget = target;

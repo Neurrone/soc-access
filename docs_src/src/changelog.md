@@ -1,5 +1,9 @@
 # Changelog
 
+## V0.7.4
+
+- Fixed tiles no longer being announced when returning to them after passing over tiles that announce nothing, which could happen when announcement elements such as coordinates and terrain are disabled
+
 ## V0.7.3
 
 - Added `D` command on the adventure map that describes the position of the accessibility cursor and the size of the map
