@@ -40,6 +40,32 @@ namespace SongsOfConquestAccess.Localization
             public static readonly ModString NameWithColor = new ModString("Artifacts.NameWithColor", "{0} ({1})");
         }
 
+        public static class Audio
+        {
+            public static readonly ModString CategoryCombat = new ModString("Audio.CategoryCombat", "Battlefield");
+            public static readonly ModString CategoryOverworld = new ModString("Audio.CategoryOverworld", "Map contents");
+            public static readonly ModString CategoryTerrain = new ModString("Audio.CategoryTerrain", "Terrain");
+            public static readonly ModString EntityEnemy = new ModString("Audio.EntityEnemy", "Enemy");
+            public static readonly ModString EntityFriendly = new ModString("Audio.EntityFriendly", "Ally");
+            public static readonly ModString EntityNeutral = new ModString("Audio.EntityNeutral", "Neutral");
+            public static readonly ModString HexActive = new ModString("Audio.HexActive", "Battlefield: acting troop");
+            public static readonly ModString HexAlly = new ModString("Audio.HexAlly", "Battlefield: allied troop");
+            public static readonly ModString HexElevation1 = new ModString("Audio.HexElevation1", "Battlefield: hex, elevation 1");
+            public static readonly ModString HexElevation2 = new ModString("Audio.HexElevation2", "Battlefield: hex, elevation 2");
+            public static readonly ModString HexElevation3 = new ModString("Audio.HexElevation3", "Battlefield: hex, elevation 3");
+            public static readonly ModString HexEmpty = new ModString("Audio.HexEmpty", "Battlefield: empty hex");
+            public static readonly ModString HexEnemy = new ModString("Audio.HexEnemy", "Battlefield: enemy troop");
+            public static readonly ModString HexObstacle = new ModString("Audio.HexObstacle", "Battlefield: obstacle");
+            public static readonly ModString MoveDenied = new ModString("Audio.MoveDenied", "Map edge");
+            public static readonly ModString TerrainGround = new ModString("Audio.TerrainGround", "Open ground");
+            public static readonly ModString TerrainImpassable = new ModString("Audio.TerrainImpassable", "Impassable tile");
+            public static readonly ModString TerrainRoad = new ModString("Audio.TerrainRoad", "Road");
+            public static readonly ModString TerrainSand = new ModString("Audio.TerrainSand", "Sand");
+            public static readonly ModString TerrainTrees = new ModString("Audio.TerrainTrees", "Trees");
+            public static readonly ModString TerrainUnexplored = new ModString("Audio.TerrainUnexplored", "Unexplored tile");
+            public static readonly ModString TerrainWater = new ModString("Audio.TerrainWater", "Water");
+        }
+
         public static class Draft
         {
             public static readonly ModPluralString AvailableTroops = new ModPluralString("Draft.AvailableTroops", "{0} available", "{0} available");
@@ -426,6 +452,8 @@ namespace SongsOfConquestAccess.Localization
             public static readonly ModString Attacker = new ModString("Screens.Attacker", "Attacker");
             public static readonly ModString AttackerEssence = new ModString("Screens.AttackerEssence", "Attacker essence");
             public static readonly ModString AttackerPortrait = new ModString("Screens.AttackerPortrait", "Attacker portrait");
+            public static readonly ModString Audio = new ModString("Screens.Audio", "Audio");
+            public static readonly ModString AudioGlossary = new ModString("Screens.AudioGlossary", "Audio glossary");
             public static readonly ModString Back = new ModString("Screens.Back", "Back");
             public static readonly ModString Ballista = new ModString("Screens.Ballista", "Ballista");
             public static readonly ModString BattleLog = new ModString("Screens.BattleLog", "Battle log");
@@ -461,6 +489,7 @@ namespace SongsOfConquestAccess.Localization
             public static readonly ModString DestructionSpells = new ModString("Screens.DestructionSpells", "Destruction spells");
             public static readonly ModString DisabledWithReason = new ModString("Screens.DisabledWithReason", "{0}. {1}");
             public static readonly ModString Downloads = new ModString("Screens.Downloads", "Downloads");
+            public static readonly ModString Duration = new ModString("Screens.Duration", "Duration");
             public static readonly ModString Empty = new ModString("Screens.Empty", "empty");
             public static readonly ModString Enabled = new ModString("Screens.Enabled", "Enabled");
             public static readonly ModString EjectWielder = new ModString("Screens.EjectWielder", "Eject wielder");
@@ -507,6 +536,10 @@ namespace SongsOfConquestAccess.Localization
             public static readonly ModString Ok = new ModString("Screens.Ok", "OK");
             public static readonly ModString OrderSpells = new ModString("Screens.OrderSpells", "Order spells");
             public static readonly ModString Options = new ModString("Screens.Options", "Options");
+            public static readonly ModString PercentValue = new ModString("Screens.PercentValue", "{0}%");
+            public static readonly ModString Pitch = new ModString("Screens.Pitch", "Pitch");
+            public static readonly ModString Play = new ModString("Screens.Play", "Play");
+            public static readonly ModString PlayTileSoundCues = new ModString("Screens.PlayTileSoundCues", "Play tile sound cues");
             public static readonly ModString PlayerStats = new ModString("Screens.PlayerStats", "Player stats");
             public static readonly ModString PlayerStatsBattle = new ModString("Screens.PlayerStatsBattle", "Conquest - Battle");
             public static readonly ModString PlayerStatsOverall = new ModString("Screens.PlayerStatsOverall", "Conquest - Overall");
@@ -529,7 +562,6 @@ namespace SongsOfConquestAccess.Localization
             public static readonly ModString Round = new ModString("Screens.Round", "Round {0}");
             public static readonly ModString Scanner = new ModString("Screens.Scanner", "Scanner");
             public static readonly ModString ScannerContentAnnouncements = new ModString("Screens.ScannerContentAnnouncements", "Scanner content announcements");
-            public static readonly ModString ScannerPlaysDirectionalBeep = new ModString("Screens.ScannerPlaysDirectionalBeep", "Scanner plays directional beep");
             public static readonly ModString ScannerResultAnnouncements = new ModString("Screens.ScannerResultAnnouncements", "Scanner result announcements");
             public static readonly ModString SettlementTroops = new ModString("Screens.SettlementTroops", "settlement troops");
             public static readonly ModString Skill = new ModString("Screens.Skill", "Skill {0}");
@@ -555,6 +587,7 @@ namespace SongsOfConquestAccess.Localization
             public static readonly ModString Unavailable = new ModString("Screens.Unavailable", "Unavailable");
             public static readonly ModString UnknownSpell = new ModString("Screens.UnknownSpell", "unknown spell");
             public static readonly ModString VisitingWielderArmy = new ModString("Screens.VisitingWielderArmy", "visiting wielder army");
+            public static readonly ModString Volume = new ModString("Screens.Volume", "Volume");
             public static readonly ModString WielderAnnouncements = new ModString("Screens.WielderAnnouncements", "Wielder announcements");
             public static readonly ModString WielderArmyPossessive = new ModString("Screens.WielderArmyPossessive", "{0}'s army");
             public static readonly ModString WielderArmy = new ModString("Screens.WielderArmy", "wielder army");

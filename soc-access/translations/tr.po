@@ -945,11 +945,6 @@ msgctxt "Screens.ReadStoryCameraFocusChanges"
 msgid "Read story camera focus change events"
 msgstr "Hikaye kamerası odak değişikliği olaylarını oku"
 
-#. Screens.ScannerPlaysDirectionalBeep
-msgctxt "Screens.ScannerPlaysDirectionalBeep"
-msgid "Scanner plays directional beep"
-msgstr "Tarayıcı yönlü bip sesi çalar"
-
 #. Screens.RecruitFrom
 msgctxt "Screens.RecruitFrom"
 msgid "Recruit from"
@@ -3237,3 +3232,153 @@ msgctxt "Screens.AnnouncementZoneOfControl"
 msgid "Zone of control"
 msgstr "Kontrol bölgesi"
 
+
+#. Audio.CategoryCombat
+msgctxt "Audio.CategoryCombat"
+msgid "Battlefield"
+msgstr "Savaş alanı"
+
+#. Audio.CategoryOverworld
+msgctxt "Audio.CategoryOverworld"
+msgid "Map contents"
+msgstr "Harita içeriği"
+
+#. Audio.CategoryTerrain
+msgctxt "Audio.CategoryTerrain"
+msgid "Terrain"
+msgstr "Arazi"
+
+#. Audio.EntityEnemy
+msgctxt "Audio.EntityEnemy"
+msgid "Enemy"
+msgstr "Düşman"
+
+#. Audio.EntityFriendly
+msgctxt "Audio.EntityFriendly"
+msgid "Ally"
+msgstr "Müttefik"
+
+#. Audio.EntityNeutral
+msgctxt "Audio.EntityNeutral"
+msgid "Neutral"
+msgstr "Tarafsız"
+
+#. Audio.HexActive
+msgctxt "Audio.HexActive"
+msgid "Battlefield: acting troop"
+msgstr "Savaş alanı: hareket eden birlik"
+
+#. Audio.HexAlly
+msgctxt "Audio.HexAlly"
+msgid "Battlefield: allied troop"
+msgstr "Savaş alanı: müttefik birlik"
+
+#. Audio.HexElevation1
+msgctxt "Audio.HexElevation1"
+msgid "Battlefield: hex, elevation 1"
+msgstr "Savaş alanı: altıgen, yükseklik 1"
+
+#. Audio.HexElevation2
+msgctxt "Audio.HexElevation2"
+msgid "Battlefield: hex, elevation 2"
+msgstr "Savaş alanı: altıgen, yükseklik 2"
+
+#. Audio.HexElevation3
+msgctxt "Audio.HexElevation3"
+msgid "Battlefield: hex, elevation 3"
+msgstr "Savaş alanı: altıgen, yükseklik 3"
+
+#. Audio.HexEmpty
+msgctxt "Audio.HexEmpty"
+msgid "Battlefield: empty hex"
+msgstr "Savaş alanı: boş altıgen"
+
+#. Audio.HexEnemy
+msgctxt "Audio.HexEnemy"
+msgid "Battlefield: enemy troop"
+msgstr "Savaş alanı: düşman birlik"
+
+#. Audio.HexObstacle
+msgctxt "Audio.HexObstacle"
+msgid "Battlefield: obstacle"
+msgstr "Savaş alanı: engel"
+
+#. Audio.MoveDenied
+msgctxt "Audio.MoveDenied"
+msgid "Map edge"
+msgstr "Harita kenarı"
+
+#. Audio.TerrainGround
+msgctxt "Audio.TerrainGround"
+msgid "Open ground"
+msgstr "Açık arazi"
+
+#. Audio.TerrainImpassable
+msgctxt "Audio.TerrainImpassable"
+msgid "Impassable tile"
+msgstr "Geçilemez kare"
+
+#. Audio.TerrainRoad
+msgctxt "Audio.TerrainRoad"
+msgid "Road"
+msgstr "Yol"
+
+#. Audio.TerrainSand
+msgctxt "Audio.TerrainSand"
+msgid "Sand"
+msgstr "Kum"
+
+#. Audio.TerrainTrees
+msgctxt "Audio.TerrainTrees"
+msgid "Trees"
+msgstr "Ağaçlar"
+
+#. Audio.TerrainUnexplored
+msgctxt "Audio.TerrainUnexplored"
+msgid "Unexplored tile"
+msgstr "Keşfedilmemiş kare"
+
+#. Audio.TerrainWater
+msgctxt "Audio.TerrainWater"
+msgid "Water"
+msgstr "Su"
+
+#. Screens.Audio
+msgctxt "Screens.Audio"
+msgid "Audio"
+msgstr "Ses"
+
+#. Screens.AudioGlossary
+msgctxt "Screens.AudioGlossary"
+msgid "Audio glossary"
+msgstr "Ses sözlüğü"
+
+#. Screens.Duration
+msgctxt "Screens.Duration"
+msgid "Duration"
+msgstr "Süre"
+
+#. Screens.PercentValue
+msgctxt "Screens.PercentValue"
+msgid "{0}%"
+msgstr "%{0}"
+
+#. Screens.Pitch
+msgctxt "Screens.Pitch"
+msgid "Pitch"
+msgstr "Ses perdesi"
+
+#. Screens.Play
+msgctxt "Screens.Play"
+msgid "Play"
+msgstr "Çal"
+
+#. Screens.PlayTileSoundCues
+msgctxt "Screens.PlayTileSoundCues"
+msgid "Play tile sound cues"
+msgstr "Kare ses ipuçlarını çal"
+
+#. Screens.Volume
+msgctxt "Screens.Volume"
+msgid "Volume"
+msgstr "Ses seviyesi"

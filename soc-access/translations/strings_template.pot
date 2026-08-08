@@ -129,6 +129,116 @@ msgctxt "Artifacts.NameWithColor"
 msgid "{0} ({1})"
 msgstr ""
 
+#. Audio.CategoryCombat
+msgctxt "Audio.CategoryCombat"
+msgid "Battlefield"
+msgstr ""
+
+#. Audio.CategoryOverworld
+msgctxt "Audio.CategoryOverworld"
+msgid "Map contents"
+msgstr ""
+
+#. Audio.CategoryTerrain
+msgctxt "Audio.CategoryTerrain"
+msgid "Terrain"
+msgstr ""
+
+#. Audio.EntityEnemy
+msgctxt "Audio.EntityEnemy"
+msgid "Enemy"
+msgstr ""
+
+#. Audio.EntityFriendly
+msgctxt "Audio.EntityFriendly"
+msgid "Ally"
+msgstr ""
+
+#. Audio.EntityNeutral
+msgctxt "Audio.EntityNeutral"
+msgid "Neutral"
+msgstr ""
+
+#. Audio.HexActive
+msgctxt "Audio.HexActive"
+msgid "Battlefield: acting troop"
+msgstr ""
+
+#. Audio.HexAlly
+msgctxt "Audio.HexAlly"
+msgid "Battlefield: allied troop"
+msgstr ""
+
+#. Audio.HexElevation1
+msgctxt "Audio.HexElevation1"
+msgid "Battlefield: hex, elevation 1"
+msgstr ""
+
+#. Audio.HexElevation2
+msgctxt "Audio.HexElevation2"
+msgid "Battlefield: hex, elevation 2"
+msgstr ""
+
+#. Audio.HexElevation3
+msgctxt "Audio.HexElevation3"
+msgid "Battlefield: hex, elevation 3"
+msgstr ""
+
+#. Audio.HexEmpty
+msgctxt "Audio.HexEmpty"
+msgid "Battlefield: empty hex"
+msgstr ""
+
+#. Audio.HexEnemy
+msgctxt "Audio.HexEnemy"
+msgid "Battlefield: enemy troop"
+msgstr ""
+
+#. Audio.HexObstacle
+msgctxt "Audio.HexObstacle"
+msgid "Battlefield: obstacle"
+msgstr ""
+
+#. Audio.MoveDenied
+msgctxt "Audio.MoveDenied"
+msgid "Map edge"
+msgstr ""
+
+#. Audio.TerrainGround
+msgctxt "Audio.TerrainGround"
+msgid "Open ground"
+msgstr ""
+
+#. Audio.TerrainImpassable
+msgctxt "Audio.TerrainImpassable"
+msgid "Impassable tile"
+msgstr ""
+
+#. Audio.TerrainRoad
+msgctxt "Audio.TerrainRoad"
+msgid "Road"
+msgstr ""
+
+#. Audio.TerrainSand
+msgctxt "Audio.TerrainSand"
+msgid "Sand"
+msgstr ""
+
+#. Audio.TerrainTrees
+msgctxt "Audio.TerrainTrees"
+msgid "Trees"
+msgstr ""
+
+#. Audio.TerrainUnexplored
+msgctxt "Audio.TerrainUnexplored"
+msgid "Unexplored tile"
+msgstr ""
+
+#. Audio.TerrainWater
+msgctxt "Audio.TerrainWater"
+msgid "Water"
+msgstr ""
+
 #. Draft.EssenceVariants
 msgctxt "Draft.EssenceVariants"
 msgid "Essence variants"
@@ -1894,6 +2004,16 @@ msgctxt "Screens.AttackerPortrait"
 msgid "Attacker portrait"
 msgstr ""
 
+#. Screens.Audio
+msgctxt "Screens.Audio"
+msgid "Audio"
+msgstr ""
+
+#. Screens.AudioGlossary
+msgctxt "Screens.AudioGlossary"
+msgid "Audio glossary"
+msgstr ""
+
 #. Screens.Back
 msgctxt "Screens.Back"
 msgid "Back"
@@ -2067,6 +2187,11 @@ msgstr ""
 #. Screens.Downloads
 msgctxt "Screens.Downloads"
 msgid "Downloads"
+msgstr ""
+
+#. Screens.Duration
+msgctxt "Screens.Duration"
+msgid "Duration"
 msgstr ""
 
 #. Screens.Empty
@@ -2299,6 +2424,26 @@ msgctxt "Screens.Options"
 msgid "Options"
 msgstr ""
 
+#. Screens.PercentValue
+msgctxt "Screens.PercentValue"
+msgid "{0}%"
+msgstr ""
+
+#. Screens.Pitch
+msgctxt "Screens.Pitch"
+msgid "Pitch"
+msgstr ""
+
+#. Screens.Play
+msgctxt "Screens.Play"
+msgid "Play"
+msgstr ""
+
+#. Screens.PlayTileSoundCues
+msgctxt "Screens.PlayTileSoundCues"
+msgid "Play tile sound cues"
+msgstr ""
+
 #. Screens.PlayerStats
 msgctxt "Screens.PlayerStats"
 msgid "Player stats"
@@ -2407,11 +2552,6 @@ msgstr ""
 #. Screens.ScannerContentAnnouncements
 msgctxt "Screens.ScannerContentAnnouncements"
 msgid "Scanner content announcements"
-msgstr ""
-
-#. Screens.ScannerPlaysDirectionalBeep
-msgctxt "Screens.ScannerPlaysDirectionalBeep"
-msgid "Scanner plays directional beep"
 msgstr ""
 
 #. Screens.ScannerResultAnnouncements
@@ -2537,6 +2677,11 @@ msgstr ""
 #. Screens.VisitingWielderArmy
 msgctxt "Screens.VisitingWielderArmy"
 msgid "visiting wielder army"
+msgstr ""
+
+#. Screens.Volume
+msgctxt "Screens.Volume"
+msgid "Volume"
 msgstr ""
 
 #. Screens.WielderAnnouncements

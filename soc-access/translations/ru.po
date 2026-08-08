@@ -965,11 +965,6 @@ msgctxt "Screens.ReadStoryCameraFocusChanges"
 msgid "Read story camera focus change events"
 msgstr "Читать события изменения фокуса сюжетной камеры"
 
-#. Screens.ScannerPlaysDirectionalBeep
-msgctxt "Screens.ScannerPlaysDirectionalBeep"
-msgid "Scanner plays directional beep"
-msgstr "Сканер воспроизводит направленный звуковой сигнал"
-
 #. Screens.RecruitFrom
 msgctxt "Screens.RecruitFrom"
 msgid "Recruit from"
@@ -3477,3 +3472,153 @@ msgctxt "Screens.AnnouncementZoneOfControl"
 msgid "Zone of control"
 msgstr "Зона контроля"
 
+
+#. Audio.CategoryCombat
+msgctxt "Audio.CategoryCombat"
+msgid "Battlefield"
+msgstr "Поле боя"
+
+#. Audio.CategoryOverworld
+msgctxt "Audio.CategoryOverworld"
+msgid "Map contents"
+msgstr "Содержимое карты"
+
+#. Audio.CategoryTerrain
+msgctxt "Audio.CategoryTerrain"
+msgid "Terrain"
+msgstr "Местность"
+
+#. Audio.EntityEnemy
+msgctxt "Audio.EntityEnemy"
+msgid "Enemy"
+msgstr "Враг"
+
+#. Audio.EntityFriendly
+msgctxt "Audio.EntityFriendly"
+msgid "Ally"
+msgstr "Союзник"
+
+#. Audio.EntityNeutral
+msgctxt "Audio.EntityNeutral"
+msgid "Neutral"
+msgstr "Нейтральный"
+
+#. Audio.HexActive
+msgctxt "Audio.HexActive"
+msgid "Battlefield: acting troop"
+msgstr "Поле боя: действующий отряд"
+
+#. Audio.HexAlly
+msgctxt "Audio.HexAlly"
+msgid "Battlefield: allied troop"
+msgstr "Поле боя: союзный отряд"
+
+#. Audio.HexElevation1
+msgctxt "Audio.HexElevation1"
+msgid "Battlefield: hex, elevation 1"
+msgstr "Поле боя: гекс, высота 1"
+
+#. Audio.HexElevation2
+msgctxt "Audio.HexElevation2"
+msgid "Battlefield: hex, elevation 2"
+msgstr "Поле боя: гекс, высота 2"
+
+#. Audio.HexElevation3
+msgctxt "Audio.HexElevation3"
+msgid "Battlefield: hex, elevation 3"
+msgstr "Поле боя: гекс, высота 3"
+
+#. Audio.HexEmpty
+msgctxt "Audio.HexEmpty"
+msgid "Battlefield: empty hex"
+msgstr "Поле боя: пустой гекс"
+
+#. Audio.HexEnemy
+msgctxt "Audio.HexEnemy"
+msgid "Battlefield: enemy troop"
+msgstr "Поле боя: вражеский отряд"
+
+#. Audio.HexObstacle
+msgctxt "Audio.HexObstacle"
+msgid "Battlefield: obstacle"
+msgstr "Поле боя: препятствие"
+
+#. Audio.MoveDenied
+msgctxt "Audio.MoveDenied"
+msgid "Map edge"
+msgstr "Край карты"
+
+#. Audio.TerrainGround
+msgctxt "Audio.TerrainGround"
+msgid "Open ground"
+msgstr "Открытая местность"
+
+#. Audio.TerrainImpassable
+msgctxt "Audio.TerrainImpassable"
+msgid "Impassable tile"
+msgstr "Непроходимая клетка"
+
+#. Audio.TerrainRoad
+msgctxt "Audio.TerrainRoad"
+msgid "Road"
+msgstr "Дорога"
+
+#. Audio.TerrainSand
+msgctxt "Audio.TerrainSand"
+msgid "Sand"
+msgstr "Песок"
+
+#. Audio.TerrainTrees
+msgctxt "Audio.TerrainTrees"
+msgid "Trees"
+msgstr "Деревья"
+
+#. Audio.TerrainUnexplored
+msgctxt "Audio.TerrainUnexplored"
+msgid "Unexplored tile"
+msgstr "Неизведанная клетка"
+
+#. Audio.TerrainWater
+msgctxt "Audio.TerrainWater"
+msgid "Water"
+msgstr "Вода"
+
+#. Screens.Audio
+msgctxt "Screens.Audio"
+msgid "Audio"
+msgstr "Звук"
+
+#. Screens.AudioGlossary
+msgctxt "Screens.AudioGlossary"
+msgid "Audio glossary"
+msgstr "Словарь звуков"
+
+#. Screens.Duration
+msgctxt "Screens.Duration"
+msgid "Duration"
+msgstr "Длительность"
+
+#. Screens.PercentValue
+msgctxt "Screens.PercentValue"
+msgid "{0}%"
+msgstr "{0}%"
+
+#. Screens.Pitch
+msgctxt "Screens.Pitch"
+msgid "Pitch"
+msgstr "Высота тона"
+
+#. Screens.Play
+msgctxt "Screens.Play"
+msgid "Play"
+msgstr "Воспроизвести"
+
+#. Screens.PlayTileSoundCues
+msgctxt "Screens.PlayTileSoundCues"
+msgid "Play tile sound cues"
+msgstr "Воспроизводить звуки клеток"
+
+#. Screens.Volume
+msgctxt "Screens.Volume"
+msgid "Volume"
+msgstr "Громкость"

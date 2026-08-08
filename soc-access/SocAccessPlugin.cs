@@ -83,7 +83,7 @@ namespace SongsOfConquestAccess
             Logger.LogInfo("Accessibility plugin OnDestroy");
             _screenManager?.Clear();
             AdventureBeaconAudio.DisposeAll();
-            ScannerDirectionalBeepAudio.DisposeAll();
+            SynthCuePlayer.DisposeAll();
             _harmony?.UnpatchSelf();
             _harmony = null;
             _inputRouter?.Dispose();

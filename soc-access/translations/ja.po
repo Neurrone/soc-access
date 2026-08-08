@@ -945,11 +945,6 @@ msgctxt "Screens.ReadStoryCameraFocusChanges"
 msgid "Read story camera focus change events"
 msgstr "ストーリーカメラのフォーカス変更イベントを読み上げる"
 
-#. Screens.ScannerPlaysDirectionalBeep
-msgctxt "Screens.ScannerPlaysDirectionalBeep"
-msgid "Scanner plays directional beep"
-msgstr "スキャナーが方向ビープ音を再生"
-
 #. Screens.RecruitFrom
 msgctxt "Screens.RecruitFrom"
 msgid "Recruit from"
@@ -3237,3 +3232,153 @@ msgctxt "Screens.AnnouncementZoneOfControl"
 msgid "Zone of control"
 msgstr "支配領域"
 
+
+#. Audio.CategoryCombat
+msgctxt "Audio.CategoryCombat"
+msgid "Battlefield"
+msgstr "戦場"
+
+#. Audio.CategoryOverworld
+msgctxt "Audio.CategoryOverworld"
+msgid "Map contents"
+msgstr "マップ上の対象"
+
+#. Audio.CategoryTerrain
+msgctxt "Audio.CategoryTerrain"
+msgid "Terrain"
+msgstr "地形"
+
+#. Audio.EntityEnemy
+msgctxt "Audio.EntityEnemy"
+msgid "Enemy"
+msgstr "敵"
+
+#. Audio.EntityFriendly
+msgctxt "Audio.EntityFriendly"
+msgid "Ally"
+msgstr "味方"
+
+#. Audio.EntityNeutral
+msgctxt "Audio.EntityNeutral"
+msgid "Neutral"
+msgstr "中立"
+
+#. Audio.HexActive
+msgctxt "Audio.HexActive"
+msgid "Battlefield: acting troop"
+msgstr "戦場: 行動中の部隊"
+
+#. Audio.HexAlly
+msgctxt "Audio.HexAlly"
+msgid "Battlefield: allied troop"
+msgstr "戦場: 味方部隊"
+
+#. Audio.HexElevation1
+msgctxt "Audio.HexElevation1"
+msgid "Battlefield: hex, elevation 1"
+msgstr "戦場: ヘックス、高度1"
+
+#. Audio.HexElevation2
+msgctxt "Audio.HexElevation2"
+msgid "Battlefield: hex, elevation 2"
+msgstr "戦場: ヘックス、高度2"
+
+#. Audio.HexElevation3
+msgctxt "Audio.HexElevation3"
+msgid "Battlefield: hex, elevation 3"
+msgstr "戦場: ヘックス、高度3"
+
+#. Audio.HexEmpty
+msgctxt "Audio.HexEmpty"
+msgid "Battlefield: empty hex"
+msgstr "戦場: 空のヘックス"
+
+#. Audio.HexEnemy
+msgctxt "Audio.HexEnemy"
+msgid "Battlefield: enemy troop"
+msgstr "戦場: 敵部隊"
+
+#. Audio.HexObstacle
+msgctxt "Audio.HexObstacle"
+msgid "Battlefield: obstacle"
+msgstr "戦場: 障害物"
+
+#. Audio.MoveDenied
+msgctxt "Audio.MoveDenied"
+msgid "Map edge"
+msgstr "マップの端"
+
+#. Audio.TerrainGround
+msgctxt "Audio.TerrainGround"
+msgid "Open ground"
+msgstr "開けた地面"
+
+#. Audio.TerrainImpassable
+msgctxt "Audio.TerrainImpassable"
+msgid "Impassable tile"
+msgstr "通行不可のタイル"
+
+#. Audio.TerrainRoad
+msgctxt "Audio.TerrainRoad"
+msgid "Road"
+msgstr "道路"
+
+#. Audio.TerrainSand
+msgctxt "Audio.TerrainSand"
+msgid "Sand"
+msgstr "砂"
+
+#. Audio.TerrainTrees
+msgctxt "Audio.TerrainTrees"
+msgid "Trees"
+msgstr "木々"
+
+#. Audio.TerrainUnexplored
+msgctxt "Audio.TerrainUnexplored"
+msgid "Unexplored tile"
+msgstr "未探索のタイル"
+
+#. Audio.TerrainWater
+msgctxt "Audio.TerrainWater"
+msgid "Water"
+msgstr "水"
+
+#. Screens.Audio
+msgctxt "Screens.Audio"
+msgid "Audio"
+msgstr "音声"
+
+#. Screens.AudioGlossary
+msgctxt "Screens.AudioGlossary"
+msgid "Audio glossary"
+msgstr "音声用語集"
+
+#. Screens.Duration
+msgctxt "Screens.Duration"
+msgid "Duration"
+msgstr "長さ"
+
+#. Screens.PercentValue
+msgctxt "Screens.PercentValue"
+msgid "{0}%"
+msgstr "{0}%"
+
+#. Screens.Pitch
+msgctxt "Screens.Pitch"
+msgid "Pitch"
+msgstr "音の高さ"
+
+#. Screens.Play
+msgctxt "Screens.Play"
+msgid "Play"
+msgstr "再生"
+
+#. Screens.PlayTileSoundCues
+msgctxt "Screens.PlayTileSoundCues"
+msgid "Play tile sound cues"
+msgstr "タイルの効果音を再生する"
+
+#. Screens.Volume
+msgctxt "Screens.Volume"
+msgid "Volume"
+msgstr "音量"

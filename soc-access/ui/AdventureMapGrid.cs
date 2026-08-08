@@ -30,6 +30,7 @@ namespace SongsOfConquestAccess.UI
         private readonly AdventureBookmarkManager _bookmarks;
         private readonly AdventureBeaconAudio _beacons;
         private int _lookAroundRadius = DefaultLookAroundRadius;
+        private bool _tileCuesHandled;
 
         public AdventureMapGrid(AdventureMapAdapter adapter)
             : base("adventure_map_grid")
@@ -196,10 +197,18 @@ namespace SongsOfConquestAccess.UI
         protected override void OnFocus()
         {
             _adapter?.SetFocusedTileOverlay(_cursorTile);
+
+            // Focus arrival announces the current tile, so it gets a cue too. Paths that already
+            // cued while claiming focus mark the arrival handled so it only sounds once.
+            if (!_tileCuesHandled)
+            {
+                PlayTileCues();
+            }
         }
 
         protected override void OnUnfocus()
         {
+            _tileCuesHandled = false;
             _adapter?.ClearFocusedTileOverlay();
         }
 
@@ -238,7 +247,52 @@ namespace SongsOfConquestAccess.UI
             }
 
             _beacons.UpdateListener(_cursorTile);
+            if (updateUiManager)
+            {
+                PlayTileCues();
+            }
+            else
+            {
+                // Silent variant: no announcement, so no cue, and the focus commit it still
+                // triggers must not produce one either.
+                _tileCuesHandled = true;
+            }
+
             return true;
+        }
+
+        private void PlayTileCues()
+        {
+            _tileCuesHandled = true;
+            PlayTileCuesFor(_cursorTile, 0f, 1f, 0f);
+        }
+
+        private void PlayTileCuesFor(Vector2Int point, float panOffset, float gainScale, float semitoneOffset)
+        {
+            if (_adapter == null)
+            {
+                return;
+            }
+
+            CueLibrary.PlayCues(
+                TileCueSelector.ForAdventureTile(_adapter.GetTile(point)),
+                panOffset,
+                gainScale,
+                semitoneOffset);
+        }
+
+        /// <summary>The remote tile's own cues carry the direction to it; out of range plays nothing.</summary>
+        private void PlayDirectionalTileCues(Vector2Int origin, Vector2Int target)
+        {
+            float pan;
+            float semitones;
+            float gainScale;
+            if (!DirectionalCueMath.TryCompute(origin, target, CueGridGeometry.Square, out pan, out semitones, out gainScale))
+            {
+                return;
+            }
+
+            PlayTileCuesFor(target, pan, gainScale, semitones);
         }
 
         private bool Move(int xDelta, int yDelta)
@@ -246,6 +300,7 @@ namespace SongsOfConquestAccess.UI
             Vector2Int nextTile = _adapter.Move(_cursorTile, xDelta, yDelta);
             if (nextTile == _cursorTile)
             {
+                CueLibrary.PlayCue(CueLibrary.MoveDenied);
                 return true;
             }
 
@@ -254,6 +309,7 @@ namespace SongsOfConquestAccess.UI
             _adapter.SetFocusedTileOverlay(_cursorTile);
             UIManager.SetFocusedWidget(this);
             _beacons.UpdateListener(_cursorTile);
+            PlayTileCues();
             return true;
         }
 
@@ -267,6 +323,7 @@ namespace SongsOfConquestAccess.UI
                 point => AdventureTileSkipSignature.FromTile(_adapter.GetTile(point), HasBookmark(point)));
             if (result.Target == _cursorTile)
             {
+                CueLibrary.PlayCue(CueLibrary.MoveDenied);
                 return true;
             }
 
@@ -276,6 +333,7 @@ namespace SongsOfConquestAccess.UI
             _adapter.SetFocusedTileOverlay(_cursorTile);
             UIManager.SetFocusedWidget(this);
             _beacons.UpdateListener(_cursorTile);
+            PlayTileCues();
             return true;
         }
 
@@ -291,6 +349,7 @@ namespace SongsOfConquestAccess.UI
             _adapter.SetFocusedTileOverlay(_cursorTile);
             UIManager.SetFocusedWidget(this);
             _beacons.UpdateListener(_cursorTile);
+            PlayTileCues();
             return true;
         }
 
@@ -306,6 +365,7 @@ namespace SongsOfConquestAccess.UI
             _adapter.SetFocusedTileOverlay(_cursorTile);
             UIManager.SetFocusedWidget(this);
             _beacons.UpdateListener(_cursorTile);
+            PlayTileCues();
             return true;
         }
 
@@ -512,7 +572,7 @@ namespace SongsOfConquestAccess.UI
             if (result != null && result.Status == ScannerCommandStatus.Result && result.Result != null)
             {
                 Vector2Int origin = result.HasOrigin ? result.Origin : _cursorTile;
-                ScannerDirectionalBeepAudio.Play(origin, result.Result.Position, DirectionalBeepGridGeometry.Square);
+                PlayDirectionalTileCues(origin, result.Result.Position);
             }
 
             _scanner.Output(result);

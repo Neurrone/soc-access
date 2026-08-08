@@ -945,11 +945,6 @@ msgctxt "Screens.ReadStoryCameraFocusChanges"
 msgid "Read story camera focus change events"
 msgstr "Lire les événements de changement de focus de la caméra d'histoire"
 
-#. Screens.ScannerPlaysDirectionalBeep
-msgctxt "Screens.ScannerPlaysDirectionalBeep"
-msgid "Scanner plays directional beep"
-msgstr "Le scanner joue un bip directionnel"
-
 #. Screens.RecruitFrom
 msgctxt "Screens.RecruitFrom"
 msgid "Recruit from"
@@ -3357,3 +3352,153 @@ msgctxt "Screens.AnnouncementZoneOfControl"
 msgid "Zone of control"
 msgstr "Zone de contrôle"
 
+
+#. Audio.CategoryCombat
+msgctxt "Audio.CategoryCombat"
+msgid "Battlefield"
+msgstr "Champ de bataille"
+
+#. Audio.CategoryOverworld
+msgctxt "Audio.CategoryOverworld"
+msgid "Map contents"
+msgstr "Contenu de la carte"
+
+#. Audio.CategoryTerrain
+msgctxt "Audio.CategoryTerrain"
+msgid "Terrain"
+msgstr "Terrain"
+
+#. Audio.EntityEnemy
+msgctxt "Audio.EntityEnemy"
+msgid "Enemy"
+msgstr "Ennemi"
+
+#. Audio.EntityFriendly
+msgctxt "Audio.EntityFriendly"
+msgid "Ally"
+msgstr "Allié"
+
+#. Audio.EntityNeutral
+msgctxt "Audio.EntityNeutral"
+msgid "Neutral"
+msgstr "Neutre"
+
+#. Audio.HexActive
+msgctxt "Audio.HexActive"
+msgid "Battlefield: acting troop"
+msgstr "Champ de bataille : unité en action"
+
+#. Audio.HexAlly
+msgctxt "Audio.HexAlly"
+msgid "Battlefield: allied troop"
+msgstr "Champ de bataille : unité alliée"
+
+#. Audio.HexElevation1
+msgctxt "Audio.HexElevation1"
+msgid "Battlefield: hex, elevation 1"
+msgstr "Champ de bataille : hexagone, altitude 1"
+
+#. Audio.HexElevation2
+msgctxt "Audio.HexElevation2"
+msgid "Battlefield: hex, elevation 2"
+msgstr "Champ de bataille : hexagone, altitude 2"
+
+#. Audio.HexElevation3
+msgctxt "Audio.HexElevation3"
+msgid "Battlefield: hex, elevation 3"
+msgstr "Champ de bataille : hexagone, altitude 3"
+
+#. Audio.HexEmpty
+msgctxt "Audio.HexEmpty"
+msgid "Battlefield: empty hex"
+msgstr "Champ de bataille : hexagone vide"
+
+#. Audio.HexEnemy
+msgctxt "Audio.HexEnemy"
+msgid "Battlefield: enemy troop"
+msgstr "Champ de bataille : unité ennemie"
+
+#. Audio.HexObstacle
+msgctxt "Audio.HexObstacle"
+msgid "Battlefield: obstacle"
+msgstr "Champ de bataille : obstacle"
+
+#. Audio.MoveDenied
+msgctxt "Audio.MoveDenied"
+msgid "Map edge"
+msgstr "Bord de la carte"
+
+#. Audio.TerrainGround
+msgctxt "Audio.TerrainGround"
+msgid "Open ground"
+msgstr "Terrain dégagé"
+
+#. Audio.TerrainImpassable
+msgctxt "Audio.TerrainImpassable"
+msgid "Impassable tile"
+msgstr "Case infranchissable"
+
+#. Audio.TerrainRoad
+msgctxt "Audio.TerrainRoad"
+msgid "Road"
+msgstr "Route"
+
+#. Audio.TerrainSand
+msgctxt "Audio.TerrainSand"
+msgid "Sand"
+msgstr "Sable"
+
+#. Audio.TerrainTrees
+msgctxt "Audio.TerrainTrees"
+msgid "Trees"
+msgstr "Arbres"
+
+#. Audio.TerrainUnexplored
+msgctxt "Audio.TerrainUnexplored"
+msgid "Unexplored tile"
+msgstr "Case inexplorée"
+
+#. Audio.TerrainWater
+msgctxt "Audio.TerrainWater"
+msgid "Water"
+msgstr "Eau"
+
+#. Screens.Audio
+msgctxt "Screens.Audio"
+msgid "Audio"
+msgstr "Audio"
+
+#. Screens.AudioGlossary
+msgctxt "Screens.AudioGlossary"
+msgid "Audio glossary"
+msgstr "Glossaire audio"
+
+#. Screens.Duration
+msgctxt "Screens.Duration"
+msgid "Duration"
+msgstr "Durée"
+
+#. Screens.PercentValue
+msgctxt "Screens.PercentValue"
+msgid "{0}%"
+msgstr "{0} %"
+
+#. Screens.Pitch
+msgctxt "Screens.Pitch"
+msgid "Pitch"
+msgstr "Hauteur du son"
+
+#. Screens.Play
+msgctxt "Screens.Play"
+msgid "Play"
+msgstr "Écouter"
+
+#. Screens.PlayTileSoundCues
+msgctxt "Screens.PlayTileSoundCues"
+msgid "Play tile sound cues"
+msgstr "Jouer les sons de case"
+
+#. Screens.Volume
+msgctxt "Screens.Volume"
+msgid "Volume"
+msgstr "Volume"

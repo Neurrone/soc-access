@@ -30,6 +30,10 @@
       <HintPath>$(BepInExCoreDir)\0Harmony.dll</HintPath>
       <Private>true</Private>
     </Reference>
+    <Reference Include="BepInEx">
+      <HintPath>$(BepInExCoreDir)\BepInEx.dll</HintPath>
+      <Private>true</Private>
+    </Reference>
     <Reference Include="Unity.Mathematics">
       <HintPath>$(GameManagedDir)\Unity.Mathematics.dll</HintPath>
       <Private>true</Private>

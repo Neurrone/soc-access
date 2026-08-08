@@ -21,6 +21,8 @@ namespace SongsOfConquestAccess.UI
         private Vector2Int _cursor;
         private Vector2Int? _dragSource;
         private readonly ScannerController _scanner;
+        private bool _tileCuesArmed;
+        private bool _tileCuesHandled;
 
         public TroopPlacementHexGrid(PreBattleMenuAdapter adapter)
             : base("pre-battle-hex-grid")
@@ -220,16 +222,70 @@ namespace SongsOfConquestAccess.UI
                 _cursor = GetInitialCursor();
             }
 
+            if (_tileCuesArmed)
+            {
+                FocusCurrentTile();
+                PlayTileCues();
+                return;
+            }
+
+            // The game can fire a deployment change while the screen is still arming. That rebuild
+            // stays silent, including the focus it claims below.
+            _tileCuesHandled = true;
             FocusCurrentTile();
+        }
+
+        private void PlayTileCues()
+        {
+            _tileCuesHandled = true;
+            PlayTileCuesFor(_cursor, 0f, 1f, 0f);
+        }
+
+        private void PlayTileCuesFor(Vector2Int point, float panOffset, float gainScale, float semitoneOffset)
+        {
+            TroopPlacementTile tile = _snapshot != null ? _snapshot.Get(point) : null;
+            if (tile == null)
+            {
+                return;
+            }
+
+            CueLibrary.PlayCues(
+                TileCueSelector.ForTroopPlacementTile(tile, IsOwnTroop(tile)),
+                panOffset,
+                gainScale,
+                semitoneOffset);
+        }
+
+        /// <summary>The remote tile's own cues carry the direction to it; out of range plays nothing.</summary>
+        private void PlayDirectionalTileCues(Vector2Int origin, Vector2Int target)
+        {
+            float pan;
+            float semitones;
+            float gainScale;
+            if (!DirectionalCueMath.TryCompute(origin, target, CueGridGeometry.Hex, out pan, out semitones, out gainScale))
+            {
+                return;
+            }
+
+            PlayTileCuesFor(target, pan, gainScale, semitones);
         }
 
         protected override void OnFocus()
         {
             FocusCurrentTile();
+            _tileCuesArmed = true;
+
+            // Focus arrival announces the current tile, so it gets a cue too. Paths that already
+            // cued while claiming focus mark the arrival handled so it only sounds once.
+            if (!_tileCuesHandled)
+            {
+                PlayTileCues();
+            }
         }
 
         protected override void OnUnfocus()
         {
+            _tileCuesHandled = false;
             if (_dragSource.HasValue)
             {
                 NativeSoundUtility.PostEvent("Common_SpellbookEndDragCancel");
@@ -260,6 +316,7 @@ namespace SongsOfConquestAccess.UI
                 point => TroopPlacementTileSkipSignature.FromTile(_snapshot != null ? _snapshot.Get(point) : null));
             if (result.Target == _cursor)
             {
+                CueLibrary.PlayCue(CueLibrary.MoveDenied);
                 return true;
             }
 
@@ -338,6 +395,7 @@ namespace SongsOfConquestAccess.UI
         {
             if (_snapshot == null || !_snapshot.IsValidTile(point))
             {
+                CueLibrary.PlayCue(CueLibrary.MoveDenied);
                 return true;
             }
 
@@ -348,6 +406,7 @@ namespace SongsOfConquestAccess.UI
 
             _cursor = point;
             FocusCurrentTile();
+            PlayTileCues();
             return true;
         }
 
@@ -430,7 +489,7 @@ namespace SongsOfConquestAccess.UI
 
             if (result != null && result.Status == ScannerCommandStatus.Result && result.Result != null)
             {
-                ScannerDirectionalBeepAudio.Play(_cursor, result.Result.Position, DirectionalBeepGridGeometry.Hex);
+                PlayDirectionalTileCues(_cursor, result.Result.Position);
             }
 
             _scanner.Output(result);

@@ -46,12 +46,6 @@ namespace SongsOfConquestAccess.Screens
         {
             ContainerWidget root = new ContainerWidget("mod-settings-screen", ModText.Get(ModStrings.Screens.ModSettings));
             root.AddChild(BuildTabs());
-            root.AddChild(new CheckboxWidget(
-                "mod-settings-scanner-plays-directional-beep",
-                ModText.Get(ModStrings.Screens.ScannerPlaysDirectionalBeep),
-                ToggleScannerPlaysDirectionalBeep,
-                () => ModSettings.ScannerPlaysDirectionalBeep,
-                IsScannerTabSelected));
             root.AddChild(new ButtonWidget(
                 "mod-settings-scanner-result-announcements",
                 ModText.Get(ModStrings.Screens.ScannerResultAnnouncements),
@@ -141,6 +135,19 @@ namespace SongsOfConquestAccess.Screens
                 null,
                 () => true,
                 IsCombatTabSelected));
+            root.AddChild(new CheckboxWidget(
+                "mod-settings-tile-cues-enabled",
+                ModText.Get(ModStrings.Screens.PlayTileSoundCues),
+                ToggleTileCuesEnabled,
+                () => ModSettings.TileCuesEnabled,
+                IsAudioTabSelected));
+            root.AddChild(new ButtonWidget(
+                "mod-settings-audio-glossary",
+                ModText.Get(ModStrings.Screens.AudioGlossary),
+                OpenAudioGlossaryScreen,
+                null,
+                () => true,
+                IsAudioTabSelected));
             root.AddChild(new ButtonWidget(
                 "mod-settings-close",
                 ModText.Get(ModStrings.Screens.Close),
@@ -158,6 +165,7 @@ namespace SongsOfConquestAccess.Screens
             AddTab(menu, ModSettingsTab.AdventureMap, "mod-settings-tab-adventure-map", ModStrings.Screens.AdventureMap);
             AddTab(menu, ModSettingsTab.TroopDeployment, "mod-settings-tab-troop-deployment", ModStrings.Screens.TroopDeployment);
             AddTab(menu, ModSettingsTab.Combat, "mod-settings-tab-combat", ModStrings.Screens.Combat);
+            AddTab(menu, ModSettingsTab.Audio, "mod-settings-tab-audio", ModStrings.Screens.Audio);
             menu.SetFocusedItemById(GetSelectedTabId());
             return menu;
         }
@@ -216,6 +224,11 @@ namespace SongsOfConquestAccess.Screens
             return _selectedTab == ModSettingsTab.Combat;
         }
 
+        private bool IsAudioTabSelected()
+        {
+            return _selectedTab == ModSettingsTab.Audio;
+        }
+
         private string GetSelectedTabId()
         {
             switch (_selectedTab)
@@ -228,6 +241,8 @@ namespace SongsOfConquestAccess.Screens
                     return "mod-settings-tab-troop-deployment";
                 case ModSettingsTab.Combat:
                     return "mod-settings-tab-combat";
+                case ModSettingsTab.Audio:
+                    return "mod-settings-tab-audio";
                 default:
                     return "mod-settings-tab-general";
             }
@@ -243,9 +258,22 @@ namespace SongsOfConquestAccess.Screens
             ModSettings.SetReadStoryCameraFocusChanges(!ModSettings.ReadStoryCameraFocusChanges);
         }
 
-        private static void ToggleScannerPlaysDirectionalBeep()
+        private static void ToggleTileCuesEnabled()
         {
-            ModSettings.SetScannerPlaysDirectionalBeep(!ModSettings.ScannerPlaysDirectionalBeep);
+            ModSettings.SetTileCuesEnabled(!ModSettings.TileCuesEnabled);
+        }
+
+        private static bool OpenAudioGlossaryScreen()
+        {
+            if (SocAccessPlugin.Instance == null || SocAccessPlugin.Instance.ScreenManager == null)
+            {
+                return false;
+            }
+
+            SocAccessPlugin.Instance.ScreenManager.Push(
+                new AudioGlossaryScreen(),
+                "audio glossary screen opened");
+            return true;
         }
 
         private static bool OpenAnnouncementOrderScreen(AnnouncementGroupDefinition group)
@@ -267,7 +295,8 @@ namespace SongsOfConquestAccess.Screens
             Scanner,
             AdventureMap,
             TroopDeployment,
-            Combat
+            Combat,
+            Audio
         }
     }
 }

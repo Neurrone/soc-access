@@ -21,6 +21,7 @@ namespace SongsOfConquestAccess.UI
         private CombatInspectContext _inspectContext;
         private bool _componentWarningSpoken;
         private readonly ScannerController _scanner;
+        private bool _tileCuesHandled;
 
         public CombatHexGrid(CombatAdapter adapter)
             : base("combat-hex-grid")
@@ -281,7 +282,15 @@ namespace SongsOfConquestAccess.UI
                     return true;
                 }
 
-                return ExitInspect();
+                // Cued here rather than inside ExitInspect: the other callers exit inspect as a
+                // prelude to their own cursor move and would double up.
+                if (!ExitInspect())
+                {
+                    return false;
+                }
+
+                PlayTileCues();
+                return true;
             }
 
             return false;
@@ -302,10 +311,18 @@ namespace SongsOfConquestAccess.UI
         protected override void OnFocus()
         {
             FocusCurrentTile(updateNativeFocus: _inspectContext == null);
+
+            // Focus arrival announces the current tile, so it gets a cue too. Paths that already
+            // cued while claiming focus mark the arrival handled so it only sounds once.
+            if (!_tileCuesHandled)
+            {
+                PlayTileCues();
+            }
         }
 
         protected override void OnUnfocus()
         {
+            _tileCuesHandled = false;
             _adapter?.ClearFocusedTileOverlay();
         }
 
@@ -329,7 +346,46 @@ namespace SongsOfConquestAccess.UI
 
             _cursor = point;
             FocusCurrentTile(updateNativeFocus: true);
+            PlayTileCues();
             return true;
+        }
+
+        private void PlayTileCues()
+        {
+            _tileCuesHandled = true;
+            PlayTileCuesFor(_cursor, 0f, 1f, 0f);
+        }
+
+        private void PlayTileCuesFor(Vector2Int point, float panOffset, float gainScale, float semitoneOffset)
+        {
+            CombatTile tile = _snapshot != null ? _snapshot.Get(point) : null;
+            if (tile == null)
+            {
+                return;
+            }
+
+            CueLibrary.PlayCues(
+                TileCueSelector.ForCombatTile(
+                    tile,
+                    _adapter != null && _adapter.IsEnemyTroop(tile.Troop),
+                    _adapter != null && _adapter.IsActingTroop(tile.Troop)),
+                panOffset,
+                gainScale,
+                semitoneOffset);
+        }
+
+        /// <summary>The remote tile's own cues carry the direction to it; out of range plays nothing.</summary>
+        private void PlayDirectionalTileCues(Vector2Int origin, Vector2Int target)
+        {
+            float pan;
+            float semitones;
+            float gainScale;
+            if (!DirectionalCueMath.TryCompute(origin, target, CueGridGeometry.Hex, out pan, out semitones, out gainScale))
+            {
+                return;
+            }
+
+            PlayTileCuesFor(target, pan, gainScale, semitones);
         }
 
         private bool MoveToCenterTile()
@@ -348,11 +404,13 @@ namespace SongsOfConquestAccess.UI
             if (_cursor == CenterTile)
             {
                 FocusCurrentTile(updateNativeFocus: true);
+                PlayTileCues();
                 return true;
             }
 
             _cursor = CenterTile;
             FocusCurrentTile(updateNativeFocus: true);
+            PlayTileCues();
             return true;
         }
 
@@ -376,6 +434,7 @@ namespace SongsOfConquestAccess.UI
                 point => CombatTileSkipSignature.FromTile(_snapshot != null ? _snapshot.Get(point) : null));
             if (result.Target == _cursor)
             {
+                CueLibrary.PlayCue(CueLibrary.MoveDenied);
                 return true;
             }
 
@@ -499,6 +558,7 @@ namespace SongsOfConquestAccess.UI
         {
             if (_snapshot == null || !_snapshot.IsValidTile(point))
             {
+                CueLibrary.PlayCue(CueLibrary.MoveDenied);
                 return true;
             }
 
@@ -506,6 +566,7 @@ namespace SongsOfConquestAccess.UI
                 && (_adapter == null || _adapter.GetTargetingMode() == CombatTargetingMode.None)
                 && !_inspectContext.Contains(point))
             {
+                CueLibrary.PlayCue(CueLibrary.MoveDenied);
                 return true;
             }
 
@@ -516,6 +577,7 @@ namespace SongsOfConquestAccess.UI
 
             _cursor = point;
             FocusCurrentTile(updateNativeFocus: _inspectContext == null);
+            PlayTileCues();
             return true;
         }
 
@@ -583,7 +645,7 @@ namespace SongsOfConquestAccess.UI
 
             if (result != null && result.Status == ScannerCommandStatus.Result && result.Result != null)
             {
-                ScannerDirectionalBeepAudio.Play(_cursor, result.Result.Position, DirectionalBeepGridGeometry.Hex);
+                PlayDirectionalTileCues(_cursor, result.Result.Position);
             }
 
             _scanner.Output(result);
