@@ -1425,6 +1425,11 @@ msgctxt "Actions.ScannerRefresh"
 msgid "Refresh Scanner"
 msgstr "스캐너 새로고침"
 
+#. Actions.ScannerReturnFromJump
+msgctxt "Actions.ScannerReturnFromJump"
+msgid "Return To Tile Before Jump"
+msgstr "이동 전 칸으로 돌아가기"
+
 #. Actions.ScannerSpeakOrientation
 msgctxt "Actions.ScannerSpeakOrientation"
 msgid "Scanner Result Orientation"
@@ -2244,6 +2249,11 @@ msgstr "주변 살펴보기 반경 {0}"
 msgctxt "Scanner.Neutral"
 msgid "Neutral"
 msgstr "중립"
+
+#. Scanner.NoTileToReturnTo
+msgctxt "Scanner.NoTileToReturnTo"
+msgid "No tile to return to"
+msgstr "돌아갈 칸이 없음"
 
 #. Scanner.North
 msgctxt "Scanner.North"

@@ -188,6 +188,9 @@ namespace SongsOfConquestAccess.Input
         public static readonly InputAction ScannerSpeakOrientation = OneShot("scanner_speak_orientation", ModStrings.Actions.ScannerSpeakOrientation, InputClaimScope.FocusedWidget)
             .AddBinding(new KeyboardBinding(Key.Home, shift: true));
 
+        public static readonly InputAction ScannerReturnFromJump = OneShot("scanner_return_from_jump", ModStrings.Actions.ScannerReturnFromJump, InputClaimScope.FocusedWidget)
+            .AddBinding(new KeyboardBinding(Key.Backspace));
+
         public static readonly InputAction ScannerLookAround = OneShot("scanner_look_around", ModStrings.Actions.ScannerLookAround, InputClaimScope.FocusedWidget)
             .AddBinding(new KeyboardBinding(Key.L));
 
@@ -396,6 +399,7 @@ namespace SongsOfConquestAccess.Input
                 ScannerNextResult,
                 ScannerJumpToResult,
                 ScannerSpeakOrientation,
+                ScannerReturnFromJump,
                 ScannerLookAround,
                 ScannerIncreaseLookAroundRadius,
                 ScannerDecreaseLookAroundRadius,

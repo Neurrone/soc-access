@@ -1425,6 +1425,11 @@ msgctxt "Actions.ScannerRefresh"
 msgid "Refresh Scanner"
 msgstr "スキャナーを更新"
 
+#. Actions.ScannerReturnFromJump
+msgctxt "Actions.ScannerReturnFromJump"
+msgid "Return To Tile Before Jump"
+msgstr "移動前のタイルへ戻る"
+
 #. Actions.ScannerSpeakOrientation
 msgctxt "Actions.ScannerSpeakOrientation"
 msgid "Scanner Result Orientation"
@@ -2244,6 +2249,11 @@ msgstr "周囲確認の半径 {0}"
 msgctxt "Scanner.Neutral"
 msgid "Neutral"
 msgstr "中立"
+
+#. Scanner.NoTileToReturnTo
+msgctxt "Scanner.NoTileToReturnTo"
+msgid "No tile to return to"
+msgstr "戻るタイルがありません"
 
 #. Scanner.North
 msgctxt "Scanner.North"

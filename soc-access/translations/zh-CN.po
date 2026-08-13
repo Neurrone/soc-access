@@ -1425,6 +1425,11 @@ msgctxt "Actions.ScannerRefresh"
 msgid "Refresh Scanner"
 msgstr "刷新扫描器"
 
+#. Actions.ScannerReturnFromJump
+msgctxt "Actions.ScannerReturnFromJump"
+msgid "Return To Tile Before Jump"
+msgstr "返回跳转前的格子"
+
 #. Actions.ScannerSpeakOrientation
 msgctxt "Actions.ScannerSpeakOrientation"
 msgid "Scanner Result Orientation"
@@ -2244,6 +2249,11 @@ msgstr "环顾半径 {0}"
 msgctxt "Scanner.Neutral"
 msgid "Neutral"
 msgstr "中立"
+
+#. Scanner.NoTileToReturnTo
+msgctxt "Scanner.NoTileToReturnTo"
+msgid "No tile to return to"
+msgstr "没有可返回的格子"
 
 #. Scanner.North
 msgctxt "Scanner.North"

@@ -1435,6 +1435,11 @@ msgctxt "Actions.ScannerRefresh"
 msgid "Refresh Scanner"
 msgstr "Actualiser le scanner"
 
+#. Actions.ScannerReturnFromJump
+msgctxt "Actions.ScannerReturnFromJump"
+msgid "Return To Tile Before Jump"
+msgstr "Revenir à la case avant le saut"
+
 #. Actions.ScannerSpeakOrientation
 msgctxt "Actions.ScannerSpeakOrientation"
 msgid "Scanner Result Orientation"
@@ -2259,6 +2264,11 @@ msgstr "Rayon d'observation {0}"
 msgctxt "Scanner.Neutral"
 msgid "Neutral"
 msgstr "Neutre"
+
+#. Scanner.NoTileToReturnTo
+msgctxt "Scanner.NoTileToReturnTo"
+msgid "No tile to return to"
+msgstr "Aucune case où revenir"
 
 #. Scanner.North
 msgctxt "Scanner.North"

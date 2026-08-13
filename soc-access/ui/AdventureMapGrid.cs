@@ -29,6 +29,7 @@ namespace SongsOfConquestAccess.UI
         private readonly ScannerController _scanner;
         private readonly AdventureBookmarkManager _bookmarks;
         private readonly AdventureBeaconAudio _beacons;
+        private readonly ScannerJumpAnchor _jumpAnchor = new ScannerJumpAnchor();
         private int _lookAroundRadius = DefaultLookAroundRadius;
         private bool _tileCuesHandled;
 
@@ -376,6 +377,7 @@ namespace SongsOfConquestAccess.UI
                 return false;
             }
 
+            _jumpAnchor.Remember(_cursorTile);
             _cursorTile = point;
             _adapter.MoveCameraToTile(_cursorTile);
             _adapter.SetFocusedTileOverlay(_cursorTile);
@@ -392,6 +394,7 @@ namespace SongsOfConquestAccess.UI
                 return false;
             }
 
+            _jumpAnchor.Remember(_cursorTile);
             _cursorTile = point;
             _adapter.MoveCameraToTile(_cursorTile);
             _adapter.SetFocusedTileOverlay(_cursorTile);
@@ -453,6 +456,11 @@ namespace SongsOfConquestAccess.UI
                 return HandleScannerNavigationResult(_scanner.ExecuteSpeakOrientation());
             }
 
+            if (action.Key == AccessibilityActions.ScannerReturnFromJump.Key)
+            {
+                return ReturnFromJump();
+            }
+
             if (action.Key == AccessibilityActions.ScannerLookAround.Key)
             {
                 return HandleScannerNavigationResult(_scanner.ExecuteLookAround(_lookAroundRadius));
@@ -469,6 +477,27 @@ namespace SongsOfConquestAccess.UI
             }
 
             return false;
+        }
+
+        private bool ReturnFromJump()
+        {
+            Vector2Int anchor;
+            if (!_jumpAnchor.TryTake(out anchor) || _adapter == null || !_adapter.IsValidMapTile(anchor))
+            {
+                CueLibrary.PlayCue(CueLibrary.MoveDenied);
+                SpeechPipeline.Output(new SpeechRequest(
+                    ModText.Get(ModStrings.Scanner.NoTileToReturnTo),
+                    interrupt: false));
+                return true;
+            }
+
+            _cursorTile = anchor;
+            _adapter.MoveCameraToTile(_cursorTile);
+            _adapter.SetFocusedTileOverlay(_cursorTile);
+            UIManager.SetFocusedWidget(this);
+            _beacons.UpdateListener(_cursorTile);
+            PlayTileCues();
+            return true;
         }
 
         private bool ChangeLookAroundRadius(int delta)
@@ -665,6 +694,7 @@ namespace SongsOfConquestAccess.UI
                 || actionKey == AccessibilityActions.ScannerNextResult.Key
                 || actionKey == AccessibilityActions.ScannerJumpToResult.Key
                 || actionKey == AccessibilityActions.ScannerSpeakOrientation.Key
+                || actionKey == AccessibilityActions.ScannerReturnFromJump.Key
                 || actionKey == AccessibilityActions.ScannerLookAround.Key
                 || actionKey == AccessibilityActions.ScannerIncreaseLookAroundRadius.Key
                 || actionKey == AccessibilityActions.ScannerDecreaseLookAroundRadius.Key;

@@ -1435,6 +1435,11 @@ msgctxt "Actions.ScannerRefresh"
 msgid "Refresh Scanner"
 msgstr "Actualizar escáner"
 
+#. Actions.ScannerReturnFromJump
+msgctxt "Actions.ScannerReturnFromJump"
+msgid "Return To Tile Before Jump"
+msgstr "Volver a la casilla anterior al salto"
+
 #. Actions.ScannerSpeakOrientation
 msgctxt "Actions.ScannerSpeakOrientation"
 msgid "Scanner Result Orientation"
@@ -2259,6 +2264,11 @@ msgstr "Radio de observación {0}"
 msgctxt "Scanner.Neutral"
 msgid "Neutral"
 msgstr "Neutral"
+
+#. Scanner.NoTileToReturnTo
+msgctxt "Scanner.NoTileToReturnTo"
+msgid "No tile to return to"
+msgstr "No hay casilla a la que volver"
 
 #. Scanner.North
 msgctxt "Scanner.North"

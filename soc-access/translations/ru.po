@@ -1445,6 +1445,11 @@ msgctxt "Actions.ScannerRefresh"
 msgid "Refresh Scanner"
 msgstr "Обновить сканер"
 
+#. Actions.ScannerReturnFromJump
+msgctxt "Actions.ScannerReturnFromJump"
+msgid "Return To Tile Before Jump"
+msgstr "Вернуться к клетке до перехода"
+
 #. Actions.ScannerSpeakOrientation
 msgctxt "Actions.ScannerSpeakOrientation"
 msgid "Scanner Result Orientation"
@@ -2274,6 +2279,11 @@ msgstr "Радиус осмотра {0}"
 msgctxt "Scanner.Neutral"
 msgid "Neutral"
 msgstr "Нейтральный"
+
+#. Scanner.NoTileToReturnTo
+msgctxt "Scanner.NoTileToReturnTo"
+msgid "No tile to return to"
+msgstr "Нет клетки для возврата"
 
 #. Scanner.North
 msgctxt "Scanner.North"

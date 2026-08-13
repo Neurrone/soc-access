@@ -1425,6 +1425,11 @@ msgctxt "Actions.ScannerRefresh"
 msgid "Refresh Scanner"
 msgstr "Tarayıcıyı yenile"
 
+#. Actions.ScannerReturnFromJump
+msgctxt "Actions.ScannerReturnFromJump"
+msgid "Return To Tile Before Jump"
+msgstr "Atlamadan önceki kareye dön"
+
 #. Actions.ScannerSpeakOrientation
 msgctxt "Actions.ScannerSpeakOrientation"
 msgid "Scanner Result Orientation"
@@ -2244,6 +2249,11 @@ msgstr "Etrafa bakma yarıçapı {0}"
 msgctxt "Scanner.Neutral"
 msgid "Neutral"
 msgstr "Tarafsız"
+
+#. Scanner.NoTileToReturnTo
+msgctxt "Scanner.NoTileToReturnTo"
+msgid "No tile to return to"
+msgstr "Dönülecek kare yok"
 
 #. Scanner.North
 msgctxt "Scanner.North"

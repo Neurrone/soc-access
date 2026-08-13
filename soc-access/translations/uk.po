@@ -1445,6 +1445,11 @@ msgctxt "Actions.ScannerRefresh"
 msgid "Refresh Scanner"
 msgstr "Оновити сканер"
 
+#. Actions.ScannerReturnFromJump
+msgctxt "Actions.ScannerReturnFromJump"
+msgid "Return To Tile Before Jump"
+msgstr "Повернутися до клітинки до переходу"
+
 #. Actions.ScannerSpeakOrientation
 msgctxt "Actions.ScannerSpeakOrientation"
 msgid "Scanner Result Orientation"
@@ -2274,6 +2279,11 @@ msgstr "Радіус огляду {0}"
 msgctxt "Scanner.Neutral"
 msgid "Neutral"
 msgstr "Нейтральний"
+
+#. Scanner.NoTileToReturnTo
+msgctxt "Scanner.NoTileToReturnTo"
+msgid "No tile to return to"
+msgstr "Немає клітинки для повернення"
 
 #. Scanner.North
 msgctxt "Scanner.North"

@@ -248,6 +248,7 @@ namespace SongsOfConquestAccess.Localization
             public static readonly ModString ScannerPreviousResult = new ModString("Actions.ScannerPreviousResult", "Previous Scanner Result");
             public static readonly ModString ScannerPreviousSubcategory = new ModString("Actions.ScannerPreviousSubcategory", "Previous Scanner Subcategory");
             public static readonly ModString ScannerRefresh = new ModString("Actions.ScannerRefresh", "Refresh Scanner");
+            public static readonly ModString ScannerReturnFromJump = new ModString("Actions.ScannerReturnFromJump", "Return To Tile Before Jump");
             public static readonly ModString ScannerSpeakOrientation = new ModString("Actions.ScannerSpeakOrientation", "Scanner Result Orientation");
             public static readonly ModString SliderDecrease = new ModString("Actions.SliderDecrease", "Slider Decrease");
             public static readonly ModString SliderIncrease = new ModString("Actions.SliderIncrease", "Slider Increase");
@@ -686,6 +687,7 @@ namespace SongsOfConquestAccess.Localization
             public static readonly ModString Mountains = new ModString("Scanner.Mountains", "Mountains");
             public static readonly ModPluralString MountainTileCount = new ModPluralString("Scanner.MountainTileCount", "{0} mountain tile", "{0} mountain tiles");
             public static readonly ModString Neutral = new ModString("Scanner.Neutral", "Neutral");
+            public static readonly ModString NoTileToReturnTo = new ModString("Scanner.NoTileToReturnTo", "No tile to return to");
             public static readonly ModString North = new ModString("Scanner.North", "north");
             public static readonly ModString Northeast = new ModString("Scanner.Northeast", "northeast");
             public static readonly ModString Northwest = new ModString("Scanner.Northwest", "northwest");

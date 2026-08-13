@@ -22,6 +22,7 @@ namespace SongsOfConquestAccess.UI
         private bool _componentWarningSpoken;
         private readonly ScannerController _scanner;
         private bool _tileCuesHandled;
+        private readonly ScannerJumpAnchor _jumpAnchor = new ScannerJumpAnchor();
 
         public CombatHexGrid(CombatAdapter adapter)
             : base("combat-hex-grid")
@@ -590,7 +591,23 @@ namespace SongsOfConquestAccess.UI
 
         private bool JumpToScannerResult(Vector2Int point)
         {
+            _jumpAnchor.Remember(_cursor);
             return SetCursor(point);
+        }
+
+        private bool ReturnFromJump()
+        {
+            Vector2Int anchor;
+            if (!_jumpAnchor.TryTake(out anchor))
+            {
+                CueLibrary.PlayCue(CueLibrary.MoveDenied);
+                SpeechPipeline.Output(new SpeechRequest(
+                    ModText.Get(ModStrings.Scanner.NoTileToReturnTo),
+                    interrupt: false));
+                return true;
+            }
+
+            return SetCursor(anchor);
         }
 
         private bool HandleScannerAction(InputAction action)
@@ -640,6 +657,11 @@ namespace SongsOfConquestAccess.UI
                 return HandleScannerNavigationResult(_scanner.ExecuteSpeakOrientation());
             }
 
+            if (action.Key == AccessibilityActions.ScannerReturnFromJump.Key)
+            {
+                return ReturnFromJump();
+            }
+
             return false;
         }
 
@@ -669,7 +691,8 @@ namespace SongsOfConquestAccess.UI
                 || actionKey == AccessibilityActions.ScannerPreviousResult.Key
                 || actionKey == AccessibilityActions.ScannerNextResult.Key
                 || actionKey == AccessibilityActions.ScannerJumpToResult.Key
-                || actionKey == AccessibilityActions.ScannerSpeakOrientation.Key;
+                || actionKey == AccessibilityActions.ScannerSpeakOrientation.Key
+                || actionKey == AccessibilityActions.ScannerReturnFromJump.Key;
         }
 
         private void FocusCurrentTile(bool updateNativeFocus)

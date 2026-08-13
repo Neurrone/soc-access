@@ -1435,6 +1435,11 @@ msgctxt "Actions.ScannerRefresh"
 msgid "Refresh Scanner"
 msgstr "Scanner aktualisieren"
 
+#. Actions.ScannerReturnFromJump
+msgctxt "Actions.ScannerReturnFromJump"
+msgid "Return To Tile Before Jump"
+msgstr "Zum Feld vor dem Sprung zurückkehren"
+
 #. Actions.ScannerSpeakOrientation
 msgctxt "Actions.ScannerSpeakOrientation"
 msgid "Scanner Result Orientation"
@@ -2259,6 +2264,11 @@ msgstr "Umschau-Radius {0}"
 msgctxt "Scanner.Neutral"
 msgid "Neutral"
 msgstr "Neutral"
+
+#. Scanner.NoTileToReturnTo
+msgctxt "Scanner.NoTileToReturnTo"
+msgid "No tile to return to"
+msgstr "Kein Feld zum Zurückkehren"
 
 #. Scanner.North
 msgctxt "Scanner.North"
