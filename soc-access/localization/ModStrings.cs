@@ -447,6 +447,8 @@
         public static class Screens
         {
             public static readonly ModString AdventureMap = new ModString("Screens.AdventureMap", "Adventure map");
+            public static readonly ModString AddCustomCategory = new ModString("Screens.AddCustomCategory", "Add custom category");
+            public static readonly ModString AddKeyword = new ModString("Screens.AddKeyword", "Add keyword");
             public static readonly ModString AmountToUpgrade = new ModString("Screens.AmountToUpgrade", "Amount to upgrade, {0}");
             public static readonly ModString ArcanaSpells = new ModString("Screens.ArcanaSpells", "Arcana spells");
             public static readonly ModString Army = new ModString("Screens.Army", "army");
@@ -462,6 +464,7 @@
             public static readonly ModString Ballista = new ModString("Screens.Ballista", "Ballista");
             public static readonly ModString BattleLog = new ModString("Screens.BattleLog", "Battle log");
             public static readonly ModString BattleResult = new ModString("Screens.BattleResult", "Battle result");
+            public static readonly ModString Battle = new ModString("Screens.Battle", "Battle");
             public static readonly ModString BuyResourceForGold = new ModString("Screens.BuyResourceForGold", "Buy {0} for {1}");
             public static readonly ModString BuyArtifact = new ModString("Screens.BuyArtifact", "Buy");
             public static readonly ModString Buyback = new ModString("Screens.Buyback", "Buyback");
@@ -480,6 +483,10 @@
             public static readonly ModString Configure = new ModString("Screens.Configure", "Configure");
             public static readonly ModString ConfigureAnnouncementElement = new ModString("Screens.ConfigureAnnouncementElement", "Configure {0}");
             public static readonly ModString CreationSpells = new ModString("Screens.CreationSpells", "Creation spells");
+            public static readonly ModString CustomCategories = new ModString("Screens.CustomCategories", "{0} custom categories");
+            public static readonly ModString CustomCategoryDefaultName = new ModString("Screens.CustomCategoryDefaultName", "Custom {0}");
+            public static readonly ModString CustomCategoryDeleted = new ModString("Screens.CustomCategoryDeleted", "{0} deleted");
+            public static readonly ModString DeleteCustomCategory = new ModString("Screens.DeleteCustomCategory", "Delete this custom category");
             public static readonly ModString CancelAbility = new ModString("Screens.CancelAbility", "Cancel ability");
             public static readonly ModString CancelSpell = new ModString("Screens.CancelSpell", "Cancel spell");
             public static readonly ModString CurrentTroop = new ModString("Screens.CurrentTroop", "Current troop, {0}");
@@ -502,6 +509,7 @@
             public static readonly ModString General = new ModString("Screens.General", "General");
             public static readonly ModString Group = new ModString("Screens.Group", "Group {0}");
             public static readonly ModString InviteFriend = new ModString("Screens.InviteFriend", "Invite friend");
+            public static readonly ModString KeywordAlreadyAdded = new ModString("Screens.KeywordAlreadyAdded", "That keyword is already in this custom category");
             public static readonly ModString Layout = new ModString("Screens.Layout", "Layout");
             public static readonly ModString LevelValue = new ModString("Screens.LevelValue", "level {0}");
             public static readonly ModString MainMenu = new ModString("Screens.MainMenu", "Main menu");
@@ -558,6 +566,8 @@
             public static readonly ModString RecruitFrom = new ModString("Screens.RecruitFrom", "Recruit from");
             public static readonly ModString RecruitingFrom = new ModString("Screens.RecruitingFrom", "Recruiting from {0}");
             public static readonly ModString RemoveFromQuickbar = new ModString("Screens.RemoveFromQuickbar", "Remove from quickbar");
+            public static readonly ModString RemoveKeyword = new ModString("Screens.RemoveKeyword", "Remove keyword, {0}");
+            public static readonly ModString RenameCustomCategory = new ModString("Screens.RenameCustomCategory", "Rename");
             public static readonly ModString ResearchTier = new ModString("Screens.ResearchTier", "{0} ({1} {2})");
             public static readonly ModString ResetAllToDefaults = new ModString("Screens.ResetAllToDefaults", "Reset all to defaults");
             public static readonly ModString ResetToDefaults = new ModString("Screens.ResetToDefaults", "Reset to defaults");
@@ -569,9 +579,11 @@
             public static readonly ModString ScannerUsesLongDirections = new ModString("Screens.ScannerUsesLongDirections", "Long directions");
             public static readonly ModString ScannerResultAnnouncements = new ModString("Screens.ScannerResultAnnouncements", "Scanner result announcements");
             public static readonly ModString SettlementTroops = new ModString("Screens.SettlementTroops", "settlement troops");
+            public static readonly ModPluralString SelectedSubcategoryCount = new ModPluralString("Screens.SelectedSubcategoryCount", "{0} selected", "{0} selected");
             public static readonly ModString Skill = new ModString("Screens.Skill", "Skill {0}");
             public static readonly ModString SlotValue = new ModString("Screens.SlotValue", "Slot {0}: {1}");
             public static readonly ModString SpellTier = new ModString("Screens.SpellTier", "{0} tier {1}");
+            public static readonly ModString TextEntryUnavailable = new ModString("Screens.TextEntryUnavailable", "Text entry is not available here");
             public static readonly ModString Sell = new ModString("Screens.Sell", "Sell");
             public static readonly ModString SellResourceForGold = new ModString("Screens.SellResourceForGold", "Sell {0} for {1}");
             public static readonly ModString Suffix = new ModString("Screens.Suffix", "Include suffix punctuation");

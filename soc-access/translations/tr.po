@@ -780,6 +780,11 @@ msgctxt "Screens.Group"
 msgid "Group {0}"
 msgstr "Grup {0}"
 
+#. Screens.KeywordAlreadyAdded
+msgctxt "Screens.KeywordAlreadyAdded"
+msgid "That keyword is already in this custom category"
+msgstr "Bu anahtar kelime zaten bu özel kategoride"
+
 #. Screens.Layout
 msgctxt "Screens.Layout"
 msgid "Layout"
@@ -955,6 +960,16 @@ msgctxt "Screens.RecruitingFrom"
 msgid "Recruiting from {0}"
 msgstr "{0} üzerinden askere alınıyor"
 
+#. Screens.RemoveKeyword
+msgctxt "Screens.RemoveKeyword"
+msgid "Remove keyword, {0}"
+msgstr "Anahtar kelimeyi kaldır, {0}"
+
+#. Screens.RenameCustomCategory
+msgctxt "Screens.RenameCustomCategory"
+msgid "Rename"
+msgstr "Yeniden adlandır"
+
 #. Screens.ResearchTier
 msgctxt "Screens.ResearchTier"
 msgid "{0} ({1} {2})"
@@ -1099,6 +1114,16 @@ msgstr "Dünya onay menüsü"
 msgctxt "Screens.RemoveFromQuickbar"
 msgid "Remove from quickbar"
 msgstr "Hızlı çubuktan kaldır"
+
+#. Screens.AddCustomCategory
+msgctxt "Screens.AddCustomCategory"
+msgid "Add custom category"
+msgstr "Özel kategori ekle"
+
+#. Screens.AddKeyword
+msgctxt "Screens.AddKeyword"
+msgid "Add keyword"
+msgstr "Anahtar kelime ekle"
 
 #. Screens.AmountToUpgrade
 msgctxt "Screens.AmountToUpgrade"
@@ -2435,10 +2460,20 @@ msgctxt "Scanner.West"
 msgid "west"
 msgstr "batı"
 
+#. Screens.Battle
+msgctxt "Screens.Battle"
+msgid "Battle"
+msgstr "Muharebe"
+
 #. Screens.BuyResourceForGold
 msgctxt "Screens.BuyResourceForGold"
 msgid "Buy {0} for {1}"
 msgstr "{0} öğesini {1} karşılığında satın al"
+
+#. Screens.TextEntryUnavailable
+msgctxt "Screens.TextEntryUnavailable"
+msgid "Text entry is not available here"
+msgstr "Metin girişi burada kullanılamaz"
 
 #. Screens.Sell
 msgctxt "Screens.Sell"
@@ -2524,6 +2559,26 @@ msgstr "Tümünü sola taşı"
 msgctxt "Screens.MoveAllRight"
 msgid "Move all right"
 msgstr "Tümünü sağa taşı"
+
+#. Screens.CustomCategories
+msgctxt "Screens.CustomCategories"
+msgid "{0} custom categories"
+msgstr "{0} özel kategorileri"
+
+#. Screens.CustomCategoryDefaultName
+msgctxt "Screens.CustomCategoryDefaultName"
+msgid "Custom {0}"
+msgstr "Özel {0}"
+
+#. Screens.CustomCategoryDeleted
+msgctxt "Screens.CustomCategoryDeleted"
+msgid "{0} deleted"
+msgstr "{0} silindi"
+
+#. Screens.DeleteCustomCategory
+msgctxt "Screens.DeleteCustomCategory"
+msgid "Delete this custom category"
+msgstr "Bu özel kategoriyi sil"
 
 #. Screens.CancelAbility
 msgctxt "Screens.CancelAbility"
@@ -3312,3 +3367,9 @@ msgstr "Kare ses ipuçlarını çal"
 msgctxt "Screens.Volume"
 msgid "Volume"
 msgstr "Ses seviyesi"
+
+#. Screens.SelectedSubcategoryCount_0
+msgctxt "Screens.SelectedSubcategoryCount_0"
+msgid "{0} selected"
+msgstr "{0} seçili"
+

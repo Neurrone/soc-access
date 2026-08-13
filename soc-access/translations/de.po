@@ -780,6 +780,11 @@ msgctxt "Screens.Group"
 msgid "Group {0}"
 msgstr "Gruppe {0}"
 
+#. Screens.KeywordAlreadyAdded
+msgctxt "Screens.KeywordAlreadyAdded"
+msgid "That keyword is already in this custom category"
+msgstr "Dieses Schlüsselwort ist bereits in dieser eigenen Kategorie"
+
 #. Screens.Layout
 msgctxt "Screens.Layout"
 msgid "Layout"
@@ -955,6 +960,16 @@ msgctxt "Screens.RecruitingFrom"
 msgid "Recruiting from {0}"
 msgstr "Rekrutierung aus {0}"
 
+#. Screens.RemoveKeyword
+msgctxt "Screens.RemoveKeyword"
+msgid "Remove keyword, {0}"
+msgstr "Schlüsselwort entfernen, {0}"
+
+#. Screens.RenameCustomCategory
+msgctxt "Screens.RenameCustomCategory"
+msgid "Rename"
+msgstr "Umbenennen"
+
 #. Screens.ResearchTier
 msgctxt "Screens.ResearchTier"
 msgid "{0} ({1} {2})"
@@ -1109,6 +1124,16 @@ msgstr "{0} Felder"
 msgctxt "Screens.RemoveFromQuickbar"
 msgid "Remove from quickbar"
 msgstr "Aus Schnellleiste entfernen"
+
+#. Screens.AddCustomCategory
+msgctxt "Screens.AddCustomCategory"
+msgid "Add custom category"
+msgstr "Eigene Kategorie hinzufügen"
+
+#. Screens.AddKeyword
+msgctxt "Screens.AddKeyword"
+msgid "Add keyword"
+msgstr "Schlüsselwort hinzufügen"
 
 #. Screens.AmountToUpgrade
 msgctxt "Screens.AmountToUpgrade"
@@ -2450,10 +2475,20 @@ msgctxt "Scanner.West"
 msgid "west"
 msgstr "Westen"
 
+#. Screens.Battle
+msgctxt "Screens.Battle"
+msgid "Battle"
+msgstr "Schlacht"
+
 #. Screens.BuyResourceForGold
 msgctxt "Screens.BuyResourceForGold"
 msgid "Buy {0} for {1}"
 msgstr "{0} für {1} kaufen"
+
+#. Screens.TextEntryUnavailable
+msgctxt "Screens.TextEntryUnavailable"
+msgid "Text entry is not available here"
+msgstr "Texteingabe ist hier nicht verfügbar"
 
 #. Screens.Sell
 msgctxt "Screens.Sell"
@@ -2539,6 +2574,26 @@ msgstr "Alle nach links verschieben"
 msgctxt "Screens.MoveAllRight"
 msgid "Move all right"
 msgstr "Alle nach rechts verschieben"
+
+#. Screens.CustomCategories
+msgctxt "Screens.CustomCategories"
+msgid "{0} custom categories"
+msgstr "Eigene Kategorien: {0}"
+
+#. Screens.CustomCategoryDefaultName
+msgctxt "Screens.CustomCategoryDefaultName"
+msgid "Custom {0}"
+msgstr "Eigene {0}"
+
+#. Screens.CustomCategoryDeleted
+msgctxt "Screens.CustomCategoryDeleted"
+msgid "{0} deleted"
+msgstr "{0} gelöscht"
+
+#. Screens.DeleteCustomCategory
+msgctxt "Screens.DeleteCustomCategory"
+msgid "Delete this custom category"
+msgstr "Diese eigene Kategorie löschen"
 
 #. Screens.CancelAbility
 msgctxt "Screens.CancelAbility"
@@ -3332,3 +3387,14 @@ msgstr "Feld-Klangsignale abspielen"
 msgctxt "Screens.Volume"
 msgid "Volume"
 msgstr "Lautstärke"
+
+#. Screens.SelectedSubcategoryCount_0
+msgctxt "Screens.SelectedSubcategoryCount_0"
+msgid "{0} selected"
+msgstr "{0} ausgewählt"
+
+#. Screens.SelectedSubcategoryCount_1
+msgctxt "Screens.SelectedSubcategoryCount_1"
+msgid "{0} selected"
+msgstr "{0} ausgewählt"
+

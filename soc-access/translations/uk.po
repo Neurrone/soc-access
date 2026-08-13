@@ -800,6 +800,11 @@ msgctxt "Screens.Group"
 msgid "Group {0}"
 msgstr "Група {0}"
 
+#. Screens.KeywordAlreadyAdded
+msgctxt "Screens.KeywordAlreadyAdded"
+msgid "That keyword is already in this custom category"
+msgstr "Це ключове слово вже є в цій власній категорії"
+
 #. Screens.Layout
 msgctxt "Screens.Layout"
 msgid "Layout"
@@ -975,6 +980,16 @@ msgctxt "Screens.RecruitingFrom"
 msgid "Recruiting from {0}"
 msgstr "Найм із {0}"
 
+#. Screens.RemoveKeyword
+msgctxt "Screens.RemoveKeyword"
+msgid "Remove keyword, {0}"
+msgstr "Видалити ключове слово, {0}"
+
+#. Screens.RenameCustomCategory
+msgctxt "Screens.RenameCustomCategory"
+msgid "Rename"
+msgstr "Перейменувати"
+
 #. Screens.ResearchTier
 msgctxt "Screens.ResearchTier"
 msgid "{0} ({1} {2})"
@@ -1119,6 +1134,16 @@ msgstr "Меню підтвердження світу"
 msgctxt "Screens.RemoveFromQuickbar"
 msgid "Remove from quickbar"
 msgstr "Вилучити з панелі швидкого доступу"
+
+#. Screens.AddCustomCategory
+msgctxt "Screens.AddCustomCategory"
+msgid "Add custom category"
+msgstr "Додати власну категорію"
+
+#. Screens.AddKeyword
+msgctxt "Screens.AddKeyword"
+msgid "Add keyword"
+msgstr "Додати ключове слово"
 
 #. Screens.AmountToUpgrade
 msgctxt "Screens.AmountToUpgrade"
@@ -2465,10 +2490,20 @@ msgctxt "Scanner.West"
 msgid "west"
 msgstr "захід"
 
+#. Screens.Battle
+msgctxt "Screens.Battle"
+msgid "Battle"
+msgstr "Битва"
+
 #. Screens.BuyResourceForGold
 msgctxt "Screens.BuyResourceForGold"
 msgid "Buy {0} for {1}"
 msgstr "Купити {0} за {1}"
+
+#. Screens.TextEntryUnavailable
+msgctxt "Screens.TextEntryUnavailable"
+msgid "Text entry is not available here"
+msgstr "Введення тексту тут недоступне"
 
 #. Screens.Sell
 msgctxt "Screens.Sell"
@@ -2554,6 +2589,26 @@ msgstr "Перемістити всіх ліворуч"
 msgctxt "Screens.MoveAllRight"
 msgid "Move all right"
 msgstr "Перемістити всіх праворуч"
+
+#. Screens.CustomCategories
+msgctxt "Screens.CustomCategories"
+msgid "{0} custom categories"
+msgstr "Власні категорії: {0}"
+
+#. Screens.CustomCategoryDefaultName
+msgctxt "Screens.CustomCategoryDefaultName"
+msgid "Custom {0}"
+msgstr "Власна {0}"
+
+#. Screens.CustomCategoryDeleted
+msgctxt "Screens.CustomCategoryDeleted"
+msgid "{0} deleted"
+msgstr "{0} видалено"
+
+#. Screens.DeleteCustomCategory
+msgctxt "Screens.DeleteCustomCategory"
+msgid "Delete this custom category"
+msgstr "Видалити цю власну категорію"
 
 #. Screens.CancelAbility
 msgctxt "Screens.CancelAbility"
@@ -3352,3 +3407,19 @@ msgstr "Відтворювати звуки клітинок"
 msgctxt "Screens.Volume"
 msgid "Volume"
 msgstr "Гучність"
+
+#. Screens.SelectedSubcategoryCount_0
+msgctxt "Screens.SelectedSubcategoryCount_0"
+msgid "{0} selected"
+msgstr "{0} вибрана"
+
+#. Screens.SelectedSubcategoryCount_1
+msgctxt "Screens.SelectedSubcategoryCount_1"
+msgid "{0} selected"
+msgstr "{0} вибрані"
+
+#. Screens.SelectedSubcategoryCount_2
+msgctxt "Screens.SelectedSubcategoryCount_2"
+msgid "{0} selected"
+msgstr "{0} вибрано"
+

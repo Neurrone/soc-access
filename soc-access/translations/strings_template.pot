@@ -1979,6 +1979,16 @@ msgctxt "Screens.AdventureMap"
 msgid "Adventure map"
 msgstr ""
 
+#. Screens.AddCustomCategory
+msgctxt "Screens.AddCustomCategory"
+msgid "Add custom category"
+msgstr ""
+
+#. Screens.AddKeyword
+msgctxt "Screens.AddKeyword"
+msgid "Add keyword"
+msgstr ""
+
 #. Screens.AmountToUpgrade
 msgctxt "Screens.AmountToUpgrade"
 msgid "Amount to upgrade, {0}"
@@ -2052,6 +2062,11 @@ msgstr ""
 #. Screens.BattleResult
 msgctxt "Screens.BattleResult"
 msgid "Battle result"
+msgstr ""
+
+#. Screens.Battle
+msgctxt "Screens.Battle"
+msgid "Battle"
 msgstr ""
 
 #. Screens.BuyResourceForGold
@@ -2142,6 +2157,26 @@ msgstr ""
 #. Screens.CreationSpells
 msgctxt "Screens.CreationSpells"
 msgid "Creation spells"
+msgstr ""
+
+#. Screens.CustomCategories
+msgctxt "Screens.CustomCategories"
+msgid "{0} custom categories"
+msgstr ""
+
+#. Screens.CustomCategoryDefaultName
+msgctxt "Screens.CustomCategoryDefaultName"
+msgid "Custom {0}"
+msgstr ""
+
+#. Screens.CustomCategoryDeleted
+msgctxt "Screens.CustomCategoryDeleted"
+msgid "{0} deleted"
+msgstr ""
+
+#. Screens.DeleteCustomCategory
+msgctxt "Screens.DeleteCustomCategory"
+msgid "Delete this custom category"
 msgstr ""
 
 #. Screens.CancelAbility
@@ -2252,6 +2287,11 @@ msgstr ""
 #. Screens.InviteFriend
 msgctxt "Screens.InviteFriend"
 msgid "Invite friend"
+msgstr ""
+
+#. Screens.KeywordAlreadyAdded
+msgctxt "Screens.KeywordAlreadyAdded"
+msgid "That keyword is already in this custom category"
 msgstr ""
 
 #. Screens.Layout
@@ -2534,6 +2574,16 @@ msgctxt "Screens.RemoveFromQuickbar"
 msgid "Remove from quickbar"
 msgstr ""
 
+#. Screens.RemoveKeyword
+msgctxt "Screens.RemoveKeyword"
+msgid "Remove keyword, {0}"
+msgstr ""
+
+#. Screens.RenameCustomCategory
+msgctxt "Screens.RenameCustomCategory"
+msgid "Rename"
+msgstr ""
+
 #. Screens.ResearchTier
 msgctxt "Screens.ResearchTier"
 msgid "{0} ({1} {2})"
@@ -2602,6 +2652,11 @@ msgstr ""
 #. Screens.SpellTier
 msgctxt "Screens.SpellTier"
 msgid "{0} tier {1}"
+msgstr ""
+
+#. Screens.TextEntryUnavailable
+msgctxt "Screens.TextEntryUnavailable"
+msgid "Text entry is not available here"
 msgstr ""
 
 #. Screens.Sell
@@ -3347,5 +3402,20 @@ msgstr ""
 #. Combat.BoltAt_2
 msgctxt "Combat.BoltAt_2"
 msgid "{0} bolts at {1}"
+msgstr ""
+
+#. Screens.SelectedSubcategoryCount_0
+msgctxt "Screens.SelectedSubcategoryCount_0"
+msgid "{0} selected"
+msgstr ""
+
+#. Screens.SelectedSubcategoryCount_1
+msgctxt "Screens.SelectedSubcategoryCount_1"
+msgid "{0} selected"
+msgstr ""
+
+#. Screens.SelectedSubcategoryCount_2
+msgctxt "Screens.SelectedSubcategoryCount_2"
+msgid "{0} selected"
 msgstr ""
 

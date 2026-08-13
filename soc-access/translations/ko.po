@@ -780,6 +780,11 @@ msgctxt "Screens.Group"
 msgid "Group {0}"
 msgstr "그룹 {0}"
 
+#. Screens.KeywordAlreadyAdded
+msgctxt "Screens.KeywordAlreadyAdded"
+msgid "That keyword is already in this custom category"
+msgstr "해당 키워드는 이미 이 사용자 지정 범주에 있습니다"
+
 #. Screens.Layout
 msgctxt "Screens.Layout"
 msgid "Layout"
@@ -955,6 +960,16 @@ msgctxt "Screens.RecruitingFrom"
 msgid "Recruiting from {0}"
 msgstr "{0}에서 모집 중"
 
+#. Screens.RemoveKeyword
+msgctxt "Screens.RemoveKeyword"
+msgid "Remove keyword, {0}"
+msgstr "키워드 제거, {0}"
+
+#. Screens.RenameCustomCategory
+msgctxt "Screens.RenameCustomCategory"
+msgid "Rename"
+msgstr "이름 바꾸기"
+
 #. Screens.ResearchTier
 msgctxt "Screens.ResearchTier"
 msgid "{0} ({1} {2})"
@@ -1099,6 +1114,16 @@ msgstr "세계 확인 메뉴"
 msgctxt "Screens.RemoveFromQuickbar"
 msgid "Remove from quickbar"
 msgstr "빠른 표시줄에서 제거"
+
+#. Screens.AddCustomCategory
+msgctxt "Screens.AddCustomCategory"
+msgid "Add custom category"
+msgstr "사용자 지정 범주 추가"
+
+#. Screens.AddKeyword
+msgctxt "Screens.AddKeyword"
+msgid "Add keyword"
+msgstr "키워드 추가"
 
 #. Screens.AmountToUpgrade
 msgctxt "Screens.AmountToUpgrade"
@@ -2435,10 +2460,20 @@ msgctxt "Scanner.West"
 msgid "west"
 msgstr "서쪽"
 
+#. Screens.Battle
+msgctxt "Screens.Battle"
+msgid "Battle"
+msgstr "전장"
+
 #. Screens.BuyResourceForGold
 msgctxt "Screens.BuyResourceForGold"
 msgid "Buy {0} for {1}"
 msgstr "{1}에 {0} 구매"
+
+#. Screens.TextEntryUnavailable
+msgctxt "Screens.TextEntryUnavailable"
+msgid "Text entry is not available here"
+msgstr "여기서는 텍스트 입력을 사용할 수 없습니다"
 
 #. Screens.Sell
 msgctxt "Screens.Sell"
@@ -2524,6 +2559,26 @@ msgstr "모두 왼쪽으로 이동"
 msgctxt "Screens.MoveAllRight"
 msgid "Move all right"
 msgstr "모두 오른쪽으로 이동"
+
+#. Screens.CustomCategories
+msgctxt "Screens.CustomCategories"
+msgid "{0} custom categories"
+msgstr "{0} 사용자 지정 범주"
+
+#. Screens.CustomCategoryDefaultName
+msgctxt "Screens.CustomCategoryDefaultName"
+msgid "Custom {0}"
+msgstr "사용자 지정 {0}"
+
+#. Screens.CustomCategoryDeleted
+msgctxt "Screens.CustomCategoryDeleted"
+msgid "{0} deleted"
+msgstr "{0} 삭제됨"
+
+#. Screens.DeleteCustomCategory
+msgctxt "Screens.DeleteCustomCategory"
+msgid "Delete this custom category"
+msgstr "이 사용자 지정 범주 삭제"
 
 #. Screens.CancelAbility
 msgctxt "Screens.CancelAbility"
@@ -3312,3 +3367,9 @@ msgstr "타일 효과음 재생"
 msgctxt "Screens.Volume"
 msgid "Volume"
 msgstr "음량"
+
+#. Screens.SelectedSubcategoryCount_0
+msgctxt "Screens.SelectedSubcategoryCount_0"
+msgid "{0} selected"
+msgstr "{0}개 선택됨"
+
