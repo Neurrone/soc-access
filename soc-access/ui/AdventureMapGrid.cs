@@ -408,11 +408,6 @@ namespace SongsOfConquestAccess.UI
 
         private bool HandleScannerAction(InputAction action)
         {
-            if (action.Key == AccessibilityActions.ScannerRefresh.Key)
-            {
-                return HandleScannerNavigationResult(_scanner.ExecuteInitialLanding());
-            }
-
             if (action.Key == AccessibilityActions.ScannerSearch.Key)
             {
                 return OpenScannerSearch();
@@ -453,9 +448,9 @@ namespace SongsOfConquestAccess.UI
                 return _scanner.JumpToCurrent();
             }
 
-            if (action.Key == AccessibilityActions.ScannerSpeakOrientation.Key)
+            if (action.Key == AccessibilityActions.ScannerSpeakDistanceAndDirection.Key)
             {
-                return HandleScannerNavigationResult(_scanner.ExecuteSpeakOrientation());
+                return HandleScannerNavigationResult(_scanner.ExecuteSpeakDistanceAndDirection());
             }
 
             if (action.Key == AccessibilityActions.ScannerReturnFromJump.Key)
@@ -686,8 +681,7 @@ namespace SongsOfConquestAccess.UI
 
         private static bool IsScannerAction(string actionKey)
         {
-            return actionKey == AccessibilityActions.ScannerRefresh.Key
-                || actionKey == AccessibilityActions.ScannerSearch.Key
+            return actionKey == AccessibilityActions.ScannerSearch.Key
                 || actionKey == AccessibilityActions.ScannerPreviousCategory.Key
                 || actionKey == AccessibilityActions.ScannerNextCategory.Key
                 || actionKey == AccessibilityActions.ScannerPreviousSubcategory.Key
@@ -695,7 +689,7 @@ namespace SongsOfConquestAccess.UI
                 || actionKey == AccessibilityActions.ScannerPreviousResult.Key
                 || actionKey == AccessibilityActions.ScannerNextResult.Key
                 || actionKey == AccessibilityActions.ScannerJumpToResult.Key
-                || actionKey == AccessibilityActions.ScannerSpeakOrientation.Key
+                || actionKey == AccessibilityActions.ScannerSpeakDistanceAndDirection.Key
                 || actionKey == AccessibilityActions.ScannerReturnFromJump.Key
                 || actionKey == AccessibilityActions.ScannerLookAround.Key
                 || actionKey == AccessibilityActions.ScannerIncreaseLookAroundRadius.Key

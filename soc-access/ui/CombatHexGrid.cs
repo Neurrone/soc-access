@@ -614,11 +614,6 @@ namespace SongsOfConquestAccess.UI
 
         private bool HandleScannerAction(InputAction action)
         {
-            if (action.Key == AccessibilityActions.ScannerRefresh.Key)
-            {
-                return HandleScannerNavigationResult(_scanner.ExecuteInitialLanding());
-            }
-
             if (action.Key == AccessibilityActions.ScannerPreviousCategory.Key)
             {
                 return HandleScannerNavigationResult(_scanner.ExecuteMoveCategory(-1));
@@ -654,9 +649,9 @@ namespace SongsOfConquestAccess.UI
                 return _scanner.JumpToCurrent();
             }
 
-            if (action.Key == AccessibilityActions.ScannerSpeakOrientation.Key)
+            if (action.Key == AccessibilityActions.ScannerSpeakDistanceAndDirection.Key)
             {
-                return HandleScannerNavigationResult(_scanner.ExecuteSpeakOrientation());
+                return HandleScannerNavigationResult(_scanner.ExecuteSpeakDistanceAndDirection());
             }
 
             if (action.Key == AccessibilityActions.ScannerReturnFromJump.Key)
@@ -685,15 +680,14 @@ namespace SongsOfConquestAccess.UI
 
         private static bool IsScannerAction(string actionKey)
         {
-            return actionKey == AccessibilityActions.ScannerRefresh.Key
-                || actionKey == AccessibilityActions.ScannerPreviousCategory.Key
+            return actionKey == AccessibilityActions.ScannerPreviousCategory.Key
                 || actionKey == AccessibilityActions.ScannerNextCategory.Key
                 || actionKey == AccessibilityActions.ScannerPreviousSubcategory.Key
                 || actionKey == AccessibilityActions.ScannerNextSubcategory.Key
                 || actionKey == AccessibilityActions.ScannerPreviousResult.Key
                 || actionKey == AccessibilityActions.ScannerNextResult.Key
                 || actionKey == AccessibilityActions.ScannerJumpToResult.Key
-                || actionKey == AccessibilityActions.ScannerSpeakOrientation.Key
+                || actionKey == AccessibilityActions.ScannerSpeakDistanceAndDirection.Key
                 || actionKey == AccessibilityActions.ScannerReturnFromJump.Key;
         }
 

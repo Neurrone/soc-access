@@ -247,9 +247,8 @@
             public static readonly ModString ScannerPreviousCategory = new ModString("Actions.ScannerPreviousCategory", "Previous Scanner Category");
             public static readonly ModString ScannerPreviousResult = new ModString("Actions.ScannerPreviousResult", "Previous Scanner Result");
             public static readonly ModString ScannerPreviousSubcategory = new ModString("Actions.ScannerPreviousSubcategory", "Previous Scanner Subcategory");
-            public static readonly ModString ScannerRefresh = new ModString("Actions.ScannerRefresh", "Refresh Scanner");
             public static readonly ModString ScannerReturnFromJump = new ModString("Actions.ScannerReturnFromJump", "Return To Tile Before Jump");
-            public static readonly ModString ScannerSpeakOrientation = new ModString("Actions.ScannerSpeakOrientation", "Scanner Result Orientation");
+            public static readonly ModString ScannerSpeakDistanceAndDirection = new ModString("Actions.ScannerSpeakDistanceAndDirection", "Scanner Result Distance and Direction");
             public static readonly ModString SliderDecrease = new ModString("Actions.SliderDecrease", "Slider Decrease");
             public static readonly ModString SliderIncrease = new ModString("Actions.SliderIncrease", "Slider Increase");
             public static readonly ModString SliderMaximum = new ModString("Actions.SliderMaximum", "Slider Maximum");
@@ -673,6 +672,7 @@
             public static readonly ModPluralString DeepWaterTileCount = new ModPluralString("Scanner.DeepWaterTileCount", "{0} deep water tile", "{0} deep water tiles");
             public static readonly ModString Deforestation = new ModString("Scanner.Deforestation", "Deforestation");
             public static readonly ModPluralString DeforestationTileCount = new ModPluralString("Scanner.DeforestationTileCount", "{0} deforestation tile", "{0} deforestation tiles");
+            public static readonly ModString DistanceAndDirection = new ModString("Scanner.DistanceAndDirection", "{0}, {1}");
             public static readonly ModString Dirt = new ModString("Scanner.Dirt", "Dirt");
             public static readonly ModPluralString DirtTileCount = new ModPluralString("Scanner.DirtTileCount", "{0} dirt tile", "{0} dirt tiles");
             public static readonly ModString DirtRoads = new ModString("Scanner.DirtRoads", "Dirt roads");

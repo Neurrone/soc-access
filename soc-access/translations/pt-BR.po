@@ -1430,20 +1430,15 @@ msgctxt "Actions.ScannerPreviousSubcategory"
 msgid "Previous Scanner Subcategory"
 msgstr "Anterior scanner subcategoria"
 
-#. Actions.ScannerRefresh
-msgctxt "Actions.ScannerRefresh"
-msgid "Refresh Scanner"
-msgstr "Atualizar scanner"
-
 #. Actions.ScannerReturnFromJump
 msgctxt "Actions.ScannerReturnFromJump"
 msgid "Return To Tile Before Jump"
 msgstr "Voltar ao bloco anterior ao salto"
 
-#. Actions.ScannerSpeakOrientation
-msgctxt "Actions.ScannerSpeakOrientation"
-msgid "Scanner Result Orientation"
-msgstr "Orientação do resultado do scanner"
+#. Actions.ScannerSpeakDistanceAndDirection
+msgctxt "Actions.ScannerSpeakDistanceAndDirection"
+msgid "Scanner Result Distance and Direction"
+msgstr "Distância e direção do resultado do scanner"
 
 #. Actions.SliderDecrease
 msgctxt "Actions.SliderDecrease"
@@ -2715,6 +2710,11 @@ msgstr "Água profunda"
 msgctxt "Scanner.Deforestation"
 msgid "Deforestation"
 msgstr "Desmatamento"
+
+#. Scanner.DistanceAndDirection
+msgctxt "Scanner.DistanceAndDirection"
+msgid "{0}, {1}"
+msgstr "{0}, {1}"
 
 #. Scanner.Dirt
 msgctxt "Scanner.Dirt"

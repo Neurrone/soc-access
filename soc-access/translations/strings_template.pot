@@ -1064,19 +1064,14 @@ msgctxt "Actions.ScannerPreviousSubcategory"
 msgid "Previous Scanner Subcategory"
 msgstr ""
 
-#. Actions.ScannerRefresh
-msgctxt "Actions.ScannerRefresh"
-msgid "Refresh Scanner"
-msgstr ""
-
 #. Actions.ScannerReturnFromJump
 msgctxt "Actions.ScannerReturnFromJump"
 msgid "Return To Tile Before Jump"
 msgstr ""
 
-#. Actions.ScannerSpeakOrientation
-msgctxt "Actions.ScannerSpeakOrientation"
-msgid "Scanner Result Orientation"
+#. Actions.ScannerSpeakDistanceAndDirection
+msgctxt "Actions.ScannerSpeakDistanceAndDirection"
+msgid "Scanner Result Distance and Direction"
 msgstr ""
 
 #. Actions.SliderDecrease
@@ -3052,6 +3047,11 @@ msgstr ""
 #. Scanner.Deforestation
 msgctxt "Scanner.Deforestation"
 msgid "Deforestation"
+msgstr ""
+
+#. Scanner.DistanceAndDirection
+msgctxt "Scanner.DistanceAndDirection"
+msgid "{0}, {1}"
 msgstr ""
 
 #. Scanner.Dirt

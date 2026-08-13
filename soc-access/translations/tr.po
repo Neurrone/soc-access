@@ -1420,20 +1420,15 @@ msgctxt "Actions.ScannerPreviousSubcategory"
 msgid "Previous Scanner Subcategory"
 msgstr "Önceki tarayıcı alt kategori"
 
-#. Actions.ScannerRefresh
-msgctxt "Actions.ScannerRefresh"
-msgid "Refresh Scanner"
-msgstr "Tarayıcıyı yenile"
-
 #. Actions.ScannerReturnFromJump
 msgctxt "Actions.ScannerReturnFromJump"
 msgid "Return To Tile Before Jump"
 msgstr "Atlamadan önceki kareye dön"
 
-#. Actions.ScannerSpeakOrientation
-msgctxt "Actions.ScannerSpeakOrientation"
-msgid "Scanner Result Orientation"
-msgstr "Tarayıcı sonucu yönelimi"
+#. Actions.ScannerSpeakDistanceAndDirection
+msgctxt "Actions.ScannerSpeakDistanceAndDirection"
+msgid "Scanner Result Distance and Direction"
+msgstr "Tarayıcı Sonucunun Uzaklığı ve Yönü"
 
 #. Actions.SliderDecrease
 msgctxt "Actions.SliderDecrease"
@@ -2670,6 +2665,11 @@ msgstr "Derin su"
 msgctxt "Scanner.Deforestation"
 msgid "Deforestation"
 msgstr "Ormansızlaşma"
+
+#. Scanner.DistanceAndDirection
+msgctxt "Scanner.DistanceAndDirection"
+msgid "{0}, {1}"
+msgstr "{0}, {1}"
 
 #. Scanner.Dirt
 msgctxt "Scanner.Dirt"

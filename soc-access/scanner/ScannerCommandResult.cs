@@ -39,6 +39,14 @@ namespace SongsOfConquestAccess.Scanner
 
         public bool IncludePath { get; set; }
 
+        /// <summary>
+        /// Narrows the announcement to how far away the current result is and
+        /// which way it lies. Used by the dedicated readout key, which exists so
+        /// the player can re-check a bearing without sitting through the whole
+        /// result again.
+        /// </summary>
+        public bool DistanceAndDirectionOnly { get; set; }
+
         public bool Wrapped { get; set; }
 
         public string NoResultsText { get; set; }
@@ -51,7 +59,17 @@ namespace SongsOfConquestAccess.Scanner
                 return BuildNoResults();
             }
 
-            if (speechContextProvider == null || Result == null)
+            if (Result == null)
+            {
+                return BuildNoResults();
+            }
+
+            if (DistanceAndDirectionOnly)
+            {
+                return BuildDistanceAndDirection();
+            }
+
+            if (speechContextProvider == null)
             {
                 return BuildNoResults();
             }
@@ -69,6 +87,38 @@ namespace SongsOfConquestAccess.Scanner
             }
 
             return request;
+        }
+
+        private SpeechRequest BuildDistanceAndDirection()
+        {
+            return new SpeechRequest(
+                FormatDistanceAndDirection(ModSettings.ScannerUsesLongDirections),
+                interrupt: false);
+        }
+
+        /// <summary>
+        /// The distance is the sum of the direction runs rather than a separate
+        /// geometry, so the number spoken always matches the steps spoken after
+        /// it, on square and hex grids alike.
+        /// </summary>
+        internal string FormatDistanceAndDirection(bool useLongDirections)
+        {
+            string directions = ScannerSpeechUtility.FormatDirections(Directions, useLongDirections);
+            if (Directions == null || Directions.Count == 0)
+            {
+                return directions;
+            }
+
+            int tiles = 0;
+            for (int i = 0; i < Directions.Count; i++)
+            {
+                tiles += Directions[i].Count;
+            }
+
+            return ModText.Get(
+                ModStrings.Scanner.DistanceAndDirection,
+                ModText.Plural(ModStrings.Common.TileCount, tiles, tiles),
+                directions);
         }
 
         private SpeechRequest BuildNoResults()

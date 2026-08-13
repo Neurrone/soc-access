@@ -1440,20 +1440,15 @@ msgctxt "Actions.ScannerPreviousSubcategory"
 msgid "Previous Scanner Subcategory"
 msgstr "Предыдущий сканер подкатегория"
 
-#. Actions.ScannerRefresh
-msgctxt "Actions.ScannerRefresh"
-msgid "Refresh Scanner"
-msgstr "Обновить сканер"
-
 #. Actions.ScannerReturnFromJump
 msgctxt "Actions.ScannerReturnFromJump"
 msgid "Return To Tile Before Jump"
 msgstr "Вернуться к клетке до перехода"
 
-#. Actions.ScannerSpeakOrientation
-msgctxt "Actions.ScannerSpeakOrientation"
-msgid "Scanner Result Orientation"
-msgstr "Ориентация результата сканера"
+#. Actions.ScannerSpeakDistanceAndDirection
+msgctxt "Actions.ScannerSpeakDistanceAndDirection"
+msgid "Scanner Result Distance and Direction"
+msgstr "Расстояние и направление результата сканера"
 
 #. Actions.SliderDecrease
 msgctxt "Actions.SliderDecrease"
@@ -2760,6 +2755,11 @@ msgstr "Глубокая вода"
 msgctxt "Scanner.Deforestation"
 msgid "Deforestation"
 msgstr "Вырубка леса"
+
+#. Scanner.DistanceAndDirection
+msgctxt "Scanner.DistanceAndDirection"
+msgid "{0}, {1}"
+msgstr "{0}, {1}"
 
 #. Scanner.Dirt
 msgctxt "Scanner.Dirt"

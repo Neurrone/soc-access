@@ -1420,20 +1420,15 @@ msgctxt "Actions.ScannerPreviousSubcategory"
 msgid "Previous Scanner Subcategory"
 msgstr "前 スキャナー サブカテゴリ"
 
-#. Actions.ScannerRefresh
-msgctxt "Actions.ScannerRefresh"
-msgid "Refresh Scanner"
-msgstr "スキャナーを更新"
-
 #. Actions.ScannerReturnFromJump
 msgctxt "Actions.ScannerReturnFromJump"
 msgid "Return To Tile Before Jump"
 msgstr "移動前のタイルへ戻る"
 
-#. Actions.ScannerSpeakOrientation
-msgctxt "Actions.ScannerSpeakOrientation"
-msgid "Scanner Result Orientation"
-msgstr "スキャナー結果の方向"
+#. Actions.ScannerSpeakDistanceAndDirection
+msgctxt "Actions.ScannerSpeakDistanceAndDirection"
+msgid "Scanner Result Distance and Direction"
+msgstr "スキャナー結果の距離と方角"
 
 #. Actions.SliderDecrease
 msgctxt "Actions.SliderDecrease"
@@ -2670,6 +2665,11 @@ msgstr "深い水域"
 msgctxt "Scanner.Deforestation"
 msgid "Deforestation"
 msgstr "森林伐採"
+
+#. Scanner.DistanceAndDirection
+msgctxt "Scanner.DistanceAndDirection"
+msgid "{0}, {1}"
+msgstr "{0}、{1}"
 
 #. Scanner.Dirt
 msgctxt "Scanner.Dirt"

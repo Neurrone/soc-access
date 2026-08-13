@@ -1,4 +1,4 @@
-using UnityEngine.InputSystem;
+﻿using UnityEngine.InputSystem;
 using System.Collections.Generic;
 using SongsOfConquestAccess.Bookmarks;
 using SongsOfConquestAccess.Localization;
@@ -158,9 +158,6 @@ namespace SongsOfConquestAccess.Input
         public static readonly InputAction FocusHudNotifications = OneShot("focus_hud_notifications", ModStrings.Actions.FocusHudNotifications, InputClaimScope.Screen)
             .AddBinding(new KeyboardBinding(Key.N));
 
-        public static readonly InputAction ScannerRefresh = OneShot("scanner_refresh", ModStrings.Actions.ScannerRefresh, InputClaimScope.FocusedWidget)
-            .AddBinding(new KeyboardBinding(Key.End));
-
         public static readonly InputAction ScannerSearch = OneShot("scanner_search", ModStrings.Scanner.Search, InputClaimScope.FocusedWidget)
             .AddBinding(new KeyboardBinding(Key.F, ctrl: true));
 
@@ -185,8 +182,8 @@ namespace SongsOfConquestAccess.Input
         public static readonly InputAction ScannerJumpToResult = OneShot("scanner_jump_to_result", ModStrings.Actions.ScannerJumpToResult, InputClaimScope.FocusedWidget)
             .AddBinding(new KeyboardBinding(Key.Home));
 
-        public static readonly InputAction ScannerSpeakOrientation = OneShot("scanner_speak_orientation", ModStrings.Actions.ScannerSpeakOrientation, InputClaimScope.FocusedWidget)
-            .AddBinding(new KeyboardBinding(Key.Home, shift: true));
+        public static readonly InputAction ScannerSpeakDistanceAndDirection = OneShot("scanner_speak_distance_and_direction", ModStrings.Actions.ScannerSpeakDistanceAndDirection, InputClaimScope.FocusedWidget)
+            .AddBinding(new KeyboardBinding(Key.End));
 
         public static readonly InputAction ScannerReturnFromJump = OneShot("scanner_return_from_jump", ModStrings.Actions.ScannerReturnFromJump, InputClaimScope.FocusedWidget)
             .AddBinding(new KeyboardBinding(Key.Backspace));
@@ -389,7 +386,6 @@ namespace SongsOfConquestAccess.Input
                 FocusHudResources,
                 FocusHudObjectives,
                 FocusHudNotifications,
-                ScannerRefresh,
                 ScannerSearch,
                 ScannerPreviousCategory,
                 ScannerNextCategory,
@@ -398,7 +394,7 @@ namespace SongsOfConquestAccess.Input
                 ScannerPreviousResult,
                 ScannerNextResult,
                 ScannerJumpToResult,
-                ScannerSpeakOrientation,
+                ScannerSpeakDistanceAndDirection,
                 ScannerReturnFromJump,
                 ScannerLookAround,
                 ScannerIncreaseLookAroundRadius,

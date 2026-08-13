@@ -1420,20 +1420,15 @@ msgctxt "Actions.ScannerPreviousSubcategory"
 msgid "Previous Scanner Subcategory"
 msgstr "上一个 扫描器 子类别"
 
-#. Actions.ScannerRefresh
-msgctxt "Actions.ScannerRefresh"
-msgid "Refresh Scanner"
-msgstr "刷新扫描器"
-
 #. Actions.ScannerReturnFromJump
 msgctxt "Actions.ScannerReturnFromJump"
 msgid "Return To Tile Before Jump"
 msgstr "返回跳转前的格子"
 
-#. Actions.ScannerSpeakOrientation
-msgctxt "Actions.ScannerSpeakOrientation"
-msgid "Scanner Result Orientation"
-msgstr "扫描器结果方向"
+#. Actions.ScannerSpeakDistanceAndDirection
+msgctxt "Actions.ScannerSpeakDistanceAndDirection"
+msgid "Scanner Result Distance and Direction"
+msgstr "扫描结果的距离和方向"
 
 #. Actions.SliderDecrease
 msgctxt "Actions.SliderDecrease"
@@ -2670,6 +2665,11 @@ msgstr "深水"
 msgctxt "Scanner.Deforestation"
 msgid "Deforestation"
 msgstr "伐木区"
+
+#. Scanner.DistanceAndDirection
+msgctxt "Scanner.DistanceAndDirection"
+msgid "{0}, {1}"
+msgstr "{0}，{1}"
 
 #. Scanner.Dirt
 msgctxt "Scanner.Dirt"

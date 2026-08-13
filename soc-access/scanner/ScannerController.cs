@@ -325,19 +325,18 @@ namespace SongsOfConquestAccess.Scanner
             return null;
         }
 
-        public bool SpeakOrientation()
+        internal ScannerCommandResult ExecuteSpeakDistanceAndDirection()
         {
-            Output(ExecuteSpeakOrientation());
-            return true;
+            return ExecuteSpeakDistanceAndDirectionCore();
         }
 
-        internal ScannerCommandResult ExecuteSpeakOrientation()
+        private ScannerCommandResult ExecuteSpeakDistanceAndDirectionCore()
         {
-            return ExecuteSpeakOrientationCore();
-        }
+            if (!_hasBuiltSnapshot)
+            {
+                return NoResults();
+            }
 
-        private ScannerCommandResult ExecuteSpeakOrientationCore()
-        {
             if (!RebuildForCurrentResultAction())
             {
                 return NoResults();
@@ -349,7 +348,13 @@ namespace SongsOfConquestAccess.Scanner
                 return NoResults();
             }
 
-            return BuildCommandResult(includePath: false);
+            ScannerCommandResult command = BuildCommandResult(includePath: false);
+            if (command != null)
+            {
+                command.DistanceAndDirectionOnly = true;
+            }
+
+            return command;
         }
 
         private ScannerCommandResult BuildCommandResult(bool includePath)

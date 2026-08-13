@@ -288,7 +288,7 @@ namespace SongsOfConquestAccess.Tests
         }
 
         [TestMethod]
-        public void ExecuteSpeakOrientationRebuildsAndDoesNotFallbackWhenCurrentKeyLeavesSubcategory()
+        public void ExecuteSpeakDistanceAndDirectionRebuildsAndDoesNotFallbackWhenCurrentKeyLeavesSubcategory()
         {
             ScannerSnapshot first = BuildSnapshot(
                 Entry("Pickups", "All", "Gold", 1, 0, "entity:gold"),
@@ -300,7 +300,7 @@ namespace SongsOfConquestAccess.Tests
 
             controller.ExecuteInitialLanding();
             controller.ExecuteMoveSubcategory(1);
-            ScannerCommandResult result = controller.ExecuteSpeakOrientation();
+            ScannerCommandResult result = controller.ExecuteSpeakDistanceAndDirection();
 
             Assert.AreEqual(ScannerCommandStatus.NoResults, result.Status);
         }
@@ -645,6 +645,43 @@ namespace SongsOfConquestAccess.Tests
 
             Assert.AreEqual("Terrain", result.CategoryLabel);
             Assert.AreEqual("Road", result.Result.Label);
+        }
+
+        [TestMethod]
+        public void SpeakDistanceAndDirectionReadsTileCountThenBearing()
+        {
+            ScannerController controller = CreateController(BuildSnapshot(
+                Entry("Terrain", "Roads", "Road", 2, 3, "terrain:road")));
+
+            controller.ExecuteInitialLanding();
+            ScannerCommandResult result = controller.ExecuteSpeakDistanceAndDirection();
+
+            Assert.AreEqual(ScannerCommandStatus.Result, result.Status);
+            Assert.IsTrue(result.DistanceAndDirectionOnly);
+            Assert.AreEqual("5 tiles, 3n, 2e", result.FormatDistanceAndDirection(useLongDirections: false));
+        }
+
+        [TestMethod]
+        public void SpeakDistanceAndDirectionSaysHereOnTheCursor()
+        {
+            ScannerController controller = CreateController(BuildSnapshot(
+                Entry("Terrain", "Roads", "Road", 0, 0, "terrain:road")));
+
+            controller.ExecuteInitialLanding();
+            ScannerCommandResult result = controller.ExecuteSpeakDistanceAndDirection();
+
+            Assert.AreEqual("here", result.FormatDistanceAndDirection(useLongDirections: false));
+        }
+
+        [TestMethod]
+        public void SpeakDistanceAndDirectionReportsNoResultsBeforeAnythingIsScanned()
+        {
+            ScannerController controller = CreateController(BuildSnapshot(
+                Entry("Terrain", "Roads", "Road", 2, 3, "terrain:road")));
+
+            ScannerCommandResult result = controller.ExecuteSpeakDistanceAndDirection();
+
+            Assert.AreEqual(ScannerCommandStatus.NoResults, result.Status);
         }
 
         [TestMethod]
