@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using Lavapotion.Utilities;
 using SongsOfConquest.Client;
@@ -410,7 +410,7 @@ namespace SongsOfConquestAccess.UI
         {
             if (action.Key == AccessibilityActions.ScannerRefresh.Key)
             {
-                return HandleScannerNavigationResult(_scanner.ExecuteRefresh());
+                return HandleScannerNavigationResult(_scanner.ExecuteInitialLanding());
             }
 
             if (action.Key == AccessibilityActions.ScannerSearch.Key)

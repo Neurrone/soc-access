@@ -19,6 +19,7 @@ namespace SongsOfConquestAccess.Scanner
         private int _subcategoryIndex;
         private int _resultIndex;
         private int _preTemporaryCategoryIndex;
+        private bool _hasBuiltSnapshot;
 
         public ScannerController(
             Func<Vector2Int, ScannerSnapshot> snapshotBuilder,
@@ -36,15 +37,16 @@ namespace SongsOfConquestAccess.Scanner
             _directionMode = directionMode;
         }
 
-        public bool Refresh()
+        /// <summary>
+        /// Builds the first snapshot and announces the first scope that has
+        /// anything in it. Every navigation command falls back to this when
+        /// nothing has been scanned yet, because otherwise the first key press
+        /// steps out of an empty starting category and reports no results while
+        /// the map is full of them.
+        /// </summary>
+        internal ScannerCommandResult ExecuteInitialLanding()
         {
-            Output(ExecuteRefresh());
-            return true;
-        }
-
-        internal ScannerCommandResult ExecuteRefresh()
-        {
-            return ExecuteRefreshCore();
+            return ExecuteInitialLandingCore();
         }
 
         internal ScannerCommandResult ExecuteSearch(string query)
@@ -57,7 +59,7 @@ namespace SongsOfConquestAccess.Scanner
             return ExecuteLookAroundCore(radius);
         }
 
-        private ScannerCommandResult ExecuteRefreshCore()
+        private ScannerCommandResult ExecuteInitialLandingCore()
         {
             Vector2Int origin = GetCursor();
             _snapshot = BuildSnapshot(origin);
@@ -149,6 +151,11 @@ namespace SongsOfConquestAccess.Scanner
 
         private ScannerCommandResult ExecuteMoveCategoryCore(int delta)
         {
+            if (!_hasBuiltSnapshot)
+            {
+                return ExecuteInitialLandingCore();
+            }
+
             if (_snapshot != null && _snapshot.IsTemporarySnapshot)
             {
                 _categoryIndex = _preTemporaryCategoryIndex;
@@ -191,6 +198,11 @@ namespace SongsOfConquestAccess.Scanner
 
         private ScannerCommandResult ExecuteMoveSubcategoryCore(int delta)
         {
+            if (!_hasBuiltSnapshot)
+            {
+                return ExecuteInitialLandingCore();
+            }
+
             if (_snapshot == null || !_snapshot.IsTemporarySnapshot)
             {
                 RebuildFromCursorPreservingScope();
@@ -234,6 +246,11 @@ namespace SongsOfConquestAccess.Scanner
 
         private ScannerCommandResult ExecuteMoveResultCore(int delta)
         {
+            if (!_hasBuiltSnapshot)
+            {
+                return ExecuteInitialLandingCore();
+            }
+
             bool locatedCurrent = _snapshot != null && _snapshot.IsTemporarySnapshot
                 ? CurrentValidResult() != null
                 : RebuildForResultNavigation();
@@ -940,6 +957,7 @@ namespace SongsOfConquestAccess.Scanner
 
         private ScannerSnapshot BuildSnapshot(Vector2Int origin)
         {
+            _hasBuiltSnapshot = true;
             return _snapshotBuilder != null ? _snapshotBuilder(origin) : null;
         }
 

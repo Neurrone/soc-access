@@ -1,4 +1,4 @@
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using SongsOfConquestAccess.Adapters;
 using SongsOfConquestAccess.Audio;
 using SongsOfConquestAccess.Input;
@@ -616,7 +616,7 @@ namespace SongsOfConquestAccess.UI
         {
             if (action.Key == AccessibilityActions.ScannerRefresh.Key)
             {
-                return HandleScannerNavigationResult(_scanner.ExecuteRefresh());
+                return HandleScannerNavigationResult(_scanner.ExecuteInitialLanding());
             }
 
             if (action.Key == AccessibilityActions.ScannerPreviousCategory.Key)
