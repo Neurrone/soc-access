@@ -140,6 +140,7 @@ namespace SongsOfConquestAccess.Localization
             public static readonly ModString ExtraTargetPrefix = new ModString("Spatial.ExtraTargetPrefix", "extra target ");
             public static readonly ModString Friendly = new ModString("Spatial.Friendly", "friendly");
             public static readonly ModString FurthestReachableInTurns = new ModString("Spatial.FurthestReachableInTurns", "furthest reachable in {0} turns");
+            public static readonly ModString FurthestReachableNextTurn = new ModString("Spatial.FurthestReachableNextTurn", "furthest reachable next turn");
             public static readonly ModString FurthestReachableThisTurn = new ModString("Spatial.FurthestReachableThisTurn", "furthest reachable this turn");
             public static readonly ModString Grass = new ModString("Spatial.Grass", "Grass");
             public static readonly ModString Health = new ModString("Spatial.Health", "{0} / {1} health");
@@ -156,6 +157,7 @@ namespace SongsOfConquestAccess.Localization
             public static readonly ModString Mountain = new ModString("Spatial.Mountain", "Mountain");
             public static readonly ModString Obstruction = new ModString("Spatial.Obstruction", "Obstruction");
             public static readonly ModString Neutral = new ModString("Spatial.Neutral", "neutral");
+            public static readonly ModString NextTurn = new ModString("Spatial.NextTurn", "next turn");
             public static readonly ModString NoRoutePreview = new ModString("Spatial.NoRoutePreview", "no route preview");
             public static readonly ModString OnRoute = new ModString("Spatial.OnRoute", "On route");
             public static readonly ModString PositionAndMapSize = new ModString("Spatial.PositionAndMapSize", "Position {0}, {1}. Map is {2} by {3}.");

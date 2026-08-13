@@ -2030,6 +2030,11 @@ msgctxt "Spatial.FurthestReachableInTurns"
 msgid "furthest reachable in {0} turns"
 msgstr "più lontano raggiungibile tra {0} turni"
 
+#. Spatial.FurthestReachableNextTurn
+msgctxt "Spatial.FurthestReachableNextTurn"
+msgid "furthest reachable next turn"
+msgstr "più lontano raggiungibile il prossimo turno"
+
 #. Spatial.FurthestReachableThisTurn
 msgctxt "Spatial.FurthestReachableThisTurn"
 msgid "furthest reachable this turn"
@@ -2099,6 +2104,11 @@ msgstr "Ostacolo"
 msgctxt "Spatial.Neutral"
 msgid "neutral"
 msgstr "neutrale"
+
+#. Spatial.NextTurn
+msgctxt "Spatial.NextTurn"
+msgid "next turn"
+msgstr "prossimo turno"
 
 #. Spatial.NoRoutePreview
 msgctxt "Spatial.NoRoutePreview"

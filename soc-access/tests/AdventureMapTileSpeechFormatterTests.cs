@@ -214,6 +214,119 @@ namespace SongsOfConquestAccess.Tests
             Assert.AreEqual(0, calls, "turning road directions off should not cost the work of finding them");
         }
 
+        [TestMethod]
+        public void DescribeTileReadsADestinationReachedNextTurnAsNextTurn()
+        {
+            string text = CreateFormatter().DescribeTile(CreateRouteTile(
+                new AdventureMapTile.PathIndicatorInfo
+                {
+                    Kind = AdventureMapTile.PathIndicatorKind.Destination,
+                    TravelTurns = 2,
+                    HasRoutePreview = true
+                }));
+
+            Assert.AreEqual("Grass, Destination, next turn, 4, 2.", text);
+        }
+
+        [TestMethod]
+        public void DescribeTileCountsDestinationTurnsFromTheNextTurnOnward()
+        {
+            string text = CreateFormatter().DescribeTile(CreateRouteTile(
+                new AdventureMapTile.PathIndicatorInfo
+                {
+                    Kind = AdventureMapTile.PathIndicatorKind.Destination,
+                    TravelTurns = 4,
+                    HasRoutePreview = true
+                }));
+
+            Assert.AreEqual("Grass, Destination, in 3 turns, 4, 2.", text);
+        }
+
+        [TestMethod]
+        public void DescribeTileSaysNothingAboutTurnsForADestinationReachedThisTurn()
+        {
+            string text = CreateFormatter().DescribeTile(CreateRouteTile(
+                new AdventureMapTile.PathIndicatorInfo
+                {
+                    Kind = AdventureMapTile.PathIndicatorKind.Destination,
+                    TravelTurns = 1,
+                    HasRoutePreview = true
+                }));
+
+            Assert.AreEqual("Grass, Destination, 4, 2.", text);
+        }
+
+        [TestMethod]
+        public void DescribeTileReadsTheFurthestReachableTileOfTheNextTurnAsNextTurn()
+        {
+            string text = CreateFormatter().DescribeTile(CreateRouteTile(
+                new AdventureMapTile.PathIndicatorInfo
+                {
+                    Kind = AdventureMapTile.PathIndicatorKind.OnRoute,
+                    TravelTurns = 2,
+                    FurthestReachableTurns = 2,
+                    HasRoutePreview = true
+                }));
+
+            Assert.AreEqual("Grass, On route, furthest reachable next turn, 4, 2.", text);
+        }
+
+        [TestMethod]
+        public void DescribeTileCountsFurthestReachableTurnsFromTheNextTurnOnward()
+        {
+            string text = CreateFormatter().DescribeTile(CreateRouteTile(
+                new AdventureMapTile.PathIndicatorInfo
+                {
+                    Kind = AdventureMapTile.PathIndicatorKind.OnRoute,
+                    TravelTurns = 3,
+                    FurthestReachableTurns = 3,
+                    HasRoutePreview = true
+                }));
+
+            Assert.AreEqual("Grass, On route, furthest reachable in 2 turns, 4, 2.", text);
+        }
+
+        [TestMethod]
+        public void DescribeTileKeepsTheFurthestReachableTileOfThisTurnAsThisTurn()
+        {
+            string text = CreateFormatter().DescribeTile(CreateRouteTile(
+                new AdventureMapTile.PathIndicatorInfo
+                {
+                    Kind = AdventureMapTile.PathIndicatorKind.OnRoute,
+                    TravelTurns = 1,
+                    FurthestReachableTurns = 1,
+                    HasRoutePreview = true
+                }));
+
+            Assert.AreEqual("Grass, On route, furthest reachable this turn, 4, 2.", text);
+        }
+
+        [TestMethod]
+        public void DescribeTileReadsARouteTileReachedNextTurnAsNextTurn()
+        {
+            string text = CreateFormatter().DescribeTile(CreateRouteTile(
+                new AdventureMapTile.PathIndicatorInfo
+                {
+                    Kind = AdventureMapTile.PathIndicatorKind.OnRoute,
+                    TravelTurns = 2,
+                    HasRoutePreview = true
+                }));
+
+            Assert.AreEqual("Grass, On route, next turn, 4, 2.", text);
+        }
+
+        private static AdventureMapTile CreateRouteTile(AdventureMapTile.PathIndicatorInfo indicator)
+        {
+            return new AdventureMapTile(new Vector2Int(4, 2))
+            {
+                IsExplored = true,
+                IsVisible = true,
+                Terrain = AdventureTerrainKind.Grass,
+                IsReachable = true,
+                PathIndicator = indicator
+            };
+        }
+
         private static AdventureMapTileSpeechFormatter CreateFormatter()
         {
             return CreateFormatter(enableMovementCost: false);

@@ -2015,6 +2015,11 @@ msgctxt "Spatial.FurthestReachableInTurns"
 msgid "furthest reachable in {0} turns"
 msgstr "{0} 回合后可到达的最远处"
 
+#. Spatial.FurthestReachableNextTurn
+msgctxt "Spatial.FurthestReachableNextTurn"
+msgid "furthest reachable next turn"
+msgstr "下回合可到达的最远处"
+
 #. Spatial.FurthestReachableThisTurn
 msgctxt "Spatial.FurthestReachableThisTurn"
 msgid "furthest reachable this turn"
@@ -2084,6 +2089,11 @@ msgstr "障碍物"
 msgctxt "Spatial.Neutral"
 msgid "neutral"
 msgstr "中立"
+
+#. Spatial.NextTurn
+msgctxt "Spatial.NextTurn"
+msgid "next turn"
+msgstr "下回合"
 
 #. Spatial.NoRoutePreview
 msgctxt "Spatial.NoRoutePreview"

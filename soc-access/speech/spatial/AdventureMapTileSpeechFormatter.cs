@@ -325,9 +325,10 @@ namespace SongsOfConquestAccess.Speech.Spatial
                     return string.Join(", ", details.ToArray());
                 }
 
-                if (indicator.TravelTurns > 1)
+                string arrival = DescribeArrivalTurns(indicator.TravelTurns);
+                if (!string.IsNullOrWhiteSpace(arrival))
                 {
-                    details.Add(ModText.Get(ModStrings.Spatial.TurnsIn, indicator.TravelTurns));
+                    details.Add(arrival);
                 }
 
                 if (indicator.IsInteractable)
@@ -342,14 +343,15 @@ namespace SongsOfConquestAccess.Speech.Spatial
                 details.Add(ModText.Get(ModStrings.Spatial.OnRoute));
                 if (indicator.FurthestReachableTurns.HasValue)
                 {
-                    int turns = indicator.FurthestReachableTurns.Value;
-                    details.Add(turns <= 1
-                        ? ModText.Get(ModStrings.Spatial.FurthestReachableThisTurn)
-                        : ModText.Get(ModStrings.Spatial.FurthestReachableInTurns, turns));
+                    details.Add(DescribeFurthestReachableTurns(indicator.FurthestReachableTurns.Value));
                 }
-                else if (indicator.TravelTurns > 1)
+                else
                 {
-                    details.Add(ModText.Get(ModStrings.Spatial.TurnsIn, indicator.TravelTurns));
+                    string routeArrival = DescribeArrivalTurns(indicator.TravelTurns);
+                    if (!string.IsNullOrWhiteSpace(routeArrival))
+                    {
+                        details.Add(routeArrival);
+                    }
                 }
             }
 
@@ -359,6 +361,33 @@ namespace SongsOfConquestAccess.Speech.Spatial
             }
 
             return string.Join(", ", details.ToArray());
+        }
+
+        // Travel turns are ordinals counting the current turn as 1, matching the
+        // numbers the game paints on its path markers. Speech says how long the
+        // wait is instead, so ordinal 2 is next turn and ordinal 3 is two turns.
+        private static string DescribeArrivalTurns(int travelTurns)
+        {
+            if (travelTurns <= 1)
+            {
+                return string.Empty;
+            }
+
+            return travelTurns == 2
+                ? ModText.Get(ModStrings.Spatial.NextTurn)
+                : ModText.Get(ModStrings.Spatial.TurnsIn, travelTurns - 1);
+        }
+
+        private static string DescribeFurthestReachableTurns(int turns)
+        {
+            if (turns <= 1)
+            {
+                return ModText.Get(ModStrings.Spatial.FurthestReachableThisTurn);
+            }
+
+            return turns == 2
+                ? ModText.Get(ModStrings.Spatial.FurthestReachableNextTurn)
+                : ModText.Get(ModStrings.Spatial.FurthestReachableInTurns, turns - 1);
         }
 
         private static string FormatMovementValue(float value)

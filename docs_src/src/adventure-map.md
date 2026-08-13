@@ -51,10 +51,13 @@ After setting a destination, the game draws a route preview. When focus is on a 
 
 - `On route`: part of the planned route.
 - `On route, furthest reachable this turn`: furthest point the wielder can reach this turn.
-- `On route, in n turns`: the tile is on the route, but can only be reached on a later turn.
-- `On route, furthest reachable in n turns`: furthest point the wielder can reach by that later turn.
+- `On route, next turn`: the tile is on the route and is reached on the next turn.
+- `On route, in n turns`: the tile is on the route, but can only be reached after that many more turns.
+- `On route, furthest reachable next turn`: furthest point the wielder can reach on the next turn.
+- `On route, furthest reachable in n turns`: furthest point the wielder can reach after that many more turns.
 - `Destination`: the tile is the selected destination.
-- `Destination, in n turns`: the destination cannot be reached this turn.
+- `Destination, next turn`: the destination is reached on the next turn.
+- `Destination, in n turns`: the destination is reached after that many more turns.
 - `Destination, interactable`: the destination has an interactable object.
 - `Destination, interactable next turn`: the destination is reachable this turn, but there is not enough movement left to interact with it this turn.
 - `Destination, no route preview`: the destination is set, but the game is not showing route preview markers for it.

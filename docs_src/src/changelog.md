@@ -17,6 +17,7 @@
 - Wielders, and other things that belong to a side, now get a separate entry per side instead of being mixed together
 - Battle troops are now grouped by what they are rather than by how much they are worth, and combat results say which troops the acting troop can hit
 - Battle spawn points are now read as a side and whatever stands on them
+- Route preview turn counts now say how long the wait is instead of numbering the turn. A tile you arrive at on the next turn reads as `next turn` rather than `in 2 turns`, and the counts beyond that drop by one to match
 
 ## V1.0.0
 
