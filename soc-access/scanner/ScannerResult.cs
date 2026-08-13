@@ -65,7 +65,8 @@ namespace SongsOfConquestAccess.Scanner
         /// <summary>
         /// Grouping identity. Set it where the item is a fixed kind of thing and
         /// a stable string is available, so item identity does not ride on
-        /// translated text.
+        /// translated text. It says what the thing is, not whose it is or what
+        /// state it is in: the item layer splits those apart on their own.
         /// </summary>
         public string ItemKey
         {

@@ -76,7 +76,43 @@ namespace SongsOfConquestAccess.Scanner
                 return;
             }
 
-            GetOrAddItem(FlatItems ? result.Key : result.ItemKey).Instances.Add(result);
+            GetOrAddItem(FlatItems ? result.Key : ItemKeyFor(result)).Instances.Add(result);
+        }
+
+        /// <summary>
+        /// Items group on everything the announcement says about the thing
+        /// itself: what it is, whose it is, and what state it is in. Instances
+        /// under one item are then interchangeable, and a scope that mixes
+        /// sides or states spends a stop on each rather than making the player
+        /// walk the enemy's spawn points to reach their own, or the chests they
+        /// have already emptied to reach the ones still worth a visit. Each
+        /// fact is spoken with the instance, so the items say which is which
+        /// without needing names of their own.
+        /// </summary>
+        private static string ItemKeyFor(ScannerResult result)
+        {
+            string key = result.ItemKey + RelationshipSuffix(result.Relationship);
+            if (result.Unvisited)
+            {
+                key += ":unvisited";
+            }
+
+            return result.NotVisible ? key + ":unseen" : key;
+        }
+
+        private static string RelationshipSuffix(ScannerResultRelationship relationship)
+        {
+            switch (relationship)
+            {
+                case ScannerResultRelationship.Neutral:
+                    return ":neutral";
+                case ScannerResultRelationship.Friendly:
+                    return ":friendly";
+                case ScannerResultRelationship.Enemy:
+                    return ":enemy";
+                default:
+                    return string.Empty;
+            }
         }
 
         public ScannerItem GetOrAddItem(string key)
