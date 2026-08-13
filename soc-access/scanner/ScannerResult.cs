@@ -32,6 +32,7 @@ namespace SongsOfConquestAccess.Scanner
     {
         private string _itemKey;
         private string _itemLabel;
+        private string _instanceLabel;
 
         public ScannerResult(string key, string label, Vector2Int position)
         {
@@ -84,10 +85,15 @@ namespace SongsOfConquestAccess.Scanner
 
         /// <summary>
         /// What tells this instance apart from the others under the same item,
-        /// such as a cluster's tile count. Blank where the item name already
-        /// says everything, which is the case for ordinary entities.
+        /// such as a cluster's tile count. Falls back to the item name, so a
+        /// result always says what it is even when the item name is all there
+        /// is to say.
         /// </summary>
-        public string InstanceLabel { get; set; }
+        public string InstanceLabel
+        {
+            get { return string.IsNullOrWhiteSpace(_instanceLabel) ? ItemLabel : _instanceLabel; }
+            set { _instanceLabel = value; }
+        }
 
         public Vector2Int Position { get; private set; }
 

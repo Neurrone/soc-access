@@ -38,7 +38,7 @@ namespace SongsOfConquestAccess.Scanner
         {
             TroopPlacementTileSpeechFormatter formatter = new TroopPlacementTileSpeechFormatter(_snapshot);
             string text = ScannerResultSpeechFormatter.Compose(
-                _includeItemName && _result != null ? _result.ItemLabel : null,
+                ScannerResultSpeechFormatter.ItemName(_result, _includeItemName),
                 ScannerResultContentFormatter.Describe(
                     TroopDeploymentAnnouncementDefinitions.ScannerContent,
                     _result,

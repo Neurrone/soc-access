@@ -21,14 +21,14 @@ namespace SongsOfConquestAccess.Tests
         }
 
         [TestMethod]
-        public void LeavesTheContentToTheOwnerAndStatusWhenTheItemNameSaysEverything()
+        public void FallsBackToTheItemNameWhenTheInstanceHasNoNameOfItsOwn()
         {
             ScannerResult result = new ScannerResult("entity:7", "Chest", new Vector2Int(3, 4))
             {
                 Relationship = ScannerResultRelationship.Neutral
             };
 
-            Assert.AreEqual("Neutral", Describe(result));
+            Assert.AreEqual("Chest, Neutral", Describe(result));
         }
 
         [TestMethod]

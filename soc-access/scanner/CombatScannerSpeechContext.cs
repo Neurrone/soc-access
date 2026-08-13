@@ -38,7 +38,7 @@ namespace SongsOfConquestAccess.Scanner
         {
             CombatTileSpeechFormatter formatter = new CombatTileSpeechFormatter(_adapter, null, includeEnemyInfluence: false);
             string text = ScannerResultSpeechFormatter.Compose(
-                _includeItemName && _result != null ? _result.ItemLabel : null,
+                ScannerResultSpeechFormatter.ItemName(_result, _includeItemName),
                 ScannerResultContentFormatter.Describe(
                     CombatAnnouncementDefinitions.ScannerContent,
                     _result,

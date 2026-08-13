@@ -34,7 +34,7 @@ namespace SongsOfConquestAccess.Scanner
         {
             AdventureMapTileSpeechFormatter formatter = new AdventureMapTileSpeechFormatter();
             string text = ScannerResultSpeechFormatter.Compose(
-                _includeItemName && _result != null ? _result.ItemLabel : null,
+                ScannerResultSpeechFormatter.ItemName(_result, _includeItemName),
                 ScannerResultContentFormatter.Describe(
                     AdventureMapAnnouncementDefinitions.ScannerContent,
                     _result),

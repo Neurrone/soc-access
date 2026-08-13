@@ -31,13 +31,14 @@ namespace SongsOfConquestAccess.Scanner
         }
 
         /// <summary>
-        /// Counts the copies of the current item. An item with only one copy
-        /// says nothing rather than "1 of 1", so the readout appearing at all is
-        /// the signal that there is more of this thing to walk through.
+        /// Counts the copies of the current item, always. "1 of 8" says there
+        /// are eight of these and this is the nearest, which is worth a word
+        /// even when the answer is one, and the player can silence the element
+        /// outright if they disagree.
         /// </summary>
         public static string FormatResultCount(int index, int count)
         {
-            return count <= 1 ? string.Empty : ModText.Get(ModStrings.Common.CountOf, index, count);
+            return ModText.Get(ModStrings.Common.CountOf, index, count);
         }
 
         public static void AddIfPresent(List<string> parts, string text)
