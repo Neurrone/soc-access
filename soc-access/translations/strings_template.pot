@@ -754,6 +754,11 @@ msgctxt "Spatial.ZoneOfControlTiles"
 msgid "{0} within {1} zone of control"
 msgstr ""
 
+#. Spatial.ZoneOfControlInstance
+msgctxt "Spatial.ZoneOfControlInstance"
+msgid "{0} within {1}"
+msgstr ""
+
 #. Actions.Activate
 msgctxt "Actions.Activate"
 msgid "Activate"
@@ -3119,9 +3124,9 @@ msgctxt "Scanner.FriendlyGates"
 msgid "Friendly gates"
 msgstr ""
 
-#. Scanner.Impassable
-msgctxt "Scanner.Impassable"
-msgid "Impassable"
+#. Scanner.Exploration
+msgctxt "Scanner.Exploration"
+msgid "Exploration"
 msgstr ""
 
 #. Scanner.ImpassableTerrain
@@ -3299,6 +3304,11 @@ msgctxt "Scanner.SpawnPoints"
 msgid "Spawn points"
 msgstr ""
 
+#. Scanner.SpecialSites
+msgctxt "Scanner.SpecialSites"
+msgid "Special sites"
+msgstr ""
+
 #. Scanner.Teleport
 msgctxt "Scanner.Teleport"
 msgid "Teleport"
@@ -3342,6 +3352,11 @@ msgstr ""
 #. Scanner.Wielders
 msgctxt "Scanner.Wielders"
 msgid "Wielders"
+msgstr ""
+
+#. Scanner.ZoneOfControl
+msgctxt "Scanner.ZoneOfControl"
+msgid "Zone of control"
 msgstr ""
 
 #. Common.TileCount_0

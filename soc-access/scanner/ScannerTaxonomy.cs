@@ -74,29 +74,9 @@ namespace SongsOfConquestAccess.Scanner
 
         public Func<string> Label { get; private set; }
 
-        public bool PreserveResultOrder { get; set; }
-
-        public bool FlatItems { get; set; }
-
         public IReadOnlyList<ScannerSubcategoryDefinition> Subcategories
         {
             get { return _subcategories; }
-        }
-
-        public ScannerCategoryDefinition WithPreservedResultOrder()
-        {
-            PreserveResultOrder = true;
-            return this;
-        }
-
-        /// <summary>
-        /// Keeps every result its own item. For a category whose order carries
-        /// meaning, grouping by name would shuffle that order away.
-        /// </summary>
-        public ScannerCategoryDefinition WithFlatItems()
-        {
-            FlatItems = true;
-            return this;
         }
 
         public ScannerSubcategoryDefinition GetSubcategory(string key)
@@ -134,5 +114,29 @@ namespace SongsOfConquestAccess.Scanner
         public string Key { get; private set; }
 
         public Func<string> Label { get; private set; }
+
+        /// <summary>
+        /// Leaves the results in the order the adapter added them instead of
+        /// sorting by distance, for a scope whose order is the information.
+        /// </summary>
+        public bool PreserveResultOrder { get; set; }
+
+        /// <summary>
+        /// Keeps every result its own item. For a scope whose order carries
+        /// meaning, grouping by name would shuffle that order away.
+        /// </summary>
+        public bool FlatItems { get; set; }
+
+        public ScannerSubcategoryDefinition WithPreservedResultOrder()
+        {
+            PreserveResultOrder = true;
+            return this;
+        }
+
+        public ScannerSubcategoryDefinition WithFlatItems()
+        {
+            FlatItems = true;
+            return this;
+        }
     }
 }

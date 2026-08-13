@@ -135,7 +135,6 @@ namespace SongsOfConquestAccess.Scanner
             {
                 ScannerCategoryDefinition definition = taxonomy.Categories[i];
                 ScannerCategory category = GetOrAddCategory(definition.Key);
-                category.PreserveResultOrder = definition.PreserveResultOrder;
                 for (int j = 0; j < definition.Subcategories.Count; j++)
                 {
                     category.GetOrAddSubcategory(definition.Subcategories[j].Key);
@@ -217,14 +216,13 @@ namespace SongsOfConquestAccess.Scanner
             for (int i = 0; i < _categories.Count; i++)
             {
                 ScannerCategory category = _categories[i];
-                if (category.PreserveResultOrder)
-                {
-                    continue;
-                }
-
                 for (int j = 0; j < category.Subcategories.Count; j++)
                 {
-                    SortSubcategory(category.Subcategories[j], comparison);
+                    ScannerSubcategory subcategory = category.Subcategories[j];
+                    if (!subcategory.PreserveResultOrder)
+                    {
+                        SortSubcategory(subcategory, comparison);
+                    }
                 }
             }
         }

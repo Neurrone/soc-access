@@ -623,7 +623,7 @@ namespace SongsOfConquestAccess.Adapters
                     if (tile.IsBlocked)
                     {
                         snapshot.Add(
-                            ScannerCategoryKeys.Obstacles,
+                            ScannerCategoryKeys.Terrain,
                             ScannerSubcategoryKeys.All,
                             new ScannerResult(
                                 ScannerTileKey("obstacle:blocked", point),

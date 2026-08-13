@@ -9,29 +9,44 @@ namespace SongsOfConquestAccess.Scanner
             new ScannerCategoryDefinition(
                 ScannerCategoryKeys.Pickups,
                 () => ModText.Get(ModStrings.Scanner.Pickups),
-                Subcategory(ScannerSubcategoryKeys.Unvisited, ModStrings.Scanner.Unvisited),
                 All(),
+                Subcategory(ScannerSubcategoryKeys.Unvisited, ModStrings.Scanner.Unvisited),
                 Subcategory(ScannerSubcategoryKeys.Knowledge, ModStrings.Scanner.Knowledge),
                 Subcategory(ScannerSubcategoryKeys.Power, ModStrings.Scanner.Power),
                 Subcategory(ScannerSubcategoryKeys.Riches, ModStrings.Scanner.Riches)),
             Relationship(ScannerCategoryKeys.ResourceGenerators, ModStrings.Scanner.ResourceGenerators),
-            OnlyAll(ScannerCategoryKeys.Beacons, ModStrings.Scanner.Beacons),
+            // The map's fixed landmarks and services. Each was its own
+            // top-level category before the item layer, which cost four stops
+            // in the category cycle to reach a handful of entities apiece.
+            new ScannerCategoryDefinition(
+                ScannerCategoryKeys.SpecialSites,
+                () => ModText.Get(ModStrings.Scanner.SpecialSites),
+                All(),
+                Subcategory(ScannerSubcategoryKeys.Beacons, ModStrings.Scanner.Beacons),
+                Subcategory(ScannerSubcategoryKeys.Objectives, ModStrings.Scanner.Objectives),
+                Subcategory(ScannerSubcategoryKeys.ArtifactMarkets, ModStrings.Scanner.ArtifactMarkets),
+                Subcategory(ScannerSubcategoryKeys.Teleport, ModStrings.Scanner.Teleport)),
             OnlyAll(ScannerCategoryKeys.Wielders, ModStrings.Scanner.Wielders),
             Relationship(ScannerCategoryKeys.SettlementsAndBuildSites, ModStrings.Scanner.SettlementsAndBuildSites),
             Relationship(ScannerCategoryKeys.TroopSources, ModStrings.Scanner.TroopSources),
             Relationship(ScannerCategoryKeys.Buildings, ModStrings.Scanner.Buildings),
-            OnlyAll(ScannerCategoryKeys.Objectives, ModStrings.Scanner.Objectives),
             OnlyAll(ScannerCategoryKeys.Obstacles, ModStrings.Scanner.Obstacles),
-            OnlyAll(ScannerCategoryKeys.ArtifactMarkets, ModStrings.Scanner.ArtifactMarkets),
-            OnlyAll(ScannerCategoryKeys.Teleport, ModStrings.Scanner.Teleport),
             new ScannerCategoryDefinition(
                 ScannerCategoryKeys.Terrain,
                 () => ModText.Get(ModStrings.Scanner.Terrain),
                 Subcategory(ScannerSubcategoryKeys.RoadsAndCrossings, ModStrings.Scanner.RoadsAndCrossings),
                 Subcategory(ScannerSubcategoryKeys.OpenGround, ModStrings.Scanner.OpenGround),
                 Subcategory(ScannerSubcategoryKeys.Barriers, ModStrings.Scanner.Barriers)),
-            OnlyAll(ScannerCategoryKeys.Unexplored, ModStrings.Scanner.Unexplored),
-            OnlyAll(ScannerCategoryKeys.Revealed, ModStrings.Scanner.Revealed).WithPreservedResultOrder().WithFlatItems());
+            // Two halves of the same question, and both are single scopes, so
+            // they share a category rather than costing two stops. Revealed
+            // keeps its own ordering: the chronology is the information.
+            new ScannerCategoryDefinition(
+                ScannerCategoryKeys.Exploration,
+                () => ModText.Get(ModStrings.Scanner.Exploration),
+                Subcategory(ScannerSubcategoryKeys.Unexplored, ModStrings.Scanner.Unexplored),
+                Subcategory(ScannerSubcategoryKeys.Revealed, ModStrings.Scanner.Revealed)
+                    .WithPreservedResultOrder()
+                    .WithFlatItems()));
 
         private static ScannerCategoryDefinition OnlyAll(string key, ModString label)
         {

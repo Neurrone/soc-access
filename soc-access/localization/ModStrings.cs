@@ -1,4 +1,4 @@
-﻿namespace SongsOfConquestAccess.Localization
+namespace SongsOfConquestAccess.Localization
 {
     internal static class ModStrings
     {
@@ -181,6 +181,7 @@
             public static readonly ModString WithinZoneOfControl = new ModString("Spatial.WithinZoneOfControl", "Within {0} zone of control");
             public static readonly ModString ZoneOfControl = new ModString("Spatial.ZoneOfControl", "Zone of control");
             public static readonly ModString ZoneOfControlTiles = new ModString("Spatial.ZoneOfControlTiles", "{0} within {1} zone of control");
+            public static readonly ModString ZoneOfControlInstance = new ModString("Spatial.ZoneOfControlInstance", "{0} within {1}");
         }
 
         public static class Actions
@@ -681,7 +682,7 @@
             public static readonly ModString DistanceAndDirection = new ModString("Scanner.DistanceAndDirection", "{0}, {1}");
             public static readonly ModString Friendly = new ModString("Scanner.Friendly", "Friendly");
             public static readonly ModString FriendlyGates = new ModString("Scanner.FriendlyGates", "Friendly gates");
-            public static readonly ModString Impassable = new ModString("Scanner.Impassable", "Impassable");
+            public static readonly ModString Exploration = new ModString("Scanner.Exploration", "Exploration");
             public static readonly ModString ImpassableTerrain = new ModString("Scanner.ImpassableTerrain", "Impassable terrain");
             public static readonly ModString Knowledge = new ModString("Scanner.Knowledge", "Knowledge");
             public static readonly ModString LookAround = new ModString("Scanner.LookAround", "Look around");
@@ -717,6 +718,7 @@
             public static readonly ModString Southwest = new ModString("Scanner.Southwest", "southwest");
             public static readonly ModString SouthwestShort = new ModString("Scanner.SouthwestShort", "sw");
             public static readonly ModString SpawnPoints = new ModString("Scanner.SpawnPoints", "Spawn points");
+            public static readonly ModString SpecialSites = new ModString("Scanner.SpecialSites", "Special sites");
             public static readonly ModString Teleport = new ModString("Scanner.Teleport", "Teleport");
             public static readonly ModString Terrain = new ModString("Scanner.Terrain", "Terrain");
             public static readonly ModString TroopSources = new ModString("Scanner.TroopSources", "Troop sources");
@@ -726,6 +728,7 @@
             public static readonly ModString West = new ModString("Scanner.West", "west");
             public static readonly ModString WestShort = new ModString("Scanner.WestShort", "w");
             public static readonly ModString Wielders = new ModString("Scanner.Wielders", "Wielders");
+            public static readonly ModString ZoneOfControl = new ModString("Scanner.ZoneOfControl", "Zone of control");
         }
     }
 }

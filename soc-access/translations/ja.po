@@ -30,6 +30,26 @@ msgctxt "Common.ResourceAmount"
 msgid "{0} {1}"
 msgstr "{0} {1}"
 
+#. Scanner.Exploration
+msgctxt "Scanner.Exploration"
+msgid "Exploration"
+msgstr "探索"
+
+#. Scanner.SpecialSites
+msgctxt "Scanner.SpecialSites"
+msgid "Special sites"
+msgstr "特別な場所"
+
+#. Scanner.ZoneOfControl
+msgctxt "Scanner.ZoneOfControl"
+msgid "Zone of control"
+msgstr "支配領域"
+
+#. Spatial.ZoneOfControlInstance
+msgctxt "Spatial.ZoneOfControlInstance"
+msgid "{0} within {1}"
+msgstr "{1}{0}"
+
 #. TeamColors.Black
 msgctxt "TeamColors.Black"
 msgid "black"
@@ -2269,11 +2289,6 @@ msgstr "味方"
 msgctxt "Scanner.FriendlyGates"
 msgid "Friendly gates"
 msgstr "味方の門"
-
-#. Scanner.Impassable
-msgctxt "Scanner.Impassable"
-msgid "Impassable"
-msgstr "通行不可"
 
 #. Scanner.ImpassableTerrain
 msgctxt "Scanner.ImpassableTerrain"

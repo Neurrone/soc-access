@@ -136,6 +136,16 @@ namespace SongsOfConquestAccess.Scanner
             return ModText.Get(ModStrings.Spatial.ZoneOfControlTiles, tileText, FormatPossessive(name));
         }
 
+        /// <summary>
+        /// The shorter form used once the item name has already said "zone of
+        /// control", leaving the instance to say whose it is and how big.
+        /// </summary>
+        public static string ZoneOfControlInstance(int tileCount, string name)
+        {
+            string tileText = ModText.Plural(ModStrings.Common.TileCount, tileCount, tileCount);
+            return ModText.Get(ModStrings.Spatial.ZoneOfControlInstance, tileText, FormatPossessive(name));
+        }
+
         private static string FormatPossessive(string name)
         {
             return ModText.FormatPossessiveName(name, ModStrings.Spatial.CommanderPossessive);

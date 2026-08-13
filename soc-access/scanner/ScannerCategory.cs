@@ -19,7 +19,6 @@ namespace SongsOfConquestAccess.Scanner
             Key = key ?? string.Empty;
             _label = label;
             Definition = definition;
-            _flatItems = definition != null && definition.FlatItems;
         }
 
         public string Key { get; private set; }
@@ -34,8 +33,6 @@ namespace SongsOfConquestAccess.Scanner
         }
 
         public ScannerCategoryDefinition Definition { get; private set; }
-
-        public bool PreserveResultOrder { get; set; }
 
         /// <summary>
         /// Marks a category the player defined, which holds copies of results
@@ -71,7 +68,17 @@ namespace SongsOfConquestAccess.Scanner
         public ScannerSubcategory GetOrAddSubcategory(string key)
         {
             ScannerSubcategoryDefinition definition = Definition != null ? Definition.GetSubcategory(key) : null;
-            return GetOrAddSubcategory(key, definition != null ? definition.Label : null);
+            ScannerSubcategory subcategory = GetOrAddSubcategory(key, definition != null ? definition.Label : null);
+            if (definition != null)
+            {
+                // Both are one-way: a definition can turn them on, and a
+                // caller that already turned one on for its own reasons, as
+                // Look Around does, does not get it turned back off.
+                subcategory.FlatItems = subcategory.FlatItems || definition.FlatItems;
+                subcategory.PreserveResultOrder = subcategory.PreserveResultOrder || definition.PreserveResultOrder;
+            }
+
+            return subcategory;
         }
 
         public ScannerSubcategory GetOrAddSubcategory(string key, Func<string> label)

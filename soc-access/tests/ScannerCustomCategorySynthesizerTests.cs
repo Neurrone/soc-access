@@ -135,6 +135,38 @@ namespace SongsOfConquestAccess.Tests
             return snapshot;
         }
 
+        /// <summary>
+        /// Revealed is chronological and ungrouped because that order is the
+        /// information. Pulling it into a category of the player's own must not
+        /// quietly re-sort it by distance and collapse it by name.
+        /// </summary>
+        [TestMethod]
+        public void SelectorKeepsTheSourceSubcategoryOrderingFlags()
+        {
+            ScannerSnapshot snapshot = new ScannerSnapshot(AdventureScannerTaxonomy.Instance);
+            snapshot.Add(
+                ScannerCategoryKeys.Exploration,
+                ScannerSubcategoryKeys.Revealed,
+                new ScannerResult("revealed:far", "Chest", new Vector2Int(10, 0)));
+            snapshot.Add(
+                ScannerCategoryKeys.Exploration,
+                ScannerSubcategoryKeys.Revealed,
+                new ScannerResult("revealed:near", "Chest", new Vector2Int(1, 0)));
+
+            ScannerCustomCategory definition = new ScannerCustomCategory(1, "Watchlist");
+            definition.SetSelector(
+                ScannerCategoryKeys.Exploration,
+                ScannerSubcategoryKeys.Revealed,
+                selected: true);
+            ScannerCustomCategorySynthesizer.Apply(snapshot, new[] { definition });
+            snapshot.SortByDistance(Vector2Int.zero);
+
+            ScannerSubcategory selector = snapshot.Categories[0].Subcategories[1];
+            Assert.IsTrue(selector.PreserveResultOrder);
+            Assert.IsTrue(selector.FlatItems);
+            CollectionAssert.AreEqual(new[] { "revealed:far", "revealed:near" }, Keys(selector));
+        }
+
         private static string[] Keys(ScannerSubcategory subcategory)
         {
             List<string> keys = new List<string>();

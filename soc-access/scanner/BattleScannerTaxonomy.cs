@@ -21,13 +21,12 @@ namespace SongsOfConquestAccess.Scanner
                 Subcategory(ScannerSubcategoryKeys.EnemyGates, ModStrings.Scanner.EnemyGates),
                 Subcategory(ScannerSubcategoryKeys.Attackable, ModStrings.Scanner.Attackable),
                 Subcategory(ScannerSubcategoryKeys.Dangerous, ModStrings.Scanner.Dangerous)),
+            // Blocked ground lives here as an item beside the elevations and
+            // impassable terrain, rather than in an Obstacles category of its
+            // own that would cost a category stop to reach one item.
             new ScannerCategoryDefinition(
                 ScannerCategoryKeys.Terrain,
                 () => ModText.Get(ModStrings.Scanner.Terrain),
-                All()),
-            new ScannerCategoryDefinition(
-                ScannerCategoryKeys.Obstacles,
-                () => ModText.Get(ModStrings.Scanner.Obstacles),
                 All()));
 
         private static ScannerCategoryDefinition Sides(string key, ModString label)

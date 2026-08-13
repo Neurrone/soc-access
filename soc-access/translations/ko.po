@@ -30,6 +30,26 @@ msgctxt "Common.ResourceAmount"
 msgid "{0} {1}"
 msgstr "{0} {1}"
 
+#. Scanner.Exploration
+msgctxt "Scanner.Exploration"
+msgid "Exploration"
+msgstr "탐색"
+
+#. Scanner.SpecialSites
+msgctxt "Scanner.SpecialSites"
+msgid "Special sites"
+msgstr "특별 장소"
+
+#. Scanner.ZoneOfControl
+msgctxt "Scanner.ZoneOfControl"
+msgid "Zone of control"
+msgstr "통제 구역"
+
+#. Spatial.ZoneOfControlInstance
+msgctxt "Spatial.ZoneOfControlInstance"
+msgid "{0} within {1}"
+msgstr "{1} {0}"
+
 #. TeamColors.Black
 msgctxt "TeamColors.Black"
 msgid "black"
@@ -2269,11 +2289,6 @@ msgstr "아군"
 msgctxt "Scanner.FriendlyGates"
 msgid "Friendly gates"
 msgstr "아군 관문"
-
-#. Scanner.Impassable
-msgctxt "Scanner.Impassable"
-msgid "Impassable"
-msgstr "통행 불가"
 
 #. Scanner.ImpassableTerrain
 msgctxt "Scanner.ImpassableTerrain"

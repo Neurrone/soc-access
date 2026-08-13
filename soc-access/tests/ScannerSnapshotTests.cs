@@ -38,19 +38,42 @@ namespace SongsOfConquestAccess.Tests
         }
 
         [TestMethod]
-        public void SortByDistancePreservesOrderForPreservedCategories()
+        public void SortByDistancePreservesOrderForPreservedSubcategories()
         {
             ScannerSnapshot snapshot = new ScannerSnapshot();
-            ScannerCategory revealed = snapshot.GetOrAddCategory("Revealed");
+            ScannerCategory exploration = snapshot.GetOrAddCategory("Exploration");
+            ScannerSubcategory revealed = exploration.GetOrAddSubcategory("Revealed");
             revealed.PreserveResultOrder = true;
-            revealed.GetOrAddSubcategory("All").Add(new ScannerResult("entity:far", "Far", new Vector2Int(10, 0)));
-            revealed.GetOrAddSubcategory("All").Add(new ScannerResult("entity:near", "Near", new Vector2Int(1, 0)));
+            revealed.Add(new ScannerResult("entity:far", "Far", new Vector2Int(10, 0)));
+            revealed.Add(new ScannerResult("entity:near", "Near", new Vector2Int(1, 0)));
 
             snapshot.SortByDistance(Vector2Int.zero);
 
-            ScannerSubcategory subcategory = snapshot.Categories[0].Subcategories[0];
-            Assert.AreEqual("Far", subcategory.Items[0].Label);
-            Assert.AreEqual("Near", subcategory.Items[1].Label);
+            Assert.AreEqual("Far", revealed.Items[0].Label);
+            Assert.AreEqual("Near", revealed.Items[1].Label);
+        }
+
+        /// <summary>
+        /// The flag is per subcategory, so a neighbour under the same category
+        /// still sorts. This is what lets Unexplored and Revealed share one.
+        /// </summary>
+        [TestMethod]
+        public void SortByDistanceStillSortsUnpreservedSiblings()
+        {
+            ScannerSnapshot snapshot = new ScannerSnapshot();
+            ScannerCategory exploration = snapshot.GetOrAddCategory("Exploration");
+            ScannerSubcategory revealed = exploration.GetOrAddSubcategory("Revealed");
+            revealed.PreserveResultOrder = true;
+            revealed.Add(new ScannerResult("entity:far", "Far", new Vector2Int(10, 0)));
+            revealed.Add(new ScannerResult("entity:near", "Near", new Vector2Int(1, 0)));
+            ScannerSubcategory unexplored = exploration.GetOrAddSubcategory("Unexplored");
+            unexplored.Add(new ScannerResult("region:far", "Far region", new Vector2Int(10, 0)));
+            unexplored.Add(new ScannerResult("region:near", "Near region", new Vector2Int(1, 0)));
+
+            snapshot.SortByDistance(Vector2Int.zero);
+
+            Assert.AreEqual("Far", revealed.Items[0].Label);
+            Assert.AreEqual("Near region", unexplored.Items[0].Label);
         }
 
         [TestMethod]

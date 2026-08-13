@@ -107,6 +107,12 @@ namespace SongsOfConquestAccess.Scanner
             ScannerSubcategory target = category.GetOrAddSubcategory(
                 SelectorKeyPrefix + selector.CategoryKey + ":" + selector.SubcategoryKey,
                 () => DescribeSelector(snapshot, selector));
+
+            // A scope that is deliberately unsorted or ungrouped is that way
+            // for a reason the player did not stop caring about by pulling it
+            // into a category of their own.
+            target.FlatItems = source.FlatItems;
+            target.PreserveResultOrder = source.PreserveResultOrder;
             foreach (ScannerResult result in source.AllResults)
             {
                 target.Add(result);

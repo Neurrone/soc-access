@@ -32,6 +32,14 @@ namespace SongsOfConquestAccess.Scanner
         /// </summary>
         public bool FlatItems { get; set; }
 
+        /// <summary>
+        /// Leaves the results where the adapter put them rather than sorting
+        /// them by distance. Lives here rather than on the category because a
+        /// category can hold one scope whose order matters beside others whose
+        /// order does not.
+        /// </summary>
+        public bool PreserveResultOrder { get; set; }
+
         public List<ScannerItem> Items
         {
             get { return _items; }

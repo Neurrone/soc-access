@@ -21,18 +21,14 @@ namespace SongsOfConquestAccess.Tests
                 {
                     "pickups",
                     "resource_generators",
-                    "beacons",
+                    "special_sites",
                     "wielders",
                     "settlements_and_build_sites",
                     "troop_sources",
                     "buildings",
-                    "objectives",
                     "obstacles",
-                    "artifact_markets",
-                    "teleport",
                     "terrain",
-                    "unexplored",
-                    "revealed"
+                    "exploration"
                 },
                 CategoryKeys(AdventureScannerTaxonomy.Instance));
         }
@@ -43,12 +39,15 @@ namespace SongsOfConquestAccess.Tests
             AssertSubcategories(
                 AdventureScannerTaxonomy.Instance,
                 "pickups",
-                "unvisited", "all", "knowledge", "power", "riches");
+                "all", "unvisited", "knowledge", "power", "riches");
             AssertSubcategories(
                 AdventureScannerTaxonomy.Instance,
                 "resource_generators",
                 "all", "neutral", "friendly", "enemy");
-            AssertSubcategories(AdventureScannerTaxonomy.Instance, "beacons", "all");
+            AssertSubcategories(
+                AdventureScannerTaxonomy.Instance,
+                "special_sites",
+                "all", "beacons", "objectives", "artifact_markets", "teleport");
             AssertSubcategories(AdventureScannerTaxonomy.Instance, "wielders", "all");
             AssertSubcategories(
                 AdventureScannerTaxonomy.Instance,
@@ -62,23 +61,22 @@ namespace SongsOfConquestAccess.Tests
                 AdventureScannerTaxonomy.Instance,
                 "buildings",
                 "all", "neutral", "friendly", "enemy");
-            AssertSubcategories(AdventureScannerTaxonomy.Instance, "objectives", "all");
             AssertSubcategories(AdventureScannerTaxonomy.Instance, "obstacles", "all");
-            AssertSubcategories(AdventureScannerTaxonomy.Instance, "artifact_markets", "all");
-            AssertSubcategories(AdventureScannerTaxonomy.Instance, "teleport", "all");
             AssertSubcategories(
                 AdventureScannerTaxonomy.Instance,
                 "terrain",
                 "roads_and_crossings", "open_ground", "barriers");
-            AssertSubcategories(AdventureScannerTaxonomy.Instance, "unexplored", "all");
-            AssertSubcategories(AdventureScannerTaxonomy.Instance, "revealed", "all");
+            AssertSubcategories(
+                AdventureScannerTaxonomy.Instance,
+                "exploration",
+                "unexplored", "revealed");
         }
 
         [TestMethod]
         public void BattleTaxonomyDeclaresExpectedCategoryOrder()
         {
             CollectionAssert.AreEqual(
-                new[] { "troops", "spawn_points", "entities", "terrain", "obstacles" },
+                new[] { "troops", "spawn_points", "entities", "terrain" },
                 CategoryKeys(BattleScannerTaxonomy.Instance));
         }
 
@@ -92,27 +90,49 @@ namespace SongsOfConquestAccess.Tests
                 "entities",
                 "all", "friendly_gates", "enemy_gates", "attackable", "dangerous");
             AssertSubcategories(BattleScannerTaxonomy.Instance, "terrain", "all");
-            AssertSubcategories(BattleScannerTaxonomy.Instance, "obstacles", "all");
         }
 
         [TestMethod]
         public void OnlyRevealedPreservesResultOrder()
         {
             List<string> preserved = new List<string>();
-            AddPreservedCategoryKeys(AdventureScannerTaxonomy.Instance, preserved);
-            AddPreservedCategoryKeys(BattleScannerTaxonomy.Instance, preserved);
+            AddSubcategoryKeysWhere(AdventureScannerTaxonomy.Instance, preserved, s => s.PreserveResultOrder);
+            AddSubcategoryKeysWhere(BattleScannerTaxonomy.Instance, preserved, s => s.PreserveResultOrder);
 
-            CollectionAssert.AreEqual(new[] { "revealed" }, preserved);
+            CollectionAssert.AreEqual(new[] { "exploration/revealed" }, preserved);
         }
 
         [TestMethod]
         public void OnlyRevealedKeepsResultsUngrouped()
         {
             List<string> flat = new List<string>();
-            AddFlatItemCategoryKeys(AdventureScannerTaxonomy.Instance, flat);
-            AddFlatItemCategoryKeys(BattleScannerTaxonomy.Instance, flat);
+            AddSubcategoryKeysWhere(AdventureScannerTaxonomy.Instance, flat, s => s.FlatItems);
+            AddSubcategoryKeysWhere(BattleScannerTaxonomy.Instance, flat, s => s.FlatItems);
 
-            CollectionAssert.AreEqual(new[] { "revealed" }, flat);
+            CollectionAssert.AreEqual(new[] { "exploration/revealed" }, flat);
+        }
+
+        /// <summary>
+        /// The flags ride on the subcategory rather than the category, so a
+        /// category can hold one scope whose order is the information beside
+        /// others that sort by distance like everything else.
+        /// </summary>
+        [TestMethod]
+        public void InitializedSnapshotCopiesSubcategoryOrderingFlags()
+        {
+            ScannerSnapshot snapshot = new ScannerSnapshot(AdventureScannerTaxonomy.Instance);
+
+            ScannerSubcategory revealed = snapshot
+                .GetOrAddCategory(ScannerCategoryKeys.Exploration)
+                .GetOrAddSubcategory(ScannerSubcategoryKeys.Revealed);
+            ScannerSubcategory unexplored = snapshot
+                .GetOrAddCategory(ScannerCategoryKeys.Exploration)
+                .GetOrAddSubcategory(ScannerSubcategoryKeys.Unexplored);
+
+            Assert.IsTrue(revealed.PreserveResultOrder);
+            Assert.IsTrue(revealed.FlatItems);
+            Assert.IsFalse(unexplored.PreserveResultOrder);
+            Assert.IsFalse(unexplored.FlatItems);
         }
 
         [TestMethod]
@@ -128,21 +148,6 @@ namespace SongsOfConquestAccess.Tests
 
             CollectionAssert.AreEqual(CategoryKeys(AdventureScannerTaxonomy.Instance), categories);
             Assert.IsTrue(snapshot.IsEmpty);
-        }
-
-        [TestMethod]
-        public void InitializedSnapshotCopiesPreservedResultOrder()
-        {
-            ScannerSnapshot snapshot = new ScannerSnapshot(AdventureScannerTaxonomy.Instance);
-
-            for (int i = 0; i < snapshot.Categories.Count; i++)
-            {
-                ScannerCategory category = snapshot.Categories[i];
-                Assert.AreEqual(
-                    category.Key == ScannerCategoryKeys.Revealed,
-                    category.PreserveResultOrder,
-                    category.Key);
-            }
         }
 
         private static void AssertSubcategories(ScannerTaxonomy taxonomy, string categoryKey, params string[] expected)
@@ -170,24 +175,22 @@ namespace SongsOfConquestAccess.Tests
             return keys;
         }
 
-        private static void AddFlatItemCategoryKeys(ScannerTaxonomy taxonomy, List<string> keys)
+        private static void AddSubcategoryKeysWhere(
+            ScannerTaxonomy taxonomy,
+            List<string> keys,
+            System.Func<ScannerSubcategoryDefinition, bool> predicate)
         {
             for (int i = 0; i < taxonomy.Categories.Count; i++)
             {
-                if (taxonomy.Categories[i].FlatItems && !keys.Contains(taxonomy.Categories[i].Key))
+                ScannerCategoryDefinition category = taxonomy.Categories[i];
+                for (int j = 0; j < category.Subcategories.Count; j++)
                 {
-                    keys.Add(taxonomy.Categories[i].Key);
-                }
-            }
-        }
-
-        private static void AddPreservedCategoryKeys(ScannerTaxonomy taxonomy, List<string> keys)
-        {
-            for (int i = 0; i < taxonomy.Categories.Count; i++)
-            {
-                if (taxonomy.Categories[i].PreserveResultOrder && !keys.Contains(taxonomy.Categories[i].Key))
-                {
-                    keys.Add(taxonomy.Categories[i].Key);
+                    ScannerSubcategoryDefinition subcategory = category.Subcategories[j];
+                    string key = category.Key + "/" + subcategory.Key;
+                    if (predicate(subcategory) && !keys.Contains(key))
+                    {
+                        keys.Add(key);
+                    }
                 }
             }
         }
