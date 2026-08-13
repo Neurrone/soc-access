@@ -1,0 +1,102 @@
+using System;
+using System.Collections.Generic;
+using SongsOfConquestAccess.Localization;
+using SongsOfConquestAccess.Scanner;
+
+namespace SongsOfConquestAccess.Speech.Spatial
+{
+    /// <summary>
+    /// Describes the thing a scanner result points at: what it is called, whose
+    /// it is, and what state it is in. Everything else about the tile it happens
+    /// to stand on belongs to the cursor announcement, not to the scanner.
+    /// </summary>
+    internal static class ScannerResultContentFormatter
+    {
+        public static string Describe(AnnouncementGroupDefinition group, ScannerResult result)
+        {
+            return Describe(
+                group,
+                result,
+                ModSettings.GetAnnouncementOrder,
+                ModSettings.GetAnnouncementElementEnabled,
+                ModSettings.GetAnnouncementElementSuffix);
+        }
+
+        internal static string Describe(
+            AnnouncementGroupDefinition group,
+            ScannerResult result,
+            Func<AnnouncementGroupDefinition, IReadOnlyList<string>> getOrder,
+            Func<AnnouncementGroupDefinition, AnnouncementElementDefinition, bool> isEnabled,
+            Func<AnnouncementGroupDefinition, AnnouncementElementDefinition, bool> includeSuffix)
+        {
+            if (result == null)
+            {
+                return string.Empty;
+            }
+
+            return ConfigurableAnnouncementComposer.Compose(
+                group,
+                BuildParts(result),
+                getOrder,
+                isEnabled,
+                includeSuffix);
+        }
+
+        private static IEnumerable<AnnouncementPart> BuildParts(ScannerResult result)
+        {
+            if (!string.IsNullOrWhiteSpace(result.Label))
+            {
+                yield return new AnnouncementPart(
+                    ScannerAnnouncementDefinitions.ContentKeys.Name,
+                    result.Label);
+            }
+
+            string owner = DescribeOwner(result);
+            if (!string.IsNullOrWhiteSpace(owner))
+            {
+                yield return new AnnouncementPart(
+                    ScannerAnnouncementDefinitions.ContentKeys.Owner,
+                    owner);
+            }
+
+            string status = DescribeStatus(result);
+            if (!string.IsNullOrWhiteSpace(status))
+            {
+                yield return new AnnouncementPart(
+                    ScannerAnnouncementDefinitions.ContentKeys.Status,
+                    status);
+            }
+        }
+
+        private static string DescribeOwner(ScannerResult result)
+        {
+            switch (result.Relationship)
+            {
+                case ScannerResultRelationship.Neutral:
+                    return ModText.Get(ModStrings.Scanner.Neutral);
+                case ScannerResultRelationship.Friendly:
+                    return ModText.Get(ModStrings.Scanner.Friendly);
+                case ScannerResultRelationship.Enemy:
+                    return ModText.Get(ModStrings.Scanner.Enemy);
+                default:
+                    return string.Empty;
+            }
+        }
+
+        private static string DescribeStatus(ScannerResult result)
+        {
+            List<string> parts = new List<string>();
+            if (result.Unvisited)
+            {
+                parts.Add(ModText.Get(ModStrings.Scanner.Unvisited));
+            }
+
+            if (result.NotVisible)
+            {
+                parts.Add(ModText.Get(ModStrings.Spatial.Unseen));
+            }
+
+            return parts.Count == 0 ? string.Empty : ModText.JoinListWithCommas(parts);
+        }
+    }
+}

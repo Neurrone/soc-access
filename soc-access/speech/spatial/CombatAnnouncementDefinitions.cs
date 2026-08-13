@@ -42,12 +42,10 @@ namespace SongsOfConquestAccess.Speech.Spatial
             "combat_scanner_content",
             "Combat Scanner Content Announcements",
             ModStrings.Screens.ScannerContentAnnouncements,
-            new AnnouncementElementDefinition(TileKeys.Reachable, ModStrings.Screens.AnnouncementReachable),
-            new AnnouncementElementDefinition(TileKeys.Occupant, ModStrings.Screens.AnnouncementOccupant),
-            new AnnouncementElementDefinition(TileKeys.ImpassableOrBlocked, ModStrings.Screens.AnnouncementImpassableOrBlocked),
-            new AnnouncementElementDefinition(TileKeys.TileEffects, ModStrings.Screens.AnnouncementTileEffects),
-            new AnnouncementElementDefinition(TileKeys.Elevation, ModStrings.Screens.AnnouncementElevation),
-            new AnnouncementElementDefinition(TileKeys.DecorativeFeatures, ModStrings.Screens.AnnouncementDecorativeFeatures));
+            new AnnouncementElementDefinition(ScannerAnnouncementDefinitions.ContentKeys.Name, ModStrings.Screens.AnnouncementName),
+            new AnnouncementElementDefinition(ScannerAnnouncementDefinitions.ContentKeys.Owner, ModStrings.Screens.AnnouncementOwner),
+            new AnnouncementElementDefinition(ScannerAnnouncementDefinitions.ContentKeys.Status, ModStrings.Screens.AnnouncementStatus, defaultSuffix: false))
+            .WithVersion(2);
 
         public static readonly AnnouncementGroupDefinition[] All =
         {

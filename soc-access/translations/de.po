@@ -3236,6 +3236,11 @@ msgctxt "Screens.AnnouncementSelectedForSpellcast"
 msgid "Selected for spellcast"
 msgstr "Für Zauber ausgewählt"
 
+#. Screens.AnnouncementStatus
+msgctxt "Screens.AnnouncementStatus"
+msgid "Status"
+msgstr "Status"
+
 #. Screens.AnnouncementStackSize
 msgctxt "Screens.AnnouncementStackSize"
 msgid "Stack size"
@@ -3250,6 +3255,11 @@ msgstr "Feldeffekte"
 msgctxt "Screens.AnnouncementTroopName"
 msgid "Troop name"
 msgstr "Truppenname"
+
+#. Screens.AnnouncementOwner
+msgctxt "Screens.AnnouncementOwner"
+msgid "Owner"
+msgstr "Besitzer"
 
 #. Screens.AnnouncementOrderRow
 msgctxt "Screens.AnnouncementOrderRow"
@@ -3351,11 +3361,6 @@ msgstr "Ziel"
 msgctxt "Screens.AnnouncementExplorationState"
 msgid "Exploration state"
 msgstr "Erkundungsstatus"
-
-#. Screens.AnnouncementGroupResult
-msgctxt "Screens.AnnouncementGroupResult"
-msgid "Group result"
-msgstr "Gruppenergebnis"
 
 #. Screens.AnnouncementInteractionPoint
 msgctxt "Screens.AnnouncementInteractionPoint"

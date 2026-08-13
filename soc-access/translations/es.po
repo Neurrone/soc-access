@@ -3236,6 +3236,11 @@ msgctxt "Screens.AnnouncementSelectedForSpellcast"
 msgid "Selected for spellcast"
 msgstr "Seleccionado para lanzar hechizo"
 
+#. Screens.AnnouncementStatus
+msgctxt "Screens.AnnouncementStatus"
+msgid "Status"
+msgstr "Estado"
+
 #. Screens.AnnouncementStackSize
 msgctxt "Screens.AnnouncementStackSize"
 msgid "Stack size"
@@ -3250,6 +3255,11 @@ msgstr "Efectos de casilla"
 msgctxt "Screens.AnnouncementTroopName"
 msgid "Troop name"
 msgstr "Nombre de tropa"
+
+#. Screens.AnnouncementOwner
+msgctxt "Screens.AnnouncementOwner"
+msgid "Owner"
+msgstr "Propietario"
 
 #. Screens.AnnouncementOrderRow
 msgctxt "Screens.AnnouncementOrderRow"
@@ -3351,11 +3361,6 @@ msgstr "Destino"
 msgctxt "Screens.AnnouncementExplorationState"
 msgid "Exploration state"
 msgstr "Estado de exploración"
-
-#. Screens.AnnouncementGroupResult
-msgctxt "Screens.AnnouncementGroupResult"
-msgid "Group result"
-msgstr "Resultado de grupo"
 
 #. Screens.AnnouncementInteractionPoint
 msgctxt "Screens.AnnouncementInteractionPoint"

@@ -422,6 +422,11 @@ namespace SongsOfConquestAccess
             {
                 AnnouncementGroupDefinition group = groups[i];
                 AnnouncementGroupConfig groupConfig = new AnnouncementGroupConfig();
+                groupConfig.Version = config.Bind(
+                    group.ConfigSection,
+                    "Version",
+                    group.Version,
+                    "Layout version of this announcement group. Saved settings are reset when it changes.");
                 groupConfig.Order = config.Bind(
                     group.ConfigSection,
                     "Order",
@@ -448,7 +453,52 @@ namespace SongsOfConquestAccess
                 }
 
                 _announcementGroups[group.Key] = groupConfig;
+                DiscardOutdatedAnnouncementSettings(group, groupConfig);
             }
+        }
+
+        /// <summary>
+        /// A group whose element set has been redesigned cannot honour the old
+        /// saved settings: every stored key is retired, so the saved order would
+        /// contribute nothing and the player would be left with whatever the
+        /// merge happened to produce. Throw the saved values away and re-stamp
+        /// the version instead.
+        /// </summary>
+        private static void DiscardOutdatedAnnouncementSettings(
+            AnnouncementGroupDefinition group,
+            AnnouncementGroupConfig groupConfig)
+        {
+            if (groupConfig.Version == null || groupConfig.Version.Value == group.Version)
+            {
+                return;
+            }
+
+            if (groupConfig.Order != null)
+            {
+                groupConfig.Order.Value = group.DefaultOrderCsv;
+            }
+
+            for (int i = 0; i < group.Elements.Count; i++)
+            {
+                AnnouncementElementDefinition element = group.Elements[i];
+                AnnouncementElementConfig elementConfig;
+                if (!groupConfig.Elements.TryGetValue(element.Key, out elementConfig))
+                {
+                    continue;
+                }
+
+                if (elementConfig.Enabled != null)
+                {
+                    elementConfig.Enabled.Value = element.DefaultEnabled;
+                }
+
+                if (elementConfig.Suffix != null)
+                {
+                    elementConfig.Suffix.Value = element.DefaultSuffix;
+                }
+            }
+
+            groupConfig.Version.Value = group.Version;
         }
 
         private static AnnouncementGroupConfig GetAnnouncementConfig(AnnouncementGroupDefinition group)
@@ -540,13 +590,8 @@ namespace SongsOfConquestAccess
 
         private static bool ShouldAppendMissingAnnouncementElement(AnnouncementGroupDefinition group, string key)
         {
-            if (group == null || key != Speech.Spatial.AdventureMapAnnouncementDefinitions.TileKeys.MovementCost)
-            {
-                return false;
-            }
-
             return group == Speech.Spatial.AdventureMapAnnouncementDefinitions.Tile
-                || group == Speech.Spatial.AdventureMapAnnouncementDefinitions.ScannerContent;
+                && key == Speech.Spatial.AdventureMapAnnouncementDefinitions.TileKeys.MovementCost;
         }
 
         private static string ToConfigKeyPrefix(string key)
@@ -573,6 +618,7 @@ namespace SongsOfConquestAccess
 
         private sealed class AnnouncementGroupConfig
         {
+            public ConfigEntry<int> Version { get; set; }
             public ConfigEntry<string> Order { get; set; }
             public Dictionary<string, AnnouncementElementConfig> Elements { get; private set; } =
                 new Dictionary<string, AnnouncementElementConfig>();

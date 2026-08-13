@@ -256,7 +256,12 @@ namespace SongsOfConquestAccess.Adapters
                     ScannerResult result = new ScannerResult(
                         ScannerTileKey(own ? "troop:friendly" : "troop:enemy", tile.Point),
                         string.IsNullOrWhiteSpace(tile.TroopLabel) ? ModText.Get(ModStrings.Combat.UnknownTroop) : tile.TroopLabel,
-                        tile.Point);
+                        tile.Point)
+                    {
+                        Relationship = own
+                            ? ScannerResultRelationship.Friendly
+                            : ScannerResultRelationship.Enemy
+                    };
                     snapshot.Add(
                         ScannerCategoryKeys.Troops,
                         ScannerSubcategoryKeys.All,
@@ -278,7 +283,12 @@ namespace SongsOfConquestAccess.Adapters
                     ScannerResult result = new ScannerResult(
                         ScannerTileKey(own ? "spawn:friendly" : "spawn:enemy", tile.Point),
                         ModText.Get(ModStrings.Spatial.SpawnPoint),
-                        tile.Point);
+                        tile.Point)
+                    {
+                        Relationship = own
+                            ? ScannerResultRelationship.Friendly
+                            : ScannerResultRelationship.Enemy
+                    };
                     snapshot.Add(
                         ScannerCategoryKeys.SpawnPoints,
                         ScannerSubcategoryKeys.All,
@@ -314,6 +324,8 @@ namespace SongsOfConquestAccess.Adapters
             ScannerResult clone = new ScannerResult(result.Key, result.Label, result.Position)
             {
                 NotVisible = result.NotVisible,
+                Unvisited = result.Unvisited,
+                Relationship = result.Relationship,
                 StableReference = result.StableReference,
                 Kind = result.Kind
             };

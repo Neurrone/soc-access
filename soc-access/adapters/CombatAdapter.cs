@@ -493,7 +493,12 @@ namespace SongsOfConquestAccess.Adapters
                         ScannerResult result = new ScannerResult(
                             ScannerTileKey(friendly ? "troop:friendly" : "troop:enemy", point),
                             FormatTroopGridLabel(tile.Troop),
-                            point);
+                            point)
+                        {
+                            Relationship = friendly
+                                ? ScannerResultRelationship.Friendly
+                                : ScannerResultRelationship.Enemy
+                        };
                         snapshot.Add(ScannerCategoryKeys.Troops, ScannerSubcategoryKeys.All, CloneResult(result));
                         snapshot.Add(ScannerCategoryKeys.Troops, friendly ? ScannerSubcategoryKeys.Friendly : ScannerSubcategoryKeys.Enemy, result);
                     }
@@ -519,12 +524,18 @@ namespace SongsOfConquestAccess.Adapters
                     {
                         if (mapEntity.Category == MapEntityCategory.TownWallGate)
                         {
+                            bool friendlyGate = IsFriendlyMapEntity(mapEntity);
                             ScannerResult result = new ScannerResult(
-                                ScannerTileKey(IsFriendlyMapEntity(mapEntity) ? "gate:friendly" : "gate:enemy", point),
+                                ScannerTileKey(friendlyGate ? "gate:friendly" : "gate:enemy", point),
                                 GetMapEntityName(mapEntity),
-                                point);
+                                point)
+                            {
+                                Relationship = friendlyGate
+                                    ? ScannerResultRelationship.Friendly
+                                    : ScannerResultRelationship.Enemy
+                            };
                             snapshot.Add(ScannerCategoryKeys.Entities, ScannerSubcategoryKeys.All, CloneResult(result));
-                            snapshot.Add(ScannerCategoryKeys.Entities, IsFriendlyMapEntity(mapEntity) ? ScannerSubcategoryKeys.FriendlyGates : ScannerSubcategoryKeys.EnemyGates, result);
+                            snapshot.Add(ScannerCategoryKeys.Entities, friendlyGate ? ScannerSubcategoryKeys.FriendlyGates : ScannerSubcategoryKeys.EnemyGates, result);
                         }
                         else if (tile.Entity != null)
                         {
@@ -634,6 +645,8 @@ namespace SongsOfConquestAccess.Adapters
             ScannerResult clone = new ScannerResult(result.Key, result.Label, result.Position)
             {
                 NotVisible = result.NotVisible,
+                Unvisited = result.Unvisited,
+                Relationship = result.Relationship,
                 StableReference = result.StableReference,
                 Kind = result.Kind
             };

@@ -1,4 +1,4 @@
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using SongsOfConquestAccess.Speech.Spatial;
 
@@ -26,31 +26,6 @@ namespace SongsOfConquestAccess.Tests
 
             IReadOnlyList<string> order = ModSettings.MergeAnnouncementOrder(
                 AdventureMapAnnouncementDefinitions.Tile,
-                savedOrder);
-
-            Assert.AreEqual(AdventureMapAnnouncementDefinitions.TileKeys.Terrain, order[order.Count - 2]);
-            Assert.AreEqual(AdventureMapAnnouncementDefinitions.TileKeys.MovementCost, order[order.Count - 1]);
-        }
-
-        [TestMethod]
-        public void MergeAnnouncementOrderAppendsMovementCostAfterCustomizedAdventureScannerContentOrder()
-        {
-            string savedOrder = string.Join(
-                ",",
-                new[]
-                {
-                    AdventureMapAnnouncementDefinitions.TileKeys.GroupResult,
-                    AdventureMapAnnouncementDefinitions.TileKeys.ExplorationState,
-                    AdventureMapAnnouncementDefinitions.TileKeys.Wielder,
-                    AdventureMapAnnouncementDefinitions.TileKeys.MapEntity,
-                    AdventureMapAnnouncementDefinitions.TileKeys.InteractionPoint,
-                    AdventureMapAnnouncementDefinitions.TileKeys.ReachabilityOrRoutePreview,
-                    AdventureMapAnnouncementDefinitions.TileKeys.ZoneOfControl,
-                    AdventureMapAnnouncementDefinitions.TileKeys.Terrain
-                });
-
-            IReadOnlyList<string> order = ModSettings.MergeAnnouncementOrder(
-                AdventureMapAnnouncementDefinitions.ScannerContent,
                 savedOrder);
 
             Assert.AreEqual(AdventureMapAnnouncementDefinitions.TileKeys.Terrain, order[order.Count - 2]);

@@ -3116,6 +3116,11 @@ msgctxt "Screens.AnnouncementSelectedForSpellcast"
 msgid "Selected for spellcast"
 msgstr "呪文詠唱用に選択済み"
 
+#. Screens.AnnouncementStatus
+msgctxt "Screens.AnnouncementStatus"
+msgid "Status"
+msgstr "状態"
+
 #. Screens.AnnouncementStackSize
 msgctxt "Screens.AnnouncementStackSize"
 msgid "Stack size"
@@ -3130,6 +3135,11 @@ msgstr "タイル効果"
 msgctxt "Screens.AnnouncementTroopName"
 msgid "Troop name"
 msgstr "部隊名"
+
+#. Screens.AnnouncementOwner
+msgctxt "Screens.AnnouncementOwner"
+msgid "Owner"
+msgstr "所有者"
 
 #. Screens.AnnouncementOrderRow
 msgctxt "Screens.AnnouncementOrderRow"
@@ -3231,11 +3241,6 @@ msgstr "目的地"
 msgctxt "Screens.AnnouncementExplorationState"
 msgid "Exploration state"
 msgstr "探索状態"
-
-#. Screens.AnnouncementGroupResult
-msgctxt "Screens.AnnouncementGroupResult"
-msgid "Group result"
-msgstr "グループ結果"
 
 #. Screens.AnnouncementInteractionPoint
 msgctxt "Screens.AnnouncementInteractionPoint"

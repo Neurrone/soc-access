@@ -1,4 +1,4 @@
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using SongsOfConquestAccess.Speech.Spatial;
 
@@ -21,22 +21,6 @@ namespace SongsOfConquestAccess.Tests
                 });
 
             Assert.AreEqual("20 Militia, spawn point, 2 northeast, 3, 4, 1 of 5", text);
-        }
-
-        [TestMethod]
-        public void TroopDeploymentScannerContentGroupOmitsCoordinates()
-        {
-            string text = ComposeWithDefaults(
-                TroopDeploymentAnnouncementDefinitions.ScannerContent,
-                new[]
-                {
-                    new AnnouncementPart(TroopDeploymentAnnouncementDefinitions.TileKeys.Troop, "20 Militia"),
-                    new AnnouncementPart(TroopDeploymentAnnouncementDefinitions.TileKeys.SpawnPoint, "spawn point"),
-                    new AnnouncementPart(TroopDeploymentAnnouncementDefinitions.TileKeys.Elevation, "elevated ground, height 1"),
-                    new AnnouncementPart(TroopDeploymentAnnouncementDefinitions.TileKeys.Coordinates, "3, 4")
-                });
-
-            Assert.AreEqual("20 Militia, spawn point, elevated ground, height 1", text);
         }
 
         private static string ComposeWithDefaults(AnnouncementGroupDefinition group, IEnumerable<AnnouncementPart> parts)

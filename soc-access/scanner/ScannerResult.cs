@@ -15,6 +15,19 @@ namespace SongsOfConquestAccess.Scanner
         CommanderZoneOfControl
     }
 
+    /// <summary>
+    /// How the thing stands towards the local player, where that is a fact the
+    /// game knows. <see cref="None"/> covers results that have no owner at all,
+    /// such as terrain.
+    /// </summary>
+    internal enum ScannerResultRelationship
+    {
+        None,
+        Neutral,
+        Friendly,
+        Enemy
+    }
+
     internal sealed class ScannerResult
     {
         public ScannerResult(string key, string label, Vector2Int position)
@@ -37,6 +50,10 @@ namespace SongsOfConquestAccess.Scanner
         public Vector2Int Position { get; private set; }
 
         public bool NotVisible { get; set; }
+
+        public bool Unvisited { get; set; }
+
+        public ScannerResultRelationship Relationship { get; set; }
 
         public ScannerResultKind Kind { get; set; }
 

@@ -2809,11 +2809,6 @@ msgctxt "Screens.AnnouncementFacingDirectionForBeamAttacks"
 msgid "Facing direction for troops with beam attacks"
 msgstr ""
 
-#. Screens.AnnouncementGroupResult
-msgctxt "Screens.AnnouncementGroupResult"
-msgid "Group result"
-msgstr ""
-
 #. Screens.AnnouncementHealth
 msgctxt "Screens.AnnouncementHealth"
 msgid "Health"
@@ -2864,6 +2859,11 @@ msgctxt "Screens.AnnouncementOccupant"
 msgid "Occupant"
 msgstr ""
 
+#. Screens.AnnouncementOwner
+msgctxt "Screens.AnnouncementOwner"
+msgid "Owner"
+msgstr ""
+
 #. Screens.AnnouncementOrderRow
 msgctxt "Screens.AnnouncementOrderRow"
 msgid "{0} horizontal row"
@@ -2902,6 +2902,11 @@ msgstr ""
 #. Screens.AnnouncementSpawnPoint
 msgctxt "Screens.AnnouncementSpawnPoint"
 msgid "Spawn point"
+msgstr ""
+
+#. Screens.AnnouncementStatus
+msgctxt "Screens.AnnouncementStatus"
+msgid "Status"
 msgstr ""
 
 #. Screens.AnnouncementStackSize

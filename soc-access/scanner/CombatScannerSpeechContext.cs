@@ -33,18 +33,10 @@ namespace SongsOfConquestAccess.Scanner
         public SpeechRequest ToSpeechRequest()
         {
             CombatTileSpeechFormatter formatter = new CombatTileSpeechFormatter(_adapter, null, includeEnemyInfluence: false);
-            string content;
-            if (_result != null && _result.Kind == ScannerResultKind.TerrainGroup)
-            {
-                content = _result.Label;
-            }
-            else
-            {
-                content = formatter.DescribeScannerContent(_tile);
-            }
-
             string text = ScannerResultSpeechFormatter.Compose(
-                content,
+                ScannerResultContentFormatter.Describe(
+                    CombatAnnouncementDefinitions.ScannerContent,
+                    _result),
                 ScannerSpeechUtility.FormatDirections(_directions),
                 formatter.DescribeCoordinates(_tile),
                 ScannerSpeechUtility.FormatResultCount(_resultIndex, _resultCount));

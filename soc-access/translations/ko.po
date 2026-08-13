@@ -3116,6 +3116,11 @@ msgctxt "Screens.AnnouncementSelectedForSpellcast"
 msgid "Selected for spellcast"
 msgstr "주문 시전용으로 선택됨"
 
+#. Screens.AnnouncementStatus
+msgctxt "Screens.AnnouncementStatus"
+msgid "Status"
+msgstr "상태"
+
 #. Screens.AnnouncementStackSize
 msgctxt "Screens.AnnouncementStackSize"
 msgid "Stack size"
@@ -3130,6 +3135,11 @@ msgstr "타일 효과"
 msgctxt "Screens.AnnouncementTroopName"
 msgid "Troop name"
 msgstr "부대 이름"
+
+#. Screens.AnnouncementOwner
+msgctxt "Screens.AnnouncementOwner"
+msgid "Owner"
+msgstr "소유자"
 
 #. Screens.AnnouncementOrderRow
 msgctxt "Screens.AnnouncementOrderRow"
@@ -3231,11 +3241,6 @@ msgstr "목적지"
 msgctxt "Screens.AnnouncementExplorationState"
 msgid "Exploration state"
 msgstr "탐험 상태"
-
-#. Screens.AnnouncementGroupResult
-msgctxt "Screens.AnnouncementGroupResult"
-msgid "Group result"
-msgstr "그룹 결과"
 
 #. Screens.AnnouncementInteractionPoint
 msgctxt "Screens.AnnouncementInteractionPoint"

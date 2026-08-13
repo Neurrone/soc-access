@@ -3356,6 +3356,11 @@ msgctxt "Screens.AnnouncementSelectedForSpellcast"
 msgid "Selected for spellcast"
 msgstr "Вибрано для заклинання"
 
+#. Screens.AnnouncementStatus
+msgctxt "Screens.AnnouncementStatus"
+msgid "Status"
+msgstr "Стан"
+
 #. Screens.AnnouncementStackSize
 msgctxt "Screens.AnnouncementStackSize"
 msgid "Stack size"
@@ -3370,6 +3375,11 @@ msgstr "Ефекти клітинки"
 msgctxt "Screens.AnnouncementTroopName"
 msgid "Troop name"
 msgstr "Назва загону"
+
+#. Screens.AnnouncementOwner
+msgctxt "Screens.AnnouncementOwner"
+msgid "Owner"
+msgstr "Власник"
 
 #. Screens.AnnouncementOrderRow
 msgctxt "Screens.AnnouncementOrderRow"
@@ -3471,11 +3481,6 @@ msgstr "Пункт призначення"
 msgctxt "Screens.AnnouncementExplorationState"
 msgid "Exploration state"
 msgstr "Стан розвідки"
-
-#. Screens.AnnouncementGroupResult
-msgctxt "Screens.AnnouncementGroupResult"
-msgid "Group result"
-msgstr "Результат групи"
 
 #. Screens.AnnouncementInteractionPoint
 msgctxt "Screens.AnnouncementInteractionPoint"

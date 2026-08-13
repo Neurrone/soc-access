@@ -3356,6 +3356,11 @@ msgctxt "Screens.AnnouncementSelectedForSpellcast"
 msgid "Selected for spellcast"
 msgstr "Wybrane do rzucenia zaklęcia"
 
+#. Screens.AnnouncementStatus
+msgctxt "Screens.AnnouncementStatus"
+msgid "Status"
+msgstr "Stan"
+
 #. Screens.AnnouncementStackSize
 msgctxt "Screens.AnnouncementStackSize"
 msgid "Stack size"
@@ -3370,6 +3375,11 @@ msgstr "Efekty pola"
 msgctxt "Screens.AnnouncementTroopName"
 msgid "Troop name"
 msgstr "Nazwa oddziału"
+
+#. Screens.AnnouncementOwner
+msgctxt "Screens.AnnouncementOwner"
+msgid "Owner"
+msgstr "Właściciel"
 
 #. Screens.AnnouncementOrderRow
 msgctxt "Screens.AnnouncementOrderRow"
@@ -3471,11 +3481,6 @@ msgstr "Cel"
 msgctxt "Screens.AnnouncementExplorationState"
 msgid "Exploration state"
 msgstr "Stan odkrycia"
-
-#. Screens.AnnouncementGroupResult
-msgctxt "Screens.AnnouncementGroupResult"
-msgid "Group result"
-msgstr "Wynik grupy"
 
 #. Screens.AnnouncementInteractionPoint
 msgctxt "Screens.AnnouncementInteractionPoint"

@@ -40,16 +40,8 @@ namespace SongsOfConquestAccess.Speech.Spatial
 
             string text = Compose(
                 AdventureMapAnnouncementDefinitions.Tile,
-                BuildTileParts(tile, groupResult: null, includeCoordinates: true, appendRouteToTerrainWhenNoContent: true));
+                BuildTileParts(tile, includeCoordinates: true, appendRouteToTerrainWhenNoContent: true));
             return string.IsNullOrWhiteSpace(text) ? string.Empty : text + ".";
-        }
-
-        public string DescribeScannerContent(ScannerResult result, AdventureMapTile tile)
-        {
-            string groupResult = IsGroupResult(result) ? result.Label : null;
-            return Compose(
-                AdventureMapAnnouncementDefinitions.ScannerContent,
-                BuildTileParts(tile, groupResult, includeCoordinates: false, appendRouteToTerrainWhenNoContent: false));
         }
 
         private string DescribeWielder(AdventureMapTile tile)
@@ -101,16 +93,9 @@ namespace SongsOfConquestAccess.Speech.Spatial
 
         private IEnumerable<AnnouncementPart> BuildTileParts(
             AdventureMapTile tile,
-            string groupResult,
             bool includeCoordinates,
             bool appendRouteToTerrainWhenNoContent)
         {
-            if (!string.IsNullOrWhiteSpace(groupResult))
-            {
-                yield return new AnnouncementPart(AdventureMapAnnouncementDefinitions.TileKeys.GroupResult, groupResult);
-                yield break;
-            }
-
             if (tile == null)
             {
                 yield break;
@@ -249,15 +234,6 @@ namespace SongsOfConquestAccess.Speech.Spatial
                     AdventureMapAnnouncementDefinitions.MapEntityKeys.Affiliation,
                     tile.MapEntityRelationship);
             }
-        }
-
-        private static bool IsGroupResult(ScannerResult result)
-        {
-            return result != null
-                && (result.Kind == ScannerResultKind.TerrainGroup
-                    || result.Kind == ScannerResultKind.AreaGroup
-                    || result.Kind == ScannerResultKind.UnexploredGroup
-                    || result.Kind == ScannerResultKind.CommanderZoneOfControl);
         }
 
         private static string DescribeExplorationState(AdventureMapTile tile)

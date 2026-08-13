@@ -1,4 +1,4 @@
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using SongsOfConquest.Common.Entities.Adventure;
 using SongsOfConquestAccess.Adapters;
 using SongsOfConquestAccess.Localization;
@@ -23,19 +23,7 @@ namespace SongsOfConquestAccess.Speech.Spatial
 
             return ConfigurableAnnouncementComposer.Compose(
                 TroopDeploymentAnnouncementDefinitions.Tile,
-                BuildTileParts(tile, includeCoordinates: true));
-        }
-
-        public string DescribeScannerContent(TroopPlacementTile tile)
-        {
-            if (tile == null)
-            {
-                return string.Empty;
-            }
-
-            return ConfigurableAnnouncementComposer.Compose(
-                TroopDeploymentAnnouncementDefinitions.ScannerContent,
-                BuildTileParts(tile, includeCoordinates: false));
+                BuildTileParts(tile));
         }
 
         public string DescribeCoordinates(TroopPlacementTile tile)
@@ -43,7 +31,7 @@ namespace SongsOfConquestAccess.Speech.Spatial
             return tile == null ? string.Empty : HexCoordinateFormatter.Format(tile.Point);
         }
 
-        private IEnumerable<AnnouncementPart> BuildTileParts(TroopPlacementTile tile, bool includeCoordinates)
+        private IEnumerable<AnnouncementPart> BuildTileParts(TroopPlacementTile tile)
         {
             if (!string.IsNullOrWhiteSpace(tile.TroopLabel))
             {
@@ -74,12 +62,9 @@ namespace SongsOfConquestAccess.Speech.Spatial
                     ModText.Get(ModStrings.Spatial.ElevatedGroundHeight, tile.Elevation));
             }
 
-            if (includeCoordinates)
-            {
-                yield return new AnnouncementPart(
-                    TroopDeploymentAnnouncementDefinitions.TileKeys.Coordinates,
-                    DescribeCoordinates(tile));
-            }
+            yield return new AnnouncementPart(
+                TroopDeploymentAnnouncementDefinitions.TileKeys.Coordinates,
+                DescribeCoordinates(tile));
         }
 
         private string DescribeSpawnPoint(TroopPlacementTile tile)

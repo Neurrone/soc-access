@@ -25,5 +25,18 @@ namespace SongsOfConquestAccess.Speech.Spatial
             public const string Coordinates = "coordinates";
             public const string ResultPosition = "result_position";
         }
+
+        /// <summary>
+        /// The parts of the scanned thing itself. Shared by the adventure map,
+        /// combat and troop deployment content groups, which describe the same
+        /// three facts and only differ in what the player is allowed to reorder
+        /// per screen.
+        /// </summary>
+        public static class ContentKeys
+        {
+            public const string Name = "name";
+            public const string Owner = "owner";
+            public const string Status = "status";
+        }
     }
 }

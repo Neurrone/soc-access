@@ -1,4 +1,4 @@
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using SongsOfConquestAccess.Adapters;
 using SongsOfConquestAccess.Events.Combat;
 using SongsOfConquestAccess.Localization;
@@ -61,18 +61,6 @@ namespace SongsOfConquestAccess.Speech.Spatial
             }
 
             return string.Join(", ", parts.ToArray());
-        }
-
-        public string DescribeScannerContent(CombatTile tile)
-        {
-            if (tile == null)
-            {
-                return string.Empty;
-            }
-
-            return ConfigurableAnnouncementComposer.Compose(
-                CombatAnnouncementDefinitions.ScannerContent,
-                BuildScannerContentParts(tile));
         }
 
         public string DescribeTroop(CombatTile tile)
@@ -199,46 +187,6 @@ namespace SongsOfConquestAccess.Speech.Spatial
             if (!string.IsNullOrWhiteSpace(influence))
             {
                 yield return new AnnouncementPart(CombatAnnouncementDefinitions.TileKeys.Influence, influence);
-            }
-        }
-
-        private IEnumerable<AnnouncementPart> BuildScannerContentParts(CombatTile tile)
-        {
-            if (_context == null && tile.IsReachable)
-            {
-                yield return new AnnouncementPart(
-                    CombatAnnouncementDefinitions.TileKeys.Reachable,
-                    ModText.Get(ModStrings.Spatial.Reachable));
-            }
-
-            AddTilePartIfPresent(CombatAnnouncementDefinitions.TileKeys.Occupant, DescribeOccupant(tile), out AnnouncementPart occupant);
-            if (occupant != null)
-            {
-                yield return occupant;
-            }
-
-            string impassableOrBlocked = DescribeImpassableOrBlocked(tile);
-            if (!string.IsNullOrWhiteSpace(impassableOrBlocked))
-            {
-                yield return new AnnouncementPart(CombatAnnouncementDefinitions.TileKeys.ImpassableOrBlocked, impassableOrBlocked);
-            }
-
-            string tileEffects = DescribeTileEffects(tile);
-            if (!string.IsNullOrWhiteSpace(tileEffects))
-            {
-                yield return new AnnouncementPart(CombatAnnouncementDefinitions.TileKeys.TileEffects, tileEffects);
-            }
-
-            if (tile.Elevation > 0)
-            {
-                yield return new AnnouncementPart(
-                    CombatAnnouncementDefinitions.TileKeys.Elevation,
-                    ModText.Get(ModStrings.Spatial.ElevatedGroundHeight, tile.Elevation));
-            }
-
-            if (!string.IsNullOrWhiteSpace(tile.DecorativeFeature))
-            {
-                yield return new AnnouncementPart(CombatAnnouncementDefinitions.TileKeys.DecorativeFeatures, tile.DecorativeFeature);
             }
         }
 

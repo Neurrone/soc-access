@@ -1,4 +1,4 @@
-namespace SongsOfConquestAccess.Localization
+﻿namespace SongsOfConquestAccess.Localization
 {
     internal static class ModStrings
     {
@@ -614,7 +614,6 @@ namespace SongsOfConquestAccess.Localization
             public static readonly ModString AnnouncementEntityName = new ModString("Screens.AnnouncementEntityName", "Entity name");
             public static readonly ModString AnnouncementExplorationState = new ModString("Screens.AnnouncementExplorationState", "Exploration state");
             public static readonly ModString AnnouncementFacingDirectionForBeamAttacks = new ModString("Screens.AnnouncementFacingDirectionForBeamAttacks", "Facing direction for troops with beam attacks");
-            public static readonly ModString AnnouncementGroupResult = new ModString("Screens.AnnouncementGroupResult", "Group result");
             public static readonly ModString AnnouncementHealth = new ModString("Screens.AnnouncementHealth", "Health");
             public static readonly ModString AnnouncementImpassable = new ModString("Screens.AnnouncementImpassable", "Impassable");
             public static readonly ModString AnnouncementImpassableOrBlocked = new ModString("Screens.AnnouncementImpassableOrBlocked", "Impassable or blocked");
@@ -625,6 +624,7 @@ namespace SongsOfConquestAccess.Localization
             public static readonly ModString AnnouncementMovementCost = new ModString("Screens.AnnouncementMovementCost", "Movement cost");
             public static readonly ModString AnnouncementName = new ModString("Screens.AnnouncementName", "Name");
             public static readonly ModString AnnouncementOccupant = new ModString("Screens.AnnouncementOccupant", "Occupant");
+            public static readonly ModString AnnouncementOwner = new ModString("Screens.AnnouncementOwner", "Owner");
             public static readonly ModString AnnouncementOrderRow = new ModString("Screens.AnnouncementOrderRow", "{0} horizontal row");
             public static readonly ModString AnnouncementReachable = new ModString("Screens.AnnouncementReachable", "Reachable");
             public static readonly ModString AnnouncementReachabilityOrRoutePreview = new ModString("Screens.AnnouncementReachabilityOrRoutePreview", "Reachability or route preview");
@@ -633,6 +633,7 @@ namespace SongsOfConquestAccess.Localization
             public static readonly ModString AnnouncementSelected = new ModString("Screens.AnnouncementSelected", "Selected");
             public static readonly ModString AnnouncementSelectedForSpellcast = new ModString("Screens.AnnouncementSelectedForSpellcast", "Selected for spellcast");
             public static readonly ModString AnnouncementSpawnPoint = new ModString("Screens.AnnouncementSpawnPoint", "Spawn point");
+            public static readonly ModString AnnouncementStatus = new ModString("Screens.AnnouncementStatus", "Status");
             public static readonly ModString AnnouncementStackSize = new ModString("Screens.AnnouncementStackSize", "Stack size");
             public static readonly ModString AnnouncementTerrain = new ModString("Screens.AnnouncementTerrain", "Terrain");
             public static readonly ModString AnnouncementThisTurnDestination = new ModString("Screens.AnnouncementThisTurnDestination", "This turn destination");

@@ -31,7 +31,9 @@ namespace SongsOfConquestAccess.Scanner
         {
             AdventureMapTileSpeechFormatter formatter = new AdventureMapTileSpeechFormatter();
             string text = ScannerResultSpeechFormatter.Compose(
-                formatter.DescribeScannerContent(_result, _tile),
+                ScannerResultContentFormatter.Describe(
+                    AdventureMapAnnouncementDefinitions.ScannerContent,
+                    _result),
                 ScannerSpeechUtility.FormatDirections(_directions),
                 formatter.DescribeCoordinates(_tile),
                 ScannerSpeechUtility.FormatResultCount(_resultIndex, _resultCount));

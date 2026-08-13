@@ -18,10 +18,10 @@ namespace SongsOfConquestAccess.Speech.Spatial
             "troop_deployment_scanner_content",
             "Troop Deployment Scanner Content Announcements",
             ModStrings.Screens.ScannerContentAnnouncements,
-            new AnnouncementElementDefinition(TileKeys.Troop, ModStrings.Screens.AnnouncementTroop),
-            new AnnouncementElementDefinition(TileKeys.SpawnPoint, ModStrings.Screens.AnnouncementSpawnPoint),
-            new AnnouncementElementDefinition(TileKeys.Impassable, ModStrings.Screens.AnnouncementImpassable),
-            new AnnouncementElementDefinition(TileKeys.Elevation, ModStrings.Screens.AnnouncementElevation));
+            new AnnouncementElementDefinition(ScannerAnnouncementDefinitions.ContentKeys.Name, ModStrings.Screens.AnnouncementName),
+            new AnnouncementElementDefinition(ScannerAnnouncementDefinitions.ContentKeys.Owner, ModStrings.Screens.AnnouncementOwner),
+            new AnnouncementElementDefinition(ScannerAnnouncementDefinitions.ContentKeys.Status, ModStrings.Screens.AnnouncementStatus, defaultSuffix: false))
+            .WithVersion(2);
 
         public static readonly AnnouncementGroupDefinition[] All =
         {

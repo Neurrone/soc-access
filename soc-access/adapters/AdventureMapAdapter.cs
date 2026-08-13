@@ -1418,6 +1418,7 @@ namespace SongsOfConquestAccess.Adapters
                 return;
             }
 
+            int localTeamId = GetLocalTeamId();
             foreach (ICommanderState commander in commanders)
             {
                 if (commander == null || !commander.IsAlive || !IsWithinMap(commander.Position))
@@ -1435,6 +1436,8 @@ namespace SongsOfConquestAccess.Adapters
                 snapshot.Add(ScannerCategoryKeys.Wielders, ScannerSubcategoryKeys.All,
                     new ScannerResult(ScannerKey("commander", commander.Id), name, commander.Position)
                     {
+                        NotVisible = !tile.IsVisible,
+                        Relationship = ScannerRelationship(GetCommanderRelationship(commander, localTeamId)),
                         StableReference = commander.Id,
                         EntityCategory = AdventureEntityCategory.Wielder
                     });
@@ -1464,10 +1467,13 @@ namespace SongsOfConquestAccess.Adapters
 
                 string name = FirstNonEmpty(tile.MapEntityName, GetMapEntityName(entity));
                 bool notVisible = !tile.IsVisible;
-                string relationship = ScannerRelationshipKey(GetMapEntityRelationship(entity, localTeamId));
+                string entityRelationship = GetMapEntityRelationship(entity, localTeamId);
+                string relationship = ScannerRelationshipKey(entityRelationship);
                 ScannerResult result = new ScannerResult(ScannerKey("entity", entity.Id), name, tile.Position)
                 {
                     NotVisible = notVisible,
+                    Unvisited = IsScannerPickupEntity(entity) && IsUnvisited(entity),
+                    Relationship = ScannerRelationship(entityRelationship),
                     StableReference = entity.Id,
                     EntityCategory = ClassifyMapEntity(entity)
                 };
@@ -1779,6 +1785,7 @@ namespace SongsOfConquestAccess.Adapters
                     representative)
                 {
                     Kind = ScannerResultKind.CommanderZoneOfControl,
+                    Relationship = ScannerResultRelationship.Enemy,
                     StableReference = commander.Id
                 };
                 result.Points.AddRange(points);
@@ -1996,6 +2003,8 @@ namespace SongsOfConquestAccess.Adapters
             return new ScannerResult(ScannerKey("entity", entity.Id), name, tile.Position)
             {
                 NotVisible = !tile.IsVisible,
+                Unvisited = IsScannerPickupEntity(entity) && IsUnvisited(entity),
+                Relationship = ScannerRelationship(GetMapEntityRelationship(entity, GetLocalTeamId())),
                 StableReference = entity.Id,
                 EntityCategory = ClassifyMapEntity(entity)
             };
@@ -2630,6 +2639,8 @@ namespace SongsOfConquestAccess.Adapters
             ScannerResult clone = new ScannerResult(result.Key, result.Label, result.Position)
             {
                 NotVisible = result.NotVisible,
+                Unvisited = result.Unvisited,
+                Relationship = result.Relationship,
                 StableReference = result.StableReference,
                 Kind = result.Kind,
                 EntityCategory = result.EntityCategory
@@ -2666,6 +2677,21 @@ namespace SongsOfConquestAccess.Adapters
             }
 
             return string.Join(":", parts.ToArray());
+        }
+
+        private static ScannerResultRelationship ScannerRelationship(string value)
+        {
+            switch (value)
+            {
+                case "friendly":
+                    return ScannerResultRelationship.Friendly;
+                case "enemy":
+                    return ScannerResultRelationship.Enemy;
+                case "neutral":
+                    return ScannerResultRelationship.Neutral;
+                default:
+                    return ScannerResultRelationship.None;
+            }
         }
 
         private static string ScannerRelationshipKey(string value)
