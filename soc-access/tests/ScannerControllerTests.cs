@@ -645,7 +645,7 @@ namespace SongsOfConquestAccess.Tests
         }
 
         [TestMethod]
-        public void SpeakDistanceAndDirectionReadsTileCountThenBearing()
+        public void SpeakDistanceAndDirectionReadsTheBearingWithoutATotal()
         {
             ScannerController controller = CreateController(BuildSnapshot(
                 Entry("Terrain", "Roads", "Road", 2, 3, "terrain:road")));
@@ -655,7 +655,7 @@ namespace SongsOfConquestAccess.Tests
 
             Assert.AreEqual(ScannerCommandStatus.Result, result.Status);
             Assert.IsTrue(result.DistanceAndDirectionOnly);
-            Assert.AreEqual("5 tiles, 3n, 2e", result.FormatDistanceAndDirection(useLongDirections: false));
+            Assert.AreEqual("3n, 2e", result.FormatDistanceAndDirection(useLongDirections: false));
         }
 
         [TestMethod]

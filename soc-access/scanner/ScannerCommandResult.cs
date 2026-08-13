@@ -104,28 +104,12 @@ namespace SongsOfConquestAccess.Scanner
         }
 
         /// <summary>
-        /// The distance is the sum of the direction runs rather than a separate
-        /// geometry, so the number spoken always matches the steps spoken after
-        /// it, on square and hex grids alike.
+        /// The direction runs carry their own counts, so their sum is the
+        /// distance and speaking a total first would only repeat it.
         /// </summary>
         internal string FormatDistanceAndDirection(bool useLongDirections)
         {
-            string directions = ScannerSpeechUtility.FormatDirections(Directions, useLongDirections);
-            if (Directions == null || Directions.Count == 0)
-            {
-                return directions;
-            }
-
-            int tiles = 0;
-            for (int i = 0; i < Directions.Count; i++)
-            {
-                tiles += Directions[i].Count;
-            }
-
-            return ModText.Get(
-                ModStrings.Scanner.DistanceAndDirection,
-                ModText.Plural(ModStrings.Common.TileCount, tiles, tiles),
-                directions);
+            return ScannerSpeechUtility.FormatDirections(Directions, useLongDirections);
         }
 
         private SpeechRequest BuildNoResults()

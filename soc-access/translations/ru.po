@@ -2736,11 +2736,6 @@ msgctxt "Combat.YourRangedTroops"
 msgid "your ranged troops"
 msgstr "ваши стрелковые отряды"
 
-#. Scanner.DistanceAndDirection
-msgctxt "Scanner.DistanceAndDirection"
-msgid "{0}, {1}"
-msgstr "{0}, {1}"
-
 #. Scanner.WestShort
 msgctxt "Scanner.WestShort"
 msgid "w"

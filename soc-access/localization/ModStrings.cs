@@ -679,7 +679,6 @@ namespace SongsOfConquestAccess.Localization
             public static readonly ModString Enemy = new ModString("Scanner.Enemy", "Enemy");
             public static readonly ModString EnemyGates = new ModString("Scanner.EnemyGates", "Enemy gates");
             public static readonly ModString Entities = new ModString("Scanner.Entities", "Entities");
-            public static readonly ModString DistanceAndDirection = new ModString("Scanner.DistanceAndDirection", "{0}, {1}");
             public static readonly ModString Friendly = new ModString("Scanner.Friendly", "Friendly");
             public static readonly ModString FriendlyGates = new ModString("Scanner.FriendlyGates", "Friendly gates");
             public static readonly ModString Exploration = new ModString("Scanner.Exploration", "Exploration");

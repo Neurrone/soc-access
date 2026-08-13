@@ -3109,11 +3109,6 @@ msgctxt "Scanner.Entities"
 msgid "Entities"
 msgstr ""
 
-#. Scanner.DistanceAndDirection
-msgctxt "Scanner.DistanceAndDirection"
-msgid "{0}, {1}"
-msgstr ""
-
 #. Scanner.Friendly
 msgctxt "Scanner.Friendly"
 msgid "Friendly"
