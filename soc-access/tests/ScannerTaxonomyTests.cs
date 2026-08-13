@@ -69,7 +69,7 @@ namespace SongsOfConquestAccess.Tests
             AssertSubcategories(
                 AdventureScannerTaxonomy.Instance,
                 "terrain",
-                "roads_and_crossings", "open_ground", "rough_ground", "barriers");
+                "roads_and_crossings", "open_ground", "barriers");
             AssertSubcategories(AdventureScannerTaxonomy.Instance, "unexplored", "all");
             AssertSubcategories(AdventureScannerTaxonomy.Instance, "revealed", "all");
         }

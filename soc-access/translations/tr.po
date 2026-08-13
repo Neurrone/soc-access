@@ -2050,6 +2050,11 @@ msgctxt "Spatial.MovementRange"
 msgid "Movement range"
 msgstr "Hareket menzili"
 
+#. Spatial.Obstruction
+msgctxt "Spatial.Obstruction"
+msgid "Obstruction"
+msgstr "Engel"
+
 #. Spatial.Neutral
 msgctxt "Spatial.Neutral"
 msgid "neutral"
@@ -2374,11 +2379,6 @@ msgstr "Zenginlikler"
 msgctxt "Scanner.RoadsAndCrossings"
 msgid "Roads and crossings"
 msgstr "Yollar ve geçitler"
-
-#. Scanner.RoughGround
-msgctxt "Scanner.RoughGround"
-msgid "Rough ground"
-msgstr "Engebeli arazi"
 
 #. Scanner.Search
 msgctxt "Scanner.Search"

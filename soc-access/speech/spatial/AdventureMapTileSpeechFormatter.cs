@@ -395,6 +395,8 @@ namespace SongsOfConquestAccess.Speech.Spatial
                     return ModText.Get(ModStrings.Spatial.CobblestoneRoad);
                 case AdventureTerrainKind.Wall:
                     return ModText.Get(ModStrings.Spatial.Wall);
+                case AdventureTerrainKind.Obstruction:
+                    return ModText.Get(ModStrings.Spatial.Obstruction);
                 case AdventureTerrainKind.Grass:
                     return ModText.Get(ModStrings.Spatial.Grass);
                 case AdventureTerrainKind.Sand:

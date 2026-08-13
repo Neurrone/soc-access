@@ -2065,6 +2065,11 @@ msgctxt "Spatial.MovementRange"
 msgid "Movement range"
 msgstr "Bewegungsreichweite"
 
+#. Spatial.Obstruction
+msgctxt "Spatial.Obstruction"
+msgid "Obstruction"
+msgstr "Hindernis"
+
 #. Spatial.Neutral
 msgctxt "Spatial.Neutral"
 msgid "neutral"
@@ -2389,11 +2394,6 @@ msgstr "Reichtümer"
 msgctxt "Scanner.RoadsAndCrossings"
 msgid "Roads and crossings"
 msgstr "Straßen und Übergänge"
-
-#. Scanner.RoughGround
-msgctxt "Scanner.RoughGround"
-msgid "Rough ground"
-msgstr "Unwegsames Gelände"
 
 #. Scanner.Search
 msgctxt "Scanner.Search"

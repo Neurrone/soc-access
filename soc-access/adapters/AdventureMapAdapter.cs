@@ -2230,6 +2230,7 @@ namespace SongsOfConquestAccess.Adapters
             AddTerrainGroups(snapshot, terrain, ScannerSubcategoryKeys.OpenGround, "deforestation", ModStrings.Spatial.Deforestation, origin, cell => cell.Terrain == AdventureTerrainKind.Deforestation);
             AddTerrainGroups(snapshot, terrain, ScannerSubcategoryKeys.Barriers, "mountain", ModStrings.Spatial.Mountain, origin, cell => cell.Terrain == AdventureTerrainKind.Mountain);
             AddTerrainGroups(snapshot, terrain, ScannerSubcategoryKeys.Barriers, "wall", ModStrings.Spatial.Wall, origin, cell => cell.Terrain == AdventureTerrainKind.Wall);
+            AddTerrainGroups(snapshot, terrain, ScannerSubcategoryKeys.Barriers, "obstruction", ModStrings.Spatial.Obstruction, origin, cell => cell.Terrain == AdventureTerrainKind.Obstruction);
             AddTerrainGroups(snapshot, terrain, ScannerSubcategoryKeys.Barriers, "water", ModStrings.Spatial.Water, origin, cell => cell.Terrain == AdventureTerrainKind.Water);
             AddTerrainGroups(snapshot, terrain, ScannerSubcategoryKeys.Barriers, "shallow-water", ModStrings.Spatial.ShallowWater, origin, cell => cell.Terrain == AdventureTerrainKind.ShallowWater);
             AddTerrainGroups(snapshot, terrain, ScannerSubcategoryKeys.Barriers, "deep-water", ModStrings.Spatial.DeepWater, origin, cell => cell.Terrain == AdventureTerrainKind.DeepWater);
@@ -3931,6 +3932,12 @@ namespace SongsOfConquestAccess.Adapters
             }
         }
 
+        /// <summary>
+        /// The eight decoration brushes the level editor paints with. Value 5 is
+        /// the lights brush, which is scenery standing on the ground rather than
+        /// a kind of ground, so it deliberately falls through to whatever is
+        /// underneath it.
+        /// </summary>
         private static AdventureTerrainKind GetDecorationTerrain(byte decoration)
         {
             switch (decoration)
@@ -3941,6 +3948,8 @@ namespace SongsOfConquestAccess.Adapters
                     return AdventureTerrainKind.TemperateTrees;
                 case 3:
                     return AdventureTerrainKind.Mountain;
+                case 4:
+                    return AdventureTerrainKind.Obstruction;
                 case 6:
                     return AdventureTerrainKind.Wall;
                 case 7:

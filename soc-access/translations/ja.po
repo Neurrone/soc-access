@@ -2050,6 +2050,11 @@ msgctxt "Spatial.MovementRange"
 msgid "Movement range"
 msgstr "移動範囲"
 
+#. Spatial.Obstruction
+msgctxt "Spatial.Obstruction"
+msgid "Obstruction"
+msgstr "障害物"
+
 #. Spatial.Neutral
 msgctxt "Spatial.Neutral"
 msgid "neutral"
@@ -2374,11 +2379,6 @@ msgstr "富"
 msgctxt "Scanner.RoadsAndCrossings"
 msgid "Roads and crossings"
 msgstr "道路と渡り"
-
-#. Scanner.RoughGround
-msgctxt "Scanner.RoughGround"
-msgid "Rough ground"
-msgstr "荒れた地形"
 
 #. Scanner.Search
 msgctxt "Scanner.Search"

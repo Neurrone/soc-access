@@ -624,6 +624,11 @@ msgctxt "Spatial.Mountain"
 msgid "Mountain"
 msgstr ""
 
+#. Spatial.Obstruction
+msgctxt "Spatial.Obstruction"
+msgid "Obstruction"
+msgstr ""
+
 #. Spatial.Neutral
 msgctxt "Spatial.Neutral"
 msgid "neutral"
@@ -3237,11 +3242,6 @@ msgstr ""
 #. Scanner.RoadsAndCrossings
 msgctxt "Scanner.RoadsAndCrossings"
 msgid "Roads and crossings"
-msgstr ""
-
-#. Scanner.RoughGround
-msgctxt "Scanner.RoughGround"
-msgid "Rough ground"
 msgstr ""
 
 #. Scanner.Search

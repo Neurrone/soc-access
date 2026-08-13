@@ -58,7 +58,6 @@ namespace SongsOfConquestAccess.Scanner
 
         public const string RoadsAndCrossings = "roads_and_crossings";
         public const string OpenGround = "open_ground";
-        public const string RoughGround = "rough_ground";
         public const string Barriers = "barriers";
 
         public const string FriendlyGates = "friendly_gates";

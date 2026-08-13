@@ -154,6 +154,7 @@
             public static readonly ModString MovementCost = new ModString("Spatial.MovementCost", "Movement cost: {0}");
             public static readonly ModString MovementRange = new ModString("Spatial.MovementRange", "Movement range");
             public static readonly ModString Mountain = new ModString("Spatial.Mountain", "Mountain");
+            public static readonly ModString Obstruction = new ModString("Spatial.Obstruction", "Obstruction");
             public static readonly ModString Neutral = new ModString("Spatial.Neutral", "neutral");
             public static readonly ModString NoRoutePreview = new ModString("Spatial.NoRoutePreview", "no route preview");
             public static readonly ModString OnRoute = new ModString("Spatial.OnRoute", "On route");
@@ -705,7 +706,6 @@
             public static readonly ModString ResourceGenerators = new ModString("Scanner.ResourceGenerators", "Resource generators");
             public static readonly ModString Riches = new ModString("Scanner.Riches", "Riches");
             public static readonly ModString RoadsAndCrossings = new ModString("Scanner.RoadsAndCrossings", "Roads and crossings");
-            public static readonly ModString RoughGround = new ModString("Scanner.RoughGround", "Rough ground");
             public static readonly ModString Search = new ModString("Scanner.Search", "Search");
             public static readonly ModString SearchNoResults = new ModString("Scanner.SearchNoResults", "No results");
             public static readonly ModString SearchResults = new ModString("Scanner.SearchResults", "Search Results");

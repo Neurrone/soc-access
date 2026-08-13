@@ -2050,6 +2050,11 @@ msgctxt "Spatial.MovementRange"
 msgid "Movement range"
 msgstr "移動範圍"
 
+#. Spatial.Obstruction
+msgctxt "Spatial.Obstruction"
+msgid "Obstruction"
+msgstr "障礙物"
+
 #. Spatial.Neutral
 msgctxt "Spatial.Neutral"
 msgid "neutral"
@@ -2374,11 +2379,6 @@ msgstr "財富"
 msgctxt "Scanner.RoadsAndCrossings"
 msgid "Roads and crossings"
 msgstr "道路與通道"
-
-#. Scanner.RoughGround
-msgctxt "Scanner.RoughGround"
-msgid "Rough ground"
-msgstr "崎嶇地"
 
 #. Scanner.Search
 msgctxt "Scanner.Search"

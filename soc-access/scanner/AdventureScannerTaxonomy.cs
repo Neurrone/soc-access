@@ -29,7 +29,6 @@ namespace SongsOfConquestAccess.Scanner
                 () => ModText.Get(ModStrings.Scanner.Terrain),
                 Subcategory(ScannerSubcategoryKeys.RoadsAndCrossings, ModStrings.Scanner.RoadsAndCrossings),
                 Subcategory(ScannerSubcategoryKeys.OpenGround, ModStrings.Scanner.OpenGround),
-                Subcategory(ScannerSubcategoryKeys.RoughGround, ModStrings.Scanner.RoughGround),
                 Subcategory(ScannerSubcategoryKeys.Barriers, ModStrings.Scanner.Barriers)),
             OnlyAll(ScannerCategoryKeys.Unexplored, ModStrings.Scanner.Unexplored),
             OnlyAll(ScannerCategoryKeys.Revealed, ModStrings.Scanner.Revealed).WithPreservedResultOrder().WithFlatItems());

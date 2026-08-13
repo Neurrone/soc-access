@@ -2080,6 +2080,11 @@ msgctxt "Spatial.MovementRange"
 msgid "Movement range"
 msgstr "Дальність руху"
 
+#. Spatial.Obstruction
+msgctxt "Spatial.Obstruction"
+msgid "Obstruction"
+msgstr "Перешкода"
+
 #. Spatial.Neutral
 msgctxt "Spatial.Neutral"
 msgid "neutral"
@@ -2404,11 +2409,6 @@ msgstr "Багатства"
 msgctxt "Scanner.RoadsAndCrossings"
 msgid "Roads and crossings"
 msgstr "Дороги та переправи"
-
-#. Scanner.RoughGround
-msgctxt "Scanner.RoughGround"
-msgid "Rough ground"
-msgstr "Пересічена місцевість"
 
 #. Scanner.Search
 msgctxt "Scanner.Search"
