@@ -1,7 +1,11 @@
+using System;
 using System.Collections.Generic;
+using System.Globalization;
 using UnityEngine;
 using SongsOfConquest.Common.Entities.Adventure;
+using SongsOfConquestAccess.Adapters;
 using SongsOfConquestAccess.Localization;
+using SongsOfConquestAccess.Scanner;
 
 namespace SongsOfConquestAccess.Events
 {
@@ -228,11 +232,12 @@ namespace SongsOfConquestAccess.Events
 
     internal sealed class MapDestinationSetEvent : IAccessibilityEvent
     {
-        public MapDestinationSetEvent(int wielderId, string wielderName, Vector2Int destination)
+        public MapDestinationSetEvent(int wielderId, string wielderName, Vector2Int destination, WielderRoute route)
         {
             WielderId = wielderId;
             WielderName = string.IsNullOrWhiteSpace(wielderName) ? ModText.Get(ModStrings.Events.Wielder) : wielderName;
             Destination = destination;
+            Route = route;
         }
 
         public string Kind { get { return AccessibilityEvents.Map.DestinationSet; } }
@@ -242,9 +247,69 @@ namespace SongsOfConquestAccess.Events
 
         public Vector2Int Destination { get; private set; }
 
+        public WielderRoute Route { get; private set; }
+
         public string GetSpeechText()
         {
-            return ModText.Get(ModStrings.Events.DestinationSet, WielderName, FormatTile(Destination));
+            return GetSpeechText(ModSettings.ScannerUsesLongDirections);
+        }
+
+        internal string GetSpeechText(bool useLongDirections)
+        {
+            if (Route == null || Route.Steps.Count == 0 || Route.Turns.Count == 0)
+            {
+                return ModText.Get(ModStrings.Events.DestinationSet, WielderName, FormatTile(Destination));
+            }
+
+            return ModText.Get(
+                ModStrings.Events.DestinationSetRoute,
+                DescribeCost(Route.Turns),
+                WielderName,
+                DescribeSteps(Route.Steps, useLongDirections));
+        }
+
+        private static string DescribeCost(IReadOnlyList<WielderRouteTurn> turns)
+        {
+            List<string> parts = new List<string>();
+            for (int i = 0; i < turns.Count; i++)
+            {
+                parts.Add(DescribeTurnCost(turns[i]));
+            }
+
+            return ModText.JoinListWithCommas(parts);
+        }
+
+        // Travel turns are ordinals counting the current turn as 1, so speech
+        // drops one to say how long the wait is, matching the route preview.
+        private static string DescribeTurnCost(WielderRouteTurn turn)
+        {
+            string cost = FormatCost(turn.Cost);
+            if (turn.TravelTurns <= 1)
+            {
+                return ModText.Get(ModStrings.Events.RouteCostThisTurn, cost);
+            }
+
+            return turn.TravelTurns == 2
+                ? ModText.Get(ModStrings.Events.RouteCostNextTurn, cost)
+                : ModText.Get(ModStrings.Events.RouteCostInTurns, cost, turn.TravelTurns - 1);
+        }
+
+        private static string FormatCost(float cost)
+        {
+            return Math.Round(cost, 2).ToString("0.##", CultureInfo.InvariantCulture);
+        }
+
+        // Steps follow the scanner's Long directions setting, so a route reads as
+        // "n, n, ne" by default and "north, north, northeast" when it is on.
+        private static string DescribeSteps(IReadOnlyList<ScannerDirection> steps, bool useLongForm)
+        {
+            List<string> parts = new List<string>();
+            for (int i = 0; i < steps.Count; i++)
+            {
+                parts.Add(ScannerDirectionUtility.FormatDirection(steps[i], useLongForm));
+            }
+
+            return ModText.JoinListWithCommas(parts);
         }
 
         private static string FormatTile(Vector2Int tile)

@@ -89,6 +89,7 @@ namespace SongsOfConquestAccess.Localization
             public static readonly ModString BuildSiteTown = new ModString("Events.BuildSiteTown", "town");
             public static readonly ModString DestinationCleared = new ModString("Events.DestinationCleared", "{0}'s destination cleared.");
             public static readonly ModString DestinationSet = new ModString("Events.DestinationSet", "{0}'s destination set to {1}");
+            public static readonly ModString DestinationSetRoute = new ModString("Events.DestinationSetRoute", "Cost: {0}. {1} will move {2}.");
             public static readonly ModString HudClosed = new ModString("Events.HudClosed", "HUD closed");
             public static readonly ModString HudOpen = new ModString("Events.HudOpen", "HUD open");
             public static readonly ModString LeveledUpTo = new ModString("Events.LeveledUpTo", "{0} leveled up to {1}");
@@ -96,6 +97,9 @@ namespace SongsOfConquestAccess.Localization
             public static readonly ModString ModError = new ModString("Events.ModError", "Mod error: {0}");
             public static readonly ModString RecruitedWielder = new ModString("Events.RecruitedWielder", "Recruited wielder {0}");
             public static readonly ModString Revealed = new ModString("Events.Revealed", "Revealed {0}");
+            public static readonly ModString RouteCostInTurns = new ModString("Events.RouteCostInTurns", "{0} in {1} turns");
+            public static readonly ModString RouteCostNextTurn = new ModString("Events.RouteCostNextTurn", "{0} next turn");
+            public static readonly ModString RouteCostThisTurn = new ModString("Events.RouteCostThisTurn", "{0} this turn");
             public static readonly ModString SelectedBuildSite = new ModString("Events.SelectedBuildSite", "Selected {0} build site at {1}");
             public static readonly ModString SelectedWielder = new ModString("Events.SelectedWielder", "Selected wielder {0}");
             public static readonly ModString StoryCameraFocusAreaAround = new ModString("Events.StoryCameraFocusAreaAround", "Camera focuses on the area around {0}.");

@@ -33,6 +33,38 @@ namespace SongsOfConquestAccess.Scanner
         }
 
         /// <summary>
+        /// Names the direction of a single step onto a neighbouring tile. Returns false for a
+        /// zero offset, and for anything further than one tile away, which is not a step.
+        /// </summary>
+        public static bool TryGetStepDirection(Vector2Int offset, out ScannerDirection direction)
+        {
+            direction = ScannerDirection.North;
+            if (offset == Vector2Int.zero || Mathf.Abs(offset.x) > 1 || Mathf.Abs(offset.y) > 1)
+            {
+                return false;
+            }
+
+            if (offset.y > 0)
+            {
+                direction = offset.x > 0
+                    ? ScannerDirection.Northeast
+                    : offset.x < 0 ? ScannerDirection.Northwest : ScannerDirection.North;
+            }
+            else if (offset.y < 0)
+            {
+                direction = offset.x > 0
+                    ? ScannerDirection.Southeast
+                    : offset.x < 0 ? ScannerDirection.Southwest : ScannerDirection.South;
+            }
+            else
+            {
+                direction = offset.x > 0 ? ScannerDirection.East : ScannerDirection.West;
+            }
+
+            return true;
+        }
+
+        /// <summary>
         /// Formats one step. Short form is the default and gives "3ne"; the Long
         /// directions setting gives "3 northeast". The count and direction are
         /// joined through a format string of their own so a translator can add a

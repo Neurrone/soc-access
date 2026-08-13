@@ -225,6 +225,11 @@ msgctxt "Events.DestinationSet"
 msgid "{0}'s destination set to {1}"
 msgstr "{0}の目的地を{1}に設定しました"
 
+#. Events.DestinationSetRoute
+msgctxt "Events.DestinationSetRoute"
+msgid "Cost: {0}. {1} will move {2}."
+msgstr "コスト: {0}。{1}の移動: {2}。"
+
 #. Events.HudClosed
 msgctxt "Events.HudClosed"
 msgid "HUD closed"
@@ -2659,6 +2664,21 @@ msgstr "配置地点"
 msgctxt "Events.Revealed"
 msgid "Revealed {0}"
 msgstr "{0}を発見しました"
+
+#. Events.RouteCostInTurns
+msgctxt "Events.RouteCostInTurns"
+msgid "{0} in {1} turns"
+msgstr "{1}ターン後に{0}"
+
+#. Events.RouteCostNextTurn
+msgctxt "Events.RouteCostNextTurn"
+msgid "{0} next turn"
+msgstr "次のターンに{0}"
+
+#. Events.RouteCostThisTurn
+msgctxt "Events.RouteCostThisTurn"
+msgid "{0} this turn"
+msgstr "このターンに{0}"
 
 #. Bookmarks.BookmarkSaved
 #. Bookmarks.BeaconActivated

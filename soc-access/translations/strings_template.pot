@@ -319,6 +319,11 @@ msgctxt "Events.DestinationSet"
 msgid "{0}'s destination set to {1}"
 msgstr ""
 
+#. Events.DestinationSetRoute
+msgctxt "Events.DestinationSetRoute"
+msgid "Cost: {0}. {1} will move {2}."
+msgstr ""
+
 #. Events.HudClosed
 msgctxt "Events.HudClosed"
 msgid "HUD closed"
@@ -352,6 +357,21 @@ msgstr ""
 #. Events.Revealed
 msgctxt "Events.Revealed"
 msgid "Revealed {0}"
+msgstr ""
+
+#. Events.RouteCostInTurns
+msgctxt "Events.RouteCostInTurns"
+msgid "{0} in {1} turns"
+msgstr ""
+
+#. Events.RouteCostNextTurn
+msgctxt "Events.RouteCostNextTurn"
+msgid "{0} next turn"
+msgstr ""
+
+#. Events.RouteCostThisTurn
+msgctxt "Events.RouteCostThisTurn"
+msgid "{0} this turn"
 msgstr ""
 
 #. Events.SelectedBuildSite

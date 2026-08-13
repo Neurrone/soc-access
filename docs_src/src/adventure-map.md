@@ -45,6 +45,16 @@ The mod mentions if a tile is unexplored or currently unseen.
 - `S`: select the next settlement
 - `Space`: move focus to the selected wielder's tile
 
+### Setting a Destination
+
+When a destination is set, the mod reads what it will cost and the route the wielder will walk, for example `Cost: 5 this turn, 12 next turn. Aurelia will move n, n, ne, e, e.`
+
+The cost is broken over the turns it is spent on. Each number is the movement used during that turn, so the first is capped by what the wielder has left right now and the rest by its full movement. A turn that costs nothing is left out, so a wielder that has already run out this turn starts at `next turn`.
+
+The route is then named a step at a time, one direction per tile walked. These follow the scanner's `Long directions` setting, so they read as `n, n, ne` by default and `north, north, northeast` when that setting is on.
+
+If the route cannot be worked out, this falls back to naming the destination tile instead.
+
 ### Route Previews
 
 After setting a destination, the game draws a route preview. When focus is on a tile with a route preview marker, the mod speaks the following information:

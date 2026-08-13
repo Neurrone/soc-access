@@ -225,6 +225,11 @@ msgctxt "Events.DestinationSet"
 msgid "{0}'s destination set to {1}"
 msgstr "Ziel von {0} auf {1} gesetzt"
 
+#. Events.DestinationSetRoute
+msgctxt "Events.DestinationSetRoute"
+msgid "Cost: {0}. {1} will move {2}."
+msgstr "Kosten: {0}. {1} bewegt sich: {2}."
+
 #. Events.HudClosed
 msgctxt "Events.HudClosed"
 msgid "HUD closed"
@@ -2674,6 +2679,21 @@ msgstr "Startpunkte"
 msgctxt "Events.Revealed"
 msgid "Revealed {0}"
 msgstr "{0} aufgedeckt"
+
+#. Events.RouteCostInTurns
+msgctxt "Events.RouteCostInTurns"
+msgid "{0} in {1} turns"
+msgstr "{0} in {1} Runden"
+
+#. Events.RouteCostNextTurn
+msgctxt "Events.RouteCostNextTurn"
+msgid "{0} next turn"
+msgstr "{0} in der nächsten Runde"
+
+#. Events.RouteCostThisTurn
+msgctxt "Events.RouteCostThisTurn"
+msgid "{0} this turn"
+msgstr "{0} in dieser Runde"
 
 #. Bookmarks.BookmarkSaved
 #. Bookmarks.BeaconActivated

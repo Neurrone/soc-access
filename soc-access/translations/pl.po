@@ -230,6 +230,11 @@ msgctxt "Events.DestinationSet"
 msgid "{0}'s destination set to {1}"
 msgstr "Cel bohatera {0} ustawiono na {1}"
 
+#. Events.DestinationSetRoute
+msgctxt "Events.DestinationSetRoute"
+msgid "Cost: {0}. {1} will move {2}."
+msgstr "Koszt: {0}. {1} przemieści się: {2}."
+
 #. Events.HudClosed
 msgctxt "Events.HudClosed"
 msgid "HUD closed"
@@ -2689,6 +2694,21 @@ msgstr "Punkty rozmieszczenia"
 msgctxt "Events.Revealed"
 msgid "Revealed {0}"
 msgstr "Odkryto {0}"
+
+#. Events.RouteCostInTurns
+msgctxt "Events.RouteCostInTurns"
+msgid "{0} in {1} turns"
+msgstr "{0} za {1} tury"
+
+#. Events.RouteCostNextTurn
+msgctxt "Events.RouteCostNextTurn"
+msgid "{0} next turn"
+msgstr "{0} w następnej turze"
+
+#. Events.RouteCostThisTurn
+msgctxt "Events.RouteCostThisTurn"
+msgid "{0} this turn"
+msgstr "{0} w tej turze"
 
 #. Bookmarks.BookmarkSaved
 #. Bookmarks.BeaconActivated

@@ -225,6 +225,11 @@ msgctxt "Events.DestinationSet"
 msgid "{0}'s destination set to {1}"
 msgstr "{0} hedefi {1} olarak ayarlandı"
 
+#. Events.DestinationSetRoute
+msgctxt "Events.DestinationSetRoute"
+msgid "Cost: {0}. {1} will move {2}."
+msgstr "Maliyet: {0}. {1} şöyle hareket edecek: {2}."
+
 #. Events.HudClosed
 msgctxt "Events.HudClosed"
 msgid "HUD closed"
@@ -2659,6 +2664,21 @@ msgstr "Yerleştirme noktaları"
 msgctxt "Events.Revealed"
 msgid "Revealed {0}"
 msgstr "{0} ortaya çıkarıldı"
+
+#. Events.RouteCostInTurns
+msgctxt "Events.RouteCostInTurns"
+msgid "{0} in {1} turns"
+msgstr "{1} tur içinde {0}"
+
+#. Events.RouteCostNextTurn
+msgctxt "Events.RouteCostNextTurn"
+msgid "{0} next turn"
+msgstr "sonraki turda {0}"
+
+#. Events.RouteCostThisTurn
+msgctxt "Events.RouteCostThisTurn"
+msgid "{0} this turn"
+msgstr "bu turda {0}"
 
 #. Bookmarks.BookmarkSaved
 #. Bookmarks.BeaconActivated
