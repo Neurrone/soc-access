@@ -27,7 +27,7 @@ namespace SongsOfConquestAccess.Scanner
                 Subcategory(ScannerSubcategoryKeys.ArtifactMarkets, ModStrings.Scanner.ArtifactMarkets),
                 Subcategory(ScannerSubcategoryKeys.Merchants, ModStrings.Scanner.Merchants),
                 Subcategory(ScannerSubcategoryKeys.Teleport, ModStrings.Scanner.Teleport)),
-            OnlyAll(ScannerCategoryKeys.Wielders, ModStrings.Scanner.Wielders),
+            Relationship(ScannerCategoryKeys.Wielders, ModStrings.Scanner.Wielders),
             Relationship(ScannerCategoryKeys.SettlementsAndBuildSites, ModStrings.Scanner.SettlementsAndBuildSites),
             Relationship(ScannerCategoryKeys.TroopSources, ModStrings.Scanner.TroopSources),
             Relationship(ScannerCategoryKeys.Buildings, ModStrings.Scanner.Buildings),

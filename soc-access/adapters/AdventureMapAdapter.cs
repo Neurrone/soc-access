@@ -1434,14 +1434,17 @@ namespace SongsOfConquestAccess.Adapters
                 }
 
                 string name = FirstNonEmpty(tile.Commander.Name, ModText.Get(ModStrings.Events.Wielder));
-                snapshot.Add(ScannerCategoryKeys.Wielders, ScannerSubcategoryKeys.All,
-                    new ScannerResult(ScannerKey("commander", commander.Id), name, commander.Position)
-                    {
-                        NotVisible = !tile.IsVisible,
-                        Relationship = ScannerRelationship(GetCommanderRelationship(commander, localTeamId)),
-                        StableReference = commander.Id,
-                        EntityCategory = AdventureEntityCategory.Wielder
-                    });
+                string relationship = GetCommanderRelationship(commander, localTeamId);
+                ScannerResult result = new ScannerResult(ScannerKey("commander", commander.Id), name, commander.Position)
+                {
+                    NotVisible = !tile.IsVisible,
+                    Relationship = ScannerRelationship(relationship),
+                    StableReference = commander.Id,
+                    EntityCategory = AdventureEntityCategory.Wielder
+                };
+
+                snapshot.Add(ScannerCategoryKeys.Wielders, ScannerSubcategoryKeys.All, CloneResult(result));
+                snapshot.Add(ScannerCategoryKeys.Wielders, ScannerRelationshipKey(relationship), CloneResult(result));
             }
         }
 

@@ -48,7 +48,10 @@ namespace SongsOfConquestAccess.Tests
                 AdventureScannerTaxonomy.Instance,
                 "special_sites",
                 "all", "beacons", "objectives", "artifact_markets", "merchants", "teleport");
-            AssertSubcategories(AdventureScannerTaxonomy.Instance, "wielders", "all");
+            AssertSubcategories(
+                AdventureScannerTaxonomy.Instance,
+                "wielders",
+                "all", "neutral", "friendly", "enemy");
             AssertSubcategories(
                 AdventureScannerTaxonomy.Instance,
                 "settlements_and_build_sites",
