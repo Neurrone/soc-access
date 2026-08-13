@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using SongsOfConquestAccess.Adapters;
+using SongsOfConquestAccess.Localization;
 using SongsOfConquestAccess.Speech;
 using SongsOfConquestAccess.Speech.Spatial;
 
@@ -36,11 +37,29 @@ namespace SongsOfConquestAccess.Scanner
             string text = ScannerResultSpeechFormatter.Compose(
                 ScannerResultContentFormatter.Describe(
                     TroopDeploymentAnnouncementDefinitions.ScannerContent,
-                    _result),
+                    _result,
+                    BuildTileParts()),
                 ScannerSpeechUtility.FormatDirections(_directions),
                 formatter.DescribeCoordinates(_tile),
                 ScannerSpeechUtility.FormatResultCount(_resultIndex, _resultCount));
             return new SpeechRequest(text, interrupt: false);
+        }
+
+        /// <summary>
+        /// How high the ground is decides where the player wants a troop, so the
+        /// scanner keeps it. A terrain result already names it as its subject,
+        /// so it does not get it twice.
+        /// </summary>
+        private IEnumerable<AnnouncementPart> BuildTileParts()
+        {
+            if (_tile == null || _tile.Elevation <= 0 || _result == null || _result.Kind == ScannerResultKind.TerrainPoint)
+            {
+                yield break;
+            }
+
+            yield return new AnnouncementPart(
+                TroopDeploymentAnnouncementDefinitions.TileKeys.Elevation,
+                ModText.Get(ModStrings.Spatial.ElevatedGroundHeight, _tile.Elevation));
         }
     }
 }

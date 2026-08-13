@@ -12,11 +12,21 @@ namespace SongsOfConquestAccess.Speech.Spatial
     /// </summary>
     internal static class ScannerResultContentFormatter
     {
-        public static string Describe(AnnouncementGroupDefinition group, ScannerResult result)
+        /// <summary>
+        /// <paramref name="tileParts"/> lets a screen add facts about the tile
+        /// the thing stands on where those change how the player would act on
+        /// it, such as combat reachability. They are ordinary elements, so the
+        /// player can reorder or silence them like any other.
+        /// </summary>
+        public static string Describe(
+            AnnouncementGroupDefinition group,
+            ScannerResult result,
+            IEnumerable<AnnouncementPart> tileParts = null)
         {
             return Describe(
                 group,
                 result,
+                tileParts,
                 ModSettings.GetAnnouncementOrder,
                 ModSettings.GetAnnouncementElementEnabled,
                 ModSettings.GetAnnouncementElementSuffix);
@@ -25,6 +35,7 @@ namespace SongsOfConquestAccess.Speech.Spatial
         internal static string Describe(
             AnnouncementGroupDefinition group,
             ScannerResult result,
+            IEnumerable<AnnouncementPart> tileParts,
             Func<AnnouncementGroupDefinition, IReadOnlyList<string>> getOrder,
             Func<AnnouncementGroupDefinition, AnnouncementElementDefinition, bool> isEnabled,
             Func<AnnouncementGroupDefinition, AnnouncementElementDefinition, bool> includeSuffix)
@@ -34,9 +45,15 @@ namespace SongsOfConquestAccess.Speech.Spatial
                 return string.Empty;
             }
 
+            List<AnnouncementPart> parts = new List<AnnouncementPart>(BuildParts(result));
+            if (tileParts != null)
+            {
+                parts.AddRange(tileParts);
+            }
+
             return ConfigurableAnnouncementComposer.Compose(
                 group,
-                BuildParts(result),
+                parts,
                 getOrder,
                 isEnabled,
                 includeSuffix);

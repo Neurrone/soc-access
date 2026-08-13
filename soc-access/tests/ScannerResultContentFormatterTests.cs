@@ -1,4 +1,4 @@
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using SongsOfConquestAccess.Scanner;
 using SongsOfConquestAccess.Speech.Spatial;
@@ -69,6 +69,7 @@ namespace SongsOfConquestAccess.Tests
             string text = ScannerResultContentFormatter.Describe(
                 AdventureMapAnnouncementDefinitions.ScannerContent,
                 result,
+                null,
                 DefaultOrder,
                 (group, element) => element.Key != ScannerAnnouncementDefinitions.ContentKeys.Owner,
                 (group, element) => element.DefaultSuffix);
@@ -87,6 +88,7 @@ namespace SongsOfConquestAccess.Tests
             string text = ScannerResultContentFormatter.Describe(
                 AdventureMapAnnouncementDefinitions.ScannerContent,
                 result,
+                null,
                 group => new[]
                 {
                     ScannerAnnouncementDefinitions.ContentKeys.Owner,
@@ -99,30 +101,65 @@ namespace SongsOfConquestAccess.Tests
         }
 
         [TestMethod]
-        public void EveryScannerContentGroupSharesTheSameElementSet()
+        public void EveryScannerContentGroupLeadsWithTheThingItself()
         {
-            AnnouncementGroupDefinition[] groups =
+            Assert.AreEqual(
+                "name,owner,status",
+                AdventureMapAnnouncementDefinitions.ScannerContent.DefaultOrderCsv);
+            Assert.AreEqual(
+                "name,owner,status,reachable,elevation",
+                CombatAnnouncementDefinitions.ScannerContent.DefaultOrderCsv);
+            Assert.AreEqual(
+                "name,owner,status,elevation",
+                TroopDeploymentAnnouncementDefinitions.ScannerContent.DefaultOrderCsv);
+        }
+
+        [TestMethod]
+        public void ReadsTileFactsAfterTheThing()
+        {
+            ScannerResult result = new ScannerResult("troop:friendly:2:3", "20 Militia", new Vector2Int(2, 3))
             {
-                AdventureMapAnnouncementDefinitions.ScannerContent,
-                CombatAnnouncementDefinitions.ScannerContent,
-                TroopDeploymentAnnouncementDefinitions.ScannerContent
+                Relationship = ScannerResultRelationship.Friendly
             };
 
-            for (int i = 0; i < groups.Length; i++)
-            {
-                Assert.AreEqual(
-                    "name,owner,status",
-                    groups[i].DefaultOrderCsv,
-                    groups[i].Key);
-                Assert.AreEqual(2, groups[i].Version, groups[i].Key);
-            }
+            string text = ScannerResultContentFormatter.Describe(
+                CombatAnnouncementDefinitions.ScannerContent,
+                result,
+                new[]
+                {
+                    new AnnouncementPart(CombatAnnouncementDefinitions.TileKeys.Reachable, "reachable"),
+                    new AnnouncementPart(CombatAnnouncementDefinitions.TileKeys.Elevation, "elevated ground, height 2")
+                },
+                DefaultOrder,
+                (group, element) => element.DefaultEnabled,
+                (group, element) => element.DefaultSuffix);
+
+            Assert.AreEqual("20 Militia, Friendly, reachable, elevated ground, height 2", text);
+        }
+
+        [TestMethod]
+        public void IgnoresTilePartsTheGroupDoesNotDeclare()
+        {
+            ScannerResult result = new ScannerResult("entity:7", "Gold mine", new Vector2Int(3, 4));
+
+            string text = Describe(
+                result,
+                new[] { new AnnouncementPart(CombatAnnouncementDefinitions.TileKeys.Reachable, "reachable") });
+
+            Assert.AreEqual("Gold mine", text);
         }
 
         private static string Describe(ScannerResult result)
         {
+            return Describe(result, null);
+        }
+
+        private static string Describe(ScannerResult result, IEnumerable<AnnouncementPart> tileParts)
+        {
             return ScannerResultContentFormatter.Describe(
                 AdventureMapAnnouncementDefinitions.ScannerContent,
                 result,
+                tileParts,
                 DefaultOrder,
                 (group, element) => element.DefaultEnabled,
                 (group, element) => element.DefaultSuffix);
