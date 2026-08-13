@@ -55,6 +55,7 @@ namespace SongsOfConquestAccess.Scanner
         public const string Beacons = "beacons";
         public const string Objectives = "objectives";
         public const string ArtifactMarkets = "artifact_markets";
+        public const string Merchants = "merchants";
         public const string Teleport = "teleport";
 
         public const string RoadsAndCrossings = "roads_and_crossings";

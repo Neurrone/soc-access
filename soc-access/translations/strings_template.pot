@@ -3149,6 +3149,11 @@ msgctxt "Scanner.LookAroundRadius"
 msgid "Look around radius {0}"
 msgstr ""
 
+#. Scanner.Merchants
+msgctxt "Scanner.Merchants"
+msgid "Merchants"
+msgstr ""
+
 #. Scanner.Neutral
 msgctxt "Scanner.Neutral"
 msgid "Neutral"

@@ -47,7 +47,7 @@ namespace SongsOfConquestAccess.Tests
             AssertSubcategories(
                 AdventureScannerTaxonomy.Instance,
                 "special_sites",
-                "all", "beacons", "objectives", "artifact_markets", "teleport");
+                "all", "beacons", "objectives", "artifact_markets", "merchants", "teleport");
             AssertSubcategories(AdventureScannerTaxonomy.Instance, "wielders", "all");
             AssertSubcategories(
                 AdventureScannerTaxonomy.Instance,

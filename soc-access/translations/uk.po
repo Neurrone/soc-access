@@ -35,6 +35,11 @@ msgctxt "Scanner.Exploration"
 msgid "Exploration"
 msgstr "Дослідження"
 
+#. Scanner.Merchants
+msgctxt "Scanner.Merchants"
+msgid "Merchants"
+msgstr "Торговці"
+
 #. Scanner.SpecialSites
 msgctxt "Scanner.SpecialSites"
 msgid "Special sites"

@@ -1027,6 +1027,7 @@ namespace SongsOfConquestAccess.Adapters
             ScannerContribution.Run(ScannerSubcategoryKeys.Objectives, () => AddObjectiveScannerResults(snapshot, tileCache));
             ScannerContribution.Run(ScannerCategoryKeys.Obstacles, () => AddObstacleScannerResults(snapshot, localTeamId, origin, tileCache));
             ScannerContribution.Run(ScannerSubcategoryKeys.ArtifactMarkets, () => AddArtifactMarketScannerResults(snapshot, tileCache));
+            ScannerContribution.Run(ScannerSubcategoryKeys.Merchants, () => AddMerchantScannerResults(snapshot, tileCache));
             ScannerContribution.Run(ScannerSubcategoryKeys.Teleport, () => AddTeleportScannerResults(snapshot, tileCache));
             ScannerContribution.Run(ScannerCategoryKeys.Terrain, () => AddAdventureTerrainScannerResults(snapshot, origin, tileCache));
             ScannerContribution.Run(ScannerSubcategoryKeys.Unexplored, () => AddUnexploredScannerResults(snapshot, origin));
@@ -1558,6 +1559,37 @@ namespace SongsOfConquestAccess.Adapters
                 if (result != null)
                 {
                     AddSpecialSiteResult(snapshot, ScannerSubcategoryKeys.Beacons, result);
+                }
+            });
+        }
+
+        /// <summary>
+        /// Merchants are picked by category rather than by a component, because
+        /// what makes one worth visiting is that it trades, and the trading
+        /// component is not one the scanner otherwise knows about. Without this
+        /// the scanner cannot reach them at all: Merchant is in none of the
+        /// other contributions' categories and carries none of their
+        /// components.
+        /// </summary>
+        private void AddMerchantScannerResults(ScannerSnapshot snapshot, Dictionary<Vector2Int, AdventureMapTile> tileCache)
+        {
+            ForEachScannerEntity(tileCache, entity =>
+            {
+                if (entity.Category != MapEntityCategory.Merchant)
+                {
+                    return;
+                }
+
+                AdventureMapTile tile;
+                if (!TryGetMapEntityIdentityTile(entity, tileCache, out tile))
+                {
+                    return;
+                }
+
+                ScannerResult result = CreateMapEntityScannerResult(entity, tile);
+                if (result != null)
+                {
+                    AddSpecialSiteResult(snapshot, ScannerSubcategoryKeys.Merchants, result);
                 }
             });
         }

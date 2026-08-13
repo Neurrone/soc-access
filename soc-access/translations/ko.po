@@ -35,6 +35,11 @@ msgctxt "Scanner.Exploration"
 msgid "Exploration"
 msgstr "탐색"
 
+#. Scanner.Merchants
+msgctxt "Scanner.Merchants"
+msgid "Merchants"
+msgstr "상인"
+
 #. Scanner.SpecialSites
 msgctxt "Scanner.SpecialSites"
 msgid "Special sites"

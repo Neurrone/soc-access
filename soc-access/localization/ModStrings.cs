@@ -687,6 +687,7 @@ namespace SongsOfConquestAccess.Localization
             public static readonly ModString Knowledge = new ModString("Scanner.Knowledge", "Knowledge");
             public static readonly ModString LookAround = new ModString("Scanner.LookAround", "Look around");
             public static readonly ModString LookAroundRadius = new ModString("Scanner.LookAroundRadius", "Look around radius {0}");
+            public static readonly ModString Merchants = new ModString("Scanner.Merchants", "Merchants");
             public static readonly ModString Neutral = new ModString("Scanner.Neutral", "Neutral");
             public static readonly ModString NoTileToReturnTo = new ModString("Scanner.NoTileToReturnTo", "No tile to return to");
             public static readonly ModString North = new ModString("Scanner.North", "north");
