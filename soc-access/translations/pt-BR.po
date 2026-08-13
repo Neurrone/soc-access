@@ -2565,6 +2565,11 @@ msgctxt "Spatial.Road"
 msgid "Road"
 msgstr "Estrada"
 
+#. Spatial.RoadDirectionJoin
+msgctxt "Spatial.RoadDirectionJoin"
+msgid "{0} {1}"
+msgstr "{0} {1}"
+
 #. Spatial.ShallowWater
 msgctxt "Spatial.ShallowWater"
 msgid "Shallow water"
@@ -3120,6 +3125,16 @@ msgstr "Anúncios de conteúdo do scanner"
 msgctxt "Screens.ScannerUsesLongDirections"
 msgid "Long directions"
 msgstr "Direções por extenso"
+
+#. Screens.AdventureMapReadsRoadDirections
+msgctxt "Screens.AdventureMapReadsRoadDirections"
+msgid "Road directions"
+msgstr "Direções da estrada"
+
+#. Screens.AdventureMapUsesLongRoadDirections
+msgctxt "Screens.AdventureMapUsesLongRoadDirections"
+msgid "Long road directions"
+msgstr "Direções da estrada por extenso"
 
 #. Screens.ScannerResultAnnouncements
 msgctxt "Screens.ScannerResultAnnouncements"

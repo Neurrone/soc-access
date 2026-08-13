@@ -431,10 +431,8 @@ namespace SongsOfConquestAccess.Adapters
             AdventureMapTile tile = new AdventureMapTile(clamped);
             int localTeamId = GetLocalTeamId();
             byte fog = GetFog(clamped);
-            tile.IsVisible = fog == byte.MaxValue || _fogManager.IsVisible(clamped);
-            tile.IsExplored = tile.IsVisible
-                || fog == ExploredButNotVisibleFogValue
-                || _facade.Level.GetIsPointExplored(localTeamId, clamped);
+            tile.IsVisible = IsPointVisible(fog, clamped);
+            tile.IsExplored = IsPointExplored(fog, tile.IsVisible, clamped, localTeamId);
             PopulateZoneOfControl(tile, localTeamId);
 
             if (!tile.IsExplored)
@@ -443,6 +441,7 @@ namespace SongsOfConquestAccess.Adapters
             }
 
             tile.Terrain = GetTerrain(clamped);
+            tile.SetRoadDirectionsSource(() => GetRoadDirections(clamped, localTeamId));
             ICommanderState selectedCommander = _selectionHandler.SelectedCommander;
             tile.IsImpassable = float.IsPositiveInfinity(_facade.Level.GetStaticTravelCost(localTeamId, clamped));
             tile.IsBlocked = !tile.IsImpassable && !_facade.Level.IsValidMoveDestination(localTeamId, clamped);
@@ -3624,6 +3623,81 @@ namespace SongsOfConquestAccess.Adapters
             }
         }
 
+        /// <summary>
+        /// The neighbouring tiles a road carries on into, or an empty list when this is not a
+        /// road. Bridges count as road so a route does not appear to stop dead at every water
+        /// crossing.
+        /// </summary>
+        private IReadOnlyList<ScannerDirection> GetRoadDirections(Vector2Int position, int localTeamId)
+        {
+            return RoadConnections.Compute(position, tile => IsRoadTile(tile, localTeamId));
+        }
+
+        /// <summary>
+        /// Whether this tile is one the player has seen and would hear named as a road. Asking
+        /// through the surface terrain rather than the road byte keeps the directions honest:
+        /// a tile whose decoration hides the road under it is named for the decoration, so it
+        /// must not be offered as somewhere the road carries on to either.
+        /// </summary>
+        private bool IsRoadTile(Vector2Int position, int localTeamId)
+        {
+            return IsWithinMap(position)
+                && IsPointExplored(position, localTeamId)
+                && IsRoadTerrain(GetSurfaceTerrain(position));
+        }
+
+        private static bool IsRoadTerrain(AdventureTerrainKind terrain)
+        {
+            return terrain == AdventureTerrainKind.Road
+                || terrain == AdventureTerrainKind.DirtRoad
+                || terrain == AdventureTerrainKind.CobblestoneRoad
+                || terrain == AdventureTerrainKind.Bridge;
+        }
+
+        private bool IsPointVisible(byte fog, Vector2Int position)
+        {
+            if (fog == byte.MaxValue)
+            {
+                return true;
+            }
+
+            try
+            {
+                return _fogManager.IsVisible(position);
+            }
+            catch (Exception)
+            {
+                return false;
+            }
+        }
+
+        private bool IsPointExplored(byte fog, bool visible, Vector2Int position, int localTeamId)
+        {
+            if (visible || fog == ExploredButNotVisibleFogValue)
+            {
+                return true;
+            }
+
+            try
+            {
+                return _facade.Level.GetIsPointExplored(localTeamId, position);
+            }
+            catch (Exception)
+            {
+                return false;
+            }
+        }
+
+        /// <summary>
+        /// The same exploration rule GetTile applies, for callers that only need the answer.
+        /// Roads leading into unexplored ground stop here, so they read as though they ended.
+        /// </summary>
+        private bool IsPointExplored(Vector2Int position, int localTeamId)
+        {
+            byte fog = GetFog(position);
+            return IsPointExplored(fog, IsPointVisible(fog, position), position, localTeamId);
+        }
+
         private byte GetFog(Vector2Int position)
         {
             try
@@ -3885,32 +3959,10 @@ namespace SongsOfConquestAccess.Adapters
 
         private AdventureTerrainKind GetTerrain(Vector2Int position)
         {
-            AdventureTerrainKind decorationTerrain = GetDecorationTerrain(GetDecorationValue(position));
-            if (decorationTerrain != AdventureTerrainKind.Unknown)
+            AdventureTerrainKind surface = GetSurfaceTerrain(position);
+            if (surface != AdventureTerrainKind.Unknown)
             {
-                return decorationTerrain;
-            }
-
-            byte bridge = GetLayerValue(position, LayerKind.Bridge);
-            if (bridge > 0)
-            {
-                return AdventureTerrainKind.Bridge;
-            }
-
-            byte road = GetLayerValue(position, LayerKind.Road);
-            switch (road)
-            {
-                case 1:
-                    return AdventureTerrainKind.DirtRoad;
-                case 2:
-                    return AdventureTerrainKind.CobblestoneRoad;
-                default:
-                    if (road > 0)
-                    {
-                        return AdventureTerrainKind.Road;
-                    }
-
-                    break;
+                return surface;
             }
 
             byte water = GetLayerValue(position, LayerKind.Water);
@@ -3950,6 +4002,37 @@ namespace SongsOfConquestAccess.Adapters
             catch
             {
                 return 0;
+            }
+        }
+
+        /// <summary>
+        /// Whatever sits on top of the ground: a decoration hides the bridge or road beneath it,
+        /// and a bridge hides the road. Returns Unknown when only ground or water is left.
+        /// Kept separate from GetTerrain so that asking "is this a road" answers with the same
+        /// rule that decides what the tile is called.
+        /// </summary>
+        private AdventureTerrainKind GetSurfaceTerrain(Vector2Int position)
+        {
+            AdventureTerrainKind decorationTerrain = GetDecorationTerrain(GetDecorationValue(position));
+            if (decorationTerrain != AdventureTerrainKind.Unknown)
+            {
+                return decorationTerrain;
+            }
+
+            if (GetLayerValue(position, LayerKind.Bridge) > 0)
+            {
+                return AdventureTerrainKind.Bridge;
+            }
+
+            byte road = GetLayerValue(position, LayerKind.Road);
+            switch (road)
+            {
+                case 1:
+                    return AdventureTerrainKind.DirtRoad;
+                case 2:
+                    return AdventureTerrainKind.CobblestoneRoad;
+                default:
+                    return road > 0 ? AdventureTerrainKind.Road : AdventureTerrainKind.Unknown;
             }
         }
 

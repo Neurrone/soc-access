@@ -106,6 +106,114 @@ namespace SongsOfConquestAccess.Tests
             Assert.AreEqual("Unexplored, 4, 2.", text);
         }
 
+        [TestMethod]
+        public void DescribeTileReadsTheWaysARoadLeadsOnAfterTheTerrain()
+        {
+            AdventureMapTile tile = new AdventureMapTile(new Vector2Int(4, 2))
+            {
+                IsExplored = true,
+                IsVisible = true,
+                Terrain = AdventureTerrainKind.DirtRoad,
+                IsReachable = true,
+                RoadDirections = new[] { ScannerDirection.East, ScannerDirection.West }
+            };
+
+            string text = CreateFormatter().DescribeTile(tile);
+
+            Assert.AreEqual("Dirt road e w, reachable, 4, 2.", text);
+        }
+
+        [TestMethod]
+        public void DescribeTileReadsAForkAsThreeDirectionsWithoutNamingTheShape()
+        {
+            AdventureMapTile tile = new AdventureMapTile(new Vector2Int(4, 2))
+            {
+                IsExplored = true,
+                IsVisible = true,
+                Terrain = AdventureTerrainKind.CobblestoneRoad,
+                IsReachable = true,
+                RoadDirections = new[]
+                {
+                    ScannerDirection.North,
+                    ScannerDirection.East,
+                    ScannerDirection.Southwest
+                }
+            };
+
+            string text = CreateFormatter().DescribeTile(tile);
+
+            Assert.AreEqual("Cobblestone road n e sw, reachable, 4, 2.", text);
+        }
+
+        [TestMethod]
+        public void DescribeTileSpellsOutRoadDirectionsWhenLongDirectionsAreOn()
+        {
+            AdventureMapTile tile = new AdventureMapTile(new Vector2Int(4, 2))
+            {
+                IsExplored = true,
+                IsVisible = true,
+                Terrain = AdventureTerrainKind.DirtRoad,
+                IsReachable = true,
+                RoadDirections = new[] { ScannerDirection.East, ScannerDirection.West }
+            };
+
+            string text = new AdventureMapTileSpeechFormatter(
+                GetDefaultOrder,
+                (group, element) => element.Key != AdventureMapAnnouncementDefinitions.TileKeys.MovementCost
+                    && element.DefaultEnabled,
+                (group, element) => element.DefaultSuffix,
+                () => true,
+                () => true).DescribeTile(tile);
+
+            Assert.AreEqual("Dirt road east west, reachable, 4, 2.", text);
+        }
+
+        [TestMethod]
+        public void DescribeTileLeavesTerrainAloneWhenThereAreNoRoadDirections()
+        {
+            AdventureMapTile tile = new AdventureMapTile(new Vector2Int(4, 2))
+            {
+                IsExplored = true,
+                IsVisible = true,
+                Terrain = AdventureTerrainKind.Grass,
+                IsReachable = true,
+                RoadDirections = new ScannerDirection[0]
+            };
+
+            string text = CreateFormatter().DescribeTile(tile);
+
+            Assert.AreEqual("Grass, reachable, 4, 2.", text);
+        }
+
+        [TestMethod]
+        public void DescribeTileSaysNothingAboutRoadDirectionsWhenTheyAreTurnedOff()
+        {
+            int calls = 0;
+            AdventureMapTile tile = new AdventureMapTile(new Vector2Int(4, 2))
+            {
+                IsExplored = true,
+                IsVisible = true,
+                Terrain = AdventureTerrainKind.DirtRoad,
+                IsReachable = true
+            };
+            tile.SetRoadDirectionsSource(() =>
+            {
+                calls++;
+                return new[] { ScannerDirection.East, ScannerDirection.West };
+            });
+
+            string text = new AdventureMapTileSpeechFormatter(
+                GetDefaultOrder,
+                (group, element) => element.Key != AdventureMapAnnouncementDefinitions.TileKeys.MovementCost
+                    && element.DefaultEnabled,
+                (group, element) => element.DefaultSuffix,
+                () => false,
+                () => false).DescribeTile(tile);
+
+            Assert.AreEqual("Dirt road, reachable, 4, 2.", text);
+            Assert.AreEqual(0, calls, "turning road directions off should not cost the work of finding them");
+        }
+
         private static AdventureMapTileSpeechFormatter CreateFormatter()
         {
             return CreateFormatter(enableMovementCost: false);

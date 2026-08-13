@@ -53,7 +53,16 @@ namespace SongsOfConquestAccess.Scanner
             return ModText.Get(
                 useLongForm ? ModStrings.Scanner.DirectionStepLong : ModStrings.Scanner.DirectionStep,
                 step.Count,
-                ModText.Get(useLongForm ? LongForm(step.Direction) : ShortForm(step.Direction)));
+                FormatDirection(step.Direction, useLongForm));
+        }
+
+        /// <summary>
+        /// Names a direction on its own, without a distance in front of it. Short form gives
+        /// "ne"; the Long directions setting gives "northeast".
+        /// </summary>
+        internal static string FormatDirection(ScannerDirection direction, bool useLongForm)
+        {
+            return ModText.Get(useLongForm ? LongForm(direction) : ShortForm(direction));
         }
 
         private static ModString LongForm(ScannerDirection direction)

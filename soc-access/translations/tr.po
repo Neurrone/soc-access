@@ -2550,6 +2550,11 @@ msgctxt "Spatial.Road"
 msgid "Road"
 msgstr "Yol"
 
+#. Spatial.RoadDirectionJoin
+msgctxt "Spatial.RoadDirectionJoin"
+msgid "{0} {1}"
+msgstr "{0} {1}"
+
 #. Spatial.ShallowWater
 msgctxt "Spatial.ShallowWater"
 msgid "Shallow water"
@@ -3100,6 +3105,16 @@ msgstr "Tarayıcı içerik duyuruları"
 msgctxt "Screens.ScannerUsesLongDirections"
 msgid "Long directions"
 msgstr "Uzun yön adları"
+
+#. Screens.AdventureMapReadsRoadDirections
+msgctxt "Screens.AdventureMapReadsRoadDirections"
+msgid "Road directions"
+msgstr "Yol yönleri"
+
+#. Screens.AdventureMapUsesLongRoadDirections
+msgctxt "Screens.AdventureMapUsesLongRoadDirections"
+msgid "Long road directions"
+msgstr "Uzun yol yön adları"
 
 #. Screens.ScannerResultAnnouncements
 msgctxt "Screens.ScannerResultAnnouncements"

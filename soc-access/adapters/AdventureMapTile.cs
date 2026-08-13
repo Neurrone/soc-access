@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using SongsOfConquest.Common.Entities;
 using SongsOfConquest.Common.Gamestate;
@@ -7,6 +8,11 @@ namespace SongsOfConquestAccess.Adapters
 {
     internal sealed class AdventureMapTile
     {
+        private static readonly Scanner.ScannerDirection[] NoRoadDirections = new Scanner.ScannerDirection[0];
+
+        private IReadOnlyList<Scanner.ScannerDirection> _roadDirections;
+        private Func<IReadOnlyList<Scanner.ScannerDirection>> _roadDirectionsSource;
+
         public enum PathIndicatorKind
         {
             OnRoute,
@@ -83,6 +89,42 @@ namespace SongsOfConquestAccess.Adapters
         public PathIndicatorInfo PathIndicator { get; set; }
 
         public AdventureTerrainKind Terrain { get; set; }
+
+        /// <summary>
+        /// The neighbouring tiles this road carries on into, empty for anything that is not a
+        /// road. Worked out on first read rather than up front, because finding them looks at
+        /// the surrounding tiles and most callers of GetTile never ask: the skip navigator walks
+        /// a whole row through GetTile, and turning road directions off means nothing reads this
+        /// at all.
+        /// </summary>
+        public IReadOnlyList<Scanner.ScannerDirection> RoadDirections
+        {
+            get
+            {
+                if (_roadDirections == null)
+                {
+                    _roadDirections = _roadDirectionsSource != null
+                        ? _roadDirectionsSource() ?? NoRoadDirections
+                        : NoRoadDirections;
+                    _roadDirectionsSource = null;
+                }
+
+                return _roadDirections;
+            }
+
+            set
+            {
+                _roadDirections = value ?? NoRoadDirections;
+                _roadDirectionsSource = null;
+            }
+        }
+
+        /// <summary>Defers working out the road directions until something asks for them.</summary>
+        public void SetRoadDirectionsSource(Func<IReadOnlyList<Scanner.ScannerDirection>> source)
+        {
+            _roadDirections = null;
+            _roadDirectionsSource = source;
+        }
 
         public CommanderInfo Commander { get; set; }
 

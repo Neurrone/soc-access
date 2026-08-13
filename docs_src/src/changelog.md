@@ -2,6 +2,7 @@
 
 ## Unreleased
 
+- Road tiles now name the neighbouring tiles the road carries on into, so a road reads as `Dirt road e w` and can be followed a step at a time instead of leaving you to guess where it went. The adventure map tab has a `Road directions` setting to turn this off and a `Long road directions` setting to spell the directions out
 - Scanner results are now grouped into items and copies of an item. `Page Up` and `Page Down` step between different things, and the new `Alt+Page Up` and `Alt+Page Down` walk the copies of the thing you are on, so a map with a dozen chests costs one stop in the list instead of a dozen
 - Scanner readouts now describe the thing that was scanned instead of everything else on its tile. On the adventure map they still say whether the selected wielder can reach it, which you can turn off like any other announcement element
 - Removed the `End` refresh. Scanner results are re-queried on every scanner key press, so they follow things that move and drop things that are gone. `End` now reads how far away the current result is and which way it lies, replacing `Shift+Home`

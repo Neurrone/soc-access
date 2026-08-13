@@ -80,6 +80,19 @@ namespace SongsOfConquestAccess.Screens
                 ToggleReadStoryCameraFocusChanges,
                 () => ModSettings.ReadStoryCameraFocusChanges,
                 IsGeneralTabSelected));
+            root.AddChild(new CheckboxWidget(
+                "mod-settings-adventure-map-reads-road-directions",
+                ModText.Get(ModStrings.Screens.AdventureMapReadsRoadDirections),
+                ToggleAdventureMapReadsRoadDirections,
+                () => ModSettings.AdventureMapReadsRoadDirections,
+                IsAdventureMapTabSelected));
+            root.AddChild(new CheckboxWidget(
+                "mod-settings-adventure-map-uses-long-road-directions",
+                ModText.Get(ModStrings.Screens.AdventureMapUsesLongRoadDirections),
+                ToggleAdventureMapUsesLongRoadDirections,
+                () => ModSettings.AdventureMapUsesLongRoadDirections,
+                IsAdventureMapTabSelected,
+                () => ModSettings.AdventureMapReadsRoadDirections));
             root.AddChild(new ButtonWidget(
                 "mod-settings-adventure-map-tile-announcements",
                 ModText.Get(ModStrings.Screens.TileAnnouncements),
@@ -300,6 +313,16 @@ namespace SongsOfConquestAccess.Screens
         private static void ToggleScannerUsesLongDirections()
         {
             ModSettings.SetScannerUsesLongDirections(!ModSettings.ScannerUsesLongDirections);
+        }
+
+        private static void ToggleAdventureMapReadsRoadDirections()
+        {
+            ModSettings.SetAdventureMapReadsRoadDirections(!ModSettings.AdventureMapReadsRoadDirections);
+        }
+
+        private static void ToggleAdventureMapUsesLongRoadDirections()
+        {
+            ModSettings.SetAdventureMapUsesLongRoadDirections(!ModSettings.AdventureMapUsesLongRoadDirections);
         }
 
         private static bool OpenCustomCategoriesScreen(ScannerTaxonomy taxonomy, ModString contextLabel)
