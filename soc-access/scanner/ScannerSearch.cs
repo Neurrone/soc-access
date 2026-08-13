@@ -20,8 +20,8 @@ namespace SongsOfConquestAccess.Scanner
                 return null;
             }
 
-            string normalizedQuery = query.Trim().ToLowerInvariant();
-            if (normalizedQuery.Length == 0)
+            string normalizedQuery = ScannerTextMatch.NormalizeQuery(query);
+            if (normalizedQuery == null)
             {
                 return null;
             }
@@ -64,8 +64,8 @@ namespace SongsOfConquestAccess.Scanner
                             continue;
                         }
 
-                        int tier = MatchTier((result.Label ?? string.Empty).ToLowerInvariant(), normalizedQuery);
-                        if (tier < 0)
+                        int tier = ScannerTextMatch.TierForLabel(result.Label, normalizedQuery);
+                        if (tier == ScannerTextMatch.NoMatch)
                         {
                             continue;
                         }
@@ -154,80 +154,6 @@ namespace SongsOfConquestAccess.Scanner
 
             int xCompare = left.Position.x.CompareTo(right.Position.x);
             return xCompare != 0 ? xCompare : left.Position.y.CompareTo(right.Position.y);
-        }
-
-        private static int MatchTier(string label, string query)
-        {
-            if (string.IsNullOrEmpty(label) || string.IsNullOrEmpty(query) || query.Length > label.Length)
-            {
-                return -1;
-            }
-
-            if (StartsAt(label, query, 0))
-            {
-                return IsWordEnd(label, query.Length) ? 0 : 1;
-            }
-
-            for (int i = 1; i < label.Length; i++)
-            {
-                if (!IsWordBoundary(label[i - 1]) || IsWordBoundary(label[i]))
-                {
-                    continue;
-                }
-
-                if (StartsAt(label, query, i))
-                {
-                    return IsWordEnd(label, i + query.Length) ? 2 : 3;
-                }
-            }
-
-            if (label.IndexOf(query, StringComparison.Ordinal) >= 0)
-            {
-                return 4;
-            }
-
-            return query.IndexOf(' ') >= 0 && MatchesWordPrefixTokens(label, query) ? 5 : -1;
-        }
-
-        private static bool StartsAt(string label, string query, int index)
-        {
-            return index >= 0
-                && index + query.Length <= label.Length
-                && string.Compare(label, index, query, 0, query.Length, StringComparison.Ordinal) == 0;
-        }
-
-        private static bool IsWordBoundary(char value)
-        {
-            return value == ' ' || value == ',';
-        }
-
-        private static bool IsWordEnd(string label, int index)
-        {
-            return index >= label.Length || IsWordBoundary(label[index]);
-        }
-
-        private static bool MatchesWordPrefixTokens(string label, string query)
-        {
-            string[] tokens = query.Split(new[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
-            if (tokens.Length == 0)
-            {
-                return false;
-            }
-
-            int tokenIndex = 0;
-            for (int i = 0; i < label.Length && tokenIndex < tokens.Length; i++)
-            {
-                if ((i == 0 || IsWordBoundary(label[i - 1])) && !IsWordBoundary(label[i]))
-                {
-                    string token = tokens[tokenIndex];
-                    if (StartsAt(label, token, i))
-                    {
-                        tokenIndex++;
-                    }
-                }
-            }
-
-            return tokenIndex == tokens.Length;
         }
 
         private static int DistanceSquared(Vector2Int origin, Vector2Int point)
