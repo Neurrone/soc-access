@@ -39,6 +39,7 @@ namespace SongsOfConquestAccess.Speech.Spatial
             public const string Name = "name";
             public const string Owner = "owner";
             public const string Status = "status";
+            public const string Attackable = "attackable";
         }
     }
 }

@@ -102,6 +102,13 @@ namespace SongsOfConquestAccess.Scanner
 
         public bool Unvisited { get; set; }
 
+        /// <summary>
+        /// Whether the troop whose turn it is can attack this. Set by the
+        /// screens that have an acting troop to answer for, and left alone
+        /// everywhere else.
+        /// </summary>
+        public bool Attackable { get; set; }
+
         public ScannerResultRelationship Relationship { get; set; }
 
         public ScannerResultKind Kind { get; set; }

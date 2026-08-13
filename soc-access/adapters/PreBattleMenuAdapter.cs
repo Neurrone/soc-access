@@ -345,6 +345,7 @@ namespace SongsOfConquestAccess.Adapters
             {
                 NotVisible = result.NotVisible,
                 Unvisited = result.Unvisited,
+                Attackable = result.Attackable,
                 Relationship = result.Relationship,
                 StableReference = result.StableReference,
                 Kind = result.Kind,

@@ -73,6 +73,32 @@ namespace SongsOfConquestAccess.Tests
             Assert.AreEqual("pickup:chest-3", subcategory.Items[2].Instances[0].Key);
         }
 
+        /// <summary>
+        /// Every enemy stack of one unit is one item however the current turn
+        /// happens to fall. Which of them the acting troop can hit is what the
+        /// player hears walking the instances, not a reason to walk two items.
+        /// </summary>
+        [TestMethod]
+        public void AddKeepsOneItemWhateverTheActingTroopCanReach()
+        {
+            ScannerSnapshot snapshot = new ScannerSnapshot();
+            snapshot.Add("Troops", "Enemy", new ScannerResult("troop:enemy:1", "20 Militia", new Vector2Int(1, 0))
+            {
+                ItemKey = "troop:0:1:none",
+                Relationship = ScannerResultRelationship.Enemy,
+                Attackable = true
+            });
+            snapshot.Add("Troops", "Enemy", new ScannerResult("troop:enemy:2", "20 Militia", new Vector2Int(9, 0))
+            {
+                ItemKey = "troop:0:1:none",
+                Relationship = ScannerResultRelationship.Enemy
+            });
+
+            ScannerSubcategory subcategory = snapshot.Categories[0].Subcategories[0];
+            Assert.AreEqual(1, subcategory.Items.Count);
+            Assert.AreEqual(2, subcategory.Items[0].Instances.Count);
+        }
+
         [TestMethod]
         public void AddKeepsOneItemPerResultWhenTheSubcategoryIsFlat()
         {

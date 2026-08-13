@@ -502,7 +502,8 @@ namespace SongsOfConquestAccess.Adapters
                             ItemKey = ScannerTroopItemKey(tile.Troop),
                             Relationship = friendly
                                 ? ScannerResultRelationship.Friendly
-                                : ScannerResultRelationship.Enemy
+                                : ScannerResultRelationship.Enemy,
+                            Attackable = tile.IsTroopAttackable
                         };
                         snapshot.Add(ScannerCategoryKeys.Troops, ScannerSubcategoryKeys.All, CloneResult(result));
                         snapshot.Add(ScannerCategoryKeys.Troops, friendly ? ScannerSubcategoryKeys.Friendly : ScannerSubcategoryKeys.Enemy, result);
@@ -537,7 +538,8 @@ namespace SongsOfConquestAccess.Adapters
                             {
                                 Relationship = friendlyGate
                                     ? ScannerResultRelationship.Friendly
-                                    : ScannerResultRelationship.Enemy
+                                    : ScannerResultRelationship.Enemy,
+                                Attackable = tile.IsEntityAttackable
                             };
                             snapshot.Add(ScannerCategoryKeys.Entities, ScannerSubcategoryKeys.All, CloneResult(result));
                             snapshot.Add(ScannerCategoryKeys.Entities, friendlyGate ? ScannerSubcategoryKeys.FriendlyGates : ScannerSubcategoryKeys.EnemyGates, result);
@@ -547,7 +549,14 @@ namespace SongsOfConquestAccess.Adapters
                             ScannerResult result = new ScannerResult(
                                 ScannerTileKey("entity:attackable", point),
                                 GetMapEntityName(tile.Entity),
-                                point);
+                                point)
+                            {
+                                // The subcategory says these can be attacked in
+                                // principle. This says the acting troop can
+                                // reach one now, which is a different question
+                                // and the one worth answering per result.
+                                Attackable = tile.IsEntityAttackable
+                            };
                             snapshot.Add(ScannerCategoryKeys.Entities, ScannerSubcategoryKeys.All, CloneResult(result));
                             snapshot.Add(ScannerCategoryKeys.Entities, ScannerSubcategoryKeys.Attackable, result);
                         }
@@ -648,6 +657,7 @@ namespace SongsOfConquestAccess.Adapters
             {
                 NotVisible = result.NotVisible,
                 Unvisited = result.Unvisited,
+                Attackable = result.Attackable,
                 Relationship = result.Relationship,
                 StableReference = result.StableReference,
                 Kind = result.Kind,

@@ -119,18 +119,63 @@ namespace SongsOfConquestAccess.Tests
             Assert.AreEqual("Friendly, Gold mine", text);
         }
 
+        /// <summary>
+        /// Everything about the result itself comes before anything about the
+        /// ground it stands on. In combat that starts with whether the acting
+        /// troop can hit it, since a player sweeping the enemy line is asking
+        /// that and nothing else, and hearing it first means not sitting
+        /// through the name and health of everything out of reach.
+        /// </summary>
         [TestMethod]
-        public void EveryScannerContentGroupLeadsWithTheThingItself()
+        public void EveryScannerContentGroupLeadsWithTheResultBeforeTheTile()
         {
             Assert.AreEqual(
                 "name,owner,status,reachability_or_route_preview",
                 AdventureMapAnnouncementDefinitions.ScannerContent.DefaultOrderCsv);
             Assert.AreEqual(
-                "name,owner,status,reachable,elevation",
+                "attackable,name,owner,status,reachable,elevation",
                 CombatAnnouncementDefinitions.ScannerContent.DefaultOrderCsv);
             Assert.AreEqual(
                 "name,owner,status,elevation",
                 TroopDeploymentAnnouncementDefinitions.ScannerContent.DefaultOrderCsv);
+        }
+
+        [TestMethod]
+        public void ReadsAttackableBeforeTheTroopItNames()
+        {
+            ScannerResult result = new ScannerResult("troop:enemy:2:3", "20 Militia", new Vector2Int(2, 3))
+            {
+                InstanceLabel = "20 Militia",
+                Relationship = ScannerResultRelationship.Enemy,
+                Attackable = true
+            };
+
+            string text = ScannerResultContentFormatter.Describe(
+                CombatAnnouncementDefinitions.ScannerContent,
+                result,
+                null,
+                DefaultOrder,
+                (group, element) => element.DefaultEnabled,
+                (group, element) => element.DefaultSuffix);
+
+            Assert.AreEqual("Attackable, 20 Militia, Enemy", text);
+        }
+
+        /// <summary>
+        /// Only combat has an acting troop to answer for, so the screens that
+        /// do not declare the element drop it rather than showing a fact they
+        /// cannot compute.
+        /// </summary>
+        [TestMethod]
+        public void OmitsAttackableWhereTheGroupDoesNotDeclareIt()
+        {
+            ScannerResult result = new ScannerResult("entity:7", "Gold mine", new Vector2Int(3, 4))
+            {
+                InstanceLabel = "Gold mine",
+                Attackable = true
+            };
+
+            Assert.AreEqual("Gold mine", Describe(result));
         }
 
         [TestMethod]

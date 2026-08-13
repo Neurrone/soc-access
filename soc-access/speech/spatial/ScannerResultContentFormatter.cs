@@ -62,6 +62,16 @@ namespace SongsOfConquestAccess.Speech.Spatial
 
         private static IEnumerable<AnnouncementPart> BuildParts(ScannerResult result)
         {
+            // Emitted for every screen; only the groups that declare the
+            // element show it, which is what keeps a fact that belongs to one
+            // screen out of the others without a screen-specific formatter.
+            if (result.Attackable)
+            {
+                yield return new AnnouncementPart(
+                    ScannerAnnouncementDefinitions.ContentKeys.Attackable,
+                    ModText.Get(ModStrings.Scanner.Attackable));
+            }
+
             if (!string.IsNullOrWhiteSpace(result.InstanceLabel))
             {
                 yield return new AnnouncementPart(

@@ -80,14 +80,18 @@ namespace SongsOfConquestAccess.Scanner
         }
 
         /// <summary>
-        /// Items group on everything the announcement says about the thing
-        /// itself: what it is, whose it is, and what state it is in. Instances
-        /// under one item are then interchangeable, and a scope that mixes
-        /// sides or states spends a stop on each rather than making the player
-        /// walk the enemy's spawn points to reach their own, or the chests they
-        /// have already emptied to reach the ones still worth a visit. Each
-        /// fact is spoken with the instance, so the items say which is which
-        /// without needing names of their own.
+        /// Items group on what the thing is, whose it is, and the state it is
+        /// in, so a scope that mixes sides or states spends a stop on each
+        /// rather than making the player walk the enemy's spawn points to
+        /// reach their own, or the chests they have already emptied to reach
+        /// the ones still worth a visit. Each fact is spoken with the
+        /// instance, so the items say which is which without needing names of
+        /// their own.
+        ///
+        /// What the current turn happens to allow is not identity and does not
+        /// split anything: every enemy stack of one unit stays one item, and
+        /// whether the acting troop can hit this one is what the player hears
+        /// walking the instances.
         /// </summary>
         private static string ItemKeyFor(ScannerResult result)
         {
