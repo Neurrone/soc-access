@@ -495,6 +495,11 @@ namespace SongsOfConquestAccess.Adapters
                             FormatTroopGridLabel(tile.Troop),
                             point)
                         {
+                            // Keyed by troop type, not by the label: the label
+                            // carries stack size and health, so grouping on it
+                            // would give every stack an item of its own and
+                            // split one apart the moment it took damage.
+                            ItemKey = ScannerTroopItemKey(tile.Troop),
                             Relationship = friendly
                                 ? ScannerResultRelationship.Friendly
                                 : ScannerResultRelationship.Enemy
@@ -652,6 +657,21 @@ namespace SongsOfConquestAccess.Adapters
             };
             clone.Points.AddRange(result.Points);
             return clone;
+        }
+
+        /// <summary>
+        /// Identifies the kind of troop rather than the stack, so every stack
+        /// of the same unit collapses into one stop in the item cycle.
+        /// </summary>
+        private static string ScannerTroopItemKey(ICommonTroopState troop)
+        {
+            if (troop == null)
+            {
+                return null;
+            }
+
+            TroopReference reference = troop.Reference;
+            return "troop:" + reference.FactionIndex + ":" + reference.UnitIndex + ":" + reference.UpgradeType;
         }
 
         public ScannerResultRefresh TryRefreshScannerResult(ScannerResult result, Vector2Int cursorHint)

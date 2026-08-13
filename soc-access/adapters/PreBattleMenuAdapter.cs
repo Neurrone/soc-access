@@ -260,6 +260,11 @@ namespace SongsOfConquestAccess.Adapters
                         string.IsNullOrWhiteSpace(tile.TroopLabel) ? ModText.Get(ModStrings.Combat.UnknownTroop) : tile.TroopLabel,
                         tile.Point)
                     {
+                        // Keyed by troop type so stacks of the same unit are
+                        // one stop in the item cycle, except where the game is
+                        // hiding what the troop is: those keep the label as
+                        // their key so the item cycle cannot leak it.
+                        ItemKey = ScannerTroopItemKey(tile),
                         Relationship = own
                             ? ScannerResultRelationship.Friendly
                             : ScannerResultRelationship.Enemy
@@ -323,6 +328,17 @@ namespace SongsOfConquestAccess.Adapters
             };
             clone.Points.AddRange(result.Points);
             return clone;
+        }
+
+        private static string ScannerTroopItemKey(TroopPlacementTile tile)
+        {
+            if (tile == null || tile.Troop == null || tile.TroopDetailsHidden)
+            {
+                return null;
+            }
+
+            TroopReference reference = tile.Troop.Reference;
+            return "troop:" + reference.FactionIndex + ":" + reference.UnitIndex + ":" + reference.UpgradeType;
         }
 
         public ScannerResultRefresh TryRefreshScannerResult(ScannerResult result, Vector2Int cursorHint)
