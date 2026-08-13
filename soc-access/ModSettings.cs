@@ -25,6 +25,7 @@ namespace SongsOfConquestAccess
         private static ConfigEntry<bool> _readEnemyInfluence;
         private static ConfigEntry<bool> _readStoryCameraFocusChanges;
         private static ConfigEntry<bool> _tileCuesEnabled;
+        private static ConfigEntry<bool> _scannerUsesLongDirections;
         private static readonly Dictionary<string, AnnouncementGroupConfig> _announcementGroups =
             new Dictionary<string, AnnouncementGroupConfig>();
         private static readonly Dictionary<string, AudioCueConfig> _audioCues =
@@ -45,6 +46,11 @@ namespace SongsOfConquestAccess
             get { return _tileCuesEnabled == null || _tileCuesEnabled.Value; }
         }
 
+        public static bool ScannerUsesLongDirections
+        {
+            get { return _scannerUsesLongDirections != null && _scannerUsesLongDirections.Value; }
+        }
+
         public static void Bind(ConfigFile config)
         {
             _config = config;
@@ -63,6 +69,11 @@ namespace SongsOfConquestAccess
                 "TileCuesEnabled",
                 true,
                 "Whether cursor movement plays synthesised tile sound cues.");
+            _scannerUsesLongDirections = config.Bind(
+                "Scanner",
+                "ScannerUsesLongDirections",
+                false,
+                "Whether spoken directions use the long form (\"3 northeast\") instead of the short form (\"3ne\").");
             BindAnnouncementGroups(config);
             BindAudioCues(config);
         }
@@ -207,6 +218,17 @@ namespace SongsOfConquestAccess
             SaveAndInvalidateCue(cueKey);
         }
 
+        public static void SetScannerUsesLongDirections(bool value)
+        {
+            if (_scannerUsesLongDirections == null)
+            {
+                return;
+            }
+
+            _scannerUsesLongDirections.Value = value;
+            _config?.Save();
+        }
+
         public static IReadOnlyList<string> GetAnnouncementOrder(AnnouncementGroupDefinition group)
         {
             if (group == null)
@@ -326,6 +348,7 @@ namespace SongsOfConquestAccess
             _readEnemyInfluence = null;
             _readStoryCameraFocusChanges = null;
             _tileCuesEnabled = null;
+            _scannerUsesLongDirections = null;
             _announcementGroups.Clear();
             _audioCues.Clear();
         }

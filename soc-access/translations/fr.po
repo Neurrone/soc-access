@@ -2200,10 +2200,25 @@ msgctxt "Scanner.Dangerous"
 msgid "Dangerous"
 msgstr "Dangereux"
 
+#. Scanner.DirectionStep
+msgctxt "Scanner.DirectionStep"
+msgid "{0}{1}"
+msgstr "{0}{1}"
+
+#. Scanner.DirectionStepLong
+msgctxt "Scanner.DirectionStepLong"
+msgid "{0} {1}"
+msgstr "{0} {1}"
+
 #. Scanner.East
 msgctxt "Scanner.East"
 msgid "east"
 msgstr "est"
+
+#. Scanner.EastShort
+msgctxt "Scanner.EastShort"
+msgid "e"
+msgstr "e"
 
 #. Scanner.ElevatedGround
 msgctxt "Scanner.ElevatedGround"
@@ -2275,15 +2290,30 @@ msgctxt "Scanner.North"
 msgid "north"
 msgstr "nord"
 
+#. Scanner.NorthShort
+msgctxt "Scanner.NorthShort"
+msgid "n"
+msgstr "n"
+
 #. Scanner.Northeast
 msgctxt "Scanner.Northeast"
 msgid "northeast"
 msgstr "nord-est"
 
+#. Scanner.NortheastShort
+msgctxt "Scanner.NortheastShort"
+msgid "ne"
+msgstr "ne"
+
 #. Scanner.Northwest
 msgctxt "Scanner.Northwest"
 msgid "northwest"
 msgstr "nord-ouest"
+
+#. Scanner.NorthwestShort
+msgctxt "Scanner.NorthwestShort"
+msgid "nw"
+msgstr "no"
 
 #. Scanner.Objectives
 msgctxt "Scanner.Objectives"
@@ -2350,10 +2380,20 @@ msgctxt "Scanner.South"
 msgid "south"
 msgstr "sud"
 
+#. Scanner.SouthShort
+msgctxt "Scanner.SouthShort"
+msgid "s"
+msgstr "s"
+
 #. Scanner.Southeast
 msgctxt "Scanner.Southeast"
 msgid "southeast"
 msgstr "sud-est"
+
+#. Scanner.SoutheastShort
+msgctxt "Scanner.SoutheastShort"
+msgid "se"
+msgstr "se"
 
 #. Scanner.Southwest
 msgctxt "Scanner.Southwest"
@@ -2575,6 +2615,11 @@ msgctxt "Screens.Options"
 msgid "Options"
 msgstr "Options"
 
+#. Scanner.SouthwestShort
+msgctxt "Scanner.SouthwestShort"
+msgid "sw"
+msgstr "so"
+
 #. Scanner.SpawnPoints
 msgctxt "Scanner.SpawnPoints"
 msgid "Spawn points"
@@ -2710,6 +2755,11 @@ msgstr "Eau peu profonde"
 msgctxt "Scanner.TemperateTrees"
 msgid "Temperate trees"
 msgstr "Arbres tempérés"
+
+#. Scanner.WestShort
+msgctxt "Scanner.WestShort"
+msgid "w"
+msgstr "o"
 
 #. Scanner.Walls
 msgctxt "Scanner.Walls"
@@ -3230,6 +3280,11 @@ msgstr "Scanner"
 msgctxt "Screens.ScannerContentAnnouncements"
 msgid "Scanner content announcements"
 msgstr "Annonces du contenu du scanner"
+
+#. Screens.ScannerUsesLongDirections
+msgctxt "Screens.ScannerUsesLongDirections"
+msgid "Long directions"
+msgstr "Directions longues"
 
 #. Screens.ScannerResultAnnouncements
 msgctxt "Screens.ScannerResultAnnouncements"

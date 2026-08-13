@@ -2185,10 +2185,25 @@ msgctxt "Scanner.Dangerous"
 msgid "Dangerous"
 msgstr "위험"
 
+#. Scanner.DirectionStep
+msgctxt "Scanner.DirectionStep"
+msgid "{0}{1}"
+msgstr "{0}{1}"
+
+#. Scanner.DirectionStepLong
+msgctxt "Scanner.DirectionStepLong"
+msgid "{0} {1}"
+msgstr "{0} {1}"
+
 #. Scanner.East
 msgctxt "Scanner.East"
 msgid "east"
 msgstr "동쪽"
+
+#. Scanner.EastShort
+msgctxt "Scanner.EastShort"
+msgid "e"
+msgstr "동"
 
 #. Scanner.ElevatedGround
 msgctxt "Scanner.ElevatedGround"
@@ -2260,15 +2275,30 @@ msgctxt "Scanner.North"
 msgid "north"
 msgstr "북쪽"
 
+#. Scanner.NorthShort
+msgctxt "Scanner.NorthShort"
+msgid "n"
+msgstr "북"
+
 #. Scanner.Northeast
 msgctxt "Scanner.Northeast"
 msgid "northeast"
 msgstr "북동쪽"
 
+#. Scanner.NortheastShort
+msgctxt "Scanner.NortheastShort"
+msgid "ne"
+msgstr "북동"
+
 #. Scanner.Northwest
 msgctxt "Scanner.Northwest"
 msgid "northwest"
 msgstr "북서쪽"
+
+#. Scanner.NorthwestShort
+msgctxt "Scanner.NorthwestShort"
+msgid "nw"
+msgstr "북서"
 
 #. Scanner.Objectives
 msgctxt "Scanner.Objectives"
@@ -2335,10 +2365,20 @@ msgctxt "Scanner.South"
 msgid "south"
 msgstr "남쪽"
 
+#. Scanner.SouthShort
+msgctxt "Scanner.SouthShort"
+msgid "s"
+msgstr "남"
+
 #. Scanner.Southeast
 msgctxt "Scanner.Southeast"
 msgid "southeast"
 msgstr "남동쪽"
+
+#. Scanner.SoutheastShort
+msgctxt "Scanner.SoutheastShort"
+msgid "se"
+msgstr "남동"
 
 #. Scanner.Southwest
 msgctxt "Scanner.Southwest"
@@ -2530,6 +2570,11 @@ msgctxt "Screens.Options"
 msgid "Options"
 msgstr "옵션"
 
+#. Scanner.SouthwestShort
+msgctxt "Scanner.SouthwestShort"
+msgid "sw"
+msgstr "남서"
+
 #. Scanner.SpawnPoints
 msgctxt "Scanner.SpawnPoints"
 msgid "Spawn points"
@@ -2665,6 +2710,11 @@ msgstr "얕은 물"
 msgctxt "Scanner.TemperateTrees"
 msgid "Temperate trees"
 msgstr "온대 나무"
+
+#. Scanner.WestShort
+msgctxt "Scanner.WestShort"
+msgid "w"
+msgstr "서"
 
 #. Scanner.Walls
 msgctxt "Scanner.Walls"
@@ -3110,6 +3160,11 @@ msgstr "스캐너"
 msgctxt "Screens.ScannerContentAnnouncements"
 msgid "Scanner content announcements"
 msgstr "스캐너 내용 알림"
+
+#. Screens.ScannerUsesLongDirections
+msgctxt "Screens.ScannerUsesLongDirections"
+msgid "Long directions"
+msgstr "방향 전체 표기"
 
 #. Screens.ScannerResultAnnouncements
 msgctxt "Screens.ScannerResultAnnouncements"

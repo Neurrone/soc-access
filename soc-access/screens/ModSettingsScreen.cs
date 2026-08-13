@@ -46,6 +46,12 @@ namespace SongsOfConquestAccess.Screens
         {
             ContainerWidget root = new ContainerWidget("mod-settings-screen", ModText.Get(ModStrings.Screens.ModSettings));
             root.AddChild(BuildTabs());
+            root.AddChild(new CheckboxWidget(
+                "mod-settings-scanner-uses-long-directions",
+                ModText.Get(ModStrings.Screens.ScannerUsesLongDirections),
+                ToggleScannerUsesLongDirections,
+                () => ModSettings.ScannerUsesLongDirections,
+                IsScannerTabSelected));
             root.AddChild(new ButtonWidget(
                 "mod-settings-scanner-result-announcements",
                 ModText.Get(ModStrings.Screens.ScannerResultAnnouncements),
@@ -274,6 +280,11 @@ namespace SongsOfConquestAccess.Screens
                 new AudioGlossaryScreen(),
                 "audio glossary screen opened");
             return true;
+        }
+
+        private static void ToggleScannerUsesLongDirections()
+        {
+            ModSettings.SetScannerUsesLongDirections(!ModSettings.ScannerUsesLongDirections);
         }
 
         private static bool OpenAnnouncementOrderScreen(AnnouncementGroupDefinition group)

@@ -2185,9 +2185,24 @@ msgctxt "Scanner.Dangerous"
 msgid "Dangerous"
 msgstr "危险"
 
+#. Scanner.DirectionStep
+msgctxt "Scanner.DirectionStep"
+msgid "{0}{1}"
+msgstr "{0}{1}"
+
+#. Scanner.DirectionStepLong
+msgctxt "Scanner.DirectionStepLong"
+msgid "{0} {1}"
+msgstr "{0} {1}"
+
 #. Scanner.East
 msgctxt "Scanner.East"
 msgid "east"
+msgstr "东"
+
+#. Scanner.EastShort
+msgctxt "Scanner.EastShort"
+msgid "e"
 msgstr "东"
 
 #. Scanner.ElevatedGround
@@ -2260,14 +2275,29 @@ msgctxt "Scanner.North"
 msgid "north"
 msgstr "北"
 
+#. Scanner.NorthShort
+msgctxt "Scanner.NorthShort"
+msgid "n"
+msgstr "北"
+
 #. Scanner.Northeast
 msgctxt "Scanner.Northeast"
 msgid "northeast"
 msgstr "东北"
 
+#. Scanner.NortheastShort
+msgctxt "Scanner.NortheastShort"
+msgid "ne"
+msgstr "东北"
+
 #. Scanner.Northwest
 msgctxt "Scanner.Northwest"
 msgid "northwest"
+msgstr "西北"
+
+#. Scanner.NorthwestShort
+msgctxt "Scanner.NorthwestShort"
+msgid "nw"
 msgstr "西北"
 
 #. Scanner.Objectives
@@ -2335,9 +2365,19 @@ msgctxt "Scanner.South"
 msgid "south"
 msgstr "南"
 
+#. Scanner.SouthShort
+msgctxt "Scanner.SouthShort"
+msgid "s"
+msgstr "南"
+
 #. Scanner.Southeast
 msgctxt "Scanner.Southeast"
 msgid "southeast"
+msgstr "东南"
+
+#. Scanner.SoutheastShort
+msgctxt "Scanner.SoutheastShort"
+msgid "se"
 msgstr "东南"
 
 #. Scanner.Southwest
@@ -2530,6 +2570,11 @@ msgctxt "Screens.Options"
 msgid "Options"
 msgstr "选项"
 
+#. Scanner.SouthwestShort
+msgctxt "Scanner.SouthwestShort"
+msgid "sw"
+msgstr "西南"
+
 #. Scanner.SpawnPoints
 msgctxt "Scanner.SpawnPoints"
 msgid "Spawn points"
@@ -2665,6 +2710,11 @@ msgstr "浅水"
 msgctxt "Scanner.TemperateTrees"
 msgid "Temperate trees"
 msgstr "温带树木"
+
+#. Scanner.WestShort
+msgctxt "Scanner.WestShort"
+msgid "w"
+msgstr "西"
 
 #. Scanner.Walls
 msgctxt "Scanner.Walls"
@@ -3110,6 +3160,11 @@ msgstr "扫描器"
 msgctxt "Screens.ScannerContentAnnouncements"
 msgid "Scanner content announcements"
 msgstr "扫描器内容播报"
+
+#. Screens.ScannerUsesLongDirections
+msgctxt "Screens.ScannerUsesLongDirections"
+msgid "Long directions"
+msgstr "方向使用完整名称"
 
 #. Screens.ScannerResultAnnouncements
 msgctxt "Screens.ScannerResultAnnouncements"

@@ -2215,10 +2215,25 @@ msgctxt "Scanner.Dangerous"
 msgid "Dangerous"
 msgstr "Опасно"
 
+#. Scanner.DirectionStep
+msgctxt "Scanner.DirectionStep"
+msgid "{0}{1}"
+msgstr "{0}{1}"
+
+#. Scanner.DirectionStepLong
+msgctxt "Scanner.DirectionStepLong"
+msgid "{0} {1}"
+msgstr "{0} {1}"
+
 #. Scanner.East
 msgctxt "Scanner.East"
 msgid "east"
 msgstr "восток"
+
+#. Scanner.EastShort
+msgctxt "Scanner.EastShort"
+msgid "e"
+msgstr "в"
 
 #. Scanner.ElevatedGround
 msgctxt "Scanner.ElevatedGround"
@@ -2290,15 +2305,30 @@ msgctxt "Scanner.North"
 msgid "north"
 msgstr "север"
 
+#. Scanner.NorthShort
+msgctxt "Scanner.NorthShort"
+msgid "n"
+msgstr "с"
+
 #. Scanner.Northeast
 msgctxt "Scanner.Northeast"
 msgid "northeast"
 msgstr "северо-восток"
 
+#. Scanner.NortheastShort
+msgctxt "Scanner.NortheastShort"
+msgid "ne"
+msgstr "св"
+
 #. Scanner.Northwest
 msgctxt "Scanner.Northwest"
 msgid "northwest"
 msgstr "северо-запад"
+
+#. Scanner.NorthwestShort
+msgctxt "Scanner.NorthwestShort"
+msgid "nw"
+msgstr "сз"
 
 #. Scanner.Objectives
 msgctxt "Scanner.Objectives"
@@ -2365,10 +2395,20 @@ msgctxt "Scanner.South"
 msgid "south"
 msgstr "юг"
 
+#. Scanner.SouthShort
+msgctxt "Scanner.SouthShort"
+msgid "s"
+msgstr "ю"
+
 #. Scanner.Southeast
 msgctxt "Scanner.Southeast"
 msgid "southeast"
 msgstr "юго-восток"
+
+#. Scanner.SoutheastShort
+msgctxt "Scanner.SoutheastShort"
+msgid "se"
+msgstr "юв"
 
 #. Scanner.Southwest
 msgctxt "Scanner.Southwest"
@@ -2620,6 +2660,11 @@ msgctxt "Screens.Options"
 msgid "Options"
 msgstr "Параметры"
 
+#. Scanner.SouthwestShort
+msgctxt "Scanner.SouthwestShort"
+msgid "sw"
+msgstr "юз"
+
 #. Scanner.SpawnPoints
 msgctxt "Scanner.SpawnPoints"
 msgid "Spawn points"
@@ -2755,6 +2800,11 @@ msgstr "Мелководье"
 msgctxt "Scanner.TemperateTrees"
 msgid "Temperate trees"
 msgstr "Деревья умеренного климата"
+
+#. Scanner.WestShort
+msgctxt "Scanner.WestShort"
+msgid "w"
+msgstr "з"
 
 #. Scanner.Walls
 msgctxt "Scanner.Walls"
@@ -3350,6 +3400,11 @@ msgstr "Сканер"
 msgctxt "Screens.ScannerContentAnnouncements"
 msgid "Scanner content announcements"
 msgstr "Объявления содержимого сканера"
+
+#. Screens.ScannerUsesLongDirections
+msgctxt "Screens.ScannerUsesLongDirections"
+msgid "Long directions"
+msgstr "Полные названия направлений"
 
 #. Screens.ScannerResultAnnouncements
 msgctxt "Screens.ScannerResultAnnouncements"

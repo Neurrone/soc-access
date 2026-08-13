@@ -719,9 +719,9 @@ namespace SongsOfConquestAccess.Scanner
             Vector2Int current = origin;
             while (current != target)
             {
-                string direction;
+                ScannerDirection direction;
                 Vector2Int next = GetNextHexStep(current, target, out direction);
-                if (next == current || string.IsNullOrWhiteSpace(direction))
+                if (next == current)
                 {
                     break;
                 }
@@ -733,7 +733,7 @@ namespace SongsOfConquestAccess.Scanner
             return result;
         }
 
-        private static Vector2Int GetNextHexStep(Vector2Int current, Vector2Int target, out string direction)
+        private static Vector2Int GetNextHexStep(Vector2Int current, Vector2Int target, out ScannerDirection direction)
         {
             Vector2Int[] neighbors =
             {
@@ -744,14 +744,14 @@ namespace SongsOfConquestAccess.Scanner
                 OffsetHexNeighbor(current, north: false, east: true),
                 OffsetHexNeighbor(current, north: false, east: false)
             };
-            string[] directions =
+            ScannerDirection[] directions =
             {
-                ModText.Get(ModStrings.Scanner.East),
-                ModText.Get(ModStrings.Scanner.West),
-                ModText.Get(ModStrings.Scanner.Northeast),
-                ModText.Get(ModStrings.Scanner.Northwest),
-                ModText.Get(ModStrings.Scanner.Southeast),
-                ModText.Get(ModStrings.Scanner.Southwest)
+                ScannerDirection.East,
+                ScannerDirection.West,
+                ScannerDirection.Northeast,
+                ScannerDirection.Northwest,
+                ScannerDirection.Southeast,
+                ScannerDirection.Southwest
             };
 
             int bestIndex = 0;
@@ -800,7 +800,7 @@ namespace SongsOfConquestAccess.Scanner
             cubeY = -cubeX - cubeZ;
         }
 
-        private static void AddHexDirectionStep(List<ScannerDirectionStep> result, string direction)
+        private static void AddHexDirectionStep(List<ScannerDirectionStep> result, ScannerDirection direction)
         {
             if (result.Count > 0)
             {

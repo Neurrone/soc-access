@@ -2185,10 +2185,25 @@ msgctxt "Scanner.Dangerous"
 msgid "Dangerous"
 msgstr "Tehlikeli"
 
+#. Scanner.DirectionStep
+msgctxt "Scanner.DirectionStep"
+msgid "{0}{1}"
+msgstr "{0}{1}"
+
+#. Scanner.DirectionStepLong
+msgctxt "Scanner.DirectionStepLong"
+msgid "{0} {1}"
+msgstr "{0} {1}"
+
 #. Scanner.East
 msgctxt "Scanner.East"
 msgid "east"
 msgstr "doğu"
+
+#. Scanner.EastShort
+msgctxt "Scanner.EastShort"
+msgid "e"
+msgstr "d"
 
 #. Scanner.ElevatedGround
 msgctxt "Scanner.ElevatedGround"
@@ -2260,15 +2275,30 @@ msgctxt "Scanner.North"
 msgid "north"
 msgstr "kuzey"
 
+#. Scanner.NorthShort
+msgctxt "Scanner.NorthShort"
+msgid "n"
+msgstr "k"
+
 #. Scanner.Northeast
 msgctxt "Scanner.Northeast"
 msgid "northeast"
 msgstr "kuzeydoğu"
 
+#. Scanner.NortheastShort
+msgctxt "Scanner.NortheastShort"
+msgid "ne"
+msgstr "kd"
+
 #. Scanner.Northwest
 msgctxt "Scanner.Northwest"
 msgid "northwest"
 msgstr "kuzeybatı"
+
+#. Scanner.NorthwestShort
+msgctxt "Scanner.NorthwestShort"
+msgid "nw"
+msgstr "kb"
 
 #. Scanner.Objectives
 msgctxt "Scanner.Objectives"
@@ -2335,10 +2365,20 @@ msgctxt "Scanner.South"
 msgid "south"
 msgstr "güney"
 
+#. Scanner.SouthShort
+msgctxt "Scanner.SouthShort"
+msgid "s"
+msgstr "g"
+
 #. Scanner.Southeast
 msgctxt "Scanner.Southeast"
 msgid "southeast"
 msgstr "güneydoğu"
+
+#. Scanner.SoutheastShort
+msgctxt "Scanner.SoutheastShort"
+msgid "se"
+msgstr "gd"
 
 #. Scanner.Southwest
 msgctxt "Scanner.Southwest"
@@ -2530,6 +2570,11 @@ msgctxt "Screens.Options"
 msgid "Options"
 msgstr "Seçenekler"
 
+#. Scanner.SouthwestShort
+msgctxt "Scanner.SouthwestShort"
+msgid "sw"
+msgstr "gb"
+
 #. Scanner.SpawnPoints
 msgctxt "Scanner.SpawnPoints"
 msgid "Spawn points"
@@ -2665,6 +2710,11 @@ msgstr "Sığ su"
 msgctxt "Scanner.TemperateTrees"
 msgid "Temperate trees"
 msgstr "Ilıman ağaçlar"
+
+#. Scanner.WestShort
+msgctxt "Scanner.WestShort"
+msgid "w"
+msgstr "b"
 
 #. Scanner.Walls
 msgctxt "Scanner.Walls"
@@ -3110,6 +3160,11 @@ msgstr "Tarayıcı"
 msgctxt "Screens.ScannerContentAnnouncements"
 msgid "Scanner content announcements"
 msgstr "Tarayıcı içerik duyuruları"
+
+#. Screens.ScannerUsesLongDirections
+msgctxt "Screens.ScannerUsesLongDirections"
+msgid "Long directions"
+msgstr "Uzun yön adları"
 
 #. Screens.ScannerResultAnnouncements
 msgctxt "Screens.ScannerResultAnnouncements"

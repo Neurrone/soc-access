@@ -565,6 +565,7 @@ namespace SongsOfConquestAccess.Localization
             public static readonly ModString Round = new ModString("Screens.Round", "Round {0}");
             public static readonly ModString Scanner = new ModString("Screens.Scanner", "Scanner");
             public static readonly ModString ScannerContentAnnouncements = new ModString("Screens.ScannerContentAnnouncements", "Scanner content announcements");
+            public static readonly ModString ScannerUsesLongDirections = new ModString("Screens.ScannerUsesLongDirections", "Long directions");
             public static readonly ModString ScannerResultAnnouncements = new ModString("Screens.ScannerResultAnnouncements", "Scanner result announcements");
             public static readonly ModString SettlementTroops = new ModString("Screens.SettlementTroops", "settlement troops");
             public static readonly ModString Skill = new ModString("Screens.Skill", "Skill {0}");
@@ -655,7 +656,10 @@ namespace SongsOfConquestAccess.Localization
             public static readonly ModPluralString BridgeTileCount = new ModPluralString("Scanner.BridgeTileCount", "{0} bridge tile", "{0} bridge tiles");
             public static readonly ModString Buildings = new ModString("Scanner.Buildings", "Buildings");
             public static readonly ModString Dangerous = new ModString("Scanner.Dangerous", "Dangerous");
+            public static readonly ModString DirectionStep = new ModString("Scanner.DirectionStep", "{0}{1}");
+            public static readonly ModString DirectionStepLong = new ModString("Scanner.DirectionStepLong", "{0} {1}");
             public static readonly ModString East = new ModString("Scanner.East", "east");
+            public static readonly ModString EastShort = new ModString("Scanner.EastShort", "e");
             public static readonly ModString ElevatedGround = new ModString("Scanner.ElevatedGround", "Elevated ground {0}");
             public static readonly ModString Enemy = new ModString("Scanner.Enemy", "Enemy");
             public static readonly ModString EnemyGates = new ModString("Scanner.EnemyGates", "Enemy gates");
@@ -689,8 +693,11 @@ namespace SongsOfConquestAccess.Localization
             public static readonly ModString Neutral = new ModString("Scanner.Neutral", "Neutral");
             public static readonly ModString NoTileToReturnTo = new ModString("Scanner.NoTileToReturnTo", "No tile to return to");
             public static readonly ModString North = new ModString("Scanner.North", "north");
+            public static readonly ModString NorthShort = new ModString("Scanner.NorthShort", "n");
             public static readonly ModString Northeast = new ModString("Scanner.Northeast", "northeast");
+            public static readonly ModString NortheastShort = new ModString("Scanner.NortheastShort", "ne");
             public static readonly ModString Northwest = new ModString("Scanner.Northwest", "northwest");
+            public static readonly ModString NorthwestShort = new ModString("Scanner.NorthwestShort", "nw");
             public static readonly ModString Objectives = new ModString("Scanner.Objectives", "Objectives");
             public static readonly ModString Obstacles = new ModString("Scanner.Obstacles", "Obstacles");
             public static readonly ModString Pickups = new ModString("Scanner.Pickups", "Pickups");
@@ -712,8 +719,11 @@ namespace SongsOfConquestAccess.Localization
             public static readonly ModString ShallowWater = new ModString("Scanner.ShallowWater", "Shallow water");
             public static readonly ModPluralString ShallowWaterTileCount = new ModPluralString("Scanner.ShallowWaterTileCount", "{0} shallow water tile", "{0} shallow water tiles");
             public static readonly ModString South = new ModString("Scanner.South", "south");
+            public static readonly ModString SouthShort = new ModString("Scanner.SouthShort", "s");
             public static readonly ModString Southeast = new ModString("Scanner.Southeast", "southeast");
+            public static readonly ModString SoutheastShort = new ModString("Scanner.SoutheastShort", "se");
             public static readonly ModString Southwest = new ModString("Scanner.Southwest", "southwest");
+            public static readonly ModString SouthwestShort = new ModString("Scanner.SouthwestShort", "sw");
             public static readonly ModString SpawnPoints = new ModString("Scanner.SpawnPoints", "Spawn points");
             public static readonly ModString Teleport = new ModString("Scanner.Teleport", "Teleport");
             public static readonly ModString TemperateTrees = new ModString("Scanner.TemperateTrees", "Temperate trees");
@@ -729,6 +739,7 @@ namespace SongsOfConquestAccess.Localization
             public static readonly ModPluralString WaterEdgeTileCount = new ModPluralString("Scanner.WaterEdgeTileCount", "{0} water edge tile", "{0} water edge tiles");
             public static readonly ModPluralString WaterTileCount = new ModPluralString("Scanner.WaterTileCount", "{0} water tile", "{0} water tiles");
             public static readonly ModString West = new ModString("Scanner.West", "west");
+            public static readonly ModString WestShort = new ModString("Scanner.WestShort", "w");
             public static readonly ModString Walls = new ModString("Scanner.Walls", "Walls");
             public static readonly ModPluralString WallTileCount = new ModPluralString("Scanner.WallTileCount", "{0} wall tile", "{0} wall tiles");
             public static readonly ModString Wielders = new ModString("Scanner.Wielders", "Wielders");

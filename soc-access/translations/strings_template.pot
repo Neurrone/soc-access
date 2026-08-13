@@ -2569,6 +2569,11 @@ msgctxt "Screens.ScannerContentAnnouncements"
 msgid "Scanner content announcements"
 msgstr ""
 
+#. Screens.ScannerUsesLongDirections
+msgctxt "Screens.ScannerUsesLongDirections"
+msgid "Long directions"
+msgstr ""
+
 #. Screens.ScannerResultAnnouncements
 msgctxt "Screens.ScannerResultAnnouncements"
 msgid "Scanner result announcements"
@@ -2984,9 +2989,24 @@ msgctxt "Scanner.Dangerous"
 msgid "Dangerous"
 msgstr ""
 
+#. Scanner.DirectionStep
+msgctxt "Scanner.DirectionStep"
+msgid "{0}{1}"
+msgstr ""
+
+#. Scanner.DirectionStepLong
+msgctxt "Scanner.DirectionStepLong"
+msgid "{0} {1}"
+msgstr ""
+
 #. Scanner.East
 msgctxt "Scanner.East"
 msgid "east"
+msgstr ""
+
+#. Scanner.EastShort
+msgctxt "Scanner.EastShort"
+msgid "e"
 msgstr ""
 
 #. Scanner.ElevatedGround
@@ -3104,14 +3124,29 @@ msgctxt "Scanner.North"
 msgid "north"
 msgstr ""
 
+#. Scanner.NorthShort
+msgctxt "Scanner.NorthShort"
+msgid "n"
+msgstr ""
+
 #. Scanner.Northeast
 msgctxt "Scanner.Northeast"
 msgid "northeast"
 msgstr ""
 
+#. Scanner.NortheastShort
+msgctxt "Scanner.NortheastShort"
+msgid "ne"
+msgstr ""
+
 #. Scanner.Northwest
 msgctxt "Scanner.Northwest"
 msgid "northwest"
+msgstr ""
+
+#. Scanner.NorthwestShort
+msgctxt "Scanner.NorthwestShort"
+msgid "nw"
 msgstr ""
 
 #. Scanner.Objectives
@@ -3204,14 +3239,29 @@ msgctxt "Scanner.South"
 msgid "south"
 msgstr ""
 
+#. Scanner.SouthShort
+msgctxt "Scanner.SouthShort"
+msgid "s"
+msgstr ""
+
 #. Scanner.Southeast
 msgctxt "Scanner.Southeast"
 msgid "southeast"
 msgstr ""
 
+#. Scanner.SoutheastShort
+msgctxt "Scanner.SoutheastShort"
+msgid "se"
+msgstr ""
+
 #. Scanner.Southwest
 msgctxt "Scanner.Southwest"
 msgid "southwest"
+msgstr ""
+
+#. Scanner.SouthwestShort
+msgctxt "Scanner.SouthwestShort"
+msgid "sw"
 msgstr ""
 
 #. Scanner.SpawnPoints
@@ -3267,6 +3317,11 @@ msgstr ""
 #. Scanner.West
 msgctxt "Scanner.West"
 msgid "west"
+msgstr ""
+
+#. Scanner.WestShort
+msgctxt "Scanner.WestShort"
+msgid "w"
 msgstr ""
 
 #. Scanner.Walls
