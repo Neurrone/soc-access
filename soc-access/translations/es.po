@@ -1405,10 +1405,15 @@ msgctxt "Actions.ScannerNextCategory"
 msgid "Next Scanner Category"
 msgstr "Siguiente escáner categoría"
 
-#. Actions.ScannerNextResult
-msgctxt "Actions.ScannerNextResult"
-msgid "Next Scanner Result"
-msgstr "Siguiente escáner resultado"
+#. Actions.ScannerNextInstance
+msgctxt "Actions.ScannerNextInstance"
+msgid "Next Scanner Instance"
+msgstr "Siguiente aparición del escáner"
+
+#. Actions.ScannerNextItem
+msgctxt "Actions.ScannerNextItem"
+msgid "Next Scanner Item"
+msgstr "Siguiente elemento del escáner"
 
 #. Actions.ScannerNextSubcategory
 msgctxt "Actions.ScannerNextSubcategory"
@@ -1420,10 +1425,15 @@ msgctxt "Actions.ScannerPreviousCategory"
 msgid "Previous Scanner Category"
 msgstr "Anterior escáner categoría"
 
-#. Actions.ScannerPreviousResult
-msgctxt "Actions.ScannerPreviousResult"
-msgid "Previous Scanner Result"
-msgstr "Anterior escáner resultado"
+#. Actions.ScannerPreviousInstance
+msgctxt "Actions.ScannerPreviousInstance"
+msgid "Previous Scanner Instance"
+msgstr "Aparición anterior del escáner"
+
+#. Actions.ScannerPreviousItem
+msgctxt "Actions.ScannerPreviousItem"
+msgid "Previous Scanner Item"
+msgstr "Elemento anterior del escáner"
 
 #. Actions.ScannerPreviousSubcategory
 msgctxt "Actions.ScannerPreviousSubcategory"
@@ -3210,6 +3220,11 @@ msgstr "Dirección de orientación para tropas con ataques de rayo"
 msgctxt "Screens.AnnouncementHealth"
 msgid "Health"
 msgstr "Salud"
+
+#. Screens.AnnouncementItem
+msgctxt "Screens.AnnouncementItem"
+msgid "Item name"
+msgstr "Nombre del elemento"
 
 #. Screens.AnnouncementImpassableOrBlocked
 msgctxt "Screens.AnnouncementImpassableOrBlocked"

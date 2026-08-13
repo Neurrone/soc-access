@@ -56,9 +56,8 @@ namespace SongsOfConquestAccess.Scanner
                         continue;
                     }
 
-                    for (int resultIndex = 0; resultIndex < sourceSubcategory.Results.Count; resultIndex++)
+                    foreach (ScannerResult result in sourceSubcategory.AllResults)
                     {
-                        ScannerResult result = sourceSubcategory.Results[resultIndex];
                         if (result == null)
                         {
                             continue;
@@ -75,7 +74,7 @@ namespace SongsOfConquestAccess.Scanner
 
                         if (addedToAll.Add(result.Key))
                         {
-                            all.Results.Add(result);
+                            all.Add(result);
                         }
 
                         HashSet<string> categoryKeys;
@@ -95,13 +94,13 @@ namespace SongsOfConquestAccess.Scanner
                                     () => labelSource.Label);
                             }
 
-                            targetSubcategory.Results.Add(result);
+                            targetSubcategory.Add(result);
                         }
                     }
                 }
             }
 
-            if (all.Results.Count == 0)
+            if (!all.HasResults)
             {
                 return null;
             }

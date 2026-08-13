@@ -1720,7 +1720,7 @@ namespace SongsOfConquestAccess.Adapters
                     position = tile.Position;
                 }
 
-                all.Results.Add(new ScannerResult(entry.Key, entry.Label, position)
+                all.Add(new ScannerResult(entry.Key, entry.Label, position)
                 {
                     NotVisible = tile != null && !tile.IsVisible,
                     StableReference = entry.StableReference,
@@ -2643,6 +2643,9 @@ namespace SongsOfConquestAccess.Adapters
                 Relationship = result.Relationship,
                 StableReference = result.StableReference,
                 Kind = result.Kind,
+                ItemKey = result.ItemKey,
+                ItemLabel = result.ItemLabel,
+                InstanceLabel = result.InstanceLabel,
                 EntityCategory = result.EntityCategory
             };
             clone.Points.AddRange(result.Points);

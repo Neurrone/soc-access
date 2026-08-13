@@ -14,6 +14,7 @@ namespace SongsOfConquestAccess.Scanner
         private readonly IReadOnlyList<ScannerDirectionStep> _directions;
         private readonly int _resultIndex;
         private readonly int _resultCount;
+        private readonly bool _includeItemName;
 
         public CombatScannerSpeechContext(
             ScannerResult result,
@@ -21,7 +22,8 @@ namespace SongsOfConquestAccess.Scanner
             CombatAdapter adapter,
             IReadOnlyList<ScannerDirectionStep> directions,
             int resultIndex,
-            int resultCount)
+            int resultCount,
+            bool includeItemName)
         {
             _result = result;
             _tile = tile;
@@ -29,12 +31,14 @@ namespace SongsOfConquestAccess.Scanner
             _directions = directions;
             _resultIndex = resultIndex;
             _resultCount = resultCount;
+            _includeItemName = includeItemName;
         }
 
         public SpeechRequest ToSpeechRequest()
         {
             CombatTileSpeechFormatter formatter = new CombatTileSpeechFormatter(_adapter, null, includeEnemyInfluence: false);
             string text = ScannerResultSpeechFormatter.Compose(
+                _includeItemName && _result != null ? _result.ItemLabel : null,
                 ScannerResultContentFormatter.Describe(
                     CombatAnnouncementDefinitions.ScannerContent,
                     _result,

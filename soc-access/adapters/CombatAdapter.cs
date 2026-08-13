@@ -648,7 +648,10 @@ namespace SongsOfConquestAccess.Adapters
                 Unvisited = result.Unvisited,
                 Relationship = result.Relationship,
                 StableReference = result.StableReference,
-                Kind = result.Kind
+                Kind = result.Kind,
+                ItemKey = result.ItemKey,
+                ItemLabel = result.ItemLabel,
+                InstanceLabel = result.InstanceLabel
             };
             clone.Points.AddRange(result.Points);
             return clone;

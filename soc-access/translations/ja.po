@@ -1395,10 +1395,15 @@ msgctxt "Actions.ScannerNextCategory"
 msgid "Next Scanner Category"
 msgstr "次 スキャナー カテゴリ"
 
-#. Actions.ScannerNextResult
-msgctxt "Actions.ScannerNextResult"
-msgid "Next Scanner Result"
-msgstr "次 スキャナー 結果"
+#. Actions.ScannerNextInstance
+msgctxt "Actions.ScannerNextInstance"
+msgid "Next Scanner Instance"
+msgstr "次のスキャナー出現箇所"
+
+#. Actions.ScannerNextItem
+msgctxt "Actions.ScannerNextItem"
+msgid "Next Scanner Item"
+msgstr "次のスキャナー項目"
 
 #. Actions.ScannerNextSubcategory
 msgctxt "Actions.ScannerNextSubcategory"
@@ -1410,10 +1415,15 @@ msgctxt "Actions.ScannerPreviousCategory"
 msgid "Previous Scanner Category"
 msgstr "前 スキャナー カテゴリ"
 
-#. Actions.ScannerPreviousResult
-msgctxt "Actions.ScannerPreviousResult"
-msgid "Previous Scanner Result"
-msgstr "前 スキャナー 結果"
+#. Actions.ScannerPreviousInstance
+msgctxt "Actions.ScannerPreviousInstance"
+msgid "Previous Scanner Instance"
+msgstr "前のスキャナー出現箇所"
+
+#. Actions.ScannerPreviousItem
+msgctxt "Actions.ScannerPreviousItem"
+msgid "Previous Scanner Item"
+msgstr "前のスキャナー項目"
 
 #. Actions.ScannerPreviousSubcategory
 msgctxt "Actions.ScannerPreviousSubcategory"
@@ -3090,6 +3100,11 @@ msgstr "ビーム攻撃を行う部隊の向き"
 msgctxt "Screens.AnnouncementHealth"
 msgid "Health"
 msgstr "体力"
+
+#. Screens.AnnouncementItem
+msgctxt "Screens.AnnouncementItem"
+msgid "Item name"
+msgstr "項目名"
 
 #. Screens.AnnouncementImpassableOrBlocked
 msgctxt "Screens.AnnouncementImpassableOrBlocked"

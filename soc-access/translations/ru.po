@@ -1415,10 +1415,15 @@ msgctxt "Actions.ScannerNextCategory"
 msgid "Next Scanner Category"
 msgstr "Следующий сканер категория"
 
-#. Actions.ScannerNextResult
-msgctxt "Actions.ScannerNextResult"
-msgid "Next Scanner Result"
-msgstr "Следующий сканер результат"
+#. Actions.ScannerNextInstance
+msgctxt "Actions.ScannerNextInstance"
+msgid "Next Scanner Instance"
+msgstr "Следующее вхождение сканера"
+
+#. Actions.ScannerNextItem
+msgctxt "Actions.ScannerNextItem"
+msgid "Next Scanner Item"
+msgstr "Следующий элемент сканера"
 
 #. Actions.ScannerNextSubcategory
 msgctxt "Actions.ScannerNextSubcategory"
@@ -1430,10 +1435,15 @@ msgctxt "Actions.ScannerPreviousCategory"
 msgid "Previous Scanner Category"
 msgstr "Предыдущий сканер категория"
 
-#. Actions.ScannerPreviousResult
-msgctxt "Actions.ScannerPreviousResult"
-msgid "Previous Scanner Result"
-msgstr "Предыдущий сканер результат"
+#. Actions.ScannerPreviousInstance
+msgctxt "Actions.ScannerPreviousInstance"
+msgid "Previous Scanner Instance"
+msgstr "Предыдущее вхождение сканера"
+
+#. Actions.ScannerPreviousItem
+msgctxt "Actions.ScannerPreviousItem"
+msgid "Previous Scanner Item"
+msgstr "Предыдущий элемент сканера"
 
 #. Actions.ScannerPreviousSubcategory
 msgctxt "Actions.ScannerPreviousSubcategory"
@@ -3330,6 +3340,11 @@ msgstr "Направление для отрядов с лучевыми ата�
 msgctxt "Screens.AnnouncementHealth"
 msgid "Health"
 msgstr "Здоровье"
+
+#. Screens.AnnouncementItem
+msgctxt "Screens.AnnouncementItem"
+msgid "Item name"
+msgstr "Название элемента"
 
 #. Screens.AnnouncementImpassableOrBlocked
 msgctxt "Screens.AnnouncementImpassableOrBlocked"

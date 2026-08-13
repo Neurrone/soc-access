@@ -173,11 +173,17 @@ namespace SongsOfConquestAccess.Input
         public static readonly InputAction ScannerNextSubcategory = OneShot("scanner_next_subcategory", ModStrings.Actions.ScannerNextSubcategory, InputClaimScope.FocusedWidget)
             .AddBinding(new KeyboardBinding(Key.PageDown, shift: true));
 
-        public static readonly InputAction ScannerPreviousResult = OneShot("scanner_previous_result", ModStrings.Actions.ScannerPreviousResult, InputClaimScope.FocusedWidget)
+        public static readonly InputAction ScannerPreviousItem = OneShot("scanner_previous_item", ModStrings.Actions.ScannerPreviousItem, InputClaimScope.FocusedWidget)
             .AddBinding(new KeyboardBinding(Key.PageUp));
 
-        public static readonly InputAction ScannerNextResult = OneShot("scanner_next_result", ModStrings.Actions.ScannerNextResult, InputClaimScope.FocusedWidget)
+        public static readonly InputAction ScannerNextItem = OneShot("scanner_next_item", ModStrings.Actions.ScannerNextItem, InputClaimScope.FocusedWidget)
             .AddBinding(new KeyboardBinding(Key.PageDown));
+
+        public static readonly InputAction ScannerPreviousInstance = OneShot("scanner_previous_instance", ModStrings.Actions.ScannerPreviousInstance, InputClaimScope.FocusedWidget)
+            .AddBinding(new KeyboardBinding(Key.PageUp, alt: true));
+
+        public static readonly InputAction ScannerNextInstance = OneShot("scanner_next_instance", ModStrings.Actions.ScannerNextInstance, InputClaimScope.FocusedWidget)
+            .AddBinding(new KeyboardBinding(Key.PageDown, alt: true));
 
         public static readonly InputAction ScannerJumpToResult = OneShot("scanner_jump_to_result", ModStrings.Actions.ScannerJumpToResult, InputClaimScope.FocusedWidget)
             .AddBinding(new KeyboardBinding(Key.Home));
@@ -391,8 +397,10 @@ namespace SongsOfConquestAccess.Input
                 ScannerNextCategory,
                 ScannerPreviousSubcategory,
                 ScannerNextSubcategory,
-                ScannerPreviousResult,
-                ScannerNextResult,
+                ScannerPreviousItem,
+                ScannerNextItem,
+                ScannerPreviousInstance,
+                ScannerNextInstance,
                 ScannerJumpToResult,
                 ScannerSpeakDistanceAndDirection,
                 ScannerReturnFromJump,

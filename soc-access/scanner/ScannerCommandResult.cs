@@ -31,6 +31,13 @@ namespace SongsOfConquestAccess.Scanner
 
         public int ResultCount { get; set; }
 
+        /// <summary>
+        /// Whether this announcement leads with the name of the thing being
+        /// walked through. Set for a landing that moves to a different item and
+        /// cleared for a step between copies of the same one.
+        /// </summary>
+        public bool IncludeItemName { get; set; }
+
         public IReadOnlyList<ScannerDirectionStep> Directions { get; set; }
 
         public bool HasOrigin { get; set; }
@@ -52,7 +59,7 @@ namespace SongsOfConquestAccess.Scanner
         public string NoResultsText { get; set; }
 
         public SpeechRequest ToSpeechRequest(
-            Func<ScannerResult, IReadOnlyList<ScannerDirectionStep>, int, int, IScannerSpeechContext> speechContextProvider)
+            Func<ScannerResult, IReadOnlyList<ScannerDirectionStep>, int, int, bool, IScannerSpeechContext> speechContextProvider)
         {
             if (Status == ScannerCommandStatus.NoResults)
             {
@@ -74,7 +81,7 @@ namespace SongsOfConquestAccess.Scanner
                 return BuildNoResults();
             }
 
-            IScannerSpeechContext context = speechContextProvider(Result, Directions, ResultIndex, ResultCount);
+            IScannerSpeechContext context = speechContextProvider(Result, Directions, ResultIndex, ResultCount, IncludeItemName);
             SpeechRequest request = context != null
                 ? context.ToSpeechRequest()
                 : BuildNoResults();

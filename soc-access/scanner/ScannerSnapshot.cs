@@ -6,10 +6,11 @@ namespace SongsOfConquestAccess.Scanner
 {
     internal struct ScannerSnapshotLocation
     {
-        public ScannerSnapshotLocation(int categoryIndex, int subcategoryIndex, int resultIndex)
+        public ScannerSnapshotLocation(int categoryIndex, int subcategoryIndex, int itemIndex, int resultIndex)
         {
             CategoryIndex = categoryIndex;
             SubcategoryIndex = subcategoryIndex;
+            ItemIndex = itemIndex;
             ResultIndex = resultIndex;
         }
 
@@ -17,11 +18,13 @@ namespace SongsOfConquestAccess.Scanner
 
         public int SubcategoryIndex { get; private set; }
 
+        public int ItemIndex { get; private set; }
+
         public int ResultIndex { get; private set; }
 
         public static ScannerSnapshotLocation NotFound
         {
-            get { return new ScannerSnapshotLocation(-1, -1, -1); }
+            get { return new ScannerSnapshotLocation(-1, -1, -1, -1); }
         }
     }
 
@@ -52,7 +55,7 @@ namespace SongsOfConquestAccess.Scanner
                 {
                     for (int j = 0; j < _categories[i].Subcategories.Count; j++)
                     {
-                        if (_categories[i].Subcategories[j].Results.Count > 0)
+                        if (_categories[i].Subcategories[j].HasResults)
                         {
                             return false;
                         }
@@ -152,7 +155,7 @@ namespace SongsOfConquestAccess.Scanner
                 subcategoryKey = ScannerSubcategoryKeys.All;
             }
 
-            GetOrAddCategory(categoryKey).GetOrAddSubcategory(subcategoryKey).Results.Add(result);
+            GetOrAddCategory(categoryKey).GetOrAddSubcategory(subcategoryKey).Add(result);
         }
 
         public void SortByDistance(Vector2Int origin)
@@ -195,9 +198,25 @@ namespace SongsOfConquestAccess.Scanner
 
                 for (int j = 0; j < category.Subcategories.Count; j++)
                 {
-                    category.Subcategories[j].Results.Sort(comparison);
+                    SortSubcategory(category.Subcategories[j], comparison);
                 }
             }
+        }
+
+        /// <summary>
+        /// Instances sort inside their item, then items sort by their leading
+        /// instance, so the item cycle runs nearest first for the same reason
+        /// the flat list used to.
+        /// </summary>
+        private static void SortSubcategory(ScannerSubcategory subcategory, Comparison<ScannerResult> comparison)
+        {
+            List<ScannerItem> items = subcategory.Items;
+            for (int i = 0; i < items.Count; i++)
+            {
+                items[i].Instances.Sort(comparison);
+            }
+
+            items.Sort((left, right) => comparison(left.Instances[0], right.Instances[0]));
         }
 
         public bool TryLocateByKey(
@@ -264,13 +283,17 @@ namespace SongsOfConquestAccess.Scanner
             }
 
             ScannerSubcategory subcategory = category.Subcategories[subcategoryIndex];
-            for (int resultIndex = 0; resultIndex < subcategory.Results.Count; resultIndex++)
+            for (int itemIndex = 0; itemIndex < subcategory.Items.Count; itemIndex++)
             {
-                ScannerResult result = subcategory.Results[resultIndex];
-                if (result != null && result.Key == key)
+                List<ScannerResult> instances = subcategory.Items[itemIndex].Instances;
+                for (int resultIndex = 0; resultIndex < instances.Count; resultIndex++)
                 {
-                    location = new ScannerSnapshotLocation(categoryIndex, subcategoryIndex, resultIndex);
-                    return true;
+                    ScannerResult result = instances[resultIndex];
+                    if (result != null && result.Key == key)
+                    {
+                        location = new ScannerSnapshotLocation(categoryIndex, subcategoryIndex, itemIndex, resultIndex);
+                        return true;
+                    }
                 }
             }
 
@@ -284,7 +307,7 @@ namespace SongsOfConquestAccess.Scanner
                 ScannerCategory category = _categories[i];
                 for (int j = category.Subcategories.Count - 1; j >= 0; j--)
                 {
-                    if (category.Subcategories[j].Results.Count == 0)
+                    if (!category.Subcategories[j].HasResults)
                     {
                         category.Subcategories.RemoveAt(j);
                     }
@@ -310,12 +333,21 @@ namespace SongsOfConquestAccess.Scanner
                 for (int j = 0; j < category.Subcategories.Count; j++)
                 {
                     ScannerSubcategory subcategory = category.Subcategories[j];
-                    for (int k = subcategory.Results.Count - 1; k >= 0; k--)
+                    for (int itemIndex = subcategory.Items.Count - 1; itemIndex >= 0; itemIndex--)
                     {
-                        ScannerResult result = subcategory.Results[k];
-                        if (result != null && result.Key == key)
+                        List<ScannerResult> instances = subcategory.Items[itemIndex].Instances;
+                        for (int k = instances.Count - 1; k >= 0; k--)
                         {
-                            subcategory.Results.RemoveAt(k);
+                            ScannerResult result = instances[k];
+                            if (result != null && result.Key == key)
+                            {
+                                instances.RemoveAt(k);
+                            }
+                        }
+
+                        if (instances.Count == 0)
+                        {
+                            subcategory.Items.RemoveAt(itemIndex);
                         }
                     }
                 }

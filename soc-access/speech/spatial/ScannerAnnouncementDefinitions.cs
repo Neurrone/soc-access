@@ -8,6 +8,7 @@ namespace SongsOfConquestAccess.Speech.Spatial
             "scanner_result",
             "Scanner Result Announcements",
             ModStrings.Screens.ScannerResultAnnouncements,
+            new AnnouncementElementDefinition(ResultKeys.Item, ModStrings.Screens.AnnouncementItem),
             new AnnouncementElementDefinition(ResultKeys.Content, ModStrings.Screens.AnnouncementContent),
             new AnnouncementElementDefinition(ResultKeys.Direction, ModStrings.Screens.AnnouncementDirection),
             new AnnouncementElementDefinition(ResultKeys.Coordinates, ModStrings.Screens.AnnouncementCoordinates),
@@ -20,6 +21,7 @@ namespace SongsOfConquestAccess.Speech.Spatial
 
         public static class ResultKeys
         {
+            public const string Item = "item";
             public const string Content = "content";
             public const string Direction = "direction";
             public const string Coordinates = "coordinates";

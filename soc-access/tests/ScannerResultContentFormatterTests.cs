@@ -10,11 +10,25 @@ namespace SongsOfConquestAccess.Tests
     public sealed class ScannerResultContentFormatterTests
     {
         [TestMethod]
-        public void ReadsTheNameAloneWhenThereIsNoOwnerOrStatus()
+        public void ReadsTheInstanceAloneWhenThereIsNoOwnerOrStatus()
         {
-            ScannerResult result = new ScannerResult("terrain:road", "12 road tiles", new Vector2Int(3, 4));
+            ScannerResult result = new ScannerResult("terrain:road", "Road", new Vector2Int(3, 4))
+            {
+                InstanceLabel = "12 tiles"
+            };
 
-            Assert.AreEqual("12 road tiles", Describe(result));
+            Assert.AreEqual("12 tiles", Describe(result));
+        }
+
+        [TestMethod]
+        public void LeavesTheContentToTheOwnerAndStatusWhenTheItemNameSaysEverything()
+        {
+            ScannerResult result = new ScannerResult("entity:7", "Chest", new Vector2Int(3, 4))
+            {
+                Relationship = ScannerResultRelationship.Neutral
+            };
+
+            Assert.AreEqual("Neutral", Describe(result));
         }
 
         [TestMethod]
@@ -22,6 +36,7 @@ namespace SongsOfConquestAccess.Tests
         {
             ScannerResult result = new ScannerResult("entity:7", "Gold mine", new Vector2Int(3, 4))
             {
+                InstanceLabel = "Gold mine",
                 Relationship = ScannerResultRelationship.Enemy
             };
 
@@ -33,6 +48,7 @@ namespace SongsOfConquestAccess.Tests
         {
             ScannerResult result = new ScannerResult("entity:7", "Ancient amber", new Vector2Int(3, 4))
             {
+                InstanceLabel = "Ancient amber",
                 Relationship = ScannerResultRelationship.Neutral,
                 Unvisited = true,
                 NotVisible = true
@@ -46,6 +62,7 @@ namespace SongsOfConquestAccess.Tests
         {
             ScannerResult result = new ScannerResult("terrain:impassable", "Impassable", new Vector2Int(3, 4))
             {
+                InstanceLabel = "Impassable",
                 NotVisible = true
             };
 
@@ -63,6 +80,7 @@ namespace SongsOfConquestAccess.Tests
         {
             ScannerResult result = new ScannerResult("entity:7", "Gold mine", new Vector2Int(3, 4))
             {
+                InstanceLabel = "Gold mine",
                 Relationship = ScannerResultRelationship.Friendly
             };
 
@@ -82,6 +100,7 @@ namespace SongsOfConquestAccess.Tests
         {
             ScannerResult result = new ScannerResult("entity:7", "Gold mine", new Vector2Int(3, 4))
             {
+                InstanceLabel = "Gold mine",
                 Relationship = ScannerResultRelationship.Friendly
             };
 
@@ -119,6 +138,7 @@ namespace SongsOfConquestAccess.Tests
         {
             ScannerResult result = new ScannerResult("troop:friendly:2:3", "20 Militia", new Vector2Int(2, 3))
             {
+                InstanceLabel = "20 Militia",
                 Relationship = ScannerResultRelationship.Friendly
             };
 
@@ -140,7 +160,10 @@ namespace SongsOfConquestAccess.Tests
         [TestMethod]
         public void IgnoresTilePartsTheGroupDoesNotDeclare()
         {
-            ScannerResult result = new ScannerResult("entity:7", "Gold mine", new Vector2Int(3, 4));
+            ScannerResult result = new ScannerResult("entity:7", "Gold mine", new Vector2Int(3, 4))
+            {
+                InstanceLabel = "Gold mine"
+            };
 
             string text = Describe(
                 result,

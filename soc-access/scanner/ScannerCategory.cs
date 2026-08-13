@@ -7,6 +7,7 @@ namespace SongsOfConquestAccess.Scanner
     {
         private readonly List<ScannerSubcategory> _subcategories = new List<ScannerSubcategory>();
         private readonly Func<string> _label;
+        private bool _flatItems;
 
         public ScannerCategory(string key, Func<string> label)
             : this(key, label, null)
@@ -18,6 +19,7 @@ namespace SongsOfConquestAccess.Scanner
             Key = key ?? string.Empty;
             _label = label;
             Definition = definition;
+            _flatItems = definition != null && definition.FlatItems;
         }
 
         public string Key { get; private set; }
@@ -34,6 +36,25 @@ namespace SongsOfConquestAccess.Scanner
         public ScannerCategoryDefinition Definition { get; private set; }
 
         public bool PreserveResultOrder { get; set; }
+
+        /// <summary>
+        /// Applies to every subcategory under this category, including ones
+        /// added later, so a category that wants a flat list cannot end up half
+        /// grouped.
+        /// </summary>
+        public bool FlatItems
+        {
+            get { return _flatItems; }
+
+            set
+            {
+                _flatItems = value;
+                for (int i = 0; i < _subcategories.Count; i++)
+                {
+                    _subcategories[i].FlatItems = value;
+                }
+            }
+        }
 
         public List<ScannerSubcategory> Subcategories
         {
@@ -56,7 +77,10 @@ namespace SongsOfConquestAccess.Scanner
                 }
             }
 
-            ScannerSubcategory subcategory = new ScannerSubcategory(key, label);
+            ScannerSubcategory subcategory = new ScannerSubcategory(key, label)
+            {
+                FlatItems = _flatItems
+            };
             _subcategories.Add(subcategory);
             return subcategory;
         }

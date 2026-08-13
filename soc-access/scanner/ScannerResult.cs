@@ -30,6 +30,9 @@ namespace SongsOfConquestAccess.Scanner
 
     internal sealed class ScannerResult
     {
+        private string _itemKey;
+        private string _itemLabel;
+
         public ScannerResult(string key, string label, Vector2Int position)
         {
             if (string.IsNullOrWhiteSpace(key))
@@ -46,6 +49,45 @@ namespace SongsOfConquestAccess.Scanner
         public string Label { get; private set; }
 
         public string Key { get; private set; }
+
+        /// <summary>
+        /// What the thing is called as a group. Defaults to the label, which is
+        /// what makes every entity with the same name collapse into one item
+        /// without the adapters saying anything.
+        /// </summary>
+        public string ItemLabel
+        {
+            get { return string.IsNullOrWhiteSpace(_itemLabel) ? Label : _itemLabel; }
+            set { _itemLabel = value; }
+        }
+
+        /// <summary>
+        /// Grouping identity. Set it where the item is a fixed kind of thing and
+        /// a stable string is available, so item identity does not ride on
+        /// translated text.
+        /// </summary>
+        public string ItemKey
+        {
+            get
+            {
+                if (!string.IsNullOrWhiteSpace(_itemKey))
+                {
+                    return _itemKey;
+                }
+
+                string label = ItemLabel;
+                return string.IsNullOrWhiteSpace(label) ? Key : label;
+            }
+
+            set { _itemKey = value; }
+        }
+
+        /// <summary>
+        /// What tells this instance apart from the others under the same item,
+        /// such as a cluster's tile count. Blank where the item name already
+        /// says everything, which is the case for ordinary entities.
+        /// </summary>
+        public string InstanceLabel { get; set; }
 
         public Vector2Int Position { get; private set; }
 

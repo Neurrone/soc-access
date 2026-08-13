@@ -242,10 +242,12 @@
             public static readonly ModString ScannerJumpToResult = new ModString("Actions.ScannerJumpToResult", "Jump To Scanner Result");
             public static readonly ModString ScannerLookAround = new ModString("Actions.ScannerLookAround", "Look Around");
             public static readonly ModString ScannerNextCategory = new ModString("Actions.ScannerNextCategory", "Next Scanner Category");
-            public static readonly ModString ScannerNextResult = new ModString("Actions.ScannerNextResult", "Next Scanner Result");
+            public static readonly ModString ScannerNextInstance = new ModString("Actions.ScannerNextInstance", "Next Scanner Instance");
+            public static readonly ModString ScannerNextItem = new ModString("Actions.ScannerNextItem", "Next Scanner Item");
             public static readonly ModString ScannerNextSubcategory = new ModString("Actions.ScannerNextSubcategory", "Next Scanner Subcategory");
             public static readonly ModString ScannerPreviousCategory = new ModString("Actions.ScannerPreviousCategory", "Previous Scanner Category");
-            public static readonly ModString ScannerPreviousResult = new ModString("Actions.ScannerPreviousResult", "Previous Scanner Result");
+            public static readonly ModString ScannerPreviousInstance = new ModString("Actions.ScannerPreviousInstance", "Previous Scanner Instance");
+            public static readonly ModString ScannerPreviousItem = new ModString("Actions.ScannerPreviousItem", "Previous Scanner Item");
             public static readonly ModString ScannerPreviousSubcategory = new ModString("Actions.ScannerPreviousSubcategory", "Previous Scanner Subcategory");
             public static readonly ModString ScannerReturnFromJump = new ModString("Actions.ScannerReturnFromJump", "Return To Tile Before Jump");
             public static readonly ModString ScannerSpeakDistanceAndDirection = new ModString("Actions.ScannerSpeakDistanceAndDirection", "Scanner Result Distance and Direction");
@@ -615,6 +617,7 @@
             public static readonly ModString AnnouncementFacingDirectionForBeamAttacks = new ModString("Screens.AnnouncementFacingDirectionForBeamAttacks", "Facing direction for troops with beam attacks");
             public static readonly ModString AnnouncementHealth = new ModString("Screens.AnnouncementHealth", "Health");
             public static readonly ModString AnnouncementImpassable = new ModString("Screens.AnnouncementImpassable", "Impassable");
+            public static readonly ModString AnnouncementItem = new ModString("Screens.AnnouncementItem", "Item name");
             public static readonly ModString AnnouncementImpassableOrBlocked = new ModString("Screens.AnnouncementImpassableOrBlocked", "Impassable or blocked");
             public static readonly ModString AnnouncementInfluence = new ModString("Screens.AnnouncementInfluence", "Influence");
             public static readonly ModString AnnouncementInteractionPoint = new ModString("Screens.AnnouncementInteractionPoint", "Interaction point");

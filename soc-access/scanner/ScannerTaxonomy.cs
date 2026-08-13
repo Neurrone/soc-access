@@ -64,6 +64,8 @@ namespace SongsOfConquestAccess.Scanner
 
         public bool PreserveResultOrder { get; set; }
 
+        public bool FlatItems { get; set; }
+
         public IReadOnlyList<ScannerSubcategoryDefinition> Subcategories
         {
             get { return _subcategories; }
@@ -72,6 +74,16 @@ namespace SongsOfConquestAccess.Scanner
         public ScannerCategoryDefinition WithPreservedResultOrder()
         {
             PreserveResultOrder = true;
+            return this;
+        }
+
+        /// <summary>
+        /// Keeps every result its own item. For a category whose order carries
+        /// meaning, grouping by name would shuffle that order away.
+        /// </summary>
+        public ScannerCategoryDefinition WithFlatItems()
+        {
+            FlatItems = true;
             return this;
         }
 

@@ -12,21 +12,25 @@ namespace SongsOfConquestAccess.Scanner
         private readonly Func<Vector2Int> _cursorProvider;
         private readonly Func<ScannerResult, Vector2Int, ScannerResultRefresh> _refreshResult;
         private readonly Func<Vector2Int, bool> _jumpTo;
-        private readonly Func<ScannerResult, IReadOnlyList<ScannerDirectionStep>, int, int, IScannerSpeechContext> _speechContextProvider;
+        private readonly Func<ScannerResult, IReadOnlyList<ScannerDirectionStep>, int, int, bool, IScannerSpeechContext> _speechContextProvider;
         private readonly ScannerDirectionMode _directionMode;
         private ScannerSnapshot _snapshot;
         private int _categoryIndex;
         private int _subcategoryIndex;
-        private int _resultIndex;
+        private int _itemIndex;
+        private int _instanceIndex;
         private int _preTemporaryCategoryIndex;
         private bool _hasBuiltSnapshot;
+        private string _announcedCategoryKey;
+        private string _announcedSubcategoryKey;
+        private string _announcedItemKey;
 
         public ScannerController(
             Func<Vector2Int, ScannerSnapshot> snapshotBuilder,
             Func<Vector2Int> cursorProvider,
             Func<ScannerResult, Vector2Int, ScannerResultRefresh> refreshResult,
             Func<Vector2Int, bool> jumpTo,
-            Func<ScannerResult, IReadOnlyList<ScannerDirectionStep>, int, int, IScannerSpeechContext> speechContextProvider,
+            Func<ScannerResult, IReadOnlyList<ScannerDirectionStep>, int, int, bool, IScannerSpeechContext> speechContextProvider,
             ScannerDirectionMode directionMode)
         {
             _snapshotBuilder = snapshotBuilder;
@@ -99,7 +103,8 @@ namespace SongsOfConquestAccess.Scanner
             _snapshot = search;
             _categoryIndex = 0;
             _subcategoryIndex = 0;
-            _resultIndex = 0;
+            _itemIndex = 0;
+            _instanceIndex = 0;
             return BuildCommandResult(includePath: true);
         }
 
@@ -122,7 +127,8 @@ namespace SongsOfConquestAccess.Scanner
             _snapshot = lookAround;
             _categoryIndex = 0;
             _subcategoryIndex = 0;
-            _resultIndex = 0;
+            _itemIndex = 0;
+            _instanceIndex = 0;
             return BuildCommandResult(includePath: true);
         }
 
@@ -135,7 +141,8 @@ namespace SongsOfConquestAccess.Scanner
 
             _snapshot = null;
             _subcategoryIndex = 0;
-            _resultIndex = 0;
+            _itemIndex = 0;
+            _instanceIndex = 0;
         }
 
         public bool MoveCategory(int delta)
@@ -160,7 +167,8 @@ namespace SongsOfConquestAccess.Scanner
             {
                 _categoryIndex = _preTemporaryCategoryIndex;
                 _subcategoryIndex = 0;
-                _resultIndex = 0;
+                _itemIndex = 0;
+                _instanceIndex = 0;
                 _snapshot = null;
             }
 
@@ -179,7 +187,8 @@ namespace SongsOfConquestAccess.Scanner
 
             _categoryIndex = nextIndex;
             _subcategoryIndex = FirstNonEmptySubcategoryIndex(CurrentCategory());
-            _resultIndex = 0;
+            _itemIndex = 0;
+            _instanceIndex = 0;
             ScannerCommandResult result = BuildCommandResult(includePath: true);
             result.Wrapped = wrapped;
             return result;
@@ -227,24 +236,25 @@ namespace SongsOfConquestAccess.Scanner
             }
 
             _subcategoryIndex = nextIndex;
-            _resultIndex = 0;
+            _itemIndex = 0;
+            _instanceIndex = 0;
             ScannerCommandResult result = BuildCommandResult(includePath: true);
             result.Wrapped = wrapped;
             return result;
         }
 
-        public bool MoveResult(int delta)
+        public bool MoveItem(int delta)
         {
-            Output(ExecuteMoveResult(delta));
+            Output(ExecuteMoveItem(delta));
             return true;
         }
 
-        internal ScannerCommandResult ExecuteMoveResult(int delta)
+        internal ScannerCommandResult ExecuteMoveItem(int delta)
         {
-            return ExecuteMoveResultCore(delta);
+            return ExecuteMoveItemCore(delta);
         }
 
-        private ScannerCommandResult ExecuteMoveResultCore(int delta)
+        private ScannerCommandResult ExecuteMoveItemCore(int delta)
         {
             if (!_hasBuiltSnapshot)
             {
@@ -260,30 +270,96 @@ namespace SongsOfConquestAccess.Scanner
             }
 
             ScannerSubcategory subcategory = CurrentSubcategory();
-            if (subcategory == null || subcategory.Results.Count == 0)
+            if (subcategory == null || !subcategory.HasResults)
             {
                 return NoResults();
             }
 
             if (!locatedCurrent)
             {
-                _resultIndex = delta < 0 ? subcategory.Results.Count : -1;
+                _itemIndex = delta < 0 ? subcategory.Items.Count : -1;
             }
 
             subcategory = CurrentSubcategory();
-            if (subcategory == null || subcategory.Results.Count == 0)
+            if (subcategory == null || !subcategory.HasResults)
             {
                 return NoResults();
             }
 
             bool wrapped = false;
-            int previousIndex = _resultIndex;
-            _resultIndex = WrapIndex(_resultIndex, subcategory.Results.Count, delta, out wrapped);
+            int previousIndex = _itemIndex;
+            _itemIndex = WrapIndex(_itemIndex, subcategory.Items.Count, delta, out wrapped);
+            _instanceIndex = 0;
             if (!locatedCurrent)
             {
                 wrapped = false;
             }
-            else if (delta != 0 && subcategory.Results.Count == 1 && previousIndex == _resultIndex)
+            else if (delta != 0 && subcategory.Items.Count == 1 && previousIndex == _itemIndex)
+            {
+                wrapped = true;
+            }
+
+            ScannerCommandResult result = BuildCommandResult(includePath: false);
+            result.Wrapped = wrapped;
+            return result;
+        }
+
+        public bool MoveInstance(int delta)
+        {
+            Output(ExecuteMoveInstance(delta));
+            return true;
+        }
+
+        internal ScannerCommandResult ExecuteMoveInstance(int delta)
+        {
+            return ExecuteMoveInstanceCore(delta);
+        }
+
+        /// <summary>
+        /// Walks the copies of the thing the item cycle is sitting on, so a
+        /// map with a dozen chests costs one stop in the outer cycle and the
+        /// dozen are only visited when the player asks for them.
+        /// </summary>
+        private ScannerCommandResult ExecuteMoveInstanceCore(int delta)
+        {
+            if (!_hasBuiltSnapshot)
+            {
+                return ExecuteInitialLandingCore();
+            }
+
+            bool locatedCurrent = _snapshot != null && _snapshot.IsTemporarySnapshot
+                ? CurrentValidResult() != null
+                : RebuildForResultNavigation();
+            if (_snapshot == null || _snapshot.IsEmpty)
+            {
+                return NoResults();
+            }
+
+            ScannerItem item = CurrentItem();
+            if (item == null || item.Instances.Count == 0)
+            {
+                return NoResults();
+            }
+
+            if (!locatedCurrent)
+            {
+                _instanceIndex = delta < 0 ? item.Instances.Count : -1;
+            }
+
+            item = CurrentItem();
+            if (item == null || item.Instances.Count == 0)
+            {
+                return NoResults();
+            }
+
+            bool wrapped = false;
+            int previousIndex = _instanceIndex;
+            _instanceIndex = WrapIndex(_instanceIndex, item.Instances.Count, delta, out wrapped);
+            if (!locatedCurrent)
+            {
+                wrapped = false;
+            }
+            else if (delta != 0 && item.Instances.Count == 1 && previousIndex == _instanceIndex)
             {
                 wrapped = true;
             }
@@ -365,21 +441,43 @@ namespace SongsOfConquestAccess.Scanner
                 return NoResults();
             }
 
+            ScannerCategory category = CurrentCategory();
             ScannerSubcategory subcategory = CurrentSubcategory();
+            ScannerItem item = CurrentItem();
             Vector2Int origin = GetSpeechOrigin();
             IReadOnlyList<ScannerDirectionStep> directions = BuildDirections(origin, result.Position);
             return new ScannerCommandResult(ScannerCommandStatus.Result)
             {
                 Result = result,
-                CategoryLabel = CurrentCategory() != null ? CurrentCategory().Label : null,
+                CategoryLabel = category != null ? category.Label : null,
                 SubcategoryLabel = subcategory != null ? subcategory.Label : null,
-                ResultIndex = _resultIndex + 1,
-                ResultCount = subcategory != null ? subcategory.Results.Count : 1,
+                ResultIndex = _instanceIndex + 1,
+                ResultCount = item != null ? item.Instances.Count : 1,
+                IncludeItemName = TakeItemNameTurn(category, subcategory, item),
                 Directions = directions,
                 HasOrigin = true,
                 Origin = origin,
                 IncludePath = includePath
             };
+        }
+
+        /// <summary>
+        /// The item name leads an announcement that moves to a different thing
+        /// and is dropped when only the instance changed, since the player has
+        /// just been told what they are walking through.
+        /// </summary>
+        private bool TakeItemNameTurn(ScannerCategory category, ScannerSubcategory subcategory, ScannerItem item)
+        {
+            string categoryKey = category != null ? category.Key : null;
+            string subcategoryKey = subcategory != null ? subcategory.Key : null;
+            string itemKey = item != null ? item.Key : null;
+            bool changed = categoryKey != _announcedCategoryKey
+                || subcategoryKey != _announcedSubcategoryKey
+                || itemKey != _announcedItemKey;
+            _announcedCategoryKey = categoryKey;
+            _announcedSubcategoryKey = subcategoryKey;
+            _announcedItemKey = itemKey;
+            return changed;
         }
 
         internal void Output(ScannerCommandResult result)
@@ -432,7 +530,7 @@ namespace SongsOfConquestAccess.Scanner
             }
 
             LandOnFirstNonEmptyScope();
-            return CurrentSubcategory() != null && CurrentSubcategory().Results.Count > 0;
+            return CurrentSubcategory() != null && CurrentSubcategory().HasResults;
         }
 
         private ReseatResultState RebuildAndReseatCurrentResult()
@@ -461,7 +559,8 @@ namespace SongsOfConquestAccess.Scanner
                 _snapshot = null;
                 _categoryIndex = 0;
                 _subcategoryIndex = 0;
-                _resultIndex = 0;
+                _itemIndex = 0;
+                _instanceIndex = 0;
                 return new ReseatResultState(false, hadCurrent, categoryHint, subcategoryHint);
             }
 
@@ -472,7 +571,8 @@ namespace SongsOfConquestAccess.Scanner
             {
                 _categoryIndex = location.CategoryIndex;
                 _subcategoryIndex = location.SubcategoryIndex;
-                _resultIndex = location.ResultIndex;
+                _itemIndex = location.ItemIndex;
+                _instanceIndex = location.ResultIndex;
                 return new ReseatResultState(true, hadCurrent, categoryHint, subcategoryHint);
             }
 
@@ -491,7 +591,8 @@ namespace SongsOfConquestAccess.Scanner
                 _snapshot = null;
                 _categoryIndex = 0;
                 _subcategoryIndex = 0;
-                _resultIndex = 0;
+                _itemIndex = 0;
+                _instanceIndex = 0;
                 return;
             }
 
@@ -520,7 +621,8 @@ namespace SongsOfConquestAccess.Scanner
             {
                 _categoryIndex = categoryIndex;
                 _subcategoryIndex = 0;
-                _resultIndex = 0;
+                _itemIndex = 0;
+                _instanceIndex = 0;
                 return false;
             }
 
@@ -535,7 +637,8 @@ namespace SongsOfConquestAccess.Scanner
 
             _categoryIndex = categoryIndex;
             _subcategoryIndex = subcategoryIndex;
-            _resultIndex = 0;
+            _itemIndex = 0;
+            _instanceIndex = 0;
             return true;
         }
 
@@ -556,7 +659,8 @@ namespace SongsOfConquestAccess.Scanner
             {
                 _categoryIndex = 0;
                 _subcategoryIndex = 0;
-                _resultIndex = 0;
+                _itemIndex = 0;
+                _instanceIndex = 0;
                 return;
             }
 
@@ -569,7 +673,8 @@ namespace SongsOfConquestAccess.Scanner
                     {
                         _categoryIndex = categoryIndex;
                         _subcategoryIndex = subcategoryIndex;
-                        _resultIndex = 0;
+                        _itemIndex = 0;
+                        _instanceIndex = 0;
                         return;
                     }
                 }
@@ -577,7 +682,8 @@ namespace SongsOfConquestAccess.Scanner
 
             _categoryIndex = 0;
             _subcategoryIndex = 0;
-            _resultIndex = 0;
+            _itemIndex = 0;
+            _instanceIndex = 0;
         }
 
         private struct ReseatResultState
@@ -709,7 +815,7 @@ namespace SongsOfConquestAccess.Scanner
 
         private static bool SubcategoryHasResults(ScannerSubcategory subcategory)
         {
-            return subcategory != null && subcategory.Results.Count > 0;
+            return subcategory != null && subcategory.HasResults;
         }
 
         private static int FirstNonEmptySubcategoryIndex(ScannerCategory category)
@@ -852,10 +958,16 @@ namespace SongsOfConquestAccess.Scanner
 
             ClampIndices();
             ScannerSubcategory subcategory = CurrentSubcategory();
-            while (subcategory != null && subcategory.Results.Count > 0)
+            while (subcategory != null && subcategory.HasResults)
             {
                 ClampIndices();
-                ScannerResult result = subcategory.Results[_resultIndex];
+                ScannerItem item = CurrentItem();
+                if (item == null || item.Instances.Count == 0)
+                {
+                    return null;
+                }
+
+                ScannerResult result = item.Instances[_instanceIndex];
                 if (TryRefreshResult(result))
                 {
                     return result;
@@ -867,7 +979,11 @@ namespace SongsOfConquestAccess.Scanner
                 }
                 else
                 {
-                    subcategory.Results.RemoveAt(_resultIndex);
+                    item.Instances.RemoveAt(_instanceIndex);
+                    if (item.Instances.Count == 0)
+                    {
+                        subcategory.Items.Remove(item);
+                    }
                 }
                 if (_snapshot == null || _snapshot.IsEmpty)
                 {
@@ -916,13 +1032,20 @@ namespace SongsOfConquestAccess.Scanner
             return category != null && category.Subcategories.Count > 0 ? category.Subcategories[_subcategoryIndex] : null;
         }
 
+        private ScannerItem CurrentItem()
+        {
+            ScannerSubcategory subcategory = CurrentSubcategory();
+            return subcategory != null && subcategory.Items.Count > 0 ? subcategory.Items[_itemIndex] : null;
+        }
+
         private void ClampIndices()
         {
             if (_snapshot == null || _snapshot.Categories.Count == 0)
             {
                 _categoryIndex = 0;
                 _subcategoryIndex = 0;
-                _resultIndex = 0;
+                _itemIndex = 0;
+                _instanceIndex = 0;
                 return;
             }
 
@@ -931,21 +1054,58 @@ namespace SongsOfConquestAccess.Scanner
                 _categoryIndex = _snapshot.Categories.Count - 1;
             }
 
+            if (_categoryIndex < 0)
+            {
+                _categoryIndex = 0;
+            }
+
             ScannerCategory category = _snapshot.Categories[_categoryIndex];
+            if (category.Subcategories.Count == 0)
+            {
+                _subcategoryIndex = 0;
+                _itemIndex = 0;
+                _instanceIndex = 0;
+                return;
+            }
+
             if (_subcategoryIndex >= category.Subcategories.Count)
             {
                 _subcategoryIndex = category.Subcategories.Count - 1;
             }
 
-            ScannerSubcategory subcategory = category.Subcategories[_subcategoryIndex];
-            if (_resultIndex >= subcategory.Results.Count)
+            if (_subcategoryIndex < 0)
             {
-                _resultIndex = subcategory.Results.Count - 1;
+                _subcategoryIndex = 0;
             }
 
-            if (_categoryIndex < 0) _categoryIndex = 0;
-            if (_subcategoryIndex < 0) _subcategoryIndex = 0;
-            if (_resultIndex < 0) _resultIndex = 0;
+            ScannerSubcategory subcategory = category.Subcategories[_subcategoryIndex];
+            if (subcategory.Items.Count == 0)
+            {
+                _itemIndex = 0;
+                _instanceIndex = 0;
+                return;
+            }
+
+            if (_itemIndex >= subcategory.Items.Count)
+            {
+                _itemIndex = subcategory.Items.Count - 1;
+            }
+
+            if (_itemIndex < 0)
+            {
+                _itemIndex = 0;
+            }
+
+            ScannerItem item = subcategory.Items[_itemIndex];
+            if (_instanceIndex >= item.Instances.Count)
+            {
+                _instanceIndex = item.Instances.Count - 1;
+            }
+
+            if (_instanceIndex < 0)
+            {
+                _instanceIndex = 0;
+            }
         }
 
         private Vector2Int GetCursor()

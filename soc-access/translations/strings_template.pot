@@ -1039,9 +1039,14 @@ msgctxt "Actions.ScannerNextCategory"
 msgid "Next Scanner Category"
 msgstr ""
 
-#. Actions.ScannerNextResult
-msgctxt "Actions.ScannerNextResult"
-msgid "Next Scanner Result"
+#. Actions.ScannerNextInstance
+msgctxt "Actions.ScannerNextInstance"
+msgid "Next Scanner Instance"
+msgstr ""
+
+#. Actions.ScannerNextItem
+msgctxt "Actions.ScannerNextItem"
+msgid "Next Scanner Item"
 msgstr ""
 
 #. Actions.ScannerNextSubcategory
@@ -1054,9 +1059,14 @@ msgctxt "Actions.ScannerPreviousCategory"
 msgid "Previous Scanner Category"
 msgstr ""
 
-#. Actions.ScannerPreviousResult
-msgctxt "Actions.ScannerPreviousResult"
-msgid "Previous Scanner Result"
+#. Actions.ScannerPreviousInstance
+msgctxt "Actions.ScannerPreviousInstance"
+msgid "Previous Scanner Instance"
+msgstr ""
+
+#. Actions.ScannerPreviousItem
+msgctxt "Actions.ScannerPreviousItem"
+msgid "Previous Scanner Item"
 msgstr ""
 
 #. Actions.ScannerPreviousSubcategory
@@ -2812,6 +2822,11 @@ msgstr ""
 #. Screens.AnnouncementImpassable
 msgctxt "Screens.AnnouncementImpassable"
 msgid "Impassable"
+msgstr ""
+
+#. Screens.AnnouncementItem
+msgctxt "Screens.AnnouncementItem"
+msgid "Item name"
 msgstr ""
 
 #. Screens.AnnouncementImpassableOrBlocked

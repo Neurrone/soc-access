@@ -21,7 +21,7 @@ namespace SongsOfConquestAccess.Tests
             Assert.AreEqual("All", result.SubcategoryLabel);
             Assert.AreEqual("Gold", result.Result.Label);
             Assert.AreEqual(1, result.ResultIndex);
-            Assert.AreEqual(2, result.ResultCount);
+            Assert.AreEqual(1, result.ResultCount);
             Assert.IsTrue(result.IncludePath);
         }
 
@@ -30,8 +30,7 @@ namespace SongsOfConquestAccess.Tests
         {
             ScannerSnapshot snapshot = new ScannerSnapshot();
             snapshot.GetOrAddCategory("Pickups").GetOrAddSubcategory("Unvisited");
-            snapshot.GetOrAddCategory("Terrain").GetOrAddSubcategory("Roads").Results.Add(
-                new ScannerResult("terrain:road", "Road", new Vector2Int(2, 0)));
+            snapshot.Add("Terrain", "Roads", new ScannerResult("terrain:road", "Road", new Vector2Int(2, 0)));
             ScannerController controller = CreateController(snapshot);
 
             ScannerCommandResult result = controller.ExecuteInitialLanding();
@@ -46,53 +45,53 @@ namespace SongsOfConquestAccess.Tests
         }
 
         [TestMethod]
-        public void ExecuteMoveResultWrapsForwardWithinSubcategory()
+        public void ExecuteMoveItemWrapsForwardWithinSubcategory()
         {
             ScannerController controller = CreateController(BuildSnapshot(
                 Entry("Pickups", "All", "Gold", 1, 0),
                 Entry("Pickups", "All", "Ore", 2, 0)));
 
             controller.ExecuteInitialLanding();
-            controller.ExecuteMoveResult(1);
-            ScannerCommandResult result = controller.ExecuteMoveResult(1);
+            controller.ExecuteMoveItem(1);
+            ScannerCommandResult result = controller.ExecuteMoveItem(1);
 
             Assert.AreEqual(ScannerCommandStatus.Result, result.Status);
             Assert.AreEqual("Gold", result.Result.Label);
             Assert.AreEqual(1, result.ResultIndex);
-            Assert.AreEqual(2, result.ResultCount);
+            Assert.AreEqual(1, result.ResultCount);
             Assert.IsTrue(result.Wrapped);
         }
 
         [TestMethod]
-        public void ExecuteMoveResultBuildsSnapshotWhenNoneExists()
+        public void ExecuteMoveItemBuildsSnapshotWhenNoneExists()
         {
             ScannerController controller = CreateController(BuildSnapshot(
                 Entry("Pickups", "All", "Gold", 1, 0),
                 Entry("Pickups", "All", "Ore", 2, 0)));
 
-            ScannerCommandResult result = controller.ExecuteMoveResult(1);
+            ScannerCommandResult result = controller.ExecuteMoveItem(1);
 
             Assert.AreEqual(ScannerCommandStatus.Result, result.Status);
             Assert.AreEqual("Gold", result.Result.Label);
             Assert.AreEqual(1, result.ResultIndex);
-            Assert.AreEqual(2, result.ResultCount);
+            Assert.AreEqual(1, result.ResultCount);
             Assert.IsFalse(result.Wrapped);
         }
 
         [TestMethod]
-        public void ExecuteMoveResultWrapsBackwardWithinSubcategory()
+        public void ExecuteMoveItemWrapsBackwardWithinSubcategory()
         {
             ScannerController controller = CreateController(BuildSnapshot(
                 Entry("Pickups", "All", "Gold", 1, 0),
                 Entry("Pickups", "All", "Ore", 2, 0)));
 
             controller.ExecuteInitialLanding();
-            ScannerCommandResult result = controller.ExecuteMoveResult(-1);
+            ScannerCommandResult result = controller.ExecuteMoveItem(-1);
 
             Assert.AreEqual(ScannerCommandStatus.Result, result.Status);
             Assert.AreEqual("Ore", result.Result.Label);
-            Assert.AreEqual(2, result.ResultIndex);
-            Assert.AreEqual(2, result.ResultCount);
+            Assert.AreEqual(1, result.ResultIndex);
+            Assert.AreEqual(1, result.ResultCount);
             Assert.IsTrue(result.Wrapped);
         }
 
@@ -155,13 +154,13 @@ namespace SongsOfConquestAccess.Tests
         }
 
         [TestMethod]
-        public void ExecuteMoveResultWrapsSingleResultAfterRebuildWithInitializedEmptyCategories()
+        public void ExecuteMoveItemWrapsSingleResultAfterRebuildWithInitializedEmptyCategories()
         {
             ScannerController controller = CreateController(_ => BuildSnapshotWithEmptyCategoryBeforeTerrain());
 
             controller.ExecuteInitialLanding();
             controller.ExecuteMoveCategory(1);
-            ScannerCommandResult result = controller.ExecuteMoveResult(1);
+            ScannerCommandResult result = controller.ExecuteMoveItem(1);
 
             Assert.AreEqual(ScannerCommandStatus.Result, result.Status);
             Assert.AreEqual("Terrain", result.CategoryLabel);
@@ -210,7 +209,7 @@ namespace SongsOfConquestAccess.Tests
         }
 
         [TestMethod]
-        public void ExecuteMoveResultRebuildsAndPreservesCurrentIdentityBeforeMoving()
+        public void ExecuteMoveItemRebuildsAndPreservesCurrentIdentityBeforeMoving()
         {
             ScannerSnapshot first = BuildSnapshot(
                 Entry("Pickups", "All", "A", 1, 0, "entity:a"),
@@ -225,18 +224,16 @@ namespace SongsOfConquestAccess.Tests
             ScannerController controller = CreateController(_ => builds++ < 2 ? first : second);
 
             controller.ExecuteInitialLanding();
-            controller.ExecuteMoveResult(1);
-            ScannerCommandResult result = controller.ExecuteMoveResult(1);
+            controller.ExecuteMoveItem(1);
+            ScannerCommandResult result = controller.ExecuteMoveItem(1);
 
             Assert.AreEqual(ScannerCommandStatus.Result, result.Status);
             Assert.AreEqual("C", result.Result.Label);
             Assert.AreEqual("entity:c", result.Result.Key);
-            Assert.AreEqual(4, result.ResultIndex);
-            Assert.AreEqual(4, result.ResultCount);
         }
 
         [TestMethod]
-        public void ExecuteMoveResultDoesNotFallbackToAllWhenCurrentKeyLeavesSubcategory()
+        public void ExecuteMoveItemDoesNotFallbackToAllWhenCurrentKeyLeavesSubcategory()
         {
             ScannerSnapshot first = BuildSnapshot(
                 Entry("Pickups", "All", "Gold", 1, 0, "entity:gold"),
@@ -250,7 +247,7 @@ namespace SongsOfConquestAccess.Tests
 
             controller.ExecuteInitialLanding();
             controller.ExecuteMoveSubcategory(1);
-            ScannerCommandResult result = controller.ExecuteMoveResult(1);
+            ScannerCommandResult result = controller.ExecuteMoveItem(1);
 
             Assert.AreEqual(ScannerCommandStatus.Result, result.Status);
             Assert.AreEqual("Pickups", result.CategoryLabel);
@@ -263,7 +260,7 @@ namespace SongsOfConquestAccess.Tests
         }
 
         [TestMethod]
-        public void ExecuteMoveResultDoesNotMarkPruneRecoveryAsWrapped()
+        public void ExecuteMoveItemDoesNotMarkPruneRecoveryAsWrapped()
         {
             ScannerSnapshot first = BuildSnapshot(
                 Entry("Pickups", "All", "Gold", 1, 0, "entity:gold"),
@@ -277,7 +274,7 @@ namespace SongsOfConquestAccess.Tests
 
             controller.ExecuteInitialLanding();
             controller.ExecuteMoveSubcategory(1);
-            ScannerCommandResult result = controller.ExecuteMoveResult(1);
+            ScannerCommandResult result = controller.ExecuteMoveItem(1);
 
             Assert.AreEqual(ScannerCommandStatus.Result, result.Status);
             Assert.AreEqual("Pickups", result.CategoryLabel);
@@ -367,14 +364,14 @@ namespace SongsOfConquestAccess.Tests
         }
 
         [TestMethod]
-        public void ExecuteMoveResultDoesNotMarkNormalMovementAsWrapped()
+        public void ExecuteMoveItemDoesNotMarkNormalMovementAsWrapped()
         {
             ScannerController controller = CreateController(BuildSnapshot(
                 Entry("Pickups", "All", "Gold", 1, 0),
                 Entry("Pickups", "All", "Ore", 2, 0)));
 
             controller.ExecuteInitialLanding();
-            ScannerCommandResult result = controller.ExecuteMoveResult(1);
+            ScannerCommandResult result = controller.ExecuteMoveItem(1);
 
             Assert.AreEqual(ScannerCommandStatus.Result, result.Status);
             Assert.AreEqual("Ore", result.Result.Label);
@@ -382,13 +379,13 @@ namespace SongsOfConquestAccess.Tests
         }
 
         [TestMethod]
-        public void ExecuteMoveResultWrapsSingleResultBackward()
+        public void ExecuteMoveItemWrapsSingleResultBackward()
         {
             ScannerController controller = CreateController(BuildSnapshot(
                 Entry("Pickups", "All", "Gold", 1, 0)));
 
             controller.ExecuteInitialLanding();
-            ScannerCommandResult result = controller.ExecuteMoveResult(-1);
+            ScannerCommandResult result = controller.ExecuteMoveItem(-1);
 
             Assert.AreEqual(ScannerCommandStatus.Result, result.Status);
             Assert.AreEqual("Gold", result.Result.Label);
@@ -473,7 +470,7 @@ namespace SongsOfConquestAccess.Tests
 
             controller.ExecuteSearch("gold");
             ScannerCommandResult noResults = controller.ExecuteSearch("amber");
-            ScannerCommandResult result = controller.ExecuteMoveResult(1);
+            ScannerCommandResult result = controller.ExecuteMoveItem(1);
 
             Assert.AreEqual(ScannerCommandStatus.NoResults, noResults.Status);
             Assert.AreEqual(ScannerCommandStatus.Result, result.Status);
@@ -483,7 +480,7 @@ namespace SongsOfConquestAccess.Tests
         }
 
         [TestMethod]
-        public void ExecuteMoveResultInsideSearchDoesNotRebuildNormalScanner()
+        public void ExecuteMoveItemInsideSearchDoesNotRebuildNormalScanner()
         {
             ScannerSnapshot first = BuildSnapshot(
                 Entry("Pickups", "All", "Gold", 1, 0, "pickup:gold"),
@@ -494,7 +491,7 @@ namespace SongsOfConquestAccess.Tests
             ScannerController controller = CreateController(_ => builds++ == 0 ? first : second);
 
             controller.ExecuteSearch("gold");
-            ScannerCommandResult result = controller.ExecuteMoveResult(1);
+            ScannerCommandResult result = controller.ExecuteMoveItem(1);
 
             Assert.AreEqual(ScannerCommandStatus.Result, result.Status);
             Assert.AreEqual("Gold pile", result.Result.Label);
@@ -542,8 +539,8 @@ namespace SongsOfConquestAccess.Tests
                 Entry("Terrain", "Roads", "Road tiles", 0, 1, "terrain:road"),
                 Entry("Obstacles", "All", "5 blocked tiles", 1, 0, "blocked:area"),
                 Entry("Pickups", "All", "Wood", 0, 2, "pickup:wood"));
-            snapshot.Categories[0].Subcategories[0].Results[0].Kind = ScannerResultKind.TerrainGroup;
-            snapshot.Categories[1].Subcategories[0].Results[0].Kind = ScannerResultKind.AreaGroup;
+            snapshot.Categories[0].Subcategories[0].Items[0].Instances[0].Kind = ScannerResultKind.TerrainGroup;
+            snapshot.Categories[1].Subcategories[0].Items[0].Instances[0].Kind = ScannerResultKind.AreaGroup;
             ScannerController controller = CreateController(snapshot);
 
             ScannerCommandResult result = controller.ExecuteLookAround(15);
@@ -564,17 +561,17 @@ namespace SongsOfConquestAccess.Tests
                 Entry("Pickups", "All", "East", 5, 0, "pickup:east")));
 
             ScannerCommandResult first = controller.ExecuteLookAround(15);
-            ScannerCommandResult second = controller.ExecuteMoveResult(1);
-            ScannerCommandResult third = controller.ExecuteMoveResult(1);
-            ScannerCommandResult fourth = controller.ExecuteMoveResult(1);
-            ScannerCommandResult fifth = controller.ExecuteMoveResult(1);
+            ScannerCommandResult second = controller.ExecuteMoveItem(1);
+            ScannerCommandResult third = controller.ExecuteMoveItem(1);
+            ScannerCommandResult fourth = controller.ExecuteMoveItem(1);
+            ScannerCommandResult fifth = controller.ExecuteMoveItem(1);
 
             Assert.AreEqual("Wood", first.Result.Label);
             Assert.AreEqual("Stone", second.Result.Label);
             Assert.AreEqual("Gold mine", third.Result.Label);
             Assert.AreEqual("Dead commander", fourth.Result.Label);
             Assert.AreEqual("East", fifth.Result.Label);
-            Assert.AreEqual(5, first.ResultCount);
+            Assert.AreEqual("Wood", controller.ExecuteMoveItem(1).Result.Label);
         }
 
         [TestMethod]
@@ -589,13 +586,13 @@ namespace SongsOfConquestAccess.Tests
 
             Assert.AreEqual("Look around", result.CategoryLabel);
             Assert.AreEqual("All", result.SubcategoryLabel);
-            Assert.AreEqual(2, result.ResultCount);
+            Assert.AreEqual(1, result.ResultCount);
             Assert.AreEqual("Pickups", pickups.SubcategoryLabel);
             Assert.AreEqual("Gold", pickups.Result.Label);
         }
 
         [TestMethod]
-        public void ExecuteMoveResultInsideLookAroundDoesNotRebuildNormalScanner()
+        public void ExecuteMoveItemInsideLookAroundDoesNotRebuildNormalScanner()
         {
             ScannerSnapshot first = BuildSnapshot(
                 Entry("Pickups", "All", "Wood", 0, 5, "pickup:wood"),
@@ -606,7 +603,7 @@ namespace SongsOfConquestAccess.Tests
             ScannerController controller = CreateController(_ => builds++ == 0 ? first : second);
 
             controller.ExecuteLookAround(15);
-            ScannerCommandResult result = controller.ExecuteMoveResult(1);
+            ScannerCommandResult result = controller.ExecuteMoveItem(1);
 
             Assert.AreEqual(ScannerCommandStatus.Result, result.Status);
             Assert.AreEqual("Gold", result.Result.Label);
@@ -792,6 +789,113 @@ namespace SongsOfConquestAccess.Tests
             Assert.AreEqual("Built name", result.Result.Label);
         }
 
+        [TestMethod]
+        public void ThingsSharingANameBecomeOneStopInTheItemCycle()
+        {
+            ScannerController controller = CreateController(BuildSnapshot(
+                Entry("Pickups", "All", "Chest", 1, 0, "pickup:chest-1"),
+                Entry("Pickups", "All", "Chest", 2, 0, "pickup:chest-2"),
+                Entry("Pickups", "All", "Ancient amber", 3, 0, "pickup:amber")));
+
+            ScannerCommandResult chest = controller.ExecuteInitialLanding();
+            ScannerCommandResult amber = controller.ExecuteMoveItem(1);
+            ScannerCommandResult wrapped = controller.ExecuteMoveItem(1);
+
+            Assert.AreEqual("Chest", chest.Result.Label);
+            Assert.AreEqual("pickup:chest-1", chest.Result.Key);
+            Assert.AreEqual(1, chest.ResultIndex);
+            Assert.AreEqual(2, chest.ResultCount);
+            Assert.AreEqual("Ancient amber", amber.Result.Label);
+            Assert.AreEqual(1, amber.ResultCount);
+            Assert.AreEqual("pickup:chest-1", wrapped.Result.Key);
+            Assert.IsTrue(wrapped.Wrapped);
+        }
+
+        [TestMethod]
+        public void ExecuteMoveInstanceWalksTheCopiesOfTheCurrentItem()
+        {
+            ScannerController controller = CreateController(BuildSnapshot(
+                Entry("Pickups", "All", "Chest", 1, 0, "pickup:chest-1"),
+                Entry("Pickups", "All", "Chest", 2, 0, "pickup:chest-2"),
+                Entry("Pickups", "All", "Ancient amber", 3, 0, "pickup:amber")));
+
+            controller.ExecuteInitialLanding();
+            ScannerCommandResult second = controller.ExecuteMoveInstance(1);
+            ScannerCommandResult wrapped = controller.ExecuteMoveInstance(1);
+
+            Assert.AreEqual("pickup:chest-2", second.Result.Key);
+            Assert.AreEqual(2, second.ResultIndex);
+            Assert.AreEqual(2, second.ResultCount);
+            Assert.IsFalse(second.Wrapped);
+            Assert.AreEqual("pickup:chest-1", wrapped.Result.Key);
+            Assert.IsTrue(wrapped.Wrapped);
+        }
+
+        [TestMethod]
+        public void ExecuteMoveItemLandsOnTheNearestCopyOfTheNewItem()
+        {
+            ScannerController controller = CreateController(BuildSnapshot(
+                Entry("Pickups", "All", "Chest", 1, 0, "pickup:chest-1"),
+                Entry("Pickups", "All", "Chest", 9, 0, "pickup:chest-2"),
+                Entry("Pickups", "All", "Ancient amber", 3, 0, "pickup:amber")));
+
+            controller.ExecuteInitialLanding();
+            controller.ExecuteMoveInstance(1);
+            controller.ExecuteMoveItem(1);
+            ScannerCommandResult back = controller.ExecuteMoveItem(-1);
+
+            Assert.AreEqual("pickup:chest-1", back.Result.Key);
+            Assert.AreEqual(1, back.ResultIndex);
+        }
+
+        [TestMethod]
+        public void TheItemNameLeadsAChangeOfItemAndIsDroppedBetweenCopies()
+        {
+            ScannerController controller = CreateController(BuildSnapshot(
+                Entry("Pickups", "All", "Chest", 1, 0, "pickup:chest-1"),
+                Entry("Pickups", "All", "Chest", 2, 0, "pickup:chest-2"),
+                Entry("Pickups", "All", "Ancient amber", 3, 0, "pickup:amber")));
+
+            ScannerCommandResult landing = controller.ExecuteInitialLanding();
+            ScannerCommandResult sameItem = controller.ExecuteMoveInstance(1);
+            ScannerCommandResult newItem = controller.ExecuteMoveItem(1);
+
+            Assert.IsTrue(landing.IncludeItemName);
+            Assert.IsFalse(sameItem.IncludeItemName);
+            Assert.IsTrue(newItem.IncludeItemName);
+        }
+
+        [TestMethod]
+        public void TheItemNameLeadsAgainWhenTheSameThingIsReachedThroughAnotherSubcategory()
+        {
+            ScannerController controller = CreateController(BuildSnapshot(
+                Entry("Pickups", "All", "Chest", 1, 0, "pickup:chest"),
+                Entry("Pickups", "Unvisited", "Chest", 1, 0, "pickup:chest")));
+
+            controller.ExecuteInitialLanding();
+            ScannerCommandResult unvisited = controller.ExecuteMoveSubcategory(1);
+
+            Assert.AreEqual("Unvisited", unvisited.SubcategoryLabel);
+            Assert.IsTrue(unvisited.IncludeItemName);
+        }
+
+        [TestMethod]
+        public void LookAroundKeepsOneItemPerResultSoTheSweepIsNotRegrouped()
+        {
+            ScannerController controller = CreateController(BuildSnapshot(
+                Entry("Pickups", "All", "Chest", 0, 5, "pickup:chest-north"),
+                Entry("Pickups", "All", "Wood", 5, 0, "pickup:wood"),
+                Entry("Pickups", "All", "Chest", 0, -5, "pickup:chest-south")));
+
+            ScannerCommandResult north = controller.ExecuteLookAround(15);
+            ScannerCommandResult east = controller.ExecuteMoveItem(1);
+            ScannerCommandResult south = controller.ExecuteMoveItem(1);
+
+            Assert.AreEqual("pickup:chest-north", north.Result.Key);
+            Assert.AreEqual("pickup:wood", east.Result.Key);
+            Assert.AreEqual("pickup:chest-south", south.Result.Key);
+        }
+
         private static ScannerController CreateController(ScannerSnapshot snapshot)
         {
             return CreateController(_ => snapshot);
@@ -844,7 +948,7 @@ namespace SongsOfConquestAccess.Tests
                 cursorProvider,
                 refreshResult,
                 jumpTo,
-                (result, directions, index, count) => null,
+                (result, directions, index, count, includeItemName) => null,
                 ScannerDirectionMode.Square);
         }
 

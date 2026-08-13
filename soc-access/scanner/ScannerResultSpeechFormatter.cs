@@ -5,9 +5,10 @@ namespace SongsOfConquestAccess.Scanner
 {
     internal static class ScannerResultSpeechFormatter
     {
-        public static string Compose(string content, string direction, string coordinates, string resultPosition)
+        public static string Compose(string item, string content, string direction, string coordinates, string resultPosition)
         {
             List<AnnouncementPart> parts = new List<AnnouncementPart>();
+            AddIfPresent(parts, ScannerAnnouncementDefinitions.ResultKeys.Item, item);
             AddIfPresent(parts, ScannerAnnouncementDefinitions.ResultKeys.Content, content);
             AddIfPresent(parts, ScannerAnnouncementDefinitions.ResultKeys.Direction, direction);
             AddIfPresent(parts, ScannerAnnouncementDefinitions.ResultKeys.Coordinates, coordinates);

@@ -45,7 +45,7 @@ namespace SongsOfConquestAccess.Scanner
                 Subcategory(ScannerSubcategoryKeys.Farmland, ModStrings.Scanner.Farmland),
                 Subcategory(ScannerSubcategoryKeys.Impassable, ModStrings.Scanner.Impassable)),
             OnlyAll(ScannerCategoryKeys.Unexplored, ModStrings.Scanner.Unexplored),
-            OnlyAll(ScannerCategoryKeys.Revealed, ModStrings.Scanner.Revealed).WithPreservedResultOrder());
+            OnlyAll(ScannerCategoryKeys.Revealed, ModStrings.Scanner.Revealed).WithPreservedResultOrder().WithFlatItems());
 
         private static ScannerCategoryDefinition OnlyAll(string key, ModString label)
         {

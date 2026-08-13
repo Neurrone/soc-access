@@ -6,9 +6,10 @@ using SongsOfConquestAccess.Scanner;
 namespace SongsOfConquestAccess.Speech.Spatial
 {
     /// <summary>
-    /// Describes the thing a scanner result points at: what it is called, whose
-    /// it is, and what state it is in. Everything else about the tile it happens
-    /// to stand on belongs to the cursor announcement, not to the scanner.
+    /// Describes the thing a scanner result points at: what tells it apart from
+    /// the others under its item, whose it is, and what state it is in. The item
+    /// name is announced separately, and everything else about the tile it
+    /// happens to stand on belongs to the cursor announcement.
     /// </summary>
     internal static class ScannerResultContentFormatter
     {
@@ -61,11 +62,11 @@ namespace SongsOfConquestAccess.Speech.Spatial
 
         private static IEnumerable<AnnouncementPart> BuildParts(ScannerResult result)
         {
-            if (!string.IsNullOrWhiteSpace(result.Label))
+            if (!string.IsNullOrWhiteSpace(result.InstanceLabel))
             {
                 yield return new AnnouncementPart(
                     ScannerAnnouncementDefinitions.ContentKeys.Name,
-                    result.Label);
+                    result.InstanceLabel);
             }
 
             string owner = DescribeOwner(result);

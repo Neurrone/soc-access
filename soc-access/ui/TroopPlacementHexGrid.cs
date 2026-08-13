@@ -38,13 +38,14 @@ namespace SongsOfConquestAccess.UI
                     ? _adapter.TryRefreshScannerResult(result, cursorHint)
                     : ScannerResultRefresh.Invalid,
                 JumpToScannerResult,
-                (result, directions, index, count) => new TroopPlacementScannerSpeechContext(
+                (result, directions, index, count, includeItemName) => new TroopPlacementScannerSpeechContext(
                     result,
                     GetScannerTile(result),
                     _snapshot,
                     directions,
                     index,
-                    count),
+                    count,
+                    includeItemName),
                 ScannerDirectionMode.Hex);
         }
 
@@ -471,14 +472,24 @@ namespace SongsOfConquestAccess.UI
                 return HandleScannerNavigationResult(_scanner.ExecuteMoveSubcategory(1));
             }
 
-            if (action.Key == AccessibilityActions.ScannerPreviousResult.Key)
+            if (action.Key == AccessibilityActions.ScannerPreviousItem.Key)
             {
-                return HandleScannerNavigationResult(_scanner.ExecuteMoveResult(-1));
+                return HandleScannerNavigationResult(_scanner.ExecuteMoveItem(-1));
             }
 
-            if (action.Key == AccessibilityActions.ScannerNextResult.Key)
+            if (action.Key == AccessibilityActions.ScannerNextItem.Key)
             {
-                return HandleScannerNavigationResult(_scanner.ExecuteMoveResult(1));
+                return HandleScannerNavigationResult(_scanner.ExecuteMoveItem(1));
+            }
+
+            if (action.Key == AccessibilityActions.ScannerPreviousInstance.Key)
+            {
+                return HandleScannerNavigationResult(_scanner.ExecuteMoveInstance(-1));
+            }
+
+            if (action.Key == AccessibilityActions.ScannerNextInstance.Key)
+            {
+                return HandleScannerNavigationResult(_scanner.ExecuteMoveInstance(1));
             }
 
             if (action.Key == AccessibilityActions.ScannerJumpToResult.Key)
@@ -521,8 +532,10 @@ namespace SongsOfConquestAccess.UI
                 || actionKey == AccessibilityActions.ScannerNextCategory.Key
                 || actionKey == AccessibilityActions.ScannerPreviousSubcategory.Key
                 || actionKey == AccessibilityActions.ScannerNextSubcategory.Key
-                || actionKey == AccessibilityActions.ScannerPreviousResult.Key
-                || actionKey == AccessibilityActions.ScannerNextResult.Key
+                || actionKey == AccessibilityActions.ScannerPreviousItem.Key
+                || actionKey == AccessibilityActions.ScannerNextItem.Key
+                || actionKey == AccessibilityActions.ScannerPreviousInstance.Key
+                || actionKey == AccessibilityActions.ScannerNextInstance.Key
                 || actionKey == AccessibilityActions.ScannerJumpToResult.Key
                 || actionKey == AccessibilityActions.ScannerSpeakDistanceAndDirection.Key
                 || actionKey == AccessibilityActions.ScannerReturnFromJump.Key;

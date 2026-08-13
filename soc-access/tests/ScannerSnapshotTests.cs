@@ -19,10 +19,10 @@ namespace SongsOfConquestAccess.Tests
             snapshot.SortByDistance(Vector2Int.zero);
 
             ScannerSubcategory subcategory = snapshot.Categories[0].Subcategories[0];
-            Assert.AreEqual("Berry", subcategory.Results[0].Label);
-            Assert.AreEqual("Zinc", subcategory.Results[1].Label);
-            Assert.AreEqual(new Vector2Int(0, 2), subcategory.Results[2].Position);
-            Assert.AreEqual(new Vector2Int(2, 0), subcategory.Results[3].Position);
+            Assert.AreEqual("Berry", subcategory.Items[0].Label);
+            Assert.AreEqual("Zinc", subcategory.Items[1].Label);
+            Assert.AreEqual(new Vector2Int(0, 2), subcategory.Items[2].Instances[0].Position);
+            Assert.AreEqual(new Vector2Int(2, 0), subcategory.Items[2].Instances[1].Position);
         }
 
         [TestMethod]
@@ -43,14 +43,14 @@ namespace SongsOfConquestAccess.Tests
             ScannerSnapshot snapshot = new ScannerSnapshot();
             ScannerCategory revealed = snapshot.GetOrAddCategory("Revealed");
             revealed.PreserveResultOrder = true;
-            revealed.GetOrAddSubcategory("All").Results.Add(new ScannerResult("entity:far", "Far", new Vector2Int(10, 0)));
-            revealed.GetOrAddSubcategory("All").Results.Add(new ScannerResult("entity:near", "Near", new Vector2Int(1, 0)));
+            revealed.GetOrAddSubcategory("All").Add(new ScannerResult("entity:far", "Far", new Vector2Int(10, 0)));
+            revealed.GetOrAddSubcategory("All").Add(new ScannerResult("entity:near", "Near", new Vector2Int(1, 0)));
 
             snapshot.SortByDistance(Vector2Int.zero);
 
             ScannerSubcategory subcategory = snapshot.Categories[0].Subcategories[0];
-            Assert.AreEqual("Far", subcategory.Results[0].Label);
-            Assert.AreEqual("Near", subcategory.Results[1].Label);
+            Assert.AreEqual("Far", subcategory.Items[0].Label);
+            Assert.AreEqual("Near", subcategory.Items[1].Label);
         }
 
         [TestMethod]
@@ -133,7 +133,7 @@ namespace SongsOfConquestAccess.Tests
 
             Assert.AreEqual("Terrain", snapshot.Categories[0].Key);
             Assert.AreEqual(ScannerSubcategoryKeys.All, snapshot.Categories[0].Subcategories[0].Key);
-            Assert.AreEqual("Water", snapshot.Categories[0].Subcategories[0].Results[0].Label);
+            Assert.AreEqual("Water", snapshot.Categories[0].Subcategories[0].Items[0].Instances[0].Label);
         }
 
         [TestMethod]
@@ -148,6 +148,7 @@ namespace SongsOfConquestAccess.Tests
             Assert.IsTrue(found);
             Assert.AreEqual(0, location.CategoryIndex);
             Assert.AreEqual(1, location.SubcategoryIndex);
+            Assert.AreEqual(0, location.ItemIndex);
             Assert.AreEqual(0, location.ResultIndex);
         }
 
@@ -163,6 +164,7 @@ namespace SongsOfConquestAccess.Tests
             Assert.IsTrue(found);
             Assert.AreEqual(0, location.CategoryIndex);
             Assert.AreEqual(0, location.SubcategoryIndex);
+            Assert.AreEqual(0, location.ItemIndex);
             Assert.AreEqual(0, location.ResultIndex);
         }
 
@@ -178,6 +180,7 @@ namespace SongsOfConquestAccess.Tests
             Assert.IsFalse(found);
             Assert.AreEqual(-1, location.CategoryIndex);
             Assert.AreEqual(-1, location.SubcategoryIndex);
+            Assert.AreEqual(-1, location.ItemIndex);
             Assert.AreEqual(-1, location.ResultIndex);
         }
 
@@ -194,9 +197,9 @@ namespace SongsOfConquestAccess.Tests
             Assert.AreEqual(1, snapshot.Categories.Count);
             Assert.AreEqual(2, snapshot.Categories[0].Subcategories.Count);
             Assert.AreEqual("All", snapshot.Categories[0].Subcategories[0].Key);
-            Assert.AreEqual(0, snapshot.Categories[0].Subcategories[0].Results.Count);
+            Assert.IsFalse(snapshot.Categories[0].Subcategories[0].HasResults);
             Assert.AreEqual("Unvisited", snapshot.Categories[0].Subcategories[1].Key);
-            Assert.AreEqual("Ore", snapshot.Categories[0].Subcategories[1].Results[0].Label);
+            Assert.AreEqual("Ore", snapshot.Categories[0].Subcategories[1].Items[0].Instances[0].Label);
         }
     }
 }
