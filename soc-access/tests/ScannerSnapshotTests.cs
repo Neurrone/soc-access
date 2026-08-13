@@ -119,9 +119,9 @@ namespace SongsOfConquestAccess.Tests
             snapshot.PruneEmpty();
 
             Assert.AreEqual(1, snapshot.Categories.Count);
-            Assert.AreEqual("Pickups", snapshot.Categories[0].Label);
+            Assert.AreEqual("Pickups", snapshot.Categories[0].Key);
             Assert.AreEqual(1, snapshot.Categories[0].Subcategories.Count);
-            Assert.AreEqual("All", snapshot.Categories[0].Subcategories[0].Label);
+            Assert.AreEqual("All", snapshot.Categories[0].Subcategories[0].Key);
         }
 
         [TestMethod]
@@ -131,8 +131,8 @@ namespace SongsOfConquestAccess.Tests
 
             snapshot.Add("Terrain", "", new ScannerResult("terrain:water", "Water", new Vector2Int(2, 3)));
 
-            Assert.AreEqual("Terrain", snapshot.Categories[0].Label);
-            Assert.AreEqual("All", snapshot.Categories[0].Subcategories[0].Label);
+            Assert.AreEqual("Terrain", snapshot.Categories[0].Key);
+            Assert.AreEqual(ScannerSubcategoryKeys.All, snapshot.Categories[0].Subcategories[0].Key);
             Assert.AreEqual("Water", snapshot.Categories[0].Subcategories[0].Results[0].Label);
         }
 
@@ -193,9 +193,9 @@ namespace SongsOfConquestAccess.Tests
 
             Assert.AreEqual(1, snapshot.Categories.Count);
             Assert.AreEqual(2, snapshot.Categories[0].Subcategories.Count);
-            Assert.AreEqual("All", snapshot.Categories[0].Subcategories[0].Label);
+            Assert.AreEqual("All", snapshot.Categories[0].Subcategories[0].Key);
             Assert.AreEqual(0, snapshot.Categories[0].Subcategories[0].Results.Count);
-            Assert.AreEqual("Unvisited", snapshot.Categories[0].Subcategories[1].Label);
+            Assert.AreEqual("Unvisited", snapshot.Categories[0].Subcategories[1].Key);
             Assert.AreEqual("Ore", snapshot.Categories[0].Subcategories[1].Results[0].Label);
         }
     }

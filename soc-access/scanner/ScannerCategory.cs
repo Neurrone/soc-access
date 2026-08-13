@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 
 namespace SongsOfConquestAccess.Scanner
@@ -5,13 +6,32 @@ namespace SongsOfConquestAccess.Scanner
     internal sealed class ScannerCategory
     {
         private readonly List<ScannerSubcategory> _subcategories = new List<ScannerSubcategory>();
+        private readonly Func<string> _label;
 
-        public ScannerCategory(string label)
+        public ScannerCategory(string key, Func<string> label)
+            : this(key, label, null)
         {
-            Label = label;
         }
 
-        public string Label { get; private set; }
+        public ScannerCategory(string key, Func<string> label, ScannerCategoryDefinition definition)
+        {
+            Key = key ?? string.Empty;
+            _label = label;
+            Definition = definition;
+        }
+
+        public string Key { get; private set; }
+
+        /// <summary>
+        /// Resolved at call time so a language change between snapshot
+        /// construction and speech cannot leave a stale label behind.
+        /// </summary>
+        public string Label
+        {
+            get { return _label != null ? _label() : Key; }
+        }
+
+        public ScannerCategoryDefinition Definition { get; private set; }
 
         public bool PreserveResultOrder { get; set; }
 
@@ -20,17 +40,23 @@ namespace SongsOfConquestAccess.Scanner
             get { return _subcategories; }
         }
 
-        public ScannerSubcategory GetOrAddSubcategory(string label)
+        public ScannerSubcategory GetOrAddSubcategory(string key)
+        {
+            ScannerSubcategoryDefinition definition = Definition != null ? Definition.GetSubcategory(key) : null;
+            return GetOrAddSubcategory(key, definition != null ? definition.Label : null);
+        }
+
+        public ScannerSubcategory GetOrAddSubcategory(string key, Func<string> label)
         {
             for (int i = 0; i < _subcategories.Count; i++)
             {
-                if (_subcategories[i].Label == label)
+                if (_subcategories[i].Key == key)
                 {
                     return _subcategories[i];
                 }
             }
 
-            ScannerSubcategory subcategory = new ScannerSubcategory(label);
+            ScannerSubcategory subcategory = new ScannerSubcategory(key, label);
             _subcategories.Add(subcategory);
             return subcategory;
         }

@@ -186,31 +186,11 @@ namespace SongsOfConquestAccess.Adapters
         public ScannerSnapshot BuildScannerSnapshot(Vector2Int origin)
         {
             TroopPlacementSnapshot placement = BuildSnapshot();
-            ScannerSnapshot snapshot = new ScannerSnapshot();
-            InitializeTroopPlacementScannerCategories(snapshot);
+            ScannerSnapshot snapshot = new ScannerSnapshot(BattleScannerTaxonomy.Instance);
             AddTroopPlacementTroopScannerResults(snapshot, placement);
             AddTroopPlacementSpawnScannerResults(snapshot, placement);
             AddTroopPlacementTerrainScannerResults(snapshot, placement);
             return snapshot;
-        }
-
-        private static void InitializeTroopPlacementScannerCategories(ScannerSnapshot snapshot)
-        {
-            ScannerCategory troops = snapshot.GetOrAddCategory(ModText.Get(ModStrings.Scanner.Troops));
-            troops.GetOrAddSubcategory(ModText.Get(ModStrings.Scanner.All));
-            troops.GetOrAddSubcategory(ModText.Get(ModStrings.Scanner.Friendly));
-            troops.GetOrAddSubcategory(ModText.Get(ModStrings.Scanner.Enemy));
-
-            ScannerCategory spawnPoints = snapshot.GetOrAddCategory(ModText.Get(ModStrings.Scanner.SpawnPoints));
-            spawnPoints.GetOrAddSubcategory(ModText.Get(ModStrings.Scanner.All));
-            spawnPoints.GetOrAddSubcategory(ModText.Get(ModStrings.Scanner.Friendly));
-            spawnPoints.GetOrAddSubcategory(ModText.Get(ModStrings.Scanner.Enemy));
-
-            ScannerCategory terrain = snapshot.GetOrAddCategory(ModText.Get(ModStrings.Scanner.Terrain));
-            terrain.GetOrAddSubcategory(ModText.Get(ModStrings.Scanner.ElevatedGround, 1));
-            terrain.GetOrAddSubcategory(ModText.Get(ModStrings.Scanner.ElevatedGround, 2));
-            terrain.GetOrAddSubcategory(ModText.Get(ModStrings.Scanner.ElevatedGround, 3));
-            terrain.GetOrAddSubcategory(ModText.Get(ModStrings.Scanner.ImpassableTerrain));
         }
 
         private void AddTroopPlacementTroopScannerResults(ScannerSnapshot snapshot, TroopPlacementSnapshot placement)
@@ -241,8 +221,8 @@ namespace SongsOfConquestAccess.Adapters
                             Kind = ScannerResultKind.TerrainPoint
                         };
                         snapshot.Add(
-                            ModText.Get(ModStrings.Scanner.Terrain),
-                            ModText.Get(ModStrings.Scanner.ElevatedGround, elevation),
+                            ScannerCategoryKeys.Terrain,
+                            ElevatedGroundSubcategoryKey(elevation),
                             result);
                     }
                 }
@@ -260,8 +240,8 @@ namespace SongsOfConquestAccess.Adapters
                         Kind = ScannerResultKind.TerrainPoint
                     };
                     snapshot.Add(
-                        ModText.Get(ModStrings.Scanner.Terrain),
-                        ModText.Get(ModStrings.Scanner.ImpassableTerrain),
+                        ScannerCategoryKeys.Terrain,
+                        ScannerSubcategoryKeys.ImpassableTerrain,
                         result);
                 }
             }
@@ -278,12 +258,12 @@ namespace SongsOfConquestAccess.Adapters
                         string.IsNullOrWhiteSpace(tile.TroopLabel) ? ModText.Get(ModStrings.Combat.UnknownTroop) : tile.TroopLabel,
                         tile.Point);
                     snapshot.Add(
-                        ModText.Get(ModStrings.Scanner.Troops),
-                        ModText.Get(ModStrings.Scanner.All),
+                        ScannerCategoryKeys.Troops,
+                        ScannerSubcategoryKeys.All,
                         CloneResult(result));
                     snapshot.Add(
-                        ModText.Get(ModStrings.Scanner.Troops),
-                        ModText.Get(own ? ModStrings.Scanner.Friendly : ModStrings.Scanner.Enemy),
+                        ScannerCategoryKeys.Troops,
+                        own ? ScannerSubcategoryKeys.Friendly : ScannerSubcategoryKeys.Enemy,
                         result);
                 }
             }
@@ -300,14 +280,27 @@ namespace SongsOfConquestAccess.Adapters
                         ModText.Get(ModStrings.Spatial.SpawnPoint),
                         tile.Point);
                     snapshot.Add(
-                        ModText.Get(ModStrings.Scanner.SpawnPoints),
-                        ModText.Get(ModStrings.Scanner.All),
+                        ScannerCategoryKeys.SpawnPoints,
+                        ScannerSubcategoryKeys.All,
                         CloneResult(result));
                     snapshot.Add(
-                        ModText.Get(ModStrings.Scanner.SpawnPoints),
-                        ModText.Get(own ? ModStrings.Scanner.Friendly : ModStrings.Scanner.Enemy),
+                        ScannerCategoryKeys.SpawnPoints,
+                        own ? ScannerSubcategoryKeys.Friendly : ScannerSubcategoryKeys.Enemy,
                         result);
                 }
+            }
+        }
+
+        private static string ElevatedGroundSubcategoryKey(int elevation)
+        {
+            switch (elevation)
+            {
+                case 1:
+                    return ScannerSubcategoryKeys.ElevatedGroundOne;
+                case 2:
+                    return ScannerSubcategoryKeys.ElevatedGroundTwo;
+                default:
+                    return ScannerSubcategoryKeys.ElevatedGroundThree;
             }
         }
 

@@ -17,8 +17,12 @@ namespace SongsOfConquestAccess.Scanner
             ScannerSnapshot lookAround = new ScannerSnapshot();
             lookAround.MarkAsLookAroundSnapshot();
 
-            ScannerCategory lookAroundCategory = lookAround.GetOrAddCategory(ModText.Get(ModStrings.Scanner.LookAround));
-            ScannerSubcategory all = lookAroundCategory.GetOrAddSubcategory(ModText.Get(ModStrings.Scanner.All));
+            ScannerCategory lookAroundCategory = lookAround.GetOrAddCategory(
+                ScannerCategoryKeys.LookAround,
+                () => ModText.Get(ModStrings.Scanner.LookAround));
+            ScannerSubcategory all = lookAroundCategory.GetOrAddSubcategory(
+                ScannerSubcategoryKeys.All,
+                () => ModText.Get(ModStrings.Scanner.All));
             Dictionary<string, HashSet<string>> addedToCategory = new Dictionary<string, HashSet<string>>();
             HashSet<string> addedToAll = new HashSet<string>();
 
@@ -53,17 +57,20 @@ namespace SongsOfConquestAccess.Scanner
                         }
 
                         HashSet<string> categoryKeys;
-                        if (!addedToCategory.TryGetValue(sourceCategory.Label, out categoryKeys))
+                        if (!addedToCategory.TryGetValue(sourceCategory.Key, out categoryKeys))
                         {
                             categoryKeys = new HashSet<string>();
-                            addedToCategory[sourceCategory.Label] = categoryKeys;
+                            addedToCategory[sourceCategory.Key] = categoryKeys;
                         }
 
                         if (categoryKeys.Add(result.Key))
                         {
                             if (targetSubcategory == null)
                             {
-                                targetSubcategory = lookAroundCategory.GetOrAddSubcategory(sourceCategory.Label);
+                                ScannerCategory labelSource = sourceCategory;
+                                targetSubcategory = lookAroundCategory.GetOrAddSubcategory(
+                                    labelSource.Key,
+                                    () => labelSource.Label);
                             }
 
                             targetSubcategory.Results.Add(result);

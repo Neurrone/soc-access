@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using SongsOfConquestAccess.Localization;
 using UnityEngine;
 
 namespace SongsOfConquestAccess.Scanner
@@ -29,6 +28,16 @@ namespace SongsOfConquestAccess.Scanner
     internal sealed class ScannerSnapshot
     {
         private readonly List<ScannerCategory> _categories = new List<ScannerCategory>();
+        private ScannerTaxonomy _taxonomy;
+
+        public ScannerSnapshot()
+        {
+        }
+
+        public ScannerSnapshot(ScannerTaxonomy taxonomy)
+        {
+            Initialize(taxonomy);
+        }
 
         public List<ScannerCategory> Categories
         {
@@ -80,34 +89,70 @@ namespace SongsOfConquestAccess.Scanner
             UseSortOriginForDirections = true;
         }
 
-        public ScannerCategory GetOrAddCategory(string label)
+        /// <summary>
+        /// Creates every category and subcategory the taxonomy declares, in
+        /// declaration order, so cycling order is fixed regardless of which
+        /// contributions actually produce results.
+        /// </summary>
+        public void Initialize(ScannerTaxonomy taxonomy)
+        {
+            _taxonomy = taxonomy;
+            if (taxonomy == null)
+            {
+                return;
+            }
+
+            for (int i = 0; i < taxonomy.Categories.Count; i++)
+            {
+                ScannerCategoryDefinition definition = taxonomy.Categories[i];
+                ScannerCategory category = GetOrAddCategory(definition.Key);
+                category.PreserveResultOrder = definition.PreserveResultOrder;
+                for (int j = 0; j < definition.Subcategories.Count; j++)
+                {
+                    category.GetOrAddSubcategory(definition.Subcategories[j].Key);
+                }
+            }
+        }
+
+        public ScannerCategory GetOrAddCategory(string key)
+        {
+            ScannerCategoryDefinition definition = _taxonomy != null ? _taxonomy.GetCategory(key) : null;
+            return GetOrAddCategory(key, definition != null ? definition.Label : null, definition);
+        }
+
+        public ScannerCategory GetOrAddCategory(string key, Func<string> label)
+        {
+            return GetOrAddCategory(key, label, null);
+        }
+
+        private ScannerCategory GetOrAddCategory(string key, Func<string> label, ScannerCategoryDefinition definition)
         {
             for (int i = 0; i < _categories.Count; i++)
             {
-                if (_categories[i].Label == label)
+                if (_categories[i].Key == key)
                 {
                     return _categories[i];
                 }
             }
 
-            ScannerCategory category = new ScannerCategory(label);
+            ScannerCategory category = new ScannerCategory(key, label, definition);
             _categories.Add(category);
             return category;
         }
 
-        public void Add(string category, string subcategory, ScannerResult result)
+        public void Add(string categoryKey, string subcategoryKey, ScannerResult result)
         {
             if (result == null)
             {
                 return;
             }
 
-            if (string.IsNullOrWhiteSpace(subcategory))
+            if (string.IsNullOrWhiteSpace(subcategoryKey))
             {
-                subcategory = ModText.Get(ModStrings.Scanner.All);
+                subcategoryKey = ScannerSubcategoryKeys.All;
             }
 
-            GetOrAddCategory(category).GetOrAddSubcategory(subcategory).Results.Add(result);
+            GetOrAddCategory(categoryKey).GetOrAddSubcategory(subcategoryKey).Results.Add(result);
         }
 
         public void SortByDistance(Vector2Int origin)
