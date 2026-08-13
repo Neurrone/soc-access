@@ -1,9 +1,8 @@
-using System;
+﻿using System;
 using System.Globalization;
 using System.Collections.Generic;
 using SongsOfConquestAccess.Adapters;
 using SongsOfConquestAccess.Localization;
-using SongsOfConquestAccess.Scanner;
 
 namespace SongsOfConquestAccess.Speech.Spatial
 {
@@ -40,7 +39,7 @@ namespace SongsOfConquestAccess.Speech.Spatial
 
             string text = Compose(
                 AdventureMapAnnouncementDefinitions.Tile,
-                BuildTileParts(tile, includeCoordinates: true, appendRouteToTerrainWhenNoContent: true));
+                BuildTileParts(tile));
             return string.IsNullOrWhiteSpace(text) ? string.Empty : text + ".";
         }
 
@@ -91,10 +90,7 @@ namespace SongsOfConquestAccess.Speech.Spatial
             return tile == null ? string.Empty : tile.Position.x + ", " + tile.Position.y;
         }
 
-        private IEnumerable<AnnouncementPart> BuildTileParts(
-            AdventureMapTile tile,
-            bool includeCoordinates,
-            bool appendRouteToTerrainWhenNoContent)
+        private IEnumerable<AnnouncementPart> BuildTileParts(AdventureMapTile tile)
         {
             if (tile == null)
             {
@@ -132,8 +128,7 @@ namespace SongsOfConquestAccess.Speech.Spatial
                 || !string.IsNullOrWhiteSpace(mapEntity)
                 || !string.IsNullOrWhiteSpace(interactionPoint);
             string terrain = DescribeTerrain(tile.Terrain);
-            bool appendRouteToTerrain = appendRouteToTerrainWhenNoContent
-                && tile.IsExplored
+            bool appendRouteToTerrain = tile.IsExplored
                 && !hasContent
                 && !string.IsNullOrWhiteSpace(terrain)
                 && !string.IsNullOrWhiteSpace(route);
@@ -159,10 +154,7 @@ namespace SongsOfConquestAccess.Speech.Spatial
                 yield return new AnnouncementPart(AdventureMapAnnouncementDefinitions.TileKeys.Terrain, terrain);
             }
 
-            if (includeCoordinates)
-            {
-                yield return new AnnouncementPart(AdventureMapAnnouncementDefinitions.TileKeys.Coordinates, DescribeCoordinates(tile));
-            }
+            yield return new AnnouncementPart(AdventureMapAnnouncementDefinitions.TileKeys.Coordinates, DescribeCoordinates(tile));
 
             string movementCost = DescribeMovementCost(tile);
             if (!string.IsNullOrWhiteSpace(movementCost))
