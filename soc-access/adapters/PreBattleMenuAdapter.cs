@@ -321,9 +321,11 @@ namespace SongsOfConquestAccess.Adapters
             return clone;
         }
 
-        public bool ValidateScannerResult(ScannerResult result)
+        public ScannerResultRefresh TryRefreshScannerResult(ScannerResult result, Vector2Int cursorHint)
         {
-            return result != null && BuildSnapshot().IsValidTile(result.Position);
+            return result != null && BuildSnapshot().IsValidTile(result.Position)
+                ? ScannerResultRefresh.Valid(result.Position)
+                : ScannerResultRefresh.Invalid;
         }
 
         public bool TryMoveTroop(Vector2Int source, Vector2Int destination)

@@ -641,9 +641,11 @@ namespace SongsOfConquestAccess.Adapters
             return clone;
         }
 
-        public bool ValidateScannerResult(ScannerResult result)
+        public ScannerResultRefresh TryRefreshScannerResult(ScannerResult result, Vector2Int cursorHint)
         {
-            return result != null && IsValidTile(result.Position);
+            return result != null && IsValidTile(result.Position)
+                ? ScannerResultRefresh.Valid(result.Position)
+                : ScannerResultRefresh.Invalid;
         }
 
         public bool IsValidTile(Vector2Int point)

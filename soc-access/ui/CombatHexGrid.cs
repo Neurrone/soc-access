@@ -33,7 +33,9 @@ namespace SongsOfConquestAccess.UI
             _scanner = new ScannerController(
                 origin => _adapter != null ? _adapter.BuildScannerSnapshot(origin) : null,
                 () => _cursor,
-                result => _adapter != null && _adapter.ValidateScannerResult(result),
+                (result, cursorHint) => _adapter != null
+                    ? _adapter.TryRefreshScannerResult(result, cursorHint)
+                    : ScannerResultRefresh.Invalid,
                 JumpToScannerResult,
                 (result, directions, index, count) => new CombatScannerSpeechContext(
                     result,

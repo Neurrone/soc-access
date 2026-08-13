@@ -48,6 +48,25 @@ namespace SongsOfConquestAccess.Scanner
         public object StableReference { get; set; }
 
         public List<Vector2Int> Points { get; private set; }
+
+        /// <summary>
+        /// Takes the position and name the adapter reported on the last
+        /// re-query. A blank label leaves the existing one alone, so an adapter
+        /// that only tracks position does not have to re-resolve the name.
+        /// </summary>
+        public void ApplyRefresh(ScannerResultRefresh refresh)
+        {
+            if (!refresh.IsValid)
+            {
+                return;
+            }
+
+            Position = refresh.Position;
+            if (!string.IsNullOrWhiteSpace(refresh.Label))
+            {
+                Label = refresh.Label;
+            }
+        }
     }
 
     internal static class ScannerResultLabels

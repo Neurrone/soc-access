@@ -1171,7 +1171,14 @@ namespace SongsOfConquestAccess.Adapters
             }
         }
 
-        public bool ValidateScannerResult(ScannerResult result)
+        public ScannerResultRefresh TryRefreshScannerResult(ScannerResult result, Vector2Int cursorHint)
+        {
+            return ValidateScannerResult(result)
+                ? ScannerResultRefresh.Valid(result.Position)
+                : ScannerResultRefresh.Invalid;
+        }
+
+        private bool ValidateScannerResult(ScannerResult result)
         {
             if (result == null || !IsWithinMap(result.Position))
             {

@@ -10,7 +10,7 @@ namespace SongsOfConquestAccess.Scanner
     {
         private readonly Func<Vector2Int, ScannerSnapshot> _snapshotBuilder;
         private readonly Func<Vector2Int> _cursorProvider;
-        private readonly Func<ScannerResult, bool> _validator;
+        private readonly Func<ScannerResult, Vector2Int, ScannerResultRefresh> _refreshResult;
         private readonly Func<Vector2Int, bool> _jumpTo;
         private readonly Func<ScannerResult, IReadOnlyList<ScannerDirectionStep>, int, int, IScannerSpeechContext> _speechContextProvider;
         private readonly ScannerDirectionMode _directionMode;
@@ -23,14 +23,14 @@ namespace SongsOfConquestAccess.Scanner
         public ScannerController(
             Func<Vector2Int, ScannerSnapshot> snapshotBuilder,
             Func<Vector2Int> cursorProvider,
-            Func<ScannerResult, bool> validator,
+            Func<ScannerResult, Vector2Int, ScannerResultRefresh> refreshResult,
             Func<Vector2Int, bool> jumpTo,
             Func<ScannerResult, IReadOnlyList<ScannerDirectionStep>, int, int, IScannerSpeechContext> speechContextProvider,
             ScannerDirectionMode directionMode)
         {
             _snapshotBuilder = snapshotBuilder;
             _cursorProvider = cursorProvider;
-            _validator = validator;
+            _refreshResult = refreshResult;
             _jumpTo = jumpTo;
             _speechContextProvider = speechContextProvider;
             _directionMode = directionMode;
@@ -834,7 +834,7 @@ namespace SongsOfConquestAccess.Scanner
             {
                 ClampIndices();
                 ScannerResult result = subcategory.Results[_resultIndex];
-                if (_validator == null || _validator(result))
+                if (TryRefreshResult(result))
                 {
                     return result;
                 }
@@ -858,6 +858,29 @@ namespace SongsOfConquestAccess.Scanner
             }
 
             return null;
+        }
+
+        /// <summary>
+        /// Re-queries the adapter for a result that is about to be announced,
+        /// passing the live cursor so the adapter can re-center a result that
+        /// covers several tiles. Returns false when the thing is gone, which
+        /// makes the caller prune it.
+        /// </summary>
+        private bool TryRefreshResult(ScannerResult result)
+        {
+            if (_refreshResult == null)
+            {
+                return true;
+            }
+
+            ScannerResultRefresh refresh = _refreshResult(result, GetCursor());
+            if (!refresh.IsValid)
+            {
+                return false;
+            }
+
+            result.ApplyRefresh(refresh);
+            return true;
         }
 
         private ScannerCategory CurrentCategory()

@@ -679,10 +679,25 @@ namespace SongsOfConquestAccess.Tests
             System.Func<ScannerResult, bool> validator,
             System.Func<Vector2Int, bool> jumpTo)
         {
+            return CreateController(
+                snapshotBuilder,
+                cursorProvider,
+                (result, cursorHint) => validator(result)
+                    ? ScannerResultRefresh.Valid(result.Position)
+                    : ScannerResultRefresh.Invalid,
+                jumpTo);
+        }
+
+        private static ScannerController CreateController(
+            System.Func<Vector2Int, ScannerSnapshot> snapshotBuilder,
+            System.Func<Vector2Int> cursorProvider,
+            System.Func<ScannerResult, Vector2Int, ScannerResultRefresh> refreshResult,
+            System.Func<Vector2Int, bool> jumpTo)
+        {
             return new ScannerController(
                 snapshotBuilder,
                 cursorProvider,
-                validator,
+                refreshResult,
                 jumpTo,
                 (result, directions, index, count) => null,
                 ScannerDirectionMode.Square);
