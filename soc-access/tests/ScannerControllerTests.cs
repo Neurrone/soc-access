@@ -1,4 +1,4 @@
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using SongsOfConquestAccess.Scanner;
 using UnityEngine;
 
@@ -645,6 +645,71 @@ namespace SongsOfConquestAccess.Tests
 
             Assert.AreEqual("Terrain", result.CategoryLabel);
             Assert.AreEqual("Road", result.Result.Label);
+        }
+
+        [TestMethod]
+        public void RefreshMovesTheResultBeforeDirectionsAreBuilt()
+        {
+            ScannerController controller = CreateController(
+                _ => BuildSnapshot(Entry("Terrain", "Roads", "Road", 10, 0, "terrain:road")),
+                () => Vector2Int.zero,
+                (candidate, cursorHint) => ScannerResultRefresh.Valid(new Vector2Int(0, 3)),
+                _ => true);
+
+            ScannerCommandResult result = controller.ExecuteRefresh();
+
+            Assert.AreEqual(new Vector2Int(0, 3), result.Result.Position);
+            Assert.AreEqual(1, result.Directions.Count);
+            Assert.AreEqual(ScannerDirection.North, result.Directions[0].Direction);
+            Assert.AreEqual(3, result.Directions[0].Count);
+        }
+
+        [TestMethod]
+        public void RefreshIsGivenTheLiveCursorAsItsHint()
+        {
+            Vector2Int cursor = new Vector2Int(4, 7);
+            Vector2Int hint = new Vector2Int(-1, -1);
+            ScannerController controller = CreateController(
+                _ => BuildSnapshot(Entry("Terrain", "Roads", "Road", 10, 0, "terrain:road")),
+                () => cursor,
+                (candidate, cursorHint) =>
+                {
+                    hint = cursorHint;
+                    return ScannerResultRefresh.Valid(candidate.Position);
+                },
+                _ => true);
+
+            controller.ExecuteRefresh();
+
+            Assert.AreEqual(cursor, hint);
+        }
+
+        [TestMethod]
+        public void RefreshReplacesTheLabelWhenTheAdapterReportsANewName()
+        {
+            ScannerController controller = CreateController(
+                _ => BuildSnapshot(Entry("Wielders", "All", "Stale name", 1, 0, "commander:1")),
+                () => Vector2Int.zero,
+                (candidate, cursorHint) => ScannerResultRefresh.Valid(candidate.Position, "Current name"),
+                _ => true);
+
+            ScannerCommandResult result = controller.ExecuteRefresh();
+
+            Assert.AreEqual("Current name", result.Result.Label);
+        }
+
+        [TestMethod]
+        public void RefreshKeepsTheBuiltLabelWhenTheAdapterReportsNoName()
+        {
+            ScannerController controller = CreateController(
+                _ => BuildSnapshot(Entry("Wielders", "All", "Built name", 1, 0, "commander:1")),
+                () => Vector2Int.zero,
+                (candidate, cursorHint) => ScannerResultRefresh.Valid(candidate.Position),
+                _ => true);
+
+            ScannerCommandResult result = controller.ExecuteRefresh();
+
+            Assert.AreEqual("Built name", result.Result.Label);
         }
 
         private static ScannerController CreateController(ScannerSnapshot snapshot)

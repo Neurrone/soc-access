@@ -1173,14 +1173,47 @@ namespace SongsOfConquestAccess.Adapters
 
         public ScannerResultRefresh TryRefreshScannerResult(ScannerResult result, Vector2Int cursorHint)
         {
-            return ValidateScannerResult(result)
-                ? ScannerResultRefresh.Valid(result.Position)
+            if (result == null)
+            {
+                return ScannerResultRefresh.Invalid;
+            }
+
+            Vector2Int position = RecenterScannerGroupResult(result, cursorHint);
+            return ValidateScannerResult(result, position)
+                ? ScannerResultRefresh.Valid(position)
                 : ScannerResultRefresh.Invalid;
         }
 
-        private bool ValidateScannerResult(ScannerResult result)
+        /// <summary>
+        /// A result covering many tiles is announced through one representative
+        /// tile, picked when the snapshot was built and measured from wherever
+        /// the scan started. That goes stale the moment the cursor moves, so the
+        /// spoken bearing ends up pointing at a far corner of a region the
+        /// player is standing next to. Re-pick the representative against the
+        /// live cursor instead.
+        /// </summary>
+        private Vector2Int RecenterScannerGroupResult(ScannerResult result, Vector2Int cursorHint)
         {
-            if (result == null || !IsWithinMap(result.Position))
+            if (result.Points.Count == 0)
+            {
+                return result.Position;
+            }
+
+            List<Vector2Int> surviving = new List<Vector2Int>();
+            for (int i = 0; i < result.Points.Count; i++)
+            {
+                if (IsWithinMap(result.Points[i]))
+                {
+                    surviving.Add(result.Points[i]);
+                }
+            }
+
+            return surviving.Count == 0 ? result.Position : ClosestPoint(surviving, cursorHint);
+        }
+
+        private bool ValidateScannerResult(ScannerResult result, Vector2Int position)
+        {
+            if (result == null || !IsWithinMap(position))
             {
                 RemoveRevealedScannerResult(result);
                 return false;
@@ -1188,7 +1221,7 @@ namespace SongsOfConquestAccess.Adapters
 
             if (result.Kind == ScannerResultKind.CommanderZoneOfControl)
             {
-                bool validZone = ValidateCommanderZoneOfControlResult(result);
+                bool validZone = ValidateCommanderZoneOfControlResult(result, position);
                 if (!validZone)
                 {
                     RemoveRevealedScannerResult(result);
@@ -1199,7 +1232,7 @@ namespace SongsOfConquestAccess.Adapters
 
             if (result.Kind == ScannerResultKind.UnexploredGroup)
             {
-                bool validUnexplored = ValidateUnexploredScannerResult(result);
+                bool validUnexplored = ValidateUnexploredScannerResult(result, position);
                 if (!validUnexplored)
                 {
                     RemoveRevealedScannerResult(result);
@@ -1208,7 +1241,7 @@ namespace SongsOfConquestAccess.Adapters
                 return validUnexplored;
             }
 
-            AdventureMapTile tile = GetTile(result.Position);
+            AdventureMapTile tile = GetTile(position);
             if (tile == null || !tile.IsExplored)
             {
                 RemoveRevealedScannerResult(result);
@@ -1786,7 +1819,7 @@ namespace SongsOfConquestAccess.Adapters
             }
         }
 
-        private bool ValidateCommanderZoneOfControlResult(ScannerResult result)
+        private bool ValidateCommanderZoneOfControlResult(ScannerResult result, Vector2Int position)
         {
             if (!(result.StableReference is int commanderId))
             {
@@ -1805,7 +1838,7 @@ namespace SongsOfConquestAccess.Adapters
                 return false;
             }
 
-            return ZoneOfControlContains(localTeamId, commanderId, result.Position);
+            return ZoneOfControlContains(localTeamId, commanderId, position);
         }
 
         private bool IsOverlayVisibleZoneOfControlSource(ICommanderState commander)
@@ -2316,7 +2349,7 @@ namespace SongsOfConquestAccess.Adapters
             }
         }
 
-        private bool ValidateUnexploredScannerResult(ScannerResult result)
+        private bool ValidateUnexploredScannerResult(ScannerResult result, Vector2Int position)
         {
             if (result == null || _selectionHandler == null || _facade == null || _facade.Level == null)
             {
@@ -2336,9 +2369,9 @@ namespace SongsOfConquestAccess.Adapters
             }
 
             byte[] exploration = _facade.Level.GetExplorationForTeam(localTeamId);
-            int index = result.Position.y * _facade.Level.Width + result.Position.x;
-            return IsUnexplored(exploration, index, result.Position)
-                && HasFiniteMovementPathToTile(selectedCommander, selectedCommander.TeamId, result.Position);
+            int index = position.y * _facade.Level.Width + position.x;
+            return IsUnexplored(exploration, index, position)
+                && HasFiniteMovementPathToTile(selectedCommander, selectedCommander.TeamId, position);
         }
 
         private bool[,] BuildReachableMoveDestinationScan(ICommanderState selectedCommander, int teamId)
