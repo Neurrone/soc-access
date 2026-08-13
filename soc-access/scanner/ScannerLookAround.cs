@@ -30,7 +30,7 @@ namespace SongsOfConquestAccess.Scanner
             for (int categoryIndex = 0; categoryIndex < source.Categories.Count; categoryIndex++)
             {
                 ScannerCategory sourceCategory = source.Categories[categoryIndex];
-                if (sourceCategory == null)
+                if (sourceCategory == null || sourceCategory.IsCustom)
                 {
                     continue;
                 }

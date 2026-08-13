@@ -42,7 +42,8 @@ namespace SongsOfConquestAccess.UI
             _beacons = new AdventureBeaconAudio();
             HydrateBookmarks();
             _scanner = new ScannerController(
-                origin => _adapter != null ? _adapter.BuildScannerSnapshot(origin) : null,
+                origin => ScannerCustomCategorySynthesizer.ApplyFromSettings(
+                    _adapter != null ? _adapter.BuildScannerSnapshot(origin) : null),
                 () => _cursorTile,
                 (result, cursorHint) => _adapter != null
                     ? _adapter.TryRefreshScannerResult(result, cursorHint)

@@ -38,6 +38,13 @@ namespace SongsOfConquestAccess.Scanner
         public bool PreserveResultOrder { get; set; }
 
         /// <summary>
+        /// Marks a category the player defined, which holds copies of results
+        /// that already live in a real category. Anything that sweeps the whole
+        /// snapshot skips these, so a result is not counted twice.
+        /// </summary>
+        public bool IsCustom { get; set; }
+
+        /// <summary>
         /// Applies to every subcategory under this category, including ones
         /// added later, so a category that wants a flat list cannot end up half
         /// grouped.

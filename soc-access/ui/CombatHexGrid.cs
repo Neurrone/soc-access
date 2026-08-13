@@ -31,7 +31,8 @@ namespace SongsOfConquestAccess.UI
             RefreshSnapshot();
             _cursor = _adapter != null ? _adapter.GetInitialTile() : Vector2Int.zero;
             _scanner = new ScannerController(
-                origin => _adapter != null ? _adapter.BuildScannerSnapshot(origin) : null,
+                origin => ScannerCustomCategorySynthesizer.ApplyFromSettings(
+                    _adapter != null ? _adapter.BuildScannerSnapshot(origin) : null),
                 () => _cursor,
                 (result, cursorHint) => _adapter != null
                     ? _adapter.TryRefreshScannerResult(result, cursorHint)

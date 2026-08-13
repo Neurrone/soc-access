@@ -47,6 +47,32 @@ namespace SongsOfConquestAccess.Scanner
             get { return _categories; }
         }
 
+        public ScannerTaxonomy Taxonomy
+        {
+            get { return _taxonomy; }
+        }
+
+        /// <summary>
+        /// Puts categories in front of everything the taxonomy declared, so the
+        /// player's own categories are the first ones the category cycle
+        /// reaches.
+        /// </summary>
+        public void PrependCategories(IReadOnlyList<ScannerCategory> categories)
+        {
+            if (categories == null)
+            {
+                return;
+            }
+
+            for (int i = categories.Count - 1; i >= 0; i--)
+            {
+                if (categories[i] != null)
+                {
+                    _categories.Insert(0, categories[i]);
+                }
+            }
+        }
+
         public bool IsEmpty
         {
             get
