@@ -215,14 +215,15 @@ namespace SongsOfConquestAccess.Adapters
                     {
                         ScannerResult result = new ScannerResult(
                             ScannerTileKey("terrain:elevated:" + elevation, tile.Point),
-                            ModText.Get(ModStrings.Spatial.ElevatedGroundHeight, elevation),
+                            ModText.Get(ModStrings.Scanner.ElevatedGround, elevation),
                             tile.Point)
                         {
-                            Kind = ScannerResultKind.TerrainPoint
+                            Kind = ScannerResultKind.TerrainPoint,
+                            ItemKey = ScannerItemKeys.ElevatedGround + elevation
                         };
                         snapshot.Add(
                             ScannerCategoryKeys.Terrain,
-                            ElevatedGroundSubcategoryKey(elevation),
+                            ScannerSubcategoryKeys.All,
                             result);
                     }
                 }
@@ -234,14 +235,15 @@ namespace SongsOfConquestAccess.Adapters
                 {
                     ScannerResult result = new ScannerResult(
                         ScannerTileKey("terrain:impassable", tile.Point),
-                        ModText.Get(ModStrings.Spatial.Impassable),
+                        ModText.Get(ModStrings.Scanner.ImpassableTerrain),
                         tile.Point)
                     {
-                        Kind = ScannerResultKind.TerrainPoint
+                        Kind = ScannerResultKind.TerrainPoint,
+                        ItemKey = ScannerItemKeys.ImpassableTerrain
                     };
                     snapshot.Add(
                         ScannerCategoryKeys.Terrain,
-                        ScannerSubcategoryKeys.ImpassableTerrain,
+                        ScannerSubcategoryKeys.All,
                         result);
                 }
             }
@@ -298,19 +300,6 @@ namespace SongsOfConquestAccess.Adapters
                         own ? ScannerSubcategoryKeys.Friendly : ScannerSubcategoryKeys.Enemy,
                         result);
                 }
-            }
-        }
-
-        private static string ElevatedGroundSubcategoryKey(int elevation)
-        {
-            switch (elevation)
-            {
-                case 1:
-                    return ScannerSubcategoryKeys.ElevatedGroundOne;
-                case 2:
-                    return ScannerSubcategoryKeys.ElevatedGroundTwo;
-                default:
-                    return ScannerSubcategoryKeys.ElevatedGroundThree;
             }
         }
 

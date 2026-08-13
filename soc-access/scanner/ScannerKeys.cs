@@ -52,9 +52,16 @@ namespace SongsOfConquestAccess.Scanner
         public const string EnemyGates = "enemy_gates";
         public const string Attackable = "attackable";
         public const string Dangerous = "dangerous";
-        public const string ElevatedGroundOne = "elevated_ground_1";
-        public const string ElevatedGroundTwo = "elevated_ground_2";
-        public const string ElevatedGroundThree = "elevated_ground_3";
+    }
+
+    /// <summary>
+    /// Stable identifiers for the items the mod names itself, rather than
+    /// taking from an entity. Anything the game already names groups by that
+    /// name and needs no key here.
+    /// </summary>
+    internal static class ScannerItemKeys
+    {
+        public const string ElevatedGround = "elevated_ground_";
         public const string ImpassableTerrain = "impassable_terrain";
         public const string Blocked = "blocked";
     }

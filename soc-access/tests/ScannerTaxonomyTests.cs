@@ -91,11 +91,8 @@ namespace SongsOfConquestAccess.Tests
                 BattleScannerTaxonomy.Instance,
                 "entities",
                 "all", "friendly_gates", "enemy_gates", "attackable", "dangerous");
-            AssertSubcategories(
-                BattleScannerTaxonomy.Instance,
-                "terrain",
-                "elevated_ground_1", "elevated_ground_2", "elevated_ground_3", "impassable_terrain");
-            AssertSubcategories(BattleScannerTaxonomy.Instance, "obstacles", "blocked");
+            AssertSubcategories(BattleScannerTaxonomy.Instance, "terrain", "all");
+            AssertSubcategories(BattleScannerTaxonomy.Instance, "obstacles", "all");
         }
 
         [TestMethod]

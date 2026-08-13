@@ -579,12 +579,13 @@ namespace SongsOfConquestAccess.Adapters
                         {
                             ScannerResult result = new ScannerResult(
                                 ScannerTileKey("terrain:elevated:" + elevation, point),
-                                ModText.Get(ModStrings.Spatial.ElevatedGroundHeight, elevation),
+                                ModText.Get(ModStrings.Scanner.ElevatedGround, elevation),
                                 point)
                             {
-                                Kind = ScannerResultKind.TerrainPoint
+                                Kind = ScannerResultKind.TerrainPoint,
+                                ItemKey = ScannerItemKeys.ElevatedGround + elevation
                             };
-                            snapshot.Add(ScannerCategoryKeys.Terrain, ElevatedGroundSubcategoryKey(elevation), result);
+                            snapshot.Add(ScannerCategoryKeys.Terrain, ScannerSubcategoryKeys.All, result);
                         }
                     }
                 }
@@ -605,33 +606,29 @@ namespace SongsOfConquestAccess.Adapters
                     {
                         ScannerResult result = new ScannerResult(
                             ScannerTileKey("terrain:impassable", point),
-                            ModText.Get(ModStrings.Spatial.Impassable),
+                            ModText.Get(ModStrings.Scanner.ImpassableTerrain),
                             point)
                         {
-                            Kind = ScannerResultKind.TerrainPoint
+                            Kind = ScannerResultKind.TerrainPoint,
+                            ItemKey = ScannerItemKeys.ImpassableTerrain
                         };
-                        snapshot.Add(ScannerCategoryKeys.Terrain, ScannerSubcategoryKeys.ImpassableTerrain, result);
+                        snapshot.Add(ScannerCategoryKeys.Terrain, ScannerSubcategoryKeys.All, result);
                     }
 
                     if (tile.IsBlocked)
                     {
-                        snapshot.Add(ScannerCategoryKeys.Obstacles, ScannerSubcategoryKeys.Blocked,
-                            new ScannerResult(ScannerTileKey("obstacle:blocked", point), ModText.Get(ModStrings.Spatial.Blocked), point));
+                        snapshot.Add(
+                            ScannerCategoryKeys.Obstacles,
+                            ScannerSubcategoryKeys.All,
+                            new ScannerResult(
+                                ScannerTileKey("obstacle:blocked", point),
+                                ModText.Get(ModStrings.Scanner.Blocked),
+                                point)
+                            {
+                                ItemKey = ScannerItemKeys.Blocked
+                            });
                     }
                 }
-            }
-        }
-
-        private static string ElevatedGroundSubcategoryKey(int elevation)
-        {
-            switch (elevation)
-            {
-                case 1:
-                    return ScannerSubcategoryKeys.ElevatedGroundOne;
-                case 2:
-                    return ScannerSubcategoryKeys.ElevatedGroundTwo;
-                default:
-                    return ScannerSubcategoryKeys.ElevatedGroundThree;
             }
         }
 

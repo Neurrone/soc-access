@@ -23,14 +23,11 @@ namespace SongsOfConquestAccess.Scanner
             new ScannerCategoryDefinition(
                 ScannerCategoryKeys.Terrain,
                 () => ModText.Get(ModStrings.Scanner.Terrain),
-                ElevatedGround(ScannerSubcategoryKeys.ElevatedGroundOne, 1),
-                ElevatedGround(ScannerSubcategoryKeys.ElevatedGroundTwo, 2),
-                ElevatedGround(ScannerSubcategoryKeys.ElevatedGroundThree, 3),
-                Subcategory(ScannerSubcategoryKeys.ImpassableTerrain, ModStrings.Scanner.ImpassableTerrain)),
+                All()),
             new ScannerCategoryDefinition(
                 ScannerCategoryKeys.Obstacles,
                 () => ModText.Get(ModStrings.Scanner.Obstacles),
-                Subcategory(ScannerSubcategoryKeys.Blocked, ModStrings.Scanner.Blocked)));
+                All()));
 
         private static ScannerCategoryDefinition Sides(string key, ModString label)
         {
@@ -40,11 +37,6 @@ namespace SongsOfConquestAccess.Scanner
                 All(),
                 Subcategory(ScannerSubcategoryKeys.Friendly, ModStrings.Scanner.Friendly),
                 Subcategory(ScannerSubcategoryKeys.Enemy, ModStrings.Scanner.Enemy));
-        }
-
-        private static ScannerSubcategoryDefinition ElevatedGround(string key, int height)
-        {
-            return new ScannerSubcategoryDefinition(key, () => ModText.Get(ModStrings.Scanner.ElevatedGround, height));
         }
 
         private static ScannerSubcategoryDefinition All()
