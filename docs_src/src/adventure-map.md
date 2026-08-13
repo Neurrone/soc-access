@@ -49,9 +49,13 @@ The mod mentions if a tile is unexplored or currently unseen.
 
 When a destination is set, the mod reads what it will cost and the route the wielder will walk, for example `Cost: 5 this turn, 12 next turn. Aurelia will move 2n, ne, 2e.`
 
-The cost is broken over the turns it is spent on. Each number is the movement used during that turn, so the first is capped by what the wielder has left right now and the rest by its full movement. A turn that costs nothing is left out, so a wielder that has already run out this turn starts at `next turn`.
+The cost is broken over the turns it is spent on. Each number is the movement used during that turn, so the first is capped by what the wielder has left right now and the rest by its full movement. A turn that costs nothing is left out, so a wielder that has already run out this turn starts at `next turn`. When the destination is something the wielder interacts with, what that interaction costs is counted too, on the turn the wielder can afford to spend it.
 
 The route is then named as a run of steps at a time, with the number of tiles in front of the direction they are walked. A run of a single tile is named on its own, so a route that goes north twice, then northeast, then east twice reads as `2n, ne, 2e`. These follow the scanner's `Long directions` setting, so the same route reads as `2 north, northeast, 2 east` when that setting is on.
+
+When the destination is something the wielder acts on rather than somewhere it stands, the action is named after the last step, for example `Cost: 5.5 this turn. Aurelia will move 2n, ne and Claim Gold Mine.` If the wielder is already standing next to it there is nothing to walk, so the action is all that is read, for example `Cost: 0.5 this turn. Aurelia will Claim Gold Mine.` An action that costs no movement drops the cost, reading as `Aurelia will Visit Watermill.`
+
+The action and the name of the thing acted on are the game's own, the same wording its tooltip uses. Another wielder is named the same way, as `Attack` for a hostile one and `Trade` for your own or a partner's, and neither is named while that side is in a battle, since the game does not allow it then.
 
 If the route cannot be worked out, this falls back to naming the destination tile instead.
 

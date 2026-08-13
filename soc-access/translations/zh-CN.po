@@ -225,10 +225,25 @@ msgctxt "Events.DestinationSet"
 msgid "{0}'s destination set to {1}"
 msgstr "{0}的目的地已设为{1}"
 
+#. Events.DestinationSetInteraction
+msgctxt "Events.DestinationSetInteraction"
+msgid "Cost: {0}. {1} will {2} {3}."
+msgstr "消耗：{0}。{1}的行动：{2} {3}。"
+
+#. Events.DestinationSetInteractionFree
+msgctxt "Events.DestinationSetInteractionFree"
+msgid "{0} will {1} {2}."
+msgstr "{0}的行动：{1} {2}。"
+
 #. Events.DestinationSetRoute
 msgctxt "Events.DestinationSetRoute"
 msgid "Cost: {0}. {1} will move {2}."
 msgstr "消耗：{0}。{1}的移动：{2}。"
+
+#. Events.DestinationSetRouteInteraction
+msgctxt "Events.DestinationSetRouteInteraction"
+msgid "Cost: {0}. {1} will move {2} and {3} {4}."
+msgstr "消耗：{0}。{1}的移动：{2}，行动：{3} {4}。"
 
 #. Events.HudClosed
 msgctxt "Events.HudClosed"

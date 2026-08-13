@@ -245,10 +245,25 @@ msgctxt "Events.DestinationSet"
 msgid "{0}'s destination set to {1}"
 msgstr "Пункт назначения героя {0}: {1}"
 
+#. Events.DestinationSetInteraction
+msgctxt "Events.DestinationSetInteraction"
+msgid "Cost: {0}. {1} will {2} {3}."
+msgstr "Стоимость: {0}. Действие героя {1}: {2} {3}."
+
+#. Events.DestinationSetInteractionFree
+msgctxt "Events.DestinationSetInteractionFree"
+msgid "{0} will {1} {2}."
+msgstr "Действие героя {0}: {1} {2}."
+
 #. Events.DestinationSetRoute
 msgctxt "Events.DestinationSetRoute"
 msgid "Cost: {0}. {1} will move {2}."
 msgstr "Стоимость: {0}. Перемещение героя {1}: {2}."
+
+#. Events.DestinationSetRouteInteraction
+msgctxt "Events.DestinationSetRouteInteraction"
+msgid "Cost: {0}. {1} will move {2} and {3} {4}."
+msgstr "Стоимость: {0}. Перемещение героя {1}: {2}, действие: {3} {4}."
 
 #. Events.HudClosed
 msgctxt "Events.HudClosed"

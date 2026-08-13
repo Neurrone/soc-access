@@ -225,10 +225,25 @@ msgctxt "Events.DestinationSet"
 msgid "{0}'s destination set to {1}"
 msgstr "Destination de {0} définie sur {1}"
 
+#. Events.DestinationSetInteraction
+msgctxt "Events.DestinationSetInteraction"
+msgid "Cost: {0}. {1} will {2} {3}."
+msgstr "Coût : {0}. {1} effectuera : {2} {3}."
+
+#. Events.DestinationSetInteractionFree
+msgctxt "Events.DestinationSetInteractionFree"
+msgid "{0} will {1} {2}."
+msgstr "{0} effectuera : {1} {2}."
+
 #. Events.DestinationSetRoute
 msgctxt "Events.DestinationSetRoute"
 msgid "Cost: {0}. {1} will move {2}."
 msgstr "Coût : {0}. {1} se déplacera : {2}."
+
+#. Events.DestinationSetRouteInteraction
+msgctxt "Events.DestinationSetRouteInteraction"
+msgid "Cost: {0}. {1} will move {2} and {3} {4}."
+msgstr "Coût : {0}. {1} se déplacera : {2} puis effectuera : {3} {4}."
 
 #. Events.HudClosed
 msgctxt "Events.HudClosed"

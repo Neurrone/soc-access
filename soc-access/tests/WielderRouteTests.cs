@@ -84,6 +84,72 @@ namespace SongsOfConquestAccess.Tests
             AssertStep(steps[2], 1, ScannerDirection.East);
         }
 
+        [TestMethod]
+        public void AddInteractionCostSpendsItOnTheTurnTheWielderArrives()
+        {
+            IReadOnlyList<WielderRouteTurn> turns = WielderRoute.AddInteractionCost(
+                new List<WielderRouteTurn> { Turn(1, 5f) },
+                interactionCost: 0.5f,
+                movesLeft: 12f,
+                maxMovement: 12f);
+
+            Assert.AreEqual(1, turns.Count);
+            AssertTurn(turns[0], 1, 5.5f);
+        }
+
+        [TestMethod]
+        public void AddInteractionCostSlipsToTheNextTurnWhenArrivingSpendsTheLot()
+        {
+            IReadOnlyList<WielderRouteTurn> turns = WielderRoute.AddInteractionCost(
+                new List<WielderRouteTurn> { Turn(1, 5f), Turn(2, 12f) },
+                interactionCost: 0.5f,
+                movesLeft: 5f,
+                maxMovement: 12f);
+
+            Assert.AreEqual(3, turns.Count);
+            AssertTurn(turns[1], 2, 12f);
+            AssertTurn(turns[2], 3, 0.5f);
+        }
+
+        [TestMethod]
+        public void AddInteractionCostStandsOnItsOwnWhenThereIsNothingToWalk()
+        {
+            IReadOnlyList<WielderRouteTurn> turns = WielderRoute.AddInteractionCost(
+                new List<WielderRouteTurn>(),
+                interactionCost: 0.5f,
+                movesLeft: 3f,
+                maxMovement: 12f);
+
+            Assert.AreEqual(1, turns.Count);
+            AssertTurn(turns[0], 1, 0.5f);
+        }
+
+        [TestMethod]
+        public void AddInteractionCostWaitsForNextTurnWhenTheWielderIsSpentAlready()
+        {
+            IReadOnlyList<WielderRouteTurn> turns = WielderRoute.AddInteractionCost(
+                new List<WielderRouteTurn>(),
+                interactionCost: 0.5f,
+                movesLeft: 0f,
+                maxMovement: 12f);
+
+            Assert.AreEqual(1, turns.Count);
+            AssertTurn(turns[0], 2, 0.5f);
+        }
+
+        [TestMethod]
+        public void AddInteractionCostLeavesTheTurnsAloneWhenTheInteractionIsFree()
+        {
+            IReadOnlyList<WielderRouteTurn> turns = WielderRoute.AddInteractionCost(
+                new List<WielderRouteTurn> { Turn(1, 5f) },
+                interactionCost: 0f,
+                movesLeft: 12f,
+                maxMovement: 12f);
+
+            Assert.AreEqual(1, turns.Count);
+            AssertTurn(turns[0], 1, 5f);
+        }
+
         private static void AssertTurn(WielderRouteTurn turn, int expectedTravelTurns, float expectedCost)
         {
             Assert.AreEqual(expectedTravelTurns, turn.TravelTurns);
@@ -94,6 +160,11 @@ namespace SongsOfConquestAccess.Tests
         {
             Assert.AreEqual(expectedCount, step.Count);
             Assert.AreEqual(expectedDirection, step.Direction);
+        }
+
+        private static WielderRouteTurn Turn(int travelTurns, float cost)
+        {
+            return new WielderRouteTurn(travelTurns, cost);
         }
 
         private static PathNode[] Path(params float[] travelCosts)

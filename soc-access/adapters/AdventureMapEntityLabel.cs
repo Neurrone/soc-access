@@ -99,6 +99,43 @@ namespace SongsOfConquestAccess.Adapters
             }
         }
 
+        /// <summary>
+        /// Reads the action the game names in its own tooltip for interacting with this
+        /// entity, such as claim, visit or pick up. Returns false when the game names no
+        /// action for it.
+        /// </summary>
+        public static bool TryGetInteractionType(
+            IClientAdventureFacade facade,
+            int interactorId,
+            IMapEntity entity,
+            out AdventureInteractionType interactionType)
+        {
+            interactionType = AdventureInteractionType.None;
+            if (entity == null)
+            {
+                return false;
+            }
+
+            try
+            {
+                ScoutingInfo scouting = GetScouting(facade, entity);
+                MapEntityPreVisitDetails details = entity.GetPreVisitDetails(
+                    interactorId,
+                    false,
+                    scouting.DetailLevel,
+                    scouting.ProviderKey,
+                    true) as MapEntityPreVisitDetails;
+
+                interactionType = details != null ? details.InteractionType : AdventureInteractionType.None;
+                return interactionType != AdventureInteractionType.None;
+            }
+            catch (Exception exception)
+            {
+                SocAccessPlugin.Instance?.LogWarning("AdventureMapEntityLabel failed to read map entity interaction type: " + exception.Message);
+                return false;
+            }
+        }
+
         private static ScoutingInfo GetScouting(IClientAdventureFacade facade, IMapEntity entity)
         {
             if (facade == null || facade.Teams == null || entity == null)

@@ -225,10 +225,25 @@ msgctxt "Events.DestinationSet"
 msgid "{0}'s destination set to {1}"
 msgstr "{0}의 목적지가 {1}(으)로 설정되었습니다"
 
+#. Events.DestinationSetInteraction
+msgctxt "Events.DestinationSetInteraction"
+msgid "Cost: {0}. {1} will {2} {3}."
+msgstr "비용: {0}. {1}의 행동: {2} {3}."
+
+#. Events.DestinationSetInteractionFree
+msgctxt "Events.DestinationSetInteractionFree"
+msgid "{0} will {1} {2}."
+msgstr "{0}의 행동: {1} {2}."
+
 #. Events.DestinationSetRoute
 msgctxt "Events.DestinationSetRoute"
 msgid "Cost: {0}. {1} will move {2}."
 msgstr "비용: {0}. {1}의 이동: {2}."
+
+#. Events.DestinationSetRouteInteraction
+msgctxt "Events.DestinationSetRouteInteraction"
+msgid "Cost: {0}. {1} will move {2} and {3} {4}."
+msgstr "비용: {0}. {1}의 이동: {2}, 행동: {3} {4}."
 
 #. Events.HudClosed
 msgctxt "Events.HudClosed"

@@ -61,18 +61,84 @@ namespace SongsOfConquestAccess.Tests
         }
 
         [TestMethod]
-        public void GetSpeechTextFallsBackWhenTheRouteHasNoSteps()
+        public void GetSpeechTextFallsBackWhenTheRouteHasNoStepsToWalkOrActionToTake()
         {
             string text = Describe(new ScannerDirectionStep[0], new[] { Turn(1, 5f) });
 
             Assert.AreEqual("Aurelia's destination set to 34, 12", text);
         }
 
+        [TestMethod]
+        public void GetSpeechTextNamesTheActionWhenThereIsNothingToWalk()
+        {
+            string text = Describe(
+                new ScannerDirectionStep[0],
+                new[] { Turn(1, 0.5f) },
+                Interaction("Claim", "Gold Mine", 0.5f));
+
+            Assert.AreEqual("Cost: 0.5 this turn. Aurelia will Claim Gold Mine.", text);
+        }
+
+        [TestMethod]
+        public void GetSpeechTextSaysWhenTheActionHasToWaitForNextTurn()
+        {
+            string text = Describe(
+                new ScannerDirectionStep[0],
+                new[] { Turn(2, 0.5f) },
+                Interaction("Claim", "Gold Mine", 0.5f));
+
+            Assert.AreEqual("Cost: 0.5 next turn. Aurelia will Claim Gold Mine.", text);
+        }
+
+        [TestMethod]
+        public void GetSpeechTextDropsTheCostWhenTheActionIsFree()
+        {
+            string text = Describe(
+                new ScannerDirectionStep[0],
+                new WielderRouteTurn[0],
+                Interaction("Visit", "Watermill", 0f));
+
+            Assert.AreEqual("Aurelia will Visit Watermill.", text);
+        }
+
+        [TestMethod]
+        public void GetSpeechTextFallsBackWhenTheGameNamesNoAction()
+        {
+            string text = Describe(
+                new ScannerDirectionStep[0],
+                new[] { Turn(1, 0.5f) },
+                Interaction(string.Empty, string.Empty, 0.5f));
+
+            Assert.AreEqual("Aurelia's destination set to 34, 12", text);
+        }
+
+        [TestMethod]
+        public void GetSpeechTextNamesTheActionAfterTheWalkThatLeadsToIt()
+        {
+            string text = Describe(
+                new[] { Step(2, ScannerDirection.North), Step(1, ScannerDirection.Northeast) },
+                new[] { Turn(1, 5.5f) },
+                Interaction("Claim", "Gold Mine", 0.5f));
+
+            Assert.AreEqual("Cost: 5.5 this turn. Aurelia will move 2n, ne and Claim Gold Mine.", text);
+        }
+
+        [TestMethod]
+        public void GetSpeechTextReadsTheWalkAloneWhenTheGameNamesNoActionForTheDestination()
+        {
+            string text = Describe(
+                new[] { Step(2, ScannerDirection.North) },
+                new[] { Turn(1, 5.5f) },
+                Interaction(string.Empty, string.Empty, 0.5f));
+
+            Assert.AreEqual("Cost: 5.5 this turn. Aurelia will move 2n.", text);
+        }
+
         private static string Describe(
             IReadOnlyList<ScannerDirectionStep> steps,
             IReadOnlyList<WielderRouteTurn> turns)
         {
-            return Describe(steps, turns, useLongDirections: false);
+            return Describe(steps, turns, null, useLongDirections: false);
         }
 
         private static string Describe(
@@ -80,11 +146,28 @@ namespace SongsOfConquestAccess.Tests
             IReadOnlyList<WielderRouteTurn> turns,
             bool useLongDirections)
         {
+            return Describe(steps, turns, null, useLongDirections);
+        }
+
+        private static string Describe(
+            IReadOnlyList<ScannerDirectionStep> steps,
+            IReadOnlyList<WielderRouteTurn> turns,
+            WielderRouteInteraction interaction)
+        {
+            return Describe(steps, turns, interaction, useLongDirections: false);
+        }
+
+        private static string Describe(
+            IReadOnlyList<ScannerDirectionStep> steps,
+            IReadOnlyList<WielderRouteTurn> turns,
+            WielderRouteInteraction interaction,
+            bool useLongDirections)
+        {
             return new MapDestinationSetEvent(
                 7,
                 "Aurelia",
                 new Vector2Int(34, 12),
-                new WielderRoute(steps, turns)).GetSpeechText(useLongDirections);
+                new WielderRoute(steps, turns, interaction)).GetSpeechText(useLongDirections);
         }
 
         private static ScannerDirectionStep Step(int count, ScannerDirection direction)
@@ -95,6 +178,11 @@ namespace SongsOfConquestAccess.Tests
         private static WielderRouteTurn Turn(int travelTurns, float cost)
         {
             return new WielderRouteTurn(travelTurns, cost);
+        }
+
+        private static WielderRouteInteraction Interaction(string action, string target, float cost)
+        {
+            return new WielderRouteInteraction(action, target, cost);
         }
     }
 }

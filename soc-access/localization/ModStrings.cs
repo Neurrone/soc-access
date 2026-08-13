@@ -89,7 +89,10 @@ namespace SongsOfConquestAccess.Localization
             public static readonly ModString BuildSiteTown = new ModString("Events.BuildSiteTown", "town");
             public static readonly ModString DestinationCleared = new ModString("Events.DestinationCleared", "{0}'s destination cleared.");
             public static readonly ModString DestinationSet = new ModString("Events.DestinationSet", "{0}'s destination set to {1}");
+            public static readonly ModString DestinationSetInteraction = new ModString("Events.DestinationSetInteraction", "Cost: {0}. {1} will {2} {3}.");
+            public static readonly ModString DestinationSetInteractionFree = new ModString("Events.DestinationSetInteractionFree", "{0} will {1} {2}.");
             public static readonly ModString DestinationSetRoute = new ModString("Events.DestinationSetRoute", "Cost: {0}. {1} will move {2}.");
+            public static readonly ModString DestinationSetRouteInteraction = new ModString("Events.DestinationSetRouteInteraction", "Cost: {0}. {1} will move {2} and {3} {4}.");
             public static readonly ModString HudClosed = new ModString("Events.HudClosed", "HUD closed");
             public static readonly ModString HudOpen = new ModString("Events.HudOpen", "HUD open");
             public static readonly ModString LeveledUpTo = new ModString("Events.LeveledUpTo", "{0} leveled up to {1}");

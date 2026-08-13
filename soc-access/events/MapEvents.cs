@@ -256,16 +256,68 @@ namespace SongsOfConquestAccess.Events
 
         internal string GetSpeechText(bool useLongDirections)
         {
-            if (Route == null || Route.Steps.Count == 0 || Route.Turns.Count == 0)
+            if (Route == null)
             {
-                return ModText.Get(ModStrings.Events.DestinationSet, WielderName, FormatTile(Destination));
+                return DescribeDestinationTile();
+            }
+
+            if (Route.Steps.Count != 0 && Route.Turns.Count != 0)
+            {
+                return DescribeRoute(useLongDirections);
+            }
+
+            // Standing next to what it is sent to leaves the wielder nothing to
+            // walk, so the action it will take stands in for the route.
+            if (Route.Steps.Count == 0 && Route.Interaction != null && Route.Interaction.HasAction)
+            {
+                return DescribeInteraction(Route.Interaction, Route.Turns);
+            }
+
+            return DescribeDestinationTile();
+        }
+
+        private string DescribeDestinationTile()
+        {
+            return ModText.Get(ModStrings.Events.DestinationSet, WielderName, FormatTile(Destination));
+        }
+
+        // A route that ends in an interaction names it after the last step, so the
+        // walk and what it is for are heard in the order they happen.
+        private string DescribeRoute(bool useLongDirections)
+        {
+            string cost = DescribeCost(Route.Turns);
+            string steps = DescribeSteps(Route.Steps, useLongDirections);
+            if (Route.Interaction == null || !Route.Interaction.HasAction)
+            {
+                return ModText.Get(ModStrings.Events.DestinationSetRoute, cost, WielderName, steps);
             }
 
             return ModText.Get(
-                ModStrings.Events.DestinationSetRoute,
-                DescribeCost(Route.Turns),
+                ModStrings.Events.DestinationSetRouteInteraction,
+                cost,
                 WielderName,
-                DescribeSteps(Route.Steps, useLongDirections));
+                steps,
+                Route.Interaction.ActionText,
+                Route.Interaction.TargetName);
+        }
+
+        private string DescribeInteraction(WielderRouteInteraction interaction, IReadOnlyList<WielderRouteTurn> turns)
+        {
+            if (turns.Count == 0)
+            {
+                return ModText.Get(
+                    ModStrings.Events.DestinationSetInteractionFree,
+                    WielderName,
+                    interaction.ActionText,
+                    interaction.TargetName);
+            }
+
+            return ModText.Get(
+                ModStrings.Events.DestinationSetInteraction,
+                DescribeCost(turns),
+                WielderName,
+                interaction.ActionText,
+                interaction.TargetName);
         }
 
         private static string DescribeCost(IReadOnlyList<WielderRouteTurn> turns)
