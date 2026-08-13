@@ -2165,6 +2165,11 @@ msgctxt "Scanner.Attackable"
 msgid "Attackable"
 msgstr "攻撃可能"
 
+#. Scanner.Barriers
+msgctxt "Scanner.Barriers"
+msgid "Barriers"
+msgstr "障壁"
+
 #. Scanner.Beacons
 msgctxt "Scanner.Beacons"
 msgid "Beacons"
@@ -2174,11 +2179,6 @@ msgstr "ビーコン"
 msgctxt "Scanner.Blocked"
 msgid "Blocked"
 msgstr "ブロック済み"
-
-#. Scanner.Bridges
-msgctxt "Scanner.Bridges"
-msgid "Bridges"
-msgstr "橋"
 
 #. Scanner.Buildings
 msgctxt "Scanner.Buildings"
@@ -2310,6 +2310,11 @@ msgctxt "Scanner.Objectives"
 msgid "Objectives"
 msgstr "目標"
 
+#. Scanner.OpenGround
+msgctxt "Scanner.OpenGround"
+msgid "Open ground"
+msgstr "開けた地形"
+
 #. Scanner.Obstacles
 msgctxt "Scanner.Obstacles"
 msgid "Obstacles"
@@ -2340,10 +2345,15 @@ msgctxt "Scanner.Riches"
 msgid "Riches"
 msgstr "富"
 
-#. Scanner.Roads
-msgctxt "Scanner.Roads"
-msgid "Roads"
-msgstr "道路"
+#. Scanner.RoadsAndCrossings
+msgctxt "Scanner.RoadsAndCrossings"
+msgid "Roads and crossings"
+msgstr "道路と渡り"
+
+#. Scanner.RoughGround
+msgctxt "Scanner.RoughGround"
+msgid "Rough ground"
+msgstr "荒れた地形"
 
 #. Scanner.Search
 msgctxt "Scanner.Search"
@@ -2415,20 +2425,10 @@ msgctxt "Scanner.Unexplored"
 msgid "Unexplored"
 msgstr "未探索"
 
-#. Scanner.UnexploredTileCount_0
-msgctxt "Scanner.UnexploredTileCount_0"
-msgid "{0} unexplored tile"
-msgstr "{0}個の未探索タイル"
-
 #. Scanner.Unvisited
 msgctxt "Scanner.Unvisited"
 msgid "Unvisited"
 msgstr "未訪問"
-
-#. Scanner.Water
-msgctxt "Scanner.Water"
-msgid "Water"
-msgstr "水"
 
 #. Scanner.West
 msgctxt "Scanner.West"
@@ -2454,31 +2454,6 @@ msgstr "{0}を{1}で売却"
 msgctxt "Scanner.Wielders"
 msgid "Wielders"
 msgstr "ウィールダー"
-
-#. Scanner.BlockedTileCount_0
-msgctxt "Scanner.BlockedTileCount_0"
-msgid "{0} blocked tile"
-msgstr "{0}個のブロック済みタイル"
-
-#. Scanner.BridgeTileCount_0
-msgctxt "Scanner.BridgeTileCount_0"
-msgid "{0} bridge tile"
-msgstr "{0}個の橋タイル"
-
-#. Scanner.ImpassableTileCount_0
-msgctxt "Scanner.ImpassableTileCount_0"
-msgid "{0} impassable tile"
-msgstr "{0}個の通行不可タイル"
-
-#. Scanner.RoadTileCount_0
-msgctxt "Scanner.RoadTileCount_0"
-msgid "{0} road tile"
-msgstr "{0}個の道路タイル"
-
-#. Scanner.WaterTileCount_0
-msgctxt "Scanner.WaterTileCount_0"
-msgid "{0} water tile"
-msgstr "{0}個の水タイル"
 
 #. Spatial.AridTrees
 msgctxt "Spatial.AridTrees"
@@ -2656,85 +2631,15 @@ msgctxt "Combat.YourRangedTroops"
 msgid "your ranged troops"
 msgstr "味方遠隔部隊"
 
-#. Scanner.AridTrees
-msgctxt "Scanner.AridTrees"
-msgid "Arid trees"
-msgstr "乾燥地の木々"
-
-#. Scanner.CobblestoneRoads
-msgctxt "Scanner.CobblestoneRoads"
-msgid "Cobblestone roads"
-msgstr "石畳の道"
-
-#. Scanner.DeepWater
-msgctxt "Scanner.DeepWater"
-msgid "Deep water"
-msgstr "深い水域"
-
-#. Scanner.Deforestation
-msgctxt "Scanner.Deforestation"
-msgid "Deforestation"
-msgstr "森林伐採"
-
 #. Scanner.DistanceAndDirection
 msgctxt "Scanner.DistanceAndDirection"
 msgid "{0}, {1}"
 msgstr "{0}、{1}"
 
-#. Scanner.Dirt
-msgctxt "Scanner.Dirt"
-msgid "Dirt"
-msgstr "土"
-
-#. Scanner.DirtRoads
-msgctxt "Scanner.DirtRoads"
-msgid "Dirt roads"
-msgstr "土の道"
-
-#. Scanner.Farmland
-msgctxt "Scanner.Farmland"
-msgid "Farmland"
-msgstr "農地"
-
-#. Scanner.Grass
-msgctxt "Scanner.Grass"
-msgid "Grass"
-msgstr "草地"
-
-#. Scanner.Mountains
-msgctxt "Scanner.Mountains"
-msgid "Mountains"
-msgstr "山"
-
-#. Scanner.Sand
-msgctxt "Scanner.Sand"
-msgid "Sand"
-msgstr "砂"
-
-#. Scanner.ShallowWater
-msgctxt "Scanner.ShallowWater"
-msgid "Shallow water"
-msgstr "浅い水域"
-
-#. Scanner.TemperateTrees
-msgctxt "Scanner.TemperateTrees"
-msgid "Temperate trees"
-msgstr "温帯の木々"
-
 #. Scanner.WestShort
 msgctxt "Scanner.WestShort"
 msgid "w"
 msgstr "西"
-
-#. Scanner.Walls
-msgctxt "Scanner.Walls"
-msgid "Walls"
-msgstr "壁"
-
-#. Scanner.WaterEdge
-msgctxt "Scanner.WaterEdge"
-msgid "Water edge"
-msgstr "水辺"
 
 #. Spatial.Dirt
 msgctxt "Spatial.Dirt"
@@ -2760,76 +2665,6 @@ msgstr "砂"
 msgctxt "Spatial.TemperateTrees"
 msgid "Temperate trees"
 msgstr "温帯の木々"
-
-#. Scanner.AridTreeTileCount_0
-msgctxt "Scanner.AridTreeTileCount_0"
-msgid "{0} arid tree tile"
-msgstr "{0}個の乾燥地の木々タイル"
-
-#. Scanner.CobblestoneRoadTileCount_0
-msgctxt "Scanner.CobblestoneRoadTileCount_0"
-msgid "{0} cobblestone road tile"
-msgstr "{0}個の石畳の道タイル"
-
-#. Scanner.DeepWaterTileCount_0
-msgctxt "Scanner.DeepWaterTileCount_0"
-msgid "{0} deep water tile"
-msgstr "{0}個の深い水域タイル"
-
-#. Scanner.DeforestationTileCount_0
-msgctxt "Scanner.DeforestationTileCount_0"
-msgid "{0} deforestation tile"
-msgstr "{0}個の森林伐採タイル"
-
-#. Scanner.DirtRoadTileCount_0
-msgctxt "Scanner.DirtRoadTileCount_0"
-msgid "{0} dirt road tile"
-msgstr "{0}個の土の道タイル"
-
-#. Scanner.DirtTileCount_0
-msgctxt "Scanner.DirtTileCount_0"
-msgid "{0} dirt tile"
-msgstr "{0}個の土タイル"
-
-#. Scanner.FarmlandTileCount_0
-msgctxt "Scanner.FarmlandTileCount_0"
-msgid "{0} farmland tile"
-msgstr "{0}個の農地タイル"
-
-#. Scanner.GrassTileCount_0
-msgctxt "Scanner.GrassTileCount_0"
-msgid "{0} grass tile"
-msgstr "{0}個の草地タイル"
-
-#. Scanner.MountainTileCount_0
-msgctxt "Scanner.MountainTileCount_0"
-msgid "{0} mountain tile"
-msgstr "{0}個の山タイル"
-
-#. Scanner.SandTileCount_0
-msgctxt "Scanner.SandTileCount_0"
-msgid "{0} sand tile"
-msgstr "{0}個の砂タイル"
-
-#. Scanner.ShallowWaterTileCount_0
-msgctxt "Scanner.ShallowWaterTileCount_0"
-msgid "{0} shallow water tile"
-msgstr "{0}個の浅い水域タイル"
-
-#. Scanner.TemperateTreeTileCount_0
-msgctxt "Scanner.TemperateTreeTileCount_0"
-msgid "{0} temperate tree tile"
-msgstr "{0}個の温帯の木々タイル"
-
-#. Scanner.WallTileCount_0
-msgctxt "Scanner.WallTileCount_0"
-msgid "{0} wall tile"
-msgstr "{0}個の壁タイル"
-
-#. Scanner.WaterEdgeTileCount_0
-msgctxt "Scanner.WaterEdgeTileCount_0"
-msgid "{0} water edge tile"
-msgstr "{0}個の水辺タイル"
 
 #. Spatial.SkippedTileCount_0
 msgctxt "Spatial.SkippedTileCount_0"

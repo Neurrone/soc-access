@@ -2165,6 +2165,11 @@ msgctxt "Scanner.Attackable"
 msgid "Attackable"
 msgstr "Saldırılabilir"
 
+#. Scanner.Barriers
+msgctxt "Scanner.Barriers"
+msgid "Barriers"
+msgstr "Bariyerler"
+
 #. Scanner.Beacons
 msgctxt "Scanner.Beacons"
 msgid "Beacons"
@@ -2174,11 +2179,6 @@ msgstr "İşaretler"
 msgctxt "Scanner.Blocked"
 msgid "Blocked"
 msgstr "Engelli"
-
-#. Scanner.Bridges
-msgctxt "Scanner.Bridges"
-msgid "Bridges"
-msgstr "Köprüler"
 
 #. Scanner.Buildings
 msgctxt "Scanner.Buildings"
@@ -2310,6 +2310,11 @@ msgctxt "Scanner.Objectives"
 msgid "Objectives"
 msgstr "Hedefler"
 
+#. Scanner.OpenGround
+msgctxt "Scanner.OpenGround"
+msgid "Open ground"
+msgstr "Açık arazi"
+
 #. Scanner.Obstacles
 msgctxt "Scanner.Obstacles"
 msgid "Obstacles"
@@ -2340,10 +2345,15 @@ msgctxt "Scanner.Riches"
 msgid "Riches"
 msgstr "Zenginlikler"
 
-#. Scanner.Roads
-msgctxt "Scanner.Roads"
-msgid "Roads"
-msgstr "Yollar"
+#. Scanner.RoadsAndCrossings
+msgctxt "Scanner.RoadsAndCrossings"
+msgid "Roads and crossings"
+msgstr "Yollar ve geçitler"
+
+#. Scanner.RoughGround
+msgctxt "Scanner.RoughGround"
+msgid "Rough ground"
+msgstr "Engebeli arazi"
 
 #. Scanner.Search
 msgctxt "Scanner.Search"
@@ -2415,20 +2425,10 @@ msgctxt "Scanner.Unexplored"
 msgid "Unexplored"
 msgstr "Keşfedilmemiş"
 
-#. Scanner.UnexploredTileCount_0
-msgctxt "Scanner.UnexploredTileCount_0"
-msgid "{0} unexplored tile"
-msgstr "{0} keşfedilmemiş karo"
-
 #. Scanner.Unvisited
 msgctxt "Scanner.Unvisited"
 msgid "Unvisited"
 msgstr "Ziyaret edilmemiş"
-
-#. Scanner.Water
-msgctxt "Scanner.Water"
-msgid "Water"
-msgstr "Su"
 
 #. Scanner.West
 msgctxt "Scanner.West"
@@ -2454,31 +2454,6 @@ msgstr "{0} öğesini {1} karşılığında sat"
 msgctxt "Scanner.Wielders"
 msgid "Wielders"
 msgstr "Taşıyıcılar"
-
-#. Scanner.BlockedTileCount_0
-msgctxt "Scanner.BlockedTileCount_0"
-msgid "{0} blocked tile"
-msgstr "{0} engelli kare"
-
-#. Scanner.BridgeTileCount_0
-msgctxt "Scanner.BridgeTileCount_0"
-msgid "{0} bridge tile"
-msgstr "{0} köprü karesi"
-
-#. Scanner.ImpassableTileCount_0
-msgctxt "Scanner.ImpassableTileCount_0"
-msgid "{0} impassable tile"
-msgstr "{0} geçilemez kare"
-
-#. Scanner.RoadTileCount_0
-msgctxt "Scanner.RoadTileCount_0"
-msgid "{0} road tile"
-msgstr "{0} yol karesi"
-
-#. Scanner.WaterTileCount_0
-msgctxt "Scanner.WaterTileCount_0"
-msgid "{0} water tile"
-msgstr "{0} su karesi"
 
 #. Spatial.AridTrees
 msgctxt "Spatial.AridTrees"
@@ -2656,85 +2631,15 @@ msgctxt "Combat.YourRangedTroops"
 msgid "your ranged troops"
 msgstr "menzilli birliklerin"
 
-#. Scanner.AridTrees
-msgctxt "Scanner.AridTrees"
-msgid "Arid trees"
-msgstr "Kurak ağaçlar"
-
-#. Scanner.CobblestoneRoads
-msgctxt "Scanner.CobblestoneRoads"
-msgid "Cobblestone roads"
-msgstr "Arnavut kaldırımı yollar"
-
-#. Scanner.DeepWater
-msgctxt "Scanner.DeepWater"
-msgid "Deep water"
-msgstr "Derin su"
-
-#. Scanner.Deforestation
-msgctxt "Scanner.Deforestation"
-msgid "Deforestation"
-msgstr "Ormansızlaşma"
-
 #. Scanner.DistanceAndDirection
 msgctxt "Scanner.DistanceAndDirection"
 msgid "{0}, {1}"
 msgstr "{0}, {1}"
 
-#. Scanner.Dirt
-msgctxt "Scanner.Dirt"
-msgid "Dirt"
-msgstr "Toprak"
-
-#. Scanner.DirtRoads
-msgctxt "Scanner.DirtRoads"
-msgid "Dirt roads"
-msgstr "Toprak yollar"
-
-#. Scanner.Farmland
-msgctxt "Scanner.Farmland"
-msgid "Farmland"
-msgstr "Tarım arazisi"
-
-#. Scanner.Grass
-msgctxt "Scanner.Grass"
-msgid "Grass"
-msgstr "Çimen"
-
-#. Scanner.Mountains
-msgctxt "Scanner.Mountains"
-msgid "Mountains"
-msgstr "Dağlar"
-
-#. Scanner.Sand
-msgctxt "Scanner.Sand"
-msgid "Sand"
-msgstr "Kum"
-
-#. Scanner.ShallowWater
-msgctxt "Scanner.ShallowWater"
-msgid "Shallow water"
-msgstr "Sığ su"
-
-#. Scanner.TemperateTrees
-msgctxt "Scanner.TemperateTrees"
-msgid "Temperate trees"
-msgstr "Ilıman ağaçlar"
-
 #. Scanner.WestShort
 msgctxt "Scanner.WestShort"
 msgid "w"
 msgstr "b"
-
-#. Scanner.Walls
-msgctxt "Scanner.Walls"
-msgid "Walls"
-msgstr "Duvarlar"
-
-#. Scanner.WaterEdge
-msgctxt "Scanner.WaterEdge"
-msgid "Water edge"
-msgstr "Su kenarı"
 
 #. Spatial.Dirt
 msgctxt "Spatial.Dirt"
@@ -2760,76 +2665,6 @@ msgstr "Kum"
 msgctxt "Spatial.TemperateTrees"
 msgid "Temperate trees"
 msgstr "Ilıman ağaçlar"
-
-#. Scanner.AridTreeTileCount_0
-msgctxt "Scanner.AridTreeTileCount_0"
-msgid "{0} arid tree tile"
-msgstr "{0} kare: Kurak ağaçlar"
-
-#. Scanner.CobblestoneRoadTileCount_0
-msgctxt "Scanner.CobblestoneRoadTileCount_0"
-msgid "{0} cobblestone road tile"
-msgstr "{0} kare: Arnavut kaldırımı yollar"
-
-#. Scanner.DeepWaterTileCount_0
-msgctxt "Scanner.DeepWaterTileCount_0"
-msgid "{0} deep water tile"
-msgstr "{0} kare: Derin su"
-
-#. Scanner.DeforestationTileCount_0
-msgctxt "Scanner.DeforestationTileCount_0"
-msgid "{0} deforestation tile"
-msgstr "{0} kare: Ormansızlaşma"
-
-#. Scanner.DirtRoadTileCount_0
-msgctxt "Scanner.DirtRoadTileCount_0"
-msgid "{0} dirt road tile"
-msgstr "{0} kare: Toprak yollar"
-
-#. Scanner.DirtTileCount_0
-msgctxt "Scanner.DirtTileCount_0"
-msgid "{0} dirt tile"
-msgstr "{0} kare: Toprak"
-
-#. Scanner.FarmlandTileCount_0
-msgctxt "Scanner.FarmlandTileCount_0"
-msgid "{0} farmland tile"
-msgstr "{0} kare: Tarım arazisi"
-
-#. Scanner.GrassTileCount_0
-msgctxt "Scanner.GrassTileCount_0"
-msgid "{0} grass tile"
-msgstr "{0} kare: Çimen"
-
-#. Scanner.MountainTileCount_0
-msgctxt "Scanner.MountainTileCount_0"
-msgid "{0} mountain tile"
-msgstr "{0} kare: Dağlar"
-
-#. Scanner.SandTileCount_0
-msgctxt "Scanner.SandTileCount_0"
-msgid "{0} sand tile"
-msgstr "{0} kare: Kum"
-
-#. Scanner.ShallowWaterTileCount_0
-msgctxt "Scanner.ShallowWaterTileCount_0"
-msgid "{0} shallow water tile"
-msgstr "{0} kare: Sığ su"
-
-#. Scanner.TemperateTreeTileCount_0
-msgctxt "Scanner.TemperateTreeTileCount_0"
-msgid "{0} temperate tree tile"
-msgstr "{0} kare: Ilıman ağaçlar"
-
-#. Scanner.WallTileCount_0
-msgctxt "Scanner.WallTileCount_0"
-msgid "{0} wall tile"
-msgstr "{0} kare: Duvarlar"
-
-#. Scanner.WaterEdgeTileCount_0
-msgctxt "Scanner.WaterEdgeTileCount_0"
-msgid "{0} water edge tile"
-msgstr "{0} kare: Su kenarı"
 
 #. Spatial.SkippedTileCount_0
 msgctxt "Spatial.SkippedTileCount_0"

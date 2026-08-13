@@ -2165,6 +2165,11 @@ msgctxt "Scanner.Attackable"
 msgid "Attackable"
 msgstr "공격 가능"
 
+#. Scanner.Barriers
+msgctxt "Scanner.Barriers"
+msgid "Barriers"
+msgstr "장벽"
+
 #. Scanner.Beacons
 msgctxt "Scanner.Beacons"
 msgid "Beacons"
@@ -2174,11 +2179,6 @@ msgstr "봉화"
 msgctxt "Scanner.Blocked"
 msgid "Blocked"
 msgstr "막힘"
-
-#. Scanner.Bridges
-msgctxt "Scanner.Bridges"
-msgid "Bridges"
-msgstr "다리"
 
 #. Scanner.Buildings
 msgctxt "Scanner.Buildings"
@@ -2310,6 +2310,11 @@ msgctxt "Scanner.Objectives"
 msgid "Objectives"
 msgstr "목표"
 
+#. Scanner.OpenGround
+msgctxt "Scanner.OpenGround"
+msgid "Open ground"
+msgstr "열린 지형"
+
 #. Scanner.Obstacles
 msgctxt "Scanner.Obstacles"
 msgid "Obstacles"
@@ -2340,10 +2345,15 @@ msgctxt "Scanner.Riches"
 msgid "Riches"
 msgstr "부"
 
-#. Scanner.Roads
-msgctxt "Scanner.Roads"
-msgid "Roads"
-msgstr "도로"
+#. Scanner.RoadsAndCrossings
+msgctxt "Scanner.RoadsAndCrossings"
+msgid "Roads and crossings"
+msgstr "도로와 건널목"
+
+#. Scanner.RoughGround
+msgctxt "Scanner.RoughGround"
+msgid "Rough ground"
+msgstr "험한 지형"
 
 #. Scanner.Search
 msgctxt "Scanner.Search"
@@ -2415,20 +2425,10 @@ msgctxt "Scanner.Unexplored"
 msgid "Unexplored"
 msgstr "미탐색"
 
-#. Scanner.UnexploredTileCount_0
-msgctxt "Scanner.UnexploredTileCount_0"
-msgid "{0} unexplored tile"
-msgstr "{0}개의 미탐색 타일"
-
 #. Scanner.Unvisited
 msgctxt "Scanner.Unvisited"
 msgid "Unvisited"
 msgstr "방문 안 함"
-
-#. Scanner.Water
-msgctxt "Scanner.Water"
-msgid "Water"
-msgstr "물"
 
 #. Scanner.West
 msgctxt "Scanner.West"
@@ -2454,31 +2454,6 @@ msgstr "{1}에 {0} 판매"
 msgctxt "Scanner.Wielders"
 msgid "Wielders"
 msgstr "소유자"
-
-#. Scanner.BlockedTileCount_0
-msgctxt "Scanner.BlockedTileCount_0"
-msgid "{0} blocked tile"
-msgstr "막힌 타일 {0}개"
-
-#. Scanner.BridgeTileCount_0
-msgctxt "Scanner.BridgeTileCount_0"
-msgid "{0} bridge tile"
-msgstr "다리 타일 {0}개"
-
-#. Scanner.ImpassableTileCount_0
-msgctxt "Scanner.ImpassableTileCount_0"
-msgid "{0} impassable tile"
-msgstr "통행 불가 타일 {0}개"
-
-#. Scanner.RoadTileCount_0
-msgctxt "Scanner.RoadTileCount_0"
-msgid "{0} road tile"
-msgstr "도로 타일 {0}개"
-
-#. Scanner.WaterTileCount_0
-msgctxt "Scanner.WaterTileCount_0"
-msgid "{0} water tile"
-msgstr "물 타일 {0}개"
 
 #. Spatial.AridTrees
 msgctxt "Spatial.AridTrees"
@@ -2656,85 +2631,15 @@ msgctxt "Combat.YourRangedTroops"
 msgid "your ranged troops"
 msgstr "아군 원거리 부대"
 
-#. Scanner.AridTrees
-msgctxt "Scanner.AridTrees"
-msgid "Arid trees"
-msgstr "건조 지대 나무"
-
-#. Scanner.CobblestoneRoads
-msgctxt "Scanner.CobblestoneRoads"
-msgid "Cobblestone roads"
-msgstr "자갈길"
-
-#. Scanner.DeepWater
-msgctxt "Scanner.DeepWater"
-msgid "Deep water"
-msgstr "깊은 물"
-
-#. Scanner.Deforestation
-msgctxt "Scanner.Deforestation"
-msgid "Deforestation"
-msgstr "벌목지"
-
 #. Scanner.DistanceAndDirection
 msgctxt "Scanner.DistanceAndDirection"
 msgid "{0}, {1}"
 msgstr "{0}, {1}"
 
-#. Scanner.Dirt
-msgctxt "Scanner.Dirt"
-msgid "Dirt"
-msgstr "흙"
-
-#. Scanner.DirtRoads
-msgctxt "Scanner.DirtRoads"
-msgid "Dirt roads"
-msgstr "흙길"
-
-#. Scanner.Farmland
-msgctxt "Scanner.Farmland"
-msgid "Farmland"
-msgstr "농지"
-
-#. Scanner.Grass
-msgctxt "Scanner.Grass"
-msgid "Grass"
-msgstr "풀밭"
-
-#. Scanner.Mountains
-msgctxt "Scanner.Mountains"
-msgid "Mountains"
-msgstr "산"
-
-#. Scanner.Sand
-msgctxt "Scanner.Sand"
-msgid "Sand"
-msgstr "모래"
-
-#. Scanner.ShallowWater
-msgctxt "Scanner.ShallowWater"
-msgid "Shallow water"
-msgstr "얕은 물"
-
-#. Scanner.TemperateTrees
-msgctxt "Scanner.TemperateTrees"
-msgid "Temperate trees"
-msgstr "온대 나무"
-
 #. Scanner.WestShort
 msgctxt "Scanner.WestShort"
 msgid "w"
 msgstr "서"
-
-#. Scanner.Walls
-msgctxt "Scanner.Walls"
-msgid "Walls"
-msgstr "벽"
-
-#. Scanner.WaterEdge
-msgctxt "Scanner.WaterEdge"
-msgid "Water edge"
-msgstr "물가"
 
 #. Spatial.Dirt
 msgctxt "Spatial.Dirt"
@@ -2760,76 +2665,6 @@ msgstr "모래"
 msgctxt "Spatial.TemperateTrees"
 msgid "Temperate trees"
 msgstr "온대 나무"
-
-#. Scanner.AridTreeTileCount_0
-msgctxt "Scanner.AridTreeTileCount_0"
-msgid "{0} arid tree tile"
-msgstr "건조 지대 나무 타일 {0}개"
-
-#. Scanner.CobblestoneRoadTileCount_0
-msgctxt "Scanner.CobblestoneRoadTileCount_0"
-msgid "{0} cobblestone road tile"
-msgstr "자갈길 타일 {0}개"
-
-#. Scanner.DeepWaterTileCount_0
-msgctxt "Scanner.DeepWaterTileCount_0"
-msgid "{0} deep water tile"
-msgstr "깊은 물 타일 {0}개"
-
-#. Scanner.DeforestationTileCount_0
-msgctxt "Scanner.DeforestationTileCount_0"
-msgid "{0} deforestation tile"
-msgstr "벌목지 타일 {0}개"
-
-#. Scanner.DirtRoadTileCount_0
-msgctxt "Scanner.DirtRoadTileCount_0"
-msgid "{0} dirt road tile"
-msgstr "흙길 타일 {0}개"
-
-#. Scanner.DirtTileCount_0
-msgctxt "Scanner.DirtTileCount_0"
-msgid "{0} dirt tile"
-msgstr "흙 타일 {0}개"
-
-#. Scanner.FarmlandTileCount_0
-msgctxt "Scanner.FarmlandTileCount_0"
-msgid "{0} farmland tile"
-msgstr "농지 타일 {0}개"
-
-#. Scanner.GrassTileCount_0
-msgctxt "Scanner.GrassTileCount_0"
-msgid "{0} grass tile"
-msgstr "풀밭 타일 {0}개"
-
-#. Scanner.MountainTileCount_0
-msgctxt "Scanner.MountainTileCount_0"
-msgid "{0} mountain tile"
-msgstr "산 타일 {0}개"
-
-#. Scanner.SandTileCount_0
-msgctxt "Scanner.SandTileCount_0"
-msgid "{0} sand tile"
-msgstr "모래 타일 {0}개"
-
-#. Scanner.ShallowWaterTileCount_0
-msgctxt "Scanner.ShallowWaterTileCount_0"
-msgid "{0} shallow water tile"
-msgstr "얕은 물 타일 {0}개"
-
-#. Scanner.TemperateTreeTileCount_0
-msgctxt "Scanner.TemperateTreeTileCount_0"
-msgid "{0} temperate tree tile"
-msgstr "온대 나무 타일 {0}개"
-
-#. Scanner.WallTileCount_0
-msgctxt "Scanner.WallTileCount_0"
-msgid "{0} wall tile"
-msgstr "벽 타일 {0}개"
-
-#. Scanner.WaterEdgeTileCount_0
-msgctxt "Scanner.WaterEdgeTileCount_0"
-msgid "{0} water edge tile"
-msgstr "물가 타일 {0}개"
 
 #. Spatial.SkippedTileCount_0
 msgctxt "Spatial.SkippedTileCount_0"

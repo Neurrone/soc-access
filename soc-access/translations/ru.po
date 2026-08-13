@@ -2195,6 +2195,11 @@ msgctxt "Scanner.Attackable"
 msgid "Attackable"
 msgstr "Можно атаковать"
 
+#. Scanner.Barriers
+msgctxt "Scanner.Barriers"
+msgid "Barriers"
+msgstr "Барьеры"
+
 #. Scanner.Beacons
 msgctxt "Scanner.Beacons"
 msgid "Beacons"
@@ -2204,11 +2209,6 @@ msgstr "Маяки"
 msgctxt "Scanner.Blocked"
 msgid "Blocked"
 msgstr "Заблокировано"
-
-#. Scanner.Bridges
-msgctxt "Scanner.Bridges"
-msgid "Bridges"
-msgstr "Мосты"
 
 #. Scanner.Buildings
 msgctxt "Scanner.Buildings"
@@ -2340,6 +2340,11 @@ msgctxt "Scanner.Objectives"
 msgid "Objectives"
 msgstr "Цели"
 
+#. Scanner.OpenGround
+msgctxt "Scanner.OpenGround"
+msgid "Open ground"
+msgstr "Открытая местность"
+
 #. Scanner.Obstacles
 msgctxt "Scanner.Obstacles"
 msgid "Obstacles"
@@ -2370,10 +2375,15 @@ msgctxt "Scanner.Riches"
 msgid "Riches"
 msgstr "Богатства"
 
-#. Scanner.Roads
-msgctxt "Scanner.Roads"
-msgid "Roads"
-msgstr "Дороги"
+#. Scanner.RoadsAndCrossings
+msgctxt "Scanner.RoadsAndCrossings"
+msgid "Roads and crossings"
+msgstr "Дороги и переправы"
+
+#. Scanner.RoughGround
+msgctxt "Scanner.RoughGround"
+msgid "Rough ground"
+msgstr "Пересечённая местность"
 
 #. Scanner.Search
 msgctxt "Scanner.Search"
@@ -2445,30 +2455,10 @@ msgctxt "Scanner.Unexplored"
 msgid "Unexplored"
 msgstr "Неизведанное"
 
-#. Scanner.UnexploredTileCount_0
-msgctxt "Scanner.UnexploredTileCount_0"
-msgid "{0} unexplored tile"
-msgstr "{0} неисследованная клетка"
-
-#. Scanner.UnexploredTileCount_1
-msgctxt "Scanner.UnexploredTileCount_1"
-msgid "{0} unexplored tiles"
-msgstr "{0} неисследованные клетки"
-
-#. Scanner.UnexploredTileCount_2
-msgctxt "Scanner.UnexploredTileCount_2"
-msgid "{0} unexplored tiles"
-msgstr "{0} неисследованных клеток"
-
 #. Scanner.Unvisited
 msgctxt "Scanner.Unvisited"
 msgid "Unvisited"
 msgstr "Не посещено"
-
-#. Scanner.Water
-msgctxt "Scanner.Water"
-msgid "Water"
-msgstr "Вода"
 
 #. Scanner.West
 msgctxt "Scanner.West"
@@ -2494,81 +2484,6 @@ msgstr "Продать {0} за {1}"
 msgctxt "Scanner.Wielders"
 msgid "Wielders"
 msgstr "Владельцы"
-
-#. Scanner.BlockedTileCount_0
-msgctxt "Scanner.BlockedTileCount_0"
-msgid "{0} blocked tile"
-msgstr "{0} заблокированная клетка"
-
-#. Scanner.BlockedTileCount_1
-msgctxt "Scanner.BlockedTileCount_1"
-msgid "{0} blocked tiles"
-msgstr "{0} заблокированные клетки"
-
-#. Scanner.BlockedTileCount_2
-msgctxt "Scanner.BlockedTileCount_2"
-msgid "{0} blocked tiles"
-msgstr "{0} заблокированных клеток"
-
-#. Scanner.BridgeTileCount_0
-msgctxt "Scanner.BridgeTileCount_0"
-msgid "{0} bridge tile"
-msgstr "{0} клетка моста"
-
-#. Scanner.BridgeTileCount_1
-msgctxt "Scanner.BridgeTileCount_1"
-msgid "{0} bridge tiles"
-msgstr "{0} клетки моста"
-
-#. Scanner.BridgeTileCount_2
-msgctxt "Scanner.BridgeTileCount_2"
-msgid "{0} bridge tiles"
-msgstr "{0} клеток моста"
-
-#. Scanner.ImpassableTileCount_0
-msgctxt "Scanner.ImpassableTileCount_0"
-msgid "{0} impassable tile"
-msgstr "{0} непроходимая клетка"
-
-#. Scanner.ImpassableTileCount_1
-msgctxt "Scanner.ImpassableTileCount_1"
-msgid "{0} impassable tiles"
-msgstr "{0} непроходимые клетки"
-
-#. Scanner.ImpassableTileCount_2
-msgctxt "Scanner.ImpassableTileCount_2"
-msgid "{0} impassable tiles"
-msgstr "{0} непроходимых клеток"
-
-#. Scanner.RoadTileCount_0
-msgctxt "Scanner.RoadTileCount_0"
-msgid "{0} road tile"
-msgstr "{0} клетка дороги"
-
-#. Scanner.RoadTileCount_1
-msgctxt "Scanner.RoadTileCount_1"
-msgid "{0} road tiles"
-msgstr "{0} клетки дороги"
-
-#. Scanner.RoadTileCount_2
-msgctxt "Scanner.RoadTileCount_2"
-msgid "{0} road tiles"
-msgstr "{0} клеток дороги"
-
-#. Scanner.WaterTileCount_0
-msgctxt "Scanner.WaterTileCount_0"
-msgid "{0} water tile"
-msgstr "{0} клетка воды"
-
-#. Scanner.WaterTileCount_1
-msgctxt "Scanner.WaterTileCount_1"
-msgid "{0} water tiles"
-msgstr "{0} клетки воды"
-
-#. Scanner.WaterTileCount_2
-msgctxt "Scanner.WaterTileCount_2"
-msgid "{0} water tiles"
-msgstr "{0} клеток воды"
 
 #. Spatial.AridTrees
 msgctxt "Spatial.AridTrees"
@@ -2746,85 +2661,15 @@ msgctxt "Combat.YourRangedTroops"
 msgid "your ranged troops"
 msgstr "ваши стрелковые отряды"
 
-#. Scanner.AridTrees
-msgctxt "Scanner.AridTrees"
-msgid "Arid trees"
-msgstr "Засушливые деревья"
-
-#. Scanner.CobblestoneRoads
-msgctxt "Scanner.CobblestoneRoads"
-msgid "Cobblestone roads"
-msgstr "Мощеные дороги"
-
-#. Scanner.DeepWater
-msgctxt "Scanner.DeepWater"
-msgid "Deep water"
-msgstr "Глубокая вода"
-
-#. Scanner.Deforestation
-msgctxt "Scanner.Deforestation"
-msgid "Deforestation"
-msgstr "Вырубка леса"
-
 #. Scanner.DistanceAndDirection
 msgctxt "Scanner.DistanceAndDirection"
 msgid "{0}, {1}"
 msgstr "{0}, {1}"
 
-#. Scanner.Dirt
-msgctxt "Scanner.Dirt"
-msgid "Dirt"
-msgstr "Земля"
-
-#. Scanner.DirtRoads
-msgctxt "Scanner.DirtRoads"
-msgid "Dirt roads"
-msgstr "Грунтовые дороги"
-
-#. Scanner.Farmland
-msgctxt "Scanner.Farmland"
-msgid "Farmland"
-msgstr "Сельхозугодья"
-
-#. Scanner.Grass
-msgctxt "Scanner.Grass"
-msgid "Grass"
-msgstr "Трава"
-
-#. Scanner.Mountains
-msgctxt "Scanner.Mountains"
-msgid "Mountains"
-msgstr "Горы"
-
-#. Scanner.Sand
-msgctxt "Scanner.Sand"
-msgid "Sand"
-msgstr "Песок"
-
-#. Scanner.ShallowWater
-msgctxt "Scanner.ShallowWater"
-msgid "Shallow water"
-msgstr "Мелководье"
-
-#. Scanner.TemperateTrees
-msgctxt "Scanner.TemperateTrees"
-msgid "Temperate trees"
-msgstr "Деревья умеренного климата"
-
 #. Scanner.WestShort
 msgctxt "Scanner.WestShort"
 msgid "w"
 msgstr "з"
-
-#. Scanner.Walls
-msgctxt "Scanner.Walls"
-msgid "Walls"
-msgstr "Стены"
-
-#. Scanner.WaterEdge
-msgctxt "Scanner.WaterEdge"
-msgid "Water edge"
-msgstr "Край воды"
 
 #. Spatial.Dirt
 msgctxt "Spatial.Dirt"
@@ -2850,216 +2695,6 @@ msgstr "Песок"
 msgctxt "Spatial.TemperateTrees"
 msgid "Temperate trees"
 msgstr "Деревья умеренного климата"
-
-#. Scanner.AridTreeTileCount_0
-msgctxt "Scanner.AridTreeTileCount_0"
-msgid "{0} arid tree tile"
-msgstr "{0} клетка: засушливые деревья"
-
-#. Scanner.AridTreeTileCount_1
-msgctxt "Scanner.AridTreeTileCount_1"
-msgid "{0} arid tree tiles"
-msgstr "{0} клетки: засушливые деревья"
-
-#. Scanner.AridTreeTileCount_2
-msgctxt "Scanner.AridTreeTileCount_2"
-msgid "{0} arid tree tiles"
-msgstr "{0} клетки: засушливые деревья"
-
-#. Scanner.CobblestoneRoadTileCount_0
-msgctxt "Scanner.CobblestoneRoadTileCount_0"
-msgid "{0} cobblestone road tile"
-msgstr "{0} клетка: мощеные дороги"
-
-#. Scanner.CobblestoneRoadTileCount_1
-msgctxt "Scanner.CobblestoneRoadTileCount_1"
-msgid "{0} cobblestone road tiles"
-msgstr "{0} клетки: мощеные дороги"
-
-#. Scanner.CobblestoneRoadTileCount_2
-msgctxt "Scanner.CobblestoneRoadTileCount_2"
-msgid "{0} cobblestone road tiles"
-msgstr "{0} клетки: мощеные дороги"
-
-#. Scanner.DeepWaterTileCount_0
-msgctxt "Scanner.DeepWaterTileCount_0"
-msgid "{0} deep water tile"
-msgstr "{0} клетка: глубокая вода"
-
-#. Scanner.DeepWaterTileCount_1
-msgctxt "Scanner.DeepWaterTileCount_1"
-msgid "{0} deep water tiles"
-msgstr "{0} клетки: глубокая вода"
-
-#. Scanner.DeepWaterTileCount_2
-msgctxt "Scanner.DeepWaterTileCount_2"
-msgid "{0} deep water tiles"
-msgstr "{0} клетки: глубокая вода"
-
-#. Scanner.DeforestationTileCount_0
-msgctxt "Scanner.DeforestationTileCount_0"
-msgid "{0} deforestation tile"
-msgstr "{0} клетка: вырубка леса"
-
-#. Scanner.DeforestationTileCount_1
-msgctxt "Scanner.DeforestationTileCount_1"
-msgid "{0} deforestation tiles"
-msgstr "{0} клетки: вырубка леса"
-
-#. Scanner.DeforestationTileCount_2
-msgctxt "Scanner.DeforestationTileCount_2"
-msgid "{0} deforestation tiles"
-msgstr "{0} клетки: вырубка леса"
-
-#. Scanner.DirtRoadTileCount_0
-msgctxt "Scanner.DirtRoadTileCount_0"
-msgid "{0} dirt road tile"
-msgstr "{0} клетка: грунтовые дороги"
-
-#. Scanner.DirtRoadTileCount_1
-msgctxt "Scanner.DirtRoadTileCount_1"
-msgid "{0} dirt road tiles"
-msgstr "{0} клетки: грунтовые дороги"
-
-#. Scanner.DirtRoadTileCount_2
-msgctxt "Scanner.DirtRoadTileCount_2"
-msgid "{0} dirt road tiles"
-msgstr "{0} клетки: грунтовые дороги"
-
-#. Scanner.DirtTileCount_0
-msgctxt "Scanner.DirtTileCount_0"
-msgid "{0} dirt tile"
-msgstr "{0} клетка: земля"
-
-#. Scanner.DirtTileCount_1
-msgctxt "Scanner.DirtTileCount_1"
-msgid "{0} dirt tiles"
-msgstr "{0} клетки: земля"
-
-#. Scanner.DirtTileCount_2
-msgctxt "Scanner.DirtTileCount_2"
-msgid "{0} dirt tiles"
-msgstr "{0} клетки: земля"
-
-#. Scanner.FarmlandTileCount_0
-msgctxt "Scanner.FarmlandTileCount_0"
-msgid "{0} farmland tile"
-msgstr "{0} клетка: сельхозугодья"
-
-#. Scanner.FarmlandTileCount_1
-msgctxt "Scanner.FarmlandTileCount_1"
-msgid "{0} farmland tiles"
-msgstr "{0} клетки: сельхозугодья"
-
-#. Scanner.FarmlandTileCount_2
-msgctxt "Scanner.FarmlandTileCount_2"
-msgid "{0} farmland tiles"
-msgstr "{0} клетки: сельхозугодья"
-
-#. Scanner.GrassTileCount_0
-msgctxt "Scanner.GrassTileCount_0"
-msgid "{0} grass tile"
-msgstr "{0} клетка: трава"
-
-#. Scanner.GrassTileCount_1
-msgctxt "Scanner.GrassTileCount_1"
-msgid "{0} grass tiles"
-msgstr "{0} клетки: трава"
-
-#. Scanner.GrassTileCount_2
-msgctxt "Scanner.GrassTileCount_2"
-msgid "{0} grass tiles"
-msgstr "{0} клетки: трава"
-
-#. Scanner.MountainTileCount_0
-msgctxt "Scanner.MountainTileCount_0"
-msgid "{0} mountain tile"
-msgstr "{0} клетка: горы"
-
-#. Scanner.MountainTileCount_1
-msgctxt "Scanner.MountainTileCount_1"
-msgid "{0} mountain tiles"
-msgstr "{0} клетки: горы"
-
-#. Scanner.MountainTileCount_2
-msgctxt "Scanner.MountainTileCount_2"
-msgid "{0} mountain tiles"
-msgstr "{0} клетки: горы"
-
-#. Scanner.SandTileCount_0
-msgctxt "Scanner.SandTileCount_0"
-msgid "{0} sand tile"
-msgstr "{0} клетка: песок"
-
-#. Scanner.SandTileCount_1
-msgctxt "Scanner.SandTileCount_1"
-msgid "{0} sand tiles"
-msgstr "{0} клетки: песок"
-
-#. Scanner.SandTileCount_2
-msgctxt "Scanner.SandTileCount_2"
-msgid "{0} sand tiles"
-msgstr "{0} клетки: песок"
-
-#. Scanner.ShallowWaterTileCount_0
-msgctxt "Scanner.ShallowWaterTileCount_0"
-msgid "{0} shallow water tile"
-msgstr "{0} клетка: мелководье"
-
-#. Scanner.ShallowWaterTileCount_1
-msgctxt "Scanner.ShallowWaterTileCount_1"
-msgid "{0} shallow water tiles"
-msgstr "{0} клетки: мелководье"
-
-#. Scanner.ShallowWaterTileCount_2
-msgctxt "Scanner.ShallowWaterTileCount_2"
-msgid "{0} shallow water tiles"
-msgstr "{0} клетки: мелководье"
-
-#. Scanner.TemperateTreeTileCount_0
-msgctxt "Scanner.TemperateTreeTileCount_0"
-msgid "{0} temperate tree tile"
-msgstr "{0} клетка: деревья умеренного климата"
-
-#. Scanner.TemperateTreeTileCount_1
-msgctxt "Scanner.TemperateTreeTileCount_1"
-msgid "{0} temperate tree tiles"
-msgstr "{0} клетки: деревья умеренного климата"
-
-#. Scanner.TemperateTreeTileCount_2
-msgctxt "Scanner.TemperateTreeTileCount_2"
-msgid "{0} temperate tree tiles"
-msgstr "{0} клетки: деревья умеренного климата"
-
-#. Scanner.WallTileCount_0
-msgctxt "Scanner.WallTileCount_0"
-msgid "{0} wall tile"
-msgstr "{0} клетка: стены"
-
-#. Scanner.WallTileCount_1
-msgctxt "Scanner.WallTileCount_1"
-msgid "{0} wall tiles"
-msgstr "{0} клетки: стены"
-
-#. Scanner.WallTileCount_2
-msgctxt "Scanner.WallTileCount_2"
-msgid "{0} wall tiles"
-msgstr "{0} клетки: стены"
-
-#. Scanner.WaterEdgeTileCount_0
-msgctxt "Scanner.WaterEdgeTileCount_0"
-msgid "{0} water edge tile"
-msgstr "{0} клетка: край воды"
-
-#. Scanner.WaterEdgeTileCount_1
-msgctxt "Scanner.WaterEdgeTileCount_1"
-msgid "{0} water edge tiles"
-msgstr "{0} клетки: край воды"
-
-#. Scanner.WaterEdgeTileCount_2
-msgctxt "Scanner.WaterEdgeTileCount_2"
-msgid "{0} water edge tiles"
-msgstr "{0} клетки: край воды"
 
 #. Spatial.SkippedTileCount_0
 msgctxt "Spatial.SkippedTileCount_0"

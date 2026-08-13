@@ -2217,31 +2217,31 @@ namespace SongsOfConquestAccess.Adapters
             }
 
             TerrainScanCell[,] terrain = BuildTerrainScan(GetLocalTeamId());
-            AddTerrainGroups(snapshot, terrain, ScannerSubcategoryKeys.Roads, "road", ModStrings.Scanner.RoadTileCount, origin, cell => cell.Terrain == AdventureTerrainKind.Road);
-            AddTerrainGroups(snapshot, terrain, ScannerSubcategoryKeys.DirtRoads, "dirt-road", ModStrings.Scanner.DirtRoadTileCount, origin, cell => cell.Terrain == AdventureTerrainKind.DirtRoad);
-            AddTerrainGroups(snapshot, terrain, ScannerSubcategoryKeys.CobblestoneRoads, "cobblestone-road", ModStrings.Scanner.CobblestoneRoadTileCount, origin, cell => cell.Terrain == AdventureTerrainKind.CobblestoneRoad);
-            AddTerrainGroups(snapshot, terrain, ScannerSubcategoryKeys.Walls, "wall", ModStrings.Scanner.WallTileCount, origin, cell => cell.Terrain == AdventureTerrainKind.Wall);
-            AddTerrainGroups(snapshot, terrain, ScannerSubcategoryKeys.Grass, "grass", ModStrings.Scanner.GrassTileCount, origin, cell => cell.Terrain == AdventureTerrainKind.Grass);
-            AddTerrainGroups(snapshot, terrain, ScannerSubcategoryKeys.Sand, "sand", ModStrings.Scanner.SandTileCount, origin, cell => cell.Terrain == AdventureTerrainKind.Sand);
-            AddTerrainGroups(snapshot, terrain, ScannerSubcategoryKeys.Dirt, "dirt", ModStrings.Scanner.DirtTileCount, origin, cell => cell.Terrain == AdventureTerrainKind.Dirt);
-            AddTerrainGroups(snapshot, terrain, ScannerSubcategoryKeys.Bridges, "bridge", ModStrings.Scanner.BridgeTileCount, origin, cell => cell.Terrain == AdventureTerrainKind.Bridge);
-            AddTerrainGroups(snapshot, terrain, ScannerSubcategoryKeys.Water, "water", ModStrings.Scanner.WaterTileCount, origin, cell => cell.Terrain == AdventureTerrainKind.Water);
-            AddTerrainGroups(snapshot, terrain, ScannerSubcategoryKeys.ShallowWater, "shallow-water", ModStrings.Scanner.ShallowWaterTileCount, origin, cell => cell.Terrain == AdventureTerrainKind.ShallowWater);
-            AddTerrainGroups(snapshot, terrain, ScannerSubcategoryKeys.DeepWater, "deep-water", ModStrings.Scanner.DeepWaterTileCount, origin, cell => cell.Terrain == AdventureTerrainKind.DeepWater);
-            AddTerrainGroups(snapshot, terrain, ScannerSubcategoryKeys.WaterEdge, "water-edge", ModStrings.Scanner.WaterEdgeTileCount, origin, cell => cell.Terrain == AdventureTerrainKind.WaterEdge);
-            AddTerrainGroups(snapshot, terrain, ScannerSubcategoryKeys.AridTrees, "arid-trees", ModStrings.Scanner.AridTreeTileCount, origin, cell => cell.Terrain == AdventureTerrainKind.AridTrees);
-            AddTerrainGroups(snapshot, terrain, ScannerSubcategoryKeys.TemperateTrees, "temperate-trees", ModStrings.Scanner.TemperateTreeTileCount, origin, cell => cell.Terrain == AdventureTerrainKind.TemperateTrees);
-            AddTerrainGroups(snapshot, terrain, ScannerSubcategoryKeys.Mountains, "mountain", ModStrings.Scanner.MountainTileCount, origin, cell => cell.Terrain == AdventureTerrainKind.Mountain);
-            AddTerrainGroups(snapshot, terrain, ScannerSubcategoryKeys.Deforestation, "deforestation", ModStrings.Scanner.DeforestationTileCount, origin, cell => cell.Terrain == AdventureTerrainKind.Deforestation);
-            AddTerrainGroups(snapshot, terrain, ScannerSubcategoryKeys.Farmland, "farmland", ModStrings.Scanner.FarmlandTileCount, origin, cell => cell.Terrain == AdventureTerrainKind.Farmland);
-            AddTerrainGroups(snapshot, terrain, ScannerSubcategoryKeys.Impassable, "impassable", ModStrings.Scanner.ImpassableTileCount, origin, cell => cell.Impassable);
+            AddTerrainGroups(snapshot, terrain, ScannerSubcategoryKeys.RoadsAndCrossings, "road", ModStrings.Spatial.Road, origin, cell => cell.Terrain == AdventureTerrainKind.Road);
+            AddTerrainGroups(snapshot, terrain, ScannerSubcategoryKeys.RoadsAndCrossings, "dirt-road", ModStrings.Spatial.DirtRoad, origin, cell => cell.Terrain == AdventureTerrainKind.DirtRoad);
+            AddTerrainGroups(snapshot, terrain, ScannerSubcategoryKeys.RoadsAndCrossings, "cobblestone-road", ModStrings.Spatial.CobblestoneRoad, origin, cell => cell.Terrain == AdventureTerrainKind.CobblestoneRoad);
+            AddTerrainGroups(snapshot, terrain, ScannerSubcategoryKeys.RoadsAndCrossings, "bridge", ModStrings.Spatial.Bridge, origin, cell => cell.Terrain == AdventureTerrainKind.Bridge);
+            AddTerrainGroups(snapshot, terrain, ScannerSubcategoryKeys.OpenGround, "grass", ModStrings.Spatial.Grass, origin, cell => cell.Terrain == AdventureTerrainKind.Grass);
+            AddTerrainGroups(snapshot, terrain, ScannerSubcategoryKeys.OpenGround, "sand", ModStrings.Spatial.Sand, origin, cell => cell.Terrain == AdventureTerrainKind.Sand);
+            AddTerrainGroups(snapshot, terrain, ScannerSubcategoryKeys.OpenGround, "dirt", ModStrings.Spatial.Dirt, origin, cell => cell.Terrain == AdventureTerrainKind.Dirt);
+            AddTerrainGroups(snapshot, terrain, ScannerSubcategoryKeys.OpenGround, "farmland", ModStrings.Spatial.Farmland, origin, cell => cell.Terrain == AdventureTerrainKind.Farmland);
+            AddTerrainGroups(snapshot, terrain, ScannerSubcategoryKeys.OpenGround, "arid-trees", ModStrings.Spatial.AridTrees, origin, cell => cell.Terrain == AdventureTerrainKind.AridTrees);
+            AddTerrainGroups(snapshot, terrain, ScannerSubcategoryKeys.OpenGround, "temperate-trees", ModStrings.Spatial.TemperateTrees, origin, cell => cell.Terrain == AdventureTerrainKind.TemperateTrees);
+            AddTerrainGroups(snapshot, terrain, ScannerSubcategoryKeys.OpenGround, "deforestation", ModStrings.Spatial.Deforestation, origin, cell => cell.Terrain == AdventureTerrainKind.Deforestation);
+            AddTerrainGroups(snapshot, terrain, ScannerSubcategoryKeys.Barriers, "mountain", ModStrings.Spatial.Mountain, origin, cell => cell.Terrain == AdventureTerrainKind.Mountain);
+            AddTerrainGroups(snapshot, terrain, ScannerSubcategoryKeys.Barriers, "wall", ModStrings.Spatial.Wall, origin, cell => cell.Terrain == AdventureTerrainKind.Wall);
+            AddTerrainGroups(snapshot, terrain, ScannerSubcategoryKeys.Barriers, "water", ModStrings.Spatial.Water, origin, cell => cell.Terrain == AdventureTerrainKind.Water);
+            AddTerrainGroups(snapshot, terrain, ScannerSubcategoryKeys.Barriers, "shallow-water", ModStrings.Spatial.ShallowWater, origin, cell => cell.Terrain == AdventureTerrainKind.ShallowWater);
+            AddTerrainGroups(snapshot, terrain, ScannerSubcategoryKeys.Barriers, "deep-water", ModStrings.Spatial.DeepWater, origin, cell => cell.Terrain == AdventureTerrainKind.DeepWater);
+            AddTerrainGroups(snapshot, terrain, ScannerSubcategoryKeys.Barriers, "water-edge", ModStrings.Spatial.WaterEdge, origin, cell => cell.Terrain == AdventureTerrainKind.WaterEdge);
+            AddTerrainGroups(snapshot, terrain, ScannerSubcategoryKeys.Barriers, "impassable", ModStrings.Scanner.Impassable, origin, cell => cell.Impassable);
             AddScannerGroups(
                 snapshot,
                 ScannerCategoryKeys.Obstacles,
                 ScannerSubcategoryKeys.All,
                 terrain,
                 "blocked",
-                ModStrings.Scanner.BlockedTileCount,
+                ModStrings.Scanner.Blocked,
                 origin,
                 ScannerResultKind.AreaGroup,
                 cell => cell.Blocked);
@@ -2261,7 +2261,7 @@ namespace SongsOfConquestAccess.Adapters
                 ScannerSubcategoryKeys.All,
                 unexplored,
                 "unexplored",
-                ModStrings.Scanner.UnexploredTileCount,
+                ModStrings.Scanner.Unexplored,
                 origin,
                 ScannerResultKind.UnexploredGroup,
                 cell => true);
@@ -2496,21 +2496,26 @@ namespace SongsOfConquestAccess.Adapters
             ScannerSnapshot snapshot,
             TerrainScanCell[,] terrain,
             string subcategory,
-            string label,
-            ModPluralString labelText,
+            string itemKey,
+            ModString itemLabel,
             Vector2Int origin,
             Func<TerrainScanCell, bool> predicate)
         {
-            AddScannerGroups(snapshot, ScannerCategoryKeys.Terrain, subcategory, terrain, label, labelText, origin, ScannerResultKind.TerrainGroup, predicate);
+            AddScannerGroups(snapshot, ScannerCategoryKeys.Terrain, subcategory, terrain, itemKey, itemLabel, origin, ScannerResultKind.TerrainGroup, predicate);
         }
 
+        /// <summary>
+        /// The kind of ground is the item and each contiguous cluster of it is
+        /// an instance, so cycling terrain steps between kinds and the tile
+        /// counts belong to the patches.
+        /// </summary>
         private void AddScannerGroups(
             ScannerSnapshot snapshot,
             string category,
             string subcategory,
             TerrainScanCell[,] terrain,
-            string label,
-            ModPluralString labelText,
+            string itemKey,
+            ModString itemLabel,
             Vector2Int origin,
             ScannerResultKind kind,
             Func<TerrainScanCell, bool> predicate)
@@ -2537,11 +2542,13 @@ namespace SongsOfConquestAccess.Adapters
                     List<Vector2Int> group = FloodTerrainGroup(start, terrain, visited, predicate);
                     Vector2Int representative = ClosestPoint(group, origin);
                     ScannerResult result = new ScannerResult(
-                        ScannerGroupKey(category, subcategory, label, group),
-                        ModText.Plural(labelText, group.Count, group.Count),
+                        ScannerGroupKey(category, subcategory, itemKey, group),
+                        ModText.Get(itemLabel),
                         representative)
                     {
-                        Kind = kind
+                        Kind = kind,
+                        ItemKey = itemKey,
+                        InstanceLabel = ModText.Plural(ModStrings.Common.TileCount, group.Count, group.Count)
                     };
                     result.Points.AddRange(group);
                     snapshot.Add(category, subcategory, result);

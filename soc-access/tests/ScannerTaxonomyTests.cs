@@ -69,9 +69,7 @@ namespace SongsOfConquestAccess.Tests
             AssertSubcategories(
                 AdventureScannerTaxonomy.Instance,
                 "terrain",
-                "roads", "dirt_roads", "cobblestone_roads", "walls", "grass", "sand", "dirt", "bridges",
-                "water", "shallow_water", "deep_water", "water_edge", "arid_trees", "temperate_trees",
-                "mountains", "deforestation", "farmland", "impassable");
+                "roads_and_crossings", "open_ground", "rough_ground", "barriers");
             AssertSubcategories(AdventureScannerTaxonomy.Instance, "unexplored", "all");
             AssertSubcategories(AdventureScannerTaxonomy.Instance, "revealed", "all");
         }
@@ -108,6 +106,16 @@ namespace SongsOfConquestAccess.Tests
             AddPreservedCategoryKeys(BattleScannerTaxonomy.Instance, preserved);
 
             CollectionAssert.AreEqual(new[] { "revealed" }, preserved);
+        }
+
+        [TestMethod]
+        public void OnlyRevealedKeepsResultsUngrouped()
+        {
+            List<string> flat = new List<string>();
+            AddFlatItemCategoryKeys(AdventureScannerTaxonomy.Instance, flat);
+            AddFlatItemCategoryKeys(BattleScannerTaxonomy.Instance, flat);
+
+            CollectionAssert.AreEqual(new[] { "revealed" }, flat);
         }
 
         [TestMethod]
@@ -163,6 +171,17 @@ namespace SongsOfConquestAccess.Tests
             }
 
             return keys;
+        }
+
+        private static void AddFlatItemCategoryKeys(ScannerTaxonomy taxonomy, List<string> keys)
+        {
+            for (int i = 0; i < taxonomy.Categories.Count; i++)
+            {
+                if (taxonomy.Categories[i].FlatItems && !keys.Contains(taxonomy.Categories[i].Key))
+                {
+                    keys.Add(taxonomy.Categories[i].Key);
+                }
+            }
         }
 
         private static void AddPreservedCategoryKeys(ScannerTaxonomy taxonomy, List<string> keys)

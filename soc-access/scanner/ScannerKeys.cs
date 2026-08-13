@@ -43,24 +43,10 @@ namespace SongsOfConquestAccess.Scanner
         public const string Friendly = "friendly";
         public const string Enemy = "enemy";
 
-        public const string Roads = "roads";
-        public const string DirtRoads = "dirt_roads";
-        public const string CobblestoneRoads = "cobblestone_roads";
-        public const string Walls = "walls";
-        public const string Grass = "grass";
-        public const string Sand = "sand";
-        public const string Dirt = "dirt";
-        public const string Bridges = "bridges";
-        public const string Water = "water";
-        public const string ShallowWater = "shallow_water";
-        public const string DeepWater = "deep_water";
-        public const string WaterEdge = "water_edge";
-        public const string AridTrees = "arid_trees";
-        public const string TemperateTrees = "temperate_trees";
-        public const string Mountains = "mountains";
-        public const string Deforestation = "deforestation";
-        public const string Farmland = "farmland";
-        public const string Impassable = "impassable";
+        public const string RoadsAndCrossings = "roads_and_crossings";
+        public const string OpenGround = "open_ground";
+        public const string RoughGround = "rough_ground";
+        public const string Barriers = "barriers";
 
         public const string FriendlyGates = "friendly_gates";
         public const string EnemyGates = "enemy_gates";
