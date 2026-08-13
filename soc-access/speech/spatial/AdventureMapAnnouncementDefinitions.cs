@@ -24,7 +24,8 @@ namespace SongsOfConquestAccess.Speech.Spatial
             ModStrings.Screens.ScannerContentAnnouncements,
             new AnnouncementElementDefinition(ScannerAnnouncementDefinitions.ContentKeys.Name, ModStrings.Screens.AnnouncementName),
             new AnnouncementElementDefinition(ScannerAnnouncementDefinitions.ContentKeys.Owner, ModStrings.Screens.AnnouncementOwner),
-            new AnnouncementElementDefinition(ScannerAnnouncementDefinitions.ContentKeys.Status, ModStrings.Screens.AnnouncementStatus, defaultSuffix: false))
+            new AnnouncementElementDefinition(ScannerAnnouncementDefinitions.ContentKeys.Status, ModStrings.Screens.AnnouncementStatus),
+            new AnnouncementElementDefinition(TileKeys.ReachabilityOrRoutePreview, ModStrings.Screens.AnnouncementReachabilityOrRoutePreview, defaultSuffix: false))
             .WithVersion(2);
 
         public static readonly AnnouncementGroupDefinition Wielder = new AnnouncementGroupDefinition(

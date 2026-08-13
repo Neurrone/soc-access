@@ -37,11 +37,29 @@ namespace SongsOfConquestAccess.Scanner
                 ScannerResultSpeechFormatter.ItemName(_result, _includeItemName),
                 ScannerResultContentFormatter.Describe(
                     AdventureMapAnnouncementDefinitions.ScannerContent,
-                    _result),
+                    _result,
+                    BuildTileParts()),
                 ScannerSpeechUtility.FormatDirections(_directions),
                 formatter.DescribeCoordinates(_tile),
                 ScannerSpeechUtility.FormatResultCount(_resultIndex, _resultCount));
             return new SpeechRequest(text, interrupt: false);
+        }
+
+        /// <summary>
+        /// Whether the selected wielder can get there, and what the route
+        /// costs, decide what the player would do with a result, so the scanner
+        /// keeps them even though the rest of the tile belongs to the cursor.
+        /// This is the adventure map's counterpart to combat reachability.
+        /// </summary>
+        private IEnumerable<AnnouncementPart> BuildTileParts()
+        {
+            string route = AdventureMapTileSpeechFormatter.DescribeReachabilityOrRoutePreview(_tile);
+            if (!string.IsNullOrWhiteSpace(route))
+            {
+                yield return new AnnouncementPart(
+                    AdventureMapAnnouncementDefinitions.TileKeys.ReachabilityOrRoutePreview,
+                    route);
+            }
         }
     }
 }

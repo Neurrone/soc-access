@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Globalization;
 using System.Collections.Generic;
 using SongsOfConquestAccess.Adapters;
@@ -262,7 +262,7 @@ namespace SongsOfConquestAccess.Speech.Spatial
             return string.Join(". ", parts.ToArray());
         }
 
-        private static string DescribeReachabilityOrRoutePreview(AdventureMapTile tile)
+        public static string DescribeReachabilityOrRoutePreview(AdventureMapTile tile)
         {
             List<string> details = GetMovementDetails(tile);
             return details.Count > 0 ? string.Join(", ", details.ToArray()) : string.Empty;

@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using SongsOfConquestAccess.Scanner;
 using SongsOfConquestAccess.Speech.Spatial;
@@ -123,7 +123,7 @@ namespace SongsOfConquestAccess.Tests
         public void EveryScannerContentGroupLeadsWithTheThingItself()
         {
             Assert.AreEqual(
-                "name,owner,status",
+                "name,owner,status,reachability_or_route_preview",
                 AdventureMapAnnouncementDefinitions.ScannerContent.DefaultOrderCsv);
             Assert.AreEqual(
                 "name,owner,status,reachable,elevation",
