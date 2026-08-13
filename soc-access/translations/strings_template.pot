@@ -1049,6 +1049,11 @@ msgctxt "Actions.ScannerNextCategory"
 msgid "Next Scanner Category"
 msgstr ""
 
+#. Actions.ScannerNextCustomEntry
+msgctxt "Actions.ScannerNextCustomEntry"
+msgid "Next Entry In The Custom Category On {0}"
+msgstr ""
+
 #. Actions.ScannerNextInstance
 msgctxt "Actions.ScannerNextInstance"
 msgid "Next Scanner Instance"
@@ -1067,6 +1072,11 @@ msgstr ""
 #. Actions.ScannerPreviousCategory
 msgctxt "Actions.ScannerPreviousCategory"
 msgid "Previous Scanner Category"
+msgstr ""
+
+#. Actions.ScannerPreviousCustomEntry
+msgctxt "Actions.ScannerPreviousCustomEntry"
+msgid "Previous Entry In The Custom Category On {0}"
 msgstr ""
 
 #. Actions.ScannerPreviousInstance
@@ -2184,6 +2194,26 @@ msgctxt "Screens.CustomCategoryDeleted"
 msgid "{0} deleted"
 msgstr ""
 
+#. Screens.CustomCategoryKey
+msgctxt "Screens.CustomCategoryKey"
+msgid "Key, {0}"
+msgstr ""
+
+#. Screens.CustomCategoryKeyCurrent
+msgctxt "Screens.CustomCategoryKeyCurrent"
+msgid "{0}, current"
+msgstr ""
+
+#. Screens.CustomCategoryKeyHeldBy
+msgctxt "Screens.CustomCategoryKeyHeldBy"
+msgid "{0}, held by {1}"
+msgstr ""
+
+#. Screens.CustomCategoryKeyTitle
+msgctxt "Screens.CustomCategoryKeyTitle"
+msgid "Key for {0}"
+msgstr ""
+
 #. Screens.DeleteCustomCategory
 msgctxt "Screens.DeleteCustomCategory"
 msgid "Delete this custom category"
@@ -3154,6 +3184,11 @@ msgctxt "Scanner.Neutral"
 msgid "Neutral"
 msgstr ""
 
+#. Scanner.NoCustomCategoryOnKey
+msgctxt "Scanner.NoCustomCategoryOnKey"
+msgid "No custom category on {0}"
+msgstr ""
+
 #. Scanner.NoTileToReturnTo
 msgctxt "Scanner.NoTileToReturnTo"
 msgid "No tile to return to"
@@ -3207,6 +3242,26 @@ msgstr ""
 #. Scanner.Pickups
 msgctxt "Scanner.Pickups"
 msgid "Pickups"
+msgstr ""
+
+#. Scanner.QuickKeyComma
+msgctxt "Scanner.QuickKeyComma"
+msgid "Comma"
+msgstr ""
+
+#. Scanner.QuickKeyNone
+msgctxt "Scanner.QuickKeyNone"
+msgid "None"
+msgstr ""
+
+#. Scanner.QuickKeyPeriod
+msgctxt "Scanner.QuickKeyPeriod"
+msgid "Period"
+msgstr ""
+
+#. Scanner.QuickKeySlash
+msgctxt "Scanner.QuickKeySlash"
+msgid "Slash"
 msgstr ""
 
 #. Scanner.Power

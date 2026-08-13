@@ -77,6 +77,24 @@ namespace SongsOfConquestAccess.Scanner
         }
 
         /// <summary>
+        /// The single key that walks this category on the adventure map. Only
+        /// one category can hold a given key, which the list this belongs to is
+        /// what enforces; a category on its own only knows what it was told.
+        /// </summary>
+        public ScannerQuickKey QuickKey { get; private set; }
+
+        public bool SetQuickKey(ScannerQuickKey quickKey)
+        {
+            if (QuickKey == quickKey)
+            {
+                return false;
+            }
+
+            QuickKey = quickKey;
+            return true;
+        }
+
+        /// <summary>
         /// A whitespace-only name would persist as something a screen reader
         /// speaks as silence, with no cue that anything went wrong, so a blank
         /// rename is refused rather than stored.

@@ -3393,3 +3393,58 @@ msgctxt "Screens.SelectedSubcategoryCount_0"
 msgid "{0} selected"
 msgstr "已选 {0} 项"
 
+#. Actions.ScannerNextCustomEntry
+msgctxt "Actions.ScannerNextCustomEntry"
+msgid "Next Entry In The Custom Category On {0}"
+msgstr "{0}上自定义类别的下一项"
+
+#. Actions.ScannerPreviousCustomEntry
+msgctxt "Actions.ScannerPreviousCustomEntry"
+msgid "Previous Entry In The Custom Category On {0}"
+msgstr "{0}上自定义类别的上一项"
+
+#. Screens.CustomCategoryKey
+msgctxt "Screens.CustomCategoryKey"
+msgid "Key, {0}"
+msgstr "按键，{0}"
+
+#. Screens.CustomCategoryKeyCurrent
+msgctxt "Screens.CustomCategoryKeyCurrent"
+msgid "{0}, current"
+msgstr "{0}，当前"
+
+#. Screens.CustomCategoryKeyHeldBy
+msgctxt "Screens.CustomCategoryKeyHeldBy"
+msgid "{0}, held by {1}"
+msgstr "{0}，已分配给{1}"
+
+#. Screens.CustomCategoryKeyTitle
+msgctxt "Screens.CustomCategoryKeyTitle"
+msgid "Key for {0}"
+msgstr "{0}的按键"
+
+#. Scanner.NoCustomCategoryOnKey
+msgctxt "Scanner.NoCustomCategoryOnKey"
+msgid "No custom category on {0}"
+msgstr "{0}上没有自定义类别"
+
+#. Scanner.QuickKeyComma
+msgctxt "Scanner.QuickKeyComma"
+msgid "Comma"
+msgstr "逗号"
+
+#. Scanner.QuickKeyNone
+msgctxt "Scanner.QuickKeyNone"
+msgid "None"
+msgstr "无"
+
+#. Scanner.QuickKeyPeriod
+msgctxt "Scanner.QuickKeyPeriod"
+msgid "Period"
+msgstr "句号"
+
+#. Scanner.QuickKeySlash
+msgctxt "Scanner.QuickKeySlash"
+msgid "Slash"
+msgstr "斜杠"
+

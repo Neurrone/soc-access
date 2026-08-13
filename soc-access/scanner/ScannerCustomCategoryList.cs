@@ -87,5 +87,69 @@ namespace SongsOfConquestAccess.Scanner
                 _nextId = nextId;
             }
         }
+
+        public ScannerCustomCategory GetByQuickKey(ScannerQuickKey quickKey)
+        {
+            if (quickKey == ScannerQuickKey.None)
+            {
+                return null;
+            }
+
+            for (int i = 0; i < _categories.Count; i++)
+            {
+                if (_categories[i].QuickKey == quickKey)
+                {
+                    return _categories[i];
+                }
+            }
+
+            return null;
+        }
+
+        /// <summary>
+        /// The first key nobody holds, or None once every key is spoken for.
+        /// A key freed by a deletion is left alone until somebody asks for it,
+        /// so a category the player never touched cannot change key underneath
+        /// them.
+        /// </summary>
+        public ScannerQuickKey FirstFreeQuickKey()
+        {
+            for (int i = 0; i < ScannerQuickKeys.Assignable.Length; i++)
+            {
+                ScannerQuickKey quickKey = ScannerQuickKeys.Assignable[i];
+                if (GetByQuickKey(quickKey) == null)
+                {
+                    return quickKey;
+                }
+            }
+
+            return ScannerQuickKey.None;
+        }
+
+        /// <summary>
+        /// Hands the key to one category and takes it off whoever held it
+        /// before, because a key that walked two categories would step through
+        /// whichever the storage order happened to reach first.
+        /// </summary>
+        public bool SetQuickKey(int id, ScannerQuickKey quickKey)
+        {
+            ScannerCustomCategory category = Get(id);
+            if (category == null)
+            {
+                return false;
+            }
+
+            bool changed = false;
+            if (quickKey != ScannerQuickKey.None)
+            {
+                ScannerCustomCategory holder = GetByQuickKey(quickKey);
+                if (holder != null && holder.Id != id)
+                {
+                    changed |= holder.SetQuickKey(ScannerQuickKey.None);
+                }
+            }
+
+            return category.SetQuickKey(quickKey) || changed;
+        }
     }
 }

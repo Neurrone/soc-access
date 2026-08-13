@@ -185,23 +185,31 @@ namespace SongsOfConquestAccess.Scanner
 
         public void SortByDistance(Vector2Int origin)
         {
-            SortBy(origin, (left, right) =>
+            SortBy(origin, (left, right) => CompareByDistance(origin, left, right));
+        }
+
+        /// <summary>
+        /// Nearest first, and then by name and position so no two results are
+        /// ever tied. A walk that flattens a subcategory back into one list has
+        /// to reproduce this order exactly, which it can only do if the order is
+        /// total.
+        /// </summary>
+        public static int CompareByDistance(Vector2Int origin, ScannerResult left, ScannerResult right)
+        {
+            int distanceCompare = DistanceSquared(origin, left.Position).CompareTo(DistanceSquared(origin, right.Position));
+            if (distanceCompare != 0)
             {
-                int distanceCompare = DistanceSquared(origin, left.Position).CompareTo(DistanceSquared(origin, right.Position));
-                if (distanceCompare != 0)
-                {
-                    return distanceCompare;
-                }
+                return distanceCompare;
+            }
 
-                int labelCompare = string.Compare(left.Label, right.Label, StringComparison.OrdinalIgnoreCase);
-                if (labelCompare != 0)
-                {
-                    return labelCompare;
-                }
+            int labelCompare = string.Compare(left.Label, right.Label, StringComparison.OrdinalIgnoreCase);
+            if (labelCompare != 0)
+            {
+                return labelCompare;
+            }
 
-                int xCompare = left.Position.x.CompareTo(right.Position.x);
-                return xCompare != 0 ? xCompare : left.Position.y.CompareTo(right.Position.y);
-            });
+            int xCompare = left.Position.x.CompareTo(right.Position.x);
+            return xCompare != 0 ? xCompare : left.Position.y.CompareTo(right.Position.y);
         }
 
         public void SortBy(Vector2Int origin, Comparison<ScannerResult> comparison)

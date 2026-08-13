@@ -485,6 +485,85 @@ namespace SongsOfConquestAccess.UI
                 return ChangeLookAroundRadius(-LookAroundRadiusStep);
             }
 
+            ScannerQuickKey quickKey;
+            int delta;
+            if (TryGetCustomEntryKey(action.Key, out quickKey, out delta))
+            {
+                return MoveCustomCategoryEntry(quickKey, delta);
+            }
+
+            return false;
+        }
+
+        /// <summary>
+        /// Steps the custom category the player put on this key. A key nobody
+        /// has taken says so rather than falling silent, because a dead
+        /// keypress reads as the mod having missed it.
+        /// </summary>
+        private bool MoveCustomCategoryEntry(ScannerQuickKey quickKey, int delta)
+        {
+            ScannerCustomCategory category = ModSettings.GetScannerCustomCategoryByQuickKey(
+                ScannerTaxonomyKeys.Adventure,
+                quickKey);
+            if (category == null)
+            {
+                SpeechPipeline.Output(new SpeechRequest(
+                    ModText.Get(ModStrings.Scanner.NoCustomCategoryOnKey, ScannerQuickKeyText.Name(quickKey)),
+                    interrupt: false));
+                return true;
+            }
+
+            return HandleScannerNavigationResult(_scanner.ExecuteMoveCustomCategoryEntry(
+                ScannerCustomCategorySynthesizer.CategoryKeyFor(category.Id),
+                delta));
+        }
+
+        private static bool TryGetCustomEntryKey(string actionKey, out ScannerQuickKey quickKey, out int delta)
+        {
+            if (actionKey == AccessibilityActions.ScannerNextCustomEntryComma.Key)
+            {
+                quickKey = ScannerQuickKey.Comma;
+                delta = 1;
+                return true;
+            }
+
+            if (actionKey == AccessibilityActions.ScannerPreviousCustomEntryComma.Key)
+            {
+                quickKey = ScannerQuickKey.Comma;
+                delta = -1;
+                return true;
+            }
+
+            if (actionKey == AccessibilityActions.ScannerNextCustomEntryPeriod.Key)
+            {
+                quickKey = ScannerQuickKey.Period;
+                delta = 1;
+                return true;
+            }
+
+            if (actionKey == AccessibilityActions.ScannerPreviousCustomEntryPeriod.Key)
+            {
+                quickKey = ScannerQuickKey.Period;
+                delta = -1;
+                return true;
+            }
+
+            if (actionKey == AccessibilityActions.ScannerNextCustomEntrySlash.Key)
+            {
+                quickKey = ScannerQuickKey.Slash;
+                delta = 1;
+                return true;
+            }
+
+            if (actionKey == AccessibilityActions.ScannerPreviousCustomEntrySlash.Key)
+            {
+                quickKey = ScannerQuickKey.Slash;
+                delta = -1;
+                return true;
+            }
+
+            quickKey = ScannerQuickKey.None;
+            delta = 0;
             return false;
         }
 
@@ -707,7 +786,15 @@ namespace SongsOfConquestAccess.UI
                 || actionKey == AccessibilityActions.ScannerReturnFromJump.Key
                 || actionKey == AccessibilityActions.ScannerLookAround.Key
                 || actionKey == AccessibilityActions.ScannerIncreaseLookAroundRadius.Key
-                || actionKey == AccessibilityActions.ScannerDecreaseLookAroundRadius.Key;
+                || actionKey == AccessibilityActions.ScannerDecreaseLookAroundRadius.Key
+                || IsCustomEntryAction(actionKey);
+        }
+
+        private static bool IsCustomEntryAction(string actionKey)
+        {
+            ScannerQuickKey quickKey;
+            int delta;
+            return TryGetCustomEntryKey(actionKey, out quickKey, out delta);
         }
 
         private static bool IsBookmarkAction(string actionKey)

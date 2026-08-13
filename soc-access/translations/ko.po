@@ -3393,3 +3393,58 @@ msgctxt "Screens.SelectedSubcategoryCount_0"
 msgid "{0} selected"
 msgstr "{0}개 선택됨"
 
+#. Actions.ScannerNextCustomEntry
+msgctxt "Actions.ScannerNextCustomEntry"
+msgid "Next Entry In The Custom Category On {0}"
+msgstr "{0}의 사용자 지정 범주 다음 항목"
+
+#. Actions.ScannerPreviousCustomEntry
+msgctxt "Actions.ScannerPreviousCustomEntry"
+msgid "Previous Entry In The Custom Category On {0}"
+msgstr "{0}의 사용자 지정 범주 이전 항목"
+
+#. Screens.CustomCategoryKey
+msgctxt "Screens.CustomCategoryKey"
+msgid "Key, {0}"
+msgstr "키, {0}"
+
+#. Screens.CustomCategoryKeyCurrent
+msgctxt "Screens.CustomCategoryKeyCurrent"
+msgid "{0}, current"
+msgstr "{0}, 현재"
+
+#. Screens.CustomCategoryKeyHeldBy
+msgctxt "Screens.CustomCategoryKeyHeldBy"
+msgid "{0}, held by {1}"
+msgstr "{0}, {1}이(가) 사용 중"
+
+#. Screens.CustomCategoryKeyTitle
+msgctxt "Screens.CustomCategoryKeyTitle"
+msgid "Key for {0}"
+msgstr "{0}의 키"
+
+#. Scanner.NoCustomCategoryOnKey
+msgctxt "Scanner.NoCustomCategoryOnKey"
+msgid "No custom category on {0}"
+msgstr "{0}에 사용자 지정 범주가 없습니다"
+
+#. Scanner.QuickKeyComma
+msgctxt "Scanner.QuickKeyComma"
+msgid "Comma"
+msgstr "쉼표"
+
+#. Scanner.QuickKeyNone
+msgctxt "Scanner.QuickKeyNone"
+msgid "None"
+msgstr "없음"
+
+#. Scanner.QuickKeyPeriod
+msgctxt "Scanner.QuickKeyPeriod"
+msgid "Period"
+msgstr "마침표"
+
+#. Scanner.QuickKeySlash
+msgctxt "Scanner.QuickKeySlash"
+msgid "Slash"
+msgstr "슬래시"
+

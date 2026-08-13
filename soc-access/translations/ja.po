@@ -3393,3 +3393,58 @@ msgctxt "Screens.SelectedSubcategoryCount_0"
 msgid "{0} selected"
 msgstr "{0}件選択中"
 
+#. Actions.ScannerNextCustomEntry
+msgctxt "Actions.ScannerNextCustomEntry"
+msgid "Next Entry In The Custom Category On {0}"
+msgstr "{0}のカスタムカテゴリの次の項目"
+
+#. Actions.ScannerPreviousCustomEntry
+msgctxt "Actions.ScannerPreviousCustomEntry"
+msgid "Previous Entry In The Custom Category On {0}"
+msgstr "{0}のカスタムカテゴリの前の項目"
+
+#. Screens.CustomCategoryKey
+msgctxt "Screens.CustomCategoryKey"
+msgid "Key, {0}"
+msgstr "キー、{0}"
+
+#. Screens.CustomCategoryKeyCurrent
+msgctxt "Screens.CustomCategoryKeyCurrent"
+msgid "{0}, current"
+msgstr "{0}、現在"
+
+#. Screens.CustomCategoryKeyHeldBy
+msgctxt "Screens.CustomCategoryKeyHeldBy"
+msgid "{0}, held by {1}"
+msgstr "{0}、{1}が使用中"
+
+#. Screens.CustomCategoryKeyTitle
+msgctxt "Screens.CustomCategoryKeyTitle"
+msgid "Key for {0}"
+msgstr "{0}のキー"
+
+#. Scanner.NoCustomCategoryOnKey
+msgctxt "Scanner.NoCustomCategoryOnKey"
+msgid "No custom category on {0}"
+msgstr "{0}にカスタムカテゴリはありません"
+
+#. Scanner.QuickKeyComma
+msgctxt "Scanner.QuickKeyComma"
+msgid "Comma"
+msgstr "カンマ"
+
+#. Scanner.QuickKeyNone
+msgctxt "Scanner.QuickKeyNone"
+msgid "None"
+msgstr "なし"
+
+#. Scanner.QuickKeyPeriod
+msgctxt "Scanner.QuickKeyPeriod"
+msgid "Period"
+msgstr "ピリオド"
+
+#. Scanner.QuickKeySlash
+msgctxt "Scanner.QuickKeySlash"
+msgid "Slash"
+msgstr "スラッシュ"
+

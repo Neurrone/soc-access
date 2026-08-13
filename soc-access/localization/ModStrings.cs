@@ -244,10 +244,12 @@ namespace SongsOfConquestAccess.Localization
             public static readonly ModString ScannerJumpToResult = new ModString("Actions.ScannerJumpToResult", "Jump To Scanner Result");
             public static readonly ModString ScannerLookAround = new ModString("Actions.ScannerLookAround", "Look Around");
             public static readonly ModString ScannerNextCategory = new ModString("Actions.ScannerNextCategory", "Next Scanner Category");
+            public static readonly ModString ScannerNextCustomEntry = new ModString("Actions.ScannerNextCustomEntry", "Next Entry In The Custom Category On {0}");
             public static readonly ModString ScannerNextInstance = new ModString("Actions.ScannerNextInstance", "Next Scanner Instance");
             public static readonly ModString ScannerNextItem = new ModString("Actions.ScannerNextItem", "Next Scanner Item");
             public static readonly ModString ScannerNextSubcategory = new ModString("Actions.ScannerNextSubcategory", "Next Scanner Subcategory");
             public static readonly ModString ScannerPreviousCategory = new ModString("Actions.ScannerPreviousCategory", "Previous Scanner Category");
+            public static readonly ModString ScannerPreviousCustomEntry = new ModString("Actions.ScannerPreviousCustomEntry", "Previous Entry In The Custom Category On {0}");
             public static readonly ModString ScannerPreviousInstance = new ModString("Actions.ScannerPreviousInstance", "Previous Scanner Instance");
             public static readonly ModString ScannerPreviousItem = new ModString("Actions.ScannerPreviousItem", "Previous Scanner Item");
             public static readonly ModString ScannerPreviousSubcategory = new ModString("Actions.ScannerPreviousSubcategory", "Previous Scanner Subcategory");
@@ -488,6 +490,10 @@ namespace SongsOfConquestAccess.Localization
             public static readonly ModString CustomCategories = new ModString("Screens.CustomCategories", "{0} custom categories");
             public static readonly ModString CustomCategoryDefaultName = new ModString("Screens.CustomCategoryDefaultName", "Custom {0}");
             public static readonly ModString CustomCategoryDeleted = new ModString("Screens.CustomCategoryDeleted", "{0} deleted");
+            public static readonly ModString CustomCategoryKey = new ModString("Screens.CustomCategoryKey", "Key, {0}");
+            public static readonly ModString CustomCategoryKeyCurrent = new ModString("Screens.CustomCategoryKeyCurrent", "{0}, current");
+            public static readonly ModString CustomCategoryKeyHeldBy = new ModString("Screens.CustomCategoryKeyHeldBy", "{0}, held by {1}");
+            public static readonly ModString CustomCategoryKeyTitle = new ModString("Screens.CustomCategoryKeyTitle", "Key for {0}");
             public static readonly ModString DeleteCustomCategory = new ModString("Screens.DeleteCustomCategory", "Delete this custom category");
             public static readonly ModString CancelAbility = new ModString("Screens.CancelAbility", "Cancel ability");
             public static readonly ModString CancelSpell = new ModString("Screens.CancelSpell", "Cancel spell");
@@ -688,6 +694,7 @@ namespace SongsOfConquestAccess.Localization
             public static readonly ModString LookAroundRadius = new ModString("Scanner.LookAroundRadius", "Look around radius {0}");
             public static readonly ModString Merchants = new ModString("Scanner.Merchants", "Merchants");
             public static readonly ModString Neutral = new ModString("Scanner.Neutral", "Neutral");
+            public static readonly ModString NoCustomCategoryOnKey = new ModString("Scanner.NoCustomCategoryOnKey", "No custom category on {0}");
             public static readonly ModString NoTileToReturnTo = new ModString("Scanner.NoTileToReturnTo", "No tile to return to");
             public static readonly ModString North = new ModString("Scanner.North", "north");
             public static readonly ModString NorthShort = new ModString("Scanner.NorthShort", "n");
@@ -699,6 +706,10 @@ namespace SongsOfConquestAccess.Localization
             public static readonly ModString OpenGround = new ModString("Scanner.OpenGround", "Open ground");
             public static readonly ModString Obstacles = new ModString("Scanner.Obstacles", "Obstacles");
             public static readonly ModString Pickups = new ModString("Scanner.Pickups", "Pickups");
+            public static readonly ModString QuickKeyComma = new ModString("Scanner.QuickKeyComma", "Comma");
+            public static readonly ModString QuickKeyNone = new ModString("Scanner.QuickKeyNone", "None");
+            public static readonly ModString QuickKeyPeriod = new ModString("Scanner.QuickKeyPeriod", "Period");
+            public static readonly ModString QuickKeySlash = new ModString("Scanner.QuickKeySlash", "Slash");
             public static readonly ModString Power = new ModString("Scanner.Power", "Power");
             public static readonly ModString Revealed = new ModString("Scanner.Revealed", "Revealed");
             public static readonly ModString ReachableSummary = new ModString("Scanner.ReachableSummary", "Reachable: {0}");

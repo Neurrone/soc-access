@@ -98,6 +98,19 @@ This page summarizes the mod hotkeys used across the documentation.
 | `K`              | Increase look radius               |
 | `Shift+K`        | Decrease look radius               |
 
+The next three keys are adventure map only. Each walks whichever custom
+category holds it, as one flat list taken nearest first. See
+[Scanner](scanner.md) for how to choose which category holds which key.
+
+| Key       | Action                                        |
+| --------- | --------------------------------------------- |
+| `,`       | Next entry in the custom category on comma    |
+| `Shift+,` | Previous entry in the custom category on comma |
+| `.`       | Next entry in the custom category on period   |
+| `Shift+.` | Previous entry in the custom category on period |
+| `/`       | Next entry in the custom category on slash    |
+| `Shift+/` | Previous entry in the custom category on slash |
+
 ## Hex Grids
 
 | Key                 | Action                        |

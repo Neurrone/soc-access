@@ -9,11 +9,15 @@ namespace SongsOfConquestAccess.Scanner
     /// comma-separated entry.
     ///
     /// The text is the next id, then one record per category, separated by
-    /// semicolons. A record is the id, the name, the selectors and the keywords
-    /// separated by pipes; selectors and keywords are comma separated, and a
-    /// selector is its category key and subcategory key separated by a colon.
-    /// Names and keywords are player-authored, so every separator is backslash
-    /// escaped and only unescaped at the innermost split.
+    /// semicolons. A record is the id, the name, the selectors, the keywords and
+    /// the quick key separated by pipes; selectors and keywords are comma
+    /// separated, and a selector is its category key and subcategory key
+    /// separated by a colon. Names and keywords are player-authored, so every
+    /// separator is backslash escaped and only unescaped at the innermost
+    /// split.
+    ///
+    /// Both trailing fields are optional on the way in, so text written before
+    /// quick keys existed still reads back with no key set.
     /// </summary>
     internal static class ScannerCustomCategoryCodec
     {
@@ -97,6 +101,9 @@ namespace SongsOfConquestAccess.Scanner
 
                 builder.Append(Escape(category.Keywords[i]));
             }
+
+            builder.Append(FieldSeparator);
+            builder.Append(Escape(ScannerQuickKeys.ToToken(category.QuickKey)));
         }
 
         private static ScannerCustomCategory DecodeCategory(string record)
@@ -129,6 +136,11 @@ namespace SongsOfConquestAccess.Scanner
                 {
                     category.AddKeyword(Unescape(keywords[i]));
                 }
+            }
+
+            if (fields.Count > 4)
+            {
+                category.SetQuickKey(ScannerQuickKeys.FromToken(Unescape(fields[4])));
             }
 
             return category;

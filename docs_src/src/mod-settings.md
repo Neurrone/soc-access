@@ -19,3 +19,5 @@ Scanner directions are spoken in a short form by default, such as `3ne` for thre
 ## Custom Categories
 
 `Adventure map custom categories` and `Battle custom categories` open the editors for scanner categories you define yourself, built from subcategories you pick and keywords you type. Each scanner context keeps its own set. See [Scanner](scanner.md) for what the rules do and how the results are grouped.
+
+An adventure map category's editor also has a `Key` entry, which chooses whether `,`, `.`, or `/` walks that category from a single keypress. Battle categories have no such entry, because combat uses `,` and `.` for its own troop cycles.

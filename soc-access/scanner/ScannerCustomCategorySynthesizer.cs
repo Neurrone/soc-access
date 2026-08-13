@@ -22,6 +22,15 @@ namespace SongsOfConquestAccess.Scanner
         private const string KeywordKeyPrefix = "kw:";
 
         /// <summary>
+        /// The key a synthesized category carries in the snapshot, which is how
+        /// anything that has to find one definition again names it.
+        /// </summary>
+        public static string CategoryKeyFor(int id)
+        {
+            return CategoryKeyPrefix + id;
+        }
+
+        /// <summary>
         /// Applies the categories the player defined for whichever taxonomy the
         /// snapshot was built from, and hands the snapshot back so a snapshot
         /// builder can wrap its own result in one call.
@@ -68,7 +77,7 @@ namespace SongsOfConquestAccess.Scanner
             }
 
             ScannerCategory category = new ScannerCategory(
-                CategoryKeyPrefix + definition.Id,
+                CategoryKeyFor(definition.Id),
                 () => definition.Name)
             {
                 IsCustom = true

@@ -73,6 +73,18 @@ namespace SongsOfConquestAccess.Screens
                 null,
                 () => true));
 
+            if (ModSettings.SupportsScannerQuickKeys(GetTaxonomyKey()))
+            {
+                root.AddChild(new ButtonWidget(
+                    GetScreenId() + "-key",
+                    () => ModText.Get(
+                        ModStrings.Screens.CustomCategoryKey,
+                        ScannerQuickKeyText.Name(GetQuickKey())),
+                    OpenKeyPicker,
+                    null,
+                    () => true));
+            }
+
             IReadOnlyList<ScannerCategoryDefinition> definitions = _taxonomy != null
                 ? _taxonomy.Categories
                 : new ScannerCategoryDefinition[0];
@@ -176,6 +188,25 @@ namespace SongsOfConquestAccess.Screens
             SocAccessPlugin.Instance.ScreenManager.Push(
                 new ScannerCustomCategorySelectorScreen(GetTaxonomyKey(), _id, definition),
                 "scanner custom category selectors opened");
+            return true;
+        }
+
+        private ScannerQuickKey GetQuickKey()
+        {
+            ScannerCustomCategory category = GetCategory();
+            return category != null ? category.QuickKey : ScannerQuickKey.None;
+        }
+
+        private bool OpenKeyPicker()
+        {
+            if (SocAccessPlugin.Instance == null || SocAccessPlugin.Instance.ScreenManager == null)
+            {
+                return false;
+            }
+
+            SocAccessPlugin.Instance.ScreenManager.Push(
+                new ScannerCustomCategoryKeyScreen(GetTaxonomyKey(), _id),
+                "scanner custom category key picker opened");
             return true;
         }
 

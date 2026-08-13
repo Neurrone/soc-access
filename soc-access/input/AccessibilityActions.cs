@@ -203,6 +203,29 @@ namespace SongsOfConquestAccess.Input
         public static readonly InputAction ScannerDecreaseLookAroundRadius = OneShot("scanner_decrease_look_around_radius", ModStrings.Actions.ScannerDecreaseLookAroundRadius, InputClaimScope.FocusedWidget)
             .AddBinding(new KeyboardBinding(Key.K, shift: true));
 
+        // One key per custom category on the adventure map, with shift walking
+        // it backwards. Which category answers to which key is the player's to
+        // set, so the actions are named after the keys rather than after any
+        // category. Combat binds comma and period to its own troop cycles, and
+        // both are claimed by the focused widget, so the two never meet.
+        public static readonly InputAction ScannerNextCustomEntryComma =
+            CustomEntry("scanner_next_custom_entry_comma", ModStrings.Actions.ScannerNextCustomEntry, ModStrings.Scanner.QuickKeyComma, Key.Comma, shift: false);
+
+        public static readonly InputAction ScannerPreviousCustomEntryComma =
+            CustomEntry("scanner_previous_custom_entry_comma", ModStrings.Actions.ScannerPreviousCustomEntry, ModStrings.Scanner.QuickKeyComma, Key.Comma, shift: true);
+
+        public static readonly InputAction ScannerNextCustomEntryPeriod =
+            CustomEntry("scanner_next_custom_entry_period", ModStrings.Actions.ScannerNextCustomEntry, ModStrings.Scanner.QuickKeyPeriod, Key.Period, shift: false);
+
+        public static readonly InputAction ScannerPreviousCustomEntryPeriod =
+            CustomEntry("scanner_previous_custom_entry_period", ModStrings.Actions.ScannerPreviousCustomEntry, ModStrings.Scanner.QuickKeyPeriod, Key.Period, shift: true);
+
+        public static readonly InputAction ScannerNextCustomEntrySlash =
+            CustomEntry("scanner_next_custom_entry_slash", ModStrings.Actions.ScannerNextCustomEntry, ModStrings.Scanner.QuickKeySlash, Key.Slash, shift: false);
+
+        public static readonly InputAction ScannerPreviousCustomEntrySlash =
+            CustomEntry("scanner_previous_custom_entry_slash", ModStrings.Actions.ScannerPreviousCustomEntry, ModStrings.Scanner.QuickKeySlash, Key.Slash, shift: true);
+
         public static readonly InputAction SliderDecrease = OneShot("slider_decrease", ModStrings.Actions.SliderDecrease, InputClaimScope.FocusedWidget)
             .AddBinding(new KeyboardBinding(Key.LeftArrow));
 
@@ -336,6 +359,21 @@ namespace SongsOfConquestAccess.Input
             return new InputAction(key, label, claimScope, InputRepeatPolicy.OneShotUntilRelease());
         }
 
+        /// <summary>
+        /// The label names the key the action is bound to, because the category
+        /// it walks is whichever one the player put on that key and can change
+        /// between one reading of the label and the next.
+        /// </summary>
+        private static InputAction CustomEntry(string key, ModString label, ModString keyName, Key boundKey, bool shift)
+        {
+            return new InputAction(
+                    key,
+                    () => ModText.Get(label, ModText.Get(keyName)),
+                    InputClaimScope.FocusedWidget,
+                    InputRepeatPolicy.OneShotUntilRelease())
+                .AddBinding(new KeyboardBinding(boundKey, shift: shift));
+        }
+
         private static InputAction[] CreateBookmarkActions(string keyPrefix, string labelPrefix, bool ctrl, bool shift, bool alt)
         {
             Key[] digitKeys =
@@ -407,6 +445,12 @@ namespace SongsOfConquestAccess.Input
                 ScannerLookAround,
                 ScannerIncreaseLookAroundRadius,
                 ScannerDecreaseLookAroundRadius,
+                ScannerNextCustomEntryComma,
+                ScannerPreviousCustomEntryComma,
+                ScannerNextCustomEntryPeriod,
+                ScannerPreviousCustomEntryPeriod,
+                ScannerNextCustomEntrySlash,
+                ScannerPreviousCustomEntrySlash,
                 SliderDecrease,
                 SliderIncrease,
                 SliderMinimum,

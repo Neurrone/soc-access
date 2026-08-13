@@ -361,6 +361,307 @@ namespace SongsOfConquestAccess.Scanner
             return result;
         }
 
+        public bool MoveCustomCategoryEntry(string categoryKey, int delta)
+        {
+            Output(ExecuteMoveCustomCategoryEntry(categoryKey, delta));
+            return true;
+        }
+
+        internal ScannerCommandResult ExecuteMoveCustomCategoryEntry(string categoryKey, int delta)
+        {
+            return ExecuteMoveCustomCategoryEntryCore(categoryKey, delta);
+        }
+
+        /// <summary>
+        /// Walks one custom category from a single key, as one flat list of
+        /// instances taken nearest first and with the item grouping ignored.
+        /// A single key has no separate instance axis the way the paging cycles
+        /// do, so two chests gathered under one item stop would leave the second
+        /// one unreachable; flattening is what lets the one key reach
+        /// everything.
+        ///
+        /// The walk answers "nearest first from where I am", so a cursor that
+        /// has left the origin the snapshot was sorted from starts a fresh
+        /// sweep rather than continuing the old one. Everything downstream, the
+        /// jump, the bearing readout, the return key and the beep, acts on
+        /// whatever this lands on exactly as it does for the paging cycles.
+        /// </summary>
+        private ScannerCommandResult ExecuteMoveCustomCategoryEntryCore(string categoryKey, int delta)
+        {
+            if (string.IsNullOrWhiteSpace(categoryKey))
+            {
+                return NoResults();
+            }
+
+            // The same escape hatch the category cycle uses: a frozen search or
+            // look around snapshot is stepped out of before the real categories
+            // are walked.
+            if (_snapshot != null && _snapshot.IsTemporarySnapshot)
+            {
+                _categoryIndex = _preTemporaryCategoryIndex;
+                _subcategoryIndex = 0;
+                _itemIndex = 0;
+                _instanceIndex = 0;
+                _snapshot = null;
+            }
+
+            if (IsSeatedInCustomCategory(categoryKey) && IsCursorAtSortOrigin())
+            {
+                ReseatResultState state = RebuildAndReseatCurrentResult();
+                if (IsSeatedInCustomCategory(categoryKey))
+                {
+                    return StepFlatWalk(delta, state.LocatedCurrent);
+                }
+            }
+
+            return RestartFlatWalk(categoryKey, delta);
+        }
+
+        private ScannerCommandResult StepFlatWalk(int delta, bool locatedCurrent)
+        {
+            List<FlatWalkEntry> walk = BuildFlatWalk();
+            if (walk.Count == 0)
+            {
+                return NoResults();
+            }
+
+            bool wrapped = false;
+            int position = locatedCurrent ? IndexInFlatWalk(walk, _itemIndex, _instanceIndex) : -1;
+            if (position < 0)
+            {
+                // The entry the walk was standing on died across the rebuild.
+                // Landing on the end the press was heading for is not a wrap;
+                // the player never walked off anything.
+                position = delta < 0 ? walk.Count - 1 : 0;
+            }
+            else
+            {
+                position = WrapIndex(position, walk.Count, delta, out wrapped);
+            }
+
+            _itemIndex = walk[position].ItemIndex;
+            _instanceIndex = walk[position].InstanceIndex;
+            return BuildFlatWalkResult(wrapped);
+        }
+
+        /// <summary>
+        /// Re-anchors on the live cursor and takes the nearest entry, except
+        /// when that is the entry the walk was already on with the cursor parked
+        /// on top of it, which is what a jump to that very entry leaves behind.
+        /// The press asked to move, so it steps on instead of landing where the
+        /// player already is: that is what turns a jump-and-press rhythm into a
+        /// nearest-neighbour hop across the map.
+        /// </summary>
+        private ScannerCommandResult RestartFlatWalk(string categoryKey, int delta)
+        {
+            string previousKey = null;
+            ScannerCategory seated = CurrentCategory();
+            if (seated != null && seated.Key == categoryKey)
+            {
+                ScannerResult current = CurrentValidResult();
+                previousKey = current != null ? current.Key : null;
+            }
+
+            Vector2Int origin = GetCursor();
+            _snapshot = BuildSnapshot(origin);
+            if (_snapshot == null || _snapshot.IsEmpty)
+            {
+                _snapshot = null;
+                _categoryIndex = 0;
+                _subcategoryIndex = 0;
+                _itemIndex = 0;
+                _instanceIndex = 0;
+                return NoResults();
+            }
+
+            _snapshot.SortByDistance(origin);
+            int categoryIndex = IndexOfCategory(categoryKey);
+            int subcategoryIndex = categoryIndex >= 0
+                ? IndexOfSubcategory(_snapshot.Categories[categoryIndex], ScannerSubcategoryKeys.All)
+                : -1;
+            if (subcategoryIndex < 0)
+            {
+                return NoResults();
+            }
+
+            _categoryIndex = categoryIndex;
+            _subcategoryIndex = subcategoryIndex;
+            _itemIndex = 0;
+            _instanceIndex = 0;
+
+            List<FlatWalkEntry> walk = BuildFlatWalk();
+            if (walk.Count == 0)
+            {
+                return NoResults();
+            }
+
+            int position = 0;
+            if (previousKey != null
+                && walk.Count > 1
+                && walk[0].Result != null
+                && walk[0].Result.Key == previousKey
+                && walk[0].Result.Position == origin)
+            {
+                position = WrapIndex(0, walk.Count, delta);
+            }
+
+            _itemIndex = walk[position].ItemIndex;
+            _instanceIndex = walk[position].InstanceIndex;
+            return BuildFlatWalkResult(wrapped: false);
+        }
+
+        /// <summary>
+        /// Counts the position and the total over the flat walk rather than the
+        /// copies of one item, because the walk is what the key steps through.
+        /// The category name is left off for the same reason the paging cycles
+        /// leave it off mid-walk: the player picked this key for this category
+        /// and is being told where in it they now are.
+        /// </summary>
+        private ScannerCommandResult BuildFlatWalkResult(bool wrapped)
+        {
+            // Validation can prune a result that has gone and reshape the
+            // subcategory around it, so the walk is measured afterwards: the
+            // spoken count has to be the one the next press will step through.
+            ScannerResult result = CurrentValidResult();
+            if (result == null)
+            {
+                return NoResults();
+            }
+
+            List<FlatWalkEntry> walk = BuildFlatWalk();
+            int position = IndexInFlatWalk(walk, _itemIndex, _instanceIndex);
+            ScannerCategory category = CurrentCategory();
+            ScannerSubcategory subcategory = CurrentSubcategory();
+            ScannerItem item = CurrentItem();
+            Vector2Int origin = GetSpeechOrigin();
+            return new ScannerCommandResult(ScannerCommandStatus.Result)
+            {
+                Result = result,
+                CategoryLabel = category != null ? category.Label : null,
+                SubcategoryLabel = subcategory != null ? subcategory.Label : null,
+                ResultIndex = position >= 0 ? position + 1 : 1,
+                ResultCount = walk.Count,
+                IncludeItemName = TakeItemNameTurn(category, subcategory, item),
+                Directions = BuildDirections(origin, result.Position),
+                HasOrigin = true,
+                Origin = origin,
+                IncludePath = false,
+                Wrapped = wrapped
+            };
+        }
+
+        /// <summary>
+        /// Every instance under the current subcategory as one list, back in the
+        /// order the snapshot was sorted into. A scope the adapter deliberately
+        /// left unsorted keeps the order it was given.
+        /// </summary>
+        private List<FlatWalkEntry> BuildFlatWalk()
+        {
+            List<FlatWalkEntry> walk = new List<FlatWalkEntry>();
+            ScannerSubcategory subcategory = CurrentSubcategory();
+            if (subcategory == null)
+            {
+                return walk;
+            }
+
+            for (int itemIndex = 0; itemIndex < subcategory.Items.Count; itemIndex++)
+            {
+                List<ScannerResult> instances = subcategory.Items[itemIndex].Instances;
+                for (int instanceIndex = 0; instanceIndex < instances.Count; instanceIndex++)
+                {
+                    walk.Add(new FlatWalkEntry(itemIndex, instanceIndex, instances[instanceIndex]));
+                }
+            }
+
+            if (!subcategory.PreserveResultOrder && _snapshot != null && _snapshot.HasSortOrigin)
+            {
+                Vector2Int origin = _snapshot.SortOrigin;
+                walk.Sort((left, right) => ScannerSnapshot.CompareByDistance(origin, left.Result, right.Result));
+            }
+
+            return walk;
+        }
+
+        private static int IndexInFlatWalk(IReadOnlyList<FlatWalkEntry> walk, int itemIndex, int instanceIndex)
+        {
+            for (int i = 0; i < walk.Count; i++)
+            {
+                if (walk[i].ItemIndex == itemIndex && walk[i].InstanceIndex == instanceIndex)
+                {
+                    return i;
+                }
+            }
+
+            return -1;
+        }
+
+        private bool IsSeatedInCustomCategory(string categoryKey)
+        {
+            ScannerCategory category = CurrentCategory();
+            ScannerSubcategory subcategory = CurrentSubcategory();
+            return category != null
+                && category.Key == categoryKey
+                && subcategory != null
+                && subcategory.Key == ScannerSubcategoryKeys.All;
+        }
+
+        private bool IsCursorAtSortOrigin()
+        {
+            return _snapshot != null && _snapshot.HasSortOrigin && GetCursor() == _snapshot.SortOrigin;
+        }
+
+        private int IndexOfCategory(string categoryKey)
+        {
+            if (_snapshot == null)
+            {
+                return -1;
+            }
+
+            for (int i = 0; i < _snapshot.Categories.Count; i++)
+            {
+                if (_snapshot.Categories[i].Key == categoryKey)
+                {
+                    return i;
+                }
+            }
+
+            return -1;
+        }
+
+        private static int IndexOfSubcategory(ScannerCategory category, string subcategoryKey)
+        {
+            if (category == null)
+            {
+                return -1;
+            }
+
+            for (int i = 0; i < category.Subcategories.Count; i++)
+            {
+                if (category.Subcategories[i].Key == subcategoryKey)
+                {
+                    return i;
+                }
+            }
+
+            return -1;
+        }
+
+        private struct FlatWalkEntry
+        {
+            public FlatWalkEntry(int itemIndex, int instanceIndex, ScannerResult result)
+            {
+                ItemIndex = itemIndex;
+                InstanceIndex = instanceIndex;
+                Result = result;
+            }
+
+            public int ItemIndex { get; private set; }
+
+            public int InstanceIndex { get; private set; }
+
+            public ScannerResult Result { get; private set; }
+        }
+
         public bool JumpToCurrent()
         {
             Output(ExecuteJumpToCurrent());

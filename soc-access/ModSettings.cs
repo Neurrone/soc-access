@@ -372,8 +372,51 @@ namespace SongsOfConquestAccess
             }
 
             ScannerCustomCategory category = list.Add(nameForPosition);
+            if (SupportsScannerQuickKeys(taxonomyKey))
+            {
+                category.SetQuickKey(list.FirstFreeQuickKey());
+            }
+
             SaveScannerCustomCategories(taxonomyKey, list);
             return category;
+        }
+
+        /// <summary>
+        /// Only the adventure map walks a custom category from a single key, so
+        /// only its categories are given one. Battle keeps those keys for the
+        /// acting and enemy troop cycles.
+        /// </summary>
+        public static bool SupportsScannerQuickKeys(string taxonomyKey)
+        {
+            return taxonomyKey == ScannerTaxonomyKeys.Adventure;
+        }
+
+        public static ScannerCustomCategory GetScannerCustomCategoryByQuickKey(string taxonomyKey, ScannerQuickKey quickKey)
+        {
+            if (!SupportsScannerQuickKeys(taxonomyKey))
+            {
+                return null;
+            }
+
+            ScannerCustomCategoryList list = GetScannerCustomCategoryList(taxonomyKey);
+            return list != null ? list.GetByQuickKey(quickKey) : null;
+        }
+
+        public static bool SetScannerCustomCategoryQuickKey(string taxonomyKey, int id, ScannerQuickKey quickKey)
+        {
+            if (!SupportsScannerQuickKeys(taxonomyKey))
+            {
+                return false;
+            }
+
+            ScannerCustomCategoryList list = GetScannerCustomCategoryList(taxonomyKey);
+            if (list == null || !list.SetQuickKey(id, quickKey))
+            {
+                return false;
+            }
+
+            SaveScannerCustomCategories(taxonomyKey, list);
+            return true;
         }
 
         public static bool RemoveScannerCustomCategory(string taxonomyKey, int id)
