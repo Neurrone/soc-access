@@ -1,4 +1,4 @@
-﻿using UnityEngine.InputSystem;
+using UnityEngine.InputSystem;
 using System.Collections.Generic;
 using SongsOfConquestAccess.Bookmarks;
 using SongsOfConquestAccess.Localization;

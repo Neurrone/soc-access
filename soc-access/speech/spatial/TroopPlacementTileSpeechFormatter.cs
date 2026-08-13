@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using SongsOfConquest.Common.Entities.Adventure;
 using SongsOfConquestAccess.Adapters;
 using SongsOfConquestAccess.Localization;
