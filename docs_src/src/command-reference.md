@@ -80,21 +80,23 @@ This page summarizes the mod hotkeys used across the documentation.
 
 ## Scanner
 
-| Key              | Action                        |
-| ---------------- | ----------------------------- |
-| `End`            | Refresh scanner results       |
-| `PageUp`         | Previous result               |
-| `PageDown`       | Next result                   |
-| `Home`           | Jump to current result        |
-| `Shift+Home`     | Repeat current scanner result |
-| `Ctrl+PageUp`    | Previous category             |
-| `Ctrl+PageDown`  | Next category                 |
-| `Shift+PageUp`   | Previous subcategory          |
-| `Shift+PageDown` | Next subcategory              |
-| `Ctrl+F`         | Search scanner categories     |
-| `L`              | Look around from current tile |
-| `K`              | Increase look radius          |
-| `Shift+K`        | Decrease look radius          |
+| Key              | Action                             |
+| ---------------- | ---------------------------------- |
+| `PageUp`         | Previous item                      |
+| `PageDown`       | Next item                          |
+| `Alt+PageUp`     | Previous copy of the current item  |
+| `Alt+PageDown`   | Next copy of the current item      |
+| `Ctrl+PageUp`    | Previous category                  |
+| `Ctrl+PageDown`  | Next category                      |
+| `Shift+PageUp`   | Previous subcategory               |
+| `Shift+PageDown` | Next subcategory                   |
+| `Home`           | Jump to current result             |
+| `Backspace`      | Return to the tile before the jump |
+| `End`            | Distance and direction to result   |
+| `Ctrl+F`         | Search scanner categories          |
+| `L`              | Look around from current tile      |
+| `K`              | Increase look radius               |
+| `Shift+K`        | Decrease look radius               |
 
 ## Hex Grids
 
