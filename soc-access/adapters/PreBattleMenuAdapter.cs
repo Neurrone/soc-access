@@ -187,9 +187,9 @@ namespace SongsOfConquestAccess.Adapters
         {
             TroopPlacementSnapshot placement = BuildSnapshot();
             ScannerSnapshot snapshot = new ScannerSnapshot(BattleScannerTaxonomy.Instance);
-            AddTroopPlacementTroopScannerResults(snapshot, placement);
-            AddTroopPlacementSpawnScannerResults(snapshot, placement);
-            AddTroopPlacementTerrainScannerResults(snapshot, placement);
+            ScannerContribution.Run(ScannerCategoryKeys.Troops, () => AddTroopPlacementTroopScannerResults(snapshot, placement));
+            ScannerContribution.Run(ScannerCategoryKeys.SpawnPoints, () => AddTroopPlacementSpawnScannerResults(snapshot, placement));
+            ScannerContribution.Run(ScannerCategoryKeys.Terrain, () => AddTroopPlacementTerrainScannerResults(snapshot, placement));
             return snapshot;
         }
 

@@ -463,9 +463,9 @@ namespace SongsOfConquestAccess.Adapters
                 return snapshot;
             }
 
-            AddCombatTroopScannerResults(snapshot);
-            AddCombatEntityScannerResults(snapshot);
-            AddCombatTerrainScannerResults(snapshot);
+            ScannerContribution.Run(ScannerCategoryKeys.Troops, () => AddCombatTroopScannerResults(snapshot));
+            ScannerContribution.Run(ScannerCategoryKeys.Entities, () => AddCombatEntityScannerResults(snapshot));
+            ScannerContribution.Run(ScannerCategoryKeys.Terrain, () => AddCombatTerrainScannerResults(snapshot));
             return snapshot;
         }
 

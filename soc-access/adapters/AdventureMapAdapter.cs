@@ -1017,20 +1017,20 @@ namespace SongsOfConquestAccess.Adapters
             ScannerSnapshot snapshot = new ScannerSnapshot(AdventureScannerTaxonomy.Instance);
             Dictionary<Vector2Int, AdventureMapTile> tileCache = new Dictionary<Vector2Int, AdventureMapTile>();
             int localTeamId = GetLocalTeamId();
-            AddPickupScannerResults(snapshot, tileCache);
-            AddResourceGeneratorScannerResults(snapshot, localTeamId, tileCache);
-            AddBeaconScannerResults(snapshot, tileCache);
-            AddWielderScannerResults(snapshot, tileCache);
-            AddStructuralScannerResults(snapshot, localTeamId, tileCache, MapEntityCategory.Town, MapEntityCategory.Settlement, MapEntityCategory.BuildSite);
-            AddTroopSourceScannerResults(snapshot, localTeamId, tileCache);
-            AddStructuralScannerResults(snapshot, localTeamId, tileCache, MapEntityCategory.Building);
-            AddObjectiveScannerResults(snapshot, tileCache);
-            AddObstacleScannerResults(snapshot, localTeamId, origin, tileCache);
-            AddArtifactMarketScannerResults(snapshot, tileCache);
-            AddTeleportScannerResults(snapshot, tileCache);
-            AddAdventureTerrainScannerResults(snapshot, origin, tileCache);
-            AddUnexploredScannerResults(snapshot, origin);
-            AddRevealedScannerResults(snapshot);
+            ScannerContribution.Run(ScannerCategoryKeys.Pickups, () => AddPickupScannerResults(snapshot, tileCache));
+            ScannerContribution.Run(ScannerCategoryKeys.ResourceGenerators, () => AddResourceGeneratorScannerResults(snapshot, localTeamId, tileCache));
+            ScannerContribution.Run(ScannerCategoryKeys.Beacons, () => AddBeaconScannerResults(snapshot, tileCache));
+            ScannerContribution.Run(ScannerCategoryKeys.Wielders, () => AddWielderScannerResults(snapshot, tileCache));
+            ScannerContribution.Run(ScannerCategoryKeys.SettlementsAndBuildSites, () => AddStructuralScannerResults(snapshot, localTeamId, tileCache, MapEntityCategory.Town, MapEntityCategory.Settlement, MapEntityCategory.BuildSite));
+            ScannerContribution.Run(ScannerCategoryKeys.TroopSources, () => AddTroopSourceScannerResults(snapshot, localTeamId, tileCache));
+            ScannerContribution.Run(ScannerCategoryKeys.Buildings, () => AddStructuralScannerResults(snapshot, localTeamId, tileCache, MapEntityCategory.Building));
+            ScannerContribution.Run(ScannerCategoryKeys.Objectives, () => AddObjectiveScannerResults(snapshot, tileCache));
+            ScannerContribution.Run(ScannerCategoryKeys.Obstacles, () => AddObstacleScannerResults(snapshot, localTeamId, origin, tileCache));
+            ScannerContribution.Run(ScannerCategoryKeys.ArtifactMarkets, () => AddArtifactMarketScannerResults(snapshot, tileCache));
+            ScannerContribution.Run(ScannerCategoryKeys.Teleport, () => AddTeleportScannerResults(snapshot, tileCache));
+            ScannerContribution.Run(ScannerCategoryKeys.Terrain, () => AddAdventureTerrainScannerResults(snapshot, origin, tileCache));
+            ScannerContribution.Run(ScannerCategoryKeys.Unexplored, () => AddUnexploredScannerResults(snapshot, origin));
+            ScannerContribution.Run(ScannerCategoryKeys.Revealed, () => AddRevealedScannerResults(snapshot));
             return snapshot;
         }
 
