@@ -34,7 +34,7 @@ Moving to a different item reads its name. Stepping between copies of the same i
 - `Page Up`: previous item
 - `Alt+Page Down`: next copy of the current item
 - `Alt+Page Up`: previous copy of the current item
-- `Home` or `J`: move the accessibility cursor to the current scanner result
+- `Home` or `J`: move the accessibility cursor to the current scanner result and read the tile it lands on
 - `Backspace`: return the cursor to the tile it was on before the last jump
 - `End`: read how far away the current result is and which way it lies
 

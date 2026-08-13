@@ -662,9 +662,21 @@ namespace SongsOfConquestAccess.Scanner
             public ScannerResult Result { get; private set; }
         }
 
+        /// <summary>
+        /// A jump that lands somewhere leaves the talking to the tile it landed
+        /// on. The result was just read out by whatever step chose it, so
+        /// speaking it again puts the thing the player picked in front of the
+        /// tile they are now standing on. Only a jump with nowhere to go still
+        /// says so.
+        /// </summary>
         public bool JumpToCurrent()
         {
-            Output(ExecuteJumpToCurrent());
+            ScannerCommandResult result = ExecuteJumpToCurrent();
+            if (result != null && result.Status == ScannerCommandStatus.NoResults)
+            {
+                Output(result);
+            }
+
             return true;
         }
 
