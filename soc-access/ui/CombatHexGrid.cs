@@ -595,8 +595,24 @@ namespace SongsOfConquestAccess.UI
 
         private bool JumpToScannerResult(Vector2Int point)
         {
+            if (point == _cursor)
+            {
+                SpeakHere();
+                return true;
+            }
+
             _jumpAnchor.Remember(_cursor);
             return SetCursor(point);
+        }
+
+        /// <summary>
+        /// A jump onto the tile the cursor already occupies moves nothing, so no
+        /// tile announcement follows it. Say where the player is rather than
+        /// letting the key fall silent.
+        /// </summary>
+        private static void SpeakHere()
+        {
+            SpeechPipeline.Output(new SpeechRequest(ModText.Get(ModStrings.Spatial.Here), interrupt: false));
         }
 
         private bool ReturnFromJump()

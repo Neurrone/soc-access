@@ -381,6 +381,12 @@ namespace SongsOfConquestAccess.UI
                 return false;
             }
 
+            if (point == _cursorTile)
+            {
+                SpeakHere();
+                return true;
+            }
+
             _jumpAnchor.Remember(_cursorTile);
             _cursorTile = point;
             _adapter.MoveCameraToTile(_cursorTile);
@@ -396,6 +402,12 @@ namespace SongsOfConquestAccess.UI
             if (_adapter == null || !_adapter.IsValidMapTile(point))
             {
                 return false;
+            }
+
+            if (point == _cursorTile)
+            {
+                SpeakHere();
+                return true;
             }
 
             _jumpAnchor.Remember(_cursorTile);
@@ -675,6 +687,16 @@ namespace SongsOfConquestAccess.UI
         private static void SpeakNoBookmark()
         {
             SpeechPipeline.Output(new SpeechRequest(ModText.Get(ModStrings.Bookmarks.NoBookmark), interrupt: false));
+        }
+
+        /// <summary>
+        /// A jump onto the tile the cursor already occupies moves nothing, so the
+        /// tile announcement is dropped as a repeat of the one just spoken. Say
+        /// where the player is rather than letting the key fall silent.
+        /// </summary>
+        private static void SpeakHere()
+        {
+            SpeechPipeline.Output(new SpeechRequest(ModText.Get(ModStrings.Spatial.Here), interrupt: false));
         }
 
         private bool OpenScannerSearch()
