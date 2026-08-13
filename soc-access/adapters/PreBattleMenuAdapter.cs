@@ -292,9 +292,17 @@ namespace SongsOfConquestAccess.Adapters
                         ModText.Get(ModStrings.Spatial.SpawnPoint),
                         tile.Point)
                     {
-                        Relationship = own
-                            ? ScannerResultRelationship.Friendly
-                            : ScannerResultRelationship.Enemy
+                        // Whose it is names the item, because that is the whole
+                        // of what one spawn point is next to another, and what
+                        // stands on it tells the instances apart. The label
+                        // stays "spawn point" so a search for the word still
+                        // finds them, but no result speaks it: the category has
+                        // already said it. No relationship either, since the
+                        // item name says whose it is.
+                        ItemLabel = own
+                            ? ModText.Get(ModStrings.Scanner.Friendly)
+                            : ModText.Get(ModStrings.Scanner.Enemy),
+                        InstanceLabel = DescribeSpawnPointOccupant(tile)
                     };
                     snapshot.Add(
                         ScannerCategoryKeys.SpawnPoints,
@@ -306,6 +314,24 @@ namespace SongsOfConquestAccess.Adapters
                         result);
                 }
             }
+        }
+
+        /// <summary>
+        /// What stands on the spawn point, or that nothing does. Says neither
+        /// where the side's troops are not shown at all: an unscouted spawn
+        /// point is not an empty one, and claiming it is would be worse than
+        /// the announcement falling back to naming the side.
+        /// </summary>
+        private string DescribeSpawnPointOccupant(TroopPlacementTile tile)
+        {
+            if (!string.IsNullOrWhiteSpace(tile.TroopLabel))
+            {
+                return tile.TroopLabel;
+            }
+
+            return ShouldShowSide(tile.SpawnSide.Value)
+                ? ModText.Get(ModStrings.Scanner.SpawnPointEmpty)
+                : null;
         }
 
         private static string ScannerTileKey(string prefix, Vector2Int point)
@@ -688,7 +714,7 @@ namespace SongsOfConquestAccess.Adapters
                 tile.Troop = troop;
                 tile.TroopId = placement.TroopId;
                 tile.TroopDetailsHidden = detailsHidden;
-                tile.TroopLabel = detailsHidden ? "Unknown" : BuildTroopLabel(troop);
+                tile.TroopLabel = detailsHidden ? ModText.Get(ModStrings.Combat.UnknownTroop) : BuildTroopLabel(troop);
             }
         }
 

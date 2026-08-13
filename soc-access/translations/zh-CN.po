@@ -2630,6 +2630,11 @@ msgctxt "Scanner.SouthwestShort"
 msgid "sw"
 msgstr "西南"
 
+#. Scanner.SpawnPointEmpty
+msgctxt "Scanner.SpawnPointEmpty"
+msgid "empty"
+msgstr "空"
+
 #. Scanner.SpawnPoints
 msgctxt "Scanner.SpawnPoints"
 msgid "Spawn points"

@@ -717,6 +717,7 @@ namespace SongsOfConquestAccess.Localization
             public static readonly ModString SoutheastShort = new ModString("Scanner.SoutheastShort", "se");
             public static readonly ModString Southwest = new ModString("Scanner.Southwest", "southwest");
             public static readonly ModString SouthwestShort = new ModString("Scanner.SouthwestShort", "sw");
+            public static readonly ModString SpawnPointEmpty = new ModString("Scanner.SpawnPointEmpty", "empty");
             public static readonly ModString SpawnPoints = new ModString("Scanner.SpawnPoints", "Spawn points");
             public static readonly ModString SpecialSites = new ModString("Scanner.SpecialSites", "Special sites");
             public static readonly ModString Teleport = new ModString("Scanner.Teleport", "Teleport");
