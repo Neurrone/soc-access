@@ -300,13 +300,17 @@ namespace SongsOfConquestAccess.Events
         }
 
         // Steps follow the scanner's Long directions setting, so a route reads as
-        // "n, n, ne" by default and "north, north, northeast" when it is on.
-        private static string DescribeSteps(IReadOnlyList<ScannerDirection> steps, bool useLongForm)
+        // "2n, ne" by default and "2 north, northeast" when it is on. A run of one
+        // is named on its own, since a count in front of every single step would
+        // be more to listen to than it is worth.
+        private static string DescribeSteps(IReadOnlyList<ScannerDirectionStep> steps, bool useLongForm)
         {
             List<string> parts = new List<string>();
             for (int i = 0; i < steps.Count; i++)
             {
-                parts.Add(ScannerDirectionUtility.FormatDirection(steps[i], useLongForm));
+                parts.Add(steps[i].Count == 1
+                    ? ScannerDirectionUtility.FormatDirection(steps[i].Direction, useLongForm)
+                    : ScannerDirectionUtility.FormatStep(steps[i], useLongForm));
             }
 
             return ModText.JoinListWithCommas(parts);

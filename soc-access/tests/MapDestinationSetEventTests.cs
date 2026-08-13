@@ -14,27 +14,27 @@ namespace SongsOfConquestAccess.Tests
         public void GetSpeechTextReadsTheCostThenEveryStepOfTheRoute()
         {
             string text = Describe(
-                new[] { ScannerDirection.North, ScannerDirection.North, ScannerDirection.Northeast },
+                new[] { Step(2, ScannerDirection.North), Step(1, ScannerDirection.Northeast) },
                 new[] { Turn(1, 5f) });
 
-            Assert.AreEqual("Cost: 5 this turn. Aurelia will move n, n, ne.", text);
+            Assert.AreEqual("Cost: 5 this turn. Aurelia will move 2n, ne.", text);
         }
 
         [TestMethod]
         public void GetSpeechTextSplitsTheCostOverTheTurnsItIsSpentOn()
         {
             string text = Describe(
-                new[] { ScannerDirection.East, ScannerDirection.East },
+                new[] { Step(2, ScannerDirection.East) },
                 new[] { Turn(1, 5f), Turn(2, 12f), Turn(3, 3f) });
 
-            Assert.AreEqual("Cost: 5 this turn, 12 next turn, 3 in 2 turns. Aurelia will move e, e.", text);
+            Assert.AreEqual("Cost: 5 this turn, 12 next turn, 3 in 2 turns. Aurelia will move 2e.", text);
         }
 
         [TestMethod]
         public void GetSpeechTextKeepsAFractionalCostIntact()
         {
             string text = Describe(
-                new[] { ScannerDirection.Southwest },
+                new[] { Step(1, ScannerDirection.Southwest) },
                 new[] { Turn(1, 2.5f) });
 
             Assert.AreEqual("Cost: 2.5 this turn. Aurelia will move sw.", text);
@@ -44,11 +44,11 @@ namespace SongsOfConquestAccess.Tests
         public void GetSpeechTextSpellsTheStepsOutWhenLongDirectionsAreOn()
         {
             string text = Describe(
-                new[] { ScannerDirection.North, ScannerDirection.Southeast },
+                new[] { Step(3, ScannerDirection.North), Step(1, ScannerDirection.Southeast) },
                 new[] { Turn(1, 4f) },
                 useLongDirections: true);
 
-            Assert.AreEqual("Cost: 4 this turn. Aurelia will move north, southeast.", text);
+            Assert.AreEqual("Cost: 4 this turn. Aurelia will move 3 north, southeast.", text);
         }
 
         [TestMethod]
@@ -63,20 +63,20 @@ namespace SongsOfConquestAccess.Tests
         [TestMethod]
         public void GetSpeechTextFallsBackWhenTheRouteHasNoSteps()
         {
-            string text = Describe(new ScannerDirection[0], new[] { Turn(1, 5f) });
+            string text = Describe(new ScannerDirectionStep[0], new[] { Turn(1, 5f) });
 
             Assert.AreEqual("Aurelia's destination set to 34, 12", text);
         }
 
         private static string Describe(
-            IReadOnlyList<ScannerDirection> steps,
+            IReadOnlyList<ScannerDirectionStep> steps,
             IReadOnlyList<WielderRouteTurn> turns)
         {
             return Describe(steps, turns, useLongDirections: false);
         }
 
         private static string Describe(
-            IReadOnlyList<ScannerDirection> steps,
+            IReadOnlyList<ScannerDirectionStep> steps,
             IReadOnlyList<WielderRouteTurn> turns,
             bool useLongDirections)
         {
@@ -85,6 +85,11 @@ namespace SongsOfConquestAccess.Tests
                 "Aurelia",
                 new Vector2Int(34, 12),
                 new WielderRoute(steps, turns)).GetSpeechText(useLongDirections);
+        }
+
+        private static ScannerDirectionStep Step(int count, ScannerDirection direction)
+        {
+            return new ScannerDirectionStep(count, direction);
         }
 
         private static WielderRouteTurn Turn(int travelTurns, float cost)

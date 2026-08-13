@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using Lavapotion.Pathfinding;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using SongsOfConquestAccess.Adapters;
+using SongsOfConquestAccess.Scanner;
 using Unity.Mathematics;
 
 namespace SongsOfConquestAccess.Tests
@@ -50,10 +51,49 @@ namespace SongsOfConquestAccess.Tests
             AssertTurn(turns[1], 3, 6f);
         }
 
+        [TestMethod]
+        public void BuildStepsCountsARunOfStepsInTheSameDirectionAsOne()
+        {
+            IReadOnlyList<ScannerDirectionStep> steps = WielderRoute.BuildSteps(
+                Route(Point(0, 0), Point(0, 1), Point(0, 2), Point(0, 3)));
+
+            Assert.AreEqual(1, steps.Count);
+            AssertStep(steps[0], 3, ScannerDirection.North);
+        }
+
+        [TestMethod]
+        public void BuildStepsStartsANewRunWhenTheDirectionChanges()
+        {
+            IReadOnlyList<ScannerDirectionStep> steps = WielderRoute.BuildSteps(
+                Route(Point(0, 0), Point(0, 1), Point(0, 2), Point(1, 2), Point(2, 2)));
+
+            Assert.AreEqual(2, steps.Count);
+            AssertStep(steps[0], 2, ScannerDirection.North);
+            AssertStep(steps[1], 2, ScannerDirection.East);
+        }
+
+        [TestMethod]
+        public void BuildStepsKeepsSingleStepsOfTheirOwn()
+        {
+            IReadOnlyList<ScannerDirectionStep> steps = WielderRoute.BuildSteps(
+                Route(Point(0, 0), Point(0, 1), Point(1, 2), Point(2, 2)));
+
+            Assert.AreEqual(3, steps.Count);
+            AssertStep(steps[0], 1, ScannerDirection.North);
+            AssertStep(steps[1], 1, ScannerDirection.Northeast);
+            AssertStep(steps[2], 1, ScannerDirection.East);
+        }
+
         private static void AssertTurn(WielderRouteTurn turn, int expectedTravelTurns, float expectedCost)
         {
             Assert.AreEqual(expectedTravelTurns, turn.TravelTurns);
             Assert.AreEqual(expectedCost, turn.Cost, 0.001f);
+        }
+
+        private static void AssertStep(ScannerDirectionStep step, int expectedCount, ScannerDirection expectedDirection)
+        {
+            Assert.AreEqual(expectedCount, step.Count);
+            Assert.AreEqual(expectedDirection, step.Direction);
         }
 
         private static PathNode[] Path(params float[] travelCosts)
@@ -65,6 +105,26 @@ namespace SongsOfConquestAccess.Tests
                 {
                     point = new int2(i, 0),
                     travelCost = travelCosts[i]
+                };
+            }
+
+            return nodes;
+        }
+
+        private static int2 Point(int x, int y)
+        {
+            return new int2(x, y);
+        }
+
+        private static PathNode[] Route(params int2[] points)
+        {
+            PathNode[] nodes = new PathNode[points.Length];
+            for (int i = 0; i < points.Length; i++)
+            {
+                nodes[i] = new PathNode
+                {
+                    point = points[i],
+                    travelCost = i
                 };
             }
 

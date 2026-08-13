@@ -47,11 +47,11 @@ The mod mentions if a tile is unexplored or currently unseen.
 
 ### Setting a Destination
 
-When a destination is set, the mod reads what it will cost and the route the wielder will walk, for example `Cost: 5 this turn, 12 next turn. Aurelia will move n, n, ne, e, e.`
+When a destination is set, the mod reads what it will cost and the route the wielder will walk, for example `Cost: 5 this turn, 12 next turn. Aurelia will move 2n, ne, 2e.`
 
 The cost is broken over the turns it is spent on. Each number is the movement used during that turn, so the first is capped by what the wielder has left right now and the rest by its full movement. A turn that costs nothing is left out, so a wielder that has already run out this turn starts at `next turn`.
 
-The route is then named a step at a time, one direction per tile walked. These follow the scanner's `Long directions` setting, so they read as `n, n, ne` by default and `north, north, northeast` when that setting is on.
+The route is then named as a run of steps at a time, with the number of tiles in front of the direction they are walked. A run of a single tile is named on its own, so a route that goes north twice, then northeast, then east twice reads as `2n, ne, 2e`. These follow the scanner's `Long directions` setting, so the same route reads as `2 north, northeast, 2 east` when that setting is on.
 
 If the route cannot be worked out, this falls back to naming the destination tile instead.
 

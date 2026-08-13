@@ -16,14 +16,17 @@ namespace SongsOfConquestAccess.Adapters
     /// </summary>
     internal sealed class WielderRoute
     {
-        internal WielderRoute(IReadOnlyList<ScannerDirection> steps, IReadOnlyList<WielderRouteTurn> turns)
+        internal WielderRoute(IReadOnlyList<ScannerDirectionStep> steps, IReadOnlyList<WielderRouteTurn> turns)
         {
             Steps = steps;
             Turns = turns;
         }
 
-        /// <summary>The direction of each tile stepped, in the order they are walked.</summary>
-        public IReadOnlyList<ScannerDirection> Steps { get; private set; }
+        /// <summary>
+        /// The tiles stepped, in the order they are walked, with a run of steps in the
+        /// same direction counted as one.
+        /// </summary>
+        public IReadOnlyList<ScannerDirectionStep> Steps { get; private set; }
 
         /// <summary>Movement spent per turn, in order, skipping turns that cost nothing.</summary>
         public IReadOnlyList<WielderRouteTurn> Turns { get; private set; }
@@ -95,17 +98,27 @@ namespace SongsOfConquestAccess.Adapters
             return route.Steps.Count != 0;
         }
 
-        private static IReadOnlyList<ScannerDirection> BuildSteps(PathNode[] path)
+        internal static IReadOnlyList<ScannerDirectionStep> BuildSteps(PathNode[] path)
         {
-            List<ScannerDirection> steps = new List<ScannerDirection>();
+            List<ScannerDirectionStep> steps = new List<ScannerDirectionStep>();
             for (int i = 1; i < path.Length; i++)
             {
                 ScannerDirection direction;
-                if (ScannerDirectionUtility.TryGetStepDirection(
+                if (!ScannerDirectionUtility.TryGetStepDirection(
                     ToVector2Int(path[i]) - ToVector2Int(path[i - 1]),
                     out direction))
                 {
-                    steps.Add(direction);
+                    continue;
+                }
+
+                ScannerDirectionStep previous = steps.Count != 0 ? steps[steps.Count - 1] : null;
+                if (previous != null && previous.Direction == direction)
+                {
+                    steps[steps.Count - 1] = new ScannerDirectionStep(previous.Count + 1, direction);
+                }
+                else
+                {
+                    steps.Add(new ScannerDirectionStep(1, direction));
                 }
             }
 
