@@ -751,19 +751,44 @@ namespace SongsOfConquestAccess.Scanner
             ScannerItem item = CurrentItem();
             Vector2Int origin = GetSpeechOrigin();
             IReadOnlyList<ScannerDirectionStep> directions = BuildDirections(origin, result.Position);
+            int resultIndex;
+            int resultCount;
+            GetResultPosition(subcategory, item, out resultIndex, out resultCount);
             return new ScannerCommandResult(ScannerCommandStatus.Result)
             {
                 Result = result,
                 CategoryLabel = category != null ? category.Label : null,
                 SubcategoryLabel = subcategory != null ? subcategory.Label : null,
-                ResultIndex = _instanceIndex + 1,
-                ResultCount = item != null ? item.Instances.Count : 1,
+                ResultIndex = resultIndex,
+                ResultCount = resultCount,
                 IncludeItemName = TakeItemNameTurn(category, subcategory, item),
                 Directions = directions,
                 HasOrigin = true,
                 Origin = origin,
                 IncludePath = includePath
             };
+        }
+
+        /// <summary>
+        /// Counts over whatever the item cycle actually steps through. A grouped
+        /// scope steps between the copies of the item, so it counts those. A
+        /// flat scope gives every result an item of its own, so counting copies
+        /// there would read "1 of 1" for the whole walk and say nothing; it
+        /// counts the items, which is the sequence the player is in. Look Around
+        /// and the revealed list are the flat ones, and both are sequences whose
+        /// length and position are the information.
+        /// </summary>
+        private void GetResultPosition(ScannerSubcategory subcategory, ScannerItem item, out int index, out int count)
+        {
+            if (subcategory != null && subcategory.FlatItems)
+            {
+                index = _itemIndex + 1;
+                count = subcategory.Items.Count;
+                return;
+            }
+
+            index = _instanceIndex + 1;
+            count = item != null ? item.Instances.Count : 1;
         }
 
         /// <summary>

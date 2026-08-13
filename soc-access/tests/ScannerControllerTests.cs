@@ -572,6 +572,7 @@ namespace SongsOfConquestAccess.Tests
             Assert.AreEqual("Dead commander", fourth.Result.Label);
             Assert.AreEqual("East", fifth.Result.Label);
             Assert.AreEqual("Wood", controller.ExecuteMoveItem(1).Result.Label);
+            Assert.AreEqual(5, first.ResultCount);
         }
 
         [TestMethod]
@@ -586,7 +587,7 @@ namespace SongsOfConquestAccess.Tests
 
             Assert.AreEqual("Look around", result.CategoryLabel);
             Assert.AreEqual("All", result.SubcategoryLabel);
-            Assert.AreEqual(1, result.ResultCount);
+            Assert.AreEqual(2, result.ResultCount);
             Assert.AreEqual("Pickups", pickups.SubcategoryLabel);
             Assert.AreEqual("Gold", pickups.Result.Label);
         }
@@ -882,6 +883,73 @@ namespace SongsOfConquestAccess.Tests
             Assert.AreEqual("pickup:chest-south", south.Result.Key);
         }
 
+        /// <summary>
+        /// The sweep is one result per item, so counting the copies of an item
+        /// would answer "1 of 1" all the way round and leave the player with no
+        /// idea how much is near them or how far through it they are.
+        /// </summary>
+        [TestMethod]
+        public void LookAroundCountsThePositionOverTheWholeSweep()
+        {
+            ScannerController controller = CreateController(BuildSnapshot(
+                Entry("Pickups", "All", "Chest", 0, 5, "pickup:chest-north"),
+                Entry("Pickups", "All", "Wood", 5, 0, "pickup:wood"),
+                Entry("Pickups", "All", "Chest", 0, -5, "pickup:chest-south")));
+
+            ScannerCommandResult first = controller.ExecuteLookAround(15);
+            ScannerCommandResult second = controller.ExecuteMoveItem(1);
+            ScannerCommandResult third = controller.ExecuteMoveItem(1);
+
+            Assert.AreEqual(1, first.ResultIndex);
+            Assert.AreEqual(3, first.ResultCount);
+            Assert.AreEqual(2, second.ResultIndex);
+            Assert.AreEqual(3, second.ResultCount);
+            Assert.AreEqual(3, third.ResultIndex);
+            Assert.AreEqual(3, third.ResultCount);
+        }
+
+        /// <summary>
+        /// The shape of the revealed list, which is flat for the same reason
+        /// Look Around is: the order of the whole sequence is the information,
+        /// so the position has to be measured over it.
+        /// </summary>
+        [TestMethod]
+        public void FlatSubcategoryCountsThePositionOverItsItems()
+        {
+            ScannerController controller = CreateController(BuildFlatSnapshot(
+                Entry("Exploration", "Revealed", "Chest", 1, 0, "revealed:chest-near"),
+                Entry("Exploration", "Revealed", "Chest", 2, 0, "revealed:chest-far")));
+
+            ScannerCommandResult first = controller.ExecuteInitialLanding();
+            ScannerCommandResult second = controller.ExecuteMoveItem(1);
+
+            Assert.AreEqual(1, first.ResultIndex);
+            Assert.AreEqual(2, first.ResultCount);
+            Assert.AreEqual(2, second.ResultIndex);
+            Assert.AreEqual(2, second.ResultCount);
+        }
+
+        /// <summary>
+        /// The other half of the rule: a grouped scope still counts the copies
+        /// of the item the player is walking, which is what the item cycle
+        /// leaves the instance cycle to step through.
+        /// </summary>
+        [TestMethod]
+        public void GroupedSubcategoryStillCountsTheCopiesOfTheItem()
+        {
+            ScannerController controller = CreateController(BuildSnapshot(
+                Entry("Pickups", "All", "Chest", 1, 0, "pickup:chest-near"),
+                Entry("Pickups", "All", "Chest", 2, 0, "pickup:chest-far")));
+
+            ScannerCommandResult first = controller.ExecuteInitialLanding();
+            ScannerCommandResult second = controller.ExecuteMoveInstance(1);
+
+            Assert.AreEqual(1, first.ResultIndex);
+            Assert.AreEqual(2, first.ResultCount);
+            Assert.AreEqual(2, second.ResultIndex);
+            Assert.AreEqual(2, second.ResultCount);
+        }
+
         private static ScannerController CreateController(ScannerSnapshot snapshot)
         {
             return CreateController(_ => snapshot);
@@ -945,6 +1013,25 @@ namespace SongsOfConquestAccess.Tests
             {
                 ScannerEntry entry = entries[i];
                 snapshot.Add(entry.Category, entry.Subcategory, new ScannerResult(entry.Key, entry.Label, entry.Position));
+            }
+
+            return snapshot;
+        }
+
+        /// <summary>
+        /// The same entries under a category that hands out flat subcategories,
+        /// which is how the taxonomy declares the revealed list.
+        /// </summary>
+        private static ScannerSnapshot BuildFlatSnapshot(params ScannerEntry[] entries)
+        {
+            ScannerSnapshot snapshot = new ScannerSnapshot();
+            for (int i = 0; i < entries.Length; i++)
+            {
+                ScannerEntry entry = entries[i];
+                ScannerCategory category = snapshot.GetOrAddCategory(entry.Category);
+                category.FlatItems = true;
+                category.GetOrAddSubcategory(entry.Subcategory)
+                    .Add(new ScannerResult(entry.Key, entry.Label, entry.Position));
             }
 
             return snapshot;
