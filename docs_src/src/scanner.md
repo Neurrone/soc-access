@@ -34,7 +34,7 @@ Moving to a different item reads its name. Stepping between copies of the same i
 - `Page Up`: previous item
 - `Alt+Page Down`: next copy of the current item
 - `Alt+Page Up`: previous copy of the current item
-- `Home`: move the accessibility cursor to the current scanner result
+- `Home` or `J`: move the accessibility cursor to the current scanner result
 - `Backspace`: return the cursor to the tile it was on before the last jump
 - `End`: read how far away the current result is and which way it lies
 
@@ -73,9 +73,11 @@ Deleting a category frees its key. The freed key is not handed to another catego
 
 These keys ignore the item grouping and walk the category's `All` subcategory as one flat list, nearest first. Twelve chests are twelve stops rather than one, because a single key has no separate cycle for the copies of an item. The count you hear is your position in that flat walk, and the category name is not repeated on every press.
 
-The walk answers "nearest first from where I am". Once the accessibility cursor moves, by arrow keys, by `Home`, or by a bookmark jump, the next press starts a fresh sweep from wherever the cursor now is. When the cursor is sitting on the entry you are already on, the press steps to the next-nearest rather than announcing the same entry again, so pressing `Home` and the key in turn walks the map by nearest neighbour.
+The walk answers "nearest first from where I am". Once the accessibility cursor moves, by arrow keys, by a jump to the current result, or by a bookmark jump, the next press starts a fresh sweep from wherever the cursor now is. When the cursor is sitting on the entry you are already on, the press steps to the next-nearest rather than announcing the same entry again, so pressing `J` and the key in turn walks the map by nearest neighbour.
 
-`Home`, `End`, and `Backspace` act on whatever the key lands on, exactly as they do for the paging cycles. Pressing a key that no category holds says so.
+`J` is a second key for the jump that `Home` also does. It is here so that the jump and these three keys sit under the same hand.
+
+`Home`, `J`, `End`, and `Backspace` act on whatever the key lands on, exactly as they do for the paging cycles. Pressing a key that no category holds says so.
 
 These keys are adventure map only. In combat, `,` and `.` remain the acting and enemy troop cycles.
 

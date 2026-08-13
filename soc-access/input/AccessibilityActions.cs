@@ -186,7 +186,10 @@ namespace SongsOfConquestAccess.Input
             .AddBinding(new KeyboardBinding(Key.PageDown, alt: true));
 
         public static readonly InputAction ScannerJumpToResult = OneShot("scanner_jump_to_result", ModStrings.Actions.ScannerJumpToResult, InputClaimScope.FocusedWidget)
-            .AddBinding(new KeyboardBinding(Key.Home));
+            .AddBinding(new KeyboardBinding(Key.Home))
+            // J mirrors Home so the jump sits next to the comma, period, and
+            // slash category keys and the pair can be worked with one hand.
+            .AddBinding(new KeyboardBinding(Key.J));
 
         public static readonly InputAction ScannerSpeakDistanceAndDirection = OneShot("scanner_speak_distance_and_direction", ModStrings.Actions.ScannerSpeakDistanceAndDirection, InputClaimScope.FocusedWidget)
             .AddBinding(new KeyboardBinding(Key.End));

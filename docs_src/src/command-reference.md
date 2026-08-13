@@ -90,7 +90,7 @@ This page summarizes the mod hotkeys used across the documentation.
 | `Ctrl+PageDown`  | Next category                      |
 | `Shift+PageUp`   | Previous subcategory               |
 | `Shift+PageDown` | Next subcategory                   |
-| `Home`           | Jump to current result             |
+| `Home` or `J`    | Jump to current result             |
 | `Backspace`      | Return to the tile before the jump |
 | `End`            | Distance and direction to result   |
 | `Ctrl+F`         | Search scanner categories          |
