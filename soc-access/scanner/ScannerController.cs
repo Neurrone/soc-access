@@ -286,17 +286,14 @@ namespace SongsOfConquestAccess.Scanner
                 return NoResults();
             }
 
-            bool wrapped = false;
-            int previousIndex = _itemIndex;
+            bool wrapped;
             _itemIndex = WrapIndex(_itemIndex, subcategory.Items.Count, delta, out wrapped);
             _instanceIndex = 0;
             if (!locatedCurrent)
             {
+                // Landing back on the list after losing the old result is not
+                // a wrap; the player never walked off the end of anything.
                 wrapped = false;
-            }
-            else if (delta != 0 && subcategory.Items.Count == 1 && previousIndex == _itemIndex)
-            {
-                wrapped = true;
             }
 
             ScannerCommandResult result = BuildCommandResult(includePath: false);
@@ -352,16 +349,11 @@ namespace SongsOfConquestAccess.Scanner
                 return NoResults();
             }
 
-            bool wrapped = false;
-            int previousIndex = _instanceIndex;
+            bool wrapped;
             _instanceIndex = WrapIndex(_instanceIndex, item.Instances.Count, delta, out wrapped);
             if (!locatedCurrent)
             {
                 wrapped = false;
-            }
-            else if (delta != 0 && item.Instances.Count == 1 && previousIndex == _instanceIndex)
-            {
-                wrapped = true;
             }
 
             ScannerCommandResult result = BuildCommandResult(includePath: false);

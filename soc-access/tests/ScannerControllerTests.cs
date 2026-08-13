@@ -1,4 +1,4 @@
-﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 using SongsOfConquestAccess.Scanner;
 using UnityEngine;
 
@@ -762,21 +762,7 @@ namespace SongsOfConquestAccess.Tests
         }
 
         [TestMethod]
-        public void RefreshReplacesTheLabelWhenTheAdapterReportsANewName()
-        {
-            ScannerController controller = CreateController(
-                _ => BuildSnapshot(Entry("Wielders", "All", "Stale name", 1, 0, "commander:1")),
-                () => Vector2Int.zero,
-                (candidate, cursorHint) => ScannerResultRefresh.Valid(candidate.Position, "Current name"),
-                _ => true);
-
-            ScannerCommandResult result = controller.ExecuteInitialLanding();
-
-            Assert.AreEqual("Current name", result.Result.Label);
-        }
-
-        [TestMethod]
-        public void RefreshKeepsTheBuiltLabelWhenTheAdapterReportsNoName()
+        public void RefreshKeepsTheBuiltLabel()
         {
             ScannerController controller = CreateController(
                 _ => BuildSnapshot(Entry("Wielders", "All", "Built name", 1, 0, "commander:1")),

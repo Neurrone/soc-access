@@ -18,11 +18,6 @@ namespace SongsOfConquestAccess.Adapters
     /// </summary>
     internal static class NativeTextPrompt
     {
-        public static bool IsAvailable
-        {
-            get { return Resolve() != null; }
-        }
-
         /// <summary>
         /// Asks for a line of text and reports it back when the player confirms.
         /// A cancelled prompt calls nothing. Returns false when the game has no
@@ -49,9 +44,23 @@ namespace SongsOfConquestAccess.Adapters
                         InputLevel.Popup)
                     .Then((Action<AsyncResponse>)(response =>
                     {
-                        if (response.Success)
+                        if (!response.Success)
+                        {
+                            return;
+                        }
+
+                        // The game holds this callback for as long as the popup
+                        // is open, which can outlive a script reload. Whatever
+                        // it lands in by then is the mod's problem, not the
+                        // game's, so it never escapes into the popup.
+                        try
                         {
                             onConfirm(response.Message);
+                        }
+                        catch (Exception callbackException)
+                        {
+                            SocAccessPlugin.Instance?.LogWarning(
+                                "Text prompt callback failed: " + callbackException);
                         }
                     }));
                 return true;

@@ -1444,51 +1444,6 @@ namespace SongsOfConquestAccess.Adapters
             }
         }
 
-        private void AddMapEntityScannerResults(ScannerSnapshot snapshot, int localTeamId, Dictionary<Vector2Int, AdventureMapTile> tileCache)
-        {
-            IEnumerable<IMapEntity> entities = _facade != null && _facade.MapEntities != null ? _facade.MapEntities.All : null;
-            if (entities == null)
-            {
-                return;
-            }
-
-            foreach (IMapEntity entity in entities)
-            {
-                if (entity == null || !entity.IsEnabled || !IsWithinMap(entity.Position))
-                {
-                    continue;
-                }
-
-                AdventureMapTile tile;
-                if (!TryGetMapEntityIdentityTile(entity, tileCache, out tile))
-                {
-                    continue;
-                }
-
-                string name = FirstNonEmpty(tile.MapEntityName, GetMapEntityName(entity));
-                bool notVisible = !tile.IsVisible;
-                string entityRelationship = GetMapEntityRelationship(entity, localTeamId);
-                string relationship = ScannerRelationshipKey(entityRelationship);
-                ScannerResult result = new ScannerResult(ScannerKey("entity", entity.Id), name, tile.Position)
-                {
-                    NotVisible = notVisible,
-                    Unvisited = IsScannerPickupEntity(entity) && IsUnvisited(entity),
-                    Relationship = ScannerRelationship(entityRelationship),
-                    StableReference = entity.Id,
-                    EntityCategory = ClassifyMapEntity(entity)
-                };
-
-                AddStructuralMapEntityResult(snapshot, entity, relationship, result);
-                AddTroopSourceResult(snapshot, entity, relationship, result);
-                if (IsScannerPickupEntity(entity))
-                {
-                    AddPickupResult(snapshot, entity, result);
-                }
-
-                AddSpecialMapEntityResult(snapshot, entity, result);
-            }
-        }
-
         private void AddStructuralScannerResults(ScannerSnapshot snapshot, int localTeamId, Dictionary<Vector2Int, AdventureMapTile> tileCache, params MapEntityCategory[] categories)
         {
             ForEachScannerEntity(tileCache, entity =>
@@ -2138,37 +2093,6 @@ namespace SongsOfConquestAccess.Adapters
 
             ICommanderState selectedCommander = _selectionHandler != null ? _selectionHandler.SelectedCommander : null;
             return selectedCommander == null || !entity.DidVisit(selectedCommander.Id);
-        }
-
-        private void AddSpecialMapEntityResult(ScannerSnapshot snapshot, IMapEntity entity, ScannerResult result)
-        {
-            if (entity.HasComponent<IArtifactMarketComponent>())
-            {
-                snapshot.Add(ScannerCategoryKeys.ArtifactMarkets, ScannerSubcategoryKeys.All, CloneResult(result));
-            }
-
-            if (entity.Category == MapEntityCategory.Objective || entity.Category == MapEntityCategory.Story)
-            {
-                snapshot.Add(ScannerCategoryKeys.Objectives, ScannerSubcategoryKeys.All, CloneResult(result));
-            }
-
-            if (entity.HasComponent<ITeleportComponent>() || entity.HasComponent<ITownPortalComponent>() || entity.HasComponent<ITownPortalBuildingComponent>())
-            {
-                snapshot.Add(ScannerCategoryKeys.Teleport, ScannerSubcategoryKeys.All, CloneResult(result));
-            }
-
-            if (entity.Category == MapEntityCategory.Hostile)
-            {
-                snapshot.Add(ScannerCategoryKeys.Obstacles, ScannerSubcategoryKeys.All, CloneResult(result));
-            }
-            else if (entity.HasComponent<IMagicGateCommonComponent>() || entity.HasComponent<IUnlockWithArtifactComponent>())
-            {
-                snapshot.Add(ScannerCategoryKeys.Obstacles, ScannerSubcategoryKeys.All, CloneResult(result));
-            }
-            else if (entity.Category == MapEntityCategory.Obstacle)
-            {
-                snapshot.Add(ScannerCategoryKeys.Obstacles, ScannerSubcategoryKeys.All, CloneResult(result));
-            }
         }
 
         private MapEntityPreVisitDetails.PreVisitHint GetPreVisitHint(IMapEntity entity)
