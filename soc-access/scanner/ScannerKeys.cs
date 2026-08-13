@@ -29,6 +29,19 @@ namespace SongsOfConquestAccess.Scanner
     }
 
     /// <summary>
+    /// Stable identifiers for the scanner taxonomies themselves. Custom
+    /// categories are stored against these, so they must never change once
+    /// shipped.
+    /// </summary>
+    internal static class ScannerTaxonomyKeys
+    {
+        public const string Adventure = "adventure";
+        public const string Battle = "battle";
+
+        public static readonly string[] All = { Adventure, Battle };
+    }
+
+    /// <summary>
     /// Stable identifiers for scanner subcategories. Shared across taxonomies
     /// where the meaning is the same.
     /// </summary>

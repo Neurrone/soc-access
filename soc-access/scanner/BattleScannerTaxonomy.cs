@@ -10,6 +10,7 @@ namespace SongsOfConquestAccess.Scanner
     internal static class BattleScannerTaxonomy
     {
         public static readonly ScannerTaxonomy Instance = new ScannerTaxonomy(
+            ScannerTaxonomyKeys.Battle,
             Sides(ScannerCategoryKeys.Troops, ModStrings.Scanner.Troops),
             Sides(ScannerCategoryKeys.SpawnPoints, ModStrings.Scanner.SpawnPoints),
             new ScannerCategoryDefinition(

@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using SongsOfConquestAccess.Audio;
+using SongsOfConquestAccess.Scanner;
 using SongsOfConquestAccess.Speech.Spatial;
 
 namespace SongsOfConquestAccess
@@ -30,6 +31,8 @@ namespace SongsOfConquestAccess
             new Dictionary<string, AnnouncementGroupConfig>();
         private static readonly Dictionary<string, AudioCueConfig> _audioCues =
             new Dictionary<string, AudioCueConfig>();
+        private static readonly Dictionary<string, ScannerCustomCategoryConfig> _scannerCustomCategories =
+            new Dictionary<string, ScannerCustomCategoryConfig>();
 
         public static bool ReadEnemyInfluence
         {
@@ -76,6 +79,7 @@ namespace SongsOfConquestAccess
                 "Whether spoken directions use the long form (\"3 northeast\") instead of the short form (\"3ne\").");
             BindAnnouncementGroups(config);
             BindAudioCues(config);
+            BindScannerCustomCategories(config);
         }
 
         public static void SetReadEnemyInfluence(bool value)
@@ -342,6 +346,76 @@ namespace SongsOfConquestAccess
             _config?.Save();
         }
 
+        public static IReadOnlyList<ScannerCustomCategory> GetScannerCustomCategories(string taxonomyKey)
+        {
+            ScannerCustomCategoryList list = GetScannerCustomCategoryList(taxonomyKey);
+            return list != null ? list.Categories : new ScannerCustomCategory[0];
+        }
+
+        public static ScannerCustomCategory GetScannerCustomCategory(string taxonomyKey, int id)
+        {
+            ScannerCustomCategoryList list = GetScannerCustomCategoryList(taxonomyKey);
+            return list != null ? list.Get(id) : null;
+        }
+
+        /// <summary>
+        /// The caller supplies the starting name because the wording is
+        /// localized accessibility text, and it is stored rather than derived so
+        /// it stays put when an earlier category is deleted.
+        /// </summary>
+        public static ScannerCustomCategory AddScannerCustomCategory(string taxonomyKey, Func<int, string> nameForPosition)
+        {
+            ScannerCustomCategoryList list = GetScannerCustomCategoryList(taxonomyKey);
+            if (list == null)
+            {
+                return null;
+            }
+
+            ScannerCustomCategory category = list.Add(nameForPosition);
+            SaveScannerCustomCategories(taxonomyKey, list);
+            return category;
+        }
+
+        public static bool RemoveScannerCustomCategory(string taxonomyKey, int id)
+        {
+            ScannerCustomCategoryList list = GetScannerCustomCategoryList(taxonomyKey);
+            if (list == null || !list.Remove(id))
+            {
+                return false;
+            }
+
+            SaveScannerCustomCategories(taxonomyKey, list);
+            return true;
+        }
+
+        public static bool RenameScannerCustomCategory(string taxonomyKey, int id, string name)
+        {
+            return MutateScannerCustomCategory(taxonomyKey, id, category => category.Rename(name));
+        }
+
+        public static bool SetScannerCustomCategorySelector(
+            string taxonomyKey,
+            int id,
+            string categoryKey,
+            string subcategoryKey,
+            bool selected)
+        {
+            return MutateScannerCustomCategory(
+                taxonomyKey,
+                id,
+                category => category.SetSelector(categoryKey, subcategoryKey, selected));
+        }
+
+        public static bool AddScannerCustomCategoryKeyword(string taxonomyKey, int id, string keyword)
+        {
+            return MutateScannerCustomCategory(taxonomyKey, id, category => category.AddKeyword(keyword));
+        }
+
+        public static bool RemoveScannerCustomCategoryKeyword(string taxonomyKey, int id, string keyword)
+        {
+            return MutateScannerCustomCategory(taxonomyKey, id, category => category.RemoveKeyword(keyword));
+        }
+
         public static void Reset()
         {
             _config = null;
@@ -351,6 +425,7 @@ namespace SongsOfConquestAccess
             _scannerUsesLongDirections = null;
             _announcementGroups.Clear();
             _audioCues.Clear();
+            _scannerCustomCategories.Clear();
         }
 
         private static void BindAudioCues(ConfigFile config)
@@ -412,6 +487,83 @@ namespace SongsOfConquestAccess
             }
 
             return value > maximum ? maximum : value;
+        }
+
+        private static void BindScannerCustomCategories(ConfigFile config)
+        {
+            _scannerCustomCategories.Clear();
+            for (int i = 0; i < ScannerTaxonomyKeys.All.Length; i++)
+            {
+                string taxonomyKey = ScannerTaxonomyKeys.All[i];
+                _scannerCustomCategories[taxonomyKey] = new ScannerCustomCategoryConfig
+                {
+                    Entry = config.Bind(
+                        "Scanner",
+                        ToConfigKeyPrefix(taxonomyKey) + "CustomCategories",
+                        string.Empty,
+                        "Player-defined scanner categories for this context. Edited through the mod settings screen.")
+                };
+            }
+        }
+
+        /// <summary>
+        /// Decoded once per context and kept, because these are player settings
+        /// rather than game state: nothing outside this class can change them
+        /// between reads.
+        /// </summary>
+        private static ScannerCustomCategoryList GetScannerCustomCategoryList(string taxonomyKey)
+        {
+            ScannerCustomCategoryConfig config = GetScannerCustomCategoryConfig(taxonomyKey);
+            if (config == null)
+            {
+                return null;
+            }
+
+            if (config.List == null)
+            {
+                config.List = ScannerCustomCategoryCodec.Decode(config.Entry != null ? config.Entry.Value : null);
+            }
+
+            return config.List;
+        }
+
+        private static ScannerCustomCategoryConfig GetScannerCustomCategoryConfig(string taxonomyKey)
+        {
+            if (string.IsNullOrWhiteSpace(taxonomyKey))
+            {
+                return null;
+            }
+
+            ScannerCustomCategoryConfig config;
+            return _scannerCustomCategories.TryGetValue(taxonomyKey, out config) ? config : null;
+        }
+
+        private static bool MutateScannerCustomCategory(
+            string taxonomyKey,
+            int id,
+            Func<ScannerCustomCategory, bool> mutate)
+        {
+            ScannerCustomCategoryList list = GetScannerCustomCategoryList(taxonomyKey);
+            ScannerCustomCategory category = list != null ? list.Get(id) : null;
+            if (category == null || mutate == null || !mutate(category))
+            {
+                return false;
+            }
+
+            SaveScannerCustomCategories(taxonomyKey, list);
+            return true;
+        }
+
+        private static void SaveScannerCustomCategories(string taxonomyKey, ScannerCustomCategoryList list)
+        {
+            ScannerCustomCategoryConfig config = GetScannerCustomCategoryConfig(taxonomyKey);
+            if (config == null || config.Entry == null)
+            {
+                return;
+            }
+
+            config.Entry.Value = ScannerCustomCategoryCodec.Encode(list);
+            _config?.Save();
         }
 
         private static void BindAnnouncementGroups(ConfigFile config)
@@ -636,6 +788,12 @@ namespace SongsOfConquestAccess
             public ConfigEntry<int> Volume { get; set; }
             public ConfigEntry<int> PitchSemitones { get; set; }
             public ConfigEntry<int> DurationScale { get; set; }
+        }
+
+        private sealed class ScannerCustomCategoryConfig
+        {
+            public ConfigEntry<string> Entry { get; set; }
+            public ScannerCustomCategoryList List { get; set; }
         }
     }
 }

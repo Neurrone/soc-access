@@ -5,6 +5,7 @@ namespace SongsOfConquestAccess.Scanner
     internal static class AdventureScannerTaxonomy
     {
         public static readonly ScannerTaxonomy Instance = new ScannerTaxonomy(
+            ScannerTaxonomyKeys.Adventure,
             new ScannerCategoryDefinition(
                 ScannerCategoryKeys.Pickups,
                 () => ModText.Get(ModStrings.Scanner.Pickups),
