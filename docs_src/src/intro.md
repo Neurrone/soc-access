@@ -9,6 +9,7 @@ Songs of Conquest Access is a screen reader accessibility mod for Songs of Conqu
 - Keyboard-based drag-and-drop, which is used extensively throughout the game
 - Buffer system for review of tooltips, lengthy text elements and event notifications
 - Scanner system, bookmarks and audio beacons for overworld navigation
+- Sound cues for terrain, map contents and battlefield hexes, plus a sonar sweep of your surroundings, all tunable from an [audio glossary](audio.md)
 - Narration of all combat events with summaries to condense similar events for less verbosity
 - In combat, readouts for threat information for tiles: attack, deadly and movement range as well as zone of control
 - AI written translations for all other languages that the game supports: French, Italian, German, Spanish, Polish, Russian, Portuguese - Brazil, Simplified Chinese, Korean, Traditional Chinese, Ukrainian, Turkish and Japanese

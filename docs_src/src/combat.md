@@ -34,11 +34,13 @@ Move through the hex grid with:
 
 Use drag and drop to rearrange your troops.
 
-The deployment grid also supports the [Scanner](scanner.md) for finding enemy troops, spawn points and terrain features. Scan from the centre tile with audio beeps enabled to understand the position of troops and terrain features.
+The deployment grid also supports the [Scanner](scanner.md) for finding enemy troops, spawn points and terrain features. Scanning from the centre tile is a quick way to understand where troops and terrain features are, since each result is heard in the direction it lies in. See [Audio](audio.md#scanner-results).
 
 ## Combat
 
 The combat hex grid uses the same keys for navigation and also supports the [Scanner](scanner.md).
+
+Each hex you land on plays a short sound for what is on it: whether it is empty, raised, obstructed, holds an ally or an enemy, or is threatened by an enemy. See [Audio](audio.md#battlefield-sounds).
 
 Every troop stack has a tooltip which can be reviewed with the UI buffer.
 

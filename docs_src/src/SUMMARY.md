@@ -11,6 +11,7 @@
 - [Troop Management](troop-management.md)
 - [Character Sheet and Trading](character-sheet-and-trading.md)
 - [Combat](combat.md)
+- [Audio](audio.md)
 - [Mod settings](mod-settings.md)
 - [Codex](codex.md)
 - [Command Reference](command-reference.md)

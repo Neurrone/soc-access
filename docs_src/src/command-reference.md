@@ -64,7 +64,7 @@ This page summarizes the mod hotkeys used across the documentation.
 | `Backslash`         | Secondary tile action               |
 | `A`                 | Summarize reachable entities        |
 | `D`                 | Describe cursor position and map size |
-| `P`                 | Play a sonar sweep of nearby entities |
+| `P`                 | Play a [sonar sweep](audio.md#sonar-sweep) of nearby entities |
 | `W`                 | Select next wielder                 |
 | `S`                 | Select next settlement              |
 | `Space`             | Move focus to selected wielder tile |
@@ -76,7 +76,7 @@ This page summarizes the mod hotkeys used across the documentation.
 | `Ctrl+number`       | Save bookmark                       |
 | `Shift+number`      | Jump to bookmark                    |
 | `Alt+number`        | Read directions to bookmark         |
-| `Ctrl+Shift+number` | Toggle bookmark beacon              |
+| `Ctrl+Shift+number` | Toggle [bookmark beacon](audio.md#bookmark-beacons) |
 
 ## Scanner
 
