@@ -1,6 +1,6 @@
 # Audio
 
-The mod uses sound and speech for different jobs. Sound carries geometry and category: what kind of thing is on a tile, whether it is friendly or hostile, and which direction it lies in. Speech keeps the names, numbers and exact states. A cue always acknowledges that the cursor moved, even when the announcement for that tile is short or silent.
+The mod uses sound and speech for different jobs. Sound carries geometry and category: what kind of thing is on a tile, whether it is friendly or hostile, and which direction it lies in. Speech keeps the names, numbers and exact states.
 
 Every cue is listed in the [audio glossary](#the-audio-glossary-and-tuning), where you can play it on demand and change how it sounds.
 
@@ -53,7 +53,7 @@ Notes on how the gesture behaves:
 The combat hex grid and the troop deployment grid play a cue for each hex you land on.
 
 - `Battlefield: empty hex`: a soft tick for an empty, passable hex at ground level.
-- `Battlefield: hex, elevation 1`, `Battlefield: hex, elevation 2`, `Battlefield: hex, elevation 3`: the same tick raised one step higher for each level of elevation. Levels above three sound the same as three. An empty raised hex plays only its elevation cue. On an occupied or obstructed hex, the elevation cue plays first and the rest of the hex follows just behind it, so the raised ground stays audible.
+- `Battlefield: hex, elevation 1`, `Battlefield: hex, elevation 2`, `Battlefield: hex, elevation 3`: the same tick raised one step higher for each level of elevation. An empty raised hex plays only its elevation cue. On an occupied or obstructed hex, the elevation cue plays first and the rest of the hex follows just behind it, so the raised ground stays audible.
 - Troops use the same `Ally` and `Enemy` sounds as the adventure map, so affiliation is one sound language everywhere.
 - `Battlefield: acting troop`: two high blips after the occupant's sound, marking the stack whose turn it is.
 - Obstacles and impassable hexes use `Impassable tile`, the same low thud as impassable terrain.
