@@ -3,14 +3,12 @@
 ## V1.0.0
 
 - Added a procedural sound system: moving the accessibility cursor now plays a short cue for every tile, on the adventure map (roads, open ground, sand, water, trees, impassable and unexplored tiles) and on the battlefield and troop deployment grids (empty hexes, elevation levels 1 to 3, obstacles, and troops)
-- Things on the map play a two-part gesture instead of their terrain sound: a category sound for wielders, settlements, resource deposits, and pickups, followed by an `Ally` or `Enemy` marker. Neutral things play the category sound alone, keeping ally and enemy easy to pick out
-- Added `Battlefield: threatened hex`, a warning that plays first on unoccupied hexes that enemies can attack, exactly when speech would call the hex threatened
-- Added a sonar sweep on `P`: every entity the scanner can see within the look around radius plays its gesture from west to east, positioned by direction and quieter with distance, giving the shape of your surroundings in a few seconds
-- Moving through scanner results now plays each result's sound positioned relative to the cursor. This replaces the "Scanner plays directional beep" setting and its sound file
-- Added an audio glossary, reachable from the new Audio tab in mod settings: play any cue on demand to learn it, and tune each cue's volume, pitch, and duration or disable it, with every change replayed instantly
-- A refused move, such as bumping the map edge or a skip that finds nothing, now plays a falling bonk sound
-- Tabbing into the adventure map or a hex grid plays the current tile's sound along with its announcement
-- Added an [Audio chapter](audio.md) to the documentation consolidating all sound features in one place
+  - Things on the map play a two-part gesture instead of their terrain sound: a category sound for wielders, settlements, resource deposits, and pickups, followed by an `Ally` or `Enemy` marker. Neutral things play the category sound alone, keeping ally and enemy easy to pick out
+  - Added a sonar sweep on `P`: every entity the scanner can see within the look around radius plays its gesture from west to east, positioned by direction and quieter with distance, giving the shape of your surroundings in a few seconds
+  - Moving through scanner results now plays each result's sound positioned relative to the cursor. This replaces the "Scanner plays directional beep" setting and its sound file
+  - Added an audio glossary, reachable from the new Audio tab in mod settings: play any cue on demand to learn it, and tune each cue's volume, pitch, and duration or disable it
+  - A refused move, such as bumping the map edge or a skip that finds nothing, now plays a falling bonk sound
+  - Added an [Audio chapter](audio.md) to the documentation consolidating all sound features in one place
 
 ## V0.7.4
 
