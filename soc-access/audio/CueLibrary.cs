@@ -45,17 +45,18 @@ namespace SongsOfConquestAccess.Audio
         public const string TerrainTrees = "terrain_trees";
         public const string TerrainImpassable = "terrain_impassable";
         public const string TerrainUnexplored = "terrain_unexplored";
-        public const string EntityNeutral = "entity_neutral";
         public const string EntityFriendly = "entity_friendly";
         public const string EntityEnemy = "entity_enemy";
         public const string MoveDenied = "move_denied";
+        public const string SweepWielder = "sweep_wielder";
+        public const string SweepSettlement = "sweep_settlement";
+        public const string SweepResource = "sweep_resource";
+        public const string SweepPickup = "sweep_pickup";
         public const string HexEmpty = "hex_empty";
         public const string HexElevation1 = "hex_elevation_1";
         public const string HexElevation2 = "hex_elevation_2";
         public const string HexElevation3 = "hex_elevation_3";
-        public const string HexObstacle = "hex_obstacle";
-        public const string HexAlly = "hex_ally";
-        public const string HexEnemy = "hex_enemy";
+        public const string HexDanger = "hex_danger";
         public const string HexActive = "hex_active";
 
         private static readonly List<CueDefinition> _allCues = BuildCues();
@@ -189,7 +190,38 @@ namespace SongsOfConquestAccess.Audio
             return delays;
         }
 
-        private static float GetAudibleDurationSeconds(string key)
+        /// <summary>
+        /// How long the whole serialized stack sounds, for callers that must not start another
+        /// stack on top of it. Pure; the live lookup is <see cref="GetStackDurationSeconds"/>.
+        /// </summary>
+        internal static float ComputeStackDurationSeconds(IReadOnlyList<TileCue> cues, Func<string, float> durationSeconds)
+        {
+            if (cues == null || cues.Count == 0)
+            {
+                return 0f;
+            }
+
+            float[] delays = ComputeDelaySeconds(cues, durationSeconds);
+            float end = 0f;
+            for (int i = 0; i < cues.Count; i++)
+            {
+                float finish = delays[i] + durationSeconds(cues[i].Key);
+                if (finish > end)
+                {
+                    end = finish;
+                }
+            }
+
+            return end;
+        }
+
+        public static float GetStackDurationSeconds(IReadOnlyList<TileCue> cues)
+        {
+            return ComputeStackDurationSeconds(cues, GetAudibleDurationSeconds);
+        }
+
+        /// <summary>Zero for cues the user has silenced, so they take no room in a schedule.</summary>
+        internal static float GetAudibleDurationSeconds(string key)
         {
             if (!ModSettings.TileCuesEnabled || !ModSettings.GetCueEnabled(key))
             {
@@ -297,14 +329,8 @@ namespace SongsOfConquestAccess.Audio
                     Tone(CueWaveform.Sine, 220f, 0f, 25f, 4f, 10f),
                     Tone(CueWaveform.Sine, 220f, 90f, 25f, 4f, 10f))));
 
-            cues.Add(new CueDefinition(
-                EntityNeutral,
-                CueCategory.Overworld,
-                ModStrings.Audio.EntityNeutral,
-                Spec(
-                    EntityNeutral,
-                    Tone(CueWaveform.Triangle, 880f, 0f, 20f, 4f, 6f),
-                    Tone(CueWaveform.Triangle, 1046f, 20f, 20f, 4f, 8f))));
+            // Affiliation is one sound language: these also mark troops on the battlefield, so
+            // they keep the context-free names "Ally" and "Enemy".
             cues.Add(new CueDefinition(
                 EntityFriendly,
                 CueCategory.Overworld,
@@ -318,6 +344,39 @@ namespace SongsOfConquestAccess.Audio
                     EntityEnemy,
                     Tone(CueWaveform.Triangle, 587f, 0f, 30f, 4f, 12f),
                     Tone(CueWaveform.Triangle, 587f, 40f, 30f, 4f, 12f))));
+            // Sonar sweep voices. Each names a category and is immediately followed at the same
+            // pan by an entity_* affiliation marker, so all four avoid the affiliation timbres:
+            // a low rising triangle horn, a static sine fifth, and two very high sine blips.
+            cues.Add(new CueDefinition(
+                SweepWielder,
+                CueCategory.Overworld,
+                ModStrings.Audio.SweepWielder,
+                Spec(
+                    SweepWielder,
+                    Tone(CueWaveform.Triangle, 392f, 0f, 30f, 4f, 10f),
+                    Tone(CueWaveform.Triangle, 523f, 30f, 35f, 4f, 14f))));
+            cues.Add(new CueDefinition(
+                SweepSettlement,
+                CueCategory.Overworld,
+                ModStrings.Audio.SweepSettlement,
+                Spec(
+                    SweepSettlement,
+                    Tone(CueWaveform.Sine, 392f, 0f, 60f, 6f, 24f),
+                    Tone(CueWaveform.Sine, 588f, 0f, 60f, 6f, 24f))));
+            cues.Add(new CueDefinition(
+                SweepResource,
+                CueCategory.Overworld,
+                ModStrings.Audio.SweepResource,
+                Spec(
+                    SweepResource,
+                    Tone(CueWaveform.Sine, 1319f, 0f, 18f, 4f, 6f),
+                    Tone(CueWaveform.Sine, 1319f, 26f, 18f, 4f, 8f))));
+            cues.Add(new CueDefinition(
+                SweepPickup,
+                CueCategory.Overworld,
+                ModStrings.Audio.SweepPickup,
+                Spec(SweepPickup, Tone(CueWaveform.Sine, 1568f, 0f, 40f, 4f, 16f))));
+
             cues.Add(new CueDefinition(
                 MoveDenied,
                 CueCategory.Overworld,
@@ -347,25 +406,16 @@ namespace SongsOfConquestAccess.Audio
                 CueCategory.Combat,
                 ModStrings.Audio.HexElevation3,
                 ElevatedHexSpec(HexElevation3, 12f)));
+            // A falling tritone: the one dissonant interval in the set, so danger never reads
+            // as a variant of another cue.
             cues.Add(new CueDefinition(
-                HexObstacle,
+                HexDanger,
                 CueCategory.Combat,
-                ModStrings.Audio.HexObstacle,
-                Spec(HexObstacle, Tone(CueWaveform.Sine, 150f, 0f, 90f, 5f, 40f))));
-            cues.Add(new CueDefinition(
-                HexAlly,
-                CueCategory.Combat,
-                ModStrings.Audio.HexAlly,
-                Spec(HexAlly, Tone(CueWaveform.Sine, 784f, 0f, 50f, 4f, 20f))));
-            // Same sound as EntityEnemy — enemy is enemy, on the map or the battlefield.
-            cues.Add(new CueDefinition(
-                HexEnemy,
-                CueCategory.Combat,
-                ModStrings.Audio.HexEnemy,
+                ModStrings.Audio.HexDanger,
                 Spec(
-                    HexEnemy,
-                    Tone(CueWaveform.Triangle, 587f, 0f, 30f, 4f, 12f),
-                    Tone(CueWaveform.Triangle, 587f, 40f, 30f, 4f, 12f))));
+                    HexDanger,
+                    Tone(CueWaveform.Triangle, 566f, 0f, 30f, 4f, 12f),
+                    Tone(CueWaveform.Triangle, 400f, 35f, 30f, 4f, 12f))));
             cues.Add(new CueDefinition(
                 HexActive,
                 CueCategory.Combat,

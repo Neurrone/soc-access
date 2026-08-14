@@ -99,6 +99,7 @@ namespace SongsOfConquestAccess.UI
                 || actionKey == AccessibilityActions.NextSettlement.Key
                 || actionKey == AccessibilityActions.SummarizeReachableEntities.Key
                 || actionKey == AccessibilityActions.DescribePosition.Key
+                || actionKey == AccessibilityActions.SonarSweep.Key
                 || IsBookmarkAction(actionKey)
                 || IsBeaconAction(actionKey)
                 || IsScannerAction(actionKey);
@@ -191,6 +192,11 @@ namespace SongsOfConquestAccess.UI
                 return SpeakPosition();
             }
 
+            if (action.Key == AccessibilityActions.SonarSweep.Key)
+            {
+                return PlaySonarSweep();
+            }
+
             return false;
         }
 
@@ -281,18 +287,44 @@ namespace SongsOfConquestAccess.UI
                 semitoneOffset);
         }
 
-        /// <summary>The remote tile's own cues carry the direction to it; out of range plays nothing.</summary>
-        private void PlayDirectionalTileCues(Vector2Int origin, Vector2Int target)
+        /// <summary>
+        /// The result's own cues carry the direction to it; out of range plays nothing. A
+        /// categorised entry sounds exactly as the sonar sweep pings it; terrain groups,
+        /// unexplored regions and zones of control fall back to the tile they land on.
+        /// </summary>
+        private void PlayDirectionalTileCues(Vector2Int origin, ScannerResult result)
         {
             float pan;
             float semitones;
             float gainScale;
-            if (!DirectionalCueMath.TryCompute(origin, target, CueGridGeometry.Square, out pan, out semitones, out gainScale))
+            if (!DirectionalCueMath.TryCompute(origin, result.Position, CueGridGeometry.Square, out pan, out semitones, out gainScale))
             {
                 return;
             }
 
-            PlayTileCuesFor(target, pan, gainScale, semitones);
+            IReadOnlyList<TileCue> cues = SweepSelector.ForScannerResult(result, point => _adapter.GetTile(point));
+            if (cues.Count == 0)
+            {
+                PlayTileCuesFor(result.Position, pan, gainScale, semitones);
+                return;
+            }
+
+            CueLibrary.PlayCues(cues, pan, gainScale, semitones);
+        }
+
+        /// <summary>Pings every scanner-visible entity within the look-around radius, west to east.
+        /// Speech is untouched, and an empty sweep is silent because silence is the accurate answer.</summary>
+        private bool PlaySonarSweep()
+        {
+            ScannerSnapshot lookAround = ScannerLookAround.Build(
+                _adapter.BuildScannerSnapshot(_cursorTile),
+                _cursorTile,
+                _lookAroundRadius);
+            SweepPlayer.Start(
+                SweepSelector.ForLookAround(lookAround, point => _adapter.GetTile(point)),
+                _cursorTile,
+                CueGridGeometry.Square);
+            return true;
         }
 
         private bool Move(int xDelta, int yDelta)
@@ -572,7 +604,7 @@ namespace SongsOfConquestAccess.UI
             if (result != null && result.Status == ScannerCommandStatus.Result && result.Result != null)
             {
                 Vector2Int origin = result.HasOrigin ? result.Origin : _cursorTile;
-                PlayDirectionalTileCues(origin, result.Result.Position);
+                PlayDirectionalTileCues(origin, result.Result);
             }
 
             _scanner.Output(result);

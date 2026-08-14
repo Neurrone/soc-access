@@ -1450,6 +1450,11 @@ msgctxt "Actions.SliderMinimum"
 msgid "Slider Minimum"
 msgstr "슬라이더 최소"
 
+#. Actions.SonarSweep
+msgctxt "Actions.SonarSweep"
+msgid "Play Sonar Sweep"
+msgstr "소나 스윕 재생"
+
 #. Actions.StartDrag
 msgctxt "Actions.StartDrag"
 msgid "Start Drag"
@@ -3258,20 +3263,15 @@ msgctxt "Audio.EntityFriendly"
 msgid "Ally"
 msgstr "아군"
 
-#. Audio.EntityNeutral
-msgctxt "Audio.EntityNeutral"
-msgid "Neutral"
-msgstr "중립"
-
 #. Audio.HexActive
 msgctxt "Audio.HexActive"
 msgid "Battlefield: acting troop"
 msgstr "전장: 행동 중인 부대"
 
-#. Audio.HexAlly
-msgctxt "Audio.HexAlly"
-msgid "Battlefield: allied troop"
-msgstr "전장: 아군 부대"
+#. Audio.HexDanger
+msgctxt "Audio.HexDanger"
+msgid "Battlefield: threatened hex"
+msgstr "전장: 위협받는 타일"
 
 #. Audio.HexElevation1
 msgctxt "Audio.HexElevation1"
@@ -3293,20 +3293,30 @@ msgctxt "Audio.HexEmpty"
 msgid "Battlefield: empty hex"
 msgstr "전장: 빈 타일"
 
-#. Audio.HexEnemy
-msgctxt "Audio.HexEnemy"
-msgid "Battlefield: enemy troop"
-msgstr "전장: 적 부대"
-
-#. Audio.HexObstacle
-msgctxt "Audio.HexObstacle"
-msgid "Battlefield: obstacle"
-msgstr "전장: 장애물"
-
 #. Audio.MoveDenied
 msgctxt "Audio.MoveDenied"
 msgid "Map edge"
 msgstr "지도 가장자리"
+
+#. Audio.SweepPickup
+msgctxt "Audio.SweepPickup"
+msgid "Pickup"
+msgstr "획득물"
+
+#. Audio.SweepResource
+msgctxt "Audio.SweepResource"
+msgid "Resource deposit"
+msgstr "자원 매장지"
+
+#. Audio.SweepSettlement
+msgctxt "Audio.SweepSettlement"
+msgid "Settlement"
+msgstr "정착지"
+
+#. Audio.SweepWielder
+msgctxt "Audio.SweepWielder"
+msgid "Wielder"
+msgstr "위더"
 
 #. Audio.TerrainGround
 msgctxt "Audio.TerrainGround"

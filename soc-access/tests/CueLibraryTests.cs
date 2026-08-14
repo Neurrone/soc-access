@@ -17,17 +17,18 @@ namespace SongsOfConquestAccess.Tests
             CueLibrary.TerrainTrees,
             CueLibrary.TerrainImpassable,
             CueLibrary.TerrainUnexplored,
-            CueLibrary.EntityNeutral,
             CueLibrary.EntityFriendly,
             CueLibrary.EntityEnemy,
+            CueLibrary.SweepWielder,
+            CueLibrary.SweepSettlement,
+            CueLibrary.SweepResource,
+            CueLibrary.SweepPickup,
             CueLibrary.MoveDenied,
             CueLibrary.HexEmpty,
             CueLibrary.HexElevation1,
             CueLibrary.HexElevation2,
             CueLibrary.HexElevation3,
-            CueLibrary.HexObstacle,
-            CueLibrary.HexAlly,
-            CueLibrary.HexEnemy,
+            CueLibrary.HexDanger,
             CueLibrary.HexActive
         };
 
@@ -94,6 +95,32 @@ namespace SongsOfConquestAccess.Tests
                 Assert.AreEqual(flat.DurationMs, segment.DurationMs, 0.001f, elevationKeys[i]);
                 Assert.AreEqual(flat.AttackMs, segment.AttackMs, 0.001f, elevationKeys[i]);
                 Assert.AreEqual(flat.ReleaseMs, segment.ReleaseMs, 0.001f, elevationKeys[i]);
+            }
+        }
+
+        [TestMethod]
+        public void SweepVoicesStayShortAndHighEnoughToPrecedeAnAffiliationMarker()
+        {
+            string[] sweepKeys = { CueLibrary.SweepWielder, CueLibrary.SweepSettlement, CueLibrary.SweepResource, CueLibrary.SweepPickup };
+            for (int i = 0; i < sweepKeys.Length; i++)
+            {
+                CueDefinition cue = CueLibrary.GetCue(sweepKeys[i]);
+                Assert.AreEqual(CueCategory.Overworld, cue.Category, sweepKeys[i]);
+
+                float endMs = 0f;
+                for (int segmentIndex = 0; segmentIndex < cue.DefaultSpec.Segments.Count; segmentIndex++)
+                {
+                    CueSegment segment = cue.DefaultSpec.Segments[segmentIndex];
+                    Assert.IsTrue(segment.FrequencyHz >= 250f, sweepKeys[i]);
+                    Assert.IsTrue(segment.AttackMs >= 4f, sweepKeys[i]);
+                    float segmentEnd = segment.StartMs + segment.DurationMs;
+                    if (segmentEnd > endMs)
+                    {
+                        endMs = segmentEnd;
+                    }
+                }
+
+                Assert.IsTrue(endMs >= 40f && endMs <= 80f, sweepKeys[i] + " lasts " + endMs + " ms");
             }
         }
 

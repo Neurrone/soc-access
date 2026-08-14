@@ -101,5 +101,9 @@ namespace SongsOfConquestAccess.Adapters
         public bool MapEntityVisited { get; set; }
 
         public string MapEntityRelationship { get; set; }
+
+        /// <summary>The commander or map entity on this tile classified the way the scanner
+        /// classifies it; <see cref="AdventureEntityCategory.None"/> when nothing here qualifies.</summary>
+        public AdventureEntityCategory EntityCategory { get; set; }
     }
 }

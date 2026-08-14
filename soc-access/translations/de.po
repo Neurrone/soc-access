@@ -1460,6 +1460,11 @@ msgctxt "Actions.SliderMinimum"
 msgid "Slider Minimum"
 msgstr "Regler Minimum"
 
+#. Actions.SonarSweep
+msgctxt "Actions.SonarSweep"
+msgid "Play Sonar Sweep"
+msgstr "Sonar-Sweep abspielen"
+
 #. Actions.StartDrag
 msgctxt "Actions.StartDrag"
 msgid "Start Drag"
@@ -3378,20 +3383,15 @@ msgctxt "Audio.EntityFriendly"
 msgid "Ally"
 msgstr "Verbündeter"
 
-#. Audio.EntityNeutral
-msgctxt "Audio.EntityNeutral"
-msgid "Neutral"
-msgstr "Neutral"
-
 #. Audio.HexActive
 msgctxt "Audio.HexActive"
 msgid "Battlefield: acting troop"
 msgstr "Schlachtfeld: handelnde Einheit"
 
-#. Audio.HexAlly
-msgctxt "Audio.HexAlly"
-msgid "Battlefield: allied troop"
-msgstr "Schlachtfeld: verbündete Einheit"
+#. Audio.HexDanger
+msgctxt "Audio.HexDanger"
+msgid "Battlefield: threatened hex"
+msgstr "Schlachtfeld: bedrohtes Hexfeld"
 
 #. Audio.HexElevation1
 msgctxt "Audio.HexElevation1"
@@ -3413,20 +3413,30 @@ msgctxt "Audio.HexEmpty"
 msgid "Battlefield: empty hex"
 msgstr "Schlachtfeld: leeres Hexfeld"
 
-#. Audio.HexEnemy
-msgctxt "Audio.HexEnemy"
-msgid "Battlefield: enemy troop"
-msgstr "Schlachtfeld: gegnerische Einheit"
-
-#. Audio.HexObstacle
-msgctxt "Audio.HexObstacle"
-msgid "Battlefield: obstacle"
-msgstr "Schlachtfeld: Hindernis"
-
 #. Audio.MoveDenied
 msgctxt "Audio.MoveDenied"
 msgid "Map edge"
 msgstr "Kartenrand"
+
+#. Audio.SweepPickup
+msgctxt "Audio.SweepPickup"
+msgid "Pickup"
+msgstr "Sammelobjekt"
+
+#. Audio.SweepResource
+msgctxt "Audio.SweepResource"
+msgid "Resource deposit"
+msgstr "Ressourcenvorkommen"
+
+#. Audio.SweepSettlement
+msgctxt "Audio.SweepSettlement"
+msgid "Settlement"
+msgstr "Siedlung"
+
+#. Audio.SweepWielder
+msgctxt "Audio.SweepWielder"
+msgid "Wielder"
+msgstr "Machtträger"
 
 #. Audio.TerrainGround
 msgctxt "Audio.TerrainGround"

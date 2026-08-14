@@ -67,17 +67,17 @@ namespace SongsOfConquestAccess.Tests
         [TestMethod]
         public void ResetCueRestoresDefaults()
         {
-            ModSettings.SetCueEnabled(CueLibrary.HexEnemy, false);
-            ModSettings.SetCueVolume(CueLibrary.HexEnemy, 10);
-            ModSettings.SetCuePitchSemitones(CueLibrary.HexEnemy, 7);
-            ModSettings.SetCueDurationScale(CueLibrary.HexEnemy, 200);
+            ModSettings.SetCueEnabled(CueLibrary.HexActive, false);
+            ModSettings.SetCueVolume(CueLibrary.HexActive, 10);
+            ModSettings.SetCuePitchSemitones(CueLibrary.HexActive, 7);
+            ModSettings.SetCueDurationScale(CueLibrary.HexActive, 200);
 
-            ModSettings.ResetCue(CueLibrary.HexEnemy);
+            ModSettings.ResetCue(CueLibrary.HexActive);
 
-            Assert.IsTrue(ModSettings.GetCueEnabled(CueLibrary.HexEnemy));
-            Assert.AreEqual(ModSettings.CueVolumeDefault, ModSettings.GetCueVolume(CueLibrary.HexEnemy));
-            Assert.AreEqual(ModSettings.CuePitchSemitonesDefault, ModSettings.GetCuePitchSemitones(CueLibrary.HexEnemy));
-            Assert.AreEqual(ModSettings.CueDurationScaleDefault, ModSettings.GetCueDurationScale(CueLibrary.HexEnemy));
+            Assert.IsTrue(ModSettings.GetCueEnabled(CueLibrary.HexActive));
+            Assert.AreEqual(ModSettings.CueVolumeDefault, ModSettings.GetCueVolume(CueLibrary.HexActive));
+            Assert.AreEqual(ModSettings.CuePitchSemitonesDefault, ModSettings.GetCuePitchSemitones(CueLibrary.HexActive));
+            Assert.AreEqual(ModSettings.CueDurationScaleDefault, ModSettings.GetCueDurationScale(CueLibrary.HexActive));
         }
 
         [TestMethod]

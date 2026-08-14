@@ -516,8 +516,42 @@ namespace SongsOfConquestAccess.Adapters
             }
 
             tile.PathIndicator = BuildPathIndicatorForTile(clamped, selectedCommander, localTeamId);
+            tile.EntityCategory = tile.Commander != null
+                ? AdventureEntityCategory.Wielder
+                : ClassifyMapEntity(tile.MapEntity);
 
             return tile;
+        }
+
+        /// <summary>
+        /// The same tests the scanner category builders use, so a tile and a scanner result for
+        /// the same entity always agree. Categories the scanner lists elsewhere (obstacles,
+        /// objectives, teleports) classify as None.
+        /// </summary>
+        private static AdventureEntityCategory ClassifyMapEntity(IMapEntity entity)
+        {
+            if (entity == null)
+            {
+                return AdventureEntityCategory.None;
+            }
+
+            switch (entity.Category)
+            {
+                case MapEntityCategory.Town:
+                case MapEntityCategory.Settlement:
+                case MapEntityCategory.BuildSite:
+                case MapEntityCategory.Building:
+                    return AdventureEntityCategory.Settlement;
+                case MapEntityCategory.ResourceGenerator:
+                    return AdventureEntityCategory.ResourceDeposit;
+            }
+
+            if (entity.HasComponent<IRecruitmentPoolComponent>() || entity.HasComponent<ITroopDwellingComponent>())
+            {
+                return AdventureEntityCategory.Settlement;
+            }
+
+            return IsScannerPickupEntity(entity) ? AdventureEntityCategory.Pickup : AdventureEntityCategory.None;
         }
 
         private bool TryGetReachableMovementCost(
@@ -1362,7 +1396,8 @@ namespace SongsOfConquestAccess.Adapters
                 snapshot.Add(ModText.Get(ModStrings.Scanner.Wielders), ModText.Get(ModStrings.Scanner.All),
                     new ScannerResult(ScannerKey("commander", commander.Id), name, commander.Position)
                     {
-                        StableReference = commander.Id
+                        StableReference = commander.Id,
+                        EntityCategory = AdventureEntityCategory.Wielder
                     });
             }
         }
@@ -1394,7 +1429,8 @@ namespace SongsOfConquestAccess.Adapters
                 ScannerResult result = new ScannerResult(ScannerKey("entity", entity.Id), name, tile.Position)
                 {
                     NotVisible = notVisible,
-                    StableReference = entity.Id
+                    StableReference = entity.Id,
+                    EntityCategory = ClassifyMapEntity(entity)
                 };
 
                 AddStructuralMapEntityResult(snapshot, entity, relationship, result);
@@ -1698,7 +1734,8 @@ namespace SongsOfConquestAccess.Adapters
                 all.Results.Add(new ScannerResult(entry.Key, entry.Label, position)
                 {
                     NotVisible = tile != null && !tile.IsVisible,
-                    StableReference = entry.StableReference
+                    StableReference = entry.StableReference,
+                    EntityCategory = tile != null ? tile.EntityCategory : AdventureEntityCategory.None
                 });
             }
         }
@@ -1976,7 +2013,8 @@ namespace SongsOfConquestAccess.Adapters
             return new ScannerResult(ScannerKey("entity", entity.Id), name, tile.Position)
             {
                 NotVisible = !tile.IsVisible,
-                StableReference = entity.Id
+                StableReference = entity.Id,
+                EntityCategory = ClassifyMapEntity(entity)
             };
         }
 
@@ -2610,7 +2648,8 @@ namespace SongsOfConquestAccess.Adapters
             {
                 NotVisible = result.NotVisible,
                 StableReference = result.StableReference,
-                Kind = result.Kind
+                Kind = result.Kind,
+                EntityCategory = result.EntityCategory
             };
             clone.Points.AddRange(result.Points);
             return clone;

@@ -154,19 +154,14 @@ msgctxt "Audio.EntityFriendly"
 msgid "Ally"
 msgstr ""
 
-#. Audio.EntityNeutral
-msgctxt "Audio.EntityNeutral"
-msgid "Neutral"
-msgstr ""
-
 #. Audio.HexActive
 msgctxt "Audio.HexActive"
 msgid "Battlefield: acting troop"
 msgstr ""
 
-#. Audio.HexAlly
-msgctxt "Audio.HexAlly"
-msgid "Battlefield: allied troop"
+#. Audio.HexDanger
+msgctxt "Audio.HexDanger"
+msgid "Battlefield: threatened hex"
 msgstr ""
 
 #. Audio.HexElevation1
@@ -189,19 +184,29 @@ msgctxt "Audio.HexEmpty"
 msgid "Battlefield: empty hex"
 msgstr ""
 
-#. Audio.HexEnemy
-msgctxt "Audio.HexEnemy"
-msgid "Battlefield: enemy troop"
-msgstr ""
-
-#. Audio.HexObstacle
-msgctxt "Audio.HexObstacle"
-msgid "Battlefield: obstacle"
-msgstr ""
-
 #. Audio.MoveDenied
 msgctxt "Audio.MoveDenied"
 msgid "Map edge"
+msgstr ""
+
+#. Audio.SweepPickup
+msgctxt "Audio.SweepPickup"
+msgid "Pickup"
+msgstr ""
+
+#. Audio.SweepResource
+msgctxt "Audio.SweepResource"
+msgid "Resource deposit"
+msgstr ""
+
+#. Audio.SweepSettlement
+msgctxt "Audio.SweepSettlement"
+msgid "Settlement"
+msgstr ""
+
+#. Audio.SweepWielder
+msgctxt "Audio.SweepWielder"
+msgid "Wielder"
 msgstr ""
 
 #. Audio.TerrainGround
@@ -1087,6 +1092,11 @@ msgstr ""
 #. Actions.SliderMinimum
 msgctxt "Actions.SliderMinimum"
 msgid "Slider Minimum"
+msgstr ""
+
+#. Actions.SonarSweep
+msgctxt "Actions.SonarSweep"
+msgid "Play Sonar Sweep"
 msgstr ""
 
 #. Actions.StartDrag

@@ -1470,6 +1470,11 @@ msgctxt "Actions.SliderMinimum"
 msgid "Slider Minimum"
 msgstr "Мінімум повзунка"
 
+#. Actions.SonarSweep
+msgctxt "Actions.SonarSweep"
+msgid "Play Sonar Sweep"
+msgstr "Відтворити сонарне сканування"
+
 #. Actions.StartDrag
 msgctxt "Actions.StartDrag"
 msgid "Start Drag"
@@ -3498,20 +3503,15 @@ msgctxt "Audio.EntityFriendly"
 msgid "Ally"
 msgstr "Союзник"
 
-#. Audio.EntityNeutral
-msgctxt "Audio.EntityNeutral"
-msgid "Neutral"
-msgstr "Нейтральний"
-
 #. Audio.HexActive
 msgctxt "Audio.HexActive"
 msgid "Battlefield: acting troop"
 msgstr "Поле бою: загін, що діє"
 
-#. Audio.HexAlly
-msgctxt "Audio.HexAlly"
-msgid "Battlefield: allied troop"
-msgstr "Поле бою: союзний загін"
+#. Audio.HexDanger
+msgctxt "Audio.HexDanger"
+msgid "Battlefield: threatened hex"
+msgstr "Поле бою: гекс під загрозою"
 
 #. Audio.HexElevation1
 msgctxt "Audio.HexElevation1"
@@ -3533,20 +3533,30 @@ msgctxt "Audio.HexEmpty"
 msgid "Battlefield: empty hex"
 msgstr "Поле бою: порожній гекс"
 
-#. Audio.HexEnemy
-msgctxt "Audio.HexEnemy"
-msgid "Battlefield: enemy troop"
-msgstr "Поле бою: ворожий загін"
-
-#. Audio.HexObstacle
-msgctxt "Audio.HexObstacle"
-msgid "Battlefield: obstacle"
-msgstr "Поле бою: перешкода"
-
 #. Audio.MoveDenied
 msgctxt "Audio.MoveDenied"
 msgid "Map edge"
 msgstr "Край карти"
+
+#. Audio.SweepPickup
+msgctxt "Audio.SweepPickup"
+msgid "Pickup"
+msgstr "Здобич"
+
+#. Audio.SweepResource
+msgctxt "Audio.SweepResource"
+msgid "Resource deposit"
+msgstr "Родовище ресурсів"
+
+#. Audio.SweepSettlement
+msgctxt "Audio.SweepSettlement"
+msgid "Settlement"
+msgstr "Поселення"
+
+#. Audio.SweepWielder
+msgctxt "Audio.SweepWielder"
+msgid "Wielder"
+msgstr "Герой"
 
 #. Audio.TerrainGround
 msgctxt "Audio.TerrainGround"

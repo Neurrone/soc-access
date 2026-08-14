@@ -364,11 +364,18 @@ namespace SongsOfConquestAccess.UI
                 return;
             }
 
+            // Same condition as the speech formatter, so the warning sounds exactly when the
+            // threatened wording would be spoken.
+            bool isThreatened = tile.Troop == null
+                && tile.TroopId < 0
+                && _adapter != null
+                && _adapter.IsThreatenedByEnemy(point, tile.Troop);
             CueLibrary.PlayCues(
                 TileCueSelector.ForCombatTile(
                     tile,
                     _adapter != null && _adapter.IsEnemyTroop(tile.Troop),
-                    _adapter != null && _adapter.IsActingTroop(tile.Troop)),
+                    _adapter != null && _adapter.IsActingTroop(tile.Troop),
+                    isThreatened),
                 panOffset,
                 gainScale,
                 semitoneOffset);

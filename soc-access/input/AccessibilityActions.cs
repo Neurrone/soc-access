@@ -143,6 +143,9 @@ namespace SongsOfConquestAccess.Input
         public static readonly InputAction DescribePosition = OneShot("describe_position", ModStrings.Actions.DescribePosition, InputClaimScope.FocusedWidget)
             .AddBinding(new KeyboardBinding(Key.D));
 
+        public static readonly InputAction SonarSweep = OneShot("sonar_sweep", ModStrings.Actions.SonarSweep, InputClaimScope.FocusedWidget)
+            .AddBinding(new KeyboardBinding(Key.P));
+
         public static readonly InputAction FocusHudTroops = OneShot("focus_hud_troops", ModStrings.Actions.FocusHudTroops, InputClaimScope.Screen)
             .AddBinding(new KeyboardBinding(Key.T));
 
@@ -378,6 +381,7 @@ namespace SongsOfConquestAccess.Input
                 NextSettlement,
                 SummarizeReachableEntities,
                 DescribePosition,
+                SonarSweep,
                 FocusHudTroops,
                 FocusHudResources,
                 FocusHudObjectives,

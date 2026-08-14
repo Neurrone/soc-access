@@ -84,6 +84,7 @@ namespace SongsOfConquestAccess
             _screenManager?.Clear();
             AdventureBeaconAudio.DisposeAll();
             SynthCuePlayer.DisposeAll();
+            SweepPlayer.DisposeAll();
             _harmony?.UnpatchSelf();
             _harmony = null;
             _inputRouter?.Dispose();

@@ -28,6 +28,7 @@ The mod mentions if a tile is unexplored or currently unseen.
 - `\`: perform the secondary action on the focused tile, corresponding to a right-click. Press once on a tile to set it as the destination. Press again to actually move. If the tile has an interactable entity and the wielder is nearby, this causes your wielder to interact with the entity.
 - `A`: get a summary of entities reachable by the current wielder excluding visited pickups or friendly resource generators
 - `D`: describe the position of the cursor and the size of the map, for example "Position 12, 34. Map is 80 by 96."
+- `P`: play a sonar sweep of the entities around the cursor, described below
 - `W`: select the next wielder
 - `S`: select the next settlement
 - `Space`: move focus to the selected wielder's tile
@@ -46,6 +47,16 @@ After setting a destination, the game draws a route preview. When focus is on a 
 - `Destination, interactable next turn`: the destination is reachable this turn, but there is not enough movement left to interact with it this turn.
 - `Destination, no route preview`: the destination is set, but the game is not showing route preview markers for it.
 - `cost n`: the route has crossed the indicated movement cost marker.
+
+### Sonar Sweep
+
+Press `P` to sweep the area around the cursor. Every entity the [scanner](scanner.md) can see within the look around radius plays one short sound, one after another from west to east, so a few seconds of listening gives you the shape of your surroundings without any speech.
+
+The first part of each sound names what the entity is: a rising horn for a wielder, a chord for a settlement or other interactive building, a high double blip for a resource deposit and a single high tick for a pickup. If the entity is yours, allied or hostile, the ally or enemy marker follows immediately behind it. Neutral entities, which most map objects are, play the category sound alone.
+
+These are the same sounds the cursor plays when you step onto such a tile, and the same sounds a scanner result plays when you page to it, so what you hear in a sweep is what you hear when you get there. On a tile with one of these entities the terrain sound is left out, because the entity is the more useful fact.
+
+Each sound is positioned relative to the cursor in the same way scanner results are: stereo pan for east and west, pitch for north and south, and volume for distance. The sweep uses the look around radius, so `K` and `Shift+K` widen and narrow it. Pings never overlap: a crowded area takes longer to sweep rather than blurring together. Pressing `P` again cancels the sweep in progress and starts a new one. If nothing is nearby, the sweep is silent.
 
 ### Revealed Entity Announcements
 

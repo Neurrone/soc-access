@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using SongsOfConquestAccess.Adapters;
 using SongsOfConquestAccess.Localization;
 using UnityEngine;
 
@@ -38,6 +39,11 @@ namespace SongsOfConquestAccess.Scanner
         public bool NotVisible { get; set; }
 
         public ScannerResultKind Kind { get; set; }
+
+        /// <summary>What the adapter classified this entry as when it built the snapshot, so a
+        /// result sounds like itself even where its position tile no longer carries the entity.
+        /// None for terrain groups, zones of control and every non-adventure snapshot.</summary>
+        public AdventureEntityCategory EntityCategory { get; set; }
 
         public object StableReference { get; set; }
 

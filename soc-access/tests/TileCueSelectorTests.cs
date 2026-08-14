@@ -25,7 +25,7 @@ namespace SongsOfConquestAccess.Tests
         public void NullTilesProduceNoCues()
         {
             Assert.AreEqual(0, TileCueSelector.ForAdventureTile(null).Count);
-            Assert.AreEqual(0, TileCueSelector.ForCombatTile(null, isEnemyTroop: false, isActingTroop: false).Count);
+            Assert.AreEqual(0, TileCueSelector.ForCombatTile(null, isEnemyTroop: false, isActingTroop: false, isThreatened: false).Count);
             Assert.AreEqual(0, TileCueSelector.ForTroopPlacementTile(null, isOwnTroop: false).Count);
         }
 
@@ -87,10 +87,10 @@ namespace SongsOfConquestAccess.Tests
         {
             AdventureMapTile tile = ExploredTile(AdventureTerrainKind.Mountain);
             tile.MapEntityId = 42;
-            tile.MapEntityRelationship = ModText.Get(ModStrings.Spatial.Neutral);
+            tile.MapEntityRelationship = ModText.Get(ModStrings.Spatial.Enemy);
 
             CollectionAssert.AreEqual(
-                new[] { CueLibrary.TerrainImpassable, CueLibrary.EntityNeutral },
+                new[] { CueLibrary.TerrainImpassable, CueLibrary.EntityEnemy },
                 ToArray(TileCueSelector.ForAdventureTile(tile)));
         }
 
@@ -103,7 +103,7 @@ namespace SongsOfConquestAccess.Tests
             tile.MapEntityRelationship = ModText.Get(ModStrings.Spatial.Neutral);
 
             CollectionAssert.AreEqual(
-                new[] { CueLibrary.TerrainGround, CueLibrary.EntityNeutral },
+                new[] { CueLibrary.TerrainGround },
                 ToArray(TileCueSelector.ForAdventureTile(tile)));
         }
 
@@ -153,14 +153,101 @@ namespace SongsOfConquestAccess.Tests
         }
 
         [TestMethod]
-        public void UnknownCommanderRelationshipFallsBackToTheNeutralOverlay()
+        public void NeutralCommanderPlaysNoOverlay()
         {
             AdventureMapTile tile = ExploredTile(AdventureTerrainKind.Road);
             tile.Commander = Commander(ModStrings.Spatial.Neutral, isOwnedByLocalTeam: false);
 
             CollectionAssert.AreEqual(
-                new[] { CueLibrary.TerrainRoad, CueLibrary.EntityNeutral },
+                new[] { CueLibrary.TerrainRoad },
                 ToArray(TileCueSelector.ForAdventureTile(tile)));
+        }
+
+        [TestMethod]
+        public void ACategorisedEntityReplacesTheTerrainCue()
+        {
+            // A treasure trove on grass is a pickup, and the pickup voice is the whole
+            // acknowledgment: the ground under it would only add noise.
+            AdventureMapTile trove = ExploredTile(AdventureTerrainKind.Grass);
+            trove.MapEntityId = 1;
+            trove.MapEntityRelationship = ModText.Get(ModStrings.Spatial.Neutral);
+            trove.EntityCategory = AdventureEntityCategory.Pickup;
+
+            CollectionAssert.AreEqual(new[] { CueLibrary.SweepPickup }, ToArray(TileCueSelector.ForAdventureTile(trove)));
+        }
+
+        [TestMethod]
+        public void ACategorisedEntityKeepsItsAffiliationMarkerBehindTheCategoryVoice()
+        {
+            AdventureMapTile generator = ExploredTile(AdventureTerrainKind.Sand);
+            generator.MapEntityId = 2;
+            generator.MapEntityRelationship = ModText.Get(ModStrings.Spatial.Enemy);
+            generator.EntityCategory = AdventureEntityCategory.ResourceDeposit;
+
+            IReadOnlyList<TileCue> cues = TileCueSelector.ForAdventureTile(generator);
+
+            CollectionAssert.AreEqual(new[] { CueLibrary.SweepResource, CueLibrary.EntityEnemy }, ToArray(cues));
+            Assert.IsFalse(cues[0].FollowsPrevious);
+            Assert.IsTrue(cues[1].FollowsPrevious);
+        }
+
+        [TestMethod]
+        public void AnOwnCommanderSoundsAsAFriendlyWielder()
+        {
+            AdventureMapTile tile = ExploredTile(AdventureTerrainKind.Road);
+            tile.Commander = Commander(ModStrings.Spatial.Friendly, isOwnedByLocalTeam: true);
+            tile.EntityCategory = AdventureEntityCategory.Wielder;
+
+            CollectionAssert.AreEqual(
+                new[] { CueLibrary.SweepWielder, CueLibrary.EntityFriendly },
+                ToArray(TileCueSelector.ForAdventureTile(tile)));
+        }
+
+        [TestMethod]
+        public void ACategorisedEntityOnImpassableGroundStillPlaysOnlyItsGesture()
+        {
+            AdventureMapTile settlement = ExploredTile(AdventureTerrainKind.Mountain);
+            settlement.IsImpassable = true;
+            settlement.MapEntityId = 3;
+            settlement.MapEntityRelationship = ModText.Get(ModStrings.Spatial.Neutral);
+            settlement.EntityCategory = AdventureEntityCategory.Settlement;
+
+            CollectionAssert.AreEqual(
+                new[] { CueLibrary.SweepSettlement },
+                ToArray(TileCueSelector.ForAdventureTile(settlement)));
+        }
+
+        [TestMethod]
+        public void AnUncategorisedOccupantStillPlaysTerrainAndItsMarker()
+        {
+            AdventureMapTile obstacle = ExploredTile(AdventureTerrainKind.Grass);
+            obstacle.MapEntityId = 4;
+            obstacle.MapEntityRelationship = ModText.Get(ModStrings.Spatial.Enemy);
+
+            IReadOnlyList<TileCue> cues = TileCueSelector.ForAdventureTile(obstacle);
+
+            CollectionAssert.AreEqual(new[] { CueLibrary.TerrainGround, CueLibrary.EntityEnemy }, ToArray(cues));
+            Assert.IsFalse(cues[1].FollowsPrevious);
+        }
+
+        [TestMethod]
+        public void UnexploredStillSuppressesTheCategoryVoice()
+        {
+            AdventureMapTile tile = ExploredTile(AdventureTerrainKind.Grass);
+            tile.IsExplored = false;
+            tile.EntityCategory = AdventureEntityCategory.Pickup;
+
+            CollectionAssert.AreEqual(new[] { CueLibrary.TerrainUnexplored }, ToArray(TileCueSelector.ForAdventureTile(tile)));
+        }
+
+        [TestMethod]
+        public void NeutralAffiliationHasNoCue()
+        {
+            AdventureMapTile tile = ExploredTile(AdventureTerrainKind.Grass);
+            tile.MapEntityId = 1;
+            tile.MapEntityRelationship = ModText.Get(ModStrings.Spatial.Neutral);
+
+            Assert.IsNull(TileCueSelector.AffiliationCueKey(tile));
         }
 
         [TestMethod]
@@ -168,7 +255,7 @@ namespace SongsOfConquestAccess.Tests
         {
             AssertMapEntityOverlay(ModStrings.Spatial.Friendly, CueLibrary.EntityFriendly);
             AssertMapEntityOverlay(ModStrings.Spatial.Enemy, CueLibrary.EntityEnemy);
-            AssertMapEntityOverlay(ModStrings.Spatial.Neutral, CueLibrary.EntityNeutral);
+            AssertMapEntityOverlay(ModStrings.Spatial.Neutral, null);
         }
 
         [TestMethod]
@@ -190,8 +277,8 @@ namespace SongsOfConquestAccess.Tests
             CombatTile tile = new CombatTile(new Vector2Int(3, 4)) { TroopId = 11 };
 
             CollectionAssert.AreEqual(
-                new[] { CueLibrary.HexAlly },
-                ToArray(TileCueSelector.ForCombatTile(tile, isEnemyTroop: false, isActingTroop: false)));
+                new[] { CueLibrary.EntityFriendly },
+                ToArray(TileCueSelector.ForCombatTile(tile, isEnemyTroop: false, isActingTroop: false, isThreatened: false)));
         }
 
         [TestMethod]
@@ -200,8 +287,8 @@ namespace SongsOfConquestAccess.Tests
             CombatTile tile = new CombatTile(new Vector2Int(3, 4)) { TroopId = 11 };
 
             CollectionAssert.AreEqual(
-                new[] { CueLibrary.HexEnemy },
-                ToArray(TileCueSelector.ForCombatTile(tile, isEnemyTroop: true, isActingTroop: false)));
+                new[] { CueLibrary.EntityEnemy },
+                ToArray(TileCueSelector.ForCombatTile(tile, isEnemyTroop: true, isActingTroop: false, isThreatened: false)));
         }
 
         [TestMethod]
@@ -210,8 +297,8 @@ namespace SongsOfConquestAccess.Tests
             CombatTile tile = new CombatTile(new Vector2Int(3, 4)) { TroopId = 11 };
 
             CollectionAssert.AreEqual(
-                new[] { CueLibrary.HexEnemy, CueLibrary.HexActive },
-                ToArray(TileCueSelector.ForCombatTile(tile, isEnemyTroop: true, isActingTroop: true)));
+                new[] { CueLibrary.EntityEnemy, CueLibrary.HexActive },
+                ToArray(TileCueSelector.ForCombatTile(tile, isEnemyTroop: true, isActingTroop: true, isThreatened: false)));
         }
 
         [TestMethod]
@@ -221,9 +308,9 @@ namespace SongsOfConquestAccess.Tests
             CombatTile blocked = new CombatTile(new Vector2Int(1, 2)) { IsBlocked = true };
             CombatTile withEntity = new CombatTile(new Vector2Int(1, 3)) { EntityId = 5 };
 
-            CollectionAssert.AreEqual(new[] { CueLibrary.HexObstacle }, ToArray(TileCueSelector.ForCombatTile(impassable, false, false)));
-            CollectionAssert.AreEqual(new[] { CueLibrary.HexObstacle }, ToArray(TileCueSelector.ForCombatTile(blocked, false, false)));
-            CollectionAssert.AreEqual(new[] { CueLibrary.HexObstacle }, ToArray(TileCueSelector.ForCombatTile(withEntity, false, false)));
+            CollectionAssert.AreEqual(new[] { CueLibrary.TerrainImpassable }, ToArray(TileCueSelector.ForCombatTile(impassable, false, false, false)));
+            CollectionAssert.AreEqual(new[] { CueLibrary.TerrainImpassable }, ToArray(TileCueSelector.ForCombatTile(blocked, false, false, false)));
+            CollectionAssert.AreEqual(new[] { CueLibrary.TerrainImpassable }, ToArray(TileCueSelector.ForCombatTile(withEntity, false, false, false)));
         }
 
         [TestMethod]
@@ -233,7 +320,7 @@ namespace SongsOfConquestAccess.Tests
 
             CollectionAssert.AreEqual(
                 new[] { CueLibrary.HexEmpty },
-                ToArray(TileCueSelector.ForCombatTile(tile, isEnemyTroop: false, isActingTroop: false)));
+                ToArray(TileCueSelector.ForCombatTile(tile, isEnemyTroop: false, isActingTroop: false, isThreatened: false)));
         }
 
         [TestMethod]
@@ -241,7 +328,7 @@ namespace SongsOfConquestAccess.Tests
         {
             CombatTile tile = new CombatTile(new Vector2Int(2, 2)) { Elevation = 2 };
 
-            IReadOnlyList<TileCue> cues = TileCueSelector.ForCombatTile(tile, isEnemyTroop: false, isActingTroop: false);
+            IReadOnlyList<TileCue> cues = TileCueSelector.ForCombatTile(tile, isEnemyTroop: false, isActingTroop: false, isThreatened: false);
 
             CollectionAssert.AreEqual(new[] { CueLibrary.HexElevation2 }, ToArray(cues));
             CollectionAssert.AreEqual(new[] { 0f }, ToSemitones(cues));
@@ -252,9 +339,9 @@ namespace SongsOfConquestAccess.Tests
         {
             CombatTile tile = new CombatTile(new Vector2Int(3, 4)) { TroopId = 11, Elevation = 1 };
 
-            IReadOnlyList<TileCue> cues = TileCueSelector.ForCombatTile(tile, isEnemyTroop: true, isActingTroop: false);
+            IReadOnlyList<TileCue> cues = TileCueSelector.ForCombatTile(tile, isEnemyTroop: true, isActingTroop: false, isThreatened: false);
 
-            CollectionAssert.AreEqual(new[] { CueLibrary.HexElevation1, CueLibrary.HexEnemy }, ToArray(cues));
+            CollectionAssert.AreEqual(new[] { CueLibrary.HexElevation1, CueLibrary.EntityEnemy }, ToArray(cues));
             CollectionAssert.AreEqual(new[] { 0f, 0f }, ToSemitones(cues));
         }
 
@@ -263,9 +350,9 @@ namespace SongsOfConquestAccess.Tests
         {
             CombatTile tile = new CombatTile(new Vector2Int(1, 1)) { IsImpassable = true, Elevation = 3 };
 
-            IReadOnlyList<TileCue> cues = TileCueSelector.ForCombatTile(tile, isEnemyTroop: false, isActingTroop: false);
+            IReadOnlyList<TileCue> cues = TileCueSelector.ForCombatTile(tile, isEnemyTroop: false, isActingTroop: false, isThreatened: false);
 
-            CollectionAssert.AreEqual(new[] { CueLibrary.HexElevation3, CueLibrary.HexObstacle }, ToArray(cues));
+            CollectionAssert.AreEqual(new[] { CueLibrary.HexElevation3, CueLibrary.TerrainImpassable }, ToArray(cues));
             CollectionAssert.AreEqual(new[] { 0f, 0f }, ToSemitones(cues));
         }
 
@@ -275,13 +362,71 @@ namespace SongsOfConquestAccess.Tests
             CombatTile elevated = new CombatTile(new Vector2Int(3, 4)) { TroopId = 11, Elevation = 2 };
             CombatTile flat = new CombatTile(new Vector2Int(3, 5)) { TroopId = 12 };
 
-            IReadOnlyList<TileCue> elevatedCues = TileCueSelector.ForCombatTile(elevated, isEnemyTroop: false, isActingTroop: true);
+            IReadOnlyList<TileCue> elevatedCues = TileCueSelector.ForCombatTile(elevated, isEnemyTroop: false, isActingTroop: true, isThreatened: false);
             Assert.IsFalse(elevatedCues[0].FollowsPrevious);
             Assert.IsTrue(elevatedCues[1].FollowsPrevious, "occupant cue must wait for the elevation tick");
             Assert.IsFalse(elevatedCues[2].FollowsPrevious, "active cue stays aligned with the occupant cue");
 
-            IReadOnlyList<TileCue> flatCues = TileCueSelector.ForCombatTile(flat, isEnemyTroop: false, isActingTroop: false);
+            IReadOnlyList<TileCue> flatCues = TileCueSelector.ForCombatTile(flat, isEnemyTroop: false, isActingTroop: false, isThreatened: false);
             Assert.IsFalse(flatCues[0].FollowsPrevious);
+        }
+
+        [TestMethod]
+        public void ThreatenedEmptyHexWarnsBeforeTheTileCue()
+        {
+            CombatTile tile = new CombatTile(new Vector2Int(4, 4));
+
+            IReadOnlyList<TileCue> cues = TileCueSelector.ForCombatTile(
+                tile,
+                isEnemyTroop: false,
+                isActingTroop: false,
+                isThreatened: true);
+
+            CollectionAssert.AreEqual(new[] { CueLibrary.HexDanger, CueLibrary.HexEmpty }, ToArray(cues));
+            Assert.IsFalse(cues[0].FollowsPrevious);
+            Assert.IsTrue(cues[1].FollowsPrevious, "the tile cue must wait for the warning");
+        }
+
+        [TestMethod]
+        public void ThreatenedElevatedAndObstacleHexesKeepTheirOwnSerialization()
+        {
+            CombatTile elevated = new CombatTile(new Vector2Int(4, 5)) { Elevation = 2 };
+            CombatTile obstacle = new CombatTile(new Vector2Int(4, 6)) { IsImpassable = true, Elevation = 1 };
+
+            IReadOnlyList<TileCue> elevatedCues = TileCueSelector.ForCombatTile(
+                elevated,
+                isEnemyTroop: false,
+                isActingTroop: false,
+                isThreatened: true);
+            CollectionAssert.AreEqual(new[] { CueLibrary.HexDanger, CueLibrary.HexElevation2 }, ToArray(elevatedCues));
+            Assert.IsTrue(elevatedCues[1].FollowsPrevious);
+
+            IReadOnlyList<TileCue> obstacleCues = TileCueSelector.ForCombatTile(
+                obstacle,
+                isEnemyTroop: false,
+                isActingTroop: false,
+                isThreatened: true);
+            CollectionAssert.AreEqual(
+                new[] { CueLibrary.HexDanger, CueLibrary.HexElevation1, CueLibrary.TerrainImpassable },
+                ToArray(obstacleCues));
+            Assert.IsTrue(obstacleCues[1].FollowsPrevious, "elevation waits for the warning");
+            Assert.IsTrue(obstacleCues[2].FollowsPrevious, "the obstacle still waits for the elevation tick");
+        }
+
+        [TestMethod]
+        public void OccupiedHexesNeverWarnEvenWhenTheCallerSaysThreatened()
+        {
+            CombatTile tile = new CombatTile(new Vector2Int(5, 5)) { TroopId = 9, Elevation = 1 };
+
+            IReadOnlyList<TileCue> threatened = TileCueSelector.ForCombatTile(
+                tile,
+                isEnemyTroop: true,
+                isActingTroop: false,
+                isThreatened: true);
+
+            CollectionAssert.AreEqual(
+                ToArray(TileCueSelector.ForCombatTile(tile, isEnemyTroop: true, isActingTroop: false, isThreatened: false)),
+                ToArray(threatened));
         }
 
         [TestMethod]
@@ -290,7 +435,7 @@ namespace SongsOfConquestAccess.Tests
             TileCue[] cues =
             {
                 new TileCue(CueLibrary.HexElevation2, 0f),
-                new TileCue(CueLibrary.HexAlly, 0f, followsPrevious: true),
+                new TileCue(CueLibrary.EntityFriendly, 0f, followsPrevious: true),
                 new TileCue(CueLibrary.HexActive, 0f)
             };
 
@@ -307,7 +452,7 @@ namespace SongsOfConquestAccess.Tests
             TileCue[] cues =
             {
                 new TileCue(CueLibrary.HexElevation2, 0f),
-                new TileCue(CueLibrary.HexAlly, 0f, followsPrevious: true)
+                new TileCue(CueLibrary.EntityFriendly, 0f, followsPrevious: true)
             };
 
             float[] delays = CueLibrary.ComputeDelaySeconds(cues, key => 0f);
@@ -332,7 +477,7 @@ namespace SongsOfConquestAccess.Tests
             TroopPlacementTile empty = new TroopPlacementTile(new Vector2Int(2, 5)) { Elevation = 1 };
 
             IReadOnlyList<TileCue> occupiedCues = TileCueSelector.ForTroopPlacementTile(occupied, isOwnTroop: true);
-            CollectionAssert.AreEqual(new[] { CueLibrary.HexElevation2, CueLibrary.HexAlly }, ToArray(occupiedCues));
+            CollectionAssert.AreEqual(new[] { CueLibrary.HexElevation2, CueLibrary.EntityFriendly }, ToArray(occupiedCues));
             CollectionAssert.AreEqual(new[] { 0f, 0f }, ToSemitones(occupiedCues));
 
             IReadOnlyList<TileCue> emptyCues = TileCueSelector.ForTroopPlacementTile(empty, isOwnTroop: false);
@@ -346,8 +491,8 @@ namespace SongsOfConquestAccess.Tests
             TroopPlacementTile own = new TroopPlacementTile(new Vector2Int(1, 1)) { TroopId = 3 };
             TroopPlacementTile enemy = new TroopPlacementTile(new Vector2Int(1, 2)) { TroopId = 4 };
 
-            CollectionAssert.AreEqual(new[] { CueLibrary.HexAlly }, ToArray(TileCueSelector.ForTroopPlacementTile(own, isOwnTroop: true)));
-            CollectionAssert.AreEqual(new[] { CueLibrary.HexEnemy }, ToArray(TileCueSelector.ForTroopPlacementTile(enemy, isOwnTroop: false)));
+            CollectionAssert.AreEqual(new[] { CueLibrary.EntityFriendly }, ToArray(TileCueSelector.ForTroopPlacementTile(own, isOwnTroop: true)));
+            CollectionAssert.AreEqual(new[] { CueLibrary.EntityEnemy }, ToArray(TileCueSelector.ForTroopPlacementTile(enemy, isOwnTroop: false)));
         }
 
         [TestMethod]
@@ -357,20 +502,22 @@ namespace SongsOfConquestAccess.Tests
             TroopPlacementTile withEntity = new TroopPlacementTile(new Vector2Int(2, 2)) { EntityId = 9 };
             TroopPlacementTile empty = new TroopPlacementTile(new Vector2Int(2, 3));
 
-            CollectionAssert.AreEqual(new[] { CueLibrary.HexObstacle }, ToArray(TileCueSelector.ForTroopPlacementTile(impassable, false)));
-            CollectionAssert.AreEqual(new[] { CueLibrary.HexObstacle }, ToArray(TileCueSelector.ForTroopPlacementTile(withEntity, false)));
+            CollectionAssert.AreEqual(new[] { CueLibrary.TerrainImpassable }, ToArray(TileCueSelector.ForTroopPlacementTile(impassable, false)));
+            CollectionAssert.AreEqual(new[] { CueLibrary.TerrainImpassable }, ToArray(TileCueSelector.ForTroopPlacementTile(withEntity, false)));
             CollectionAssert.AreEqual(new[] { CueLibrary.HexEmpty }, ToArray(TileCueSelector.ForTroopPlacementTile(empty, false)));
         }
 
+        /// <summary>A null expected cue means the affiliation is not marked at all.</summary>
         private static void AssertMapEntityOverlay(ModString relationship, string expectedCue)
         {
             AdventureMapTile tile = ExploredTile(AdventureTerrainKind.Grass);
             tile.MapEntityId = 1;
             tile.MapEntityRelationship = ModText.Get(relationship);
 
-            CollectionAssert.AreEqual(
-                new[] { CueLibrary.TerrainGround, expectedCue },
-                ToArray(TileCueSelector.ForAdventureTile(tile)));
+            string[] expected = expectedCue == null
+                ? new[] { CueLibrary.TerrainGround }
+                : new[] { CueLibrary.TerrainGround, expectedCue };
+            CollectionAssert.AreEqual(expected, ToArray(TileCueSelector.ForAdventureTile(tile)));
         }
 
         private static void AssertTerrainCue(string expectedCue, params AdventureTerrainKind[] terrains)

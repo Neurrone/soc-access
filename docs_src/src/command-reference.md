@@ -64,6 +64,7 @@ This page summarizes the mod hotkeys used across the documentation.
 | `Backslash`         | Secondary tile action               |
 | `A`                 | Summarize reachable entities        |
 | `D`                 | Describe cursor position and map size |
+| `P`                 | Play a sonar sweep of nearby entities |
 | `W`                 | Select next wielder                 |
 | `S`                 | Select next settlement              |
 | `Space`             | Move focus to selected wielder tile |
