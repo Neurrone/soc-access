@@ -57,9 +57,10 @@ namespace SongsOfConquestAccess.Scanner
             }
 
             List<ScannerCategory> synthesized = new List<ScannerCategory>();
+            KeywordCandidates candidates = new KeywordCandidates(snapshot);
             for (int i = 0; i < customCategories.Count; i++)
             {
-                ScannerCategory category = Build(snapshot, customCategories[i]);
+                ScannerCategory category = Build(snapshot, customCategories[i], candidates);
                 if (category != null)
                 {
                     synthesized.Add(category);
@@ -69,7 +70,10 @@ namespace SongsOfConquestAccess.Scanner
             snapshot.PrependCategories(synthesized);
         }
 
-        private static ScannerCategory Build(ScannerSnapshot snapshot, ScannerCustomCategory definition)
+        private static ScannerCategory Build(
+            ScannerSnapshot snapshot,
+            ScannerCustomCategory definition,
+            KeywordCandidates candidates)
         {
             if (definition == null)
             {
@@ -94,7 +98,7 @@ namespace SongsOfConquestAccess.Scanner
 
             for (int i = 0; i < definition.Keywords.Count; i++)
             {
-                AddKeyword(snapshot, category, all, addedToAll, definition.Keywords[i]);
+                AddKeyword(category, all, addedToAll, candidates, definition.Keywords[i]);
             }
 
             return category;
@@ -130,10 +134,10 @@ namespace SongsOfConquestAccess.Scanner
         }
 
         private static void AddKeyword(
-            ScannerSnapshot snapshot,
             ScannerCategory category,
             ScannerSubcategory all,
             HashSet<string> addedToAll,
+            KeywordCandidates candidates,
             string keyword)
         {
             string query = ScannerTextMatch.NormalizeQuery(keyword);
@@ -144,40 +148,18 @@ namespace SongsOfConquestAccess.Scanner
 
             ScannerSubcategory target = category.GetOrAddSubcategory(KeywordKeyPrefix + keyword, () => keyword);
             HashSet<string> added = new HashSet<string>();
-            for (int i = 0; i < snapshot.Categories.Count; i++)
+            List<KeywordCandidate> searchable = candidates.All;
+            for (int i = 0; i < searchable.Count; i++)
             {
-                ScannerCategory source = snapshot.Categories[i];
-                if (source == null || source.IsCustom)
+                KeywordCandidate candidate = searchable[i];
+                if (!candidate.Matches(query) || !added.Add(candidate.Result.Key))
                 {
                     continue;
                 }
 
-                for (int j = 0; j < source.Subcategories.Count; j++)
-                {
-                    foreach (ScannerResult result in source.Subcategories[j].AllResults)
-                    {
-                        if (result == null || !Matches(result, query) || !added.Add(result.Key))
-                        {
-                            continue;
-                        }
-
-                        target.Add(result);
-                        AddToAll(all, addedToAll, result);
-                    }
-                }
+                target.Add(candidate.Result);
+                AddToAll(all, addedToAll, candidate.Result);
             }
-        }
-
-        /// <summary>
-        /// A keyword catches a result by any of the three names it can be
-        /// spoken under, so "grass" finds terrain named by its item and
-        /// "12 tiles" is not the only handle on a cluster.
-        /// </summary>
-        private static bool Matches(ScannerResult result, string query)
-        {
-            return ScannerTextMatch.Matches(result.Label, query)
-                || ScannerTextMatch.Matches(result.ItemLabel, query)
-                || ScannerTextMatch.Matches(result.InstanceLabel, query);
         }
 
         private static void AddToAll(ScannerSubcategory all, HashSet<string> addedToAll, ScannerResult result)
@@ -208,6 +190,98 @@ namespace SongsOfConquestAccess.Scanner
             }
 
             return null;
+        }
+
+        /// <summary>
+        /// Every result the keywords are asked about, in the order the
+        /// snapshot holds them, with the names they can be caught by already
+        /// lowercased. Matching lowercases both sides, and the same results are
+        /// asked about every keyword of every custom category, so lowercasing
+        /// where the question is put threw away results times keywords times
+        /// three strings inside one frame. Gathered on the first keyword and
+        /// not before, since a category built only from selectors never asks,
+        /// and thrown away with the pass: the names are read live and this must
+        /// not be the copy that outlives them.
+        /// </summary>
+        private sealed class KeywordCandidates
+        {
+            private readonly ScannerSnapshot _snapshot;
+            private List<KeywordCandidate> _gathered;
+
+            public KeywordCandidates(ScannerSnapshot snapshot)
+            {
+                _snapshot = snapshot;
+            }
+
+            public List<KeywordCandidate> All
+            {
+                get
+                {
+                    if (_gathered == null)
+                    {
+                        _gathered = Gather();
+                    }
+
+                    return _gathered;
+                }
+            }
+
+            private List<KeywordCandidate> Gather()
+            {
+                List<KeywordCandidate> candidates = new List<KeywordCandidate>();
+                for (int i = 0; i < _snapshot.Categories.Count; i++)
+                {
+                    ScannerCategory source = _snapshot.Categories[i];
+                    if (source == null || source.IsCustom)
+                    {
+                        continue;
+                    }
+
+                    for (int j = 0; j < source.Subcategories.Count; j++)
+                    {
+                        foreach (ScannerResult result in source.Subcategories[j].AllResults)
+                        {
+                            if (result != null)
+                            {
+                                candidates.Add(new KeywordCandidate(result));
+                            }
+                        }
+                    }
+                }
+
+                return candidates;
+            }
+        }
+
+        private struct KeywordCandidate
+        {
+            public KeywordCandidate(ScannerResult result)
+            {
+                Result = result;
+                Label = ScannerTextMatch.NormalizeLabel(result.Label);
+                ItemLabel = ScannerTextMatch.NormalizeLabel(result.ItemLabel);
+                InstanceLabel = ScannerTextMatch.NormalizeLabel(result.InstanceLabel);
+            }
+
+            public ScannerResult Result { get; private set; }
+
+            private string Label { get; set; }
+
+            private string ItemLabel { get; set; }
+
+            private string InstanceLabel { get; set; }
+
+            /// <summary>
+            /// A keyword catches a result by any of the three names it can be
+            /// spoken under, so "grass" finds terrain named by its item and
+            /// "12 tiles" is not the only handle on a cluster.
+            /// </summary>
+            public bool Matches(string query)
+            {
+                return ScannerTextMatch.MatchesNormalized(Label, query)
+                    || ScannerTextMatch.MatchesNormalized(ItemLabel, query)
+                    || ScannerTextMatch.MatchesNormalized(InstanceLabel, query);
+            }
         }
 
         /// <summary>

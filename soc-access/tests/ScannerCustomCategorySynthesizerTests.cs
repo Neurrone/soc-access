@@ -58,6 +58,32 @@ namespace SongsOfConquestAccess.Tests
                 Keys(custom.Subcategories[1]));
         }
 
+        /// <summary>
+        /// The results are gathered once for a whole synthesis pass and asked
+        /// about every keyword of every category, so each keyword has to come
+        /// out with its own catch and its own subcategory.
+        /// </summary>
+        [TestMethod]
+        public void EveryKeywordOfEveryCategoryCatchesItsOwn()
+        {
+            ScannerSnapshot snapshot = BuildAdventureSnapshot();
+            ScannerCustomCategory ground = new ScannerCustomCategory(1, "Ground");
+            ground.AddKeyword("grass");
+            ground.AddKeyword("crate");
+            ScannerCustomCategory loot = new ScannerCustomCategory(2, "Loot");
+            loot.AddKeyword("chest");
+
+            ScannerCustomCategorySynthesizer.Apply(snapshot, new[] { ground, loot });
+
+            ScannerCategory first = snapshot.Categories[0];
+            ScannerCategory second = snapshot.Categories[1];
+            CollectionAssert.AreEquivalent(
+                new[] { "terrain:grass:1", "wielder:grasshopper" },
+                Keys(first.Subcategories[1]));
+            CollectionAssert.AreEquivalent(new[] { "pickup:crate" }, Keys(first.Subcategories[2]));
+            CollectionAssert.AreEquivalent(new[] { "pickup:chest" }, Keys(second.Subcategories[1]));
+        }
+
         [TestMethod]
         public void TheAllSubcategoryHearsAResultOnceHoweverManyWaysItWasCaught()
         {

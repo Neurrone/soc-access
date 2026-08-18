@@ -87,6 +87,17 @@ namespace SongsOfConquestAccess.Scanner
             return TierForLabel(label, normalizedQuery) != NoMatch;
         }
 
+        /// <summary>
+        /// The same question as <see cref="Matches"/> for a label that has
+        /// already been through <see cref="NormalizeLabel"/>, so a caller
+        /// asking about one label many times over does not lowercase it again
+        /// for every question.
+        /// </summary>
+        public static bool MatchesNormalized(string normalizedLabel, string normalizedQuery)
+        {
+            return Tier(normalizedLabel, normalizedQuery) != NoMatch;
+        }
+
         private static bool StartsAt(string label, string query, int index)
         {
             return index >= 0

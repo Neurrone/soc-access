@@ -56,6 +56,25 @@ namespace SongsOfConquestAccess.Tests
             Assert.AreEqual(ScannerTextMatch.NoMatch, ScannerTextMatch.TierForLabel("Ore", "ore mine"));
         }
 
+        /// <summary>
+        /// The pre-normalized overload is there so a caller asking about one
+        /// label many times over lowercases it once. It has to be the same
+        /// question, blank labels and all.
+        /// </summary>
+        [TestMethod]
+        public void PreNormalizedMatchingAsksTheSameQuestion()
+        {
+            string query = ScannerTextMatch.NormalizeQuery("GOLD");
+
+            Assert.IsTrue(ScannerTextMatch.MatchesNormalized(ScannerTextMatch.NormalizeLabel("Gold Mine"), query));
+            Assert.AreEqual(
+                ScannerTextMatch.Matches("Ore Mine", query),
+                ScannerTextMatch.MatchesNormalized(ScannerTextMatch.NormalizeLabel("Ore Mine"), query));
+            Assert.AreEqual(
+                ScannerTextMatch.Matches(null, query),
+                ScannerTextMatch.MatchesNormalized(ScannerTextMatch.NormalizeLabel(null), query));
+        }
+
         [TestMethod]
         public void NormalizeQueryRejectsBlankInput()
         {
