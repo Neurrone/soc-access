@@ -3,7 +3,6 @@ using System.Globalization;
 using System.Collections.Generic;
 using SongsOfConquestAccess.Adapters;
 using SongsOfConquestAccess.Localization;
-using SongsOfConquestAccess.Scanner;
 
 namespace SongsOfConquestAccess.Speech.Spatial
 {
@@ -40,16 +39,8 @@ namespace SongsOfConquestAccess.Speech.Spatial
 
             string text = Compose(
                 AdventureMapAnnouncementDefinitions.Tile,
-                BuildTileParts(tile, groupResult: null, includeCoordinates: true, appendRouteToTerrainWhenNoContent: true));
+                BuildTileParts(tile));
             return string.IsNullOrWhiteSpace(text) ? string.Empty : text + ".";
-        }
-
-        public string DescribeScannerContent(ScannerResult result, AdventureMapTile tile)
-        {
-            string groupResult = IsGroupResult(result) ? result.Label : null;
-            return Compose(
-                AdventureMapAnnouncementDefinitions.ScannerContent,
-                BuildTileParts(tile, groupResult, includeCoordinates: false, appendRouteToTerrainWhenNoContent: false));
         }
 
         private string DescribeWielder(AdventureMapTile tile)
@@ -99,18 +90,8 @@ namespace SongsOfConquestAccess.Speech.Spatial
             return tile == null ? string.Empty : tile.Position.x + ", " + tile.Position.y;
         }
 
-        private IEnumerable<AnnouncementPart> BuildTileParts(
-            AdventureMapTile tile,
-            string groupResult,
-            bool includeCoordinates,
-            bool appendRouteToTerrainWhenNoContent)
+        private IEnumerable<AnnouncementPart> BuildTileParts(AdventureMapTile tile)
         {
-            if (!string.IsNullOrWhiteSpace(groupResult))
-            {
-                yield return new AnnouncementPart(AdventureMapAnnouncementDefinitions.TileKeys.GroupResult, groupResult);
-                yield break;
-            }
-
             if (tile == null)
             {
                 yield break;
@@ -147,8 +128,7 @@ namespace SongsOfConquestAccess.Speech.Spatial
                 || !string.IsNullOrWhiteSpace(mapEntity)
                 || !string.IsNullOrWhiteSpace(interactionPoint);
             string terrain = DescribeTerrain(tile.Terrain);
-            bool appendRouteToTerrain = appendRouteToTerrainWhenNoContent
-                && tile.IsExplored
+            bool appendRouteToTerrain = tile.IsExplored
                 && !hasContent
                 && !string.IsNullOrWhiteSpace(terrain)
                 && !string.IsNullOrWhiteSpace(route);
@@ -174,10 +154,7 @@ namespace SongsOfConquestAccess.Speech.Spatial
                 yield return new AnnouncementPart(AdventureMapAnnouncementDefinitions.TileKeys.Terrain, terrain);
             }
 
-            if (includeCoordinates)
-            {
-                yield return new AnnouncementPart(AdventureMapAnnouncementDefinitions.TileKeys.Coordinates, DescribeCoordinates(tile));
-            }
+            yield return new AnnouncementPart(AdventureMapAnnouncementDefinitions.TileKeys.Coordinates, DescribeCoordinates(tile));
 
             string movementCost = DescribeMovementCost(tile);
             if (!string.IsNullOrWhiteSpace(movementCost))
@@ -251,15 +228,6 @@ namespace SongsOfConquestAccess.Speech.Spatial
             }
         }
 
-        private static bool IsGroupResult(ScannerResult result)
-        {
-            return result != null
-                && (result.Kind == ScannerResultKind.TerrainGroup
-                    || result.Kind == ScannerResultKind.AreaGroup
-                    || result.Kind == ScannerResultKind.UnexploredGroup
-                    || result.Kind == ScannerResultKind.CommanderZoneOfControl);
-        }
-
         private static string DescribeExplorationState(AdventureMapTile tile)
         {
             if (tile == null)
@@ -294,7 +262,7 @@ namespace SongsOfConquestAccess.Speech.Spatial
             return string.Join(". ", parts.ToArray());
         }
 
-        private static string DescribeReachabilityOrRoutePreview(AdventureMapTile tile)
+        public static string DescribeReachabilityOrRoutePreview(AdventureMapTile tile)
         {
             List<string> details = GetMovementDetails(tile);
             return details.Count > 0 ? string.Join(", ", details.ToArray()) : string.Empty;
@@ -390,7 +358,7 @@ namespace SongsOfConquestAccess.Speech.Spatial
             return Math.Round(normalized, 2).ToString("g2", CultureInfo.InvariantCulture);
         }
 
-        private static string DescribeMovementCost(AdventureMapTile tile)
+        public static string DescribeMovementCost(AdventureMapTile tile)
         {
             return tile != null && tile.IsExplored && tile.ReachableMovementCost.HasValue
                 ? ModText.Get(ModStrings.Spatial.MovementCost, FormatMovementValue(tile.ReachableMovementCost.Value))
@@ -427,6 +395,8 @@ namespace SongsOfConquestAccess.Speech.Spatial
                     return ModText.Get(ModStrings.Spatial.CobblestoneRoad);
                 case AdventureTerrainKind.Wall:
                     return ModText.Get(ModStrings.Spatial.Wall);
+                case AdventureTerrainKind.Obstruction:
+                    return ModText.Get(ModStrings.Spatial.Obstruction);
                 case AdventureTerrainKind.Grass:
                     return ModText.Get(ModStrings.Spatial.Grass);
                 case AdventureTerrainKind.Sand:

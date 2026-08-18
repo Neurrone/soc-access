@@ -186,31 +186,11 @@ namespace SongsOfConquestAccess.Adapters
         public ScannerSnapshot BuildScannerSnapshot(Vector2Int origin)
         {
             TroopPlacementSnapshot placement = BuildSnapshot();
-            ScannerSnapshot snapshot = new ScannerSnapshot();
-            InitializeTroopPlacementScannerCategories(snapshot);
-            AddTroopPlacementTroopScannerResults(snapshot, placement);
-            AddTroopPlacementSpawnScannerResults(snapshot, placement);
-            AddTroopPlacementTerrainScannerResults(snapshot, placement);
+            ScannerSnapshot snapshot = new ScannerSnapshot(BattleScannerTaxonomy.Instance);
+            ScannerContribution.Run(ScannerCategoryKeys.Troops, () => AddTroopPlacementTroopScannerResults(snapshot, placement));
+            ScannerContribution.Run(ScannerCategoryKeys.SpawnPoints, () => AddTroopPlacementSpawnScannerResults(snapshot, placement));
+            ScannerContribution.Run(ScannerCategoryKeys.Terrain, () => AddTroopPlacementTerrainScannerResults(snapshot, placement));
             return snapshot;
-        }
-
-        private static void InitializeTroopPlacementScannerCategories(ScannerSnapshot snapshot)
-        {
-            ScannerCategory troops = snapshot.GetOrAddCategory(ModText.Get(ModStrings.Scanner.Troops));
-            troops.GetOrAddSubcategory(ModText.Get(ModStrings.Scanner.All));
-            troops.GetOrAddSubcategory(ModText.Get(ModStrings.Scanner.Friendly));
-            troops.GetOrAddSubcategory(ModText.Get(ModStrings.Scanner.Enemy));
-
-            ScannerCategory spawnPoints = snapshot.GetOrAddCategory(ModText.Get(ModStrings.Scanner.SpawnPoints));
-            spawnPoints.GetOrAddSubcategory(ModText.Get(ModStrings.Scanner.All));
-            spawnPoints.GetOrAddSubcategory(ModText.Get(ModStrings.Scanner.Friendly));
-            spawnPoints.GetOrAddSubcategory(ModText.Get(ModStrings.Scanner.Enemy));
-
-            ScannerCategory terrain = snapshot.GetOrAddCategory(ModText.Get(ModStrings.Scanner.Terrain));
-            terrain.GetOrAddSubcategory(ModText.Get(ModStrings.Scanner.ElevatedGround, 1));
-            terrain.GetOrAddSubcategory(ModText.Get(ModStrings.Scanner.ElevatedGround, 2));
-            terrain.GetOrAddSubcategory(ModText.Get(ModStrings.Scanner.ElevatedGround, 3));
-            terrain.GetOrAddSubcategory(ModText.Get(ModStrings.Scanner.ImpassableTerrain));
         }
 
         private void AddTroopPlacementTroopScannerResults(ScannerSnapshot snapshot, TroopPlacementSnapshot placement)
@@ -235,14 +215,15 @@ namespace SongsOfConquestAccess.Adapters
                     {
                         ScannerResult result = new ScannerResult(
                             ScannerTileKey("terrain:elevated:" + elevation, tile.Point),
-                            ModText.Get(ModStrings.Spatial.ElevatedGroundHeight, elevation),
+                            ModText.Get(ModStrings.Scanner.ElevatedGround, elevation),
                             tile.Point)
                         {
-                            Kind = ScannerResultKind.TerrainPoint
+                            Kind = ScannerResultKind.TerrainPoint,
+                            ItemKey = ScannerItemKeys.ElevatedGround + elevation
                         };
                         snapshot.Add(
-                            ModText.Get(ModStrings.Scanner.Terrain),
-                            ModText.Get(ModStrings.Scanner.ElevatedGround, elevation),
+                            ScannerCategoryKeys.Terrain,
+                            ScannerSubcategoryKeys.All,
                             result);
                     }
                 }
@@ -254,14 +235,15 @@ namespace SongsOfConquestAccess.Adapters
                 {
                     ScannerResult result = new ScannerResult(
                         ScannerTileKey("terrain:impassable", tile.Point),
-                        ModText.Get(ModStrings.Spatial.Impassable),
+                        ModText.Get(ModStrings.Scanner.ImpassableTerrain),
                         tile.Point)
                     {
-                        Kind = ScannerResultKind.TerrainPoint
+                        Kind = ScannerResultKind.TerrainPoint,
+                        ItemKey = ScannerItemKeys.ImpassableTerrain
                     };
                     snapshot.Add(
-                        ModText.Get(ModStrings.Scanner.Terrain),
-                        ModText.Get(ModStrings.Scanner.ImpassableTerrain),
+                        ScannerCategoryKeys.Terrain,
+                        ScannerSubcategoryKeys.All,
                         result);
                 }
             }
@@ -276,14 +258,24 @@ namespace SongsOfConquestAccess.Adapters
                     ScannerResult result = new ScannerResult(
                         ScannerTileKey(own ? "troop:friendly" : "troop:enemy", tile.Point),
                         string.IsNullOrWhiteSpace(tile.TroopLabel) ? ModText.Get(ModStrings.Combat.UnknownTroop) : tile.TroopLabel,
-                        tile.Point);
+                        tile.Point)
+                    {
+                        // Keyed by troop type so stacks of the same unit are
+                        // one stop in the item cycle, except where the game is
+                        // hiding what the troop is: those keep the label as
+                        // their key so the item cycle cannot leak it.
+                        ItemKey = ScannerTroopItemKey(tile),
+                        Relationship = own
+                            ? ScannerResultRelationship.Friendly
+                            : ScannerResultRelationship.Enemy
+                    };
                     snapshot.Add(
-                        ModText.Get(ModStrings.Scanner.Troops),
-                        ModText.Get(ModStrings.Scanner.All),
+                        ScannerCategoryKeys.Troops,
+                        ScannerSubcategoryKeys.All,
                         CloneResult(result));
                     snapshot.Add(
-                        ModText.Get(ModStrings.Scanner.Troops),
-                        ModText.Get(own ? ModStrings.Scanner.Friendly : ModStrings.Scanner.Enemy),
+                        ScannerCategoryKeys.Troops,
+                        own ? ScannerSubcategoryKeys.Friendly : ScannerSubcategoryKeys.Enemy,
                         result);
                 }
             }
@@ -298,17 +290,48 @@ namespace SongsOfConquestAccess.Adapters
                     ScannerResult result = new ScannerResult(
                         ScannerTileKey(own ? "spawn:friendly" : "spawn:enemy", tile.Point),
                         ModText.Get(ModStrings.Spatial.SpawnPoint),
-                        tile.Point);
+                        tile.Point)
+                    {
+                        // Whose it is names the item, because that is the whole
+                        // of what one spawn point is next to another, and what
+                        // stands on it tells the instances apart. The label
+                        // stays "spawn point" so a search for the word still
+                        // finds them, but no result speaks it: the category has
+                        // already said it. No relationship either, since the
+                        // item name says whose it is.
+                        ItemLabel = own
+                            ? ModText.Get(ModStrings.Scanner.Friendly)
+                            : ModText.Get(ModStrings.Scanner.Enemy),
+                        InstanceLabel = DescribeSpawnPointOccupant(tile)
+                    };
                     snapshot.Add(
-                        ModText.Get(ModStrings.Scanner.SpawnPoints),
-                        ModText.Get(ModStrings.Scanner.All),
+                        ScannerCategoryKeys.SpawnPoints,
+                        ScannerSubcategoryKeys.All,
                         CloneResult(result));
                     snapshot.Add(
-                        ModText.Get(ModStrings.Scanner.SpawnPoints),
-                        ModText.Get(own ? ModStrings.Scanner.Friendly : ModStrings.Scanner.Enemy),
+                        ScannerCategoryKeys.SpawnPoints,
+                        own ? ScannerSubcategoryKeys.Friendly : ScannerSubcategoryKeys.Enemy,
                         result);
                 }
             }
+        }
+
+        /// <summary>
+        /// What stands on the spawn point, or that nothing does. Says neither
+        /// where the side's troops are not shown at all: an unscouted spawn
+        /// point is not an empty one, and claiming it is would be worse than
+        /// the announcement falling back to naming the side.
+        /// </summary>
+        private string DescribeSpawnPointOccupant(TroopPlacementTile tile)
+        {
+            if (!string.IsNullOrWhiteSpace(tile.TroopLabel))
+            {
+                return tile.TroopLabel;
+            }
+
+            return ShouldShowSide(tile.SpawnSide.Value)
+                ? ModText.Get(ModStrings.Scanner.SpawnPointEmpty)
+                : null;
         }
 
         private static string ScannerTileKey(string prefix, Vector2Int point)
@@ -321,16 +344,35 @@ namespace SongsOfConquestAccess.Adapters
             ScannerResult clone = new ScannerResult(result.Key, result.Label, result.Position)
             {
                 NotVisible = result.NotVisible,
+                Unvisited = result.Unvisited,
+                Attackable = result.Attackable,
+                Relationship = result.Relationship,
                 StableReference = result.StableReference,
-                Kind = result.Kind
+                Kind = result.Kind,
+                ItemKey = result.ItemKey,
+                ItemLabel = result.ItemLabel,
+                InstanceLabel = result.InstanceLabel
             };
             clone.Points.AddRange(result.Points);
             return clone;
         }
 
-        public bool ValidateScannerResult(ScannerResult result)
+        private static string ScannerTroopItemKey(TroopPlacementTile tile)
         {
-            return result != null && BuildSnapshot().IsValidTile(result.Position);
+            if (tile == null || tile.Troop == null || tile.TroopDetailsHidden)
+            {
+                return null;
+            }
+
+            TroopReference reference = tile.Troop.Reference;
+            return "troop:" + reference.FactionIndex + ":" + reference.UnitIndex + ":" + reference.UpgradeType;
+        }
+
+        public ScannerResultRefresh TryRefreshScannerResult(ScannerResult result, Vector2Int cursorHint)
+        {
+            return result != null && BuildSnapshot().IsValidTile(result.Position)
+                ? ScannerResultRefresh.Valid(result.Position)
+                : ScannerResultRefresh.Invalid;
         }
 
         public bool TryMoveTroop(Vector2Int source, Vector2Int destination)
@@ -673,7 +715,7 @@ namespace SongsOfConquestAccess.Adapters
                 tile.Troop = troop;
                 tile.TroopId = placement.TroopId;
                 tile.TroopDetailsHidden = detailsHidden;
-                tile.TroopLabel = detailsHidden ? "Unknown" : BuildTroopLabel(troop);
+                tile.TroopLabel = detailsHidden ? ModText.Get(ModStrings.Combat.UnknownTroop) : BuildTroopLabel(troop);
             }
         }
 

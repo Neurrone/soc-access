@@ -30,6 +30,31 @@ msgctxt "Common.ResourceAmount"
 msgid "{0} {1}"
 msgstr "{0} {1}"
 
+#. Scanner.Exploration
+msgctxt "Scanner.Exploration"
+msgid "Exploration"
+msgstr "Дослідження"
+
+#. Scanner.Merchants
+msgctxt "Scanner.Merchants"
+msgid "Merchants"
+msgstr "Торговці"
+
+#. Scanner.SpecialSites
+msgctxt "Scanner.SpecialSites"
+msgid "Special sites"
+msgstr "Особливі місця"
+
+#. Scanner.ZoneOfControl
+msgctxt "Scanner.ZoneOfControl"
+msgid "Zone of control"
+msgstr "Зона контролю"
+
+#. Spatial.ZoneOfControlInstance
+msgctxt "Spatial.ZoneOfControlInstance"
+msgid "{0} within {1}"
+msgstr "{0}, {1}"
+
 #. TeamColors.Black
 msgctxt "TeamColors.Black"
 msgid "black"
@@ -800,6 +825,11 @@ msgctxt "Screens.Group"
 msgid "Group {0}"
 msgstr "Група {0}"
 
+#. Screens.KeywordAlreadyAdded
+msgctxt "Screens.KeywordAlreadyAdded"
+msgid "That keyword is already in this custom category"
+msgstr "Це ключове слово вже є в цій власній категорії"
+
 #. Screens.Layout
 msgctxt "Screens.Layout"
 msgid "Layout"
@@ -975,6 +1005,16 @@ msgctxt "Screens.RecruitingFrom"
 msgid "Recruiting from {0}"
 msgstr "Найм із {0}"
 
+#. Screens.RemoveKeyword
+msgctxt "Screens.RemoveKeyword"
+msgid "Remove keyword, {0}"
+msgstr "Видалити ключове слово, {0}"
+
+#. Screens.RenameCustomCategory
+msgctxt "Screens.RenameCustomCategory"
+msgid "Rename"
+msgstr "Перейменувати"
+
 #. Screens.ResearchTier
 msgctxt "Screens.ResearchTier"
 msgid "{0} ({1} {2})"
@@ -1119,6 +1159,16 @@ msgstr "Меню підтвердження світу"
 msgctxt "Screens.RemoveFromQuickbar"
 msgid "Remove from quickbar"
 msgstr "Вилучити з панелі швидкого доступу"
+
+#. Screens.AddCustomCategory
+msgctxt "Screens.AddCustomCategory"
+msgid "Add custom category"
+msgstr "Додати власну категорію"
+
+#. Screens.AddKeyword
+msgctxt "Screens.AddKeyword"
+msgid "Add keyword"
+msgstr "Додати ключове слово"
 
 #. Screens.AmountToUpgrade
 msgctxt "Screens.AmountToUpgrade"
@@ -1415,10 +1465,15 @@ msgctxt "Actions.ScannerNextCategory"
 msgid "Next Scanner Category"
 msgstr "Наступний сканер категорія"
 
-#. Actions.ScannerNextResult
-msgctxt "Actions.ScannerNextResult"
-msgid "Next Scanner Result"
-msgstr "Наступний сканер результат"
+#. Actions.ScannerNextInstance
+msgctxt "Actions.ScannerNextInstance"
+msgid "Next Scanner Instance"
+msgstr "Наступний екземпляр сканера"
+
+#. Actions.ScannerNextItem
+msgctxt "Actions.ScannerNextItem"
+msgid "Next Scanner Item"
+msgstr "Наступний елемент сканера"
 
 #. Actions.ScannerNextSubcategory
 msgctxt "Actions.ScannerNextSubcategory"
@@ -1430,25 +1485,30 @@ msgctxt "Actions.ScannerPreviousCategory"
 msgid "Previous Scanner Category"
 msgstr "Попередній сканер категорія"
 
-#. Actions.ScannerPreviousResult
-msgctxt "Actions.ScannerPreviousResult"
-msgid "Previous Scanner Result"
-msgstr "Попередній сканер результат"
+#. Actions.ScannerPreviousInstance
+msgctxt "Actions.ScannerPreviousInstance"
+msgid "Previous Scanner Instance"
+msgstr "Попередній екземпляр сканера"
+
+#. Actions.ScannerPreviousItem
+msgctxt "Actions.ScannerPreviousItem"
+msgid "Previous Scanner Item"
+msgstr "Попередній елемент сканера"
 
 #. Actions.ScannerPreviousSubcategory
 msgctxt "Actions.ScannerPreviousSubcategory"
 msgid "Previous Scanner Subcategory"
 msgstr "Попередній сканер підкатегорія"
 
-#. Actions.ScannerRefresh
-msgctxt "Actions.ScannerRefresh"
-msgid "Refresh Scanner"
-msgstr "Оновити сканер"
+#. Actions.ScannerReturnFromJump
+msgctxt "Actions.ScannerReturnFromJump"
+msgid "Return To Tile Before Jump"
+msgstr "Повернутися до клітинки до переходу"
 
-#. Actions.ScannerSpeakOrientation
-msgctxt "Actions.ScannerSpeakOrientation"
-msgid "Scanner Result Orientation"
-msgstr "Орієнтація результату сканера"
+#. Actions.ScannerSpeakDistanceAndDirection
+msgctxt "Actions.ScannerSpeakDistanceAndDirection"
+msgid "Scanner Result Distance and Direction"
+msgstr "Відстань і напрямок результату сканера"
 
 #. Actions.SliderDecrease
 msgctxt "Actions.SliderDecrease"
@@ -2045,6 +2105,11 @@ msgctxt "Spatial.MovementRange"
 msgid "Movement range"
 msgstr "Дальність руху"
 
+#. Spatial.Obstruction
+msgctxt "Spatial.Obstruction"
+msgid "Obstruction"
+msgstr "Перешкода"
+
 #. Spatial.Neutral
 msgctxt "Spatial.Neutral"
 msgid "neutral"
@@ -2185,6 +2250,11 @@ msgctxt "Scanner.Attackable"
 msgid "Attackable"
 msgstr "Можна атакувати"
 
+#. Scanner.Barriers
+msgctxt "Scanner.Barriers"
+msgid "Barriers"
+msgstr "Бар'єри"
+
 #. Scanner.Beacons
 msgctxt "Scanner.Beacons"
 msgid "Beacons"
@@ -2194,11 +2264,6 @@ msgstr "Маяки"
 msgctxt "Scanner.Blocked"
 msgid "Blocked"
 msgstr "Заблоковано"
-
-#. Scanner.Bridges
-msgctxt "Scanner.Bridges"
-msgid "Bridges"
-msgstr "Мости"
 
 #. Scanner.Buildings
 msgctxt "Scanner.Buildings"
@@ -2210,10 +2275,25 @@ msgctxt "Scanner.Dangerous"
 msgid "Dangerous"
 msgstr "Небезпечно"
 
+#. Scanner.DirectionStep
+msgctxt "Scanner.DirectionStep"
+msgid "{0}{1}"
+msgstr "{0}{1}"
+
+#. Scanner.DirectionStepLong
+msgctxt "Scanner.DirectionStepLong"
+msgid "{0} {1}"
+msgstr "{0} {1}"
+
 #. Scanner.East
 msgctxt "Scanner.East"
 msgid "east"
 msgstr "схід"
+
+#. Scanner.EastShort
+msgctxt "Scanner.EastShort"
+msgid "e"
+msgstr "сх"
 
 #. Scanner.ElevatedGround
 msgctxt "Scanner.ElevatedGround"
@@ -2245,11 +2325,6 @@ msgctxt "Scanner.FriendlyGates"
 msgid "Friendly gates"
 msgstr "Дружні брами"
 
-#. Scanner.Impassable
-msgctxt "Scanner.Impassable"
-msgid "Impassable"
-msgstr "Непрохідно"
-
 #. Scanner.ImpassableTerrain
 msgctxt "Scanner.ImpassableTerrain"
 msgid "Impassable terrain"
@@ -2275,25 +2350,50 @@ msgctxt "Scanner.Neutral"
 msgid "Neutral"
 msgstr "Нейтральний"
 
+#. Scanner.NoTileToReturnTo
+msgctxt "Scanner.NoTileToReturnTo"
+msgid "No tile to return to"
+msgstr "Немає клітинки для повернення"
+
 #. Scanner.North
 msgctxt "Scanner.North"
 msgid "north"
 msgstr "північ"
+
+#. Scanner.NorthShort
+msgctxt "Scanner.NorthShort"
+msgid "n"
+msgstr "пн"
 
 #. Scanner.Northeast
 msgctxt "Scanner.Northeast"
 msgid "northeast"
 msgstr "північний схід"
 
+#. Scanner.NortheastShort
+msgctxt "Scanner.NortheastShort"
+msgid "ne"
+msgstr "пн-сх"
+
 #. Scanner.Northwest
 msgctxt "Scanner.Northwest"
 msgid "northwest"
 msgstr "північний захід"
 
+#. Scanner.NorthwestShort
+msgctxt "Scanner.NorthwestShort"
+msgid "nw"
+msgstr "пн-зх"
+
 #. Scanner.Objectives
 msgctxt "Scanner.Objectives"
 msgid "Objectives"
 msgstr "Цілі"
+
+#. Scanner.OpenGround
+msgctxt "Scanner.OpenGround"
+msgid "Open ground"
+msgstr "Відкрита місцевість"
 
 #. Scanner.Obstacles
 msgctxt "Scanner.Obstacles"
@@ -2325,10 +2425,10 @@ msgctxt "Scanner.Riches"
 msgid "Riches"
 msgstr "Багатства"
 
-#. Scanner.Roads
-msgctxt "Scanner.Roads"
-msgid "Roads"
-msgstr "Дороги"
+#. Scanner.RoadsAndCrossings
+msgctxt "Scanner.RoadsAndCrossings"
+msgid "Roads and crossings"
+msgstr "Дороги та переправи"
 
 #. Scanner.Search
 msgctxt "Scanner.Search"
@@ -2355,10 +2455,20 @@ msgctxt "Scanner.South"
 msgid "south"
 msgstr "південь"
 
+#. Scanner.SouthShort
+msgctxt "Scanner.SouthShort"
+msgid "s"
+msgstr "пд"
+
 #. Scanner.Southeast
 msgctxt "Scanner.Southeast"
 msgid "southeast"
 msgstr "південний схід"
+
+#. Scanner.SoutheastShort
+msgctxt "Scanner.SoutheastShort"
+msgid "se"
+msgstr "пд-сх"
 
 #. Scanner.Southwest
 msgctxt "Scanner.Southwest"
@@ -2390,40 +2500,30 @@ msgctxt "Scanner.Unexplored"
 msgid "Unexplored"
 msgstr "Недосліджене"
 
-#. Scanner.UnexploredTileCount_0
-msgctxt "Scanner.UnexploredTileCount_0"
-msgid "{0} unexplored tile"
-msgstr "{0} недосліджена клітинка"
-
-#. Scanner.UnexploredTileCount_1
-msgctxt "Scanner.UnexploredTileCount_1"
-msgid "{0} unexplored tiles"
-msgstr "{0} недосліджені клітинки"
-
-#. Scanner.UnexploredTileCount_2
-msgctxt "Scanner.UnexploredTileCount_2"
-msgid "{0} unexplored tiles"
-msgstr "{0} недосліджених клітинок"
-
 #. Scanner.Unvisited
 msgctxt "Scanner.Unvisited"
 msgid "Unvisited"
 msgstr "Не відвідано"
-
-#. Scanner.Water
-msgctxt "Scanner.Water"
-msgid "Water"
-msgstr "Вода"
 
 #. Scanner.West
 msgctxt "Scanner.West"
 msgid "west"
 msgstr "захід"
 
+#. Screens.Battle
+msgctxt "Screens.Battle"
+msgid "Battle"
+msgstr "Битва"
+
 #. Screens.BuyResourceForGold
 msgctxt "Screens.BuyResourceForGold"
 msgid "Buy {0} for {1}"
 msgstr "Купити {0} за {1}"
+
+#. Screens.TextEntryUnavailable
+msgctxt "Screens.TextEntryUnavailable"
+msgid "Text entry is not available here"
+msgstr "Введення тексту тут недоступне"
 
 #. Screens.Sell
 msgctxt "Screens.Sell"
@@ -2439,81 +2539,6 @@ msgstr "Продати {0} за {1}"
 msgctxt "Scanner.Wielders"
 msgid "Wielders"
 msgstr "Носії"
-
-#. Scanner.BlockedTileCount_0
-msgctxt "Scanner.BlockedTileCount_0"
-msgid "{0} blocked tile"
-msgstr "{0} заблокована клітинка"
-
-#. Scanner.BlockedTileCount_1
-msgctxt "Scanner.BlockedTileCount_1"
-msgid "{0} blocked tiles"
-msgstr "{0} заблоковані клітинки"
-
-#. Scanner.BlockedTileCount_2
-msgctxt "Scanner.BlockedTileCount_2"
-msgid "{0} blocked tiles"
-msgstr "{0} заблокованих клітинок"
-
-#. Scanner.BridgeTileCount_0
-msgctxt "Scanner.BridgeTileCount_0"
-msgid "{0} bridge tile"
-msgstr "{0} клітинка мосту"
-
-#. Scanner.BridgeTileCount_1
-msgctxt "Scanner.BridgeTileCount_1"
-msgid "{0} bridge tiles"
-msgstr "{0} клітинки мосту"
-
-#. Scanner.BridgeTileCount_2
-msgctxt "Scanner.BridgeTileCount_2"
-msgid "{0} bridge tiles"
-msgstr "{0} клітинок мосту"
-
-#. Scanner.ImpassableTileCount_0
-msgctxt "Scanner.ImpassableTileCount_0"
-msgid "{0} impassable tile"
-msgstr "{0} непрохідна клітинка"
-
-#. Scanner.ImpassableTileCount_1
-msgctxt "Scanner.ImpassableTileCount_1"
-msgid "{0} impassable tiles"
-msgstr "{0} непрохідні клітинки"
-
-#. Scanner.ImpassableTileCount_2
-msgctxt "Scanner.ImpassableTileCount_2"
-msgid "{0} impassable tiles"
-msgstr "{0} непрохідних клітинок"
-
-#. Scanner.RoadTileCount_0
-msgctxt "Scanner.RoadTileCount_0"
-msgid "{0} road tile"
-msgstr "{0} клітинка дороги"
-
-#. Scanner.RoadTileCount_1
-msgctxt "Scanner.RoadTileCount_1"
-msgid "{0} road tiles"
-msgstr "{0} клітинки дороги"
-
-#. Scanner.RoadTileCount_2
-msgctxt "Scanner.RoadTileCount_2"
-msgid "{0} road tiles"
-msgstr "{0} клітинок дороги"
-
-#. Scanner.WaterTileCount_0
-msgctxt "Scanner.WaterTileCount_0"
-msgid "{0} water tile"
-msgstr "{0} клітинка води"
-
-#. Scanner.WaterTileCount_1
-msgctxt "Scanner.WaterTileCount_1"
-msgid "{0} water tiles"
-msgstr "{0} клітинки води"
-
-#. Scanner.WaterTileCount_2
-msgctxt "Scanner.WaterTileCount_2"
-msgid "{0} water tiles"
-msgstr "{0} клітинок води"
 
 #. Spatial.AridTrees
 msgctxt "Spatial.AridTrees"
@@ -2585,6 +2610,26 @@ msgctxt "Screens.MoveAllRight"
 msgid "Move all right"
 msgstr "Перемістити всіх праворуч"
 
+#. Screens.CustomCategories
+msgctxt "Screens.CustomCategories"
+msgid "{0} custom categories"
+msgstr "Власні категорії: {0}"
+
+#. Screens.CustomCategoryDefaultName
+msgctxt "Screens.CustomCategoryDefaultName"
+msgid "Custom {0}"
+msgstr "Власна {0}"
+
+#. Screens.CustomCategoryDeleted
+msgctxt "Screens.CustomCategoryDeleted"
+msgid "{0} deleted"
+msgstr "{0} видалено"
+
+#. Screens.DeleteCustomCategory
+msgctxt "Screens.DeleteCustomCategory"
+msgid "Delete this custom category"
+msgstr "Видалити цю власну категорію"
+
 #. Screens.CancelAbility
 msgctxt "Screens.CancelAbility"
 msgid "Cancel ability"
@@ -2609,6 +2654,16 @@ msgstr "Ліворуч: {0}, праворуч: {1}"
 msgctxt "Screens.Options"
 msgid "Options"
 msgstr "Параметри"
+
+#. Scanner.SouthwestShort
+msgctxt "Scanner.SouthwestShort"
+msgid "sw"
+msgstr "пд-зх"
+
+#. Scanner.SpawnPointEmpty
+msgctxt "Scanner.SpawnPointEmpty"
+msgid "empty"
+msgstr "порожньо"
 
 #. Scanner.SpawnPoints
 msgctxt "Scanner.SpawnPoints"
@@ -2686,75 +2741,10 @@ msgctxt "Combat.YourRangedTroops"
 msgid "your ranged troops"
 msgstr "ваші далекобійні загони"
 
-#. Scanner.AridTrees
-msgctxt "Scanner.AridTrees"
-msgid "Arid trees"
-msgstr "Посушливі дерева"
-
-#. Scanner.CobblestoneRoads
-msgctxt "Scanner.CobblestoneRoads"
-msgid "Cobblestone roads"
-msgstr "Бруковані дороги"
-
-#. Scanner.DeepWater
-msgctxt "Scanner.DeepWater"
-msgid "Deep water"
-msgstr "Глибока вода"
-
-#. Scanner.Deforestation
-msgctxt "Scanner.Deforestation"
-msgid "Deforestation"
-msgstr "Вирубка лісу"
-
-#. Scanner.Dirt
-msgctxt "Scanner.Dirt"
-msgid "Dirt"
-msgstr "Земля"
-
-#. Scanner.DirtRoads
-msgctxt "Scanner.DirtRoads"
-msgid "Dirt roads"
-msgstr "Ґрунтові дороги"
-
-#. Scanner.Farmland
-msgctxt "Scanner.Farmland"
-msgid "Farmland"
-msgstr "Сільськогосподарські землі"
-
-#. Scanner.Grass
-msgctxt "Scanner.Grass"
-msgid "Grass"
-msgstr "Трава"
-
-#. Scanner.Mountains
-msgctxt "Scanner.Mountains"
-msgid "Mountains"
-msgstr "Гори"
-
-#. Scanner.Sand
-msgctxt "Scanner.Sand"
-msgid "Sand"
-msgstr "Пісок"
-
-#. Scanner.ShallowWater
-msgctxt "Scanner.ShallowWater"
-msgid "Shallow water"
-msgstr "Мілководдя"
-
-#. Scanner.TemperateTrees
-msgctxt "Scanner.TemperateTrees"
-msgid "Temperate trees"
-msgstr "Дерева помірного клімату"
-
-#. Scanner.Walls
-msgctxt "Scanner.Walls"
-msgid "Walls"
-msgstr "Мури"
-
-#. Scanner.WaterEdge
-msgctxt "Scanner.WaterEdge"
-msgid "Water edge"
-msgstr "Край води"
+#. Scanner.WestShort
+msgctxt "Scanner.WestShort"
+msgid "w"
+msgstr "зх"
 
 #. Spatial.Dirt
 msgctxt "Spatial.Dirt"
@@ -2780,216 +2770,6 @@ msgstr "Пісок"
 msgctxt "Spatial.TemperateTrees"
 msgid "Temperate trees"
 msgstr "Дерева помірного клімату"
-
-#. Scanner.AridTreeTileCount_0
-msgctxt "Scanner.AridTreeTileCount_0"
-msgid "{0} arid tree tile"
-msgstr "{0} клітинка: Посушливі дерева"
-
-#. Scanner.AridTreeTileCount_1
-msgctxt "Scanner.AridTreeTileCount_1"
-msgid "{0} arid tree tiles"
-msgstr "{0} клітинки: Посушливі дерева"
-
-#. Scanner.AridTreeTileCount_2
-msgctxt "Scanner.AridTreeTileCount_2"
-msgid "{0} arid tree tiles"
-msgstr "{0} клітинок: Посушливі дерева"
-
-#. Scanner.CobblestoneRoadTileCount_0
-msgctxt "Scanner.CobblestoneRoadTileCount_0"
-msgid "{0} cobblestone road tile"
-msgstr "{0} клітинка: Бруковані дороги"
-
-#. Scanner.CobblestoneRoadTileCount_1
-msgctxt "Scanner.CobblestoneRoadTileCount_1"
-msgid "{0} cobblestone road tiles"
-msgstr "{0} клітинки: Бруковані дороги"
-
-#. Scanner.CobblestoneRoadTileCount_2
-msgctxt "Scanner.CobblestoneRoadTileCount_2"
-msgid "{0} cobblestone road tiles"
-msgstr "{0} клітинок: Бруковані дороги"
-
-#. Scanner.DeepWaterTileCount_0
-msgctxt "Scanner.DeepWaterTileCount_0"
-msgid "{0} deep water tile"
-msgstr "{0} клітинка: Глибока вода"
-
-#. Scanner.DeepWaterTileCount_1
-msgctxt "Scanner.DeepWaterTileCount_1"
-msgid "{0} deep water tiles"
-msgstr "{0} клітинки: Глибока вода"
-
-#. Scanner.DeepWaterTileCount_2
-msgctxt "Scanner.DeepWaterTileCount_2"
-msgid "{0} deep water tiles"
-msgstr "{0} клітинок: Глибока вода"
-
-#. Scanner.DeforestationTileCount_0
-msgctxt "Scanner.DeforestationTileCount_0"
-msgid "{0} deforestation tile"
-msgstr "{0} клітинка: Вирубка лісу"
-
-#. Scanner.DeforestationTileCount_1
-msgctxt "Scanner.DeforestationTileCount_1"
-msgid "{0} deforestation tiles"
-msgstr "{0} клітинки: Вирубка лісу"
-
-#. Scanner.DeforestationTileCount_2
-msgctxt "Scanner.DeforestationTileCount_2"
-msgid "{0} deforestation tiles"
-msgstr "{0} клітинок: Вирубка лісу"
-
-#. Scanner.DirtRoadTileCount_0
-msgctxt "Scanner.DirtRoadTileCount_0"
-msgid "{0} dirt road tile"
-msgstr "{0} клітинка: Ґрунтові дороги"
-
-#. Scanner.DirtRoadTileCount_1
-msgctxt "Scanner.DirtRoadTileCount_1"
-msgid "{0} dirt road tiles"
-msgstr "{0} клітинки: Ґрунтові дороги"
-
-#. Scanner.DirtRoadTileCount_2
-msgctxt "Scanner.DirtRoadTileCount_2"
-msgid "{0} dirt road tiles"
-msgstr "{0} клітинок: Ґрунтові дороги"
-
-#. Scanner.DirtTileCount_0
-msgctxt "Scanner.DirtTileCount_0"
-msgid "{0} dirt tile"
-msgstr "{0} клітинка: Земля"
-
-#. Scanner.DirtTileCount_1
-msgctxt "Scanner.DirtTileCount_1"
-msgid "{0} dirt tiles"
-msgstr "{0} клітинки: Земля"
-
-#. Scanner.DirtTileCount_2
-msgctxt "Scanner.DirtTileCount_2"
-msgid "{0} dirt tiles"
-msgstr "{0} клітинок: Земля"
-
-#. Scanner.FarmlandTileCount_0
-msgctxt "Scanner.FarmlandTileCount_0"
-msgid "{0} farmland tile"
-msgstr "{0} клітинка: Сільськогосподарські землі"
-
-#. Scanner.FarmlandTileCount_1
-msgctxt "Scanner.FarmlandTileCount_1"
-msgid "{0} farmland tiles"
-msgstr "{0} клітинки: Сільськогосподарські землі"
-
-#. Scanner.FarmlandTileCount_2
-msgctxt "Scanner.FarmlandTileCount_2"
-msgid "{0} farmland tiles"
-msgstr "{0} клітинок: Сільськогосподарські землі"
-
-#. Scanner.GrassTileCount_0
-msgctxt "Scanner.GrassTileCount_0"
-msgid "{0} grass tile"
-msgstr "{0} клітинка: Трава"
-
-#. Scanner.GrassTileCount_1
-msgctxt "Scanner.GrassTileCount_1"
-msgid "{0} grass tiles"
-msgstr "{0} клітинки: Трава"
-
-#. Scanner.GrassTileCount_2
-msgctxt "Scanner.GrassTileCount_2"
-msgid "{0} grass tiles"
-msgstr "{0} клітинок: Трава"
-
-#. Scanner.MountainTileCount_0
-msgctxt "Scanner.MountainTileCount_0"
-msgid "{0} mountain tile"
-msgstr "{0} клітинка: Гори"
-
-#. Scanner.MountainTileCount_1
-msgctxt "Scanner.MountainTileCount_1"
-msgid "{0} mountain tiles"
-msgstr "{0} клітинки: Гори"
-
-#. Scanner.MountainTileCount_2
-msgctxt "Scanner.MountainTileCount_2"
-msgid "{0} mountain tiles"
-msgstr "{0} клітинок: Гори"
-
-#. Scanner.SandTileCount_0
-msgctxt "Scanner.SandTileCount_0"
-msgid "{0} sand tile"
-msgstr "{0} клітинка: Пісок"
-
-#. Scanner.SandTileCount_1
-msgctxt "Scanner.SandTileCount_1"
-msgid "{0} sand tiles"
-msgstr "{0} клітинки: Пісок"
-
-#. Scanner.SandTileCount_2
-msgctxt "Scanner.SandTileCount_2"
-msgid "{0} sand tiles"
-msgstr "{0} клітинок: Пісок"
-
-#. Scanner.ShallowWaterTileCount_0
-msgctxt "Scanner.ShallowWaterTileCount_0"
-msgid "{0} shallow water tile"
-msgstr "{0} клітинка: Мілководдя"
-
-#. Scanner.ShallowWaterTileCount_1
-msgctxt "Scanner.ShallowWaterTileCount_1"
-msgid "{0} shallow water tiles"
-msgstr "{0} клітинки: Мілководдя"
-
-#. Scanner.ShallowWaterTileCount_2
-msgctxt "Scanner.ShallowWaterTileCount_2"
-msgid "{0} shallow water tiles"
-msgstr "{0} клітинок: Мілководдя"
-
-#. Scanner.TemperateTreeTileCount_0
-msgctxt "Scanner.TemperateTreeTileCount_0"
-msgid "{0} temperate tree tile"
-msgstr "{0} клітинка: Дерева помірного клімату"
-
-#. Scanner.TemperateTreeTileCount_1
-msgctxt "Scanner.TemperateTreeTileCount_1"
-msgid "{0} temperate tree tiles"
-msgstr "{0} клітинки: Дерева помірного клімату"
-
-#. Scanner.TemperateTreeTileCount_2
-msgctxt "Scanner.TemperateTreeTileCount_2"
-msgid "{0} temperate tree tiles"
-msgstr "{0} клітинок: Дерева помірного клімату"
-
-#. Scanner.WallTileCount_0
-msgctxt "Scanner.WallTileCount_0"
-msgid "{0} wall tile"
-msgstr "{0} клітинка: Мури"
-
-#. Scanner.WallTileCount_1
-msgctxt "Scanner.WallTileCount_1"
-msgid "{0} wall tiles"
-msgstr "{0} клітинки: Мури"
-
-#. Scanner.WallTileCount_2
-msgctxt "Scanner.WallTileCount_2"
-msgid "{0} wall tiles"
-msgstr "{0} клітинок: Мури"
-
-#. Scanner.WaterEdgeTileCount_0
-msgctxt "Scanner.WaterEdgeTileCount_0"
-msgid "{0} water edge tile"
-msgstr "{0} клітинка: Край води"
-
-#. Scanner.WaterEdgeTileCount_1
-msgctxt "Scanner.WaterEdgeTileCount_1"
-msgid "{0} water edge tiles"
-msgstr "{0} клітинки: Край води"
-
-#. Scanner.WaterEdgeTileCount_2
-msgctxt "Scanner.WaterEdgeTileCount_2"
-msgid "{0} water edge tiles"
-msgstr "{0} клітинок: Край води"
 
 #. Spatial.SkippedTileCount_0
 msgctxt "Spatial.SkippedTileCount_0"
@@ -3271,6 +3051,11 @@ msgctxt "Screens.AnnouncementHealth"
 msgid "Health"
 msgstr "Здоров’я"
 
+#. Screens.AnnouncementItem
+msgctxt "Screens.AnnouncementItem"
+msgid "Item name"
+msgstr "Назва елемента"
+
 #. Screens.AnnouncementImpassableOrBlocked
 msgctxt "Screens.AnnouncementImpassableOrBlocked"
 msgid "Impassable or blocked"
@@ -3296,6 +3081,11 @@ msgctxt "Screens.AnnouncementSelectedForSpellcast"
 msgid "Selected for spellcast"
 msgstr "Вибрано для заклинання"
 
+#. Screens.AnnouncementStatus
+msgctxt "Screens.AnnouncementStatus"
+msgid "Status"
+msgstr "Стан"
+
 #. Screens.AnnouncementStackSize
 msgctxt "Screens.AnnouncementStackSize"
 msgid "Stack size"
@@ -3310,6 +3100,11 @@ msgstr "Ефекти клітинки"
 msgctxt "Screens.AnnouncementTroopName"
 msgid "Troop name"
 msgstr "Назва загону"
+
+#. Screens.AnnouncementOwner
+msgctxt "Screens.AnnouncementOwner"
+msgid "Owner"
+msgstr "Власник"
 
 #. Screens.AnnouncementOrderRow
 msgctxt "Screens.AnnouncementOrderRow"
@@ -3340,6 +3135,11 @@ msgstr "Сканер"
 msgctxt "Screens.ScannerContentAnnouncements"
 msgid "Scanner content announcements"
 msgstr "Оголошення вмісту сканера"
+
+#. Screens.ScannerUsesLongDirections
+msgctxt "Screens.ScannerUsesLongDirections"
+msgid "Long directions"
+msgstr "Повні назви напрямків"
 
 #. Screens.ScannerResultAnnouncements
 msgctxt "Screens.ScannerResultAnnouncements"
@@ -3406,11 +3206,6 @@ msgstr "Пункт призначення"
 msgctxt "Screens.AnnouncementExplorationState"
 msgid "Exploration state"
 msgstr "Стан розвідки"
-
-#. Screens.AnnouncementGroupResult
-msgctxt "Screens.AnnouncementGroupResult"
-msgid "Group result"
-msgstr "Результат групи"
 
 #. Screens.AnnouncementInteractionPoint
 msgctxt "Screens.AnnouncementInteractionPoint"
@@ -3632,3 +3427,79 @@ msgstr "Відтворювати звуки клітинок"
 msgctxt "Screens.Volume"
 msgid "Volume"
 msgstr "Гучність"
+
+#. Screens.SelectedSubcategoryCount_0
+msgctxt "Screens.SelectedSubcategoryCount_0"
+msgid "{0} selected"
+msgstr "{0} вибрана"
+
+#. Screens.SelectedSubcategoryCount_1
+msgctxt "Screens.SelectedSubcategoryCount_1"
+msgid "{0} selected"
+msgstr "{0} вибрані"
+
+#. Screens.SelectedSubcategoryCount_2
+msgctxt "Screens.SelectedSubcategoryCount_2"
+msgid "{0} selected"
+msgstr "{0} вибрано"
+
+#. Actions.ScannerNextCustomEntry
+msgctxt "Actions.ScannerNextCustomEntry"
+msgid "Next Entry In The Custom Category On {0}"
+msgstr "Наступний запис у власній категорії на {0}"
+
+#. Actions.ScannerPreviousCustomEntry
+msgctxt "Actions.ScannerPreviousCustomEntry"
+msgid "Previous Entry In The Custom Category On {0}"
+msgstr "Попередній запис у власній категорії на {0}"
+
+#. Screens.CustomCategoryKey
+msgctxt "Screens.CustomCategoryKey"
+msgid "Key, {0}"
+msgstr "Клавіша, {0}"
+
+#. Screens.CustomCategoryKeyCurrent
+msgctxt "Screens.CustomCategoryKeyCurrent"
+msgid "{0}, current"
+msgstr "{0}, поточна"
+
+#. Screens.CustomCategoryKeyHeldBy
+msgctxt "Screens.CustomCategoryKeyHeldBy"
+msgid "{0}, held by {1}"
+msgstr "{0}, зайнята категорією {1}"
+
+#. Screens.CustomCategoryKeyTitle
+msgctxt "Screens.CustomCategoryKeyTitle"
+msgid "Key for {0}"
+msgstr "Клавіша для {0}"
+
+#. Screens.CustomCategoryNameTaken
+msgctxt "Screens.CustomCategoryNameTaken"
+msgid "{0} is already the name of a category"
+msgstr "{0} — уже назва категорії"
+
+#. Scanner.NoCustomCategoryOnKey
+msgctxt "Scanner.NoCustomCategoryOnKey"
+msgid "No custom category on {0}"
+msgstr "На {0} немає власної категорії"
+
+#. Scanner.QuickKeyComma
+msgctxt "Scanner.QuickKeyComma"
+msgid "Comma"
+msgstr "Кома"
+
+#. Scanner.QuickKeyNone
+msgctxt "Scanner.QuickKeyNone"
+msgid "None"
+msgstr "Немає"
+
+#. Scanner.QuickKeyPeriod
+msgctxt "Scanner.QuickKeyPeriod"
+msgid "Period"
+msgstr "Крапка"
+
+#. Scanner.QuickKeySlash
+msgctxt "Scanner.QuickKeySlash"
+msgid "Slash"
+msgstr "Скісна риска"
+

@@ -2,6 +2,7 @@ using System;
 using SongsOfConquestAccess.Adapters;
 using SongsOfConquestAccess.Input;
 using SongsOfConquestAccess.Localization;
+using SongsOfConquestAccess.Scanner;
 using SongsOfConquestAccess.Speech.Spatial;
 using SongsOfConquestAccess.UI;
 
@@ -46,10 +47,30 @@ namespace SongsOfConquestAccess.Screens
         {
             ContainerWidget root = new ContainerWidget("mod-settings-screen", ModText.Get(ModStrings.Screens.ModSettings));
             root.AddChild(BuildTabs());
+            root.AddChild(new CheckboxWidget(
+                "mod-settings-scanner-uses-long-directions",
+                ModText.Get(ModStrings.Screens.ScannerUsesLongDirections),
+                ToggleScannerUsesLongDirections,
+                () => ModSettings.ScannerUsesLongDirections,
+                IsScannerTabSelected));
             root.AddChild(new ButtonWidget(
                 "mod-settings-scanner-result-announcements",
                 ModText.Get(ModStrings.Screens.ScannerResultAnnouncements),
                 () => OpenAnnouncementOrderScreen(ScannerAnnouncementDefinitions.Result),
+                null,
+                () => true,
+                IsScannerTabSelected));
+            root.AddChild(new ButtonWidget(
+                "mod-settings-scanner-adventure-custom-categories",
+                ModText.Get(ModStrings.Screens.CustomCategories, ModText.Get(ModStrings.Screens.AdventureMap)),
+                () => OpenCustomCategoriesScreen(AdventureScannerTaxonomy.Instance, ModStrings.Screens.AdventureMap),
+                null,
+                () => true,
+                IsScannerTabSelected));
+            root.AddChild(new ButtonWidget(
+                "mod-settings-scanner-battle-custom-categories",
+                ModText.Get(ModStrings.Screens.CustomCategories, ModText.Get(ModStrings.Screens.Battle)),
+                () => OpenCustomCategoriesScreen(BattleScannerTaxonomy.Instance, ModStrings.Screens.Battle),
                 null,
                 () => true,
                 IsScannerTabSelected));
@@ -273,6 +294,24 @@ namespace SongsOfConquestAccess.Screens
             SocAccessPlugin.Instance.ScreenManager.Push(
                 new AudioGlossaryScreen(),
                 "audio glossary screen opened");
+            return true;
+        }
+
+        private static void ToggleScannerUsesLongDirections()
+        {
+            ModSettings.SetScannerUsesLongDirections(!ModSettings.ScannerUsesLongDirections);
+        }
+
+        private static bool OpenCustomCategoriesScreen(ScannerTaxonomy taxonomy, ModString contextLabel)
+        {
+            if (taxonomy == null || SocAccessPlugin.Instance == null || SocAccessPlugin.Instance.ScreenManager == null)
+            {
+                return false;
+            }
+
+            SocAccessPlugin.Instance.ScreenManager.Push(
+                new ScannerCustomCategoriesScreen(taxonomy, contextLabel),
+                "scanner custom categories screen opened");
             return true;
         }
 

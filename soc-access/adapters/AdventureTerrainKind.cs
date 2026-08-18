@@ -19,6 +19,7 @@ namespace SongsOfConquestAccess.Adapters
         TemperateTrees,
         Mountain,
         Deforestation,
-        Farmland
+        Farmland,
+        Obstruction
     }
 }

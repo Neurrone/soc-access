@@ -624,6 +624,11 @@ msgctxt "Spatial.Mountain"
 msgid "Mountain"
 msgstr ""
 
+#. Spatial.Obstruction
+msgctxt "Spatial.Obstruction"
+msgid "Obstruction"
+msgstr ""
+
 #. Spatial.Neutral
 msgctxt "Spatial.Neutral"
 msgid "neutral"
@@ -747,6 +752,11 @@ msgstr ""
 #. Spatial.ZoneOfControlTiles
 msgctxt "Spatial.ZoneOfControlTiles"
 msgid "{0} within {1} zone of control"
+msgstr ""
+
+#. Spatial.ZoneOfControlInstance
+msgctxt "Spatial.ZoneOfControlInstance"
+msgid "{0} within {1}"
 msgstr ""
 
 #. Actions.Activate
@@ -1039,9 +1049,19 @@ msgctxt "Actions.ScannerNextCategory"
 msgid "Next Scanner Category"
 msgstr ""
 
-#. Actions.ScannerNextResult
-msgctxt "Actions.ScannerNextResult"
-msgid "Next Scanner Result"
+#. Actions.ScannerNextCustomEntry
+msgctxt "Actions.ScannerNextCustomEntry"
+msgid "Next Entry In The Custom Category On {0}"
+msgstr ""
+
+#. Actions.ScannerNextInstance
+msgctxt "Actions.ScannerNextInstance"
+msgid "Next Scanner Instance"
+msgstr ""
+
+#. Actions.ScannerNextItem
+msgctxt "Actions.ScannerNextItem"
+msgid "Next Scanner Item"
 msgstr ""
 
 #. Actions.ScannerNextSubcategory
@@ -1054,9 +1074,19 @@ msgctxt "Actions.ScannerPreviousCategory"
 msgid "Previous Scanner Category"
 msgstr ""
 
-#. Actions.ScannerPreviousResult
-msgctxt "Actions.ScannerPreviousResult"
-msgid "Previous Scanner Result"
+#. Actions.ScannerPreviousCustomEntry
+msgctxt "Actions.ScannerPreviousCustomEntry"
+msgid "Previous Entry In The Custom Category On {0}"
+msgstr ""
+
+#. Actions.ScannerPreviousInstance
+msgctxt "Actions.ScannerPreviousInstance"
+msgid "Previous Scanner Instance"
+msgstr ""
+
+#. Actions.ScannerPreviousItem
+msgctxt "Actions.ScannerPreviousItem"
+msgid "Previous Scanner Item"
 msgstr ""
 
 #. Actions.ScannerPreviousSubcategory
@@ -1064,14 +1094,14 @@ msgctxt "Actions.ScannerPreviousSubcategory"
 msgid "Previous Scanner Subcategory"
 msgstr ""
 
-#. Actions.ScannerRefresh
-msgctxt "Actions.ScannerRefresh"
-msgid "Refresh Scanner"
+#. Actions.ScannerReturnFromJump
+msgctxt "Actions.ScannerReturnFromJump"
+msgid "Return To Tile Before Jump"
 msgstr ""
 
-#. Actions.ScannerSpeakOrientation
-msgctxt "Actions.ScannerSpeakOrientation"
-msgid "Scanner Result Orientation"
+#. Actions.ScannerSpeakDistanceAndDirection
+msgctxt "Actions.ScannerSpeakDistanceAndDirection"
+msgid "Scanner Result Distance and Direction"
 msgstr ""
 
 #. Actions.SliderDecrease
@@ -1969,6 +1999,16 @@ msgctxt "Screens.AdventureMap"
 msgid "Adventure map"
 msgstr ""
 
+#. Screens.AddCustomCategory
+msgctxt "Screens.AddCustomCategory"
+msgid "Add custom category"
+msgstr ""
+
+#. Screens.AddKeyword
+msgctxt "Screens.AddKeyword"
+msgid "Add keyword"
+msgstr ""
+
 #. Screens.AmountToUpgrade
 msgctxt "Screens.AmountToUpgrade"
 msgid "Amount to upgrade, {0}"
@@ -2042,6 +2082,11 @@ msgstr ""
 #. Screens.BattleResult
 msgctxt "Screens.BattleResult"
 msgid "Battle result"
+msgstr ""
+
+#. Screens.Battle
+msgctxt "Screens.Battle"
+msgid "Battle"
 msgstr ""
 
 #. Screens.BuyResourceForGold
@@ -2132,6 +2177,51 @@ msgstr ""
 #. Screens.CreationSpells
 msgctxt "Screens.CreationSpells"
 msgid "Creation spells"
+msgstr ""
+
+#. Screens.CustomCategories
+msgctxt "Screens.CustomCategories"
+msgid "{0} custom categories"
+msgstr ""
+
+#. Screens.CustomCategoryDefaultName
+msgctxt "Screens.CustomCategoryDefaultName"
+msgid "Custom {0}"
+msgstr ""
+
+#. Screens.CustomCategoryDeleted
+msgctxt "Screens.CustomCategoryDeleted"
+msgid "{0} deleted"
+msgstr ""
+
+#. Screens.CustomCategoryKey
+msgctxt "Screens.CustomCategoryKey"
+msgid "Key, {0}"
+msgstr ""
+
+#. Screens.CustomCategoryKeyCurrent
+msgctxt "Screens.CustomCategoryKeyCurrent"
+msgid "{0}, current"
+msgstr ""
+
+#. Screens.CustomCategoryKeyHeldBy
+msgctxt "Screens.CustomCategoryKeyHeldBy"
+msgid "{0}, held by {1}"
+msgstr ""
+
+#. Screens.CustomCategoryKeyTitle
+msgctxt "Screens.CustomCategoryKeyTitle"
+msgid "Key for {0}"
+msgstr ""
+
+#. Screens.CustomCategoryNameTaken
+msgctxt "Screens.CustomCategoryNameTaken"
+msgid "{0} is already the name of a category"
+msgstr ""
+
+#. Screens.DeleteCustomCategory
+msgctxt "Screens.DeleteCustomCategory"
+msgid "Delete this custom category"
 msgstr ""
 
 #. Screens.CancelAbility
@@ -2242,6 +2332,11 @@ msgstr ""
 #. Screens.InviteFriend
 msgctxt "Screens.InviteFriend"
 msgid "Invite friend"
+msgstr ""
+
+#. Screens.KeywordAlreadyAdded
+msgctxt "Screens.KeywordAlreadyAdded"
+msgid "That keyword is already in this custom category"
 msgstr ""
 
 #. Screens.Layout
@@ -2524,6 +2619,16 @@ msgctxt "Screens.RemoveFromQuickbar"
 msgid "Remove from quickbar"
 msgstr ""
 
+#. Screens.RemoveKeyword
+msgctxt "Screens.RemoveKeyword"
+msgid "Remove keyword, {0}"
+msgstr ""
+
+#. Screens.RenameCustomCategory
+msgctxt "Screens.RenameCustomCategory"
+msgid "Rename"
+msgstr ""
+
 #. Screens.ResearchTier
 msgctxt "Screens.ResearchTier"
 msgid "{0} ({1} {2})"
@@ -2564,6 +2669,11 @@ msgctxt "Screens.ScannerContentAnnouncements"
 msgid "Scanner content announcements"
 msgstr ""
 
+#. Screens.ScannerUsesLongDirections
+msgctxt "Screens.ScannerUsesLongDirections"
+msgid "Long directions"
+msgstr ""
+
 #. Screens.ScannerResultAnnouncements
 msgctxt "Screens.ScannerResultAnnouncements"
 msgid "Scanner result announcements"
@@ -2587,6 +2697,11 @@ msgstr ""
 #. Screens.SpellTier
 msgctxt "Screens.SpellTier"
 msgid "{0} tier {1}"
+msgstr ""
+
+#. Screens.TextEntryUnavailable
+msgctxt "Screens.TextEntryUnavailable"
+msgid "Text entry is not available here"
 msgstr ""
 
 #. Screens.Sell
@@ -2799,11 +2914,6 @@ msgctxt "Screens.AnnouncementFacingDirectionForBeamAttacks"
 msgid "Facing direction for troops with beam attacks"
 msgstr ""
 
-#. Screens.AnnouncementGroupResult
-msgctxt "Screens.AnnouncementGroupResult"
-msgid "Group result"
-msgstr ""
-
 #. Screens.AnnouncementHealth
 msgctxt "Screens.AnnouncementHealth"
 msgid "Health"
@@ -2812,6 +2922,11 @@ msgstr ""
 #. Screens.AnnouncementImpassable
 msgctxt "Screens.AnnouncementImpassable"
 msgid "Impassable"
+msgstr ""
+
+#. Screens.AnnouncementItem
+msgctxt "Screens.AnnouncementItem"
+msgid "Item name"
 msgstr ""
 
 #. Screens.AnnouncementImpassableOrBlocked
@@ -2854,6 +2969,11 @@ msgctxt "Screens.AnnouncementOccupant"
 msgid "Occupant"
 msgstr ""
 
+#. Screens.AnnouncementOwner
+msgctxt "Screens.AnnouncementOwner"
+msgid "Owner"
+msgstr ""
+
 #. Screens.AnnouncementOrderRow
 msgctxt "Screens.AnnouncementOrderRow"
 msgid "{0} horizontal row"
@@ -2892,6 +3012,11 @@ msgstr ""
 #. Screens.AnnouncementSpawnPoint
 msgctxt "Screens.AnnouncementSpawnPoint"
 msgid "Spawn point"
+msgstr ""
+
+#. Screens.AnnouncementStatus
+msgctxt "Screens.AnnouncementStatus"
+msgid "Status"
 msgstr ""
 
 #. Screens.AnnouncementStackSize
@@ -2954,6 +3079,11 @@ msgctxt "Scanner.Attackable"
 msgid "Attackable"
 msgstr ""
 
+#. Scanner.Barriers
+msgctxt "Scanner.Barriers"
+msgid "Barriers"
+msgstr ""
+
 #. Scanner.Beacons
 msgctxt "Scanner.Beacons"
 msgid "Beacons"
@@ -2962,11 +3092,6 @@ msgstr ""
 #. Scanner.Blocked
 msgctxt "Scanner.Blocked"
 msgid "Blocked"
-msgstr ""
-
-#. Scanner.Bridges
-msgctxt "Scanner.Bridges"
-msgid "Bridges"
 msgstr ""
 
 #. Scanner.Buildings
@@ -2979,9 +3104,24 @@ msgctxt "Scanner.Dangerous"
 msgid "Dangerous"
 msgstr ""
 
+#. Scanner.DirectionStep
+msgctxt "Scanner.DirectionStep"
+msgid "{0}{1}"
+msgstr ""
+
+#. Scanner.DirectionStepLong
+msgctxt "Scanner.DirectionStepLong"
+msgid "{0} {1}"
+msgstr ""
+
 #. Scanner.East
 msgctxt "Scanner.East"
 msgid "east"
+msgstr ""
+
+#. Scanner.EastShort
+msgctxt "Scanner.EastShort"
+msgid "e"
 msgstr ""
 
 #. Scanner.ElevatedGround
@@ -3004,41 +3144,6 @@ msgctxt "Scanner.Entities"
 msgid "Entities"
 msgstr ""
 
-#. Scanner.AridTrees
-msgctxt "Scanner.AridTrees"
-msgid "Arid trees"
-msgstr ""
-
-#. Scanner.CobblestoneRoads
-msgctxt "Scanner.CobblestoneRoads"
-msgid "Cobblestone roads"
-msgstr ""
-
-#. Scanner.DeepWater
-msgctxt "Scanner.DeepWater"
-msgid "Deep water"
-msgstr ""
-
-#. Scanner.Deforestation
-msgctxt "Scanner.Deforestation"
-msgid "Deforestation"
-msgstr ""
-
-#. Scanner.Dirt
-msgctxt "Scanner.Dirt"
-msgid "Dirt"
-msgstr ""
-
-#. Scanner.DirtRoads
-msgctxt "Scanner.DirtRoads"
-msgid "Dirt roads"
-msgstr ""
-
-#. Scanner.Farmland
-msgctxt "Scanner.Farmland"
-msgid "Farmland"
-msgstr ""
-
 #. Scanner.Friendly
 msgctxt "Scanner.Friendly"
 msgid "Friendly"
@@ -3049,14 +3154,9 @@ msgctxt "Scanner.FriendlyGates"
 msgid "Friendly gates"
 msgstr ""
 
-#. Scanner.Grass
-msgctxt "Scanner.Grass"
-msgid "Grass"
-msgstr ""
-
-#. Scanner.Impassable
-msgctxt "Scanner.Impassable"
-msgid "Impassable"
+#. Scanner.Exploration
+msgctxt "Scanner.Exploration"
+msgid "Exploration"
 msgstr ""
 
 #. Scanner.ImpassableTerrain
@@ -3079,9 +3179,9 @@ msgctxt "Scanner.LookAroundRadius"
 msgid "Look around radius {0}"
 msgstr ""
 
-#. Scanner.Mountains
-msgctxt "Scanner.Mountains"
-msgid "Mountains"
+#. Scanner.Merchants
+msgctxt "Scanner.Merchants"
+msgid "Merchants"
 msgstr ""
 
 #. Scanner.Neutral
@@ -3089,9 +3189,24 @@ msgctxt "Scanner.Neutral"
 msgid "Neutral"
 msgstr ""
 
+#. Scanner.NoCustomCategoryOnKey
+msgctxt "Scanner.NoCustomCategoryOnKey"
+msgid "No custom category on {0}"
+msgstr ""
+
+#. Scanner.NoTileToReturnTo
+msgctxt "Scanner.NoTileToReturnTo"
+msgid "No tile to return to"
+msgstr ""
+
 #. Scanner.North
 msgctxt "Scanner.North"
 msgid "north"
+msgstr ""
+
+#. Scanner.NorthShort
+msgctxt "Scanner.NorthShort"
+msgid "n"
 msgstr ""
 
 #. Scanner.Northeast
@@ -3099,14 +3214,29 @@ msgctxt "Scanner.Northeast"
 msgid "northeast"
 msgstr ""
 
+#. Scanner.NortheastShort
+msgctxt "Scanner.NortheastShort"
+msgid "ne"
+msgstr ""
+
 #. Scanner.Northwest
 msgctxt "Scanner.Northwest"
 msgid "northwest"
 msgstr ""
 
+#. Scanner.NorthwestShort
+msgctxt "Scanner.NorthwestShort"
+msgid "nw"
+msgstr ""
+
 #. Scanner.Objectives
 msgctxt "Scanner.Objectives"
 msgid "Objectives"
+msgstr ""
+
+#. Scanner.OpenGround
+msgctxt "Scanner.OpenGround"
+msgid "Open ground"
 msgstr ""
 
 #. Scanner.Obstacles
@@ -3117,6 +3247,26 @@ msgstr ""
 #. Scanner.Pickups
 msgctxt "Scanner.Pickups"
 msgid "Pickups"
+msgstr ""
+
+#. Scanner.QuickKeyComma
+msgctxt "Scanner.QuickKeyComma"
+msgid "Comma"
+msgstr ""
+
+#. Scanner.QuickKeyNone
+msgctxt "Scanner.QuickKeyNone"
+msgid "None"
+msgstr ""
+
+#. Scanner.QuickKeyPeriod
+msgctxt "Scanner.QuickKeyPeriod"
+msgid "Period"
+msgstr ""
+
+#. Scanner.QuickKeySlash
+msgctxt "Scanner.QuickKeySlash"
+msgid "Slash"
 msgstr ""
 
 #. Scanner.Power
@@ -3154,14 +3304,9 @@ msgctxt "Scanner.Riches"
 msgid "Riches"
 msgstr ""
 
-#. Scanner.Roads
-msgctxt "Scanner.Roads"
-msgid "Roads"
-msgstr ""
-
-#. Scanner.Sand
-msgctxt "Scanner.Sand"
-msgid "Sand"
+#. Scanner.RoadsAndCrossings
+msgctxt "Scanner.RoadsAndCrossings"
+msgid "Roads and crossings"
 msgstr ""
 
 #. Scanner.Search
@@ -3184,14 +3329,14 @@ msgctxt "Scanner.SettlementsAndBuildSites"
 msgid "Settlements and Build sites"
 msgstr ""
 
-#. Scanner.ShallowWater
-msgctxt "Scanner.ShallowWater"
-msgid "Shallow water"
-msgstr ""
-
 #. Scanner.South
 msgctxt "Scanner.South"
 msgid "south"
+msgstr ""
+
+#. Scanner.SouthShort
+msgctxt "Scanner.SouthShort"
+msgid "s"
 msgstr ""
 
 #. Scanner.Southeast
@@ -3199,9 +3344,24 @@ msgctxt "Scanner.Southeast"
 msgid "southeast"
 msgstr ""
 
+#. Scanner.SoutheastShort
+msgctxt "Scanner.SoutheastShort"
+msgid "se"
+msgstr ""
+
 #. Scanner.Southwest
 msgctxt "Scanner.Southwest"
 msgid "southwest"
+msgstr ""
+
+#. Scanner.SouthwestShort
+msgctxt "Scanner.SouthwestShort"
+msgid "sw"
+msgstr ""
+
+#. Scanner.SpawnPointEmpty
+msgctxt "Scanner.SpawnPointEmpty"
+msgid "empty"
 msgstr ""
 
 #. Scanner.SpawnPoints
@@ -3209,14 +3369,14 @@ msgctxt "Scanner.SpawnPoints"
 msgid "Spawn points"
 msgstr ""
 
+#. Scanner.SpecialSites
+msgctxt "Scanner.SpecialSites"
+msgid "Special sites"
+msgstr ""
+
 #. Scanner.Teleport
 msgctxt "Scanner.Teleport"
 msgid "Teleport"
-msgstr ""
-
-#. Scanner.TemperateTrees
-msgctxt "Scanner.TemperateTrees"
-msgid "Temperate trees"
 msgstr ""
 
 #. Scanner.Terrain
@@ -3244,29 +3404,24 @@ msgctxt "Scanner.Unvisited"
 msgid "Unvisited"
 msgstr ""
 
-#. Scanner.Water
-msgctxt "Scanner.Water"
-msgid "Water"
-msgstr ""
-
-#. Scanner.WaterEdge
-msgctxt "Scanner.WaterEdge"
-msgid "Water edge"
-msgstr ""
-
 #. Scanner.West
 msgctxt "Scanner.West"
 msgid "west"
 msgstr ""
 
-#. Scanner.Walls
-msgctxt "Scanner.Walls"
-msgid "Walls"
+#. Scanner.WestShort
+msgctxt "Scanner.WestShort"
+msgid "w"
 msgstr ""
 
 #. Scanner.Wielders
 msgctxt "Scanner.Wielders"
 msgid "Wielders"
+msgstr ""
+
+#. Scanner.ZoneOfControl
+msgctxt "Scanner.ZoneOfControl"
+msgid "Zone of control"
 msgstr ""
 
 #. Common.TileCount_0
@@ -3329,303 +3484,18 @@ msgctxt "Combat.BoltAt_2"
 msgid "{0} bolts at {1}"
 msgstr ""
 
-#. Scanner.BlockedTileCount_0
-msgctxt "Scanner.BlockedTileCount_0"
-msgid "{0} blocked tile"
+#. Screens.SelectedSubcategoryCount_0
+msgctxt "Screens.SelectedSubcategoryCount_0"
+msgid "{0} selected"
 msgstr ""
 
-#. Scanner.BlockedTileCount_1
-msgctxt "Scanner.BlockedTileCount_1"
-msgid "{0} blocked tiles"
+#. Screens.SelectedSubcategoryCount_1
+msgctxt "Screens.SelectedSubcategoryCount_1"
+msgid "{0} selected"
 msgstr ""
 
-#. Scanner.BlockedTileCount_2
-msgctxt "Scanner.BlockedTileCount_2"
-msgid "{0} blocked tiles"
-msgstr ""
-
-#. Scanner.BridgeTileCount_0
-msgctxt "Scanner.BridgeTileCount_0"
-msgid "{0} bridge tile"
-msgstr ""
-
-#. Scanner.BridgeTileCount_1
-msgctxt "Scanner.BridgeTileCount_1"
-msgid "{0} bridge tiles"
-msgstr ""
-
-#. Scanner.BridgeTileCount_2
-msgctxt "Scanner.BridgeTileCount_2"
-msgid "{0} bridge tiles"
-msgstr ""
-
-#. Scanner.AridTreeTileCount_0
-msgctxt "Scanner.AridTreeTileCount_0"
-msgid "{0} arid tree tile"
-msgstr ""
-
-#. Scanner.AridTreeTileCount_1
-msgctxt "Scanner.AridTreeTileCount_1"
-msgid "{0} arid tree tiles"
-msgstr ""
-
-#. Scanner.AridTreeTileCount_2
-msgctxt "Scanner.AridTreeTileCount_2"
-msgid "{0} arid tree tiles"
-msgstr ""
-
-#. Scanner.CobblestoneRoadTileCount_0
-msgctxt "Scanner.CobblestoneRoadTileCount_0"
-msgid "{0} cobblestone road tile"
-msgstr ""
-
-#. Scanner.CobblestoneRoadTileCount_1
-msgctxt "Scanner.CobblestoneRoadTileCount_1"
-msgid "{0} cobblestone road tiles"
-msgstr ""
-
-#. Scanner.CobblestoneRoadTileCount_2
-msgctxt "Scanner.CobblestoneRoadTileCount_2"
-msgid "{0} cobblestone road tiles"
-msgstr ""
-
-#. Scanner.DeepWaterTileCount_0
-msgctxt "Scanner.DeepWaterTileCount_0"
-msgid "{0} deep water tile"
-msgstr ""
-
-#. Scanner.DeepWaterTileCount_1
-msgctxt "Scanner.DeepWaterTileCount_1"
-msgid "{0} deep water tiles"
-msgstr ""
-
-#. Scanner.DeepWaterTileCount_2
-msgctxt "Scanner.DeepWaterTileCount_2"
-msgid "{0} deep water tiles"
-msgstr ""
-
-#. Scanner.DeforestationTileCount_0
-msgctxt "Scanner.DeforestationTileCount_0"
-msgid "{0} deforestation tile"
-msgstr ""
-
-#. Scanner.DeforestationTileCount_1
-msgctxt "Scanner.DeforestationTileCount_1"
-msgid "{0} deforestation tiles"
-msgstr ""
-
-#. Scanner.DeforestationTileCount_2
-msgctxt "Scanner.DeforestationTileCount_2"
-msgid "{0} deforestation tiles"
-msgstr ""
-
-#. Scanner.DirtTileCount_0
-msgctxt "Scanner.DirtTileCount_0"
-msgid "{0} dirt tile"
-msgstr ""
-
-#. Scanner.DirtTileCount_1
-msgctxt "Scanner.DirtTileCount_1"
-msgid "{0} dirt tiles"
-msgstr ""
-
-#. Scanner.DirtTileCount_2
-msgctxt "Scanner.DirtTileCount_2"
-msgid "{0} dirt tiles"
-msgstr ""
-
-#. Scanner.DirtRoadTileCount_0
-msgctxt "Scanner.DirtRoadTileCount_0"
-msgid "{0} dirt road tile"
-msgstr ""
-
-#. Scanner.DirtRoadTileCount_1
-msgctxt "Scanner.DirtRoadTileCount_1"
-msgid "{0} dirt road tiles"
-msgstr ""
-
-#. Scanner.DirtRoadTileCount_2
-msgctxt "Scanner.DirtRoadTileCount_2"
-msgid "{0} dirt road tiles"
-msgstr ""
-
-#. Scanner.FarmlandTileCount_0
-msgctxt "Scanner.FarmlandTileCount_0"
-msgid "{0} farmland tile"
-msgstr ""
-
-#. Scanner.FarmlandTileCount_1
-msgctxt "Scanner.FarmlandTileCount_1"
-msgid "{0} farmland tiles"
-msgstr ""
-
-#. Scanner.FarmlandTileCount_2
-msgctxt "Scanner.FarmlandTileCount_2"
-msgid "{0} farmland tiles"
-msgstr ""
-
-#. Scanner.GrassTileCount_0
-msgctxt "Scanner.GrassTileCount_0"
-msgid "{0} grass tile"
-msgstr ""
-
-#. Scanner.GrassTileCount_1
-msgctxt "Scanner.GrassTileCount_1"
-msgid "{0} grass tiles"
-msgstr ""
-
-#. Scanner.GrassTileCount_2
-msgctxt "Scanner.GrassTileCount_2"
-msgid "{0} grass tiles"
-msgstr ""
-
-#. Scanner.ImpassableTileCount_0
-msgctxt "Scanner.ImpassableTileCount_0"
-msgid "{0} impassable tile"
-msgstr ""
-
-#. Scanner.ImpassableTileCount_1
-msgctxt "Scanner.ImpassableTileCount_1"
-msgid "{0} impassable tiles"
-msgstr ""
-
-#. Scanner.ImpassableTileCount_2
-msgctxt "Scanner.ImpassableTileCount_2"
-msgid "{0} impassable tiles"
-msgstr ""
-
-#. Scanner.MountainTileCount_0
-msgctxt "Scanner.MountainTileCount_0"
-msgid "{0} mountain tile"
-msgstr ""
-
-#. Scanner.MountainTileCount_1
-msgctxt "Scanner.MountainTileCount_1"
-msgid "{0} mountain tiles"
-msgstr ""
-
-#. Scanner.MountainTileCount_2
-msgctxt "Scanner.MountainTileCount_2"
-msgid "{0} mountain tiles"
-msgstr ""
-
-#. Scanner.RoadTileCount_0
-msgctxt "Scanner.RoadTileCount_0"
-msgid "{0} road tile"
-msgstr ""
-
-#. Scanner.RoadTileCount_1
-msgctxt "Scanner.RoadTileCount_1"
-msgid "{0} road tiles"
-msgstr ""
-
-#. Scanner.RoadTileCount_2
-msgctxt "Scanner.RoadTileCount_2"
-msgid "{0} road tiles"
-msgstr ""
-
-#. Scanner.SandTileCount_0
-msgctxt "Scanner.SandTileCount_0"
-msgid "{0} sand tile"
-msgstr ""
-
-#. Scanner.SandTileCount_1
-msgctxt "Scanner.SandTileCount_1"
-msgid "{0} sand tiles"
-msgstr ""
-
-#. Scanner.SandTileCount_2
-msgctxt "Scanner.SandTileCount_2"
-msgid "{0} sand tiles"
-msgstr ""
-
-#. Scanner.ShallowWaterTileCount_0
-msgctxt "Scanner.ShallowWaterTileCount_0"
-msgid "{0} shallow water tile"
-msgstr ""
-
-#. Scanner.ShallowWaterTileCount_1
-msgctxt "Scanner.ShallowWaterTileCount_1"
-msgid "{0} shallow water tiles"
-msgstr ""
-
-#. Scanner.ShallowWaterTileCount_2
-msgctxt "Scanner.ShallowWaterTileCount_2"
-msgid "{0} shallow water tiles"
-msgstr ""
-
-#. Scanner.TemperateTreeTileCount_0
-msgctxt "Scanner.TemperateTreeTileCount_0"
-msgid "{0} temperate tree tile"
-msgstr ""
-
-#. Scanner.TemperateTreeTileCount_1
-msgctxt "Scanner.TemperateTreeTileCount_1"
-msgid "{0} temperate tree tiles"
-msgstr ""
-
-#. Scanner.TemperateTreeTileCount_2
-msgctxt "Scanner.TemperateTreeTileCount_2"
-msgid "{0} temperate tree tiles"
-msgstr ""
-
-#. Scanner.UnexploredTileCount_0
-msgctxt "Scanner.UnexploredTileCount_0"
-msgid "{0} unexplored tile"
-msgstr ""
-
-#. Scanner.UnexploredTileCount_1
-msgctxt "Scanner.UnexploredTileCount_1"
-msgid "{0} unexplored tiles"
-msgstr ""
-
-#. Scanner.UnexploredTileCount_2
-msgctxt "Scanner.UnexploredTileCount_2"
-msgid "{0} unexplored tiles"
-msgstr ""
-
-#. Scanner.WaterEdgeTileCount_0
-msgctxt "Scanner.WaterEdgeTileCount_0"
-msgid "{0} water edge tile"
-msgstr ""
-
-#. Scanner.WaterEdgeTileCount_1
-msgctxt "Scanner.WaterEdgeTileCount_1"
-msgid "{0} water edge tiles"
-msgstr ""
-
-#. Scanner.WaterEdgeTileCount_2
-msgctxt "Scanner.WaterEdgeTileCount_2"
-msgid "{0} water edge tiles"
-msgstr ""
-
-#. Scanner.WaterTileCount_0
-msgctxt "Scanner.WaterTileCount_0"
-msgid "{0} water tile"
-msgstr ""
-
-#. Scanner.WaterTileCount_1
-msgctxt "Scanner.WaterTileCount_1"
-msgid "{0} water tiles"
-msgstr ""
-
-#. Scanner.WaterTileCount_2
-msgctxt "Scanner.WaterTileCount_2"
-msgid "{0} water tiles"
-msgstr ""
-
-#. Scanner.WallTileCount_0
-msgctxt "Scanner.WallTileCount_0"
-msgid "{0} wall tile"
-msgstr ""
-
-#. Scanner.WallTileCount_1
-msgctxt "Scanner.WallTileCount_1"
-msgid "{0} wall tiles"
-msgstr ""
-
-#. Scanner.WallTileCount_2
-msgctxt "Scanner.WallTileCount_2"
-msgid "{0} wall tiles"
+#. Screens.SelectedSubcategoryCount_2
+msgctxt "Screens.SelectedSubcategoryCount_2"
+msgid "{0} selected"
 msgstr ""
 

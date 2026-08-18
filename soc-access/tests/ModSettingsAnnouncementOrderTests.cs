@@ -39,21 +39,17 @@ namespace SongsOfConquestAccess.Tests
                 ",",
                 new[]
                 {
-                    AdventureMapAnnouncementDefinitions.TileKeys.GroupResult,
-                    AdventureMapAnnouncementDefinitions.TileKeys.ExplorationState,
-                    AdventureMapAnnouncementDefinitions.TileKeys.Wielder,
-                    AdventureMapAnnouncementDefinitions.TileKeys.MapEntity,
-                    AdventureMapAnnouncementDefinitions.TileKeys.InteractionPoint,
                     AdventureMapAnnouncementDefinitions.TileKeys.ReachabilityOrRoutePreview,
-                    AdventureMapAnnouncementDefinitions.TileKeys.ZoneOfControl,
-                    AdventureMapAnnouncementDefinitions.TileKeys.Terrain
+                    ScannerAnnouncementDefinitions.ContentKeys.Name,
+                    ScannerAnnouncementDefinitions.ContentKeys.Owner,
+                    ScannerAnnouncementDefinitions.ContentKeys.Status
                 });
 
             IReadOnlyList<string> order = ModSettings.MergeAnnouncementOrder(
                 AdventureMapAnnouncementDefinitions.ScannerContent,
                 savedOrder);
 
-            Assert.AreEqual(AdventureMapAnnouncementDefinitions.TileKeys.Terrain, order[order.Count - 2]);
+            Assert.AreEqual(ScannerAnnouncementDefinitions.ContentKeys.Status, order[order.Count - 2]);
             Assert.AreEqual(AdventureMapAnnouncementDefinitions.TileKeys.MovementCost, order[order.Count - 1]);
         }
     }

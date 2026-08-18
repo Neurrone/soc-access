@@ -30,6 +30,31 @@ msgctxt "Common.ResourceAmount"
 msgid "{0} {1}"
 msgstr "{0} {1}"
 
+#. Scanner.Exploration
+msgctxt "Scanner.Exploration"
+msgid "Exploration"
+msgstr "Keşif"
+
+#. Scanner.Merchants
+msgctxt "Scanner.Merchants"
+msgid "Merchants"
+msgstr "Tüccarlar"
+
+#. Scanner.SpecialSites
+msgctxt "Scanner.SpecialSites"
+msgid "Special sites"
+msgstr "Özel yerler"
+
+#. Scanner.ZoneOfControl
+msgctxt "Scanner.ZoneOfControl"
+msgid "Zone of control"
+msgstr "Kontrol bölgesi"
+
+#. Spatial.ZoneOfControlInstance
+msgctxt "Spatial.ZoneOfControlInstance"
+msgid "{0} within {1}"
+msgstr "{1} {0}"
+
 #. TeamColors.Black
 msgctxt "TeamColors.Black"
 msgid "black"
@@ -780,6 +805,11 @@ msgctxt "Screens.Group"
 msgid "Group {0}"
 msgstr "Grup {0}"
 
+#. Screens.KeywordAlreadyAdded
+msgctxt "Screens.KeywordAlreadyAdded"
+msgid "That keyword is already in this custom category"
+msgstr "Bu anahtar kelime zaten bu özel kategoride"
+
 #. Screens.Layout
 msgctxt "Screens.Layout"
 msgid "Layout"
@@ -955,6 +985,16 @@ msgctxt "Screens.RecruitingFrom"
 msgid "Recruiting from {0}"
 msgstr "{0} üzerinden askere alınıyor"
 
+#. Screens.RemoveKeyword
+msgctxt "Screens.RemoveKeyword"
+msgid "Remove keyword, {0}"
+msgstr "Anahtar kelimeyi kaldır, {0}"
+
+#. Screens.RenameCustomCategory
+msgctxt "Screens.RenameCustomCategory"
+msgid "Rename"
+msgstr "Yeniden adlandır"
+
 #. Screens.ResearchTier
 msgctxt "Screens.ResearchTier"
 msgid "{0} ({1} {2})"
@@ -1099,6 +1139,16 @@ msgstr "Dünya onay menüsü"
 msgctxt "Screens.RemoveFromQuickbar"
 msgid "Remove from quickbar"
 msgstr "Hızlı çubuktan kaldır"
+
+#. Screens.AddCustomCategory
+msgctxt "Screens.AddCustomCategory"
+msgid "Add custom category"
+msgstr "Özel kategori ekle"
+
+#. Screens.AddKeyword
+msgctxt "Screens.AddKeyword"
+msgid "Add keyword"
+msgstr "Anahtar kelime ekle"
 
 #. Screens.AmountToUpgrade
 msgctxt "Screens.AmountToUpgrade"
@@ -1395,10 +1445,15 @@ msgctxt "Actions.ScannerNextCategory"
 msgid "Next Scanner Category"
 msgstr "Sonraki tarayıcı kategori"
 
-#. Actions.ScannerNextResult
-msgctxt "Actions.ScannerNextResult"
-msgid "Next Scanner Result"
-msgstr "Sonraki tarayıcı sonuç"
+#. Actions.ScannerNextInstance
+msgctxt "Actions.ScannerNextInstance"
+msgid "Next Scanner Instance"
+msgstr "Sonraki tarayıcı örneği"
+
+#. Actions.ScannerNextItem
+msgctxt "Actions.ScannerNextItem"
+msgid "Next Scanner Item"
+msgstr "Sonraki tarayıcı öğesi"
 
 #. Actions.ScannerNextSubcategory
 msgctxt "Actions.ScannerNextSubcategory"
@@ -1410,25 +1465,30 @@ msgctxt "Actions.ScannerPreviousCategory"
 msgid "Previous Scanner Category"
 msgstr "Önceki tarayıcı kategori"
 
-#. Actions.ScannerPreviousResult
-msgctxt "Actions.ScannerPreviousResult"
-msgid "Previous Scanner Result"
-msgstr "Önceki tarayıcı sonuç"
+#. Actions.ScannerPreviousInstance
+msgctxt "Actions.ScannerPreviousInstance"
+msgid "Previous Scanner Instance"
+msgstr "Önceki tarayıcı örneği"
+
+#. Actions.ScannerPreviousItem
+msgctxt "Actions.ScannerPreviousItem"
+msgid "Previous Scanner Item"
+msgstr "Önceki tarayıcı öğesi"
 
 #. Actions.ScannerPreviousSubcategory
 msgctxt "Actions.ScannerPreviousSubcategory"
 msgid "Previous Scanner Subcategory"
 msgstr "Önceki tarayıcı alt kategori"
 
-#. Actions.ScannerRefresh
-msgctxt "Actions.ScannerRefresh"
-msgid "Refresh Scanner"
-msgstr "Tarayıcıyı yenile"
+#. Actions.ScannerReturnFromJump
+msgctxt "Actions.ScannerReturnFromJump"
+msgid "Return To Tile Before Jump"
+msgstr "Atlamadan önceki kareye dön"
 
-#. Actions.ScannerSpeakOrientation
-msgctxt "Actions.ScannerSpeakOrientation"
-msgid "Scanner Result Orientation"
-msgstr "Tarayıcı sonucu yönelimi"
+#. Actions.ScannerSpeakDistanceAndDirection
+msgctxt "Actions.ScannerSpeakDistanceAndDirection"
+msgid "Scanner Result Distance and Direction"
+msgstr "Tarayıcı Sonucunun Uzaklığı ve Yönü"
 
 #. Actions.SliderDecrease
 msgctxt "Actions.SliderDecrease"
@@ -2015,6 +2075,11 @@ msgctxt "Spatial.MovementRange"
 msgid "Movement range"
 msgstr "Hareket menzili"
 
+#. Spatial.Obstruction
+msgctxt "Spatial.Obstruction"
+msgid "Obstruction"
+msgstr "Engel"
+
 #. Spatial.Neutral
 msgctxt "Spatial.Neutral"
 msgid "neutral"
@@ -2155,6 +2220,11 @@ msgctxt "Scanner.Attackable"
 msgid "Attackable"
 msgstr "Saldırılabilir"
 
+#. Scanner.Barriers
+msgctxt "Scanner.Barriers"
+msgid "Barriers"
+msgstr "Bariyerler"
+
 #. Scanner.Beacons
 msgctxt "Scanner.Beacons"
 msgid "Beacons"
@@ -2164,11 +2234,6 @@ msgstr "İşaretler"
 msgctxt "Scanner.Blocked"
 msgid "Blocked"
 msgstr "Engelli"
-
-#. Scanner.Bridges
-msgctxt "Scanner.Bridges"
-msgid "Bridges"
-msgstr "Köprüler"
 
 #. Scanner.Buildings
 msgctxt "Scanner.Buildings"
@@ -2180,10 +2245,25 @@ msgctxt "Scanner.Dangerous"
 msgid "Dangerous"
 msgstr "Tehlikeli"
 
+#. Scanner.DirectionStep
+msgctxt "Scanner.DirectionStep"
+msgid "{0}{1}"
+msgstr "{0}{1}"
+
+#. Scanner.DirectionStepLong
+msgctxt "Scanner.DirectionStepLong"
+msgid "{0} {1}"
+msgstr "{0} {1}"
+
 #. Scanner.East
 msgctxt "Scanner.East"
 msgid "east"
 msgstr "doğu"
+
+#. Scanner.EastShort
+msgctxt "Scanner.EastShort"
+msgid "e"
+msgstr "d"
 
 #. Scanner.ElevatedGround
 msgctxt "Scanner.ElevatedGround"
@@ -2215,11 +2295,6 @@ msgctxt "Scanner.FriendlyGates"
 msgid "Friendly gates"
 msgstr "Dost kapıları"
 
-#. Scanner.Impassable
-msgctxt "Scanner.Impassable"
-msgid "Impassable"
-msgstr "Geçilemez"
-
 #. Scanner.ImpassableTerrain
 msgctxt "Scanner.ImpassableTerrain"
 msgid "Impassable terrain"
@@ -2245,25 +2320,50 @@ msgctxt "Scanner.Neutral"
 msgid "Neutral"
 msgstr "Tarafsız"
 
+#. Scanner.NoTileToReturnTo
+msgctxt "Scanner.NoTileToReturnTo"
+msgid "No tile to return to"
+msgstr "Dönülecek kare yok"
+
 #. Scanner.North
 msgctxt "Scanner.North"
 msgid "north"
 msgstr "kuzey"
+
+#. Scanner.NorthShort
+msgctxt "Scanner.NorthShort"
+msgid "n"
+msgstr "k"
 
 #. Scanner.Northeast
 msgctxt "Scanner.Northeast"
 msgid "northeast"
 msgstr "kuzeydoğu"
 
+#. Scanner.NortheastShort
+msgctxt "Scanner.NortheastShort"
+msgid "ne"
+msgstr "kd"
+
 #. Scanner.Northwest
 msgctxt "Scanner.Northwest"
 msgid "northwest"
 msgstr "kuzeybatı"
 
+#. Scanner.NorthwestShort
+msgctxt "Scanner.NorthwestShort"
+msgid "nw"
+msgstr "kb"
+
 #. Scanner.Objectives
 msgctxt "Scanner.Objectives"
 msgid "Objectives"
 msgstr "Hedefler"
+
+#. Scanner.OpenGround
+msgctxt "Scanner.OpenGround"
+msgid "Open ground"
+msgstr "Açık arazi"
 
 #. Scanner.Obstacles
 msgctxt "Scanner.Obstacles"
@@ -2295,10 +2395,10 @@ msgctxt "Scanner.Riches"
 msgid "Riches"
 msgstr "Zenginlikler"
 
-#. Scanner.Roads
-msgctxt "Scanner.Roads"
-msgid "Roads"
-msgstr "Yollar"
+#. Scanner.RoadsAndCrossings
+msgctxt "Scanner.RoadsAndCrossings"
+msgid "Roads and crossings"
+msgstr "Yollar ve geçitler"
 
 #. Scanner.Search
 msgctxt "Scanner.Search"
@@ -2325,10 +2425,20 @@ msgctxt "Scanner.South"
 msgid "south"
 msgstr "güney"
 
+#. Scanner.SouthShort
+msgctxt "Scanner.SouthShort"
+msgid "s"
+msgstr "g"
+
 #. Scanner.Southeast
 msgctxt "Scanner.Southeast"
 msgid "southeast"
 msgstr "güneydoğu"
+
+#. Scanner.SoutheastShort
+msgctxt "Scanner.SoutheastShort"
+msgid "se"
+msgstr "gd"
 
 #. Scanner.Southwest
 msgctxt "Scanner.Southwest"
@@ -2360,30 +2470,30 @@ msgctxt "Scanner.Unexplored"
 msgid "Unexplored"
 msgstr "Keşfedilmemiş"
 
-#. Scanner.UnexploredTileCount_0
-msgctxt "Scanner.UnexploredTileCount_0"
-msgid "{0} unexplored tile"
-msgstr "{0} keşfedilmemiş karo"
-
 #. Scanner.Unvisited
 msgctxt "Scanner.Unvisited"
 msgid "Unvisited"
 msgstr "Ziyaret edilmemiş"
-
-#. Scanner.Water
-msgctxt "Scanner.Water"
-msgid "Water"
-msgstr "Su"
 
 #. Scanner.West
 msgctxt "Scanner.West"
 msgid "west"
 msgstr "batı"
 
+#. Screens.Battle
+msgctxt "Screens.Battle"
+msgid "Battle"
+msgstr "Muharebe"
+
 #. Screens.BuyResourceForGold
 msgctxt "Screens.BuyResourceForGold"
 msgid "Buy {0} for {1}"
 msgstr "{0} öğesini {1} karşılığında satın al"
+
+#. Screens.TextEntryUnavailable
+msgctxt "Screens.TextEntryUnavailable"
+msgid "Text entry is not available here"
+msgstr "Metin girişi burada kullanılamaz"
 
 #. Screens.Sell
 msgctxt "Screens.Sell"
@@ -2399,31 +2509,6 @@ msgstr "{0} öğesini {1} karşılığında sat"
 msgctxt "Scanner.Wielders"
 msgid "Wielders"
 msgstr "Taşıyıcılar"
-
-#. Scanner.BlockedTileCount_0
-msgctxt "Scanner.BlockedTileCount_0"
-msgid "{0} blocked tile"
-msgstr "{0} engelli kare"
-
-#. Scanner.BridgeTileCount_0
-msgctxt "Scanner.BridgeTileCount_0"
-msgid "{0} bridge tile"
-msgstr "{0} köprü karesi"
-
-#. Scanner.ImpassableTileCount_0
-msgctxt "Scanner.ImpassableTileCount_0"
-msgid "{0} impassable tile"
-msgstr "{0} geçilemez kare"
-
-#. Scanner.RoadTileCount_0
-msgctxt "Scanner.RoadTileCount_0"
-msgid "{0} road tile"
-msgstr "{0} yol karesi"
-
-#. Scanner.WaterTileCount_0
-msgctxt "Scanner.WaterTileCount_0"
-msgid "{0} water tile"
-msgstr "{0} su karesi"
 
 #. Spatial.AridTrees
 msgctxt "Spatial.AridTrees"
@@ -2495,6 +2580,26 @@ msgctxt "Screens.MoveAllRight"
 msgid "Move all right"
 msgstr "Tümünü sağa taşı"
 
+#. Screens.CustomCategories
+msgctxt "Screens.CustomCategories"
+msgid "{0} custom categories"
+msgstr "{0} özel kategorileri"
+
+#. Screens.CustomCategoryDefaultName
+msgctxt "Screens.CustomCategoryDefaultName"
+msgid "Custom {0}"
+msgstr "Özel {0}"
+
+#. Screens.CustomCategoryDeleted
+msgctxt "Screens.CustomCategoryDeleted"
+msgid "{0} deleted"
+msgstr "{0} silindi"
+
+#. Screens.DeleteCustomCategory
+msgctxt "Screens.DeleteCustomCategory"
+msgid "Delete this custom category"
+msgstr "Bu özel kategoriyi sil"
+
 #. Screens.CancelAbility
 msgctxt "Screens.CancelAbility"
 msgid "Cancel ability"
@@ -2519,6 +2624,16 @@ msgstr "Sol: {0}, sağ: {1}"
 msgctxt "Screens.Options"
 msgid "Options"
 msgstr "Seçenekler"
+
+#. Scanner.SouthwestShort
+msgctxt "Scanner.SouthwestShort"
+msgid "sw"
+msgstr "gb"
+
+#. Scanner.SpawnPointEmpty
+msgctxt "Scanner.SpawnPointEmpty"
+msgid "empty"
+msgstr "boş"
 
 #. Scanner.SpawnPoints
 msgctxt "Scanner.SpawnPoints"
@@ -2596,75 +2711,10 @@ msgctxt "Combat.YourRangedTroops"
 msgid "your ranged troops"
 msgstr "menzilli birliklerin"
 
-#. Scanner.AridTrees
-msgctxt "Scanner.AridTrees"
-msgid "Arid trees"
-msgstr "Kurak ağaçlar"
-
-#. Scanner.CobblestoneRoads
-msgctxt "Scanner.CobblestoneRoads"
-msgid "Cobblestone roads"
-msgstr "Arnavut kaldırımı yollar"
-
-#. Scanner.DeepWater
-msgctxt "Scanner.DeepWater"
-msgid "Deep water"
-msgstr "Derin su"
-
-#. Scanner.Deforestation
-msgctxt "Scanner.Deforestation"
-msgid "Deforestation"
-msgstr "Ormansızlaşma"
-
-#. Scanner.Dirt
-msgctxt "Scanner.Dirt"
-msgid "Dirt"
-msgstr "Toprak"
-
-#. Scanner.DirtRoads
-msgctxt "Scanner.DirtRoads"
-msgid "Dirt roads"
-msgstr "Toprak yollar"
-
-#. Scanner.Farmland
-msgctxt "Scanner.Farmland"
-msgid "Farmland"
-msgstr "Tarım arazisi"
-
-#. Scanner.Grass
-msgctxt "Scanner.Grass"
-msgid "Grass"
-msgstr "Çimen"
-
-#. Scanner.Mountains
-msgctxt "Scanner.Mountains"
-msgid "Mountains"
-msgstr "Dağlar"
-
-#. Scanner.Sand
-msgctxt "Scanner.Sand"
-msgid "Sand"
-msgstr "Kum"
-
-#. Scanner.ShallowWater
-msgctxt "Scanner.ShallowWater"
-msgid "Shallow water"
-msgstr "Sığ su"
-
-#. Scanner.TemperateTrees
-msgctxt "Scanner.TemperateTrees"
-msgid "Temperate trees"
-msgstr "Ilıman ağaçlar"
-
-#. Scanner.Walls
-msgctxt "Scanner.Walls"
-msgid "Walls"
-msgstr "Duvarlar"
-
-#. Scanner.WaterEdge
-msgctxt "Scanner.WaterEdge"
-msgid "Water edge"
-msgstr "Su kenarı"
+#. Scanner.WestShort
+msgctxt "Scanner.WestShort"
+msgid "w"
+msgstr "b"
 
 #. Spatial.Dirt
 msgctxt "Spatial.Dirt"
@@ -2690,76 +2740,6 @@ msgstr "Kum"
 msgctxt "Spatial.TemperateTrees"
 msgid "Temperate trees"
 msgstr "Ilıman ağaçlar"
-
-#. Scanner.AridTreeTileCount_0
-msgctxt "Scanner.AridTreeTileCount_0"
-msgid "{0} arid tree tile"
-msgstr "{0} kare: Kurak ağaçlar"
-
-#. Scanner.CobblestoneRoadTileCount_0
-msgctxt "Scanner.CobblestoneRoadTileCount_0"
-msgid "{0} cobblestone road tile"
-msgstr "{0} kare: Arnavut kaldırımı yollar"
-
-#. Scanner.DeepWaterTileCount_0
-msgctxt "Scanner.DeepWaterTileCount_0"
-msgid "{0} deep water tile"
-msgstr "{0} kare: Derin su"
-
-#. Scanner.DeforestationTileCount_0
-msgctxt "Scanner.DeforestationTileCount_0"
-msgid "{0} deforestation tile"
-msgstr "{0} kare: Ormansızlaşma"
-
-#. Scanner.DirtRoadTileCount_0
-msgctxt "Scanner.DirtRoadTileCount_0"
-msgid "{0} dirt road tile"
-msgstr "{0} kare: Toprak yollar"
-
-#. Scanner.DirtTileCount_0
-msgctxt "Scanner.DirtTileCount_0"
-msgid "{0} dirt tile"
-msgstr "{0} kare: Toprak"
-
-#. Scanner.FarmlandTileCount_0
-msgctxt "Scanner.FarmlandTileCount_0"
-msgid "{0} farmland tile"
-msgstr "{0} kare: Tarım arazisi"
-
-#. Scanner.GrassTileCount_0
-msgctxt "Scanner.GrassTileCount_0"
-msgid "{0} grass tile"
-msgstr "{0} kare: Çimen"
-
-#. Scanner.MountainTileCount_0
-msgctxt "Scanner.MountainTileCount_0"
-msgid "{0} mountain tile"
-msgstr "{0} kare: Dağlar"
-
-#. Scanner.SandTileCount_0
-msgctxt "Scanner.SandTileCount_0"
-msgid "{0} sand tile"
-msgstr "{0} kare: Kum"
-
-#. Scanner.ShallowWaterTileCount_0
-msgctxt "Scanner.ShallowWaterTileCount_0"
-msgid "{0} shallow water tile"
-msgstr "{0} kare: Sığ su"
-
-#. Scanner.TemperateTreeTileCount_0
-msgctxt "Scanner.TemperateTreeTileCount_0"
-msgid "{0} temperate tree tile"
-msgstr "{0} kare: Ilıman ağaçlar"
-
-#. Scanner.WallTileCount_0
-msgctxt "Scanner.WallTileCount_0"
-msgid "{0} wall tile"
-msgstr "{0} kare: Duvarlar"
-
-#. Scanner.WaterEdgeTileCount_0
-msgctxt "Scanner.WaterEdgeTileCount_0"
-msgid "{0} water edge tile"
-msgstr "{0} kare: Su kenarı"
 
 #. Spatial.SkippedTileCount_0
 msgctxt "Spatial.SkippedTileCount_0"
@@ -3031,6 +3011,11 @@ msgctxt "Screens.AnnouncementHealth"
 msgid "Health"
 msgstr "Sağlık"
 
+#. Screens.AnnouncementItem
+msgctxt "Screens.AnnouncementItem"
+msgid "Item name"
+msgstr "Öğe adı"
+
 #. Screens.AnnouncementImpassableOrBlocked
 msgctxt "Screens.AnnouncementImpassableOrBlocked"
 msgid "Impassable or blocked"
@@ -3056,6 +3041,11 @@ msgctxt "Screens.AnnouncementSelectedForSpellcast"
 msgid "Selected for spellcast"
 msgstr "Büyü kullanımı için seçili"
 
+#. Screens.AnnouncementStatus
+msgctxt "Screens.AnnouncementStatus"
+msgid "Status"
+msgstr "Durum"
+
 #. Screens.AnnouncementStackSize
 msgctxt "Screens.AnnouncementStackSize"
 msgid "Stack size"
@@ -3070,6 +3060,11 @@ msgstr "Kare etkileri"
 msgctxt "Screens.AnnouncementTroopName"
 msgid "Troop name"
 msgstr "Birlik adı"
+
+#. Screens.AnnouncementOwner
+msgctxt "Screens.AnnouncementOwner"
+msgid "Owner"
+msgstr "Sahibi"
 
 #. Screens.AnnouncementOrderRow
 msgctxt "Screens.AnnouncementOrderRow"
@@ -3100,6 +3095,11 @@ msgstr "Tarayıcı"
 msgctxt "Screens.ScannerContentAnnouncements"
 msgid "Scanner content announcements"
 msgstr "Tarayıcı içerik duyuruları"
+
+#. Screens.ScannerUsesLongDirections
+msgctxt "Screens.ScannerUsesLongDirections"
+msgid "Long directions"
+msgstr "Uzun yön adları"
 
 #. Screens.ScannerResultAnnouncements
 msgctxt "Screens.ScannerResultAnnouncements"
@@ -3166,11 +3166,6 @@ msgstr "Hedef"
 msgctxt "Screens.AnnouncementExplorationState"
 msgid "Exploration state"
 msgstr "Keşif durumu"
-
-#. Screens.AnnouncementGroupResult
-msgctxt "Screens.AnnouncementGroupResult"
-msgid "Group result"
-msgstr "Grup sonucu"
 
 #. Screens.AnnouncementInteractionPoint
 msgctxt "Screens.AnnouncementInteractionPoint"
@@ -3392,3 +3387,69 @@ msgstr "Kare ses ipuçlarını çal"
 msgctxt "Screens.Volume"
 msgid "Volume"
 msgstr "Ses seviyesi"
+
+#. Screens.SelectedSubcategoryCount_0
+msgctxt "Screens.SelectedSubcategoryCount_0"
+msgid "{0} selected"
+msgstr "{0} seçili"
+
+#. Actions.ScannerNextCustomEntry
+msgctxt "Actions.ScannerNextCustomEntry"
+msgid "Next Entry In The Custom Category On {0}"
+msgstr "{0} tuşundaki özel kategorinin sonraki girdisi"
+
+#. Actions.ScannerPreviousCustomEntry
+msgctxt "Actions.ScannerPreviousCustomEntry"
+msgid "Previous Entry In The Custom Category On {0}"
+msgstr "{0} tuşundaki özel kategorinin önceki girdisi"
+
+#. Screens.CustomCategoryKey
+msgctxt "Screens.CustomCategoryKey"
+msgid "Key, {0}"
+msgstr "Tuş, {0}"
+
+#. Screens.CustomCategoryKeyCurrent
+msgctxt "Screens.CustomCategoryKeyCurrent"
+msgid "{0}, current"
+msgstr "{0}, geçerli"
+
+#. Screens.CustomCategoryKeyHeldBy
+msgctxt "Screens.CustomCategoryKeyHeldBy"
+msgid "{0}, held by {1}"
+msgstr "{0}, {1} tarafından kullanılıyor"
+
+#. Screens.CustomCategoryKeyTitle
+msgctxt "Screens.CustomCategoryKeyTitle"
+msgid "Key for {0}"
+msgstr "{0} için tuş"
+
+#. Screens.CustomCategoryNameTaken
+msgctxt "Screens.CustomCategoryNameTaken"
+msgid "{0} is already the name of a category"
+msgstr "{0} zaten bir kategori adı"
+
+#. Scanner.NoCustomCategoryOnKey
+msgctxt "Scanner.NoCustomCategoryOnKey"
+msgid "No custom category on {0}"
+msgstr "{0} tuşunda özel kategori yok"
+
+#. Scanner.QuickKeyComma
+msgctxt "Scanner.QuickKeyComma"
+msgid "Comma"
+msgstr "Virgül"
+
+#. Scanner.QuickKeyNone
+msgctxt "Scanner.QuickKeyNone"
+msgid "None"
+msgstr "Yok"
+
+#. Scanner.QuickKeyPeriod
+msgctxt "Scanner.QuickKeyPeriod"
+msgid "Period"
+msgstr "Nokta"
+
+#. Scanner.QuickKeySlash
+msgctxt "Scanner.QuickKeySlash"
+msgid "Slash"
+msgstr "Eğik çizgi"
+

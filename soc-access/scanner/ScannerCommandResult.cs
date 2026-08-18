@@ -31,6 +31,13 @@ namespace SongsOfConquestAccess.Scanner
 
         public int ResultCount { get; set; }
 
+        /// <summary>
+        /// Whether this announcement leads with the name of the thing being
+        /// walked through. Set for a landing that moves to a different item and
+        /// cleared for a step between copies of the same one.
+        /// </summary>
+        public bool IncludeItemName { get; set; }
+
         public IReadOnlyList<ScannerDirectionStep> Directions { get; set; }
 
         public bool HasOrigin { get; set; }
@@ -39,24 +46,42 @@ namespace SongsOfConquestAccess.Scanner
 
         public bool IncludePath { get; set; }
 
+        /// <summary>
+        /// Narrows the announcement to how far away the current result is and
+        /// which way it lies. Used by the dedicated readout key, which exists so
+        /// the player can re-check a bearing without sitting through the whole
+        /// result again.
+        /// </summary>
+        public bool DistanceAndDirectionOnly { get; set; }
+
         public bool Wrapped { get; set; }
 
         public string NoResultsText { get; set; }
 
         public SpeechRequest ToSpeechRequest(
-            Func<ScannerResult, IReadOnlyList<ScannerDirectionStep>, int, int, IScannerSpeechContext> speechContextProvider)
+            Func<ScannerResult, IReadOnlyList<ScannerDirectionStep>, int, int, bool, IScannerSpeechContext> speechContextProvider)
         {
             if (Status == ScannerCommandStatus.NoResults)
             {
                 return BuildNoResults();
             }
 
-            if (speechContextProvider == null || Result == null)
+            if (Result == null)
             {
                 return BuildNoResults();
             }
 
-            IScannerSpeechContext context = speechContextProvider(Result, Directions, ResultIndex, ResultCount);
+            if (DistanceAndDirectionOnly)
+            {
+                return BuildDistanceAndDirection();
+            }
+
+            if (speechContextProvider == null)
+            {
+                return BuildNoResults();
+            }
+
+            IScannerSpeechContext context = speechContextProvider(Result, Directions, ResultIndex, ResultCount, IncludeItemName);
             SpeechRequest request = context != null
                 ? context.ToSpeechRequest()
                 : BuildNoResults();
@@ -69,6 +94,22 @@ namespace SongsOfConquestAccess.Scanner
             }
 
             return request;
+        }
+
+        private SpeechRequest BuildDistanceAndDirection()
+        {
+            return new SpeechRequest(
+                FormatDistanceAndDirection(ModSettings.ScannerUsesLongDirections),
+                interrupt: false);
+        }
+
+        /// <summary>
+        /// The direction runs carry their own counts, so their sum is the
+        /// distance and speaking a total first would only repeat it.
+        /// </summary>
+        internal string FormatDistanceAndDirection(bool useLongDirections)
+        {
+            return ScannerSpeechUtility.FormatDirections(Directions, useLongDirections);
         }
 
         private SpeechRequest BuildNoResults()

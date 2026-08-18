@@ -17,15 +17,20 @@ namespace SongsOfConquestAccess.Scanner
             ScannerSnapshot lookAround = new ScannerSnapshot();
             lookAround.MarkAsLookAroundSnapshot();
 
-            ScannerCategory lookAroundCategory = lookAround.GetOrAddCategory(ModText.Get(ModStrings.Scanner.LookAround));
-            ScannerSubcategory all = lookAroundCategory.GetOrAddSubcategory(ModText.Get(ModStrings.Scanner.All));
+            ScannerCategory lookAroundCategory = lookAround.GetOrAddCategory(
+                ScannerCategoryKeys.LookAround,
+                () => ModText.Get(ModStrings.Scanner.LookAround));
+            lookAroundCategory.FlatItems = true;
+            ScannerSubcategory all = lookAroundCategory.GetOrAddSubcategory(
+                ScannerSubcategoryKeys.All,
+                () => ModText.Get(ModStrings.Scanner.All));
             Dictionary<string, HashSet<string>> addedToCategory = new Dictionary<string, HashSet<string>>();
             HashSet<string> addedToAll = new HashSet<string>();
 
             for (int categoryIndex = 0; categoryIndex < source.Categories.Count; categoryIndex++)
             {
                 ScannerCategory sourceCategory = source.Categories[categoryIndex];
-                if (sourceCategory == null)
+                if (sourceCategory == null || sourceCategory.IsCustom)
                 {
                     continue;
                 }
@@ -39,9 +44,8 @@ namespace SongsOfConquestAccess.Scanner
                         continue;
                     }
 
-                    for (int resultIndex = 0; resultIndex < sourceSubcategory.Results.Count; resultIndex++)
+                    foreach (ScannerResult result in sourceSubcategory.AllResults)
                     {
-                        ScannerResult result = sourceSubcategory.Results[resultIndex];
                         if (!IsWithinLookRadius(result, origin, radius))
                         {
                             continue;
@@ -49,30 +53,33 @@ namespace SongsOfConquestAccess.Scanner
 
                         if (addedToAll.Add(result.Key))
                         {
-                            all.Results.Add(result);
+                            all.Add(result);
                         }
 
                         HashSet<string> categoryKeys;
-                        if (!addedToCategory.TryGetValue(sourceCategory.Label, out categoryKeys))
+                        if (!addedToCategory.TryGetValue(sourceCategory.Key, out categoryKeys))
                         {
                             categoryKeys = new HashSet<string>();
-                            addedToCategory[sourceCategory.Label] = categoryKeys;
+                            addedToCategory[sourceCategory.Key] = categoryKeys;
                         }
 
                         if (categoryKeys.Add(result.Key))
                         {
                             if (targetSubcategory == null)
                             {
-                                targetSubcategory = lookAroundCategory.GetOrAddSubcategory(sourceCategory.Label);
+                                ScannerCategory labelSource = sourceCategory;
+                                targetSubcategory = lookAroundCategory.GetOrAddSubcategory(
+                                    labelSource.Key,
+                                    () => labelSource.Label);
                             }
 
-                            targetSubcategory.Results.Add(result);
+                            targetSubcategory.Add(result);
                         }
                     }
                 }
             }
 
-            if (all.Results.Count == 0)
+            if (!all.HasResults)
             {
                 return null;
             }

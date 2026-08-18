@@ -106,24 +106,6 @@ namespace SongsOfConquestAccess.Tests
             Assert.AreEqual("Unexplored, 4, 2.", text);
         }
 
-        [TestMethod]
-        public void DescribeScannerContentReadsEnabledMovementCostAtEnd()
-        {
-            AdventureMapTile tile = new AdventureMapTile(new Vector2Int(4, 2))
-            {
-                IsExplored = true,
-                IsVisible = true,
-                IsReachable = true,
-                ReachableMovementCost = 3f,
-                Terrain = AdventureTerrainKind.DirtRoad
-            };
-            ScannerResult result = new ScannerResult("terrain:road:4:2", "Dirt road", tile.Position);
-
-            string text = CreateFormatter(enableMovementCost: true).DescribeScannerContent(result, tile);
-
-            Assert.AreEqual("reachable, Dirt road, Movement cost: 3", text);
-        }
-
         private static AdventureMapTileSpeechFormatter CreateFormatter()
         {
             return CreateFormatter(enableMovementCost: false);

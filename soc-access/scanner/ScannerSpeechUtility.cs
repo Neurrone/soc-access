@@ -7,6 +7,11 @@ namespace SongsOfConquestAccess.Scanner
     {
         public static string FormatDirections(IReadOnlyList<ScannerDirectionStep> directions)
         {
+            return FormatDirections(directions, ModSettings.ScannerUsesLongDirections);
+        }
+
+        internal static string FormatDirections(IReadOnlyList<ScannerDirectionStep> directions, bool useLongForm)
+        {
             if (directions == null || directions.Count == 0)
             {
                 return ModText.Get(ModStrings.Spatial.Here);
@@ -15,16 +20,22 @@ namespace SongsOfConquestAccess.Scanner
             List<string> parts = new List<string>();
             for (int i = 0; i < directions.Count; i++)
             {
-                ScannerDirectionStep step = directions[i];
-                if (step != null && step.Count > 0 && !string.IsNullOrWhiteSpace(step.Direction))
+                string step = ScannerDirectionUtility.FormatStep(directions[i], useLongForm);
+                if (!string.IsNullOrWhiteSpace(step))
                 {
-                    parts.Add(step.Count + " " + step.Direction);
+                    parts.Add(step);
                 }
             }
 
-            return parts.Count == 0 ? ModText.Get(ModStrings.Spatial.Here) : string.Join(", ", parts.ToArray());
+            return parts.Count == 0 ? ModText.Get(ModStrings.Spatial.Here) : ModText.JoinListWithCommas(parts);
         }
 
+        /// <summary>
+        /// Counts the copies of the current item, always. "1 of 8" says there
+        /// are eight of these and this is the nearest, which is worth a word
+        /// even when the answer is one, and the player can silence the element
+        /// outright if they disagree.
+        /// </summary>
         public static string FormatResultCount(int index, int count)
         {
             return ModText.Get(ModStrings.Common.CountOf, index, count);

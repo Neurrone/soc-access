@@ -80,21 +80,36 @@ This page summarizes the mod hotkeys used across the documentation.
 
 ## Scanner
 
-| Key              | Action                        |
-| ---------------- | ----------------------------- |
-| `End`            | Refresh scanner results       |
-| `PageUp`         | Previous result               |
-| `PageDown`       | Next result                   |
-| `Home`           | Jump to current result        |
-| `Shift+Home`     | Repeat current scanner result |
-| `Ctrl+PageUp`    | Previous category             |
-| `Ctrl+PageDown`  | Next category                 |
-| `Shift+PageUp`   | Previous subcategory          |
-| `Shift+PageDown` | Next subcategory              |
-| `Ctrl+F`         | Search scanner categories     |
-| `L`              | Look around from current tile |
-| `K`              | Increase look radius          |
-| `Shift+K`        | Decrease look radius          |
+| Key              | Action                             |
+| ---------------- | ---------------------------------- |
+| `PageUp`         | Previous item                      |
+| `PageDown`       | Next item                          |
+| `Alt+PageUp`     | Previous copy of the current item  |
+| `Alt+PageDown`   | Next copy of the current item      |
+| `Ctrl+PageUp`    | Previous category                  |
+| `Ctrl+PageDown`  | Next category                      |
+| `Shift+PageUp`   | Previous subcategory               |
+| `Shift+PageDown` | Next subcategory                   |
+| `Home` or `J`    | Jump to current result             |
+| `Backspace`      | Return to the tile before the jump |
+| `End`            | Distance and direction to result   |
+| `Ctrl+F`         | Search scanner categories          |
+| `L`              | Look around from current tile      |
+| `K`              | Increase look radius               |
+| `Shift+K`        | Decrease look radius               |
+
+The next three keys are adventure map only. Each walks whichever custom
+category holds it, as one flat list taken nearest first. See
+[Scanner](scanner.md) for how to choose which category holds which key.
+
+| Key       | Action                                        |
+| --------- | --------------------------------------------- |
+| `,`       | Next entry in the custom category on comma    |
+| `Shift+,` | Previous entry in the custom category on comma |
+| `.`       | Next entry in the custom category on period   |
+| `Shift+.` | Previous entry in the custom category on period |
+| `/`       | Next entry in the custom category on slash    |
+| `Shift+/` | Previous entry in the custom category on slash |
 
 ## Hex Grids
 

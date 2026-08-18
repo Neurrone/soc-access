@@ -30,6 +30,31 @@ msgctxt "Common.ResourceAmount"
 msgid "{0} {1}"
 msgstr "{0} {1}"
 
+#. Scanner.Exploration
+msgctxt "Scanner.Exploration"
+msgid "Exploration"
+msgstr "Exploração"
+
+#. Scanner.Merchants
+msgctxt "Scanner.Merchants"
+msgid "Merchants"
+msgstr "Mercadores"
+
+#. Scanner.SpecialSites
+msgctxt "Scanner.SpecialSites"
+msgid "Special sites"
+msgstr "Locais especiais"
+
+#. Scanner.ZoneOfControl
+msgctxt "Scanner.ZoneOfControl"
+msgid "Zone of control"
+msgstr "Zona de controle"
+
+#. Spatial.ZoneOfControlInstance
+msgctxt "Spatial.ZoneOfControlInstance"
+msgid "{0} within {1}"
+msgstr "{0} {1}"
+
 #. TeamColors.Black
 msgctxt "TeamColors.Black"
 msgid "black"
@@ -790,6 +815,11 @@ msgctxt "Screens.Group"
 msgid "Group {0}"
 msgstr "Grupo {0}"
 
+#. Screens.KeywordAlreadyAdded
+msgctxt "Screens.KeywordAlreadyAdded"
+msgid "That keyword is already in this custom category"
+msgstr "Essa palavra-chave já está nesta categoria personalizada"
+
 #. Screens.Layout
 msgctxt "Screens.Layout"
 msgid "Layout"
@@ -965,6 +995,16 @@ msgctxt "Screens.RecruitingFrom"
 msgid "Recruiting from {0}"
 msgstr "Recrutando de {0}"
 
+#. Screens.RemoveKeyword
+msgctxt "Screens.RemoveKeyword"
+msgid "Remove keyword, {0}"
+msgstr "Remover palavra-chave, {0}"
+
+#. Screens.RenameCustomCategory
+msgctxt "Screens.RenameCustomCategory"
+msgid "Rename"
+msgstr "Renomear"
+
 #. Screens.ResearchTier
 msgctxt "Screens.ResearchTier"
 msgid "{0} ({1} {2})"
@@ -1109,6 +1149,16 @@ msgstr "Menu de confirmação do mundo"
 msgctxt "Screens.RemoveFromQuickbar"
 msgid "Remove from quickbar"
 msgstr "Remover da barra rápida"
+
+#. Screens.AddCustomCategory
+msgctxt "Screens.AddCustomCategory"
+msgid "Add custom category"
+msgstr "Adicionar categoria personalizada"
+
+#. Screens.AddKeyword
+msgctxt "Screens.AddKeyword"
+msgid "Add keyword"
+msgstr "Adicionar palavra-chave"
 
 #. Screens.AmountToUpgrade
 msgctxt "Screens.AmountToUpgrade"
@@ -1405,10 +1455,15 @@ msgctxt "Actions.ScannerNextCategory"
 msgid "Next Scanner Category"
 msgstr "Próximo scanner categoria"
 
-#. Actions.ScannerNextResult
-msgctxt "Actions.ScannerNextResult"
-msgid "Next Scanner Result"
-msgstr "Próximo scanner resultado"
+#. Actions.ScannerNextInstance
+msgctxt "Actions.ScannerNextInstance"
+msgid "Next Scanner Instance"
+msgstr "Próxima ocorrência do scanner"
+
+#. Actions.ScannerNextItem
+msgctxt "Actions.ScannerNextItem"
+msgid "Next Scanner Item"
+msgstr "Próximo item do scanner"
 
 #. Actions.ScannerNextSubcategory
 msgctxt "Actions.ScannerNextSubcategory"
@@ -1420,25 +1475,30 @@ msgctxt "Actions.ScannerPreviousCategory"
 msgid "Previous Scanner Category"
 msgstr "Anterior scanner categoria"
 
-#. Actions.ScannerPreviousResult
-msgctxt "Actions.ScannerPreviousResult"
-msgid "Previous Scanner Result"
-msgstr "Anterior scanner resultado"
+#. Actions.ScannerPreviousInstance
+msgctxt "Actions.ScannerPreviousInstance"
+msgid "Previous Scanner Instance"
+msgstr "Ocorrência anterior do scanner"
+
+#. Actions.ScannerPreviousItem
+msgctxt "Actions.ScannerPreviousItem"
+msgid "Previous Scanner Item"
+msgstr "Item anterior do scanner"
 
 #. Actions.ScannerPreviousSubcategory
 msgctxt "Actions.ScannerPreviousSubcategory"
 msgid "Previous Scanner Subcategory"
 msgstr "Anterior scanner subcategoria"
 
-#. Actions.ScannerRefresh
-msgctxt "Actions.ScannerRefresh"
-msgid "Refresh Scanner"
-msgstr "Atualizar scanner"
+#. Actions.ScannerReturnFromJump
+msgctxt "Actions.ScannerReturnFromJump"
+msgid "Return To Tile Before Jump"
+msgstr "Voltar ao bloco anterior ao salto"
 
-#. Actions.ScannerSpeakOrientation
-msgctxt "Actions.ScannerSpeakOrientation"
-msgid "Scanner Result Orientation"
-msgstr "Orientação do resultado do scanner"
+#. Actions.ScannerSpeakDistanceAndDirection
+msgctxt "Actions.ScannerSpeakDistanceAndDirection"
+msgid "Scanner Result Distance and Direction"
+msgstr "Distância e direção do resultado do scanner"
 
 #. Actions.SliderDecrease
 msgctxt "Actions.SliderDecrease"
@@ -2030,6 +2090,11 @@ msgctxt "Spatial.MovementRange"
 msgid "Movement range"
 msgstr "Alcance de movimento"
 
+#. Spatial.Obstruction
+msgctxt "Spatial.Obstruction"
+msgid "Obstruction"
+msgstr "Obstáculo"
+
 #. Spatial.Neutral
 msgctxt "Spatial.Neutral"
 msgid "neutral"
@@ -2170,6 +2235,11 @@ msgctxt "Scanner.Attackable"
 msgid "Attackable"
 msgstr "Atacável"
 
+#. Scanner.Barriers
+msgctxt "Scanner.Barriers"
+msgid "Barriers"
+msgstr "Barreiras"
+
 #. Scanner.Beacons
 msgctxt "Scanner.Beacons"
 msgid "Beacons"
@@ -2179,11 +2249,6 @@ msgstr "Sinalizadores"
 msgctxt "Scanner.Blocked"
 msgid "Blocked"
 msgstr "Bloqueado"
-
-#. Scanner.Bridges
-msgctxt "Scanner.Bridges"
-msgid "Bridges"
-msgstr "Pontes"
 
 #. Scanner.Buildings
 msgctxt "Scanner.Buildings"
@@ -2195,10 +2260,25 @@ msgctxt "Scanner.Dangerous"
 msgid "Dangerous"
 msgstr "Perigoso"
 
+#. Scanner.DirectionStep
+msgctxt "Scanner.DirectionStep"
+msgid "{0}{1}"
+msgstr "{0}{1}"
+
+#. Scanner.DirectionStepLong
+msgctxt "Scanner.DirectionStepLong"
+msgid "{0} {1}"
+msgstr "{0} {1}"
+
 #. Scanner.East
 msgctxt "Scanner.East"
 msgid "east"
 msgstr "leste"
+
+#. Scanner.EastShort
+msgctxt "Scanner.EastShort"
+msgid "e"
+msgstr "l"
 
 #. Scanner.ElevatedGround
 msgctxt "Scanner.ElevatedGround"
@@ -2230,11 +2310,6 @@ msgctxt "Scanner.FriendlyGates"
 msgid "Friendly gates"
 msgstr "Portões aliados"
 
-#. Scanner.Impassable
-msgctxt "Scanner.Impassable"
-msgid "Impassable"
-msgstr "Intransponível"
-
 #. Scanner.ImpassableTerrain
 msgctxt "Scanner.ImpassableTerrain"
 msgid "Impassable terrain"
@@ -2260,25 +2335,50 @@ msgctxt "Scanner.Neutral"
 msgid "Neutral"
 msgstr "Neutro"
 
+#. Scanner.NoTileToReturnTo
+msgctxt "Scanner.NoTileToReturnTo"
+msgid "No tile to return to"
+msgstr "Nenhum bloco para voltar"
+
 #. Scanner.North
 msgctxt "Scanner.North"
 msgid "north"
 msgstr "norte"
+
+#. Scanner.NorthShort
+msgctxt "Scanner.NorthShort"
+msgid "n"
+msgstr "n"
 
 #. Scanner.Northeast
 msgctxt "Scanner.Northeast"
 msgid "northeast"
 msgstr "nordeste"
 
+#. Scanner.NortheastShort
+msgctxt "Scanner.NortheastShort"
+msgid "ne"
+msgstr "ne"
+
 #. Scanner.Northwest
 msgctxt "Scanner.Northwest"
 msgid "northwest"
 msgstr "noroeste"
 
+#. Scanner.NorthwestShort
+msgctxt "Scanner.NorthwestShort"
+msgid "nw"
+msgstr "no"
+
 #. Scanner.Objectives
 msgctxt "Scanner.Objectives"
 msgid "Objectives"
 msgstr "Objetivos"
+
+#. Scanner.OpenGround
+msgctxt "Scanner.OpenGround"
+msgid "Open ground"
+msgstr "Terreno aberto"
 
 #. Scanner.Obstacles
 msgctxt "Scanner.Obstacles"
@@ -2310,10 +2410,10 @@ msgctxt "Scanner.Riches"
 msgid "Riches"
 msgstr "Riquezas"
 
-#. Scanner.Roads
-msgctxt "Scanner.Roads"
-msgid "Roads"
-msgstr "Estradas"
+#. Scanner.RoadsAndCrossings
+msgctxt "Scanner.RoadsAndCrossings"
+msgid "Roads and crossings"
+msgstr "Estradas e travessias"
 
 #. Scanner.Search
 msgctxt "Scanner.Search"
@@ -2340,10 +2440,20 @@ msgctxt "Scanner.South"
 msgid "south"
 msgstr "sul"
 
+#. Scanner.SouthShort
+msgctxt "Scanner.SouthShort"
+msgid "s"
+msgstr "s"
+
 #. Scanner.Southeast
 msgctxt "Scanner.Southeast"
 msgid "southeast"
 msgstr "sudeste"
+
+#. Scanner.SoutheastShort
+msgctxt "Scanner.SoutheastShort"
+msgid "se"
+msgstr "se"
 
 #. Scanner.Southwest
 msgctxt "Scanner.Southwest"
@@ -2375,35 +2485,30 @@ msgctxt "Scanner.Unexplored"
 msgid "Unexplored"
 msgstr "Inexplorado"
 
-#. Scanner.UnexploredTileCount_0
-msgctxt "Scanner.UnexploredTileCount_0"
-msgid "{0} unexplored tile"
-msgstr "{0} bloco inexplorado"
-
-#. Scanner.UnexploredTileCount_1
-msgctxt "Scanner.UnexploredTileCount_1"
-msgid "{0} unexplored tiles"
-msgstr "{0} blocos inexplorados"
-
 #. Scanner.Unvisited
 msgctxt "Scanner.Unvisited"
 msgid "Unvisited"
 msgstr "Não visitado"
-
-#. Scanner.Water
-msgctxt "Scanner.Water"
-msgid "Water"
-msgstr "Água"
 
 #. Scanner.West
 msgctxt "Scanner.West"
 msgid "west"
 msgstr "oeste"
 
+#. Screens.Battle
+msgctxt "Screens.Battle"
+msgid "Battle"
+msgstr "Batalha"
+
 #. Screens.BuyResourceForGold
 msgctxt "Screens.BuyResourceForGold"
 msgid "Buy {0} for {1}"
 msgstr "Comprar {0} por {1}"
+
+#. Screens.TextEntryUnavailable
+msgctxt "Screens.TextEntryUnavailable"
+msgid "Text entry is not available here"
+msgstr "A entrada de texto não está disponível aqui"
 
 #. Screens.Sell
 msgctxt "Screens.Sell"
@@ -2419,56 +2524,6 @@ msgstr "Vender {0} por {1}"
 msgctxt "Scanner.Wielders"
 msgid "Wielders"
 msgstr "Portadores"
-
-#. Scanner.BlockedTileCount_0
-msgctxt "Scanner.BlockedTileCount_0"
-msgid "{0} blocked tile"
-msgstr "{0} casa bloqueada"
-
-#. Scanner.BlockedTileCount_1
-msgctxt "Scanner.BlockedTileCount_1"
-msgid "{0} blocked tiles"
-msgstr "{0} casas bloqueadas"
-
-#. Scanner.BridgeTileCount_0
-msgctxt "Scanner.BridgeTileCount_0"
-msgid "{0} bridge tile"
-msgstr "{0} casa de ponte"
-
-#. Scanner.BridgeTileCount_1
-msgctxt "Scanner.BridgeTileCount_1"
-msgid "{0} bridge tiles"
-msgstr "{0} casas de ponte"
-
-#. Scanner.ImpassableTileCount_0
-msgctxt "Scanner.ImpassableTileCount_0"
-msgid "{0} impassable tile"
-msgstr "{0} casa intransponível"
-
-#. Scanner.ImpassableTileCount_1
-msgctxt "Scanner.ImpassableTileCount_1"
-msgid "{0} impassable tiles"
-msgstr "{0} casas intransponíveis"
-
-#. Scanner.RoadTileCount_0
-msgctxt "Scanner.RoadTileCount_0"
-msgid "{0} road tile"
-msgstr "{0} casa de estrada"
-
-#. Scanner.RoadTileCount_1
-msgctxt "Scanner.RoadTileCount_1"
-msgid "{0} road tiles"
-msgstr "{0} casas de estrada"
-
-#. Scanner.WaterTileCount_0
-msgctxt "Scanner.WaterTileCount_0"
-msgid "{0} water tile"
-msgstr "{0} casa de água"
-
-#. Scanner.WaterTileCount_1
-msgctxt "Scanner.WaterTileCount_1"
-msgid "{0} water tiles"
-msgstr "{0} casas de água"
 
 #. Spatial.AridTrees
 msgctxt "Spatial.AridTrees"
@@ -2540,6 +2595,26 @@ msgctxt "Screens.MoveAllRight"
 msgid "Move all right"
 msgstr "Mover tudo para a direita"
 
+#. Screens.CustomCategories
+msgctxt "Screens.CustomCategories"
+msgid "{0} custom categories"
+msgstr "Categorias personalizadas: {0}"
+
+#. Screens.CustomCategoryDefaultName
+msgctxt "Screens.CustomCategoryDefaultName"
+msgid "Custom {0}"
+msgstr "Personalizada {0}"
+
+#. Screens.CustomCategoryDeleted
+msgctxt "Screens.CustomCategoryDeleted"
+msgid "{0} deleted"
+msgstr "{0} excluída"
+
+#. Screens.DeleteCustomCategory
+msgctxt "Screens.DeleteCustomCategory"
+msgid "Delete this custom category"
+msgstr "Excluir esta categoria personalizada"
+
 #. Screens.CancelAbility
 msgctxt "Screens.CancelAbility"
 msgid "Cancel ability"
@@ -2564,6 +2639,16 @@ msgstr "Esquerda: {0}, direita: {1}"
 msgctxt "Screens.Options"
 msgid "Options"
 msgstr "Opções"
+
+#. Scanner.SouthwestShort
+msgctxt "Scanner.SouthwestShort"
+msgid "sw"
+msgstr "so"
+
+#. Scanner.SpawnPointEmpty
+msgctxt "Scanner.SpawnPointEmpty"
+msgid "empty"
+msgstr "vazio"
 
 #. Scanner.SpawnPoints
 msgctxt "Scanner.SpawnPoints"
@@ -2641,75 +2726,10 @@ msgctxt "Combat.YourRangedTroops"
 msgid "your ranged troops"
 msgstr "suas tropas de longo alcance"
 
-#. Scanner.AridTrees
-msgctxt "Scanner.AridTrees"
-msgid "Arid trees"
-msgstr "Árvores áridas"
-
-#. Scanner.CobblestoneRoads
-msgctxt "Scanner.CobblestoneRoads"
-msgid "Cobblestone roads"
-msgstr "Estradas de paralelepípedos"
-
-#. Scanner.DeepWater
-msgctxt "Scanner.DeepWater"
-msgid "Deep water"
-msgstr "Água profunda"
-
-#. Scanner.Deforestation
-msgctxt "Scanner.Deforestation"
-msgid "Deforestation"
-msgstr "Desmatamento"
-
-#. Scanner.Dirt
-msgctxt "Scanner.Dirt"
-msgid "Dirt"
-msgstr "Terra"
-
-#. Scanner.DirtRoads
-msgctxt "Scanner.DirtRoads"
-msgid "Dirt roads"
-msgstr "Estradas de terra"
-
-#. Scanner.Farmland
-msgctxt "Scanner.Farmland"
-msgid "Farmland"
-msgstr "Terras agrícolas"
-
-#. Scanner.Grass
-msgctxt "Scanner.Grass"
-msgid "Grass"
-msgstr "Grama"
-
-#. Scanner.Mountains
-msgctxt "Scanner.Mountains"
-msgid "Mountains"
-msgstr "Montanhas"
-
-#. Scanner.Sand
-msgctxt "Scanner.Sand"
-msgid "Sand"
-msgstr "Areia"
-
-#. Scanner.ShallowWater
-msgctxt "Scanner.ShallowWater"
-msgid "Shallow water"
-msgstr "Água rasa"
-
-#. Scanner.TemperateTrees
-msgctxt "Scanner.TemperateTrees"
-msgid "Temperate trees"
-msgstr "Árvores temperadas"
-
-#. Scanner.Walls
-msgctxt "Scanner.Walls"
-msgid "Walls"
-msgstr "Muros"
-
-#. Scanner.WaterEdge
-msgctxt "Scanner.WaterEdge"
-msgid "Water edge"
-msgstr "Margem da água"
+#. Scanner.WestShort
+msgctxt "Scanner.WestShort"
+msgid "w"
+msgstr "o"
 
 #. Spatial.Dirt
 msgctxt "Spatial.Dirt"
@@ -2735,146 +2755,6 @@ msgstr "Areia"
 msgctxt "Spatial.TemperateTrees"
 msgid "Temperate trees"
 msgstr "Árvores temperadas"
-
-#. Scanner.AridTreeTileCount_0
-msgctxt "Scanner.AridTreeTileCount_0"
-msgid "{0} arid tree tile"
-msgstr "{0} casa: Árvores áridas"
-
-#. Scanner.AridTreeTileCount_1
-msgctxt "Scanner.AridTreeTileCount_1"
-msgid "{0} arid tree tiles"
-msgstr "{0} casas: Árvores áridas"
-
-#. Scanner.CobblestoneRoadTileCount_0
-msgctxt "Scanner.CobblestoneRoadTileCount_0"
-msgid "{0} cobblestone road tile"
-msgstr "{0} casa: Estradas de paralelepípedos"
-
-#. Scanner.CobblestoneRoadTileCount_1
-msgctxt "Scanner.CobblestoneRoadTileCount_1"
-msgid "{0} cobblestone road tiles"
-msgstr "{0} casas: Estradas de paralelepípedos"
-
-#. Scanner.DeepWaterTileCount_0
-msgctxt "Scanner.DeepWaterTileCount_0"
-msgid "{0} deep water tile"
-msgstr "{0} casa: Água profunda"
-
-#. Scanner.DeepWaterTileCount_1
-msgctxt "Scanner.DeepWaterTileCount_1"
-msgid "{0} deep water tiles"
-msgstr "{0} casas: Água profunda"
-
-#. Scanner.DeforestationTileCount_0
-msgctxt "Scanner.DeforestationTileCount_0"
-msgid "{0} deforestation tile"
-msgstr "{0} casa: Desmatamento"
-
-#. Scanner.DeforestationTileCount_1
-msgctxt "Scanner.DeforestationTileCount_1"
-msgid "{0} deforestation tiles"
-msgstr "{0} casas: Desmatamento"
-
-#. Scanner.DirtRoadTileCount_0
-msgctxt "Scanner.DirtRoadTileCount_0"
-msgid "{0} dirt road tile"
-msgstr "{0} casa: Estradas de terra"
-
-#. Scanner.DirtRoadTileCount_1
-msgctxt "Scanner.DirtRoadTileCount_1"
-msgid "{0} dirt road tiles"
-msgstr "{0} casas: Estradas de terra"
-
-#. Scanner.DirtTileCount_0
-msgctxt "Scanner.DirtTileCount_0"
-msgid "{0} dirt tile"
-msgstr "{0} casa: Terra"
-
-#. Scanner.DirtTileCount_1
-msgctxt "Scanner.DirtTileCount_1"
-msgid "{0} dirt tiles"
-msgstr "{0} casas: Terra"
-
-#. Scanner.FarmlandTileCount_0
-msgctxt "Scanner.FarmlandTileCount_0"
-msgid "{0} farmland tile"
-msgstr "{0} casa: Terras agrícolas"
-
-#. Scanner.FarmlandTileCount_1
-msgctxt "Scanner.FarmlandTileCount_1"
-msgid "{0} farmland tiles"
-msgstr "{0} casas: Terras agrícolas"
-
-#. Scanner.GrassTileCount_0
-msgctxt "Scanner.GrassTileCount_0"
-msgid "{0} grass tile"
-msgstr "{0} casa: Grama"
-
-#. Scanner.GrassTileCount_1
-msgctxt "Scanner.GrassTileCount_1"
-msgid "{0} grass tiles"
-msgstr "{0} casas: Grama"
-
-#. Scanner.MountainTileCount_0
-msgctxt "Scanner.MountainTileCount_0"
-msgid "{0} mountain tile"
-msgstr "{0} casa: Montanhas"
-
-#. Scanner.MountainTileCount_1
-msgctxt "Scanner.MountainTileCount_1"
-msgid "{0} mountain tiles"
-msgstr "{0} casas: Montanhas"
-
-#. Scanner.SandTileCount_0
-msgctxt "Scanner.SandTileCount_0"
-msgid "{0} sand tile"
-msgstr "{0} casa: Areia"
-
-#. Scanner.SandTileCount_1
-msgctxt "Scanner.SandTileCount_1"
-msgid "{0} sand tiles"
-msgstr "{0} casas: Areia"
-
-#. Scanner.ShallowWaterTileCount_0
-msgctxt "Scanner.ShallowWaterTileCount_0"
-msgid "{0} shallow water tile"
-msgstr "{0} casa: Água rasa"
-
-#. Scanner.ShallowWaterTileCount_1
-msgctxt "Scanner.ShallowWaterTileCount_1"
-msgid "{0} shallow water tiles"
-msgstr "{0} casas: Água rasa"
-
-#. Scanner.TemperateTreeTileCount_0
-msgctxt "Scanner.TemperateTreeTileCount_0"
-msgid "{0} temperate tree tile"
-msgstr "{0} casa: Árvores temperadas"
-
-#. Scanner.TemperateTreeTileCount_1
-msgctxt "Scanner.TemperateTreeTileCount_1"
-msgid "{0} temperate tree tiles"
-msgstr "{0} casas: Árvores temperadas"
-
-#. Scanner.WallTileCount_0
-msgctxt "Scanner.WallTileCount_0"
-msgid "{0} wall tile"
-msgstr "{0} casa: Muros"
-
-#. Scanner.WallTileCount_1
-msgctxt "Scanner.WallTileCount_1"
-msgid "{0} wall tiles"
-msgstr "{0} casas: Muros"
-
-#. Scanner.WaterEdgeTileCount_0
-msgctxt "Scanner.WaterEdgeTileCount_0"
-msgid "{0} water edge tile"
-msgstr "{0} casa: Margem da água"
-
-#. Scanner.WaterEdgeTileCount_1
-msgctxt "Scanner.WaterEdgeTileCount_1"
-msgid "{0} water edge tiles"
-msgstr "{0} casas: Margem da água"
 
 #. Spatial.SkippedTileCount_0
 msgctxt "Spatial.SkippedTileCount_0"
@@ -3151,6 +3031,11 @@ msgctxt "Screens.AnnouncementHealth"
 msgid "Health"
 msgstr "Saúde"
 
+#. Screens.AnnouncementItem
+msgctxt "Screens.AnnouncementItem"
+msgid "Item name"
+msgstr "Nome do item"
+
 #. Screens.AnnouncementImpassableOrBlocked
 msgctxt "Screens.AnnouncementImpassableOrBlocked"
 msgid "Impassable or blocked"
@@ -3176,6 +3061,11 @@ msgctxt "Screens.AnnouncementSelectedForSpellcast"
 msgid "Selected for spellcast"
 msgstr "Selecionado para conjuração"
 
+#. Screens.AnnouncementStatus
+msgctxt "Screens.AnnouncementStatus"
+msgid "Status"
+msgstr "Estado"
+
 #. Screens.AnnouncementStackSize
 msgctxt "Screens.AnnouncementStackSize"
 msgid "Stack size"
@@ -3190,6 +3080,11 @@ msgstr "Efeitos da casa"
 msgctxt "Screens.AnnouncementTroopName"
 msgid "Troop name"
 msgstr "Nome da tropa"
+
+#. Screens.AnnouncementOwner
+msgctxt "Screens.AnnouncementOwner"
+msgid "Owner"
+msgstr "Proprietário"
 
 #. Screens.AnnouncementOrderRow
 msgctxt "Screens.AnnouncementOrderRow"
@@ -3220,6 +3115,11 @@ msgstr "Scanner"
 msgctxt "Screens.ScannerContentAnnouncements"
 msgid "Scanner content announcements"
 msgstr "Anúncios de conteúdo do scanner"
+
+#. Screens.ScannerUsesLongDirections
+msgctxt "Screens.ScannerUsesLongDirections"
+msgid "Long directions"
+msgstr "Direções por extenso"
 
 #. Screens.ScannerResultAnnouncements
 msgctxt "Screens.ScannerResultAnnouncements"
@@ -3286,11 +3186,6 @@ msgstr "Destino"
 msgctxt "Screens.AnnouncementExplorationState"
 msgid "Exploration state"
 msgstr "Estado de exploração"
-
-#. Screens.AnnouncementGroupResult
-msgctxt "Screens.AnnouncementGroupResult"
-msgid "Group result"
-msgstr "Resultado do grupo"
 
 #. Screens.AnnouncementInteractionPoint
 msgctxt "Screens.AnnouncementInteractionPoint"
@@ -3512,3 +3407,74 @@ msgstr "Reproduzir sons das casas"
 msgctxt "Screens.Volume"
 msgid "Volume"
 msgstr "Volume"
+
+#. Screens.SelectedSubcategoryCount_0
+msgctxt "Screens.SelectedSubcategoryCount_0"
+msgid "{0} selected"
+msgstr "{0} selecionada"
+
+#. Screens.SelectedSubcategoryCount_1
+msgctxt "Screens.SelectedSubcategoryCount_1"
+msgid "{0} selected"
+msgstr "{0} selecionadas"
+
+#. Actions.ScannerNextCustomEntry
+msgctxt "Actions.ScannerNextCustomEntry"
+msgid "Next Entry In The Custom Category On {0}"
+msgstr "Próxima entrada da categoria personalizada em {0}"
+
+#. Actions.ScannerPreviousCustomEntry
+msgctxt "Actions.ScannerPreviousCustomEntry"
+msgid "Previous Entry In The Custom Category On {0}"
+msgstr "Entrada anterior da categoria personalizada em {0}"
+
+#. Screens.CustomCategoryKey
+msgctxt "Screens.CustomCategoryKey"
+msgid "Key, {0}"
+msgstr "Tecla, {0}"
+
+#. Screens.CustomCategoryKeyCurrent
+msgctxt "Screens.CustomCategoryKeyCurrent"
+msgid "{0}, current"
+msgstr "{0}, atual"
+
+#. Screens.CustomCategoryKeyHeldBy
+msgctxt "Screens.CustomCategoryKeyHeldBy"
+msgid "{0}, held by {1}"
+msgstr "{0}, usada por {1}"
+
+#. Screens.CustomCategoryKeyTitle
+msgctxt "Screens.CustomCategoryKeyTitle"
+msgid "Key for {0}"
+msgstr "Tecla para {0}"
+
+#. Screens.CustomCategoryNameTaken
+msgctxt "Screens.CustomCategoryNameTaken"
+msgid "{0} is already the name of a category"
+msgstr "{0} já é o nome de uma categoria"
+
+#. Scanner.NoCustomCategoryOnKey
+msgctxt "Scanner.NoCustomCategoryOnKey"
+msgid "No custom category on {0}"
+msgstr "Nenhuma categoria personalizada em {0}"
+
+#. Scanner.QuickKeyComma
+msgctxt "Scanner.QuickKeyComma"
+msgid "Comma"
+msgstr "Vírgula"
+
+#. Scanner.QuickKeyNone
+msgctxt "Scanner.QuickKeyNone"
+msgid "None"
+msgstr "Nenhuma"
+
+#. Scanner.QuickKeyPeriod
+msgctxt "Scanner.QuickKeyPeriod"
+msgid "Period"
+msgstr "Ponto"
+
+#. Scanner.QuickKeySlash
+msgctxt "Scanner.QuickKeySlash"
+msgid "Slash"
+msgstr "Barra"
+

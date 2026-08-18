@@ -22,15 +22,12 @@ namespace SongsOfConquestAccess.Speech.Spatial
             "adventure_map_scanner_content",
             "Adventure Map Scanner Content Announcements",
             ModStrings.Screens.ScannerContentAnnouncements,
-            new AnnouncementElementDefinition(TileKeys.GroupResult, ModStrings.Screens.AnnouncementGroupResult),
-            new AnnouncementElementDefinition(TileKeys.ExplorationState, ModStrings.Screens.AnnouncementExplorationState),
-            new AnnouncementElementDefinition(TileKeys.Wielder, ModStrings.Screens.AnnouncementWielder),
-            new AnnouncementElementDefinition(TileKeys.MapEntity, ModStrings.Screens.AnnouncementMapEntity),
-            new AnnouncementElementDefinition(TileKeys.InteractionPoint, ModStrings.Screens.AnnouncementInteractionPoint),
+            new AnnouncementElementDefinition(ScannerAnnouncementDefinitions.ContentKeys.Name, ModStrings.Screens.AnnouncementName),
+            new AnnouncementElementDefinition(ScannerAnnouncementDefinitions.ContentKeys.Owner, ModStrings.Screens.AnnouncementOwner),
+            new AnnouncementElementDefinition(ScannerAnnouncementDefinitions.ContentKeys.Status, ModStrings.Screens.AnnouncementStatus),
             new AnnouncementElementDefinition(TileKeys.ReachabilityOrRoutePreview, ModStrings.Screens.AnnouncementReachabilityOrRoutePreview),
-            new AnnouncementElementDefinition(TileKeys.ZoneOfControl, ModStrings.Screens.AnnouncementZoneOfControl),
-            new AnnouncementElementDefinition(TileKeys.Terrain, ModStrings.Screens.AnnouncementTerrain),
-            new AnnouncementElementDefinition(TileKeys.MovementCost, ModStrings.Screens.AnnouncementMovementCost, defaultEnabled: false));
+            new AnnouncementElementDefinition(TileKeys.MovementCost, ModStrings.Screens.AnnouncementMovementCost, defaultEnabled: false, defaultSuffix: false))
+            .WithVersion(2);
 
         public static readonly AnnouncementGroupDefinition Wielder = new AnnouncementGroupDefinition(
             "adventure_map_wielder",
@@ -61,7 +58,6 @@ namespace SongsOfConquestAccess.Speech.Spatial
 
         public static class TileKeys
         {
-            public const string GroupResult = "group_result";
             public const string ExplorationState = "exploration_state";
             public const string Wielder = "wielder";
             public const string MapEntity = "map_entity";

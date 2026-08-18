@@ -63,7 +63,7 @@ namespace SongsOfConquestAccess.Audio
                     ScannerSubcategory subcategory = category.Subcategories[j];
                     if (subcategory != null)
                     {
-                        AddResults(entries, seen, subcategory.Results, tileLookup);
+                        AddResults(entries, seen, subcategory.AllResults, tileLookup);
                     }
                 }
             }
@@ -74,12 +74,11 @@ namespace SongsOfConquestAccess.Audio
         private static void AddResults(
             List<SweepEntry> entries,
             HashSet<Vector2Int> seen,
-            List<ScannerResult> results,
+            IEnumerable<ScannerResult> results,
             Func<Vector2Int, AdventureMapTile> tileLookup)
         {
-            for (int i = 0; i < results.Count; i++)
+            foreach (ScannerResult result in results)
             {
-                ScannerResult result = results[i];
                 if (result == null || seen.Contains(result.Position))
                 {
                     continue;

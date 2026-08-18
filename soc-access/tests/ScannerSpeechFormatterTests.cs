@@ -1,6 +1,8 @@
 using System.Collections.Generic;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using SongsOfConquestAccess.Scanner;
 using SongsOfConquestAccess.Speech.Spatial;
+using UnityEngine;
 
 namespace SongsOfConquestAccess.Tests
 {
@@ -24,19 +26,17 @@ namespace SongsOfConquestAccess.Tests
         }
 
         [TestMethod]
-        public void TroopDeploymentScannerContentGroupOmitsCoordinates()
+        public void TheItemNameIsSpokenOnlyWhenTheInstanceIsNotAlreadySayingIt()
         {
-            string text = ComposeWithDefaults(
-                TroopDeploymentAnnouncementDefinitions.ScannerContent,
-                new[]
-                {
-                    new AnnouncementPart(TroopDeploymentAnnouncementDefinitions.TileKeys.Troop, "20 Militia"),
-                    new AnnouncementPart(TroopDeploymentAnnouncementDefinitions.TileKeys.SpawnPoint, "spawn point"),
-                    new AnnouncementPart(TroopDeploymentAnnouncementDefinitions.TileKeys.Elevation, "elevated ground, height 1"),
-                    new AnnouncementPart(TroopDeploymentAnnouncementDefinitions.TileKeys.Coordinates, "3, 4")
-                });
+            ScannerResult grouped = new ScannerResult("terrain:grass:1", "Grass", new Vector2Int(1, 2))
+            {
+                InstanceLabel = "12 tiles"
+            };
+            ScannerResult ungrouped = new ScannerResult("pickup:chest", "Chest", new Vector2Int(1, 2));
 
-            Assert.AreEqual("20 Militia, spawn point, elevated ground, height 1", text);
+            Assert.AreEqual("Grass", ScannerResultSpeechFormatter.ItemName(grouped, includeItemName: true));
+            Assert.IsNull(ScannerResultSpeechFormatter.ItemName(ungrouped, includeItemName: true));
+            Assert.IsNull(ScannerResultSpeechFormatter.ItemName(grouped, includeItemName: false));
         }
 
         private static string ComposeWithDefaults(AnnouncementGroupDefinition group, IEnumerable<AnnouncementPart> parts)

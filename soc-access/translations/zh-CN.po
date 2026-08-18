@@ -30,6 +30,31 @@ msgctxt "Common.ResourceAmount"
 msgid "{0} {1}"
 msgstr "{0} {1}"
 
+#. Scanner.Exploration
+msgctxt "Scanner.Exploration"
+msgid "Exploration"
+msgstr "探索"
+
+#. Scanner.Merchants
+msgctxt "Scanner.Merchants"
+msgid "Merchants"
+msgstr "商人"
+
+#. Scanner.SpecialSites
+msgctxt "Scanner.SpecialSites"
+msgid "Special sites"
+msgstr "特殊地点"
+
+#. Scanner.ZoneOfControl
+msgctxt "Scanner.ZoneOfControl"
+msgid "Zone of control"
+msgstr "控制区"
+
+#. Spatial.ZoneOfControlInstance
+msgctxt "Spatial.ZoneOfControlInstance"
+msgid "{0} within {1}"
+msgstr "{1}{0}"
+
 #. TeamColors.Black
 msgctxt "TeamColors.Black"
 msgid "black"
@@ -780,6 +805,11 @@ msgctxt "Screens.Group"
 msgid "Group {0}"
 msgstr "组 {0}"
 
+#. Screens.KeywordAlreadyAdded
+msgctxt "Screens.KeywordAlreadyAdded"
+msgid "That keyword is already in this custom category"
+msgstr "该关键词已在此自定义类别中"
+
 #. Screens.Layout
 msgctxt "Screens.Layout"
 msgid "Layout"
@@ -955,6 +985,16 @@ msgctxt "Screens.RecruitingFrom"
 msgid "Recruiting from {0}"
 msgstr "从 {0} 招募"
 
+#. Screens.RemoveKeyword
+msgctxt "Screens.RemoveKeyword"
+msgid "Remove keyword, {0}"
+msgstr "移除关键词，{0}"
+
+#. Screens.RenameCustomCategory
+msgctxt "Screens.RenameCustomCategory"
+msgid "Rename"
+msgstr "重命名"
+
 #. Screens.ResearchTier
 msgctxt "Screens.ResearchTier"
 msgid "{0} ({1} {2})"
@@ -1099,6 +1139,16 @@ msgstr "世界确认菜单"
 msgctxt "Screens.RemoveFromQuickbar"
 msgid "Remove from quickbar"
 msgstr "从快捷栏移除"
+
+#. Screens.AddCustomCategory
+msgctxt "Screens.AddCustomCategory"
+msgid "Add custom category"
+msgstr "添加自定义类别"
+
+#. Screens.AddKeyword
+msgctxt "Screens.AddKeyword"
+msgid "Add keyword"
+msgstr "添加关键词"
 
 #. Screens.AmountToUpgrade
 msgctxt "Screens.AmountToUpgrade"
@@ -1395,10 +1445,15 @@ msgctxt "Actions.ScannerNextCategory"
 msgid "Next Scanner Category"
 msgstr "下一个 扫描器 类别"
 
-#. Actions.ScannerNextResult
-msgctxt "Actions.ScannerNextResult"
-msgid "Next Scanner Result"
-msgstr "下一个 扫描器 结果"
+#. Actions.ScannerNextInstance
+msgctxt "Actions.ScannerNextInstance"
+msgid "Next Scanner Instance"
+msgstr "下一个扫描器实例"
+
+#. Actions.ScannerNextItem
+msgctxt "Actions.ScannerNextItem"
+msgid "Next Scanner Item"
+msgstr "下一个扫描器项目"
 
 #. Actions.ScannerNextSubcategory
 msgctxt "Actions.ScannerNextSubcategory"
@@ -1410,25 +1465,30 @@ msgctxt "Actions.ScannerPreviousCategory"
 msgid "Previous Scanner Category"
 msgstr "上一个 扫描器 类别"
 
-#. Actions.ScannerPreviousResult
-msgctxt "Actions.ScannerPreviousResult"
-msgid "Previous Scanner Result"
-msgstr "上一个 扫描器 结果"
+#. Actions.ScannerPreviousInstance
+msgctxt "Actions.ScannerPreviousInstance"
+msgid "Previous Scanner Instance"
+msgstr "上一个扫描器实例"
+
+#. Actions.ScannerPreviousItem
+msgctxt "Actions.ScannerPreviousItem"
+msgid "Previous Scanner Item"
+msgstr "上一个扫描器项目"
 
 #. Actions.ScannerPreviousSubcategory
 msgctxt "Actions.ScannerPreviousSubcategory"
 msgid "Previous Scanner Subcategory"
 msgstr "上一个 扫描器 子类别"
 
-#. Actions.ScannerRefresh
-msgctxt "Actions.ScannerRefresh"
-msgid "Refresh Scanner"
-msgstr "刷新扫描器"
+#. Actions.ScannerReturnFromJump
+msgctxt "Actions.ScannerReturnFromJump"
+msgid "Return To Tile Before Jump"
+msgstr "返回跳转前的格子"
 
-#. Actions.ScannerSpeakOrientation
-msgctxt "Actions.ScannerSpeakOrientation"
-msgid "Scanner Result Orientation"
-msgstr "扫描器结果方向"
+#. Actions.ScannerSpeakDistanceAndDirection
+msgctxt "Actions.ScannerSpeakDistanceAndDirection"
+msgid "Scanner Result Distance and Direction"
+msgstr "扫描结果的距离和方向"
 
 #. Actions.SliderDecrease
 msgctxt "Actions.SliderDecrease"
@@ -2015,6 +2075,11 @@ msgctxt "Spatial.MovementRange"
 msgid "Movement range"
 msgstr "移动范围"
 
+#. Spatial.Obstruction
+msgctxt "Spatial.Obstruction"
+msgid "Obstruction"
+msgstr "障碍物"
+
 #. Spatial.Neutral
 msgctxt "Spatial.Neutral"
 msgid "neutral"
@@ -2155,6 +2220,11 @@ msgctxt "Scanner.Attackable"
 msgid "Attackable"
 msgstr "可攻击"
 
+#. Scanner.Barriers
+msgctxt "Scanner.Barriers"
+msgid "Barriers"
+msgstr "屏障"
+
 #. Scanner.Beacons
 msgctxt "Scanner.Beacons"
 msgid "Beacons"
@@ -2164,11 +2234,6 @@ msgstr "信标"
 msgctxt "Scanner.Blocked"
 msgid "Blocked"
 msgstr "被阻挡"
-
-#. Scanner.Bridges
-msgctxt "Scanner.Bridges"
-msgid "Bridges"
-msgstr "桥梁"
 
 #. Scanner.Buildings
 msgctxt "Scanner.Buildings"
@@ -2180,9 +2245,24 @@ msgctxt "Scanner.Dangerous"
 msgid "Dangerous"
 msgstr "危险"
 
+#. Scanner.DirectionStep
+msgctxt "Scanner.DirectionStep"
+msgid "{0}{1}"
+msgstr "{0}{1}"
+
+#. Scanner.DirectionStepLong
+msgctxt "Scanner.DirectionStepLong"
+msgid "{0} {1}"
+msgstr "{0} {1}"
+
 #. Scanner.East
 msgctxt "Scanner.East"
 msgid "east"
+msgstr "东"
+
+#. Scanner.EastShort
+msgctxt "Scanner.EastShort"
+msgid "e"
 msgstr "东"
 
 #. Scanner.ElevatedGround
@@ -2215,11 +2295,6 @@ msgctxt "Scanner.FriendlyGates"
 msgid "Friendly gates"
 msgstr "友方城门"
 
-#. Scanner.Impassable
-msgctxt "Scanner.Impassable"
-msgid "Impassable"
-msgstr "不可通行"
-
 #. Scanner.ImpassableTerrain
 msgctxt "Scanner.ImpassableTerrain"
 msgid "Impassable terrain"
@@ -2245,9 +2320,19 @@ msgctxt "Scanner.Neutral"
 msgid "Neutral"
 msgstr "中立"
 
+#. Scanner.NoTileToReturnTo
+msgctxt "Scanner.NoTileToReturnTo"
+msgid "No tile to return to"
+msgstr "没有可返回的格子"
+
 #. Scanner.North
 msgctxt "Scanner.North"
 msgid "north"
+msgstr "北"
+
+#. Scanner.NorthShort
+msgctxt "Scanner.NorthShort"
+msgid "n"
 msgstr "北"
 
 #. Scanner.Northeast
@@ -2255,15 +2340,30 @@ msgctxt "Scanner.Northeast"
 msgid "northeast"
 msgstr "东北"
 
+#. Scanner.NortheastShort
+msgctxt "Scanner.NortheastShort"
+msgid "ne"
+msgstr "东北"
+
 #. Scanner.Northwest
 msgctxt "Scanner.Northwest"
 msgid "northwest"
+msgstr "西北"
+
+#. Scanner.NorthwestShort
+msgctxt "Scanner.NorthwestShort"
+msgid "nw"
 msgstr "西北"
 
 #. Scanner.Objectives
 msgctxt "Scanner.Objectives"
 msgid "Objectives"
 msgstr "目标"
+
+#. Scanner.OpenGround
+msgctxt "Scanner.OpenGround"
+msgid "Open ground"
+msgstr "开阔地"
 
 #. Scanner.Obstacles
 msgctxt "Scanner.Obstacles"
@@ -2295,10 +2395,10 @@ msgctxt "Scanner.Riches"
 msgid "Riches"
 msgstr "财富"
 
-#. Scanner.Roads
-msgctxt "Scanner.Roads"
-msgid "Roads"
-msgstr "道路"
+#. Scanner.RoadsAndCrossings
+msgctxt "Scanner.RoadsAndCrossings"
+msgid "Roads and crossings"
+msgstr "道路与通道"
 
 #. Scanner.Search
 msgctxt "Scanner.Search"
@@ -2325,9 +2425,19 @@ msgctxt "Scanner.South"
 msgid "south"
 msgstr "南"
 
+#. Scanner.SouthShort
+msgctxt "Scanner.SouthShort"
+msgid "s"
+msgstr "南"
+
 #. Scanner.Southeast
 msgctxt "Scanner.Southeast"
 msgid "southeast"
+msgstr "东南"
+
+#. Scanner.SoutheastShort
+msgctxt "Scanner.SoutheastShort"
+msgid "se"
 msgstr "东南"
 
 #. Scanner.Southwest
@@ -2360,30 +2470,30 @@ msgctxt "Scanner.Unexplored"
 msgid "Unexplored"
 msgstr "未探索"
 
-#. Scanner.UnexploredTileCount_0
-msgctxt "Scanner.UnexploredTileCount_0"
-msgid "{0} unexplored tile"
-msgstr "{0} 个未探索地块"
-
 #. Scanner.Unvisited
 msgctxt "Scanner.Unvisited"
 msgid "Unvisited"
 msgstr "未访问"
-
-#. Scanner.Water
-msgctxt "Scanner.Water"
-msgid "Water"
-msgstr "水"
 
 #. Scanner.West
 msgctxt "Scanner.West"
 msgid "west"
 msgstr "西"
 
+#. Screens.Battle
+msgctxt "Screens.Battle"
+msgid "Battle"
+msgstr "战场"
+
 #. Screens.BuyResourceForGold
 msgctxt "Screens.BuyResourceForGold"
 msgid "Buy {0} for {1}"
 msgstr "用 {1} 购买 {0}"
+
+#. Screens.TextEntryUnavailable
+msgctxt "Screens.TextEntryUnavailable"
+msgid "Text entry is not available here"
+msgstr "此处无法输入文本"
 
 #. Screens.Sell
 msgctxt "Screens.Sell"
@@ -2399,31 +2509,6 @@ msgstr "以 {1} 出售 {0}"
 msgctxt "Scanner.Wielders"
 msgid "Wielders"
 msgstr "持有者"
-
-#. Scanner.BlockedTileCount_0
-msgctxt "Scanner.BlockedTileCount_0"
-msgid "{0} blocked tile"
-msgstr "{0} 个被阻挡格"
-
-#. Scanner.BridgeTileCount_0
-msgctxt "Scanner.BridgeTileCount_0"
-msgid "{0} bridge tile"
-msgstr "{0} 个桥梁格"
-
-#. Scanner.ImpassableTileCount_0
-msgctxt "Scanner.ImpassableTileCount_0"
-msgid "{0} impassable tile"
-msgstr "{0} 个不可通行格"
-
-#. Scanner.RoadTileCount_0
-msgctxt "Scanner.RoadTileCount_0"
-msgid "{0} road tile"
-msgstr "{0} 个道路格"
-
-#. Scanner.WaterTileCount_0
-msgctxt "Scanner.WaterTileCount_0"
-msgid "{0} water tile"
-msgstr "{0} 个水域格"
 
 #. Spatial.AridTrees
 msgctxt "Spatial.AridTrees"
@@ -2495,6 +2580,26 @@ msgctxt "Screens.MoveAllRight"
 msgid "Move all right"
 msgstr "全部移到右侧"
 
+#. Screens.CustomCategories
+msgctxt "Screens.CustomCategories"
+msgid "{0} custom categories"
+msgstr "{0}自定义类别"
+
+#. Screens.CustomCategoryDefaultName
+msgctxt "Screens.CustomCategoryDefaultName"
+msgid "Custom {0}"
+msgstr "自定义 {0}"
+
+#. Screens.CustomCategoryDeleted
+msgctxt "Screens.CustomCategoryDeleted"
+msgid "{0} deleted"
+msgstr "已删除 {0}"
+
+#. Screens.DeleteCustomCategory
+msgctxt "Screens.DeleteCustomCategory"
+msgid "Delete this custom category"
+msgstr "删除此自定义类别"
+
 #. Screens.CancelAbility
 msgctxt "Screens.CancelAbility"
 msgid "Cancel ability"
@@ -2519,6 +2624,16 @@ msgstr "左侧：{0}，右侧：{1}"
 msgctxt "Screens.Options"
 msgid "Options"
 msgstr "选项"
+
+#. Scanner.SouthwestShort
+msgctxt "Scanner.SouthwestShort"
+msgid "sw"
+msgstr "西南"
+
+#. Scanner.SpawnPointEmpty
+msgctxt "Scanner.SpawnPointEmpty"
+msgid "empty"
+msgstr "空"
 
 #. Scanner.SpawnPoints
 msgctxt "Scanner.SpawnPoints"
@@ -2596,75 +2711,10 @@ msgctxt "Combat.YourRangedTroops"
 msgid "your ranged troops"
 msgstr "你的远程部队"
 
-#. Scanner.AridTrees
-msgctxt "Scanner.AridTrees"
-msgid "Arid trees"
-msgstr "旱地树木"
-
-#. Scanner.CobblestoneRoads
-msgctxt "Scanner.CobblestoneRoads"
-msgid "Cobblestone roads"
-msgstr "鹅卵石道路"
-
-#. Scanner.DeepWater
-msgctxt "Scanner.DeepWater"
-msgid "Deep water"
-msgstr "深水"
-
-#. Scanner.Deforestation
-msgctxt "Scanner.Deforestation"
-msgid "Deforestation"
-msgstr "伐木区"
-
-#. Scanner.Dirt
-msgctxt "Scanner.Dirt"
-msgid "Dirt"
-msgstr "泥地"
-
-#. Scanner.DirtRoads
-msgctxt "Scanner.DirtRoads"
-msgid "Dirt roads"
-msgstr "泥土道路"
-
-#. Scanner.Farmland
-msgctxt "Scanner.Farmland"
-msgid "Farmland"
-msgstr "农田"
-
-#. Scanner.Grass
-msgctxt "Scanner.Grass"
-msgid "Grass"
-msgstr "草地"
-
-#. Scanner.Mountains
-msgctxt "Scanner.Mountains"
-msgid "Mountains"
-msgstr "山地"
-
-#. Scanner.Sand
-msgctxt "Scanner.Sand"
-msgid "Sand"
-msgstr "沙地"
-
-#. Scanner.ShallowWater
-msgctxt "Scanner.ShallowWater"
-msgid "Shallow water"
-msgstr "浅水"
-
-#. Scanner.TemperateTrees
-msgctxt "Scanner.TemperateTrees"
-msgid "Temperate trees"
-msgstr "温带树木"
-
-#. Scanner.Walls
-msgctxt "Scanner.Walls"
-msgid "Walls"
-msgstr "墙"
-
-#. Scanner.WaterEdge
-msgctxt "Scanner.WaterEdge"
-msgid "Water edge"
-msgstr "水边"
+#. Scanner.WestShort
+msgctxt "Scanner.WestShort"
+msgid "w"
+msgstr "西"
 
 #. Spatial.Dirt
 msgctxt "Spatial.Dirt"
@@ -2690,76 +2740,6 @@ msgstr "沙地"
 msgctxt "Spatial.TemperateTrees"
 msgid "Temperate trees"
 msgstr "温带树木"
-
-#. Scanner.AridTreeTileCount_0
-msgctxt "Scanner.AridTreeTileCount_0"
-msgid "{0} arid tree tile"
-msgstr "{0} 个地块：旱地树木"
-
-#. Scanner.CobblestoneRoadTileCount_0
-msgctxt "Scanner.CobblestoneRoadTileCount_0"
-msgid "{0} cobblestone road tile"
-msgstr "{0} 个地块：鹅卵石道路"
-
-#. Scanner.DeepWaterTileCount_0
-msgctxt "Scanner.DeepWaterTileCount_0"
-msgid "{0} deep water tile"
-msgstr "{0} 个地块：深水"
-
-#. Scanner.DeforestationTileCount_0
-msgctxt "Scanner.DeforestationTileCount_0"
-msgid "{0} deforestation tile"
-msgstr "{0} 个地块：伐木区"
-
-#. Scanner.DirtRoadTileCount_0
-msgctxt "Scanner.DirtRoadTileCount_0"
-msgid "{0} dirt road tile"
-msgstr "{0} 个地块：泥土道路"
-
-#. Scanner.DirtTileCount_0
-msgctxt "Scanner.DirtTileCount_0"
-msgid "{0} dirt tile"
-msgstr "{0} 个地块：泥地"
-
-#. Scanner.FarmlandTileCount_0
-msgctxt "Scanner.FarmlandTileCount_0"
-msgid "{0} farmland tile"
-msgstr "{0} 个地块：农田"
-
-#. Scanner.GrassTileCount_0
-msgctxt "Scanner.GrassTileCount_0"
-msgid "{0} grass tile"
-msgstr "{0} 个地块：草地"
-
-#. Scanner.MountainTileCount_0
-msgctxt "Scanner.MountainTileCount_0"
-msgid "{0} mountain tile"
-msgstr "{0} 个地块：山地"
-
-#. Scanner.SandTileCount_0
-msgctxt "Scanner.SandTileCount_0"
-msgid "{0} sand tile"
-msgstr "{0} 个地块：沙地"
-
-#. Scanner.ShallowWaterTileCount_0
-msgctxt "Scanner.ShallowWaterTileCount_0"
-msgid "{0} shallow water tile"
-msgstr "{0} 个地块：浅水"
-
-#. Scanner.TemperateTreeTileCount_0
-msgctxt "Scanner.TemperateTreeTileCount_0"
-msgid "{0} temperate tree tile"
-msgstr "{0} 个地块：温带树木"
-
-#. Scanner.WallTileCount_0
-msgctxt "Scanner.WallTileCount_0"
-msgid "{0} wall tile"
-msgstr "{0} 个地块：墙"
-
-#. Scanner.WaterEdgeTileCount_0
-msgctxt "Scanner.WaterEdgeTileCount_0"
-msgid "{0} water edge tile"
-msgstr "{0} 个地块：水边"
 
 #. Spatial.SkippedTileCount_0
 msgctxt "Spatial.SkippedTileCount_0"
@@ -3031,6 +3011,11 @@ msgctxt "Screens.AnnouncementHealth"
 msgid "Health"
 msgstr "生命值"
 
+#. Screens.AnnouncementItem
+msgctxt "Screens.AnnouncementItem"
+msgid "Item name"
+msgstr "项目名称"
+
 #. Screens.AnnouncementImpassableOrBlocked
 msgctxt "Screens.AnnouncementImpassableOrBlocked"
 msgid "Impassable or blocked"
@@ -3056,6 +3041,11 @@ msgctxt "Screens.AnnouncementSelectedForSpellcast"
 msgid "Selected for spellcast"
 msgstr "已选为施法目标"
 
+#. Screens.AnnouncementStatus
+msgctxt "Screens.AnnouncementStatus"
+msgid "Status"
+msgstr "状态"
+
 #. Screens.AnnouncementStackSize
 msgctxt "Screens.AnnouncementStackSize"
 msgid "Stack size"
@@ -3070,6 +3060,11 @@ msgstr "地格效果"
 msgctxt "Screens.AnnouncementTroopName"
 msgid "Troop name"
 msgstr "部队名称"
+
+#. Screens.AnnouncementOwner
+msgctxt "Screens.AnnouncementOwner"
+msgid "Owner"
+msgstr "归属"
 
 #. Screens.AnnouncementOrderRow
 msgctxt "Screens.AnnouncementOrderRow"
@@ -3100,6 +3095,11 @@ msgstr "扫描器"
 msgctxt "Screens.ScannerContentAnnouncements"
 msgid "Scanner content announcements"
 msgstr "扫描器内容播报"
+
+#. Screens.ScannerUsesLongDirections
+msgctxt "Screens.ScannerUsesLongDirections"
+msgid "Long directions"
+msgstr "方向使用完整名称"
 
 #. Screens.ScannerResultAnnouncements
 msgctxt "Screens.ScannerResultAnnouncements"
@@ -3166,11 +3166,6 @@ msgstr "目的地"
 msgctxt "Screens.AnnouncementExplorationState"
 msgid "Exploration state"
 msgstr "探索状态"
-
-#. Screens.AnnouncementGroupResult
-msgctxt "Screens.AnnouncementGroupResult"
-msgid "Group result"
-msgstr "分组结果"
 
 #. Screens.AnnouncementInteractionPoint
 msgctxt "Screens.AnnouncementInteractionPoint"
@@ -3392,3 +3387,69 @@ msgstr "播放地块音效"
 msgctxt "Screens.Volume"
 msgid "Volume"
 msgstr "音量"
+
+#. Screens.SelectedSubcategoryCount_0
+msgctxt "Screens.SelectedSubcategoryCount_0"
+msgid "{0} selected"
+msgstr "已选 {0} 项"
+
+#. Actions.ScannerNextCustomEntry
+msgctxt "Actions.ScannerNextCustomEntry"
+msgid "Next Entry In The Custom Category On {0}"
+msgstr "{0}上自定义类别的下一项"
+
+#. Actions.ScannerPreviousCustomEntry
+msgctxt "Actions.ScannerPreviousCustomEntry"
+msgid "Previous Entry In The Custom Category On {0}"
+msgstr "{0}上自定义类别的上一项"
+
+#. Screens.CustomCategoryKey
+msgctxt "Screens.CustomCategoryKey"
+msgid "Key, {0}"
+msgstr "按键，{0}"
+
+#. Screens.CustomCategoryKeyCurrent
+msgctxt "Screens.CustomCategoryKeyCurrent"
+msgid "{0}, current"
+msgstr "{0}，当前"
+
+#. Screens.CustomCategoryKeyHeldBy
+msgctxt "Screens.CustomCategoryKeyHeldBy"
+msgid "{0}, held by {1}"
+msgstr "{0}，已分配给{1}"
+
+#. Screens.CustomCategoryKeyTitle
+msgctxt "Screens.CustomCategoryKeyTitle"
+msgid "Key for {0}"
+msgstr "{0}的按键"
+
+#. Screens.CustomCategoryNameTaken
+msgctxt "Screens.CustomCategoryNameTaken"
+msgid "{0} is already the name of a category"
+msgstr "{0}已经是一个类别的名称"
+
+#. Scanner.NoCustomCategoryOnKey
+msgctxt "Scanner.NoCustomCategoryOnKey"
+msgid "No custom category on {0}"
+msgstr "{0}上没有自定义类别"
+
+#. Scanner.QuickKeyComma
+msgctxt "Scanner.QuickKeyComma"
+msgid "Comma"
+msgstr "逗号"
+
+#. Scanner.QuickKeyNone
+msgctxt "Scanner.QuickKeyNone"
+msgid "None"
+msgstr "无"
+
+#. Scanner.QuickKeyPeriod
+msgctxt "Scanner.QuickKeyPeriod"
+msgid "Period"
+msgstr "句号"
+
+#. Scanner.QuickKeySlash
+msgctxt "Scanner.QuickKeySlash"
+msgid "Slash"
+msgstr "斜杠"
+

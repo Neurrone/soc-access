@@ -1014,24 +1014,24 @@ namespace SongsOfConquestAccess.Adapters
 
         public ScannerSnapshot BuildScannerSnapshot(Vector2Int origin)
         {
-            ScannerSnapshot snapshot = new ScannerSnapshot();
-            InitializeAdventureScannerCategories(snapshot);
+            ScannerSnapshot snapshot = new ScannerSnapshot(AdventureScannerTaxonomy.Instance);
             Dictionary<Vector2Int, AdventureMapTile> tileCache = new Dictionary<Vector2Int, AdventureMapTile>();
             int localTeamId = GetLocalTeamId();
-            AddPickupScannerResults(snapshot, tileCache);
-            AddResourceGeneratorScannerResults(snapshot, localTeamId, tileCache);
-            AddBeaconScannerResults(snapshot, tileCache);
-            AddWielderScannerResults(snapshot, tileCache);
-            AddStructuralScannerResults(snapshot, localTeamId, tileCache, MapEntityCategory.Town, MapEntityCategory.Settlement, MapEntityCategory.BuildSite);
-            AddTroopSourceScannerResults(snapshot, localTeamId, tileCache);
-            AddStructuralScannerResults(snapshot, localTeamId, tileCache, MapEntityCategory.Building);
-            AddObjectiveScannerResults(snapshot, tileCache);
-            AddObstacleScannerResults(snapshot, localTeamId, origin, tileCache);
-            AddArtifactMarketScannerResults(snapshot, tileCache);
-            AddTeleportScannerResults(snapshot, tileCache);
-            AddAdventureTerrainScannerResults(snapshot, origin, tileCache);
-            AddUnexploredScannerResults(snapshot, origin);
-            AddRevealedScannerResults(snapshot);
+            ScannerContribution.Run(ScannerCategoryKeys.Pickups, () => AddPickupScannerResults(snapshot, tileCache));
+            ScannerContribution.Run(ScannerCategoryKeys.ResourceGenerators, () => AddResourceGeneratorScannerResults(snapshot, localTeamId, tileCache));
+            ScannerContribution.Run(ScannerSubcategoryKeys.Beacons, () => AddBeaconScannerResults(snapshot, tileCache));
+            ScannerContribution.Run(ScannerCategoryKeys.Wielders, () => AddWielderScannerResults(snapshot, tileCache));
+            ScannerContribution.Run(ScannerCategoryKeys.SettlementsAndBuildSites, () => AddStructuralScannerResults(snapshot, localTeamId, tileCache, MapEntityCategory.Town, MapEntityCategory.Settlement, MapEntityCategory.BuildSite));
+            ScannerContribution.Run(ScannerCategoryKeys.TroopSources, () => AddTroopSourceScannerResults(snapshot, localTeamId, tileCache));
+            ScannerContribution.Run(ScannerCategoryKeys.Buildings, () => AddStructuralScannerResults(snapshot, localTeamId, tileCache, MapEntityCategory.Building));
+            ScannerContribution.Run(ScannerSubcategoryKeys.Objectives, () => AddObjectiveScannerResults(snapshot, tileCache));
+            ScannerContribution.Run(ScannerCategoryKeys.Obstacles, () => AddObstacleScannerResults(snapshot, localTeamId, origin, tileCache));
+            ScannerContribution.Run(ScannerSubcategoryKeys.ArtifactMarkets, () => AddArtifactMarketScannerResults(snapshot, tileCache));
+            ScannerContribution.Run(ScannerSubcategoryKeys.Merchants, () => AddMerchantScannerResults(snapshot, tileCache));
+            ScannerContribution.Run(ScannerSubcategoryKeys.Teleport, () => AddTeleportScannerResults(snapshot, tileCache));
+            ScannerContribution.Run(ScannerCategoryKeys.Terrain, () => AddAdventureTerrainScannerResults(snapshot, origin, tileCache));
+            ScannerContribution.Run(ScannerSubcategoryKeys.Unexplored, () => AddUnexploredScannerResults(snapshot, origin));
+            ScannerContribution.Run(ScannerSubcategoryKeys.Revealed, () => AddRevealedScannerResults(snapshot));
             return snapshot;
         }
 
@@ -1172,40 +1172,136 @@ namespace SongsOfConquestAccess.Adapters
             }
         }
 
-        public bool ValidateScannerResult(ScannerResult result)
+        public ScannerResultRefresh TryRefreshScannerResult(ScannerResult result, Vector2Int cursorHint)
         {
-            if (result == null || !IsWithinMap(result.Position))
+            if (result == null)
+            {
+                return ScannerResultRefresh.Invalid;
+            }
+
+            Vector2Int position;
+            if (!TryRevalidateScannerResult(result, cursorHint, out position))
             {
                 RemoveRevealedScannerResult(result);
+                return ScannerResultRefresh.Invalid;
+            }
+
+            return ScannerResultRefresh.Valid(position);
+        }
+
+        /// <summary>
+        /// Judges a result against the live map and picks the tile it speaks
+        /// through. A result covering many tiles is announced through one
+        /// representative, picked when the snapshot was built and measured from
+        /// wherever the scan started; that goes stale the moment the cursor
+        /// moves, so the representative is re-picked against the live cursor.
+        /// A group is only gone once none of its tiles qualifies any more:
+        /// exploring one fringe tile of a large unexplored region must not take
+        /// the whole region away.
+        /// </summary>
+        private bool TryRevalidateScannerResult(ScannerResult result, Vector2Int cursorHint, out Vector2Int position)
+        {
+            position = result.Position;
+            Func<Vector2Int, bool> isValidPoint = CreateScannerPointValidator(result);
+            if (isValidPoint == null)
+            {
                 return false;
             }
 
-            if (result.Kind == ScannerResultKind.CommanderZoneOfControl)
+            if (result.Points.Count == 0)
             {
-                bool validZone = ValidateCommanderZoneOfControlResult(result);
-                if (!validZone)
+                return isValidPoint(position);
+            }
+
+            Vector2Int nearest = ClosestPoint(result.Points, cursorHint);
+            if (isValidPoint(nearest))
+            {
+                position = nearest;
+                return true;
+            }
+
+            return TryPickSurvivingScannerGroupPoint(result, cursorHint, isValidPoint, out position);
+        }
+
+        /// <summary>
+        /// Walks a group's tiles outwards from the cursor and answers through
+        /// the first one that still qualifies, dropping the closer ones it
+        /// proved gone so the group stops speaking through tiles it no longer
+        /// covers. Judging a tile costs a pathfind or a map query, so the walk
+        /// stops at the survivor rather than sweeping the whole group.
+        /// </summary>
+        internal static bool TryPickSurvivingScannerGroupPoint(
+            ScannerResult result,
+            Vector2Int cursorHint,
+            Func<Vector2Int, bool> isValidPoint,
+            out Vector2Int position)
+        {
+            position = result.Position;
+            List<Vector2Int> ordered = new List<Vector2Int>(result.Points);
+            ordered.Sort((left, right) =>
+            {
+                int compared = DistanceSquared(cursorHint, left).CompareTo(DistanceSquared(cursorHint, right));
+                return compared != 0 ? compared : ComparePointOrder(left, right);
+            });
+
+            for (int i = 0; i < ordered.Count; i++)
+            {
+                if (!isValidPoint(ordered[i]))
                 {
-                    RemoveRevealedScannerResult(result);
+                    continue;
                 }
 
-                return validZone;
+                if (i > 0)
+                {
+                    HashSet<Vector2Int> gone = new HashSet<Vector2Int>();
+                    for (int rejected = 0; rejected < i; rejected++)
+                    {
+                        gone.Add(ordered[rejected]);
+                    }
+
+                    result.Points.RemoveAll(point => gone.Contains(point));
+                }
+
+                position = ordered[i];
+                return true;
+            }
+
+            return false;
+        }
+
+        private static int ComparePointOrder(Vector2Int left, Vector2Int right)
+        {
+            int compared = left.x.CompareTo(right.x);
+            return compared != 0 ? compared : left.y.CompareTo(right.y);
+        }
+
+        /// <summary>
+        /// The live test for whether one tile still carries what the result
+        /// stands for, or null where the result cannot be valid anywhere any
+        /// more. Built once per refresh so the per-kind setup, the exploration
+        /// array and the reachability flood, is paid once however many of the
+        /// group's tiles have to be judged.
+        /// </summary>
+        private Func<Vector2Int, bool> CreateScannerPointValidator(ScannerResult result)
+        {
+            if (result.Kind == ScannerResultKind.CommanderZoneOfControl)
+            {
+                return CreateCommanderZoneOfControlPointValidator(result);
             }
 
             if (result.Kind == ScannerResultKind.UnexploredGroup)
             {
-                bool validUnexplored = ValidateUnexploredScannerResult(result);
-                if (!validUnexplored)
-                {
-                    RemoveRevealedScannerResult(result);
-                }
-
-                return validUnexplored;
+                return CreateUnexploredPointValidator();
             }
 
-            AdventureMapTile tile = GetTile(result.Position);
+            return position => IsWithinMap(position) && IsScannerEntityPointValid(result, position);
+        }
+
+        private bool IsScannerEntityPointValid(ScannerResult result, Vector2Int position)
+        {
+            AdventureMapTile tile = GetTile(position);
             if (tile == null || !tile.IsExplored)
             {
-                RemoveRevealedScannerResult(result);
                 return false;
             }
 
@@ -1218,13 +1314,7 @@ namespace SongsOfConquestAccess.Adapters
 
                 IMapEntity entity = TryGetMapEntity(stableId);
                 AdventureMapTile identityTile;
-                if (entity != null && TryGetMapEntityIdentityTile(entity, null, out identityTile))
-                {
-                    return true;
-                }
-
-                RemoveRevealedScannerResult(result);
-                return false;
+                return entity != null && TryGetMapEntityIdentityTile(entity, null, out identityTile);
             }
 
             return true;
@@ -1379,6 +1469,7 @@ namespace SongsOfConquestAccess.Adapters
                 return;
             }
 
+            int localTeamId = GetLocalTeamId();
             foreach (ICommanderState commander in commanders)
             {
                 if (commander == null || !commander.IsAlive || !IsWithinMap(commander.Position))
@@ -1393,111 +1484,18 @@ namespace SongsOfConquestAccess.Adapters
                 }
 
                 string name = FirstNonEmpty(tile.Commander.Name, ModText.Get(ModStrings.Events.Wielder));
-                snapshot.Add(ModText.Get(ModStrings.Scanner.Wielders), ModText.Get(ModStrings.Scanner.All),
-                    new ScannerResult(ScannerKey("commander", commander.Id), name, commander.Position)
-                    {
-                        StableReference = commander.Id,
-                        EntityCategory = AdventureEntityCategory.Wielder
-                    });
-            }
-        }
-
-        private void AddMapEntityScannerResults(ScannerSnapshot snapshot, int localTeamId, Dictionary<Vector2Int, AdventureMapTile> tileCache)
-        {
-            IEnumerable<IMapEntity> entities = _facade != null && _facade.MapEntities != null ? _facade.MapEntities.All : null;
-            if (entities == null)
-            {
-                return;
-            }
-
-            foreach (IMapEntity entity in entities)
-            {
-                if (entity == null || !entity.IsEnabled || !IsWithinMap(entity.Position))
+                string relationship = GetCommanderRelationship(commander, localTeamId);
+                ScannerResult result = new ScannerResult(ScannerKey("commander", commander.Id), name, commander.Position)
                 {
-                    continue;
-                }
-
-                AdventureMapTile tile;
-                if (!TryGetMapEntityIdentityTile(entity, tileCache, out tile))
-                {
-                    continue;
-                }
-
-                string name = FirstNonEmpty(tile.MapEntityName, GetMapEntityName(entity));
-                bool notVisible = !tile.IsVisible;
-                string relationship = FormatScannerRelationship(GetMapEntityRelationship(entity, localTeamId));
-                ScannerResult result = new ScannerResult(ScannerKey("entity", entity.Id), name, tile.Position)
-                {
-                    NotVisible = notVisible,
-                    StableReference = entity.Id,
-                    EntityCategory = ClassifyMapEntity(entity)
+                    NotVisible = !tile.IsVisible,
+                    Relationship = ScannerRelationship(relationship),
+                    StableReference = commander.Id,
+                    EntityCategory = AdventureEntityCategory.Wielder
                 };
 
-                AddStructuralMapEntityResult(snapshot, entity, relationship, result);
-                AddTroopSourceResult(snapshot, entity, relationship, result);
-                if (IsScannerPickupEntity(entity))
-                {
-                    AddPickupResult(snapshot, entity, result);
-                }
-
-                AddSpecialMapEntityResult(snapshot, entity, result);
+                snapshot.Add(ScannerCategoryKeys.Wielders, ScannerSubcategoryKeys.All, CloneResult(result));
+                snapshot.Add(ScannerCategoryKeys.Wielders, ScannerRelationshipKey(relationship), CloneResult(result));
             }
-        }
-
-        private static void InitializeAdventureScannerCategories(ScannerSnapshot snapshot)
-        {
-            string all = ModText.Get(ModStrings.Scanner.All);
-            ScannerCategory pickups = snapshot.GetOrAddCategory(ModText.Get(ModStrings.Scanner.Pickups));
-            pickups.GetOrAddSubcategory(ModText.Get(ModStrings.Scanner.Unvisited));
-            pickups.GetOrAddSubcategory(all);
-            pickups.GetOrAddSubcategory(ModText.Get(ModStrings.Scanner.Knowledge));
-            pickups.GetOrAddSubcategory(ModText.Get(ModStrings.Scanner.Power));
-            pickups.GetOrAddSubcategory(ModText.Get(ModStrings.Scanner.Riches));
-
-            AddRelationshipSubcategories(snapshot.GetOrAddCategory(ModText.Get(ModStrings.Scanner.ResourceGenerators)));
-            snapshot.GetOrAddCategory(ModText.Get(ModStrings.Scanner.Beacons)).GetOrAddSubcategory(all);
-            snapshot.GetOrAddCategory(ModText.Get(ModStrings.Scanner.Wielders)).GetOrAddSubcategory(all);
-            AddRelationshipSubcategories(snapshot.GetOrAddCategory(ModText.Get(ModStrings.Scanner.SettlementsAndBuildSites)));
-            AddRelationshipSubcategories(snapshot.GetOrAddCategory(ModText.Get(ModStrings.Scanner.TroopSources)));
-            AddRelationshipSubcategories(snapshot.GetOrAddCategory(ModText.Get(ModStrings.Scanner.Buildings)));
-            snapshot.GetOrAddCategory(ModText.Get(ModStrings.Scanner.Objectives)).GetOrAddSubcategory(all);
-            snapshot.GetOrAddCategory(ModText.Get(ModStrings.Scanner.Obstacles)).GetOrAddSubcategory(all);
-            snapshot.GetOrAddCategory(ModText.Get(ModStrings.Scanner.ArtifactMarkets)).GetOrAddSubcategory(all);
-            snapshot.GetOrAddCategory(ModText.Get(ModStrings.Scanner.Teleport)).GetOrAddSubcategory(all);
-
-            ScannerCategory terrain = snapshot.GetOrAddCategory(ModText.Get(ModStrings.Scanner.Terrain));
-            terrain.GetOrAddSubcategory(ModText.Get(ModStrings.Scanner.Roads));
-            terrain.GetOrAddSubcategory(ModText.Get(ModStrings.Scanner.DirtRoads));
-            terrain.GetOrAddSubcategory(ModText.Get(ModStrings.Scanner.CobblestoneRoads));
-            terrain.GetOrAddSubcategory(ModText.Get(ModStrings.Scanner.Walls));
-            terrain.GetOrAddSubcategory(ModText.Get(ModStrings.Scanner.Grass));
-            terrain.GetOrAddSubcategory(ModText.Get(ModStrings.Scanner.Sand));
-            terrain.GetOrAddSubcategory(ModText.Get(ModStrings.Scanner.Dirt));
-            terrain.GetOrAddSubcategory(ModText.Get(ModStrings.Scanner.Bridges));
-            terrain.GetOrAddSubcategory(ModText.Get(ModStrings.Scanner.Water));
-            terrain.GetOrAddSubcategory(ModText.Get(ModStrings.Scanner.ShallowWater));
-            terrain.GetOrAddSubcategory(ModText.Get(ModStrings.Scanner.DeepWater));
-            terrain.GetOrAddSubcategory(ModText.Get(ModStrings.Scanner.WaterEdge));
-            terrain.GetOrAddSubcategory(ModText.Get(ModStrings.Scanner.AridTrees));
-            terrain.GetOrAddSubcategory(ModText.Get(ModStrings.Scanner.TemperateTrees));
-            terrain.GetOrAddSubcategory(ModText.Get(ModStrings.Scanner.Mountains));
-            terrain.GetOrAddSubcategory(ModText.Get(ModStrings.Scanner.Deforestation));
-            terrain.GetOrAddSubcategory(ModText.Get(ModStrings.Scanner.Farmland));
-            terrain.GetOrAddSubcategory(ModText.Get(ModStrings.Scanner.Impassable));
-
-            snapshot.GetOrAddCategory(ModText.Get(ModStrings.Scanner.Unexplored)).GetOrAddSubcategory(all);
-
-            ScannerCategory revealed = snapshot.GetOrAddCategory(ModText.Get(ModStrings.Scanner.Revealed));
-            revealed.PreserveResultOrder = true;
-            revealed.GetOrAddSubcategory(all);
-        }
-
-        private static void AddRelationshipSubcategories(ScannerCategory category)
-        {
-            category.GetOrAddSubcategory(ModText.Get(ModStrings.Scanner.All));
-            category.GetOrAddSubcategory(ModText.Get(ModStrings.Scanner.Neutral));
-            category.GetOrAddSubcategory(ModText.Get(ModStrings.Scanner.Friendly));
-            category.GetOrAddSubcategory(ModText.Get(ModStrings.Scanner.Enemy));
         }
 
         private void AddStructuralScannerResults(ScannerSnapshot snapshot, int localTeamId, Dictionary<Vector2Int, AdventureMapTile> tileCache, params MapEntityCategory[] categories)
@@ -1521,7 +1519,7 @@ namespace SongsOfConquestAccess.Adapters
                     return;
                 }
 
-                string relationship = FormatScannerRelationship(GetMapEntityRelationship(entity, localTeamId));
+                string relationship = ScannerRelationshipKey(GetMapEntityRelationship(entity, localTeamId));
                 AddStructuralMapEntityResult(snapshot, entity, relationship, result);
             });
         }
@@ -1544,7 +1542,7 @@ namespace SongsOfConquestAccess.Adapters
                 ScannerResult result = CreateMapEntityScannerResult(entity, tile);
                 if (result != null)
                 {
-                    AddTroopSourceResult(snapshot, entity, FormatScannerRelationship(GetMapEntityRelationship(entity, localTeamId)), result);
+                    AddTroopSourceResult(snapshot, entity, ScannerRelationshipKey(GetMapEntityRelationship(entity, localTeamId)), result);
                 }
             });
         }
@@ -1590,7 +1588,7 @@ namespace SongsOfConquestAccess.Adapters
                 ScannerResult result = CreateMapEntityScannerResult(entity, tile);
                 if (result != null)
                 {
-                    AddResourceGeneratorResult(snapshot, FormatScannerRelationship(GetMapEntityRelationship(entity, localTeamId)), result);
+                    AddResourceGeneratorResult(snapshot, ScannerRelationshipKey(GetMapEntityRelationship(entity, localTeamId)), result);
                 }
             });
         }
@@ -1613,7 +1611,38 @@ namespace SongsOfConquestAccess.Adapters
                 ScannerResult result = CreateMapEntityScannerResult(entity, tile);
                 if (result != null)
                 {
-                    snapshot.Add(ModText.Get(ModStrings.Scanner.Beacons), ModText.Get(ModStrings.Scanner.All), result);
+                    AddSpecialSiteResult(snapshot, ScannerSubcategoryKeys.Beacons, result);
+                }
+            });
+        }
+
+        /// <summary>
+        /// Merchants are picked by category rather than by a component, because
+        /// what makes one worth visiting is that it trades, and the trading
+        /// component is not one the scanner otherwise knows about. Without this
+        /// the scanner cannot reach them at all: Merchant is in none of the
+        /// other contributions' categories and carries none of their
+        /// components.
+        /// </summary>
+        private void AddMerchantScannerResults(ScannerSnapshot snapshot, Dictionary<Vector2Int, AdventureMapTile> tileCache)
+        {
+            ForEachScannerEntity(tileCache, entity =>
+            {
+                if (entity.Category != MapEntityCategory.Merchant)
+                {
+                    return;
+                }
+
+                AdventureMapTile tile;
+                if (!TryGetMapEntityIdentityTile(entity, tileCache, out tile))
+                {
+                    return;
+                }
+
+                ScannerResult result = CreateMapEntityScannerResult(entity, tile);
+                if (result != null)
+                {
+                    AddSpecialSiteResult(snapshot, ScannerSubcategoryKeys.Merchants, result);
                 }
             });
         }
@@ -1636,7 +1665,7 @@ namespace SongsOfConquestAccess.Adapters
                 ScannerResult result = CreateMapEntityScannerResult(entity, tile);
                 if (result != null)
                 {
-                    snapshot.Add(ModText.Get(ModStrings.Scanner.ArtifactMarkets), ModText.Get(ModStrings.Scanner.All), result);
+                    AddSpecialSiteResult(snapshot, ScannerSubcategoryKeys.ArtifactMarkets, result);
                 }
             });
         }
@@ -1659,7 +1688,7 @@ namespace SongsOfConquestAccess.Adapters
                 ScannerResult result = CreateMapEntityScannerResult(entity, tile);
                 if (result != null)
                 {
-                    snapshot.Add(ModText.Get(ModStrings.Scanner.Objectives), ModText.Get(ModStrings.Scanner.All), result);
+                    AddSpecialSiteResult(snapshot, ScannerSubcategoryKeys.Objectives, result);
                 }
             });
         }
@@ -1682,7 +1711,7 @@ namespace SongsOfConquestAccess.Adapters
                 ScannerResult result = CreateMapEntityScannerResult(entity, tile);
                 if (result != null)
                 {
-                    snapshot.Add(ModText.Get(ModStrings.Scanner.Teleport), ModText.Get(ModStrings.Scanner.All), result);
+                    AddSpecialSiteResult(snapshot, ScannerSubcategoryKeys.Teleport, result);
                 }
             });
         }
@@ -1700,9 +1729,8 @@ namespace SongsOfConquestAccess.Adapters
                 return;
             }
 
-            ScannerCategory category = snapshot.GetOrAddCategory(ModText.Get(ModStrings.Scanner.Revealed));
-            category.PreserveResultOrder = true;
-            ScannerSubcategory all = category.GetOrAddSubcategory(ModText.Get(ModStrings.Scanner.All));
+            ScannerCategory category = snapshot.GetOrAddCategory(ScannerCategoryKeys.Exploration);
+            ScannerSubcategory all = category.GetOrAddSubcategory(ScannerSubcategoryKeys.Revealed);
             for (int i = 0; i < entries.Count; i++)
             {
                 AdventureMapRevealedEntry entry = entries[i];
@@ -1731,7 +1759,7 @@ namespace SongsOfConquestAccess.Adapters
                     position = tile.Position;
                 }
 
-                all.Results.Add(new ScannerResult(entry.Key, entry.Label, position)
+                all.Add(new ScannerResult(entry.Key, entry.Label, position)
                 {
                     NotVisible = tile != null && !tile.IsVisible,
                     StableReference = entry.StableReference,
@@ -1761,7 +1789,7 @@ namespace SongsOfConquestAccess.Adapters
                     return;
                 }
 
-                snapshot.Add(ModText.Get(ModStrings.Scanner.Obstacles), ModText.Get(ModStrings.Scanner.All), result);
+                snapshot.Add(ScannerCategoryKeys.Obstacles, ScannerSubcategoryKeys.All, result);
             });
 
             AddHostileZoneOfControlScannerResults(snapshot, localTeamId, origin);
@@ -1790,16 +1818,24 @@ namespace SongsOfConquestAccess.Adapters
 
                 Vector2Int representative = ClosestPoint(points, origin);
                 string name = FirstNonEmpty(GetCommanderName(commander), ModText.Get(ModStrings.Spatial.Commander));
+                // One item holding every hostile commander's reach, so the
+                // item cycle spends one stop on zones of control however many
+                // enemies are on the map. The owner and the size tell the
+                // instances apart. No relationship: these are only ever built
+                // for hostile commanders, so saying "enemy" adds nothing.
                 ScannerResult result = new ScannerResult(
                     ScannerKey("zoc", commander.Id),
                     ScannerResultLabels.ZoneOfControl(points.Count, name),
                     representative)
                 {
                     Kind = ScannerResultKind.CommanderZoneOfControl,
+                    ItemKey = ScannerItemKeys.ZoneOfControl,
+                    ItemLabel = ModText.Get(ModStrings.Scanner.ZoneOfControl),
+                    InstanceLabel = ScannerResultLabels.ZoneOfControlInstance(points.Count, name),
                     StableReference = commander.Id
                 };
                 result.Points.AddRange(points);
-                snapshot.Add(ModText.Get(ModStrings.Scanner.Obstacles), ModText.Get(ModStrings.Scanner.All), result);
+                snapshot.Add(ScannerCategoryKeys.Obstacles, ScannerSubcategoryKeys.All, result);
             }
         }
 
@@ -1836,26 +1872,26 @@ namespace SongsOfConquestAccess.Adapters
             }
         }
 
-        private bool ValidateCommanderZoneOfControlResult(ScannerResult result)
+        private Func<Vector2Int, bool> CreateCommanderZoneOfControlPointValidator(ScannerResult result)
         {
             if (!(result.StableReference is int commanderId))
             {
-                return false;
+                return null;
             }
 
             int localTeamId = GetLocalTeamId();
             if (localTeamId < 0)
             {
-                return false;
+                return null;
             }
 
             ICommanderState commander = FindCommanderById(commanderId);
             if (!IsOverlayVisibleZoneOfControlSource(commander) || !IsHostileZoneOfControlSource(commander, localTeamId))
             {
-                return false;
+                return null;
             }
 
-            return ZoneOfControlContains(localTeamId, commanderId, result.Position);
+            return position => IsWithinMap(position) && ZoneOfControlContains(localTeamId, commanderId, position);
         }
 
         private bool IsOverlayVisibleZoneOfControlSource(ICommanderState commander)
@@ -2013,6 +2049,8 @@ namespace SongsOfConquestAccess.Adapters
             return new ScannerResult(ScannerKey("entity", entity.Id), name, tile.Position)
             {
                 NotVisible = !tile.IsVisible,
+                Unvisited = IsScannerPickupEntity(entity) && IsUnvisited(entity),
+                Relationship = ScannerRelationship(GetMapEntityRelationship(entity, GetLocalTeamId())),
                 StableReference = entity.Id,
                 EntityCategory = ClassifyMapEntity(entity)
             };
@@ -2043,28 +2081,38 @@ namespace SongsOfConquestAccess.Adapters
                 case MapEntityCategory.Town:
                 case MapEntityCategory.Settlement:
                 case MapEntityCategory.BuildSite:
-                    snapshot.Add(ModText.Get(ModStrings.Scanner.SettlementsAndBuildSites), ModText.Get(ModStrings.Scanner.All), CloneResult(result));
-                    snapshot.Add(ModText.Get(ModStrings.Scanner.SettlementsAndBuildSites), relationship, CloneResult(result));
+                    snapshot.Add(ScannerCategoryKeys.SettlementsAndBuildSites, ScannerSubcategoryKeys.All, CloneResult(result));
+                    snapshot.Add(ScannerCategoryKeys.SettlementsAndBuildSites, relationship, CloneResult(result));
                     break;
                 case MapEntityCategory.Building:
-                    snapshot.Add(ModText.Get(ModStrings.Scanner.Buildings), ModText.Get(ModStrings.Scanner.All), CloneResult(result));
-                    snapshot.Add(ModText.Get(ModStrings.Scanner.Buildings), relationship, CloneResult(result));
+                    snapshot.Add(ScannerCategoryKeys.Buildings, ScannerSubcategoryKeys.All, CloneResult(result));
+                    snapshot.Add(ScannerCategoryKeys.Buildings, relationship, CloneResult(result));
                     break;
             }
         }
 
+        /// <summary>
+        /// Files a landmark under both the whole-category sweep and the one
+        /// scope that says what kind of landmark it is.
+        /// </summary>
+        private void AddSpecialSiteResult(ScannerSnapshot snapshot, string subcategory, ScannerResult result)
+        {
+            snapshot.Add(ScannerCategoryKeys.SpecialSites, ScannerSubcategoryKeys.All, CloneResult(result));
+            snapshot.Add(ScannerCategoryKeys.SpecialSites, subcategory, CloneResult(result));
+        }
+
         private void AddResourceGeneratorResult(ScannerSnapshot snapshot, string relationship, ScannerResult result)
         {
-            snapshot.Add(ModText.Get(ModStrings.Scanner.ResourceGenerators), ModText.Get(ModStrings.Scanner.All), CloneResult(result));
-            snapshot.Add(ModText.Get(ModStrings.Scanner.ResourceGenerators), relationship, CloneResult(result));
+            snapshot.Add(ScannerCategoryKeys.ResourceGenerators, ScannerSubcategoryKeys.All, CloneResult(result));
+            snapshot.Add(ScannerCategoryKeys.ResourceGenerators, relationship, CloneResult(result));
         }
 
         private void AddTroopSourceResult(ScannerSnapshot snapshot, IMapEntity entity, string relationship, ScannerResult result)
         {
             if (entity.HasComponent<IRecruitmentPoolComponent>() || entity.HasComponent<ITroopDwellingComponent>())
             {
-                snapshot.Add(ModText.Get(ModStrings.Scanner.TroopSources), ModText.Get(ModStrings.Scanner.All), CloneResult(result));
-                snapshot.Add(ModText.Get(ModStrings.Scanner.TroopSources), relationship, CloneResult(result));
+                snapshot.Add(ScannerCategoryKeys.TroopSources, ScannerSubcategoryKeys.All, CloneResult(result));
+                snapshot.Add(ScannerCategoryKeys.TroopSources, relationship, CloneResult(result));
             }
         }
 
@@ -2075,13 +2123,13 @@ namespace SongsOfConquestAccess.Adapters
             switch (hint)
             {
                 case MapEntityPreVisitDetails.PreVisitHint.SourceOfKnowledge:
-                    subcategory = ModText.Get(ModStrings.Scanner.Knowledge);
+                    subcategory = ScannerSubcategoryKeys.Knowledge;
                     break;
                 case MapEntityPreVisitDetails.PreVisitHint.SourceOfPower:
-                    subcategory = ModText.Get(ModStrings.Scanner.Power);
+                    subcategory = ScannerSubcategoryKeys.Power;
                     break;
                 case MapEntityPreVisitDetails.PreVisitHint.SourceOfRiches:
-                    subcategory = ModText.Get(ModStrings.Scanner.Riches);
+                    subcategory = ScannerSubcategoryKeys.Riches;
                     break;
             }
 
@@ -2090,13 +2138,13 @@ namespace SongsOfConquestAccess.Adapters
                 return;
             }
 
-            snapshot.Add(ModText.Get(ModStrings.Scanner.Pickups), ModText.Get(ModStrings.Scanner.All), CloneResult(result));
+            snapshot.Add(ScannerCategoryKeys.Pickups, ScannerSubcategoryKeys.All, CloneResult(result));
             if (IsUnvisited(entity))
             {
-                snapshot.Add(ModText.Get(ModStrings.Scanner.Pickups), ModText.Get(ModStrings.Scanner.Unvisited), CloneResult(result));
+                snapshot.Add(ScannerCategoryKeys.Pickups, ScannerSubcategoryKeys.Unvisited, CloneResult(result));
             }
 
-            snapshot.Add(ModText.Get(ModStrings.Scanner.Pickups), subcategory, CloneResult(result));
+            snapshot.Add(ScannerCategoryKeys.Pickups, subcategory, CloneResult(result));
         }
 
         private static bool IsScannerPickupEntity(IMapEntity entity)
@@ -2148,37 +2196,6 @@ namespace SongsOfConquestAccess.Adapters
             return selectedCommander == null || !entity.DidVisit(selectedCommander.Id);
         }
 
-        private void AddSpecialMapEntityResult(ScannerSnapshot snapshot, IMapEntity entity, ScannerResult result)
-        {
-            if (entity.HasComponent<IArtifactMarketComponent>())
-            {
-                snapshot.Add(ModText.Get(ModStrings.Scanner.ArtifactMarkets), ModText.Get(ModStrings.Scanner.All), CloneResult(result));
-            }
-
-            if (entity.Category == MapEntityCategory.Objective || entity.Category == MapEntityCategory.Story)
-            {
-                snapshot.Add(ModText.Get(ModStrings.Scanner.Objectives), ModText.Get(ModStrings.Scanner.All), CloneResult(result));
-            }
-
-            if (entity.HasComponent<ITeleportComponent>() || entity.HasComponent<ITownPortalComponent>() || entity.HasComponent<ITownPortalBuildingComponent>())
-            {
-                snapshot.Add(ModText.Get(ModStrings.Scanner.Teleport), ModText.Get(ModStrings.Scanner.All), CloneResult(result));
-            }
-
-            if (entity.Category == MapEntityCategory.Hostile)
-            {
-                snapshot.Add(ModText.Get(ModStrings.Scanner.Obstacles), ModText.Get(ModStrings.Scanner.All), CloneResult(result));
-            }
-            else if (entity.HasComponent<IMagicGateCommonComponent>() || entity.HasComponent<IUnlockWithArtifactComponent>())
-            {
-                snapshot.Add(ModText.Get(ModStrings.Scanner.Obstacles), ModText.Get(ModStrings.Scanner.All), CloneResult(result));
-            }
-            else if (entity.Category == MapEntityCategory.Obstacle)
-            {
-                snapshot.Add(ModText.Get(ModStrings.Scanner.Obstacles), ModText.Get(ModStrings.Scanner.All), CloneResult(result));
-            }
-        }
-
         private MapEntityPreVisitDetails.PreVisitHint GetPreVisitHint(IMapEntity entity)
         {
             try
@@ -2225,31 +2242,34 @@ namespace SongsOfConquestAccess.Adapters
             }
 
             TerrainScanCell[,] terrain = BuildTerrainScan(GetLocalTeamId());
-            AddTerrainGroups(snapshot, terrain, ModText.Get(ModStrings.Scanner.Roads), "road", ModStrings.Scanner.RoadTileCount, origin, cell => cell.Terrain == AdventureTerrainKind.Road);
-            AddTerrainGroups(snapshot, terrain, ModText.Get(ModStrings.Scanner.DirtRoads), "dirt-road", ModStrings.Scanner.DirtRoadTileCount, origin, cell => cell.Terrain == AdventureTerrainKind.DirtRoad);
-            AddTerrainGroups(snapshot, terrain, ModText.Get(ModStrings.Scanner.CobblestoneRoads), "cobblestone-road", ModStrings.Scanner.CobblestoneRoadTileCount, origin, cell => cell.Terrain == AdventureTerrainKind.CobblestoneRoad);
-            AddTerrainGroups(snapshot, terrain, ModText.Get(ModStrings.Scanner.Walls), "wall", ModStrings.Scanner.WallTileCount, origin, cell => cell.Terrain == AdventureTerrainKind.Wall);
-            AddTerrainGroups(snapshot, terrain, ModText.Get(ModStrings.Scanner.Grass), "grass", ModStrings.Scanner.GrassTileCount, origin, cell => cell.Terrain == AdventureTerrainKind.Grass);
-            AddTerrainGroups(snapshot, terrain, ModText.Get(ModStrings.Scanner.Sand), "sand", ModStrings.Scanner.SandTileCount, origin, cell => cell.Terrain == AdventureTerrainKind.Sand);
-            AddTerrainGroups(snapshot, terrain, ModText.Get(ModStrings.Scanner.Dirt), "dirt", ModStrings.Scanner.DirtTileCount, origin, cell => cell.Terrain == AdventureTerrainKind.Dirt);
-            AddTerrainGroups(snapshot, terrain, ModText.Get(ModStrings.Scanner.Bridges), "bridge", ModStrings.Scanner.BridgeTileCount, origin, cell => cell.Terrain == AdventureTerrainKind.Bridge);
-            AddTerrainGroups(snapshot, terrain, ModText.Get(ModStrings.Scanner.Water), "water", ModStrings.Scanner.WaterTileCount, origin, cell => cell.Terrain == AdventureTerrainKind.Water);
-            AddTerrainGroups(snapshot, terrain, ModText.Get(ModStrings.Scanner.ShallowWater), "shallow-water", ModStrings.Scanner.ShallowWaterTileCount, origin, cell => cell.Terrain == AdventureTerrainKind.ShallowWater);
-            AddTerrainGroups(snapshot, terrain, ModText.Get(ModStrings.Scanner.DeepWater), "deep-water", ModStrings.Scanner.DeepWaterTileCount, origin, cell => cell.Terrain == AdventureTerrainKind.DeepWater);
-            AddTerrainGroups(snapshot, terrain, ModText.Get(ModStrings.Scanner.WaterEdge), "water-edge", ModStrings.Scanner.WaterEdgeTileCount, origin, cell => cell.Terrain == AdventureTerrainKind.WaterEdge);
-            AddTerrainGroups(snapshot, terrain, ModText.Get(ModStrings.Scanner.AridTrees), "arid-trees", ModStrings.Scanner.AridTreeTileCount, origin, cell => cell.Terrain == AdventureTerrainKind.AridTrees);
-            AddTerrainGroups(snapshot, terrain, ModText.Get(ModStrings.Scanner.TemperateTrees), "temperate-trees", ModStrings.Scanner.TemperateTreeTileCount, origin, cell => cell.Terrain == AdventureTerrainKind.TemperateTrees);
-            AddTerrainGroups(snapshot, terrain, ModText.Get(ModStrings.Scanner.Mountains), "mountain", ModStrings.Scanner.MountainTileCount, origin, cell => cell.Terrain == AdventureTerrainKind.Mountain);
-            AddTerrainGroups(snapshot, terrain, ModText.Get(ModStrings.Scanner.Deforestation), "deforestation", ModStrings.Scanner.DeforestationTileCount, origin, cell => cell.Terrain == AdventureTerrainKind.Deforestation);
-            AddTerrainGroups(snapshot, terrain, ModText.Get(ModStrings.Scanner.Farmland), "farmland", ModStrings.Scanner.FarmlandTileCount, origin, cell => cell.Terrain == AdventureTerrainKind.Farmland);
-            AddTerrainGroups(snapshot, terrain, ModText.Get(ModStrings.Scanner.Impassable), "impassable", ModStrings.Scanner.ImpassableTileCount, origin, cell => cell.Impassable);
+            AddTerrainGroups(snapshot, terrain, ScannerSubcategoryKeys.RoadsAndCrossings, ScannerItemKeys.Road, ModStrings.Spatial.Road, origin, cell => cell.Terrain == AdventureTerrainKind.Road);
+            AddTerrainGroups(snapshot, terrain, ScannerSubcategoryKeys.RoadsAndCrossings, ScannerItemKeys.DirtRoad, ModStrings.Spatial.DirtRoad, origin, cell => cell.Terrain == AdventureTerrainKind.DirtRoad);
+            AddTerrainGroups(snapshot, terrain, ScannerSubcategoryKeys.RoadsAndCrossings, ScannerItemKeys.CobblestoneRoad, ModStrings.Spatial.CobblestoneRoad, origin, cell => cell.Terrain == AdventureTerrainKind.CobblestoneRoad);
+            AddTerrainGroups(snapshot, terrain, ScannerSubcategoryKeys.RoadsAndCrossings, ScannerItemKeys.Bridge, ModStrings.Spatial.Bridge, origin, cell => cell.Terrain == AdventureTerrainKind.Bridge);
+            AddTerrainGroups(snapshot, terrain, ScannerSubcategoryKeys.OpenGround, ScannerItemKeys.Grass, ModStrings.Spatial.Grass, origin, cell => cell.Terrain == AdventureTerrainKind.Grass);
+            AddTerrainGroups(snapshot, terrain, ScannerSubcategoryKeys.OpenGround, ScannerItemKeys.Sand, ModStrings.Spatial.Sand, origin, cell => cell.Terrain == AdventureTerrainKind.Sand);
+            AddTerrainGroups(snapshot, terrain, ScannerSubcategoryKeys.OpenGround, ScannerItemKeys.Dirt, ModStrings.Spatial.Dirt, origin, cell => cell.Terrain == AdventureTerrainKind.Dirt);
+            AddTerrainGroups(snapshot, terrain, ScannerSubcategoryKeys.OpenGround, ScannerItemKeys.Farmland, ModStrings.Spatial.Farmland, origin, cell => cell.Terrain == AdventureTerrainKind.Farmland);
+            AddTerrainGroups(snapshot, terrain, ScannerSubcategoryKeys.OpenGround, ScannerItemKeys.AridTrees, ModStrings.Spatial.AridTrees, origin, cell => cell.Terrain == AdventureTerrainKind.AridTrees);
+            AddTerrainGroups(snapshot, terrain, ScannerSubcategoryKeys.OpenGround, ScannerItemKeys.TemperateTrees, ModStrings.Spatial.TemperateTrees, origin, cell => cell.Terrain == AdventureTerrainKind.TemperateTrees);
+            AddTerrainGroups(snapshot, terrain, ScannerSubcategoryKeys.OpenGround, ScannerItemKeys.Deforestation, ModStrings.Spatial.Deforestation, origin, cell => cell.Terrain == AdventureTerrainKind.Deforestation);
+            AddTerrainGroups(snapshot, terrain, ScannerSubcategoryKeys.Barriers, ScannerItemKeys.Mountain, ModStrings.Spatial.Mountain, origin, cell => cell.Terrain == AdventureTerrainKind.Mountain);
+            AddTerrainGroups(snapshot, terrain, ScannerSubcategoryKeys.Barriers, ScannerItemKeys.Wall, ModStrings.Spatial.Wall, origin, cell => cell.Terrain == AdventureTerrainKind.Wall);
+            AddTerrainGroups(snapshot, terrain, ScannerSubcategoryKeys.Barriers, ScannerItemKeys.Obstruction, ModStrings.Spatial.Obstruction, origin, cell => cell.Terrain == AdventureTerrainKind.Obstruction);
+            AddTerrainGroups(snapshot, terrain, ScannerSubcategoryKeys.Barriers, ScannerItemKeys.Water, ModStrings.Spatial.Water, origin, cell => cell.Terrain == AdventureTerrainKind.Water);
+            AddTerrainGroups(snapshot, terrain, ScannerSubcategoryKeys.Barriers, ScannerItemKeys.ShallowWater, ModStrings.Spatial.ShallowWater, origin, cell => cell.Terrain == AdventureTerrainKind.ShallowWater);
+            AddTerrainGroups(snapshot, terrain, ScannerSubcategoryKeys.Barriers, ScannerItemKeys.DeepWater, ModStrings.Spatial.DeepWater, origin, cell => cell.Terrain == AdventureTerrainKind.DeepWater);
+            AddTerrainGroups(snapshot, terrain, ScannerSubcategoryKeys.Barriers, ScannerItemKeys.WaterEdge, ModStrings.Spatial.WaterEdge, origin, cell => cell.Terrain == AdventureTerrainKind.WaterEdge);
+            // No Impassable item: it is a property of the ground rather than a
+            // kind of it, so every tile it would gather is already under its
+            // own name in this same subcategory.
             AddScannerGroups(
                 snapshot,
-                ModText.Get(ModStrings.Scanner.Obstacles),
-                ModText.Get(ModStrings.Scanner.All),
+                ScannerCategoryKeys.Obstacles,
+                ScannerSubcategoryKeys.All,
                 terrain,
-                "blocked",
-                ModStrings.Scanner.BlockedTileCount,
+                ScannerItemKeys.Blocked,
+                ModStrings.Scanner.Blocked,
                 origin,
                 ScannerResultKind.AreaGroup,
                 cell => cell.Blocked);
@@ -2265,11 +2285,11 @@ namespace SongsOfConquestAccess.Adapters
             TerrainScanCell[,] unexplored = BuildUnexploredScan(GetLocalTeamId());
             AddScannerGroups(
                 snapshot,
-                ModText.Get(ModStrings.Scanner.Unexplored),
-                ModText.Get(ModStrings.Scanner.All),
+                ScannerCategoryKeys.Exploration,
+                ScannerSubcategoryKeys.Unexplored,
                 unexplored,
-                "unexplored",
-                ModStrings.Scanner.UnexploredTileCount,
+                ScannerItemKeys.Unexplored,
+                ModStrings.Scanner.Unexplored,
                 origin,
                 ScannerResultKind.UnexploredGroup,
                 cell => true);
@@ -2366,29 +2386,33 @@ namespace SongsOfConquestAccess.Adapters
             }
         }
 
-        private bool ValidateUnexploredScannerResult(ScannerResult result)
+        private Func<Vector2Int, bool> CreateUnexploredPointValidator()
         {
-            if (result == null || _selectionHandler == null || _facade == null || _facade.Level == null)
+            if (_selectionHandler == null || _facade == null || _facade.Level == null)
             {
-                return false;
+                return null;
             }
 
             ICommanderState selectedCommander = _selectionHandler.SelectedCommander;
             if (selectedCommander == null || !selectedCommander.IsAlive)
             {
-                return false;
+                return null;
             }
 
             int localTeamId = GetLocalTeamId();
             if (localTeamId < 0)
             {
-                return false;
+                return null;
             }
 
             byte[] exploration = _facade.Level.GetExplorationForTeam(localTeamId);
-            int index = result.Position.y * _facade.Level.Width + result.Position.x;
-            return IsUnexplored(exploration, index, result.Position)
-                && HasFiniteMovementPathToTile(selectedCommander, selectedCommander.TeamId, result.Position);
+            int width = _facade.Level.Width;
+            // The reachability flood walks the whole map, so it is built once
+            // for the refresh rather than once per tile judged.
+            bool[,] reachable = BuildReachableMoveDestinationScan(selectedCommander, selectedCommander.TeamId);
+            return position => IsWithinMap(position)
+                && IsUnexplored(exploration, position.y * width + position.x, position)
+                && reachable[position.x, position.y];
         }
 
         private bool[,] BuildReachableMoveDestinationScan(ICommanderState selectedCommander, int teamId)
@@ -2443,17 +2467,6 @@ namespace SongsOfConquestAccess.Adapters
             queue.Enqueue(point);
         }
 
-        private bool HasFiniteMovementPathToTile(ICommanderState selectedCommander, int teamId, Vector2Int target)
-        {
-            if (selectedCommander == null || !IsWithinMap(target))
-            {
-                return false;
-            }
-
-            bool[,] reachable = BuildReachableMoveDestinationScan(selectedCommander, teamId);
-            return reachable[target.x, target.y];
-        }
-
         private bool IsValidUnexploredMovementDestination(int teamId, Vector2Int point)
         {
             try
@@ -2504,21 +2517,26 @@ namespace SongsOfConquestAccess.Adapters
             ScannerSnapshot snapshot,
             TerrainScanCell[,] terrain,
             string subcategory,
-            string label,
-            ModPluralString labelText,
+            string itemKey,
+            ModString itemLabel,
             Vector2Int origin,
             Func<TerrainScanCell, bool> predicate)
         {
-            AddScannerGroups(snapshot, ModText.Get(ModStrings.Scanner.Terrain), subcategory, terrain, label, labelText, origin, ScannerResultKind.TerrainGroup, predicate);
+            AddScannerGroups(snapshot, ScannerCategoryKeys.Terrain, subcategory, terrain, itemKey, itemLabel, origin, ScannerResultKind.TerrainGroup, predicate);
         }
 
+        /// <summary>
+        /// The kind of ground is the item and each contiguous cluster of it is
+        /// an instance, so cycling terrain steps between kinds and the tile
+        /// counts belong to the patches.
+        /// </summary>
         private void AddScannerGroups(
             ScannerSnapshot snapshot,
             string category,
             string subcategory,
             TerrainScanCell[,] terrain,
-            string label,
-            ModPluralString labelText,
+            string itemKey,
+            ModString itemLabel,
             Vector2Int origin,
             ScannerResultKind kind,
             Func<TerrainScanCell, bool> predicate)
@@ -2545,11 +2563,13 @@ namespace SongsOfConquestAccess.Adapters
                     List<Vector2Int> group = FloodTerrainGroup(start, terrain, visited, predicate);
                     Vector2Int representative = ClosestPoint(group, origin);
                     ScannerResult result = new ScannerResult(
-                        ScannerGroupKey(category, subcategory, label, group),
-                        ModText.Plural(labelText, group.Count, group.Count),
+                        ScannerGroupKey(category, subcategory, itemKey, group),
+                        ModText.Get(itemLabel),
                         representative)
                     {
-                        Kind = kind
+                        Kind = kind,
+                        ItemKey = itemKey,
+                        InstanceLabel = ModText.Plural(ModStrings.Common.TileCount, group.Count, group.Count)
                     };
                     result.Points.AddRange(group);
                     snapshot.Add(category, subcategory, result);
@@ -2647,8 +2667,14 @@ namespace SongsOfConquestAccess.Adapters
             ScannerResult clone = new ScannerResult(result.Key, result.Label, result.Position)
             {
                 NotVisible = result.NotVisible,
+                Unvisited = result.Unvisited,
+                Attackable = result.Attackable,
+                Relationship = result.Relationship,
                 StableReference = result.StableReference,
                 Kind = result.Kind,
+                ItemKey = result.ItemKey,
+                ItemLabel = result.ItemLabel,
+                InstanceLabel = result.InstanceLabel,
                 EntityCategory = result.EntityCategory
             };
             clone.Points.AddRange(result.Points);
@@ -2685,21 +2711,31 @@ namespace SongsOfConquestAccess.Adapters
             return string.Join(":", parts.ToArray());
         }
 
-        private static string FormatScannerRelationship(string value)
+        private static ScannerResultRelationship ScannerRelationship(string value)
         {
-            if (string.IsNullOrWhiteSpace(value))
-            {
-                return ModText.Get(ModStrings.Scanner.Neutral);
-            }
-
             switch (value)
             {
                 case "friendly":
-                    return ModText.Get(ModStrings.Scanner.Friendly);
+                    return ScannerResultRelationship.Friendly;
                 case "enemy":
-                    return ModText.Get(ModStrings.Scanner.Enemy);
+                    return ScannerResultRelationship.Enemy;
+                case "neutral":
+                    return ScannerResultRelationship.Neutral;
                 default:
-                    return ModText.Get(ModStrings.Scanner.Neutral);
+                    return ScannerResultRelationship.None;
+            }
+        }
+
+        private static string ScannerRelationshipKey(string value)
+        {
+            switch (value)
+            {
+                case "friendly":
+                    return ScannerSubcategoryKeys.Friendly;
+                case "enemy":
+                    return ScannerSubcategoryKeys.Enemy;
+                default:
+                    return ScannerSubcategoryKeys.Neutral;
             }
         }
 
@@ -3917,6 +3953,12 @@ namespace SongsOfConquestAccess.Adapters
             }
         }
 
+        /// <summary>
+        /// The eight decoration brushes the level editor paints with. Value 5 is
+        /// the lights brush, which is scenery standing on the ground rather than
+        /// a kind of ground, so it deliberately falls through to whatever is
+        /// underneath it.
+        /// </summary>
         private static AdventureTerrainKind GetDecorationTerrain(byte decoration)
         {
             switch (decoration)
@@ -3927,6 +3969,8 @@ namespace SongsOfConquestAccess.Adapters
                     return AdventureTerrainKind.TemperateTrees;
                 case 3:
                     return AdventureTerrainKind.Mountain;
+                case 4:
+                    return AdventureTerrainKind.Obstruction;
                 case 6:
                     return AdventureTerrainKind.Wall;
                 case 7:

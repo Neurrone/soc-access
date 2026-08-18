@@ -457,41 +457,16 @@ namespace SongsOfConquestAccess.Adapters
 
         public ScannerSnapshot BuildScannerSnapshot(Vector2Int origin)
         {
-            ScannerSnapshot snapshot = new ScannerSnapshot();
+            ScannerSnapshot snapshot = new ScannerSnapshot(BattleScannerTaxonomy.Instance);
             if (_facade == null || _facade.Level == null)
             {
                 return snapshot;
             }
 
-            InitializeCombatScannerCategories(snapshot);
-            AddCombatTroopScannerResults(snapshot);
-            AddCombatEntityScannerResults(snapshot);
-            AddCombatTerrainScannerResults(snapshot);
+            ScannerContribution.Run(ScannerCategoryKeys.Troops, () => AddCombatTroopScannerResults(snapshot));
+            ScannerContribution.Run(ScannerCategoryKeys.Entities, () => AddCombatEntityScannerResults(snapshot));
+            ScannerContribution.Run(ScannerCategoryKeys.Terrain, () => AddCombatTerrainScannerResults(snapshot));
             return snapshot;
-        }
-
-        private static void InitializeCombatScannerCategories(ScannerSnapshot snapshot)
-        {
-            ScannerCategory troops = snapshot.GetOrAddCategory(ModText.Get(ModStrings.Scanner.Troops));
-            troops.GetOrAddSubcategory(ModText.Get(ModStrings.Scanner.All));
-            troops.GetOrAddSubcategory(ModText.Get(ModStrings.Scanner.Friendly));
-            troops.GetOrAddSubcategory(ModText.Get(ModStrings.Scanner.Enemy));
-
-            ScannerCategory entities = snapshot.GetOrAddCategory(ModText.Get(ModStrings.Scanner.Entities));
-            entities.GetOrAddSubcategory(ModText.Get(ModStrings.Scanner.All));
-            entities.GetOrAddSubcategory(ModText.Get(ModStrings.Scanner.FriendlyGates));
-            entities.GetOrAddSubcategory(ModText.Get(ModStrings.Scanner.EnemyGates));
-            entities.GetOrAddSubcategory(ModText.Get(ModStrings.Scanner.Attackable));
-            entities.GetOrAddSubcategory(ModText.Get(ModStrings.Scanner.Dangerous));
-
-            ScannerCategory terrain = snapshot.GetOrAddCategory(ModText.Get(ModStrings.Scanner.Terrain));
-            terrain.GetOrAddSubcategory(ModText.Get(ModStrings.Scanner.ElevatedGround, 1));
-            terrain.GetOrAddSubcategory(ModText.Get(ModStrings.Scanner.ElevatedGround, 2));
-            terrain.GetOrAddSubcategory(ModText.Get(ModStrings.Scanner.ElevatedGround, 3));
-            terrain.GetOrAddSubcategory(ModText.Get(ModStrings.Scanner.ImpassableTerrain));
-
-            snapshot.GetOrAddCategory(ModText.Get(ModStrings.Scanner.Obstacles))
-                .GetOrAddSubcategory(ModText.Get(ModStrings.Scanner.Blocked));
         }
 
         private void AddCombatTroopScannerResults(ScannerSnapshot snapshot)
@@ -518,9 +493,20 @@ namespace SongsOfConquestAccess.Adapters
                         ScannerResult result = new ScannerResult(
                             ScannerTileKey(friendly ? "troop:friendly" : "troop:enemy", point),
                             FormatTroopGridLabel(tile.Troop),
-                            point);
-                        snapshot.Add(ModText.Get(ModStrings.Scanner.Troops), ModText.Get(ModStrings.Scanner.All), CloneResult(result));
-                        snapshot.Add(ModText.Get(ModStrings.Scanner.Troops), friendly ? ModText.Get(ModStrings.Scanner.Friendly) : ModText.Get(ModStrings.Scanner.Enemy), result);
+                            point)
+                        {
+                            // Keyed by troop type, not by the label: the label
+                            // carries stack size and health, so grouping on it
+                            // would give every stack an item of its own and
+                            // split one apart the moment it took damage.
+                            ItemKey = ScannerTroopItemKey(tile.Troop),
+                            Relationship = friendly
+                                ? ScannerResultRelationship.Friendly
+                                : ScannerResultRelationship.Enemy,
+                            Attackable = tile.IsTroopAttackable
+                        };
+                        snapshot.Add(ScannerCategoryKeys.Troops, ScannerSubcategoryKeys.All, CloneResult(result));
+                        snapshot.Add(ScannerCategoryKeys.Troops, friendly ? ScannerSubcategoryKeys.Friendly : ScannerSubcategoryKeys.Enemy, result);
                     }
                 }
             }
@@ -544,21 +530,35 @@ namespace SongsOfConquestAccess.Adapters
                     {
                         if (mapEntity.Category == MapEntityCategory.TownWallGate)
                         {
+                            bool friendlyGate = IsFriendlyMapEntity(mapEntity);
                             ScannerResult result = new ScannerResult(
-                                ScannerTileKey(IsFriendlyMapEntity(mapEntity) ? "gate:friendly" : "gate:enemy", point),
+                                ScannerTileKey(friendlyGate ? "gate:friendly" : "gate:enemy", point),
                                 GetMapEntityName(mapEntity),
-                                point);
-                            snapshot.Add(ModText.Get(ModStrings.Scanner.Entities), ModText.Get(ModStrings.Scanner.All), CloneResult(result));
-                            snapshot.Add(ModText.Get(ModStrings.Scanner.Entities), IsFriendlyMapEntity(mapEntity) ? ModText.Get(ModStrings.Scanner.FriendlyGates) : ModText.Get(ModStrings.Scanner.EnemyGates), result);
+                                point)
+                            {
+                                Relationship = friendlyGate
+                                    ? ScannerResultRelationship.Friendly
+                                    : ScannerResultRelationship.Enemy,
+                                Attackable = tile.IsEntityAttackable
+                            };
+                            snapshot.Add(ScannerCategoryKeys.Entities, ScannerSubcategoryKeys.All, CloneResult(result));
+                            snapshot.Add(ScannerCategoryKeys.Entities, friendlyGate ? ScannerSubcategoryKeys.FriendlyGates : ScannerSubcategoryKeys.EnemyGates, result);
                         }
                         else if (tile.Entity != null)
                         {
                             ScannerResult result = new ScannerResult(
                                 ScannerTileKey("entity:attackable", point),
                                 GetMapEntityName(tile.Entity),
-                                point);
-                            snapshot.Add(ModText.Get(ModStrings.Scanner.Entities), ModText.Get(ModStrings.Scanner.All), CloneResult(result));
-                            snapshot.Add(ModText.Get(ModStrings.Scanner.Entities), ModText.Get(ModStrings.Scanner.Attackable), result);
+                                point)
+                            {
+                                // The subcategory says these can be attacked in
+                                // principle. This says the acting troop can
+                                // reach one now, which is a different question
+                                // and the one worth answering per result.
+                                Attackable = tile.IsEntityAttackable
+                            };
+                            snapshot.Add(ScannerCategoryKeys.Entities, ScannerSubcategoryKeys.All, CloneResult(result));
+                            snapshot.Add(ScannerCategoryKeys.Entities, ScannerSubcategoryKeys.Attackable, result);
                         }
                         else if (tile.MapEffects.Count > 0)
                         {
@@ -566,8 +566,8 @@ namespace SongsOfConquestAccess.Adapters
                                 ScannerTileKey("entity:dangerous", point),
                                 GetMapEntityName(mapEntity),
                                 point);
-                            snapshot.Add(ModText.Get(ModStrings.Scanner.Entities), ModText.Get(ModStrings.Scanner.All), CloneResult(result));
-                            snapshot.Add(ModText.Get(ModStrings.Scanner.Entities), ModText.Get(ModStrings.Scanner.Dangerous), result);
+                            snapshot.Add(ScannerCategoryKeys.Entities, ScannerSubcategoryKeys.All, CloneResult(result));
+                            snapshot.Add(ScannerCategoryKeys.Entities, ScannerSubcategoryKeys.Dangerous, result);
                         }
                     }
                 }
@@ -593,12 +593,13 @@ namespace SongsOfConquestAccess.Adapters
                         {
                             ScannerResult result = new ScannerResult(
                                 ScannerTileKey("terrain:elevated:" + elevation, point),
-                                ModText.Get(ModStrings.Spatial.ElevatedGroundHeight, elevation),
+                                ModText.Get(ModStrings.Scanner.ElevatedGround, elevation),
                                 point)
                             {
-                                Kind = ScannerResultKind.TerrainPoint
+                                Kind = ScannerResultKind.TerrainPoint,
+                                ItemKey = ScannerItemKeys.ElevatedGround + elevation
                             };
-                            snapshot.Add(ModText.Get(ModStrings.Scanner.Terrain), ModText.Get(ModStrings.Scanner.ElevatedGround, elevation), result);
+                            snapshot.Add(ScannerCategoryKeys.Terrain, ScannerSubcategoryKeys.All, result);
                         }
                     }
                 }
@@ -619,18 +620,27 @@ namespace SongsOfConquestAccess.Adapters
                     {
                         ScannerResult result = new ScannerResult(
                             ScannerTileKey("terrain:impassable", point),
-                            ModText.Get(ModStrings.Spatial.Impassable),
+                            ModText.Get(ModStrings.Scanner.ImpassableTerrain),
                             point)
                         {
-                            Kind = ScannerResultKind.TerrainPoint
+                            Kind = ScannerResultKind.TerrainPoint,
+                            ItemKey = ScannerItemKeys.ImpassableTerrain
                         };
-                        snapshot.Add(ModText.Get(ModStrings.Scanner.Terrain), ModText.Get(ModStrings.Scanner.ImpassableTerrain), result);
+                        snapshot.Add(ScannerCategoryKeys.Terrain, ScannerSubcategoryKeys.All, result);
                     }
 
                     if (tile.IsBlocked)
                     {
-                        snapshot.Add(ModText.Get(ModStrings.Scanner.Obstacles), ModText.Get(ModStrings.Scanner.Blocked),
-                            new ScannerResult(ScannerTileKey("obstacle:blocked", point), ModText.Get(ModStrings.Spatial.Blocked), point));
+                        snapshot.Add(
+                            ScannerCategoryKeys.Terrain,
+                            ScannerSubcategoryKeys.All,
+                            new ScannerResult(
+                                ScannerTileKey("obstacle:blocked", point),
+                                ModText.Get(ModStrings.Scanner.Blocked),
+                                point)
+                            {
+                                ItemKey = ScannerItemKeys.Blocked
+                            });
                     }
                 }
             }
@@ -646,16 +656,39 @@ namespace SongsOfConquestAccess.Adapters
             ScannerResult clone = new ScannerResult(result.Key, result.Label, result.Position)
             {
                 NotVisible = result.NotVisible,
+                Unvisited = result.Unvisited,
+                Attackable = result.Attackable,
+                Relationship = result.Relationship,
                 StableReference = result.StableReference,
-                Kind = result.Kind
+                Kind = result.Kind,
+                ItemKey = result.ItemKey,
+                ItemLabel = result.ItemLabel,
+                InstanceLabel = result.InstanceLabel
             };
             clone.Points.AddRange(result.Points);
             return clone;
         }
 
-        public bool ValidateScannerResult(ScannerResult result)
+        /// <summary>
+        /// Identifies the kind of troop rather than the stack, so every stack
+        /// of the same unit collapses into one stop in the item cycle.
+        /// </summary>
+        private static string ScannerTroopItemKey(ICommonTroopState troop)
         {
-            return result != null && IsValidTile(result.Position);
+            if (troop == null)
+            {
+                return null;
+            }
+
+            TroopReference reference = troop.Reference;
+            return "troop:" + reference.FactionIndex + ":" + reference.UnitIndex + ":" + reference.UpgradeType;
+        }
+
+        public ScannerResultRefresh TryRefreshScannerResult(ScannerResult result, Vector2Int cursorHint)
+        {
+            return result != null && IsValidTile(result.Position)
+                ? ScannerResultRefresh.Valid(result.Position)
+                : ScannerResultRefresh.Invalid;
         }
 
         public bool IsValidTile(Vector2Int point)

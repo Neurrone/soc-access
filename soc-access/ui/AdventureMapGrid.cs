@@ -29,6 +29,7 @@ namespace SongsOfConquestAccess.UI
         private readonly ScannerController _scanner;
         private readonly AdventureBookmarkManager _bookmarks;
         private readonly AdventureBeaconAudio _beacons;
+        private readonly ScannerJumpAnchor _jumpAnchor = new ScannerJumpAnchor();
         private int _lookAroundRadius = DefaultLookAroundRadius;
         private bool _tileCuesHandled;
 
@@ -41,16 +42,20 @@ namespace SongsOfConquestAccess.UI
             _beacons = new AdventureBeaconAudio();
             HydrateBookmarks();
             _scanner = new ScannerController(
-                origin => _adapter != null ? _adapter.BuildScannerSnapshot(origin) : null,
+                origin => ScannerCustomCategorySynthesizer.ApplyFromSettings(
+                    _adapter != null ? _adapter.BuildScannerSnapshot(origin) : null),
                 () => _cursorTile,
-                result => _adapter != null && _adapter.ValidateScannerResult(result),
+                (result, cursorHint) => _adapter != null
+                    ? _adapter.TryRefreshScannerResult(result, cursorHint)
+                    : ScannerResultRefresh.Invalid,
                 JumpToScannerResult,
-                (result, directions, index, count) => new AdventureScannerSpeechContext(
+                (result, directions, index, count, includeItemName) => new AdventureScannerSpeechContext(
                     result,
                     _adapter.GetTile(result.Position),
                     directions,
                     index,
-                    count),
+                    count,
+                    includeItemName),
                 ScannerDirectionMode.Square);
         }
 
@@ -376,6 +381,13 @@ namespace SongsOfConquestAccess.UI
                 return false;
             }
 
+            if (point == _cursorTile)
+            {
+                SpeakHere();
+                return true;
+            }
+
+            _jumpAnchor.Remember(_cursorTile);
             _cursorTile = point;
             _adapter.MoveCameraToTile(_cursorTile);
             _adapter.SetFocusedTileOverlay(_cursorTile);
@@ -392,6 +404,13 @@ namespace SongsOfConquestAccess.UI
                 return false;
             }
 
+            if (point == _cursorTile)
+            {
+                SpeakHere();
+                return true;
+            }
+
+            _jumpAnchor.Remember(_cursorTile);
             _cursorTile = point;
             _adapter.MoveCameraToTile(_cursorTile);
             _adapter.SetFocusedTileOverlay(_cursorTile);
@@ -403,11 +422,6 @@ namespace SongsOfConquestAccess.UI
 
         private bool HandleScannerAction(InputAction action)
         {
-            if (action.Key == AccessibilityActions.ScannerRefresh.Key)
-            {
-                return HandleScannerNavigationResult(_scanner.ExecuteRefresh());
-            }
-
             if (action.Key == AccessibilityActions.ScannerSearch.Key)
             {
                 return OpenScannerSearch();
@@ -433,14 +447,24 @@ namespace SongsOfConquestAccess.UI
                 return HandleScannerNavigationResult(_scanner.ExecuteMoveSubcategory(1));
             }
 
-            if (action.Key == AccessibilityActions.ScannerPreviousResult.Key)
+            if (action.Key == AccessibilityActions.ScannerPreviousItem.Key)
             {
-                return HandleScannerNavigationResult(_scanner.ExecuteMoveResult(-1));
+                return HandleScannerNavigationResult(_scanner.ExecuteMoveItem(-1));
             }
 
-            if (action.Key == AccessibilityActions.ScannerNextResult.Key)
+            if (action.Key == AccessibilityActions.ScannerNextItem.Key)
             {
-                return HandleScannerNavigationResult(_scanner.ExecuteMoveResult(1));
+                return HandleScannerNavigationResult(_scanner.ExecuteMoveItem(1));
+            }
+
+            if (action.Key == AccessibilityActions.ScannerPreviousInstance.Key)
+            {
+                return HandleScannerNavigationResult(_scanner.ExecuteMoveInstance(-1));
+            }
+
+            if (action.Key == AccessibilityActions.ScannerNextInstance.Key)
+            {
+                return HandleScannerNavigationResult(_scanner.ExecuteMoveInstance(1));
             }
 
             if (action.Key == AccessibilityActions.ScannerJumpToResult.Key)
@@ -448,9 +472,14 @@ namespace SongsOfConquestAccess.UI
                 return _scanner.JumpToCurrent();
             }
 
-            if (action.Key == AccessibilityActions.ScannerSpeakOrientation.Key)
+            if (action.Key == AccessibilityActions.ScannerSpeakDistanceAndDirection.Key)
             {
-                return HandleScannerNavigationResult(_scanner.ExecuteSpeakOrientation());
+                return HandleScannerNavigationResult(_scanner.ExecuteSpeakDistanceAndDirection());
+            }
+
+            if (action.Key == AccessibilityActions.ScannerReturnFromJump.Key)
+            {
+                return ReturnFromJump();
             }
 
             if (action.Key == AccessibilityActions.ScannerLookAround.Key)
@@ -468,7 +497,107 @@ namespace SongsOfConquestAccess.UI
                 return ChangeLookAroundRadius(-LookAroundRadiusStep);
             }
 
+            ScannerQuickKey quickKey;
+            int delta;
+            if (TryGetCustomEntryKey(action.Key, out quickKey, out delta))
+            {
+                return MoveCustomCategoryEntry(quickKey, delta);
+            }
+
             return false;
+        }
+
+        /// <summary>
+        /// Steps the custom category the player put on this key. A key nobody
+        /// has taken says so rather than falling silent, because a dead
+        /// keypress reads as the mod having missed it.
+        /// </summary>
+        private bool MoveCustomCategoryEntry(ScannerQuickKey quickKey, int delta)
+        {
+            ScannerCustomCategory category = ModSettings.GetScannerCustomCategoryByQuickKey(
+                ScannerTaxonomyKeys.Adventure,
+                quickKey);
+            if (category == null)
+            {
+                SpeechPipeline.Output(new SpeechRequest(
+                    ModText.Get(ModStrings.Scanner.NoCustomCategoryOnKey, ScannerQuickKeyText.Name(quickKey)),
+                    interrupt: false));
+                return true;
+            }
+
+            return HandleScannerNavigationResult(_scanner.ExecuteMoveCustomCategoryEntry(
+                ScannerCustomCategorySynthesizer.CategoryKeyFor(category.Id),
+                delta));
+        }
+
+        private static bool TryGetCustomEntryKey(string actionKey, out ScannerQuickKey quickKey, out int delta)
+        {
+            if (actionKey == AccessibilityActions.ScannerNextCustomEntryComma.Key)
+            {
+                quickKey = ScannerQuickKey.Comma;
+                delta = 1;
+                return true;
+            }
+
+            if (actionKey == AccessibilityActions.ScannerPreviousCustomEntryComma.Key)
+            {
+                quickKey = ScannerQuickKey.Comma;
+                delta = -1;
+                return true;
+            }
+
+            if (actionKey == AccessibilityActions.ScannerNextCustomEntryPeriod.Key)
+            {
+                quickKey = ScannerQuickKey.Period;
+                delta = 1;
+                return true;
+            }
+
+            if (actionKey == AccessibilityActions.ScannerPreviousCustomEntryPeriod.Key)
+            {
+                quickKey = ScannerQuickKey.Period;
+                delta = -1;
+                return true;
+            }
+
+            if (actionKey == AccessibilityActions.ScannerNextCustomEntrySlash.Key)
+            {
+                quickKey = ScannerQuickKey.Slash;
+                delta = 1;
+                return true;
+            }
+
+            if (actionKey == AccessibilityActions.ScannerPreviousCustomEntrySlash.Key)
+            {
+                quickKey = ScannerQuickKey.Slash;
+                delta = -1;
+                return true;
+            }
+
+            quickKey = ScannerQuickKey.None;
+            delta = 0;
+            return false;
+        }
+
+        private bool ReturnFromJump()
+        {
+            Vector2Int anchor;
+            if (!_jumpAnchor.TryTake(out anchor) || _adapter == null || !_adapter.IsValidMapTile(anchor))
+            {
+                CueLibrary.PlayCue(CueLibrary.MoveDenied);
+                SpeechPipeline.Output(new SpeechRequest(
+                    ModText.Get(ModStrings.Scanner.NoTileToReturnTo),
+                    interrupt: false));
+                return true;
+            }
+
+            _cursorTile = anchor;
+            _adapter.MoveCameraToTile(_cursorTile);
+            _adapter.SetFocusedTileOverlay(_cursorTile);
+            UIManager.SetFocusedWidget(this);
+            _beacons.UpdateListener(_cursorTile);
+            PlayTileCues();
+            return true;
         }
 
         private bool ChangeLookAroundRadius(int delta)
@@ -558,6 +687,16 @@ namespace SongsOfConquestAccess.UI
         private static void SpeakNoBookmark()
         {
             SpeechPipeline.Output(new SpeechRequest(ModText.Get(ModStrings.Bookmarks.NoBookmark), interrupt: false));
+        }
+
+        /// <summary>
+        /// A jump onto the tile the cursor already occupies moves nothing, so the
+        /// tile announcement is dropped as a repeat of the one just spoken. Say
+        /// where the player is rather than letting the key fall silent.
+        /// </summary>
+        private static void SpeakHere()
+        {
+            SpeechPipeline.Output(new SpeechRequest(ModText.Get(ModStrings.Spatial.Here), interrupt: false));
         }
 
         private bool OpenScannerSearch()
@@ -655,19 +794,29 @@ namespace SongsOfConquestAccess.UI
 
         private static bool IsScannerAction(string actionKey)
         {
-            return actionKey == AccessibilityActions.ScannerRefresh.Key
-                || actionKey == AccessibilityActions.ScannerSearch.Key
+            return actionKey == AccessibilityActions.ScannerSearch.Key
                 || actionKey == AccessibilityActions.ScannerPreviousCategory.Key
                 || actionKey == AccessibilityActions.ScannerNextCategory.Key
                 || actionKey == AccessibilityActions.ScannerPreviousSubcategory.Key
                 || actionKey == AccessibilityActions.ScannerNextSubcategory.Key
-                || actionKey == AccessibilityActions.ScannerPreviousResult.Key
-                || actionKey == AccessibilityActions.ScannerNextResult.Key
+                || actionKey == AccessibilityActions.ScannerPreviousItem.Key
+                || actionKey == AccessibilityActions.ScannerNextItem.Key
+                || actionKey == AccessibilityActions.ScannerPreviousInstance.Key
+                || actionKey == AccessibilityActions.ScannerNextInstance.Key
                 || actionKey == AccessibilityActions.ScannerJumpToResult.Key
-                || actionKey == AccessibilityActions.ScannerSpeakOrientation.Key
+                || actionKey == AccessibilityActions.ScannerSpeakDistanceAndDirection.Key
+                || actionKey == AccessibilityActions.ScannerReturnFromJump.Key
                 || actionKey == AccessibilityActions.ScannerLookAround.Key
                 || actionKey == AccessibilityActions.ScannerIncreaseLookAroundRadius.Key
-                || actionKey == AccessibilityActions.ScannerDecreaseLookAroundRadius.Key;
+                || actionKey == AccessibilityActions.ScannerDecreaseLookAroundRadius.Key
+                || IsCustomEntryAction(actionKey);
+        }
+
+        private static bool IsCustomEntryAction(string actionKey)
+        {
+            ScannerQuickKey quickKey;
+            int delta;
+            return TryGetCustomEntryKey(actionKey, out quickKey, out delta);
         }
 
         private static bool IsBookmarkAction(string actionKey)

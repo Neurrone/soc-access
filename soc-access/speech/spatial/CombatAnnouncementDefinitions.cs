@@ -42,12 +42,17 @@ namespace SongsOfConquestAccess.Speech.Spatial
             "combat_scanner_content",
             "Combat Scanner Content Announcements",
             ModStrings.Screens.ScannerContentAnnouncements,
+            // Leads, the way it does on the cursor's troop announcement: what
+            // the player is looking for is which of these they can hit, and
+            // hearing it after the name means waiting through the stack size
+            // and health of everything they cannot.
+            new AnnouncementElementDefinition(ScannerAnnouncementDefinitions.ContentKeys.Attackable, ModStrings.Screens.AnnouncementAttackable),
+            new AnnouncementElementDefinition(ScannerAnnouncementDefinitions.ContentKeys.Name, ModStrings.Screens.AnnouncementName),
+            new AnnouncementElementDefinition(ScannerAnnouncementDefinitions.ContentKeys.Owner, ModStrings.Screens.AnnouncementOwner),
+            new AnnouncementElementDefinition(ScannerAnnouncementDefinitions.ContentKeys.Status, ModStrings.Screens.AnnouncementStatus),
             new AnnouncementElementDefinition(TileKeys.Reachable, ModStrings.Screens.AnnouncementReachable),
-            new AnnouncementElementDefinition(TileKeys.Occupant, ModStrings.Screens.AnnouncementOccupant),
-            new AnnouncementElementDefinition(TileKeys.ImpassableOrBlocked, ModStrings.Screens.AnnouncementImpassableOrBlocked),
-            new AnnouncementElementDefinition(TileKeys.TileEffects, ModStrings.Screens.AnnouncementTileEffects),
-            new AnnouncementElementDefinition(TileKeys.Elevation, ModStrings.Screens.AnnouncementElevation),
-            new AnnouncementElementDefinition(TileKeys.DecorativeFeatures, ModStrings.Screens.AnnouncementDecorativeFeatures));
+            new AnnouncementElementDefinition(TileKeys.Elevation, ModStrings.Screens.AnnouncementElevation, defaultSuffix: false))
+            .WithVersion(2);
 
         public static readonly AnnouncementGroupDefinition[] All =
         {

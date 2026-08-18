@@ -19,10 +19,161 @@ namespace SongsOfConquestAccess.Tests
             snapshot.SortByDistance(Vector2Int.zero);
 
             ScannerSubcategory subcategory = snapshot.Categories[0].Subcategories[0];
-            Assert.AreEqual("Berry", subcategory.Results[0].Label);
-            Assert.AreEqual("Zinc", subcategory.Results[1].Label);
-            Assert.AreEqual(new Vector2Int(0, 2), subcategory.Results[2].Position);
-            Assert.AreEqual(new Vector2Int(2, 0), subcategory.Results[3].Position);
+            Assert.AreEqual("Berry", subcategory.Items[0].Label);
+            Assert.AreEqual("Zinc", subcategory.Items[1].Label);
+            Assert.AreEqual(new Vector2Int(0, 2), subcategory.Items[2].Instances[0].Position);
+            Assert.AreEqual(new Vector2Int(2, 0), subcategory.Items[2].Instances[1].Position);
+        }
+
+        /// <summary>
+        /// The whole-category sweep holds both sides, and the player asking for
+        /// their own spawn points should not have to walk the enemy's to find
+        /// them.
+        /// </summary>
+        [TestMethod]
+        public void AddGivesEachSideOfTheSameThingItsOwnItem()
+        {
+            ScannerSnapshot snapshot = new ScannerSnapshot();
+            snapshot.Add("SpawnPoints", "All", Sided("spawn:friendly:1", 1, 0, ScannerResultRelationship.Friendly));
+            snapshot.Add("SpawnPoints", "All", Sided("spawn:enemy:1", 2, 0, ScannerResultRelationship.Enemy));
+            snapshot.Add("SpawnPoints", "All", Sided("spawn:friendly:2", 3, 0, ScannerResultRelationship.Friendly));
+
+            ScannerSubcategory subcategory = snapshot.Categories[0].Subcategories[0];
+            Assert.AreEqual(2, subcategory.Items.Count);
+            Assert.AreEqual(2, subcategory.Items[0].Instances.Count);
+            Assert.AreEqual("spawn:friendly:1", subcategory.Items[0].Instances[0].Key);
+            Assert.AreEqual("spawn:friendly:2", subcategory.Items[0].Instances[1].Key);
+            Assert.AreEqual(1, subcategory.Items[1].Instances.Count);
+            Assert.AreEqual("spawn:enemy:1", subcategory.Items[1].Instances[0].Key);
+        }
+
+        /// <summary>
+        /// State parts the same way the side does: a looted chest and one still
+        /// worth walking to are not copies of each other.
+        /// </summary>
+        [TestMethod]
+        public void AddGivesEachStateOfTheSameThingItsOwnItem()
+        {
+            ScannerSnapshot snapshot = new ScannerSnapshot();
+            snapshot.Add("Pickups", "All", new ScannerResult("pickup:chest-1", "Chest", new Vector2Int(1, 0)));
+            snapshot.Add("Pickups", "All", new ScannerResult("pickup:chest-2", "Chest", new Vector2Int(2, 0))
+            {
+                Unvisited = true
+            });
+            snapshot.Add("Pickups", "All", new ScannerResult("pickup:chest-3", "Chest", new Vector2Int(3, 0))
+            {
+                Unvisited = true,
+                NotVisible = true
+            });
+
+            ScannerSubcategory subcategory = snapshot.Categories[0].Subcategories[0];
+            Assert.AreEqual(3, subcategory.Items.Count);
+            Assert.AreEqual("pickup:chest-1", subcategory.Items[0].Instances[0].Key);
+            Assert.AreEqual("pickup:chest-2", subcategory.Items[1].Instances[0].Key);
+            Assert.AreEqual("pickup:chest-3", subcategory.Items[2].Instances[0].Key);
+        }
+
+        /// <summary>
+        /// The item cycle walks the items in the order the scope first met
+        /// them, before any sort has a say, which is the order a scope the
+        /// adapter asked to leave alone keeps for good.
+        /// </summary>
+        [TestMethod]
+        public void ItemsKeepTheOrderTheyWereFirstSeenIn()
+        {
+            ScannerSnapshot snapshot = new ScannerSnapshot();
+            snapshot.Add("Pickups", "All", new ScannerResult("pickup:zinc-1", "Zinc", new Vector2Int(9, 0)));
+            snapshot.Add("Pickups", "All", new ScannerResult("pickup:apple", "Apple", new Vector2Int(1, 0)));
+            snapshot.Add("Pickups", "All", new ScannerResult("pickup:zinc-2", "Zinc", new Vector2Int(2, 0)));
+            snapshot.Add("Pickups", "All", new ScannerResult("pickup:berry", "Berry", new Vector2Int(3, 0)));
+
+            ScannerSubcategory subcategory = snapshot.Categories[0].Subcategories[0];
+            Assert.AreEqual(3, subcategory.Items.Count);
+            Assert.AreEqual("Zinc", subcategory.Items[0].Label);
+            Assert.AreEqual("Apple", subcategory.Items[1].Label);
+            Assert.AreEqual("Berry", subcategory.Items[2].Label);
+            Assert.AreEqual(2, subcategory.Items[0].Instances.Count);
+        }
+
+        [TestMethod]
+        public void FlatItemsKeepEveryResultInTheOrderItArrived()
+        {
+            ScannerSnapshot snapshot = new ScannerSnapshot();
+            ScannerSubcategory revealed = snapshot.GetOrAddCategory("Exploration").GetOrAddSubcategory("Revealed");
+            revealed.FlatItems = true;
+            revealed.Add(new ScannerResult("entity:far", "Gold", new Vector2Int(10, 0)));
+            revealed.Add(new ScannerResult("entity:near", "Gold", new Vector2Int(1, 0)));
+
+            Assert.AreEqual(2, revealed.Items.Count);
+            Assert.AreEqual("entity:far", revealed.Items[0].Instances[0].Key);
+            Assert.AreEqual("entity:near", revealed.Items[1].Instances[0].Key);
+        }
+
+        /// <summary>
+        /// An item is found by key on the way in, so one that has lost its last
+        /// instance has to be forgotten by that lookup too. Otherwise the next
+        /// result of the same kind is filed into an item the scope no longer
+        /// holds and is never heard of again.
+        /// </summary>
+        [TestMethod]
+        public void AnItemPrunedAwayAndSeenAgainIsBackInTheScope()
+        {
+            ScannerSnapshot snapshot = new ScannerSnapshot();
+            snapshot.Add("Pickups", "All", new ScannerResult("entity:1", "Gold", new Vector2Int(1, 0)));
+
+            snapshot.PruneByKey("entity:1");
+            snapshot.Add("Pickups", "All", new ScannerResult("entity:2", "Gold", new Vector2Int(2, 0)));
+
+            ScannerSubcategory subcategory = snapshot.Categories[0].Subcategories[0];
+            Assert.AreEqual(1, subcategory.Items.Count);
+            Assert.AreEqual("entity:2", subcategory.Items[0].Instances[0].Key);
+        }
+
+        /// <summary>
+        /// Every enemy stack of one unit is one item however the current turn
+        /// happens to fall. Which of them the acting troop can hit is what the
+        /// player hears walking the instances, not a reason to walk two items.
+        /// </summary>
+        [TestMethod]
+        public void AddKeepsOneItemWhateverTheActingTroopCanReach()
+        {
+            ScannerSnapshot snapshot = new ScannerSnapshot();
+            snapshot.Add("Troops", "Enemy", new ScannerResult("troop:enemy:1", "20 Militia", new Vector2Int(1, 0))
+            {
+                ItemKey = "troop:0:1:none",
+                Relationship = ScannerResultRelationship.Enemy,
+                Attackable = true
+            });
+            snapshot.Add("Troops", "Enemy", new ScannerResult("troop:enemy:2", "20 Militia", new Vector2Int(9, 0))
+            {
+                ItemKey = "troop:0:1:none",
+                Relationship = ScannerResultRelationship.Enemy
+            });
+
+            ScannerSubcategory subcategory = snapshot.Categories[0].Subcategories[0];
+            Assert.AreEqual(1, subcategory.Items.Count);
+            Assert.AreEqual(2, subcategory.Items[0].Instances.Count);
+        }
+
+        [TestMethod]
+        public void AddKeepsOneItemPerResultWhenTheSubcategoryIsFlat()
+        {
+            ScannerSnapshot snapshot = new ScannerSnapshot();
+            ScannerSubcategory subcategory = snapshot.GetOrAddCategory("LookAround").GetOrAddSubcategory("All");
+            subcategory.FlatItems = true;
+
+            subcategory.Add(Sided("spawn:friendly:1", 1, 0, ScannerResultRelationship.Friendly));
+            subcategory.Add(Sided("spawn:friendly:2", 3, 0, ScannerResultRelationship.Friendly));
+
+            Assert.AreEqual(2, subcategory.Items.Count);
+        }
+
+        private static ScannerResult Sided(string key, int x, int y, ScannerResultRelationship relationship)
+        {
+            return new ScannerResult(key, "Spawn point", new Vector2Int(x, y))
+            {
+                Relationship = relationship
+            };
         }
 
         [TestMethod]
@@ -38,19 +189,42 @@ namespace SongsOfConquestAccess.Tests
         }
 
         [TestMethod]
-        public void SortByDistancePreservesOrderForPreservedCategories()
+        public void SortByDistancePreservesOrderForPreservedSubcategories()
         {
             ScannerSnapshot snapshot = new ScannerSnapshot();
-            ScannerCategory revealed = snapshot.GetOrAddCategory("Revealed");
+            ScannerCategory exploration = snapshot.GetOrAddCategory("Exploration");
+            ScannerSubcategory revealed = exploration.GetOrAddSubcategory("Revealed");
             revealed.PreserveResultOrder = true;
-            revealed.GetOrAddSubcategory("All").Results.Add(new ScannerResult("entity:far", "Far", new Vector2Int(10, 0)));
-            revealed.GetOrAddSubcategory("All").Results.Add(new ScannerResult("entity:near", "Near", new Vector2Int(1, 0)));
+            revealed.Add(new ScannerResult("entity:far", "Far", new Vector2Int(10, 0)));
+            revealed.Add(new ScannerResult("entity:near", "Near", new Vector2Int(1, 0)));
 
             snapshot.SortByDistance(Vector2Int.zero);
 
-            ScannerSubcategory subcategory = snapshot.Categories[0].Subcategories[0];
-            Assert.AreEqual("Far", subcategory.Results[0].Label);
-            Assert.AreEqual("Near", subcategory.Results[1].Label);
+            Assert.AreEqual("Far", revealed.Items[0].Label);
+            Assert.AreEqual("Near", revealed.Items[1].Label);
+        }
+
+        /// <summary>
+        /// The flag is per subcategory, so a neighbour under the same category
+        /// still sorts. This is what lets Unexplored and Revealed share one.
+        /// </summary>
+        [TestMethod]
+        public void SortByDistanceStillSortsUnpreservedSiblings()
+        {
+            ScannerSnapshot snapshot = new ScannerSnapshot();
+            ScannerCategory exploration = snapshot.GetOrAddCategory("Exploration");
+            ScannerSubcategory revealed = exploration.GetOrAddSubcategory("Revealed");
+            revealed.PreserveResultOrder = true;
+            revealed.Add(new ScannerResult("entity:far", "Far", new Vector2Int(10, 0)));
+            revealed.Add(new ScannerResult("entity:near", "Near", new Vector2Int(1, 0)));
+            ScannerSubcategory unexplored = exploration.GetOrAddSubcategory("Unexplored");
+            unexplored.Add(new ScannerResult("region:far", "Far region", new Vector2Int(10, 0)));
+            unexplored.Add(new ScannerResult("region:near", "Near region", new Vector2Int(1, 0)));
+
+            snapshot.SortByDistance(Vector2Int.zero);
+
+            Assert.AreEqual("Far", revealed.Items[0].Label);
+            Assert.AreEqual("Near region", unexplored.Items[0].Label);
         }
 
         [TestMethod]
@@ -119,9 +293,9 @@ namespace SongsOfConquestAccess.Tests
             snapshot.PruneEmpty();
 
             Assert.AreEqual(1, snapshot.Categories.Count);
-            Assert.AreEqual("Pickups", snapshot.Categories[0].Label);
+            Assert.AreEqual("Pickups", snapshot.Categories[0].Key);
             Assert.AreEqual(1, snapshot.Categories[0].Subcategories.Count);
-            Assert.AreEqual("All", snapshot.Categories[0].Subcategories[0].Label);
+            Assert.AreEqual("All", snapshot.Categories[0].Subcategories[0].Key);
         }
 
         [TestMethod]
@@ -131,9 +305,9 @@ namespace SongsOfConquestAccess.Tests
 
             snapshot.Add("Terrain", "", new ScannerResult("terrain:water", "Water", new Vector2Int(2, 3)));
 
-            Assert.AreEqual("Terrain", snapshot.Categories[0].Label);
-            Assert.AreEqual("All", snapshot.Categories[0].Subcategories[0].Label);
-            Assert.AreEqual("Water", snapshot.Categories[0].Subcategories[0].Results[0].Label);
+            Assert.AreEqual("Terrain", snapshot.Categories[0].Key);
+            Assert.AreEqual(ScannerSubcategoryKeys.All, snapshot.Categories[0].Subcategories[0].Key);
+            Assert.AreEqual("Water", snapshot.Categories[0].Subcategories[0].Items[0].Instances[0].Label);
         }
 
         [TestMethod]
@@ -148,6 +322,7 @@ namespace SongsOfConquestAccess.Tests
             Assert.IsTrue(found);
             Assert.AreEqual(0, location.CategoryIndex);
             Assert.AreEqual(1, location.SubcategoryIndex);
+            Assert.AreEqual(0, location.ItemIndex);
             Assert.AreEqual(0, location.ResultIndex);
         }
 
@@ -163,6 +338,7 @@ namespace SongsOfConquestAccess.Tests
             Assert.IsTrue(found);
             Assert.AreEqual(0, location.CategoryIndex);
             Assert.AreEqual(0, location.SubcategoryIndex);
+            Assert.AreEqual(0, location.ItemIndex);
             Assert.AreEqual(0, location.ResultIndex);
         }
 
@@ -178,6 +354,7 @@ namespace SongsOfConquestAccess.Tests
             Assert.IsFalse(found);
             Assert.AreEqual(-1, location.CategoryIndex);
             Assert.AreEqual(-1, location.SubcategoryIndex);
+            Assert.AreEqual(-1, location.ItemIndex);
             Assert.AreEqual(-1, location.ResultIndex);
         }
 
@@ -193,10 +370,10 @@ namespace SongsOfConquestAccess.Tests
 
             Assert.AreEqual(1, snapshot.Categories.Count);
             Assert.AreEqual(2, snapshot.Categories[0].Subcategories.Count);
-            Assert.AreEqual("All", snapshot.Categories[0].Subcategories[0].Label);
-            Assert.AreEqual(0, snapshot.Categories[0].Subcategories[0].Results.Count);
-            Assert.AreEqual("Unvisited", snapshot.Categories[0].Subcategories[1].Label);
-            Assert.AreEqual("Ore", snapshot.Categories[0].Subcategories[1].Results[0].Label);
+            Assert.AreEqual("All", snapshot.Categories[0].Subcategories[0].Key);
+            Assert.IsFalse(snapshot.Categories[0].Subcategories[0].HasResults);
+            Assert.AreEqual("Unvisited", snapshot.Categories[0].Subcategories[1].Key);
+            Assert.AreEqual("Ore", snapshot.Categories[0].Subcategories[1].Items[0].Instances[0].Label);
         }
     }
 }

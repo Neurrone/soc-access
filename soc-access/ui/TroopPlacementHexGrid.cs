@@ -23,6 +23,7 @@ namespace SongsOfConquestAccess.UI
         private readonly ScannerController _scanner;
         private bool _tileCuesArmed;
         private bool _tileCuesHandled;
+        private readonly ScannerJumpAnchor _jumpAnchor = new ScannerJumpAnchor();
 
         public TroopPlacementHexGrid(PreBattleMenuAdapter adapter)
             : base("pre-battle-hex-grid")
@@ -31,17 +32,21 @@ namespace SongsOfConquestAccess.UI
             RefreshSnapshot();
             _cursor = GetInitialCursor();
             _scanner = new ScannerController(
-                origin => _adapter != null ? _adapter.BuildScannerSnapshot(origin) : null,
+                origin => ScannerCustomCategorySynthesizer.ApplyFromSettings(
+                    _adapter != null ? _adapter.BuildScannerSnapshot(origin) : null),
                 () => _cursor,
-                result => _adapter != null && _adapter.ValidateScannerResult(result),
+                (result, cursorHint) => _adapter != null
+                    ? _adapter.TryRefreshScannerResult(result, cursorHint)
+                    : ScannerResultRefresh.Invalid,
                 JumpToScannerResult,
-                (result, directions, index, count) => new TroopPlacementScannerSpeechContext(
+                (result, directions, index, count, includeItemName) => new TroopPlacementScannerSpeechContext(
                     result,
                     GetScannerTile(result),
                     _snapshot,
                     directions,
                     index,
-                    count),
+                    count,
+                    includeItemName),
                 ScannerDirectionMode.Hex);
         }
 
@@ -412,7 +417,40 @@ namespace SongsOfConquestAccess.UI
 
         private bool JumpToScannerResult(Vector2Int point)
         {
-            return SetCursor(point);
+            if (point == _cursor)
+            {
+                SpeakHere();
+                return true;
+            }
+
+            Vector2Int origin = _cursor;
+            SetCursor(point);
+            return _jumpAnchor.RememberIfMoved(origin, _cursor);
+        }
+
+        /// <summary>
+        /// A jump onto the tile the cursor already occupies moves nothing, so no
+        /// tile announcement follows it. Say where the player is rather than
+        /// letting the key fall silent.
+        /// </summary>
+        private static void SpeakHere()
+        {
+            SpeechPipeline.Output(new SpeechRequest(ModText.Get(ModStrings.Spatial.Here), interrupt: false));
+        }
+
+        private bool ReturnFromJump()
+        {
+            Vector2Int anchor;
+            if (!_jumpAnchor.TryTake(out anchor))
+            {
+                CueLibrary.PlayCue(CueLibrary.MoveDenied);
+                SpeechPipeline.Output(new SpeechRequest(
+                    ModText.Get(ModStrings.Scanner.NoTileToReturnTo),
+                    interrupt: false));
+                return true;
+            }
+
+            return SetCursor(anchor);
         }
 
         private TroopPlacementTile GetScannerTile(ScannerResult result)
@@ -432,11 +470,6 @@ namespace SongsOfConquestAccess.UI
 
         private bool HandleScannerAction(InputAction action)
         {
-            if (action.Key == AccessibilityActions.ScannerRefresh.Key)
-            {
-                return HandleScannerNavigationResult(_scanner.ExecuteRefresh());
-            }
-
             if (action.Key == AccessibilityActions.ScannerPreviousCategory.Key)
             {
                 return HandleScannerNavigationResult(_scanner.ExecuteMoveCategory(-1));
@@ -457,14 +490,24 @@ namespace SongsOfConquestAccess.UI
                 return HandleScannerNavigationResult(_scanner.ExecuteMoveSubcategory(1));
             }
 
-            if (action.Key == AccessibilityActions.ScannerPreviousResult.Key)
+            if (action.Key == AccessibilityActions.ScannerPreviousItem.Key)
             {
-                return HandleScannerNavigationResult(_scanner.ExecuteMoveResult(-1));
+                return HandleScannerNavigationResult(_scanner.ExecuteMoveItem(-1));
             }
 
-            if (action.Key == AccessibilityActions.ScannerNextResult.Key)
+            if (action.Key == AccessibilityActions.ScannerNextItem.Key)
             {
-                return HandleScannerNavigationResult(_scanner.ExecuteMoveResult(1));
+                return HandleScannerNavigationResult(_scanner.ExecuteMoveItem(1));
+            }
+
+            if (action.Key == AccessibilityActions.ScannerPreviousInstance.Key)
+            {
+                return HandleScannerNavigationResult(_scanner.ExecuteMoveInstance(-1));
+            }
+
+            if (action.Key == AccessibilityActions.ScannerNextInstance.Key)
+            {
+                return HandleScannerNavigationResult(_scanner.ExecuteMoveInstance(1));
             }
 
             if (action.Key == AccessibilityActions.ScannerJumpToResult.Key)
@@ -472,9 +515,14 @@ namespace SongsOfConquestAccess.UI
                 return _scanner.JumpToCurrent();
             }
 
-            if (action.Key == AccessibilityActions.ScannerSpeakOrientation.Key)
+            if (action.Key == AccessibilityActions.ScannerSpeakDistanceAndDirection.Key)
             {
-                return HandleScannerNavigationResult(_scanner.ExecuteSpeakOrientation());
+                return HandleScannerNavigationResult(_scanner.ExecuteSpeakDistanceAndDirection());
+            }
+
+            if (action.Key == AccessibilityActions.ScannerReturnFromJump.Key)
+            {
+                return ReturnFromJump();
             }
 
             return false;
@@ -498,15 +546,17 @@ namespace SongsOfConquestAccess.UI
 
         private static bool IsScannerAction(string actionKey)
         {
-            return actionKey == AccessibilityActions.ScannerRefresh.Key
-                || actionKey == AccessibilityActions.ScannerPreviousCategory.Key
+            return actionKey == AccessibilityActions.ScannerPreviousCategory.Key
                 || actionKey == AccessibilityActions.ScannerNextCategory.Key
                 || actionKey == AccessibilityActions.ScannerPreviousSubcategory.Key
                 || actionKey == AccessibilityActions.ScannerNextSubcategory.Key
-                || actionKey == AccessibilityActions.ScannerPreviousResult.Key
-                || actionKey == AccessibilityActions.ScannerNextResult.Key
+                || actionKey == AccessibilityActions.ScannerPreviousItem.Key
+                || actionKey == AccessibilityActions.ScannerNextItem.Key
+                || actionKey == AccessibilityActions.ScannerPreviousInstance.Key
+                || actionKey == AccessibilityActions.ScannerNextInstance.Key
                 || actionKey == AccessibilityActions.ScannerJumpToResult.Key
-                || actionKey == AccessibilityActions.ScannerSpeakOrientation.Key;
+                || actionKey == AccessibilityActions.ScannerSpeakDistanceAndDirection.Key
+                || actionKey == AccessibilityActions.ScannerReturnFromJump.Key;
         }
 
         private void FocusCurrentTile()

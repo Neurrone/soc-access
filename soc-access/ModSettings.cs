@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using SongsOfConquestAccess.Audio;
+using SongsOfConquestAccess.Scanner;
 using SongsOfConquestAccess.Speech.Spatial;
 
 namespace SongsOfConquestAccess
@@ -25,10 +26,13 @@ namespace SongsOfConquestAccess
         private static ConfigEntry<bool> _readEnemyInfluence;
         private static ConfigEntry<bool> _readStoryCameraFocusChanges;
         private static ConfigEntry<bool> _tileCuesEnabled;
+        private static ConfigEntry<bool> _scannerUsesLongDirections;
         private static readonly Dictionary<string, AnnouncementGroupConfig> _announcementGroups =
             new Dictionary<string, AnnouncementGroupConfig>();
         private static readonly Dictionary<string, AudioCueConfig> _audioCues =
             new Dictionary<string, AudioCueConfig>();
+        private static readonly Dictionary<string, ScannerCustomCategoryConfig> _scannerCustomCategories =
+            new Dictionary<string, ScannerCustomCategoryConfig>();
 
         public static bool ReadEnemyInfluence
         {
@@ -43,6 +47,11 @@ namespace SongsOfConquestAccess
         public static bool TileCuesEnabled
         {
             get { return _tileCuesEnabled == null || _tileCuesEnabled.Value; }
+        }
+
+        public static bool ScannerUsesLongDirections
+        {
+            get { return _scannerUsesLongDirections != null && _scannerUsesLongDirections.Value; }
         }
 
         public static void Bind(ConfigFile config)
@@ -63,8 +72,14 @@ namespace SongsOfConquestAccess
                 "TileCuesEnabled",
                 true,
                 "Whether cursor movement plays synthesised tile sound cues.");
+            _scannerUsesLongDirections = config.Bind(
+                "Scanner",
+                "ScannerUsesLongDirections",
+                false,
+                "Whether spoken directions use the long form (\"3 northeast\") instead of the short form (\"3ne\").");
             BindAnnouncementGroups(config);
             BindAudioCues(config);
+            BindScannerCustomCategories(config);
         }
 
         public static void SetReadEnemyInfluence(bool value)
@@ -207,6 +222,17 @@ namespace SongsOfConquestAccess
             SaveAndInvalidateCue(cueKey);
         }
 
+        public static void SetScannerUsesLongDirections(bool value)
+        {
+            if (_scannerUsesLongDirections == null)
+            {
+                return;
+            }
+
+            _scannerUsesLongDirections.Value = value;
+            _config?.Save();
+        }
+
         public static IReadOnlyList<string> GetAnnouncementOrder(AnnouncementGroupDefinition group)
         {
             if (group == null)
@@ -320,14 +346,129 @@ namespace SongsOfConquestAccess
             _config?.Save();
         }
 
+        public static IReadOnlyList<ScannerCustomCategory> GetScannerCustomCategories(string taxonomyKey)
+        {
+            ScannerCustomCategoryList list = GetScannerCustomCategoryList(taxonomyKey);
+            return list != null ? list.Categories : new ScannerCustomCategory[0];
+        }
+
+        public static ScannerCustomCategory GetScannerCustomCategory(string taxonomyKey, int id)
+        {
+            ScannerCustomCategoryList list = GetScannerCustomCategoryList(taxonomyKey);
+            return list != null ? list.Get(id) : null;
+        }
+
+        /// <summary>
+        /// The caller supplies the starting name because the wording is
+        /// localized accessibility text, and it is stored rather than derived so
+        /// it stays put when an earlier category is deleted.
+        /// </summary>
+        public static ScannerCustomCategory AddScannerCustomCategory(string taxonomyKey, Func<int, string> nameForPosition)
+        {
+            ScannerCustomCategoryList list = GetScannerCustomCategoryList(taxonomyKey);
+            if (list == null)
+            {
+                return null;
+            }
+
+            ScannerCustomCategory category = list.Add(nameForPosition);
+            if (SupportsScannerQuickKeys(taxonomyKey))
+            {
+                category.SetQuickKey(list.FirstFreeQuickKey());
+            }
+
+            SaveScannerCustomCategories(taxonomyKey, list);
+            return category;
+        }
+
+        /// <summary>
+        /// Only the adventure map walks a custom category from a single key, so
+        /// only its categories are given one. Battle keeps those keys for the
+        /// acting and enemy troop cycles.
+        /// </summary>
+        public static bool SupportsScannerQuickKeys(string taxonomyKey)
+        {
+            return taxonomyKey == ScannerTaxonomyKeys.Adventure;
+        }
+
+        public static ScannerCustomCategory GetScannerCustomCategoryByQuickKey(string taxonomyKey, ScannerQuickKey quickKey)
+        {
+            if (!SupportsScannerQuickKeys(taxonomyKey))
+            {
+                return null;
+            }
+
+            ScannerCustomCategoryList list = GetScannerCustomCategoryList(taxonomyKey);
+            return list != null ? list.GetByQuickKey(quickKey) : null;
+        }
+
+        public static bool SetScannerCustomCategoryQuickKey(string taxonomyKey, int id, ScannerQuickKey quickKey)
+        {
+            if (!SupportsScannerQuickKeys(taxonomyKey))
+            {
+                return false;
+            }
+
+            ScannerCustomCategoryList list = GetScannerCustomCategoryList(taxonomyKey);
+            if (list == null || !list.SetQuickKey(id, quickKey))
+            {
+                return false;
+            }
+
+            SaveScannerCustomCategories(taxonomyKey, list);
+            return true;
+        }
+
+        public static bool RemoveScannerCustomCategory(string taxonomyKey, int id)
+        {
+            ScannerCustomCategoryList list = GetScannerCustomCategoryList(taxonomyKey);
+            if (list == null || !list.Remove(id))
+            {
+                return false;
+            }
+
+            SaveScannerCustomCategories(taxonomyKey, list);
+            return true;
+        }
+
+        public static bool RenameScannerCustomCategory(string taxonomyKey, int id, string name)
+        {
+            return MutateScannerCustomCategory(taxonomyKey, id, category => category.Rename(name));
+        }
+
+        public static bool SetScannerCustomCategorySelector(
+            string taxonomyKey,
+            int id,
+            string categoryKey,
+            string subcategoryKey,
+            bool selected)
+        {
+            return MutateScannerCustomCategory(
+                taxonomyKey,
+                id,
+                category => category.SetSelector(categoryKey, subcategoryKey, selected));
+        }
+
+        public static bool AddScannerCustomCategoryKeyword(string taxonomyKey, int id, string keyword)
+        {
+            return MutateScannerCustomCategory(taxonomyKey, id, category => category.AddKeyword(keyword));
+        }
+
+        public static bool RemoveScannerCustomCategoryKeyword(string taxonomyKey, int id, string keyword)
+        {
+            return MutateScannerCustomCategory(taxonomyKey, id, category => category.RemoveKeyword(keyword));
+        }
+
         public static void Reset()
         {
             _config = null;
             _readEnemyInfluence = null;
             _readStoryCameraFocusChanges = null;
             _tileCuesEnabled = null;
+            _scannerUsesLongDirections = null;
             _announcementGroups.Clear();
             _audioCues.Clear();
+            _scannerCustomCategories.Clear();
         }
 
         private static void BindAudioCues(ConfigFile config)
@@ -391,6 +532,83 @@ namespace SongsOfConquestAccess
             return value > maximum ? maximum : value;
         }
 
+        private static void BindScannerCustomCategories(ConfigFile config)
+        {
+            _scannerCustomCategories.Clear();
+            for (int i = 0; i < ScannerTaxonomyKeys.All.Length; i++)
+            {
+                string taxonomyKey = ScannerTaxonomyKeys.All[i];
+                _scannerCustomCategories[taxonomyKey] = new ScannerCustomCategoryConfig
+                {
+                    Entry = config.Bind(
+                        "Scanner",
+                        ToConfigKeyPrefix(taxonomyKey) + "CustomCategories",
+                        string.Empty,
+                        "Player-defined scanner categories for this context. Edited through the mod settings screen.")
+                };
+            }
+        }
+
+        /// <summary>
+        /// Decoded once per context and kept, because these are player settings
+        /// rather than game state: nothing outside this class can change them
+        /// between reads.
+        /// </summary>
+        private static ScannerCustomCategoryList GetScannerCustomCategoryList(string taxonomyKey)
+        {
+            ScannerCustomCategoryConfig config = GetScannerCustomCategoryConfig(taxonomyKey);
+            if (config == null)
+            {
+                return null;
+            }
+
+            if (config.List == null)
+            {
+                config.List = ScannerCustomCategoryCodec.Decode(config.Entry != null ? config.Entry.Value : null);
+            }
+
+            return config.List;
+        }
+
+        private static ScannerCustomCategoryConfig GetScannerCustomCategoryConfig(string taxonomyKey)
+        {
+            if (string.IsNullOrWhiteSpace(taxonomyKey))
+            {
+                return null;
+            }
+
+            ScannerCustomCategoryConfig config;
+            return _scannerCustomCategories.TryGetValue(taxonomyKey, out config) ? config : null;
+        }
+
+        private static bool MutateScannerCustomCategory(
+            string taxonomyKey,
+            int id,
+            Func<ScannerCustomCategory, bool> mutate)
+        {
+            ScannerCustomCategoryList list = GetScannerCustomCategoryList(taxonomyKey);
+            ScannerCustomCategory category = list != null ? list.Get(id) : null;
+            if (category == null || mutate == null || !mutate(category))
+            {
+                return false;
+            }
+
+            SaveScannerCustomCategories(taxonomyKey, list);
+            return true;
+        }
+
+        private static void SaveScannerCustomCategories(string taxonomyKey, ScannerCustomCategoryList list)
+        {
+            ScannerCustomCategoryConfig config = GetScannerCustomCategoryConfig(taxonomyKey);
+            if (config == null || config.Entry == null)
+            {
+                return;
+            }
+
+            config.Entry.Value = ScannerCustomCategoryCodec.Encode(list);
+            _config?.Save();
+        }
+
         private static void BindAnnouncementGroups(ConfigFile config)
         {
             _announcementGroups.Clear();
@@ -399,6 +617,15 @@ namespace SongsOfConquestAccess
             {
                 AnnouncementGroupDefinition group = groups[i];
                 AnnouncementGroupConfig groupConfig = new AnnouncementGroupConfig();
+                // Configs written before versioning existed have no Version key, and
+                // Bind returns the default for a missing key. The default must be 1,
+                // not group.Version, or those configs would be treated as already
+                // migrated and DiscardOutdatedAnnouncementSettings would never fire.
+                groupConfig.Version = config.Bind(
+                    group.ConfigSection,
+                    "Version",
+                    1,
+                    "Layout version of this announcement group. Saved settings are reset when it changes.");
                 groupConfig.Order = config.Bind(
                     group.ConfigSection,
                     "Order",
@@ -425,7 +652,52 @@ namespace SongsOfConquestAccess
                 }
 
                 _announcementGroups[group.Key] = groupConfig;
+                DiscardOutdatedAnnouncementSettings(group, groupConfig);
             }
+        }
+
+        /// <summary>
+        /// A group whose element set has been redesigned cannot honour the old
+        /// saved settings: every stored key is retired, so the saved order would
+        /// contribute nothing and the player would be left with whatever the
+        /// merge happened to produce. Throw the saved values away and re-stamp
+        /// the version instead.
+        /// </summary>
+        private static void DiscardOutdatedAnnouncementSettings(
+            AnnouncementGroupDefinition group,
+            AnnouncementGroupConfig groupConfig)
+        {
+            if (groupConfig.Version == null || groupConfig.Version.Value == group.Version)
+            {
+                return;
+            }
+
+            if (groupConfig.Order != null)
+            {
+                groupConfig.Order.Value = group.DefaultOrderCsv;
+            }
+
+            for (int i = 0; i < group.Elements.Count; i++)
+            {
+                AnnouncementElementDefinition element = group.Elements[i];
+                AnnouncementElementConfig elementConfig;
+                if (!groupConfig.Elements.TryGetValue(element.Key, out elementConfig))
+                {
+                    continue;
+                }
+
+                if (elementConfig.Enabled != null)
+                {
+                    elementConfig.Enabled.Value = element.DefaultEnabled;
+                }
+
+                if (elementConfig.Suffix != null)
+                {
+                    elementConfig.Suffix.Value = element.DefaultSuffix;
+                }
+            }
+
+            groupConfig.Version.Value = group.Version;
         }
 
         private static AnnouncementGroupConfig GetAnnouncementConfig(AnnouncementGroupDefinition group)
@@ -550,6 +822,7 @@ namespace SongsOfConquestAccess
 
         private sealed class AnnouncementGroupConfig
         {
+            public ConfigEntry<int> Version { get; set; }
             public ConfigEntry<string> Order { get; set; }
             public Dictionary<string, AnnouncementElementConfig> Elements { get; private set; } =
                 new Dictionary<string, AnnouncementElementConfig>();
@@ -567,6 +840,12 @@ namespace SongsOfConquestAccess
             public ConfigEntry<int> Volume { get; set; }
             public ConfigEntry<int> PitchSemitones { get; set; }
             public ConfigEntry<int> DurationScale { get; set; }
+        }
+
+        private sealed class ScannerCustomCategoryConfig
+        {
+            public ConfigEntry<string> Entry { get; set; }
+            public ScannerCustomCategoryList List { get; set; }
         }
     }
 }

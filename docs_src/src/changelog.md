@@ -1,5 +1,22 @@
 # Changelog
 
+## Unreleased
+
+- Scanner results are now grouped into items and copies of an item. `Page Up` and `Page Down` step between different things, and the new `Alt+Page Up` and `Alt+Page Down` walk the copies of the thing you are on, so a map with a dozen chests costs one stop in the list instead of a dozen
+- Scanner readouts now describe the thing that was scanned instead of everything else on its tile. On the adventure map they still say whether the selected wielder can reach it, which you can turn off like any other announcement element
+- Removed the `End` refresh. Scanner results are re-queried on every scanner key press, so they follow things that move and drop things that are gone. `End` now reads how far away the current result is and which way it lies, replacing `Shift+Home`
+- Added `Backspace` to return the accessibility cursor to the tile it was on before the last scanner or bookmark jump
+- Added `J` as a second key for jumping the accessibility cursor to the current scanner result, mirroring `Home` so that it and the `,`, `.`, and `/` category keys can be worked with one hand
+- Jumping to a scanner result now reads the tile you land on instead of repeating the result you jumped to first
+- A scanner or bookmark jump to the tile you are already standing on now says `here` instead of falling silent, and it no longer overwrites the tile `Backspace` returns you to
+- Scanner directions are now spoken in a short form such as `3ne`. The new `Long directions` mod setting restores the full wording
+- Added custom scanner categories, defined from the scanner tab of the mod settings screen and built from subcategories you pick and keywords you type. The adventure map and battle keep separate sets
+- Adventure map terrain is now split into four subcategories with a separate entry per kind of terrain, and decoration blockers are now named rather than being read as `Rough ground`
+- Added merchants to the adventure map scanner
+- Wielders, and other things that belong to a side, now get a separate entry per side instead of being mixed together
+- Battle troops are now grouped by what they are rather than by how much they are worth, and combat results say which troops the acting troop can hit
+- Battle spawn points are now read as a side and whatever stands on them
+
 ## V1.0.0
 
 - Added a procedural sound system: moving the accessibility cursor now plays a short cue for every tile, on the adventure map (roads, open ground, sand, water, trees, impassable and unexplored tiles) and on the battlefield and troop deployment grids (empty hexes, elevation levels 1 to 3, obstacles, and troops)

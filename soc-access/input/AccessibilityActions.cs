@@ -158,9 +158,6 @@ namespace SongsOfConquestAccess.Input
         public static readonly InputAction FocusHudNotifications = OneShot("focus_hud_notifications", ModStrings.Actions.FocusHudNotifications, InputClaimScope.Screen)
             .AddBinding(new KeyboardBinding(Key.N));
 
-        public static readonly InputAction ScannerRefresh = OneShot("scanner_refresh", ModStrings.Actions.ScannerRefresh, InputClaimScope.FocusedWidget)
-            .AddBinding(new KeyboardBinding(Key.End));
-
         public static readonly InputAction ScannerSearch = OneShot("scanner_search", ModStrings.Scanner.Search, InputClaimScope.FocusedWidget)
             .AddBinding(new KeyboardBinding(Key.F, ctrl: true));
 
@@ -176,17 +173,29 @@ namespace SongsOfConquestAccess.Input
         public static readonly InputAction ScannerNextSubcategory = OneShot("scanner_next_subcategory", ModStrings.Actions.ScannerNextSubcategory, InputClaimScope.FocusedWidget)
             .AddBinding(new KeyboardBinding(Key.PageDown, shift: true));
 
-        public static readonly InputAction ScannerPreviousResult = OneShot("scanner_previous_result", ModStrings.Actions.ScannerPreviousResult, InputClaimScope.FocusedWidget)
+        public static readonly InputAction ScannerPreviousItem = OneShot("scanner_previous_item", ModStrings.Actions.ScannerPreviousItem, InputClaimScope.FocusedWidget)
             .AddBinding(new KeyboardBinding(Key.PageUp));
 
-        public static readonly InputAction ScannerNextResult = OneShot("scanner_next_result", ModStrings.Actions.ScannerNextResult, InputClaimScope.FocusedWidget)
+        public static readonly InputAction ScannerNextItem = OneShot("scanner_next_item", ModStrings.Actions.ScannerNextItem, InputClaimScope.FocusedWidget)
             .AddBinding(new KeyboardBinding(Key.PageDown));
 
-        public static readonly InputAction ScannerJumpToResult = OneShot("scanner_jump_to_result", ModStrings.Actions.ScannerJumpToResult, InputClaimScope.FocusedWidget)
-            .AddBinding(new KeyboardBinding(Key.Home));
+        public static readonly InputAction ScannerPreviousInstance = OneShot("scanner_previous_instance", ModStrings.Actions.ScannerPreviousInstance, InputClaimScope.FocusedWidget)
+            .AddBinding(new KeyboardBinding(Key.PageUp, alt: true));
 
-        public static readonly InputAction ScannerSpeakOrientation = OneShot("scanner_speak_orientation", ModStrings.Actions.ScannerSpeakOrientation, InputClaimScope.FocusedWidget)
-            .AddBinding(new KeyboardBinding(Key.Home, shift: true));
+        public static readonly InputAction ScannerNextInstance = OneShot("scanner_next_instance", ModStrings.Actions.ScannerNextInstance, InputClaimScope.FocusedWidget)
+            .AddBinding(new KeyboardBinding(Key.PageDown, alt: true));
+
+        public static readonly InputAction ScannerJumpToResult = OneShot("scanner_jump_to_result", ModStrings.Actions.ScannerJumpToResult, InputClaimScope.FocusedWidget)
+            .AddBinding(new KeyboardBinding(Key.Home))
+            // J mirrors Home so the jump sits next to the comma, period, and
+            // slash category keys and the pair can be worked with one hand.
+            .AddBinding(new KeyboardBinding(Key.J));
+
+        public static readonly InputAction ScannerSpeakDistanceAndDirection = OneShot("scanner_speak_distance_and_direction", ModStrings.Actions.ScannerSpeakDistanceAndDirection, InputClaimScope.FocusedWidget)
+            .AddBinding(new KeyboardBinding(Key.End));
+
+        public static readonly InputAction ScannerReturnFromJump = OneShot("scanner_return_from_jump", ModStrings.Actions.ScannerReturnFromJump, InputClaimScope.FocusedWidget)
+            .AddBinding(new KeyboardBinding(Key.Backspace));
 
         public static readonly InputAction ScannerLookAround = OneShot("scanner_look_around", ModStrings.Actions.ScannerLookAround, InputClaimScope.FocusedWidget)
             .AddBinding(new KeyboardBinding(Key.L));
@@ -196,6 +205,29 @@ namespace SongsOfConquestAccess.Input
 
         public static readonly InputAction ScannerDecreaseLookAroundRadius = OneShot("scanner_decrease_look_around_radius", ModStrings.Actions.ScannerDecreaseLookAroundRadius, InputClaimScope.FocusedWidget)
             .AddBinding(new KeyboardBinding(Key.K, shift: true));
+
+        // One key per custom category on the adventure map, with shift walking
+        // it backwards. Which category answers to which key is the player's to
+        // set, so the actions are named after the keys rather than after any
+        // category. Combat binds comma and period to its own troop cycles, and
+        // both are claimed by the focused widget, so the two never meet.
+        public static readonly InputAction ScannerNextCustomEntryComma =
+            CustomEntry("scanner_next_custom_entry_comma", ModStrings.Actions.ScannerNextCustomEntry, ModStrings.Scanner.QuickKeyComma, Key.Comma, shift: false);
+
+        public static readonly InputAction ScannerPreviousCustomEntryComma =
+            CustomEntry("scanner_previous_custom_entry_comma", ModStrings.Actions.ScannerPreviousCustomEntry, ModStrings.Scanner.QuickKeyComma, Key.Comma, shift: true);
+
+        public static readonly InputAction ScannerNextCustomEntryPeriod =
+            CustomEntry("scanner_next_custom_entry_period", ModStrings.Actions.ScannerNextCustomEntry, ModStrings.Scanner.QuickKeyPeriod, Key.Period, shift: false);
+
+        public static readonly InputAction ScannerPreviousCustomEntryPeriod =
+            CustomEntry("scanner_previous_custom_entry_period", ModStrings.Actions.ScannerPreviousCustomEntry, ModStrings.Scanner.QuickKeyPeriod, Key.Period, shift: true);
+
+        public static readonly InputAction ScannerNextCustomEntrySlash =
+            CustomEntry("scanner_next_custom_entry_slash", ModStrings.Actions.ScannerNextCustomEntry, ModStrings.Scanner.QuickKeySlash, Key.Slash, shift: false);
+
+        public static readonly InputAction ScannerPreviousCustomEntrySlash =
+            CustomEntry("scanner_previous_custom_entry_slash", ModStrings.Actions.ScannerPreviousCustomEntry, ModStrings.Scanner.QuickKeySlash, Key.Slash, shift: true);
 
         public static readonly InputAction SliderDecrease = OneShot("slider_decrease", ModStrings.Actions.SliderDecrease, InputClaimScope.FocusedWidget)
             .AddBinding(new KeyboardBinding(Key.LeftArrow));
@@ -330,6 +362,21 @@ namespace SongsOfConquestAccess.Input
             return new InputAction(key, label, claimScope, InputRepeatPolicy.OneShotUntilRelease());
         }
 
+        /// <summary>
+        /// The label names the key the action is bound to, because the category
+        /// it walks is whichever one the player put on that key and can change
+        /// between one reading of the label and the next.
+        /// </summary>
+        private static InputAction CustomEntry(string key, ModString label, ModString keyName, Key boundKey, bool shift)
+        {
+            return new InputAction(
+                    key,
+                    () => ModText.Get(label, ModText.Get(keyName)),
+                    InputClaimScope.FocusedWidget,
+                    InputRepeatPolicy.OneShotUntilRelease())
+                .AddBinding(new KeyboardBinding(boundKey, shift: shift));
+        }
+
         private static InputAction[] CreateBookmarkActions(string keyPrefix, string labelPrefix, bool ctrl, bool shift, bool alt)
         {
             Key[] digitKeys =
@@ -386,19 +433,27 @@ namespace SongsOfConquestAccess.Input
                 FocusHudResources,
                 FocusHudObjectives,
                 FocusHudNotifications,
-                ScannerRefresh,
                 ScannerSearch,
                 ScannerPreviousCategory,
                 ScannerNextCategory,
                 ScannerPreviousSubcategory,
                 ScannerNextSubcategory,
-                ScannerPreviousResult,
-                ScannerNextResult,
+                ScannerPreviousItem,
+                ScannerNextItem,
+                ScannerPreviousInstance,
+                ScannerNextInstance,
                 ScannerJumpToResult,
-                ScannerSpeakOrientation,
+                ScannerSpeakDistanceAndDirection,
+                ScannerReturnFromJump,
                 ScannerLookAround,
                 ScannerIncreaseLookAroundRadius,
                 ScannerDecreaseLookAroundRadius,
+                ScannerNextCustomEntryComma,
+                ScannerPreviousCustomEntryComma,
+                ScannerNextCustomEntryPeriod,
+                ScannerPreviousCustomEntryPeriod,
+                ScannerNextCustomEntrySlash,
+                ScannerPreviousCustomEntrySlash,
                 SliderDecrease,
                 SliderIncrease,
                 SliderMinimum,
