@@ -159,6 +159,36 @@ namespace SongsOfConquestAccess.Tests
             Assert.AreEqual(ScannerCommandStatus.NoResults, result.Status);
         }
 
+        /// <summary>
+        /// A contribution that throws while a snapshot is built is swallowed
+        /// and carried on from, so the next snapshot can arrive without the
+        /// custom categories the one before it had. The walk has to come out of
+        /// that standing somewhere real: it used to keep the indices it had
+        /// measured against the snapshot before, and the press after reached
+        /// past the end of the new one.
+        /// </summary>
+        [TestMethod]
+        public void KeyPressSurvivesTheCategoryVanishingFromTheSnapshot()
+        {
+            Vector2Int cursor = Vector2Int.zero;
+            bool categoryIsGone = false;
+            ScannerController controller = CreateController(
+                () => cursor,
+                () => categoryIsGone ? BuildSnapshotWithoutTheCategory() : BuildSnapshotWithTheCategoryLast());
+
+            controller.ExecuteMoveCustomCategoryEntry(CategoryKey, 1);
+            cursor = new Vector2Int(5, 5);
+            categoryIsGone = true;
+            ScannerCommandResult gone = controller.ExecuteMoveCustomCategoryEntry(CategoryKey, 1);
+            ScannerCommandResult again = controller.ExecuteMoveCustomCategoryEntry(CategoryKey, 1);
+            ScannerCommandResult paged = controller.ExecuteMoveCategory(1);
+
+            Assert.AreEqual(ScannerCommandStatus.NoResults, gone.Status);
+            Assert.AreEqual(ScannerCommandStatus.NoResults, again.Status);
+            Assert.AreEqual(ScannerCommandStatus.Result, paged.Status);
+            Assert.AreEqual("gold", paged.Result.Key);
+        }
+
         [TestMethod]
         public void EmptyCategoryReportsNoResults()
         {
@@ -273,6 +303,25 @@ namespace SongsOfConquestAccess.Tests
                 snapshot.Add(CategoryKey, ScannerSubcategoryKeys.All, results[i]);
             }
 
+            return snapshot;
+        }
+
+        /// <summary>
+        /// The custom category sits behind a built-in one, which is what makes
+        /// the seat an index the smaller snapshot below has no room for.
+        /// </summary>
+        private static ScannerSnapshot BuildSnapshotWithTheCategoryLast()
+        {
+            ScannerSnapshot snapshot = new ScannerSnapshot();
+            snapshot.Add("pickups", ScannerSubcategoryKeys.All, Result("gold", "Gold", 2, 0));
+            snapshot.Add(CategoryKey, ScannerSubcategoryKeys.All, Result("chest:near", "Chest", 1, 0));
+            return snapshot;
+        }
+
+        private static ScannerSnapshot BuildSnapshotWithoutTheCategory()
+        {
+            ScannerSnapshot snapshot = new ScannerSnapshot();
+            snapshot.Add("pickups", ScannerSubcategoryKeys.All, Result("gold", "Gold", 2, 0));
             return snapshot;
         }
 

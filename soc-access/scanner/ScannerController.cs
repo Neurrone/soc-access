@@ -481,6 +481,15 @@ namespace SongsOfConquestAccess.Scanner
                 : -1;
             if (subcategoryIndex < 0)
             {
+                // The category the key answers for is not in the snapshot that
+                // was just swapped in, which a contribution that threw during
+                // the build is enough to do. Leaving the walk seated on indices
+                // measured against the snapshot before it would point the next
+                // press past the end of this one.
+                _categoryIndex = 0;
+                _subcategoryIndex = 0;
+                _itemIndex = 0;
+                _instanceIndex = 0;
                 return NoResults();
             }
 
@@ -1351,21 +1360,35 @@ namespace SongsOfConquestAccess.Scanner
             return true;
         }
 
+        /// <summary>
+        /// Where the walk is standing, or nothing where the indices have not
+        /// caught up with the snapshot under them. A snapshot is rebuilt on
+        /// every press and a contribution that throws is swallowed and carried
+        /// on from, so a snapshot arriving with fewer categories than the last
+        /// one is a state the walk has to survive rather than an impossible
+        /// one: these answer null instead of reaching past the end.
+        /// </summary>
         private ScannerCategory CurrentCategory()
         {
-            return _snapshot != null && _snapshot.Categories.Count > 0 ? _snapshot.Categories[_categoryIndex] : null;
+            return _snapshot != null && _categoryIndex >= 0 && _categoryIndex < _snapshot.Categories.Count
+                ? _snapshot.Categories[_categoryIndex]
+                : null;
         }
 
         private ScannerSubcategory CurrentSubcategory()
         {
             ScannerCategory category = CurrentCategory();
-            return category != null && category.Subcategories.Count > 0 ? category.Subcategories[_subcategoryIndex] : null;
+            return category != null && _subcategoryIndex >= 0 && _subcategoryIndex < category.Subcategories.Count
+                ? category.Subcategories[_subcategoryIndex]
+                : null;
         }
 
         private ScannerItem CurrentItem()
         {
             ScannerSubcategory subcategory = CurrentSubcategory();
-            return subcategory != null && subcategory.Items.Count > 0 ? subcategory.Items[_itemIndex] : null;
+            return subcategory != null && _itemIndex >= 0 && _itemIndex < subcategory.Items.Count
+                ? subcategory.Items[_itemIndex]
+                : null;
         }
 
         private void ClampIndices()
