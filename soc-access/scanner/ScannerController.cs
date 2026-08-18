@@ -738,7 +738,7 @@ namespace SongsOfConquestAccess.Scanner
                 return NoResults();
             }
 
-            ScannerCommandResult command = BuildCommandResult(includePath: false);
+            ScannerCommandResult command = BuildCommandResult(includePath: false, takesItemNameTurn: false);
             if (command != null)
             {
                 command.DistanceAndDirectionOnly = true;
@@ -748,6 +748,19 @@ namespace SongsOfConquestAccess.Scanner
         }
 
         private ScannerCommandResult BuildCommandResult(bool includePath)
+        {
+            return BuildCommandResult(includePath, takesItemNameTurn: true);
+        }
+
+        /// <summary>
+        /// The item name gets one turn per item, and a readout that never
+        /// speaks the name must not be the announcement that spends it. The
+        /// bearing key can land on an item nobody has heard of yet, since it
+        /// falls back to the nearest scope when the snapshot went away under
+        /// it, and the player would then walk the copies of a thing whose name
+        /// was never said.
+        /// </summary>
+        private ScannerCommandResult BuildCommandResult(bool includePath, bool takesItemNameTurn)
         {
             ScannerResult result = CurrentValidResult();
             if (result == null)
@@ -770,7 +783,7 @@ namespace SongsOfConquestAccess.Scanner
                 SubcategoryLabel = subcategory != null ? subcategory.Label : null,
                 ResultIndex = resultIndex,
                 ResultCount = resultCount,
-                IncludeItemName = TakeItemNameTurn(category, subcategory, item),
+                IncludeItemName = takesItemNameTurn && TakeItemNameTurn(category, subcategory, item),
                 Directions = directions,
                 HasOrigin = true,
                 Origin = origin,

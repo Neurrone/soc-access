@@ -682,6 +682,33 @@ namespace SongsOfConquestAccess.Tests
             Assert.AreEqual(ScannerCommandStatus.NoResults, result.Status);
         }
 
+        /// <summary>
+        /// The item name gets one turn per item, and the bearing readout never
+        /// speaks it, so it must not be the announcement that spends it. The
+        /// key can move the walk on its own: with the snapshot gone from under
+        /// it, which a search that found nothing is enough to do, it lands on
+        /// the nearest scope, and that is how it ends up sitting on an item
+        /// whose name the player has never been told.
+        /// </summary>
+        [TestMethod]
+        public void SpeakDistanceAndDirectionLeavesTheItemNameTurnUnspent()
+        {
+            ScannerController controller = CreateController(BuildSnapshot(
+                Entry("Pickups", "All", "Gold", 1, 0, "pickup:gold"),
+                Entry("Pickups", "All", "Ore", 2, 0, "pickup:ore")));
+
+            controller.ExecuteInitialLanding();
+            controller.ExecuteMoveItem(1);
+            controller.ExecuteSearch("nothing by this name");
+            ScannerCommandResult bearing = controller.ExecuteSpeakDistanceAndDirection();
+            ScannerCommandResult announced = controller.ExecuteJumpToCurrent();
+
+            Assert.AreEqual("Gold", bearing.Result.Label);
+            Assert.IsFalse(bearing.IncludeItemName);
+            Assert.AreEqual("Gold", announced.Result.Label);
+            Assert.IsTrue(announced.IncludeItemName);
+        }
+
         [TestMethod]
         public void FirstSubcategoryStepLandsInsteadOfSteppingOutOfAnEmptyCategory()
         {
