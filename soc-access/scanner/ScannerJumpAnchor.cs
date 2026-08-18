@@ -22,6 +22,27 @@ namespace SongsOfConquestAccess.Scanner
             _anchor = tile;
         }
 
+        /// <summary>
+        /// Remembers where a jump came from, but only where the cursor really
+        /// left it. A grid can turn a jump down, an inspect context holds the
+        /// cursor inside its own tiles, and says so with a cue rather than in
+        /// its answer, so the cursor itself is what tells the two apart.
+        /// Reports whether the jump happened, which is also what the scanner
+        /// needs before it decides to leave the talking to the tile landed on:
+        /// a refused jump keeps the anchor the player already had and is no
+        /// jump at all.
+        /// </summary>
+        public bool RememberIfMoved(Vector2Int origin, Vector2Int cursor)
+        {
+            if (cursor == origin)
+            {
+                return false;
+            }
+
+            Remember(origin);
+            return true;
+        }
+
         public void Clear()
         {
             _hasAnchor = false;

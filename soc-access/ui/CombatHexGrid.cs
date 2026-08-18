@@ -601,8 +601,9 @@ namespace SongsOfConquestAccess.UI
                 return true;
             }
 
-            _jumpAnchor.Remember(_cursor);
-            return SetCursor(point);
+            Vector2Int origin = _cursor;
+            SetCursor(point);
+            return _jumpAnchor.RememberIfMoved(origin, _cursor);
         }
 
         /// <summary>
