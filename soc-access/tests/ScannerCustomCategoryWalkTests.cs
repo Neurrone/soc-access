@@ -160,6 +160,36 @@ namespace SongsOfConquestAccess.Tests
         }
 
         /// <summary>
+        /// One press is one scan. The walk restarting because the rebuild left
+        /// it outside the category used to scan the whole map a second time at
+        /// the same cursor, which on a large map is the difference between a
+        /// key that answers and one that stutters.
+        /// </summary>
+        [TestMethod]
+        public void RestartingTheWalkScansTheMapOnceForOnePress()
+        {
+            Vector2Int cursor = Vector2Int.zero;
+            int builds = 0;
+            ScannerController controller = CreateController(
+                () => cursor,
+                () =>
+                {
+                    builds++;
+                    return builds <= 1
+                        ? BuildSnapshotWithTheCategoryFirst()
+                        : BuildSnapshotWithTheCategoryLast();
+                });
+
+            controller.ExecuteMoveCustomCategoryEntry(CategoryKey, 1);
+            ScannerCommandResult restarted = controller.ExecuteMoveCustomCategoryEntry(CategoryKey, 1);
+
+            Assert.AreEqual(2, builds);
+            Assert.AreEqual(ScannerCommandStatus.Result, restarted.Status);
+            Assert.AreEqual("chest:near", restarted.Result.Key);
+            Assert.AreEqual(1, restarted.ResultCount);
+        }
+
+        /// <summary>
         /// A contribution that throws while a snapshot is built is swallowed
         /// and carried on from, so the next snapshot can arrive without the
         /// custom categories the one before it had. The walk has to come out of
@@ -315,6 +345,14 @@ namespace SongsOfConquestAccess.Tests
             ScannerSnapshot snapshot = new ScannerSnapshot();
             snapshot.Add("pickups", ScannerSubcategoryKeys.All, Result("gold", "Gold", 2, 0));
             snapshot.Add(CategoryKey, ScannerSubcategoryKeys.All, Result("chest:near", "Chest", 1, 0));
+            return snapshot;
+        }
+
+        private static ScannerSnapshot BuildSnapshotWithTheCategoryFirst()
+        {
+            ScannerSnapshot snapshot = new ScannerSnapshot();
+            snapshot.Add(CategoryKey, ScannerSubcategoryKeys.All, Result("chest:near", "Chest", 1, 0));
+            snapshot.Add("pickups", ScannerSubcategoryKeys.All, Result("gold", "Gold", 2, 0));
             return snapshot;
         }
 

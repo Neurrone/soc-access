@@ -412,9 +412,15 @@ namespace SongsOfConquestAccess.Scanner
                 {
                     return StepFlatWalk(delta, state.LocatedCurrent);
                 }
+
+                // The reseat landed outside the category, so the walk restarts.
+                // It restarts on the snapshot the reseat just built: same
+                // cursor, same press, nothing has happened in between, so
+                // scanning the map a second time would only produce it again.
+                return RestartFlatWalk(categoryKey, delta, rebuildSnapshot: false);
             }
 
-            return RestartFlatWalk(categoryKey, delta);
+            return RestartFlatWalk(categoryKey, delta, rebuildSnapshot: true);
         }
 
         private ScannerCommandResult StepFlatWalk(int delta, bool locatedCurrent)
@@ -441,7 +447,7 @@ namespace SongsOfConquestAccess.Scanner
 
             _itemIndex = walk[position].ItemIndex;
             _instanceIndex = walk[position].InstanceIndex;
-            return BuildFlatWalkResult(wrapped);
+            return BuildFlatWalkResult(wrapped, walk);
         }
 
         /// <summary>
@@ -452,7 +458,7 @@ namespace SongsOfConquestAccess.Scanner
         /// player already is: that is what turns a jump-and-press rhythm into a
         /// nearest-neighbour hop across the map.
         /// </summary>
-        private ScannerCommandResult RestartFlatWalk(string categoryKey, int delta)
+        private ScannerCommandResult RestartFlatWalk(string categoryKey, int delta, bool rebuildSnapshot)
         {
             string previousKey = null;
             ScannerCategory seated = CurrentCategory();
@@ -463,7 +469,11 @@ namespace SongsOfConquestAccess.Scanner
             }
 
             Vector2Int origin = GetCursor();
-            _snapshot = BuildSnapshot(origin);
+            if (rebuildSnapshot)
+            {
+                _snapshot = BuildSnapshot(origin);
+            }
+
             if (_snapshot == null || _snapshot.IsEmpty)
             {
                 _snapshot = null;
@@ -474,7 +484,13 @@ namespace SongsOfConquestAccess.Scanner
                 return NoResults();
             }
 
-            _snapshot.SortByDistance(origin);
+            if (rebuildSnapshot)
+            {
+                // A reused snapshot was already sorted from this same cursor
+                // when the reseat built it.
+                _snapshot.SortByDistance(origin);
+            }
+
             int categoryIndex = IndexOfCategory(categoryKey);
             int subcategoryIndex = categoryIndex >= 0
                 ? IndexOfSubcategory(_snapshot.Categories[categoryIndex], ScannerSubcategoryKeys.All)
@@ -516,7 +532,7 @@ namespace SongsOfConquestAccess.Scanner
 
             _itemIndex = walk[position].ItemIndex;
             _instanceIndex = walk[position].InstanceIndex;
-            return BuildFlatWalkResult(wrapped: false);
+            return BuildFlatWalkResult(wrapped: false, walk: walk);
         }
 
         /// <summary>
@@ -526,18 +542,25 @@ namespace SongsOfConquestAccess.Scanner
         /// leave it off mid-walk: the player picked this key for this category
         /// and is being told where in it they now are.
         /// </summary>
-        private ScannerCommandResult BuildFlatWalkResult(bool wrapped)
+        private ScannerCommandResult BuildFlatWalkResult(bool wrapped, List<FlatWalkEntry> walk)
         {
             // Validation can prune a result that has gone and reshape the
             // subcategory around it, so the walk is measured afterwards: the
             // spoken count has to be the one the next press will step through.
-            ScannerResult result = CurrentValidResult();
+            // Where it pruned nothing, the walk the caller already has is that
+            // walk and is not gathered and sorted a second time.
+            bool pruned;
+            ScannerResult result = CurrentValidResult(out pruned);
             if (result == null)
             {
                 return NoResults();
             }
 
-            List<FlatWalkEntry> walk = BuildFlatWalk();
+            if (pruned || walk == null)
+            {
+                walk = BuildFlatWalk();
+            }
+
             int position = IndexInFlatWalk(walk, _itemIndex, _instanceIndex);
             ScannerCategory category = CurrentCategory();
             ScannerSubcategory subcategory = CurrentSubcategory();
@@ -1297,6 +1320,18 @@ namespace SongsOfConquestAccess.Scanner
 
         private ScannerResult CurrentValidResult()
         {
+            bool pruned;
+            return CurrentValidResult(out pruned);
+        }
+
+        /// <summary>
+        /// Also says whether anything was taken out of the snapshot on the way,
+        /// which is what tells a caller holding a walk it gathered a moment ago
+        /// whether that walk still describes the scope.
+        /// </summary>
+        private ScannerResult CurrentValidResult(out bool pruned)
+        {
+            pruned = false;
             if (_snapshot == null)
             {
                 return null;
@@ -1325,6 +1360,7 @@ namespace SongsOfConquestAccess.Scanner
                     return result;
                 }
 
+                pruned = true;
                 if (!string.IsNullOrWhiteSpace(result.Key))
                 {
                     _snapshot.PruneByKey(result.Key);
