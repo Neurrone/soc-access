@@ -1,4 +1,5 @@
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using SongsOfConquestAccess.Adapters;
 using SongsOfConquestAccess.Input;
@@ -218,15 +219,70 @@ namespace SongsOfConquestAccess.Screens
                 return false;
             }
 
+            return PromptRename(category.Name);
+        }
+
+        private bool PromptRename(string prepopulate)
+        {
             return Prompt(
                 ModText.Get(ModStrings.Screens.RenameCustomCategory),
-                category.Name,
-                name =>
-                {
-                    ModSettings.RenameScannerCustomCategory(GetTaxonomyKey(), _id, name);
-                    Rebuild();
-                    UIManager.RequestFocus(RootWidget);
-                });
+                prepopulate,
+                HandleRenameConfirmed);
+        }
+
+        /// <summary>
+        /// Two categories under one name are one name in speech, which is the
+        /// only way the category cycle is ever read, so a name already spoken
+        /// for is refused. The prompt then comes back holding what was typed, so
+        /// a near miss is edited rather than typed out again.
+        /// </summary>
+        private void HandleRenameConfirmed(string name)
+        {
+            string trimmed = (name ?? string.Empty).Trim();
+            if (ScannerCustomCategoryNameConflict.Exists(
+                    trimmed,
+                    _taxonomy,
+                    ModSettings.GetScannerCustomCategories(GetTaxonomyKey()),
+                    _id))
+            {
+                Speak(ModText.Get(ModStrings.Screens.CustomCategoryNameTaken, trimmed));
+                RepromptRename(trimmed);
+                return;
+            }
+
+            ModSettings.RenameScannerCustomCategory(GetTaxonomyKey(), _id, trimmed);
+            Rebuild();
+            UIManager.RequestFocus(RootWidget);
+        }
+
+        /// <summary>
+        /// The game frees its popup slot before running the confirm callback, so
+        /// a second prompt is not refused outright, but the first one is still
+        /// coming apart around it: the backdrop is mid fade-out and the click
+        /// that confirmed is still being dispatched. A fresh prompt therefore
+        /// waits for the frame to end rather than opening into that.
+        /// </summary>
+        private void RepromptRename(string rejected)
+        {
+            SocAccessPlugin plugin = SocAccessPlugin.Instance;
+            if (plugin == null)
+            {
+                PromptRename(rejected);
+                return;
+            }
+
+            plugin.StartCoroutine(RepromptRenameNextFrame(rejected));
+        }
+
+        private IEnumerator RepromptRenameNextFrame(string rejected)
+        {
+            yield return null;
+            // The popup outlives the screen that opened it, so the category
+            // this was going to rename may be gone by now.
+            if (GetCategory() != null)
+            {
+                PromptRename(rejected);
+            }
         }
 
         private bool AddKeyword()

@@ -494,6 +494,7 @@ namespace SongsOfConquestAccess.Localization
             public static readonly ModString CustomCategoryKeyCurrent = new ModString("Screens.CustomCategoryKeyCurrent", "{0}, current");
             public static readonly ModString CustomCategoryKeyHeldBy = new ModString("Screens.CustomCategoryKeyHeldBy", "{0}, held by {1}");
             public static readonly ModString CustomCategoryKeyTitle = new ModString("Screens.CustomCategoryKeyTitle", "Key for {0}");
+            public static readonly ModString CustomCategoryNameTaken = new ModString("Screens.CustomCategoryNameTaken", "{0} is already the name of a category");
             public static readonly ModString DeleteCustomCategory = new ModString("Screens.DeleteCustomCategory", "Delete this custom category");
             public static readonly ModString CancelAbility = new ModString("Screens.CancelAbility", "Cancel ability");
             public static readonly ModString CancelSpell = new ModString("Screens.CancelSpell", "Cancel spell");

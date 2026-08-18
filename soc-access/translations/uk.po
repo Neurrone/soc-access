@@ -3473,6 +3473,11 @@ msgctxt "Screens.CustomCategoryKeyTitle"
 msgid "Key for {0}"
 msgstr "Клавіша для {0}"
 
+#. Screens.CustomCategoryNameTaken
+msgctxt "Screens.CustomCategoryNameTaken"
+msgid "{0} is already the name of a category"
+msgstr "{0} — уже назва категорії"
+
 #. Scanner.NoCustomCategoryOnKey
 msgctxt "Scanner.NoCustomCategoryOnKey"
 msgid "No custom category on {0}"

@@ -3448,6 +3448,11 @@ msgctxt "Screens.CustomCategoryKeyTitle"
 msgid "Key for {0}"
 msgstr "Tecla para {0}"
 
+#. Screens.CustomCategoryNameTaken
+msgctxt "Screens.CustomCategoryNameTaken"
+msgid "{0} is already the name of a category"
+msgstr "{0} já é o nome de uma categoria"
+
 #. Scanner.NoCustomCategoryOnKey
 msgctxt "Scanner.NoCustomCategoryOnKey"
 msgid "No custom category on {0}"
