@@ -358,7 +358,7 @@ namespace SongsOfConquestAccess.Speech.Spatial
             return Math.Round(normalized, 2).ToString("g2", CultureInfo.InvariantCulture);
         }
 
-        private static string DescribeMovementCost(AdventureMapTile tile)
+        public static string DescribeMovementCost(AdventureMapTile tile)
         {
             return tile != null && tile.IsExplored && tile.ReachableMovementCost.HasValue
                 ? ModText.Get(ModStrings.Spatial.MovementCost, FormatMovementValue(tile.ReachableMovementCost.Value))

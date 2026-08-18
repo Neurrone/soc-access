@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using SongsOfConquestAccess.Adapters;
 using SongsOfConquestAccess.Scanner;
 using SongsOfConquestAccess.Speech.Spatial;
 using UnityEngine;
@@ -130,7 +131,7 @@ namespace SongsOfConquestAccess.Tests
         public void EveryScannerContentGroupLeadsWithTheResultBeforeTheTile()
         {
             Assert.AreEqual(
-                "name,owner,status,reachability_or_route_preview",
+                "name,owner,status,reachability_or_route_preview,movement_cost",
                 AdventureMapAnnouncementDefinitions.ScannerContent.DefaultOrderCsv);
             Assert.AreEqual(
                 "attackable,name,owner,status,reachable,elevation",
@@ -215,6 +216,77 @@ namespace SongsOfConquestAccess.Tests
                 new[] { new AnnouncementPart(CombatAnnouncementDefinitions.TileKeys.Reachable, "reachable") });
 
             Assert.AreEqual("Gold mine", text);
+        }
+
+        [TestMethod]
+        public void DoesNotReadTheAdventureMovementCostByDefault()
+        {
+            AdventureMapTile tile = CreateReachableRoadTile();
+            ScannerResult result = new ScannerResult("terrain:road:4:2", "Dirt road", tile.Position)
+            {
+                InstanceLabel = "Dirt road"
+            };
+
+            string text = Describe(result, AdventureScannerSpeechContext.BuildTileParts(tile));
+
+            Assert.AreEqual("Dirt road, reachable", text);
+        }
+
+        [TestMethod]
+        public void ReadsAnEnabledAdventureMovementCostAtTheEnd()
+        {
+            AdventureMapTile tile = CreateReachableRoadTile();
+            ScannerResult result = new ScannerResult("terrain:road:4:2", "Dirt road", tile.Position)
+            {
+                InstanceLabel = "Dirt road"
+            };
+
+            string text = ScannerResultContentFormatter.Describe(
+                AdventureMapAnnouncementDefinitions.ScannerContent,
+                result,
+                AdventureScannerSpeechContext.BuildTileParts(tile),
+                DefaultOrder,
+                (group, element) => element.Key == AdventureMapAnnouncementDefinitions.TileKeys.MovementCost
+                    || element.DefaultEnabled,
+                (group, element) => element.DefaultSuffix);
+
+            Assert.AreEqual("Dirt road, reachable, Movement cost: 3", text);
+        }
+
+        [TestMethod]
+        public void OmitsTheAdventureMovementCostForAnUnexploredTile()
+        {
+            AdventureMapTile tile = new AdventureMapTile(new Vector2Int(4, 2))
+            {
+                ReachableMovementCost = 3f
+            };
+            ScannerResult result = new ScannerResult("terrain:road:4:2", "Dirt road", tile.Position)
+            {
+                InstanceLabel = "Dirt road"
+            };
+
+            string text = ScannerResultContentFormatter.Describe(
+                AdventureMapAnnouncementDefinitions.ScannerContent,
+                result,
+                AdventureScannerSpeechContext.BuildTileParts(tile),
+                DefaultOrder,
+                (group, element) => element.Key == AdventureMapAnnouncementDefinitions.TileKeys.MovementCost
+                    || element.DefaultEnabled,
+                (group, element) => element.DefaultSuffix);
+
+            Assert.AreEqual("Dirt road", text);
+        }
+
+        private static AdventureMapTile CreateReachableRoadTile()
+        {
+            return new AdventureMapTile(new Vector2Int(4, 2))
+            {
+                IsExplored = true,
+                IsVisible = true,
+                IsReachable = true,
+                ReachableMovementCost = 3f,
+                Terrain = AdventureTerrainKind.DirtRoad
+            };
         }
 
         private static string Describe(ScannerResult result)

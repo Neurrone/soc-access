@@ -31,5 +31,26 @@ namespace SongsOfConquestAccess.Tests
             Assert.AreEqual(AdventureMapAnnouncementDefinitions.TileKeys.Terrain, order[order.Count - 2]);
             Assert.AreEqual(AdventureMapAnnouncementDefinitions.TileKeys.MovementCost, order[order.Count - 1]);
         }
+
+        [TestMethod]
+        public void MergeAnnouncementOrderAppendsMovementCostAfterCustomizedAdventureScannerContentOrder()
+        {
+            string savedOrder = string.Join(
+                ",",
+                new[]
+                {
+                    AdventureMapAnnouncementDefinitions.TileKeys.ReachabilityOrRoutePreview,
+                    ScannerAnnouncementDefinitions.ContentKeys.Name,
+                    ScannerAnnouncementDefinitions.ContentKeys.Owner,
+                    ScannerAnnouncementDefinitions.ContentKeys.Status
+                });
+
+            IReadOnlyList<string> order = ModSettings.MergeAnnouncementOrder(
+                AdventureMapAnnouncementDefinitions.ScannerContent,
+                savedOrder);
+
+            Assert.AreEqual(ScannerAnnouncementDefinitions.ContentKeys.Status, order[order.Count - 2]);
+            Assert.AreEqual(AdventureMapAnnouncementDefinitions.TileKeys.MovementCost, order[order.Count - 1]);
+        }
     }
 }

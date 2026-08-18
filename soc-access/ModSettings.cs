@@ -789,8 +789,13 @@ namespace SongsOfConquestAccess
 
         private static bool ShouldAppendMissingAnnouncementElement(AnnouncementGroupDefinition group, string key)
         {
+            if (group == null || key != Speech.Spatial.AdventureMapAnnouncementDefinitions.TileKeys.MovementCost)
+            {
+                return false;
+            }
+
             return group == Speech.Spatial.AdventureMapAnnouncementDefinitions.Tile
-                && key == Speech.Spatial.AdventureMapAnnouncementDefinitions.TileKeys.MovementCost;
+                || group == Speech.Spatial.AdventureMapAnnouncementDefinitions.ScannerContent;
         }
 
         private static string ToConfigKeyPrefix(string key)

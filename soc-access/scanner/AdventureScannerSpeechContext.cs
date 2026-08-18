@@ -38,7 +38,7 @@ namespace SongsOfConquestAccess.Scanner
                 ScannerResultContentFormatter.Describe(
                     AdventureMapAnnouncementDefinitions.ScannerContent,
                     _result,
-                    BuildTileParts()),
+                    BuildTileParts(_tile)),
                 ScannerSpeechUtility.FormatDirections(_directions),
                 formatter.DescribeCoordinates(_tile),
                 ScannerSpeechUtility.FormatResultCount(_resultIndex, _resultCount));
@@ -51,14 +51,22 @@ namespace SongsOfConquestAccess.Scanner
         /// keeps them even though the rest of the tile belongs to the cursor.
         /// This is the adventure map's counterpart to combat reachability.
         /// </summary>
-        private IEnumerable<AnnouncementPart> BuildTileParts()
+        internal static IEnumerable<AnnouncementPart> BuildTileParts(AdventureMapTile tile)
         {
-            string route = AdventureMapTileSpeechFormatter.DescribeReachabilityOrRoutePreview(_tile);
+            string route = AdventureMapTileSpeechFormatter.DescribeReachabilityOrRoutePreview(tile);
             if (!string.IsNullOrWhiteSpace(route))
             {
                 yield return new AnnouncementPart(
                     AdventureMapAnnouncementDefinitions.TileKeys.ReachabilityOrRoutePreview,
                     route);
+            }
+
+            string movementCost = AdventureMapTileSpeechFormatter.DescribeMovementCost(tile);
+            if (!string.IsNullOrWhiteSpace(movementCost))
+            {
+                yield return new AnnouncementPart(
+                    AdventureMapAnnouncementDefinitions.TileKeys.MovementCost,
+                    movementCost);
             }
         }
     }
