@@ -617,10 +617,14 @@ namespace SongsOfConquestAccess
             {
                 AnnouncementGroupDefinition group = groups[i];
                 AnnouncementGroupConfig groupConfig = new AnnouncementGroupConfig();
+                // Configs written before versioning existed have no Version key, and
+                // Bind returns the default for a missing key. The default must be 1,
+                // not group.Version, or those configs would be treated as already
+                // migrated and DiscardOutdatedAnnouncementSettings would never fire.
                 groupConfig.Version = config.Bind(
                     group.ConfigSection,
                     "Version",
-                    group.Version,
+                    1,
                     "Layout version of this announcement group. Saved settings are reset when it changes.");
                 groupConfig.Order = config.Bind(
                     group.ConfigSection,
