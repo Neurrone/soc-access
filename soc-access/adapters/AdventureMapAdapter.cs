@@ -1179,73 +1179,129 @@ namespace SongsOfConquestAccess.Adapters
                 return ScannerResultRefresh.Invalid;
             }
 
-            Vector2Int position = RecenterScannerGroupResult(result, cursorHint);
-            return ValidateScannerResult(result, position)
-                ? ScannerResultRefresh.Valid(position)
-                : ScannerResultRefresh.Invalid;
+            Vector2Int position;
+            if (!TryRevalidateScannerResult(result, cursorHint, out position))
+            {
+                RemoveRevealedScannerResult(result);
+                return ScannerResultRefresh.Invalid;
+            }
+
+            return ScannerResultRefresh.Valid(position);
         }
 
         /// <summary>
-        /// A result covering many tiles is announced through one representative
-        /// tile, picked when the snapshot was built and measured from wherever
-        /// the scan started. That goes stale the moment the cursor moves, so the
-        /// spoken bearing ends up pointing at a far corner of a region the
-        /// player is standing next to. Re-pick the representative against the
-        /// live cursor instead.
+        /// Judges a result against the live map and picks the tile it speaks
+        /// through. A result covering many tiles is announced through one
+        /// representative, picked when the snapshot was built and measured from
+        /// wherever the scan started; that goes stale the moment the cursor
+        /// moves, so the representative is re-picked against the live cursor.
+        /// A group is only gone once none of its tiles qualifies any more:
+        /// exploring one fringe tile of a large unexplored region must not take
+        /// the whole region away.
         /// </summary>
-        private Vector2Int RecenterScannerGroupResult(ScannerResult result, Vector2Int cursorHint)
+        private bool TryRevalidateScannerResult(ScannerResult result, Vector2Int cursorHint, out Vector2Int position)
         {
-            if (result.Points.Count == 0)
+            position = result.Position;
+            Func<Vector2Int, bool> isValidPoint = CreateScannerPointValidator(result);
+            if (isValidPoint == null)
             {
-                return result.Position;
-            }
-
-            List<Vector2Int> surviving = new List<Vector2Int>();
-            for (int i = 0; i < result.Points.Count; i++)
-            {
-                if (IsWithinMap(result.Points[i]))
-                {
-                    surviving.Add(result.Points[i]);
-                }
-            }
-
-            return surviving.Count == 0 ? result.Position : ClosestPoint(surviving, cursorHint);
-        }
-
-        private bool ValidateScannerResult(ScannerResult result, Vector2Int position)
-        {
-            if (result == null || !IsWithinMap(position))
-            {
-                RemoveRevealedScannerResult(result);
                 return false;
             }
 
-            if (result.Kind == ScannerResultKind.CommanderZoneOfControl)
+            if (result.Points.Count == 0)
             {
-                bool validZone = ValidateCommanderZoneOfControlResult(result, position);
-                if (!validZone)
+                return isValidPoint(position);
+            }
+
+            Vector2Int nearest = ClosestPoint(result.Points, cursorHint);
+            if (isValidPoint(nearest))
+            {
+                position = nearest;
+                return true;
+            }
+
+            return TryPickSurvivingScannerGroupPoint(result, cursorHint, isValidPoint, out position);
+        }
+
+        /// <summary>
+        /// Walks a group's tiles outwards from the cursor and answers through
+        /// the first one that still qualifies, dropping the closer ones it
+        /// proved gone so the group stops speaking through tiles it no longer
+        /// covers. Judging a tile costs a pathfind or a map query, so the walk
+        /// stops at the survivor rather than sweeping the whole group.
+        /// </summary>
+        internal static bool TryPickSurvivingScannerGroupPoint(
+            ScannerResult result,
+            Vector2Int cursorHint,
+            Func<Vector2Int, bool> isValidPoint,
+            out Vector2Int position)
+        {
+            position = result.Position;
+            List<Vector2Int> ordered = new List<Vector2Int>(result.Points);
+            ordered.Sort((left, right) =>
+            {
+                int compared = DistanceSquared(cursorHint, left).CompareTo(DistanceSquared(cursorHint, right));
+                return compared != 0 ? compared : ComparePointOrder(left, right);
+            });
+
+            for (int i = 0; i < ordered.Count; i++)
+            {
+                if (!isValidPoint(ordered[i]))
                 {
-                    RemoveRevealedScannerResult(result);
+                    continue;
                 }
 
-                return validZone;
+                if (i > 0)
+                {
+                    HashSet<Vector2Int> gone = new HashSet<Vector2Int>();
+                    for (int rejected = 0; rejected < i; rejected++)
+                    {
+                        gone.Add(ordered[rejected]);
+                    }
+
+                    result.Points.RemoveAll(point => gone.Contains(point));
+                }
+
+                position = ordered[i];
+                return true;
+            }
+
+            return false;
+        }
+
+        private static int ComparePointOrder(Vector2Int left, Vector2Int right)
+        {
+            int compared = left.x.CompareTo(right.x);
+            return compared != 0 ? compared : left.y.CompareTo(right.y);
+        }
+
+        /// <summary>
+        /// The live test for whether one tile still carries what the result
+        /// stands for, or null where the result cannot be valid anywhere any
+        /// more. Built once per refresh so the per-kind setup, the exploration
+        /// array and the reachability flood, is paid once however many of the
+        /// group's tiles have to be judged.
+        /// </summary>
+        private Func<Vector2Int, bool> CreateScannerPointValidator(ScannerResult result)
+        {
+            if (result.Kind == ScannerResultKind.CommanderZoneOfControl)
+            {
+                return CreateCommanderZoneOfControlPointValidator(result);
             }
 
             if (result.Kind == ScannerResultKind.UnexploredGroup)
             {
-                bool validUnexplored = ValidateUnexploredScannerResult(result, position);
-                if (!validUnexplored)
-                {
-                    RemoveRevealedScannerResult(result);
-                }
-
-                return validUnexplored;
+                return CreateUnexploredPointValidator();
             }
 
+            return position => IsWithinMap(position) && IsScannerEntityPointValid(result, position);
+        }
+
+        private bool IsScannerEntityPointValid(ScannerResult result, Vector2Int position)
+        {
             AdventureMapTile tile = GetTile(position);
             if (tile == null || !tile.IsExplored)
             {
-                RemoveRevealedScannerResult(result);
                 return false;
             }
 
@@ -1258,13 +1314,7 @@ namespace SongsOfConquestAccess.Adapters
 
                 IMapEntity entity = TryGetMapEntity(stableId);
                 AdventureMapTile identityTile;
-                if (entity != null && TryGetMapEntityIdentityTile(entity, null, out identityTile))
-                {
-                    return true;
-                }
-
-                RemoveRevealedScannerResult(result);
-                return false;
+                return entity != null && TryGetMapEntityIdentityTile(entity, null, out identityTile);
             }
 
             return true;
@@ -1822,26 +1872,26 @@ namespace SongsOfConquestAccess.Adapters
             }
         }
 
-        private bool ValidateCommanderZoneOfControlResult(ScannerResult result, Vector2Int position)
+        private Func<Vector2Int, bool> CreateCommanderZoneOfControlPointValidator(ScannerResult result)
         {
             if (!(result.StableReference is int commanderId))
             {
-                return false;
+                return null;
             }
 
             int localTeamId = GetLocalTeamId();
             if (localTeamId < 0)
             {
-                return false;
+                return null;
             }
 
             ICommanderState commander = FindCommanderById(commanderId);
             if (!IsOverlayVisibleZoneOfControlSource(commander) || !IsHostileZoneOfControlSource(commander, localTeamId))
             {
-                return false;
+                return null;
             }
 
-            return ZoneOfControlContains(localTeamId, commanderId, position);
+            return position => IsWithinMap(position) && ZoneOfControlContains(localTeamId, commanderId, position);
         }
 
         private bool IsOverlayVisibleZoneOfControlSource(ICommanderState commander)
@@ -2336,29 +2386,33 @@ namespace SongsOfConquestAccess.Adapters
             }
         }
 
-        private bool ValidateUnexploredScannerResult(ScannerResult result, Vector2Int position)
+        private Func<Vector2Int, bool> CreateUnexploredPointValidator()
         {
-            if (result == null || _selectionHandler == null || _facade == null || _facade.Level == null)
+            if (_selectionHandler == null || _facade == null || _facade.Level == null)
             {
-                return false;
+                return null;
             }
 
             ICommanderState selectedCommander = _selectionHandler.SelectedCommander;
             if (selectedCommander == null || !selectedCommander.IsAlive)
             {
-                return false;
+                return null;
             }
 
             int localTeamId = GetLocalTeamId();
             if (localTeamId < 0)
             {
-                return false;
+                return null;
             }
 
             byte[] exploration = _facade.Level.GetExplorationForTeam(localTeamId);
-            int index = position.y * _facade.Level.Width + position.x;
-            return IsUnexplored(exploration, index, position)
-                && HasFiniteMovementPathToTile(selectedCommander, selectedCommander.TeamId, position);
+            int width = _facade.Level.Width;
+            // The reachability flood walks the whole map, so it is built once
+            // for the refresh rather than once per tile judged.
+            bool[,] reachable = BuildReachableMoveDestinationScan(selectedCommander, selectedCommander.TeamId);
+            return position => IsWithinMap(position)
+                && IsUnexplored(exploration, position.y * width + position.x, position)
+                && reachable[position.x, position.y];
         }
 
         private bool[,] BuildReachableMoveDestinationScan(ICommanderState selectedCommander, int teamId)
@@ -2411,17 +2465,6 @@ namespace SongsOfConquestAccess.Adapters
 
             reachable[x, y] = true;
             queue.Enqueue(point);
-        }
-
-        private bool HasFiniteMovementPathToTile(ICommanderState selectedCommander, int teamId, Vector2Int target)
-        {
-            if (selectedCommander == null || !IsWithinMap(target))
-            {
-                return false;
-            }
-
-            bool[,] reachable = BuildReachableMoveDestinationScan(selectedCommander, teamId);
-            return reachable[target.x, target.y];
         }
 
         private bool IsValidUnexploredMovementDestination(int teamId, Vector2Int point)
