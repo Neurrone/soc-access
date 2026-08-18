@@ -379,7 +379,7 @@ namespace SongsOfConquestAccess.Scanner
 
                         if (instances.Count == 0)
                         {
-                            subcategory.Items.RemoveAt(itemIndex);
+                            subcategory.RemoveItemAt(itemIndex);
                         }
                     }
                 }

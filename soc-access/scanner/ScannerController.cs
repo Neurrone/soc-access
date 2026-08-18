@@ -1334,7 +1334,7 @@ namespace SongsOfConquestAccess.Scanner
                     item.Instances.RemoveAt(_instanceIndex);
                     if (item.Instances.Count == 0)
                     {
-                        subcategory.Items.Remove(item);
+                        subcategory.RemoveItem(item);
                     }
                 }
                 if (_snapshot == null || _snapshot.IsEmpty)

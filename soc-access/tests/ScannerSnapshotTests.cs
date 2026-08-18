@@ -74,6 +74,62 @@ namespace SongsOfConquestAccess.Tests
         }
 
         /// <summary>
+        /// The item cycle walks the items in the order the scope first met
+        /// them, before any sort has a say, which is the order a scope the
+        /// adapter asked to leave alone keeps for good.
+        /// </summary>
+        [TestMethod]
+        public void ItemsKeepTheOrderTheyWereFirstSeenIn()
+        {
+            ScannerSnapshot snapshot = new ScannerSnapshot();
+            snapshot.Add("Pickups", "All", new ScannerResult("pickup:zinc-1", "Zinc", new Vector2Int(9, 0)));
+            snapshot.Add("Pickups", "All", new ScannerResult("pickup:apple", "Apple", new Vector2Int(1, 0)));
+            snapshot.Add("Pickups", "All", new ScannerResult("pickup:zinc-2", "Zinc", new Vector2Int(2, 0)));
+            snapshot.Add("Pickups", "All", new ScannerResult("pickup:berry", "Berry", new Vector2Int(3, 0)));
+
+            ScannerSubcategory subcategory = snapshot.Categories[0].Subcategories[0];
+            Assert.AreEqual(3, subcategory.Items.Count);
+            Assert.AreEqual("Zinc", subcategory.Items[0].Label);
+            Assert.AreEqual("Apple", subcategory.Items[1].Label);
+            Assert.AreEqual("Berry", subcategory.Items[2].Label);
+            Assert.AreEqual(2, subcategory.Items[0].Instances.Count);
+        }
+
+        [TestMethod]
+        public void FlatItemsKeepEveryResultInTheOrderItArrived()
+        {
+            ScannerSnapshot snapshot = new ScannerSnapshot();
+            ScannerSubcategory revealed = snapshot.GetOrAddCategory("Exploration").GetOrAddSubcategory("Revealed");
+            revealed.FlatItems = true;
+            revealed.Add(new ScannerResult("entity:far", "Gold", new Vector2Int(10, 0)));
+            revealed.Add(new ScannerResult("entity:near", "Gold", new Vector2Int(1, 0)));
+
+            Assert.AreEqual(2, revealed.Items.Count);
+            Assert.AreEqual("entity:far", revealed.Items[0].Instances[0].Key);
+            Assert.AreEqual("entity:near", revealed.Items[1].Instances[0].Key);
+        }
+
+        /// <summary>
+        /// An item is found by key on the way in, so one that has lost its last
+        /// instance has to be forgotten by that lookup too. Otherwise the next
+        /// result of the same kind is filed into an item the scope no longer
+        /// holds and is never heard of again.
+        /// </summary>
+        [TestMethod]
+        public void AnItemPrunedAwayAndSeenAgainIsBackInTheScope()
+        {
+            ScannerSnapshot snapshot = new ScannerSnapshot();
+            snapshot.Add("Pickups", "All", new ScannerResult("entity:1", "Gold", new Vector2Int(1, 0)));
+
+            snapshot.PruneByKey("entity:1");
+            snapshot.Add("Pickups", "All", new ScannerResult("entity:2", "Gold", new Vector2Int(2, 0)));
+
+            ScannerSubcategory subcategory = snapshot.Categories[0].Subcategories[0];
+            Assert.AreEqual(1, subcategory.Items.Count);
+            Assert.AreEqual("entity:2", subcategory.Items[0].Instances[0].Key);
+        }
+
+        /// <summary>
         /// Every enemy stack of one unit is one item however the current turn
         /// happens to fall. Which of them the acting troop can hit is what the
         /// player hears walking the instances, not a reason to walk two items.

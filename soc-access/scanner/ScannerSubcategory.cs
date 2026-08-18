@@ -6,6 +6,17 @@ namespace SongsOfConquestAccess.Scanner
     internal sealed class ScannerSubcategory
     {
         private readonly List<ScannerItem> _items = new List<ScannerItem>();
+
+        /// <summary>
+        /// The same items again, by key, purely so adding one does not have to
+        /// walk the ones already there. The list is what defines their order;
+        /// this only answers whether a key has an item yet. A flat scope gives
+        /// every result a key of its own, so a large map put thousands of
+        /// results through that walk inside a single frame.
+        /// </summary>
+        private readonly Dictionary<string, ScannerItem> _itemsByKey =
+            new Dictionary<string, ScannerItem>(StringComparer.Ordinal);
+
         private readonly Func<string> _label;
 
         public ScannerSubcategory(string key, Func<string> label)
@@ -40,6 +51,11 @@ namespace SongsOfConquestAccess.Scanner
         /// </summary>
         public bool PreserveResultOrder { get; set; }
 
+        /// <summary>
+        /// The items in the order the cycle walks them, free to be reordered in
+        /// place. Taking one out is what has to go through
+        /// <see cref="RemoveItem"/> instead, so the key lookup loses it too.
+        /// </summary>
         public List<ScannerItem> Items
         {
             get { return _items; }
@@ -121,17 +137,50 @@ namespace SongsOfConquestAccess.Scanner
 
         public ScannerItem GetOrAddItem(string key)
         {
-            for (int i = 0; i < _items.Count; i++)
+            // The same normalization the item does to its own key, done before
+            // the lookup so a hit costs nothing but the hash.
+            string lookup = key ?? string.Empty;
+            ScannerItem existing;
+            if (_itemsByKey.TryGetValue(lookup, out existing))
             {
-                if (_items[i].Key == key)
-                {
-                    return _items[i];
-                }
+                return existing;
             }
 
-            ScannerItem item = new ScannerItem(key);
+            ScannerItem item = new ScannerItem(lookup);
             _items.Add(item);
+            _itemsByKey.Add(lookup, item);
             return item;
+        }
+
+        /// <summary>
+        /// An item that has lost its last instance leaves both the order and
+        /// the key lookup. Leaving it in the lookup would hand a later result
+        /// with that key an item nothing holds any more, and the result would
+        /// vanish from the scope without a trace.
+        /// </summary>
+        public void RemoveItem(ScannerItem item)
+        {
+            if (item == null)
+            {
+                return;
+            }
+
+            _items.Remove(item);
+            ScannerItem held;
+            if (_itemsByKey.TryGetValue(item.Key, out held) && held == item)
+            {
+                _itemsByKey.Remove(item.Key);
+            }
+        }
+
+        public void RemoveItemAt(int index)
+        {
+            if (index < 0 || index >= _items.Count)
+            {
+                return;
+            }
+
+            RemoveItem(_items[index]);
         }
     }
 }
