@@ -52,6 +52,15 @@ namespace SongsOfConquestAccess.Tests
         }
 
         [TestMethod]
+        public void BuildTurnsCostsNothingWhenThereIsNoStepToCharge()
+        {
+            // The walk is shortened to a single node when the wielder stops
+            // short of a tile it cannot stand on, leaving no step to charge.
+            Assert.AreEqual(0, WielderRoute.BuildTurns(Path(0f), reachableCost: 5f, maxMovement: 12f).Count);
+            Assert.AreEqual(0, WielderRoute.BuildTurns(null, reachableCost: 5f, maxMovement: 12f).Count);
+        }
+
+        [TestMethod]
         public void BuildStepsCountsARunOfStepsInTheSameDirectionAsOne()
         {
             IReadOnlyList<ScannerDirectionStep> steps = WielderRoute.BuildSteps(

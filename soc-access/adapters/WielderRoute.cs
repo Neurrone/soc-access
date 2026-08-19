@@ -118,16 +118,19 @@ namespace SongsOfConquestAccess.Adapters
             }
 
             IReadOnlyList<ScannerDirectionStep> steps = BuildSteps(path);
-            IReadOnlyList<WielderRouteTurn> turns = path.Length < 2
-                ? new List<WielderRouteTurn>()
-                : BuildTurns(path, reachablePoint.travelCost, maxMovement);
+            IReadOnlyList<WielderRouteTurn> turns = BuildTurns(path, reachablePoint.travelCost, maxMovement);
             if (interaction != null)
             {
                 turns = AddInteractionCost(turns, interaction.Cost, commander.MovesLeft, maxMovement);
             }
 
+            if (steps.Count == 0 && interaction == null)
+            {
+                return false;
+            }
+
             route = new WielderRoute(steps, turns, interaction);
-            return steps.Count != 0 || interaction != null;
+            return true;
         }
 
         internal static IReadOnlyList<ScannerDirectionStep> BuildSteps(PathNode[] path)
@@ -160,6 +163,11 @@ namespace SongsOfConquestAccess.Adapters
         internal static IReadOnlyList<WielderRouteTurn> BuildTurns(PathNode[] path, float reachableCost, float maxMovement)
         {
             List<WielderRouteTurn> turns = new List<WielderRouteTurn>();
+            if (path == null || path.Length < 2)
+            {
+                return turns;
+            }
+
             float spentBeforeThisTurn = 0f;
             int currentTurn = GetTravelTurns(path[1].travelCost, reachableCost, maxMovement);
             for (int i = 2; i < path.Length; i++)
