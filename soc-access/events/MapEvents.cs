@@ -1,11 +1,10 @@
-using System;
 using System.Collections.Generic;
-using System.Globalization;
 using UnityEngine;
 using SongsOfConquest.Common.Entities.Adventure;
 using SongsOfConquestAccess.Adapters;
 using SongsOfConquestAccess.Localization;
 using SongsOfConquestAccess.Scanner;
+using SongsOfConquestAccess.Speech.Spatial;
 
 namespace SongsOfConquestAccess.Events
 {
@@ -348,7 +347,7 @@ namespace SongsOfConquestAccess.Events
 
         private static string FormatCost(float cost)
         {
-            return Math.Round(cost, 2).ToString("0.##", CultureInfo.InvariantCulture);
+            return AdventureMapTileSpeechFormatter.FormatMovementNumber(cost);
         }
 
         // Steps follow the scanner's Long directions setting, so a route reads as

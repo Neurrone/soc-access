@@ -390,10 +390,24 @@ namespace SongsOfConquestAccess.Speech.Spatial
                 : ModText.Get(ModStrings.Spatial.FurthestReachableInTurns, turns - 1);
         }
 
+        /// <summary>
+        /// A movement number as it is spoken, to at most two decimals. Shared with the
+        /// route readout so that one cost is never spoken two ways depending on which
+        /// part of the mod happens to be saying it.
+        /// </summary>
+        public static string FormatMovementNumber(float value)
+        {
+            return Math.Round(value, 2).ToString("0.##", CultureInfo.InvariantCulture);
+        }
+
+        /// <summary>
+        /// A movement figure with less than half a point spoken as none, since that much
+        /// buys no step. The rule was written for what a wielder has left, and the tile
+        /// cost readout has shared it from the start.
+        /// </summary>
         private static string FormatMovementValue(float value)
         {
-            float normalized = value < 0.5f ? 0f : value;
-            return Math.Round(normalized, 2).ToString("g2", CultureInfo.InvariantCulture);
+            return FormatMovementNumber(value < 0.5f ? 0f : value);
         }
 
         public static string DescribeMovementCost(AdventureMapTile tile)
