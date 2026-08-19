@@ -401,9 +401,8 @@ namespace SongsOfConquestAccess.Speech.Spatial
         }
 
         /// <summary>
-        /// A movement figure with less than half a point spoken as none, since that much
-        /// buys no step. The rule was written for what a wielder has left, and the tile
-        /// cost readout has shared it from the start.
+        /// Movement a wielder has, with less than half a point spoken as none: that much
+        /// is left over rather than held, since it buys no step.
         /// </summary>
         private static string FormatMovementValue(float value)
         {
@@ -413,7 +412,7 @@ namespace SongsOfConquestAccess.Speech.Spatial
         public static string DescribeMovementCost(AdventureMapTile tile)
         {
             return tile != null && tile.IsExplored && tile.ReachableMovementCost.HasValue
-                ? ModText.Get(ModStrings.Spatial.MovementCost, FormatMovementValue(tile.ReachableMovementCost.Value))
+                ? ModText.Get(ModStrings.Spatial.MovementCost, FormatMovementNumber(tile.ReachableMovementCost.Value))
                 : string.Empty;
         }
 

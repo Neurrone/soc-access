@@ -20,7 +20,7 @@
 - Route preview turn counts now say how long the wait is instead of numbering the turn. A tile you arrive at on the next turn reads as `next turn` rather than `in 2 turns`, and the counts beyond that drop by one to match
 - Setting a wielder's destination now reads what the trip costs and the route it will walk, for example `Cost: 5 this turn, 12 next turn. Aurelia will move 2n, ne, 2e.`, instead of only naming the destination tile. The cost is split over the turns it is spent on, steps walked in the same direction are counted rather than repeated, and the steps follow the scanner's `Long directions` setting
 - Setting a destination on something the wielder acts on now names the action after the route, for example `Cost: 5.5 this turn. Aurelia will move 2n, ne and Claim Gold Mine.`, and names it on its own when the wielder is already standing next to it, which used to fall back to the destination tile because there was nothing to walk. What the interaction costs is now counted in the movement cost, and another wielder is named as an attack or a trade
-- Movement costs are now read to two decimal places wherever they are spoken. A cost of 15.5 used to be read as `16` on the adventure map cursor and in the scanner, and anything above 100 was read in exponential form such as `1.2e+02`
+- Movement costs are now read to two decimal places wherever they are spoken. A cost of 15.5 used to be read as `16` on the adventure map cursor and in the scanner, and anything above 100 was read in exponential form such as `1.2e+02`. A tile costing less than half a point is also no longer read as costing nothing
 
 ## V1.0.0
 

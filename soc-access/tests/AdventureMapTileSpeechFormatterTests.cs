@@ -109,6 +109,23 @@ namespace SongsOfConquestAccess.Tests
         }
 
         [TestMethod]
+        public void DescribeTileReadsACostOfLessThanHalfAPointRatherThanCallingItFree()
+        {
+            AdventureMapTile tile = new AdventureMapTile(new Vector2Int(4, 2))
+            {
+                IsExplored = true,
+                IsVisible = true,
+                IsReachable = true,
+                ReachableMovementCost = 0.4f,
+                Terrain = AdventureTerrainKind.DirtRoad
+            };
+
+            string text = CreateFormatter(enableMovementCost: true).DescribeTile(tile);
+
+            Assert.AreEqual("Dirt road, reachable, 4, 2, Movement cost: 0.4.", text);
+        }
+
+        [TestMethod]
         public void FormatMovementNumberKeepsALargeCostOutOfExponentialForm()
         {
             Assert.AreEqual("123.45", AdventureMapTileSpeechFormatter.FormatMovementNumber(123.45f));
