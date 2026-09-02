@@ -18,6 +18,9 @@ namespace SongsOfConquestAccess.Adapters
     /// deliberately not part of it, so a road tile blocked by an army or a town entrance is
     /// still named; the road really does carry on there, and what stands on it is announced
     /// when the cursor arrives.
+    ///
+    /// The origin is taken on trust: the caller has already decided it is road, and only asks
+    /// about tiles it would name as one.
     /// </summary>
     internal static class RoadConnections
     {
@@ -42,29 +45,22 @@ namespace SongsOfConquestAccess.Adapters
 
         public static IReadOnlyList<ScannerDirection> Compute(Vector2Int origin, Func<Vector2Int, bool> isRoad)
         {
-            if (isRoad == null || !isRoad(origin))
+            if (isRoad == null)
             {
                 return Empty;
             }
 
-            List<ScannerDirection> directions = null;
+            List<ScannerDirection> directions = new List<ScannerDirection>(Neighbours.Length);
             for (int i = 0; i < Neighbours.Length; i++)
             {
                 Neighbour neighbour = Neighbours[i];
-                if (!isRoad(new Vector2Int(origin.x + neighbour.X, origin.y + neighbour.Y)))
+                if (isRoad(new Vector2Int(origin.x + neighbour.X, origin.y + neighbour.Y)))
                 {
-                    continue;
+                    directions.Add(neighbour.Direction);
                 }
-
-                if (directions == null)
-                {
-                    directions = new List<ScannerDirection>(Neighbours.Length);
-                }
-
-                directions.Add(neighbour.Direction);
             }
 
-            return directions ?? (IReadOnlyList<ScannerDirection>)Empty;
+            return directions;
         }
 
         private struct Neighbour

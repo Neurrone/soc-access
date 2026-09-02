@@ -156,14 +156,13 @@ namespace SongsOfConquestAccess.Tests
             {
                 IsExplored = true,
                 IsVisible = true,
-                Terrain = AdventureTerrainKind.DirtRoad,
-                IsReachable = true,
-                RoadDirections = new[] { ScannerDirection.East, ScannerDirection.West }
+                Terrain = AdventureTerrainKind.DirtRoad
             };
+            tile.SetRoadDirectionsSource(() => new[] { ScannerDirection.East, ScannerDirection.West });
 
             string text = CreateFormatter().DescribeTile(tile);
 
-            Assert.AreEqual("Dirt road e w, reachable, 4, 2.", text);
+            Assert.AreEqual("Dirt road, e w, 4, 2.", text);
         }
 
         [TestMethod]
@@ -173,19 +172,18 @@ namespace SongsOfConquestAccess.Tests
             {
                 IsExplored = true,
                 IsVisible = true,
-                Terrain = AdventureTerrainKind.CobblestoneRoad,
-                IsReachable = true,
-                RoadDirections = new[]
-                {
-                    ScannerDirection.North,
-                    ScannerDirection.East,
-                    ScannerDirection.Southwest
-                }
+                Terrain = AdventureTerrainKind.CobblestoneRoad
             };
+            tile.SetRoadDirectionsSource(() => new[]
+            {
+                ScannerDirection.North,
+                ScannerDirection.East,
+                ScannerDirection.Southwest
+            });
 
             string text = CreateFormatter().DescribeTile(tile);
 
-            Assert.AreEqual("Cobblestone road n e sw, reachable, 4, 2.", text);
+            Assert.AreEqual("Cobblestone road, n e sw, 4, 2.", text);
         }
 
         [TestMethod]
@@ -195,20 +193,18 @@ namespace SongsOfConquestAccess.Tests
             {
                 IsExplored = true,
                 IsVisible = true,
-                Terrain = AdventureTerrainKind.DirtRoad,
-                IsReachable = true,
-                RoadDirections = new[] { ScannerDirection.East, ScannerDirection.West }
+                Terrain = AdventureTerrainKind.DirtRoad
             };
+            tile.SetRoadDirectionsSource(() => new[] { ScannerDirection.East, ScannerDirection.West });
 
             string text = new AdventureMapTileSpeechFormatter(
                 GetDefaultOrder,
                 (group, element) => element.Key != AdventureMapAnnouncementDefinitions.TileKeys.MovementCost
                     && element.DefaultEnabled,
                 (group, element) => element.DefaultSuffix,
-                () => true,
                 () => true).DescribeTile(tile);
 
-            Assert.AreEqual("Dirt road east west, reachable, 4, 2.", text);
+            Assert.AreEqual("Dirt road, east west, 4, 2.", text);
         }
 
         [TestMethod]
@@ -219,9 +215,9 @@ namespace SongsOfConquestAccess.Tests
                 IsExplored = true,
                 IsVisible = true,
                 Terrain = AdventureTerrainKind.Grass,
-                IsReachable = true,
-                RoadDirections = new ScannerDirection[0]
+                IsReachable = true
             };
+            tile.SetRoadDirectionsSource(() => new ScannerDirection[0]);
 
             string text = CreateFormatter().DescribeTile(tile);
 
@@ -248,10 +244,9 @@ namespace SongsOfConquestAccess.Tests
             string text = new AdventureMapTileSpeechFormatter(
                 GetDefaultOrder,
                 (group, element) => element.Key != AdventureMapAnnouncementDefinitions.TileKeys.MovementCost
+                    && element.Key != AdventureMapAnnouncementDefinitions.TileKeys.RoadDirections
                     && element.DefaultEnabled,
-                (group, element) => element.DefaultSuffix,
-                () => false,
-                () => false).DescribeTile(tile);
+                (group, element) => element.DefaultSuffix).DescribeTile(tile);
 
             Assert.AreEqual("Dirt road, reachable, 4, 2.", text);
             Assert.AreEqual(0, calls, "turning road directions off should not cost the work of finding them");

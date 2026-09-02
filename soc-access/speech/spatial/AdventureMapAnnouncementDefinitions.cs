@@ -15,6 +15,7 @@ namespace SongsOfConquestAccess.Speech.Spatial
             new AnnouncementElementDefinition(TileKeys.ReachabilityOrRoutePreview, ModStrings.Screens.AnnouncementReachabilityOrRoutePreview),
             new AnnouncementElementDefinition(TileKeys.ZoneOfControl, ModStrings.Screens.AnnouncementZoneOfControl),
             new AnnouncementElementDefinition(TileKeys.Terrain, ModStrings.Screens.AnnouncementTerrain),
+            new AnnouncementElementDefinition(TileKeys.RoadDirections, ModStrings.Screens.AnnouncementRoadDirections),
             new AnnouncementElementDefinition(TileKeys.Coordinates, ModStrings.Screens.AnnouncementCoordinates),
             new AnnouncementElementDefinition(TileKeys.MovementCost, ModStrings.Screens.AnnouncementMovementCost, defaultEnabled: false));
 
@@ -56,6 +57,16 @@ namespace SongsOfConquestAccess.Speech.Spatial
             MapEntity
         };
 
+        /// <summary>
+        /// The element that decides whether the ways a road carries on are worked out at all.
+        /// Looked up here so that the settings screen and the skip navigator ask the same
+        /// question rather than each spelling out the key.
+        /// </summary>
+        public static AnnouncementElementDefinition RoadDirectionsElement
+        {
+            get { return Tile.GetElement(TileKeys.RoadDirections); }
+        }
+
         public static class TileKeys
         {
             public const string ExplorationState = "exploration_state";
@@ -65,6 +76,7 @@ namespace SongsOfConquestAccess.Speech.Spatial
             public const string ReachabilityOrRoutePreview = "reachability_or_route_preview";
             public const string ZoneOfControl = "zone_of_control";
             public const string Terrain = "terrain";
+            public const string RoadDirections = "road_directions";
             public const string Coordinates = "coordinates";
             public const string MovementCost = "movement_cost";
         }

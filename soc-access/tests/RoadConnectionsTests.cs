@@ -83,9 +83,16 @@ namespace SongsOfConquestAccess.Tests
         }
 
         [TestMethod]
-        public void TileWithoutRoadCarriesOnNowhere()
+        public void OriginIsTakenOnTrustSoOnlyTheNeighboursAreAsked()
         {
-            AssertDirections(Compute(new Vector2Int(4, 4), HorizontalRoad(10, 0, 20)));
+            // Whether the tile you are standing on is road is the adapter's call, made from the
+            // same terrain it names the tile by. Compute is only ever handed a road, so it asks
+            // about the eight around it and nothing else.
+            AssertDirections(
+                Compute(new Vector2Int(10, 11), HorizontalRoad(10, 0, 20)),
+                ScannerDirection.Southwest,
+                ScannerDirection.South,
+                ScannerDirection.Southeast);
         }
 
         [TestMethod]

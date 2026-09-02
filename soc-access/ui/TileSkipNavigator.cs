@@ -67,7 +67,8 @@ namespace SongsOfConquestAccess.UI
             bool isReachable,
             bool hasBookmark,
             string occupantKind,
-            int occupantId)
+            int occupantId,
+            bool isRoadFork)
         {
             Visibility = visibility;
             Terrain = terrain;
@@ -75,6 +76,7 @@ namespace SongsOfConquestAccess.UI
             HasBookmark = hasBookmark;
             OccupantKind = occupantKind ?? string.Empty;
             OccupantId = occupantId;
+            IsRoadFork = isRoadFork;
         }
 
         public AdventureTileVisibility Visibility { get; private set; }
@@ -89,7 +91,15 @@ namespace SongsOfConquestAccess.UI
 
         public int OccupantId { get; private set; }
 
-        public static AdventureTileSkipSignature FromTile(AdventureMapTile tile, bool hasBookmark)
+        /// <summary>
+        /// Set only when road directions are being announced, so a skip that would otherwise
+        /// run past a junction stops on it. A road painted two tiles wide makes a run of tiles
+        /// that are all forks; they share this signature and are still skipped over together,
+        /// which is right: the run is one junction, not several.
+        /// </summary>
+        public bool IsRoadFork { get; private set; }
+
+        public static AdventureTileSkipSignature FromTile(AdventureMapTile tile, bool hasBookmark, bool stopsAtRoadForks)
         {
             if (tile == null)
             {
@@ -99,7 +109,8 @@ namespace SongsOfConquestAccess.UI
                     false,
                     hasBookmark,
                     string.Empty,
-                    -1);
+                    -1,
+                    false);
             }
 
             string occupantKind = string.Empty;
@@ -126,7 +137,8 @@ namespace SongsOfConquestAccess.UI
                 tile.IsReachable,
                 hasBookmark,
                 occupantKind,
-                occupantId);
+                occupantId,
+                stopsAtRoadForks && tile.IsRoadFork);
         }
 
         public bool Equals(AdventureTileSkipSignature other)
@@ -137,7 +149,8 @@ namespace SongsOfConquestAccess.UI
                 && IsReachable == other.IsReachable
                 && HasBookmark == other.HasBookmark
                 && OccupantKind == other.OccupantKind
-                && OccupantId == other.OccupantId;
+                && OccupantId == other.OccupantId
+                && IsRoadFork == other.IsRoadFork;
         }
 
         public override bool Equals(object obj)
@@ -155,6 +168,7 @@ namespace SongsOfConquestAccess.UI
                 hash = hash * 31 + HasBookmark.GetHashCode();
                 hash = hash * 31 + OccupantKind.GetHashCode();
                 hash = hash * 31 + OccupantId;
+                hash = hash * 31 + IsRoadFork.GetHashCode();
                 return hash;
             }
         }

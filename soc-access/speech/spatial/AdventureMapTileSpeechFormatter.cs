@@ -12,7 +12,6 @@ namespace SongsOfConquestAccess.Speech.Spatial
         private readonly Func<AnnouncementGroupDefinition, IReadOnlyList<string>> _getOrder;
         private readonly Func<AnnouncementGroupDefinition, AnnouncementElementDefinition, bool> _isEnabled;
         private readonly Func<AnnouncementGroupDefinition, AnnouncementElementDefinition, bool> _includeSuffix;
-        private readonly Func<bool> _readsRoadDirections;
         private readonly Func<bool> _usesLongRoadDirections;
 
         public AdventureMapTileSpeechFormatter()
@@ -20,7 +19,6 @@ namespace SongsOfConquestAccess.Speech.Spatial
                 ModSettings.GetAnnouncementOrder,
                 ModSettings.GetAnnouncementElementEnabled,
                 ModSettings.GetAnnouncementElementSuffix,
-                () => ModSettings.AdventureMapReadsRoadDirections,
                 () => ModSettings.AdventureMapUsesLongRoadDirections)
         {
         }
@@ -29,13 +27,11 @@ namespace SongsOfConquestAccess.Speech.Spatial
             Func<AnnouncementGroupDefinition, IReadOnlyList<string>> getOrder,
             Func<AnnouncementGroupDefinition, AnnouncementElementDefinition, bool> isEnabled,
             Func<AnnouncementGroupDefinition, AnnouncementElementDefinition, bool> includeSuffix,
-            Func<bool> readsRoadDirections = null,
             Func<bool> usesLongRoadDirections = null)
         {
             _getOrder = getOrder;
             _isEnabled = isEnabled;
             _includeSuffix = includeSuffix;
-            _readsRoadDirections = readsRoadDirections ?? (() => true);
             _usesLongRoadDirections = usesLongRoadDirections ?? (() => false);
         }
 
@@ -136,7 +132,7 @@ namespace SongsOfConquestAccess.Speech.Spatial
             bool hasContent = !string.IsNullOrWhiteSpace(wielder)
                 || !string.IsNullOrWhiteSpace(mapEntity)
                 || !string.IsNullOrWhiteSpace(interactionPoint);
-            string terrain = AppendRoadDirections(DescribeTerrain(tile.Terrain), tile);
+            string terrain = DescribeTerrain(tile.Terrain);
             bool appendRouteToTerrain = tile.IsExplored
                 && !hasContent
                 && !string.IsNullOrWhiteSpace(terrain)
@@ -161,6 +157,12 @@ namespace SongsOfConquestAccess.Speech.Spatial
             if (!string.IsNullOrWhiteSpace(terrain))
             {
                 yield return new AnnouncementPart(AdventureMapAnnouncementDefinitions.TileKeys.Terrain, terrain);
+            }
+
+            string roadDirections = DescribeRoadDirections(tile);
+            if (!string.IsNullOrWhiteSpace(roadDirections))
+            {
+                yield return new AnnouncementPart(AdventureMapAnnouncementDefinitions.TileKeys.RoadDirections, roadDirections);
             }
 
             yield return new AnnouncementPart(AdventureMapAnnouncementDefinitions.TileKeys.Coordinates, DescribeCoordinates(tile));
@@ -435,38 +437,44 @@ namespace SongsOfConquestAccess.Speech.Spatial
         }
 
         /// <summary>
-        /// Adds the neighbouring tiles a road carries on into, as bare direction words after the
-        /// terrain name, so a road reads as "Dirt road e w". Every direction named is a neighbour
-        /// that is road as well, which is what lets a curve be followed a step at a time. Naming
-        /// a shape on top of that would only make the tile slower to hear, so the directions are
-        /// left to speak for themselves.
+        /// The neighbouring tiles a road carries on into, as bare direction words, so a road
+        /// reads as "Dirt road, e w". Every direction named is a neighbour that is road as well,
+        /// which is what lets a curve be followed a step at a time. Naming a shape on top of that
+        /// would only make the tile slower to hear, so the directions are left to speak for
+        /// themselves.
         /// </summary>
-        internal string AppendRoadDirections(string terrain, AdventureMapTile tile)
+        internal string DescribeRoadDirections(AdventureMapTile tile)
         {
-            // Checked before reading the tile, which only works out its road directions when
-            // something asks, so turning this off costs nothing rather than costing it anyway.
-            if (tile == null || string.IsNullOrWhiteSpace(terrain) || !_readsRoadDirections())
+            // Asked before reading the tile, which only works out its road directions when
+            // something asks, so turning the element off costs nothing rather than costing the
+            // work and then throwing the answer away.
+            if (tile == null || !IsRoadDirectionsEnabled())
             {
-                return terrain;
+                return string.Empty;
             }
 
             IReadOnlyList<ScannerDirection> directions = tile.RoadDirections;
             if (directions == null || directions.Count == 0)
             {
-                return terrain;
+                return string.Empty;
             }
 
             bool useLongForm = _usesLongRoadDirections();
-            string text = terrain;
+            List<string> words = new List<string>(directions.Count);
             for (int i = 0; i < directions.Count; i++)
             {
-                text = ModText.Get(
-                    ModStrings.Spatial.RoadDirectionJoin,
-                    text,
-                    ScannerDirectionUtility.FormatDirection(directions[i], useLongForm));
+                words.Add(ScannerDirectionUtility.FormatDirection(directions[i], useLongForm));
             }
 
-            return text;
+            return ModText.JoinList(ModStrings.Spatial.RoadDirectionSeparator, words);
+        }
+
+        private bool IsRoadDirectionsEnabled()
+        {
+            AnnouncementElementDefinition element = AdventureMapAnnouncementDefinitions.RoadDirectionsElement;
+            return _isEnabled == null
+                || element == null
+                || _isEnabled(AdventureMapAnnouncementDefinitions.Tile, element);
         }
 
         private static string DescribeTerrain(AdventureTerrainKind terrain)

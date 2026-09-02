@@ -43,6 +43,7 @@ namespace SongsOfConquestAccess.Adapters
         private const ushort FallenBeaconBlueprintId = 158;
         private static readonly PropertyInfo InstallerContainerProperty =
             AccessTools.Property(typeof(AdventureViewInstaller), "Container");
+        private static readonly ScannerDirection[] NoRoadDirections = new ScannerDirection[0];
 
         private readonly DiContainer _container;
         private readonly IClientAdventureFacade _facade;
@@ -441,7 +442,13 @@ namespace SongsOfConquestAccess.Adapters
             }
 
             tile.Terrain = GetTerrain(clamped);
-            tile.SetRoadDirectionsSource(() => GetRoadDirections(clamped, localTeamId));
+            if (IsRoadTerrain(tile.Terrain))
+            {
+                // GetTerrain answers with the surface terrain whenever there is one, so a tile
+                // named as road is exactly a tile whose surface is road. Asking here saves the
+                // probe from having to rule the origin out for itself.
+                tile.SetRoadDirectionsSource(() => GetRoadDirections(clamped, localTeamId));
+            }
             ICommanderState selectedCommander = _selectionHandler.SelectedCommander;
             tile.IsImpassable = float.IsPositiveInfinity(_facade.Level.GetStaticTravelCost(localTeamId, clamped));
             tile.IsBlocked = !tile.IsImpassable && !_facade.Level.IsValidMoveDestination(localTeamId, clamped);
@@ -3624,12 +3631,19 @@ namespace SongsOfConquestAccess.Adapters
         }
 
         /// <summary>
-        /// The neighbouring tiles a road carries on into, or an empty list when this is not a
-        /// road. Bridges count as road so a route does not appear to stop dead at every water
-        /// crossing.
+        /// The neighbouring tiles a road carries on into, given a tile already known to be road.
+        /// Bridges count as road so a route does not appear to stop dead at every water crossing.
         /// </summary>
         private IReadOnlyList<ScannerDirection> GetRoadDirections(Vector2Int position, int localTeamId)
         {
+            // The nine tiles this looks at each ask the fog and the level about a point, which
+            // is only answerable once the fog has finished loading. Mid-load and teardown the
+            // road simply carries on nowhere rather than faulting a whole tile announcement.
+            if (!IsFogReady())
+            {
+                return NoRoadDirections;
+            }
+
             return RoadConnections.Compute(position, tile => IsRoadTile(tile, localTeamId));
         }
 
@@ -3661,14 +3675,7 @@ namespace SongsOfConquestAccess.Adapters
                 return true;
             }
 
-            try
-            {
-                return _fogManager.IsVisible(position);
-            }
-            catch (Exception)
-            {
-                return false;
-            }
+            return _fogManager.IsVisible(position);
         }
 
         private bool IsPointExplored(byte fog, bool visible, Vector2Int position, int localTeamId)
@@ -3678,14 +3685,7 @@ namespace SongsOfConquestAccess.Adapters
                 return true;
             }
 
-            try
-            {
-                return _facade.Level.GetIsPointExplored(localTeamId, position);
-            }
-            catch (Exception)
-            {
-                return false;
-            }
+            return _facade.Level.GetIsPointExplored(localTeamId, position);
         }
 
         /// <summary>
