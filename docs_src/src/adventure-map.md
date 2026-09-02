@@ -59,7 +59,7 @@ The route is then named as a run of steps at a time, with the number of tiles in
 
 When the destination is something the wielder acts on rather than somewhere it stands, the action is named after the last step, for example `Cost: 5.5 this turn. Aurelia will move 2n, ne and Claim Gold Mine.` If the wielder is already standing next to it there is nothing to walk, so the action is all that is read, for example `Cost: 0.5 this turn. Aurelia will Claim Gold Mine.` An action that costs no movement drops the cost, reading as `Aurelia will Visit Watermill.`
 
-The action and the name of the thing acted on are the game's own, the same wording its tooltip uses. Another wielder is named the same way, as `Attack` for a hostile one and `Trade` for your own or a partner's, and neither is named while that side is in a battle, since the game does not allow it then.
+The action and the name of the thing acted on are the game's own, the same wording its tooltip uses, and like the tooltip it is only named for something the wielder has not visited yet, so a wielder sent to a mine its side already holds is read as a walk. Another wielder is named the same way, as `Attack` for a hostile one and `Trade` for your own or a partner's, and neither is named while that side is in a battle, since the game does not allow it then.
 
 If the route cannot be worked out, this falls back to naming the destination tile instead.
 

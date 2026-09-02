@@ -256,6 +256,15 @@ namespace SongsOfConquestAccess.Adapters
                     return null;
                 }
 
+                // The game's tooltip names an action only for something the wielder
+                // has not visited yet. For a claimable that means not held by its
+                // team already, so a wielder sent to its own mine is not told it
+                // will claim it.
+                if (entity.DidVisit(commander.Id))
+                {
+                    return null;
+                }
+
                 AdventureInteractionType interactionType;
                 string action = AdventureMapEntityLabel.TryGetInteractionType(facade, commander.Id, entity, out interactionType)
                     ? GameText.Get(
