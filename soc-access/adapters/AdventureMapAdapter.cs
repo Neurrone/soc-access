@@ -673,73 +673,27 @@ namespace SongsOfConquestAccess.Adapters
 
         private RoutePreviewInfo BuildRoutePreviewInfo(ICommanderState selectedCommander, int localTeamId)
         {
-            if (selectedCommander == null
-                || selectedCommander.Destination == null
-                || !selectedCommander.Destination.HasDestination
-                || localTeamId < 0)
+            if (IsSecondaryInputHolding())
+            {
+                return null;
+            }
+
+            WielderPath path;
+            if (!WielderPath.TryBuild(_facade, selectedCommander, localTeamId, out path) || path.Nodes.Length < 2)
             {
                 return null;
             }
 
             Vector2Int destination = selectedCommander.Destination.Destination;
-            if (IsSecondaryInputHolding()
-                || destination == selectedCommander.Position
-                || !_facade.Level.IsPointWithinMapForTravel(destination)
-                || !_facade.Level.GetIsPointExplored(selectedCommander.TeamId, destination)
-                || _facade.Teams.IsNotInCurrentTurn(localTeamId))
-            {
-                return null;
-            }
-
-            PathNode[] fullPath = _facade.Level.PointsInPath(localTeamId, selectedCommander.Position, destination, (PathfinderCacheType)0);
-            if (!PathfinderExtensions.GetIsValid(fullPath))
-            {
-                return null;
-            }
-
-            PathNode[] drawPath = fullPath.ToArray();
-            if (drawPath.Length == 0)
-            {
-                return null;
-            }
-
-            Vector2Int originalLastPoint = ToVector2Int(drawPath[drawPath.Length - 1]);
-            if (!_facade.Level.IsValidMoveDestination(localTeamId, originalLastPoint))
-            {
-                Array.Resize(ref drawPath, drawPath.Length - 1);
-            }
-
-            if (drawPath.Length < 2)
-            {
-                return null;
-            }
-
-            PathNode reachablePoint = _facade.Level.GetClosestReachablePoint(
-                localTeamId,
-                selectedCommander.Position,
-                destination,
-                selectedCommander.MovesLeft);
-            int reachableIndex = FindNodeIndex(drawPath, reachablePoint);
-            if (reachableIndex < 0)
-            {
-                reachableIndex = 0;
-                reachablePoint = drawPath[0];
-            }
-
-            float maxMovement = selectedCommander.Stats != null && selectedCommander.Stats.Movement != null
-                ? selectedCommander.Stats.Movement.GetValue()
-                : 0f;
-            if (maxMovement <= 0f)
-            {
-                maxMovement = 1f;
-            }
+            PathNode[] drawPath = path.Nodes;
+            PathNode reachablePoint = path.ReachablePoint;
 
             RoutePreviewInfo preview = new RoutePreviewInfo
             {
                 Destination = destination,
                 ReachablePoint = reachablePoint,
-                ReachableIndex = reachableIndex,
-                MaxMovement = maxMovement,
+                ReachableIndex = path.ReachableIndex,
+                MaxMovement = path.MaxMovement,
                 IsInteractableDestination = IsInteractableDestination(selectedCommander, destination, localTeamId)
             };
             preview.CanInteractDestinationThisTurn = preview.IsInteractableDestination
@@ -753,7 +707,7 @@ namespace SongsOfConquestAccess.Adapters
                 tileInfo.Kind = point == destination
                     ? AdventureMapTile.PathIndicatorKind.Destination
                     : AdventureMapTile.PathIndicatorKind.OnRoute;
-                tileInfo.TravelTurns = GetTravelTurns(node.travelCost, reachablePoint.travelCost, maxMovement);
+                tileInfo.TravelTurns = path.GetTravelTurns(node.travelCost);
                 tileInfo.HasRoutePreview = true;
                 if (point == destination)
                 {
@@ -764,14 +718,14 @@ namespace SongsOfConquestAccess.Adapters
 
             RouteTileInfo destinationInfo = preview.GetOrCreate(destination);
             destinationInfo.Kind = AdventureMapTile.PathIndicatorKind.Destination;
-            destinationInfo.TravelTurns = GetTravelTurns(drawPath[drawPath.Length - 1].travelCost, reachablePoint.travelCost, maxMovement);
+            destinationInfo.TravelTurns = path.GetTravelTurns(drawPath[drawPath.Length - 1].travelCost);
             destinationInfo.IsInteractable = preview.IsInteractableDestination;
             destinationInfo.CanInteractThisTurn = preview.CanInteractDestinationThisTurn;
             destinationInfo.HasRoutePreview = true;
             preview.DestinationTravelTurns = destinationInfo.TravelTurns;
 
             AddReachableBoundaryMarkers(preview, drawPath);
-            AddCostMarks(preview, drawPath, reachableIndex);
+            AddCostMarks(preview, drawPath, path.ReachableIndex);
             return preview;
         }
 
@@ -927,41 +881,6 @@ namespace SongsOfConquestAccess.Adapters
                 && _inputManager.Screen.Secondary != null
                 && _inputManager.Screen.Secondary.IsActive
                 && _inputManager.Screen.Secondary.IsHolding;
-        }
-
-        private static int GetTravelTurns(float nodeCost, float reachableCost, float maxMovement)
-        {
-            if (nodeCost <= reachableCost + 0.001f)
-            {
-                return 1;
-            }
-
-            return 1 + Mathf.CeilToInt((nodeCost - reachableCost) / maxMovement);
-        }
-
-        private static int FindNodeIndex(PathNode[] path, PathNode node)
-        {
-            if (path == null)
-            {
-                return -1;
-            }
-
-            for (int i = 0; i < path.Length; i++)
-            {
-                if (SameNode(path[i], node))
-                {
-                    return i;
-                }
-            }
-
-            return -1;
-        }
-
-        private static bool SameNode(PathNode left, PathNode right)
-        {
-            return left.point.x == right.point.x
-                && left.point.y == right.point.y
-                && Mathf.Abs(left.travelCost - right.travelCost) < 0.001f;
         }
 
         private static Vector2Int ToVector2Int(PathNode node)

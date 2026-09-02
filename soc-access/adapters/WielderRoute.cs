@@ -14,9 +14,9 @@ namespace SongsOfConquestAccess.Adapters
 {
     /// <summary>
     /// The route a wielder will walk to reach its destination, as the steps it
-    /// takes and the movement it spends on each turn along the way. This is the
-    /// same path the game draws as a route preview, so the turn ordinals here
-    /// agree with the ones on the preview markers.
+    /// takes and the movement it spends on each turn along the way. It reads the
+    /// walk from <see cref="WielderPath"/>, the same path the game draws as a route
+    /// preview, so the turn ordinals here agree with the ones on the preview markers.
     /// </summary>
     internal sealed class WielderRoute
     {
@@ -66,7 +66,9 @@ namespace SongsOfConquestAccess.Adapters
 
             int localTeamId = facade.Teams.LocalTeamInControlId;
             Vector2Int destination = commander.Destination.Destination;
-            if (localTeamId < 0 || destination == commander.Position)
+
+            WielderPath path;
+            if (!WielderPath.TryBuild(facade, commander, localTeamId, out path))
             {
                 return false;
             }
@@ -79,49 +81,11 @@ namespace SongsOfConquestAccess.Adapters
                 commander,
                 destination);
 
-            PathNode[] path;
-            PathNode reachablePoint;
-            try
-            {
-                path = facade.Level.PointsInPath(localTeamId, commander.Position, destination);
-                if (!PathfinderExtensions.GetIsValid(path) || path.Length < 2)
-                {
-                    return false;
-                }
-
-                // The wielder stops short of a tile it cannot stand on, such as
-                // a building it walks up to and interacts with. Standing next to
-                // that tile already leaves nothing to walk.
-                if (!facade.Level.IsValidMoveDestination(localTeamId, ToVector2Int(path[path.Length - 1])))
-                {
-                    Array.Resize(ref path, path.Length - 1);
-                }
-
-                reachablePoint = facade.Level.GetClosestReachablePoint(
-                    localTeamId,
-                    commander.Position,
-                    destination,
-                    commander.MovesLeft);
-            }
-            catch (Exception exception)
-            {
-                SocAccessPlugin.Instance?.LogWarning("WielderRoute could not path to the destination: " + exception.Message);
-                return false;
-            }
-
-            float maxMovement = commander.Stats != null && commander.Stats.Movement != null
-                ? commander.Stats.Movement.GetValue()
-                : 0f;
-            if (maxMovement <= 0f)
-            {
-                maxMovement = 1f;
-            }
-
-            IReadOnlyList<ScannerDirectionStep> steps = BuildSteps(path);
-            IReadOnlyList<WielderRouteTurn> turns = BuildTurns(path, reachablePoint.travelCost, maxMovement);
+            IReadOnlyList<ScannerDirectionStep> steps = BuildSteps(path.Nodes);
+            IReadOnlyList<WielderRouteTurn> turns = BuildTurns(path.Nodes, path.ReachablePoint.travelCost, path.MaxMovement);
             if (interaction != null)
             {
-                turns = AddInteractionCost(turns, interaction.Cost, commander.MovesLeft, maxMovement);
+                turns = AddInteractionCost(turns, interaction.Cost, commander.MovesLeft, path.MaxMovement);
             }
 
             if (steps.Count == 0 && interaction == null)
@@ -169,10 +133,10 @@ namespace SongsOfConquestAccess.Adapters
             }
 
             float spentBeforeThisTurn = 0f;
-            int currentTurn = GetTravelTurns(path[1].travelCost, reachableCost, maxMovement);
+            int currentTurn = WielderPath.GetTravelTurns(path[1].travelCost, reachableCost, maxMovement);
             for (int i = 2; i < path.Length; i++)
             {
-                int travelTurns = GetTravelTurns(path[i].travelCost, reachableCost, maxMovement);
+                int travelTurns = WielderPath.GetTravelTurns(path[i].travelCost, reachableCost, maxMovement);
                 if (travelTurns == currentTurn)
                 {
                     continue;
@@ -354,18 +318,6 @@ namespace SongsOfConquestAccess.Adapters
             {
                 turns.Add(new WielderRouteTurn(travelTurns, cost));
             }
-        }
-
-        // Matches the ordinal the game paints on its route preview markers,
-        // counting the current turn as 1.
-        private static int GetTravelTurns(float nodeCost, float reachableCost, float maxMovement)
-        {
-            if (nodeCost <= reachableCost + 0.001f)
-            {
-                return 1;
-            }
-
-            return 1 + Mathf.CeilToInt((nodeCost - reachableCost) / maxMovement);
         }
 
         private static Vector2Int ToVector2Int(PathNode node)
