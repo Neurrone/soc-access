@@ -2550,6 +2550,11 @@ msgctxt "Spatial.Road"
 msgid "Road"
 msgstr "道路"
 
+#. Spatial.RoadDirectionSeparator
+msgctxt "Spatial.RoadDirectionSeparator"
+msgid "{0} {1}"
+msgstr "{0}、{1}"
+
 #. Spatial.ShallowWater
 msgctxt "Spatial.ShallowWater"
 msgid "Shallow water"
@@ -3100,6 +3105,16 @@ msgstr "扫描器内容播报"
 msgctxt "Screens.ScannerUsesLongDirections"
 msgid "Long directions"
 msgstr "方向使用完整名称"
+
+#. Screens.AnnouncementRoadDirections
+msgctxt "Screens.AnnouncementRoadDirections"
+msgid "Road directions"
+msgstr "道路方向"
+
+#. Screens.AdventureMapUsesLongRoadDirections
+msgctxt "Screens.AdventureMapUsesLongRoadDirections"
+msgid "Long road directions"
+msgstr "道路方向使用完整名称"
 
 #. Screens.ScannerResultAnnouncements
 msgctxt "Screens.ScannerResultAnnouncements"

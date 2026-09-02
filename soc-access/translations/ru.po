@@ -2580,6 +2580,11 @@ msgctxt "Spatial.Road"
 msgid "Road"
 msgstr "Дорога"
 
+#. Spatial.RoadDirectionSeparator
+msgctxt "Spatial.RoadDirectionSeparator"
+msgid "{0} {1}"
+msgstr "{0} {1}"
+
 #. Spatial.ShallowWater
 msgctxt "Spatial.ShallowWater"
 msgid "Shallow water"
@@ -3140,6 +3145,16 @@ msgstr "Объявления содержимого сканера"
 msgctxt "Screens.ScannerUsesLongDirections"
 msgid "Long directions"
 msgstr "Полные названия направлений"
+
+#. Screens.AnnouncementRoadDirections
+msgctxt "Screens.AnnouncementRoadDirections"
+msgid "Road directions"
+msgstr "Направления дороги"
+
+#. Screens.AdventureMapUsesLongRoadDirections
+msgctxt "Screens.AdventureMapUsesLongRoadDirections"
+msgid "Long road directions"
+msgstr "Полные названия направлений дороги"
 
 #. Screens.ScannerResultAnnouncements
 msgctxt "Screens.ScannerResultAnnouncements"

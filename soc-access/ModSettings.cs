@@ -27,6 +27,7 @@ namespace SongsOfConquestAccess
         private static ConfigEntry<bool> _readStoryCameraFocusChanges;
         private static ConfigEntry<bool> _tileCuesEnabled;
         private static ConfigEntry<bool> _scannerUsesLongDirections;
+        private static ConfigEntry<bool> _adventureMapUsesLongRoadDirections;
         private static readonly Dictionary<string, AnnouncementGroupConfig> _announcementGroups =
             new Dictionary<string, AnnouncementGroupConfig>();
         private static readonly Dictionary<string, AudioCueConfig> _audioCues =
@@ -54,6 +55,11 @@ namespace SongsOfConquestAccess
             get { return _scannerUsesLongDirections != null && _scannerUsesLongDirections.Value; }
         }
 
+        public static bool AdventureMapUsesLongRoadDirections
+        {
+            get { return _adventureMapUsesLongRoadDirections != null && _adventureMapUsesLongRoadDirections.Value; }
+        }
+
         public static void Bind(ConfigFile config)
         {
             _config = config;
@@ -77,6 +83,11 @@ namespace SongsOfConquestAccess
                 "ScannerUsesLongDirections",
                 false,
                 "Whether spoken directions use the long form (\"3 northeast\") instead of the short form (\"3ne\").");
+            _adventureMapUsesLongRoadDirections = config.Bind(
+                "AdventureMap",
+                "UseLongRoadDirections",
+                false,
+                "Whether road directions use the long form (\"east west\") instead of the short form (\"e w\").");
             BindAnnouncementGroups(config);
             BindAudioCues(config);
             BindScannerCustomCategories(config);
@@ -220,6 +231,17 @@ namespace SongsOfConquestAccess
             }
 
             SaveAndInvalidateCue(cueKey);
+        }
+
+        public static void SetAdventureMapUsesLongRoadDirections(bool value)
+        {
+            if (_adventureMapUsesLongRoadDirections == null)
+            {
+                return;
+            }
+
+            _adventureMapUsesLongRoadDirections.Value = value;
+            _config?.Save();
         }
 
         public static void SetScannerUsesLongDirections(bool value)
@@ -466,6 +488,7 @@ namespace SongsOfConquestAccess
             _readStoryCameraFocusChanges = null;
             _tileCuesEnabled = null;
             _scannerUsesLongDirections = null;
+            _adventureMapUsesLongRoadDirections = null;
             _announcementGroups.Clear();
             _audioCues.Clear();
             _scannerCustomCategories.Clear();

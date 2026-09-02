@@ -2550,6 +2550,11 @@ msgctxt "Spatial.Road"
 msgid "Road"
 msgstr "道"
 
+#. Spatial.RoadDirectionSeparator
+msgctxt "Spatial.RoadDirectionSeparator"
+msgid "{0} {1}"
+msgstr "{0}、{1}"
+
 #. Spatial.ShallowWater
 msgctxt "Spatial.ShallowWater"
 msgid "Shallow water"
@@ -3100,6 +3105,16 @@ msgstr "スキャナー内容の通知"
 msgctxt "Screens.ScannerUsesLongDirections"
 msgid "Long directions"
 msgstr "方角を省略しない"
+
+#. Screens.AnnouncementRoadDirections
+msgctxt "Screens.AnnouncementRoadDirections"
+msgid "Road directions"
+msgstr "道の方角"
+
+#. Screens.AdventureMapUsesLongRoadDirections
+msgctxt "Screens.AdventureMapUsesLongRoadDirections"
+msgid "Long road directions"
+msgstr "道の方角を省略しない"
 
 #. Screens.ScannerResultAnnouncements
 msgctxt "Screens.ScannerResultAnnouncements"

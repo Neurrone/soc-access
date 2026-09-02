@@ -14,6 +14,22 @@ Tiles within the movement range of the currently selected wielder are indicated 
 
 Tiles that cannot be entered because of terrain are announced as impassable. Tiles that are otherwise blocked by game state, such as an occupying unit or blocking map entity, are announced as blocked.
 
+### Following Roads
+
+A road tile names the neighbouring tiles the road carries on into, straight after the terrain, so a road running east to west reads as `Dirt road, e w` and a fork reads as `Dirt road, n e w`. Every direction named is a neighbour that is road as well, so you can follow a road by stepping in one of the directions it just gave you.
+
+The number of directions tells you the shape without spending a word on it: one direction means the road ends where you are standing, two means it passes through, and three or more means it forks.
+
+Roads are not always one tile wide. On a road that has been painted wider, a tile borders road on several sides and names all of them, so expect more directions there than the road has ways to go.
+
+Bridges count as road, so a route does not appear to stop dead at a water crossing. A road running into unexplored ground contributes no direction, so it reads as though it ended until you explore further.
+
+The directions are a `Road directions` element in `Tile announcements` on the adventure map tab, on by default. Turn it off, move it elsewhere in the tile announcement, or change whether it takes a suffix, the same as any other element.
+
+`Long road directions`, a checkbox on the adventure map tab, reads them as `east west` instead of `e w`. It is separate from the scanner's own `Long directions` setting, so the map and the scanner can differ.
+
+While road directions are on, the shift+arrow keys also stop on a fork, so you can run along a road and be put down where it branches instead of sailing past. Turn the element off and they run past forks as before.
+
 A tile can be in one of three visibility states:
 
 - Currently visible: in view radius of your wielder or building
