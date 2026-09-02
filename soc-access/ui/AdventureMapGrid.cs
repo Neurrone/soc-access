@@ -353,11 +353,16 @@ namespace SongsOfConquestAccess.UI
         private bool SkipMove(int xDelta, int yDelta)
         {
             HydrateBookmarks();
+            // Asked once for the whole sweep rather than per tile: a skip walks a whole row, and
+            // with road directions turned off no tile is ever asked to work its forks out.
+            bool stopsAtRoadForks = ModSettings.GetAnnouncementElementEnabled(
+                AdventureMapAnnouncementDefinitions.Tile,
+                AdventureMapAnnouncementDefinitions.RoadDirectionsElement);
             TileSkipResult result = TileSkipNavigator.FindTarget(
                 _cursorTile,
                 point => new Vector2Int(point.x + xDelta, point.y + yDelta),
                 point => _adapter != null && _adapter.IsValidMapTile(point),
-                point => AdventureTileSkipSignature.FromTile(_adapter.GetTile(point), HasBookmark(point)));
+                point => AdventureTileSkipSignature.FromTile(_adapter.GetTile(point), HasBookmark(point), stopsAtRoadForks));
             if (result.Target == _cursorTile)
             {
                 CueLibrary.PlayCue(CueLibrary.MoveDenied);

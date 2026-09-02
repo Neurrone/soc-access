@@ -2580,8 +2580,8 @@ msgctxt "Spatial.Road"
 msgid "Road"
 msgstr "Дорога"
 
-#. Spatial.RoadDirectionJoin
-msgctxt "Spatial.RoadDirectionJoin"
+#. Spatial.RoadDirectionSeparator
+msgctxt "Spatial.RoadDirectionSeparator"
 msgid "{0} {1}"
 msgstr "{0} {1}"
 
@@ -3146,8 +3146,8 @@ msgctxt "Screens.ScannerUsesLongDirections"
 msgid "Long directions"
 msgstr "Повні назви напрямків"
 
-#. Screens.AdventureMapReadsRoadDirections
-msgctxt "Screens.AdventureMapReadsRoadDirections"
+#. Screens.AnnouncementRoadDirections
+msgctxt "Screens.AnnouncementRoadDirections"
 msgid "Road directions"
 msgstr "Напрямки дороги"
 

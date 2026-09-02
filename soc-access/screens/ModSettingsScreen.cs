@@ -81,18 +81,12 @@ namespace SongsOfConquestAccess.Screens
                 () => ModSettings.ReadStoryCameraFocusChanges,
                 IsGeneralTabSelected));
             root.AddChild(new CheckboxWidget(
-                "mod-settings-adventure-map-reads-road-directions",
-                ModText.Get(ModStrings.Screens.AdventureMapReadsRoadDirections),
-                ToggleAdventureMapReadsRoadDirections,
-                () => ModSettings.AdventureMapReadsRoadDirections,
-                IsAdventureMapTabSelected));
-            root.AddChild(new CheckboxWidget(
                 "mod-settings-adventure-map-uses-long-road-directions",
                 ModText.Get(ModStrings.Screens.AdventureMapUsesLongRoadDirections),
                 ToggleAdventureMapUsesLongRoadDirections,
                 () => ModSettings.AdventureMapUsesLongRoadDirections,
                 IsAdventureMapTabSelected,
-                () => ModSettings.AdventureMapReadsRoadDirections));
+                IsRoadDirectionsAnnounced));
             root.AddChild(new ButtonWidget(
                 "mod-settings-adventure-map-tile-announcements",
                 ModText.Get(ModStrings.Screens.TileAnnouncements),
@@ -315,14 +309,21 @@ namespace SongsOfConquestAccess.Screens
             ModSettings.SetScannerUsesLongDirections(!ModSettings.ScannerUsesLongDirections);
         }
 
-        private static void ToggleAdventureMapReadsRoadDirections()
-        {
-            ModSettings.SetAdventureMapReadsRoadDirections(!ModSettings.AdventureMapReadsRoadDirections);
-        }
-
         private static void ToggleAdventureMapUsesLongRoadDirections()
         {
             ModSettings.SetAdventureMapUsesLongRoadDirections(!ModSettings.AdventureMapUsesLongRoadDirections);
+        }
+
+        /// <summary>
+        /// Whether the tile announcement still names the ways a road carries on. Turning that
+        /// element off leaves nothing for the long form to lengthen, so this checkbox goes with
+        /// it rather than sitting there doing nothing.
+        /// </summary>
+        private static bool IsRoadDirectionsAnnounced()
+        {
+            return ModSettings.GetAnnouncementElementEnabled(
+                AdventureMapAnnouncementDefinitions.Tile,
+                AdventureMapAnnouncementDefinitions.RoadDirectionsElement);
         }
 
         private static bool OpenCustomCategoriesScreen(ScannerTaxonomy taxonomy, ModString contextLabel)

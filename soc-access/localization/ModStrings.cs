@@ -163,7 +163,7 @@ namespace SongsOfConquestAccess.Localization
             public static readonly ModString RangeAndMovement = new ModString("Spatial.RangeAndMovement", "{0} and movement range");
             public static readonly ModString Reachable = new ModString("Spatial.Reachable", "reachable");
             public static readonly ModString Road = new ModString("Spatial.Road", "Road");
-            public static readonly ModString RoadDirectionJoin = new ModString("Spatial.RoadDirectionJoin", "{0} {1}");
+            public static readonly ModString RoadDirectionSeparator = new ModString("Spatial.RoadDirectionSeparator", "{0} {1}");
             public static readonly ModString Sand = new ModString("Spatial.Sand", "Sand");
             public static readonly ModString ShallowWater = new ModString("Spatial.ShallowWater", "Shallow water");
             public static readonly ModPluralString SkippedTileCount = new ModPluralString("Spatial.SkippedTileCount", "Skipped {0} tile", "Skipped {0} tiles");
@@ -587,7 +587,6 @@ namespace SongsOfConquestAccess.Localization
             public static readonly ModString Scanner = new ModString("Screens.Scanner", "Scanner");
             public static readonly ModString ScannerContentAnnouncements = new ModString("Screens.ScannerContentAnnouncements", "Scanner content announcements");
             public static readonly ModString ScannerUsesLongDirections = new ModString("Screens.ScannerUsesLongDirections", "Long directions");
-            public static readonly ModString AdventureMapReadsRoadDirections = new ModString("Screens.AdventureMapReadsRoadDirections", "Road directions");
             public static readonly ModString AdventureMapUsesLongRoadDirections = new ModString("Screens.AdventureMapUsesLongRoadDirections", "Long road directions");
             public static readonly ModString ScannerResultAnnouncements = new ModString("Screens.ScannerResultAnnouncements", "Scanner result announcements");
             public static readonly ModString SettlementTroops = new ModString("Screens.SettlementTroops", "settlement troops");
@@ -656,6 +655,7 @@ namespace SongsOfConquestAccess.Localization
             public static readonly ModString AnnouncementReachabilityOrRoutePreview = new ModString("Screens.AnnouncementReachabilityOrRoutePreview", "Reachability or route preview");
             public static readonly ModString AnnouncementRelationship = new ModString("Screens.AnnouncementRelationship", "Relationship");
             public static readonly ModString AnnouncementResultPosition = new ModString("Screens.AnnouncementResultPosition", "Result position");
+            public static readonly ModString AnnouncementRoadDirections = new ModString("Screens.AnnouncementRoadDirections", "Road directions");
             public static readonly ModString AnnouncementSelected = new ModString("Screens.AnnouncementSelected", "Selected");
             public static readonly ModString AnnouncementSelectedForSpellcast = new ModString("Screens.AnnouncementSelectedForSpellcast", "Selected for spellcast");
             public static readonly ModString AnnouncementSpawnPoint = new ModString("Screens.AnnouncementSpawnPoint", "Spawn point");

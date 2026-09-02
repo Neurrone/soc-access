@@ -136,6 +136,21 @@ namespace SongsOfConquestAccess.Localization
 
         public static string JoinListWithCommas(ILocalizationHandler localization, IReadOnlyList<string> parts)
         {
+            return JoinList(localization, ModStrings.Common.ListSeparator, parts);
+        }
+
+        /// <summary>
+        /// Runs the parts together with the given two-placeholder separator, folding from the
+        /// left. Every language sees the same pair of neighbouring parts, so a locale that puts
+        /// them the other way round only has to say so once in its own separator.
+        /// </summary>
+        public static string JoinList(ModString separator, IReadOnlyList<string> parts)
+        {
+            return JoinList(GetCurrentLocalization(), separator, parts);
+        }
+
+        public static string JoinList(ILocalizationHandler localization, ModString separator, IReadOnlyList<string> parts)
+        {
             if (parts == null || parts.Count == 0)
             {
                 return string.Empty;
@@ -158,7 +173,7 @@ namespace SongsOfConquestAccess.Localization
             string text = nonEmptyParts[0];
             for (int i = 1; i < nonEmptyParts.Count; i++)
             {
-                text = Get(localization, ModStrings.Common.ListSeparator, text, nonEmptyParts[i]);
+                text = Get(localization, separator, text, nonEmptyParts[i]);
             }
 
             return text;

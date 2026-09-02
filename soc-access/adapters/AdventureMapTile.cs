@@ -111,12 +111,15 @@ namespace SongsOfConquestAccess.Adapters
 
                 return _roadDirections;
             }
+        }
 
-            set
-            {
-                _roadDirections = value ?? NoRoadDirections;
-                _roadDirectionsSource = null;
-            }
+        /// <summary>
+        /// Whether the road branches here rather than merely passing through. Three neighbours
+        /// carrying road is the fork: one is a dead end and two is a road going somewhere.
+        /// </summary>
+        public bool IsRoadFork
+        {
+            get { return RoadDirections.Count >= 3; }
         }
 
         /// <summary>Defers working out the road directions until something asks for them.</summary>

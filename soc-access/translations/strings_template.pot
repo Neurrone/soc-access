@@ -669,8 +669,8 @@ msgctxt "Spatial.Road"
 msgid "Road"
 msgstr ""
 
-#. Spatial.RoadDirectionJoin
-msgctxt "Spatial.RoadDirectionJoin"
+#. Spatial.RoadDirectionSeparator
+msgctxt "Spatial.RoadDirectionSeparator"
 msgid "{0} {1}"
 msgstr ""
 
@@ -2679,11 +2679,6 @@ msgctxt "Screens.ScannerUsesLongDirections"
 msgid "Long directions"
 msgstr ""
 
-#. Screens.AdventureMapReadsRoadDirections
-msgctxt "Screens.AdventureMapReadsRoadDirections"
-msgid "Road directions"
-msgstr ""
-
 #. Screens.AdventureMapUsesLongRoadDirections
 msgctxt "Screens.AdventureMapUsesLongRoadDirections"
 msgid "Long road directions"
@@ -3012,6 +3007,11 @@ msgstr ""
 #. Screens.AnnouncementResultPosition
 msgctxt "Screens.AnnouncementResultPosition"
 msgid "Result position"
+msgstr ""
+
+#. Screens.AnnouncementRoadDirections
+msgctxt "Screens.AnnouncementRoadDirections"
+msgid "Road directions"
 msgstr ""
 
 #. Screens.AnnouncementSelected
