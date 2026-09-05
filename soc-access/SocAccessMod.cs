@@ -65,9 +65,7 @@ namespace SongsOfConquestAccess
             _speechService = new SpeechService(Logger);
             _speechAvailable = _speechService.Initialize();
             Logger.LogInfo("Speech initialization result: " + _speechAvailable);
-            bool muteSpeech = _host.Config.Bind("Dev", "muteSpeech", false,
-                "Development only: log and capture speech without voicing it. run-game.ps1 -NoSpeech sets this.").Value;
-            SpeechPipeline.Initialize(_speechService, muteSpeech);
+            SpeechPipeline.Initialize(_speechService, _host.MuteSpeech);
             _reviewBufferManager = new ReviewBufferManager();
             _reviewBufferController = new ReviewBufferController(_reviewBufferManager);
             _adventureMapScannerState = new AdventureMapScannerState();

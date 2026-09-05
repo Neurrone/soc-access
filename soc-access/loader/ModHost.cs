@@ -33,6 +33,13 @@ namespace SongsOfConquestAccess.Loader
             get { return _plugin.Config; }
         }
 
+        /// <summary>Whether this launch was asked to keep the screen reader silent (the one-shot
+        /// muteSpeech setting, already cleared in the file). Survives hot reloads.</summary>
+        public bool MuteSpeech
+        {
+            get { return _plugin.MuteSpeech; }
+        }
+
         public void LogInfo(string message)
         {
             LoaderLog.Info(message);

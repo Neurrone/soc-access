@@ -23,6 +23,10 @@ namespace SongsOfConquestAccess.Loader
         private Action _modUpdate;
         private int _maxFrameRate;
 
+        /// <summary>Whether this launch was asked to keep the screen reader silent. Held here
+        /// rather than re-read by the mod so a hot reload stays muted.</summary>
+        internal bool MuteSpeech { get; private set; }
+
         private void Awake()
         {
             LoaderLog.Install(Logger.LogInfo, Logger.LogWarning, Logger.LogError);
@@ -34,6 +38,14 @@ namespace SongsOfConquestAccess.Loader
                     + "the game burns in a virtual machine with no GPU acceleration. 0 disables the "
                     + "cap and leaves the game's own frame rate and vertical sync settings untouched.");
             _maxFrameRate = maxFrameRate.Value;
+            // One-shot on purpose: a persistent mute once silenced the owner's own launch after a
+            // development run, so the switch covers only the launch that reads it.
+            var muteSpeech = Config.Bind("Dev", "muteSpeech", false,
+                "Development only: mute the screen reader for the NEXT launch only, while the dev "
+                    + "server still captures every line. Written back to false as soon as it is "
+                    + "read. run-game.ps1 -NoSpeech sets it.");
+            MuteSpeech = muteSpeech.Value;
+            if (muteSpeech.Value) muteSpeech.Value = false;
             _dev = new DevServer(this);
             _mods = new ModLoader(this, _dev, pluginDirectory);
             _dev.Mods = _mods;

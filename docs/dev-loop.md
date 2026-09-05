@@ -11,7 +11,10 @@ are `soc-access/loader/` (loader side) and `soc-access/dev/` (mod side).
 Off by default for players: `devServer = true` under `[Dev]` in
 `BepInEx\config\songs.of.conquest.access.cfg` turns the server on, and `muteSpeech = true`
 in the same section keeps the screen reader silent while `/speech` still captures every
-line; `run-game.ps1` writes both (`-NoDev`, `-NoSpeech`). The environment variables
+line; `run-game.ps1` writes both (`-NoDev`, `-NoSpeech`). `muteSpeech` is one-shot: the
+loader writes it back to `false` as soon as it has read it, so it covers the launch the
+script made and never the owner's next launch from Steam (a hot reload stays muted, the
+loader remembers the answer). The environment variables
 `SOCACCESS_NO_DEV=1`, `SOCACCESS_DEV_PORT` and `SOCACCESS_NO_SPEECH=1` do the same, but only
 for a game started by hand: `SongsOfConquest.exe` hands itself to Steam, which relaunches it
 without the launcher's environment, which is why the config file is the switch. The server
