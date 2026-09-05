@@ -69,6 +69,19 @@ Mod routes answer 404 while the mod is down:
   leaf for diffing. Side-effect free: two calls answer identically. Multi-position widgets
   (map grid, hex grids, inventory grid, army exchange grid, announcement order menu, codex
   content) print one placeholder line each. Grammar in `dev-server-plan.md` §5.
+- `GET /gui/unity?path=&depth=&visibleOnly=&fields=`: the game's own UI read as accessible
+  meaning - the coverage baseline the mod's tree is diffed against. Per node `name`, `kind`
+  (button/toggle/slider/dropdown/input/text/image/canvas/panel), `text` (markup stripped),
+  `tooltip` (read without hovering), `value`, `interactable` (computed over the whole ancestor
+  chain), `visible` when false, and `rect` as `[x,y,w,h]` in screen pixels with a top-left
+  origin, which is what `crop-shot.ps1` crops by. Roots are every root canvas in the loaded
+  scenes, topmost sorting order first; the top-level `windows` array names them all, visible or
+  not, so a caller can pick a `path=`. `path=` matches a root by name, then any named transform
+  under the roots (exact, then case-insensitive substring); a name nothing answers to is a 404
+  carrying `windows[]`, and a match emptied by `depth=` or `visibleOnly=` says which. Decoration
+  is pruned, but a node at the `depth=` frontier is kept and carries `"more": true`. `fields=`
+  answers plain text instead: one line per node, two spaces of indent per level, the requested
+  fields separated by ` | `. Side-effect free: it never hovers, selects or focuses anything.
 - `POST /loadsave`: body = save name (empty = newest), through the game's own load menu.
   Answers `{"result":"loading '<name>'"}` once the native load button was clicked, 404 for a
   name that is not a save, 422 with the menu's details text when the game itself refuses
@@ -80,6 +93,15 @@ Mod routes answer 404 while the mod is down:
   continue" screen (`State()` says `loading`); the route keeps watching for up to five
   minutes and presses it natively, so waiting for `ingame` is enough. A game loaded some
   other way is continued with `/eval DevProbe.ContinueLoading()`.
+- `POST /key?hold=MS&gap=MS&text=1`: body = a key sequence pressed as real OS key events at
+  the game's window (`Return`, `Escape`, `Ctrl+I`, `Shift+Tab`, `DownArrow`; `+Name` holds
+  and `-Name` releases; `text=1` types the body's characters). Unity `KeyCode` names plus
+  `Ctrl`, `Shift`, `Alt`, `Enter`. The only route where a key is physically down, so the only
+  way to exercise the mod's raw `InputSystem.onEvent` subscription, the release debounce, and
+  the game's own handling of the same key. It raises the game window and REFUSES with 409,
+  sending nothing, unless the foreground window then belongs to the game, re-checked before
+  every step; 400 for a key name it does not know (the answer lists the vocabulary). It
+  takes the desktop's focus while it runs, so never call it while the owner is working.
 
 Every route declares its query parameters; an undeclared one answers 400 naming it. A
 bodyless POST answers 411 before any handler runs: always send a body, even an empty one.

@@ -34,6 +34,9 @@ namespace SongsOfConquestAccess.Dev
     ///   GET  /gui/widgets?buffers=1&amp;flat=1
     ///                           the accessible tree of the top screen (see <see cref="WidgetDump"/>)
     ///   POST /input             body = an action key; run it as a keypress would
+    ///   POST /key?hold=MS&amp;gap=MS&amp;text=1
+    ///                           body = a key sequence (or, with text=1, characters); pressed as REAL
+    ///                           OS key events at the game's window (see RawKeyboard)
     ///   POST /loadsave          body = a save name, or empty for the most recent save
     ///
     /// /speech reads the thread-safe buffer straight from the HTTP thread; /status and /gui/widgets
@@ -97,7 +100,16 @@ namespace SongsOfConquestAccess.Dev
             _host.RegisterRoute("GET", "/status", Status);
             _host.RegisterRoute("GET", "/speech", Speech, "since", "wait");
             _host.RegisterRoute("GET", "/gui/widgets", Widgets, "buffers", "flat");
+            _host.RegisterRoute(
+                "GET",
+                "/gui/unity",
+                request => UnityDump.Route(request, _host),
+                "path",
+                "depth",
+                "visibleOnly",
+                "fields");
             _host.RegisterRoute("POST", "/input", Input);
+            _host.RegisterRoute("POST", "/key", Key, "hold", "gap", "text");
             _host.RegisterRoute("POST", "/loadsave", LoadSave);
         }
 
@@ -252,6 +264,77 @@ namespace SongsOfConquestAccess.Dev
                     json.WriteValue(key);
                     json.WritePropertyName("outcome");
                     json.WriteValue(injection.Outcome);
+                    json.WritePropertyName("speech");
+                    json.WriteStartArray();
+                    foreach (SpeechLog.Entry entry in spoken)
+                    {
+                        json.WriteValue(entry.Text);
+                    }
+
+                    json.WriteEndArray();
+                    json.WriteEndObject();
+                })
+            );
+        }
+
+        /// <summary>
+        /// Press keys the way a hand presses them - real OS key events at the game's window
+        /// (<see cref="RawKeyboard"/>) - and report what the mod said about them.
+        ///
+        /// The one route that is NOT a shortcut into the mod: /input runs an action with no key
+        /// physically down, and everything that branches on a key being down (the router's raw
+        /// InputSystem subscription and its release debounce, the game's own reading of the same
+        /// key) is invisible to it. This is how those are tested.
+        ///
+        /// Never on the main thread: a sequence holds keys down across frames, so the game has to keep
+        /// running while it is sent.
+        /// </summary>
+        private DevResponse Key(DevRequest request)
+        {
+            int hold = request.QueryInt("hold", RawKeyboard.DefaultHoldMilliseconds);
+            int gap = request.QueryInt("gap", RawKeyboard.DefaultGapMilliseconds);
+            if (hold < 0 || gap < 0)
+            {
+                return DevResponse.Json(
+                    400,
+                    DevJson.Error("hold= and gap= are milliseconds, and cannot be negative")
+                );
+            }
+
+            bool asText;
+            DevResponse bad = Flag(request, "text", out asText);
+            if (bad != null)
+            {
+                return bad;
+            }
+
+            string body = request.Body ?? string.Empty;
+            long spokenBefore = _speech.Cursor;
+            RawKeyboard.Result result = asText
+                ? RawKeyboard.Type(body, gap)
+                : RawKeyboard.Send(body, hold, gap);
+            if (!result.Ok)
+            {
+                // 409 for "the game does not have the foreground" - the caller can fix that one and
+                // ask again; 400 for a key name or a body the route cannot make sense of.
+                return DevResponse.Json(result.Refused ? 409 : 400, DevJson.Error(result.Error));
+            }
+
+            List<SpeechLog.Entry> spoken = Settled(spokenBefore);
+            return DevResponse.Json(
+                DevJson.Write(json =>
+                {
+                    json.WriteStartObject();
+                    json.WritePropertyName("ok");
+                    json.WriteValue(true);
+                    json.WritePropertyName("sent");
+                    json.WriteStartArray();
+                    foreach (string step in result.Sent)
+                    {
+                        json.WriteValue(step);
+                    }
+
+                    json.WriteEndArray();
                     json.WritePropertyName("speech");
                     json.WriteStartArray();
                     foreach (SpeechLog.Entry entry in spoken)
@@ -713,7 +796,7 @@ namespace SongsOfConquestAccess.Dev
         /// <summary>A query flag written either way callers write one: 1/0 or true/false. False for
         /// a value that is neither, so the route can say so rather than quietly using its default.
         /// </summary>
-        private static bool ParseFlag(string text, bool fallback, out bool value)
+        internal static bool ParseFlag(string text, bool fallback, out bool value)
         {
             value = fallback;
             if (text == null)
