@@ -21,6 +21,7 @@ namespace SongsOfConquestAccess.Loader
         private DevServer _dev;
         private ModLoader _mods;
         private Action _modUpdate;
+        private int _maxFrameRate;
 
         private void Awake()
         {
@@ -28,6 +29,11 @@ namespace SongsOfConquestAccess.Loader
             string pluginDirectory = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
             var devServer = Config.Bind("Dev", "devServer", false,
                 "Enable the loopback developer HTTP server on http://127.0.0.1:8772. Development only; leave off to play.");
+            var maxFrameRate = Config.Bind("Performance", "maxFrameRate", 0,
+                "Development only: cap the frame rate to this many frames per second, to cut the CPU "
+                    + "the game burns in a virtual machine with no GPU acceleration. 0 disables the "
+                    + "cap and leaves the game's own frame rate and vertical sync settings untouched.");
+            _maxFrameRate = maxFrameRate.Value;
             _dev = new DevServer(this);
             _mods = new ModLoader(this, _dev, pluginDirectory);
             _dev.Mods = _mods;
@@ -37,6 +43,7 @@ namespace SongsOfConquestAccess.Loader
 
         private void Update()
         {
+            ApplyFrameRateCap();
             _dev.Tick();
             Action update = _modUpdate;
             if (update == null) return;
@@ -52,6 +59,18 @@ namespace SongsOfConquestAccess.Loader
         {
             if (_mods != null) _mods.Unload();
             if (_dev != null) _dev.Stop();
+        }
+
+        private void ApplyFrameRateCap()
+        {
+            if (_maxFrameRate <= 0) return;
+
+            // The game's own FrameRateManager writes both of these whenever the video settings
+            // are applied (SetRefreshRateDivider turns vertical sync on and resets the target
+            // frame rate), long after this plugin wakes. So the cap is re-asserted every frame,
+            // not set once. Application.targetFrameRate is ignored while vertical sync is on.
+            if (QualitySettings.vSyncCount != 0) QualitySettings.vSyncCount = 0;
+            if (Application.targetFrameRate != _maxFrameRate) Application.targetFrameRate = _maxFrameRate;
         }
 
         internal void SetModUpdateHandler(Action update) { _modUpdate = update; }

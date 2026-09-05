@@ -17,6 +17,12 @@ for a game started by hand: `SongsOfConquest.exe` hands itself to Steam, which r
 without the launcher's environment, which is why the config file is the switch. The server
 binds `http://127.0.0.1:8772` only.
 
+`maxFrameRate = N` under `[Performance]` in the same file caps the game at N frames per second
+(0, the default, leaves the game alone), re-asserted every frame because the game's own
+`FrameRateManager` rewrites the target rate and vertical sync whenever video settings are
+applied. It exists for a development machine without GPU acceleration; nothing writes it, so
+set it once by hand. It is read by the loader at start, so a change needs a game restart.
+
 The REPL needs `mcs.dll` next to the loader DLL; the build deploys it and the release ships
 it too, as Endless Space 2's does (the evaluator is built on the first `/eval`, so with the
 server off the file is never loaded).
@@ -152,14 +158,13 @@ builds, launches `SongsOfConquest.exe`, turns the server on, and drives the load
 `.\wait-game.ps1 ingame` blocks until the map is up (exit 1 prints the state it saw, exit 2
 means the process died). Both are run from the PowerShell tool. One game at a time: the
 script refuses to launch over a running one and never kills anything; `POST /quit` first
-(the process is gone about 6 s later). On a Steam install the game boots twice: the process
-the script starts loads BepInEx, the loader and the mod, answers on 8772, then the game's
-own Steam check (`RestartAppIfNecessary` in `Bitwave.Platform.Steam`) asks Steam to relaunch
-it and exits; the script tracks the second process and only talks to a server that process
-owns. Anything else polling the port during boot can be answered by the first process. A
-GOG install has no relaunch and the script tracks the process it started. The relaunched
-process is a full Steam session: the DLCs the account owns read as owned
-(`IAddonManager.OwnsAddons`).
+(the process is gone about 6 s later). A Steam install (recognised by its app manifest) is
+launched through `steam://rungameid/867210`; a GOG install starts the executable. Never start
+`SongsOfConquest.exe` by hand on a Steam install: it boots BepInEx, the loader and the mod,
+answers on 8772, then the game's own Steam check (`RestartAppIfNecessary` in
+`Bitwave.Platform.Steam`) asks Steam to relaunch it and exits, and that relaunch was seen to
+fail. The Steam-launched process is a full Steam session: the DLCs the account owns read as
+owned (`IAddonManager.OwnsAddons`).
 
 **Reload.** `dotnet build soc-access\soc-access.csproj` (deploys) → `POST /reload` →
 poll `GET /loader/status` until `modLoaded:true` with `staleBuild:false` and the new

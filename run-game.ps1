@@ -103,28 +103,34 @@ $cfgText = Set-DevSetting $cfgText 'muteSpeech' $(if ($NoSpeech) { 'true' } else
 New-Item -ItemType Directory -Force (Split-Path $cfgPath) | Out-Null
 Set-Content $cfgPath $cfgText -Encoding utf8
 
-# On a Steam install the process this starts is not the game that runs: it boots Unity,
+# A Steam install is launched through Steam. Started directly, the executable boots Unity,
 # BepInEx, the loader and the mod - far enough that its dev server answers - and then the
-# game's own Steam check asks Steam to relaunch it and exits. So the pid worth tracking is the
-# second process, found by name once it exists; the first one is excluded by pid so its short
-# life is never mistaken for the game. A GOG install has no such check: the process started
-# here keeps running, and the fallback below tracks it. Nothing here assumes Steam.
-$launcher = Start-Process "$gameDir\SongsOfConquest.exe" -WorkingDirectory $gameDir -PassThru
+# game's own Steam check asks Steam to relaunch it and exits; that relaunch was seen to fail
+# outright, and while it works it leaves a first process answering the dev port. The install
+# is recognised by its Steam app manifest, so a GOG install (no manifest) starts the
+# executable itself and keeps that process. Nothing here assumes Steam.
+$steamManifest = Join-Path (Split-Path (Split-Path $gameDir -Parent) -Parent) 'appmanifest_867210.acf'
+$launcher = $null
+if (Test-Path $steamManifest) {
+    Start-Process 'steam://rungameid/867210'
+} else {
+    $launcher = Start-Process "$gameDir\SongsOfConquest.exe" -WorkingDirectory $gameDir -PassThru
+}
 $proc = $null
 $deadline = (Get-Date).AddSeconds(60)
 while ((Get-Date) -lt $deadline) {
     $proc = Get-LiveGameProcess |
-        Where-Object { -not $_.HasExited -and $_.Id -ne $launcher.Id } |
+        Where-Object { -not $_.HasExited -and ($null -eq $launcher -or $_.Id -ne $launcher.Id) } |
         Select-Object -First 1
     if ($proc) { break }
     Start-Sleep -Milliseconds 500
 }
 if (-not $proc) {
-    if (-not $launcher.HasExited) {
-        # No relaunch happened (Steam not involved); the process started here is the game.
+    if ($launcher -and -not $launcher.HasExited) {
+        # The process started here is the game (no Steam handoff happened).
         $proc = $launcher
     } else {
-        Write-Error "Songs of Conquest did not appear within 60s of launching (launcher pid $($launcher.Id) exited without a relaunch). On a Steam install, is Steam running?"
+        Write-Error "Songs of Conquest did not appear within 60s of launching. On a Steam install, is Steam running and the game not already open?"
         exit 1
     }
 }
