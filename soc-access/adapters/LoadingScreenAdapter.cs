@@ -40,6 +40,33 @@ namespace SongsOfConquestAccess.Adapters
             }
         }
 
+        // What a key press does on the "press any key to continue" screen: LoadingScreenMenu.Tick
+        // calls FinalizeLoadingScreen once any input is held while the scene loader is waiting
+        // for finalization. Invoking the same method is the native path minus the key.
+        public bool Continue()
+        {
+            if (!IsPresent())
+            {
+                return false;
+            }
+
+            object sceneLoader = AccessTools.Field(typeof(LoadingScreenMenu), "_sceneLoader")?.GetValue(_menu);
+            object state = sceneLoader != null ? Traverse.Create(sceneLoader).Property("State").GetValue() : null;
+            if (state == null || state.ToString() != "WaitingForFinalization")
+            {
+                return false;
+            }
+
+            System.Reflection.MethodInfo finalize = AccessTools.Method(typeof(LoadingScreenMenu), "FinalizeLoadingScreen");
+            if (finalize == null)
+            {
+                return false;
+            }
+
+            finalize.Invoke(_menu, null);
+            return true;
+        }
+
         public bool IsPresent()
         {
             if (_menu == null || !_menu.Active)

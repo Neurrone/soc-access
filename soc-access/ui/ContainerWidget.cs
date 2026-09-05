@@ -55,6 +55,11 @@ namespace SongsOfConquestAccess.UI
             _children.Add(child);
         }
 
+        internal override IEnumerable<Widget> EnumerateChildren()
+        {
+            return _children;
+        }
+
         public Widget GetChildAt(int index)
         {
             if (index < 0 || index >= _children.Count)

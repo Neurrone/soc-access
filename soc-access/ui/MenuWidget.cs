@@ -88,6 +88,11 @@ namespace SongsOfConquestAccess.UI
             _items.Add(item);
         }
 
+        internal override IEnumerable<Widget> EnumerateChildren()
+        {
+            return _items;
+        }
+
         public bool SetFocusedItemById(string id)
         {
             if (string.IsNullOrWhiteSpace(id))

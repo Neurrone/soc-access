@@ -16,6 +16,7 @@ namespace SongsOfConquestAccess.Input
         private readonly ScreenManager _screenManager;
         private readonly Dictionary<string, ActiveBindingState> _activeBindings =
             new Dictionary<string, ActiveBindingState>();
+        private readonly Queue<Injection> _injections = new Queue<Injection>();
         private IDisposable _rawInputSubscription;
 
         public AccessibilityInputRouter(ScreenManager screenManager)
@@ -39,7 +40,101 @@ namespace SongsOfConquestAccess.Input
 
         public void Update()
         {
+            DrainInjections();
             ConfirmPendingReleases();
+        }
+
+        /// <summary>
+        /// Queue an action to be run as though its key had been pressed, and hand back the ticket
+        /// the caller waits on. Enqueued rather than run here because the dev server's HTTP thread
+        /// is not the Unity main thread, and drained at the top of <see cref="Update"/> so it lands
+        /// at the same point in the frame a real key press does - the same claim check, the same
+        /// silence, the same dispatch.
+        ///
+        /// It deliberately does not touch <see cref="_activeBindings"/>: no physical key is down,
+        /// so there is no release to wait for and nothing to debounce.
+        /// </summary>
+        internal Injection Inject(InputAction action)
+        {
+            Injection injection = new Injection
+            {
+                Action = action,
+                ActionKey = action != null ? action.Key : string.Empty,
+            };
+            lock (_injections)
+            {
+                _injections.Enqueue(injection);
+            }
+
+            return injection;
+        }
+
+        private void DrainInjections()
+        {
+            while (true)
+            {
+                Injection injection;
+                lock (_injections)
+                {
+                    if (_injections.Count == 0)
+                    {
+                        return;
+                    }
+
+                    injection = _injections.Dequeue();
+                }
+
+                RunInjection(injection);
+            }
+        }
+
+        private void RunInjection(Injection injection)
+        {
+            try
+            {
+                InputAction action = injection.Action;
+                if (_screenManager == null || _screenManager.CurrentScreen == null)
+                {
+                    injection.Outcome = "no screen";
+                    return;
+                }
+
+                if (_screenManager.CurrentScreenClaimsAction(action))
+                {
+                    SpeechPipeline.Silence();
+                    injection.Outcome = _screenManager.DispatchAction(action)
+                        ? "consumed"
+                        : "claimed, not handled";
+                    return;
+                }
+
+                if (_screenManager.CanHandleGlobalAction(action))
+                {
+                    SpeechPipeline.Silence();
+                    _screenManager.HandleGlobalAction(action);
+                    injection.Outcome = "consumed (global)";
+                    return;
+                }
+
+                injection.Outcome = "unclaimed";
+            }
+            finally
+            {
+                // Whatever happened, including a throw, the waiting HTTP thread is released.
+                injection.Done.Set();
+            }
+        }
+
+        /// <summary>One queued action and what became of it. The event is set on the main thread
+        /// once the action has run; the dev server's handler waits on it.</summary>
+        internal sealed class Injection
+        {
+            public readonly System.Threading.ManualResetEvent Done =
+                new System.Threading.ManualResetEvent(false);
+
+            public InputAction Action;
+            public string ActionKey;
+            public string Outcome;
         }
 
         public void OnCompleted()

@@ -118,6 +118,14 @@ namespace SongsOfConquestAccess.UI
             return this;
         }
 
+        // Read-only walk over the widgets below this one, for the dev server's accessible-tree
+        // dump. Most widgets are leaves; the container-like ones override this. It must never
+        // move focus or change anything, so two dumps of a settled screen are identical.
+        internal virtual IEnumerable<Widget> EnumerateChildren()
+        {
+            yield break;
+        }
+
         public virtual bool EnsureFocus()
         {
             return IsVisible;

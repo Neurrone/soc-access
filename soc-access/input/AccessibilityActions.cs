@@ -403,6 +403,54 @@ namespace SongsOfConquestAccess.Input
             return actions;
         }
 
+        /// <summary>The action a dev-server caller named, or null. NON_GLOBAL_ACTIONS already
+        /// carries the bookmark arrays, so these two arrays are the whole vocabulary.</summary>
+        public static InputAction FindByKey(string key)
+        {
+            if (string.IsNullOrEmpty(key))
+            {
+                return null;
+            }
+
+            InputAction found = FindByKey(GLOBAL_ACTIONS, key);
+            return found ?? FindByKey(NON_GLOBAL_ACTIONS, key);
+        }
+
+        /// <summary>Every action key, comma separated - what a caller who named an action we do not
+        /// have is told it could have said instead.</summary>
+        public static string AllKeys()
+        {
+            List<string> keys = new List<string>(GLOBAL_ACTIONS.Length + NON_GLOBAL_ACTIONS.Length);
+            AddKeys(keys, GLOBAL_ACTIONS);
+            AddKeys(keys, NON_GLOBAL_ACTIONS);
+            return string.Join(", ", keys.ToArray());
+        }
+
+        private static InputAction FindByKey(InputAction[] actions, string key)
+        {
+            for (int i = 0; i < actions.Length; i++)
+            {
+                InputAction action = actions[i];
+                if (action != null && action.Key == key)
+                {
+                    return action;
+                }
+            }
+
+            return null;
+        }
+
+        private static void AddKeys(List<string> keys, InputAction[] actions)
+        {
+            for (int i = 0; i < actions.Length; i++)
+            {
+                if (actions[i] != null)
+                {
+                    keys.Add(actions[i].Key);
+                }
+            }
+        }
+
         private static InputAction[] BuildNonGlobalActions()
         {
             List<InputAction> actions = new List<InputAction>

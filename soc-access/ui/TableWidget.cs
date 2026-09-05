@@ -67,6 +67,22 @@ namespace SongsOfConquestAccess.UI
             return focused ?? this;
         }
 
+        // Row-major, header row first, one cell widget per position - the same cells the table hands
+        // to focus, built fresh here because a row is data rather than a widget and only the cell is
+        // one. Reading a cell's label does not disturb the table's own announcement state.
+        internal override IEnumerable<Widget> EnumerateChildren()
+        {
+            for (int row = 0; row <= _rows.Count; row++)
+            {
+                for (int column = 0; column < _columns.Count; column++)
+                {
+                    CellWidget cell = new CellWidget(this, row, column);
+                    cell.Parent = this;
+                    yield return cell;
+                }
+            }
+        }
+
         public bool SetFocusedRowById(string id)
         {
             if (string.IsNullOrWhiteSpace(id))

@@ -139,6 +139,18 @@ namespace SongsOfConquestAccess.Adapters
                 UITextMeshTextUtility.GetEffectiveText(settings != null ? settings.SelectedSaveText : null));
         }
 
+        // The menu's own verdict on the selected save: SetupSelectedSave ends on InvalidEntry when
+        // the save fails validation (version, missing content) and leaves the load button off.
+        // The field starts out at InvalidEntry, so read it only after a selection has settled.
+        public bool IsSelectedSaveRefused()
+        {
+            object state = _menu != null ? SelectionStateField?.GetValue(_menu) : null;
+            return state != null && state.ToString() == "InvalidEntry";
+        }
+
+        private static readonly FieldInfo SelectionStateField =
+            AccessTools.Field(typeof(SaveLoadGameMenu), "_selectionState");
+
         public string GetInformationText()
         {
             SaveLoadGameMenu.Settings settings = Settings;
@@ -468,6 +480,15 @@ namespace SongsOfConquestAccess.Adapters
                 {
                     LoadGameDefinition definition = Definition;
                     return definition != null && definition.Corrupt;
+                }
+            }
+
+            public DateTime LastWriteTime
+            {
+                get
+                {
+                    LoadGameDefinition definition = Definition;
+                    return definition != null ? definition.LastWriteTime : DateTime.MinValue;
                 }
             }
 

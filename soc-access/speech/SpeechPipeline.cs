@@ -1,17 +1,37 @@
+using System;
+
 namespace SongsOfConquestAccess.Speech
 {
     internal static class SpeechPipeline
     {
         private static SpeechService _speechService;
+        private static bool _muted;
 
-        public static void Initialize(SpeechService speechService)
+        // The dev server's tap on the one place every spoken line passes through, so
+        // GET /speech reports exactly what a listener would have heard. Set while the mod's
+        // routes are registered and cleared when they are taken down.
+        internal static Action<string> Observer;
+
+        public static void Initialize(SpeechService speechService, bool muteFromConfig)
         {
             _speechService = speechService;
+            // Read once: a test run decides before launch whether it wants to hear the mod, and a
+            // value that could change mid-session would make two identical runs differ. The config
+            // setting exists because the game relaunches itself through Steam, which drops the
+            // environment a launcher script set.
+            _muted = muteFromConfig || Environment.GetEnvironmentVariable("SOCACCESS_NO_SPEECH") == "1";
         }
 
         public static void Shutdown()
         {
             _speechService = null;
+        }
+
+        /// <summary>Whether SOCACCESS_NO_SPEECH is holding the backend silent. The lines are still
+        /// logged and still reach the observer, so a muted run is fully readable over HTTP.</summary>
+        public static bool Muted
+        {
+            get { return _muted; }
         }
 
         public static void Output(SpeechRequest request)
@@ -30,6 +50,12 @@ namespace SongsOfConquestAccess.Speech
             }
 
             SocAccessMod.Instance?.LogInfo("SpeechPipeline output: \"" + text + "\", interrupt=" + request.Interrupt);
+            Observer?.Invoke(text);
+            if (_muted)
+            {
+                return;
+            }
+
             _speechService.Speak(text, request.Interrupt);
         }
 

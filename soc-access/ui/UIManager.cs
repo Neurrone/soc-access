@@ -132,13 +132,20 @@ namespace SongsOfConquestAccess.UI
 
         private static string BuildAnnouncement(Widget widget)
         {
+            return BuildAnnouncement(widget, FocusContext);
+        }
+
+        // The same composition against a caller's own context, so the dev server's tree dump can
+        // read each widget the way arriving on it would sound without disturbing the live one.
+        internal static string BuildAnnouncement(Widget widget, FocusContext context)
+        {
             List<string> parts = new List<string>(2);
             if (widget.IncludeParentLabelInAnnouncement && widget.Parent != null)
             {
                 AddIfNotEmpty(parts, widget.Parent.GetLabel());
             }
 
-            AddIfNotEmpty(parts, FocusContext.BuildAnnouncement(widget));
+            AddIfNotEmpty(parts, context.BuildAnnouncement(widget));
             return string.Join(". ", parts.ToArray());
         }
 
@@ -164,6 +171,14 @@ namespace SongsOfConquestAccess.UI
                 return;
             }
 
+            buffers.ReplaceLines(ReviewBufferKind.Ui, BuildReviewLines(widget));
+            buffers.SetCurrentBuffer(ReviewBufferKind.Ui);
+        }
+
+        // What the UI review buffer would hold for this widget. The dev server's dump reports the
+        // same lines, so buffer coverage can be read off a tree dump rather than walked to.
+        internal static List<string> BuildReviewLines(Widget widget)
+        {
             List<string> lines = new List<string>();
             if (widget != null)
             {
@@ -197,8 +212,7 @@ namespace SongsOfConquestAccess.UI
                 AddIfNotEmpty(lines, widget.GetTooltipActionsText());
             }
 
-            buffers.ReplaceLines(ReviewBufferKind.Ui, lines);
-            buffers.SetCurrentBuffer(ReviewBufferKind.Ui);
+            return lines;
         }
 
         private static Widget ResolveFocusedWidget(Widget widget)

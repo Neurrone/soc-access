@@ -19,6 +19,12 @@ namespace SongsOfConquestAccess.Screens
             ApplyVisibleReviewBuffers();
         }
 
+        /// <summary>The stack bottom first, read-only, for the dev server's dump header.</summary>
+        internal IReadOnlyList<Screen> Stack
+        {
+            get { return _stack; }
+        }
+
         public Screen CurrentScreen
         {
             get

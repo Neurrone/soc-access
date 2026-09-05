@@ -7,6 +7,7 @@ using HarmonyLib;
 using SongsOfConquest.Common.Localization;
 using SongsOfConquestAccess.Audio;
 using SongsOfConquestAccess.Buffers;
+using SongsOfConquestAccess.Dev;
 using SongsOfConquestAccess.Events;
 using SongsOfConquestAccess.Input;
 using SongsOfConquestAccess.Localization;
@@ -50,6 +51,8 @@ namespace SongsOfConquestAccess
         private ScreenDetector _screenDetector;
         private AccessibilityInputRouter _inputRouter;
         private ILocalizationHandler _localizationHandler;
+        private ModRoutes _modRoutes;
+        private bool _speechAvailable;
         private bool _announcedReady;
         private bool _reportedLocalizationUnavailable;
 
@@ -60,9 +63,11 @@ namespace SongsOfConquestAccess
             Logger.LogInfo("Accessibility mod starting");
             ModSettings.Bind(_host.Config);
             _speechService = new SpeechService(Logger);
-            bool speechInitialized = _speechService.Initialize();
-            Logger.LogInfo("Speech initialization result: " + speechInitialized);
-            SpeechPipeline.Initialize(_speechService);
+            _speechAvailable = _speechService.Initialize();
+            Logger.LogInfo("Speech initialization result: " + _speechAvailable);
+            bool muteSpeech = _host.Config.Bind("Dev", "muteSpeech", false,
+                "Development only: log and capture speech without voicing it. run-game.ps1 -NoSpeech sets this.").Value;
+            SpeechPipeline.Initialize(_speechService, muteSpeech);
             _reviewBufferManager = new ReviewBufferManager();
             _reviewBufferController = new ReviewBufferController(_reviewBufferManager);
             _adventureMapScannerState = new AdventureMapScannerState();
@@ -73,6 +78,9 @@ namespace SongsOfConquestAccess
             _screenManager = new ScreenManager(_reviewBufferManager, _reviewBufferController);
             _screenDetector = new ScreenDetector(_screenManager);
             _inputRouter = new AccessibilityInputRouter(_screenManager);
+            // Before the ready line, so /speech carries it: the routes install the speech tap.
+            _modRoutes = new ModRoutes(_host, _screenManager, _inputRouter, this);
+            _modRoutes.Register();
             _harmony = new Harmony(PluginGuid + "." + Guid.NewGuid());
             try
             {
@@ -93,6 +101,9 @@ namespace SongsOfConquestAccess
 
         internal void Stop()
         {
+            // First, so a mod being torn down stops answering for state that is going away.
+            Step("dev routes", () => _modRoutes?.Unregister());
+            _modRoutes = null;
             Step("update handler", () => _host.SetUpdateHandler(null));
             Step("routes", _host.UnregisterAllModRoutes);
             Step("coroutines", _host.StopAllCoroutines);
@@ -162,6 +173,13 @@ namespace SongsOfConquestAccess
             _inputRouter?.Update();
             _screenManager?.Update();
             UIManager.Update();
+        }
+
+        /// <summary>Whether the speech backend came up. Reported by GET /status, where a silent
+        /// run is otherwise indistinguishable from a mod that has nothing to say.</summary>
+        internal bool SpeechAvailable
+        {
+            get { return _speechAvailable; }
         }
 
         internal ScreenDetector ScreenDetector
@@ -245,7 +263,7 @@ namespace SongsOfConquestAccess
             }
 
             string message = PluginName + " v" + PluginVersion + " ready";
-            _speechService.Speak(message, interrupt: true);
+            SpeechPipeline.Output(new SpeechRequest(message, interrupt: true));
             _announcedReady = true;
             Logger.LogInfo(message);
         }
