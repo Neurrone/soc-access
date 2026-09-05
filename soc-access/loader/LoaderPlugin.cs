@@ -38,6 +38,12 @@ namespace SongsOfConquestAccess.Loader
                     + "the game burns in a virtual machine with no GPU acceleration. 0 disables the "
                     + "cap and leaves the game's own frame rate and vertical sync settings untouched.");
             _maxFrameRate = maxFrameRate.Value;
+            var resolution = Config.Bind("Performance", "resolution", "",
+                "Development only: force this render resolution as WIDTHxHEIGHT (for example "
+                    + "1280x800), regardless of what the display driver advertises, to cut the CPU a "
+                    + "software renderer burns per pixel. Empty leaves the game's own resolution "
+                    + "handling untouched.");
+            ParseForcedResolution(resolution.Value);
             // One-shot on purpose: a persistent mute once silenced the owner's own launch after a
             // development run, so the switch covers only the launch that reads it.
             var muteSpeech = Config.Bind("Dev", "muteSpeech", false,
@@ -56,6 +62,7 @@ namespace SongsOfConquestAccess.Loader
         private void Update()
         {
             ApplyFrameRateCap();
+            ApplyForcedResolution();
             _dev.Tick();
             Action update = _modUpdate;
             if (update == null) return;
@@ -71,6 +78,44 @@ namespace SongsOfConquestAccess.Loader
         {
             if (_mods != null) _mods.Unload();
             if (_dev != null) _dev.Stop();
+        }
+
+        private int _forcedWidth;
+        private int _forcedHeight;
+
+        private void ParseForcedResolution(string setting)
+        {
+            string value = setting == null ? "" : setting.Trim();
+            if (value.Length == 0) return;
+
+            string[] parts = value.Split('x', 'X');
+            int width;
+            int height;
+            if (parts.Length != 2
+                || !int.TryParse(parts[0].Trim(), out width)
+                || !int.TryParse(parts[1].Trim(), out height)
+                || width <= 0
+                || height <= 0)
+            {
+                LoaderLog.Warn("Performance/resolution is not a WIDTHxHEIGHT size and was ignored: " + value);
+                return;
+            }
+
+            _forcedWidth = width;
+            _forcedHeight = height;
+        }
+
+        private void ApplyForcedResolution()
+        {
+            if (_forcedWidth <= 0) return;
+
+            // Same re-assert story as the frame cap, and for the same reason: the game's video
+            // settings push the player's stored resolution back through Screen.SetResolution
+            // when they are applied. SetResolution lands a frame or more later, so the comparison
+            // retries until it takes and then stays quiet.
+            if (Screen.width == _forcedWidth && Screen.height == _forcedHeight) return;
+
+            Screen.SetResolution(_forcedWidth, _forcedHeight, Screen.fullScreen);
         }
 
         private void ApplyFrameRateCap()

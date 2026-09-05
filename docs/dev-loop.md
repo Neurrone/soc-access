@@ -23,8 +23,10 @@ binds `http://127.0.0.1:8772` only.
 `maxFrameRate = N` under `[Performance]` in the same file caps the game at N frames per second
 (0, the default, leaves the game alone), re-asserted every frame because the game's own
 `FrameRateManager` rewrites the target rate and vertical sync whenever video settings are
-applied. It exists for a development machine without GPU acceleration; nothing writes it, so
-set it once by hand. It is read by the loader at start, so a change needs a game restart.
+applied. `resolution = WIDTHxHEIGHT` beside it forces the render size the same way (empty
+leaves the game alone). Both exist for a development machine without GPU acceleration;
+nothing writes them, so set them once by hand. They are read by the loader at start, so a
+change needs a game restart.
 
 The REPL needs `mcs.dll` next to the loader DLL; the build deploys it and the release ships
 it too, as Endless Space 2's does (the evaluator is built on the first `/eval`, so with the

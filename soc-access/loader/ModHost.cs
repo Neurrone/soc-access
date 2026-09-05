@@ -40,6 +40,14 @@ namespace SongsOfConquestAccess.Loader
             get { return _plugin.MuteSpeech; }
         }
 
+        /// <summary>Whether the dev server is up, so a dev-only feature the mod ships can ask
+        /// whether it is wanted. The config setting and the environment override both land inside
+        /// <c>DevServer.Start</c>, and this is where they end up: the listener existing.</summary>
+        public bool DevServerUp
+        {
+            get { return _dev != null && _dev.Listening; }
+        }
+
         public void LogInfo(string message)
         {
             LoaderLog.Info(message);
