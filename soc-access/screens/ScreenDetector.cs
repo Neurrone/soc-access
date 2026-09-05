@@ -2874,6 +2874,23 @@ namespace SongsOfConquestAccess.Screens
             screen.Refresh();
         }
 
+        /// <summary>The runtime factories that would answer present right now, by screen type
+        /// name, in factory order - what a resync would push. For the dev server's probes.</summary>
+        internal List<string> PresentRuntimeScreens()
+        {
+            List<string> names = new List<string>();
+            for (int i = 0; i < _runtimeScreenFactories.Count; i++)
+            {
+                Screen screen = _runtimeScreenFactories[i]();
+                if (screen != null && screen.IsPresent())
+                {
+                    names.Add(screen.GetType().Name);
+                }
+            }
+
+            return names;
+        }
+
         public void ResyncFromRuntimeState()
         {
             List<Screen> activeScreens = new List<Screen>();

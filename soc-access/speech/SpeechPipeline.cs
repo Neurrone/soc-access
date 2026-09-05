@@ -61,6 +61,13 @@ namespace SongsOfConquestAccess.Speech
 
         public static void Silence()
         {
+            // A muted run must leave the screen reader alone entirely: cutting it off on every
+            // key press is as intrusive as speaking, and the owner may be using it meanwhile.
+            if (_muted)
+            {
+                return;
+            }
+
             _speechService?.Silence();
         }
     }

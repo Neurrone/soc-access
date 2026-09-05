@@ -103,10 +103,12 @@ $cfgText = Set-DevSetting $cfgText 'muteSpeech' $(if ($NoSpeech) { 'true' } else
 New-Item -ItemType Directory -Force (Split-Path $cfgPath) | Out-Null
 Set-Content $cfgPath $cfgText -Encoding utf8
 
-# The process this starts is not the game that runs. It boots Unity, BepInEx, the loader and
-# the mod - far enough that its dev server answers - and then asks Steam to relaunch it and
-# exits. So the pid worth tracking is the second process, found by name once it exists; the
-# first one is excluded by pid so its short life is never mistaken for the game.
+# On a Steam install the process this starts is not the game that runs: it boots Unity,
+# BepInEx, the loader and the mod - far enough that its dev server answers - and then the
+# game's own Steam check asks Steam to relaunch it and exits. So the pid worth tracking is the
+# second process, found by name once it exists; the first one is excluded by pid so its short
+# life is never mistaken for the game. A GOG install has no such check: the process started
+# here keeps running, and the fallback below tracks it. Nothing here assumes Steam.
 $launcher = Start-Process "$gameDir\SongsOfConquest.exe" -WorkingDirectory $gameDir -PassThru
 $proc = $null
 $deadline = (Get-Date).AddSeconds(60)
@@ -122,7 +124,7 @@ if (-not $proc) {
         # No relaunch happened (Steam not involved); the process started here is the game.
         $proc = $launcher
     } else {
-        Write-Error "Songs of Conquest did not appear within 60s of launching (launcher pid $($launcher.Id) exited). Is Steam running?"
+        Write-Error "Songs of Conquest did not appear within 60s of launching (launcher pid $($launcher.Id) exited without a relaunch). On a Steam install, is Steam running?"
         exit 1
     }
 }

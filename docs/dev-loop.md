@@ -103,6 +103,8 @@ than assuming they failed.
 - `Saves()`: the saves the load menu would list, newest first, with `corrupt` flagged.
 - `ContinueLoading()`: press "any key" on the loading-complete screen through the game's own
   `FinalizeLoadingScreen`; `continued:false` when that screen is not up.
+- `RuntimeScreens()`: the screens the detector's runtime factories read as present right
+  now, which is exactly what a reload's resync would push. Read it when a resync looks wrong.
 
 REPL facts observed on this Mono (Unity 2022.3, `mcs.dll` built for net35):
 
@@ -128,10 +130,14 @@ builds, launches `SongsOfConquest.exe`, turns the server on, and drives the load
 `.\wait-game.ps1 ingame` blocks until the map is up (exit 1 prints the state it saw, exit 2
 means the process died). Both are run from the PowerShell tool. One game at a time: the
 script refuses to launch over a running one and never kills anything; `POST /quit` first
-(the process is gone about 6 s later). The game boots twice: the process the script starts
-loads BepInEx, the loader and the mod, answers on 8772, then asks Steam to relaunch it and
-exits; the script tracks the second process and only talks to a server that process owns.
-Anything else polling the port during boot can be answered by the first process.
+(the process is gone about 6 s later). On a Steam install the game boots twice: the process
+the script starts loads BepInEx, the loader and the mod, answers on 8772, then the game's
+own Steam check (`RestartAppIfNecessary` in `Bitwave.Platform.Steam`) asks Steam to relaunch
+it and exits; the script tracks the second process and only talks to a server that process
+owns. Anything else polling the port during boot can be answered by the first process. A
+GOG install has no relaunch and the script tracks the process it started. The relaunched
+process is a full Steam session: the DLCs the account owns read as owned
+(`IAddonManager.OwnsAddons`).
 
 **Reload.** `dotnet build soc-access\soc-access.csproj` (deploys) → `POST /reload` →
 poll `GET /loader/status` until `modLoaded:true` with `staleBuild:false` and the new
@@ -171,11 +177,12 @@ Filled in as the loop is used; keep entries to one line each with the date.
   `ingame` 75 s; `POST /loadsave` to `ingame` 12 s on a warm game; `POST /quit` to process
   exit 6 s. Three reloads on the map after using the
   sonar sweep and tile cues left `gameObjectCount` unchanged (1583).
-- 2026-09-05: a reload on the map after the wielder sheet, the options screen and the load
-  menu had been opened and closed resynced with `OptionsScreen` and `PauseMenuScreen`
-  stacked over the map although nothing was open, and `/loadsave` then drove a stale menu.
-  Reload from a plain map (or reload, then `POST /loadsave` twice) until the detector's
-  resync is fixed; `State()` reports `dialog` when this has happened.
+- 2026-09-05: once, a reload on the map after the wielder sheet, the options screen and the
+  load menu had been opened and closed resynced with `SaveLoadGameScreen`, then
+  `OptionsScreen` and `PauseMenuScreen`, stacked over the map although nothing was open.
+  Two replays of the same sequence resynced cleanly. If `State()` answers `dialog` on a bare
+  map after a reload, read `DevProbe.RuntimeScreens()` before touching anything and keep the
+  answer; that is the evidence the fix needs.
 - 2026-09-05: the "The Enemy Revealed" campaign saves (`QuickSave_*`, `AutoSave_1..3`) are
   refused in-session with "Content not available", and loading `QuickSave_4` from the main
   menu crashed the game natively while building the scene (`The file 'none' is corrupted`,
