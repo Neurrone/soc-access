@@ -47,10 +47,11 @@ try {
         throw "Loader DLL was not copied to template: $loaderDll"
     }
 
-    $mcsDll = Join-Path $pluginDir "mcs.dll"
-    if (Test-Path $mcsDll) {
-        throw "Development-only mcs.dll must not be included in a release: $mcsDll"
-    }
+    # mcs.dll backs POST /eval; the dev server is off unless the config enables it, and the
+    # config is not shipped, so this only ever loads for someone who turns it on.
+    $vendorMcs = Join-Path $scriptDir "vendor\mcs"
+    Copy-Item -LiteralPath (Join-Path $vendorMcs "mcs.dll") -Destination $pluginDir
+    Copy-Item -LiteralPath (Join-Path $vendorMcs "NOTICE") -Destination (Join-Path $pluginDir "mcs-NOTICE.txt")
 
     Compress-Archive -Path (Join-Path $templateDir "*") -DestinationPath $zipPath -Force
 

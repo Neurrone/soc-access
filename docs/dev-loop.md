@@ -17,9 +17,9 @@ for a game started by hand: `SongsOfConquest.exe` hands itself to Steam, which r
 without the launcher's environment, which is why the config file is the switch. The server
 binds `http://127.0.0.1:8772` only.
 
-The REPL needs `mcs.dll` next to the loader DLL; the build deploys it and the release never
-ships it (the evaluator is built on the first `/eval`, so a missing `mcs.dll` is never
-touched when the server is off).
+The REPL needs `mcs.dll` next to the loader DLL; the build deploys it and the release ships
+it too, as Endless Space 2's does (the evaluator is built on the first `/eval`, so with the
+server off the file is never loaded).
 
 ## 2. Route reference
 

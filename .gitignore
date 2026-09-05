@@ -6,3 +6,5 @@ release-template/BepInEx/plugins/SongsOfConquestAccess/SongsOfConquest.Access.dl
 release-template/BepInEx/plugins/SongsOfConquestAccess/SongsOfConquest.Access.pdb
 release-template/BepInEx/plugins/SongsOfConquestAccess/SongsOfConquest.Access.Loader.dll
 release-template/BepInEx/plugins/SongsOfConquestAccess/SongsOfConquest.Access.Loader.pdb
+release-template/BepInEx/plugins/SongsOfConquestAccess/mcs.dll
+release-template/BepInEx/plugins/SongsOfConquestAccess/mcs-NOTICE.txt

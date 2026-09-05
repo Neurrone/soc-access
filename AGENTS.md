@@ -113,7 +113,7 @@ Current environment assumptions:
 
 - `BepInEx.cfg` uses `HideManagerGameObject = true`
 - The dev server is off for players: `[Dev] devServer = false` in `BepInEx/config/songs.of.conquest.access.cfg`. `run-game.ps1` writes it true for development runs; `SOCACCESS_NO_DEV=1` forces it off, `SOCACCESS_DEV_PORT` overrides the port, `SOCACCESS_NO_SPEECH=1` mutes the screen reader while `/speech` still captures
-- `mcs.dll` (the REPL compiler) is deployed next to the loader for development and is never packaged in a release
+- `mcs.dll` (the REPL compiler) sits next to the loader in both the development deployment and the release; it is only loaded on the first `/eval`, so with the server off it never runs
 
 ## Logs
 
