@@ -79,7 +79,7 @@ Mod routes answer 404 while the mod is down:
   review-buffer lines, `flat=1` answers one `label | status | buffer | actions` line per
   leaf for diffing. Side-effect free: two calls answer identically. Multi-position widgets
   (map grid, hex grids, inventory grid, army exchange grid, announcement order menu, codex
-  content) print one placeholder line each. Grammar in `dev-server-plan.md` §5.
+  content) print one placeholder line each. Grammar in §2a below.
 - `GET /gui/unity?path=&depth=&visibleOnly=&fields=`: the game's own UI read as accessible
   meaning - the coverage baseline the mod's tree is diffed against. Per node `name`, `kind`
   (button/toggle/slider/dropdown/input/text/image/canvas/panel), `text` (markup stripped),
@@ -123,6 +123,38 @@ drops the empty argument there.
 Main-thread routes answer 503 when a frame takes longer than 5 s (boot, loading, the first
 Harmony pass): retry, and confirm state-changing requests through their status route rather
 than assuming they failed.
+
+## 2a. Dump grammar (shared with the UI rewrite)
+
+Both `/gui/widgets` (today) and `/gui/graph` (the UI rewrite) emit the same grammar so the
+migration diff is `sort | diff`.
+
+Tree mode (default):
+
+```
+screen: <ScreenType> | stack: <Bottom> > ... > <Top>
+<indent>[*] <WidgetType> #<id> "<line as spoken on arrival>"
+<indent>    buffer: <line 1>
+<indent>    buffer: <line 2>
+<indent>    actions: <a>, <b>
+<indent>[ ] <MultiPositionType> #<id> (multi-position) current="<GetFocusMessage()>" key=<GetAnnouncementKey()>
+```
+
+`[*]` marks the focused widget. Hidden widgets (`IsVisible` false) are omitted; a container
+with no visible children still prints, marked `(empty)`.
+
+Flat mode (`flat=1`): one line per leaf, no indentation, no focus marker, no role word,
+no position text, no context prefix:
+
+```
+<label> | <status> | <buffer lines joined " / "> | <actions joined ", ">
+```
+
+Labels come from `GetLabel()`, status from `GetStatus()`, buffer lines from the same
+composition the UI review buffer uses (label lines, status, tooltip lines with the duplicated
+heading dropped, actions text). Multi-position widgets print one flat line
+`<Type> (multi-position) | <current focus message>`. The graph dump maps its node parts onto
+the same four columns.
 
 ## 3. Probes (`/eval` one-liners)
 

@@ -6,7 +6,7 @@ uses, one screen at a time, with both systems live until the last screen is port
 screen the mod supports today is listed in §8 with its proposed model and its place in the
 order.
 
-Prerequisite: `dev-server-plan.md` is complete. This plan uses `/gui/widgets`, `/gui/graph`,
+Prerequisite: the dev server (done 2026-09-05; `docs/dev-loop.md` is its reference). This plan uses `/gui/widgets`, `/gui/graph`,
 `/input`, `/speech`, `/eval`, `/reload` and `run-game.ps1` throughout. Do not start without them.
 
 Owner decisions already made (do not re-ask):
@@ -145,7 +145,7 @@ parents).
 - `screens/GraphScreen.cs` — the bridge (§3). Screens port by changing their base class
   and replacing their constructor's widget tree with `Build(GraphBuilder)`.
 - `dev/GraphDump.cs` — `/gui/graph`, plus `flat=1` in the shared grammar
-  (`dev-server-plan.md` §5), and `/gui/tree` which answers whichever dump fits the
+  (`docs/dev-loop.md` §2a), and `/gui/tree` which answers whichever dump fits the
   focused screen's kind.
 - Final phase only: `screens/ScreenManager.cs` becomes ES2's poll-and-diff manager with
   layers and child screens; `ScreenDetector` shrinks to state recording; `UIManager`,
