@@ -148,7 +148,7 @@ namespace SongsOfConquestAccess.Dev
                         {
                             json.WriteStartObject();
                             json.WritePropertyName("version");
-                            json.WriteValue(SocAccessMod.PluginVersion);
+                            json.WriteValue(ModEntry.ModVersion);
                             // Which LOAD is answering. /loader/status reports the same name from the
                             // outside; read here it is the mod's own assembly saying so, which is
                             // what catches a reload that half-happened.

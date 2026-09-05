@@ -23,7 +23,6 @@ namespace SongsOfConquestAccess
     {
         public const string PluginGuid = "songs.of.conquest.access";
         public const string PluginName = "Songs of Conquest Access";
-        public const string PluginVersion = "1.0.0";
 
         internal static SocAccessMod Instance { get; private set; }
 
@@ -260,7 +259,7 @@ namespace SongsOfConquestAccess
                 return;
             }
 
-            string message = PluginName + " v" + PluginVersion + " ready";
+            string message = PluginName + " v" + ModEntry.ModVersion + " ready";
             SpeechPipeline.Output(new SpeechRequest(message, interrupt: true));
             _announcedReady = true;
             Logger.LogInfo(message);
