@@ -209,3 +209,6 @@ Filled in as the loop is used; keep entries to one line each with the date.
   refused in-session with "Content not available", and loading `QuickSave_4` from the main
   menu crashed the game natively while building the scene (`The file 'none' is corrupted`,
   no mod frame). Use `test` (Vassals and Villains, round 20) as the fixture.
+- 2026-09-05: `POST /key` with `Tab` from the map raised the game window, the mod's raw input
+  subscription dispatched `next_widget` exactly once (no debounce duplicate) and answered
+  `speech:["Cecilia Stoutheart button."]`; the wielder button had the focus afterwards.
