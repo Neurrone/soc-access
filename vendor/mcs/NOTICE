@@ -1,0 +1,8 @@
+mcs.dll — Mono.CSharp compiler-as-a-service, built for .NET 3.5 (old Unity Mono).
+
+Built from https://github.com/sinai-dev/mcs-unity ("Mono.CSharp with edits for Unity
+modding", used by UnityExplorer), commit 76cb87fc0194c7d1dfb16a5ef6fd5718e743d809,
+configuration Release_net35. Verified ImageRuntimeVersion v2.0.50727; runtime dependency
+MonoMod.RuntimeDetour is provided by BepInEx core.
+
+Upstream sources are the Mono project's mcs compiler (MIT/X11 license).

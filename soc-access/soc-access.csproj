@@ -27,6 +27,7 @@
   <ItemGroup>
     <Compile Remove="tests\**\*.cs" />
     <Compile Remove="tools\**\*.cs" />
+    <Compile Remove="loader\**\*.cs" />
   </ItemGroup>
 
   <ItemGroup>

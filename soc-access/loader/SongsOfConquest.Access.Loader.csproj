@@ -1,0 +1,29 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <Import Project="..\GamePaths.props" Condition="Exists('..\GamePaths.props')" />
+  <PropertyGroup>
+    <TargetFramework>net472</TargetFramework>
+    <LangVersion>7.3</LangVersion>
+    <AssemblyName>SongsOfConquest.Access.Loader</AssemblyName>
+    <RootNamespace>SongsOfConquestAccess.Loader</RootNamespace>
+    <Version>1.0.0</Version>
+    <BepInExCoreDir>$(GameDir)\BepInEx\core</BepInExCoreDir>
+    <GameManagedDir>$(GameDir)\SongsOfConquest_Data\Managed</GameManagedDir>
+    <PluginOutputDir>$(GameDir)\BepInEx\plugins\SongsOfConquestAccess</PluginOutputDir>
+    <McsPath>$(MSBuildProjectDirectory)\..\..\vendor\mcs\mcs.dll</McsPath>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="BepInEx"><HintPath>$(BepInExCoreDir)\BepInEx.dll</HintPath><Private>false</Private></Reference>
+    <Reference Include="Mono.Cecil"><HintPath>$(BepInExCoreDir)\Mono.Cecil.dll</HintPath><Private>false</Private></Reference>
+    <Reference Include="Newtonsoft.Json"><HintPath>$(GameManagedDir)\Newtonsoft.Json.dll</HintPath><Private>false</Private></Reference>
+    <Reference Include="UnityEngine"><HintPath>$(GameManagedDir)\UnityEngine.dll</HintPath><Private>false</Private></Reference>
+    <Reference Include="UnityEngine.CoreModule"><HintPath>$(GameManagedDir)\UnityEngine.CoreModule.dll</HintPath><Private>false</Private></Reference>
+    <Reference Include="UnityEngine.ImageConversionModule"><HintPath>$(GameManagedDir)\UnityEngine.ImageConversionModule.dll</HintPath><Private>false</Private></Reference>
+    <Reference Include="mcs"><HintPath>$(McsPath)</HintPath><Private>false</Private></Reference>
+  </ItemGroup>
+  <Target Name="DeployLoader" AfterTargets="Build"
+          Condition="Exists('$(GameDir)') and '$(DeployToGame)' != 'false'">
+    <MakeDir Directories="$(PluginOutputDir)" />
+    <Copy SourceFiles="$(TargetPath);$(TargetDir)$(AssemblyName).pdb;$(McsPath)"
+          DestinationFolder="$(PluginOutputDir)" SkipUnchangedFiles="true" />
+  </Target>
+</Project>
