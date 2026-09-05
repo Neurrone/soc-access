@@ -379,14 +379,14 @@ namespace SongsOfConquestAccess.Adapters
                 object response = ResolveWritablePrimaryResponse();
                 if (response == null)
                 {
-                    SocAccessPlugin.Instance?.LogWarning("TroopHudAdapter could not override native screen input position");
+                    SocAccessMod.Instance?.LogWarning("TroopHudAdapter could not override native screen input position");
                     return null;
                 }
 
                 PropertyInfo positionProperty = AccessTools.Property(response.GetType(), "Position");
                 if (positionProperty == null || !positionProperty.CanWrite)
                 {
-                    SocAccessPlugin.Instance?.LogWarning("TroopHudAdapter could not override native screen input position because Position was not writable on " + response.GetType().FullName);
+                    SocAccessMod.Instance?.LogWarning("TroopHudAdapter could not override native screen input position because Position was not writable on " + response.GetType().FullName);
                     return null;
                 }
 

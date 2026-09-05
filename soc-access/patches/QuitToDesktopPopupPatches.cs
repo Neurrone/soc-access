@@ -10,14 +10,14 @@ namespace SongsOfConquestAccess.Patches
         [HarmonyPostfix]
         private static void OnOpenedPostfix(QuitToDesktopPopup __instance)
         {
-            SocAccessPlugin.Instance?.ScreenDetector?.OnQuitToDesktopPopupReady(__instance);
+            SocAccessMod.Instance?.ScreenDetector?.OnQuitToDesktopPopupReady(__instance);
         }
 
         [HarmonyPatch(typeof(QuitToDesktopPopup), "OnClosed")]
         [HarmonyPostfix]
         private static void OnClosedPostfix(QuitToDesktopPopup __instance)
         {
-            SocAccessPlugin.Instance?.ScreenDetector?.OnQuitToDesktopPopupClosed(__instance);
+            SocAccessMod.Instance?.ScreenDetector?.OnQuitToDesktopPopupClosed(__instance);
         }
     }
 }

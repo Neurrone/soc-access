@@ -101,7 +101,7 @@ namespace SongsOfConquestAccess.Screens
 
         private void HandleResourceUpdated(ResourceUpdatedPayload payload)
         {
-            SocAccessPlugin.Instance?.ScreenDetector?.OnMarketplaceChanged();
+            SocAccessMod.Instance?.ScreenDetector?.OnMarketplaceChanged();
         }
 
         private int GetFocusedResourceIndex()

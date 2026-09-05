@@ -709,7 +709,7 @@ namespace SongsOfConquestAccess.UI
             ISystemPopups systemPopups = _adapter != null ? _adapter.SystemPopups : null;
             if (systemPopups == null)
             {
-                SocAccessPlugin.Instance?.LogWarning("Scanner search could not open because system popups are unavailable");
+                SocAccessMod.Instance?.LogWarning("Scanner search could not open because system popups are unavailable");
                 return false;
             }
 

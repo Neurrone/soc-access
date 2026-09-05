@@ -22,7 +22,7 @@ namespace SongsOfConquestAccess
                 return;
             }
 
-            SocAccessPlugin.Instance?.ScreenDetector?.OnClaimMenuReady(__instance);
+            SocAccessMod.Instance?.ScreenDetector?.OnClaimMenuReady(__instance);
         }
 
         [HarmonyPatch(typeof(ClaimMenu), "Hide")]
@@ -38,7 +38,7 @@ namespace SongsOfConquestAccess
         {
             if (__state)
             {
-                SocAccessPlugin.Instance?.ScreenDetector?.OnClaimMenuClosed(__instance);
+                SocAccessMod.Instance?.ScreenDetector?.OnClaimMenuClosed(__instance);
             }
         }
     }

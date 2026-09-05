@@ -42,7 +42,7 @@ namespace SongsOfConquestAccess
         {
             if (__state)
             {
-                SocAccessPlugin.Instance?.ScreenDetector?.OnDefenceMenuClosed(__instance);
+                SocAccessMod.Instance?.ScreenDetector?.OnDefenceMenuClosed(__instance);
             }
         }
 
@@ -69,7 +69,7 @@ namespace SongsOfConquestAccess
 
         private static void StartWaitForTopLevel(DefenceMenu menu)
         {
-            SocAccessPlugin plugin = SocAccessPlugin.Instance;
+            SocAccessMod plugin = SocAccessMod.Instance;
             if (plugin != null && menu != null)
             {
                 plugin.StartCoroutine(WaitForTopLevel(menu, fromSubMenu: false));
@@ -78,7 +78,7 @@ namespace SongsOfConquestAccess
 
         private static void StartWaitForTopLevelFromSubMenu(DefenceMenu menu)
         {
-            SocAccessPlugin plugin = SocAccessPlugin.Instance;
+            SocAccessMod plugin = SocAccessMod.Instance;
             if (plugin != null && menu != null)
             {
                 plugin.StartCoroutine(WaitForTopLevel(menu, fromSubMenu: true));
@@ -87,7 +87,7 @@ namespace SongsOfConquestAccess
 
         private static void StartWaitForDraft(DefenceMenu menu)
         {
-            SocAccessPlugin plugin = SocAccessPlugin.Instance;
+            SocAccessMod plugin = SocAccessMod.Instance;
             if (plugin != null && menu != null)
             {
                 plugin.StartCoroutine(WaitForDraft(menu));
@@ -96,7 +96,7 @@ namespace SongsOfConquestAccess
 
         private static void StartWaitForUpgrade(DefenceMenu menu)
         {
-            SocAccessPlugin plugin = SocAccessPlugin.Instance;
+            SocAccessMod plugin = SocAccessMod.Instance;
             if (plugin != null && menu != null)
             {
                 plugin.StartCoroutine(WaitForUpgrade(menu));
@@ -113,11 +113,11 @@ namespace SongsOfConquestAccess
                 {
                     if (fromSubMenu)
                     {
-                        SocAccessPlugin.Instance?.ScreenDetector?.OnDefenceMenuBackToTop(menu);
+                        SocAccessMod.Instance?.ScreenDetector?.OnDefenceMenuBackToTop(menu);
                     }
                     else
                     {
-                        SocAccessPlugin.Instance?.ScreenDetector?.OnDefenceMenuReady(menu);
+                        SocAccessMod.Instance?.ScreenDetector?.OnDefenceMenuReady(menu);
                     }
 
                     yield break;
@@ -136,7 +136,7 @@ namespace SongsOfConquestAccess
                 DefenceMenuAdapter adapter = new DefenceMenuAdapter(menu);
                 if (adapter.IsDraftPresent())
                 {
-                    SocAccessPlugin.Instance?.ScreenDetector?.OnDefenceDraftReady(menu);
+                    SocAccessMod.Instance?.ScreenDetector?.OnDefenceDraftReady(menu);
                     yield break;
                 }
 
@@ -153,7 +153,7 @@ namespace SongsOfConquestAccess
                 DefenceMenuAdapter adapter = new DefenceMenuAdapter(menu);
                 if (adapter.IsUpgradePresent())
                 {
-                    SocAccessPlugin.Instance?.ScreenDetector?.OnDefenceUpgradeReady(menu);
+                    SocAccessMod.Instance?.ScreenDetector?.OnDefenceUpgradeReady(menu);
                     yield break;
                 }
 

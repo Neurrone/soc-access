@@ -11,7 +11,7 @@ namespace SongsOfConquestAccess
         [HarmonyPostfix]
         private static void MarketplaceMenuShowPostfix(MarketplaceMenu __instance)
         {
-            SocAccessPlugin.Instance?.ScreenDetector?.OnMarketplaceReady(__instance);
+            SocAccessMod.Instance?.ScreenDetector?.OnMarketplaceReady(__instance);
         }
 
         [HarmonyPatch(typeof(MarketplaceMenu), "Hide")]
@@ -27,7 +27,7 @@ namespace SongsOfConquestAccess
         {
             if (__state)
             {
-                SocAccessPlugin.Instance?.ScreenDetector?.OnMarketplaceClosed(__instance);
+                SocAccessMod.Instance?.ScreenDetector?.OnMarketplaceClosed(__instance);
             }
         }
 

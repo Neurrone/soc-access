@@ -146,7 +146,7 @@ namespace SongsOfConquestAccess
                 return;
             }
 
-            SocAccessPlugin.Instance?.LogInfo("Adventure world notification for entity " + entityId + " commander " + commanderId);
+            SocAccessMod.Instance?.LogInfo("Adventure world notification for entity " + entityId + " commander " + commanderId);
             AccessibilityEventBus.Publish(new WorldMessageNotificationEvent(entityId, commanderId, localizedHeader, localizedBody, localizedEffects));
         }
 
@@ -209,7 +209,7 @@ namespace SongsOfConquestAccess
             }
             catch (Exception exception)
             {
-                SocAccessPlugin.Instance?.LogWarning("Failed to read notification HUD entry text: " + exception.Message);
+                SocAccessMod.Instance?.LogWarning("Failed to read notification HUD entry text: " + exception.Message);
                 return string.Empty;
             }
         }

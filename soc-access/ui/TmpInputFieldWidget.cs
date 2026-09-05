@@ -128,7 +128,7 @@ namespace SongsOfConquestAccess.UI
                 return;
             }
 
-            SocAccessPlugin.Instance?.StartCoroutine(ActivateAfterEndOfFrame(field));
+            SocAccessMod.Instance?.StartCoroutine(ActivateAfterEndOfFrame(field));
         }
 
         private IEnumerator ActivateAfterEndOfFrame(TMP_InputField field)

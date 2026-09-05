@@ -194,7 +194,7 @@ namespace SongsOfConquestAccess.Adapters
                 return value;
             }
 
-            SocAccessPlugin.Instance?.LogWarning("TeleportMenuAdapter could not discover teleport instruction text from native UI");
+            SocAccessMod.Instance?.LogWarning("TeleportMenuAdapter could not discover teleport instruction text from native UI");
             return string.Empty;
         }
 

@@ -45,7 +45,7 @@ namespace SongsOfConquestAccess
         {
             if (__state)
             {
-                SocAccessPlugin.Instance?.ScreenDetector?.OnDwellingInteractionClosed(__instance);
+                SocAccessMod.Instance?.ScreenDetector?.OnDwellingInteractionClosed(__instance);
             }
         }
 
@@ -65,7 +65,7 @@ namespace SongsOfConquestAccess
 
         private static void StartWaitForReady(DwellingInteractionMenu menu)
         {
-            SocAccessPlugin plugin = SocAccessPlugin.Instance;
+            SocAccessMod plugin = SocAccessMod.Instance;
             if (plugin != null && menu != null)
             {
                 plugin.StartCoroutine(WaitForReady(menu));
@@ -74,7 +74,7 @@ namespace SongsOfConquestAccess
 
         private static void StartWaitForDraftFromSubMenu(DwellingInteractionMenu menu)
         {
-            SocAccessPlugin plugin = SocAccessPlugin.Instance;
+            SocAccessMod plugin = SocAccessMod.Instance;
             if (plugin != null && menu != null)
             {
                 plugin.StartCoroutine(WaitForDraftFromSubMenu(menu));
@@ -83,7 +83,7 @@ namespace SongsOfConquestAccess
 
         private static void StartWaitForUpgrade(DwellingInteractionMenu menu)
         {
-            SocAccessPlugin plugin = SocAccessPlugin.Instance;
+            SocAccessMod plugin = SocAccessMod.Instance;
             if (plugin != null && menu != null)
             {
                 plugin.StartCoroutine(WaitForUpgrade(menu));
@@ -98,7 +98,7 @@ namespace SongsOfConquestAccess
                 DwellingInteractionMenuAdapter adapter = new DwellingInteractionMenuAdapter(menu);
                 if (adapter.IsPresent())
                 {
-                    SocAccessPlugin.Instance?.ScreenDetector?.OnDwellingInteractionReady(menu);
+                    SocAccessMod.Instance?.ScreenDetector?.OnDwellingInteractionReady(menu);
                     yield break;
                 }
 
@@ -115,7 +115,7 @@ namespace SongsOfConquestAccess
                 DwellingInteractionMenuAdapter adapter = new DwellingInteractionMenuAdapter(menu);
                 if (adapter.IsDraftPresent())
                 {
-                    SocAccessPlugin.Instance?.ScreenDetector?.OnDwellingBackToTop(menu);
+                    SocAccessMod.Instance?.ScreenDetector?.OnDwellingBackToTop(menu);
                     yield break;
                 }
 
@@ -132,7 +132,7 @@ namespace SongsOfConquestAccess
                 DwellingInteractionMenuAdapter adapter = new DwellingInteractionMenuAdapter(menu);
                 if (adapter.IsUpgradePresent())
                 {
-                    SocAccessPlugin.Instance?.ScreenDetector?.OnDwellingUpgradeReady(menu);
+                    SocAccessMod.Instance?.ScreenDetector?.OnDwellingUpgradeReady(menu);
                     yield break;
                 }
 

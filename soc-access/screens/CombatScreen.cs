@@ -539,7 +539,7 @@ namespace SongsOfConquestAccess.Screens
         {
             BattleHudAdapter.QuickbarItem item = GetQuickbarItem(adapter, index);
             bool activated = item != null && item.Activate();
-            CombatScreen screen = SocAccessPlugin.Instance?.ScreenManager?.CurrentScreen as CombatScreen;
+            CombatScreen screen = SocAccessMod.Instance?.ScreenManager?.CurrentScreen as CombatScreen;
             screen?.FocusGridIfNeeded();
             return activated;
         }
@@ -547,7 +547,7 @@ namespace SongsOfConquestAccess.Screens
         private static bool ActivateAbilityButton(CombatAdapter adapter)
         {
             bool activated = adapter != null && adapter.Hud.ClickAbilityButton();
-            CombatScreen screen = SocAccessPlugin.Instance?.ScreenManager?.CurrentScreen as CombatScreen;
+            CombatScreen screen = SocAccessMod.Instance?.ScreenManager?.CurrentScreen as CombatScreen;
             if (adapter != null && adapter.GetTargetingMode() == CombatTargetingMode.Ability)
             {
                 screen?.FocusGridIfNeeded();
@@ -559,7 +559,7 @@ namespace SongsOfConquestAccess.Screens
         private static bool ActivateCancelAbilityButton(CombatAdapter adapter)
         {
             bool activated = adapter != null && adapter.Hud.ClickCancelAbilityButton();
-            CombatScreen screen = SocAccessPlugin.Instance?.ScreenManager?.CurrentScreen as CombatScreen;
+            CombatScreen screen = SocAccessMod.Instance?.ScreenManager?.CurrentScreen as CombatScreen;
             screen?.FocusGridIfNeeded();
             return activated;
         }
@@ -642,7 +642,7 @@ namespace SongsOfConquestAccess.Screens
                 return false;
             }
 
-            CombatScreen screen = SocAccessPlugin.Instance?.ScreenManager?.CurrentScreen as CombatScreen;
+            CombatScreen screen = SocAccessMod.Instance?.ScreenManager?.CurrentScreen as CombatScreen;
             return screen != null && screen.MoveCursorToTroop(item.TroopId, focusGrid: true, requireLocalCurrentTurn: false);
         }
 
@@ -653,7 +653,7 @@ namespace SongsOfConquestAccess.Screens
                 return false;
             }
 
-            CombatScreen screen = SocAccessPlugin.Instance?.ScreenManager?.CurrentScreen as CombatScreen;
+            CombatScreen screen = SocAccessMod.Instance?.ScreenManager?.CurrentScreen as CombatScreen;
             return screen != null && screen.MoveCursorToTroop(adapter.GetCurrentTroopId(), focusGrid: true, requireLocalCurrentTurn: false);
         }
 
@@ -725,7 +725,7 @@ namespace SongsOfConquestAccess.Screens
             }
             catch (System.Exception exception)
             {
-                SocAccessPlugin.Instance?.LogWarning("CombatScreen section " + section + " failed to build: " + exception);
+                SocAccessMod.Instance?.LogWarning("CombatScreen section " + section + " failed to build: " + exception);
                 return new T[0];
             }
         }
@@ -738,7 +738,7 @@ namespace SongsOfConquestAccess.Screens
             }
             catch (System.Exception exception)
             {
-                SocAccessPlugin.Instance?.LogWarning("CombatScreen section " + section + " failed to count: " + exception);
+                SocAccessMod.Instance?.LogWarning("CombatScreen section " + section + " failed to count: " + exception);
                 return 0;
             }
         }
@@ -893,7 +893,7 @@ namespace SongsOfConquestAccess.Screens
             }
 
             _lastProbeDiagnostic = message;
-            SocAccessPlugin.Instance?.LogInfo(message);
+            SocAccessMod.Instance?.LogInfo(message);
         }
     }
 }

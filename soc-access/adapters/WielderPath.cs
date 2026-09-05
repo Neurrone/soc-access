@@ -94,7 +94,7 @@ namespace SongsOfConquestAccess.Adapters
             }
             catch (Exception exception)
             {
-                SocAccessPlugin.Instance?.LogWarning("WielderPath could not path to the destination: " + exception.Message);
+                SocAccessMod.Instance?.LogWarning("WielderPath could not path to the destination: " + exception.Message);
                 return false;
             }
 

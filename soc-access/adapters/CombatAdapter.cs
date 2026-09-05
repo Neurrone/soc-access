@@ -974,7 +974,7 @@ namespace SongsOfConquestAccess.Adapters
             FocusTargetTile(point);
             if (_spellPrimaryClickMethod == null || _mouseKeyboardSpellInputModule == null)
             {
-                SocAccessPlugin.Instance?.LogWarning("CombatAdapter cannot confirm spell target because native HandlePrimaryClick was not found");
+                SocAccessMod.Instance?.LogWarning("CombatAdapter cannot confirm spell target because native HandlePrimaryClick was not found");
                 return false;
             }
 
@@ -984,7 +984,7 @@ namespace SongsOfConquestAccess.Adapters
             }
             catch (Exception exception)
             {
-                SocAccessPlugin.Instance?.LogWarning("CombatAdapter failed to invoke native spell primary click: " + exception.Message);
+                SocAccessMod.Instance?.LogWarning("CombatAdapter failed to invoke native spell primary click: " + exception.Message);
                 return false;
             }
 
@@ -1278,7 +1278,7 @@ namespace SongsOfConquestAccess.Adapters
             }
             catch (Exception exception)
             {
-                SocAccessPlugin.Instance?.LogWarning("CombatAdapter failed to capture attack preview text: " + exception.Message);
+                SocAccessMod.Instance?.LogWarning("CombatAdapter failed to capture attack preview text: " + exception.Message);
             }
 
             return previews;
@@ -1368,7 +1368,7 @@ namespace SongsOfConquestAccess.Adapters
             }
             catch (Exception exception)
             {
-                SocAccessPlugin.Instance?.LogWarning("CombatAdapter failed to resolve battle tooltip behavior: " + exception.Message);
+                SocAccessMod.Instance?.LogWarning("CombatAdapter failed to resolve battle tooltip behavior: " + exception.Message);
                 return null;
             }
         }
@@ -1462,7 +1462,7 @@ namespace SongsOfConquestAccess.Adapters
             }
             catch (Exception exception)
             {
-                SocAccessPlugin.Instance?.LogWarning("CombatAdapter failed to set focused tile overlay: " + exception.Message);
+                SocAccessMod.Instance?.LogWarning("CombatAdapter failed to set focused tile overlay: " + exception.Message);
             }
         }
 
@@ -1481,7 +1481,7 @@ namespace SongsOfConquestAccess.Adapters
             }
             catch (Exception exception)
             {
-                SocAccessPlugin.Instance?.LogWarning("CombatAdapter failed to clear focused tile overlay: " + exception.Message);
+                SocAccessMod.Instance?.LogWarning("CombatAdapter failed to clear focused tile overlay: " + exception.Message);
             }
         }
 
@@ -1641,7 +1641,7 @@ namespace SongsOfConquestAccess.Adapters
         {
             if (clickMethod == null || _mouseKeyboardInputModule == null)
             {
-                SocAccessPlugin.Instance?.LogWarning("CombatAdapter cannot emulate " + clickName + " click because the native mouse input module was not resolved.");
+                SocAccessMod.Instance?.LogWarning("CombatAdapter cannot emulate " + clickName + " click because the native mouse input module was not resolved.");
                 return false;
             }
 
@@ -1652,7 +1652,7 @@ namespace SongsOfConquestAccess.Adapters
             }
             catch (Exception exception)
             {
-                SocAccessPlugin.Instance?.LogWarning("CombatAdapter failed to emulate native " + clickName + " click: " + exception.Message);
+                SocAccessMod.Instance?.LogWarning("CombatAdapter failed to emulate native " + clickName + " click: " + exception.Message);
                 return false;
             }
         }
@@ -1687,14 +1687,14 @@ namespace SongsOfConquestAccess.Adapters
             screenInputOverride = null;
             if (_inputManager == null || _inputManager.Screen == null || _inputManager.Screen.Primary == null)
             {
-                SocAccessPlugin.Instance?.LogWarning("CombatAdapter could not override native screen input because primary screen input was unavailable");
+                SocAccessMod.Instance?.LogWarning("CombatAdapter could not override native screen input because primary screen input was unavailable");
                 return false;
             }
 
             object response = ResolveWritableScreenInputResponse(_inputManager.Screen.Primary);
             if (response == null)
             {
-                SocAccessPlugin.Instance?.LogWarning("CombatAdapter could not override native screen input because no writable ScreenInputResponse could be resolved from " + _inputManager.Screen.Primary.GetType().FullName);
+                SocAccessMod.Instance?.LogWarning("CombatAdapter could not override native screen input because no writable ScreenInputResponse could be resolved from " + _inputManager.Screen.Primary.GetType().FullName);
                 return false;
             }
 
@@ -1704,7 +1704,7 @@ namespace SongsOfConquestAccess.Adapters
                 || screenPosition.x > Screen.width
                 || screenPosition.y > Screen.height)
             {
-                SocAccessPlugin.Instance?.LogWarning("CombatAdapter could not target tile " + FormatDiagnosticPoint(tilePosition) + " because its screen position is outside the current view: " + screenPosition);
+                SocAccessMod.Instance?.LogWarning("CombatAdapter could not target tile " + FormatDiagnosticPoint(tilePosition) + " because its screen position is outside the current view: " + screenPosition);
                 return false;
             }
 
@@ -1861,7 +1861,7 @@ namespace SongsOfConquestAccess.Adapters
             }
             catch (Exception exception)
             {
-                SocAccessPlugin.Instance?.LogWarning("CombatAdapter failed to update native attack previews: " + exception.Message);
+                SocAccessMod.Instance?.LogWarning("CombatAdapter failed to update native attack previews: " + exception.Message);
             }
         }
 
@@ -3063,7 +3063,7 @@ namespace SongsOfConquestAccess.Adapters
                 }
                 catch (Exception exception)
                 {
-                    SocAccessPlugin.Instance?.LogWarning("CombatAdapter failed to resolve tile world position: " + exception.Message);
+                    SocAccessMod.Instance?.LogWarning("CombatAdapter failed to resolve tile world position: " + exception.Message);
                 }
             }
 
@@ -3203,7 +3203,7 @@ namespace SongsOfConquestAccess.Adapters
                     || isPanningProperty == null
                     || wasActivatedOverUIProperty == null)
                 {
-                    SocAccessPlugin.Instance?.LogWarning("CombatAdapter could not override native screen input because required writable properties were missing on " + responseType.FullName);
+                    SocAccessMod.Instance?.LogWarning("CombatAdapter could not override native screen input because required writable properties were missing on " + responseType.FullName);
                     return null;
                 }
 

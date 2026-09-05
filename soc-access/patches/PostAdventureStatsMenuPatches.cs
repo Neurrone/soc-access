@@ -12,7 +12,7 @@ namespace SongsOfConquestAccess
         [HarmonyPostfix]
         private static void PostAdventureStatsMenuShowPostfix(PostAdventureStatsMenu __instance)
         {
-            SocAccessPlugin plugin = SocAccessPlugin.Instance;
+            SocAccessMod plugin = SocAccessMod.Instance;
             if (plugin != null && __instance != null)
             {
                 plugin.StartCoroutine(WaitForPostAdventureStatsReady(__instance));
@@ -23,7 +23,7 @@ namespace SongsOfConquestAccess
         [HarmonyPrefix]
         private static void PostAdventureStatsMenuClosePrefix(PostAdventureStatsMenu __instance)
         {
-            SocAccessPlugin.Instance?.ScreenDetector?.OnPostAdventureStatsClosed(__instance);
+            SocAccessMod.Instance?.ScreenDetector?.OnPostAdventureStatsClosed(__instance);
         }
 
         private static IEnumerator WaitForPostAdventureStatsReady(PostAdventureStatsMenu menu)
@@ -34,7 +34,7 @@ namespace SongsOfConquestAccess
                 PostAdventureStatsAdapter adapter = new PostAdventureStatsAdapter(menu);
                 if (adapter.IsReadyAfterAnimation())
                 {
-                    SocAccessPlugin.Instance?.ScreenDetector?.OnPostAdventureStatsReady(menu);
+                    SocAccessMod.Instance?.ScreenDetector?.OnPostAdventureStatsReady(menu);
                     yield break;
                 }
 

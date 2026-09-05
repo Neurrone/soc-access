@@ -94,9 +94,9 @@ namespace SongsOfConquestAccess.Screens
 
         private static bool Close()
         {
-            return SocAccessPlugin.Instance != null
-                && SocAccessPlugin.Instance.ScreenManager != null
-                && SocAccessPlugin.Instance.ScreenManager.Pop<AnnouncementElementSettingsScreen>(
+            return SocAccessMod.Instance != null
+                && SocAccessMod.Instance.ScreenManager != null
+                && SocAccessMod.Instance.ScreenManager.Pop<AnnouncementElementSettingsScreen>(
                     "announcement element settings screen closed");
         }
 

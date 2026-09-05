@@ -21,14 +21,14 @@ namespace SongsOfConquestAccess
                 facade = FacadeRef(__instance);
             }
 
-            SocAccessPlugin.Instance?.ScreenDetector?.OnStorySequenceTrigger(payload, facade);
+            SocAccessMod.Instance?.ScreenDetector?.OnStorySequenceTrigger(payload, facade);
         }
 
         [HarmonyPatch(typeof(ReactiveAdventureMenuSystem), "HandleTriggerSeriesCompleted")]
         [HarmonyPostfix]
         private static void HandleTriggerSeriesCompletedPostfix()
         {
-            SocAccessPlugin.Instance?.ScreenDetector?.OnStorySequenceCompleted();
+            SocAccessMod.Instance?.ScreenDetector?.OnStorySequenceCompleted();
         }
     }
 }

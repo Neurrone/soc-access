@@ -36,7 +36,7 @@ namespace SongsOfConquestAccess.Bookmarks
             }
             catch (Exception exception)
             {
-                SocAccessPlugin.Instance?.LogWarning("Failed to load adventure bookmarks: " + exception.Message);
+                SocAccessMod.Instance?.LogWarning("Failed to load adventure bookmarks: " + exception.Message);
                 _set = new AdventureBookmarkSet();
             }
         }
@@ -55,7 +55,7 @@ namespace SongsOfConquestAccess.Bookmarks
             }
             catch (Exception exception)
             {
-                SocAccessPlugin.Instance?.LogWarning("Failed to persist adventure bookmarks: " + exception.Message);
+                SocAccessMod.Instance?.LogWarning("Failed to persist adventure bookmarks: " + exception.Message);
             }
 
             return ModText.Get(ModStrings.Bookmarks.BookmarkSaved);

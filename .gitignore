@@ -2,4 +2,7 @@ decompiled
 screenshots
 releases/
 release-template/BepInEx/config/SongsOfConquestAccess/translations
-release-template/BepInEx/plugins/SongsOfConquest.Access.dll
+release-template/BepInEx/plugins/SongsOfConquestAccess/SongsOfConquest.Access.dll
+release-template/BepInEx/plugins/SongsOfConquestAccess/SongsOfConquest.Access.pdb
+release-template/BepInEx/plugins/SongsOfConquestAccess/SongsOfConquest.Access.Loader.dll
+release-template/BepInEx/plugins/SongsOfConquestAccess/SongsOfConquest.Access.Loader.pdb

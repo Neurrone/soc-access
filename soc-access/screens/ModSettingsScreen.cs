@@ -293,12 +293,12 @@ namespace SongsOfConquestAccess.Screens
 
         private static bool OpenAudioGlossaryScreen()
         {
-            if (SocAccessPlugin.Instance == null || SocAccessPlugin.Instance.ScreenManager == null)
+            if (SocAccessMod.Instance == null || SocAccessMod.Instance.ScreenManager == null)
             {
                 return false;
             }
 
-            SocAccessPlugin.Instance.ScreenManager.Push(
+            SocAccessMod.Instance.ScreenManager.Push(
                 new AudioGlossaryScreen(),
                 "audio glossary screen opened");
             return true;
@@ -328,12 +328,12 @@ namespace SongsOfConquestAccess.Screens
 
         private static bool OpenCustomCategoriesScreen(ScannerTaxonomy taxonomy, ModString contextLabel)
         {
-            if (taxonomy == null || SocAccessPlugin.Instance == null || SocAccessPlugin.Instance.ScreenManager == null)
+            if (taxonomy == null || SocAccessMod.Instance == null || SocAccessMod.Instance.ScreenManager == null)
             {
                 return false;
             }
 
-            SocAccessPlugin.Instance.ScreenManager.Push(
+            SocAccessMod.Instance.ScreenManager.Push(
                 new ScannerCustomCategoriesScreen(taxonomy, contextLabel),
                 "scanner custom categories screen opened");
             return true;
@@ -341,12 +341,12 @@ namespace SongsOfConquestAccess.Screens
 
         private static bool OpenAnnouncementOrderScreen(AnnouncementGroupDefinition group)
         {
-            if (group == null || SocAccessPlugin.Instance == null || SocAccessPlugin.Instance.ScreenManager == null)
+            if (group == null || SocAccessMod.Instance == null || SocAccessMod.Instance.ScreenManager == null)
             {
                 return false;
             }
 
-            SocAccessPlugin.Instance.ScreenManager.Push(
+            SocAccessMod.Instance.ScreenManager.Push(
                 new AnnouncementOrderScreen(group),
                 "announcement order screen opened");
             return true;

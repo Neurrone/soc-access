@@ -54,7 +54,7 @@ namespace SongsOfConquestAccess
                 _currentWindow = null;
             }
 
-            ScreenManager screenManager = SocAccessPlugin.Instance?.ScreenManager;
+            ScreenManager screenManager = SocAccessMod.Instance?.ScreenManager;
             if (screenManager != null && screenManager.CurrentScreen is ChatScreen)
             {
                 screenManager.Pop<ChatScreen>("chat window disposed");
@@ -72,7 +72,7 @@ namespace SongsOfConquestAccess
                 return;
             }
 
-            ScreenManager screenManager = SocAccessPlugin.Instance?.ScreenManager;
+            ScreenManager screenManager = SocAccessMod.Instance?.ScreenManager;
             if (screenManager == null)
             {
                 return;
@@ -94,7 +94,7 @@ namespace SongsOfConquestAccess
         [HarmonyPostfix]
         private static void HidePostfix()
         {
-            ScreenManager screenManager = SocAccessPlugin.Instance?.ScreenManager;
+            ScreenManager screenManager = SocAccessMod.Instance?.ScreenManager;
             // Native Hide is also called during initialization and cleanup when
             // the chat window may not be open, so only pop an active top screen.
             if (screenManager != null && screenManager.CurrentScreen is ChatScreen)
@@ -114,7 +114,7 @@ namespace SongsOfConquestAccess
                 return;
             }
 
-            ScreenManager screenManager = SocAccessPlugin.Instance?.ScreenManager;
+            ScreenManager screenManager = SocAccessMod.Instance?.ScreenManager;
             ChatScreen chatScreen = screenManager?.CurrentScreen as ChatScreen;
             if (adapter.IsOpen && chatScreen != null)
             {
@@ -225,7 +225,7 @@ namespace SongsOfConquestAccess
             }
             catch (System.Exception exception)
             {
-                SocAccessPlugin.Instance?.LogWarning("Failed to recover chat runtime service: " + exception.Message);
+                SocAccessMod.Instance?.LogWarning("Failed to recover chat runtime service: " + exception.Message);
             }
 
             return null;

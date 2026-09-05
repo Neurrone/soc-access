@@ -138,7 +138,7 @@ namespace SongsOfConquestAccess.Adapters
                 }
                 catch (System.Exception exception)
                 {
-                    SocAccessPlugin.Instance?.LogWarning("Failed to read QuitToDesktopPopup settings: " + exception.Message);
+                    SocAccessMod.Instance?.LogWarning("Failed to read QuitToDesktopPopup settings: " + exception.Message);
                     return null;
                 }
             }

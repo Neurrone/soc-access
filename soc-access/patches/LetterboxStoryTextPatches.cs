@@ -15,7 +15,7 @@ namespace SongsOfConquestAccess
         [HarmonyPostfix]
         private static void LetterboxStoryTextShowPostfix(LetterboxStoryText __instance)
         {
-            SocAccessPlugin plugin = SocAccessPlugin.Instance;
+            SocAccessMod plugin = SocAccessMod.Instance;
             if (plugin != null)
             {
                 plugin.StartCoroutine(WaitForLetterboxStoryTextReady(__instance));
@@ -35,7 +35,7 @@ namespace SongsOfConquestAccess
         {
             if (__state)
             {
-                SocAccessPlugin.Instance?.ScreenDetector?.OnLetterboxStoryTextClosed(__instance);
+                SocAccessMod.Instance?.ScreenDetector?.OnLetterboxStoryTextClosed(__instance);
             }
         }
 
@@ -47,7 +47,7 @@ namespace SongsOfConquestAccess
                 LetterboxStoryTextAdapter adapter = new LetterboxStoryTextAdapter(storyText);
                 if (adapter.IsPresent())
                 {
-                    SocAccessPlugin.Instance?.ScreenDetector?.OnLetterboxStoryTextReady(storyText);
+                    SocAccessMod.Instance?.ScreenDetector?.OnLetterboxStoryTextReady(storyText);
                     yield break;
                 }
 

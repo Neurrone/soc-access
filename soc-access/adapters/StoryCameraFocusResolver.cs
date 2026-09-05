@@ -32,7 +32,7 @@ namespace SongsOfConquestAccess.Adapters
             IMapEntity focusPoint = FindCameraFocusPoint(facade, camera.reference);
             if (focusPoint == null)
             {
-                SocAccessPlugin.Instance?.LogWarning("Story camera focus point not found: " + camera.reference);
+                SocAccessMod.Instance?.LogWarning("Story camera focus point not found: " + camera.reference);
                 return null;
             }
 
@@ -107,7 +107,7 @@ namespace SongsOfConquestAccess.Adapters
             }
             catch (Exception exception)
             {
-                SocAccessPlugin.Instance?.LogWarning("Failed to localize story camera focus target " + nameKey + ": " + exception.Message);
+                SocAccessMod.Instance?.LogWarning("Failed to localize story camera focus target " + nameKey + ": " + exception.Message);
                 return nameKey;
             }
         }
@@ -173,7 +173,7 @@ namespace SongsOfConquestAccess.Adapters
             }
             catch (Exception exception)
             {
-                SocAccessPlugin.Instance?.LogWarning("Failed to resolve story camera focus tile entity at " + FormatTile(tile) + ": " + exception.Message);
+                SocAccessMod.Instance?.LogWarning("Failed to resolve story camera focus tile entity at " + FormatTile(tile) + ": " + exception.Message);
             }
 
             return facade.MapEntities.All != null
@@ -227,7 +227,7 @@ namespace SongsOfConquestAccess.Adapters
             }
             catch (Exception exception)
             {
-                SocAccessPlugin.Instance?.LogWarning("Failed to convert story camera focus world position to tile: " + exception.Message);
+                SocAccessMod.Instance?.LogWarning("Failed to convert story camera focus world position to tile: " + exception.Message);
             }
 
             return null;
@@ -244,7 +244,7 @@ namespace SongsOfConquestAccess.Adapters
             }
             catch (Exception exception)
             {
-                SocAccessPlugin.Instance?.LogWarning("Failed to resolve story camera focus wielder name: " + exception.Message);
+                SocAccessMod.Instance?.LogWarning("Failed to resolve story camera focus wielder name: " + exception.Message);
                 return ModText.Get(ModStrings.Events.Wielder);
             }
         }

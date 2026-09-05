@@ -447,7 +447,7 @@ namespace SongsOfConquestAccess.Adapters
             }
             catch (Exception exception)
             {
-                SocAccessPlugin.Instance?.LogWarning("Failed to read local chat team: " + exception.Message);
+                SocAccessMod.Instance?.LogWarning("Failed to read local chat team: " + exception.Message);
                 return false;
             }
         }
@@ -487,7 +487,7 @@ namespace SongsOfConquestAccess.Adapters
                 }
                 catch (Exception exception)
                 {
-                    SocAccessPlugin.Instance?.LogWarning("Failed to read chat sender name: " + exception.Message);
+                    SocAccessMod.Instance?.LogWarning("Failed to read chat sender name: " + exception.Message);
                 }
             }
 
@@ -511,7 +511,7 @@ namespace SongsOfConquestAccess.Adapters
                 }
                 catch (Exception exception)
                 {
-                    SocAccessPlugin.Instance?.LogWarning("Failed to render chat message: " + exception.Message);
+                    SocAccessMod.Instance?.LogWarning("Failed to render chat message: " + exception.Message);
                 }
             }
 

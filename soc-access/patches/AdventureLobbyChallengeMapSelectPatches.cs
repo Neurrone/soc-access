@@ -13,28 +13,28 @@ namespace SongsOfConquestAccess
         [HarmonyPostfix]
         private static void ChallengeMapsMenuShowPostfix(ChallengeMapsMenu __instance)
         {
-            SocAccessPlugin.Instance?.StartCoroutine(WaitForChallengeMapSelectMenuReady(__instance));
+            SocAccessMod.Instance?.StartCoroutine(WaitForChallengeMapSelectMenuReady(__instance));
         }
 
         [HarmonyPatch(typeof(ChallengeMapsMenu), "Hide")]
         [HarmonyPostfix]
         private static void ChallengeMapsMenuHidePostfix(ChallengeMapsMenu __instance)
         {
-            SocAccessPlugin.Instance?.ScreenDetector?.OnAdventureLobbyChallengeMapSelectClosed(__instance);
+            SocAccessMod.Instance?.ScreenDetector?.OnAdventureLobbyChallengeMapSelectClosed(__instance);
         }
 
         [HarmonyPatch(typeof(ChallengeMapsMenu), "OnDestroy")]
         [HarmonyPostfix]
         private static void ChallengeMapsMenuOnDestroyPostfix(ChallengeMapsMenu __instance)
         {
-            SocAccessPlugin.Instance?.ScreenDetector?.OnAdventureLobbyChallengeMapSelectClosed(__instance);
+            SocAccessMod.Instance?.ScreenDetector?.OnAdventureLobbyChallengeMapSelectClosed(__instance);
         }
 
         [HarmonyPatch(typeof(ChallengeMapsMenu), "SetSelectedEntry")]
         [HarmonyPostfix]
         private static void ChallengeMapsMenuSetSelectedEntryPostfix(ChallengeMapsMenu __instance)
         {
-            SocAccessPlugin.Instance?.ScreenDetector?.OnAdventureLobbyChallengeMapSelectSelectionChanged(__instance);
+            SocAccessMod.Instance?.ScreenDetector?.OnAdventureLobbyChallengeMapSelectSelectionChanged(__instance);
         }
 
         private static IEnumerator WaitForChallengeMapSelectMenuReady(ChallengeMapsMenu menu)
@@ -45,7 +45,7 @@ namespace SongsOfConquestAccess
                 AdventureLobbyChallengeMapSelectAdapter adapter = new AdventureLobbyChallengeMapSelectAdapter(menu);
                 if (adapter.IsPresent())
                 {
-                    SocAccessPlugin.Instance?.ScreenDetector?.OnAdventureLobbyChallengeMapSelectReady(menu);
+                    SocAccessMod.Instance?.ScreenDetector?.OnAdventureLobbyChallengeMapSelectReady(menu);
                     yield break;
                 }
 

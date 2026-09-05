@@ -20,14 +20,14 @@ namespace SongsOfConquestAccess
         [HarmonyPostfix]
         private static void CustomCampaignSelectMenuBehaviorDisposePostfix(CustomCampaignSelectMenuBehavior __instance)
         {
-            SocAccessPlugin.Instance?.ScreenDetector?.OnCustomCampaignSelectClosed(__instance);
+            SocAccessMod.Instance?.ScreenDetector?.OnCustomCampaignSelectClosed(__instance);
         }
 
         [HarmonyPatch(typeof(CustomCampaignEntry), "HandleStatusChanged")]
         [HarmonyPostfix]
         private static void CustomCampaignEntryHandleStatusChangedPostfix(CustomCampaignEntry __instance)
         {
-            SocAccessPlugin.Instance?.ScreenDetector?.OnCustomCampaignEntryStatusChanged(__instance);
+            SocAccessMod.Instance?.ScreenDetector?.OnCustomCampaignEntryStatusChanged(__instance);
         }
 
         private static async UniTask WaitForCustomCampaignSelectRepopulate(
@@ -35,7 +35,7 @@ namespace SongsOfConquestAccess
             UniTask original)
         {
             await original;
-            SocAccessPlugin.Instance?.ScreenDetector?.OnCustomCampaignSelectRepopulated(behavior);
+            SocAccessMod.Instance?.ScreenDetector?.OnCustomCampaignSelectRepopulated(behavior);
         }
     }
 }

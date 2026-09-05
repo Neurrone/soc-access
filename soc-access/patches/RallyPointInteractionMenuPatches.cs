@@ -45,7 +45,7 @@ namespace SongsOfConquestAccess
         {
             if (__state)
             {
-                SocAccessPlugin.Instance?.ScreenDetector?.OnRallyPointClosed(__instance);
+                SocAccessMod.Instance?.ScreenDetector?.OnRallyPointClosed(__instance);
             }
         }
 
@@ -58,7 +58,7 @@ namespace SongsOfConquestAccess
 
         private static void StartWaitForReady(RallyPointInteractionMenu menu)
         {
-            SocAccessPlugin plugin = SocAccessPlugin.Instance;
+            SocAccessMod plugin = SocAccessMod.Instance;
             if (plugin != null && menu != null)
             {
                 plugin.StartCoroutine(WaitForReady(menu, initialOpen: true));
@@ -67,7 +67,7 @@ namespace SongsOfConquestAccess
 
         private static void StartWaitForChanged(RallyPointInteractionMenu menu)
         {
-            SocAccessPlugin plugin = SocAccessPlugin.Instance;
+            SocAccessMod plugin = SocAccessMod.Instance;
             if (plugin != null && menu != null)
             {
                 plugin.StartCoroutine(WaitForReady(menu, initialOpen: false));
@@ -84,11 +84,11 @@ namespace SongsOfConquestAccess
                 {
                     if (initialOpen)
                     {
-                        SocAccessPlugin.Instance?.ScreenDetector?.OnRallyPointReady(menu);
+                        SocAccessMod.Instance?.ScreenDetector?.OnRallyPointReady(menu);
                     }
                     else
                     {
-                        SocAccessPlugin.Instance?.ScreenDetector?.OnRallyPointChanged(menu);
+                        SocAccessMod.Instance?.ScreenDetector?.OnRallyPointChanged(menu);
                     }
 
                     yield break;

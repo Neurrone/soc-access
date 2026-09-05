@@ -61,7 +61,7 @@ namespace SongsOfConquestAccess
 
         private static void StartReadyWait(PostAdventureMenu menu)
         {
-            SocAccessPlugin plugin = SocAccessPlugin.Instance;
+            SocAccessMod plugin = SocAccessMod.Instance;
             if (plugin != null && menu != null)
             {
                 plugin.StartCoroutine(WaitForPostAdventureResultReady(menu));
@@ -76,7 +76,7 @@ namespace SongsOfConquestAccess
                 PostAdventureResultAdapter adapter = new PostAdventureResultAdapter(menu);
                 if (adapter.IsReadyAfterAnimation())
                 {
-                    SocAccessPlugin.Instance?.ScreenDetector?.OnPostAdventureResultReady(menu);
+                    SocAccessMod.Instance?.ScreenDetector?.OnPostAdventureResultReady(menu);
                     yield break;
                 }
 
@@ -87,7 +87,7 @@ namespace SongsOfConquestAccess
 
         private static void NotifyClosedIfTopScreen(PostAdventureMenu menu)
         {
-            SocAccessPlugin.Instance?.ScreenDetector?.OnPostAdventureResultClosed(menu);
+            SocAccessMod.Instance?.ScreenDetector?.OnPostAdventureResultClosed(menu);
         }
     }
 }

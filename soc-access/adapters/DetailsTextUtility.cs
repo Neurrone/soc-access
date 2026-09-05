@@ -67,7 +67,7 @@ namespace SongsOfConquestAccess.Adapters
             }
             catch (System.Exception ex)
             {
-                SocAccessPlugin.Instance?.LogWarning("DetailsTextUtility failed to draw details: " + ex.Message);
+                SocAccessMod.Instance?.LogWarning("DetailsTextUtility failed to draw details: " + ex.Message);
             }
 
             return drawer;

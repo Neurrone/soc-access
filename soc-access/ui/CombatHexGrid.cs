@@ -207,31 +207,31 @@ namespace SongsOfConquestAccess.UI
 
             if (action.Key == AccessibilityActions.CombatNextActingTroop.Key)
             {
-                CombatScreen screen = SocAccessPlugin.Instance?.ScreenManager?.CurrentScreen as CombatScreen;
+                CombatScreen screen = SocAccessMod.Instance?.ScreenManager?.CurrentScreen as CombatScreen;
                 return screen != null && screen.NavigateLocalActingTroop(1);
             }
 
             if (action.Key == AccessibilityActions.CombatPreviousActingTroop.Key)
             {
-                CombatScreen screen = SocAccessPlugin.Instance?.ScreenManager?.CurrentScreen as CombatScreen;
+                CombatScreen screen = SocAccessMod.Instance?.ScreenManager?.CurrentScreen as CombatScreen;
                 return screen != null && screen.NavigateLocalActingTroop(-1);
             }
 
             if (action.Key == AccessibilityActions.CombatFocusActingTroop.Key)
             {
-                CombatScreen screen = SocAccessPlugin.Instance?.ScreenManager?.CurrentScreen as CombatScreen;
+                CombatScreen screen = SocAccessMod.Instance?.ScreenManager?.CurrentScreen as CombatScreen;
                 return screen != null && screen.FocusActingTroop();
             }
 
             if (action.Key == AccessibilityActions.CombatNextEnemyTroop.Key)
             {
-                CombatScreen screen = SocAccessPlugin.Instance?.ScreenManager?.CurrentScreen as CombatScreen;
+                CombatScreen screen = SocAccessMod.Instance?.ScreenManager?.CurrentScreen as CombatScreen;
                 return screen != null && screen.NavigateEnemyActingTroop(1);
             }
 
             if (action.Key == AccessibilityActions.CombatPreviousEnemyTroop.Key)
             {
-                CombatScreen screen = SocAccessPlugin.Instance?.ScreenManager?.CurrentScreen as CombatScreen;
+                CombatScreen screen = SocAccessMod.Instance?.ScreenManager?.CurrentScreen as CombatScreen;
                 return screen != null && screen.NavigateEnemyActingTroop(-1);
             }
 
@@ -247,7 +247,7 @@ namespace SongsOfConquestAccess.UI
 
             if (action.Key == AccessibilityActions.CombatFocusTimeline.Key)
             {
-                CombatScreen screen = SocAccessPlugin.Instance?.ScreenManager?.CurrentScreen as CombatScreen;
+                CombatScreen screen = SocAccessMod.Instance?.ScreenManager?.CurrentScreen as CombatScreen;
                 return screen != null && screen.FocusTimeline();
             }
 
@@ -303,13 +303,13 @@ namespace SongsOfConquestAccess.UI
 
         private bool CanNavigateLocalActingTroops()
         {
-            CombatScreen screen = SocAccessPlugin.Instance?.ScreenManager?.CurrentScreen as CombatScreen;
+            CombatScreen screen = SocAccessMod.Instance?.ScreenManager?.CurrentScreen as CombatScreen;
             return screen != null && screen.CanNavigateLocalActingTroops();
         }
 
         private bool CanNavigateEnemyActingTroops()
         {
-            CombatScreen screen = SocAccessPlugin.Instance?.ScreenManager?.CurrentScreen as CombatScreen;
+            CombatScreen screen = SocAccessMod.Instance?.ScreenManager?.CurrentScreen as CombatScreen;
             return screen != null && screen.CanNavigateEnemyActingTroops();
         }
 

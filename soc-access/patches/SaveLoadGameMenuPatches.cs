@@ -11,14 +11,14 @@ namespace SongsOfConquestAccess.Patches
         [HarmonyPostfix]
         private static void SaveLoadGameMenuOnOpenedPostfix(SaveLoadGameMenu __instance)
         {
-            SocAccessPlugin.Instance?.ScreenDetector?.OnSaveLoadGameMenuReady(__instance);
+            SocAccessMod.Instance?.ScreenDetector?.OnSaveLoadGameMenuReady(__instance);
         }
 
         [HarmonyPatch(typeof(SaveLoadGameMenu), "OnClosed")]
         [HarmonyPostfix]
         private static void SaveLoadGameMenuOnClosedPostfix(SaveLoadGameMenu __instance)
         {
-            SocAccessPlugin.Instance?.ScreenDetector?.OnSaveLoadGameMenuClosed(__instance);
+            SocAccessMod.Instance?.ScreenDetector?.OnSaveLoadGameMenuClosed(__instance);
         }
 
         [HarmonyPatch(typeof(SaveLoadGameMenu), "SpawnEntriesGameDefinitionsLoaded")]
@@ -51,12 +51,12 @@ namespace SongsOfConquestAccess.Patches
 
         private static void NotifyChanged(SaveLoadGameMenu menu)
         {
-            SocAccessPlugin.Instance?.ScreenDetector?.OnSaveLoadGameMenuChanged(menu);
+            SocAccessMod.Instance?.ScreenDetector?.OnSaveLoadGameMenuChanged(menu);
         }
 
         private static void NotifyChangedAfterFrames(SaveLoadGameMenu menu, int frames)
         {
-            SocAccessPlugin plugin = SocAccessPlugin.Instance;
+            SocAccessMod plugin = SocAccessMod.Instance;
             if (plugin == null)
             {
                 return;

@@ -15,14 +15,14 @@ namespace SongsOfConquestAccess
         [HarmonyPostfix]
         private static void MapTypeMenuShowPostfix(MapTypeMenu __instance)
         {
-            SocAccessPlugin.Instance?.StartCoroutine(WaitForMapTypeMenuReady(__instance));
+            SocAccessMod.Instance?.StartCoroutine(WaitForMapTypeMenuReady(__instance));
         }
 
         [HarmonyPatch(typeof(MapTypeMenu), "Hide")]
         [HarmonyPostfix]
         private static void MapTypeMenuHidePostfix(MapTypeMenu __instance)
         {
-            SocAccessPlugin.Instance?.ScreenDetector?.OnAdventureLobbyMapTypeClosed(__instance);
+            SocAccessMod.Instance?.ScreenDetector?.OnAdventureLobbyMapTypeClosed(__instance);
         }
 
         private static IEnumerator WaitForMapTypeMenuReady(MapTypeMenu menu)
@@ -36,7 +36,7 @@ namespace SongsOfConquestAccess
                     && gameObject.activeInHierarchy
                     && (canvasGroup == null || canvasGroup.blocksRaycasts || canvasGroup.alpha > 0.5f))
                 {
-                    SocAccessPlugin.Instance?.ScreenDetector?.OnAdventureLobbyMapTypeReady(menu);
+                    SocAccessMod.Instance?.ScreenDetector?.OnAdventureLobbyMapTypeReady(menu);
                     yield break;
                 }
 

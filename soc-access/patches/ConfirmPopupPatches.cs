@@ -13,35 +13,35 @@ namespace SongsOfConquestAccess.Patches
         [HarmonyPostfix]
         private static void ShowPostfix(ConfirmPopup __instance)
         {
-            SocAccessPlugin.Instance?.ScreenDetector?.OnConfirmPopupReady(__instance);
+            SocAccessMod.Instance?.ScreenDetector?.OnConfirmPopupReady(__instance);
         }
 
         [HarmonyPatch(typeof(ConfirmPopup), "ShowConfirmOnly", new Type[] { typeof(string), typeof(string), typeof(Vector2), typeof(bool), typeof(InputLevel) })]
         [HarmonyPostfix]
         private static void ShowConfirmOnlyPostfix(ConfirmPopup __instance)
         {
-            SocAccessPlugin.Instance?.ScreenDetector?.OnConfirmPopupReady(__instance);
+            SocAccessMod.Instance?.ScreenDetector?.OnConfirmPopupReady(__instance);
         }
 
         [HarmonyPatch(typeof(ConfirmPopup), "ShowDenyOnly", new Type[] { typeof(string), typeof(string), typeof(Vector2), typeof(bool), typeof(InputLevel) })]
         [HarmonyPostfix]
         private static void ShowDenyOnlyPostfix(ConfirmPopup __instance)
         {
-            SocAccessPlugin.Instance?.ScreenDetector?.OnConfirmPopupReady(__instance);
+            SocAccessMod.Instance?.ScreenDetector?.OnConfirmPopupReady(__instance);
         }
 
         [HarmonyPatch(typeof(ConfirmPopup), "ShowButtonLess", new Type[] { typeof(string), typeof(string), typeof(Vector2), typeof(bool), typeof(InputLevel) })]
         [HarmonyPostfix]
         private static void ShowButtonLessPostfix(ConfirmPopup __instance)
         {
-            SocAccessPlugin.Instance?.ScreenDetector?.OnConfirmPopupReady(__instance);
+            SocAccessMod.Instance?.ScreenDetector?.OnConfirmPopupReady(__instance);
         }
 
         [HarmonyPatch(typeof(ConfirmPopup), "Close", new Type[] { typeof(bool) })]
         [HarmonyPostfix]
         private static void ClosePostfix(ConfirmPopup __instance)
         {
-            SocAccessPlugin.Instance?.ScreenDetector?.OnConfirmPopupClosed(__instance);
+            SocAccessMod.Instance?.ScreenDetector?.OnConfirmPopupClosed(__instance);
         }
     }
 }

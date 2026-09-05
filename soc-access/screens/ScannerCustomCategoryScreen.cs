@@ -181,12 +181,12 @@ namespace SongsOfConquestAccess.Screens
 
         private bool OpenSelectors(ScannerCategoryDefinition definition)
         {
-            if (SocAccessPlugin.Instance == null || SocAccessPlugin.Instance.ScreenManager == null)
+            if (SocAccessMod.Instance == null || SocAccessMod.Instance.ScreenManager == null)
             {
                 return false;
             }
 
-            SocAccessPlugin.Instance.ScreenManager.Push(
+            SocAccessMod.Instance.ScreenManager.Push(
                 new ScannerCustomCategorySelectorScreen(GetTaxonomyKey(), _id, definition),
                 "scanner custom category selectors opened");
             return true;
@@ -200,12 +200,12 @@ namespace SongsOfConquestAccess.Screens
 
         private bool OpenKeyPicker()
         {
-            if (SocAccessPlugin.Instance == null || SocAccessPlugin.Instance.ScreenManager == null)
+            if (SocAccessMod.Instance == null || SocAccessMod.Instance.ScreenManager == null)
             {
                 return false;
             }
 
-            SocAccessPlugin.Instance.ScreenManager.Push(
+            SocAccessMod.Instance.ScreenManager.Push(
                 new ScannerCustomCategoryKeyScreen(GetTaxonomyKey(), _id),
                 "scanner custom category key picker opened");
             return true;
@@ -264,7 +264,7 @@ namespace SongsOfConquestAccess.Screens
         /// </summary>
         private void RepromptRename(string rejected)
         {
-            SocAccessPlugin plugin = SocAccessPlugin.Instance;
+            SocAccessMod plugin = SocAccessMod.Instance;
             if (plugin == null)
             {
                 PromptRename(rejected);
@@ -363,9 +363,9 @@ namespace SongsOfConquestAccess.Screens
 
         private static bool Close()
         {
-            return SocAccessPlugin.Instance != null
-                && SocAccessPlugin.Instance.ScreenManager != null
-                && SocAccessPlugin.Instance.ScreenManager.Pop<ScannerCustomCategoryScreen>(
+            return SocAccessMod.Instance != null
+                && SocAccessMod.Instance.ScreenManager != null
+                && SocAccessMod.Instance.ScreenManager.Pop<ScannerCustomCategoryScreen>(
                     "scanner custom category editor closed");
         }
     }

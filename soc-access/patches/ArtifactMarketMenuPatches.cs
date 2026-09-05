@@ -16,14 +16,14 @@ namespace SongsOfConquestAccess
                 return;
             }
 
-            SocAccessPlugin.Instance?.ScreenDetector?.OnArtifactMarketReady(__instance);
+            SocAccessMod.Instance?.ScreenDetector?.OnArtifactMarketReady(__instance);
         }
 
         [HarmonyPatch(typeof(ArtifactMarketMenu), "Close")]
         [HarmonyPostfix]
         private static void ArtifactMarketMenuClosePostfix(ArtifactMarketMenu __instance)
         {
-            SocAccessPlugin.Instance?.ScreenDetector?.OnArtifactMarketClosed(__instance);
+            SocAccessMod.Instance?.ScreenDetector?.OnArtifactMarketClosed(__instance);
         }
 
         [HarmonyPatch(typeof(ArtifactMarketMenu), "HandleSwitchedCategory")]
@@ -35,7 +35,7 @@ namespace SongsOfConquestAccess
                 return;
             }
 
-            SocAccessPlugin.Instance?.ScreenDetector?.OnArtifactMarketChanged();
+            SocAccessMod.Instance?.ScreenDetector?.OnArtifactMarketChanged();
         }
     }
 }

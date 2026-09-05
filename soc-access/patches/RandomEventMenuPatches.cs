@@ -11,14 +11,14 @@ namespace SongsOfConquestAccess.Patches
         [HarmonyPostfix]
         private static void OpenPostfix(RandomEventMenu __instance)
         {
-            SocAccessPlugin.Instance?.ScreenDetector?.OnRandomEventMenuReady(__instance);
+            SocAccessMod.Instance?.ScreenDetector?.OnRandomEventMenuReady(__instance);
         }
 
         [HarmonyPatch(typeof(RandomEventMenu), "Hide")]
         [HarmonyPostfix]
         private static void HidePostfix(RandomEventMenu __instance)
         {
-            SocAccessPlugin.Instance?.ScreenDetector?.OnRandomEventMenuClosed(__instance);
+            SocAccessMod.Instance?.ScreenDetector?.OnRandomEventMenuClosed(__instance);
         }
     }
 }

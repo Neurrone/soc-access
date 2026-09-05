@@ -78,7 +78,7 @@ namespace SongsOfConquestAccess
         [HarmonyPostfix]
         private static void PopupMenuOnClosedPostfix(PopupMenu __instance)
         {
-            SocAccessPlugin.Instance?.ScreenDetector?.OnPopupMenuClosed(__instance);
+            SocAccessMod.Instance?.ScreenDetector?.OnPopupMenuClosed(__instance);
         }
 
         private static void NotifyReady(PopupMenu popup)
@@ -91,7 +91,7 @@ namespace SongsOfConquestAccess
 
             if (settings == null)
             {
-                SocAccessPlugin.Instance?.ScreenDetector?.OnPopupMenuReady(popup, settings);
+                SocAccessMod.Instance?.ScreenDetector?.OnPopupMenuReady(popup, settings);
                 return;
             }
 
@@ -100,7 +100,7 @@ namespace SongsOfConquestAccess
                 return;
             }
 
-            SocAccessPlugin plugin = SocAccessPlugin.Instance;
+            SocAccessMod plugin = SocAccessMod.Instance;
             if (plugin != null)
             {
                 plugin.StartCoroutine(NotifyReadyWhenPresent(popup, settings));
@@ -133,14 +133,14 @@ namespace SongsOfConquestAccess
                 return false;
             }
 
-            SocAccessPlugin.Instance?.ScreenDetector?.OnPopupMenuReady(popup, settings);
+            SocAccessMod.Instance?.ScreenDetector?.OnPopupMenuReady(popup, settings);
             return true;
         }
 
         private static void LogPlatformUserInputPopup(PopupMenu popup)
         {
             PopupMenu.Settings settings = popup != null ? SettingsRef(popup) : null;
-            SocAccessPlugin.Instance?.LogInfo(
+            SocAccessMod.Instance?.LogInfo(
                 "PlatformUserMenuDebug input popup opened: header=\""
                 + GetText(settings != null ? settings.HeaderText : null)
                 + "\", message=\""

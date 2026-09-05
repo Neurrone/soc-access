@@ -59,7 +59,7 @@ namespace SongsOfConquestAccess.Adapters
                         }
                         catch (Exception callbackException)
                         {
-                            SocAccessPlugin.Instance?.LogWarning(
+                            SocAccessMod.Instance?.LogWarning(
                                 "Text prompt callback failed: " + callbackException);
                         }
                     }));
@@ -67,7 +67,7 @@ namespace SongsOfConquestAccess.Adapters
             }
             catch (Exception exception)
             {
-                SocAccessPlugin.Instance?.LogWarning("Failed to open the text prompt: " + exception.Message);
+                SocAccessMod.Instance?.LogWarning("Failed to open the text prompt: " + exception.Message);
                 return false;
             }
         }
@@ -82,7 +82,7 @@ namespace SongsOfConquestAccess.Adapters
             }
             catch (Exception exception)
             {
-                SocAccessPlugin.Instance?.LogWarning("Failed to resolve the system popups: " + exception.Message);
+                SocAccessMod.Instance?.LogWarning("Failed to resolve the system popups: " + exception.Message);
                 return null;
             }
         }

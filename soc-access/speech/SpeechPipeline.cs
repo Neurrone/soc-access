@@ -18,18 +18,18 @@ namespace SongsOfConquestAccess.Speech
         {
             if (request == null)
             {
-                SocAccessPlugin.Instance?.LogWarning("SpeechPipeline dropped null request");
+                SocAccessMod.Instance?.LogWarning("SpeechPipeline dropped null request");
                 return;
             }
 
             string text = request.Text;
             if (string.IsNullOrWhiteSpace(text))
             {
-                SocAccessPlugin.Instance?.LogWarning("SpeechPipeline dropped empty text");
+                SocAccessMod.Instance?.LogWarning("SpeechPipeline dropped empty text");
                 return;
             }
 
-            SocAccessPlugin.Instance?.LogInfo("SpeechPipeline output: \"" + text + "\", interrupt=" + request.Interrupt);
+            SocAccessMod.Instance?.LogInfo("SpeechPipeline output: \"" + text + "\", interrupt=" + request.Interrupt);
             _speechService.Speak(text, request.Interrupt);
         }
 

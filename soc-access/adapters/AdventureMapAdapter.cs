@@ -213,7 +213,7 @@ namespace SongsOfConquestAccess.Adapters
             }
             catch (Exception exception)
             {
-                SocAccessPlugin.Instance?.LogWarning("AdventureMapAdapter failed to read map file name for bookmarks: " + exception.Message);
+                SocAccessMod.Instance?.LogWarning("AdventureMapAdapter failed to read map file name for bookmarks: " + exception.Message);
             }
 
             uint mapRandomSeed = _facade.MapSettings != null ? _facade.MapSettings.RandomSeed : 0;
@@ -2703,7 +2703,7 @@ namespace SongsOfConquestAccess.Adapters
             }
             catch (Exception exception)
             {
-                SocAccessPlugin.Instance?.LogWarning("AdventureMapAdapter failed to set focused tile overlay: " + exception.Message);
+                SocAccessMod.Instance?.LogWarning("AdventureMapAdapter failed to set focused tile overlay: " + exception.Message);
             }
         }
 
@@ -2874,7 +2874,7 @@ namespace SongsOfConquestAccess.Adapters
             }
             catch (Exception exception)
             {
-                SocAccessPlugin.Instance?.LogWarning("AdventureMapAdapter failed to keep focused tile in view: " + exception.Message);
+                SocAccessMod.Instance?.LogWarning("AdventureMapAdapter failed to keep focused tile in view: " + exception.Message);
             }
         }
 
@@ -2889,11 +2889,11 @@ namespace SongsOfConquestAccess.Adapters
             {
                 Vector3 world = GetWorldCenter(tile);
                 _cameraController.MoveToPosition(world, false, Vector3.zero, null, true);
-                SocAccessPlugin.Instance?.StartCoroutine(RefreshFocusedTileOverlayAfterCameraMove(tile));
+                SocAccessMod.Instance?.StartCoroutine(RefreshFocusedTileOverlayAfterCameraMove(tile));
             }
             catch (Exception exception)
             {
-                SocAccessPlugin.Instance?.LogWarning("AdventureMapAdapter failed to move camera to focused tile: " + exception.Message);
+                SocAccessMod.Instance?.LogWarning("AdventureMapAdapter failed to move camera to focused tile: " + exception.Message);
             }
         }
 
@@ -2915,7 +2915,7 @@ namespace SongsOfConquestAccess.Adapters
             }
             catch (Exception exception)
             {
-                SocAccessPlugin.Instance?.LogWarning("AdventureMapAdapter failed to clear focused tile overlay: " + exception.Message);
+                SocAccessMod.Instance?.LogWarning("AdventureMapAdapter failed to clear focused tile overlay: " + exception.Message);
             }
         }
 
@@ -2939,7 +2939,7 @@ namespace SongsOfConquestAccess.Adapters
             }
             catch (Exception exception)
             {
-                SocAccessPlugin.Instance?.LogWarning("AdventureMapAdapter primary action failed: " + exception);
+                SocAccessMod.Instance?.LogWarning("AdventureMapAdapter primary action failed: " + exception);
                 PublishDenied(tilePosition, "Could not perform primary action.");
                 return true;
             }
@@ -2965,7 +2965,7 @@ namespace SongsOfConquestAccess.Adapters
             }
             catch (Exception exception)
             {
-                SocAccessPlugin.Instance?.LogWarning("AdventureMapAdapter secondary action failed: " + exception);
+                SocAccessMod.Instance?.LogWarning("AdventureMapAdapter secondary action failed: " + exception);
                 PublishDenied(tilePosition, "Could not perform secondary action.");
                 return true;
             }
@@ -2975,7 +2975,7 @@ namespace SongsOfConquestAccess.Adapters
         {
             if (_humanAdventureController == null)
             {
-                SocAccessPlugin.Instance?.LogWarning("AdventureMapAdapter could not select next wielder: controller is not available.");
+                SocAccessMod.Instance?.LogWarning("AdventureMapAdapter could not select next wielder: controller is not available.");
                 return true;
             }
 
@@ -2986,7 +2986,7 @@ namespace SongsOfConquestAccess.Adapters
             }
             catch (Exception exception)
             {
-                SocAccessPlugin.Instance?.LogWarning("AdventureMapAdapter next wielder action failed: " + exception);
+                SocAccessMod.Instance?.LogWarning("AdventureMapAdapter next wielder action failed: " + exception);
                 return true;
             }
         }
@@ -2995,7 +2995,7 @@ namespace SongsOfConquestAccess.Adapters
         {
             if (_humanAdventureController == null)
             {
-                SocAccessPlugin.Instance?.LogWarning("AdventureMapAdapter could not select next settlement: controller is not available.");
+                SocAccessMod.Instance?.LogWarning("AdventureMapAdapter could not select next settlement: controller is not available.");
                 return true;
             }
 
@@ -3006,7 +3006,7 @@ namespace SongsOfConquestAccess.Adapters
             }
             catch (Exception exception)
             {
-                SocAccessPlugin.Instance?.LogWarning("AdventureMapAdapter next settlement action failed: " + exception);
+                SocAccessMod.Instance?.LogWarning("AdventureMapAdapter next settlement action failed: " + exception);
                 return true;
             }
         }
@@ -3027,7 +3027,7 @@ namespace SongsOfConquestAccess.Adapters
             object inputModule = GetCurrentInputModule();
             if (inputModule == null)
             {
-                SocAccessPlugin.Instance?.LogWarning("AdventureMapAdapter could not invoke native " + inputName + " action because current input module was null");
+                SocAccessMod.Instance?.LogWarning("AdventureMapAdapter could not invoke native " + inputName + " action because current input module was null");
                 PublishDenied(tilePosition, unavailableMessage);
                 return false;
             }
@@ -3057,20 +3057,20 @@ namespace SongsOfConquestAccess.Adapters
             screenInputOverride = null;
             if (_inputManager == null || _inputManager.Screen == null || _inputManager.Screen.Primary == null)
             {
-                SocAccessPlugin.Instance?.LogWarning("AdventureMapAdapter could not override native screen input because primary screen input was unavailable");
+                SocAccessMod.Instance?.LogWarning("AdventureMapAdapter could not override native screen input because primary screen input was unavailable");
                 return false;
             }
 
             if (_cameraController == null || _cameraController.Camera == null)
             {
-                SocAccessPlugin.Instance?.LogWarning("AdventureMapAdapter could not override native screen input because the adventure camera was unavailable");
+                SocAccessMod.Instance?.LogWarning("AdventureMapAdapter could not override native screen input because the adventure camera was unavailable");
                 return false;
             }
 
             object response = ResolveWritableScreenInputResponse(_inputManager.Screen.Primary);
             if (response == null)
             {
-                SocAccessPlugin.Instance?.LogWarning("AdventureMapAdapter could not override native screen input because no writable ScreenInputResponse could be resolved from " + _inputManager.Screen.Primary.GetType().FullName);
+                SocAccessMod.Instance?.LogWarning("AdventureMapAdapter could not override native screen input because no writable ScreenInputResponse could be resolved from " + _inputManager.Screen.Primary.GetType().FullName);
                 return false;
             }
 
@@ -3083,7 +3083,7 @@ namespace SongsOfConquestAccess.Adapters
                 || screenPosition.x > Screen.width
                 || screenPosition.y > Screen.height)
             {
-                SocAccessPlugin.Instance?.LogWarning("AdventureMapAdapter could not target tile " + FormatTile(tilePosition) + " because its screen position is outside the current view: " + screenPosition);
+                SocAccessMod.Instance?.LogWarning("AdventureMapAdapter could not target tile " + FormatTile(tilePosition) + " because its screen position is outside the current view: " + screenPosition);
                 return false;
             }
 
@@ -3188,7 +3188,7 @@ namespace SongsOfConquestAccess.Adapters
                     || isPanningProperty == null
                     || wasActivatedOverUIProperty == null)
                 {
-                    SocAccessPlugin.Instance?.LogWarning("AdventureMapAdapter could not override native screen input because required writable properties were missing on " + responseType.FullName);
+                    SocAccessMod.Instance?.LogWarning("AdventureMapAdapter could not override native screen input because required writable properties were missing on " + responseType.FullName);
                     return null;
                 }
 
@@ -3266,7 +3266,7 @@ namespace SongsOfConquestAccess.Adapters
                 }
                 catch (Exception exception)
                 {
-                    SocAccessPlugin.Instance?.LogWarning("AdventureMapAdapter failed to resolve camera center tile: " + exception.Message);
+                    SocAccessMod.Instance?.LogWarning("AdventureMapAdapter failed to resolve camera center tile: " + exception.Message);
                 }
             }
 
@@ -3370,7 +3370,7 @@ namespace SongsOfConquestAccess.Adapters
                 }
                 catch (Exception exception)
                 {
-                    SocAccessPlugin.Instance?.LogWarning("AdventureMapAdapter failed to resolve tile world position: " + exception.Message);
+                    SocAccessMod.Instance?.LogWarning("AdventureMapAdapter failed to resolve tile world position: " + exception.Message);
                 }
             }
 
@@ -3476,7 +3476,7 @@ namespace SongsOfConquestAccess.Adapters
             }
             catch (Exception exception)
             {
-                SocAccessPlugin.Instance?.LogWarning("AdventureMapAdapter failed to get focused tile tooltip details: " + exception.Message);
+                SocAccessMod.Instance?.LogWarning("AdventureMapAdapter failed to get focused tile tooltip details: " + exception.Message);
                 return null;
             }
         }
@@ -3544,7 +3544,7 @@ namespace SongsOfConquestAccess.Adapters
             }
             catch (Exception exception)
             {
-                SocAccessPlugin.Instance?.LogWarning("AdventureMapAdapter failed to read fog readiness: " + exception.Message);
+                SocAccessMod.Instance?.LogWarning("AdventureMapAdapter failed to read fog readiness: " + exception.Message);
                 return false;
             }
         }
@@ -3715,7 +3715,7 @@ namespace SongsOfConquestAccess.Adapters
             }
             catch (Exception exception)
             {
-                SocAccessPlugin.Instance?.LogWarning("AdventureMapAdapter failed to read commander destination path: " + exception.Message);
+                SocAccessMod.Instance?.LogWarning("AdventureMapAdapter failed to read commander destination path: " + exception.Message);
             }
         }
 
@@ -4037,7 +4037,7 @@ namespace SongsOfConquestAccess.Adapters
             }
             catch (Exception exception)
             {
-                SocAccessPlugin.Instance?.LogWarning("AdventureMapAdapter failed to read map entity tooltip details: " + exception.Message);
+                SocAccessMod.Instance?.LogWarning("AdventureMapAdapter failed to read map entity tooltip details: " + exception.Message);
             }
         }
 

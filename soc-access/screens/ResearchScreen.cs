@@ -119,7 +119,7 @@ namespace SongsOfConquestAccess.Screens
 
         private void HandleResearchPurchased(OnResearchPurchasedPayload payload)
         {
-            if (!ReferenceEquals(SocAccessPlugin.Instance?.ScreenManager?.CurrentScreen, this))
+            if (!ReferenceEquals(SocAccessMod.Instance?.ScreenManager?.CurrentScreen, this))
             {
                 return;
             }

@@ -48,19 +48,19 @@ namespace SongsOfConquestAccess
         [HarmonyPostfix]
         private static void IconDropdownHidePostfix(IconDropdown __instance)
         {
-            SocAccessPlugin.Instance?.ScreenDetector?.OnAdventureLobbyIconDropdownClosed(__instance);
+            SocAccessMod.Instance?.ScreenDetector?.OnAdventureLobbyIconDropdownClosed(__instance);
         }
 
         [HarmonyPatch(typeof(IconDropdown), "OnDestroy")]
         [HarmonyPostfix]
         private static void IconDropdownOnDestroyPostfix(IconDropdown __instance)
         {
-            SocAccessPlugin.Instance?.ScreenDetector?.OnAdventureLobbyIconDropdownClosed(__instance);
+            SocAccessMod.Instance?.ScreenDetector?.OnAdventureLobbyIconDropdownClosed(__instance);
         }
 
         private static void StartReadyProbe(IconDropdown dropdown)
         {
-            SocAccessPlugin.Instance?.StartCoroutine(WaitForIconDropdownReady(dropdown));
+            SocAccessMod.Instance?.StartCoroutine(WaitForIconDropdownReady(dropdown));
         }
 
         private static IEnumerator WaitForIconDropdownReady(IconDropdown dropdown)
@@ -70,7 +70,7 @@ namespace SongsOfConquestAccess
             {
                 if (AdventureLobbyIconDropdownScreen.FindActiveDropdown(dropdown) != null)
                 {
-                    SocAccessPlugin.Instance?.ScreenDetector?.OnAdventureLobbyIconDropdownReady(dropdown);
+                    SocAccessMod.Instance?.ScreenDetector?.OnAdventureLobbyIconDropdownReady(dropdown);
                     yield break;
                 }
 

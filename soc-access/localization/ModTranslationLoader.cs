@@ -27,20 +27,20 @@ namespace SongsOfConquestAccess.Localization
 
                 if (string.IsNullOrEmpty(languageCode))
                 {
-                    SocAccessPlugin.Instance?.LogInfo("No game language is available for mod translations");
+                    SocAccessMod.Instance?.LogInfo("No game language is available for mod translations");
                     return;
                 }
 
                 if (IsEnglish(languageCode))
                 {
-                    SocAccessPlugin.Instance?.LogInfo("Using English mod string fallbacks");
+                    SocAccessMod.Instance?.LogInfo("Using English mod string fallbacks");
                     return;
                 }
 
                 string path = ResolvePoPath(localization, languageCode);
                 if (string.IsNullOrEmpty(path))
                 {
-                    SocAccessPlugin.Instance?.LogInfo(
+                    SocAccessMod.Instance?.LogInfo(
                         "No mod translation file found for language '" + languageCode + "' in " + string.Join(", ", GetTranslationsDirectories()));
                     return;
                 }
@@ -48,11 +48,11 @@ namespace SongsOfConquestAccess.Localization
                 try
                 {
                     _loadedCatalog = PoTranslationCatalog.Load(path);
-                    SocAccessPlugin.Instance?.LogInfo("Loaded mod translations from " + Path.GetFileName(path));
+                    SocAccessMod.Instance?.LogInfo("Loaded mod translations from " + Path.GetFileName(path));
                 }
                 catch (Exception exception)
                 {
-                    SocAccessPlugin.Instance?.LogWarning(
+                    SocAccessMod.Instance?.LogWarning(
                         "Failed to load mod translations from " + path + ": " + exception.Message);
                 }
             }

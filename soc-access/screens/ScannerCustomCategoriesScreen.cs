@@ -108,12 +108,12 @@ namespace SongsOfConquestAccess.Screens
 
         private bool OpenEditor(int id)
         {
-            if (SocAccessPlugin.Instance == null || SocAccessPlugin.Instance.ScreenManager == null)
+            if (SocAccessMod.Instance == null || SocAccessMod.Instance.ScreenManager == null)
             {
                 return false;
             }
 
-            SocAccessPlugin.Instance.ScreenManager.Push(
+            SocAccessMod.Instance.ScreenManager.Push(
                 new ScannerCustomCategoryScreen(_taxonomy, id),
                 "scanner custom category editor opened");
             return true;
@@ -136,9 +136,9 @@ namespace SongsOfConquestAccess.Screens
 
         private static bool Close()
         {
-            return SocAccessPlugin.Instance != null
-                && SocAccessPlugin.Instance.ScreenManager != null
-                && SocAccessPlugin.Instance.ScreenManager.Pop<ScannerCustomCategoriesScreen>(
+            return SocAccessMod.Instance != null
+                && SocAccessMod.Instance.ScreenManager != null
+                && SocAccessMod.Instance.ScreenManager.Pop<ScannerCustomCategoriesScreen>(
                     "scanner custom categories screen closed");
         }
 

@@ -123,7 +123,7 @@ namespace SongsOfConquestAccess.UI
             _lastFocusedWidget = target;
             _lastAnnouncement = announcement;
             _lastAnnouncementKey = announcementKey;
-            SocAccessPlugin.Instance?.LogInfo("UIManager speaking focused widget: \"" + announcement + "\"");
+            SocAccessMod.Instance?.LogInfo("UIManager speaking focused widget: \"" + announcement + "\"");
             SpeechPipeline.Output(new SpeechRequest(announcement, interrupt: false));
 
             PopulateUiReviewBuffer(target);
@@ -158,7 +158,7 @@ namespace SongsOfConquestAccess.UI
 
         private static void PopulateUiReviewBuffer(Widget widget)
         {
-            ReviewBufferManager buffers = SocAccessPlugin.Instance?.ReviewBuffers;
+            ReviewBufferManager buffers = SocAccessMod.Instance?.ReviewBuffers;
             if (buffers == null)
             {
                 return;

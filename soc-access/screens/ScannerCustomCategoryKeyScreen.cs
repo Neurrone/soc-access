@@ -117,9 +117,9 @@ namespace SongsOfConquestAccess.Screens
 
         private static bool Close()
         {
-            return SocAccessPlugin.Instance != null
-                && SocAccessPlugin.Instance.ScreenManager != null
-                && SocAccessPlugin.Instance.ScreenManager.Pop<ScannerCustomCategoryKeyScreen>(
+            return SocAccessMod.Instance != null
+                && SocAccessMod.Instance.ScreenManager != null
+                && SocAccessMod.Instance.ScreenManager.Pop<ScannerCustomCategoryKeyScreen>(
                     "scanner custom category key screen closed");
         }
     }

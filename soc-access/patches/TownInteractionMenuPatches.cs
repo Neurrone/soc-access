@@ -45,7 +45,7 @@ namespace SongsOfConquestAccess
         {
             if (__state)
             {
-                SocAccessPlugin.Instance?.ScreenDetector?.OnSettlementClosed(__instance);
+                SocAccessMod.Instance?.ScreenDetector?.OnSettlementClosed(__instance);
             }
         }
 
@@ -72,7 +72,7 @@ namespace SongsOfConquestAccess
 
         private static void StartWaitForTopLevel(TownInteractionMenu menu)
         {
-            SocAccessPlugin plugin = SocAccessPlugin.Instance;
+            SocAccessMod plugin = SocAccessMod.Instance;
             if (plugin != null && menu != null)
             {
                 plugin.StartCoroutine(WaitForTopLevel(menu, fromSubMenu: false));
@@ -81,7 +81,7 @@ namespace SongsOfConquestAccess
 
         private static void StartWaitForTopLevelFromSubMenu(TownInteractionMenu menu)
         {
-            SocAccessPlugin plugin = SocAccessPlugin.Instance;
+            SocAccessMod plugin = SocAccessMod.Instance;
             if (plugin != null && menu != null)
             {
                 plugin.StartCoroutine(WaitForTopLevel(menu, fromSubMenu: true));
@@ -90,7 +90,7 @@ namespace SongsOfConquestAccess
 
         private static void StartWaitForDraft(TownInteractionMenu menu)
         {
-            SocAccessPlugin plugin = SocAccessPlugin.Instance;
+            SocAccessMod plugin = SocAccessMod.Instance;
             if (plugin != null && menu != null)
             {
                 plugin.StartCoroutine(WaitForDraft(menu));
@@ -99,7 +99,7 @@ namespace SongsOfConquestAccess
 
         private static void StartWaitForUpgrade(TownInteractionMenu menu)
         {
-            SocAccessPlugin plugin = SocAccessPlugin.Instance;
+            SocAccessMod plugin = SocAccessMod.Instance;
             if (plugin != null && menu != null)
             {
                 plugin.StartCoroutine(WaitForUpgrade(menu));
@@ -116,11 +116,11 @@ namespace SongsOfConquestAccess
                 {
                     if (fromSubMenu)
                     {
-                        SocAccessPlugin.Instance?.ScreenDetector?.OnSettlementBackToTop(menu);
+                        SocAccessMod.Instance?.ScreenDetector?.OnSettlementBackToTop(menu);
                     }
                     else
                     {
-                        SocAccessPlugin.Instance?.ScreenDetector?.OnSettlementReady(menu);
+                        SocAccessMod.Instance?.ScreenDetector?.OnSettlementReady(menu);
                     }
 
                     yield break;
@@ -139,7 +139,7 @@ namespace SongsOfConquestAccess
                 TownInteractionMenuAdapter adapter = new TownInteractionMenuAdapter(menu);
                 if (adapter.IsDraftPresent())
                 {
-                    SocAccessPlugin.Instance?.ScreenDetector?.OnSettlementDraftReady(menu);
+                    SocAccessMod.Instance?.ScreenDetector?.OnSettlementDraftReady(menu);
                     yield break;
                 }
 
@@ -156,7 +156,7 @@ namespace SongsOfConquestAccess
                 TownInteractionMenuAdapter adapter = new TownInteractionMenuAdapter(menu);
                 if (adapter.IsUpgradePresent())
                 {
-                    SocAccessPlugin.Instance?.ScreenDetector?.OnSettlementUpgradeReady(menu);
+                    SocAccessMod.Instance?.ScreenDetector?.OnSettlementUpgradeReady(menu);
                     yield break;
                 }
 

@@ -22,7 +22,7 @@ namespace SongsOfConquestAccess.Input
         {
             _screenManager = screenManager;
             _rawInputSubscription = InputSystem.onEvent.Subscribe(this);
-            SocAccessPlugin.Instance?.LogInfo("AccessibilityInputRouter raw keyboard input attached");
+            SocAccessMod.Instance?.LogInfo("AccessibilityInputRouter raw keyboard input attached");
         }
 
         public void Dispose()
@@ -31,7 +31,7 @@ namespace SongsOfConquestAccess.Input
             {
                 _rawInputSubscription.Dispose();
                 _rawInputSubscription = null;
-                SocAccessPlugin.Instance?.LogInfo("AccessibilityInputRouter raw keyboard input detached");
+                SocAccessMod.Instance?.LogInfo("AccessibilityInputRouter raw keyboard input detached");
             }
 
             _activeBindings.Clear();
@@ -51,7 +51,7 @@ namespace SongsOfConquestAccess.Input
 
         public void OnError(Exception error)
         {
-            SocAccessPlugin.Instance?.LogWarning("AccessibilityInputRouter raw input stream error: " + error);
+            SocAccessMod.Instance?.LogWarning("AccessibilityInputRouter raw input stream error: " + error);
         }
 
         public void OnNext(InputEventPtr value)

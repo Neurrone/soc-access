@@ -10,14 +10,14 @@ namespace SongsOfConquestAccess
         [HarmonyPostfix]
         private static void TutorialMenuOpenPostfix(TutorialMenu __instance)
         {
-            SocAccessPlugin.Instance?.ScreenDetector?.OnTutorialReady(__instance);
+            SocAccessMod.Instance?.ScreenDetector?.OnTutorialReady(__instance);
         }
 
         [HarmonyPatch(typeof(TutorialMenu), "UpdatePage")]
         [HarmonyPostfix]
         private static void TutorialMenuUpdatePagePostfix(TutorialMenu __instance)
         {
-            SocAccessPlugin.Instance?.ScreenDetector?.OnTutorialChanged(__instance);
+            SocAccessMod.Instance?.ScreenDetector?.OnTutorialChanged(__instance);
         }
 
         [HarmonyPatch(typeof(TutorialMenu), "Close")]
@@ -33,7 +33,7 @@ namespace SongsOfConquestAccess
         {
             if (__state)
             {
-                SocAccessPlugin.Instance?.ScreenDetector?.OnTutorialClosed(__instance);
+                SocAccessMod.Instance?.ScreenDetector?.OnTutorialClosed(__instance);
             }
         }
     }

@@ -49,7 +49,7 @@ namespace SongsOfConquestAccess
         {
             CampaignMapSelectMenu menu;
             MenusByInformationView.TryGetValue(__instance, out menu);
-            SocAccessPlugin.Instance?.ScreenDetector?.OnCampaignMapSelectShown(menu, __instance);
+            SocAccessMod.Instance?.ScreenDetector?.OnCampaignMapSelectShown(menu, __instance);
         }
 
         [HarmonyPatch(typeof(CampaignMapSelectMenu), "HandleMapButtonClicked")]
@@ -79,14 +79,14 @@ namespace SongsOfConquestAccess
                 return;
             }
 
-            SocAccessPlugin.Instance?.ScreenDetector?.OnCampaignMapSelectShown(__instance, informationView);
+            SocAccessMod.Instance?.ScreenDetector?.OnCampaignMapSelectShown(__instance, informationView);
         }
 
         [HarmonyPatch(typeof(CampaignMapSelectedInformationView), "Dispose")]
         [HarmonyPostfix]
         private static void CampaignMapSelectedInformationViewDisposePostfix(CampaignMapSelectedInformationView __instance)
         {
-            SocAccessPlugin.Instance?.ScreenDetector?.OnCampaignMapSelectClosed(__instance);
+            SocAccessMod.Instance?.ScreenDetector?.OnCampaignMapSelectClosed(__instance);
         }
 
         private static CampaignMapSelectedInformationView GetInformationView(CampaignMapSelectMenu menu)

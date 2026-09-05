@@ -14,8 +14,16 @@ namespace SongsOfConquestAccess
         private static readonly AccessTools.FieldRef<MainMenu, GameObject> LeftButtonContainerRef =
             AccessTools.FieldRefAccess<MainMenu, GameObject>("_leftButtonContainer");
 
-        private static readonly Dictionary<MainMenu, Coroutine> PendingOpenCoroutines =
-            new Dictionary<MainMenu, Coroutine>();
+        private sealed class PendingOpen { public bool Cancelled; }
+
+        private static readonly Dictionary<MainMenu, PendingOpen> PendingOpenCoroutines =
+            new Dictionary<MainMenu, PendingOpen>();
+
+        internal static void Reset()
+        {
+            foreach (PendingOpen pending in PendingOpenCoroutines.Values) pending.Cancelled = true;
+            PendingOpenCoroutines.Clear();
+        }
 
         [HarmonyPatch(typeof(MainMenu), "HandleSceneLoaded")]
         [HarmonyPostfix]
@@ -26,12 +34,12 @@ namespace SongsOfConquestAccess
                 return;
             }
 
-            SocAccessPlugin.Instance?.ScreenDetector?.OnMainMenuSceneLoaded(loadedScene);
+            SocAccessMod.Instance?.ScreenDetector?.OnMainMenuSceneLoaded(loadedScene);
 
             if (loadedScene != MainMenuSceneType.MainMenu)
             {
                 StopPendingOpenCoroutine(__instance);
-                SocAccessPlugin.Instance?.ScreenDetector?.OnMainMenuClosed(__instance);
+                SocAccessMod.Instance?.ScreenDetector?.OnMainMenuClosed(__instance);
                 return;
             }
 
@@ -47,7 +55,7 @@ namespace SongsOfConquestAccess
                 return;
             }
 
-            SocAccessPlugin.Instance?.ScreenDetector?.OnMainMenuFoldoutReady(__instance, button);
+            SocAccessMod.Instance?.ScreenDetector?.OnMainMenuFoldoutReady(__instance, button);
         }
 
         [HarmonyPatch(typeof(FoldoutUIButton), "ForceClose")]
@@ -65,7 +73,7 @@ namespace SongsOfConquestAccess
                 return;
             }
 
-            SocAccessPlugin.Instance?.ScreenDetector?.OnMainMenuFoldoutClosed(__instance);
+            SocAccessMod.Instance?.ScreenDetector?.OnMainMenuFoldoutClosed(__instance);
         }
 
         [HarmonyPatch(typeof(MainMenu), "OnDestroy")]
@@ -78,51 +86,48 @@ namespace SongsOfConquestAccess
             }
 
             StopPendingOpenCoroutine(__instance);
-            SocAccessPlugin.Instance?.ScreenDetector?.OnMainMenuClosed(__instance);
+            SocAccessMod.Instance?.ScreenDetector?.OnMainMenuClosed(__instance);
         }
 
         private static void RestartPendingOpenCoroutine(MainMenu mainMenu)
         {
             StopPendingOpenCoroutine(mainMenu);
 
-            SocAccessPlugin plugin = SocAccessPlugin.Instance;
+            SocAccessMod plugin = SocAccessMod.Instance;
             if (plugin == null)
             {
                 return;
             }
 
-            Coroutine coroutine = plugin.StartCoroutine(WaitForMainMenuVisible(mainMenu));
-            PendingOpenCoroutines[mainMenu] = coroutine;
+            PendingOpen pending = new PendingOpen();
+            PendingOpenCoroutines[mainMenu] = pending;
+            plugin.StartCoroutine(WaitForMainMenuVisible(mainMenu, pending));
         }
 
         private static void StopPendingOpenCoroutine(MainMenu mainMenu)
         {
             if (mainMenu == null)
             {
-                PendingOpenCoroutines.Clear();
+                Reset();
                 return;
             }
 
-            Coroutine coroutine;
-            if (!PendingOpenCoroutines.TryGetValue(mainMenu, out coroutine))
+            PendingOpen pending;
+            if (!PendingOpenCoroutines.TryGetValue(mainMenu, out pending))
             {
                 return;
             }
 
-            SocAccessPlugin plugin = SocAccessPlugin.Instance;
-            if (plugin != null && coroutine != null)
-            {
-                plugin.StopCoroutine(coroutine);
-            }
-
+            pending.Cancelled = true;
             PendingOpenCoroutines.Remove(mainMenu);
         }
 
-        private static IEnumerator WaitForMainMenuVisible(MainMenu mainMenu)
+        private static IEnumerator WaitForMainMenuVisible(MainMenu mainMenu, PendingOpen pending)
         {
             MainMenu trackedMenu = mainMenu;
             while (mainMenu != null)
             {
+                if (pending.Cancelled) yield break;
                 GameObject leftButtonContainer = LeftButtonContainerRef(mainMenu);
                 // HandleSceneLoaded is the stable "we entered the main menu scene" signal,
                 // but the menu is not actually navigable until DelayedEntry enables the
@@ -131,14 +136,14 @@ namespace SongsOfConquestAccess
                 if (leftButtonContainer != null && leftButtonContainer.activeInHierarchy)
                 {
                     PendingOpenCoroutines.Remove(trackedMenu);
-                    SocAccessPlugin.Instance?.ScreenDetector?.OnMainMenuReady(mainMenu);
+                    SocAccessMod.Instance?.ScreenDetector?.OnMainMenuReady(mainMenu);
                     yield break;
                 }
 
                 yield return null;
             }
 
-            PendingOpenCoroutines.Remove(trackedMenu);
+            if (!pending.Cancelled) PendingOpenCoroutines.Remove(trackedMenu);
         }
     }
 }

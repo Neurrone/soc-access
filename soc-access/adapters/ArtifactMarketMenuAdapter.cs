@@ -595,7 +595,7 @@ namespace SongsOfConquestAccess.Adapters
             }
             catch (Exception ex)
             {
-                SocAccessPlugin.Instance?.LogWarning("ArtifactMarketMenuAdapter could not get artifact name: " + ex.Message);
+                SocAccessMod.Instance?.LogWarning("ArtifactMarketMenuAdapter could not get artifact name: " + ex.Message);
                 return _artifactLookup != null ? _artifactLookup.GetLocalizedName(artifact.Type) : artifact.Type.ToString();
             }
         }

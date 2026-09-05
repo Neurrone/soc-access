@@ -91,7 +91,7 @@ namespace SongsOfConquestAccess.Adapters
                 }
                 catch (System.Exception exception)
                 {
-                    SocAccessPlugin.Instance?.LogWarning("Failed to read PauseMenu settings: " + exception.Message);
+                    SocAccessMod.Instance?.LogWarning("Failed to read PauseMenu settings: " + exception.Message);
                     return null;
                 }
             }
@@ -107,7 +107,7 @@ namespace SongsOfConquestAccess.Adapters
             string label = MenuButtonTextUtility.GetDirectButtonText(button);
             if (string.IsNullOrWhiteSpace(label))
             {
-                SocAccessPlugin.Instance?.LogWarning("Skipping visible pause menu button with empty direct text: " + id);
+                SocAccessMod.Instance?.LogWarning("Skipping visible pause menu button with empty direct text: " + id);
                 return;
             }
 
@@ -199,14 +199,14 @@ namespace SongsOfConquestAccess.Adapters
                 object response = ResolveWritablePrimaryResponse();
                 if (response == null)
                 {
-                    SocAccessPlugin.Instance?.LogWarning("PauseMenuAdapter could not override native screen input position");
+                    SocAccessMod.Instance?.LogWarning("PauseMenuAdapter could not override native screen input position");
                     return null;
                 }
 
                 PropertyInfo positionProperty = AccessTools.Property(response.GetType(), "Position");
                 if (positionProperty == null || !positionProperty.CanWrite)
                 {
-                    SocAccessPlugin.Instance?.LogWarning("PauseMenuAdapter could not override native screen input position because Position was not writable on " + response.GetType().FullName);
+                    SocAccessMod.Instance?.LogWarning("PauseMenuAdapter could not override native screen input position because Position was not writable on " + response.GetType().FullName);
                     return null;
                 }
 

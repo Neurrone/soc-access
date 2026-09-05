@@ -21,7 +21,7 @@ namespace SongsOfConquestAccess.Scanner
             }
             catch (Exception exception)
             {
-                SocAccessPlugin.Instance?.LogWarning(
+                SocAccessMod.Instance?.LogWarning(
                     "Scanner contribution '" + name + "' failed and was skipped: " + exception);
             }
         }

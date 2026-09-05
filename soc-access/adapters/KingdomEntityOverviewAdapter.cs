@@ -182,7 +182,7 @@ namespace SongsOfConquestAccess.Adapters
             }
             catch (Exception ex)
             {
-                SocAccessPlugin.Instance?.LogWarning("KingdomEntityOverviewAdapter failed to click category: " + ex.Message);
+                SocAccessMod.Instance?.LogWarning("KingdomEntityOverviewAdapter failed to click category: " + ex.Message);
                 return false;
             }
         }
@@ -201,7 +201,7 @@ namespace SongsOfConquestAccess.Adapters
             }
             catch (Exception ex)
             {
-                SocAccessPlugin.Instance?.LogWarning("KingdomEntityOverviewAdapter failed to click building row: " + ex.Message);
+                SocAccessMod.Instance?.LogWarning("KingdomEntityOverviewAdapter failed to click building row: " + ex.Message);
                 return false;
             }
         }

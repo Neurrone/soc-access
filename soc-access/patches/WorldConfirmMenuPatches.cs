@@ -35,7 +35,7 @@ namespace SongsOfConquestAccess
                 ActiveCosts[__instance] = cost;
             }
 
-            SocAccessPlugin.Instance?.ScreenDetector?.OnWorldConfirmMenuReady(__instance);
+            SocAccessMod.Instance?.ScreenDetector?.OnWorldConfirmMenuReady(__instance);
         }
 
         [HarmonyPatch(typeof(WorldConfirmMenu), "HideMenu", new[] { typeof(bool) })]
@@ -47,7 +47,7 @@ namespace SongsOfConquestAccess
                 ActiveCosts.Remove(__instance);
             }
 
-            SocAccessPlugin.Instance?.ScreenDetector?.OnWorldConfirmMenuClosed(__instance);
+            SocAccessMod.Instance?.ScreenDetector?.OnWorldConfirmMenuClosed(__instance);
         }
     }
 }

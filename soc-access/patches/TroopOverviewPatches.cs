@@ -22,14 +22,14 @@ namespace SongsOfConquestAccess
         [HarmonyPostfix]
         private static void KingdomTroopOverviewShowPostfix(KingdomTroopOverviewMenu __instance)
         {
-            SocAccessPlugin.Instance?.ScreenDetector?.OnTroopOverviewReady(__instance);
+            SocAccessMod.Instance?.ScreenDetector?.OnTroopOverviewReady(__instance);
         }
 
         [HarmonyPatch(typeof(KingdomTroopOverviewMenu), "Hide")]
         [HarmonyPostfix]
         private static void KingdomTroopOverviewHidePostfix(KingdomTroopOverviewMenu __instance)
         {
-            SocAccessPlugin.Instance?.ScreenDetector?.OnTroopOverviewClosed(__instance);
+            SocAccessMod.Instance?.ScreenDetector?.OnTroopOverviewClosed(__instance);
         }
 
         [HarmonyPatch(typeof(KingdomTroopOverviewTownEntry), "HandleTownNameClicked")]
@@ -79,7 +79,7 @@ namespace SongsOfConquestAccess
             }
             catch (Exception ex)
             {
-                SocAccessPlugin.Instance?.LogWarning("TroopOverviewPatches failed to read town entry target: " + ex.Message);
+                SocAccessMod.Instance?.LogWarning("TroopOverviewPatches failed to read town entry target: " + ex.Message);
                 return null;
             }
         }
@@ -105,7 +105,7 @@ namespace SongsOfConquestAccess
             }
             catch (Exception ex)
             {
-                SocAccessPlugin.Instance?.LogWarning("TroopOverviewPatches failed to read current troop overview row target: " + ex.Message);
+                SocAccessMod.Instance?.LogWarning("TroopOverviewPatches failed to read current troop overview row target: " + ex.Message);
                 return null;
             }
         }

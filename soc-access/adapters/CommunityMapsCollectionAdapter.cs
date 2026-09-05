@@ -335,7 +335,7 @@ namespace SongsOfConquestAccess.Adapters
                 if (homes[i] != null && homes[i].BrowserPanel != null)
                 {
                     homes[i].Open();
-                    SocAccessPlugin.Instance?.ScreenDetector?.OnCommunityMapsChanged();
+                    SocAccessMod.Instance?.ScreenDetector?.OnCommunityMapsChanged();
                     return true;
                 }
             }

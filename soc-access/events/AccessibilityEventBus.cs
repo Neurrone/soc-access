@@ -10,7 +10,7 @@ namespace SongsOfConquestAccess.Events
         {
             if (accessibilityEvent == null)
             {
-                SocAccessPlugin.Instance?.LogWarning("AccessibilityEventBus dropped null event");
+                SocAccessMod.Instance?.LogWarning("AccessibilityEventBus dropped null event");
                 return;
             }
 

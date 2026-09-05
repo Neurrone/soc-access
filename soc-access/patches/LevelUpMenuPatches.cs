@@ -22,7 +22,7 @@ namespace SongsOfConquestAccess
         [HarmonyPostfix]
         private static void CommanderLevelUpMenuOpenPostfix(CommanderLevelUpMenu __instance)
         {
-            SocAccessPlugin.Instance?.ScreenDetector?.OnLevelUpMenuReady(__instance);
+            SocAccessMod.Instance?.ScreenDetector?.OnLevelUpMenuReady(__instance);
         }
 
         [HarmonyPatch(typeof(CommanderLevelUpMenu), "ConfirmSkill")]
@@ -43,7 +43,7 @@ namespace SongsOfConquestAccess
         {
             if (menu != null && AsyncField != null && AsyncField.GetValue(menu) is Async<SkillReference?>)
             {
-                SocAccessPlugin.Instance?.ScreenDetector?.OnLevelUpMenuClosed(menu);
+                SocAccessMod.Instance?.ScreenDetector?.OnLevelUpMenuClosed(menu);
             }
         }
     }

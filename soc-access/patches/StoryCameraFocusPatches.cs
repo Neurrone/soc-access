@@ -247,7 +247,7 @@ namespace SongsOfConquestAccess
             }
             catch (Exception exception)
             {
-                SocAccessPlugin.Instance?.LogWarning("Failed to read dialogue camera facade: " + exception.Message);
+                SocAccessMod.Instance?.LogWarning("Failed to read dialogue camera facade: " + exception.Message);
                 return null;
             }
         }
@@ -262,7 +262,7 @@ namespace SongsOfConquestAccess
             }
             catch (Exception exception)
             {
-                SocAccessPlugin.Instance?.LogWarning("Failed to read dialogue camera converter: " + exception.Message);
+                SocAccessMod.Instance?.LogWarning("Failed to read dialogue camera converter: " + exception.Message);
                 return null;
             }
         }
@@ -283,7 +283,7 @@ namespace SongsOfConquestAccess
             }
             catch (Exception exception)
             {
-                SocAccessPlugin.Instance?.LogWarning("Failed to resolve dialogue interacting wielder: " + exception.Message);
+                SocAccessMod.Instance?.LogWarning("Failed to resolve dialogue interacting wielder: " + exception.Message);
                 return null;
             }
         }

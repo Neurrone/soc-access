@@ -94,7 +94,7 @@ namespace SongsOfConquestAccess.Adapters
             }
             catch (Exception exception)
             {
-                SocAccessPlugin.Instance?.LogWarning("AdventureMapEntityLabel failed to read map entity pre-visit label: " + exception.Message);
+                SocAccessMod.Instance?.LogWarning("AdventureMapEntityLabel failed to read map entity pre-visit label: " + exception.Message);
                 return false;
             }
         }
@@ -131,7 +131,7 @@ namespace SongsOfConquestAccess.Adapters
             }
             catch (Exception exception)
             {
-                SocAccessPlugin.Instance?.LogWarning("AdventureMapEntityLabel failed to read map entity interaction type: " + exception.Message);
+                SocAccessMod.Instance?.LogWarning("AdventureMapEntityLabel failed to read map entity interaction type: " + exception.Message);
                 return false;
             }
         }
@@ -328,7 +328,7 @@ namespace SongsOfConquestAccess.Adapters
             }
             catch (Exception exception)
             {
-                SocAccessPlugin.Instance?.LogWarning("AdventureMapEntityLabel failed to read essence variant: " + exception.Message);
+                SocAccessMod.Instance?.LogWarning("AdventureMapEntityLabel failed to read essence variant: " + exception.Message);
                 return false;
             }
         }

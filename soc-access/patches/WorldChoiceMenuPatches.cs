@@ -24,7 +24,7 @@ namespace SongsOfConquestAccess
         [HarmonyPostfix]
         private static void WorldChoiceMenuShowMenuAtPointPostfix(WorldChoiceMenu __instance)
         {
-            SocAccessPlugin.Instance?.ScreenDetector?.OnWorldChoiceMenuReady(__instance);
+            SocAccessMod.Instance?.ScreenDetector?.OnWorldChoiceMenuReady(__instance);
         }
 
         [HarmonyPatch(typeof(WorldChoiceMenu), "ShowMenu", new[]
@@ -37,7 +37,7 @@ namespace SongsOfConquestAccess
         [HarmonyPostfix]
         private static void WorldChoiceMenuShowMenuPostfix(WorldChoiceMenu __instance)
         {
-            SocAccessPlugin.Instance?.ScreenDetector?.OnWorldChoiceMenuReady(__instance);
+            SocAccessMod.Instance?.ScreenDetector?.OnWorldChoiceMenuReady(__instance);
         }
 
         [HarmonyPatch(typeof(WorldChoiceMenu), "HideMenu", new[] { typeof(int), typeof(int) })]
@@ -53,7 +53,7 @@ namespace SongsOfConquestAccess
         {
             if (__state)
             {
-                SocAccessPlugin.Instance?.ScreenDetector?.OnWorldChoiceMenuClosed(__instance);
+                SocAccessMod.Instance?.ScreenDetector?.OnWorldChoiceMenuClosed(__instance);
             }
         }
     }

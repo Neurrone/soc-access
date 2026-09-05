@@ -66,7 +66,7 @@ namespace SongsOfConquestAccess.Screens
                 return;
             }
 
-            SocAccessPlugin.Instance?.ScreenManager?.Push(
+            SocAccessMod.Instance?.ScreenManager?.Push(
                 new AnnouncementElementSettingsScreen(_group, element),
                 "announcement element settings opened");
         }
@@ -80,9 +80,9 @@ namespace SongsOfConquestAccess.Screens
 
         private static bool Close()
         {
-            return SocAccessPlugin.Instance != null
-                && SocAccessPlugin.Instance.ScreenManager != null
-                && SocAccessPlugin.Instance.ScreenManager.Pop<AnnouncementOrderScreen>("announcement order screen closed");
+            return SocAccessMod.Instance != null
+                && SocAccessMod.Instance.ScreenManager != null
+                && SocAccessMod.Instance.ScreenManager.Pop<AnnouncementOrderScreen>("announcement order screen closed");
         }
 
         private string GetScreenId()

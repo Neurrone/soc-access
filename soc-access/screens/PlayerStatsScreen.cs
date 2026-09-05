@@ -132,7 +132,7 @@ namespace SongsOfConquestAccess.Screens
                             return false;
                         }
 
-                        SocAccessPlugin.Instance?.ScreenDetector?.OnPlayerStatsChanged();
+                        SocAccessMod.Instance?.ScreenDetector?.OnPlayerStatsChanged();
                         return true;
                     },
                     null,

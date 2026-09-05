@@ -28,7 +28,7 @@ namespace SongsOfConquestAccess
                 ActiveMenus.Add(__instance.GetInstanceID());
             }
 
-            SocAccessPlugin.Instance?.ScreenDetector?.OnPreBattleMenuChanged(__instance);
+            SocAccessMod.Instance?.ScreenDetector?.OnPreBattleMenuChanged(__instance);
         }
 
         [HarmonyPatch(typeof(PreBattleMenu), "Hide")]
@@ -40,7 +40,7 @@ namespace SongsOfConquestAccess
                 return;
             }
 
-            SocAccessPlugin.Instance?.ScreenDetector?.OnPreBattleMenuClosed(__instance);
+            SocAccessMod.Instance?.ScreenDetector?.OnPreBattleMenuClosed(__instance);
         }
 
         [HarmonyPatch(typeof(PreBattleMenu), "HandleReadyButton")]
@@ -52,7 +52,7 @@ namespace SongsOfConquestAccess
                 return;
             }
 
-            SocAccessPlugin.Instance?.ScreenDetector?.OnPreBattleMenuChanged(__instance);
+            SocAccessMod.Instance?.ScreenDetector?.OnPreBattleMenuChanged(__instance);
         }
     }
 }

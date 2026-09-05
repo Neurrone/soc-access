@@ -23,7 +23,7 @@ namespace SongsOfConquestAccess.Adapters
             }
             catch (System.Exception exception)
             {
-                SocAccessPlugin.Instance?.LogWarning("Failed to post sound event " + eventKey + ": " + exception.Message);
+                SocAccessMod.Instance?.LogWarning("Failed to post sound event " + eventKey + ": " + exception.Message);
             }
         }
     }

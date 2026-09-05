@@ -15,7 +15,7 @@ namespace SongsOfConquestAccess
         [HarmonyPostfix]
         private static void StoryTextShowPostfix(StoryText __instance)
         {
-            SocAccessPlugin plugin = SocAccessPlugin.Instance;
+            SocAccessMod plugin = SocAccessMod.Instance;
             if (plugin != null)
             {
                 plugin.StartCoroutine(WaitForStoryTextReady(__instance));
@@ -35,7 +35,7 @@ namespace SongsOfConquestAccess
         {
             if (__state)
             {
-                SocAccessPlugin.Instance?.ScreenDetector?.OnStoryTextClosed(__instance);
+                SocAccessMod.Instance?.ScreenDetector?.OnStoryTextClosed(__instance);
             }
         }
 
@@ -47,7 +47,7 @@ namespace SongsOfConquestAccess
                 StoryTextAdapter adapter = new StoryTextAdapter(storyText);
                 if (adapter.IsPresent())
                 {
-                    SocAccessPlugin.Instance?.ScreenDetector?.OnStoryTextReady(storyText);
+                    SocAccessMod.Instance?.ScreenDetector?.OnStoryTextReady(storyText);
                     yield break;
                 }
 

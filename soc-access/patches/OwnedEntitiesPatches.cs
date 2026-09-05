@@ -22,14 +22,14 @@ namespace SongsOfConquestAccess
         [HarmonyPostfix]
         private static void KingdomEntityOverviewShowPostfix(KingdomEntityOverviewMenu __instance)
         {
-            SocAccessPlugin.Instance?.ScreenDetector?.OnOwnedEntitiesReady(__instance);
+            SocAccessMod.Instance?.ScreenDetector?.OnOwnedEntitiesReady(__instance);
         }
 
         [HarmonyPatch(typeof(KingdomEntityOverviewMenu), "Hide")]
         [HarmonyPostfix]
         private static void KingdomEntityOverviewHidePostfix(KingdomEntityOverviewMenu __instance)
         {
-            SocAccessPlugin.Instance?.ScreenDetector?.OnOwnedEntitiesClosed(__instance);
+            SocAccessMod.Instance?.ScreenDetector?.OnOwnedEntitiesClosed(__instance);
         }
 
         [HarmonyPatch(typeof(KingdomEntityOverviewCategoryEntry), "HandleCategoryTextClicked")]
@@ -79,7 +79,7 @@ namespace SongsOfConquestAccess
             }
             catch (Exception ex)
             {
-                SocAccessPlugin.Instance?.LogWarning("OwnedEntitiesPatches failed to read category parent: " + ex.Message);
+                SocAccessMod.Instance?.LogWarning("OwnedEntitiesPatches failed to read category parent: " + ex.Message);
                 return null;
             }
         }
@@ -105,7 +105,7 @@ namespace SongsOfConquestAccess
             }
             catch (Exception ex)
             {
-                SocAccessPlugin.Instance?.LogWarning("OwnedEntitiesPatches failed to read current owned entity row target: " + ex.Message);
+                SocAccessMod.Instance?.LogWarning("OwnedEntitiesPatches failed to read current owned entity row target: " + ex.Message);
                 return null;
             }
         }

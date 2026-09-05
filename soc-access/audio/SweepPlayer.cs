@@ -82,7 +82,7 @@ namespace SongsOfConquestAccess.Audio
             }
             catch (Exception exception)
             {
-                SocAccessPlugin.Instance?.LogWarning("Failed to start sonar sweep: " + exception.Message);
+                SocAccessMod.Instance?.LogWarning("Failed to start sonar sweep: " + exception.Message);
                 _steps = null;
             }
         }
@@ -244,7 +244,7 @@ namespace SongsOfConquestAccess.Audio
                 catch (Exception exception)
                 {
                     Cancel();
-                    SocAccessPlugin.Instance?.LogWarning("Sonar sweep scheduling failed: " + exception.Message);
+                    SocAccessMod.Instance?.LogWarning("Sonar sweep scheduling failed: " + exception.Message);
                 }
             }
         }

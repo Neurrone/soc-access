@@ -1134,7 +1134,7 @@ namespace SongsOfConquestAccess.Screens
 
         private static AdventureMapRevealedRegistry GetAdventureMapRevealedRegistry()
         {
-            AdventureMapScannerState scannerState = SocAccessPlugin.Instance?.AdventureMapScannerState;
+            AdventureMapScannerState scannerState = SocAccessMod.Instance?.AdventureMapScannerState;
             return scannerState != null ? scannerState.RevealedRegistry : new AdventureMapRevealedRegistry();
         }
 
@@ -1207,7 +1207,7 @@ namespace SongsOfConquestAccess.Screens
             }
 
             _lastProbeDiagnostic = message;
-            SocAccessPlugin.Instance?.LogInfo(message);
+            SocAccessMod.Instance?.LogInfo(message);
         }
     }
 }

@@ -15,19 +15,28 @@
   <PropertyGroup>
     <BepInExCoreDir>$(GameDir)\BepInEx\core</BepInExCoreDir>
     <GameManagedDir>$(GameDir)\SongsOfConquest_Data\Managed</GameManagedDir>
-    <ScriptOutputDir>$(GameDir)\BepInEx\scripts</ScriptOutputDir>
+    <PluginOutputDir>$(GameDir)\BepInEx\plugins\SongsOfConquestAccess</PluginOutputDir>
     <DeployTranslationsDir>$(GameDir)\BepInEx\config\SongsOfConquestAccess\translations</DeployTranslationsDir>
-    <DeployDllPath>$(ScriptOutputDir)\$(AssemblyName).dll</DeployDllPath>
-    <DeployPdbPath>$(ScriptOutputDir)\$(AssemblyName).pdb</DeployPdbPath>
-    <ReleaseTemplatePluginsDir>$(MSBuildProjectDirectory)\..\release-template\BepInEx\plugins</ReleaseTemplatePluginsDir>
+    <DeployDllPath>$(PluginOutputDir)\$(AssemblyName).dll</DeployDllPath>
+    <DeployPdbPath>$(PluginOutputDir)\$(AssemblyName).pdb</DeployPdbPath>
+    <ReleaseTemplatePluginsDir>$(MSBuildProjectDirectory)\..\release-template\BepInEx\plugins\SongsOfConquestAccess</ReleaseTemplatePluginsDir>
     <ReleaseTemplateTranslationsDir>$(MSBuildProjectDirectory)\..\release-template\BepInEx\config\SongsOfConquestAccess\translations</ReleaseTemplateTranslationsDir>
     <ReleaseTemplatePluginDllPath>$(ReleaseTemplatePluginsDir)\$(AssemblyName).dll</ReleaseTemplatePluginDllPath>
+    <ReleaseTemplatePluginPdbPath>$(ReleaseTemplatePluginsDir)\$(AssemblyName).pdb</ReleaseTemplatePluginPdbPath>
+    <ReleaseTemplateLoaderDllPath>$(ReleaseTemplatePluginsDir)\SongsOfConquest.Access.Loader.dll</ReleaseTemplateLoaderDllPath>
+    <ReleaseTemplateLoaderPdbPath>$(ReleaseTemplatePluginsDir)\SongsOfConquest.Access.Loader.pdb</ReleaseTemplateLoaderPdbPath>
   </PropertyGroup>
 
   <ItemGroup>
     <Compile Remove="tests\**\*.cs" />
     <Compile Remove="tools\**\*.cs" />
     <Compile Remove="loader\**\*.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="loader\SongsOfConquest.Access.Loader.csproj">
+      <Private>false</Private>
+    </ProjectReference>
   </ItemGroup>
 
   <ItemGroup>
@@ -155,11 +164,11 @@
     </Reference>
   </ItemGroup>
 
-  <Target Name="DeployToScriptFolder"
+  <Target Name="DeployToPluginFolder"
           AfterTargets="Build"
-          Condition="'$(GameDir)' != '' and '$(DeployToGame)' == 'true'">
+          Condition="Exists('$(GameDir)') and '$(DeployToGame)' != 'false'">
     <Message Text="Deploying $(TargetPath) to $(DeployDllPath)" Importance="High" />
-    <MakeDir Directories="$(ScriptOutputDir)" />
+    <MakeDir Directories="$(PluginOutputDir)" />
     <Copy SourceFiles="$(TargetPath)"
           DestinationFiles="$(DeployDllPath)"
           SkipUnchangedFiles="false" />
@@ -188,6 +197,17 @@
     <Copy SourceFiles="$(TargetPath)"
           DestinationFiles="$(ReleaseTemplatePluginDllPath)"
           SkipUnchangedFiles="false" />
+    <Copy SourceFiles="$(TargetDir)$(AssemblyName).pdb"
+          DestinationFiles="$(ReleaseTemplatePluginPdbPath)"
+          SkipUnchangedFiles="false"
+          Condition="Exists('$(TargetDir)$(AssemblyName).pdb')" />
+    <Copy SourceFiles="$(MSBuildProjectDirectory)\loader\bin\$(Configuration)\net472\SongsOfConquest.Access.Loader.dll"
+          DestinationFiles="$(ReleaseTemplateLoaderDllPath)"
+          SkipUnchangedFiles="false" />
+    <Copy SourceFiles="$(MSBuildProjectDirectory)\loader\bin\$(Configuration)\net472\SongsOfConquest.Access.Loader.pdb"
+          DestinationFiles="$(ReleaseTemplateLoaderPdbPath)"
+          SkipUnchangedFiles="false"
+          Condition="Exists('$(MSBuildProjectDirectory)\loader\bin\$(Configuration)\net472\SongsOfConquest.Access.Loader.pdb')" />
     <ItemGroup>
       <ModTranslationFiles Include="$(MSBuildProjectDirectory)\translations\*.po" />
     </ItemGroup>

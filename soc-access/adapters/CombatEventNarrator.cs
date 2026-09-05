@@ -112,7 +112,7 @@ namespace SongsOfConquestAccess.Adapters
             }
             catch (Exception exception)
             {
-                SocAccessPlugin.Instance?.LogWarning("CombatEventNarrator failed to queue " + response.GetType().Name + ": " + exception.Message);
+                SocAccessMod.Instance?.LogWarning("CombatEventNarrator failed to queue " + response.GetType().Name + ": " + exception.Message);
             }
         }
 
@@ -152,7 +152,7 @@ namespace SongsOfConquestAccess.Adapters
 
         private static void MoveCombatCursorToLocalActingTroop(int troopId)
         {
-            CombatScreen screen = SocAccessPlugin.Instance?.ScreenManager?.CurrentScreen as CombatScreen;
+            CombatScreen screen = SocAccessMod.Instance?.ScreenManager?.CurrentScreen as CombatScreen;
             screen?.MoveCursorToLocalActingTroop(troopId);
         }
 
@@ -796,7 +796,7 @@ namespace SongsOfConquestAccess.Adapters
             }
 
             _bacteriaDiagnosticLogCount++;
-            SocAccessPlugin.Instance?.LogInfo(
+            SocAccessMod.Instance?.LogInfo(
                 "Combat bacteria diagnostic "
                 + action
                 + ": type="
@@ -814,7 +814,7 @@ namespace SongsOfConquestAccess.Adapters
 
             if (_bacteriaDiagnosticLogCount == BacteriaDiagnosticLogLimit)
             {
-                SocAccessPlugin.Instance?.LogInfo("Combat bacteria diagnostic log limit reached; further bacteria diagnostics suppressed until combat narrator reset.");
+                SocAccessMod.Instance?.LogInfo("Combat bacteria diagnostic log limit reached; further bacteria diagnostics suppressed until combat narrator reset.");
             }
         }
 
@@ -858,7 +858,7 @@ namespace SongsOfConquestAccess.Adapters
             }
 
             EntityRef entity = narrationEvent != null ? narrationEvent.Entity : null;
-            SocAccessPlugin.Instance?.LogInfo(
+            SocAccessMod.Instance?.LogInfo(
                 "Combat map entity creation response: stateId="
                 + response.State.Id
                 + ", stateBlueprintId="
@@ -889,7 +889,7 @@ namespace SongsOfConquestAccess.Adapters
             }
 
             EntityRef entity = created.Entity;
-            SocAccessPlugin.Instance?.LogInfo(
+            SocAccessMod.Instance?.LogInfo(
                 "Combat map entity creation narration: entityId="
                 + (entity != null ? entity.EntityId : -1)
                 + ", blueprintId="
@@ -913,7 +913,7 @@ namespace SongsOfConquestAccess.Adapters
             _mapEntityCreationNarrationDiagnosticLogCount++;
             if (_mapEntityCreationNarrationDiagnosticLogCount == MapEntityCreationNarrationDiagnosticLogLimit)
             {
-                SocAccessPlugin.Instance?.LogInfo("Combat map entity creation narration diagnostic log limit reached.");
+                SocAccessMod.Instance?.LogInfo("Combat map entity creation narration diagnostic log limit reached.");
             }
 
             return true;
@@ -1087,7 +1087,7 @@ namespace SongsOfConquestAccess.Adapters
                 return;
             }
 
-            SocAccessPlugin plugin = SocAccessPlugin.Instance;
+            SocAccessMod plugin = SocAccessMod.Instance;
             if (plugin == null)
             {
                 LogCombatNarrationTimingDiagnostic("flush_immediate_no_plugin", null);
@@ -1432,7 +1432,7 @@ namespace SongsOfConquestAccess.Adapters
                 ? FormatSeconds(time - _lastCombatNarrationTimingDiagnosticTime)
                 : "n/a";
 
-            SocAccessPlugin.Instance?.LogInfo(
+            SocAccessMod.Instance?.LogInfo(
                 "Combat narration timing: phase=" + phase
                 + ", frame=" + frame
                 + ", deltaFrames=" + frameDelta
@@ -1448,7 +1448,7 @@ namespace SongsOfConquestAccess.Adapters
 
             if (_combatNarrationTimingDiagnosticLogCount == CombatNarrationTimingDiagnosticLogLimit)
             {
-                SocAccessPlugin.Instance?.LogInfo("Combat narration timing diagnostic reached log limit");
+                SocAccessMod.Instance?.LogInfo("Combat narration timing diagnostic reached log limit");
             }
         }
 

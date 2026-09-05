@@ -223,7 +223,7 @@ namespace SongsOfConquestAccess.Adapters
                     return;
                 }
 
-                SocAccessPlugin.Instance?.LogWarning(
+                SocAccessMod.Instance?.LogWarning(
                     "PurchaseTroopsSubMenuAdapter failed to resolve troop name for faction "
                     + reference.FactionIndex
                     + ", unit "

@@ -170,7 +170,7 @@ namespace SongsOfConquestAccess.Screens
 
         private void RequestDetectorRefresh()
         {
-            SocAccessPlugin.Instance?.ScreenDetector?.OnCommanderSheetChanged();
+            SocAccessMod.Instance?.ScreenDetector?.OnCommanderSheetChanged();
         }
 
         private static ContainerWidget BuildRoot(CommanderSheetAdapter adapter)
@@ -294,7 +294,7 @@ namespace SongsOfConquestAccess.Screens
             }
             catch (Exception ex)
             {
-                SocAccessPlugin.Instance?.LogWarning("CommanderSheetScreen section " + section + " failed to build: " + ex);
+                SocAccessMod.Instance?.LogWarning("CommanderSheetScreen section " + section + " failed to build: " + ex);
                 return new CommanderSheetAdapter.LabeledItem[]
                 {
                     new CommanderSheetAdapter.LabeledItem(section.ToLowerInvariant() + "-error", ModText.Get(ModStrings.Screens.Unavailable))

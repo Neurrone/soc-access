@@ -82,12 +82,12 @@ namespace SongsOfConquestAccess.Screens
         private bool OpenSelectedCueSettings()
         {
             CueDefinition cue = CueLibrary.GetCue(_selectedCueKey);
-            if (cue == null || SocAccessPlugin.Instance == null || SocAccessPlugin.Instance.ScreenManager == null)
+            if (cue == null || SocAccessMod.Instance == null || SocAccessMod.Instance.ScreenManager == null)
             {
                 return false;
             }
 
-            SocAccessPlugin.Instance.ScreenManager.Push(
+            SocAccessMod.Instance.ScreenManager.Push(
                 new AudioCueSettingsScreen(cue),
                 "audio cue settings opened");
             return true;
@@ -107,9 +107,9 @@ namespace SongsOfConquestAccess.Screens
 
         private static bool Close()
         {
-            return SocAccessPlugin.Instance != null
-                && SocAccessPlugin.Instance.ScreenManager != null
-                && SocAccessPlugin.Instance.ScreenManager.Pop<AudioGlossaryScreen>("audio glossary screen closed");
+            return SocAccessMod.Instance != null
+                && SocAccessMod.Instance.ScreenManager != null
+                && SocAccessMod.Instance.ScreenManager.Pop<AudioGlossaryScreen>("audio glossary screen closed");
         }
     }
 }

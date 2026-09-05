@@ -15,14 +15,14 @@ namespace SongsOfConquestAccess
         [HarmonyPostfix]
         private static void BrowserClosePostfix()
         {
-            SocAccessPlugin.Instance?.ScreenDetector?.OnCommunityMapsClosed();
+            SocAccessMod.Instance?.ScreenDetector?.OnCommunityMapsClosed();
         }
 
         [HarmonyPatch(typeof(Home), "RefreshHomePanel")]
         [HarmonyPostfix]
         private static void HomeRefreshHomePanelPostfix()
         {
-            SocAccessPlugin.Instance?.ScreenDetector?.OnCommunityMapsChanged();
+            SocAccessMod.Instance?.ScreenDetector?.OnCommunityMapsChanged();
         }
     }
 
@@ -36,7 +36,7 @@ namespace SongsOfConquestAccess
 
         private static void Postfix()
         {
-            SocAccessPlugin.Instance?.ScreenDetector?.OnCommunityMapsChanged();
+            SocAccessMod.Instance?.ScreenDetector?.OnCommunityMapsChanged();
         }
     }
 
@@ -50,7 +50,7 @@ namespace SongsOfConquestAccess
 
         private static void Postfix()
         {
-            SocAccessPlugin.Instance?.ScreenDetector?.OnCommunityMapsHomeContentChanged();
+            SocAccessMod.Instance?.ScreenDetector?.OnCommunityMapsHomeContentChanged();
         }
     }
 
@@ -64,7 +64,7 @@ namespace SongsOfConquestAccess
 
         private static void Postfix()
         {
-            SocAccessPlugin.Instance?.ScreenDetector?.OnCommunityMapsHomeContentChanged();
+            SocAccessMod.Instance?.ScreenDetector?.OnCommunityMapsHomeContentChanged();
         }
     }
 
@@ -78,7 +78,7 @@ namespace SongsOfConquestAccess
 
         private static void Postfix()
         {
-            SocAccessPlugin.Instance?.ScreenDetector?.OnCommunityMapsModalChanged();
+            SocAccessMod.Instance?.ScreenDetector?.OnCommunityMapsModalChanged();
         }
     }
 
@@ -92,7 +92,7 @@ namespace SongsOfConquestAccess
 
         private static void Postfix()
         {
-            SocAccessPlugin.Instance?.ScreenDetector?.OnCommunityMapsModalChanged();
+            SocAccessMod.Instance?.ScreenDetector?.OnCommunityMapsModalChanged();
         }
     }
 
@@ -106,7 +106,7 @@ namespace SongsOfConquestAccess
 
         private static void Postfix()
         {
-            SocAccessPlugin.Instance?.ScreenDetector?.OnCommunityMapsChanged();
+            SocAccessMod.Instance?.ScreenDetector?.OnCommunityMapsChanged();
         }
     }
 
@@ -120,7 +120,7 @@ namespace SongsOfConquestAccess
 
         private static void Postfix()
         {
-            SocAccessPlugin.Instance?.ScreenDetector?.OnCommunityMapsChanged();
+            SocAccessMod.Instance?.ScreenDetector?.OnCommunityMapsChanged();
         }
     }
 
@@ -134,7 +134,7 @@ namespace SongsOfConquestAccess
 
         private static void Postfix()
         {
-            SocAccessPlugin.Instance?.ScreenDetector?.OnCommunityMapsModalChanged();
+            SocAccessMod.Instance?.ScreenDetector?.OnCommunityMapsModalChanged();
         }
     }
 
@@ -148,7 +148,7 @@ namespace SongsOfConquestAccess
 
         private static void Postfix()
         {
-            SocAccessPlugin.Instance?.ScreenDetector?.OnCommunityMapsModalChanged();
+            SocAccessMod.Instance?.ScreenDetector?.OnCommunityMapsModalChanged();
         }
     }
 
@@ -162,7 +162,7 @@ namespace SongsOfConquestAccess
 
         private static void Postfix()
         {
-            SocAccessPlugin.Instance?.ScreenDetector?.OnCommunityMapsModalChanged();
+            SocAccessMod.Instance?.ScreenDetector?.OnCommunityMapsModalChanged();
         }
     }
 
@@ -176,7 +176,7 @@ namespace SongsOfConquestAccess
 
         private static void Postfix()
         {
-            SocAccessPlugin.Instance?.ScreenDetector?.OnCommunityMapsModalChanged();
+            SocAccessMod.Instance?.ScreenDetector?.OnCommunityMapsModalChanged();
         }
     }
 
@@ -190,7 +190,7 @@ namespace SongsOfConquestAccess
 
         private static void Postfix()
         {
-            SocAccessPlugin.Instance?.ScreenDetector?.OnCommunityMapsChanged();
+            SocAccessMod.Instance?.ScreenDetector?.OnCommunityMapsChanged();
         }
     }
 
@@ -204,7 +204,7 @@ namespace SongsOfConquestAccess
 
         private static void Postfix()
         {
-            SocAccessPlugin.Instance?.ScreenDetector?.OnCommunityMapsModalChanged();
+            SocAccessMod.Instance?.ScreenDetector?.OnCommunityMapsModalChanged();
         }
     }
 
@@ -218,7 +218,7 @@ namespace SongsOfConquestAccess
 
         private static void Postfix()
         {
-            SocAccessPlugin.Instance?.ScreenDetector?.OnCommunityMapsModalChanged();
+            SocAccessMod.Instance?.ScreenDetector?.OnCommunityMapsModalChanged();
         }
     }
 
@@ -232,7 +232,7 @@ namespace SongsOfConquestAccess
 
         private static void Postfix()
         {
-            SocAccessPlugin.Instance?.ScreenDetector?.OnCommunityMapsModalChanged();
+            SocAccessMod.Instance?.ScreenDetector?.OnCommunityMapsModalChanged();
         }
     }
 
@@ -248,7 +248,7 @@ namespace SongsOfConquestAccess
 
         private static void Postfix()
         {
-            SocAccessPlugin.Instance?.ScreenDetector?.OnCommunityMapsModalChanged();
+            SocAccessMod.Instance?.ScreenDetector?.OnCommunityMapsModalChanged();
         }
     }
 
@@ -264,7 +264,7 @@ namespace SongsOfConquestAccess
 
         private static void Postfix()
         {
-            SocAccessPlugin.Instance?.ScreenDetector?.OnCommunityMapsModalChanged();
+            SocAccessMod.Instance?.ScreenDetector?.OnCommunityMapsModalChanged();
         }
     }
 
@@ -278,7 +278,7 @@ namespace SongsOfConquestAccess
 
         private static void Postfix()
         {
-            SocAccessPlugin.Instance?.ScreenDetector?.OnCommunityMapsSearchFilterChanged();
+            SocAccessMod.Instance?.ScreenDetector?.OnCommunityMapsSearchFilterChanged();
         }
     }
 
@@ -292,7 +292,7 @@ namespace SongsOfConquestAccess
 
         private static void Postfix()
         {
-            SocAccessPlugin.Instance?.ScreenDetector?.OnCommunityMapsSearchFilterChanged();
+            SocAccessMod.Instance?.ScreenDetector?.OnCommunityMapsSearchFilterChanged();
         }
     }
 
@@ -306,8 +306,8 @@ namespace SongsOfConquestAccess
 
         private static void Postfix()
         {
-            SocAccessPlugin.Instance?.ScreenDetector?.OnCommunityMapsSearchFilterChanged();
-            SocAccessPlugin.Instance?.ScreenDetector?.OnCommunityMapsChanged();
+            SocAccessMod.Instance?.ScreenDetector?.OnCommunityMapsSearchFilterChanged();
+            SocAccessMod.Instance?.ScreenDetector?.OnCommunityMapsChanged();
         }
     }
 
@@ -321,7 +321,7 @@ namespace SongsOfConquestAccess
 
         private static void Postfix()
         {
-            SocAccessPlugin.Instance?.ScreenDetector?.OnCommunityMapsSearchFilterChanged();
+            SocAccessMod.Instance?.ScreenDetector?.OnCommunityMapsSearchFilterChanged();
         }
     }
 
@@ -335,7 +335,7 @@ namespace SongsOfConquestAccess
 
         private static void Postfix()
         {
-            SocAccessPlugin.Instance?.ScreenDetector?.OnCommunityMapsSearchFilterContentsChanged();
+            SocAccessMod.Instance?.ScreenDetector?.OnCommunityMapsSearchFilterContentsChanged();
         }
     }
 
@@ -349,7 +349,7 @@ namespace SongsOfConquestAccess
 
         private static void Postfix()
         {
-            SocAccessPlugin.Instance?.ScreenDetector?.OnCommunityMapsSearchResultsChanged();
+            SocAccessMod.Instance?.ScreenDetector?.OnCommunityMapsSearchResultsChanged();
         }
     }
 
@@ -363,7 +363,7 @@ namespace SongsOfConquestAccess
 
         private static void Postfix()
         {
-            SocAccessPlugin.Instance?.ScreenDetector?.OnCommunityMapsSearchResultsChanged();
+            SocAccessMod.Instance?.ScreenDetector?.OnCommunityMapsSearchResultsChanged();
         }
     }
 
@@ -377,7 +377,7 @@ namespace SongsOfConquestAccess
 
         private static void Postfix()
         {
-            SocAccessPlugin.Instance?.ScreenDetector?.OnCommunityMapsSearchResultsChanged();
+            SocAccessMod.Instance?.ScreenDetector?.OnCommunityMapsSearchResultsChanged();
         }
     }
 
@@ -391,7 +391,7 @@ namespace SongsOfConquestAccess
 
         private static void Postfix()
         {
-            SocAccessPlugin.Instance?.ScreenDetector?.OnCommunityMapsSearchResultsChanged();
+            SocAccessMod.Instance?.ScreenDetector?.OnCommunityMapsSearchResultsChanged();
         }
     }
 
@@ -413,7 +413,7 @@ namespace SongsOfConquestAccess
         private static void Postfix(SearchFocusState __state)
         {
             RestoreSearchFocus(__state);
-            SocAccessPlugin.Instance?.ScreenDetector?.OnCommunityMapsCollectionChanged();
+            SocAccessMod.Instance?.ScreenDetector?.OnCommunityMapsCollectionChanged();
         }
 
         private static SearchFocusState CaptureSearchFocus(Collection collection)
@@ -496,7 +496,7 @@ namespace SongsOfConquestAccess
 
         private static void Postfix()
         {
-            SocAccessPlugin.Instance?.ScreenDetector?.OnCommunityMapsModalChanged();
+            SocAccessMod.Instance?.ScreenDetector?.OnCommunityMapsModalChanged();
         }
     }
 
@@ -510,7 +510,7 @@ namespace SongsOfConquestAccess
 
         private static void Postfix()
         {
-            SocAccessPlugin.Instance?.ScreenDetector?.OnCommunityMapsModalChanged();
+            SocAccessMod.Instance?.ScreenDetector?.OnCommunityMapsModalChanged();
         }
     }
 
@@ -524,7 +524,7 @@ namespace SongsOfConquestAccess
 
         private static void Postfix()
         {
-            SocAccessPlugin.Instance?.ScreenDetector?.OnCommunityMapsModalChanged();
+            SocAccessMod.Instance?.ScreenDetector?.OnCommunityMapsModalChanged();
         }
     }
 
@@ -538,7 +538,7 @@ namespace SongsOfConquestAccess
 
         private static void Postfix()
         {
-            SocAccessPlugin.Instance?.ScreenDetector?.OnCommunityMapsModalChanged();
+            SocAccessMod.Instance?.ScreenDetector?.OnCommunityMapsModalChanged();
         }
     }
 

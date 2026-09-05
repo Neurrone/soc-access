@@ -16,7 +16,7 @@ namespace SongsOfConquestAccess
                 return;
             }
 
-            SocAccessPlugin.Instance?.ScreenDetector?.OnCodexReady(__instance);
+            SocAccessMod.Instance?.ScreenDetector?.OnCodexReady(__instance);
         }
 
         [HarmonyPatch(typeof(CodexMenu), "Hide")]
@@ -32,7 +32,7 @@ namespace SongsOfConquestAccess
         {
             if (__state)
             {
-                SocAccessPlugin.Instance?.ScreenDetector?.OnCodexClosed(__instance);
+                SocAccessMod.Instance?.ScreenDetector?.OnCodexClosed(__instance);
             }
         }
 
@@ -40,14 +40,14 @@ namespace SongsOfConquestAccess
         [HarmonyPostfix]
         private static void CodexMenuSetActiveTabPostfix(CodexMenu __instance)
         {
-            SocAccessPlugin.Instance?.ScreenDetector?.OnCodexTabChanged(__instance);
+            SocAccessMod.Instance?.ScreenDetector?.OnCodexTabChanged(__instance);
         }
 
         [HarmonyPatch(typeof(CodexMenu), "HandleContentButtonClicked")]
         [HarmonyPostfix]
         private static void CodexMenuHandleContentButtonClickedPostfix(CodexMenu __instance)
         {
-            SocAccessPlugin.Instance?.ScreenDetector?.OnCodexArticleChanged(__instance);
+            SocAccessMod.Instance?.ScreenDetector?.OnCodexArticleChanged(__instance);
         }
     }
 }

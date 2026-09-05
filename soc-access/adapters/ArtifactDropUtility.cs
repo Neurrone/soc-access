@@ -53,7 +53,7 @@ namespace SongsOfConquestAccess.Adapters
             catch (Exception ex)
             {
                 string prefix = string.IsNullOrWhiteSpace(logContext) ? "Artifact grid drop" : logContext;
-                SocAccessPlugin.Instance?.LogWarning(prefix + " failed: " + ex.Message);
+                SocAccessMod.Instance?.LogWarning(prefix + " failed: " + ex.Message);
                 return DropResult.Invalid;
             }
         }

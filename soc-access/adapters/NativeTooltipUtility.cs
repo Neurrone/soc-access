@@ -34,7 +34,7 @@ namespace SongsOfConquestAccess.Adapters
             }
             catch (System.Exception exception)
             {
-                SocAccessPlugin.Instance?.LogWarning("NativeTooltipUtility failed to read UI tooltip details: " + exception.Message);
+                SocAccessMod.Instance?.LogWarning("NativeTooltipUtility failed to read UI tooltip details: " + exception.Message);
                 return false;
             }
         }

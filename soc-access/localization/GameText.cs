@@ -37,7 +37,7 @@ namespace SongsOfConquestAccess.Localization
             }
             catch (Exception exception)
             {
-                SocAccessPlugin.Instance?.LogWarning("Failed to localize game key " + key + ": " + exception.Message);
+                SocAccessMod.Instance?.LogWarning("Failed to localize game key " + key + ": " + exception.Message);
                 return FormatFallback(fallback, args);
             }
         }
@@ -75,7 +75,7 @@ namespace SongsOfConquestAccess.Localization
             }
             catch (Exception exception)
             {
-                SocAccessPlugin.Instance?.LogWarning("Failed to localize game plural key " + key + ": " + exception.Message);
+                SocAccessMod.Instance?.LogWarning("Failed to localize game plural key " + key + ": " + exception.Message);
                 return FormatFallback(fallback, args);
             }
         }

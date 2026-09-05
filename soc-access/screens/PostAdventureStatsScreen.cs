@@ -169,7 +169,7 @@ namespace SongsOfConquestAccess.Screens
                             return false;
                         }
 
-                        SocAccessPlugin.Instance?.ScreenDetector?.OnPostAdventureStatsChanged();
+                        SocAccessMod.Instance?.ScreenDetector?.OnPostAdventureStatsChanged();
                         return true;
                     },
                     () =>
@@ -177,7 +177,7 @@ namespace SongsOfConquestAccess.Screens
                         adapter.FocusGraphDropdown();
                         if (adapter.SelectedGraphIndex != option.Index && adapter.SelectGraph(option.Index))
                         {
-                            SocAccessPlugin.Instance?.ScreenDetector?.OnPostAdventureStatsChanged();
+                            SocAccessMod.Instance?.ScreenDetector?.OnPostAdventureStatsChanged();
                         }
                     },
                     () => true));
@@ -221,7 +221,7 @@ namespace SongsOfConquestAccess.Screens
                             return false;
                         }
 
-                        SocAccessPlugin.Instance?.ScreenDetector?.OnPostAdventureStatsChanged(announceFocus: true);
+                        SocAccessMod.Instance?.ScreenDetector?.OnPostAdventureStatsChanged(announceFocus: true);
                         return true;
                     },
                     () => adapter.FocusTeam(team.Entry),

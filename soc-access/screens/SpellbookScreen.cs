@@ -231,7 +231,7 @@ namespace SongsOfConquestAccess.Screens
             }
             catch (Exception exception)
             {
-                SocAccessPlugin.Instance?.LogWarning("SpellbookScreen section " + section + " failed to build: " + exception);
+                SocAccessMod.Instance?.LogWarning("SpellbookScreen section " + section + " failed to build: " + exception);
                 return new T[0];
             }
         }

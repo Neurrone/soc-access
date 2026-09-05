@@ -168,7 +168,7 @@ namespace SongsOfConquestAccess.Screens
 
         private void RequestDetectorRefresh()
         {
-            SocAccessPlugin.Instance?.ScreenDetector?.OnArtifactMarketChanged();
+            SocAccessMod.Instance?.ScreenDetector?.OnArtifactMarketChanged();
         }
 
         private int GetFocusedMenuIndex(string id)
@@ -297,7 +297,7 @@ namespace SongsOfConquestAccess.Screens
             bool result = adapter.SelectCategory(categoryIndex);
             if (result && previousCategoryIndex != adapter.ActiveCategoryIndex)
             {
-                SocAccessPlugin.Instance?.ScreenDetector?.OnArtifactMarketChanged();
+                SocAccessMod.Instance?.ScreenDetector?.OnArtifactMarketChanged();
             }
 
             return result;

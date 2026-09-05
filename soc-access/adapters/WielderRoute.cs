@@ -247,7 +247,7 @@ namespace SongsOfConquestAccess.Adapters
             }
             catch (Exception exception)
             {
-                SocAccessPlugin.Instance?.LogWarning("WielderRoute could not read the destination interaction: " + exception.Message);
+                SocAccessMod.Instance?.LogWarning("WielderRoute could not read the destination interaction: " + exception.Message);
                 return null;
             }
         }

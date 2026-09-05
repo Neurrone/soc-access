@@ -159,7 +159,7 @@ namespace SongsOfConquestAccess.Adapters
             }
             catch (Exception ex)
             {
-                SocAccessPlugin.Instance?.LogWarning("KingdomTroopOverviewAdapter failed to click town row: " + ex.Message);
+                SocAccessMod.Instance?.LogWarning("KingdomTroopOverviewAdapter failed to click town row: " + ex.Message);
                 return false;
             }
         }
@@ -178,7 +178,7 @@ namespace SongsOfConquestAccess.Adapters
             }
             catch (Exception ex)
             {
-                SocAccessPlugin.Instance?.LogWarning("KingdomTroopOverviewAdapter failed to click troop row: " + ex.Message);
+                SocAccessMod.Instance?.LogWarning("KingdomTroopOverviewAdapter failed to click troop row: " + ex.Message);
                 return false;
             }
         }

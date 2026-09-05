@@ -217,7 +217,7 @@ namespace SongsOfConquestAccess.Audio
             }
             catch (Exception exception)
             {
-                SocAccessPlugin.Instance?.LogWarning("Failed to load beacon sound from " + path + ": " + exception.Message);
+                SocAccessMod.Instance?.LogWarning("Failed to load beacon sound from " + path + ": " + exception.Message);
                 _clip = null;
             }
 

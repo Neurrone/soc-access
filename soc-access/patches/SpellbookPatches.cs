@@ -9,7 +9,7 @@ namespace SongsOfConquestAccess
     {
         private static void Postfix(SpellBook __instance, ICommanderState commanderState)
         {
-            SocAccessPlugin.Instance?.ScreenDetector?.OnSpellbookReady(__instance);
+            SocAccessMod.Instance?.ScreenDetector?.OnSpellbookReady(__instance);
         }
     }
 
@@ -28,7 +28,7 @@ namespace SongsOfConquestAccess
                 return;
             }
 
-            SocAccessPlugin.Instance?.ScreenDetector?.OnSpellbookClosed(__instance);
+            SocAccessMod.Instance?.ScreenDetector?.OnSpellbookClosed(__instance);
         }
     }
 }

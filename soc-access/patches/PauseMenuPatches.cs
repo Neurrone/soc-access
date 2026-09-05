@@ -16,7 +16,7 @@ namespace SongsOfConquestAccess.Patches
         [HarmonyPostfix]
         private static void PauseMenuOnOpenedPostfix(PauseMenu __instance)
         {
-            SocAccessPlugin.Instance?.ScreenDetector?.OnPauseMenuReady(__instance);
+            SocAccessMod.Instance?.ScreenDetector?.OnPauseMenuReady(__instance);
         }
 
         [HarmonyPatch(typeof(PauseMenu), "TryClose")]
@@ -28,7 +28,7 @@ namespace SongsOfConquestAccess.Patches
                 return;
             }
 
-            SocAccessPlugin.Instance?.ScreenDetector?.OnPauseMenuClosed(__instance);
+            SocAccessMod.Instance?.ScreenDetector?.OnPauseMenuClosed(__instance);
         }
     }
 }

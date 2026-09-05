@@ -34,19 +34,19 @@ namespace SongsOfConquestAccess
         [HarmonyPostfix]
         private static void HostileJoinMenuHandleDoneButtonClickedPostfix(HostileJoinMenu __instance)
         {
-            SocAccessPlugin.Instance?.ScreenDetector?.OnHostileJoinMenuClosed(__instance);
+            SocAccessMod.Instance?.ScreenDetector?.OnHostileJoinMenuClosed(__instance);
         }
 
         [HarmonyPatch(typeof(HostileJoinMenu), "HandleNoButtonClicked")]
         [HarmonyPostfix]
         private static void HostileJoinMenuHandleNoButtonClickedPostfix(HostileJoinMenu __instance)
         {
-            SocAccessPlugin.Instance?.ScreenDetector?.OnHostileJoinMenuClosed(__instance);
+            SocAccessMod.Instance?.ScreenDetector?.OnHostileJoinMenuClosed(__instance);
         }
 
         private static void StartWaitForReady(HostileJoinMenu menu)
         {
-            SocAccessPlugin plugin = SocAccessPlugin.Instance;
+            SocAccessMod plugin = SocAccessMod.Instance;
             if (plugin != null && menu != null)
             {
                 plugin.StartCoroutine(WaitForReady(menu));
@@ -61,7 +61,7 @@ namespace SongsOfConquestAccess
                 HostileJoinMenuAdapter adapter = new HostileJoinMenuAdapter(menu);
                 if (adapter.IsPresent())
                 {
-                    SocAccessPlugin.Instance?.ScreenDetector?.OnHostileJoinMenuChanged(menu);
+                    SocAccessMod.Instance?.ScreenDetector?.OnHostileJoinMenuChanged(menu);
                     yield break;
                 }
 

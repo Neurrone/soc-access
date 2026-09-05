@@ -311,7 +311,7 @@ namespace SongsOfConquestAccess.Adapters
                 : null;
             if (movableSpell == null || MovableSpellHoverQuickbarEntryField == null || MovableSpellEndDragMethod == null)
             {
-                SocAccessPlugin.Instance?.LogWarning("Spellbook quickbar drag failed because native movable spell members were not found");
+                SocAccessMod.Instance?.LogWarning("Spellbook quickbar drag failed because native movable spell members were not found");
                 return false;
             }
 

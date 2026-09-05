@@ -196,7 +196,7 @@ namespace SongsOfConquestAccess.Adapters
             }
             catch (Exception exception)
             {
-                SocAccessPlugin.Instance?.LogWarning("Failed to resolve dialogue header text: " + exception.Message);
+                SocAccessMod.Instance?.LogWarning("Failed to resolve dialogue header text: " + exception.Message);
                 return false;
             }
         }

@@ -11,7 +11,7 @@ namespace SongsOfConquestAccess
         [HarmonyPostfix]
         private static void SetStatePostfix(SceneLoader __instance, SceneLoaderState state)
         {
-            SocAccessPlugin plugin = SocAccessPlugin.Instance;
+            SocAccessMod plugin = SocAccessMod.Instance;
             if (plugin == null || __instance == null)
             {
                 return;
@@ -33,7 +33,7 @@ namespace SongsOfConquestAccess
         [HarmonyPostfix]
         private static void AdventureViewInstallerInstallBindingsPostfix(AdventureViewInstaller __instance)
         {
-            SocAccessPlugin.Instance?.ScreenDetector?.OnAdventureViewReady(__instance);
+            SocAccessMod.Instance?.ScreenDetector?.OnAdventureViewReady(__instance);
         }
     }
 }

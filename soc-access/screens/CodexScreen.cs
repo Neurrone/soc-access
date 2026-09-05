@@ -254,7 +254,7 @@ namespace SongsOfConquestAccess.Screens
             }
             catch (Exception ex)
             {
-                SocAccessPlugin.Instance?.LogWarning("CodexScreen failed to build " + section + ": " + ex);
+                SocAccessMod.Instance?.LogWarning("CodexScreen failed to build " + section + ": " + ex);
                 return new T[0];
             }
         }

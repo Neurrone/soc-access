@@ -15,49 +15,49 @@ namespace SongsOfConquestAccess
         [HarmonyPostfix]
         private static void LobbyMenuShowPostfix(LobbyMenu __instance)
         {
-            SocAccessPlugin.Instance?.StartCoroutine(WaitForLobbyPlayersReady(__instance));
+            SocAccessMod.Instance?.StartCoroutine(WaitForLobbyPlayersReady(__instance));
         }
 
         [HarmonyPatch(typeof(LobbyMenu), "Hide")]
         [HarmonyPostfix]
         private static void LobbyMenuHidePostfix(LobbyMenu __instance)
         {
-            SocAccessPlugin.Instance?.ScreenDetector?.OnAdventureLobbyPlayersClosed(__instance);
+            SocAccessMod.Instance?.ScreenDetector?.OnAdventureLobbyPlayersClosed(__instance);
         }
 
         [HarmonyPatch(typeof(LobbyMenu), "OnDestroy")]
         [HarmonyPostfix]
         private static void LobbyMenuOnDestroyPostfix(LobbyMenu __instance)
         {
-            SocAccessPlugin.Instance?.ScreenDetector?.OnAdventureLobbyPlayersClosed(__instance);
+            SocAccessMod.Instance?.ScreenDetector?.OnAdventureLobbyPlayersClosed(__instance);
         }
 
         [HarmonyPatch(typeof(LobbyPlayerEntry), "Refresh")]
         [HarmonyPostfix]
         private static void LobbyPlayerEntryRefreshPostfix()
         {
-            SocAccessPlugin.Instance?.ScreenDetector?.OnAdventureLobbyPlayersChanged();
+            SocAccessMod.Instance?.ScreenDetector?.OnAdventureLobbyPlayersChanged();
         }
 
         [HarmonyPatch(typeof(LobbyMapSettings), "RefreshMixedFactionToggle")]
         [HarmonyPostfix]
         private static void LobbyMapSettingsRefreshMixedFactionTogglePostfix()
         {
-            SocAccessPlugin.Instance?.ScreenDetector?.OnAdventureLobbyPlayersChanged();
+            SocAccessMod.Instance?.ScreenDetector?.OnAdventureLobbyPlayersChanged();
         }
 
         [HarmonyPatch(typeof(LobbyMultiplayerPanel), "Refresh")]
         [HarmonyPostfix]
         private static void LobbyMultiplayerPanelRefreshPostfix()
         {
-            SocAccessPlugin.Instance?.ScreenDetector?.OnAdventureLobbyPlayersChanged();
+            SocAccessMod.Instance?.ScreenDetector?.OnAdventureLobbyPlayersChanged();
         }
 
         [HarmonyPatch(typeof(LobbyMultiplayerPanel), "HandleInviteFriendButtonClicked")]
         [HarmonyPostfix]
         private static void LobbyMultiplayerPanelInviteFriendPostfix(LobbyMultiplayerPanel __instance)
         {
-            SocAccessPlugin plugin = SocAccessPlugin.Instance;
+            SocAccessMod plugin = SocAccessMod.Instance;
             if (plugin != null)
             {
                 plugin.StartCoroutine(WaitForInviteProvidersReady(__instance));
@@ -68,7 +68,7 @@ namespace SongsOfConquestAccess
         [HarmonyPostfix]
         private static void LobbyMultiplayerPanelCancelInvitePostfix(LobbyMultiplayerPanel __instance)
         {
-            SocAccessPlugin.Instance?.ScreenDetector?.OnAdventureLobbyInviteProvidersClosed(__instance);
+            SocAccessMod.Instance?.ScreenDetector?.OnAdventureLobbyInviteProvidersClosed(__instance);
         }
 
         private static IEnumerator WaitForLobbyPlayersReady(LobbyMenu menu)
@@ -79,7 +79,7 @@ namespace SongsOfConquestAccess
                 AdventureLobbyPlayersAdapter adapter = new AdventureLobbyPlayersAdapter(menu);
                 if (adapter.IsPresent())
                 {
-                    SocAccessPlugin.Instance?.ScreenDetector?.OnAdventureLobbyPlayersReady(menu);
+                    SocAccessMod.Instance?.ScreenDetector?.OnAdventureLobbyPlayersReady(menu);
                     yield break;
                 }
 
@@ -94,7 +94,7 @@ namespace SongsOfConquestAccess
             AdventureLobbyInviteProvidersAdapter adapter = new AdventureLobbyInviteProvidersAdapter(panel);
             if (adapter.IsPresent())
             {
-                SocAccessPlugin.Instance?.ScreenDetector?.OnAdventureLobbyInviteProvidersReady(panel);
+                SocAccessMod.Instance?.ScreenDetector?.OnAdventureLobbyInviteProvidersReady(panel);
             }
         }
     }

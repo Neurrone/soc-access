@@ -12,14 +12,14 @@ namespace SongsOfConquestAccess.Patches
         [HarmonyPostfix]
         private static void ShowPostfix(SystemPopup __instance)
         {
-            SocAccessPlugin.Instance?.ScreenDetector?.OnSystemPopupReady(__instance);
+            SocAccessMod.Instance?.ScreenDetector?.OnSystemPopupReady(__instance);
         }
 
         [HarmonyPatch(typeof(SystemPopup), "Hide")]
         [HarmonyPrefix]
         private static void HidePrefix(SystemPopup __instance)
         {
-            SocAccessPlugin.Instance?.ScreenDetector?.OnSystemPopupClosed(__instance);
+            SocAccessMod.Instance?.ScreenDetector?.OnSystemPopupClosed(__instance);
         }
     }
 }

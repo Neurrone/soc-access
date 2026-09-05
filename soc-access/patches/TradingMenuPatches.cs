@@ -17,14 +17,14 @@ namespace SongsOfConquestAccess
                 return;
             }
 
-            SocAccessPlugin.Instance?.ScreenDetector?.OnTradingMenuReady(__instance);
+            SocAccessMod.Instance?.ScreenDetector?.OnTradingMenuReady(__instance);
         }
 
         [HarmonyPatch(typeof(TradingMenu), "Close", new[] { typeof(bool) })]
         [HarmonyPostfix]
         private static void TradingMenuClosePostfix(TradingMenu __instance)
         {
-            SocAccessPlugin.Instance?.ScreenDetector?.OnTradingMenuClosed(__instance);
+            SocAccessMod.Instance?.ScreenDetector?.OnTradingMenuClosed(__instance);
         }
     }
 }

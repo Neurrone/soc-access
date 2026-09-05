@@ -755,7 +755,7 @@ namespace SongsOfConquestAccess.Adapters
             }
             catch (Exception ex)
             {
-                SocAccessPlugin.Instance?.LogWarning("CommanderSheetAdapter could not get artifact rarity color: " + ex.Message);
+                SocAccessMod.Instance?.LogWarning("CommanderSheetAdapter could not get artifact rarity color: " + ex.Message);
                 return _artifactLookup != null ? _artifactLookup.GetLocalizedName(artifact.Type) : artifact.Type.ToString();
             }
         }

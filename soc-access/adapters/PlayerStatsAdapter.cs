@@ -617,7 +617,7 @@ namespace SongsOfConquestAccess.Adapters
         {
             if (root == null)
             {
-                SocAccessPlugin.Instance?.LogWarning("PlayerStats title lookup failed because the root component is null.");
+                SocAccessMod.Instance?.LogWarning("PlayerStats title lookup failed because the root component is null.");
                 return string.Empty;
             }
 
@@ -627,7 +627,7 @@ namespace SongsOfConquestAccess.Adapters
                 current = current != null ? current.Find(path[i]) : null;
                 if (current == null)
                 {
-                    SocAccessPlugin.Instance?.LogWarning(
+                    SocAccessMod.Instance?.LogWarning(
                         "PlayerStats title lookup failed under "
                         + root.GetType().Name
                         + " at "
@@ -640,7 +640,7 @@ namespace SongsOfConquestAccess.Adapters
             string text = GetText(current.GetComponent<UITextMesh>());
             if (string.IsNullOrWhiteSpace(text))
             {
-                SocAccessPlugin.Instance?.LogWarning(
+                SocAccessMod.Instance?.LogWarning(
                     "PlayerStats title lookup found empty text at "
                     + root.GetType().Name
                     + "/"

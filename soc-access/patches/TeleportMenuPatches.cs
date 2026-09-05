@@ -15,7 +15,7 @@ namespace SongsOfConquestAccess
         [HarmonyPostfix]
         private static void TeleportMenuShowPostfix(TeleportMenu __instance)
         {
-            SocAccessPlugin.Instance?.ScreenDetector?.OnTeleportMenuReady(__instance);
+            SocAccessMod.Instance?.ScreenDetector?.OnTeleportMenuReady(__instance);
         }
 
         [HarmonyPatch(typeof(TeleportMenu), "Close")]
@@ -32,7 +32,7 @@ namespace SongsOfConquestAccess
         {
             if (__state)
             {
-                SocAccessPlugin.Instance?.ScreenDetector?.OnTeleportMenuClosed(__instance);
+                SocAccessMod.Instance?.ScreenDetector?.OnTeleportMenuClosed(__instance);
             }
         }
     }

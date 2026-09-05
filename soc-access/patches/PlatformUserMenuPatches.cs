@@ -28,23 +28,23 @@ namespace SongsOfConquestAccess
         [HarmonyPostfix]
         private static void PlatformUserMenuShowPostfix(PlatformUserMenu __instance)
         {
-            SocAccessPlugin.Instance?.StartCoroutine(WaitForPlatformUserMenuReady(__instance));
+            SocAccessMod.Instance?.StartCoroutine(WaitForPlatformUserMenuReady(__instance));
         }
 
         [HarmonyPatch(typeof(PlatformUserMenu), "Hide")]
         [HarmonyPostfix]
         private static void PlatformUserMenuHidePostfix(PlatformUserMenu __instance)
         {
-            SocAccessPlugin.Instance?.LogInfo("PlatformUserMenuDebug hidden");
-            SocAccessPlugin.Instance?.ScreenDetector?.OnPlatformUserMenuClosed(__instance);
+            SocAccessMod.Instance?.LogInfo("PlatformUserMenuDebug hidden");
+            SocAccessMod.Instance?.ScreenDetector?.OnPlatformUserMenuClosed(__instance);
         }
 
         [HarmonyPatch(typeof(PlatformUserMenu), "OnDestroy")]
         [HarmonyPostfix]
         private static void PlatformUserMenuOnDestroyPostfix(PlatformUserMenu __instance)
         {
-            SocAccessPlugin.Instance?.LogInfo("PlatformUserMenuDebug hidden");
-            SocAccessPlugin.Instance?.ScreenDetector?.OnPlatformUserMenuClosed(__instance);
+            SocAccessMod.Instance?.LogInfo("PlatformUserMenuDebug hidden");
+            SocAccessMod.Instance?.ScreenDetector?.OnPlatformUserMenuClosed(__instance);
         }
 
         [HarmonyPatch(typeof(PlatformUserButtonEntry), "HandleClicked")]
@@ -52,7 +52,7 @@ namespace SongsOfConquestAccess
         private static void PlatformUserButtonEntryHandleClickedPostfix(PlatformUserButtonEntry __instance)
         {
             _lastActionTime = Time.realtimeSinceStartup;
-            SocAccessPlugin.Instance?.LogInfo(
+            SocAccessMod.Instance?.LogInfo(
                 "PlatformUserMenuDebug action clicked: type="
                 + GetActionType(__instance)
                 + ", label=\""
@@ -68,7 +68,7 @@ namespace SongsOfConquestAccess
                 PlatformUserMenuAdapter adapter = PlatformUserMenuScreen.FindActiveMenu(menu);
                 if (adapter != null)
                 {
-                    SocAccessPlugin.Instance?.LogInfo(
+                    SocAccessMod.Instance?.LogInfo(
                         "PlatformUserMenuDebug shown: present="
                         + adapter.IsPresent()
                         + ", buttonCount="
@@ -76,7 +76,7 @@ namespace SongsOfConquestAccess
                         + ", labels=["
                         + string.Join(", ", GetLabels(menu).ToArray())
                         + "]");
-                    SocAccessPlugin.Instance?.ScreenDetector?.OnPlatformUserMenuReady(menu);
+                    SocAccessMod.Instance?.ScreenDetector?.OnPlatformUserMenuReady(menu);
                     yield break;
                 }
 

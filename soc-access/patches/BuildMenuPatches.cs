@@ -40,7 +40,7 @@ namespace SongsOfConquestAccess
         {
             if (__state)
             {
-                SocAccessPlugin.Instance?.ScreenDetector?.OnBuildMenuClosed(__instance);
+                SocAccessMod.Instance?.ScreenDetector?.OnBuildMenuClosed(__instance);
             }
         }
 
@@ -128,7 +128,7 @@ namespace SongsOfConquestAccess
 
         private static void StartNotifySiteChanged(BuildMenu menu)
         {
-            SocAccessPlugin plugin = SocAccessPlugin.Instance;
+            SocAccessMod plugin = SocAccessMod.Instance;
             if (plugin != null && menu != null)
             {
                 plugin.StartCoroutine(NotifySiteChangedNextFrame(menu));
@@ -137,7 +137,7 @@ namespace SongsOfConquestAccess
 
         private static void StartNotifyContentChanged(BuildMenu menu)
         {
-            SocAccessPlugin plugin = SocAccessPlugin.Instance;
+            SocAccessMod plugin = SocAccessMod.Instance;
             if (plugin != null && menu != null)
             {
                 plugin.StartCoroutine(NotifyContentChangedNextFrame(menu));
@@ -150,7 +150,7 @@ namespace SongsOfConquestAccess
             BuildMenuAdapter adapter = new BuildMenuAdapter(menu);
             if (adapter.IsPresent())
             {
-                SocAccessPlugin.Instance?.ScreenDetector?.OnBuildMenuSiteChanged(menu);
+                SocAccessMod.Instance?.ScreenDetector?.OnBuildMenuSiteChanged(menu);
             }
         }
 
@@ -160,13 +160,13 @@ namespace SongsOfConquestAccess
             BuildMenuAdapter adapter = new BuildMenuAdapter(menu);
             if (adapter.IsPresent())
             {
-                SocAccessPlugin.Instance?.ScreenDetector?.OnBuildMenuCategoryChanged(menu);
+                SocAccessMod.Instance?.ScreenDetector?.OnBuildMenuCategoryChanged(menu);
             }
         }
 
         private static void StartWaitForReady(BuildMenu menu)
         {
-            SocAccessPlugin plugin = SocAccessPlugin.Instance;
+            SocAccessMod plugin = SocAccessMod.Instance;
             if (plugin != null && menu != null)
             {
                 plugin.StartCoroutine(WaitForReady(menu));
@@ -181,7 +181,7 @@ namespace SongsOfConquestAccess
                 BuildMenuAdapter adapter = new BuildMenuAdapter(menu);
                 if (adapter.IsPresent())
                 {
-                    SocAccessPlugin.Instance?.ScreenDetector?.OnBuildMenuReady(menu);
+                    SocAccessMod.Instance?.ScreenDetector?.OnBuildMenuReady(menu);
                     yield break;
                 }
 

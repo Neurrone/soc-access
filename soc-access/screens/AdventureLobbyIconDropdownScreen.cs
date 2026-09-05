@@ -91,14 +91,14 @@ namespace SongsOfConquestAccess.Screens
                 return false;
             }
 
-            SocAccessPlugin.Instance?.ScreenDetector?.OnAdventureLobbyIconDropdownOptionActivating(
+            SocAccessMod.Instance?.ScreenDetector?.OnAdventureLobbyIconDropdownOptionActivating(
                 adapter != null ? adapter.SourceKey as IconDropdown : null,
                 item.TypeName);
 
             bool activated = item.Activate();
             if (!activated)
             {
-                SocAccessPlugin.Instance?.ScreenDetector?.OnAdventureLobbyIconDropdownOptionActivationFailed(
+                SocAccessMod.Instance?.ScreenDetector?.OnAdventureLobbyIconDropdownOptionActivationFailed(
                     adapter != null ? adapter.SourceKey as IconDropdown : null);
             }
 

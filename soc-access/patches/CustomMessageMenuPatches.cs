@@ -21,14 +21,14 @@ namespace SongsOfConquestAccess.Patches
         [HarmonyPostfix]
         private static void ShowPostfix(CustomMessageMenu __instance)
         {
-            SocAccessPlugin.Instance?.ScreenDetector?.OnCustomMessageMenuReady(__instance);
+            SocAccessMod.Instance?.ScreenDetector?.OnCustomMessageMenuReady(__instance);
         }
 
         [HarmonyPatch(typeof(CustomMessageMenu), "Hide", new[] { typeof(bool) })]
         [HarmonyPrefix]
         private static void HidePrefix(CustomMessageMenu __instance)
         {
-            SocAccessPlugin.Instance?.ScreenDetector?.OnCustomMessageMenuClosed(__instance);
+            SocAccessMod.Instance?.ScreenDetector?.OnCustomMessageMenuClosed(__instance);
         }
     }
 }

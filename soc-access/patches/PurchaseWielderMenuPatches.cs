@@ -33,13 +33,13 @@ namespace SongsOfConquestAccess
         {
             if (__state)
             {
-                SocAccessPlugin.Instance?.ScreenDetector?.OnPurchaseWielderClosed(__instance);
+                SocAccessMod.Instance?.ScreenDetector?.OnPurchaseWielderClosed(__instance);
             }
         }
 
         private static void StartWaitForReady(PurchaseWielderMenu menu)
         {
-            SocAccessPlugin plugin = SocAccessPlugin.Instance;
+            SocAccessMod plugin = SocAccessMod.Instance;
             if (plugin != null && menu != null)
             {
                 plugin.StartCoroutine(WaitForReady(menu));
@@ -54,7 +54,7 @@ namespace SongsOfConquestAccess
                 PurchaseWielderMenuAdapter adapter = new PurchaseWielderMenuAdapter(menu);
                 if (adapter.IsPresent())
                 {
-                    SocAccessPlugin.Instance?.ScreenDetector?.OnPurchaseWielderReady(menu);
+                    SocAccessMod.Instance?.ScreenDetector?.OnPurchaseWielderReady(menu);
                     yield break;
                 }
 

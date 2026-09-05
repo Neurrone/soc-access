@@ -20,7 +20,7 @@ namespace SongsOfConquestAccess
             }
 
             ActiveSheets.Add(__instance.GetInstanceID());
-            SocAccessPlugin.Instance?.ScreenDetector?.OnCommanderSheetReady(__instance);
+            SocAccessMod.Instance?.ScreenDetector?.OnCommanderSheetReady(__instance);
         }
 
         [HarmonyPatch(typeof(CommanderSheet), "Close")]
@@ -32,42 +32,42 @@ namespace SongsOfConquestAccess
                 return;
             }
 
-            SocAccessPlugin.Instance?.ScreenDetector?.OnCommanderSheetClosed(__instance);
+            SocAccessMod.Instance?.ScreenDetector?.OnCommanderSheetClosed(__instance);
         }
 
         [HarmonyPatch(typeof(CommanderSheet), "HandleTutorialClicked")]
         [HarmonyPostfix]
         private static void CommanderSheetHandleTutorialClickedPostfix(CommanderSheet __instance)
         {
-            SocAccessPlugin.Instance?.ScreenDetector?.OnCommanderSheetChanged();
+            SocAccessMod.Instance?.ScreenDetector?.OnCommanderSheetChanged();
         }
 
         [HarmonyPatch(typeof(CommanderSheetModifierTabNavigation), "SetActiveTab")]
         [HarmonyPostfix]
         private static void CommanderSheetModifierTabNavigationSetActiveTabPostfix(CommanderSheetModifierTabNavigation __instance)
         {
-            SocAccessPlugin.Instance?.ScreenDetector?.OnCommanderSheetComponentChanged(__instance);
+            SocAccessMod.Instance?.ScreenDetector?.OnCommanderSheetComponentChanged(__instance);
         }
 
         [HarmonyPatch(typeof(CommanderSheetSummary), "UpdateSummary")]
         [HarmonyPostfix]
         private static void CommanderSheetSummaryUpdateSummaryPostfix(CommanderSheetSummary __instance)
         {
-            SocAccessPlugin.Instance?.ScreenDetector?.OnCommanderSheetComponentChanged(__instance);
+            SocAccessMod.Instance?.ScreenDetector?.OnCommanderSheetComponentChanged(__instance);
         }
 
         [HarmonyPatch(typeof(CommanderSheetTroopSummary), "UpdateSummary")]
         [HarmonyPostfix]
         private static void CommanderSheetTroopSummaryUpdateSummaryPostfix(CommanderSheetTroopSummary __instance)
         {
-            SocAccessPlugin.Instance?.ScreenDetector?.OnCommanderSheetComponentChanged(__instance);
+            SocAccessMod.Instance?.ScreenDetector?.OnCommanderSheetComponentChanged(__instance);
         }
 
         [HarmonyPatch(typeof(CommanderSheetTempEffectSummary), "UpdateSummary")]
         [HarmonyPostfix]
         private static void CommanderSheetTempEffectSummaryUpdateSummaryPostfix(CommanderSheetTempEffectSummary __instance)
         {
-            SocAccessPlugin.Instance?.ScreenDetector?.OnCommanderSheetComponentChanged(__instance);
+            SocAccessMod.Instance?.ScreenDetector?.OnCommanderSheetComponentChanged(__instance);
         }
     }
 }

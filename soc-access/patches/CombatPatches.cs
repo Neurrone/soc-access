@@ -29,14 +29,14 @@ namespace SongsOfConquestAccess
         [HarmonyPostfix]
         private static void ClientBattleCommandsReadyPostfix(ClientBattleCommandsFacade __instance)
         {
-            SocAccessPlugin.Instance?.ScreenDetector?.OnCombatReady(__instance);
+            SocAccessMod.Instance?.ScreenDetector?.OnCombatReady(__instance);
         }
 
         [HarmonyPatch(typeof(BattleSceneInstaller), "InstallBindings")]
         [HarmonyPostfix]
         private static void BattleSceneInstallerInstallBindingsPostfix(BattleSceneInstaller __instance)
         {
-            SocAccessPlugin.Instance?.ScreenDetector?.OnBattleSceneReady(__instance);
+            SocAccessMod.Instance?.ScreenDetector?.OnBattleSceneReady(__instance);
         }
 
         [HarmonyPatch(typeof(HumanBattleSpellController), "HandleSpellCastCancelled")]
@@ -60,7 +60,7 @@ namespace SongsOfConquestAccess
             CombatEventNarrator.HandleResponse(r);
             if (r is BattleResultCommand.Response)
             {
-                SocAccessPlugin.Instance?.ScreenDetector?.OnCombatEnded();
+                SocAccessMod.Instance?.ScreenDetector?.OnCombatEnded();
             }
         }
 
@@ -114,7 +114,7 @@ namespace SongsOfConquestAccess
                 ActivePostBattleMenus.Add(menu.GetInstanceID());
             }
 
-            SocAccessPlugin.Instance?.ScreenDetector?.OnPostBattleResultReady(__instance);
+            SocAccessMod.Instance?.ScreenDetector?.OnPostBattleResultReady(__instance);
         }
 
         [HarmonyPatch(typeof(PostBattleMenu), "Hide")]
@@ -126,7 +126,7 @@ namespace SongsOfConquestAccess
                 return;
             }
 
-            SocAccessPlugin.Instance?.ScreenDetector?.OnPostBattleResultClosed();
+            SocAccessMod.Instance?.ScreenDetector?.OnPostBattleResultClosed();
         }
 
         [HarmonyPatch(typeof(PostBattleMenu), "AnimateResults")]
@@ -143,7 +143,7 @@ namespace SongsOfConquestAccess
                 yield return original.Current;
             }
 
-            SocAccessPlugin.Instance?.ScreenDetector?.OnPostBattleResultChanged();
+            SocAccessMod.Instance?.ScreenDetector?.OnPostBattleResultChanged();
         }
 
         [HarmonyPatch(typeof(NotificationPanel), "Show", new[] { typeof(string), typeof(UnityEngine.Vector3), typeof(UnityEngine.Vector2) })]

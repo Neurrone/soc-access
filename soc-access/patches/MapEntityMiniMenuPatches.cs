@@ -15,7 +15,7 @@ namespace SongsOfConquestAccess.Patches
             MapEntityMiniMenuAdapter adapter = new MapEntityMiniMenuAdapter(__instance);
             if (adapter.IsPresent())
             {
-                SocAccessPlugin.Instance?.ScreenDetector?.OnMapEntityMiniMenuReady(__instance);
+                SocAccessMod.Instance?.ScreenDetector?.OnMapEntityMiniMenuReady(__instance);
             }
         }
 
@@ -32,7 +32,7 @@ namespace SongsOfConquestAccess.Patches
         {
             if (__state)
             {
-                SocAccessPlugin.Instance?.ScreenDetector?.OnMapEntityMiniMenuClosed(__instance);
+                SocAccessMod.Instance?.ScreenDetector?.OnMapEntityMiniMenuClosed(__instance);
             }
         }
     }

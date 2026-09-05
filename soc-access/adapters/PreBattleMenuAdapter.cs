@@ -380,7 +380,7 @@ namespace SongsOfConquestAccess.Adapters
             DeploymentMenu deployment = GetDeploymentMenu();
             if (deployment == null || DeploymentControllerField == null || GrabMethod == null || DropMethod == null)
             {
-                SocAccessPlugin.Instance?.LogWarning("PreBattleMenuAdapter could not resolve native deployment grab/drop methods");
+                SocAccessMod.Instance?.LogWarning("PreBattleMenuAdapter could not resolve native deployment grab/drop methods");
                 return false;
             }
 
@@ -403,7 +403,7 @@ namespace SongsOfConquestAccess.Adapters
             }
             catch (Exception ex)
             {
-                SocAccessPlugin.Instance?.LogWarning("PreBattleMenuAdapter native drag/drop failed: " + ex.Message);
+                SocAccessMod.Instance?.LogWarning("PreBattleMenuAdapter native drag/drop failed: " + ex.Message);
                 return false;
             }
 
@@ -485,7 +485,7 @@ namespace SongsOfConquestAccess.Adapters
             }
             catch (Exception exception)
             {
-                SocAccessPlugin.Instance?.LogWarning("PreBattleMenuAdapter failed to set focused tile overlay: " + exception.Message);
+                SocAccessMod.Instance?.LogWarning("PreBattleMenuAdapter failed to set focused tile overlay: " + exception.Message);
             }
         }
 
@@ -504,7 +504,7 @@ namespace SongsOfConquestAccess.Adapters
             }
             catch (Exception exception)
             {
-                SocAccessPlugin.Instance?.LogWarning("PreBattleMenuAdapter failed to clear focused tile overlay: " + exception.Message);
+                SocAccessMod.Instance?.LogWarning("PreBattleMenuAdapter failed to clear focused tile overlay: " + exception.Message);
             }
         }
 
@@ -772,7 +772,7 @@ namespace SongsOfConquestAccess.Adapters
             }
             catch (Exception ex)
             {
-                SocAccessPlugin.Instance?.LogWarning("PreBattleMenuAdapter failed to localize troop name: " + ex.Message);
+                SocAccessMod.Instance?.LogWarning("PreBattleMenuAdapter failed to localize troop name: " + ex.Message);
             }
 
             name = SpeechTextSanitizer.Normalize(name);
@@ -960,7 +960,7 @@ namespace SongsOfConquestAccess.Adapters
             }
             catch (Exception ex)
             {
-                SocAccessPlugin.Instance?.LogWarning("PreBattleMenuAdapter failed to resolve troop details: " + ex.Message);
+                SocAccessMod.Instance?.LogWarning("PreBattleMenuAdapter failed to resolve troop details: " + ex.Message);
                 return null;
             }
         }

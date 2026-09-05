@@ -17,7 +17,7 @@ namespace SongsOfConquestAccess.Patches
         [HarmonyPostfix]
         private static void OptionsMenuOnOpenedPostfix(OptionsMenu __instance)
         {
-            SocAccessPlugin plugin = SocAccessPlugin.Instance;
+            SocAccessMod plugin = SocAccessMod.Instance;
             if (plugin == null)
             {
                 return;
@@ -35,7 +35,7 @@ namespace SongsOfConquestAccess.Patches
                 return;
             }
 
-            SocAccessPlugin.Instance?.ScreenDetector?.OnOptionsMenuClosed(__instance);
+            SocAccessMod.Instance?.ScreenDetector?.OnOptionsMenuClosed(__instance);
         }
 
         [HarmonyPatch(typeof(OptionsMenu), "DrawContent")]
@@ -52,7 +52,7 @@ namespace SongsOfConquestAccess.Patches
                 return;
             }
 
-            SocAccessPlugin.Instance?.ScreenDetector?.OnOptionsMenuChanged(__instance);
+            SocAccessMod.Instance?.ScreenDetector?.OnOptionsMenuChanged(__instance);
         }
 
         [HarmonyPatch(typeof(OptionsMenu), "ReDrawAfterLanguageChange")]
@@ -73,14 +73,14 @@ namespace SongsOfConquestAccess.Patches
 
             if (__exception == null)
             {
-                SocAccessPlugin.Instance?.ScreenDetector?.OnOptionsMenuChanged(__instance);
+                SocAccessMod.Instance?.ScreenDetector?.OnOptionsMenuChanged(__instance);
             }
         }
 
         private static IEnumerator NotifyReadyNextFrame(OptionsMenu menu)
         {
             yield return null;
-            SocAccessPlugin.Instance?.ScreenDetector?.OnOptionsMenuReady(menu);
+            SocAccessMod.Instance?.ScreenDetector?.OnOptionsMenuReady(menu);
         }
     }
 }

@@ -1,4 +1,8 @@
 using BepInEx;
+using System;
+using System.Collections;
+using BepInEx.Logging;
+using SongsOfConquestAccess.Loader;
 using HarmonyLib;
 using SongsOfConquest.Common.Localization;
 using SongsOfConquestAccess.Audio;
@@ -14,14 +18,26 @@ using UnityEngine;
 
 namespace SongsOfConquestAccess
 {
-    [BepInPlugin(PluginGuid, PluginName, PluginVersion)]
-    public sealed class SocAccessPlugin : BaseUnityPlugin
+    public sealed class SocAccessMod
     {
         public const string PluginGuid = "songs.of.conquest.access";
         public const string PluginName = "Songs of Conquest Access";
         public const string PluginVersion = "1.0.0";
 
-        internal static SocAccessPlugin Instance { get; private set; }
+        internal static SocAccessMod Instance { get; private set; }
+
+        private readonly ModHost _host;
+        private ManualLogSource Logger;
+
+        internal SocAccessMod(ModHost host)
+        {
+            _host = host;
+        }
+
+        internal Coroutine StartCoroutine(IEnumerator routine)
+        {
+            return _host.StartCoroutine(routine);
+        }
 
         private Harmony _harmony;
         private SpeechService _speechService;
@@ -37,11 +53,12 @@ namespace SongsOfConquestAccess
         private bool _announcedReady;
         private bool _reportedLocalizationUnavailable;
 
-        private void Awake()
+        internal void Start()
         {
             Instance = this;
-            Logger.LogInfo("Accessibility plugin Awake");
-            ModSettings.Bind(Config);
+            Logger = BepInEx.Logging.Logger.CreateLogSource("SongsOfConquestAccess");
+            Logger.LogInfo("Accessibility mod starting");
+            ModSettings.Bind(_host.Config);
             _speechService = new SpeechService(Logger);
             bool speechInitialized = _speechService.Initialize();
             Logger.LogInfo("Speech initialization result: " + speechInitialized);
@@ -56,7 +73,7 @@ namespace SongsOfConquestAccess
             _screenManager = new ScreenManager(_reviewBufferManager, _reviewBufferController);
             _screenDetector = new ScreenDetector(_screenManager);
             _inputRouter = new AccessibilityInputRouter(_screenManager);
-            _harmony = new Harmony(PluginGuid);
+            _harmony = new Harmony(PluginGuid + "." + Guid.NewGuid());
             try
             {
                 Logger.LogInfo("Applying Harmony patches");
@@ -68,55 +85,73 @@ namespace SongsOfConquestAccess
                 Logger.LogError("Harmony patching failed: " + exception);
                 throw;
             }
-        }
-
-        private void Start()
-        {
-            Logger.LogInfo("Accessibility plugin Start");
             AttachLocalizationHandler();
             TryAnnounceReady();
             _screenDetector?.ResyncFromRuntimeState();
+            _host.SetUpdateHandler(Update);
         }
 
-        private void OnDestroy()
+        internal void Stop()
         {
-            Logger.LogInfo("Accessibility plugin OnDestroy");
-            _screenManager?.Clear();
-            AdventureBeaconAudio.DisposeAll();
-            SynthCuePlayer.DisposeAll();
-            SweepPlayer.DisposeAll();
-            _harmony?.UnpatchSelf();
+            Step("update handler", () => _host.SetUpdateHandler(null));
+            Step("routes", _host.UnregisterAllModRoutes);
+            Step("coroutines", _host.StopAllCoroutines);
+            Step("main menu waits", MainMenuPatches.Reset);
+            Step("screens", () => _screenManager?.Clear());
+            Step("beacon audio", AdventureBeaconAudio.DisposeAll);
+            Step("synth audio", SynthCuePlayer.DisposeAll);
+            Step("sweep audio", SweepPlayer.DisposeAll);
+            Step("campaign notifiers", CampaignMenuLifetimeNotifier.DetachAll);
+            Step("tale notifiers", Adapters.TaleSelectLifetimeNotifier.DetachAll);
+            Step("Harmony", () => _harmony?.UnpatchSelf());
             _harmony = null;
-            _inputRouter?.Dispose();
+            Step("input", () => _inputRouter?.Dispose());
             _inputRouter = null;
-            if (_localizationHandler != null)
+            Step("localization events", () =>
             {
-                _localizationHandler.OnLanguageChanged -= HandleLanguageChanged;
-                _localizationHandler = null;
-            }
-            ModTranslationLoader.Reset();
+                if (_localizationHandler != null)
+                    _localizationHandler.OnLanguageChanged -= HandleLanguageChanged;
+            });
+            _localizationHandler = null;
+            Step("translations", ModTranslationLoader.Reset);
             _screenDetector = null;
             _screenManager = null;
-            StoryCameraFocusPatches.ResetDedupe();
-            CombatPatches.Reset();
-            ChatPatches.Reset();
-            TooltipPatches.Reset();
-            UIManager.Reset();
-            _bufferEventRecorder?.Detach();
+            Step("story camera", StoryCameraFocusPatches.ResetDedupe);
+            Step("combat", CombatPatches.Reset);
+            Step("chat", ChatPatches.Reset);
+            Step("tooltips", TooltipPatches.Reset);
+            Step("UI", UIManager.Reset);
+            Step("buffer recorder", () => _bufferEventRecorder?.Detach());
             _bufferEventRecorder = null;
-            _speechEventAnnouncer?.Detach();
+            Step("speech announcer", () => _speechEventAnnouncer?.Detach());
             _speechEventAnnouncer = null;
-            AccessibilityEventBus.Reset();
+            Step("event bus", AccessibilityEventBus.Reset);
             _reviewBufferController = null;
             _reviewBufferManager = null;
             _adventureMapScannerState = null;
-            SpeechPipeline.Shutdown();
-            _speechService?.Dispose();
+            Step("speech pipeline", SpeechPipeline.Shutdown);
+            Step("speech service", () => _speechService?.Dispose());
             _speechService = null;
-            ModSettings.Reset();
+            Step("settings", ModSettings.Reset);
             if (Instance == this)
             {
                 Instance = null;
+            }
+            Step("log source", () =>
+            {
+                if (Logger == null) return;
+                BepInEx.Logging.Logger.Sources.Remove(Logger);
+                Logger.Dispose();
+            });
+            Logger = null;
+        }
+
+        private void Step(string name, Action action)
+        {
+            try { action(); }
+            catch (Exception exception)
+            {
+                _host.LogError("Mod stop: " + name + " failed: " + exception);
             }
         }
 

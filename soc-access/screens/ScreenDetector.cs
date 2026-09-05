@@ -305,7 +305,7 @@ namespace SongsOfConquestAccess.Screens
 
             if (_screenManager.CurrentScreen is OwnedEntitiesScreen)
             {
-                SocAccessPlugin.Instance?.LogWarning("ScreenDetector ignored duplicate owned entities ready while owned entities is already top");
+                SocAccessMod.Instance?.LogWarning("ScreenDetector ignored duplicate owned entities ready while owned entities is already top");
                 return;
             }
 
@@ -330,7 +330,7 @@ namespace SongsOfConquestAccess.Screens
 
             if (_screenManager.CurrentScreen is TroopOverviewScreen)
             {
-                SocAccessPlugin.Instance?.LogWarning("ScreenDetector ignored duplicate troop overview ready while troop overview is already top");
+                SocAccessMod.Instance?.LogWarning("ScreenDetector ignored duplicate troop overview ready while troop overview is already top");
                 return;
             }
 
@@ -466,7 +466,7 @@ namespace SongsOfConquestAccess.Screens
 
             if (_screenManager.CurrentScreen is MarketplaceScreen)
             {
-                SocAccessPlugin.Instance?.LogWarning("ScreenDetector ignored duplicate marketplace ready while marketplace is already top");
+                SocAccessMod.Instance?.LogWarning("ScreenDetector ignored duplicate marketplace ready while marketplace is already top");
                 return;
             }
 
@@ -535,7 +535,7 @@ namespace SongsOfConquestAccess.Screens
                 return;
             }
 
-            SocAccessPlugin plugin = SocAccessPlugin.Instance;
+            SocAccessMod plugin = SocAccessMod.Instance;
             if (plugin == null)
             {
                 RefreshArtifactMarket("artifact market changed");
@@ -701,7 +701,7 @@ namespace SongsOfConquestAccess.Screens
                 return;
             }
 
-            SocAccessPlugin plugin = SocAccessPlugin.Instance;
+            SocAccessMod plugin = SocAccessMod.Instance;
             if (plugin == null)
             {
                 RefreshCommunityMapsHome("community maps home content changed");
@@ -1014,7 +1014,7 @@ namespace SongsOfConquestAccess.Screens
         {
             if (settings == null)
             {
-                SocAccessPlugin.Instance?.LogWarning("ScreenDetector.OnPopupMenuReady received null settings");
+                SocAccessMod.Instance?.LogWarning("ScreenDetector.OnPopupMenuReady received null settings");
                 return;
             }
 
@@ -1899,8 +1899,8 @@ namespace SongsOfConquestAccess.Screens
             CustomCampaignSelectScreen customCampaignSelect = _screenManager.Get<CustomCampaignSelectScreen>();
             if (loadedScene == MainMenuSceneType.MainMenu)
             {
-                SocAccessPlugin.Instance?.ReviewBuffers?.Clear(ReviewBufferKind.AdventureMapNotifications);
-                SocAccessPlugin.Instance?.AdventureMapScannerState?.Clear();
+                SocAccessMod.Instance?.ReviewBuffers?.Clear(ReviewBufferKind.AdventureMapNotifications);
+                SocAccessMod.Instance?.AdventureMapScannerState?.Clear();
             }
 
             if (loadedScene != MainMenuSceneType.Campaign && _screenManager.CurrentScreen is CampaignMenuScreen)
@@ -2003,7 +2003,7 @@ namespace SongsOfConquestAccess.Screens
             string readinessDiagnostic = adapter.GetReadinessDiagnostic();
             if (readinessDiagnostic != null)
             {
-                SocAccessPlugin.Instance?.LogWarning(
+                SocAccessMod.Instance?.LogWarning(
                     "ScreenDetector "
                     + reason
                     + " adventure map adapter is not present: "
@@ -2058,12 +2058,12 @@ namespace SongsOfConquestAccess.Screens
             CombatAdapter adapter = new CombatAdapter(_battleSceneInstaller);
             if (!adapter.Matches(commands))
             {
-                SocAccessPlugin.Instance?.LogWarning("ScreenDetector.OnCombatReady ignored because the battle command facade did not match the stored battle scene");
+                SocAccessMod.Instance?.LogWarning("ScreenDetector.OnCombatReady ignored because the battle command facade did not match the stored battle scene");
                 return false;
             }
 
             CombatEventNarrator.SetActiveAdapter(adapter);
-            SocAccessPlugin.Instance?.ReviewBuffers?.Clear(ReviewBufferKind.CombatEvents);
+            SocAccessMod.Instance?.ReviewBuffers?.Clear(ReviewBufferKind.CombatEvents);
             CombatScreen screen = new CombatScreen(adapter);
             if (IsTutorialTopScreen())
             {
@@ -2078,7 +2078,7 @@ namespace SongsOfConquestAccess.Screens
             SpellbookScreen screen = new SpellbookScreen(new SpellbookAdapter(spellbook));
             if (_screenManager.CurrentScreen is SpellbookScreen)
             {
-                SocAccessPlugin.Instance?.LogWarning("ScreenDetector ignored duplicate spellbook ready while spellbook is already top");
+                SocAccessMod.Instance?.LogWarning("ScreenDetector ignored duplicate spellbook ready while spellbook is already top");
                 return;
             }
 
@@ -2096,7 +2096,7 @@ namespace SongsOfConquestAccess.Screens
             if (_screenManager.Contains<CombatScreen>())
             {
                 _screenManager.Remove<CombatScreen>("combat ended");
-                SocAccessPlugin.Instance?.LogInfo("ScreenDetector removed CombatScreen when combat ended");
+                SocAccessMod.Instance?.LogInfo("ScreenDetector removed CombatScreen when combat ended");
             }
 
             CombatEventNarrator.FlushPendingEventsForCombatEnd();
@@ -2406,7 +2406,7 @@ namespace SongsOfConquestAccess.Screens
                 DraftTroopsScreen draft = _screenManager.CurrentScreen as DraftTroopsScreen;
                 if (draft != null && draft.HostIdPrefix == "dwelling")
                 {
-                    SocAccessPlugin.Instance?.LogWarning("ScreenDetector ignored dwelling back to top while draft is already top");
+                    SocAccessMod.Instance?.LogWarning("ScreenDetector ignored dwelling back to top while draft is already top");
                     return;
                 }
             }
@@ -2465,7 +2465,7 @@ namespace SongsOfConquestAccess.Screens
             SettlementScreen screen = new SettlementScreen(new TownInteractionMenuAdapter(menu));
             if (_screenManager.CurrentScreen is SettlementScreen)
             {
-                SocAccessPlugin.Instance?.LogWarning("ScreenDetector ignored duplicate settlement ready while settlement is already top");
+                SocAccessMod.Instance?.LogWarning("ScreenDetector ignored duplicate settlement ready while settlement is already top");
                 return;
             }
 
@@ -2508,7 +2508,7 @@ namespace SongsOfConquestAccess.Screens
                 }
                 else if (_screenManager.CurrentScreen is SettlementScreen)
                 {
-                    SocAccessPlugin.Instance?.LogWarning("ScreenDetector ignored settlement back to top while settlement is already top");
+                    SocAccessMod.Instance?.LogWarning("ScreenDetector ignored settlement back to top while settlement is already top");
                     return;
                 }
             }
@@ -2541,7 +2541,7 @@ namespace SongsOfConquestAccess.Screens
             DefenceMenuScreen screen = new DefenceMenuScreen(new DefenceMenuAdapter(menu));
             if (_screenManager.CurrentScreen is DefenceMenuScreen)
             {
-                SocAccessPlugin.Instance?.LogWarning("ScreenDetector ignored duplicate defence menu ready while defence menu is already top");
+                SocAccessMod.Instance?.LogWarning("ScreenDetector ignored duplicate defence menu ready while defence menu is already top");
                 return;
             }
 
@@ -2584,7 +2584,7 @@ namespace SongsOfConquestAccess.Screens
                 }
                 else if (_screenManager.CurrentScreen is DefenceMenuScreen)
                 {
-                    SocAccessPlugin.Instance?.LogWarning("ScreenDetector ignored defence back to top while defence menu is already top");
+                    SocAccessMod.Instance?.LogWarning("ScreenDetector ignored defence back to top while defence menu is already top");
                     return;
                 }
                 else
@@ -2620,7 +2620,7 @@ namespace SongsOfConquestAccess.Screens
         {
             if (_screenManager.CurrentScreen is BuildMenuScreen)
             {
-                SocAccessPlugin.Instance?.LogWarning("ScreenDetector ignored duplicate build menu ready while build menu is already top");
+                SocAccessMod.Instance?.LogWarning("ScreenDetector ignored duplicate build menu ready while build menu is already top");
                 return;
             }
 
@@ -2657,7 +2657,7 @@ namespace SongsOfConquestAccess.Screens
 
             if (_screenManager.CurrentScreen is ResearchScreen)
             {
-                SocAccessPlugin.Instance?.LogWarning("ScreenDetector ignored duplicate research menu ready while research menu is already top");
+                SocAccessMod.Instance?.LogWarning("ScreenDetector ignored duplicate research menu ready while research menu is already top");
                 return;
             }
 
@@ -2897,13 +2897,13 @@ namespace SongsOfConquestAccess.Screens
         {
             if (screen == null)
             {
-                SocAccessPlugin.Instance?.LogWarning("ScreenDetector ignored " + reason + " because no screen could be built");
+                SocAccessMod.Instance?.LogWarning("ScreenDetector ignored " + reason + " because no screen could be built");
                 return false;
             }
 
             if (!screen.IsPresent())
             {
-                SocAccessPlugin.Instance?.LogWarning(
+                SocAccessMod.Instance?.LogWarning(
                     "ScreenDetector ignored "
                     + reason
                     + " because "
@@ -2920,13 +2920,13 @@ namespace SongsOfConquestAccess.Screens
         {
             if (screen == null)
             {
-                SocAccessPlugin.Instance?.LogWarning("ScreenDetector ignored " + reason + " because no screen could be built");
+                SocAccessMod.Instance?.LogWarning("ScreenDetector ignored " + reason + " because no screen could be built");
                 return false;
             }
 
             if (!screen.IsPresent())
             {
-                SocAccessPlugin.Instance?.LogWarning(
+                SocAccessMod.Instance?.LogWarning(
                     "ScreenDetector ignored "
                     + reason
                     + " because "
@@ -2943,13 +2943,13 @@ namespace SongsOfConquestAccess.Screens
         {
             if (screen == null)
             {
-                SocAccessPlugin.Instance?.LogWarning("ScreenDetector ignored " + reason + " because no screen could be built");
+                SocAccessMod.Instance?.LogWarning("ScreenDetector ignored " + reason + " because no screen could be built");
                 return false;
             }
 
             if (!screen.IsPresent())
             {
-                SocAccessPlugin.Instance?.LogWarning(
+                SocAccessMod.Instance?.LogWarning(
                     "ScreenDetector ignored "
                     + reason
                     + " because "
@@ -2964,7 +2964,7 @@ namespace SongsOfConquestAccess.Screens
 
         private static AdventureMapRevealedRegistry GetAdventureMapRevealedRegistry()
         {
-            AdventureMapScannerState scannerState = SocAccessPlugin.Instance?.AdventureMapScannerState;
+            AdventureMapScannerState scannerState = SocAccessMod.Instance?.AdventureMapScannerState;
             return scannerState != null ? scannerState.RevealedRegistry : new AdventureMapRevealedRegistry();
         }
 
@@ -3038,7 +3038,7 @@ namespace SongsOfConquestAccess.Screens
         private void LogUnexpectedTop(string reason)
         {
             Screen current = _screenManager.CurrentScreen;
-            SocAccessPlugin.Instance?.LogWarning(
+            SocAccessMod.Instance?.LogWarning(
                 "ScreenDetector ignored "
                 + reason
                 + "; unexpected top screen "

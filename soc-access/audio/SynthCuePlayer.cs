@@ -74,7 +74,7 @@ namespace SongsOfConquestAccess.Audio
             }
             catch (Exception exception)
             {
-                SocAccessPlugin.Instance?.LogWarning("Failed to play synthesised cue " + cacheKey + ": " + exception.Message);
+                SocAccessMod.Instance?.LogWarning("Failed to play synthesised cue " + cacheKey + ": " + exception.Message);
             }
         }
 

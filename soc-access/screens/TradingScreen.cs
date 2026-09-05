@@ -42,7 +42,7 @@ namespace SongsOfConquestAccess.Screens
                 TradingMenuAdapter adapter = new TradingMenuAdapter(menu);
                 if (adapter.IsPresent())
                 {
-                    SocAccessPlugin.Instance?.LogInfo("Trading menu probe found ready trading menu");
+                    SocAccessMod.Instance?.LogInfo("Trading menu probe found ready trading menu");
                     return new TradingScreen(adapter);
                 }
             }
@@ -198,7 +198,7 @@ namespace SongsOfConquestAccess.Screens
 
         private void RequestDetectorRefresh()
         {
-            SocAccessPlugin.Instance?.ScreenDetector?.OnTradingMenuChanged();
+            SocAccessMod.Instance?.ScreenDetector?.OnTradingMenuChanged();
         }
 
         private InventoryGridWidget.FocusState CaptureInventoryGridFocus()
@@ -395,7 +395,7 @@ namespace SongsOfConquestAccess.Screens
             }
             catch (Exception ex)
             {
-                SocAccessPlugin.Instance?.LogWarning("TradingScreen section " + section + " failed to build: " + ex);
+                SocAccessMod.Instance?.LogWarning("TradingScreen section " + section + " failed to build: " + ex);
                 return new TradingMenuAdapter.LabeledItem[]
                 {
                     new TradingMenuAdapter.LabeledItem(section.ToLowerInvariant() + "-error", ModText.Get(ModStrings.Screens.Unavailable))
@@ -438,7 +438,7 @@ namespace SongsOfConquestAccess.Screens
             bool result = adapter.FocusModifierCategory(left, categoryIndex);
             if (result && previousCategoryIndex != adapter.GetActiveModifierCategoryIndex(left))
             {
-                SocAccessPlugin.Instance?.ScreenDetector?.OnTradingMenuChanged();
+                SocAccessMod.Instance?.ScreenDetector?.OnTradingMenuChanged();
             }
 
             return result;

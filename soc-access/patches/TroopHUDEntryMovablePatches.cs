@@ -16,7 +16,7 @@ namespace SongsOfConquestAccess
                 return;
             }
 
-            SocAccessPlugin.Instance?.ScreenDetector?.OnMoveTroopPopupReady(__instance);
+            SocAccessMod.Instance?.ScreenDetector?.OnMoveTroopPopupReady(__instance);
         }
 
         [HarmonyPatch(typeof(TroopHUDEntryMovable), "Reset")]
@@ -28,7 +28,7 @@ namespace SongsOfConquestAccess
                 return;
             }
 
-            SocAccessPlugin.Instance?.ScreenDetector?.OnMoveTroopPopupClosed(__instance);
+            SocAccessMod.Instance?.ScreenDetector?.OnMoveTroopPopupClosed(__instance);
         }
     }
 }

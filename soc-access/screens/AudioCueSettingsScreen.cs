@@ -157,9 +157,9 @@ namespace SongsOfConquestAccess.Screens
 
         private static bool Close()
         {
-            return SocAccessPlugin.Instance != null
-                && SocAccessPlugin.Instance.ScreenManager != null
-                && SocAccessPlugin.Instance.ScreenManager.Pop<AudioCueSettingsScreen>("audio cue settings screen closed");
+            return SocAccessMod.Instance != null
+                && SocAccessMod.Instance.ScreenManager != null
+                && SocAccessMod.Instance.ScreenManager.Pop<AudioCueSettingsScreen>("audio cue settings screen closed");
         }
 
         private static string GetTitle(CueDefinition cue)

@@ -113,7 +113,7 @@ namespace SongsOfConquestAccess.Adapters
             }
             catch (Exception exception)
             {
-                SocAccessPlugin.Instance?.LogWarning("CommanderHudPortraitAdapter failed to refresh commander tooltip: " + exception.Message);
+                SocAccessMod.Instance?.LogWarning("CommanderHudPortraitAdapter failed to refresh commander tooltip: " + exception.Message);
             }
         }
 

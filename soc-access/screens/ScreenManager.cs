@@ -41,7 +41,7 @@ namespace SongsOfConquestAccess.Screens
 
             if (CurrentScreen != null && CurrentScreen.GetType() == screen.GetType())
             {
-                SocAccessPlugin.Instance?.LogWarning(
+                SocAccessMod.Instance?.LogWarning(
                     "ScreenManager.Push received duplicate top screen "
                     + DescribeScreen(screen)
                     + " for "
@@ -61,13 +61,13 @@ namespace SongsOfConquestAccess.Screens
         {
             if (replacement == null)
             {
-                SocAccessPlugin.Instance?.LogWarning("ScreenManager.RefreshTop ignored " + reason + " because replacement was null");
+                SocAccessMod.Instance?.LogWarning("ScreenManager.RefreshTop ignored " + reason + " because replacement was null");
                 return false;
             }
 
             if (!replacement.IsPresent())
             {
-                SocAccessPlugin.Instance?.LogWarning(
+                SocAccessMod.Instance?.LogWarning(
                     "ScreenManager.RefreshTop ignored "
                     + reason
                     + " because "
@@ -78,7 +78,7 @@ namespace SongsOfConquestAccess.Screens
 
             if (_stack.Count == 0 || !(_stack[_stack.Count - 1] is TScreen))
             {
-                SocAccessPlugin.Instance?.LogWarning(
+                SocAccessMod.Instance?.LogWarning(
                     "ScreenManager.RefreshTop ignored "
                     + reason
                     + "; expected top "
@@ -141,7 +141,7 @@ namespace SongsOfConquestAccess.Screens
         {
             if (_stack.Count == 0)
             {
-                SocAccessPlugin.Instance?.LogWarning(
+                SocAccessMod.Instance?.LogWarning(
                     "ScreenManager.Pop ignored "
                     + reason
                     + "; expected top "
@@ -153,7 +153,7 @@ namespace SongsOfConquestAccess.Screens
             int lastIndex = _stack.Count - 1;
             if (!(_stack[lastIndex] is TScreen))
             {
-                SocAccessPlugin.Instance?.LogWarning(
+                SocAccessMod.Instance?.LogWarning(
                     "ScreenManager.Pop ignored "
                     + reason
                     + "; expected top "
@@ -202,7 +202,7 @@ namespace SongsOfConquestAccess.Screens
                 return true;
             }
 
-            SocAccessPlugin.Instance?.LogWarning(
+            SocAccessMod.Instance?.LogWarning(
                 "ScreenManager.Remove ignored "
                 + reason
                 + "; no "
@@ -257,19 +257,19 @@ namespace SongsOfConquestAccess.Screens
         {
             if (action == null)
             {
-                SocAccessPlugin.Instance?.LogInfo("ScreenManager.DispatchAction ignored because the action was null");
+                SocAccessMod.Instance?.LogInfo("ScreenManager.DispatchAction ignored because the action was null");
                 return false;
             }
 
             if (_stack.Count == 0)
             {
-                SocAccessPlugin.Instance?.LogInfo("ScreenManager.DispatchAction ignored because there is no active screen");
+                SocAccessMod.Instance?.LogInfo("ScreenManager.DispatchAction ignored because there is no active screen");
                 return false;
             }
 
             Screen screen = CurrentScreen;
             bool handled = screen.OnActionJustPressed(action);
-            SocAccessPlugin.Instance?.LogInfo(
+            SocAccessMod.Instance?.LogInfo(
                 "ScreenManager.DispatchAction action "
                 + action.Key
                 + " on top screen "

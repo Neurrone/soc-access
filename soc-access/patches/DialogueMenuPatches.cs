@@ -15,7 +15,7 @@ namespace SongsOfConquestAccess
         [HarmonyPostfix]
         private static void DialogueMenuTypingTextEnterPostfix(DialogueMenu __instance)
         {
-            SocAccessPlugin plugin = SocAccessPlugin.Instance;
+            SocAccessMod plugin = SocAccessMod.Instance;
             if (plugin != null)
             {
                 plugin.StartCoroutine(WaitForDialogueMenuReady(__instance));
@@ -31,7 +31,7 @@ namespace SongsOfConquestAccess
                 return;
             }
 
-            SocAccessPlugin.Instance?.ScreenDetector?.OnDialogueMenuClosed(__instance);
+            SocAccessMod.Instance?.ScreenDetector?.OnDialogueMenuClosed(__instance);
         }
 
         private static IEnumerator WaitForDialogueMenuReady(DialogueMenu dialogueMenu)
@@ -48,7 +48,7 @@ namespace SongsOfConquestAccess
                 if (adapter.IsPresent())
                 {
                     ActiveMenus.Add(dialogueMenu);
-                    SocAccessPlugin.Instance?.ScreenDetector?.OnDialogueMenuChanged(dialogueMenu);
+                    SocAccessMod.Instance?.ScreenDetector?.OnDialogueMenuChanged(dialogueMenu);
                     yield break;
                 }
 

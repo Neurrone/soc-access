@@ -22,7 +22,7 @@ namespace SongsOfConquestAccess
             }
 
             CampaignMenuLifetimeNotifier.Attach(campaignMenu);
-            SocAccessPlugin.Instance?.ScreenDetector?.OnCampaignMenuReady(campaignMenu);
+            SocAccessMod.Instance?.ScreenDetector?.OnCampaignMenuReady(campaignMenu);
         }
     }
 }
