@@ -1,19 +1,21 @@
 # Songs of Conquest Access
 
-This repository contains a BepInEx-based mod to make the Songs of Conquest game screen reader accessible. The active mod project is built for Script Engine hot reload using the BepInEx script reload plugin.
+This repository contains a BepInEx-based mod to make the Songs of Conquest game screen reader accessible. The mod is split in two: `soc-access/loader/` builds `SongsOfConquest.Access.Loader.dll`, the BepInEx plugin that never reloads and owns the loopback dev server, and `soc-access/soc-access.csproj` builds `SongsOfConquest.Access.dll`, a plain library the loader loads from bytes and swaps out on `POST /reload`. The development loop (launch, reload, speech capture, input injection, REPL) is documented in `docs/dev-loop.md`; read it before verifying anything in-game.
 
 ## Project Structure & Module Organization
 
-Keep all authored mod code under `soc-access/`. Current reusable speech code lives in `soc-access/speech/` and wraps Tolk for screen-reader output. Treat `decompiled/` as reference material only: it contains decompiled game and support assemblies used to find hook points, lifecycle flow, and UI structure. Do not edit decompiled files as part of the mod itself.
+Keep all authored mod code under `soc-access/`. Current reusable speech code lives in `soc-access/speech/` and wraps Prism for screen-reader output. Treat `decompiled/` as reference material only: it contains decompiled game and support assemblies used to find hook points, lifecycle flow, and UI structure. Do not edit decompiled files as part of the mod itself.
 
 Layout:
 
 - `soc-access/adapters/` for code that interacts directly with the game. Adapters must never create accessibility widgets directly or expose widget-tree concepts such as widget ids, menu item ids, row ids, column ids, or screen layout/grouping. Adapters may expose native/game text and semantic facts, such as localized building names, resource names, troop names, button text, tooltip text, counts, owners, indexes, levels, enabled/available/met state, and native focus/action hooks. Screens are responsible for constructing widgets and for accessibility/UI wording: combined row labels, slot labels, positional text, grouping labels, status strings like `unavailable`, `missing`, `disabled`, `dragging`, and any prefix/suffix such as `Missing ...` or `... lost`.
 - `soc-access/input/` for receiving keyboard input
 - `soc-access/patches/` for Harmony or BepInEx hook classes
-- `soc-access/speech/` for Tolk and output plumbing
+- `soc-access/speech/` for Prism and output plumbing
 - `soc-access/screens/` for accessible screen models. Screens can depend on adaptors and use widgets
 - `soc-access/ui/` for UI widgets in the accessibility tree
+- `soc-access/dev/` for the mod-side dev server routes and probes (`ModRoutes`, `WidgetDump`, `DevProbe`); development only, never spoken
+- `soc-access/loader/` for the loader plugin and the loader-side dev server. Changing anything here needs a game restart; prefer a mod-side probe over a new loader member
 - `soc-access/tests/` for tests
 - `soc-access/soc-access.csproj` is the live mod project and currently targets `.NET Framework 4.7.2`
 
@@ -33,13 +35,13 @@ After adding, removing, or changing a `ModString` or `ModPluralString`, run `dot
 
 ## Build, Test, and Development Commands
 
-- `dotnet build soc-access\soc-access.csproj` to build the mod locally
-- `dotnet build soc-access\soc-access.csproj /p:DeployToGame=true` to build and copy the DLL to `BepInEx\scripts` for Script Engine hot reload. Default to using this to build
+- `dotnet build soc-access\soc-access.csproj` to build the mod and the loader. When the game folder in `GamePaths.props` exists, the build also deploys both into `BepInEx\plugins\SongsOfConquestAccess`; pass `/p:DeployToGame=false` to skip that. The mod DLL is never locked, so `dotnet build` then `POST /reload` swaps it into the running game; a changed loader DLL is locked while the game runs and needs a game restart
+- `.\run-game.ps1` to build and launch the game with the dev server on; `.\wait-game.ps1 <state>` to block until it is usable (see `docs/dev-loop.md`)
 - `dotnet test soc-access\tests\SongsOfConquestAccess.Tests.csproj` to run unit tests
 - `dotnet run --project soc-access\tools\Localization -- update-pot` to regenerate `soc-access\translations\strings_template.pot` from `ModStrings.cs`
 - `dotnet run --project soc-access\tools\Localization -- validate` to check `.po` files for missing, stale, empty, duplicate, changed-source, or placeholder-mismatched translations
 
-Prefer fast text search over manual browsing when tracing the game code. Do not change deployment to `BepInEx\plugins`; Script Engine loads the mod from `BepInEx\scripts`.
+Prefer fast text search over manual browsing when tracing the game code.
 
 ## Coding Style & Naming Conventions
 
@@ -49,12 +51,13 @@ Never use `SpeechTextSanitizer.Normalize` unless explicitly given approval to do
 
 Keep engine-specific access isolated in patch or adapter classes; keep speech composition out of hook methods. Favor small, explicit wrappers around reflected or patched game objects. Avoid creating unneeded abstractions and change code sergically so that you never implement more than what is requested.
 
-Because the mod is hot-reloaded by Script Engine, every change must be reload-safe:
+Because the mod is hot-reloaded by the loader, every change must be reload-safe. `ModEntry.Stop()` runs `SocAccessMod.Stop()`, whose steps are isolated so one failure does not skip the rest:
 
-- unsubscribe any events in `OnDestroy()`
-- dispose native resources in `OnDestroy()`
-- unpatch Harmony hooks on unload
-- avoid leaving loose `GameObject`s or components alive across reloads
+- unsubscribe any events in `SocAccessMod.Stop()` (or a static `Reset()` it calls)
+- dispose native resources there too
+- Harmony hooks are unpatched there through a per-load unique Harmony id; never create a second Harmony instance
+- avoid leaving loose `GameObject`s or components alive across reloads; a `MonoBehaviour` the mod adds to a game object needs a `DetachAll()` called from `Stop()` (see `CampaignMenuLifetimeNotifier`)
+- never stop a coroutine by handle after a reload; cancel through a flag the coroutine checks (see `MainMenuPatches`)
 
 ## Native Input Equivalence
 
@@ -84,7 +87,7 @@ For menu screens, first identify the game's own readiness point:
 - prefer a screen-specific coroutine or callback that runs after the UI is actually shown
 - if the screen has a `Start()` coroutine that enables containers, waits for animations, sets the title, or plays an entry sound, hook the end of that coroutine
 - if an owner or manager exposes an `OnSceneLoaded` event and the target UI is still hidden afterward, use that event only to start waiting for the specific visible container
-- avoid patching `Awake()` for accessibility screen activation; `Awake()` is often too early, and under Script Engine hot reload or additive scene loading it may already have run before our patch is applied
+- avoid patching `Awake()` for accessibility screen activation; `Awake()` is often too early, and under hot reload or additive scene loading it may already have run before our patch is applied
 
 Examples:
 
@@ -102,17 +105,18 @@ When adding a new screen:
 
 ## Testing Guidelines
 
-No test framework is committed yet. When tests are added, place them under `soc-access/tests/` and name files after the subject under test, for example `AnalyticsConsentScreenTests.cs`. Prioritize offline tests for text generation, focus logic, and adapter behavior. Runtime verification should be done in-game through BepInEx after each hook change.
+Tests are MSTest under `soc-access/tests/`; name files after the subject under test, for example `AnalyticsConsentScreenTests.cs`. Prioritize offline tests for text generation, focus logic, and adapter behavior. Runtime verification should be done in-game through the dev server after each hook change (`docs/dev-loop.md`): `POST /input` for keys, `GET /speech` for what was said, `GET /gui/widgets` for the whole accessible tree.
 
 ## Security & Configuration Notes
 
 Current environment assumptions:
 
 - `BepInEx.cfg` uses `HideManagerGameObject = true`
-- Script Engine config uses `DumpAssemblies = true` for debugging reload behavior
+- The dev server is off for players: `[Dev] devServer = false` in `BepInEx/config/songs.of.conquest.access.cfg`. `run-game.ps1` writes it true for development runs; `SOCACCESS_NO_DEV=1` forces it off, `SOCACCESS_DEV_PORT` overrides the port, `SOCACCESS_NO_SPEECH=1` mutes the screen reader while `/speech` still captures
+- `mcs.dll` (the REPL compiler) is deployed next to the loader for development and is never packaged in a release
 
 ## Logs
 
-Look at `GamePaths.props` for the path to the local game install. Logs are in the `BepInEx/LogOutput.log` in the game installation.
+Look at `GamePaths.props` for the path to the local game install. Logs are in the `BepInEx/LogOutput.log` in the game installation; while the game runs with the dev server, `GET http://127.0.0.1:8772/log?since=N&grep=TEXT` answers the same lines without reading the file.
 
 If you are unable to implement a feature correctly even after inspecting the decompiled source code, you should offer to add runtime logging to help with debugging, instead of continuing to guess at what might be wrong. Then once the task is complete, offer to remove the now unneeded logs.
