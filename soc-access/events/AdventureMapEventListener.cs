@@ -294,10 +294,19 @@ namespace SongsOfConquestAccess.Events
             string name = GetCommanderName(commander);
             if (commander.Destination != null && commander.Destination.HasDestination)
             {
+                WielderRoute route;
+                WielderRoute.TryBuild(
+                    _facade,
+                    _selectionHandler,
+                    _localizationHandler,
+                    _fogManager,
+                    commander,
+                    out route);
                 AccessibilityEventBus.Publish(new MapDestinationSetEvent(
                     commander.Id,
                     name,
-                    commander.Destination.Destination));
+                    commander.Destination.Destination,
+                    route));
             }
             else
             {

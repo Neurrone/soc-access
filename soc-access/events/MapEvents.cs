@@ -1,7 +1,10 @@
 using System.Collections.Generic;
 using UnityEngine;
 using SongsOfConquest.Common.Entities.Adventure;
+using SongsOfConquestAccess.Adapters;
 using SongsOfConquestAccess.Localization;
+using SongsOfConquestAccess.Scanner;
+using SongsOfConquestAccess.Speech.Spatial;
 
 namespace SongsOfConquestAccess.Events
 {
@@ -228,11 +231,12 @@ namespace SongsOfConquestAccess.Events
 
     internal sealed class MapDestinationSetEvent : IAccessibilityEvent
     {
-        public MapDestinationSetEvent(int wielderId, string wielderName, Vector2Int destination)
+        public MapDestinationSetEvent(int wielderId, string wielderName, Vector2Int destination, WielderRoute route)
         {
             WielderId = wielderId;
             WielderName = string.IsNullOrWhiteSpace(wielderName) ? ModText.Get(ModStrings.Events.Wielder) : wielderName;
             Destination = destination;
+            Route = route;
         }
 
         public string Kind { get { return AccessibilityEvents.Map.DestinationSet; } }
@@ -242,9 +246,125 @@ namespace SongsOfConquestAccess.Events
 
         public Vector2Int Destination { get; private set; }
 
+        public WielderRoute Route { get; private set; }
+
         public string GetSpeechText()
         {
+            return GetSpeechText(ModSettings.ScannerUsesLongDirections);
+        }
+
+        internal string GetSpeechText(bool useLongDirections)
+        {
+            if (Route == null)
+            {
+                return DescribeDestinationTile();
+            }
+
+            if (Route.Steps.Count != 0 && Route.Turns.Count != 0)
+            {
+                return DescribeRoute(useLongDirections);
+            }
+
+            // Standing next to what it is sent to leaves the wielder nothing to
+            // walk, so the action it will take stands in for the route.
+            if (Route.Steps.Count == 0 && Route.Interaction != null && Route.Interaction.HasAction)
+            {
+                return DescribeInteraction(Route.Interaction, Route.Turns);
+            }
+
+            return DescribeDestinationTile();
+        }
+
+        private string DescribeDestinationTile()
+        {
             return ModText.Get(ModStrings.Events.DestinationSet, WielderName, FormatTile(Destination));
+        }
+
+        // A route that ends in an interaction names it after the last step, so the
+        // walk and what it is for are heard in the order they happen.
+        private string DescribeRoute(bool useLongDirections)
+        {
+            string cost = DescribeCost(Route.Turns);
+            string steps = DescribeSteps(Route.Steps, useLongDirections);
+            if (Route.Interaction == null || !Route.Interaction.HasAction)
+            {
+                return ModText.Get(ModStrings.Events.DestinationSetRoute, cost, WielderName, steps);
+            }
+
+            return ModText.Get(
+                ModStrings.Events.DestinationSetRouteInteraction,
+                cost,
+                WielderName,
+                steps,
+                Route.Interaction.ActionText,
+                Route.Interaction.TargetName);
+        }
+
+        private string DescribeInteraction(WielderRouteInteraction interaction, IReadOnlyList<WielderRouteTurn> turns)
+        {
+            if (turns.Count == 0)
+            {
+                return ModText.Get(
+                    ModStrings.Events.DestinationSetInteractionFree,
+                    WielderName,
+                    interaction.ActionText,
+                    interaction.TargetName);
+            }
+
+            return ModText.Get(
+                ModStrings.Events.DestinationSetInteraction,
+                DescribeCost(turns),
+                WielderName,
+                interaction.ActionText,
+                interaction.TargetName);
+        }
+
+        private static string DescribeCost(IReadOnlyList<WielderRouteTurn> turns)
+        {
+            List<string> parts = new List<string>();
+            for (int i = 0; i < turns.Count; i++)
+            {
+                parts.Add(DescribeTurnCost(turns[i]));
+            }
+
+            return ModText.JoinListWithCommas(parts);
+        }
+
+        // Travel turns are ordinals counting the current turn as 1, so speech
+        // drops one to say how long the wait is, matching the route preview.
+        private static string DescribeTurnCost(WielderRouteTurn turn)
+        {
+            string cost = FormatCost(turn.Cost);
+            if (turn.TravelTurns <= 1)
+            {
+                return ModText.Get(ModStrings.Events.RouteCostThisTurn, cost);
+            }
+
+            return turn.TravelTurns == 2
+                ? ModText.Get(ModStrings.Events.RouteCostNextTurn, cost)
+                : ModText.Get(ModStrings.Events.RouteCostInTurns, cost, turn.TravelTurns - 1);
+        }
+
+        private static string FormatCost(float cost)
+        {
+            return AdventureMapTileSpeechFormatter.FormatMovementNumber(cost);
+        }
+
+        // Steps follow the scanner's Long directions setting, so a route reads as
+        // "2n, ne" by default and "2 north, northeast" when it is on. A run of one
+        // is named on its own, since a count in front of every single step would
+        // be more to listen to than it is worth.
+        private static string DescribeSteps(IReadOnlyList<ScannerDirectionStep> steps, bool useLongForm)
+        {
+            List<string> parts = new List<string>();
+            for (int i = 0; i < steps.Count; i++)
+            {
+                parts.Add(steps[i].Count == 1
+                    ? ScannerDirectionUtility.FormatDirection(steps[i].Direction, useLongForm)
+                    : ScannerDirectionUtility.FormatStep(steps[i], useLongForm));
+            }
+
+            return ModText.JoinListWithCommas(parts);
         }
 
         private static string FormatTile(Vector2Int tile)

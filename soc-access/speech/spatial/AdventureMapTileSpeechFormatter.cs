@@ -327,9 +327,10 @@ namespace SongsOfConquestAccess.Speech.Spatial
                     return string.Join(", ", details.ToArray());
                 }
 
-                if (indicator.TravelTurns > 1)
+                string arrival = DescribeArrivalTurns(indicator.TravelTurns);
+                if (!string.IsNullOrWhiteSpace(arrival))
                 {
-                    details.Add(ModText.Get(ModStrings.Spatial.TurnsIn, indicator.TravelTurns));
+                    details.Add(arrival);
                 }
 
                 if (indicator.IsInteractable)
@@ -344,14 +345,15 @@ namespace SongsOfConquestAccess.Speech.Spatial
                 details.Add(ModText.Get(ModStrings.Spatial.OnRoute));
                 if (indicator.FurthestReachableTurns.HasValue)
                 {
-                    int turns = indicator.FurthestReachableTurns.Value;
-                    details.Add(turns <= 1
-                        ? ModText.Get(ModStrings.Spatial.FurthestReachableThisTurn)
-                        : ModText.Get(ModStrings.Spatial.FurthestReachableInTurns, turns));
+                    details.Add(DescribeFurthestReachableTurns(indicator.FurthestReachableTurns.Value));
                 }
-                else if (indicator.TravelTurns > 1)
+                else
                 {
-                    details.Add(ModText.Get(ModStrings.Spatial.TurnsIn, indicator.TravelTurns));
+                    string routeArrival = DescribeArrivalTurns(indicator.TravelTurns);
+                    if (!string.IsNullOrWhiteSpace(routeArrival))
+                    {
+                        details.Add(routeArrival);
+                    }
                 }
             }
 
@@ -363,16 +365,56 @@ namespace SongsOfConquestAccess.Speech.Spatial
             return string.Join(", ", details.ToArray());
         }
 
+        // Travel turns are ordinals counting the current turn as 1, matching the
+        // numbers the game paints on its path markers. Speech says how long the
+        // wait is instead, so ordinal 2 is next turn and ordinal 3 is two turns.
+        private static string DescribeArrivalTurns(int travelTurns)
+        {
+            if (travelTurns <= 1)
+            {
+                return string.Empty;
+            }
+
+            return travelTurns == 2
+                ? ModText.Get(ModStrings.Spatial.NextTurn)
+                : ModText.Get(ModStrings.Spatial.TurnsIn, travelTurns - 1);
+        }
+
+        private static string DescribeFurthestReachableTurns(int turns)
+        {
+            if (turns <= 1)
+            {
+                return ModText.Get(ModStrings.Spatial.FurthestReachableThisTurn);
+            }
+
+            return turns == 2
+                ? ModText.Get(ModStrings.Spatial.FurthestReachableNextTurn)
+                : ModText.Get(ModStrings.Spatial.FurthestReachableInTurns, turns - 1);
+        }
+
+        /// <summary>
+        /// A movement number as it is spoken, to at most two decimals. Shared with the
+        /// route readout so that one cost is never spoken two ways depending on which
+        /// part of the mod happens to be saying it.
+        /// </summary>
+        public static string FormatMovementNumber(float value)
+        {
+            return Math.Round(value, 2).ToString("0.##", CultureInfo.InvariantCulture);
+        }
+
+        /// <summary>
+        /// Movement a wielder has, with less than half a point spoken as none: that much
+        /// is left over rather than held, since it buys no step.
+        /// </summary>
         private static string FormatMovementValue(float value)
         {
-            float normalized = value < 0.5f ? 0f : value;
-            return Math.Round(normalized, 2).ToString("g2", CultureInfo.InvariantCulture);
+            return FormatMovementNumber(value < 0.5f ? 0f : value);
         }
 
         public static string DescribeMovementCost(AdventureMapTile tile)
         {
             return tile != null && tile.IsExplored && tile.ReachableMovementCost.HasValue
-                ? ModText.Get(ModStrings.Spatial.MovementCost, FormatMovementValue(tile.ReachableMovementCost.Value))
+                ? ModText.Get(ModStrings.Spatial.MovementCost, FormatMovementNumber(tile.ReachableMovementCost.Value))
                 : string.Empty;
         }
 

@@ -225,6 +225,26 @@ msgctxt "Events.DestinationSet"
 msgid "{0}'s destination set to {1}"
 msgstr "Destinazione di {0} impostata su {1}"
 
+#. Events.DestinationSetInteraction
+msgctxt "Events.DestinationSetInteraction"
+msgid "Cost: {0}. {1} will {2} {3}."
+msgstr "Costo: {0}. {1} eseguirà: {2} {3}."
+
+#. Events.DestinationSetInteractionFree
+msgctxt "Events.DestinationSetInteractionFree"
+msgid "{0} will {1} {2}."
+msgstr "{0} eseguirà: {1} {2}."
+
+#. Events.DestinationSetRoute
+msgctxt "Events.DestinationSetRoute"
+msgid "Cost: {0}. {1} will move {2}."
+msgstr "Costo: {0}. {1} si sposterà: {2}."
+
+#. Events.DestinationSetRouteInteraction
+msgctxt "Events.DestinationSetRouteInteraction"
+msgid "Cost: {0}. {1} will move {2} and {3} {4}."
+msgstr "Costo: {0}. {1} si sposterà: {2} ed eseguirà: {3} {4}."
+
 #. Events.HudClosed
 msgctxt "Events.HudClosed"
 msgid "HUD closed"
@@ -2030,6 +2050,11 @@ msgctxt "Spatial.FurthestReachableInTurns"
 msgid "furthest reachable in {0} turns"
 msgstr "più lontano raggiungibile tra {0} turni"
 
+#. Spatial.FurthestReachableNextTurn
+msgctxt "Spatial.FurthestReachableNextTurn"
+msgid "furthest reachable next turn"
+msgstr "più lontano raggiungibile il prossimo turno"
+
 #. Spatial.FurthestReachableThisTurn
 msgctxt "Spatial.FurthestReachableThisTurn"
 msgid "furthest reachable this turn"
@@ -2099,6 +2124,11 @@ msgstr "Ostacolo"
 msgctxt "Spatial.Neutral"
 msgid "neutral"
 msgstr "neutrale"
+
+#. Spatial.NextTurn
+msgctxt "Spatial.NextTurn"
+msgid "next turn"
+msgstr "prossimo turno"
 
 #. Spatial.NoRoutePreview
 msgctxt "Spatial.NoRoutePreview"
@@ -2664,6 +2694,21 @@ msgstr "Punti di schieramento"
 msgctxt "Events.Revealed"
 msgid "Revealed {0}"
 msgstr "{0} rivelato"
+
+#. Events.RouteCostInTurns
+msgctxt "Events.RouteCostInTurns"
+msgid "{0} in {1} turns"
+msgstr "{0} tra {1} turni"
+
+#. Events.RouteCostNextTurn
+msgctxt "Events.RouteCostNextTurn"
+msgid "{0} next turn"
+msgstr "{0} il prossimo turno"
+
+#. Events.RouteCostThisTurn
+msgctxt "Events.RouteCostThisTurn"
+msgid "{0} this turn"
+msgstr "{0} in questo turno"
 
 #. Bookmarks.BookmarkSaved
 #. Bookmarks.BeaconActivated
