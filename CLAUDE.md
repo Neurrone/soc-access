@@ -1,1 +1,3 @@
-AGENTS.md
+# Songs of Conquest Access
+
+See @AGENTS.md
