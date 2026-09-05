@@ -18,7 +18,7 @@ using UnityEngine;
 
 namespace SongsOfConquestAccess.Adapters
 {
-    internal sealed class TownInteractionMenuAdapter
+    public sealed class TownInteractionMenuAdapter
     {
         private static readonly FieldInfo AsyncField = AccessTools.Field(typeof(TownInteractionMenu), "_async");
         private static readonly FieldInfo HeaderField = AccessTools.Field(typeof(TownInteractionMenu), "_wielderInteractHeader");

@@ -15,7 +15,7 @@ namespace SongsOfConquestAccess.Audio.Synth
     /// or not. Interpolation never reads past the slice, so one slice cannot bleed into the next,
     /// which is what keeps left/right noise slices decorrelated.</para>
     /// </summary>
-    internal sealed class BufferGrain : Grain
+    public sealed class BufferGrain : Grain
     {
         private readonly float[] _data;
         private readonly int _offset;

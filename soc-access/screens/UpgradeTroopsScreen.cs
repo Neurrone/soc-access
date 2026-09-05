@@ -7,7 +7,7 @@ using UnityEngine;
 
 namespace SongsOfConquestAccess.Screens
 {
-    internal sealed class UpgradeTroopsScreen : TroopManagementScreenBase
+    public sealed class UpgradeTroopsScreen : TroopManagementScreenBase
     {
         private string _selectedUpgradeId;
 

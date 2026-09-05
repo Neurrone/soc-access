@@ -11,7 +11,7 @@ namespace SongsOfConquestAccess.Speech.Spatial
     /// name is announced separately, and everything else about the tile it
     /// happens to stand on belongs to the cursor announcement.
     /// </summary>
-    internal static class ScannerResultContentFormatter
+    public static class ScannerResultContentFormatter
     {
         /// <summary>
         /// <paramref name="tileParts"/> lets a screen add facts about the tile
@@ -33,7 +33,7 @@ namespace SongsOfConquestAccess.Speech.Spatial
                 ModSettings.GetAnnouncementElementSuffix);
         }
 
-        internal static string Describe(
+        public static string Describe(
             AnnouncementGroupDefinition group,
             ScannerResult result,
             IEnumerable<AnnouncementPart> tileParts,

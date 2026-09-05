@@ -8,7 +8,7 @@ using UnityEngine;
 
 namespace SongsOfConquestAccess.Screens
 {
-    internal sealed class BuildMenuScreen : Screen
+    public sealed class BuildMenuScreen : Screen
     {
         private readonly BuildMenuAdapter _adapter;
 

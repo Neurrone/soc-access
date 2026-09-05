@@ -8,7 +8,7 @@ using SongsOfConquestAccess.Speech.Spatial;
 
 namespace SongsOfConquestAccess.Events
 {
-    internal sealed class MapWielderSelectedEvent : IAccessibilityEvent
+    public sealed class MapWielderSelectedEvent : IAccessibilityEvent
     {
         public MapWielderSelectedEvent(int wielderId, string wielderName, Vector2Int tile)
         {
@@ -30,7 +30,7 @@ namespace SongsOfConquestAccess.Events
         }
     }
 
-    internal sealed class WielderRecruitedEvent : IAccessibilityEvent
+    public sealed class WielderRecruitedEvent : IAccessibilityEvent
     {
         public WielderRecruitedEvent(int wielderId, string wielderName)
         {
@@ -50,7 +50,7 @@ namespace SongsOfConquestAccess.Events
         }
     }
 
-    internal sealed class MapWielderMovedEvent : IAccessibilityEvent
+    public sealed class MapWielderMovedEvent : IAccessibilityEvent
     {
         public MapWielderMovedEvent(int wielderId, string wielderName, Vector2Int tile)
             : this(wielderId, wielderName, tile, isLocalWielder: false)
@@ -85,7 +85,7 @@ namespace SongsOfConquestAccess.Events
         }
     }
 
-    internal sealed class MapWielderTeleportedEvent : IAccessibilityEvent
+    public sealed class MapWielderTeleportedEvent : IAccessibilityEvent
     {
         public MapWielderTeleportedEvent(int wielderId, string wielderName, Vector2Int tile, TeleportSource source)
         {
@@ -115,7 +115,7 @@ namespace SongsOfConquestAccess.Events
         }
     }
 
-    internal sealed class BuildSiteSelectedEvent : IAccessibilityEvent
+    public sealed class BuildSiteSelectedEvent : IAccessibilityEvent
     {
         public BuildSiteSelectedEvent(int entityId, BuildSiteSize size, Vector2Int tile)
         {
@@ -161,7 +161,7 @@ namespace SongsOfConquestAccess.Events
         }
     }
 
-    internal sealed class MapDiscoveryRevealedEvent : IAccessibilityEvent
+    public sealed class MapDiscoveryRevealedEvent : IAccessibilityEvent
     {
         private readonly List<string> _items;
 
@@ -195,7 +195,7 @@ namespace SongsOfConquestAccess.Events
         }
     }
 
-    internal sealed class MapWieldersNoLongerVisibleEvent : IAccessibilityEvent
+    public sealed class MapWieldersNoLongerVisibleEvent : IAccessibilityEvent
     {
         private readonly List<string> _wielderNames;
 
@@ -229,7 +229,7 @@ namespace SongsOfConquestAccess.Events
         }
     }
 
-    internal sealed class MapDestinationSetEvent : IAccessibilityEvent
+    public sealed class MapDestinationSetEvent : IAccessibilityEvent
     {
         public MapDestinationSetEvent(int wielderId, string wielderName, Vector2Int destination, WielderRoute route)
         {
@@ -253,7 +253,7 @@ namespace SongsOfConquestAccess.Events
             return GetSpeechText(ModSettings.ScannerUsesLongDirections);
         }
 
-        internal string GetSpeechText(bool useLongDirections)
+        public string GetSpeechText(bool useLongDirections)
         {
             if (Route == null)
             {
@@ -373,7 +373,7 @@ namespace SongsOfConquestAccess.Events
         }
     }
 
-    internal sealed class MapDestinationClearedEvent : IAccessibilityEvent
+    public sealed class MapDestinationClearedEvent : IAccessibilityEvent
     {
         public MapDestinationClearedEvent(int wielderId, string wielderName)
         {
@@ -392,7 +392,7 @@ namespace SongsOfConquestAccess.Events
         }
     }
 
-    internal sealed class MapActionFailedEvent : IAccessibilityEvent
+    public sealed class MapActionFailedEvent : IAccessibilityEvent
     {
         // This is an accessibility mod failure, not a native game denial.
         // Native movement/action denials are surfaced from AdventureMenuSystem
@@ -414,7 +414,7 @@ namespace SongsOfConquestAccess.Events
         }
     }
 
-    internal sealed class MapHudVisibilityChangedEvent : IAccessibilityEvent
+    public sealed class MapHudVisibilityChangedEvent : IAccessibilityEvent
     {
         public MapHudVisibilityChangedEvent(bool isVisible)
         {
@@ -431,7 +431,7 @@ namespace SongsOfConquestAccess.Events
         }
     }
 
-    internal sealed class MapCameraFocusEvent : IAccessibilityEvent
+    public sealed class MapCameraFocusEvent : IAccessibilityEvent
     {
         public MapCameraFocusEvent(Vector2Int tile)
             : this(tile, announce: false)
@@ -458,7 +458,7 @@ namespace SongsOfConquestAccess.Events
         }
     }
 
-    internal sealed class MapRoundChangedEvent : IAccessibilityEvent
+    public sealed class MapRoundChangedEvent : IAccessibilityEvent
     {
         public MapRoundChangedEvent(string roundLabel)
         {

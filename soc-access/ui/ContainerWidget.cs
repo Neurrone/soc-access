@@ -4,7 +4,7 @@ using SongsOfConquestAccess.Input;
 
 namespace SongsOfConquestAccess.UI
 {
-    internal class ContainerWidget : Widget
+    public class ContainerWidget : Widget
     {
         private const string FocusWrapCueKey = "Common_ClickUnfold";
 
@@ -55,7 +55,7 @@ namespace SongsOfConquestAccess.UI
             _children.Add(child);
         }
 
-        internal override IEnumerable<Widget> EnumerateChildren()
+        public override IEnumerable<Widget> EnumerateChildren()
         {
             return _children;
         }

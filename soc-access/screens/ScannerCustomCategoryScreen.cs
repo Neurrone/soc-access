@@ -16,7 +16,7 @@ namespace SongsOfConquestAccess.Screens
     /// category at a time, because the full taxonomy is far too long a list to
     /// walk through as a single run of checkboxes.
     /// </summary>
-    internal sealed class ScannerCustomCategoryScreen : Screen
+    public sealed class ScannerCustomCategoryScreen : Screen
     {
         private readonly ScannerTaxonomy _taxonomy;
         private readonly int _id;

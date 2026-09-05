@@ -2,7 +2,7 @@ using SongsOfConquestAccess.Speech;
 
 namespace SongsOfConquestAccess.Scanner
 {
-    internal interface IScannerSpeechContext
+    public interface IScannerSpeechContext
     {
         SpeechRequest ToSpeechRequest();
     }

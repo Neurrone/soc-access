@@ -11,7 +11,7 @@ namespace SongsOfConquestAccess.Scanner
     /// because the controller does not own the cursor, and bookmark jumps set
     /// the same anchor without going through the controller at all.
     /// </summary>
-    internal sealed class ScannerJumpAnchor
+    public sealed class ScannerJumpAnchor
     {
         private bool _hasAnchor;
         private Vector2Int _anchor;

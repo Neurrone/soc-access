@@ -27,7 +27,7 @@ using Zenject;
 
 namespace SongsOfConquestAccess.Adapters
 {
-    internal sealed class AdventureHudAdapter
+    public sealed class AdventureHudAdapter
     {
         private static readonly FieldInfo CommanderHudPortraitEssenceContainerField =
             AccessTools.Field(typeof(CommanderHUDPortrait), "_essenceContainer");

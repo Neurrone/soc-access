@@ -13,7 +13,7 @@ using UnityEngine;
 
 namespace SongsOfConquestAccess.Adapters
 {
-    internal sealed class ChatAdapter
+    public sealed class ChatAdapter
     {
         private static readonly FieldInfo WindowSettingsField =
             AccessTools.Field(typeof(ChatWindowBehavior), "_settings");
@@ -591,7 +591,7 @@ namespace SongsOfConquestAccess.Adapters
         }
     }
 
-    internal sealed class ChatMessageInfo
+    public sealed class ChatMessageInfo
     {
         public ChatMessageInfo(
             string senderName,

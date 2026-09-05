@@ -7,14 +7,14 @@ namespace SongsOfConquestAccess.Audio.Synth
     /// Implementations must return 0 outside [0, DurationSeconds) so the timeline can
     /// mix grains without tracking their bounds.
     /// </summary>
-    internal abstract class Grain
+    public abstract class Grain
     {
         public abstract float DurationSeconds { get; }
 
         public abstract float Evaluate(float seconds);
     }
 
-    internal sealed class SineGrain : Grain
+    public sealed class SineGrain : Grain
     {
         private readonly float _frequencyHz;
         private readonly float _durationSeconds;
@@ -50,7 +50,7 @@ namespace SongsOfConquestAccess.Audio.Synth
     /// Linear zigzag between -1 and +1, starting at 0 and rising, so it shares the
     /// sine grain's phase and zero-crossing count.
     /// </summary>
-    internal sealed class TriangleGrain : Grain
+    public sealed class TriangleGrain : Grain
     {
         private readonly float _frequencyHz;
         private readonly float _durationSeconds;

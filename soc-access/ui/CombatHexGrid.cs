@@ -10,7 +10,7 @@ using UnityEngine;
 
 namespace SongsOfConquestAccess.UI
 {
-    internal sealed class CombatHexGrid : Widget
+    public sealed class CombatHexGrid : Widget
     {
         private const string ScannerWrapCueKey = "Common_ClickUnfold";
         private static readonly Vector2Int CenterTile = new Vector2Int(6, 4);

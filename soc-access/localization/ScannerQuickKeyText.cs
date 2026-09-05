@@ -7,7 +7,7 @@ namespace SongsOfConquestAccess.Localization
     /// punctuation itself is unspeakable, so the mod names each key rather than
     /// handing a screen reader the character.
     /// </summary>
-    internal static class ScannerQuickKeyText
+    public static class ScannerQuickKeyText
     {
         public static string Name(ScannerQuickKey quickKey)
         {

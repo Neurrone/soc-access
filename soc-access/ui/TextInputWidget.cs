@@ -7,7 +7,7 @@ using TMPro;
 
 namespace SongsOfConquestAccess.UI
 {
-    internal sealed class TextInputWidget : Widget
+    public sealed class TextInputWidget : Widget
     {
         private readonly string _label;
         private readonly Func<IUITextMeshInputField> _getField;

@@ -3,7 +3,7 @@ using UnityEngine;
 
 namespace SongsOfConquestAccess.Bookmarks
 {
-    internal sealed class AdventureBookmarkSet
+    public sealed class AdventureBookmarkSet
     {
         private static readonly HashSet<string> ValidSlots = new HashSet<string>(AdventureBookmarkSlots.All);
         private readonly Dictionary<string, Vector2Int> _positions = new Dictionary<string, Vector2Int>();

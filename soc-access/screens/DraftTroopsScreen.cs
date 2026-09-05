@@ -10,7 +10,7 @@ using UnityEngine;
 
 namespace SongsOfConquestAccess.Screens
 {
-    internal sealed class DraftTroopsScreen : TroopManagementScreenBase
+    public sealed class DraftTroopsScreen : TroopManagementScreenBase
     {
         private string _selectedRecruitId;
 

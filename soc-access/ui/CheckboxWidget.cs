@@ -6,7 +6,7 @@ using SongsOfConquestAccess.Speech;
 
 namespace SongsOfConquestAccess.UI
 {
-    internal sealed class CheckboxWidget : Widget
+    public sealed class CheckboxWidget : Widget
     {
         private readonly Func<string> _getLabel;
         private readonly Action _toggle;

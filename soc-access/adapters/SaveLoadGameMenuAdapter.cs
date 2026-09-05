@@ -12,7 +12,7 @@ using UnityEngine.UI;
 
 namespace SongsOfConquestAccess.Adapters
 {
-    internal sealed class SaveLoadGameMenuAdapter
+    public sealed class SaveLoadGameMenuAdapter
     {
         private static readonly FieldInfo SettingsField = AccessTools.Field(typeof(SaveLoadGameMenu), "_settings");
         private static readonly FieldInfo CurrentModeField = AccessTools.Field(typeof(SaveLoadGameMenu), "_currentMode");
@@ -389,7 +389,7 @@ namespace SongsOfConquestAccess.Adapters
             return component != null && component.gameObject.activeInHierarchy;
         }
 
-        internal sealed class TabItem
+        public sealed class TabItem
         {
             private readonly Func<string> _getLabel;
             private readonly Func<bool> _activate;
@@ -431,7 +431,7 @@ namespace SongsOfConquestAccess.Adapters
             public bool IsSelected() { return _isSelected != null && _isSelected(); }
         }
 
-        internal sealed class SaveEntry
+        public sealed class SaveEntry
         {
             private readonly SaveLoadGameMenuAdapter _adapter;
             private readonly SaveLoadGameMenuEntry _entry;
@@ -526,7 +526,7 @@ namespace SongsOfConquestAccess.Adapters
             }
         }
 
-        internal sealed class ButtonItem
+        public sealed class ButtonItem
         {
             private readonly Func<string> _getLabel;
             private readonly Func<bool> _activate;

@@ -22,7 +22,7 @@ namespace SongsOfConquestAccess.Adapters
     /// The origin is taken on trust: the caller has already decided it is road, and only asks
     /// about tiles it would name as one.
     /// </summary>
-    internal static class RoadConnections
+    public static class RoadConnections
     {
         /// <summary>
         /// Compass order, so the directions are always named in a consistent sweep. Offset and

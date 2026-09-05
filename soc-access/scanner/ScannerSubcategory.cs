@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace SongsOfConquestAccess.Scanner
 {
-    internal sealed class ScannerSubcategory
+    public sealed class ScannerSubcategory
     {
         private readonly List<ScannerItem> _items = new List<ScannerItem>();
 

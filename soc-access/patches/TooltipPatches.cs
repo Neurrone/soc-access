@@ -13,7 +13,7 @@ namespace SongsOfConquestAccess
     // adapters force-display the selected object's native ITooltipable through the
     // same lower-level ITooltipManager used by the game.
     [HarmonyPatch(typeof(UITooltipManager), "Tick")]
-    internal static class TooltipPatches
+    public static class TooltipPatches
     {
         private static readonly AccessTools.FieldRef<UITooltipManager, ITooltipManager> TooltipManagerRef =
             AccessTools.FieldRefAccess<UITooltipManager, ITooltipManager>("_tooltipManager");

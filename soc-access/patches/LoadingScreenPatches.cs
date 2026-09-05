@@ -4,7 +4,7 @@ using SongsOfConquest.Client.Menu;
 namespace SongsOfConquestAccess
 {
     [HarmonyPatch]
-    internal static class LoadingScreenPatches
+    public static class LoadingScreenPatches
     {
         [HarmonyPatch(typeof(LoadingScreenMenu), "Initialize")]
         [HarmonyPrefix]

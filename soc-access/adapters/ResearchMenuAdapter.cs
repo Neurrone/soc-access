@@ -18,7 +18,7 @@ using UnityEngine;
 
 namespace SongsOfConquestAccess.Adapters
 {
-    internal sealed class ResearchMenuAdapter
+    public sealed class ResearchMenuAdapter
     {
         private static readonly TooltipAnchor[] ResearchTooltipAnchors =
         {
@@ -459,7 +459,7 @@ namespace SongsOfConquestAccess.Adapters
             return owner != null && field != null ? field.GetValue(owner) as T : null;
         }
 
-        internal sealed class FactionItem
+        public sealed class FactionItem
         {
             public FactionItem(int factionIndex, string label, bool isSelected, Func<bool> focus, Func<bool> activate)
             {
@@ -477,7 +477,7 @@ namespace SongsOfConquestAccess.Adapters
             public Func<bool> Activate { get; private set; }
         }
 
-        internal sealed class BuildingItem
+        public sealed class BuildingItem
         {
             public BuildingItem(string label, string description, bool missingBuilding, Func<bool> focus, Func<bool> activate)
             {
@@ -495,7 +495,7 @@ namespace SongsOfConquestAccess.Adapters
             public Func<bool> Activate { get; private set; }
         }
 
-        internal sealed class CategoryItem
+        public sealed class CategoryItem
         {
             public CategoryItem(string label, IReadOnlyList<ResearchItem> items)
             {
@@ -507,7 +507,7 @@ namespace SongsOfConquestAccess.Adapters
             public IReadOnlyList<ResearchItem> Items { get; private set; }
         }
 
-        internal sealed class ResearchItem
+        public sealed class ResearchItem
         {
             public ResearchItem(string label, int ownedTier, string tierHeader, Func<bool> focus, Func<bool> activate, Tooltip tooltip)
             {

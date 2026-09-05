@@ -5,7 +5,7 @@ using SongsOfConquestAccess.Speech.Spatial;
 
 namespace SongsOfConquestAccess.Scanner
 {
-    internal sealed class AdventureScannerSpeechContext : IScannerSpeechContext
+    public sealed class AdventureScannerSpeechContext : IScannerSpeechContext
     {
         private readonly ScannerResult _result;
         private readonly AdventureMapTile _tile;
@@ -51,7 +51,7 @@ namespace SongsOfConquestAccess.Scanner
         /// keeps them even though the rest of the tile belongs to the cursor.
         /// This is the adventure map's counterpart to combat reachability.
         /// </summary>
-        internal static IEnumerable<AnnouncementPart> BuildTileParts(AdventureMapTile tile)
+        public static IEnumerable<AnnouncementPart> BuildTileParts(AdventureMapTile tile)
         {
             string route = AdventureMapTileSpeechFormatter.DescribeReachabilityOrRoutePreview(tile);
             if (!string.IsNullOrWhiteSpace(route))

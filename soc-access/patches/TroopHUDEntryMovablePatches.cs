@@ -5,7 +5,7 @@ using SongsOfConquestAccess.Adapters;
 namespace SongsOfConquestAccess
 {
     [HarmonyPatch]
-    internal static class TroopHUDEntryMovablePatches
+    public static class TroopHUDEntryMovablePatches
     {
         [HarmonyPatch(typeof(TroopHUDEntryMovable), "DecideAmount")]
         [HarmonyPostfix]

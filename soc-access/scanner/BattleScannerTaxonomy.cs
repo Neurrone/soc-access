@@ -7,7 +7,7 @@ namespace SongsOfConquestAccess.Scanner
     /// The category set is the union of both screens' needs; each screen
     /// populates only what applies and the empty-scope skip hides the rest.
     /// </summary>
-    internal static class BattleScannerTaxonomy
+    public static class BattleScannerTaxonomy
     {
         public static readonly ScannerTaxonomy Instance = new ScannerTaxonomy(
             ScannerTaxonomyKeys.Battle,

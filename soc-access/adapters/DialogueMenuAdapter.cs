@@ -11,7 +11,7 @@ using UnityEngine;
 
 namespace SongsOfConquestAccess.Adapters
 {
-    internal sealed class DialogueMenuAdapter : IStoryTextAdapter
+    public sealed class DialogueMenuAdapter : IStoryTextAdapter
     {
         private static readonly AccessTools.FieldRef<DialogueMenu, DialogueMenu.Settings> SettingsRef =
             AccessTools.FieldRefAccess<DialogueMenu, DialogueMenu.Settings>("_settings");

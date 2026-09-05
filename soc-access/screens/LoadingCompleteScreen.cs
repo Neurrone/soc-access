@@ -9,7 +9,7 @@ using Zenject;
 
 namespace SongsOfConquestAccess.Screens
 {
-    internal sealed class LoadingCompleteScreen : Screen
+    public sealed class LoadingCompleteScreen : Screen
     {
         private static readonly PropertyInfo InstallerContainerProperty =
             AccessTools.Property(typeof(LoadingScreenMenuInstaller), "Container");

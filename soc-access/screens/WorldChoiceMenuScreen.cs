@@ -11,7 +11,7 @@ using Zenject;
 
 namespace SongsOfConquestAccess.Screens
 {
-    internal sealed class WorldChoiceMenuScreen : Screen
+    public sealed class WorldChoiceMenuScreen : Screen
     {
         private static readonly System.Reflection.PropertyInfo InstallerContainerProperty =
             AccessTools.Property(typeof(WorldChoiceMenuInstaller), "Container");

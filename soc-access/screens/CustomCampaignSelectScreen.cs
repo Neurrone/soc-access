@@ -8,7 +8,7 @@ using UnityEngine;
 
 namespace SongsOfConquestAccess.Screens
 {
-    internal sealed class CustomCampaignSelectScreen : Screen
+    public sealed class CustomCampaignSelectScreen : Screen
     {
         private readonly CustomCampaignSelectAdapter _adapter;
 

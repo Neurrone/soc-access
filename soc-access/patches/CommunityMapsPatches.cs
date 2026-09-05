@@ -9,7 +9,7 @@ using UnityEngine;
 namespace SongsOfConquestAccess
 {
     [HarmonyPatch]
-    internal static class CommunityMapsPatches
+    public static class CommunityMapsPatches
     {
         [HarmonyPatch(typeof(Browser), "Close")]
         [HarmonyPostfix]
@@ -27,7 +27,7 @@ namespace SongsOfConquestAccess
     }
 
     [HarmonyPatch]
-    internal static class CommunityMapsHomeOpenPatches
+    public static class CommunityMapsHomeOpenPatches
     {
         private static MethodBase TargetMethod()
         {
@@ -41,7 +41,7 @@ namespace SongsOfConquestAccess
     }
 
     [HarmonyPatch]
-    internal static class CommunityMapsFeaturedLoadedPatches
+    public static class CommunityMapsFeaturedLoadedPatches
     {
         private static MethodBase TargetMethod()
         {
@@ -55,7 +55,7 @@ namespace SongsOfConquestAccess
     }
 
     [HarmonyPatch]
-    internal static class CommunityMapsRowLoadedPatches
+    public static class CommunityMapsRowLoadedPatches
     {
         private static MethodBase TargetMethod()
         {
@@ -69,7 +69,7 @@ namespace SongsOfConquestAccess
     }
 
     [HarmonyPatch]
-    internal static class CommunityMapsContextMenuOpenPatches
+    public static class CommunityMapsContextMenuOpenPatches
     {
         private static MethodBase TargetMethod()
         {
@@ -83,7 +83,7 @@ namespace SongsOfConquestAccess
     }
 
     [HarmonyPatch]
-    internal static class CommunityMapsContextMenuClosePatches
+    public static class CommunityMapsContextMenuClosePatches
     {
         private static MethodBase TargetMethod()
         {
@@ -97,7 +97,7 @@ namespace SongsOfConquestAccess
     }
 
     [HarmonyPatch]
-    internal static class CommunityMapsDetailsOpenPatches
+    public static class CommunityMapsDetailsOpenPatches
     {
         private static MethodBase TargetMethod()
         {
@@ -111,7 +111,7 @@ namespace SongsOfConquestAccess
     }
 
     [HarmonyPatch]
-    internal static class CommunityMapsDetailsClosePatches
+    public static class CommunityMapsDetailsClosePatches
     {
         private static MethodBase TargetMethod()
         {
@@ -125,7 +125,7 @@ namespace SongsOfConquestAccess
     }
 
     [HarmonyPatch]
-    internal static class CommunityMapsReportOpenPatches
+    public static class CommunityMapsReportOpenPatches
     {
         private static MethodBase TargetMethod()
         {
@@ -139,7 +139,7 @@ namespace SongsOfConquestAccess
     }
 
     [HarmonyPatch]
-    internal static class CommunityMapsReportClosePatches
+    public static class CommunityMapsReportClosePatches
     {
         private static MethodBase TargetMethod()
         {
@@ -153,7 +153,7 @@ namespace SongsOfConquestAccess
     }
 
     [HarmonyPatch]
-    internal static class CommunityMapsDownloadQueueOpenPatches
+    public static class CommunityMapsDownloadQueueOpenPatches
     {
         private static MethodBase TargetMethod()
         {
@@ -167,7 +167,7 @@ namespace SongsOfConquestAccess
     }
 
     [HarmonyPatch]
-    internal static class CommunityMapsDownloadQueueClosePatches
+    public static class CommunityMapsDownloadQueueClosePatches
     {
         private static MethodBase TargetMethod()
         {
@@ -181,7 +181,7 @@ namespace SongsOfConquestAccess
     }
 
     [HarmonyPatch]
-    internal static class CommunityMapsCollectionOpenPatches
+    public static class CommunityMapsCollectionOpenPatches
     {
         private static MethodBase TargetMethod()
         {
@@ -195,7 +195,7 @@ namespace SongsOfConquestAccess
     }
 
     [HarmonyPatch]
-    internal static class CommunityMapsAuthenticationOpenPatches
+    public static class CommunityMapsAuthenticationOpenPatches
     {
         private static MethodBase TargetMethod()
         {
@@ -209,7 +209,7 @@ namespace SongsOfConquestAccess
     }
 
     [HarmonyPatch]
-    internal static class CommunityMapsAuthenticationClosePatches
+    public static class CommunityMapsAuthenticationClosePatches
     {
         private static MethodBase TargetMethod()
         {
@@ -223,7 +223,7 @@ namespace SongsOfConquestAccess
     }
 
     [HarmonyPatch]
-    internal static class CommunityMapsAuthenticationLogoutOpenPatches
+    public static class CommunityMapsAuthenticationLogoutOpenPatches
     {
         private static MethodBase TargetMethod()
         {
@@ -237,7 +237,7 @@ namespace SongsOfConquestAccess
     }
 
     [HarmonyPatch]
-    internal static class CommunityMapsNotificationPopupOpenPatches
+    public static class CommunityMapsNotificationPopupOpenPatches
     {
         private static MethodBase TargetMethod()
         {
@@ -253,7 +253,7 @@ namespace SongsOfConquestAccess
     }
 
     [HarmonyPatch]
-    internal static class CommunityMapsNotificationPopupClosePatches
+    public static class CommunityMapsNotificationPopupClosePatches
     {
         private static MethodBase TargetMethod()
         {
@@ -269,7 +269,7 @@ namespace SongsOfConquestAccess
     }
 
     [HarmonyPatch]
-    internal static class CommunityMapsSearchPanelOpenPatches
+    public static class CommunityMapsSearchPanelOpenPatches
     {
         private static MethodBase TargetMethod()
         {
@@ -283,7 +283,7 @@ namespace SongsOfConquestAccess
     }
 
     [HarmonyPatch]
-    internal static class CommunityMapsSearchPanelClosePatches
+    public static class CommunityMapsSearchPanelClosePatches
     {
         private static MethodBase TargetMethod()
         {
@@ -297,7 +297,7 @@ namespace SongsOfConquestAccess
     }
 
     [HarmonyPatch]
-    internal static class CommunityMapsSearchPanelApplyFilterPatches
+    public static class CommunityMapsSearchPanelApplyFilterPatches
     {
         private static MethodBase TargetMethod()
         {
@@ -312,7 +312,7 @@ namespace SongsOfConquestAccess
     }
 
     [HarmonyPatch]
-    internal static class CommunityMapsSearchPanelClearFilterPatches
+    public static class CommunityMapsSearchPanelClearFilterPatches
     {
         private static MethodBase TargetMethod()
         {
@@ -326,7 +326,7 @@ namespace SongsOfConquestAccess
     }
 
     [HarmonyPatch]
-    internal static class CommunityMapsSearchPanelCreateTagsPatches
+    public static class CommunityMapsSearchPanelCreateTagsPatches
     {
         private static MethodBase TargetMethod()
         {
@@ -340,7 +340,7 @@ namespace SongsOfConquestAccess
     }
 
     [HarmonyPatch]
-    internal static class CommunityMapsSearchResultsOpenPatches
+    public static class CommunityMapsSearchResultsOpenPatches
     {
         private static MethodBase TargetMethod()
         {
@@ -354,7 +354,7 @@ namespace SongsOfConquestAccess
     }
 
     [HarmonyPatch]
-    internal static class CommunityMapsSearchResultsOpenWithoutRefreshingPatches
+    public static class CommunityMapsSearchResultsOpenWithoutRefreshingPatches
     {
         private static MethodBase TargetMethod()
         {
@@ -368,7 +368,7 @@ namespace SongsOfConquestAccess
     }
 
     [HarmonyPatch]
-    internal static class CommunityMapsSearchResultsRefreshPatches
+    public static class CommunityMapsSearchResultsRefreshPatches
     {
         private static MethodBase TargetMethod()
         {
@@ -382,7 +382,7 @@ namespace SongsOfConquestAccess
     }
 
     [HarmonyPatch]
-    internal static class CommunityMapsSearchResultsGetPatches
+    public static class CommunityMapsSearchResultsGetPatches
     {
         private static MethodBase TargetMethod()
         {
@@ -396,7 +396,7 @@ namespace SongsOfConquestAccess
     }
 
     [HarmonyPatch]
-    internal static class CommunityMapsCollectionRefreshListPatches
+    public static class CommunityMapsCollectionRefreshListPatches
     {
         private static readonly FieldInfo SearchFieldInfo = AccessTools.Field(typeof(Collection), "CollectionPanelSearchField");
 
@@ -487,7 +487,7 @@ namespace SongsOfConquestAccess
     }
 
     [HarmonyPatch]
-    internal static class CommunityMapsOpenUninstallConfirmationPatches
+    public static class CommunityMapsOpenUninstallConfirmationPatches
     {
         private static MethodBase TargetMethod()
         {
@@ -501,7 +501,7 @@ namespace SongsOfConquestAccess
     }
 
     [HarmonyPatch]
-    internal static class CommunityMapsCloseUninstallConfirmationPatches
+    public static class CommunityMapsCloseUninstallConfirmationPatches
     {
         private static MethodBase TargetMethod()
         {
@@ -515,7 +515,7 @@ namespace SongsOfConquestAccess
     }
 
     [HarmonyPatch]
-    internal static class CommunityMapsFiveDigitInputOpenPatches
+    public static class CommunityMapsFiveDigitInputOpenPatches
     {
         private static MethodBase TargetMethod()
         {
@@ -529,7 +529,7 @@ namespace SongsOfConquestAccess
     }
 
     [HarmonyPatch]
-    internal static class CommunityMapsFiveDigitInputClosePatches
+    public static class CommunityMapsFiveDigitInputClosePatches
     {
         private static MethodBase TargetMethod()
         {
@@ -543,7 +543,7 @@ namespace SongsOfConquestAccess
     }
 
     [HarmonyPatch]
-    internal static class CommunityMapsFiveDigitInputDuplicateKeyPatches
+    public static class CommunityMapsFiveDigitInputDuplicateKeyPatches
     {
         private static readonly Dictionary<int, FrameInput> LastInputByInstance =
             new Dictionary<int, FrameInput>();

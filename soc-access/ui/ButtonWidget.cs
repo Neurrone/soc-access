@@ -5,7 +5,7 @@ using SongsOfConquestAccess.Localization;
 
 namespace SongsOfConquestAccess.UI
 {
-    internal sealed class ButtonWidget : Widget
+    public sealed class ButtonWidget : Widget
     {
         private readonly Func<bool> _activate;
         private readonly Action _onFocus;

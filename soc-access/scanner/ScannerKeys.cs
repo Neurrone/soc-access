@@ -5,7 +5,7 @@ namespace SongsOfConquestAccess.Scanner
     /// keys and in custom category selectors, so they must never change once
     /// shipped.
     /// </summary>
-    internal static class ScannerCategoryKeys
+    public static class ScannerCategoryKeys
     {
         public const string Pickups = "pickups";
         public const string ResourceGenerators = "resource_generators";
@@ -29,7 +29,7 @@ namespace SongsOfConquestAccess.Scanner
     /// categories are stored against these, so they must never change once
     /// shipped.
     /// </summary>
-    internal static class ScannerTaxonomyKeys
+    public static class ScannerTaxonomyKeys
     {
         public const string Adventure = "adventure";
         public const string Battle = "battle";
@@ -41,7 +41,7 @@ namespace SongsOfConquestAccess.Scanner
     /// Stable identifiers for scanner subcategories. Shared across taxonomies
     /// where the meaning is the same.
     /// </summary>
-    internal static class ScannerSubcategoryKeys
+    public static class ScannerSubcategoryKeys
     {
         public const string All = "all";
         public const string Unvisited = "unvisited";
@@ -76,7 +76,7 @@ namespace SongsOfConquestAccess.Scanner
     /// taking from an entity. Anything the game already names groups by that
     /// name and needs no key here.
     /// </summary>
-    internal static class ScannerItemKeys
+    public static class ScannerItemKeys
     {
         public const string Road = "road";
         public const string DirtRoad = "dirt-road";

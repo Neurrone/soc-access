@@ -8,7 +8,7 @@ using SongsOfConquestAccess.UI;
 
 namespace SongsOfConquestAccess.Screens
 {
-    internal sealed class ChatScreen : Screen
+    public sealed class ChatScreen : Screen
     {
         private readonly ChatAdapter _adapter;
 

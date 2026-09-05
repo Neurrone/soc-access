@@ -3,21 +3,21 @@ using SongsOfConquestAccess.Localization;
 
 namespace SongsOfConquestAccess.Buffers
 {
-    internal enum ReviewBufferKind
+    public enum ReviewBufferKind
     {
         Ui,
         AdventureMapNotifications,
         CombatEvents
     }
 
-    internal enum ReviewBufferMoveResult
+    public enum ReviewBufferMoveResult
     {
         Moved,
         BeginningOfBuffer,
         EndOfBuffer
     }
 
-    internal sealed class ReviewBuffer
+    public sealed class ReviewBuffer
     {
         private readonly List<string> _lines = new List<string>();
 

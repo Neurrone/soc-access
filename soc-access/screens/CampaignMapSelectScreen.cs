@@ -14,7 +14,7 @@ using Zenject;
 
 namespace SongsOfConquestAccess.Screens
 {
-    internal sealed class CampaignMapSelectScreen : Screen
+    public sealed class CampaignMapSelectScreen : Screen
     {
         private const string DifficultyMenuId = "campaign-map-difficulty";
         private static readonly PropertyInfo InstallerContainerProperty =

@@ -9,7 +9,7 @@ namespace SongsOfConquestAccess.Screens
     /// Tuning screen for a single cue. Every change replays the cue so the effect is audible
     /// without leaving the slider.
     /// </summary>
-    internal sealed class AudioCueSettingsScreen : Screen
+    public sealed class AudioCueSettingsScreen : Screen
     {
         private const int VolumeStep = 5;
         private const int PitchStep = 1;

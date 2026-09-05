@@ -13,7 +13,7 @@ using UnityEngine;
 
 namespace SongsOfConquestAccess.Adapters
 {
-    internal sealed class LevelUpMenuAdapter
+    public sealed class LevelUpMenuAdapter
     {
         private static readonly FieldInfo SettingsField = AccessTools.Field(typeof(CommanderLevelUpMenu), "_settings");
         private static readonly FieldInfo AsyncField = AccessTools.Field(typeof(CommanderLevelUpMenu), "_async");
@@ -230,7 +230,7 @@ namespace SongsOfConquestAccess.Adapters
             return owner != null && field != null ? field.GetValue(owner) as T : null;
         }
 
-        internal sealed class StatItem
+        public sealed class StatItem
         {
             public StatItem(string id, string label, Tooltip tooltip)
             {
@@ -244,7 +244,7 @@ namespace SongsOfConquestAccess.Adapters
             public Tooltip Tooltip { get; private set; }
         }
 
-        internal sealed class SkillChoice
+        public sealed class SkillChoice
         {
             public SkillChoice(
                 string id,

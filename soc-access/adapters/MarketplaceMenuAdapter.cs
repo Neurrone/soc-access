@@ -17,7 +17,7 @@ using UnityEngine;
 
 namespace SongsOfConquestAccess.Adapters
 {
-    internal sealed class MarketplaceMenuAdapter
+    public sealed class MarketplaceMenuAdapter
     {
         private static readonly FieldInfo ButtonsField = AccessTools.Field(typeof(MarketplaceMenu), "_buttons");
         private static readonly FieldInfo TitleTextField = AccessTools.Field(typeof(MarketplaceMenu), "_titleText");
@@ -301,7 +301,7 @@ namespace SongsOfConquestAccess.Adapters
             return value is T ? (T)value : fallback;
         }
 
-        internal sealed class ResourceItem
+        public sealed class ResourceItem
         {
             public ResourceItem(ResourceType resourceType, string resourceName, int amount)
             {
@@ -315,7 +315,7 @@ namespace SongsOfConquestAccess.Adapters
             public int Amount { get; private set; }
         }
 
-        internal sealed class TradeActionItem
+        public sealed class TradeActionItem
         {
             private readonly MarketplaceMenuAdapter _adapter;
 

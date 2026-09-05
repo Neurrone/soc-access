@@ -2,7 +2,7 @@ using SongsOfConquestAccess.Localization;
 
 namespace SongsOfConquestAccess.Speech.Spatial
 {
-    internal static class ScannerAnnouncementDefinitions
+    public static class ScannerAnnouncementDefinitions
     {
         public static readonly AnnouncementGroupDefinition Result = new AnnouncementGroupDefinition(
             "scanner_result",

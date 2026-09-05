@@ -12,7 +12,7 @@ using UnityEngine;
 
 namespace SongsOfConquestAccess.Screens
 {
-    internal sealed class DefenceMenuScreen : Screen
+    public sealed class DefenceMenuScreen : Screen
     {
         private const int ArmyWidgetIndex = 7;
 

@@ -6,7 +6,7 @@ using UnityEngine;
 
 namespace SongsOfConquestAccess.Adapters
 {
-    internal static class NativeTooltipUtility
+    public static class NativeTooltipUtility
     {
         private static readonly IReadOnlyList<string> EmptyLines = new string[0];
 

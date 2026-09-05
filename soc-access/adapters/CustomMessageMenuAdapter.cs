@@ -10,7 +10,7 @@ using UnityEngine.UI;
 
 namespace SongsOfConquestAccess.Adapters
 {
-    internal sealed class CustomMessageMenuAdapter : IMessageDialogAdapter
+    public sealed class CustomMessageMenuAdapter : IMessageDialogAdapter
     {
         private static readonly FieldInfo SettingsField = AccessTools.Field(typeof(CustomMessageMenu), "_settings");
         private static readonly FieldInfo AsyncField = AccessTools.Field(typeof(CustomMessageMenu), "_async");

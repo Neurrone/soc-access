@@ -18,7 +18,7 @@ using UnityEngine;
 
 namespace SongsOfConquestAccess.Events
 {
-    internal sealed class AdventureMapEventListener
+    public sealed class AdventureMapEventListener
     {
         private readonly IClientAdventureFacade _facade;
         private readonly ISelectionHandler _selectionHandler;

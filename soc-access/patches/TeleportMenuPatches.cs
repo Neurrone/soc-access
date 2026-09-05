@@ -5,7 +5,7 @@ using UnityEngine;
 namespace SongsOfConquestAccess
 {
     [HarmonyPatch]
-    internal static class TeleportMenuPatches
+    public static class TeleportMenuPatches
     {
         [HarmonyPatch(typeof(TeleportMenu), "Show", new[]
         {

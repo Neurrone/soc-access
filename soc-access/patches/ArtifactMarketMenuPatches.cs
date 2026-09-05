@@ -5,7 +5,7 @@ using SongsOfConquestAccess.Adapters;
 namespace SongsOfConquestAccess
 {
     [HarmonyPatch]
-    internal static class ArtifactMarketMenuPatches
+    public static class ArtifactMarketMenuPatches
     {
         [HarmonyPatch(typeof(ArtifactMarketMenu), "Show", new[] { typeof(int), typeof(int) })]
         [HarmonyPostfix]

@@ -9,7 +9,7 @@ using Zenject;
 
 namespace SongsOfConquestAccess.Screens
 {
-    internal sealed class ClaimMenuScreen : Screen
+    public sealed class ClaimMenuScreen : Screen
     {
         private static readonly System.Reflection.PropertyInfo InstallerContainerProperty =
             AccessTools.Property(typeof(ClaimMenuInstaller), "Container");

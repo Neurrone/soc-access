@@ -13,7 +13,7 @@ namespace SongsOfConquestAccess.Audio.Synth
     /// <para>Callers should pass an attack of at least ~0.004 s to avoid an audible click at onset.
     /// This is not enforced, so deliberate percussive transients remain possible.</para>
     /// </summary>
-    internal sealed class AdsrGrain : Grain
+    public sealed class AdsrGrain : Grain
     {
         private readonly Grain _inner;
         private readonly float _attackSeconds;

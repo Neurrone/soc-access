@@ -12,7 +12,7 @@ using UnityEngine;
 
 namespace SongsOfConquestAccess.Screens
 {
-    internal sealed class ArtifactMarketScreen : Screen
+    public sealed class ArtifactMarketScreen : Screen
     {
         private const string CategoriesMenuId = "artifact-market-categories";
         private const string OffersMenuId = "artifact-market-offers";

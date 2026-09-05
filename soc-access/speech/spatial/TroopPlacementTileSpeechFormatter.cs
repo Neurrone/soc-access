@@ -5,7 +5,7 @@ using SongsOfConquestAccess.Localization;
 
 namespace SongsOfConquestAccess.Speech.Spatial
 {
-    internal sealed class TroopPlacementTileSpeechFormatter
+    public sealed class TroopPlacementTileSpeechFormatter
     {
         private readonly TroopPlacementSnapshot _snapshot;
 

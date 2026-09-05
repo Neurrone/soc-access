@@ -6,7 +6,7 @@ namespace SongsOfConquestAccess.Scanner
     /// Runs one adapter's contribution to a scanner snapshot in isolation. A
     /// contribution that throws costs its own category, not the whole scanner.
     /// </summary>
-    internal static class ScannerContribution
+    public static class ScannerContribution
     {
         public static void Run(string name, Action contribute)
         {

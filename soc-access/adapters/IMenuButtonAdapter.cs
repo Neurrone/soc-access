@@ -2,7 +2,7 @@ using SongsOfConquest.Client.UI;
 
 namespace SongsOfConquestAccess.Adapters
 {
-    internal interface IMenuButtonAdapter
+    public interface IMenuButtonAdapter
     {
         UIButton Button { get; }
 

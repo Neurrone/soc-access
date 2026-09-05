@@ -9,7 +9,7 @@ using UnityEngine.UI;
 
 namespace SongsOfConquestAccess.UI
 {
-    internal sealed class TimeInputTextWidget : Widget
+    public sealed class TimeInputTextWidget : Widget
     {
         private enum ActiveField
         {

@@ -2,7 +2,7 @@ using System.Collections.Generic;
 
 namespace SongsOfConquestAccess.Screens
 {
-    internal sealed class CombatTroopCycle
+    public sealed class CombatTroopCycle
     {
         private int _anchorTroopId = -1;
         private bool _hasAnchor;
@@ -70,7 +70,7 @@ namespace SongsOfConquestAccess.Screens
         }
     }
 
-    internal struct CombatTroopCycleResult
+    public struct CombatTroopCycleResult
     {
         private CombatTroopCycleResult(bool moved, int troopId, bool wrapped)
         {

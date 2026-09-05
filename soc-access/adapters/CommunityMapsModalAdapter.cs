@@ -11,7 +11,7 @@ using UnityEngine.UI;
 
 namespace SongsOfConquestAccess.Adapters
 {
-    internal sealed class CommunityMapsModalAdapter
+    public sealed class CommunityMapsModalAdapter
     {
         private readonly AuthenticationPanels _authPanels;
         private readonly GameObject _panel;
@@ -1013,7 +1013,7 @@ namespace SongsOfConquestAccess.Adapters
             return text.Replace("<color=red>", string.Empty).Replace("</color>", string.Empty);
         }
 
-        internal sealed class TextItem
+        public sealed class TextItem
         {
             public TextItem(int index, string text)
             {
@@ -1025,7 +1025,7 @@ namespace SongsOfConquestAccess.Adapters
             public string Text { get; private set; }
         }
 
-        internal sealed class InputItem
+        public sealed class InputItem
         {
             public InputItem(int index, string label, TMP_InputField field)
             {
@@ -1039,7 +1039,7 @@ namespace SongsOfConquestAccess.Adapters
             public TMP_InputField Field { get; private set; }
         }
 
-        internal sealed class FiveDigitInputItem
+        public sealed class FiveDigitInputItem
         {
             private readonly KeyInput5DigitsUi _keyInput;
 
@@ -1090,7 +1090,7 @@ namespace SongsOfConquestAccess.Adapters
             }
         }
 
-        internal sealed class ActionItem
+        public sealed class ActionItem
         {
             public ActionItem(int index, string label, Button button)
             {
@@ -1139,7 +1139,7 @@ namespace SongsOfConquestAccess.Adapters
         }
     }
 
-    internal enum CommunityMapsModalState
+    public enum CommunityMapsModalState
     {
         None,
         Unknown,

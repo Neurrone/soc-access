@@ -12,7 +12,7 @@ using UnityEngine;
 
 namespace SongsOfConquestAccess.Screens
 {
-    internal sealed class CommanderSheetScreen : Screen
+    public sealed class CommanderSheetScreen : Screen
     {
         private const string InventoryGridId = "commander-sheet-inventory-grid";
 

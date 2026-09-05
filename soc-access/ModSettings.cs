@@ -8,7 +8,7 @@ using SongsOfConquestAccess.Speech.Spatial;
 
 namespace SongsOfConquestAccess
 {
-    internal static class ModSettings
+    public static class ModSettings
     {
         public const int CueVolumeMinimum = 0;
         public const int CueVolumeMaximum = 100;
@@ -760,7 +760,7 @@ namespace SongsOfConquestAccess
             _config?.Save();
         }
 
-        internal static IReadOnlyList<string> MergeAnnouncementOrder(AnnouncementGroupDefinition group, string orderCsv)
+        public static IReadOnlyList<string> MergeAnnouncementOrder(AnnouncementGroupDefinition group, string orderCsv)
         {
             List<string> result = new List<string>();
             HashSet<string> seen = new HashSet<string>();

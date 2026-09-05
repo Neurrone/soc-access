@@ -27,7 +27,7 @@ namespace SongsOfConquestAccess.Dev
     /// Keyboard only. A mouse would need the pointer moved off whatever the player left it on, and
     /// nothing in this mod is driven by clicks.
     /// </summary>
-    internal static class RawKeyboard
+    public static class RawKeyboard
     {
         /// <summary>How long a tapped key stays down, and how long the next one waits - a few frames
         /// each at 60fps, which is what makes a press look like a press to code that counts frames.

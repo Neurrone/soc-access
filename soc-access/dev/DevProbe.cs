@@ -116,7 +116,7 @@ namespace SongsOfConquestAccess.Dev
 
         /// <summary>The shared implementation: the loading-complete screen the mod has on its stack,
         /// continued natively. False when there is none to continue.</summary>
-        internal static bool PressContinue()
+        public static bool PressContinue()
         {
             ScreenManager screens = SocAccessMod.Instance?.ScreenManager;
             LoadingCompleteScreen loading = screens == null ? null : screens.Get<LoadingCompleteScreen>();

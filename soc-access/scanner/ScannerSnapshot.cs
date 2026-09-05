@@ -4,7 +4,7 @@ using UnityEngine;
 
 namespace SongsOfConquestAccess.Scanner
 {
-    internal struct ScannerSnapshotLocation
+    public struct ScannerSnapshotLocation
     {
         public ScannerSnapshotLocation(int categoryIndex, int subcategoryIndex, int itemIndex, int resultIndex)
         {
@@ -28,7 +28,7 @@ namespace SongsOfConquestAccess.Scanner
         }
     }
 
-    internal sealed class ScannerSnapshot
+    public sealed class ScannerSnapshot
     {
         private readonly List<ScannerCategory> _categories = new List<ScannerCategory>();
         private ScannerTaxonomy _taxonomy;

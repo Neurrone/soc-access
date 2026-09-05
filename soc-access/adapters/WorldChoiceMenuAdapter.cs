@@ -19,7 +19,7 @@ using UnityEngine.UI;
 
 namespace SongsOfConquestAccess.Adapters
 {
-    internal sealed class WorldChoiceMenuAdapter
+    public sealed class WorldChoiceMenuAdapter
     {
         private static readonly FieldInfo SettingsField = AccessTools.Field(typeof(WorldChoiceMenu), "_settings");
         private static readonly FieldInfo AsyncField = AccessTools.Field(typeof(WorldChoiceMenu), "_async");
@@ -382,7 +382,7 @@ namespace SongsOfConquestAccess.Adapters
             return owner != null && field != null ? field.GetValue(owner) as T : null;
         }
 
-        internal sealed class ChoiceItem
+        public sealed class ChoiceItem
         {
             private readonly Func<string> _getLabel;
             private readonly Func<bool> _isEnabled;

@@ -7,7 +7,7 @@ using UnityEngine;
 
 namespace SongsOfConquestAccess.Screens
 {
-    internal sealed class MainMenuScreen : Screen
+    public sealed class MainMenuScreen : Screen
     {
         private static readonly string[] TopLevelItemIds =
         {
@@ -38,7 +38,7 @@ namespace SongsOfConquestAccess.Screens
             return adapter != null ? new MainMenuScreen(adapter) : null;
         }
 
-        internal static MainMenuAdapter FindActiveMainMenu()
+        public static MainMenuAdapter FindActiveMainMenu()
         {
             MainMenu[] mainMenus = Resources.FindObjectsOfTypeAll<MainMenu>();
             for (int i = 0; i < mainMenus.Length; i++)

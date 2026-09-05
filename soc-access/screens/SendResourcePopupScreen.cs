@@ -8,7 +8,7 @@ using UnityEngine;
 
 namespace SongsOfConquestAccess.Screens
 {
-    internal sealed class SendResourcePopupScreen : Screen
+    public sealed class SendResourcePopupScreen : Screen
     {
         private readonly SendResourcePopupAdapter _adapter;
 

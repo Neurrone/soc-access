@@ -7,7 +7,7 @@ using SongsOfConquestAccess.Screens;
 namespace SongsOfConquestAccess.Patches
 {
     [HarmonyPatch]
-    internal static class PauseMenuPatches
+    public static class PauseMenuPatches
     {
         private static readonly AccessTools.FieldRef<PauseMenu, Async<PauseResponse>> AsyncRef =
             AccessTools.FieldRefAccess<PauseMenu, Async<PauseResponse>>("_async");

@@ -7,7 +7,7 @@ using UnityEngine;
 
 namespace SongsOfConquestAccess.Adapters
 {
-    internal static class AdventureMapVisibility
+    public static class AdventureMapVisibility
     {
         /// <summary>
         /// Finds a representative tile where this map entity can be identified from remembered map knowledge.

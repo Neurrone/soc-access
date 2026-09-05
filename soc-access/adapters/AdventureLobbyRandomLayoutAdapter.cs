@@ -20,7 +20,7 @@ using UnityEngine.UI;
 
 namespace SongsOfConquestAccess.Adapters
 {
-    internal sealed class AdventureLobbyRandomLayoutAdapter
+    public sealed class AdventureLobbyRandomLayoutAdapter
     {
         private static readonly AccessTools.FieldRef<LobbyRandomMapSelectionMenu, CanvasGroup> CanvasGroupRef =
             AccessTools.FieldRefAccess<LobbyRandomMapSelectionMenu, CanvasGroup>("_canvasGroup");
@@ -348,7 +348,7 @@ namespace SongsOfConquestAccess.Adapters
             return options;
         }
 
-        internal sealed class RandomLayoutItem
+        public sealed class RandomLayoutItem
         {
             private readonly AdventureLobbyRandomLayoutAdapter _owner;
             private readonly ILocalizationHandler _localization;
@@ -427,7 +427,7 @@ namespace SongsOfConquestAccess.Adapters
             }
         }
 
-        internal sealed class WinConditionToggleItem
+        public sealed class WinConditionToggleItem
         {
             private readonly UIToggle _toggle;
             private readonly ILocalizationHandler _localization;
@@ -497,7 +497,7 @@ namespace SongsOfConquestAccess.Adapters
             }
         }
 
-        internal sealed class LayoutDropdownItem
+        public sealed class LayoutDropdownItem
         {
             private readonly UITextMeshDropdown _dropdown;
             private readonly ILocalizationHandler _localization;

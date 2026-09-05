@@ -5,7 +5,7 @@ using UnityEngine;
 
 namespace SongsOfConquestAccess.Scanner
 {
-    internal enum ScannerResultKind
+    public enum ScannerResultKind
     {
         Point,
         TerrainPoint,
@@ -20,7 +20,7 @@ namespace SongsOfConquestAccess.Scanner
     /// game knows. <see cref="None"/> covers results that have no owner at all,
     /// such as terrain.
     /// </summary>
-    internal enum ScannerResultRelationship
+    public enum ScannerResultRelationship
     {
         None,
         Neutral,
@@ -28,7 +28,7 @@ namespace SongsOfConquestAccess.Scanner
         Enemy
     }
 
-    internal sealed class ScannerResult
+    public sealed class ScannerResult
     {
         private string _itemKey;
         private string _itemLabel;
@@ -136,7 +136,7 @@ namespace SongsOfConquestAccess.Scanner
         }
     }
 
-    internal static class ScannerResultLabels
+    public static class ScannerResultLabels
     {
         public static string ZoneOfControl(int tileCount, string name)
         {

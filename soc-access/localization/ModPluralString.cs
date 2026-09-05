@@ -1,6 +1,6 @@
 namespace SongsOfConquestAccess.Localization
 {
-    internal readonly struct ModPluralString
+    public readonly struct ModPluralString
     {
         public ModPluralString(string key, params string[] forms)
         {

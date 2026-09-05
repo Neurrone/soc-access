@@ -16,7 +16,7 @@ using UnityEngine;
 
 namespace SongsOfConquestAccess.Adapters
 {
-    internal sealed class PurchaseWielderMenuAdapter
+    public sealed class PurchaseWielderMenuAdapter
     {
         private static readonly FieldInfo AsyncField = AccessTools.Field(typeof(PurchaseWielderMenu), "_async");
         private static readonly FieldInfo WielderListTitleField = AccessTools.Field(typeof(PurchaseWielderMenu), "_wielderListTitle");
@@ -576,7 +576,7 @@ namespace SongsOfConquestAccess.Adapters
             return owner != null && field != null ? field.GetValue(owner) as T : null;
         }
 
-        internal sealed class EntryItem
+        public sealed class EntryItem
         {
             private readonly PurchaseWielderMenuAdapter _adapter;
             private readonly PurchaseWielderEntry _entry;

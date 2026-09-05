@@ -4,7 +4,7 @@ using SongsOfConquestAccess.Localization;
 
 namespace SongsOfConquestAccess.Speech.Spatial
 {
-    internal sealed class AnnouncementGroupDefinition
+    public sealed class AnnouncementGroupDefinition
     {
         private readonly Dictionary<string, AnnouncementElementDefinition> _elementsByKey;
 

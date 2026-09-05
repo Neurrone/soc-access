@@ -6,7 +6,7 @@ using SongsOfConquestAccess.UI;
 
 namespace SongsOfConquestAccess.Screens
 {
-    internal sealed class AudioGlossaryScreen : Screen
+    public sealed class AudioGlossaryScreen : Screen
     {
         private const string ScreenId = "audio-glossary";
 

@@ -4,7 +4,7 @@ using System.Text;
 
 namespace SongsOfConquestAccess.Bookmarks
 {
-    internal sealed class AdventureBookmarkGameIdentity
+    public sealed class AdventureBookmarkGameIdentity
     {
         private const int FileHashLength = 16;
 

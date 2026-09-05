@@ -9,7 +9,7 @@ using SongsOfConquestAccess.Adapters;
 namespace SongsOfConquestAccess
 {
     [HarmonyPatch]
-    internal static class HostileJoinMenuPatches
+    public static class HostileJoinMenuPatches
     {
         [HarmonyPatch(typeof(HostileJoinMenu), "ShowMenu", new[]
         {

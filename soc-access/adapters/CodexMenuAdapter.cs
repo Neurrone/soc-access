@@ -17,7 +17,7 @@ using UnityEngine.UI;
 
 namespace SongsOfConquestAccess.Adapters
 {
-    internal sealed class CodexMenuAdapter
+    public sealed class CodexMenuAdapter
     {
         private static readonly FieldInfo SettingsField = AccessTools.Field(typeof(CodexMenu), "_settings");
         private static readonly FieldInfo LocalizationField = AccessTools.Field(typeof(CodexMenu), "_localizationHandler");
@@ -803,7 +803,7 @@ namespace SongsOfConquestAccess.Adapters
             return owner != null && field != null ? field.GetValue(owner) as T : null;
         }
 
-        internal sealed class TabItem
+        public sealed class TabItem
         {
             public TabItem(string label, int index, bool isActive)
             {
@@ -817,7 +817,7 @@ namespace SongsOfConquestAccess.Adapters
             public bool IsActive { get; private set; }
         }
 
-        internal sealed class ArticleGroupItem
+        public sealed class ArticleGroupItem
         {
             public ArticleGroupItem(string label, int index, IReadOnlyList<ArticleItem> articles, bool containsSelectedArticle)
             {
@@ -833,7 +833,7 @@ namespace SongsOfConquestAccess.Adapters
             public bool ContainsSelectedArticle { get; private set; }
         }
 
-        internal sealed class ArticleItem
+        public sealed class ArticleItem
         {
             public ArticleItem(string label, CodexContentButton button, bool isSelected, int categoryIndex, int articleIndex)
             {
@@ -851,14 +851,14 @@ namespace SongsOfConquestAccess.Adapters
             public int ArticleIndex { get; private set; }
         }
 
-        internal enum CodexContentItemKind
+        public enum CodexContentItemKind
         {
             Heading,
             Text,
             Essence
         }
 
-        internal sealed class EssenceAmount
+        public sealed class EssenceAmount
         {
             public EssenceAmount(string text)
             {
@@ -868,7 +868,7 @@ namespace SongsOfConquestAccess.Adapters
             public string Text { get; private set; }
         }
 
-        internal sealed class CodexContentItem
+        public sealed class CodexContentItem
         {
             public CodexContentItem(CodexContentItemKind kind, string text, RectTransform sourceTransform = null)
             {

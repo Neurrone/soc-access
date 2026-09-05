@@ -6,7 +6,7 @@ using BepInEx.Logging;
 
 namespace SongsOfConquestAccess.Speech
 {
-    internal sealed class SpeechService : IDisposable
+    public sealed class SpeechService : IDisposable
     {
         private readonly ManualLogSource _logger;
         private IntPtr _context = IntPtr.Zero;

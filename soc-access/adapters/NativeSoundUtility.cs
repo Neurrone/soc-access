@@ -2,7 +2,7 @@ using Lavapotion.Sound;
 
 namespace SongsOfConquestAccess.Adapters
 {
-    internal static class NativeSoundUtility
+    public static class NativeSoundUtility
     {
         public static void PostEvent(string eventKey)
         {

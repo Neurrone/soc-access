@@ -4,7 +4,7 @@ using System.Text;
 
 namespace SongsOfConquestAccess.Speech
 {
-    internal static class PrismNative
+    public static class PrismNative
     {
         private const string Dll = "prism";
         public const ulong BackendBoyPcReader = 0x285aba1c16f3300fUL;

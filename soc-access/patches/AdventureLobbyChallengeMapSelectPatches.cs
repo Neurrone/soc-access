@@ -7,7 +7,7 @@ using UnityEngine;
 namespace SongsOfConquestAccess
 {
     [HarmonyPatch]
-    internal static class AdventureLobbyChallengeMapSelectPatches
+    public static class AdventureLobbyChallengeMapSelectPatches
     {
         [HarmonyPatch(typeof(ChallengeMapsMenu), "Show")]
         [HarmonyPostfix]

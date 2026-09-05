@@ -9,7 +9,7 @@ using SongsOfConquestAccess.Adapters;
 namespace SongsOfConquestAccess
 {
     [HarmonyPatch]
-    internal static class PopupMenuPatches
+    public static class PopupMenuPatches
     {
         private const int MaxReadyWaitFrames = 30;
 

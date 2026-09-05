@@ -5,7 +5,7 @@ using SongsOfConquest.Client.Menu.Online;
 namespace SongsOfConquestAccess
 {
     [HarmonyPatch]
-    internal static class OnlineGameListPatches
+    public static class OnlineGameListPatches
     {
         [HarmonyPatch(typeof(GameListMenu), "Initialize")]
         [HarmonyPostfix]

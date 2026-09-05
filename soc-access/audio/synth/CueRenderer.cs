@@ -7,7 +7,7 @@ namespace SongsOfConquestAccess.Audio.Synth
     /// deterministic: the same spec always produces an identical buffer, because noise
     /// segments seed their RNG from a stable hash of the segment's own parameters.
     /// </summary>
-    internal static class CueRenderer
+    public static class CueRenderer
     {
         public static float[] Render(CueSpec spec)
         {

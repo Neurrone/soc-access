@@ -38,20 +38,20 @@ using Zenject;
 
 namespace SongsOfConquestAccess.Adapters
 {
-    internal enum CombatTargetingMode
+    public enum CombatTargetingMode
     {
         None,
         Spell,
         Ability
     }
 
-    internal enum CombatTroopSideFilter
+    public enum CombatTroopSideFilter
     {
         CurrentPlayer,
         Enemy
     }
 
-    internal sealed class CombatAdapter
+    public sealed class CombatAdapter
     {
         private static readonly PropertyInfo InstallerContainerProperty =
             AccessTools.Property(typeof(BattleSceneInstaller), "Container");
@@ -264,7 +264,7 @@ namespace SongsOfConquestAccess.Adapters
             }
         }
 
-        internal static void CaptureAttackPreviewAdditionalText(BattleAttackPreview preview, string text)
+        public static void CaptureAttackPreviewAdditionalText(BattleAttackPreview preview, string text)
         {
             if (preview == null)
             {
@@ -281,7 +281,7 @@ namespace SongsOfConquestAccess.Adapters
             AttackPreviewAdditionalTexts[preview] = text;
         }
 
-        internal static void ClearAttackPreviewAdditionalText(BattleAttackPreview preview)
+        public static void ClearAttackPreviewAdditionalText(BattleAttackPreview preview)
         {
             if (preview != null)
             {
@@ -2002,7 +2002,7 @@ namespace SongsOfConquestAccess.Adapters
             }
         }
 
-        internal void AddEnemyInfluenceForSpeech(Vector2Int point, IBattleTroopState occupyingTroop, List<string> parts)
+        public void AddEnemyInfluenceForSpeech(Vector2Int point, IBattleTroopState occupyingTroop, List<string> parts)
         {
             string influence = DescribeEnemyInfluenceForSpeech(point, occupyingTroop);
             if (!string.IsNullOrWhiteSpace(influence))
@@ -2011,12 +2011,12 @@ namespace SongsOfConquestAccess.Adapters
             }
         }
 
-        internal string DescribeEnemyInfluenceForSpeech(Vector2Int point, IBattleTroopState occupyingTroop)
+        public string DescribeEnemyInfluenceForSpeech(Vector2Int point, IBattleTroopState occupyingTroop)
         {
             return CombatInfluenceFormatter.Format(BuildEnemyInfluenceSources(point, occupyingTroop));
         }
 
-        internal bool IsThreatenedByEnemy(Vector2Int point, IBattleTroopState occupyingTroop)
+        public bool IsThreatenedByEnemy(Vector2Int point, IBattleTroopState occupyingTroop)
         {
             return BuildEnemyInfluenceSources(point, occupyingTroop).Count > 0;
         }
@@ -2293,17 +2293,17 @@ namespace SongsOfConquestAccess.Adapters
             return IsDebris(entity) ? ModText.Get(ModStrings.Spatial.Debris) : string.Empty;
         }
 
-        internal string DescribeTroopForSpeech(IBattleTroopState troop)
+        public string DescribeTroopForSpeech(IBattleTroopState troop)
         {
             return FormatTroopGridLabel(troop);
         }
 
-        internal bool PerformsBeamAttacks(IBattleTroopState troop)
+        public bool PerformsBeamAttacks(IBattleTroopState troop)
         {
             return troop != null && troop.PerformsBeamAttacks();
         }
 
-        internal BeamFacing? GetBeamFacing(IBattleTroopState troop)
+        public BeamFacing? GetBeamFacing(IBattleTroopState troop)
         {
             if (!PerformsBeamAttacks(troop) || _battleViewManager == null)
             {
@@ -2319,7 +2319,7 @@ namespace SongsOfConquestAccess.Adapters
             return view.IsLookingRight ? BeamFacing.Right : BeamFacing.Left;
         }
 
-        internal BeamFacing? GetTeamSideBeamDirection(IBattleTroopState troop)
+        public BeamFacing? GetTeamSideBeamDirection(IBattleTroopState troop)
         {
             if (!PerformsBeamAttacks(troop) || _facade == null || _facade.Teams == null)
             {
@@ -2329,7 +2329,7 @@ namespace SongsOfConquestAccess.Adapters
             return troop.TeamId == _facade.Teams.AttackingTeam.Id ? BeamFacing.Right : BeamFacing.Left;
         }
 
-        internal string DescribeEntityForSpeech(IMapEntity entity)
+        public string DescribeEntityForSpeech(IMapEntity entity)
         {
             string name = GetMapEntityName(entity);
             if (string.IsNullOrWhiteSpace(name))
@@ -2682,41 +2682,41 @@ namespace SongsOfConquestAccess.Adapters
             return label;
         }
 
-        internal bool IsActingTroop(IBattleTroopState troop)
+        public bool IsActingTroop(IBattleTroopState troop)
         {
             IBattleTroopState current = GetCurrentTroop();
             return troop != null && current != null && troop.Id == current.Id;
         }
 
-        internal bool IsEnemyTroop(IBattleTroopState troop)
+        public bool IsEnemyTroop(IBattleTroopState troop)
         {
             int localTeamId = GetLocalTeamId();
             return troop != null && localTeamId >= 0 && troop.TeamId != localTeamId;
         }
 
-        internal int GetTroopStackSize(IBattleTroopState troop)
+        public int GetTroopStackSize(IBattleTroopState troop)
         {
             return troop != null ? troop.Stats.Size : 0;
         }
 
-        internal string GetTroopNameForSpeech(IBattleTroopState troop)
+        public string GetTroopNameForSpeech(IBattleTroopState troop)
         {
             return CreateTroopRef(troop).Name;
         }
 
-        internal string GetTroopHealthForSpeech(IBattleTroopState troop)
+        public string GetTroopHealthForSpeech(IBattleTroopState troop)
         {
             return troop != null
                 ? ModText.Get(ModStrings.Spatial.Health, troop.CurrentHealth, troop.Stats.MaxHealth.GetValue())
                 : string.Empty;
         }
 
-        internal string GetEntityNameForSpeech(IMapEntity entity)
+        public string GetEntityNameForSpeech(IMapEntity entity)
         {
             return GetMapEntityName(entity);
         }
 
-        internal string GetEntityHealthForSpeech(IMapEntity entity)
+        public string GetEntityHealthForSpeech(IMapEntity entity)
         {
             if (entity == null)
             {
@@ -3280,7 +3280,7 @@ namespace SongsOfConquestAccess.Adapters
             return new Vector2Int(point.x, point.y);
         }
 
-        internal static Vector2Int[] GetNeighbors(Vector2Int point)
+        public static Vector2Int[] GetNeighbors(Vector2Int point)
         {
             if ((point.y & 1) == 0)
             {
@@ -3318,7 +3318,7 @@ namespace SongsOfConquestAccess.Adapters
 
     }
 
-    internal sealed class CombatSnapshot
+    public sealed class CombatSnapshot
     {
         private readonly CombatAdapter _adapter;
 
@@ -3341,7 +3341,7 @@ namespace SongsOfConquestAccess.Adapters
         }
     }
 
-    internal sealed class CombatTile
+    public sealed class CombatTile
     {
         public CombatTile(Vector2Int point)
         {
@@ -3377,7 +3377,7 @@ namespace SongsOfConquestAccess.Adapters
         public string DecorativeFeature { get; set; }
     }
 
-    internal enum CombatRangeIndicator
+    public enum CombatRangeIndicator
     {
         Source,
         Movement,
@@ -3387,7 +3387,7 @@ namespace SongsOfConquestAccess.Adapters
         ZoneOfControl
     }
 
-    internal sealed class CombatInspectContext
+    public sealed class CombatInspectContext
     {
         private readonly Dictionary<Vector2Int, HashSet<CombatRangeIndicator>> _indicators =
             new Dictionary<Vector2Int, HashSet<CombatRangeIndicator>>();
@@ -3609,7 +3609,7 @@ namespace SongsOfConquestAccess.Adapters
         }
     }
 
-    internal enum CombatInspectMode
+    public enum CombatInspectMode
     {
         Stack,
         Path,

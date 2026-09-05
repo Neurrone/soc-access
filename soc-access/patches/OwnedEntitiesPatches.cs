@@ -9,7 +9,7 @@ using UnityEngine;
 namespace SongsOfConquestAccess
 {
     [HarmonyPatch]
-    internal static class OwnedEntitiesPatches
+    public static class OwnedEntitiesPatches
     {
         private static readonly FieldInfo CategoryParentField =
             AccessTools.Field(typeof(KingdomEntityOverviewCategoryEntry), "_parent");

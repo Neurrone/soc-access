@@ -7,7 +7,7 @@ using UnityEngine;
 
 namespace SongsOfConquestAccess.Screens
 {
-    internal sealed class MoveTroopPopupScreen : Screen
+    public sealed class MoveTroopPopupScreen : Screen
     {
         private readonly MoveTroopPopupAdapter _adapter;
 

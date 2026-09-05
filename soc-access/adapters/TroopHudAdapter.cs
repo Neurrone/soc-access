@@ -17,7 +17,7 @@ using UnityEngine;
 
 namespace SongsOfConquestAccess.Adapters
 {
-    internal sealed class TroopHudAdapter
+    public sealed class TroopHudAdapter
     {
         private static readonly FieldInfo TroopHudEntriesField = AccessTools.Field(typeof(TroopHUD), "_troops");
         private static readonly FieldInfo MovableTroopField = AccessTools.Field(typeof(TroopHUD), "_movableHudTroop");
@@ -285,7 +285,7 @@ namespace SongsOfConquestAccess.Adapters
             return false;
         }
 
-        internal sealed class SlotItem
+        public sealed class SlotItem
         {
             private readonly TroopHudAdapter _adapter;
 

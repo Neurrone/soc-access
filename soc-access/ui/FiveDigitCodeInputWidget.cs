@@ -5,7 +5,7 @@ using SongsOfConquestAccess.Speech;
 
 namespace SongsOfConquestAccess.UI
 {
-    internal sealed class FiveDigitCodeInputWidget : Widget
+    public sealed class FiveDigitCodeInputWidget : Widget
     {
         private readonly string _label;
         private readonly Func<string> _getValue;

@@ -7,7 +7,7 @@ using UnityEngine;
 
 namespace SongsOfConquestAccess.Screens
 {
-    internal sealed class PreBattleMenuScreen : Screen
+    public sealed class PreBattleMenuScreen : Screen
     {
         private readonly PreBattleMenuAdapter _adapter;
         private readonly TroopPlacementHexGrid _hexGrid;

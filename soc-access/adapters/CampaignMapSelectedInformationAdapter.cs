@@ -13,7 +13,7 @@ using UnityEngine.EventSystems;
 
 namespace SongsOfConquestAccess.Adapters
 {
-    internal sealed class CampaignMapSelectedInformationAdapter
+    public sealed class CampaignMapSelectedInformationAdapter
     {
         private const string MissionCounterLocalizationKey = "Campaign/MapSelect/InformationView/MissionCounter";
 

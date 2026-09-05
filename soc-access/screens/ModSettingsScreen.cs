@@ -8,7 +8,7 @@ using SongsOfConquestAccess.UI;
 
 namespace SongsOfConquestAccess.Screens
 {
-    internal sealed class ModSettingsScreen : Screen
+    public sealed class ModSettingsScreen : Screen
     {
         private const string TabChangedSoundKey = "Common_DefaultClick";
 

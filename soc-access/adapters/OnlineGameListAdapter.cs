@@ -17,7 +17,7 @@ using UnityEngine.UI;
 
 namespace SongsOfConquestAccess.Adapters
 {
-    internal sealed class OnlineGameListAdapter
+    public sealed class OnlineGameListAdapter
     {
         private static readonly AccessTools.FieldRef<GameListMenu, GameListMenu.Settings> SettingsRef =
             AccessTools.FieldRefAccess<GameListMenu, GameListMenu.Settings>("_settings");
@@ -369,7 +369,7 @@ namespace SongsOfConquestAccess.Adapters
             return gameObject != null && gameObject.scene.IsValid() && gameObject.scene.isLoaded;
         }
 
-        internal sealed class DropdownOption
+        public sealed class DropdownOption
         {
             private readonly OnlineGameListAdapter _adapter;
 
@@ -393,7 +393,7 @@ namespace SongsOfConquestAccess.Adapters
             }
         }
 
-        internal sealed class GameRow
+        public sealed class GameRow
         {
             private static readonly AccessTools.FieldRef<GameListEntry, UITextMesh> NameTextRef =
                 AccessTools.FieldRefAccess<GameListEntry, UITextMesh>("_nameText");

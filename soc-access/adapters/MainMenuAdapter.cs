@@ -9,7 +9,7 @@ using UnityEngine;
 
 namespace SongsOfConquestAccess.Adapters
 {
-    internal sealed class MainMenuAdapter
+    public sealed class MainMenuAdapter
     {
         private static readonly AccessTools.FieldRef<MainMenu, GameObject> LeftButtonContainerRef =
             AccessTools.FieldRefAccess<MainMenu, GameObject>("_leftButtonContainer");
@@ -227,7 +227,7 @@ namespace SongsOfConquestAccess.Adapters
             }
         }
 
-        internal sealed class NativeFoldoutAdapter
+        public sealed class NativeFoldoutAdapter
         {
             private readonly FoldoutUIButton _foldout;
             private readonly List<IMenuButtonAdapter> _items;

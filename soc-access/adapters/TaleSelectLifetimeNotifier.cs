@@ -3,7 +3,7 @@ using UnityEngine;
 
 namespace SongsOfConquestAccess.Adapters
 {
-    internal sealed class TaleSelectLifetimeNotifier : MonoBehaviour
+    public sealed class TaleSelectLifetimeNotifier : MonoBehaviour
     {
         private TaleButtonLayoutCoordinator _coordinator;
         private static readonly List<TaleSelectLifetimeNotifier> Instances =
@@ -11,7 +11,7 @@ namespace SongsOfConquestAccess.Adapters
 
         // Components live on game objects, so a reload must take them down itself or the old
         // assembly's copies stay attached and keep firing into a mod that no longer exists.
-        internal static void DetachAll()
+        public static void DetachAll()
         {
             foreach (TaleSelectLifetimeNotifier notifier in Instances.ToArray())
             {

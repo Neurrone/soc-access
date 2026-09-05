@@ -1,6 +1,6 @@
 namespace SongsOfConquestAccess.Scanner
 {
-    internal enum ScannerDirection
+    public enum ScannerDirection
     {
         North,
         South,

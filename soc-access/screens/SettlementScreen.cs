@@ -12,7 +12,7 @@ using UnityEngine;
 
 namespace SongsOfConquestAccess.Screens
 {
-    internal sealed class SettlementScreen : Screen
+    public sealed class SettlementScreen : Screen
     {
         private const int ArmyExchangeGridIndex = 10;
 

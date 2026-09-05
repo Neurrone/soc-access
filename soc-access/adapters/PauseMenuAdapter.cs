@@ -9,7 +9,7 @@ using UnityEngine;
 
 namespace SongsOfConquestAccess.Adapters
 {
-    internal sealed class PauseMenuAdapter
+    public sealed class PauseMenuAdapter
     {
         private static readonly AccessTools.FieldRef<PauseMenu, PauseMenu.Settings> SettingsRef =
             AccessTools.FieldRefAccess<PauseMenu, PauseMenu.Settings>("_settings");
@@ -130,7 +130,7 @@ namespace SongsOfConquestAccess.Adapters
             return transform == null || transform.Active;
         }
 
-        internal sealed class Item
+        public sealed class Item
         {
             private readonly UIButton _button;
 

@@ -25,7 +25,7 @@ using UnityEngine;
 
 namespace SongsOfConquestAccess.Adapters
 {
-    internal static class CombatEventNarrator
+    public static class CombatEventNarrator
     {
         private const int BacteriaDiagnosticLogLimit = 200;
         private const int MapEntityCreationNarrationDiagnosticLogLimit = 100;
@@ -116,12 +116,12 @@ namespace SongsOfConquestAccess.Adapters
             }
         }
 
-        internal static bool ShouldBufferForBacteriaSummary(ICommandResponse response)
+        public static bool ShouldBufferForBacteriaSummary(ICommandResponse response)
         {
             return response != null && ShouldBufferResponseTypeForBacteriaSummary(response.GetType());
         }
 
-        internal static bool ShouldBufferResponseTypeForBacteriaSummary(Type responseType)
+        public static bool ShouldBufferResponseTypeForBacteriaSummary(Type responseType)
         {
             return responseType == typeof(AddBattleBacteriaCommand.Response)
                 || responseType == typeof(RemoveBattleBacteriaCommand.Response)
@@ -936,7 +936,7 @@ namespace SongsOfConquestAccess.Adapters
             return new ActorRef(troopRef, troopRef.TroopId == currentTroopId);
         }
 
-        internal static AbilityUsedEvent CreateLeapAbilityUsedEvent(
+        public static AbilityUsedEvent CreateLeapAbilityUsedEvent(
             ActorRef actor,
             AbilityRef ability,
             Vector2Int originalPosition,

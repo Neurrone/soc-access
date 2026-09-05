@@ -60,7 +60,7 @@ namespace SongsOfConquestAccess.Dev
     /// the mod already uses at draw time. Every per-node read is guarded: a getter that throws costs
     /// that one field, not the dump.
     /// </summary>
-    internal static class UnityDump
+    public static class UnityDump
     {
         public const int DefaultDepth = 6;
 
@@ -88,7 +88,7 @@ namespace SongsOfConquestAccess.Dev
 
         /// <summary>A finished answer and the status it deserves, so a <c>path=</c> that matched
         /// nothing can be a 404 in whichever format the caller asked for.</summary>
-        internal sealed class Answer
+        public sealed class Answer
         {
             public int Status = 200;
             public string Body;

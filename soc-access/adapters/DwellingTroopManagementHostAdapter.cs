@@ -5,7 +5,7 @@ using SongsOfConquest.Common.Gamestate.Facade;
 
 namespace SongsOfConquestAccess.Adapters
 {
-    internal sealed class DwellingTroopManagementHostAdapter : ITroopManagementHostAdapter
+    public sealed class DwellingTroopManagementHostAdapter : ITroopManagementHostAdapter
     {
         private readonly DwellingInteractionMenuAdapter _adapter;
 

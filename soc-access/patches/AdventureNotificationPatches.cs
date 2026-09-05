@@ -12,7 +12,7 @@ using UnityEngine;
 namespace SongsOfConquestAccess
 {
     [HarmonyPatch]
-    internal static class AdventureNotificationPatches
+    public static class AdventureNotificationPatches
     {
         private static readonly FieldInfo NotificationHudEntrySettingsField =
             AccessTools.Field(typeof(NotificationHUDEntry), "_settings");

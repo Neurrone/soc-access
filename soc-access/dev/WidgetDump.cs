@@ -19,7 +19,7 @@ namespace SongsOfConquestAccess.Dev
     ///
     /// Main thread only: all of it reads live widget state.
     /// </summary>
-    internal static class WidgetDump
+    public static class WidgetDump
     {
         /// <summary>Widgets that present many positions through one object - a map, a hex grid, an
         /// inventory. There is nothing below them to walk, so each gets one placeholder line naming

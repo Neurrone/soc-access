@@ -5,7 +5,7 @@ using SongsOfConquestAccess.Localization;
 
 namespace SongsOfConquestAccess.UI
 {
-    internal class MenuItemWidget : Widget
+    public class MenuItemWidget : Widget
     {
         private readonly Func<string> _getLabel;
         private readonly Func<string> _getStatus;

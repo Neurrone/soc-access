@@ -16,7 +16,7 @@ using UnityEngine;
 
 namespace SongsOfConquestAccess.Adapters
 {
-    internal static class StoryCameraFocusResolver
+    public static class StoryCameraFocusResolver
     {
         public static StoryCameraFocusTarget ResolvePointTarget(
             IClientAdventureFacade facade,

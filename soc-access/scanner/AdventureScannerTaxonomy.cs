@@ -2,7 +2,7 @@ using SongsOfConquestAccess.Localization;
 
 namespace SongsOfConquestAccess.Scanner
 {
-    internal static class AdventureScannerTaxonomy
+    public static class AdventureScannerTaxonomy
     {
         public static readonly ScannerTaxonomy Instance = new ScannerTaxonomy(
             ScannerTaxonomyKeys.Adventure,

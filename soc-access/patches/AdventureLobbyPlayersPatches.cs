@@ -9,7 +9,7 @@ using UnityEngine;
 namespace SongsOfConquestAccess
 {
     [HarmonyPatch]
-    internal static class AdventureLobbyPlayersPatches
+    public static class AdventureLobbyPlayersPatches
     {
         [HarmonyPatch(typeof(LobbyMenu), "Show")]
         [HarmonyPostfix]

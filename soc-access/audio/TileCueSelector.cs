@@ -9,7 +9,7 @@ namespace SongsOfConquestAccess.Audio
     /// Pure mapping from a tile snapshot to the cue keys describing it, in play order.
     /// Relationship and acting-troop facts come from the caller's adapter so this stays testable.
     /// </summary>
-    internal static class TileCueSelector
+    public static class TileCueSelector
     {
         private static readonly TileCue[] NoCues = new TileCue[0];
 

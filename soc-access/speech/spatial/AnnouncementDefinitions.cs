@@ -2,7 +2,7 @@ using System.Collections.Generic;
 
 namespace SongsOfConquestAccess.Speech.Spatial
 {
-    internal static class AnnouncementDefinitions
+    public static class AnnouncementDefinitions
     {
         public static IReadOnlyList<AnnouncementGroupDefinition> All
         {

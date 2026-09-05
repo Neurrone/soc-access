@@ -18,9 +18,9 @@ namespace SongsOfConquestAccess.Adapters
     /// walk from <see cref="WielderPath"/>, the same path the game draws as a route
     /// preview, so the turn ordinals here agree with the ones on the preview markers.
     /// </summary>
-    internal sealed class WielderRoute
+    public sealed class WielderRoute
     {
-        internal WielderRoute(
+        public WielderRoute(
             IReadOnlyList<ScannerDirectionStep> steps,
             IReadOnlyList<WielderRouteTurn> turns,
             WielderRouteInteraction interaction = null)
@@ -97,7 +97,7 @@ namespace SongsOfConquestAccess.Adapters
             return true;
         }
 
-        internal static IReadOnlyList<ScannerDirectionStep> BuildSteps(PathNode[] path)
+        public static IReadOnlyList<ScannerDirectionStep> BuildSteps(PathNode[] path)
         {
             List<ScannerDirectionStep> steps = new List<ScannerDirectionStep>();
             for (int i = 1; i < path.Length; i++)
@@ -124,7 +124,7 @@ namespace SongsOfConquestAccess.Adapters
             return steps;
         }
 
-        internal static IReadOnlyList<WielderRouteTurn> BuildTurns(PathNode[] path, float reachableCost, float maxMovement)
+        public static IReadOnlyList<WielderRouteTurn> BuildTurns(PathNode[] path, float reachableCost, float maxMovement)
         {
             List<WielderRouteTurn> turns = new List<WielderRouteTurn>();
             if (path == null || path.Length < 2)
@@ -157,7 +157,7 @@ namespace SongsOfConquestAccess.Adapters
         /// the wielder arrives when there is enough left for it, and slips to the turn
         /// after when there is not.
         /// </summary>
-        internal static IReadOnlyList<WielderRouteTurn> AddInteractionCost(
+        public static IReadOnlyList<WielderRouteTurn> AddInteractionCost(
             IReadOnlyList<WielderRouteTurn> turns,
             float interactionCost,
             float movesLeft,
@@ -330,9 +330,9 @@ namespace SongsOfConquestAccess.Adapters
     /// What a wielder does when it reaches its destination: the game's own name for the
     /// action, the name of the thing acted on, and the movement the interaction costs.
     /// </summary>
-    internal sealed class WielderRouteInteraction
+    public sealed class WielderRouteInteraction
     {
-        internal WielderRouteInteraction(string actionText, string targetName, float cost)
+        public WielderRouteInteraction(string actionText, string targetName, float cost)
         {
             ActionText = actionText;
             TargetName = targetName;
@@ -355,7 +355,7 @@ namespace SongsOfConquestAccess.Adapters
         }
     }
 
-    internal struct WielderRouteTurn
+    public struct WielderRouteTurn
     {
         public WielderRouteTurn(int travelTurns, float cost)
         {

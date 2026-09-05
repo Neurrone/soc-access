@@ -11,7 +11,7 @@ using UnityEngine;
 
 namespace SongsOfConquestAccess.Adapters
 {
-    internal sealed class DwellingInteractionMenuAdapter
+    public sealed class DwellingInteractionMenuAdapter
     {
         private static readonly FieldInfo WielderInteractHeaderField = AccessTools.Field(typeof(DwellingInteractionMenu), "_wielderInteractHeader");
         private static readonly FieldInfo BuildingNameField = AccessTools.Field(typeof(DwellingInteractionMenu), "_buildingName");

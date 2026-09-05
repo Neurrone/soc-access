@@ -4,7 +4,7 @@ using SongsOfConquest.Common.Localization;
 
 namespace SongsOfConquestAccess.Localization
 {
-    internal static class GameText
+    public static class GameText
     {
         public static string Get(
             string key,
@@ -80,7 +80,7 @@ namespace SongsOfConquestAccess.Localization
             }
         }
 
-        internal static string FormatFallback(string fallback, params object[] args)
+        public static string FormatFallback(string fallback, params object[] args)
         {
             if (string.IsNullOrEmpty(fallback))
             {

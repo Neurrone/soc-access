@@ -3,14 +3,14 @@ using SongsOfConquest.Client.UI;
 
 namespace SongsOfConquestAccess.Adapters
 {
-    internal enum DialogAction
+    public enum DialogAction
     {
         Body = 0,
         Positive = 1,
         Negative = 2
     }
 
-    internal interface IMessageDialogAdapter
+    public interface IMessageDialogAdapter
     {
         object SourceKey { get; }
 
@@ -37,7 +37,7 @@ namespace SongsOfConquestAccess.Adapters
         bool ActivateAction(DialogAction action);
     }
 
-    internal interface IInputDialogAdapter
+    public interface IInputDialogAdapter
     {
         bool HasInputField { get; }
 

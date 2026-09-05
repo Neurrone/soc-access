@@ -18,7 +18,7 @@ using UnityEngine;
 
 namespace SongsOfConquestAccess.Adapters
 {
-    internal sealed class UpgradeTroopsSubMenuAdapter
+    public sealed class UpgradeTroopsSubMenuAdapter
     {
         private static readonly FieldInfo EntriesField = AccessTools.Field(typeof(UpgradeTroopsSubMenu), "_entries");
         private static readonly FieldInfo NoUpgradableTroopsField = AccessTools.Field(typeof(UpgradeTroopsSubMenu), "_noUpgradableTroops");
@@ -111,7 +111,7 @@ namespace SongsOfConquestAccess.Adapters
             return string.Join(". ", parts.ToArray());
         }
 
-        internal sealed class UpgradeEntry
+        public sealed class UpgradeEntry
         {
             private static readonly FieldInfo CurrentTextField = AccessTools.Field(typeof(UpgradeTroopsEntry), "_currentText");
             private static readonly FieldInfo CurrentAmountTextField = AccessTools.Field(typeof(UpgradeTroopsEntry), "_currentTroopAmountText");

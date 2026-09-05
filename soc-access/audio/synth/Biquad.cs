@@ -10,7 +10,7 @@ namespace SongsOfConquestAccess.Audio.Synth
     /// sequentially over a buffer from a zeroed state, never sample it pointwise. Coefficients are
     /// computed in double; the only factory here is the RBJ constant-0 dB-peak band-pass.
     /// </summary>
-    internal sealed class Biquad
+    public sealed class Biquad
     {
         private double _b0;
         private double _b1;

@@ -2,7 +2,7 @@ using System.Text.RegularExpressions;
 
 namespace SongsOfConquestAccess.Speech
 {
-    internal static class SpeechTextSanitizer
+    public static class SpeechTextSanitizer
     {
         // Native tooltip/detail strings can include Unity rich-text tags, for example
         // "<color=#...><b>+10%</b></color> Melee Resistance".

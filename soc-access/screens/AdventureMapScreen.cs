@@ -27,7 +27,7 @@ using Zenject;
 
 namespace SongsOfConquestAccess.Screens
 {
-    internal sealed class AdventureMapScreen : Screen
+    public sealed class AdventureMapScreen : Screen
     {
         private static readonly PropertyInfo InstallerContainerProperty =
             AccessTools.Property(typeof(AdventureViewInstaller), "Container");

@@ -4,7 +4,7 @@ using SongsOfConquest.Client.Menu.Popup;
 namespace SongsOfConquestAccess.Patches
 {
     [HarmonyPatch]
-    internal static class QuitToDesktopPopupPatches
+    public static class QuitToDesktopPopupPatches
     {
         [HarmonyPatch(typeof(QuitToDesktopPopup), "OnOpened")]
         [HarmonyPostfix]

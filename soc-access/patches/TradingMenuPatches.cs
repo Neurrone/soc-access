@@ -6,7 +6,7 @@ using SongsOfConquestAccess.Adapters;
 namespace SongsOfConquestAccess
 {
     [HarmonyPatch]
-    internal static class TradingMenuPatches
+    public static class TradingMenuPatches
     {
         [HarmonyPatch(typeof(TradingMenu), "Open", new[] { typeof(TradeInitiatedPayload) })]
         [HarmonyPostfix]

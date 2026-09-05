@@ -21,7 +21,7 @@ using UnityEngine.UI;
 
 namespace SongsOfConquestAccess.Adapters
 {
-    internal sealed class TradingMenuAdapter
+    public sealed class TradingMenuAdapter
     {
         private static readonly FieldInfo SettingsField = AccessTools.Field(typeof(TradingMenu), "_settings");
         private static readonly FieldInfo FacadeField = AccessTools.Field(typeof(TradingMenu), "_facade");
@@ -740,7 +740,7 @@ namespace SongsOfConquestAccess.Adapters
             return value is T ? (T)value : fallback;
         }
 
-        internal sealed class LabeledItem
+        public sealed class LabeledItem
         {
             public LabeledItem(string id, string label, string status = null, Action onFocus = null, Func<bool> activate = null, Tooltip tooltip = null)
             {
@@ -760,7 +760,7 @@ namespace SongsOfConquestAccess.Adapters
             public Tooltip Tooltip { get; private set; }
         }
 
-        internal sealed class ModifierCategory
+        public sealed class ModifierCategory
         {
             public ModifierCategory(string id, string label, int index, Tooltip tooltip = null)
             {

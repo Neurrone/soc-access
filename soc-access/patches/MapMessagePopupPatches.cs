@@ -4,7 +4,7 @@ using SongsOfConquest.Client.Adventure;
 namespace SongsOfConquestAccess.Patches
 {
     [HarmonyPatch]
-    internal static class MapMessagePopupPatches
+    public static class MapMessagePopupPatches
     {
         [HarmonyPatch(typeof(MapMessagePopup), "Show")]
         [HarmonyPostfix]

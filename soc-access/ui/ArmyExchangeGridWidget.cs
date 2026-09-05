@@ -9,7 +9,7 @@ namespace SongsOfConquestAccess.UI
 {
     // Most widgets are generic and can be used in other games too
     // However, this is only going to be applicable to Songs of Conquest, hence the imports of the game types
-    internal sealed class ArmyExchangeGridWidget : Widget
+    public sealed class ArmyExchangeGridWidget : Widget
     {
         private readonly List<SlotWidget> _wielderSlots = new List<SlotWidget>();
         private readonly List<SlotWidget> _joiningSlots = new List<SlotWidget>();
@@ -466,7 +466,7 @@ namespace SongsOfConquestAccess.UI
             SpeechPipeline.Output(new SpeechRequest(text, interrupt: false));
         }
 
-        internal sealed class FocusState
+        public sealed class FocusState
         {
             private readonly int[] _rememberedRowsByColumn;
 
@@ -490,7 +490,7 @@ namespace SongsOfConquestAccess.UI
             }
         }
 
-        internal sealed class SlotWidget : Widget
+        public sealed class SlotWidget : Widget
         {
             private readonly ArmyExchangeGridWidget _grid;
             private readonly TroopHudAdapter.SlotItem _slot;

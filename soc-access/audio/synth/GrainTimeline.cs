@@ -10,7 +10,7 @@ namespace SongsOfConquestAccess.Audio.Synth
     /// <summary>
     /// Places grains on a stereo timeline and mixes them down to an interleaved buffer.
     /// </summary>
-    internal sealed class GrainTimeline
+    public sealed class GrainTimeline
     {
         public const int SampleRate = 44100;
 

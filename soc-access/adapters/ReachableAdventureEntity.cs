@@ -2,7 +2,7 @@ using UnityEngine;
 
 namespace SongsOfConquestAccess.Adapters
 {
-    internal sealed class ReachableAdventureEntity
+    public sealed class ReachableAdventureEntity
     {
         public ReachableAdventureEntity(int id, string name, Vector2Int position, float distance)
         {

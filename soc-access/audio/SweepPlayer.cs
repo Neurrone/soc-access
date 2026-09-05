@@ -5,7 +5,7 @@ using UnityEngine;
 namespace SongsOfConquestAccess.Audio
 {
     /// <summary>One entity found by the sweep: where it is and the cue stack that names it.</summary>
-    internal struct SweepEntry
+    public struct SweepEntry
     {
         public SweepEntry(Vector2Int position, IReadOnlyList<TileCue> cues)
         {
@@ -19,7 +19,7 @@ namespace SongsOfConquestAccess.Audio
     }
 
     /// <summary>A ping resolved to render offsets plus the time it fires, relative to the sweep start.</summary>
-    internal struct SweepStep
+    public struct SweepStep
     {
         public SweepStep(IReadOnlyList<TileCue> cues, float pan, float semitones, float gainScale, float timeSeconds)
         {
@@ -46,7 +46,7 @@ namespace SongsOfConquestAccess.Audio
     /// driven from a ticker rather than PlayDelayed because the voice pool steals pending
     /// delayed voices once a sweep gets busy.
     /// </summary>
-    internal static class SweepPlayer
+    public static class SweepPlayer
     {
         /// <summary>The sweep aims to finish inside this window, within the gap bounds.</summary>
         public const float TargetWindowSeconds = 0.75f;
@@ -105,7 +105,7 @@ namespace SongsOfConquestAccess.Audio
             }
         }
 
-        internal static List<SweepStep> BuildSchedule(
+        public static List<SweepStep> BuildSchedule(
             IReadOnlyList<SweepEntry> entries,
             Vector2Int origin,
             CueGridGeometry geometry)
@@ -118,7 +118,7 @@ namespace SongsOfConquestAccess.Audio
         /// base rhythm, pushed later whenever a gesture would still be sounding. Pure: no Unity
         /// time, no playback; <paramref name="durationSeconds"/> supplies each cue's length.
         /// </summary>
-        internal static List<SweepStep> BuildSchedule(
+        public static List<SweepStep> BuildSchedule(
             IReadOnlyList<SweepEntry> entries,
             Vector2Int origin,
             CueGridGeometry geometry,

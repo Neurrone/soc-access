@@ -6,7 +6,7 @@ using UnityEngine;
 
 namespace SongsOfConquestAccess.Screens
 {
-    internal sealed class AdventureLobbyIconDropdownScreen : Screen
+    public sealed class AdventureLobbyIconDropdownScreen : Screen
     {
         private readonly AdventureLobbyIconDropdownAdapter _adapter;
 
@@ -105,7 +105,7 @@ namespace SongsOfConquestAccess.Screens
             return activated;
         }
 
-        internal static AdventureLobbyIconDropdownAdapter FindActiveDropdown(IconDropdown targetDropdown)
+        public static AdventureLobbyIconDropdownAdapter FindActiveDropdown(IconDropdown targetDropdown)
         {
             IconDropdown[] dropdowns = Resources.FindObjectsOfTypeAll<IconDropdown>();
             for (int i = 0; i < dropdowns.Length; i++)

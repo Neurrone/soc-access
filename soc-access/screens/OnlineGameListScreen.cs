@@ -7,7 +7,7 @@ using SongsOfConquestAccess.UI;
 
 namespace SongsOfConquestAccess.Screens
 {
-    internal sealed class OnlineGameListScreen : Screen
+    public sealed class OnlineGameListScreen : Screen
     {
         private const string TableId = "online-games-table";
         private readonly OnlineGameListAdapter _adapter;

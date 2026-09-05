@@ -4,13 +4,13 @@ using System.Collections.Generic;
 
 namespace SongsOfConquestAccess
 {
-    internal sealed class CampaignMenuLifetimeNotifier : MonoBehaviour
+    public sealed class CampaignMenuLifetimeNotifier : MonoBehaviour
     {
         private CampaignMenu _campaignMenu;
         private static readonly List<CampaignMenuLifetimeNotifier> Instances =
             new List<CampaignMenuLifetimeNotifier>();
 
-        internal static void DetachAll()
+        public static void DetachAll()
         {
             foreach (CampaignMenuLifetimeNotifier notifier in Instances.ToArray())
             {

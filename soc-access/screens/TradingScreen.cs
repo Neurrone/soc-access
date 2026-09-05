@@ -14,7 +14,7 @@ using Zenject;
 
 namespace SongsOfConquestAccess.Screens
 {
-    internal sealed class TradingScreen : Screen
+    public sealed class TradingScreen : Screen
     {
         private const int InventoryGridIndex = 4;
         private const int ArmyExchangeGridIndex = 5;

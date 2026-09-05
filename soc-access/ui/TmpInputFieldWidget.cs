@@ -11,7 +11,7 @@ using UnityEngine.UI;
 
 namespace SongsOfConquestAccess.UI
 {
-    internal sealed class TmpInputFieldWidget : Widget
+    public sealed class TmpInputFieldWidget : Widget
     {
         private readonly string _label;
         private readonly Func<TMP_InputField> _getField;

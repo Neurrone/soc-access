@@ -10,7 +10,7 @@ using UnityEngine;
 
 namespace SongsOfConquestAccess.Screens
 {
-    internal sealed class AdventureLobbyPlayersScreen : Screen
+    public sealed class AdventureLobbyPlayersScreen : Screen
     {
         private const int PlayerSlotsIndex = 1;
 
@@ -341,7 +341,7 @@ namespace SongsOfConquestAccess.Screens
             }
         }
 
-        internal static AdventureLobbyPlayersAdapter FindActiveLobbyMenu(LobbyMenu targetMenu)
+        public static AdventureLobbyPlayersAdapter FindActiveLobbyMenu(LobbyMenu targetMenu)
         {
             LobbyMenu[] menus = Resources.FindObjectsOfTypeAll<LobbyMenu>();
             for (int i = 0; i < menus.Length; i++)

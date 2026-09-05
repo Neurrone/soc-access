@@ -9,7 +9,7 @@ using UnityEngine.EventSystems;
 
 namespace SongsOfConquestAccess.Adapters
 {
-    internal sealed class CampaignMapButtonAdapter
+    public sealed class CampaignMapButtonAdapter
     {
         private static readonly AccessTools.FieldRef<CampaignMapButton, UIButton> UnplayedButtonRef =
             AccessTools.FieldRefAccess<CampaignMapButton, UIButton>("_unplayedButton");

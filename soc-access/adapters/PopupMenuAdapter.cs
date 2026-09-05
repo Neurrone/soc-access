@@ -9,7 +9,7 @@ using UnityEngine.UI;
 
 namespace SongsOfConquestAccess.Adapters
 {
-    internal sealed class PopupMenuAdapter : IMessageDialogAdapter, IInputDialogAdapter
+    public sealed class PopupMenuAdapter : IMessageDialogAdapter, IInputDialogAdapter
     {
         private readonly object _sourceKey;
         private readonly IUITransform _containerTransform;

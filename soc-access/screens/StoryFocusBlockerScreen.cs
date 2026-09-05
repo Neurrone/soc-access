@@ -6,7 +6,7 @@ namespace SongsOfConquestAccess.Screens
 {
     // Holds accessibility focus between story entries so the adventure map
     // below does not regain focus and speak a tile before the next story screen.
-    internal sealed class StoryFocusBlockerScreen : Screen
+    public sealed class StoryFocusBlockerScreen : Screen
     {
         private readonly Func<bool> _isPresent;
 

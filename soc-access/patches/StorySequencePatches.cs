@@ -6,7 +6,7 @@ using SongsOfConquest.Common.Gamestate.Facade;
 namespace SongsOfConquestAccess
 {
     [HarmonyPatch]
-    internal static class StorySequencePatches
+    public static class StorySequencePatches
     {
         private static readonly AccessTools.FieldRef<ReactiveAdventureMenuSystem, IClientAdventureFacade> FacadeRef =
             AccessTools.FieldRefAccess<ReactiveAdventureMenuSystem, IClientAdventureFacade>("_facade");

@@ -25,7 +25,7 @@ using UnityEngine.UI;
 
 namespace SongsOfConquestAccess.Adapters
 {
-    internal sealed class ArtifactMarketMenuAdapter
+    public sealed class ArtifactMarketMenuAdapter
     {
         private static readonly FieldInfo HeaderTextField = AccessTools.Field(typeof(ArtifactMarketMenu), "_headerText");
         private static readonly FieldInfo DescriptionTextField = AccessTools.Field(typeof(ArtifactMarketMenu), "_descriptionText");
@@ -723,7 +723,7 @@ namespace SongsOfConquestAccess.Adapters
             return value is T ? (T)value : fallback;
         }
 
-        internal sealed class CategoryItem
+        public sealed class CategoryItem
         {
             public CategoryItem(string id, string label, int index)
             {
@@ -737,7 +737,7 @@ namespace SongsOfConquestAccess.Adapters
             public int Index { get; private set; }
         }
 
-        internal sealed class MarketArtifactItem
+        public sealed class MarketArtifactItem
         {
             public MarketArtifactItem(
                 string id,

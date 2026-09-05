@@ -1,6 +1,6 @@
 namespace SongsOfConquestAccess.Scanner
 {
-    internal enum ScannerDirectionMode
+    public enum ScannerDirectionMode
     {
         Square,
         Hex

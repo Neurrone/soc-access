@@ -10,7 +10,7 @@ namespace SongsOfConquestAccess.Audio
     /// How a scanner entry sounds. The sweep and scanner-result browsing both come through
     /// here, so a ping and the sound of landing on the same entry are one gesture.
     /// </summary>
-    internal static class SweepSelector
+    public static class SweepSelector
     {
         private static readonly SweepEntry[] NoEntries = new SweepEntry[0];
         private static readonly TileCue[] NoCues = new TileCue[0];

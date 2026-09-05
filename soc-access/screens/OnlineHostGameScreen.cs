@@ -5,7 +5,7 @@ using SongsOfConquestAccess.UI;
 
 namespace SongsOfConquestAccess.Screens
 {
-    internal sealed class OnlineHostGameScreen : Screen
+    public sealed class OnlineHostGameScreen : Screen
     {
         private readonly OnlineHostGameAdapter _adapter;
 

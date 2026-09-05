@@ -7,7 +7,7 @@ using SongsOfConquestAccess.Speech;
 
 namespace SongsOfConquestAccess.UI
 {
-    internal sealed class TableWidget : Widget
+    public sealed class TableWidget : Widget
     {
         public enum SortDirection
         {
@@ -70,7 +70,7 @@ namespace SongsOfConquestAccess.UI
         // Row-major, header row first, one cell widget per position - the same cells the table hands
         // to focus, built fresh here because a row is data rather than a widget and only the cell is
         // one. Reading a cell's label does not disturb the table's own announcement state.
-        internal override IEnumerable<Widget> EnumerateChildren()
+        public override IEnumerable<Widget> EnumerateChildren()
         {
             for (int row = 0; row <= _rows.Count; row++)
             {
@@ -462,7 +462,7 @@ namespace SongsOfConquestAccess.UI
             SpeechPipeline.Output(new SpeechRequest(text, interrupt: true));
         }
 
-        internal sealed class Column
+        public sealed class Column
         {
             public Column(string id, string label, Func<SortDirection> getSortDirection, Func<bool> activateSort)
             {
@@ -478,7 +478,7 @@ namespace SongsOfConquestAccess.UI
             public Func<bool> ActivateSort { get; private set; }
         }
 
-        internal sealed class Row
+        public sealed class Row
         {
             public Row(
                 string id,

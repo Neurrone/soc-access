@@ -15,7 +15,7 @@ using UnityEngine;
 
 namespace SongsOfConquestAccess.Adapters
 {
-    internal static class AdventureMapEntityLabel
+    public static class AdventureMapEntityLabel
     {
         public static string GetMapEntityName(
             IClientAdventureFacade facade,

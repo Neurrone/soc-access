@@ -5,7 +5,7 @@ using UnityEngine.UI;
 
 namespace SongsOfConquestAccess.Adapters
 {
-    internal static class NativeSelectionUtility
+    public static class NativeSelectionUtility
     {
         public static bool Select(Component component)
         {

@@ -8,7 +8,7 @@ using CodexContentItemKind = SongsOfConquestAccess.Adapters.CodexMenuAdapter.Cod
 
 namespace SongsOfConquestAccess.UI
 {
-    internal sealed class CodexContentWidget : Widget
+    public sealed class CodexContentWidget : Widget
     {
         private readonly Func<IReadOnlyList<CodexContentItem>> _getItems;
         private readonly Action _onFocus;

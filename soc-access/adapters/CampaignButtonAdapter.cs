@@ -12,7 +12,7 @@ using UnityEngine.EventSystems;
 
 namespace SongsOfConquestAccess.Adapters
 {
-    internal sealed class CampaignButtonAdapter : IMenuButtonAdapter
+    public sealed class CampaignButtonAdapter : IMenuButtonAdapter
     {
         private static readonly AccessTools.FieldRef<CampaignButton, UIButton> ButtonRef =
             AccessTools.FieldRefAccess<CampaignButton, UIButton>("_button");

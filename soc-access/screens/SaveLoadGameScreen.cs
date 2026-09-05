@@ -12,7 +12,7 @@ using Zenject;
 
 namespace SongsOfConquestAccess.Screens
 {
-    internal sealed class SaveLoadGameScreen : Screen
+    public sealed class SaveLoadGameScreen : Screen
     {
         private const string EntriesMenuId = "save-load-entries";
         private const string TabsMenuId = "save-load-tabs";

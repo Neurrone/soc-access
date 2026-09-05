@@ -9,7 +9,7 @@ using Zenject;
 
 namespace SongsOfConquestAccess.Screens
 {
-    internal sealed class QuitToDesktopPopupScreen : Screen
+    public sealed class QuitToDesktopPopupScreen : Screen
     {
         private static readonly System.Reflection.PropertyInfo InstallerContainerProperty =
             AccessTools.Property(typeof(QuitToDesktopPopupInstaller), "Container");

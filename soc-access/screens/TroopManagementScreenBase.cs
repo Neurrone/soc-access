@@ -10,7 +10,7 @@ using SongsOfConquestAccess.UI;
 
 namespace SongsOfConquestAccess.Screens
 {
-    internal abstract class TroopManagementScreenBase : Screen
+    public abstract class TroopManagementScreenBase : Screen
     {
         private const int WielderTroopMenuIndex = 3;
 

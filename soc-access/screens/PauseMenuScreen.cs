@@ -12,7 +12,7 @@ using Zenject;
 
 namespace SongsOfConquestAccess.Screens
 {
-    internal sealed class PauseMenuScreen : Screen
+    public sealed class PauseMenuScreen : Screen
     {
         private static readonly PropertyInfo InstallerContainerProperty =
             AccessTools.Property(typeof(PauseMenuInstaller), "Container");

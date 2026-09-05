@@ -24,17 +24,17 @@ namespace SongsOfConquestAccess
         public const string PluginGuid = "songs.of.conquest.access";
         public const string PluginName = "Songs of Conquest Access";
 
-        internal static SocAccessMod Instance { get; private set; }
+        public static SocAccessMod Instance { get; private set; }
 
         private readonly ModHost _host;
         private ManualLogSource Logger;
 
-        internal SocAccessMod(ModHost host)
+        public SocAccessMod(ModHost host)
         {
             _host = host;
         }
 
-        internal Coroutine StartCoroutine(IEnumerator routine)
+        public Coroutine StartCoroutine(IEnumerator routine)
         {
             return _host.StartCoroutine(routine);
         }
@@ -55,7 +55,7 @@ namespace SongsOfConquestAccess
         private bool _announcedReady;
         private bool _reportedLocalizationUnavailable;
 
-        internal void Start()
+        public void Start()
         {
             Instance = this;
             Logger = BepInEx.Logging.Logger.CreateLogSource("SongsOfConquestAccess");
@@ -96,7 +96,7 @@ namespace SongsOfConquestAccess
             _host.SetUpdateHandler(Update);
         }
 
-        internal void Stop()
+        public void Stop()
         {
             // First, so a mod being torn down stops answering for state that is going away.
             Step("dev routes", () => _modRoutes?.Unregister());
@@ -174,42 +174,42 @@ namespace SongsOfConquestAccess
 
         /// <summary>Whether the speech backend came up. Reported by GET /status, where a silent
         /// run is otherwise indistinguishable from a mod that has nothing to say.</summary>
-        internal bool SpeechAvailable
+        public bool SpeechAvailable
         {
             get { return _speechAvailable; }
         }
 
-        internal ScreenDetector ScreenDetector
+        public ScreenDetector ScreenDetector
         {
             get { return _screenDetector; }
         }
 
-        internal AccessibilityInputRouter InputRouter
+        public AccessibilityInputRouter InputRouter
         {
             get { return _inputRouter; }
         }
 
-        internal ScreenManager ScreenManager
+        public ScreenManager ScreenManager
         {
             get { return _screenManager; }
         }
 
-        internal ReviewBufferManager ReviewBuffers
+        public ReviewBufferManager ReviewBuffers
         {
             get { return _reviewBufferManager; }
         }
 
-        internal AdventureMapScannerState AdventureMapScannerState
+        public AdventureMapScannerState AdventureMapScannerState
         {
             get { return _adventureMapScannerState; }
         }
 
-        internal void LogInfo(string message)
+        public void LogInfo(string message)
         {
             Logger.LogInfo(message);
         }
 
-        internal void LogWarning(string message)
+        public void LogWarning(string message)
         {
             Logger.LogWarning(message);
         }

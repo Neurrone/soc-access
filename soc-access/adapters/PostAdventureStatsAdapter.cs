@@ -15,7 +15,7 @@ using UnityEngine;
 
 namespace SongsOfConquestAccess.Adapters
 {
-    internal sealed class PostAdventureStatsAdapter
+    public sealed class PostAdventureStatsAdapter
     {
         private static readonly FieldInfo SettingsField = AccessTools.Field(typeof(PostAdventureStatsMenu), "_settings");
         private static readonly FieldInfo DropdownField = AccessTools.Field(typeof(UITextMeshDropdown), "_dropdown");
@@ -429,7 +429,7 @@ namespace SongsOfConquestAccess.Adapters
             return owner != null && field != null ? field.GetValue(owner) as T : null;
         }
 
-        internal sealed class GraphOption
+        public sealed class GraphOption
         {
             public GraphOption(string id, int index, string label)
             {
@@ -445,7 +445,7 @@ namespace SongsOfConquestAccess.Adapters
             public string Label { get; private set; }
         }
 
-        internal sealed class TeamOption
+        public sealed class TeamOption
         {
             public TeamOption(string id, PostAdventureStatsMenuTeamEntry entry, string label)
             {
@@ -461,7 +461,7 @@ namespace SongsOfConquestAccess.Adapters
             public string Label { get; private set; }
         }
 
-        internal sealed class GraphTeamColumn
+        public sealed class GraphTeamColumn
         {
             public GraphTeamColumn(string id, int teamId, string label)
             {
@@ -477,7 +477,7 @@ namespace SongsOfConquestAccess.Adapters
             public string Label { get; private set; }
         }
 
-        internal sealed class GraphRoundRow
+        public sealed class GraphRoundRow
         {
             private readonly Dictionary<int, GraphPoint> _values;
 
@@ -507,7 +507,7 @@ namespace SongsOfConquestAccess.Adapters
             }
         }
 
-        internal sealed class GraphPoint
+        public sealed class GraphPoint
         {
             public GraphPoint(int value, bool battleLost)
             {

@@ -6,7 +6,7 @@ using UnityEngine;
 namespace SongsOfConquestAccess
 {
     [HarmonyPatch]
-    internal static class AdventureLobbyMapTypePatches
+    public static class AdventureLobbyMapTypePatches
     {
         private static readonly AccessTools.FieldRef<MapTypeMenu, CanvasGroup> CanvasGroupRef =
             AccessTools.FieldRefAccess<MapTypeMenu, CanvasGroup>("_canvasGroup");

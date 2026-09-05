@@ -1,6 +1,6 @@
 namespace SongsOfConquestAccess.Events
 {
-    internal static class AccessibilityEvents
+    public static class AccessibilityEvents
     {
         public static class Map
         {

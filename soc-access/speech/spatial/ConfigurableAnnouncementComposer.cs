@@ -4,7 +4,7 @@ using System.Text;
 
 namespace SongsOfConquestAccess.Speech.Spatial
 {
-    internal static class ConfigurableAnnouncementComposer
+    public static class ConfigurableAnnouncementComposer
     {
         public static string Compose(AnnouncementGroupDefinition group, IEnumerable<AnnouncementPart> parts)
         {
@@ -16,7 +16,7 @@ namespace SongsOfConquestAccess.Speech.Spatial
                 ModSettings.GetAnnouncementElementSuffix);
         }
 
-        internal static string Compose(
+        public static string Compose(
             AnnouncementGroupDefinition group,
             IEnumerable<AnnouncementPart> parts,
             Func<AnnouncementGroupDefinition, IReadOnlyList<string>> getOrder,

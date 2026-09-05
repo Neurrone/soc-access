@@ -9,7 +9,7 @@ using UnityEngine;
 
 namespace SongsOfConquestAccess.Screens
 {
-    internal sealed class AdventureLobbyChallengeMapSelectScreen : Screen
+    public sealed class AdventureLobbyChallengeMapSelectScreen : Screen
     {
         private const string TableId = "challenge-map-select-table";
 
@@ -289,7 +289,7 @@ namespace SongsOfConquestAccess.Screens
             return id;
         }
 
-        internal static AdventureLobbyChallengeMapSelectAdapter FindActiveChallengeMapSelectMenu(ChallengeMapsMenu targetMenu)
+        public static AdventureLobbyChallengeMapSelectAdapter FindActiveChallengeMapSelectMenu(ChallengeMapsMenu targetMenu)
         {
             ChallengeMapsMenu[] menus = Resources.FindObjectsOfTypeAll<ChallengeMapsMenu>();
             for (int i = 0; i < menus.Length; i++)

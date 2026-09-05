@@ -10,7 +10,7 @@ using UnityEngine;
 
 namespace SongsOfConquestAccess.Adapters
 {
-    internal sealed class PostAdventureResultAdapter
+    public sealed class PostAdventureResultAdapter
     {
         private static readonly FieldInfo DescriptionField = AccessTools.Field(typeof(PostAdventureMenu), "_description");
         private static readonly FieldInfo DescriptionTitleField = AccessTools.Field(typeof(PostAdventureMenu), "_descriptionTitle");
@@ -286,7 +286,7 @@ namespace SongsOfConquestAccess.Adapters
             return owner != null && field != null ? field.GetValue(owner) as T : null;
         }
 
-        internal sealed class ObjectiveEntry
+        public sealed class ObjectiveEntry
         {
             private readonly PostAdventureMenuObjectiveEntry _entry;
 

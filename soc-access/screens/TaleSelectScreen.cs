@@ -7,7 +7,7 @@ using UnityEngine;
 
 namespace SongsOfConquestAccess.Screens
 {
-    internal sealed class TaleSelectScreen : Screen
+    public sealed class TaleSelectScreen : Screen
     {
         private readonly TaleSelectAdapter _adapter;
 

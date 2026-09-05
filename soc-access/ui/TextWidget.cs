@@ -3,7 +3,7 @@ using SongsOfConquestAccess.Adapters;
 
 namespace SongsOfConquestAccess.UI
 {
-    internal sealed class TextWidget : Widget
+    public sealed class TextWidget : Widget
     {
         private readonly Func<string> _getText;
         private readonly Action _onFocus;

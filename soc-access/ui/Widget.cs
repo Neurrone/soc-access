@@ -5,7 +5,7 @@ using SongsOfConquestAccess.Speech;
 
 namespace SongsOfConquestAccess.UI
 {
-    internal abstract class Widget
+    public abstract class Widget
     {
         private static readonly IReadOnlyList<string> EmptyTooltipLines = new string[0];
 
@@ -16,7 +16,7 @@ namespace SongsOfConquestAccess.UI
 
         public string Id { get; private set; }
 
-        public Widget Parent { get; internal set; }
+        public Widget Parent { get; set; }
 
         public bool IsFocused { get; private set; }
 
@@ -121,7 +121,7 @@ namespace SongsOfConquestAccess.UI
         // Read-only walk over the widgets below this one, for the dev server's accessible-tree
         // dump. Most widgets are leaves; the container-like ones override this. It must never
         // move focus or change anything, so two dumps of a settled screen are identical.
-        internal virtual IEnumerable<Widget> EnumerateChildren()
+        public virtual IEnumerable<Widget> EnumerateChildren()
         {
             yield break;
         }

@@ -4,7 +4,7 @@ using SongsOfConquest.Client.Menu;
 namespace SongsOfConquestAccess
 {
     [HarmonyPatch]
-    internal static class TutorialMenuPatches
+    public static class TutorialMenuPatches
     {
         [HarmonyPatch(typeof(TutorialMenu), "Open")]
         [HarmonyPostfix]

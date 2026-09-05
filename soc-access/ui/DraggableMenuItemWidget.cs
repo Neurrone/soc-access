@@ -4,7 +4,7 @@ using SongsOfConquestAccess.Localization;
 
 namespace SongsOfConquestAccess.UI
 {
-    internal sealed class DraggableMenuItemWidget : MenuItemWidget
+    public sealed class DraggableMenuItemWidget : MenuItemWidget
     {
         private readonly Func<bool> _canDrag;
         private readonly Func<bool> _isDragging;

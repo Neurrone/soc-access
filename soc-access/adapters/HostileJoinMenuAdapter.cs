@@ -17,14 +17,14 @@ using SongsOfConquestAccess.Speech;
 
 namespace SongsOfConquestAccess.Adapters
 {
-    internal enum HostileJoinMenuStage
+    public enum HostileJoinMenuStage
     {
         None,
         Choice,
         Join
     }
 
-    internal sealed class HostileJoinMenuAdapter : IDisposable
+    public sealed class HostileJoinMenuAdapter : IDisposable
     {
         private static readonly FieldInfo SettingsField = AccessTools.Field(typeof(HostileJoinMenu), "_settings");
         private static readonly FieldInfo AsyncField = AccessTools.Field(typeof(HostileJoinMenu), "_async");

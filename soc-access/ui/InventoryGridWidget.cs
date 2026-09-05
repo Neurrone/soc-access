@@ -7,7 +7,7 @@ using SongsOfConquestAccess.Speech;
 
 namespace SongsOfConquestAccess.UI
 {
-    internal sealed class InventoryGridWidget : Widget
+    public sealed class InventoryGridWidget : Widget
     {
         private readonly List<Column> _columns = new List<Column>();
         private readonly List<int> _focusedRowsByColumn = new List<int>();
@@ -436,7 +436,7 @@ namespace SongsOfConquestAccess.UI
             SpeechPipeline.Output(new SpeechRequest(text, interrupt: false));
         }
 
-        internal sealed class Column
+        public sealed class Column
         {
             public Column(string id, string label, IEnumerable<Cell> cells)
             {
@@ -462,7 +462,7 @@ namespace SongsOfConquestAccess.UI
             public List<Cell> Cells { get; private set; }
         }
 
-        internal sealed class FocusState
+        public sealed class FocusState
         {
             private readonly int[] _rememberedRowsByColumn;
 
@@ -486,7 +486,7 @@ namespace SongsOfConquestAccess.UI
             }
         }
 
-        internal sealed class Cell
+        public sealed class Cell
         {
             public Cell(
                 string id,
@@ -504,7 +504,7 @@ namespace SongsOfConquestAccess.UI
             public CellWidget Widget { get; set; }
         }
 
-        internal sealed class CellWidget : Widget
+        public sealed class CellWidget : Widget
         {
             private readonly InventoryGridWidget _grid;
             private readonly Cell _cell;

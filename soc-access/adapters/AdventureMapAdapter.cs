@@ -36,7 +36,7 @@ using Zenject;
 
 namespace SongsOfConquestAccess.Adapters
 {
-    internal sealed class AdventureMapAdapter
+    public sealed class AdventureMapAdapter
     {
         private const byte ExploredButNotVisibleFogValue = 128;
         private const ushort ObjectiveBeaconBlueprintId = 50;
@@ -585,7 +585,7 @@ namespace SongsOfConquestAccess.Adapters
             return TryGetReachableMovementCost(reachable, target, out cost);
         }
 
-        internal static bool TryGetReachableMovementCost(PathNode[] reachable, Vector2Int target, out float cost)
+        public static bool TryGetReachableMovementCost(PathNode[] reachable, Vector2Int target, out float cost)
         {
             cost = 0f;
             if (reachable == null)
@@ -608,7 +608,7 @@ namespace SongsOfConquestAccess.Adapters
             return false;
         }
 
-        internal static void ApplyReachableMovementCost(AdventureMapTile tile, float cost)
+        public static void ApplyReachableMovementCost(AdventureMapTile tile, float cost)
         {
             if (tile == null || float.IsInfinity(cost) || float.IsNaN(cost))
             {
@@ -1155,7 +1155,7 @@ namespace SongsOfConquestAccess.Adapters
         /// covers. Judging a tile costs a pathfind or a map query, so the walk
         /// stops at the survivor rather than sweeping the whole group.
         /// </summary>
-        internal static bool TryPickSurvivingScannerGroupPoint(
+        public static bool TryPickSurvivingScannerGroupPoint(
             ScannerResult result,
             Vector2Int cursorHint,
             Func<Vector2Int, bool> isValidPoint,

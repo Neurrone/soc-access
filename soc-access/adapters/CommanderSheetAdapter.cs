@@ -25,7 +25,7 @@ using UnityEngine.UI;
 
 namespace SongsOfConquestAccess.Adapters
 {
-    internal sealed class CommanderSheetAdapter
+    public sealed class CommanderSheetAdapter
     {
         private static readonly FieldInfo FacadeField = AccessTools.Field(typeof(CommanderSheet), "_facade");
         private static readonly FieldInfo LocalizationField = AccessTools.Field(typeof(CommanderSheet), "_localizationHandler");
@@ -806,7 +806,7 @@ namespace SongsOfConquestAccess.Adapters
             return owner != null && field != null ? field.GetValue(owner) as T : null;
         }
 
-        internal sealed class LabeledItem
+        public sealed class LabeledItem
         {
             public LabeledItem(string id, string label, string status = null, Action onFocus = null, Func<bool> activate = null, Tooltip tooltip = null)
             {
@@ -826,7 +826,7 @@ namespace SongsOfConquestAccess.Adapters
             public Tooltip Tooltip { get; private set; }
         }
 
-        internal sealed class ModifierCategory
+        public sealed class ModifierCategory
         {
             public ModifierCategory(string id, string label, int index, Tooltip tooltip = null)
             {

@@ -14,7 +14,7 @@ using UnityEngine;
 
 namespace SongsOfConquestAccess.Adapters
 {
-    internal sealed class AdventureLobbyIconDropdownAdapter
+    public sealed class AdventureLobbyIconDropdownAdapter
     {
         private static readonly FieldInfo MainContainerField = AccessTools.Field(typeof(IconDropdown), "_mainContainer");
         private static readonly FieldInfo SpawnedEntriesField = AccessTools.Field(typeof(IconDropdown), "_spawnedEntries");
@@ -203,7 +203,7 @@ namespace SongsOfConquestAccess.Adapters
             return gameObject != null && gameObject.scene.IsValid() && gameObject.scene.isLoaded;
         }
 
-        internal sealed class OptionItem
+        public sealed class OptionItem
         {
             private readonly AdventureLobbyIconDropdownAdapter _adapter;
             private readonly IconDropdownEntry _entry;

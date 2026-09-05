@@ -8,7 +8,7 @@ namespace SongsOfConquestAccess.Input
     // If a new widget uses the same key (such as the arrow keys) as an existing widget, do not reuse the previous widget's action in the new widget
     // Instead, create new semantic actions for the new widget.
     // For example, the map navigation and menu widgets both use the arrow keys, but different actions
-    internal static class AccessibilityActions
+    public static class AccessibilityActions
     {
         // Global actions are available on every accessibility screen. The input
         // router checks screen-claimed actions first, then global actions, so

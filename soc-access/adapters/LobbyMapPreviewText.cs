@@ -8,7 +8,7 @@ using SongsOfConquestAccess.Speech;
 
 namespace SongsOfConquestAccess.Adapters
 {
-    internal static class LobbyMapPreviewText
+    public static class LobbyMapPreviewText
     {
         private static readonly FieldInfo MapNameHeaderField =
             AccessTools.Field(typeof(LobbyMapPreview), "_mapNameHeader");

@@ -9,7 +9,7 @@ namespace SongsOfConquestAccess.Scanner
     /// categories sharing a name are one name to the player no matter which ids
     /// sit behind them, and the name is what has to stay distinct.
     /// </summary>
-    internal static class ScannerCustomCategoryNameConflict
+    public static class ScannerCustomCategoryNameConflict
     {
         /// <summary>
         /// Reports whether <paramref name="name"/> is already the name of a

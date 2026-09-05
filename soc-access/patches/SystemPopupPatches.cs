@@ -6,7 +6,7 @@ using SongsOfConquestAccess.Screens;
 namespace SongsOfConquestAccess.Patches
 {
     [HarmonyPatch]
-    internal static class SystemPopupPatches
+    public static class SystemPopupPatches
     {
         [HarmonyPatch(typeof(SystemPopup), "Show")]
         [HarmonyPostfix]

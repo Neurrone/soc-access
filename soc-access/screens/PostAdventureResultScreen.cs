@@ -8,7 +8,7 @@ using UnityEngine;
 
 namespace SongsOfConquestAccess.Screens
 {
-    internal sealed class PostAdventureResultScreen : Screen
+    public sealed class PostAdventureResultScreen : Screen
     {
         private readonly PostAdventureResultAdapter _adapter;
 

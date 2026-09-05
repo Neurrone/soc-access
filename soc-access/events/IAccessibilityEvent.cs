@@ -1,6 +1,6 @@
 namespace SongsOfConquestAccess.Events
 {
-    internal interface IAccessibilityEvent
+    public interface IAccessibilityEvent
     {
         string Kind { get; }
 

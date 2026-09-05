@@ -6,7 +6,7 @@ using SongsOfConquestAccess.Localization;
 
 namespace SongsOfConquestAccess.Speech.Spatial
 {
-    internal enum CombatInfluenceGroup
+    public enum CombatInfluenceGroup
     {
         ZoneOfControl,
         DeadlyRange,
@@ -14,7 +14,7 @@ namespace SongsOfConquestAccess.Speech.Spatial
         MovementRange
     }
 
-    internal sealed class CombatInfluenceSource
+    public sealed class CombatInfluenceSource
     {
         public CombatInfluenceSource(TroopRef troop, IEnumerable<CombatRangeIndicator> indicators)
         {
@@ -28,7 +28,7 @@ namespace SongsOfConquestAccess.Speech.Spatial
         public HashSet<CombatRangeIndicator> Indicators { get; private set; }
     }
 
-    internal static class CombatInfluenceFormatter
+    public static class CombatInfluenceFormatter
     {
         private static readonly CombatInfluenceGroup[] GroupOrder =
         {

@@ -7,7 +7,7 @@ using UnityEngine;
 namespace SongsOfConquestAccess
 {
     [HarmonyPatch]
-    internal static class TaleSelectPatches
+    public static class TaleSelectPatches
     {
         [HarmonyPatch(typeof(TaleButtonLayoutCoordinator), "RebuildLayout")]
         [HarmonyPostfix]

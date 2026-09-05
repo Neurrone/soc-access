@@ -7,7 +7,7 @@ using UnityEngine;
 
 namespace SongsOfConquestAccess.Screens
 {
-    internal sealed class TutorialSlideshowScreen : Screen
+    public sealed class TutorialSlideshowScreen : Screen
     {
         private readonly TutorialSlideshowAdapter _adapter;
 
@@ -38,7 +38,7 @@ namespace SongsOfConquestAccess.Screens
             return null;
         }
 
-        internal static bool IsLiveSceneMenu(TutorialMenu menu)
+        public static bool IsLiveSceneMenu(TutorialMenu menu)
         {
             return menu != null
                 && menu.gameObject != null

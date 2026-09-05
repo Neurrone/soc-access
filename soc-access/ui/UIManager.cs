@@ -5,7 +5,7 @@ using SongsOfConquestAccess.Speech;
 
 namespace SongsOfConquestAccess.UI
 {
-    internal static class UIManager
+    public static class UIManager
     {
         private static Widget _currentWidget;
         private static Widget _lastFocusedWidget;
@@ -137,7 +137,7 @@ namespace SongsOfConquestAccess.UI
 
         // The same composition against a caller's own context, so the dev server's tree dump can
         // read each widget the way arriving on it would sound without disturbing the live one.
-        internal static string BuildAnnouncement(Widget widget, FocusContext context)
+        public static string BuildAnnouncement(Widget widget, FocusContext context)
         {
             List<string> parts = new List<string>(2);
             if (widget.IncludeParentLabelInAnnouncement && widget.Parent != null)
@@ -177,7 +177,7 @@ namespace SongsOfConquestAccess.UI
 
         // What the UI review buffer would hold for this widget. The dev server's dump reports the
         // same lines, so buffer coverage can be read off a tree dump rather than walked to.
-        internal static List<string> BuildReviewLines(Widget widget)
+        public static List<string> BuildReviewLines(Widget widget)
         {
             List<string> lines = new List<string>();
             if (widget != null)

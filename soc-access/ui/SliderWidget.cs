@@ -6,7 +6,7 @@ using SongsOfConquestAccess.Speech;
 
 namespace SongsOfConquestAccess.UI
 {
-    internal sealed class SliderWidget : Widget
+    public sealed class SliderWidget : Widget
     {
         private readonly Func<string> _getLabel;
         private readonly Func<string> _getValueText;

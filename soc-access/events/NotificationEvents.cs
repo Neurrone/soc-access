@@ -11,7 +11,7 @@ namespace SongsOfConquestAccess.Events
     // Used for claim notifications, claim-with-resources popups, pillage/repair,
     // siege state changes, artifact notifications, and similar large floating
     // notifications displayed by IconNotification.ShowNotification(...).
-    internal sealed class AdventureIconNotificationEvent : IAccessibilityEvent
+    public sealed class AdventureIconNotificationEvent : IAccessibilityEvent
     {
         public AdventureIconNotificationEvent(string header, string body)
         {
@@ -34,7 +34,7 @@ namespace SongsOfConquestAccess.Events
     // Used for resource rewards, penalties, bacteria/stat changes, commander
     // messages, entity messages, inventory/market feedback, cursor messages,
     // and other transient text displayed by SimpleNotification.Show(...).
-    internal sealed class AdventureSimpleNotificationEvent : IAccessibilityEvent
+    public sealed class AdventureSimpleNotificationEvent : IAccessibilityEvent
     {
         public AdventureSimpleNotificationEvent(string text)
         {
@@ -53,7 +53,7 @@ namespace SongsOfConquestAccess.Events
     // Wielder level-up popup shown above the commander on the adventure map.
     // The native component displays only the wielder name and the reached level
     // number, so speech mirrors those visible fields without adding extra wording.
-    internal sealed class CommanderLevelUpNotificationEvent : IAccessibilityEvent
+    public sealed class CommanderLevelUpNotificationEvent : IAccessibilityEvent
     {
         public CommanderLevelUpNotificationEvent(string wielderName, int reachedLevel)
         {
@@ -76,7 +76,7 @@ namespace SongsOfConquestAccess.Events
     // Used for strategic/log-style notifications such as lost entities, beacon
     // progress, town threats, player defeated/disconnected, remaining rounds,
     // hostile growth, and commander max-level messages.
-    internal sealed class AdventureHudNotificationEvent : IAccessibilityEvent
+    public sealed class AdventureHudNotificationEvent : IAccessibilityEvent
     {
         public AdventureHudNotificationEvent(string text)
         {
@@ -95,7 +95,7 @@ namespace SongsOfConquestAccess.Events
     // Transient objective update animation shown on the adventure HUD.
     // Used when objectives are added, updated, or completed; speech mirrors the
     // visible header plus objective line including progress/optional text.
-    internal sealed class ObjectiveNotificationEvent : IAccessibilityEvent
+    public sealed class ObjectiveNotificationEvent : IAccessibilityEvent
     {
         public ObjectiveNotificationEvent(string text)
         {
@@ -114,7 +114,7 @@ namespace SongsOfConquestAccess.Events
     // Non-modal adventure-map new-turn popup shown when control returns to a
     // local human player/team in online or hotseat-style games. Modal versions
     // requiring confirm/cancel are handled as popup screens, not notifications.
-    internal sealed class AdventureNewTurnPopupEvent : IAccessibilityEvent
+    public sealed class AdventureNewTurnPopupEvent : IAccessibilityEvent
     {
         public AdventureNewTurnPopupEvent(string text)
         {
@@ -133,7 +133,7 @@ namespace SongsOfConquestAccess.Events
     // World-lore panel notification from AdventureMenuSystem.ShowWorldNotification(...).
     // Used for larger map-entity messages and denied interactions that display
     // localized header/body/effects text in the world lore panel.
-    internal sealed class WorldMessageNotificationEvent : IAccessibilityEvent
+    public sealed class WorldMessageNotificationEvent : IAccessibilityEvent
     {
         public WorldMessageNotificationEvent(int entityId, int commanderId, string header, string body, string effects)
         {
@@ -164,7 +164,7 @@ namespace SongsOfConquestAccess.Events
 
     // Lightweight centered global adventure notification.
     // Used for short centered messages such as game-saved style feedback.
-    internal sealed class CenteredNotificationEvent : IAccessibilityEvent
+    public sealed class CenteredNotificationEvent : IAccessibilityEvent
     {
         private readonly string _text;
 
@@ -187,7 +187,7 @@ namespace SongsOfConquestAccess.Events
     // Prominent centered adventure notification.
     // Used for major centered warnings or loss-style messages that the game
     // displays through CenteredNotificationHeavy.
-    internal sealed class CenteredHeavyNotificationEvent : IAccessibilityEvent
+    public sealed class CenteredHeavyNotificationEvent : IAccessibilityEvent
     {
         private readonly string _text;
 
@@ -207,7 +207,7 @@ namespace SongsOfConquestAccess.Events
         }
     }
 
-    internal static class NotificationSpeechText
+    public static class NotificationSpeechText
     {
         public static string JoinNonEmpty(params string[] values)
         {

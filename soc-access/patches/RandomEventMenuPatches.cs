@@ -5,7 +5,7 @@ using SongsOfConquest.Common.Adventure;
 namespace SongsOfConquestAccess.Patches
 {
     [HarmonyPatch]
-    internal static class RandomEventMenuPatches
+    public static class RandomEventMenuPatches
     {
         [HarmonyPatch(typeof(RandomEventMenu), "Open", new[] { typeof(RandomEventResult) })]
         [HarmonyPostfix]

@@ -9,7 +9,7 @@ using UnityEngine.UI;
 
 namespace SongsOfConquestAccess.Adapters
 {
-    internal sealed class MapMessagePopupAdapter : IMessageDialogAdapter
+    public sealed class MapMessagePopupAdapter : IMessageDialogAdapter
     {
         private static readonly AccessTools.FieldRef<MapMessagePopup, UITransform> ContainerRef =
             AccessTools.FieldRefAccess<MapMessagePopup, UITransform>("_container");

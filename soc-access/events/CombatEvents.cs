@@ -16,7 +16,7 @@ using static SongsOfConquestAccess.Events.Combat.CombatText;
 
 namespace SongsOfConquestAccess.Events.Combat
 {
-    internal enum TargetKind
+    public enum TargetKind
     {
         Troop,
         MapEntity,
@@ -24,13 +24,13 @@ namespace SongsOfConquestAccess.Events.Combat
         Tile
     }
 
-    internal enum BeamFacing
+    public enum BeamFacing
     {
         Left,
         Right
     }
 
-    internal enum EffectTargetSummaryKind
+    public enum EffectTargetSummaryKind
     {
         ExplicitTargets,
         AllTroops,
@@ -44,7 +44,7 @@ namespace SongsOfConquestAccess.Events.Combat
         EnemyRangedTroops
     }
 
-    internal sealed class TroopRef
+    public sealed class TroopRef
     {
         public TroopRef(int troopId, int teamId, int localTeamId, string name, int count, Vector2Int position)
         {
@@ -73,7 +73,7 @@ namespace SongsOfConquestAccess.Events.Combat
         }
     }
 
-    internal sealed class ActorRef
+    public sealed class ActorRef
     {
         public ActorRef(TroopRef troop, bool isActingOnItsTurn)
         {
@@ -92,7 +92,7 @@ namespace SongsOfConquestAccess.Events.Combat
         }
     }
 
-    internal sealed class EntityRef
+    public sealed class EntityRef
     {
         public EntityRef(int entityId, string name, Vector2Int position)
             : this(entityId, -1, name, position)
@@ -118,7 +118,7 @@ namespace SongsOfConquestAccess.Events.Combat
         }
     }
 
-    internal sealed class CommanderRef
+    public sealed class CommanderRef
     {
         public CommanderRef(int commanderId, int teamId, int localTeamId, string name)
         {
@@ -140,7 +140,7 @@ namespace SongsOfConquestAccess.Events.Combat
         }
     }
 
-    internal sealed class TargetRef
+    public sealed class TargetRef
     {
         private TargetRef(TargetKind targetKind)
         {
@@ -191,7 +191,7 @@ namespace SongsOfConquestAccess.Events.Combat
         }
     }
 
-    internal sealed class SpellRef
+    public sealed class SpellRef
     {
         public SpellRef(SpellTypes spellType, string name, int tier)
         {
@@ -205,7 +205,7 @@ namespace SongsOfConquestAccess.Events.Combat
         public int Tier { get; private set; }
     }
 
-    internal sealed class AbilityRef
+    public sealed class AbilityRef
     {
         public AbilityRef(TroopAbilityType abilityType, string name)
         {
@@ -217,7 +217,7 @@ namespace SongsOfConquestAccess.Events.Combat
         public string Name { get; private set; }
     }
 
-    internal sealed class BacteriaRef
+    public sealed class BacteriaRef
     {
         public BacteriaRef(int bacteriaId, BacteriaTypes bacteriaType, string name)
         {
@@ -231,7 +231,7 @@ namespace SongsOfConquestAccess.Events.Combat
         public string Name { get; private set; }
     }
 
-    internal sealed class ModifierChange
+    public sealed class ModifierChange
     {
         public ModifierChange(BacteriaModifierType modifierType, BacteriaModifierApplicationType applicationType, int amount)
             : this(modifierType, applicationType, amount, string.Empty, true, 1)
@@ -317,7 +317,7 @@ namespace SongsOfConquestAccess.Events.Combat
         }
     }
 
-    internal sealed class BacteriaModifierTargetSummary
+    public sealed class BacteriaModifierTargetSummary
     {
         public BacteriaModifierTargetSummary(TroopRef target, IList<ModifierChange> changes)
         {
@@ -329,7 +329,7 @@ namespace SongsOfConquestAccess.Events.Combat
         public IReadOnlyList<ModifierChange> Changes { get; private set; }
     }
 
-    internal static class EffectTargetSummary
+    public static class EffectTargetSummary
     {
         public static string FormatTargets(IList<TroopRef> targets, EffectTargetSummaryKind kind)
         {
@@ -366,7 +366,7 @@ namespace SongsOfConquestAccess.Events.Combat
         }
     }
 
-    internal sealed class EffectTargetSummaryContext
+    public sealed class EffectTargetSummaryContext
     {
         public EffectTargetSummaryContext(
             int localTeamId,
@@ -494,7 +494,7 @@ namespace SongsOfConquestAccess.Events.Combat
         }
     }
 
-    internal sealed class FaeyFireDamageSummary
+    public sealed class FaeyFireDamageSummary
     {
         public FaeyFireDamageSummary(TargetRef target, int boltCount, int totalDamage, int totalKills)
         {
@@ -515,7 +515,7 @@ namespace SongsOfConquestAccess.Events.Combat
         }
     }
 
-    internal sealed class NewTurnEvent : IAccessibilityEvent
+    public sealed class NewTurnEvent : IAccessibilityEvent
     {
         public NewTurnEvent(TroopRef troop) { Troop = troop; }
         public string Kind { get { return AccessibilityEvents.Combat.NewTurn; } }
@@ -523,7 +523,7 @@ namespace SongsOfConquestAccess.Events.Combat
         public string GetSpeechText() { return ModText.Get(ModStrings.Combat.NewTurn, Troop.Format(includePosition: true)); }
     }
 
-    internal sealed class NewRoundEvent : IAccessibilityEvent
+    public sealed class NewRoundEvent : IAccessibilityEvent
     {
         public NewRoundEvent(int roundNumber) { RoundNumber = roundNumber; }
         public string Kind { get { return AccessibilityEvents.Combat.NewRound; } }
@@ -531,13 +531,13 @@ namespace SongsOfConquestAccess.Events.Combat
         public string GetSpeechText() { return RoundNumber > 0 ? ModText.Get(ModStrings.Screens.Round, RoundNumber) : string.Empty; }
     }
 
-    internal sealed class QueueChangedEvent : IAccessibilityEvent
+    public sealed class QueueChangedEvent : IAccessibilityEvent
     {
         public string Kind { get { return AccessibilityEvents.Combat.QueueChanged; } }
         public string GetSpeechText() { return string.Empty; }
     }
 
-    internal sealed class TroopMovedEvent : IAccessibilityEvent
+    public sealed class TroopMovedEvent : IAccessibilityEvent
     {
         public TroopMovedEvent(ActorRef actor, Vector2Int from, Vector2Int to, IList<Vector2Int> path)
         {
@@ -555,7 +555,7 @@ namespace SongsOfConquestAccess.Events.Combat
         public string GetSpeechText() { return ModText.Get(ModStrings.Combat.TroopMoved, Actor.Format(), FormatPoint(To)); }
     }
 
-    internal sealed class AttackEvent : IAccessibilityEvent
+    public sealed class AttackEvent : IAccessibilityEvent
     {
         public AttackEvent(ActorRef attacker, TargetRef target, AttackTrigger attackTrigger)
         {
@@ -571,7 +571,7 @@ namespace SongsOfConquestAccess.Events.Combat
         public string GetSpeechText() { return ModText.Get(ModStrings.Combat.Attack, Attacker.Format(), FormatAttackVerb(AttackTrigger), Target.Format()); }
     }
 
-    internal sealed class DirectionalAttackEvent : IAccessibilityEvent
+    public sealed class DirectionalAttackEvent : IAccessibilityEvent
     {
         public DirectionalAttackEvent(ActorRef attacker, BeamFacing direction)
         {
@@ -590,7 +590,7 @@ namespace SongsOfConquestAccess.Events.Combat
         }
     }
 
-    internal sealed class DamageEvent : IAccessibilityEvent
+    public sealed class DamageEvent : IAccessibilityEvent
     {
         public DamageEvent(ActorRef attacker, TargetRef target, int damage, int kills, int sizeBefore, int sizeAfter, DamageType damageType, AttackTrigger attackTrigger, bool isSplashDamage, BacteriaRef bacteria)
         {
@@ -640,7 +640,7 @@ namespace SongsOfConquestAccess.Events.Combat
         }
     }
 
-    internal sealed class SpellCastEvent : IAccessibilityEvent
+    public sealed class SpellCastEvent : IAccessibilityEvent
     {
         public SpellCastEvent(CommanderRef caster, SpellRef spell, IList<Vector2Int> selectedTargetPoints, IList<TargetRef> affectedTargets)
         {
@@ -693,7 +693,7 @@ namespace SongsOfConquestAccess.Events.Combat
         }
     }
 
-    internal sealed class FaeyFireEvent : IAccessibilityEvent
+    public sealed class FaeyFireEvent : IAccessibilityEvent
     {
         public FaeyFireEvent(ActorRef attacker, IList<FaeyFireDamageSummary> damageSummaries)
         {
@@ -720,7 +720,7 @@ namespace SongsOfConquestAccess.Events.Combat
         }
     }
 
-    internal sealed class BacteriaRemovedEvent : IAccessibilityEvent
+    public sealed class BacteriaRemovedEvent : IAccessibilityEvent
     {
         public BacteriaRemovedEvent(TroopRef target, BacteriaRef bacteria) { Target = target; Bacteria = bacteria; }
         public string Kind { get { return AccessibilityEvents.Combat.BacteriaRemoved; } }
@@ -729,7 +729,7 @@ namespace SongsOfConquestAccess.Events.Combat
         public string GetSpeechText() { return ModText.Get(ModStrings.Combat.RemovedFrom, Bacteria.Name, Target.Format(includePosition: true)); }
     }
 
-    internal sealed class BacteriaModifierAppliedEvent : IAccessibilityEvent
+    public sealed class BacteriaModifierAppliedEvent : IAccessibilityEvent
     {
         public BacteriaModifierAppliedEvent(TroopRef target, BacteriaRef bacteria, IList<ModifierChange> changes)
         {
@@ -755,7 +755,7 @@ namespace SongsOfConquestAccess.Events.Combat
         }
     }
 
-    internal sealed class BacteriaRemovedSummaryEvent : IAccessibilityEvent
+    public sealed class BacteriaRemovedSummaryEvent : IAccessibilityEvent
     {
         public BacteriaRemovedSummaryEvent(BacteriaRef bacteria, IList<TroopRef> targets, EffectTargetSummaryKind targetSummaryKind)
         {
@@ -776,7 +776,7 @@ namespace SongsOfConquestAccess.Events.Combat
         }
     }
 
-    internal sealed class BacteriaModifierSummaryEvent : IAccessibilityEvent
+    public sealed class BacteriaModifierSummaryEvent : IAccessibilityEvent
     {
         public BacteriaModifierSummaryEvent(BacteriaRef bacteria, IList<BacteriaModifierTargetSummary> targets, EffectTargetSummaryKind targetSummaryKind)
             : this(bacteria, targets, targetSummaryKind, EffectTargetSummaryContext.Empty)
@@ -844,7 +844,7 @@ namespace SongsOfConquestAccess.Events.Combat
         }
     }
 
-    internal sealed class EssenceGeneratedEvent : IAccessibilityEvent
+    public sealed class EssenceGeneratedEvent : IAccessibilityEvent
     {
         public EssenceGeneratedEvent(ActorRef actor, int order, int creation, int chaos, int arcana, int destruction)
         {
@@ -870,7 +870,7 @@ namespace SongsOfConquestAccess.Events.Combat
         }
     }
 
-    internal sealed class WielderEssenceGeneratedEvent : IAccessibilityEvent
+    public sealed class WielderEssenceGeneratedEvent : IAccessibilityEvent
     {
         public WielderEssenceGeneratedEvent(CommanderRef wielder, int order, int creation, int chaos, int arcana, int destruction)
         {
@@ -902,7 +902,7 @@ namespace SongsOfConquestAccess.Events.Combat
         }
     }
 
-    internal sealed class TroopCreatedEvent : IAccessibilityEvent
+    public sealed class TroopCreatedEvent : IAccessibilityEvent
     {
         public TroopCreatedEvent(TroopRef troop, bool isSummon) { Troop = troop; IsSummon = isSummon; }
         public string Kind { get { return AccessibilityEvents.Combat.TroopCreated; } }
@@ -916,7 +916,7 @@ namespace SongsOfConquestAccess.Events.Combat
         }
     }
 
-    internal sealed class MapEntityCreatedEvent : IAccessibilityEvent
+    public sealed class MapEntityCreatedEvent : IAccessibilityEvent
     {
         public MapEntityCreatedEvent(EntityRef entity) { Entity = entity; }
         public string Kind { get { return AccessibilityEvents.Combat.MapEntityCreated; } }
@@ -924,7 +924,7 @@ namespace SongsOfConquestAccess.Events.Combat
         public string GetSpeechText() { return ModText.Get(ModStrings.Combat.Appears, Entity.Format()); }
     }
 
-    internal sealed class MapEntityDestroyedEvent : IAccessibilityEvent
+    public sealed class MapEntityDestroyedEvent : IAccessibilityEvent
     {
         public MapEntityDestroyedEvent(EntityRef entity) { Entity = entity; }
         public string Kind { get { return AccessibilityEvents.Combat.MapEntityDestroyed; } }
@@ -932,7 +932,7 @@ namespace SongsOfConquestAccess.Events.Combat
         public string GetSpeechText() { return ModText.Get(ModStrings.Combat.Destroyed, Entity.Format()); }
     }
 
-    internal sealed class TroopPushedEvent : IAccessibilityEvent
+    public sealed class TroopPushedEvent : IAccessibilityEvent
     {
         public TroopPushedEvent(TroopRef troop, Vector2Int from, Vector2Int to, IList<Vector2Int> path)
         {
@@ -950,7 +950,7 @@ namespace SongsOfConquestAccess.Events.Combat
         public string GetSpeechText() { return ModText.Get(ModStrings.Combat.PushedTo, Troop.Format(includePosition: true), FormatPoint(To)); }
     }
 
-    internal sealed class AbilityUsedEvent : IAccessibilityEvent
+    public sealed class AbilityUsedEvent : IAccessibilityEvent
     {
         public AbilityUsedEvent(ActorRef actor, AbilityRef ability, Vector2Int? targetingPosition, IList<Vector2Int> movementPath)
         {
@@ -968,7 +968,7 @@ namespace SongsOfConquestAccess.Events.Combat
         public string GetSpeechText() { return ModText.Get(ModStrings.Combat.AbilityUsed, Actor.Format(), Ability.Name); }
     }
 
-    internal sealed class TeleportEvent : IAccessibilityEvent
+    public sealed class TeleportEvent : IAccessibilityEvent
     {
         public TeleportEvent(ActorRef actor, Vector2Int from, Vector2Int to, TeleportBattleTroopCommand.Source source)
         {
@@ -991,7 +991,7 @@ namespace SongsOfConquestAccess.Events.Combat
         }
     }
 
-    internal sealed class BurrowUpEvent : IAccessibilityEvent
+    public sealed class BurrowUpEvent : IAccessibilityEvent
     {
         public BurrowUpEvent(ActorRef actor, bool succeeded) { Actor = actor; Succeeded = succeeded; }
         public string Kind { get { return AccessibilityEvents.Combat.BurrowUp; } }
@@ -1005,7 +1005,7 @@ namespace SongsOfConquestAccess.Events.Combat
         }
     }
 
-    internal sealed class BattleResultEvent : IAccessibilityEvent
+    public sealed class BattleResultEvent : IAccessibilityEvent
     {
         public BattleResultEvent(int localTeamId, BattleOutcome localOutcome, int attackerTeamId, BattleOutcome attackerOutcome, int defenderTeamId, BattleOutcome defenderOutcome)
         {
@@ -1043,7 +1043,7 @@ namespace SongsOfConquestAccess.Events.Combat
         }
     }
 
-    internal sealed class HudNotificationEvent : IAccessibilityEvent
+    public sealed class HudNotificationEvent : IAccessibilityEvent
     {
         // Native combat HUD popups that share BattleHUDNotificationManager or NotificationPanel
         // handling and are already authored as localized text. Examples include ranged blocked
@@ -1058,7 +1058,7 @@ namespace SongsOfConquestAccess.Events.Combat
         public string GetSpeechText() { return SpeechTextSanitizer.Normalize(Text); }
     }
 
-    internal static class CombatText
+    public static class CombatText
     {
         public static string FormatPoint(Vector2Int point)
         {

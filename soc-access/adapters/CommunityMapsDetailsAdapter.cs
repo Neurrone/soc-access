@@ -12,7 +12,7 @@ using UnityEngine.UI;
 
 namespace SongsOfConquestAccess.Adapters
 {
-    internal sealed class CommunityMapsDetailsAdapter
+    public sealed class CommunityMapsDetailsAdapter
     {
         private static readonly FieldInfo ContentRectField = AccessTools.Field(typeof(Details), "ModDetailsContentRect");
         private static readonly FieldInfo NameField = AccessTools.Field(typeof(Details), "ModDetailsName");
@@ -390,7 +390,7 @@ namespace SongsOfConquestAccess.Adapters
             return RichTextTagRegex.Replace(text, string.Empty).Replace("\r\n", "\n").Replace('\r', '\n').Trim();
         }
 
-        internal sealed class ActionItem
+        public sealed class ActionItem
         {
             private readonly Func<bool> _isSelected;
 
@@ -410,7 +410,7 @@ namespace SongsOfConquestAccess.Adapters
             public Func<bool> Activate { get; private set; }
         }
 
-        internal sealed class DetailItem
+        public sealed class DetailItem
         {
             public DetailItem(string id, string label, string value)
             {
@@ -424,7 +424,7 @@ namespace SongsOfConquestAccess.Adapters
             public string Value { get; private set; }
         }
 
-        internal sealed class TagItem
+        public sealed class TagItem
         {
             public TagItem(int index, string label)
             {

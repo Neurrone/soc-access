@@ -3,14 +3,14 @@ using SongsOfConquestAccess.Localization;
 
 namespace SongsOfConquestAccess.Scanner
 {
-    internal static class ScannerSpeechUtility
+    public static class ScannerSpeechUtility
     {
         public static string FormatDirections(IReadOnlyList<ScannerDirectionStep> directions)
         {
             return FormatDirections(directions, ModSettings.ScannerUsesLongDirections);
         }
 
-        internal static string FormatDirections(IReadOnlyList<ScannerDirectionStep> directions, bool useLongForm)
+        public static string FormatDirections(IReadOnlyList<ScannerDirectionStep> directions, bool useLongForm)
         {
             if (directions == null || directions.Count == 0)
             {

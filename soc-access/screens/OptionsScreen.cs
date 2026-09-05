@@ -12,7 +12,7 @@ using Zenject;
 
 namespace SongsOfConquestAccess.Screens
 {
-    internal sealed class OptionsScreen : Screen
+    public sealed class OptionsScreen : Screen
     {
         private static readonly PropertyInfo InstallerContainerProperty =
             AccessTools.Property(typeof(OptionsMenuInstaller), "Container");

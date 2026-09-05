@@ -9,7 +9,7 @@ using UnityEngine;
 
 namespace SongsOfConquestAccess.Bookmarks
 {
-    internal sealed class AdventureBookmarkStore
+    public sealed class AdventureBookmarkStore
     {
         private const int CurrentVersion = 1;
         private readonly string _directory;
@@ -76,7 +76,7 @@ namespace SongsOfConquestAccess.Bookmarks
             File.WriteAllText(GetPath(identity), Serialize(file), Encoding.UTF8);
         }
 
-        internal string GetPath(AdventureBookmarkGameIdentity identity)
+        public string GetPath(AdventureBookmarkGameIdentity identity)
         {
             return Path.Combine(_directory, identity.FileName);
         }
@@ -124,7 +124,7 @@ namespace SongsOfConquestAccess.Bookmarks
         }
 
         [DataContract]
-        internal sealed class BookmarkStoreFile
+        public sealed class BookmarkStoreFile
         {
             [DataMember]
             public int version;
@@ -135,7 +135,7 @@ namespace SongsOfConquestAccess.Bookmarks
         }
 
         [DataContract]
-        internal sealed class BookmarkGameInfo
+        public sealed class BookmarkGameInfo
         {
             [DataMember]
             public string key;
@@ -174,7 +174,7 @@ namespace SongsOfConquestAccess.Bookmarks
         }
 
         [DataContract]
-        internal sealed class BookmarkSlotEntry
+        public sealed class BookmarkSlotEntry
         {
             [DataMember]
             public string slot;

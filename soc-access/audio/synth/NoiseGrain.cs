@@ -15,7 +15,7 @@ namespace SongsOfConquestAccess.Audio.Synth
     /// fully determined by its constructor arguments: the same parameters always produce the same
     /// samples, which is what lets <see cref="CueRenderer"/> guarantee reproducible cues.</para>
     /// </summary>
-    internal sealed class NoiseGrain : Grain
+    public sealed class NoiseGrain : Grain
     {
         public const float DefaultQ = 30f;
         public const float DefaultTargetRms = 0.25f;

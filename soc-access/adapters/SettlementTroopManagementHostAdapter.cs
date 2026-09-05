@@ -6,7 +6,7 @@ using SongsOfConquest.Common.Gamestate.Facade;
 
 namespace SongsOfConquestAccess.Adapters
 {
-    internal sealed class SettlementTroopManagementHostAdapter : ITroopManagementHostAdapter
+    public sealed class SettlementTroopManagementHostAdapter : ITroopManagementHostAdapter
     {
         private readonly TownInteractionMenuAdapter _adapter;
 

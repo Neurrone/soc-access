@@ -7,7 +7,7 @@ using SongsOfConquestAccess.Adapters;
 namespace SongsOfConquestAccess
 {
     [HarmonyPatch]
-    internal static class LetterboxStoryTextPatches
+    public static class LetterboxStoryTextPatches
     {
         private static readonly FieldInfo LoreAsyncField = AccessTools.Field(typeof(LetterboxStoryText), "_loreAsync");
 

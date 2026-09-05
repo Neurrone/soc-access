@@ -7,7 +7,7 @@ using UnityEngine;
 
 namespace SongsOfConquestAccess.Screens
 {
-    internal sealed class TroopOverviewScreen : Screen
+    public sealed class TroopOverviewScreen : Screen
     {
         private readonly KingdomTroopOverviewAdapter _adapter;
 

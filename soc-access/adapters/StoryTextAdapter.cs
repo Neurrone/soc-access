@@ -9,7 +9,7 @@ using UnityEngine;
 
 namespace SongsOfConquestAccess.Adapters
 {
-    internal sealed class StoryTextAdapter : IStoryTextAdapter
+    public sealed class StoryTextAdapter : IStoryTextAdapter
     {
         private static readonly AccessTools.FieldRef<StoryText, Async> LoreAsyncRef =
             AccessTools.FieldRefAccess<StoryText, Async>("_loreAsync");

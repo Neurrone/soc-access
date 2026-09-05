@@ -5,7 +5,7 @@ using UnityEngine;
 
 namespace SongsOfConquestAccess.Audio
 {
-    internal static class WavAudioClipLoader
+    public static class WavAudioClipLoader
     {
         public static AudioClip Load(string path, string clipName)
         {

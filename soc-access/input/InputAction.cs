@@ -1,12 +1,12 @@
 namespace SongsOfConquestAccess.Input
 {
-    internal enum InputClaimScope
+    public enum InputClaimScope
     {
         FocusedWidget,
         Screen
     }
 
-    internal sealed class InputAction
+    public sealed class InputAction
     {
         private readonly System.Collections.Generic.List<InputBinding> _bindings =
             new System.Collections.Generic.List<InputBinding>();

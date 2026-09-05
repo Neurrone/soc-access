@@ -16,7 +16,7 @@ namespace SongsOfConquestAccess.Adapters
     /// scene owns, so it is reachable from the mod settings screen wherever that
     /// was opened from.
     /// </summary>
-    internal static class NativeTextPrompt
+    public static class NativeTextPrompt
     {
         /// <summary>
         /// Asks for a line of text and reports it back when the player confirms.

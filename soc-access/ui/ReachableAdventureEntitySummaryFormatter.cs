@@ -7,7 +7,7 @@ using UnityEngine;
 
 namespace SongsOfConquestAccess.UI
 {
-    internal static class ReachableAdventureEntitySummaryFormatter
+    public static class ReachableAdventureEntitySummaryFormatter
     {
         public static string Format(IReadOnlyList<ReachableAdventureEntity> entities)
         {

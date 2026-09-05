@@ -1,7 +1,7 @@
 namespace SongsOfConquestAccess.Audio
 {
     /// <summary>A cue key plus a pitch offset applied on top of the cue's user pitch setting.</summary>
-    internal readonly struct TileCue
+    public readonly struct TileCue
     {
         public TileCue(string key, float semitones)
             : this(key, semitones, false)

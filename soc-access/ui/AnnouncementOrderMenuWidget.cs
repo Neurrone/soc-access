@@ -7,7 +7,7 @@ using SongsOfConquestAccess.Speech.Spatial;
 
 namespace SongsOfConquestAccess.UI
 {
-    internal sealed class AnnouncementOrderMenuWidget : Widget
+    public sealed class AnnouncementOrderMenuWidget : Widget
     {
         private readonly AnnouncementGroupDefinition _group;
         private readonly Action<AnnouncementElementDefinition> _configure;
@@ -24,7 +24,7 @@ namespace SongsOfConquestAccess.UI
         {
         }
 
-        internal AnnouncementOrderMenuWidget(
+        public AnnouncementOrderMenuWidget(
             string id,
             AnnouncementGroupDefinition group,
             Action<AnnouncementElementDefinition> configure,
@@ -39,7 +39,7 @@ namespace SongsOfConquestAccess.UI
             SyncRowsWithOrder();
         }
 
-        internal string FocusedElementKey
+        public string FocusedElementKey
         {
             get
             {
@@ -48,7 +48,7 @@ namespace SongsOfConquestAccess.UI
             }
         }
 
-        internal int FocusedButtonIndex
+        public int FocusedButtonIndex
         {
             get
             {
@@ -231,7 +231,7 @@ namespace SongsOfConquestAccess.UI
             }
         }
 
-        internal string BuildMoveFeedback(string key)
+        public string BuildMoveFeedback(string key)
         {
             SyncRowsWithOrder();
             int index = GetRowIndex(key);

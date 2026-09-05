@@ -8,7 +8,7 @@ using SongsOfConquestAccess.Localization;
 
 namespace SongsOfConquestAccess.Speech
 {
-    internal static class ArtifactSpeechFormatter
+    public static class ArtifactSpeechFormatter
     {
         public static string FormatName(string name, Color powerLevelColor)
         {

@@ -1,6 +1,6 @@
 namespace SongsOfConquestAccess.Scanner
 {
-    internal sealed class AdventureMapScannerState
+    public sealed class AdventureMapScannerState
     {
         private readonly AdventureMapRevealedRegistry _revealedRegistry = new AdventureMapRevealedRegistry();
 

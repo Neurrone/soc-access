@@ -3,13 +3,13 @@ using UnityEngine;
 
 namespace SongsOfConquestAccess.Scanner
 {
-    internal enum AdventureMapRevealedKind
+    public enum AdventureMapRevealedKind
     {
         MapEntity,
         Wielder
     }
 
-    internal sealed class AdventureMapRevealedEntry
+    public sealed class AdventureMapRevealedEntry
     {
         public AdventureMapRevealedEntry(
             long sequence,
@@ -40,7 +40,7 @@ namespace SongsOfConquestAccess.Scanner
         public AdventureMapRevealedKind Kind { get; private set; }
     }
 
-    internal sealed class AdventureMapRevealedRegistry
+    public sealed class AdventureMapRevealedRegistry
     {
         private readonly Dictionary<string, AdventureMapRevealedEntry> _entriesByKey =
             new Dictionary<string, AdventureMapRevealedEntry>();

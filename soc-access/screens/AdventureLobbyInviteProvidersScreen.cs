@@ -7,7 +7,7 @@ using UnityEngine;
 
 namespace SongsOfConquestAccess.Screens
 {
-    internal sealed class AdventureLobbyInviteProvidersScreen : Screen
+    public sealed class AdventureLobbyInviteProvidersScreen : Screen
     {
         private readonly AdventureLobbyInviteProvidersAdapter _adapter;
 
@@ -101,7 +101,7 @@ namespace SongsOfConquestAccess.Screens
             return root;
         }
 
-        internal static AdventureLobbyInviteProvidersAdapter FindActiveInviteProviders(LobbyMultiplayerPanel targetPanel)
+        public static AdventureLobbyInviteProvidersAdapter FindActiveInviteProviders(LobbyMultiplayerPanel targetPanel)
         {
             LobbyMultiplayerPanel[] panels = Resources.FindObjectsOfTypeAll<LobbyMultiplayerPanel>();
             for (int i = 0; i < panels.Length; i++)

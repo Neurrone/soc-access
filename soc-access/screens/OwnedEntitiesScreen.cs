@@ -7,7 +7,7 @@ using UnityEngine;
 
 namespace SongsOfConquestAccess.Screens
 {
-    internal sealed class OwnedEntitiesScreen : Screen
+    public sealed class OwnedEntitiesScreen : Screen
     {
         private readonly KingdomEntityOverviewAdapter _adapter;
 

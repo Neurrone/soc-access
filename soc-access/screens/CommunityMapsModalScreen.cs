@@ -6,7 +6,7 @@ using SongsOfConquestAccess.UI;
 
 namespace SongsOfConquestAccess.Screens
 {
-    internal sealed class CommunityMapsModalScreen : Screen
+    public sealed class CommunityMapsModalScreen : Screen
     {
         private readonly CommunityMapsModalAdapter _adapter;
         private CommunityMapsModalState _state;

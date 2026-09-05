@@ -8,7 +8,7 @@ using SongsOfConquest.Common.Map;
 namespace SongsOfConquestAccess
 {
     [HarmonyPatch]
-    internal static class CampaignMapSelectPatches
+    public static class CampaignMapSelectPatches
     {
         private static readonly FieldInfo InformationViewField =
             AccessTools.Field(typeof(CampaignMapSelectMenu), "_informationView");

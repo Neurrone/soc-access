@@ -10,7 +10,7 @@ namespace SongsOfConquestAccess.Screens
     /// The checkboxes read the stored selectors directly, so a toggle is
     /// already saved by the time it is spoken back.
     /// </summary>
-    internal sealed class ScannerCustomCategorySelectorScreen : Screen
+    public sealed class ScannerCustomCategorySelectorScreen : Screen
     {
         private readonly string _taxonomyKey;
         private readonly int _id;

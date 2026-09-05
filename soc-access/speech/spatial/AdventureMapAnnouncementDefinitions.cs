@@ -2,7 +2,7 @@ using SongsOfConquestAccess.Localization;
 
 namespace SongsOfConquestAccess.Speech.Spatial
 {
-    internal static class AdventureMapAnnouncementDefinitions
+    public static class AdventureMapAnnouncementDefinitions
     {
         public static readonly AnnouncementGroupDefinition Tile = new AnnouncementGroupDefinition(
             "adventure_map_tile",

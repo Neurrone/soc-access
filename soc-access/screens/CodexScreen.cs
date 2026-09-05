@@ -12,7 +12,7 @@ using Zenject;
 
 namespace SongsOfConquestAccess.Screens
 {
-    internal sealed class CodexScreen : Screen
+    public sealed class CodexScreen : Screen
     {
         private static readonly PropertyInfo ContainerProperty = AccessTools.Property(typeof(MonoInstallerBase), "Container");
         private static readonly FieldInfo ContainerField = AccessTools.Field(typeof(MonoInstallerBase), "_container");

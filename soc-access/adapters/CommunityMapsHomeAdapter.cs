@@ -13,7 +13,7 @@ using UnityEngine.UI;
 
 namespace SongsOfConquestAccess.Adapters
 {
-    internal sealed class CommunityMapsHomeAdapter
+    public sealed class CommunityMapsHomeAdapter
     {
         private static readonly FieldInfo RowsField = AccessTools.Field(typeof(Home), "BrowserPanelModListRows");
         private static readonly FieldInfo FeaturedNameField = AccessTools.Field(typeof(Home), "featuredSelectedName");
@@ -836,7 +836,7 @@ namespace SongsOfConquestAccess.Adapters
             return text.Replace("<color=red>", string.Empty).Replace("</color>", string.Empty);
         }
 
-        internal sealed class RowItem
+        public sealed class RowItem
         {
             public RowItem(int index, string label, string status, IReadOnlyList<ModItem> items)
             {
@@ -852,7 +852,7 @@ namespace SongsOfConquestAccess.Adapters
             public IReadOnlyList<ModItem> Items { get; private set; }
         }
 
-        internal sealed class FeaturedItem
+        public sealed class FeaturedItem
         {
             public FeaturedItem(int index, string label)
             {
@@ -864,7 +864,7 @@ namespace SongsOfConquestAccess.Adapters
             public string Label { get; private set; }
         }
 
-        internal sealed class TabItem
+        public sealed class TabItem
         {
             private readonly Func<bool> _isSelected;
             private readonly Func<bool> _select;
@@ -883,7 +883,7 @@ namespace SongsOfConquestAccess.Adapters
             public bool Select() { return _select != null && _select(); }
         }
 
-        internal sealed class ModItem
+        public sealed class ModItem
         {
             public ModItem(int rowIndex, int index, string label, string status, ListItem nativeItem)
             {

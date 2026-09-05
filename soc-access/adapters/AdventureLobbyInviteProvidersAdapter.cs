@@ -12,7 +12,7 @@ using UnityEngine;
 
 namespace SongsOfConquestAccess.Adapters
 {
-    internal sealed class AdventureLobbyInviteProvidersAdapter
+    public sealed class AdventureLobbyInviteProvidersAdapter
     {
         private static readonly FieldInfo InviteDropdownContainerField =
             AccessTools.Field(typeof(LobbyMultiplayerPanel), "_inviteDropdownContainer");
@@ -118,7 +118,7 @@ namespace SongsOfConquestAccess.Adapters
             return gameObject != null && gameObject.scene.IsValid() && gameObject.scene.isLoaded;
         }
 
-        internal sealed class ProviderButtonItem
+        public sealed class ProviderButtonItem
         {
             private readonly int _index;
             private readonly UIButton _button;

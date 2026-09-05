@@ -7,7 +7,7 @@ using UnityEngine;
 
 namespace SongsOfConquestAccess.Adapters
 {
-    internal sealed class Tooltip
+    public sealed class Tooltip
     {
         private static readonly IReadOnlyList<string> EmptyLines = new string[0];
         private static readonly IReadOnlyList<TooltipAction> EmptyActions = new TooltipAction[0];
@@ -73,7 +73,7 @@ namespace SongsOfConquestAccess.Adapters
 
     }
 
-    internal sealed class TooltipAction
+    public sealed class TooltipAction
     {
         public TooltipAction(string label, Func<bool> invoke)
         {
@@ -86,7 +86,7 @@ namespace SongsOfConquestAccess.Adapters
         public Func<bool> Invoke { get; private set; }
     }
 
-    internal sealed class VisualTooltipMetadata
+    public sealed class VisualTooltipMetadata
     {
         private VisualTooltipMetadata()
         {

@@ -7,7 +7,7 @@ namespace SongsOfConquestAccess.Scanner
     /// keywords. Lower tiers are better matches; <see cref="NoMatch"/> means the
     /// query does not match at all.
     /// </summary>
-    internal static class ScannerTextMatch
+    public static class ScannerTextMatch
     {
         public const int NoMatch = -1;
 

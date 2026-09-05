@@ -2,7 +2,7 @@ using System;
 
 namespace SongsOfConquestAccess.Events
 {
-    internal static class AccessibilityEventBus
+    public static class AccessibilityEventBus
     {
         private static event Action<IAccessibilityEvent> Published;
 
@@ -17,7 +17,7 @@ namespace SongsOfConquestAccess.Events
             Published?.Invoke(accessibilityEvent);
         }
 
-        internal static void Subscribe(Action<IAccessibilityEvent> handler)
+        public static void Subscribe(Action<IAccessibilityEvent> handler)
         {
             if (handler == null)
             {
@@ -28,7 +28,7 @@ namespace SongsOfConquestAccess.Events
             Published += handler;
         }
 
-        internal static void Unsubscribe(Action<IAccessibilityEvent> handler)
+        public static void Unsubscribe(Action<IAccessibilityEvent> handler)
         {
             if (handler == null)
             {

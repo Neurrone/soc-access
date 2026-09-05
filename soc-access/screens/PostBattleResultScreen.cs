@@ -10,7 +10,7 @@ using UnityEngine;
 
 namespace SongsOfConquestAccess.Screens
 {
-    internal sealed class PostBattleResultScreen : Screen
+    public sealed class PostBattleResultScreen : Screen
     {
         private static readonly System.Reflection.FieldInfo PostBattleMenuResultField =
             AccessTools.Field(typeof(PostBattleMenu), "_result");

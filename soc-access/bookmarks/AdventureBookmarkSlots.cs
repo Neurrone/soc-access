@@ -1,6 +1,6 @@
 namespace SongsOfConquestAccess.Bookmarks
 {
-    internal static class AdventureBookmarkSlots
+    public static class AdventureBookmarkSlots
     {
         public static readonly string[] All =
         {

@@ -26,7 +26,7 @@ using SongsOfConquestAccess.Scanner;
 
 namespace SongsOfConquestAccess.Screens
 {
-    internal sealed class ScreenDetector
+    public sealed class ScreenDetector
     {
         private delegate Screen RuntimeScreenFactory();
 
@@ -2876,7 +2876,7 @@ namespace SongsOfConquestAccess.Screens
 
         /// <summary>The runtime factories that would answer present right now, by screen type
         /// name, in factory order - what a resync would push. For the dev server's probes.</summary>
-        internal List<string> PresentRuntimeScreens()
+        public List<string> PresentRuntimeScreens()
         {
             List<string> names = new List<string>();
             for (int i = 0; i < _runtimeScreenFactories.Count; i++)

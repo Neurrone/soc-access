@@ -19,7 +19,7 @@ using UnityEngine;
 
 namespace SongsOfConquestAccess.Adapters
 {
-    internal sealed class BattleCommanderHudAdapter
+    public sealed class BattleCommanderHudAdapter
     {
         private static readonly FieldInfo WielderPortraitButtonField =
             AccessTools.Field(typeof(BattleCommanderHUD), "_wielderPortraitButton");

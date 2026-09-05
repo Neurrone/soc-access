@@ -6,7 +6,7 @@ using SongsOfConquestAccess.Screens;
 namespace SongsOfConquestAccess.Patches
 {
     [HarmonyPatch]
-    internal static class AdventureLobbyGameSettingsPatches
+    public static class AdventureLobbyGameSettingsPatches
     {
         [HarmonyPatch(typeof(LobbyMapSettingsMenu), "Show")]
         [HarmonyPostfix]

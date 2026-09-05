@@ -5,7 +5,7 @@ using SongsOfConquest.Client.UI;
 
 namespace SongsOfConquestAccess.Adapters
 {
-    internal static class UITextMeshTextUtility
+    public static class UITextMeshTextUtility
     {
         // Hot reload can desync UITextMesh from TMP_Text on existing popup instances:
         // the public Text/TMP m_text may revert to prefab placeholder strings while the

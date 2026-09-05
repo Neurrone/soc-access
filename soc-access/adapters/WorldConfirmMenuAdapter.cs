@@ -11,7 +11,7 @@ using SongsOfConquestAccess.Speech;
 
 namespace SongsOfConquestAccess.Adapters
 {
-    internal sealed class WorldConfirmMenuAdapter
+    public sealed class WorldConfirmMenuAdapter
     {
         private static readonly FieldInfo SettingsField = AccessTools.Field(typeof(WorldConfirmMenu), "_settings");
         private static readonly FieldInfo AsyncField = AccessTools.Field(typeof(WorldConfirmMenu), "_async");

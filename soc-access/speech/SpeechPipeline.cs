@@ -2,7 +2,7 @@ using System;
 
 namespace SongsOfConquestAccess.Speech
 {
-    internal static class SpeechPipeline
+    public static class SpeechPipeline
     {
         private static SpeechService _speechService;
         private static bool _muted;
@@ -10,7 +10,7 @@ namespace SongsOfConquestAccess.Speech
         // The dev server's tap on the one place every spoken line passes through, so
         // GET /speech reports exactly what a listener would have heard. Set while the mod's
         // routes are registered and cleared when they are taken down.
-        internal static Action<string> Observer;
+        public static Action<string> Observer;
 
         public static void Initialize(SpeechService speechService, bool muteFromConfig)
         {

@@ -4,7 +4,7 @@ using SongsOfConquest.Client.Gamestate;
 
 namespace SongsOfConquestAccess.Adapters
 {
-    internal enum DropResult
+    public enum DropResult
     {
         Invalid,
         Dropped,
@@ -12,7 +12,7 @@ namespace SongsOfConquestAccess.Adapters
         DeniedWithoutFeedback
     }
 
-    internal static class ArtifactDropUtility
+    public static class ArtifactDropUtility
     {
         private const byte NativeFeedbackErrorCode = 10;
 

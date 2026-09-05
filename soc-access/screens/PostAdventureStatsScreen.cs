@@ -10,7 +10,7 @@ using UnityEngine;
 
 namespace SongsOfConquestAccess.Screens
 {
-    internal sealed class PostAdventureStatsScreen : Screen
+    public sealed class PostAdventureStatsScreen : Screen
     {
         private static readonly FieldInfo StatsMenuField = AccessTools.Field(typeof(PostAdventureMenu), "_statsMenu");
 

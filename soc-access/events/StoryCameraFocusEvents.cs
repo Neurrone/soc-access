@@ -5,14 +5,14 @@ using UnityEngine;
 
 namespace SongsOfConquestAccess.Events
 {
-    internal enum StoryCameraFocusKind
+    public enum StoryCameraFocusKind
     {
         Point,
         Wielder,
         ConversationArea
     }
 
-    internal sealed class StoryCameraFocusTarget
+    public sealed class StoryCameraFocusTarget
     {
         public StoryCameraFocusTarget(string label, Vector2Int tile)
         {
@@ -30,7 +30,7 @@ namespace SongsOfConquestAccess.Events
         }
     }
 
-    internal sealed class StoryCameraFocusStartedEvent : IAccessibilityEvent
+    public sealed class StoryCameraFocusStartedEvent : IAccessibilityEvent
     {
         public StoryCameraFocusStartedEvent(StoryCameraFocusKind focusKind, IEnumerable<StoryCameraFocusTarget> targets, string focusReference)
         {

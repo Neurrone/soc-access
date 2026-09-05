@@ -1,6 +1,6 @@
 namespace SongsOfConquestAccess.Events
 {
-    internal sealed class ArmyExchangeInvalidDestinationEvent : IAccessibilityEvent
+    public sealed class ArmyExchangeInvalidDestinationEvent : IAccessibilityEvent
     {
         public ArmyExchangeInvalidDestinationEvent(string sourceSlotId, string targetSlotId)
         {

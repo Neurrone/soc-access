@@ -18,7 +18,7 @@ using UnityEngine.UI;
 
 namespace SongsOfConquestAccess.Adapters
 {
-    internal sealed class MapEntityMiniMenuAdapter
+    public sealed class MapEntityMiniMenuAdapter
     {
         private static readonly FieldInfo TopContainerField = AccessTools.Field(typeof(MapEntityMiniMenu), "_topContainer");
         private static readonly FieldInfo NameTextField = AccessTools.Field(typeof(MapEntityMiniMenu), "_nameText");

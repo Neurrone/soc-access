@@ -2,7 +2,7 @@ using SongsOfConquestAccess.Speech;
 
 namespace SongsOfConquestAccess.Events
 {
-    internal sealed class SpeechEventAnnouncer
+    public sealed class SpeechEventAnnouncer
     {
         private bool _attached;
 

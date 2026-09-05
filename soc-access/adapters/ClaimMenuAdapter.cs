@@ -12,7 +12,7 @@ using UnityEngine.UI;
 
 namespace SongsOfConquestAccess.Adapters
 {
-    internal sealed class ClaimMenuAdapter
+    public sealed class ClaimMenuAdapter
     {
         private static readonly FieldInfo SettingsField = AccessTools.Field(typeof(ClaimMenu), "_settings");
 
@@ -149,7 +149,7 @@ namespace SongsOfConquestAccess.Adapters
             return owner != null && field != null ? field.GetValue(owner) as T : null;
         }
 
-        internal sealed class ChoiceItem
+        public sealed class ChoiceItem
         {
             private readonly Func<bool> _isEnabled;
 

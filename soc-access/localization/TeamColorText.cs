@@ -2,7 +2,7 @@ using SongsOfConquest.Common;
 
 namespace SongsOfConquestAccess.Localization
 {
-    internal static class TeamColorText
+    public static class TeamColorText
     {
         public static string Get(TeamColor color)
         {

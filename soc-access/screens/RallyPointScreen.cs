@@ -15,7 +15,7 @@ using UnityEngine;
 
 namespace SongsOfConquestAccess.Screens
 {
-    internal sealed class RallyPointScreen : Screen
+    public sealed class RallyPointScreen : Screen
     {
         private const int TroopMenuIndex = 3;
         private const int SourceMenuIndex = 4;

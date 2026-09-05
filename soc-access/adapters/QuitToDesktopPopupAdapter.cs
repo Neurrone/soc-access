@@ -9,7 +9,7 @@ using UnityEngine.UI;
 
 namespace SongsOfConquestAccess.Adapters
 {
-    internal sealed class QuitToDesktopPopupAdapter
+    public sealed class QuitToDesktopPopupAdapter
     {
         private static readonly AccessTools.FieldRef<QuitToDesktopPopup, QuitToDesktopPopup.Settings> SettingsRef =
             AccessTools.FieldRefAccess<QuitToDesktopPopup, QuitToDesktopPopup.Settings>("_settings");

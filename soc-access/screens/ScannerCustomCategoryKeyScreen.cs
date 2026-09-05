@@ -10,7 +10,7 @@ namespace SongsOfConquestAccess.Screens
     /// key says who holds it, because picking one that is taken moves it, and
     /// the player deserves to know what they are about to take it from.
     /// </summary>
-    internal sealed class ScannerCustomCategoryKeyScreen : Screen
+    public sealed class ScannerCustomCategoryKeyScreen : Screen
     {
         private readonly string _taxonomyKey;
         private readonly int _id;

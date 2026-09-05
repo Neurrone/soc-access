@@ -12,7 +12,7 @@ using Zenject;
 namespace SongsOfConquestAccess
 {
     [HarmonyPatch]
-    internal static class ChatPatches
+    public static class ChatPatches
     {
         private static readonly System.Reflection.PropertyInfo ChatWindowContainerProperty =
             AccessTools.Property(typeof(ChatWindow), "Container");

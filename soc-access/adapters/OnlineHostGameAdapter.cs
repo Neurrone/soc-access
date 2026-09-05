@@ -10,7 +10,7 @@ using UnityEngine;
 
 namespace SongsOfConquestAccess.Adapters
 {
-    internal sealed class OnlineHostGameAdapter
+    public sealed class OnlineHostGameAdapter
     {
         private static readonly AccessTools.FieldRef<GameListMenu, GameListMenu.Settings> SettingsRef =
             AccessTools.FieldRefAccess<GameListMenu, GameListMenu.Settings>("_settings");

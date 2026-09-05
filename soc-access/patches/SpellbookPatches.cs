@@ -5,7 +5,7 @@ using SongsOfConquest.Common.Gamestate;
 namespace SongsOfConquestAccess
 {
     [HarmonyPatch(typeof(SpellBook), "Show")]
-    internal static class SpellbookShowPatch
+    public static class SpellbookShowPatch
     {
         private static void Postfix(SpellBook __instance, ICommanderState commanderState)
         {
@@ -14,7 +14,7 @@ namespace SongsOfConquestAccess
     }
 
     [HarmonyPatch(typeof(SpellBook), "Close")]
-    internal static class SpellbookClosePatch
+    public static class SpellbookClosePatch
     {
         private static void Prefix(SpellBook __instance, ref bool __state)
         {

@@ -6,7 +6,7 @@ using SongsOfConquestAccess.Speech.Spatial;
 
 namespace SongsOfConquestAccess.Scanner
 {
-    internal sealed class CombatScannerSpeechContext : IScannerSpeechContext
+    public sealed class CombatScannerSpeechContext : IScannerSpeechContext
     {
         private readonly ScannerResult _result;
         private readonly CombatTile _tile;

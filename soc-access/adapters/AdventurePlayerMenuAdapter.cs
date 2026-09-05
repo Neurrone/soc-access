@@ -20,7 +20,7 @@ using UnityEngine.UI;
 
 namespace SongsOfConquestAccess.Adapters
 {
-    internal sealed class AdventurePlayerMenuAdapter
+    public sealed class AdventurePlayerMenuAdapter
     {
         private static readonly FieldInfo AdventureFacadeField =
             AccessTools.Field(typeof(AdventurePlayerMenu), "_adventureFacade");
@@ -199,7 +199,7 @@ namespace SongsOfConquestAccess.Adapters
             return gameObject != null && gameObject.scene.IsValid() && gameObject.scene.isLoaded;
         }
 
-        internal sealed class PlayerItem
+        public sealed class PlayerItem
         {
             private static readonly FieldInfo TeamField =
                 AccessTools.Field(typeof(AdventurePlayerMenuEntry), "_teamState");
@@ -564,7 +564,7 @@ namespace SongsOfConquestAccess.Adapters
             }
         }
 
-        internal sealed class ActionItem
+        public sealed class ActionItem
         {
             private readonly AdventurePlayerMenuAdapter _adapter;
             private readonly UIButton _button;

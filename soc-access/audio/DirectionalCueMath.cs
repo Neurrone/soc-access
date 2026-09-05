@@ -3,7 +3,7 @@ using UnityEngine;
 
 namespace SongsOfConquestAccess.Audio
 {
-    internal enum CueGridGeometry
+    public enum CueGridGeometry
     {
         Square,
         Hex
@@ -14,7 +14,7 @@ namespace SongsOfConquestAccess.Audio
     /// distance becomes pan, vertical distance becomes pitch, straight-line distance becomes gain.
     /// Ported from the retired scanner directional beep so the encoding stays familiar.
     /// </summary>
-    internal static class DirectionalCueMath
+    public static class DirectionalCueMath
     {
         private const int SquarePanSaturationTiles = 12;
         private const int HexPanSaturationTiles = 6;

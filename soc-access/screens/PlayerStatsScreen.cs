@@ -10,7 +10,7 @@ using UnityEngine;
 
 namespace SongsOfConquestAccess.Screens
 {
-    internal sealed class PlayerStatsScreen : Screen
+    public sealed class PlayerStatsScreen : Screen
     {
         private readonly PlayerStatsAdapter _adapter;
 

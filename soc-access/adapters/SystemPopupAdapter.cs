@@ -9,7 +9,7 @@ using UnityEngine.UI;
 
 namespace SongsOfConquestAccess.Adapters
 {
-    internal sealed class SystemPopupAdapter : IMessageDialogAdapter, IInputDialogAdapter
+    public sealed class SystemPopupAdapter : IMessageDialogAdapter, IInputDialogAdapter
     {
         private static readonly AccessTools.FieldRef<SystemPopup, UITextMesh> HeaderTextRef =
             AccessTools.FieldRefAccess<SystemPopup, UITextMesh>("_headerText");

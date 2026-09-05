@@ -11,7 +11,7 @@ using UnityEngine;
 
 namespace SongsOfConquestAccess.Screens
 {
-    internal sealed class MarketplaceScreen : Screen
+    public sealed class MarketplaceScreen : Screen
     {
         private const int ResourcesMenuIndex = 1;
 

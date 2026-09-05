@@ -9,7 +9,7 @@ using SongsOfConquestAccess.Adapters;
 namespace SongsOfConquestAccess
 {
     [HarmonyPatch]
-    internal static class PurchaseWielderMenuPatches
+    public static class PurchaseWielderMenuPatches
     {
         private static readonly FieldInfo AsyncField = AccessTools.Field(typeof(PurchaseWielderMenu), "_async");
 

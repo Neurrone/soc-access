@@ -11,7 +11,7 @@ using Zenject;
 
 namespace SongsOfConquestAccess.Screens
 {
-    internal sealed class LevelUpScreen : Screen
+    public sealed class LevelUpScreen : Screen
     {
         private static readonly System.Reflection.PropertyInfo InstallerContainerProperty =
             AccessTools.Property(typeof(CommanderLevelUpMenuInstaller), "Container");

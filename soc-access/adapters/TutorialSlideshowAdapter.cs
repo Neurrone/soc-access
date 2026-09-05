@@ -8,7 +8,7 @@ using UnityEngine;
 
 namespace SongsOfConquestAccess.Adapters
 {
-    internal sealed class TutorialSlideshowAdapter
+    public sealed class TutorialSlideshowAdapter
     {
         private static readonly AccessTools.FieldRef<TutorialMenu, GameObject> TopContainerRef =
             AccessTools.FieldRefAccess<TutorialMenu, GameObject>("_topContainer");

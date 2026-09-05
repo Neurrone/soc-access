@@ -2,7 +2,7 @@ using System.Collections.Generic;
 
 namespace SongsOfConquestAccess.Audio.Synth
 {
-    internal enum CueWaveform
+    public enum CueWaveform
     {
         Sine,
         Triangle,
@@ -13,7 +13,7 @@ namespace SongsOfConquestAccess.Audio.Synth
     /// One layer of a cue. Every sonic property is a plain mutable field so a tuning UI
     /// can edit it directly and re-render.
     /// </summary>
-    internal sealed class CueSegment
+    public sealed class CueSegment
     {
         public CueWaveform Waveform = CueWaveform.Sine;
 
@@ -58,7 +58,7 @@ namespace SongsOfConquestAccess.Audio.Synth
         }
     }
 
-    internal sealed class CueSpec
+    public sealed class CueSpec
     {
         public string Name;
 

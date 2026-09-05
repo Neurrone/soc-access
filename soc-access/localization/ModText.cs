@@ -4,7 +4,7 @@ using SongsOfConquest.Common.Localization;
 
 namespace SongsOfConquestAccess.Localization
 {
-    internal static class ModText
+    public static class ModText
     {
         public static string Get(ModString text, params object[] args)
         {

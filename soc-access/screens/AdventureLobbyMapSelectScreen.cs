@@ -9,7 +9,7 @@ using UnityEngine;
 
 namespace SongsOfConquestAccess.Screens
 {
-    internal sealed class AdventureLobbyMapSelectScreen : Screen
+    public sealed class AdventureLobbyMapSelectScreen : Screen
     {
         private const string TableId = "map-select-table";
         private static readonly string[] FilterIds =
@@ -431,7 +431,7 @@ namespace SongsOfConquestAccess.Screens
             NativeSelectionUtility.Select(button);
         }
 
-        internal static AdventureLobbyMapSelectAdapter FindActiveMapSelectMenu(MapSelectMenu targetMenu)
+        public static AdventureLobbyMapSelectAdapter FindActiveMapSelectMenu(MapSelectMenu targetMenu)
         {
             MapSelectMenu[] menus = Resources.FindObjectsOfTypeAll<MapSelectMenu>();
             for (int i = 0; i < menus.Length; i++)

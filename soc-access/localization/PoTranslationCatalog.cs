@@ -5,7 +5,7 @@ using System.Text;
 
 namespace SongsOfConquestAccess.Localization
 {
-    internal sealed class PoTranslationCatalog
+    public sealed class PoTranslationCatalog
     {
         private readonly Dictionary<string, string> _entries;
 

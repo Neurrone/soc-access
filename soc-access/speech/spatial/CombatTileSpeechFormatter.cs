@@ -5,7 +5,7 @@ using SongsOfConquestAccess.Localization;
 
 namespace SongsOfConquestAccess.Speech.Spatial
 {
-    internal sealed class CombatTileSpeechFormatter
+    public sealed class CombatTileSpeechFormatter
     {
         private readonly CombatAdapter _adapter;
         private readonly CombatInspectContext _context;

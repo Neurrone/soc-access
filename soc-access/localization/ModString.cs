@@ -1,6 +1,6 @@
 namespace SongsOfConquestAccess.Localization
 {
-    internal readonly struct ModString
+    public readonly struct ModString
     {
         public ModString(string key, string text)
         {

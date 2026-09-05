@@ -5,7 +5,7 @@ namespace SongsOfConquestAccess.Scanner
     /// rather than resolved text so the short and long spoken forms are chosen
     /// at speech time, from the current setting and language.
     /// </summary>
-    internal sealed class ScannerDirectionStep
+    public sealed class ScannerDirectionStep
     {
         public ScannerDirectionStep(int count, ScannerDirection direction)
         {

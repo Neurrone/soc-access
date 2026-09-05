@@ -15,7 +15,7 @@ namespace SongsOfConquestAccess.Audio.Synth
     /// zeroed filter, discard the leading <c>warmup</c> samples (the filter's settling transient),
     /// then RMS-normalise so perceived loudness is independent of Q.</para>
     /// </summary>
-    internal sealed class NoisePool
+    public sealed class NoisePool
     {
         private readonly double _centerHz;
         private readonly double _q;
@@ -86,7 +86,7 @@ namespace SongsOfConquestAccess.Audio.Synth
             _cursor = 0;
         }
 
-        internal static void NormalizeRms(float[] buffer, double target)
+        public static void NormalizeRms(float[] buffer, double target)
         {
             double sumSquares = 0.0;
             for (int i = 0; i < buffer.Length; i++)

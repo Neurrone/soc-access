@@ -4,7 +4,7 @@ using UnityEngine;
 
 namespace SongsOfConquestAccess.Bookmarks
 {
-    internal sealed class AdventureBookmarkManager
+    public sealed class AdventureBookmarkManager
     {
         private readonly AdventureBookmarkStore _store;
         private AdventureBookmarkGameIdentity _identity;

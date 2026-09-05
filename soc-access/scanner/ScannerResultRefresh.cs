@@ -9,7 +9,7 @@ namespace SongsOfConquestAccess.Scanner
     /// result measured from wherever the scan started, is corrected at
     /// announcement time rather than surviving until the next full rebuild.
     /// </summary>
-    internal struct ScannerResultRefresh
+    public struct ScannerResultRefresh
     {
         private ScannerResultRefresh(bool isValid, Vector2Int position)
         {

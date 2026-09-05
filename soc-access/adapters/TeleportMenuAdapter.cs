@@ -10,7 +10,7 @@ using UnityEngine;
 
 namespace SongsOfConquestAccess.Adapters
 {
-    internal sealed class TeleportMenuAdapter
+    public sealed class TeleportMenuAdapter
     {
         private static readonly FieldInfo CurrentTeleportIndexField = AccessTools.Field(typeof(TeleportMenu), "_currentTeleportIndex");
         private static readonly FieldInfo CurrentTeleportPositionsField = AccessTools.Field(typeof(TeleportMenu), "_currentTeleportPositions");

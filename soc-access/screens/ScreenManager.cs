@@ -6,7 +6,7 @@ using SongsOfConquestAccess.UI;
 
 namespace SongsOfConquestAccess.Screens
 {
-    internal sealed class ScreenManager
+    public sealed class ScreenManager
     {
         private readonly List<Screen> _stack = new List<Screen>();
         private readonly ReviewBufferManager _reviewBuffers;
@@ -20,7 +20,7 @@ namespace SongsOfConquestAccess.Screens
         }
 
         /// <summary>The stack bottom first, read-only, for the dev server's dump header.</summary>
-        internal IReadOnlyList<Screen> Stack
+        public IReadOnlyList<Screen> Stack
         {
             get { return _stack; }
         }

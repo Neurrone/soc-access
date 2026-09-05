@@ -11,7 +11,7 @@ using Zenject;
 
 namespace SongsOfConquestAccess.Screens
 {
-    internal sealed class StoryTextScreen : Screen
+    public sealed class StoryTextScreen : Screen
     {
         private static readonly PropertyInfo DialogueInstallerContainerProperty =
             AccessTools.Property(typeof(DialogueMenuInstaller), "Container");

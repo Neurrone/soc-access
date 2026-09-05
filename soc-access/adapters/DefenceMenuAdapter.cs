@@ -18,7 +18,7 @@ using UnityEngine;
 
 namespace SongsOfConquestAccess.Adapters
 {
-    internal sealed class DefenceMenuAdapter
+    public sealed class DefenceMenuAdapter
     {
         private static readonly FieldInfo AsyncField = AccessTools.Field(typeof(DefenceMenu), "_async");
         private static readonly FieldInfo TutorialButtonField = AccessTools.Field(typeof(DefenceMenu), "_tutorialButton");
@@ -400,7 +400,7 @@ namespace SongsOfConquestAccess.Adapters
             return owner != null && field != null ? field.GetValue(owner) as T : null;
         }
 
-        internal sealed class TowerItem
+        public sealed class TowerItem
         {
             private readonly DefenceTowerEntry _entry;
             private readonly ILocalizationHandler _localization;

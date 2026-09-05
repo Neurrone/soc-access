@@ -7,7 +7,7 @@ using SongsOfConquestAccess.Speech;
 
 namespace SongsOfConquestAccess.UI
 {
-    internal static class TroopHudMenu
+    public static class TroopHudMenu
     {
         public static MenuWidget Build(string id, string label, TroopHudAdapter adapter, Func<bool> isVisible, bool readOnly = false)
         {

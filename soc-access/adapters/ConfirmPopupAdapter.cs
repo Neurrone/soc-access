@@ -11,7 +11,7 @@ using UnityEngine.UI;
 
 namespace SongsOfConquestAccess.Adapters
 {
-    internal sealed class ConfirmPopupAdapter : IMessageDialogAdapter
+    public sealed class ConfirmPopupAdapter : IMessageDialogAdapter
     {
         private static readonly AccessTools.FieldRef<ConfirmPopup, UITextMesh> TitleRef =
             AccessTools.FieldRefAccess<ConfirmPopup, UITextMesh>("_title");

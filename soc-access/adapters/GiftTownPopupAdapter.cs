@@ -11,7 +11,7 @@ using UnityEngine;
 
 namespace SongsOfConquestAccess.Adapters
 {
-    internal sealed class GiftTownPopupAdapter
+    public sealed class GiftTownPopupAdapter
     {
         private static readonly FieldInfo GiftButtonParentField = AccessTools.Field(typeof(GiftTownPopup), "_giftButtonParent");
         private static readonly FieldInfo RequestButtonParentField = AccessTools.Field(typeof(GiftTownPopup), "_requestButtonParent");
@@ -164,7 +164,7 @@ namespace SongsOfConquestAccess.Adapters
             return MenuButtonTextUtility.JoinParts(parts.ToArray());
         }
 
-        internal sealed class TownItem
+        public sealed class TownItem
         {
             private readonly GiftTownPopupAdapter _adapter;
             private readonly GiftTownButton _button;

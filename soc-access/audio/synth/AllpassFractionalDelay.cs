@@ -15,7 +15,7 @@ namespace SongsOfConquestAccess.Audio.Synth
     ///
     /// <para>One instance carries the state for one mono stream; feed samples in time order.</para>
     /// </summary>
-    internal sealed class AllpassFractionalDelay
+    public sealed class AllpassFractionalDelay
     {
         private readonly double _a;
         private double _previousInput;

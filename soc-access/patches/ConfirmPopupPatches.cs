@@ -7,7 +7,7 @@ using UnityEngine;
 namespace SongsOfConquestAccess.Patches
 {
     [HarmonyPatch]
-    internal static class ConfirmPopupPatches
+    public static class ConfirmPopupPatches
     {
         [HarmonyPatch(typeof(ConfirmPopup), "Show", new Type[] { typeof(string), typeof(string), typeof(Vector2), typeof(bool), typeof(InputLevel) })]
         [HarmonyPostfix]

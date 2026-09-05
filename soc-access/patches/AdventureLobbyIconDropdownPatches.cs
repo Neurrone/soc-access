@@ -7,7 +7,7 @@ using UnityEngine;
 namespace SongsOfConquestAccess
 {
     [HarmonyPatch]
-    internal static class AdventureLobbyIconDropdownPatches
+    public static class AdventureLobbyIconDropdownPatches
     {
         [HarmonyPatch(typeof(IconDropdown), "SetupAsColor")]
         [HarmonyPostfix]

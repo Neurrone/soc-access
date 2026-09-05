@@ -8,7 +8,7 @@ using UnityEngine;
 
 namespace SongsOfConquestAccess.Adapters
 {
-    internal sealed class DefenceSlotListAdapter
+    public sealed class DefenceSlotListAdapter
     {
         private readonly IReadOnlyList<TroopHUDEntry> _entries;
         private readonly ILocalizationHandler _localization;
@@ -31,7 +31,7 @@ namespace SongsOfConquestAccess.Adapters
             return slots;
         }
 
-        internal sealed class Slot
+        public sealed class Slot
         {
             private readonly TroopHUDEntry _entry;
             private readonly ILocalizationHandler _localization;

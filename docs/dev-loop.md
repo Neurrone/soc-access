@@ -152,9 +152,9 @@ REPL facts observed on this Mono (Unity 2022.3, `mcs.dll` built for net35):
 - Private game members are reached with plain reflection
   (`typeof(T).GetMethod("Close", BindingFlags.NonPublic | BindingFlags.Instance)`), which
   is how a game-owned menu is closed when the mod does not claim the key that closes it.
-- Reaching a mod internal from `/eval`: mod types are `internal`, so go through the public
-  `DevProbe` and `ModEntry`, or add a probe there (mod side, hot-reloads) rather than
-  widening a type.
+- Mod types are public, as in ES2, so `/eval` can name them directly
+  (`SongsOfConquestAccess.SocAccessMod.Instance.ScreenManager.CurrentScreen`); a question
+  asked more than once still belongs in `DevProbe` (mod side, hot-reloads), compile-checked.
 
 ## 4. The loops
 

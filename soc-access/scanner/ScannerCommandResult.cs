@@ -6,13 +6,13 @@ using UnityEngine;
 
 namespace SongsOfConquestAccess.Scanner
 {
-    internal enum ScannerCommandStatus
+    public enum ScannerCommandStatus
     {
         Result,
         NoResults
     }
 
-    internal sealed class ScannerCommandResult
+    public sealed class ScannerCommandResult
     {
         public ScannerCommandResult(ScannerCommandStatus status)
         {
@@ -107,7 +107,7 @@ namespace SongsOfConquestAccess.Scanner
         /// The direction runs carry their own counts, so their sum is the
         /// distance and speaking a total first would only repeat it.
         /// </summary>
-        internal string FormatDistanceAndDirection(bool useLongDirections)
+        public string FormatDistanceAndDirection(bool useLongDirections)
         {
             return ScannerSpeechUtility.FormatDirections(Directions, useLongDirections);
         }

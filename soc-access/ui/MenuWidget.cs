@@ -5,7 +5,7 @@ using SongsOfConquestAccess.Localization;
 
 namespace SongsOfConquestAccess.UI
 {
-    internal class MenuWidget : Widget
+    public class MenuWidget : Widget
     {
         private readonly List<MenuItemWidget> _items = new List<MenuItemWidget>();
         private readonly Func<bool> _isVisible;
@@ -88,7 +88,7 @@ namespace SongsOfConquestAccess.UI
             _items.Add(item);
         }
 
-        internal override IEnumerable<Widget> EnumerateChildren()
+        public override IEnumerable<Widget> EnumerateChildren()
         {
             return _items;
         }

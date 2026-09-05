@@ -8,7 +8,7 @@ using SongsOfConquestAccess.Adapters;
 namespace SongsOfConquestAccess
 {
     [HarmonyPatch]
-    internal static class PostAdventureMenuPatches
+    public static class PostAdventureMenuPatches
     {
         [HarmonyPatch(typeof(PostAdventureMenu), "ShowVictory", new[] { typeof(AdventureGameResult) })]
         [HarmonyPostfix]

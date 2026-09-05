@@ -14,7 +14,7 @@ using UnityEngine.UI;
 
 namespace SongsOfConquestAccess.Adapters
 {
-    internal sealed class CommunityMapsSearchFilterAdapter
+    public sealed class CommunityMapsSearchFilterAdapter
     {
         private static readonly Type SearchPanelType = AccessTools.TypeByName("ModIOBrowser.Implementation.SearchPanel");
         private static readonly FieldInfo PanelField = AccessTools.Field(SearchPanelType, "SearchPanelGameObject");
@@ -453,7 +453,7 @@ namespace SongsOfConquestAccess.Adapters
             return builder.ToString().Trim();
         }
 
-        internal sealed class CategoryItem
+        public sealed class CategoryItem
         {
             public CategoryItem(int index, string label, IReadOnlyList<TagItem> tags)
             {
@@ -469,7 +469,7 @@ namespace SongsOfConquestAccess.Adapters
             public IReadOnlyList<TagItem> Tags { get; private set; }
         }
 
-        internal sealed class TagItem
+        public sealed class TagItem
         {
             private readonly CommunityMapsSearchFilterAdapter _adapter;
             private readonly string _category;
@@ -508,7 +508,7 @@ namespace SongsOfConquestAccess.Adapters
             }
         }
 
-        internal sealed class ActionItem
+        public sealed class ActionItem
         {
             private readonly Func<bool> _activate;
 

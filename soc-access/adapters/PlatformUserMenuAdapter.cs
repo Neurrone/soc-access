@@ -12,7 +12,7 @@ using UnityEngine;
 
 namespace SongsOfConquestAccess.Adapters
 {
-    internal sealed class PlatformUserMenuAdapter
+    public sealed class PlatformUserMenuAdapter
     {
         private static readonly FieldInfo ContainerField = AccessTools.Field(typeof(PlatformUserMenu), "_container");
         private static readonly FieldInfo UserButtonsField = AccessTools.Field(typeof(PlatformUserMenu), "_userButtons");
@@ -112,7 +112,7 @@ namespace SongsOfConquestAccess.Adapters
             return gameObject != null && gameObject.scene.IsValid() && gameObject.scene.isLoaded;
         }
 
-        internal sealed class ActionItem
+        public sealed class ActionItem
         {
             private static readonly FieldInfo ButtonLabelField = AccessTools.Field(typeof(PlatformUserButtonEntry), "_buttonLabel");
             private static readonly FieldInfo ButtonField = AccessTools.Field(typeof(PlatformUserButtonEntry), "_button");

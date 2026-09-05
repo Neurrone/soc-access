@@ -6,7 +6,7 @@ using UnityEngine;
 
 namespace SongsOfConquestAccess.Adapters
 {
-    internal sealed class AdventureMapTile
+    public sealed class AdventureMapTile
     {
         private static readonly Scanner.ScannerDirection[] NoRoadDirections = new Scanner.ScannerDirection[0];
 

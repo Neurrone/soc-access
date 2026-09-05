@@ -7,7 +7,7 @@ namespace SongsOfConquestAccess.Scanner
     /// Twelve chests are a single stop in the item cycle rather than twelve, and
     /// the instance cycle walks the chests themselves.
     /// </summary>
-    internal sealed class ScannerItem
+    public sealed class ScannerItem
     {
         private readonly List<ScannerResult> _instances = new List<ScannerResult>();
 

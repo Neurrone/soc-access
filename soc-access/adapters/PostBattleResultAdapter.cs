@@ -13,7 +13,7 @@ using UnityEngine;
 
 namespace SongsOfConquestAccess.Adapters
 {
-    internal sealed class PostBattleResultAdapter
+    public sealed class PostBattleResultAdapter
     {
         public const string SourceKey = "POST_BATTLE_RESULT";
 
@@ -488,7 +488,7 @@ namespace SongsOfConquestAccess.Adapters
             return field != null ? field.GetValue(settings) as T : null;
         }
 
-        internal sealed class ResultEntry
+        public sealed class ResultEntry
         {
             private readonly Func<bool> _isVisible;
 

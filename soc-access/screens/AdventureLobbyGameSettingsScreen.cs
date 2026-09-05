@@ -7,7 +7,7 @@ using UnityEngine;
 
 namespace SongsOfConquestAccess.Screens
 {
-    internal sealed class AdventureLobbyGameSettingsScreen : Screen
+    public sealed class AdventureLobbyGameSettingsScreen : Screen
     {
         private readonly AdventureLobbyGameSettingsAdapter _adapter;
 
@@ -51,7 +51,7 @@ namespace SongsOfConquestAccess.Screens
             RootWidget?.SetFocusByIndexSilently(focusedIndex);
         }
 
-        internal static LobbyMapSettingsMenu FindActiveMenu(LobbyMapSettingsMenu targetMenu)
+        public static LobbyMapSettingsMenu FindActiveMenu(LobbyMapSettingsMenu targetMenu)
         {
             LobbyMapSettingsMenu[] menus = Resources.FindObjectsOfTypeAll<LobbyMapSettingsMenu>();
             for (int i = 0; i < menus.Length; i++)

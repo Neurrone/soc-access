@@ -6,7 +6,7 @@ using SongsOfConquestAccess.Adapters;
 namespace SongsOfConquestAccess
 {
     [HarmonyPatch]
-    internal static class PlayerStatsMenuPatches
+    public static class PlayerStatsMenuPatches
     {
         [HarmonyPatch(typeof(PlayerStatsMenuNavigation), "Start")]
         [HarmonyPostfix]

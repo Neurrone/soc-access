@@ -18,7 +18,7 @@ namespace SongsOfConquestAccess.Adapters
     // This class is a text-capturing fake drawer: text-producing draw calls become
     // speech/buffer lines, while visual-only draw calls are implemented as safe
     // no-ops so native details builders can run without needing per-details parsers.
-    internal sealed class DetailsTextUtility : IDetailsDrawer
+    public sealed class DetailsTextUtility : IDetailsDrawer
     {
         // Native details builders often mutate the element returned from AddText/AddImage,
         // for example drawer.AddText(...).FontColor = .... Return a no-op element so
@@ -626,7 +626,7 @@ namespace SongsOfConquestAccess.Adapters
         }
     }
 
-    internal sealed class TooltipInstructionRow
+    public sealed class TooltipInstructionRow
     {
         public TooltipInstructionRow(string text, InputType inputType)
         {

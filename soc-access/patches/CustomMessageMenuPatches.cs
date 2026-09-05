@@ -5,7 +5,7 @@ using SongsOfConquest.Client.Adventure;
 namespace SongsOfConquestAccess.Patches
 {
     [HarmonyPatch]
-    internal static class CustomMessageMenuPatches
+    public static class CustomMessageMenuPatches
     {
         [HarmonyPatch(typeof(CustomMessageMenu), "Show", new[]
         {

@@ -6,7 +6,7 @@ using SongsOfConquestAccess.Localization;
 
 namespace SongsOfConquestAccess.Adapters
 {
-    internal static class CampaignProgress
+    public static class CampaignProgress
     {
         public static string BuildMissionStatus(
             ICampaignDefinition definition,

@@ -6,7 +6,7 @@ using UnityEngine;
 
 namespace SongsOfConquestAccess.UI
 {
-    internal static class TileSkipNavigator
+    public static class TileSkipNavigator
     {
         public static TileSkipResult FindTarget<TSignature>(
             Vector2Int origin,
@@ -46,7 +46,7 @@ namespace SongsOfConquestAccess.UI
         }
     }
 
-    internal sealed class TileSkipResult
+    public sealed class TileSkipResult
     {
         public TileSkipResult(Vector2Int target, int skippedCount)
         {
@@ -59,7 +59,7 @@ namespace SongsOfConquestAccess.UI
         public int SkippedCount { get; private set; }
     }
 
-    internal sealed class AdventureTileSkipSignature : IEquatable<AdventureTileSkipSignature>
+    public sealed class AdventureTileSkipSignature : IEquatable<AdventureTileSkipSignature>
     {
         private AdventureTileSkipSignature(
             AdventureTileVisibility visibility,
@@ -193,14 +193,14 @@ namespace SongsOfConquestAccess.UI
         }
     }
 
-    internal enum AdventureTileVisibility
+    public enum AdventureTileVisibility
     {
         Unexplored,
         ExploredFog,
         Visible
     }
 
-    internal sealed class CombatTileSkipSignature : IEquatable<CombatTileSkipSignature>
+    public sealed class CombatTileSkipSignature : IEquatable<CombatTileSkipSignature>
     {
         public CombatTileSkipSignature(
             byte elevation,
@@ -343,7 +343,7 @@ namespace SongsOfConquestAccess.UI
         }
     }
 
-    internal sealed class TroopPlacementTileSkipSignature : IEquatable<TroopPlacementTileSkipSignature>
+    public sealed class TroopPlacementTileSkipSignature : IEquatable<TroopPlacementTileSkipSignature>
     {
         private TroopPlacementTileSkipSignature(
             byte elevation,

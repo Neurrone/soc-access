@@ -9,7 +9,7 @@ using SongsOfConquestAccess.Adapters;
 namespace SongsOfConquestAccess
 {
     [HarmonyPatch]
-    internal static class TownInteractionMenuPatches
+    public static class TownInteractionMenuPatches
     {
         private static readonly FieldInfo AsyncField = AccessTools.Field(typeof(TownInteractionMenu), "_async");
 

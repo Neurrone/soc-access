@@ -9,7 +9,7 @@ using UnityEngine;
 namespace SongsOfConquestAccess
 {
     [HarmonyPatch]
-    internal static class MainMenuPatches
+    public static class MainMenuPatches
     {
         private static readonly AccessTools.FieldRef<MainMenu, GameObject> LeftButtonContainerRef =
             AccessTools.FieldRefAccess<MainMenu, GameObject>("_leftButtonContainer");
@@ -19,7 +19,7 @@ namespace SongsOfConquestAccess
         private static readonly Dictionary<MainMenu, PendingOpen> PendingOpenCoroutines =
             new Dictionary<MainMenu, PendingOpen>();
 
-        internal static void Reset()
+        public static void Reset()
         {
             foreach (PendingOpen pending in PendingOpenCoroutines.Values) pending.Cancelled = true;
             PendingOpenCoroutines.Clear();

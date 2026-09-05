@@ -12,7 +12,7 @@ namespace SongsOfConquestAccess.Dev
     ///
     /// Written from the Unity main thread (the speech pump) and read from HTTP handler threads.
     /// </summary>
-    internal sealed class SpeechLog : SeqLog
+    public sealed class SpeechLog : SeqLog
     {
         /// <summary>How many lines are kept. Longer than the loader's own log, because the question
         /// asked of this one is usually "what did that whole walk say".</summary>

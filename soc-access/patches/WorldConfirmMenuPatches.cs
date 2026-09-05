@@ -6,7 +6,7 @@ using SongsOfConquest.Common.Economy;
 namespace SongsOfConquestAccess
 {
     [HarmonyPatch]
-    internal static class WorldConfirmMenuPatches
+    public static class WorldConfirmMenuPatches
     {
         private static readonly Dictionary<WorldConfirmMenu, Cost> ActiveCosts = new Dictionary<WorldConfirmMenu, Cost>();
 

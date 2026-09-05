@@ -25,7 +25,7 @@ using UnityEngine.UI;
 
 namespace SongsOfConquestAccess.Adapters
 {
-    internal sealed class AdventureLobbyPlayersAdapter
+    public sealed class AdventureLobbyPlayersAdapter
     {
         private static readonly AccessTools.FieldRef<LobbyMenu, CanvasGroup> CanvasGroupRef =
             AccessTools.FieldRefAccess<LobbyMenu, CanvasGroup>("_canvasGroup");
@@ -427,7 +427,7 @@ namespace SongsOfConquestAccess.Adapters
             return loader != null && loader.CurrentlyLoadedScene == sceneType;
         }
 
-        internal sealed class PlayerSlotItem
+        public sealed class PlayerSlotItem
         {
             private static readonly FieldInfo NameTextField = AccessTools.Field(typeof(LobbyPlayerEntry), "_nameText");
             private static readonly FieldInfo JoinButtonField = AccessTools.Field(typeof(LobbyPlayerEntry), "_joinButton");
@@ -793,7 +793,7 @@ namespace SongsOfConquestAccess.Adapters
             }
         }
 
-        internal sealed class MultiplayerPanelItem
+        public sealed class MultiplayerPanelItem
         {
             private readonly LobbyMultiplayerPanel _panel;
             private readonly ILocalizationHandler _localization;
@@ -919,7 +919,7 @@ namespace SongsOfConquestAccess.Adapters
             }
         }
 
-        internal sealed class ToggleItem
+        public sealed class ToggleItem
         {
             private readonly UIToggle _toggle;
             private readonly ILocalizationHandler _localization;
@@ -969,7 +969,7 @@ namespace SongsOfConquestAccess.Adapters
             }
         }
 
-        internal sealed class LobbyButtonItem
+        public sealed class LobbyButtonItem
         {
             private readonly UIButton _button;
             private readonly Func<string> _getLabel;
@@ -1032,7 +1032,7 @@ namespace SongsOfConquestAccess.Adapters
             }
         }
 
-        internal sealed class LobbyPlayerSettingsItem
+        public sealed class LobbyPlayerSettingsItem
         {
             private readonly UIButton _button;
             private readonly ILocalizationHandler _localization;
@@ -1074,7 +1074,7 @@ namespace SongsOfConquestAccess.Adapters
             }
         }
 
-        internal sealed class MixedFactionsItem
+        public sealed class MixedFactionsItem
         {
             private readonly UIToggle _toggle;
             private readonly GameObject _hostContainer;

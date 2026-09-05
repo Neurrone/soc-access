@@ -18,7 +18,7 @@ using UnityEngine;
 namespace SongsOfConquestAccess
 {
     [HarmonyPatch]
-    internal static class AdventureHudRuntimePatches
+    public static class AdventureHudRuntimePatches
     {
         private static readonly FieldInfo AdventureInputManagerField =
             AccessTools.Field(typeof(AdventureHUDStateHandler), "_inputManager");

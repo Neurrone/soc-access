@@ -2,7 +2,7 @@ using System;
 
 namespace SongsOfConquestAccess.Audio.Synth
 {
-    internal static class SemitoneMath
+    public static class SemitoneMath
     {
         public static float ToRate(float semitones)
         {

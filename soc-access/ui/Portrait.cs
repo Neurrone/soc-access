@@ -5,7 +5,7 @@ using UnityEngine;
 
 namespace SongsOfConquestAccess.UI
 {
-    internal static class Portrait
+    public static class Portrait
     {
         public static Widget Static(
             string id,

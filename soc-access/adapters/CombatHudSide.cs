@@ -1,6 +1,6 @@
 namespace SongsOfConquestAccess.Adapters
 {
-    internal enum CombatHudSide
+    public enum CombatHudSide
     {
         Attacker,
         Defender

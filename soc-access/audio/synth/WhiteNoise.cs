@@ -9,7 +9,7 @@ namespace SongsOfConquestAccess.Audio.Synth
     /// power per Hz, uncorrelated samples). A band-pass over this picks out a pitch while keeping
     /// the random fine structure that makes the tone sound alive and lets slices decorrelate.
     /// </summary>
-    internal static class WhiteNoise
+    public static class WhiteNoise
     {
         public static void Fill(float[] buffer, Random rng)
         {

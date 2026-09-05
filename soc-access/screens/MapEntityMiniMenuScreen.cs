@@ -8,7 +8,7 @@ using UnityEngine;
 
 namespace SongsOfConquestAccess.Screens
 {
-    internal sealed class MapEntityMiniMenuScreen : Screen
+    public sealed class MapEntityMiniMenuScreen : Screen
     {
         private readonly MapEntityMiniMenuAdapter _adapter;
 

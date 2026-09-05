@@ -12,7 +12,7 @@ namespace SongsOfConquestAccess.Adapters
     /// turn, and the movement it has per turn. The route preview and the destination
     /// announcement both build from this, so their turn boundaries come from one place.
     /// </summary>
-    internal sealed class WielderPath
+    public sealed class WielderPath
     {
         private WielderPath(PathNode[] nodes, PathNode reachablePoint, int reachableIndex, float maxMovement)
         {
@@ -119,7 +119,7 @@ namespace SongsOfConquestAccess.Adapters
             return GetTravelTurns(nodeCost, ReachablePoint.travelCost, MaxMovement);
         }
 
-        internal static int GetTravelTurns(float nodeCost, float reachableCost, float maxMovement)
+        public static int GetTravelTurns(float nodeCost, float reachableCost, float maxMovement)
         {
             if (nodeCost <= reachableCost + 0.001f)
             {

@@ -27,7 +27,7 @@ using Zenject;
 
 namespace SongsOfConquestAccess.Screens
 {
-    internal sealed class CombatScreen : Screen
+    public sealed class CombatScreen : Screen
     {
         private static readonly PropertyInfo InstallerContainerProperty =
             AccessTools.Property(typeof(BattleSceneInstaller), "Container");

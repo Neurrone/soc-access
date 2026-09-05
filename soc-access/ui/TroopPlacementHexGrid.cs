@@ -11,7 +11,7 @@ using UnityEngine;
 
 namespace SongsOfConquestAccess.UI
 {
-    internal sealed class TroopPlacementHexGrid : Widget
+    public sealed class TroopPlacementHexGrid : Widget
     {
         private const string ScannerWrapCueKey = "Common_ClickUnfold";
         private static readonly Vector2Int CenterTile = new Vector2Int(6, 4);

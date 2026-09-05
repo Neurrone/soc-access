@@ -44,7 +44,7 @@ namespace SongsOfConquestAccess.Dev
     /// wedged. /input, /loadsave and /speech?wait block the HTTP thread and never the main one: the
     /// game has to keep running frames for any of them to be answered at all.
     /// </summary>
-    internal sealed class ModRoutes
+    public sealed class ModRoutes
     {
         // Long enough for a frame that is doing real work (a screen rebuild, a window animating in),
         // short enough that a wedged game answers rather than hanging the caller.
@@ -796,7 +796,7 @@ namespace SongsOfConquestAccess.Dev
         /// <summary>A query flag written either way callers write one: 1/0 or true/false. False for
         /// a value that is neither, so the route can say so rather than quietly using its default.
         /// </summary>
-        internal static bool ParseFlag(string text, bool fallback, out bool value)
+        public static bool ParseFlag(string text, bool fallback, out bool value)
         {
             value = fallback;
             if (text == null)

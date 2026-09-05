@@ -21,7 +21,7 @@ using System.Collections.Generic;
 namespace SongsOfConquestAccess
 {
     [HarmonyPatch]
-    internal static class CombatPatches
+    public static class CombatPatches
     {
         private static readonly HashSet<int> ActivePostBattleMenus = new HashSet<int>();
 

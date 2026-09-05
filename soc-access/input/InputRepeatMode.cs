@@ -1,6 +1,6 @@
 namespace SongsOfConquestAccess.Input
 {
-    internal enum InputRepeatMode
+    public enum InputRepeatMode
     {
         // Fires once when the binding is pressed and will not fire again until
         // the physical key has been confirmed released.
@@ -13,7 +13,7 @@ namespace SongsOfConquestAccess.Input
         // TimedRepeat
     }
 
-    internal sealed class InputRepeatPolicy
+    public sealed class InputRepeatPolicy
     {
         private InputRepeatPolicy(InputRepeatMode mode)
         {

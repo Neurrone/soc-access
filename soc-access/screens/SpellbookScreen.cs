@@ -9,7 +9,7 @@ using UnityEngine;
 
 namespace SongsOfConquestAccess.Screens
 {
-    internal sealed class SpellbookScreen : Screen
+    public sealed class SpellbookScreen : Screen
     {
         private readonly SpellbookAdapter _adapter;
 

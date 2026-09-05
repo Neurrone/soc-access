@@ -5,7 +5,7 @@ using UnityEngine.UI;
 
 namespace SongsOfConquestAccess.Adapters
 {
-    internal abstract class MenuButtonAdapterBase : IMenuButtonAdapter
+    public abstract class MenuButtonAdapterBase : IMenuButtonAdapter
     {
         private readonly Func<bool> _isVisible;
         private readonly Func<bool> _activate;

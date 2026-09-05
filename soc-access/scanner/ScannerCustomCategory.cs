@@ -8,7 +8,7 @@ namespace SongsOfConquestAccess.Scanner
     /// stable taxonomy keys, so a selector survives a language change and can be
     /// written to the config file as it stands.
     /// </summary>
-    internal struct ScannerCustomCategorySelector : IEquatable<ScannerCustomCategorySelector>
+    public struct ScannerCustomCategorySelector : IEquatable<ScannerCustomCategorySelector>
     {
         public ScannerCustomCategorySelector(string categoryKey, string subcategoryKey)
         {
@@ -47,7 +47,7 @@ namespace SongsOfConquestAccess.Scanner
     /// for every turn sit together instead of scattered across the full
     /// category cycle.
     /// </summary>
-    internal sealed class ScannerCustomCategory
+    public sealed class ScannerCustomCategory
     {
         private readonly List<ScannerCustomCategorySelector> _selectors = new List<ScannerCustomCategorySelector>();
         private readonly List<string> _keywords = new List<string>();

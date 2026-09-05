@@ -18,7 +18,7 @@ using UnityEngine;
 
 namespace SongsOfConquestAccess.Adapters
 {
-    internal sealed class PurchaseTroopsSubMenuAdapter
+    public sealed class PurchaseTroopsSubMenuAdapter
     {
         private static readonly FieldInfo CurrentEntriesField = AccessTools.Field(typeof(PurchaseTroopsSubMenu), "_currentEntries");
         private static readonly FieldInfo FactionLookupField = AccessTools.Field(typeof(PurchaseTroopsSubMenu), "_factionLookup");
@@ -85,7 +85,7 @@ namespace SongsOfConquestAccess.Adapters
             return SpeechTextSanitizer.Normalize(UITextMeshTextUtility.GetEffectiveText(textMesh));
         }
 
-        internal abstract class RecruitEntry
+        public abstract class RecruitEntry
         {
             protected RecruitEntry(IPurchaseTroopsEntry entry, IClientAdventureFacade facade, ILocalizationHandler localization, IFactionLookup factionLookup)
             {
@@ -235,7 +235,7 @@ namespace SongsOfConquestAccess.Adapters
             }
         }
 
-        internal sealed class ActiveRecruitEntry : RecruitEntry
+        public sealed class ActiveRecruitEntry : RecruitEntry
         {
             private static readonly FieldInfo NoTroopsContainerField = AccessTools.Field(typeof(PurchaseTroopsEntry), "_noTroopsContainer");
             private static readonly FieldInfo NoTroopsTextField = AccessTools.Field(typeof(PurchaseTroopsEntry), "_noTroopsText");
@@ -397,7 +397,7 @@ namespace SongsOfConquestAccess.Adapters
             }
         }
 
-        internal sealed class InactiveRecruitEntry : RecruitEntry
+        public sealed class InactiveRecruitEntry : RecruitEntry
         {
             private static readonly FieldInfo NoTroopsTextField = AccessTools.Field(typeof(PurchaseTroopsInactiveEntry), "_noTroopsText");
 
@@ -416,7 +416,7 @@ namespace SongsOfConquestAccess.Adapters
             public override bool IsNoTroopsVisible { get { return true; } }
         }
 
-        internal sealed class ResourceCostLine
+        public sealed class ResourceCostLine
         {
             public ResourceCostLine(ResourceType resourceType, int amount, bool canAfford)
             {

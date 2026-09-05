@@ -12,7 +12,7 @@ using UnityEngine;
 
 namespace SongsOfConquestAccess.Adapters
 {
-    internal sealed class TaleButtonAdapter : IMenuButtonAdapter
+    public sealed class TaleButtonAdapter : IMenuButtonAdapter
     {
         private static readonly AccessTools.FieldRef<TaleButton, AddonProfile> AddonProfileRef =
             AccessTools.FieldRefAccess<TaleButton, AddonProfile>("_addonProfile");

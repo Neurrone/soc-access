@@ -13,7 +13,7 @@ using Zenject;
 
 namespace SongsOfConquestAccess.Screens
 {
-    internal sealed class MessageDialogScreen : Screen
+    public sealed class MessageDialogScreen : Screen
     {
         private static readonly AccessTools.FieldRef<PopupMenu, PopupMenu.Settings> PopupSettingsRef =
             AccessTools.FieldRefAccess<PopupMenu, PopupMenu.Settings>("_settings");

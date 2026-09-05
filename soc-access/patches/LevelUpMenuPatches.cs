@@ -9,7 +9,7 @@ using SongsOfConquest.Common.Skills;
 namespace SongsOfConquestAccess
 {
     [HarmonyPatch]
-    internal static class LevelUpMenuPatches
+    public static class LevelUpMenuPatches
     {
         private static readonly FieldInfo AsyncField = AccessTools.Field(typeof(CommanderLevelUpMenu), "_async");
 

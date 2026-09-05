@@ -1,6 +1,6 @@
 namespace SongsOfConquestAccess.Speech
 {
-    internal sealed class SpeechRequest
+    public sealed class SpeechRequest
     {
         public SpeechRequest(string text, bool interrupt)
         {

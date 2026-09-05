@@ -6,7 +6,7 @@ using SongsOfConquestAccess.Speech;
 
 namespace SongsOfConquestAccess.UI
 {
-    internal sealed class DraggableMenuWidget : MenuWidget
+    public sealed class DraggableMenuWidget : MenuWidget
     {
         private readonly Func<DraggableMenuItemWidget, MenuItemWidget, bool> _drop;
         private DraggableMenuItemWidget _dragSource;

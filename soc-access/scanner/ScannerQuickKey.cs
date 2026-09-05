@@ -5,7 +5,7 @@ namespace SongsOfConquestAccess.Scanner
     /// Stored with the category, so the tokens the codec writes must never
     /// change once shipped.
     /// </summary>
-    internal enum ScannerQuickKey
+    public enum ScannerQuickKey
     {
         None,
         Comma,
@@ -13,7 +13,7 @@ namespace SongsOfConquestAccess.Scanner
         Slash
     }
 
-    internal static class ScannerQuickKeys
+    public static class ScannerQuickKeys
     {
         private const string CommaToken = "comma";
         private const string PeriodToken = "period";

@@ -14,7 +14,7 @@ using UnityEngine.UI;
 
 namespace SongsOfConquestAccess.Adapters
 {
-    internal sealed class PlayerStatsAdapter
+    public sealed class PlayerStatsAdapter
     {
         private const int OverallTabIndex = 0;
         private const int BattleTabIndex = 1;
@@ -816,7 +816,7 @@ namespace SongsOfConquestAccess.Adapters
             return owner != null && field != null ? field.GetValue(owner) as T : null;
         }
 
-        internal sealed class TabItem
+        public sealed class TabItem
         {
             public TabItem(string id, int index, string label)
             {
@@ -830,7 +830,7 @@ namespace SongsOfConquestAccess.Adapters
             public string Label { get; private set; }
         }
 
-        internal sealed class LabeledItem
+        public sealed class LabeledItem
         {
             public LabeledItem(string id, string label, RectTransform sourceTransform)
             {
@@ -844,7 +844,7 @@ namespace SongsOfConquestAccess.Adapters
             public RectTransform SourceTransform { get; private set; }
         }
 
-        internal sealed class TableRowItem
+        public sealed class TableRowItem
         {
             private readonly Dictionary<string, string> _values;
 

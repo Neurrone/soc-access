@@ -5,7 +5,7 @@ using SongsOfConquestAccess.Adapters;
 namespace SongsOfConquestAccess
 {
     [HarmonyPatch]
-    internal static class CodexMenuPatches
+    public static class CodexMenuPatches
     {
         [HarmonyPatch(typeof(CodexMenu), "Show")]
         [HarmonyPostfix]

@@ -8,7 +8,7 @@ using UnityEngine;
 
 namespace SongsOfConquestAccess.Screens
 {
-    internal sealed class AdventurePlayerMenuScreen : Screen
+    public sealed class AdventurePlayerMenuScreen : Screen
     {
         private const int PlayersMenuIndex = 0;
         private static readonly ResourceType[] ResourceSummaryOrder =

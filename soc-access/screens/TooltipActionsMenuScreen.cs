@@ -7,7 +7,7 @@ using SongsOfConquestAccess.UI;
 
 namespace SongsOfConquestAccess.Screens
 {
-    internal sealed class TooltipActionsMenuScreen : Screen
+    public sealed class TooltipActionsMenuScreen : Screen
     {
         private readonly Func<bool> _close;
 

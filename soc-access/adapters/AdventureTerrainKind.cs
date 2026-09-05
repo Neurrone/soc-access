@@ -1,6 +1,6 @@
 namespace SongsOfConquestAccess.Adapters
 {
-    internal enum AdventureTerrainKind
+    public enum AdventureTerrainKind
     {
         Unknown,
         Road,

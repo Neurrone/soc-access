@@ -12,7 +12,7 @@ using UnityEngine.UI;
 
 namespace SongsOfConquestAccess.Adapters
 {
-    internal sealed class CommunityMapsCollectionAdapter
+    public sealed class CommunityMapsCollectionAdapter
     {
         private static readonly FieldInfo TitleField = AccessTools.Field(typeof(Collection), "CollectionPanelTitle");
         private static readonly FieldInfo SearchFieldInfo = AccessTools.Field(typeof(Collection), "CollectionPanelSearchField");
@@ -663,7 +663,7 @@ namespace SongsOfConquestAccess.Adapters
             return true;
         }
 
-        internal sealed class TabItem
+        public sealed class TabItem
         {
             private readonly Func<bool> _select;
 
@@ -687,7 +687,7 @@ namespace SongsOfConquestAccess.Adapters
             }
         }
 
-        internal sealed class ButtonAction
+        public sealed class ButtonAction
         {
             private readonly Func<bool> _focus;
             private readonly Func<bool> _activate;
@@ -735,7 +735,7 @@ namespace SongsOfConquestAccess.Adapters
             }
         }
 
-        internal sealed class DropdownItem
+        public sealed class DropdownItem
         {
             private readonly MultiTargetDropdown _dropdown;
             private readonly Func<MultiTargetDropdown, int, bool> _setValue;
@@ -797,7 +797,7 @@ namespace SongsOfConquestAccess.Adapters
             }
         }
 
-        internal sealed class CollectionItem
+        public sealed class CollectionItem
         {
             public CollectionItem(
                 int index,

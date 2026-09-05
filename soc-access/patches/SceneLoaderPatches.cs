@@ -5,7 +5,7 @@ using SongsOfConquest.Client.Menu.Loading;
 namespace SongsOfConquestAccess
 {
     [HarmonyPatch]
-    internal static class SceneLoaderPatches
+    public static class SceneLoaderPatches
     {
         [HarmonyPatch(typeof(SceneLoader), "SetState")]
         [HarmonyPostfix]

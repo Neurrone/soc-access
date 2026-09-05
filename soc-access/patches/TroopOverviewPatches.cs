@@ -9,7 +9,7 @@ using UnityEngine;
 namespace SongsOfConquestAccess
 {
     [HarmonyPatch]
-    internal static class TroopOverviewPatches
+    public static class TroopOverviewPatches
     {
         private static readonly FieldInfo TownEntryTownField =
             AccessTools.Field(typeof(KingdomTroopOverviewTownEntry), "_town");

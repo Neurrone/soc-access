@@ -8,7 +8,7 @@ using UnityEngine;
 
 namespace SongsOfConquestAccess.Screens
 {
-    internal sealed class PurchaseWielderScreen : Screen
+    public sealed class PurchaseWielderScreen : Screen
     {
         private readonly PurchaseWielderMenuAdapter _adapter;
 

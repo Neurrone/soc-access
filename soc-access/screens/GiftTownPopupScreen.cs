@@ -8,7 +8,7 @@ using UnityEngine;
 
 namespace SongsOfConquestAccess.Screens
 {
-    internal sealed class GiftTownPopupScreen : Screen
+    public sealed class GiftTownPopupScreen : Screen
     {
         private readonly GiftTownPopupAdapter _adapter;
 

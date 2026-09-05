@@ -5,7 +5,7 @@ using SongsOfConquest.Client.Menu;
 namespace SongsOfConquestAccess.Patches
 {
     [HarmonyPatch]
-    internal static class SaveLoadGameMenuPatches
+    public static class SaveLoadGameMenuPatches
     {
         [HarmonyPatch(typeof(SaveLoadGameMenu), "OnOpened")]
         [HarmonyPostfix]

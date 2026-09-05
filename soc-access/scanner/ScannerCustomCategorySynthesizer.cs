@@ -15,7 +15,7 @@ namespace SongsOfConquestAccess.Scanner
     /// whole snapshot, so a shared result stays in step with its original
     /// instead of drifting from it.
     /// </summary>
-    internal static class ScannerCustomCategorySynthesizer
+    public static class ScannerCustomCategorySynthesizer
     {
         private const string CategoryKeyPrefix = "custom:";
         private const string SelectorKeyPrefix = "sel:";

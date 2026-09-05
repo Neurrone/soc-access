@@ -12,7 +12,7 @@ using UnityEngine.UI;
 
 namespace SongsOfConquestAccess.Adapters
 {
-    internal sealed class CommunityMapsSearchResultsAdapter
+    public sealed class CommunityMapsSearchResultsAdapter
     {
         private static readonly Type SearchResultListItemType = AccessTools.TypeByName("ModIOBrowser.Implementation.SearchResultListItem");
         private static readonly Type SearchResultOverlayType = AccessTools.TypeByName("ModIOBrowser.Implementation.SearchResultListItem_Overlay");
@@ -613,7 +613,7 @@ namespace SongsOfConquestAccess.Adapters
             return builder.ToString().Trim();
         }
 
-        internal sealed class SortDropdown
+        public sealed class SortDropdown
         {
             private readonly TMP_Dropdown _dropdown;
             private readonly string _label;
@@ -712,7 +712,7 @@ namespace SongsOfConquestAccess.Adapters
             }
         }
 
-        internal sealed class ResultItem
+        public sealed class ResultItem
         {
             public ResultItem(int index, string id, string label, Component nativeComponent, ListItem nativeListItem)
             {

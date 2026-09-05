@@ -19,7 +19,7 @@ namespace SongsOfConquestAccess.Scanner
     /// Both trailing fields are optional on the way in, so text written before
     /// quick keys existed still reads back with no key set.
     /// </summary>
-    internal static class ScannerCustomCategoryCodec
+    public static class ScannerCustomCategoryCodec
     {
         private const char RecordSeparator = ';';
         private const char FieldSeparator = '|';

@@ -6,7 +6,7 @@ using SongsOfConquestAccess.Adapters;
 namespace SongsOfConquestAccess
 {
     [HarmonyPatch]
-    internal static class BuildMenuPatches
+    public static class BuildMenuPatches
     {
         [HarmonyPatch(typeof(BuildMenu), "Show")]
         [HarmonyPrefix]

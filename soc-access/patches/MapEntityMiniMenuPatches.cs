@@ -6,7 +6,7 @@ using SongsOfConquestAccess.Adapters;
 namespace SongsOfConquestAccess.Patches
 {
     [HarmonyPatch]
-    internal static class MapEntityMiniMenuPatches
+    public static class MapEntityMiniMenuPatches
     {
         [HarmonyPatch(typeof(MapEntityMiniMenu), "Show")]
         [HarmonyPostfix]

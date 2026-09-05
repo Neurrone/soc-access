@@ -15,7 +15,7 @@ using UnityEngine.UI;
 
 namespace SongsOfConquestAccess.Adapters
 {
-    internal sealed class AdventureLobbyGameSettingsAdapter
+    public sealed class AdventureLobbyGameSettingsAdapter
     {
         private static readonly FieldInfo ContainerField =
             AccessTools.Field(typeof(LobbyMapSettingsMenu), "_container");
@@ -484,7 +484,7 @@ namespace SongsOfConquestAccess.Adapters
             return string.Join(".", parts);
         }
 
-        internal sealed class ControlItem
+        public sealed class ControlItem
         {
             public ControlItem(Transform transform, object item)
             {
@@ -496,7 +496,7 @@ namespace SongsOfConquestAccess.Adapters
             public object Item { get; private set; }
         }
 
-        internal sealed class TextItem
+        public sealed class TextItem
         {
             public TextItem(string id, Func<string> getText, Func<bool> isVisible)
             {
@@ -510,7 +510,7 @@ namespace SongsOfConquestAccess.Adapters
             public Func<bool> IsVisible { get; private set; }
         }
 
-        internal sealed class DropdownItem
+        public sealed class DropdownItem
         {
             public DropdownItem(string id, Func<string> getLabel, Func<IReadOnlyList<string>> getOptions, Func<int> getValue, Func<int, bool> setValue, Action focus, Func<bool> isEnabled, Func<bool> isVisible, Func<Tooltip> getTooltip)
             {
@@ -536,7 +536,7 @@ namespace SongsOfConquestAccess.Adapters
             public Func<Tooltip> GetTooltip { get; private set; }
         }
 
-        internal sealed class ToggleItem
+        public sealed class ToggleItem
         {
             public ToggleItem(string id, Func<string> getLabel, Action toggle, Func<bool> isChecked, Action focus, Func<bool> isEnabled, Func<bool> isVisible, Func<Tooltip> getTooltip)
             {
@@ -560,7 +560,7 @@ namespace SongsOfConquestAccess.Adapters
             public Func<Tooltip> GetTooltip { get; private set; }
         }
 
-        internal sealed class TextInputItem
+        public sealed class TextInputItem
         {
             public TextInputItem(string id, Func<string> getLabel, Func<IUITextMeshInputField> getField, Action focus, Func<bool> isEnabled, Func<bool> isVisible, Func<Tooltip> getTooltip)
             {
@@ -582,7 +582,7 @@ namespace SongsOfConquestAccess.Adapters
             public Func<Tooltip> GetTooltip { get; private set; }
         }
 
-        internal sealed class TimeInputItem
+        public sealed class TimeInputItem
         {
             public TimeInputItem(
                 string id,
@@ -617,7 +617,7 @@ namespace SongsOfConquestAccess.Adapters
             public Func<Tooltip> GetTooltip { get; private set; }
         }
 
-        internal sealed class ButtonItem
+        public sealed class ButtonItem
         {
             public ButtonItem(string id, Func<string> getLabel, Func<bool> activate, Action focus, Func<bool> isEnabled, Func<bool> isVisible, Func<Tooltip> getTooltip)
             {

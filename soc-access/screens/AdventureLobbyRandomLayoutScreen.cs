@@ -9,7 +9,7 @@ using UnityEngine;
 
 namespace SongsOfConquestAccess.Screens
 {
-    internal sealed class AdventureLobbyRandomLayoutScreen : Screen
+    public sealed class AdventureLobbyRandomLayoutScreen : Screen
     {
         private const int LayoutMenuIndex = 0;
         private const int VariantMenuIndex = 4;
@@ -294,7 +294,7 @@ namespace SongsOfConquestAccess.Screens
             NativeSelectionUtility.Select(button);
         }
 
-        internal static AdventureLobbyRandomLayoutAdapter FindActiveRandomLayoutMenu(LobbyRandomMapSelectionMenu targetMenu)
+        public static AdventureLobbyRandomLayoutAdapter FindActiveRandomLayoutMenu(LobbyRandomMapSelectionMenu targetMenu)
         {
             LobbyRandomMapSelectionMenu[] menus = Resources.FindObjectsOfTypeAll<LobbyRandomMapSelectionMenu>();
             for (int i = 0; i < menus.Length; i++)

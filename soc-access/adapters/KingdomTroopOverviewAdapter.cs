@@ -11,7 +11,7 @@ using UnityEngine.UI;
 
 namespace SongsOfConquestAccess.Adapters
 {
-    internal sealed class KingdomTroopOverviewAdapter
+    public sealed class KingdomTroopOverviewAdapter
     {
         private static readonly FieldInfo TownNameTextField =
             AccessTools.Field(typeof(KingdomTroopOverviewTownEntry), "_townNameText");
@@ -246,7 +246,7 @@ namespace SongsOfConquestAccess.Adapters
             return separator > 0 ? category.Substring(0, separator).Trim() : category.Trim();
         }
 
-        internal sealed class GroupItem
+        public sealed class GroupItem
         {
             public GroupItem(string label, IReadOnlyList<RowItem> rows)
             {
@@ -258,7 +258,7 @@ namespace SongsOfConquestAccess.Adapters
             public IReadOnlyList<RowItem> Rows { get; private set; }
         }
 
-        internal sealed class RowItem
+        public sealed class RowItem
         {
             public RowItem(string label, string status, Func<bool> activate, Func<bool> focus)
             {

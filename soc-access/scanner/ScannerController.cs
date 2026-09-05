@@ -6,7 +6,7 @@ using UnityEngine;
 
 namespace SongsOfConquestAccess.Scanner
 {
-    internal sealed class ScannerController
+    public sealed class ScannerController
     {
         private readonly Func<Vector2Int, ScannerSnapshot> _snapshotBuilder;
         private readonly Func<Vector2Int> _cursorProvider;
@@ -48,17 +48,17 @@ namespace SongsOfConquestAccess.Scanner
         /// steps out of an empty starting category and reports no results while
         /// the map is full of them.
         /// </summary>
-        internal ScannerCommandResult ExecuteInitialLanding()
+        public ScannerCommandResult ExecuteInitialLanding()
         {
             return ExecuteInitialLandingCore();
         }
 
-        internal ScannerCommandResult ExecuteSearch(string query)
+        public ScannerCommandResult ExecuteSearch(string query)
         {
             return ExecuteSearchCore(query);
         }
 
-        internal ScannerCommandResult ExecuteLookAround(int radius)
+        public ScannerCommandResult ExecuteLookAround(int radius)
         {
             return ExecuteLookAroundCore(radius);
         }
@@ -151,7 +151,7 @@ namespace SongsOfConquestAccess.Scanner
             return true;
         }
 
-        internal ScannerCommandResult ExecuteMoveCategory(int delta)
+        public ScannerCommandResult ExecuteMoveCategory(int delta)
         {
             return ExecuteMoveCategoryCore(delta);
         }
@@ -200,7 +200,7 @@ namespace SongsOfConquestAccess.Scanner
             return true;
         }
 
-        internal ScannerCommandResult ExecuteMoveSubcategory(int delta)
+        public ScannerCommandResult ExecuteMoveSubcategory(int delta)
         {
             return ExecuteMoveSubcategoryCore(delta);
         }
@@ -249,7 +249,7 @@ namespace SongsOfConquestAccess.Scanner
             return true;
         }
 
-        internal ScannerCommandResult ExecuteMoveItem(int delta)
+        public ScannerCommandResult ExecuteMoveItem(int delta)
         {
             return ExecuteMoveItemCore(delta);
         }
@@ -307,7 +307,7 @@ namespace SongsOfConquestAccess.Scanner
             return true;
         }
 
-        internal ScannerCommandResult ExecuteMoveInstance(int delta)
+        public ScannerCommandResult ExecuteMoveInstance(int delta)
         {
             return ExecuteMoveInstanceCore(delta);
         }
@@ -367,7 +367,7 @@ namespace SongsOfConquestAccess.Scanner
             return true;
         }
 
-        internal ScannerCommandResult ExecuteMoveCustomCategoryEntry(string categoryKey, int delta)
+        public ScannerCommandResult ExecuteMoveCustomCategoryEntry(string categoryKey, int delta)
         {
             return ExecuteMoveCustomCategoryEntryCore(categoryKey, delta);
         }
@@ -712,7 +712,7 @@ namespace SongsOfConquestAccess.Scanner
             return true;
         }
 
-        internal ScannerCommandResult ExecuteJumpToCurrent()
+        public ScannerCommandResult ExecuteJumpToCurrent()
         {
             return ExecuteJumpToCurrentCore();
         }
@@ -738,7 +738,7 @@ namespace SongsOfConquestAccess.Scanner
             return null;
         }
 
-        internal ScannerCommandResult ExecuteSpeakDistanceAndDirection()
+        public ScannerCommandResult ExecuteSpeakDistanceAndDirection()
         {
             return ExecuteSpeakDistanceAndDirectionCore();
         }
@@ -855,7 +855,7 @@ namespace SongsOfConquestAccess.Scanner
             return changed;
         }
 
-        internal void Output(ScannerCommandResult result)
+        public void Output(ScannerCommandResult result)
         {
             if (result == null)
             {

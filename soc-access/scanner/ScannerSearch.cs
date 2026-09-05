@@ -5,7 +5,7 @@ using UnityEngine;
 
 namespace SongsOfConquestAccess.Scanner
 {
-    internal static class ScannerSearch
+    public static class ScannerSearch
     {
         private sealed class MatchInfo
         {

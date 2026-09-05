@@ -7,7 +7,7 @@ using UnityEngine;
 
 namespace SongsOfConquestAccess.Screens
 {
-    internal sealed class TutorialSimpleScreen : Screen
+    public sealed class TutorialSimpleScreen : Screen
     {
         private readonly TutorialSimpleAdapter _adapter;
 

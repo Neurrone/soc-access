@@ -11,7 +11,7 @@ using Zenject;
 
 namespace SongsOfConquestAccess.Screens
 {
-    internal sealed class HostileJoinMenuScreen : Screen
+    public sealed class HostileJoinMenuScreen : Screen
     {
         private const int ArmyExchangeGridIndex = 2;
         private static readonly System.Reflection.PropertyInfo InstallerContainerProperty =

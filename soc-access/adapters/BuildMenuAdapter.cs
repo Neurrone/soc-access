@@ -23,7 +23,7 @@ using UnityEngine;
 
 namespace SongsOfConquestAccess.Adapters
 {
-    internal sealed class BuildMenuAdapter
+    public sealed class BuildMenuAdapter
     {
         private static readonly FieldInfo AsyncField = AccessTools.Field(typeof(BuildMenu), "_async");
         private static readonly FieldInfo TutorialButtonField = AccessTools.Field(typeof(BuildMenu), "_tutorialButton");
@@ -1399,7 +1399,7 @@ namespace SongsOfConquestAccess.Adapters
             return owner != null && field != null ? field.GetValue(owner) as T : null;
         }
 
-        internal sealed class CategoryItem
+        public sealed class CategoryItem
         {
             public CategoryItem(string label, int index, BuildSiteSize size, bool enabled)
             {
@@ -1415,7 +1415,7 @@ namespace SongsOfConquestAccess.Adapters
             public bool Enabled { get; private set; }
         }
 
-        internal sealed class BuildingItem
+        public sealed class BuildingItem
         {
             private readonly Func<bool> _isAvailable;
 
@@ -1437,7 +1437,7 @@ namespace SongsOfConquestAccess.Adapters
             }
         }
 
-        internal sealed class TierItem
+        public sealed class TierItem
         {
             public TierItem(string label, int level, Func<bool> focus, Func<Tooltip> tooltip)
             {
@@ -1453,7 +1453,7 @@ namespace SongsOfConquestAccess.Adapters
             public Func<Tooltip> Tooltip { get; private set; }
         }
 
-        internal sealed class SectionMenu
+        public sealed class SectionMenu
         {
             public SectionMenu(string label, IReadOnlyList<SectionItem> items)
             {
@@ -1465,7 +1465,7 @@ namespace SongsOfConquestAccess.Adapters
             public IReadOnlyList<SectionItem> Items { get; private set; }
         }
 
-        internal sealed class SectionItem
+        public sealed class SectionItem
         {
             public SectionItem(string label, Action focus, Func<Tooltip> tooltip)
             {
@@ -1479,7 +1479,7 @@ namespace SongsOfConquestAccess.Adapters
             public Func<Tooltip> Tooltip { get; private set; }
         }
 
-        internal sealed class RequirementItem
+        public sealed class RequirementItem
         {
             public RequirementItem(string label, bool isMet, Tooltip tooltip)
             {
@@ -1493,7 +1493,7 @@ namespace SongsOfConquestAccess.Adapters
             public Tooltip Tooltip { get; private set; }
         }
 
-        internal sealed class DetailItem
+        public sealed class DetailItem
         {
             public DetailItem(string header, string body)
             {

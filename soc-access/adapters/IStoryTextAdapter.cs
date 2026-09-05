@@ -1,6 +1,6 @@
 namespace SongsOfConquestAccess.Adapters
 {
-    internal interface IStoryTextAdapter
+    public interface IStoryTextAdapter
     {
         object SourceKey { get; }
 

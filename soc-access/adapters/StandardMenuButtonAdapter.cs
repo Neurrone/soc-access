@@ -3,7 +3,7 @@ using SongsOfConquest.Client.UI;
 
 namespace SongsOfConquestAccess.Adapters
 {
-    internal class StandardMenuButtonAdapter : MenuButtonAdapterBase
+    public class StandardMenuButtonAdapter : MenuButtonAdapterBase
     {
         public StandardMenuButtonAdapter(
             UIButton button,

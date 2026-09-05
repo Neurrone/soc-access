@@ -3,7 +3,7 @@ using UnityEngine.InputSystem.Controls;
 
 namespace SongsOfConquestAccess.Input
 {
-    internal sealed class KeyboardDisplayNameBinding : InputBinding
+    public sealed class KeyboardDisplayNameBinding : InputBinding
     {
         public KeyboardDisplayNameBinding(string displayName, bool ctrl = false, bool shift = false, bool alt = false)
         {

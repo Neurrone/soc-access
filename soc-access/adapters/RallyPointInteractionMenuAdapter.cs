@@ -18,7 +18,7 @@ using UnityEngine.UI;
 
 namespace SongsOfConquestAccess.Adapters
 {
-    internal sealed class RallyPointInteractionMenuAdapter
+    public sealed class RallyPointInteractionMenuAdapter
     {
         private static readonly FieldInfo HeaderField = AccessTools.Field(typeof(RallyPointInteractionMenu), "_wielderInteractHeader");
         private static readonly FieldInfo PurchaseTroopsSubMenuField = AccessTools.Field(typeof(RallyPointInteractionMenu), "_purchaseTroopsSubMenu");
@@ -269,7 +269,7 @@ namespace SongsOfConquestAccess.Adapters
             return owner != null && field != null ? field.GetValue(owner) as T : null;
         }
 
-        internal sealed class SourceItem
+        public sealed class SourceItem
         {
             private readonly RallyPointInteractionMenuAdapter _adapter;
             private readonly RallyPointTownEntry _entry;

@@ -6,7 +6,7 @@ using System.Collections.Generic;
 namespace SongsOfConquestAccess
 {
     [HarmonyPatch]
-    internal static class CommanderSheetPatches
+    public static class CommanderSheetPatches
     {
         private static readonly HashSet<int> ActiveSheets = new HashSet<int>();
 

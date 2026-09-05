@@ -8,7 +8,7 @@ using UnityEngine;
 
 namespace SongsOfConquestAccess.Events
 {
-    internal sealed class CombatNarrationSnapshot
+    public sealed class CombatNarrationSnapshot
     {
         public CombatNarrationSnapshot(int localTeamId, IEnumerable<int> yourAliveTroopIds, IEnumerable<int> enemyAliveTroopIds)
             : this(localTeamId, yourAliveTroopIds, enemyAliveTroopIds, null, null, null, null)
@@ -56,7 +56,7 @@ namespace SongsOfConquestAccess.Events
         }
     }
 
-    internal sealed class CombatNarrationPlanner
+    public sealed class CombatNarrationPlanner
     {
         private static readonly HashSet<int> AcidCloudBattleMapEntityBlueprintIds = new HashSet<int> { 4, 5, 6 };
         // Verified from the runtime bacteria table diagnostic.
@@ -463,7 +463,7 @@ namespace SongsOfConquestAccess.Events
             return null;
         }
 
-        internal static List<CombatNarrationItem> ReorderSpellEvents(List<CombatNarrationItem> events)
+        public static List<CombatNarrationItem> ReorderSpellEvents(List<CombatNarrationItem> events)
         {
             if (events == null || events.Count < 2)
             {
@@ -577,7 +577,7 @@ namespace SongsOfConquestAccess.Events
         }
     }
 
-    internal sealed class CombatNarrationItem
+    public sealed class CombatNarrationItem
     {
         public CombatNarrationItemKind Kind;
         public IAccessibilityEvent Event;
@@ -896,7 +896,7 @@ namespace SongsOfConquestAccess.Events
         }
     }
 
-    internal sealed class CombatNarrationModifierTarget
+    public sealed class CombatNarrationModifierTarget
     {
         public CombatNarrationModifierTarget(TroopRef target, IList<ModifierChange> changes)
         {
@@ -908,7 +908,7 @@ namespace SongsOfConquestAccess.Events
         public List<ModifierChange> Changes;
     }
 
-    internal enum CombatNarrationItemKind
+    public enum CombatNarrationItemKind
     {
         NewTurn,
         NewRound,
@@ -933,7 +933,7 @@ namespace SongsOfConquestAccess.Events
         BattleResult
     }
 
-    internal struct BacteriaTargetKey : IEquatable<BacteriaTargetKey>
+    public struct BacteriaTargetKey : IEquatable<BacteriaTargetKey>
     {
         private readonly int _bacteriaId;
         private readonly int _bacteriaType;

@@ -5,7 +5,7 @@ using SongsOfConquestAccess.UI;
 
 namespace SongsOfConquestAccess.Screens
 {
-    internal abstract class Screen
+    public abstract class Screen
     {
         protected Screen(ContainerWidget rootWidget)
         {

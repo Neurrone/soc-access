@@ -8,7 +8,7 @@ using UnityEngine;
 
 namespace SongsOfConquestAccess.Screens
 {
-    internal sealed class AdventureLobbyMapTypeScreen : Screen
+    public sealed class AdventureLobbyMapTypeScreen : Screen
     {
         private readonly AdventureLobbyMapTypeAdapter _adapter;
 

@@ -7,7 +7,7 @@ using SongsOfConquestAccess.Adapters;
 namespace SongsOfConquestAccess
 {
     [HarmonyPatch]
-    internal static class DialogueMenuPatches
+    public static class DialogueMenuPatches
     {
         private static readonly HashSet<DialogueMenu> ActiveMenus = new HashSet<DialogueMenu>();
 

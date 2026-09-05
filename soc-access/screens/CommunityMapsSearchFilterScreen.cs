@@ -7,7 +7,7 @@ using SongsOfConquestAccess.UI;
 
 namespace SongsOfConquestAccess.Screens
 {
-    internal sealed class CommunityMapsSearchFilterScreen : Screen
+    public sealed class CommunityMapsSearchFilterScreen : Screen
     {
         private readonly CommunityMapsSearchFilterAdapter _adapter;
 

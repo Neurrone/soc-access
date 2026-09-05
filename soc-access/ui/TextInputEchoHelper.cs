@@ -5,7 +5,7 @@ using TMPro;
 
 namespace SongsOfConquestAccess.UI
 {
-    internal sealed class TextInputEchoHelper
+    public sealed class TextInputEchoHelper
     {
         private IUITextMeshInputField _field;
         private TMP_InputField _inputField;

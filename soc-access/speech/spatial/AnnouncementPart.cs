@@ -1,6 +1,6 @@
 namespace SongsOfConquestAccess.Speech.Spatial
 {
-    internal sealed class AnnouncementPart
+    public sealed class AnnouncementPart
     {
         public AnnouncementPart(string key, string text)
         {

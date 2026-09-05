@@ -2,7 +2,7 @@ using System.Collections.Generic;
 
 namespace SongsOfConquestAccess.Buffers
 {
-    internal sealed class ReviewBufferManager
+    public sealed class ReviewBufferManager
     {
         private readonly ReviewBufferKind[] _order =
         {
@@ -213,7 +213,7 @@ namespace SongsOfConquestAccess.Buffers
         }
     }
 
-    internal sealed class ReviewBufferLineMove
+    public sealed class ReviewBufferLineMove
     {
         public ReviewBufferLineMove(ReviewBuffer buffer, ReviewBufferMoveResult result)
         {

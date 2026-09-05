@@ -6,7 +6,7 @@ using SongsOfConquest.Common.Gamestate.Facade;
 
 namespace SongsOfConquestAccess.Adapters
 {
-    internal sealed class DefenceTroopManagementHostAdapter : ITroopManagementHostAdapter
+    public sealed class DefenceTroopManagementHostAdapter : ITroopManagementHostAdapter
     {
         private readonly DefenceMenuAdapter _adapter;
 

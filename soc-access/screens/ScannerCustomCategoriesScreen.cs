@@ -10,7 +10,7 @@ namespace SongsOfConquestAccess.Screens
     /// The custom categories defined for one scanner context, with a way to add
     /// another. Each one opens its own editor.
     /// </summary>
-    internal sealed class ScannerCustomCategoriesScreen : Screen
+    public sealed class ScannerCustomCategoriesScreen : Screen
     {
         private readonly ScannerTaxonomy _taxonomy;
         private readonly ModString _contextLabel;

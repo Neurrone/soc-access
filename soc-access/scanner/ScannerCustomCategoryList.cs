@@ -9,7 +9,7 @@ namespace SongsOfConquestAccess.Scanner
     /// climbs, so deleting a category can never let a later one inherit its
     /// stored selectors.
     /// </summary>
-    internal sealed class ScannerCustomCategoryList
+    public sealed class ScannerCustomCategoryList
     {
         private readonly List<ScannerCustomCategory> _categories = new List<ScannerCustomCategory>();
         private int _nextId = 1;

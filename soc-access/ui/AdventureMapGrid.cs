@@ -16,7 +16,7 @@ using UnityEngine;
 
 namespace SongsOfConquestAccess.UI
 {
-    internal sealed class AdventureMapGrid : Widget
+    public sealed class AdventureMapGrid : Widget
     {
         private const string ScannerWrapCueKey = "Common_ClickUnfold";
         private const int DefaultLookAroundRadius = 15;

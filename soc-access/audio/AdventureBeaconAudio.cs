@@ -6,7 +6,7 @@ using UnityEngine;
 
 namespace SongsOfConquestAccess.Audio
 {
-    internal sealed class AdventureBeaconAudio : IDisposable
+    public sealed class AdventureBeaconAudio : IDisposable
     {
         private const string BeaconFileName = "beacon.wav";
         private const int PanSaturationTiles = 12;

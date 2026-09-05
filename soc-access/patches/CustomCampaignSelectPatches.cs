@@ -5,7 +5,7 @@ using SongsOfConquest.Client.Menu;
 namespace SongsOfConquestAccess
 {
     [HarmonyPatch]
-    internal static class CustomCampaignSelectPatches
+    public static class CustomCampaignSelectPatches
     {
         [HarmonyPatch(typeof(CustomCampaignSelectMenuBehavior), "Repopulate")]
         [HarmonyPostfix]

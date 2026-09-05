@@ -7,7 +7,7 @@ using SongsOfConquestAccess.Scanner;
 
 namespace SongsOfConquestAccess.Speech.Spatial
 {
-    internal sealed class AdventureMapTileSpeechFormatter
+    public sealed class AdventureMapTileSpeechFormatter
     {
         private readonly Func<AnnouncementGroupDefinition, IReadOnlyList<string>> _getOrder;
         private readonly Func<AnnouncementGroupDefinition, AnnouncementElementDefinition, bool> _isEnabled;
@@ -23,7 +23,7 @@ namespace SongsOfConquestAccess.Speech.Spatial
         {
         }
 
-        internal AdventureMapTileSpeechFormatter(
+        public AdventureMapTileSpeechFormatter(
             Func<AnnouncementGroupDefinition, IReadOnlyList<string>> getOrder,
             Func<AnnouncementGroupDefinition, AnnouncementElementDefinition, bool> isEnabled,
             Func<AnnouncementGroupDefinition, AnnouncementElementDefinition, bool> includeSuffix,
@@ -443,7 +443,7 @@ namespace SongsOfConquestAccess.Speech.Spatial
         /// would only make the tile slower to hear, so the directions are left to speak for
         /// themselves.
         /// </summary>
-        internal string DescribeRoadDirections(AdventureMapTile tile)
+        public string DescribeRoadDirections(AdventureMapTile tile)
         {
             // Asked before reading the tile, which only works out its road directions when
             // something asks, so turning the element off costs nothing rather than costing the

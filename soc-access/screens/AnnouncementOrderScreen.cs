@@ -5,7 +5,7 @@ using SongsOfConquestAccess.UI;
 
 namespace SongsOfConquestAccess.Screens
 {
-    internal sealed class AnnouncementOrderScreen : Screen
+    public sealed class AnnouncementOrderScreen : Screen
     {
         private readonly AnnouncementGroupDefinition _group;
 

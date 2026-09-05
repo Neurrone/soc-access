@@ -2,7 +2,7 @@ using UnityEngine.InputSystem;
 
 namespace SongsOfConquestAccess.Input
 {
-    internal sealed class KeyboardBinding : InputBinding
+    public sealed class KeyboardBinding : InputBinding
     {
         public KeyboardBinding(Key key, bool ctrl = false, bool shift = false, bool alt = false)
         {

@@ -4,7 +4,7 @@ using SongsOfConquestAccess.Speech.Spatial;
 
 namespace SongsOfConquestAccess.Scanner
 {
-    internal static class ScannerResultSpeechFormatter
+    public static class ScannerResultSpeechFormatter
     {
         /// <summary>
         /// The item name is a prefix that says which group was reached, so it

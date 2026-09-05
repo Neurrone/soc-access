@@ -3,7 +3,7 @@ using UnityEngine.InputSystem.Controls;
 
 namespace SongsOfConquestAccess.Input
 {
-    internal abstract class InputBinding
+    public abstract class InputBinding
     {
         // Stable identifier for this physical binding, derived from binding data
         // and used only for active/release tracking. It is not user-facing.

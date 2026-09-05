@@ -8,7 +8,7 @@ using System.Collections.Generic;
 namespace SongsOfConquestAccess
 {
     [HarmonyPatch]
-    internal static class PreBattleMenuPatches
+    public static class PreBattleMenuPatches
     {
         private static readonly HashSet<int> ActiveMenus = new HashSet<int>();
 

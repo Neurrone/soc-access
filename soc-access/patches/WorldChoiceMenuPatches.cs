@@ -9,7 +9,7 @@ using SongsOfConquest.Common.Rewards;
 namespace SongsOfConquestAccess
 {
     [HarmonyPatch]
-    internal static class WorldChoiceMenuPatches
+    public static class WorldChoiceMenuPatches
     {
         private static readonly FieldInfo AsyncField = AccessTools.Field(typeof(WorldChoiceMenu), "_async");
 

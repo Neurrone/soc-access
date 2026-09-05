@@ -22,7 +22,7 @@ using UnityEngine.UI;
 
 namespace SongsOfConquestAccess.Adapters
 {
-    internal sealed class SpellbookAdapter
+    public sealed class SpellbookAdapter
     {
         private static readonly FieldInfo EntriesField = AccessTools.Field(typeof(SpellBook), "_entries");
         private static readonly FieldInfo CommanderStateField = AccessTools.Field(typeof(SpellBook), "_commanderState");
@@ -821,7 +821,7 @@ namespace SongsOfConquestAccess.Adapters
             return true;
         }
 
-        internal sealed class SchoolSummaryItem
+        public sealed class SchoolSummaryItem
         {
             public SchoolSummaryItem(string id, string label, Component tierArea)
             {
@@ -837,7 +837,7 @@ namespace SongsOfConquestAccess.Adapters
             public Component TierArea { get; private set; }
         }
 
-        internal sealed class SpellItem
+        public sealed class SpellItem
         {
             private readonly SpellbookAdapter _adapter;
             private readonly SpellbookSpellEntry _entry;
@@ -862,7 +862,7 @@ namespace SongsOfConquestAccess.Adapters
             public Tooltip Tooltip { get { return _adapter.GetSpellTooltip(_entry); } }
         }
 
-        internal sealed class QuickbarItem
+        public sealed class QuickbarItem
         {
             private readonly SpellbookAdapter _adapter;
             private readonly SpellbookQuickbarEntry _entry;
@@ -902,7 +902,7 @@ namespace SongsOfConquestAccess.Adapters
         }
     }
 
-    internal enum SpellbookSpellGroup
+    public enum SpellbookSpellGroup
     {
         Order,
         Creation,

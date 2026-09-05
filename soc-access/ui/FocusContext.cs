@@ -2,7 +2,7 @@ using System.Collections.Generic;
 
 namespace SongsOfConquestAccess.UI
 {
-    internal sealed class FocusContext
+    public sealed class FocusContext
     {
         private readonly List<Widget> _lastPath = new List<Widget>();
 

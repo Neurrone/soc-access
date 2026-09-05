@@ -3,7 +3,7 @@ using UnityEngine;
 
 namespace SongsOfConquestAccess.Speech.Spatial
 {
-    internal static class HexCoordinateFormatter
+    public static class HexCoordinateFormatter
     {
         public static string Format(Vector2Int point)
         {

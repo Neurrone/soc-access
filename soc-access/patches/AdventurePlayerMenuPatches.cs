@@ -5,7 +5,7 @@ using UnityEngine;
 namespace SongsOfConquestAccess
 {
     [HarmonyPatch]
-    internal static class AdventurePlayerMenuPatches
+    public static class AdventurePlayerMenuPatches
     {
         [HarmonyPatch(typeof(AdventurePlayerMenu), "Show")]
         [HarmonyPostfix]

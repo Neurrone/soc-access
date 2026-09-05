@@ -4,7 +4,7 @@ using SongsOfConquest.Client.Adventure.UI;
 namespace SongsOfConquestAccess
 {
     [HarmonyPatch]
-    internal static class ResearchMenuPatches
+    public static class ResearchMenuPatches
     {
         [HarmonyPatch(typeof(ResearchMenu), "Show")]
         [HarmonyPostfix]

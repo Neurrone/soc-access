@@ -7,7 +7,7 @@ using SongsOfConquest.Common.Localization;
 
 namespace SongsOfConquestAccess.Localization
 {
-    internal static class ModTranslationLoader
+    public static class ModTranslationLoader
     {
         private const string TranslationsDirectoryName = "translations";
         private const string ConfigDirectoryName = "SongsOfConquestAccess";

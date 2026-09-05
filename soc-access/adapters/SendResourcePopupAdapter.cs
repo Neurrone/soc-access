@@ -13,7 +13,7 @@ using UnityEngine;
 
 namespace SongsOfConquestAccess.Adapters
 {
-    internal sealed class SendResourcePopupAdapter
+    public sealed class SendResourcePopupAdapter
     {
         private static readonly FieldInfo GoldButtonField = AccessTools.Field(typeof(SendResourcePopup), "_goldButton");
         private static readonly FieldInfo StoneButtonField = AccessTools.Field(typeof(SendResourcePopup), "_stoneButton");
@@ -172,7 +172,7 @@ namespace SongsOfConquestAccess.Adapters
             return component != null && component.gameObject != null && component.gameObject.activeInHierarchy;
         }
 
-        internal sealed class ResourceItem
+        public sealed class ResourceItem
         {
             private readonly SendResourcePopupAdapter _adapter;
             private readonly UIButton _button;

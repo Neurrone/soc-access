@@ -5,7 +5,7 @@ using UnityEngine;
 
 namespace SongsOfConquestAccess.Scanner
 {
-    internal static class ScannerLookAround
+    public static class ScannerLookAround
     {
         public static ScannerSnapshot Build(ScannerSnapshot source, Vector2Int origin, int radius)
         {

@@ -10,7 +10,7 @@ using UnityEngine;
 
 namespace SongsOfConquestAccess.Screens
 {
-    internal sealed class ResearchScreen : Screen
+    public sealed class ResearchScreen : Screen
     {
         private const string BuildingsMenuId = "research-buildings";
         private const string FactionsMenuId = "research-factions";

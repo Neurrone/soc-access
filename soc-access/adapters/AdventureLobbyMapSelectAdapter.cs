@@ -23,14 +23,14 @@ using UnityEngine.UI;
 
 namespace SongsOfConquestAccess.Adapters
 {
-    internal enum MapSelectSortDirection
+    public enum MapSelectSortDirection
     {
         None,
         Ascending,
         Descending
     }
 
-    internal sealed class AdventureLobbyMapSelectAdapter
+    public sealed class AdventureLobbyMapSelectAdapter
     {
         private static readonly AccessTools.FieldRef<MapSelectMenu, CanvasGroup> CanvasGroupRef =
             AccessTools.FieldRefAccess<MapSelectMenu, CanvasGroup>("_canvasGroup");
@@ -351,7 +351,7 @@ namespace SongsOfConquestAccess.Adapters
             return columnIndex >= 0 && columnIndex < buttons.Count ? buttons[columnIndex] : null;
         }
 
-        internal void SortSiblings()
+        public void SortSiblings()
         {
             if (_menu != null && SortSiblingsMethod != null)
             {
@@ -540,14 +540,14 @@ namespace SongsOfConquestAccess.Adapters
             }
         }
 
-        internal static IReadOnlyList<UIToggle> GetDropdownToggles(UIFilterDropdown dropdown)
+        public static IReadOnlyList<UIToggle> GetDropdownToggles(UIFilterDropdown dropdown)
         {
             return dropdown != null && FilterDropdownTogglesField != null
                 ? FilterDropdownTogglesField.GetValue(dropdown) as IReadOnlyList<UIToggle> ?? new UIToggle[0]
                 : new UIToggle[0];
         }
 
-        internal static bool IsDropdownOpen(UIFilterDropdown dropdown)
+        public static bool IsDropdownOpen(UIFilterDropdown dropdown)
         {
             UITransform container = dropdown != null && FilterDropdownToggleContainerField != null
                 ? FilterDropdownToggleContainerField.GetValue(dropdown) as UITransform
@@ -555,7 +555,7 @@ namespace SongsOfConquestAccess.Adapters
             return container != null && container.Active;
         }
 
-        internal static void OpenDropdown(UIFilterDropdown dropdown)
+        public static void OpenDropdown(UIFilterDropdown dropdown)
         {
             if (dropdown != null && !IsDropdownOpen(dropdown) && FilterDropdownShowMethod != null)
             {
@@ -563,7 +563,7 @@ namespace SongsOfConquestAccess.Adapters
             }
         }
 
-        internal static void CloseDropdown(UIFilterDropdown dropdown)
+        public static void CloseDropdown(UIFilterDropdown dropdown)
         {
             if (dropdown != null && IsDropdownOpen(dropdown) && FilterDropdownCloseMethod != null)
             {
@@ -572,7 +572,7 @@ namespace SongsOfConquestAccess.Adapters
         }
     }
 
-    internal sealed class AdventureLobbyMapSelectRowAdapter
+    public sealed class AdventureLobbyMapSelectRowAdapter
     {
         private static readonly AccessTools.FieldRef<LobbyMapSelectMenuEntry, UIImage> IconRef =
             AccessTools.FieldRefAccess<LobbyMapSelectMenuEntry, UIImage>("_icon");
@@ -879,7 +879,7 @@ namespace SongsOfConquestAccess.Adapters
         }
     }
 
-    internal sealed class MapSelectSortButtonAdapter
+    public sealed class MapSelectSortButtonAdapter
     {
         private readonly AdventureLobbyMapSelectAdapter _owner;
         private readonly TableSortUIButton _button;
@@ -940,7 +940,7 @@ namespace SongsOfConquestAccess.Adapters
         }
     }
 
-    internal sealed class MapSelectFilterAdapter
+    public sealed class MapSelectFilterAdapter
     {
         private readonly UIFilterDropdown _dropdown;
         private readonly Func<int, string> _getOptionLabel;
@@ -988,7 +988,7 @@ namespace SongsOfConquestAccess.Adapters
             return _getOptionLabel != null ? _getOptionLabel(index) ?? string.Empty : string.Empty;
         }
 
-        internal sealed class Option
+        public sealed class Option
         {
             private readonly UIToggle _toggle;
             private readonly MapSelectFilterAdapter _owner;

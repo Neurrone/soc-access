@@ -4,7 +4,7 @@ using SongsOfConquest.Common;
 
 namespace SongsOfConquestAccess.Adapters
 {
-    internal sealed class InventorySlotInfo
+    public sealed class InventorySlotInfo
     {
         private readonly Action _focusNative;
 

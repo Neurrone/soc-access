@@ -6,7 +6,7 @@ using UnityEngine;
 
 namespace SongsOfConquestAccess.Screens
 {
-    internal sealed class PlatformUserMenuScreen : Screen
+    public sealed class PlatformUserMenuScreen : Screen
     {
         private readonly PlatformUserMenuAdapter _adapter;
 
@@ -84,7 +84,7 @@ namespace SongsOfConquestAccess.Screens
             return root;
         }
 
-        internal static PlatformUserMenuAdapter FindActiveMenu(PlatformUserMenu targetMenu)
+        public static PlatformUserMenuAdapter FindActiveMenu(PlatformUserMenu targetMenu)
         {
             PlatformUserMenu[] menus = Resources.FindObjectsOfTypeAll<PlatformUserMenu>();
             for (int i = 0; i < menus.Length; i++)

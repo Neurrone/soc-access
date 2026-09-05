@@ -4,7 +4,7 @@ using UnityEngine;
 
 namespace SongsOfConquestAccess.Scanner
 {
-    internal static class ScannerDirectionUtility
+    public static class ScannerDirectionUtility
     {
         public static IReadOnlyList<ScannerDirectionStep> BuildSquareDirections(Vector2Int origin, Vector2Int target)
         {
@@ -75,7 +75,7 @@ namespace SongsOfConquestAccess.Scanner
             return FormatStep(step, ModSettings.ScannerUsesLongDirections);
         }
 
-        internal static string FormatStep(ScannerDirectionStep step, bool useLongForm)
+        public static string FormatStep(ScannerDirectionStep step, bool useLongForm)
         {
             if (step == null || step.Count <= 0)
             {
@@ -92,7 +92,7 @@ namespace SongsOfConquestAccess.Scanner
         /// Names a direction on its own, without a distance in front of it. Short form gives
         /// "ne"; the Long directions setting gives "northeast".
         /// </summary>
-        internal static string FormatDirection(ScannerDirection direction, bool useLongForm)
+        public static string FormatDirection(ScannerDirection direction, bool useLongForm)
         {
             return ModText.Get(useLongForm ? LongForm(direction) : ShortForm(direction));
         }

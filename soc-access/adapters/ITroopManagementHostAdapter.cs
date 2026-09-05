@@ -5,7 +5,7 @@ using SongsOfConquest.Common.Gamestate.Facade;
 
 namespace SongsOfConquestAccess.Adapters
 {
-    internal interface ITroopManagementHostAdapter
+    public interface ITroopManagementHostAdapter
     {
         string IdPrefix { get; }
         string Title { get; }

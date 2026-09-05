@@ -5,7 +5,7 @@ using UnityEngine;
 
 namespace SongsOfConquestAccess.Adapters
 {
-    internal sealed class OptionsMenuButtonAdapter : MenuButtonAdapterBase
+    public sealed class OptionsMenuButtonAdapter : MenuButtonAdapterBase
     {
         public OptionsMenuButtonAdapter(
             UIButton button,

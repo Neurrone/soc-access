@@ -9,7 +9,7 @@ using UnityEngine.EventSystems;
 
 namespace SongsOfConquestAccess.Screens
 {
-    internal sealed class CampaignMenuScreen : Screen
+    public sealed class CampaignMenuScreen : Screen
     {
         private readonly CampaignMenuAdapter _adapter;
 

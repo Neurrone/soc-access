@@ -3,7 +3,7 @@ using SongsOfConquestAccess.Speech;
 
 namespace SongsOfConquestAccess.Buffers
 {
-    internal sealed class ReviewBufferController
+    public sealed class ReviewBufferController
     {
         private readonly ReviewBufferManager _buffers;
 

@@ -9,7 +9,7 @@ namespace SongsOfConquestAccess.Scanner
     /// snapshot construction never depends on localized text; the label resolver
     /// runs at speech time.
     /// </summary>
-    internal sealed class ScannerTaxonomy
+    public sealed class ScannerTaxonomy
     {
         private readonly List<ScannerCategoryDefinition> _categories;
 
@@ -54,7 +54,7 @@ namespace SongsOfConquestAccess.Scanner
         }
     }
 
-    internal sealed class ScannerCategoryDefinition
+    public sealed class ScannerCategoryDefinition
     {
         private readonly List<ScannerSubcategoryDefinition> _subcategories;
 
@@ -98,7 +98,7 @@ namespace SongsOfConquestAccess.Scanner
         }
     }
 
-    internal sealed class ScannerSubcategoryDefinition
+    public sealed class ScannerSubcategoryDefinition
     {
         public ScannerSubcategoryDefinition(string key, Func<string> label)
         {

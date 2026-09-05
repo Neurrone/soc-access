@@ -5,7 +5,7 @@ using SongsOfConquestAccess.UI;
 
 namespace SongsOfConquestAccess.Screens
 {
-    internal sealed class FoldoutMenuScreen : Screen
+    public sealed class FoldoutMenuScreen : Screen
     {
         private readonly MainMenuAdapter.NativeFoldoutAdapter _foldout;
         private readonly MainMenuAdapter _owner;

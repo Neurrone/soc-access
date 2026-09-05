@@ -12,7 +12,7 @@ using UnityEngine.UI;
 
 namespace SongsOfConquestAccess.Adapters
 {
-    internal sealed class RandomEventMenuAdapter : IMessageDialogAdapter
+    public sealed class RandomEventMenuAdapter : IMessageDialogAdapter
     {
         private static readonly Regex RichTextTagRegex = new Regex("<.*?>", RegexOptions.Compiled);
 

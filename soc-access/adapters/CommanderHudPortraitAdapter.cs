@@ -8,7 +8,7 @@ using UnityEngine;
 
 namespace SongsOfConquestAccess.Adapters
 {
-    internal sealed class CommanderHudPortraitAdapter
+    public sealed class CommanderHudPortraitAdapter
     {
         private static readonly FieldInfo WielderPortraitButtonField =
             AccessTools.Field(typeof(CommanderHUDPortrait), "_wielderPortraitButton");

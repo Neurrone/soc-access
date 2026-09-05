@@ -1,6 +1,6 @@
 namespace SongsOfConquestAccess.Localization
 {
-    internal static class ModStrings
+    public static class ModStrings
     {
         public static class Common
         {

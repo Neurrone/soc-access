@@ -25,7 +25,7 @@ using Zenject;
 
 namespace SongsOfConquestAccess.Adapters
 {
-    internal sealed class BattleHudAdapter
+    public sealed class BattleHudAdapter
     {
         private static readonly FieldInfo BattleHudSettingsField =
             AccessTools.Field(typeof(BattleHUDStateHandler), "_settings");
@@ -1130,7 +1130,7 @@ namespace SongsOfConquestAccess.Adapters
             }
         }
 
-        internal sealed class QuickbarItem
+        public sealed class QuickbarItem
         {
             private readonly BattleHudAdapter _adapter;
             private readonly QuickbarEntry _entry;
@@ -1222,7 +1222,7 @@ namespace SongsOfConquestAccess.Adapters
             }
         }
 
-        internal sealed class QueueItem
+        public sealed class QueueItem
         {
             private readonly BattleHudAdapter _adapter;
             private readonly QueuedTroop _queuedTroop;
@@ -1309,7 +1309,7 @@ namespace SongsOfConquestAccess.Adapters
             }
         }
 
-        internal sealed class TroopInfo
+        public sealed class TroopInfo
         {
             public TroopInfo(string name, int size, bool hasSize, bool isEnemy, Vector2Int position)
             {

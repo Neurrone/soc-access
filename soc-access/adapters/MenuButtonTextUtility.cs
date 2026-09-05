@@ -8,7 +8,7 @@ using UnityEngine.UI;
 
 namespace SongsOfConquestAccess.Adapters
 {
-    internal static class MenuButtonTextUtility
+    public static class MenuButtonTextUtility
     {
         private static readonly AccessTools.FieldRef<UITextMeshLocalization, string> UITextMeshLocalizationKeyRef =
             AccessTools.FieldRefAccess<UITextMeshLocalization, string>("_localizationKey");

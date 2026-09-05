@@ -2,7 +2,7 @@ using SongsOfConquestAccess.Localization;
 
 namespace SongsOfConquestAccess.Speech.Spatial
 {
-    internal sealed class AnnouncementElementDefinition
+    public sealed class AnnouncementElementDefinition
     {
         public AnnouncementElementDefinition(string key, ModString label, bool defaultEnabled = true, bool defaultSuffix = true)
         {

@@ -8,7 +8,7 @@ using UnityEngine.InputSystem.LowLevel;
 
 namespace SongsOfConquestAccess.Input
 {
-    internal sealed class AccessibilityInputRouter : IDisposable, IObserver<InputEventPtr>
+    public sealed class AccessibilityInputRouter : IDisposable, IObserver<InputEventPtr>
     {
         private const float ReleasePollingDelaySeconds = 0.05f;
         private const float ModifiedReleasePollingDelaySeconds = 0.10f;
@@ -54,7 +54,7 @@ namespace SongsOfConquestAccess.Input
         /// It deliberately does not touch <see cref="_activeBindings"/>: no physical key is down,
         /// so there is no release to wait for and nothing to debounce.
         /// </summary>
-        internal Injection Inject(InputAction action)
+        public Injection Inject(InputAction action)
         {
             Injection injection = new Injection
             {
@@ -127,7 +127,7 @@ namespace SongsOfConquestAccess.Input
 
         /// <summary>One queued action and what became of it. The event is set on the main thread
         /// once the action has run; the dev server's handler waits on it.</summary>
-        internal sealed class Injection
+        public sealed class Injection
         {
             public readonly System.Threading.ManualResetEvent Done =
                 new System.Threading.ManualResetEvent(false);
@@ -441,7 +441,7 @@ namespace SongsOfConquestAccess.Input
             public Key PressedKey { get; private set; }
         }
 
-        internal sealed class KeyboardStateSnapshot
+        public sealed class KeyboardStateSnapshot
         {
             private KeyboardStateSnapshot(bool ctrl, bool shift, bool alt)
             {

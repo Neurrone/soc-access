@@ -18,7 +18,7 @@ using UnityEngine;
 namespace SongsOfConquestAccess
 {
     [HarmonyPatch]
-    internal static class StoryCameraFocusPatches
+    public static class StoryCameraFocusPatches
     {
         private static readonly ConditionalWeakTable<AdventureDialogueCameraManager, ConversationTargets> DialogueTargets =
             new ConditionalWeakTable<AdventureDialogueCameraManager, ConversationTargets>();

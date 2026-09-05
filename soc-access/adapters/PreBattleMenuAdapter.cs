@@ -28,7 +28,7 @@ using UnityEngine.UI;
 
 namespace SongsOfConquestAccess.Adapters
 {
-    internal sealed class PreBattleMenuAdapter
+    public sealed class PreBattleMenuAdapter
     {
         private static readonly FieldInfo GridContainerField = AccessTools.Field(typeof(PreBattleMenu), "_gridContainer");
         private static readonly FieldInfo MainContainerField = AccessTools.Field(typeof(PreBattleMenu), "_mainContainer");
@@ -1193,7 +1193,7 @@ namespace SongsOfConquestAccess.Adapters
         }
     }
 
-    internal sealed class TroopPlacementSnapshot
+    public sealed class TroopPlacementSnapshot
     {
         private readonly Dictionary<Vector2Int, TroopPlacementTile> _tiles = new Dictionary<Vector2Int, TroopPlacementTile>();
 
@@ -1270,7 +1270,7 @@ namespace SongsOfConquestAccess.Adapters
         }
     }
 
-    internal sealed class TroopPlacementTile
+    public sealed class TroopPlacementTile
     {
         public TroopPlacementTile(Vector2Int point)
         {

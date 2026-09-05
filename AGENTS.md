@@ -45,7 +45,7 @@ Prefer fast text search over manual browsing when tracing the game code.
 
 ## Coding Style & Naming Conventions
 
-Use C# conventions: 4-space indentation, PascalCase for types and public members, camelCase for locals and private fields unless the surrounding code already uses underscore-prefixed fields. Avoid repeating words in file names. For example, use `adapters/ContinueMenuButton.cs` instead of `adapters/ContinueMenuButtonAdapter.cs` to avoid repeating adapter.
+Use C# conventions: 4-space indentation, PascalCase for types and public members, camelCase for locals and private fields unless the surrounding code already uses underscore-prefixed fields. Types and members are public by default, as in Endless Space 2 Access, so the dev server's REPL can name any of them; use `private` for what a type keeps to itself and never `internal`. Avoid repeating words in file names. For example, use `adapters/ContinueMenuButton.cs` instead of `adapters/ContinueMenuButtonAdapter.cs` to avoid repeating adapter.
 
 Never use `SpeechTextSanitizer.Normalize` unless explicitly given approval to do so. It is problematic as it strips newlines.
 

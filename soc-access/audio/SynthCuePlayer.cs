@@ -12,7 +12,7 @@ namespace SongsOfConquestAccess.Audio
     /// on the AudioSource, so a cue always sounds the same regardless of engine mixer
     /// state; the offsets are quantised before rendering to keep the clip cache bounded.
     /// </summary>
-    internal static class SynthCuePlayer
+    public static class SynthCuePlayer
     {
         private const int VoiceCount = 8;
         private const int MaxCachedClips = 64;

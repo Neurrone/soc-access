@@ -6,7 +6,7 @@ using SongsOfConquestAccess.UI;
 
 namespace SongsOfConquestAccess.Screens
 {
-    internal sealed class CommunityMapsHomeScreen : Screen
+    public sealed class CommunityMapsHomeScreen : Screen
     {
         private readonly CommunityMapsHomeAdapter _adapter;
 

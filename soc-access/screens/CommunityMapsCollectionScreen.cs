@@ -6,7 +6,7 @@ using SongsOfConquestAccess.UI;
 
 namespace SongsOfConquestAccess.Screens
 {
-    internal sealed class CommunityMapsCollectionScreen : Screen
+    public sealed class CommunityMapsCollectionScreen : Screen
     {
         private const string SearchInputId = "community-maps-collection-keyword";
         private const int ItemsMenuIndex = 7;

@@ -5,14 +5,14 @@ using SongsOfConquestAccess.Localization;
 
 namespace SongsOfConquestAccess.Audio
 {
-    internal enum CueCategory
+    public enum CueCategory
     {
         Terrain,
         Overworld,
         Combat
     }
 
-    internal sealed class CueDefinition
+    public sealed class CueDefinition
     {
         public CueDefinition(string key, CueCategory category, ModString name, CueSpec defaultSpec)
         {
@@ -36,7 +36,7 @@ namespace SongsOfConquestAccess.Audio
     /// The registry of every tile cue: key, category, localized name and default sound.
     /// Adding a cue is one entry here plus one ModString.
     /// </summary>
-    internal static class CueLibrary
+    public static class CueLibrary
     {
         public const string TerrainRoad = "terrain_road";
         public const string TerrainGround = "terrain_ground";
@@ -169,7 +169,7 @@ namespace SongsOfConquestAccess.Audio
         }
 
         /// <summary>Pure delay planning; the duration lookup returns 0 for cues that will not sound.</summary>
-        internal static float[] ComputeDelaySeconds(IReadOnlyList<TileCue> cues, Func<string, float> durationSeconds)
+        public static float[] ComputeDelaySeconds(IReadOnlyList<TileCue> cues, Func<string, float> durationSeconds)
         {
             float[] delays = new float[cues.Count];
             float accumulated = 0f;
@@ -194,7 +194,7 @@ namespace SongsOfConquestAccess.Audio
         /// How long the whole serialized stack sounds, for callers that must not start another
         /// stack on top of it. Pure; the live lookup is <see cref="GetStackDurationSeconds"/>.
         /// </summary>
-        internal static float ComputeStackDurationSeconds(IReadOnlyList<TileCue> cues, Func<string, float> durationSeconds)
+        public static float ComputeStackDurationSeconds(IReadOnlyList<TileCue> cues, Func<string, float> durationSeconds)
         {
             if (cues == null || cues.Count == 0)
             {
@@ -221,7 +221,7 @@ namespace SongsOfConquestAccess.Audio
         }
 
         /// <summary>Zero for cues the user has silenced, so they take no room in a schedule.</summary>
-        internal static float GetAudibleDurationSeconds(string key)
+        public static float GetAudibleDurationSeconds(string key)
         {
             if (!ModSettings.TileCuesEnabled || !ModSettings.GetCueEnabled(key))
             {
@@ -248,12 +248,12 @@ namespace SongsOfConquestAccess.Audio
         }
 
         /// <summary>Default spec with the duration setting applied; volume and pitch are render offsets.</summary>
-        internal static CueSpec GetEffectiveSpec(string key)
+        public static CueSpec GetEffectiveSpec(string key)
         {
             return GetEffectiveSpec(key, ModSettings.GetCueDurationScale(key));
         }
 
-        internal static CueSpec GetEffectiveSpec(string key, int durationScale)
+        public static CueSpec GetEffectiveSpec(string key, int durationScale)
         {
             CueDefinition definition = GetCue(key);
             if (definition == null || definition.DefaultSpec == null)

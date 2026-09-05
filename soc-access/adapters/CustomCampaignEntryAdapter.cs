@@ -7,7 +7,7 @@ using UnityEngine;
 
 namespace SongsOfConquestAccess.Adapters
 {
-    internal sealed class CustomCampaignEntryAdapter
+    public sealed class CustomCampaignEntryAdapter
     {
         private static readonly AccessTools.FieldRef<CustomCampaignEntry, UIButton> ButtonRef =
             AccessTools.FieldRefAccess<CustomCampaignEntry, UIButton>("_button");
