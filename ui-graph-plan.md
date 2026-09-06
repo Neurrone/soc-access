@@ -672,3 +672,9 @@ exception to the edit contract); the lobby's player rows are a table; the codex'
 and articles are ONE stop, a region per category with its articles as rows, Alt+Up/Down
 moving between categories (the adapter's `GetArticleGroups` already lists every category
 with its articles).
+Further answers: the codex is four stops (tabs; categories with their articles; the article
+content as a stop NAMED after the article's top-level heading; the footer of Reset Tutorials,
+Show tutorials and Close, declared while drawn). The map table's win-condition column reads
+each drawn icon as its own piece under the one column (`GraphSheet` pieces). The loading
+screen keeps arrows for reading and lets unclaimed keys reach the game's press-any-key. The
+slider's value button is a child node opening the game's "Provide a number" popup.
