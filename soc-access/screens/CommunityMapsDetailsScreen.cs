@@ -226,9 +226,18 @@ namespace SongsOfConquestAccess.Screens
             AddParagraph(builder, "description", _adapter.DescriptionLabel, _adapter.Description);
         }
 
-        /// <summary>A drawn block of prose as ONE node: its heading, or its first line where the block
-        /// has no heading, is the label, and the rest of its lines are a section, so the review buffer
-        /// gives them one at a time instead of running the whole block together.</summary>
+        /// <summary>
+        /// A drawn block of prose as ONE node: its heading, or its first line where the block has no
+        /// heading, is the label, and the prose under it READS AFTER THE LABEL as a value part - the
+        /// rule the campaign cards set, because the paragraph is always drawn and a player standing on
+        /// "Full description" who hears only those two words has been told nothing.
+        ///
+        /// ONE PART PER DRAWN LINE, and no section beside them: a part is a review-buffer line
+        /// already, so the buffer still gives the block a line at a time, and a section repeating the
+        /// same lines would put every one of them in the buffer twice (the rule the campaign cards
+        /// wrote down, and the engine's own ruling that what is spoken beside the name is a buffer
+        /// line by construction).
+        /// </summary>
         private void AddParagraph(GraphBuilder builder, string key, string heading, string text)
         {
             IList<string> lines = SpokenLines.Of(new[] { text });
@@ -239,13 +248,16 @@ namespace SongsOfConquestAccess.Screens
 
             int firstBodyLine = string.IsNullOrWhiteSpace(heading) ? 1 : 0;
             string label = firstBodyLine == 0 ? heading : lines[0];
-            List<string> rest = new List<string>();
+            NodeVtable vtable = GraphNodes.Text(() => label);
             for (int i = firstBodyLine; i < lines.Count; i++)
             {
-                rest.Add(lines[i]);
+                // Nothing on this page changes under the cursor - a details page is opened for one
+                // mod and closed again - so the parts are read once and not watched.
+                string line = lines[i];
+                vtable.Announcements.Add(GraphNodes.ValuePart(() => line, watch: false));
             }
 
-            builder.AddItem(Synthetic(key, GraphNodes.Text(() => label, () => rest)));
+            builder.AddItem(Synthetic(key, vtable));
         }
 
         // ---- the way back ----
