@@ -791,6 +791,62 @@ Manual test:
 5. Tab: "Cancel, button, 1 of 2", "Host, button, 2 of 2".
 6. Escape closes the popup, the same as pressing Cancel.
 
+### CommunityMapsSearchFilterScreen
+
+Built: two stops. `search-filter-rows` holds the keyword box and then the tag checkboxes, one
+region per drawn category caption; `search-filter-buttons` holds the footer's buttons in drawn
+order. Screen name is the panel's drawn title ("Search & filter"); focus starts on the rows.
+
+Measured 2026-09-06 at 1280x800 through `/gui/unity` and a screenshot crop: the panel down the
+right of the window at [853,0,427,800] - the keyword box at [880,60,373,32], then a scrolling
+list of tags (1035 px of rows in a 608 px viewport) in which each category draws a caption of its
+own ("Content Type" at y 128, "Map Type" at y 336, "Languages" at y 651, "Contests" at y 1045)
+over its rows - and the footer at y 747 with Search (x 880), Clear filter (x 977) and Cancel
+(x 1164). So this page DOES draw captions, and each is the region its tags belong to: Alt+Down
+read "Map Type, Single Player, checkbox, not checked, 1 of 10" and Alt+Up came back.
+
+Escape is CLAIMED and runs mod.io's own `Close`: the panel is the browser's, not the game's, and
+nothing registers the key for it - the finding the community maps modal already recorded.
+Verified: `ui_back` answered `consumed` and the home page returned.
+
+Diff: one kind. "unchecked" became "not checked", on all 33 tags. Nothing else changed - the
+keyword box, Search and Clear filter read exactly as before. (The stack line differs because the
+search results page was still under the home page from the Search test below.)
+
+Deviations, measured:
+
+- The keyword box takes a native focus visual of its own (`NativeSelectionUtility.Select` on the
+  field). Without it, an activation that FOLLOWED a tag row - whose focus visual selects mod.io's
+  own toggle - selected the box but never made it focused: measured, `ui_activate` said "editing",
+  `/input ui_down` answered `consumed` rather than `standing down`, and the edit ended in silence,
+  reproducibly. With it, the same sequence answers `standing down` and a native deselect says
+  "Cancelled".
+- The tag rows are `SyntheticNode`s keyed on category and tag rather than on the drawn row: mod.io
+  rebuilds the row objects as the list scrolls, and a tag is a category and a name either way.
+
+Follow-ups, not fixed:
+
+- The footer's third button, Cancel, is not read: `GetActions` looks for a button whose onClick
+  names `Close` and falls back to the third of the panel's labelled buttons, and neither finds it
+  (the drawn control is "Close (Controller Icon)"). Pre-existing - the before capture is missing
+  the same line - and Escape does what it would do.
+- Pressing Search left the stack as `CommunityMapsSearchResultsScreen > CommunityMapsHomeScreen >
+  CommunityMapsSearchFilterScreen`: the results page went UNDER the home page rather than being
+  popped when Back returned to it. The detector's, not this port's.
+
+Manual test:
+
+1. Main menu, Community Maps; close the mod.io modal with Escape if it appears; then the search
+   and filter button. Hear "Search & filter", then "Enter keyword, editable".
+2. Down: "Content Type, Map, checkbox, not checked, 1 of 6". Enter says "checked", Enter again
+   "not checked".
+3. Alt+Down and Alt+Up jump between Content Type, Map Type, Languages and Contests, naming each
+   on the way in; watch the list scroll itself to the row under the cursor.
+4. Home, then Enter on the keyword box: "editing". Type, hear the keys, Escape says "Cancelled".
+5. Tab: "Search, button, 1 of 2", "Clear filter, button, 2 of 2". Enter on Search opens the
+   results; its Back returns.
+6. Escape closes the panel.
+
 
 ## Family E: drop lists
 
