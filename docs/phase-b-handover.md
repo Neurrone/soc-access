@@ -374,3 +374,49 @@ Manual test:
 3. Enter on Set Name: the system popup opens with its field ("Set Name, editable, <name>");
    Escape there restores the name and closes both popups.
 4. Escape on the popup itself, and Enter on its Cancel: both close it.
+
+## Family C: loading screen
+
+### LoadingCompleteScreen (representative; no siblings)
+
+Built: one stop with two rows in the order the page draws them. Measured 2026-09-06 at
+1280x800 on the cropped screenshot: the tip line ("Tip: Is an enemy blocking your path in
+battle? Hold Ctrl to target the ground instead") above "PRESS ANY KEY TO CONTINUE". The tip
+is a read-only text node and the start node, so arrival reads it; the prompt is the button,
+and activating it runs the game's own `FinalizeLoadingScreen` through
+`LoadingScreenAdapter.Continue()` - the same member `DevProbe.PressContinue` already used,
+so the probe and the screen share one call. No screen name: the two rows say where the
+player is, and a name over a page whose whole purpose is to be dismissed is a line in the
+way.
+
+Diff: one line added, the tip, which the widget screen never read. Nothing missing, nothing
+changed. (The stack line differs too because the after-capture was taken with the map
+already resynced underneath.)
+
+Keys, per the owner's ruling: the arrows are the mod's, so the two lines can be read;
+`AllowsTypeahead` is false so a letter is one of the keys the game is waiting for; Escape is
+left to the game (`ConsumesBack` false). Enter is the one key the navigator always claims, so
+Enter on the tip row does nothing rather than continuing - the button row is where Enter
+continues.
+
+Deviations, measured: the tip is read as the LAID-OUT text (`TMP_Text.GetParsedText`), not as
+the string the menu assigned. A tip carries the game's own action tokens - the assigned string
+here was "Hold <action name=ToggleHexTargetingMode> to target the ground instead" - which
+`UITextMesh.UpdateText` rewrites into the bound key as it draws, and the picture reads "Hold
+Ctrl". `UITextMeshTextUtility.GetEffectiveText` answers with the pre-substitution string,
+which is why this one label does not go through it. Both rows are `DrawnNode`s on the labels
+the page paints (`TipLabel`, `PromptLabel`, new on the adapter), with marker subjects only as
+the fallback when the game has no label to give.
+
+Follow-ups, not fixed: `LoadingScreenAdapter.PromptText` still normalises through
+`SpeechTextSanitizer.Normalize` (pre-existing, and against the repo's standing rule); every
+other adapter that reads a `UITextMesh` through `GetEffectiveText` has the same action-token
+gap this screen's tip just fixed for itself, so any label carrying `<action name=...>`
+elsewhere is being read as the raw token.
+
+Manual test:
+
+1. Load a save from the main menu and wait for "press any key to continue". Hear the tip.
+2. Down: "PRESS ANY KEY TO CONTINUE, button, 2 of 2". Up: the tip again.
+3. Any letter, Space or Escape should continue the load, because the mod does not claim them.
+4. Enter on the button continues the load; Enter on the tip row does nothing.
