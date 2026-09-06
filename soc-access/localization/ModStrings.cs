@@ -293,6 +293,7 @@ namespace SongsOfConquestAccess.Localization
             public static readonly ModString TooltipActionsMenu = new ModString("Actions.TooltipActionsMenu", "Tooltip Actions Menu");
             public static readonly ModString UiActivate = new ModString("Actions.UiActivate", "Activate");
             public static readonly ModString UiBack = new ModString("Actions.UiBack", "Back");
+            public static readonly ModString UiClearSearch = new ModString("Actions.UiClearSearch", "Clear Search");
             public static readonly ModString UiCoarseDecrease = new ModString("Actions.UiCoarseDecrease", "Coarse Decrease");
             public static readonly ModString UiCoarseIncrease = new ModString("Actions.UiCoarseIncrease", "Coarse Increase");
             public static readonly ModString UiDown = new ModString("Actions.UiDown", "Move Down");
@@ -304,7 +305,7 @@ namespace SongsOfConquestAccess.Localization
             public static readonly ModString UiRegionNext = new ModString("Actions.UiRegionNext", "Next Region");
             public static readonly ModString UiRegionPrev = new ModString("Actions.UiRegionPrev", "Previous Region");
             public static readonly ModString UiRight = new ModString("Actions.UiRight", "Move Right");
-            public static readonly ModString UiSecondary = new ModString("Actions.UiSecondary", "Secondary Action");
+            public static readonly ModString UiRightClick = new ModString("Actions.UiRightClick", "Right Click");
             public static readonly ModString UiUp = new ModString("Actions.UiUp", "Move Up");
         }
 

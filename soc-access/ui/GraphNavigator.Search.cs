@@ -14,8 +14,8 @@ namespace SongsOfConquestAccess.UI
         //
         // Typing a letter on a graph screen searches what is on it and moves focus to the best
         // match; more letters narrow it, Up/Down step the matches, Home/End go to the ends, and
-        // Escape puts the keyboard back. There is no key that starts a search, because a key nobody
-        // is told about is a key nobody uses.
+        // Escape or Backspace puts the keyboard back. There is no key that starts a search, because
+        // a key nobody is told about is a key nobody uses.
         //
         // The characters do not come through the mod's bindings: a binding is one key meaning one
         // action, and this is text. They come from TypedCharacters, which is the input router's text
@@ -196,9 +196,11 @@ namespace SongsOfConquestAccess.UI
                     _typeAhead.Last();
                     return true;
                 case "ui_back":
-                case "ui_secondary":
-                    // The two keys that put the keyboard back, and they go no further: the game must
-                    // not also act on the key the player used to leave the search.
+                case "ui_clear_search":
+                    // The two keys that put the keyboard back (Escape and Backspace), and they go no
+                    // further: the game must not also act on the key the player used to leave the
+                    // search. Backspace is the way OUT rather than an edit of the typed letters: a
+                    // search is re-typed in a keystroke, and the key is worth more as the exit.
                     ClearSearch(true);
                     return true;
                 default:

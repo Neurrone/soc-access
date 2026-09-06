@@ -1274,6 +1274,11 @@ msgctxt "Actions.UiBack"
 msgid "Back"
 msgstr ""
 
+#. Actions.UiClearSearch
+msgctxt "Actions.UiClearSearch"
+msgid "Clear Search"
+msgstr ""
+
 #. Actions.UiCoarseDecrease
 msgctxt "Actions.UiCoarseDecrease"
 msgid "Coarse Decrease"
@@ -1329,9 +1334,9 @@ msgctxt "Actions.UiRight"
 msgid "Move Right"
 msgstr ""
 
-#. Actions.UiSecondary
-msgctxt "Actions.UiSecondary"
-msgid "Secondary Action"
+#. Actions.UiRightClick
+msgctxt "Actions.UiRightClick"
+msgid "Right Click"
 msgstr ""
 
 #. Actions.UiUp

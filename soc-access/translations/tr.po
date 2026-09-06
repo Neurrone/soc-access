@@ -1645,10 +1645,15 @@ msgctxt "Actions.UiRight"
 msgid "Move Right"
 msgstr "Sağa git"
 
-#. Actions.UiSecondary
-msgctxt "Actions.UiSecondary"
-msgid "Secondary Action"
-msgstr "İkincil eylem"
+#. Actions.UiRightClick
+msgctxt "Actions.UiRightClick"
+msgid "Right Click"
+msgstr "Sağ tık"
+
+#. Actions.UiClearSearch
+msgctxt "Actions.UiClearSearch"
+msgid "Clear Search"
+msgstr "Aramayı temizle"
 
 #. Actions.UiUp
 msgctxt "Actions.UiUp"

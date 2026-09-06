@@ -314,8 +314,14 @@ namespace SongsOfConquestAccess.Input
             .AddBinding(new KeyboardBinding(Key.Enter))
             .AddBinding(new KeyboardBinding(Key.NumpadEnter));
 
-        // The right-click equivalent, on the key the map's secondary action already uses.
-        public static readonly InputAction UiSecondary = OneShot("ui_secondary", ModStrings.Actions.UiSecondary, InputClaimScope.Screen)
+        // The way out of a type-ahead search: claimed only while one is live, so Backspace stays the
+        // game's everywhere else.
+        public static readonly InputAction UiClearSearch = OneShot("ui_clear_search", ModStrings.Actions.UiClearSearch, InputClaimScope.Screen)
+            .AddBinding(new KeyboardBinding(Key.Backspace));
+
+        // The right-click equivalent, on the key the map's secondary action
+        // already uses.
+        public static readonly InputAction UiRightClick = OneShot("ui_right_click", ModStrings.Actions.UiRightClick, InputClaimScope.Screen)
             .AddBinding(new KeyboardBinding(Key.Backslash))
             .AddBinding(new KeyboardDisplayNameBinding("\\"));
 
@@ -604,7 +610,8 @@ namespace SongsOfConquestAccess.Input
                 UiRegionPrev,
                 UiRegionNext,
                 UiActivate,
-                UiSecondary,
+                UiClearSearch,
+                UiRightClick,
                 UiBack
             };
 

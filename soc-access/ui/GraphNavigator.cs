@@ -249,7 +249,7 @@ namespace SongsOfConquestAccess.UI
             }
 
             if (_typeAhead.IsActive && (actionKey == AccessibilityActions.UiBack.Key
-                || actionKey == AccessibilityActions.UiSecondary.Key))
+                || actionKey == AccessibilityActions.UiClearSearch.Key))
             {
                 return true;
             }
@@ -272,11 +272,12 @@ namespace SongsOfConquestAccess.UI
                 case "ui_coarse_increase":
                 case "ui_coarse_decrease":
                     return HasAdjust();
-                case "ui_secondary":
-                    return HasSecondary();
+                case "ui_right_click":
+                    return HasContextual();
                 case "ui_back":
                     return _screen.ConsumesBack;
                 default:
+                    // ui_clear_search is claimed above, only while a search is live.
                     return false;
             }
         }
@@ -323,11 +324,13 @@ namespace SongsOfConquestAccess.UI
                     return Adjust(-1, true);
                 case "ui_activate":
                     return Activate();
-                case "ui_secondary":
-                    return Secondary();
+                case "ui_right_click":
+                    return Contextual();
                 case "ui_back":
                     return _screen.Back();
                 default:
+                    // ui_clear_search only reaches here with no search live, which its claim
+                    // never allows.
                     return false;
             }
         }
@@ -633,10 +636,10 @@ namespace SongsOfConquestAccess.UI
             return node != null && node.Vtable != null && node.Vtable.OnAdjust != null;
         }
 
-        private bool HasSecondary()
+        private bool HasContextual()
         {
             GraphNode node = _graph == null ? null : _graph.CurrentNode;
-            return node != null && node.Vtable != null && node.Vtable.OnSecondary != null;
+            return node != null && node.Vtable != null && node.Vtable.OnContextual != null;
         }
 
         private bool Region(int step)
@@ -667,7 +670,9 @@ namespace SongsOfConquestAccess.UI
             return true;
         }
 
-        private bool Secondary()
+        // The command the game puts on a right click here. Claimed only where the control has one, so
+        // the key stays the game's everywhere else.
+        private bool Contextual()
         {
             GraphNode node = _graph.CurrentNode;
             if (node == null)
@@ -675,9 +680,9 @@ namespace SongsOfConquestAccess.UI
                 return false;
             }
 
-            if (node.Vtable.OnSecondary != null)
+            if (node.Vtable.OnContextual != null)
             {
-                _graph.Secondary();
+                _graph.Contextual();
                 SpeakStateAfterChange();
             }
 

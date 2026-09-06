@@ -1645,10 +1645,15 @@ msgctxt "Actions.UiRight"
 msgid "Move Right"
 msgstr "向右移動"
 
-#. Actions.UiSecondary
-msgctxt "Actions.UiSecondary"
-msgid "Secondary Action"
-msgstr "次要操作"
+#. Actions.UiRightClick
+msgctxt "Actions.UiRightClick"
+msgid "Right Click"
+msgstr "右鍵點擊"
+
+#. Actions.UiClearSearch
+msgctxt "Actions.UiClearSearch"
+msgid "Clear Search"
+msgstr "清除搜尋"
 
 #. Actions.UiUp
 msgctxt "Actions.UiUp"

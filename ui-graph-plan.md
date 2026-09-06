@@ -181,7 +181,7 @@ graph side of the mod.
 - `input/AccessibilityActions.cs` — the graph screens' own actions, all `InputClaimScope.Screen`:
   `ui_up/down/left/right`, `ui_coarse_decrease/increase` (Shift+Left/Right), `ui_next/prev`
   (Tab, Shift+Tab), `ui_home/end`, `ui_region_prev/next` (Alt+Up/Down), `ui_activate`
-  (Enter), `ui_secondary` (Backslash), `ui_back` (Escape). `AccessibilityInputRouter` also
+  (Enter), `ui_clear_search` (Backspace, live only during a search), `ui_right_click` (Backslash), `ui_back` (Escape). `AccessibilityInputRouter` also
   claims bare letters (and Space mid-search) while a graph screen searches, feeding the
   characters from the keyboard's text events.
 - `dev/GraphDump.cs` — `/gui/graph?buffers=1&flat=1&edges=1`, `/gui/tree` (whichever dump
@@ -212,7 +212,8 @@ screen answers it, so an unclaimed key still reaches the game.
 | `ui_home` / `ui_end` | always | `MoveToSiblingEdge` in a tree, else `MoveToEdge` along the stop's wired axis; in a search, first/last result |
 | `ui_region_prev` / `ui_region_next` | node has a region | `MoveRegion` |
 | `ui_activate` | always | `OnActivate`, then `StateText` interrupting |
-| `ui_secondary` | node has `OnSecondary`, or a search is live | `OnSecondary`; in a search, clears it |
+| `ui_clear_search` (Backspace) | a search is live | ends the search, "Search cleared" |
+| `ui_right_click` (Backslash) | node has `OnContextual` | `OnContextual`, the right-click command |
 | `ui_back` | `Screen.ConsumesBack`, or a search is live | `Screen.Back()`; in a search, "Search cleared" |
 | letters, Space mid-search | `AllowsTypeahead && !CapturesRawInput` | type-ahead over the focused stop plus the fully-open build |
 
@@ -227,7 +228,7 @@ queue); the router silences speech on every claimed key.
 Owner decision, taken 2026-09-06 before the main menu port: graph screens use ES2's
 four-arrow model. Left/Right adjust a value, else step along a row, else expand/descend and
 ascend/collapse; Tab cycles stops; Alt+Up/Down jump regions (H/Shift+H cannot stay, because
-type-ahead claims the letters); Backslash is the right-click equivalent, as on the map. The
+type-ahead claims the letters); Backspace ends a search, as in ES2, and is otherwise the game's until a screen needs a named Backspace command; Backslash is the right-click equivalent, as on the map. Action names say what the key does (`ui_clear_search`, `ui_right_click`), never "secondary". The
 graph screens get their own `ui_*` actions in `AccessibilityActions.cs`, so the widget actions
 stay untouched until phase G. Escape stays the game's on game-owned surfaces. Role words
 follow ES2 (`button`); positions are announced.
