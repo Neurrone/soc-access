@@ -23,6 +23,15 @@ namespace SongsOfConquestAccess.Input
     {
         public static bool IsTyping()
         {
+            // The field the mod's own editor handed the keyboard to, asked beside the selection: the
+            // mod.io browser drives its own selection and can leave the event system pointing
+            // elsewhere while its box is focused, and a letter typed then must not become a search.
+            TMP_InputField editing = SongsOfConquestAccess.UI.GameTextEditor.CurrentInput;
+            if (editing != null && editing.isFocused)
+            {
+                return true;
+            }
+
             EventSystem events = EventSystem.current;
             GameObject selected = events == null ? null : events.currentSelectedGameObject;
             if (selected == null)

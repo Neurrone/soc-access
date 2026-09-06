@@ -41,6 +41,16 @@ namespace SongsOfConquestAccess.UI
 
         private readonly TextInputEchoHelper _echo = new TextInputEchoHelper();
 
+        /// <summary>The TMP field a mod editor currently holds, or null - what the stand-down asks
+        /// beside the event system's selection, because a toolkit that drives its own selection (the
+        /// mod.io browser) can leave the selection elsewhere while the field is focused.</summary>
+        public static TMPro.TMP_InputField CurrentInput { get; private set; }
+
+        // Whether the end of the edit is spoken. The chat box keeps quiet: its Enter SENDS, the line
+        // arriving in the history is the announcement, and the game empties the box, which would
+        // otherwise read as a cancel.
+        private bool _announceEnd = true;
+
         private Field _requested;
         private Field _editing;
         private string _snapshot;
@@ -73,6 +83,18 @@ namespace SongsOfConquestAccess.UI
         public void Request(TMPro.TMP_InputField field)
         {
             Request(field == null ? null : new Field(field));
+        }
+
+        /// <summary>As <see cref="Request(IUITextMeshInputField)"/>, saying nothing when the edit ends:
+        /// for a box whose Enter is the game's own send.</summary>
+        public void RequestSilentEnd(IUITextMeshInputField field)
+        {
+            Field f = field == null ? null : new Field(field);
+            if (f != null && _requested == null && _editing == null)
+            {
+                _announceEnd = false;
+                _requested = f;
+            }
         }
 
         private void Request(Field field)
@@ -159,6 +181,7 @@ namespace SongsOfConquestAccess.UI
             // the player asked to edit.
             _snapshot = field.Text;
             _editing = field;
+            CurrentInput = field.Input;
             _sawFocus = false;
             _framesWaited = 0;
             field.Activate();
@@ -174,11 +197,14 @@ namespace SongsOfConquestAccess.UI
             string before = _snapshot;
             _echo.Stop();
             _editing = null;
+            CurrentInput = null;
+            bool announceEnd = _announceEnd;
+            _announceEnd = true;
             _snapshot = null;
             _sawFocus = false;
             _framesWaited = 0;
 
-            if (!announce || field == null)
+            if (!announce || !announceEnd || field == null)
             {
                 return;
             }
@@ -221,6 +247,12 @@ namespace SongsOfConquestAccess.UI
         {
             private readonly IUITextMeshInputField _game;
             private readonly TMPro.TMP_InputField _input;
+
+            /// <summary>The TMP field underneath, whichever toolkit drew it.</summary>
+            public TMPro.TMP_InputField Input
+            {
+                get { return _input; }
+            }
 
             public Field(IUITextMeshInputField field)
             {

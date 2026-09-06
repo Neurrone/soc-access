@@ -106,10 +106,6 @@ namespace SongsOfConquestAccess.Screens
         {
         }
 
-        // How many frames after taking focus a field the game focused on its own is still released.
-        private const int ReleaseWindowFrames = 30;
-        private int _releaseFrames;
-
         public GraphNavigator Navigator
         {
             get { return SocAccessMod.Instance == null ? null : SocAccessMod.Instance.Navigator; }
@@ -124,10 +120,6 @@ namespace SongsOfConquestAccess.Screens
             }
 
             navigator.Attach(this);
-            // A field the game focuses on its own as the page opens would keep every key from the mod;
-            // it is released over the next few frames (Update), because the game selects it a frame
-            // or more after this screen took focus (the host popup's name box).
-            _releaseFrames = ReleaseWindowFrames;
             string name = ScreenName;
             if (!string.IsNullOrEmpty(name))
             {
@@ -157,13 +149,12 @@ namespace SongsOfConquestAccess.Screens
         public override void Update()
         {
             GraphNavigator navigator = Navigator;
-            if (_releaseFrames > 0)
+            // Every frame, not only on arrival: a game field that takes the keyboard on its own at any
+            // time (the chat box re-focusing itself after a send) would otherwise keep every key from
+            // the mod until the player found Escape. The screen's own editor is left alone.
+            if (!OwnsGameField)
             {
-                _releaseFrames--;
-                if (!OwnsGameField)
-                {
-                    GameTextFocus.Release();
-                }
+                GameTextFocus.Release();
             }
 
             if (navigator != null && ReferenceEquals(navigator.Screen, this))

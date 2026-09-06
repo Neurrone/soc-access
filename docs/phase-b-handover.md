@@ -2400,3 +2400,21 @@ Manual test:
 5. Escape closes the window from anywhere in it.
 6. With someone else in the lobby: a message arriving while the window is open should be spoken once,
    and while it is shut should say "New chat message".
+
+### Owner's first walk (2026-09-06): the chat trap and typing into mod.io boxes
+
+Reported: after sending a chat message with Enter the mod said "Cancelled" and then no key
+did anything; and on the mod.io e-mail box and the collection keyword box, Enter said
+"editing" but the first letter typed threw the player out and started a type-ahead search.
+One cause: the stand-down asked only the event system's selection, and the game re-focuses
+the chat box after a send (the selection stays, so the mod stood down for good), while the
+mod.io browser drives its own selection, so its focused box was invisible to the stand-down
+and letters became a search whose landing deselected the box. Fixed: `GameTextFocus.IsTyping`
+also asks the field the mod's own editor holds (`GameTextEditor.CurrentInput`); a field the
+game focuses on its own is released every frame while the screen's editor does not own it
+(the thirty-frame window was too short for a re-focus after a send); and the chat's edit
+ends silently (`RequestSilentEnd`), since its Enter sends and the game empties the box.
+Verified on the owner's stuck chat: after the reload the box was released and Up/Down read
+the chat rows. Manual test: send a chat line with Enter (no "Cancelled"), then Up/Down must
+read; on the collection tab, Enter on the keyword box, type letters, hear each echoed, no
+search.

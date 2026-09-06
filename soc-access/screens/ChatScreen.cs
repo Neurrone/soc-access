@@ -237,7 +237,7 @@ namespace SongsOfConquestAccess.Screens
                     // Nothing while the game holds the keyboard: the echo is already speaking the keys.
                     return live == null || _editor.Editing ? null : live.InputFieldValue;
                 },
-                () => _editor.Request(_adapter.InputField),
+                () => _editor.RequestSilentEnd(_adapter.InputField),
                 _adapter.IsInputEnabled);
             ControlId id = ControlId.For(subject, "chat:input");
             builder.AddItem(new DrawnNode(id, vtable, subject));
