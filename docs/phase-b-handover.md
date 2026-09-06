@@ -1504,3 +1504,120 @@ Manual test:
    checked", "Close, button"; on any other tab, "Close, button" alone. Enter on Show tutorials
    toggles it. DO NOT press Reset Tutorials unless you mean it.
 8. Escape closes the window (the game's own key); so does Enter on Close.
+
+### SaveLoadGameScreen (load variant; the save variant is verified in phase C)
+
+Built: four stops. `save-load-tabs` holds the band at the top of the window - the three category
+tabs in load mode, the "Saved as ..." line in save mode, which the game draws in the same place;
+`save-load-saves` holds the saves in drawn order; `save-load-details` holds the preview panel as
+one line while a save is selected; `save-load-buttons` holds the save variant's name box, then the
+commands in drawn order, then the window's cross. Screen name is the window's drawn title ("Load
+Game"); focus starts on the list, which is what the player came for, and lands on the selected
+save.
+
+Measured 2026-09-06 at 1280x800 through `/gui/unity`: the window `Panel` at [256,96,768,608] with
+the title at y 120 and the close cross at [981,104,34,34]; the band at [374,147,532,45] holding
+Single Player (x 392), Online (x 559) and Hotseat (x 725); `SaveGameScrollEntry` at
+[275,208,448,466] holding 19 `SaveLoadGameMenuEntry(Clone)` rows 43 px apart, NEWEST FIRST, over
+844 px of content; `PreviewEntries` at [734,208,272,466] with the details block at [734,432,258,78]
+and the commands under it - Delete at y 602 and Load at y 637 once a save is selected, both hidden
+until then. The save variant's box (`OptionsTextMeshInput`) measures at [279,212,439,32], at the
+TOP OF THE LIST rather than beside the commands, but it is inactive in load mode and a hidden
+object's rect is not where the layout will put it, so it is declared with the commands as the
+proposal has it and phase C re-measures with the save window open.
+
+Escape is the GAME's (`ConsumesBack` false): `SaveLoadGameMenu` registers
+`InputActions.UI.ExitMenu` on `TryClose` (decompiled, line 233), beside `UI.Cancel` for the
+gamepad. Verified: `ui_back` answered `unclaimed`. The screen's own Cancel handling is gone with it.
+
+Diff, both captures, and every before line is accounted for in three groups:
+
+1. Every save row (19 lines): the date moved out of the label into the status column, the change
+   every family has made for always-drawn text. "test. Thursday, May 14, 2026 11:36 PM" is now
+   "test | Thursday, May 14, 2026 11:36 PM".
+2. "Confirm" became "Load" (the -selected capture). The adapter labelled its buttons by gathering
+   every visible text under them, and these commands carry an input-icon child naming the action
+   that presses them, so the Load button answered "Confirm" where it draws "Load". It now reads the
+   button's own text first and falls back to the gather.
+3. The details line: the whole block was one line, and is now the save's name as the label with the
+   three other drawn lines as a section - "Vassals and Villains" with "Thursday, May 14, 2026
+   11:36 PM", "Campaign, Round: 20, Difficulty: Fair." and "Play time: 4 hours, 9 minutes, 34
+   seconds." in the buffer, one line each.
+
+Deviations, each measured:
+
+- THE TABS SWITCH ON ENTER, NOT ON FOCUS, against the proposal. Selecting a tab button natively
+  left `UITabGroup.CurrentTab` where it was (measured through `/eval`: tab 0 still selected after
+  `Focus()`), and only the click moved it - the player stats page's finding, not the options
+  window's. The focus visual is still the native selection, for the highlight.
+- ARRIVING ON A SAVE DOES NOT SELECT IT, and the row's focus visual is the native selection anyway:
+  `SaveLoadGameMenuEntry.OnSelect` shows an input icon and nothing else, while `HandleEntryClicked`
+  is what fills the details, shows Load and Delete and, in save mode, copies the name into the box
+  (decompiled). The list's own `AutoScrollToSelected` follows that selection, which is what scrolls
+  a row into view. The adapter's `Focus()` was a deliberate no-op for fear of selecting the save;
+  the measurement says the fear was of the click, so it selects natively now.
+- ENTER ON A ROW SELECTS THE SAVE and says "selected" - not from a state text, but from the live
+  selected part changing under the cursor. The game's DOUBLE-click loads; no second activation is
+  declared, so loading is the Load button.
+- THE ROWS ARE SORTED BY DRAWN TOP EDGE, because the menu's own list is oldest first
+  (`SpawnEntriesGameDefinitionsLoaded` orders by `LastWriteTime` ascending, decompiled) and the page
+  draws it the other way up. On the frame the list is built the layout has not placed the rows yet -
+  they all report one y - and the sort falls back to the newest save first, which is the order the
+  page settles into a frame later. Seen before the fallback was added: the first readout after
+  opening said "test, 1 of 19" and the next rebuild made it 19 of 19.
+- The name box follows the PLAIN edit contract (Enter ends the edit, Escape restores the text),
+  which is what the owner ruled for this page. What the game does with its own submit is recorded
+  rather than imitated: `SaveLoadGameMenu.HandleSubmit` SAVES THE GAME when the mode is Save and the
+  Save button is interactable (decompiled, line 352). It is labelled with the window's title, as the
+  dialog's field is labelled with its heading; phase C confirms both with the save window open.
+- The window's cross reads LAST, after the commands, though it is drawn at the top of the window: it
+  is the way out rather than one of the things to do to a save, and it draws no text of its own, so
+  it keeps the mod's word "Cancel" as the widget screen gave it.
+- The adapter gained `SaveEntry.Entry` and `ButtonItem.Button` (the drawn components a node keys on)
+  and stopped normalising the details block, which is what lets the screen split it into the four
+  lines the game drew.
+
+Walk (all through `/input` and `/type`): Tab cycles tabs, saves, details, buttons, skipping the
+details and the commands while no save is selected; Down and Up walk the saves; End reached "test,
+19 of 19" and Home "QuickSave_4, 1 of 19"; Enter on test said "selected" and the details and the
+commands appeared; the details line read "Vassals and Villains" then the rest of the block; the
+commands read "Delete, button, 1 of 3", "Load, button, 2 of 3", "Cancel, button, 3 of 3"; Enter on
+the Online tab said "selected" and emptied the list, Enter on Single Player brought it back;
+`/type test` landed on that save with ONE result and Backspace cleared the search; `ui_back`
+answered `unclaimed`; Enter on Cancel closed the window. No save was loaded and Delete was never
+pressed.
+
+Follow-ups, not fixed:
+
+- A STALE SELECTION SURVIVES A TAB SWITCH. `SaveLoadGameMenu._selectedSaveEntry` still points at the
+  pooled row object after the list is rebuilt, so the row that inherits that object reads "selected"
+  while the preview and the commands are hidden and nothing is really chosen (seen once: QuickSave_4
+  said "selected" with no details drawn). The widget screen read the same fact the same way. The
+  page's own truth is the preview being drawn.
+- `SaveLoadGameMenuAdapter` still normalises the title, the save names, the dates and the save
+  description through `SpeechTextSanitizer.Normalize` (pre-existing).
+- The preview panel's "Click an entry to select" line is drawn while no save is selected and is read
+  by nobody; the widget screen did not read it either.
+- The game keeps Enter and Delete as hotkeys on this window (`UI.Confirm` loads the selected save,
+  `UI.Delete` opens the delete confirm - decompiled, lines 234 to 243). The mod claims Enter, so a
+  physical Enter on a control the mod owns should not reach them, but this is the first thing to
+  check by hand.
+- `/screenshot` answered an all-black frame for the whole of this port's verification (the same
+  locked-session symptom the options entry records), so the layout evidence here is `/gui/unity`,
+  which is side-effect free and reads the same rects.
+
+Manual test:
+
+1. Main menu, Load Game. Hear "Load Game", then the newest save, its date and "1 of 19".
+2. Down and Up walk the saves, newest first; End reaches the oldest; watch the list scroll itself to
+   the row under the cursor.
+3. Enter on a save: "selected". The preview fills in and Load and Delete appear.
+4. Tab: the preview line, read as the save's name then its date, mode and play time; Ctrl+Down
+   through its review buffer must give those one line at a time.
+5. Tab: "Delete, button, 1 of 3", "Load, button, 2 of 3", "Cancel, button, 3 of 3".
+6. Shift+Tab back to the band: "Single Player, tab, selected, 1 of 3". Down reads Online WITHOUT
+   switching; Enter switches and empties the list; Enter on Single Player brings the saves back.
+7. Type a few letters of a save's name: the cursor lands on it. Backspace ends the search.
+8. Escape closes the window (the game's own key); so does Enter on Cancel.
+9. Careful with the game's own hotkeys here: Enter loads the selected save and Delete opens the
+   delete confirm, whatever the cursor is on.

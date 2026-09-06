@@ -151,11 +151,13 @@ namespace SongsOfConquestAccess.Adapters
         private static readonly FieldInfo SelectionStateField =
             AccessTools.Field(typeof(SaveLoadGameMenu), "_selectionState");
 
+        /// <summary>The details block the preview panel draws, AS DRAWN: the game writes it as four
+        /// lines (the save's name, its date, the game mode and round, the play time), and the lines
+        /// are the caller's to split - a normaliser here would join them into one breath.</summary>
         public string GetInformationText()
         {
             SaveLoadGameMenu.Settings settings = Settings;
-            return SpeechTextSanitizer.Normalize(
-                UITextMeshTextUtility.GetEffectiveText(settings != null ? settings.InformationText : null));
+            return UITextMeshTextUtility.GetEffectiveText(settings != null ? settings.InformationText : null);
         }
 
         public bool HasDetailsText()
@@ -290,6 +292,7 @@ namespace SongsOfConquestAccess.Adapters
                 UIButton button = settings != null ? settings.ExitButton : null;
                 return new ButtonItem(
                     "save-load-cancel",
+                    button,
                     () => GetButtonLabel(button),
                     Close,
                     () => FocusButton(button),
@@ -307,6 +310,7 @@ namespace SongsOfConquestAccess.Adapters
         {
             return new ButtonItem(
                 id,
+                button,
                 () => GetButtonLabel(button),
                 () => ActivateButton(button),
                 () => FocusButton(button),
@@ -318,6 +322,7 @@ namespace SongsOfConquestAccess.Adapters
         {
             return new ButtonItem(
                 id,
+                button,
                 () => GetButtonLabel(button),
                 () => ActivateButton(button),
                 () => FocusButton(button),
@@ -328,9 +333,14 @@ namespace SongsOfConquestAccess.Adapters
                     && MenuButtonAdapterBase.IsButtonVisible(button));
         }
 
+        /// <summary>What a button has written on it. The button's OWN text first: the commands here
+        /// carry an input-icon child naming the action that presses them, so gathering every visible
+        /// text answered "Confirm" where the button draws "Load" (measured 2026-09-06). The gather is
+        /// still the fallback, for a button whose words live in a child.</summary>
         private static string GetButtonLabel(UIButton button)
         {
-            return MenuButtonTextUtility.GetAllVisibleText(button);
+            string direct = MenuButtonTextUtility.GetDirectButtonText(button);
+            return string.IsNullOrWhiteSpace(direct) ? MenuButtonTextUtility.GetAllVisibleText(button) : direct;
         }
 
         private static string GetTabLabel(int index, UIButton button)
@@ -513,11 +523,24 @@ namespace SongsOfConquestAccess.Adapters
                 return NativeSelectionUtility.Click(button);
             }
 
+            /// <summary>The drawn row, which is what the page destroys when the list is rebuilt.
+            /// </summary>
+            public Component Entry
+            {
+                get { return _entry as Component; }
+            }
+
+            /// <summary>Highlight the row. Unity's selection is a HIGHLIGHT here and not a choice:
+            /// `SaveLoadGameMenuEntry.OnSelect` shows an input icon and nothing else, while the
+            /// CLICK is what selects the save (decompiled). The list's own AutoScrollToSelected
+            /// follows this selection, which is what scrolls a row into view.</summary>
             public void Focus()
             {
-                // Accessibility focus must not select a save. The game reuses
-                // native selection to load details and, in save mode, to copy
-                // the selected save name into the edit field.
+                UIButton button = EntryButtonField != null ? EntryButtonField.GetValue(_entry) as UIButton : null;
+                if (button != null)
+                {
+                    NativeSelectionUtility.Select(button);
+                }
             }
 
             private LoadGameDefinition Definition
@@ -536,6 +559,7 @@ namespace SongsOfConquestAccess.Adapters
 
             public ButtonItem(
                 string id,
+                UIButton button,
                 Func<string> getLabel,
                 Func<bool> activate,
                 Action focus,
@@ -543,6 +567,7 @@ namespace SongsOfConquestAccess.Adapters
                 Func<bool> isVisible)
             {
                 Id = id;
+                Button = button;
                 _getLabel = getLabel;
                 _activate = activate;
                 _focus = focus;
@@ -551,6 +576,9 @@ namespace SongsOfConquestAccess.Adapters
             }
 
             public string Id { get; private set; }
+
+            /// <summary>The drawn button, so a screen can read where it is drawn.</summary>
+            public UIButton Button { get; private set; }
             public string GetLabel() { return _getLabel != null ? _getLabel() : string.Empty; }
             public bool Activate() { return _activate != null && _activate(); }
             public void Focus() { _focus?.Invoke(); }
