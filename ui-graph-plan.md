@@ -337,8 +337,10 @@ What landed, and what differed from the original brief:
 - `GraphScreen.IsWorkable` mutes the live-part watch while a page fades out (the main
   menu's canvas group), found on the first activation: every button read "disabled" as
   the menu left.
-- Disabled wording stays "disabled" (not ES2's "unavailable") until the migration ends,
-  so ported and unported screens agree; one line in `GraphNodes.DisabledPart` flips it.
+- Disabled wording stayed "disabled" (not ES2's "unavailable") through phase A, so ported and
+  unported screens agreed; the phase B ruling above flipped that one line in
+  `GraphNodes.DisabledPart` to "unavailable" (2026-09-06, with the campaign menu port), so every
+  graph screen says "unavailable" and the widget screens still say "disabled".
 - Every native tooltip is an `Indicate` section (buffer only), this mod's standing ruling.
 - The foldouts are expandable groups on the main menu stop, opening the game's own foldout;
   `FoldoutMenuScreen` is deleted rather than ported. Drawn order beat declaration order
