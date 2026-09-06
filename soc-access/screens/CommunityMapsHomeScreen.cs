@@ -28,6 +28,11 @@ namespace SongsOfConquestAccess.Screens
     /// featured item is highlighted, so they are declared as the last two rows of the featured region
     /// rather than as children of an item.
     ///
+    /// A BAND'S OWN ITEMS ARE DIFFERENT: mod.io draws their Subscribe and More options as an OVERLAY
+    /// over the selected item (<c>HomeModListItem_Overlay</c>, moved onto the item by its
+    /// <c>OnSelect</c>), so each item is an expandable group carrying the two as its children - Right
+    /// opens it, Enter on the item still opens its details page.
+    ///
     /// THE TABS SWITCH ON ENTER, NOT ON FOCUS. The nav bar draws two text labels with no clickable
     /// control under them at all (<c>NavBar</c> only tints them, decompiled), so there is no native
     /// selection to arrive on: the only way to switch is to OPEN the other panel, which re-fetches the
@@ -239,19 +244,53 @@ namespace SongsOfConquestAccess.Screens
                         continue;
                     }
 
-                    CommunityMapsHomeAdapter.ModItem captured = item;
-                    NodeVtable vtable = GraphNodes.Button(
-                        () => captured.Label,
-                        () => _adapter.ActivateItem(captured));
-                    vtable.Announcements.Add(GraphNodes.ValuePart(() => captured.Status));
-                    vtable.OnFocusVisual = () => _adapter.FocusItem(captured);
-                    builder.AddItem(Synthetic("row/" + captured.RowIndex + "/item/" + captured.Index, vtable));
+                    AddItem(builder, item);
                 }
 
                 builder.PopContext();
             }
 
             builder.SetRegion(null);
+        }
+
+        /// <summary>
+        /// One map or mod of a band, with the two commands mod.io hangs on it as children: Enter opens
+        /// its details page, Right opens the group and reaches Subscribe and More options.
+        ///
+        /// They are the item's own, not the band's. mod.io keeps ONE overlay object
+        /// (<c>SelectionOverlayHandler.homeModListItemOverlay</c>) and moves it onto whichever list item
+        /// is selected - the item's <c>OnSelect</c> calls <c>MoveSelection(this)</c>, which sets the
+        /// overlay's <c>listItemToReplicate</c> - so what the two buttons act on is whatever is
+        /// selected, and the adapter selects the child's own item before pressing either. The featured
+        /// carousel is the exception and keeps its pair as rows of the band, because there the block is
+        /// drawn once under the whole carousel rather than over an item.
+        /// </summary>
+        private void AddItem(GraphBuilder builder, CommunityMapsHomeAdapter.ModItem item)
+        {
+            CommunityMapsHomeAdapter.ModItem captured = item;
+            string key = "row/" + captured.RowIndex + "/item/" + captured.Index;
+            NodeVtable vtable = GraphNodes.Button(
+                () => captured.Label,
+                () => _adapter.ActivateItem(captured));
+            vtable.Announcements.Add(GraphNodes.ValuePart(() => captured.Status));
+            vtable.OnFocusVisual = () => _adapter.FocusItem(captured);
+
+            builder.BeginGroup(Synthetic(key, vtable));
+
+            NodeVtable subscribe = GraphNodes.Button(
+                () => _adapter.GetItemSubscribeLabel(captured),
+                () => _adapter.SubscribeItem(captured));
+            // The overlay follows mod.io's selection, so standing on a child keeps the item selected.
+            subscribe.OnFocusVisual = () => _adapter.FocusItem(captured);
+            builder.AddItem(Synthetic(key + "/subscribe", subscribe));
+
+            NodeVtable options = GraphNodes.Button(
+                () => _adapter.MoreOptionsLabel,
+                () => _adapter.OpenItemOptions(captured));
+            options.OnFocusVisual = () => _adapter.FocusItem(captured);
+            builder.AddItem(Synthetic(key + "/options", options));
+
+            builder.EndGroup();
         }
 
         // ---- the way out ----

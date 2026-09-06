@@ -358,6 +358,34 @@ namespace SongsOfConquestAccess.Adapters
             return InvokeStaticBool("ModIOBrowser.Implementation.SelectionOverlayHandler", "TryToOpenMoreOptionsForBrowserOverlayObject");
         }
 
+        /// <summary>The word mod.io's overlay would draw on its subscribe button for one item -
+        /// "Unsubscribe" for a mod already taken, "Subscribe" otherwise.</summary>
+        public string GetItemSubscribeLabel(ModItem item)
+        {
+            ModProfile? profile = item != null ? GetProfile(item.NativeItem) : null;
+            return profile.HasValue && IsSubscribed(profile.Value.id) ? _unsubscribeLabel : _subscribeLabel;
+        }
+
+        /// <summary>
+        /// Press the overlay's subscribe button for one item.
+        ///
+        /// There is ONE overlay object (<c>SelectionOverlayHandler.homeModListItemOverlay</c>) and
+        /// mod.io moves it onto whichever list item is selected - the item's own <c>OnSelect</c> calls
+        /// <c>MoveSelection(this)</c>, which is what sets the overlay's <c>listItemToReplicate</c> -
+        /// so acting on a particular item means selecting it first and then pressing the one button.
+        /// </summary>
+        public bool SubscribeItem(ModItem item)
+        {
+            return FocusItem(item) && SubscribeSelectedItem();
+        }
+
+        /// <summary>Open the overlay's "more options" menu for one item, selected the same way
+        /// <see cref="SubscribeItem"/> selects it.</summary>
+        public bool OpenItemOptions(ModItem item)
+        {
+            return FocusItem(item) && OpenSelectedItemOptions();
+        }
+
         public bool Close()
         {
             Browser.Close();
