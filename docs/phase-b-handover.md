@@ -11,6 +11,69 @@ Alt+Up/Down (regions), Enter, Backspace (ends a search), Backslash (right click)
 (only where the screen says it claims it), and letters (type-ahead). "Diff clean" means the
 sorted flat dumps before and after the port differ only in the ways listed.
 
+## Summary (read this first)
+
+Done on 2026-09-06, commits `5f4825d` to `5f1dc96` on `main`: 32 of the 33 phase B screens are
+graph screens, ported by family with each family's representative first. Build clean, 829
+unit tests pass, the localization validator passes, every `.po` file carries real
+translations of the nine `ModString`s the phase added (the edit-field words, the role words
+checkbox, combo box, tab, radio button, and "not checked").
+
+Not ported, with the reason: `AdventureLobbyInviteProvidersScreen` (Invite Friend opens Steam
+directly on this machine, the provider list never draws); the mod settings family, which
+waits on your decision on proposal J in the plan (an "Accessibility" tab of the game's own
+options window, drawn with the game's row factory); `TooltipActionsMenuScreen`, which stays a
+widget screen by the plan until phase G.
+
+What the engine gained on the way, each in its own commit and each explained below where it
+was found: the "unavailable", "not checked" and ES2 role words; the edit field (`GameTextEditor`,
+the stand-down in `GameTextFocus`, "editing"/"edited"/"Cancelled"); the checkbox, slider,
+combo box, tab, radio and choice factories; the mod-owned `DropListScreen` over the game's real
+dropdown popup; tables through `GraphSheet` with control cells and per-icon pieces; a silent
+re-seat while a page leaves (`IsWorkable`); markup-free buffer lines (`SpokenLines`); one focus
+visual per aim; the release of a field the game focused on its own; the stand-down limited to
+graph screens while widget screens remain.
+
+Two dev-loop repairs, also committed: a failed `/eval` no longer breaks game creation (a
+dev-only finalizer on `AssemblyBuilder.GetTypes`), and a reload no longer dies silently on a
+null coroutine handle.
+
+Decisions waiting for you:
+
+1. Proposal J, the mod settings tab (plan section 10).
+2. The community maps browse page: mod.io draws Subscribe and More options per item as an
+   overlay; the approved model reads them once per band. Child nodes per item are a small
+   change if you want them.
+3. The chat's Enter sends and the dialog fields' Enter submits, as ruled; every other field
+   ends its edit on Enter. Say if any other field should submit.
+
+Suggested order for your walk with real keys, each entry's "Manual test" below has the exact
+expected speech: campaign menu (family A), the join-with-code and delete-save dialogs (B),
+Options with its drop lists and slider value box (D and E), the loading screen (C), the lobby
+map select table (F), the codex (G), the online lobby and its chat (H and I). The screenshot
+checks in the later entries were taken from `/gui/unity` rects, because the desktop session
+was locked and `/screenshot` returned black frames after the game's second relaunch; the
+first families were checked against real crops.
+
+Cross-cutting follow-ups, not fixed (the per-screen sections hold the rest):
+
+- Several adapters still normalise text with `SpeechTextSanitizer.Normalize`, so their
+  multi-line bodies read as one line (dialog bodies, the codex and campaign adapters, the
+  loading prompt).
+- `POST /type` bypasses the router's stand-down; no physical key can.
+- No family A card is hovered out again when the cursor leaves it (the adapters have hover-in
+  only).
+- The detector leaves the community maps results page under the home page, so closing the
+  browser speaks one stray "Search results"; choosing a mission or difficulty re-announces
+  the campaign map select's name through the detector's `RefreshTop`.
+- The game binds Enter itself on some pages (START MISSION on the mission page, load on the
+  save menu, Yes on the quit popup in keyboard mode), independent of the cursor; only a
+  physical key shows it.
+- The pause menu's quit to main menu once wedged the game in a loop of
+  `AdventureMapAdapter.GetInitialTile` throwing on resync (phase E's screen).
+- A third press on a table's sort header clears the arrow without restoring the original
+  order (the game's behaviour); type-ahead announces once per typed character (the engine's).
+
 ## Family A: menu pages
 
 ### CampaignMenuScreen (representative)

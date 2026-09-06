@@ -13,7 +13,9 @@ Resuming in a fresh session: read §0's docs, then §2 (what is built) and §3 (
 the current phase in §7 and its rows in §8, then `docs/dev-loop.md` for the verification
 loop. Every screen goes through §4's dump-and-diff; the before-capture must be taken on the
 unported build, before the screen is touched. Commit per logical step and update this file
-as decisions are taken. Phase A is complete, walk included; start at phase B item 1.
+as decisions are taken. Phase A is complete, walk included. Phase B is complete except its item 4 (the mod settings
+family), which waits on the owner's answer to proposal J in section 10; `docs/phase-b-handover.md`
+is the record of the phase and the owner's manual test. Resume with that answer, then phase C.
 
 Owner decisions already made (do not re-ask):
 
@@ -507,6 +509,34 @@ Ported so far, with what each taught (the siblings of a family follow its repres
   of its label into its own part. One defect found, not this screen's: `POST /type` reaches the
   navigator directly rather than through the router, so it can still start a search while the
   game's field holds the keyboard, which no physical key can.
+
+What landed (2026-09-06, commits `5f4825d` to `5f1dc96`; the record is `docs/phase-b-handover.md`):
+
+- Every screen of items 1 to 3 is a graph screen except `AdventureLobbyInviteProvidersScreen`
+  (unreachable here: Invite Friend opens Steam directly). Item 4 waits on proposal J (section
+  10). Item 5 stands.
+- Ported by family, representative first, siblings shown against it: A menu pages, B
+  dialogs, C the loading screen, D settings forms, E drop lists, F table pages, G browse
+  pages, H the lobby, I the chat (section 10).
+- The engine adapter gained: ES2 role and state words ("unavailable", "not checked", checkbox,
+  combo box, tab, radio button, editable) in one localization batch; the edit field
+  (`ui/GameTextEditor.cs`, `input/GameTextFocus.cs`) with the ES2 contract and two exceptions
+  (a dialog's field and the chat box keep the game's submit on Enter); the checkbox, slider,
+  combo box, tab, radio and choice factories; `screens/DropListScreen.cs`, mod-owned, opened
+  over the game's real dropdown popup by every combo box; tables through `GraphSheet` with
+  control cells (the lobby's player rows) and per-icon pieces (win conditions);
+  `ui/SpokenLines.cs` for markup-free buffer lines; `GraphScreen.IsWorkable` also silencing the
+  re-seat when a leaving page hides the focused control; one focus visual per aim
+  (`GraphNavigator.SameAim`); the release of a field the game focuses on its own
+  (`GraphScreen.OwnsGameField`, a thirty-frame window after focus); the stand-down applied on
+  graph screens only until phase G.
+- Escape was measured per screen from the decompiled input registrations: where the game
+  registers `UI.ExitMenu` in keyboard mode (Options, the confirm and popup-menu dialogs, the
+  quit popup, the codex, the save menu, the game settings) the key stays the game's;
+  everywhere else the screen claims Back and presses the drawn close control.
+- Two dev-loop repairs: a failed `/eval` poisoned the AppDomain's type scans until a dev-only
+  finalizer on `AssemblyBuilder.GetTypes` (`patches/DynamicAssemblyTypesPatches.cs`); a reload
+  died silently on a null coroutine handle (loader).
 
 ### Phase C — in-game menus, popups, forms and tables
 
