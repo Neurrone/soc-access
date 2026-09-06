@@ -175,6 +175,36 @@ namespace SongsOfConquestAccess.UI
         }
 
         /// <summary>
+        /// Free text the player types into the game's own editor. Activating it is the request for
+        /// the keyboard; the handover itself, the words on the way in and out and the echo of what is
+        /// typed all belong to <see cref="GameTextEditor"/>.
+        ///
+        /// <paramref name="value"/> reports null while the game holds the keyboard: the mod is
+        /// already speaking the keys as they land, and re-reading the whole field on top of them
+        /// buries them.
+        /// </summary>
+        public static NodeVtable EditField(
+            Func<string> label,
+            Func<string> value,
+            Action edit,
+            Func<bool> enabled = null,
+            Tooltip tooltip = null,
+            Func<IList<string>> details = null)
+        {
+            List<NodeAnnouncement> parts = Parts(label, enabled);
+            parts.Add(ValuePart(value));
+            NodeVtable vtable = new NodeVtable
+            {
+                ControlType = ControlTypes.EditField,
+                Announcements = parts,
+                Sections = Sections(details, tooltip),
+                OnActivate = Guarded(edit, enabled),
+            };
+            Aim(vtable, tooltip);
+            return vtable;
+        }
+
+        /// <summary>
         /// THE RAISING HALF: what the navigator draws the game's own tooltip for when focus lands on
         /// this node. Written down beside the content (<see cref="NodeVtable.PointsAt"/>) rather than
         /// hidden in a closure, so the tooltip actions menu and the dev dump can ask the node which

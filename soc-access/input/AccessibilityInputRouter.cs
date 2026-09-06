@@ -92,6 +92,13 @@ namespace SongsOfConquestAccess.Input
                 return;
             }
 
+            // The stand-down: while the game's own field has the keyboard, the character is that
+            // field's and is never a search.
+            if (GameTextFocus.IsTyping())
+            {
+                return;
+            }
+
             if (TypingScreen() != null)
             {
                 _typed.Append(character);
@@ -188,6 +195,14 @@ namespace SongsOfConquestAccess.Input
                 if (_screenManager == null || _screenManager.CurrentScreen == null)
                 {
                     injection.Outcome = "no screen";
+                    return;
+                }
+
+                // The same stand-down a physical key meets, so the dev server sees what the player
+                // would: while the game's field has the keyboard, the mod answers nothing.
+                if (GameTextFocus.IsTyping())
+                {
+                    injection.Outcome = "standing down";
                     return;
                 }
 
@@ -289,6 +304,14 @@ namespace SongsOfConquestAccess.Input
 
         private bool TryHandleKeyDown(KeyControl keyControl)
         {
+            // THE STAND-DOWN, before any claim is even asked. A game text field with the keyboard owns
+            // every key while it has it - the letters, the arrows walking the caret, the Backspace -
+            // so the whole layer goes quiet rather than picking which keys to leave alone.
+            if (GameTextFocus.IsTyping())
+            {
+                return false;
+            }
+
             Key key = keyControl.keyCode;
             ActiveBindingState activeForKey = FindActiveBindingForKey(key);
             if (activeForKey != null)

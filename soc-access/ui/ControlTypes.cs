@@ -55,6 +55,15 @@ namespace SongsOfConquestAccess.UI
             Order = StandardOrder,
         };
 
+        /// <summary>Free text the player types into. The editing itself is the game's own field:
+        /// activating the control is what hands the keyboard over to it.</summary>
+        public static readonly ControlType EditField = new ControlType
+        {
+            Key = "edit-field",
+            Order = StandardOrder,
+            Common = () => RoleWord(ModStrings.UI.RoleEditable),
+        };
+
         private static IList<NodeAnnouncement> RoleWord(ModString word)
         {
             return new[]

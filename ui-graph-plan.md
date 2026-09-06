@@ -181,13 +181,23 @@ graph side of the mod.
   Not wired yet: carry (phase D), modes (phase E), the game-text-field stand-down for
   type-ahead (phase B, with the edit field), pointer hover simulation.
 - `ui/GraphNodes.cs` — the factories: `Button(label, activate, enabled, tooltip, details)`,
-  `Group(label, activate, enabled, tooltip, details)`, `Text(label, details, tooltip)`, plus
+  `Group(label, activate, enabled, tooltip, details)`, `Text(label, details, tooltip)`,
+  `EditField(label, value, edit, enabled, tooltip, details)` (activation is the request for the
+  game's keyboard; the value reports null while the field holds it, because the echo is already
+  speaking the keys), plus
   the parts (`LabelPart`, `DisabledPart`, `ValuePart`) and `TooltipSection` (every native
   `Tooltip` is an `Indicate` section, buffer only, and `Aim` sets `PointsAt` so focus draws
   it). Every new factory takes the same cross-cutting parameters. Phase B adds checkbox,
-  slider, radio, tab, choice, edit field, combo box, and the sheet cell.
-- `ui/ControlTypes.cs` — the role registry: `Button`, `Group`, `Text` (no role word). New
+  slider, radio, tab, choice, combo box, and the sheet cell.
+- `ui/ControlTypes.cs` — the role registry: `Button`, `Group`, `Text` (no role word),
+  `EditField` ("editable"). New
   types need a role `ModString` in the phase's localization batch.
+- `ui/GameTextEditor.cs` + `input/GameTextFocus.cs` — the edit field's two halves: a screen-owned
+  editor that defers the handover until the activating Enter is released, says "editing", echoes the
+  typing through `TextInputEchoHelper` and says "edited" with the new text or "Cancelled" on the way
+  out; and the STAND-DOWN, a static query answering whether the game's own field has the keyboard,
+  which `AccessibilityInputRouter` asks before every claim, before appending a typed character, and
+  before running a `/input` injection (which then answers `standing down`).
 - `input/AccessibilityActions.cs` — the graph screens' own actions, all `InputClaimScope.Screen`:
   `ui_up/down/left/right`, `ui_coarse_decrease/increase` (Shift+Left/Right), `ui_next/prev`
   (Tab, Shift+Tab), `ui_home/end`, `ui_region_prev/next` (Alt+Up/Down), `ui_activate`
