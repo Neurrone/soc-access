@@ -653,7 +653,7 @@ to bring to the owner, not a decision.
 | `AdventureLobbyMapTypeScreen` | Menu, Buttons | menu rows | B, done |
 | `AdventureLobbyRandomLayoutScreen` | Menu, Checkbox, Buttons | option rows | B, redesign K |
 | `AdventureLobbyPlayersScreen` | Menu, Checkbox, Buttons, Text | one region per slot, slot rows | B, done |
-| `AdventureLobbyInviteProvidersScreen` | Menu, Buttons | menu rows | B, blocked |
+| `AdventureLobbyInviteProvidersScreen` | Menu, Buttons | menu rows | B, done unverified |
 | `AdventureLobbyGameSettingsScreen` | Menu, Checkbox, TextInput, TimeInput, Buttons, Text | setting rows, edit nodes | B, done |
 | `AdventureLobbyPlayerSettingsScreen` | Checkbox, Slider, Buttons, Text | setting rows | B, done |
 | `AdventureLobbyIconDropdownScreen` | Menu, Buttons | drop list (ES2 `DropListScreen` shape) | B, done |

@@ -156,6 +156,12 @@ namespace SongsOfConquestAccess.Adapters
                 }
             }
 
+            /// <summary>The drawn button, for the node's identity and its rectangle.</summary>
+            public Component Button
+            {
+                get { return _button as Component; }
+            }
+
             public bool IsVisible
             {
                 get { return MenuButtonAdapterBase.IsButtonVisible(_button); }
