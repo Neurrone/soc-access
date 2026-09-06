@@ -335,3 +335,42 @@ Manual test:
 5. If you ever sign in by e-mail: the e-mail box should say "editable", Enter should say
    "editing", typing should echo, Enter should end the edit without sending; the code panel
    should read one control, speak each character as it is typed, and Enter should continue.
+
+### PlatformUserMenuScreen
+
+Built: one stop. The heading is a text node and the screen name, then the action rows, then a
+Cancel. Focus starts on the first action, there being no body to start on. Measured 2026-09-06
+at 1280x800 under `PlatformUserMenu`: a `PlatformUserMainContainer` at [141,122,163,41] holding
+one `PlatformUserButtonEntry` per action ("Set Name" here) over a full-screen `UIBlocker`, and
+nothing else. The screenshot confirms it: no heading and no Cancel are drawn.
+
+Escape: claimed. `PlatformUserMenu.Show` registers `UI.Cancel` on `Hide` (line 271) and nothing
+else, and `UI.Cancel` is this game's GAMEPAD binding throughout - every keyboard branch
+registers `UI.ExitMenu` instead (`ConfirmPopup.Show` lines 182 to 208 and
+`QuitToDesktopPopup.Show` lines 145 to 152 both show the pair). So Escape does nothing here and
+the screen takes it, running the same `Hide` the game's own callback would. Verified: `ui_back`
+answered `consumed` and the popup closed.
+
+Diff: one line added, the heading, which the widget tree spoke only as the container's name.
+Nothing missing, nothing changed.
+
+Deviations, measured: the heading is NOT drawn - it is the menu's own localized name
+(`Lobby/LobbyPlayerMenu/ShowPlayerActions`), which the widget screen also spoke, and it is
+declared as a node because the family's contract puts the heading in the readout as a line of
+its own; the Cancel is the mod's own control for the same reason it was in the widget tree,
+the popup drawing no way out and the game's Cancel being bound to the gamepad only. Both take
+marker subjects. The action rows are `DrawnNode`s keyed on the row the game draws, for which
+`ActionItem` gained an `Entry` component.
+
+Follow-ups, not fixed: closing the Set Name popup with Escape closes the player-actions popup
+behind it as well, so the cursor lands back in the lobby rather than on Set Name - that is the
+game hiding the menu once the action finishes, not the mod.
+
+Manual test:
+
+1. Conquest, a Conquest map, Confirm; in the lobby, the player row's Show Player Actions.
+   Hear "Show Player Actions", then "Set Name, button, 2 of 3".
+2. Home: the heading; End: "Cancel, button, 3 of 3".
+3. Enter on Set Name: the system popup opens with its field ("Set Name, editable, <name>");
+   Escape there restores the name and closes both popups.
+4. Escape on the popup itself, and Enter on its Cancel: both close it.

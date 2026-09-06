@@ -134,6 +134,13 @@ namespace SongsOfConquestAccess.Adapters
                 get { return "platform-user-action-" + _index; }
             }
 
+            /// <summary>The row the game draws for this action, so a screen can key a control on it
+            /// and ask whether it is still painted.</summary>
+            public Component Entry
+            {
+                get { return _entry as Component; }
+            }
+
             public string Label
             {
                 get
