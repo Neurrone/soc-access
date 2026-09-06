@@ -309,7 +309,7 @@ namespace SongsOfConquestAccess.Screens
                 () => _editor.Request(getField()),
                 time.IsEnabled,
                 time.GetTooltip());
-            DoNotDrawTooltip(vtable);
+            GraphNodes.DoNotDrawTooltip(vtable);
             builder.AddItem(new DrawnNode(
                 ControlId.For(subject, "game-settings:" + time.Id + "/" + part),
                 vtable,
@@ -351,21 +351,8 @@ namespace SongsOfConquestAccess.Screens
                 () => _editor.Request(getField != null ? getField() : null),
                 enabled,
                 tooltip);
-            DoNotDrawTooltip(vtable);
+            GraphNodes.DoNotDrawTooltip(vtable);
             return vtable;
-        }
-
-        /// <summary>Keep a row's tooltip in the review buffer but stop the game's own tooltip being
-        /// DRAWN for it. Drawing it selects the component the tooltip hangs on - here the row's label -
-        /// and that selection takes the keyboard straight back off the text field the player just
-        /// asked to type in (measured 2026-09-06: the field never reported focus and the edit ended
-        /// in silence). Only an edit row needs this; nothing else on the page holds the keyboard.</summary>
-        private static void DoNotDrawTooltip(NodeVtable vtable)
-        {
-            if (vtable != null)
-            {
-                vtable.PointsAt = null;
-            }
         }
 
         private static void AddButton(GraphBuilder builder, AdventureLobbyGameSettingsAdapter.ButtonItem button)

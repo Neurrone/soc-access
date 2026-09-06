@@ -407,6 +407,26 @@ namespace SongsOfConquestAccess.UI
         }
 
         /// <summary>
+        /// Keep a control's tooltip in the review buffer but stop the game's own tooltip being DRAWN
+        /// for it.
+        ///
+        /// Drawing a tooltip means <c>NativeTooltipUtility.ShowTooltipForComponent</c>, which SELECTS
+        /// the component the tooltip hangs on - for a text row, the row's own label - and that
+        /// selection takes the keyboard straight back off the field the player just asked to type in.
+        /// Measured 2026-09-06 on the lobby's game settings: with the tooltip aimed, the field never
+        /// reported focus and the edit ended in silence; with it cleared, the same keys answered
+        /// "standing down" and the edit ended properly. Only an EDIT control needs this; nothing else
+        /// competes with the game for the keyboard.
+        /// </summary>
+        public static void DoNotDrawTooltip(NodeVtable vtable)
+        {
+            if (vtable != null)
+            {
+                vtable.PointsAt = null;
+            }
+        }
+
+        /// <summary>
         /// THE RAISING HALF: what the navigator draws the game's own tooltip for when focus lands on
         /// this node. Written down beside the content (<see cref="NodeVtable.PointsAt"/>) rather than
         /// hidden in a closure, so the tooltip actions menu and the dev dump can ask the node which

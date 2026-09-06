@@ -739,6 +739,58 @@ Manual test:
 5. Tab: "Cancel, button, 1 of 2", "Confirm, button, 2 of 2".
 6. Escape closes the popup without applying (the game's own key).
 
+### OnlineHostGameScreen
+
+Built: two stops. `host-game-rows` holds the sentence the popup asks with, the name box and the
+Invite Only toggle; `host-game-buttons` holds Cancel then Host. Screen name is the popup's drawn
+heading ("Host Game"); focus starts on the rows.
+
+Measured 2026-09-06 at 1280x800 through `/gui/unity` and a screenshot crop: the popup at
+[427,269,427,261], Header at y 295, the sentence at y 328, `OptionsTextMeshInput` at y 365, the
+Invite Only toggle at y 421, and Cancel (x 509) with Host (x 647) at y 470. The sentence is a
+read-only row because it is drawn and heads nothing; the heading is the screen's name and so is
+not a row (the family B contract, and the sentence is what the popup actually asks).
+
+Escape is CLAIMED and presses the drawn Cancel: `GameListMenu.ShowHostGame` registers
+`InputActions.UI.Cancel` only on its GAMEPAD branch and gives the keyboard `UI.Confirm` instead
+(decompiled, lines 546 to 555), so the key would otherwise do nothing. Verified: `ui_back`
+answered `consumed` and the game list returned.
+
+Diff: exactly two kinds.
+
+1. The name row's label and value separated: "Host Game, Neurrone's Heroic Adventure" is now
+   "Host Game | Neurrone's Bombastic Buffoonery" (the name itself is the one the game generated
+   this session, not the port).
+2. "unchecked" became "not checked".
+
+Deviations, measured: the name row declares its tooltip for the buffer but does not aim at it,
+for the reason the game settings entry records.
+
+Follow-ups, not fixed:
+
+- THE GAME TAKES THE KEYBOARD AS THE POPUP OPENS. `ShowHostGame` calls
+  `HostGameInputField.ActivateInputField()`, so the field is focused before the player has done
+  anything and the mod stands down: measured, the first `/input ui_down` after the popup opened
+  answered `standing down`, and only after the field was deselected did the keys work. While the
+  field holds the keyboard the mod's echo is not running either (it echoes an edit the mod
+  started), and the game's own Enter on that branch presses HOST. Nothing here fixes that; it
+  would want the mod to take the keyboard back from the game on arrival, which is a decision
+  about native behaviour rather than a port.
+
+Manual test:
+
+1. Main menu, Multiplayer, Find online game, then Host Game. Hear "Host Game", then "Please
+   enter the name of the game you want to create, 1 of 3".
+   Note the field may already have the keyboard (follow-up above): press Escape or click
+   elsewhere first if the arrows do nothing.
+2. Down: "Host Game, editable, <the generated name>"; then "Invite Only Game, checkbox, not
+   checked".
+3. Enter on the name box says "editing"; type and hear the keys; Escape says "Cancelled" and puts
+   the name back. Careful: Enter inside the box is the game's own submit and creates the game.
+4. Enter on Invite Only says "checked", Enter again "not checked".
+5. Tab: "Cancel, button, 1 of 2", "Host, button, 2 of 2".
+6. Escape closes the popup, the same as pressing Cancel.
+
 
 ## Family E: drop lists
 
