@@ -2016,3 +2016,81 @@ Manual test:
 4. Enter on a result opens its details page; Escape there comes back to the same row.
 5. Type a few letters of a map's name: the cursor lands on it. Backspace ends the search.
 6. Tab: "Back, button". Enter and Escape both return to the browse page.
+
+### CommunityMapsDetailsScreen
+
+Built: four stops. `community-maps-details-commands` holds the mod's name, Subscribe, Downloads, the
+two votes and Report; `community-maps-details-facts` holds the stats as a REGION named "Details" and
+the tags as one named "Categories"; `community-maps-details-text` holds the summary and, under its own
+drawn heading, the full description; `community-maps-details-footer` holds Back. Screen name is the
+mod's own name as the panel draws it; focus starts on the commands.
+
+Measured 2026-09-06 at 1280x800 through `/gui/unity`: a side panel down the right ([873,0,403,800])
+drawing the mod's name at y 133, the Subscribe button at [873,213,361,43], the vote pair at y 283
+("Vote Up" at [874,283,153,32] and "Vote Down" at [1038,283,153,32], each carrying its count), a
+`Mod Stats` block from y 341 to y 461 and the tags at y 488; and a main view holding the Back prompt
+at [50,24,74,27], the picture gallery, and `Verbose Details` at y 633 - the summary at y 633 over a
+"Full description" heading at y 683 with the description under it. Downloads and Report are drawn
+nowhere on this panel: both are mod.io methods the widget screen already called (`InputReceiver.OnMenu`
+and `Details.ReportButtonPress`), so both stay mod-authored rows.
+
+Escape is CLAIMED and runs the panel's own `Close`, which is exactly what mod.io's `Navigating.Cancel`
+reaches while this panel is up (decompiled). Verified: `ui_back` answered `consumed` and the search
+results page came back with the cursor on the result the page was opened from.
+
+Diff: ONE line, and it is the game's own text changing under both engines. The Subscribe button now
+draws "Log in to Subscribe" rather than "Subscribe" - confirmed at the source, `/gui/unity` reads
+`Subscribe Button > Text` as "Log in to Subscribe" - because this session cancelled mod.io's
+authentication modal. Both screens read that button's own text; nothing else differs.
+
+Deviations, each measured:
+
+- THE FACTS ARE A LIST, NOT A TABLE, so they are read-only rows with the value as a value part rather
+  than a `GraphSheet`. `Mod Stats` draws five label/value pairs in two aligned columns (labels at
+  x 873, values at x 1043) with NO heading band over them, which is a definition list, not a table with
+  columns to cross. The flat lines are unchanged by it ("File size | 24.0KB").
+- The votes are buttons with their count as a value part and their cast state as a selected part,
+  both watched live, so voting speaks the new count under the cursor. The widget composed
+  "selected, count" into one status string; the parts say the same thing in the family's own words.
+- The mod-authored group labels the widget gave the vote pair ("Options"), the stats ("Details") and
+  the tags ("Categories") survive only as REGION names, and only where the game draws something to
+  head: "Details" and "Categories" are the regions of the facts stop, walked with Alt+Up and Alt+Down,
+  while the vote pair heads nothing drawn and simply sits between Downloads and Report. Group labels
+  never appeared in a flat dump, so none of this shows in the diff.
+- The summary and the description are one node each, the family's shape for a drawn block of prose:
+  the block's own heading, or its first line where it has none, is the label, and the rest of its
+  lines are a section, so the review buffer gives them one at a time. The widget put the whole block -
+  heading and all - in one label with embedded newlines. Invisible here: this mod's summary is the one
+  line "my first map" and its description is empty.
+- Report is declared but was never pressed, and neither was Subscribe, Vote up, Vote down or
+  Downloads.
+
+Follow-ups, not fixed:
+
+- The stack oddity again: this page sits over `CommunityMapsSearchResultsScreen`, which itself stays
+  under the home page after a Back. The detector's.
+- `CommunityMapsDetailsAdapter` reads its labels through its own `CleanText` regex rather than through
+  `ui/SpokenLines.cs`, so a multi-line summary is split by `SpokenLines` at declaration time but a
+  tooltip-shaped string would not be. Nothing on this page has a tooltip; pre-existing.
+- `/screenshot` answered an all-black frame (the locked-session symptom), so the layout evidence is
+  `/gui/unity`.
+
+Walk (all through `/input` and `/type`): Tab cycles commands, facts, prose, Back; the commands read
+"my first map, 1 of 6", "Log in to Subscribe, button, 2 of 6", "Downloads, button, 3 of 6", "Vote up,
+button, 1, 4 of 6", "Vote down, button, 0, 5 of 6" and "Report, button, 6 of 6"; the facts stop opened
+on "Details, File size, 24.0KB, 1 of 5" and Down read "Last updated, 7/1/2026, 2 of 5"; Alt+Down read
+"Categories, 8 Players" and Alt+Up came back; the prose stop read "my first map"; `ui_back` returned
+to the results page on the row the page was opened from.
+
+Manual test:
+
+1. From a search result or a browse band, Enter on a map. Hear the map's name, then "<name>, 1 of 6".
+2. Down: Subscribe (or "Log in to Subscribe" while you are not signed in), "Downloads", "Vote up,
+   button, N", "Vote down, button, N" - the vote you have cast says "selected" - and "Report". DO NOT
+   press Subscribe, Vote or Report unless you mean them.
+3. Tab: "Details, File size, ..., 1 of 5". Down walks the five facts; Alt+Down jumps to "Categories"
+   and its tags, Alt+Up comes back.
+4. Tab: the summary paragraph; Ctrl+Down through its review buffer must give a long summary one line
+   at a time, and a mod with a full description should read a second line here headed "Full
+   description".
+5. Tab: "Back, button". Enter and Escape both return to where you came from.

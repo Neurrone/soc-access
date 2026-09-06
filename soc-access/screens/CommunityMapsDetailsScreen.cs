@@ -1,17 +1,44 @@
 using System.Collections.Generic;
 using SongsOfConquestAccess.Adapters;
-using SongsOfConquestAccess.Input;
 using SongsOfConquestAccess.Localization;
 using SongsOfConquestAccess.UI;
+using SongsOfConquestAccess.UI.Graph;
 
 namespace SongsOfConquestAccess.Screens
 {
-    public sealed class CommunityMapsDetailsScreen : Screen
+    /// <summary>
+    /// One community map or mod's details page, made navigable as a graph. Four places to be, and Tab
+    /// moves between them: the side panel's commands, the facts and categories under them, the prose
+    /// in the main view, and the way back.
+    ///
+    /// Measured 2026-09-06 at 1280x800 through <c>/gui/unity</c>: a side panel down the right
+    /// ([873,0,403,800]) drawing the mod's name at y 133, the Subscribe button at [873,213,361,43],
+    /// the vote pair at y 283 ("Vote Up" at [874,283,153,32] and "Vote Down" at [1038,283,153,32],
+    /// each carrying its count), a <c>Mod Stats</c> block from y 341 to y 461 and the tags at y 488;
+    /// and a main view holding the Back prompt at [50,24,74,27], the picture gallery, and
+    /// <c>Verbose Details</c> at y 633 - the summary at y 633 over a "Full description" heading at
+    /// y 683 with the description under it.
+    ///
+    /// THE FACTS ARE A LIST, NOT A TABLE. <c>Mod Stats</c> draws five label/value pairs in two aligned
+    /// columns (labels at x 873, values at x 1043) with no heading band over them, so they are
+    /// read-only rows whose value is a value part - the shape every labelled fact in this mod takes -
+    /// rather than a <c>GraphSheet</c>.
+    ///
+    /// Escape is CLAIMED and runs the panel's own <c>Close</c>, which is exactly what mod.io's
+    /// <c>Navigating.Cancel</c> reaches while this panel is up (decompiled).
+    /// </summary>
+    public sealed class CommunityMapsDetailsScreen : GraphScreen
     {
+        private const string CommandsStop = "community-maps-details-commands";
+        private const string FactsStop = "community-maps-details-facts";
+        private const string TextStop = "community-maps-details-text";
+        private const string FooterStop = "community-maps-details-footer";
+
         private readonly CommunityMapsDetailsAdapter _adapter;
 
+        private readonly Dictionary<string, object> _markers = new Dictionary<string, object>();
+
         public CommunityMapsDetailsScreen(CommunityMapsDetailsAdapter adapter)
-            : base(BuildRoot(adapter))
         {
             _adapter = adapter;
         }
@@ -22,221 +49,232 @@ namespace SongsOfConquestAccess.Screens
             return adapter != null && adapter.IsPresent() ? new CommunityMapsDetailsScreen(adapter) : null;
         }
 
+        public override string Key
+        {
+            get { return "community-maps-details"; }
+        }
+
+        /// <summary>The mod's own name, as the panel draws it.</summary>
+        public override string ScreenName
+        {
+            get { return _adapter != null ? _adapter.Title : null; }
+        }
+
+        public override object InitialFocusStop
+        {
+            get { return CommandsStop; }
+        }
+
         public override bool IsPresent()
         {
             return _adapter != null && _adapter.IsPresent();
         }
 
-        public override void OnUnfocus()
+        public override bool ConsumesBack
         {
-            RootWidget?.Unfocus();
+            get { return IsPresent(); }
         }
 
-        public override bool HasClaimed(string actionKey)
+        public override bool Back()
         {
-            return actionKey == AccessibilityActions.Cancel.Key || base.HasClaimed(actionKey);
+            return _adapter != null && _adapter.Close();
         }
 
-        public override bool OnActionJustPressed(InputAction action)
-        {
-            if (action != null && action.Key == AccessibilityActions.Cancel.Key)
-            {
-                return _adapter != null && _adapter.Close();
-            }
-
-            return base.OnActionJustPressed(action);
-        }
-
+        /// <summary>Kept for the detector, which calls it whenever the browser's content changes. The
+        /// graph is declared afresh on every operation, so there is nothing to rebuild.</summary>
         public void Refresh()
+        {
+        }
+
+        public override void Build(GraphBuilder builder)
         {
             if (!IsPresent())
             {
                 return;
             }
 
-            int focusedIndex = RootWidget != null ? RootWidget.FocusedIndex : -1;
-            RootWidget = BuildRoot(_adapter);
-            RootWidget?.SetFocusByIndexSilently(focusedIndex);
+            builder.BeginStop(CommandsStop);
+            BuildCommands(builder);
+
+            builder.BeginStop(FactsStop);
+            BuildFacts(builder);
+            BuildTags(builder);
+
+            builder.BeginStop(TextStop);
+            BuildProse(builder);
+
+            builder.BeginStop(FooterStop);
+            BuildFooter(builder);
         }
 
-        private static ContainerWidget BuildRoot(CommunityMapsDetailsAdapter adapter)
+        // ---- the side panel's commands ----
+
+        private void BuildCommands(GraphBuilder builder)
         {
-            ContainerWidget root = new ContainerWidget("community-maps-details", adapter != null ? adapter.Title : string.Empty);
-            if (adapter == null)
+            string title = _adapter.Title;
+            if (!string.IsNullOrWhiteSpace(title))
             {
-                return root;
+                builder.AddItem(Synthetic("title", GraphNodes.Text(() => _adapter.Title)));
             }
 
-            root.AddChild(new TextWidget(
-                "community-maps-details-title",
-                () => adapter.Title,
-                null,
-                includeParentLabelInAnnouncement: false,
-                isVisible: () => !string.IsNullOrWhiteSpace(adapter.Title)));
-
-            root.AddChild(new ButtonWidget(
-                "community-maps-details-subscribe",
-                () => adapter.SubscribeLabel,
-                adapter.Subscribe,
-                null,
-                () => !string.IsNullOrWhiteSpace(adapter.SubscribeLabel),
-                () => !string.IsNullOrWhiteSpace(adapter.SubscribeLabel)));
-            root.AddChild(new ButtonWidget(
-                "community-maps-details-downloads",
-                ModText.Get(ModStrings.Screens.Downloads),
-                adapter.OpenDownloadsMenu,
-                null,
-                () => adapter.HasDownloadsMenu,
-                () => adapter.HasDownloadsMenu));
-
-            root.AddChild(BuildActionsMenu(adapter));
-            root.AddChild(new ButtonWidget(
-                "community-maps-details-report",
-                () => adapter.ReportLabel,
-                adapter.Report,
-                null,
-                () => !string.IsNullOrWhiteSpace(adapter.ReportLabel),
-                () => !string.IsNullOrWhiteSpace(adapter.ReportLabel)));
-            root.AddChild(BuildDetailsMenu(adapter));
-            root.AddChild(BuildTagsMenu(adapter));
-
-            root.AddChild(new TextWidget(
-                "community-maps-details-summary",
-                () => adapter.Summary,
-                null,
-                includeParentLabelInAnnouncement: false,
-                isVisible: () => !string.IsNullOrWhiteSpace(adapter.Summary)));
-
-            root.AddChild(new TextWidget(
-                "community-maps-details-description",
-                () => BuildLabelValue(adapter.DescriptionLabel, adapter.Description),
-                null,
-                includeParentLabelInAnnouncement: false,
-                isVisible: () => !string.IsNullOrWhiteSpace(adapter.Description)));
-
-            root.AddChild(new ButtonWidget(
-                "community-maps-details-back",
-                () => adapter.BackLabel,
-                adapter.Close,
-                null,
-                () => true,
-                () => !string.IsNullOrWhiteSpace(adapter.BackLabel)));
-
-            return root;
-        }
-
-        private static MenuWidget BuildActionsMenu(CommunityMapsDetailsAdapter adapter)
-        {
-            IReadOnlyList<CommunityMapsDetailsAdapter.ActionItem> actions = adapter.GetVoteActions();
-            MenuWidget menu = new MenuWidget(
-                "community-maps-details-actions",
-                ModText.Get(ModStrings.Screens.Options),
-                () => actions.Count > 0);
-            for (int i = 0; i < actions.Count; i++)
+            if (!string.IsNullOrWhiteSpace(_adapter.SubscribeLabel))
             {
-                CommunityMapsDetailsAdapter.ActionItem action = actions[i];
-                CommunityMapsDetailsAdapter.ActionItem captured = action;
-                menu.AddItem(new MenuItemWidget(
-                    "community-maps-details-action-" + captured.Id,
+                NodeVtable subscribe = GraphNodes.Button(
+                    () => _adapter.SubscribeLabel,
+                    () => _adapter.Subscribe());
+                builder.AddItem(Synthetic("subscribe", subscribe));
+            }
+
+            NodeVtable downloads = GraphNodes.Button(
+                () => ModText.Get(ModStrings.Screens.Downloads),
+                () => _adapter.OpenDownloadsMenu(),
+                () => _adapter.HasDownloadsMenu);
+            builder.AddItem(Synthetic("downloads", downloads));
+
+            IReadOnlyList<CommunityMapsDetailsAdapter.ActionItem> votes = _adapter.GetVoteActions();
+            for (int i = 0; i < votes.Count; i++)
+            {
+                CommunityMapsDetailsAdapter.ActionItem vote = votes[i];
+                if (vote == null)
+                {
+                    continue;
+                }
+
+                CommunityMapsDetailsAdapter.ActionItem captured = vote;
+                NodeVtable vtable = GraphNodes.Button(
                     () => captured.Label,
-                    () => BuildVoteStatus(captured),
-                    () => ActivateVoteAction(menu, captured),
-                    null,
-                    () => true));
+                    () => { if (captured.Activate != null) { captured.Activate(); } });
+                // The vote the player has already cast is marked on the drawn button; its count is
+                // beside the label, and both are watched because a vote changes them under the cursor.
+                vtable.Announcements.Add(GraphNodes.SelectedPart(() => captured.IsSelected));
+                vtable.Announcements.Add(GraphNodes.ValuePart(() => captured.Status));
+                builder.AddItem(Synthetic("vote/" + captured.Id, vtable));
             }
 
-            return menu;
+            if (!string.IsNullOrWhiteSpace(_adapter.ReportLabel))
+            {
+                NodeVtable report = GraphNodes.Button(
+                    () => _adapter.ReportLabel,
+                    () => _adapter.Report());
+                builder.AddItem(Synthetic("report", report));
+            }
         }
 
-        private static string BuildLabelValue(string label, string value)
+        // ---- the facts and the categories ----
+
+        private void BuildFacts(GraphBuilder builder)
         {
-            if (string.IsNullOrWhiteSpace(label))
+            IReadOnlyList<CommunityMapsDetailsAdapter.DetailItem> details = _adapter.GetDetails();
+            if (details.Count == 0)
             {
-                return value ?? string.Empty;
+                return;
             }
 
-            return label + "\n" + (value ?? string.Empty);
-        }
-
-        private static string BuildVoteStatus(CommunityMapsDetailsAdapter.ActionItem action)
-        {
-            if (action == null)
-            {
-                return string.Empty;
-            }
-
-            string count = action.Status;
-            if (!action.IsSelected)
-            {
-                return count;
-            }
-
-            string selected = ModText.Get(ModStrings.UI.Selected);
-            return string.IsNullOrWhiteSpace(count)
-                ? selected
-                : ModText.Get(ModStrings.Common.ListSeparator, selected, count);
-        }
-
-        private static bool ActivateVoteAction(MenuWidget menu, CommunityMapsDetailsAdapter.ActionItem action)
-        {
-            if (action == null || action.Activate == null)
-            {
-                return false;
-            }
-
-            bool handled = action.Activate();
-            if (handled)
-            {
-                UIManager.RequestFocus(menu);
-            }
-
-            return handled;
-        }
-
-        private static MenuWidget BuildDetailsMenu(CommunityMapsDetailsAdapter adapter)
-        {
-            IReadOnlyList<CommunityMapsDetailsAdapter.DetailItem> details = adapter.GetDetails();
-            MenuWidget menu = new MenuWidget(
-                "community-maps-details-facts",
-                ModText.Get(ModStrings.UI.ColumnDetails),
-                () => details.Count > 0);
+            builder.PushContext(ModText.Get(ModStrings.UI.ColumnDetails));
+            builder.SetRegion("community-maps-details:facts");
             for (int i = 0; i < details.Count; i++)
             {
                 CommunityMapsDetailsAdapter.DetailItem detail = details[i];
+                if (detail == null)
+                {
+                    continue;
+                }
+
                 CommunityMapsDetailsAdapter.DetailItem captured = detail;
-                menu.AddItem(new MenuItemWidget(
-                    "community-maps-details-fact-" + captured.Id,
-                    () => captured.Label,
-                    () => captured.Value,
-                    null,
-                    null,
-                    () => true));
+                NodeVtable vtable = GraphNodes.Text(() => captured.Label);
+                vtable.Announcements.Add(GraphNodes.ValuePart(() => captured.Value));
+                builder.AddItem(Synthetic("fact/" + captured.Id, vtable));
             }
 
-            return menu;
+            builder.PopContext();
+            builder.SetRegion(null);
         }
 
-        private static MenuWidget BuildTagsMenu(CommunityMapsDetailsAdapter adapter)
+        private void BuildTags(GraphBuilder builder)
         {
-            IReadOnlyList<CommunityMapsDetailsAdapter.TagItem> tags = adapter.GetTags();
-            MenuWidget menu = new MenuWidget(
-                "community-maps-details-tags",
-                ModText.Get(ModStrings.Screens.Categories),
-                () => tags.Count > 0);
+            IReadOnlyList<CommunityMapsDetailsAdapter.TagItem> tags = _adapter.GetTags();
+            if (tags.Count == 0)
+            {
+                return;
+            }
+
+            builder.PushContext(ModText.Get(ModStrings.Screens.Categories));
+            builder.SetRegion("community-maps-details:tags");
             for (int i = 0; i < tags.Count; i++)
             {
                 CommunityMapsDetailsAdapter.TagItem tag = tags[i];
+                if (tag == null)
+                {
+                    continue;
+                }
+
                 CommunityMapsDetailsAdapter.TagItem captured = tag;
-                menu.AddItem(new MenuItemWidget(
-                    "community-maps-details-tag-" + captured.Index,
-                    () => captured.Label,
-                    null,
-                    null,
-                    null,
-                    () => true));
+                builder.AddItem(Synthetic(
+                    "tag/" + captured.Index,
+                    GraphNodes.Text(() => captured.Label)));
             }
 
-            return menu;
+            builder.PopContext();
+            builder.SetRegion(null);
+        }
+
+        // ---- the prose in the main view ----
+
+        private void BuildProse(GraphBuilder builder)
+        {
+            AddParagraph(builder, "summary", null, _adapter.Summary);
+            AddParagraph(builder, "description", _adapter.DescriptionLabel, _adapter.Description);
+        }
+
+        /// <summary>A drawn block of prose as ONE node: its heading, or its first line where the block
+        /// has no heading, is the label, and the rest of its lines are a section, so the review buffer
+        /// gives them one at a time instead of running the whole block together.</summary>
+        private void AddParagraph(GraphBuilder builder, string key, string heading, string text)
+        {
+            IList<string> lines = SpokenLines.Of(new[] { text });
+            if (lines.Count == 0)
+            {
+                return;
+            }
+
+            int firstBodyLine = string.IsNullOrWhiteSpace(heading) ? 1 : 0;
+            string label = firstBodyLine == 0 ? heading : lines[0];
+            List<string> rest = new List<string>();
+            for (int i = firstBodyLine; i < lines.Count; i++)
+            {
+                rest.Add(lines[i]);
+            }
+
+            builder.AddItem(Synthetic(key, GraphNodes.Text(() => label, () => rest)));
+        }
+
+        // ---- the way back ----
+
+        private void BuildFooter(GraphBuilder builder)
+        {
+            NodeVtable back = GraphNodes.Button(
+                () => _adapter.BackLabel,
+                () => _adapter.Close());
+            builder.AddItem(Synthetic("back", back));
+        }
+
+        private SyntheticNode Synthetic(string key, NodeVtable vtable)
+        {
+            return new SyntheticNode(
+                ControlId.For(Marker(key), "community-maps-details:" + key),
+                vtable);
+        }
+
+        private object Marker(string key)
+        {
+            object marker;
+            if (!_markers.TryGetValue(key, out marker))
+            {
+                marker = new object();
+                _markers.Add(key, marker);
+            }
+
+            return marker;
         }
     }
 }
