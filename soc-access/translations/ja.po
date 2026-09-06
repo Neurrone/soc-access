@@ -510,6 +510,11 @@ msgctxt "UI.RoleGrid"
 msgid "grid"
 msgstr "グリッド"
 
+#. UI.RoleGroup
+msgctxt "UI.RoleGroup"
+msgid "group"
+msgstr "グループ"
+
 #. UI.RoleMenu
 msgctxt "UI.RoleMenu"
 msgid "menu"
@@ -519,6 +524,16 @@ msgstr "メニュー"
 msgctxt "UI.RoleSlider"
 msgid "slider"
 msgstr "スライダー"
+
+#. UI.SearchCleared
+msgctxt "UI.SearchCleared"
+msgid "Search cleared"
+msgstr "検索をクリアしました"
+
+#. UI.SearchNoMatch
+msgctxt "UI.SearchNoMatch"
+msgid "No match for {0}"
+msgstr "{0} に一致するものがありません"
 
 #. UI.Selected
 msgctxt "UI.Selected"
@@ -595,10 +610,20 @@ msgctxt "UI.WielderArmy"
 msgid "wielder's army"
 msgstr "ウィールダーの軍"
 
+#. UI.StatusCollapsed
+msgctxt "UI.StatusCollapsed"
+msgid "collapsed"
+msgstr "折りたたみ"
+
 #. UI.StatusCorrupt
 msgctxt "UI.StatusCorrupt"
 msgid "corrupt"
 msgstr "破損"
+
+#. UI.StatusExpanded
+msgctxt "UI.StatusExpanded"
+msgid "expanded"
+msgstr "展開"
 
 #. UI.StatusMissing
 msgctxt "UI.StatusMissing"
@@ -614,6 +639,11 @@ msgstr "利用不可"
 msgctxt "UI.BufferEmpty"
 msgid "Buffer empty"
 msgstr "バッファは空です"
+
+#. UI.NoDetails
+msgctxt "UI.NoDetails"
+msgid "Nothing in here"
+msgstr "ここには何もありません"
 
 #. UI.NoScannerResults
 msgctxt "UI.NoScannerResults"
@@ -879,11 +909,6 @@ msgstr "{0} の軍"
 msgctxt "Screens.NamedLevel"
 msgid "{0}, level {1}"
 msgstr "{0}、レベル {1}"
-
-#. Screens.NamedMenu
-msgctxt "Screens.NamedMenu"
-msgid "{0} menu"
-msgstr "{0} メニュー"
 
 #. Screens.NamedTabs
 msgctxt "Screens.NamedTabs"
@@ -1555,6 +1580,81 @@ msgctxt "Actions.TooltipActionsMenu"
 msgid "Tooltip Actions Menu"
 msgstr "ツールチップ操作メニュー"
 
+#. Actions.UiActivate
+msgctxt "Actions.UiActivate"
+msgid "Activate"
+msgstr "実行"
+
+#. Actions.UiBack
+msgctxt "Actions.UiBack"
+msgid "Back"
+msgstr "戻る"
+
+#. Actions.UiCoarseDecrease
+msgctxt "Actions.UiCoarseDecrease"
+msgid "Coarse Decrease"
+msgstr "大きく減少"
+
+#. Actions.UiCoarseIncrease
+msgctxt "Actions.UiCoarseIncrease"
+msgid "Coarse Increase"
+msgstr "大きく増加"
+
+#. Actions.UiDown
+msgctxt "Actions.UiDown"
+msgid "Move Down"
+msgstr "下へ移動"
+
+#. Actions.UiEnd
+msgctxt "Actions.UiEnd"
+msgid "Last Item"
+msgstr "最後の項目"
+
+#. Actions.UiHome
+msgctxt "Actions.UiHome"
+msgid "First Item"
+msgstr "最初の項目"
+
+#. Actions.UiLeft
+msgctxt "Actions.UiLeft"
+msgid "Move Left"
+msgstr "左へ移動"
+
+#. Actions.UiNext
+msgctxt "Actions.UiNext"
+msgid "Next Stop"
+msgstr "次のタブ位置"
+
+#. Actions.UiPrev
+msgctxt "Actions.UiPrev"
+msgid "Previous Stop"
+msgstr "前のタブ位置"
+
+#. Actions.UiRegionNext
+msgctxt "Actions.UiRegionNext"
+msgid "Next Region"
+msgstr "次の領域"
+
+#. Actions.UiRegionPrev
+msgctxt "Actions.UiRegionPrev"
+msgid "Previous Region"
+msgstr "前の領域"
+
+#. Actions.UiRight
+msgctxt "Actions.UiRight"
+msgid "Move Right"
+msgstr "右へ移動"
+
+#. Actions.UiSecondary
+msgctxt "Actions.UiSecondary"
+msgid "Secondary Action"
+msgstr "副操作"
+
+#. Actions.UiUp
+msgctxt "Actions.UiUp"
+msgid "Move Up"
+msgstr "上へ移動"
+
 #. Combat.AbilityUsed
 msgctxt "Combat.AbilityUsed"
 msgid "{0} uses {1}"
@@ -1929,6 +2029,66 @@ msgstr "{1}中{0}"
 msgctxt "Common.NamePossessive"
 msgid "{0}'s"
 msgstr "{0}の"
+
+#. Graph.DragCancelled
+msgctxt "Graph.DragCancelled"
+msgid "Cancelled drag"
+msgstr "ドラッグをキャンセルしました"
+
+#. Graph.DragDropHint
+msgctxt "Graph.DragDropHint"
+msgid "{0} to drop {1}."
+msgstr "{0} で {1} をドロップします。"
+
+#. Graph.DragDropRefused
+msgctxt "Graph.DragDropRefused"
+msgid "{0} cannot go there"
+msgstr "{0} はそこに置けません"
+
+#. Graph.DragDropTarget
+msgctxt "Graph.DragDropTarget"
+msgid "drop target"
+msgstr "ドロップ先"
+
+#. Graph.DragDropped
+msgctxt "Graph.DragDropped"
+msgid "Dropped {0}"
+msgstr "{0} をドロップしました"
+
+#. Graph.DragHint
+msgctxt "Graph.DragHint"
+msgid "{0} to drag {1}."
+msgstr "{0} で {1} をドラッグします。"
+
+#. Graph.DragStarted
+msgctxt "Graph.DragStarted"
+msgid "Dragging {0}. {1} to drop, {2} to cancel."
+msgstr "{0} をドラッグ中。{1} でドロップ、{2} でキャンセル。"
+
+#. Graph.DragStartedPlain
+msgctxt "Graph.DragStartedPlain"
+msgid "Dragging {0}"
+msgstr "{0} をドラッグ中"
+
+#. Graph.FractionUnit
+msgctxt "Graph.FractionUnit"
+msgid "{0} of {1} {2}"
+msgstr "{1} {2}中{0}"
+
+#. Graph.FragmentSeparator
+msgctxt "Graph.FragmentSeparator"
+msgid " "
+msgstr " "
+
+#. Graph.ListSeparator
+msgctxt "Graph.ListSeparator"
+msgid ", "
+msgstr "、"
+
+#. Graph.Quantity
+msgctxt "Graph.Quantity"
+msgid "x {0}"
+msgstr "×{0}"
 
 #. Spatial.Acting
 msgctxt "Spatial.Acting"

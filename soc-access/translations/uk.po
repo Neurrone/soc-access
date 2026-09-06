@@ -530,6 +530,11 @@ msgctxt "UI.RoleGrid"
 msgid "grid"
 msgstr "сітка"
 
+#. UI.RoleGroup
+msgctxt "UI.RoleGroup"
+msgid "group"
+msgstr "група"
+
 #. UI.RoleMenu
 msgctxt "UI.RoleMenu"
 msgid "menu"
@@ -539,6 +544,16 @@ msgstr "меню"
 msgctxt "UI.RoleSlider"
 msgid "slider"
 msgstr "повзунок"
+
+#. UI.SearchCleared
+msgctxt "UI.SearchCleared"
+msgid "Search cleared"
+msgstr "Пошук очищено"
+
+#. UI.SearchNoMatch
+msgctxt "UI.SearchNoMatch"
+msgid "No match for {0}"
+msgstr "Немає збігів для {0}"
 
 #. UI.Selected
 msgctxt "UI.Selected"
@@ -615,10 +630,20 @@ msgctxt "UI.WielderArmy"
 msgid "wielder's army"
 msgstr "армія героя"
 
+#. UI.StatusCollapsed
+msgctxt "UI.StatusCollapsed"
+msgid "collapsed"
+msgstr "згорнуто"
+
 #. UI.StatusCorrupt
 msgctxt "UI.StatusCorrupt"
 msgid "corrupt"
 msgstr "пошкоджено"
+
+#. UI.StatusExpanded
+msgctxt "UI.StatusExpanded"
+msgid "expanded"
+msgstr "розгорнуто"
 
 #. UI.StatusMissing
 msgctxt "UI.StatusMissing"
@@ -634,6 +659,11 @@ msgstr "недоступно"
 msgctxt "UI.BufferEmpty"
 msgid "Buffer empty"
 msgstr "Буфер порожній"
+
+#. UI.NoDetails
+msgctxt "UI.NoDetails"
+msgid "Nothing in here"
+msgstr "Тут нічого немає"
 
 #. UI.NoScannerResults
 msgctxt "UI.NoScannerResults"
@@ -899,11 +929,6 @@ msgstr "армія {0}"
 msgctxt "Screens.NamedLevel"
 msgid "{0}, level {1}"
 msgstr "{0}, рівень {1}"
-
-#. Screens.NamedMenu
-msgctxt "Screens.NamedMenu"
-msgid "{0} menu"
-msgstr "меню {0}"
 
 #. Screens.NamedTabs
 msgctxt "Screens.NamedTabs"
@@ -1575,6 +1600,81 @@ msgctxt "Actions.TooltipActionsMenu"
 msgid "Tooltip Actions Menu"
 msgstr "Меню дій підказки"
 
+#. Actions.UiActivate
+msgctxt "Actions.UiActivate"
+msgid "Activate"
+msgstr "Активувати"
+
+#. Actions.UiBack
+msgctxt "Actions.UiBack"
+msgid "Back"
+msgstr "Назад"
+
+#. Actions.UiCoarseDecrease
+msgctxt "Actions.UiCoarseDecrease"
+msgid "Coarse Decrease"
+msgstr "Зменшити з великим кроком"
+
+#. Actions.UiCoarseIncrease
+msgctxt "Actions.UiCoarseIncrease"
+msgid "Coarse Increase"
+msgstr "Збільшити з великим кроком"
+
+#. Actions.UiDown
+msgctxt "Actions.UiDown"
+msgid "Move Down"
+msgstr "Вниз"
+
+#. Actions.UiEnd
+msgctxt "Actions.UiEnd"
+msgid "Last Item"
+msgstr "Останній елемент"
+
+#. Actions.UiHome
+msgctxt "Actions.UiHome"
+msgid "First Item"
+msgstr "Перший елемент"
+
+#. Actions.UiLeft
+msgctxt "Actions.UiLeft"
+msgid "Move Left"
+msgstr "Ліворуч"
+
+#. Actions.UiNext
+msgctxt "Actions.UiNext"
+msgid "Next Stop"
+msgstr "Наступна позиція табуляції"
+
+#. Actions.UiPrev
+msgctxt "Actions.UiPrev"
+msgid "Previous Stop"
+msgstr "Попередня позиція табуляції"
+
+#. Actions.UiRegionNext
+msgctxt "Actions.UiRegionNext"
+msgid "Next Region"
+msgstr "Наступна область"
+
+#. Actions.UiRegionPrev
+msgctxt "Actions.UiRegionPrev"
+msgid "Previous Region"
+msgstr "Попередня область"
+
+#. Actions.UiRight
+msgctxt "Actions.UiRight"
+msgid "Move Right"
+msgstr "Праворуч"
+
+#. Actions.UiSecondary
+msgctxt "Actions.UiSecondary"
+msgid "Secondary Action"
+msgstr "Вторинна дія"
+
+#. Actions.UiUp
+msgctxt "Actions.UiUp"
+msgid "Move Up"
+msgstr "Вгору"
+
 #. Combat.AbilityUsed
 msgctxt "Combat.AbilityUsed"
 msgid "{0} uses {1}"
@@ -1959,6 +2059,66 @@ msgstr "{0} з {1}"
 msgctxt "Common.NamePossessive"
 msgid "{0}'s"
 msgstr "{0}"
+
+#. Graph.DragCancelled
+msgctxt "Graph.DragCancelled"
+msgid "Cancelled drag"
+msgstr "Перетягування скасовано"
+
+#. Graph.DragDropHint
+msgctxt "Graph.DragDropHint"
+msgid "{0} to drop {1}."
+msgstr "{0}, щоб покласти {1}."
+
+#. Graph.DragDropRefused
+msgctxt "Graph.DragDropRefused"
+msgid "{0} cannot go there"
+msgstr "{0} не можна покласти сюди"
+
+#. Graph.DragDropTarget
+msgctxt "Graph.DragDropTarget"
+msgid "drop target"
+msgstr "ціль перетягування"
+
+#. Graph.DragDropped
+msgctxt "Graph.DragDropped"
+msgid "Dropped {0}"
+msgstr "{0} покладено"
+
+#. Graph.DragHint
+msgctxt "Graph.DragHint"
+msgid "{0} to drag {1}."
+msgstr "{0}, щоб перетягнути {1}."
+
+#. Graph.DragStarted
+msgctxt "Graph.DragStarted"
+msgid "Dragging {0}. {1} to drop, {2} to cancel."
+msgstr "Перетягування {0}. {1}, щоб покласти, {2}, щоб скасувати."
+
+#. Graph.DragStartedPlain
+msgctxt "Graph.DragStartedPlain"
+msgid "Dragging {0}"
+msgstr "Перетягування {0}"
+
+#. Graph.FractionUnit
+msgctxt "Graph.FractionUnit"
+msgid "{0} of {1} {2}"
+msgstr "{0} з {1} {2}"
+
+#. Graph.FragmentSeparator
+msgctxt "Graph.FragmentSeparator"
+msgid " "
+msgstr " "
+
+#. Graph.ListSeparator
+msgctxt "Graph.ListSeparator"
+msgid ", "
+msgstr ", "
+
+#. Graph.Quantity
+msgctxt "Graph.Quantity"
+msgid "x {0}"
+msgstr "{0} шт."
 
 #. Spatial.Acting
 msgctxt "Spatial.Acting"

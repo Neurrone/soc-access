@@ -510,6 +510,11 @@ msgctxt "UI.RoleGrid"
 msgid "grid"
 msgstr "griglia"
 
+#. UI.RoleGroup
+msgctxt "UI.RoleGroup"
+msgid "group"
+msgstr "gruppo"
+
 #. UI.RoleMenu
 msgctxt "UI.RoleMenu"
 msgid "menu"
@@ -519,6 +524,16 @@ msgstr "menu"
 msgctxt "UI.RoleSlider"
 msgid "slider"
 msgstr "cursore"
+
+#. UI.SearchCleared
+msgctxt "UI.SearchCleared"
+msgid "Search cleared"
+msgstr "Ricerca cancellata"
+
+#. UI.SearchNoMatch
+msgctxt "UI.SearchNoMatch"
+msgid "No match for {0}"
+msgstr "Nessuna corrispondenza per {0}"
 
 #. UI.Selected
 msgctxt "UI.Selected"
@@ -545,6 +560,11 @@ msgctxt "UI.StatusChecked"
 msgid "checked"
 msgstr "selezionato"
 
+#. UI.StatusCollapsed
+msgctxt "UI.StatusCollapsed"
+msgid "collapsed"
+msgstr "compresso"
+
 #. UI.StatusCorrupt
 msgctxt "UI.StatusCorrupt"
 msgid "corrupt"
@@ -564,6 +584,11 @@ msgstr "trascinabile"
 msgctxt "UI.StatusDragging"
 msgid "dragging"
 msgstr "in trascinamento"
+
+#. UI.StatusExpanded
+msgctxt "UI.StatusExpanded"
+msgid "expanded"
+msgstr "espanso"
 
 #. UI.StatusMissing
 msgctxt "UI.StatusMissing"
@@ -614,6 +639,11 @@ msgstr "esercito del portatore"
 msgctxt "UI.BufferEmpty"
 msgid "Buffer empty"
 msgstr "Buffer vuoto"
+
+#. UI.NoDetails
+msgctxt "UI.NoDetails"
+msgid "Nothing in here"
+msgstr "Qui non c'è niente"
 
 #. UI.NoScannerResults
 msgctxt "UI.NoScannerResults"
@@ -879,11 +909,6 @@ msgstr "esercito {0}"
 msgctxt "Screens.NamedLevel"
 msgid "{0}, level {1}"
 msgstr "{0}, livello {1}"
-
-#. Screens.NamedMenu
-msgctxt "Screens.NamedMenu"
-msgid "{0} menu"
-msgstr "menu {0}"
 
 #. Screens.NamedTabs
 msgctxt "Screens.NamedTabs"
@@ -1565,6 +1590,81 @@ msgctxt "Actions.TooltipActionsMenu"
 msgid "Tooltip Actions Menu"
 msgstr "Menu azioni tooltip"
 
+#. Actions.UiActivate
+msgctxt "Actions.UiActivate"
+msgid "Activate"
+msgstr "Attiva"
+
+#. Actions.UiBack
+msgctxt "Actions.UiBack"
+msgid "Back"
+msgstr "Indietro"
+
+#. Actions.UiCoarseDecrease
+msgctxt "Actions.UiCoarseDecrease"
+msgid "Coarse Decrease"
+msgstr "Diminuisci a passi grandi"
+
+#. Actions.UiCoarseIncrease
+msgctxt "Actions.UiCoarseIncrease"
+msgid "Coarse Increase"
+msgstr "Aumenta a passi grandi"
+
+#. Actions.UiDown
+msgctxt "Actions.UiDown"
+msgid "Move Down"
+msgstr "Vai giù"
+
+#. Actions.UiEnd
+msgctxt "Actions.UiEnd"
+msgid "Last Item"
+msgstr "Ultimo elemento"
+
+#. Actions.UiHome
+msgctxt "Actions.UiHome"
+msgid "First Item"
+msgstr "Primo elemento"
+
+#. Actions.UiLeft
+msgctxt "Actions.UiLeft"
+msgid "Move Left"
+msgstr "Vai a sinistra"
+
+#. Actions.UiNext
+msgctxt "Actions.UiNext"
+msgid "Next Stop"
+msgstr "Tabulazione successiva"
+
+#. Actions.UiPrev
+msgctxt "Actions.UiPrev"
+msgid "Previous Stop"
+msgstr "Tabulazione precedente"
+
+#. Actions.UiRegionNext
+msgctxt "Actions.UiRegionNext"
+msgid "Next Region"
+msgstr "Regione successiva"
+
+#. Actions.UiRegionPrev
+msgctxt "Actions.UiRegionPrev"
+msgid "Previous Region"
+msgstr "Regione precedente"
+
+#. Actions.UiRight
+msgctxt "Actions.UiRight"
+msgid "Move Right"
+msgstr "Vai a destra"
+
+#. Actions.UiSecondary
+msgctxt "Actions.UiSecondary"
+msgid "Secondary Action"
+msgstr "Azione secondaria"
+
+#. Actions.UiUp
+msgctxt "Actions.UiUp"
+msgid "Move Up"
+msgstr "Vai su"
+
 #. Combat.AbilityUsed
 msgctxt "Combat.AbilityUsed"
 msgid "{0} uses {1}"
@@ -1944,6 +2044,66 @@ msgstr "{0} di {1}"
 msgctxt "Common.NamePossessive"
 msgid "{0}'s"
 msgstr "di {0}"
+
+#. Graph.DragCancelled
+msgctxt "Graph.DragCancelled"
+msgid "Cancelled drag"
+msgstr "Trascinamento annullato"
+
+#. Graph.DragDropHint
+msgctxt "Graph.DragDropHint"
+msgid "{0} to drop {1}."
+msgstr "{0} per rilasciare {1}."
+
+#. Graph.DragDropRefused
+msgctxt "Graph.DragDropRefused"
+msgid "{0} cannot go there"
+msgstr "{0} non può andare lì"
+
+#. Graph.DragDropTarget
+msgctxt "Graph.DragDropTarget"
+msgid "drop target"
+msgstr "destinazione di rilascio"
+
+#. Graph.DragDropped
+msgctxt "Graph.DragDropped"
+msgid "Dropped {0}"
+msgstr "{0} rilasciato"
+
+#. Graph.DragHint
+msgctxt "Graph.DragHint"
+msgid "{0} to drag {1}."
+msgstr "{0} per trascinare {1}."
+
+#. Graph.DragStarted
+msgctxt "Graph.DragStarted"
+msgid "Dragging {0}. {1} to drop, {2} to cancel."
+msgstr "Trascinamento di {0}. {1} per rilasciare, {2} per annullare."
+
+#. Graph.DragStartedPlain
+msgctxt "Graph.DragStartedPlain"
+msgid "Dragging {0}"
+msgstr "Trascinamento di {0}"
+
+#. Graph.FractionUnit
+msgctxt "Graph.FractionUnit"
+msgid "{0} of {1} {2}"
+msgstr "{0} di {1} {2}"
+
+#. Graph.FragmentSeparator
+msgctxt "Graph.FragmentSeparator"
+msgid " "
+msgstr " "
+
+#. Graph.ListSeparator
+msgctxt "Graph.ListSeparator"
+msgid ", "
+msgstr ", "
+
+#. Graph.Quantity
+msgctxt "Graph.Quantity"
+msgid "x {0}"
+msgstr "x {0}"
 
 #. Spatial.Acting
 msgctxt "Spatial.Acting"

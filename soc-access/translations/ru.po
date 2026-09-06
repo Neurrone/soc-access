@@ -530,6 +530,11 @@ msgctxt "UI.RoleGrid"
 msgid "grid"
 msgstr "сетка"
 
+#. UI.RoleGroup
+msgctxt "UI.RoleGroup"
+msgid "group"
+msgstr "группа"
+
 #. UI.RoleMenu
 msgctxt "UI.RoleMenu"
 msgid "menu"
@@ -539,6 +544,16 @@ msgstr "меню"
 msgctxt "UI.RoleSlider"
 msgid "slider"
 msgstr "ползунок"
+
+#. UI.SearchCleared
+msgctxt "UI.SearchCleared"
+msgid "Search cleared"
+msgstr "Поиск очищен"
+
+#. UI.SearchNoMatch
+msgctxt "UI.SearchNoMatch"
+msgid "No match for {0}"
+msgstr "Нет совпадений для {0}"
 
 #. UI.Selected
 msgctxt "UI.Selected"
@@ -615,10 +630,20 @@ msgctxt "UI.WielderArmy"
 msgid "wielder's army"
 msgstr "армия героя"
 
+#. UI.StatusCollapsed
+msgctxt "UI.StatusCollapsed"
+msgid "collapsed"
+msgstr "свёрнуто"
+
 #. UI.StatusCorrupt
 msgctxt "UI.StatusCorrupt"
 msgid "corrupt"
 msgstr "повреждено"
+
+#. UI.StatusExpanded
+msgctxt "UI.StatusExpanded"
+msgid "expanded"
+msgstr "развёрнуто"
 
 #. UI.StatusMissing
 msgctxt "UI.StatusMissing"
@@ -634,6 +659,11 @@ msgstr "недоступно"
 msgctxt "UI.BufferEmpty"
 msgid "Buffer empty"
 msgstr "Буфер пуст"
+
+#. UI.NoDetails
+msgctxt "UI.NoDetails"
+msgid "Nothing in here"
+msgstr "Здесь ничего нет"
 
 #. UI.NoScannerResults
 msgctxt "UI.NoScannerResults"
@@ -899,11 +929,6 @@ msgstr "армия {0}"
 msgctxt "Screens.NamedLevel"
 msgid "{0}, level {1}"
 msgstr "{0}, уровень {1}"
-
-#. Screens.NamedMenu
-msgctxt "Screens.NamedMenu"
-msgid "{0} menu"
-msgstr "меню {0}"
 
 #. Screens.NamedTabs
 msgctxt "Screens.NamedTabs"
@@ -1575,6 +1600,81 @@ msgctxt "Actions.TooltipActionsMenu"
 msgid "Tooltip Actions Menu"
 msgstr "Меню действий подсказки"
 
+#. Actions.UiActivate
+msgctxt "Actions.UiActivate"
+msgid "Activate"
+msgstr "Активировать"
+
+#. Actions.UiBack
+msgctxt "Actions.UiBack"
+msgid "Back"
+msgstr "Назад"
+
+#. Actions.UiCoarseDecrease
+msgctxt "Actions.UiCoarseDecrease"
+msgid "Coarse Decrease"
+msgstr "Уменьшить с большим шагом"
+
+#. Actions.UiCoarseIncrease
+msgctxt "Actions.UiCoarseIncrease"
+msgid "Coarse Increase"
+msgstr "Увеличить с большим шагом"
+
+#. Actions.UiDown
+msgctxt "Actions.UiDown"
+msgid "Move Down"
+msgstr "Вниз"
+
+#. Actions.UiEnd
+msgctxt "Actions.UiEnd"
+msgid "Last Item"
+msgstr "Последний элемент"
+
+#. Actions.UiHome
+msgctxt "Actions.UiHome"
+msgid "First Item"
+msgstr "Первый элемент"
+
+#. Actions.UiLeft
+msgctxt "Actions.UiLeft"
+msgid "Move Left"
+msgstr "Влево"
+
+#. Actions.UiNext
+msgctxt "Actions.UiNext"
+msgid "Next Stop"
+msgstr "Следующая позиция табуляции"
+
+#. Actions.UiPrev
+msgctxt "Actions.UiPrev"
+msgid "Previous Stop"
+msgstr "Предыдущая позиция табуляции"
+
+#. Actions.UiRegionNext
+msgctxt "Actions.UiRegionNext"
+msgid "Next Region"
+msgstr "Следующая область"
+
+#. Actions.UiRegionPrev
+msgctxt "Actions.UiRegionPrev"
+msgid "Previous Region"
+msgstr "Предыдущая область"
+
+#. Actions.UiRight
+msgctxt "Actions.UiRight"
+msgid "Move Right"
+msgstr "Вправо"
+
+#. Actions.UiSecondary
+msgctxt "Actions.UiSecondary"
+msgid "Secondary Action"
+msgstr "Вторичное действие"
+
+#. Actions.UiUp
+msgctxt "Actions.UiUp"
+msgid "Move Up"
+msgstr "Вверх"
+
 #. Combat.AbilityUsed
 msgctxt "Combat.AbilityUsed"
 msgid "{0} uses {1}"
@@ -1959,6 +2059,66 @@ msgstr "{0} из {1}"
 msgctxt "Common.NamePossessive"
 msgid "{0}'s"
 msgstr "{0}"
+
+#. Graph.DragCancelled
+msgctxt "Graph.DragCancelled"
+msgid "Cancelled drag"
+msgstr "Перетаскивание отменено"
+
+#. Graph.DragDropHint
+msgctxt "Graph.DragDropHint"
+msgid "{0} to drop {1}."
+msgstr "{0}, чтобы поместить {1}."
+
+#. Graph.DragDropRefused
+msgctxt "Graph.DragDropRefused"
+msgid "{0} cannot go there"
+msgstr "{0} нельзя поместить сюда"
+
+#. Graph.DragDropTarget
+msgctxt "Graph.DragDropTarget"
+msgid "drop target"
+msgstr "цель перетаскивания"
+
+#. Graph.DragDropped
+msgctxt "Graph.DragDropped"
+msgid "Dropped {0}"
+msgstr "{0} помещено"
+
+#. Graph.DragHint
+msgctxt "Graph.DragHint"
+msgid "{0} to drag {1}."
+msgstr "{0}, чтобы перетащить {1}."
+
+#. Graph.DragStarted
+msgctxt "Graph.DragStarted"
+msgid "Dragging {0}. {1} to drop, {2} to cancel."
+msgstr "Перетаскивание {0}. {1}, чтобы поместить, {2}, чтобы отменить."
+
+#. Graph.DragStartedPlain
+msgctxt "Graph.DragStartedPlain"
+msgid "Dragging {0}"
+msgstr "Перетаскивание {0}"
+
+#. Graph.FractionUnit
+msgctxt "Graph.FractionUnit"
+msgid "{0} of {1} {2}"
+msgstr "{0} из {1} {2}"
+
+#. Graph.FragmentSeparator
+msgctxt "Graph.FragmentSeparator"
+msgid " "
+msgstr " "
+
+#. Graph.ListSeparator
+msgctxt "Graph.ListSeparator"
+msgid ", "
+msgstr ", "
+
+#. Graph.Quantity
+msgctxt "Graph.Quantity"
+msgid "x {0}"
+msgstr "{0} шт."
 
 #. Spatial.Acting
 msgctxt "Spatial.Acting"

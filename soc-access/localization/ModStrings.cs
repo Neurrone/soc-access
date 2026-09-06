@@ -116,6 +116,22 @@ namespace SongsOfConquestAccess.Localization
             public static readonly ModString WielderTeleported = new ModString("Events.WielderTeleported", "{0} teleported to {1}");
         }
 
+        public static class Graph
+        {
+            public static readonly ModString DragCancelled = new ModString("Graph.DragCancelled", "Cancelled drag");
+            public static readonly ModString DragDropHint = new ModString("Graph.DragDropHint", "{0} to drop {1}.");
+            public static readonly ModString DragDropRefused = new ModString("Graph.DragDropRefused", "{0} cannot go there");
+            public static readonly ModString DragDropTarget = new ModString("Graph.DragDropTarget", "drop target");
+            public static readonly ModString DragDropped = new ModString("Graph.DragDropped", "Dropped {0}");
+            public static readonly ModString DragHint = new ModString("Graph.DragHint", "{0} to drag {1}.");
+            public static readonly ModString DragStarted = new ModString("Graph.DragStarted", "Dragging {0}. {1} to drop, {2} to cancel.");
+            public static readonly ModString DragStartedPlain = new ModString("Graph.DragStartedPlain", "Dragging {0}");
+            public static readonly ModString FractionUnit = new ModString("Graph.FractionUnit", "{0} of {1} {2}");
+            public static readonly ModString FragmentSeparator = new ModString("Graph.FragmentSeparator", " ");
+            public static readonly ModString ListSeparator = new ModString("Graph.ListSeparator", ", ");
+            public static readonly ModString Quantity = new ModString("Graph.Quantity", "x {0}");
+        }
+
         public static class Spatial
         {
             public static readonly ModString Acting = new ModString("Spatial.Acting", "acting");
@@ -275,6 +291,21 @@ namespace SongsOfConquestAccess.Localization
             public static readonly ModString SummarizeEnemyResources = new ModString("Actions.SummarizeEnemyResources", "Summarize Enemy Resources");
             public static readonly ModString SummarizeResources = new ModString("Actions.SummarizeResources", "Summarize Resources");
             public static readonly ModString TooltipActionsMenu = new ModString("Actions.TooltipActionsMenu", "Tooltip Actions Menu");
+            public static readonly ModString UiActivate = new ModString("Actions.UiActivate", "Activate");
+            public static readonly ModString UiBack = new ModString("Actions.UiBack", "Back");
+            public static readonly ModString UiCoarseDecrease = new ModString("Actions.UiCoarseDecrease", "Coarse Decrease");
+            public static readonly ModString UiCoarseIncrease = new ModString("Actions.UiCoarseIncrease", "Coarse Increase");
+            public static readonly ModString UiDown = new ModString("Actions.UiDown", "Move Down");
+            public static readonly ModString UiEnd = new ModString("Actions.UiEnd", "Last Item");
+            public static readonly ModString UiHome = new ModString("Actions.UiHome", "First Item");
+            public static readonly ModString UiLeft = new ModString("Actions.UiLeft", "Move Left");
+            public static readonly ModString UiNext = new ModString("Actions.UiNext", "Next Stop");
+            public static readonly ModString UiPrev = new ModString("Actions.UiPrev", "Previous Stop");
+            public static readonly ModString UiRegionNext = new ModString("Actions.UiRegionNext", "Next Region");
+            public static readonly ModString UiRegionPrev = new ModString("Actions.UiRegionPrev", "Previous Region");
+            public static readonly ModString UiRight = new ModString("Actions.UiRight", "Move Right");
+            public static readonly ModString UiSecondary = new ModString("Actions.UiSecondary", "Secondary Action");
+            public static readonly ModString UiUp = new ModString("Actions.UiUp", "Move Up");
         }
 
         public static class Bookmarks
@@ -418,6 +449,7 @@ namespace SongsOfConquestAccess.Localization
             public static readonly ModString InvalidDestination = new ModString("UI.InvalidDestination", "Invalid destination.");
             public static readonly ModString JoiningArmy = new ModString("UI.JoiningArmy", "joining army");
             public static readonly ModString LabelValue = new ModString("UI.LabelValue", "{0}: {1}");
+            public static readonly ModString NoDetails = new ModString("UI.NoDetails", "Nothing in here");
             public static readonly ModString NoScannerResults = new ModString("UI.NoScannerResults", "No scanner results");
             public static readonly ModString NotInMovementRange = new ModString("UI.NotInMovementRange", "Not in movement range");
             public static readonly ModString PressSpaceSelectItemToDrag = new ModString("UI.PressSpaceSelectItemToDrag", "Press space to select an item to drag.");
@@ -432,19 +464,24 @@ namespace SongsOfConquestAccess.Localization
             public static readonly ModString RoleDocument = new ModString("UI.RoleDocument", "document");
             public static readonly ModString RoleEdit = new ModString("UI.RoleEdit", "edit");
             public static readonly ModString RoleGrid = new ModString("UI.RoleGrid", "grid");
+            public static readonly ModString RoleGroup = new ModString("UI.RoleGroup", "group");
             public static readonly ModString RoleMenu = new ModString("UI.RoleMenu", "menu");
             public static readonly ModString RoleSlider = new ModString("UI.RoleSlider", "slider");
             public static readonly ModString ScannerPath = new ModString("UI.ScannerPath", "{0}, {1}. {2}");
+            public static readonly ModString SearchCleared = new ModString("UI.SearchCleared", "Search cleared");
+            public static readonly ModString SearchNoMatch = new ModString("UI.SearchNoMatch", "No match for {0}");
             public static readonly ModString Selected = new ModString("UI.Selected", "selected");
             public static readonly ModString SelectedCount = new ModString("UI.SelectedCount", "selected {0}x");
             public static readonly ModString Slot = new ModString("UI.Slot", "slot {0}");
             public static readonly ModString SlotInGroup = new ModString("UI.SlotInGroup", "{0} slot {1}");
             public static readonly ModString Status = new ModString("UI.Status", "status");
             public static readonly ModString StatusChecked = new ModString("UI.StatusChecked", "checked");
+            public static readonly ModString StatusCollapsed = new ModString("UI.StatusCollapsed", "collapsed");
             public static readonly ModString StatusCorrupt = new ModString("UI.StatusCorrupt", "corrupt");
             public static readonly ModString StatusDisabled = new ModString("UI.StatusDisabled", "disabled");
             public static readonly ModString StatusDraggable = new ModString("UI.StatusDraggable", "draggable");
             public static readonly ModString StatusDragging = new ModString("UI.StatusDragging", "dragging");
+            public static readonly ModString StatusExpanded = new ModString("UI.StatusExpanded", "expanded");
             public static readonly ModString StatusBattleLost = new ModString("UI.StatusBattleLost", "battle lost");
             public static readonly ModString StatusMissing = new ModString("UI.StatusMissing", "missing");
             public static readonly ModString StatusUnchecked = new ModString("UI.StatusUnchecked", "unchecked");
@@ -549,7 +586,6 @@ namespace SongsOfConquestAccess.Localization
             public static readonly ModString MultiEssenceSpells = new ModString("Screens.MultiEssenceSpells", "Multi-essence spells");
             public static readonly ModString NamedArmy = new ModString("Screens.NamedArmy", "{0} army");
             public static readonly ModString NamedLevel = new ModString("Screens.NamedLevel", "{0}, level {1}");
-            public static readonly ModString NamedMenu = new ModString("Screens.NamedMenu", "{0} menu");
             public static readonly ModString NamedTabs = new ModString("Screens.NamedTabs", "{0} {1}");
             public static readonly ModString Next = new ModString("Screens.Next", "Next");
             public static readonly ModString NoBuildSiteSelected = new ModString("Screens.NoBuildSiteSelected", "No build site selected");

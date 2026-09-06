@@ -455,7 +455,9 @@ internal static class Program
                     continue;
                 }
 
-                if (string.IsNullOrWhiteSpace(translation.Value))
+                // A source string that is itself only whitespace - the spoken fragment separator
+                // is a single space - is translated by a whitespace string in every language.
+                if (string.IsNullOrWhiteSpace(translation.Value) && !string.IsNullOrWhiteSpace(source.Text))
                 {
                     failures.Add(Path.GetFileName(poFile) + ": empty translation for " + source.Key);
                 }
