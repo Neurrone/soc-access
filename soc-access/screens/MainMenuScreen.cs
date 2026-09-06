@@ -120,12 +120,12 @@ namespace SongsOfConquestAccess.Screens
                     continue;
                 }
 
-                // The entry is still a button - activating it opens the foldout, as clicking does -
-                // and it also opens onto its entries, so it is declared as both. Opening and closing
-                // go through the foldout itself, which is what keeps a foldout the game closed on its
+                // A group and nothing else: the game wires no click to a foldout header (it opens on
+                // hover), so Enter does nothing here and Right is the way in. Opening and closing go
+                // through the foldout itself, which is what keeps a foldout the game closed on its
                 // own in step with the group.
                 MainMenuAdapter.NativeFoldoutAdapter it = foldout;
-                NodeVtable group = GraphNodes.Group(item.GetLabel, () => item.Activate(), item.IsEnabled);
+                NodeVtable group = GraphNodes.Group(item.GetLabel, null, item.IsEnabled);
                 group.OnExpand = () => it.Open();
                 group.OnCollapse = () => it.Close();
                 builder.BeginGroup(new DrawnNode(ControlId.For(item.Button, key), group, item.Button), expanded: foldout.IsOpen());
