@@ -123,6 +123,11 @@ namespace SongsOfConquestAccess.Screens
             get { return _editor.Pending; }
         }
 
+        public override bool OwnsGameField
+        {
+            get { return _editor.Pending || _editor.Editing; }
+        }
+
         /// <summary>Off while the code panel is up: the letters and digits typed there are the code,
         /// read by the game's own per-frame key scan, and a search must not eat them.</summary>
         public override bool AllowsTypeahead

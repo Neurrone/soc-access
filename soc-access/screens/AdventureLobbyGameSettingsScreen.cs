@@ -92,6 +92,11 @@ namespace SongsOfConquestAccess.Screens
             get { return _editor.Pending; }
         }
 
+        public override bool OwnsGameField
+        {
+            get { return _editor.Pending || _editor.Editing; }
+        }
+
         /// <summary>Kept for the detector, which calls it whenever the window's content changes. The
         /// graph is declared afresh on every operation, so there is nothing to rebuild.</summary>
         public void Refresh()

@@ -322,6 +322,11 @@ namespace SongsOfConquestAccess.Screens
             get { return _editor.Pending; }
         }
 
+        public override bool OwnsGameField
+        {
+            get { return _editor.Pending || _editor.Editing; }
+        }
+
         public override void Update()
         {
             base.Update();

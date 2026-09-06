@@ -1377,3 +1377,9 @@ Manual test:
    battle general lines, the spells table with its two summary lines, and the enemy troops table.
 9. Watch the picture on the battle page: the row under the cursor should scroll itself into view.
 10. Escape leaves for the main menu, the same as pressing Main Menu.
+- The arrival release runs over a window of thirty frames after the screen takes focus, not
+  once: the host-game popup selects its name box a frame after the mod's screen arrived, and
+  the single release found nothing. Screens that own a `GameTextEditor` answer
+  `OwnsGameField` while it is pending or editing, which the window leaves alone. Verified on
+  the host popup: keys answered on arrival ("Please enter the name of the game...", then the
+  field, then Invite Only).

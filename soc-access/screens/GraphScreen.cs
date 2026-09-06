@@ -71,6 +71,14 @@ namespace SongsOfConquestAccess.Screens
             get { return false; }
         }
 
+        /// <summary>Whether this screen's own editor holds or is about to hold a game text field, so
+        /// the arrival release leaves it alone. Screens that own a <see cref="GameTextEditor"/>
+        /// answer with its pending-or-editing state.</summary>
+        public virtual bool OwnsGameField
+        {
+            get { return false; }
+        }
+
         /// <summary>Whether typing searches this screen. False for a screen whose whole point is a
         /// box the player types into.</summary>
         public virtual bool AllowsTypeahead
@@ -98,6 +106,10 @@ namespace SongsOfConquestAccess.Screens
         {
         }
 
+        // How many frames after taking focus a field the game focused on its own is still released.
+        private const int ReleaseWindowFrames = 30;
+        private int _releaseFrames;
+
         public GraphNavigator Navigator
         {
             get { return SocAccessMod.Instance == null ? null : SocAccessMod.Instance.Navigator; }
@@ -112,12 +124,10 @@ namespace SongsOfConquestAccess.Screens
             }
 
             navigator.Attach(this);
-            // A field the game focused on its own as the page opened would keep every key from the mod.
-            if (!CapturesRawInput)
-            {
-                GameTextFocus.Release();
-            }
-
+            // A field the game focuses on its own as the page opens would keep every key from the mod;
+            // it is released over the next few frames (Update), because the game selects it a frame
+            // or more after this screen took focus (the host popup's name box).
+            _releaseFrames = ReleaseWindowFrames;
             string name = ScreenName;
             if (!string.IsNullOrEmpty(name))
             {
@@ -147,6 +157,15 @@ namespace SongsOfConquestAccess.Screens
         public override void Update()
         {
             GraphNavigator navigator = Navigator;
+            if (_releaseFrames > 0)
+            {
+                _releaseFrames--;
+                if (!OwnsGameField)
+                {
+                    GameTextFocus.Release();
+                }
+            }
+
             if (navigator != null && ReferenceEquals(navigator.Screen, this))
             {
                 navigator.Update();
