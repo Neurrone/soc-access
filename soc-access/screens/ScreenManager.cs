@@ -95,6 +95,30 @@ namespace SongsOfConquestAccess.Screens
             }
 
             Screen removed = _stack[_stack.Count - 1];
+
+            // THE SAME PAGE, REBUILT. A detector that answers a change on the page by handing us a new
+            // instance of the same screen is not moving the player anywhere: the graph screen that goes
+            // adopts the cursor of the one it replaces, so the incoming instance neither re-seats the
+            // cursor, nor re-reads the control it is standing on, nor says the page's name a second
+            // time (the campaign mission page, which refreshes on every mission and difficulty change).
+            // Done BEFORE the outgoing screen is unfocused, so its OnUnfocus and OnPop - which detach
+            // and forget the cursor - see a navigator already pointed at the replacement.
+            GraphScreen outgoing = removed as GraphScreen;
+            GraphScreen incoming = replacement as GraphScreen;
+            if (outgoing != null && incoming != null && outgoing.GetType() == incoming.GetType())
+            {
+                GraphNavigator navigator = SocAccessMod.Instance != null ? SocAccessMod.Instance.Navigator : null;
+                if (navigator != null)
+                {
+                    navigator.Adopt(outgoing, incoming);
+                }
+
+                // The name is only silenced when it is the SAME name: a page whose title has changed
+                // under the refresh (the community maps modal walking from Authentication to Terms of
+                // use) has news, and saying it is the arrival the player did make.
+                incoming.ArrivedByRefresh = outgoing.ScreenName == incoming.ScreenName;
+            }
+
             removed.OnUnfocus();
             removed.OnPop();
             UIManager.Reset();

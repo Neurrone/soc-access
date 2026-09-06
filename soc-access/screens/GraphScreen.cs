@@ -111,6 +111,12 @@ namespace SongsOfConquestAccess.Screens
             get { return SocAccessMod.Instance == null ? null : SocAccessMod.Instance.Navigator; }
         }
 
+        /// <summary>This instance replaced an identical one that was already on screen, so the player
+        /// has not arrived anywhere: the screen does not say its own name again. Set by
+        /// <see cref="ScreenManager.RefreshTop{TScreen}"/> before <see cref="OnFocus"/>, and spent
+        /// there.</summary>
+        public bool ArrivedByRefresh { get; set; }
+
         public override void OnFocus()
         {
             GraphNavigator navigator = Navigator;
@@ -120,8 +126,10 @@ namespace SongsOfConquestAccess.Screens
             }
 
             navigator.Attach(this);
+            bool refreshed = ArrivedByRefresh;
+            ArrivedByRefresh = false;
             string name = ScreenName;
-            if (!string.IsNullOrEmpty(name))
+            if (!refreshed && !string.IsNullOrEmpty(name))
             {
                 // Queued, so the first control's readout follows it rather than cutting it off.
                 SpeechPipeline.Output(new SpeechRequest(name, interrupt: false));

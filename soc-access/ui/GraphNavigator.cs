@@ -176,6 +176,54 @@ namespace SongsOfConquestAccess.UI
             _graph = new KeyGraph(() => BuildRender(built, state), state);
         }
 
+        /// <summary>
+        /// Hand one screen instance's cursor to another - THE SAME PAGE, rebuilt by the detector as a
+        /// new object (<see cref="ScreenManager.RefreshTop{TScreen}"/>). The state entry moves, the
+        /// graph is re-pointed at the incoming screen over that same state, a landing still in flight
+        /// is re-owned, and the "last spoken" memory is LEFT ALONE.
+        ///
+        /// That memory is the whole point: <see cref="Attach"/> starts the differ fresh so an arrival
+        /// reads in full, which is right for a page the player has just walked onto and wrong for a
+        /// page that never went away. Without this the cursor was re-seated and the control it had
+        /// never left read again, under a second announcement of the screen's own name.
+        /// </summary>
+        public void Adopt(GraphScreen from, GraphScreen to)
+        {
+            if (from == null || to == null || ReferenceEquals(from, to))
+            {
+                return;
+            }
+
+            GraphState state;
+            if (!_states.TryGetValue(from, out state))
+            {
+                state = new GraphState();
+            }
+
+            _states.Remove(from);
+            _states[to] = state;
+
+            if (_pendingFocus != null && ReferenceEquals(_pendingFocus.Owner, from))
+            {
+                _pendingFocus = new FocusRequest(
+                    _pendingFocus.Id,
+                    _pendingFocus.Announce,
+                    to,
+                    _pendingFocus.FramesLeft);
+            }
+
+            if (!ReferenceEquals(_screen, from))
+            {
+                return;
+            }
+
+            _screen = to;
+            _state = state;
+            GraphScreen built = to;
+            GraphState adopted = state;
+            _graph = new KeyGraph(() => BuildRender(built, adopted), adopted);
+        }
+
         /// <summary>Forget a closed screen's cursor, so re-opening it starts at the top - and with it
         /// any landing that screen was still waiting to make.</summary>
         public void ScreenClosed(GraphScreen screen)

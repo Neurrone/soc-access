@@ -202,11 +202,10 @@ namespace SongsOfConquestAccess.Screens
 
         // ---- the panel describing the chosen mission ----
 
-        /// <summary>The panel as one line: the mission's counter and title as the label, then what the
-        /// panel says about the mission after it - both watched live, because the panel is redrawn
-        /// whenever another mission is chosen on the map and the node must follow it rather than keep
-        /// reading the mission the cursor arrived on. The same lines stay a section, so the review
-        /// buffer holds the panel a drawn line at a time.</summary>
+        /// <summary>The panel as one line: the mission's counter and title as the label, watched live
+        /// because the mission changes from the map, with what the panel says about it as a COMPOSED
+        /// section - which is announced as well as reviewed, so the node reads the whole panel on
+        /// arrival and the review buffer holds it a drawn line at a time.</summary>
         private void BuildDetails(GraphBuilder builder)
         {
             CampaignMapSelectedInformationAdapter information = _adapter.Information;
@@ -221,7 +220,6 @@ namespace SongsOfConquestAccess.Screens
                 Announcements = new List<NodeAnnouncement>
                 {
                     new NodeAnnouncement(DetailsTitle, live: true, kind: AnnouncementKinds.Label),
-                    new NodeAnnouncement(DetailsBody, live: true, kind: AnnouncementKinds.Value),
                 },
                 Sections = new List<NodeSection> { NodeSection.Composed(DetailsLines) },
             };
@@ -239,16 +237,6 @@ namespace SongsOfConquestAccess.Screens
             }
 
             return JoinSentences(information.GetMissionCounter(), information.GetTitle());
-        }
-
-        /// <summary>What the panel draws under the title, newline-joined so it is read as the drawn
-        /// lines rather than as one breath.</summary>
-        private string DetailsBody()
-        {
-            IList<string> lines = DetailsLines();
-            string[] parts = new string[lines.Count];
-            lines.CopyTo(parts, 0);
-            return string.Join("\n", parts);
         }
 
         private IList<string> DetailsLines()
