@@ -566,3 +566,59 @@ Manual test:
    highlighted and scrolled into view.
 4. Escape: the list closes, the setting is unchanged, and the cursor is back on the row.
 5. Enter on an entry: the list closes and the row reads the value you picked.
+
+### AdventureLobbyIconDropdownScreen
+
+Built: one stop of Choice nodes in the order the game spawned the entries, walked Up and Down
+although the popup draws them as a horizontal strip (owner ruling: a list of values is read
+down whatever the page does with it), then the mod's own Cancel row last. The entry the
+dropdown was opened ON says "selected" and is where the list lands. Screen name is what the
+dropdown is choosing, in the game's words ("Colour", "AI Difficulty"). Enter is the game's own
+click on the entry, through the same detector notifications the widget screen sent.
+
+Which entry is the current value is a new adapter fact, read where the game records it: every
+`IconDropdown.SetupAs*` keeps the entry whose value matches the current one and hands it to
+`Show`, which parks it on `_selectionLayer.DefaultSelectable` (decompiled). `OptionItem`
+answers `IsCurrentValue` by comparing that against its own button's selectable.
+
+Escape: claimed. `IconDropdown.Show` registers `InputActions.UI.Cancel` on `Hide`, and
+`UI.Cancel` is this game's GAMEPAD binding throughout - every keyboard branch registers
+`UI.ExitMenu` instead, the finding `PlatformUserMenuScreen` established - so Escape does
+nothing here and the screen takes it, running the same `Hide` the Cancel row runs. Verified:
+`ui_back` answered `consumed` and the popup closed with the value unchanged, and `ui_back` on
+the lobby underneath answered `unclaimed`.
+
+Diff, on all five variants: exactly two kinds of change, plus lobby state.
+
+1. The current value gained "selected" (colour, faction, starting wielder, partnership, AI
+   difficulty - one line each).
+2. "disabled" became "unavailable" on the colours the game is refusing.
+
+The rest is the lobby, not the port: this session's slot is Yulan in dark red where the
+before-capture was Arleon in another colour, so a different colour is refused and the starting
+wielders are Yulan's.
+
+Deviations, measured: the Cancel row is the mod's own control and keeps a marker subject of its
+own, the popup drawing no way out; the entries are `DrawnNode`s on the spawned
+`IconDropdownEntry`, which is what the game destroys when the list closes.
+
+Follow-ups, not fixed: the tooltip-cleaning gap the options port found shows badly here. A
+faction's description and a wielder's dossier are the entry's tooltip, and they reach the
+buffer raw, so the italics, colour and highlight tags the game writes ("<i>", "<color=...>",
+"<hl>") are now in the text, and the newlines inside a dossier are not split into lines - which
+is why a wielder's flat line runs on and the dump shows a stray " | " continuation. The widget
+engine cleaned both with `SpeechTextSanitizer.Normalize`; the graph engine's `NodeSection`
+does not, and this repo does not allow that cleaner. This is the highest-value thing to fix
+before the rest of family D and E are batched.
+
+Manual test:
+
+1. Conquest, a Conquest map, Confirm; in the lobby, the colour button. Hear "Colour", then the
+   colour you are on, "selected" (and "unavailable", because the game refuses the colour you
+   already hold).
+2. Up and Down walk the nine colours; End reaches Cancel.
+3. Escape closes the popup and leaves the colour alone; so does Enter on Cancel.
+4. The faction, starting wielder and partnership buttons behave the same; select the AI slot
+   and its AI difficulty button does too.
+5. Enter on a colour: the popup closes and the lobby row reads the colour you picked.
+6. Listen to a faction or wielder entry: note the markup now being read out (follow-up above).

@@ -11,6 +11,7 @@ using SongsOfConquestAccess.Localization;
 using SongsOfConquestAccess.Speech;
 using SongsOfConquestAccess.UI;
 using UnityEngine;
+using UnityEngine.UI;
 
 namespace SongsOfConquestAccess.Adapters
 {
@@ -29,6 +30,7 @@ namespace SongsOfConquestAccess.Adapters
         private static readonly FieldInfo EntryWielderLookupField = AccessTools.Field(typeof(IconDropdownEntry), "_wielderLookup");
         private static readonly FieldInfo EntryLocalizationField = AccessTools.Field(typeof(IconDropdownEntry), "_localization");
         private static readonly FieldInfo DropdownLocalizationField = AccessTools.Field(typeof(IconDropdown), "_localizationHandler");
+        private static readonly FieldInfo SelectionLayerField = AccessTools.Field(typeof(IconDropdown), "_selectionLayer");
 
         private readonly IconDropdown _dropdown;
 
@@ -193,6 +195,19 @@ namespace SongsOfConquestAccess.Adapters
                 : null;
         }
 
+        /// <summary>The entry the popup opened ON - the value this dropdown is currently set to.
+        /// Every <c>IconDropdown.SetupAs*</c> keeps the entry whose value matches the current one and
+        /// hands it to <c>Show</c>, which parks it on the selection layer's default selectable
+        /// (decompiled: <c>_selectionLayer.DefaultSelectable = selection</c>), so that is where the
+        /// game records which entry is the answer.</summary>
+        private Selectable GetCurrentSelectable()
+        {
+            UISelectionLayer layer = _dropdown != null && SelectionLayerField != null
+                ? SelectionLayerField.GetValue(_dropdown) as UISelectionLayer
+                : null;
+            return layer != null ? layer.DefaultSelectable : null;
+        }
+
         private static bool IsVisible(Component component)
         {
             return component != null && component.gameObject != null && component.gameObject.activeInHierarchy;
@@ -257,6 +272,17 @@ namespace SongsOfConquestAccess.Adapters
             public bool IsEnabled
             {
                 get { return _entry != null && _entry.Button != null && _entry.Button.Interactable; }
+            }
+
+            /// <summary>Whether this entry is the value the dropdown was opened on.</summary>
+            public bool IsCurrentValue
+            {
+                get
+                {
+                    Selectable current = _adapter != null ? _adapter.GetCurrentSelectable() : null;
+                    Selectable mine = _entry != null && _entry.Button != null ? _entry.Button.GetSelectable() : null;
+                    return current != null && mine != null && ReferenceEquals(current, mine);
+                }
             }
 
             public Tooltip Tooltip

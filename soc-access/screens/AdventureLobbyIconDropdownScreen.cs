@@ -2,16 +2,37 @@ using System.Collections.Generic;
 using SongsOfConquest.Client.Adventure.Menu.Lobby;
 using SongsOfConquestAccess.Adapters;
 using SongsOfConquestAccess.UI;
+using SongsOfConquestAccess.UI.Graph;
 using UnityEngine;
 
 namespace SongsOfConquestAccess.Screens
 {
-    public sealed class AdventureLobbyIconDropdownScreen : Screen
+    /// <summary>
+    /// The lobby's icon dropdown - the faction, colour, starting wielder, partnership or AI
+    /// difficulty a player row opens - made navigable as a graph, in family E's drop list shape.
+    ///
+    /// The game draws its entries as a horizontal strip, and the list is walked Up and Down anyway
+    /// (owner ruling 2026-09-06): a list of values is read down whatever the page does with it. The
+    /// entry the dropdown was opened ON says "selected" and is where the list lands, read off the
+    /// selection layer the game parks that entry on. Enter is the game's own click on the entry.
+    ///
+    /// The Cancel row at the end is the mod's, as it was in the widget tree: the popup draws no way
+    /// out, and the game's own <c>UI.Cancel</c> registration is the GAMEPAD binding (<c>IconDropdown.Show</c>
+    /// registers <c>InputActions.UI.Cancel</c> on <c>Hide</c>, and every keyboard branch in this game
+    /// registers <c>UI.ExitMenu</c> instead - the finding <see cref="PlatformUserMenuScreen"/>
+    /// established). So Escape does nothing here and the screen claims it, running the same
+    /// <c>Hide</c> the Cancel row runs.
+    /// </summary>
+    public sealed class AdventureLobbyIconDropdownScreen : GraphScreen
     {
+        private const string OptionsStop = "icon-dropdown";
+
         private readonly AdventureLobbyIconDropdownAdapter _adapter;
 
+        // The Cancel row is the mod's own control, so it needs a subject the game does not provide.
+        private readonly object _cancelKey = new object();
+
         public AdventureLobbyIconDropdownScreen(AdventureLobbyIconDropdownAdapter adapter)
-            : base(BuildRoot(adapter))
         {
             _adapter = adapter;
         }
@@ -27,82 +48,118 @@ namespace SongsOfConquestAccess.Screens
             return _adapter != null && ReferenceEquals(_adapter.SourceKey, dropdown);
         }
 
+        public override string Key
+        {
+            get { return "adventure-lobby-icon-dropdown"; }
+        }
+
+        /// <summary>What the dropdown is choosing, in the game's own words ("Colour", "Faction").
+        /// </summary>
+        public override string ScreenName
+        {
+            get
+            {
+                string title = _adapter != null ? _adapter.Title : null;
+                return string.IsNullOrWhiteSpace(title) ? null : title;
+            }
+        }
+
         public override bool IsPresent()
         {
             return _adapter != null && _adapter.IsPresent();
         }
 
+        public override bool ConsumesBack
+        {
+            get { return IsPresent(); }
+        }
+
+        public override bool Back()
+        {
+            return Cancel();
+        }
+
         public override void OnUnfocus()
         {
-            _adapter?.HideNativeTooltip();
-            RootWidget?.Unfocus();
+            base.OnUnfocus();
+            if (_adapter != null)
+            {
+                _adapter.HideNativeTooltip();
+            }
         }
 
         public override void OnPop()
         {
-            _adapter?.HideNativeTooltip();
+            base.OnPop();
+            if (_adapter != null)
+            {
+                _adapter.HideNativeTooltip();
+            }
         }
 
-        private static ContainerWidget BuildRoot(AdventureLobbyIconDropdownAdapter adapter)
+        public override void Build(GraphBuilder builder)
         {
-            ContainerWidget root = new ContainerWidget("adventure-lobby-icon-dropdown", adapter != null ? adapter.Title : string.Empty);
-            if (adapter == null)
+            if (!IsPresent())
             {
-                return root;
+                return;
             }
 
-            MenuWidget options = new MenuWidget("icon-dropdown-options", adapter.Title);
-            IReadOnlyList<AdventureLobbyIconDropdownAdapter.OptionItem> items = adapter.GetOptions();
+            IReadOnlyList<AdventureLobbyIconDropdownAdapter.OptionItem> items = _adapter.GetOptions();
+            builder.BeginStop(OptionsStop);
             for (int i = 0; i < items.Count; i++)
             {
                 AdventureLobbyIconDropdownAdapter.OptionItem item = items[i];
-                if (item == null)
+                if (item == null || !item.IsVisible || item.Entry == null)
                 {
                     continue;
                 }
 
-                options.AddItem(new MenuItemWidget(
-                    item.Id,
-                    () => item.Label,
+                AdventureLobbyIconDropdownAdapter.OptionItem it = item;
+                NodeVtable vtable = GraphNodes.Choice(
+                    () => it.Label,
+                    () => it.IsCurrentValue,
+                    () => Activate(it),
+                    () => it.IsEnabled,
                     null,
-                    () => ActivateOption(adapter, item),
-                    item.FocusNative,
-                    () => item.IsVisible,
-                    () => item.Tooltip,
-                    onUnfocus: null,
-                    isEnabled: () => item.IsEnabled));
+                    it.Tooltip);
+                vtable.OnFocusVisual = it.FocusNative;
+                builder.AddItem(new DrawnNode(
+                    ControlId.For(it.Entry, "icon-dropdown:" + i),
+                    vtable,
+                    it.Entry));
             }
 
-            root.AddChild(options);
-            root.AddChild(new ButtonWidget(
-                "icon-dropdown-cancel",
-                () => adapter.CancelLabel,
-                adapter.Cancel,
-                adapter.HideNativeTooltip,
-                () => true,
-                adapter.IsPresent));
-            return root;
+            builder.AddItem(new SyntheticNode(
+                ControlId.For(_cancelKey, "icon-dropdown:cancel"),
+                CancelRow()));
         }
 
-        private static bool ActivateOption(AdventureLobbyIconDropdownAdapter adapter, AdventureLobbyIconDropdownAdapter.OptionItem item)
+        private NodeVtable CancelRow()
         {
-            if (item == null)
+            NodeVtable vtable = GraphNodes.Button(() => _adapter.CancelLabel, () => Cancel());
+            vtable.OnFocusVisual = _adapter.HideNativeTooltip;
+            return vtable;
+        }
+
+        private bool Cancel()
+        {
+            return _adapter != null && _adapter.Cancel();
+        }
+
+        private void Activate(AdventureLobbyIconDropdownAdapter.OptionItem item)
+        {
+            SocAccessMod mod = SocAccessMod.Instance;
+            ScreenDetector detector = mod != null ? mod.ScreenDetector : null;
+            IconDropdown dropdown = _adapter != null ? _adapter.SourceKey as IconDropdown : null;
+            if (detector != null)
             {
-                return false;
+                detector.OnAdventureLobbyIconDropdownOptionActivating(dropdown, item.TypeName);
             }
 
-            SocAccessMod.Instance?.ScreenDetector?.OnAdventureLobbyIconDropdownOptionActivating(
-                adapter != null ? adapter.SourceKey as IconDropdown : null,
-                item.TypeName);
-
-            bool activated = item.Activate();
-            if (!activated)
+            if (!item.Activate() && detector != null)
             {
-                SocAccessMod.Instance?.ScreenDetector?.OnAdventureLobbyIconDropdownOptionActivationFailed(
-                    adapter != null ? adapter.SourceKey as IconDropdown : null);
+                detector.OnAdventureLobbyIconDropdownOptionActivationFailed(dropdown);
             }
-
-            return activated;
         }
 
         public static AdventureLobbyIconDropdownAdapter FindActiveDropdown(IconDropdown targetDropdown)
