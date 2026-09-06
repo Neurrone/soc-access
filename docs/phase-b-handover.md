@@ -694,6 +694,51 @@ Manual test:
 7. Tab: "Cancel, button, 1 of 2", "Confirm, button, 2 of 2".
 8. Escape closes the window without applying (the game's own key).
 
+### AdventureLobbyPlayerSettingsScreen
+
+Built: two stops. `player-settings-rows` holds the three multiplier sliders, the Start with
+Marketplace checkbox and the "Reset to default" button in drawn order;
+`player-settings-buttons` holds Cancel then Confirm. Screen name is the popup's drawn title
+("Player settings"); focus starts on the rows.
+
+Measured 2026-09-06 at 1280x800 through `/gui/unity` and a screenshot crop: the popup at
+[333,226,613,348], the title at y 252, one column of rows at x 450 - Income multiplier (y 298),
+Troop production multiplier (y 337), Start with Marketplace (y 382), XP bonus multiplier
+(y 421), "Reset to default" (y 453) - and Cancel (x 508) with Confirm (x 646) at y 514. No
+caption is drawn, so the screen declares no regions.
+
+Every slider draws a value box over its number (an `EditButton` at x 792, measured on all
+three), so every slider row carries the same always-open child the options window's sliders do:
+a button whose label is the game's own "Please provide a number" and whose activation runs the
+delegate the slider installed on the box. Verified: Enter on the child opened the game's number
+popup as `MessageDialogScreen`, and Escape there came back to the child with the value unchanged.
+One coarse step is ten fine steps, as on the options window (measured: Right said "1.1", Left
+"1", Shift+Right "2", Shift+Left "1").
+
+Escape is the game's (`ConsumesBack` false): `LobbyPlayerSettingsMenu.Show` registers
+`InputActions.UI.ExitMenu` outside its gamepad branch (decompiled, line 146). Verified:
+`ui_back` answered `unclaimed` on the popup, and `consumed` on the number popup over it.
+
+Diff: exactly two kinds.
+
+1. Each slider gained a "Please provide a number" child row (the options window's shape).
+2. "unchecked" became "not checked".
+
+Deviations, measured: none beyond the representative's. The adapter's slider gained the two
+value-box facts the options adapter already had, and both now read them from one place
+(`adapters/SliderValueEditor.cs`).
+
+Manual test:
+
+1. A lobby, a player row's Player settings. Hear "Player settings", then "Income multiplier,
+   slider, 1, 1 of 5".
+2. Right and Left move the multiplier by 0.1; Shift+Right and Shift+Left by 1.
+3. Down: "Please provide a number, button, 1 of 1". Enter opens the game's number popup; Escape
+   there comes back to the row with the slider unchanged.
+4. Down through the rest: the Marketplace checkbox and "Reset to default".
+5. Tab: "Cancel, button, 1 of 2", "Confirm, button, 2 of 2".
+6. Escape closes the popup without applying (the game's own key).
+
 
 ## Family E: drop lists
 

@@ -181,7 +181,9 @@ namespace SongsOfConquestAccess.Adapters
                         () => NativeSelectionUtility.Select(slider.GetSelectable()),
                         () => slider.Active && slider.Interactable,
                         () => IsActive(component),
-                        () => Tooltip.ForComponent(GetSliderTooltipComponent(slider) ?? component, _localization))));
+                        () => Tooltip.ForComponent(GetSliderTooltipComponent(slider) ?? component, _localization),
+                        () => SliderValueEditor.Label(slider),
+                        () => SliderValueEditor.Open(slider))));
             }
         }
 
@@ -472,8 +474,10 @@ namespace SongsOfConquestAccess.Adapters
 
         public sealed class SliderItem
         {
-            public SliderItem(string id, Func<string> getLabel, Func<string> getValueText, Func<float> getValue, Func<float> getMinimumValue, Func<float> getMaximumValue, Func<float> getStep, Func<float, bool> setValue, Action focus, Func<bool> isEnabled, Func<bool> isVisible, Func<Tooltip> getTooltip)
+            public SliderItem(string id, Func<string> getLabel, Func<string> getValueText, Func<float> getValue, Func<float> getMinimumValue, Func<float> getMaximumValue, Func<float> getStep, Func<float, bool> setValue, Action focus, Func<bool> isEnabled, Func<bool> isVisible, Func<Tooltip> getTooltip, Func<string> getValueEditorLabel, Func<bool> openValueEditor)
             {
+                GetValueEditorLabel = getValueEditorLabel;
+                OpenValueEditor = openValueEditor;
                 Id = id;
                 GetLabel = getLabel;
                 GetValueText = getValueText;
@@ -500,6 +504,11 @@ namespace SongsOfConquestAccess.Adapters
             public Func<bool> IsEnabled { get; private set; }
             public Func<bool> IsVisible { get; private set; }
             public Func<Tooltip> GetTooltip { get; private set; }
+
+            /// <summary>What the game calls the popup the slider's own value box opens, empty where
+            /// the slider draws no such box; and the native open itself.</summary>
+            public Func<string> GetValueEditorLabel { get; private set; }
+            public Func<bool> OpenValueEditor { get; private set; }
         }
 
         public sealed class ButtonItem

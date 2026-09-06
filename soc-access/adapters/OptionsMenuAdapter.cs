@@ -22,7 +22,6 @@ namespace SongsOfConquestAccess.Adapters
         private static readonly FieldInfo CurrentContentField = AccessTools.Field(typeof(OptionsMenu), "_currentContent");
         private static readonly MethodInfo SliderGetTextMeshMethod = AccessTools.Method(typeof(UISlider), "GetTextMesh");
         private static readonly MethodInfo DropdownGetTextMethod = AccessTools.Method(typeof(UITextMeshDropdown), "GetText");
-        private static readonly FieldInfo SliderEditButtonField = AccessTools.Field(typeof(UISlider), "_editValueButton");
 
         private readonly OptionsMenu _menu;
 
@@ -269,8 +268,8 @@ namespace SongsOfConquestAccess.Adapters
                         () => slider.Active && slider.Interactable,
                         () => IsActive(component),
                         () => Tooltip.ForComponent(GetSliderTooltipComponent(slider) ?? component, null),
-                        () => GetSliderValueEditorLabel(slider),
-                        () => OpenSliderValueEditor(slider))));
+                        () => SliderValueEditor.Label(slider),
+                        () => SliderValueEditor.Open(slider))));
             }
         }
 
@@ -403,47 +402,6 @@ namespace SongsOfConquestAccess.Adapters
         private static bool IsActive(Component component)
         {
             return component != null && component.gameObject.activeInHierarchy;
-        }
-
-        private static UIButton GetSliderEditButton(IUISlider slider)
-        {
-            UISlider concrete = slider as UISlider;
-            return concrete != null && SliderEditButtonField != null
-                ? SliderEditButtonField.GetValue(concrete) as UIButton
-                : null;
-        }
-
-        /// <summary>What the game calls the popup its own value box opens ("Provide a number",
-        /// <c>UISlider.HandleTextClicked</c>), or empty where this slider draws no such box.</summary>
-        private static string GetSliderValueEditorLabel(IUISlider slider)
-        {
-            return GetSliderEditButton(slider) == null
-                ? string.Empty
-                : GameText.Get("Common/ProvideNumber", string.Empty);
-        }
-
-        /// <summary>
-        /// Open the game's own "Provide a number" popup for this slider.
-        ///
-        /// The native path is the delegate the slider itself installed:
-        /// <c>UISlider.OnEnable</c> adds <c>HandleTextClicked</c> to the value box's
-        /// <c>OnClickedInside</c>, which <c>UITransform.Update</c> raises from a real mouse press
-        /// landing inside the box - NOT from <c>OnPointerClick</c>, so a synthesized pointer click
-        /// reaches the button's empty <c>OnClicked</c> and nothing happens. Running the installed
-        /// delegate is that same handler minus the mouse; the handler's own guard on the slider being
-        /// interactable, and the popup it raises, are the game's.
-        /// </summary>
-        private static bool OpenSliderValueEditor(IUISlider slider)
-        {
-            UIButton button = GetSliderEditButton(slider);
-            Action<Vector2> clicked = button != null ? button.OnClickedInside : null;
-            if (clicked == null || !button.Active || !button.Interactable)
-            {
-                return false;
-            }
-
-            clicked(Vector2.zero);
-            return true;
         }
 
         private static IReadOnlyList<string> GetDropdownOptions(IUITextMeshDropdown dropdown)
