@@ -13,15 +13,32 @@ namespace SongsOfConquestAccess.Screens
     /// The random map layout page, made navigable as a graph. Two stops: the settings the page draws,
     /// and the buttons under and above them.
     ///
-    /// Measured 2026-09-06 at 1280x800: four cards side by side at x 187, 417, 648 and 878, each
-    /// drawing a player count ("2 Players"), a paragraph of description, three win-condition toggles
-    /// and a layout dropdown; Confirm at [562,662]; the lobby's Back at [21,20] and Options at
-    /// [1233,11] in the header band.
+    /// Measured 2026-09-06 at 1280x800 (<c>/gui/unity</c>): four cards side by side at x 187, 417,
+    /// 648 and 878, each drawing a player count ("2 Players"), a paragraph of description, three
+    /// win-condition toggles and a layout dropdown; Confirm at [562,662]; the lobby's Back at
+    /// [21,20] and Options at [1233,11] in the header band, where the page's title is drawn too
+    /// ("Select layout", set by <c>LobbyNavigation</c> from <c>Lobby/RandomMapPopup/Header</c>).
     ///
     /// A card is a RADIO BUTTON, not a button: exactly one of the four is in force at a time (the
     /// menu's own <c>SetSelectedEntry</c>), picking one is not yet doing anything, and Confirm is
-    /// what does. Only the card in force says "selected", which is also what makes focus entering
-    /// the page land on it.
+    /// what does.
+    ///
+    /// ARRIVING ON A CARD DOES NOT CHOOSE IT (owner ruling K, 2026-09-06). The card's selectable is
+    /// what the game watches: <c>LobbyRandomMapPreviewEntry.Awake</c> hangs a <c>UISelectionProxy</c>
+    /// on the card's button and that proxy's <c>OnSelect</c> runs the menu's <c>SetSelectedEntry</c>,
+    /// so the mod's old focus visual - a native selection on every arrival - silently changed the
+    /// choice as the player walked the row, and only the card the page opened on ever said
+    /// "selected". The cards therefore declare NO <c>OnFocusVisual</c>, and there is no hover
+    /// highlight to put in its place: <c>UIButton.OnPointerEnter</c> (decompiled, line 328) only
+    /// plays the hover sound and invokes <c>OnHoverEnter</c>, which nothing on the card subscribes
+    /// to. Enter chooses through the card's own selection path and the live "selected" part says
+    /// which card is in force, so Up and Down read the choice without changing it. All four cards
+    /// are on screen at 1280x800, so nothing is lost by the page's <c>AutoScrollToSelected</c> no
+    /// longer being nudged on arrival.
+    ///
+    /// The rows stop lands on the chosen card, and because the cards are the FIRST stop that landing
+    /// also needs <c>SetStart</c>: the first seating is the start node's, not
+    /// <see cref="InitialFocusStop"/>'s.
     ///
     /// The win-condition toggles and the layout dropdown are the SELECTED card's, as they were for
     /// the widget screen: the other three cards draw their own copies, but they are the settings of
@@ -29,7 +46,11 @@ namespace SongsOfConquestAccess.Screens
     /// draws them. The dropdown is a real <c>UITextMeshDropdown</c>, so it is a combo box opening
     /// <see cref="DropListScreen"/> over the game's own popup.
     ///
-    /// The page draws no captions over the rows, so it declares no regions.
+    /// Three REGIONS, one per band. The page draws no caption over any of them, so each is named
+    /// with the game's own word for what it holds where the game has one - <c>Common/Players</c>
+    /// ("Players") and <c>Campaign/MapSelect/InformationView/WinConditionsHeader</c> ("Win
+    /// Conditions"), both read out of the live localization table on 2026-09-06 - and with the mod's
+    /// existing <c>Screens.Layout</c> where it has none.
     ///
     /// Escape: the menu registers only <c>InputActions.UI.Confirm</c> (decompiled
     /// <c>LobbyRandomMapSelectionMenu.Show</c>, line 113) and neither <c>LobbyNavigation</c> nor
@@ -40,6 +61,9 @@ namespace SongsOfConquestAccess.Screens
     {
         private const string RowsStop = "random-layout-rows";
         private const string ButtonsStop = "random-layout-buttons";
+        private const string PlayersRegion = "random-layout-players";
+        private const string WinConditionsRegion = "random-layout-win-conditions";
+        private const string LayoutRegion = "random-layout-variant";
 
         private readonly AdventureLobbyRandomLayoutAdapter _adapter;
 
@@ -117,6 +141,9 @@ namespace SongsOfConquestAccess.Screens
         private void BuildLayouts(GraphBuilder builder)
         {
             IReadOnlyList<AdventureLobbyRandomLayoutAdapter.RandomLayoutItem> layouts = _adapter.GetLayouts();
+            ControlId landing = null;
+            builder.PushContext(GameText.Get("Common/Players", "Players"));
+            builder.SetRegion(PlayersRegion);
             for (int i = 0; i < layouts.Count; i++)
             {
                 AdventureLobbyRandomLayoutAdapter.RandomLayoutItem layout = layouts[i];
@@ -133,11 +160,24 @@ namespace SongsOfConquestAccess.Screens
                     () => layout.IsSelected,
                     () => layout.Activate());
                 vtable.Announcements.Add(GraphNodes.ValuePart(() => layout.Description, watch: false));
-                vtable.OnFocusVisual = layout.FocusNative;
-                builder.AddItem(new DrawnNode(
-                    ControlId.For(subject, "random-layout:card/" + layout.Id),
-                    vtable,
-                    subject));
+                ControlId id = ControlId.For(subject, "random-layout:card/" + layout.Id);
+                builder.AddItem(new DrawnNode(id, vtable, subject));
+                if (layout.IsSelected)
+                {
+                    landing = id;
+                }
+            }
+
+            builder.SetRegion(null);
+            builder.PopContext();
+
+            // The card in force, so Tab into the page - and the very first seating, which is the
+            // start node's business rather than the stop's because the cards are the first stop -
+            // both land on the choice the player would otherwise have to walk the row to find.
+            builder.LandStopOn(landing);
+            if (landing != null)
+            {
+                builder.SetStart(landing);
             }
         }
 
@@ -149,8 +189,15 @@ namespace SongsOfConquestAccess.Screens
                 return;
             }
 
+            BuildWinConditions(builder, selected);
+            BuildLayoutDropdown(builder, selected);
+        }
+
+        private void BuildWinConditions(GraphBuilder builder, AdventureLobbyRandomLayoutAdapter.RandomLayoutItem selected)
+        {
             IReadOnlyList<AdventureLobbyRandomLayoutAdapter.WinConditionToggleItem> toggles =
                 selected.GetWinConditionToggles();
+            bool opened = false;
             for (int i = 0; i < toggles.Count; i++)
             {
                 AdventureLobbyRandomLayoutAdapter.WinConditionToggleItem toggle = toggles[i];
@@ -158,6 +205,15 @@ namespace SongsOfConquestAccess.Screens
                 if (subject == null || !toggle.IsVisible)
                 {
                     continue;
+                }
+
+                if (!opened)
+                {
+                    builder.PushContext(GameText.Get(
+                        "Campaign/MapSelect/InformationView/WinConditionsHeader",
+                        "Win Conditions"));
+                    builder.SetRegion(WinConditionsRegion);
+                    opened = true;
                 }
 
                 NodeVtable vtable = GraphNodes.Checkbox(
@@ -173,6 +229,15 @@ namespace SongsOfConquestAccess.Screens
                     subject));
             }
 
+            if (opened)
+            {
+                builder.SetRegion(null);
+                builder.PopContext();
+            }
+        }
+
+        private void BuildLayoutDropdown(GraphBuilder builder, AdventureLobbyRandomLayoutAdapter.RandomLayoutItem selected)
+        {
             AdventureLobbyRandomLayoutAdapter.LayoutDropdownItem dropdown = selected.GetLayoutDropdown();
             Component dropdownSubject = dropdown != null ? dropdown.Subject : null;
             if (dropdownSubject == null || !dropdown.IsVisible())
@@ -190,10 +255,14 @@ namespace SongsOfConquestAccess.Screens
                 dropdown.IsEnabled,
                 dropdown.GetTooltip());
             combo.OnFocusVisual = dropdown.Focus;
+            builder.PushContext(label());
+            builder.SetRegion(LayoutRegion);
             builder.AddItem(new DrawnNode(
                 ControlId.For(dropdownSubject, "random-layout:" + dropdown.Id),
                 combo,
                 dropdownSubject));
+            builder.SetRegion(null);
+            builder.PopContext();
         }
 
         private static string CurrentOption(AdventureLobbyRandomLayoutAdapter.LayoutDropdownItem dropdown)

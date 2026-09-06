@@ -97,9 +97,13 @@ namespace SongsOfConquestAccess.Adapters
                 && GetEntries().Count > 0;
         }
 
+        /// <summary>The page's drawn title. <c>LobbyNavigation.ShowSubmenu</c> (decompiled, line 350)
+        /// sets it from <c>Lobby/RandomMapPopup/Header</c> ("Select layout") on the SHARED main-menu
+        /// header, not on the menu's own canvas, which is why searching the menu's children for it
+        /// answered nothing.</summary>
         public string Title
         {
-            get { return GetVisibleTitleText(); }
+            get { return GameText.Get(_localization, "Lobby/RandomMapPopup/Header", string.Empty); }
         }
 
         public RandomLayoutItem SelectedLayout
@@ -190,62 +194,6 @@ namespace SongsOfConquestAccess.Adapters
             MainMenuManagerContainer container = _navigation != null ? NavigationManagerContainerRef(_navigation) : null;
             MainMenuManager manager = container != null ? container.CurrentManager as MainMenuManager : null;
             return manager != null ? MainMenuSettingsRef(manager) : null;
-        }
-
-        private string GetVisibleTitleText()
-        {
-            if (_menu == null)
-            {
-                return string.Empty;
-            }
-
-            UITextMesh[] textMeshes = ((Component)_menu).GetComponentsInChildren<UITextMesh>(includeInactive: false);
-            for (int i = 0; i < textMeshes.Length; i++)
-            {
-                UITextMesh textMesh = textMeshes[i];
-                if (textMesh == null || IsInsideRandomLayoutEntry(textMesh.transform) || IsInsideButton(textMesh.transform))
-                {
-                    continue;
-                }
-
-                string text = GetText(textMesh);
-                if (!string.IsNullOrWhiteSpace(text))
-                {
-                    return text;
-                }
-            }
-
-            return string.Empty;
-        }
-
-        private static bool IsInsideRandomLayoutEntry(Transform transform)
-        {
-            while (transform != null)
-            {
-                if (transform.GetComponent<LobbyRandomMapPreviewEntry>() != null)
-                {
-                    return true;
-                }
-
-                transform = transform.parent;
-            }
-
-            return false;
-        }
-
-        private static bool IsInsideButton(Transform transform)
-        {
-            while (transform != null)
-            {
-                if (transform.GetComponent<UIButton>() != null || transform.GetComponent<UIBackButton>() != null)
-                {
-                    return true;
-                }
-
-                transform = transform.parent;
-            }
-
-            return false;
         }
 
         private static int CompareVisualOrder(RandomLayoutItem left, RandomLayoutItem right)
@@ -384,11 +332,6 @@ namespace SongsOfConquestAccess.Adapters
             public bool IsSelected
             {
                 get { return _owner != null && ReferenceEquals(SelectedEntryRef(_owner._menu), Entry); }
-            }
-
-            public void FocusNative()
-            {
-                _owner?.SelectLayout(Entry);
             }
 
             public bool Activate()

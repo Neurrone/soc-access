@@ -854,8 +854,11 @@ Up/Down tells which is chosen; region "Win conditions" with the three checkboxes
 "Layout" with the combo box. Screen name = the drawn title ("Random maps"). On arrival the
 stop lands on the chosen card. Decision needed: this shape, or the cards kept choosing on
 arrival with "selected" read live.
-K decided (2026-09-06): explicit selection, no choosing on arrival; Enter chooses and says
-"selected"; the chosen card reads "selected" live.
+K built (2026-09-06): the cards dropped their focus visual so arrival no longer selects, Enter
+chooses and says "selected" with the chosen card carrying the live part, the stop lands on that
+card (`LandStopOn` plus `SetStart`), and the three bands are regions named "Players"
+(`Common/Players`), "Win Conditions" (`Campaign/MapSelect/InformationView/WinConditionsHeader`)
+and "Layout" (`Screens.Layout`).
 J decided (2026-09-06): the second proposal as written, extended so that the announcement
 order, the audio glossary and the custom categories are themselves real dialogs stacked over
 the Mod options dialog, drawn from a clone of the lobby's settings popup panel with the
