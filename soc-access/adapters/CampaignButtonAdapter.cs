@@ -47,8 +47,18 @@ namespace SongsOfConquestAccess.Adapters
             return MenuButtonTextUtility.JoinParts(
                 PrefixCampaignNumber(_campaignNumber),
                 GetLocalizedText(definition != null ? definition.Title : null, GetText(CampaignNameTextRef)),
-                GetLocalizedText(definition != null ? definition.SubTitle : null, GetText(CampaignSubHeaderTextRef)),
-                GetLocalizedText(definition != null ? definition.Description : null, GetText(DescriptionTextRef)));
+                GetLocalizedText(definition != null ? definition.SubTitle : null, GetText(CampaignSubHeaderTextRef)));
+        }
+
+        /// <summary>The paragraph the card draws under its subtitle, apart from the card's name: it
+        /// is always on the screen, so a screen can decide where in the readout it belongs.</summary>
+        public string GetDescription()
+        {
+            ICampaignDefinition definition = GetDefinition();
+            // Trimmed, not normalized: the localized paragraph ends in whitespace, which used to be
+            // eaten by the joiner that put the description inside the label.
+            string description = GetLocalizedText(definition != null ? definition.Description : null, GetText(DescriptionTextRef));
+            return description != null ? description.Trim() : string.Empty;
         }
 
         public string GetStatus()

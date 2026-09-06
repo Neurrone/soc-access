@@ -420,6 +420,30 @@ are an icon row; the load menu draws "Load" where the widget says "Confirm"; the
 screen draws a tip line the widget never reads; the search results list gives every row the
 same widget id. The captures sit under a gitignored folder, so this note is their record.
 
+Ported so far, with what each taught (the siblings of a family follow its representative):
+
+- `CampaignMenuScreen` (family A, 2026-09-06). Two stops as proposed. Community Campaigns
+  is NOT in the card band: it is drawn at [493,681,294,87] under
+  `ForegroundCanvas` > `BottomButtonsLayout`, below the band's bottom edge at y 644, so it
+  is declared after the x-sorted cards and reads last of the stop. Three rules for the rest
+  of family A: (1) an announcement part is ALREADY a review-buffer line, so a `details`
+  section repeating what the parts say puts every line in the buffer twice - declare
+  always-drawn text as parts and let the buffer follow; (2) a card's progress line is
+  declared with the availability state (`AnnouncementKinds.Enabled`, after
+  `GraphNodes.DisabledPart`), because the game's `GetStatus()` is the progress on an
+  available card and the refusal's reason on one it refuses, which has to be heard after
+  "unavailable"; (3) that part is LIVE - the page is ready before the game fills the
+  campaign state in, so the first readout after entering has no progress line and the watch
+  is what speaks it a moment later. The Tales and Community Campaigns cards keep their whole
+  visible text as one label: only `CampaignButton` gives the game named fields for the
+  number, name, subtitle and paragraph, so only the campaign cards can split them.
+  Two defects found by the walk, neither this screen's to fix: pressing the drawn Back
+  button speaks one stray line ("Community Campaigns, button, 6 of 6") as the header stop
+  disappears under the cursor while the page leaves, and returning from
+  `CampaignMapSelectScreen` leaves TWO `CampaignMenuScreen` instances on the stack
+  (`ScreenDetector` pushes without popping the one already there), which reads the screen
+  name twice.
+
 ### Phase C — in-game menus, popups, forms and tables
 
 `PauseMenuScreen`, `WorldChoiceMenuScreen`, `WorldConfirmMenuScreen`,
