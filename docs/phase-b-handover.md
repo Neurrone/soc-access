@@ -3,13 +3,15 @@
 One page. Detail per screen is in the commit messages (`git log 5f4825d..`) and each screen's
 doc comment; the rulings are in `ui-graph-plan.md`.
 
-## State (2026-09-06)
+## State (2026-09-07)
 
-All 33 out-of-game screens are graph screens. The invite providers page is ported unmeasured
-(it never draws here, one provider) and waits for you. Your first walk's defects are fixed:
-chat trap and mod.io typing, slider "provide a number" buttons, description readout, "table",
-Enter on any cell, filters first, campaign title twice, browse items' Subscribe and More
-options. Still to build: the random maps redesign (K) and the mod options dialogs (J).
+All 33 out-of-game screens are graph screens, and the mod options are drawn dialogs: "Mod
+options" beside Options on the main menu and after Options in the pause menu, a dialog cloned
+from the options panel with the six tabs of rows, and the announcement order, audio glossary
+and custom category dialogs stacked over it, every page visually inspected. The nine
+widget-era settings menus are gone. The invite providers page is ported unmeasured (it never
+draws here, one provider). The random maps page chooses on Enter only. Your first walk's
+defects are all fixed.
 
 ## Screens to test, and what to watch for
 
@@ -34,6 +36,9 @@ options. Still to build: the random maps redesign (K) and the mod options dialog
   stops with categories as regions; load menu tabs switch on Enter and arriving on a save
   only highlights it; a browse item opens with Right to its Subscribe and More options; the
   results page stays under the home page after Back (known, detector).
+- **Mod options** (main menu header, pause menu): tabs switch on focus; a dialog beneath the
+  active one is inert to the mouse; Escape closes the top dialog only; typing into the name and
+  keyword boxes of the category dialog is unverified (injection cannot type).
 - **Lobby**: player rows are a table whose cells are the row's own controls; the invite
   providers popup (two providers needed) reads its buttons then Cancel. **Chat**: Enter sends
   and nothing else is spoken; the chat button is a row of the lobby.
