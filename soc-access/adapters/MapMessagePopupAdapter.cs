@@ -72,6 +72,18 @@ namespace SongsOfConquestAccess.Adapters
             get { return false; }
         }
 
+        /// <summary>True: <c>MapMessagePopup.Show</c> registers <c>InputActions.UI.ExitMenu</c> on
+        /// <c>Hide</c> unconditionally, whatever the input mode.</summary>
+        public bool GameHandlesEscape
+        {
+            get { return true; }
+        }
+
+        public Component ButtonOf(DialogAction action)
+        {
+            return action == DialogAction.Positive ? GetOkButton() : null;
+        }
+
         public bool IsPresent()
         {
             if (_popup == null)

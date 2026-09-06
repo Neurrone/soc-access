@@ -1,5 +1,6 @@
 using System;
 using SongsOfConquest.Client.UI;
+using UnityEngine;
 
 namespace SongsOfConquestAccess.Adapters
 {
@@ -30,7 +31,17 @@ namespace SongsOfConquestAccess.Adapters
 
         bool IsNegativeActionEnabled { get; }
 
+        /// <summary>Whether the game itself registers keyboard input that closes this source - the
+        /// dialogs differ, and this is a fact about each native source rather than about dialogs.
+        /// </summary>
+        bool GameHandlesEscape { get; }
+
         bool IsPresent();
+
+        /// <summary>The component the game draws this action's button with, or null where the source
+        /// has no such button. Where a button IS on the screen is a game fact; what the reading order
+        /// makes of it is not.</summary>
+        Component ButtonOf(DialogAction action);
 
         void SyncNativeSelection(DialogAction action);
 

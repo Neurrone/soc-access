@@ -97,6 +97,18 @@ namespace SongsOfConquestAccess.Adapters
             get { return false; }
         }
 
+        /// <summary>True: <c>RandomEventMenu.Show</c> registers <c>InputActions.UI.ExitMenu</c> on
+        /// <c>Hide</c> unconditionally, whatever the input mode.</summary>
+        public bool GameHandlesEscape
+        {
+            get { return true; }
+        }
+
+        public Component ButtonOf(DialogAction action)
+        {
+            return action == DialogAction.Positive ? GetConfirmButton() : null;
+        }
+
         public bool IsPresent()
         {
             RandomEventMenu.Settings settings = GetSettings();

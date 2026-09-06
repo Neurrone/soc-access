@@ -454,6 +454,24 @@ Ported so far, with what each taught (the siblings of a family follow its repres
   (`ScreenDetector` pushes without popping the one already there), which reads the screen
   name twice.
 
+- `MessageDialogScreen` (family B, 2026-09-06; the three out-of-game sources verified, the four
+  in-game ones in phase C). One stop in ES2's dialog order: heading, body, field, buttons, with the
+  heading also the screen name and the body the start node. Four rules for the rest of family B:
+  (1) buttons are sorted by their drawn left edge every build, never by positive/negative - the
+  options confirm draws its tick then its cross while the delete and join popups draw the negative
+  first; (2) a node the source gives no component for needs a SUBJECT OF ITS OWN, because the
+  reconciler seats the cursor by subject before it looks at the structural key: the heading and the
+  body both keyed on the popup meant focus arrived on the body and fell onto the heading a frame
+  later; (3) Escape is per SOURCE, not per screen - `ConfirmPopup`, `PopupMenu`, `MapMessagePopup`
+  and `RandomEventMenu` all register `UI.ExitMenu` themselves and keep the key, while `SystemPopup`
+  and `CustomMessageMenu` register nothing and the screen claims it; (4) the edit field's value is
+  NOT watched live - the only change a watch can catch is the text reappearing as the edit ends,
+  which the editor has just said. Diffs clean against all four before-captures except the heading
+  now being a line of its own, "disabled" becoming "unavailable", and the field's value moving out
+  of its label into its own part. One defect found, not this screen's: `POST /type` reaches the
+  navigator directly rather than through the router, so it can still start a search while the
+  game's field holds the keyboard, which no physical key can.
+
 ### Phase C — in-game menus, popups, forms and tables
 
 `PauseMenuScreen`, `WorldChoiceMenuScreen`, `WorldConfirmMenuScreen`,

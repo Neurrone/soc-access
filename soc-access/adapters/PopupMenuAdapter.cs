@@ -113,6 +113,27 @@ namespace SongsOfConquestAccess.Adapters
             get { return HasInputField ? _inputField : null; }
         }
 
+        /// <summary>True: every <c>PopupMenu.Show</c> overload registers
+        /// <c>InputActions.UI.ExitMenu</c> on <c>HandleNegativeButtonClicked</c> in its non-gamepad
+        /// branch, so Escape already presses the negative button.</summary>
+        public bool GameHandlesEscape
+        {
+            get { return true; }
+        }
+
+        public Component ButtonOf(DialogAction action)
+        {
+            switch (action)
+            {
+                case DialogAction.Positive:
+                    return ComponentOf(_positiveButton);
+                case DialogAction.Negative:
+                    return ComponentOf(_negativeButton);
+                default:
+                    return null;
+            }
+        }
+
         public bool IsPresent()
         {
             if (_containerTransform == null)
@@ -188,6 +209,11 @@ namespace SongsOfConquestAccess.Adapters
                 default:
                     return false;
             }
+        }
+
+        private static Component ComponentOf(IUIButton button)
+        {
+            return button == null ? null : button.MonoTransform;
         }
 
         private static bool IsButtonActive(IUIButton button)

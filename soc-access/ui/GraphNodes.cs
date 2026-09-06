@@ -181,7 +181,11 @@ namespace SongsOfConquestAccess.UI
         ///
         /// <paramref name="value"/> reports null while the game holds the keyboard: the mod is
         /// already speaking the keys as they land, and re-reading the whole field on top of them
-        /// buries them.
+        /// buries them. It is NOT watched live for the same reason - the only thing a watch could
+        /// ever catch is the field's text reappearing as the edit ends, which the editor has just
+        /// said itself ("edited", then the text), or, on a cancel, the text the player already knows
+        /// is back (measured on the join-game popup: the watch read "ABCDE" straight after
+        /// "Cancelled", 2026-09-06).
         /// </summary>
         public static NodeVtable EditField(
             Func<string> label,
@@ -192,7 +196,7 @@ namespace SongsOfConquestAccess.UI
             Func<IList<string>> details = null)
         {
             List<NodeAnnouncement> parts = Parts(label, enabled);
-            parts.Add(ValuePart(value));
+            parts.Add(ValuePart(value, watch: false));
             NodeVtable vtable = new NodeVtable
             {
                 ControlType = ControlTypes.EditField,

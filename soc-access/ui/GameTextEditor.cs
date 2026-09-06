@@ -191,11 +191,22 @@ namespace SongsOfConquestAccess.UI
             return keyboard != null && (keyboard.enterKey.isPressed || keyboard.numpadEnterKey.isPressed);
         }
 
+        /// <summary>
+        /// Whether the field still has the keyboard, asked of TMP's own <c>isFocused</c> rather than of
+        /// <see cref="IUITextMeshInputField.Focused"/>. The game's property also answers true for its
+        /// gamepad "this field controls the UI input" latch, which is cleared by the field's DESELECT
+        /// and not by deactivating it - so a field the game had merely deactivated still read as
+        /// focused and the edit never ended (measured on the join-game popup, 2026-09-06). This is
+        /// also the signal the stand-down reads, so the two halves agree about when the keyboard is
+        /// the game's.
+        /// </summary>
         private static bool IsFocused(IUITextMeshInputField field)
         {
             try
             {
-                return field != null && field.Focused;
+                UITextMeshInputField concrete = field as UITextMeshInputField;
+                TMPro.TMP_InputField input = concrete != null ? concrete.GetInputField() : null;
+                return input != null ? input.isFocused : field != null && field.Focused;
             }
             catch (Exception)
             {

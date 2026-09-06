@@ -99,6 +99,33 @@ namespace SongsOfConquestAccess.Adapters
             }
         }
 
+        /// <summary>False: <c>CustomMessageMenu.Show</c> only calls
+        /// <c>RegisterAsButtonPoller</c> and registers no keyboard input callback, so nothing in the
+        /// game answers Escape while it is up.</summary>
+        public bool GameHandlesEscape
+        {
+            get { return false; }
+        }
+
+        public Component ButtonOf(DialogAction action)
+        {
+            CustomMessageMenu.Settings settings = GetSettings();
+            if (settings == null)
+            {
+                return null;
+            }
+
+            switch (action)
+            {
+                case DialogAction.Positive:
+                    return settings.PositiveButton;
+                case DialogAction.Negative:
+                    return settings.NegativeButton;
+                default:
+                    return null;
+            }
+        }
+
         public bool IsPresent()
         {
             CustomMessageMenu.Settings settings = GetSettings();

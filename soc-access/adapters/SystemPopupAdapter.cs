@@ -88,6 +88,26 @@ namespace SongsOfConquestAccess.Adapters
             get { return HasInputField ? GetInputField() : null; }
         }
 
+        /// <summary>False: <c>SystemPopup</c> touches the input manager nowhere at all, so nothing in
+        /// the game answers Escape while it is up.</summary>
+        public bool GameHandlesEscape
+        {
+            get { return false; }
+        }
+
+        public Component ButtonOf(DialogAction action)
+        {
+            switch (action)
+            {
+                case DialogAction.Positive:
+                    return GetConfirmButton();
+                case DialogAction.Negative:
+                    return GetCancelButton();
+                default:
+                    return null;
+            }
+        }
+
         public bool IsPresent()
         {
             if (_popup == null)

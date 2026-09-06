@@ -80,6 +80,27 @@ namespace SongsOfConquestAccess.Adapters
             get { return IsButtonEnabled(GetNoButton()); }
         }
 
+        /// <summary>True: <c>ConfirmPopup.Show</c> registers <c>InputActions.UI.ExitMenu</c> on
+        /// <c>HandleNoClicked</c> whenever the input mode is KeyboardMouse, so Escape already presses
+        /// No.</summary>
+        public bool GameHandlesEscape
+        {
+            get { return true; }
+        }
+
+        public Component ButtonOf(DialogAction action)
+        {
+            switch (action)
+            {
+                case DialogAction.Positive:
+                    return GetYesButton();
+                case DialogAction.Negative:
+                    return GetNoButton();
+                default:
+                    return null;
+            }
+        }
+
         public bool IsPresent()
         {
             if (_popup == null)
