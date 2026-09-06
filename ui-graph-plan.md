@@ -27,6 +27,17 @@ Owner decisions already made (do not re-ask):
   internal-by-default in one mechanical commit before phase A (2026-09-05), so the engine
   copied from ES2 lands in matching surroundings and `/eval` can name any mod type. New
   and ported code follows that; nothing is declared `internal`.
+- Phase B rulings (2026-09-06): role words and state words follow ES2 exactly ("unavailable",
+  "not checked", "editable", "combo box", ...), so `GraphNodes.DisabledPart` flips to
+  unavailable now rather than at the end of the migration. Escape follows ES2: the game keeps
+  it on its own surfaces, a screen claims Back only to press a drawn close control where the
+  game itself does nothing on Escape, and a mod-owned surface denies the game the key. The
+  edit field follows ES2: Enter ends the edit and nothing else, Escape restores the pre-edit
+  text, with the same kind of exceptions ES2 made (a chat box sends). The loading-complete
+  screen is modelled like ES2's loading screen (readout rows, per-frame status speech) with a
+  node for the continue button. Dropdowns match ES2: a combo box node opening a drop-list
+  child screen over the game's real popup. Proposals go by family: one representative per
+  family is proposed and approved first, then the siblings are shown against it.
 
 ## 0. Read first
 
@@ -565,3 +576,92 @@ to bring to the owner, not a decision.
 - Each phase's localization batch is real work; a phase is not done until `validate` passes.
 - `ScreenDetector`'s readiness knowledge is the most expensive thing in the repo to lose.
   In phase F, move it, never rewrite it from memory.
+
+## 10. Phase B family proposals (2026-09-06, awaiting the owner)
+
+Screens are proposed by family: one representative each, measured with `/gui/unity` and a
+cropped screenshot; the siblings are shown against the approved representative afterwards.
+
+| Family | Representative | Siblings |
+|---|---|---|
+| A. Menu page: a header band and a row of big card buttons | `CampaignMenuScreen` | `TaleSelectScreen`, `CustomCampaignSelectScreen`, `AdventureLobbyMapTypeScreen`, `AdventureLobbyInviteProvidersScreen` (blocked) |
+| B. Dialog: heading, body, optional field, buttons | `MessageDialogScreen` (7 sources) | `QuitToDesktopPopupScreen`, `PlatformUserMenuScreen`, `CommunityMapsModalScreen` |
+| C. Loading complete | `LoadingCompleteScreen` | none |
+| D. Settings form: tabs, captioned rows of toggles, sliders, combos, buttons | `OptionsScreen` | `AdventureLobbyGameSettingsScreen`, `AdventureLobbyPlayerSettingsScreen`, `AdventureLobbyRandomLayoutScreen`, `OnlineHostGameScreen` (the edit-field exemplar), `CommunityMapsSearchFilterScreen`, the mod settings family last |
+| E. Drop list child screen | `AdventureLobbyIconDropdownScreen` | the combo boxes of every D screen open the same screen |
+| F. Table page: filters, sortable table, detail panel, buttons | `AdventureLobbyMapSelectScreen` | `OnlineGameListScreen`, `AdventureLobbyChallengeMapSelectScreen`, `PlayerStatsScreen` |
+| G. Browse page: tabs, lists, a content pane, buttons | `CodexScreen` | `SaveLoadGameScreen`, `CampaignMapSelectScreen`, `CommunityMapsHomeScreen`, `CommunityMapsCollectionScreen`, `CommunityMapsSearchResultsScreen`, `CommunityMapsDetailsScreen` |
+| H. Lobby page: player rows with per-row controls, a side panel | `AdventureLobbyPlayersScreen` | none |
+| I. Chat: the edit-field exception | `ChatScreen` | none |
+
+**A. `CampaignMenuScreen`.** Drawn (1280x800): a header band with Back ("Main Menu", top
+left), the title ("Choose Campaign or Tale", centre) and Options (top right); five cards left
+to right at x 35, 287, 529, 770, 1012 (campaigns 1 to 4, then Tales), each one button carrying
+its number, name, subtitle, description and a progress line ("Campaign completed", "Completed
+4/4"). Community Campaigns did not appear in the dump and is measured at implementation. Model:
+stop `cards`, one button per card in drawn x order, label = number, name, subtitle; the
+description and progress line are always-drawn text and read after the label, and fill the
+buffer; Enter is the game's click. Stop `header`: Back, Options. Screen name = the drawn
+title. The game registers no keyboard input here, so Escape is claimed and presses the drawn
+Back button.
+
+**B. `MessageDialogScreen`.** Drawn (quit popup): heading, body ("Are you sure?"), then the
+buttons No (x 508) and Yes (x 647); the delete popup draws No then Yes too; the options
+confirm draws a tick then a cross (Confirm then Cancel). One stop, ES2's three-part contract:
+the heading is a text node first, the screen name carries the heading, focus starts on the
+body text (a text node whose sections hold the body lines), then the edit field when the
+source has one, then the buttons in drawn x order read live each build. The quit popup's
+follow-us block (a text and a FOLLOW button) reads before the heading because it is drawn
+above it. Escape: the quit popup registers keyboard input for nothing, so Back is claimed and
+presses the drawn negative button; each other source is measured the same way. The field
+follows the ES2 contract (Enter ends the edit, the dialog's Confirm is pressed on purpose).
+
+**C. `LoadingCompleteScreen`.** ES2's loading screen shape: read-only rows for what the page
+draws (the tip line, which the widget never read), and one button node for "PRESS ANY KEY TO
+CONTINUE" whose activation runs the game's own continue (`FinalizeLoadingScreen`, the route
+`DevProbe.ContinueLoading` already uses). Arrival speaks the tip, queued.
+
+**D. `OptionsScreen`.** Drawn: title; a tab column on the left (x 270, seven tabs 30 px
+apart); a content column (x 489, 486 wide, scrolling: 904 px of rows in a 519 px panel) of
+rows with the label left and the control right, under drawn captions ("General", "Battle",
+"Adventure"); the Close button at the bottom. Three stops: `tabs` (Tab nodes, Selected on the
+showing one, switching on focus as ES2's do since the switch is free), `rows` (one region per
+drawn caption; toggle rows as checkboxes, slider rows as sliders speaking the drawn value
+text, dropdown rows as combo boxes opening family E, button rows as buttons; the small edit
+button beside a slider's value is omitted, the arrows cover it), `buttons` (Close). Escape is
+the game's: it registers ExitMenu in keyboard mode. Needs the scroll-into-view hook on the
+navigator's focus commit, through the game's own scroll rect.
+
+**E. `AdventureLobbyIconDropdownScreen`.** The game's popup, drawn as a strip of icon
+entries over the row that opened it; it is already a detector-pushed screen. Choice nodes
+in drawn order, walked Up/Down, the current value Selected so the list lands on it; Enter is
+the game's click; the mod's own Cancel button stays as the last row; Escape: the game's if
+its popup closes on it, else claimed to press that Cancel. The same screen, opened by a mod
+request, serves every combo box row of family D over the game's real dropdown popup.
+
+**F. `AdventureLobbyMapSelectScreen`.** Drawn: a header band at y 104 holding the sort
+buttons (Type, Name, Tag, Win Condition, Players, Size, Played) and four filter buttons
+that open checkbox lists; the table of map rows (34 px each) with the columns of that band;
+a preview panel on the right (title, description, win condition); Confirm, Back, Options.
+Stops: `filters` (four expandable groups of checkbox children), `table` (a `GraphSheet`: the
+sort band as the first row, then one row per map with Name as the primary column, Enter
+selects the row through the game's click), `details` (one text node with sections), `buttons`.
+Escape measured; else Back.
+
+**G. `CodexScreen`.** Drawn: a title pair ("Tutorials & Codex" over the tab name), an icon
+tab row, a category list, an article list, the article body, and the footer (Reset tutorials,
+Show tutorials, Close). Stops: `tabs` (Tab nodes named from the game's tooltips, switching
+on focus), `categories`, `articles`, `content` (one node per article section carrying its
+sections, headings as regions; `CodexContentWidget` retires), `footer`. Escape measured.
+
+**H. `AdventureLobbyPlayersScreen`.** Drawn: one row per slot at y 100 and 154 with number,
+Name, Faction, Colour, Starting wielder, Team, AI mode (AI rows), and Leave or Remove AI at
+x 813; the right panel with the map preview, Mixed Factions, Game settings, Start Game;
+online adds the game name, the code, Invite Only, Invite Friend, Set Ready. Model: `players`
+as a `GraphSheet` whose cells are the drawn controls (combo boxes opening family E, buttons),
+Up/Down keeping the column, replacing the widget's "selected player" indirection; `panel`
+stop for the rest in drawn order. Escape measured; else Back.
+
+**I. `ChatScreen`.** The lobby chat window: the message field, Send, the history, Close. The
+field is the ES2 exception: Enter sends (the game's submit), the arriving line is the
+announcement.
