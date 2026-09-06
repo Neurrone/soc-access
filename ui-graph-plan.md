@@ -13,8 +13,7 @@ Resuming in a fresh session: read §0's docs, then §2 (what is built) and §3 (
 the current phase in §7 and its rows in §8, then `docs/dev-loop.md` for the verification
 loop. Every screen goes through §4's dump-and-diff; the before-capture must be taken on the
 unported build, before the screen is touched. Commit per logical step and update this file
-as decisions are taken. Phase A's manual walk by the owner is still pending; its steps are
-in the phase A section.
+as decisions are taken. Phase A is complete, walk included; start at phase B item 1.
 
 Owner decisions already made (do not re-ask):
 
