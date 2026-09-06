@@ -9,6 +9,13 @@ order.
 Prerequisite: the dev server (done 2026-09-05; `docs/dev-loop.md` is its reference). This plan uses `/gui/widgets`, `/gui/graph`,
 `/input`, `/speech`, `/eval`, `/reload` and `run-game.ps1` throughout. Do not start without them.
 
+Resuming in a fresh session: read §0's docs, then §2 (what is built) and §3 (keys), then
+the current phase in §7 and its rows in §8, then `docs/dev-loop.md` for the verification
+loop. Every screen goes through §4's dump-and-diff; the before-capture must be taken on the
+unported build, before the screen is touched. Commit per logical step and update this file
+as decisions are taken. Phase A's manual walk by the owner is still pending; its steps are
+in the phase A section.
+
 Owner decisions already made (do not re-ask):
 
 - The owner gives input on every screen. Each screen's model is proposed and approved
@@ -131,89 +138,91 @@ mod-owned menus: `ModSettingsScreen` and `TooltipActionsMenuScreen` (pushed by
 `ScannerCustomCategoryKeyScreen`, `ScannerCustomCategorySelectorScreen` (pushed by their
 parents).
 
-## 2. Target architecture
+## 2. What exists now (as built in phase A)
 
-- `ui/graph/` — the engine, namespace `SongsOfConquestAccess.UI.Graph`, copied verbatim,
-  unit-tested offline.
-- `ui/GraphNavigator.cs` — this game's adapter: one `GraphState` per screen, `Attach`,
-  `Dispatch(actionKey)`, `EnsureFocus` (the single announce/buffer/visual site),
-  `InspectRender` for the dump. Starts at a few hundred lines; grows per phase (carry in
-  E, modes in F, type-ahead only if the owner wants it).
-- `ui/GraphNodes.cs` — node factories per game widget kind (§5), all taking the same
-  cross-cutting parameters (tooltip, sections, activation).
-- `ui/ControlTypes.cs` — the role registry, reusing the existing role `ModStrings`.
-- `screens/GraphScreen.cs` — the bridge (§3). Screens port by changing their base class
-  and replacing their constructor's widget tree with `Build(GraphBuilder)`.
-- `dev/GraphDump.cs` — `/gui/graph`, plus `flat=1` in the shared grammar
-  (`docs/dev-loop.md` §2a), and `/gui/tree` which answers whichever dump fits the
-  focused screen's kind.
+Paths relative to `soc-access/`. Read these before porting a screen; they are the whole
+graph side of the mod.
+
+- `ui/graph/` — the engine, namespace `SongsOfConquestAccess.UI.Graph`, 20 files copied from
+  ES2 (`ControlId`, `GraphTypes`, `GraphBuilder`, `GraphAnnouncer`, `KeyGraph`, `NodeBuffer`,
+  `TooltipParts`, `GraphSheet`, `Carry`, `Nudge`, `TypeAheadSearch`, `TypeAhead`,
+  `SearchScope`, `NodeHint`, `OneTooltipRule`, `FocusRequest`, `TextUtil`, `Cycle`,
+  `MessageBuilder`, `SpokenText`). Changed only where the repo's rules required: `internal`
+  is `public`, strings go through `ModText`, `NodeHint.Template` is a `ModString`. Never edit
+  these for a screen's needs; re-sync them against ES2 instead. Tests: `tests/Graph*Tests.cs`,
+  `KeyGraphTests`, `NodeBufferTests`, `TooltipPartTests`, `CarryTests`, `NudgeTests`,
+  `TypeAhead*Tests`, `SearchScopeTests`, `NodeHintTests`, `OneTooltipRuleTests`,
+  `FocusReachTests`, with `tests/GraphFixtures.cs` (class `Graphs`) as the helper.
+- `screens/GraphScreen.cs` — the bridge. A screen ports by deriving from it, dropping its
+  widget tree, and writing `Key`, `Build(GraphBuilder)`, `IsPresent()`, and optionally
+  `ScreenName` (spoken once on focus), `InitialFocusStop`, `Back()`/`ConsumesBack` (Escape;
+  false = the game keeps it), `IsWorkable` (mutes the live watch while the page fades),
+  `AllowsTypeahead`, `CapturesRawInput`, `TypeAheadScope`, `OnFocusVisual`. Everything the
+  push/pop `ScreenManager` asks of a screen is answered by the one navigator. Constructor
+  sites, detector handlers and `IsPresent()` stay exactly as they were for the widget
+  screen; only the class body changes.
+- `ui/GraphNavigator.cs` + `GraphNavigator.Search.cs` — the adapter: one `GraphState` per
+  screen instance, `Attach`, `Claims(actionKey)`, `Dispatch(actionKey)`, `Update()` (type-ahead
+  tick then `EnsureFocus`, the single site that announces, fills `ReviewBufferKind.Ui`, draws
+  the native tooltip through `NativeTooltipUtility.ShowVisualTooltip`, and runs the live-part
+  watch), `FocusNode` (pending landings through `FocusRequest`), `InspectRender` for the dump,
+  `FocusedTooltip` for the tooltip actions menu. Static wiring (`InstallWiring`/`ResetWiring`
+  in `SocAccessMod.Start`/`Stop`) injects the position, expanded/collapsed and sheet wording.
+  Not wired yet: carry (phase D), modes (phase E), the game-text-field stand-down for
+  type-ahead (phase B, with the edit field), pointer hover simulation.
+- `ui/GraphNodes.cs` — the factories: `Button(label, activate, enabled, tooltip, details)`,
+  `Group(label, activate, enabled, tooltip, details)`, `Text(label, details, tooltip)`, plus
+  the parts (`LabelPart`, `DisabledPart`, `ValuePart`) and `TooltipSection` (every native
+  `Tooltip` is an `Indicate` section, buffer only, and `Aim` sets `PointsAt` so focus draws
+  it). Every new factory takes the same cross-cutting parameters. Phase B adds checkbox,
+  slider, radio, tab, choice, edit field, combo box, and the sheet cell.
+- `ui/ControlTypes.cs` — the role registry: `Button`, `Group`, `Text` (no role word). New
+  types need a role `ModString` in the phase's localization batch.
+- `input/AccessibilityActions.cs` — the graph screens' own actions, all `InputClaimScope.Screen`:
+  `ui_up/down/left/right`, `ui_coarse_decrease/increase` (Shift+Left/Right), `ui_next/prev`
+  (Tab, Shift+Tab), `ui_home/end`, `ui_region_prev/next` (Alt+Up/Down), `ui_activate`
+  (Enter), `ui_secondary` (Backslash), `ui_back` (Escape). `AccessibilityInputRouter` also
+  claims bare letters (and Space mid-search) while a graph screen searches, feeding the
+  characters from the keyboard's text events.
+- `dev/GraphDump.cs` — `/gui/graph?buffers=1&flat=1&edges=1`, `/gui/tree` (whichever dump
+  fits the focused screen), `POST /type` (type-ahead). `/status` reports the focused node's
+  key and control type as `focusedWidgetId`/`focusedWidgetType`. Reference: `docs/dev-loop.md`.
+- `screens/Screen.cs` has `CurrentTooltip`, which `ScreenManager` reads for the tooltip
+  actions menu; `dev/WidgetDump.cs` answers with a pointer to `/gui/graph` on a graph screen.
 - Final phase only: `screens/ScreenManager.cs` becomes ES2's poll-and-diff manager with
   layers and child screens; `ScreenDetector` shrinks to state recording; `UIManager`,
   `FocusContext`, and every `ui/*Widget.cs` are deleted.
 
-## 3. The bridge: `GraphScreen`
+Exemplar: `screens/MainMenuScreen.cs` (two stops, expandable groups driving a game-side
+container through `OnExpand`/`OnCollapse` with `expanded:` read live, drawn order measured
+off the buttons, `IsWorkable` off the menu's canvas group).
 
-```csharp
-public abstract class GraphScreen : Screen
-{
-    protected GraphScreen() : base(rootWidget: null) { }
-    public abstract string Key { get; }
-    public abstract void Build(GraphBuilder builder);
-    public virtual string ScreenName { get { return null; } }   // spoken once on focus
-    public virtual object InitialFocusStop { get { return null; } }
-    public virtual bool Back() { return false; }                // cancel key; false = game keeps it
-    public override void OnFocus()      { Navigator.Attach(this); speak ScreenName (queued) }
-    public override void OnUnfocus()    { Navigator.Attach(null); }
-    public override void Update()       { Navigator.EnsureFocus(); }
-    public override bool OnActionJustPressed(InputAction a) { return Navigator.Dispatch(a.Key); }
-    public override bool HasClaimed(string key)              { return Navigator.Claims(key); }
-    public override bool HasFocusedWidgetClaimed(string key) { return Navigator.Claims(key); }
-    public override Tooltip CurrentTooltip { get { return Navigator.FocusedTooltip; } }
-}
-```
+## 3. How the navigator handles keys
 
-Seams to change in the shared code, each small:
+`Navigator.Claims` answers the router before the press; `Dispatch` runs the action. On any
+graph screen the navigation set is always claimed; the rest only where the focused node or
+screen answers it, so an unclaimed key still reaches the game.
 
-1. `Screen` gains `virtual Tooltip CurrentTooltip` (widget screens answer
-   `UIManager.CurrentWidget?.GetTooltip()`); `ScreenManager.HandleGlobalAction` and
-   `CanHandleGlobalAction` use it instead of `UIManager.CurrentWidget`.
-2. `Screen` defaults tolerate a null `RootWidget` (`HasClaimed`, `OnFocus`); or `GraphScreen`
-   overrides all of them, which it does above. `ScreenManager.Push` calling
-   `UIManager.Reset()` is harmless for a graph screen.
-3. Claims: `Navigator.Claims(key)` answers true for the navigation set the graph always
-   takes (`next_widget`, `previous_widget`, `next_menu_item`, `previous_menu_item`,
-   `first_menu_item`, `last_menu_item`, `next_heading`, `previous_heading`, `activate`,
-   `cancel` when `Back()` would answer true) and, from the focused node's vtable, for
-   `slider_*` when it has `OnAdjust`, `start_drag` when it has a carry, `next_column` etc.
-   when it sits in a sheet, `map_*`/`hex_grid_*`/`combat_*`/`scanner_*` when the node is a
-   mode that declares them (`Screen.AnyKey` in ES2). This keeps the router's
-   claim-before-dispatch contract intact.
-4. Review buffer: `EnsureFocus` fills `ReviewBufferKind.Ui` from the node's `NodeBuffer`
-   lines through the existing `ReviewBufferManager`, mirroring `UIManager.PopulateUiReviewBuffer`.
-5. Native tooltip visual: `EnsureFocus` calls `NativeTooltipUtility.ShowVisualTooltip` with
-   the focused node's `VisualMetadata`, as `UIManager.Update` does today. Pointer hover
-   simulation (`PointerFocus` in ES2) is a later addition once a screen shows it matters.
-6. Speech: announcements go through `SpeechPipeline.Output`; the navigator never calls
-   Prism. Interrupt policy stays what the router does today.
-7. `GraphState` is keyed by screen instance. Today every push constructs a new screen, so
-   cursor memory across pushes is lost exactly as it is today; the final phase's registered
-   singletons restore it (`KeepStateOnPop`).
+| Action | Claimed when | What it does |
+|---|---|---|
+| `ui_up` / `ui_down` | always | `Move` Up / Down; while a search is live, step its results |
+| `ui_left` / `ui_right` | always | `OnAdjust` if the node has one, else `Move`, else `TreeLeft`/`TreeRight` (ascend+collapse / expand+descend); consumed silently on a leaf |
+| `ui_coarse_decrease` / `ui_coarse_increase` | node has `OnAdjust` | `OnAdjust` with the large step |
+| `ui_next` / `ui_prev` | always | `MoveStop`, wrapping; one stop consumes silently |
+| `ui_home` / `ui_end` | always | `MoveToSiblingEdge` in a tree, else `MoveToEdge` along the stop's wired axis; in a search, first/last result |
+| `ui_region_prev` / `ui_region_next` | node has a region | `MoveRegion` |
+| `ui_activate` | always | `OnActivate`, then `StateText` interrupting |
+| `ui_secondary` | node has `OnSecondary`, or a search is live | `OnSecondary`; in a search, clears it |
+| `ui_back` | `Screen.ConsumesBack`, or a search is live | `Screen.Back()`; in a search, "Search cleared" |
+| letters, Space mid-search | `AllowsTypeahead && !CapturesRawInput` | type-ahead over the focused stop plus the fully-open build |
 
-Action-to-operation table for `Navigator.Dispatch`:
+Still to add, each in the phase that needs it: `ui_carry` (Space, phase D), the mode keys
+(phase E, the mode node's own handler, claimed through a screen-level `AnyKey`-style hook).
 
-| Action key | KeyGraph operation |
-|---|---|
-| `next_widget` / `previous_widget` | `MoveStop` forward / back |
-| `next_menu_item` / `previous_menu_item` | `Move` Down / Up |
-| `first_menu_item` / `last_menu_item` | `MoveToEdge` Up / Down |
-| `next_column` / `previous_column` | `Move` Right / Left (sheets) |
-| `next_row` / `previous_row`, `first_row` / `last_row` | `Move` Down / Up, `MoveToEdge` (sheets) |
-| `next_heading` / `previous_heading` | `MoveRegion` next / prev |
-| `activate` | `Activate` |
-| `cancel` | `Screen.Back()`; unhandled falls through to the game |
-| `slider_increase` / `slider_decrease` / `slider_minimum` / `slider_maximum` | `OnAdjust` +1 / -1 / min / max |
-| `start_drag` | `Carry` pick up / drop |
-| mode keys (`map_*`, `hex_grid_*`, `combat_*`, `scanner_*`, bookmarks) | the mode node's own handler |
+Facts a port relies on: `GraphState` is keyed by screen instance, so cursor memory across a
+push and pop is lost exactly as today until phase F's registered singletons restore it;
+announcements go through `SpeechPipeline.Output` (moves interrupt, arrivals and live changes
+queue); the router silences speech on every claimed key.
 
 Owner decision, taken 2026-09-06 before the main menu port: graph screens use ES2's
 four-arrow model. Left/Right adjust a value, else step along a row, else expand/descend and
@@ -303,9 +312,9 @@ owner's manual screen-reader review before its siblings are batched
 plan update recording what was learned; commits are per logical step (engine, adapter,
 one screen or one kind of screen at a time).
 
-### Phase A — engine, bridge, first screen (done 2026-09-06)
+### Phase A — engine, bridge, first screen (code done 2026-09-06; owner walk pending)
 
-What landed, and what differed from the plan above:
+What landed, and what differed from the original brief:
 
 - The engine needed eight files the plan did not list (`NodeHint`, `OneTooltipRule`,
   `FocusRequest`, `TypeAhead`, `SearchScope`, `MessageBuilder`, `SpokenText`, `Cycle`); all
@@ -326,6 +335,12 @@ What landed, and what differed from the plan above:
 - The flat diff of the main menu and both foldouts is clean except for the group state
   word in the buffer. The localization validator accepts a whitespace translation of a
   whitespace source (the fragment separator).
+- Manual test still to be run by the owner: arrive on the main menu ("Main menu", then the
+  first button with "1 of 8"); Down to "Multiplayer, group, collapsed, 4 of 8", Right opens
+  the foldout on screen and lands on "Host online game, button, 1 of 4", Left closes it and
+  re-reads the header; Tab reads "Options, button", Shift+Tab returns to the remembered
+  item; typing "q" lands on Quit and Escape says "Search cleared"; Escape with no search
+  reaches the game; Enter on Conquest opens the lobby with no "disabled" spoken first.
 
 ### Phase B — every screen outside a running game
 
