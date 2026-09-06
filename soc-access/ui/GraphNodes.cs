@@ -77,7 +77,7 @@ namespace SongsOfConquestAccess.UI
 
             Tooltip it = tooltip;
             return NodeSection.Derived(
-                () => new List<string>(it.TextLines),
+                () => SpokenLines.Of(it.TextLines),
                 TooltipMode.Indicate,
                 () => it.VisualMetadata != null,
                 it);
@@ -92,7 +92,7 @@ namespace SongsOfConquestAccess.UI
         public static IList<NodeSection> Sections(Func<IList<string>> details, Tooltip tooltip)
         {
             List<NodeSection> list = null;
-            Add(ref list, NodeSection.Buffer(details));
+            Add(ref list, NodeSection.Buffer(details == null ? null : (Func<IList<string>>)(() => SpokenLines.Of(details()))));
             Add(ref list, TooltipSection(tooltip));
             if (tooltip != null && tooltip.Actions != null && tooltip.Actions.Count > 0)
             {

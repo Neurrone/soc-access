@@ -622,3 +622,15 @@ Manual test:
    and its AI difficulty button does too.
 5. Enter on a colour: the popup closes and the lobby row reads the colour you picked.
 6. Listen to a faction or wielder entry: note the markup now being read out (follow-up above).
+
+### Buffer lines lose the game's markup (all graph screens)
+
+Found on the drop lists: faction and wielder entries read their tooltips with the game's
+rich-text tags spoken aloud and their paragraphs as one line, because the widget engine
+cleaned tooltip lines and the graph's sections did not. `ui/SpokenLines.cs` now splits every
+raw tooltip or details string on its newlines first and then strips the tags and doubled
+spaces from each line, and `GraphNodes.Sections` routes both through it (commit below). The
+repo's rule against `SpeechTextSanitizer.Normalize` stands: that normaliser collapses the
+newlines before anything can split on them. Verified: no `<` in any buffer line of the
+seven Options tabs after the change. Manual test: on a lobby's faction list, Ctrl+Down
+through the buffer of an entry; the description must read as sentences, with no tag names.
