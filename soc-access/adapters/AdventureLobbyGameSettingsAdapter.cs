@@ -151,7 +151,11 @@ namespace SongsOfConquestAccess.Adapters
                         () => NativeSelectionUtility.Select(dropdown.GetSelectable()),
                         () => dropdown.Active && dropdown.Interactable,
                         () => IsActive(component),
-                        () => Tooltip.ForComponent(GetDropdownTooltipComponent(dropdown) ?? component, _localization))));
+                        () => Tooltip.ForComponent(GetDropdownTooltipComponent(dropdown) ?? component, _localization),
+                        () => DropdownPopup.Show(dropdown),
+                        () => DropdownPopup.Hide(dropdown),
+                        () => DropdownPopup.IsOpen(dropdown),
+                        optionIndex => DropdownPopup.FocusOption(dropdown, optionIndex))));
             }
         }
 
@@ -232,7 +236,7 @@ namespace SongsOfConquestAccess.Adapters
                     component.transform,
                     new TimeInputItem(
                         "game-settings-time-input-" + index,
-                        () => GetTextLabel(field),
+                        () => GetTimeInputLabel(field),
                         () => field,
                         () => GetTimeInputChildField(field, TimeInputMinutesField),
                         () => GetTimeInputChildField(field, TimeInputSecondsField),
@@ -299,6 +303,25 @@ namespace SongsOfConquestAccess.Adapters
         private static string GetTextLabel(IUIText text)
         {
             return SpeechTextSanitizer.Normalize(text != null ? text.Text : null);
+        }
+
+        /// <summary>What the time row DRAWS as its label. Read off the row's own text mesh rather than
+        /// its <c>Text</c> property, which answers with the prefab's placeholder ("Label") once the
+        /// menu has rebuilt the rows - measured on the turn-timer rows, which draw "Base turn time"
+        /// and friends while every one of them reported "Label".</summary>
+        private static string GetTimeInputLabel(IUITimeInputField field)
+        {
+            UITimeInputField concrete = field as UITimeInputField;
+            if (concrete != null)
+            {
+                string text = SpeechTextSanitizer.Normalize(UITextMeshTextUtility.GetEffectiveText(concrete.GetTextMeshPro()));
+                if (!string.IsNullOrWhiteSpace(text))
+                {
+                    return text;
+                }
+            }
+
+            return GetTextLabel(field);
         }
 
         private static IUITextMeshInputField GetTimeInputChildField(IUITimeInputField field, FieldInfo childField)
@@ -510,9 +533,9 @@ namespace SongsOfConquestAccess.Adapters
             public Func<bool> IsVisible { get; private set; }
         }
 
-        public sealed class DropdownItem
+        public sealed class DropdownItem : IDropList
         {
-            public DropdownItem(string id, Func<string> getLabel, Func<IReadOnlyList<string>> getOptions, Func<int> getValue, Func<int, bool> setValue, Action focus, Func<bool> isEnabled, Func<bool> isVisible, Func<Tooltip> getTooltip)
+            public DropdownItem(string id, Func<string> getLabel, Func<IReadOnlyList<string>> getOptions, Func<int> getValue, Func<int, bool> setValue, Action focus, Func<bool> isEnabled, Func<bool> isVisible, Func<Tooltip> getTooltip, Func<bool> openPopup, Func<bool> closePopup, Func<bool> isPopupOpen, Func<int, bool> focusOption)
             {
                 Id = id;
                 GetLabel = getLabel;
@@ -523,6 +546,10 @@ namespace SongsOfConquestAccess.Adapters
                 IsEnabled = isEnabled;
                 IsVisible = isVisible;
                 GetTooltip = getTooltip;
+                OpenPopup = openPopup;
+                ClosePopup = closePopup;
+                IsPopupOpen = isPopupOpen;
+                FocusOption = focusOption;
             }
 
             public string Id { get; private set; }
@@ -534,6 +561,13 @@ namespace SongsOfConquestAccess.Adapters
             public Func<bool> IsEnabled { get; private set; }
             public Func<bool> IsVisible { get; private set; }
             public Func<Tooltip> GetTooltip { get; private set; }
+
+            /// <summary>The game's own list popup: opened, closed, asked about, and told which entry
+            /// to highlight.</summary>
+            public Func<bool> OpenPopup { get; private set; }
+            public Func<bool> ClosePopup { get; private set; }
+            public Func<bool> IsPopupOpen { get; private set; }
+            public Func<int, bool> FocusOption { get; private set; }
         }
 
         public sealed class ToggleItem

@@ -604,6 +604,96 @@ Manual test:
 5. Tab: "Confirm, button, 1 of 3", then Back and Options.
 6. Escape leaves the page for the map type screen, the same as pressing Back.
 
+### AdventureLobbyGameSettingsScreen
+
+Built: two stops. `game-settings-rows` holds the settings in the order the page draws them,
+`game-settings-buttons` holds Cancel then Confirm. Screen name is the window's drawn title
+("Game settings"); focus starts on the rows.
+
+Measured 2026-09-06 at 1280x800 through `/gui/unity` and a screenshot crop: the window at
+[325,147,630,519], one scrolling column of rows at x 364 (539 wide, 861 px of rows in a 379 px
+viewport) with the label at x 367 and the control at x 570, Cancel at x 508 and Confirm at
+x 646. The page draws NO caption over any group of rows, so the screen declares no regions;
+the adapter's text rows would read as plain lines where the game drew one, and it draws none.
+
+Offline the page is six dropdowns, five toggles and the Random Seed field; online it adds the
+game Name field and the Invite Only, Simultaneous turns, Humans fight for hostiles and Turn
+timers toggles, plus the Force quickbattles dropdown. Turn timers ON adds seven time rows and
+a "Reset to defaults" button, a variant no capture had; it was taken on the widget build first
+(`walks/before/AdventureLobbyGameSettingsScreen-online-timers.txt`).
+
+A TIME row is TWO edit fields, minutes and seconds, because that is what the game draws for a
+keyboard: `UITimeInputField` keeps `_minutesInputfield` and `_secondsInputfield` under a
+"Keyboard" header and `_gamepadSlider` under a "Gamepad" one, and `OnControlsChanged` only
+brings the slider back in gamepad mode - measured, `GamepadSlider` reads `visible=false` on
+every drawn row while `KeyboardInput` holds the two boxes and a ":" between them. So there is
+no slider to model. Each node is named with the row's drawn label and says which half it holds
+in the game's own words ("Base turn time, editable, 1 minute", then "Base turn time, editable,
+0 seconds"), through the same text keys the widget read them with
+(`Adventure/PostGameMenu/TotalPlayTime/Minutes` and `.../Seconds`).
+
+Escape is the game's (`ConsumesBack` false): `LobbyMapSettingsMenu.Show` registers
+`InputActions.UI.ExitMenu` outside its gamepad branch (decompiled, line 333). Verified:
+`ui_back` answered `unclaimed` on the page, and `consumed` on the drop list over it.
+
+Diff, offline and online and online-with-timers: every difference is one of four kinds.
+
+1. "unchecked" became "not checked".
+2. A dropdown's OPTIONS are gone from the page - they are the drop list screen now - and each
+   dropdown is one labelled line with its current value ("Starting resources | Map default",
+   "Force quickbattles | Never", ...). The widget screen never read a dropdown's name at all.
+3. A text field's label and value separated: "Random Seed, 353629319" is now
+   "Random Seed | 3255587122" (the seed itself is this session's, not the port's), and the same
+   for the online Name field.
+4. A time row became two: "Base turn time, 1:00" is now "Base turn time | 1 minute" and
+   "Base turn time | 0 seconds".
+
+Deviations, measured:
+
+- AN EDIT ROW DECLARES ITS TOOLTIP FOR THE BUFFER BUT DOES NOT AIM AT IT. Drawing the game's
+  tooltip for a control means `NativeTooltipUtility.ShowTooltipForComponent`, which SELECTS the
+  component the tooltip hangs on - for a text row, the row's own label - and that selection takes
+  the keyboard straight back off the field the player just asked to type in. Measured: with the
+  tooltip aimed, `ui_activate` said "editing", the field never reported focus, `/input ui_down`
+  answered `consumed` (no stand-down) and the edit ended in silence; with `PointsAt` cleared,
+  the same sequence answered `standing down` and a native deselect said "Cancelled". The
+  tooltip's lines are still in the review buffer, which is where this mod's ruling puts them.
+- The turn-timer rows' labels are read off the row's own text mesh
+  (`UITextMeshTextUtility.GetEffectiveText`), not off `UITimeInputField.Text`: measured, every
+  one of the seven rows answered `Text` with the prefab's placeholder "Label" while the page
+  drew "Base turn time" and the rest. The adapter now reads them the way it already read every
+  other row kind.
+
+Follow-ups, not fixed:
+
+- THE FOCUS VISUAL IS RE-ASSERTED WHILE THE CURSOR STANDS STILL, which is what the deviation
+  above works around. `GraphNavigator.SyncVisual` skips its work when the node id and the AIM are
+  unchanged, but the aim is compared with `ReferenceEquals` and every build hands it a fresh
+  `Tooltip` object, so a row with a tooltip re-draws it - and re-selects its component - over and
+  over. Measured: with the cursor on a row, a selection put anywhere else by `/eval` was taken
+  back within a second, every time. It affects every ported screen with tooltips (the options
+  window included); nothing there holds the keyboard, so only the text fields showed it.
+- Entering the ONLINE lobby leaves the game's own game-code field holding the keyboard, and
+  opening this window leaves its Name field holding it, so `/input` answers `standing down`
+  until something takes the focus off them. The game activates both itself; the stand-down is
+  working as designed.
+- The online Name row's tooltip is the raw key `Lobby/MapSettings/GameName/Tooltip`, which the
+  game itself fails to localize. Present in the before capture too.
+
+Manual test:
+
+1. A lobby, Game settings. Hear "Game settings", then the first row.
+2. Down the rows: dropdowns read "combo box" and their value, toggles read their state, the
+   Random Seed row reads "editable" and its number.
+3. Enter on a dropdown opens the game's own list; Up and Down walk it; Escape leaves it alone.
+4. Enter on a checkbox says "checked", Enter again "not checked".
+5. Enter on Random Seed says "editing"; type and hear the characters; Enter ends the edit and
+   says "edited" with the new number; Escape instead says "Cancelled" and puts the old one back.
+6. Online, tick Turn timers: seven rows appear, each twice - minutes then seconds - followed by
+   "Reset to defaults". Enter on one, type a number, Enter to end.
+7. Tab: "Cancel, button, 1 of 2", "Confirm, button, 2 of 2".
+8. Escape closes the window without applying (the game's own key).
+
 
 ## Family E: drop lists
 
