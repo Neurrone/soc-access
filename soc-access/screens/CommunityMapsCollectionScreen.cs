@@ -1,21 +1,51 @@
 using System.Collections.Generic;
 using SongsOfConquestAccess.Adapters;
-using SongsOfConquestAccess.Input;
 using SongsOfConquestAccess.Localization;
 using SongsOfConquestAccess.UI;
+using SongsOfConquestAccess.UI.Graph;
+using TMPro;
 
 namespace SongsOfConquestAccess.Screens
 {
-    public sealed class CommunityMapsCollectionScreen : Screen
+    /// <summary>
+    /// The community maps browser's Collection page, made navigable as a graph. Five places to be, and
+    /// Tab moves between them: the Browse/Collection tab pair, the page's two commands, the filtering
+    /// band, the subscribed mods, and the way out.
+    ///
+    /// Measured 2026-09-06 at 1280x800 through <c>/gui/unity</c>: the nav bar as on the browse page -
+    /// BROWSE (x 479) and COLLECTION (x 634) at y 29, "Search &amp; filter" at [1064,27,107,27], the
+    /// "Back / Exit" prompt at [53,24,50,27] - then the panel's own title ("Collection") at
+    /// [53,133,181,27] and one <c>Filtering</c> band across y 192: the keyword box at [53,192,373,32]
+    /// (placeholder "Enter keyword"), "Check for updates" at [714,195,118,27], "Filter by:" at
+    /// [843,195,187,27] reading "Subscribed" and "Sort by:" at [1040,195,187,27] reading
+    /// "Alphabetical". The mods hang under that; this account has none, and an empty stop declares
+    /// nothing, so Tab passes straight over it.
+    ///
+    /// Both drawn filters are real dropdowns - mod.io's <c>MultiTargetDropdown</c>, a
+    /// <c>TMP_Dropdown</c> subclass (decompiled) - so each is a combo box opening the mod's own list
+    /// over mod.io's popup, as every other page's dropdown does.
+    ///
+    /// THE TABS SWITCH ON ENTER, NOT ON FOCUS, for the reason the browse page records: the nav bar
+    /// draws two text labels with no clickable control under them, and the only way to switch is to
+    /// OPEN the other panel, which re-fetches the page.
+    ///
+    /// Escape is CLAIMED and runs mod.io's own cancel, which from this panel opens the browse page
+    /// again (decompiled <c>Navigating.Cancel</c>); the drawn Close closes the whole browser, as the
+    /// widget screen's did.
+    /// </summary>
+    public sealed class CommunityMapsCollectionScreen : GraphScreen
     {
-        private const string SearchInputId = "community-maps-collection-keyword";
-        private const int ItemsMenuIndex = 7;
+        private const string TabsStop = "community-maps-collection-tabs";
+        private const string CommandsStop = "community-maps-collection-commands";
+        private const string FiltersStop = "community-maps-collection-filters";
+        private const string ItemsStop = "community-maps-collection-items";
+        private const string FooterStop = "community-maps-collection-footer";
 
         private readonly CommunityMapsCollectionAdapter _adapter;
-        private bool _refreshAfterSearchInput;
+        private readonly GameTextEditor _editor = new GameTextEditor();
+        private readonly Dictionary<string, object> _markers = new Dictionary<string, object>();
 
         public CommunityMapsCollectionScreen(CommunityMapsCollectionAdapter adapter)
-            : base(BuildRoot(adapter))
         {
             _adapter = adapter;
         }
@@ -28,228 +58,264 @@ namespace SongsOfConquestAccess.Screens
                 : null;
         }
 
+        public override string Key
+        {
+            get { return "community-maps-collection"; }
+        }
+
+        /// <summary>The panel's own drawn title, which carries the count ("Collection (0)").</summary>
+        public override string ScreenName
+        {
+            get { return _adapter != null ? _adapter.Title : null; }
+        }
+
+        public override object InitialFocusStop
+        {
+            get { return TabsStop; }
+        }
+
         public override bool IsPresent()
         {
             return _adapter != null && _adapter.IsPresent();
         }
 
-        public override void OnUnfocus()
+        public override bool ConsumesBack
         {
-            RootWidget?.Unfocus();
+            get { return IsPresent(); }
         }
 
-        public override bool OnActionJustPressed(InputAction action)
+        public override bool Back()
         {
-            if (action != null && action.Key == AccessibilityActions.Cancel.Key)
-            {
-                if (RootWidget != null && RootWidget.HandleAction(action))
-                {
-                    return true;
-                }
+            return _adapter != null && _adapter.Cancel();
+        }
 
-                return _adapter != null && _adapter.Close();
-            }
+        /// <summary>While the keyboard is on its way to the keyword box, what the player types next is
+        /// meant for that box and must not start a search of the page.</summary>
+        public override bool CapturesRawInput
+        {
+            get { return _editor.Pending; }
+        }
 
-            return base.OnActionJustPressed(action);
+        public override bool OwnsGameField
+        {
+            get { return _editor.Pending || _editor.Editing; }
+        }
+
+        /// <summary>Asked by the detector before it refreshes the page. The keyword box is the one
+        /// thing here that must not be disturbed mid-edit.</summary>
+        public bool IsSearchInputFocused()
+        {
+            return _editor.Pending || _editor.Editing;
+        }
+
+        /// <summary>Kept for the detector. The graph is declared afresh on every operation, so there is
+        /// nothing to defer.</summary>
+        public void DeferRefreshUntilSearchInputUnfocused()
+        {
+        }
+
+        /// <summary>Kept for the detector, which calls it whenever the collection changes. The graph is
+        /// declared afresh on every operation, so there is nothing to rebuild.</summary>
+        public void Refresh()
+        {
         }
 
         public override void Update()
         {
             base.Update();
-            if (_refreshAfterSearchInput && !IsSearchInputFocused())
-            {
-                Refresh();
-            }
+            _editor.Update(IsPresent());
         }
 
-        public bool IsSearchInputFocused()
+        public override void OnUnfocus()
         {
-            Widget focused = UIManager.CurrentWidget;
-            return focused != null && focused.Id == SearchInputId;
+            base.OnUnfocus();
+            _editor.Abandon();
         }
 
-        public void DeferRefreshUntilSearchInputUnfocused()
+        public override void OnPop()
         {
-            _refreshAfterSearchInput = true;
+            base.OnPop();
+            _editor.Abandon();
         }
 
-        public void Refresh()
+        public override void Build(GraphBuilder builder)
         {
             if (!IsPresent())
             {
                 return;
             }
 
-            _refreshAfterSearchInput = false;
-            int focusedIndex = RootWidget != null ? RootWidget.FocusedIndex : -1;
-            int itemFocusedIndex = GetFocusedItemIndex();
-            RootWidget = BuildRoot(_adapter);
-            RestoreItemFocus(itemFocusedIndex);
-            RootWidget?.SetFocusByIndexSilently(focusedIndex);
+            builder.BeginStop(TabsStop);
+            BuildTabs(builder);
+
+            builder.BeginStop(CommandsStop);
+            BuildCommands(builder);
+
+            builder.BeginStop(FiltersStop);
+            BuildKeyword(builder);
+            BuildCheckForUpdates(builder);
+            BuildDropdown(builder, _adapter.FilterDropdown);
+            BuildDropdown(builder, _adapter.SortDropdown);
+
+            builder.BeginStop(ItemsStop);
+            BuildItems(builder);
+
+            builder.BeginStop(FooterStop);
+            BuildFooter(builder);
         }
 
-        private int GetFocusedItemIndex()
+        // ---- the tab pair ----
+
+        private void BuildTabs(GraphBuilder builder)
         {
-            MenuWidget menu = RootWidget != null ? RootWidget.GetChildAt(ItemsMenuIndex) as MenuWidget : null;
-            return menu != null ? menu.FocusedIndex : -1;
-        }
-
-        private void RestoreItemFocus(int itemFocusedIndex)
-        {
-            MenuWidget menu = RootWidget != null ? RootWidget.GetChildAt(ItemsMenuIndex) as MenuWidget : null;
-            menu?.SetFocusByIndexSilently(itemFocusedIndex);
-        }
-
-        private static ContainerWidget BuildRoot(CommunityMapsCollectionAdapter adapter)
-        {
-            ContainerWidget root = new ContainerWidget("community-maps-collection", adapter != null ? adapter.Title : string.Empty);
-            if (adapter == null)
-            {
-                return root;
-            }
-
-            root.AddChild(BuildTabs(adapter));
-            root.AddChild(new ButtonWidget(
-                "community-maps-collection-search-filter",
-                () => adapter.SearchFilterLabel,
-                adapter.OpenSearchFilter,
-                null,
-                () => adapter.HasSearchFilter,
-                () => adapter.HasSearchFilter));
-            root.AddChild(new ButtonWidget(
-                "community-maps-collection-downloads",
-                () => adapter.DownloadsLabel,
-                adapter.OpenDownloadsMenu,
-                null,
-                () => adapter.HasDownloadsMenu,
-                () => adapter.HasDownloadsMenu));
-            root.AddChild(new TmpInputFieldWidget(
-                "community-maps-collection-keyword",
-                adapter.SearchFieldLabel,
-                () => adapter.SearchField));
-            AddButton(root, "community-maps-collection-", adapter.CheckForUpdatesAction);
-            root.AddChild(BuildDropdown(adapter.FilterDropdown));
-            root.AddChild(BuildDropdown(adapter.SortDropdown));
-            root.AddChild(BuildItemsMenu(adapter));
-            root.AddChild(new CheckboxWidget(
-                "community-maps-collection-selected-enabled",
-                () => adapter.SelectedItemLabel,
-                () => adapter.ToggleSelectedItemEnabled(),
-                adapter.IsSelectedItemEnabled,
-                adapter.IsSelectedItemToggleVisible,
-                adapter.IsSelectedItemToggleEnabled,
-                null));
-            root.AddChild(new ButtonWidget(
-                "community-maps-collection-selected-unsubscribe",
-                () => adapter.UnsubscribeLabel,
-                adapter.UnsubscribeSelectedItem,
-                null,
-                adapter.IsUnsubscribeEnabled,
-                adapter.IsUnsubscribeVisible));
-            root.AddChild(new ButtonWidget(
-                "community-maps-collection-selected-options",
-                () => adapter.MoreOptionsLabel,
-                adapter.OpenSelectedItemOptions,
-                null,
-                adapter.IsMoreOptionsEnabled,
-                adapter.IsMoreOptionsVisible));
-            root.AddChild(new ButtonWidget(
-                "community-maps-collection-close",
-                ModText.Get(ModStrings.Screens.Close),
-                adapter.Close,
-                null,
-                () => true));
-
-            return root;
-        }
-
-        private static MenuWidget BuildTabs(CommunityMapsCollectionAdapter adapter)
-        {
-            MenuWidget menu = new MenuWidget("community-maps-collection-tabs", ModText.Get(ModStrings.Screens.Tabs));
-            IReadOnlyList<CommunityMapsCollectionAdapter.TabItem> tabs = adapter.GetTabs();
-            string selectedId = null;
+            IReadOnlyList<CommunityMapsCollectionAdapter.TabItem> tabs = _adapter.GetTabs();
             for (int i = 0; i < tabs.Count; i++)
             {
                 CommunityMapsCollectionAdapter.TabItem tab = tabs[i];
-                CommunityMapsCollectionAdapter.TabItem captured = tab;
-                if (captured.IsSelected)
+                if (tab == null)
                 {
-                    selectedId = "community-maps-collection-tab-" + captured.Id;
+                    continue;
                 }
 
-                menu.AddItem(new MenuItemWidget(
-                    "community-maps-collection-tab-" + captured.Id,
+                CommunityMapsCollectionAdapter.TabItem captured = tab;
+                NodeVtable vtable = GraphNodes.Tab(
                     () => captured.Label,
-                    () => captured.IsSelected ? ModText.Get(ModStrings.UI.Selected) : string.Empty,
-                    captured.Select,
-                    () => captured.Select(),
-                    () => true));
+                    () => captured.IsSelected);
+                vtable.OnActivate = () => captured.Select();
+                builder.AddItem(Synthetic("tab/" + captured.Id, vtable));
             }
-
-            menu.SetFocusedItemById(selectedId);
-            return menu;
         }
 
-        private static MenuWidget BuildDropdown(CommunityMapsCollectionAdapter.DropdownItem dropdown)
+        // ---- the page's commands ----
+
+        private void BuildCommands(GraphBuilder builder)
         {
-            MenuWidget menu = new MenuWidget(
-                "community-maps-collection-" + dropdown.Id,
-                dropdown.Label,
-                () => dropdown.IsVisible,
-                () => dropdown.Focus(),
-                null);
-            IReadOnlyList<string> options = dropdown.GetOptions();
-            for (int i = 0; i < options.Count; i++)
+            NodeVtable searchFilter = GraphNodes.Button(
+                () => _adapter.SearchFilterLabel,
+                () => _adapter.OpenSearchFilter(),
+                () => _adapter.HasSearchFilter);
+            builder.AddItem(Synthetic("search-filter", searchFilter));
+
+            NodeVtable downloads = GraphNodes.Button(
+                () => _adapter.DownloadsLabel,
+                () => _adapter.OpenDownloadsMenu(),
+                () => _adapter.HasDownloadsMenu);
+            builder.AddItem(Synthetic("downloads", downloads));
+        }
+
+        // ---- the filtering band ----
+
+        /// <summary>The keyword box. It is one of mod.io's own TMP fields rather than one of the
+        /// game's, and the editing contract is the same; its label is the box's own placeholder, which
+        /// is the only thing the band writes next to it.</summary>
+        private void BuildKeyword(GraphBuilder builder)
+        {
+            TMP_InputField field = _adapter.SearchField;
+            if (field == null || !field.gameObject.activeInHierarchy)
             {
-                int index = i;
-                menu.AddItem(new MenuItemWidget(
-                    "community-maps-collection-" + dropdown.Id + "-option-" + index,
-                    () => options[index],
-                    () => dropdown.Value == index ? ModText.Get(ModStrings.UI.Selected) : string.Empty,
-                    () => dropdown.SetValue(index),
-                    () => dropdown.Focus(),
-                    () => true));
+                return;
             }
 
-            menu.SetFocusByIndexSilently(dropdown.Value);
-            return menu;
+            NodeVtable vtable = GraphNodes.EditField(
+                () => _adapter.SearchFieldLabel,
+                () => _editor.Editing ? null : field.text,
+                () => _editor.Request(_adapter.SearchField),
+                () => field.interactable);
+            // Arriving puts the game's own selection on the box - the search filter panel's finding:
+            // without it an activation that follows a row whose focus visual selected one of mod.io's
+            // own controls selects the box but never makes it FOCUSED, and the edit ends in silence.
+            vtable.OnFocusVisual = () => NativeSelectionUtility.Select(field);
+            builder.AddItem(new DrawnNode(
+                ControlId.For(field, "community-maps-collection:keyword"),
+                vtable,
+                field));
         }
 
-        private static MenuWidget BuildItemsMenu(CommunityMapsCollectionAdapter adapter)
+        private void BuildCheckForUpdates(GraphBuilder builder)
         {
-            IReadOnlyList<CommunityMapsCollectionAdapter.CollectionItem> items = adapter.GetItems();
-            MenuWidget menu = new MenuWidget(
-                "community-maps-collection-items",
-                adapter.ItemsLabel,
-                () => items.Count > 0);
+            CommunityMapsCollectionAdapter.ButtonAction action = _adapter.CheckForUpdatesAction;
+            if (action == null || !action.IsVisible())
+            {
+                return;
+            }
+
+            NodeVtable vtable = GraphNodes.Button(
+                () => action.Label,
+                () => action.Activate(),
+                action.IsEnabled);
+            vtable.OnFocusVisual = () => action.Focus();
+            builder.AddItem(Synthetic(action.Id, vtable));
+        }
+
+        private void BuildDropdown(GraphBuilder builder, CommunityMapsCollectionAdapter.DropdownItem list)
+        {
+            if (list == null || !list.IsVisible() || list.Subject == null)
+            {
+                return;
+            }
+
+            NodeVtable vtable = GraphNodes.ComboBox(
+                () => list.Label,
+                () => list.CurrentLabel,
+                () => DropListScreen.Open(list, list.Label, index => list.SetValue(index)),
+                list.IsEnabled);
+            vtable.OnFocusVisual = () => list.Focus();
+            builder.AddItem(new DrawnNode(
+                ControlId.For(list.Subject, "community-maps-collection:" + list.Id),
+                vtable,
+                list.Subject));
+        }
+
+        // ---- the subscribed mods ----
+
+        private void BuildItems(GraphBuilder builder)
+        {
+            IReadOnlyList<CommunityMapsCollectionAdapter.CollectionItem> items = _adapter.GetItems();
             for (int i = 0; i < items.Count; i++)
             {
                 CommunityMapsCollectionAdapter.CollectionItem item = items[i];
-                CommunityMapsCollectionAdapter.CollectionItem captured = item;
-                menu.AddItem(new MenuItemWidget(
-                    "community-maps-collection-item-" + captured.Index,
-                    () => captured.Label,
-                    () => captured.Status,
-                    () => adapter.ActivateItem(captured),
-                    () => adapter.FocusItem(captured),
-                    () => captured.IsVisible));
-            }
+                if (item == null || !item.IsVisible)
+                {
+                    continue;
+                }
 
-            return menu;
+                CommunityMapsCollectionAdapter.CollectionItem captured = item;
+                NodeVtable vtable = GraphNodes.Button(
+                    () => captured.Label,
+                    () => _adapter.ActivateItem(captured));
+                vtable.Announcements.Add(GraphNodes.ValuePart(() => captured.Status));
+                vtable.OnFocusVisual = () => _adapter.FocusItem(captured);
+                builder.AddItem(Synthetic("item/" + captured.Index, vtable));
+            }
         }
 
-        private static void AddButton(
-            ContainerWidget root,
-            string idPrefix,
-            CommunityMapsCollectionAdapter.ButtonAction action)
+        // ---- the way out ----
+
+        private void BuildFooter(GraphBuilder builder)
         {
-            root.AddChild(new ButtonWidget(
-                idPrefix + action.Id,
-                () => action.Label,
-                action.Activate,
-                () => action.Focus(),
-                action.IsEnabled,
-                action.IsVisible));
+            NodeVtable close = GraphNodes.Button(
+                () => ModText.Get(ModStrings.Screens.Close),
+                () => _adapter.Close());
+            builder.AddItem(Synthetic("close", close));
+        }
+
+        private SyntheticNode Synthetic(string key, NodeVtable vtable)
+        {
+            return new SyntheticNode(
+                ControlId.For(Marker(key), "community-maps-collection:" + key),
+                vtable);
+        }
+
+        private object Marker(string key)
+        {
+            object marker;
+            if (!_markers.TryGetValue(key, out marker))
+            {
+                marker = new object();
+                _markers.Add(key, marker);
+            }
+
+            return marker;
         }
     }
 }

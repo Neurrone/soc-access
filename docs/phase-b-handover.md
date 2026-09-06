@@ -1831,3 +1831,100 @@ Manual test:
 8. Tab: "Close, button". Enter closes the browser, and so does Escape from anywhere on the page.
 9. Note what is NOT here any more: the per-item Subscribe and More options of the four bands
    (follow-up above). Subscribe is still on the item's details page.
+
+### CommunityMapsCollectionScreen
+
+Built: five stops. `community-maps-collection-tabs` holds Browse and Collection;
+`community-maps-collection-commands` holds Search & filter and Downloads;
+`community-maps-collection-filters` holds the keyword box, Check for updates and the two dropdowns in
+drawn left-to-right order; `community-maps-collection-items` holds the subscribed mods;
+`community-maps-collection-footer` holds Close. Screen name is the panel's own drawn title, which
+carries the count ("Collection (0)"); focus starts on the tab pair.
+
+Measured 2026-09-06 at 1280x800 through `/gui/unity`: the nav bar as on the browse page - BROWSE
+(x 479) and COLLECTION (x 634) at y 29, "Search & filter" at [1064,27,107,27], the "Back / Exit"
+prompt at [53,24,50,27] - then the panel's title at [53,133,181,27] and ONE `Filtering` band across
+y 192: the keyword box at [53,192,373,32] (placeholder "Enter keyword"), "Check for updates" at
+[714,195,118,27], "Filter by:" at [843,195,187,27] reading "Subscribed" and "Sort by:" at
+[1040,195,187,27] reading "Alphabetical". This account's collection is empty, so the items stop
+declares nothing and Tab passes straight over it - verified in the walk.
+
+Escape is CLAIMED and runs mod.io's own cancel (`InputReceiver.OnCancel` into `Navigating.Cancel`),
+which from this panel opens the BROWSE page again rather than closing the browser: the decompiled
+branch chain reaches `Home.Instance.Open()` because the collection is not the browser panel. Verified:
+`ui_back` answered `consumed` and the browse page read "Browse, tab, selected, 1 of 2". The drawn
+Close still closes the whole browser, as the widget screen's did.
+
+Diff: one kind of change, and every before line is accounted for.
+
+1. The five dropdown options (Subscribed, Unsubscribed, All mods; Alphabetical, File size) left the
+   page - they are the drop list screen now.
+2. Each dropdown became one labelled line: "Filter by: | Subscribed" and "Sort by: | Alphabetical".
+   The widget screen never read either control's own name.
+
+Nothing else changed; the tabs, Search & filter, Downloads, the keyword box, Check for updates and
+Close read exactly as before.
+
+Deviations, each measured:
+
+- BOTH FILTERS ARE REAL DROPDOWNS, so each is a combo box opening the mod's list over mod.io's popup
+  (family E), not a set of radio rows: `Collection.CollectionPanelFirstDropDownFilter` and
+  `...SecondDropDownFilter` are `MultiTargetDropdown`s, which decompile as `TMP_Dropdown` subclasses.
+  `DropdownPopup` grew `Show`/`Hide`/`IsOpen`/`FocusOption` overloads taking a bare `TMP_Dropdown`
+  (the game's own dropdowns come wrapped in `IUITextMeshDropdown`; mod.io's do not), and the
+  adapter's `DropdownItem` now implements `IDropList` and answers `CurrentLabel` and `Subject`.
+  Verified: Enter on Sort by: read "Sort by:" then "Alphabetical, selected, 1 of 2", Down read "File
+  size", Escape came back to the unchanged row; on Filter by:, taking "Unsubscribed" redrew the page
+  and left the cursor on the row reading the new value, and taking "Subscribed" put it back.
+- THE TABS SWITCH ON ENTER, NOT ON FOCUS, the browse page's finding. Verified here: Down on the tab
+  row read "Collection, tab, 2 of 2" without changing the page, and Enter switched it.
+- The keyword box takes a native focus visual of its own (`NativeSelectionUtility.Select` on the
+  field), the search filter panel's finding, and follows the plain edit contract. Verified: Enter said
+  "editing", `/input ui_down` answered `standing down`, and deactivating the field natively through
+  `/eval` said "Cancelled".
+- THE WIDGET SCREEN'S THREE SELECTED-ITEM CONTROLS ARE GONE - the enabled/disabled checkbox, the
+  Unsubscribe button and the More options button it drew for whichever mod was selected. The approved
+  model has the items as rows and nothing else, and neither the before capture nor this walk could
+  show any of them, the collection being empty. The facts are still in the adapter
+  (`CollectionItem.Toggle`, `.UnsubscribeButton`, `.MoreOptionsButton` are the drawn components mod.io
+  puts on each row), so they can become each item's child nodes when there is a collection to measure
+  with (follow-up below).
+- `IsSearchInputFocused()`, which the detector asks before refreshing, now answers the editor's
+  pending-or-editing state rather than looking at `UIManager.CurrentWidget`;
+  `DeferRefreshUntilSearchInputUnfocused()` is an empty method, the graph being declared afresh on
+  every operation.
+- A mod's download progress is declared as a live value part (the widget's status column).
+
+Follow-ups, not fixed:
+
+- The per-item enable toggle, Unsubscribe and More options are unreachable from this page (deviation
+  above). Nothing could be walked here: this account is subscribed to nothing. Whoever ports the rest
+  should open this page with a real collection before deciding.
+- `Check for updates` was declared but never pressed.
+- `/screenshot` answered an all-black frame (the locked-session symptom), so the layout evidence is
+  `/gui/unity`.
+
+Walk (all through `/input` and `/eval`): Tab cycles tabs, commands, filters and footer, SKIPPING the
+empty items stop; the commands read "Search & filter, button, 1 of 2" and "Downloads, button, 2 of 2";
+the filters read "Enter keyword, editable, 1 of 4", "Check for updates, button, 2 of 4", "Filter by:,
+combo box, Subscribed, 3 of 4" and "Sort by:, combo box, Alphabetical, 4 of 4"; both drop lists opened
+on their current value, walked and cancelled; the filter took a value and was put back; the keyword box
+gave "editing", `standing down` and "Cancelled"; `ui_back` returned to the browse page. Check for
+updates and Downloads were never activated.
+
+Manual test:
+
+1. Main menu, Community Maps, Escape past the modal, Down to "Collection, tab, 2 of 2", Enter. Hear
+   "Collection (0)", then "Collection, tab, selected, 2 of 2".
+2. Tab: "Search & filter, button, 1 of 2", "Downloads, button, 2 of 2".
+3. Tab: "Enter keyword, editable". Enter says "editing"; type and hear the keys; Escape says
+   "Cancelled" and Enter ends the edit with what you typed.
+4. Down: "Check for updates, button, 2 of 4" (leave it alone unless you mean it), then "Filter by:,
+   combo box, Subscribed" and "Sort by:, combo box, Alphabetical". Enter on either opens mod.io's own
+   list; Up and Down walk it; Escape leaves the filter alone; Enter takes the value and the cursor
+   comes back to the row.
+5. Tab: "Close, button" - the items stop is skipped while the collection is empty. With mods
+   subscribed, Tab should stop on the list between the filters and Close; walk it and tell me what
+   each row should say, and whether you want its enable toggle, Unsubscribe and More options back as
+   child nodes (follow-up above).
+6. Escape goes back to the browse page; Enter on Close closes the browser.

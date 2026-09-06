@@ -327,6 +327,21 @@ namespace SongsOfConquestAccess.Adapters
             return true;
         }
 
+        /// <summary>mod.io's own cancel, which knows what this panel closes to: with no context menu,
+        /// dropdown, search panel, authentication, download queue, details panel or uninstall
+        /// confirmation up, <c>Navigating.Cancel</c> opens the browse page again because the collection
+        /// is not the browser panel (decompiled).</summary>
+        public bool Cancel()
+        {
+            if (!Browser.IsOpen)
+            {
+                return false;
+            }
+
+            InputReceiver.OnCancel();
+            return true;
+        }
+
         private bool OpenBrowse()
         {
             Home[] homes = Resources.FindObjectsOfTypeAll<Home>();
@@ -735,7 +750,10 @@ namespace SongsOfConquestAccess.Adapters
             }
         }
 
-        public sealed class DropdownItem
+        /// <summary>One of the collection page's two dropdowns, answering the questions every drop
+        /// list answers so the mod's own list screen can be opened over mod.io's popup. What TAKING an
+        /// entry means is the page's, and it hands that over when it opens the list.</summary>
+        public sealed class DropdownItem : IDropList
         {
             private readonly MultiTargetDropdown _dropdown;
             private readonly Func<MultiTargetDropdown, int, bool> _setValue;
@@ -753,23 +771,60 @@ namespace SongsOfConquestAccess.Adapters
                 _dropdown = dropdown;
                 _setValue = setValue;
                 _focus = focus;
+                GetOptions = ReadOptions;
+                GetValue = () => _dropdown != null ? _dropdown.value : -1;
+                IsEnabled = () => _dropdown != null
+                    && _dropdown.gameObject.activeInHierarchy
+                    && _dropdown.interactable;
+                IsVisible = () => _dropdown != null && _dropdown.gameObject.activeInHierarchy;
+                OpenPopup = () => DropdownPopup.Show(_dropdown);
+                ClosePopup = () => DropdownPopup.Hide(_dropdown);
+                IsPopupOpen = () => DropdownPopup.IsOpen(_dropdown);
+                FocusOption = index => DropdownPopup.FocusOption(_dropdown, index);
             }
 
             public string Id { get; private set; }
 
+            /// <summary>What the dropdown is choosing, in mod.io's own words ("Filter by:").</summary>
             public string Label { get; private set; }
 
-            public bool IsVisible
+            /// <summary>The drawn control itself, so a caller can key a node on it.</summary>
+            public Component Subject
             {
-                get { return _dropdown != null && _dropdown.gameObject.activeInHierarchy; }
+                get { return _dropdown; }
             }
 
-            public int Value
+            public Func<IReadOnlyList<string>> GetOptions { get; private set; }
+            public Func<int> GetValue { get; private set; }
+            public Func<bool> IsEnabled { get; private set; }
+            public Func<bool> IsVisible { get; private set; }
+            public Func<bool> OpenPopup { get; private set; }
+            public Func<bool> ClosePopup { get; private set; }
+            public Func<bool> IsPopupOpen { get; private set; }
+            public Func<int, bool> FocusOption { get; private set; }
+
+            /// <summary>The entry the dropdown is on, in mod.io's own words.</summary>
+            public string CurrentLabel
             {
-                get { return _dropdown != null ? _dropdown.value : -1; }
+                get
+                {
+                    IReadOnlyList<string> options = ReadOptions();
+                    int value = GetValue();
+                    return value >= 0 && value < options.Count ? options[value] : string.Empty;
+                }
             }
 
-            public IReadOnlyList<string> GetOptions()
+            public bool Focus()
+            {
+                return _focus != null && _focus(_dropdown);
+            }
+
+            public bool SetValue(int value)
+            {
+                return _setValue != null && _setValue(_dropdown, value);
+            }
+
+            private IReadOnlyList<string> ReadOptions()
             {
                 List<string> result = new List<string>();
                 if (_dropdown == null || _dropdown.options == null)
@@ -784,16 +839,6 @@ namespace SongsOfConquestAccess.Adapters
                 }
 
                 return result;
-            }
-
-            public bool Focus()
-            {
-                return _focus != null && _focus(_dropdown);
-            }
-
-            public bool SetValue(int value)
-            {
-                return _setValue != null && _setValue(_dropdown, value);
             }
         }
 

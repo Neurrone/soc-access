@@ -59,7 +59,42 @@ namespace SongsOfConquestAccess.Adapters
         /// <c>AutoScrollToSelected</c> scrolls to.</summary>
         public static bool FocusOption(IUITextMeshDropdown dropdown, int index)
         {
-            TMP_Dropdown tmpDropdown = GetTmpDropdown(dropdown);
+            return FocusOption(GetTmpDropdown(dropdown), index);
+        }
+
+        /// <summary>Show a bare TMP dropdown's popup. The community maps browser draws mod.io's own
+        /// <c>MultiTargetDropdown</c>, which is a <c>TMP_Dropdown</c> subclass with no
+        /// <c>IUITextMeshDropdown</c> wrapper around it, so the same four questions are answered off
+        /// the TMP control directly.</summary>
+        public static bool Show(TMP_Dropdown dropdown)
+        {
+            if (dropdown == null || !dropdown.IsActive() || !dropdown.IsInteractable())
+            {
+                return false;
+            }
+
+            dropdown.Show();
+            return true;
+        }
+
+        public static bool Hide(TMP_Dropdown dropdown)
+        {
+            if (dropdown == null)
+            {
+                return false;
+            }
+
+            dropdown.Hide();
+            return true;
+        }
+
+        public static bool IsOpen(TMP_Dropdown dropdown)
+        {
+            return dropdown != null && dropdown.IsActive() && dropdown.IsExpanded;
+        }
+
+        public static bool FocusOption(TMP_Dropdown tmpDropdown, int index)
+        {
             IList items = tmpDropdown != null && TmpItemsField != null
                 ? TmpItemsField.GetValue(tmpDropdown) as IList
                 : null;
