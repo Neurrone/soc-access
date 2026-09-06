@@ -198,13 +198,16 @@ graph side of the mod.
   (every native `Tooltip` is an `Indicate` section, buffer only, and `Aim` sets `PointsAt` so
   focus draws it). `ActedState` is the other half of the unavailable swallow: a control that
   refused an activation reports nothing afterwards. Every new factory takes the same
-  cross-cutting parameters. Still to add: radio, and the sheet cell.
+  cross-cutting parameters. `Radio` arrived with the random layout page (a set where exactly one
+  is in force and picking is not doing). Still to add: the sheet cell.
 - `ui/ControlTypes.cs` — the role registry: `Button`, `Group`, `Text` (no role word),
   `EditField` ("editable"), `Checkbox` ("checkbox"), `Slider` ("slider"), `ComboBox`
-  ("combo box"), `Tab` ("tab"). New
+  ("combo box"), `Tab` ("tab"), `RadioButton` ("radio button"). New
   types need a role `ModString` in the phase's localization batch.
 - `screens/DropListScreen.cs` — the list a combo box opens, as a mod-owned child screen: a
-  static `Open(item, title, choose)` the page underneath calls, one stop of `Choice` nodes
+  static `Open(item, title, choose)` the page underneath calls over any adapter's
+  `adapters/IDropList.cs` (the dropdown facts every page shares, `adapters/DropdownPopup.cs`
+  being the popup half), one stop of `Choice` nodes
   walked Up/Down with the current value `Selected` so the list lands on it, the game's own
   popup opened on push and hidden on pop, and Escape claimed (`ConsumesBack`) so a mod-owned
   surface denies the game the key.

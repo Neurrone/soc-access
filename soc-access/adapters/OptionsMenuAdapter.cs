@@ -1,5 +1,4 @@
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Reflection;
 using HarmonyLib;
@@ -11,7 +10,6 @@ using SongsOfConquestAccess.Localization;
 using SongsOfConquestAccess.Speech;
 using TMPro;
 using UnityEngine;
-using UnityEngine.UI;
 
 namespace SongsOfConquestAccess.Adapters
 {
@@ -25,7 +23,6 @@ namespace SongsOfConquestAccess.Adapters
         private static readonly MethodInfo SliderGetTextMeshMethod = AccessTools.Method(typeof(UISlider), "GetTextMesh");
         private static readonly MethodInfo DropdownGetTextMethod = AccessTools.Method(typeof(UITextMeshDropdown), "GetText");
         private static readonly FieldInfo SliderEditButtonField = AccessTools.Field(typeof(UISlider), "_editValueButton");
-        private static readonly FieldInfo TmpDropdownItemsField = AccessTools.Field(typeof(TMP_Dropdown), "m_Items");
 
         private readonly OptionsMenu _menu;
 
@@ -204,10 +201,10 @@ namespace SongsOfConquestAccess.Adapters
                         () => dropdown.Active && dropdown.Interactable,
                         () => IsActive(component),
                         () => Tooltip.ForComponent(GetDropdownTooltipComponent(dropdown) ?? component, null),
-                        () => ShowDropdownPopup(dropdown),
-                        () => HideDropdownPopup(dropdown),
-                        () => dropdown.Active && dropdown.IsExpanded,
-                        optionIndex => FocusDropdownOption(dropdown, optionIndex))));
+                        () => DropdownPopup.Show(dropdown),
+                        () => DropdownPopup.Hide(dropdown),
+                        () => DropdownPopup.IsOpen(dropdown),
+                        optionIndex => DropdownPopup.FocusOption(dropdown, optionIndex))));
             }
         }
 
@@ -447,57 +444,6 @@ namespace SongsOfConquestAccess.Adapters
 
             clicked(Vector2.zero);
             return true;
-        }
-
-        private static TMP_Dropdown GetTmpDropdown(IUITextMeshDropdown dropdown)
-        {
-            Component component = dropdown as Component;
-            return component != null ? component.GetComponentInChildren<TMP_Dropdown>(true) : null;
-        }
-
-        private static bool ShowDropdownPopup(IUITextMeshDropdown dropdown)
-        {
-            if (dropdown == null || !dropdown.Active || !dropdown.Interactable)
-            {
-                return false;
-            }
-
-            dropdown.Show();
-            return true;
-        }
-
-        private static bool HideDropdownPopup(IUITextMeshDropdown dropdown)
-        {
-            TMP_Dropdown tmpDropdown = GetTmpDropdown(dropdown);
-            if (tmpDropdown == null)
-            {
-                return false;
-            }
-
-            tmpDropdown.Hide();
-            return true;
-        }
-
-        /// <summary>Put the game's own highlight on one entry of the open popup, the way hovering it
-        /// does. The entries are the toggles TMP builds when the list opens (<c>TMP_Dropdown.m_Items</c>,
-        /// one per option in option order), and selecting one is also what the template's
-        /// <c>AutoScrollToSelected</c> scrolls to.</summary>
-        private static bool FocusDropdownOption(IUITextMeshDropdown dropdown, int index)
-        {
-            TMP_Dropdown tmpDropdown = GetTmpDropdown(dropdown);
-            IList items = tmpDropdown != null && TmpDropdownItemsField != null
-                ? TmpDropdownItemsField.GetValue(tmpDropdown) as IList
-                : null;
-            if (items == null || index < 0 || index >= items.Count)
-            {
-                return false;
-            }
-
-            // The entry's own type is protected, so it is read as the behaviour it is: the toggle that
-            // makes the row clickable sits on the same object TMP builds for it.
-            Component item = items[index] as Component;
-            Toggle toggle = item != null ? item.GetComponent<Toggle>() : null;
-            return toggle != null && NativeSelectionUtility.Select(toggle);
         }
 
         private static IReadOnlyList<string> GetDropdownOptions(IUITextMeshDropdown dropdown)
@@ -783,7 +729,7 @@ namespace SongsOfConquestAccess.Adapters
             public Func<Tooltip> GetTooltip { get; private set; }
         }
 
-        public sealed class DropdownItem
+        public sealed class DropdownItem : IDropList
         {
             public DropdownItem(string id, Func<string> getLabel, Func<IReadOnlyList<string>> getOptions, Func<int> getValue, Func<int, bool> setValue, Action focus, Func<bool> isEnabled, Func<bool> isVisible, Func<Tooltip> getTooltip, Func<bool> openPopup, Func<bool> closePopup, Func<bool> isPopupOpen, Func<int, bool> focusOption)
             {

@@ -441,6 +441,13 @@ namespace SongsOfConquestAccess.Adapters
 
             public AdventureWinCondition Condition { get; private set; }
 
+            /// <summary>The drawn toggle itself, so a caller can key a control on the object the game
+            /// destroys when the card goes away.</summary>
+            public Component Subject
+            {
+                get { return _toggle; }
+            }
+
             public string Id
             {
                 get { return Condition.ToString().ToLowerInvariant(); }
@@ -483,6 +490,16 @@ namespace SongsOfConquestAccess.Adapters
                 }
             }
 
+            /// <summary>The game's own selection on the toggle, which is what its scroll rect
+            /// follows.</summary>
+            public void Focus()
+            {
+                if (_toggle != null)
+                {
+                    NativeSelectionUtility.Select(_toggle.GetSelectable());
+                }
+            }
+
             public Tooltip GetTooltip()
             {
                 Component component = _toggle != null ? _toggle.GetTextMesh() as Component : null;
@@ -497,7 +514,10 @@ namespace SongsOfConquestAccess.Adapters
             }
         }
 
-        public sealed class LayoutDropdownItem
+        /// <summary>The layout dropdown the selected card draws ("Quad", "Corridor", "Random"), in
+        /// the shape every drop list in the mod answers: the options, the one in force, and the
+        /// game's own popup underneath.</summary>
+        public sealed class LayoutDropdownItem : IDropList
         {
             private readonly UITextMeshDropdown _dropdown;
             private readonly ILocalizationHandler _localization;
@@ -506,41 +526,35 @@ namespace SongsOfConquestAccess.Adapters
             {
                 _dropdown = dropdown;
                 _localization = localization;
+                GetOptions = () => GetDropdownOptions(_dropdown);
+                GetValue = ReadValue;
+                IsEnabled = () => _dropdown != null && _dropdown.Active && _dropdown.Interactable;
+                IsVisible = () => _dropdown != null && ((Component)_dropdown).gameObject.activeInHierarchy;
+                OpenPopup = () => DropdownPopup.Show(_dropdown);
+                ClosePopup = () => DropdownPopup.Hide(_dropdown);
+                IsPopupOpen = () => DropdownPopup.IsOpen(_dropdown);
+                FocusOption = index => DropdownPopup.FocusOption(_dropdown, index);
             }
 
-            public bool IsVisible
+            public string Id
             {
-                get { return _dropdown != null && ((Component)_dropdown).gameObject.activeInHierarchy; }
+                get { return "random-layout-variant"; }
             }
 
-            public bool IsEnabled
+            /// <summary>The drawn dropdown itself, so a caller can key a control on it.</summary>
+            public Component Subject
             {
-                get { return _dropdown != null && _dropdown.Active && _dropdown.Interactable; }
+                get { return _dropdown; }
             }
 
-            public int Value
-            {
-                get
-                {
-                    if (_dropdown == null || _dropdown.DropdownValueCount <= 0)
-                    {
-                        return 0;
-                    }
-
-                    int value = _dropdown.DropdownValue;
-                    if (value < 0)
-                    {
-                        return 0;
-                    }
-
-                    return value >= _dropdown.DropdownValueCount ? _dropdown.DropdownValueCount - 1 : value;
-                }
-            }
-
-            public IReadOnlyList<string> GetOptions()
-            {
-                return GetDropdownOptions(_dropdown);
-            }
+            public Func<IReadOnlyList<string>> GetOptions { get; private set; }
+            public Func<int> GetValue { get; private set; }
+            public Func<bool> IsEnabled { get; private set; }
+            public Func<bool> IsVisible { get; private set; }
+            public Func<bool> OpenPopup { get; private set; }
+            public Func<bool> ClosePopup { get; private set; }
+            public Func<bool> IsPopupOpen { get; private set; }
+            public Func<int, bool> FocusOption { get; private set; }
 
             public bool SetValue(int value)
             {
@@ -574,6 +588,22 @@ namespace SongsOfConquestAccess.Adapters
             {
                 Component component = GetDropdownTooltipComponent(_dropdown) ?? _dropdown as Component;
                 return component != null ? Tooltip.ForComponent(component, _localization) : null;
+            }
+
+            private int ReadValue()
+            {
+                if (_dropdown == null || _dropdown.DropdownValueCount <= 0)
+                {
+                    return 0;
+                }
+
+                int value = _dropdown.DropdownValue;
+                if (value < 0)
+                {
+                    return 0;
+                }
+
+                return value >= _dropdown.DropdownValueCount ? _dropdown.DropdownValueCount - 1 : value;
             }
         }
     }

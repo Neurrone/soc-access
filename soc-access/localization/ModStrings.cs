@@ -473,6 +473,7 @@ namespace SongsOfConquestAccess.Localization
             public static readonly ModString RoleGrid = new ModString("UI.RoleGrid", "grid");
             public static readonly ModString RoleGroup = new ModString("UI.RoleGroup", "group");
             public static readonly ModString RoleMenu = new ModString("UI.RoleMenu", "menu");
+            public static readonly ModString RoleRadioButton = new ModString("UI.RoleRadioButton", "radio button");
             public static readonly ModString RoleSlider = new ModString("UI.RoleSlider", "slider");
             public static readonly ModString RoleTab = new ModString("UI.RoleTab", "tab");
             public static readonly ModString ScannerPath = new ModString("UI.ScannerPath", "{0}, {1}. {2}");

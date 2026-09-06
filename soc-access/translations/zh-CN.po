@@ -540,6 +540,11 @@ msgctxt "UI.RoleMenu"
 msgid "menu"
 msgstr "菜单"
 
+#. UI.RoleRadioButton
+msgctxt "UI.RoleRadioButton"
+msgid "radio button"
+msgstr "单选按钮"
+
 #. UI.RoleSlider
 msgctxt "UI.RoleSlider"
 msgid "slider"

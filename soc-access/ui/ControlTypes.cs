@@ -73,6 +73,16 @@ namespace SongsOfConquestAccess.UI
             Common = () => RoleWord(ModStrings.UI.RoleCheckbox),
         };
 
+        /// <summary>One of a set the game lets the player choose exactly one of, drawn in place on
+        /// the page rather than in a list something opened. It is not a checkbox: there is no
+        /// unticking it, and a player told "checkbox, not checked" would go looking for one.</summary>
+        public static readonly ControlType RadioButton = new ControlType
+        {
+            Key = "radio-button",
+            Order = StandardOrder,
+            Common = () => RoleWord(ModStrings.UI.RoleRadioButton),
+        };
+
         /// <summary>A value along a range. Left and Right move it rather than moving the cursor, so
         /// its role word is also the warning that the arrows mean something else here.</summary>
         public static readonly ControlType Slider = new ControlType

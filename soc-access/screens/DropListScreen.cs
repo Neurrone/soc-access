@@ -34,7 +34,7 @@ namespace SongsOfConquestAccess.Screens
         /// </summary>
         public sealed class Request
         {
-            public OptionsMenuAdapter.DropdownItem Item;
+            public IDropList Item;
             public string Title;
             public Action<int> Choose;
         }
@@ -59,7 +59,7 @@ namespace SongsOfConquestAccess.Screens
         /// <summary>Open <paramref name="item"/>'s list as a screen over whatever is showing.
         /// <paramref name="choose"/> is what taking an entry means, which only the page that owns the
         /// list knows.</summary>
-        public static void Open(OptionsMenuAdapter.DropdownItem item, string title, Action<int> choose)
+        public static void Open(IDropList item, string title, Action<int> choose)
         {
             ScreenManager screens = SocAccessMod.Instance != null ? SocAccessMod.Instance.ScreenManager : null;
             if (item == null || screens == null)
@@ -163,7 +163,7 @@ namespace SongsOfConquestAccess.Screens
 
         public override void Build(GraphBuilder builder)
         {
-            OptionsMenuAdapter.DropdownItem item = _request != null ? _request.Item : null;
+            IDropList item = _request != null ? _request.Item : null;
             if (item == null || !IsPresent())
             {
                 return;
@@ -199,7 +199,7 @@ namespace SongsOfConquestAccess.Screens
             }
         }
 
-        private static string Option(OptionsMenuAdapter.DropdownItem item, int index)
+        private static string Option(IDropList item, int index)
         {
             IReadOnlyList<string> options = item.GetOptions();
             return options != null && index < options.Count ? options[index] : string.Empty;

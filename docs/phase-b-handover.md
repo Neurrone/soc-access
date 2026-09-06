@@ -527,6 +527,84 @@ Manual test:
 9. Escape closes the window (the game's own key); so does Enter on Close.
 10. Watch the picture on a long page: the row under the cursor should scroll itself into view.
 
+### AdventureLobbyRandomLayoutScreen
+
+Built: two stops. `random-layout-rows` holds the four map cards, then the selected card's three
+win-condition checkboxes and its layout combo box; `random-layout-buttons` holds Confirm, Back
+and Options. Screen name is the page's drawn title ("Select layout"); focus starts on the rows.
+
+Measured 2026-09-06 at 1280x800 through `/gui/unity` and a screenshot crop: four
+`LobbyRandomMapEntry(Clone)` cards side by side at x 187, 417, 648 and 878, each 215 wide and
+481 tall, each drawing a player count ("2 PLAYERS"), a paragraph of description, three win
+condition toggles (y 502, 530, 558) and a layout dropdown (y 586) whose element draws only its
+current value ("Quad"); Confirm at [562,662]; the lobby's Back at [21,20] and Options at
+[1233,11] in the header band. No caption is drawn anywhere on the page, so the screen declares
+no regions.
+
+A card is a RADIO BUTTON, the new control type: exactly one of the four is in force, picking one
+is not doing anything, and Confirm is what does. `ControlTypes.RadioButton` and
+`GraphNodes.Radio` are ES2's, and the role word is the new `UI.RoleRadioButton` ("radio button",
+translated in all 13 `.po` files, validator passing).
+
+The win-condition toggles and the layout dropdown are the SELECTED card's, as they were for the
+widget screen. All four cards draw their own copies, but the other three belong to maps the
+player has not chosen; the selected card's read after the cards because that is where the page
+draws them.
+
+The dropdown is a real `UITextMeshDropdown`, so it is a combo box opening `DropListScreen` over
+the game's own popup - which is what made the list screen take any adapter's drop list rather
+than only the options menu's (`adapters/IDropList.cs`, below).
+
+Escape is CLAIMED and presses the drawn Back button: `LobbyRandomMapSelectionMenu.Show`
+registers only `InputActions.UI.Confirm` (decompiled, line 113), and neither `LobbyNavigation`
+nor `MapTypeMenu` registers any input callback at all, so the key would otherwise do nothing.
+Verified: `ui_back` answered `consumed` and left the page for the map type screen.
+
+Diff: every difference is one of three kinds.
+
+1. A card's description left the label and became a value part, so "2 Players and A randomly
+   generated map for two players" is now "2 Players | A randomly generated map for two players".
+   The same words, the same buffer lines, and the description still reads after the label.
+2. "unchecked" became "not checked" (the phase B word).
+3. The layout dropdown's OPTIONS ("Quad", "Corridor", "Random") are gone from the page - they are
+   the drop list screen now - and the dropdown has become one labelled line, "Layout | Quad".
+
+Deviations, measured:
+
+- ARRIVING ON A CARD CHOOSES IT. The game raises the entry's `OnSelect` from the button's own
+  Unity selection (`LobbyRandomMapPreviewEntry.HandleSelect`, fed by a `UISelectionProxy`), and
+  the menu answers it with `SetSelectedEntry`, so a mouse click and a keyboard selection are the
+  same event to the game and there is no native way to look at a card without picking it. The
+  focus visual is therefore the game's own selection, exactly as the tab bar's is on the options
+  window. Verified: walking down the four cards moved the win conditions and the layout under
+  them (the layout read "Quad" on the 2-player card and "Dijkstra" on the 8-player one).
+- Because the choice is made by the focus visual, which runs after the arrival is composed, the
+  card just arrived on does NOT say "selected" in the same breath; the card the page opened on
+  does. Enter on a card is still declared and is the same `SetSelectedEntry`.
+- The combo box row is named with the mod's "Layout" (`ModStrings.Screens.Layout`), as the widget
+  screen named it: the dropdown draws no label of its own, only its current value.
+
+Follow-ups, not fixed:
+
+- Entering the ONLINE lobby leaves the game's own game-code field holding the keyboard, so the
+  mod stands down (`/input` answers `standing down`) until something takes the focus off it. The
+  same happens on the game settings popup, whose Name field the game activates on open. Neither
+  is this port; both are the stand-down working as designed against a game that hands its fields
+  the keyboard unasked.
+
+Manual test:
+
+1. Conquest, Random maps. Hear "Select layout", then "2 Players, radio button, A randomly
+   generated map for two players, selected, 1 of 8".
+2. Down through the cards: each reads its name and description, and the picture's orange border
+   follows the cursor.
+3. Down again: the three win conditions read as checkboxes, then "Layout, combo box, Quad".
+   Enter on a checkbox says "checked", Enter again "not checked".
+4. Enter on Layout opens the game's own list; Up and Down walk it, Escape leaves it unchanged.
+5. Tab: "Confirm, button, 1 of 3", then Back and Options.
+6. Escape leaves the page for the map type screen, the same as pressing Back.
+
+
 ## Family E: drop lists
 
 ### DropListScreen (new, mod-owned; the list every family D combo box opens)

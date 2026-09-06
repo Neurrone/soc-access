@@ -300,6 +300,38 @@ namespace SongsOfConquestAccess.UI
             return vtable;
         }
 
+        /// <summary>
+        /// One of a set where exactly one is in force and picking is not yet doing - the game's own
+        /// select-then-confirm model.
+        ///
+        /// Only the chosen one says so, which is the silence a tab bar keeps and is what lets focus
+        /// entering the group land on the choice already made rather than at the top of the list.
+        /// Activating says "selected" at once, interrupting: unlike a checkbox there is no other
+        /// state the keypress could have produced, and the player needs to hear that it took.
+        /// </summary>
+        public static NodeVtable Radio(
+            Func<string> label,
+            Func<bool> selected,
+            Action choose,
+            Func<bool> enabled = null,
+            Tooltip tooltip = null,
+            Func<IList<string>> details = null)
+        {
+            Func<string> chosen = () => selected != null && selected() ? ModText.Get(ModStrings.UI.Selected) : null;
+            List<NodeAnnouncement> parts = Parts(label, enabled);
+            parts.Insert(1, SelectedPart(selected));
+            NodeVtable vtable = new NodeVtable
+            {
+                ControlType = ControlTypes.RadioButton,
+                Announcements = parts,
+                Sections = Sections(details, tooltip),
+                StateText = ActedState(chosen, enabled),
+                OnActivate = Guarded(choose, enabled),
+            };
+            Aim(vtable, tooltip);
+            return vtable;
+        }
+
         /// <summary>A setting chosen from a list the control opens. Activating it is the screen's
         /// business - what the list is and how it is navigated belongs to whoever declared it.</summary>
         public static NodeVtable ComboBox(
