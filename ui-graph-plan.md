@@ -215,10 +215,13 @@ Action-to-operation table for `Navigator.Dispatch`:
 | `start_drag` | `Carry` pick up / drop |
 | mode keys (`map_*`, `hex_grid_*`, `combat_*`, `scanner_*`, bookmarks) | the mode node's own handler |
 
-Owner decision needed in phase A, before the main menu port: whether to keep the current
-key bindings as they are, or adopt ES2's four-arrow model where Left/Right also expand and
-collapse tree groups and Tab cycles stops. The engine supports both; the answer decides
-whether `next_column`/`previous_column` and tree navigation share keys.
+Owner decision, taken 2026-09-06 before the main menu port: graph screens use ES2's
+four-arrow model. Left/Right adjust a value, else step along a row, else expand/descend and
+ascend/collapse; Tab cycles stops; Alt+Up/Down jump regions (H/Shift+H cannot stay, because
+type-ahead claims the letters); Backslash is the right-click equivalent, as on the map. The
+graph screens get their own `ui_*` actions in `AccessibilityActions.cs`, so the widget actions
+stay untouched until phase G. Escape stays the game's on game-owned surfaces. Role words
+follow ES2 (`button`); positions are announced.
 
 ## 4. The dump-and-diff loop (per screen)
 
@@ -284,62 +287,90 @@ batch at the end of the phase, not per screen.
 
 ## 7. Phases and order
 
-Rationale for the order: prove the seams on the cheapest screen; then convert the screens
-that are pure menus so the factories for buttons, items and text settle; then forms (adds
-toggles, sliders, edits); then tables (adds sheets); then the composite grids (adds carry
-and the two-sided sheets); then the three modes, which are the largest and depend on
-everything before; then swap the manager, because the map and combat predicates carry the
-most conditions and are best written once those screens are graph screens.
+Rationale for the order: phase A proved the seams on the cheapest screen. Phase B converts
+every screen that exists outside a running game, so the whole out-of-game experience moves
+to one engine before any in-game screen does, and the factories for every control kind
+settle on screens that can be reached from the main menu in seconds. Phase C converts the
+in-game menus, forms and tables with those factories already proven. Then the composite
+grids (carry and two-sided sheets), then the three modes, which are the largest and depend
+on everything before; then the manager swap, because the map and combat predicates carry
+the most conditions and are best written once those screens are graph screens.
 
-### Phase A — engine, bridge, first screen
+Within a phase the order is by kind: pure menus, then dialogs, then forms (adds toggles,
+sliders, edits), then tables (adds sheets). The first screen of each new kind goes to the
+owner's manual screen-reader review before its siblings are batched
+(`making-screens-accessible.md` §2). Each phase ends with one localization batch and a
+plan update recording what was learned; commits are per logical step (engine, adapter,
+one screen or one kind of screen at a time).
 
-1. Copy the engine into `ui/graph/`; copy and convert the tests; `dotnet test` green.
-2. Write `GraphScreen`, `GraphNavigator`, `ControlTypes`, the first `GraphNodes` factories
-   (context, stop, button, menu item, text), the `CurrentTooltip` seam, `GraphDump` with
-   `flat=1`, `/gui/tree`.
-3. Localization batch (§6).
-4. Owner decision on the key model (§3).
-5. Port `MainMenuScreen` (menu of buttons) and `FoldoutMenuScreen` (the main menu's
-   foldouts) through the §4 loop. Exit: both dumps diff clean, the owner has walked it.
+### Phase A — engine, bridge, first screen (done 2026-09-06)
 
-### Phase B1 — out-of-game menus and dialogs (push/pop stays)
+What landed, and what differed from the plan above:
 
-`PauseMenuScreen`, `PlatformUserMenuScreen`, `QuitToDesktopPopupScreen`,
-`MessageDialogScreen` (the dialog family: confirm, system, popup menu, map message, random
-event, custom message, dialogue; 488 lines, the one to do carefully), `LoadingCompleteScreen`,
-`CampaignMenuScreen`, `TaleSelectScreen`, `CustomCampaignSelectScreen`,
-`WorldChoiceMenuScreen`, `WorldConfirmMenuScreen`, `TutorialSimpleScreen`,
-`TutorialSlideshowScreen`, `StoryTextScreen`, `TooltipActionsMenuScreen`,
-`AudioGlossaryScreen`.
+- The engine needed eight files the plan did not list (`NodeHint`, `OneTooltipRule`,
+  `FocusRequest`, `TypeAhead`, `SearchScope`, `MessageBuilder`, `SpokenText`, `Cycle`); all
+  are BCL-only and live in `ui/graph/` too. Its tests are MSTest now: 322 cases, four
+  dropped because they only proved an installed translation.
+- Key model: ES2's, through graph-only `ui_*` actions (§3). Type-ahead is live on every
+  graph screen; the stand-down for the game's own text fields is not wired yet and belongs
+  with the edit-field work in phase B.
+- `GraphScreen.IsWorkable` mutes the live-part watch while a page fades out (the main
+  menu's canvas group), found on the first activation: every button read "disabled" as
+  the menu left.
+- Disabled wording stays "disabled" (not ES2's "unavailable") until the migration ends,
+  so ported and unported screens agree; one line in `GraphNodes.DisabledPart` flips it.
+- Every native tooltip is an `Indicate` section (buffer only), this mod's standing ruling.
+- The foldouts are expandable groups on the main menu stop, opening the game's own foldout;
+  `FoldoutMenuScreen` is deleted rather than ported. Drawn order beat declaration order
+  (Conquest above Campaigns), read off the buttons' rectangles every build.
+- The flat diff of the main menu and both foldouts is clean except for the group state
+  word in the buffer. The localization validator accepts a whitespace translation of a
+  whitespace source (the fragment separator).
 
-### Phase B2 — in-game menus and popups
+### Phase B — every screen outside a running game
 
+Everything reachable from the main menu without loading a game, in kind order:
+
+1. Menus and dialogs: `QuitToDesktopPopupScreen`, `MessageDialogScreen` (the confirm,
+   system and popup-menu sources now; the four in-game sources get their before-captures
+   in phase C, on the same class), `LoadingCompleteScreen` (loading a save from the main
+   menu), `CampaignMenuScreen`, `TaleSelectScreen`, `CustomCampaignSelectScreen`,
+   `PlatformUserMenuScreen`, `TooltipActionsMenuScreen`, `AudioGlossaryScreen`,
+   `AdventureLobbyMapTypeScreen`, `AdventureLobbyInviteProvidersScreen`,
+   `CommunityMapsHomeScreen`.
+2. Forms: `OptionsScreen`, `SaveLoadGameScreen` (the load variant; the save variant is
+   re-verified in phase C), `OnlineHostGameScreen`, `AdventureLobbyRandomLayoutScreen`,
+   `AdventureLobbyPlayersScreen`, `AdventureLobbyGameSettingsScreen`,
+   `AdventureLobbyPlayerSettingsScreen`, `AdventureLobbyIconDropdownScreen`,
+   `CampaignMapSelectScreen`, `ModSettingsScreen` and its sub-screens
+   (`AnnouncementOrderScreen`, `AnnouncementElementSettingsScreen`,
+   `AudioCueSettingsScreen`, `ScannerCustomCategoriesScreen`, `ScannerCustomCategoryScreen`,
+   `ScannerCustomCategoryKeyScreen`, `ScannerCustomCategorySelectorScreen`),
+   `CommunityMapsCollectionScreen`, `CommunityMapsDetailsScreen`,
+   `CommunityMapsSearchFilterScreen`, `CommunityMapsSearchResultsScreen`,
+   `CommunityMapsModalScreen`, `CodexScreen` (from Extras), `ChatScreen` (the lobby chat).
+   The edit field brings the type-ahead stand-down and the game-field handover
+   (`widgets.md` "Edit field", `input.md`'s late-frame rule).
+3. Tables (adds `GraphSheet`): `OnlineGameListScreen`, `PlayerStatsScreen`,
+   `AdventureLobbyMapSelectScreen`, `AdventureLobbyChallengeMapSelectScreen`.
+
+Exit: every screen's dumps diff clean and the owner has walked each kind. The pause menu
+is deliberately not here (it is in-game), and no screen of phase C is touched.
+
+### Phase C — in-game menus, popups, forms and tables
+
+`PauseMenuScreen`, `WorldChoiceMenuScreen`, `WorldConfirmMenuScreen`,
+`TutorialSimpleScreen`, `TutorialSlideshowScreen`, `StoryTextScreen`,
 `AdventurePlayerMenuScreen`, `ClaimMenuScreen`, `GiftTownPopupScreen`,
 `SendResourcePopupScreen`, `MapEntityMiniMenuScreen`, `OwnedEntitiesScreen`,
 `TroopOverviewScreen`, `LevelUpScreen`, `PurchaseWielderScreen`,
 `PostAdventureResultScreen`, `PostBattleResultScreen`, `ResearchScreen`,
-`MarketplaceScreen`, `BuildMenuScreen`.
+`MarketplaceScreen`, `BuildMenuScreen`, `SpellbookScreen`, `PostAdventureStatsScreen`;
+plus the in-game verification of what phase B ported on one class: the map message,
+random event, custom message and dialogue sources of `MessageDialogScreen`, the save
+variant of `SaveLoadGameScreen`, the in-game chat and codex.
 
-### Phase C — forms, settings, lobby, chat
-
-`OptionsScreen`, `SaveLoadGameScreen`, `OnlineHostGameScreen`, `ChatScreen`,
-`AdventureLobbyMapTypeScreen`, `AdventureLobbyRandomLayoutScreen`,
-`AdventureLobbyPlayersScreen`, `AdventureLobbyInviteProvidersScreen`,
-`AdventureLobbyGameSettingsScreen`, `AdventureLobbyPlayerSettingsScreen`,
-`AdventureLobbyIconDropdownScreen`, `CampaignMapSelectScreen`, `ModSettingsScreen`,
-`AnnouncementOrderScreen`, `AnnouncementElementSettingsScreen`, `AudioCueSettingsScreen`,
-`ScannerCustomCategoriesScreen`, `ScannerCustomCategoryScreen`,
-`ScannerCustomCategoryKeyScreen`, `ScannerCustomCategorySelectorScreen`,
-`CommunityMapsHomeScreen`, `CommunityMapsCollectionScreen`, `CommunityMapsDetailsScreen`,
-`CommunityMapsSearchFilterScreen`, `CommunityMapsSearchResultsScreen`,
-`CommunityMapsModalScreen`, `CodexScreen`, `SpellbookScreen`.
-
-### Phase D — tables (adds `GraphSheet`)
-
-`OnlineGameListScreen`, `PlayerStatsScreen`, `PostAdventureStatsScreen`,
-`AdventureLobbyMapSelectScreen`, `AdventureLobbyChallengeMapSelectScreen`.
-
-### Phase E — composite grids (adds `Carry` and two-sided sheets)
+### Phase D — composite grids (adds `Carry` and two-sided sheets)
 
 `CommanderSheetScreen` (inventory), `ArtifactMarketScreen` (inventory), `TradingScreen`
 (inventory + army exchange), `SettlementScreen` (army exchange), `DefenceMenuScreen`
@@ -347,7 +378,7 @@ event, custom message, dialogue; 488 lines, the one to do carefully), `LoadingCo
 `DraftTroopsScreen` and `UpgradeTroopsScreen`, `RallyPointScreen`, `MoveTroopPopupScreen`.
 The owner's simplification targets are here; each gets its own proposal.
 
-### Phase F — modes
+### Phase E — modes
 
 `PreBattleMenuScreen` (troop placement hex grid; smallest mode, do it first),
 `CombatScreen` with `CombatTroopCycle` (combat hex grid, timeline, troop cycling, threat),
@@ -356,12 +387,12 @@ mode, the summaries). The grid classes survive as the mode's cursor; what change
 the HUD and side panels become stops, and the mode node owns its keys, its buffer and its
 exit announcement (`ui-navigation.md`, "A mode whose cursor is not the focus cursor").
 
-### Phase G — the screen manager swap
+### Phase F — the screen manager swap
 
 1. Replace `ScreenManager` with ES2's poll-and-diff manager: registered singleton screens,
    `Layer`, `IsActive()` polled every frame, insertion-sorted, diffed, one focus-change
    site, child screens (`PushChild`) for the mod-owned menus (tooltip actions, mod settings
-   and its seven sub-screens, foldout menu if it stays mod-owned).
+   and its sub-screens).
 2. Every screen's `IsPresent()` becomes `IsActive()`. Screens that today receive the native
    menu instance in their constructor read it from an adapter static that the existing
    `On*Ready` / `On*Closed` patch handlers write; `ScreenDetector` shrinks to those writes
@@ -376,7 +407,7 @@ exit announcement (`ui-navigation.md`, "A mode whose cursor is not the focus cur
    case (open a confirm popup on the map: the map must not speak; close it: the map speaks
    its name and the tile once), and the story sequence gap.
 
-### Phase H — cleanup
+### Phase G — cleanup
 
 Delete `ui/UIManager.cs`, `ui/FocusContext.cs`, every `ui/*Widget.cs`, `ui/MenuWidget.cs`,
 `ui/TableWidget.cs`, and the three grid classes' widget base once their mode wrappers own
@@ -391,85 +422,85 @@ to bring to the owner, not a decision.
 
 | Screen | Widgets today | Proposed model | Phase |
 |---|---|---|---|
-| `MainMenuScreen` | Menu, Buttons | one stop, menu rows | A |
-| `FoldoutMenuScreen` | Menu | child of the main menu; menu rows | A |
-| `PauseMenuScreen` | Menu | one stop, menu rows | B1 |
-| `PlatformUserMenuScreen` | Menu, Buttons | menu rows | B1 |
-| `QuitToDesktopPopupScreen` | Buttons, Text | dialog: question as read-only node, buttons row | B1 |
-| `MessageDialogScreen` | Buttons, TextInput, Text | dialog with `AnswersOnly`; text node with sections, optional edit node, buttons row; one screen for all seven sources | B1 |
-| `LoadingCompleteScreen` | PassiveButton | single node | B1 |
-| `CampaignMenuScreen` | Menu, Buttons | menu rows | B1 |
-| `TaleSelectScreen` | Menu, Buttons | menu rows with `Sections` for the tale blurb | B1 |
-| `CustomCampaignSelectScreen` | Menu (custom entry item), Buttons | menu rows with status parts | B1 |
-| `WorldChoiceMenuScreen` | Menu, Buttons, Text | menu rows, text as sections | B1 |
-| `WorldConfirmMenuScreen` | Buttons, Text | dialog shape | B1 |
-| `TutorialSimpleScreen` | Buttons, Checkbox, Text | text node, toggle, buttons row | B1 |
-| `TutorialSlideshowScreen` | Buttons, Checkbox, Text | as above with prev/next | B1 |
-| `StoryTextScreen` | Buttons, Text | text node with sections, continue button; cutscene layer in G | B1 |
-| `TooltipActionsMenuScreen` | Menu | child screen: menu rows of `TooltipAction` | B1 |
-| `AudioGlossaryScreen` | Menu, Buttons | child of mod settings; menu rows | B1 |
-| `AdventurePlayerMenuScreen` | Menu, Buttons | menu rows | B2 |
-| `ClaimMenuScreen` | Menu, Text | text node, menu rows | B2 |
-| `GiftTownPopupScreen` | Menu, Buttons | menu rows, buttons row | B2 |
-| `SendResourcePopupScreen` | Menu, Buttons | menu rows with adjust for amounts if present | B2 |
-| `MapEntityMiniMenuScreen` | Menu, Buttons, Text | menu rows | B2 |
-| `OwnedEntitiesScreen` | Menu, Text | menu rows; consider a sheet if columns exist | B2 |
-| `TroopOverviewScreen` | Menu, Text | menu rows | B2 |
-| `LevelUpScreen` | Menu, Buttons, Text | skill rows with sections, confirm row | B2 |
-| `PurchaseWielderScreen` | Menu, Buttons, Text | candidate rows with sections, buttons row | B2 |
-| `PostAdventureResultScreen` | Menu, Buttons, Text | text sections, buttons row | B2 |
-| `PostBattleResultScreen` | Menu, Buttons, Text | result sections, menu rows | B2 |
-| `ResearchScreen` | Menu, Buttons | research rows with sections | B2 |
-| `MarketplaceScreen` | Menu, Buttons, Text | offer rows with adjust, buttons row | B2 |
-| `BuildMenuScreen` | Menu, Checkbox, Buttons, Text | category regions, building rows with sections | B2 |
-| `OptionsScreen` | Menu, Checkbox, Slider, Buttons, Text | tab regions, toggle/slider/choice rows | C |
-| `SaveLoadGameScreen` | Menu, TextInput, Buttons, Text | save rows, name edit, buttons row | C |
-| `OnlineHostGameScreen` | Checkbox, TextInput, Buttons, Text | form rows | C |
-| `ChatScreen` | Menu, TextInput, Buttons | message rows, edit node; game-owned field handover | C |
-| `AdventureLobbyMapTypeScreen` | Menu, Buttons | menu rows | C |
-| `AdventureLobbyRandomLayoutScreen` | Menu, Checkbox, Buttons | option rows | C |
-| `AdventureLobbyPlayersScreen` | Menu, Checkbox, Buttons, Text | one region per slot, slot rows | C |
-| `AdventureLobbyInviteProvidersScreen` | Menu, Buttons | menu rows | C |
-| `AdventureLobbyGameSettingsScreen` | Menu, Checkbox, TextInput, TimeInput, Buttons, Text | setting rows, edit nodes | C |
-| `AdventureLobbyPlayerSettingsScreen` | Checkbox, Slider, Buttons, Text | setting rows | C |
-| `AdventureLobbyIconDropdownScreen` | Menu, Buttons | drop list (ES2 `DropListScreen` shape) | C |
-| `CampaignMapSelectScreen` | Menu, Buttons, Text | map rows with sections, buttons row | C |
-| `ModSettingsScreen` | Menu, Checkbox, Buttons | child screen root; setting rows | C |
-| `AnnouncementOrderScreen` | AnnouncementOrderMenu, Buttons | rows plus carry for reorder | C |
-| `AnnouncementElementSettingsScreen` | Checkbox, Buttons | toggle rows | C |
-| `AudioCueSettingsScreen` | Checkbox, Slider, Buttons | toggle/slider rows | C |
-| `ScannerCustomCategoriesScreen` | Buttons | rows | C |
-| `ScannerCustomCategoryScreen` | Buttons | rows, child screens for key and selector | C |
-| `ScannerCustomCategoryKeyScreen` | Buttons | key-capture node (`widgets.md` "Key-rebind capture") | C |
-| `ScannerCustomCategorySelectorScreen` | Checkbox, Buttons | toggle rows | C |
-| `CommunityMapsHomeScreen` | Menu, Buttons | menu rows | C |
-| `CommunityMapsCollectionScreen` | Menu, Checkbox, TmpInputField, Buttons | rows, filter edit | C |
-| `CommunityMapsDetailsScreen` | Menu, Buttons, Text | text sections, action rows | C |
-| `CommunityMapsSearchFilterScreen` | Menu, TmpInputField, Buttons | filter rows, edit | C |
-| `CommunityMapsSearchResultsScreen` | Menu, Buttons, Text | result rows | C |
-| `CommunityMapsModalScreen` | Menu, FiveDigitCode, TmpInputField, Buttons, Text | dialog shape with edit nodes | C |
-| `CodexScreen` | Menu, Checkbox, CodexContent, Buttons | category stop, article stop, content sections as regions | C |
+| `MainMenuScreen` | Menu, Buttons | one stop, menu rows | A, done |
+| `FoldoutMenuScreen` | Menu | deleted: expandable groups on the main menu stop | A, done |
+| `PauseMenuScreen` | Menu | one stop, menu rows | C |
+| `PlatformUserMenuScreen` | Menu, Buttons | menu rows | B |
+| `QuitToDesktopPopupScreen` | Buttons, Text | dialog: question as read-only node, buttons row | B |
+| `MessageDialogScreen` | Buttons, TextInput, Text | dialog with `AnswersOnly`; text node with sections, optional edit node, buttons row; one screen for all seven sources (three out-of-game sources in B, the rest verified in C) | B |
+| `LoadingCompleteScreen` | PassiveButton | single node | B |
+| `CampaignMenuScreen` | Menu, Buttons | menu rows | B |
+| `TaleSelectScreen` | Menu, Buttons | menu rows with `Sections` for the tale blurb | B |
+| `CustomCampaignSelectScreen` | Menu (custom entry item), Buttons | menu rows with status parts | B |
+| `WorldChoiceMenuScreen` | Menu, Buttons, Text | menu rows, text as sections | C |
+| `WorldConfirmMenuScreen` | Buttons, Text | dialog shape | C |
+| `TutorialSimpleScreen` | Buttons, Checkbox, Text | text node, toggle, buttons row | C |
+| `TutorialSlideshowScreen` | Buttons, Checkbox, Text | as above with prev/next | C |
+| `StoryTextScreen` | Buttons, Text | text node with sections, continue button; cutscene layer in G | C |
+| `TooltipActionsMenuScreen` | Menu | child screen: menu rows of `TooltipAction` | B |
+| `AudioGlossaryScreen` | Menu, Buttons | child of mod settings; menu rows | B |
+| `AdventurePlayerMenuScreen` | Menu, Buttons | menu rows | C |
+| `ClaimMenuScreen` | Menu, Text | text node, menu rows | C |
+| `GiftTownPopupScreen` | Menu, Buttons | menu rows, buttons row | C |
+| `SendResourcePopupScreen` | Menu, Buttons | menu rows with adjust for amounts if present | C |
+| `MapEntityMiniMenuScreen` | Menu, Buttons, Text | menu rows | C |
+| `OwnedEntitiesScreen` | Menu, Text | menu rows; consider a sheet if columns exist | C |
+| `TroopOverviewScreen` | Menu, Text | menu rows | C |
+| `LevelUpScreen` | Menu, Buttons, Text | skill rows with sections, confirm row | C |
+| `PurchaseWielderScreen` | Menu, Buttons, Text | candidate rows with sections, buttons row | C |
+| `PostAdventureResultScreen` | Menu, Buttons, Text | text sections, buttons row | C |
+| `PostBattleResultScreen` | Menu, Buttons, Text | result sections, menu rows | C |
+| `ResearchScreen` | Menu, Buttons | research rows with sections | C |
+| `MarketplaceScreen` | Menu, Buttons, Text | offer rows with adjust, buttons row | C |
+| `BuildMenuScreen` | Menu, Checkbox, Buttons, Text | category regions, building rows with sections | C |
+| `OptionsScreen` | Menu, Checkbox, Slider, Buttons, Text | tab regions, toggle/slider/choice rows | B |
+| `SaveLoadGameScreen` | Menu, TextInput, Buttons, Text | save rows, name edit, buttons row (load variant in B, save variant verified in C) | B |
+| `OnlineHostGameScreen` | Checkbox, TextInput, Buttons, Text | form rows | B |
+| `ChatScreen` | Menu, TextInput, Buttons | message rows, edit node; game-owned field handover | B |
+| `AdventureLobbyMapTypeScreen` | Menu, Buttons | menu rows | B |
+| `AdventureLobbyRandomLayoutScreen` | Menu, Checkbox, Buttons | option rows | B |
+| `AdventureLobbyPlayersScreen` | Menu, Checkbox, Buttons, Text | one region per slot, slot rows | B |
+| `AdventureLobbyInviteProvidersScreen` | Menu, Buttons | menu rows | B |
+| `AdventureLobbyGameSettingsScreen` | Menu, Checkbox, TextInput, TimeInput, Buttons, Text | setting rows, edit nodes | B |
+| `AdventureLobbyPlayerSettingsScreen` | Checkbox, Slider, Buttons, Text | setting rows | B |
+| `AdventureLobbyIconDropdownScreen` | Menu, Buttons | drop list (ES2 `DropListScreen` shape) | B |
+| `CampaignMapSelectScreen` | Menu, Buttons, Text | map rows with sections, buttons row | B |
+| `ModSettingsScreen` | Menu, Checkbox, Buttons | child screen root; setting rows | B |
+| `AnnouncementOrderScreen` | AnnouncementOrderMenu, Buttons | rows plus carry for reorder | B |
+| `AnnouncementElementSettingsScreen` | Checkbox, Buttons | toggle rows | B |
+| `AudioCueSettingsScreen` | Checkbox, Slider, Buttons | toggle/slider rows | B |
+| `ScannerCustomCategoriesScreen` | Buttons | rows | B |
+| `ScannerCustomCategoryScreen` | Buttons | rows, child screens for key and selector | B |
+| `ScannerCustomCategoryKeyScreen` | Buttons | key-capture node (`widgets.md` "Key-rebind capture") | B |
+| `ScannerCustomCategorySelectorScreen` | Checkbox, Buttons | toggle rows | B |
+| `CommunityMapsHomeScreen` | Menu, Buttons | menu rows | B |
+| `CommunityMapsCollectionScreen` | Menu, Checkbox, TmpInputField, Buttons | rows, filter edit | B |
+| `CommunityMapsDetailsScreen` | Menu, Buttons, Text | text sections, action rows | B |
+| `CommunityMapsSearchFilterScreen` | Menu, TmpInputField, Buttons | filter rows, edit | B |
+| `CommunityMapsSearchResultsScreen` | Menu, Buttons, Text | result rows | B |
+| `CommunityMapsModalScreen` | Menu, FiveDigitCode, TmpInputField, Buttons, Text | dialog shape with edit nodes | B |
+| `CodexScreen` | Menu, Checkbox, CodexContent, Buttons | category stop, article stop, content sections as regions | B |
 | `SpellbookScreen` | Menu, DraggableMenu, Checkbox, Buttons | spell rows plus carry for reorder | C |
-| `OnlineGameListScreen` | Menu, Table, Buttons, Text | sheet of games, buttons row | D |
-| `PlayerStatsScreen` | Menu, Table, Buttons, Text | sheet per tab | D |
-| `PostAdventureStatsScreen` | Menu, Table, Buttons, Text | sheet per tab | D |
-| `AdventureLobbyMapSelectScreen` | Menu, Table, Buttons, Text | sheet of maps, detail sections | D |
-| `AdventureLobbyChallengeMapSelectScreen` | Table, Buttons, Text | sheet of challenges | D |
-| `CommanderSheetScreen` | InventoryGrid, Menu, Buttons, Text | stats region, equipment sheet, backpack sheet, carry | E |
-| `ArtifactMarketScreen` | InventoryGrid, Menu, Buttons, Text | offers sheet, backpack sheet, carry or buy/sell activation | E |
-| `TradingScreen` | InventoryGrid, ArmyExchangeGrid, Menu, Buttons | two army sheets plus two inventory sheets, carry across | E |
-| `SettlementScreen` | ArmyExchangeGrid, Menu, Buttons, Text | garrison and visitor sheets, building rows | E |
-| `DefenceMenuScreen` | ArmyExchangeGrid, Menu, Buttons, Text | as settlement | E |
-| `HostileJoinMenuScreen` | ArmyExchangeGrid, Buttons, Text | army sheet, offer text, buttons row | E |
-| `TroopManagementScreenBase` | Buttons, Text | shared base for the two below | E |
-| `DraftTroopsScreen` | Menu, Slider, Buttons | troop rows with adjust for count | E |
-| `UpgradeTroopsScreen` | Menu, Slider, Buttons, Text | troop rows with adjust | E |
-| `RallyPointScreen` | Menu, Slider, Buttons, Text | troop rows with adjust, buttons row | E |
-| `MoveTroopPopupScreen` | Slider, Buttons, Text | child dialog: adjust node, buttons row | E |
-| `PreBattleMenuScreen` | TroopPlacementHexGrid, Buttons, Text | mode node plus buttons stop | F |
+| `OnlineGameListScreen` | Menu, Table, Buttons, Text | sheet of games, buttons row | B |
+| `PlayerStatsScreen` | Menu, Table, Buttons, Text | sheet per tab | B |
+| `PostAdventureStatsScreen` | Menu, Table, Buttons, Text | sheet per tab | C |
+| `AdventureLobbyMapSelectScreen` | Menu, Table, Buttons, Text | sheet of maps, detail sections | B |
+| `AdventureLobbyChallengeMapSelectScreen` | Table, Buttons, Text | sheet of challenges | B |
+| `CommanderSheetScreen` | InventoryGrid, Menu, Buttons, Text | stats region, equipment sheet, backpack sheet, carry | D |
+| `ArtifactMarketScreen` | InventoryGrid, Menu, Buttons, Text | offers sheet, backpack sheet, carry or buy/sell activation | D |
+| `TradingScreen` | InventoryGrid, ArmyExchangeGrid, Menu, Buttons | two army sheets plus two inventory sheets, carry across | D |
+| `SettlementScreen` | ArmyExchangeGrid, Menu, Buttons, Text | garrison and visitor sheets, building rows | D |
+| `DefenceMenuScreen` | ArmyExchangeGrid, Menu, Buttons, Text | as settlement | D |
+| `HostileJoinMenuScreen` | ArmyExchangeGrid, Buttons, Text | army sheet, offer text, buttons row | D |
+| `TroopManagementScreenBase` | Buttons, Text | shared base for the two below | D |
+| `DraftTroopsScreen` | Menu, Slider, Buttons | troop rows with adjust for count | D |
+| `UpgradeTroopsScreen` | Menu, Slider, Buttons, Text | troop rows with adjust | D |
+| `RallyPointScreen` | Menu, Slider, Buttons, Text | troop rows with adjust, buttons row | D |
+| `MoveTroopPopupScreen` | Slider, Buttons, Text | child dialog: adjust node, buttons row | D |
+| `PreBattleMenuScreen` | TroopPlacementHexGrid, Buttons, Text | mode node plus buttons stop | E |
 | `CombatScreen` (+ `CombatTroopCycle`) | CombatHexGrid, CombatTroopCycle, Menu, Buttons, Text | mode node, timeline stop, actions stop | F |
-| `AdventureMapScreen` | AdventureMapGrid, Menu, Buttons, Text | mode node, HUD stops (troops, resources, objectives, notifications) | F |
-| `StoryFocusBlockerScreen` | Container | deleted in G; becomes a predicate | G |
+| `AdventureMapScreen` | AdventureMapGrid, Menu, Buttons, Text | mode node, HUD stops (troops, resources, objectives, notifications) | E |
+| `StoryFocusBlockerScreen` | Container | deleted in F; becomes a predicate | F |
 
 ## 9. Risks
 
@@ -482,4 +513,4 @@ to bring to the owner, not a decision.
   drawn layout first.
 - Each phase's localization batch is real work; a phase is not done until `validate` passes.
 - `ScreenDetector`'s readiness knowledge is the most expensive thing in the repo to lose.
-  In phase G, move it, never rewrite it from memory.
+  In phase F, move it, never rewrite it from memory.
