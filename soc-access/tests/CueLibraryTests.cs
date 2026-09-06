@@ -54,6 +54,23 @@ namespace SongsOfConquestAccess.Tests
             }
         }
 
+        /// <summary>
+        /// The audio glossary lists a cue by its name and nothing else, so a nameless cue is a blank
+        /// row and two cues under one name are two rows a listener cannot tell apart. Inherited from
+        /// the glossary menu's own test when that menu became a drawn dialog.
+        /// </summary>
+        [TestMethod]
+        public void EveryCueIsNamedAndNoTwoShareAName()
+        {
+            HashSet<string> seen = new HashSet<string>();
+            for (int i = 0; i < CueLibrary.AllCues.Count; i++)
+            {
+                CueDefinition cue = CueLibrary.AllCues[i];
+                Assert.IsFalse(string.IsNullOrWhiteSpace(cue.Name.Text), cue.Key);
+                Assert.IsTrue(seen.Add(cue.Name.Text), cue.Name.Text);
+            }
+        }
+
         [TestMethod]
         public void CuesAreGroupedByCategoryInGlossaryOrder()
         {

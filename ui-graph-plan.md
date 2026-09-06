@@ -869,3 +869,10 @@ selector dialog of toggles per source, keywords, Delete). Every dialog beneath t
 is inert for the mouse too: a blocker behind the top dialog and the covered dialog's canvas
 group non-interactable until it is uncovered. Each dialog claims Escape (mod-owned) and closes
 itself only. Teardown removes every drawn object by name.
+J built (2026-09-07): a "Mod options" entry is drawn beside the main menu's Options and after
+the pause menu's, and opens a copy of the live options panel (project-scoped, not per scene)
+with the mod's six categories as tabs and every setting as a real game row drawn by a
+`MenuFactoryController` of its own; its buttons open the announcement order, glossary, cue,
+custom category and selector dialogs stacked over it in the same panel's popup shape, and the
+nine mod-owned widget menus are deleted. `adapters/MenuRows.cs` and `ui/MenuFormNodes.cs` are
+the reader and the node declarations both Options and the mod's window are read with.
