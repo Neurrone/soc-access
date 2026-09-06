@@ -55,14 +55,21 @@ namespace SongsOfConquestAccess.Adapters
 
         public string GetLabel()
         {
+            return GetText(GetCampaignTitle());
+        }
+
+        /// <summary>The paragraph the card draws under its name, apart from the name itself: it is
+        /// always on the screen, so a screen can decide where in the readout it belongs. Empty while
+        /// the card draws its purchase state instead, which is what the card says in place of the
+        /// description.</summary>
+        public string GetDescription()
+        {
             if (IsActive(GetPurchaseContainer()))
             {
-                return GetText(GetCampaignTitle());
+                return string.Empty;
             }
 
-            return MenuButtonTextUtility.JoinParts(
-                GetText(GetCampaignTitle()),
-                GetText(GetCampaignDescription()));
+            return GetText(GetCampaignDescription());
         }
 
         public string GetStatus()

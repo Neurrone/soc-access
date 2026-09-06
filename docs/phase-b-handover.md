@@ -53,6 +53,46 @@ Manual test:
 6. Watch the picture: the card under the cursor should look hovered; note that the previous
    one stays raised (follow-up above).
 
+### TaleSelectScreen
+
+Built: two stops, exactly as the representative. `tale-cards` holds the seven tale cards
+sorted by measured left edge every build (2026-09-06 at 1280x800: x 113, 355, 586, 827,
+1064, 1300, 1536 inside `Canvas` > `TaleSelectMenu` > `Scroll View`, a band wider than the
+window); `tale-header` holds the main menu's shared band, Back (x 21) then Options (x 1233).
+Screen name is the drawn title ("Choose Campaign or Tale"); focus starts on the first card.
+A card reads its name, "button", then its description and its progress line, the progress
+watched live for the same reason the campaign cards' is.
+
+Escape: neither `TaleButton` nor `TaleButtonLayoutCoordinator` registers an input callback
+at all, so the screen claims Back and presses the drawn Back button. Verified: `ui_back`
+answered `consumed` and the campaign menu returned with nothing stray spoken.
+
+Diff: exactly the seven card lines changed, the description having moved out of the label
+into the status column; Back and Options unchanged; nothing missing.
+
+Deviations, measured: `TaleButtonAdapter` gained `GetDescription()` and its `GetLabel()`
+dropped the description, the same split `CampaignButtonAdapter` took. The description is
+empty while a card draws its purchase state, because the card's `_ownedContainer` (which
+holds `DescriptionText`) is switched off then and the purchase text is what the card says
+instead - which is what the old label did too. No details section beside the parts: an
+announcement part is a buffer line already.
+
+Follow-ups, not fixed: `TaleButtonAdapter.FocusNative` hovers a card in but nothing hovers
+it out, so the previous card stays raised (the same pre-existing fault the campaign menu
+has); the seventh card is drawn off-screen at x 1536 and nothing scrolls it into view when
+focus lands on it (scroll-into-view arrives with family D).
+
+Manual test:
+
+1. Campaign menu, Down to the Tales card, Enter. Hear "Choose Campaign or Tale", then
+   "Tales of Wonder, button", its description, then "Completed: 0 / 2 missions".
+2. Down through all seven cards; Home and End; a letter searches the card names, Backspace
+   ends the search.
+3. Tab: "Back, button, 1 of 2"; Down: "Options, button, 2 of 2"; Shift+Tab returns to the
+   card you left.
+4. Enter on a card opens its mission page (still a widget screen); its Back returns.
+5. Escape: the campaign menu returns with no stray card name spoken first.
+
 ## Family B: dialogs
 
 ### MessageDialogScreen (representative; seven sources, three verified out of game)
