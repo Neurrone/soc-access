@@ -52,3 +52,58 @@ Manual test:
 5. Enter on a card opens its mission page (still a widget screen); its Back returns.
 6. Watch the picture: the card under the cursor should look hovered; note that the previous
    one stays raised (follow-up above).
+
+## Family B: dialogs
+
+### MessageDialogScreen (representative; seven sources, three verified out of game)
+
+Built (commits `9435d39`, `7a53562`, `4669ed8`): one stop in ES2's three-part shape. The
+heading is a text node first and is also the screen name; focus starts on the body text (or
+on the edit field when a source draws no body, as the system popup does); then the edit
+field when the source has one; then the buttons in drawn x order, read live each build.
+`IMessageDialogAdapter` gained `ButtonOf(action)` and `GameHandlesEscape`. Escape: the confirm
+popup, the popup menu, the map message popup and the random event menu register the game's
+own ExitMenu in keyboard mode and keep the key; the system popup and the custom message
+menu register nothing, so there the mod claims Escape and presses the negative button.
+
+The edit field arrived with this screen: `ControlTypes.EditField` ("editable"),
+`GraphNodes.EditField`, the stand-down in `input/GameTextFocus.cs` (the whole input layer
+goes quiet while a game text field has the keyboard, the dev server's `/input` answers
+"standing down"), and `ui/GameTextEditor.cs` (Enter on the node hands the field the
+keyboard once Enter is released, says "editing", echoes typing through
+`TextInputEchoHelper`, and on the way out says "edited" with the new text or "Cancelled").
+A dialog's field keeps the game's submit on Enter (owner ruling). Four `ModString`s were
+added and translated in all thirteen `.po` files.
+
+Diffs: the heading is a line of its own on every source; "unavailable" replaces "disabled"
+on the join popup's greyed Join; on Set Name the field's value moved from the label into the
+status column. Nothing missing. Screenshots matched on all four dialogs, button order
+included (No then Yes; tick then cross).
+
+Deviations, measured: each synthetic node (heading, body) needs its own subject object or
+the reconciler seats the cursor on the wrong one; the edit node's value is not watched live
+(a cancel would re-speak the restored text); the end of an edit is read off TMP's
+`isFocused`, since the wrapper's `Focused` also answers true for the gamepad latch; the
+body's buffer section only fires for a multi-line body.
+
+Follow-ups, not fixed: `POST /type` bypasses the router's stand-down (no physical key can);
+every dialog adapter normalises the body with `SpeechTextSanitizer.Normalize`, so a
+multi-paragraph body reads as one line; the crash dialog capture (`-popup-error`) has no
+reachable route and was not diffed.
+
+Manual test:
+
+1. Main menu, Multiplayer group (Right), Join with game code. Hear "Join game", then the body.
+   Down: the field ("editable"), then Cancel, then Join ("unavailable").
+2. Enter on the field: "editing". Type: each character spoken. Backspace deletes and speaks
+   the deleted character (it does not end a search). Left/Right walk the caret and read the
+   character under it. Nothing else is spoken meanwhile.
+3. Escape inside the field: the text is restored and "Cancelled" is spoken; the mod's keys
+   work again.
+4. Type a code and Enter inside the field: the dialog submits (Join) with nothing spoken
+   about the edit.
+5. Letters on the dialog while not editing start a type-ahead search; while editing never.
+6. Escape on the options "Are you sure?" confirm and on the load menu's Delete Save popup: the
+   game's own No; Escape on a lobby's Set Name popup: the mod presses Cancel.
+7. Confirm the handover waits for Enter to be released: hold Enter on the field node and
+   release; the field must not submit the dialog.
