@@ -2098,6 +2098,164 @@ Manual test:
    description".
 5. Tab: "Back, button". Enter and Escape both return to where you came from.
 
+
+## Family H: the lobby page
+
+### AdventureLobbyPlayersScreen (representative; no siblings)
+
+Built: three stops. `lobby-players` is a `GraphSheet` of one region holding the player slots;
+`lobby-panel` holds everything else the page draws, in drawn order; `lobby-header` holds Back then
+Options. Screen name is the header band's drawn title ("Conquest", "Online Conquest"); focus starts
+on the table, landing on the first slot (`LandStopOn` with `SetStart` beside it, because this is the
+first stop and the reconciler seats the start node itself).
+
+The slots are a TABLE, which is what retires the widget screen's "selected player" indirection: the
+widget drew ONE set of faction, colour, starting wielder, team and AI-difficulty controls and
+pointed them at whichever slot the cursor had last been on, and the sheet reads each row's own
+controls in place. The name is the primary column; the settings are `ComboBox` cells whose value is
+what the button draws and whose Enter is the button's own click, which opens the game's icon
+dropdown (`AdventureLobbyIconDropdownScreen`, already a graph screen); the row's commands are
+`Button` cells. A control the row does not draw is skipped, and the sheet matches columns by
+identity, so a ragged row never lands the cursor in a neighbouring column - verified: Down from
+Leave on the human row reached the AI row's NAME, and Down in the Faction column read "Gowin (AI
+Player), Faction, combo box, Random, 2 of 2".
+
+Measured 2026-09-06 at 1280x800 through `/gui/unity`. Offline: two `LobbyPlayerEntry` rows 52 px
+tall at y 97 and y 151, each drawing its slot number (x 83), the name (x 147) over a `NameButton`
+(x 141), then FactionButton (334), ColorButton (380), StartingWielderButton (425), Partnership (471)
+and, on the AI row, AiModeButton (517), with Leave or Remove AI at x 813; the right panel with the
+map preview (title at y 307, description under it), Mixed Factions (y 582), Game settings (y 616)
+and Start Game (y 676); Back at [21,20] and Options at [1233,11]; the title at [399,19]. Online adds
+a band ACROSS THE TOP at y 43 to 82 - the game name (x 266), the Invites Only toggle (645), the game
+code (782) and Invite Friend (915) - a Player settings button (x 782) and a Join button (719) on the
+rows that draw them, Set Ready at [793,678], and a chat button at [77,693].
+
+Escape is CLAIMED and presses the drawn Back button: `LobbyMenu`, `LobbyPlayerMenu` and
+`LobbyNavigation` register NO input callback at all (decompiled; `LobbyNavigation` only ever
+UNregisters), so the key would otherwise do nothing here. Verified offline and online: `ui_back`
+answered `consumed` and the map select page came back.
+
+Diff, offline and online, and every before line is accounted for.
+
+1. The two widget rows ("slot 1, Neurrone, Arleon, blue, Random, Team 1") became one primary each
+   ("Neurrone", "Gowin (AI Player)") plus that row's own cells. The names, factions, colours and the
+   random seed differ because a lobby is generated afresh on every entry, not because of the port.
+2. The widget's ONE set of selected-player controls maps onto the row's cells, and each cell now
+   NAMES its setting: "blue" is "Colour | red", "Random" is "Starting Wielder | Random", "Team 1" is
+   "Team | 1", "Arleon" is "Faction | Barya", "Fair" is "AI Difficulty | Fair". The caption is the
+   game's own name for the setting, read from the localization keys `LobbyPlayerEntry` writes those
+   buttons' tooltips with (`Adventure/TeamQueueHUD/Faction`, `Lobby/LobbyPlayerMenu/SetColor`,
+   `.../SetStartingWielder`, `.../Coop`, `.../SetAiDifficulty`, decompiled).
+3. "Show Player Actions" left as a row of its own: `NameButton` IS
+   `LobbyPlayerEntry._userActionsButton`, drawn over the name, so it is the PRIMARY's click now and
+   its tooltip is the primary's buffer line. Verified: Enter on "Neurrone" opened
+   `PlatformUserMenuScreen`.
+4. The AI row's Faction and AI Difficulty cells are new to the offline capture and old to the
+   `-ai-slot` one: that variant was the widget's "second slot selected" state, which no longer
+   exists, so its before lines are diffed against the same offline after-capture.
+5. The map summary's label was the title and the description on two lines; the label is the title
+   now and the description is a declared section, so the review buffer holds it one drawn line at a
+   time.
+6. "unchecked" became "not checked" and "disabled" became "unavailable" (the phase B words).
+7. Two toggle labels changed because they were WRONG: the game assigns the localization token itself
+   to those toggles ("IsInviteOnly_", "Mixed Factions_", measured through `/eval`) and the renderer
+   resolves it as it lays the line out, so the labels are read with `GetParsedText` now ("Invites
+   Only Game", "Mixed Factions") - the same gap the loading screen's tip found for action tokens.
+8. Online adds four lines the widget never had: "Chat" (the drawn chat button, below), "Join" and
+   "Add AI" (the empty slot's own commands, which the widget could only show while that slot was the
+   selected one), and "Empty | Not ready".
+
+Deviations, each measured:
+
+- THE COLUMNS CARRY NO CAPTIONS. The page draws no heading band, and every cell is a control that
+  says its own name, so a caption spoken as the edge crossed into the column would be the same word
+  twice. The columns array is still the right LENGTH, which is what makes the region read as a table.
+- THE REGION IS NAMED "Players", WHICH THE PAGE DOES NOT DRAW. Measured: `LobbyPlayerMenu` draws its
+  `Entries` band and nothing over it. The word is the game's own `Common/Players`, which the widget
+  screen already named the menu with, and a table with no name and no role would say nothing at all
+  on the way in.
+- EACH COMMAND IS ITS OWN COLUMN (Join, Player settings, Leave, Kick, Remove AI / Add AI), emitted in
+  the order the row draws them. Down from a command therefore reaches the same command on the next
+  row that has one and falls to that row's name where it does not, rather than landing on a different
+  command that happens to share a rectangle.
+- THE ONLINE BAND IS DECLARED FIRST, before the map preview, because it is drawn first (y 43 to 82
+  against the preview's y 97) - the brief listed it after the preview. Within the band the controls
+  are sorted by their drawn left edge, which puts the Invites Only toggle before the game code.
+- THE COPY-CODE ROW IS NEITHER SELECTED NOR AIMED AT. The game draws the code in one of its own text
+  fields, and selecting that field - which a focus visual does, and which drawing its tooltip does
+  too - hands it the keyboard and the mod stands down. Measured: with the focus visual, landing on
+  that row answered `standing down` to every key; without it, the row reads and the arrows keep
+  working. Its tooltip is still in the review buffer (`GraphNodes.DoNotDrawTooltip`).
+- THE EMPTY SLOT SAYS "Not ready". The game sets `_isNotReadyImage` active on every row while the
+  lobby is online, the empty one included (measured through `/eval`: `notready=True` on both rows),
+  so the row is read as it is drawn; the widget suppressed the ready state on an unoccupied slot.
+- THE PARTNERSHIP CELL READS THE DRAWN NUMBER ("Team, combo box, 1"), not the mod's "Team 1": the
+  cell is a control with a label of its own, so the composed value would say the word twice.
+- `IsWorkable` is the canvas group's alpha AND its `interactable`, not the alpha alone. Measured with
+  the game settings window open: alpha 1, interactable false - the game switches the page off
+  wholesale while one of its own windows is up, and without the second half activating Game settings
+  spoke a stray "unavailable" as the page went quiet under the cursor.
+- The primary carries NO availability part. `_userActionsButton` is only drawn while there is an
+  action to take (`CanPerformAnyAction`), so "unavailable" there would be heard as the slot being
+  unavailable.
+- The adapter lost `Label`, `SelectedSlot` and `SelectedTeamId` (widget-tree composition and the
+  selected-player indirection) and gained the facts the rows need: `PlayerSlotItem.Entry`, `.Name`,
+  `.IsReadyStateDrawn`, `.IsReady`, the five setting captions, `MapTitle`/`MapDescription` in place
+  of `MapSummary`, `IsInteractive()`, `MultiplayerPanelItem.GameNameLabel`/`.GameCodeField` and
+  `ToggleItem.Subject`. `ChatAdapter` gained `Button`.
+- The chat button is declared as the last row of the panel, where it is drawn (y 693), so a keyboard
+  player has a route into the chat at all; the widget screen read no such control.
+
+Walk (all through `/input`): Tab cycles table, panel, header; Right along a row said "Faction, combo
+box, Barya", "Colour, combo box, red", "Starting Wielder, combo box, Random", "Team, combo box, 1",
+"Leave, button"; Down in the Faction column kept the column and named the row; Down from Leave fell
+to the AI row's name; the AI row's fifth cell read "AI Difficulty, combo box, Fair" and the human
+row has none; Enter on Colour opened the icon dropdown ("Colour", then "teal, selected, unavailable,
+7 of 9") and Escape left it unchanged; Enter on the AI row's AI Difficulty opened it too; Enter on
+the primary opened `PlatformUserMenuScreen`; the panel read the online band, the preview, Mixed
+Factions, Game settings, Set Ready, "Start Game!, button, unavailable" and Chat; Enter on Game
+settings opened `AdventureLobbyGameSettingsScreen` and its Cancel came back; `ui_back` left the
+lobby. Start Game was never activated and no slot was kicked.
+
+Follow-ups, not fixed:
+
+- The DLC requirement part was never exercised: no slot on this machine wants a faction DLC the
+  account does not own. `PlayerSlotItem.DlcRequirementText` still joins the disclaimer's tooltip
+  lines with ". " in the adapter (pre-existing composition, against the adapter rule).
+- `ScreenDetector.OnAdventureLobbyPlayersReady` builds a NEW screen for `RefreshTop`, so a lobby
+  change that goes through it loses the cursor and re-reads the screen name - the same detector
+  behaviour the campaign map select entry records.
+- The adapter still normalises names, the title and its localized text through
+  `SpeechTextSanitizer.Normalize` (pre-existing, and against the repo's standing rule).
+- `/screenshot` answered an all-black frame throughout (the locked-session symptom the options entry
+  records), so the layout evidence is `/gui/unity`, which reads the same rects side-effect free.
+- Crossplay and the Xbox crossplay line are declared but are drawn on no platform here.
+
+Manual test:
+
+1. Main menu, Conquest, Conquest maps, Confirm. Hear "Conquest", then "Players, grid, Neurrone,
+   button, 1 of 2".
+2. Down and Up walk the slots. Right walks one slot's controls, each naming itself: "Faction, combo
+   box, Barya", "Colour, combo box, red", "Starting Wielder, combo box, Random", "Team, combo box,
+   1", then the row's commands. Left comes back the same way.
+3. From the Colour column, Down says the next slot's name, then its colour, then "2 of 2". On the AI
+   row, Right reaches "AI Difficulty, combo box, Fair", which the human row does not have; Down from
+   a command the next row has not got lands on that row's name.
+4. Enter on any of the five settings opens the game's own icon list; Up and Down walk it; Escape
+   leaves the setting alone. Enter on a slot's NAME opens the player actions popup.
+5. Type a few letters of a player's name: the cursor lands on that row whichever column it is in.
+   Backspace ends the search.
+6. Tab: the panel. Offline it reads the map preview (name, then its description), Mixed Factions,
+   Game settings and "Start Game!". Online it reads the game's name, "Invites Only Game", "Copy game
+   code to clipboard: XXXXX", "Invite Friend" first, and adds "Set Ready" and "Chat" at the end.
+   Check that the arrows still answer on the copy-code row - that is the row whose field used to
+   swallow the keyboard.
+7. Enter on Game settings opens the settings window and its Cancel comes back with nothing stray
+   spoken. Enter on Mixed Factions says "checked", Enter again "not checked". Enter on Chat opens the
+   chat window.
+8. Tab: "Back, button, 1 of 2", then Options. Escape leaves the lobby, the same as pressing Back.
+9. Online with a second player: the rows should say "Ready" and "Not ready" as they change, and the
+   empty slot's Join and Add AI should be reachable on its own row.
 ## Family I: the chat
 
 ### ChatScreen (representative; no siblings)

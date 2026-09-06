@@ -69,6 +69,8 @@ namespace SongsOfConquestAccess.Adapters
             AccessTools.Field(typeof(LobbyMultiplayerPanel), "_crossplayToggle");
         private static readonly FieldInfo MultiplayerXboxCrossplayInformationField =
             AccessTools.Field(typeof(LobbyMultiplayerPanel), "_xboxCrossplayInformation");
+        private static readonly FieldInfo ToggleTextMeshField =
+            AccessTools.Field(typeof(UIToggle), "_textMesh");
 
         private readonly LobbyMenu _menu;
         private readonly LobbyNavigation _navigation;
@@ -97,8 +99,6 @@ namespace SongsOfConquestAccess.Adapters
         public IMenuButtonAdapter BackButton { get; private set; }
 
         public IMenuButtonAdapter OptionsButton { get; private set; }
-
-        public int SelectedTeamId { get; set; } = -1;
 
         public void InvalidateSnapshot()
         {
@@ -130,13 +130,61 @@ namespace SongsOfConquestAccess.Adapters
             get { return GetLocalizedText("Common/Players", string.Empty); }
         }
 
-        public string MapSummary
+        /// <summary>The name the map preview panel draws over its picture.</summary>
+        public string MapTitle
         {
             get
             {
                 LobbyMapPreview preview = _menu != null ? MapPreviewRef(_menu) : null;
-                return LobbyMapPreviewText.GetSummary(preview);
+                return LobbyMapPreviewText.GetTitle(preview);
             }
+        }
+
+        /// <summary>What the preview panel draws under that name, one drawn line at a time.</summary>
+        public string MapDescription
+        {
+            get
+            {
+                LobbyMapPreview preview = _menu != null ? MapPreviewRef(_menu) : null;
+                return LobbyMapPreviewText.GetInfo(preview);
+            }
+        }
+
+        /// <summary>Whether the page is still taking input. It fades as the lobby is left, and the
+        /// game switches its canvas group off wholesale while one of its own windows is up (measured
+        /// 2026-09-06 with the game settings window open: alpha 1, interactable false) - which turns
+        /// every control on the page unavailable at once.</summary>
+        public bool IsInteractive()
+        {
+            CanvasGroup canvasGroup = _menu != null ? CanvasGroupRef(_menu) : null;
+            return canvasGroup != null && canvasGroup.alpha >= 1f && canvasGroup.interactable;
+        }
+
+        /// <summary>The game's own names for the settings each player row draws a button for, read
+        /// from the same localization keys <c>LobbyPlayerEntry</c> writes their tooltips with.</summary>
+        public string FactionLabel
+        {
+            get { return GetLocalizedText("Adventure/TeamQueueHUD/Faction", string.Empty); }
+        }
+
+        public string ColorLabel
+        {
+            get { return GetLocalizedText("Lobby/LobbyPlayerMenu/SetColor", string.Empty); }
+        }
+
+        public string StartingWielderLabel
+        {
+            get { return GetLocalizedText("Lobby/LobbyPlayerMenu/SetStartingWielder", string.Empty); }
+        }
+
+        public string PartnershipLabel
+        {
+            get { return GetLocalizedText("Lobby/LobbyPlayerMenu/Coop", string.Empty); }
+        }
+
+        public string AiDifficultyLabel
+        {
+            get { return GetLocalizedText("Lobby/LobbyPlayerMenu/SetAiDifficulty", string.Empty); }
         }
 
         public IReadOnlyList<PlayerSlotItem> GetPlayerSlots()
@@ -160,30 +208,8 @@ namespace SongsOfConquestAccess.Adapters
             }
 
             slots.Sort((left, right) => left.TeamId.CompareTo(right.TeamId));
-            if (SelectedTeamId < 0 && slots.Count > 0)
-            {
-                SelectedTeamId = slots[0].TeamId;
-            }
-
             _playerSlots = slots;
             return _playerSlots;
-        }
-
-        public PlayerSlotItem SelectedSlot
-        {
-            get
-            {
-                IReadOnlyList<PlayerSlotItem> slots = GetPlayerSlots();
-                for (int i = 0; i < slots.Count; i++)
-                {
-                    if (slots[i] != null && slots[i].TeamId == SelectedTeamId)
-                    {
-                        return slots[i];
-                    }
-                }
-
-                return slots.Count > 0 ? slots[0] : null;
-            }
         }
 
         public LobbyPlayerSettingsItem GetSettingsItem()
@@ -446,6 +472,8 @@ namespace SongsOfConquestAccess.Adapters
             private static readonly FieldInfo DlcNeededContainerField = AccessTools.Field(typeof(LobbyPlayerEntry), "_dlcNeededToJoinDisclaimer");
             private static readonly FieldInfo DlcNeededButtonField = AccessTools.Field(typeof(LobbyPlayerEntry), "_dlcNeededToJoinDisclaimerButton");
             private static readonly FieldInfo WielderLockedIconField = AccessTools.Field(typeof(LobbyPlayerEntry), "_wielderLockedIcon");
+            private static readonly FieldInfo ReadyImageField = AccessTools.Field(typeof(LobbyPlayerEntry), "_isReadyImage");
+            private static readonly FieldInfo NotReadyImageField = AccessTools.Field(typeof(LobbyPlayerEntry), "_isNotReadyImage");
 
             private readonly AdventureLobbyPlayersAdapter _adapter;
             private readonly LobbyPlayerEntry _entry;
@@ -466,9 +494,37 @@ namespace SongsOfConquestAccess.Adapters
                 get { return "lobby-player-slot-" + Math.Max(TeamId + 1, 0); }
             }
 
-            public string Label
+            /// <summary>The row the game draws this slot as.</summary>
+            public Component Entry
             {
-                get { return BuildLabel(); }
+                get { return _entry; }
+            }
+
+            /// <summary>The name the row draws - a player's, an AI's, or the game's own word for an
+            /// empty slot.</summary>
+            public string Name
+            {
+                get { return GetName(); }
+            }
+
+            /// <summary>Whether the row draws a ready marker at all, which it does only online.
+            /// </summary>
+            public bool IsReadyStateDrawn
+            {
+                get
+                {
+                    return IsDrawn(GetField<GameObject>(_entry, ReadyImageField))
+                        || IsDrawn(GetField<GameObject>(_entry, NotReadyImageField));
+                }
+            }
+
+            public bool IsReady
+            {
+                get
+                {
+                    ILobbyTeamState team = _entry != null ? _entry.LobbyTeamState : null;
+                    return team != null && team.IsReadyToStart;
+                }
             }
 
             public Tooltip Tooltip
@@ -513,7 +569,7 @@ namespace SongsOfConquestAccess.Adapters
 
             public LobbyButtonItem PartnershipButton
             {
-                get { return BuildValueButton(SetPartnershipButtonField, ModText.Get(ModStrings.Screens.TeamValue, GetPartnershipNumber()), GetField<Component>(_entry, PartnershipTransformField)); }
+                get { return BuildValueButton(SetPartnershipButtonField, GetPartnershipNumber(), GetField<Component>(_entry, PartnershipTransformField)); }
             }
 
             public LobbyButtonItem AiDifficultyButton
@@ -554,49 +610,6 @@ namespace SongsOfConquestAccess.Adapters
                 {
                     NativeSelectionUtility.Select(selectable);
                 }
-            }
-
-            private string BuildLabel()
-            {
-                List<string> parts = new List<string>();
-                AddIfNotEmpty(parts, ModText.Get(ModStrings.UI.Slot, TeamId + 1));
-                AddIfNotEmpty(parts, GetName());
-                if (!IsOccupied)
-                {
-                    return ModText.JoinListWithCommas(parts);
-                }
-
-                AddIfNotEmpty(parts, GetFactionLabel());
-                AddIfNotEmpty(parts, GetColorLabel());
-                AddIfNotEmpty(parts, GetStartingWielderLabel());
-                AddIfNotEmpty(parts, ModText.Get(ModStrings.Screens.TeamValue, GetPartnershipNumber()));
-                AddIfNotEmpty(parts, GetAiDifficultyLabel());
-                AddIfNotEmpty(parts, GetReadyStatusLabel());
-                return ModText.JoinListWithCommas(parts);
-            }
-
-            private bool IsOccupied
-            {
-                get
-                {
-                    ILobbyTeamState team = _entry != null ? _entry.LobbyTeamState : null;
-                    return team != null
-                        && ((team.AiMode != AiMode.Off)
-                            || (_adapter != null && _adapter._facade != null && _adapter._facade.HasClient(team.Id)));
-                }
-            }
-
-            private string GetReadyStatusLabel()
-            {
-                ILobbyTeamState team = _entry != null ? _entry.LobbyTeamState : null;
-                if (team == null || _adapter == null || _adapter.GetMultiplayerPanel() == null)
-                {
-                    return string.Empty;
-                }
-
-                return team.IsReadyToStart
-                    ? ModText.Get(ModStrings.Screens.Ready)
-                    : ModText.Get(ModStrings.Screens.NotReady);
             }
 
             private string GetName()
@@ -773,6 +786,11 @@ namespace SongsOfConquestAccess.Adapters
                 return component != null && component.gameObject != null && component.gameObject.activeInHierarchy;
             }
 
+            private static bool IsDrawn(GameObject gameObject)
+            {
+                return gameObject != null && gameObject.activeInHierarchy;
+            }
+
             private static T GetInjectedField<T>(object owner, string fieldName) where T : class
             {
                 FieldInfo field = AccessTools.Field(owner != null ? owner.GetType() : null, fieldName);
@@ -782,14 +800,6 @@ namespace SongsOfConquestAccess.Adapters
             private static T GetField<T>(object owner, FieldInfo field) where T : class
             {
                 return owner != null && field != null ? field.GetValue(owner) as T : null;
-            }
-
-            private static void AddIfNotEmpty(List<string> parts, string value)
-            {
-                if (!string.IsNullOrWhiteSpace(value))
-                {
-                    parts.Add(value);
-                }
             }
         }
 
@@ -816,6 +826,19 @@ namespace SongsOfConquestAccess.Adapters
                     GameObject gameObject = _panel != null ? ((Component)_panel).gameObject : null;
                     return IsLiveSceneObject(gameObject) && gameObject.activeInHierarchy;
                 }
+            }
+
+            /// <summary>The label the band draws the game's name in, so a caller can key a control
+            /// on it and read where it is drawn.</summary>
+            public Component GameNameLabel
+            {
+                get { return GetField<Component>(MultiplayerGameNameLabelField); }
+            }
+
+            /// <summary>The box the band draws the game code in, likewise.</summary>
+            public Component GameCodeField
+            {
+                get { return GetField<Component>(MultiplayerGameCodeInputField); }
             }
 
             public string GameName
@@ -930,6 +953,12 @@ namespace SongsOfConquestAccess.Adapters
                 _localization = localization;
             }
 
+            /// <summary>The drawn toggle, so a caller can key a control on it.</summary>
+            public Component Subject
+            {
+                get { return _toggle as Component; }
+            }
+
             public bool IsVisible
             {
                 get { return IsVisibleComponent(_toggle as Component); }
@@ -947,7 +976,7 @@ namespace SongsOfConquestAccess.Adapters
 
             public string Label
             {
-                get { return SpeechTextSanitizer.Normalize(_toggle != null ? _toggle.Text : string.Empty); }
+                get { return GetToggleText(_toggle); }
             }
 
             public Tooltip Tooltip
@@ -1119,7 +1148,7 @@ namespace SongsOfConquestAccess.Adapters
 
             public string Label
             {
-                get { return SpeechTextSanitizer.Normalize(_toggle != null ? _toggle.Text : string.Empty); }
+                get { return GetToggleText(_toggle); }
             }
 
             public Tooltip Tooltip
@@ -1158,6 +1187,30 @@ namespace SongsOfConquestAccess.Adapters
         private static bool IsVisible(Component component)
         {
             return IsVisibleComponent(component);
+        }
+
+        /// <summary>
+        /// A toggle's label as the game DRAWS it. <c>UIToggle.Text</c> answers the string the panel
+        /// assigned, which here is the localization token itself ("IsInviteOnly_", "Mixed Factions_",
+        /// measured 2026-09-06); the renderer resolves it as it lays the line out, and
+        /// <c>GetParsedText</c> is that finished line ("Invites Only Game", "Mixed Factions"). The same
+        /// gap the loading screen's tip found for the game's action tokens.
+        /// </summary>
+        private static string GetToggleText(UIToggle toggle)
+        {
+            UITextMesh textMesh = toggle != null && ToggleTextMeshField != null
+                ? ToggleTextMeshField.GetValue(toggle) as UITextMesh
+                : null;
+            if (textMesh != null)
+            {
+                string drawn = textMesh.GetParsedText();
+                if (!string.IsNullOrWhiteSpace(drawn))
+                {
+                    return drawn.Trim();
+                }
+            }
+
+            return toggle != null ? toggle.Text ?? string.Empty : string.Empty;
         }
 
         private static bool IsVisibleComponent(Component component)

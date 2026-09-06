@@ -207,7 +207,10 @@ graph side of the mod.
   heading stamped with `NodeVtable.Column` and `SearchesAsItself`, no positions), then one region
   per drawn caption with `RowAt` per row - the primary cell first, the metadata cells as
   `SheetCell(column, piece, vtable)` read-only text carrying a `BufferHead` of the caption and the
-  value - and pins the stop's Tab landing with `builder.LandStopOn(sheet.FirstRow)`.
+  value - and pins the stop's Tab landing with `builder.LandStopOn(sheet.FirstRow)`. A cell may
+  instead carry a REAL CONTROL's vtable, keeping its role word, its label and its click (the lobby's
+  player rows, whose cells are the combo boxes and buttons the row draws); there the columns carry no
+  captions, because the control already says its own name.
 - A stop is NAMED after live content by wrapping the whole stop in one `PushContext(...)`, so
   entering it says what is in it once however deep the remembered position is (the codex's
   article body, named after the article's own heading).
