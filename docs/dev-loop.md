@@ -80,6 +80,15 @@ Mod routes answer 404 while the mod is down:
   leaf for diffing. Side-effect free: two calls answer identically. Multi-position widgets
   (map grid, hex grids, inventory grid, army exchange grid, announcement order menu, codex
   content) print one placeholder line each. Grammar in §2a below.
+- `GET /gui/graph?buffers=1&flat=1&edges=1`: the same for a graph screen (`screens/GraphScreen.cs`):
+  one line per node in navigation order, indented by its depth, with `-- stop:` markers between
+  Tab stops and `(collapsed)` on a shut group; `edges=1` adds where each arrow goes from every
+  node (a wired edge, `adjust value`, `expand`, `descend to`, `collapse`, `ascend to`). A widget
+  screen answers with one line saying to use `/gui/widgets`, and vice versa.
+- `GET /gui/tree?buffers=1&flat=1&edges=1`: whichever of the two dumps fits the focused screen.
+- `POST /type`: body = characters typed into the focused graph screen's type-ahead search,
+  through the same per-frame tick a keypress takes. Answers `{ok, searchText, searchActive,
+  results, speech:[...]}`; 409 when the focused screen is a widget screen.
 - `GET /gui/unity?path=&depth=&visibleOnly=&fields=`: the game's own UI read as accessible
   meaning - the coverage baseline the mod's tree is diffed against. Per node `name`, `kind`
   (button/toggle/slider/dropdown/input/text/image/canvas/panel), `text` (markup stripped),

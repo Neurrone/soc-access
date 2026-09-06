@@ -47,6 +47,7 @@ namespace SongsOfConquestAccess
         private ReviewBufferController _reviewBufferController;
         private AdventureMapScannerState _adventureMapScannerState;
         private ScreenManager _screenManager;
+        private GraphNavigator _navigator;
         private ScreenDetector _screenDetector;
         private AccessibilityInputRouter _inputRouter;
         private ILocalizationHandler _localizationHandler;
@@ -72,9 +73,12 @@ namespace SongsOfConquestAccess
             _speechEventAnnouncer.Attach();
             _bufferEventRecorder = new BufferEventRecorder(_reviewBufferManager);
             _bufferEventRecorder.Attach();
+            GraphNavigator.InstallWiring();
+            _navigator = new GraphNavigator();
             _screenManager = new ScreenManager(_reviewBufferManager, _reviewBufferController);
             _screenDetector = new ScreenDetector(_screenManager);
             _inputRouter = new AccessibilityInputRouter(_screenManager);
+            _navigator.TypedCharacters = _inputRouter.TakeTypedCharacters;
             // Before the ready line, so /speech carries it: the routes install the speech tap.
             _modRoutes = new ModRoutes(_host, _screenManager, _inputRouter, this);
             _modRoutes.Register();
@@ -106,6 +110,12 @@ namespace SongsOfConquestAccess
             Step("coroutines", _host.StopAllCoroutines);
             Step("main menu waits", MainMenuPatches.Reset);
             Step("screens", () => _screenManager?.Clear());
+            Step("graph navigator", () =>
+            {
+                _navigator?.Attach(null);
+                GraphNavigator.ResetWiring();
+            });
+            _navigator = null;
             Step("beacon audio", AdventureBeaconAudio.DisposeAll);
             Step("synth audio", SynthCuePlayer.DisposeAll);
             Step("sweep audio", SweepPlayer.DisposeAll);
@@ -192,6 +202,12 @@ namespace SongsOfConquestAccess
         public ScreenManager ScreenManager
         {
             get { return _screenManager; }
+        }
+
+        /// <summary>The one navigator every graph screen is driven by (screens/GraphScreen.cs).</summary>
+        public GraphNavigator Navigator
+        {
+            get { return _navigator; }
         }
 
         public ReviewBufferManager ReviewBuffers

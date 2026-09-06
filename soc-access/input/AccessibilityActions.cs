@@ -269,6 +269,59 @@ namespace SongsOfConquestAccess.Input
         public static readonly InputAction Cancel = OneShot("cancel", ModStrings.Actions.Cancel, InputClaimScope.Screen)
             .AddBinding(new KeyboardBinding(Key.Escape));
 
+        // The graph engine's own keys (screens/GraphScreen.cs). Named for what the player is doing
+        // rather than for the widget under the cursor, because on a graph screen one key means
+        // several things in turn: Left adjusts a slider, else steps along a row, else collapses a
+        // group. They share physical keys with the widget actions above and never meet them, since a
+        // graph screen claims only these and a widget screen claims only those.
+        public static readonly InputAction UiUp = OneShot("ui_up", ModStrings.Actions.UiUp, InputClaimScope.Screen)
+            .AddBinding(new KeyboardBinding(Key.UpArrow));
+
+        public static readonly InputAction UiDown = OneShot("ui_down", ModStrings.Actions.UiDown, InputClaimScope.Screen)
+            .AddBinding(new KeyboardBinding(Key.DownArrow));
+
+        public static readonly InputAction UiLeft = OneShot("ui_left", ModStrings.Actions.UiLeft, InputClaimScope.Screen)
+            .AddBinding(new KeyboardBinding(Key.LeftArrow));
+
+        public static readonly InputAction UiRight = OneShot("ui_right", ModStrings.Actions.UiRight, InputClaimScope.Screen)
+            .AddBinding(new KeyboardBinding(Key.RightArrow));
+
+        public static readonly InputAction UiCoarseDecrease = OneShot("ui_coarse_decrease", ModStrings.Actions.UiCoarseDecrease, InputClaimScope.Screen)
+            .AddBinding(new KeyboardBinding(Key.LeftArrow, shift: true));
+
+        public static readonly InputAction UiCoarseIncrease = OneShot("ui_coarse_increase", ModStrings.Actions.UiCoarseIncrease, InputClaimScope.Screen)
+            .AddBinding(new KeyboardBinding(Key.RightArrow, shift: true));
+
+        public static readonly InputAction UiNext = OneShot("ui_next", ModStrings.Actions.UiNext, InputClaimScope.Screen)
+            .AddBinding(new KeyboardBinding(Key.Tab));
+
+        public static readonly InputAction UiPrev = OneShot("ui_prev", ModStrings.Actions.UiPrev, InputClaimScope.Screen)
+            .AddBinding(new KeyboardBinding(Key.Tab, shift: true));
+
+        public static readonly InputAction UiHome = OneShot("ui_home", ModStrings.Actions.UiHome, InputClaimScope.Screen)
+            .AddBinding(new KeyboardBinding(Key.Home));
+
+        public static readonly InputAction UiEnd = OneShot("ui_end", ModStrings.Actions.UiEnd, InputClaimScope.Screen)
+            .AddBinding(new KeyboardBinding(Key.End));
+
+        public static readonly InputAction UiRegionPrev = OneShot("ui_region_prev", ModStrings.Actions.UiRegionPrev, InputClaimScope.Screen)
+            .AddBinding(new KeyboardBinding(Key.UpArrow, alt: true));
+
+        public static readonly InputAction UiRegionNext = OneShot("ui_region_next", ModStrings.Actions.UiRegionNext, InputClaimScope.Screen)
+            .AddBinding(new KeyboardBinding(Key.DownArrow, alt: true));
+
+        public static readonly InputAction UiActivate = OneShot("ui_activate", ModStrings.Actions.UiActivate, InputClaimScope.Screen)
+            .AddBinding(new KeyboardBinding(Key.Enter))
+            .AddBinding(new KeyboardBinding(Key.NumpadEnter));
+
+        // The right-click equivalent, on the key the map's secondary action already uses.
+        public static readonly InputAction UiSecondary = OneShot("ui_secondary", ModStrings.Actions.UiSecondary, InputClaimScope.Screen)
+            .AddBinding(new KeyboardBinding(Key.Backslash))
+            .AddBinding(new KeyboardDisplayNameBinding("\\"));
+
+        public static readonly InputAction UiBack = OneShot("ui_back", ModStrings.Actions.UiBack, InputClaimScope.Screen)
+            .AddBinding(new KeyboardBinding(Key.Escape));
+
         public static readonly InputAction HexGridWest = OneShot("hex_grid_west", ModStrings.Actions.HexGridWest, InputClaimScope.FocusedWidget)
             .AddBinding(new KeyboardBinding(Key.A));
 
@@ -537,7 +590,22 @@ namespace SongsOfConquestAccess.Input
                 ReadThreat,
                 StartDrag,
                 Activate,
-                Cancel
+                Cancel,
+                UiUp,
+                UiDown,
+                UiLeft,
+                UiRight,
+                UiCoarseDecrease,
+                UiCoarseIncrease,
+                UiNext,
+                UiPrev,
+                UiHome,
+                UiEnd,
+                UiRegionPrev,
+                UiRegionNext,
+                UiActivate,
+                UiSecondary,
+                UiBack
             };
 
             actions.AddRange(SaveBookmarks);

@@ -13,6 +13,7 @@ using SongsOfConquestAccess.Loader.Dev;
 using SongsOfConquestAccess.Screens;
 using SongsOfConquestAccess.Speech;
 using SongsOfConquestAccess.UI;
+using SongsOfConquestAccess.UI.Graph;
 using UnityEngine;
 using Zenject;
 
@@ -33,6 +34,10 @@ namespace SongsOfConquestAccess.Dev
     ///                           the connection open until there is one
     ///   GET  /gui/widgets?buffers=1&amp;flat=1
     ///                           the accessible tree of the top screen (see <see cref="WidgetDump"/>)
+    ///   GET  /gui/graph?buffers=1&amp;flat=1&amp;edges=1
+    ///                           the same for a graph screen (see <see cref="GraphDump"/>)
+    ///   GET  /gui/tree          whichever of the two fits the top screen
+    ///   POST /type              body = characters; typed into the graph screen's type-ahead search
     ///   POST /input             body = an action key; run it as a keypress would
     ///   POST /key?hold=MS&amp;gap=MS&amp;text=1
     ///                           body = a key sequence (or, with text=1, characters); pressed as REAL
@@ -100,6 +105,9 @@ namespace SongsOfConquestAccess.Dev
             _host.RegisterRoute("GET", "/status", Status);
             _host.RegisterRoute("GET", "/speech", Speech, "since", "wait");
             _host.RegisterRoute("GET", "/gui/widgets", Widgets, "buffers", "flat");
+            _host.RegisterRoute("GET", "/gui/graph", Graph, "buffers", "flat", "edges");
+            _host.RegisterRoute("GET", "/gui/tree", Tree, "buffers", "flat", "edges");
+            _host.RegisterRoute("POST", "/type", Type);
             _host.RegisterRoute(
                 "GET",
                 "/gui/unity",
@@ -174,10 +182,20 @@ namespace SongsOfConquestAccess.Dev
                             json.WriteEndArray();
                             json.WritePropertyName("topScreen");
                             json.WriteValue(top == null ? null : top.GetType().Name);
+                            // On a graph screen the "widget" is the focused node: its structural
+                            // key and its control type, so the two engines answer the same fields.
+                            GraphScreen graphTop = top as GraphScreen;
+                            GraphNode node = graphTop == null || graphTop.Navigator == null
+                                ? null
+                                : graphTop.Navigator.CurrentNode;
                             json.WritePropertyName("focusedWidgetId");
-                            json.WriteValue(focused == null ? null : focused.Id);
+                            json.WriteValue(node != null
+                                ? Convert.ToString(node.Id.StructuralKey)
+                                : focused == null ? null : focused.Id);
                             json.WritePropertyName("focusedWidgetType");
-                            json.WriteValue(focused == null ? null : focused.GetType().Name);
+                            json.WriteValue(node != null
+                                ? (node.Vtable.ControlType == null ? "node" : node.Vtable.ControlType.Key)
+                                : focused == null ? null : focused.GetType().Name);
                             json.WritePropertyName("gameObjectCount");
                             json.WriteValue(gameObjectCount);
                             json.WriteEndObject();
@@ -202,6 +220,91 @@ namespace SongsOfConquestAccess.Dev
 
             return Plain(
                 (string)_host.MainThread.Run(() => WidgetDump.Dump(_screens, buffers, flat))
+            );
+        }
+
+        /// <summary>The same for a graph screen (see <see cref="GraphDump"/>); <c>edges=1</c> adds
+        /// where each arrow goes from every node.</summary>
+        private DevResponse Graph(DevRequest request)
+        {
+            bool buffers;
+            bool flat;
+            bool edges;
+            DevResponse badBuffers = Flag(request, "buffers", out buffers);
+            DevResponse badFlat = Flag(request, "flat", out flat);
+            DevResponse badEdges = Flag(request, "edges", out edges);
+            DevResponse bad = badBuffers ?? badFlat ?? badEdges;
+            if (bad != null)
+            {
+                return bad;
+            }
+
+            return Plain(
+                (string)_host.MainThread.Run(() => GraphDump.Dump(_screens, buffers, flat, edges))
+            );
+        }
+
+        /// <summary>Whichever dump fits the focused screen's kind, so a caller walking a mixed stack
+        /// during the migration need not know which engine draws the top screen.</summary>
+        private DevResponse Tree(DevRequest request)
+        {
+            bool graph = (bool)_host.MainThread.Run(() => GraphDump.Fits(_screens));
+            return graph ? Graph(request) : Widgets(request);
+        }
+
+        /// <summary>
+        /// Type characters into the focused graph screen's type-ahead search, through the same tick a
+        /// keypress goes through, and report what the search did: what it holds, how many controls
+        /// matched, and what was said.
+        /// </summary>
+        private DevResponse Type(DevRequest request)
+        {
+            string text = request.Body ?? string.Empty;
+            long spokenBefore = _speech.Cursor;
+            GraphNavigator navigator = _mod == null ? null : _mod.Navigator;
+            if (navigator == null)
+            {
+                return DevResponse.Json(503, DevJson.Error("the mod's navigator is not up"));
+            }
+
+            bool graph = (bool)_host.MainThread.Run(() =>
+            {
+                if (!GraphDump.Fits(_screens))
+                {
+                    return false;
+                }
+
+                navigator.TypeText(text);
+                return true;
+            });
+            if (!graph)
+            {
+                return DevResponse.Json(409, DevJson.Error("the focused screen is not a graph screen"));
+            }
+
+            List<SpeechLog.Entry> spoken = Settled(spokenBefore);
+            return DevResponse.Json(
+                DevJson.Write(json =>
+                {
+                    json.WriteStartObject();
+                    json.WritePropertyName("ok");
+                    json.WriteValue(true);
+                    json.WritePropertyName("searchText");
+                    json.WriteValue(navigator.SearchText);
+                    json.WritePropertyName("searchActive");
+                    json.WriteValue(navigator.SearchIsActive);
+                    json.WritePropertyName("results");
+                    json.WriteValue(navigator.SearchResultCount);
+                    json.WritePropertyName("speech");
+                    json.WriteStartArray();
+                    foreach (SpeechLog.Entry entry in spoken)
+                    {
+                        json.WriteValue(entry.Text);
+                    }
+
+                    json.WriteEndArray();
+                    json.WriteEndObject();
+                })
             );
         }
 

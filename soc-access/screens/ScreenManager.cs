@@ -301,7 +301,7 @@ namespace SongsOfConquestAccess.Screens
 
             if (action.Key == AccessibilityActions.TooltipActionsMenu.Key)
             {
-                Tooltip tooltip = UIManager.CurrentWidget.GetTooltip();
+                Tooltip tooltip = CurrentScreen.CurrentTooltip;
                 Push(new TooltipActionsMenuScreen(tooltip.Actions, () => Pop<TooltipActionsMenuScreen>("tooltip actions menu closed")), "tooltip actions menu opened");
                 return true;
             }
@@ -386,7 +386,7 @@ namespace SongsOfConquestAccess.Screens
                     return false;
                 }
 
-                Tooltip tooltip = UIManager.CurrentWidget != null ? UIManager.CurrentWidget.GetTooltip() : null;
+                Tooltip tooltip = CurrentScreen != null ? CurrentScreen.CurrentTooltip : null;
                 return tooltip != null
                     && tooltip.Actions != null
                     && tooltip.Actions.Count > 0;

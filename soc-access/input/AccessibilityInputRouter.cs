@@ -23,6 +23,12 @@ namespace SongsOfConquestAccess.Input
         {
             _screenManager = screenManager;
             _rawInputSubscription = InputSystem.onEvent.Subscribe(this);
+            _textKeyboard = Keyboard.current;
+            if (_textKeyboard != null)
+            {
+                _textKeyboard.onTextInput += OnTextInput;
+            }
+
             SocAccessMod.Instance?.LogInfo("AccessibilityInputRouter raw keyboard input attached");
         }
 
@@ -35,7 +41,63 @@ namespace SongsOfConquestAccess.Input
                 SocAccessMod.Instance?.LogInfo("AccessibilityInputRouter raw keyboard input detached");
             }
 
+            if (_textKeyboard != null)
+            {
+                _textKeyboard.onTextInput -= OnTextInput;
+                _textKeyboard = null;
+            }
+
             _activeBindings.Clear();
+            _typed.Length = 0;
+        }
+
+        // ---- typed text, for the graph screens' type-ahead search ----
+        //
+        // A character is not a chord: it comes from the keyboard's own text events (layout, dead
+        // keys and shift all resolved by the engine), never from mapping key codes to letters. The
+        // characters are queued here and taken once a frame by the navigator (TakeTypedCharacters),
+        // so a letter and the control it lands on are the same frame's work.
+
+        private readonly System.Text.StringBuilder _typed = new System.Text.StringBuilder();
+        private Keyboard _textKeyboard;
+
+        private void OnTextInput(char character)
+        {
+            if (TypingScreen() != null)
+            {
+                _typed.Append(character);
+            }
+        }
+
+        /// <summary>The characters typed since the last call, or null - the navigator's text source.</summary>
+        public string TakeTypedCharacters()
+        {
+            if (_typed.Length == 0)
+            {
+                return null;
+            }
+
+            string typed = _typed.ToString();
+            _typed.Length = 0;
+            return typed;
+        }
+
+        // Whether a bare letter (or a space continuing a search) is the focused graph screen's to
+        // hear. A chord with Ctrl or Alt held is not typing; Shift is (capitals).
+        private bool TakesTypedKey(Key key, KeyboardStateSnapshot state)
+        {
+            if (state == null || state.Ctrl || state.Alt)
+            {
+                return false;
+            }
+
+            GraphScreen screen = TypingScreen();
+            return screen != null && screen.Navigator != null && screen.Navigator.TakesTypedKey(key);
+        }
+
+        private GraphScreen TypingScreen()
+        {
+            return _screenManager == null ? null : _screenManager.CurrentScreen as GraphScreen;
         }
 
         public void Update()
@@ -218,7 +280,10 @@ namespace SongsOfConquestAccess.Input
             BindingMatch match = ResolveGlobalMatch(keyControl, state);
             if (match == null)
             {
-                return false;
+                // A letter no binding took is TEXT on a graph screen that searches: claimed here so
+                // the game never sees the key, while the character itself arrives through the
+                // keyboard's text events (OnTextInput) and is searched with on the next tick.
+                return TakesTypedKey(key, state);
             }
 
             if (_screenManager != null && _screenManager.CanHandleGlobalAction(match.Action))

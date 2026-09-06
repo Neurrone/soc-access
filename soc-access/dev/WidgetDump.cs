@@ -39,22 +39,16 @@ namespace SongsOfConquestAccess.Dev
         {
             StringBuilder text = new StringBuilder();
             Screen top = screens == null ? null : screens.CurrentScreen;
+            text.Append(Header(screens));
             if (top == null)
             {
-                text.Append("screen: none | stack: (empty)");
                 return text.ToString();
             }
 
-            text.Append("screen: ").Append(top.GetType().Name).Append(" | stack: ");
-            IReadOnlyList<Screen> stack = screens.Stack;
-            for (int i = 0; i < stack.Count; i++)
+            if (top.RootWidget == null)
             {
-                if (i > 0)
-                {
-                    text.Append(" > ");
-                }
-
-                text.Append(stack[i].GetType().Name);
+                text.Append("\n(").Append(top.GetType().Name).Append(" is a graph screen: read it with /gui/graph)");
+                return text.ToString();
             }
 
             List<Visit> visits = new List<Visit>();
@@ -67,6 +61,32 @@ namespace SongsOfConquestAccess.Dev
             else
             {
                 WriteTree(text, visits, buffers);
+            }
+
+            return text.ToString();
+        }
+
+        /// <summary>The first line of every dump, whichever engine draws the rest: the focused screen
+        /// and the stack it sits on.</summary>
+        public static string Header(ScreenManager screens)
+        {
+            Screen top = screens == null ? null : screens.CurrentScreen;
+            if (top == null)
+            {
+                return "screen: none | stack: (empty)";
+            }
+
+            StringBuilder text = new StringBuilder();
+            text.Append("screen: ").Append(top.GetType().Name).Append(" | stack: ");
+            IReadOnlyList<Screen> stack = screens.Stack;
+            for (int i = 0; i < stack.Count; i++)
+            {
+                if (i > 0)
+                {
+                    text.Append(" > ");
+                }
+
+                text.Append(stack[i].GetType().Name);
             }
 
             return text.ToString();

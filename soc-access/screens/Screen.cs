@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using SongsOfConquestAccess.Adapters;
 using SongsOfConquestAccess.Buffers;
 using SongsOfConquestAccess.Input;
 using SongsOfConquestAccess.UI;
@@ -59,6 +60,14 @@ namespace SongsOfConquestAccess.Screens
         public virtual bool OnActionJustPressed(InputAction action)
         {
             return RootWidget.HandleAction(action);
+        }
+
+        /// <summary>The tooltip of whatever the player is standing on, or null - what the tooltip
+        /// actions menu opens on. Widget screens answer with the focused widget's; graph screens with
+        /// the focused node's.</summary>
+        public virtual Tooltip CurrentTooltip
+        {
+            get { return UIManager.CurrentWidget != null ? UIManager.CurrentWidget.GetTooltip() : null; }
         }
     }
 }

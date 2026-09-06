@@ -8,3 +8,6 @@ release-template/BepInEx/plugins/SongsOfConquestAccess/SongsOfConquest.Access.Lo
 release-template/BepInEx/plugins/SongsOfConquestAccess/SongsOfConquest.Access.Loader.pdb
 release-template/BepInEx/plugins/SongsOfConquestAccess/mcs.dll
 release-template/BepInEx/plugins/SongsOfConquestAccess/mcs-NOTICE.txt
+
+# Dump-and-diff captures for the UI graph rewrite
+walks/
