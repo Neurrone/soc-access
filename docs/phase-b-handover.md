@@ -1383,3 +1383,124 @@ Manual test:
   `OwnsGameField` while it is pending or editing, which the window leaves alone. Verified on
   the host popup: keys answered on arrival ("Please enter the name of the game...", then the
   field, then Invite Only).
+
+## Family G: browse pages
+
+### CodexScreen (representative)
+
+Built: four stops. `codex-tabs` holds the eight icon tabs; `codex-articles` holds every category
+as a REGION over its own articles; `codex-content` holds the article's body, named after the
+article's own heading; `codex-footer` holds Reset Tutorials, Show tutorials and Close while they
+are drawn. Screen name is the window's drawn heading ("Tutorials & Codex"); focus starts on the
+tab row, so arrival reads "Tutorials & Codex", then "Tutorials, tab, selected, 1 of 8".
+
+Measured 2026-09-06 at 1280x800 through `/gui/unity` and a screenshot crop: the window
+`CodexContainer` at [205,85,870,630] drawing a title PAIR - `SubHeader` ("Tutorials & Codex") at
+y 106 over `Title` at y 125, which is the showing tab's own name; eight
+`CodexCategoryTabButton(Clone)` icons at y 157 (x 360 to 847); `NavigationScrollView` at
+[223,206,259,444] holding one `CodexCategorySection` per category, each drawing its name over its
+article buttons; `ContentScrollView` at [505,206,522,444]; `TutorialSettings` at [231,657,819,45]
+with "Reset Tutorials" (x 264) and the "Show tutorials" toggle (x 466), drawn on the Tutorials tab
+only; `CloseButton` at [1032,93,34,34] on every tab. The screenshot matches.
+
+Escape is the GAME's (`ConsumesBack` false): `CodexMenu.Show` registers `InputActions.UI.ExitMenu`
+on `Hide` outside its gamepad branch (decompiled, line 108; the gamepad branch adds `UI.Cancel`
+beside it). Verified: `ui_back` answered `unclaimed`. The screen's old Cancel handling is gone
+with it.
+
+Diff, both captures, and every before line is accounted for in two groups:
+
+1. The category rows left the flat dump (six on Tutorials, seven on Wielders): a category is the
+   REGION its articles belong to now, spoken on the way in, which is the options window's rule for
+   a caption over rows. The focused category's "selected" went with them - that state was the
+   widget's own cursor memory, not a game fact.
+2. The content placeholder (`CodexContentWidget (multi-position)`) became one line per drawn
+   paragraph. Proven for Level up Wielder: the body draws a `Header` and four
+   `CodexTutorialText(Clone)` blocks whose laid-out text (`TMP_Text.GetParsedText`, read through
+   `/eval`) holds 1, 3, 1, 2 and 2 paragraphs; the graph declares the header as the stop's name and
+   eight text nodes, one per paragraph, in that order.
+
+Everything else the after captures add is the model the owner asked for: the widget listed only
+the FOCUSED category's articles, and the graph lists every category's (33 rows on Tutorials, 79 on
+Wielders).
+
+Deviations, each measured:
+
+- ARRIVING ON AN ARTICLE DOES NOT SHOW IT, unlike the map select and random layout pages.
+  `CodexContentButton` raises its `OnClicked` from `UIButton`'s click and submit paths only;
+  `UIButton.OnSelect` plays a hover sound and nothing else (decompiled). So the focus visual is the
+  native selection alone (`FocusArticle`) and Enter is what draws the article - verified: Enter on
+  Battle Advanced said nothing itself and Tab then read "Battle Advanced, Obstacles, such as
+  stakes, ..., 1 of 11".
+- THE SHOWING TAB IS NEVER RE-SELECTED NATIVELY. The event system's selection is where the game
+  records which article it is drawing (`CodexMenu.HandleContentButtonClicked` sets it), so the tab
+  bar's focus visual switches tab only when the tab under the cursor is not the one showing - the
+  guard the options window uses for a different reason. Without it, arriving on the tab row took
+  the selection off the article and the article stop lost its landing (measured: every
+  `ArticleItem.IsSelected` false). The showing tab still has the game's own marker under it.
+- The tab bar switches ON FOCUS: `CodexMenu.SetActiveTab` re-spawns the categories and draws the
+  first article at once, only the tab marker being tweened (decompiled), so arriving at a tab and
+  arriving at its page are one event. Enter does it too. As on the random layout page, the tab just
+  arrived on does not say "selected" in the same breath - the focus visual runs after the arrival
+  is composed - while the tab the window opened on does.
+- The article's body is a stop NAMED after its top-level heading, through a context wrapping the
+  whole stop, so entering it always says which article is open once. Every other heading is the
+  region its lines belong to; Alt+Down and Alt+Up name each on the way in (verified on Militia:
+  "Cost, 100 Gold", "Reload, Troop can perform one ranged attack...", "Sappers, Generates Essence
+  of type:: Destruction, 1 of 13"). A heading with nothing under it stays a read-only line, the
+  options window's rule for a caption over no rows.
+- The essence block reads its label and its amounts as one line (`ModStrings.UI.LabelValue` and
+  `JoinList`, exactly what the retired widget composed).
+- Reset Tutorials is labelled from the menu's own key (`Options/ResetTutorials`, decompiled
+  `CodexTutorialSettings.OnEnable`), NOT off the drawn button: `UIButton.Text` answers the
+  unresolved localization token the renderer substitutes as it draws ("_Reset tutorials",
+  measured), the same class of gap the loading screen's tip found for action tokens.
+- The adapter gained `Title` (the window's drawn `SubHeader`, which the menu never writes - it only
+  writes the tab name under it), `ResetButtonLabel`, `ResetButton`, `TutorialsToggle` and
+  `CloseButton` as the drawn components a node keys on, and `GetActiveTabIndex` became public. It
+  LOST `FocusedCategoryIndex`, `FocusCategory` and `EnsureFocusedCategory`: a "focused category" is
+  a widget-tree concept (which slice of the article list to draw), and with every category declared
+  there is no slice to choose.
+- Close runs the menu's `Hide`, as the widget screen did, which is the same method the drawn
+  button's own `OnClicked` is combined with (decompiled `CodexMenu.Initialize`).
+
+Walk (all through `/input` and `/type`): Tab cycles tabs, articles, content, footer; the articles
+stop landed on "Level up Wielder", the article the window was drawing; Alt+Down read "Battle,
+Battle Advanced, button, 1 of 4" then "Towns and Settlements, Buildings and Build Sites, button,
+1 of 9" and Alt+Up came back; Home and End reached the ends of the body (11 lines); Down the tab
+row switched the page each time; `/type rally` landed on "Towns and Settlements, Rally Point,
+button, 6 of 9" with ONE result; Enter on Show tutorials said "not checked" and Enter again
+"checked" (restored); Enter on Close closed the window and the main menu read again; `ui_back`
+answered `unclaimed`. Reset Tutorials was never pressed.
+
+Follow-ups, not fixed:
+
+- `CodexMenuAdapter` still normalises every label it reads through `SpeechTextSanitizer.Normalize`
+  (the category names, the article names, the content lines, its localized text). Pre-existing and
+  against the repo's standing rule; the content lines survive it only because the adapter splits
+  the raw text on its newlines BEFORE normalising each piece.
+- The essence line reads "Generates Essence of type:: Destruction" - the game's label already ends
+  in a colon and the mod's label-value string adds another. Present in the widget screen too.
+- Type-ahead re-announces the landing once per typed character, the engine's behaviour the map
+  select entry records.
+- Activating a footer or tab control takes the native selection off the article, so the articles
+  stop's landing is only right until the cursor has been elsewhere; the stop's own remembered
+  position covers it after that.
+
+Manual test:
+
+1. Main menu, Extras, Tutorials & Codex. Hear "Tutorials & Codex", then "Tutorials, tab, selected,
+   1 of 8".
+2. Down and Up walk the eight tabs and the page changes under each; Enter does the same.
+3. Tab: "Wielders, Level up Wielder, button, 1 of 5" - the article the window is showing. Down
+   walks that category's articles, and past the last one into the next category, naming it.
+4. Alt+Down and Alt+Up jump between categories; watch the list scroll itself to the row.
+5. Enter on an article: the body on the right changes and nothing is spoken. Tab: the body, which
+   says the article's heading, then its first paragraph, then "1 of N".
+6. Down and Up read the body a paragraph at a time and the panel scrolls itself; on a unit or
+   wielder article, Alt+Down and Alt+Up jump between its headings (Cost, Reload, Starting Troops)
+   naming each.
+7. Tab: on the Tutorials tab, "Reset Tutorials, button, 1 of 3", "Show tutorials, checkbox,
+   checked", "Close, button"; on any other tab, "Close, button" alone. Enter on Show tutorials
+   toggles it. DO NOT press Reset Tutorials unless you mean it.
+8. Escape closes the window (the game's own key); so does Enter on Close.

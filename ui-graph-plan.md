@@ -208,6 +208,9 @@ graph side of the mod.
   per drawn caption with `RowAt` per row - the primary cell first, the metadata cells as
   `SheetCell(column, piece, vtable)` read-only text carrying a `BufferHead` of the caption and the
   value - and pins the stop's Tab landing with `builder.LandStopOn(sheet.FirstRow)`.
+- A stop is NAMED after live content by wrapping the whole stop in one `PushContext(...)`, so
+  entering it says what is in it once however deep the remembered position is (the codex's
+  article body, named after the article's own heading).
 - `ui/ControlTypes.cs` — the role registry: `Button`, `Group`, `Text` (no role word),
   `EditField` ("editable"), `Checkbox` ("checkbox"), `Slider` ("slider"), `ComboBox`
   ("combo box"), `Tab` ("tab"), `RadioButton` ("radio button"). New

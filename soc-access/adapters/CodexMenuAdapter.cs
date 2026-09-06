@@ -58,7 +58,6 @@ namespace SongsOfConquestAccess.Adapters
 
         private readonly CodexMenu _menu;
         private readonly ILocalizationHandler _localization;
-        private int _focusedCategoryIndex = -1;
 
         public CodexMenuAdapter(CodexMenu menu)
         {
@@ -69,6 +68,20 @@ namespace SongsOfConquestAccess.Adapters
         public bool IsPresent()
         {
             return _menu != null && ShowAsyncField != null && ShowAsyncField.GetValue(_menu) != null && IsWindowActive();
+        }
+
+        /// <summary>The window's own heading, drawn above the showing tab's name (the "SubHeader"
+        /// text mesh of the window transform; the menu itself only ever writes the line under it).
+        /// </summary>
+        public string Title
+        {
+            get
+            {
+                Component window = GetSettingsField<object>("WindowTransform") as Component;
+                Transform header = window != null ? window.transform.Find("SubHeader") : null;
+                UITextMesh textMesh = header != null ? header.GetComponent<UITextMesh>() : null;
+                return textMesh != null ? UITextMeshTextUtility.GetEffectiveText(textMesh) : null;
+            }
         }
 
         public bool Close()
@@ -120,58 +133,6 @@ namespace SongsOfConquestAccess.Adapters
             }
 
             return NativeSelectionUtility.PointerClick(tabComponent);
-        }
-
-        public int FocusedCategoryIndex
-        {
-            get { return _focusedCategoryIndex; }
-        }
-
-        public void FocusCategory(int index)
-        {
-            IReadOnlyList<ArticleGroupItem> groups = GetArticleGroups();
-            if (groups.Count == 0)
-            {
-                _focusedCategoryIndex = -1;
-                return;
-            }
-
-            if (index < 0)
-            {
-                index = 0;
-            }
-            else if (index >= groups.Count)
-            {
-                index = groups.Count - 1;
-            }
-
-            _focusedCategoryIndex = index;
-        }
-
-        public void EnsureFocusedCategory()
-        {
-            IReadOnlyList<ArticleGroupItem> groups = GetArticleGroups();
-            if (groups.Count == 0)
-            {
-                _focusedCategoryIndex = -1;
-                return;
-            }
-
-            if (_focusedCategoryIndex >= 0 && _focusedCategoryIndex < groups.Count)
-            {
-                return;
-            }
-
-            for (int i = 0; i < groups.Count; i++)
-            {
-                if (groups[i].ContainsSelectedArticle)
-                {
-                    _focusedCategoryIndex = i;
-                    return;
-                }
-            }
-
-            _focusedCategoryIndex = 0;
         }
 
         public IReadOnlyList<ArticleGroupItem> GetArticleGroups()
@@ -362,6 +323,39 @@ namespace SongsOfConquestAccess.Adapters
             get { return GetLocalizedText("Tutorial/TutorialPopup/ShowTutorialCheckbox", "Show tutorials"); }
         }
 
+        /// <summary>The tutorials toggle the footer draws, while it draws one.</summary>
+        public Component TutorialsToggle
+        {
+            get { return GetTutorialToggle() as Component; }
+        }
+
+        /// <summary>The reset button the footer draws, while it draws one.</summary>
+        public Component ResetButton
+        {
+            get { return GetResetButton() as Component; }
+        }
+
+        /// <summary>What the reset button has written on it, through the menu's own key for it
+        /// (<c>Options/ResetTutorials</c>, decompiled <c>CodexTutorialSettings.OnEnable</c>). Read
+        /// off the KEY rather than off the button, whose assigned string is the unresolved
+        /// localization token the renderer substitutes as it draws ("_Reset tutorials", measured
+        /// 2026-09-06).</summary>
+        public string ResetButtonLabel
+        {
+            get { return GetLocalizedText("Options/ResetTutorials", string.Empty); }
+        }
+
+        /// <summary>The window's close button, while it is drawn (the game hides it in gamepad
+        /// mode: <c>CodexMenu.HandleControlsChanged</c>).</summary>
+        public Component CloseButton
+        {
+            get
+            {
+                Component button = GetSettingsField<object>("CloseButton") as Component;
+                return button != null && button.gameObject.activeInHierarchy ? button : null;
+            }
+        }
+
         public bool IsTutorialsChecked()
         {
             UIToggle toggle = GetTutorialToggle();
@@ -408,7 +402,8 @@ namespace SongsOfConquestAccess.Adapters
                 : new ICodexProvider[0];
         }
 
-        private int GetActiveTabIndex()
+        /// <summary>Which tab the window is showing, by its place in the tab row.</summary>
+        public int GetActiveTabIndex()
         {
             ICodexProvider current = CurrentProviderField != null && _menu != null
                 ? CurrentProviderField.GetValue(_menu) as ICodexProvider
