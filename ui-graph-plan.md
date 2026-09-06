@@ -678,3 +678,8 @@ Show tutorials and Close, declared while drawn). The map table's win-condition c
 each drawn icon as its own piece under the one column (`GraphSheet` pieces). The loading
 screen keeps arrows for reading and lets unclaimed keys reach the game's press-any-key. The
 slider's value button is a child node opening the game's "Provide a number" popup.
+All nine representatives are approved (2026-09-06). The drop list walks Up/Down although the
+game draws its entries as a horizontal strip. The mod settings family is done last, after
+everything else in the phase. The owner has authorised autonomous progress through the
+representatives and their siblings; the owner's real-key walk of each kind remains the gate
+before that kind's siblings are batched.
