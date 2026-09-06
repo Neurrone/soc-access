@@ -1,14 +1,33 @@
+using System;
+using System.Collections.Generic;
 using SongsOfConquest.Client.Menu.Main;
-using SongsOfConquestAccess.Input;
 using SongsOfConquestAccess.Adapters;
 using SongsOfConquestAccess.Localization;
 using SongsOfConquestAccess.UI;
+using SongsOfConquestAccess.UI.Graph;
 using UnityEngine;
 
 namespace SongsOfConquestAccess.Screens
 {
-    public sealed class MainMenuScreen : Screen
+    /// <summary>
+    /// The game's main menu, made navigable as a graph. Two stops: the column of menu buttons, in the
+    /// order the game draws them, and the Options button in the corner.
+    ///
+    /// Two of the entries (Extras, Multiplayer) are foldouts the game opens on hover, so there is no
+    /// keyboard route to what they hold. Here each is an expandable group whose children are the
+    /// foldout's buttons: Right opens the game's own foldout and lands on its first entry, Left
+    /// closes it again. The group's expanded state is read off the foldout itself every build, so a
+    /// foldout the game hides on its own (Join With Code hides the multiplayer container directly)
+    /// collapses the group with no hook needed.
+    ///
+    /// Entries the game hides (Hotseat, the map editor) are not declared; entries it disables stay
+    /// in the list and say so.
+    /// </summary>
+    public sealed class MainMenuScreen : GraphScreen
     {
+        private const string MenuStop = "main-menu";
+        private const string OptionsStop = "options";
+
         private static readonly string[] TopLevelItemIds =
         {
             "continue",
@@ -27,7 +46,6 @@ namespace SongsOfConquestAccess.Screens
         private readonly MainMenuAdapter _adapter;
 
         public MainMenuScreen(MainMenuAdapter adapter)
-            : base(BuildRootWidget(adapter))
         {
             _adapter = adapter;
         }
@@ -59,25 +77,153 @@ namespace SongsOfConquestAccess.Screens
             return null;
         }
 
+        public override string Key
+        {
+            get { return "main-menu"; }
+        }
+
+        public override string ScreenName
+        {
+            get { return ModText.Get(ModStrings.Screens.MainMenu); }
+        }
+
         public override bool IsPresent()
         {
             return _adapter != null && _adapter.IsPresent();
         }
 
-        private static ContainerWidget BuildRootWidget(MainMenuAdapter adapter)
+        /// <summary>The menu fades out after a click (Conquest fades the whole canvas group before it
+        /// starts the lobby), and every button reads disabled on the way; that is the page leaving,
+        /// not the button changing.</summary>
+        public override bool IsWorkable
         {
-            ContainerWidget root = new ContainerWidget("main-menu-screen", ModText.Get(ModStrings.Screens.MainMenu));
-            MenuWidget menu = new MenuWidget("main-menu", ModText.Get(ModStrings.Screens.MainMenu));
-            if (adapter == null)
+            get { return _adapter != null && !_adapter.IsFading(); }
+        }
+
+        public override void Build(GraphBuilder builder)
+        {
+            if (!IsPresent())
             {
-                root.AddChild(menu);
-                return root;
+                return;
             }
 
-            AddItems(menu, adapter.TopLevelItems);
-            root.AddChild(menu);
-            AddOptionalButton(root, "options", adapter.OptionsButton);
-            return root;
+            builder.BeginStop(MenuStop);
+            IReadOnlyList<IMenuButtonAdapter> items = _adapter.TopLevelItems;
+            foreach (int index in DrawnOrder(items))
+            {
+                IMenuButtonAdapter item = items[index];
+                string key = "mainmenu:" + GetTopLevelItemId(index);
+                MainMenuAdapter.NativeFoldoutAdapter foldout = FoldoutFor(item);
+                if (foldout == null)
+                {
+                    builder.AddItem(new DrawnNode(ControlId.For(item.Button, key), Button(item), item.Button));
+                    continue;
+                }
+
+                // The entry is still a button - activating it opens the foldout, as clicking does -
+                // and it also opens onto its entries, so it is declared as both. Opening and closing
+                // go through the foldout itself, which is what keeps a foldout the game closed on its
+                // own in step with the group.
+                MainMenuAdapter.NativeFoldoutAdapter it = foldout;
+                NodeVtable group = GraphNodes.Group(item.GetLabel, () => item.Activate(), item.IsEnabled);
+                group.OnExpand = () => it.Open();
+                group.OnCollapse = () => it.Close();
+                builder.BeginGroup(new DrawnNode(ControlId.For(item.Button, key), group, item.Button), expanded: foldout.IsOpen());
+                IReadOnlyList<IMenuButtonAdapter> children = foldout.Items;
+                foreach (int childIndex in DrawnOrder(children))
+                {
+                    IMenuButtonAdapter child = children[childIndex];
+                    builder.AddItem(new DrawnNode(
+                        ControlId.For(child.Button, key + "/" + childIndex),
+                        Button(child),
+                        child.Button));
+                }
+
+                builder.EndGroup();
+            }
+
+            IMenuButtonAdapter options = _adapter.OptionsButton;
+            if (options != null && options.IsVisible())
+            {
+                builder.BeginStop(OptionsStop);
+                builder.AddItem(new DrawnNode(ControlId.For(options.Button, "mainmenu:options"), Button(options), options.Button));
+            }
+        }
+
+        private static NodeVtable Button(IMenuButtonAdapter item)
+        {
+            return GraphNodes.Button(item.GetLabel, () => item.Activate(), item.IsEnabled);
+        }
+
+        private MainMenuAdapter.NativeFoldoutAdapter FoldoutFor(IMenuButtonAdapter item)
+        {
+            if (_adapter.ExtrasFoldout != null && ReferenceEquals(item, _adapter.ExtrasFoldout.TriggerButton))
+            {
+                return _adapter.ExtrasFoldout;
+            }
+
+            if (_adapter.MultiplayerFoldout != null && ReferenceEquals(item, _adapter.MultiplayerFoldout.TriggerButton))
+            {
+                return _adapter.MultiplayerFoldout;
+            }
+
+            return null;
+        }
+
+        /// <summary>
+        /// The indexes of the visible items, top to bottom as the game draws them. The adapter lists
+        /// the buttons in the order the game's class declares them, which is not the order on screen
+        /// (Conquest is drawn above Campaigns, Multiplayer above Load Game), and the reading order is
+        /// the drawn one. Measured off each button's own rectangle every build, so a layout the game
+        /// changes is followed; a stable index tiebreak keeps two buttons at one height in list order.
+        /// </summary>
+        private static List<int> DrawnOrder(IReadOnlyList<IMenuButtonAdapter> items)
+        {
+            List<int> order = new List<int>();
+            List<float> tops = new List<float>();
+            for (int i = 0; items != null && i < items.Count; i++)
+            {
+                IMenuButtonAdapter item = items[i];
+                if (item == null || item.Button == null || !item.IsVisible())
+                {
+                    continue;
+                }
+
+                order.Add(i);
+                tops.Add(Top(item));
+            }
+
+            // Insertion sort by drawn top, highest first; stable, so equal heights keep list order.
+            for (int i = 1; i < order.Count; i++)
+            {
+                int index = order[i];
+                float top = tops[i];
+                int j = i - 1;
+                while (j >= 0 && tops[j] < top)
+                {
+                    order[j + 1] = order[j];
+                    tops[j + 1] = tops[j];
+                    j--;
+                }
+
+                order[j + 1] = index;
+                tops[j + 1] = top;
+            }
+
+            return order;
+        }
+
+        private static float Top(IMenuButtonAdapter item)
+        {
+            Component component = item.Button;
+            return component != null ? component.transform.position.y : 0f;
+        }
+
+        private static string GetTopLevelItemId(int index)
+        {
+            return index >= 0 && index < TopLevelItemIds.Length
+                ? TopLevelItemIds[index]
+                : "main-menu-item-" + index;
         }
 
         private static bool IsLiveSceneMainMenu(MainMenu mainMenu)
@@ -89,72 +235,6 @@ namespace SongsOfConquestAccess.Screens
 
             GameObject gameObject = mainMenu.gameObject;
             return gameObject != null && gameObject.scene.IsValid() && gameObject.scene.isLoaded;
-        }
-
-        private static void AddItems(MenuWidget root, System.Collections.Generic.IReadOnlyList<IMenuButtonAdapter> items)
-        {
-            if (root == null || items == null)
-            {
-                return;
-            }
-
-            for (int i = 0; i < items.Count; i++)
-            {
-                IMenuButtonAdapter item = items[i];
-                if (item == null)
-                {
-                    continue;
-                }
-
-                root.AddItem(new MenuItemWidget(
-                    GetTopLevelItemId(i),
-                    item.GetLabel,
-                    () => BuildMenuButtonStatus(item),
-                    item.Activate,
-                    null,
-                    item.IsVisible));
-            }
-        }
-
-        private static string GetTopLevelItemId(int index)
-        {
-            return index >= 0 && index < TopLevelItemIds.Length
-                ? TopLevelItemIds[index]
-                : "main-menu-item-" + index;
-        }
-
-        private static void AddOptionalButton(ContainerWidget root, string id, IMenuButtonAdapter button)
-        {
-            if (root == null || button == null)
-            {
-                return;
-            }
-
-            root.AddChild(new ButtonWidget(
-                "main-menu-" + id,
-                button.GetLabel,
-                button.Activate,
-                null,
-                button.IsEnabled,
-                button.IsVisible));
-        }
-
-        private static string BuildMenuButtonStatus(IMenuButtonAdapter item)
-        {
-            if (item == null)
-            {
-                return string.Empty;
-            }
-
-            string nativeStatus = item.GetStatus();
-            if (item.IsEnabled())
-            {
-                return nativeStatus;
-            }
-
-            return string.IsNullOrWhiteSpace(nativeStatus)
-                ? ModText.Get(ModStrings.UI.StatusDisabled)
-                : ModText.Get(ModStrings.Screens.DisabledWithReason, ModText.Get(ModStrings.UI.StatusDisabled), nativeStatus);
         }
     }
 }

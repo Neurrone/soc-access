@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using HarmonyLib;
 using SongsOfConquest.Client.Menu.Main;
 using SongsOfConquest.Client.Menu.Loading;
-using SongsOfConquest.Client.UI;
 using UnityEngine;
 
 namespace SongsOfConquestAccess
@@ -44,36 +43,6 @@ namespace SongsOfConquestAccess
             }
 
             RestartPendingOpenCoroutine(__instance);
-        }
-
-        [HarmonyPatch(typeof(MainMenu), "HandleFoldoutOpened")]
-        [HarmonyPostfix]
-        private static void HandleFoldoutOpenedPostfix(MainMenu __instance, FoldoutUIButton button)
-        {
-            if (__instance == null || button == null)
-            {
-                return;
-            }
-
-            SocAccessMod.Instance?.ScreenDetector?.OnMainMenuFoldoutReady(__instance, button);
-        }
-
-        [HarmonyPatch(typeof(FoldoutUIButton), "ForceClose")]
-        [HarmonyPostfix]
-        private static void FoldoutForceClosePostfix(FoldoutUIButton __instance)
-        {
-            if (__instance == null)
-            {
-                return;
-            }
-
-            MainMenu mainMenu = ((Component)__instance).GetComponentInParent<MainMenu>();
-            if (mainMenu == null)
-            {
-                return;
-            }
-
-            SocAccessMod.Instance?.ScreenDetector?.OnMainMenuFoldoutClosed(__instance);
         }
 
         [HarmonyPatch(typeof(MainMenu), "OnDestroy")]

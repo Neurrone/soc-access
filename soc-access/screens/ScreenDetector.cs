@@ -47,7 +47,6 @@ namespace SongsOfConquestAccess.Screens
             _runtimeScreenFactories = new List<RuntimeScreenFactory>
             {
                 MainMenuScreen.TryBuildActiveScreen,
-                FoldoutMenuScreen.TryBuildActiveScreen,
                 CampaignMenuScreen.TryBuildActiveScreen,
                 TaleSelectScreen.TryBuildActiveScreen,
                 CustomCampaignSelectScreen.TryBuildActiveScreen,
@@ -1019,7 +1018,6 @@ namespace SongsOfConquestAccess.Screens
             }
 
             object resolvedSourceKey = sourceKey ?? (settings != null ? (object)settings.ContainerTransform : null);
-            PopStaleMainMenuFoldoutBeforePopup();
             MessageDialogScreen screen = new MessageDialogScreen(new PopupMenuAdapter(resolvedSourceKey, settings));
             if (IsCurrentMessageDialogSource(resolvedSourceKey))
             {
@@ -1028,21 +1026,6 @@ namespace SongsOfConquestAccess.Screens
             }
 
             Push(screen, "popup menu ready");
-        }
-
-        private void PopStaleMainMenuFoldoutBeforePopup()
-        {
-            FoldoutMenuScreen foldoutScreen = _screenManager.CurrentScreen as FoldoutMenuScreen;
-            if (foldoutScreen == null || foldoutScreen.IsPresent())
-            {
-                return;
-            }
-
-            // MainMenu.HandleJoinWithCodeClicked hides the multiplayer foldout item
-            // container directly instead of calling FoldoutUIButton.ForceClose(), so
-            // our normal foldout close hook does not run. Pop the now-stale foldout
-            // before stacking the popup above it.
-            _screenManager.Pop<FoldoutMenuScreen>("main menu foldout hidden before popup");
         }
 
         public void OnPopupMenuClosed(object sourceKey)
@@ -1164,34 +1147,7 @@ namespace SongsOfConquestAccess.Screens
 
         public void OnMainMenuClosed(MainMenu mainMenu)
         {
-            if (_screenManager.CurrentScreen is FoldoutMenuScreen)
-            {
-                _screenManager.Pop<FoldoutMenuScreen>("main menu closed with foldout open");
-            }
-
             _screenManager.Pop<MainMenuScreen>("main menu closed");
-        }
-
-        public void OnMainMenuFoldoutReady(MainMenu mainMenu, FoldoutUIButton foldoutButton)
-        {
-            if (mainMenu == null || foldoutButton == null)
-            {
-                return;
-            }
-
-            MainMenuAdapter owner = new MainMenuAdapter(mainMenu);
-            MainMenuAdapter.NativeFoldoutAdapter foldout = ResolveFoldout(owner, foldoutButton);
-            if (foldout == null || !owner.IsPresent() || !foldout.IsVisible() || !foldout.IsOpen())
-            {
-                return;
-            }
-
-            Push(new FoldoutMenuScreen(owner, foldout), "main menu foldout ready");
-        }
-
-        public void OnMainMenuFoldoutClosed(FoldoutUIButton foldoutButton)
-        {
-            _screenManager.Pop<FoldoutMenuScreen>("main menu foldout closed");
         }
 
         public void OnCampaignMenuReady(CampaignMenu campaignMenu)
@@ -3027,26 +2983,6 @@ namespace SongsOfConquestAccess.Screens
             if (simpleAdapter.IsPresent())
             {
                 return new TutorialSimpleScreen(simpleAdapter);
-            }
-
-            return null;
-        }
-
-        private static MainMenuAdapter.NativeFoldoutAdapter ResolveFoldout(MainMenuAdapter adapter, FoldoutUIButton foldoutButton)
-        {
-            if (adapter == null || foldoutButton == null)
-            {
-                return null;
-            }
-
-            if (adapter.ExtrasFoldout != null && ReferenceEquals(adapter.ExtrasFoldout.SourceKey, foldoutButton))
-            {
-                return adapter.ExtrasFoldout;
-            }
-
-            if (adapter.MultiplayerFoldout != null && ReferenceEquals(adapter.MultiplayerFoldout.SourceKey, foldoutButton))
-            {
-                return adapter.MultiplayerFoldout;
             }
 
             return null;

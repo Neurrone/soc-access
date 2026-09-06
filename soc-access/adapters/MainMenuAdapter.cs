@@ -13,6 +13,8 @@ namespace SongsOfConquestAccess.Adapters
     {
         private static readonly AccessTools.FieldRef<MainMenu, GameObject> LeftButtonContainerRef =
             AccessTools.FieldRefAccess<MainMenu, GameObject>("_leftButtonContainer");
+        private static readonly AccessTools.FieldRef<MainMenu, CanvasGroup> TopCanvasGroupRef =
+            AccessTools.FieldRefAccess<MainMenu, CanvasGroup>("_topCanvasGroup");
         private static readonly AccessTools.FieldRef<MainMenu, GameObject> ContinueContainerRef =
             AccessTools.FieldRefAccess<MainMenu, GameObject>("_continueContainer");
         private static readonly AccessTools.FieldRef<MainMenu, UIButton> ContinueButtonRef =
@@ -155,6 +157,15 @@ namespace SongsOfConquestAccess.Adapters
             return _mainMenu != null
                 && IsLiveSceneObject(_mainMenu.gameObject)
                 && IsGameObjectActive(LeftButtonContainerRef(_mainMenu));
+        }
+
+        /// <summary>Whether the menu is fading in or out: the game tweens its top canvas group's alpha
+        /// away from 1 around every scene change (MainMenu.HandleSkirmishClicked and kin), and its
+        /// buttons stop answering while it does.</summary>
+        public bool IsFading()
+        {
+            CanvasGroup group = _mainMenu != null ? TopCanvasGroupRef(_mainMenu) : null;
+            return group != null && group.alpha < 1f;
         }
 
         private bool IsContinueVisible()
