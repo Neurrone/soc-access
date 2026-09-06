@@ -313,7 +313,7 @@ owner's manual screen-reader review before its siblings are batched
 plan update recording what was learned; commits are per logical step (engine, adapter,
 one screen or one kind of screen at a time).
 
-### Phase A — engine, bridge, first screen (code done 2026-09-06; owner walk pending)
+### Phase A — engine, bridge, first screen (done 2026-09-06, owner walk passed)
 
 What landed, and what differed from the original brief:
 
@@ -336,12 +336,23 @@ What landed, and what differed from the original brief:
 - The flat diff of the main menu and both foldouts is clean except for the group state
   word in the buffer. The localization validator accepts a whitespace translation of a
   whitespace source (the fragment separator).
-- Manual test still to be run by the owner: arrive on the main menu ("Main menu", then the
-  first button with "1 of 8"); Down to "Multiplayer, group, collapsed, 4 of 8", Right opens
-  the foldout on screen and lands on "Host online game, button, 1 of 4", Left closes it and
-  re-reads the header; Tab reads "Options, button", Shift+Tab returns to the remembered
-  item; typing "q" lands on Quit and Escape says "Search cleared"; Escape with no search
-  reaches the game; Enter on Conquest opens the lobby with no "disabled" spoken first.
+- The owner's walk with real keys found four defects the dev-server walk had passed, each
+  now fixed and each a rule for every later screen:
+  1. `/input` and `/type` exercise the mod's dispatch, never a physical key. The keyboard
+     text subscription was made in the router's constructor, where `Keyboard.current` is
+     null on a cold start, so type-ahead only ever worked after a hot reload. The router now
+     follows the current keyboard every frame. Every screen's verification ends with real
+     keys (the owner, or `/key` when the owner is not at the machine).
+  2. Backspace must end a search (ES2's Secondary). The port had merged ES2's two keys into
+     one on Backslash; they are `ui_clear_search` (Backspace) and `ui_right_click`
+     (Backslash) now, named for what they do.
+  3. A chord is not typing: characters produced while Ctrl or Alt is held never enter a
+     search (ES2's `TypedText.Frame`).
+  4. A group header the game wires no click to (a hover foldout) gets NO `OnActivate`: Enter
+     does nothing and Right is the way in. ES2's main menu groups answer Enter only because
+     those entries are real buttons too.
+  Type-ahead ranks by match tier before list order (a name starting with the text beats one
+  containing it), so "q" lands on Quit before Conquest; typing the letter again cycles.
 
 ### Phase B — every screen outside a running game
 
