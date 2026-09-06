@@ -1988,7 +1988,10 @@ Follow-ups, not fixed:
 - The known stack oddity, reproduced here: leaving this page with Escape or Back left the stack as
   `CommunityMapsSearchResultsScreen > CommunityMapsHomeScreen` - the results page stayed UNDER the
   home page rather than being popped. The detector's, recorded by the search filter entry before this
-  port, and not this screen's to fix. Closing and reopening the browser clears it.
+  port, and not this screen's to fix. Closing and reopening the browser clears it. Closing the browser
+  from the home page with that screen still underneath speaks one stray line ("Search results") as the
+  home page goes and the leftover results screen is uncovered for a frame - the same shape of stray
+  line the campaign menu entry records.
 - Subscribe and More options are no longer reachable from a result; the details page a result opens
   still offers Subscribe.
 - `/screenshot` answered an all-black frame (the locked-session symptom), so the layout evidence is
