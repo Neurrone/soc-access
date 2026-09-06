@@ -412,7 +412,19 @@ namespace SongsOfConquestAccess.UI
             // A landing of this screen's still in flight: a row the cursor is standing on that nobody
             // asked for is not where the player is going, and is not said.
             bool inFlight = OwnPendingFocus != null;
-            if ((_lastSpokenKey == null || !_lastSpokenKey.Equals(node.Id)) && !inFlight)
+            bool moved = _lastSpokenKey == null || !_lastSpokenKey.Equals(node.Id);
+            if (moved && !inFlight && RecoveredWhileLeaving())
+            {
+                // The control the player was on vanished because the page is being switched off (a
+                // header the game hides as the menu closes) and the cursor fell onto whatever
+                // survived. That is not somewhere the player went, so it is not said: the differ
+                // adopts it silently and the screen that replaces this one speaks.
+                _lastSpokenKey = node.Id;
+                _lastSpokenNode = node;
+                moved = false;
+            }
+
+            if (moved && !inFlight)
             {
                 // Queued: an arrival follows the screen name rather than cutting it off.
                 Say(GraphAnnouncer.Compose(_lastSpokenNode, node), false);
@@ -422,6 +434,18 @@ namespace SongsOfConquestAccess.UI
 
             FillBuffer(node);
             WatchLive(node);
+        }
+
+        // Whether the cursor stands on a node it was RECOVERED onto rather than moved to: the node
+        // last spoken is gone from the render, and the screen says it cannot be worked right now. A
+        // workable screen keeps announcing recoveries, because there a vanished control (a row the
+        // game deleted) is real news.
+        private bool RecoveredWhileLeaving()
+        {
+            return _lastSpokenKey != null
+                && _graph.Current != null
+                && _graph.Current.NodeAt(_lastSpokenKey) == null
+                && !Workable();
         }
 
         private FocusOutcome PendingOutcome(FocusRequest pending)

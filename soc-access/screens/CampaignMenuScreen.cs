@@ -66,6 +66,14 @@ namespace SongsOfConquestAccess.Screens
             return _adapter != null && _adapter.IsPresent();
         }
 
+        /// <summary>The page hides its header band as it closes (Back and Options go first), and the
+        /// cursor standing on a header button falls onto a card: that recovery is the page leaving,
+        /// not a move, and stays silent while the band is gone.</summary>
+        public override bool IsWorkable
+        {
+            get { return _adapter != null && _adapter.BackButton != null && _adapter.BackButton.IsVisible(); }
+        }
+
         public override bool ConsumesBack
         {
             get { return _adapter != null && _adapter.BackButton != null && _adapter.BackButton.IsVisible(); }

@@ -166,7 +166,7 @@ graph side of the mod.
 - `screens/GraphScreen.cs` — the bridge. A screen ports by deriving from it, dropping its
   widget tree, and writing `Key`, `Build(GraphBuilder)`, `IsPresent()`, and optionally
   `ScreenName` (spoken once on focus), `InitialFocusStop`, `Back()`/`ConsumesBack` (Escape;
-  false = the game keeps it), `IsWorkable` (mutes the live watch while the page fades),
+  false = the game keeps it), `IsWorkable` (mutes the live watch while the page fades, and silences the re-seat when the focused control vanishes with the page),
   `AllowsTypeahead`, `CapturesRawInput`, `TypeAheadScope`, `OnFocusVisual`. Everything the
   push/pop `ScreenManager` asks of a screen is answered by the one navigator. Constructor
   sites, detector handlers and `IsPresent()` stay exactly as they were for the widget
