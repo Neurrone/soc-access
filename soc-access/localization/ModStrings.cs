@@ -584,6 +584,7 @@ namespace SongsOfConquestAccess.Localization
             public static readonly ModString Missing = new ModString("Screens.Missing", "Missing {0}");
             public static readonly ModString MissingBuilding = new ModString("Screens.MissingBuilding", "missing building");
             public static readonly ModString ModSettings = new ModString("Screens.ModSettings", "Mod settings");
+            public static readonly ModString ModOptions = new ModString("Screens.ModOptions", "Mod options");
             public static readonly ModString MoveDown = new ModString("Screens.MoveDown", "Move down");
             public static readonly ModString MoveUp = new ModString("Screens.MoveUp", "Move up");
             public static readonly ModString MovedAfter = new ModString("Screens.MovedAfter", "Moved after {0}");

@@ -83,6 +83,8 @@ namespace SongsOfConquestAccess
             _navigator = new GraphNavigator();
             _screenManager = new ScreenManager(_reviewBufferManager, _reviewBufferController);
             _screenDetector = new ScreenDetector(_screenManager);
+            // One door for the drawn entries and for Ctrl+M alike; the manager itself gains nothing.
+            Adapters.ModOptionsEntries.Open = OpenModOptions;
             _inputRouter = new AccessibilityInputRouter(_screenManager);
             _navigator.TypedCharacters = _inputRouter.TakeTypedCharacters;
             // Before the ready line, so /speech carries it: the routes install the speech tap.
@@ -102,6 +104,9 @@ namespace SongsOfConquestAccess
             }
             AttachLocalizationHandler();
             TryAnnounceReady();
+            // Before the resync: a screen rebuilt from runtime state lists the mod's drawn entries
+            // only if they are already there, and a hot reload has just destroyed the old load's.
+            Adapters.ModOptionsEntries.Tick();
             _screenDetector?.ResyncFromRuntimeState();
             _host.SetUpdateHandler(Update);
         }
@@ -115,6 +120,7 @@ namespace SongsOfConquestAccess
             Step("routes", _host.UnregisterAllModRoutes);
             Step("coroutines", _host.StopAllCoroutines);
             Step("main menu waits", MainMenuPatches.Reset);
+            Step("mod options entries", Adapters.ModOptionsEntries.Remove);
             Step("screens", () => _screenManager?.Clear());
             Step("drop list", Screens.DropListScreen.Reset);
             Step("graph navigator", () =>
@@ -180,9 +186,28 @@ namespace SongsOfConquestAccess
             }
         }
 
+        /// <summary>Open the mod's own options. The drawn entries of
+        /// <see cref="Adapters.ModOptionsEntries"/> and the Ctrl+M route in
+        /// <c>ScreenManager.HandleGlobalAction</c> both come here, so one place decides what "mod
+        /// options" means and both routes change together.</summary>
+        public bool OpenModOptions()
+        {
+            ScreenManager manager = _screenManager;
+            if (manager == null || manager.CurrentScreen is ModSettingsScreen)
+            {
+                return false;
+            }
+
+            manager.Push(
+                new ModSettingsScreen(() => manager.Pop<ModSettingsScreen>("mod settings closed")),
+                "mod settings opened");
+            return true;
+        }
+
         private void Update()
         {
             AttachLocalizationHandler();
+            Adapters.ModOptionsEntries.Tick();
             _screenDetector?.Update();
             _inputRouter?.Update();
             _screenManager?.Update();

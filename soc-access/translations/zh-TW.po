@@ -915,6 +915,11 @@ msgctxt "Screens.ModSettings"
 msgid "Mod settings"
 msgstr "模组设置"
 
+#. Screens.ModOptions
+msgctxt "Screens.ModOptions"
+msgid "Mod options"
+msgstr "模組選項"
+
 #. Screens.NewChatMessage
 msgctxt "Screens.NewChatMessage"
 msgid "New chat message"

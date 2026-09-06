@@ -332,8 +332,8 @@ namespace SongsOfConquestAccess.Screens
 
             if (action.Key == AccessibilityActions.OpenModSettings.Key)
             {
-                Push(new ModSettingsScreen(() => Pop<ModSettingsScreen>("mod settings closed")), "mod settings opened");
-                return true;
+                // The drawn "Mod options" entries open the same door, so this route only knocks.
+                return SocAccessMod.Instance != null && SocAccessMod.Instance.OpenModOptions();
             }
 
             if (action.Key == AccessibilityActions.SummarizeResources.Key)

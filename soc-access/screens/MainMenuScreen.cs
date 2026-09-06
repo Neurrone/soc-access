@@ -143,10 +143,26 @@ namespace SongsOfConquestAccess.Screens
             }
 
             IMenuButtonAdapter options = _adapter.OptionsButton;
-            if (options != null && options.IsVisible())
+            IMenuButtonAdapter modOptions = ModOptionsEntries.MainMenuEntry;
+            bool hasOptions = options != null && options.IsVisible();
+            bool hasModOptions = modOptions != null && modOptions.IsVisible();
+            if (hasOptions || hasModOptions)
             {
                 builder.BeginStop(OptionsStop);
-                builder.AddItem(new DrawnNode(ControlId.For(options.Button, "mainmenu:options"), Button(options), options.Button));
+                if (hasOptions)
+                {
+                    builder.AddItem(new DrawnNode(ControlId.For(options.Button, "mainmenu:options"), Button(options), options.Button));
+                }
+
+                // The mod's own entry, drawn beside the game's by ModOptionsEntries and read here
+                // exactly as the game's is: after Options, because that is what it is next to.
+                if (hasModOptions)
+                {
+                    builder.AddItem(new DrawnNode(
+                        ControlId.For(modOptions.Button, "mainmenu:mod-options"),
+                        Button(modOptions),
+                        modOptions.Button));
+                }
             }
         }
 

@@ -935,6 +935,11 @@ msgctxt "Screens.ModSettings"
 msgid "Mod settings"
 msgstr "Налаштування мода"
 
+#. Screens.ModOptions
+msgctxt "Screens.ModOptions"
+msgid "Mod options"
+msgstr "Параметри мода"
+
 #. Screens.NewChatMessage
 msgctxt "Screens.NewChatMessage"
 msgid "New chat message"

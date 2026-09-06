@@ -49,6 +49,10 @@ namespace SongsOfConquestAccess.Adapters
                 AddItem(items, "load", settings.loadButton);
                 AddItem(items, "restart", settings.restartButton);
                 AddItem(items, "options", settings.optionsButton);
+                // The mod's own entry, drawn straight after Options by ModOptionsEntries. The pause
+                // menu's items are fixed serialized fields rather than a list, so it is named here
+                // as well as drawn there.
+                AddItem(items, "mod-options", ModOptionsEntries.PauseMenuButton);
                 AddItem(items, "tutorials", settings.tutorialsButton);
                 AddItem(items, "quit-to-main-menu", settings.exitButton);
                 AddItem(items, "quit-application", settings.quitButton);
