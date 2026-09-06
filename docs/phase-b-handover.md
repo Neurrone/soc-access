@@ -1105,3 +1105,73 @@ Manual test:
 8. On a filter group, Right opens the game's own checkbox list and lands on its first box; Enter
    ticks and unticks it and the table refilters under you; Left closes the list again.
 9. Escape leaves the page for the map type page, the same as pressing Back.
+
+### AdventureLobbyChallengeMapSelectScreen
+
+Built: three stops, the representative's minus its header band. `challenge-map-table` holds a
+`GraphSheet` of one region (Name as the primary, then Win condition and Completed);
+`challenge-map-details` holds the preview panel as one line; `challenge-map-buttons` holds Back,
+Options and Confirm. Screen name is the page's drawn title ("Challenge maps"); focus starts on the
+table, landing on the challenge the page opened on.
+
+Measured 2026-09-06 at 1280x800 through `/gui/unity` and a screenshot crop: `MapEntryContainer` at
+[87,96,858,613] holding ten `ChallengeMapEntry(Clone)` rows 48 px tall at x 95, each drawing its name
+(x 152) and its win-condition icons (x 739) and NOTHING ELSE; `LobbyMapPreview` at x 954 with the
+name at y 307, the dossier in a scroll rect at y 356 and the win-condition icons at y 287; Confirm at
+[982,679]; Back at [21,20] and Options at [1233,11] under the drawn title at [399,19]. The screenshot
+matches: no heading band, no funnels, one icon per row.
+
+Escape is CLAIMED and presses the drawn Back button, the representative's finding on this page's own
+class: `ChallengeMapsMenu.SetupAndAnimateAfterLoad` registers only `InputActions.UI.Confirm` on its
+non-gamepad branch (decompiled, line 232), and `LobbyNavigation` registers nothing. Verified:
+`ui_back` answered `consumed` and the map type page came back.
+
+Diff: 37 before lines against 36 after, sixteen of them with no identical after line, in four groups
+- the same four the representative has, minus its filters:
+
+1. Every challenge's NAME cell (10 lines): "A Hot Deal, Name" became "A Hot Deal", the primary
+   opening its buffer with its own readout.
+2. The three column headings are GONE (3 lines): the game draws no heading band on this page at all,
+   so none is declared. The captions survive where they belong - as the edge labels the sheet speaks
+   on the way into a column, heard in the walk below.
+3. The two challenges with two win conditions lost their joined cell ("King of the Hill and Find the
+   Object"): one piece per drawn icon now, each with that icon's own tooltip.
+4. The preview line: the dossier moved out of the label into a declared section, so the label is the
+   challenge's name alone, the buffer holds the dossier one drawn line at a time exactly as before,
+   and the win conditions were added after them.
+
+Deviations, measured:
+
+- NO HEADING BAND IS DECLARED, because the game draws none. The three captions the widget screen
+  invented rows for ("Name", "Win condition", "Completed") are localized game strings and are kept as
+  the sheet's column captions, so they are still spoken - as the crossing into each column - but
+  there is nothing drawn for them to be a row of.
+- No Completed cell is drawn either: `LobbyChallengeMapEntry._playedContainer` is switched off on
+  every one of these ten. The column is still declared, and reads "Not completed" - never dropped, or
+  the columns would not be the same all the way down.
+- The adapter gained the same members the representative's did: `PreviewTitle`, `IsSelectedEntry`
+  with the row's `IsSelected`, `Entry` and `WinConditionTooltips`.
+
+Walk: Tab cycles table, preview, buttons; Right said "Win condition, Beacons of Power" then
+"Completed, Not completed"; Down in the Completed column said "Choices, Not completed, 2 of 10";
+End reached "King of the Hill, 10 of 10" and Home came back, both keeping the column; `/type marsh`
+landed on The Marsh Provides with ONE result; Right across its win condition said
+"Win condition, King of the Hill" then "Find the Object" with no caption between the pieces, and
+Left came back the same way; Enter on the row said nothing beyond what arriving had already done, and
+Tab read the preview with the new dossier; `ui_back` answered `consumed`.
+
+Follow-ups: none of this screen's own. `AdventureLobbyChallengeMapRowAdapter.Name` still normalises
+through `SpeechTextSanitizer.Normalize` (pre-existing).
+
+Manual test:
+
+1. Main menu, Conquest, Challenge maps. Hear "Challenge maps", then "Challenge maps, grid, A Hot
+   Deal, selected, 1 of 10".
+2. Down and Up walk the ten challenges; the preview panel follows the cursor.
+3. Right says "Win condition, ..." then "Completed, Not completed"; on The Marsh Provides or The
+   Rotten Caves, Right steps from one win-condition icon to the other with no caption in between.
+4. From the Completed column, Down says the next challenge's name, then its value, then "N of 10".
+5. Type a few letters of a challenge's name: the cursor lands on it. Backspace ends the search.
+6. Tab: the preview line, read as name then dossier; Ctrl+Down through its review buffer must give
+   the dossier one line at a time. Tab: "Back, button, 1 of 3", then Options and Confirm.
+7. Escape leaves the page for the map type page, the same as pressing Back.
