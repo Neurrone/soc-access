@@ -709,7 +709,9 @@ namespace SongsOfConquestAccess.UI
         // is left alone entirely, live watch included.
         private void SpeakStateAfterChange()
         {
-            GraphNode node = _graph.CurrentNode;
+            // The action may have pushed another screen and detached this navigator (Quit opens
+            // its popup synchronously): then there is nothing left to report on.
+            GraphNode node = _graph == null ? null : _graph.CurrentNode;
             Func<string> state = node == null ? null : node.Vtable.StateText;
             if (state == null)
             {
