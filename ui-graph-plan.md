@@ -14,8 +14,7 @@ current phase in §7 and its rows in §8, then `docs/dev-loop.md` for the verifi
 Every screen goes through §4's loop; the before-capture must be taken on the unported build,
 before the screen is touched. Commit per logical step and update this file as decisions are
 taken; prune it at the end of each phase so it holds only what the remaining work needs.
-Phases A and B are done (2026-09-06); `docs/phase-b-handover.md` is phase B's one-page
-handover. Start at phase C.
+Phases A and B are done (2026-09-06). Start at phase C.
 
 Owner decisions already made (do not re-ask):
 
@@ -284,7 +283,7 @@ with the localization batch, this file pruned, and a one-page handover.
 
 ### Phase B — every screen outside a running game (done)
 
-All 33 screens; `docs/phase-b-handover.md` is the record. Verified in phase C on shared
+All 33 screens. Verified in phase C on shared
 classes: the map message, random event, custom message and dialogue sources of
 `MessageDialogScreen`, the save variant of `SaveLoadGameScreen`, the in-game chat (its
 recipient selector) and codex, the mod options dialog opened from the pause menu.

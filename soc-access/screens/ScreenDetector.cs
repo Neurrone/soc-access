@@ -1939,7 +1939,15 @@ namespace SongsOfConquestAccess.Screens
 
         public void OnAdventureMapReady()
         {
-            Push(BuildAdventureMapScreen("adventure map ready"), "adventure map ready");
+            // The scene loader raises this on every return to its idle state while the current
+            // scene is still the adventure, including the frames after the player quit to the main
+            // menu with the view installer already gone; a screen built on an absent adapter threw
+            // on its first read of the map and did so on every frame the loop lasted (2026-09-07).
+            AdventureMapScreen screen = BuildAdventureMapScreen("adventure map ready");
+            if (screen != null)
+            {
+                Push(screen, "adventure map ready");
+            }
         }
 
         private void EnsureAdventureMapBaseScreen(string reason)
@@ -1949,7 +1957,11 @@ namespace SongsOfConquestAccess.Screens
                 return;
             }
 
-            PushBottom(BuildAdventureMapScreen(reason), reason + " adventure map base");
+            AdventureMapScreen screen = BuildAdventureMapScreen(reason);
+            if (screen != null)
+            {
+                PushBottom(screen, reason + " adventure map base");
+            }
         }
 
         private AdventureMapScreen BuildAdventureMapScreen(string reason)
@@ -1964,6 +1976,12 @@ namespace SongsOfConquestAccess.Screens
                     + reason
                     + " adventure map adapter is not present: "
                     + readinessDiagnostic);
+            }
+
+            // An absent adapter is no screen: everything the screen reads on arrival is null.
+            if (readinessDiagnostic != null)
+            {
+                return null;
             }
 
             AdventureMapEventListener eventListener = readinessDiagnostic == null

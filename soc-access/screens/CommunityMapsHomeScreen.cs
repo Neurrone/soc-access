@@ -24,9 +24,9 @@ namespace SongsOfConquestAccess.Screens
     ///
     /// A drawn caption is the REGION its items belong to, so Alt+Up and Alt+Down jump between the five
     /// bands and the caption is spoken on the way in. THE FEATURED ROW'S SUBSCRIBE AND MORE OPTIONS
-    /// ARE NOT PER ITEM: the block above is drawn once, below the carousel, and acts on whichever
-    /// featured item is highlighted, so they are declared as the last two rows of the featured region
-    /// rather than as children of an item.
+    /// ARE DRAWN ONCE, below the carousel, acting on whichever featured item is highlighted; each
+    /// featured item is nonetheless a group whose children highlight that item and then press the
+    /// block, so the keyboard reaches them from the item as it does in the bands (owner, 2026-09-07).
     ///
     /// A BAND'S OWN ITEMS ARE DIFFERENT: mod.io draws their Subscribe and More options as an OVERLAY
     /// over the selected item (<c>HomeModListItem_Overlay</c>, moved onto the item by its
@@ -192,28 +192,42 @@ namespace SongsOfConquestAccess.Screens
                 }
 
                 CommunityMapsHomeAdapter.FeaturedItem captured = item;
+                string key = "featured/" + captured.Index;
                 NodeVtable vtable = GraphNodes.Button(
                     () => captured.Label,
                     () => _adapter.ActivateFeaturedItem(captured));
                 vtable.OnFocusVisual = () => _adapter.FocusFeaturedItem(captured);
-                builder.AddItem(Synthetic("featured/" + captured.Index, vtable));
+
+                // mod.io draws ONE Subscribe / More options block under the carousel, acting on
+                // whichever featured item is highlighted. The owner wants it reachable from each
+                // item, as the bands' own per-item overlay is (2026-09-07), so every featured item
+                // is a group whose children highlight the item first and then press that block.
+                builder.BeginGroup(Synthetic(key, vtable));
+
+                NodeVtable subscribe = GraphNodes.Button(
+                    () => _adapter.FeaturedSubscribeLabel,
+                    () =>
+                    {
+                        _adapter.FocusFeaturedItem(captured);
+                        _adapter.SubscribeFeatured();
+                    },
+                    () => _adapter.HasFeatured);
+                subscribe.OnFocusVisual = () => _adapter.FocusFeaturedItem(captured);
+                builder.AddItem(Synthetic(key + "/subscribe", subscribe));
+
+                NodeVtable options = GraphNodes.Button(
+                    () => _adapter.MoreOptionsLabel,
+                    () =>
+                    {
+                        _adapter.FocusFeaturedItem(captured);
+                        _adapter.OpenFeaturedOptions();
+                    },
+                    () => _adapter.HasFeatured);
+                options.OnFocusVisual = () => _adapter.FocusFeaturedItem(captured);
+                builder.AddItem(Synthetic(key + "/options", options));
+
+                builder.EndGroup();
             }
-
-            // The one block mod.io draws under the carousel, acting on whichever featured item is
-            // highlighted - so it reads as the band's last two rows rather than as any item's own.
-            NodeVtable subscribe = GraphNodes.Button(
-                () => _adapter.FeaturedSubscribeLabel,
-                () => _adapter.SubscribeFeatured(),
-                () => _adapter.HasFeatured);
-            subscribe.OnFocusVisual = () => _adapter.FocusFeatured();
-            builder.AddItem(Synthetic("featured-subscribe", subscribe));
-
-            NodeVtable options = GraphNodes.Button(
-                () => _adapter.MoreOptionsLabel,
-                () => _adapter.OpenFeaturedOptions(),
-                () => _adapter.HasFeatured);
-            options.OnFocusVisual = () => _adapter.FocusFeatured();
-            builder.AddItem(Synthetic("featured-options", options));
 
             builder.PopContext();
             builder.SetRegion(null);

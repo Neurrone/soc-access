@@ -105,6 +105,27 @@ namespace SongsOfConquestAccess.Screens
             get { return _rows.Editor.Pending; }
         }
 
+        /// <summary>The editor behind the text rows is driven from here: without this tick a request
+        /// for the keyboard stayed pending forever and Enter on a name box did nothing (owner,
+        /// 2026-09-07).</summary>
+        public override void Update()
+        {
+            base.Update();
+            _rows.Editor.Update(IsPresent());
+        }
+
+        public override void OnUnfocus()
+        {
+            base.OnUnfocus();
+            _rows.Editor.Abandon();
+        }
+
+        public override void OnPop()
+        {
+            base.OnPop();
+            _rows.Editor.Abandon();
+        }
+
         /// <summary>The window this screen reads, for whatever is drawing into it.</summary>
         public ModDialog Dialog
         {

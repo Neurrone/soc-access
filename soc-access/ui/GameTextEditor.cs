@@ -46,6 +46,16 @@ namespace SongsOfConquestAccess.UI
         /// mod.io browser) can leave the selection elsewhere while the field is focused.</summary>
         public static TMPro.TMP_InputField CurrentInput { get; private set; }
 
+        /// <summary>Whether ANY editor is pending or editing. The arrival release in
+        /// <c>GraphScreen.Update</c> asks this beside the screen's own answer, so a screen whose editor
+        /// lives in a shared row builder (the mod dialogs) cannot forget to say it owns the field.</summary>
+        public static bool Owned
+        {
+            get { return _owner != null; }
+        }
+
+        private static GameTextEditor _owner;
+
         // Whether the end of the edit is spoken. The chat box keeps quiet: its Enter SENDS, the line
         // arriving in the history is the announcement, and the game empties the box, which would
         // otherwise read as a cancel.
@@ -94,6 +104,7 @@ namespace SongsOfConquestAccess.UI
             {
                 _announceEnd = false;
                 _requested = f;
+                _owner = this;
             }
         }
 
@@ -105,6 +116,7 @@ namespace SongsOfConquestAccess.UI
             }
 
             _requested = field;
+            _owner = this;
         }
 
         /// <summary>
@@ -159,6 +171,11 @@ namespace SongsOfConquestAccess.UI
         public void Abandon()
         {
             _requested = null;
+            if (ReferenceEquals(_owner, this))
+            {
+                _owner = null;
+            }
+
             Finish(false);
         }
 
@@ -198,6 +215,11 @@ namespace SongsOfConquestAccess.UI
             _echo.Stop();
             _editing = null;
             CurrentInput = null;
+            if (ReferenceEquals(_owner, this) && _requested == null)
+            {
+                _owner = null;
+            }
+
             bool announceEnd = _announceEnd;
             _announceEnd = true;
             _snapshot = null;
@@ -222,10 +244,15 @@ namespace SongsOfConquestAccess.UI
             Say(after);
         }
 
+        // Asked of the operating system, not of Unity's input system: the mod claimed the Enter that
+        // asked for this edit by marking its event handled, and a handled event never updates the
+        // keyboard's state, so enterKey.isPressed reads false while the finger is still down. That is
+        // exactly the frame a field must not be given the keyboard on.
         private static bool EnterIsDown()
         {
             Keyboard keyboard = Keyboard.current;
-            return keyboard != null && (keyboard.enterKey.isPressed || keyboard.numpadEnterKey.isPressed);
+            return SongsOfConquestAccess.Input.OsKeys.EnterIsDown()
+                || (keyboard != null && (keyboard.enterKey.isPressed || keyboard.numpadEnterKey.isPressed));
         }
 
         private static void Say(string text)

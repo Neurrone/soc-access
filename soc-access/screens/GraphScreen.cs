@@ -160,7 +160,7 @@ namespace SongsOfConquestAccess.Screens
             // Every frame, not only on arrival: a game field that takes the keyboard on its own at any
             // time (the chat box re-focusing itself after a send) would otherwise keep every key from
             // the mod until the player found Escape. The screen's own editor is left alone.
-            if (!OwnsGameField)
+            if (!OwnsGameField && !GameTextEditor.Owned)
             {
                 GameTextFocus.Release();
             }
