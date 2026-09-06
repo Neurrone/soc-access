@@ -709,3 +709,24 @@ game draws its entries as a horizontal strip. The mod settings family is done la
 everything else in the phase. The owner has authorised autonomous progress through the
 representatives and their siblings; the owner's real-key walk of each kind remains the gate
 before that kind's siblings are batched.
+
+**J. The mod settings as a tab of the game's options window (proposal, awaiting the owner).**
+Measured in the decompiled `OptionsMenu`: on opening it resolves every `IOptionsContent`
+from its container and calls `AddTab(content, 0)` for each; a content is three things, a
+`NameKey`, `Draw(OptionsMenu, MenuFactoryController)` and open/close hooks. The factory
+controller draws the game's own rows (`AddToggle`, `AddSlider`, `AddTextMeshDropdown`,
+`AddButton`, `AddText`, `AddInputField`, `AddDivider`, horizontal layouts) from text KEYS,
+and both it and the tab name resolve a key with `TryGetText("Options/" + key, key)`: an
+unknown key is drawn as itself, so mod text already localized through `ModText` can be
+passed as the key and is drawn verbatim. Proposal: one mod `IOptionsContent`
+("Accessibility", from a `ModString`) added after the game's tabs by a postfix on
+`OptionsMenu.OnOpened` calling the private `AddTab`, drawing every toggle and slider the mod
+settings hold today as real game rows, grouped under the same captions the Ctrl+M tabs use
+(General, Scanner, Adventure map, Troop deployment, Combat, Audio). The ported
+`OptionsScreen` then reads the tab like any other, and the Ctrl+M menu and `ModSettingsScreen`
+go away. The sub-screens that are not rows (announcement order with its reorder, the audio
+glossary with per-cue sliders, the custom categories with their key capture and selectors)
+stay mod-owned graph screens, opened from buttons on the tab, with `Carry` for the reorder
+arriving in phase D as planned; a later step could draw them too. Teardown removes the tab
+by name on reload. Decision needed: this shape, or every sub-screen also drawn as game rows
+now (larger, and the reorder has no row form).
