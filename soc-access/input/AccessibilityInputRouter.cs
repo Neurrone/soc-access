@@ -83,6 +83,15 @@ namespace SongsOfConquestAccess.Input
 
         private void OnTextInput(char character)
         {
+            // A chord is not typing: Ctrl+R and Alt+R are the mod's own commands, and the character
+            // Windows still produces for them must not land in a search (ES2's TypedText.Frame makes
+            // the same cut). Shift is typing - capitals.
+            KeyboardStateSnapshot state = KeyboardStateSnapshot.Capture();
+            if (state.Ctrl || state.Alt)
+            {
+                return;
+            }
+
             if (TypingScreen() != null)
             {
                 _typed.Append(character);

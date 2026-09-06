@@ -215,7 +215,7 @@ screen answers it, so an unclaimed key still reaches the game.
 | `ui_clear_search` (Backspace) | a search is live | ends the search, "Search cleared" |
 | `ui_right_click` (Backslash) | node has `OnContextual` | `OnContextual`, the right-click command |
 | `ui_back` | `Screen.ConsumesBack`, or a search is live | `Screen.Back()`; in a search, "Search cleared" |
-| letters, Space mid-search | `AllowsTypeahead && !CapturesRawInput` | type-ahead over the focused stop plus the fully-open build |
+| letters, Space mid-search | `AllowsTypeahead && !CapturesRawInput`, no Ctrl or Alt held | type-ahead over the focused stop plus the fully-open build |
 
 Still to add, each in the phase that needs it: `ui_carry` (Space, phase D), the mode keys
 (phase E, the mode node's own handler, claimed through a screen-level `AnyKey`-style hook).
