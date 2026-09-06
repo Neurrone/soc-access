@@ -425,6 +425,21 @@ msgctxt "UI.DragStartedTroopPlacement"
 msgid "Started drag for {0} at {1}. Press enter to drop on destination spawn point, or press escape to cancel."
 msgstr "{1}의 {0} 끌기를 시작했습니다. 대상 배치 지점에서 Enter를 눌러 놓거나 Escape로 취소하세요."
 
+#. UI.EditCancelled
+msgctxt "UI.EditCancelled"
+msgid "Cancelled"
+msgstr "취소되었습니다"
+
+#. UI.EditCommitted
+msgctxt "UI.EditCommitted"
+msgid "edited"
+msgstr "편집됨"
+
+#. UI.EditStarted
+msgctxt "UI.EditStarted"
+msgid "editing"
+msgstr "편집 중"
+
 #. UI.Empty
 msgctxt "UI.Empty"
 msgid "Empty"
@@ -504,6 +519,11 @@ msgstr "문서"
 msgctxt "UI.RoleEdit"
 msgid "edit"
 msgstr "편집"
+
+#. UI.RoleEditable
+msgctxt "UI.RoleEditable"
+msgid "editable"
+msgstr "편집 가능"
 
 #. UI.RoleGrid
 msgctxt "UI.RoleGrid"

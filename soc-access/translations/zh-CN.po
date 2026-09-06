@@ -425,6 +425,21 @@ msgctxt "UI.DragStartedTroopPlacement"
 msgid "Started drag for {0} at {1}. Press enter to drop on destination spawn point, or press escape to cancel."
 msgstr "已开始拖动 {1} 的 {0}。按回车放到目标部署点，或按 Escape 取消。"
 
+#. UI.EditCancelled
+msgctxt "UI.EditCancelled"
+msgid "Cancelled"
+msgstr "已取消"
+
+#. UI.EditCommitted
+msgctxt "UI.EditCommitted"
+msgid "edited"
+msgstr "已编辑"
+
+#. UI.EditStarted
+msgctxt "UI.EditStarted"
+msgid "editing"
+msgstr "编辑中"
+
 #. UI.Empty
 msgctxt "UI.Empty"
 msgid "Empty"
@@ -504,6 +519,11 @@ msgstr "文档"
 msgctxt "UI.RoleEdit"
 msgid "edit"
 msgstr "编辑框"
+
+#. UI.RoleEditable
+msgctxt "UI.RoleEditable"
+msgid "editable"
+msgstr "可编辑"
 
 #. UI.RoleGrid
 msgctxt "UI.RoleGrid"

@@ -1949,6 +1949,21 @@ msgctxt "UI.DragStartedTroopPlacement"
 msgid "Started drag for {0} at {1}. Press enter to drop on destination spawn point, or press escape to cancel."
 msgstr ""
 
+#. UI.EditCancelled
+msgctxt "UI.EditCancelled"
+msgid "Cancelled"
+msgstr ""
+
+#. UI.EditCommitted
+msgctxt "UI.EditCommitted"
+msgid "edited"
+msgstr ""
+
+#. UI.EditStarted
+msgctxt "UI.EditStarted"
+msgid "editing"
+msgstr ""
+
 #. UI.Empty
 msgctxt "UI.Empty"
 msgid "Empty"
@@ -2062,6 +2077,11 @@ msgstr ""
 #. UI.RoleEdit
 msgctxt "UI.RoleEdit"
 msgid "edit"
+msgstr ""
+
+#. UI.RoleEditable
+msgctxt "UI.RoleEditable"
+msgid "editable"
 msgstr ""
 
 #. UI.RoleGrid

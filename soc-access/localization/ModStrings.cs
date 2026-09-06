@@ -441,6 +441,9 @@ namespace SongsOfConquestAccess.Localization
             public static readonly ModString DragComplete = new ModString("UI.DragComplete", "Drag complete.");
             public static readonly ModString DragStarted = new ModString("UI.DragStarted", "Started drag. Move to destination and press enter to drop.");
             public static readonly ModString DragStartedTroopPlacement = new ModString("UI.DragStartedTroopPlacement", "Started drag for {0} at {1}. Press enter to drop on destination spawn point, or press escape to cancel.");
+            public static readonly ModString EditCancelled = new ModString("UI.EditCancelled", "Cancelled");
+            public static readonly ModString EditCommitted = new ModString("UI.EditCommitted", "edited");
+            public static readonly ModString EditStarted = new ModString("UI.EditStarted", "editing");
             public static readonly ModString Empty = new ModString("UI.Empty", "Empty");
             public static readonly ModString EmptyTroopSlot = new ModString("UI.EmptyTroopSlot", "Empty troop {0}");
             public static readonly ModString ExitedInspectMode = new ModString("UI.ExitedInspectMode", "Exited inspect mode");
@@ -464,6 +467,7 @@ namespace SongsOfConquestAccess.Localization
             public static readonly ModString RoleColumnHeader = new ModString("UI.RoleColumnHeader", "column header");
             public static readonly ModString RoleDocument = new ModString("UI.RoleDocument", "document");
             public static readonly ModString RoleEdit = new ModString("UI.RoleEdit", "edit");
+            public static readonly ModString RoleEditable = new ModString("UI.RoleEditable", "editable");
             public static readonly ModString RoleGrid = new ModString("UI.RoleGrid", "grid");
             public static readonly ModString RoleGroup = new ModString("UI.RoleGroup", "group");
             public static readonly ModString RoleMenu = new ModString("UI.RoleMenu", "menu");
