@@ -185,13 +185,29 @@ graph side of the mod.
   `EditField(label, value, edit, enabled, tooltip, details)` (activation is the request for the
   game's keyboard; the value reports null while the field holds it, because the echo is already
   speaking the keys), plus
-  the parts (`LabelPart`, `DisabledPart`, `ValuePart`) and `TooltipSection` (every native
-  `Tooltip` is an `Indicate` section, buffer only, and `Aim` sets `PointsAt` so focus draws
-  it). Every new factory takes the same cross-cutting parameters. Phase B adds checkbox,
-  slider, radio, tab, choice, combo box, and the sheet cell.
+  `Checkbox(label, state, toggle, enabled, tooltip, details, value)` (the state reads live and
+  again right after a toggle, and a refused box says nothing),
+  `Slider(label, valueText, adjust(sign, large), enabled, tooltip, details)` (`OnAdjust` is
+  declared even while it refuses, so Left and Right stay the slider's keys),
+  `ComboBox(label, valueText, open, enabled, tooltip, details)` (what the list is belongs to
+  whoever opens it), `Tab(label, selected, enabled, tooltip, details)` (only the showing tab
+  says "selected", which is what makes the stop land on it; the screen wires the switch),
+  `Choice(label, selected, choose, enabled, details, tooltip)` (an opened list's entry, no role
+  word), plus
+  the parts (`LabelPart`, `DisabledPart`, `ValuePart`, `SelectedPart`) and `TooltipSection`
+  (every native `Tooltip` is an `Indicate` section, buffer only, and `Aim` sets `PointsAt` so
+  focus draws it). `ActedState` is the other half of the unavailable swallow: a control that
+  refused an activation reports nothing afterwards. Every new factory takes the same
+  cross-cutting parameters. Still to add: radio, and the sheet cell.
 - `ui/ControlTypes.cs` — the role registry: `Button`, `Group`, `Text` (no role word),
-  `EditField` ("editable"). New
+  `EditField` ("editable"), `Checkbox` ("checkbox"), `Slider` ("slider"), `ComboBox`
+  ("combo box"), `Tab` ("tab"). New
   types need a role `ModString` in the phase's localization batch.
+- `screens/DropListScreen.cs` — the list a combo box opens, as a mod-owned child screen: a
+  static `Open(item, title, choose)` the page underneath calls, one stop of `Choice` nodes
+  walked Up/Down with the current value `Selected` so the list lands on it, the game's own
+  popup opened on push and hidden on pop, and Escape claimed (`ConsumesBack`) so a mod-owned
+  surface denies the game the key.
 - `ui/GameTextEditor.cs` + `input/GameTextFocus.cs` — the edit field's two halves: a screen-owned
   editor that defers the handover until the activating Enter is released, says "editing", echoes the
   typing through `TextInputEchoHelper` and says "edited" with the new text or "Cancelled" on the way

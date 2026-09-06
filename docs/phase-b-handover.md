@@ -420,3 +420,149 @@ Manual test:
 2. Down: "PRESS ANY KEY TO CONTINUE, button, 2 of 2". Up: the tip again.
 3. Any letter, Space or Escape should continue the load, because the mod does not claim them.
 4. Enter on the button continues the load; Enter on the tip row does nothing.
+
+## Family D: settings forms
+
+### OptionsScreen (representative)
+
+Built: three stops. `options-tabs` holds the seven category tabs, `options-rows` the settings
+of the category showing, `options-buttons` the OK button (labelled "Close", as the widget
+screen labelled it). Screen name is the mod's "Options"; focus starts on the tab bar's
+SELECTED tab, so arrival reads "Options", then "Gameplay, tab, selected, 1 of 7".
+
+Measured 2026-09-06 at 1280x800 through `/gui/unity`: the window at [270,141,741,519], the
+tab column at x 270 (seven `OptionsTabButtonWithText(Clone)` 30 px apart), the content panel
+`ContentScrollEntry` at [489,218,500,406] over 904 px of rows, each row drawing its label at
+x 496 and its control at x 707 to 968. A slider draws its value in a `PercentText` with an
+`EditButton` over it at [930,347,38,21]; a dropdown draws the current option in a
+`DropdownElement` label; captions ("General" at y 221, "Battle" at y 421, "Adventure" at
+y 687) head groups of rows.
+
+The tab bar switches ON FOCUS, as ES2's does (the switch is instant and costs nothing, so
+arriving at a tab and arriving at its page are one event); Enter switches too. A caption is
+the REGION its rows belong to and not a row of its own - Alt+Up and Alt+Down jump between
+them and the name is spoken on the way in ("General, Language, combo box, English, 1 of 5").
+Scroll-into-view is the game's: every row's focus visual is the adapter's `Focus`, which
+selects the row natively, and the panel's own `AutoScrollToSelected` does the rest. Verified:
+with the cursor on Reset player statistics, the content had scrolled to y -280 and the row's
+rect [496,587,471,36] sat inside the panel's [489,218,500,406].
+
+Escape is the game's (`ConsumesBack` false): `OptionsMenu.ReregisterInput` registers
+`UI.ExitMenu` on its keyboard branch (decompiled lines 532 to 544). The old screen's own
+Cancel handling is gone with it.
+
+Diff, all seven tabs, and every difference is one of five:
+
+1. "unchecked" became "not checked" (the phase B word).
+2. The showing tab now reads "selected".
+3. A dropdown's OPTIONS are gone from the page - they are the drop list screen now - and each
+   dropdown has become one labelled line with its current value ("Language | English",
+   "Battle log | Always hide", "End turn behaviour | Instantly end the turn (default)",
+   "Resolution", "Max Framerate Limit", "Energy Saving Framerate", "Graphics quality",
+   "UI & Font Size"). The widget screen never read a dropdown's NAME at all, only its options.
+4. A caption that heads rows became a region and so left the flat dump: "General", "Battle",
+   "Adventure" on Gameplay, "Zoom settings" and "Keybindings" on Controls, "Send Bug Report"
+   on Report Issue.
+5. Each slider gained a "Please provide a number" child row.
+
+Two differences on Video are the machine, not the port: the game was relaunched windowed
+during this session, so Fullscreen reads "not checked" and the resolution list is the
+window's, where the before-capture was taken fullscreen at 1920 x 1200.
+
+Deviations, measured:
+
+- A caption with NO rows under it stays a read-only row rather than becoming an empty region.
+  That is the whole Controls page below Keybindings: its key binding rows are drawn by
+  `MenuFactoryController.AddKeyBinding`, which the adapter does not read, so "Adventure",
+  "Build Menu", "Kingdom Overview", "Split Troop Size", "Battle", "Common", "Map Editor" and
+  "UI" head nothing at all. Making every caption a region would have silently dropped those
+  eight lines.
+- The slider's value box is a CHILD of the slider row, declared always open and reached with
+  Down: Left and Right belong to the value, so they cannot open the group, and the group says
+  nothing about being expanded (`SpeaksOwnExpansion`) because there is no closing it.
+- The value box is opened by running the delegate the slider itself installed
+  (`UISlider.OnEnable` puts `HandleTextClicked` on the button's `OnClickedInside`, which
+  `UITransform.Update` raises from a real mouse press INSIDE the box). A synthesized pointer
+  click reaches `UIButton.OnClicked`, which is null here, and does nothing - so the brief's
+  `NativeSelectionUtility.Click` would have been silent. Verified: Enter on the child row
+  opened the game's own "Please provide a number" popup as `MessageDialogScreen`, and Escape
+  there returned the cursor to the child row with the value unchanged.
+- The child row's label is the game's own prompt (`Common/ProvideNumber`, the key
+  `UISlider.HandleTextClicked` passes to `ISystemPopups.AskForInput`), read through the
+  adapter and empty for a slider that draws no such box.
+- One coarse step is ten fine steps (the item's own step), as in ES2.
+
+Follow-ups, not fixed:
+
+- A tooltip line reaches the graph buffer RAW, where the widget engine normalised it: on
+  Report Issue the Report new issue button's tooltip is now one buffer line reading
+  "Report Bug", a newline, then the highlight markup around "Press B three times (B+B+B) for
+  better screenshot", against three clean lines before. This is the graph engine's
+  `NodeSection` against `UIManager.BuildReviewLines`, not this screen's, and it will show on
+  every ported screen whose game tooltip carries markup. The widget engine's cleaner is
+  `SpeechTextSanitizer.Normalize`, which this repo does not allow, so the fix wants a
+  markup-aware splitter of its own.
+- Quitting to the main menu from the pause menu after loading a save left the game stuck on a
+  Game Menu whose buttons all reported unavailable, with `SceneLoader.SetState` calling
+  `ScreenDetector.OnAdventureMapReady` in a loop and `AdventureMapAdapter.GetInitialTile`
+  throwing a NullReferenceException every time. The game had to be restarted. Pre-existing
+  and unrelated to this port, but it is what the log fills with.
+- Screenshots could not be taken after that restart: `/screenshot` answers an all-black
+  1280x800 frame and the desktop reports no foreground window, so the session is locked. The
+  layout evidence above is `/gui/unity`, which is side-effect free and reads the same rects.
+
+Manual test:
+
+1. Main menu, Tab to Options, Enter. Hear "Options", then "Gameplay, tab, selected, 1 of 7".
+2. Down through the tabs: each one reads and the page under it changes; Enter does the same.
+3. Tab to the rows: "General, Language, combo box, English, 1 of 5". Alt+Down and Alt+Up jump
+   between General, Battle and Adventure, naming each on the way in.
+4. On Auto save round interval: Right says "4", Left says "3"; Shift+Right moves ten.
+5. Down from the slider: "Please provide a number, button, 1 of 1". Enter opens the game's own
+   number popup; Escape there comes back to the row.
+6. On Screen shake: Enter says "not checked", Enter again says "checked".
+7. On Battle log: Enter opens the drop list (below); Escape leaves the setting as it was.
+8. Every tab reads its rows. On Controls, the key binding categories read as plain lines and
+   the bindings themselves are not there at all - the adapter has never read them.
+9. Escape closes the window (the game's own key); so does Enter on Close.
+10. Watch the picture on a long page: the row under the cursor should scroll itself into view.
+
+## Family E: drop lists
+
+### DropListScreen (new, mod-owned; the list every family D combo box opens)
+
+Built: `screens/DropListScreen.cs`, one stop of Choice nodes in option order, walked Up and
+Down. The entry the setting is currently on says "selected", which is also what the list lands
+on. Screen name is the setting's own label. Enter takes the entry through the adapter's
+`SetValue` and pops; Escape pops without touching the setting.
+
+`ConsumesBack` is TRUE: this is the one surface here the MOD put on the screen, so it is the
+one that denies the game the key, per the phase B ruling. `IsPresent()` is "still the list the
+mod asked for, and its control still drawn".
+
+The game's real popup is opened on push (`UITextMeshDropdown.Show`) and hidden on pop
+(`TMP_Dropdown.Hide` through the wrapper's own dropdown), so the picture shows what the player
+is doing; the game closing it underneath - a click elsewhere, the page going - is noticed in
+`Update` and takes the screen with it. The highlight DOES follow the cursor: each entry's focus
+visual selects the toggle TMP built for it (`TMP_Dropdown.m_Items`, one per option in option
+order), which is the same selection the game's own hover and the template's
+`AutoScrollToSelected` follow. The harness cannot photograph that, so it is in the manual test.
+
+Verified on Battle log: Enter read "Battle log" then "Always hide, selected, 3 of 3"; Up read
+"Always show, 2 of 3"; Escape came back to "Battle, Battle log, combo box, Always hide, 7 of 7"
+unchanged, with the game's `Dropdown List` gone from the hierarchy; reopening and pressing
+Enter on the current value closed the list and left the setting alone.
+
+Deviations, measured: the entries are `SyntheticNode`s keyed on the option index, because TMP
+builds a row per entry only while the popup is open and the mod's row has to answer either
+way; no tooltip is declared, the game putting none on an options dropdown's entries.
+
+Manual test:
+
+1. Options, Gameplay, the Language row. Enter: hear "Language", then the language you are on,
+   "selected".
+2. Up and Down walk the list; Home and End reach its ends.
+3. Watch the picture: the game's own list should be open, and the entry under the cursor
+   highlighted and scrolled into view.
+4. Escape: the list closes, the setting is unchanged, and the cursor is back on the row.
+5. Enter on an entry: the list closes and the row reads the value you picked.

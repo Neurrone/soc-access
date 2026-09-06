@@ -1,4 +1,5 @@
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Reflection;
 using HarmonyLib;
@@ -6,6 +7,7 @@ using SongsOfConquest.Client;
 using SongsOfConquest.Client.Menu.Options;
 using SongsOfConquest.Client.Menu.Utils;
 using SongsOfConquest.Client.UI;
+using SongsOfConquestAccess.Localization;
 using SongsOfConquestAccess.Speech;
 using TMPro;
 using UnityEngine;
@@ -22,6 +24,8 @@ namespace SongsOfConquestAccess.Adapters
         private static readonly FieldInfo CurrentContentField = AccessTools.Field(typeof(OptionsMenu), "_currentContent");
         private static readonly MethodInfo SliderGetTextMeshMethod = AccessTools.Method(typeof(UISlider), "GetTextMesh");
         private static readonly MethodInfo DropdownGetTextMethod = AccessTools.Method(typeof(UITextMeshDropdown), "GetText");
+        private static readonly FieldInfo SliderEditButtonField = AccessTools.Field(typeof(UISlider), "_editValueButton");
+        private static readonly FieldInfo TmpDropdownItemsField = AccessTools.Field(typeof(TMP_Dropdown), "m_Items");
 
         private readonly OptionsMenu _menu;
 
@@ -199,7 +203,11 @@ namespace SongsOfConquestAccess.Adapters
                         () => NativeSelectionUtility.Select(dropdown.GetSelectable()),
                         () => dropdown.Active && dropdown.Interactable,
                         () => IsActive(component),
-                        () => Tooltip.ForComponent(GetDropdownTooltipComponent(dropdown) ?? component, null))));
+                        () => Tooltip.ForComponent(GetDropdownTooltipComponent(dropdown) ?? component, null),
+                        () => ShowDropdownPopup(dropdown),
+                        () => HideDropdownPopup(dropdown),
+                        () => dropdown.Active && dropdown.IsExpanded,
+                        optionIndex => FocusDropdownOption(dropdown, optionIndex))));
             }
         }
 
@@ -263,7 +271,9 @@ namespace SongsOfConquestAccess.Adapters
                         () => NativeSelectionUtility.Select(slider.GetSelectable()),
                         () => slider.Active && slider.Interactable,
                         () => IsActive(component),
-                        () => Tooltip.ForComponent(GetSliderTooltipComponent(slider) ?? component, null))));
+                        () => Tooltip.ForComponent(GetSliderTooltipComponent(slider) ?? component, null),
+                        () => GetSliderValueEditorLabel(slider),
+                        () => OpenSliderValueEditor(slider))));
             }
         }
 
@@ -396,6 +406,98 @@ namespace SongsOfConquestAccess.Adapters
         private static bool IsActive(Component component)
         {
             return component != null && component.gameObject.activeInHierarchy;
+        }
+
+        private static UIButton GetSliderEditButton(IUISlider slider)
+        {
+            UISlider concrete = slider as UISlider;
+            return concrete != null && SliderEditButtonField != null
+                ? SliderEditButtonField.GetValue(concrete) as UIButton
+                : null;
+        }
+
+        /// <summary>What the game calls the popup its own value box opens ("Provide a number",
+        /// <c>UISlider.HandleTextClicked</c>), or empty where this slider draws no such box.</summary>
+        private static string GetSliderValueEditorLabel(IUISlider slider)
+        {
+            return GetSliderEditButton(slider) == null
+                ? string.Empty
+                : GameText.Get("Common/ProvideNumber", string.Empty);
+        }
+
+        /// <summary>
+        /// Open the game's own "Provide a number" popup for this slider.
+        ///
+        /// The native path is the delegate the slider itself installed:
+        /// <c>UISlider.OnEnable</c> adds <c>HandleTextClicked</c> to the value box's
+        /// <c>OnClickedInside</c>, which <c>UITransform.Update</c> raises from a real mouse press
+        /// landing inside the box - NOT from <c>OnPointerClick</c>, so a synthesized pointer click
+        /// reaches the button's empty <c>OnClicked</c> and nothing happens. Running the installed
+        /// delegate is that same handler minus the mouse; the handler's own guard on the slider being
+        /// interactable, and the popup it raises, are the game's.
+        /// </summary>
+        private static bool OpenSliderValueEditor(IUISlider slider)
+        {
+            UIButton button = GetSliderEditButton(slider);
+            Action<Vector2> clicked = button != null ? button.OnClickedInside : null;
+            if (clicked == null || !button.Active || !button.Interactable)
+            {
+                return false;
+            }
+
+            clicked(Vector2.zero);
+            return true;
+        }
+
+        private static TMP_Dropdown GetTmpDropdown(IUITextMeshDropdown dropdown)
+        {
+            Component component = dropdown as Component;
+            return component != null ? component.GetComponentInChildren<TMP_Dropdown>(true) : null;
+        }
+
+        private static bool ShowDropdownPopup(IUITextMeshDropdown dropdown)
+        {
+            if (dropdown == null || !dropdown.Active || !dropdown.Interactable)
+            {
+                return false;
+            }
+
+            dropdown.Show();
+            return true;
+        }
+
+        private static bool HideDropdownPopup(IUITextMeshDropdown dropdown)
+        {
+            TMP_Dropdown tmpDropdown = GetTmpDropdown(dropdown);
+            if (tmpDropdown == null)
+            {
+                return false;
+            }
+
+            tmpDropdown.Hide();
+            return true;
+        }
+
+        /// <summary>Put the game's own highlight on one entry of the open popup, the way hovering it
+        /// does. The entries are the toggles TMP builds when the list opens (<c>TMP_Dropdown.m_Items</c>,
+        /// one per option in option order), and selecting one is also what the template's
+        /// <c>AutoScrollToSelected</c> scrolls to.</summary>
+        private static bool FocusDropdownOption(IUITextMeshDropdown dropdown, int index)
+        {
+            TMP_Dropdown tmpDropdown = GetTmpDropdown(dropdown);
+            IList items = tmpDropdown != null && TmpDropdownItemsField != null
+                ? TmpDropdownItemsField.GetValue(tmpDropdown) as IList
+                : null;
+            if (items == null || index < 0 || index >= items.Count)
+            {
+                return false;
+            }
+
+            // The entry's own type is protected, so it is read as the behaviour it is: the toggle that
+            // makes the row clickable sits on the same object TMP builds for it.
+            Component item = items[index] as Component;
+            Toggle toggle = item != null ? item.GetComponent<Toggle>() : null;
+            return toggle != null && NativeSelectionUtility.Select(toggle);
         }
 
         private static IReadOnlyList<string> GetDropdownOptions(IUITextMeshDropdown dropdown)
@@ -683,7 +785,7 @@ namespace SongsOfConquestAccess.Adapters
 
         public sealed class DropdownItem
         {
-            public DropdownItem(string id, Func<string> getLabel, Func<IReadOnlyList<string>> getOptions, Func<int> getValue, Func<int, bool> setValue, Action focus, Func<bool> isEnabled, Func<bool> isVisible, Func<Tooltip> getTooltip)
+            public DropdownItem(string id, Func<string> getLabel, Func<IReadOnlyList<string>> getOptions, Func<int> getValue, Func<int, bool> setValue, Action focus, Func<bool> isEnabled, Func<bool> isVisible, Func<Tooltip> getTooltip, Func<bool> openPopup, Func<bool> closePopup, Func<bool> isPopupOpen, Func<int, bool> focusOption)
             {
                 Id = id;
                 GetLabel = getLabel;
@@ -694,6 +796,10 @@ namespace SongsOfConquestAccess.Adapters
                 IsEnabled = isEnabled;
                 IsVisible = isVisible;
                 GetTooltip = getTooltip;
+                OpenPopup = openPopup;
+                ClosePopup = closePopup;
+                IsPopupOpen = isPopupOpen;
+                FocusOption = focusOption;
             }
 
             public string Id { get; private set; }
@@ -705,12 +811,21 @@ namespace SongsOfConquestAccess.Adapters
             public Func<bool> IsEnabled { get; private set; }
             public Func<bool> IsVisible { get; private set; }
             public Func<Tooltip> GetTooltip { get; private set; }
+
+            /// <summary>Open the game's own list popup, close it, ask whether it is open, and put the
+            /// game's highlight on one of its entries.</summary>
+            public Func<bool> OpenPopup { get; private set; }
+            public Func<bool> ClosePopup { get; private set; }
+            public Func<bool> IsPopupOpen { get; private set; }
+            public Func<int, bool> FocusOption { get; private set; }
         }
 
         public sealed class SliderItem
         {
-            public SliderItem(string id, Func<string> getLabel, Func<string> getValueText, Func<float> getValue, Func<float> getMinimumValue, Func<float> getMaximumValue, Func<float> getStep, Func<float, bool> setValue, Action focus, Func<bool> isEnabled, Func<bool> isVisible, Func<Tooltip> getTooltip)
+            public SliderItem(string id, Func<string> getLabel, Func<string> getValueText, Func<float> getValue, Func<float> getMinimumValue, Func<float> getMaximumValue, Func<float> getStep, Func<float, bool> setValue, Action focus, Func<bool> isEnabled, Func<bool> isVisible, Func<Tooltip> getTooltip, Func<string> getValueEditorLabel, Func<bool> openValueEditor)
             {
+                GetValueEditorLabel = getValueEditorLabel;
+                OpenValueEditor = openValueEditor;
                 Id = id;
                 GetLabel = getLabel;
                 GetValueText = getValueText;
@@ -737,6 +852,11 @@ namespace SongsOfConquestAccess.Adapters
             public Func<bool> IsEnabled { get; private set; }
             public Func<bool> IsVisible { get; private set; }
             public Func<Tooltip> GetTooltip { get; private set; }
+
+            /// <summary>What the game calls the popup the slider's own value box opens, empty where
+            /// the slider draws no such box; and the native open itself.</summary>
+            public Func<string> GetValueEditorLabel { get; private set; }
+            public Func<bool> OpenValueEditor { get; private set; }
         }
     }
 }

@@ -116,6 +116,7 @@ namespace SongsOfConquestAccess
             Step("coroutines", _host.StopAllCoroutines);
             Step("main menu waits", MainMenuPatches.Reset);
             Step("screens", () => _screenManager?.Clear());
+            Step("drop list", Screens.DropListScreen.Reset);
             Step("graph navigator", () =>
             {
                 _navigator?.Attach(null);
