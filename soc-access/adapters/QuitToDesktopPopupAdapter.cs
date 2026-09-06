@@ -72,6 +72,25 @@ namespace SongsOfConquestAccess.Adapters
             get { return GetButtonText(Settings != null ? Settings.OpenSteamPageButton : null); }
         }
 
+        /// <summary>The drawn Yes button itself, so a screen can key a control on it and read where
+        /// the popup puts it. Null while the popup draws none.</summary>
+        public Component ConfirmButton
+        {
+            get { return Settings != null ? Settings.ConfirmButton : null; }
+        }
+
+        /// <summary>The drawn No button itself.</summary>
+        public Component CancelButton
+        {
+            get { return Settings != null ? Settings.CancelButton : null; }
+        }
+
+        /// <summary>The drawn FOLLOW button itself.</summary>
+        public Component SteamFollowButton
+        {
+            get { return Settings != null ? Settings.OpenSteamPageButton : null; }
+        }
+
         public bool IsPresent()
         {
             QuitToDesktopPopup.Settings settings = Settings;

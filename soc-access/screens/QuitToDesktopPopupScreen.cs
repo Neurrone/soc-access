@@ -1,23 +1,54 @@
 using System;
+using System.Collections.Generic;
 using HarmonyLib;
 using SongsOfConquest.Client.Menu.Popup;
 using SongsOfConquestAccess.Adapters;
-using SongsOfConquestAccess.Input;
 using SongsOfConquestAccess.UI;
+using SongsOfConquestAccess.UI.Graph;
 using UnityEngine;
 using Zenject;
 
 namespace SongsOfConquestAccess.Screens
 {
-    public sealed class QuitToDesktopPopupScreen : Screen
+    /// <summary>
+    /// The quit confirmation, made navigable as a graph in the three-part dialog contract its
+    /// family's representative (<see cref="MessageDialogScreen"/>) established: one stop holding the
+    /// heading as a line of its own and as the screen name, the body as the control focus starts on,
+    /// then the buttons.
+    ///
+    /// This popup draws more above the question than a plain dialog does, and everything is read in
+    /// the order it is drawn. Measured 2026-09-06 at 1280x800 inside `QuitToDesktopPopup(Clone)` &gt;
+    /// `Container`: the follow-us block first (`FollowHeader` at y 286 and the `OpenSteamPageButton`
+    /// "FOLLOW" at y 356), then the heading "Quit to Desktop" at y 418, then the body "Are you sure?"
+    /// at y 438, then No at x 508 and Yes at x 647. So the follow text and its button read before the
+    /// heading, and the buttons are read by their drawn left edges rather than positive-first.
+    ///
+    /// ESCAPE is the game's. `QuitToDesktopPopup.Show` registers <c>UI.ExitMenu</c> on
+    /// <c>HandleCancelClicked</c> in its NON-gamepad branch (and <c>UI.Confirm</c> on
+    /// <c>HandleConfirmClicked</c> beside it), so the key already presses No and the screen leaves it
+    /// alone. Read 2026-09-06 from
+    /// `decompiled/Lavapotion.SongsOfConquest.UILayer.Runtime/SongsOfConquest/Client/Menu/Popup/QuitToDesktopPopup.cs`
+    /// lines 145 to 152.
+    /// </summary>
+    public sealed class QuitToDesktopPopupScreen : GraphScreen
     {
+        private const string DialogStop = "quit-to-desktop";
+        private const string ConfirmKey = "quit:confirm";
+        private const string CancelKey = "quit:cancel";
+
         private static readonly System.Reflection.PropertyInfo InstallerContainerProperty =
             AccessTools.Property(typeof(QuitToDesktopPopupInstaller), "Container");
 
         private readonly QuitToDesktopPopupAdapter _adapter;
 
+        // A subject of its own for each node the popup gives no component for: the reconciler seats
+        // the cursor by SUBJECT before it looks at the structural key, so two nodes sharing one would
+        // collapse onto whichever was declared first (the rule the message dialog's port established).
+        private readonly object _followTitleKey = new object();
+        private readonly object _headingKey = new object();
+        private readonly object _bodyKey = new object();
+
         public QuitToDesktopPopupScreen(QuitToDesktopPopupAdapter adapter)
-            : base(BuildRootWidget(adapter))
         {
             _adapter = adapter;
         }
@@ -49,94 +80,138 @@ namespace SongsOfConquestAccess.Screens
             return null;
         }
 
+        public override string Key
+        {
+            get { return "quit-to-desktop"; }
+        }
+
+        /// <summary>The popup's own heading, spoken once on arrival.</summary>
+        public override string ScreenName
+        {
+            get
+            {
+                string title = _adapter != null ? _adapter.Title : null;
+                return string.IsNullOrWhiteSpace(title) ? null : title;
+            }
+        }
+
         public override bool IsPresent()
         {
             return _adapter != null && _adapter.IsPresent();
         }
 
-        public override bool OnActionJustPressed(InputAction action)
+        public override void Build(GraphBuilder builder)
         {
-            if (action != null && action.Key == AccessibilityActions.Cancel.Key)
+            if (!IsPresent())
             {
-                return _adapter != null && _adapter.HasCancel && _adapter.ActivateCancel();
+                return;
             }
 
-            return base.OnActionJustPressed(action);
+            builder.BeginStop(DialogStop);
+            ControlId start = null;
+
+            if (_adapter.HasSteamFollow)
+            {
+                if (!string.IsNullOrWhiteSpace(_adapter.FollowTitle))
+                {
+                    NodeVtable followTitle = GraphNodes.Text(() => _adapter.FollowTitle);
+                    followTitle.OnFocusVisual = _adapter.SelectBody;
+                    builder.AddItem(new SyntheticNode(
+                        ControlId.For(_followTitleKey, "quit:follow-title"),
+                        followTitle));
+                }
+
+                Component followButton = _adapter.SteamFollowButton;
+                if (followButton != null)
+                {
+                    NodeVtable follow = GraphNodes.Button(
+                        () => _adapter.SteamFollowLabel,
+                        () => _adapter.ActivateSteamFollow(),
+                        () => _adapter.HasSteamFollow);
+                    follow.OnFocusVisual = _adapter.SelectSteamFollow;
+                    builder.AddItem(new DrawnNode(
+                        ControlId.For(followButton, "quit:follow"),
+                        follow,
+                        followButton));
+                }
+            }
+
+            if (!string.IsNullOrWhiteSpace(_adapter.Title))
+            {
+                builder.AddItem(new SyntheticNode(
+                    ControlId.For(_headingKey, "quit:heading"),
+                    GraphNodes.Text(() => _adapter.Title)));
+            }
+
+            if (!string.IsNullOrWhiteSpace(_adapter.Description))
+            {
+                ControlId bodyId = ControlId.For(_bodyKey, "quit:body");
+                NodeVtable body = GraphNodes.Text(() => _adapter.Description);
+                body.OnFocusVisual = _adapter.SelectBody;
+                builder.AddItem(new SyntheticNode(bodyId, body));
+                start = bodyId;
+            }
+
+            foreach (KeyValuePair<string, Component> button in DrawnButtons())
+            {
+                ControlId buttonId = ControlId.For(button.Value, button.Key);
+                builder.AddItem(new DrawnNode(buttonId, Button(button.Key), button.Value));
+                if (start == null)
+                {
+                    start = buttonId;
+                }
+            }
+
+            if (start != null)
+            {
+                // Focus starts on the body, so arrival reads the heading once as the screen name and
+                // then what the popup actually asks.
+                builder.SetStart(start);
+            }
         }
 
-        private static ContainerWidget BuildRootWidget(QuitToDesktopPopupAdapter adapter)
+        private NodeVtable Button(string key)
         {
-            string title = adapter != null ? adapter.Title : string.Empty;
-            ContainerWidget root = new ContainerWidget("quit-to-desktop-popup", title);
+            bool confirm = key == ConfirmKey;
+            NodeVtable vtable = GraphNodes.Button(
+                () => confirm ? _adapter.ConfirmLabel : _adapter.CancelLabel,
+                () => { if (confirm) { _adapter.ActivateConfirm(); } else { _adapter.ActivateCancel(); } },
+                () => confirm ? _adapter.HasConfirm : _adapter.HasCancel);
 
-            root.AddChild(new TextWidget(
-                "follow-title",
-                () => adapter != null ? adapter.FollowTitle : string.Empty,
-                () =>
-                {
-                    if (adapter != null)
-                    {
-                        adapter.SelectBody();
-                    }
-                },
-                includeParentLabelInAnnouncement: false,
-                isVisible: () => adapter != null && adapter.HasSteamFollow));
+            // The button the cursor is on is the button the game shows as selected, which is also
+            // what its own Confirm key would press.
+            vtable.OnFocusVisual = confirm ? (Action)_adapter.SelectConfirm : _adapter.SelectCancel;
+            return vtable;
+        }
 
-            root.AddChild(new ButtonWidget(
-                "follow-steam",
-                adapter != null ? adapter.SteamFollowLabel : string.Empty,
-                () => adapter != null && adapter.ActivateSteamFollow(),
-                () =>
-                {
-                    if (adapter != null)
-                    {
-                        adapter.SelectSteamFollow();
-                    }
-                },
-                () => adapter != null && adapter.HasSteamFollow,
-                () => adapter != null && adapter.HasSteamFollow));
+        /// <summary>The buttons the popup is drawing, leftmost first: it draws No at x 508 and Yes at
+        /// x 647, and the reading order is the drawn one rather than positive-then-negative.</summary>
+        private List<KeyValuePair<string, Component>> DrawnButtons()
+        {
+            List<KeyValuePair<string, Component>> buttons = new List<KeyValuePair<string, Component>>(2);
+            if (_adapter.HasConfirm && _adapter.ConfirmButton != null)
+            {
+                buttons.Add(new KeyValuePair<string, Component>(ConfirmKey, _adapter.ConfirmButton));
+            }
 
-            root.AddChild(new TextWidget(
-                "description",
-                () => adapter != null ? adapter.Description : string.Empty,
-                () =>
-                {
-                    if (adapter != null)
-                    {
-                        adapter.SelectBody();
-                    }
-                },
-                includeParentLabelInAnnouncement: false));
+            if (_adapter.HasCancel && _adapter.CancelButton != null)
+            {
+                buttons.Add(new KeyValuePair<string, Component>(CancelKey, _adapter.CancelButton));
+            }
 
-            root.AddChild(new ButtonWidget(
-                "confirm",
-                adapter != null ? adapter.ConfirmLabel : string.Empty,
-                () => adapter != null && adapter.ActivateConfirm(),
-                () =>
-                {
-                    if (adapter != null)
-                    {
-                        adapter.SelectConfirm();
-                    }
-                },
-                () => adapter != null && adapter.HasConfirm,
-                () => adapter != null && adapter.HasConfirm));
+            if (buttons.Count == 2 && Left(buttons[1].Value) < Left(buttons[0].Value))
+            {
+                KeyValuePair<string, Component> first = buttons[0];
+                buttons[0] = buttons[1];
+                buttons[1] = first;
+            }
 
-            root.AddChild(new ButtonWidget(
-                "cancel",
-                adapter != null ? adapter.CancelLabel : string.Empty,
-                () => adapter != null && adapter.ActivateCancel(),
-                () =>
-                {
-                    if (adapter != null)
-                    {
-                        adapter.SelectCancel();
-                    }
-                },
-                () => adapter != null && adapter.HasCancel,
-                () => adapter != null && adapter.HasCancel));
+            return buttons;
+        }
 
-            return root;
+        private static float Left(Component button)
+        {
+            return button != null ? button.transform.position.x : 0f;
         }
 
         private static bool IsLiveSceneInstaller(QuitToDesktopPopupInstaller installer)

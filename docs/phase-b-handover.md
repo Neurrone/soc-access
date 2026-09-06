@@ -233,3 +233,42 @@ Manual test:
    game's own No; Escape on a lobby's Set Name popup: the mod presses Cancel.
 7. Confirm the handover waits for Enter to be released: hold Enter on the field node and
    release; the field must not submit the dialog.
+
+### QuitToDesktopPopupScreen
+
+Built: one stop in the family's three-part shape, with the popup's extra block read where it is
+drawn. Measured 2026-09-06 at 1280x800 inside `QuitToDesktopPopup(Clone)` > `Container`: the
+follow-us text at y 286, the FOLLOW button at y 356, the heading "Quit to Desktop" at y 418,
+the body "Are you sure?" at y 438, No at x 508 and Yes at x 647. So the reading order is the
+follow text, FOLLOW, the heading, the body, No, Yes; the heading is also the screen name; focus
+starts on the body; the buttons are sorted by drawn left edge. The screenshot matches, button
+order included.
+
+Escape: the game's, and this CORRECTS the brief. `QuitToDesktopPopup.Show` registers
+`UI.ExitMenu` on `HandleCancelClicked` in its NON-gamepad branch (lines 145 to 152), with
+`UI.Confirm` on `HandleConfirmClicked` beside it; only the gamepad branch is the one-callback
+branch. So the key already presses No and the screen leaves it alone. Verified: `ui_back`
+answered `unclaimed`.
+
+Diff: one line added, the heading, which the widget tree spoke only as the container's name.
+Nothing missing, nothing changed.
+
+Deviations, measured: the follow text, the heading and the body each get a marker subject of
+their own, the rule the representative established; the FOLLOW button and the two answer
+buttons are keyed on the components the adapter now hands out (`ConfirmButton`, `CancelButton`,
+`SteamFollowButton`, added as `Component` so a screen can read where they are drawn).
+
+Follow-ups, not fixed: in keyboard mode the popup also binds the game's own Confirm to YES, so
+a physical Enter may reach the game and quit whatever the cursor stands on - the harness cannot
+press a physical key, so this is the first thing to check by hand; the FOLLOW button opens a
+Steam page and was not activated here.
+
+Manual test:
+
+1. Main menu, End, Enter on Quit. Hear "Quit to Desktop", then "Are you sure?".
+2. Home: "Follow for more news from Lavapotion!"; Down: "FOLLOW, button"; Down: "Quit to
+   Desktop"; Down: "Are you sure?"; Down: "No, button"; Down: "Yes, button".
+3. CAREFULLY, on the body rather than on Yes: press Enter and confirm the game does not quit
+   (the popup binds its own Confirm to Yes in keyboard mode - follow-up above).
+4. Escape: the game closes the popup itself, as No would.
+5. Enter on No: the popup closes and the main menu reads again.
