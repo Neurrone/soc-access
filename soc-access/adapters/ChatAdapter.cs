@@ -58,6 +58,13 @@ namespace SongsOfConquestAccess.Adapters
             }
         }
 
+        /// <summary>The button the game draws to open the chat, so a page that draws it can key a
+        /// control on it.</summary>
+        public UIButton Button
+        {
+            get { return GetChatButton(); }
+        }
+
         public bool IsButtonVisible()
         {
             UIButton button = GetChatButton();
@@ -137,6 +144,42 @@ namespace SongsOfConquestAccess.Adapters
             {
                 input.Select();
                 input.ActivateInputField();
+            }
+        }
+
+        /// <summary>The drawn Send button, so a caller can key a control on it.</summary>
+        public UIButton SendButton
+        {
+            get
+            {
+                ChatWindowBehavior.Settings settings = WindowSettings;
+                return settings != null ? settings.sendButton : null;
+            }
+        }
+
+        /// <summary>The drawn close cross. The lobby's chat window switches it off (measured
+        /// 2026-09-06: <c>CloseButton</c> reads <c>visible=false</c> there), so a caller must ask
+        /// whether it is drawn before declaring it.</summary>
+        public UIButton CloseButton
+        {
+            get
+            {
+                ChatWindowBehavior.Settings settings = WindowSettings;
+                return settings != null ? settings.closeButton : null;
+            }
+        }
+
+        /// <summary>Who the message goes to, as the drop list every combo box in the mod opens.
+        /// Null while the window draws no selector, which is the lobby's case
+        /// (<c>Settings.hideDropdown</c>).</summary>
+        public TargetDropList TargetSelector
+        {
+            get
+            {
+                UITextMeshDropdown dropdown = Dropdown;
+                return dropdown != null && IsTargetSelectorVisible()
+                    ? new TargetDropList(this, dropdown)
+                    : null;
             }
         }
 
@@ -570,6 +613,74 @@ namespace SongsOfConquestAccess.Adapters
                 && gameObject.activeInHierarchy
                 && gameObject.scene.IsValid()
                 && gameObject.scene.isLoaded;
+        }
+
+        /// <summary>The chat's "send to" dropdown as the mod's own list screen needs it. The game
+        /// draws the same <c>UITextMeshDropdown</c> here as everywhere else, so the popup half is the
+        /// shared <see cref="DropdownPopup"/>.</summary>
+        public sealed class TargetDropList : IDropList
+        {
+            private readonly ChatAdapter _adapter;
+            private readonly UITextMeshDropdown _dropdown;
+
+            public TargetDropList(ChatAdapter adapter, UITextMeshDropdown dropdown)
+            {
+                _adapter = adapter;
+                _dropdown = dropdown;
+                GetOptions = ReadOptions;
+                GetValue = () => _adapter != null ? _adapter.TargetValue : 0;
+                IsEnabled = () => _dropdown != null && _dropdown.Active && _dropdown.Interactable;
+                IsVisible = () => _adapter != null && _adapter.IsTargetSelectorVisible();
+                OpenPopup = () => DropdownPopup.Show(_dropdown);
+                ClosePopup = () => DropdownPopup.Hide(_dropdown);
+                IsPopupOpen = () => DropdownPopup.IsOpen(_dropdown);
+                FocusOption = index => DropdownPopup.FocusOption(_dropdown, index);
+            }
+
+            public string Id
+            {
+                get { return "chat-target"; }
+            }
+
+            /// <summary>The drawn dropdown itself, so a caller can key a control on it.</summary>
+            public Component Subject
+            {
+                get { return _dropdown; }
+            }
+
+            public Func<IReadOnlyList<string>> GetOptions { get; private set; }
+            public Func<int> GetValue { get; private set; }
+            public Func<bool> IsEnabled { get; private set; }
+            public Func<bool> IsVisible { get; private set; }
+            public Func<bool> OpenPopup { get; private set; }
+            public Func<bool> ClosePopup { get; private set; }
+            public Func<bool> IsPopupOpen { get; private set; }
+            public Func<int, bool> FocusOption { get; private set; }
+
+            public bool SetValue(int value)
+            {
+                return _adapter != null && _adapter.SetTargetValue(value);
+            }
+
+            public void Focus()
+            {
+                if (_adapter != null)
+                {
+                    _adapter.FocusTargetSelector();
+                }
+            }
+
+            private IReadOnlyList<string> ReadOptions()
+            {
+                List<string> labels = new List<string>();
+                int count = _adapter != null ? _adapter.TargetOptionCount : 0;
+                for (int i = 0; i < count; i++)
+                {
+                    labels.Add(_adapter.GetTargetOptionLabel(i));
+                }
+
+                return labels;
+            }
         }
 
         private static object GetMemberValue(object instance, string name)

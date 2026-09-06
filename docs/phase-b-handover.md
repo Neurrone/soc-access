@@ -2097,3 +2097,85 @@ Manual test:
    at a time, and a mod with a full description should read a second line here headed "Full
    description".
 5. Tab: "Back, button". Enter and Escape both return to where you came from.
+
+## Family I: the chat
+
+### ChatScreen (representative; no siblings)
+
+Built: one stop, `chat`, in the order the window draws itself - the messages so far, the "send to"
+selector while the window draws one, the message box, Send, and the way out. Screen name is the
+mod's "Chat"; focus starts on the message box, which is what the window is opened for.
+
+THE BOX IS THE SECOND EXCEPTION TO THE EDIT CONTRACT, as the owner ruled: Enter inside it is the
+GAME's own submit and sends the message (`ChatWindowBehavior.Initialize` combines
+`HandleInputFieldSubmit` onto the field's `OnSubmit`, decompiled line 146), so the mod adds no
+commit of its own and `GameTextEditor` does the rest - "editing" as the keyboard changes hands, the
+characters echoed as they are typed, "edited" with the new text or "Cancelled" on the way out.
+Verified: `ui_activate` said "editing", the next `/input` answered `standing down`, a text set
+through `/eval` and a native deactivate said "edited" then "hello lobby".
+
+Measured 2026-09-06 at 1280x800 in the online lobby through `/gui/unity`: the window at
+[83,468,463,222], the message list in a scroll view at [86,471,457,182], and a bottom row at y 655
+holding the box (x 86) and Send (x 461). The lobby's window draws NEITHER the "send to" dropdown
+(`Settings.hideDropdown`, and `/gui/unity` reads it `visible=false`) NOR the close cross
+(`CloseButton`, `visible=false`), and an empty history draws no line of its own.
+
+Escape is CLAIMED and runs the window's own close: `ChatWindowBehavior.Show` registers
+`InputActions.UI.Cancel` and `Common.ToggleChatType` and nothing else (decompiled, lines 399 to
+402), and `UI.Cancel` is this game's GAMEPAD binding throughout - every keyboard branch registers
+`UI.ExitMenu` instead, the finding `PlatformUserMenuScreen` established. Verified: `ui_back`
+answered `consumed` and the lobby read again.
+
+Diff: two differences, both expected.
+
+1. "None" is gone. The widget invented that row for an empty history; the window draws no such line
+   (measured: the history's own text mesh is the prefab's placeholder at zero height), so an empty
+   history declares nothing.
+2. One message line was added: "[All] Neurrone: hello lobby", sent during the walk to prove the
+   history rows. Note what it does NOT say - the rendered line carries the game's own markup
+   ("[All] &lt;sprite name=Icons-Font-PlatformIconSteam&gt; Neurrone: hello lobby", measured before
+   the fix), and every message now goes through `ui/SpokenLines.cs` like every other string the game
+   wrote for its renderer.
+
+Deviations, each measured:
+
+- THE CLOSE ROW IS THE MOD'S OWN, keyed on a subject of its own and labelled with the mod's word,
+  because the lobby's window draws no close cross - the same shape `PlatformUserMenuScreen`'s Cancel
+  has, and what the widget screen already gave this window. It runs `ChatAdapter.Close()`, which
+  clicks the drawn button where there is one and otherwise calls the window's own `Hide`.
+- The message rows are `SyntheticNode`s keyed on their place in the history: the window renders every
+  message into ONE text mesh, so there is no per-message object to key on, and a history only ever
+  appends.
+- The "send to" selector is declared but was never opened here: the lobby hides it
+  (`Settings.hideDropdown`). It is a combo box over the game's own dropdown opening `DropListScreen`,
+  through a new `ChatAdapter.TargetDropList` (`IDropList`), and it is declared BEFORE the box, which
+  is the order the brief gave; the hidden control's rect (y 687, below the bottom row) is not
+  evidence of anything while it is switched off, so phase C's in-game chat is where that order is
+  measured for real.
+- The flat and tree dumps print the message rows LAST although they are walked first. The dump orders
+  by `KeyGraph.ComputeOrder`, which starts at the render's start node - here the message box - and
+  appends what the down-right walk never reached. The positions and the edges are the truth: `/input
+  ui_home` read "[All] Neurrone: hello lobby, 1 of 4" and Down reached "Message, editable, 2 of 4".
+
+Follow-ups, not fixed:
+
+- `ChatPatches.ShowPostfix` still refuses to re-push while a `ChatScreen` is up, with a comment about
+  the focused `TextInputWidget` being replaced. The reason is gone (the graph is declared afresh), the
+  guard is harmless, and the comment is now stale.
+- The in-game chat (the adventure map's and combat's) is phase C: the target selector, a history with
+  more than one line, and the close cross all belong to that verification.
+- `ChatAdapter.RenderNativeMessage` still strips colour tags by hand before `SpokenLines` sees the
+  line; the two overlap and only `SpokenLines` is needed. Pre-existing.
+
+Manual test:
+
+1. In an online lobby, Tab to the panel and End: "Chat, button, 10 of 10". Enter opens the window and
+   reads "Chat", then "Message, editable".
+2. Up from the box reads the last message; Up again the one before it. Down comes back to the box.
+3. Enter on the box says "editing"; type and hear each character; Escape says "Cancelled" and puts
+   the old text back. CAREFUL: Enter inside the box is the game's own submit and SENDS what you typed.
+4. Down: "Send, button"; Enter sends what is in the box and the message is read as it lands. Down:
+   "Close, button"; Enter closes the window.
+5. Escape closes the window from anywhere in it.
+6. With someone else in the lobby: a message arriving while the window is open should be spoken once,
+   and while it is shut should say "New chat message".
