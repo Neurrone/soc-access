@@ -1928,3 +1928,91 @@ Manual test:
    each row should say, and whether you want its enable toggle, Unsubscribe and More options back as
    child nodes (follow-up above).
 6. Escape goes back to the browse page; Enter on Close closes the browser.
+
+### CommunityMapsSearchResultsScreen
+
+Built: three stops. `community-maps-search-results-top` holds the summary line, Refine filter and the
+sort combo box; `community-maps-search-results-list` holds the results, with mod.io's end-of-results
+or no-results line after them; `community-maps-search-results-footer` holds Back. Screen name is the
+panel's own drawn heading ("Search results"); focus starts on the band above the grid.
+
+Measured 2026-09-06 at 1280x800 through `/gui/unity`: the panel scrolls 4264 px of content through a
+720 px viewport. A `Top` band at [0,133,1280,71] holds "Refine filter" at [972,133,100,27] and the
+sort dropdown at [1085,133,141,27] ("Sort by:" over "Date submitted"); the results are
+`LavapotionSearchResultListItem_Regular(Clone)`s from y 251, five across 243 px apart and 193 px
+down; a `Bottom` band at [0,4077,1280,267] carries the end-of-results or no-results line under them.
+
+Escape is CLAIMED and runs mod.io's own cancel (`InputReceiver.OnCancel`), which from this panel opens
+the BROWSE page again - the decompiled `Navigating.Cancel` branch for "not the browser panel".
+Verified: `ui_back` answered `consumed` and the browse page read "Browse, tab, selected, 1 of 2". The
+drawn Back does the same thing, which is what the widget screen's Back button already ran.
+
+Diff: three kinds of change, and every before line is accounted for.
+
+1. The four sort options (Date submitted, Most subscribed, Popularity, Rating) left the page - they
+   are the drop list screen now - and the control became one labelled line, "Sort by: | Date
+   submitted". The widget screen never read the control's own name.
+2. Two BUFFER lines keep a doubled space the widget squeezed out: "Duel  +3rd" and "Whirlwind  Arena"
+   are what the mods are called, the widget's label column said so too, and only its buffer collapsed
+   the pair of spaces. The graph's buffer repeats the announcement part verbatim.
+3. Nothing else. Both captures list the same 100 results in the same order, which is luck: the grid is
+   live network data and it grew to 200 rows during the walk as mod.io paged more in.
+
+Deviations, each measured:
+
+- THE RESULT NODES ARE KEYED BY PLACE IN THE GRID, NOT BY MOD ID. The widget's bug - every row carried
+  the id `community-maps-search-results-item-ModIO.ModId` - is `ModId` being a struct wrapping a long
+  with no `ToString` of its own, read as an object and printed;
+  `CommunityMapsSearchResultsAdapter.BuildResultId` now unwraps it and answers the real id. But the id
+  cannot be the node key: the live grid can hold the SAME mod twice, and the engine refused a whole
+  build over it ("Duplicate control id: community-maps-search-results:result/3561654", measured, which
+  blanked the page until the key changed). A page only ever appends, so a row's position is unique and
+  stable, and that is the key.
+- FOCUS STARTS ON THE BAND, NOT ON THE RESULTS, against the family's usual "land where the player is
+  going". The page is pushed the moment mod.io switches the panel on, before it has fetched a single
+  result, so a landing declared in the results stop finds nothing there and falls back to the start
+  node anyway - measured twice, the first readout being "Search results, 1 of 3" both times. Declaring
+  the band keeps the landing the same whatever the network does, and Tab is one key from the grid.
+- The end-of-results line is declared AFTER the results, where mod.io draws it (the `Bottom` band
+  below the grid); the widget screen read it before the list. It is empty here - this search filled
+  its first page - and it is the same node that carries "no results" when a search finds nothing.
+- The results are read LIVE (`BuildResults()`) rather than from the adapter's constructor snapshot,
+  because mod.io appends to the grid as the page scrolls without the detector hearing about it;
+  everything else on the page still comes from the snapshot the detector hands over.
+- The widget screen's Subscribe and More options rows are gone. They came from mod.io's selection
+  overlay, are not in the approved model, and were not in the before capture either (the adapter reads
+  them off whichever overlay is active, and none was).
+
+Follow-ups, not fixed:
+
+- The known stack oddity, reproduced here: leaving this page with Escape or Back left the stack as
+  `CommunityMapsSearchResultsScreen > CommunityMapsHomeScreen` - the results page stayed UNDER the
+  home page rather than being popped. The detector's, recorded by the search filter entry before this
+  port, and not this screen's to fix. Closing and reopening the browser clears it.
+- Subscribe and More options are no longer reachable from a result; the details page a result opens
+  still offers Subscribe.
+- `/screenshot` answered an all-black frame (the locked-session symptom), so the layout evidence is
+  `/gui/unity`.
+
+Walk (all through `/input` and `/type`): Tab cycles band, results, Back; the band read "Search
+results, 1 of 3", "Refine filter, button, 2 of 3" and "Sort by:, combo box, Date submitted, 3 of 3";
+Enter on Refine filter reopened the search panel and Escape came back to the row; the drop list opened
+on "Date submitted, selected, 1 of 4", walked and cancelled without changing the sort; Down and Up
+walk the results, Home read "my first map, button, 1 of 100" and End "Death Mountain, button, 100 of
+100"; Enter on "Arti-Test, button, 3 of 100" opened its details page and Escape there came back to the
+same row; `/type hyena` landed on "Hyena, button, 10 of 100" with ONE result and Backspace cleared the
+search; `ui_back` returned to the browse page. Nothing was subscribed to and no download was started.
+
+Manual test:
+
+1. Main menu, Community Maps, Escape past the modal, Search & filter, then Search. Hear "Search
+   results", then "Search results, 1 of 3".
+2. Down: "Refine filter, button, 2 of 3" - Enter reopens the search panel - then "Sort by:, combo box,
+   Date submitted, 3 of 3". Enter opens mod.io's own list; Up and Down walk it; Escape leaves the sort
+   alone; Enter takes a value and the grid re-sorts.
+3. Tab: "my first map, button, 1 of 100". Down and Up walk the results; End reaches the last one;
+   watch the grid scroll itself to the row under the cursor, and note that reaching the end makes
+   mod.io fetch another hundred.
+4. Enter on a result opens its details page; Escape there comes back to the same row.
+5. Type a few letters of a map's name: the cursor lands on it. Backspace ends the search.
+6. Tab: "Back, button". Enter and Escape both return to the browse page.

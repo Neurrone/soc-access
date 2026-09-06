@@ -386,11 +386,17 @@ namespace SongsOfConquestAccess.Adapters
             return value is T ? (T)value : default(T);
         }
 
+        /// <summary>The mod's own id, which is what tells one result from another. <c>ModId</c> is a
+        /// struct wrapping a long with no <c>ToString</c> of its own, so reading it as an object and
+        /// printing it answered the type name for every row - which is why every result used to carry
+        /// the same identity.</summary>
         private static string BuildResultId(Component component, int index)
         {
             object profile = GetField<object>(component, "profile");
             object idValue = profile != null ? GetField<object>(profile, "id") : null;
-            string id = idValue != null ? idValue.ToString() : string.Empty;
+            string id = idValue is ModIO.ModId
+                ? ((ModIO.ModId)idValue).id.ToString(System.Globalization.CultureInfo.InvariantCulture)
+                : (idValue != null ? idValue.ToString() : string.Empty);
             return !string.IsNullOrWhiteSpace(id) ? id : index.ToString();
         }
 
@@ -613,21 +619,28 @@ namespace SongsOfConquestAccess.Adapters
             return builder.ToString().Trim();
         }
 
-        public sealed class SortDropdown
+        /// <summary>The results page's sort dropdown, answering the questions every drop list answers
+        /// so the mod's own list screen can be opened over mod.io's popup. What TAKING an entry means
+        /// is the page's, and it hands that over when it opens the list.</summary>
+        public sealed class SortDropdown : IDropList
         {
             private readonly TMP_Dropdown _dropdown;
             private readonly string _label;
-            private readonly bool _isVisible;
-            private readonly int _value;
-            private readonly IReadOnlyList<string> _options;
 
             public SortDropdown(TMP_Dropdown dropdown)
             {
                 _dropdown = dropdown;
                 _label = FindDropdownLabel(dropdown);
-                _isVisible = dropdown != null && dropdown.gameObject.activeInHierarchy;
-                _value = dropdown != null ? dropdown.value : -1;
-                _options = BuildOptions(dropdown);
+                GetOptions = () => BuildOptions(_dropdown);
+                GetValue = () => _dropdown != null ? _dropdown.value : -1;
+                IsEnabled = () => _dropdown != null
+                    && _dropdown.gameObject.activeInHierarchy
+                    && _dropdown.interactable;
+                IsVisible = () => _dropdown != null && _dropdown.gameObject.activeInHierarchy;
+                OpenPopup = () => DropdownPopup.Show(_dropdown);
+                ClosePopup = () => DropdownPopup.Hide(_dropdown);
+                IsPopupOpen = () => DropdownPopup.IsOpen(_dropdown);
+                FocusOption = index => DropdownPopup.FocusOption(_dropdown, index);
             }
 
             public string Id
@@ -635,24 +648,36 @@ namespace SongsOfConquestAccess.Adapters
                 get { return "sort"; }
             }
 
+            /// <summary>What the dropdown is choosing, in mod.io's own words ("Sort by:").</summary>
             public string Label
             {
                 get { return _label; }
             }
 
-            public bool IsVisible
+            /// <summary>The drawn control itself, so a caller can key a node on it.</summary>
+            public Component Subject
             {
-                get { return _isVisible; }
+                get { return _dropdown; }
             }
 
-            public int Value
-            {
-                get { return _value; }
-            }
+            public Func<IReadOnlyList<string>> GetOptions { get; private set; }
+            public Func<int> GetValue { get; private set; }
+            public Func<bool> IsEnabled { get; private set; }
+            public Func<bool> IsVisible { get; private set; }
+            public Func<bool> OpenPopup { get; private set; }
+            public Func<bool> ClosePopup { get; private set; }
+            public Func<bool> IsPopupOpen { get; private set; }
+            public Func<int, bool> FocusOption { get; private set; }
 
-            public IReadOnlyList<string> GetOptions()
+            /// <summary>The entry the dropdown is on, in mod.io's own words.</summary>
+            public string CurrentLabel
             {
-                return _options;
+                get
+                {
+                    IReadOnlyList<string> options = GetOptions();
+                    int value = GetValue();
+                    return value >= 0 && value < options.Count ? options[value] : string.Empty;
+                }
             }
 
             private static IReadOnlyList<string> BuildOptions(TMP_Dropdown dropdown)
