@@ -1273,3 +1273,107 @@ Manual test:
    reading "Connecting" then "Looking for games" where there are no games.
 9. Host Game opens the host popup; note the field may already hold the keyboard (follow-up above).
 10. Escape leaves for the main menu, the same as pressing Main Menu.
+
+### PlayerStatsScreen
+
+Built: three stops. `player-stats-tabs` holds the two tabs; `player-stats-content` is ONE `GraphSheet`
+whose REGIONS are the panels the showing tab draws, in drawn order; `player-stats-buttons` holds Back
+then Options. Screen name is the page's drawn title ("Player stats"); focus starts on the tab bar, so
+arrival says which page is showing before its first line.
+
+Measured 2026-09-06 at 1280x800 through `/gui/unity` and a screenshot crop, Conquest - Overall: the
+tabs at y 54 (Conquest - Overall at x 480, Conquest - Battle at x 643); a band at y 94 of three
+panels - `GeneralContainer` at x 30 under "General", `FactionContainer` at x 446 under "Factions,
+play distribution", `TopMapsContainer` at x 861 under "Top maps, #games"; then
+`WieldersAndTroopsContainer` at y 420 under ONE caption, "Top wielder* and troops**", holding the
+wielders at x 30 (three entries, then "Wielder max level: 15", "Played wielders: 13/64" and "*Based
+on number of times recruited or started with") and the troops at x 674 (three entries, then "Total
+units trained: 394", "Different units trained: 13/121" and "**Based on total gold spent on troops").
+Back ("Main Menu", x 21) and Options (x 1233) are the main menu's header band. The screenshot
+matches.
+
+The tabs switch on ENTER, not on focus, and this is the measurement the proposal asked for:
+`PlayerStatsMenuNavigation.HandleSwitchedTab` calls `Show`/`Hide` on the two views WITH AN ANIMATION
+(decompiled, lines 77 to 96), so arriving at a tab is not the same event as arriving at its page - the
+opposite of the options window, where the switch is instant and free. Verified: Down then Enter on
+Conquest - Battle said "selected" and the battle page was declared.
+
+Escape is CLAIMED and presses the drawn Back button: `PlayerStatsMenuNavigation` injects an input
+manager and registers no callback on it at all. Verified: `ui_back` answered `consumed` and the main
+menu came back.
+
+Diff, tab 0: every before line is accounted for, in five groups.
+
+1. Every table's NAME cell: "Arleon, Faction" became the primary cell "Arleon", and the same for
+   every map, wielder and troop.
+2. Every figure cell: "Arleon, Rank, #1" became "#1" with "Rank, #1" as its buffer head, and so on
+   for Play distribution, Details, Games, Faction, Times recruited or started with and Times trained.
+3. The seventeen column headings are GONE: the page draws NO column captions anywhere, so no heading
+   band is declared. The captions the widget screen invented are kept as the sheet's columns, which
+   is where they are said - on the crossing into a column.
+4. The two summary blocks became one row per drawn line: "Wielder max level: 15 / Played wielders:
+   13/64 / *Based on ..." was one widget line with three buffer lines and is now three rows of the
+   wielders' own region, and the same for the troops'.
+5. The three stat tiles lost the line break the prefab wraps their caption on: "Games\nPlayed: 5" is
+   now "Games Played: 5". That break is a rendering accident, not two things to say, and the widget
+   read it as two buffer lines.
+
+Diff, tab 1: not comparable line by line, and the reason is the capture. The before capture of the
+battle tab was taken before the game had filled that menu in, so it holds the prefab's placeholders
+("Spellname with very long name that can span over two lines", "name", 345, 111) where this session
+has the real figures (53 battles, Clouded Vision cast 17 times, Horned Ones 37 kills). The SHAPE
+matches line for line: twelve general lines, a spells table of three rows with Rank and Times cast, its
+two summary lines, and an enemy-troops table of three rows with Rank, Faction and Kills - with the
+same five kinds of change as tab 0.
+
+Deviations, each measured:
+
+- NO HEADING BAND ANYWHERE. Unlike the map select page and the online game list, this page draws no
+  column captions at all: a faction row is a number, a name and a percentage with nothing over them.
+  The captions stay the mod's (`ModStrings.UI.Column*`, the words the widget table used) and live
+  only as the sheet's column array.
+- GENERAL IS A LIST, NOT A TABLE, which is the other measurement the proposal asked for: the page
+  draws three stat tiles side by side and then four full-width lines, so its region declares no
+  columns and every entry is a line of its own. Making it a two-column sheet would have invented a
+  lattice the page does not draw.
+- THE WIELDERS AND THE TROOPS SHARE ONE DRAWN CAPTION. `TopWieldersLabel` and `TopTroopsLabel` both
+  read `WieldersAndTroopsContainer/Title`, because that is the only caption the game draws over
+  either. They are still two regions - their columns differ (Times recruited against Times trained)
+  and their rows are different things - and the path diff makes the repeat harmless: Alt+Down from
+  the wielders into the troops says only "Faey Queens, 1 of 6", the caption having just been said.
+- The summary lines are `GraphSheet.Line` rows of their table's region, so "N of 6" counts three
+  entries and three summary lines. That is the owner's model for them and it is what makes End reach
+  the footnote rather than the last troop.
+- Every label and figure goes through `SpokenLines`, which is what joins a wrapped stat tile back
+  into one line.
+- The adapter is UNCHANGED: every fact this port needed - the rows, their cells, their
+  `RectTransform`s for scrolling, the captions, the tab labels and `ActivateTab` - was already there.
+
+Follow-ups, not fixed:
+
+- The second tab's own label changes with the page: it reads "Conquest — Battle" while the overall
+  page is showing and "Battle general" once the battle page is up, because `FindTabLabel` falls back
+  to a text the menu re-uses. Present in the before captures too.
+- `ActivateTab` invokes the navigation's private `HandleSwitchedTab` rather than clicking the drawn
+  tab button, so `UITabGroup`'s own state is not told. Pre-existing, and it has never misbehaved.
+- Scrolling into view is the adapter's `ScrollIntoView`, driven from every node's focus visual; the
+  harness cannot photograph it, so it is in the manual test.
+
+Manual test:
+
+1. Main menu, Extras, Player statistics. Hear "Player stats", then "Conquest — Overall, tab,
+   selected, 1 of 2".
+2. Tab: "General, Games Played: 5, 1 of 7". Down through the general lines.
+3. Alt+Down: "Factions, play distribution, grid, Arleon, 1 of 6"; again: "Top maps, #games, grid, New
+   Beginnings, 1 of 5"; again: "Top wielder* and troops**, grid, Peradine, 1 of 6"; again: the troops,
+   which say only the row (the caption is the same one). Alt+Up walks back.
+4. In a table, Right names each column on the way in (Rank, Faction, Times trained) and Left comes
+   back; from a figure column, Down says the next row's name, then that figure, then "N of 6".
+5. End reaches the last footnote ("**Based on total gold spent on troops"); Home reaches the first
+   general line.
+6. Type a few letters of a wielder, troop or map name: the cursor lands on it.
+7. Tab: "Main Menu, button, 1 of 2", then Options. Shift+Tab twice returns to the tabs.
+8. Down then Enter on Conquest — Battle: the page switches and says "selected"; its content is the
+   battle general lines, the spells table with its two summary lines, and the enemy troops table.
+9. Watch the picture on the battle page: the row under the cursor should scroll itself into view.
+10. Escape leaves for the main menu, the same as pressing Main Menu.
