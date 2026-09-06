@@ -314,9 +314,12 @@ follow ES2 (`button`); positions are announced.
 6. **Walk.** `POST /input` through every stop and a sample of nodes; `/speech` must read as
    the tree dump reads. Activate one control per kind through the game's own click path.
    Crop a screenshot (`crop-shot.ps1`) of the native tooltip on a focused node.
-7. **Hand over.** The manual test lists what the harness cannot prove (physical keys,
-   game-key collisions, scroll-into-view, focus visuals). The owner tests; the screen is
-   done when they say so.
+7. **Hand over.** ONE SHORT PAGE per phase, never per screen: which screens to test, what to
+   watch for, the decisions taken, and what needs the owner's attention. No key-by-key steps and
+   no expected speech; per-screen detail (measurements, deviations, diff verdicts, follow-ups)
+   goes in the commit message and the screen's doc comment. The owner tests; the screen is
+   done when they say so. (Owner ruling 2026-09-06 after a 2,000-line phase B handover went
+   unread.)
 
 `walks/` is gitignored, as in the ES2 repo.
 
