@@ -392,6 +392,21 @@ Everything reachable from the main menu without loading a game, in kind order:
 Exit: every screen's dumps diff clean and the owner has walked each kind. The pause menu
 is deliberately not here (it is in-game), and no screen of phase C is touched.
 
+Before-captures taken 2026-09-06 (`walks/before/`, 70 flat and tree pairs), on the unported
+build, each screen checked against a cropped screenshot before the dump. Variants: the
+lobby offline and online (`-online`), the AI slot, every icon dropdown, every options and
+codex and stats tab, `MessageDialogScreen` as `-confirm`, `-system-input`, `-popup-input`,
+`-popup-question`, `-popup-error`. Not captured, with the reason: `AdventureLobbyInviteProvidersScreen`
+(Invite Friend opens Steam directly on this machine; the provider list never shows),
+`AdventureLobbyPlayerSettingsScreen` exists only in the online lobby (captured there), the
+time input (turn timers off) and the five-digit code (community maps e-mail login) never
+appeared, and `CommunityMapsModalScreen` only as the mod.io authentication modal. Facts the
+proposals must honour, read off the pictures: dialog buttons are drawn No then Yes (the
+widget screen lists Yes first); the options tabs are a column down the left; the codex tabs
+are an icon row; the load menu draws "Load" where the widget says "Confirm"; the loading
+screen draws a tip line the widget never reads; the search results list gives every row the
+same widget id. The captures sit under a gitignored folder, so this note is their record.
+
 ### Phase C — in-game menus, popups, forms and tables
 
 `PauseMenuScreen`, `WorldChoiceMenuScreen`, `WorldConfirmMenuScreen`,
