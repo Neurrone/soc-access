@@ -93,6 +93,52 @@ Manual test:
 4. Enter on a card opens its mission page (still a widget screen); its Back returns.
 5. Escape: the campaign menu returns with no stray card name spoken first.
 
+### CustomCampaignSelectScreen
+
+Built: two stops. `custom-campaign-cards` holds the community campaign entries and the
+download tip in one band, sorted by measured left edge every build (2026-09-06 at 1280x800:
+x 74, 362, 650 and 939 inside `Canvas` > `Menu` > `Scroll View`, the tip drawn as the
+rightmost card); `custom-campaign-header` holds Back (x 21) then Options (x 1233). Screen
+name is the drawn title ("Community Campaigns"); focus starts on the first entry. An entry
+reads its title, "button", its description, then its status line - the card's own button text
+("DOWNLOAD CAMPAIGN") and, while a download runs, the installation line the card draws over
+itself - watched live.
+
+Escape: `CustomCampaignSelectMenuBehavior` registers no input callback at all, so the screen
+claims Back and presses the drawn Back button. Verified: `ui_back` answered `consumed` and
+the campaign menu returned.
+
+Diff: every before line is accounted for. The entry cards' descriptions moved out of the
+label into the status column (the before labels held an embedded newline, which is why those
+lines wrap in the raw file). The tip changed more: it was labelled with its sentence AND its
+button text, and is now labelled "Find More" with the sentence reading after the label, so
+its buffer reads button-then-sentence rather than sentence-then-button. Nothing missing.
+
+Deviations, measured: the tip is drawn as the fourth card of the same band, not as a control
+below it, so it is declared in the cards stop in its drawn place rather than after them; the
+tip has no title text of its own (only `DescriptionText` and a `Button`, measured), which is
+why it takes the button's text as its label while an entry takes its title;
+`AnnounceStatusChanged` is now empty - the detector still calls it, and the live-watched
+status part says what it used to say by hand.
+
+Follow-ups, not fixed: after a hot reload the resync builds the adapter with a null
+behaviour (`TryBuildActiveScreen`), which cannot find `_downloadTip`, so the Find More card
+disappears until the page is reopened (pre-existing, seen as "1 of 3" against "1 of 4");
+`CustomCampaignEntryAdapter.FocusNative` selects a card but nothing deselects the previous
+one, the same fault the campaign menu has.
+
+Manual test:
+
+1. Campaign menu, End, Enter on Community Campaigns. Hear "Community Campaigns", then
+   "Flame And Shadow, button", its description, then "DOWNLOAD CAMPAIGN".
+2. Down through the three entries to "Find More, button, If you're looking for more campaigns
+   please browse the user created mods."; Home and End; a letter searches the titles.
+3. Tab: "Back, button, 1 of 2"; Down: "Options, button, 2 of 2"; Enter opens the options
+   window and its Close returns you to Options.
+4. Escape: the campaign menu returns.
+5. With a download running, stand on that card: the changing installation line should be
+   spoken as it changes, without re-reading the whole card.
+
 ## Family B: dialogs
 
 ### MessageDialogScreen (representative; seven sources, three verified out of game)
