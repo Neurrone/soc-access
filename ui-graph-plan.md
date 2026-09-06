@@ -199,7 +199,9 @@ graph side of the mod.
   focus draws it). `ActedState` is the other half of the unavailable swallow: a control that
   refused an activation reports nothing afterwards. Every new factory takes the same
   cross-cutting parameters. `Radio` arrived with the random layout page (a set where exactly one
-  is in force and picking is not doing). Still to add: the sheet cell.
+  is in force and picking is not doing), and `DoNotDrawTooltip` with the settings forms (an edit
+  control keeps its tooltip in the buffer but must not have it DRAWN, because drawing selects the
+  component it hangs on and that takes the keyboard off the field). Still to add: the sheet cell.
 - `ui/ControlTypes.cs` — the role registry: `Button`, `Group`, `Text` (no role word),
   `EditField` ("editable"), `Checkbox` ("checkbox"), `Slider` ("slider"), `ComboBox`
   ("combo box"), `Tab` ("tab"), `RadioButton` ("radio button"). New
