@@ -843,3 +843,5 @@ Up/Down tells which is chosen; region "Win conditions" with the three checkboxes
 "Layout" with the combo box. Screen name = the drawn title ("Random maps"). On arrival the
 stop lands on the chosen card. Decision needed: this shape, or the cards kept choosing on
 arrival with "selected" read live.
+K decided (2026-09-06): explicit selection, no choosing on arrival; Enter chooses and says
+"selected"; the chosen card reads "selected" live.
