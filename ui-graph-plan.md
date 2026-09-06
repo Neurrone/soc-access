@@ -665,3 +665,10 @@ stop for the rest in drawn order. Escape measured; else Back.
 **I. `ChatScreen`.** The lobby chat window: the message field, Send, the history, Close. The
 field is the ES2 exception: Enter sends (the game's submit), the arriving line is the
 announcement.
+
+Owner answers (2026-09-06): always-drawn descriptions read after the label, as ES2 does; a
+dialog's input field keeps the game's submit on Enter (with the chat box, the second
+exception to the edit contract); the lobby's player rows are a table; the codex's categories
+and articles are ONE stop, a region per category with its articles as rows, Alt+Up/Down
+moving between categories (the adapter's `GetArticleGroups` already lists every category
+with its articles).
