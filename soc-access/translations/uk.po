@@ -475,6 +475,11 @@ msgctxt "UI.ExitedInspectMode"
 msgid "Exited inspect mode"
 msgstr "Режим огляду закрито"
 
+#. UI.Filters
+msgctxt "UI.Filters"
+msgid "Filters"
+msgstr "Фільтри"
+
 #. UI.Heading
 msgctxt "UI.Heading"
 msgid "{0} heading"
@@ -3768,6 +3773,11 @@ msgstr "поле зі списком"
 msgctxt "UI.RoleTab"
 msgid "tab"
 msgstr "вкладка"
+
+#. UI.RoleTable
+msgctxt "UI.RoleTable"
+msgid "table"
+msgstr "таблиця"
 
 #. UI.StatusNotChecked
 msgctxt "UI.StatusNotChecked"

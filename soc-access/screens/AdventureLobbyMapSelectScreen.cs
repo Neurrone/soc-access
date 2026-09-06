@@ -94,9 +94,12 @@ namespace SongsOfConquestAccess.Screens
             get { return _adapter != null ? _adapter.Title : null; }
         }
 
+        /// <summary>The filters, which is where the page starts: the table is the whole point of the
+        /// page, but a player arriving on it cannot tell that the list has been narrowed, and the
+        /// filters are drawn above the table.</summary>
         public override object InitialFocusStop
         {
-            get { return TableStop; }
+            get { return FiltersStop; }
         }
 
         public override bool IsPresent()
@@ -147,8 +150,13 @@ namespace SongsOfConquestAccess.Screens
 
         // ---- the filter buttons of the header band ----
 
+        /// <summary>The whole stop stands under one context named "Filters", which is what the path diff
+        /// says on the way in: the game draws no caption over the band, and a stop that opens with
+        /// "Type, group, collapsed" tells a player arriving from the table nothing about where they
+        /// are.</summary>
         private void BuildFilters(GraphBuilder builder)
         {
+            builder.PushContext(ModText.Get(ModStrings.UI.Filters));
             IReadOnlyList<MapSelectFilterAdapter> filters = _adapter.GetFilters();
             for (int i = 0; i < filters.Count; i++)
             {
@@ -174,6 +182,7 @@ namespace SongsOfConquestAccess.Screens
             }
 
             AddButton(builder, "map-select:clear-filters", _adapter.GetClearFiltersButton());
+            builder.PopContext();
         }
 
         private static void BuildFilterOptions(GraphBuilder builder, MapSelectFilterAdapter filter, int index)
@@ -358,6 +367,10 @@ namespace SongsOfConquestAccess.Screens
         /// crossed into it, with the caption and the value together as what the review buffer opens
         /// with - nobody arrives at a buffer across an edge. An empty cell reads the sheet's own blank
         /// word rather than being dropped, so the columns stay the same all the way down.
+        ///
+        /// EVERY CELL CARRIES THE ROW'S CLICK: a player reading across a map's size or player count and
+        /// pressing Enter means "this map", and having to walk back to the Name column first is a rule
+        /// the drawn table does not have - clicking anywhere on the row selects it.
         /// </summary>
         private static NodeVtable Cell(
             IReadOnlyList<string> captions,
@@ -377,6 +390,7 @@ namespace SongsOfConquestAccess.Screens
                 // One search result per map, whichever column the cursor is standing in.
                 SearchText = () => it.Name,
                 BufferHead = () => ModText.Get(ModStrings.Common.ListSeparator, caption(), text()),
+                OnActivate = () => it.Activate(),
             };
             GraphNodes.Aim(vtable, tooltip);
             return vtable;
@@ -416,10 +430,16 @@ namespace SongsOfConquestAccess.Screens
 
         /// <summary>
         /// The preview beside the table, as the one line it is: the map's name as the panel draws it,
-        /// then what it draws under it - the description and the win conditions it draws icons for -
-        /// as a section, which is read on arrival AND held in the review buffer one drawn line at a
-        /// time, a map's dossier running to a paragraph or more. The name is watched live, so the
-        /// panel being refilled under a standing cursor says which map it is now showing.
+        /// then the description it draws under it, read on arrival and held in the review buffer one
+        /// drawn line at a time, a map's dossier running to a paragraph or more. The name is watched
+        /// live, so the panel being refilled under a standing cursor says which map it is now showing.
+        ///
+        /// THE WIN CONDITIONS ARE NOT READ OUT. The panel draws them as ICONS whose words the game only
+        /// reveals on hover (<c>LobbyMapPreview</c> hangs each icon's <c>GameModes/*/Name</c> and
+        /// objective on it as a tooltip), so a sentence naming them is not something the page says: it
+        /// is buffer-only, where the player who wants it goes to look. The description, by contrast, is
+        /// drawn text (<c>LobbyMapPreviewText.GetInfo</c> reads the panel's own <c>_mpInfo</c> mesh) and
+        /// stays in the readout.
         /// </summary>
         private void BuildDetails(GraphBuilder builder)
         {
@@ -438,7 +458,8 @@ namespace SongsOfConquestAccess.Screens
                 },
                 Sections = new List<NodeSection>
                 {
-                    NodeSection.Composed(() => SpokenLines.Of(new[] { Description(), PreviewWinConditions() })),
+                    NodeSection.Composed(() => SpokenLines.Of(new[] { Description() })),
+                    NodeSection.Buffer(() => SpokenLines.Of(new[] { PreviewWinConditions() })),
                 },
             };
             builder.AddItem(new SyntheticNode(

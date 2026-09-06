@@ -455,6 +455,11 @@ msgctxt "UI.ExitedInspectMode"
 msgid "Exited inspect mode"
 msgstr "İnceleme modundan çıkıldı"
 
+#. UI.Filters
+msgctxt "UI.Filters"
+msgid "Filters"
+msgstr "Filtreler"
+
 #. UI.Heading
 msgctxt "UI.Heading"
 msgid "{0} heading"
@@ -3718,6 +3723,11 @@ msgstr "birleşik giriş kutusu"
 msgctxt "UI.RoleTab"
 msgid "tab"
 msgstr "sekme"
+
+#. UI.RoleTable
+msgctxt "UI.RoleTable"
+msgid "table"
+msgstr "tablo"
 
 #. UI.StatusNotChecked
 msgctxt "UI.StatusNotChecked"

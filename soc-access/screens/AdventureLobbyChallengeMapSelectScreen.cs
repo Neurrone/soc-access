@@ -206,7 +206,9 @@ namespace SongsOfConquestAccess.Screens
         }
 
         /// <summary>One read-only cell: the drawn value alone, the column's caption being spoken as
-        /// the edge crossed into it, with the caption and the value as the buffer's head.</summary>
+        /// the edge crossed into it, with the caption and the value as the buffer's head. Every cell
+        /// carries the row's click, as the map select table's do: Enter anywhere along a row means
+        /// that row.</summary>
         private static NodeVtable Cell(
             IReadOnlyList<string> captions,
             int column,
@@ -224,6 +226,7 @@ namespace SongsOfConquestAccess.Screens
                 Sections = GraphNodes.Sections(null, tooltip),
                 SearchText = () => it.Name,
                 BufferHead = () => ModText.Get(ModStrings.Common.ListSeparator, caption, text()),
+                OnActivate = () => it.Select(),
             };
             GraphNodes.Aim(vtable, tooltip);
             return vtable;

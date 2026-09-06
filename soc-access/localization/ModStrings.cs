@@ -447,6 +447,7 @@ namespace SongsOfConquestAccess.Localization
             public static readonly ModString Empty = new ModString("UI.Empty", "Empty");
             public static readonly ModString EmptyTroopSlot = new ModString("UI.EmptyTroopSlot", "Empty troop {0}");
             public static readonly ModString ExitedInspectMode = new ModString("UI.ExitedInspectMode", "Exited inspect mode");
+            public static readonly ModString Filters = new ModString("UI.Filters", "Filters");
             public static readonly ModString Heading = new ModString("UI.Heading", "{0} heading");
             public static readonly ModString Inspecting = new ModString("UI.Inspecting", "Inspecting {0}");
             public static readonly ModString InventoryGrid = new ModString("UI.InventoryGrid", "Inventory grid");
@@ -476,6 +477,7 @@ namespace SongsOfConquestAccess.Localization
             public static readonly ModString RoleRadioButton = new ModString("UI.RoleRadioButton", "radio button");
             public static readonly ModString RoleSlider = new ModString("UI.RoleSlider", "slider");
             public static readonly ModString RoleTab = new ModString("UI.RoleTab", "tab");
+            public static readonly ModString RoleTable = new ModString("UI.RoleTable", "table");
             public static readonly ModString ScannerPath = new ModString("UI.ScannerPath", "{0}, {1}. {2}");
             public static readonly ModString SearchCleared = new ModString("UI.SearchCleared", "Search cleared");
             public static readonly ModString SearchNoMatch = new ModString("UI.SearchNoMatch", "No match for {0}");

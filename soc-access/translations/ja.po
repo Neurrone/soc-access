@@ -455,6 +455,11 @@ msgctxt "UI.ExitedInspectMode"
 msgid "Exited inspect mode"
 msgstr "調査モードを終了しました"
 
+#. UI.Filters
+msgctxt "UI.Filters"
+msgid "Filters"
+msgstr "フィルター"
+
 #. UI.Heading
 msgctxt "UI.Heading"
 msgid "{0} heading"
@@ -3718,6 +3723,11 @@ msgstr "コンボボックス"
 msgctxt "UI.RoleTab"
 msgid "tab"
 msgstr "タブ"
+
+#. UI.RoleTable
+msgctxt "UI.RoleTable"
+msgid "table"
+msgstr "テーブル"
 
 #. UI.StatusNotChecked
 msgctxt "UI.StatusNotChecked"

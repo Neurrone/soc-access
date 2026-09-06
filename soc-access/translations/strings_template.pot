@@ -1979,6 +1979,11 @@ msgctxt "UI.ExitedInspectMode"
 msgid "Exited inspect mode"
 msgstr ""
 
+#. UI.Filters
+msgctxt "UI.Filters"
+msgid "Filters"
+msgstr ""
+
 #. UI.Heading
 msgctxt "UI.Heading"
 msgid "{0} heading"
@@ -2122,6 +2127,11 @@ msgstr ""
 #. UI.RoleTab
 msgctxt "UI.RoleTab"
 msgid "tab"
+msgstr ""
+
+#. UI.RoleTable
+msgctxt "UI.RoleTable"
+msgid "table"
 msgstr ""
 
 #. UI.ScannerPath

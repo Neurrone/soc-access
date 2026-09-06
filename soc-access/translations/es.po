@@ -455,6 +455,11 @@ msgctxt "UI.ExitedInspectMode"
 msgid "Exited inspect mode"
 msgstr "Modo de inspección cerrado"
 
+#. UI.Filters
+msgctxt "UI.Filters"
+msgid "Filters"
+msgstr "Filtros"
+
 #. UI.Heading
 msgctxt "UI.Heading"
 msgid "{0} heading"
@@ -3743,6 +3748,11 @@ msgstr "cuadro combinado"
 msgctxt "UI.RoleTab"
 msgid "tab"
 msgstr "pestaña"
+
+#. UI.RoleTable
+msgctxt "UI.RoleTable"
+msgid "table"
+msgstr "tabla"
 
 #. UI.StatusNotChecked
 msgctxt "UI.StatusNotChecked"

@@ -77,7 +77,9 @@ namespace SongsOfConquestAccess.UI
             GraphAnnouncer.ExpandedStateText = expanded =>
                 ModText.Get(expanded ? ModStrings.UI.StatusExpanded : ModStrings.UI.StatusCollapsed);
             GraphSheet.BlankText = () => ModText.Get(ModStrings.UI.Blank);
-            GraphSheet.TableRoleText = () => ModText.Get(ModStrings.UI.RoleGrid);
+            // "table", the word ES2 uses, not the widget tree's "grid": a sheet is a table of rows and
+            // columns, and a grid is the map. RoleGrid stays where the widget screens still say it.
+            GraphSheet.TableRoleText = () => ModText.Get(ModStrings.UI.RoleTable);
             GraphSheet.TextCellType = ControlTypes.Text;
         }
 
