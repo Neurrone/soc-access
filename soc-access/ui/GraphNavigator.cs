@@ -870,7 +870,7 @@ namespace SongsOfConquestAccess.UI
         private void SyncVisual(GraphNode node)
         {
             object aim = Aim(node);
-            if (_visualKey != null && _visualKey.Equals(node.Id) && ReferenceEquals(aim, _visualAim))
+            if (_visualKey != null && _visualKey.Equals(node.Id) && SameAim(aim, _visualAim))
             {
                 return;
             }
@@ -909,6 +909,39 @@ namespace SongsOfConquestAccess.UI
             _visualKey = null;
             _visualNode = null;
             _visualAim = null;
+        }
+
+        // Whether two aims point the game at the same thing. A screen builds a fresh Tooltip object on
+        // every rebuild, so two aims are the same when what they DRAW is the same: the component the
+        // native tooltip is read from, at the same anchor, or the same map tooltip at the same point.
+        // Compared by reference alone, every frame looked like a new aim and the visual was torn down
+        // and re-drawn while the cursor stood still.
+        private static bool SameAim(object a, object b)
+        {
+            if (ReferenceEquals(a, b))
+            {
+                return true;
+            }
+
+            Tooltip x = a as Tooltip;
+            Tooltip y = b as Tooltip;
+            if (x == null || y == null)
+            {
+                return false;
+            }
+
+            VisualTooltipMetadata m = x.VisualMetadata;
+            VisualTooltipMetadata n = y.VisualMetadata;
+            if (m == null || n == null)
+            {
+                return m == null && n == null;
+            }
+
+            return ReferenceEquals(m.Component, n.Component)
+                && ReferenceEquals(m.Anchor, n.Anchor)
+                && ReferenceEquals(m.MapTooltipable, n.MapTooltipable)
+                && m.IsMapTooltip == n.IsMapTooltip
+                && m.ScreenPoint == n.ScreenPoint;
         }
 
         private static object Aim(GraphNode node)

@@ -33,5 +33,24 @@ namespace SongsOfConquestAccess.Input
             TMP_InputField field = selected.GetComponent<TMP_InputField>();
             return field != null && field.isFocused;
         }
+
+        /// <summary>Take the keyboard back from a field the GAME focused on its own (a lobby's game
+        /// code box, a host popup's name box, selected by the game as the page opens). Left alone, the
+        /// mod would stand down until the player found Escape; instead the field is deactivated and
+        /// deselected as the mod's screen takes focus, and the field is reached again through its
+        /// own edit node. Never called while a mod editor holds a handover.</summary>
+        public static void Release()
+        {
+            EventSystem events = EventSystem.current;
+            GameObject selected = events == null ? null : events.currentSelectedGameObject;
+            TMP_InputField field = selected == null ? null : selected.GetComponent<TMP_InputField>();
+            if (field == null || !field.isFocused)
+            {
+                return;
+            }
+
+            field.DeactivateInputField();
+            events.SetSelectedGameObject(null);
+        }
     }
 }

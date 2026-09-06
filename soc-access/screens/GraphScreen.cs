@@ -112,6 +112,12 @@ namespace SongsOfConquestAccess.Screens
             }
 
             navigator.Attach(this);
+            // A field the game focused on its own as the page opened would keep every key from the mod.
+            if (!CapturesRawInput)
+            {
+                GameTextFocus.Release();
+            }
+
             string name = ScreenName;
             if (!string.IsNullOrEmpty(name))
             {

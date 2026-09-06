@@ -955,3 +955,20 @@ repo's rule against `SpeechTextSanitizer.Normalize` stands: that normaliser coll
 newlines before anything can split on them. Verified: no `<` in any buffer line of the
 seven Options tabs after the change. Manual test: on a lobby's faction list, Ctrl+Down
 through the buffer of an entry; the description must read as sentences, with no tag names.
+
+### Three adapter rules from the forms (all graph screens)
+
+- The focus visual is re-drawn only when what it draws changes: `GraphNavigator.SameAim`
+  compares two tooltips by the component, anchor or map tooltip they point at, not by
+  reference, since every rebuild makes a fresh `Tooltip` object. Before this the native
+  tooltip was torn down and re-drawn every frame under a standing cursor, which is what the
+  edit-field rule ("an edit row's tooltip is not drawn") worked around.
+- A field the GAME focuses on its own as a page opens (the online lobby's game code, the
+  game settings name, the host popup's name) is released as the graph screen takes focus
+  (`GameTextFocus.Release`, called from `GraphScreen.OnFocus` unless a handover is pending),
+  so the mod's keys work on arrival and the field is reached through its own edit node.
+- The stand-down applies on graph screens only until phase G: a widget screen's text input
+  focuses the game's field itself and relies on the mod's Tab staying live to leave it, and
+  with the stand-down live there the lobby's game code field trapped every key (seen on the
+  widget lobby page after activating "Copy game code"). Manual test: on the online lobby
+  (still a widget page), Tab past the game code and type nothing; the mod must keep answering.

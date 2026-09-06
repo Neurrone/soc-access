@@ -94,7 +94,7 @@ namespace SongsOfConquestAccess.Input
 
             // The stand-down: while the game's own field has the keyboard, the character is that
             // field's and is never a search.
-            if (GameTextFocus.IsTyping())
+            if (StandingDown())
             {
                 return;
             }
@@ -129,6 +129,15 @@ namespace SongsOfConquestAccess.Input
 
             GraphScreen screen = TypingScreen();
             return screen != null && screen.Navigator != null && screen.Navigator.TakesTypedKey(key);
+        }
+
+        // The stand-down applies on GRAPH screens only until the widget engine is gone: a widget
+        // screen's text input focuses the game's field itself on arrival and relies on the mod's own
+        // keys (Tab to the next widget) staying live to leave it again, so silencing the layer there
+        // would turn every remaining widget-era field into a trap.
+        private bool StandingDown()
+        {
+            return GameTextFocus.IsTyping() && _screenManager != null && _screenManager.CurrentScreen is GraphScreen;
         }
 
         private GraphScreen TypingScreen()
@@ -200,7 +209,7 @@ namespace SongsOfConquestAccess.Input
 
                 // The same stand-down a physical key meets, so the dev server sees what the player
                 // would: while the game's field has the keyboard, the mod answers nothing.
-                if (GameTextFocus.IsTyping())
+                if (StandingDown())
                 {
                     injection.Outcome = "standing down";
                     return;
@@ -307,7 +316,7 @@ namespace SongsOfConquestAccess.Input
             // THE STAND-DOWN, before any claim is even asked. A game text field with the keyboard owns
             // every key while it has it - the letters, the arrows walking the caret, the Backspace -
             // so the whole layer goes quiet rather than picking which keys to leave alone.
-            if (GameTextFocus.IsTyping())
+            if (StandingDown())
             {
                 return false;
             }
