@@ -13,6 +13,7 @@ using SongsOfConquest.Client.Settings;
 using SongsOfConquest.Client.UI;
 using SongsOfConquest.Common.Localization;
 using SongsOfConquestAccess.Adapters;
+using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 using Zenject;
@@ -296,6 +297,7 @@ namespace SongsOfConquestAccess.UI
         {
             IUITextMeshInputField field = _controller.AddInputField(label, value ?? string.Empty, changed);
             ClearTooltip(field);
+            ClearPlaceholder(field);
             return field;
         }
 
@@ -309,9 +311,25 @@ namespace SongsOfConquestAccess.UI
             return _controller.AddSimpleText(text);
         }
 
+        /// <summary>
+        /// Start a row of controls drawn side by side. Only ever TWO of them: a toggle is a
+        /// full-width row with its box at the right, and four controls in one layout gave each
+        /// toggle 381 px of a 486 px column and squeezed both buttons to nothing (measured
+        /// 2026-09-07). The game itself only ever puts two buttons in one.
+        ///
+        /// The layout is marked as a scroll parent, because <c>AutoScrollToSelected.SearchTransform</c>
+        /// walks only the DIRECT children of the content column unless a child carries
+        /// <c>AutoScrollParent</c> - so without this a control inside a row is one the panel will
+        /// never scroll to, and the cursor lands on a Confirm the player cannot see.
+        /// </summary>
         public void StartRow()
         {
-            _controller.StartHorizontalLayout();
+            IUITransform layout = _controller.StartHorizontalLayout();
+            Transform transform = layout != null ? layout.MonoTransform : null;
+            if (transform != null && transform.GetComponent<AutoScrollParent>() == null)
+            {
+                transform.gameObject.AddComponent<AutoScrollParent>();
+            }
         }
 
         public void EndRow()
@@ -490,6 +508,19 @@ namespace SongsOfConquestAccess.UI
         }
 
         // ---- odds and ends ----
+
+        /// <summary>Take the prefab's design-time placeholder ("XXXXXXXXXX") off an empty box, which
+        /// is otherwise what an empty keyword field draws.</summary>
+        private static void ClearPlaceholder(IUITextMeshInputField field)
+        {
+            Component component = field as Component;
+            TMP_InputField input = component != null ? component.GetComponentInChildren<TMP_InputField>(true) : null;
+            TMP_Text placeholder = input != null ? input.placeholder as TMP_Text : null;
+            if (placeholder != null)
+            {
+                placeholder.text = string.Empty;
+            }
+        }
 
         private static void ClearTooltip(IUITransform control)
         {

@@ -1225,6 +1225,11 @@ msgctxt "Screens.AddCustomCategory"
 msgid "Add custom category"
 msgstr "新增自訂類別"
 
+#. Screens.Add
+msgctxt "Screens.Add"
+msgid "Add"
+msgstr "新增"
+
 #. Screens.AddKeyword
 msgctxt "Screens.AddKeyword"
 msgid "Add keyword"
@@ -3682,6 +3687,11 @@ msgstr "{0}，已指派給{1}"
 msgctxt "Screens.CustomCategoryKeyTitle"
 msgid "Key for {0}"
 msgstr "{0}的按鍵"
+
+#. Screens.CustomCategoryName
+msgctxt "Screens.CustomCategoryName"
+msgid "Name"
+msgstr "名稱"
 
 #. Screens.CustomCategoryNameTaken
 msgctxt "Screens.CustomCategoryNameTaken"

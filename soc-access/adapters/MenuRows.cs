@@ -40,6 +40,7 @@ namespace SongsOfConquestAccess.Adapters
 
             List<MenuRow> items = new List<MenuRow>();
             AddTexts(items, factory);
+            AddInputs(items, factory);
             AddDropdowns(items, factory);
             AddToggles(items, factory);
             AddSliders(items, factory);
@@ -86,6 +87,31 @@ namespace SongsOfConquestAccess.Adapters
                         "options-text-" + i,
                         () => SpeechTextSanitizer.Normalize(UITextMeshTextUtility.GetEffectiveText(text)),
                         () => IsActive(component))));
+            }
+        }
+
+        private static void AddInputs(List<MenuRow> items, IMenuFactoryCollection factory)
+        {
+            List<IUITextMeshInputField> fields = new List<IUITextMeshInputField>();
+            factory.GetCreatedTextMeshInputFields(fields);
+            for (int i = 0; i < fields.Count; i++)
+            {
+                IUITextMeshInputField field = fields[i];
+                Component component = field as Component;
+                if (component == null)
+                {
+                    continue;
+                }
+
+                items.Add(new MenuRow(
+                    component.transform,
+                    new MenuRowInput(
+                        "options-input-" + i,
+                        () => InputLabel(field),
+                        () => field,
+                        () => field.Active && field.Interactable,
+                        () => IsActive(component),
+                        () => Tooltip.ForComponent(InputTextMesh(field) ?? component, null))));
             }
         }
 
@@ -261,6 +287,29 @@ namespace SongsOfConquestAccess.Adapters
         private static Component SliderTextMesh(IUISlider slider)
         {
             return SliderText.Of(slider) as Component;
+        }
+
+        private static string InputLabel(IUITextMeshInputField field)
+        {
+            IUITextMesh textMesh = InputTextMesh(field) as IUITextMesh;
+            if (textMesh != null)
+            {
+                string text = SpeechTextSanitizer.Normalize(UITextMeshTextUtility.GetEffectiveText(textMesh));
+                if (!string.IsNullOrWhiteSpace(text))
+                {
+                    return text;
+                }
+            }
+
+            return SpeechTextSanitizer.Normalize(field != null ? field.Text : null);
+        }
+
+        /// <summary>An input field's own label mesh - the field draws its caption beside the box, and
+        /// <c>GetTextMeshPro</c> answers with that rather than with the box's text.</summary>
+        private static Component InputTextMesh(IUITextMeshInputField field)
+        {
+            UITextMeshInputField concrete = field as UITextMeshInputField;
+            return concrete != null ? concrete.GetTextMeshPro() : null;
         }
 
         private static string DropdownLabel(IUITextMeshDropdown dropdown)
@@ -534,6 +583,28 @@ namespace SongsOfConquestAccess.Adapters
         public Func<string> GetLabel { get; private set; }
         public Func<bool> Activate { get; private set; }
         public Action Focus { get; private set; }
+        public Func<bool> IsEnabled { get; private set; }
+        public Func<bool> IsVisible { get; private set; }
+        public Func<Tooltip> GetTooltip { get; private set; }
+    }
+
+    /// <summary>A text box the form draws. The field itself is handed over, because taking the
+    /// keyboard is the game's own affair and the mod's editor drives it directly.</summary>
+    public sealed class MenuRowInput
+    {
+        public MenuRowInput(string id, Func<string> getLabel, Func<IUITextMeshInputField> getField, Func<bool> isEnabled, Func<bool> isVisible, Func<Tooltip> getTooltip)
+        {
+            Id = id;
+            GetLabel = getLabel;
+            GetField = getField;
+            IsEnabled = isEnabled;
+            IsVisible = isVisible;
+            GetTooltip = getTooltip;
+        }
+
+        public string Id { get; private set; }
+        public Func<string> GetLabel { get; private set; }
+        public Func<IUITextMeshInputField> GetField { get; private set; }
         public Func<bool> IsEnabled { get; private set; }
         public Func<bool> IsVisible { get; private set; }
         public Func<Tooltip> GetTooltip { get; private set; }

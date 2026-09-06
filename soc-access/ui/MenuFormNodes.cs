@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using SongsOfConquestAccess.Adapters;
+using SongsOfConquest.Client.UI;
 using SongsOfConquestAccess.Screens;
 using SongsOfConquestAccess.UI.Graph;
 using UnityEngine;
@@ -36,6 +37,15 @@ namespace SongsOfConquestAccess.UI
         {
             _prefix = prefix;
         }
+
+        /// <summary>The editor behind this form's text boxes, so the screen can answer whether it is
+        /// holding the game's keyboard.</summary>
+        public GameTextEditor Editor
+        {
+            get { return _editor; }
+        }
+
+        private readonly GameTextEditor _editor = new GameTextEditor();
 
         public void BuildRows(GraphBuilder builder, IReadOnlyList<MenuRow> controls)
         {
@@ -177,6 +187,33 @@ namespace SongsOfConquestAccess.UI
                     dropdown.GetTooltip());
                 vtable.OnFocusVisual = dropdown.Focus;
                 builder.AddItem(new DrawnNode(ControlId.For(subject, _prefix + ":row/" + dropdown.Id), vtable, subject));
+                return;
+            }
+
+            MenuRowInput input = item as MenuRowInput;
+            if (input != null)
+            {
+                if (!input.IsVisible())
+                {
+                    return;
+                }
+
+                // The game's own text box: activating it is the request for the keyboard, and the
+                // value reports nothing while the game holds it, because the echo is already
+                // speaking the keys. The tooltip stays in the buffer but is never DRAWN: drawing it
+                // selects the component it hangs on, which takes the keyboard off the field.
+                NodeVtable vtable = GraphNodes.EditField(
+                    input.GetLabel,
+                    () =>
+                    {
+                        IUITextMeshInputField field = input.GetField();
+                        return field == null || Editor.Editing ? null : field.InputFieldValue;
+                    },
+                    () => Editor.Request(input.GetField()),
+                    input.IsEnabled,
+                    input.GetTooltip());
+                GraphNodes.DoNotDrawTooltip(vtable);
+                builder.AddItem(new DrawnNode(ControlId.For(subject, _prefix + ":row/" + input.Id), vtable, subject));
                 return;
             }
 

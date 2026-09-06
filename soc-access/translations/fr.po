@@ -1235,6 +1235,11 @@ msgctxt "Screens.AddCustomCategory"
 msgid "Add custom category"
 msgstr "Ajouter une catégorie personnalisée"
 
+#. Screens.Add
+msgctxt "Screens.Add"
+msgid "Add"
+msgstr "Ajouter"
+
 #. Screens.AddKeyword
 msgctxt "Screens.AddKeyword"
 msgid "Add keyword"
@@ -3707,6 +3712,11 @@ msgstr "{0}, attribuée à {1}"
 msgctxt "Screens.CustomCategoryKeyTitle"
 msgid "Key for {0}"
 msgstr "Touche pour {0}"
+
+#. Screens.CustomCategoryName
+msgctxt "Screens.CustomCategoryName"
+msgid "Name"
+msgstr "Nom"
 
 #. Screens.CustomCategoryNameTaken
 msgctxt "Screens.CustomCategoryNameTaken"

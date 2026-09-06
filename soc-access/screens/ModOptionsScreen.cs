@@ -254,33 +254,20 @@ namespace SongsOfConquestAccess.Screens
                 ModText.Get(ModStrings.Screens.PlayTileSoundCues),
                 ModSettings.TileCuesEnabled,
                 ModSettings.SetTileCuesEnabled);
-            _dialog.AddButton(ModText.Get(ModStrings.Screens.AudioGlossary), OpenAudioGlossary);
+            _dialog.AddButton(ModText.Get(ModStrings.Screens.AudioGlossary), ModOptionsDialogs.OpenAudioGlossary);
         }
 
         private void AddAnnouncementOrder(ModString label, AnnouncementGroupDefinition group)
         {
-            _dialog.AddButton(ModText.Get(label), () => Push(new AnnouncementOrderScreen(group), "announcement order screen opened"));
+            _dialog.AddButton(ModText.Get(label), () => ModOptionsDialogs.OpenAnnouncementOrder(group));
         }
 
         private void AddCustomCategories(ScannerTaxonomy taxonomy, ModString contextLabel)
         {
             _dialog.AddButton(
                 ModText.Get(ModStrings.Screens.CustomCategories, ModText.Get(contextLabel)),
-                () => Push(new ScannerCustomCategoriesScreen(taxonomy, contextLabel), "scanner custom categories screen opened"));
+                () => ModOptionsDialogs.OpenCustomCategories(taxonomy, contextLabel));
         }
 
-        private static void OpenAudioGlossary()
-        {
-            Push(new AudioGlossaryScreen(), "audio glossary screen opened");
-        }
-
-        private static void Push(Screen screen, string reason)
-        {
-            ScreenManager manager = SocAccessMod.Instance != null ? SocAccessMod.Instance.ScreenManager : null;
-            if (manager != null)
-            {
-                manager.Push(screen, reason);
-            }
-        }
     }
 }

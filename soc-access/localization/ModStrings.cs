@@ -511,6 +511,7 @@ namespace SongsOfConquestAccess.Localization
         {
             public static readonly ModString AdventureMap = new ModString("Screens.AdventureMap", "Adventure map");
             public static readonly ModString AddCustomCategory = new ModString("Screens.AddCustomCategory", "Add custom category");
+            public static readonly ModString Add = new ModString("Screens.Add", "Add");
             public static readonly ModString AddKeyword = new ModString("Screens.AddKeyword", "Add keyword");
             public static readonly ModString AmountToUpgrade = new ModString("Screens.AmountToUpgrade", "Amount to upgrade, {0}");
             public static readonly ModString ArcanaSpells = new ModString("Screens.ArcanaSpells", "Arcana spells");
@@ -553,6 +554,7 @@ namespace SongsOfConquestAccess.Localization
             public static readonly ModString CustomCategoryKeyCurrent = new ModString("Screens.CustomCategoryKeyCurrent", "{0}, current");
             public static readonly ModString CustomCategoryKeyHeldBy = new ModString("Screens.CustomCategoryKeyHeldBy", "{0}, held by {1}");
             public static readonly ModString CustomCategoryKeyTitle = new ModString("Screens.CustomCategoryKeyTitle", "Key for {0}");
+            public static readonly ModString CustomCategoryName = new ModString("Screens.CustomCategoryName", "Name");
             public static readonly ModString CustomCategoryNameTaken = new ModString("Screens.CustomCategoryNameTaken", "{0} is already the name of a category");
             public static readonly ModString DeleteCustomCategory = new ModString("Screens.DeleteCustomCategory", "Delete this custom category");
             public static readonly ModString CancelAbility = new ModString("Screens.CancelAbility", "Cancel ability");

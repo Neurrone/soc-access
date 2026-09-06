@@ -202,6 +202,25 @@ namespace SongsOfConquestAccess
             SaveAndInvalidateCue(cueKey);
         }
 
+        /// <summary>Everything the cue dialog can change about one cue, taken as a value so leaving
+        /// the dialog without confirming can put it back.</summary>
+        public static CueTuning SnapshotCue(string cueKey)
+        {
+            return new CueTuning(
+                GetCueEnabled(cueKey),
+                GetCueVolume(cueKey),
+                GetCuePitchSemitones(cueKey),
+                GetCueDurationScale(cueKey));
+        }
+
+        public static void RestoreCue(string cueKey, CueTuning tuning)
+        {
+            SetCueEnabled(cueKey, tuning.Enabled);
+            SetCueVolume(cueKey, tuning.Volume);
+            SetCuePitchSemitones(cueKey, tuning.PitchSemitones);
+            SetCueDurationScale(cueKey, tuning.DurationScale);
+        }
+
         public static void ResetCue(string cueKey)
         {
             AudioCueConfig config = GetAudioCueConfig(cueKey);
@@ -479,6 +498,32 @@ namespace SongsOfConquestAccess
         public static bool RemoveScannerCustomCategoryKeyword(string taxonomyKey, int id, string keyword)
         {
             return MutateScannerCustomCategory(taxonomyKey, id, category => category.RemoveKeyword(keyword));
+        }
+
+        /// <summary>
+        /// One taxonomy's custom categories as the one string they are stored as, and putting that
+        /// string back.
+        ///
+        /// The category dialogs edit a category in place, as the menus they replace did, so Cancel
+        /// has to be able to undo a name, a key, a set of subcategories and a list of keywords at
+        /// once. The stored form already says all of that, so the snapshot is the stored form.
+        /// </summary>
+        public static string SnapshotScannerCustomCategories(string taxonomyKey)
+        {
+            return ScannerCustomCategoryCodec.Encode(GetScannerCustomCategoryList(taxonomyKey));
+        }
+
+        public static bool RestoreScannerCustomCategories(string taxonomyKey, string snapshot)
+        {
+            ScannerCustomCategoryConfig config = GetScannerCustomCategoryConfig(taxonomyKey);
+            if (config == null)
+            {
+                return false;
+            }
+
+            config.List = ScannerCustomCategoryCodec.Decode(snapshot);
+            SaveScannerCustomCategories(taxonomyKey, config.List);
+            return true;
         }
 
         public static void Reset()

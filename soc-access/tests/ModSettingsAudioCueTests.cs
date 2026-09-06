@@ -64,6 +64,27 @@ namespace SongsOfConquestAccess.Tests
             Assert.AreEqual(ModSettings.CueDurationScaleMinimum, ModSettings.GetCueDurationScale(CueLibrary.TerrainRoad));
         }
 
+        /// <summary>The cue dialog writes every change as the player listens, so Cancel has to be
+        /// able to put the whole tuning back.</summary>
+        [TestMethod]
+        public void SnapshotAndRestorePutTheWholeTuningBack()
+        {
+            ModSettings.SetCueVolume(CueLibrary.TerrainRoad, 45);
+            ModSettings.SetCuePitchSemitones(CueLibrary.TerrainRoad, 3);
+            CueTuning snapshot = ModSettings.SnapshotCue(CueLibrary.TerrainRoad);
+
+            ModSettings.SetCueEnabled(CueLibrary.TerrainRoad, false);
+            ModSettings.SetCueVolume(CueLibrary.TerrainRoad, 90);
+            ModSettings.SetCuePitchSemitones(CueLibrary.TerrainRoad, -8);
+            ModSettings.SetCueDurationScale(CueLibrary.TerrainRoad, 200);
+            ModSettings.RestoreCue(CueLibrary.TerrainRoad, snapshot);
+
+            Assert.IsTrue(ModSettings.GetCueEnabled(CueLibrary.TerrainRoad));
+            Assert.AreEqual(45, ModSettings.GetCueVolume(CueLibrary.TerrainRoad));
+            Assert.AreEqual(3, ModSettings.GetCuePitchSemitones(CueLibrary.TerrainRoad));
+            Assert.AreEqual(ModSettings.CueDurationScaleDefault, ModSettings.GetCueDurationScale(CueLibrary.TerrainRoad));
+        }
+
         [TestMethod]
         public void ResetCueRestoresDefaults()
         {

@@ -1225,6 +1225,11 @@ msgctxt "Screens.AddCustomCategory"
 msgid "Add custom category"
 msgstr "カスタムカテゴリを追加"
 
+#. Screens.Add
+msgctxt "Screens.Add"
+msgid "Add"
+msgstr "追加"
+
 #. Screens.AddKeyword
 msgctxt "Screens.AddKeyword"
 msgid "Add keyword"
@@ -3682,6 +3687,11 @@ msgstr "{0}、{1}が使用中"
 msgctxt "Screens.CustomCategoryKeyTitle"
 msgid "Key for {0}"
 msgstr "{0}のキー"
+
+#. Screens.CustomCategoryName
+msgctxt "Screens.CustomCategoryName"
+msgid "Name"
+msgstr "名前"
 
 #. Screens.CustomCategoryNameTaken
 msgctxt "Screens.CustomCategoryNameTaken"
