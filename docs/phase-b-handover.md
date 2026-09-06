@@ -139,6 +139,46 @@ Manual test:
 5. With a download running, stand on that card: the changing installation line should be
    spoken as it changes, without re-reading the whole card.
 
+### AdventureLobbyMapTypeScreen
+
+Built: two stops. `map-type-cards` holds the map-type cards sorted by measured left edge
+every build (2026-09-06 at 1280x800: x 221, 510 and 799 inside `MapTypeMenu` > `Container`,
+Conquest maps, Challenge maps, Random maps); `map-type-header` holds Back ("Main Menu", x 21,
+on the lobby scene's own header) then Options (x 1233, on the main menu's `UtilityButtons`).
+Screen name is the drawn title ("Map type"); focus starts on the first card. A card reads its
+name and sub-header, "button", then its description.
+
+Escape: neither `MapTypeMenu` nor `LobbyNavigation` registers an input callback -
+`LobbyNavigation` only subscribes to the sub-menus' own `OnCancel` events - so the screen
+claims Back and presses the drawn Back button. Verified: `ui_back` answered `consumed` and the
+main menu came back through the scene change with nothing stray spoken.
+
+Diff: exactly the three card lines changed, the description having moved out of the label
+into the status column (and into a buffer line of its own); Main Menu and Options unchanged;
+nothing missing.
+
+Deviations, measured: the adapter declares Challenge last while the page draws it in the
+middle, so the drawn-order sort is doing real work here rather than confirming the
+declaration; the card's label is name then sub-header ("Conquest maps. Handcrafted maps")
+although the page draws the sub-header above the name, which is the order the widget screen
+already read and the order that names the card first. `MapTypeMenuButtonAdapter` became
+public and gained `GetDescription()`, and its `BuildLabel()` dropped the third text part; the
+three card properties are typed as it rather than as `IMenuButtonAdapter`.
+
+Follow-ups, not fixed: nothing hovers a card out again, so the previously focused card stays
+raised (the family's shared fault); the online variant of the page (two cards) was not opened
+in this session, and is served by the same build only because the cards are read off what is
+drawn.
+
+Manual test:
+
+1. Main menu, Conquest. Hear "Map type", then "Conquest maps. Handcrafted maps, button",
+   then its description.
+2. Down through the three cards; Home and End; a letter searches the card names.
+3. Tab: "Main Menu, button, 1 of 2"; Down: "Options, button, 2 of 2"; Shift+Tab returns.
+4. Enter on Conquest maps opens the map select page (still a widget screen); its Back returns.
+5. Escape: the main menu returns after the scene change, with nothing stray spoken.
+
 ## Family B: dialogs
 
 ### MessageDialogScreen (representative; seven sources, three verified out of game)

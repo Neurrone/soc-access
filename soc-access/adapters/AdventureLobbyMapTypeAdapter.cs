@@ -58,11 +58,11 @@ namespace SongsOfConquestAccess.Adapters
             get { return _menu; }
         }
 
-        public IMenuButtonAdapter AllMapsButton { get; private set; }
+        public MapTypeMenuButtonAdapter AllMapsButton { get; private set; }
 
-        public IMenuButtonAdapter RandomMapsButton { get; private set; }
+        public MapTypeMenuButtonAdapter RandomMapsButton { get; private set; }
 
-        public IMenuButtonAdapter ChallengeMapsButton { get; private set; }
+        public MapTypeMenuButtonAdapter ChallengeMapsButton { get; private set; }
 
         public IMenuButtonAdapter BackButton { get; private set; }
 
@@ -109,7 +109,7 @@ namespace SongsOfConquestAccess.Adapters
             return manager != null ? MainMenuSettingsRef(manager) : null;
         }
 
-        private static IMenuButtonAdapter CreateButton(UIButton button)
+        private static MapTypeMenuButtonAdapter CreateButton(UIButton button)
         {
             return new MapTypeMenuButtonAdapter(
                 button,
@@ -160,7 +160,15 @@ namespace SongsOfConquestAccess.Adapters
             return loader != null && loader.CurrentlyLoadedScene == sceneType;
         }
 
-        private sealed class MapTypeMenuButtonAdapter : MenuButtonAdapterBase
+        /// <summary>
+        /// One of the three map-type cards. The card draws three pieces of text and the toolkit
+        /// hands them over in drawn order: the sub-header first ("Handcrafted maps", drawn above the
+        /// name at y 229), then the name ("Conquest maps", y 272), then the description (y 332,
+        /// measured 2026-09-06 at 1280x800). The name is what the card is called, so it leads;
+        /// the description is a separate fact, because it is always drawn and a screen decides where
+        /// in a readout it belongs.
+        /// </summary>
+        public sealed class MapTypeMenuButtonAdapter : MenuButtonAdapterBase
         {
             public MapTypeMenuButtonAdapter(
                 UIButton button,
@@ -168,6 +176,13 @@ namespace SongsOfConquestAccess.Adapters
                 System.Func<bool> activate)
                 : base(button, isVisible, activate)
             {
+            }
+
+            /// <summary>The paragraph the card draws under its name, apart from the name itself.</summary>
+            public string GetDescription()
+            {
+                List<string> visibleParts = MenuButtonTextUtility.GetAllVisibleTextParts(Button);
+                return visibleParts.Count == 3 ? visibleParts[2] : string.Empty;
             }
 
             protected override string BuildLabel()
@@ -178,8 +193,7 @@ namespace SongsOfConquestAccess.Adapters
                     return string.Join(". ", new string[]
                     {
                         visibleParts[1],
-                        visibleParts[0],
-                        visibleParts[2]
+                        visibleParts[0]
                     });
                 }
 
