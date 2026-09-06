@@ -418,7 +418,7 @@ namespace SongsOfConquestAccess.Screens
 
             if (action.Key == AccessibilityActions.OpenModSettings.Key)
             {
-                return !(CurrentScreen is ModSettingsScreen);
+                return !(CurrentScreen is ModOptionsScreen);
             }
 
             if (action.Key == AccessibilityActions.SummarizeResources.Key)

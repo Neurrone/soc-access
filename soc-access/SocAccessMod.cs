@@ -121,6 +121,7 @@ namespace SongsOfConquestAccess
             Step("coroutines", _host.StopAllCoroutines);
             Step("main menu waits", MainMenuPatches.Reset);
             Step("mod options entries", Adapters.ModOptionsEntries.Remove);
+            Step("mod dialogs", UI.ModDialog.CloseAll);
             Step("screens", () => _screenManager?.Clear());
             Step("drop list", Screens.DropListScreen.Reset);
             Step("graph navigator", () =>
@@ -192,16 +193,7 @@ namespace SongsOfConquestAccess
         /// options" means and both routes change together.</summary>
         public bool OpenModOptions()
         {
-            ScreenManager manager = _screenManager;
-            if (manager == null || manager.CurrentScreen is ModSettingsScreen)
-            {
-                return false;
-            }
-
-            manager.Push(
-                new ModSettingsScreen(() => manager.Pop<ModSettingsScreen>("mod settings closed")),
-                "mod settings opened");
-            return true;
+            return ModOptionsScreen.Open();
         }
 
         private void Update()

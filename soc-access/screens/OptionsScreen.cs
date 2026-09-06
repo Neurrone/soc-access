@@ -47,17 +47,14 @@ namespace SongsOfConquestAccess.Screens
         private const string RowsStop = "options-rows";
         private const string ButtonsStop = "options-buttons";
 
-        /// <summary>How many fine steps one coarse slider step is worth.</summary>
-        private const int CoarseSteps = 10;
-
         private static readonly PropertyInfo InstallerContainerProperty =
             AccessTools.Property(typeof(OptionsMenuInstaller), "Container");
 
         private readonly OptionsMenuAdapter _adapter;
 
-        // A subject of its own per synthesized row, kept across rebuilds so the reconciler seats the
-        // cursor on the same line: a caption that heads nothing, and the window's own Close button.
-        private readonly Dictionary<string, object> _markers = new Dictionary<string, object>();
+        /// <summary>The rows of the form, declared the way every settings form the game draws is
+        /// declared - shared with the mod's own options dialog, which is a copy of this panel.</summary>
+        private readonly MenuFormNodes _rows = new MenuFormNodes("options");
 
         public OptionsScreen(OptionsMenuAdapter adapter)
         {
@@ -116,10 +113,13 @@ namespace SongsOfConquestAccess.Screens
             BuildTabs(builder);
 
             builder.BeginStop(RowsStop);
-            BuildRows(builder);
+            _rows.BuildRows(builder, _adapter.GetCurrentContentControls());
 
             builder.BeginStop(ButtonsStop);
-            BuildButtons(builder);
+            _rows.AddWindowButton(
+                builder,
+                _adapter.GetOkButton(),
+                () => ModText.Get(ModStrings.Screens.Close));
         }
 
         // ---- the category tabs ----
@@ -154,235 +154,6 @@ namespace SongsOfConquestAccess.Screens
             }
         }
 
-        // ---- the settings of the showing category ----
-
-        private void BuildRows(GraphBuilder builder)
-        {
-            IReadOnlyList<OptionsMenuAdapter.ControlItem> controls = _adapter.GetCurrentContentControls();
-            bool inCaption = false;
-            for (int i = 0; i < controls.Count; i++)
-            {
-                OptionsMenuAdapter.ControlItem control = controls[i];
-                object item = control != null ? control.Item : null;
-                OptionsMenuAdapter.TextItem caption = item as OptionsMenuAdapter.TextItem;
-                if (caption != null)
-                {
-                    if (inCaption)
-                    {
-                        builder.PopContext();
-                        inCaption = false;
-                    }
-
-                    builder.SetRegion(null);
-                    if (!caption.IsVisible() || string.IsNullOrWhiteSpace(caption.GetText()))
-                    {
-                        continue;
-                    }
-
-                    if (HasRowsUnder(controls, i))
-                    {
-                        builder.PushContext(caption.GetText());
-                        builder.SetRegion(caption.Id);
-                        inCaption = true;
-                    }
-                    else
-                    {
-                        // A caption heading nothing the adapter can read - every category on the
-                        // Controls page - is the only thing there is to say about that part of the
-                        // page, so it is read as a line rather than lost as an empty region.
-                        builder.AddItem(new SyntheticNode(
-                            ControlId.For(Marker(caption.Id), "options:caption/" + caption.Id),
-                            GraphNodes.Text(caption.GetText)));
-                    }
-
-                    continue;
-                }
-
-                AddRow(builder, control);
-            }
-
-            if (inCaption)
-            {
-                builder.PopContext();
-            }
-
-            builder.SetRegion(null);
-        }
-
-        /// <summary>Whether the caption at <paramref name="index"/> heads any rows: anything before the
-        /// next caption that is not a caption itself.</summary>
-        private static bool HasRowsUnder(IReadOnlyList<OptionsMenuAdapter.ControlItem> controls, int index)
-        {
-            for (int i = index + 1; i < controls.Count; i++)
-            {
-                object item = controls[i] != null ? controls[i].Item : null;
-                if (item is OptionsMenuAdapter.TextItem)
-                {
-                    return false;
-                }
-
-                if (item != null)
-                {
-                    return true;
-                }
-            }
-
-            return false;
-        }
-
-        private void AddRow(GraphBuilder builder, OptionsMenuAdapter.ControlItem control)
-        {
-            object item = control != null ? control.Item : null;
-            Component subject = control != null ? control.Transform : null;
-            if (item == null || subject == null)
-            {
-                return;
-            }
-
-            OptionsMenuAdapter.ToggleItem toggle = item as OptionsMenuAdapter.ToggleItem;
-            if (toggle != null)
-            {
-                if (!toggle.IsVisible())
-                {
-                    return;
-                }
-
-                NodeVtable vtable = GraphNodes.Checkbox(
-                    toggle.GetLabel,
-                    toggle.IsChecked,
-                    toggle.Toggle,
-                    toggle.IsEnabled,
-                    toggle.GetTooltip());
-                vtable.OnFocusVisual = toggle.Focus;
-                builder.AddItem(new DrawnNode(ControlId.For(subject, "options:row/" + toggle.Id), vtable, subject));
-                return;
-            }
-
-            OptionsMenuAdapter.SliderItem slider = item as OptionsMenuAdapter.SliderItem;
-            if (slider != null)
-            {
-                if (slider.IsVisible())
-                {
-                    AddSlider(builder, slider, subject);
-                }
-
-                return;
-            }
-
-            OptionsMenuAdapter.DropdownItem dropdown = item as OptionsMenuAdapter.DropdownItem;
-            if (dropdown != null)
-            {
-                if (!dropdown.IsVisible())
-                {
-                    return;
-                }
-
-                NodeVtable vtable = GraphNodes.ComboBox(
-                    dropdown.GetLabel,
-                    () => CurrentOption(dropdown),
-                    () => DropListScreen.Open(dropdown, dropdown.GetLabel(), index => dropdown.SetValue(index)),
-                    dropdown.IsEnabled,
-                    dropdown.GetTooltip());
-                vtable.OnFocusVisual = dropdown.Focus;
-                builder.AddItem(new DrawnNode(ControlId.For(subject, "options:row/" + dropdown.Id), vtable, subject));
-                return;
-            }
-
-            OptionsMenuAdapter.ButtonItem button = item as OptionsMenuAdapter.ButtonItem;
-            if (button != null && button.IsVisible())
-            {
-                builder.AddItem(new DrawnNode(
-                    ControlId.For(subject, "options:row/" + button.Id),
-                    Button(button, button.GetLabel),
-                    subject));
-            }
-        }
-
-        /// <summary>
-        /// A slider row. Left and Right move the value; Enter opens the game's own "provide a number"
-        /// popup through the value box the row draws beside the handle.
-        ///
-        /// The value box used to be a child node of its own, which put a "Please provide a number"
-        /// button under every slider in the window and made the list of settings twice as long to
-        /// walk. The box is one way of setting the same number the arrows set, so it is the row's
-        /// activation instead; a row that draws no box has no activation at all.
-        /// </summary>
-        private void AddSlider(GraphBuilder builder, OptionsMenuAdapter.SliderItem slider, Component subject)
-        {
-            string editorLabel = slider.GetValueEditorLabel != null ? slider.GetValueEditorLabel() : null;
-            NodeVtable vtable = GraphNodes.Slider(
-                slider.GetLabel,
-                slider.GetValueText,
-                (sign, large) => Adjust(slider, sign, large),
-                slider.IsEnabled,
-                slider.GetTooltip(),
-                activate: string.IsNullOrWhiteSpace(editorLabel)
-                    ? (Action)null
-                    : () => slider.OpenValueEditor());
-            vtable.OnFocusVisual = slider.Focus;
-            builder.AddItem(new DrawnNode(ControlId.For(subject, "options:row/" + slider.Id), vtable, subject));
-        }
-
-        private static void Adjust(OptionsMenuAdapter.SliderItem slider, int sign, bool large)
-        {
-            float step = slider.GetStep();
-            if (step <= 0f)
-            {
-                step = 1f;
-            }
-
-            if (large)
-            {
-                step *= CoarseSteps;
-            }
-
-            slider.SetValue(slider.GetValue() + sign * step);
-        }
-
-        private static string CurrentOption(OptionsMenuAdapter.DropdownItem dropdown)
-        {
-            IReadOnlyList<string> options = dropdown.GetOptions();
-            int value = dropdown.GetValue();
-            return options != null && value >= 0 && value < options.Count ? options[value] : string.Empty;
-        }
-
-        // ---- the button along the bottom ----
-
-        private void BuildButtons(GraphBuilder builder)
-        {
-            OptionsMenuAdapter.ButtonItem ok = _adapter.GetOkButton();
-            if (ok == null || !ok.IsVisible())
-            {
-                return;
-            }
-
-            builder.AddItem(new SyntheticNode(
-                ControlId.For(Marker(ok.Id), "options:" + ok.Id),
-                Button(ok, () => ModText.Get(ModStrings.Screens.Close))));
-        }
-
-        private static NodeVtable Button(OptionsMenuAdapter.ButtonItem button, Func<string> label)
-        {
-            NodeVtable vtable = GraphNodes.Button(
-                label,
-                () => button.Activate(),
-                button.IsEnabled,
-                button.GetTooltip());
-            vtable.OnFocusVisual = button.Focus;
-            return vtable;
-        }
-
-        private object Marker(string key)
-        {
-            object marker;
-            if (!_markers.TryGetValue(key, out marker))
-            {
-                marker = new object();
-                _markers.Add(key, marker);
-            }
-
-            return marker;
-        }
 
         private static OptionsMenu FindActiveOptionsMenu()
         {
