@@ -804,23 +804,42 @@ everything else in the phase. The owner has authorised autonomous progress throu
 representatives and their siblings; the owner's real-key walk of each kind remains the gate
 before that kind's siblings are batched.
 
-**J. The mod settings as a tab of the game's options window (proposal, awaiting the owner).**
-Measured in the decompiled `OptionsMenu`: on opening it resolves every `IOptionsContent`
-from its container and calls `AddTab(content, 0)` for each; a content is three things, a
-`NameKey`, `Draw(OptionsMenu, MenuFactoryController)` and open/close hooks. The factory
-controller draws the game's own rows (`AddToggle`, `AddSlider`, `AddTextMeshDropdown`,
-`AddButton`, `AddText`, `AddInputField`, `AddDivider`, horizontal layouts) from text KEYS,
-and both it and the tab name resolve a key with `TryGetText("Options/" + key, key)`: an
-unknown key is drawn as itself, so mod text already localized through `ModText` can be
-passed as the key and is drawn verbatim. Proposal: one mod `IOptionsContent`
-("Accessibility", from a `ModString`) added after the game's tabs by a postfix on
-`OptionsMenu.OnOpened` calling the private `AddTab`, drawing every toggle and slider the mod
-settings hold today as real game rows, grouped under the same captions the Ctrl+M tabs use
-(General, Scanner, Adventure map, Troop deployment, Combat, Audio). The ported
-`OptionsScreen` then reads the tab like any other, and the Ctrl+M menu and `ModSettingsScreen`
-go away. The sub-screens that are not rows (announcement order with its reorder, the audio
-glossary with per-cue sliders, the custom categories with their key capture and selectors)
-stay mod-owned graph screens, opened from buttons on the tab, with `Carry` for the reorder
-arriving in phase D as planned; a later step could draw them too. Teardown removes the tab
-by name on reload. Decision needed: this shape, or every sub-screen also drawn as game rows
-now (larger, and the reorder has no row form).
+**J. The mod options, second proposal (2026-09-06, awaiting the owner).** The owner does not
+want categories added to the game's options window. Wanted: a "Mod options" control drawn
+in the main menu, and a "Mod options" button after the game's own Options in the pause menu,
+each opening a SEPARATE dialog holding the mod's options. Proposal: (1) the entries, as ES2's
+`ModSettingsMenuEntry` did: on the main menu a clone of the header's Options button placed
+beside it (the game draws Options as a corner button with a label; the clone is laid out by
+the same header container), on the pause menu a clone of its "Options" item inserted after it
+(the ring is a game list of prefab items; the clone joins the list and the layout spreads it);
+both labelled from one `ModString` and clicking either opens the mod dialog; teardown removes
+both by name on reload. (2) The dialog, drawn with the game's own parts: a copy of the live
+options window's `Panel` (background, title, tab column, scrolling content column, OK
+button), instantiated by the mod and titled "Mod options"; its tabs are the mod's categories
+(General, Scanner, Adventure map, Troop deployment, Combat, Audio) as clones of the game's
+tab button prefab; its rows are drawn by a `MenuFactoryController` the mod constructs over
+the copied content column (the game's factory collection is reachable from the options
+window's container), passing mod text as the key since the factory draws an unknown key
+verbatim; OK closes. Every toggle and slider the mod has today becomes a real game row; the
+sub-screens that are not rows (announcement order with its reorder, the audio glossary with
+per-cue sliders, the custom categories with key capture and selectors) open from buttons on
+the dialog as mod-owned graph screens, as now. (3) The mod screen for the dialog reuses the
+ported Options screen's row readers over the copied panel, so it reads like Options.
+Risks to measure first: the options panel is pooled (`IPoolable`) and lives in the menu and
+in-game scenes separately, so the copy is made per scene on first open; the dialog must deny
+the game the Escape key (mod-owned) and close on it. Decision needed: this shape.
+**K. The random maps page, redesign (proposal, awaiting the owner).** Today: four cards
+(2, 4, 6, 8 players) as radio buttons that the game CHOOSES on arrival (the mod's focus
+selects the card natively and the game's `OnSelect` picks it), so walking the cards changes
+the choice silently and only the card the page opened on ever says "selected"; below them
+three win-condition checkboxes and a Layout combo box, unnamed. Proposal: one rows stop with
+three regions named by the game's own captions where it draws them and by a `ModString`
+where it does not (measure: the cards' band has a title; the checkboxes and the layout have
+captions "Win condition" and "Layout" in the game text): region "Players" holding the four
+cards as radio buttons whose arrival does NOT choose (no native selection on focus; the
+game's card highlight follows the choice, not the cursor) and whose Enter chooses through
+the card's click, speaking "selected"; the chosen card carries the live "selected" part, so
+Up/Down tells which is chosen; region "Win conditions" with the three checkboxes; region
+"Layout" with the combo box. Screen name = the drawn title ("Random maps"). On arrival the
+stop lands on the chosen card. Decision needed: this shape, or the cards kept choosing on
+arrival with "selected" read live.
