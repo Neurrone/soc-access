@@ -845,3 +845,13 @@ stop lands on the chosen card. Decision needed: this shape, or the cards kept ch
 arrival with "selected" read live.
 K decided (2026-09-06): explicit selection, no choosing on arrival; Enter chooses and says
 "selected"; the chosen card reads "selected" live.
+J decided (2026-09-06): the second proposal as written, extended so that the announcement
+order, the audio glossary and the custom categories are themselves real dialogs stacked over
+the Mod options dialog, drawn from a clone of the lobby's settings popup panel with the
+game's row factory (order: per-element rows with Enabled, Include suffix punctuation, Move
+up and Move down; glossary: a Configure button per cue opening a cue dialog of toggle and
+sliders; categories: a dialog per category with a name field, the key as a dropdown, a
+selector dialog of toggles per source, keywords, Delete). Every dialog beneath the active one
+is inert for the mouse too: a blocker behind the top dialog and the covered dialog's canvas
+group non-interactable until it is uncovered. Each dialog claims Escape (mod-owned) and closes
+itself only. Teardown removes every drawn object by name.
