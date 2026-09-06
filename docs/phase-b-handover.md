@@ -1175,3 +1175,101 @@ Manual test:
 6. Tab: the preview line, read as name then dossier; Ctrl+Down through its review buffer must give
    the dossier one line at a time. Tab: "Back, button, 1 of 3", then Options and Confirm.
 7. Escape leaves the page for the map type page, the same as pressing Back.
+
+### OnlineGameListScreen
+
+Built: three stops. `online-game-region` holds the Region combo box drawn above the list;
+`online-game-table` holds the status line while the game draws it, then the drawn heading band as a
+row, then a `GraphSheet` of one region (Game name as the primary, then status and Players);
+`online-game-buttons` holds the selected-game line while the game draws it, then Host Game, Load and
+Host Game, Join With Game Code, Join Game, Options and Main Menu. Screen name is the page's drawn
+title ("Game List"); focus starts on the list.
+
+Measured 2026-09-06 at 1280x800 through `/gui/unity` and a screenshot crop: the window at
+[196,104,889,593]; `RegionSelector` at [803,125,238,27]; the heading band `TitleBar` at
+[237,157,795,26] with `TitleStatus` (an icon, x 237, no caption of its own), "Game name" (x 309) and
+"Players" (x 837); the games as `GameListEntry(Clone)` rows 36 px tall at x 237, each drawing a
+status icon (x 256), its name (x 312) and its player count (x 839); the commands at y 632 - Host Game
+(x 233), Load and Host Game (416), Join With Game Code (689), Join Game (873); Back ("Main Menu",
+x 21) and Options (x 1233) in the main menu's header band. The status overlay `Buffer` is the whole
+list area [237,187,797,425] with its line at y 378, so it REPLACES the games rather than sitting
+beside them. The screenshot matches: an icon heading, GAME NAME, PLAYERS, and a lock on every row.
+
+Escape is CLAIMED and presses the drawn Main Menu button: `GameListMenu.ReregisterDefaultInput`
+registers `Gamepad.UIExtraButton2` and nothing else (decompiled, line 251), so the key would do
+nothing here. Verified: `ui_back` answered `consumed` and the main menu came back.
+
+Diff: every before line is accounted for, in four groups.
+
+1. Thirty game-row lines are a DIFFERENT SET OF GAMES: this list comes off the network, and the ten
+   games the before capture caught were gone hours later (18 games now). Row for row the shape is
+   the same: "Sirhk's Legendary Escapade, Game name" is the primary cell "KogsonCZ's Epic Song",
+   "..., status, Can't join. Game is in progress." is the status cell reading its value alone with
+   the caption as an edge and "status, Can't join..." as its buffer head, and "..., Players,
+   2/&lt;low&gt;4&lt;/low&gt;" is "2/4".
+2. The four region options (Asia, Europe, Russia, USA East) left the page: they are the drop list
+   screen now, and the dropdown is one line, "Region | Europe".
+3. The three column headings lost the words "column header".
+4. "Join Game | disabled" became "unavailable" (the phase B word).
+
+Deviations, each measured:
+
+- THE HEADING BAND IS READ-ONLY. The game draws one (`TitleBar`), so it is declared as a row above
+  the first game and Up out of a row reaches its own column's heading - but the three headings are
+  images with no click on them: this list has no sorting at all. They are text nodes, not buttons.
+  The status column's heading draws an icon and no words, so it takes the mod's own `UI.Status`, the
+  word the widget table already gave it.
+- THE RENDERER'S MARKUP IS STRIPPED IN THE SCREEN. The game writes the player count with its own
+  colour tags ("2/&lt;low&gt;4&lt;/low&gt;"), which the widget spoke as its label and cleaned only in
+  the buffer. Every value and every name here goes through `SpokenLines`, so the tags are gone from
+  both. Measured before the change: the graph's cell read the tags aloud.
+- The primary is walked first, as on the map select page: the sheet emits it before every other cell,
+  so the walk is Game name, status, Players though the game draws the status icon leftmost. The
+  heading band is declared in that same order for the same reason.
+- The status line is at the TOP OF THE LIST'S OWN STOP rather than in a stop of its own, because the
+  game draws it over the list area: with it up there are no games, and the stop is then the band and
+  that one line. Verified by switching the region to Russia: the list emptied, the band stayed, and
+  the line read "Connecting" and then "Looking for games".
+- The selected-game line is at the HEAD OF THE COMMANDS, which is where the widget put it and what
+  it belongs to: it names what Join Game would take. It is not watched live - the selection can only
+  be changed from the table, so nobody is standing on the line while it changes; verified that
+  arriving on it after an Enter in the table reads the new game.
+- The adapter gained two members: `GameRow.Entry` (the drawn row) and `Region`, an `IDropList` over
+  the region dropdown so the mod's list screen can be opened over the game's own popup.
+- NOT declared: a per-row "selected". The menu keeps the chosen game in `_selectedGameNameUniqueId`,
+  but the resync factory (`TryCreateActive`) builds the adapter with a null menu, so the fact would
+  be right only on a first entry and wrong after every hot reload. The selected-game line names the
+  choice instead, as the widget screen did.
+
+Walk: Tab cycles table, commands, region; Right across a row said "status, Can't join. Game is in
+progress." then "Players, 2/4"; Down in the Players column said "Wild Mission von Budi (GER), 2/8,
+2 of 18" and kept the column; Left said "Game name, KogsonCZ's Epic Song"; Home reached the band's
+"Game name" and End "Ekscentryczne przygody gracza GDR., 18 of 18"; `/type yegard` landed on that
+game with ONE result; Enter on a row selected it and Tab read "Selected game: Yegard's Fascinating
+Myth"; Enter on Region opened the drop list ("Region", then "Europe, selected, 2 of 4"), Russia
+emptied the list and Europe brought it back; Host Game opened `OnlineHostGameScreen` and Escape there
+came back to the button; `ui_back` on the list answered `consumed`.
+
+Follow-ups, not fixed:
+
+- Opening Host Game leaves the game's own name field holding the keyboard, so the mod stands down
+  until something takes the focus off it - the follow-up `OnlineHostGameScreen` already records. It
+  bit this walk: `ui_back` answered `standing down` until `GameTextFocus.Release()` was called by
+  hand.
+- Type-ahead re-announces the landing once per typed character, the engine's behaviour the map select
+  entry records.
+
+Manual test:
+
+1. Main menu, Multiplayer, Find online game. Hear "Game List", then the first game and "1 of N".
+2. Down and Up walk the games; Right says "status, ..." then "Players, 2/4"; Left comes back.
+3. From the Players column, Down says the next game's name, then its count, then "N of 18".
+4. Home reaches the heading band ("Game name"); Enter there does nothing - this table does not sort.
+5. Type a few letters of a game's name: the cursor lands on it. Backspace ends the search.
+6. Enter on a game selects it; Tab to the commands and the first line names it.
+7. Tab: the commands (Host Game, Load & Host Game, Join With Game Code, Join Game - "unavailable"
+   while the selected game refuses you - Options, Main Menu); Tab: "Region, combo box, Europe".
+8. Enter on Region opens the game's own list; pick another region and the list empties and reloads,
+   reading "Connecting" then "Looking for games" where there are no games.
+9. Host Game opens the host popup; note the field may already hold the keyboard (follow-up above).
+10. Escape leaves for the main menu, the same as pressing Main Menu.

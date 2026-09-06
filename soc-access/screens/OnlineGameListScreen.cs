@@ -1,19 +1,56 @@
+using System;
 using System.Collections.Generic;
 using SongsOfConquest.Client.Adventure.Menu;
 using SongsOfConquestAccess.Adapters;
-using SongsOfConquestAccess.Input;
 using SongsOfConquestAccess.Localization;
 using SongsOfConquestAccess.UI;
+using SongsOfConquestAccess.UI.Graph;
+using UnityEngine;
 
 namespace SongsOfConquestAccess.Screens
 {
-    public sealed class OnlineGameListScreen : Screen
+    /// <summary>
+    /// The online game list, made navigable as a graph. Three stops: the region the list is fetched
+    /// for, the list itself, and the commands under it.
+    ///
+    /// Measured 2026-09-06 at 1280x800 through `/gui/unity`: the window at [196,104,889,593]; the
+    /// Region dropdown at [803,125,238,27] above everything; the drawn heading band `TitleBar` at
+    /// [237,157,795,26] with a status icon (x 237, no caption of its own), "Game name" (x 309) and
+    /// "Players" (x 837); the games as `GameListEntry(Clone)` rows 36 px tall at x 237, each drawing
+    /// a status icon (x 256), the game's name (x 312) and its player count (x 839); and the commands
+    /// along the bottom at y 632 - Host Game (x 233), Load and Host Game (416), Join With Game Code
+    /// (689) and Join Game (873). Back ("Main Menu", x 21) and Options (x 1233) are the main menu's
+    /// header band.
+    ///
+    /// The list is a <see cref="GraphSheet"/> of one region with Game name as the primary column. The
+    /// heading band is drawn and so is declared as a row above the first game - as read-only text,
+    /// because these headings are images the game wires no click to: this table does not sort.
+    ///
+    /// Two lines appear only while the game draws them. The STATUS ("Looking for games", "Connecting")
+    /// is an overlay the game puts over the whole list area, so it reads at the top of the list's own
+    /// stop and an empty list is then the band and that one line. The SELECTED GAME line names what
+    /// Join Game would take, and reads at the head of the commands.
+    ///
+    /// Escape: `GameListMenu.ReregisterDefaultInput` registers a gamepad button and nothing else
+    /// (decompiled, line 251), so the key would do nothing here; the screen claims it and presses the
+    /// drawn Main Menu button, as the widget screen did.
+    /// </summary>
+    public sealed class OnlineGameListScreen : GraphScreen
     {
-        private const string TableId = "online-games-table";
+        private const string RegionStop = "online-game-region";
+        private const string TableStop = "online-game-table";
+        private const string ButtonsStop = "online-game-buttons";
+        private const string SheetKey = "online-game:";
+
         private readonly OnlineGameListAdapter _adapter;
 
+        // Subjects of their own for the two lines the game draws no widget the mod can key on, kept
+        // across rebuilds so the reconciler seats the cursor on the same line.
+        private readonly object _statusMarker = new object();
+        private readonly object _selectedMarker = new object();
+        private readonly object[] _bandMarkers = { new object(), new object(), new object() };
+
         public OnlineGameListScreen(OnlineGameListAdapter adapter)
-            : base(BuildRoot(adapter, null))
         {
             _adapter = adapter;
         }
@@ -29,230 +66,255 @@ namespace SongsOfConquestAccess.Screens
             return _adapter != null && ReferenceEquals(_adapter.SourceKey, menu);
         }
 
+        public override string Key
+        {
+            get { return "online-game-list"; }
+        }
+
+        /// <summary>The page's own drawn title ("Game List").</summary>
+        public override string ScreenName
+        {
+            get { return _adapter != null ? _adapter.Title : null; }
+        }
+
+        public override object InitialFocusStop
+        {
+            get { return TableStop; }
+        }
+
         public override bool IsPresent()
         {
             return _adapter != null && _adapter.IsPresent();
         }
 
-        public override bool HasClaimed(string actionKey)
+        public override bool ConsumesBack
         {
-            return actionKey == AccessibilityActions.Cancel.Key
-                || base.HasClaimed(actionKey);
+            get { return _adapter != null && _adapter.BackButton != null && _adapter.BackButton.IsVisible(); }
         }
 
-        public override bool OnActionJustPressed(InputAction action)
+        public override bool Back()
         {
-            if (action != null && action.Key == AccessibilityActions.Cancel.Key)
-            {
-                return _adapter != null
-                    && _adapter.BackButton != null
-                    && _adapter.BackButton.Activate();
-            }
-
-            return base.OnActionJustPressed(action);
+            return _adapter != null && _adapter.BackButton != null && _adapter.BackButton.Activate();
         }
 
+        /// <summary>Kept for the detector, which calls them as the list arrives from the network. The
+        /// graph is declared afresh on every operation, so there is nothing to rebuild.</summary>
         public void Refresh()
         {
-            Refresh(announceFocus: true);
         }
 
         public void Refresh(bool announceFocus)
+        {
+        }
+
+        public override void Build(GraphBuilder builder)
         {
             if (!IsPresent())
             {
                 return;
             }
 
-            FocusState focusState = CaptureFocusState();
-            RootWidget = BuildRoot(_adapter, focusState);
-            if (announceFocus)
+            builder.BeginStop(RegionStop);
+            BuildRegion(builder);
+
+            builder.BeginStop(TableStop);
+            BuildTable(builder);
+
+            builder.BeginStop(ButtonsStop);
+            BuildButtons(builder);
+        }
+
+        private void BuildRegion(GraphBuilder builder)
+        {
+            OnlineGameListAdapter.RegionDropList region = _adapter.Region;
+            Component subject = region != null ? region.Subject : null;
+            if (subject == null || !region.IsVisible())
             {
-                UIManager.RequestFocus(RootWidget);
+                return;
             }
-            else
+
+            OnlineGameListAdapter.RegionDropList it = region;
+            Func<string> label = () => _adapter.RegionLabel;
+            NodeVtable vtable = GraphNodes.ComboBox(
+                label,
+                () => CurrentOption(it),
+                () => DropListScreen.Open(it, label(), index => it.SetValue(index)),
+                it.IsEnabled);
+            vtable.OnFocusVisual = it.Focus;
+            builder.AddItem(new DrawnNode(ControlId.For(subject, "online-game:region"), vtable, subject));
+        }
+
+        private static string CurrentOption(OnlineGameListAdapter.RegionDropList region)
+        {
+            IReadOnlyList<string> options = region.GetOptions();
+            int value = region.GetValue();
+            return options != null && value >= 0 && value < options.Count ? options[value] : string.Empty;
+        }
+
+        private void BuildTable(GraphBuilder builder)
+        {
+            if (_adapter.IsStatusVisible)
             {
-                UIManager.RequestFocusSilently(RootWidget);
+                builder.AddItem(new SyntheticNode(
+                    ControlId.For(_statusMarker, "online-game:status"),
+                    GraphNodes.Text(() => _adapter.StatusText)));
+            }
+
+            string[] captions =
+            {
+                GameText.Get("Lobby/GameList/GameName", "Game Name"),
+                ModText.Get(ModStrings.UI.Status),
+                GameText.Get("Common/Players", "Players")
+            };
+            BuildHeadingBand(builder, captions);
+
+            GraphSheet sheet = new GraphSheet(builder, SheetKey);
+            sheet.Region(_adapter.Title, captions);
+            IReadOnlyList<OnlineGameListAdapter.GameRow> rows = _adapter.GetRows();
+            for (int i = 0; i < rows.Count; i++)
+            {
+                OnlineGameListAdapter.GameRow row = rows[i];
+                if (row == null || row.Entry == null)
+                {
+                    continue;
+                }
+
+                sheet.RowAt(Primary(row), row.Id, Cells(row, captions), row.Entry);
+            }
+
+            sheet.Finish();
+            if (sheet.FirstRow != null)
+            {
+                builder.LandStopOn(sheet.FirstRow);
             }
         }
 
-        private FocusState CaptureFocusState()
+        /// <summary>
+        /// The heading band the game draws over the list, as a row above the first game so that Up out
+        /// of a row reaches its own column's heading. Read-only: the headings are images
+        /// (`TitleStatus`, `TitleEntryGameName`, `TitleEntryPlayers`) with no click on them, this list
+        /// having no sorting at all. The status column's heading draws an icon and no words, so it
+        /// takes the mod's own word for it, as the widget table did.
+        /// </summary>
+        private void BuildHeadingBand(GraphBuilder builder, IReadOnlyList<string> captions)
         {
-            Widget focusedChild = RootWidget != null ? RootWidget.FocusedChild : null;
-            TableWidget table = focusedChild as TableWidget;
-            MenuWidget menu = focusedChild as MenuWidget;
-            MenuItemWidget menuItem = menu != null ? menu.FocusedItem : null;
-            return new FocusState(
-                focusedChild != null ? focusedChild.Id : null,
-                menuItem != null ? menuItem.Id : null,
-                table != null,
-                table != null ? table.FocusedRowIndex : 0,
-                table != null ? table.FocusedColumnIndex : 1);
+            builder.StartRow(positions: false);
+            for (int column = 0; column < captions.Count; column++)
+            {
+                string caption = captions[column];
+                NodeVtable vtable = GraphNodes.Text(() => caption);
+                vtable.Column = column;
+                // A heading is not a cell of the row below it, so the sheet's one-result-per-row
+                // filter would otherwise drop every heading past the first from type-ahead.
+                vtable.SearchesAsItself = true;
+                builder.AddItem(new SyntheticNode(
+                    ControlId.For(_bandMarkers[column], "online-game:heading/" + column),
+                    vtable));
+            }
+
+            builder.EndRow();
         }
 
-        private static ContainerWidget BuildRoot(OnlineGameListAdapter adapter, FocusState focusState)
+        /// <summary>The game's own cell: its name and the game's own click, which is what selects it
+        /// for Join Game and fills the selected-game line.</summary>
+        private static NodeVtable Primary(OnlineGameListAdapter.GameRow row)
         {
-            ContainerWidget root = new ContainerWidget("online-game-list-screen", adapter != null ? adapter.Title : string.Empty);
-            if (adapter == null)
+            OnlineGameListAdapter.GameRow it = row;
+            return new NodeVtable
             {
-                return root;
-            }
-
-            AddRegion(root, adapter, focusState);
-            root.AddChild(new TextWidget(
-                "online-game-list-status",
-                () => adapter.StatusText,
-                null,
-                includeParentLabelInAnnouncement: false,
-                isVisible: () => adapter.IsStatusVisible));
-            AddGameTable(root, adapter, focusState);
-            root.AddChild(new TextWidget(
-                "online-game-list-selected",
-                () => adapter.SelectedEntryText,
-                null,
-                includeParentLabelInAnnouncement: false,
-                isVisible: () => adapter.IsSelectedEntryTextVisible));
-            AddButton(root, "host-game", adapter.HostGameButton, adapter);
-            AddButton(root, "load-and-host-game", adapter.HostSavedGameButton, adapter);
-            AddButton(root, "join-with-game-code", adapter.JoinWithCodeButton, adapter);
-            AddButton(root, "join-selected-game", adapter.JoinSelectedButton, adapter);
-            AddButton(root, "options", adapter.OptionsButton, adapter);
-            AddButton(root, "back", adapter.BackButton, adapter);
-
-            if (focusState != null && !string.IsNullOrWhiteSpace(focusState.RootChildId))
-            {
-                root.SetFocusedChildById(focusState.RootChildId);
-            }
-
-            return root;
+                ControlType = ControlTypes.Text,
+                Announcements = new List<NodeAnnouncement> { GraphNodes.LabelPart(() => Plain(it.Name)) },
+                OnActivate = () => it.Activate(),
+                OnFocusVisual = it.FocusNative,
+            };
         }
 
-        private static void AddRegion(ContainerWidget root, OnlineGameListAdapter adapter, FocusState focusState)
+        private static List<GraphSheet.SheetCell> Cells(
+            OnlineGameListAdapter.GameRow row,
+            IReadOnlyList<string> captions)
         {
-            MenuWidget menu = new MenuWidget(
-                "online-game-list-region",
-                adapter.RegionLabel,
-                null,
-                null,
-                null);
-            IReadOnlyList<OnlineGameListAdapter.DropdownOption> options = adapter.GetRegionOptions();
-            for (int i = 0; i < options.Count; i++)
+            OnlineGameListAdapter.GameRow it = row;
+            return new List<GraphSheet.SheetCell>
             {
-                OnlineGameListAdapter.DropdownOption option = options[i];
-                menu.AddItem(new MenuItemWidget(
-                    "online-game-list-region-" + option.Index,
-                    () => option.Label,
-                    () => option.IsSelected ? ModText.Get(ModStrings.UI.Selected) : string.Empty,
-                    option.Activate,
-                    adapter.FocusRegion,
-                    () => true));
-            }
-
-            menu.SetFocusedItemById("online-game-list-region-" + adapter.GetRegionValue());
-            if (focusState != null
-                && focusState.RootChildId == menu.Id
-                && !string.IsNullOrWhiteSpace(focusState.MenuItemId))
-            {
-                menu.SetFocusedItemById(focusState.MenuItemId);
-            }
-
-            root.AddChild(menu);
+                new GraphSheet.SheetCell(1, 0, Cell(captions, 1, row, () => it.Status, it.GetCellTooltip("status"))),
+                new GraphSheet.SheetCell(2, 0, Cell(captions, 2, row, () => it.Players, null)),
+            };
         }
 
-        private static void AddGameTable(ContainerWidget root, OnlineGameListAdapter adapter, FocusState focusState)
+        /// <summary>One read-only cell: the drawn value alone, the column's caption being spoken as the
+        /// edge crossed into it, with the caption and the value as the buffer's head.</summary>
+        private static NodeVtable Cell(
+            IReadOnlyList<string> captions,
+            int column,
+            OnlineGameListAdapter.GameRow row,
+            Func<string> value,
+            Tooltip tooltip)
         {
-            TableWidget table = new TableWidget(
-                TableId,
-                adapter.GamesLabel,
-                BuildColumns(),
-                BuildRows(adapter));
-
-            if (focusState != null && focusState.HasTableFocus)
+            OnlineGameListAdapter.GameRow it = row;
+            string caption = captions != null && column < captions.Count ? captions[column] : string.Empty;
+            Func<string> text = () => Filled(Plain(value()));
+            NodeVtable vtable = new NodeVtable
             {
-                table.SetFocusedCell(focusState.TableRowIndex, focusState.TableColumnIndex);
-            }
-            else
-            {
-                table.SetFocusedColumn(1);
-            }
-
-            root.AddChild(table);
+                ControlType = ControlTypes.Text,
+                Announcements = new List<NodeAnnouncement> { GraphNodes.ValuePart(text) },
+                Sections = GraphNodes.Sections(null, tooltip),
+                SearchText = () => Plain(it.Name),
+                BufferHead = () => ModText.Get(ModStrings.Common.ListSeparator, caption, text()),
+            };
+            GraphNodes.Aim(vtable, tooltip);
+            return vtable;
         }
 
-        private static IEnumerable<TableWidget.Column> BuildColumns()
+        /// <summary>What the game wrote, without the renderer's markup: this list draws its player
+        /// count with the game's own colour tags ("2/&lt;low&gt;4&lt;/low&gt;"), which a screen reader
+        /// must not spell out.</summary>
+        private static string Plain(string value)
         {
-            yield return new TableWidget.Column("status", ModText.Get(ModStrings.UI.Status), () => TableWidget.SortDirection.None, null);
-            yield return new TableWidget.Column("game-name", GameText.Get("Lobby/GameList/GameName", "Game Name"), () => TableWidget.SortDirection.None, null);
-            yield return new TableWidget.Column("players", GameText.Get("Common/Players", "Players"), () => TableWidget.SortDirection.None, null);
+            return string.Join(" ", SpokenLines.Of(new[] { value }));
         }
 
-        private static IReadOnlyList<TableWidget.Row> BuildRows(OnlineGameListAdapter adapter)
+        private static string Filled(string value)
         {
-            List<TableWidget.Row> rows = new List<TableWidget.Row>();
-            IReadOnlyList<OnlineGameListAdapter.GameRow> games = adapter.GetRows();
-            for (int i = 0; i < games.Count; i++)
+            if (!string.IsNullOrWhiteSpace(value))
             {
-                OnlineGameListAdapter.GameRow row = games[i];
-                rows.Add(new TableWidget.Row(
-                    row.Id,
-                    row.Label,
-                    columnId => GetCellValue(row, columnId),
-                    row.GetCellTooltip,
-                    row.FocusNative,
-                    row.Activate));
+                return value;
             }
 
-            return rows;
+            return GraphSheet.BlankText != null ? GraphSheet.BlankText() : string.Empty;
         }
 
-        private static string GetCellValue(OnlineGameListAdapter.GameRow row, string columnId)
+        private void BuildButtons(GraphBuilder builder)
         {
-            if (row == null)
+            if (_adapter.IsSelectedEntryTextVisible)
             {
-                return string.Empty;
+                builder.AddItem(new SyntheticNode(
+                    ControlId.For(_selectedMarker, "online-game:selected"),
+                    GraphNodes.Text(() => _adapter.SelectedEntryText)));
             }
 
-            switch (columnId)
-            {
-                case "status":
-                    return row.Status;
-                case "game-name":
-                    return row.Name;
-                case "players":
-                    return row.Players;
-                default:
-                    return string.Empty;
-            }
+            AddButton(builder, "online-game:host", _adapter.HostGameButton);
+            AddButton(builder, "online-game:load-and-host", _adapter.HostSavedGameButton);
+            AddButton(builder, "online-game:join-with-code", _adapter.JoinWithCodeButton);
+            AddButton(builder, "online-game:join", _adapter.JoinSelectedButton);
+            AddButton(builder, "online-game:options", _adapter.OptionsButton);
+            AddButton(builder, "online-game:back", _adapter.BackButton);
         }
 
-        private static void AddButton(ContainerWidget root, string id, IMenuButtonAdapter button, OnlineGameListAdapter adapter)
+        private void AddButton(GraphBuilder builder, string key, IMenuButtonAdapter button)
         {
-            root.AddChild(new ButtonWidget(
-                id,
-                () => button != null ? button.GetLabel() : string.Empty,
-                () => button != null && button.Activate(),
-                () => NativeSelectionUtility.Select(button != null ? button.Button as UnityEngine.Component : null),
-                () => button != null && button.IsEnabled(),
-                () => button != null && button.IsVisible(),
-                () => adapter.GetButtonTooltip(button)));
-        }
-
-        private sealed class FocusState
-        {
-            public FocusState(string rootChildId, string menuItemId, bool hasTableFocus, int tableRowIndex, int tableColumnIndex)
+            if (button == null || button.Button == null || !button.IsVisible())
             {
-                RootChildId = rootChildId;
-                MenuItemId = menuItemId;
-                HasTableFocus = hasTableFocus;
-                TableRowIndex = tableRowIndex;
-                TableColumnIndex = tableColumnIndex;
+                return;
             }
 
-            public string RootChildId { get; private set; }
-            public string MenuItemId { get; private set; }
-            public bool HasTableFocus { get; private set; }
-            public int TableRowIndex { get; private set; }
-            public int TableColumnIndex { get; private set; }
+            IMenuButtonAdapter it = button;
+            NodeVtable vtable = GraphNodes.Button(
+                it.GetLabel,
+                () => it.Activate(),
+                it.IsEnabled,
+                _adapter.GetButtonTooltip(it));
+            vtable.OnFocusVisual = () => NativeSelectionUtility.Select(it.Button as Component);
+            builder.AddItem(new DrawnNode(ControlId.For(it.Button, key), vtable, it.Button));
         }
     }
 }

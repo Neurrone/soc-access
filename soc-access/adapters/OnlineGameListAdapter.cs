@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Reflection;
 using HarmonyLib;
@@ -159,6 +160,12 @@ namespace SongsOfConquestAccess.Adapters
         public bool IsSelectedEntryTextVisible
         {
             get { return !string.IsNullOrWhiteSpace(SelectedEntryText); }
+        }
+
+        /// <summary>The region dropdown as the mod's drop list screen needs it.</summary>
+        public RegionDropList Region
+        {
+            get { return new RegionDropList(this, _settings != null ? _settings.RegionDropdown : null); }
         }
 
         public IReadOnlyList<DropdownOption> GetRegionOptions()
@@ -369,6 +376,75 @@ namespace SongsOfConquestAccess.Adapters
             return gameObject != null && gameObject.scene.IsValid() && gameObject.scene.isLoaded;
         }
 
+        /// <summary>The page's one dropdown, answering the questions every drop list answers so the
+        /// mod's own list screen can be opened over the game's popup.</summary>
+        public sealed class RegionDropList : IDropList
+        {
+            private readonly OnlineGameListAdapter _adapter;
+            private readonly UITextMeshDropdown _dropdown;
+
+            public RegionDropList(OnlineGameListAdapter adapter, UITextMeshDropdown dropdown)
+            {
+                _adapter = adapter;
+                _dropdown = dropdown;
+                GetOptions = ReadOptions;
+                GetValue = () => _adapter != null ? _adapter.GetRegionValue() : 0;
+                IsEnabled = () => _dropdown != null && _dropdown.Active && _dropdown.Interactable;
+                IsVisible = () => _dropdown != null && ((Component)_dropdown).gameObject.activeInHierarchy;
+                OpenPopup = () => DropdownPopup.Show(_dropdown);
+                ClosePopup = () => DropdownPopup.Hide(_dropdown);
+                IsPopupOpen = () => DropdownPopup.IsOpen(_dropdown);
+                FocusOption = index => DropdownPopup.FocusOption(_dropdown, index);
+            }
+
+            public string Id
+            {
+                get { return "online-game-list-region"; }
+            }
+
+            /// <summary>The drawn dropdown itself, so a caller can key a control on it.</summary>
+            public Component Subject
+            {
+                get { return _dropdown; }
+            }
+
+            public Func<IReadOnlyList<string>> GetOptions { get; private set; }
+            public Func<int> GetValue { get; private set; }
+            public Func<bool> IsEnabled { get; private set; }
+            public Func<bool> IsVisible { get; private set; }
+            public Func<bool> OpenPopup { get; private set; }
+            public Func<bool> ClosePopup { get; private set; }
+            public Func<bool> IsPopupOpen { get; private set; }
+            public Func<int, bool> FocusOption { get; private set; }
+
+            public bool SetValue(int value)
+            {
+                return _adapter != null && _adapter.SetRegionValue(value);
+            }
+
+            public void Focus()
+            {
+                if (_adapter != null)
+                {
+                    _adapter.FocusRegion();
+                }
+            }
+
+            private IReadOnlyList<string> ReadOptions()
+            {
+                List<string> labels = new List<string>();
+                IReadOnlyList<DropdownOption> options = _adapter != null
+                    ? _adapter.GetRegionOptions()
+                    : new DropdownOption[0];
+                for (int i = 0; i < options.Count; i++)
+                {
+                    labels.Add(options[i].Label);
+                }
+
+                return labels;
+            }
+        }
+
         public sealed class DropdownOption
         {
             private readonly OnlineGameListAdapter _adapter;
@@ -438,6 +514,12 @@ namespace SongsOfConquestAccess.Adapters
             public string Label
             {
                 get { return Name; }
+            }
+
+            /// <summary>The row the game draws this game as.</summary>
+            public Component Entry
+            {
+                get { return _entry; }
             }
 
             public string Name
