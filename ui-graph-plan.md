@@ -335,24 +335,33 @@ Everything reachable from the main menu without loading a game, in kind order:
    system and popup-menu sources now; the four in-game sources get their before-captures
    in phase C, on the same class), `LoadingCompleteScreen` (loading a save from the main
    menu), `CampaignMenuScreen`, `TaleSelectScreen`, `CustomCampaignSelectScreen`,
-   `PlatformUserMenuScreen`, `TooltipActionsMenuScreen`, `AudioGlossaryScreen`,
-   `AdventureLobbyMapTypeScreen`, `AdventureLobbyInviteProvidersScreen`,
+   `PlatformUserMenuScreen`, `AdventureLobbyMapTypeScreen`, `AdventureLobbyInviteProvidersScreen`,
    `CommunityMapsHomeScreen`.
 2. Forms: `OptionsScreen`, `SaveLoadGameScreen` (the load variant; the save variant is
    re-verified in phase C), `OnlineHostGameScreen`, `AdventureLobbyRandomLayoutScreen`,
    `AdventureLobbyPlayersScreen`, `AdventureLobbyGameSettingsScreen`,
    `AdventureLobbyPlayerSettingsScreen`, `AdventureLobbyIconDropdownScreen`,
-   `CampaignMapSelectScreen`, `ModSettingsScreen` and its sub-screens
-   (`AnnouncementOrderScreen`, `AnnouncementElementSettingsScreen`,
-   `AudioCueSettingsScreen`, `ScannerCustomCategoriesScreen`, `ScannerCustomCategoryScreen`,
-   `ScannerCustomCategoryKeyScreen`, `ScannerCustomCategorySelectorScreen`),
-   `CommunityMapsCollectionScreen`, `CommunityMapsDetailsScreen`,
+   `CampaignMapSelectScreen`, `CommunityMapsCollectionScreen`, `CommunityMapsDetailsScreen`,
    `CommunityMapsSearchFilterScreen`, `CommunityMapsSearchResultsScreen`,
    `CommunityMapsModalScreen`, `CodexScreen` (from Extras), `ChatScreen` (the lobby chat).
    The edit field brings the type-ahead stand-down and the game-field handover
    (`widgets.md` "Edit field", `input.md`'s late-frame rule).
 3. Tables (adds `GraphSheet`): `OnlineGameListScreen`, `PlayerStatsScreen`,
    `AdventureLobbyMapSelectScreen`, `AdventureLobbyChallengeMapSelectScreen`.
+4. Mod settings as a real game screen, last, once Options is a graph screen: `ModSettingsScreen`
+   and its sub-screens (`AnnouncementOrderScreen`, `AnnouncementElementSettingsScreen`,
+   `AudioCueSettingsScreen`, `AudioGlossaryScreen`, `ScannerCustomCategoriesScreen`,
+   `ScannerCustomCategoryScreen`, `ScannerCustomCategoryKeyScreen`,
+   `ScannerCustomCategorySelectorScreen`) stop being a mod-owned menu on Ctrl+M and become an
+   entry of the game's own options window, as ES2 Access did (`ModSettingsMenuEntry`); the
+   Options port is what they are built on, so they come after it. Their own proposal.
+5. `TooltipActionsMenuScreen` is not ported in this phase and probably never: on a graph
+   screen a control's actions are its child nodes, reached with Right (`widgets.md`, "A
+   control's several actions are its DRAWN buttons, modeled as child nodes"), so no ported
+   screen offers `TooltipAction`s. The widget menu stays as it is, on Backquote, for as long
+   as any unported in-game screen still hands them out (the inventory, army and map screens
+   of phases C to E); it is deleted in phase G with the rest of the widget engine, or ported
+   then if a consumer turns out to need it.
 
 Exit: every screen's dumps diff clean and the owner has walked each kind. The pause menu
 is deliberately not here (it is in-game), and no screen of phase C is touched.
@@ -391,8 +400,8 @@ exit announcement (`ui-navigation.md`, "A mode whose cursor is not the focus cur
 
 1. Replace `ScreenManager` with ES2's poll-and-diff manager: registered singleton screens,
    `Layer`, `IsActive()` polled every frame, insertion-sorted, diffed, one focus-change
-   site, child screens (`PushChild`) for the mod-owned menus (tooltip actions, mod settings
-   and its sub-screens).
+   site, child screens (`PushChild`) for the mod-owned menus that remain (the mod settings
+   family if it is not yet an entry of the game's options window).
 2. Every screen's `IsPresent()` becomes `IsActive()`. Screens that today receive the native
    menu instance in their constructor read it from an adapter static that the existing
    `On*Ready` / `On*Closed` patch handlers write; `ScreenDetector` shrinks to those writes
@@ -411,7 +420,8 @@ exit announcement (`ui-navigation.md`, "A mode whose cursor is not the focus cur
 
 Delete `ui/UIManager.cs`, `ui/FocusContext.cs`, every `ui/*Widget.cs`, `ui/MenuWidget.cs`,
 `ui/TableWidget.cs`, and the three grid classes' widget base once their mode wrappers own
-them. Delete `/gui/widgets`. Update `AGENTS.md` (layout, the adapter rule stays, the
+them, and `TooltipActionsMenuScreen` with its Backquote action once no screen hands out a
+`TooltipAction` any more. Delete `/gui/widgets`. Update `AGENTS.md` (layout, the adapter rule stays, the
 widget-tree wording becomes graph wording) and `screens/README.md`.
 
 ## 8. Screen inventory
@@ -437,8 +447,8 @@ to bring to the owner, not a decision.
 | `TutorialSimpleScreen` | Buttons, Checkbox, Text | text node, toggle, buttons row | C |
 | `TutorialSlideshowScreen` | Buttons, Checkbox, Text | as above with prev/next | C |
 | `StoryTextScreen` | Buttons, Text | text node with sections, continue button; cutscene layer in G | C |
-| `TooltipActionsMenuScreen` | Menu | child screen: menu rows of `TooltipAction` | B |
-| `AudioGlossaryScreen` | Menu, Buttons | child of mod settings; menu rows | B |
+| `TooltipActionsMenuScreen` | Menu | stays a widget screen while unported screens hand out `TooltipAction`s; a graph control's actions are its expandable children; deleted in G | G |
+| `AudioGlossaryScreen` | Menu, Buttons | part of the mod settings game screen; menu rows | B, last |
 | `AdventurePlayerMenuScreen` | Menu, Buttons | menu rows | C |
 | `ClaimMenuScreen` | Menu, Text | text node, menu rows | C |
 | `GiftTownPopupScreen` | Menu, Buttons | menu rows, buttons row | C |
@@ -465,14 +475,14 @@ to bring to the owner, not a decision.
 | `AdventureLobbyPlayerSettingsScreen` | Checkbox, Slider, Buttons, Text | setting rows | B |
 | `AdventureLobbyIconDropdownScreen` | Menu, Buttons | drop list (ES2 `DropListScreen` shape) | B |
 | `CampaignMapSelectScreen` | Menu, Buttons, Text | map rows with sections, buttons row | B |
-| `ModSettingsScreen` | Menu, Checkbox, Buttons | child screen root; setting rows | B |
-| `AnnouncementOrderScreen` | AnnouncementOrderMenu, Buttons | rows plus carry for reorder | B |
-| `AnnouncementElementSettingsScreen` | Checkbox, Buttons | toggle rows | B |
-| `AudioCueSettingsScreen` | Checkbox, Slider, Buttons | toggle/slider rows | B |
-| `ScannerCustomCategoriesScreen` | Buttons | rows | B |
-| `ScannerCustomCategoryScreen` | Buttons | rows, child screens for key and selector | B |
-| `ScannerCustomCategoryKeyScreen` | Buttons | key-capture node (`widgets.md` "Key-rebind capture") | B |
-| `ScannerCustomCategorySelectorScreen` | Checkbox, Buttons | toggle rows | B |
+| `ModSettingsScreen` | Menu, Checkbox, Buttons | an entry of the game's options window, as in ES2; setting rows | B, last |
+| `AnnouncementOrderScreen` | AnnouncementOrderMenu, Buttons | rows plus carry for reorder | B, last |
+| `AnnouncementElementSettingsScreen` | Checkbox, Buttons | toggle rows | B, last |
+| `AudioCueSettingsScreen` | Checkbox, Slider, Buttons | toggle/slider rows | B, last |
+| `ScannerCustomCategoriesScreen` | Buttons | rows | B, last |
+| `ScannerCustomCategoryScreen` | Buttons | rows, child screens for key and selector | B, last |
+| `ScannerCustomCategoryKeyScreen` | Buttons | key-capture node (`widgets.md` "Key-rebind capture") | B, last |
+| `ScannerCustomCategorySelectorScreen` | Checkbox, Buttons | toggle rows | B, last |
 | `CommunityMapsHomeScreen` | Menu, Buttons | menu rows | B |
 | `CommunityMapsCollectionScreen` | Menu, Checkbox, TmpInputField, Buttons | rows, filter edit | B |
 | `CommunityMapsDetailsScreen` | Menu, Buttons, Text | text sections, action rows | B |
