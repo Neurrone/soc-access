@@ -40,6 +40,17 @@ namespace SongsOfConquestAccess.UI
                 kind: AnnouncementKinds.Enabled);
         }
 
+        /// <summary>Which one of a set of alternatives is in force. Only the chosen one says anything,
+        /// which is the silence a tab bar keeps and is also what lets focus entering the group land on
+        /// the alternative already chosen rather than at the top of the list.</summary>
+        public static NodeAnnouncement SelectedPart(Func<bool> selected)
+        {
+            return new NodeAnnouncement(
+                () => selected != null && selected() ? ModText.Get(ModStrings.UI.Selected) : null,
+                live: true,
+                kind: AnnouncementKinds.Selected);
+        }
+
         /// <summary>What the control currently holds, watched live by default so a value the game
         /// changes on its own speaks under the cursor.</summary>
         public static NodeAnnouncement ValuePart(Func<string> value, bool watch = true)
@@ -209,6 +220,161 @@ namespace SongsOfConquestAccess.UI
         }
 
         /// <summary>
+        /// A setting the player turns on and off. Its state is both announced live - so a box the game
+        /// ticks on the player's behalf says so - and spoken immediately after a toggle, which is what
+        /// makes holding the key down readable.
+        ///
+        /// <paramref name="value"/> is a number the box itself DRAWS beside its tick, and reads before
+        /// the state, in the order the box is read on screen.
+        ///
+        /// A box that is REFUSING says nothing at all: see <see cref="ActedState"/>.
+        /// </summary>
+        public static NodeVtable Checkbox(
+            Func<string> label,
+            Func<bool> state,
+            Action toggle,
+            Func<bool> enabled = null,
+            Tooltip tooltip = null,
+            Func<IList<string>> details = null,
+            Func<string> value = null)
+        {
+            Func<string> stateText = () => ModText.Get(
+                state != null && state() ? ModStrings.UI.StatusChecked : ModStrings.UI.StatusNotChecked);
+
+            List<NodeAnnouncement> parts = Parts(label, enabled);
+            if (value != null)
+            {
+                parts.Add(ValuePart(value));
+            }
+
+            parts.Add(ValuePart(stateText));
+            NodeVtable vtable = new NodeVtable
+            {
+                ControlType = ControlTypes.Checkbox,
+                Announcements = parts,
+                Sections = Sections(details, tooltip),
+                StateText = ActedState(stateText, enabled),
+                OnActivate = Guarded(toggle, enabled),
+            };
+            Aim(vtable, tooltip);
+            return vtable;
+        }
+
+        /// <summary>A value the player moves along a range with Left and Right, and by a coarse step
+        /// with the same arrows held with Shift. <paramref name="valueText"/> is already in the form
+        /// the player should hear it - a percentage, a count, a number of seconds - because only the
+        /// screen knows what the number means.</summary>
+        public static NodeVtable Slider(
+            Func<string> label,
+            Func<string> valueText,
+            Action<int, bool> adjust,
+            Func<bool> enabled = null,
+            Tooltip tooltip = null,
+            Func<IList<string>> details = null)
+        {
+            List<NodeAnnouncement> parts = Parts(label, enabled);
+            parts.Add(ValuePart(valueText));
+            NodeVtable vtable = new NodeVtable
+            {
+                ControlType = ControlTypes.Slider,
+                Announcements = parts,
+                Sections = Sections(details, tooltip),
+                StateText = ActedState(valueText, enabled),
+                // Declared even while the slider is refusing, so Left and Right stay the slider's keys
+                // rather than quietly turning back into navigation on a control that looks exactly like
+                // the one beside it.
+                OnAdjust = (sign, large) =>
+                {
+                    if (enabled != null && !enabled())
+                    {
+                        return;
+                    }
+
+                    if (adjust != null)
+                    {
+                        adjust(sign, large);
+                    }
+                },
+            };
+            Aim(vtable, tooltip);
+            return vtable;
+        }
+
+        /// <summary>A setting chosen from a list the control opens. Activating it is the screen's
+        /// business - what the list is and how it is navigated belongs to whoever declared it.</summary>
+        public static NodeVtable ComboBox(
+            Func<string> label,
+            Func<string> valueText,
+            Action open,
+            Func<bool> enabled = null,
+            Tooltip tooltip = null,
+            Func<IList<string>> details = null)
+        {
+            List<NodeAnnouncement> parts = Parts(label, enabled);
+            parts.Add(ValuePart(valueText));
+            NodeVtable vtable = new NodeVtable
+            {
+                ControlType = ControlTypes.ComboBox,
+                Announcements = parts,
+                Sections = Sections(details, tooltip),
+                StateText = ActedState(valueText, enabled),
+                OnActivate = Guarded(open, enabled),
+            };
+            Aim(vtable, tooltip);
+            return vtable;
+        }
+
+        /// <summary>One page of a screen. Only the showing tab says it is selected, and saying nothing
+        /// is how the rest stay quiet - which is also what lets focus entering the tab bar land on the
+        /// page the player is actually looking at rather than on the first tab.
+        ///
+        /// How a tab is switched to is the screen's business: set <c>OnActivate</c> on the returned
+        /// vtable where the game needs a click, leave it unset for a bar that changes page on focus.
+        /// </summary>
+        public static NodeVtable Tab(
+            Func<string> label,
+            Func<bool> selected,
+            Func<bool> enabled = null,
+            Tooltip tooltip = null,
+            Func<IList<string>> details = null)
+        {
+            List<NodeAnnouncement> parts = Parts(label, enabled);
+            parts.Add(SelectedPart(selected));
+            NodeVtable vtable = new NodeVtable
+            {
+                ControlType = ControlTypes.Tab,
+                Announcements = parts,
+                Sections = Sections(details, tooltip),
+            };
+            Aim(vtable, tooltip);
+            return vtable;
+        }
+
+        /// <summary>One entry of a list the player has opened to pick from. It carries no role word:
+        /// the control that opened the list has just been read as the combo box it is, and repeating
+        /// "list item" on every entry of a twenty-line list only slows the reading down. The entry the
+        /// list is currently set to says so, which is also how focus lands on it.</summary>
+        public static NodeVtable Choice(
+            Func<string> label,
+            Func<bool> selected,
+            Action choose,
+            Func<bool> enabled = null,
+            Func<IList<string>> details = null,
+            Tooltip tooltip = null)
+        {
+            List<NodeAnnouncement> parts = Parts(label, enabled);
+            parts.Insert(1, SelectedPart(selected));
+            NodeVtable vtable = new NodeVtable
+            {
+                Announcements = parts,
+                Sections = Sections(details, tooltip),
+                OnActivate = Guarded(choose, enabled),
+            };
+            Aim(vtable, tooltip);
+            return vtable;
+        }
+
+        /// <summary>
         /// THE RAISING HALF: what the navigator draws the game's own tooltip for when focus lands on
         /// this node. Written down beside the content (<see cref="NodeVtable.PointsAt"/>) rather than
         /// hidden in a closure, so the tooltip actions menu and the dev dump can ask the node which
@@ -223,6 +389,21 @@ namespace SongsOfConquestAccess.UI
 
             Tooltip it = tooltip;
             vtable.PointsAt = () => it;
+        }
+
+        // The other half of the swallow: what the control reports right after the player acted on it,
+        // which for a refused action is nothing at all. Re-reading the state after a keypress that
+        // changed nothing is heard as the keypress having worked ("not checked" from a box that would
+        // not untick), and a refusal word here would be the second "unavailable" in a row - the player
+        // heard the first on focus.
+        private static Func<string> ActedState(Func<string> state, Func<bool> enabled)
+        {
+            if (state == null || enabled == null)
+            {
+                return state;
+            }
+
+            return () => enabled() ? state() : null;
         }
 
         // The swallow every unavailable control shares: it stays focusable and readable, and the

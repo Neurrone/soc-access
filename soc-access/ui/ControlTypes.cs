@@ -64,6 +64,41 @@ namespace SongsOfConquestAccess.UI
             Common = () => RoleWord(ModStrings.UI.RoleEditable),
         };
 
+        /// <summary>A setting the player turns on and off, reading its state every time it is
+        /// touched.</summary>
+        public static readonly ControlType Checkbox = new ControlType
+        {
+            Key = "checkbox",
+            Order = StandardOrder,
+            Common = () => RoleWord(ModStrings.UI.RoleCheckbox),
+        };
+
+        /// <summary>A value along a range. Left and Right move it rather than moving the cursor, so
+        /// its role word is also the warning that the arrows mean something else here.</summary>
+        public static readonly ControlType Slider = new ControlType
+        {
+            Key = "slider",
+            Order = StandardOrder,
+            Common = () => RoleWord(ModStrings.UI.RoleSlider),
+        };
+
+        /// <summary>A setting chosen from a list the control opens.</summary>
+        public static readonly ControlType ComboBox = new ControlType
+        {
+            Key = "combo-box",
+            Order = StandardOrder,
+            Common = () => RoleWord(ModStrings.UI.RoleComboBox),
+        };
+
+        /// <summary>One page of a screen, reached from a bar of its peers. What matters about a tab
+        /// is whether it is the page currently showing, which it says as its selection state.</summary>
+        public static readonly ControlType Tab = new ControlType
+        {
+            Key = "tab",
+            Order = StandardOrder,
+            Common = () => RoleWord(ModStrings.UI.RoleTab),
+        };
+
         private static IList<NodeAnnouncement> RoleWord(ModString word)
         {
             return new[]
