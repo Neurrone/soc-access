@@ -152,6 +152,13 @@ namespace SongsOfConquestAccess.Adapters
             get { return ModText.Get(ModStrings.Common.ListSeparator, Title, ModText.Get(ModStrings.UI.RoleGrid)); }
         }
 
+        /// <summary>The map name the preview panel draws beside the table, which the game sets from
+        /// the selected map's metadata rather than from the entry's own row text.</summary>
+        public string PreviewTitle
+        {
+            get { return _menu != null ? LobbyMapPreviewText.GetTitle(PreviewRef(_menu)) : string.Empty; }
+        }
+
         public AdventureLobbyMapSelectRowAdapter SelectedRow
         {
             get
@@ -323,6 +330,13 @@ namespace SongsOfConquestAccess.Adapters
             {
                 autoScroller.ForceFocusOn(selectable);
             }
+        }
+
+        /// <summary>Whether this entry is the one the menu currently has selected - the map the
+        /// preview panel is showing and Confirm would take.</summary>
+        public bool IsSelectedEntry(LobbyMapSelectMenuEntry entry)
+        {
+            return _menu != null && entry != null && ReferenceEquals(SelectedEntryRef(_menu), entry);
         }
 
         public bool ActivateEntry(LobbyMapSelectMenuEntry entry)
@@ -618,6 +632,18 @@ namespace SongsOfConquestAccess.Adapters
             get { return _entry != null ? _entry.MetaData : null; }
         }
 
+        /// <summary>The row the game draws this map as.</summary>
+        public Component Entry
+        {
+            get { return _entry; }
+        }
+
+        /// <summary>Whether this is the map the menu has selected.</summary>
+        public bool IsSelected
+        {
+            get { return _owner != null && _owner.IsSelectedEntry(_entry); }
+        }
+
         public void FocusNative()
         {
             _owner?.FocusEntry(_entry);
@@ -661,6 +687,27 @@ namespace SongsOfConquestAccess.Adapters
         public IReadOnlyList<string> WinConditionLabels
         {
             get { return GetWinConditionLabels(); }
+        }
+
+        /// <summary>One tooltip per drawn win-condition icon, in the order of
+        /// <see cref="WinConditionLabels"/>: the game hangs a name and an objective on each icon
+        /// (<c>LobbyMapSelectMenuEntry.Setup</c>), and a null entry is an icon it drew without one.
+        /// </summary>
+        public IReadOnlyList<Tooltip> WinConditionTooltips
+        {
+            get
+            {
+                IReadOnlyList<string> labels = GetWinConditionLabels();
+                UIImage[] icons = _entry != null ? WinConditionIconsRef(_entry) : null;
+                List<Tooltip> tooltips = new List<Tooltip>(labels.Count);
+                for (int i = 0; i < labels.Count; i++)
+                {
+                    UIImage icon = icons != null && i < icons.Length ? icons[i] : null;
+                    tooltips.Add(GetComponentTooltip(icon));
+                }
+
+                return tooltips;
+            }
         }
 
         public int Players
@@ -890,6 +937,12 @@ namespace SongsOfConquestAccess.Adapters
             _button = button;
         }
 
+        /// <summary>The heading the game draws for this column.</summary>
+        public Component Button
+        {
+            get { return _button; }
+        }
+
         public string Label
         {
             get { return SpeechTextSanitizer.Normalize(MenuButtonTextUtility.GetStandardButtonLabel(_button)); }
@@ -957,6 +1010,18 @@ namespace SongsOfConquestAccess.Adapters
 
         public bool IsVisible { get; private set; }
 
+        /// <summary>The filter button the game draws in the header band.</summary>
+        public Component Subject
+        {
+            get { return _dropdown; }
+        }
+
+        /// <summary>Whether the game is showing this filter's list of checkboxes right now.</summary>
+        public bool IsOpen
+        {
+            get { return AdventureLobbyMapSelectAdapter.IsDropdownOpen(_dropdown); }
+        }
+
         public void OpenNative()
         {
             AdventureLobbyMapSelectAdapter.OpenDropdown(_dropdown);
@@ -1007,6 +1072,12 @@ namespace SongsOfConquestAccess.Adapters
             }
 
             public int Index { get; private set; }
+
+            /// <summary>The checkbox the game draws in the filter's list.</summary>
+            public Component Subject
+            {
+                get { return _toggle; }
+            }
 
             public string Label
             {

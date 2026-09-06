@@ -1,22 +1,53 @@
+using System;
 using System.Collections.Generic;
 using SongsOfConquest.Client.Menu;
-using SongsOfConquest.Client.UI;
 using SongsOfConquestAccess.Adapters;
-using SongsOfConquestAccess.Input;
 using SongsOfConquestAccess.Localization;
 using SongsOfConquestAccess.UI;
+using SongsOfConquestAccess.UI.Graph;
 using UnityEngine;
 
 namespace SongsOfConquestAccess.Screens
 {
-    public sealed class AdventureLobbyChallengeMapSelectScreen : Screen
+    /// <summary>
+    /// The lobby's challenge map page, made navigable as a graph. The map select page's shape with
+    /// the header band taken away: three stops, and Tab moves between them - the table of challenges,
+    /// the preview panel beside it, and the page's buttons.
+    ///
+    /// Measured 2026-09-06 at 1280x800 through `/gui/unity`: `MapEntryContainer` at [87,96,858,613]
+    /// holding `ChallengeMapEntry(Clone)` rows 48 px tall at x 95, each drawing its name (x 152) and
+    /// its win-condition icons (x 739) and NOTHING ELSE - no heading band, no sort buttons, no
+    /// filters; `LobbyMapPreview` at x 954 with the challenge's name at y 307, its dossier in a scroll
+    /// rect at y 356 and the win-condition icons at y 287; Confirm at [982,679]; the lobby's Back at
+    /// [21,20] and Options at [1233,11] in the header band, under the drawn title "Challenge maps".
+    ///
+    /// The table is a <see cref="GraphSheet"/> of one region with Name as its primary column and the
+    /// win condition read as one piece per drawn icon, as on the map select page. Because the game
+    /// draws NO heading band here, none is declared: the column captions live only as the edge labels
+    /// the sheet speaks on the way into a column.
+    ///
+    /// Arriving on a row selects that challenge (the menu's own `SetSelectedEntry`, which fills the
+    /// preview), so the row says "selected" for the challenge the page opened on and Enter is the
+    /// same selection again.
+    ///
+    /// Escape: `ChallengeMapsMenu.SetupAndAnimateAfterLoad` registers only
+    /// `InputActions.UI.Confirm` on its keyboard branch (decompiled, line 232) and `LobbyNavigation`
+    /// registers no input callback at all, so the screen claims it and presses the drawn Back button.
+    /// </summary>
+    public sealed class AdventureLobbyChallengeMapSelectScreen : GraphScreen
     {
-        private const string TableId = "challenge-map-select-table";
+        private const string TableStop = "challenge-map-table";
+        private const string DetailsStop = "challenge-map-details";
+        private const string ButtonsStop = "challenge-map-buttons";
+        private const string SheetKey = "challenge-map:";
 
         private readonly AdventureLobbyChallengeMapSelectAdapter _adapter;
 
+        // A subject of its own for the preview line, kept across rebuilds so the reconciler seats the
+        // cursor on the same node while the selection under it changes.
+        private readonly object _detailsMarker = new object();
+
         public AdventureLobbyChallengeMapSelectScreen(AdventureLobbyChallengeMapSelectAdapter adapter)
-            : base(BuildRootWidget(adapter, null))
         {
             _adapter = adapter;
         }
@@ -32,261 +63,252 @@ namespace SongsOfConquestAccess.Screens
             return _adapter != null && ReferenceEquals(_adapter.SourceKey, menu);
         }
 
+        public override string Key
+        {
+            get { return "challenge-map-select"; }
+        }
+
+        /// <summary>The page's own drawn title ("Challenge maps").</summary>
+        public override string ScreenName
+        {
+            get { return _adapter != null ? _adapter.Title : null; }
+        }
+
+        public override object InitialFocusStop
+        {
+            get { return TableStop; }
+        }
+
         public override bool IsPresent()
         {
             return _adapter != null && _adapter.IsPresent();
         }
 
-        public override bool HasClaimed(string actionKey)
+        public override bool ConsumesBack
         {
-            return actionKey == AccessibilityActions.Cancel.Key
-                || base.HasClaimed(actionKey);
+            get { return _adapter != null && _adapter.BackButton != null && _adapter.BackButton.IsVisible(); }
         }
 
-        public override bool OnActionJustPressed(InputAction action)
+        public override bool Back()
         {
-            if (action != null && action.Key == AccessibilityActions.Cancel.Key)
-            {
-                return _adapter != null
-                    && _adapter.BackButton != null
-                    && _adapter.BackButton.Activate();
-            }
-
-            return base.OnActionJustPressed(action);
+            return _adapter != null && _adapter.BackButton != null && _adapter.BackButton.Activate();
         }
 
+        /// <summary>Kept for the detector, which calls them whenever the page or its selection
+        /// changes. The graph is declared afresh on every operation, so there is nothing to rebuild.
+        /// </summary>
         public void Refresh()
         {
-            Refresh(announceFocus: true);
         }
 
         public void Refresh(bool announceFocus)
+        {
+        }
+
+        public override void Build(GraphBuilder builder)
         {
             if (!IsPresent())
             {
                 return;
             }
 
-            RootWidget = BuildRootWidget(_adapter, CaptureFocusState());
-            if (announceFocus)
-            {
-                UIManager.RequestFocus(RootWidget);
-            }
-            else
-            {
-                UIManager.RequestFocusSilently(RootWidget);
-            }
+            builder.BeginStop(TableStop);
+            BuildTable(builder);
+
+            builder.BeginStop(DetailsStop);
+            BuildDetails(builder);
+
+            builder.BeginStop(ButtonsStop);
+            BuildButtons(builder);
         }
 
-        private FocusState CaptureFocusState()
+        private void BuildTable(GraphBuilder builder)
         {
-            Widget focusedChild = RootWidget != null ? RootWidget.FocusedChild : null;
-            TableWidget table = focusedChild as TableWidget;
-            return new FocusState(
-                focusedChild != null ? focusedChild.Id : null,
-                table != null,
-                table != null ? table.FocusedRowIndex : 0,
-                table != null ? table.FocusedColumnIndex : 0);
-        }
-
-        private static ContainerWidget BuildRootWidget(AdventureLobbyChallengeMapSelectAdapter adapter, FocusState focusState)
-        {
-            ContainerWidget root = new ContainerWidget(
-                "adventure-lobby-challenge-map-select-screen",
-                adapter != null ? adapter.Title : string.Empty);
-
-            AddMapTable(root, adapter, focusState);
-            AddDetails(root, adapter);
-            AddOptionalButton(root, "confirm", adapter != null ? adapter.ConfirmButton : null);
-            AddOptionalButton(root, "options", adapter != null ? adapter.OptionsButton : null);
-            AddOptionalButton(root, "back", adapter != null ? adapter.BackButton : null);
-
-            if (focusState != null && !string.IsNullOrWhiteSpace(focusState.RootChildId))
+            string[] captions =
             {
-                root.SetFocusedChildById(focusState.RootChildId);
-            }
+                _adapter.NameColumnLabel,
+                _adapter.WinConditionColumnLabel,
+                _adapter.CompletedColumnLabel
+            };
 
-            return root;
-        }
-
-        private static void AddMapTable(ContainerWidget root, AdventureLobbyChallengeMapSelectAdapter adapter, FocusState focusState)
-        {
-            if (root == null)
+            GraphSheet sheet = new GraphSheet(builder, SheetKey);
+            sheet.Region(_adapter.Title, captions);
+            IReadOnlyList<AdventureLobbyChallengeMapRowAdapter> rows = _adapter.GetVisibleRows();
+            for (int i = 0; i < rows.Count; i++)
             {
-                return;
-            }
-
-            TableWidget table = new TableWidget(
-                TableId,
-                adapter != null ? adapter.MapsLabel : string.Empty,
-                BuildColumns(adapter),
-                BuildRows(adapter));
-
-            if (focusState != null && focusState.HasTableFocus)
-            {
-                table.SetFocusedCell(focusState.TableRowIndex, focusState.TableColumnIndex);
-            }
-            else
-            {
-                AdventureLobbyChallengeMapRowAdapter selected = adapter != null ? adapter.SelectedRow : null;
-                if (selected != null)
-                {
-                    table.SetFocusedRowById(BuildRowId(adapter, selected));
-                }
-
-                table.SetFocusedColumn(0);
-            }
-
-            root.AddChild(table);
-        }
-
-        private static IEnumerable<TableWidget.Column> BuildColumns(AdventureLobbyChallengeMapSelectAdapter adapter)
-        {
-            yield return new TableWidget.Column(
-                "name",
-                adapter != null ? adapter.NameColumnLabel : string.Empty,
-                () => TableWidget.SortDirection.None,
-                null);
-            yield return new TableWidget.Column(
-                "win-condition",
-                adapter != null ? adapter.WinConditionColumnLabel : string.Empty,
-                () => TableWidget.SortDirection.None,
-                null);
-            yield return new TableWidget.Column(
-                "completed",
-                adapter != null ? adapter.CompletedColumnLabel : string.Empty,
-                () => TableWidget.SortDirection.None,
-                null);
-        }
-
-        private static IReadOnlyList<TableWidget.Row> BuildRows(AdventureLobbyChallengeMapSelectAdapter adapter)
-        {
-            List<TableWidget.Row> rows = new List<TableWidget.Row>();
-            if (adapter == null)
-            {
-                return rows;
-            }
-
-            IReadOnlyList<AdventureLobbyChallengeMapRowAdapter> visibleRows = adapter.GetVisibleRows();
-            for (int i = 0; i < visibleRows.Count; i++)
-            {
-                AdventureLobbyChallengeMapRowAdapter row = visibleRows[i];
-                if (row == null)
+                AdventureLobbyChallengeMapRowAdapter row = rows[i];
+                if (row == null || row.Entry == null)
                 {
                     continue;
                 }
 
-                rows.Add(new TableWidget.Row(
-                    BuildRowId(adapter, row),
-                    row.Name,
-                    columnId => GetCellValue(row, columnId),
-                    row.GetCellTooltip,
-                    row.FocusNative,
-                    row.Select));
+                sheet.RowAt(Primary(row), row.NativeKey, Cells(row, captions), row.Entry);
             }
 
-            return rows;
-        }
-
-        private static string GetCellValue(AdventureLobbyChallengeMapRowAdapter row, string columnId)
-        {
-            if (row == null)
+            sheet.Finish();
+            if (sheet.FirstRow != null)
             {
-                return string.Empty;
-            }
-
-            switch (columnId)
-            {
-                case "name":
-                    return row.Name;
-                case "win-condition":
-                    return ModText.JoinList(row.WinConditionLabels);
-                case "completed":
-                    return row.IsCompleted ? row.CompletedLabel : row.NotCompletedLabel;
-                default:
-                    return string.Empty;
+                builder.LandStopOn(sheet.FirstRow);
             }
         }
 
-        private static void AddDetails(ContainerWidget root, AdventureLobbyChallengeMapSelectAdapter adapter)
+        /// <summary>The challenge's own cell: its name, whether it is the one the page has selected,
+        /// and the game's own selection.</summary>
+        private static NodeVtable Primary(AdventureLobbyChallengeMapRowAdapter row)
         {
-            if (root == null || adapter == null)
+            AdventureLobbyChallengeMapRowAdapter it = row;
+            return new NodeVtable
             {
-                return;
-            }
-
-            root.AddChild(new TextWidget(
-                "selected-challenge-map-details",
-                () => BuildSelectedDetails(adapter),
-                null,
-                includeParentLabelInAnnouncement: false,
-                tooltip: null,
-                isVisible: () => !string.IsNullOrWhiteSpace(BuildSelectedDetails(adapter))));
-        }
-
-        private static string BuildSelectedDetails(AdventureLobbyChallengeMapSelectAdapter adapter)
-        {
-            AdventureLobbyChallengeMapRowAdapter row = adapter != null ? adapter.SelectedRow : null;
-            if (row == null)
-            {
-                return string.Empty;
-            }
-
-            List<string> parts = new List<string>();
-            AddIfNotEmpty(parts, row.Name);
-            AddIfNotEmpty(parts, row.Description);
-            return string.Join(System.Environment.NewLine, parts.ToArray());
-        }
-
-        private static void AddOptionalButton(ContainerWidget root, string id, IMenuButtonAdapter button)
-        {
-            if (root == null || button == null || !button.IsVisible())
-            {
-                return;
-            }
-
-            root.AddChild(new ButtonWidget(
-                id,
-                button.GetLabel,
-                button.Activate,
-                () => FocusNativeButton(button.Button),
-                button.IsEnabled,
-                button.IsVisible));
-        }
-
-        private static void FocusNativeButton(UIButton button)
-        {
-            if (button == null)
-            {
-                return;
-            }
-
-            NativeSelectionUtility.Select(button);
-        }
-
-        private static string BuildRowId(AdventureLobbyChallengeMapSelectAdapter adapter, AdventureLobbyChallengeMapRowAdapter row)
-        {
-            int index = 0;
-            IReadOnlyList<AdventureLobbyChallengeMapRowAdapter> rows = adapter != null
-                ? adapter.GetVisibleRows()
-                : new AdventureLobbyChallengeMapRowAdapter[0];
-            for (int i = 0; i < rows.Count; i++)
-            {
-                if (rows[i] != null && row != null && rows[i].NativeKey == row.NativeKey)
+                ControlType = ControlTypes.Text,
+                Announcements = new List<NodeAnnouncement>
                 {
-                    index = i;
-                    break;
+                    GraphNodes.LabelPart(() => it.Name),
+                    GraphNodes.SelectedPart(() => it.IsSelected),
+                },
+                OnActivate = () => it.Select(),
+                OnFocusVisual = it.FocusNative,
+            };
+        }
+
+        private static List<GraphSheet.SheetCell> Cells(
+            AdventureLobbyChallengeMapRowAdapter row,
+            IReadOnlyList<string> captions)
+        {
+            List<GraphSheet.SheetCell> cells = new List<GraphSheet.SheetCell>();
+            AdventureLobbyChallengeMapRowAdapter it = row;
+            IReadOnlyList<string> conditions = row.WinConditionLabels;
+            IReadOnlyList<Tooltip> tooltips = row.WinConditionTooltips;
+            if (conditions.Count == 0)
+            {
+                cells.Add(new GraphSheet.SheetCell(1, 0, Cell(captions, 1, row, () => string.Empty, null)));
+            }
+            else
+            {
+                for (int i = 0; i < conditions.Count; i++)
+                {
+                    string condition = conditions[i];
+                    cells.Add(new GraphSheet.SheetCell(1, i, Cell(
+                        captions,
+                        1,
+                        row,
+                        () => condition,
+                        i < tooltips.Count ? tooltips[i] : null)));
                 }
             }
 
-            string id = "challenge-map-row-" + index;
-            string nativeKey = row != null ? row.NativeKey : null;
-            if (!string.IsNullOrWhiteSpace(nativeKey))
+            cells.Add(new GraphSheet.SheetCell(2, 0, Cell(
+                captions,
+                2,
+                row,
+                () => it.IsCompleted ? it.CompletedLabel : it.NotCompletedLabel,
+                null)));
+            return cells;
+        }
+
+        /// <summary>One read-only cell: the drawn value alone, the column's caption being spoken as
+        /// the edge crossed into it, with the caption and the value as the buffer's head.</summary>
+        private static NodeVtable Cell(
+            IReadOnlyList<string> captions,
+            int column,
+            AdventureLobbyChallengeMapRowAdapter row,
+            Func<string> value,
+            Tooltip tooltip)
+        {
+            AdventureLobbyChallengeMapRowAdapter it = row;
+            string caption = captions != null && column < captions.Count ? captions[column] : string.Empty;
+            Func<string> text = () => Filled(value());
+            NodeVtable vtable = new NodeVtable
             {
-                id = id + "-" + SanitizeId(nativeKey);
+                ControlType = ControlTypes.Text,
+                Announcements = new List<NodeAnnouncement> { GraphNodes.ValuePart(text, watch: false) },
+                Sections = GraphNodes.Sections(null, tooltip),
+                SearchText = () => it.Name,
+                BufferHead = () => ModText.Get(ModStrings.Common.ListSeparator, caption, text()),
+            };
+            GraphNodes.Aim(vtable, tooltip);
+            return vtable;
+        }
+
+        private static string Filled(string value)
+        {
+            if (!string.IsNullOrWhiteSpace(value))
+            {
+                return value;
             }
 
-            return id;
+            return GraphSheet.BlankText != null ? GraphSheet.BlankText() : string.Empty;
+        }
+
+        /// <summary>The preview beside the table, as the one line it is: the challenge's name as the
+        /// panel draws it, watched live, with the dossier and the win conditions as a section - read
+        /// on arrival and held in the review buffer one drawn line at a time.</summary>
+        private void BuildDetails(GraphBuilder builder)
+        {
+            AdventureLobbyChallengeMapRowAdapter selected = _adapter.SelectedRow;
+            if (selected == null)
+            {
+                return;
+            }
+
+            NodeVtable vtable = new NodeVtable
+            {
+                ControlType = ControlTypes.Text,
+                Announcements = new List<NodeAnnouncement>
+                {
+                    new NodeAnnouncement(() => PreviewTitle(), live: true, kind: AnnouncementKinds.Label),
+                },
+                Sections = new List<NodeSection>
+                {
+                    NodeSection.Composed(() => SpokenLines.Of(new[] { Description(), PreviewWinConditions() })),
+                },
+            };
+            builder.AddItem(new SyntheticNode(
+                ControlId.For(_detailsMarker, "challenge-map:preview"),
+                vtable));
+        }
+
+        private string PreviewTitle()
+        {
+            string title = _adapter.PreviewTitle;
+            if (!string.IsNullOrWhiteSpace(title))
+            {
+                return title;
+            }
+
+            AdventureLobbyChallengeMapRowAdapter selected = _adapter.SelectedRow;
+            return selected != null ? selected.Name : string.Empty;
+        }
+
+        private string Description()
+        {
+            AdventureLobbyChallengeMapRowAdapter selected = _adapter.SelectedRow;
+            return selected != null ? selected.Description : string.Empty;
+        }
+
+        private string PreviewWinConditions()
+        {
+            AdventureLobbyChallengeMapRowAdapter selected = _adapter.SelectedRow;
+            return selected != null ? ModText.JoinList(selected.WinConditionLabels) : string.Empty;
+        }
+
+        private void BuildButtons(GraphBuilder builder)
+        {
+            // Back (x 21) and Options (x 1233) in the header band, then Confirm at the bottom right.
+            AddButton(builder, "challenge-map:back", _adapter.BackButton);
+            AddButton(builder, "challenge-map:options", _adapter.OptionsButton);
+            AddButton(builder, "challenge-map:confirm", _adapter.ConfirmButton);
+        }
+
+        private static void AddButton(GraphBuilder builder, string key, IMenuButtonAdapter button)
+        {
+            if (button == null || button.Button == null || !button.IsVisible())
+            {
+                return;
+            }
+
+            NodeVtable vtable = GraphNodes.Button(button.GetLabel, () => button.Activate(), button.IsEnabled);
+            vtable.OnFocusVisual = () => NativeSelectionUtility.Select(button.Button);
+            builder.AddItem(new DrawnNode(ControlId.For(button.Button, key), vtable, button.Button));
         }
 
         public static AdventureLobbyChallengeMapSelectAdapter FindActiveChallengeMapSelectMenu(ChallengeMapsMenu targetMenu)
@@ -324,53 +346,6 @@ namespace SongsOfConquestAccess.Screens
 
             GameObject gameObject = ((Component)menu).gameObject;
             return gameObject != null && gameObject.scene.IsValid() && gameObject.scene.isLoaded;
-        }
-
-        private static void AddIfNotEmpty(List<string> parts, string value)
-        {
-            if (!string.IsNullOrWhiteSpace(value))
-            {
-                parts.Add(value);
-            }
-        }
-
-        private static string SanitizeId(string value)
-        {
-            if (string.IsNullOrWhiteSpace(value))
-            {
-                return string.Empty;
-            }
-
-            char[] chars = value.ToLowerInvariant().ToCharArray();
-            for (int i = 0; i < chars.Length; i++)
-            {
-                char c = chars[i];
-                if (!char.IsLetterOrDigit(c))
-                {
-                    chars[i] = '-';
-                }
-            }
-
-            return new string(chars);
-        }
-
-        private sealed class FocusState
-        {
-            public FocusState(string rootChildId, bool hasTableFocus, int tableRowIndex, int tableColumnIndex)
-            {
-                RootChildId = rootChildId;
-                HasTableFocus = hasTableFocus;
-                TableRowIndex = tableRowIndex;
-                TableColumnIndex = tableColumnIndex;
-            }
-
-            public string RootChildId { get; private set; }
-
-            public bool HasTableFocus { get; private set; }
-
-            public int TableRowIndex { get; private set; }
-
-            public int TableColumnIndex { get; private set; }
         }
     }
 }

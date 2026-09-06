@@ -972,3 +972,136 @@ through the buffer of an entry; the description must read as sentences, with no 
   with the stand-down live there the lobby's game code field trapped every key (seen on the
   widget lobby page after activating "Copy game code"). Manual test: on the online lobby
   (still a widget page), Tab past the game code and type nothing; the mod must keep answering.
+
+## Family F: table pages
+
+### AdventureLobbyMapSelectScreen (representative)
+
+Built: four stops. `map-select-filters` holds the header band's filter buttons as expandable
+groups of checkboxes, then the Clear filters button while it is drawn; `map-select-table` holds
+the drawn heading band as a row above a `GraphSheet` of one region; `map-select-details` holds the
+preview panel as one line; `map-select-buttons` holds Back, Options and Confirm. Screen name is the
+page's drawn title ("Select Map"); focus starts on the table, landing on the map the page opened on.
+
+Measured 2026-09-06 at 1280x800 through `/gui/unity` and a screenshot crop: `HeaderWithSortButtons`
+at [87,104,858,26] with seven `TableSortUIButton`s at x 95, 151, 376, 523, 690, 795 and 880 (Type
+and Played draw an icon and no caption); SIX filter buttons drawn over that band at y 108, x 122,
+495, 661, 767, 851 and 906 (Type, Tag, Win Condition, Players, Size, Played); the maps as
+`SelectMapLobbyMenuEntry(Clone)` rows 34 px tall at x 95, drawing a type icon (x 110), the name
+(151), the tag text (377), the win-condition icons (532), the player count (727), the size (791) and
+a played badge (892); `LobbyMapPreview` at x 954 with the map's name at y 319, its description in a
+scroll rect at y 367 and the win-condition icons at y 298; Confirm at [974,677]; Back at [21,20] and
+Options at [1233,11] in the band above. The screenshot matches, the six funnels included.
+
+Escape is CLAIMED and presses the drawn Back button: `MapSelectMenu.SetupAndAnimateAfterLoad`
+registers only `InputActions.UI.Confirm` on its non-gamepad branch (decompiled, line 296),
+`UIFilterDropdown.Show` registers `UI.Cancel` (this game's gamepad binding) for its own list, and
+`LobbyNavigation` registers no input callback at all - it only subscribes to the menu's own
+`OnCancel`, which the drawn Back button raises. Verified: `ui_back` answered `consumed` and the map
+type page came back with nothing stray spoken.
+
+Diff: 440 before lines against 462 after, and every before line is accounted for. The mapping, row
+by row, for New Beginnings: the widget's `New Beginnings, Type, Official` (buffer
+`New Beginnings, Type, Official / Official`) is now the cell `Official`, with the column spoken as
+the edge crossed into it and `Type, Official / Official` as its buffer; and the same for `Name`,
+`Tag, blank`, `Win Condition, King of the Hill`, `Players, 2`, `Size, 65 x 65` and `Completed`.
+Every other map's seven cells map the same way, which is why the sorted after file holds fewer
+per-row lines than the before one: two maps of the same size are one `65 x 65` line once the row
+name has left the cell. Ninety-three before lines have no identical after line, in five groups:
+
+1. Every map's NAME cell (57 lines): the widget's buffer read "New Beginnings, Name" and the
+   sheet's primary opens its buffer with its own readout, "New Beginnings" - the column's caption is
+   the edge crossed into the cell, and "Name, New Beginnings" over "New Beginnings" would be the same
+   words twice. Checked mechanically: 56 of the 57 bare names are an after buffer of their own, and
+   the 57th is the selected map, whose after buffer is "New Beginnings / selected".
+2. The seven column headings lost the words "column header" (7 lines): the band's nodes are
+   buttons, and a role word is excluded from a flat line by design.
+3. The fifteen maps with more than one win condition lost their joined cell
+   ("King of the Hill and Beacons of Power"): that cell is now one piece per drawn icon, each with
+   that icon's own tooltip, which is the owner's ruling for this column.
+4. Thirteen filter checkboxes: "unchecked" became "not checked" on Completed and Not completed (the
+   phase B word), and eleven tag and win-condition boxes gained their tooltip as a buffer line. That
+   second half is the CAPTURE, not the port: a toggle's text mesh is inactive while the game's list
+   is shut, so the before capture (taken with the lists closed) read no tooltip from them, and the
+   after capture was taken with all six lists opened so the diff could see the boxes at all.
+5. The preview line: the description moved out of the label into a declared SECTION, so the label is
+   the map's name alone and the buffer holds the description one drawn line at a time, with the win
+   conditions the panel draws icons for added after them.
+
+Deviations, each measured:
+
+- SIX filter buttons, not the four the proposal named: the game draws Size and Played funnels too
+  (measured above), and the adapter's seventh filter (Content profile) reports itself not drawn on
+  this machine and is skipped. Declaring only four would have dropped 7 of the 30 checkboxes the
+  before capture holds.
+- THE PRIMARY IS WALKED FIRST, though the game draws the type icon to the left of the name.
+  `GraphSheet` emits the primary cell before every other cell of a row, so the walk is Name, Type,
+  Tag, Win Condition, Players, Size, Completed. The heading band is declared in that same order (and
+  each heading stamped with the column it stands over) so that the band and the rows are walked
+  identically and Up out of a row reaches its own column's heading.
+- ARRIVING ON A ROW SELECTS THAT MAP. The row's focus visual is the adapter's `FocusNative`, which
+  is the menu's own `SetSelectedEntry` - the call that fills the preview - so there is no native way
+  to look at a map without picking it, exactly as on the random layout page. The row therefore says
+  "selected" only for the map the page opened on (the focus visual runs after the arrival is
+  composed), and Enter is the entry's own click, which says nothing the live watch has not said.
+- The cells carry a `BufferHead` of the column's caption and the value, because the caption is
+  spoken as the edge crossed into the cell and nobody arrives at a review buffer across an edge.
+  The primary keeps its readout as its buffer head: "Name, New Beginnings" over "New Beginnings"
+  would be the same words twice.
+- The sort heading says the DIRECTION the game draws its arrow in ("ascending", "descending",
+  nothing when the column is unsorted), through the `ModStrings.UI.SortAscending` pair the widget
+  table already used, rather than saying "selected".
+- The preview is ONE line, not a stop of several: the panel draws a name, a paragraph and a row of
+  icons, so the node's label is the name (watched live) and its SECTION is the paragraph's own lines
+  followed by the win conditions. A section rather than value parts because a dossier runs to several
+  drawn lines and the review buffer must hold them one at a time - a part is exactly one buffer line,
+  newlines and all - while a section is announced on arrival just the same. Verified: with the cursor
+  on that line, clicking another map natively made it speak "Haven", then the description, then
+  "Beacons of Power and King of the Hill"; and the buffer of a multi-paragraph map reads its
+  paragraph, then "Forced factions", then each faction on a line of its own.
+- The adapter gained six kinds of member, each a game fact the screen had no way to ask for:
+  `PreviewTitle` (the name the preview panel draws), `IsSelectedEntry` with the row's `IsSelected`,
+  `Entry` (the drawn row), `WinConditionTooltips` (one per drawn icon, for the pieces),
+  `MapSelectSortButtonAdapter.Button`, and `MapSelectFilterAdapter.Subject`/`IsOpen` with
+  `Option.Subject`.
+
+Walk (all through `/input` and `/type`): Tab cycles table, preview, buttons, filters; Right across a
+row said "Type, Official", "Tag, blank", "Win Condition, King of the Hill", "Players, 2"; Down in the
+Players column said "A Clash in the Marsh, 3, 2 of 57" and kept the column; Left into a two-icon win
+condition said "Win Condition, Beacons of Power" and then "King of the Hill" with NO caption between
+the pieces; End reached "Arti- Test, 57 of 57" and Home the band's "Name, button"; `/type haven`
+landed on "Haven, selected, 29 of 57" with ONE result; Enter on the Name heading said "ascending" and
+put "A Clash in the Marsh" first, again said "descending" and put "Woods And Walls" first; Right on
+the Type filter opened the game's list on "Official, checkbox, checked, 1 of 3", Enter said "not
+checked" and the table refiltered to one row, Enter again said "checked" and it was 57 again.
+
+Follow-ups, not fixed:
+
+- A third press of a sort heading clears the arrow but does NOT restore the order the page opened
+  with: `TableSortUIButton.Reset` only blanks the graphic and the menu re-sorts by the same column.
+  The game's, and the widget table had it too.
+- Type-ahead re-announces the landing once per typed character, so "haven" read "Haven, selected"
+  five times. The engine's, and it shows here because every letter narrows to the same row.
+- `AdventureLobbyMapSelectRowAdapter.Name` and the sort headings still normalise through
+  `SpeechTextSanitizer.Normalize` (pre-existing, and against the repo's standing rule).
+- `MapSelectFilterAdapter.Label` for the Played filter is that column's caption, so the group and
+  the last column read the same word, "Completed"; that is what the widget screen read too.
+
+Manual test:
+
+1. Main menu, Conquest, Conquest maps. Hear "Select Map", then "Select Map, grid, New Beginnings,
+   selected, 1 of 57".
+2. Down and Up walk the maps, each reading its name and its place; the picture's orange frame and the
+   preview panel follow the cursor.
+3. Right walks the columns, naming each on the way in: Type, Tag, Win Condition, Players, Size,
+   Completed. On a map with two win conditions, Right steps from one icon to the other with no
+   caption in between. Left comes back the same way.
+4. From a metadata column, Down says the next map's name, then that column's value, then "N of 57".
+5. Home reaches the heading band ("Name, button"); Enter there sorts and says "ascending", Enter
+   again "descending". Down returns to the maps.
+6. Type a few letters of a map's name: the cursor lands on it. Backspace ends the search.
+7. Tab: the preview line (name, description, win conditions); Tab: "Back, button, 1 of 3", then
+   Options and Confirm; Tab: "Type, group, collapsed, 1 of 6".
+8. On a filter group, Right opens the game's own checkbox list and lands on its first box; Enter
+   ticks and unticks it and the table refilters under you; Left closes the list again.
+9. Escape leaves the page for the map type page, the same as pressing Back.

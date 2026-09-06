@@ -110,6 +110,19 @@ namespace SongsOfConquestAccess.Adapters
             get { return GetLocalizedText("Lobby/MapSelect/Filter/FilterButton/Completed", "Completed"); }
         }
 
+        /// <summary>The map name the preview panel draws for the selected challenge.</summary>
+        public string PreviewTitle
+        {
+            get { return _menu != null ? LobbyMapPreviewText.GetTitle(PreviewRef(_menu)) : string.Empty; }
+        }
+
+        /// <summary>Whether this entry is the one the menu currently has selected - the challenge the
+        /// preview panel is showing and Confirm would take.</summary>
+        public bool IsSelectedEntry(LobbyChallengeMapEntry entry)
+        {
+            return _menu != null && entry != null && ReferenceEquals(SelectedEntryRef(_menu), entry);
+        }
+
         public AdventureLobbyChallengeMapRowAdapter SelectedRow
         {
             get
@@ -332,6 +345,38 @@ namespace SongsOfConquestAccess.Adapters
         public IReadOnlyList<string> WinConditionLabels
         {
             get { return GetWinConditionLabels(); }
+        }
+
+        /// <summary>One tooltip per drawn win-condition icon, in the order of
+        /// <see cref="WinConditionLabels"/>; a null entry is an icon the game drew without one.
+        /// </summary>
+        public IReadOnlyList<Tooltip> WinConditionTooltips
+        {
+            get
+            {
+                IReadOnlyList<string> labels = GetWinConditionLabels();
+                UIImage[] icons = _entry != null ? WinConditionIconsRef(_entry) : null;
+                List<Tooltip> tooltips = new List<Tooltip>(labels.Count);
+                for (int i = 0; i < labels.Count; i++)
+                {
+                    UIImage icon = icons != null && i < icons.Length ? icons[i] : null;
+                    tooltips.Add(HasTooltip(icon) ? Tooltip.ForComponent(icon, _localization) : null);
+                }
+
+                return tooltips;
+            }
+        }
+
+        /// <summary>The row the game draws this challenge as.</summary>
+        public Component Entry
+        {
+            get { return _entry; }
+        }
+
+        /// <summary>Whether this is the challenge the menu has selected.</summary>
+        public bool IsSelected
+        {
+            get { return _owner != null && _owner.IsSelectedEntry(_entry); }
         }
 
         public bool IsCompleted

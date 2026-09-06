@@ -201,7 +201,13 @@ graph side of the mod.
   cross-cutting parameters. `Radio` arrived with the random layout page (a set where exactly one
   is in force and picking is not doing), and `DoNotDrawTooltip` with the settings forms (an edit
   control keeps its tooltip in the buffer but must not have it DRAWN, because drawing selects the
-  component it hangs on and that takes the keyboard off the field). Still to add: the sheet cell.
+  component it hangs on and that takes the keyboard off the field).
+- Tables are declared by each screen with `ui/graph/GraphSheet.cs` directly, not through a shared
+  reader: the screen declares the drawn heading band as a menu row of the table's own stop (each
+  heading stamped with `NodeVtable.Column` and `SearchesAsItself`, no positions), then one region
+  per drawn caption with `RowAt` per row - the primary cell first, the metadata cells as
+  `SheetCell(column, piece, vtable)` read-only text carrying a `BufferHead` of the caption and the
+  value - and pins the stop's Tab landing with `builder.LandStopOn(sheet.FirstRow)`.
 - `ui/ControlTypes.cs` — the role registry: `Button`, `Group`, `Text` (no role word),
   `EditField` ("editable"), `Checkbox` ("checkbox"), `Slider` ("slider"), `ComboBox`
   ("combo box"), `Tab` ("tab"), `RadioButton` ("radio button"). New
