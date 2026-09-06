@@ -272,3 +272,66 @@ Manual test:
    (the popup binds its own Confirm to Yes in keyboard mode - follow-up above).
 4. Escape: the game closes the popup itself, as No would.
 5. Enter on No: the popup closes and the main menu reads again.
+
+### CommunityMapsModalScreen (one variant verified, three blocked)
+
+Built: one stop in the family's three-part shape. The first line the modal draws is its heading
+- a text node of its own AND the screen name - then what it has to say, where focus starts,
+then the field where the modal has one, then the buttons sorted by drawn left edge. Measured
+2026-09-06 at 1280x800 on the authentication modal (`Authentication Popup` > `Main Panel`):
+heading "Authentication" at y 315, its paragraph at y 403, Back at x 373, Connect with Steam at
+x 509, Connect with email at x 721. The screenshot matches.
+
+Escape: claimed. The game's host of the browser (`LavapotionModIOBrowserUtilityBehaviour`)
+registers no input callback at all, and mod.io's own cancel (`InputReceiver.OnCancel`, calling
+`Navigating.Cancel()`) is reached only from its Input System actions, which this build does not
+bind. The screen claims Back and runs mod.io's `Navigating.Cancel` through the adapter, rather
+than picking a drawn button: that native path already knows what each modal state closes to
+(the code panel's own Cancel, the context menu's Close). Verified: `ui_back` answered
+`consumed` and the modal closed; the drawn Back button does the same thing when activated.
+
+Diff: one line added, the heading, which the widget tree spoke only as the container's name.
+Nothing missing, nothing changed.
+
+Deviations, measured: the text nodes get marker subjects kept in a small per-screen map, so a
+rebuild seats the cursor on the same line; the widget's signature polling and its retained-tree
+`Refresh()` are gone, since the graph is declared afresh every operation - `Refresh()` stays as
+an empty method because the detector calls it, and `State` stays a constructor snapshot because
+the detector compares it against a freshly read one to tell a CHANGED modal from a changed
+panel; the widget's separate context-menu branch is gone, the same actions being declared the
+same way whatever the state is; on the download queue the heading is now the heading node
+rather than also a body line.
+
+BLOCKED, declared but never opened here (the account authenticates through Steam, so the e-mail
+login is unreachable):
+
+- The e-mail box (`AuthenticationPanels.AuthenticationPanelEmailField`, a bare
+  `TMP_InputField`): an edit field driven by `GameTextEditor`. `OpenPanel_Email` (decompiled
+  lines 640 to 685) wires no `onSubmit` or `onEndEdit` on it, so Enter ends the edit and does
+  nothing else - the plain ES2 contract, without the dialog exception. `GameTextEditor` grew a
+  `Request(TMP_InputField)` and a private `Field` that speaks to either toolkit; the game-field
+  path is unchanged and was re-verified on the join-game popup afterwards ("editing", the
+  stand-down answering `standing down`, then "Cancelled").
+- The five-digit code: ONE node, not five. `KeyInput5Digits` reads the keyboard in its own
+  `Update` while the panel is drawn, keeps one string and one index, and `KeyInput5DigitsUi.Open`
+  clears the event system's selection; the five boxes are `TMP_Text`s it renders that string
+  into, with nothing to focus and no way to move between them but typing and Backspace. The
+  screen speaks only the character that changed (the widget's own behaviour, ported) and turns
+  type-ahead off while that panel is up, because the letters typed there are the code.
+- The context menu, the notification, the confirm-uninstall and the download queue: declared by
+  the same code, never opened here.
+
+Follow-ups, not fixed: `CommunityMapsModalAdapter.GetActions()` returns an empty list for the
+ContextMenu state, so the context menu has never had any rows to read - pre-existing, and
+unchanged by this port; `POST /type` still bypasses the stand-down (seen again here, the
+type-ahead search ran while the game held the keyboard).
+
+Manual test:
+
+1. Main menu, Community Maps. Hear "Authentication", then "mod.io is a 3rd party utility...".
+2. Home: the heading; Down through the paragraph, Back, Connect with Steam, Connect with email.
+3. Escape: the modal closes and the community maps home reads again.
+4. Reopen it and press Enter on Back: the same.
+5. If you ever sign in by e-mail: the e-mail box should say "editable", Enter should say
+   "editing", typing should echo, Enter should end the edit without sending; the code panel
+   should read one control, speak each character as it is typed, and Enter should continue.

@@ -1054,6 +1054,13 @@ namespace SongsOfConquestAccess.Adapters
 
             public string Label { get; private set; }
 
+            /// <summary>The panel the game draws the code boxes on, so a screen can key a control on
+            /// it and ask whether it is still painted.</summary>
+            public Component Owner
+            {
+                get { return _keyInput; }
+            }
+
             public bool IsVisible
             {
                 get { return _keyInput != null && _keyInput.gameObject.activeInHierarchy; }

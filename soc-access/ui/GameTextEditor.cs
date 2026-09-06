@@ -41,8 +41,8 @@ namespace SongsOfConquestAccess.UI
 
         private readonly TextInputEchoHelper _echo = new TextInputEchoHelper();
 
-        private IUITextMeshInputField _requested;
-        private IUITextMeshInputField _editing;
+        private Field _requested;
+        private Field _editing;
         private string _snapshot;
         private bool _sawFocus;
         private int _framesWaited;
@@ -64,6 +64,18 @@ namespace SongsOfConquestAccess.UI
         /// <summary>Ask for the game's editor on <paramref name="field"/>. Nothing is said here: the
         /// word comes with the keyboard, a frame or more later.</summary>
         public void Request(IUITextMeshInputField field)
+        {
+            Request(field == null ? null : new Field(field));
+        }
+
+        /// <summary>The same, for a bare TMP field: the mod.io browser the community maps screens
+        /// wrap draws its own text boxes rather than the game's, and the contract is the same.</summary>
+        public void Request(TMPro.TMP_InputField field)
+        {
+            Request(field == null ? null : new Field(field));
+        }
+
+        private void Request(Field field)
         {
             if (field == null || _requested != null || _editing != null)
             {
@@ -94,7 +106,7 @@ namespace SongsOfConquestAccess.UI
                     return;
                 }
 
-                IUITextMeshInputField field = _requested;
+                Field field = _requested;
                 _requested = null;
                 Begin(field);
                 return;
@@ -105,7 +117,7 @@ namespace SongsOfConquestAccess.UI
                 return;
             }
 
-            if (IsFocused(_editing))
+            if (_editing.Focused)
             {
                 _sawFocus = true;
                 _echo.Update();
@@ -136,7 +148,7 @@ namespace SongsOfConquestAccess.UI
             return !string.Equals(before ?? string.Empty, after ?? string.Empty, StringComparison.Ordinal);
         }
 
-        private void Begin(IUITextMeshInputField field)
+        private void Begin(Field field)
         {
             if (field == null || !field.Interactable)
             {
@@ -145,21 +157,20 @@ namespace SongsOfConquestAccess.UI
 
             // Read BEFORE the handover: the text a cancel puts back is the one that was there when
             // the player asked to edit.
-            _snapshot = TextOf(field);
+            _snapshot = field.Text;
             _editing = field;
             _sawFocus = false;
             _framesWaited = 0;
-            field.Select();
-            field.ActivateInputField();
+            field.Activate();
 
             // Queued, so it follows whatever the activation itself said rather than cutting it off.
             Say(ModText.Get(ModStrings.UI.EditStarted));
-            _echo.Begin(field);
+            field.BeginEcho(_echo);
         }
 
         private void Finish(bool announce)
         {
-            IUITextMeshInputField field = _editing;
+            Field field = _editing;
             string before = _snapshot;
             _echo.Stop();
             _editing = null;
@@ -172,7 +183,7 @@ namespace SongsOfConquestAccess.UI
                 return;
             }
 
-            string after = TextOf(field);
+            string after = field.Text;
             if (!Committed(before, after))
             {
                 Say(ModText.Get(ModStrings.UI.EditCancelled));
@@ -191,46 +202,144 @@ namespace SongsOfConquestAccess.UI
             return keyboard != null && (keyboard.enterKey.isPressed || keyboard.numpadEnterKey.isPressed);
         }
 
-        /// <summary>
-        /// Whether the field still has the keyboard, asked of TMP's own <c>isFocused</c> rather than of
-        /// <see cref="IUITextMeshInputField.Focused"/>. The game's property also answers true for its
-        /// gamepad "this field controls the UI input" latch, which is cleared by the field's DESELECT
-        /// and not by deactivating it - so a field the game had merely deactivated still read as
-        /// focused and the edit never ended (measured on the join-game popup, 2026-09-06). This is
-        /// also the signal the stand-down reads, so the two halves agree about when the keyboard is
-        /// the game's.
-        /// </summary>
-        private static bool IsFocused(IUITextMeshInputField field)
-        {
-            try
-            {
-                UITextMeshInputField concrete = field as UITextMeshInputField;
-                TMPro.TMP_InputField input = concrete != null ? concrete.GetInputField() : null;
-                return input != null ? input.isFocused : field != null && field.Focused;
-            }
-            catch (Exception)
-            {
-                return false;
-            }
-        }
-
-        private static string TextOf(IUITextMeshInputField field)
-        {
-            try
-            {
-                return field == null ? string.Empty : field.InputFieldValue ?? string.Empty;
-            }
-            catch (Exception)
-            {
-                return string.Empty;
-            }
-        }
-
         private static void Say(string text)
         {
             if (!string.IsNullOrEmpty(text))
             {
                 SpeechPipeline.Output(new SpeechRequest(text, interrupt: false));
+            }
+        }
+
+        /// <summary>
+        /// The box being typed into, whichever toolkit drew it. Almost every field on the screen is
+        /// one of the game's own (<see cref="IUITextMeshInputField"/>), but the mod.io browser behind
+        /// the community maps pages draws bare TMP fields, and the editing contract - snapshot,
+        /// handover, echo, the word on the way out - is the same for both. Underneath both are TMP,
+        /// which is why one type can serve them.
+        /// </summary>
+        private sealed class Field
+        {
+            private readonly IUITextMeshInputField _game;
+            private readonly TMPro.TMP_InputField _input;
+
+            public Field(IUITextMeshInputField field)
+            {
+                _game = field;
+                _input = NativeInputFieldOf(field);
+            }
+
+            public Field(TMPro.TMP_InputField field)
+            {
+                _input = field;
+            }
+
+            public bool Interactable
+            {
+                get
+                {
+                    try
+                    {
+                        return _game != null ? _game.Interactable : _input != null && _input.interactable;
+                    }
+                    catch (Exception)
+                    {
+                        return false;
+                    }
+                }
+            }
+
+            public string Text
+            {
+                get
+                {
+                    try
+                    {
+                        if (_game != null)
+                        {
+                            return _game.InputFieldValue ?? string.Empty;
+                        }
+
+                        return _input != null ? _input.text ?? string.Empty : string.Empty;
+                    }
+                    catch (Exception)
+                    {
+                        return string.Empty;
+                    }
+                }
+            }
+
+            /// <summary>
+            /// Whether the field still has the keyboard, asked of TMP's own <c>isFocused</c> rather
+            /// than of <see cref="IUITextMeshInputField.Focused"/>. The game's property also answers
+            /// true for its gamepad "this field controls the UI input" latch, which is cleared by the
+            /// field's DESELECT and not by deactivating it - so a field the game had merely
+            /// deactivated still read as focused and the edit never ended (measured on the join-game
+            /// popup, 2026-09-06). This is also the signal the stand-down reads, so the two halves
+            /// agree about when the keyboard is the game's.
+            /// </summary>
+            public bool Focused
+            {
+                get
+                {
+                    try
+                    {
+                        if (_input != null)
+                        {
+                            return _input.isFocused;
+                        }
+
+                        return _game != null && _game.Focused;
+                    }
+                    catch (Exception)
+                    {
+                        return false;
+                    }
+                }
+            }
+
+            public void Activate()
+            {
+                if (_game != null)
+                {
+                    _game.Select();
+                    _game.ActivateInputField();
+                    return;
+                }
+
+                if (_input != null)
+                {
+                    _input.Select();
+                    _input.ActivateInputField();
+                }
+            }
+
+            public void BeginEcho(TextInputEchoHelper echo)
+            {
+                if (echo == null)
+                {
+                    return;
+                }
+
+                if (_game != null)
+                {
+                    echo.Begin(_game);
+                    return;
+                }
+
+                echo.Begin(_input);
+            }
+
+            private static TMPro.TMP_InputField NativeInputFieldOf(IUITextMeshInputField field)
+            {
+                try
+                {
+                    UITextMeshInputField concrete = field as UITextMeshInputField;
+                    return concrete != null ? concrete.GetInputField() : null;
+                }
+                catch (Exception)
+                {
+                    return null;
+                }
             }
         }
     }
