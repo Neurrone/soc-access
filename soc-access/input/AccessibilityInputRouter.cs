@@ -23,12 +23,7 @@ namespace SongsOfConquestAccess.Input
         {
             _screenManager = screenManager;
             _rawInputSubscription = InputSystem.onEvent.Subscribe(this);
-            _textKeyboard = Keyboard.current;
-            if (_textKeyboard != null)
-            {
-                _textKeyboard.onTextInput += OnTextInput;
-            }
-
+            FollowKeyboard();
             SocAccessMod.Instance?.LogInfo("AccessibilityInputRouter raw keyboard input attached");
         }
 
@@ -60,6 +55,31 @@ namespace SongsOfConquestAccess.Input
 
         private readonly System.Text.StringBuilder _typed = new System.Text.StringBuilder();
         private Keyboard _textKeyboard;
+
+        // Subscribe to whichever keyboard is current. Asked every frame, not once: on a cold start
+        // the mod comes up before the input system has a keyboard device at all (Keyboard.current
+        // is null in the constructor), and the device can be replaced later. A reference compare
+        // per frame is the whole cost.
+        private void FollowKeyboard()
+        {
+            Keyboard current = Keyboard.current;
+            if (ReferenceEquals(current, _textKeyboard))
+            {
+                return;
+            }
+
+            if (_textKeyboard != null)
+            {
+                _textKeyboard.onTextInput -= OnTextInput;
+            }
+
+            _textKeyboard = current;
+            if (_textKeyboard != null)
+            {
+                _textKeyboard.onTextInput += OnTextInput;
+                SocAccessMod.Instance?.LogInfo("AccessibilityInputRouter following keyboard " + _textKeyboard.deviceId + " for typed text");
+            }
+        }
 
         private void OnTextInput(char character)
         {
@@ -102,6 +122,7 @@ namespace SongsOfConquestAccess.Input
 
         public void Update()
         {
+            FollowKeyboard();
             DrainInjections();
             ConfirmPendingReleases();
         }
@@ -214,6 +235,14 @@ namespace SongsOfConquestAccess.Input
         public void OnNext(InputEventPtr value)
         {
             if (!value.valid)
+            {
+                return;
+            }
+
+            // Only key state carries presses. The keyboard also emits TEXT events for every typed
+            // character (read through Keyboard.onTextInput), and EnumerateChangedControls throws
+            // on those.
+            if (value.type != StateEvent.Type && value.type != DeltaStateEvent.Type)
             {
                 return;
             }
