@@ -13,9 +13,11 @@ Resuming in a fresh session: read §0's docs, then §2 (what is built) and §3 (
 the current phase in §7 and its rows in §8, then `docs/dev-loop.md` for the verification
 loop. Every screen goes through §4's dump-and-diff; the before-capture must be taken on the
 unported build, before the screen is touched. Commit per logical step and update this file
-as decisions are taken. Phase A is complete, walk included. Phase B is complete except its item 4 (the mod settings
-family), which waits on the owner's answer to proposal J in section 10; `docs/phase-b-handover.md`
-is the record of the phase and the owner's manual test. Resume with that answer, then phase C.
+as decisions are taken. Phase A is complete, walk included. Phase B: items 1 to 3 are ported (32 screens); the owner's first real-key walk found seven
+defects, fixed or being fixed under "Owner's first walk" in `docs/phase-b-handover.md`; the
+random maps page is being redesigned (ruling K, section 10) and item 4, the mod options
+dialog family, is decided (ruling J, section 10) and is the last phase B work. The handover file
+is the record of the phase and the owner's manual test. Resume there, then phase C.
 
 Owner decisions already made (do not re-ask):
 
@@ -594,7 +596,13 @@ Delete `ui/UIManager.cs`, `ui/FocusContext.cs`, every `ui/*Widget.cs`, `ui/MenuW
 `ui/TableWidget.cs`, and the three grid classes' widget base once their mode wrappers own
 them, and `TooltipActionsMenuScreen` with its Backquote action once no screen hands out a
 `TooltipAction` any more. Delete `/gui/widgets`. Update `AGENTS.md` (layout, the adapter rule stays, the
-widget-tree wording becomes graph wording) and `screens/README.md`.
+widget-tree wording becomes graph wording) and `screens/README.md`. Two more sweeps, recorded
+during phase B: replace every adapter's `SpeechTextSanitizer.Normalize` call (78 adapter files
+on 2026-09-06) with per-line handling at the adapter boundary, so multi-line bodies and
+descriptions reach the graph as lines rather than one collapsed run (`ui/SpokenLines.cs` is the
+shape); and lift the "graph screens only" limit on the input stand-down
+(`AccessibilityInputRouter.StandingDown`), which exists only because widget-era text inputs
+rely on the mod's own keys to leave a focused field.
 
 ## 8. Screen inventory
 
@@ -607,13 +615,13 @@ to bring to the owner, not a decision.
 | `MainMenuScreen` | Menu, Buttons | one stop, menu rows | A, done |
 | `FoldoutMenuScreen` | Menu | deleted: expandable groups on the main menu stop | A, done |
 | `PauseMenuScreen` | Menu | one stop, menu rows | C |
-| `PlatformUserMenuScreen` | Menu, Buttons | menu rows | B |
-| `QuitToDesktopPopupScreen` | Buttons, Text | dialog: question as read-only node, buttons row | B |
-| `MessageDialogScreen` | Buttons, TextInput, Text | dialog with `AnswersOnly`; text node with sections, optional edit node, buttons row; one screen for all seven sources (three out-of-game sources in B, the rest verified in C) | B |
-| `LoadingCompleteScreen` | PassiveButton | single node | B |
-| `CampaignMenuScreen` | Menu, Buttons | menu rows | B |
-| `TaleSelectScreen` | Menu, Buttons | menu rows with `Sections` for the tale blurb | B |
-| `CustomCampaignSelectScreen` | Menu (custom entry item), Buttons | menu rows with status parts | B |
+| `PlatformUserMenuScreen` | Menu, Buttons | menu rows | B, done |
+| `QuitToDesktopPopupScreen` | Buttons, Text | dialog: question as read-only node, buttons row | B, done |
+| `MessageDialogScreen` | Buttons, TextInput, Text | dialog with `AnswersOnly`; text node with sections, optional edit node, buttons row; one screen for all seven sources (three out-of-game sources in B, the rest verified in C) | B, done |
+| `LoadingCompleteScreen` | PassiveButton | single node | B, done |
+| `CampaignMenuScreen` | Menu, Buttons | menu rows | B, done |
+| `TaleSelectScreen` | Menu, Buttons | menu rows with `Sections` for the tale blurb | B, done |
+| `CustomCampaignSelectScreen` | Menu (custom entry item), Buttons | menu rows with status parts | B, done |
 | `WorldChoiceMenuScreen` | Menu, Buttons, Text | menu rows, text as sections | C |
 | `WorldConfirmMenuScreen` | Buttons, Text | dialog shape | C |
 | `TutorialSimpleScreen` | Buttons, Checkbox, Text | text node, toggle, buttons row | C |
@@ -635,18 +643,18 @@ to bring to the owner, not a decision.
 | `ResearchScreen` | Menu, Buttons | research rows with sections | C |
 | `MarketplaceScreen` | Menu, Buttons, Text | offer rows with adjust, buttons row | C |
 | `BuildMenuScreen` | Menu, Checkbox, Buttons, Text | category regions, building rows with sections | C |
-| `OptionsScreen` | Menu, Checkbox, Slider, Buttons, Text | tab regions, toggle/slider/choice rows | B |
-| `SaveLoadGameScreen` | Menu, TextInput, Buttons, Text | save rows, name edit, buttons row (load variant in B, save variant verified in C) | B |
-| `OnlineHostGameScreen` | Checkbox, TextInput, Buttons, Text | form rows | B |
-| `ChatScreen` | Menu, TextInput, Buttons | message rows, edit node; game-owned field handover | B |
-| `AdventureLobbyMapTypeScreen` | Menu, Buttons | menu rows | B |
-| `AdventureLobbyRandomLayoutScreen` | Menu, Checkbox, Buttons | option rows | B |
-| `AdventureLobbyPlayersScreen` | Menu, Checkbox, Buttons, Text | one region per slot, slot rows | B |
-| `AdventureLobbyInviteProvidersScreen` | Menu, Buttons | menu rows | B |
-| `AdventureLobbyGameSettingsScreen` | Menu, Checkbox, TextInput, TimeInput, Buttons, Text | setting rows, edit nodes | B |
-| `AdventureLobbyPlayerSettingsScreen` | Checkbox, Slider, Buttons, Text | setting rows | B |
-| `AdventureLobbyIconDropdownScreen` | Menu, Buttons | drop list (ES2 `DropListScreen` shape) | B |
-| `CampaignMapSelectScreen` | Menu, Buttons, Text | map rows with sections, buttons row | B |
+| `OptionsScreen` | Menu, Checkbox, Slider, Buttons, Text | tab regions, toggle/slider/choice rows | B, done |
+| `SaveLoadGameScreen` | Menu, TextInput, Buttons, Text | save rows, name edit, buttons row (load variant in B, save variant verified in C) | B, done |
+| `OnlineHostGameScreen` | Checkbox, TextInput, Buttons, Text | form rows | B, done |
+| `ChatScreen` | Menu, TextInput, Buttons | message rows, edit node; game-owned field handover | B, done |
+| `AdventureLobbyMapTypeScreen` | Menu, Buttons | menu rows | B, done |
+| `AdventureLobbyRandomLayoutScreen` | Menu, Checkbox, Buttons | option rows | B, redesign K |
+| `AdventureLobbyPlayersScreen` | Menu, Checkbox, Buttons, Text | one region per slot, slot rows | B, done |
+| `AdventureLobbyInviteProvidersScreen` | Menu, Buttons | menu rows | B, blocked |
+| `AdventureLobbyGameSettingsScreen` | Menu, Checkbox, TextInput, TimeInput, Buttons, Text | setting rows, edit nodes | B, done |
+| `AdventureLobbyPlayerSettingsScreen` | Checkbox, Slider, Buttons, Text | setting rows | B, done |
+| `AdventureLobbyIconDropdownScreen` | Menu, Buttons | drop list (ES2 `DropListScreen` shape) | B, done |
+| `CampaignMapSelectScreen` | Menu, Buttons, Text | map rows with sections, buttons row | B, done |
 | `ModSettingsScreen` | Menu, Checkbox, Buttons | an entry of the game's options window, as in ES2; setting rows | B, last |
 | `AnnouncementOrderScreen` | AnnouncementOrderMenu, Buttons | rows plus carry for reorder | B, last |
 | `AnnouncementElementSettingsScreen` | Checkbox, Buttons | toggle rows | B, last |
@@ -655,19 +663,19 @@ to bring to the owner, not a decision.
 | `ScannerCustomCategoryScreen` | Buttons | rows, child screens for key and selector | B, last |
 | `ScannerCustomCategoryKeyScreen` | Buttons | key-capture node (`widgets.md` "Key-rebind capture") | B, last |
 | `ScannerCustomCategorySelectorScreen` | Checkbox, Buttons | toggle rows | B, last |
-| `CommunityMapsHomeScreen` | Menu, Buttons | menu rows | B |
-| `CommunityMapsCollectionScreen` | Menu, Checkbox, TmpInputField, Buttons | rows, filter edit | B |
-| `CommunityMapsDetailsScreen` | Menu, Buttons, Text | text sections, action rows | B |
-| `CommunityMapsSearchFilterScreen` | Menu, TmpInputField, Buttons | filter rows, edit | B |
-| `CommunityMapsSearchResultsScreen` | Menu, Buttons, Text | result rows | B |
-| `CommunityMapsModalScreen` | Menu, FiveDigitCode, TmpInputField, Buttons, Text | dialog shape with edit nodes | B |
-| `CodexScreen` | Menu, Checkbox, CodexContent, Buttons | category stop, article stop, content sections as regions | B |
+| `CommunityMapsHomeScreen` | Menu, Buttons | menu rows | B, done |
+| `CommunityMapsCollectionScreen` | Menu, Checkbox, TmpInputField, Buttons | rows, filter edit | B, done |
+| `CommunityMapsDetailsScreen` | Menu, Buttons, Text | text sections, action rows | B, done |
+| `CommunityMapsSearchFilterScreen` | Menu, TmpInputField, Buttons | filter rows, edit | B, done |
+| `CommunityMapsSearchResultsScreen` | Menu, Buttons, Text | result rows | B, done |
+| `CommunityMapsModalScreen` | Menu, FiveDigitCode, TmpInputField, Buttons, Text | dialog shape with edit nodes | B, done |
+| `CodexScreen` | Menu, Checkbox, CodexContent, Buttons | category stop, article stop, content sections as regions | B, done |
 | `SpellbookScreen` | Menu, DraggableMenu, Checkbox, Buttons | spell rows plus carry for reorder | C |
-| `OnlineGameListScreen` | Menu, Table, Buttons, Text | sheet of games, buttons row | B |
-| `PlayerStatsScreen` | Menu, Table, Buttons, Text | sheet per tab | B |
+| `OnlineGameListScreen` | Menu, Table, Buttons, Text | sheet of games, buttons row | B, done |
+| `PlayerStatsScreen` | Menu, Table, Buttons, Text | sheet per tab | B, done |
 | `PostAdventureStatsScreen` | Menu, Table, Buttons, Text | sheet per tab | C |
-| `AdventureLobbyMapSelectScreen` | Menu, Table, Buttons, Text | sheet of maps, detail sections | B |
-| `AdventureLobbyChallengeMapSelectScreen` | Table, Buttons, Text | sheet of challenges | B |
+| `AdventureLobbyMapSelectScreen` | Menu, Table, Buttons, Text | sheet of maps, detail sections | B, done |
+| `AdventureLobbyChallengeMapSelectScreen` | Table, Buttons, Text | sheet of challenges | B, done |
 | `CommanderSheetScreen` | InventoryGrid, Menu, Buttons, Text | stats region, equipment sheet, backpack sheet, carry | D |
 | `ArtifactMarketScreen` | InventoryGrid, Menu, Buttons, Text | offers sheet, backpack sheet, carry or buy/sell activation | D |
 | `TradingScreen` | InventoryGrid, ArmyExchangeGrid, Menu, Buttons | two army sheets plus two inventory sheets, carry across | D |
