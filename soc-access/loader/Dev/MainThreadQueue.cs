@@ -76,7 +76,18 @@ namespace SongsOfConquestAccess.Loader.Dev
                 {
                     Work = () =>
                     {
-                        work();
+                        // Nobody waits on posted work, so a throw here would vanish: a reload
+                        // that died between unloading the old mod and starting the new one
+                        // once left the game with no mod and no log line.
+                        try
+                        {
+                            work();
+                        }
+                        catch (Exception e)
+                        {
+                            LoaderLog.Error("Posted main-thread work threw: " + e);
+                        }
+
                         return null;
                     },
                 }

@@ -263,3 +263,10 @@ Filled in as the loop is used; keep entries to one line each with the date.
 - 2026-09-05: `POST /key` with `Tab` from the map raised the game window, the mod's raw input
   subscription dispatched `next_widget` exactly once (no debounce duplicate) and answered
   `speech:["Cecilia Stoutheart button."]`; the wielder button had the focus afterwards.
+- 2026-09-06: an `/eval` that fails AFTER parsing (wrong namespace, misspelled member) leaves an
+  unfinished type in a dynamic assembly that can never be unloaded, and every `GetTypes()` scan
+  over the domain then throws `Type '<InteractiveExpressionClass>' is not finished`. The game
+  scans on every game creation (`AssemblyCommandLookup`), so Conquest failed with "Error during
+  construction of type 'Game'" and the main menu stayed faded out. `DynamicAssemblyTypesPatches`
+  (dev-only, a finalizer on `AssemblyBuilder.GetTypes`) now reports the finished types instead;
+  the warning "A dynamic assembly holds an unfinished type" in the log says it fired.

@@ -134,15 +134,27 @@ namespace SongsOfConquestAccess.Loader
 
         internal Coroutine StartModCoroutine(IEnumerator routine)
         {
+            // Null when the routine ran to completion inside StartCoroutine itself (a readiness
+            // wait that found the menu already ready): nothing to stop later, and StopCoroutine
+            // throws on a null handle.
             Coroutine coroutine = StartCoroutine(routine);
-            _modCoroutines.Add(coroutine);
+            if (coroutine != null) _modCoroutines.Add(coroutine);
             return coroutine;
         }
 
         internal void StopModCoroutines()
         {
-            foreach (Coroutine coroutine in _modCoroutines) StopCoroutine(coroutine);
-            _modCoroutines.Clear();
+            try
+            {
+                foreach (Coroutine coroutine in _modCoroutines)
+                {
+                    if (coroutine != null) StopCoroutine(coroutine);
+                }
+            }
+            finally
+            {
+                _modCoroutines.Clear();
+            }
         }
     }
 }

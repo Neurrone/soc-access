@@ -34,6 +34,12 @@ namespace SongsOfConquestAccess
             _host = host;
         }
 
+        /// <summary>Whether the loader is running the dev server, for the dev-only patches.</summary>
+        public bool DevServerUp
+        {
+            get { return _host != null && _host.DevServerUp; }
+        }
+
         public Coroutine StartCoroutine(IEnumerator routine)
         {
             return _host.StartCoroutine(routine);
