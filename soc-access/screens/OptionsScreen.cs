@@ -56,7 +56,7 @@ namespace SongsOfConquestAccess.Screens
         private readonly OptionsMenuAdapter _adapter;
 
         // A subject of its own per synthesized row, kept across rebuilds so the reconciler seats the
-        // cursor on the same line: a caption that heads nothing, and the child under a slider.
+        // cursor on the same line: a caption that heads nothing, and the window's own Close button.
         private readonly Dictionary<string, object> _markers = new Dictionary<string, object>();
 
         public OptionsScreen(OptionsMenuAdapter adapter)
@@ -299,40 +299,28 @@ namespace SongsOfConquestAccess.Screens
         }
 
         /// <summary>
-        /// A slider row, with the game's own value box under it as a child.
+        /// A slider row. Left and Right move the value; Enter opens the game's own "provide a number"
+        /// popup through the value box the row draws beside the handle.
         ///
-        /// Left and Right move the value, so they are not available to open the group; the child is
-        /// therefore always declared open and reached with Down, like the next row. The group says
-        /// nothing about being expanded (<see cref="NodeVtable.SpeaksOwnExpansion"/>): there is no
-        /// closing it, so its state is not news.
+        /// The value box used to be a child node of its own, which put a "Please provide a number"
+        /// button under every slider in the window and made the list of settings twice as long to
+        /// walk. The box is one way of setting the same number the arrows set, so it is the row's
+        /// activation instead; a row that draws no box has no activation at all.
         /// </summary>
         private void AddSlider(GraphBuilder builder, OptionsMenuAdapter.SliderItem slider, Component subject)
         {
+            string editorLabel = slider.GetValueEditorLabel != null ? slider.GetValueEditorLabel() : null;
             NodeVtable vtable = GraphNodes.Slider(
                 slider.GetLabel,
                 slider.GetValueText,
                 (sign, large) => Adjust(slider, sign, large),
                 slider.IsEnabled,
-                slider.GetTooltip());
+                slider.GetTooltip(),
+                activate: string.IsNullOrWhiteSpace(editorLabel)
+                    ? (Action)null
+                    : () => slider.OpenValueEditor());
             vtable.OnFocusVisual = slider.Focus;
-            vtable.SpeaksOwnExpansion = true;
-
-            string editorLabel = slider.GetValueEditorLabel != null ? slider.GetValueEditorLabel() : null;
-            DrawnNode row = new DrawnNode(ControlId.For(subject, "options:row/" + slider.Id), vtable, subject);
-            if (string.IsNullOrWhiteSpace(editorLabel))
-            {
-                builder.AddItem(row);
-                return;
-            }
-
-            builder.BeginGroup(row, expanded: true);
-            builder.AddItem(new SyntheticNode(
-                ControlId.For(Marker(slider.Id + "/edit"), "options:row/" + slider.Id + "/edit"),
-                GraphNodes.Button(
-                    () => slider.GetValueEditorLabel(),
-                    () => slider.OpenValueEditor(),
-                    slider.IsEnabled)));
-            builder.EndGroup();
+            builder.AddItem(new DrawnNode(ControlId.For(subject, "options:row/" + slider.Id), vtable, subject));
         }
 
         private static void Adjust(OptionsMenuAdapter.SliderItem slider, int sign, bool large)

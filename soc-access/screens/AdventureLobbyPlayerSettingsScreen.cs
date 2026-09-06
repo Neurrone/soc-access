@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using SongsOfConquest.Client.Adventure.Menu.Lobby;
 using SongsOfConquestAccess.Adapters;
@@ -18,8 +19,8 @@ namespace SongsOfConquestAccess.Screens
     /// caption is drawn over any of it, so the screen declares no regions.
     ///
     /// Each slider draws a value box over its number (an `EditButton` at x 792), so each slider row
-    /// carries the same always-open child the options window's sliders do: a button opening the
-    /// game's own "Provide a number" popup.
+    /// is ACTIVATED by opening the game's own "Provide a number" popup, exactly as the options
+    /// window's sliders are; the arrows remain the way the value is moved.
     ///
     /// Escape is the game's (<see cref="ConsumesBack"/> false): <c>LobbyPlayerSettingsMenu.Show</c>
     /// registers <c>InputActions.UI.ExitMenu</c> outside its gamepad branch (decompiled, line 146),
@@ -36,7 +37,7 @@ namespace SongsOfConquestAccess.Screens
         private readonly AdventureLobbyPlayerSettingsAdapter _adapter;
 
         // A subject of its own per synthesized row, kept across rebuilds so the reconciler seats the
-        // cursor on the same line: the child under a slider, and the popup's own buttons.
+        // cursor on the same line: the popup's own buttons.
         private readonly Dictionary<string, object> _markers = new Dictionary<string, object>();
 
         public AdventureLobbyPlayerSettingsScreen(AdventureLobbyPlayerSettingsAdapter adapter)
@@ -206,41 +207,27 @@ namespace SongsOfConquestAccess.Screens
         }
 
         /// <summary>
-        /// A slider row, with the game's own value box under it as a child - the shape the options
-        /// window established. Left and Right move the value, so they are not available to open the
-        /// group; the child is declared open and reached with Down, and the group says nothing about
-        /// being expanded because there is no closing it.
+        /// A slider row - the shape the options window established. Left and Right move the value;
+        /// Enter opens the game's own "provide a number" popup through the value box the row draws
+        /// beside the handle, rather than the box being a child node of its own under every slider.
         /// </summary>
         private void AddSlider(
             GraphBuilder builder,
             AdventureLobbyPlayerSettingsAdapter.SliderItem slider,
             Component subject)
         {
+            string editorLabel = slider.GetValueEditorLabel != null ? slider.GetValueEditorLabel() : null;
             NodeVtable vtable = GraphNodes.Slider(
                 slider.GetLabel,
                 slider.GetValueText,
                 (sign, large) => Adjust(slider, sign, large),
                 slider.IsEnabled,
-                slider.GetTooltip());
+                slider.GetTooltip(),
+                activate: string.IsNullOrWhiteSpace(editorLabel)
+                    ? (Action)null
+                    : () => slider.OpenValueEditor());
             vtable.OnFocusVisual = slider.Focus;
-            vtable.SpeaksOwnExpansion = true;
-
-            string editorLabel = slider.GetValueEditorLabel != null ? slider.GetValueEditorLabel() : null;
-            DrawnNode row = new DrawnNode(ControlId.For(subject, "player-settings:" + slider.Id), vtable, subject);
-            if (string.IsNullOrWhiteSpace(editorLabel))
-            {
-                builder.AddItem(row);
-                return;
-            }
-
-            builder.BeginGroup(row, expanded: true);
-            builder.AddItem(new SyntheticNode(
-                ControlId.For(Marker(slider.Id + "/edit"), "player-settings:" + slider.Id + "/edit"),
-                GraphNodes.Button(
-                    () => slider.GetValueEditorLabel(),
-                    () => slider.OpenValueEditor(),
-                    slider.IsEnabled)));
-            builder.EndGroup();
+            builder.AddItem(new DrawnNode(ControlId.For(subject, "player-settings:" + slider.Id), vtable, subject));
         }
 
         private static void Adjust(AdventureLobbyPlayerSettingsAdapter.SliderItem slider, int sign, bool large)

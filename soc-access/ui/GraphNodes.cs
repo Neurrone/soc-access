@@ -263,14 +263,19 @@ namespace SongsOfConquestAccess.UI
         /// <summary>A value the player moves along a range with Left and Right, and by a coarse step
         /// with the same arrows held with Shift. <paramref name="valueText"/> is already in the form
         /// the player should hear it - a percentage, a count, a number of seconds - because only the
-        /// screen knows what the number means.</summary>
+        /// screen knows what the number means.
+        ///
+        /// <paramref name="activate"/> is what Enter does where the row draws a way to type the
+        /// number instead of sliding to it; it takes the same guard as the arrows, so a refusing
+        /// slider refuses it too. A slider without one has no activation at all.</summary>
         public static NodeVtable Slider(
             Func<string> label,
             Func<string> valueText,
             Action<int, bool> adjust,
             Func<bool> enabled = null,
             Tooltip tooltip = null,
-            Func<IList<string>> details = null)
+            Func<IList<string>> details = null,
+            Action activate = null)
         {
             List<NodeAnnouncement> parts = Parts(label, enabled);
             parts.Add(ValuePart(valueText));
@@ -280,6 +285,7 @@ namespace SongsOfConquestAccess.UI
                 Announcements = parts,
                 Sections = Sections(details, tooltip),
                 StateText = ActedState(valueText, enabled),
+                OnActivate = activate != null ? Guarded(activate, enabled) : null,
                 // Declared even while the slider is refusing, so Left and Right stay the slider's keys
                 // rather than quietly turning back into navigation on a control that looks exactly like
                 // the one beside it.
