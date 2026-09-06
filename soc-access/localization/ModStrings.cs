@@ -464,7 +464,9 @@ namespace SongsOfConquestAccess.Localization
             public static readonly ModString ReviewBufferUi = new ModString("UI.ReviewBufferUi", "UI");
             public static readonly ModString RoleButton = new ModString("UI.RoleButton", "button");
             public static readonly ModString RoleCheckBox = new ModString("UI.RoleCheckBox", "check box");
+            public static readonly ModString RoleCheckbox = new ModString("UI.RoleCheckbox", "checkbox");
             public static readonly ModString RoleColumnHeader = new ModString("UI.RoleColumnHeader", "column header");
+            public static readonly ModString RoleComboBox = new ModString("UI.RoleComboBox", "combo box");
             public static readonly ModString RoleDocument = new ModString("UI.RoleDocument", "document");
             public static readonly ModString RoleEdit = new ModString("UI.RoleEdit", "edit");
             public static readonly ModString RoleEditable = new ModString("UI.RoleEditable", "editable");
@@ -472,6 +474,7 @@ namespace SongsOfConquestAccess.Localization
             public static readonly ModString RoleGroup = new ModString("UI.RoleGroup", "group");
             public static readonly ModString RoleMenu = new ModString("UI.RoleMenu", "menu");
             public static readonly ModString RoleSlider = new ModString("UI.RoleSlider", "slider");
+            public static readonly ModString RoleTab = new ModString("UI.RoleTab", "tab");
             public static readonly ModString ScannerPath = new ModString("UI.ScannerPath", "{0}, {1}. {2}");
             public static readonly ModString SearchCleared = new ModString("UI.SearchCleared", "Search cleared");
             public static readonly ModString SearchNoMatch = new ModString("UI.SearchNoMatch", "No match for {0}");
@@ -489,6 +492,7 @@ namespace SongsOfConquestAccess.Localization
             public static readonly ModString StatusExpanded = new ModString("UI.StatusExpanded", "expanded");
             public static readonly ModString StatusBattleLost = new ModString("UI.StatusBattleLost", "battle lost");
             public static readonly ModString StatusMissing = new ModString("UI.StatusMissing", "missing");
+            public static readonly ModString StatusNotChecked = new ModString("UI.StatusNotChecked", "not checked");
             public static readonly ModString StatusUnchecked = new ModString("UI.StatusUnchecked", "unchecked");
             public static readonly ModString StatusUnavailable = new ModString("UI.StatusUnavailable", "unavailable");
             public static readonly ModString SortAscending = new ModString("UI.SortAscending", "ascending");

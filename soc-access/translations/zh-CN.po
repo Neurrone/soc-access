@@ -3698,3 +3698,23 @@ msgctxt "Scanner.QuickKeySlash"
 msgid "Slash"
 msgstr "斜杠"
 
+
+#. UI.RoleCheckbox
+msgctxt "UI.RoleCheckbox"
+msgid "checkbox"
+msgstr "复选框"
+
+#. UI.RoleComboBox
+msgctxt "UI.RoleComboBox"
+msgid "combo box"
+msgstr "组合框"
+
+#. UI.RoleTab
+msgctxt "UI.RoleTab"
+msgid "tab"
+msgstr "选项卡"
+
+#. UI.StatusNotChecked
+msgctxt "UI.StatusNotChecked"
+msgid "not checked"
+msgstr "未勾选"

@@ -2064,9 +2064,19 @@ msgctxt "UI.RoleCheckBox"
 msgid "check box"
 msgstr ""
 
+#. UI.RoleCheckbox
+msgctxt "UI.RoleCheckbox"
+msgid "checkbox"
+msgstr ""
+
 #. UI.RoleColumnHeader
 msgctxt "UI.RoleColumnHeader"
 msgid "column header"
+msgstr ""
+
+#. UI.RoleComboBox
+msgctxt "UI.RoleComboBox"
+msgid "combo box"
 msgstr ""
 
 #. UI.RoleDocument
@@ -2102,6 +2112,11 @@ msgstr ""
 #. UI.RoleSlider
 msgctxt "UI.RoleSlider"
 msgid "slider"
+msgstr ""
+
+#. UI.RoleTab
+msgctxt "UI.RoleTab"
+msgid "tab"
 msgstr ""
 
 #. UI.ScannerPath
@@ -2187,6 +2202,11 @@ msgstr ""
 #. UI.StatusMissing
 msgctxt "UI.StatusMissing"
 msgid "missing"
+msgstr ""
+
+#. UI.StatusNotChecked
+msgctxt "UI.StatusNotChecked"
+msgid "not checked"
 msgstr ""
 
 #. UI.StatusUnchecked
