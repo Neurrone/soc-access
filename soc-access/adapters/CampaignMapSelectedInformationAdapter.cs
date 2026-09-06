@@ -39,7 +39,13 @@ namespace SongsOfConquestAccess.Adapters
             _settings = view != null ? SettingsRef(view) : null;
             StartButton = _settings != null ? new StandardMenuButtonAdapter(_settings.StartGameButton) : null;
             ReplayButton = _settings != null ? new StandardMenuButtonAdapter(_settings.ReplayOutroButton) : null;
+            Difficulty = new DifficultyDropList(this);
         }
+
+        /// <summary>The difficulty control, as a drop list: the page draws a real
+        /// <c>UITextMeshDropdown</c> for it, so it answers the questions every drop list answers and
+        /// the mod's own list screen opens over the game's popup.</summary>
+        public DifficultyDropList Difficulty { get; private set; }
 
         public object SourceKey
         {
@@ -248,6 +254,115 @@ namespace SongsOfConquestAccess.Adapters
         private static bool IsLiveSceneObject(GameObject gameObject)
         {
             return gameObject != null && gameObject.scene.IsValid() && gameObject.scene.isLoaded;
+        }
+
+        /// <summary>The difficulty dropdown, answering the questions every drop list answers so the
+        /// mod's own list screen can be opened over the game's popup. What TAKING an entry means is
+        /// the page's, and it hands that over when it opens the list.</summary>
+        public sealed class DifficultyDropList : IDropList
+        {
+            private readonly CampaignMapSelectedInformationAdapter _adapter;
+
+            public DifficultyDropList(CampaignMapSelectedInformationAdapter adapter)
+            {
+                _adapter = adapter;
+                GetOptions = ReadOptions;
+                GetValue = ReadValue;
+                IsEnabled = () => _adapter != null && _adapter.HasDifficultyMenu();
+                IsVisible = () => _adapter != null && _adapter.HasDifficultyMenu();
+                OpenPopup = () => DropdownPopup.Show(Dropdown);
+                ClosePopup = () => DropdownPopup.Hide(Dropdown);
+                IsPopupOpen = () => DropdownPopup.IsOpen(Dropdown);
+                FocusOption = index => DropdownPopup.FocusOption(Dropdown, index);
+            }
+
+            public string Id
+            {
+                get { return "campaign-map-difficulty"; }
+            }
+
+            /// <summary>The drawn dropdown itself, so a caller can key a control on it.</summary>
+            public Component Subject
+            {
+                get { return Dropdown as Component; }
+            }
+
+            public Func<IReadOnlyList<string>> GetOptions { get; private set; }
+            public Func<int> GetValue { get; private set; }
+            public Func<bool> IsEnabled { get; private set; }
+            public Func<bool> IsVisible { get; private set; }
+            public Func<bool> OpenPopup { get; private set; }
+            public Func<bool> ClosePopup { get; private set; }
+            public Func<bool> IsPopupOpen { get; private set; }
+            public Func<int, bool> FocusOption { get; private set; }
+
+            /// <summary>The difficulty the campaign is set to, in the game's own words.</summary>
+            public string CurrentLabel
+            {
+                get
+                {
+                    return _adapter != null ? _adapter.GetDifficultyLabel(_adapter.CurrentDifficulty) : string.Empty;
+                }
+            }
+
+            public bool SetValue(int value)
+            {
+                IReadOnlyList<CampaignDifficulty> difficulties = _adapter != null
+                    ? _adapter.CurrentDifficulties
+                    : new CampaignDifficulty[0];
+                return value >= 0
+                    && value < difficulties.Count
+                    && _adapter.SelectDifficulty(difficulties[value]);
+            }
+
+            public void Focus()
+            {
+                if (_adapter != null)
+                {
+                    _adapter.FocusDifficultyDropdown();
+                }
+            }
+
+            private UITextMeshDropdown Dropdown
+            {
+                get
+                {
+                    return _adapter != null && _adapter._settings != null
+                        ? _adapter._settings.DifficultyDropdown
+                        : null;
+                }
+            }
+
+            private IReadOnlyList<string> ReadOptions()
+            {
+                List<string> labels = new List<string>();
+                IReadOnlyList<CampaignDifficulty> difficulties = _adapter != null
+                    ? _adapter.CurrentDifficulties
+                    : new CampaignDifficulty[0];
+                for (int i = 0; i < difficulties.Count; i++)
+                {
+                    labels.Add(_adapter.GetDifficultyLabel(difficulties[i]));
+                }
+
+                return labels;
+            }
+
+            private int ReadValue()
+            {
+                IReadOnlyList<CampaignDifficulty> difficulties = _adapter != null
+                    ? _adapter.CurrentDifficulties
+                    : new CampaignDifficulty[0];
+                CampaignDifficulty current = _adapter != null ? _adapter.CurrentDifficulty : default(CampaignDifficulty);
+                for (int i = 0; i < difficulties.Count; i++)
+                {
+                    if (difficulties[i] == current)
+                    {
+                        return i;
+                    }
+                }
+
+                return 0;
+            }
         }
     }
 }

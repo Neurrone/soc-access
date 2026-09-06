@@ -1,32 +1,65 @@
-using System.Collections.Generic;
 using System;
+using System.Collections.Generic;
 using System.Reflection;
 using HarmonyLib;
 using SongsOfConquest.Client.Menu;
 using SongsOfConquest.Client.UI;
-using SongsOfConquest.Common.Campaign;
 using SongsOfConquestAccess.Adapters;
-using SongsOfConquestAccess.Input;
 using SongsOfConquestAccess.Localization;
 using SongsOfConquestAccess.UI;
+using SongsOfConquestAccess.UI.Graph;
 using UnityEngine;
 using Zenject;
 
 namespace SongsOfConquestAccess.Screens
 {
-    public sealed class CampaignMapSelectScreen : Screen
+    /// <summary>
+    /// A campaign's mission map, made navigable as a graph. Four places to be, and Tab moves between
+    /// them: the missions, the panel describing the one chosen, the difficulty, and the buttons.
+    ///
+    /// Measured 2026-09-06 at 1280x800 through <c>/gui/unity</c>: the missions are
+    /// <c>CampaignMapSelectButton(Clone)</c>s scattered over the map picture rather than listed
+    /// (x 485, 452, 370, 293 at y 383, 445, 396, 303 for this campaign's four), so they are declared
+    /// in the game's own order and not sorted by where they are drawn; <c>MapInformationView</c> down
+    /// the right at [882,0,365,743] with the mission counter at y 164, the map's title at y 183, the
+    /// description in a scroll rect at y 229, the completed line at y 583, the difficulty dropdown at
+    /// [953,603,222,27], START MISSION at y 658 and Replay cutscene at y 707; and the main menu's
+    /// header band with Back at [21,20] and Options at [1233,11] over the drawn campaign title pair
+    /// ("The First Song" over "The Song of Stoutheart").
+    ///
+    /// The difficulty is a real <c>UITextMeshDropdown</c> (measured), so it is a combo box opening
+    /// the mod's drop list over the game's own popup, not a row of radio buttons.
+    ///
+    /// ARRIVING ON A MISSION DOES NOT CHOOSE IT: <c>CampaignMapButton</c> answers its buttons'
+    /// OnClicked and nothing else (decompiled), so the focus visual is the native selection alone and
+    /// Enter is what redraws the panel.
+    ///
+    /// Escape is CLAIMED and presses the drawn Back button: neither <c>CampaignMapSelectMenu</c> nor
+    /// <c>CampaignMapSelectedInformationView</c> registers <c>UI.ExitMenu</c> - the view registers
+    /// <c>UI.Confirm</c> on Start Mission and two gamepad buttons, and nothing else (decompiled,
+    /// lines 143 to 148) - so the key would otherwise do nothing.
+    /// </summary>
+    public sealed class CampaignMapSelectScreen : GraphScreen
     {
-        private const string DifficultyMenuId = "campaign-map-difficulty";
+        private const string MissionsStop = "campaign-map-missions";
+        private const string DetailsStop = "campaign-map-details";
+        private const string DifficultyStop = "campaign-map-difficulty";
+        private const string ButtonsStop = "campaign-map-buttons";
+
         private static readonly PropertyInfo InstallerContainerProperty =
             AccessTools.Property(typeof(CampaignMapSelectMenuInstaller), "Container");
 
-        // Moving through the difficulty menu immediately changes the native dropdown.
-        // The game responds by redrawing the selected mission details and calling Show(...)
-        // again, which rebuilds this accessibility screen. Preserve focus in the difficulty
-        // menu across that rebuild instead of falling back to the first root widget.
+        // Taking a difficulty makes the game redraw the page, which pushes a NEW screen over this
+        // one through the detector's RefreshTop - and a new screen has no cursor memory. The flag
+        // carries the one thing worth keeping across that: that the player was at the difficulty.
         private static bool _focusDifficultyAfterNextRebuild;
 
         private readonly CampaignMapSelectAdapter _adapter;
+        private readonly bool _focusDifficulty;
+
+        // A subject of its own for the details line, kept across rebuilds so the reconciler seats the
+        // cursor on the same node while the mission under it changes.
+        private readonly object _detailsMarker = new object();
 
         public CampaignMapSelectScreen(CampaignMapSelectAdapter adapter)
             : this(adapter, false)
@@ -34,9 +67,9 @@ namespace SongsOfConquestAccess.Screens
         }
 
         public CampaignMapSelectScreen(CampaignMapSelectAdapter adapter, bool focusDifficulty)
-            : base(BuildRootWidget(adapter, focusDifficulty))
         {
             _adapter = adapter;
+            _focusDifficulty = focusDifficulty;
         }
 
         public static Screen TryBuildActiveScreen()
@@ -52,222 +85,258 @@ namespace SongsOfConquestAccess.Screens
             return result;
         }
 
+        public override string Key
+        {
+            get { return "campaign-map-select"; }
+        }
+
+        /// <summary>The campaign's own drawn title pair ("The First Song. The Song of Stoutheart").
+        /// </summary>
+        public override string ScreenName
+        {
+            get { return _adapter != null ? _adapter.GetCampaignTitle() : null; }
+        }
+
+        /// <summary>The missions, or the difficulty when the page was redrawn by taking one.</summary>
+        public override object InitialFocusStop
+        {
+            get { return _focusDifficulty ? DifficultyStop : MissionsStop; }
+        }
+
         public override bool IsPresent()
         {
             return _adapter != null && _adapter.IsPresent();
         }
 
-        public override bool OnActionJustPressed(InputAction action)
+        public override bool ConsumesBack
         {
-            if (action != null && action.Key == AccessibilityActions.Cancel.Key)
-            {
-                return _adapter != null
-                    && _adapter.BackButton != null
-                    && _adapter.BackButton.Activate();
-            }
-
-            return base.OnActionJustPressed(action);
+            get { return _adapter != null && _adapter.BackButton != null && _adapter.BackButton.IsVisible(); }
         }
 
-        private static ContainerWidget BuildRootWidget(CampaignMapSelectAdapter adapter, bool focusDifficulty)
+        public override bool Back()
         {
-            ContainerWidget root = new ContainerWidget(
-                "campaign-map-select-screen",
-                adapter != null ? adapter.GetCampaignTitle() : string.Empty);
-
-            MenuWidget missions = new MenuWidget("campaign-map-missions", string.Empty);
-            AddMissionItems(missions, adapter);
-            if (adapter != null)
-            {
-                missions.SetFocusedItemById(BuildMissionId(adapter.SelectedMissionIndex));
-            }
-
-            root.AddChild(missions);
-            AddDetails(root, adapter);
-            AddDifficultyMenu(root, adapter);
-            AddOptionalButton(root, "replay-cutscene", adapter != null ? adapter.Information.ReplayButton : null, adapter);
-            AddOptionalButton(root, "start-mission", adapter != null ? adapter.Information.StartButton : null, adapter);
-            AddOptionalButton(root, "options", adapter != null ? adapter.OptionsButton : null, adapter);
-            AddOptionalButton(root, "back", adapter != null ? adapter.BackButton : null, adapter);
-            if (focusDifficulty)
-            {
-                root.SetFocusedChildById(DifficultyMenuId);
-            }
-
-            return root;
+            return _adapter != null && _adapter.BackButton != null && _adapter.BackButton.Activate();
         }
 
-        private static void AddMissionItems(MenuWidget menu, CampaignMapSelectAdapter adapter)
+        public override void Build(GraphBuilder builder)
         {
-            if (menu == null || adapter == null || adapter.Missions == null)
+            if (!IsPresent())
             {
                 return;
             }
 
-            for (int i = 0; i < adapter.Missions.Count; i++)
+            builder.BeginStop(MissionsStop);
+            BuildMissions(builder);
+
+            builder.BeginStop(DetailsStop);
+            BuildDetails(builder);
+
+            builder.BeginStop(DifficultyStop);
+            BuildDifficulty(builder);
+
+            builder.BeginStop(ButtonsStop);
+            BuildButtons(builder);
+        }
+
+        // ---- the missions ----
+
+        private void BuildMissions(GraphBuilder builder)
+        {
+            IReadOnlyList<CampaignMapButtonAdapter> missions = _adapter.Missions;
+            int selected = _adapter.SelectedMissionIndex;
+            ControlId landing = null;
+            for (int i = 0; missions != null && i < missions.Count; i++)
             {
-                CampaignMapButtonAdapter item = adapter.Missions[i];
-                if (item == null)
+                CampaignMapButtonAdapter mission = missions[i];
+                if (mission == null || mission.Source == null || !mission.IsVisible())
                 {
                     continue;
                 }
 
-                menu.AddItem(new MenuItemWidget(
-                    BuildMissionId(i),
-                    () => GetMissionLabel(adapter, item),
-                    item.GetStatus,
-                    item.Activate,
-                    item.FocusNative,
-                    item.IsVisible));
+                CampaignMapButtonAdapter it = mission;
+                NodeVtable vtable = GraphNodes.Button(() => MissionLabel(it), () => it.Activate());
+                vtable.OnFocusVisual = () => it.FocusNative();
+                ControlId id = ControlId.For(it.Source, "campaign-map:mission/" + i);
+                builder.AddItem(new DrawnNode(id, vtable, it.Source));
+                if (i == selected)
+                {
+                    landing = id;
+                }
             }
-        }
 
-        private static void AddDetails(ContainerWidget root, CampaignMapSelectAdapter adapter)
-        {
-            if (root == null || adapter == null || adapter.Information == null)
+            // The mission the page is describing, so Tab into the map lands on what the panel says -
+            // and so does the FIRST seating, which is the start node's business rather than the
+            // stop's: the missions are the first stop, so the cursor is seated here before the
+            // screen's initial stop is consulted.
+            builder.LandStopOn(landing);
+            if (landing != null)
             {
-                return;
+                builder.SetStart(landing);
             }
-
-            root.AddChild(new TextWidget(
-                "campaign-map-details",
-                () => BuildDetailsText(adapter),
-                null,
-                includeParentLabelInAnnouncement: false));
         }
 
-        private static string BuildDetailsText(CampaignMapSelectAdapter adapter)
+        /// <summary>What a mission reads as: the game's own "Mission N" counter with its title where
+        /// the panel is describing it, as the widget screen read them.</summary>
+        private string MissionLabel(CampaignMapButtonAdapter mission)
         {
-            CampaignMapSelectedInformationAdapter information = adapter != null ? adapter.Information : null;
-            if (information == null)
+            CampaignMapSelectedInformationAdapter information = _adapter.Information;
+            if (information == null || mission == null)
             {
-                return string.Empty;
+                return mission != null ? mission.GetLabel() : string.Empty;
             }
 
-            string main = JoinSentences(
-                information.GetMissionCounter(),
-                information.GetTitle(),
-                information.GetDescription(),
-                information.GetWinConditions());
-            string completed = EnsureSentenceTerminated(information.GetCompletedStatus());
-
-            if (string.IsNullOrWhiteSpace(completed))
-            {
-                return main;
-            }
-
-            return string.IsNullOrWhiteSpace(main)
-                ? completed
-                : main + Environment.NewLine + completed;
-        }
-
-        private static string BuildMissionId(int index)
-        {
-            return index >= 0 ? "campaign-map-mission-" + index : string.Empty;
-        }
-
-        private static string GetMissionLabel(CampaignMapSelectAdapter adapter, CampaignMapButtonAdapter item)
-        {
-            if (adapter != null
-                && adapter.Information != null
-                && adapter.Information.MapDefinition != null
-                && item != null
-                && ReferenceEquals(adapter.Information.MapDefinition, item.Definition))
+            if (information.MapDefinition != null && ReferenceEquals(information.MapDefinition, mission.Definition))
             {
                 string selectedLabel = MenuButtonTextUtility.JoinParts(
-                    adapter.Information.GetMissionCounter(),
-                    adapter.Information.GetTitle());
+                    information.GetMissionCounter(),
+                    information.GetTitle());
                 if (!string.IsNullOrWhiteSpace(selectedLabel))
                 {
                     return selectedLabel;
                 }
             }
 
-            if (adapter != null && adapter.Information != null && item != null)
+            string counter = information.GetMissionCounter(mission.GetDisplayName());
+            return string.IsNullOrWhiteSpace(counter) ? mission.GetLabel() : counter;
+        }
+
+        // ---- the panel describing the chosen mission ----
+
+        /// <summary>The panel as one line: the mission's counter and title as the label, watched live
+        /// because the mission changes from the map, with what the panel says about it as a section so
+        /// the review buffer holds it a drawn line at a time.</summary>
+        private void BuildDetails(GraphBuilder builder)
+        {
+            CampaignMapSelectedInformationAdapter information = _adapter.Information;
+            if (information == null)
             {
-                string missionCounter = adapter.Information.GetMissionCounter(item.GetDisplayName());
-                if (!string.IsNullOrWhiteSpace(missionCounter))
+                return;
+            }
+
+            NodeVtable vtable = new NodeVtable
+            {
+                ControlType = ControlTypes.Text,
+                Announcements = new List<NodeAnnouncement>
                 {
-                    return missionCounter;
-                }
-            }
-
-            return item != null ? item.GetLabel() : string.Empty;
+                    new NodeAnnouncement(DetailsTitle, live: true, kind: AnnouncementKinds.Label),
+                },
+                Sections = new List<NodeSection> { NodeSection.Composed(DetailsLines) },
+            };
+            builder.AddItem(new SyntheticNode(
+                ControlId.For(_detailsMarker, "campaign-map:details"),
+                vtable));
         }
 
-        private static void AddDifficultyMenu(ContainerWidget root, CampaignMapSelectAdapter adapter)
+        private string DetailsTitle()
         {
-            CampaignMapSelectedInformationAdapter information = adapter != null ? adapter.Information : null;
-            if (root == null || information == null || !information.HasDifficultyMenu())
-            {
-                return;
-            }
-
-            MenuWidget difficultyMenu = new MenuWidget(DifficultyMenuId, GameText.Get("Campaign/Difficulty/Prefix", string.Empty));
-            IReadOnlyList<CampaignDifficulty> difficulties = information.CurrentDifficulties;
-            for (int i = 0; i < difficulties.Count; i++)
-            {
-                CampaignDifficulty difficulty = difficulties[i];
-                string id = BuildDifficultyId(difficulty);
-                difficultyMenu.AddItem(new MenuItemWidget(
-                    id,
-                    () => information.GetDifficultyLabel(difficulty),
-                    null,
-                    () => ActivateDifficultyOption(information, difficulty),
-                    () => FocusDifficultyOption(information, difficulty),
-                    () => information.HasDifficultyMenu()));
-            }
-
-            difficultyMenu.SetFocusedItemById(BuildDifficultyId(information.CurrentDifficulty));
-            root.AddChild(difficultyMenu);
-        }
-
-        private static void AddOptionalButton(ContainerWidget root, string id, IMenuButtonAdapter button, CampaignMapSelectAdapter adapter)
-        {
-            if (root == null || button == null || !button.IsVisible())
-            {
-                return;
-            }
-
-            string label = button.GetLabel();
-            if (string.IsNullOrWhiteSpace(label))
-            {
-                return;
-            }
-
-            root.AddChild(new ButtonWidget(
-                id,
-                label,
-                button.Activate,
-                () => FocusNativeButton(adapter, button.Button),
-                () => button.IsVisible(),
-                () => button.IsVisible()));
-        }
-
-        private static void FocusNativeButton(CampaignMapSelectAdapter adapter, UIButton button)
-        {
-            if (adapter == null || adapter.Information == null || button == null)
-            {
-                return;
-            }
-
-            adapter.Information.FocusButton(button);
-        }
-
-        private static string BuildDifficultyId(CampaignDifficulty difficulty)
-        {
-            return "difficulty-" + difficulty.ToString().ToLowerInvariant();
-        }
-
-        private static string JoinSentences(params string[] parts)
-        {
-            if (parts == null || parts.Length == 0)
+            CampaignMapSelectedInformationAdapter information = _adapter.Information;
+            if (information == null)
             {
                 return string.Empty;
             }
 
+            return JoinSentences(information.GetMissionCounter(), information.GetTitle());
+        }
+
+        private IList<string> DetailsLines()
+        {
+            CampaignMapSelectedInformationAdapter information = _adapter.Information;
+            if (information == null)
+            {
+                return new List<string>();
+            }
+
+            return SpokenLines.Of(new[]
+            {
+                information.GetDescription(),
+                information.GetWinConditions(),
+                EnsureSentenceTerminated(information.GetCompletedStatus()),
+            });
+        }
+
+        // ---- the difficulty ----
+
+        private void BuildDifficulty(GraphBuilder builder)
+        {
+            CampaignMapSelectedInformationAdapter information = _adapter.Information;
+            if (information == null || !information.HasDifficultyMenu())
+            {
+                return;
+            }
+
+            CampaignMapSelectedInformationAdapter.DifficultyDropList list = information.Difficulty;
+            Component subject = list.Subject;
+            if (subject == null)
+            {
+                return;
+            }
+
+            NodeVtable vtable = GraphNodes.ComboBox(
+                () => GameText.Get("Campaign/Difficulty/Prefix", string.Empty),
+                () => list.CurrentLabel,
+                () => DropListScreen.Open(
+                    list,
+                    GameText.Get("Campaign/Difficulty/Prefix", string.Empty),
+                    index => TakeDifficulty(list, index)),
+                list.IsEnabled);
+            vtable.OnFocusVisual = () => list.Focus();
+            builder.AddItem(new DrawnNode(
+                ControlId.For(subject, "campaign-map:difficulty"),
+                vtable,
+                subject));
+        }
+
+        /// <summary>Take a difficulty from the open list. The game answers by redrawing the page,
+        /// which pushes a new screen over this one, so the flag is set BEFORE the value changes: the
+        /// redraw can happen inside this call.</summary>
+        private static void TakeDifficulty(CampaignMapSelectedInformationAdapter.DifficultyDropList list, int index)
+        {
+            _focusDifficultyAfterNextRebuild = true;
+            if (!list.SetValue(index))
+            {
+                _focusDifficultyAfterNextRebuild = false;
+            }
+        }
+
+        // ---- the buttons ----
+
+        private void BuildButtons(GraphBuilder builder)
+        {
+            CampaignMapSelectedInformationAdapter information = _adapter.Information;
+            // The panel's own commands, in the order it draws them (Start above Replay).
+            AddButton(builder, "campaign-map:start", information != null ? information.StartButton : null);
+            AddButton(builder, "campaign-map:replay", information != null ? information.ReplayButton : null);
+            // Then the header band above the page, left to right.
+            AddButton(builder, "campaign-map:back", _adapter.BackButton);
+            AddButton(builder, "campaign-map:options", _adapter.OptionsButton);
+        }
+
+        private void AddButton(GraphBuilder builder, string key, IMenuButtonAdapter button)
+        {
+            if (button == null || button.Button == null || !button.IsVisible())
+            {
+                return;
+            }
+
+            IMenuButtonAdapter it = button;
+            NodeVtable vtable = GraphNodes.Button(it.GetLabel, () => it.Activate(), it.IsVisible);
+            vtable.OnFocusVisual = () => FocusNativeButton(it.Button);
+            builder.AddItem(new DrawnNode(ControlId.For(it.Button, key), vtable, it.Button));
+        }
+
+        private void FocusNativeButton(UIButton button)
+        {
+            CampaignMapSelectedInformationAdapter information = _adapter.Information;
+            if (information != null && button != null)
+            {
+                information.FocusButton(button);
+            }
+        }
+
+        private static string JoinSentences(params string[] parts)
+        {
             List<string> cleaned = new List<string>();
-            for (int i = 0; i < parts.Length; i++)
+            for (int i = 0; parts != null && i < parts.Length; i++)
             {
                 string part = EnsureSentenceTerminated(parts[i]);
                 if (!string.IsNullOrWhiteSpace(part))
@@ -291,44 +360,6 @@ namespace SongsOfConquestAccess.Screens
             return last == '.' || last == '!' || last == '?' || last == ':' || last == ';'
                 ? value
                 : value + ".";
-        }
-
-        private static bool ActivateDifficultyOption(CampaignMapSelectedInformationAdapter information, CampaignDifficulty difficulty)
-        {
-            if (information == null)
-            {
-                return false;
-            }
-
-            bool changesDifficulty = information.CurrentDifficulty != difficulty;
-            if (changesDifficulty)
-            {
-                // Set this before changing the native dropdown because the game's redraw path
-                // can synchronously rebuild the accessibility screen from the Show(...) hook.
-                _focusDifficultyAfterNextRebuild = true;
-            }
-
-            bool selected = information.SelectDifficulty(difficulty);
-            if (!selected && changesDifficulty)
-            {
-                _focusDifficultyAfterNextRebuild = false;
-            }
-
-            return selected;
-        }
-
-        private static void FocusDifficultyOption(CampaignMapSelectedInformationAdapter information, CampaignDifficulty difficulty)
-        {
-            if (information == null)
-            {
-                return;
-            }
-
-            information.FocusDifficultyDropdown();
-            if (information.CurrentDifficulty != difficulty)
-            {
-                ActivateDifficultyOption(information, difficulty);
-            }
         }
 
         private static CampaignMapSelectAdapter FindActiveCampaignMapSelect(CampaignMapSelectedInformationView targetInformationView)

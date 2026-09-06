@@ -1621,3 +1621,112 @@ Manual test:
 8. Escape closes the window (the game's own key); so does Enter on Cancel.
 9. Careful with the game's own hotkeys here: Enter loads the selected save and Delete opens the
    delete confirm, whatever the cursor is on.
+
+### CampaignMapSelectScreen
+
+Built: four stops. `campaign-map-missions` holds the missions in the game's own order,
+`campaign-map-details` the panel describing the one chosen, `campaign-map-difficulty` the
+difficulty as a combo box, `campaign-map-buttons` START MISSION and Replay cutscene then the header
+band's Back and Options. Screen name is the drawn campaign title pair ("The First Song. The Song of
+Stoutheart"); focus starts on the mission the panel is describing.
+
+Measured 2026-09-06 at 1280x800 through `/gui/unity`: the missions are
+`CampaignMapSelectButton(Clone)`s scattered over the map picture (x 485, 452, 370, 293 at y 383,
+445, 396, 303 for this campaign's four) rather than listed; `MapInformationView` down the right at
+[882,0,365,743] with the mission counter at y 164, the map's title at y 183, the description in a
+scroll rect at y 229, the completed line at y 583, the difficulty dropdown at [953,603,222,27],
+START MISSION at y 658 and Replay cutscene at y 707; the main menu's header band with Back at
+[21,20] and Options at [1233,11] under the drawn title pair.
+
+Escape is CLAIMED and presses the drawn Back button, as the widget screen's own Cancel did: neither
+`CampaignMapSelectMenu` nor `CampaignMapSelectedInformationView` registers `UI.ExitMenu` - the view
+registers `UI.Confirm` on Start Mission and two gamepad buttons and nothing else (decompiled, lines
+143 to 148). Verified: `ui_back` answered `consumed` and the campaign menu came back.
+
+Diff: every before line is accounted for in two groups.
+
+1. The four difficulty options (Simple, Fair, Worthy, Overwhelming) left the page - they are the
+   drop list screen now - and the difficulty has become one labelled line, "Difficulty | Fair". The
+   widget screen never read the control's own name.
+2. The details line: the description and the completed status moved out of the label into a declared
+   SECTION, so the label is the mission's counter and title ("Mission 4. Death to Diplomacy.") and
+   the buffer holds the description and "Completed on Fair in 37 rounds." a line each. The before
+   capture's line carried the embedded newline the widget put between them, which is why that line
+   wraps in the raw file.
+
+Deviations, each measured:
+
+- THE DIFFICULTY IS A DROPDOWN, so it is a combo box opening the mod's list over the game's own
+  popup (family E), not the row of radio buttons the proposal offered as the alternative:
+  `CampaignMapSelectedInformationView.Settings.DifficultyDropdown` is a real `UITextMeshDropdown`
+  and `/gui/unity` reads it as one closed control at [953,603,222,27]. Verified: Enter opened the
+  list on "Fair, selected, 2 of 4", Escape left the campaign on Fair, and taking Worthy redrew the
+  page and left the cursor on the difficulty row reading "Worthy".
+- ARRIVING ON A MISSION DOES NOT CHOOSE IT, unlike the map select and random layout pages:
+  `CampaignMapButton` answers its buttons' OnClicked and nothing else (decompiled), so the focus
+  visual is the native selection alone and Enter is what redraws the panel. Verified: Down to
+  Mission 2 left the panel on Mission 4; Enter on it moved the panel and gave the row its title.
+- THE MISSIONS ARE NOT SORTED BY WHERE THEY ARE DRAWN. They are dots on a hand-drawn map, not a
+  band or a column, so a drawn-order sort would read them in whatever order the campaign's path
+  wanders; they keep the game's own order, which is the mission order the labels announce.
+- THE FIRST SEATING IS THE START NODE'S BUSINESS, not the initial stop's, and this is a rule for
+  every later screen: `KeyGraph.Reconcile` seats the cursor on the render's start node and REMEMBERS
+  it as that stop's position, so `InitialFocusStop` then finds the remembered node and a
+  `LandStopOn` in the FIRST stop never gets a look in. Measured: the page opened on "Mission 1,
+  button, 1 of 4" while `SelectedMissionIndex` answered 3 and the render's stop landing said
+  `mission/3`. A page whose first stop has a landing must declare it with `GraphBuilder.SetStart`
+  as well, which this screen does. (Family F's table page is unaffected because its landing stop is
+  not the one holding the start node, and a tab bar is unaffected because a selectable start node
+  makes Reconcile look for the alternative in force.)
+- The panel is ONE line, as the lobby's preview is: the label is the mission's counter and title
+  (watched live, because the mission changes from the map stop) and the section is the description,
+  the win conditions and the completed line, so the review buffer holds them one at a time.
+- The buttons are declared in two bands: the panel's own commands in the order it draws them (START
+  MISSION above Replay cutscene, against the proposal's order, which is what the rects say), then
+  the header band's Back and Options left to right.
+- The mission labels are unchanged from the widget screen: the game's own "Mission N" counter, with
+  the map's title added for the mission the panel is describing.
+- The adapter gained one member, `CampaignMapSelectedInformationAdapter.Difficulty`, an `IDropList`
+  over the drawn dropdown (the same shape the options, lobby and game-list adapters give theirs).
+  The screen's difficulty-focus flag stays: taking a value makes the game redraw the page, which
+  pushes a NEW screen through the detector's `RefreshTop` and so a new cursor, and the flag is what
+  puts the cursor back on the difficulty.
+
+Walk (all through `/input` and `/type`): Tab cycles missions, details, difficulty, buttons; Home and
+Down walk the four missions; the details line read the title then the description and the completed
+line; "Difficulty, combo box, Fair"; the commands read "START MISSION, button, 1 of 4", "Replay
+cutscene, button, 2 of 4", then Back and Options; Enter on Mission 2 moved the panel and the page
+re-announced its name; the drop list opened, walked, cancelled and took a value; `/type mission`
+matched all four; `ui_back` answered `consumed`. START MISSION and Replay cutscene were never
+pressed, and the campaign was left on Fair with Mission 4 selected, as it was found.
+
+Follow-ups, not fixed:
+
+- THE GAME BINDS ITS OWN CONFIRM TO START MISSION on this page
+  (`CampaignMapSelectedInformationView`, decompiled line 143), so a physical Enter may start the
+  mission whatever the cursor is on. The harness cannot press a physical key; this is the first
+  thing to check by hand, as on the quit popup.
+- Choosing a mission or a difficulty re-announces the screen name, because the game redraws the page
+  and the detector pushes a new screen for it (`RefreshTop`). Pre-existing - the widget screen was
+  rebuilt the same way - and it is the same detector fault the campaign menu entry records.
+- `CampaignMapSelectAdapter` and its information adapter still normalise every label through
+  `SpeechTextSanitizer.Normalize` (pre-existing), which is why the description reads as one line
+  rather than as the paragraphs the panel draws.
+- `/screenshot` answered an all-black frame for the whole of this port's verification (the same
+  locked-session symptom the options entry records), so the layout evidence is `/gui/unity`.
+
+Manual test:
+
+1. Main menu, Campaigns & Tales, the first campaign. Hear "The First Song. The Song of Stoutheart",
+   then the mission the page opens on ("Mission 4. Death to Diplomacy, button, 4 of 4").
+2. Up and Down walk the four missions; the panel does NOT follow - it changes when you press Enter.
+3. Enter on a mission: the page redraws, the row gains the mission's title and the panel follows.
+4. Tab: the panel, read as the mission's counter and title then its description and its completed
+   line; Ctrl+Down through its review buffer must give those one at a time.
+5. Tab: "Difficulty, combo box, Fair". Enter opens the game's own list; Up and Down walk it; Escape
+   leaves the difficulty alone; Enter on an entry takes it and the cursor comes back to the row.
+6. Tab: "START MISSION, button, 1 of 4", "Replay cutscene", "Back", "Options". CAREFUL: the game
+   binds Enter to START MISSION on this page (follow-up above), so check what a physical Enter does
+   on a mission row before trusting it.
+7. Type a few letters of a mission's name: the cursor lands on it. Backspace ends the search.
+8. Escape leaves for the campaign menu, the same as pressing Back.

@@ -211,6 +211,9 @@ graph side of the mod.
 - A stop is NAMED after live content by wrapping the whole stop in one `PushContext(...)`, so
   entering it says what is in it once however deep the remembered position is (the codex's
   article body, named after the article's own heading).
+- The FIRST seating is the start node's, not `InitialFocusStop`'s: `Reconcile` seats the start node
+  and remembers it as its stop's position, so a landing in the stop that holds the start node needs
+  `SetStart` beside its `LandStopOn` (the campaign mission map).
 - `ui/ControlTypes.cs` — the role registry: `Button`, `Group`, `Text` (no role word),
   `EditField` ("editable"), `Checkbox` ("checkbox"), `Slider` ("slider"), `ComboBox`
   ("combo box"), `Tab` ("tab"), `RadioButton` ("radio button"). New
