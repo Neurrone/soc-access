@@ -1730,3 +1730,104 @@ Manual test:
    on a mission row before trusting it.
 7. Type a few letters of a mission's name: the cursor lands on it. Backspace ends the search.
 8. Escape leaves for the campaign menu, the same as pressing Back.
+
+### CommunityMapsHomeScreen
+
+Built: four stops. `community-maps-tabs` holds Browse and Collection; `community-maps-commands` holds
+Search & filter and Downloads; `community-maps-rows` holds the five drawn bands, each a REGION named
+by its own caption ("Featured maps & mods", "Highest rated", "Trending", "Most popular", "Recently
+added"), with the featured band's Subscribe and More options as its last two rows;
+`community-maps-footer` holds Close. Screen name is the page's own name in mod.io's words ("Browse");
+focus starts on the tab pair.
+
+Measured 2026-09-06 at 1280x800 through `/gui/unity` (the browser draws in its own canvas, "Canvas -
+(MUST BE DISABLED WHEN SAVING THE PREFAB)"): the nav bar holds BROWSE (x 479) and COLLECTION (x 634)
+at y 29, "Search & filter" at [1064,27,107,27] and the "Back / Exit" prompt at [53,24,50,27]; the
+page is 1791 px of content in an 800 px window - the featured band at [0,109,1280,457] drawing its
+caption at y 109 over a carousel of ten items at y 133, then ONE `Details` block at [323,513,635,27]
+carrying the highlighted item's name with Subscribe (x 748) and More options (x 859) beside it; then
+`ModRow_1` to `ModRow_4` at y 609, 891, 1173 and 1455, each drawing its caption over twenty
+`BrowserModListItem_Regular(Clone)`s 244 px apart.
+
+Escape is CLAIMED and runs the browser's own close: this page is mod.io's, not the game's, and
+nothing registers the key for it - the finding the community maps modal recorded. `Browser.Close()`
+is also the branch mod.io's `Navigating.Cancel` reaches on this panel (decompiled: after the context
+menu, dropdown, search panel, authentication, download queue, details and "not the browser panel"
+branches). Verified: `ui_back` answered `consumed`, the browser closed and the main menu read again.
+
+Diff: NO differences at all. The sorted flat dumps of the widget screen and the graph screen are
+identical, 97 lines each, including the featured band's ten items, its Subscribe and More options,
+the four bands of twenty and Close. (Both captures happened to list the same mods; the lists are live
+network data and a later capture will differ - a walk taken minutes later already read "Most popular"
+starting with "Robin Hood - Ballad of the Archer" where the capture said "Warzone".)
+
+Deviations, each measured:
+
+- THE TABS SWITCH ON ENTER, NOT ON FOCUS. The nav bar draws two text labels with NO clickable control
+  under them: `NavBar` only tints them and toggles a highlight object (decompiled,
+  `UpdateNavbarSelection`), and `/gui/unity` reads both as panels, not buttons. So there is no native
+  selection to arrive on, and the only way to switch is to OPEN the other panel - `Home.Open()` or
+  `Collection.Open()`, each of which re-fetches the page from mod.io. Arriving on a tab must not do
+  that, so the switch is `OnActivate`. The widget screen switched on focus, which is why walking its
+  tab row swapped the whole screen under the cursor.
+- THE FEATURED BAND'S SUBSCRIBE AND MORE OPTIONS ARE NOT DRAWN PER ITEM, so they are rows of the
+  featured region after its ten items rather than children of the focused item: mod.io draws one
+  `Details` block under the carousel (rect above) holding the highlighted item's name and those two
+  buttons, and `Home.SubscribeFeaturedMod`/`MoreOptionsFeatured` act on whatever the carousel is on.
+  Both rows focus the featured block natively so the block follows the cursor.
+- THE FOUR BANDS' ITEMS ARE BUTTONS ALONE, which is the approved model, and the widget screen's
+  per-band Subscribe and More options rows are gone with it. Measured, and worth the owner's eye:
+  mod.io DOES draw those two per item here - focusing a band item swaps in a
+  `HomeModListItem_RegularSelected` overlay with "Subscribe" at [26,797,123,27] and "More options" at
+  [162,797,123,27] over the item - so they could be that item's child nodes if the owner wants them
+  back (follow-up below). Neither control was in the before capture: the widget only showed them
+  while an item was selected, and nothing was selected when the page was captured.
+- The band rows are `SyntheticNode`s keyed on band and item index rather than on the drawn row, for
+  the reason the search filter panel's tags are: mod.io rebuilds its list item objects whenever a band
+  refreshes, and an item is a place in a named band either way.
+- A row's download progress is declared as a live value part (the widget's status column), so a
+  download starting under the cursor speaks; it is empty on every row here.
+- Close keeps the mod's own word, as the widget gave it: the drawn control is the nav bar's
+  "Back / Exit" prompt, which is a controller hint rather than a button.
+
+Follow-ups, not fixed:
+
+- The per-item Subscribe and More options of the four bands are no longer reachable from this page
+  (deviation above). The details page a band item opens still offers Subscribe.
+- The known stack oddity: pressing the search results page's Back left the stack as
+  `CommunityMapsSearchResultsScreen > CommunityMapsHomeScreen` - the results page stayed UNDER the
+  home page instead of being popped. The detector's, seen before this port (the search filter entry
+  records the same thing) and not this screen's to fix.
+- `CommunityMapsHomeAdapter.FocusItem` scrolls the band to the item but nothing scrolls the PAGE to
+  the band; the page's own vertical scroll is driven by mod.io's controller navigation, which the mod
+  does not drive. Pre-existing.
+- `/screenshot` answered an all-black frame throughout (the locked-session symptom the options entry
+  records), so the layout evidence is `/gui/unity`, which reads the same rects side-effect free.
+
+Walk (all through `/input` and `/type`): Tab cycles tabs, commands, bands, footer; Down and Up walk
+the two tabs; the commands read "Search & filter, button, 1 of 2" and "Downloads, button, 2 of 2";
+the bands stop opened on "Featured maps & mods, Warzone, button, 1 of 12"; Alt+Down read "Highest
+rated, Very Hard 6 players, button, 1 of 20", then "Trending, Warzone, button, 1 of 20", then "Most
+popular, ..., 1 of 20", and Alt+Up came back; End reached "Recently added, Secrets of the Ancients
+(Fair difficulty), button, 20 of 20"; `/type sword` landed on "Featured maps & mods, Sword Coast,
+button, 3 of 12" with four results and Backspace cleared the search; `ui_back` closed the browser.
+Subscribe, More options and Downloads were never activated.
+
+Manual test:
+
+1. Main menu, Community Maps. Close the mod.io authentication modal with Escape. Hear "Browse", then
+   "Browse, tab, selected, 1 of 2".
+2. Down: "Collection, tab, 2 of 2". Down and Up do NOT change the page; Enter on Collection switches
+   to it and Enter on Browse comes back.
+3. Tab: "Search & filter, button, 1 of 2"; Down: "Downloads, button, 2 of 2". (Downloads opens
+   mod.io's download queue.)
+4. Tab: "Featured maps & mods, Warzone, button, 1 of 12". Down walks the ten featured maps and then
+   "Subscribe" and "More options", which act on the featured map under the cursor; watch the block
+   under the carousel follow you.
+5. Alt+Down and Alt+Up jump between the five bands, naming each on the way in; Down walks a band's
+   twenty items; Home and End reach the ends of the whole list.
+6. Enter on an item opens its details page; its Back returns.
+7. Type a few letters of a map's name: the cursor lands on it. Backspace ends the search.
+8. Tab: "Close, button". Enter closes the browser, and so does Escape from anywhere on the page.
+9. Note what is NOT here any more: the per-item Subscribe and More options of the four bands
+   (follow-up above). Subscribe is still on the item's details page.
