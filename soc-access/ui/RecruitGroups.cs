@@ -14,12 +14,14 @@ namespace SongsOfConquestAccess.UI
     /// defence menu (<c>screens/DraftTroopsScreen.cs</c>) and by the rally point, which draws the
     /// same grid under its own list of towns.
     ///
-    /// ONE EXPANDABLE GROUP PER CARD, in the order the grid draws them: the header is the troop and
-    /// how many of them the pool holds, or the game's own line for a pool with nothing in it, and
-    /// everything the card draws for that troop hangs underneath - the essence tabs where the troop
-    /// has variants, the amount slider, the buy button with its price, and the button that upgrades
-    /// what the pool already holds. The card itself has no click of any kind (the game wires none),
-    /// so the header opens rather than acts.
+    /// ONE EXPANDABLE GROUP PER CARD THE GAME DRAWS A CONTROL ON, in the order the grid draws them:
+    /// the header is the troop and how many of them the pool holds, or the game's own line for a pool
+    /// with nothing in it, and everything the card draws for that troop hangs underneath - the
+    /// essence tabs where the troop has variants, the amount slider, the buy button with its price,
+    /// and the button that upgrades what the pool already holds. The card itself has no click of any
+    /// kind (the game wires none), so the header opens rather than acts. A card with NONE of those -
+    /// a troop the place does not train yet - is a plain line instead: a group with nothing to open
+    /// is a dead Right.
     ///
     /// EVERY GESTURE IS THE GAME'S OWN: the slider goes through the entry's own
     /// <c>HandleSliderChanged</c>, the buy button through <c>HandlePurchaseClicked</c>, the essence
@@ -85,12 +87,25 @@ namespace SongsOfConquestAccess.UI
             }
 
             PurchaseTroopsSubMenuAdapter.RecruitEntry it = entry;
-            NodeVtable vtable = GraphNodes.Group(() => it.TroopName, null, null, it.Tooltip);
+            // A card the game draws no control on - a troop this place does not train yet - is no
+            // group: a group with nothing to open is a dead Right (owner ruling 2026-09-08), so the
+            // header's own words stand as a line instead.
+            bool opens = HasAnyControl(it);
+            NodeVtable vtable = opens
+                ? GraphNodes.Group(() => it.TroopName, null, null, it.Tooltip)
+                : GraphNodes.Text(() => it.TroopName, null, it.Tooltip);
             // What the pool holds changes under a cursor standing right here: every purchase and
             // every upgrade of the pool empties or fills it.
             vtable.Announcements.Add(GraphNodes.ValuePart(() => Pool(it)));
             vtable.OnFocusVisual = () => it.Focus();
-            builder.BeginGroup(new DrawnNode(ControlId.For(card, key), vtable, card));
+            DrawnNode node = new DrawnNode(ControlId.For(card, key), vtable, card);
+            if (!opens)
+            {
+                builder.AddItem(node);
+                return;
+            }
+
+            builder.BeginGroup(node);
 
             AddEssenceTabs(builder, it, key);
             AddSlider(builder, it, key);
@@ -98,6 +113,16 @@ namespace SongsOfConquestAccess.UI
             AddUpgradeInPool(builder, it, key);
 
             builder.EndGroup();
+        }
+
+        /// <summary>Whether the card draws anything the keyboard can reach: the same four questions
+        /// the four contributors below ask themselves, asked before the card is declared.</summary>
+        private static bool HasAnyControl(PurchaseTroopsSubMenuAdapter.RecruitEntry entry)
+        {
+            return HasEssenceTabs(entry)
+                || HasSlider(entry)
+                || HasPurchase(entry)
+                || HasUpgradeInPool(entry);
         }
 
         /// <summary>How many of this troop are waiting to be bought, or the game's own line where
@@ -119,7 +144,7 @@ namespace SongsOfConquestAccess.UI
             PurchaseTroopsSubMenuAdapter.RecruitEntry entry,
             string key)
         {
-            if (!entry.IsEssenceMenuVisible)
+            if (!HasEssenceTabs(entry))
             {
                 return;
             }
@@ -134,6 +159,22 @@ namespace SongsOfConquestAccess.UI
             }
         }
 
+        private static bool HasEssenceTabs(PurchaseTroopsSubMenuAdapter.RecruitEntry entry)
+        {
+            return entry.IsEssenceMenuVisible
+                && (IsEssenceDrawn(entry, TroopUpgradeType.ArcanaUpgraded)
+                    || IsEssenceDrawn(entry, TroopUpgradeType.CreationUpgraded)
+                    || IsEssenceDrawn(entry, TroopUpgradeType.OrderUpgraded));
+        }
+
+        private static bool IsEssenceDrawn(
+            PurchaseTroopsSubMenuAdapter.RecruitEntry entry,
+            TroopUpgradeType upgradeType)
+        {
+            Component button = entry.EssenceButton(upgradeType);
+            return button != null && button.gameObject != null && button.gameObject.activeInHierarchy;
+        }
+
         private static void AddEssence(
             GraphBuilder builder,
             PurchaseTroopsSubMenuAdapter.RecruitEntry entry,
@@ -143,12 +184,12 @@ namespace SongsOfConquestAccess.UI
             string id,
             ref bool started)
         {
-            Component button = entry.EssenceButton(upgradeType);
-            if (button == null || button.gameObject == null || !button.gameObject.activeInHierarchy)
+            if (!IsEssenceDrawn(entry, upgradeType))
             {
                 return;
             }
 
+            Component button = entry.EssenceButton(upgradeType);
             if (!started)
             {
                 builder.StartRow(key + "/essence");
@@ -176,12 +217,12 @@ namespace SongsOfConquestAccess.UI
             PurchaseTroopsSubMenuAdapter.RecruitEntry entry,
             string key)
         {
-            Component slider = entry.Slider;
-            if (slider == null || !entry.IsSliderVisible)
+            if (!HasSlider(entry))
             {
                 return;
             }
 
+            Component slider = entry.Slider;
             PurchaseTroopsSubMenuAdapter.RecruitEntry it = entry;
             NodeVtable vtable = GraphNodes.Slider(
                 () => ModText.Get(ModStrings.Common.Quantity),
@@ -190,6 +231,11 @@ namespace SongsOfConquestAccess.UI
                 () => it.IsSliderEnabled);
             vtable.OnFocusVisual = () => it.Focus();
             builder.AddItem(new DrawnNode(ControlId.For(slider, key + "/slider"), vtable, slider));
+        }
+
+        private static bool HasSlider(PurchaseTroopsSubMenuAdapter.RecruitEntry entry)
+        {
+            return entry.Slider != null && entry.IsSliderVisible;
         }
 
         private static string Amount(PurchaseTroopsSubMenuAdapter.RecruitEntry entry)
@@ -212,12 +258,12 @@ namespace SongsOfConquestAccess.UI
             PurchaseTroopsSubMenuAdapter.RecruitEntry entry,
             string key)
         {
-            Component button = entry.PurchaseButton;
-            if (button == null || !entry.IsPurchaseVisible)
+            if (!HasPurchase(entry))
             {
                 return;
             }
 
+            Component button = entry.PurchaseButton;
             PurchaseTroopsSubMenuAdapter.RecruitEntry it = entry;
             NodeVtable vtable = GraphNodes.Button(
                 () => ModText.Get(ModStrings.Draft.Purchase),
@@ -229,6 +275,11 @@ namespace SongsOfConquestAccess.UI
             builder.AddItem(new DrawnNode(ControlId.For(button, key + "/purchase"), vtable, button));
         }
 
+        private static bool HasPurchase(PurchaseTroopsSubMenuAdapter.RecruitEntry entry)
+        {
+            return entry.PurchaseButton != null && entry.IsPurchaseVisible;
+        }
+
         /// <summary>The button that upgrades what the pool is holding, which the game draws with no
         /// word on it and explains in its tooltip.</summary>
         private static void AddUpgradeInPool(
@@ -236,12 +287,12 @@ namespace SongsOfConquestAccess.UI
             PurchaseTroopsSubMenuAdapter.RecruitEntry entry,
             string key)
         {
-            Component button = entry.UpgradeInPoolButton;
-            if (button == null || !entry.IsUpgradeInPoolVisible)
+            if (!HasUpgradeInPool(entry))
             {
                 return;
             }
 
+            Component button = entry.UpgradeInPoolButton;
             PurchaseTroopsSubMenuAdapter.RecruitEntry it = entry;
             NodeVtable vtable = GraphNodes.Button(
                 () => ModText.Get(ModStrings.Draft.UpgradeAvailableTroops),
@@ -250,6 +301,11 @@ namespace SongsOfConquestAccess.UI
                 it.UpgradeInPoolTooltip);
             vtable.OnFocusVisual = () => it.Focus();
             builder.AddItem(new DrawnNode(ControlId.For(button, key + "/upgrade-pool"), vtable, button));
+        }
+
+        private static bool HasUpgradeInPool(PurchaseTroopsSubMenuAdapter.RecruitEntry entry)
+        {
+            return entry.UpgradeInPoolButton != null && entry.IsUpgradeInPoolVisible;
         }
     }
 }
