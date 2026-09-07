@@ -34,7 +34,6 @@ namespace SongsOfConquestAccess.Adapters
         private readonly AdventurePlayerMenu _menu;
         private readonly IClientAdventureFacade _facade;
         private readonly ILocalizationHandler _localization;
-        private int _selectedTeamId = -1;
 
         public AdventurePlayerMenuAdapter(AdventurePlayerMenu menu)
         {
@@ -46,12 +45,6 @@ namespace SongsOfConquestAccess.Adapters
         public AdventurePlayerMenu Source
         {
             get { return _menu; }
-        }
-
-        public int SelectedTeamId
-        {
-            get { return _selectedTeamId; }
-            set { _selectedTeamId = value; }
         }
 
         public bool IsPresent()
@@ -101,29 +94,7 @@ namespace SongsOfConquestAccess.Adapters
                 players.Add(new PlayerItem(this, entry, i));
             }
 
-            if (_selectedTeamId < 0 && players.Count > 0)
-            {
-                _selectedTeamId = players[0].TeamId;
-            }
-
             return players;
-        }
-
-        public PlayerItem SelectedPlayer
-        {
-            get
-            {
-                IReadOnlyList<PlayerItem> players = GetPlayers();
-                for (int i = 0; i < players.Count; i++)
-                {
-                    if (players[i] != null && players[i].TeamId == _selectedTeamId)
-                    {
-                        return players[i];
-                    }
-                }
-
-                return players.Count > 0 ? players[0] : null;
-            }
         }
 
         public bool Close()

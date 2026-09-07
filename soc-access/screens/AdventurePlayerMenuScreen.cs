@@ -249,7 +249,7 @@ namespace SongsOfConquestAccess.Screens
                     () => it.Activate(),
                     () => it.IsEnabled,
                     it.Tooltip);
-                Follow(vtable, player, it.Focus);
+                Follow(vtable, it.Focus);
                 builder.AddItem(new DrawnNode(
                     ControlId.For(it.Component, "adventure-players:action/" + it.Id),
                     vtable,
@@ -314,7 +314,7 @@ namespace SongsOfConquestAccess.Screens
             vtable.Announcements.Add(GraphNodes.ValuePart(() => it.RelationLabel));
             vtable.Announcements.Add(GraphNodes.ValuePart(() => it.AiLabel));
             vtable.Announcements.Add(GraphNodes.ValuePart(() => it.ScoreText));
-            Follow(vtable, player, player.FocusNative);
+            Follow(vtable, player.FocusNative);
             return vtable;
         }
 
@@ -324,20 +324,10 @@ namespace SongsOfConquestAccess.Screens
             return player.IsDead ? ModText.Get(ModStrings.Screens.WielderDead) : null;
         }
 
-        /// <summary>What the row and everything under it share: the game's own focus visual, and the
-        /// row becoming the adapter's SELECTED player.</summary>
-        private void Follow(NodeVtable vtable, AdventurePlayerMenuAdapter.PlayerItem player, Action focus)
+        /// <summary>What the row and everything under it share: the game's own focus visual.</summary>
+        private static void Follow(NodeVtable vtable, Action focus)
         {
-            AdventurePlayerMenuAdapter.PlayerItem row = player;
-            Action it = focus;
-            vtable.OnFocusVisual = () =>
-            {
-                _adapter.SelectedTeamId = row.TeamId;
-                if (it != null)
-                {
-                    it();
-                }
-            };
+            vtable.OnFocusVisual = focus;
         }
 
         /// <summary>The treasury band the menu draws under an ally, as ONE line: the gold figure and
