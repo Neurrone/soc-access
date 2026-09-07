@@ -1007,8 +1007,8 @@ msgstr "{0} でクイックバーに追加します。"
 
 #. Screens.SpellbookDropToRemove
 msgctxt "Screens.SpellbookDropToRemove"
-msgid "Drop a spell here to remove it from the quickbar"
-msgstr "ここに呪文をドロップするとクイックバーから外れます"
+msgid "Drop here to remove"
+msgstr "ここにドロップして削除"
 
 #. Screens.TeamValue
 msgctxt "Screens.TeamValue"

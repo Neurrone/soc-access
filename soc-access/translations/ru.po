@@ -1027,8 +1027,8 @@ msgstr "{0} добавляет на панель быстрого доступа
 
 #. Screens.SpellbookDropToRemove
 msgctxt "Screens.SpellbookDropToRemove"
-msgid "Drop a spell here to remove it from the quickbar"
-msgstr "Поместите сюда заклинание, чтобы убрать его с панели быстрого доступа"
+msgid "Drop here to remove"
+msgstr "Перетащите сюда, чтобы убрать"
 
 #. Screens.TeamValue
 msgctxt "Screens.TeamValue"

@@ -1007,8 +1007,8 @@ msgstr "按 {0} 添加到快捷栏。"
 
 #. Screens.SpellbookDropToRemove
 msgctxt "Screens.SpellbookDropToRemove"
-msgid "Drop a spell here to remove it from the quickbar"
-msgstr "将法术放到这里可将其从快捷栏移除"
+msgid "Drop here to remove"
+msgstr "拖到此处以移除"
 
 #. Screens.TeamValue
 msgctxt "Screens.TeamValue"

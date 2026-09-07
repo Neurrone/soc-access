@@ -1007,8 +1007,8 @@ msgstr "{0} 키로 빠른바에 추가"
 
 #. Screens.SpellbookDropToRemove
 msgctxt "Screens.SpellbookDropToRemove"
-msgid "Drop a spell here to remove it from the quickbar"
-msgstr "여기에 주문을 놓으면 빠른바에서 제거됩니다"
+msgid "Drop here to remove"
+msgstr "여기에 놓아 제거"
 
 #. Screens.TeamValue
 msgctxt "Screens.TeamValue"

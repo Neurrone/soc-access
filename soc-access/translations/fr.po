@@ -1007,8 +1007,8 @@ msgstr "{0} ajoute à la barre rapide"
 
 #. Screens.SpellbookDropToRemove
 msgctxt "Screens.SpellbookDropToRemove"
-msgid "Drop a spell here to remove it from the quickbar"
-msgstr "Déposez un sort ici pour le retirer de la barre rapide"
+msgid "Drop here to remove"
+msgstr "Déposer ici pour retirer"
 
 #. Screens.TeamValue
 msgctxt "Screens.TeamValue"

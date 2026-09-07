@@ -1007,8 +1007,8 @@ msgstr "{0} fügt zur Schnellleiste hinzu"
 
 #. Screens.SpellbookDropToRemove
 msgctxt "Screens.SpellbookDropToRemove"
-msgid "Drop a spell here to remove it from the quickbar"
-msgstr "Zauber hier ablegen, um ihn aus der Schnellleiste zu entfernen"
+msgid "Drop here to remove"
+msgstr "Zum Entfernen hier ablegen"
 
 #. Screens.TeamValue
 msgctxt "Screens.TeamValue"

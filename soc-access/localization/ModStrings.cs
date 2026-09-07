@@ -661,7 +661,7 @@ namespace SongsOfConquestAccess.Localization
             public static readonly ModPluralString SelectedSubcategoryCount = new ModPluralString("Screens.SelectedSubcategoryCount", "{0} selected", "{0} selected");
             public static readonly ModString Skill = new ModString("Screens.Skill", "Skill {0}");
             public static readonly ModString SpellbookAddToQuickbarHint = new ModString("Screens.SpellbookAddToQuickbarHint", "{0} adds to quickbar");
-            public static readonly ModString SpellbookDropToRemove = new ModString("Screens.SpellbookDropToRemove", "Drop a spell here to remove it from the quickbar");
+            public static readonly ModString SpellbookDropToRemove = new ModString("Screens.SpellbookDropToRemove", "Drop here to remove");
             public static readonly ModString Sell = new ModString("Screens.Sell", "Sell");
             public static readonly ModString Suffix = new ModString("Screens.Suffix", "Include suffix punctuation");
             public static readonly ModString TeamValue = new ModString("Screens.TeamValue", "Team {0}");

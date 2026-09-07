@@ -1012,8 +1012,8 @@ msgstr "{0} dodaje do paska szybkiego dostępu"
 
 #. Screens.SpellbookDropToRemove
 msgctxt "Screens.SpellbookDropToRemove"
-msgid "Drop a spell here to remove it from the quickbar"
-msgstr "Upuść tu zaklęcie, aby usunąć je z paska szybkiego dostępu"
+msgid "Drop here to remove"
+msgstr "Upuść tutaj, aby usunąć"
 
 #. Screens.TeamValue
 msgctxt "Screens.TeamValue"

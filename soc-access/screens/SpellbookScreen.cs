@@ -247,6 +247,9 @@ namespace SongsOfConquestAccess.Screens
         ///
         /// A FILLED slot is a group, because the game hides a command under it: the delete button it
         /// draws when the pointer rests on the slot. Right opens the group and lands on it.
+        ///
+        /// An EMPTY one is no control at all (owner ruling): it is a place a spell can be dropped,
+        /// so it says the mod's word for empty and nothing about a role, and it takes no click.
         /// </summary>
         private void AddSlot(GraphBuilder builder, SpellbookAdapter.QuickbarItem item, int index)
         {
@@ -263,7 +266,7 @@ namespace SongsOfConquestAccess.Screens
             Action activate = it.CanActivate ? () => it.Activate() : (Action)null;
             NodeVtable vtable = it.HasSpell
                 ? GraphNodes.Group(label, activate, null, it.Tooltip)
-                : GraphNodes.Button(label, activate ?? (() => { }), null, it.Tooltip);
+                : GraphNodes.Text(label, null, it.Tooltip);
             // What the slot holds changes under a cursor standing right here: a drop lands on it, the
             // game's own animation fills it a fifth of a second after the drop was reported.
             vtable.Announcements[0].Live = true;
@@ -305,9 +308,8 @@ namespace SongsOfConquestAccess.Screens
         }
 
         /// <summary>The game's drag-out-to-nothing removal, as a line the keyboard can reach. It says
-        /// the whole instruction, because while nothing is carried there is no other way to know what
-        /// it is for; its row counts nothing, so the slots above it still say where they sit in the
-        /// bar.</summary>
+        /// what it is for in the owner's words and no more; its row counts nothing, so the slots
+        /// above it still say where they sit in the bar.</summary>
         private void BuildRemovalTarget(GraphBuilder builder)
         {
             NodeVtable vtable = GraphNodes.Text(() => ModText.Get(ModStrings.Screens.SpellbookDropToRemove));

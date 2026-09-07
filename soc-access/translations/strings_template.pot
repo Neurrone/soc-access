@@ -2961,7 +2961,7 @@ msgstr ""
 
 #. Screens.SpellbookDropToRemove
 msgctxt "Screens.SpellbookDropToRemove"
-msgid "Drop a spell here to remove it from the quickbar"
+msgid "Drop here to remove"
 msgstr ""
 
 #. Screens.Sell

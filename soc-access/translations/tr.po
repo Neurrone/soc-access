@@ -1007,8 +1007,8 @@ msgstr "{0} hızlı çubuğa ekler"
 
 #. Screens.SpellbookDropToRemove
 msgctxt "Screens.SpellbookDropToRemove"
-msgid "Drop a spell here to remove it from the quickbar"
-msgstr "Bir büyüyü hızlı çubuktan kaldırmak için buraya bırakın"
+msgid "Drop here to remove"
+msgstr "Kaldırmak için buraya bırakın"
 
 #. Screens.TeamValue
 msgctxt "Screens.TeamValue"
