@@ -1202,13 +1202,16 @@ namespace SongsOfConquestAccess.Adapters
             }
         }
 
+        /// <summary>The end-turn HUD object itself, bound in its own installer's container rather than
+        /// the scene's (the scene container answers null for it; measured 2026-09-08).</summary>
         private EndTurnHUD EndTurnHud
         {
             get
             {
                 if (_endTurnHud == null)
                 {
-                    _endTurnHud = Resolve<EndTurnHUD>();
+                    DiContainer container = GetInstallerContainer(FindSameSceneComponent<EndTurnHUDInstaller>());
+                    _endTurnHud = container != null ? container.TryResolve<EndTurnHUD>() : null;
                 }
 
                 return _endTurnHud;
