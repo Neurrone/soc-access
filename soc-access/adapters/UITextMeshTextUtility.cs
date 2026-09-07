@@ -46,7 +46,10 @@ namespace SongsOfConquestAccess.Adapters
             return button != null ? button.Text ?? string.Empty : string.Empty;
         }
 
-        private static string GetStringBuilderText(UITextMesh textMesh)
+        /// <summary>What the game last WROTE into the text, read off its string builder; empty when the
+        /// game wrote nothing, even where the prefab placeholder still sits in the mesh (the overview
+        /// rows the game never sets a level for keep the prefab's "9999").</summary>
+        public static string GetStringBuilderText(UITextMesh textMesh)
         {
             if (textMesh == null || StringBuilderField == null)
             {

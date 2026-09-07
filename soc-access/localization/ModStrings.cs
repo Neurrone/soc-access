@@ -664,6 +664,8 @@ namespace SongsOfConquestAccess.Localization
             public static readonly ModString TileAnnouncements = new ModString("Screens.TileAnnouncements", "Tile announcements");
             public static readonly ModString TooltipActions = new ModString("Screens.TooltipActions", "Tooltip actions");
             public static readonly ModString Tier = new ModString("Screens.Tier", "Tier");
+            public static readonly ModString TownStatus = new ModString("Screens.TownStatus", "Town status");
+            public static readonly ModString TownStatusRounds = new ModString("Screens.TownStatusRounds", "{0}: {1} rounds complete, {2} rounds remaining");
             public static readonly ModString Tower = new ModString("Screens.Tower", "Tower {0}");
             public static readonly ModString Towers = new ModString("Screens.Towers", "Towers");
             public static readonly ModString TroopLost = new ModString("Screens.TroopLost", "{0} lost");

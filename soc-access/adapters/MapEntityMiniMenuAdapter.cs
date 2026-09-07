@@ -67,11 +67,19 @@ namespace SongsOfConquestAccess.Adapters
                 && Entity != null;
         }
 
+        /// <summary>The entity's type name ("Small Settlement"), drawn BELOW the custom name.</summary>
         public string EntityName
         {
             get { return GetText(GetField<UITextMesh>(_menu, NameTextField)); }
         }
 
+        /// <summary>The text the type name is drawn as.</summary>
+        public Component EntityNameComponent
+        {
+            get { return GetField<UITextMesh>(_menu, NameTextField); }
+        }
+
+        /// <summary>The entity's own name ("Crowpoint"), drawn ABOVE the type name.</summary>
         public string CustomName
         {
             get { return GetText(GetField<UITextMesh>(_menu, CustomNameTextField)); }
@@ -85,6 +93,12 @@ namespace SongsOfConquestAccess.Adapters
         public string BlueprintDescription
         {
             get { return GetText(GetField<UITextMesh>(_menu, DescriptionTextField)); }
+        }
+
+        /// <summary>The text the blueprint description is drawn as.</summary>
+        public Component BlueprintDescriptionComponent
+        {
+            get { return GetField<UITextMesh>(_menu, DescriptionTextField); }
         }
 
         public bool IsBlueprintDescriptionVisible
@@ -106,6 +120,12 @@ namespace SongsOfConquestAccess.Adapters
                 ICommanderState storedCommander = facade.MapEntities.GetStoredCommander(entity.Id);
                 return storedCommander != null ? SpeechTextSanitizer.Normalize(facade.Commanders.GetName(storedCommander.Id)) : string.Empty;
             }
+        }
+
+        /// <summary>The one native control the stored wielder is drawn as: clicking it ejects.</summary>
+        public Component StoredWielderButton
+        {
+            get { return GetField<UIButton>(_menu, StoredWielderButtonField); }
         }
 
         public bool IsStoredWielderVisible
@@ -144,6 +164,16 @@ namespace SongsOfConquestAccess.Adapters
             }
         }
 
+        /// <summary>The row of upgrade slots the tier summary is read off.</summary>
+        public Component UpgradesComponent
+        {
+            get
+            {
+                GameObject parent = GetField<GameObject>(_menu, UpgradesParentField);
+                return parent != null ? parent.transform : null;
+            }
+        }
+
         public bool IsUpgradeSummaryVisible
         {
             get
@@ -160,24 +190,31 @@ namespace SongsOfConquestAccess.Adapters
             get { return GetText(GetField<UITextMesh>(_menu, SiegeStateDescriptionField)); }
         }
 
+        /// <summary>The text the siege state is drawn as.</summary>
+        public Component SiegeStateComponent
+        {
+            get { return GetField<UITextMesh>(_menu, SiegeStateDescriptionField); }
+        }
+
         public bool IsSiegeStateVisible
         {
             get { return IsActive(GetField<GameObject>(_menu, SiegeStateDescriptionContainerField)) && !string.IsNullOrWhiteSpace(SiegeState); }
         }
 
-        public string TownStatus
+        /// <summary>The controller drawing the round dots the town status is counted off.</summary>
+        public Component TownStatusComponent
+        {
+            get { return GetField<TownStatusController>(_menu, TownStatusControllerField); }
+        }
+
+        /// <summary>How many rounds of the claim the game has drawn as filled.</summary>
+        public int TownStatusRoundsComplete
         {
             get
             {
-                TownStatusController controller = GetField<TownStatusController>(_menu, TownStatusControllerField);
-                List<TownStatusControllerRoundEntry> entries = GetField<List<TownStatusControllerRoundEntry>>(controller, TownStatusEntriesField);
-                if (entries == null || entries.Count == 0)
-                {
-                    return string.Empty;
-                }
-
                 int filled = 0;
-                for (int i = 0; i < entries.Count; i++)
+                List<TownStatusControllerRoundEntry> entries = TownStatusEntries;
+                for (int i = 0; entries != null && i < entries.Count; i++)
                 {
                     Transform filledSlot = GetField<Transform>(entries[i], TownStatusFilledSlotField);
                     if (filledSlot != null && ((Component)filledSlot).gameObject.activeSelf)
@@ -186,9 +223,17 @@ namespace SongsOfConquestAccess.Adapters
                     }
                 }
 
-                int remaining = entries.Count - filled;
-                string prefix = !string.IsNullOrWhiteSpace(SiegeState) ? SiegeState : "Town status";
-                return prefix + ": " + filled + " rounds complete, " + remaining + " rounds remaining";
+                return filled;
+            }
+        }
+
+        /// <summary>How many rounds of the claim the game has drawn as still empty.</summary>
+        public int TownStatusRoundsRemaining
+        {
+            get
+            {
+                List<TownStatusControllerRoundEntry> entries = TownStatusEntries;
+                return entries == null ? 0 : entries.Count - TownStatusRoundsComplete;
             }
         }
 
@@ -197,7 +242,8 @@ namespace SongsOfConquestAccess.Adapters
             get
             {
                 TownStatusController controller = GetField<TownStatusController>(_menu, TownStatusControllerField);
-                return IsActive(controller) && !string.IsNullOrWhiteSpace(TownStatus);
+                List<TownStatusControllerRoundEntry> entries = TownStatusEntries;
+                return IsActive(controller) && entries != null && entries.Count > 0;
             }
         }
 
@@ -229,8 +275,8 @@ namespace SongsOfConquestAccess.Adapters
 
                 rows.Add(new DescriptionRow(
                     "map-entity-description-row-" + i,
+                    entry,
                     label,
-                    () => HideNativeTooltip(),
                     () => FirstTooltipWithLines(icon, text)));
             }
 
@@ -259,6 +305,7 @@ namespace SongsOfConquestAccess.Adapters
                 IGameAction gameAction = entry.GameAction;
                 buttons.Add(new ActionButton(
                     "map-entity-action-" + i + "-" + gameAction.ActionType,
+                    entry,
                     GetActionLabel(gameAction),
                     () => NativeSelectionUtility.Click(button),
                     () => NativeSelectionUtility.Select(entry.GetSelectable()),
@@ -269,11 +316,7 @@ namespace SongsOfConquestAccess.Adapters
             return buttons;
         }
 
-        public void HideNativeTooltip()
-        {
-            NativeTooltipUtility.HideTooltip();
-        }
-
+        /// <summary>The game's own hide path, which is what clicking outside the menu runs.</summary>
         public bool Close()
         {
             if (_menu == null)
@@ -283,6 +326,15 @@ namespace SongsOfConquestAccess.Adapters
 
             _menu.Hide();
             return true;
+        }
+
+        private List<TownStatusControllerRoundEntry> TownStatusEntries
+        {
+            get
+            {
+                TownStatusController controller = GetField<TownStatusController>(_menu, TownStatusControllerField);
+                return GetField<List<TownStatusControllerRoundEntry>>(controller, TownStatusEntriesField);
+            }
         }
 
         private IMapEntity Entity
@@ -445,19 +497,20 @@ namespace SongsOfConquestAccess.Adapters
 
         public sealed class DescriptionRow
         {
-            public DescriptionRow(string id, string label, System.Action focus, System.Func<Tooltip> getTooltip)
+            public DescriptionRow(string id, Component component, string label, System.Func<Tooltip> getTooltip)
             {
                 Id = id;
+                Component = component;
                 Label = label ?? string.Empty;
-                Focus = focus;
                 GetTooltip = getTooltip;
             }
 
             public string Id { get; private set; }
 
-            public string Label { get; private set; }
+            /// <summary>The entry the game draws the row as.</summary>
+            public Component Component { get; private set; }
 
-            public System.Action Focus { get; private set; }
+            public string Label { get; private set; }
 
             public System.Func<Tooltip> GetTooltip { get; private set; }
         }
@@ -466,6 +519,7 @@ namespace SongsOfConquestAccess.Adapters
         {
             public ActionButton(
                 string id,
+                Component component,
                 string label,
                 System.Func<bool> activate,
                 System.Action focus,
@@ -473,6 +527,7 @@ namespace SongsOfConquestAccess.Adapters
                 System.Func<Tooltip> getTooltip)
             {
                 Id = id;
+                Component = component;
                 Label = label ?? string.Empty;
                 Activate = activate;
                 Focus = focus;
@@ -481,6 +536,9 @@ namespace SongsOfConquestAccess.Adapters
             }
 
             public string Id { get; private set; }
+
+            /// <summary>The button the game draws the action as.</summary>
+            public Component Component { get; private set; }
 
             public string Label { get; private set; }
 

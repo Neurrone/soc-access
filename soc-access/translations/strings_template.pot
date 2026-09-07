@@ -3039,6 +3039,16 @@ msgctxt "Screens.Tier"
 msgid "Tier"
 msgstr ""
 
+#. Screens.TownStatus
+msgctxt "Screens.TownStatus"
+msgid "Town status"
+msgstr ""
+
+#. Screens.TownStatusRounds
+msgctxt "Screens.TownStatusRounds"
+msgid "{0}: {1} rounds complete, {2} rounds remaining"
+msgstr ""
+
 #. Screens.Tower
 msgctxt "Screens.Tower"
 msgid "Tower {0}"

@@ -1140,6 +1140,16 @@ msgctxt "Screens.Tier"
 msgid "Tier"
 msgstr "티어"
 
+#. Screens.TownStatus
+msgctxt "Screens.TownStatus"
+msgid "Town status"
+msgstr "마을 상태"
+
+#. Screens.TownStatusRounds
+msgctxt "Screens.TownStatusRounds"
+msgid "{0}: {1} rounds complete, {2} rounds remaining"
+msgstr "{0}: {1}라운드 완료, {2}라운드 남음"
+
 #. Screens.Tower
 msgctxt "Screens.Tower"
 msgid "Tower {0}"

@@ -4,13 +4,17 @@ using System.Reflection;
 using HarmonyLib;
 using SongsOfConquest.Client.Adventure;
 using SongsOfConquest.Client.UI;
-using SongsOfConquest.Common.Entities;
 using SongsOfConquestAccess.Speech;
 using UnityEngine;
 using UnityEngine.UI;
 
 namespace SongsOfConquestAccess.Adapters
 {
+    /// <summary>
+    /// The kingdom's troop overview, read off the game's own entries. One
+    /// <see cref="KingdomTroopOverviewTownEntry"/> per settlement, each drawing its name and its
+    /// tier, and one <see cref="KingdomTroopOverviewIncomeEntry"/> per recruitable troop.
+    /// </summary>
     public sealed class KingdomTroopOverviewAdapter
     {
         private static readonly FieldInfo TownNameTextField =
@@ -21,12 +25,8 @@ namespace SongsOfConquestAccess.Adapters
             AccessTools.Field(typeof(KingdomTroopOverviewIncomeEntry), "_text");
         private static readonly FieldInfo IncomeAmountField =
             AccessTools.Field(typeof(KingdomTroopOverviewIncomeEntry), "_amount");
-        private static readonly FieldInfo IncomeButtonField =
-            AccessTools.Field(typeof(KingdomTroopOverviewIncomeEntry), "_button");
         private static readonly MethodInfo TownClickMethod =
             AccessTools.Method(typeof(KingdomTroopOverviewTownEntry), "HandleTownNameClicked");
-        private static readonly MethodInfo IncomeClickMethod =
-            AccessTools.Method(typeof(KingdomTroopOverviewIncomeEntry), "HandleButtonClicked");
 
         private readonly KingdomTroopOverviewMenu _menu;
 
@@ -40,13 +40,14 @@ namespace SongsOfConquestAccess.Adapters
             return _menu != null && _menu.IsVisible;
         }
 
+        /// <summary>The menu's own drawn title. Empty when the menu draws none.</summary>
         public string Title
         {
             get
             {
                 if (_menu == null)
                 {
-                    return "Troop overview";
+                    return string.Empty;
                 }
 
                 UITextMesh[] texts = ((Component)_menu).GetComponentsInChildren<UITextMesh>(includeInactive: false);
@@ -65,16 +66,17 @@ namespace SongsOfConquestAccess.Adapters
                     }
                 }
 
-                return "Troop overview";
+                return string.Empty;
             }
         }
 
-        public IReadOnlyList<GroupItem> GetGroups()
+        /// <summary>The towns in hierarchy order, which is the order the menu draws them.</summary>
+        public IReadOnlyList<TownItem> GetTowns()
         {
-            List<GroupItem> groups = new List<GroupItem>();
+            List<TownItem> towns = new List<TownItem>();
             if (!IsPresent())
             {
-                return groups;
+                return towns;
             }
 
             KingdomTroopOverviewTownEntry[] entries =
@@ -87,42 +89,33 @@ namespace SongsOfConquestAccess.Adapters
                     continue;
                 }
 
-                GroupItem group = BuildGroup(entry, i);
-                if (group != null)
-                {
-                    groups.Add(group);
-                }
+                towns.Add(BuildTown(entry));
             }
 
-            return groups;
+            return towns;
         }
 
-        public void HideNativeTooltip()
+        /// <summary>The game's own hide path, which is what clicking the blocker behind the menu
+        /// runs.</summary>
+        public bool Close()
         {
+            if (_menu == null)
+            {
+                return false;
+            }
+
+            _menu.Hide();
+            return true;
         }
 
-        private static GroupItem BuildGroup(KingdomTroopOverviewTownEntry entry, int index)
+        private static TownItem BuildTown(KingdomTroopOverviewTownEntry entry)
         {
-            string town = NormalizeText(GetText(entry, TownNameTextField));
-            string tier = NormalizeText(GetText(entry, UpgradeTextField));
-            string title = MenuButtonTextUtility.JoinParts(town, tier);
-            string label = GetShortCategoryLabel(town);
-
             List<RowItem> rows = new List<RowItem>();
-            if (!string.IsNullOrWhiteSpace(title))
-            {
-                rows.Add(new RowItem(
-                    title,
-                    string.Empty,
-                    () => ClickTown(entry),
-                    () => true));
-            }
-
-            KingdomTroopOverviewIncomeEntry[] incomeEntries =
+            KingdomTroopOverviewIncomeEntry[] incomes =
                 entry.GetComponentsInChildren<KingdomTroopOverviewIncomeEntry>(includeInactive: false);
-            for (int i = 0; i < incomeEntries.Length; i++)
+            for (int i = 0; i < incomes.Length; i++)
             {
-                KingdomTroopOverviewIncomeEntry income = incomeEntries[i];
+                KingdomTroopOverviewIncomeEntry income = incomes[i];
                 if (income == null || !income.gameObject.activeInHierarchy)
                 {
                     continue;
@@ -134,17 +127,26 @@ namespace SongsOfConquestAccess.Adapters
                     continue;
                 }
 
-                string amount = NormalizeText(GetText(income, IncomeAmountField));
                 rows.Add(new RowItem(
+                    income,
+                    income.Button,
                     troop,
-                    amount,
+                    NormalizeText(GetText(income, IncomeAmountField)),
                     () => ClickIncome(income),
-                    () => FocusIncome(income)));
+                    () => FocusButton(income.Button)));
             }
 
-            return rows.Count > 0 ? new GroupItem(label, rows) : null;
+            return new TownItem(
+                entry,
+                NormalizeText(GetText(entry, TownNameTextField)),
+                NormalizeText(GetText(entry, UpgradeTextField)),
+                () => ClickTown(entry),
+                rows);
         }
 
+        // The town's name is a UITextMesh whose click is delivered by UITransform.Update from the real
+        // mouse position (decompiled), so there is no native call to make: the handler is invoked
+        // directly.
         private static bool ClickTown(KingdomTroopOverviewTownEntry entry)
         {
             if (entry == null || TownClickMethod == null)
@@ -164,28 +166,15 @@ namespace SongsOfConquestAccess.Adapters
             }
         }
 
+        // The row IS a UIButton, and the entry wires HandleButtonClicked onto its OnClicked in
+        // OnEnable, so the native click reaches the same handler the mouse does.
         private static bool ClickIncome(KingdomTroopOverviewIncomeEntry entry)
         {
-            if (entry == null || IncomeClickMethod == null)
-            {
-                return false;
-            }
-
-            try
-            {
-                IncomeClickMethod.Invoke(entry, null);
-                return true;
-            }
-            catch (Exception ex)
-            {
-                SocAccessMod.Instance?.LogWarning("KingdomTroopOverviewAdapter failed to click troop row: " + ex.Message);
-                return false;
-            }
+            return entry != null && NativeSelectionUtility.Click(entry.Button);
         }
 
-        private static bool FocusIncome(KingdomTroopOverviewIncomeEntry entry)
+        private static bool FocusButton(UIButton button)
         {
-            UIButton button = GetField<UIButton>(entry, IncomeButtonField);
             Selectable selectable = button != null ? button.GetSelectable() : null;
             return NativeSelectionUtility.Select(selectable);
         }
@@ -230,47 +219,75 @@ namespace SongsOfConquestAccess.Adapters
                 || text.GetComponentInParent<KingdomTroopOverviewIncomeEntry>() != null;
         }
 
-        private static string GetShortCategoryLabel(string category)
+        /// <summary>One settlement's entry.</summary>
+        public sealed class TownItem
         {
-            if (string.IsNullOrWhiteSpace(category))
+            public TownItem(
+                Component entry,
+                string name,
+                string tier,
+                Func<bool> moveCamera,
+                IReadOnlyList<RowItem> rows)
             {
-                return string.Empty;
-            }
-
-            int separator = category.IndexOf(" - ", StringComparison.Ordinal);
-            if (separator < 0)
-            {
-                separator = category.IndexOf(" \u2013 ", StringComparison.Ordinal);
-            }
-
-            return separator > 0 ? category.Substring(0, separator).Trim() : category.Trim();
-        }
-
-        public sealed class GroupItem
-        {
-            public GroupItem(string label, IReadOnlyList<RowItem> rows)
-            {
-                Label = label ?? string.Empty;
+                Entry = entry;
+                Name = name ?? string.Empty;
+                Tier = tier ?? string.Empty;
+                MoveCamera = moveCamera;
                 Rows = rows ?? new RowItem[0];
             }
 
-            public string Label { get; private set; }
+            /// <summary>The drawn entry: what the row stands on and what it is scrolled by.</summary>
+            public Component Entry { get; private set; }
+
+            /// <summary>The full drawn town text ("Hazelpoint - Small Settlement").</summary>
+            public string Name { get; private set; }
+
+            /// <summary>The drawn upgrade text ("Tier: 2/2").</summary>
+            public string Tier { get; private set; }
+
+            /// <summary>Moves the camera onto the settlement, as clicking the name does.</summary>
+            public Func<bool> MoveCamera { get; private set; }
+
             public IReadOnlyList<RowItem> Rows { get; private set; }
         }
 
+        /// <summary>One recruitable troop of a town.</summary>
         public sealed class RowItem
         {
-            public RowItem(string label, string status, Func<bool> activate, Func<bool> focus)
+            public RowItem(
+                Component entry,
+                Component button,
+                string name,
+                string amount,
+                Func<bool> activate,
+                Func<bool> focus)
             {
-                Label = label ?? string.Empty;
-                Status = status ?? string.Empty;
+                Entry = entry;
+                Button = button;
+                Name = name ?? string.Empty;
+                Amount = amount ?? string.Empty;
                 Activate = activate;
                 Focus = focus;
             }
 
-            public string Label { get; private set; }
-            public string Status { get; private set; }
+            /// <summary>The drawn entry: what the row stands on and what it is scrolled by.</summary>
+            public Component Entry { get; private set; }
+
+            /// <summary>The drawn button the row's click runs through.</summary>
+            public Component Button { get; private set; }
+
+            /// <summary>The troop's localized name.</summary>
+            public string Name { get; private set; }
+
+            /// <summary>The figure the game draws for the troop, which is the number available and the
+            /// per-round income in one text ("10 (+2)"): <c>KingdomTroopOverviewIncomeEntry.SetTroop</c>
+            /// composes them into the label and keeps neither number.</summary>
+            public string Amount { get; private set; }
+
+            /// <summary>Cycles the camera through the buildings producing this troop, as the mouse
+            /// does.</summary>
             public Func<bool> Activate { get; private set; }
+
             public Func<bool> Focus { get; private set; }
         }
     }

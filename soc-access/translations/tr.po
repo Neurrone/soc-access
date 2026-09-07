@@ -1140,6 +1140,16 @@ msgctxt "Screens.Tier"
 msgid "Tier"
 msgstr "Kademe"
 
+#. Screens.TownStatus
+msgctxt "Screens.TownStatus"
+msgid "Town status"
+msgstr "Kasaba durumu"
+
+#. Screens.TownStatusRounds
+msgctxt "Screens.TownStatusRounds"
+msgid "{0}: {1} rounds complete, {2} rounds remaining"
+msgstr "{0}: {1} tur tamamlandı, {2} tur kaldı"
+
 #. Screens.Tower
 msgctxt "Screens.Tower"
 msgid "Tower {0}"
