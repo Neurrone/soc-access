@@ -60,7 +60,8 @@ namespace SongsOfConquestAccess.UI
 
         /// <summary>A band of lines under the game's own caption, declared into the stop the caller has
         /// opened. <paramref name="marker"/> answers with the caller's own stable subject for a
-        /// synthesized node, keyed by the string handed to it.</summary>
+        /// synthesized node, keyed by the node's own id - which is what keeps two bands built from the
+        /// same key under different prefixes (the trade's two sides) apart.</summary>
         public static void Band(
             GraphBuilder builder,
             string keyPrefix,
@@ -84,6 +85,7 @@ namespace SongsOfConquestAccess.UI
             for (int i = 0; i < lines.Count; i++)
             {
                 Line it = lines[i];
+                string id = keyPrefix + ":" + key + "/" + i;
                 NodeVtable vtable = GraphNodes.Text(() => it.Label, null, it.Tooltip);
                 if (!string.IsNullOrWhiteSpace(it.Value))
                 {
@@ -95,9 +97,7 @@ namespace SongsOfConquestAccess.UI
                     vtable.OnFocusVisual = () => it.OnFocus();
                 }
 
-                builder.AddItem(new SyntheticNode(
-                    ControlId.For(marker(key + "/" + i), keyPrefix + ":" + key + "/" + i),
-                    vtable));
+                builder.AddItem(new SyntheticNode(ControlId.For(marker(id), id), vtable));
             }
 
             if (named)

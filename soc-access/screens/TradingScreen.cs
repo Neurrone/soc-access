@@ -3,34 +3,81 @@ using System.Collections.Generic;
 using System.Reflection;
 using HarmonyLib;
 using SongsOfConquest.Client.Adventure.UI.Trading;
-using SongsOfConquest.Client.Gamestate.Facade;
-using SongsOfConquest.Common.Gamestate.Facade;
 using SongsOfConquestAccess.Adapters;
 using SongsOfConquestAccess.Input;
 using SongsOfConquestAccess.Localization;
 using SongsOfConquestAccess.UI;
+using SongsOfConquestAccess.UI.Graph;
 using UnityEngine;
 using Zenject;
 
 namespace SongsOfConquestAccess.Screens
 {
-    public sealed class TradingScreen : Screen
+    /// <summary>
+    /// The trade between two wielders standing next to each other. Seven places to be.
+    ///
+    /// THE STOP ORDER IS DELIBERATE AND IS NOT THE DRAWN ONE (owner ruling 2026-09-07): left Wielder,
+    /// right Wielder, left Equipment, left Inventory, right Equipment, right Inventory, Close. The
+    /// menu draws each side as one column - portrait, stats, modifiers, artifacts, army - so the drawn
+    /// order would put a wielder band between the two backpacks, and every transfer would then cross
+    /// it. Putting the two wielder bands first and the four artifact stops together means a carry from
+    /// one backpack to the other is one Tab away.
+    ///
+    /// A WIELDER STOP HERE IS THE SHEET'S SHAPE, because the menu draws the sheet's own parts: the
+    /// portrait row, the stats band and the modifier bar with the showing tab's lines under it (both
+    /// through <c>ui/CommanderBands.cs</c>, shared with the sheet), the army rows
+    /// (<c>ui/TroopHudRows.cs</c>), and then the side's Move all button. Locked troop slots are not
+    /// there to find: the menu builds both bars with <c>hideLockedSlots</c>, so only drawn slots are
+    /// rows. Enter on a modifier tab switches BOTH sides, which is what the menu's own tab control
+    /// (<c>TradingMenu.HandleSwitchTab</c>) does.
+    ///
+    /// THE CLICKS ON AN ARTIFACT MEAN SOMETHING ELSE HERE than they do on the sheet, and the
+    /// difference is the game's: <c>InventoryHUD.EquipArtifact</c> answers the right click with
+    /// <c>MoveItemToOtherBackpack</c> when the other inventory is set. Enter is the left click (inert,
+    /// and with Ctrl held the game's drop on the ground); Backslash moves the artifact across, and
+    /// with Ctrl held destroys it. A carry ACROSS the sides goes down the game's give path, which
+    /// <c>ArtifactDropUtility</c> already branches on the owner for, and a troop carried across is
+    /// answered by the game's own <c>CanDropHere</c>, which applies its faction-mixing and partner
+    /// rules.
+    ///
+    /// Escape is the game's (<c>ConsumesBack</c> false): the window IS an
+    /// <c>AdventureMenuBackground</c> with a close cross, and <c>AnimateEntry</c> registers
+    /// <c>UI.ExitMenu</c> on its own close outside any gamepad branch (measured 2026-09-07 in the
+    /// decompiled source). The navigator claims the key only while something is being carried.
+    ///
+    /// The menu draws no title of its own, so the screen is named after the two wielders in it.
+    ///
+    /// ONE CONSEQUENCE OF THE ONE-STOP WIELDER BAND, measured 2026-09-07 and left as the model has it:
+    /// a stop with no remembered position lands on whichever alternative of a set is in force, so Tab
+    /// into a wielder stop the player has not stood in yet lands on the modifier tab that is showing
+    /// rather than on the wielder. The sheet avoids this by giving its modifier bar a stop of its own;
+    /// here the bar is inside the band, which is what makes the band one stop instead of two.
+    /// </summary>
+    public sealed class TradingScreen : GraphScreen
     {
-        private const int InventoryGridIndex = 4;
-        private const int ArmyExchangeGridIndex = 5;
+        private const string LeftWielderStop = "trade-left-wielder";
+        private const string RightWielderStop = "trade-right-wielder";
+        private const string LeftEquipmentStop = "trade-left-equipment";
+        private const string LeftInventoryStop = "trade-left-inventory";
+        private const string RightEquipmentStop = "trade-right-equipment";
+        private const string RightInventoryStop = "trade-right-inventory";
+        private const string CloseStop = "trade-close";
+        private const string LeftKey = "trade:left";
+        private const string RightKey = "trade:right";
+
         private static readonly PropertyInfo InstallerContainerProperty =
             AccessTools.Property(typeof(TradingMenuInstaller), "Container");
 
         private readonly TradingMenuAdapter _adapter;
-        private Action<int, bool> _artifactChangedHandler;
-        private Action<int> _statisticsChangedHandler;
-        private Action<OnTroopsUpdatedPayload> _troopsUpdatedHandler;
+
+        // A subject of its own per synthesized node, kept across rebuilds so the reconciler seats the
+        // cursor on the same one: the band lines and the auto-arrange buttons are not drawn as
+        // controls of their own.
+        private readonly Dictionary<string, object> _markers = new Dictionary<string, object>();
 
         public TradingScreen(TradingMenuAdapter adapter)
-            : base(new ContainerWidget("trade-screen", adapter != null ? adapter.Title : string.Empty))
         {
             _adapter = adapter;
-            RootWidget = BuildRoot(_adapter, RefreshAndAnnounceFocus);
         }
 
         public static Screen TryBuildActiveScreen()
@@ -42,7 +89,6 @@ namespace SongsOfConquestAccess.Screens
                 TradingMenuAdapter adapter = new TradingMenuAdapter(menu);
                 if (adapter.IsPresent())
                 {
-                    SocAccessMod.Instance?.LogInfo("Trading menu probe found ready trading menu");
                     return new TradingScreen(adapter);
                 }
             }
@@ -55,428 +101,299 @@ namespace SongsOfConquestAccess.Screens
             get { return _adapter; }
         }
 
+        public override string Key
+        {
+            get { return "trading"; }
+        }
+
+        /// <summary>The two wielders the menu is about, in the order it draws them: the menu writes no
+        /// title over them.</summary>
+        public override string ScreenName
+        {
+            get
+            {
+                if (_adapter == null)
+                {
+                    return null;
+                }
+
+                string left = _adapter.Left.CommanderName;
+                string right = _adapter.Right.CommanderName;
+                if (string.IsNullOrWhiteSpace(left))
+                {
+                    return string.IsNullOrWhiteSpace(right) ? null : right;
+                }
+
+                return string.IsNullOrWhiteSpace(right)
+                    ? left
+                    : ModText.Get(ModStrings.Common.ListSeparator, left, right);
+            }
+        }
+
         public override bool IsPresent()
         {
             return _adapter != null && _adapter.IsPresent();
         }
 
-        public override void OnPush()
-        {
-            AttachListeners();
-        }
-
-        public override void OnUnfocus()
-        {
-            _adapter?.HideNativeTooltip();
-            RootWidget?.Unfocus();
-        }
-
-        public override void OnPop()
-        {
-            DetachListeners();
-            _adapter?.HideNativeTooltip();
-        }
-
-        public override bool OnActionJustPressed(InputAction action)
-        {
-            if (action != null && action.Key == AccessibilityActions.Cancel.Key)
-            {
-                if (RootWidget != null && RootWidget.HandleAction(action))
-                {
-                    return true;
-                }
-
-                return _adapter != null && _adapter.Close();
-            }
-
-            return base.OnActionJustPressed(action);
-        }
-
+        /// <summary>Kept for the detector, which calls it whenever the menu is reopened over itself.
+        /// The graph is declared afresh on every operation, so there is nothing to rebuild.</summary>
         public void Refresh()
         {
-            Refresh(announceFocus: false);
         }
 
-        private void RefreshAndAnnounceFocus()
-        {
-            Refresh(announceFocus: true);
-        }
-
-        private void Refresh(bool announceFocus)
+        public override void Build(GraphBuilder builder)
         {
             if (!IsPresent())
             {
                 return;
             }
 
-            int focusedIndex = RootWidget != null ? RootWidget.FocusedIndex : -1;
-            InventoryGridWidget.FocusState inventoryFocus = CaptureInventoryGridFocus();
-            ArmyExchangeGridWidget.FocusState armyFocus = CaptureArmyGridFocus();
-            RootWidget = BuildRoot(_adapter, RefreshAndAnnounceFocus);
-            RestoreInventoryGridFocus(inventoryFocus);
-            RestoreArmyGridFocus(armyFocus);
-            if (announceFocus)
-            {
-                RootWidget?.SetFocusByIndex(focusedIndex);
-            }
-            else
-            {
-                RootWidget?.SetFocusByIndexSilently(focusedIndex);
-            }
+            ArtifactSlotNodes.RegisterSounds();
+
+            BuildWielder(builder, LeftWielderStop, LeftKey, _adapter.Left);
+            BuildWielder(builder, RightWielderStop, RightKey, _adapter.Right);
+
+            builder.BeginStop(LeftEquipmentStop);
+            ArtifactSlotNodes.Equipment(builder, _adapter.Left, LeftKey, AddSlotHints);
+
+            builder.BeginStop(LeftInventoryStop);
+            ArtifactSlotNodes.Inventory(builder, _adapter.Left, LeftKey, AddSlotHints, Marker("left/auto-arrange"));
+
+            builder.BeginStop(RightEquipmentStop);
+            ArtifactSlotNodes.Equipment(builder, _adapter.Right, RightKey, AddSlotHints);
+
+            builder.BeginStop(RightInventoryStop);
+            ArtifactSlotNodes.Inventory(builder, _adapter.Right, RightKey, AddSlotHints, Marker("right/auto-arrange"));
+
+            builder.BeginStop(CloseStop);
+            BuildClose(builder);
         }
 
-        private void AttachListeners()
+        /// <summary>The game's Ctrl+digit quick splits, on whichever side's rows the cursor is on.
+        /// </summary>
+        public override bool ClaimsAction(string actionKey)
         {
-            if (_adapter == null || _adapter.Facade == null || _adapter.Facade.Commands == null)
-            {
-                return;
-            }
-
-            IClientCommandsFacade commands = _adapter.Facade.Commands;
-            _artifactChangedHandler = HandleArtifactChanged;
-            _statisticsChangedHandler = HandleStatisticsChanged;
-            _troopsUpdatedHandler = HandleTroopsUpdated;
-            commands.OnArtifactChanged = (Action<int, bool>)Delegate.Combine(commands.OnArtifactChanged, _artifactChangedHandler);
-            commands.OnCommanderStatisticsChanged = (Action<int>)Delegate.Combine(commands.OnCommanderStatisticsChanged, _statisticsChangedHandler);
-            commands.OnTroopsUpdated = (Action<OnTroopsUpdatedPayload>)Delegate.Combine(commands.OnTroopsUpdated, _troopsUpdatedHandler);
+            return TroopHudRows.ClaimsAction(actionKey, Navigator, Troops(_adapter?.Left), LeftKey)
+                || TroopHudRows.ClaimsAction(actionKey, Navigator, Troops(_adapter?.Right), RightKey);
         }
 
-        private void DetachListeners()
+        public override bool OnAction(string actionKey)
         {
-            if (_adapter == null || _adapter.Facade == null || _adapter.Facade.Commands == null)
-            {
-                return;
-            }
-
-            IClientCommandsFacade commands = _adapter.Facade.Commands;
-            if (_artifactChangedHandler != null)
-            {
-                commands.OnArtifactChanged = (Action<int, bool>)Delegate.Remove(commands.OnArtifactChanged, _artifactChangedHandler);
-                _artifactChangedHandler = null;
-            }
-
-            if (_statisticsChangedHandler != null)
-            {
-                commands.OnCommanderStatisticsChanged = (Action<int>)Delegate.Remove(commands.OnCommanderStatisticsChanged, _statisticsChangedHandler);
-                _statisticsChangedHandler = null;
-            }
-
-            if (_troopsUpdatedHandler != null)
-            {
-                commands.OnTroopsUpdated = (Action<OnTroopsUpdatedPayload>)Delegate.Remove(commands.OnTroopsUpdated, _troopsUpdatedHandler);
-                _troopsUpdatedHandler = null;
-            }
+            return TroopHudRows.OnAction(actionKey, Navigator, Troops(_adapter?.Left), LeftKey)
+                || TroopHudRows.OnAction(actionKey, Navigator, Troops(_adapter?.Right), RightKey);
         }
 
-        private void HandleArtifactChanged(int artifactId, bool isNewArtifact)
+        private static TroopHudAdapter Troops(TradingMenuAdapter.Side side)
         {
-            RequestDetectorRefresh();
+            return side == null ? null : side.Troops;
         }
 
-        private void HandleStatisticsChanged(int commanderId)
+        // ---- one side's wielder band ----
+
+        /// <summary>One side, in the order the menu draws that side's column: who they are, their
+        /// stats, their modifiers, their army, and the button that hands the whole army over.
+        /// </summary>
+        private void BuildWielder(GraphBuilder builder, string stop, string keyPrefix, TradingMenuAdapter.Side side)
         {
-            if (_adapter != null && (commanderId == _adapter.LeftCommanderId || commanderId == _adapter.RightCommanderId))
-            {
-                RequestDetectorRefresh();
-            }
+            builder.BeginStop(stop);
+            BuildPortrait(builder, keyPrefix, side);
+            BuildStats(builder, keyPrefix, side);
+            BuildModifiers(builder, keyPrefix, side);
+            BuildTroops(builder, keyPrefix, side);
+            BuildMoveAll(builder, keyPrefix, side);
         }
 
-        private void HandleTroopsUpdated(OnTroopsUpdatedPayload payload)
+        /// <summary>The wielder, as the menu draws them over their column: their name and the level on
+        /// their portrait, with the stats the game draws on the portrait behind both in the buffer.
+        /// </summary>
+        private void BuildPortrait(GraphBuilder builder, string keyPrefix, TradingMenuAdapter.Side side)
         {
-            if (payload == null)
+            Component portrait = side.Portrait;
+            if (portrait == null)
             {
                 return;
             }
 
-            if (payload.ParentId != _adapter.LeftCommanderId && payload.ParentId != _adapter.RightCommanderId)
+            NodeVtable vtable = GraphNodes.Text(() => side.CommanderName, null, side.PortraitTooltip);
+            vtable.Announcements.Add(GraphNodes.ValuePart(
+                () => ModText.Get(ModStrings.Screens.LevelValue, side.Level)));
+            vtable.OnFocusVisual = () => side.FocusPortrait();
+            builder.AddItem(new DrawnNode(
+                ControlId.For(portrait, keyPrefix + "/portrait"),
+                vtable,
+                portrait));
+        }
+
+        private void BuildStats(GraphBuilder builder, string keyPrefix, TradingMenuAdapter.Side side)
+        {
+            CommanderBands.Band(
+                builder,
+                keyPrefix,
+                "stats",
+                GameText.Get("Common/CommanderInventory/Stats", string.Empty),
+                Lines("stats", side.GetStats),
+                Marker);
+        }
+
+        /// <summary>The three modifier tabs as the one bar the menu draws, then the showing tab's lines
+        /// under the title the game writes over them. Enter switches BOTH sides, as the menu's own tab
+        /// control does; arriving only selects, since Up from the first line lands on the bar.
+        /// </summary>
+        private void BuildModifiers(GraphBuilder builder, string keyPrefix, TradingMenuAdapter.Side side)
+        {
+            IReadOnlyList<TradingMenuAdapter.ModifierCategory> categories = Items(
+                "modifier categories",
+                side.GetModifierCategories);
+            List<CommanderBands.TabItem> tabs = new List<CommanderBands.TabItem>();
+            for (int i = 0; i < categories.Count; i++)
+            {
+                TradingMenuAdapter.ModifierCategory it = categories[i];
+                tabs.Add(new CommanderBands.TabItem(it.Label, it.Index, it.Button, it.Tooltip));
+            }
+
+            CommanderBands.Tabs(
+                builder,
+                keyPrefix,
+                tabs,
+                side.GetActiveModifierCategoryIndex,
+                index => _adapter.ActivateModifierCategory(index),
+                index => side.SelectModifierCategory(index));
+
+            CommanderBands.Band(
+                builder,
+                keyPrefix,
+                "modifiers",
+                side.GetActiveModifierListLabel(),
+                Lines("modifiers", side.GetActiveModifiers),
+                Marker);
+        }
+
+        /// <summary>The side's army, under the game's own word for it.</summary>
+        private void BuildTroops(GraphBuilder builder, string keyPrefix, TradingMenuAdapter.Side side)
+        {
+            string caption = GameText.Get("Commanders/Tooltip/Troops", string.Empty);
+            bool named = !string.IsNullOrWhiteSpace(caption);
+            if (named)
+            {
+                builder.PushContext(caption);
+                builder.SetRegion(keyPrefix + ":troops");
+            }
+
+            TroopHudRows.Rows(builder, side.Troops, TroopHudRows.RowPrefix(keyPrefix));
+
+            if (named)
+            {
+                builder.PopContext();
+            }
+
+            builder.SetRegion(null);
+        }
+
+        /// <summary>The button under the army that hands the whole of it over. The game turns it off
+        /// when it would refuse the move (<c>CanMassMoveTroops</c>), so it is watched under a cursor
+        /// waiting here.</summary>
+        private void BuildMoveAll(GraphBuilder builder, string keyPrefix, TradingMenuAdapter.Side side)
+        {
+            Component button = side.MoveAllButton;
+            if (button == null)
             {
                 return;
             }
 
-            RequestDetectorRefresh();
+            NodeVtable vtable = GraphNodes.Button(
+                () => side.MoveAllLabel,
+                () => side.ActivateMoveAll(),
+                side.IsMoveAllEnabled);
+            vtable.OnFocusVisual = () => NativeSelectionUtility.Select(button);
+            builder.AddItem(new DrawnNode(
+                ControlId.For(button, keyPrefix + ":move-all"),
+                vtable,
+                button));
         }
 
-        private void RequestDetectorRefresh()
+        // ---- the artifacts ----
+
+        /// <summary>The three gestures an occupied slot has in a trade, in the order they are said.
+        /// The left click is inert here, as it is on the sheet, so it says nothing.</summary>
+        private void AddSlotHints(NodeVtable vtable, InventorySlotInfo slot)
         {
-            SocAccessMod.Instance?.ScreenDetector?.OnTradingMenuChanged();
+            NodeHints.Add(
+                vtable,
+                ModStrings.Screens.ArtifactTradeHint,
+                AccessibilityActions.UiRightClick.Key);
+            NodeHints.Add(
+                vtable,
+                ModStrings.Screens.ArtifactDestroyHint,
+                AccessibilityActions.UiRightClick.Key,
+                AccessibilityActions.UiRightClickCtrlBindingIndex);
+            NodeHints.Add(
+                vtable,
+                ModStrings.Screens.ArtifactDropHint,
+                AccessibilityActions.UiLeftClick.Key,
+                AccessibilityActions.UiLeftClickCtrlBindingIndex);
         }
 
-        private InventoryGridWidget.FocusState CaptureInventoryGridFocus()
-        {
-            InventoryGridWidget grid = RootWidget != null ? RootWidget.GetChildAt(InventoryGridIndex) as InventoryGridWidget : null;
-            return grid != null ? grid.CaptureFocusState() : null;
-        }
+        // ---- the close cross ----
 
-        private ArmyExchangeGridWidget.FocusState CaptureArmyGridFocus()
+        private void BuildClose(GraphBuilder builder)
         {
-            ArmyExchangeGridWidget grid = RootWidget != null ? RootWidget.GetChildAt(ArmyExchangeGridIndex) as ArmyExchangeGridWidget : null;
-            return grid != null ? grid.CaptureFocusState() : null;
-        }
-
-        private void RestoreInventoryGridFocus(InventoryGridWidget.FocusState focus)
-        {
-            if (focus == null || RootWidget == null)
+            Component close = _adapter.CloseButton;
+            if (close == null || !_adapter.IsCloseVisible())
             {
                 return;
             }
 
-            InventoryGridWidget grid = RootWidget.GetChildAt(InventoryGridIndex) as InventoryGridWidget;
-            grid?.RestoreFocusState(focus);
+            // An icon with no text of its own, so the mod names it.
+            NodeVtable vtable = GraphNodes.Button(
+                () => ModText.Get(ModStrings.Screens.Close),
+                () => _adapter.ActivateClose());
+            vtable.OnFocusVisual = () => NativeSelectionUtility.Select(close);
+            builder.AddItem(new DrawnNode(ControlId.For(close, "trade:close"), vtable, close));
         }
 
-        private void RestoreArmyGridFocus(ArmyExchangeGridWidget.FocusState focus)
-        {
-            if (focus == null || RootWidget == null)
-            {
-                return;
-            }
+        // ---- shared ----
 
-            ArmyExchangeGridWidget grid = RootWidget.GetChildAt(ArmyExchangeGridIndex) as ArmyExchangeGridWidget;
-            grid?.RestoreFocusState(focus);
-        }
-
-        private static ContainerWidget BuildRoot(TradingMenuAdapter adapter, Action onCompletedDrop)
-        {
-            ContainerWidget root = new ContainerWidget("trade-screen", adapter != null ? adapter.Title : string.Empty);
-            if (adapter == null)
-            {
-                return root;
-            }
-
-            root.AddChild(BuildPortrait(adapter, left: true));
-            root.AddChild(BuildMenu("trade-left-stats", ModText.Get(ModStrings.Screens.WielderStats, adapter.LeftCommanderName), GetItemsSafely("Left stats", () => adapter.GetStats(left: true)), adapter.HideNativeTooltip));
-            root.AddChild(BuildModifierCategoryMenu(adapter, left: true));
-            root.AddChild(BuildMenu("trade-left-active-modifiers", adapter.GetActiveModifierListLabel(left: true), GetItemsSafely("Left active modifiers", () => adapter.GetActiveModifiers(left: true)), adapter.HideNativeTooltip));
-
-            root.AddChild(new InventoryGridWidget(
-                "trade-inventory-grid",
-                BuildInventoryGridColumns(adapter),
-                adapter.DropInventoryArtifact,
-                onCompletedDrop));
-
-            root.AddChild(BuildArmyExchangeGrid(
-                "trade-army-exchange-grid",
-                BuildArmyLabel(adapter.LeftCommanderName),
-                BuildArmyLabel(adapter.RightCommanderName),
-                adapter.LeftTroops,
-                adapter.RightTroops,
-                onCompletedDrop));
-
-            root.AddChild(BuildPortrait(adapter, left: false));
-            root.AddChild(BuildMenu("trade-right-stats", ModText.Get(ModStrings.Screens.WielderStats, adapter.RightCommanderName), GetItemsSafely("Right stats", () => adapter.GetStats(left: false)), adapter.HideNativeTooltip));
-            root.AddChild(BuildModifierCategoryMenu(adapter, left: false));
-            root.AddChild(BuildMenu("trade-right-active-modifiers", adapter.GetActiveModifierListLabel(left: false), GetItemsSafely("Right active modifiers", () => adapter.GetActiveModifiers(left: false)), adapter.HideNativeTooltip));
-
-            root.AddChild(new ButtonWidget(
-                "trade-close",
-                ModText.Get(ModStrings.Screens.Close),
-                adapter.Close,
-                adapter.HideNativeTooltip,
-                () => true));
-
-            return root;
-        }
-
-        private static IReadOnlyList<InventoryGridWidget.Column> BuildInventoryGridColumns(TradingMenuAdapter adapter)
-        {
-            return new[]
-            {
-                new InventoryGridWidget.Column(
-                    "trade-left-equipment",
-                    MenuButtonTextUtility.JoinParts(adapter.LeftCommanderName, adapter.EquipmentLabel),
-                    BuildInventoryCells("trade-left-equipment", adapter.GetEquipmentSlots(left: true), includeOwnerName: true)),
-                new InventoryGridWidget.Column(
-                    "trade-left-inventory",
-                    MenuButtonTextUtility.JoinParts(adapter.LeftCommanderName, adapter.InventoryLabel),
-                    BuildInventoryCells("trade-left-inventory", adapter.GetBackpackSlots(left: true), includeOwnerName: true)),
-                new InventoryGridWidget.Column(
-                    "trade-right-equipment",
-                    MenuButtonTextUtility.JoinParts(adapter.RightCommanderName, adapter.EquipmentLabel),
-                    BuildInventoryCells("trade-right-equipment", adapter.GetEquipmentSlots(left: false), includeOwnerName: true)),
-                new InventoryGridWidget.Column(
-                    "trade-right-inventory",
-                    MenuButtonTextUtility.JoinParts(adapter.RightCommanderName, adapter.InventoryLabel),
-                    BuildInventoryCells("trade-right-inventory", adapter.GetBackpackSlots(left: false), includeOwnerName: true))
-            };
-        }
-
-        private static IReadOnlyList<InventoryGridWidget.Cell> BuildInventoryCells(
-            string idPrefix,
-            IReadOnlyList<InventorySlotInfo> slots,
-            bool includeOwnerName)
-        {
-            List<InventoryGridWidget.Cell> cells = new List<InventoryGridWidget.Cell>();
-            if (slots == null)
-            {
-                return cells;
-            }
-
-            for (int i = 0; i < slots.Count; i++)
-            {
-                InventorySlotInfo slot = slots[i];
-                if (slot == null)
-                {
-                    continue;
-                }
-
-                cells.Add(new InventoryGridWidget.Cell(
-                    idPrefix + "-" + i,
-                    BuildInventorySlotLabel(slot, includeOwnerName),
-                    slot));
-            }
-
-            return cells;
-        }
-
-        private static string BuildInventorySlotLabel(InventorySlotInfo slot, bool includeOwnerName)
-        {
-            string name = !slot.IsEmpty ? slot.ArtifactName : ModText.Get(ModStrings.Screens.Empty);
-            string location = slot.IsBackpackSlot
-                ? ModText.Get(ModStrings.UI.SlotInGroup, slot.InventoryName, slot.PositionIndex + 1)
-                : slot.SlotName;
-            string ownerName = includeOwnerName ? slot.OwnerName : string.Empty;
-            return MenuButtonTextUtility.JoinParts(name, location, ownerName);
-        }
-
-        private static ArmyExchangeGridWidget BuildArmyExchangeGrid(
-            string id,
-            string leftArmyLabel,
-            string rightArmyLabel,
-            TroopHudAdapter left,
-            TroopHudAdapter right,
-            Action onCompletedDrop)
-        {
-            IReadOnlyList<TroopHudAdapter.SlotItem> leftSlots = left != null
-                ? left.GetSlots()
-                : new TroopHudAdapter.SlotItem[0];
-            IReadOnlyList<TroopHudAdapter.SlotItem> rightSlots = right != null
-                ? right.GetSlots()
-                : new TroopHudAdapter.SlotItem[0];
-            return new ArmyExchangeGridWidget(
-                id,
-                leftArmyLabel,
-                rightArmyLabel,
-                leftSlots,
-                rightSlots,
-                DropArmySlot,
-                onCompletedDrop);
-        }
-
-        private static string BuildArmyLabel(string commanderName)
-        {
-            return string.IsNullOrWhiteSpace(commanderName)
-                ? ModText.Get(ModStrings.Screens.Army)
-                : ModText.Get(ModStrings.Screens.NamedArmy, commanderName);
-        }
-
-        private static TroopHudAdapter.DropResult DropArmySlot(TroopHudAdapter.SlotItem source, TroopHudAdapter.SlotItem target)
-        {
-            return source != null ? source.CompleteDropTo(target) : TroopHudAdapter.DropResult.None;
-        }
-
-        private static Widget BuildPortrait(TradingMenuAdapter adapter, bool left)
-        {
-            string side = left ? "left" : "right";
-            return Portrait.StaticNative(
-                "trade-" + side + "-portrait",
-                () => adapter.GetPortraitLabel(left),
-                () => adapter.GetPortraitTooltipTarget(left),
-                adapter.Localization);
-        }
-
-        private static IReadOnlyList<TradingMenuAdapter.LabeledItem> GetItemsSafely(
+        private static IReadOnlyList<CommanderBands.Line> Lines(
             string section,
             Func<IReadOnlyList<TradingMenuAdapter.LabeledItem>> getter)
         {
-            try
-            {
-                IReadOnlyList<TradingMenuAdapter.LabeledItem> items = getter != null ? getter() : null;
-                return items ?? new TradingMenuAdapter.LabeledItem[0];
-            }
-            catch (Exception ex)
-            {
-                SocAccessMod.Instance?.LogWarning("TradingScreen section " + section + " failed to build: " + ex);
-                return new TradingMenuAdapter.LabeledItem[]
-                {
-                    new TradingMenuAdapter.LabeledItem(section.ToLowerInvariant() + "-error", ModText.Get(ModStrings.Screens.Unavailable))
-                };
-            }
-        }
-
-        private static MenuWidget BuildModifierCategoryMenu(TradingMenuAdapter adapter, bool left)
-        {
-            string side = left ? "left" : "right";
-            MenuWidget menu = new MenuWidget(
-                "trade-" + side + "-modifier-tabs",
-                ModText.Get(ModStrings.Screens.WielderModifierCategories, left ? adapter.LeftCommanderName : adapter.RightCommanderName));
-            string activeId = null;
-            foreach (TradingMenuAdapter.ModifierCategory category in adapter.GetModifierCategories(left))
-            {
-                TradingMenuAdapter.ModifierCategory captured = category;
-                if (captured.Index == adapter.GetActiveModifierCategoryIndex(left))
-                {
-                    activeId = captured.Id;
-                }
-
-                menu.AddItem(new MenuItemWidget(
-                    captured.Id,
-                    () => captured.Label,
-                    null,
-                    () => FocusModifierCategory(adapter, left, captured.Index),
-                    () => FocusModifierCategory(adapter, left, captured.Index),
-                    () => true,
-                    captured.Tooltip));
-            }
-
-            menu.SetFocusedItemById(activeId);
-            return menu;
-        }
-
-        private static bool FocusModifierCategory(TradingMenuAdapter adapter, bool left, int categoryIndex)
-        {
-            int previousCategoryIndex = adapter.GetActiveModifierCategoryIndex(left);
-            bool result = adapter.FocusModifierCategory(left, categoryIndex);
-            if (result && previousCategoryIndex != adapter.GetActiveModifierCategoryIndex(left))
-            {
-                SocAccessMod.Instance?.ScreenDetector?.OnTradingMenuChanged();
-            }
-
-            return result;
-        }
-
-        private static MenuWidget BuildMenu(
-            string id,
-            string label,
-            IReadOnlyList<TradingMenuAdapter.LabeledItem> items,
-            Action emptyItemFocus = null)
-        {
-            MenuWidget menu = new MenuWidget(id, label);
-            if (items == null || items.Count == 0)
-            {
-                menu.AddItem(new MenuItemWidget(
-                    id + "-none",
-                    () => ModText.Get(ModStrings.Screens.None),
-                    null,
-                    () => false,
-                    emptyItemFocus,
-                    () => true));
-                return menu;
-            }
-
+            IReadOnlyList<TradingMenuAdapter.LabeledItem> items = Items(section, getter);
+            List<CommanderBands.Line> lines = new List<CommanderBands.Line>();
             for (int i = 0; i < items.Count; i++)
             {
-                TradingMenuAdapter.LabeledItem item = items[i];
-                menu.AddItem(new MenuItemWidget(
-                    item.Id,
-                    () => item.Label,
-                    () => item.Status,
-                    item.Activate ?? (() => false),
-                    item.OnFocus ?? emptyItemFocus,
-                    () => true,
-                    item.Tooltip));
+                TradingMenuAdapter.LabeledItem it = items[i];
+                lines.Add(new CommanderBands.Line(it.Label, it.Value, it.Tooltip));
             }
 
-            return menu;
+            return lines;
+        }
+
+        /// <summary>One section's items, or none where reading them threw: a part of the menu the game
+        /// has stopped answering for costs its own rows and never the rest of the page.</summary>
+        private static IReadOnlyList<T> Items<T>(string section, Func<IReadOnlyList<T>> getter)
+        {
+            try
+            {
+                IReadOnlyList<T> items = getter != null ? getter() : null;
+                return items ?? new T[0];
+            }
+            catch (Exception exception)
+            {
+                SocAccessMod.Instance?.LogWarning("TradingScreen section " + section + " failed to build: " + exception);
+                return new T[0];
+            }
+        }
+
+        private object Marker(string key)
+        {
+            object marker;
+            if (!_markers.TryGetValue(key, out marker))
+            {
+                marker = new object();
+                _markers.Add(key, marker);
+            }
+
+            return marker;
         }
 
         private static TradingMenu TryResolveTradingMenu(TradingMenuInstaller installer)

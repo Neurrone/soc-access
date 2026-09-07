@@ -554,6 +554,7 @@ namespace SongsOfConquestAccess.Localization
             public static readonly ModString ArtifactEquipHint = new ModString("Screens.ArtifactEquipHint", "{0} equips.");
             public static readonly ModString ArtifactSelectForSaleHint = new ModString("Screens.ArtifactSelectForSaleHint", "{0} selects for sale.");
             public static readonly ModString ArtifactSellHint = new ModString("Screens.ArtifactSellHint", "{0} sells.");
+            public static readonly ModString ArtifactTradeHint = new ModString("Screens.ArtifactTradeHint", "{0} moves to the other backpack.");
             public static readonly ModString ArtifactUnequipHint = new ModString("Screens.ArtifactUnequipHint", "{0} unequips.");
             public static readonly ModString ArtifactUseHint = new ModString("Screens.ArtifactUseHint", "{0} uses.");
             public static readonly ModString AiControl = new ModString("Screens.AiControl", "AI control");

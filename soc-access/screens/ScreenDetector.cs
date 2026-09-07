@@ -2831,23 +2831,6 @@ namespace SongsOfConquestAccess.Screens
             }
         }
 
-        public void OnTradingMenuChanged()
-        {
-            TradingScreen screen = _screenManager.CurrentScreen as TradingScreen;
-            if (screen == null)
-            {
-                return;
-            }
-
-            if (!screen.IsPresent())
-            {
-                _screenManager.Pop<TradingScreen>("trading menu no longer present");
-                return;
-            }
-
-            screen.Refresh();
-        }
-
         /// <summary>The runtime factories that would answer present right now, by screen type
         /// name, in factory order - what a resync would push. For the dev server's probes.</summary>
         public List<string> PresentRuntimeScreens()
