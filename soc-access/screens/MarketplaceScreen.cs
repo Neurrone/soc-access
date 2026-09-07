@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Globalization;
 using SongsOfConquest.Client.Adventure;
 using SongsOfConquest.Client.Gamestate.Facade;
+using SongsOfConquest.Common.Economy;
 using SongsOfConquestAccess.Adapters;
 using SongsOfConquestAccess.Localization;
 using SongsOfConquestAccess.UI;
@@ -157,8 +158,8 @@ namespace SongsOfConquestAccess.Screens
         private void BuildTrades(GraphBuilder builder)
         {
             IReadOnlyList<MarketplaceMenuAdapter.TradeColumn> columns = _adapter.GetTradeColumns();
-            BuildHeadingBand(builder, columns);
-
+            // No heading band: the sheet names the column on every crossing ("Sell -1, 50 Gold"),
+            // so a row of the captions would say them a second time (owner ruling 2026-09-07).
             GraphSheet sheet = new GraphSheet(builder, SheetKey);
             sheet.Region(_adapter.Title, SheetCaptions(columns));
             IReadOnlyList<MarketplaceMenuAdapter.ResourceItem> resources = _adapter.GetResources();
@@ -201,49 +202,6 @@ namespace SongsOfConquestAccess.Screens
             }
         }
 
-        /// <summary>The captions the menu draws over the grid, as a row of the table's own stop
-        /// immediately above the first resource: Up out of a row reaches the heading of the column the
-        /// cursor was in, and Down comes back. The row carries no positions - "1 of 4" there would
-        /// count the table's columns, which is not a place in a list.</summary>
-        private void BuildHeadingBand(GraphBuilder builder, IReadOnlyList<MarketplaceMenuAdapter.TradeColumn> columns)
-        {
-            List<int> captioned = new List<int>();
-            for (int i = 0; i < columns.Count; i++)
-            {
-                if (columns[i].CaptionComponent != null && !string.IsNullOrWhiteSpace(columns[i].Caption))
-                {
-                    captioned.Add(i);
-                }
-            }
-
-            if (captioned.Count == 0)
-            {
-                // The menu draws no captions the screen could find, so there is no band - and an empty
-                // row is a build failure that would blank the whole page.
-                return;
-            }
-
-            builder.StartRow(null, false);
-            for (int c = 0; c < captioned.Count; c++)
-            {
-                int i = captioned[c];
-                MarketplaceMenuAdapter.TradeColumn column = columns[i];
-                Component drawn = column.CaptionComponent;
-                string caption = ColumnCaption(column);
-                NodeVtable vtable = GraphNodes.Text(() => caption);
-                vtable.Column = i + 1;
-                // A heading is not a cell of the row below it, so the sheet's one-result-per-row filter
-                // would otherwise drop every heading past the first from type-ahead.
-                vtable.SearchesAsItself = true;
-                builder.AddItem(new DrawnNode(
-                    ControlId.For(drawn, "marketplace:heading/" + i),
-                    vtable,
-                    drawn));
-            }
-
-            builder.EndRow();
-        }
-
         /// <summary>The row's own cell: the resource's name and what the team holds of it, which is
         /// what names the row on a vertical crossing.</summary>
         private static NodeVtable Primary(MarketplaceMenuAdapter.ResourceItem resource)
@@ -256,14 +214,19 @@ namespace SongsOfConquestAccess.Screens
         }
 
         /// <summary>One crossing of the grid, as the button the menu draws it as: the gold price it
-        /// carries, the game's own click, and "unavailable" while the game refuses the trade.</summary>
-        private static NodeVtable TradeCell(
+        /// carries (the game draws the figure beside a gold icon, so the label names the unit), the
+        /// game's own click, and "unavailable" while the game refuses the trade.</summary>
+        private NodeVtable TradeCell(
             MarketplaceMenuAdapter.TradeButtonItem button,
             MarketplaceMenuAdapter.ResourceItem resource)
         {
             MarketplaceMenuAdapter.TradeButtonItem it = button;
             string rowName = resource.ResourceName;
-            NodeVtable vtable = GraphNodes.Button(() => it.Price, () => it.Activate(), () => it.IsEnabled);
+            string gold = _adapter.GetResourceName(ResourceType.Gold);
+            NodeVtable vtable = GraphNodes.Button(
+                () => ModText.Get(ModStrings.Common.ResourceAmount, it.Price, gold),
+                () => it.Activate(),
+                () => it.IsEnabled);
             vtable.OnFocusVisual = it.Focus;
             vtable.SearchText = () => rowName;
             return vtable;
