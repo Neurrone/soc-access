@@ -137,8 +137,16 @@ namespace SongsOfConquestAccess.Adapters
                     return ModText.Get(_localization, ModStrings.Screens.NoBuildSiteSelected);
                 }
 
+                BuildSiteSize? siteSize = site.GetSize();
+                if (!siteSize.HasValue)
+                {
+                    // A site the game has not resolved a size for: it has no summary, rather than
+                    // throwing one and costing the page every line below it.
+                    return string.Empty;
+                }
+
                 Vector2Int position = site.Position;
-                string size = GetBuildSiteLabel(site.GetSize().Value);
+                string size = GetBuildSiteLabel(siteSize.Value);
                 int index = SiblingIndex + 1;
                 int count = SiblingCount;
                 List<string> parts = new List<string>();

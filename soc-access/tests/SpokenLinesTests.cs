@@ -22,6 +22,14 @@ namespace SongsOfConquestAccess.Tests
         }
 
         [TestMethod]
+        public void BreaksTheLineWhereTheGameDrewOne()
+        {
+            IList<string> lines = SpokenLines.Of(
+                new[] { "<color=#C1AC82><hl>Essence</hl><br>Order controls essence. </color>" });
+            CollectionAssert.AreEqual(new[] { "Essence", "Order controls essence." }, (List<string>)lines);
+        }
+
+        [TestMethod]
         public void DropsEmptyAndNullEntries()
         {
             IList<string> lines = SpokenLines.Of(new[] { null, "", "  ", "<hl></hl>", "Skills" });

@@ -6,6 +6,7 @@ using SongsOfConquest.Client.Adventure.UI;
 using SongsOfConquest.Client.UI;
 using SongsOfConquestAccess.Adapters;
 using SongsOfConquestAccess.Events;
+using SongsOfConquestAccess.Localization;
 using SongsOfConquestAccess.Speech;
 using UnityEngine;
 
@@ -34,12 +35,25 @@ namespace SongsOfConquestAccess
         private static void SimpleNotificationShowPostfix(string localizedString)
         {
             string normalized = SpeechTextSanitizer.Normalize(localizedString);
-            if (string.IsNullOrWhiteSpace(normalized))
+            if (string.IsNullOrWhiteSpace(normalized) || IsNewArtifactBadge(normalized))
             {
                 return;
             }
 
             AccessibilityEventBus.Publish(new AdventureSimpleNotificationEvent(normalized));
+        }
+
+        /// <summary>Whether this notification is the badge the inventory paints on an artifact that
+        /// has just arrived. <c>InventoryHUD.TriggerNewNotifications</c> shows the one word
+        /// "Common/New" over the icon of every artifact added since the panel was drawn, which is how
+        /// a purchase in the market announced itself as a bare "New". A badge is not a message: the
+        /// artifact is read where the player finds it, and the badge says nothing on its own.
+        /// </summary>
+        private static bool IsNewArtifactBadge(string normalized)
+        {
+            string badge = GameText.Get("Common/New", string.Empty);
+            return !string.IsNullOrWhiteSpace(badge)
+                && string.Equals(normalized.Trim(), badge.Trim(), StringComparison.CurrentCultureIgnoreCase);
         }
 
         [HarmonyPatch(typeof(LevelUpNotification), "ShowNotification")]
