@@ -290,122 +290,50 @@ recipient selector) and codex, the mod options dialog opened from the pause menu
 
 ### Phase C â€” in-game menus, popups, forms and tables
 
-`PauseMenuScreen`, `WorldConfirmMenuScreen`, `TutorialSimpleScreen`,
-`TutorialSlideshowScreen`, `StoryTextScreen`, `AdventurePlayerMenuScreen`,
-`ClaimMenuScreen`, `GiftTownPopupScreen`, `SendResourcePopupScreen`,
-`MapEntityMiniMenuScreen`, `OwnedEntitiesScreen`, `TroopOverviewScreen`, `LevelUpScreen`,
-`PurchaseWielderScreen`, `PostAdventureResultScreen`, `PostBattleResultScreen`,
-`ResearchScreen`, `MarketplaceScreen`, `BuildMenuScreen`, `PostAdventureStatsScreen`;
-plus the phase B verifications listed above (three in-game message sources, not four:
-dialogue feeds `StoryTextScreen`). `SpellbookScreen` (quickbar reorder) and
-`WorldChoiceMenuScreen` (draggable troop HUD) moved to phase D, where drag is introduced,
-rather than porting as half-working screens (owner, 2026-09-07). Families to propose: in-game
-menus (pause menu representative), in-game dialogs (world confirm), text pages (story text,
-tutorials), in-game forms and lists (level up, research, build menu), in-game tables
-(post-adventure stats). The pause menu's "Mod options" entry is already drawn and must stay a
-row of it.
+Ported 2026-09-07, each verified by dump diff and injected keys (`docs/phase-c-handover.md`
+is the record; details per screen are in the commit messages and doc comments):
+`PauseMenuScreen`, `WorldConfirmMenuScreen`, `ClaimMenuScreen`, `TutorialSimpleScreen`,
+`TutorialSlideshowScreen` (ES2's pager, page turn by reflection), `StoryTextScreen` (three
+sources), `LevelUpScreen`, `PurchaseWielderScreen`, `ResearchScreen`, `BuildMenuScreen`,
+`OwnedEntitiesScreen`, `TroopOverviewScreen`, `MapEntityMiniMenuScreen`; the in-game codex,
+the save variant and the map message source verified on their shared classes. Landed with
+them: `ui/PointerHover.cs` (the pointer hover simulation, released on Stop),
+`GraphNavigator.FocusedIndex`, and `UITextMeshTextUtility.GetStringBuilderText` made public
+(what the game wrote, which the prefab's placeholder text can hide).
 
-Code survey done 2026-09-07 (four read-only passes over every screen, adapter and native
-class). No phase C screen needs a new node kind; every one needs adapter surface, because no
-phase C adapter hands out the component behind its rows (no drawn node, no drawn-order sort,
-no focus visual until it does). Facts only the game answers, taken before each family's
-proposal: drawn order everywhere (owned entities and troop overview insert rows with
-`SetAsFirstSibling`, so hierarchy order is reversed; the player menu interleaves its Allies and
-Enemies headers); the serialized `_canClose` flag of `AdventureMenuBackground`, which alone
-decides whether Escape is the game's and a close cross is drawn on the build menu, level up
-and purchase wielder; the build menu's own bindings of Enter (purchase) and Up/Down (building
-cycling) at popup level; the cutscene sources' Escape-advances binding. Escape measured from
-the code: the game's on the pause menu, claim menu (it refuses on a freshly captured
-settlement), mini menu, player menu, owned entities, troop overview and research (the last
-four through `KingdomInformationHUD.ReregisterHotKeys`), the tutorials (unconditionally, so a
-slideshow closes from any page), the three story sources, post-battle (Escape confirms),
-post-adventure stats, spellbook; claimed by the mod on gift town and send resource (the game
-binds only the gamepad Cancel) and the marketplace (nothing bound, nothing drawn).
+Remaining, every one needing a game state the `test` save cannot give (every other save on this
+machine is the "The Enemy Revealed" campaign, refused as content not available):
+`AdventurePlayerMenuScreen`, `GiftTownPopupScreen`, `SendResourcePopupScreen` (a co-op game
+with an AI ally), `MarketplaceScreen` (an owned marketplace; `MarketplaceMenu.Show` refuses
+without one), `PostBattleResultScreen` (a battle), `PostAdventureResultScreen` and
+`PostAdventureStatsScreen` (a finished game), the random event and custom message sources of
+`MessageDialogScreen` and the dialogue source of `StoryTextScreen` (game data), the in-game
+chat selector (multiplayer), the mod options dialog opened from the pause menu. Their
+before-captures are still owed (Â§4 step 1) before they are touched. `SpellbookScreen` and
+`WorldChoiceMenuScreen` moved to phase D, where drag is introduced (owner, 2026-09-07).
 
-Owner rulings, 2026-09-07:
+Rulings that still apply to the remaining screens (owner, 2026-09-07): arrival selects only
+where it merely refills a details pane, Enter where the switch respawns content (the stats
+page's graph type); every closable screen ends with a close node, the drawn one where the game
+draws it, a mod-authored node running the game's hide path where it draws none (marketplace,
+player menu), none on the post-adventure result (the game offers no close); the player menu is
+a sheet whose cells are each row's own buttons, the marketplace a sheet of resource rows with
+the four fixed-amount trade buttons as cells (nothing to adjust); post-adventure stats is a
+combo box for the graph type opening the drop list, checkboxes per team, and the mod's
+rounds-by-teams table kept as a sheet (it has no tabs and shares nothing with
+`PlayerStatsScreen`); send resource amounts are fixed by config and drawn on the buttons.
+Escape from the code: the game's on the player menu, owned through
+`KingdomInformationHUD.ReregisterHotKeys`; on post-battle (Escape confirms) and the stats page;
+absent on the post-adventure result; claimed by the mod on gift town, send resource (only the
+gamepad Cancel is bound) and the marketplace (nothing bound, nothing drawn). To measure live:
+the player menu interleaves its Allies and Enemies headers by sibling index; which per-row
+buttons draw per variant (spectate battle is gamepad-only); the post-battle page's two-column
+layout and its redo countdown. No remaining adapter hands out the component behind its rows.
 
-- Arrival selects only where it merely refills a details pane (build menu buildings, purchase
-  wielder rows); Enter selects where the switch respawns content or changes the page
-  (research building tabs and faction strip, post-adventure stats graph type, build menu size
-  categories).
-- Every closable screen ends with a close node: the drawn close button where the game draws
-  one, a mod-authored node running the game's own hide path where it draws none (marketplace,
-  player menu, mini menu, owned entities, troop overview, claim menu, all of which close only
-  from a blocker click). The post-adventure result page gets none: the game offers no close,
-  only its action buttons.
-- Tutorials use ES2's pager (`TutorialScreen`): one stop of page rows, arriving on a row turns
-  the game to that page, Up/Down read the tutorial, the game's Previous/Next and page counter
-  are not declared. The page turn sets the private page index and calls the private redraw
-  by reflection (owner's choice over replaying arrow clicks; the game has no public
-  page-by-index call). Close stays unavailable until the last page was shown, as the game has
-  it. Needs `GraphNavigator.FocusedIndex` re-synced from ES2.
-- Owned entities (six unread income columns per category), troop overview, the player menu
-  (per-row buttons as control cells) and the marketplace (a grid of fixed-amount trade
-  buttons; there is no amount to adjust) are `GraphSheet`s.
-- The mini menu is three stops: heading, details, actions in drawn order; the stored wielder is
-  the one native button that ejects, not a text plus a mod-labelled Eject.
-- Story text and the random event body read as a heading node plus a body node with a section
-  per paragraph; Enter advances through the native path, unclaimed keys reach the game's
-  press-anything handler.
-- ES2's pointer hover simulation is wired in this phase (level-up cards and spell rows reveal
-  on pointer enter and hide on pointer exit; the graph has no leave hook).
-- Post-adventure stats: the graph type is a combo box opening the drop list, teams are
-  checkboxes, the mod's rounds-by-teams table stays, as a sheet. It has no tabs and shares
-  nothing with `PlayerStatsScreen`.
-- Level up has no confirm step (choosing a skill closes the menu); send resource amounts are
-  fixed by config and drawn on the buttons.
-
-Before-captures taken 2026-09-07 on the unported build from the `test` save (`walks/before/`,
-gitignored; each checked against `/gui/unity` rects, the owned entities page against a crop):
-pause menu; in-game codex and save menu (graph screens, after-captures); tutorial simple
-(`ArtifactPickup`), slideshow one-page (`ResearchSimple`) and three-page (`AdventureMovementBasics`,
-pages 1, 2 and 3); story text (panel and letterbox, with mod-authored text through `Show`);
-owned entities; troop overview; research (both buildings missing); mini menu (settlement and
-resource generator); purchase wielder (both wielders owned); build menu (empty small site,
-opened through `BuildMenu.Show` because build sites have no map view); claim menu (synthetic,
-Occupy, Raze, Loot on the own settlement); level up (synthetic three skills through
-`ICommanderLevelUpMenu.Open`); world confirm (synthetic, two costs); map message popup. Tutorials,
-menus and popups were raised from `/eval` through the DI container (`AdventureMapAdapter._container`
-via the map screen) or `Resources.FindObjectsOfTypeAll`; `TutorialType` and the other
-`AutoGeneratedDef` enums are not nameable in the REPL and go through `Enum.ToObject` on the
-parameter type. Not captured, needing a fresh game: post-battle, post-adventure result and
-stats, player menu, gift town, send resource, marketplace (the save owns no marketplace;
-`MarketplaceMenu.Show` refuses), random event and dialogue (need game data), custom message
-(`ICustomMessageMenu.Show` from the REPL drew the prefab's placeholder text).
-
-Measured 2026-09-07 (drawn order and Escape):
-
-- Pause menu: buttons Quick Save, Quick Load, Save, Load, Restart, Options, Mod options,
-  Tutorials & Codex, Quit to Main Menu, Quit to Desktop in a column, then Continue Game alone at
-  the bottom; the widget lists Continue first.
-- `_canClose` is TRUE on the build menu, level up and purchase wielder (a close cross is drawn
-  at the top right; Escape is the game's) and FALSE on the world confirm (no cross; the game
-  binds only the gamepad Cancel, so the mod claims Escape and presses the drawn Decline).
-- World confirm draws Cancel (x 511) LEFT of Confirm (x 641); the widget lists Confirm first.
-- Tutorials: the simple popup draws OK above the toggle; the slideshow draws the toggle left
-  and "Got it!" right on one line with the page arrows and the counter between; the widget
-  says Close where the game says "Got it!"; both draw a "Tutorial" caption above the title
-  the widget never reads.
-- Owned entities and troop overview: the hierarchy order the adapters enumerate IS the drawn
-  order here (Crowpoint above Hazelpoint; Quarry above Castle); the income band per category
-  (+300 gold, +1 stone, ...) is drawn and unread.
-- Research: header, the tutorial button top left, two building tabs in a row, then one column
-  per category with its stack buttons below the caption.
-- Build menu: header, size tabs Small/Medium/Large in a row, the size and build-time captions,
-  the building column left, the details (name, description, income, cost, reason) right, the
-  auto-select toggle top right; the reason text drew the game's own placeholder ("asdf ...").
-- Mini menu: custom name ABOVE the type name, then description rows, then the action strip.
-- Purchase wielder: entries left, details right; the skill levels are drawn as bare numbers
-  the widget never reads.
-- Level up: header, level, name and title, a stats row of bare numbers, "Choose a Skill", three
-  cards with headers New Skill / New Skill / Upgrade Command.
-- Story text and map message: the game uppercases the heading; the adapters collapse paragraph
-  breaks (phase G's `Normalize` sweep).
-- Claim menu: title, description, choices stacked in Occupy, Raze, Loot order.
-
-`GraphNavigator.FocusedIndex` was re-synced from ES2 for the pager (2026-09-07). The pointer
-hover simulation is built with the level-up port, the first screen that needs a leave hook.
-
+Phase C localization so far: `Screens.WielderDead`, `WielderOwned`, `TownStatus`,
+`TownStatusRounds` added and translated with their screens. Left unused for the phase G
+sweep: `Screens.Missing`, `WorldConfirmationMenu`, `Previous`, `Next`, `EjectWielder`,
+`Description`.
 ### Phase D — composite grids (adds `Carry` and two-sided sheets)
 
 `CommanderSheetScreen` (inventory), `ArtifactMarketScreen` (inventory), `TradingScreen`
@@ -477,26 +405,13 @@ decision, until the owner approves it):
 
 | Screen | Widgets today | Proposed model | Phase |
 |---|---|---|---|
-| `PauseMenuScreen` | Menu | one stop, menu rows (with the drawn Mod options entry) | C |
 | `WorldChoiceMenuScreen` | Menu, Buttons, Text, draggable TroopHudMenu | heading, body, choice rows, troop rows with carry, buttons | D |
-| `WorldConfirmMenuScreen` | Buttons, Text | dialog shape | C |
-| `TutorialSimpleScreen` | Buttons, Checkbox, Text | heading, body, toggle, OK | C |
-| `TutorialSlideshowScreen` | Buttons, Checkbox, Text | ES2 pager: one row per page, toggle, Close | C |
-| `StoryTextScreen` | Button (title+body) | heading, body with a section per paragraph, Enter advances; cutscene layer in F | C |
 | `AdventurePlayerMenuScreen` | Menu, Buttons | sheet of players with the row's buttons as control cells | C |
-| `ClaimMenuScreen` | Menu, Text | heading, body, choice buttons | C |
 | `GiftTownPopupScreen` | Menu, Buttons | menu rows, buttons row | C |
 | `SendResourcePopupScreen` | Menu, Buttons | two bands of fixed-amount buttons, close | C |
-| `MapEntityMiniMenuScreen` | Menu, Buttons, Text | three stops: heading, details, actions | C |
-| `OwnedEntitiesScreen` | Menu, Text | sheet per category with the six income columns | C |
-| `TroopOverviewScreen` | Menu, Text | sheet per town (unit, available, per turn) | C |
-| `LevelUpScreen` | Menu, Buttons, Text | heading, stats, skill cards (no confirm step), close | C |
-| `PurchaseWielderScreen` | Menu, Buttons, Text | candidate rows with sections, buttons row | C |
 | `PostAdventureResultScreen` | Menu, Buttons, Text | text sections, buttons row | C |
 | `PostBattleResultScreen` | Menu, Buttons, Text | result sections, menu rows | C |
-| `ResearchScreen` | Menu, Buttons | building tabs (Enter switches), faction strip, research rows per category | C |
 | `MarketplaceScreen` | Menu, Buttons, Text | sheet: resource rows, the four trade buttons as cells; mod close node | C |
-| `BuildMenuScreen` | Menu, Checkbox, Buttons, Text | category regions, building rows with sections | C |
 | `SpellbookScreen` | Menu, DraggableMenu, Checkbox, Buttons | spell rows, quickbar with carry for reorder | D |
 | `PostAdventureStatsScreen` | Menu, Table, Buttons, Text | graph type combo box, team checkboxes, rounds sheet | C |
 | `TooltipActionsMenuScreen` | Menu | stays a widget screen until no unported screen hands out `TooltipAction`s; deleted in G | G |
