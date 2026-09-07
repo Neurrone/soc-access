@@ -120,14 +120,24 @@ namespace SongsOfConquestAccess.Screens
                 builder.PushContext(category.Name);
                 builder.SetRegion("owned-entities:category/" + c);
 
-                ControlId id = ControlId.For(category.Entry, "owned-entities:category/" + c);
-                builder.AddItem(new DrawnNode(id, CategoryLine(category), category.Entry));
-                if (first == null)
+                // The catch-all ("Claimed") has no settlement to move the camera to, so its name is
+                // the region's name only, said once on entry, and not a line of its own (owner
+                // ruling 2026-09-07); its first line is the income line or the first building.
+                if (category.HasCameraTarget)
                 {
-                    first = id;
+                    ControlId id = ControlId.For(category.Entry, "owned-entities:category/" + c);
+                    builder.AddItem(new DrawnNode(id, CategoryLine(category), category.Entry));
+                    if (first == null)
+                    {
+                        first = id;
+                    }
                 }
 
-                BuildIncome(builder, category, c);
+                ControlId income = BuildIncome(builder, category, c);
+                if (first == null)
+                {
+                    first = income;
+                }
 
                 for (int r = 0; r < category.Rows.Count; r++)
                 {
@@ -137,10 +147,12 @@ namespace SongsOfConquestAccess.Screens
                         continue;
                     }
 
-                    builder.AddItem(new DrawnNode(
-                        ControlId.For(row.Entry, "owned-entities:building/" + c + "/" + r),
-                        BuildingLine(row),
-                        row.Entry));
+                    ControlId rowId = ControlId.For(row.Entry, "owned-entities:building/" + c + "/" + r);
+                    builder.AddItem(new DrawnNode(rowId, BuildingLine(row), row.Entry));
+                    if (first == null)
+                    {
+                        first = rowId;
+                    }
                 }
 
                 builder.PopContext();
@@ -153,14 +165,11 @@ namespace SongsOfConquestAccess.Screens
         }
 
         /// <summary>The category's own line: the name the menu draws, as the button whose click moves
-        /// the camera onto the settlement, with the tier drawn beside it. The catch-all has no
-        /// settlement to move to, so there it is a line rather than a button.</summary>
+        /// the camera onto the settlement, with the tier drawn beside it.</summary>
         private static NodeVtable CategoryLine(KingdomEntityOverviewAdapter.CategoryItem category)
         {
             KingdomEntityOverviewAdapter.CategoryItem it = category;
-            NodeVtable vtable = it.HasCameraTarget
-                ? GraphNodes.Button(() => it.Name, () => it.MoveCamera())
-                : GraphNodes.Text(() => it.Name);
+            NodeVtable vtable = GraphNodes.Button(() => it.Name, () => it.MoveCamera());
             AddTier(vtable, it.Tier);
             return vtable;
         }
@@ -168,7 +177,8 @@ namespace SongsOfConquestAccess.Screens
         /// <summary>The band of income figures under the category's name, as one read-only line: the
         /// mod's own label over one part per figure the game drew, the resources it yields something
         /// of before the ones it yields nothing of.</summary>
-        private static void BuildIncome(
+        /// <returns>The income line's id, or null when the category draws no figure.</returns>
+        private static ControlId BuildIncome(
             GraphBuilder builder,
             KingdomEntityOverviewAdapter.CategoryItem category,
             int index)
@@ -190,7 +200,7 @@ namespace SongsOfConquestAccess.Screens
             earning.AddRange(idle);
             if (earning.Count == 0)
             {
-                return;
+                return null;
             }
 
             NodeVtable vtable = GraphNodes.Text(() => ModText.Get(ModStrings.Screens.Income));
@@ -200,12 +210,12 @@ namespace SongsOfConquestAccess.Screens
                 vtable.Announcements.Add(GraphNodes.ValuePart(() => part, watch: false));
             }
 
-            builder.AddItem(new SyntheticNode(
-                // A subject of its own: the reconciler seats the cursor by subject before it looks
-                // at the structural key, so an income line sharing the category's component would
-                // hand the cursor back to the category line on arrival.
-                ControlId.Structural("owned-entities:income/" + index),
-                vtable));
+            // A subject of its own: the reconciler seats the cursor by subject before it looks at
+            // the structural key, so an income line sharing the category's component would hand the
+            // cursor back to the category line on arrival.
+            ControlId id = ControlId.Structural("owned-entities:income/" + index);
+            builder.AddItem(new SyntheticNode(id, vtable));
+            return id;
         }
 
         /// <summary>A building's own line: the count and the name the way the menu lays them out (the
