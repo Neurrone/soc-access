@@ -59,8 +59,7 @@ namespace SongsOfConquestAccess.Screens
         {
             get
             {
-                string title = Host != null ? Host.Title : null;
-                return string.IsNullOrWhiteSpace(title) ? null : title;
+                return Host == null ? null : TroopHudRows.NameWithPlace(Host.Title, Host.Wielder);
             }
         }
 

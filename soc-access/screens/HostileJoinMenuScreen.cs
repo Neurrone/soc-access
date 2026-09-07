@@ -91,7 +91,12 @@ namespace SongsOfConquestAccess.Screens
         /// </summary>
         public override string ScreenName
         {
-            get { return _adapter == null ? null : _adapter.Title; }
+            get
+            {
+                return _adapter == null
+                    ? null
+                    : TroopHudRows.NameWithPlace(_adapter.Title, _adapter.Wielder);
+            }
         }
 
         /// <summary>The offer, not the band: the band is who is asking, and the offer is the business.

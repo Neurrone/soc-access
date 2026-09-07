@@ -104,10 +104,17 @@ namespace SongsOfConquestAccess.Screens
             get { return "artifact-market"; }
         }
 
-        /// <summary>The merchant, by the title the menu draws over it ("Raider's Market").</summary>
+        /// <summary>The merchant, by the title the menu draws over it ("Raider's Market") and the
+        /// banner the wielder's band draws over the portrait where the place has a name of its own.
+        /// </summary>
         public override string ScreenName
         {
-            get { return _adapter == null ? null : _adapter.Title; }
+            get
+            {
+                return _adapter == null
+                    ? null
+                    : TroopHudRows.NameWithPlace(_adapter.Title, _adapter.Wielder);
+            }
         }
 
         public override bool IsPresent()

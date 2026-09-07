@@ -183,7 +183,6 @@ namespace SongsOfConquestAccess.Screens
                 StoredWielderKey,
                 panel.Portrait,
                 () => panel.StoredWielderName,
-                null,
                 panel.PortraitTooltip,
                 panel.FocusPortrait,
                 panel.Troops);

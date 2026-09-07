@@ -73,7 +73,6 @@ namespace SongsOfConquestAccess.UI
                 keyPrefix,
                 it.Portrait,
                 () => it.WielderName,
-                () => it.CustomName,
                 it.PortraitTooltip,
                 () => it.FocusPortrait(),
                 it.Troops);
@@ -84,15 +83,12 @@ namespace SongsOfConquestAccess.UI
         /// <c>WielderInteractHeader</c> over it - the defence menu's stored wielder, whose portrait and
         /// army hang off <c>DefencePanelWielder</c> instead.
         /// </summary>
-        /// <param name="customName">The banner naming the place the wielder walked into, where the band
-        /// draws one; null where it draws none.</param>
         public static void WielderStop(
             GraphBuilder builder,
             object stopKey,
             string keyPrefix,
             Component portrait,
             Func<string> wielderName,
-            Func<string> customName,
             Tooltip portraitTooltip,
             Action focusPortrait,
             TroopHudAdapter troops)
@@ -103,7 +99,7 @@ namespace SongsOfConquestAccess.UI
             }
 
             builder.BeginStop(stopKey);
-            AddPortrait(builder, keyPrefix, portrait, wielderName, customName, portraitTooltip, focusPortrait);
+            AddPortrait(builder, keyPrefix, portrait, wielderName, portraitTooltip, focusPortrait);
 
             string caption = GameText.Get("Commanders/Tooltip/Troops", string.Empty);
             bool named = !string.IsNullOrWhiteSpace(caption);
@@ -121,6 +117,31 @@ namespace SongsOfConquestAccess.UI
             }
 
             builder.SetRegion(null);
+        }
+
+        /// <summary>The page's name where its wielder band draws the banner naming the place the
+        /// wielder has walked into: the page's own title and that name, since the portrait row says
+        /// the wielder alone. The banner is dropped where the title is already the same words.
+        /// </summary>
+        public static string NameWithPlace(string title, WielderInteract wielder)
+        {
+            string place = wielder == null || !wielder.IsPresent ? null : wielder.CustomName;
+            if (string.IsNullOrWhiteSpace(place) || SameText(title, place))
+            {
+                return string.IsNullOrWhiteSpace(title) ? null : title;
+            }
+
+            return string.IsNullOrWhiteSpace(title)
+                ? place
+                : ModText.Get(ModStrings.Common.ListSeparator, title, place);
+        }
+
+        private static bool SameText(string left, string right)
+        {
+            return string.Equals(
+                (left ?? string.Empty).Trim(),
+                (right ?? string.Empty).Trim(),
+                StringComparison.CurrentCultureIgnoreCase);
         }
 
         /// <summary>The rows alone, one per drawn slot in the order the bar draws them, declared into
@@ -208,16 +229,16 @@ namespace SongsOfConquestAccess.UI
             return slot.IsUnlocked && slot.IsOccupied ? slot : null;
         }
 
-        /// <summary>The wielder the band is about: their name, then the banner naming the place they
-        /// walked into where the band draws one, with the stats the game draws on their portrait behind
-        /// both in the buffer. Focusing it selects the portrait, which is what makes the game draw
-        /// those stats.</summary>
+        /// <summary>The wielder the band is about: their name ALONE (owner ruling 2026-09-08), with
+        /// the stats the game draws on their portrait behind it in the buffer. The banner over the
+        /// portrait names the place, not the wielder, and belongs to the page's own name
+        /// (<see cref="NameWithPlace"/>). Focusing the row selects the portrait, which is what makes
+        /// the game draw those stats.</summary>
         private static void AddPortrait(
             GraphBuilder builder,
             string keyPrefix,
             Component portrait,
             Func<string> wielderName,
-            Func<string> customName,
             Tooltip portraitTooltip,
             Action focusPortrait)
         {
@@ -227,13 +248,6 @@ namespace SongsOfConquestAccess.UI
             }
 
             NodeVtable vtable = GraphNodes.Text(wielderName, null, portraitTooltip);
-            if (customName != null)
-            {
-                // The banner the band draws over the portrait when the place the wielder walked into
-                // has a name of its own; watched, since the game writes it as the band is set up.
-                vtable.Announcements.Add(GraphNodes.ValuePart(customName));
-            }
-
             if (focusPortrait != null)
             {
                 vtable.OnFocusVisual = () => focusPortrait();

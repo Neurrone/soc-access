@@ -81,7 +81,12 @@ namespace SongsOfConquestAccess.Screens
         /// <summary>The title the menu draws.</summary>
         public override string ScreenName
         {
-            get { return _adapter == null ? null : _adapter.Title; }
+            get
+            {
+                return _adapter == null
+                    ? null
+                    : TroopHudRows.NameWithPlace(_adapter.Title, _adapter.Wielder);
+            }
         }
 
         public override object InitialFocusStop
