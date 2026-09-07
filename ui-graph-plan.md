@@ -310,7 +310,7 @@ lines under named regions, not a table, unless the game draws column headings.
 (army exchange), `HostileJoinMenuScreen` (army exchange), `TroopManagementScreenBase` with
 `DraftTroopsScreen` and `UpgradeTroopsScreen`, `RallyPointScreen`, `MoveTroopPopupScreen`,
 `SpellbookScreen` (quickbar reorder) and `WorldChoiceMenuScreen` (the draggable troop HUD),
-both deferred from C. Wire `ui_carry` (Space) and `Carry` in the navigator first. The owner's simplification
+both deferred from C. Wire `ui_carry` (Space) and `Carry` in the navigator first. Follow-up decided 2026-09-07: `BuildMenuScreen`'s tier tabs move into one row (Left/Right between them, Enter still the switch) instead of stacked items; do it alongside the commander sheet's modifier tabs, which take the same shape. The owner's simplification
 targets are here (fewer tab stops); each gets its own proposal, measured off the drawn layout.
 
 ### Phase E — modes
