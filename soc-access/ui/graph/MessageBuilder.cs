@@ -94,7 +94,13 @@ namespace SongsOfConquestAccess.UI.Graph
 
             if (opensListItem)
             {
-                _sb.Append(ModText.Get(ModStrings.Graph.ListSeparator));
+                // A list item after a finished sentence (a paragraph part, a description ending in a
+                // full stop) is joined with the fragment separator: ", " after "." would be spoken as
+                // a stray comma (this mod's own rule, 2026-09-07; ES2's builder has no paragraph
+                // parts and joins unconditionally).
+                _sb.Append(ModText.Get(EndsSentence(_sb)
+                    ? ModStrings.Graph.FragmentSeparator
+                    : ModStrings.Graph.ListSeparator));
             }
             else if (_sb.Length > 0)
             {
@@ -104,6 +110,25 @@ namespace SongsOfConquestAccess.UI.Graph
 
             _sb.Append(fragment);
             return this;
+        }
+
+        /// <summary>Whether the text built so far ends a sentence: its last non-blank character is a
+        /// full stop, question mark, exclamation mark or ellipsis (the ideographic ones included).
+        /// </summary>
+        private static bool EndsSentence(System.Text.StringBuilder sb)
+        {
+            for (int i = sb.Length - 1; i >= 0; i--)
+            {
+                char c = sb[i];
+                if (char.IsWhiteSpace(c))
+                {
+                    continue;
+                }
+
+                return c == '.' || c == '!' || c == '?' || c == '…' || c == '。' || c == '！' || c == '？';
+            }
+
+            return false;
         }
 
         /// <summary>
