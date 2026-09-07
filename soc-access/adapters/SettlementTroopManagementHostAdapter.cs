@@ -17,8 +17,10 @@ namespace SongsOfConquestAccess.Adapters
 
         public string IdPrefix { get { return "settlement"; } }
         public string Title { get { return _adapter != null ? _adapter.Title : string.Empty; } }
-        public string DraftScreenTitle { get { return _adapter != null ? _adapter.DraftLabel : string.Empty; } }
-        public string UpgradeScreenTitle { get { return _adapter != null ? _adapter.UpgradeLabel : string.Empty; } }
+        // The sub-page is titled by the button that opened it AND the line the landing page draws
+        // under that button, which is how the town names what the page is for.
+        public string DraftScreenTitle { get { return _adapter != null ? MenuButtonTextUtility.JoinParts(_adapter.DraftLabel, _adapter.DraftDescription) : string.Empty; } }
+        public string UpgradeScreenTitle { get { return _adapter != null ? MenuButtonTextUtility.JoinParts(_adapter.UpgradeLabel, _adapter.UpgradeDescription) : string.Empty; } }
         public IClientAdventureFacade Facade { get { return _adapter != null ? _adapter.Facade : null; } }
         public PurchaseTroopsSubMenuAdapter PurchaseTroops { get { return _adapter != null ? _adapter.PurchaseTroops : null; } }
         public UpgradeTroopsSubMenuAdapter UpgradeTroops { get { return _adapter != null ? _adapter.UpgradeTroops : null; } }

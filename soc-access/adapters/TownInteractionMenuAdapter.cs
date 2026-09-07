@@ -46,12 +46,19 @@ namespace SongsOfConquestAccess.Adapters
         private static readonly FieldInfo HeaderCustomNameTextField = AccessTools.Field(typeof(WielderInteractHeader), "_customNameText");
 
         private static readonly FieldInfo SettlementTroopHudField = AccessTools.Field(typeof(TownInteractDefencePanel), "_mapEntityTroopHUD");
+        private static readonly FieldInfo MoveToDefenceButtonField = AccessTools.Field(typeof(TownInteractDefencePanel), "_moveToDefenceButton");
+        private static readonly FieldInfo MoveToWielderButtonField = AccessTools.Field(typeof(TownInteractDefencePanel), "_moveToWielderButton");
+        private static readonly FieldInfo UpgradesAvailableIndicatorField = AccessTools.Field(typeof(TownInteractionMenu), "_upgradesAvailableIndicator");
+        private static readonly FieldInfo UpgradesAvailableNumberField = AccessTools.Field(typeof(TownInteractionMenu), "_upgradesAvailableNumber");
         private static readonly FieldInfo GarrisonTroopsField = AccessTools.Field(typeof(TownInteractDefencePanel), "_garrisonTroops");
         private static readonly FieldInfo BallistaTroopsField = AccessTools.Field(typeof(TownInteractDefencePanel), "_ballistaTroops");
 
         private readonly TownInteractionMenu _menu;
         private readonly IClientAdventureFacade _facade;
         private readonly ILocalizationHandler _localization;
+        private WielderInteract _wielder;
+        private DefencePanelWielderAdapter _defendingWielder;
+        private TroopHudAdapter _settlementTroops;
 
         public TownInteractionMenuAdapter(TownInteractionMenu menu)
         {
@@ -121,6 +128,27 @@ namespace SongsOfConquestAccess.Adapters
             }
         }
 
+        /// <summary>The band the menu hangs across its top: the visiting wielder, their army and the
+        /// close cross.</summary>
+        public WielderInteract Wielder
+        {
+            get
+            {
+                WielderInteractHeader header = GetHeader();
+                if (_wielder == null || !ReferenceEquals(_wielder.Header, header))
+                {
+                    _wielder = new WielderInteract(header, _facade, _localization);
+                }
+
+                return _wielder;
+            }
+        }
+
+        public Component TutorialButton
+        {
+            get { return GetTutorialButton() as Component; }
+        }
+
         public bool IsTutorialButtonVisible()
         {
             UIButton button = GetTutorialButton();
@@ -147,19 +175,129 @@ namespace SongsOfConquestAccess.Adapters
             get { return new TroopHudAdapter(GetField<TroopHUD>(GetHeader(), HeaderTroopHudField), _facade, _localization); }
         }
 
+        /// <summary>The settlement's own army. Kept: the adapter wakes the game's drag ghost when it
+        /// is made, and the rows are rebuilt on every navigation operation.</summary>
         public TroopHudAdapter SettlementTroops
         {
-            get { return new TroopHudAdapter(GetField<TroopHUD>(GetDefencePanelTroops(), SettlementTroopHudField), _facade, _localization); }
+            get
+            {
+                TroopHUD hud = GetField<TroopHUD>(GetDefencePanelTroops(), SettlementTroopHudField);
+                if (hud == null)
+                {
+                    return null;
+                }
+
+                if (_settlementTroops == null || !ReferenceEquals(_settlementTroops.Hud, hud))
+                {
+                    _settlementTroops = new TroopHudAdapter(hud, _facade, _localization);
+                }
+
+                return _settlementTroops;
+            }
+        }
+
+        /// <summary>The panel that draws the settlement's defences, whose paint state vouches for the
+        /// rows read out of it.</summary>
+        public Component TroopsPanel
+        {
+            get { return GetDefencePanelTroops(); }
+        }
+
+        /// <summary>The button that hands the visiting wielder's whole army to the defences, and the
+        /// one that takes it back. The game draws both only for a visiting wielder and turns them off
+        /// when it would refuse the move.</summary>
+        public Component MoveToDefenceButton
+        {
+            get { return GetMoveToDefenceButton() as Component; }
+        }
+
+        public Component MoveToWielderButton
+        {
+            get { return GetMoveToWielderButton() as Component; }
+        }
+
+        public bool IsMoveToDefenceEnabled()
+        {
+            return IsButtonEnabled(GetMoveToDefenceButton());
+        }
+
+        public bool IsMoveToWielderEnabled()
+        {
+            return IsButtonEnabled(GetMoveToWielderButton());
+        }
+
+        public Tooltip MoveToDefenceTooltip
+        {
+            get { return Tooltip.ForComponent(GetMoveToDefenceButton() as Component, _localization); }
+        }
+
+        public Tooltip MoveToWielderTooltip
+        {
+            get { return Tooltip.ForComponent(GetMoveToWielderButton() as Component, _localization); }
+        }
+
+        public bool ActivateMoveToDefence()
+        {
+            return NativeSelectionUtility.Click(GetMoveToDefenceButton());
+        }
+
+        public bool ActivateMoveToWielder()
+        {
+            return NativeSelectionUtility.Click(GetMoveToWielderButton());
+        }
+
+        public void FocusMoveToDefence()
+        {
+            NativeSelectionUtility.Select(GetMoveToDefenceButton());
+        }
+
+        public void FocusMoveToWielder()
+        {
+            NativeSelectionUtility.Select(GetMoveToWielderButton());
         }
 
         public string DraftLabel
         {
-            get { return MenuButtonTextUtility.JoinParts(GetButtonLabel(GetDraftButton()), GetText(GetField<UITextMesh>(_menu, PurchaseTroopsDescriptionField))); }
+            get { return GetButtonLabel(GetDraftButton()); }
         }
 
         public string UpgradeLabel
         {
-            get { return MenuButtonTextUtility.JoinParts(GetButtonLabel(GetUpgradeButton()), GetText(GetField<UITextMesh>(_menu, UpgradeTroopsDescriptionField))); }
+            get { return GetButtonLabel(GetUpgradeButton()); }
+        }
+
+        /// <summary>The line the menu draws under each button, always: what drafting or upgrading here
+        /// would do, or the game's own reason there is nothing to do.</summary>
+        public string DraftDescription
+        {
+            get { return GetText(GetField<UITextMesh>(_menu, PurchaseTroopsDescriptionField)); }
+        }
+
+        public string UpgradeDescription
+        {
+            get { return GetText(GetField<UITextMesh>(_menu, UpgradeTroopsDescriptionField)); }
+        }
+
+        /// <summary>The number the menu stamps on the Upgrade button while something can be upgraded;
+        /// empty while the game hides that indicator.</summary>
+        public string UpgradesAvailableNumber
+        {
+            get
+            {
+                return IsVisible(GetField<GameObject>(_menu, UpgradesAvailableIndicatorField))
+                    ? GetText(GetField<UITextMesh>(_menu, UpgradesAvailableNumberField))
+                    : string.Empty;
+            }
+        }
+
+        public Component DraftButton
+        {
+            get { return GetDraftButton() as Component; }
+        }
+
+        public Component UpgradeButton
+        {
+            get { return GetUpgradeButton() as Component; }
         }
 
         public bool IsDraftEnabled()
@@ -218,15 +356,6 @@ namespace SongsOfConquestAccess.Adapters
             return true;
         }
 
-        public string CloseLabel
-        {
-            get
-            {
-                string label = GetButtonLabel(GetField<UIButton>(GetHeader(), HeaderCloseButtonField));
-                return label;
-            }
-        }
-
         public PurchaseTroopsSubMenuAdapter PurchaseTroops
         {
             get { return new PurchaseTroopsSubMenuAdapter(GetPurchaseSubMenu(), _facade, _localization); }
@@ -237,104 +366,20 @@ namespace SongsOfConquestAccess.Adapters
             get { return new UpgradeTroopsSubMenuAdapter(GetUpgradeSubMenu(), _localization); }
         }
 
-        public string DefendingWielderStatus
-        {
-            get { return DefendingWielder.Status; }
-        }
-
-        public string StoreLabel
-        {
-            get { return DefendingWielder.StoreLabel; }
-        }
-
-        public string EjectLabel
-        {
-            get { return DefendingWielder.EjectLabel; }
-        }
-
-        public string TradeLabel
-        {
-            get { return DefendingWielder.TradeLabel; }
-        }
-
+        /// <summary>The band the menu draws for the wielder defending the settlement. Kept, so the
+        /// army it holds is read off one adapter rather than a new one per operation.</summary>
         public DefencePanelWielderAdapter DefendingWielder
         {
-            get { return new DefencePanelWielderAdapter(GetDefencePanelWielder(), _facade, _localization); }
-        }
+            get
+            {
+                DefencePanelWielder panel = GetDefencePanelWielder();
+                if (_defendingWielder == null || !ReferenceEquals(_defendingWielder.Panel, panel))
+                {
+                    _defendingWielder = new DefencePanelWielderAdapter(panel, _facade, _localization);
+                }
 
-        public bool IsStoreVisible()
-        {
-            return DefendingWielder.IsStoreVisible();
-        }
-
-        public bool IsEjectVisible()
-        {
-            return DefendingWielder.IsEjectVisible();
-        }
-
-        public bool IsTradeVisible()
-        {
-            return DefendingWielder.IsTradeVisible();
-        }
-
-        public bool IsStoreEnabled()
-        {
-            return DefendingWielder.IsStoreEnabled();
-        }
-
-        public bool IsEjectEnabled()
-        {
-            return DefendingWielder.IsEjectEnabled();
-        }
-
-        public bool IsTradeEnabled()
-        {
-            return DefendingWielder.IsTradeEnabled();
-        }
-
-        public Tooltip StoreTooltip
-        {
-            get { return DefendingWielder.StoreTooltip; }
-        }
-
-        public Tooltip EjectTooltip
-        {
-            get { return DefendingWielder.EjectTooltip; }
-        }
-
-        public Tooltip TradeTooltip
-        {
-            get { return DefendingWielder.TradeTooltip; }
-        }
-
-        public bool ActivateStore()
-        {
-            return DefendingWielder.ActivateStore();
-        }
-
-        public bool ActivateEject()
-        {
-            return DefendingWielder.ActivateEject();
-        }
-
-        public bool ActivateTrade()
-        {
-            return DefendingWielder.ActivateTrade();
-        }
-
-        public void FocusStore()
-        {
-            DefendingWielder.FocusStore();
-        }
-
-        public void FocusEject()
-        {
-            DefendingWielder.FocusEject();
-        }
-
-        public void FocusTrade()
-        {
-            DefendingWielder.FocusTrade();
+                return _defendingWielder;
+            }
         }
 
         public IReadOnlyList<DefenceSlotListAdapter.Slot> GetGarrisonSlots()
@@ -398,6 +443,16 @@ namespace SongsOfConquestAccess.Adapters
         private UIButton GetUpgradeButton()
         {
             return GetField<UIButton>(_menu, UpgradeTroopsButtonField);
+        }
+
+        private UIButton GetMoveToDefenceButton()
+        {
+            return GetField<UIButton>(GetDefencePanelTroops(), MoveToDefenceButtonField);
+        }
+
+        private UIButton GetMoveToWielderButton()
+        {
+            return GetField<UIButton>(GetDefencePanelTroops(), MoveToWielderButtonField);
         }
 
         private int GetInteractingCommanderId()

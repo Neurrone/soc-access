@@ -1,26 +1,55 @@
-using System;
-using System.Collections.Generic;
 using SongsOfConquest.Client.Adventure;
-using SongsOfConquest.Client.Gamestate.Facade;
-using SongsOfConquest.Common.Gamestate.Facade;
 using SongsOfConquestAccess.Adapters;
-using SongsOfConquestAccess.Input;
 using SongsOfConquestAccess.Localization;
-using SongsOfConquestAccess.Speech;
 using SongsOfConquestAccess.UI;
+using SongsOfConquestAccess.UI.Graph;
 using UnityEngine;
 
 namespace SongsOfConquestAccess.Screens
 {
-    public sealed class SettlementScreen : Screen
+    /// <summary>
+    /// The landing page of a town or settlement a wielder has walked into. Four places to be, in the
+    /// order the menu draws them: the tutorial button in the corner, the visiting wielder's band
+    /// across the top, the page itself, and the close cross.
+    ///
+    /// THE PAGE is the drawn left column and then the defence panel on the right: the Draft and
+    /// Upgrade buttons with the line the menu always writes under each of them read as their value
+    /// (and, on Upgrade, the count the menu stamps on it while something can be upgraded); the
+    /// defending wielder's band under the header the game draws over it; and the settlement's own
+    /// troops, its garrison and its ballistae.
+    ///
+    /// THE TWO ARMIES ARE ONE CARRY: the visiting wielder's rows and the settlement's rows are the
+    /// same troop rows (<c>ui/TroopHudRows.cs</c>), so Space picks a troop out of one and Enter drops
+    /// it in the other through the game's own drag, which decides what a drop means - the split popup
+    /// onto an empty slot, a swap onto a different troop. The two Move all buttons under the
+    /// settlement's rows are the game's own mass moves; the game gives both the same tooltip ("Move as
+    /// many as possible"), so the mod names them by the direction they move in and leaves the tooltip
+    /// in the buffer.
+    ///
+    /// THE GARRISON AND THE BALLISTAE are read-only lines, not slots to be worked: the game wires no
+    /// gesture at all to those entries.
+    ///
+    /// Escape is the game's (<c>ConsumesBack</c> false): the menu IS an
+    /// <c>AdventureMenuBackground</c> with <c>_canClose</c> true, and <c>AnimateEntry</c> registers
+    /// <c>UI.ExitMenu</c> on its own close outside any gamepad branch (measured 2026-09-07 in the
+    /// decompiled source). The navigator claims the key only while something is being carried.
+    ///
+    /// The menu writes no title over the page other than the building's name and, on a banner over
+    /// the wielder's portrait, whatever the place is called, so the screen is named after both.
+    /// </summary>
+    public sealed class SettlementScreen : GraphScreen
     {
-        private const int ArmyExchangeGridIndex = 10;
+        private const string TutorialStop = "settlement-tutorial";
+        private const string WielderStop = "settlement-wielder";
+        private const string PageStop = "settlement-page";
+        private const string CloseStop = "settlement-close";
+        private const string KeyPrefix = "settlement";
+        private const string WielderKey = "settlement:wielder";
+        private const string SettlementArmyKey = "settlement:army";
 
         private readonly TownInteractionMenuAdapter _adapter;
-        private Action<OnTroopsUpdatedPayload> _troopsUpdatedHandler;
 
         public SettlementScreen(TownInteractionMenuAdapter adapter)
-            : base(BuildRoot(adapter))
         {
             _adapter = adapter;
         }
@@ -40,305 +69,220 @@ namespace SongsOfConquestAccess.Screens
             return null;
         }
 
+        public override string Key
+        {
+            get { return "settlement"; }
+        }
+
+        /// <summary>The building the menu names at the top, and the name this particular place has
+        /// where it has one of its own.</summary>
+        public override string ScreenName
+        {
+            get
+            {
+                if (_adapter == null)
+                {
+                    return null;
+                }
+
+                string building = _adapter.Title;
+                string custom = _adapter.IsCustomNameVisible ? _adapter.CustomName : null;
+                if (string.IsNullOrWhiteSpace(custom) || SameText(building, custom))
+                {
+                    return string.IsNullOrWhiteSpace(building) ? null : building;
+                }
+
+                return string.IsNullOrWhiteSpace(building)
+                    ? custom
+                    : ModText.Get(ModStrings.Common.ListSeparator, building, custom);
+            }
+        }
+
         public override bool IsPresent()
         {
             return _adapter != null && _adapter.IsTopLevelPresent();
         }
 
-        public override void OnPush()
-        {
-            AttachListeners();
-        }
-
-        public override void OnUnfocus()
-        {
-            _adapter?.HideNativeTooltip();
-            RootWidget?.Unfocus();
-        }
-
-        public override void OnPop()
-        {
-            DetachListeners();
-            _adapter?.HideNativeTooltip();
-        }
-
-        public override bool OnActionJustPressed(InputAction action)
-        {
-            if (action != null && action.Key == AccessibilityActions.Cancel.Key)
-            {
-                if (RootWidget != null && RootWidget.HandleAction(action))
-                {
-                    return true;
-                }
-
-                return _adapter != null && _adapter.Close();
-            }
-
-            return base.OnActionJustPressed(action);
-        }
-
-        public void Refresh()
+        public override void Build(GraphBuilder builder)
         {
             if (!IsPresent())
             {
                 return;
             }
 
-            int focusedIndex = RootWidget != null ? RootWidget.FocusedIndex : -1;
-            ArmyExchangeGridWidget.FocusState gridFocus = CaptureArmyGridFocus();
+            BuildTutorial(builder);
+            TroopHudRows.WielderStop(builder, WielderStop, WielderKey, _adapter.Wielder);
 
-            RootWidget = BuildRoot(_adapter);
-            RestoreArmyGridFocus(gridFocus);
-            RootWidget?.SetFocusByIndexSilently(focusedIndex);
+            builder.BeginStop(PageStop);
+            BuildDraft(builder);
+            BuildUpgrade(builder);
+            SettlementNodes.WielderBand(builder, KeyPrefix, _adapter.DefendingWielder);
+            BuildSettlementTroops(builder);
+            SettlementNodes.SlotBands(
+                builder,
+                KeyPrefix,
+                _adapter.TroopsPanel,
+                _adapter.GetGarrisonSlots(),
+                _adapter.GetBallistaSlots());
+
+            builder.BeginStop(CloseStop);
+            BuildClose(builder);
         }
 
-        private void AttachListeners()
+        /// <summary>The game's Ctrl+digit quick splits, on whichever army's rows the cursor is on.
+        /// </summary>
+        public override bool ClaimsAction(string actionKey)
         {
-            if (_adapter == null || _adapter.Facade == null || _adapter.Facade.Commands == null)
+            return TroopHudRows.ClaimsAction(actionKey, Navigator, VisitingTroops, WielderKey)
+                || TroopHudRows.ClaimsAction(actionKey, Navigator, SettlementTroops, SettlementArmyKey);
+        }
+
+        public override bool OnAction(string actionKey)
+        {
+            return TroopHudRows.OnAction(actionKey, Navigator, VisitingTroops, WielderKey)
+                || TroopHudRows.OnAction(actionKey, Navigator, SettlementTroops, SettlementArmyKey);
+        }
+
+        private TroopHudAdapter VisitingTroops
+        {
+            get
+            {
+                WielderInteract wielder = _adapter == null ? null : _adapter.Wielder;
+                return wielder == null ? null : wielder.Troops;
+            }
+        }
+
+        private TroopHudAdapter SettlementTroops
+        {
+            get { return _adapter == null ? null : _adapter.SettlementTroops; }
+        }
+
+        // ---- the tutorial ----
+
+        /// <summary>The button the game draws in the corner until the player has seen the town
+        /// tutorial, and never again.</summary>
+        private void BuildTutorial(GraphBuilder builder)
+        {
+            if (!_adapter.IsTutorialButtonVisible())
             {
                 return;
             }
 
-            _troopsUpdatedHandler = HandleTroopsUpdated;
-            IClientCommandsFacade commands = _adapter.Facade.Commands;
-            commands.OnTroopsUpdated = (Action<OnTroopsUpdatedPayload>)Delegate.Combine(
-                commands.OnTroopsUpdated,
-                _troopsUpdatedHandler);
+            builder.BeginStop(TutorialStop);
+            SettlementNodes.Button(
+                builder,
+                _adapter.TutorialButton,
+                "settlement:tutorial",
+                () => _adapter.GetTutorialButtonLabel(),
+                () => _adapter.ActivateTutorial(),
+                null,
+                null,
+                null);
         }
 
-        private void DetachListeners()
+        // ---- the two ways to get troops ----
+
+        /// <summary>The Draft button, with the line the menu always writes under it as its value: what
+        /// drafting here would do, or the game's own reason there is nothing to draft.</summary>
+        private void BuildDraft(GraphBuilder builder)
         {
-            if (_adapter == null || _adapter.Facade == null || _adapter.Facade.Commands == null || _troopsUpdatedHandler == null)
+            Component button = _adapter.DraftButton;
+            if (button == null)
             {
                 return;
             }
 
-            IClientCommandsFacade commands = _adapter.Facade.Commands;
-            commands.OnTroopsUpdated = (Action<OnTroopsUpdatedPayload>)Delegate.Remove(
-                commands.OnTroopsUpdated,
-                _troopsUpdatedHandler);
-            _troopsUpdatedHandler = null;
+            NodeVtable vtable = GraphNodes.Button(
+                () => _adapter.DraftLabel,
+                () => _adapter.ActivateDraft(),
+                _adapter.IsDraftEnabled,
+                _adapter.DraftTooltip);
+            vtable.Announcements.Add(GraphNodes.ValuePart(() => _adapter.DraftDescription));
+            vtable.OnFocusVisual = () => _adapter.FocusDraft();
+            builder.AddItem(new DrawnNode(ControlId.For(button, "settlement:draft"), vtable, button));
         }
 
-        private void HandleTroopsUpdated(OnTroopsUpdatedPayload payload)
+        /// <summary>The Upgrade button, with its own line and the count the menu stamps on it while
+        /// something can be upgraded. The game turns the button off when nothing can be.</summary>
+        private void BuildUpgrade(GraphBuilder builder)
         {
-            if (payload == null || _adapter == null)
+            Component button = _adapter.UpgradeButton;
+            if (button == null)
             {
                 return;
             }
 
-            if (payload.ParentId != _adapter.VisitingCommanderId && payload.ParentId != _adapter.SettlementMapEntityId)
+            NodeVtable vtable = GraphNodes.Button(
+                () => _adapter.UpgradeLabel,
+                () => _adapter.ActivateUpgrade(),
+                _adapter.IsUpgradeEnabled,
+                _adapter.UpgradeTooltip);
+            vtable.Announcements.Add(GraphNodes.ValuePart(() => _adapter.UpgradeDescription));
+            vtable.Announcements.Add(GraphNodes.ValuePart(() => _adapter.UpgradesAvailableNumber));
+            vtable.OnFocusVisual = () => _adapter.FocusUpgrade();
+            builder.AddItem(new DrawnNode(ControlId.For(button, "settlement:upgrade"), vtable, button));
+        }
+
+        // ---- the settlement's own army ----
+
+        /// <summary>The troops left behind in the settlement, and the two buttons that move a whole
+        /// army in or out of it.</summary>
+        private void BuildSettlementTroops(GraphBuilder builder)
+        {
+            builder.PushContext(ModText.Get(ModStrings.Screens.SettlementTroops));
+            builder.SetRegion(SettlementArmyKey);
+
+            TroopHudRows.Rows(builder, SettlementTroops, TroopHudRows.RowPrefix(SettlementArmyKey));
+            SettlementNodes.Button(
+                builder,
+                _adapter.MoveToDefenceButton,
+                "settlement:move-to-defence",
+                () => ModText.Get(ModStrings.Screens.MoveAllToDefence),
+                () => _adapter.ActivateMoveToDefence(),
+                _adapter.IsMoveToDefenceEnabled,
+                _adapter.MoveToDefenceTooltip,
+                _adapter.FocusMoveToDefence);
+            SettlementNodes.Button(
+                builder,
+                _adapter.MoveToWielderButton,
+                "settlement:move-to-wielder",
+                () => ModText.Get(ModStrings.Screens.MoveAllToWielder),
+                () => _adapter.ActivateMoveToWielder(),
+                _adapter.IsMoveToWielderEnabled,
+                _adapter.MoveToWielderTooltip,
+                _adapter.FocusMoveToWielder);
+
+            builder.PopContext();
+            builder.SetRegion(null);
+        }
+
+        // ---- the close cross ----
+
+        /// <summary>The cross on the wielder band, which is the one the menu itself listens to
+        /// (<c>WielderInteractHeader.OnCloseButtonClicked</c>).</summary>
+        private void BuildClose(GraphBuilder builder)
+        {
+            WielderInteract wielder = _adapter.Wielder;
+            Component close = wielder == null ? null : wielder.CloseButton;
+            if (close == null || !wielder.IsCloseVisible)
             {
                 return;
             }
 
-            Refresh();
+            // An icon with no text of its own, so the mod names it.
+            NodeVtable vtable = GraphNodes.Button(
+                () => ModText.Get(ModStrings.Screens.Close),
+                () => wielder.ActivateClose());
+            vtable.OnFocusVisual = () => NativeSelectionUtility.Select(close);
+            builder.AddItem(new DrawnNode(ControlId.For(close, "settlement:close"), vtable, close));
         }
 
-        private ArmyExchangeGridWidget.FocusState CaptureArmyGridFocus()
+        private static bool SameText(string left, string right)
         {
-            ArmyExchangeGridWidget grid = RootWidget != null
-                ? RootWidget.GetChildAt(ArmyExchangeGridIndex) as ArmyExchangeGridWidget
-                : null;
-            return grid != null ? grid.CaptureFocusState() : null;
-        }
-
-        private void RestoreArmyGridFocus(ArmyExchangeGridWidget.FocusState focus)
-        {
-            if (focus == null || RootWidget == null)
-            {
-                return;
-            }
-
-            ArmyExchangeGridWidget grid = RootWidget.GetChildAt(ArmyExchangeGridIndex) as ArmyExchangeGridWidget;
-            grid?.RestoreFocusState(focus);
-        }
-
-        private static ContainerWidget BuildRoot(TownInteractionMenuAdapter adapter)
-        {
-            ContainerWidget root = new ContainerWidget("settlement", adapter != null ? adapter.Title : string.Empty);
-            if (adapter == null)
-            {
-                return root;
-            }
-
-            root.AddChild(new ButtonWidget(
-                "settlement-tutorial",
-                adapter.GetTutorialButtonLabel(),
-                adapter.ActivateTutorial,
-                adapter.HideNativeTooltip,
-                adapter.IsTutorialButtonVisible,
-                adapter.IsTutorialButtonVisible));
-
-            root.AddChild(new TextWidget(
-                "settlement-title",
-                () => adapter.Title,
-                adapter.HideNativeTooltip,
-                includeParentLabelInAnnouncement: false));
-
-            root.AddChild(new TextWidget(
-                "settlement-custom-name",
-                () => adapter.CustomName,
-                adapter.HideNativeTooltip,
-                includeParentLabelInAnnouncement: false,
-                isVisible: () => adapter.IsCustomNameVisible));
-
-            root.AddChild(Portrait.Static(
-                "settlement-visiting-wielder",
-                () => adapter.VisitingWielderName,
-                adapter.HideNativeTooltip,
-                () => adapter.VisitingWielderTooltip));
-
-            root.AddChild(new ButtonWidget(
-                "settlement-draft-troops",
-                () => adapter.DraftLabel,
-                adapter.ActivateDraft,
-                adapter.FocusDraft,
-                adapter.IsDraftEnabled,
-                getTooltip: () => adapter.DraftTooltip));
-
-            root.AddChild(new ButtonWidget(
-                "settlement-upgrade-troops",
-                () => adapter.UpgradeLabel,
-                adapter.ActivateUpgrade,
-                adapter.FocusUpgrade,
-                adapter.IsUpgradeEnabled,
-                getTooltip: () => adapter.UpgradeTooltip));
-
-            root.AddChild(new TextWidget(
-                "settlement-defending-wielder-status",
-                () => adapter.DefendingWielderStatus,
-                adapter.HideNativeTooltip,
-                includeParentLabelInAnnouncement: false,
-                isVisible: () => !string.IsNullOrWhiteSpace(adapter.DefendingWielderStatus)));
-
-            root.AddChild(new ButtonWidget(
-                "settlement-store-wielder",
-                () => adapter.StoreLabel,
-                adapter.ActivateStore,
-                adapter.FocusStore,
-                adapter.IsStoreEnabled,
-                adapter.IsStoreVisible,
-                () => adapter.StoreTooltip));
-
-            root.AddChild(new ButtonWidget(
-                "settlement-eject-wielder",
-                () => adapter.EjectLabel,
-                adapter.ActivateEject,
-                adapter.FocusEject,
-                adapter.IsEjectEnabled,
-                adapter.IsEjectVisible,
-                () => adapter.EjectTooltip));
-
-            root.AddChild(new ButtonWidget(
-                "settlement-trade-wielder",
-                () => adapter.TradeLabel,
-                adapter.ActivateTrade,
-                adapter.FocusTrade,
-                adapter.IsTradeEnabled,
-                adapter.IsTradeVisible,
-                () => adapter.TradeTooltip));
-
-            root.AddChild(BuildArmyExchangeGrid(
-                "settlement-army-exchange-grid",
-                BuildVisitingArmyLabel(adapter),
-                ModText.Get(ModStrings.Screens.SettlementTroops),
-                adapter.VisitingTroops,
-                adapter.SettlementTroops));
-            root.AddChild(BuildDefenseMenu("settlement-garrison", GameText.Get("Adventure/BuildMenu/Garrison", string.Empty), adapter.GetGarrisonSlots()));
-            root.AddChild(BuildDefenseMenu("settlement-ballista", ModText.Get(ModStrings.Screens.Ballista), adapter.GetBallistaSlots()));
-
-            root.AddChild(new ButtonWidget(
-                "settlement-close",
-                ModText.Get(ModStrings.Screens.Close),
-                adapter.Close,
-                adapter.HideNativeTooltip,
-                () => adapter.IsTopLevelPresent()));
-
-            return root;
-        }
-
-        private static ArmyExchangeGridWidget BuildArmyExchangeGrid(
-            string id,
-            string leftArmyLabel,
-            string rightArmyLabel,
-            TroopHudAdapter left,
-            TroopHudAdapter right)
-        {
-            IReadOnlyList<TroopHudAdapter.SlotItem> leftSlots = left != null
-                ? left.GetSlots()
-                : new TroopHudAdapter.SlotItem[0];
-            IReadOnlyList<TroopHudAdapter.SlotItem> rightSlots = right != null
-                ? right.GetSlots()
-                : new TroopHudAdapter.SlotItem[0];
-            return new ArmyExchangeGridWidget(
-                id,
-                leftArmyLabel,
-                rightArmyLabel,
-                leftSlots,
-                rightSlots,
-                DropArmySlot);
-        }
-
-        private static string BuildVisitingArmyLabel(TownInteractionMenuAdapter adapter)
-        {
-            string name = adapter != null ? adapter.VisitingWielderName : string.Empty;
-            return string.IsNullOrWhiteSpace(name)
-                ? ModText.Get(ModStrings.Screens.VisitingWielderArmy)
-                : ModText.Get(ModStrings.Screens.WielderArmyPossessive, name);
-        }
-
-        private static TroopHudAdapter.DropResult DropArmySlot(TroopHudAdapter.SlotItem source, TroopHudAdapter.SlotItem target)
-        {
-            return source != null ? source.CompleteDropTo(target) : TroopHudAdapter.DropResult.None;
-        }
-
-        private static MenuWidget BuildDefenseMenu(
-            string id,
-            string label,
-            IReadOnlyList<DefenceSlotListAdapter.Slot> slots)
-        {
-            MenuWidget menu = new MenuWidget(id, label);
-            if (slots == null || slots.Count == 0)
-            {
-                return menu;
-            }
-
-            for (int i = 0; i < slots.Count; i++)
-            {
-                DefenceSlotListAdapter.Slot slot = slots[i];
-                menu.AddItem(new MenuItemWidget(
-                    id + "-slot-" + slot.SlotNumber,
-                    () => BuildDefenseSlotLabel(slot),
-                    null,
-                    null,
-                    slot.Focus,
-                    () => true,
-                    () => slot.Tooltip));
-            }
-
-            return menu;
-        }
-
-        private static string BuildDefenseSlotLabel(DefenceSlotListAdapter.Slot slot)
-        {
-            if (slot == null)
-            {
-                return string.Empty;
-            }
-
-            string slotLabel = ModText.Get(ModStrings.UI.Slot, slot.SlotNumber);
-            if (!slot.IsOccupied)
-            {
-                return ModText.Get(ModStrings.UI.EmptyTroopSlot, slotLabel);
-            }
-
-            if (slot.CurrentSize > 0 && slot.MaxSize > 0)
-            {
-                return ModText.Get(ModStrings.UI.TroopSlotWithSize, slot.TroopName, slot.CurrentSize, slot.MaxSize, slotLabel);
-            }
-
-            return ModText.Get(ModStrings.UI.TroopSlot, slot.TroopName, slotLabel);
+            return string.Equals(
+                (left ?? string.Empty).Trim(),
+                (right ?? string.Empty).Trim(),
+                System.StringComparison.CurrentCultureIgnoreCase);
         }
     }
 }
