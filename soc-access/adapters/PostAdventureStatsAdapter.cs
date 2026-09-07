@@ -138,6 +138,17 @@ namespace SongsOfConquestAccess.Adapters
             return dropdown != null && NativeSelectionUtility.Select(dropdown.GetSelectable());
         }
 
+        /// <summary>The graph type as a drop list the mod's own list screen can walk, over the game's
+        /// own popup. Null until the view has a dropdown to ask.</summary>
+        public GraphDropList GraphChooser
+        {
+            get
+            {
+                UITextMeshDropdown dropdown = GraphDropdown;
+                return dropdown != null ? new GraphDropList(this, dropdown) : null;
+            }
+        }
+
         public IReadOnlyList<TeamOption> GetTeamOptions()
         {
             List<PostAdventureStatsMenuTeamEntry> entries = GetTeamEntries();
@@ -185,10 +196,16 @@ namespace SongsOfConquestAccess.Adapters
             return toggle != null && NativeSelectionUtility.Select(toggle.GetSelectable());
         }
 
-        public string GetCloseButtonLabel()
+        /// <summary>The drawn close cross, for a caller to key a control on and select.</summary>
+        public Component CloseButton
         {
-            string label = MenuButtonTextUtility.GetStandardButtonLabel(Settings != null ? Settings.CloseButton : null);
-            return !string.IsNullOrWhiteSpace(label) ? label : ModText.Get(ModStrings.Screens.Close);
+            get { return Settings != null ? Settings.CloseButton as Component : null; }
+        }
+
+        public bool IsCloseButtonVisible()
+        {
+            UIButton button = Settings != null ? Settings.CloseButton : null;
+            return button != null && button.Active && button.gameObject != null && button.gameObject.activeInHierarchy;
         }
 
         public bool IsCloseButtonEnabled()
@@ -427,6 +444,58 @@ namespace SongsOfConquestAccess.Adapters
         private static T GetField<T>(object owner, FieldInfo field) where T : class
         {
             return owner != null && field != null ? field.GetValue(owner) as T : null;
+        }
+
+        public sealed class GraphDropList : IDropList
+        {
+            private readonly UITextMeshDropdown _dropdown;
+
+            public GraphDropList(PostAdventureStatsAdapter adapter, UITextMeshDropdown dropdown)
+            {
+                _dropdown = dropdown;
+                GetOptions = () => ReadOptions(adapter);
+                GetValue = () => adapter != null ? adapter.SelectedGraphIndex : -1;
+                IsEnabled = () => _dropdown != null && _dropdown.Active && _dropdown.Interactable;
+                IsVisible = () => _dropdown != null && ((Component)_dropdown).gameObject.activeInHierarchy;
+                OpenPopup = () => DropdownPopup.Show(_dropdown);
+                ClosePopup = () => DropdownPopup.Hide(_dropdown);
+                IsPopupOpen = () => DropdownPopup.IsOpen(_dropdown);
+                FocusOption = index => DropdownPopup.FocusOption(_dropdown, index);
+            }
+
+            public string Id
+            {
+                get { return "post-adventure-stats-graph"; }
+            }
+
+            /// <summary>The drawn dropdown itself, so a caller can key a control on it.</summary>
+            public Component Subject
+            {
+                get { return _dropdown; }
+            }
+
+            public Func<IReadOnlyList<string>> GetOptions { get; private set; }
+            public Func<int> GetValue { get; private set; }
+            public Func<bool> IsEnabled { get; private set; }
+            public Func<bool> IsVisible { get; private set; }
+            public Func<bool> OpenPopup { get; private set; }
+            public Func<bool> ClosePopup { get; private set; }
+            public Func<bool> IsPopupOpen { get; private set; }
+            public Func<int, bool> FocusOption { get; private set; }
+
+            private static IReadOnlyList<string> ReadOptions(PostAdventureStatsAdapter adapter)
+            {
+                IReadOnlyList<GraphOption> options = adapter != null
+                    ? adapter.GetGraphOptions()
+                    : new GraphOption[0];
+                string[] labels = new string[options.Count];
+                for (int i = 0; i < options.Count; i++)
+                {
+                    labels[i] = options[i].Label;
+                }
+
+                return labels;
+            }
         }
 
         public sealed class GraphOption

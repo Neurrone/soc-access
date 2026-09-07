@@ -6,12 +6,51 @@ using SongsOfConquest.Common.Battle;
 using SongsOfConquestAccess.Adapters;
 using SongsOfConquestAccess.Localization;
 using SongsOfConquestAccess.UI;
+using SongsOfConquestAccess.UI.Graph;
 using UnityEngine;
 
 namespace SongsOfConquestAccess.Screens
 {
-    public sealed class PostBattleResultScreen : Screen
+    /// <summary>
+    /// The page a battle ends on, made navigable as a graph. Four places to be, in the order the menu
+    /// draws them: the attacker's side, the defender's side, the loot, and the two buttons.
+    ///
+    /// Measured 2026-09-07 (<c>PostBattleMenu</c>, opened by <c>AdventureBattleMenu</c>): the
+    /// attacker's name and portrait top LEFT (the name at x 325 beside the portrait button, with the
+    /// level and essence figures), the defender's name top RIGHT (x 681), the outcome header
+    /// ("Defeat!") centred between them, and a "Troops Lost" column under each name - the attacker's
+    /// on the left, the defender's on the right. The XP gained ("+310") is drawn under the name of
+    /// whichever side is the local team (<c>_XPGainContainer</c> is moved to the attacker's or the
+    /// defender's position in <c>AnimateResults</c>), which is why it is declared inside that side
+    /// rather than as a page of its own. The buttons sit at the bottom, "Manual Battle" (x 483) LEFT
+    /// of "Accept" (x 660), and are declared in the order of their drawn left edges, measured every
+    /// build.
+    ///
+    /// THE OUTCOME HEADER IS THE SCREEN'S NAME, so arrival says "Defeat!" once and then goes on to
+    /// read the attacker's commander, which is where focus starts: the page is read top-left first,
+    /// and the header has already been said.
+    ///
+    /// The commander is a LINE rather than a control - the portrait's click opens nothing from here -
+    /// carrying the portrait's own native tooltip, which is where the commander's stats and skills
+    /// are read from. Each troop lost is a line too, named "N X lost" out of the amount the entry
+    /// draws and the troop's name, with the entry's tooltip behind it; a side that lost nothing says
+    /// "None", as it did before. The loot band is skipped entirely when the battle dropped none.
+    ///
+    /// The redo button COUNTS DOWN while turn timers are on (<c>InitiateDelayedFinalize</c> rewrites
+    /// its text once a second, "Manual Battle (9)", and turns it non-interactable at zero), so its
+    /// label is watched live and the count reads under the cursor.
+    ///
+    /// ESCAPE IS THE GAME'S AND IT CONFIRMS (<c>ConsumesBack</c> false): <c>PostBattleMenu.Show</c>
+    /// registers <c>UI.ExitMenu</c> on <c>HandleConfirmClicked</c>, so the key accepts the result
+    /// rather than dismissing the page.
+    /// </summary>
+    public sealed class PostBattleResultScreen : GraphScreen
     {
+        private const string AttackerStop = "post-battle-attacker";
+        private const string DefenderStop = "post-battle-defender";
+        private const string LootStop = "post-battle-loot";
+        private const string ButtonsStop = "post-battle-buttons";
+
         private static readonly System.Reflection.FieldInfo PostBattleMenuResultField =
             AccessTools.Field(typeof(PostBattleMenu), "_result");
         private static readonly System.Reflection.FieldInfo PostBattleMenuOnHideField =
@@ -19,8 +58,17 @@ namespace SongsOfConquestAccess.Screens
 
         private readonly PostBattleResultAdapter _adapter;
 
+        // A subject of its own per synthesized line, kept across rebuilds so the reconciler seats the
+        // cursor back on the same one: the menu gives no component the screen can key the XP figure,
+        // the returned-troops line or the "None" row on.
+        private readonly Dictionary<string, object> _markers = new Dictionary<string, object>();
+
+        // Resolving a portrait walks the menu's parents and the scene root, so it is done once per
+        // side rather than on every navigation operation; a side that has not resolved yet is retried.
+        private CommanderHudPortraitAdapter _attackerPortrait;
+        private CommanderHudPortraitAdapter _defenderPortrait;
+
         public PostBattleResultScreen(PostBattleResultAdapter adapter)
-            : base(BuildRoot(adapter))
         {
             _adapter = adapter;
         }
@@ -28,6 +76,22 @@ namespace SongsOfConquestAccess.Screens
         public static Screen TryBuildActiveScreen()
         {
             return FindActivePostBattleResultScreen();
+        }
+
+        public override string Key
+        {
+            get { return "post-battle-result"; }
+        }
+
+        /// <summary>The outcome the menu draws ("Defeat!"), which is the one thing that names this
+        /// page.</summary>
+        public override string ScreenName
+        {
+            get
+            {
+                string header = _adapter != null ? _adapter.HeaderText : null;
+                return string.IsNullOrWhiteSpace(header) ? null : header;
+            }
         }
 
         public override bool IsPresent()
@@ -40,208 +104,159 @@ namespace SongsOfConquestAccess.Screens
             return new PostBattleResultScreen(_adapter);
         }
 
-        private static PostBattleResultScreen FindActivePostBattleResultScreen()
+        public override void Build(GraphBuilder builder)
         {
-            PostBattleMenu menu = FindActivePostBattleMenu();
-            if (!IsActive(menu) || GetResult(menu) == null)
+            if (!IsPresent())
             {
-                return null;
+                return;
             }
 
-            AdventureBattleMenu battleMenu = ResolveOwningBattleMenu(menu);
-            PostBattleResultAdapter adapter = new PostBattleResultAdapter(battleMenu, menu);
-            return adapter.IsPresent() ? new PostBattleResultScreen(adapter) : null;
-        }
+            builder.BeginStop(AttackerStop);
+            ControlId start = BuildSide(builder, attacker: true);
 
-        public override void OnUnfocus()
-        {
-            RootWidget?.Unfocus();
-            _adapter?.HideNativeTooltip();
-        }
+            builder.BeginStop(DefenderStop);
+            BuildSide(builder, attacker: false);
 
-        public override void OnPop()
-        {
-            _adapter?.HideNativeTooltip();
-        }
+            builder.BeginStop(LootStop);
+            BuildLoot(builder);
 
-        private static ContainerWidget BuildRoot(PostBattleResultAdapter adapter)
-        {
-            ContainerWidget root = new ContainerWidget("post-battle-result", ModText.Get(ModStrings.Screens.BattleResult));
-            if (adapter == null)
+            builder.BeginStop(ButtonsStop);
+            BuildButtons(builder);
+
+            if (start != null)
             {
-                return root;
+                // Top left, where the page is read from.
+                builder.SetStart(start);
+            }
+        }
+
+        // ---- one side of the page ----
+
+        /// <summary>One side's column, in drawn order: the commander, the XP where it belongs to this
+        /// side, the troops lost under it, and the eternal troops the battle returned. Answers the
+        /// commander's node, which is where the page starts.</summary>
+        private ControlId BuildSide(GraphBuilder builder, bool attacker)
+        {
+            string key = attacker ? "attacker" : "defender";
+            ControlId commander = BuildCommander(builder, attacker);
+
+            if (_adapter.XpBelongsToAttacker == attacker && _adapter.XpVisible)
+            {
+                AddLine(builder, key + "-xp", () => _adapter.XpText);
             }
 
-            root.AddChild(new TextWidget(
-                "post-battle-result-header",
-                () => adapter.HeaderText,
-                adapter.HideNativeTooltip,
-                includeParentLabelInAnnouncement: false));
+            BuildEntries(
+                builder,
+                key + "-troop",
+                attacker ? _adapter.AttackerTroopsLost : _adapter.DefenderTroopsLost,
+                addNoneWhenEmpty: true);
 
-            CommanderHudPortraitAdapter attackerPortrait = adapter.AttackerCommanderPortrait;
-            root.AddChild(Portrait.Static(
-                "post-battle-attacker-commander",
-                () => attackerPortrait != null ? attackerPortrait.Name : adapter.AttackerCommanderText,
-                () =>
-                {
-                    if (attackerPortrait != null)
-                    {
-                        attackerPortrait.Focus();
-                    }
-                    else
-                    {
-                        adapter.HideNativeTooltip();
-                    }
-                },
-                () => BuildPortraitTooltip(attackerPortrait)));
-
-            if (adapter.XpBelongsToAttacker)
+            bool returned = attacker ? _adapter.AttackerReturnedTroopsVisible : _adapter.DefenderReturnedTroopsVisible;
+            if (returned)
             {
-                AddXpWidget(root, adapter);
+                AddLine(
+                    builder,
+                    key + "-returned",
+                    () => attacker ? _adapter.AttackerReturnedTroopsText : _adapter.DefenderReturnedTroopsText);
             }
 
-            AddEntryMenu(root, "post-battle-attacker-troops-lost", adapter.AttackerCommanderText, adapter.AttackerTroopsLost, adapter, addNoneWhenEmpty: true);
-
-            root.AddChild(new TextWidget(
-                "post-battle-attacker-returned-troops",
-                () => adapter.AttackerReturnedTroopsText,
-                adapter.HideNativeTooltip,
-                includeParentLabelInAnnouncement: false,
-                isVisible: () => adapter.AttackerReturnedTroopsVisible));
-
-            CommanderHudPortraitAdapter defenderPortrait = adapter.DefenderCommanderPortrait;
-            root.AddChild(Portrait.Static(
-                "post-battle-defender-commander",
-                () => defenderPortrait != null ? defenderPortrait.Name : adapter.DefenderCommanderText,
-                () =>
-                {
-                    if (defenderPortrait != null)
-                    {
-                        defenderPortrait.Focus();
-                    }
-                    else
-                    {
-                        adapter.HideNativeTooltip();
-                    }
-                },
-                () => BuildPortraitTooltip(defenderPortrait)));
-
-            if (!adapter.XpBelongsToAttacker)
-            {
-                AddXpWidget(root, adapter);
-            }
-
-            AddEntryMenu(root, "post-battle-defender-troops-lost", adapter.DefenderCommanderText, adapter.DefenderTroopsLost, adapter, addNoneWhenEmpty: true);
-
-            root.AddChild(new TextWidget(
-                "post-battle-defender-returned-troops",
-                () => adapter.DefenderReturnedTroopsText,
-                adapter.HideNativeTooltip,
-                includeParentLabelInAnnouncement: false,
-                isVisible: () => adapter.DefenderReturnedTroopsVisible));
-
-            AddEntryMenu(root, "post-battle-loot", GameText.Get("Adventure/AdventurePostBattleMenu/BattleLoot", string.Empty), adapter.Loot, adapter, addNoneWhenEmpty: false);
-
-            root.AddChild(new ButtonWidget(
-                "post-battle-accept",
-                adapter.AcceptButtonLabel,
-                adapter.Accept,
-                adapter.HideNativeTooltip,
-                adapter.IsAcceptButtonEnabled,
-                adapter.IsAcceptButtonVisible,
-                adapter.AcceptButtonTooltip));
-
-            root.AddChild(new ButtonWidget(
-                "post-battle-redo-manual-battle",
-                adapter.RedoManualBattleButtonLabel,
-                adapter.RedoManualBattle,
-                adapter.HideNativeTooltip,
-                adapter.IsRedoManualBattleButtonEnabled,
-                adapter.IsRedoManualBattleButtonVisible,
-                adapter.RedoManualBattleButtonTooltip));
-            return root;
+            return commander;
         }
 
-        private static void AddXpWidget(ContainerWidget root, PostBattleResultAdapter adapter)
+        /// <summary>The commander's name, as the portrait the game draws it beside: a line carrying
+        /// the portrait's native tooltip, which is where its stats, skills and status are read. Where
+        /// the portrait cannot be resolved the name is still said, off the menu's own label.</summary>
+        private ControlId BuildCommander(GraphBuilder builder, bool attacker)
         {
-            root.AddChild(new TextWidget(
-                "post-battle-xp",
-                () => adapter.XpText,
-                adapter.HideNativeTooltip,
-                includeParentLabelInAnnouncement: false,
-                isVisible: () => adapter.XpVisible));
-        }
-
-        private static Tooltip BuildPortraitTooltip(CommanderHudPortraitAdapter portrait)
-        {
-            return portrait != null
-                ? Portrait.BuildNativeTooltip(
-                    () => portrait.TooltipTarget,
-                    portrait.Localization,
-                    portrait.RefreshTooltip)
+            CommanderHudPortraitAdapter portrait = attacker ? AttackerPortrait : DefenderPortrait;
+            string key = attacker ? "attacker-commander" : "defender-commander";
+            Func<string> name = () => portrait != null
+                ? portrait.Name
+                : (attacker ? _adapter.AttackerCommanderText : _adapter.DefenderCommanderText);
+            Tooltip tooltip = portrait != null
+                ? Portrait.BuildNativeTooltip(() => portrait.TooltipTarget, portrait.Localization, portrait.RefreshTooltip)
                 : null;
+            NodeVtable vtable = GraphNodes.Text(name, null, tooltip);
+
+            Component target = portrait != null ? portrait.TooltipTarget : null;
+            if (target == null)
+            {
+                ControlId synthetic = ControlId.For(Marker(key), "post-battle:" + key);
+                builder.AddItem(new SyntheticNode(synthetic, vtable));
+                return synthetic;
+            }
+
+            // The mouse resting on the portrait is what makes the game draw its tooltip, and the
+            // portrait refreshes its own contents on the way.
+            vtable.OnFocusVisual = portrait.Focus;
+            ControlId id = ControlId.For(target, "post-battle:" + key);
+            builder.AddItem(new DrawnNode(id, vtable, target));
+            return id;
         }
 
-        private static void AddEntryMenu(
-            ContainerWidget root,
-            string id,
-            string label,
+        // ---- the troops lost and the loot ----
+
+        private void BuildLoot(GraphBuilder builder)
+        {
+            BuildEntries(builder, "loot", _adapter.Loot, addNoneWhenEmpty: false);
+        }
+
+        /// <summary>A band of read-only lines, one per entry the menu is drawing, each carrying the
+        /// entry's own tooltip. A band the menu drew nothing in says "None" where the page always
+        /// draws the band (the troops-lost columns) and is skipped where it does not (the loot).
+        /// </summary>
+        private void BuildEntries(
+            GraphBuilder builder,
+            string key,
             IReadOnlyList<PostBattleResultAdapter.ResultEntry> entries,
-            PostBattleResultAdapter adapter,
             bool addNoneWhenEmpty)
         {
-            if (root == null)
-            {
-                return;
-            }
-
-            MenuWidget menu = new MenuWidget(id, label);
-            if (entries == null || entries.Count == 0)
-            {
-                if (!addNoneWhenEmpty)
-                {
-                    return;
-                }
-
-                menu.AddItem(new MenuItemWidget(
-                    id + "-none",
-                    () => ModText.Get(ModStrings.Screens.None),
-                    getStatus: null,
-                    activate: null,
-                    onFocus: adapter.HideNativeTooltip,
-                    isVisible: () => true));
-                root.AddChild(menu);
-                return;
-            }
-
-            for (int i = 0; i < entries.Count; i++)
+            int declared = 0;
+            for (int i = 0; entries != null && i < entries.Count; i++)
             {
                 PostBattleResultAdapter.ResultEntry entry = entries[i];
-                if (entry == null)
+                if (entry == null || !entry.IsVisible)
                 {
                     continue;
                 }
 
-                menu.AddItem(new MenuItemWidget(
-                    id + "-" + i,
-                    () => BuildResultEntryLabel(entry),
-                    getStatus: null,
-                    activate: null,
-                    onFocus: adapter.HideNativeTooltip,
-                    isVisible: () => entry.IsVisible,
-                    tooltip: entry.Tooltip));
+                string label = EntryLabel(entry);
+                if (string.IsNullOrWhiteSpace(label))
+                {
+                    continue;
+                }
+
+                NodeVtable vtable = GraphNodes.Text(() => label, null, entry.Tooltip);
+                Component subject = entry.Subject;
+                if (subject != null)
+                {
+                    // The structural key carries the index: a ControlId is equal on its structural
+                    // key alone, so two entries under one key would be one duplicate id.
+                    builder.AddItem(new DrawnNode(
+                        ControlId.For(subject, "post-battle:" + key + "/" + i),
+                        vtable,
+                        subject));
+                }
+                else
+                {
+                    builder.AddItem(new SyntheticNode(
+                        ControlId.Structural("post-battle:" + key + "/" + i),
+                        vtable));
+                }
+
+                declared++;
             }
 
-            root.AddChild(menu);
+            if (declared == 0 && addNoneWhenEmpty)
+            {
+                AddLine(builder, key + "-none", () => ModText.Get(ModStrings.Screens.None));
+            }
         }
 
-        private static string BuildResultEntryLabel(PostBattleResultAdapter.ResultEntry entry)
+        /// <summary>What a line says: a lost troop is the amount the entry drew and the troop's name,
+        /// said as a loss; anything else is the name alone.</summary>
+        private static string EntryLabel(PostBattleResultAdapter.ResultEntry entry)
         {
-            if (entry == null)
-            {
-                return string.Empty;
-            }
-
             if (!entry.IsLostTroop)
             {
                 return entry.Name;
@@ -262,6 +277,122 @@ namespace SongsOfConquestAccess.Screens
             }
 
             return string.IsNullOrWhiteSpace(label) ? string.Empty : ModText.Get(ModStrings.Screens.TroopLost, label);
+        }
+
+        // ---- the buttons ----
+
+        /// <summary>The two buttons in the order their left edges are drawn in, measured every build:
+        /// Manual Battle then Accept.</summary>
+        private void BuildButtons(GraphBuilder builder)
+        {
+            List<KeyValuePair<float, NodeDeclaration>> drawn = new List<KeyValuePair<float, NodeDeclaration>>(2);
+            Component accept = _adapter.IsAcceptButtonVisible() ? _adapter.AcceptButton : null;
+            if (accept != null)
+            {
+                drawn.Add(new KeyValuePair<float, NodeDeclaration>(Left(accept), AcceptNode(accept)));
+            }
+
+            Component redo = _adapter.IsRedoManualBattleButtonVisible() ? _adapter.RedoManualBattleButton : null;
+            if (redo != null)
+            {
+                drawn.Add(new KeyValuePair<float, NodeDeclaration>(Left(redo), RedoNode(redo)));
+            }
+
+            if (drawn.Count == 2 && drawn[1].Key < drawn[0].Key)
+            {
+                KeyValuePair<float, NodeDeclaration> first = drawn[0];
+                drawn[0] = drawn[1];
+                drawn[1] = first;
+            }
+
+            for (int i = 0; i < drawn.Count; i++)
+            {
+                builder.AddItem(drawn[i].Value);
+            }
+        }
+
+        private NodeDeclaration AcceptNode(Component button)
+        {
+            NodeVtable vtable = GraphNodes.Button(
+                () => _adapter.AcceptButtonLabel,
+                () => _adapter.Accept(),
+                _adapter.IsAcceptButtonEnabled,
+                _adapter.AcceptButtonTooltip);
+            vtable.OnFocusVisual = () => NativeSelectionUtility.Select(button);
+            return new DrawnNode(ControlId.For(button, "post-battle:accept"), vtable, button);
+        }
+
+        private NodeDeclaration RedoNode(Component button)
+        {
+            NodeVtable vtable = GraphNodes.Button(
+                () => _adapter.RedoManualBattleButtonLabel,
+                () => _adapter.RedoManualBattle(),
+                _adapter.IsRedoManualBattleButtonEnabled,
+                _adapter.RedoManualBattleButtonTooltip);
+            // The game rewrites this button's text once a second while the turn timer runs it down, so
+            // the count is read under the cursor rather than only on arrival.
+            vtable.Announcements[0] = new NodeAnnouncement(
+                () => _adapter.RedoManualBattleButtonLabel,
+                live: true,
+                kind: AnnouncementKinds.Label);
+            vtable.OnFocusVisual = () => NativeSelectionUtility.Select(button);
+            return new DrawnNode(ControlId.For(button, "post-battle:redo"), vtable, button);
+        }
+
+        private static float Left(Component button)
+        {
+            return button != null && button.transform != null ? button.transform.position.x : 0f;
+        }
+
+        // ---- the lines the menu gives nothing to key on ----
+
+        private void AddLine(GraphBuilder builder, string key, Func<string> text)
+        {
+            if (string.IsNullOrWhiteSpace(text()))
+            {
+                return;
+            }
+
+            builder.AddItem(new SyntheticNode(
+                ControlId.For(Marker(key), "post-battle:" + key),
+                GraphNodes.Text(text)));
+        }
+
+        private object Marker(string key)
+        {
+            object marker;
+            if (!_markers.TryGetValue(key, out marker))
+            {
+                marker = new object();
+                _markers.Add(key, marker);
+            }
+
+            return marker;
+        }
+
+        private CommanderHudPortraitAdapter AttackerPortrait
+        {
+            get { return _attackerPortrait ?? (_attackerPortrait = _adapter.AttackerCommanderPortrait); }
+        }
+
+        private CommanderHudPortraitAdapter DefenderPortrait
+        {
+            get { return _defenderPortrait ?? (_defenderPortrait = _adapter.DefenderCommanderPortrait); }
+        }
+
+        // ---- finding the live menu ----
+
+        private static PostBattleResultScreen FindActivePostBattleResultScreen()
+        {
+            PostBattleMenu menu = FindActivePostBattleMenu();
+            if (!IsActive(menu) || GetResult(menu) == null)
+            {
+                return null;
+            }
+
+            AdventureBattleMenu battleMenu = ResolveOwningBattleMenu(menu);
+            PostBattleResultAdapter adapter = new PostBattleResultAdapter(battleMenu, menu);
+            return adapter.IsPresent() ? new PostBattleResultScreen(adapter) : null;
         }
 
         private static PostBattleMenu FindActivePostBattleMenu()

@@ -152,6 +152,13 @@ namespace SongsOfConquestAccess.Adapters
             get { return GetButtonLabel(GetField<UIButton>(ConfirmButtonField)); }
         }
 
+        /// <summary>The drawn Accept button, for the screen to key a control on, sort by and select.
+        /// </summary>
+        public Component AcceptButton
+        {
+            get { return GetField<UIButton>(ConfirmButtonField) as Component; }
+        }
+
         public bool Accept()
         {
             return NativeSelectionUtility.Click(GetField<UIButton>(ConfirmButtonField));
@@ -175,6 +182,13 @@ namespace SongsOfConquestAccess.Adapters
         public string RedoManualBattleButtonLabel
         {
             get { return GetButtonLabel(GetField<UIButton>(RedoManualBattleButtonField)); }
+        }
+
+        /// <summary>The drawn Manual Battle button, for the screen to key a control on, sort by and
+        /// select.</summary>
+        public Component RedoManualBattleButton
+        {
+            get { return GetField<UIButton>(RedoManualBattleButtonField) as Component; }
         }
 
         public bool RedoManualBattle()
@@ -307,7 +321,8 @@ namespace SongsOfConquestAccess.Adapters
                     GetFirstTooltipLine(tooltip),
                     isLostTroop: true,
                     tooltip,
-                    () => entry != null && entry.gameObject.activeInHierarchy));
+                    () => entry != null && entry.gameObject.activeInHierarchy,
+                    entry));
             }
 
             return result.ToArray();
@@ -344,7 +359,8 @@ namespace SongsOfConquestAccess.Adapters
                     GetLootEntryName(tooltipComponent, tooltip),
                     isLostTroop: false,
                     tooltip,
-                    () => entry != null && entry.gameObject.activeInHierarchy));
+                    () => entry != null && entry.gameObject.activeInHierarchy,
+                    entry));
             }
         }
 
@@ -492,13 +508,20 @@ namespace SongsOfConquestAccess.Adapters
         {
             private readonly Func<bool> _isVisible;
 
-            public ResultEntry(string amount, string name, bool isLostTroop, Tooltip tooltip, Func<bool> isVisible)
+            public ResultEntry(
+                string amount,
+                string name,
+                bool isLostTroop,
+                Tooltip tooltip,
+                Func<bool> isVisible,
+                Component subject)
             {
                 Amount = amount ?? string.Empty;
                 Name = name ?? string.Empty;
                 IsLostTroop = isLostTroop;
                 Tooltip = tooltip;
                 _isVisible = isVisible;
+                Subject = subject;
             }
 
             public string Amount { get; private set; }
@@ -508,6 +531,10 @@ namespace SongsOfConquestAccess.Adapters
             public bool IsLostTroop { get; private set; }
 
             public Tooltip Tooltip { get; private set; }
+
+            /// <summary>The entry the menu drew this line as - the troop entry, the loot entry - so a
+            /// caller can key a control on it and vouch for it being drawn.</summary>
+            public Component Subject { get; private set; }
 
             public bool IsVisible
             {
