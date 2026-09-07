@@ -59,6 +59,11 @@ namespace SongsOfConquestAccess.UI
         // afterwards is the consequence of the press and is not read by the watch.
         private ControlId _actedKey;
 
+        // What the player is holding, if anything. Owned here because the carry keys are dispatched
+        // here and because a carry is scoped to the page it started on, which is what this class
+        // already tracks. One per navigator, so a hot reload takes it with the rest of the mod.
+        private readonly CarryState _carry = new CarryState();
+
         // What the UI review buffer currently holds: the control it was filled from, the readout it was
         // filled at, and the lines themselves.
         private ControlId _bufferKey;
@@ -86,6 +91,12 @@ namespace SongsOfConquestAccess.UI
             // columns, and a grid is the map. RoleGrid stays where the widget screens still say it.
             GraphSheet.TableRoleText = () => ModText.Get(ModStrings.UI.RoleTable);
             GraphSheet.TextCellType = ControlTypes.Text;
+
+            // The carry's three gestures, named to the engine so its pick-up announcement and its
+            // two derived hints spell whatever chords those actions are bound to now.
+            CarryState.PickUpAction = AccessibilityActions.UiCarry.Key;
+            CarryState.DropAction = AccessibilityActions.UiLeftClick.Key;
+            CarryState.CancelAction = AccessibilityActions.UiBack.Key;
         }
 
         public static void ResetWiring()
@@ -94,12 +105,29 @@ namespace SongsOfConquestAccess.UI
             GraphSheet.Reset();
             NodeHints.Reset();
             KeyGraph.Reset();
+            CarrySounds.Reset();
         }
 
         public GraphNavigator()
         {
             _typeAhead.OnLand = LandOnSearchResult;
             _typeAhead.OnNoMatch = SayNoMatch;
+            // The announcer derives the "draggable" and "drop target" words, and the buffer the two
+            // drag hints, from THIS carry: one live drag per navigator, dropped again by
+            // GraphAnnouncer.Reset in ResetWiring.
+            GraphAnnouncer.Carry = _carry;
+            // And the game's own drag noises, so the keyboard's carry sounds like the mouse's drag.
+            // Which cargo has a sound at all is a screen's answer (ui/CarrySounds.cs), never this
+            // file's: nothing is wired to a sound here.
+            _carry.Started = CarrySounds.Started;
+            _carry.Ended = CarrySounds.Ended;
+        }
+
+        /// <summary>What the player is carrying - see <see cref="CarryState"/>. Never null; an empty
+        /// carry is the normal state.</summary>
+        public CarryState Carry
+        {
+            get { return _carry; }
         }
 
         public GraphScreen Screen
@@ -187,6 +215,7 @@ namespace SongsOfConquestAccess.UI
             }
 
             _screen = screen;
+            CarryFollowedThePage();
             ClearSearch();
             _lastSpokenKey = null;
             _lastSpokenNode = null;
@@ -243,6 +272,15 @@ namespace SongsOfConquestAccess.UI
             _states.Remove(from);
             _states[to] = state;
 
+            // The SAME page, rebuilt as a new object: what is being held is still being held over it,
+            // so the carry moves to the incoming instance rather than lapsing under it.
+            if (_carry.IsCarrying && ReferenceEquals(_carry.Owner, from))
+            {
+                _carry.PickUp(_carry.Held, to);
+            }
+
+            CarryFollowedThePage();
+
             if (_pendingFocus != null && ReferenceEquals(_pendingFocus.Owner, from))
             {
                 _pendingFocus = new FocusRequest(
@@ -278,6 +316,8 @@ namespace SongsOfConquestAccess.UI
             {
                 _pendingFocus = null;
             }
+
+            CarryFollowedThePage();
 
             if (ReferenceEquals(screen, _screen))
             {
@@ -365,8 +405,12 @@ namespace SongsOfConquestAccess.UI
                     return HasAdjust();
                 case "ui_right_click":
                     return HasContextual();
+                case "ui_carry":
+                    return CarryActions.Claims(FocusedVtable(), _carry);
                 case "ui_back":
-                    return _screen.ConsumesBack;
+                    // Putting down what is being held is the back key's first meaning, whatever the
+                    // screen would otherwise do with it.
+                    return _carry.IsCarrying || _screen.ConsumesBack;
                 default:
                     // ui_clear_search is claimed above, only while a search is live.
                     return false;
@@ -380,6 +424,13 @@ namespace SongsOfConquestAccess.UI
             if (_screen == null || _graph == null)
             {
                 return false;
+            }
+
+            if (actionKey == "ui_carry" && _typeAhead.HasBuffer)
+            {
+                // A space typed into a search is TEXT, and the search takes it in TypeAheadTick.
+                // Claimed all the same, so the game does not also act on it.
+                return true;
             }
 
             if (_typeAhead.IsActive && SearchAction(actionKey))
@@ -417,8 +468,12 @@ namespace SongsOfConquestAccess.UI
                     return Activate();
                 case "ui_right_click":
                     return Contextual();
+                case "ui_carry":
+                    return CarryKey();
                 case "ui_back":
-                    return _screen.Back();
+                    // Putting down what is being held comes before anything the screen does with the
+                    // key: the carry is the mode the player is in, and the screen underneath is not.
+                    return CancelCarry() || _screen.Back();
                 default:
                     // ui_clear_search only reaches here with no search live, which its claim
                     // never allows.
@@ -769,12 +824,36 @@ namespace SongsOfConquestAccess.UI
             return true;
         }
 
+        // The left click. While something is being carried this is also the key that PUTS IT DOWN: on
+        // a control that will take the cargo it drops there and nothing else happens, and on every
+        // other control it is the plain click it always was, with the carry still live underneath.
         private bool Activate()
         {
             GraphNode node = _graph.CurrentNode;
             if (node == null)
             {
                 return false;
+            }
+
+            if (_carry.IsCarrying)
+            {
+                if (!_graph.Rerender())
+                {
+                    return false;
+                }
+
+                node = _graph.CurrentNode;
+                CarryOutcome drop = CarryActions.Activate(node == null ? null : node.Vtable, _carry);
+                if (drop.Handled)
+                {
+                    Say(drop.Speech, true);
+                    return true;
+                }
+
+                if (node == null)
+                {
+                    return false;
+                }
             }
 
             if (node.Vtable.OnActivate != null)
@@ -789,6 +868,91 @@ namespace SongsOfConquestAccess.UI
             }
 
             return true;
+        }
+
+        /// <summary>
+        /// Pick something up, put it down, or swap what is being held - the whole decision is
+        /// <see cref="CarryActions.Press"/>'s, so it can be read (and tested) in one place. False
+        /// means the key was never ours here and the game should have it, which is the same answer
+        /// <see cref="Claims"/> gave the router before the press.
+        /// </summary>
+        private bool CarryKey()
+        {
+            if (!CarryActions.Claims(FocusedVtable(), _carry))
+            {
+                // Not ours here, and answered off the standing render rather than by building one:
+                // Space is pressed on screens that have nothing to do with carrying.
+                return false;
+            }
+
+            if (!_graph.Rerender())
+            {
+                return false;
+            }
+
+            GraphNode node = _graph.CurrentNode;
+            CarryOutcome outcome = CarryActions.Press(node == null ? null : node.Vtable, _carry, _screen);
+            if (!outcome.Handled)
+            {
+                return false;
+            }
+
+            Say(outcome.Speech, true);
+            return true;
+        }
+
+        // The back key while something is held: put it down, and go no further - the screen the
+        // player was carrying across is not the thing they were trying to leave.
+        private bool CancelCarry()
+        {
+            CarryOutcome outcome = CarryActions.Cancel(_carry);
+            if (!outcome.Handled)
+            {
+                return false;
+            }
+
+            Say(outcome.Speech, true);
+            return true;
+        }
+
+        /// <summary>
+        /// The focused screen changed. A carry belongs to the PAGE it started on - that is where its
+        /// drop targets are - and a screen opened OVER that page is still that page, so the question
+        /// is whether the owner is anywhere in the screen stack rather than whether it is on top. A
+        /// player can pick something up, open the drop list, a mod dialog or the split popup, and
+        /// come back still holding it; walking off the page drops it, silently.
+        /// </summary>
+        private void CarryFollowedThePage()
+        {
+            if (!_carry.IsCarrying)
+            {
+                return;
+            }
+
+            _carry.ScreenChanged(OwnerIsOnTheScreenStack());
+        }
+
+        private bool OwnerIsOnTheScreenStack()
+        {
+            ScreenManager manager = SocAccessMod.Instance == null ? null : SocAccessMod.Instance.ScreenManager;
+            IReadOnlyList<Screen> stack = manager == null ? null : manager.Stack;
+            for (int i = 0; stack != null && i < stack.Count; i++)
+            {
+                if (ReferenceEquals(stack[i], _carry.Owner))
+                {
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
+        // The focused control's vtable off the STANDING render - what the claim questions are
+        // answered from, since they are asked several times a frame and must not build anything.
+        private NodeVtable FocusedVtable()
+        {
+            GraphNode node = _graph == null ? null : _graph.CurrentNode;
+            return node == null ? null : node.Vtable;
         }
 
         // The command the game puts on a right click here. Claimed only where the control has one, so
