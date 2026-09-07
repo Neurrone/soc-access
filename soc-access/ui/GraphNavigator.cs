@@ -55,6 +55,10 @@ namespace SongsOfConquestAccess.UI
         private ControlId _liveKey;
         private readonly List<string> _liveValues = new List<string>();
 
+        // The node the player last activated, until the cursor moves: its availability flipping
+        // afterwards is the consequence of the press and is not read by the watch.
+        private ControlId _actedKey;
+
         // What the UI review buffer currently holds: the control it was filled from, the readout it was
         // filled at, and the lines themselves.
         private ControlId _bufferKey;
@@ -186,6 +190,7 @@ namespace SongsOfConquestAccess.UI
             ClearSearch();
             _lastSpokenKey = null;
             _lastSpokenNode = null;
+            _actedKey = null;
             _liveKey = null;
             _liveValues.Clear();
             _bufferKey = null;
@@ -291,6 +296,7 @@ namespace SongsOfConquestAccess.UI
             ClearSearch();
             _lastSpokenKey = null;
             _lastSpokenNode = null;
+            _actedKey = null;
             _liveKey = null;
             _liveValues.Clear();
             _bufferKey = null;
@@ -515,6 +521,7 @@ namespace SongsOfConquestAccess.UI
                 Say(GraphAnnouncer.Compose(_lastSpokenNode, node), false);
                 _lastSpokenKey = node.Id;
                 _lastSpokenNode = node;
+                _actedKey = null;
             }
 
             FillBuffer(node);
@@ -774,10 +781,11 @@ namespace SongsOfConquestAccess.UI
             {
                 _graph.Activate();
                 SpeakStateAfterChange();
-                // What the activation did to its own control is reported by StateText above, never
-                // by the live watch: a button that switched its page off (Statistics on the result
-                // page) would otherwise say "unavailable" on its way out. Re-baseline instead.
-                _liveKey = null;
+                // The acted node's AVAILABILITY flipping is the consequence the player caused (a
+                // button that switched its page off, Statistics on the result page) and is not news;
+                // its WORDS changing are (a dialogue line replaced in place by Enter), and stay the
+                // live watch's to read.
+                _actedKey = node.Id;
             }
 
             return true;
@@ -940,7 +948,9 @@ namespace SongsOfConquestAccess.UI
                 if (!string.Equals(_liveValues[i], text))
                 {
                     _liveValues[i] = text;
-                    if (!mute)
+                    bool acted = _actedKey != null && _actedKey.Equals(node.Id)
+                        && part.Kind == AnnouncementKinds.Enabled;
+                    if (!mute && !acted)
                     {
                         Say(text, false);
                     }
