@@ -62,14 +62,11 @@ namespace SongsOfConquestAccess.Screens
             get { return "gift-town-popup"; }
         }
 
-        /// <summary>The popup's own drawn heading ("Gift towns/settlements to Nealuchi").</summary>
+        /// <summary>None: each band's stop is named by its drawn header, and the first is what
+        /// arrival lands in.</summary>
         public override string ScreenName
         {
-            get
-            {
-                string header = _adapter != null ? _adapter.GiftHeader : null;
-                return string.IsNullOrWhiteSpace(header) ? null : header;
-            }
+            get { return null; }
         }
 
         public override bool IsPresent()
@@ -94,13 +91,19 @@ namespace SongsOfConquestAccess.Screens
                 return;
             }
 
+            // Each band is named by the header the game draws over it, said once on entering the
+            // stop (owner ruling 2026-09-07); the popup has no name of its own beyond them.
             builder.BeginStop(GiftStop);
+            builder.PushContext(_adapter.GiftHeader);
             BuildTowns(builder, _adapter.GetGiftTowns());
+            builder.PopContext();
 
             if (_adapter.IsRequestMenuVisible())
             {
                 builder.BeginStop(RequestStop);
+                builder.PushContext(_adapter.RequestHeader);
                 BuildTowns(builder, _adapter.GetRequestTowns());
+                builder.PopContext();
             }
 
             builder.BeginStop(CloseStop);
