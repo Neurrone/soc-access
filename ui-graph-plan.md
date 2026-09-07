@@ -14,7 +14,7 @@ current phase in §7 and its rows in §8, then `docs/dev-loop.md` for the verifi
 Every screen goes through §4's loop; the before-capture must be taken on the unported build,
 before the screen is touched. Commit per logical step and update this file as decisions are
 taken; prune it at the end of each phase so it holds only what the remaining work needs.
-Phases A and B are done (2026-09-06). Start at phase C.
+Phases A to C are done (2026-09-07). Start at phase D.
 
 Owner decisions already made (do not re-ask):
 
@@ -85,7 +85,8 @@ Paths relative to `soc-access/`. This is what the unported screens (§8) are bui
   `screens/ScreenManager.cs` is a push/pop stack (`Push`, `RefreshTop<T>`, `PushBelowTop`,
   `PushBottom`, `Pop<T>`, `Remove<T>`, global actions); `RefreshTop` lets a graph screen adopt
   the cursor and the spoken memory of the instance it replaces (`GraphNavigator.Adopt`,
-  `GraphScreen.ArrivedByRefresh`), so a refresh neither re-seats nor repeats the name.
+  `GraphScreen.ArrivedByRefresh`), so a refresh neither re-seats nor repeats the name (the incoming `ScreenName` must be what
+  the outgoing instance spoke, `GraphScreen.SpokenName`).
 - `screens/ScreenDetector.cs` is the readiness layer: about 150 `On*Ready` / `On*Changed` /
   `On*Closed` handlers called from `patches/*Patches.cs`; `ResyncFromRuntimeState` rebuilds
   the stack after a hot reload by asking each registered factory's screen `IsPresent()`;
@@ -135,11 +136,14 @@ Paths relative to `soc-access/`. Read these before porting a screen.
   the live-part watch; a recovery onto a survivor is silent while the screen is unworkable),
   `FocusNode` (pending landings), `InspectRender` (the dump), `FocusedTooltip`. A focus
   visual is re-drawn only when what it draws changes (`SameAim`). Static wiring in
-  `InstallWiring`/`ResetWiring`. Not wired yet: carry (phase D), modes (phase E), pointer
-  hover simulation.
+  `InstallWiring`/`ResetWiring`; `FocusedIndex(prefix)` for a pager's page. The live watch
+  re-reads a node whose live part count changed (a dialogue's next line). Not wired yet:
+  carry (phase D), modes (phase E). `ui/PointerHover.cs` simulates the pointer hover a card
+  reveals its detail on, released in `Stop()`.
 - `ui/GraphNodes.cs` — the factories, every one taking the same cross-cutting parameters:
   `Button`, `Group`, `Text`, `EditField`, `Checkbox`, `Slider` (Left/Right adjust; an optional
-  activation, used for a slider's drawn value box), `ComboBox`, `Tab`, `Radio`, `Choice`; the
+  activation, used for a slider's drawn value box), `ComboBox`, `Tab`, `Radio`, `Choice`, `Paragraphs` / `ParagraphParts` (a body of text as
+  one part per paragraph, `live` where the game replaces it in place under a still cursor); the
   parts (`LabelPart`, `DisabledPart`, `ValuePart`, `SelectedPart`), `TooltipSection` (every
   native tooltip is an `Indicate` section, buffer only; `Aim` makes focus draw it;
   `DoNotDrawTooltip` for an edit control, since drawing selects the component and takes the
@@ -283,53 +287,22 @@ with the localization batch, this file pruned, and a one-page handover.
 
 ### Phase B — every screen outside a running game (done)
 
-All 33 screens. Verified in phase C on shared
-classes: the map message, random event, custom message and dialogue sources of
-`MessageDialogScreen`, the save variant of `SaveLoadGameScreen`, the in-game chat (its
-recipient selector) and codex, the mod options dialog opened from the pause menu.
+All 33 screens.
 
-### Phase C â€” in-game menus, popups, forms and tables
+### Phase C — in-game menus, popups, forms and tables (done)
 
-Ported 2026-09-07, each verified by dump diff against its before-capture and by injected keys
-(`docs/phase-c-handover.md` is the record; details per screen are in the commit messages
-`4d0528e..` and the doc comments): `PauseMenuScreen`, `WorldConfirmMenuScreen`,
-`ClaimMenuScreen`, `TutorialSimpleScreen`, `TutorialSlideshowScreen` (ES2's pager, page turn
-by reflection), `StoryTextScreen` (three sources), `LevelUpScreen`, `PurchaseWielderScreen`,
-`ResearchScreen`, `BuildMenuScreen`, `OwnedEntitiesScreen`, `TroopOverviewScreen`,
-`MapEntityMiniMenuScreen`, `AdventurePlayerMenuScreen`, `GiftTownPopupScreen`,
-`SendResourcePopupScreen`, `MarketplaceScreen`, `PostBattleResultScreen`,
-`PostAdventureResultScreen`, `PostAdventureStatsScreen`; the in-game codex, the save variant
-and the map message source verified on their shared classes. Landed with them:
-`ui/PointerHover.cs` (the pointer hover simulation, released on Stop),
-`GraphNavigator.FocusedIndex`, `UITextMeshTextUtility.GetStringBuilderText` made public. The
-co-op, battle and post-game screens were captured and verified in a fresh 4-player random
-skirmish with an AI ally on the local team (the other saves on this machine are "The Enemy
-Revealed", a Yulan campaign, which the game's own save validation refuses while a BASE
-campaign is running - the Yulan addon profile "prevents use in older campaigns" - and loads
-from the main menu); a battle is reached by walking the map cursor onto a neutral army
-and pressing the right-click action twice, the post-game pages by Surrender in the pause menu.
+Twenty screens, 2026-09-07 (§8). `SpellbookScreen` and `WorldChoiceMenuScreen` moved to phase
+D, where drag is introduced. Rules learned, for every later port: a `ControlId` is equal on
+its structural key alone, so rows built under one key with different components collide
+(index the key); a tooltip that is the SOURCE of a node's parts is not also a section (it
+would read twice); a screen whose start node is its heading gets no `ScreenName`; a drawn
+band is named by pushing its drawn header as the context of its stop, not by a heading node;
+a popup with no name of its own has `ScreenName` null and lands in its first named stop; a
+text the game replaces in place (a dialogue) is one node of live parts, `{speaker}: {text}`,
+so Enter's advance is read by the watch; a list of allies or players is an expandable group
+per row whose children are its facts then its actions; a summary with rows of counts is
+lines under named regions, not a table, unless the game draws column headings.
 
-Still to verify in-game, each needing game data no reachable state produced today: the
-random event and custom message sources of `MessageDialogScreen` (`ICustomMessageMenu.Show`
-from the REPL drew the prefab's placeholder text) and the dialogue source of
-`StoryTextScreen` (campaign only), the in-game chat selector (multiplayer), the mod options
-dialog opened from the pause menu. `SpellbookScreen` and `WorldChoiceMenuScreen` moved to
-phase D, where drag is introduced (owner, 2026-09-07).
-
-Rules learned in this phase, for every later port: a `ControlId` is equal on its structural
-key alone, so rows built under one key with different components collide (index the key);
-a tooltip that is the SOURCE of a node's parts is not also a section (it would read twice);
-a screen whose start node is its heading gets no `ScreenName` (it would read twice); a
-hot reload while a natively-tracked menu is open loses the patch's static bookkeeping
-(`CombatPatches.ActivePostBattleMenus`), so the close of that menu is missed until the next
-reload; the REPL cannot name `AutoGeneratedDef` enums (go through `Enum.ToObject` on the
-parameter type) and fails with an internal compiler error when a top-level variable name is
-reused with another type in the same load.
-
-Phase C localization: `Screens.WielderDead`, `WielderOwned`, `TownStatus`,
-`TownStatusRounds`, `MarketplaceTradeColumn` added and translated with their screens. Left
-unused for the phase G sweep: `Screens.Missing`, `WorldConfirmationMenu`, `Previous`, `Next`,
-`EjectWielder`, `Description`, `Teams`, `PostAdventureStats`, `BattleResult`.
 ### Phase D — composite grids (adds `Carry` and two-sided sheets)
 
 `CommanderSheetScreen` (inventory), `ArtifactMarketScreen` (inventory), `TradingScreen`
@@ -347,7 +320,9 @@ targets are here (fewer tab stops); each gets its own proposal, measured off the
 (map grid, tile skipping, scanner, bookmarks, HUD stops, teleport mode, the summaries). The
 grid classes survive as the mode's cursor; the HUD and side panels become stops, and the
 mode node owns its keys, its buffer and its exit announcement. A pre-existing crash on quit
-to the main menu (`AdventureMapAdapter.GetInitialTile` throwing on resync) belongs here.
+to the main menu (`AdventureMapAdapter.GetInitialTile` throwing on resync) belongs here. A
+battle is reached by walking the map cursor onto a neutral army and pressing the right-click
+action twice; the post-game pages by Surrender in the pause menu (a fresh random skirmish).
 
 ### Phase F — the screen manager swap
 
@@ -390,11 +365,19 @@ variants unverified), `LoadingCompleteScreen`, `OptionsScreen`, `AdventureLobbyR
 `OnlineHostGameScreen`, `CommunityMapsSearchFilterScreen`, `DropListScreen` (new),
 `AdventureLobbyIconDropdownScreen`, `AdventureLobbyMapSelectScreen`,
 `AdventureLobbyChallengeMapSelectScreen`, `OnlineGameListScreen`, `PlayerStatsScreen`,
-`CodexScreen`, `SaveLoadGameScreen` (save variant verified in C), `CampaignMapSelectScreen`,
+`CodexScreen`, `SaveLoadGameScreen`, `CampaignMapSelectScreen`,
 `CommunityMapsHomeScreen`, `CommunityMapsCollectionScreen`, `CommunityMapsSearchResultsScreen`,
-`CommunityMapsDetailsScreen`, `AdventureLobbyPlayersScreen`, `ChatScreen` (in-game selector
-verified in C), `ModOptionsScreen` and `ModDialogScreen` (new; the nine widget-era settings
-menus are deleted). `FoldoutMenuScreen` was deleted in A.
+`CommunityMapsDetailsScreen`, `AdventureLobbyPlayersScreen`, `ChatScreen` (the in-game
+recipient selector needs a multiplayer game, unverified), `ModOptionsScreen` and
+`ModDialogScreen` (new; the nine widget-era settings menus are deleted). `FoldoutMenuScreen`
+was deleted in A. Phase C: `PauseMenuScreen`, `WorldConfirmMenuScreen`, `ClaimMenuScreen`,
+`TutorialSimpleScreen`, `TutorialSlideshowScreen`, `StoryTextScreen`, `LevelUpScreen`,
+`PurchaseWielderScreen`, `ResearchScreen`, `BuildMenuScreen`, `OwnedEntitiesScreen`,
+`TroopOverviewScreen`, `MapEntityMiniMenuScreen`, `AdventurePlayerMenuScreen`,
+`GiftTownPopupScreen`, `SendResourcePopupScreen`, `MarketplaceScreen`, `PostBattleResultScreen`,
+`PostAdventureResultScreen`, `PostAdventureStatsScreen`. Of `MessageDialogScreen`'s seven
+sources the random event and custom message ones are unverified (no reachable state produced
+them; the REPL draws the prefab's placeholder text).
 
 Remaining, with what the file constructs today and the proposed model (a proposal, not a
 decision, until the owner approves it):
@@ -427,6 +410,4 @@ decision, until the owner approves it):
   drawn layout first.
 - `ScreenDetector`'s readiness knowledge is the most expensive thing in the repo to lose. In
   phase F, move it, never rewrite it from memory.
-- A game text box the mod does not model (the widget era) traps the keyboard while the
-  stand-down limit stands; port in-game text inputs early in phase C.
 - Each phase's localization batch is real work; a phase is not done until `validate` passes.
