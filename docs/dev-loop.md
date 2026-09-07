@@ -280,3 +280,22 @@ Filled in as the loop is used; keep entries to one line each with the date.
   (dev-only, a finalizer on `AssemblyBuilder.GetTypes`) now reports the finished types instead;
   the warning "A dynamic assembly holds an unfinished type" in the log says it fired.
 - 2026-09-07: the wielder sheet opens with the game's `ToggleInventory` key, `C` by default (`POST /key` body `C` from the map); `CommanderHUD` is not a `UnityEngine.Object`, so `/eval` cannot find it, and the HUD's wielder button only selects the wielder.
+- 2026-09-07: REPL recipes for phase D fixtures. The game object is not in the project
+  context: resolve it from the AdventureScene's `Zenject.SceneContext` (`FindObjectsOfTypeAll<SceneContext>()`,
+  `Container.TryResolve<Lavapotion.Networking.IGame>()`); the same container answers
+  `IAdventureMenuSystem` and `IHUDActionSignals`. A map entity is spawned beside the wielder with
+  `game.server.Commands.ProcessServerRequest(new CreateAdventureMapEntityCommand.Request((ushort)blueprint, position))`
+  (the debug console's own route; the state appears a frame later): 174 is an artifact market
+  (Raider's Market; 156 is the resource market), 285 a standalone rally point (claim it with
+  `ClaimMapEntityCommand.Request(commanderId, entityId)`). Menus open through the menu system:
+  `ShowArtifactMarketMenu(entityId, commanderId)`, `OpenDefenceMenu(entity)`,
+  `PurchaseTroopToWielder(entity.GetComponent<IRecruitmentPoolComponent>(), commanderId, TroopParentType.Commander, null)`
+  (town, dwelling or rally point by the pool's type), `ShowHostileJoinMenu(attacker, defender, payload)`
+  with a hand-built `OnHostileOffersToJoinPayload` (`Type` under `SongsOfConquest.Common.Adventure.FightOrFlight`),
+  `IHUDActionSignals.OnTradeInitiated(new TradeInitiatedPayload(a, b, false))`; the world choice menu is
+  `container.Resolve<WorldChoiceMenu>()` from a loaded `WorldChoiceMenuInstaller` then
+  `ShowMenu(commander, header, body, List<string>)`. The wielder sheet is `CommanderSheet.Open(commanderId)`
+  and the spellbook `AdventureSpellbookOpener.ShowForCommander(state)`. The REPL rejects `foreach`
+  bodies with pattern matching or `List<T>` constructors over game types with an internal compiler
+  error; plain loops and field assignments work.
+
