@@ -17,16 +17,18 @@ namespace SongsOfConquestAccess.Screens
     /// The trade between two wielders standing next to each other. Seven places to be.
     ///
     /// THE STOP ORDER IS DELIBERATE AND IS NOT THE DRAWN ONE (owner ruling 2026-09-07): left Wielder,
-    /// right Wielder, left Equipment, left Inventory, right Equipment, right Inventory, Close. The
-    /// menu draws each side as one column - portrait, stats, modifiers, artifacts, army - so the drawn
-    /// order would put a wielder band between the two backpacks, and every transfer would then cross
-    /// it. Putting the two wielder bands first and the four artifact stops together means a carry from
-    /// one backpack to the other is one Tab away.
+    /// right Wielder, left Equipment, left Inventory, right Equipment, right Inventory, then the two
+    /// modifier bars, then Close. The menu draws each side as one column - portrait, stats,
+    /// modifiers, artifacts, army - so the drawn order would put a wielder band between the two
+    /// backpacks, and every transfer would then cross it. Putting the two wielder bands first and the
+    /// four artifact stops together means a carry from one backpack to the other is one Tab away.
     ///
     /// A WIELDER STOP HERE IS THE SHEET'S SHAPE, because the menu draws the sheet's own parts: the
-    /// portrait row, the stats band and the modifier bar with the showing tab's lines under it (both
-    /// through <c>ui/CommanderBands.cs</c>, shared with the sheet), the army rows
-    /// (<c>ui/TroopHudRows.cs</c>), and then the side's Move all button. Locked troop slots are not
+    /// portrait row, the stats band (through <c>ui/CommanderBands.cs</c>, shared with the sheet), the
+    /// army rows (<c>ui/TroopHudRows.cs</c>), and then the side's Move all button. Each side's
+    /// modifier bar, with the showing tab's lines under it, is a stop of its own after the artifact
+    /// stops, as the sheet's is: a stop lands on the alternative in force, so a bar inside the wielder
+    /// stop made Tab land on the showing tab instead of the wielder. Locked troop slots are not
     /// there to find: the menu builds both bars with <c>hideLockedSlots</c>, so only drawn slots are
     /// rows. Enter on a modifier tab switches BOTH sides, which is what the menu's own tab control
     /// (<c>TradingMenu.HandleSwitchTab</c>) does.
@@ -61,6 +63,8 @@ namespace SongsOfConquestAccess.Screens
         private const string LeftInventoryStop = "trade-left-inventory";
         private const string RightEquipmentStop = "trade-right-equipment";
         private const string RightInventoryStop = "trade-right-inventory";
+        private const string LeftModifiersStop = "trade-left-modifiers";
+        private const string RightModifiersStop = "trade-right-modifiers";
         private const string CloseStop = "trade-close";
         private const string LeftKey = "trade:left";
         private const string RightKey = "trade:right";
@@ -165,6 +169,15 @@ namespace SongsOfConquestAccess.Screens
             builder.BeginStop(RightInventoryStop);
             ArtifactSlotNodes.Inventory(builder, _adapter.Right, RightKey, AddSlotHints, Marker("right/auto-arrange"));
 
+            // The modifier bars last, each a stop of its own as the sheet's is: a stop lands on the
+            // alternative in force, so a bar inside the wielder stop made Tab land on the showing tab
+            // instead of the wielder. Read-only, so they sit after everything a transfer needs.
+            builder.BeginStop(LeftModifiersStop);
+            BuildModifiers(builder, LeftKey, _adapter.Left);
+
+            builder.BeginStop(RightModifiersStop);
+            BuildModifiers(builder, RightKey, _adapter.Right);
+
             builder.BeginStop(CloseStop);
             BuildClose(builder);
         }
@@ -198,7 +211,6 @@ namespace SongsOfConquestAccess.Screens
             builder.BeginStop(stop);
             BuildPortrait(builder, keyPrefix, side);
             BuildStats(builder, keyPrefix, side);
-            BuildModifiers(builder, keyPrefix, side);
             BuildTroops(builder, keyPrefix, side);
             BuildMoveAll(builder, keyPrefix, side);
         }

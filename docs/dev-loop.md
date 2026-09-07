@@ -298,4 +298,4 @@ Filled in as the loop is used; keep entries to one line each with the date.
   and the spellbook `AdventureSpellbookOpener.ShowForCommander(state)`. The REPL rejects `foreach`
   bodies with pattern matching or `List<T>` constructors over game types with an internal compiler
   error; plain loops and field assignments work.
-
+- 2026-09-07: a trade opened by `OnTradeInitiated` between wielders that are not adjacent refuses every cross-side artifact drop (`GiveArtifactCommand` requires `AreNeighbors`); troops still move. Put the two wielders side by side first for the artifact cases.

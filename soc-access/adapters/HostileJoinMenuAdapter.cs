@@ -204,7 +204,9 @@ namespace SongsOfConquestAccess.Adapters
 
         /// <summary>The game's own text on the accept button, which it draws only where the offer costs
         /// nothing; a paid offer draws the price INSTEAD of a word, and the price is
-        /// <see cref="AcceptGoldAmount"/> rather than the button's name.</summary>
+        /// <see cref="AcceptGoldAmount"/> rather than the button's name. A paid offer's button is still
+        /// named by the game's own word for it (<c>Adventure/FightOrFlight/Join/YesButton</c>, the text
+        /// it draws on the free variant), so the node does not read as a bare price.</summary>
         public string AcceptText
         {
             get
@@ -215,9 +217,12 @@ namespace SongsOfConquestAccess.Adapters
                     return GetText(text);
                 }
 
-                return string.IsNullOrWhiteSpace(AcceptGoldAmount)
-                    ? GetButtonText(_settings != null ? _settings.YesButton : null)
-                    : string.Empty;
+                if (string.IsNullOrWhiteSpace(AcceptGoldAmount))
+                {
+                    return GetButtonText(_settings != null ? _settings.YesButton : null);
+                }
+
+                return GameText.Get(_localization, "Adventure/FightOrFlight/Join/YesButton", string.Empty);
             }
         }
 
