@@ -13,7 +13,9 @@ marketplace, post-battle result, post-adventure result, post-adventure statistic
 checked in-game on their shared classes: the codex, the save menu, the map message popup.
 Spellbook and world choice moved to phase D. The co-op, battle and post-game screens were
 done in a fresh 4-player random skirmish with an AI ally on my team (no save on this machine
-is a non-campaign game; the campaign saves are refused as content not available).
+is a non-campaign game; the "The Enemy Revealed" saves load from the main menu but not from
+inside the base campaign, which is where I tried, by the game's own rule for the Yulan
+addon). Those saves are the route to the dialogue and random event sources still unverified.
 
 Not verified, for want of game data: the random event, custom message and dialogue sources;
 the in-game chat; the mod options dialog opened from the pause menu.

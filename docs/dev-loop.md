@@ -256,8 +256,11 @@ Filled in as the loop is used; keep entries to one line each with the date.
   Two replays of the same sequence resynced cleanly. If `State()` answers `dialog` on a bare
   map after a reload, read `DevProbe.RuntimeScreens()` before touching anything and keep the
   answer; that is the evidence the fix needs.
-- 2026-09-05: the "The Enemy Revealed" campaign saves (`QuickSave_*`, `AutoSave_1..3`) are
-  refused in-session with "Content not available", and loading `QuickSave_4` from the main
+- 2026-09-05: the "The Enemy Revealed" campaign saves (`QuickSave_*`, `AutoSave_*`) are
+  refused in-session with "Content not available" ONLY while a base-campaign save such as
+  `test` is running: the Yulan addon profile prevents use in older campaigns, and
+  `IsSaveValid` asks `AllowedInCurrentCampaign` (verified 2026-09-07; the addon manager
+  reports Rise Eternal, Vanir, Roots and Yulan owned). From the main menu they load. Loading `QuickSave_4` from the main
   menu crashed the game natively while building the scene (`The file 'none' is corrupted`,
   no mod frame). Use `test` (Vassals and Villains, round 20) as the fixture.
 - 2026-09-05: `POST /key` with `Tab` from the map raised the game window, the mod's raw input

@@ -303,8 +303,10 @@ and the map message source verified on their shared classes. Landed with them:
 `ui/PointerHover.cs` (the pointer hover simulation, released on Stop),
 `GraphNavigator.FocusedIndex`, `UITextMeshTextUtility.GetStringBuilderText` made public. The
 co-op, battle and post-game screens were captured and verified in a fresh 4-player random
-skirmish with an AI ally on the local team (every save on this machine is the refused "The
-Enemy Revealed" campaign); a battle is reached by walking the map cursor onto a neutral army
+skirmish with an AI ally on the local team (the other saves on this machine are "The Enemy
+Revealed", a Yulan campaign, which the game's own save validation refuses while a BASE
+campaign is running - the Yulan addon profile "prevents use in older campaigns" - and loads
+from the main menu); a battle is reached by walking the map cursor onto a neutral army
 and pressing the right-click action twice, the post-game pages by Surrender in the pause menu.
 
 Still to verify in-game, each needing game data no reachable state produced today: the
