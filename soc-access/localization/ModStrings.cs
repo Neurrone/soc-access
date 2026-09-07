@@ -439,7 +439,6 @@ namespace SongsOfConquestAccess.Localization
 
         public static class UI
         {
-            public static readonly ModString ArmyExchangeGrid = new ModString("UI.ArmyExchangeGrid", "Army exchange grid");
             public static readonly ModString AvailableActions = new ModString("UI.AvailableActions", "Available actions: {0}.");
             public static readonly ModString Blank = new ModString("UI.Blank", "blank");
             public static readonly ModString BufferEmpty = new ModString("UI.BufferEmpty", "Buffer empty");
@@ -484,7 +483,6 @@ namespace SongsOfConquestAccess.Localization
             public static readonly ModString Inspecting = new ModString("UI.Inspecting", "Inspecting {0}");
             public static readonly ModString InventoryGrid = new ModString("UI.InventoryGrid", "Inventory grid");
             public static readonly ModString InvalidDestination = new ModString("UI.InvalidDestination", "Invalid destination.");
-            public static readonly ModString JoiningArmy = new ModString("UI.JoiningArmy", "joining army");
             public static readonly ModString LabelValue = new ModString("UI.LabelValue", "{0}: {1}");
             public static readonly ModString NoDetails = new ModString("UI.NoDetails", "Nothing in here");
             public static readonly ModString NoScannerResults = new ModString("UI.NoScannerResults", "No scanner results");
@@ -516,7 +514,6 @@ namespace SongsOfConquestAccess.Localization
             public static readonly ModString Selected = new ModString("UI.Selected", "selected");
             public static readonly ModString SelectedCount = new ModString("UI.SelectedCount", "selected {0}x");
             public static readonly ModString Slot = new ModString("UI.Slot", "slot {0}");
-            public static readonly ModString SlotInGroup = new ModString("UI.SlotInGroup", "{0} slot {1}");
             public static readonly ModString Status = new ModString("UI.Status", "status");
             public static readonly ModString StatusChecked = new ModString("UI.StatusChecked", "checked");
             public static readonly ModString StatusCollapsed = new ModString("UI.StatusCollapsed", "collapsed");
@@ -537,7 +534,6 @@ namespace SongsOfConquestAccess.Localization
             public static readonly ModString TroopSlotWithSize = new ModString("UI.TroopSlotWithSize", "{0}, {1} / {2}, {3}");
             public static readonly ModString TroopWithSize = new ModString("UI.TroopWithSize", "{0}, {1} / {2}");
             public static readonly ModString Unselected = new ModString("UI.Unselected", "unselected");
-            public static readonly ModString WielderArmy = new ModString("UI.WielderArmy", "wielder's army");
         }
 
         public static class Screens
@@ -598,7 +594,6 @@ namespace SongsOfConquestAccess.Localization
             public static readonly ModString Defender = new ModString("Screens.Defender", "Defender");
             public static readonly ModString DefenderEssence = new ModString("Screens.DefenderEssence", "Defender essence");
             public static readonly ModString DefenderPortrait = new ModString("Screens.DefenderPortrait", "Defender portrait");
-            public static readonly ModString DefendingWielderArmy = new ModString("Screens.DefendingWielderArmy", "defending wielder army");
             public static readonly ModString DefendingWielderStatus = new ModString("Screens.DefendingWielderStatus", "Defending wielder: {0}");
             public static readonly ModString DescriptionWithMissingBuilding = new ModString("Screens.DescriptionWithMissingBuilding", "{0}. missing building");
             public static readonly ModString DisabledWithReason = new ModString("Screens.DisabledWithReason", "{0}. {1}");
@@ -703,7 +698,6 @@ namespace SongsOfConquestAccess.Localization
             public static readonly ModString TurnOrder = new ModString("Screens.TurnOrder", "Turn order");
             public static readonly ModString Unavailable = new ModString("Screens.Unavailable", "Unavailable");
             public static readonly ModString UnknownSpell = new ModString("Screens.UnknownSpell", "unknown spell");
-            public static readonly ModString VisitingWielderArmy = new ModString("Screens.VisitingWielderArmy", "visiting wielder army");
             public static readonly ModString Volume = new ModString("Screens.Volume", "Volume");
             public static readonly ModString WielderAnnouncements = new ModString("Screens.WielderAnnouncements", "Wielder announcements");
             public static readonly ModString WielderArmyPossessive = new ModString("Screens.WielderArmyPossessive", "{0}'s army");

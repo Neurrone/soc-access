@@ -330,11 +330,6 @@ msgctxt "Events.WielderTeleported"
 msgid "{0} teleported to {1}"
 msgstr "{0}传送到{1}"
 
-#. UI.ArmyExchangeGrid
-msgctxt "UI.ArmyExchangeGrid"
-msgid "Army exchange grid"
-msgstr "部队交换网格"
-
 #. UI.AvailableActions
 msgctxt "UI.AvailableActions"
 msgid "Available actions: {0}."
@@ -480,11 +475,6 @@ msgctxt "UI.InvalidDestination"
 msgid "Invalid destination."
 msgstr "无效目标。"
 
-#. UI.JoiningArmy
-msgctxt "UI.JoiningArmy"
-msgid "joining army"
-msgstr "加入的军队"
-
 #. UI.LabelValue
 msgctxt "UI.LabelValue"
 msgid "{0}: {1}"
@@ -575,11 +565,6 @@ msgctxt "UI.Slot"
 msgid "slot {0}"
 msgstr "槽位 {0}"
 
-#. UI.SlotInGroup
-msgctxt "UI.SlotInGroup"
-msgid "{0} slot {1}"
-msgstr "{0} 槽位 {1}"
-
 #. UI.Status
 msgctxt "UI.Status"
 msgid "status"
@@ -639,11 +624,6 @@ msgstr "{0}，{1} / {2}，{3}"
 msgctxt "UI.TroopWithSize"
 msgid "{0}, {1} / {2}"
 msgstr "{0}，{1} / {2}"
-
-#. UI.WielderArmy
-msgctxt "UI.WielderArmy"
-msgid "wielder's army"
-msgstr "持有者的军队"
 
 #. UI.StatusCollapsed
 msgctxt "UI.StatusCollapsed"
@@ -844,11 +824,6 @@ msgstr "当前部队，{0}"
 msgctxt "Screens.DefenderEssence"
 msgid "Defender essence"
 msgstr "防守方精华"
-
-#. Screens.DefendingWielderArmy
-msgctxt "Screens.DefendingWielderArmy"
-msgid "defending wielder army"
-msgstr "防守持有者军队"
 
 #. Screens.DefendingWielderStatus
 msgctxt "Screens.DefendingWielderStatus"
@@ -1155,11 +1130,6 @@ msgstr "回合顺序"
 msgctxt "Screens.Unavailable"
 msgid "Unavailable"
 msgstr "不可用"
-
-#. Screens.VisitingWielderArmy
-msgctxt "Screens.VisitingWielderArmy"
-msgid "visiting wielder army"
-msgstr "来访持有者军队"
 
 #. Screens.WielderArmyPossessive
 msgctxt "Screens.WielderArmyPossessive"

@@ -1874,11 +1874,6 @@ msgctxt "Combat.YourTroops"
 msgid "your troops"
 msgstr ""
 
-#. UI.ArmyExchangeGrid
-msgctxt "UI.ArmyExchangeGrid"
-msgid "Army exchange grid"
-msgstr ""
-
 #. UI.AvailableActions
 msgctxt "UI.AvailableActions"
 msgid "Available actions: {0}."
@@ -2099,11 +2094,6 @@ msgctxt "UI.InvalidDestination"
 msgid "Invalid destination."
 msgstr ""
 
-#. UI.JoiningArmy
-msgctxt "UI.JoiningArmy"
-msgid "joining army"
-msgstr ""
-
 #. UI.LabelValue
 msgctxt "UI.LabelValue"
 msgid "{0}: {1}"
@@ -2259,11 +2249,6 @@ msgctxt "UI.Slot"
 msgid "slot {0}"
 msgstr ""
 
-#. UI.SlotInGroup
-msgctxt "UI.SlotInGroup"
-msgid "{0} slot {1}"
-msgstr ""
-
 #. UI.Status
 msgctxt "UI.Status"
 msgid "status"
@@ -2362,11 +2347,6 @@ msgstr ""
 #. UI.Unselected
 msgctxt "UI.Unselected"
 msgid "unselected"
-msgstr ""
-
-#. UI.WielderArmy
-msgctxt "UI.WielderArmy"
-msgid "wielder's army"
 msgstr ""
 
 #. Screens.AdventureMap
@@ -2647,11 +2627,6 @@ msgstr ""
 #. Screens.DefenderPortrait
 msgctxt "Screens.DefenderPortrait"
 msgid "Defender portrait"
-msgstr ""
-
-#. Screens.DefendingWielderArmy
-msgctxt "Screens.DefendingWielderArmy"
-msgid "defending wielder army"
 msgstr ""
 
 #. Screens.DefendingWielderStatus
@@ -3167,11 +3142,6 @@ msgstr ""
 #. Screens.UnknownSpell
 msgctxt "Screens.UnknownSpell"
 msgid "unknown spell"
-msgstr ""
-
-#. Screens.VisitingWielderArmy
-msgctxt "Screens.VisitingWielderArmy"
-msgid "visiting wielder army"
 msgstr ""
 
 #. Screens.Volume

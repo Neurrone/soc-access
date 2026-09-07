@@ -75,20 +75,6 @@ namespace SongsOfConquestAccess.Adapters
             }
         }
 
-        public string Status
-        {
-            get
-            {
-                string name = StoredWielderName;
-                if (!string.IsNullOrWhiteSpace(name))
-                {
-                    return "Defending wielder: " + name;
-                }
-
-                return GetVisibleText(GetField<GameObject>(_panel, NoStoredWielderContainerField));
-            }
-        }
-
         /// <summary>The header the game draws over the band ("Defending wielder"), read off the
         /// prefab's own header layout. Empty where the panel draws none.</summary>
         public string HeaderText

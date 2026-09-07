@@ -330,11 +330,6 @@ msgctxt "Events.WielderTeleported"
 msgid "{0} teleported to {1}"
 msgstr "{0} se teletransportó a {1}"
 
-#. UI.ArmyExchangeGrid
-msgctxt "UI.ArmyExchangeGrid"
-msgid "Army exchange grid"
-msgstr "Cuadrícula de intercambio de ejércitos"
-
 #. UI.AvailableActions
 msgctxt "UI.AvailableActions"
 msgid "Available actions: {0}."
@@ -480,11 +475,6 @@ msgctxt "UI.InvalidDestination"
 msgid "Invalid destination."
 msgstr "Destino no válido."
 
-#. UI.JoiningArmy
-msgctxt "UI.JoiningArmy"
-msgid "joining army"
-msgstr "ejército que se une"
-
 #. UI.LabelValue
 msgctxt "UI.LabelValue"
 msgid "{0}: {1}"
@@ -575,11 +565,6 @@ msgctxt "UI.Slot"
 msgid "slot {0}"
 msgstr "ranura {0}"
 
-#. UI.SlotInGroup
-msgctxt "UI.SlotInGroup"
-msgid "{0} slot {1}"
-msgstr "{0}, ranura {1}"
-
 #. UI.Status
 msgctxt "UI.Status"
 msgid "status"
@@ -664,11 +649,6 @@ msgstr "{0}, {1} / {2}, {3}"
 msgctxt "UI.TroopWithSize"
 msgid "{0}, {1} / {2}"
 msgstr "{0}, {1} / {2}"
-
-#. UI.WielderArmy
-msgctxt "UI.WielderArmy"
-msgid "wielder's army"
-msgstr "ejército del portador"
 
 #. UI.BufferEmpty
 msgctxt "UI.BufferEmpty"
@@ -844,11 +824,6 @@ msgstr "Tropa actual, {0}"
 msgctxt "Screens.DefenderEssence"
 msgid "Defender essence"
 msgstr "Esencia del defensor"
-
-#. Screens.DefendingWielderArmy
-msgctxt "Screens.DefendingWielderArmy"
-msgid "defending wielder army"
-msgstr "ejército del portador defensor"
 
 #. Screens.DefendingWielderStatus
 msgctxt "Screens.DefendingWielderStatus"
@@ -1155,11 +1130,6 @@ msgstr "Orden de turnos"
 msgctxt "Screens.Unavailable"
 msgid "Unavailable"
 msgstr "No disponible"
-
-#. Screens.VisitingWielderArmy
-msgctxt "Screens.VisitingWielderArmy"
-msgid "visiting wielder army"
-msgstr "ejército del portador visitante"
 
 #. Screens.WielderArmyPossessive
 msgctxt "Screens.WielderArmyPossessive"

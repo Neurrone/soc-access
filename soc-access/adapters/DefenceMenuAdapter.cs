@@ -38,6 +38,9 @@ namespace SongsOfConquestAccess.Adapters
         private static readonly FieldInfo DefencePanelWielderField = AccessTools.Field(typeof(DefencePanel), "_defencePanelWielder");
 
         private static readonly FieldInfo SettlementTroopHudField = AccessTools.Field(typeof(DefencePanelTroops), "_mapEntityTroopHUD");
+        private static readonly FieldInfo MoveToDefenceButtonField = AccessTools.Field(typeof(DefencePanelTroops), "_moveToDefenceButton");
+        private static readonly FieldInfo MoveToWielderButtonField = AccessTools.Field(typeof(DefencePanelTroops), "_moveToWielderButton");
+        private static readonly FieldInfo CloseButtonField = AccessTools.Field(typeof(DefenceMenu), "_closeButton");
         private static readonly FieldInfo SettlementTroopsContainerField = AccessTools.Field(typeof(DefencePanelTroops), "_mapEntityTroopsContainer");
         private static readonly FieldInfo GarrisonTroopsField = AccessTools.Field(typeof(DefencePanelTroops), "_garrisonTroops");
         private static readonly FieldInfo BallistaTroopsField = AccessTools.Field(typeof(DefencePanelTroops), "_ballistaTroops");
@@ -54,6 +57,8 @@ namespace SongsOfConquestAccess.Adapters
         private readonly DefenceMenu _menu;
         private readonly IClientAdventureFacade _facade;
         private readonly ILocalizationHandler _localization;
+        private DefencePanelWielderAdapter _defendingWielder;
+        private TroopHudAdapter _settlementTroops;
 
         public DefenceMenuAdapter(DefenceMenu menu)
         {
@@ -127,19 +132,128 @@ namespace SongsOfConquestAccess.Adapters
             get { return GetLocalizedText("Adventure/TroopManagementMenu/DefendingTroopsHeader", "Defending troops"); }
         }
 
+        /// <summary>The band the menu draws for the wielder stored in the settlement. Kept, so the
+        /// army it holds is read off one adapter rather than a new one per operation.</summary>
         public DefencePanelWielderAdapter DefendingWielder
         {
-            get { return new DefencePanelWielderAdapter(GetDefencePanelWielder(), _facade, _localization); }
+            get
+            {
+                DefencePanelWielder panel = GetDefencePanelWielder();
+                if (_defendingWielder == null || !ReferenceEquals(_defendingWielder.Panel, panel))
+                {
+                    _defendingWielder = new DefencePanelWielderAdapter(panel, _facade, _localization);
+                }
+
+                return _defendingWielder;
+            }
         }
 
+        /// <summary>The settlement's own army. Kept: the adapter wakes the game's drag ghost when it
+        /// is made, and the rows are rebuilt on every navigation operation.</summary>
         public TroopHudAdapter SettlementTroops
         {
-            get { return new TroopHudAdapter(GetField<TroopHUD>(GetDefencePanelTroops(), SettlementTroopHudField), _facade, _localization); }
+            get
+            {
+                TroopHUD hud = GetField<TroopHUD>(GetDefencePanelTroops(), SettlementTroopHudField);
+                if (hud == null)
+                {
+                    return null;
+                }
+
+                if (_settlementTroops == null || !ReferenceEquals(_settlementTroops.Hud, hud))
+                {
+                    _settlementTroops = new TroopHudAdapter(hud, _facade, _localization);
+                }
+
+                return _settlementTroops;
+            }
+        }
+
+        /// <summary>The panel that draws the settlement's defences, whose paint state vouches for the
+        /// rows read out of it.</summary>
+        public Component TroopsPanel
+        {
+            get { return GetDefencePanelTroops(); }
+        }
+
+        /// <summary>The button that hands the stored wielder's whole army to the defences, and the one
+        /// that takes it back. The game hides both while no wielder is stored and while it would
+        /// refuse the move.</summary>
+        public Component MoveToDefenceButton
+        {
+            get { return GetMoveToDefenceButton() as Component; }
+        }
+
+        public Component MoveToWielderButton
+        {
+            get { return GetMoveToWielderButton() as Component; }
+        }
+
+        public bool IsMoveToDefenceEnabled()
+        {
+            return IsButtonEnabled(GetMoveToDefenceButton());
+        }
+
+        public bool IsMoveToWielderEnabled()
+        {
+            return IsButtonEnabled(GetMoveToWielderButton());
+        }
+
+        public Tooltip MoveToDefenceTooltip
+        {
+            get { return Tooltip.ForComponent(GetMoveToDefenceButton() as Component, _localization); }
+        }
+
+        public Tooltip MoveToWielderTooltip
+        {
+            get { return Tooltip.ForComponent(GetMoveToWielderButton() as Component, _localization); }
+        }
+
+        public bool ActivateMoveToDefence()
+        {
+            return NativeSelectionUtility.Click(GetMoveToDefenceButton());
+        }
+
+        public bool ActivateMoveToWielder()
+        {
+            return NativeSelectionUtility.Click(GetMoveToWielderButton());
+        }
+
+        public void FocusMoveToDefence()
+        {
+            NativeSelectionUtility.Select(GetMoveToDefenceButton());
+        }
+
+        public void FocusMoveToWielder()
+        {
+            NativeSelectionUtility.Select(GetMoveToWielderButton());
+        }
+
+        /// <summary>The cross the menu draws at its top right. The game only turns it on for a player
+        /// on mouse and keyboard.</summary>
+        public Component CloseButton
+        {
+            get { return GetCloseButton() as Component; }
+        }
+
+        public bool IsCloseVisible()
+        {
+            return IsVisible(GetCloseButton() as Component);
+        }
+
+        public bool ActivateClose()
+        {
+            return NativeSelectionUtility.Click(GetCloseButton());
         }
 
         public bool IsSettlementTroopsVisible()
         {
             return IsVisible(GetField<GameObject>(GetDefencePanelTroops(), SettlementTroopsContainerField));
+        }
+
+        public Component TutorialButton
+        {
+            get { return GetTutorialButton() as Component; }
         }
 
         public string GetTutorialButtonLabel()
@@ -183,6 +297,16 @@ namespace SongsOfConquestAccess.Adapters
         public bool IsUpgradeEnabled()
         {
             return IsButtonEnabled(GetUpgradeButton());
+        }
+
+        public Component DraftButton
+        {
+            get { return GetDraftButton() as Component; }
+        }
+
+        public Component UpgradeButton
+        {
+            get { return GetUpgradeButton() as Component; }
         }
 
         public bool IsDraftVisible()
@@ -365,6 +489,21 @@ namespace SongsOfConquestAccess.Adapters
             return GetField<UIButton>(_menu, TutorialButtonField);
         }
 
+        private UIButton GetCloseButton()
+        {
+            return GetField<UIButton>(_menu, CloseButtonField);
+        }
+
+        private UIButton GetMoveToDefenceButton()
+        {
+            return GetField<UIButton>(GetDefencePanelTroops(), MoveToDefenceButtonField);
+        }
+
+        private UIButton GetMoveToWielderButton()
+        {
+            return GetField<UIButton>(GetDefencePanelTroops(), MoveToWielderButtonField);
+        }
+
         private static string GetButtonLabel(UIButton button)
         {
             return SpeechTextSanitizer.Normalize(MenuButtonTextUtility.GetAllVisibleText(button));
@@ -415,6 +554,13 @@ namespace SongsOfConquestAccess.Adapters
             }
 
             public string Id { get; private set; }
+
+            /// <summary>The tooltip area the game draws for the tower, which is what a row about it
+            /// stands on.</summary>
+            public Component Source
+            {
+                get { return GetField<Component>(_entry, TowerTooltipAreaField); }
+            }
 
             public string Label
             {

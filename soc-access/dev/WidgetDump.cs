@@ -27,7 +27,6 @@ namespace SongsOfConquestAccess.Dev
         private static readonly HashSet<Type> MultiPositionTypes = new HashSet<Type>
         {
             typeof(InventoryGridWidget),
-            typeof(ArmyExchangeGridWidget),
             typeof(AdventureMapGrid),
             typeof(CombatHexGrid),
             typeof(TroopPlacementHexGrid),

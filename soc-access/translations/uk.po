@@ -350,11 +350,6 @@ msgctxt "Events.WielderTeleported"
 msgid "{0} teleported to {1}"
 msgstr "{0} телепортувався в {1}"
 
-#. UI.ArmyExchangeGrid
-msgctxt "UI.ArmyExchangeGrid"
-msgid "Army exchange grid"
-msgstr "Сітка обміну арміями"
-
 #. UI.AvailableActions
 msgctxt "UI.AvailableActions"
 msgid "Available actions: {0}."
@@ -500,11 +495,6 @@ msgctxt "UI.InvalidDestination"
 msgid "Invalid destination."
 msgstr "Недійсне місце призначення."
 
-#. UI.JoiningArmy
-msgctxt "UI.JoiningArmy"
-msgid "joining army"
-msgstr "армія, що приєднується"
-
 #. UI.LabelValue
 msgctxt "UI.LabelValue"
 msgid "{0}: {1}"
@@ -595,11 +585,6 @@ msgctxt "UI.Slot"
 msgid "slot {0}"
 msgstr "слот {0}"
 
-#. UI.SlotInGroup
-msgctxt "UI.SlotInGroup"
-msgid "{0} slot {1}"
-msgstr "{0}, слот {1}"
-
 #. UI.Status
 msgctxt "UI.Status"
 msgid "status"
@@ -659,11 +644,6 @@ msgstr "{0}, {1} / {2}, {3}"
 msgctxt "UI.TroopWithSize"
 msgid "{0}, {1} / {2}"
 msgstr "{0}, {1} / {2}"
-
-#. UI.WielderArmy
-msgctxt "UI.WielderArmy"
-msgid "wielder's army"
-msgstr "армія героя"
 
 #. UI.StatusCollapsed
 msgctxt "UI.StatusCollapsed"
@@ -864,11 +844,6 @@ msgstr "Поточне військо, {0}"
 msgctxt "Screens.DefenderEssence"
 msgid "Defender essence"
 msgstr "Есенція захисника"
-
-#. Screens.DefendingWielderArmy
-msgctxt "Screens.DefendingWielderArmy"
-msgid "defending wielder army"
-msgstr "армія героя-захисника"
 
 #. Screens.DefendingWielderStatus
 msgctxt "Screens.DefendingWielderStatus"
@@ -1175,11 +1150,6 @@ msgstr "Порядок ходів"
 msgctxt "Screens.Unavailable"
 msgid "Unavailable"
 msgstr "Недоступно"
-
-#. Screens.VisitingWielderArmy
-msgctxt "Screens.VisitingWielderArmy"
-msgid "visiting wielder army"
-msgstr "армія героя-відвідувача"
 
 #. Screens.WielderArmyPossessive
 msgctxt "Screens.WielderArmyPossessive"
