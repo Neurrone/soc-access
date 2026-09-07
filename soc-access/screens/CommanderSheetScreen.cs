@@ -60,6 +60,7 @@ namespace SongsOfConquestAccess.Screens
         private const string InventoryStop = "commander-sheet-inventory";
         private const string SkillsStop = "commander-sheet-skills";
         private const string CloseStop = "commander-sheet-close";
+        private const string KeyPrefix = "commander-sheet";
 
         private readonly CommanderSheetAdapter _adapter;
 
@@ -213,44 +214,25 @@ namespace SongsOfConquestAccess.Screens
                 Items("Modifiers", _adapter.GetActiveModifiers));
         }
 
-        /// <summary>The three modifier tabs as the ONE BAR the sheet draws: Left and Right walk it,
-        /// Enter switches. Arriving must not switch - Up from the first modifier row lands here.
-        /// </summary>
+        /// <summary>The three modifier tabs as the ONE BAR the sheet draws
+        /// (<see cref="CommanderBands.Tabs"/>).</summary>
         private void BuildModifierTabs(GraphBuilder builder)
         {
             IReadOnlyList<CommanderSheetAdapter.ModifierCategory> categories = _adapter.GetModifierCategories();
-            List<CommanderSheetAdapter.ModifierCategory> drawn = new List<CommanderSheetAdapter.ModifierCategory>();
+            List<CommanderBands.TabItem> tabs = new List<CommanderBands.TabItem>();
             for (int i = 0; i < categories.Count; i++)
             {
-                if (categories[i].Button != null)
-                {
-                    drawn.Add(categories[i]);
-                }
+                CommanderSheetAdapter.ModifierCategory it = categories[i];
+                tabs.Add(new CommanderBands.TabItem(it.Label, it.Index, it.Button, it.Tooltip));
             }
 
-            if (drawn.Count == 0)
-            {
-                return;
-            }
-
-            builder.StartRow("commander-sheet:modifier-tabs");
-            for (int i = 0; i < drawn.Count; i++)
-            {
-                CommanderSheetAdapter.ModifierCategory it = drawn[i];
-                NodeVtable vtable = GraphNodes.Tab(
-                    () => it.Label,
-                    () => _adapter.GetActiveModifierCategoryIndex() == it.Index,
-                    null,
-                    it.Tooltip);
-                vtable.OnActivate = () => _adapter.ActivateModifierCategory(it.Index);
-                vtable.OnFocusVisual = () => _adapter.SelectModifierCategory(it.Index);
-                builder.AddItem(new DrawnNode(
-                    ControlId.For(it.Button, "commander-sheet:modifier-tab/" + it.Index),
-                    vtable,
-                    it.Button));
-            }
-
-            builder.EndRow();
+            CommanderBands.Tabs(
+                builder,
+                KeyPrefix,
+                tabs,
+                _adapter.GetActiveModifierCategoryIndex,
+                index => _adapter.ActivateModifierCategory(index),
+                index => _adapter.SelectModifierCategory(index));
         }
 
         // ---- the equipment and the backpack ----
@@ -327,52 +309,22 @@ namespace SongsOfConquestAccess.Screens
         // ---- shared ----
 
         /// <summary>One of the bands the sheet draws under a caption - the stats, the specialization,
-        /// the modifiers of the showing tab, the skills, the powers. The caption is the REGION its
-        /// rows belong to rather than a row of its own, because there is nothing there to operate.
-        /// </summary>
+        /// the modifiers of the showing tab, the skills, the powers
+        /// (<see cref="CommanderBands.Band"/>).</summary>
         private void BuildBand(
             GraphBuilder builder,
             string key,
             string caption,
             IReadOnlyList<CommanderSheetAdapter.LabeledItem> items)
         {
-            if (items.Count == 0)
-            {
-                return;
-            }
-
-            bool named = !string.IsNullOrWhiteSpace(caption);
-            if (named)
-            {
-                builder.PushContext(caption);
-                builder.SetRegion("commander-sheet:" + key);
-            }
-
+            List<CommanderBands.Line> lines = new List<CommanderBands.Line>();
             for (int i = 0; i < items.Count; i++)
             {
                 CommanderSheetAdapter.LabeledItem it = items[i];
-                NodeVtable vtable = GraphNodes.Text(() => it.Label, null, it.Tooltip);
-                if (!string.IsNullOrWhiteSpace(it.Value))
-                {
-                    vtable.Announcements.Add(GraphNodes.ValuePart(() => it.Value));
-                }
-
-                if (it.OnFocus != null)
-                {
-                    vtable.OnFocusVisual = () => it.OnFocus();
-                }
-
-                builder.AddItem(new SyntheticNode(
-                    ControlId.For(Marker(key + "/" + i), "commander-sheet:" + key + "/" + i),
-                    vtable));
+                lines.Add(new CommanderBands.Line(it.Label, it.Value, it.Tooltip, it.OnFocus));
             }
 
-            if (named)
-            {
-                builder.PopContext();
-            }
-
-            builder.SetRegion(null);
+            CommanderBands.Band(builder, KeyPrefix, key, caption, lines, Marker);
         }
 
         /// <summary>One band's items, or an empty band where reading them threw: a section the game
