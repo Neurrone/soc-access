@@ -56,6 +56,27 @@ namespace SongsOfConquestAccess.Screens
             get { return true; }
         }
 
+        /// <summary>
+        /// Whether the screen takes an action the navigator has no meaning of its own for - asked
+        /// AFTER its own set, so a screen can never take a navigation key away from it. The claim is
+        /// asked before the press, as every claim is: an action nobody claims stays the game's.
+        ///
+        /// This is how a screen puts one of the GAME's own chords on one of its controls: the troop
+        /// rows' Ctrl+digit quick split (<see cref="UI.TroopHudRows"/>), and in phase E the map and
+        /// combat modes' keys, which belong to the mode node rather than to the screen at large.
+        /// </summary>
+        public virtual bool ClaimsAction(string actionKey)
+        {
+            return false;
+        }
+
+        /// <summary>Run an action <see cref="ClaimsAction"/> answered for. True when it was
+        /// handled.</summary>
+        public virtual bool OnAction(string actionKey)
+        {
+            return false;
+        }
+
         /// <summary>The back key was pressed. Return true when the screen handled it; false lets the
         /// game's own handling stand.</summary>
         public virtual bool Back()

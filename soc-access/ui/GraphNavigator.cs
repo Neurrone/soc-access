@@ -417,8 +417,9 @@ namespace SongsOfConquestAccess.UI
                     // screen would otherwise do with it.
                     return _carry.IsCarrying || _screen.ConsumesBack;
                 default:
-                    // ui_clear_search is claimed above, only while a search is live.
-                    return false;
+                    // ui_clear_search is claimed above, only while a search is live. Anything else is
+                    // the screen's to take or to leave to the game.
+                    return _screen.ClaimsAction(actionKey);
             }
         }
 
@@ -482,7 +483,7 @@ namespace SongsOfConquestAccess.UI
                 default:
                     // ui_clear_search only reaches here with no search live, which its claim
                     // never allows.
-                    return false;
+                    return _screen.OnAction(actionKey);
             }
         }
 

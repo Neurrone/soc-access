@@ -321,6 +321,7 @@ namespace SongsOfConquestAccess.Localization
             public static readonly ModString SummarizeEnemyResources = new ModString("Actions.SummarizeEnemyResources", "Summarize Enemy Resources");
             public static readonly ModString SummarizeResources = new ModString("Actions.SummarizeResources", "Summarize Resources");
             public static readonly ModString TooltipActionsMenu = new ModString("Actions.TooltipActionsMenu", "Tooltip Actions Menu");
+            public static readonly ModPluralString TroopSplit = new ModPluralString("Actions.TroopSplit", "Split Off {0} Troop", "Split Off {0} Troops");
             public static readonly ModString UiBack = new ModString("Actions.UiBack", "Back");
             public static readonly ModString UiCarry = new ModString("Actions.UiCarry", "Pick up or drop");
             public static readonly ModString UiClearSearch = new ModString("Actions.UiClearSearch", "Clear Search");
@@ -534,6 +535,7 @@ namespace SongsOfConquestAccess.Localization
             public static readonly ModString Target = new ModString("UI.Target", "target");
             public static readonly ModString TroopSlot = new ModString("UI.TroopSlot", "{0}, {1}");
             public static readonly ModString TroopSlotWithSize = new ModString("UI.TroopSlotWithSize", "{0}, {1} / {2}, {3}");
+            public static readonly ModString TroopWithSize = new ModString("UI.TroopWithSize", "{0}, {1} / {2}");
             public static readonly ModString Unselected = new ModString("UI.Unselected", "unselected");
             public static readonly ModString WielderArmy = new ModString("UI.WielderArmy", "wielder's army");
         }
@@ -694,6 +696,8 @@ namespace SongsOfConquestAccess.Localization
             public static readonly ModString Tower = new ModString("Screens.Tower", "Tower {0}");
             public static readonly ModString Towers = new ModString("Screens.Towers", "Towers");
             public static readonly ModString TroopDistribution = new ModString("Screens.TroopDistribution", "troop distribution");
+            public static readonly ModString TroopDisbandHint = new ModString("Screens.TroopDisbandHint", "{0} disbands");
+            public static readonly ModString TroopMoveWholeHint = new ModString("Screens.TroopMoveWholeHint", "{0} moves the whole troop");
             public static readonly ModString TroopDeployment = new ModString("Screens.TroopDeployment", "Troop deployment");
             public static readonly ModString TroopPlacement = new ModString("Screens.TroopPlacement", "Troop placement");
             public static readonly ModString TroopAnnouncements = new ModString("Screens.TroopAnnouncements", "Troop announcements");

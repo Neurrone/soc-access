@@ -427,6 +427,61 @@ namespace SongsOfConquestAccess.Input
         public static readonly InputAction ReadThreat = OneShot("read_threat", ModStrings.Actions.ReadThreat, InputClaimScope.FocusedWidget)
             .AddBinding(new KeyboardBinding(Key.S));
 
+        /// <summary>
+        /// The game's own quick split, Ctrl+1 to Ctrl+0 (<c>InputActions.Adventure.SplitTroopSize1</c>
+        /// to <c>SplitTroopSize10</c>), which splits that many off the troop the POINTER is over into
+        /// the first free slot. The mod claims a chord only on a troop row of a graph screen and drives
+        /// the game's own handler with that row as the hovered entry (<see cref="UI.TroopHudRows"/>);
+        /// everywhere else the key stays the game's. The map's bookmark chords are the same physical
+        /// keys but scoped to the focused map grid, so the two never both answer.
+        /// </summary>
+        public static readonly InputAction[] TroopSplits = CreateTroopSplitActions();
+
+        private static InputAction[] CreateTroopSplitActions()
+        {
+            Key[] digitKeys =
+            {
+                Key.Digit1,
+                Key.Digit2,
+                Key.Digit3,
+                Key.Digit4,
+                Key.Digit5,
+                Key.Digit6,
+                Key.Digit7,
+                Key.Digit8,
+                Key.Digit9,
+                Key.Digit0
+            };
+            InputAction[] actions = new InputAction[digitKeys.Length];
+            for (int i = 0; i < digitKeys.Length; i++)
+            {
+                int size = i + 1;
+                actions[i] = new InputAction(
+                        "troop_split_" + size,
+                        () => ModText.Plural(ModStrings.Actions.TroopSplit, size, size),
+                        InputClaimScope.Screen,
+                        InputRepeatPolicy.OneShotUntilRelease())
+                    .AddBinding(new KeyboardBinding(digitKeys[i], ctrl: true));
+            }
+
+            return actions;
+        }
+
+        /// <summary>How many troops the quick-split action <paramref name="actionKey"/> splits off, or
+        /// zero when it is not one of them.</summary>
+        public static int TroopSplitSize(string actionKey)
+        {
+            for (int i = 0; i < TroopSplits.Length; i++)
+            {
+                if (TroopSplits[i].Key == actionKey)
+                {
+                    return i + 1;
+                }
+            }
+
+            return 0;
+        }
+
         public static readonly InputAction[] SaveBookmarks =
             CreateBookmarkActions("save_bookmark", "SaveBookmark", ctrl: true, shift: false, alt: false);
 
@@ -646,6 +701,7 @@ namespace SongsOfConquestAccess.Input
                 UiBack
             };
 
+            actions.AddRange(TroopSplits);
             actions.AddRange(SaveBookmarks);
             actions.AddRange(JumpToBookmarks);
             actions.AddRange(SpeakBookmarkDirections);
