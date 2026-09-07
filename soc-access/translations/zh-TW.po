@@ -850,6 +850,12 @@ msgctxt "Screens.DefendingWielderArmy"
 msgid "defending wielder army"
 msgstr "防守持有者军队"
 
+#. Screens.DefendingWielderStatus
+msgctxt "Screens.DefendingWielderStatus"
+msgid "Defending wielder: {0}"
+msgstr "防守持有者：{0}"
+
+
 #. Screens.DescriptionWithMissingBuilding
 msgctxt "Screens.DescriptionWithMissingBuilding"
 msgid "{0}. missing building"
@@ -2879,6 +2885,18 @@ msgstr "全部移到左側"
 msgctxt "Screens.MoveAllRight"
 msgid "Move all right"
 msgstr "全部移到右側"
+
+#. Screens.MoveAllToDefence
+msgctxt "Screens.MoveAllToDefence"
+msgid "Move all to defence"
+msgstr "全部移到防守方"
+
+
+#. Screens.MoveAllToWielder
+msgctxt "Screens.MoveAllToWielder"
+msgid "Move all to wielder"
+msgstr "全部移到持有者"
+
 
 #. Screens.CustomCategories
 msgctxt "Screens.CustomCategories"

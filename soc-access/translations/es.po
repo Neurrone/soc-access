@@ -850,6 +850,12 @@ msgctxt "Screens.DefendingWielderArmy"
 msgid "defending wielder army"
 msgstr "ejército del portador defensor"
 
+#. Screens.DefendingWielderStatus
+msgctxt "Screens.DefendingWielderStatus"
+msgid "Defending wielder: {0}"
+msgstr "Portador defensor: {0}"
+
+
 #. Screens.DescriptionWithMissingBuilding
 msgctxt "Screens.DescriptionWithMissingBuilding"
 msgid "{0}. missing building"
@@ -2899,6 +2905,18 @@ msgstr "Mover todo a la izquierda"
 msgctxt "Screens.MoveAllRight"
 msgid "Move all right"
 msgstr "Mover todo a la derecha"
+
+#. Screens.MoveAllToDefence
+msgctxt "Screens.MoveAllToDefence"
+msgid "Move all to defence"
+msgstr "Mover todo a la defensa"
+
+
+#. Screens.MoveAllToWielder
+msgctxt "Screens.MoveAllToWielder"
+msgid "Move all to wielder"
+msgstr "Mover todo al portador"
+
 
 #. Screens.CustomCategories
 msgctxt "Screens.CustomCategories"

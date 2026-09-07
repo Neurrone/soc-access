@@ -850,6 +850,12 @@ msgctxt "Screens.DefendingWielderArmy"
 msgid "defending wielder army"
 msgstr "방어 중인 위더 군대"
 
+#. Screens.DefendingWielderStatus
+msgctxt "Screens.DefendingWielderStatus"
+msgid "Defending wielder: {0}"
+msgstr "방어 중인 위더: {0}"
+
+
 #. Screens.DescriptionWithMissingBuilding
 msgctxt "Screens.DescriptionWithMissingBuilding"
 msgid "{0}. missing building"
@@ -2879,6 +2885,18 @@ msgstr "모두 왼쪽으로 이동"
 msgctxt "Screens.MoveAllRight"
 msgid "Move all right"
 msgstr "모두 오른쪽으로 이동"
+
+#. Screens.MoveAllToDefence
+msgctxt "Screens.MoveAllToDefence"
+msgid "Move all to defence"
+msgstr "모두 방어 병력으로 이동"
+
+
+#. Screens.MoveAllToWielder
+msgctxt "Screens.MoveAllToWielder"
+msgid "Move all to wielder"
+msgstr "모두 위더에게 이동"
+
 
 #. Screens.CustomCategories
 msgctxt "Screens.CustomCategories"

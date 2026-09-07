@@ -599,6 +599,7 @@ namespace SongsOfConquestAccess.Localization
             public static readonly ModString DefenderEssence = new ModString("Screens.DefenderEssence", "Defender essence");
             public static readonly ModString DefenderPortrait = new ModString("Screens.DefenderPortrait", "Defender portrait");
             public static readonly ModString DefendingWielderArmy = new ModString("Screens.DefendingWielderArmy", "defending wielder army");
+            public static readonly ModString DefendingWielderStatus = new ModString("Screens.DefendingWielderStatus", "Defending wielder: {0}");
             public static readonly ModString DescriptionWithMissingBuilding = new ModString("Screens.DescriptionWithMissingBuilding", "{0}. missing building");
             public static readonly ModString DisabledWithReason = new ModString("Screens.DisabledWithReason", "{0}. {1}");
             public static readonly ModString Downloads = new ModString("Screens.Downloads", "Downloads");
@@ -627,6 +628,8 @@ namespace SongsOfConquestAccess.Localization
             public static readonly ModString MarketplaceTradeColumn = new ModString("Screens.MarketplaceTradeColumn", "{0} {1}");
             public static readonly ModString MoveAllLeft = new ModString("Screens.MoveAllLeft", "Move all left");
             public static readonly ModString MoveAllRight = new ModString("Screens.MoveAllRight", "Move all right");
+            public static readonly ModString MoveAllToDefence = new ModString("Screens.MoveAllToDefence", "Move all to defence");
+            public static readonly ModString MoveAllToWielder = new ModString("Screens.MoveAllToWielder", "Move all to wielder");
             public static readonly ModString LeftRightDistribution = new ModString("Screens.LeftRightDistribution", "Left: {0}, right: {1}");
             public static readonly ModString MultiEssenceSpells = new ModString("Screens.MultiEssenceSpells", "Multi-essence spells");
             public static readonly ModString NamedLevel = new ModString("Screens.NamedLevel", "{0}, level {1}");

@@ -870,6 +870,12 @@ msgctxt "Screens.DefendingWielderArmy"
 msgid "defending wielder army"
 msgstr "армия защищающегося героя"
 
+#. Screens.DefendingWielderStatus
+msgctxt "Screens.DefendingWielderStatus"
+msgid "Defending wielder: {0}"
+msgstr "Защищающийся герой: {0}"
+
+
 #. Screens.DescriptionWithMissingBuilding
 msgctxt "Screens.DescriptionWithMissingBuilding"
 msgid "{0}. missing building"
@@ -2919,6 +2925,18 @@ msgstr "Переместить всех влево"
 msgctxt "Screens.MoveAllRight"
 msgid "Move all right"
 msgstr "Переместить всех вправо"
+
+#. Screens.MoveAllToDefence
+msgctxt "Screens.MoveAllToDefence"
+msgid "Move all to defence"
+msgstr "Переместить всех в оборону"
+
+
+#. Screens.MoveAllToWielder
+msgctxt "Screens.MoveAllToWielder"
+msgid "Move all to wielder"
+msgstr "Переместить всех герою"
+
 
 #. Screens.CustomCategories
 msgctxt "Screens.CustomCategories"

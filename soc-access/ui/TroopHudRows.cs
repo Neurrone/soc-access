@@ -65,18 +65,54 @@ namespace SongsOfConquestAccess.UI
                 return;
             }
 
-            builder.BeginStop(stopKey);
-            AddPortrait(builder, keyPrefix, wielder);
+            WielderInteract it = wielder;
+            WielderStop(
+                builder,
+                stopKey,
+                keyPrefix,
+                it.Portrait,
+                () => it.WielderName,
+                () => it.CustomName,
+                it.PortraitTooltip,
+                () => it.FocusPortrait(),
+                it.Troops);
+        }
 
-            string troops = GameText.Get("Commanders/Tooltip/Troops", string.Empty);
-            bool named = !string.IsNullOrWhiteSpace(troops);
+        /// <summary>
+        /// The same stop built from the PARTS, for a band the game draws without a
+        /// <c>WielderInteractHeader</c> over it - the defence menu's stored wielder, whose portrait and
+        /// army hang off <c>DefencePanelWielder</c> instead.
+        /// </summary>
+        /// <param name="customName">The banner naming the place the wielder walked into, where the band
+        /// draws one; null where it draws none.</param>
+        public static void WielderStop(
+            GraphBuilder builder,
+            object stopKey,
+            string keyPrefix,
+            Component portrait,
+            Func<string> wielderName,
+            Func<string> customName,
+            Tooltip portraitTooltip,
+            Action focusPortrait,
+            TroopHudAdapter troops)
+        {
+            if (builder == null || troops == null)
+            {
+                return;
+            }
+
+            builder.BeginStop(stopKey);
+            AddPortrait(builder, keyPrefix, portrait, wielderName, customName, portraitTooltip, focusPortrait);
+
+            string caption = GameText.Get("Commanders/Tooltip/Troops", string.Empty);
+            bool named = !string.IsNullOrWhiteSpace(caption);
             if (named)
             {
-                builder.PushContext(troops);
+                builder.PushContext(caption);
                 builder.SetRegion(keyPrefix + ":troops");
             }
 
-            Rows(builder, wielder.Troops, RowPrefix(keyPrefix));
+            Rows(builder, troops, RowPrefix(keyPrefix));
 
             if (named)
             {
@@ -175,19 +211,33 @@ namespace SongsOfConquestAccess.UI
         /// walked into where the band draws one, with the stats the game draws on their portrait behind
         /// both in the buffer. Focusing it selects the portrait, which is what makes the game draw
         /// those stats.</summary>
-        private static void AddPortrait(GraphBuilder builder, string keyPrefix, WielderInteract wielder)
+        private static void AddPortrait(
+            GraphBuilder builder,
+            string keyPrefix,
+            Component portrait,
+            Func<string> wielderName,
+            Func<string> customName,
+            Tooltip portraitTooltip,
+            Action focusPortrait)
         {
-            Component portrait = wielder.Portrait;
             if (portrait == null)
             {
                 return;
             }
 
-            NodeVtable vtable = GraphNodes.Text(() => wielder.WielderName, null, wielder.PortraitTooltip);
-            // The banner the band draws over the portrait when the place the wielder walked into has a
-            // name of its own; watched, since the game writes it as the band is set up.
-            vtable.Announcements.Add(GraphNodes.ValuePart(() => wielder.CustomName));
-            vtable.OnFocusVisual = () => wielder.FocusPortrait();
+            NodeVtable vtable = GraphNodes.Text(wielderName, null, portraitTooltip);
+            if (customName != null)
+            {
+                // The banner the band draws over the portrait when the place the wielder walked into
+                // has a name of its own; watched, since the game writes it as the band is set up.
+                vtable.Announcements.Add(GraphNodes.ValuePart(customName));
+            }
+
+            if (focusPortrait != null)
+            {
+                vtable.OnFocusVisual = () => focusPortrait();
+            }
+
             builder.AddItem(new DrawnNode(
                 ControlId.For(portrait, keyPrefix + "/portrait"),
                 vtable,

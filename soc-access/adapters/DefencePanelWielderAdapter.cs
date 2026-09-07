@@ -28,12 +28,20 @@ namespace SongsOfConquestAccess.Adapters
         private readonly DefencePanelWielder _panel;
         private readonly IClientAdventureFacade _facade;
         private readonly ILocalizationHandler _localization;
+        private TroopHudAdapter _troops;
 
         public DefencePanelWielderAdapter(DefencePanelWielder panel, IClientAdventureFacade facade, ILocalizationHandler localization)
         {
             _panel = panel;
             _facade = facade;
             _localization = localization;
+        }
+
+        /// <summary>The band this reads, so an owner keeping one of these can tell whether the menu
+        /// has swapped its panel out from under it.</summary>
+        public DefencePanelWielder Panel
+        {
+            get { return _panel; }
         }
 
         public bool IsPresent
@@ -81,6 +89,40 @@ namespace SongsOfConquestAccess.Adapters
             }
         }
 
+        /// <summary>The header the game draws over the band ("Defending wielder"), read off the
+        /// prefab's own header layout. Empty where the panel draws none.</summary>
+        public string HeaderText
+        {
+            get
+            {
+                Component panel = _panel;
+                Transform root = panel != null ? panel.transform : null;
+                Transform header = root != null ? root.Find("Background/HeaderLayout") : null;
+                if (header == null && root != null)
+                {
+                    header = root.Find("HeaderLayout");
+                }
+
+                return header == null
+                    ? string.Empty
+                    : GetText(header.GetComponentInChildren<UITextMesh>(includeInactive: false));
+            }
+        }
+
+        /// <summary>What the game writes where no wielder is stored ("Place wielder inside building to
+        /// strengthen the defences").</summary>
+        public string NoStoredWielderText
+        {
+            get { return GetVisibleText(GetField<GameObject>(_panel, NoStoredWielderContainerField)); }
+        }
+
+        /// <summary>The stored wielder's portrait, whose details are the stats the game draws on
+        /// hover.</summary>
+        public Component Portrait
+        {
+            get { return GetField<Component>(_panel, PortraitImageField); }
+        }
+
         public Tooltip PortraitTooltip
         {
             get { return Tooltip.ForComponent(GetField<Component>(_panel, PortraitImageField), _localization); }
@@ -91,9 +133,25 @@ namespace SongsOfConquestAccess.Adapters
             NativeSelectionUtility.Select(GetField<Component>(_panel, PortraitImageField));
         }
 
+        /// <summary>The stored wielder's army, or null before the band has been set up. Kept: the
+        /// adapter wakes the game's drag ghost when it is made.</summary>
         public TroopHudAdapter Troops
         {
-            get { return new TroopHudAdapter(GetField<TroopHUD>(_panel, TroopHudField), _facade, _localization); }
+            get
+            {
+                TroopHUD hud = GetField<TroopHUD>(_panel, TroopHudField);
+                if (hud == null)
+                {
+                    return null;
+                }
+
+                if (_troops == null || !ReferenceEquals(_troops.Hud, hud))
+                {
+                    _troops = new TroopHudAdapter(hud, _facade, _localization);
+                }
+
+                return _troops;
+            }
         }
 
         public string StoreLabel
@@ -109,6 +167,23 @@ namespace SongsOfConquestAccess.Adapters
         public string TradeLabel
         {
             get { return GetButtonLabel(GetTradeButton(), "Adventure/TooltipInstruction/Trade", "Trade"); }
+        }
+
+        /// <summary>The three buttons the band draws, for the screens that declare them as controls.
+        /// </summary>
+        public Component StoreButton
+        {
+            get { return GetStoreButton() as Component; }
+        }
+
+        public Component EjectButton
+        {
+            get { return GetEjectButton() as Component; }
+        }
+
+        public Component TradeButton
+        {
+            get { return GetTradeButton() as Component; }
         }
 
         public bool IsStoreVisible()

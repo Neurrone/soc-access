@@ -850,6 +850,12 @@ msgctxt "Screens.DefendingWielderArmy"
 msgid "defending wielder army"
 msgstr "savunan wielder ordusu"
 
+#. Screens.DefendingWielderStatus
+msgctxt "Screens.DefendingWielderStatus"
+msgid "Defending wielder: {0}"
+msgstr "Savunan wielder: {0}"
+
+
 #. Screens.DescriptionWithMissingBuilding
 msgctxt "Screens.DescriptionWithMissingBuilding"
 msgid "{0}. missing building"
@@ -2879,6 +2885,18 @@ msgstr "Tümünü sola taşı"
 msgctxt "Screens.MoveAllRight"
 msgid "Move all right"
 msgstr "Tümünü sağa taşı"
+
+#. Screens.MoveAllToDefence
+msgctxt "Screens.MoveAllToDefence"
+msgid "Move all to defence"
+msgstr "Tümünü savunmaya taşı"
+
+
+#. Screens.MoveAllToWielder
+msgctxt "Screens.MoveAllToWielder"
+msgid "Move all to wielder"
+msgstr "Tümünü wielder'a taşı"
+
 
 #. Screens.CustomCategories
 msgctxt "Screens.CustomCategories"

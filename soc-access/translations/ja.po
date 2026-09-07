@@ -850,6 +850,12 @@ msgctxt "Screens.DefendingWielderArmy"
 msgid "defending wielder army"
 msgstr "防御中のウィールダー軍"
 
+#. Screens.DefendingWielderStatus
+msgctxt "Screens.DefendingWielderStatus"
+msgid "Defending wielder: {0}"
+msgstr "防御中のウィールダー: {0}"
+
+
 #. Screens.DescriptionWithMissingBuilding
 msgctxt "Screens.DescriptionWithMissingBuilding"
 msgid "{0}. missing building"
@@ -2879,6 +2885,18 @@ msgstr "すべて左へ移動"
 msgctxt "Screens.MoveAllRight"
 msgid "Move all right"
 msgstr "すべて右へ移動"
+
+#. Screens.MoveAllToDefence
+msgctxt "Screens.MoveAllToDefence"
+msgid "Move all to defence"
+msgstr "すべて防御側へ移動"
+
+
+#. Screens.MoveAllToWielder
+msgctxt "Screens.MoveAllToWielder"
+msgid "Move all to wielder"
+msgstr "すべてウィールダーへ移動"
+
 
 #. Screens.CustomCategories
 msgctxt "Screens.CustomCategories"

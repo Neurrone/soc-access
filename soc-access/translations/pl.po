@@ -855,6 +855,12 @@ msgctxt "Screens.DefendingWielderArmy"
 msgid "defending wielder army"
 msgstr "armia broniącego bohatera"
 
+#. Screens.DefendingWielderStatus
+msgctxt "Screens.DefendingWielderStatus"
+msgid "Defending wielder: {0}"
+msgstr "Broniący bohater: {0}"
+
+
 #. Screens.DescriptionWithMissingBuilding
 msgctxt "Screens.DescriptionWithMissingBuilding"
 msgid "{0}. missing building"
@@ -2919,6 +2925,18 @@ msgstr "Przenieś wszystko w lewo"
 msgctxt "Screens.MoveAllRight"
 msgid "Move all right"
 msgstr "Przenieś wszystko w prawo"
+
+#. Screens.MoveAllToDefence
+msgctxt "Screens.MoveAllToDefence"
+msgid "Move all to defence"
+msgstr "Przenieś wszystko do obrony"
+
+
+#. Screens.MoveAllToWielder
+msgctxt "Screens.MoveAllToWielder"
+msgid "Move all to wielder"
+msgstr "Przenieś wszystko do bohatera"
+
 
 #. Screens.CustomCategories
 msgctxt "Screens.CustomCategories"
