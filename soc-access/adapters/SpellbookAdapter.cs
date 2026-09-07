@@ -344,33 +344,30 @@ namespace SongsOfConquestAccess.Adapters
         }
 
         /// <summary>
-        /// The slot's own main button, clicked the way the pointer clicks it, so the game's own
-        /// dispatch decides what a click on a quick bar spell means.
-        ///
-        /// Guarded because on the ADVENTURE map the game's own listener throws:
-        /// <c>SpellbookQuickbar.HandleClickedSpell</c> reads <c>_battleFacade.Teams</c>, and outside a
-        /// battle there is no battle facade (seen 2026-09-07 through <c>/log</c>). Nothing is put in
-        /// its place - the click simply does what the mouse's does, which is nothing - but the
-        /// exception must not travel up through the mod's own update.
+        /// Whether a click on a quick bar slot does anything here: the game's own listener
+        /// (<c>SpellbookQuickbar.HandleClickedSpell</c>) casts the spell in BATTLE and reads the battle
+        /// facade to do it, and on the adventure map there is none, so the mouse's click does nothing
+        /// there (the game throws inside its own dispatch and swallows it). A slot on the map therefore
+        /// declares no click at all rather than delivering one the game cannot take.
         /// </summary>
+        public bool CanActivateQuickbar()
+        {
+            return !IsInAdventure();
+        }
+
+        /// <summary>The slot's own main button, clicked the way the pointer clicks it, so the game's
+        /// own dispatch decides what a click on a quick bar spell means. Only where
+        /// <see cref="CanActivateQuickbar"/> says the game has a listener that can take it.</summary>
         public bool ActivateQuickbar(SpellbookQuickbarEntry entry)
         {
-            FocusQuickbar(entry);
-            Button button = QuickbarMainButtonField != null ? QuickbarMainButtonField.GetValue(entry) as Button : null;
-            if (button == null)
+            if (!CanActivateQuickbar())
             {
                 return false;
             }
 
-            try
-            {
-                return NativeSelectionUtility.Click(button);
-            }
-            catch (Exception exception)
-            {
-                SocAccessMod.Instance?.LogWarning("Spellbook quickbar click threw inside the game's own handler: " + exception);
-                return false;
-            }
+            FocusQuickbar(entry);
+            Button button = QuickbarMainButtonField != null ? QuickbarMainButtonField.GetValue(entry) as Button : null;
+            return button != null && NativeSelectionUtility.Click(button);
         }
 
 
@@ -1066,6 +1063,8 @@ namespace SongsOfConquestAccess.Adapters
             {
                 get { return HasSpell ? _adapter.GetSpellLabel(_entry.Spell) : string.Empty; }
             }
+
+            public bool CanActivate { get { return _adapter.CanActivateQuickbar(); } }
 
             public bool Activate() { return _entry != null && _adapter.ActivateQuickbar(_entry); }
 

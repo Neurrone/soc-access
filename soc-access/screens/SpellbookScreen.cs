@@ -258,9 +258,12 @@ namespace SongsOfConquestAccess.Screens
             SpellbookAdapter.QuickbarItem it = item;
             ControlId id = ControlId.For(it.Entry, "spellbook:slot/" + index);
             Func<string> label = () => it.HasSpell ? it.SpellName : ModText.Get(ModStrings.Screens.Empty);
+            // The slot's click is the game's own, which casts in battle and does not exist on the
+            // map: there the node declares no click, and Enter is consumed silently.
+            Action activate = it.CanActivate ? () => it.Activate() : (Action)null;
             NodeVtable vtable = it.HasSpell
-                ? GraphNodes.Group(label, () => it.Activate(), null, it.Tooltip)
-                : GraphNodes.Button(label, () => it.Activate(), null, it.Tooltip);
+                ? GraphNodes.Group(label, activate, null, it.Tooltip)
+                : GraphNodes.Button(label, activate ?? (() => { }), null, it.Tooltip);
             // What the slot holds changes under a cursor standing right here: a drop lands on it, the
             // game's own animation fills it a fifth of a second after the drop was reported.
             vtable.Announcements[0].Live = true;
