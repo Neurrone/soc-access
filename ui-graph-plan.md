@@ -14,7 +14,7 @@ current phase in §7 and its rows in §8, then `docs/dev-loop.md` for the verifi
 Every screen goes through §4's loop; the before-capture must be taken on the unported build,
 before the screen is touched. Commit per logical step and update this file as decisions are
 taken; prune it at the end of each phase so it holds only what the remaining work needs.
-Phases A to C are done (2026-09-07). Start at phase D.
+Phases A to D are done (2026-09-08). Start at phase E.
 
 Owner decisions already made (do not re-ask):
 
@@ -93,13 +93,13 @@ Paths relative to `soc-access/`. This is what the unported screens (§8) are bui
   `_storySequenceActive` is the flag behind `StoryFocusBlockerScreen`. Its knowledge is the
   most expensive thing in the repo to lose: in phase F move it, never rewrite it.
 - `ui/UIManager.cs` and `ui/Widget.cs` are the widget focus engine; the widget kinds still
-  in use by unported screens are `ContainerWidget`, `MenuWidget` + `MenuItemWidget`,
-  `ButtonWidget`, `CheckboxWidget`, `SliderWidget`, `TextWidget`, `TextInputWidget`,
-  `TableWidget`, `DraggableMenuWidget`, `InventoryGridWidget`, `ArmyExchangeGridWidget`,
-  `AdventureMapGrid` + `TileSkipNavigator`, `CombatHexGrid`, `TroopPlacementHexGrid`,
-  `TroopHudMenu`, `Portrait`. `TextInputEchoHelper` survives as the graph editor's echo.
-  `TooltipActionsMenuScreen` (Backquote) stays until no unported screen hands out a
-  `TooltipAction`.
+  in use by the three unported screens are `ContainerWidget`, `MenuWidget` + `MenuItemWidget`,
+  `ButtonWidget`, `TextWidget`, `AdventureMapGrid` + `TileSkipNavigator`, `CombatHexGrid`,
+  `TroopPlacementHexGrid`, `TroopHudMenu` (the map's troop bar; its graph replacement is
+  `TroopHudRows.Rows`). Every other `ui/*Widget.cs` is dead code for G. `Portrait` is still
+  read by ported screens as a native-portrait reader. `TextInputEchoHelper` survives as the
+  graph editor's echo. `TooltipActionsMenuScreen` (Backquote) stays until no unported screen
+  hands out a `TooltipAction`.
 - Widget-era input actions (`input/AccessibilityActions.cs`): `next_widget`, `next_menu_item`,
   `activate`, `cancel`, `start_drag`, `slider_*`, the map, combat, scanner and bookmark sets;
   the physical bindings are in `input/KeyboardBinding.cs`. The input stand-down for a
@@ -163,10 +163,24 @@ Paths relative to `soc-access/`. Read these before porting a screen.
   lobby's player rows). The first seating is the start node's, not `InitialFocusStop`'s: a
   landing in the stop holding the start node needs `SetStart` beside `LandStopOn`. A stop is
   named after live content by wrapping it in one `PushContext(...)`.
-- `ui/TroopHudRows.cs` — the shared troop rows: one row per drawn slot of a `TroopHUD` in drawn
-  order and a `WielderStop` helper that adds the portrait row above them, with the carry, the
-  game's clicks and its Ctrl+digit quick splits (`GraphScreen.ClaimsAction`/`OnAction`); called by
-  each page that draws a wielder band, over `adapters/WielderInteract.cs`.
+- `ui/TroopHudRows.cs` — the shared troop rows: one row per drawn UNLOCKED slot of a `TroopHUD`
+  in drawn order (a locked slot is not a row) and a `WielderStop` helper that adds the portrait
+  row (the wielder's name alone; a settlement's or merchant's banner goes to the screen name)
+  above a region named by the game's Troops word, with the carry (cargo `troop`, the game's
+  drag replayed through `TroopHudAdapter` including its Ctrl branches), the game's clicks
+  (Backslash = disband where the game would take the right click) and its Ctrl+digit quick
+  splits (`troop_split_1..10`, answered through `GraphScreen.ClaimsAction`/`OnAction`, the
+  screen-level action hook phase E's modes also use); over `adapters/WielderInteract.cs`. The
+  map's HUD stop calls `Rows` alone.
+- `ui/ArtifactSlotNodes.cs` over `adapters/IArtifactSlots.cs` — the Equipment and Inventory
+  stops (Both Hands merge, positions, Auto arrange first, cargo `artifact`, `DropAccepts` off
+  the game's `CanRearrangeArtifact`); each screen passes its own click meanings and hints.
+  `ui/CommanderBands.cs` (stats band, modifier tab row + rows), `ui/SettlementNodes.cs`
+  (defending-wielder band, garrison lines), `ui/RecruitGroups.cs` + `ui/ResourceCosts.cs`
+  (a recruit or upgrade card as a collapsed group, or a line when it has no children).
+- Input rule since D: a character typed in the frame the focused screen changed is dropped
+  (`GraphNavigator.HasTicked`, the router's `TypingScreen`), so the game hotkey that opens a
+  graph screen is never typed into its search.
 - `screens/DropListScreen.cs` — the mod-owned child screen every combo box opens over the
   game's real dropdown popup (`adapters/IDropList.cs`, `adapters/DropdownPopup.cs`): `Choice`
   nodes Up/Down landing on the current value; Escape claimed.
@@ -223,7 +237,9 @@ screen answers it, so an unclaimed key still reaches the game.
 | `ui_back` | something is being carried, `Screen.ConsumesBack`, or a search is live | cancel the carry, else `Screen.Back()`; in a search, "Search cleared" |
 | letters, Space mid-search | `AllowsTypeahead && !CapturesRawInput`, no Ctrl or Alt held, no game box focused | type-ahead over the focused stop plus the fully-open build |
 
-Still to add, each in the phase that needs it: the mode keys (phase E, the mode node's own handler, claimed through a screen-level `AnyKey`-style hook).
+Still to add: the mode keys (phase E), answered through the existing screen-level hook
+`GraphScreen.ClaimsAction`/`OnAction` the quick splits use. `troop_split_1..10` (Ctrl+1..0)
+are claimed only while a troop row is focused.
 Type-ahead ranks by match tier before list order; a chord is never typing; a group header
 the game wires no click to gets no `OnActivate` (Right is the way in). `GraphState` is keyed by
 screen instance, so cursor memory across a push and pop is lost until phase F's registered
@@ -265,14 +281,9 @@ keyboard. `/key` refuses while the game window is not in the foreground (a locke
 |---|---|
 | `ContainerWidget` with `AnnounceName` | `PushContext(label)` or a `BeginStop` when it is a panel the player tabs to |
 | `MenuWidget` + `MenuItemWidget` | menu mode: one node per item |
-| `ButtonWidget`, `CheckboxWidget`, `SliderWidget` | `Button`, `Checkbox`, `Slider` |
+| `ButtonWidget` | `Button` |
 | `TextWidget` heading / body | region name, never a node (unless it carries a tooltip) / read-only `Text` node with `Sections` |
-| `TextInputWidget` | `EditField` driven by a screen-owned `GameTextEditor` |
-| `TableWidget` | `GraphSheet` as §2 describes |
-| `DraggableMenuWidget` (spellbook) | menu rows plus `Carry` for the reorder |
-| `InventoryGridWidget` | `GraphSheet` of slots plus `Carry` for move/equip; slot tooltips via `Sections` |
-| `ArmyExchangeGridWidget` | one `GraphSheet` per army with troop slots as cells, `Carry` between them; split/merge through activation opening `MoveTroopPopupScreen` |
-| `TroopHudMenu` | a stop of troop rows on the map screen |
+| `TroopHudMenu` | `TroopHudRows.Rows` in the map's HUD stop |
 | `AdventureMapGrid` + `TileSkipNavigator` | a MODE: one node on a map stop whose handler owns the tile cursor; the grid class survives, wrapped |
 | `CombatHexGrid`, `TroopPlacementHexGrid` | the same mode shape |
 | `Portrait` | an announcement part, not a node |
@@ -312,15 +323,20 @@ so Enter's advance is read by the watch; a list of allies or players is an expan
 per row whose children are its facts then its actions; a summary with rows of counts is
 lines under named regions, not a table, unless the game draws column headings.
 
-### Phase D — composite grids (adds `Carry` and two-sided sheets)
+### Phase D — composite grids (done)
 
-`CommanderSheetScreen` (inventory), `ArtifactMarketScreen` (inventory), `TradingScreen`
-(inventory + army exchange), `SettlementScreen` (army exchange), `DefenceMenuScreen`
-(army exchange), `HostileJoinMenuScreen` (army exchange), `TroopManagementScreenBase` with
-`DraftTroopsScreen` and `UpgradeTroopsScreen`, `RallyPointScreen`, `MoveTroopPopupScreen`,
-`SpellbookScreen` (quickbar reorder) and `WorldChoiceMenuScreen` (the draggable troop HUD),
-both deferred from C. Follow-up decided 2026-09-07: `BuildMenuScreen`'s tier tabs move into one row (Left/Right between them, Enter still the switch) instead of stacked items; do it alongside the commander sheet's modifier tabs, which take the same shape. The owner's simplification
-targets are here (fewer tab stops); each gets its own proposal, measured off the drawn layout.
+Fourteen screens, 2026-09-08 (§8). Rules learned, for every later port: a stop lands on the
+alternative in force and the engine looks for it from any pinned landing ONWARD, so a tab bar
+that is not the first thing in its stop is a stop of its own (the sheet's and the trade's
+modifier bars); a group with nothing to open is a line; an empty slot is a role-less `Text`
+node that still takes a drop; Enter and Backslash are the game's left and right clicks with
+the Ctrl chords as further bindings of the same actions, so the game's own handlers read the
+physical Ctrl; a hint is offered only where the game would take the gesture (a button the game
+draws non-interactable refuses its click); a mod-authored drop target exists only where the
+game's own gesture is a release over nothing, and reads as a short instruction; a refresh the
+game runs only on mouse-over (a tooltip recomposed on hover) is run through the same private
+method before the mod reads it; a wielder band inside a menu whose canvas group the game
+never enabled refuses every click, so a REPL-opened prompt variant is not a fixture.
 
 ### Phase E — modes
 
@@ -332,6 +348,14 @@ mode node owns its keys, its buffer and its exit announcement. A pre-existing cr
 to the main menu (`AdventureMapAdapter.GetInitialTile` throwing on resync) belongs here. A
 battle is reached by walking the map cursor onto a neutral army and pressing the right-click
 action twice; the post-game pages by Surrender in the pause menu (a fresh random skirmish).
+
+Owner rulings for the map (2026-09-08): type-ahead is OFF on `AdventureMapScreen`
+(`AllowsTypeahead` false), so no letter is ever claimed there and the game keeps its own
+hotkeys (C the sheet, V the spellbook, E end turn, Ctrl+digits the quick splits). The map's
+troop bar is `TroopHudRows.Rows` in a HUD stop. The end-turn button is named by the game's
+tooltip, which `AdventureHudAdapter` refreshes through the game's own hover refresh before
+reading (the button's state is refreshed every frame, its title only on hover). The map's
+`Portrait` and `TooltipAction` uses go with the port.
 
 ### Phase F — the screen manager swap
 
@@ -388,12 +412,11 @@ was deleted in A. Phase C: `PauseMenuScreen`, `WorldConfirmMenuScreen`, `ClaimMe
 `SpellbookScreen`, `MoveTroopPopupScreen`, `WorldChoiceMenuScreen`,
 `ArtifactMarketScreen`, `TradingScreen`, `HostileJoinMenuScreen`, `SettlementScreen`,
 `DefenceMenuScreen`, `TroopManagementScreenBase`, `DraftTroopsScreen`, `UpgradeTroopsScreen`,
-`RallyPointScreen` (the essence tab row is unverified: no card in the `test` save draws one). Of `MessageDialogScreen`'s seven
-sources the random event and custom message ones are unverified (no reachable state produced
-them; the REPL draws the prefab's placeholder text).
+`RallyPointScreen`. Unverified corners: `MessageDialogScreen`'s random event and custom
+message sources (no reachable state produced them), and a recruit card's essence tab row.
 
 Remaining, with what the file constructs today and the proposed model (a proposal, not a
-decision, until the owner approves it):
+decision, until the owner approves it; phase E's three are proposed by family as before):
 
 | Screen | Widgets today | Proposed model | Phase |
 |---|---|---|---|
@@ -405,9 +428,6 @@ decision, until the owner approves it):
 
 ## 9. Risks
 
-- The army exchange and inventory proposals are where the owner wants fewer tab stops; do
-  not carry the current widget's structure into the sheet by reflex. Measure the game's
-  drawn layout first.
 - `ScreenDetector`'s readiness knowledge is the most expensive thing in the repo to lose. In
   phase F, move it, never rewrite it from memory.
 - Each phase's localization batch is real work; a phase is not done until `validate` passes.
