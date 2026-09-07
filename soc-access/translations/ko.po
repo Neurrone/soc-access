@@ -740,6 +740,31 @@ msgctxt "Screens.Articles"
 msgid "Articles"
 msgstr "문서"
 
+#. Screens.ArtifactDestroyHint
+msgctxt "Screens.ArtifactDestroyHint"
+msgid "{0} destroys."
+msgstr "{0} 키로 파괴."
+
+#. Screens.ArtifactDropHint
+msgctxt "Screens.ArtifactDropHint"
+msgid "{0} drops on the ground."
+msgstr "{0} 키로 바닥에 떨어뜨리기."
+
+#. Screens.ArtifactEquipHint
+msgctxt "Screens.ArtifactEquipHint"
+msgid "{0} equips."
+msgstr "{0} 키로 장착."
+
+#. Screens.ArtifactUnequipHint
+msgctxt "Screens.ArtifactUnequipHint"
+msgid "{0} unequips."
+msgstr "{0} 키로 장착 해제."
+
+#. Screens.ArtifactUseHint
+msgctxt "Screens.ArtifactUseHint"
+msgid "{0} uses."
+msgstr "{0} 키로 사용."
+
 #. Screens.AttackerEssence
 msgctxt "Screens.AttackerEssence"
 msgid "Attacker essence"
@@ -904,11 +929,6 @@ msgstr "모드 옵션"
 msgctxt "Screens.NewChatMessage"
 msgid "New chat message"
 msgstr "새 채팅 메시지"
-
-#. Screens.ModifierCategoryTabs
-msgctxt "Screens.ModifierCategoryTabs"
-msgid "Modifier category tabs"
-msgstr "수정치 범주 탭"
 
 #. Screens.MultiEssenceSpells
 msgctxt "Screens.MultiEssenceSpells"

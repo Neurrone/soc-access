@@ -548,6 +548,11 @@ namespace SongsOfConquestAccess.Localization
             public static readonly ModString ArcanaSpells = new ModString("Screens.ArcanaSpells", "Arcana spells");
             public static readonly ModString Army = new ModString("Screens.Army", "army");
             public static readonly ModString Articles = new ModString("Screens.Articles", "Articles");
+            public static readonly ModString ArtifactDestroyHint = new ModString("Screens.ArtifactDestroyHint", "{0} destroys.");
+            public static readonly ModString ArtifactDropHint = new ModString("Screens.ArtifactDropHint", "{0} drops on the ground.");
+            public static readonly ModString ArtifactEquipHint = new ModString("Screens.ArtifactEquipHint", "{0} equips.");
+            public static readonly ModString ArtifactUnequipHint = new ModString("Screens.ArtifactUnequipHint", "{0} unequips.");
+            public static readonly ModString ArtifactUseHint = new ModString("Screens.ArtifactUseHint", "{0} uses.");
             public static readonly ModString AiControl = new ModString("Screens.AiControl", "AI control");
             public static readonly ModString AiDifficulty = new ModString("Screens.AiDifficulty", "{0} AI");
             public static readonly ModString Attacker = new ModString("Screens.Attacker", "Attacker");
@@ -621,7 +626,6 @@ namespace SongsOfConquestAccess.Localization
             public static readonly ModString MovedBefore = new ModString("Screens.MovedBefore", "Moved before {0}");
             public static readonly ModString MovedBetween = new ModString("Screens.MovedBetween", "Moved between {0} and {1}");
             public static readonly ModString NewChatMessage = new ModString("Screens.NewChatMessage", "New chat message");
-            public static readonly ModString ModifierCategoryTabs = new ModString("Screens.ModifierCategoryTabs", "Modifier category tabs");
             public static readonly ModString MarketplaceTradeColumn = new ModString("Screens.MarketplaceTradeColumn", "{0} {1}");
             public static readonly ModString MaxTroopSize = new ModString("Screens.MaxTroopSize", "Max troop size {0}");
             public static readonly ModString MoveAllLeft = new ModString("Screens.MoveAllLeft", "Move all left");

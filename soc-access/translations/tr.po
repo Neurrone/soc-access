@@ -740,6 +740,31 @@ msgctxt "Screens.Articles"
 msgid "Articles"
 msgstr "Makaleler"
 
+#. Screens.ArtifactDestroyHint
+msgctxt "Screens.ArtifactDestroyHint"
+msgid "{0} destroys."
+msgstr "{0} yok eder."
+
+#. Screens.ArtifactDropHint
+msgctxt "Screens.ArtifactDropHint"
+msgid "{0} drops on the ground."
+msgstr "{0} yere bırakır."
+
+#. Screens.ArtifactEquipHint
+msgctxt "Screens.ArtifactEquipHint"
+msgid "{0} equips."
+msgstr "{0} kuşanır."
+
+#. Screens.ArtifactUnequipHint
+msgctxt "Screens.ArtifactUnequipHint"
+msgid "{0} unequips."
+msgstr "{0} çıkarır."
+
+#. Screens.ArtifactUseHint
+msgctxt "Screens.ArtifactUseHint"
+msgid "{0} uses."
+msgstr "{0} kullanır."
+
 #. Screens.AttackerEssence
 msgctxt "Screens.AttackerEssence"
 msgid "Attacker essence"
@@ -904,11 +929,6 @@ msgstr "Mod seçenekleri"
 msgctxt "Screens.NewChatMessage"
 msgid "New chat message"
 msgstr "Yeni sohbet mesajı"
-
-#. Screens.ModifierCategoryTabs
-msgctxt "Screens.ModifierCategoryTabs"
-msgid "Modifier category tabs"
-msgstr "Değiştirici kategori sekmeleri"
 
 #. Screens.MultiEssenceSpells
 msgctxt "Screens.MultiEssenceSpells"

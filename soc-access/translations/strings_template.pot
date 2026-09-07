@@ -2404,6 +2404,31 @@ msgctxt "Screens.Articles"
 msgid "Articles"
 msgstr ""
 
+#. Screens.ArtifactDestroyHint
+msgctxt "Screens.ArtifactDestroyHint"
+msgid "{0} destroys."
+msgstr ""
+
+#. Screens.ArtifactDropHint
+msgctxt "Screens.ArtifactDropHint"
+msgid "{0} drops on the ground."
+msgstr ""
+
+#. Screens.ArtifactEquipHint
+msgctxt "Screens.ArtifactEquipHint"
+msgid "{0} equips."
+msgstr ""
+
+#. Screens.ArtifactUnequipHint
+msgctxt "Screens.ArtifactUnequipHint"
+msgid "{0} unequips."
+msgstr ""
+
+#. Screens.ArtifactUseHint
+msgctxt "Screens.ArtifactUseHint"
+msgid "{0} uses."
+msgstr ""
+
 #. Screens.AiControl
 msgctxt "Screens.AiControl"
 msgid "AI control"
@@ -2767,11 +2792,6 @@ msgstr ""
 #. Screens.NewChatMessage
 msgctxt "Screens.NewChatMessage"
 msgid "New chat message"
-msgstr ""
-
-#. Screens.ModifierCategoryTabs
-msgctxt "Screens.ModifierCategoryTabs"
-msgid "Modifier category tabs"
 msgstr ""
 
 #. Screens.MarketplaceTradeColumn

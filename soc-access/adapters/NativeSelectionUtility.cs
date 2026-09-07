@@ -50,6 +50,20 @@ namespace SongsOfConquestAccess.Adapters
             return false;
         }
 
+        /// <summary>The button's RIGHT click, raised the way the game's own pointer handler raises it:
+        /// <c>UIButton.OnPointerClick</c> reads the event's button and runs its <c>OnRightClicked</c>
+        /// handlers, so a mod-delivered right click is the same event a mouse's is - the game's own
+        /// handler included, which reads the physical Ctrl for itself.</summary>
+        public static bool RightClick(IUIButton button)
+        {
+            if (button == null || !button.Active || !button.Interactable)
+            {
+                return false;
+            }
+
+            return PointerRightClick(button as Component);
+        }
+
         public static bool Click(Button button)
         {
             if (button == null || !button.IsActive() || !button.IsInteractable())

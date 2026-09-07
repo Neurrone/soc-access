@@ -740,6 +740,31 @@ msgctxt "Screens.Articles"
 msgid "Articles"
 msgstr "條目"
 
+#. Screens.ArtifactDestroyHint
+msgctxt "Screens.ArtifactDestroyHint"
+msgid "{0} destroys."
+msgstr "按 {0} 銷毀。"
+
+#. Screens.ArtifactDropHint
+msgctxt "Screens.ArtifactDropHint"
+msgid "{0} drops on the ground."
+msgstr "按 {0} 丟在地上。"
+
+#. Screens.ArtifactEquipHint
+msgctxt "Screens.ArtifactEquipHint"
+msgid "{0} equips."
+msgstr "按 {0} 裝備。"
+
+#. Screens.ArtifactUnequipHint
+msgctxt "Screens.ArtifactUnequipHint"
+msgid "{0} unequips."
+msgstr "按 {0} 卸下。"
+
+#. Screens.ArtifactUseHint
+msgctxt "Screens.ArtifactUseHint"
+msgid "{0} uses."
+msgstr "按 {0} 使用。"
+
 #. Screens.AttackerEssence
 msgctxt "Screens.AttackerEssence"
 msgid "Attacker essence"
@@ -904,11 +929,6 @@ msgstr "模組選項"
 msgctxt "Screens.NewChatMessage"
 msgid "New chat message"
 msgstr "新聊天訊息"
-
-#. Screens.ModifierCategoryTabs
-msgctxt "Screens.ModifierCategoryTabs"
-msgid "Modifier category tabs"
-msgstr "修正類別分頁"
 
 #. Screens.MultiEssenceSpells
 msgctxt "Screens.MultiEssenceSpells"

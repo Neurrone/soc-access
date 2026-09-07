@@ -740,6 +740,31 @@ msgctxt "Screens.Articles"
 msgid "Articles"
 msgstr "Articles"
 
+#. Screens.ArtifactDestroyHint
+msgctxt "Screens.ArtifactDestroyHint"
+msgid "{0} destroys."
+msgstr "{0} pour détruire."
+
+#. Screens.ArtifactDropHint
+msgctxt "Screens.ArtifactDropHint"
+msgid "{0} drops on the ground."
+msgstr "{0} pour jeter au sol."
+
+#. Screens.ArtifactEquipHint
+msgctxt "Screens.ArtifactEquipHint"
+msgid "{0} equips."
+msgstr "{0} pour équiper."
+
+#. Screens.ArtifactUnequipHint
+msgctxt "Screens.ArtifactUnequipHint"
+msgid "{0} unequips."
+msgstr "{0} pour déséquiper."
+
+#. Screens.ArtifactUseHint
+msgctxt "Screens.ArtifactUseHint"
+msgid "{0} uses."
+msgstr "{0} pour utiliser."
+
 #. Screens.AttackerEssence
 msgctxt "Screens.AttackerEssence"
 msgid "Attacker essence"
@@ -904,11 +929,6 @@ msgstr "Options du mod"
 msgctxt "Screens.NewChatMessage"
 msgid "New chat message"
 msgstr "Nouveau message de discussion"
-
-#. Screens.ModifierCategoryTabs
-msgctxt "Screens.ModifierCategoryTabs"
-msgid "Modifier category tabs"
-msgstr "Onglets catégories modificateurs"
 
 #. Screens.MultiEssenceSpells
 msgctxt "Screens.MultiEssenceSpells"

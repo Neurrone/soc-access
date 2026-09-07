@@ -22,7 +22,18 @@ namespace SongsOfConquestAccess.Adapters
             InventorySlotInfo target,
             string logContext)
         {
-            InventoryArtifactMovable movable = source != null ? source.Movable : null;
+            return DropArtifact(facade, source != null ? source.Movable : null, target, logContext);
+        }
+
+        /// <summary>The same drop where the artifact is in hand rather than read off the slot it came
+        /// from - the keyboard's carry, which holds the movable itself and may have walked away from
+        /// the slot that gave it.</summary>
+        public static DropResult DropArtifact(
+            IClientAdventureFacade facade,
+            InventoryArtifactMovable movable,
+            InventorySlotInfo target,
+            string logContext)
+        {
             InventoryHUDSlot targetSlot = target != null ? target.NativeSlot : null;
             if (facade == null || movable == null || movable.State == null || targetSlot == null || targetSlot.HudParent == null)
             {

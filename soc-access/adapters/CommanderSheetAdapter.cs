@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Collections;
+using System.Globalization;
 using System.Linq;
 using System.Reflection;
 using HarmonyLib;
@@ -39,6 +40,8 @@ namespace SongsOfConquestAccess.Adapters
         private static readonly FieldInfo ModifierTabsField = AccessTools.Field(typeof(CommanderSheet), "_modifierTabNavigation");
         private static readonly FieldInfo CommanderIdField = AccessTools.Field(typeof(CommanderSheet), "_commanderId");
         private static readonly MethodInfo CloseMethod = AccessTools.Method(typeof(CommanderSheet), "Close", new[] { typeof(bool), typeof(bool) });
+        private static readonly FieldInfo BackgroundCloseButtonField = AccessTools.Field(typeof(AdventureMenuBackground), "_closeButton");
+        private static readonly FieldInfo MovableButtonField = AccessTools.Field(typeof(InventoryArtifactMovable), "_button");
 
         private static readonly FieldInfo BacteriaLookupField = AccessTools.Field(typeof(CommanderSheetSpecialization), "_bacteriaLookup");
         private static readonly FieldInfo FactionLookupField = AccessTools.Field(typeof(CommanderSheetSpecialization), "_factionLookup");
@@ -48,6 +51,7 @@ namespace SongsOfConquestAccess.Adapters
         private static readonly FieldInfo MovementTooltipImageField = AccessTools.Field(typeof(CommanderStatsInfo), "_movementTooltipImage");
         private static readonly FieldInfo ViewTooltipImageField = AccessTools.Field(typeof(CommanderStatsInfo), "_viewTooltipImage");
 
+        private static readonly FieldInfo SkillEntryLevelField = AccessTools.Field(typeof(CommanderSheetSkillEntry), "_levelText");
         private static readonly FieldInfo SkillEntriesField = AccessTools.Field(typeof(CommanderSheetSkills), "_entries");
         private static readonly FieldInfo PowerEntriesField = AccessTools.Field(typeof(CommanderSheetSkills), "_powerEntries");
         private static readonly FieldInfo SkillLookupField = AccessTools.Field(typeof(CommanderSheetSkills), "_skillLookup");
@@ -126,13 +130,46 @@ namespace SongsOfConquestAccess.Adapters
                 && ((Component)_sheet).gameObject.activeInHierarchy;
         }
 
-        public string GetCommanderIdentity()
+        /// <summary>The wielder's name, as the sheet draws it at the top.</summary>
+        public string CommanderName
         {
-            UITextMesh name = GetField<UITextMesh>(_sheet, NameField);
-            UITextMesh commanderClass = GetField<UITextMesh>(_sheet, ClassField);
-            return MenuButtonTextUtility.JoinParts(
-                UITextMeshTextUtility.GetEffectiveText(name),
-                UITextMeshTextUtility.GetEffectiveText(commanderClass));
+            get { return UITextMeshTextUtility.GetEffectiveText(GetField<UITextMesh>(_sheet, NameField)); }
+        }
+
+        /// <summary>The race and title drawn under the name ("Human Commander").</summary>
+        public string CommanderClass
+        {
+            get { return UITextMeshTextUtility.GetEffectiveText(GetField<UITextMesh>(_sheet, ClassField)); }
+        }
+
+        /// <summary>The close cross this sheet's <c>AdventureMenuBackground</c> draws at the top right;
+        /// it is only turned on where the background may be closed and the player is on mouse and
+        /// keyboard (<c>AnimateEntry</c>).</summary>
+        public Component CloseButton
+        {
+            get { return GetCloseButton() as Component; }
+        }
+
+        public bool IsCloseVisible()
+        {
+            UIButton button = GetCloseButton();
+            return button != null && button.Active && ((Component)button).gameObject.activeInHierarchy;
+        }
+
+        public bool ActivateClose()
+        {
+            return NativeSelectionUtility.Click(GetCloseButton());
+        }
+
+        private UIButton GetCloseButton()
+        {
+            return GetField<UIButton>(_sheet, BackgroundCloseButtonField);
+        }
+
+        /// <summary>The tutorial button the sheet draws only until the tutorial has been seen.</summary>
+        public Component TutorialButton
+        {
+            get { return GetField<UIButton>(_sheet, TutorialButtonField) as Component; }
         }
 
         public bool IsTutorialButtonVisible()
@@ -225,46 +262,50 @@ namespace SongsOfConquestAccess.Adapters
         {
             return new[]
             {
-                new ModifierCategory("modifier-category-troop", GetLocalizedText("Commanders/Details/Modifiers/TroopModTitle", "Troop modifiers"), 0, Tooltip.ForComponent(GetModifierCategoryButton(0) as Component, _localization)),
-                new ModifierCategory("modifier-category-temporary", GetLocalizedText("Commanders/Details/Modifiers/TemporaryModTitle", "Temporary modifiers"), 1, Tooltip.ForComponent(GetModifierCategoryButton(1) as Component, _localization)),
-                new ModifierCategory("modifier-category-gear", GetLocalizedText("Commanders/Details/Modifiers/GearModTitle", "Gear modifiers"), 2, Tooltip.ForComponent(GetModifierCategoryButton(2) as Component, _localization))
+                BuildModifierCategory("modifier-category-troop", "Commanders/Details/Modifiers/TroopModTitle", "Troop modifiers", 0),
+                BuildModifierCategory("modifier-category-temporary", "Commanders/Details/Modifiers/TemporaryModTitle", "Temporary modifiers", 1),
+                BuildModifierCategory("modifier-category-gear", "Commanders/Details/Modifiers/GearModTitle", "Gear modifiers", 2)
             };
         }
 
-        public bool FocusModifierCategory(int categoryIndex)
+        private ModifierCategory BuildModifierCategory(string id, string key, string fallback, int index)
         {
-            if (_modifierTabs == null)
-            {
-                return false;
-            }
+            UIButton button = GetModifierCategoryButton(index);
+            return new ModifierCategory(
+                id,
+                GetLocalizedText(key, fallback),
+                index,
+                button as Component,
+                Tooltip.ForComponent(button as Component, _localization));
+        }
 
+        /// <summary>Move the game's selection onto a modifier tab WITHOUT switching to it: the switch
+        /// redraws the modifier list under the bar, so arriving at a tab must not take the list the
+        /// player is reading away.</summary>
+        public bool SelectModifierCategory(int categoryIndex)
+        {
+            return NativeSelectionUtility.Select(GetModifierCategoryButton(categoryIndex) as Component);
+        }
+
+        /// <summary>Switch to a modifier tab through the game's own click, which is what
+        /// <c>CommanderSheetModifierTabNavigation.SetActiveTab</c> hangs on.</summary>
+        public bool ActivateModifierCategory(int categoryIndex)
+        {
             UIButton button = GetModifierCategoryButton(categoryIndex);
-            NativeSelectionUtility.Select(button as Component);
-
-            if (GetActiveModifierCategoryIndex() == categoryIndex)
+            if (button != null && NativeSelectionUtility.Click(button))
             {
                 return true;
             }
 
-            if (button != null)
-            {
-                button.OnSubmit(EventSystem.current != null ? new BaseEventData(EventSystem.current) : null);
-                return true;
-            }
-
-            if (SetActiveTabMethod == null)
-            {
-                return false;
-            }
-
+            // No button to click - the tab bar was drawn without one. Fall back to the method the
+            // click would have reached.
             Type tabStateType = AccessTools.Inner(typeof(CommanderSheetModifierTabNavigation), "TabState");
-            if (tabStateType == null)
+            if (_modifierTabs == null || SetActiveTabMethod == null || tabStateType == null)
             {
                 return false;
             }
 
-            object tabState = Enum.ToObject(tabStateType, categoryIndex);
-            SetActiveTabMethod.Invoke(_modifierTabs, new[] { tabState, (object)false });
+            SetActiveTabMethod.Invoke(_modifierTabs, new[] { Enum.ToObject(tabStateType, categoryIndex), (object)false });
             return true;
         }
 
@@ -357,6 +398,7 @@ namespace SongsOfConquestAccess.Adapters
                     items.Add(new LabeledItem(
                         (powers ? "power-" : "skill-") + i,
                         text,
+                        value: GetSkillLevelText(capturedPowers, capturedIndex, skill),
                         onFocus: () => SelectSkillEntry(capturedPowers, capturedIndex),
                         tooltip: Tooltip.ForComponent(GetSkillEntryComponent(capturedPowers, capturedIndex), _localization)));
                 }
@@ -374,7 +416,8 @@ namespace SongsOfConquestAccess.Adapters
         {
             items.Add(new LabeledItem(
                 "stat-" + type,
-                label + ", " + value,
+                label,
+                value: value.ToString(CultureInfo.CurrentCulture),
                 tooltip: Tooltip.ForComponent(GetStatTooltipComponent(type), _localization)));
         }
 
@@ -400,23 +443,27 @@ namespace SongsOfConquestAccess.Adapters
             return tooltipImage as Component;
         }
 
+        /// <summary>The equipment slots in the order the sheet DRAWS them: the head, the chest and the
+        /// two hands down the left of the portrait, then the gloves, the boots and the three trinkets.
+        /// </summary>
+        public static readonly InventorySlot[] DrawnEquipmentSlots =
+        {
+            InventorySlot.Head,
+            InventorySlot.Chest,
+            InventorySlot.MainHand,
+            InventorySlot.OffHand,
+            InventorySlot.Hands,
+            InventorySlot.Feet,
+            InventorySlot.Trinket1,
+            InventorySlot.Trinket2,
+            InventorySlot.Trinket3
+        };
+
         public IReadOnlyList<InventorySlotInfo> GetEquipmentSlots()
         {
             List<InventorySlotInfo> slotsInfo = new List<InventorySlotInfo>();
-            InventorySlot[] slots =
-            {
-                InventorySlot.Head,
-                InventorySlot.Chest,
-                InventorySlot.Hands,
-                InventorySlot.MainHand,
-                InventorySlot.OffHand,
-                InventorySlot.Feet,
-                InventorySlot.Trinket1,
-                InventorySlot.Trinket2,
-                InventorySlot.Trinket3
-            };
-
             string ownerName = GetCommanderName();
+            InventorySlot[] slots = DrawnEquipmentSlots;
             for (int i = 0; i < slots.Length; i++)
             {
                 InventorySlot slot = slots[i];
@@ -508,11 +555,183 @@ namespace SongsOfConquestAccess.Adapters
             return entry != null ? (Selectable)entry : null;
         }
 
-        public DropResult DropInventoryArtifact(InventorySlotInfo source, InventorySlotInfo target)
+        /// <summary>Put an artifact down on a slot, through the game's own check and its own move.
+        /// </summary>
+        public DropResult DropArtifact(InventoryArtifactMovable movable, InventorySlotInfo target)
         {
-            return ArtifactDropUtility.DropInventoryArtifact(_facade, source, target, "CommanderSheetAdapter artifact grid drop");
+            return ArtifactDropUtility.DropArtifact(_facade, movable, target, "CommanderSheetAdapter artifact drop");
         }
 
+        /// <summary>Whether the artifact in the main hand takes BOTH hands - the definition's own slot
+        /// (<c>IArtifactLookup.GetSlot</c>), which is what makes the game draw a ghost of it in the off
+        /// hand.</summary>
+        public bool IsMainHandTwoHanded()
+        {
+            IArtifactState artifact = GetArtifactsForSlot(InventorySlot.MainHand).FirstOrDefault();
+            return artifact != null && _artifactLookup != null && _artifactLookup.GetSlot(artifact.Type) == ArtifactSlot.BothHands;
+        }
+
+        /// <summary>Whether an artifact fits the off hand ALONE - the one case the game's own
+        /// right-click resolution (<c>InventoryHUD.GetSlot(ArtifactSlot)</c>) sends to the off hand
+        /// rather than the main one.</summary>
+        public bool IsOffHandOnlyArtifact(InventoryArtifactMovable movable)
+        {
+            return movable != null
+                && movable.State != null
+                && _artifactLookup != null
+                && _artifactLookup.GetSlot(movable.State.Type) == ArtifactSlot.OffHand;
+        }
+
+        /// <summary>The game's own name for the two-handed slot ("Both Hands").</summary>
+        public string BothHandsSlotName
+        {
+            get { return GetInventorySlotName(ArtifactSlot.BothHands.ToString()); }
+        }
+
+        /// <summary>Whether the game would accept this artifact in this slot at this position - the
+        /// same check its own drop makes (<c>CanRearrangeArtifact</c>), asked without doing anything.
+        /// </summary>
+        public bool CanRearrangeArtifactTo(InventoryArtifactMovable movable, InventorySlotInfo target)
+        {
+            InventoryHUDSlot nativeSlot = target != null ? target.NativeSlot : null;
+            if (_facade == null || movable == null || movable.State == null || nativeSlot == null)
+            {
+                return false;
+            }
+
+            try
+            {
+                return _facade.Commands.CanRearrangeArtifact(movable.State.Id, nativeSlot.Slot, target.PositionIndex).success;
+            }
+            catch (Exception ex)
+            {
+                SocAccessMod.Instance?.LogWarning("CommanderSheetAdapter could not ask whether an artifact fits: " + ex.Message);
+                return false;
+            }
+        }
+
+        /// <summary>The game's own notification for a rearrangement its Command skill blocks - what it
+        /// shows itself when the drop is refused with error code 10.</summary>
+        public string RearrangeRefusalText
+        {
+            get { return GetLocalizedText("Common/CommanderInventory/RearrangeArtifact/CannotRearrangeBecauseOfCommand", string.Empty); }
+        }
+
+        /// <summary>The artifact's LEFT click, through the button the game hangs its own handler on -
+        /// inert on this sheet, and with Ctrl physically held the game's own drop on the ground.</summary>
+        public bool LeftClickArtifact(InventorySlotInfo slot)
+        {
+            return NativeSelectionUtility.Click(GetMovableButton(slot));
+        }
+
+        /// <summary>The artifact's RIGHT click, through the same button: equip, unequip or use, and
+        /// with Ctrl physically held the game's own destroy.</summary>
+        public bool RightClickArtifact(InventorySlotInfo slot)
+        {
+            return NativeSelectionUtility.RightClick(GetMovableButton(slot));
+        }
+
+        /// <summary>What a right click on this artifact does, as the GAME decides it in
+        /// <c>InventoryArtifactMovable.GetDetails</c>: an artifact whose definition carries an action
+        /// is used, and every other one is equipped or unequipped by where it currently is.</summary>
+        public ArtifactDetails.EquipInstruction GetArtifactInstruction(InventorySlotInfo slot)
+        {
+            IArtifactState artifact = GetArtifactState(slot);
+            if (artifact == null)
+            {
+                return ArtifactDetails.EquipInstruction.None;
+            }
+
+            IArtifactDataDefinition definition = _artifactLookup != null ? _artifactLookup.GetDefinition(artifact.Type) : null;
+            if (definition != null && definition.Action != null)
+            {
+                return ArtifactDetails.EquipInstruction.Use;
+            }
+
+            return artifact.IsEquipped
+                ? ArtifactDetails.EquipInstruction.Unequip
+                : ArtifactDetails.EquipInstruction.Equip;
+        }
+
+        /// <summary>The game's own text for the auto-arrange instruction, as it draws it in an
+        /// artifact's tooltip.</summary>
+        public string AutoArrangeText
+        {
+            get { return GetLocalizedText("Adventure/TooltipInstruction/AutoArrange", string.Empty); }
+        }
+
+        /// <summary>Auto-arrange, the game's own middle click (<c>InventoryHUD.AutoArrangeArtifacts</c>).
+        /// Its second half only remembers which cell to re-select afterwards and needs an artifact to
+        /// remember, so with nothing in the inventory the command it runs is called on its own.</summary>
+        public bool AutoArrangeArtifacts()
+        {
+            if (_inventory == null)
+            {
+                return false;
+            }
+
+            InventoryArtifactMovable anyArtifact = FirstArtifactMovable();
+            if (anyArtifact != null)
+            {
+                _inventory.AutoArrangeArtifacts(anyArtifact);
+                return true;
+            }
+
+            if (_facade == null || CommanderId < 0)
+            {
+                return false;
+            }
+
+            _facade.Commands.EquipBestArtifacts(CommanderId);
+            return true;
+        }
+
+        private InventoryArtifactMovable FirstArtifactMovable()
+        {
+            IDictionary artifactMap = InventoryArtifactMapField != null && _inventory != null
+                ? InventoryArtifactMapField.GetValue(_inventory) as IDictionary
+                : null;
+            if (artifactMap == null)
+            {
+                return null;
+            }
+
+            foreach (object movable in artifactMap.Values)
+            {
+                InventoryArtifactMovable artifact = movable as InventoryArtifactMovable;
+                if (artifact != null)
+                {
+                    return artifact;
+                }
+            }
+
+            return null;
+        }
+
+        private IArtifactState GetArtifactState(InventorySlotInfo slot)
+        {
+            InventoryArtifactMovable movable = slot != null ? slot.Movable : null;
+            return movable != null ? movable.State : null;
+        }
+
+        private static IUIButton GetMovableButton(InventorySlotInfo slot)
+        {
+            InventoryArtifactMovable movable = slot != null ? slot.Movable : null;
+            return movable != null && MovableButtonField != null
+                ? MovableButtonField.GetValue(movable) as IUIButton
+                : null;
+        }
+
+        /// <summary>
+        /// An artifact's own tooltip, without the lines that tell a MOUSE what to press.
+        ///
+        /// <c>ArtifactDetails</c> ends its tooltip with a row per gesture ("&lt;rmb&gt; Equip",
+        /// "&lt;hl&gt;CTRL&lt;/hl&gt; + &lt;rmb&gt; Destroy", the drop and the auto-arrange), and the
+        /// keyboard gets those same gestures as usage hints on the slot itself, so the rows would be
+        /// said twice. They are removed by the localized text the game DREW them from rather than by
+        /// English, so a row this mod does not know about is left where it is and the player still
+        /// hears that something may be available.
+        /// </summary>
         private Tooltip BuildEquipmentTooltip(IArtifactState artifact, Selectable selectable, InventoryArtifactMovable movable)
         {
             Tooltip tooltip = Tooltip.ForComponent(selectable, _localization);
@@ -521,59 +740,17 @@ namespace SongsOfConquestAccess.Adapters
                 return tooltip;
             }
 
-            List<TooltipAction> actions = new List<TooltipAction>();
             List<string> instructionLines = new List<string>();
-
-            // ArtifactDetails renders these activation hints as ordinary tooltip
-            // rows. When this adapter supports the corresponding action, remove
-            // the native instruction row by comparing against the same localized
-            // string key the game used to draw it. Do not compare English text:
-            // unsupported or unrecognized rows must remain in TextLines so the
-            // player still hears that something may be available. Do not rely on
-            // captured InputType here: some real artifact actions are drawn with
-            // InputType.NoInput, so the input hint alone is not a reliable action
-            // signal for equipment.
-            string equipInstructionKey = artifact.IsEquipped
-                ? "Adventure/TooltipInstruction/Unequip"
-                : "Adventure/TooltipInstruction/Equip";
-            string equipLabel = GetLocalizedText(equipInstructionKey, artifact.IsEquipped ? "Unequip" : "Equip");
-            AddLocalizedLine(instructionLines, equipInstructionKey);
-            actions.Add(new TooltipAction(equipLabel, () => InvokeArtifactAction(movable, _inventory.EquipArtifact)));
-
-            if (artifact.IsImportant)
-            {
-                return new Tooltip(() => RemoveExactLines(tooltip.TextLines, instructionLines), tooltip.VisualMetadata, actions);
-            }
-
-            if (_inventory.IsArtifactShopInventory)
-            {
-                AddLocalizedLine(instructionLines, "Adventure/TooltipInstruction/Sell");
-                actions.Add(new TooltipAction(
-                    ModText.Get(_localization, ModStrings.Screens.Sell),
-                    () => InvokeArtifactAction(movable, _inventory.SellArtifact)));
-            }
-            else
-            {
-                AddLocalizedLine(instructionLines, "Adventure/TooltipInstruction/Destroy");
-                AddLocalizedLine(instructionLines, "Adventure/TooltipInstruction/Destroy.Gamepad");
-                actions.Add(new TooltipAction(
-                    GetLocalizedText("Adventure/TooltipInstruction/Destroy.Gamepad", "Destroy"),
-                    () => InvokeArtifactAction(movable, _inventory.DestroyArtifact)));
-            }
-
+            AddLocalizedLine(instructionLines, "Adventure/TooltipInstruction/Equip");
+            AddLocalizedLine(instructionLines, "Adventure/TooltipInstruction/Unequip");
+            AddLocalizedLine(instructionLines, "Adventure/TooltipInstruction/Sell");
+            AddLocalizedLine(instructionLines, "Adventure/TooltipInstruction/Destroy");
+            AddLocalizedLine(instructionLines, "Adventure/TooltipInstruction/Destroy.Gamepad");
             AddLocalizedLine(instructionLines, "Adventure/TooltipInstruction/Drop");
             AddLocalizedLine(instructionLines, "Adventure/TooltipInstruction/Drop.Gamepad");
-            actions.Add(new TooltipAction(
-                GetLocalizedText("Adventure/TooltipInstruction/Drop.Gamepad", "Drop"),
-                () => InvokeArtifactAction(movable, _inventory.DropArtifact)));
-
             AddLocalizedLine(instructionLines, "Adventure/TooltipInstruction/AutoArrange");
             AddLocalizedLine(instructionLines, "Adventure/TooltipInstruction/AutoArrange.Gamepad");
-            actions.Add(new TooltipAction(
-                GetLocalizedText("Adventure/TooltipInstruction/AutoArrange.Gamepad", "Auto Arrange"),
-                () => InvokeArtifactAction(movable, _inventory.AutoArrangeArtifacts)));
-
-            return new Tooltip(() => RemoveExactLines(tooltip.TextLines, instructionLines), tooltip.VisualMetadata, actions);
+            return new Tooltip(() => RemoveExactLines(tooltip.TextLines, instructionLines), tooltip.VisualMetadata);
         }
 
         private InventoryArtifactMovable GetArtifactMovable(IArtifactState artifact)
@@ -590,17 +767,6 @@ namespace SongsOfConquestAccess.Adapters
             }
 
             return artifactMap[artifact] as InventoryArtifactMovable;
-        }
-
-        private static bool InvokeArtifactAction(InventoryArtifactMovable movable, Action<InventoryArtifactMovable> action)
-        {
-            if (movable == null || action == null)
-            {
-                return false;
-            }
-
-            action(movable);
-            return true;
         }
 
         private void AddLocalizedLine(List<string> lines, string key)
@@ -650,6 +816,15 @@ namespace SongsOfConquestAccess.Adapters
             return false;
         }
 
+        /// <summary>The level the skill's own entry DRAWS beside its name; the reference's level where
+        /// the entry cannot be read.</summary>
+        private string GetSkillLevelText(bool powers, int index, SkillReference skill)
+        {
+            UITextMesh level = GetField<UITextMesh>(GetSkillEntryComponent(powers, index), SkillEntryLevelField);
+            string text = UITextMeshTextUtility.GetEffectiveText(level);
+            return string.IsNullOrWhiteSpace(text) ? skill.Level.ToString(CultureInfo.CurrentCulture) : text;
+        }
+
         private void SelectSkillEntry(bool powers, int index)
         {
             Component component = GetSkillEntryComponent(powers, index);
@@ -670,11 +845,6 @@ namespace SongsOfConquestAccess.Adapters
             }
 
             return entries[index] as Component;
-        }
-
-        public void HideNativeTooltip()
-        {
-            NativeTooltipUtility.HideTooltip();
         }
 
         private Transform GetActiveModifierContent()
@@ -789,16 +959,21 @@ namespace SongsOfConquestAccess.Adapters
 
         private string GetInventorySlotName(InventorySlot slot)
         {
+            return GetInventorySlotName(slot.ToString());
+        }
+
+        private string GetInventorySlotName(string slotName)
+        {
             if (_localization != null)
             {
-                string text = _localization.GetText("InventorySlots/" + slot);
+                string text = _localization.GetText("InventorySlots/" + slotName);
                 if (!string.IsNullOrWhiteSpace(text))
                 {
                     return SpeechTextSanitizer.Normalize(text);
                 }
             }
 
-            return slot.ToString();
+            return slotName;
         }
 
         private static T GetField<T>(object owner, FieldInfo field) where T : class
@@ -808,37 +983,42 @@ namespace SongsOfConquestAccess.Adapters
 
         public sealed class LabeledItem
         {
-            public LabeledItem(string id, string label, string status = null, Action onFocus = null, Func<bool> activate = null, Tooltip tooltip = null)
+            public LabeledItem(string id, string label, string value = null, Action onFocus = null, Tooltip tooltip = null)
             {
                 Id = id ?? string.Empty;
                 Label = label ?? string.Empty;
-                Status = status ?? string.Empty;
+                Value = value ?? string.Empty;
                 OnFocus = onFocus;
-                Activate = activate;
                 Tooltip = tooltip;
             }
 
             public string Id { get; private set; }
             public string Label { get; private set; }
-            public string Status { get; private set; }
+
+            /// <summary>The number the game draws beside the name - a stat's value, a skill's level -
+            /// kept apart from it so the screen decides how the two read together.</summary>
+            public string Value { get; private set; }
             public Action OnFocus { get; private set; }
-            public Func<bool> Activate { get; private set; }
             public Tooltip Tooltip { get; private set; }
         }
 
         public sealed class ModifierCategory
         {
-            public ModifierCategory(string id, string label, int index, Tooltip tooltip = null)
+            public ModifierCategory(string id, string label, int index, Component button = null, Tooltip tooltip = null)
             {
                 Id = id;
                 Label = label;
                 Index = index;
+                Button = button;
                 Tooltip = tooltip;
             }
 
             public string Id { get; private set; }
             public string Label { get; private set; }
             public int Index { get; private set; }
+
+            /// <summary>The tab the game draws for this category.</summary>
+            public Component Button { get; private set; }
             public Tooltip Tooltip { get; private set; }
         }
 
