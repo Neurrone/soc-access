@@ -40,6 +40,9 @@ namespace SongsOfConquestAccess.UI
         private GraphState _state;
         private KeyGraph _graph;
 
+        // Whether the attached screen has had an Update of its own yet (HasTicked).
+        private bool _ticked;
+
         // What the differ last read out, by identity and by node (the node carries the parent chain
         // the next readout is diffed against).
         private ControlId _lastSpokenKey;
@@ -220,6 +223,7 @@ namespace SongsOfConquestAccess.UI
             }
 
             _screen = screen;
+            _ticked = false;
             CarryFollowedThePage();
             ClearSearch();
             _lastSpokenKey = null;
@@ -493,6 +497,15 @@ namespace SongsOfConquestAccess.UI
         {
             TypeAheadTick();
             EnsureFocus();
+            _ticked = true;
+        }
+
+        /// <summary>Whether this screen has had a frame of its own: false from the moment it is
+        /// attached until its first <see cref="Update"/> has run. The input layer asks before it lets
+        /// a typed character reach the search, so the key that opened the page is not typed into it.</summary>
+        public bool HasTicked(GraphScreen screen)
+        {
+            return _ticked && ReferenceEquals(screen, _screen);
         }
 
         /// <summary>

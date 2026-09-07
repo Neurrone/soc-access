@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using SongsOfConquestAccess.Speech;
 using SongsOfConquestAccess.Screens;
+using SongsOfConquestAccess.UI;
 using UnityEngine.InputSystem;
 using UnityEngine.InputSystem.Controls;
 using UnityEngine.InputSystem.LowLevel;
@@ -55,6 +56,7 @@ namespace SongsOfConquestAccess.Input
 
         private readonly System.Text.StringBuilder _typed = new System.Text.StringBuilder();
         private Keyboard _textKeyboard;
+        private Screen _screenTyped;
 
         // Subscribe to whichever keyboard is current. Asked every frame, not once: on a cold start
         // the mod comes up before the input system has a keyboard device at all (Keyboard.current
@@ -140,14 +142,41 @@ namespace SongsOfConquestAccess.Input
             return GameTextFocus.IsTyping() && _screenManager != null && _screenManager.CurrentScreen is GraphScreen;
         }
 
+        /// <summary>
+        /// The graph screen whose search may hear the keyboard - null while one is arriving.
+        ///
+        /// The key that OPENS a page is not typing INTO it. The game acts on the press (C opens the
+        /// wielder sheet, V the spellbook) while the same press's character event is still in the
+        /// input queue, so by the time the character is delivered the page it opened is already the
+        /// focused screen and its type-ahead would search for the letter that summoned it. The
+        /// navigator's first Update on a screen is the line between the two: everything before it
+        /// belongs to the press that opened the page, and is dropped.
+        /// </summary>
         private GraphScreen TypingScreen()
         {
-            return _screenManager == null ? null : _screenManager.CurrentScreen as GraphScreen;
+            GraphScreen screen = _screenManager == null ? null : _screenManager.CurrentScreen as GraphScreen;
+            GraphNavigator navigator = screen == null ? null : screen.Navigator;
+            return navigator != null && navigator.HasTicked(screen) ? screen : null;
+        }
+
+        // Characters queued for the page that had the keyboard are not the next page's: the focused
+        // screen can change between two frames with no key of the mod's at all.
+        private void ForgetTypedAcrossScreens()
+        {
+            Screen current = _screenManager == null ? null : _screenManager.CurrentScreen;
+            if (ReferenceEquals(current, _screenTyped))
+            {
+                return;
+            }
+
+            _screenTyped = current;
+            _typed.Length = 0;
         }
 
         public void Update()
         {
             FollowKeyboard();
+            ForgetTypedAcrossScreens();
             DrainInjections();
             ConfirmPendingReleases();
         }
