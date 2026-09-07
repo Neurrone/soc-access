@@ -23,7 +23,8 @@ namespace SongsOfConquestAccess.Screens
     /// which is what the mouse does. THE SIZE TABS DO NOT switch on arrival: switching re-pools every
     /// building button under them, so walking the bar would take the list the player is reading away.
     /// Their focus visual is the game's own selection alone and Enter is the switch. The tier tabs in
-    /// the details are the same: they redraw the pane under them.
+    /// the details are the same: they redraw the pane under them, and they are declared as ONE ROW
+    /// (2026-09-07), the bar the pane draws, walked with Left and Right.
     ///
     /// Escape is the game's (<c>ConsumesBack</c> false): the menu IS an
     /// <c>AdventureMenuBackground</c> with <c>_canClose</c> true, so it draws the close cross and
@@ -302,18 +303,32 @@ namespace SongsOfConquestAccess.Screens
             return first.TrimEnd('.') + ". " + second;
         }
 
+        /// <summary>The tier tabs the details pane draws as ONE bar, declared as one row: Left and
+        /// Right walk it, Up and Down step past it to the rest of the pane, and the position is the
+        /// tab's place in the bar. Enter is still the switch, for the reason the size tabs are
+        /// (arriving must not redraw the pane the player is reading).</summary>
         private void BuildTiers(GraphBuilder builder)
         {
             IReadOnlyList<BuildMenuAdapter.TierItem> tiers = _adapter.GetTiers();
+            List<BuildMenuAdapter.TierItem> drawn = new List<BuildMenuAdapter.TierItem>();
             for (int i = 0; i < tiers.Count; i++)
             {
-                BuildMenuAdapter.TierItem tier = tiers[i];
-                Component button = tier.Button;
-                if (button == null)
+                if (tiers[i].Button != null)
                 {
-                    continue;
+                    drawn.Add(tiers[i]);
                 }
+            }
 
+            if (drawn.Count == 0)
+            {
+                return;
+            }
+
+            builder.StartRow("build:tiers");
+            for (int i = 0; i < drawn.Count; i++)
+            {
+                BuildMenuAdapter.TierItem tier = drawn[i];
+                Component button = tier.Button;
                 BuildMenuAdapter.TierItem it = tier;
                 NodeVtable vtable = GraphNodes.Tab(
                     () => it.Label,
@@ -327,6 +342,8 @@ namespace SongsOfConquestAccess.Screens
                     vtable,
                     button));
             }
+
+            builder.EndRow();
         }
 
         /// <summary>One of the bands the details pane draws under a caption - the available research,
