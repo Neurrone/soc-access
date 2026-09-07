@@ -69,9 +69,31 @@ namespace SongsOfConquestAccess.Adapters
             get { return GetLocalizedText("Tutorial/TutorialPopup/ShowTutorialCheckbox", "Show tutorials"); }
         }
 
-        public bool IsOkAvailable()
+        /// <summary>The component the game draws the OK button with, or null where the popup has
+        /// none.</summary>
+        public Component OkButton
         {
-            return IsButtonAvailable(OkButtonRef(SimplePopup));
+            get { return OkButtonRef(SimplePopup); }
+        }
+
+        /// <summary>The component the game draws the show-tutorials checkbox with, or null.</summary>
+        public Component TutorialsToggle
+        {
+            get { return ToggleRef(SimplePopup); }
+        }
+
+        /// <summary>Whether the game is drawing the OK button at all.</summary>
+        public bool IsOkVisible()
+        {
+            UIButton button = OkButtonRef(SimplePopup);
+            return button != null && button.Active;
+        }
+
+        /// <summary>Whether the game is taking a press of the OK button.</summary>
+        public bool IsOkEnabled()
+        {
+            UIButton button = OkButtonRef(SimplePopup);
+            return button != null && button.Interactable;
         }
 
         public bool IsTutorialsChecked()

@@ -8,6 +8,8 @@ using SongsOfConquest.Client.UI;
 using SongsOfConquest.Common.Economy;
 using SongsOfConquest.Common.Localization;
 using SongsOfConquestAccess.Speech;
+using SongsOfConquestAccess.UI;
+using UnityEngine;
 
 namespace SongsOfConquestAccess.Adapters
 {
@@ -49,6 +51,45 @@ namespace SongsOfConquestAccess.Adapters
         public string CancelLabel
         {
             get { return GetButtonText(_settings != null ? _settings.CancelButton : null); }
+        }
+
+        /// <summary>The component the game draws the confirm button with, or null where there is
+        /// none - where it sits on the screen and what selects it are game facts.</summary>
+        public Component ConfirmButton
+        {
+            get { return _settings != null ? _settings.OkButton : null; }
+        }
+
+        /// <summary>The component the game draws the cancel button with, or null where there is
+        /// none.</summary>
+        public Component CancelButton
+        {
+            get { return _settings != null ? _settings.CancelButton : null; }
+        }
+
+        /// <summary>The text mesh inside the warning the menu shows when the player cannot afford the
+        /// cost (<c>WorldConfirmMenu.Setup</c> turns the warning object on and the OK button off
+        /// together), or null while the game is not drawing it.</summary>
+        public UITextMesh ResourceWarning
+        {
+            get
+            {
+                GameObject warning = _settings != null ? _settings.ResourceWarning : null;
+                return warning != null && warning.activeInHierarchy
+                    ? warning.GetComponentInChildren<UITextMesh>(false)
+                    : null;
+            }
+        }
+
+        /// <summary>The wording the warning draws, with the game's rich-text tags taken off.</summary>
+        public string ResourceWarningLabel
+        {
+            get
+            {
+                return string.Join(
+                    " ",
+                    SpokenLines.Of(new[] { UITextMeshTextUtility.GetEffectiveText(ResourceWarning) }));
+            }
         }
 
         public bool IsPresent()
@@ -93,11 +134,6 @@ namespace SongsOfConquestAccess.Adapters
             }
 
             return GetVisibleCostEntryLabels();
-        }
-
-        public void ClearNativeSelection()
-        {
-            NativeSelectionUtility.Select((UnityEngine.GameObject)null);
         }
 
         private List<string> GetVisibleCostEntryLabels()

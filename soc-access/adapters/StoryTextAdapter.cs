@@ -1,9 +1,11 @@
+using System.Collections.Generic;
 using System.Reflection;
 using HarmonyLib;
 using Lavapotion.Utilities;
 using SongsOfConquest.Client.Adventure;
 using SongsOfConquest.Client.UI;
 using SongsOfConquestAccess.Speech;
+using SongsOfConquestAccess.UI;
 using TMPro;
 using UnityEngine;
 
@@ -51,7 +53,14 @@ namespace SongsOfConquestAccess.Adapters
 
         public string Body
         {
-            get { return SpeechTextSanitizer.Normalize(GetText(LoreTextRef)); }
+            get { return string.Join(" ", BodyLines); }
+        }
+
+        /// <summary>The paragraphs the game broke the lore text into, kept apart rather than
+        /// collapsed: the story is read a paragraph at a time.</summary>
+        public IList<string> BodyLines
+        {
+            get { return SpokenLines.Of(new[] { GetText(LoreTextRef) }); }
         }
 
         public bool IsPresent()

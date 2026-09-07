@@ -6,6 +6,7 @@ using SongsOfConquest.Client.Menu;
 using SongsOfConquest.Client.UI;
 using SongsOfConquest.Common.Dialogue;
 using SongsOfConquestAccess.Speech;
+using SongsOfConquestAccess.UI;
 using TMPro;
 using UnityEngine;
 
@@ -65,12 +66,20 @@ namespace SongsOfConquestAccess.Adapters
 
         public string Body
         {
+            get { return string.Join(" ", BodyLines); }
+        }
+
+        /// <summary>The paragraphs the game broke the line into, kept apart rather than collapsed:
+        /// the dialogue is read a paragraph at a time.</summary>
+        public IList<string> BodyLines
+        {
             get
             {
                 DialogueMenu.Settings settings = GetSettings();
-                return SpeechTextSanitizer.Normalize(settings != null
-                    ? UITextMeshTextUtility.GetEffectiveText(settings.DialogueText)
-                    : string.Empty);
+                return SpokenLines.Of(new[]
+                {
+                    settings != null ? UITextMeshTextUtility.GetEffectiveText(settings.DialogueText) : string.Empty
+                });
             }
         }
 

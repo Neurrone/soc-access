@@ -68,11 +68,15 @@ namespace SongsOfConquestAccess.Adapters
             NativeTooltipUtility.HideTooltip();
         }
 
+        // The three texts each choice draws are separate meshes of its container: the title in
+        // TitleLayout/Title, the duration beside it in TitleLayout/Duration, and the paragraph below
+        // in DescriptionText. They are handed out as they are drawn; what the reading order makes of
+        // them is the screen's business.
         private static void AddChoice(List<ChoiceItem> choices, string idSuffix, UITransform container, Toggle toggle)
         {
             Component containerComponent = container as Component;
             GameObject root = containerComponent != null ? containerComponent.gameObject : null;
-            if (!IsVisible(root))
+            if (!IsVisible(root) || toggle == null)
             {
                 return;
             }
@@ -82,8 +86,11 @@ namespace SongsOfConquestAccess.Adapters
             UITextMesh description = FindText(root, "DescriptionText");
             choices.Add(new ChoiceItem(
                 idSuffix,
-                () => JoinParts(GetText(title), GetText(duration), GetText(description)),
-                () => toggle != null && toggle.interactable,
+                toggle,
+                () => GetText(title),
+                () => GetText(duration),
+                () => GetText(description),
+                () => toggle.interactable,
                 () => FocusToggle(toggle),
                 () => ActivateToggle(toggle)));
         }
@@ -114,26 +121,6 @@ namespace SongsOfConquestAccess.Adapters
             return SpeechTextSanitizer.Normalize(UITextMeshTextUtility.GetEffectiveText(textMesh));
         }
 
-        private static string JoinParts(params string[] parts)
-        {
-            if (parts == null || parts.Length == 0)
-            {
-                return string.Empty;
-            }
-
-            List<string> cleaned = new List<string>();
-            for (int i = 0; i < parts.Length; i++)
-            {
-                string part = SpeechTextSanitizer.Normalize(parts[i]);
-                if (!string.IsNullOrWhiteSpace(part))
-                {
-                    cleaned.Add(part);
-                }
-            }
-
-            return cleaned.Count == 0 ? string.Empty : string.Join(". ", cleaned.ToArray());
-        }
-
         private static bool IsVisible(Component component)
         {
             return component != null && component.gameObject != null && component.gameObject.activeInHierarchy;
@@ -153,17 +140,34 @@ namespace SongsOfConquestAccess.Adapters
         {
             private readonly Func<bool> _isEnabled;
 
-            public ChoiceItem(string idSuffix, Func<string> getLabel, Func<bool> isEnabled, Func<bool> focus, Func<bool> activate)
+            public ChoiceItem(
+                string idSuffix,
+                Component toggle,
+                Func<string> getTitle,
+                Func<string> getDuration,
+                Func<string> getDescription,
+                Func<bool> isEnabled,
+                Func<bool> focus,
+                Func<bool> activate)
             {
                 IdSuffix = idSuffix ?? string.Empty;
-                GetLabel = getLabel;
+                Toggle = toggle;
+                GetTitle = getTitle;
+                GetDuration = getDuration;
+                GetDescription = getDescription;
                 _isEnabled = isEnabled;
                 Focus = focus;
                 Activate = activate;
             }
 
             public string IdSuffix { get; private set; }
-            public Func<string> GetLabel { get; private set; }
+
+            /// <summary>The component the game draws this choice with - its toggle.</summary>
+            public Component Toggle { get; private set; }
+
+            public Func<string> GetTitle { get; private set; }
+            public Func<string> GetDuration { get; private set; }
+            public Func<string> GetDescription { get; private set; }
             public Func<bool> Focus { get; private set; }
             public Func<bool> Activate { get; private set; }
 

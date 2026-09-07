@@ -1,3 +1,4 @@
+using System.Reflection;
 using HarmonyLib;
 using SongsOfConquest.Client.Menu;
 using SongsOfConquest.Client.UI;
@@ -28,6 +29,12 @@ namespace SongsOfConquestAccess.Adapters
             AccessTools.FieldRefAccess<TutorialMenu, UIButton>("_closeButton");
         private static readonly AccessTools.FieldRef<TutorialMenu, TutorialSimplePopup> SimplePopupRef =
             AccessTools.FieldRefAccess<TutorialMenu, TutorialSimplePopup>("_simplePopup");
+        private static readonly AccessTools.FieldRef<TutorialMenu, int> CurrentPageRef =
+            AccessTools.FieldRefAccess<TutorialMenu, int>("_currentPage");
+        private static readonly AccessTools.FieldRef<TutorialMenu, ITutorialEntry> CurrentTutorialRef =
+            AccessTools.FieldRefAccess<TutorialMenu, ITutorialEntry>("_currentTutorial");
+        private static readonly MethodInfo UpdatePageMethod =
+            AccessTools.Method(typeof(TutorialMenu), "UpdatePage");
 
         private readonly TutorialMenu _menu;
 
@@ -73,6 +80,75 @@ namespace SongsOfConquestAccess.Adapters
             get { return GetLocalizedText("Tutorial/TutorialPopup/ShowTutorialCheckbox", "Show tutorials"); }
         }
 
+        /// <summary>The text mesh the panel writes each page's description into - one viewer the game
+        /// rewrites per page, and the only thing on screen that draws a page at all.</summary>
+        public Component DescriptionBox
+        {
+            get { return _menu != null ? DescriptionTextRef(_menu) : null; }
+        }
+
+        /// <summary>The component the game draws the show-tutorials checkbox with, or null.</summary>
+        public Component TutorialsToggle
+        {
+            get { return _menu != null ? TutorialsToggleRef(_menu) : null; }
+        }
+
+        /// <summary>The component the game draws the closing button with, or null.</summary>
+        public Component CloseButton
+        {
+            get { return _menu != null ? CloseButtonRef(_menu) : null; }
+        }
+
+        /// <summary>What the game writes on the closing button ("Got it!").</summary>
+        public string CloseLabel
+        {
+            get { return MenuButtonTextUtility.GetStandardButtonLabel(_menu != null ? CloseButtonRef(_menu) : null); }
+        }
+
+        /// <summary>How many pages the tutorial the panel is showing has.</summary>
+        public int PageCount
+        {
+            get
+            {
+                ITutorialEntry tutorial = CurrentTutorial;
+                return tutorial != null && tutorial.SlideShowPages != null ? tutorial.SlideShowPages.Count : 0;
+            }
+        }
+
+        /// <summary>Which page the panel is showing, counted from zero.</summary>
+        public int CurrentPage
+        {
+            get { return _menu != null ? CurrentPageRef(_menu) : 0; }
+        }
+
+        /// <summary>
+        /// Turn the panel to <paramref name="page"/>. The menu offers no page-by-index call of its
+        /// own - <c>HandleOnHorizontal</c> steps one page at a time off the arrow clicks - so this
+        /// sets the page index the menu keeps and calls its own redraw, which is what the arrows do
+        /// after they have moved the index (owner's choice 2026-09-07 over replaying arrow clicks).
+        /// <c>UpdatePage</c> is also what records that the last page has been seen, so a turn to the
+        /// end enables the closing button exactly as clicking through would.
+        /// </summary>
+        public bool ShowPage(int page)
+        {
+            if (_menu == null || UpdatePageMethod == null || page < 0 || page >= PageCount)
+            {
+                return false;
+            }
+
+            try
+            {
+                CurrentPageRef(_menu) = page;
+                UpdatePageMethod.Invoke(_menu, null);
+                return true;
+            }
+            catch (System.Exception exception)
+            {
+                SocAccessMod.Instance?.LogWarning("Failed to turn the tutorial to page " + page + ": " + exception.Message);
+                return false;
+            }
+        }
+
         public bool IsPreviousAvailable()
         {
             return IsButtonAvailable(PageLeftButtonRef(_menu));
@@ -83,9 +159,19 @@ namespace SongsOfConquestAccess.Adapters
             return IsButtonAvailable(PageRightButtonRef(_menu));
         }
 
-        public bool IsCloseAvailable()
+        /// <summary>Whether the game is drawing the closing button at all.</summary>
+        public bool IsCloseVisible()
         {
-            return IsButtonAvailable(CloseButtonRef(_menu));
+            UIButton button = _menu != null ? CloseButtonRef(_menu) : null;
+            return button != null && button.Active;
+        }
+
+        /// <summary>Whether the game is taking a press of the closing button - it enables it once the
+        /// last page has been shown.</summary>
+        public bool IsCloseEnabled()
+        {
+            UIButton button = _menu != null ? CloseButtonRef(_menu) : null;
+            return button != null && button.Interactable;
         }
 
         public bool IsTutorialsChecked()
@@ -131,6 +217,11 @@ namespace SongsOfConquestAccess.Adapters
         private static bool IsButtonAvailable(UIButton button)
         {
             return button != null && button.Active && button.Interactable;
+        }
+
+        private ITutorialEntry CurrentTutorial
+        {
+            get { return _menu != null ? CurrentTutorialRef(_menu) : null; }
         }
 
         private static bool IsActive(GameObject gameObject)
