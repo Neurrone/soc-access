@@ -35,8 +35,9 @@ namespace SongsOfConquestAccess.UI
     /// - Ctrl+1 to Ctrl+0 are the game's quick splits, which act on the troop the pointer is over; on
     ///   a troop row the mod claims the chord and hands the game the row as its hovered entry.
     ///
-    /// A slot the bar draws with a lock on it reads as empty and unavailable: it is drawn, so it is
-    /// there to be found, and it holds nothing and takes nothing.
+    /// A slot the bar draws with a lock on it is NOT a row (owner ruling 2026-09-08): a wielder who
+    /// has not unlocked it cannot use it for anything, so the rows count only the slots the wielder
+    /// has.
     /// </summary>
     public static class TroopHudRows
     {
@@ -144,7 +145,7 @@ namespace SongsOfConquestAccess.UI
             // registration is a delegate over this load and must not outlive it.
             CarrySounds.Register(TroopCargo, () => NativeSoundUtility.PostEvent(PickUpSound), null);
 
-            IReadOnlyList<TroopHudAdapter.SlotItem> slots = troops.GetSlots(includeLocked: true);
+            IReadOnlyList<TroopHudAdapter.SlotItem> slots = troops.GetSlots();
             for (int i = 0; i < slots.Count; i++)
             {
                 AddRow(builder, troops, slots[i], rowPrefix + i, available);
@@ -197,7 +198,7 @@ namespace SongsOfConquestAccess.UI
             int index = navigator == null ? -1 : navigator.FocusedIndex(RowPrefix(keyPrefix));
             IReadOnlyList<TroopHudAdapter.SlotItem> slots = index < 0 || troops == null
                 ? null
-                : troops.GetSlots(includeLocked: true);
+                : troops.GetSlots();
             if (slots == null || index >= slots.Count)
             {
                 return null;
