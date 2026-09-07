@@ -1,19 +1,51 @@
+using System;
 using System.Collections.Generic;
 using SongsOfConquest.Client.UI;
 using SongsOfConquestAccess.Adapters;
-using SongsOfConquestAccess.Input;
 using SongsOfConquestAccess.Localization;
 using SongsOfConquestAccess.UI;
+using SongsOfConquestAccess.UI.Graph;
 using UnityEngine;
 
 namespace SongsOfConquestAccess.Screens
 {
-    public sealed class PurchaseWielderScreen : Screen
+    /// <summary>
+    /// The menu for hiring a wielder at a claimed settlement, made navigable as a graph. Three places
+    /// to be, in the order the menu draws them: the list of candidates down the left, the details of
+    /// the one selected on the right, and the close cross.
+    ///
+    /// Measured 2026-09-07: entries left, details right; the skill levels are drawn as bare numbers
+    /// the mod does not read. The entries are declared in the order the menu keeps them, which is the
+    /// drawn order - the pool puts each entry it takes at the end of the container
+    /// (<c>SetAsLastSibling</c>).
+    ///
+    /// ARRIVING ON A CANDIDATE SELECTS IT. The click only refills the details pane on the right -
+    /// nothing is bought and no page is replaced (<c>PurchaseWielderMenu.HandleEntrySelected</c>) -
+    /// so arriving at a candidate and seeing what they are worth is one event, which is also what the
+    /// mouse does. Enter selects the same way; the purchase is its own button, and the game's own
+    /// double click.
+    ///
+    /// The details are ONE stop rather than one per band: they are a description of the candidate the
+    /// player just arrived at, read top to bottom.
+    ///
+    /// Escape is the game's (<c>ConsumesBack</c> false): the menu is an
+    /// <c>AdventureMenuBackground</c> with <c>_canClose</c> true, so it draws the close cross and
+    /// registers <c>UI.ExitMenu</c> on its own close in <c>AnimateEntry</c>.
+    /// </summary>
+    public sealed class PurchaseWielderScreen : GraphScreen
     {
+        private const string EntriesStop = "purchase-wielder-list";
+        private const string DetailsStop = "purchase-wielder-details";
+        private const string CloseStop = "purchase-wielder-close";
+
         private readonly PurchaseWielderMenuAdapter _adapter;
 
+        // A subject of its own per synthesized line, kept across rebuilds so the reconciler seats the
+        // cursor on the same one: the summary, the four stats, the specialization and the purchase
+        // status are read off text meshes the details pane rebinds rather than off rows of their own.
+        private readonly Dictionary<string, object> _markers = new Dictionary<string, object>();
+
         public PurchaseWielderScreen(PurchaseWielderMenuAdapter adapter)
-            : base(BuildRoot(adapter))
         {
             _adapter = adapter;
         }
@@ -38,239 +70,255 @@ namespace SongsOfConquestAccess.Screens
             get { return _adapter; }
         }
 
+        public override string Key
+        {
+            get { return "purchase-wielder"; }
+        }
+
+        /// <summary>The title the menu draws over the list ("Arleon Wielders 2/2").</summary>
+        public override string ScreenName
+        {
+            get
+            {
+                string title = _adapter != null ? _adapter.Title : null;
+                return string.IsNullOrWhiteSpace(title) ? null : title;
+            }
+        }
+
         public override bool IsPresent()
         {
             return _adapter != null && _adapter.IsPresent();
         }
 
-        public override void OnUnfocus()
-        {
-            _adapter?.HideNativeTooltip();
-            RootWidget?.Unfocus();
-        }
-
-        public override void OnPop()
-        {
-            _adapter?.HideNativeTooltip();
-        }
-
-        public override bool OnActionJustPressed(InputAction action)
-        {
-            if (action != null && action.Key == AccessibilityActions.Cancel.Key)
-            {
-                if (RootWidget != null && RootWidget.HandleAction(action))
-                {
-                    return true;
-                }
-
-                return _adapter != null && _adapter.Close();
-            }
-
-            return base.OnActionJustPressed(action);
-        }
-
-        public void Refresh()
+        public override void Build(GraphBuilder builder)
         {
             if (!IsPresent())
             {
                 return;
             }
 
-            int focusedIndex = RootWidget != null ? RootWidget.FocusedIndex : -1;
-            RootWidget = BuildRoot(_adapter);
-            RootWidget?.SetFocusByIndexSilently(focusedIndex);
+            builder.BeginStop(EntriesStop);
+            BuildEntries(builder);
+
+            builder.BeginStop(DetailsStop);
+            BuildDetails(builder);
+
+            builder.BeginStop(CloseStop);
+            BuildClose(builder);
         }
 
-        private static ContainerWidget BuildRoot(PurchaseWielderMenuAdapter adapter)
+        // ---- the candidates ----
+
+        private void BuildEntries(GraphBuilder builder)
         {
-            ContainerWidget root = new ContainerWidget("purchase-wielder", adapter != null ? adapter.Title : string.Empty);
-            if (adapter == null)
-            {
-                return root;
-            }
-
-            root.AddChild(new TextWidget(
-                "purchase-wielder-title",
-                () => adapter.Title,
-                adapter.HideNativeTooltip,
-                includeParentLabelInAnnouncement: false));
-
-            root.AddChild(BuildWielderMenu(adapter));
-
-            root.AddChild(new TextWidget(
-                "purchase-wielder-summary",
-                () => adapter.SelectedSummary,
-                adapter.HideNativeTooltip,
-                includeParentLabelInAnnouncement: false));
-
-            root.AddChild(BuildStatsMenu(adapter));
-            root.AddChild(BuildTroopsMenu(adapter));
-            root.AddChild(BuildSkillsMenu(adapter));
-
-            root.AddChild(new TextWidget(
-                "purchase-wielder-specialization",
-                () => adapter.Specialization,
-                adapter.HideNativeTooltip,
-                includeParentLabelInAnnouncement: false,
-                isVisible: adapter.HasSpecialization));
-
-            root.AddChild(new TextWidget(
-                "purchase-wielder-status",
-                () => adapter.PurchaseStatus,
-                adapter.HideNativeTooltip,
-                includeParentLabelInAnnouncement: false,
-                isVisible: adapter.HasPurchaseStatus));
-
-            root.AddChild(new ButtonWidget(
-                "purchase-wielder-purchase",
-                () => adapter.PurchaseLabel,
-                adapter.ActivatePurchase,
-                adapter.FocusPurchase,
-                adapter.IsPurchaseEnabled,
-                adapter.IsPurchaseVisible,
-                () => adapter.PurchaseTooltip));
-
-            root.AddChild(new ButtonWidget(
-                "purchase-wielder-close",
-                ModText.Get(ModStrings.Screens.Close),
-                adapter.Close,
-                adapter.HideNativeTooltip,
-                () => true));
-
-            return root;
-        }
-
-        private static MenuWidget BuildWielderMenu(PurchaseWielderMenuAdapter adapter)
-        {
-            MenuWidget menu = new MenuWidget("purchase-wielder-list", adapter.Title);
-            IReadOnlyList<PurchaseWielderMenuAdapter.EntryItem> entries = adapter.GetEntries();
+            IReadOnlyList<PurchaseWielderMenuAdapter.EntryItem> entries = _adapter.GetEntries();
+            ControlId selected = null;
             for (int i = 0; i < entries.Count; i++)
             {
                 PurchaseWielderMenuAdapter.EntryItem entry = entries[i];
-                menu.AddItem(new MenuItemWidget(
-                    entry.Id,
-                    () => entry.Label,
-                    () => entry.Status,
-                    entry.Select,
-                    entry.Focus,
-                    () => entry.IsVisible));
-            }
-
-            if (entries.Count == 0)
-            {
-                return menu;
-            }
-
-            menu.SetFocusedItemById(adapter.SelectedEntryId);
-
-            return menu;
-        }
-
-        private static MenuWidget BuildStatsMenu(PurchaseWielderMenuAdapter adapter)
-        {
-            MenuWidget menu = new MenuWidget("purchase-wielder-stats", adapter.StatsHeader);
-            menu.AddItem(BuildReadOnlyItem("purchase-wielder-offence", () => adapter.OffenceHeader + " " + adapter.Offence, adapter.HideNativeTooltip));
-            menu.AddItem(BuildReadOnlyItem("purchase-wielder-defence", () => adapter.DefenceHeader + " " + adapter.Defence, adapter.HideNativeTooltip));
-            menu.AddItem(BuildReadOnlyItem("purchase-wielder-movement", () => adapter.MovementHeader + " " + adapter.Movement, adapter.HideNativeTooltip));
-            menu.AddItem(BuildReadOnlyItem("purchase-wielder-view-radius", () => adapter.ViewRadiusHeader + " " + adapter.ViewRadius, adapter.HideNativeTooltip));
-            return menu;
-        }
-
-        private static MenuWidget BuildTroopsMenu(PurchaseWielderMenuAdapter adapter)
-        {
-            MenuWidget menu = new MenuWidget("purchase-wielder-troops", adapter.TroopsHeader, adapter.HasTroops);
-            int count = adapter.TroopSlotCount;
-            for (int i = 0; i < count; i++)
-            {
-                int capturedIndex = i;
-                menu.AddItem(new MenuItemWidget(
-                    "purchase-wielder-troop-" + capturedIndex,
-                    () => BuildTroopLabel(adapter, capturedIndex),
-                    null,
-                    () => false,
-                    () => adapter.FocusTroop(capturedIndex),
-                    () => adapter.IsTroopVisible(capturedIndex),
-                    () => adapter.GetTroopTooltip(capturedIndex)));
-            }
-
-            return menu;
-        }
-
-        private static string BuildTroopLabel(PurchaseWielderMenuAdapter adapter, int index)
-        {
-            if (adapter == null)
-            {
-                return string.Empty;
-            }
-
-            string name = adapter.GetTroopName(index);
-            if (string.IsNullOrWhiteSpace(name))
-            {
-                name = string.Empty;
-            }
-
-            int amount = adapter.GetTroopAmount(index);
-            return amount > 0 ? amount + " " + name : name;
-        }
-
-        private static MenuWidget BuildSkillsMenu(PurchaseWielderMenuAdapter adapter)
-        {
-            MenuWidget menu = new MenuWidget("purchase-wielder-skills", adapter.SkillsHeader, () => HasVisibleSkills(adapter));
-            int count = adapter.SkillSlotCount;
-            for (int i = 0; i < count; i++)
-            {
-                int capturedIndex = i;
-                menu.AddItem(new MenuItemWidget(
-                    "purchase-wielder-skill-" + capturedIndex,
-                    () => BuildSkillLabel(adapter, capturedIndex),
-                    null,
-                    () => false,
-                    () => adapter.FocusSkill(capturedIndex),
-                    () => adapter.IsSkillVisible(capturedIndex),
-                    () => adapter.GetSkillTooltip(capturedIndex)));
-            }
-
-            return menu;
-        }
-
-        private static string BuildSkillLabel(PurchaseWielderMenuAdapter adapter, int index)
-        {
-            if (adapter == null)
-            {
-                return string.Empty;
-            }
-
-            string name = adapter.GetSkillName(index);
-            return string.IsNullOrWhiteSpace(name) ? ModText.Get(ModStrings.Screens.Skill, index + 1) : name;
-        }
-
-        private static bool HasVisibleSkills(PurchaseWielderMenuAdapter adapter)
-        {
-            if (adapter == null)
-            {
-                return false;
-            }
-
-            for (int i = 0; i < adapter.SkillSlotCount; i++)
-            {
-                if (adapter.IsSkillVisible(i))
+                Component button = entry.Button;
+                if (button == null)
                 {
-                    return true;
+                    continue;
+                }
+
+                PurchaseWielderMenuAdapter.EntryItem it = entry;
+                NodeVtable vtable = GraphNodes.Button(() => it.Name, () => it.Select());
+                vtable.Announcements.Add(GraphNodes.ValuePart(() => it.ClassText));
+                vtable.Announcements.Add(GraphNodes.ValuePart(() => StatusText(it)));
+                vtable.Announcements.Add(GraphNodes.SelectedPart(() => it.IsSelected));
+                // Arrival IS the selection: the click refills the details pane and nothing else.
+                vtable.OnFocusVisual = () => it.Focus();
+                ControlId id = ControlId.For(button, "purchase-wielder:entry/" + entry.Id);
+                builder.AddItem(new DrawnNode(id, vtable, button));
+                if (entry.IsSelected)
+                {
+                    selected = id;
                 }
             }
 
-            return false;
+            // The candidate the menu is showing, so arriving reads the details the player can see.
+            builder.LandStopOn(selected);
+            builder.SetStart(selected);
         }
 
-        private static MenuItemWidget BuildReadOnlyItem(string id, System.Func<string> getLabel, System.Action onFocus)
+        /// <summary>What the entry's own overlays say about the wielder: the game draws a frame around
+        /// one the team already has and a cross over one that has died, and neither carries words.
+        /// </summary>
+        private static string StatusText(PurchaseWielderMenuAdapter.EntryItem entry)
         {
-            return new MenuItemWidget(
-                id,
-                getLabel,
-                null,
-                () => false,
-                onFocus,
-                () => true);
+            if (entry.IsDead)
+            {
+                return ModText.Get(ModStrings.Screens.WielderDead);
+            }
+
+            return entry.IsOwned ? ModText.Get(ModStrings.Screens.WielderOwned) : null;
+        }
+
+        // ---- the details ----
+
+        private void BuildDetails(GraphBuilder builder)
+        {
+            AddLine(builder, "summary", () => _adapter.SelectedSummary);
+            AddStat(builder, "offence", () => _adapter.OffenceHeader, () => _adapter.Offence);
+            AddStat(builder, "defence", () => _adapter.DefenceHeader, () => _adapter.Defence);
+            AddStat(builder, "movement", () => _adapter.MovementHeader, () => _adapter.Movement);
+            AddStat(builder, "view-radius", () => _adapter.ViewRadiusHeader, () => _adapter.ViewRadius);
+            BuildTroops(builder);
+            BuildSkills(builder);
+            if (_adapter.HasSpecialization())
+            {
+                AddLine(builder, "specialization", () => _adapter.Specialization);
+            }
+
+            if (_adapter.HasPurchaseStatus())
+            {
+                AddLine(builder, "status", () => _adapter.PurchaseStatus);
+            }
+
+            BuildPurchase(builder);
+        }
+
+        private void BuildTroops(GraphBuilder builder)
+        {
+            if (!_adapter.HasTroops())
+            {
+                return;
+            }
+
+            for (int i = 0; i < _adapter.TroopSlotCount; i++)
+            {
+                Component slot = _adapter.GetTroopComponent(i);
+                if (slot == null || !_adapter.IsTroopVisible(i))
+                {
+                    continue;
+                }
+
+                int index = i;
+                NodeVtable vtable = GraphNodes.Text(
+                    () => TroopLabel(index),
+                    null,
+                    _adapter.GetTroopTooltip(index));
+                vtable.OnFocusVisual = () => _adapter.FocusTroop(index);
+                builder.AddItem(new DrawnNode(
+                    ControlId.For(slot, "purchase-wielder:troop/" + index),
+                    vtable,
+                    slot));
+            }
+        }
+
+        private string TroopLabel(int index)
+        {
+            string name = _adapter.GetTroopName(index);
+            int amount = _adapter.GetTroopAmount(index);
+            return amount > 0 ? ModText.Get(ModStrings.Combat.TroopQuantity, amount, name) : name;
+        }
+
+        private void BuildSkills(GraphBuilder builder)
+        {
+            for (int i = 0; i < _adapter.SkillSlotCount; i++)
+            {
+                Component slot = _adapter.GetSkillComponent(i);
+                if (slot == null || !_adapter.IsSkillVisible(i))
+                {
+                    continue;
+                }
+
+                int index = i;
+                NodeVtable vtable = GraphNodes.Text(
+                    () => SkillLabel(index),
+                    null,
+                    _adapter.GetSkillTooltip(index));
+                vtable.OnFocusVisual = () => _adapter.FocusSkill(index);
+                builder.AddItem(new DrawnNode(
+                    ControlId.For(slot, "purchase-wielder:skill/" + index),
+                    vtable,
+                    slot));
+            }
+        }
+
+        private string SkillLabel(int index)
+        {
+            string name = _adapter.GetSkillName(index);
+            return string.IsNullOrWhiteSpace(name) ? ModText.Get(ModStrings.Screens.Skill, index + 1) : name;
+        }
+
+        private void BuildPurchase(GraphBuilder builder)
+        {
+            Component purchase = _adapter.PurchaseButton;
+            if (purchase == null || !_adapter.IsPurchaseVisible())
+            {
+                return;
+            }
+
+            NodeVtable vtable = GraphNodes.Button(
+                () => _adapter.PurchaseLabel,
+                () => _adapter.ActivatePurchase(),
+                _adapter.IsPurchaseEnabled,
+                _adapter.PurchaseTooltip);
+            vtable.OnFocusVisual = () => _adapter.FocusPurchase();
+            builder.AddItem(new DrawnNode(
+                ControlId.For(purchase, "purchase-wielder:purchase"),
+                vtable,
+                purchase));
+        }
+
+        // ---- the close cross ----
+
+        private void BuildClose(GraphBuilder builder)
+        {
+            Component close = _adapter.CloseButton;
+            if (close == null || !_adapter.IsCloseVisible())
+            {
+                return;
+            }
+
+            // An icon with no text of its own, so the mod names it.
+            NodeVtable vtable = GraphNodes.Button(
+                () => ModText.Get(ModStrings.Screens.Close),
+                () => _adapter.ActivateClose());
+            vtable.OnFocusVisual = () => NativeSelectionUtility.Select(close);
+            builder.AddItem(new DrawnNode(ControlId.For(close, "purchase-wielder:close"), vtable, close));
+        }
+
+        // ---- shared ----
+
+        private void AddStat(GraphBuilder builder, string key, Func<string> header, Func<string> value)
+        {
+            if (string.IsNullOrWhiteSpace(value()))
+            {
+                return;
+            }
+
+            NodeVtable vtable = GraphNodes.Text(header);
+            vtable.Announcements.Add(GraphNodes.ValuePart(value));
+            builder.AddItem(new SyntheticNode(
+                ControlId.For(Marker(key), "purchase-wielder:" + key),
+                vtable));
+        }
+
+        private void AddLine(GraphBuilder builder, string key, Func<string> text)
+        {
+            if (string.IsNullOrWhiteSpace(text()))
+            {
+                return;
+            }
+
+            builder.AddItem(new SyntheticNode(
+                ControlId.For(Marker(key), "purchase-wielder:" + key),
+                GraphNodes.Text(text)));
+        }
+
+        private object Marker(string key)
+        {
+            object marker;
+            if (!_markers.TryGetValue(key, out marker))
+            {
+                marker = new object();
+                _markers.Add(key, marker);
+            }
+
+            return marker;
         }
     }
 }

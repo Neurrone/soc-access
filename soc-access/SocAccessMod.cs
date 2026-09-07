@@ -130,6 +130,7 @@ namespace SongsOfConquestAccess
                 GraphNavigator.ResetWiring();
             });
             _navigator = null;
+            Step("pointer hover", UI.PointerHover.Release);
             Step("beacon audio", AdventureBeaconAudio.DisposeAll);
             Step("synth audio", SynthCuePlayer.DisposeAll);
             Step("sweep audio", SweepPlayer.DisposeAll);

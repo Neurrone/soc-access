@@ -9,6 +9,7 @@ using SongsOfConquest.Client.Adventure;
 using SongsOfConquest.Client.Adventure.UI;
 using SongsOfConquest.Client.Menu;
 using SongsOfConquest.Client.UI;
+using SongsOfConquest.Common.Economy;
 using SongsOfConquest.Common.Localization;
 using SongsOfConquestAccess.Localization;
 using SongsOfConquestAccess.Speech;
@@ -24,6 +25,7 @@ namespace SongsOfConquestAccess.Adapters
         private static readonly FieldInfo SelectedEntryIndexField = AccessTools.Field(typeof(PurchaseWielderMenu), "_selectedEntryIndex");
         private static readonly FieldInfo WielderDetailsField = AccessTools.Field(typeof(PurchaseWielderMenu), "_wielderDetails");
         private static readonly FieldInfo LocalizationField = AccessTools.Field(typeof(PurchaseWielderMenu), "_localizationHandler");
+        private static readonly FieldInfo BackgroundCloseButtonField = AccessTools.Field(typeof(AdventureMenuBackground), "_closeButton");
 
         private static readonly FieldInfo EntryNameField = AccessTools.Field(typeof(PurchaseWielderEntry), "_name");
         private static readonly FieldInfo EntryClassField = AccessTools.Field(typeof(PurchaseWielderEntry), "_class");
@@ -245,13 +247,18 @@ namespace SongsOfConquestAccess.Adapters
             return Tooltip.ForComponent(entry != null ? entry.GetSelectable() : null, _localization);
         }
 
-        public void FocusTroop(int index)
+        /// <summary>The slot the game draws this troop in - what the row is drawn by, and what its
+        /// tooltip hangs on.</summary>
+        public Component GetTroopComponent(int index)
         {
             IReadOnlyList<TroopHUDEntry> entries = GetTroopEntries();
-            if (index >= 0 && index < entries.Count && entries[index] != null)
-            {
-                NativeSelectionUtility.Select(entries[index].GetSelectable());
-            }
+            TroopHUDEntry entry = index >= 0 && index < entries.Count ? entries[index] : null;
+            return entry != null ? entry.GetSelectable() as Component : null;
+        }
+
+        public void FocusTroop(int index)
+        {
+            NativeSelectionUtility.Select(GetTroopComponent(index));
         }
 
         public int SkillSlotCount
@@ -287,13 +294,19 @@ namespace SongsOfConquestAccess.Adapters
             return Tooltip.ForComponent(GetField<UIImage>(entries[index], SkillFrameField) as Component, _localization);
         }
 
-        public void FocusSkill(int index)
+        /// <summary>The frame the game draws this skill in - what the row is drawn by, and what its
+        /// tooltip hangs on.</summary>
+        public Component GetSkillComponent(int index)
         {
             IReadOnlyList<PurchaseWielderSkillEntry> entries = GetSkillEntries();
-            if (index >= 0 && index < entries.Count)
-            {
-                NativeSelectionUtility.Select(GetField<UIImage>(entries[index], SkillFrameField) as Component);
-            }
+            return index >= 0 && index < entries.Count
+                ? GetField<UIImage>(entries[index], SkillFrameField) as Component
+                : null;
+        }
+
+        public void FocusSkill(int index)
+        {
+            NativeSelectionUtility.Select(GetSkillComponent(index));
         }
 
         public bool HasSpecialization()
@@ -381,6 +394,31 @@ namespace SongsOfConquestAccess.Adapters
             NativeSelectionUtility.Select(GetPurchaseButton() as Component);
         }
 
+        /// <summary>The Purchase button the details pane draws.</summary>
+        public Component PurchaseButton
+        {
+            get { return GetPurchaseButton() as Component; }
+        }
+
+        /// <summary>The close cross the menu's <c>AdventureMenuBackground</c> draws at the top right.
+        /// It is only turned on where the background may be closed and the player is on mouse and
+        /// keyboard (<c>AnimateEntry</c>).</summary>
+        public Component CloseButton
+        {
+            get { return GetCloseButton() as Component; }
+        }
+
+        public bool IsCloseVisible()
+        {
+            UIButton button = GetCloseButton();
+            return button != null && button.Active && IsVisible(button as Component);
+        }
+
+        public bool ActivateClose()
+        {
+            return NativeSelectionUtility.Click(GetCloseButton());
+        }
+
         public bool Close()
         {
             if (_menu == null)
@@ -429,19 +467,30 @@ namespace SongsOfConquestAccess.Adapters
                 }
 
                 List<string> parts = new List<string>();
-                AddCostPart(parts, section, GoldCostEntryField, GoldAmountTextField, "gold");
-                AddCostPart(parts, section, StoneCostEntryField, StoneAmountTextField, "stone");
-                AddCostPart(parts, section, WoodCostEntryField, WoodAmountTextField, "wood");
-                AddCostPart(parts, section, GlimmerWeaveCostEntryField, GlimmerWeaveAmountTextField, "glimmerweave");
-                AddCostPart(parts, section, AncientAmberCostEntryField, AncientAmberAmountTextField, "ancient amber");
-                AddCostPart(parts, section, CelestialOreCostEntryField, CelestialOreAmountTextField, "celestial ore");
-                return parts.Count == 0 ? string.Empty : "Cost: " + JoinWithAnd(parts);
+                AddCostPart(parts, section, GoldCostEntryField, GoldAmountTextField, ResourceType.Gold);
+                AddCostPart(parts, section, StoneCostEntryField, StoneAmountTextField, ResourceType.Stone);
+                AddCostPart(parts, section, WoodCostEntryField, WoodAmountTextField, ResourceType.Wood);
+                AddCostPart(parts, section, GlimmerWeaveCostEntryField, GlimmerWeaveAmountTextField, ResourceType.Glimmerweave);
+                AddCostPart(parts, section, AncientAmberCostEntryField, AncientAmberAmountTextField, ResourceType.AncientAmber);
+                AddCostPart(parts, section, CelestialOreCostEntryField, CelestialOreAmountTextField, ResourceType.CelestialOre);
+                return parts.Count == 0
+                    ? string.Empty
+                    : ModText.Get(
+                        _localization,
+                        ModStrings.UI.LabelValue,
+                        GetLocalizedText("Adventure/BuildMenu/Cost", "Cost").TrimEnd(':'),
+                        ModText.JoinList(_localization, parts));
             }
         }
 
         private PurchaseWielderDetails GetDetails()
         {
             return GetField<PurchaseWielderDetails>(_menu, WielderDetailsField);
+        }
+
+        private UIButton GetCloseButton()
+        {
+            return GetField<UIButton>(_menu, BackgroundCloseButtonField);
         }
 
         private UIButton GetPurchaseButton()
@@ -464,7 +513,7 @@ namespace SongsOfConquestAccess.Adapters
             return GetField<List<PurchaseWielderSkillEntry>>(GetDetails(), DetailsSkillEntriesField) ?? new List<PurchaseWielderSkillEntry>();
         }
 
-        private static void AddCostPart(List<string> parts, LargeCostSection section, FieldInfo entryField, FieldInfo textField, string resourceName)
+        private void AddCostPart(List<string> parts, LargeCostSection section, FieldInfo entryField, FieldInfo textField, ResourceType resourceType)
         {
             UITransform entry = GetField<UITransform>(section, entryField);
             if (entry == null || !entry.Active)
@@ -473,10 +522,34 @@ namespace SongsOfConquestAccess.Adapters
             }
 
             string amount = GetText(GetField<UITextMesh>(section, textField));
-            if (!string.IsNullOrWhiteSpace(amount))
+            if (string.IsNullOrWhiteSpace(amount))
             {
-                parts.Add(amount + " " + resourceName);
+                return;
             }
+
+            int parsed;
+            parts.Add(ModText.Get(
+                _localization,
+                ModStrings.Common.ResourceAmount,
+                amount,
+                GetResourceName(resourceType, int.TryParse(amount, out parsed) ? parsed : 0)));
+        }
+
+        /// <summary>The resource's own name, in the game's plural form for the amount asked for.</summary>
+        private string GetResourceName(ResourceType type, int amount)
+        {
+            string key = "Common/Resource/" + type;
+            if (_localization != null)
+            {
+                string localized = _localization.GetPluralText(key, amount);
+                localized = localized != null ? localized.Trim() : string.Empty;
+                if (!string.IsNullOrWhiteSpace(localized) && localized != key)
+                {
+                    return localized;
+                }
+            }
+
+            return type.ToString();
         }
 
         private static string GetText(IUITextMesh textMesh)
@@ -546,21 +619,6 @@ namespace SongsOfConquestAccess.Adapters
             return string.Join(". ", filtered.ToArray());
         }
 
-        private static string JoinWithAnd(List<string> parts)
-        {
-            if (parts.Count == 1)
-            {
-                return parts[0];
-            }
-
-            if (parts.Count == 2)
-            {
-                return parts[0] + " and " + parts[1];
-            }
-
-            return string.Join(", ", parts.GetRange(0, parts.Count - 1).ToArray()) + ", and " + parts[parts.Count - 1];
-        }
-
         private static bool IsVisible(Component component)
         {
             return component != null && component.gameObject != null && component.gameObject.activeInHierarchy;
@@ -600,37 +658,40 @@ namespace SongsOfConquestAccess.Adapters
                 }
             }
 
-            public string Label
+            /// <summary>The wielder's own name.</summary>
+            public string Name
             {
-                get
-                {
-                    string name = GetText(GetField<UITextMesh>(_entry, EntryNameField));
-                    string classText = GetText(GetField<UITextMesh>(_entry, EntryClassField));
-                    if (string.IsNullOrWhiteSpace(name))
-                    {
-                        return classText;
-                    }
-
-                    return string.IsNullOrWhiteSpace(classText) ? name : name + ", " + classText;
-                }
+                get { return GetText(GetField<UITextMesh>(_entry, EntryNameField)); }
             }
 
-            public string Status
+            /// <summary>The class line the entry draws under the name ("Level 12 Human Commander").</summary>
+            public string ClassText
             {
-                get
-                {
-                    if (IsVisible(GetField<GameObject>(_entry, EntryDeadOverlayField)))
-                    {
-                        return "dead";
-                    }
+                get { return GetText(GetField<UITextMesh>(_entry, EntryClassField)); }
+            }
 
-                    if (IsVisible(GetField<GameObject>(_entry, EntryOwnedFrameField)))
-                    {
-                        return "owned";
-                    }
+            /// <summary>The entry the menu is showing the details of.</summary>
+            public bool IsSelected
+            {
+                get { return _adapter != null && _adapter.SelectedEntryIndex == _index; }
+            }
 
-                    return string.Empty;
-                }
+            /// <summary>The game draws a crossed-out overlay over a wielder that has died.</summary>
+            public bool IsDead
+            {
+                get { return IsVisible(GetField<GameObject>(_entry, EntryDeadOverlayField)); }
+            }
+
+            /// <summary>The game draws a frame around a wielder the team already has.</summary>
+            public bool IsOwned
+            {
+                get { return IsVisible(GetField<GameObject>(_entry, EntryOwnedFrameField)); }
+            }
+
+            /// <summary>The entry's own button - what the row is drawn by.</summary>
+            public Component Button
+            {
+                get { return GetField<UIButton>(_entry, EntryButtonField) as Component; }
             }
 
             public bool IsVisible

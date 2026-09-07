@@ -679,6 +679,8 @@ namespace SongsOfConquestAccess.Localization
             public static readonly ModString WielderAnnouncements = new ModString("Screens.WielderAnnouncements", "Wielder announcements");
             public static readonly ModString WielderArmyPossessive = new ModString("Screens.WielderArmyPossessive", "{0}'s army");
             public static readonly ModString WielderArmy = new ModString("Screens.WielderArmy", "wielder army");
+            public static readonly ModString WielderDead = new ModString("Screens.WielderDead", "dead");
+            public static readonly ModString WielderOwned = new ModString("Screens.WielderOwned", "owned");
             public static readonly ModString Wielders = new ModString("Screens.Wielders", "Wielders");
             public static readonly ModString WielderStats = new ModString("Screens.WielderStats", "{0}'s stats");
             public static readonly ModString WielderModifierCategories = new ModString("Screens.WielderModifierCategories", "{0}'s modifier categories");

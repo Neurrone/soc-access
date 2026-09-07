@@ -1190,6 +1190,16 @@ msgctxt "Screens.WielderArmy"
 msgid "wielder army"
 msgstr "위더 군대"
 
+#. Screens.WielderDead
+msgctxt "Screens.WielderDead"
+msgid "dead"
+msgstr "사망"
+
+#. Screens.WielderOwned
+msgctxt "Screens.WielderOwned"
+msgid "owned"
+msgstr "보유 중"
+
 #. Screens.Wielders
 msgctxt "Screens.Wielders"
 msgid "Wielders"

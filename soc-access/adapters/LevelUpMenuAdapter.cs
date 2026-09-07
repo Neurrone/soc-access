@@ -36,6 +36,7 @@ namespace SongsOfConquestAccess.Adapters
         private static readonly FieldInfo SpellDamagePowerTooltipImageField = AccessTools.Field(typeof(CommanderStatsInfo), "_spellDamagePowerTooltipImage");
 
         private static readonly FieldInfo BackgroundIsOpenField = AccessTools.Field(typeof(AdventureMenuBackground), "_isOpen");
+        private static readonly FieldInfo BackgroundCloseButtonField = AccessTools.Field(typeof(AdventureMenuBackground), "_closeButton");
 
         private readonly CommanderLevelUpMenu _menu;
         private readonly CommanderLevelUpMenu.Settings _settings;
@@ -62,7 +63,9 @@ namespace SongsOfConquestAccess.Adapters
         {
             string header = GetText(_settings != null ? _settings.HeaderText : null);
             string level = GetText(_settings != null ? _settings.LevelText : null);
-            return MenuButtonTextUtility.JoinParts(header, string.IsNullOrWhiteSpace(level) ? string.Empty : "Level " + level);
+            return MenuButtonTextUtility.JoinParts(
+                header,
+                string.IsNullOrWhiteSpace(level) ? string.Empty : ModText.Get(ModStrings.Screens.LevelValue, level));
         }
 
         public string GetCommanderIdentity()
@@ -70,6 +73,32 @@ namespace SongsOfConquestAccess.Adapters
             return MenuButtonTextUtility.JoinParts(
                 GetText(_settings != null ? _settings.WielderNameText : null),
                 GetText(_settings != null ? _settings.WielderTitleText : null));
+        }
+
+        /// <summary>The line the menu draws over the cards ("Choose a Skill"), set by
+        /// <c>CommanderLevelUpMenu.Open</c> from <c>Adventure/CommanderLevelUp/Description</c>.</summary>
+        public string GetChooseSkillText()
+        {
+            return GetText(_settings != null ? _settings.DescriptionText : null);
+        }
+
+        /// <summary>The close cross the menu's <c>AdventureMenuBackground</c> draws at the top right.
+        /// It is only turned on where the background may be closed and the player is on mouse and
+        /// keyboard (<c>AnimateEntry</c>).</summary>
+        public Component CloseButton
+        {
+            get { return GetCloseButton() as Component; }
+        }
+
+        public bool IsCloseVisible()
+        {
+            UIButton button = GetCloseButton();
+            return button != null && button.Active && ((Component)button).gameObject.activeInHierarchy;
+        }
+
+        public bool ActivateClose()
+        {
+            return NativeSelectionUtility.Click(GetCloseButton());
         }
 
         public bool IsMaxLevelMessageVisible()
@@ -143,7 +172,9 @@ namespace SongsOfConquestAccess.Adapters
 
             items.Add(new StatItem(
                 "level-up-stat-" + id,
-                fallbackLabel + ", " + value,
+                fallbackLabel,
+                value,
+                tooltipComponent,
                 Tooltip.ForComponent(tooltipComponent, _localization)));
         }
 
@@ -159,30 +190,16 @@ namespace SongsOfConquestAccess.Adapters
             string skillName = GetText(GetField<UITextMesh>(component, HeaderTextField));
             string skillLevel = GetText(GetField<UITextMesh>(component, SkillLevelTextField));
             string description = GetText(GetField<UITextMesh>(component, DescriptionTextField));
-            string label = BuildSkillLabel(choiceHeader, skillName, skillLevel, description);
-            bool disabled = button == null || !button.Active || !button.Interactable;
-            string status = MenuButtonTextUtility.JoinParts(disabled ? "disabled" : string.Empty, description);
             Component buttonComponent = button as Component;
 
             choices.Add(new SkillChoice(
                 "level-up-skill-" + id,
-                label,
-                status,
-                () =>
-                {
-                    if (buttonComponent != null)
-                    {
-                        NativeSelectionUtility.PointerEnter(buttonComponent);
-                    }
-                },
-                () =>
-                {
-                    if (buttonComponent != null)
-                    {
-                        NativeSelectionUtility.PointerExit(buttonComponent);
-                    }
-                },
-                () => button != null && button.Active && button.Interactable && NativeSelectionUtility.Click(button),
+                choiceHeader,
+                BuildSkillNameAndLevel(skillName, skillLevel),
+                description,
+                buttonComponent,
+                () => button != null && button.Active && button.Interactable,
+                () => NativeSelectionUtility.Click(button),
                 () => component != null && component.gameObject.activeInHierarchy));
         }
 
@@ -211,13 +228,19 @@ namespace SongsOfConquestAccess.Adapters
             return value is bool ? (bool)value : true;
         }
 
-        private static string BuildSkillLabel(string choiceHeader, string skillName, string skillLevel, string description)
+        /// <summary>The card's skill line as the menu draws it: the skill's own name and the level
+        /// the card would take it to.</summary>
+        private static string BuildSkillNameAndLevel(string skillName, string skillLevel)
         {
-            string nameAndLevel = string.IsNullOrWhiteSpace(skillLevel)
+            return string.IsNullOrWhiteSpace(skillLevel)
                 ? skillName
-                : MenuButtonTextUtility.JoinParts(skillName, "Level " + skillLevel);
-            string label = MenuButtonTextUtility.JoinParts(choiceHeader, nameAndLevel);
-            return string.IsNullOrWhiteSpace(label) ? description : label;
+                : MenuButtonTextUtility.JoinParts(skillName, ModText.Get(ModStrings.Screens.LevelValue, skillLevel));
+        }
+
+        private UIButton GetCloseButton()
+        {
+            AdventureMenuBackground background = _settings != null ? _settings.AdventureMenuBackground : null;
+            return GetField<UIButton>(background, BackgroundCloseButtonField);
         }
 
         private static string GetText(IUITextMesh textMesh)
@@ -232,15 +255,26 @@ namespace SongsOfConquestAccess.Adapters
 
         public sealed class StatItem
         {
-            public StatItem(string id, string label, Tooltip tooltip)
+            public StatItem(string id, string label, string value, Component target, Tooltip tooltip)
             {
                 Id = id ?? string.Empty;
                 Label = label ?? string.Empty;
+                Value = value ?? string.Empty;
+                Target = target;
                 Tooltip = tooltip;
             }
 
             public string Id { get; private set; }
+
+            /// <summary>The stat's name, as the game's own localization has it.</summary>
             public string Label { get; private set; }
+
+            /// <summary>The number the stats row draws for it.</summary>
+            public string Value { get; private set; }
+
+            /// <summary>The icon the game hangs the stat's tooltip on - what draws the row.</summary>
+            public Component Target { get; private set; }
+
             public Tooltip Tooltip { get; private set; }
         }
 
@@ -248,29 +282,47 @@ namespace SongsOfConquestAccess.Adapters
         {
             public SkillChoice(
                 string id,
-                string label,
-                string status,
-                Action onFocus,
-                Action onUnfocus,
+                string header,
+                string nameAndLevel,
+                string description,
+                Component button,
+                Func<bool> isEnabled,
                 Func<bool> activate,
                 Func<bool> isVisible)
             {
                 Id = id ?? string.Empty;
-                Label = label ?? string.Empty;
-                Status = status ?? string.Empty;
-                OnFocus = onFocus;
-                OnUnfocus = onUnfocus;
+                Header = header ?? string.Empty;
+                NameAndLevel = nameAndLevel ?? string.Empty;
+                Description = description ?? string.Empty;
+                Button = button;
+                IsEnabled = isEnabled;
                 Activate = activate;
                 IsVisible = isVisible;
             }
 
             public string Id { get; private set; }
-            public string Label { get; private set; }
-            public string Status { get; private set; }
-            public Action OnFocus { get; private set; }
-            public Action OnUnfocus { get; private set; }
+
+            /// <summary>The header the menu draws over the card ("New Skill", "Upgrade Command"),
+            /// read off the settings' own header text mesh.</summary>
+            public string Header { get; private set; }
+
+            /// <summary>The skill the card offers and the level it would reach.</summary>
+            public string NameAndLevel { get; private set; }
+
+            /// <summary>What the card draws under the name; always drawn, never a tooltip.</summary>
+            public string Description { get; private set; }
+
+            /// <summary>The card's own button - what the game draws it with, and what a hover rests
+            /// on.</summary>
+            public Component Button { get; private set; }
+
+            /// <summary>Whether the card can be chosen: a card the menu filled in with "no more
+            /// skills" is turned non-interactable by <c>SetupInactive</c>.</summary>
+            public Func<bool> IsEnabled { get; private set; }
+
             public Func<bool> Activate { get; private set; }
             public Func<bool> IsVisible { get; private set; }
         }
+
     }
 }

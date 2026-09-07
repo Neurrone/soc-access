@@ -56,6 +56,7 @@ namespace SongsOfConquestAccess.Adapters
         private static readonly FieldInfo GameConfigField = AccessTools.Field(typeof(BuildMenu), "_gameConfig");
         private static readonly FieldInfo BuildingRequirementValidatorField = AccessTools.Field(typeof(BuildMenu), "_buildingRequirementValidator");
         private static readonly FieldInfo ResearchLookupField = AccessTools.Field(typeof(BuildMenu), "_researchLookup");
+        private static readonly FieldInfo BackgroundCloseButtonField = AccessTools.Field(typeof(AdventureMenuBackground), "_closeButton");
         private static readonly MethodInfo GetSelectedLevelMethod = AccessTools.Method(typeof(BuildMenu), "GetSelectedLevel");
         private static readonly MethodInfo HandleLeftNavigationButtonClickedMethod = AccessTools.Method(typeof(BuildMenu), "HandleLeftNavigationButtonClicked");
         private static readonly MethodInfo HandleRightNavigationButtonClickedMethod = AccessTools.Method(typeof(BuildMenu), "HandleRightNavigationButtonClicked");
@@ -149,6 +150,14 @@ namespace SongsOfConquestAccess.Adapters
             }
         }
 
+        /// <summary>The header the menu draws over the page ("Build"). The prefab writes it from
+        /// <c>Adventure/BuildMenu/Header</c> through a <c>UITextMeshLocalization</c> rather than
+        /// through a field the menu holds, so it is read from the same key.</summary>
+        public string HeaderText
+        {
+            get { return GetLocalizedText("Adventure/BuildMenu/Header", "Build"); }
+        }
+
         public string BuildSiteSummary
         {
             get
@@ -194,26 +203,90 @@ namespace SongsOfConquestAccess.Adapters
             return NativeSelectionUtility.Click(GetTutorialButton());
         }
 
+        /// <summary>The tutorial button the menu draws at the top left.</summary>
+        public Component TutorialButton
+        {
+            get { return GetTutorialButton() as Component; }
+        }
+
+        /// <summary>The two build-site navigation buttons drawn beside the current site.</summary>
+        public Component PreviousBuildSiteButton
+        {
+            get { return GetPreviousBuildSiteButton() as Component; }
+        }
+
+        public Component NextBuildSiteButton
+        {
+            get { return GetNextBuildSiteButton() as Component; }
+        }
+
+        /// <summary>The auto-select toggle drawn at the top right.</summary>
+        public Component AutoSelectToggle
+        {
+            get { return GetAutoSelectToggle() as Component; }
+        }
+
+        /// <summary>The Build button under the details.</summary>
+        public Component PurchaseButton
+        {
+            get { return GetPurchaseButton() as Component; }
+        }
+
+        /// <summary>The close cross this menu's <c>AdventureMenuBackground</c> draws at the top
+        /// right. It is only turned on where the background may be closed and the player is on mouse
+        /// and keyboard (<c>AnimateEntry</c>).</summary>
+        public Component CloseButton
+        {
+            get { return GetCloseButton() as Component; }
+        }
+
+        public bool IsCloseVisible()
+        {
+            UIButton button = GetCloseButton();
+            return button != null && button.Active && IsVisible(button as Component);
+        }
+
+        public bool ActivateClose()
+        {
+            return NativeSelectionUtility.Click(GetCloseButton());
+        }
+
         public IReadOnlyList<CategoryItem> GetCategories()
         {
             return new[]
             {
-                new CategoryItem(BuildCategoryLabel(GetCategoryButtonLabel(BuildSiteSize.Small), BuildSiteSize.Small), 0, BuildSiteSize.Small, IsButtonEnabled(GetSmallTabButton())),
-                new CategoryItem(BuildCategoryLabel(GetCategoryButtonLabel(BuildSiteSize.Medium), BuildSiteSize.Medium), 1, BuildSiteSize.Medium, IsButtonEnabled(GetMediumTabButton())),
-                new CategoryItem(BuildCategoryLabel(GetCategoryButtonLabel(BuildSiteSize.Large), BuildSiteSize.Large), 2, BuildSiteSize.Large, IsButtonEnabled(GetLargeTabButton()))
+                BuildCategory(0, BuildSiteSize.Small, GetSmallTabButton()),
+                BuildCategory(1, BuildSiteSize.Medium, GetMediumTabButton()),
+                BuildCategory(2, BuildSiteSize.Large, GetLargeTabButton())
             };
         }
 
-        public bool FocusCategory(BuildSiteSize size)
+        /// <summary>Move the game's selection to a size tab WITHOUT switching to it: switching
+        /// re-pools every building button under it, so arriving at a tab must not take the list the
+        /// player is reading away.</summary>
+        public bool SelectCategory(BuildSiteSize size)
+        {
+            return NativeSelectionUtility.Select(GetCategoryButton(size) as Component);
+        }
+
+        /// <summary>Switch to a size tab, through the game's own click.</summary>
+        public bool ActivateCategory(BuildSiteSize size)
         {
             UIButton button = GetCategoryButton(size);
             NativeSelectionUtility.Select(button as Component);
-            if (SelectedCategory == size)
-            {
-                return true;
-            }
+            return SelectedCategory == size || NativeSelectionUtility.Click(button);
+        }
 
-            return NativeSelectionUtility.Click(button);
+        private CategoryItem BuildCategory(int index, BuildSiteSize size, UIButton button)
+        {
+            return new CategoryItem(
+                GetCategoryButtonLabel(size),
+                BuildTimeForSize(size),
+                index,
+                size,
+                IsButtonEnabled(button),
+                SelectedCategory == size,
+                button as Component);
         }
 
         public string BuildTimeText
@@ -248,6 +321,8 @@ namespace SongsOfConquestAccess.Adapters
                 items.Add(new BuildingItem(
                     label,
                     () => capturedAction == null || capturedAction.CanExecute(),
+                    () => ReferenceEquals(captured.BuildAction, CurrentAction),
+                    GetBuildButton(captured) as Component,
                     () => FocusBuilding(captured),
                     () => Tooltip.ForComponent(GetBuildButton(captured) as Component, _localization)));
             }
@@ -326,23 +401,29 @@ namespace SongsOfConquestAccess.Adapters
                 items.Add(new TierItem(
                     label,
                     level,
-                    () => FocusTier(level),
+                    SelectedTier == level,
+                    button as Component,
+                    () => SelectTier(level),
+                    () => ActivateTier(level),
                     () => Tooltip.ForComponent(button as Component, _localization)));
             }
 
             return items;
         }
 
-        public bool FocusTier(int level)
+        /// <summary>Move the game's selection to a tier tab WITHOUT switching to it: switching
+        /// redraws the whole details pane under it.</summary>
+        public bool SelectTier(int level)
+        {
+            return NativeSelectionUtility.Select(GetTierButton(level) as Component);
+        }
+
+        /// <summary>Switch to a tier, through the game's own click.</summary>
+        public bool ActivateTier(int level)
         {
             UIButton button = GetTierButton(level);
             NativeSelectionUtility.Select(button as Component);
-            if (SelectedTier == level)
-            {
-                return true;
-            }
-
-            return NativeSelectionUtility.Click(button);
+            return SelectedTier == level || NativeSelectionUtility.Click(button);
         }
 
         public IReadOnlyList<SectionItem> GetAvailableResearchItems()
@@ -493,37 +574,6 @@ namespace SongsOfConquestAccess.Adapters
         public bool HasWarning()
         {
             return !string.IsNullOrWhiteSpace(CannotBuyText);
-        }
-
-        public IReadOnlyList<DetailItem> GetDetailItems()
-        {
-            List<DetailItem> items = new List<DetailItem>();
-            AddIfNotEmpty(items, string.Empty, SelectedBuildingSummary);
-            AddVisibleDescriptionSections(items);
-            AddIfNotEmpty(items, "Cost", CurrentTierCostText);
-            AddIfNotEmpty(items, "Warning", CannotBuyText);
-            if (items.Count == 0)
-            {
-                items.Add(new DetailItem("Details", "No details"));
-            }
-
-            return items;
-        }
-
-        public string GetDetailsText()
-        {
-            IReadOnlyList<DetailItem> details = GetDetailItems();
-            List<string> lines = new List<string>();
-            for (int i = 0; i < details.Count; i++)
-            {
-                string label = details[i] != null ? details[i].Label : string.Empty;
-                if (!string.IsNullOrWhiteSpace(label) && !lines.Contains(label))
-                {
-                    lines.Add(label);
-                }
-            }
-
-            return string.Join("\n", lines.ToArray());
         }
 
         public string CannotBuyText
@@ -749,36 +799,6 @@ namespace SongsOfConquestAccess.Adapters
             return string.Join(", ", parts.ToArray());
         }
 
-        private void AddVisibleDescriptionSections(List<DetailItem> items)
-        {
-            IReadOnlyList<BuildMenuDescriptionSection> sections = GetActiveDescriptionSections();
-            int detailIndex = 0;
-            for (int i = 0; i < sections.Count; i++)
-            {
-                BuildMenuDescriptionSection section = sections[i];
-                if (!IsVisible(section as Component))
-                {
-                    continue;
-                }
-
-                string header = GetText(GetField<UITextMesh>(section, DescriptionSectionHeaderField));
-                List<string> lines = new List<string>();
-                BuildMenuDescriptionEntry[] entries = section.GetComponentsInChildren<BuildMenuDescriptionEntry>(false);
-                for (int j = 0; j < entries.Length; j++)
-                {
-                    string text = GetText(GetField<UITextMesh>(entries[j], DescriptionEntryTextField));
-                    if (!string.IsNullOrWhiteSpace(text) && !lines.Contains(text))
-                    {
-                        lines.Add(text);
-                    }
-                }
-
-                string body = string.Join(". ", lines.ToArray());
-                AddIfNotEmpty(items, header, body);
-                detailIndex++;
-            }
-        }
-
         private IReadOnlyList<SectionItem> GetVisibleSectionItems(string localizationKey)
         {
             BuildMenuDescriptionSection section = GetVisibleSection(localizationKey, null);
@@ -806,6 +826,7 @@ namespace SongsOfConquestAccess.Adapters
                 BuildMenuDescriptionEntry captured = entry;
                 items.Add(new SectionItem(
                     text,
+                    GetEntryTooltipComponent(captured),
                     () => FocusEntry(captured),
                     () => GetEntryTooltip(captured)));
             }
@@ -1031,6 +1052,11 @@ namespace SongsOfConquestAccess.Adapters
             return GetField<UIToggle>(_menu, AutoSelectBuildSiteToggleField);
         }
 
+        private UIButton GetCloseButton()
+        {
+            return GetField<UIButton>(_menu, BackgroundCloseButtonField);
+        }
+
         private UIButton GetPurchaseButton()
         {
             return GetField<UIButton>(_menu, PurchaseButtonField);
@@ -1076,14 +1102,6 @@ namespace SongsOfConquestAccess.Adapters
                 default:
                     return GetLocalizedText("Adventure/BuildMenu/Tabs/SmallBuildings", "Small");
             }
-        }
-
-        private string BuildCategoryLabel(string baseLabel, BuildSiteSize size)
-        {
-            string buildTime = BuildTimeForSize(size);
-            return string.IsNullOrWhiteSpace(buildTime)
-                ? baseLabel
-                : baseLabel + ", " + buildTime;
         }
 
         private string FormatCostText(string body)
@@ -1261,16 +1279,6 @@ namespace SongsOfConquestAccess.Adapters
             return SpeechTextSanitizer.Normalize(GameText.Get(_localization, key, fallback ?? string.Empty));
         }
 
-        private static void AddIfNotEmpty(List<DetailItem> items, string header, string body)
-        {
-            if (string.IsNullOrWhiteSpace(body))
-            {
-                return;
-            }
-
-            items.Add(new DetailItem(header, body));
-        }
-
         private static string JoinParts(string first, string second)
         {
             if (string.IsNullOrWhiteSpace(first))
@@ -1401,8 +1409,18 @@ namespace SongsOfConquestAccess.Adapters
 
         public sealed class CategoryItem
         {
-            public CategoryItem(string label, int index, BuildSiteSize size, bool enabled)
+            public CategoryItem(
+                string label,
+                string buildTime,
+                int index,
+                BuildSiteSize size,
+                bool enabled,
+                bool isSelected,
+                Component button)
             {
+                BuildTime = buildTime ?? string.Empty;
+                IsSelected = isSelected;
+                Button = button;
                 Label = label;
                 Index = index;
                 Size = size;
@@ -1410,26 +1428,56 @@ namespace SongsOfConquestAccess.Adapters
             }
 
             public string Label { get; private set; }
+
+            /// <summary>How long anything of this size takes to build, in the wording the menu's own
+            /// caption uses ("Build time: 2 rounds").</summary>
+            public string BuildTime { get; private set; }
+
             public int Index { get; private set; }
             public BuildSiteSize Size { get; private set; }
             public bool Enabled { get; private set; }
+
+            /// <summary>The size the menu is showing.</summary>
+            public bool IsSelected { get; private set; }
+
+            /// <summary>The tab's own button - what the tab is drawn by.</summary>
+            public Component Button { get; private set; }
         }
 
         public sealed class BuildingItem
         {
             private readonly Func<bool> _isAvailable;
 
-            public BuildingItem(string label, Func<bool> isAvailable, Func<bool> focus, Func<Tooltip> tooltip)
+            public BuildingItem(
+                string label,
+                Func<bool> isAvailable,
+                Func<bool> isSelected,
+                Component button,
+                Func<bool> focus,
+                Func<Tooltip> tooltip)
             {
+                _isSelected = isSelected;
+                Button = button;
                 Label = label;
                 _isAvailable = isAvailable;
                 Focus = focus;
                 Tooltip = tooltip;
             }
 
+            private readonly Func<bool> _isSelected;
+
             public string Label { get; private set; }
             public Func<bool> Focus { get; private set; }
             public Func<Tooltip> Tooltip { get; private set; }
+
+            /// <summary>The building's own button - what the row is drawn by.</summary>
+            public Component Button { get; private set; }
+
+            /// <summary>The building the details pane is describing.</summary>
+            public bool IsSelected
+            {
+                get { return _isSelected == null || _isSelected(); }
+            }
 
             public bool IsAvailable
             {
@@ -1439,8 +1487,18 @@ namespace SongsOfConquestAccess.Adapters
 
         public sealed class TierItem
         {
-            public TierItem(string label, int level, Func<bool> focus, Func<Tooltip> tooltip)
+            public TierItem(
+                string label,
+                int level,
+                bool isSelected,
+                Component button,
+                Func<bool> focus,
+                Func<bool> activate,
+                Func<Tooltip> tooltip)
             {
+                IsSelected = isSelected;
+                Button = button;
+                Activate = activate;
                 Label = label;
                 Level = level;
                 Focus = focus;
@@ -1450,7 +1508,14 @@ namespace SongsOfConquestAccess.Adapters
             public string Label { get; private set; }
             public int Level { get; private set; }
             public Func<bool> Focus { get; private set; }
+            public Func<bool> Activate { get; private set; }
             public Func<Tooltip> Tooltip { get; private set; }
+
+            /// <summary>The tier the details pane is showing.</summary>
+            public bool IsSelected { get; private set; }
+
+            /// <summary>The tier's own button - what the tab is drawn by.</summary>
+            public Component Button { get; private set; }
         }
 
         public sealed class SectionMenu
@@ -1467,8 +1532,9 @@ namespace SongsOfConquestAccess.Adapters
 
         public sealed class SectionItem
         {
-            public SectionItem(string label, Action focus, Func<Tooltip> tooltip)
+            public SectionItem(string label, Component target, Action focus, Func<Tooltip> tooltip)
             {
+                Target = target;
                 Label = label ?? string.Empty;
                 Focus = focus;
                 Tooltip = tooltip;
@@ -1477,6 +1543,10 @@ namespace SongsOfConquestAccess.Adapters
             public string Label { get; private set; }
             public Action Focus { get; private set; }
             public Func<Tooltip> Tooltip { get; private set; }
+
+            /// <summary>The entry's own background or icon - what the row is drawn by, and what its
+            /// tooltip hangs on.</summary>
+            public Component Target { get; private set; }
         }
 
         public sealed class RequirementItem
@@ -1493,21 +1563,5 @@ namespace SongsOfConquestAccess.Adapters
             public Tooltip Tooltip { get; private set; }
         }
 
-        public sealed class DetailItem
-        {
-            public DetailItem(string header, string body)
-            {
-                Header = header ?? string.Empty;
-                Body = body ?? string.Empty;
-            }
-
-            public string Header { get; private set; }
-            public string Body { get; private set; }
-
-            public string Label
-            {
-                get { return JoinParts(Header, Body); }
-            }
-        }
     }
 }

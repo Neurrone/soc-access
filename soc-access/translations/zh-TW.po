@@ -1190,6 +1190,16 @@ msgctxt "Screens.WielderArmy"
 msgid "wielder army"
 msgstr "持有者军队"
 
+#. Screens.WielderDead
+msgctxt "Screens.WielderDead"
+msgid "dead"
+msgstr "已陣亡"
+
+#. Screens.WielderOwned
+msgctxt "Screens.WielderOwned"
+msgid "owned"
+msgstr "已擁有"
+
 #. Screens.Wielders
 msgctxt "Screens.Wielders"
 msgid "Wielders"

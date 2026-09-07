@@ -39,6 +39,7 @@ namespace SongsOfConquestAccess.Adapters
         private static readonly FieldInfo MixedFactionsContainerField = AccessTools.Field(typeof(ResearchMenu), "_mixedFactionsContainer");
         private static readonly FieldInfo MixedFactionButtonsField = AccessTools.Field(typeof(ResearchMenu), "_mixedFactionButtons");
         private static readonly FieldInfo SelectedFactionIndexField = AccessTools.Field(typeof(ResearchMenu), "_selectedFactionIndex");
+        private static readonly FieldInfo HeaderTextField = AccessTools.Field(typeof(ResearchMenu), "_headerText");
         private static readonly FieldInfo BuildingTabNameField = AccessTools.Field(typeof(ResearchMenuBuildingTabButton), "_name");
         private static readonly FieldInfo BuildingTabDescriptionField = AccessTools.Field(typeof(ResearchMenuBuildingTabButton), "_description");
         private static readonly FieldInfo BuildingTabMapEntityIdField = AccessTools.Field(typeof(ResearchMenuBuildingTabButton), "_mapEntityId");
@@ -65,6 +66,20 @@ namespace SongsOfConquestAccess.Adapters
                 && container != null
                 && container.activeInHierarchy
                 && _menu.HasContent();
+        }
+
+        /// <summary>The header the menu draws over the page. <c>ResearchMenu.SetHeaderText</c> writes
+        /// "Research" into it, and appends the faction on a mixed-factions map, so it is the one place
+        /// that says which faction's research is showing.</summary>
+        public string HeaderText
+        {
+            get { return GetText(GetField<UITextMesh>(_menu, HeaderTextField)); }
+        }
+
+        /// <summary>The tutorial button the menu draws at the top left.</summary>
+        public Component TutorialButton
+        {
+            get { return GetTutorialButton() as Component; }
         }
 
         public bool IsTutorialButtonVisible()
@@ -118,7 +133,8 @@ namespace SongsOfConquestAccess.Adapters
                     factionIndex,
                     label,
                     factionIndex == selectedFactionIndex,
-                    () => FocusFaction(factionIndex, button),
+                    button as Component,
+                    () => SelectFaction(button),
                     () => ActivateFaction(factionIndex, button)));
             }
 
@@ -164,7 +180,9 @@ namespace SongsOfConquestAccess.Adapters
                     label,
                     description,
                     mapEntityId < 0,
-                    () => FocusBuilding(index, button),
+                    index == SelectedBuildingIndex,
+                    button as Component,
+                    () => SelectBuilding(button),
                     () => ActivateBuilding(button)));
             }
 
@@ -207,15 +225,16 @@ namespace SongsOfConquestAccess.Adapters
                         : null;
                     UIButton button = stackButton.Button;
                     int itemIndex = j;
-                    Func<bool> activate = () => NativeSelectionUtility.Click(button);
                     string name = Localize(stack != null ? stack.NameKey : null, "Research " + (itemIndex + 1));
                     researchItems.Add(new ResearchItem(
                         name,
                         GetOwnedTier(stack),
                         GetTierHeader(),
+                        button as Component,
+                        () => button != null && button.Active && button.Interactable,
                         () => FocusResearch(button),
-                        activate,
-                        BuildResearchTooltip(button, activate)));
+                        () => NativeSelectionUtility.Click(button),
+                        BuildResearchTooltip(button)));
                 }
 
                 if (researchItems.Count > 0)
@@ -234,16 +253,26 @@ namespace SongsOfConquestAccess.Adapters
             NativeTooltipUtility.HideTooltip();
         }
 
-        private bool FocusBuilding(int index, UIButton button)
+        /// <summary>Close the menu the way the game closes it: the blocker click and the gamepad
+        /// cancel both go to <c>ResearchMenu.Hide</c>, which unregisters the menu's input, restores
+        /// the HUD and completes the request.</summary>
+        public bool Close()
         {
-            HideNativeTooltip();
-            NativeSelectionUtility.Select(button as Component);
-            if (SelectedBuildingIndex == index)
+            if (_menu == null)
             {
-                return true;
+                return false;
             }
 
-            return ClickBuilding(button);
+            _menu.Hide();
+            return true;
+        }
+
+        // Arriving at a tab must not switch to it: switching respawns the categories and their stack
+        // buttons, so the page under the cursor would be replaced by merely walking the bar. Focus
+        // therefore only moves the game's own selection; the click is Enter's.
+        private bool SelectBuilding(UIButton button)
+        {
+            return NativeSelectionUtility.Select(button as Component);
         }
 
         private bool ActivateBuilding(UIButton button)
@@ -251,16 +280,9 @@ namespace SongsOfConquestAccess.Adapters
             return ClickBuilding(button);
         }
 
-        private bool FocusFaction(int factionIndex, UIButton button)
+        private bool SelectFaction(UIButton button)
         {
-            HideNativeTooltip();
-            NativeSelectionUtility.Select(button as Component);
-            if (SelectedFactionIndex == factionIndex)
-            {
-                return true;
-            }
-
-            return NativeSelectionUtility.Click(button);
+            return NativeSelectionUtility.Select(button as Component);
         }
 
         private bool ActivateFaction(int factionIndex, UIButton button)
@@ -275,16 +297,16 @@ namespace SongsOfConquestAccess.Adapters
             return NativeSelectionUtility.PointerClick(button as Component);
         }
 
+        // The row's focus visual is the game's own selection; the tooltip beside it is drawn by the
+        // navigator, off the tooltip the node points at.
         private bool FocusResearch(UIButton button)
         {
-            if (button == null)
-            {
-                HideNativeTooltip();
-                return false;
-            }
+            return NativeSelectionUtility.Select(button as Component);
+        }
 
-            NativeTooltipUtility.ShowTooltipForComponent(button as Component);
-            return true;
+        private static string GetText(UITextMesh textMesh)
+        {
+            return SpeechTextSanitizer.Normalize(UITextMeshTextUtility.GetEffectiveText(textMesh));
         }
 
         private string GetBuildingLabel(ResearchMenuBuildingTabButton tab, int index)
@@ -345,7 +367,7 @@ namespace SongsOfConquestAccess.Adapters
             return Localize("Adventure/KingdomInformationHUD/ResearchTierHeader", "Tier");
         }
 
-        private Tooltip BuildResearchTooltip(UIButton button, Func<bool> activate)
+        private Tooltip BuildResearchTooltip(UIButton button)
         {
             Component component = button as Component;
             if (component == null)
@@ -353,29 +375,11 @@ namespace SongsOfConquestAccess.Adapters
                 return null;
             }
 
+            // No structured actions: Enter on the row IS the buy, so a tooltip action naming it would
+            // be a second door onto the same click.
             return new Tooltip(
                 () => CaptureResearchTooltip(component).TextLines,
-                VisualTooltipMetadata.ForComponent(component, component.GetComponent<RectTransform>(), ResearchTooltipAnchors),
-                GetResearchTooltipActions(component, activate));
-        }
-
-        private IReadOnlyList<TooltipAction> GetResearchTooltipActions(Component component, Func<bool> activate)
-        {
-            DetailsTextUtility capture = CaptureResearchTooltip(component);
-            List<TooltipAction> actions = new List<TooltipAction>();
-            for (int i = 0; i < capture.InstructionRows.Count; i++)
-            {
-                TooltipInstructionRow row = capture.InstructionRows[i];
-                string label = SpeechTextSanitizer.Normalize(row != null ? row.Text : null);
-                if (string.IsNullOrWhiteSpace(label) || row.InputType == InputType.NoInput)
-                {
-                    continue;
-                }
-
-                actions.Add(new TooltipAction(label, activate));
-            }
-
-            return actions;
+                VisualTooltipMetadata.ForComponent(component, component.GetComponent<RectTransform>(), ResearchTooltipAnchors));
         }
 
         private DetailsTextUtility CaptureResearchTooltip(Component component)
@@ -461,11 +465,12 @@ namespace SongsOfConquestAccess.Adapters
 
         public sealed class FactionItem
         {
-            public FactionItem(int factionIndex, string label, bool isSelected, Func<bool> focus, Func<bool> activate)
+            public FactionItem(int factionIndex, string label, bool isSelected, Component button, Func<bool> focus, Func<bool> activate)
             {
                 FactionIndex = factionIndex;
                 Label = label ?? string.Empty;
                 IsSelected = isSelected;
+                Button = button;
                 Focus = focus;
                 Activate = activate;
             }
@@ -473,25 +478,52 @@ namespace SongsOfConquestAccess.Adapters
             public int FactionIndex { get; private set; }
             public string Label { get; private set; }
             public bool IsSelected { get; private set; }
+
+            /// <summary>The faction's own button - what the strip is drawn by.</summary>
+            public Component Button { get; private set; }
+
+            /// <summary>Move the game's selection here, without switching to the faction.</summary>
             public Func<bool> Focus { get; private set; }
+
             public Func<bool> Activate { get; private set; }
         }
 
         public sealed class BuildingItem
         {
-            public BuildingItem(string label, string description, bool missingBuilding, Func<bool> focus, Func<bool> activate)
+            public BuildingItem(
+                string label,
+                string description,
+                bool missingBuilding,
+                bool isSelected,
+                Component button,
+                Func<bool> focus,
+                Func<bool> activate)
             {
                 Label = label ?? string.Empty;
                 Description = description ?? string.Empty;
                 MissingBuilding = missingBuilding;
+                IsSelected = isSelected;
+                Button = button;
                 Focus = focus;
                 Activate = activate;
             }
 
             public string Label { get; private set; }
             public string Description { get; private set; }
+
+            /// <summary>The team owns no building of this kind, so nothing under the tab can be
+            /// bought; the menu draws its "missing building" label over the page.</summary>
             public bool MissingBuilding { get; private set; }
+
+            /// <summary>The tab the menu is showing.</summary>
+            public bool IsSelected { get; private set; }
+
+            /// <summary>The tab's own button - what the tab is drawn by.</summary>
+            public Component Button { get; private set; }
+
+            /// <summary>Move the game's selection here, without switching to the tab.</summary>
             public Func<bool> Focus { get; private set; }
+
             public Func<bool> Activate { get; private set; }
         }
 
@@ -509,11 +541,21 @@ namespace SongsOfConquestAccess.Adapters
 
         public sealed class ResearchItem
         {
-            public ResearchItem(string label, int ownedTier, string tierHeader, Func<bool> focus, Func<bool> activate, Tooltip tooltip)
+            public ResearchItem(
+                string label,
+                int ownedTier,
+                string tierHeader,
+                Component button,
+                Func<bool> isEnabled,
+                Func<bool> focus,
+                Func<bool> activate,
+                Tooltip tooltip)
             {
                 Label = label ?? string.Empty;
                 OwnedTier = ownedTier;
                 TierHeader = tierHeader ?? string.Empty;
+                Button = button;
+                IsEnabled = isEnabled;
                 Focus = focus;
                 Activate = activate;
                 Tooltip = tooltip;
@@ -522,6 +564,14 @@ namespace SongsOfConquestAccess.Adapters
             public string Label { get; private set; }
             public int OwnedTier { get; private set; }
             public string TierHeader { get; private set; }
+
+            /// <summary>The stack's own button - what the row is drawn by.</summary>
+            public Component Button { get; private set; }
+
+            /// <summary>Whether the game would answer a click here: the menu turns a stack that
+            /// cannot be bought non-interactable.</summary>
+            public Func<bool> IsEnabled { get; private set; }
+
             public Func<bool> Focus { get; private set; }
             public Func<bool> Activate { get; private set; }
             public Tooltip Tooltip { get; private set; }

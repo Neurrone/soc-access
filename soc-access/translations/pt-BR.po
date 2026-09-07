@@ -1200,6 +1200,16 @@ msgctxt "Screens.WielderArmy"
 msgid "wielder army"
 msgstr "exército do portador"
 
+#. Screens.WielderDead
+msgctxt "Screens.WielderDead"
+msgid "dead"
+msgstr "morto"
+
+#. Screens.WielderOwned
+msgctxt "Screens.WielderOwned"
+msgid "owned"
+msgstr "já possuído"
+
 #. Screens.Wielders
 msgctxt "Screens.Wielders"
 msgid "Wielders"

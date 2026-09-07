@@ -1,19 +1,50 @@
+using System;
 using System.Collections.Generic;
 using SongsOfConquest.Client.Adventure;
 using SongsOfConquestAccess.Adapters;
-using SongsOfConquestAccess.Input;
 using SongsOfConquestAccess.Localization;
 using SongsOfConquestAccess.UI;
+using SongsOfConquestAccess.UI.Graph;
 using UnityEngine;
 
 namespace SongsOfConquestAccess.Screens
 {
-    public sealed class BuildMenuScreen : Screen
+    /// <summary>
+    /// The build menu, made navigable as a graph. Five places to be, in the order the menu draws
+    /// them: the build site and its controls, the size tabs, the list of buildings, the details of
+    /// the one selected, and the close cross.
+    ///
+    /// Measured 2026-09-07: header, size tabs Small / Medium / Large in a row, the size and
+    /// build-time captions, the building column on the left, the details on the right (name,
+    /// description, income, cost, reason), the auto-select toggle at the top right.
+    ///
+    /// ARRIVING ON A BUILDING SELECTS IT (owner ruling 2026-09-07): the click only refills the
+    /// details pane on the right, so arriving at a building and reading what it costs is one event,
+    /// which is what the mouse does. THE SIZE TABS DO NOT switch on arrival: switching re-pools every
+    /// building button under them, so walking the bar would take the list the player is reading away.
+    /// Their focus visual is the game's own selection alone and Enter is the switch. The tier tabs in
+    /// the details are the same: they redraw the pane under them.
+    ///
+    /// Escape is the game's (<c>ConsumesBack</c> false): the menu IS an
+    /// <c>AdventureMenuBackground</c> with <c>_canClose</c> true, so it draws the close cross and
+    /// registers <c>UI.ExitMenu</c> on its own close in <c>AnimateEntry</c>.
+    /// </summary>
+    public sealed class BuildMenuScreen : GraphScreen
     {
+        private const string SiteStop = "build-site";
+        private const string SizesStop = "build-sizes";
+        private const string BuildingsStop = "build-buildings";
+        private const string DetailsStop = "build-details";
+        private const string CloseStop = "build-close";
+
         private readonly BuildMenuAdapter _adapter;
 
+        // A subject of its own per synthesized line, kept across rebuilds so the reconciler seats the
+        // cursor on the same one: the site summary, the selected building's description, the cost and
+        // the warning are read off text meshes the menu rebinds rather than off rows of their own.
+        private readonly Dictionary<string, object> _markers = new Dictionary<string, object>();
+
         public BuildMenuScreen(BuildMenuAdapter adapter)
-            : base(BuildRoot(adapter))
         {
             _adapter = adapter;
         }
@@ -33,309 +64,401 @@ namespace SongsOfConquestAccess.Screens
             return null;
         }
 
+        public override string Key
+        {
+            get { return "build-menu"; }
+        }
+
+        /// <summary>The header the menu draws over the page ("Build").</summary>
+        public override string ScreenName
+        {
+            get
+            {
+                string header = _adapter != null ? _adapter.HeaderText : null;
+                return string.IsNullOrWhiteSpace(header) ? null : header;
+            }
+        }
+
         public override bool IsPresent()
         {
             return _adapter != null && _adapter.IsPresent();
         }
 
-        public override void OnUnfocus()
-        {
-            _adapter?.HideNativeTooltip();
-            RootWidget?.Unfocus();
-        }
-
-        public override void OnPop()
-        {
-            _adapter?.HideNativeTooltip();
-        }
-
-        public override bool OnActionJustPressed(InputAction action)
-        {
-            if (action != null && action.Key == AccessibilityActions.Cancel.Key)
-            {
-                if (RootWidget != null && RootWidget.HandleAction(action))
-                {
-                    return true;
-                }
-
-                return _adapter != null && _adapter.Close();
-            }
-
-            return base.OnActionJustPressed(action);
-        }
-
-        public BuildMenuScreen Rebuild()
-        {
-            return new BuildMenuScreen(_adapter);
-        }
-
+        /// <summary>Kept for the detector, which calls it when the site or the size changes. The
+        /// graph is declared afresh on every operation, so there is nothing to rebuild.</summary>
         public void Refresh()
+        {
+        }
+
+        public override void Build(GraphBuilder builder)
         {
             if (!IsPresent())
             {
                 return;
             }
 
-            int focusedIndex = RootWidget != null ? RootWidget.FocusedIndex : -1;
-            RootWidget = BuildRoot(_adapter);
-            RootWidget?.SetFocusByIndexSilently(focusedIndex);
+            builder.BeginStop(SiteStop);
+            BuildSite(builder);
+
+            builder.BeginStop(SizesStop);
+            BuildSizes(builder);
+
+            builder.BeginStop(BuildingsStop);
+            BuildBuildings(builder);
+
+            builder.BeginStop(DetailsStop);
+            BuildDetails(builder);
+
+            builder.BeginStop(CloseStop);
+            BuildClose(builder);
         }
 
-        private static ContainerWidget BuildRoot(BuildMenuAdapter adapter)
+        // ---- the build site ----
+
+        private void BuildSite(GraphBuilder builder)
         {
-            ContainerWidget root = new ContainerWidget("build-menu", adapter != null ? adapter.BuildButtonLabel : string.Empty);
-            if (adapter == null)
+            Component tutorial = _adapter.TutorialButton;
+            if (tutorial != null && _adapter.IsTutorialButtonVisible())
             {
-                return root;
+                AddButton(
+                    builder,
+                    tutorial,
+                    "tutorial",
+                    _adapter.GetTutorialButtonLabel,
+                    () => _adapter.ActivateTutorial(),
+                    null);
             }
 
-            root.AddChild(new ButtonWidget(
-                "build-tutorial",
-                adapter.GetTutorialButtonLabel,
-                adapter.ActivateTutorial,
-                adapter.HideNativeTooltip,
-                adapter.IsTutorialButtonVisible,
-                adapter.IsTutorialButtonVisible));
+            AddLine(builder, "current-site", () => _adapter.BuildSiteSummary);
 
-            root.AddChild(new TextWidget(
-                "build-current-site",
-                () => adapter.BuildSiteSummary,
-                adapter.HideNativeTooltip,
-                includeParentLabelInAnnouncement: false));
+            AddButton(
+                builder,
+                _adapter.PreviousBuildSiteButton,
+                "previous-site",
+                () => _adapter.PreviousBuildSiteButtonLabel,
+                () => _adapter.ActivatePreviousBuildSite(),
+                _adapter.IsPreviousBuildSiteEnabled);
 
-            root.AddChild(new ButtonWidget(
-                "build-previous-site",
-                () => adapter.PreviousBuildSiteButtonLabel,
-                adapter.ActivatePreviousBuildSite,
-                adapter.HideNativeTooltip,
-                adapter.IsPreviousBuildSiteEnabled));
+            AddButton(
+                builder,
+                _adapter.NextBuildSiteButton,
+                "next-site",
+                () => _adapter.NextBuildSiteButtonLabel,
+                () => _adapter.ActivateNextBuildSite(),
+                _adapter.IsNextBuildSiteEnabled);
 
-            root.AddChild(new ButtonWidget(
-                "build-next-site",
-                () => adapter.NextBuildSiteButtonLabel,
-                adapter.ActivateNextBuildSite,
-                adapter.HideNativeTooltip,
-                adapter.IsNextBuildSiteEnabled));
-
-            root.AddChild(new CheckboxWidget(
-                "build-auto-select-site",
-                adapter.AutoSelectLabel,
-                adapter.ToggleAutoSelect,
-                adapter.IsAutoSelectChecked,
-                adapter.IsAutoSelectVisible));
-
-            root.AddChild(BuildCategoryMenu(adapter));
-            root.AddChild(BuildBuildingMenu(adapter));
-            root.AddChild(new TextWidget(
-                "build-summary",
-                () => adapter.SelectedBuildingSummary,
-                adapter.HideNativeTooltip,
-                includeParentLabelInAnnouncement: false,
-                isVisible: adapter.HasSelectedBuildingSummary));
-            root.AddChild(BuildTierMenu(adapter));
-            root.AddChild(BuildAvailableResearchMenu(adapter));
-            AddIncomeAndGarrisonMenus(root, adapter);
-            root.AddChild(BuildRequirementsMenu(adapter));
-            root.AddChild(new TextWidget(
-                "build-cost",
-                () => adapter.CurrentTierCostText,
-                adapter.HideNativeTooltip,
-                includeParentLabelInAnnouncement: false,
-                isVisible: adapter.HasCurrentTierCost));
-            root.AddChild(new TextWidget(
-                "build-warning",
-                () => adapter.CannotBuyText,
-                adapter.HideNativeTooltip,
-                includeParentLabelInAnnouncement: false,
-                isVisible: adapter.HasWarning));
-
-            root.AddChild(new ButtonWidget(
-                "build-purchase",
-                () => adapter.BuildButtonLabel,
-                adapter.ActivateBuild,
-                adapter.FocusBuildButton,
-                adapter.IsBuildButtonEnabled,
-                adapter.IsBuildButtonVisible));
-
-            root.AddChild(new ButtonWidget(
-                "build-close",
-                ModText.Get(ModStrings.Screens.Close),
-                adapter.Close,
-                adapter.HideNativeTooltip,
-                () => true));
-
-            return root;
-        }
-
-        private static MenuWidget BuildTierMenu(BuildMenuAdapter adapter)
-        {
-            MenuWidget menu = new MenuWidget("build-tiers", ModText.Get(ModStrings.Screens.Tier), () => adapter.GetTiers().Count > 0);
-            IReadOnlyList<BuildMenuAdapter.TierItem> tiers = adapter.GetTiers();
-            for (int i = 0; i < tiers.Count; i++)
+            Component toggle = _adapter.AutoSelectToggle;
+            if (toggle != null && _adapter.IsAutoSelectVisible())
             {
-                BuildMenuAdapter.TierItem tier = tiers[i];
-                menu.AddItem(new MenuItemWidget(
-                    BuildTierId(tier),
-                    () => tier.Label,
-                    null,
-                    tier.Focus,
-                    () => tier.Focus(),
-                    () => true,
-                    tier.Tooltip));
-            }
-
-            menu.SetFocusedItemById("build-tier-" + adapter.SelectedTier);
-            return menu;
-        }
-
-        private static MenuWidget BuildAvailableResearchMenu(BuildMenuAdapter adapter)
-        {
-            MenuWidget menu = new MenuWidget("build-available-research", adapter.AvailableResearchHeader, adapter.HasAvailableResearch);
-            IReadOnlyList<BuildMenuAdapter.SectionItem> items = adapter.GetAvailableResearchItems();
-            for (int i = 0; i < items.Count; i++)
-            {
-                BuildMenuAdapter.SectionItem item = items[i];
-                menu.AddItem(new MenuItemWidget(
-                    "build-available-research-" + i,
-                    () => item.Label,
-                    null,
-                    () => false,
-                    item.Focus,
-                    () => true,
-                    item.Tooltip));
-            }
-
-            return menu;
-        }
-
-        private static void AddIncomeAndGarrisonMenus(ContainerWidget root, BuildMenuAdapter adapter)
-        {
-            IReadOnlyList<BuildMenuAdapter.SectionMenu> menus = adapter.GetIncomeAndGarrisonMenus();
-            for (int i = 0; i < menus.Count; i++)
-            {
-                BuildMenuAdapter.SectionMenu section = menus[i];
-                string sectionId = "build-info-section-" + i;
-                MenuWidget menu = new MenuWidget(sectionId, section.Label);
-                for (int j = 0; j < section.Items.Count; j++)
-                {
-                    BuildMenuAdapter.SectionItem item = section.Items[j];
-                    menu.AddItem(new MenuItemWidget(
-                        sectionId + "-" + j,
-                        () => item.Label,
-                        null,
-                        () => false,
-                        item.Focus,
-                        () => true,
-                        item.Tooltip));
-                }
-
-                root.AddChild(menu);
+                NodeVtable vtable = GraphNodes.Checkbox(
+                    () => _adapter.AutoSelectLabel,
+                    _adapter.IsAutoSelectChecked,
+                    _adapter.ToggleAutoSelect);
+                vtable.OnFocusVisual = () => NativeSelectionUtility.Select(toggle);
+                builder.AddItem(new DrawnNode(
+                    ControlId.For(toggle, "build:auto-select"),
+                    vtable,
+                    toggle));
             }
         }
 
-        private static MenuWidget BuildRequirementsMenu(BuildMenuAdapter adapter)
-        {
-            MenuWidget menu = new MenuWidget("build-requirements", adapter.RequirementsHeader, adapter.HasRequirements);
-            IReadOnlyList<BuildMenuAdapter.RequirementItem> requirements = adapter.GetRequirements();
-            for (int i = 0; i < requirements.Count; i++)
-            {
-                BuildMenuAdapter.RequirementItem requirement = requirements[i];
-                menu.AddItem(new MenuItemWidget(
-                    "build-requirement-" + i,
-                    () => BuildRequirementLabel(requirement),
-                    () => requirement.IsMet ? string.Empty : ModText.Get(ModStrings.UI.StatusMissing),
-                    () => false,
-                    adapter.HideNativeTooltip,
-                    () => true,
-                    requirement.Tooltip));
-            }
+        // ---- the size tabs ----
 
-            return menu;
-        }
-
-        private static MenuWidget BuildCategoryMenu(BuildMenuAdapter adapter)
+        private void BuildSizes(GraphBuilder builder)
         {
-            MenuWidget menu = new MenuWidget("build-size-tabs", adapter.BuildSizeHeader);
-            IReadOnlyList<BuildMenuAdapter.CategoryItem> categories = adapter.GetCategories();
-            string activeId = null;
+            IReadOnlyList<BuildMenuAdapter.CategoryItem> categories = _adapter.GetCategories();
             for (int i = 0; i < categories.Count; i++)
             {
                 BuildMenuAdapter.CategoryItem category = categories[i];
-                BuildMenuAdapter.CategoryItem captured = category;
-                string id = BuildCategoryId(captured);
-                if (captured.Index == adapter.SelectedCategoryIndex)
+                Component button = category.Button;
+                if (button == null)
                 {
-                    activeId = id;
+                    continue;
                 }
 
-                menu.AddItem(new MenuItemWidget(
-                    id,
-                    () => captured.Label,
-                    () => captured.Enabled ? string.Empty : ModText.Get(ModStrings.UI.StatusUnavailable),
-                    () => captured.Enabled && adapter.FocusCategory(captured.Size),
-                    () =>
-                    {
-                        if (captured.Enabled)
-                        {
-                            adapter.FocusCategory(captured.Size);
-                        }
-                    },
-                    () => true,
-                    (SongsOfConquestAccess.Adapters.Tooltip)null,
-                    null,
-                    () => captured.Enabled));
+                BuildMenuAdapter.CategoryItem it = category;
+                NodeVtable vtable = GraphNodes.Tab(
+                    () => it.Label,
+                    () => it.IsSelected,
+                    () => it.Enabled);
+                // Drawn under the bar: how long anything of this size takes to build.
+                vtable.Announcements.Add(GraphNodes.ValuePart(() => it.BuildTime, watch: false));
+                vtable.OnActivate = () => _adapter.ActivateCategory(it.Size);
+                vtable.OnFocusVisual = () => _adapter.SelectCategory(it.Size);
+                builder.AddItem(new DrawnNode(
+                    ControlId.For(button, "build:size/" + category.Index),
+                    vtable,
+                    button));
             }
-
-            menu.SetFocusedItemById(activeId);
-            return menu;
         }
 
-        private static MenuWidget BuildBuildingMenu(BuildMenuAdapter adapter)
+        // ---- the buildings ----
+
+        private void BuildBuildings(GraphBuilder builder)
         {
-            MenuWidget menu = new MenuWidget("build-buildings", adapter.BuildSizeHeader);
-            IReadOnlyList<BuildMenuAdapter.BuildingItem> buildings = adapter.GetBuildings();
+            IReadOnlyList<BuildMenuAdapter.BuildingItem> buildings = _adapter.GetBuildings();
+            ControlId selected = null;
             for (int i = 0; i < buildings.Count; i++)
             {
                 BuildMenuAdapter.BuildingItem building = buildings[i];
-                menu.AddItem(new MenuItemWidget(
-                    "build-building-" + i,
-                    () => building.Label,
-                    () => building.IsAvailable ? string.Empty : ModText.Get(ModStrings.UI.StatusUnavailable),
-                    building.Focus,
-                    () => building.Focus(),
-                    () => true,
-                    building.Tooltip));
+                Component button = building.Button;
+                if (button == null)
+                {
+                    continue;
+                }
+
+                BuildMenuAdapter.BuildingItem it = building;
+                string label = building.Label;
+                NodeVtable vtable = GraphNodes.Button(
+                    () => label,
+                    () => { if (it.Focus != null) it.Focus(); },
+                    () => it.IsAvailable,
+                    it.Tooltip != null ? it.Tooltip() : null);
+                vtable.Announcements.Add(GraphNodes.SelectedPart(() => it.IsSelected));
+                // Arrival IS the selection: the click only refills the details pane beside the list.
+                vtable.OnFocusVisual = () => { if (it.Focus != null) it.Focus(); };
+                ControlId id = ControlId.For(button, "build:building/" + i);
+                builder.AddItem(new DrawnNode(id, vtable, button));
+                if (building.IsSelected)
+                {
+                    selected = id;
+                }
             }
 
-            if (buildings.Count == 0)
+            // The building the details pane is describing, so arriving reads what the player sees.
+            builder.LandStopOn(selected);
+        }
+
+        // ---- the details ----
+
+        private void BuildDetails(GraphBuilder builder)
+        {
+            if (_adapter.HasSelectedBuildingSummary())
             {
-                return menu;
+                AddLine(builder, "summary", () => _adapter.SelectedBuildingSummary);
             }
 
-            menu.SetFocusedItemById("build-building-" + adapter.SelectedBuildingIndex);
+            BuildTiers(builder);
+            BuildSection(builder, "available-research", _adapter.AvailableResearchHeader, _adapter.GetAvailableResearchItems());
 
-            return menu;
-        }
-
-        private static string BuildTierId(BuildMenuAdapter.TierItem tier)
-        {
-            return tier != null ? "build-tier-" + tier.Level : "build-tier";
-        }
-
-        private static string BuildCategoryId(BuildMenuAdapter.CategoryItem category)
-        {
-            return category != null ? "build-category-" + category.Index : "build-category";
-        }
-
-        private static string BuildRequirementLabel(BuildMenuAdapter.RequirementItem requirement)
-        {
-            if (requirement == null)
+            IReadOnlyList<BuildMenuAdapter.SectionMenu> sections = _adapter.GetIncomeAndGarrisonMenus();
+            for (int i = 0; i < sections.Count; i++)
             {
-                return string.Empty;
+                BuildSection(builder, "section/" + i, sections[i].Label, sections[i].Items);
             }
 
-            return requirement.IsMet ? requirement.Label : ModText.Get(ModStrings.Screens.Missing, requirement.Label);
+            BuildRequirements(builder);
+            if (_adapter.HasCurrentTierCost())
+            {
+                AddLine(builder, "cost", () => _adapter.CurrentTierCostText);
+            }
+
+            if (_adapter.HasWarning())
+            {
+                AddLine(builder, "warning", () => _adapter.CannotBuyText);
+            }
+
+            BuildPurchase(builder);
         }
 
+        private void BuildTiers(GraphBuilder builder)
+        {
+            IReadOnlyList<BuildMenuAdapter.TierItem> tiers = _adapter.GetTiers();
+            for (int i = 0; i < tiers.Count; i++)
+            {
+                BuildMenuAdapter.TierItem tier = tiers[i];
+                Component button = tier.Button;
+                if (button == null)
+                {
+                    continue;
+                }
+
+                BuildMenuAdapter.TierItem it = tier;
+                NodeVtable vtable = GraphNodes.Tab(
+                    () => it.Label,
+                    () => it.IsSelected,
+                    null,
+                    it.Tooltip != null ? it.Tooltip() : null);
+                vtable.OnActivate = () => { if (it.Activate != null) it.Activate(); };
+                vtable.OnFocusVisual = () => { if (it.Focus != null) it.Focus(); };
+                builder.AddItem(new DrawnNode(
+                    ControlId.For(button, "build:tier/" + it.Level),
+                    vtable,
+                    button));
+            }
+        }
+
+        /// <summary>One of the bands the details pane draws under a caption - the available research,
+        /// the income, the garrison. The caption is the REGION its rows belong to rather than a row of
+        /// its own, because there is nothing there to operate.</summary>
+        private void BuildSection(
+            GraphBuilder builder,
+            string key,
+            string caption,
+            IReadOnlyList<BuildMenuAdapter.SectionItem> items)
+        {
+            if (items == null || items.Count == 0)
+            {
+                return;
+            }
+
+            bool named = !string.IsNullOrWhiteSpace(caption);
+            if (named)
+            {
+                builder.PushContext(caption);
+                builder.SetRegion("build:" + key);
+            }
+
+            for (int i = 0; i < items.Count; i++)
+            {
+                BuildMenuAdapter.SectionItem item = items[i];
+                if (item == null)
+                {
+                    continue;
+                }
+
+                BuildMenuAdapter.SectionItem it = item;
+                string label = item.Label;
+                Component target = item.Target;
+                NodeVtable vtable = GraphNodes.Text(
+                    () => label,
+                    null,
+                    it.Tooltip != null ? it.Tooltip() : null);
+                vtable.OnFocusVisual = () => { if (it.Focus != null) it.Focus(); };
+                ControlId id = ControlId.For(
+                    target != null ? (object)target : Marker(key + "/" + i),
+                    "build:" + key + "/" + i);
+                builder.AddItem(target == null
+                    ? (NodeDeclaration)new SyntheticNode(id, vtable)
+                    : new DrawnNode(id, vtable, target));
+            }
+
+            if (named)
+            {
+                builder.PopContext();
+            }
+
+            builder.SetRegion(null);
+        }
+
+        private void BuildRequirements(GraphBuilder builder)
+        {
+            IReadOnlyList<BuildMenuAdapter.RequirementItem> requirements = _adapter.GetRequirements();
+            if (requirements.Count == 0)
+            {
+                return;
+            }
+
+            string caption = _adapter.RequirementsHeader;
+            bool named = !string.IsNullOrWhiteSpace(caption);
+            if (named)
+            {
+                builder.PushContext(caption);
+                builder.SetRegion("build:requirements");
+            }
+
+            for (int i = 0; i < requirements.Count; i++)
+            {
+                BuildMenuAdapter.RequirementItem requirement = requirements[i];
+                BuildMenuAdapter.RequirementItem it = requirement;
+                string label = requirement.Label;
+                NodeVtable vtable = GraphNodes.Text(() => label, null, it.Tooltip);
+                // The row is the one place the player learns a requirement is not met, so the state
+                // is said once, after the requirement it is about.
+                vtable.Announcements.Add(GraphNodes.ValuePart(
+                    () => it.IsMet ? null : ModText.Get(ModStrings.UI.StatusMissing)));
+                builder.AddItem(new SyntheticNode(
+                    ControlId.For(Marker("requirement/" + i), "build:requirement/" + i),
+                    vtable));
+            }
+
+            if (named)
+            {
+                builder.PopContext();
+            }
+
+            builder.SetRegion(null);
+        }
+
+        private void BuildPurchase(GraphBuilder builder)
+        {
+            Component purchase = _adapter.PurchaseButton;
+            if (purchase == null || !_adapter.IsBuildButtonVisible())
+            {
+                return;
+            }
+
+            NodeVtable vtable = GraphNodes.Button(
+                () => _adapter.BuildButtonLabel,
+                () => _adapter.ActivateBuild(),
+                _adapter.IsBuildButtonEnabled);
+            vtable.OnFocusVisual = () => _adapter.FocusBuildButton();
+            builder.AddItem(new DrawnNode(
+                ControlId.For(purchase, "build:purchase"),
+                vtable,
+                purchase));
+        }
+
+        // ---- the close cross ----
+
+        private void BuildClose(GraphBuilder builder)
+        {
+            Component close = _adapter.CloseButton;
+            if (close == null || !_adapter.IsCloseVisible())
+            {
+                return;
+            }
+
+            // An icon with no text of its own, so the mod names it.
+            NodeVtable vtable = GraphNodes.Button(
+                () => ModText.Get(ModStrings.Screens.Close),
+                () => _adapter.ActivateClose());
+            vtable.OnFocusVisual = () => NativeSelectionUtility.Select(close);
+            builder.AddItem(new DrawnNode(ControlId.For(close, "build:close"), vtable, close));
+        }
+
+        // ---- shared ----
+
+        private void AddButton(
+            GraphBuilder builder,
+            Component component,
+            string key,
+            Func<string> label,
+            Action activate,
+            Func<bool> enabled)
+        {
+            if (component == null)
+            {
+                return;
+            }
+
+            NodeVtable vtable = GraphNodes.Button(label, activate, enabled);
+            vtable.OnFocusVisual = () => NativeSelectionUtility.Select(component);
+            builder.AddItem(new DrawnNode(ControlId.For(component, "build:" + key), vtable, component));
+        }
+
+        private void AddLine(GraphBuilder builder, string key, Func<string> text)
+        {
+            if (string.IsNullOrWhiteSpace(text()))
+            {
+                return;
+            }
+
+            builder.AddItem(new SyntheticNode(
+                ControlId.For(Marker(key), "build:" + key),
+                GraphNodes.Text(text)));
+        }
+
+        private object Marker(string key)
+        {
+            object marker;
+            if (!_markers.TryGetValue(key, out marker))
+            {
+                marker = new object();
+                _markers.Add(key, marker);
+            }
+
+            return marker;
+        }
     }
 }
