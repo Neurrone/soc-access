@@ -578,6 +578,7 @@ namespace SongsOfConquestAccess.Localization
             public static readonly ModString GraphType = new ModString("Screens.GraphType", "Graph type");
             public static readonly ModString General = new ModString("Screens.General", "General");
             public static readonly ModString Group = new ModString("Screens.Group", "Group {0}");
+            public static readonly ModString Income = new ModString("Screens.Income", "Income");
             public static readonly ModString InviteFriend = new ModString("Screens.InviteFriend", "Invite friend");
             public static readonly ModString KeywordAlreadyAdded = new ModString("Screens.KeywordAlreadyAdded", "That keyword is already in this custom category");
             public static readonly ModString Layout = new ModString("Screens.Layout", "Layout");

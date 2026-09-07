@@ -3146,6 +3146,11 @@ msgctxt "Screens.CopyGameCodeToClipboard"
 msgid "Copy game code to clipboard: {0}"
 msgstr "Copiar código do jogo para a área de transferência: {0}"
 
+#. Screens.Income
+msgctxt "Screens.Income"
+msgid "Income"
+msgstr "Renda"
+
 #. Screens.InviteFriend
 msgctxt "Screens.InviteFriend"
 msgid "Invite friend"

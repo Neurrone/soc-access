@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using SongsOfConquest.Client.Adventure;
 using SongsOfConquestAccess.Adapters;
@@ -10,22 +9,23 @@ using UnityEngine;
 namespace SongsOfConquestAccess.Screens
 {
     /// <summary>
-    /// The kingdom's troop overview, made navigable as a graph. Two places to be: the table of every
-    /// town's recruitment, and the close.
+    /// The kingdom's troop overview, made navigable as a graph. Two places to be: the lines the page
+    /// draws, and the close.
     ///
-    /// The whole page is ONE sheet stop whose REGIONS are the towns the menu draws, in drawn order,
-    /// so Alt+Up and Alt+Down jump between towns and each names itself on the way in. Measured
-    /// 2026-09-07: the title "Troop Overview"; then per town a header line (the settlement's name
-    /// "Hazelpoint - Small Settlement" beside its "Tier: 2/2"), then one line per recruitable troop
-    /// with the figure the game draws as "10 (+2)". The hierarchy order the menu is enumerated in IS
-    /// the drawn order here.
+    /// The page is LINES, not a table (owner ruling 2026-09-07). It is ONE stop whose REGIONS are the
+    /// towns the menu draws, in drawn order, so Alt+Up and Alt+Down jump between towns and each names
+    /// itself on the way in. Measured 2026-09-07: the title "Troop Overview"; then per town the
+    /// settlement's name ("Hazelpoint - Small Settlement") beside its "Tier: 2/2", then one line per
+    /// recruitable troop with the figure the game draws as "10 (+2)". The hierarchy order the menu is
+    /// enumerated in IS the drawn order here.
     ///
-    /// Two columns: the row's NAME and the VALUE drawn at the right of it - the town's tier on the
-    /// header line, the troop's figure on a troop line. The game draws a caption over neither, so a
-    /// crossing into the value column is label-free and the value says itself.
-    /// <c>KingdomTroopOverviewIncomeEntry.SetTroop</c> composes the number available and the
-    /// per-round income into one drawn label and keeps neither number, so there is nothing to split
-    /// into an "available" and a "per turn" column: the composed text is one cell.
+    /// So each town is two kinds of line, in the order they are drawn: the town itself, as the button
+    /// whose click moves the camera onto the settlement, and one button per troop, whose click cycles
+    /// the camera through the buildings producing it. The figure the game draws at the right of a line
+    /// - the town's tier, the troop's count - is that line's value.
+    /// <c>KingdomTroopOverviewIncomeEntry.SetTroop</c> composes the number available and the per-round
+    /// income into one drawn label and keeps neither number, so there is nothing to split into an
+    /// "available" and a "per turn": the composed text is the whole value.
     ///
     /// THE CLOSE IS THE MOD'S OWN NODE: the menu draws no close control and is dismissed by clicking
     /// the blocker behind it, so the node runs the game's own <c>KingdomTroopOverviewMenu.Hide</c>.
@@ -36,12 +36,6 @@ namespace SongsOfConquestAccess.Screens
     {
         private const string ContentStop = "troop-overview-content";
         private const string CloseStop = "troop-overview-close";
-        private const string SheetKey = "troop-overview:";
-
-        // The logical columns of a row: the name is the primary, and the figure drawn at the right of
-        // it is the one metadata column.
-        private const int ValueColumn = 1;
-        private const int ColumnCount = 2;
 
         private readonly KingdomTroopOverviewAdapter _adapter;
 
@@ -104,79 +98,86 @@ namespace SongsOfConquestAccess.Screens
             BuildClose(builder);
         }
 
-        // ---- the table ----
+        // ---- the lines ----
 
         private void BuildTowns(GraphBuilder builder)
         {
-            GraphSheet sheet = new GraphSheet(builder, SheetKey);
             IReadOnlyList<KingdomTroopOverviewAdapter.TownItem> towns = _adapter.GetTowns();
+            ControlId first = null;
             for (int t = 0; t < towns.Count; t++)
             {
                 KingdomTroopOverviewAdapter.TownItem town = towns[t];
-                if (town == null)
+                if (town == null || town.Entry == null)
                 {
                     continue;
                 }
 
-                sheet.Region(town.Name, new string[ColumnCount]);
-                sheet.RowAt(TownPrimary(town), town.Entry, Cells(town.Tier, () => town.Name, null), town.Entry);
+                builder.PushContext(town.Name);
+                builder.SetRegion("troop-overview:town/" + t);
+
+                ControlId id = ControlId.For(town.Entry, "troop-overview:town/" + t);
+                builder.AddItem(new DrawnNode(id, TownLine(town), town.Entry));
+                if (first == null)
+                {
+                    first = id;
+                }
+
                 for (int r = 0; r < town.Rows.Count; r++)
                 {
                     KingdomTroopOverviewAdapter.RowItem row = town.Rows[r];
-                    sheet.RowAt(TroopPrimary(row), row.Entry, Cells(row.Amount, () => row.Name, row.Focus), row.Entry);
+                    if (row == null || row.Entry == null)
+                    {
+                        continue;
+                    }
+
+                    builder.AddItem(new DrawnNode(
+                        ControlId.For(row.Entry, "troop-overview:troop/" + t + "/" + r),
+                        TroopLine(row),
+                        row.Entry));
                 }
+
+                builder.PopContext();
             }
 
-            sheet.Finish();
-            // The first town's header row, which is the top of the page rather than whatever the game
+            builder.SetRegion(null);
+            // The first town's own line, which is the top of the page rather than whatever the game
             // last selected.
-            builder.LandStopOn(sheet.FirstRow);
+            builder.LandStopOn(first);
         }
 
         /// <summary>The town's own line: the name the menu draws, as the button whose click moves the
-        /// camera onto the settlement.</summary>
-        private static NodeVtable TownPrimary(KingdomTroopOverviewAdapter.TownItem town)
+        /// camera onto the settlement, with the tier drawn beside it.</summary>
+        private static NodeVtable TownLine(KingdomTroopOverviewAdapter.TownItem town)
         {
             KingdomTroopOverviewAdapter.TownItem it = town;
-            return GraphNodes.Button(() => it.Name, () => it.MoveCamera());
+            NodeVtable vtable = GraphNodes.Button(() => it.Name, () => it.MoveCamera());
+            AddValue(vtable, it.Tier);
+            return vtable;
         }
 
         /// <summary>A troop's own line: the name the menu draws, as the button whose click cycles the
-        /// camera through the buildings producing it.</summary>
-        private static NodeVtable TroopPrimary(KingdomTroopOverviewAdapter.RowItem row)
+        /// camera through the buildings producing it, with the figure drawn at the right of it.
+        /// </summary>
+        private static NodeVtable TroopLine(KingdomTroopOverviewAdapter.RowItem row)
         {
             KingdomTroopOverviewAdapter.RowItem it = row;
             NodeVtable vtable = GraphNodes.Button(() => it.Name, () => it.Activate());
             vtable.OnFocusVisual = () => it.Focus();
+            AddValue(vtable, it.Amount);
             return vtable;
         }
 
-        /// <summary>The row's one read-only cell: the figure the game drew, with the row's name as
-        /// what a search matches it by. A row the game draws no figure on declares no cell - the
-        /// sheet's rows are ragged by design.</summary>
-        private static List<GraphSheet.SheetCell> Cells(string value, Func<string> rowName, Func<bool> focus)
+        /// <summary>The figure the game drew at the right of the line, as that line's value. A line
+        /// the game draws no figure on says nothing beyond its name.</summary>
+        private static void AddValue(NodeVtable vtable, string value)
         {
-            List<GraphSheet.SheetCell> cells = new List<GraphSheet.SheetCell>();
             if (string.IsNullOrWhiteSpace(value))
             {
-                return cells;
+                return;
             }
 
             string text = value;
-            NodeVtable vtable = new NodeVtable
-            {
-                ControlType = ControlTypes.Text,
-                Announcements = new List<NodeAnnouncement> { GraphNodes.ValuePart(() => text, watch: false) },
-                SearchText = rowName,
-                BufferHead = () => text,
-            };
-            if (focus != null)
-            {
-                vtable.OnFocusVisual = () => focus();
-            }
-
-            cells.Add(new GraphSheet.SheetCell(ValueColumn, 0, vtable));
-            return cells;
+            vtable.Announcements.Add(GraphNodes.ValuePart(() => text, watch: false));
         }
 
         // ---- the close ----

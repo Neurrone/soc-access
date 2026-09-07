@@ -22,8 +22,8 @@ the in-game chat; the mod options dialog opened from the pause menu.
 
 ## Screens to test, and what to watch for
 
-- **Pause menu**: arrival lands on Continue Game (the game's own default), read last because
-  it is drawn last; Escape is the game's.
+- **Pause menu**: arrival lands on Quick Save, the first drawn button; Continue Game reads last
+  because it is drawn last; Escape is the game's.
 - **World confirm** (paying at a site): Cancel reads before Confirm, as drawn; Escape presses
   Cancel. **Claim menu** (after a siege): choices are buttons reading title, duration,
   description; Escape reaches the game, which refuses it on a freshly captured settlement.
@@ -66,7 +66,11 @@ the in-game chat; the mod options dialog opened from the pause menu.
 
 ## Decisions taken in your absence
 
-- Pause menu lands on Continue Game rather than the first drawn button.
+- Pause menu lands on the first drawn button (your ruling; it first landed on Continue Game).
+- Owned entities and troop overview are lines under a region per settlement, not tables (your
+  ruling): the category line with its tier, an "Income" line reading the resources in drawn
+  order with the +0 ones last, then "1 Quarry, Tier: 1/2" per building; troop lines read
+  "Sheng Tian, 21 (+2)".
 - Story text reads the body as one spoken line and holds only the paragraphs in the buffer
   (your ruling, applied).
 - Claim menu gets no close node: the game draws none and its own Escape handler decides.

@@ -87,14 +87,12 @@ namespace SongsOfConquestAccess.Screens
                 NodeVtable vtable = GraphNodes.Button(item.GetLabel, () => item.Activate(), item.IsEnabled);
                 // The game's own selection visual, which is what the mouse leaves behind on hover.
                 vtable.OnFocusVisual = item.Select;
-                ControlId id = ControlId.For(item.Button, "pause-menu:" + item.Id);
-                builder.AddItem(new DrawnNode(id, vtable, item.Button));
-                // Arrival lands where the game itself puts its selection: Continue Game is the
-                // menu's default selectable, although it is drawn last.
-                if (item.Id == "continue")
-                {
-                    builder.SetStart(id);
-                }
+                // Arrival lands on the first drawn button (owner ruling 2026-09-07), not on Continue
+                // Game, which the game makes its default selectable but draws last.
+                builder.AddItem(new DrawnNode(
+                    ControlId.For(item.Button, "pause-menu:" + item.Id),
+                    vtable,
+                    item.Button));
             }
         }
 

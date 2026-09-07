@@ -2614,6 +2614,11 @@ msgctxt "Screens.Group"
 msgid "Group {0}"
 msgstr ""
 
+#. Screens.Income
+msgctxt "Screens.Income"
+msgid "Income"
+msgstr ""
+
 #. Screens.InviteFriend
 msgctxt "Screens.InviteFriend"
 msgid "Invite friend"
