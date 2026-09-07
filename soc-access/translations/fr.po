@@ -725,11 +725,6 @@ msgctxt "Screens.AdventureMap"
 msgid "Adventure map"
 msgstr "Carte aventure"
 
-#. Screens.ArcanaSpells
-msgctxt "Screens.ArcanaSpells"
-msgid "Arcana spells"
-msgstr "Sorts Arcana"
-
 #. Screens.Army
 msgctxt "Screens.Army"
 msgid "army"
@@ -790,11 +785,6 @@ msgctxt "Screens.Categories"
 msgid "Categories"
 msgstr "Catégories"
 
-#. Screens.ChaosSpells
-msgctxt "Screens.ChaosSpells"
-msgid "Chaos spells"
-msgstr "Sorts Chaos"
-
 #. Screens.Choices
 msgctxt "Screens.Choices"
 msgid "Choices"
@@ -835,11 +825,6 @@ msgctxt "Screens.Combat"
 msgid "Combat"
 msgstr "Combat"
 
-#. Screens.CreationSpells
-msgctxt "Screens.CreationSpells"
-msgid "Creation spells"
-msgstr "Sorts Création"
-
 #. Screens.CurrentTroop
 msgctxt "Screens.CurrentTroop"
 msgid "Current troop, {0}"
@@ -859,11 +844,6 @@ msgstr "armée du porteur défenseur"
 msgctxt "Screens.DescriptionWithMissingBuilding"
 msgid "{0}. missing building"
 msgstr "{0}. bâtiment manquant"
-
-#. Screens.DestructionSpells
-msgctxt "Screens.DestructionSpells"
-msgid "Destruction spells"
-msgstr "Sorts Destruction"
 
 #. Screens.DisabledWithReason
 msgctxt "Screens.DisabledWithReason"
@@ -1010,11 +990,6 @@ msgctxt "Screens.Ok"
 msgid "OK"
 msgstr "OK"
 
-#. Screens.OrderSpells
-msgctxt "Screens.OrderSpells"
-msgid "Order spells"
-msgstr "Sorts Ordre"
-
 #. Screens.PostAdventureResult
 msgctxt "Screens.PostAdventureResult"
 msgid "Post adventure result"
@@ -1049,6 +1024,11 @@ msgstr "Recruter depuis"
 msgctxt "Screens.RecruitingFrom"
 msgid "Recruiting from {0}"
 msgstr "Recrutement depuis {0}"
+
+#. Screens.Remove
+msgctxt "Screens.Remove"
+msgid "Remove"
+msgstr "Retirer"
 
 #. Screens.RemoveKeyword
 msgctxt "Screens.RemoveKeyword"
@@ -1090,15 +1070,20 @@ msgctxt "Screens.Skill"
 msgid "Skill {0}"
 msgstr "Compétence {0}"
 
-#. Screens.SlotValue
-msgctxt "Screens.SlotValue"
-msgid "Slot {0}: {1}"
-msgstr "Emplacement {0} : {1}"
-
 #. Screens.SpellTier
 msgctxt "Screens.SpellTier"
 msgid "{0} tier {1}"
 msgstr "{0}, rang {1}"
+
+#. Screens.SpellbookAddToQuickbarHint
+msgctxt "Screens.SpellbookAddToQuickbarHint"
+msgid "{0} adds to quickbar"
+msgstr "{0} ajoute à la barre rapide"
+
+#. Screens.SpellbookDropToRemove
+msgctxt "Screens.SpellbookDropToRemove"
+msgid "Drop a spell here to remove it from the quickbar"
+msgstr "Déposez un sort ici pour le retirer de la barre rapide"
 
 #. Screens.Tabs
 msgctxt "Screens.Tabs"
@@ -1214,11 +1199,6 @@ msgstr "{0} case"
 msgctxt "Common.TileCount_1"
 msgid "{0} tiles"
 msgstr "{0} cases"
-
-#. Screens.RemoveFromQuickbar
-msgctxt "Screens.RemoveFromQuickbar"
-msgid "Remove from quickbar"
-msgstr "Retirer de la barre rapide"
 
 #. Screens.AddCustomCategory
 msgctxt "Screens.AddCustomCategory"

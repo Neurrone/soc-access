@@ -2389,11 +2389,6 @@ msgctxt "Screens.AmountToUpgrade"
 msgid "Amount to upgrade, {0}"
 msgstr ""
 
-#. Screens.ArcanaSpells
-msgctxt "Screens.ArcanaSpells"
-msgid "Arcana spells"
-msgstr ""
-
 #. Screens.Army
 msgctxt "Screens.Army"
 msgid "army"
@@ -2504,11 +2499,6 @@ msgctxt "Screens.Categories"
 msgid "Categories"
 msgstr ""
 
-#. Screens.ChaosSpells
-msgctxt "Screens.ChaosSpells"
-msgid "Chaos spells"
-msgstr ""
-
 #. Screens.Choices
 msgctxt "Screens.Choices"
 msgid "Choices"
@@ -2567,11 +2557,6 @@ msgstr ""
 #. Screens.ConfigureAnnouncementElement
 msgctxt "Screens.ConfigureAnnouncementElement"
 msgid "Configure {0}"
-msgstr ""
-
-#. Screens.CreationSpells
-msgctxt "Screens.CreationSpells"
-msgid "Creation spells"
 msgstr ""
 
 #. Screens.CustomCategories
@@ -2667,11 +2652,6 @@ msgstr ""
 #. Screens.DescriptionWithMissingBuilding
 msgctxt "Screens.DescriptionWithMissingBuilding"
 msgid "{0}. missing building"
-msgstr ""
-
-#. Screens.DestructionSpells
-msgctxt "Screens.DestructionSpells"
-msgid "Destruction spells"
 msgstr ""
 
 #. Screens.DisabledWithReason
@@ -2904,11 +2884,6 @@ msgctxt "Screens.Ok"
 msgid "OK"
 msgstr ""
 
-#. Screens.OrderSpells
-msgctxt "Screens.OrderSpells"
-msgid "Order spells"
-msgstr ""
-
 #. Screens.Options
 msgctxt "Screens.Options"
 msgid "Options"
@@ -2989,9 +2964,9 @@ msgctxt "Screens.RecruitingFrom"
 msgid "Recruiting from {0}"
 msgstr ""
 
-#. Screens.RemoveFromQuickbar
-msgctxt "Screens.RemoveFromQuickbar"
-msgid "Remove from quickbar"
+#. Screens.Remove
+msgctxt "Screens.Remove"
+msgid "Remove"
 msgstr ""
 
 #. Screens.RemoveKeyword
@@ -3069,14 +3044,19 @@ msgctxt "Screens.Skill"
 msgid "Skill {0}"
 msgstr ""
 
-#. Screens.SlotValue
-msgctxt "Screens.SlotValue"
-msgid "Slot {0}: {1}"
-msgstr ""
-
 #. Screens.SpellTier
 msgctxt "Screens.SpellTier"
 msgid "{0} tier {1}"
+msgstr ""
+
+#. Screens.SpellbookAddToQuickbarHint
+msgctxt "Screens.SpellbookAddToQuickbarHint"
+msgid "{0} adds to quickbar"
+msgstr ""
+
+#. Screens.SpellbookDropToRemove
+msgctxt "Screens.SpellbookDropToRemove"
+msgid "Drop a spell here to remove it from the quickbar"
 msgstr ""
 
 #. Screens.TextEntryUnavailable

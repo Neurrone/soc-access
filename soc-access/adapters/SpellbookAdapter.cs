@@ -42,18 +42,26 @@ namespace SongsOfConquestAccess.Adapters
         private static readonly FieldInfo ChaosTierAreaField = AccessTools.Field(typeof(SpellBook), "_chaosTierArea");
         private static readonly FieldInfo ArcanaTierAreaField = AccessTools.Field(typeof(SpellBook), "_arcanaTierArea");
         private static readonly FieldInfo DestructionTierAreaField = AccessTools.Field(typeof(SpellBook), "_destructionTierArea");
-        private static readonly FieldInfo OrderTierValueField = AccessTools.Field(typeof(SpellBook), "_orderTierValue");
-        private static readonly FieldInfo CreationTierValueField = AccessTools.Field(typeof(SpellBook), "_creationTierValue");
-        private static readonly FieldInfo ChaosTierValueField = AccessTools.Field(typeof(SpellBook), "_chaosTierValue");
-        private static readonly FieldInfo ArcanaTierValueField = AccessTools.Field(typeof(SpellBook), "_arcanaTierValue");
-        private static readonly FieldInfo DestructionTierValueField = AccessTools.Field(typeof(SpellBook), "_destructionTierValue");
-        private static readonly MethodInfo HandleEntryRightClickedMethod = AccessTools.Method(typeof(SpellBook), "HandleEntryRightClicked");
-        private static readonly MethodInfo HandleCloseClickedMethod = AccessTools.Method(typeof(SpellBook), "HandleCloseClicked");
+        private static readonly FieldInfo OrderTierTextField = AccessTools.Field(typeof(SpellBook), "_orderTier");
+        private static readonly FieldInfo CreationTierTextField = AccessTools.Field(typeof(SpellBook), "_creationTier");
+        private static readonly FieldInfo ChaosTierTextField = AccessTools.Field(typeof(SpellBook), "_chaosTier");
+        private static readonly FieldInfo ArcanaTierTextField = AccessTools.Field(typeof(SpellBook), "_arcanaTier");
+        private static readonly FieldInfo DestructionTierTextField = AccessTools.Field(typeof(SpellBook), "_destructionTier");
+        private static readonly FieldInfo EssenceControllerField = AccessTools.Field(typeof(SpellBook), "_spellbookEssenceController");
+        private static readonly FieldInfo EssenceOrderTextField = AccessTools.Field(typeof(SpellBookEssenceController), "_orderText");
+        private static readonly FieldInfo EssenceCreationTextField = AccessTools.Field(typeof(SpellBookEssenceController), "_creationText");
+        private static readonly FieldInfo EssenceChaosTextField = AccessTools.Field(typeof(SpellBookEssenceController), "_chaosText");
+        private static readonly FieldInfo EssenceArcanaTextField = AccessTools.Field(typeof(SpellBookEssenceController), "_arcanaText");
+        private static readonly FieldInfo EssenceDestructionTextField = AccessTools.Field(typeof(SpellBookEssenceController), "_destructionText");
+        private static readonly FieldInfo EssenceOrderImageField = AccessTools.Field(typeof(SpellBookEssenceController), "_orderImageNonActive");
+        private static readonly FieldInfo EssenceCreationImageField = AccessTools.Field(typeof(SpellBookEssenceController), "_creationImageNonActive");
+        private static readonly FieldInfo EssenceChaosImageField = AccessTools.Field(typeof(SpellBookEssenceController), "_chaosImageNonActive");
+        private static readonly FieldInfo EssenceArcanaImageField = AccessTools.Field(typeof(SpellBookEssenceController), "_arcanaImageNonActive");
+        private static readonly FieldInfo EssenceDestructionImageField = AccessTools.Field(typeof(SpellBookEssenceController), "_destructionImageNonActive");
         private static readonly MethodInfo RefreshShownSpellMethod = AccessTools.Method(typeof(SpellBook), "RefreshShownSpell");
         private static readonly FieldInfo QuickbarEntriesField = AccessTools.Field(typeof(SpellbookQuickbar), "_entries");
         private static readonly FieldInfo QuickbarMovableSpellField = AccessTools.Field(typeof(SpellbookQuickbar), "_movableSpell");
         private static readonly FieldInfo QuickbarAutoPopulateToggleField = AccessTools.Field(typeof(SpellbookQuickbar), "_autoPopulateToggle");
-        private static readonly MethodInfo QuickbarSetEmptyMethod = AccessTools.Method(typeof(SpellbookQuickbar), "SetEmpty", new[] { typeof(int) });
         private static readonly FieldInfo QuickbarMainButtonField = AccessTools.Field(typeof(SpellbookQuickbarEntry), "_mainButton");
         private static readonly FieldInfo QuickbarDeleteButtonField = AccessTools.Field(typeof(SpellbookQuickbarEntry), "_deleteButton");
         private static readonly FieldInfo MovableSpellHoverQuickbarEntryField = AccessTools.Field(typeof(SpellbookMovableSpell), "_hoverQuickbarEntry");
@@ -75,21 +83,27 @@ namespace SongsOfConquestAccess.Adapters
                 && ((Component)_spellbook).gameObject.activeInHierarchy;
         }
 
-        public bool Close()
+        /// <summary>The drawn close cross.</summary>
+        public UIButton CloseButton
         {
-            if (_spellbook == null)
-            {
-                return false;
-            }
+            get { return CloseButtonField != null ? CloseButtonField.GetValue(_spellbook) as UIButton : null; }
+        }
 
-            if (HandleCloseClickedMethod != null)
-            {
-                HandleCloseClickedMethod.Invoke(_spellbook, null);
-                return true;
-            }
+        public bool IsCloseVisible()
+        {
+            UIButton button = CloseButton;
+            return button != null && ((Component)button).gameObject.activeInHierarchy;
+        }
 
-            _spellbook.Close();
-            return true;
+        public bool ActivateClose()
+        {
+            return NativeSelectionUtility.Click(CloseButton);
+        }
+
+        /// <summary>The tutorial button, drawn only until the tutorial has been seen.</summary>
+        public UIButton TutorialButton
+        {
+            get { return GetTutorialButton(); }
         }
 
         public bool IsTutorialButtonVisible()
@@ -112,16 +126,65 @@ namespace SongsOfConquestAccess.Adapters
             return NativeSelectionUtility.Click(GetTutorialButton());
         }
 
-        public IReadOnlyList<SchoolSummaryItem> GetSchoolSummary()
+        /// <summary>The five single-essence columns the window draws, in the order it draws them.
+        /// </summary>
+        public IReadOnlyList<SchoolItem> GetSchools()
         {
             return new[]
             {
-                BuildSchool("order", EssenceType.Order, OrderTierValueField, OrderTierAreaField),
-                BuildSchool("chaos", EssenceType.Chaos, ChaosTierValueField, ChaosTierAreaField),
-                BuildSchool("destruction", EssenceType.Destruction, DestructionTierValueField, DestructionTierAreaField),
-                BuildSchool("creation", EssenceType.Creation, CreationTierValueField, CreationTierAreaField),
-                BuildSchool("arcana", EssenceType.Arcana, ArcanaTierValueField, ArcanaTierAreaField)
+                BuildSchool(SpellbookSpellGroup.Order, EssenceType.Order, OrderTierTextField, OrderTierAreaField, EssenceOrderTextField, EssenceOrderImageField),
+                BuildSchool(SpellbookSpellGroup.Chaos, EssenceType.Chaos, ChaosTierTextField, ChaosTierAreaField, EssenceChaosTextField, EssenceChaosImageField),
+                BuildSchool(SpellbookSpellGroup.Destruction, EssenceType.Destruction, DestructionTierTextField, DestructionTierAreaField, EssenceDestructionTextField, EssenceDestructionImageField),
+                BuildSchool(SpellbookSpellGroup.Creation, EssenceType.Creation, CreationTierTextField, CreationTierAreaField, EssenceCreationTextField, EssenceCreationImageField),
+                BuildSchool(SpellbookSpellGroup.Arcana, EssenceType.Arcana, ArcanaTierTextField, ArcanaTierAreaField, EssenceArcanaTextField, EssenceArcanaImageField)
             };
+        }
+
+        /// <summary>The drawn header over the quick bar.</summary>
+        public string GetQuickbarHeaderText()
+        {
+            SpellbookQuickbar quickbar = GetQuickbar();
+            if (quickbar == null)
+            {
+                return string.Empty;
+            }
+
+            List<SpellbookQuickbarEntry> entries = QuickbarEntriesField != null
+                ? QuickbarEntriesField.GetValue(quickbar) as List<SpellbookQuickbarEntry>
+                : null;
+            UITextMesh[] texts = quickbar.GetComponentsInChildren<UITextMesh>(true);
+            for (int i = 0; i < texts.Length; i++)
+            {
+                UITextMesh text = texts[i];
+                if (text == null || IsUnderEntry(((Component)text).transform, entries))
+                {
+                    continue;
+                }
+
+                string value = UITextMeshTextUtility.GetEffectiveText(text);
+                if (!string.IsNullOrWhiteSpace(value))
+                {
+                    return value;
+                }
+            }
+
+            return string.Empty;
+        }
+
+        // The cost numbers a slot draws are text meshes of the quick bar too; only the header sits
+        // outside every entry.
+        private static bool IsUnderEntry(Transform transform, List<SpellbookQuickbarEntry> entries)
+        {
+            for (int i = 0; entries != null && i < entries.Count; i++)
+            {
+                SpellbookQuickbarEntry entry = entries[i];
+                if (entry != null && transform != null && transform.IsChildOf(((Component)entry).transform))
+                {
+                    return true;
+                }
+            }
+
+            return false;
         }
 
         public IReadOnlyList<SpellItem> GetSpells(SpellbookSpellGroup group)
@@ -161,6 +224,12 @@ namespace SongsOfConquestAccess.Adapters
             }
 
             return items;
+        }
+
+        /// <summary>The game's own auto-fill toggle.</summary>
+        public UIToggle AutoPopulateToggle
+        {
+            get { return GetAutoPopulateToggle(); }
         }
 
         public bool IsAutoPopulateVisible()
@@ -234,17 +303,24 @@ namespace SongsOfConquestAccess.Adapters
             return NativeSelectionUtility.PointerClick(entry);
         }
 
-        public bool AddSpellToQuickbar(SpellbookSpellEntry entry)
+        /// <summary>The entry's own RIGHT click, which the game answers by adding the spell to the
+        /// first free quick bar slot under its own guards
+        /// (<c>SpellBook.AddEntryToFirstAvailableQuickbarSlot</c>).</summary>
+        public bool RightClickSpell(SpellbookSpellEntry entry)
         {
             FocusSpell(entry);
-            if (HandleEntryRightClickedMethod != null)
-            {
-                HandleEntryRightClickedMethod.Invoke(_spellbook, new object[] { entry });
-                return true;
-            }
-
             UIButton button = EntryButtonField != null ? EntryButtonField.GetValue(entry) as UIButton : null;
-            return button != null && button.OnRightClicked != null && Invoke(button.OnRightClicked);
+            return NativeSelectionUtility.RightClick(button);
+        }
+
+        /// <summary>Whether the game's own right-click handler would do anything with this spell: the
+        /// two conditions <c>AddEntryToFirstAvailableQuickbarSlot</c> tests.</summary>
+        public bool CanAddSpellToQuickbar(SpellbookSpellEntry entry)
+        {
+            return entry != null
+                && entry.SpellDefinition != null
+                && !IsAutoPopulateChecked()
+                && !IsSpellOnQuickbar(entry.SpellDefinition);
         }
 
         public void FocusQuickbar(SpellbookQuickbarEntry entry)
@@ -267,6 +343,16 @@ namespace SongsOfConquestAccess.Adapters
             entry.OnPointerExit(new PointerEventData(EventSystem.current));
         }
 
+        /// <summary>
+        /// The slot's own main button, clicked the way the pointer clicks it, so the game's own
+        /// dispatch decides what a click on a quick bar spell means.
+        ///
+        /// Guarded because on the ADVENTURE map the game's own listener throws:
+        /// <c>SpellbookQuickbar.HandleClickedSpell</c> reads <c>_battleFacade.Teams</c>, and outside a
+        /// battle there is no battle facade (seen 2026-09-07 through <c>/log</c>). Nothing is put in
+        /// its place - the click simply does what the mouse's does, which is nothing - but the
+        /// exception must not travel up through the mod's own update.
+        /// </summary>
         public bool ActivateQuickbar(SpellbookQuickbarEntry entry)
         {
             FocusQuickbar(entry);
@@ -276,35 +362,87 @@ namespace SongsOfConquestAccess.Adapters
                 return false;
             }
 
+            try
+            {
+                return NativeSelectionUtility.Click(button);
+            }
+            catch (Exception exception)
+            {
+                SocAccessMod.Instance?.LogWarning("Spellbook quickbar click threw inside the game's own handler: " + exception);
+                return false;
+            }
+        }
+
+
+        /// <summary>The delete button the game reveals when the pointer rests on a filled slot, pressed
+        /// the way the pointer presses it. Focusing the slot first is what makes the game draw the
+        /// button at all (<c>SpellbookQuickbarEntry.ShowDeleteButton</c>).</summary>
+        public bool ActivateQuickbarDelete(SpellbookQuickbarEntry entry)
+        {
+            FocusQuickbar(entry);
+            UIButton button = entry != null && QuickbarDeleteButtonField != null
+                ? QuickbarDeleteButtonField.GetValue(entry) as UIButton
+                : null;
             return NativeSelectionUtility.Click(button);
         }
 
-        public bool ClearQuickbarSlot(int index)
+        /// <summary>
+        /// The mouse's whole drag of a spell already on the bar, replayed in one call: the source
+        /// slot's own <c>OnBeginDrag</c> (which hands the spell to the movable and empties the slot
+        /// up front, as the pointer's press does), then the movable's hover and its
+        /// <c>EndDrag</c>. A null <paramref name="target"/> is the release over nothing, which the
+        /// game answers with its cancel sound and puts the spell nowhere.
+        ///
+        /// One call, because the movable's own <c>LateUpdate</c> re-reads the hovered slot from the
+        /// real pointer and ends the drag the moment the mouse button is up.
+        /// </summary>
+        public bool DragQuickbarSpell(SpellbookQuickbarEntry source, SpellbookQuickbarEntry target)
         {
-            SpellbookQuickbar quickbar = GetQuickbar();
-            if (quickbar == null)
+            if (source == null || source.Spell == null || IsAutoPopulateChecked())
             {
                 return false;
             }
 
-            if (QuickbarSetEmptyMethod != null)
+            SpellbookMovableSpell movableSpell = GetMovableSpell();
+            if (movableSpell == null)
             {
-                QuickbarSetEmptyMethod.Invoke(quickbar, new object[] { index });
-                return true;
+                return false;
             }
 
-            return false;
+            source.OnBeginDrag(LeftDrag());
+            return EndDrag(movableSpell, target);
         }
 
-        public bool DropQuickbarItem(QuickbarItem source, QuickbarItem target)
+        /// <summary>The same replay for a spell dragged out of a column: the entry's own
+        /// <c>OnBeginDrag</c> (<c>SpellBook.HandleBeginDragSpell</c> to
+        /// <c>SpellbookQuickbar.HandleBeginDragSpell</c> to the movable), then hover and
+        /// <c>EndDrag</c>, which overwrites whatever the slot held.</summary>
+        public bool DragSpellToQuickbar(SpellbookSpellEntry source, SpellbookQuickbarEntry target)
         {
-            SpellbookQuickbarEntry sourceEntry = source != null ? source.Entry : null;
-            SpellbookQuickbarEntry targetEntry = target != null ? target.Entry : null;
-            if (sourceEntry == null || targetEntry == null || sourceEntry.Spell == null || IsAutoPopulateChecked())
+            if (source == null || source.SpellDefinition == null || target == null || IsAutoPopulateChecked())
             {
                 return false;
             }
 
+            SpellbookMovableSpell movableSpell = GetMovableSpell();
+            if (movableSpell == null)
+            {
+                return false;
+            }
+
+            source.OnBeginDrag(LeftDrag());
+            return EndDrag(movableSpell, target);
+        }
+
+        private bool EndDrag(SpellbookMovableSpell movableSpell, SpellbookQuickbarEntry target)
+        {
+            MovableSpellHoverQuickbarEntryField.SetValue(movableSpell, target);
+            MovableSpellEndDragMethod.Invoke(movableSpell, null);
+            return true;
+        }
+
+        private SpellbookMovableSpell GetMovableSpell()
+        {
             SpellbookQuickbar quickbar = GetQuickbar();
             SpellbookMovableSpell movableSpell = quickbar != null && QuickbarMovableSpellField != null
                 ? QuickbarMovableSpellField.GetValue(quickbar) as SpellbookMovableSpell
@@ -312,13 +450,15 @@ namespace SongsOfConquestAccess.Adapters
             if (movableSpell == null || MovableSpellHoverQuickbarEntryField == null || MovableSpellEndDragMethod == null)
             {
                 SocAccessMod.Instance?.LogWarning("Spellbook quickbar drag failed because native movable spell members were not found");
-                return false;
+                return null;
             }
 
-            movableSpell.BeginDrag(sourceEntry);
-            MovableSpellHoverQuickbarEntryField.SetValue(movableSpell, targetEntry);
-            MovableSpellEndDragMethod.Invoke(movableSpell, null);
-            return true;
+            return movableSpell;
+        }
+
+        private static PointerEventData LeftDrag()
+        {
+            return new PointerEventData(EventSystem.current) { button = PointerEventData.InputButton.Left };
         }
 
         public string GetSpellLabel(ISpellDefinition spell)
@@ -353,16 +493,7 @@ namespace SongsOfConquestAccess.Adapters
             }
 
             SpellbookSpellEntry capturedEntry = entry;
-            IReadOnlyList<TooltipAction> actions = IsAutoPopulateChecked() || IsSpellOnQuickbar(capturedEntry.SpellDefinition)
-                ? null
-                : new[]
-                {
-                    new TooltipAction(GameText.Get(GetLocalization(), "Spells/Spellbook/AddToQuickbar", "Add to quickbar"), () => AddSpellToQuickbar(capturedEntry))
-                };
-            return new Tooltip(
-                () => BuildSpellTooltipLines(capturedEntry.SpellDefinition),
-                null,
-                actions);
+            return new Tooltip(() => BuildSpellTooltipLines(capturedEntry.SpellDefinition), null);
         }
 
         private bool IsSpellOnQuickbar(ISpellDefinition spell)
@@ -391,7 +522,7 @@ namespace SongsOfConquestAccess.Adapters
             return false;
         }
 
-        public Tooltip GetQuickbarTooltip(SpellbookQuickbarEntry entry, int index)
+        public Tooltip GetQuickbarTooltip(SpellbookQuickbarEntry entry)
         {
             if (entry == null || entry.Spell == null)
             {
@@ -399,21 +530,7 @@ namespace SongsOfConquestAccess.Adapters
             }
 
             SpellbookQuickbarEntry capturedEntry = entry;
-            int capturedIndex = index;
-            return new Tooltip(
-                () => BuildSpellTooltipLines(capturedEntry.Spell),
-                null,
-                new[]
-                {
-                    new TooltipAction(ModText.Get(ModStrings.Screens.RemoveFromQuickbar), () => ClearQuickbarSlot(capturedIndex))
-                });
-        }
-
-        public Tooltip GetTierTooltip(SchoolSummaryItem item)
-        {
-            return item != null && item.TierArea != null
-                ? Tooltip.ForComponent(item.TierArea, GetLocalization())
-                : null;
+            return new Tooltip(() => BuildSpellTooltipLines(capturedEntry.Spell), null);
         }
 
         public void HideNativeTooltip()
@@ -520,27 +637,51 @@ namespace SongsOfConquestAccess.Adapters
                 : localization.GetText("Spells/Tooltip/Battle/ClickToBeginCast");
         }
 
-        private SchoolSummaryItem BuildSchool(string id, EssenceType essence, FieldInfo tierField, FieldInfo tierAreaField)
+        private SchoolItem BuildSchool(
+            SpellbookSpellGroup group,
+            EssenceType essence,
+            FieldInfo tierTextField,
+            FieldInfo tierAreaField,
+            FieldInfo essenceTextField,
+            FieldInfo essenceImageField)
         {
-            int tier = tierField != null ? (int)tierField.GetValue(_spellbook) : 0;
-            int essenceAmount = GetEssenceAmount(essence);
-            string essenceLabel = FormatSchoolEssenceAmount(essenceAmount, IsInAdventure());
-            return new SchoolSummaryItem(
-                id,
-                GetEssenceName(essence) + ": " + GetTierLabel(tier) + ", " + essenceLabel,
-                tierAreaField != null ? tierAreaField.GetValue(_spellbook) as Component : null);
-        }
-
-        private string FormatSchoolEssenceAmount(int amount, bool perTurn)
-        {
-            string amountText = ModText.Get(GetLocalization(), ModStrings.Combat.EssenceAmounts, (perTurn ? "+" : string.Empty) + amount);
-            if (!perTurn)
+            SpellBookEssenceController controller = GetEssenceController();
+            UITextMesh tierText = tierTextField != null ? tierTextField.GetValue(_spellbook) as UITextMesh : null;
+            Component tierArea = tierAreaField != null ? tierAreaField.GetValue(_spellbook) as Component : null;
+            UITextMesh essenceText = controller != null && essenceTextField != null
+                ? essenceTextField.GetValue(controller) as UITextMesh
+                : null;
+            Component essenceImage = controller != null && essenceImageField != null
+                ? essenceImageField.GetValue(controller) as Component
+                : null;
+            if (essenceImage != null)
             {
-                return amountText;
+                // The details the essence icon carries are declared on its UIImage, not on the raw
+                // Image the controller keeps (SpellBookEssenceController.UpdateTooltip).
+                UIImage details = essenceImage.GetComponent<UIImage>();
+                if (details != null)
+                {
+                    essenceImage = details;
+                }
             }
 
-            string perTurnText = GameText.Get(GetLocalization(), "Common/PerTurn", "per turn").Trim();
-            return string.IsNullOrWhiteSpace(perTurnText) ? amountText : amountText + " " + perTurnText;
+            return new SchoolItem(
+                group,
+                GameText.Get(GetLocalization(), "Spells/Spellbook/SelectedEssenceTitle", string.Empty, GetEssenceName(essence)),
+                GetEssenceName(essence),
+                UITextMeshTextUtility.GetEffectiveText(essenceText),
+                essenceImage,
+                Tooltip.ForComponent(essenceImage, GetLocalization()),
+                UITextMeshTextUtility.GetEffectiveText(tierText),
+                tierArea,
+                Tooltip.ForComponent(tierArea, GetLocalization()));
+        }
+
+        private SpellBookEssenceController GetEssenceController()
+        {
+            return EssenceControllerField != null
+                ? EssenceControllerField.GetValue(_spellbook) as SpellBookEssenceController
+                : null;
         }
 
         private string GetTierLabel(int tier)
@@ -810,31 +951,52 @@ namespace SongsOfConquestAccess.Adapters
             return TutorialButtonField != null ? TutorialButtonField.GetValue(_spellbook) as UIButton : null;
         }
 
-        private static bool Invoke(Action action)
+        /// <summary>One drawn essence column: the game's own name for its spells, the essence income
+        /// it heads and the tier it grants, each with the details the game hangs on it.</summary>
+        public sealed class SchoolItem
         {
-            if (action == null)
+            public SchoolItem(
+                SpellbookSpellGroup group,
+                string title,
+                string essenceName,
+                string essenceAmountText,
+                Component essenceComponent,
+                Tooltip essenceTooltip,
+                string tierTitle,
+                Component tierComponent,
+                Tooltip tierTooltip)
             {
-                return false;
+                Group = group;
+                Title = title;
+                EssenceName = essenceName;
+                EssenceAmountText = essenceAmountText;
+                EssenceComponent = essenceComponent;
+                EssenceTooltip = essenceTooltip;
+                TierTitle = tierTitle;
+                TierComponent = tierComponent;
+                TierTooltip = tierTooltip;
             }
 
-            action();
-            return true;
-        }
+            public SpellbookSpellGroup Group { get; private set; }
 
-        public sealed class SchoolSummaryItem
-        {
-            public SchoolSummaryItem(string id, string label, Component tierArea)
-            {
-                Id = id;
-                Label = label;
-                TierArea = tierArea;
-            }
+            /// <summary>What the game calls this column's spells ("Order spells").</summary>
+            public string Title { get; private set; }
 
-            public string Id { get; private set; }
+            public string EssenceName { get; private set; }
 
-            public string Label { get; private set; }
+            /// <summary>The income the column draws beside its essence icon ("(+11)").</summary>
+            public string EssenceAmountText { get; private set; }
 
-            public Component TierArea { get; private set; }
+            public Component EssenceComponent { get; private set; }
+
+            public Tooltip EssenceTooltip { get; private set; }
+
+            /// <summary>The tier heading the column draws ("Tier 3").</summary>
+            public string TierTitle { get; private set; }
+
+            public Component TierComponent { get; private set; }
+
+            public Tooltip TierTooltip { get; private set; }
         }
 
         public sealed class SpellItem
@@ -851,9 +1013,21 @@ namespace SongsOfConquestAccess.Adapters
 
             public string Id { get; private set; }
 
+            public SpellbookSpellEntry Entry { get { return _entry; } }
+
             public string Label { get { return _adapter.GetSpellLabel(_entry.SpellDefinition); } }
 
+            /// <summary>Whether the game reads the spell as castable; it greys the ones it does not.
+            /// </summary>
+            public bool CanCast { get { return _entry != null && _entry.CanCast; } }
+
+            /// <summary>Whether the game's own right click would add this spell to the quick bar.
+            /// </summary>
+            public bool CanAddToQuickbar { get { return _adapter.CanAddSpellToQuickbar(_entry); } }
+
             public bool Activate() { return _adapter.ActivateSpell(_entry); }
+
+            public bool RightClick() { return _adapter.RightClickSpell(_entry); }
 
             public void Focus() { _adapter.FocusSpell(_entry); }
 
@@ -880,6 +1054,9 @@ namespace SongsOfConquestAccess.Adapters
 
             public bool CanDrag { get { return _entry != null && _entry.Spell != null && !_adapter.IsAutoPopulateChecked(); } }
 
+            /// <summary>Whether the game would take a spell dropped here at all.</summary>
+            public bool AcceptsDrop { get { return _entry != null && !_adapter.IsAutoPopulateChecked(); } }
+
             public bool HasSpell
             {
                 get { return _entry != null && _entry.Spell != null; }
@@ -892,13 +1069,13 @@ namespace SongsOfConquestAccess.Adapters
 
             public bool Activate() { return _entry != null && _adapter.ActivateQuickbar(_entry); }
 
-            public bool DropTo(QuickbarItem target) { return _adapter.DropQuickbarItem(this, target); }
+            public bool Delete() { return _adapter.ActivateQuickbarDelete(_entry); }
 
             public void Focus() { _adapter.FocusQuickbar(_entry); }
 
             public void Unfocus() { _adapter.UnfocusQuickbar(_entry); }
 
-            public Tooltip Tooltip { get { return _adapter.GetQuickbarTooltip(_entry, Index); } }
+            public Tooltip Tooltip { get { return _adapter.GetQuickbarTooltip(_entry); } }
         }
     }
 

@@ -5,16 +5,81 @@ using SongsOfConquestAccess.Adapters;
 using SongsOfConquestAccess.Input;
 using SongsOfConquestAccess.Localization;
 using SongsOfConquestAccess.UI;
+using SongsOfConquestAccess.UI.Graph;
 using UnityEngine;
+using DropResult = SongsOfConquestAccess.UI.Graph.DropResult;
 
 namespace SongsOfConquestAccess.Screens
 {
-    public sealed class SpellbookScreen : Screen
+    /// <summary>
+    /// The adventure spellbook, made navigable as a graph. Four places to be: the tutorial button
+    /// while the game still draws it, the quick bar, the spells, and the close cross.
+    ///
+    /// EVERY GESTURE IS THE GAME'S OWN. Enter on a spell is its <c>UIButton</c>'s left click, which
+    /// casts in battle and is inert on the map; Backslash is the same button's RIGHT click, which the
+    /// game answers by putting the spell in the first free slot under its own guards
+    /// (<c>SpellBook.AddEntryToFirstAvailableQuickbarSlot</c>: nothing while auto-fill is on or the
+    /// spell is already on the bar), and the spoken hint is gated on exactly those two conditions.
+    /// Enter on a filled slot is its <c>_mainButton</c>'s click, delivered as a pointer click so the
+    /// game's own dispatch decides what happens.
+    ///
+    /// A DROP IS THE MOUSE'S WHOLE DRAG, replayed in one call
+    /// (<c>SpellbookAdapter.DragQuickbarSpell</c> / <c>DragSpellToQuickbar</c>): the source's own
+    /// <c>OnBeginDrag</c> - which empties a source SLOT up front, as the pointer's press does - then
+    /// the movable's hovered entry and its <c>EndDrag</c>, which moves onto an empty slot, swaps onto
+    /// an occupied one and overwrites from a column. It has to be one call because the movable's
+    /// <c>LateUpdate</c> re-reads the hovered slot from the real pointer and ends the drag as soon as
+    /// the mouse button is up.
+    ///
+    /// THE AUTO-FILL BOX IS READ FIRST, before the slots, although the game draws it BENEATH them
+    /// (owner ruling): it decides whether any of the slots can be worked at all.
+    ///
+    /// THE REMOVAL TARGET after the slots is the mod's line for a gesture the mouse has and the
+    /// keyboard otherwise could not reach: the game removes a spell from the bar when a drag of it is
+    /// released over nothing (<c>SpellbookMovableSpell.EndDrag</c> with no hovered entry, which plays
+    /// its cancel sound and empties the origin). It is a plain line while nothing is carried and a
+    /// drop target only while a spell picked up FROM A SLOT is held. The delete button the game
+    /// reveals on hover is the other way out, declared as the one child of a filled slot's group.
+    ///
+    /// POSITIONS COUNT THE LIST, not the extras: the auto-fill box and the removal target sit in rows
+    /// that count nothing, so a slot says "3 of 8"; the essence and tier headings of a column do the
+    /// same, so its spells say "1 of 4".
+    ///
+    /// Escape is the game's (<c>ConsumesBack</c> false): <c>SpellBook.Show</c> registers
+    /// <c>InputActions.UI.ExitMenu</c> and <c>UI.Cancel</c> at <c>InputLevel.Popup</c> with no gamepad
+    /// gate (measured 2026-09-07 in the decompiled source), and <c>Common.ToggleSpellBook</c> - V -
+    /// closes the window too. The navigator claims the key only while something is being carried.
+    /// </summary>
+    public sealed class SpellbookScreen : GraphScreen
     {
+        private const string TutorialStop = "spellbook-tutorial";
+        private const string QuickbarStop = "spellbook-quickbar";
+        private const string SpellsStop = "spellbook-spells";
+        private const string CloseStop = "spellbook-close";
+
+        /// <summary>What is carried between the quick bar's slots and the spell columns.</summary>
+        public const string SpellCargo = "spell";
+
+        /// <summary>The noise the game itself makes when a drag of a spell begins
+        /// (<c>SpellbookMovableSpell.BeginDrag</c>).</summary>
+        public const string PickUpSound = "Common_SpellbookBeginDrag";
+
+        /// <summary>The noise the game makes when a drag ends on nothing
+        /// (<c>SpellbookMovableSpell.EndDrag</c>), which is what a given-up carry is.</summary>
+        public const string CancelSound = "Common_SpellbookEndDragCancel";
+
         private readonly SpellbookAdapter _adapter;
 
+        // A subject of its own per synthesized node, kept across rebuilds so the reconciler seats the
+        // cursor on the same one: the removal target is a line the mod invented.
+        private readonly Dictionary<string, object> _markers = new Dictionary<string, object>();
+
+        // Whether the carry that is ending ran the game's own drag, which plays the game's own noise
+        // for how it ended. Only a carry that did NOT get that far - one the player gave up, or one
+        // the game would not take - is the mod's to make a noise about.
+        private bool _nativeDragRan;
+
         public SpellbookScreen(SpellbookAdapter adapter)
-            : base(BuildRoot(adapter))
         {
             _adapter = adapter;
         }
@@ -40,189 +105,409 @@ namespace SongsOfConquestAccess.Screens
             return null;
         }
 
+        public override string Key
+        {
+            get { return "spellbook"; }
+        }
+
+        /// <summary>The window draws no title of its own, so it is named after the HUD button that
+        /// opens it.</summary>
+        public override string ScreenName
+        {
+            get { return GameText.Get("Common/HUD/SpellbookButton", string.Empty); }
+        }
+
         public override bool IsPresent()
         {
             return _adapter != null && _adapter.IsPresent();
         }
 
-        public override void OnUnfocus()
+        public override void Build(GraphBuilder builder)
         {
-            _adapter?.HideNativeTooltip();
-        }
-
-        public override void OnPop()
-        {
-            _adapter?.HideNativeTooltip();
-        }
-
-        public override bool OnActionJustPressed(InputAction action)
-        {
-            if (action != null && action.Key == AccessibilityActions.Cancel.Key)
+            if (!IsPresent())
             {
-                if (RootWidget != null && RootWidget.HandleAction(action))
+                return;
+            }
+
+            // The game's own drag noises, for the keyboard's carry. Registered on every build: the
+            // registration is a delegate over this load and must not outlive it.
+            CarrySounds.Register(SpellCargo, () => NativeSoundUtility.PostEvent(PickUpSound), EndedCarry);
+
+            if (_adapter.IsTutorialButtonVisible())
+            {
+                builder.BeginStop(TutorialStop);
+                BuildTutorial(builder);
+            }
+
+            builder.BeginStop(QuickbarStop);
+            BuildQuickbar(builder);
+
+            builder.BeginStop(SpellsStop);
+            BuildSpells(builder);
+
+            builder.BeginStop(CloseStop);
+            BuildClose(builder);
+        }
+
+        /// <summary>A carry has ended. The game made its own noise for every ending it performed
+        /// itself; the ones it never heard about - a give-up, a drop it would not take - are the
+        /// cancel, which is what the game calls a drag released over nothing.</summary>
+        private void EndedCarry()
+        {
+            if (_nativeDragRan)
+            {
+                _nativeDragRan = false;
+                return;
+            }
+
+            NativeSoundUtility.PostEvent(CancelSound);
+        }
+
+        // ---- the tutorial button ----
+
+        private void BuildTutorial(GraphBuilder builder)
+        {
+            UIButton button = _adapter.TutorialButton;
+            if (button == null)
+            {
+                return;
+            }
+
+            NodeVtable vtable = GraphNodes.Button(
+                () => _adapter.GetTutorialButtonLabel(),
+                () => _adapter.ActivateTutorial());
+            vtable.OnFocusVisual = () => NativeSelectionUtility.Select((Component)button);
+            builder.AddItem(new DrawnNode(
+                ControlId.For(button, "spellbook:tutorial"),
+                vtable,
+                button));
+        }
+
+        // ---- the quick bar ----
+
+        private void BuildQuickbar(GraphBuilder builder)
+        {
+            string header = OneLine(_adapter.GetQuickbarHeaderText());
+            bool named = !string.IsNullOrWhiteSpace(header);
+            if (named)
+            {
+                builder.PushContext(header);
+                builder.SetRegion("spellbook:quickbar");
+            }
+
+            BuildAutoPopulate(builder);
+
+            IReadOnlyList<SpellbookAdapter.QuickbarItem> items = Items("quickbar", _adapter.GetQuickbarItems);
+            for (int i = 0; i < items.Count; i++)
+            {
+                AddSlot(builder, items[i], i);
+            }
+
+            if (items.Count > 0)
+            {
+                BuildRemovalTarget(builder);
+            }
+
+            if (named)
+            {
+                builder.PopContext();
+            }
+
+            builder.SetRegion(null);
+        }
+
+        /// <summary>The auto-fill box, at the TOP of the bar although the game draws it under the
+        /// slots. Its row counts nothing, so the slots below it say where they sit in the bar rather
+        /// than in a list with a box at the top of it.</summary>
+        private void BuildAutoPopulate(GraphBuilder builder)
+        {
+            Component toggle = _adapter.AutoPopulateToggle;
+            if (toggle == null || !_adapter.IsAutoPopulateVisible())
+            {
+                return;
+            }
+
+            // The box's name IS its tooltip, so the tooltip is not also declared: it would read twice.
+            NodeVtable vtable = GraphNodes.Checkbox(
+                () => _adapter.GetAutoPopulateLabel(),
+                () => _adapter.IsAutoPopulateChecked(),
+                () => _adapter.ToggleAutoPopulate());
+            vtable.OnFocusVisual = () => NativeSelectionUtility.Select(toggle);
+            builder.StartRow("spellbook:auto-populate", positions: false);
+            builder.AddItem(new DrawnNode(
+                ControlId.For(toggle, "spellbook:auto-populate"),
+                vtable,
+                toggle));
+            builder.EndRow();
+        }
+
+        /// <summary>
+        /// One slot: the spell in it or the mod's word for an empty one, where it sits in the bar, and
+        /// every gesture the game gives a spell there.
+        ///
+        /// A FILLED slot is a group, because the game hides a command under it: the delete button it
+        /// draws when the pointer rests on the slot. Right opens the group and lands on it.
+        /// </summary>
+        private void AddSlot(GraphBuilder builder, SpellbookAdapter.QuickbarItem item, int index)
+        {
+            if (item == null || item.Entry == null)
+            {
+                return;
+            }
+
+            SpellbookAdapter.QuickbarItem it = item;
+            ControlId id = ControlId.For(it.Entry, "spellbook:slot/" + index);
+            Func<string> label = () => it.HasSpell ? it.SpellName : ModText.Get(ModStrings.Screens.Empty);
+            NodeVtable vtable = it.HasSpell
+                ? GraphNodes.Group(label, () => it.Activate(), null, it.Tooltip)
+                : GraphNodes.Button(label, () => it.Activate(), null, it.Tooltip);
+            // What the slot holds changes under a cursor standing right here: a drop lands on it, the
+            // game's own animation fills it a fifth of a second after the drop was reported.
+            vtable.Announcements[0].Live = true;
+            vtable.DropKind = SpellCargo;
+            vtable.DropAccepts = held => it.AcceptsDrop;
+            vtable.OnDrop = held => DropOnSlot(held, it);
+            vtable.OnPickUp = () => PickUp(it);
+            // Resting on the slot is what makes the game draw the spell's details and reveal the
+            // delete button; leaving takes both away again.
+            vtable.OnFocusVisual = () => it.Focus();
+            vtable.OnBlurVisual = () => it.Unfocus();
+
+            if (!it.HasSpell)
+            {
+                builder.AddItem(new DrawnNode(id, vtable, it.Entry));
+                return;
+            }
+
+            builder.BeginGroup(new DrawnNode(id, vtable, it.Entry));
+            AddRemove(builder, it, index);
+            builder.EndGroup();
+        }
+
+        /// <summary>The delete button the game reveals on hover, as the one thing inside a filled
+        /// slot. The game draws no text on it (its <c>RemoveButton</c> is an icon), so the mod names
+        /// it.</summary>
+        private void AddRemove(GraphBuilder builder, SpellbookAdapter.QuickbarItem item, int index)
+        {
+            SpellbookAdapter.QuickbarItem it = item;
+            NodeVtable vtable = GraphNodes.Button(
+                () => ModText.Get(ModStrings.Screens.Remove),
+                () => it.Delete());
+            vtable.OnFocusVisual = () => it.Focus();
+            vtable.OnBlurVisual = () => it.Unfocus();
+            builder.AddItem(new DrawnNode(
+                ControlId.Structural("spellbook:slot/" + index + "/remove"),
+                vtable,
+                it.Entry));
+        }
+
+        /// <summary>The game's drag-out-to-nothing removal, as a line the keyboard can reach. It says
+        /// the whole instruction, because while nothing is carried there is no other way to know what
+        /// it is for; its row counts nothing, so the slots above it still say where they sit in the
+        /// bar.</summary>
+        private void BuildRemovalTarget(GraphBuilder builder)
+        {
+            NodeVtable vtable = GraphNodes.Text(() => ModText.Get(ModStrings.Screens.SpellbookDropToRemove));
+            vtable.DropKind = SpellCargo;
+            vtable.DropAccepts = held => held != null
+                && held.Cargo is SpellbookQuickbarEntry
+                && !_adapter.IsAutoPopulateChecked();
+            vtable.OnDrop = DropToRemove;
+            builder.StartRow("spellbook:remove-target", positions: false);
+            builder.AddItem(new SyntheticNode(
+                ControlId.For(Marker("remove-target"), "spellbook:remove-target"),
+                vtable));
+            builder.EndRow();
+        }
+
+        private CarryItem PickUp(SpellbookAdapter.QuickbarItem item)
+        {
+            return item.CanDrag ? new CarryItem(item.Entry, item.SpellName, SpellCargo) : null;
+        }
+
+        /// <summary>A drop on a slot, through the game's own drag: a spell from another slot moves or
+        /// swaps, a spell from a column overwrites.</summary>
+        private DropResult DropOnSlot(CarryItem held, SpellbookAdapter.QuickbarItem target)
+        {
+            SpellbookQuickbarEntry fromSlot = held == null ? null : held.Cargo as SpellbookQuickbarEntry;
+            bool ran = fromSlot != null
+                ? _adapter.DragQuickbarSpell(fromSlot, target.Entry)
+                : _adapter.DragSpellToQuickbar(held == null ? null : held.Cargo as SpellbookSpellEntry, target.Entry);
+            if (!ran)
+            {
+                return DropResult.Refused();
+            }
+
+            _nativeDragRan = true;
+            return DropResult.Done();
+        }
+
+        /// <summary>A drop on the removal line: the same drag, released over nothing, which the game
+        /// answers with its cancel sound and an emptied slot.</summary>
+        private DropResult DropToRemove(CarryItem held)
+        {
+            SpellbookQuickbarEntry fromSlot = held == null ? null : held.Cargo as SpellbookQuickbarEntry;
+            if (fromSlot == null || !_adapter.DragQuickbarSpell(fromSlot, null))
+            {
+                return DropResult.Refused();
+            }
+
+            _nativeDragRan = true;
+            return DropResult.Done();
+        }
+
+        // ---- the spell columns ----
+
+        private void BuildSpells(GraphBuilder builder)
+        {
+            IReadOnlyList<SpellbookAdapter.SchoolItem> schools = Items("schools", _adapter.GetSchools);
+            for (int i = 0; i < schools.Count; i++)
+            {
+                SpellbookAdapter.SchoolItem school = schools[i];
+                if (school == null)
                 {
-                    return true;
+                    continue;
                 }
 
-                return _adapter != null && _adapter.Close();
+                BuildColumn(builder, school.Group, school.Title, school);
             }
 
-            return base.OnActionJustPressed(action);
+            BuildColumn(builder, SpellbookSpellGroup.Multi, ModText.Get(ModStrings.Screens.MultiEssenceSpells), null);
+            builder.SetRegion(null);
         }
 
-        private static ContainerWidget BuildRoot(SpellbookAdapter adapter)
+        /// <summary>One drawn column, named by the game's own name for its spells. A single-essence
+        /// column opens with the two things in it that own words of their own: the essence income and
+        /// the tier the column grants, both of which say everything they have to say in a tooltip and
+        /// so must be reachable.</summary>
+        private void BuildColumn(
+            GraphBuilder builder,
+            SpellbookSpellGroup group,
+            string title,
+            SpellbookAdapter.SchoolItem school)
         {
-            ContainerWidget root = new ContainerWidget("spellbook-screen", GameText.Get("Common/HUD/SpellbookButton", string.Empty));
-            if (adapter == null)
+            IReadOnlyList<SpellbookAdapter.SpellItem> spells = Items(
+                group.ToString(),
+                () => _adapter.GetSpells(group));
+            if (spells.Count == 0 && school == null)
             {
-                return root;
+                return;
             }
 
-            if (adapter.IsTutorialButtonVisible())
+            string key = group.ToString().ToLowerInvariant();
+            bool named = !string.IsNullOrWhiteSpace(title);
+            if (named)
             {
-                root.AddChild(new ButtonWidget(
-                    "spellbook-tutorial",
-                    adapter.GetTutorialButtonLabel(),
-                    adapter.ActivateTutorial,
-                    adapter.HideNativeTooltip,
-                    adapter.IsTutorialButtonVisible,
-                    adapter.IsTutorialButtonVisible));
+                builder.PushContext(title);
             }
 
-            root.AddChild(BuildQuickbarMenu(adapter));
-            root.AddChild(new CheckboxWidget(
-                "spellbook-auto-populate",
-                adapter.GetAutoPopulateLabel(),
-                adapter.ToggleAutoPopulate,
-                adapter.IsAutoPopulateChecked,
-                adapter.IsAutoPopulateVisible));
-            root.AddChild(BuildSchoolSummary(adapter));
-            root.AddChild(BuildSpellMenu(adapter, SpellbookSpellGroup.Order, ModText.Get(ModStrings.Screens.OrderSpells)));
-            root.AddChild(BuildSpellMenu(adapter, SpellbookSpellGroup.Chaos, ModText.Get(ModStrings.Screens.ChaosSpells)));
-            root.AddChild(BuildSpellMenu(adapter, SpellbookSpellGroup.Destruction, ModText.Get(ModStrings.Screens.DestructionSpells)));
-            root.AddChild(BuildSpellMenu(adapter, SpellbookSpellGroup.Creation, ModText.Get(ModStrings.Screens.CreationSpells)));
-            root.AddChild(BuildSpellMenu(adapter, SpellbookSpellGroup.Arcana, ModText.Get(ModStrings.Screens.ArcanaSpells)));
-            root.AddChild(BuildSpellMenu(adapter, SpellbookSpellGroup.Multi, ModText.Get(ModStrings.Screens.MultiEssenceSpells)));
+            builder.SetRegion("spellbook:column/" + key);
+            if (school != null)
+            {
+                AddColumnHeadings(builder, school, key);
+            }
 
-            root.AddChild(new ButtonWidget(
-                "spellbook-close",
-                ModText.Get(ModStrings.Screens.Close),
-                adapter.Close,
-                adapter.HideNativeTooltip,
-                () => true));
-            return root;
+            for (int i = 0; i < spells.Count; i++)
+            {
+                AddSpell(builder, spells[i]);
+            }
+
+            if (named)
+            {
+                builder.PopContext();
+            }
         }
 
-        private static MenuWidget BuildSchoolSummary(SpellbookAdapter adapter)
+        /// <summary>The essence income and the tier heading, in a row that counts nothing so the
+        /// spells under them say where they sit in the column.</summary>
+        private void AddColumnHeadings(GraphBuilder builder, SpellbookAdapter.SchoolItem school, string key)
         {
-            MenuWidget menu = new MenuWidget("spellbook-school-summary", string.Empty);
-            IReadOnlyList<SpellbookAdapter.SchoolSummaryItem> items = SafeGet("school summary", adapter.GetSchoolSummary);
-            for (int i = 0; i < items.Count; i++)
+            SpellbookAdapter.SchoolItem it = school;
+            if (it.EssenceComponent != null)
             {
-                SpellbookAdapter.SchoolSummaryItem item = items[i];
-                menu.AddItem(new MenuItemWidget(
-                    "spellbook-school-" + item.Id,
-                    () => item.Label,
-                    null,
-                    () => false,
-                    adapter.HideNativeTooltip,
-                    () => true,
-                    adapter.GetTierTooltip(item)));
+                NodeVtable essence = GraphNodes.Text(() => it.EssenceName, null, it.EssenceTooltip);
+                essence.Announcements.Add(GraphNodes.ValuePart(() => OneLine(it.EssenceAmountText)));
+                builder.StartRow("spellbook:essence/" + key, positions: false);
+                builder.AddItem(new DrawnNode(
+                    ControlId.For(it.EssenceComponent, "spellbook:essence/" + key),
+                    essence,
+                    it.EssenceComponent));
+                builder.EndRow();
             }
 
-            return menu;
+            if (it.TierComponent != null)
+            {
+                NodeVtable tier = GraphNodes.Text(() => OneLine(it.TierTitle), null, it.TierTooltip);
+                builder.StartRow("spellbook:tier/" + key, positions: false);
+                builder.AddItem(new DrawnNode(
+                    ControlId.For(it.TierComponent, "spellbook:tier/" + key),
+                    tier,
+                    it.TierComponent));
+                builder.EndRow();
+            }
         }
 
-        private static MenuWidget BuildSpellMenu(SpellbookAdapter adapter, SpellbookSpellGroup group, string label)
+        private void AddSpell(GraphBuilder builder, SpellbookAdapter.SpellItem item)
         {
-            MenuWidget menu = new MenuWidget("spellbook-" + group.ToString().ToLowerInvariant() + "-spells", label);
-            IReadOnlyList<SpellbookAdapter.SpellItem> items = SafeGet(label, () => adapter.GetSpells(group));
-            if (items.Count == 0)
+            if (item == null || item.Entry == null)
             {
-                menu.AddItem(new MenuItemWidget(
-                    menu.Id + "-none",
-                    () => ModText.Get(ModStrings.Screens.None),
-                    null,
-                    () => false,
-                    adapter.HideNativeTooltip,
-                    () => true));
-                return menu;
+                return;
             }
 
-            for (int i = 0; i < items.Count; i++)
-            {
-                SpellbookAdapter.SpellItem item = items[i];
-                menu.AddItem(new MenuItemWidget(
-                    "spellbook-spell-" + item.Id,
-                    () => item.Label,
-                    null,
-                    item.Activate,
-                    item.Focus,
-                    () => true,
-                    () => item.Tooltip,
-                    item.Unfocus));
-            }
-
-            return menu;
+            SpellbookAdapter.SpellItem it = item;
+            NodeVtable vtable = GraphNodes.Button(
+                () => it.Label,
+                () => it.Activate(),
+                () => it.CanCast,
+                it.Tooltip);
+            vtable.OnContextual = () => it.RightClick();
+            vtable.OnPickUp = () => PickUpSpell(it);
+            // Focusing the entry selects it natively and is what makes the game draw the spell's
+            // detail panel for it.
+            vtable.OnFocusVisual = () => it.Focus();
+            vtable.OnBlurVisual = () => it.Unfocus();
+            NodeHints.Add(
+                vtable,
+                ModStrings.Screens.SpellbookAddToQuickbarHint,
+                AccessibilityActions.UiRightClick.Key,
+                0,
+                () => it.CanAddToQuickbar);
+            builder.AddItem(new DrawnNode(
+                ControlId.For(it.Entry, "spellbook:spell/" + it.Id),
+                vtable,
+                it.Entry));
         }
 
-        private static MenuWidget BuildQuickbarMenu(SpellbookAdapter adapter)
+        private CarryItem PickUpSpell(SpellbookAdapter.SpellItem item)
         {
-            Dictionary<MenuItemWidget, SpellbookAdapter.QuickbarItem> itemByWidget = new Dictionary<MenuItemWidget, SpellbookAdapter.QuickbarItem>();
-            DraggableMenuWidget menu = null;
-            menu = new DraggableMenuWidget(
-                "spellbook-quickbar",
-                ModText.Get(ModStrings.Screens.Quickbar),
-                (source, target) =>
-                {
-                    SpellbookAdapter.QuickbarItem sourceItem;
-                    SpellbookAdapter.QuickbarItem targetItem;
-                    return itemByWidget.TryGetValue(source, out sourceItem)
-                        && itemByWidget.TryGetValue(target, out targetItem)
-                        && sourceItem.DropTo(targetItem);
-                });
-            IReadOnlyList<SpellbookAdapter.QuickbarItem> items = SafeGet("quickbar", adapter.GetQuickbarItems);
-            for (int i = 0; i < items.Count; i++)
-            {
-                SpellbookAdapter.QuickbarItem item = items[i];
-                DraggableMenuItemWidget widget = null;
-                widget = new DraggableMenuItemWidget(
-                    "spellbook-quickbar-" + (item.Index + 1),
-                    () => BuildQuickbarLabel(item),
-                    null,
-                    item.Activate,
-                    item.Focus,
-                    () => true,
-                    () => item.CanDrag,
-                    () => ReferenceEquals(menu.DragSource, widget),
-                    () => item.Tooltip,
-                    item.Unfocus);
-                itemByWidget.Add(widget, item);
-                menu.AddItem(widget);
-            }
-
-            if (items.Count == 0)
-            {
-                return menu;
-            }
-
-            return menu;
+            return _adapter.IsAutoPopulateChecked()
+                ? null
+                : new CarryItem(item.Entry, item.Label, SpellCargo);
         }
 
-        private static string BuildQuickbarLabel(SpellbookAdapter.QuickbarItem item)
+        // ---- the close cross ----
+
+        private void BuildClose(GraphBuilder builder)
         {
-            if (item == null)
+            UIButton close = _adapter.CloseButton;
+            if (close == null || !_adapter.IsCloseVisible())
             {
-                return string.Empty;
+                return;
             }
 
-            return ModText.Get(
-                ModStrings.Screens.SlotValue,
-                item.Index + 1,
-                item.HasSpell ? item.SpellName : ModText.Get(ModStrings.Screens.Empty));
+            // An icon with no text of its own, so the mod names it.
+            NodeVtable vtable = GraphNodes.Button(
+                () => ModText.Get(ModStrings.Screens.Close),
+                () => _adapter.ActivateClose());
+            vtable.OnFocusVisual = () => NativeSelectionUtility.Select((Component)close);
+            builder.AddItem(new DrawnNode(ControlId.For(close, "spellbook:close"), vtable, close));
         }
 
-        private static IReadOnlyList<T> SafeGet<T>(string section, Func<IReadOnlyList<T>> getter)
+        // ---- shared ----
+
+        /// <summary>One section's items, or none where reading them threw: a part of the window the
+        /// game has stopped answering for costs its own rows and never the rest of the page.</summary>
+        private static IReadOnlyList<T> Items<T>(string section, Func<IReadOnlyList<T>> getter)
         {
             try
             {
@@ -234,6 +519,26 @@ namespace SongsOfConquestAccess.Screens
                 SocAccessMod.Instance?.LogWarning("SpellbookScreen section " + section + " failed to build: " + exception);
                 return new T[0];
             }
+        }
+
+        /// <summary>Game text written for a renderer, read as one spoken line: its rich-text tags are
+        /// not words.</summary>
+        private static string OneLine(string raw)
+        {
+            IList<string> lines = SpokenLines.Of(new[] { raw });
+            return lines.Count > 0 ? lines[0] : string.Empty;
+        }
+
+        private object Marker(string key)
+        {
+            object marker;
+            if (!_markers.TryGetValue(key, out marker))
+            {
+                marker = new object();
+                _markers.Add(key, marker);
+            }
+
+            return marker;
         }
     }
 }
