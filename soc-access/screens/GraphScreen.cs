@@ -77,18 +77,6 @@ namespace SongsOfConquestAccess.Screens
             return false;
         }
 
-        /// <summary>
-        /// Home or End on the focused control, asked BEFORE the cursor moves: <paramref name="first"/>
-        /// is Home. True where the CONTROL owns its own ends - a slider jumps to its minimum and its
-        /// maximum, which no number of arrow presses would reach in one gesture - and the value it
-        /// reports is spoken as an adjustment's is. False, the usual answer, leaves both keys as the
-        /// navigation they are everywhere else.
-        /// </summary>
-        public virtual bool OnEdge(GraphNode node, bool first)
-        {
-            return false;
-        }
-
         /// <summary>The back key was pressed. Return true when the screen handled it; false lets the
         /// game's own handling stand.</summary>
         public virtual bool Back()

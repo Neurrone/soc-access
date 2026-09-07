@@ -110,12 +110,6 @@ namespace SongsOfConquestAccess.Screens
             return TroopHudRows.OnAction(actionKey, Navigator, WielderTroops, WielderKey);
         }
 
-        /// <summary>Home and End take an amount slider to the ends of its pool.</summary>
-        public override bool OnEdge(GraphNode node, bool first)
-        {
-            return RecruitGroups.OnEdge(_adapter == null ? null : _adapter.PurchaseTroops, KeyPrefix, node, first);
-        }
-
         private TroopHudAdapter WielderTroops
         {
             get

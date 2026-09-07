@@ -86,11 +86,5 @@ namespace SongsOfConquestAccess.Screens
         {
             RecruitGroups.Region(builder, Host.PurchaseTroops, Key);
         }
-
-        /// <summary>Home and End take an amount slider to the ends of its pool.</summary>
-        public override bool OnEdge(GraphNode node, bool first)
-        {
-            return RecruitGroups.OnEdge(Host == null ? null : Host.PurchaseTroops, Key, node, first);
-        }
     }
 }

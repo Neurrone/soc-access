@@ -73,55 +73,6 @@ namespace SongsOfConquestAccess.UI
             return keyPrefix + ":recruit/";
         }
 
-        /// <summary>Home and End on one of these cards: on the amount slider they are the ends of the
-        /// pool, which is the only way to take all of it or none of it in one press. Anywhere else
-        /// they stay navigation.</summary>
-        public static bool OnEdge(
-            PurchaseTroopsSubMenuAdapter subMenu,
-            string keyPrefix,
-            GraphNode node,
-            bool first)
-        {
-            int index = ChildIndex(node, CardPrefix(keyPrefix), "slider");
-            IReadOnlyList<PurchaseTroopsSubMenuAdapter.RecruitEntry> entries = index < 0 || subMenu == null
-                ? null
-                : subMenu.GetRecruitEntries();
-            if (entries == null || index >= entries.Count)
-            {
-                return false;
-            }
-
-            PurchaseTroopsSubMenuAdapter.RecruitEntry entry = entries[index];
-            if (entry == null || !entry.IsSliderEnabled)
-            {
-                return false;
-            }
-
-            entry.SetSliderValue(first ? entry.SliderMinimum : entry.SliderMaximum);
-            return true;
-        }
-
-        /// <summary>The index of the card whose named child the cursor is on, or -1 anywhere else -
-        /// read off the focused node's own key rather than a remembered position.</summary>
-        public static int ChildIndex(GraphNode node, string cardPrefix, string child)
-        {
-            string key = node == null || node.Id == null ? null : node.Id.StructuralKey as string;
-            if (key == null || !key.StartsWith(cardPrefix, StringComparison.Ordinal))
-            {
-                return -1;
-            }
-
-            string rest = key.Substring(cardPrefix.Length);
-            int slash = rest.IndexOf('/');
-            if (slash < 0 || rest.Substring(slash + 1) != child)
-            {
-                return -1;
-            }
-
-            int index;
-            return int.TryParse(rest.Substring(0, slash), out index) ? index : -1;
-        }
-
         private static void AddCard(
             GraphBuilder builder,
             PurchaseTroopsSubMenuAdapter.RecruitEntry entry,

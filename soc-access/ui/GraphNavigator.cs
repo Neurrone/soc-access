@@ -770,15 +770,6 @@ namespace SongsOfConquestAccess.UI
                 return false;
             }
 
-            // A control that owns the ends of its own range takes the two keys before the cursor
-            // does: on a slider, Home and End are its minimum and its maximum, which is the one
-            // place the player cannot reach by arrowing without holding the key down.
-            if (_screen.OnEdge(node, first))
-            {
-                SpeakStateAfterChange();
-                return true;
-            }
-
             MoveResult move = KeyGraph.InTree(node)
                 ? _graph.MoveToSiblingEdge(first)
                 : _graph.MoveToEdge(EdgeDir(node, first));

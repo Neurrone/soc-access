@@ -119,30 +119,6 @@ namespace SongsOfConquestAccess.Screens
             }
         }
 
-        /// <summary>Home and End take the slider to none of the stack and to all of it - the same two
-        /// ends the game's own portrait shortcuts reach.</summary>
-        public override bool OnEdge(GraphNode node, bool first)
-        {
-            int index = RecruitGroups.ChildIndex(node, CardPrefix, "slider");
-            UpgradeTroopsSubMenuAdapter subMenu = Host == null ? null : Host.UpgradeTroops;
-            IReadOnlyList<UpgradeTroopsSubMenuAdapter.UpgradeEntry> entries = index < 0 || subMenu == null
-                ? null
-                : subMenu.GetEntries();
-            if (entries == null || index >= entries.Count)
-            {
-                return false;
-            }
-
-            UpgradeTroopsSubMenuAdapter.UpgradeEntry entry = entries[index];
-            if (entry == null || !entry.IsSliderEnabled)
-            {
-                return false;
-            }
-
-            entry.SetSliderValue(first ? entry.SliderMinimum : entry.SliderMaximum);
-            return true;
-        }
-
         /// <summary>The game's own line for a page with nothing on it: every troop already upgraded,
         /// or the buildings that would allow it not built yet.</summary>
         private void BuildNoUpgrades(GraphBuilder builder, UpgradeTroopsSubMenuAdapter subMenu)
