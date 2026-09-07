@@ -41,6 +41,8 @@ namespace SongsOfConquestAccess.Screens
     {
         private const string TutorialStop = "settlement-tutorial";
         private const string WielderStop = "settlement-wielder";
+        private const string StoredWielderStop = "settlement-stored-wielder";
+        private const string StoredWielderKey = "settlement/stored";
         private const string PageStop = "settlement-page";
         private const string CloseStop = "settlement-close";
         private const string KeyPrefix = "settlement";
@@ -112,6 +114,7 @@ namespace SongsOfConquestAccess.Screens
 
             BuildTutorial(builder);
             TroopHudRows.WielderStop(builder, WielderStop, WielderKey, _adapter.Wielder);
+            BuildStoredWielder(builder);
 
             builder.BeginStop(PageStop);
             BuildDraft(builder);
@@ -134,12 +137,14 @@ namespace SongsOfConquestAccess.Screens
         public override bool ClaimsAction(string actionKey)
         {
             return TroopHudRows.ClaimsAction(actionKey, Navigator, VisitingTroops, WielderKey)
+                || TroopHudRows.ClaimsAction(actionKey, Navigator, StoredWielderTroops, StoredWielderKey)
                 || TroopHudRows.ClaimsAction(actionKey, Navigator, SettlementTroops, SettlementArmyKey);
         }
 
         public override bool OnAction(string actionKey)
         {
             return TroopHudRows.OnAction(actionKey, Navigator, VisitingTroops, WielderKey)
+                || TroopHudRows.OnAction(actionKey, Navigator, StoredWielderTroops, StoredWielderKey)
                 || TroopHudRows.OnAction(actionKey, Navigator, SettlementTroops, SettlementArmyKey);
         }
 
@@ -161,6 +166,38 @@ namespace SongsOfConquestAccess.Screens
 
         /// <summary>The button the game draws in the corner until the player has seen the town
         /// tutorial, and never again.</summary>
+        /// <summary>The wielder stored in the settlement, when one is: the panel draws their portrait
+        /// and their army, and the game's drag reaches that army, so it is a Wielder stop of its own
+        /// as it is on the defence menu.</summary>
+        private void BuildStoredWielder(GraphBuilder builder)
+        {
+            DefencePanelWielderAdapter panel = _adapter.DefendingWielder;
+            if (panel == null || !panel.IsStoredWielderVisible)
+            {
+                return;
+            }
+
+            TroopHudRows.WielderStop(
+                builder,
+                StoredWielderStop,
+                StoredWielderKey,
+                panel.Portrait,
+                () => panel.StoredWielderName,
+                null,
+                panel.PortraitTooltip,
+                panel.FocusPortrait,
+                panel.Troops);
+        }
+
+        private TroopHudAdapter StoredWielderTroops
+        {
+            get
+            {
+                DefencePanelWielderAdapter panel = _adapter == null ? null : _adapter.DefendingWielder;
+                return panel == null || !panel.IsStoredWielderVisible ? null : panel.Troops;
+            }
+        }
+
         private void BuildTutorial(GraphBuilder builder)
         {
             if (!_adapter.IsTutorialButtonVisible())

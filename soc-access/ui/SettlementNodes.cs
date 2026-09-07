@@ -147,12 +147,12 @@ namespace SongsOfConquestAccess.UI
                 drawnBy));
         }
 
+        /// <summary>The stored wielder's name alone, or the game's own prompt: the band is already
+        /// named by the game's header, so a "Defending wielder:" prefix would say it twice.</summary>
         private static string Status(DefencePanelWielderAdapter panel)
         {
             string name = panel.StoredWielderName;
-            return string.IsNullOrWhiteSpace(name)
-                ? panel.NoStoredWielderText
-                : ModText.Get(ModStrings.Screens.DefendingWielderStatus, name);
+            return string.IsNullOrWhiteSpace(name) ? panel.NoStoredWielderText : name;
         }
 
         private static void SlotBand(
