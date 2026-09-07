@@ -773,6 +773,10 @@ namespace SongsOfConquestAccess.UI
             {
                 _graph.Activate();
                 SpeakStateAfterChange();
+                // What the activation did to its own control is reported by StateText above, never
+                // by the live watch: a button that switched its page off (Statistics on the result
+                // page) would otherwise say "unavailable" on its way out. Re-baseline instead.
+                _liveKey = null;
             }
 
             return true;
@@ -881,7 +885,10 @@ namespace SongsOfConquestAccess.UI
                 return;
             }
 
-            bool mute = !Workable();
+            // A drawn control whose game object has gone inactive has left with its page (a result
+            // page hiding itself as Statistics opens): its parts flipping to unavailable is the page
+            // leaving, not the control changing, so that is muted the same way.
+            bool mute = !Workable() || !StillDrawn(node);
             bool baseline = _liveKey == null || !_liveKey.Equals(node.Id) || _liveValues.Count != parts.Count;
             if (baseline)
             {
@@ -928,6 +935,22 @@ namespace SongsOfConquestAccess.UI
                         Say(text, false);
                     }
                 }
+            }
+        }
+
+        /// <summary>Whether a drawn node's subject is still active in the hierarchy; true for a node
+        /// drawn by nothing the engine can ask.</summary>
+        private static bool StillDrawn(GraphNode node)
+        {
+            DrawnNode drawn = node == null ? null : node.Declared as DrawnNode;
+            UnityEngine.Component component = drawn == null ? null : drawn.DrawnBy as UnityEngine.Component;
+            try
+            {
+                return component == null || component.gameObject.activeInHierarchy;
+            }
+            catch (Exception)
+            {
+                return true;
             }
         }
 

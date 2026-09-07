@@ -65,8 +65,8 @@ the in-game chat; the mod options dialog opened from the pause menu.
 ## Decisions taken in your absence
 
 - Pause menu lands on Continue Game rather than the first drawn button.
-- Story text keeps the whole body as the spoken line and adds one buffer line per paragraph,
-  so the buffer holds the body twice (joined, then split).
+- Story text reads the body as one spoken line and holds only the paragraphs in the buffer
+  (your ruling, applied).
 - Claim menu gets no close node: the game draws none and its own Escape handler decides.
 - Slideshow dumps show the shown page's text on every row (a dump turns no pages, by design).
 - Level up says "New Level. level 13" and "Archery. level 1" through the existing lowercase
@@ -93,12 +93,11 @@ the in-game chat; the mod options dialog opened from the pause menu.
 ## Needs your attention
 
 - Real-key walks: none done by me (the `/key` route takes the desktop's focus).
-- The story text buffer duplication above: keep, or drop the joined line?
-- The lowercase "level 13" wording on the level-up page: keep, or a capitalised ModString?
-- Returning from a child screen (a drop list, a popup) re-announces the page's name
-  ("Players", "Conquest"): a manager behaviour, present since phase B. Wanted, or a phase F fix?
-- Pressing a button that leaves the page can speak a stray "unavailable" as the page fades
-  (Statistics on the result page, Quit to Main Menu); the same class as the phase B stray line.
+- Rulings applied after the first handover: only the paragraphs in the story buffer; the
+  lowercase "level 13" stays; returning from a child screen keeps re-announcing the page's
+  name; the stray "unavailable" after a button that switches its page off is fixed in the
+  navigator (an activation's effect on its own control is never reported by the live watch,
+  and a control whose game object has gone inactive is muted).
 - A hot reload while the post-battle screen is open loses the patch's bookkeeping, so the mod
   does not notice the Accept afterwards until the next reload (dev loop only).
 - Research and build menu were captured with no owned research building and an empty site;
