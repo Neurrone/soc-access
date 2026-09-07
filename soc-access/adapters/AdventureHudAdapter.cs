@@ -122,6 +122,8 @@ namespace SongsOfConquestAccess.Adapters
         private TownListUI _townListUi;
         private KingdomInformationHUD.Settings _kingdomInformationSettings;
         private EndTurnHUD.Settings _endTurnSettings;
+        private EndTurnHUD _endTurnHud;
+        private static readonly MethodInfo EndTurnUpdateTooltipMethod = AccessTools.Method(typeof(EndTurnHUD), "UpdateTooltip");
         private TeamQueueHUDBehaviour _teamQueueHud;
 
         public AdventureHudAdapter(AdventureMapAdapter map, DiContainer container)
@@ -935,6 +937,33 @@ namespace SongsOfConquestAccess.Adapters
             get { return GetFirstTooltipLine(EndTurnButtonTooltip) ?? string.Empty; }
         }
 
+        /// <summary>
+        /// Recompose the end-turn button's tooltip the way the game does when the mouse arrives on it.
+        /// <c>EndTurnHUD.Tick</c> refreshes the button's interactable state every frame, but its title
+        /// ("End turn" against "Hold on...") is only recomposed by <c>UpdateTooltip</c> on mouse-over,
+        /// on a click and on round events, so a mouse user never sees it stale while a reader that
+        /// names the button by that title and selects it without hovering does (seen 2026-09-08: the
+        /// check mark drawn, the tooltip still saying "Hold on..."). This runs the same private
+        /// refresh the hover handler runs.
+        /// </summary>
+        private void RefreshEndTurnTooltip()
+        {
+            EndTurnHUD hud = EndTurnHud;
+            if (hud == null || EndTurnUpdateTooltipMethod == null)
+            {
+                return;
+            }
+
+            try
+            {
+                EndTurnUpdateTooltipMethod.Invoke(hud, null);
+            }
+            catch (Exception ex)
+            {
+                SocAccessMod.Instance?.LogWarning("AdventureHudAdapter could not refresh the end-turn tooltip: " + ex.Message);
+            }
+        }
+
         public void FocusEndTurnButton()
         {
             NativeSelectionUtility.Select(EndTurnSettings != null ? EndTurnSettings.EndTurnButton : null);
@@ -947,7 +976,11 @@ namespace SongsOfConquestAccess.Adapters
 
         public Tooltip EndTurnButtonTooltip
         {
-            get { return Tooltip.ForComponent(EndTurnSettings != null ? EndTurnSettings.EndTurnButton : null, LocalizationHandler); }
+            get
+            {
+                RefreshEndTurnTooltip();
+                return Tooltip.ForComponent(EndTurnSettings != null ? EndTurnSettings.EndTurnButton : null, LocalizationHandler);
+            }
         }
 
         public bool IsRoundTextVisible()
@@ -1166,6 +1199,19 @@ namespace SongsOfConquestAccess.Adapters
                 }
 
                 return _kingdomInformationSettings;
+            }
+        }
+
+        private EndTurnHUD EndTurnHud
+        {
+            get
+            {
+                if (_endTurnHud == null)
+                {
+                    _endTurnHud = Resolve<EndTurnHUD>();
+                }
+
+                return _endTurnHud;
             }
         }
 
