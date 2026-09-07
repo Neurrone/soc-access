@@ -92,6 +92,11 @@ namespace SongsOfConquestAccess.UI
             GraphSheet.TableRoleText = () => ModText.Get(ModStrings.UI.RoleTable);
             GraphSheet.TextCellType = ControlTypes.Text;
 
+            // How a USAGE HINT spells the gesture it names. The engine is game-free and cannot see
+            // the action table, so the renderer is injected here and reads the LIVE bindings: a
+            // re-bound gesture re-words every hint that names it, with nothing to keep in step.
+            NodeHints.Chord = ChordNames.Of;
+
             // The carry's three gestures, named to the engine so its pick-up announcement and its
             // two derived hints spell whatever chords those actions are bound to now.
             CarryState.PickUpAction = AccessibilityActions.UiCarry.Key;

@@ -137,8 +137,12 @@ Paths relative to `soc-access/`. Read these before porting a screen.
   `FocusNode` (pending landings), `InspectRender` (the dump), `FocusedTooltip`. A focus
   visual is re-drawn only when what it draws changes (`SameAim`). Static wiring in
   `InstallWiring`/`ResetWiring`; `FocusedIndex(prefix)` for a pager's page. The live watch
-  re-reads a node whose live part count changed (a dialogue's next line). Not wired yet:
-  carry (phase D), modes (phase E). `ui/PointerHover.cs` simulates the pointer hover a card
+  re-reads a node whose live part count changed (a dialogue's next line). Carry is wired: one `CarryState`
+  per navigator handed to the engine as `GraphAnnouncer.Carry`, `ui_carry`, `ui_left_click`
+  and `ui_back` dispatched through `CarryActions`, the owner's page answered off the screen
+  stack (a child screen over it is still it), `ui/CarrySounds.cs` the seam a screen registers
+  the game's own drag noises for its cargo kind on, `input/ChordNames.cs` installed as
+  `NodeHints.Chord`. Not wired yet: modes (phase E). `ui/PointerHover.cs` simulates the pointer hover a card
   reveals its detail on, released in `Stop()`.
 - `ui/GraphNodes.cs` — the factories, every one taking the same cross-cutting parameters:
   `Button`, `Group`, `Text`, `EditField`, `Checkbox`, `Slider` (Left/Right adjust; an optional
@@ -311,7 +315,7 @@ lines under named regions, not a table, unless the game draws column headings.
 (army exchange), `HostileJoinMenuScreen` (army exchange), `TroopManagementScreenBase` with
 `DraftTroopsScreen` and `UpgradeTroopsScreen`, `RallyPointScreen`, `MoveTroopPopupScreen`,
 `SpellbookScreen` (quickbar reorder) and `WorldChoiceMenuScreen` (the draggable troop HUD),
-both deferred from C. Wire `ui_carry` (Space) and `Carry` in the navigator first. Follow-up decided 2026-09-07: `BuildMenuScreen`'s tier tabs move into one row (Left/Right between them, Enter still the switch) instead of stacked items; do it alongside the commander sheet's modifier tabs, which take the same shape. The owner's simplification
+both deferred from C. Follow-up decided 2026-09-07: `BuildMenuScreen`'s tier tabs move into one row (Left/Right between them, Enter still the switch) instead of stacked items; do it alongside the commander sheet's modifier tabs, which take the same shape. The owner's simplification
 targets are here (fewer tab stops); each gets its own proposal, measured off the drawn layout.
 
 ### Phase E — modes

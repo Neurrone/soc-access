@@ -132,6 +132,36 @@ namespace SongsOfConquestAccess.Localization
             public static readonly ModString Quantity = new ModString("Graph.Quantity", "x {0}");
         }
 
+        /// <summary>
+        /// The words a KEY CHORD is spoken with (<c>input/ChordNames.cs</c>): the modifier names, the
+        /// joiner that puts a chord together, and the mod's own names for the keys it binds gestures
+        /// to. A language that spells a chord differently - a different joiner, another word order -
+        /// changes <see cref="ChordJoiner"/> and nothing else. Keys the mod binds nothing to are named
+        /// by Unity's own display name for them, so this list only grows when a new gesture lands on
+        /// a key nobody has named.
+        /// </summary>
+        public static class Keys
+        {
+            public static readonly ModString Alt = new ModString("Keys.Alt", "Alt");
+            public static readonly ModString Backquote = new ModString("Keys.Backquote", "Backquote");
+            public static readonly ModString Backslash = new ModString("Keys.Backslash", "Backslash");
+            public static readonly ModString Backspace = new ModString("Keys.Backspace", "Backspace");
+            public static readonly ModString ChordJoiner = new ModString("Keys.ChordJoiner", "{0}+{1}");
+            public static readonly ModString Ctrl = new ModString("Keys.Ctrl", "Ctrl");
+            public static readonly ModString DownArrow = new ModString("Keys.DownArrow", "Down arrow");
+            public static readonly ModString End = new ModString("Keys.End", "End");
+            public static readonly ModString Enter = new ModString("Keys.Enter", "Enter");
+            public static readonly ModString Escape = new ModString("Keys.Escape", "Escape");
+            public static readonly ModString Home = new ModString("Keys.Home", "Home");
+            public static readonly ModString LeftArrow = new ModString("Keys.LeftArrow", "Left arrow");
+            public static readonly ModString NumpadEnter = new ModString("Keys.NumpadEnter", "Numpad Enter");
+            public static readonly ModString RightArrow = new ModString("Keys.RightArrow", "Right arrow");
+            public static readonly ModString Shift = new ModString("Keys.Shift", "Shift");
+            public static readonly ModString Space = new ModString("Keys.Space", "Space");
+            public static readonly ModString Tab = new ModString("Keys.Tab", "Tab");
+            public static readonly ModString UpArrow = new ModString("Keys.UpArrow", "Up arrow");
+        }
+
         public static class Spatial
         {
             public static readonly ModString Acting = new ModString("Spatial.Acting", "acting");
