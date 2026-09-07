@@ -175,9 +175,10 @@ Paths relative to `soc-access/`. Read these before porting a screen.
   the one door for the clicks and Ctrl+M.
 - `input/AccessibilityActions.cs` — the graph actions, all `InputClaimScope.Screen`:
   `ui_up/down/left/right`, `ui_coarse_decrease/increase` (Shift+Left/Right), `ui_next/prev`
-  (Tab), `ui_home/end`, `ui_region_prev/next` (Alt+Up/Down), `ui_activate` (Enter),
-  `ui_clear_search` (Backspace, live during a search), `ui_right_click` (Backslash), `ui_back`
-  (Escape); the router claims letters (and Space mid-search) for type-ahead on graph screens.
+  (Tab), `ui_home/end`, `ui_region_prev/next` (Alt+Up/Down), `ui_left_click` (Enter, NumpadEnter,
+  Ctrl+Enter, Ctrl+NumpadEnter), `ui_carry` (Space),
+  `ui_clear_search` (Backspace, live during a search), `ui_right_click` (Backslash,
+  Ctrl+Backslash), `ui_back` (Escape); the router claims letters (and Space mid-search) for type-ahead on graph screens.
 - `dev/GraphDump.cs` — `/gui/graph?buffers=1&flat=1&edges=1`, `/gui/tree`, `POST /type`;
   `/status` reports the focused node as `focusedWidgetId`/`focusedWidgetType`.
 - Dev-loop guards added in phase B: a failed `/eval` no longer breaks the game's type scans
@@ -207,14 +208,14 @@ screen answers it, so an unclaimed key still reaches the game.
 | `ui_next` / `ui_prev` | always | `MoveStop`, wrapping; one stop consumes silently |
 | `ui_home` / `ui_end` | always | `MoveToSiblingEdge` in a tree, else `MoveToEdge` along the stop's wired axis; in a search, first/last result |
 | `ui_region_prev` / `ui_region_next` | node has a region | `MoveRegion` |
-| `ui_activate` | always | `OnActivate`, then `StateText` interrupting |
+| `ui_left_click` | always | a drop where something is being carried and the node takes it, else `OnActivate` then `StateText` interrupting |
+| `ui_carry` (Space) | the node has `OnPickUp`, or something is being carried | pick up, swap what is held, or consume silently |
 | `ui_clear_search` (Backspace) | a search is live | ends the search, "Search cleared" |
 | `ui_right_click` (Backslash) | node has `OnContextual` | `OnContextual`, the right-click command |
-| `ui_back` | `Screen.ConsumesBack`, or a search is live | `Screen.Back()`; in a search, "Search cleared" |
+| `ui_back` | something is being carried, `Screen.ConsumesBack`, or a search is live | cancel the carry, else `Screen.Back()`; in a search, "Search cleared" |
 | letters, Space mid-search | `AllowsTypeahead && !CapturesRawInput`, no Ctrl or Alt held, no game box focused | type-ahead over the focused stop plus the fully-open build |
 
-Still to add, each in the phase that needs it: `ui_carry` (Space, phase D), the mode keys
-(phase E, the mode node's own handler, claimed through a screen-level `AnyKey`-style hook).
+Still to add, each in the phase that needs it: the mode keys (phase E, the mode node's own handler, claimed through a screen-level `AnyKey`-style hook).
 Type-ahead ranks by match tier before list order; a chord is never typing; a group header
 the game wires no click to gets no `OnActivate` (Right is the way in). `GraphState` is keyed by
 screen instance, so cursor memory across a push and pop is lost until phase F's registered

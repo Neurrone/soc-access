@@ -355,7 +355,7 @@ namespace SongsOfConquestAccess.UI
                 case "ui_prev":
                 case "ui_home":
                 case "ui_end":
-                case "ui_activate":
+                case "ui_left_click":
                     return true;
                 case "ui_region_prev":
                 case "ui_region_next":
@@ -413,7 +413,7 @@ namespace SongsOfConquestAccess.UI
                     return Adjust(1, true);
                 case "ui_coarse_decrease":
                     return Adjust(-1, true);
-                case "ui_activate":
+                case "ui_left_click":
                     return Activate();
                 case "ui_right_click":
                     return Contextual();

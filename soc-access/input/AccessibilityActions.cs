@@ -310,9 +310,24 @@ namespace SongsOfConquestAccess.Input
         public static readonly InputAction UiRegionNext = OneShot("ui_region_next", ModStrings.Actions.UiRegionNext, InputClaimScope.Screen)
             .AddBinding(new KeyboardBinding(Key.DownArrow, alt: true));
 
-        public static readonly InputAction UiActivate = OneShot("ui_activate", ModStrings.Actions.UiActivate, InputClaimScope.Screen)
+        /// <summary>
+        /// The left click, on every key that delivers one. The two Ctrl chords are bindings of the
+        /// SAME action on purpose: the game's own click handlers read the physical Ctrl
+        /// (<c>IInputManager.IsCtrlHeld</c>, <c>Keyboard.current.ctrlKey</c>), so a modified Enter
+        /// delivered into the same native click IS the game's Ctrl+click, and a second action would
+        /// only be a second way to reach the one handler. A hint names the modified gesture by this
+        /// action plus <see cref="UiLeftClickCtrlBindingIndex"/>.
+        /// </summary>
+        public static readonly InputAction UiLeftClick = OneShot("ui_left_click", ModStrings.Actions.UiLeftClick, InputClaimScope.Screen)
             .AddBinding(new KeyboardBinding(Key.Enter))
-            .AddBinding(new KeyboardBinding(Key.NumpadEnter));
+            .AddBinding(new KeyboardBinding(Key.NumpadEnter))
+            .AddBinding(new KeyboardBinding(Key.Enter, ctrl: true))
+            .AddBinding(new KeyboardBinding(Key.NumpadEnter, ctrl: true));
+
+        /// <summary>Which of <see cref="UiLeftClick"/>'s bindings is Ctrl+Enter - what a usage hint
+        /// for the Ctrl+left click names, since a hint addresses a chord as (action, binding
+        /// index).</summary>
+        public const int UiLeftClickCtrlBindingIndex = 2;
 
         // The way out of a type-ahead search: claimed only while one is live, so Backspace stays the
         // game's everywhere else.
@@ -323,7 +338,22 @@ namespace SongsOfConquestAccess.Input
         // already uses.
         public static readonly InputAction UiRightClick = OneShot("ui_right_click", ModStrings.Actions.UiRightClick, InputClaimScope.Screen)
             .AddBinding(new KeyboardBinding(Key.Backslash))
-            .AddBinding(new KeyboardDisplayNameBinding("\\"));
+            .AddBinding(new KeyboardDisplayNameBinding("\\"))
+            // Ctrl+right click, the same native right click with the physical Ctrl the game's own
+            // handler reads. The display-name fallback is repeated with Ctrl for the keyboard that
+            // reports backslash as OEM1 (see MapSecondaryAction).
+            .AddBinding(new KeyboardBinding(Key.Backslash, ctrl: true))
+            .AddBinding(new KeyboardDisplayNameBinding("\\", ctrl: true));
+
+        /// <summary>Which of <see cref="UiRightClick"/>'s bindings is Ctrl+Backslash.</summary>
+        public const int UiRightClickCtrlBindingIndex = 2;
+
+        /// <summary>Pick something up, or hand it over to whatever is under the cursor - the keyboard's
+        /// half of the game's mouse drag (<c>ui/graph/Carry.cs</c>). Claimed only where the focused
+        /// control has something to give or something is already being carried, so Space stays the
+        /// game's everywhere else.</summary>
+        public static readonly InputAction UiCarry = OneShot("ui_carry", ModStrings.Actions.UiCarry, InputClaimScope.Screen)
+            .AddBinding(new KeyboardBinding(Key.Space));
 
         public static readonly InputAction UiBack = OneShot("ui_back", ModStrings.Actions.UiBack, InputClaimScope.Screen)
             .AddBinding(new KeyboardBinding(Key.Escape));
@@ -609,9 +639,10 @@ namespace SongsOfConquestAccess.Input
                 UiEnd,
                 UiRegionPrev,
                 UiRegionNext,
-                UiActivate,
+                UiLeftClick,
                 UiClearSearch,
                 UiRightClick,
+                UiCarry,
                 UiBack
             };
 

@@ -291,8 +291,8 @@ namespace SongsOfConquestAccess.Localization
             public static readonly ModString SummarizeEnemyResources = new ModString("Actions.SummarizeEnemyResources", "Summarize Enemy Resources");
             public static readonly ModString SummarizeResources = new ModString("Actions.SummarizeResources", "Summarize Resources");
             public static readonly ModString TooltipActionsMenu = new ModString("Actions.TooltipActionsMenu", "Tooltip Actions Menu");
-            public static readonly ModString UiActivate = new ModString("Actions.UiActivate", "Activate");
             public static readonly ModString UiBack = new ModString("Actions.UiBack", "Back");
+            public static readonly ModString UiCarry = new ModString("Actions.UiCarry", "Pick up or drop");
             public static readonly ModString UiClearSearch = new ModString("Actions.UiClearSearch", "Clear Search");
             public static readonly ModString UiCoarseDecrease = new ModString("Actions.UiCoarseDecrease", "Coarse Decrease");
             public static readonly ModString UiCoarseIncrease = new ModString("Actions.UiCoarseIncrease", "Coarse Increase");
@@ -300,12 +300,13 @@ namespace SongsOfConquestAccess.Localization
             public static readonly ModString UiEnd = new ModString("Actions.UiEnd", "Last Item");
             public static readonly ModString UiHome = new ModString("Actions.UiHome", "First Item");
             public static readonly ModString UiLeft = new ModString("Actions.UiLeft", "Move Left");
+            public static readonly ModString UiLeftClick = new ModString("Actions.UiLeftClick", "Left click");
             public static readonly ModString UiNext = new ModString("Actions.UiNext", "Next Stop");
             public static readonly ModString UiPrev = new ModString("Actions.UiPrev", "Previous Stop");
             public static readonly ModString UiRegionNext = new ModString("Actions.UiRegionNext", "Next Region");
             public static readonly ModString UiRegionPrev = new ModString("Actions.UiRegionPrev", "Previous Region");
             public static readonly ModString UiRight = new ModString("Actions.UiRight", "Move Right");
-            public static readonly ModString UiRightClick = new ModString("Actions.UiRightClick", "Right Click");
+            public static readonly ModString UiRightClick = new ModString("Actions.UiRightClick", "Right click");
             public static readonly ModString UiUp = new ModString("Actions.UiUp", "Move Up");
         }
 
