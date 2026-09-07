@@ -45,6 +45,7 @@ namespace SongsOfConquestAccess.UI
         private ControlId _lastSpokenKey;
         private GraphNode _lastSpokenNode;
 
+
         // A requested landing, applied on the next EnsureFocus - and kept across the frames a branch
         // takes to open where the control asked for is inside a collapsed one (see FocusRequest).
         private FocusRequest _pendingFocus;
@@ -889,9 +890,18 @@ namespace SongsOfConquestAccess.UI
             // page hiding itself as Statistics opens): its parts flipping to unavailable is the page
             // leaving, not the control changing, so that is muted the same way.
             bool mute = !Workable() || !StillDrawn(node);
-            bool baseline = _liveKey == null || !_liveKey.Equals(node.Id) || _liveValues.Count != parts.Count;
+            bool sameNode = _liveKey != null && _liveKey.Equals(node.Id);
+            bool baseline = !sameNode || _liveValues.Count != parts.Count;
             if (baseline)
             {
+                // The same node with a different NUMBER of parts is that node changed under the
+                // cursor (a dialogue's next line with more or fewer paragraphs): the whole readout is
+                // what changed, and it is said before the new baseline is taken.
+                if (sameNode && !mute && HasLivePart(parts))
+                {
+                    Say(GraphAnnouncer.LeafText(node), false);
+                }
+
                 _liveKey = node.Id;
                 _liveValues.Clear();
             }
@@ -936,6 +946,19 @@ namespace SongsOfConquestAccess.UI
                     }
                 }
             }
+        }
+
+        private static bool HasLivePart(List<NodeAnnouncement> parts)
+        {
+            for (int i = 0; i < parts.Count; i++)
+            {
+                if (parts[i] != null && parts[i].Live)
+                {
+                    return true;
+                }
+            }
+
+            return false;
         }
 
         /// <summary>Whether a drawn node's subject is still active in the hierarchy; true for a node

@@ -199,19 +199,26 @@ namespace SongsOfConquestAccess.UI
         /// with is the one the node keeps until the next build - a resolver that runs late simply
         /// reports null for a paragraph that is no longer there.
         /// </summary>
-        public static NodeVtable Paragraphs(Func<IList<string>> lines, Tooltip tooltip = null)
+        /// <param name="live">Whether the paragraphs are WATCHED: a text the game replaces in place under
+        /// a still cursor (a dialogue's next line) is then read again by the live watch.</param>
+        public static NodeVtable Paragraphs(Func<IList<string>> lines, Tooltip tooltip = null, bool live = false)
         {
             NodeVtable vtable = Text(() => Paragraph(lines, 0), tooltip: tooltip);
-            AddParagraphs(vtable, lines, 1);
+            if (live && vtable.Announcements.Count > 0)
+            {
+                vtable.Announcements[0].Live = true;
+            }
+
+            AddParagraphs(vtable, lines, 1, live);
             return vtable;
         }
 
         /// <summary>The same body of text where it is something a CONTROL draws beside its name - a
         /// card's description, a summary's blurb - appended to that control's own readout as one part
         /// per paragraph, rather than declared as a node or a section of its own.</summary>
-        public static void ParagraphParts(NodeVtable vtable, Func<IList<string>> lines)
+        public static void ParagraphParts(NodeVtable vtable, Func<IList<string>> lines, bool live = false)
         {
-            AddParagraphs(vtable, lines, 0);
+            AddParagraphs(vtable, lines, 0, live);
         }
 
         /// <summary>
@@ -512,13 +519,13 @@ namespace SongsOfConquestAccess.UI
         }
 
         // One part per paragraph from the given index on, each resolving its own paragraph live.
-        private static void AddParagraphs(NodeVtable vtable, Func<IList<string>> lines, int first)
+        private static void AddParagraphs(NodeVtable vtable, Func<IList<string>> lines, int first, bool live)
         {
             int count = Count(lines);
             for (int i = first; i < count; i++)
             {
                 int index = i;
-                vtable.Announcements.Add(ValuePart(() => Paragraph(lines, index), watch: false));
+                vtable.Announcements.Add(ValuePart(() => Paragraph(lines, index), watch: live));
             }
         }
 

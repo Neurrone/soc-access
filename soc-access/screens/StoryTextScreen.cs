@@ -1,9 +1,11 @@
 using System;
+using System.Collections.Generic;
 using System.Reflection;
 using HarmonyLib;
 using SongsOfConquest.Client.Adventure;
 using SongsOfConquest.Client.Menu;
 using SongsOfConquestAccess.Adapters;
+using SongsOfConquestAccess.Localization;
 using SongsOfConquestAccess.UI;
 using SongsOfConquestAccess.UI.Graph;
 using UnityEngine;
@@ -13,16 +15,16 @@ namespace SongsOfConquestAccess.Screens
 {
     /// <summary>
     /// The story text the game shows between scenes - the panel, the letterbox and the dialogue line
-    /// - made navigable as a graph. One stop: the heading, which the game draws in capitals and which
-    /// is also the screen name, and the body as the start node, one part per
-    /// paragraph. The headerless variants declare no heading node and have no screen name: the body
-    /// is all there is to say.
+    /// - made navigable as a graph. One stop holding ONE BUTTON (owner ruling 2026-09-07): the
+    /// speaker or heading and the first paragraph as "{speaker}: {text}", the further paragraphs as
+    /// parts, so the review buffer holds one line per paragraph. Every part is live: the game writes
+    /// the next line of a dialogue in place under a cursor that never moves, and the live watch is
+    /// what reads it, speaker first, then the text. The headerless variants read the body alone.
     ///
     /// The paragraphs survive because the adapters keep the game's own line breaks
-    /// (<c>IStoryTextAdapter.BodyLines</c>): the body is a <c>GraphNodes.Paragraphs</c> node, read
-    /// aloud as one body and held in the review buffer one line per paragraph.
+    /// (<c>IStoryTextAdapter.BodyLines</c>).
     ///
-    /// ENTER on either node advances, through the game's own handler that a click would reach
+    /// ENTER advances, through the game's own handler that a click would reach
     /// (<c>AbortCurrentState</c> on the two story texts, <c>HandlePrimaryClicked</c> on the dialogue
     /// menu). ESCAPE is the game's on all three sources: each binds it to advancing, and every key
     /// the navigator does not claim reaches the game's press-anything handling unchanged.
@@ -36,10 +38,8 @@ namespace SongsOfConquestAccess.Screens
 
         private readonly IStoryTextAdapter _adapter;
 
-        // A subject of its own for each node: the sources draw the heading and the body in text
-        // meshes the adapters do not hand out, and two nodes sharing one subject would collapse onto
-        // whichever was declared first.
-        private readonly object _headingKey = new object();
+        // A subject of its own for the node: the sources draw the text in meshes the adapters do not
+        // hand out.
         private readonly object _bodyKey = new object();
 
         public StoryTextScreen(IStoryTextAdapter adapter)
@@ -70,14 +70,10 @@ namespace SongsOfConquestAccess.Screens
             get { return "story-text"; }
         }
 
-        /// <summary>The heading the source draws, or null where it draws none.</summary>
+        /// <summary>None: the one node says the speaker or heading itself.</summary>
         public override string ScreenName
         {
-            get
-            {
-                string title = _adapter != null ? _adapter.Title : null;
-                return string.IsNullOrWhiteSpace(title) ? null : title;
-            }
+            get { return null; }
         }
 
         public override bool IsPresent()
@@ -94,25 +90,34 @@ namespace SongsOfConquestAccess.Screens
 
             builder.BeginStop(StoryStop);
 
-            // Both nodes are BUTTONS: Enter on either advances the story, and a control that does
-            // something on Enter says so (owner ruling 2026-09-07).
-            if (!string.IsNullOrWhiteSpace(_adapter.Title))
-            {
-                NodeVtable heading = GraphNodes.Button(() => _adapter.Title, Advance);
-                builder.AddItem(new SyntheticNode(ControlId.For(_headingKey, "story-text:heading"), heading));
-            }
-
+            // ONE BUTTON: "{speaker}: {first paragraph}" then the further paragraphs as parts, every
+            // part live, so the next line the game writes in place is read by the live watch under a
+            // cursor that never moved. Enter advances (owner ruling 2026-09-07).
             if (!string.IsNullOrWhiteSpace(_adapter.Body))
             {
                 ControlId bodyId = ControlId.For(_bodyKey, "story-text:body");
-                NodeVtable body = GraphNodes.Paragraphs(() => _adapter.BodyLines);
+                NodeVtable body = GraphNodes.Paragraphs(Lines, live: true);
                 body.ControlType = ControlTypes.Button;
                 body.OnActivate = Advance;
                 builder.AddItem(new SyntheticNode(bodyId, body));
-                // Focus starts on the body, so arrival says the heading once as the screen name and
-                // then the story itself.
                 builder.SetStart(bodyId);
             }
+        }
+
+        /// <summary>The body's paragraphs, the first carrying the speaker or heading where the source
+        /// draws one ("Cecilia Stoutheart: Peradine, I came as quickly as I could.").</summary>
+        private IList<string> Lines()
+        {
+            IList<string> lines = _adapter != null ? _adapter.BodyLines : null;
+            string title = _adapter != null ? _adapter.Title : null;
+            if (lines == null || lines.Count == 0 || string.IsNullOrWhiteSpace(title))
+            {
+                return lines;
+            }
+
+            List<string> named = new List<string>(lines);
+            named[0] = ModText.Get(ModStrings.UI.LabelValue, title, lines[0]);
+            return named;
         }
 
         private void Advance()
