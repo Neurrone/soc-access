@@ -5,16 +5,18 @@ doc comment; the rulings and measurements are in `ui-graph-plan.md` (Phase C).
 
 ## State (2026-09-07)
 
-Thirteen in-game screens are graph screens, each verified by a dump diff against its
+Twenty in-game screens are graph screens, each verified by a dump diff against its
 before-capture and by injected keys: pause menu, world confirm, claim menu, both tutorials,
 story text (panel and letterbox), level up, purchase wielder, research, build menu, owned
-entities, troop overview, map entity mini menu. Also checked in-game on their shared classes:
-the codex, the save menu, the map message popup. Spellbook and world choice moved to phase D.
+entities, troop overview, map entity mini menu, players menu, gift town, send resource,
+marketplace, post-battle result, post-adventure result, post-adventure statistics. Also
+checked in-game on their shared classes: the codex, the save menu, the map message popup.
+Spellbook and world choice moved to phase D. The co-op, battle and post-game screens were
+done in a fresh 4-player random skirmish with an AI ally on my team (no save on this machine
+is a non-campaign game; the campaign saves are refused as content not available).
 
-Not started, because no save on this machine reaches them (every save but `test` is the
-refused "The Enemy Revealed" campaign): player menu, gift town, send resource, marketplace,
-post-battle, post-adventure result and stats, the random event, custom message and dialogue
-sources, the in-game chat, the mod options dialog from the pause menu.
+Not verified, for want of game data: the random event, custom message and dialogue sources;
+the in-game chat; the mod options dialog opened from the pause menu.
 
 ## Screens to test, and what to watch for
 
@@ -45,6 +47,20 @@ sources, the in-game chat, the mod options dialog from the pause menu.
   categories; Close is a mod-authored last node.
 - **Mini menu** (Enter on an owned entity): heading, details, actions, close; the stored
   wielder is one button that ejects; Escape is the game's.
+- **Players menu** (co-op): a table with Allies and Enemies regions; Right on an ally row
+  reaches its Resources and Towns buttons; the ally's resource summary is a stop that follows
+  the row you are on; Close is the last node; Escape is the game's.
+- **Gift town, send resource**: bands of buttons, the amount and any refusal reason read as
+  parts; Escape presses the drawn close cross.
+- **Marketplace** (a court of trade or an owned marketplace): a table of resource rows with
+  Sell -1, Sell -5, Purchase +1, Purchase +5 columns whose cells are the price buttons; there is
+  no Gold row (gold is the currency); Escape closes.
+- **Post-battle**: attacker stop, defender stop, loot, then Manual Battle and Accept; the
+  outcome is the screen name; Escape confirms (the game's binding).
+- **Post-adventure result**: title, description or objectives, Statistics, then Main Menu and
+  Load game in drawn order, then the player statistics link; no Escape.
+- **Post-adventure statistics**: the graph type is a combo box opening a drop list, teams are
+  checkboxes, the rounds table is a sheet under a heading band; the close cross is the last stop.
 
 ## Decisions taken in your absence
 
@@ -56,10 +72,9 @@ sources, the in-game chat, the mod options dialog from the pause menu.
 - Level up says "New Level. level 13" and "Archery. level 1" through the existing lowercase
   "level {0}" ModString instead of the old hard-coded "Level".
 - Purchase wielder rows say "owned" / "dead" through two new ModStrings; the cost line is
-  composed from the game's resource names.
+  composed from the game's resource names. The players menu reuses "dead".
 - Build menu requirement rows read "Peasant hut, missing" rather than "Missing Peasant hut,
-  missing"; `ModStrings.Screens.Missing`, `WorldConfirmationMenu`, `Previous`, `Next`,
-  `EjectWielder`, `Description` are now unused and left for the phase G cleanup.
+  missing"; nine ModStrings are now unused and left for the phase G cleanup.
 - Research rows no longer hand out tooltip actions (Enter is the buy).
 - In the tables a building row reads count after the name (the sheet always walks the primary
   cell first, though the count is drawn to its left); the "Claimed" catch-all header is a plain
@@ -67,13 +82,24 @@ sources, the in-game chat, the mod options dialog from the pause menu.
 - The mini menu has no screen name: its heading is the start node and already says the name.
 - The owned entities table reads tier texts as the game wrote them, so the prefab's "9999" and
   "1/4" placeholders on the claimed rows are silent.
+- The players menu keeps the non-aggression pact button as a row cell; the local player's own
+  disabled name button is not declared.
+- The gift town and send resource buttons carry no tooltip section: their parts come from the
+  tooltip and a section would read them twice.
+- The marketplace lost its Gold row (the game draws none); the column captions are composed
+  "Sell -1" through a new ModString from the game's two drawn captions.
+- Post-adventure stats: the 13 graph types live in the drop list, not on the page.
 
 ## Needs your attention
 
 - Real-key walks: none done by me (the `/key` route takes the desktop's focus).
-- The remaining screens need a fresh skirmish or co-op game; say whether to start one, or
-  point me at a save from another machine.
 - The story text buffer duplication above: keep, or drop the joined line?
 - The lowercase "level 13" wording on the level-up page: keep, or a capitalised ModString?
+- Returning from a child screen (a drop list, a popup) re-announces the page's name
+  ("Players", "Conquest"): a manager behaviour, present since phase B. Wanted, or a phase F fix?
+- Pressing a button that leaves the page can speak a stray "unavailable" as the page fades
+  (Statistics on the result page, Quit to Main Menu); the same class as the phase B stray line.
+- A hot reload while the post-battle screen is open loses the patch's bookkeeping, so the mod
+  does not notice the Accept afterwards until the next reload (dev loop only).
 - Research and build menu were captured with no owned research building and an empty site;
-  the marketplace-owning and research-owning variants are unmeasured.
+  the marketplace only as a standalone court of trade with nothing tradeable.

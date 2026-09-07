@@ -290,50 +290,44 @@ recipient selector) and codex, the mod options dialog opened from the pause menu
 
 ### Phase C â€” in-game menus, popups, forms and tables
 
-Ported 2026-09-07, each verified by dump diff and injected keys (`docs/phase-c-handover.md`
-is the record; details per screen are in the commit messages and doc comments):
-`PauseMenuScreen`, `WorldConfirmMenuScreen`, `ClaimMenuScreen`, `TutorialSimpleScreen`,
-`TutorialSlideshowScreen` (ES2's pager, page turn by reflection), `StoryTextScreen` (three
-sources), `LevelUpScreen`, `PurchaseWielderScreen`, `ResearchScreen`, `BuildMenuScreen`,
-`OwnedEntitiesScreen`, `TroopOverviewScreen`, `MapEntityMiniMenuScreen`; the in-game codex,
-the save variant and the map message source verified on their shared classes. Landed with
-them: `ui/PointerHover.cs` (the pointer hover simulation, released on Stop),
-`GraphNavigator.FocusedIndex`, and `UITextMeshTextUtility.GetStringBuilderText` made public
-(what the game wrote, which the prefab's placeholder text can hide).
+Ported 2026-09-07, each verified by dump diff against its before-capture and by injected keys
+(`docs/phase-c-handover.md` is the record; details per screen are in the commit messages
+`4d0528e..` and the doc comments): `PauseMenuScreen`, `WorldConfirmMenuScreen`,
+`ClaimMenuScreen`, `TutorialSimpleScreen`, `TutorialSlideshowScreen` (ES2's pager, page turn
+by reflection), `StoryTextScreen` (three sources), `LevelUpScreen`, `PurchaseWielderScreen`,
+`ResearchScreen`, `BuildMenuScreen`, `OwnedEntitiesScreen`, `TroopOverviewScreen`,
+`MapEntityMiniMenuScreen`, `AdventurePlayerMenuScreen`, `GiftTownPopupScreen`,
+`SendResourcePopupScreen`, `MarketplaceScreen`, `PostBattleResultScreen`,
+`PostAdventureResultScreen`, `PostAdventureStatsScreen`; the in-game codex, the save variant
+and the map message source verified on their shared classes. Landed with them:
+`ui/PointerHover.cs` (the pointer hover simulation, released on Stop),
+`GraphNavigator.FocusedIndex`, `UITextMeshTextUtility.GetStringBuilderText` made public. The
+co-op, battle and post-game screens were captured and verified in a fresh 4-player random
+skirmish with an AI ally on the local team (every save on this machine is the refused "The
+Enemy Revealed" campaign); a battle is reached by walking the map cursor onto a neutral army
+and pressing the right-click action twice, the post-game pages by Surrender in the pause menu.
 
-Remaining, every one needing a game state the `test` save cannot give (every other save on this
-machine is the "The Enemy Revealed" campaign, refused as content not available):
-`AdventurePlayerMenuScreen`, `GiftTownPopupScreen`, `SendResourcePopupScreen` (a co-op game
-with an AI ally), `MarketplaceScreen` (an owned marketplace; `MarketplaceMenu.Show` refuses
-without one), `PostBattleResultScreen` (a battle), `PostAdventureResultScreen` and
-`PostAdventureStatsScreen` (a finished game), the random event and custom message sources of
-`MessageDialogScreen` and the dialogue source of `StoryTextScreen` (game data), the in-game
-chat selector (multiplayer), the mod options dialog opened from the pause menu. Their
-before-captures are still owed (Â§4 step 1) before they are touched. `SpellbookScreen` and
-`WorldChoiceMenuScreen` moved to phase D, where drag is introduced (owner, 2026-09-07).
+Still to verify in-game, each needing game data no reachable state produced today: the
+random event and custom message sources of `MessageDialogScreen` (`ICustomMessageMenu.Show`
+from the REPL drew the prefab's placeholder text) and the dialogue source of
+`StoryTextScreen` (campaign only), the in-game chat selector (multiplayer), the mod options
+dialog opened from the pause menu. `SpellbookScreen` and `WorldChoiceMenuScreen` moved to
+phase D, where drag is introduced (owner, 2026-09-07).
 
-Rulings that still apply to the remaining screens (owner, 2026-09-07): arrival selects only
-where it merely refills a details pane, Enter where the switch respawns content (the stats
-page's graph type); every closable screen ends with a close node, the drawn one where the game
-draws it, a mod-authored node running the game's hide path where it draws none (marketplace,
-player menu), none on the post-adventure result (the game offers no close); the player menu is
-a sheet whose cells are each row's own buttons, the marketplace a sheet of resource rows with
-the four fixed-amount trade buttons as cells (nothing to adjust); post-adventure stats is a
-combo box for the graph type opening the drop list, checkboxes per team, and the mod's
-rounds-by-teams table kept as a sheet (it has no tabs and shares nothing with
-`PlayerStatsScreen`); send resource amounts are fixed by config and drawn on the buttons.
-Escape from the code: the game's on the player menu, owned through
-`KingdomInformationHUD.ReregisterHotKeys`; on post-battle (Escape confirms) and the stats page;
-absent on the post-adventure result; claimed by the mod on gift town, send resource (only the
-gamepad Cancel is bound) and the marketplace (nothing bound, nothing drawn). To measure live:
-the player menu interleaves its Allies and Enemies headers by sibling index; which per-row
-buttons draw per variant (spectate battle is gamepad-only); the post-battle page's two-column
-layout and its redo countdown. No remaining adapter hands out the component behind its rows.
+Rules learned in this phase, for every later port: a `ControlId` is equal on its structural
+key alone, so rows built under one key with different components collide (index the key);
+a tooltip that is the SOURCE of a node's parts is not also a section (it would read twice);
+a screen whose start node is its heading gets no `ScreenName` (it would read twice); a
+hot reload while a natively-tracked menu is open loses the patch's static bookkeeping
+(`CombatPatches.ActivePostBattleMenus`), so the close of that menu is missed until the next
+reload; the REPL cannot name `AutoGeneratedDef` enums (go through `Enum.ToObject` on the
+parameter type) and fails with an internal compiler error when a top-level variable name is
+reused with another type in the same load.
 
-Phase C localization so far: `Screens.WielderDead`, `WielderOwned`, `TownStatus`,
-`TownStatusRounds` added and translated with their screens. Left unused for the phase G
-sweep: `Screens.Missing`, `WorldConfirmationMenu`, `Previous`, `Next`, `EjectWielder`,
-`Description`.
+Phase C localization: `Screens.WielderDead`, `WielderOwned`, `TownStatus`,
+`TownStatusRounds`, `MarketplaceTradeColumn` added and translated with their screens. Left
+unused for the phase G sweep: `Screens.Missing`, `WorldConfirmationMenu`, `Previous`, `Next`,
+`EjectWielder`, `Description`, `Teams`, `PostAdventureStats`, `BattleResult`.
 ### Phase D — composite grids (adds `Carry` and two-sided sheets)
 
 `CommanderSheetScreen` (inventory), `ArtifactMarketScreen` (inventory), `TradingScreen`
@@ -406,14 +400,7 @@ decision, until the owner approves it):
 | Screen | Widgets today | Proposed model | Phase |
 |---|---|---|---|
 | `WorldChoiceMenuScreen` | Menu, Buttons, Text, draggable TroopHudMenu | heading, body, choice rows, troop rows with carry, buttons | D |
-| `AdventurePlayerMenuScreen` | Menu, Buttons | sheet of players with the row's buttons as control cells | C |
-| `GiftTownPopupScreen` | Menu, Buttons | menu rows, buttons row | C |
-| `SendResourcePopupScreen` | Menu, Buttons | two bands of fixed-amount buttons, close | C |
-| `PostAdventureResultScreen` | Menu, Buttons, Text | text sections, buttons row | C |
-| `PostBattleResultScreen` | Menu, Buttons, Text | result sections, menu rows | C |
-| `MarketplaceScreen` | Menu, Buttons, Text | sheet: resource rows, the four trade buttons as cells; mod close node | C |
 | `SpellbookScreen` | Menu, DraggableMenu, Checkbox, Buttons | spell rows, quickbar with carry for reorder | D |
-| `PostAdventureStatsScreen` | Menu, Table, Buttons, Text | graph type combo box, team checkboxes, rounds sheet | C |
 | `TooltipActionsMenuScreen` | Menu | stays a widget screen until no unported screen hands out `TooltipAction`s; deleted in G | G |
 | `CommanderSheetScreen` | InventoryGrid, Menu, Buttons, Text | stats region, equipment sheet, backpack sheet, carry | D |
 | `ArtifactMarketScreen` | InventoryGrid, Menu, Buttons, Text | offers sheet, backpack sheet, carry or buy/sell activation | D |
