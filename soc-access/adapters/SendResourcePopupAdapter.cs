@@ -107,22 +107,6 @@ namespace SongsOfConquestAccess.Adapters
             };
         }
 
-        public bool Close()
-        {
-            if (_popup == null)
-            {
-                return false;
-            }
-
-            _popup.Hide();
-            return true;
-        }
-
-        public bool CanClose()
-        {
-            return IsPresent();
-        }
-
         /// <summary>The cross the popup draws at its top right. The game only draws it outside gamepad
         /// mode (<c>SendResourcePopup.Show</c>), so it is absent rather than merely refusing there.
         /// </summary>
@@ -149,11 +133,6 @@ namespace SongsOfConquestAccess.Adapters
         public void FocusClose()
         {
             NativeSelectionUtility.Select(GetField<UIButton>(CloseButtonField));
-        }
-
-        public void HideNativeTooltip()
-        {
-            NativeTooltipUtility.HideTooltip();
         }
 
         private ResourceItem BuildSendItem(ResourceType type, FieldInfo buttonField, FieldInfo tooltipButtonField)

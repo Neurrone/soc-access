@@ -124,13 +124,11 @@ namespace SongsOfConquestAccess.Adapters
             for (int i = 0; i < geometry.Count; i++)
             {
                 ColumnGeometry column = geometry[i];
-                UITextMesh caption = NearestByX(columnCaptions, column.Centre);
                 columns.Add(new TradeColumn(
                     column.IsBuyButton,
                     column.Amount,
                     GetText(NearestByX(bandCaptions, column.Centre)),
-                    GetText(caption),
-                    caption));
+                    GetText(NearestByX(columnCaptions, column.Centre))));
             }
 
             return columns;
@@ -432,13 +430,12 @@ namespace SongsOfConquestAccess.Adapters
         /// captions the menu draws over it.</summary>
         public sealed class TradeColumn
         {
-            public TradeColumn(bool isBuyButton, int amount, string bandCaption, string caption, Component captionComponent)
+            public TradeColumn(bool isBuyButton, int amount, string bandCaption, string caption)
             {
                 IsBuyButton = isBuyButton;
                 Amount = amount;
                 BandCaption = bandCaption ?? string.Empty;
                 Caption = caption ?? string.Empty;
-                CaptionComponent = captionComponent;
             }
 
             public bool IsBuyButton { get; private set; }
@@ -450,9 +447,6 @@ namespace SongsOfConquestAccess.Adapters
 
             /// <summary>The caption drawn directly over the column ("-1", "+5").</summary>
             public string Caption { get; private set; }
-
-            /// <summary>The text the caption is drawn as.</summary>
-            public Component CaptionComponent { get; private set; }
         }
 
         /// <summary>One crossing of the grid: the button the menu draws, and the price it draws on it.

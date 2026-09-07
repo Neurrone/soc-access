@@ -41,8 +41,6 @@ namespace SongsOfConquestAccess.Adapters
         private static readonly FieldInfo SelectedActionField = AccessTools.Field(typeof(BuildMenu), "_selectedAction");
         private static readonly FieldInfo AllSiblingsField = AccessTools.Field(typeof(BuildMenu), "_allSiblings");
         private static readonly FieldInfo SiblingIndexField = AccessTools.Field(typeof(BuildMenu), "_siblingIndex");
-        private static readonly FieldInfo BuildTimeTextField = AccessTools.Field(typeof(BuildMenu), "_buildTimeText");
-        private static readonly FieldInfo BuildSizeHeaderField = AccessTools.Field(typeof(BuildMenu), "_buildSizeHeader");
         private static readonly FieldInfo HeaderSectionField = AccessTools.Field(typeof(BuildMenu), "_headerSection");
         private static readonly FieldInfo PurchaseButtonField = AccessTools.Field(typeof(BuildMenu), "_purchaseButton");
         private static readonly FieldInfo PurchaseButtonContainerField = AccessTools.Field(typeof(BuildMenu), "_purchaseButtonContainer");
@@ -112,42 +110,12 @@ namespace SongsOfConquestAccess.Adapters
                 && GetField<object>(_menu, AsyncField) != null;
         }
 
-        public string CurrentStateKey
-        {
-            get
-            {
-                IMapEntity site = CurrentBuildSite;
-                BuildOnBuildSiteAction action = CurrentAction;
-                return (site != null ? site.Id.ToString() : "none")
-                    + "|"
-                    + SelectedCategory
-                    + "|"
-                    + (action != null ? action.BuildingBlueprintId.ToString() : "none");
-            }
-        }
-
         public BuildSiteSize SelectedCategory
         {
             get
             {
                 object value = SelectedCategoryField != null ? SelectedCategoryField.GetValue(_menu) : null;
                 return value is BuildSiteSize ? (BuildSiteSize)value : BuildSiteSize.Small;
-            }
-        }
-
-        public int SelectedCategoryIndex
-        {
-            get
-            {
-                switch (SelectedCategory)
-                {
-                    case BuildSiteSize.Medium:
-                        return 1;
-                    case BuildSiteSize.Large:
-                        return 2;
-                    default:
-                        return 0;
-                }
             }
         }
 
@@ -290,16 +258,6 @@ namespace SongsOfConquestAccess.Adapters
                 button as Component);
         }
 
-        public string BuildTimeText
-        {
-            get { return GetText(GetField<UITextMesh>(_menu, BuildTimeTextField)); }
-        }
-
-        public string BuildSizeHeader
-        {
-            get { return GetText(GetField<UITextMesh>(_menu, BuildSizeHeaderField)); }
-        }
-
         public IReadOnlyList<BuildingItem> GetBuildings()
         {
             List<BuildingItem> items = new List<BuildingItem>();
@@ -349,34 +307,25 @@ namespace SongsOfConquestAccess.Adapters
             }
         }
 
-        /// <summary>The building the pane is describing: its name and the description drawn under
-        /// it, one line per paragraph of that description.</summary>
-        public IList<string> SelectedBuildingSummaryLines
+        /// <summary>The name the pane draws for the building it is describing.</summary>
+        public string SelectedBuildingName
         {
             get
             {
                 BuildMenuHeaderSection header = GetField<BuildMenuHeaderSection>(_menu, HeaderSectionField);
-                string name = GetText(GetField<UITextMesh>(header, HeaderNameField));
-                IList<string> description = GetLines(GetField<UITextMesh>(header, HeaderDescriptionField));
-                List<string> lines = new List<string>();
-                string first = JoinParts(name, description.Count > 0 ? description[0] : null);
-                if (!string.IsNullOrWhiteSpace(first))
-                {
-                    lines.Add(first);
-                }
-
-                for (int i = 1; i < description.Count; i++)
-                {
-                    lines.Add(description[i]);
-                }
-
-                return lines;
+                return GetText(GetField<UITextMesh>(header, HeaderNameField));
             }
         }
 
-        public bool HasSelectedBuildingSummary()
+        /// <summary>The description the pane draws under that name, one line per paragraph of it.
+        /// </summary>
+        public IList<string> SelectedBuildingDescriptionLines
         {
-            return SelectedBuildingSummaryLines.Count > 0;
+            get
+            {
+                BuildMenuHeaderSection header = GetField<BuildMenuHeaderSection>(_menu, HeaderSectionField);
+                return GetLines(GetField<UITextMesh>(header, HeaderDescriptionField));
+            }
         }
 
         public int SelectedTier
@@ -543,16 +492,6 @@ namespace SongsOfConquestAccess.Adapters
         public string RequirementsHeader
         {
             get { return GetLocalizedText("Adventure/BuildMenu/Requirements", "Requirements"); }
-        }
-
-        public bool HasRequirements()
-        {
-            return GetRequirements().Count > 0;
-        }
-
-        public bool HasAvailableResearch()
-        {
-            return GetAvailableResearchItems().Count > 0;
         }
 
         public string CurrentTierCostText
@@ -1292,21 +1231,6 @@ namespace SongsOfConquestAccess.Adapters
         private string GetLocalizedText(string key, string fallback)
         {
             return SpeechTextSanitizer.Normalize(GameText.Get(_localization, key, fallback ?? string.Empty));
-        }
-
-        private static string JoinParts(string first, string second)
-        {
-            if (string.IsNullOrWhiteSpace(first))
-            {
-                return second ?? string.Empty;
-            }
-
-            if (string.IsNullOrWhiteSpace(second))
-            {
-                return first;
-            }
-
-            return first.TrimEnd('.') + ". " + second;
         }
 
         private string GetBuildSiteLabel(BuildSiteSize size)

@@ -74,12 +74,6 @@ namespace SongsOfConquestAccess.Adapters
             get { return GetText(GetField<UITextMesh>(_menu, NameTextField)); }
         }
 
-        /// <summary>The text the type name is drawn as.</summary>
-        public Component EntityNameComponent
-        {
-            get { return GetField<UITextMesh>(_menu, NameTextField); }
-        }
-
         /// <summary>The entity's own name ("Crowpoint"), drawn ABOVE the type name.</summary>
         public string CustomName
         {

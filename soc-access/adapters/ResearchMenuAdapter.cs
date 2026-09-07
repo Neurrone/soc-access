@@ -142,24 +142,6 @@ namespace SongsOfConquestAccess.Adapters
             return items;
         }
 
-        public int SelectedFactionMenuIndex
-        {
-            get
-            {
-                int selectedFactionIndex = SelectedFactionIndex;
-                IReadOnlyList<FactionItem> factions = GetFactions();
-                for (int i = 0; i < factions.Count; i++)
-                {
-                    if (factions[i].FactionIndex == selectedFactionIndex)
-                    {
-                        return i;
-                    }
-                }
-
-                return 0;
-            }
-        }
-
         public IReadOnlyList<BuildingItem> GetBuildings()
         {
             List<BuildingItem> items = new List<BuildingItem>();

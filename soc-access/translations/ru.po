@@ -780,11 +780,6 @@ msgctxt "Screens.BattleLog"
 msgid "Battle log"
 msgstr "Журнал боя"
 
-#. Screens.BattleResult
-msgctxt "Screens.BattleResult"
-msgid "Battle result"
-msgstr "Итог боя"
-
 #. Screens.Categories
 msgctxt "Screens.Categories"
 msgid "Categories"
@@ -855,11 +850,6 @@ msgctxt "Screens.DefendingWielderArmy"
 msgid "defending wielder army"
 msgstr "армия защищающегося героя"
 
-#. Screens.Description
-msgctxt "Screens.Description"
-msgid "Description"
-msgstr "Описание"
-
 #. Screens.DescriptionWithMissingBuilding
 msgctxt "Screens.DescriptionWithMissingBuilding"
 msgid "{0}. missing building"
@@ -884,11 +874,6 @@ msgstr "Загрузки"
 msgctxt "Screens.Empty"
 msgid "empty"
 msgstr "пусто"
-
-#. Screens.EjectWielder
-msgctxt "Screens.EjectWielder"
-msgid "Eject wielder"
-msgstr "Вывести героя"
 
 #. Screens.GraphType
 msgctxt "Screens.GraphType"
@@ -919,11 +904,6 @@ msgstr "Макет"
 msgctxt "Screens.MainMenu"
 msgid "Main menu"
 msgstr "Главное меню"
-
-#. Screens.Missing
-msgctxt "Screens.Missing"
-msgid "Missing {0}"
-msgstr "Не хватает {0}"
 
 #. Screens.MissingBuilding
 msgctxt "Screens.MissingBuilding"
@@ -969,11 +949,6 @@ msgstr "{0}, уровень {1}"
 msgctxt "Screens.NamedTabs"
 msgid "{0} {1}"
 msgstr "{0} {1}"
-
-#. Screens.Next
-msgctxt "Screens.Next"
-msgid "Next"
-msgstr "Далее"
 
 #. Screens.NoBuildSiteSelected
 msgctxt "Screens.NoBuildSiteSelected"
@@ -1045,20 +1020,10 @@ msgctxt "Screens.PostAdventureResult"
 msgid "Post adventure result"
 msgstr "Итог после приключения"
 
-#. Screens.PostAdventureStats
-msgctxt "Screens.PostAdventureStats"
-msgid "Post adventure stats"
-msgstr "Статистика после приключения"
-
 #. Screens.Penalties
 msgctxt "Screens.Penalties"
 msgid "Penalties"
 msgstr "Штрафы"
-
-#. Screens.Previous
-msgctxt "Screens.Previous"
-msgid "Previous"
-msgstr "Назад"
 
 #. Screens.Quickbar
 msgctxt "Screens.Quickbar"
@@ -1145,11 +1110,6 @@ msgctxt "Screens.TeamValue"
 msgid "Team {0}"
 msgstr "Команда {0}"
 
-#. Screens.Teams
-msgctxt "Screens.Teams"
-msgid "Teams"
-msgstr "Команды"
-
 #. Screens.TooltipActions
 msgctxt "Screens.TooltipActions"
 msgid "Tooltip actions"
@@ -1179,11 +1139,6 @@ msgstr "Башня {0}"
 msgctxt "Screens.Towers"
 msgid "Towers"
 msgstr "Башни"
-
-#. Screens.TroopLost
-msgctxt "Screens.TroopLost"
-msgid "{0} lost"
-msgstr "{0} потеряно"
 
 #. Screens.TroopDistribution
 msgctxt "Screens.TroopDistribution"
@@ -1249,11 +1204,6 @@ msgstr "категории модификаторов {0}"
 msgctxt "Screens.WorldChoiceMenu"
 msgid "World choice menu"
 msgstr "Меню выбора мира"
-
-#. Screens.WorldConfirmationMenu
-msgctxt "Screens.WorldConfirmationMenu"
-msgid "World confirmation menu"
-msgstr "Меню подтверждения мира"
 
 #. Screens.RemoveFromQuickbar
 msgctxt "Screens.RemoveFromQuickbar"

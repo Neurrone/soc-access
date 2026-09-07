@@ -760,11 +760,6 @@ msgctxt "Screens.BattleLog"
 msgid "Battle log"
 msgstr "Savaş günlüğü"
 
-#. Screens.BattleResult
-msgctxt "Screens.BattleResult"
-msgid "Battle result"
-msgstr "Savaş sonucu"
-
 #. Screens.Categories
 msgctxt "Screens.Categories"
 msgid "Categories"
@@ -835,11 +830,6 @@ msgctxt "Screens.DefendingWielderArmy"
 msgid "defending wielder army"
 msgstr "savunan wielder ordusu"
 
-#. Screens.Description
-msgctxt "Screens.Description"
-msgid "Description"
-msgstr "Açıklama"
-
 #. Screens.DescriptionWithMissingBuilding
 msgctxt "Screens.DescriptionWithMissingBuilding"
 msgid "{0}. missing building"
@@ -864,11 +854,6 @@ msgstr "İndirmeler"
 msgctxt "Screens.Empty"
 msgid "empty"
 msgstr "boş"
-
-#. Screens.EjectWielder
-msgctxt "Screens.EjectWielder"
-msgid "Eject wielder"
-msgstr "Wielderı çıkar"
 
 #. Screens.GraphType
 msgctxt "Screens.GraphType"
@@ -899,11 +884,6 @@ msgstr "Düzen"
 msgctxt "Screens.MainMenu"
 msgid "Main menu"
 msgstr "Ana menü"
-
-#. Screens.Missing
-msgctxt "Screens.Missing"
-msgid "Missing {0}"
-msgstr "{0} eksik"
 
 #. Screens.MissingBuilding
 msgctxt "Screens.MissingBuilding"
@@ -949,11 +929,6 @@ msgstr "{0}, seviye {1}"
 msgctxt "Screens.NamedTabs"
 msgid "{0} {1}"
 msgstr "{0} {1}"
-
-#. Screens.Next
-msgctxt "Screens.Next"
-msgid "Next"
-msgstr "Sonraki"
 
 #. Screens.NoBuildSiteSelected
 msgctxt "Screens.NoBuildSiteSelected"
@@ -1025,20 +1000,10 @@ msgctxt "Screens.PostAdventureResult"
 msgid "Post adventure result"
 msgstr "Macera sonrası sonuç"
 
-#. Screens.PostAdventureStats
-msgctxt "Screens.PostAdventureStats"
-msgid "Post adventure stats"
-msgstr "Macera sonrası istatistikler"
-
 #. Screens.Penalties
 msgctxt "Screens.Penalties"
 msgid "Penalties"
 msgstr "Cezalar"
-
-#. Screens.Previous
-msgctxt "Screens.Previous"
-msgid "Previous"
-msgstr "Önceki"
 
 #. Screens.Quickbar
 msgctxt "Screens.Quickbar"
@@ -1125,11 +1090,6 @@ msgctxt "Screens.TeamValue"
 msgid "Team {0}"
 msgstr "Takım {0}"
 
-#. Screens.Teams
-msgctxt "Screens.Teams"
-msgid "Teams"
-msgstr "Takımlar"
-
 #. Screens.TooltipActions
 msgctxt "Screens.TooltipActions"
 msgid "Tooltip actions"
@@ -1159,11 +1119,6 @@ msgstr "Kule {0}"
 msgctxt "Screens.Towers"
 msgid "Towers"
 msgstr "Kuleler"
-
-#. Screens.TroopLost
-msgctxt "Screens.TroopLost"
-msgid "{0} lost"
-msgstr "{0} kaybedildi"
 
 #. Screens.TroopDistribution
 msgctxt "Screens.TroopDistribution"
@@ -1229,11 +1184,6 @@ msgstr "{0} değiştirici kategorileri"
 msgctxt "Screens.WorldChoiceMenu"
 msgid "World choice menu"
 msgstr "Dünya seçim menüsü"
-
-#. Screens.WorldConfirmationMenu
-msgctxt "Screens.WorldConfirmationMenu"
-msgid "World confirmation menu"
-msgstr "Dünya onay menüsü"
 
 #. Screens.RemoveFromQuickbar
 msgctxt "Screens.RemoveFromQuickbar"

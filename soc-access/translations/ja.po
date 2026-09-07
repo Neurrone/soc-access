@@ -760,11 +760,6 @@ msgctxt "Screens.BattleLog"
 msgid "Battle log"
 msgstr "戦闘ログ"
 
-#. Screens.BattleResult
-msgctxt "Screens.BattleResult"
-msgid "Battle result"
-msgstr "戦闘結果"
-
 #. Screens.Categories
 msgctxt "Screens.Categories"
 msgid "Categories"
@@ -835,11 +830,6 @@ msgctxt "Screens.DefendingWielderArmy"
 msgid "defending wielder army"
 msgstr "防御中のウィールダー軍"
 
-#. Screens.Description
-msgctxt "Screens.Description"
-msgid "Description"
-msgstr "説明"
-
 #. Screens.DescriptionWithMissingBuilding
 msgctxt "Screens.DescriptionWithMissingBuilding"
 msgid "{0}. missing building"
@@ -864,11 +854,6 @@ msgstr "ダウンロード"
 msgctxt "Screens.Empty"
 msgid "empty"
 msgstr "空"
-
-#. Screens.EjectWielder
-msgctxt "Screens.EjectWielder"
-msgid "Eject wielder"
-msgstr "ウィールダーを追い出す"
 
 #. Screens.GraphType
 msgctxt "Screens.GraphType"
@@ -899,11 +884,6 @@ msgstr "レイアウト"
 msgctxt "Screens.MainMenu"
 msgid "Main menu"
 msgstr "メインメニュー"
-
-#. Screens.Missing
-msgctxt "Screens.Missing"
-msgid "Missing {0}"
-msgstr "{0} が不足"
 
 #. Screens.MissingBuilding
 msgctxt "Screens.MissingBuilding"
@@ -949,11 +929,6 @@ msgstr "{0}、レベル {1}"
 msgctxt "Screens.NamedTabs"
 msgid "{0} {1}"
 msgstr "{0} {1}"
-
-#. Screens.Next
-msgctxt "Screens.Next"
-msgid "Next"
-msgstr "次へ"
 
 #. Screens.NoBuildSiteSelected
 msgctxt "Screens.NoBuildSiteSelected"
@@ -1025,20 +1000,10 @@ msgctxt "Screens.PostAdventureResult"
 msgid "Post adventure result"
 msgstr "冒険後の結果"
 
-#. Screens.PostAdventureStats
-msgctxt "Screens.PostAdventureStats"
-msgid "Post adventure stats"
-msgstr "冒険後の統計"
-
 #. Screens.Penalties
 msgctxt "Screens.Penalties"
 msgid "Penalties"
 msgstr "ペナルティ"
-
-#. Screens.Previous
-msgctxt "Screens.Previous"
-msgid "Previous"
-msgstr "前へ"
 
 #. Screens.Quickbar
 msgctxt "Screens.Quickbar"
@@ -1125,11 +1090,6 @@ msgctxt "Screens.TeamValue"
 msgid "Team {0}"
 msgstr "チーム {0}"
 
-#. Screens.Teams
-msgctxt "Screens.Teams"
-msgid "Teams"
-msgstr "チーム"
-
 #. Screens.TooltipActions
 msgctxt "Screens.TooltipActions"
 msgid "Tooltip actions"
@@ -1159,11 +1119,6 @@ msgstr "塔 {0}"
 msgctxt "Screens.Towers"
 msgid "Towers"
 msgstr "塔"
-
-#. Screens.TroopLost
-msgctxt "Screens.TroopLost"
-msgid "{0} lost"
-msgstr "{0} 喪失"
 
 #. Screens.TroopDistribution
 msgctxt "Screens.TroopDistribution"
@@ -1229,11 +1184,6 @@ msgstr "{0} の修正カテゴリ"
 msgctxt "Screens.WorldChoiceMenu"
 msgid "World choice menu"
 msgstr "ワールド選択メニュー"
-
-#. Screens.WorldConfirmationMenu
-msgctxt "Screens.WorldConfirmationMenu"
-msgid "World confirmation menu"
-msgstr "ワールド確認メニュー"
 
 #. Screens.RemoveFromQuickbar
 msgctxt "Screens.RemoveFromQuickbar"

@@ -760,11 +760,6 @@ msgctxt "Screens.BattleLog"
 msgid "Battle log"
 msgstr "전투 기록"
 
-#. Screens.BattleResult
-msgctxt "Screens.BattleResult"
-msgid "Battle result"
-msgstr "전투 결과"
-
 #. Screens.Categories
 msgctxt "Screens.Categories"
 msgid "Categories"
@@ -835,11 +830,6 @@ msgctxt "Screens.DefendingWielderArmy"
 msgid "defending wielder army"
 msgstr "방어 중인 위더 군대"
 
-#. Screens.Description
-msgctxt "Screens.Description"
-msgid "Description"
-msgstr "설명"
-
 #. Screens.DescriptionWithMissingBuilding
 msgctxt "Screens.DescriptionWithMissingBuilding"
 msgid "{0}. missing building"
@@ -864,11 +854,6 @@ msgstr "다운로드"
 msgctxt "Screens.Empty"
 msgid "empty"
 msgstr "비어 있음"
-
-#. Screens.EjectWielder
-msgctxt "Screens.EjectWielder"
-msgid "Eject wielder"
-msgstr "위더 내보내기"
 
 #. Screens.GraphType
 msgctxt "Screens.GraphType"
@@ -899,11 +884,6 @@ msgstr "레이아웃"
 msgctxt "Screens.MainMenu"
 msgid "Main menu"
 msgstr "주 메뉴"
-
-#. Screens.Missing
-msgctxt "Screens.Missing"
-msgid "Missing {0}"
-msgstr "{0} 부족"
 
 #. Screens.MissingBuilding
 msgctxt "Screens.MissingBuilding"
@@ -949,11 +929,6 @@ msgstr "{0}, 레벨 {1}"
 msgctxt "Screens.NamedTabs"
 msgid "{0} {1}"
 msgstr "{0} {1}"
-
-#. Screens.Next
-msgctxt "Screens.Next"
-msgid "Next"
-msgstr "다음"
 
 #. Screens.NoBuildSiteSelected
 msgctxt "Screens.NoBuildSiteSelected"
@@ -1025,20 +1000,10 @@ msgctxt "Screens.PostAdventureResult"
 msgid "Post adventure result"
 msgstr "모험 후 결과"
 
-#. Screens.PostAdventureStats
-msgctxt "Screens.PostAdventureStats"
-msgid "Post adventure stats"
-msgstr "모험 후 통계"
-
 #. Screens.Penalties
 msgctxt "Screens.Penalties"
 msgid "Penalties"
 msgstr "불이익"
-
-#. Screens.Previous
-msgctxt "Screens.Previous"
-msgid "Previous"
-msgstr "이전"
 
 #. Screens.Quickbar
 msgctxt "Screens.Quickbar"
@@ -1125,11 +1090,6 @@ msgctxt "Screens.TeamValue"
 msgid "Team {0}"
 msgstr "팀 {0}"
 
-#. Screens.Teams
-msgctxt "Screens.Teams"
-msgid "Teams"
-msgstr "팀"
-
 #. Screens.TooltipActions
 msgctxt "Screens.TooltipActions"
 msgid "Tooltip actions"
@@ -1159,11 +1119,6 @@ msgstr "탑 {0}"
 msgctxt "Screens.Towers"
 msgid "Towers"
 msgstr "탑"
-
-#. Screens.TroopLost
-msgctxt "Screens.TroopLost"
-msgid "{0} lost"
-msgstr "{0} 손실"
 
 #. Screens.TroopDistribution
 msgctxt "Screens.TroopDistribution"
@@ -1229,11 +1184,6 @@ msgstr "{0}의 수정치 범주"
 msgctxt "Screens.WorldChoiceMenu"
 msgid "World choice menu"
 msgstr "세계 선택 메뉴"
-
-#. Screens.WorldConfirmationMenu
-msgctxt "Screens.WorldConfirmationMenu"
-msgid "World confirmation menu"
-msgstr "세계 확인 메뉴"
 
 #. Screens.RemoveFromQuickbar
 msgctxt "Screens.RemoveFromQuickbar"

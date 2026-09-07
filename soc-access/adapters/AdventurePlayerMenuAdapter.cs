@@ -24,8 +24,6 @@ namespace SongsOfConquestAccess.Adapters
     {
         private static readonly FieldInfo AdventureFacadeField =
             AccessTools.Field(typeof(AdventurePlayerMenu), "_adventureFacade");
-        private static readonly FieldInfo UiBlockerField =
-            AccessTools.Field(typeof(AdventurePlayerMenu), "_uiBlocker");
         private static readonly FieldInfo AllyHeaderField =
             AccessTools.Field(typeof(AdventurePlayerMenu), "_allyHeader");
         private static readonly FieldInfo EnemyHeaderField =
@@ -236,8 +234,6 @@ namespace SongsOfConquestAccess.Adapters
                 AccessTools.Field(typeof(AdventurePlayerMenuEntry), "_nameButton");
             private static readonly FieldInfo ResourceButtonField =
                 AccessTools.Field(typeof(AdventurePlayerMenuEntry), "_resourceButton");
-            private static readonly FieldInfo ResourcesContainerField =
-                AccessTools.Field(typeof(AdventurePlayerMenuEntry), "_resourcesContainer");
             private static readonly FieldInfo GoldAmountField =
                 AccessTools.Field(typeof(AdventurePlayerMenuEntry), "_goldAmount");
             private static readonly FieldInfo GoldIncomeField =

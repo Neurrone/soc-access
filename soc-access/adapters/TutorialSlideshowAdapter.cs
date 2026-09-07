@@ -21,10 +21,6 @@ namespace SongsOfConquestAccess.Adapters
             AccessTools.FieldRefAccess<TutorialMenu, UITextMesh>("_tutorialEntryHeaderText");
         private static readonly AccessTools.FieldRef<TutorialMenu, UITextMesh> DescriptionTextRef =
             AccessTools.FieldRefAccess<TutorialMenu, UITextMesh>("_tutorialEntryDescriptionText");
-        private static readonly AccessTools.FieldRef<TutorialMenu, UIButton> PageLeftButtonRef =
-            AccessTools.FieldRefAccess<TutorialMenu, UIButton>("_pageLeftButton");
-        private static readonly AccessTools.FieldRef<TutorialMenu, UIButton> PageRightButtonRef =
-            AccessTools.FieldRefAccess<TutorialMenu, UIButton>("_pageRightButton");
         private static readonly AccessTools.FieldRef<TutorialMenu, UIToggle> TutorialsToggleRef =
             AccessTools.FieldRefAccess<TutorialMenu, UIToggle>("_tutorialsToggle");
         private static readonly AccessTools.FieldRef<TutorialMenu, UIButton> CloseButtonRef =
@@ -153,16 +149,6 @@ namespace SongsOfConquestAccess.Adapters
             }
         }
 
-        public bool IsPreviousAvailable()
-        {
-            return IsButtonAvailable(PageLeftButtonRef(_menu));
-        }
-
-        public bool IsNextAvailable()
-        {
-            return IsButtonAvailable(PageRightButtonRef(_menu));
-        }
-
         /// <summary>Whether the game is drawing the closing button at all.</summary>
         public bool IsCloseVisible()
         {
@@ -182,16 +168,6 @@ namespace SongsOfConquestAccess.Adapters
         {
             UIToggle toggle = TutorialsToggleRef(_menu);
             return toggle != null && toggle.ToggleValue;
-        }
-
-        public bool ActivatePrevious()
-        {
-            return InvokeButton(PageLeftButtonRef(_menu));
-        }
-
-        public bool ActivateNext()
-        {
-            return InvokeButton(PageRightButtonRef(_menu));
         }
 
         public bool ActivateClose()

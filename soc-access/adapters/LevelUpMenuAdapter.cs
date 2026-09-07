@@ -137,22 +137,6 @@ namespace SongsOfConquestAccess.Adapters
             return GetText(_settings != null ? _settings.ReachedMaxXPText : null);
         }
 
-        public bool Close()
-        {
-            if (_menu == null)
-            {
-                return false;
-            }
-
-            _menu.ForceClose();
-            return true;
-        }
-
-        public void HideNativeTooltip()
-        {
-            NativeTooltipUtility.HideTooltip();
-        }
-
         public IReadOnlyList<StatItem> GetStats()
         {
             List<StatItem> items = new List<StatItem>();

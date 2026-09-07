@@ -81,11 +81,6 @@ namespace SongsOfConquestAccess.Adapters
             return panel != null ? new CommunityMapsModalAdapter(panel) : null;
         }
 
-        public static bool HasActiveModal()
-        {
-            return GetActivePanel() != null;
-        }
-
         private static CommunityMapsModalAdapter TryCreateConfirmUninstall()
         {
             ConfirmUninstallPanel confirmUninstall = GetActiveConfirmUninstallPanel();

@@ -95,16 +95,6 @@ namespace SongsOfConquestAccess.Adapters
             get { return GetText(GetField<UITextMesh>(_menu, WielderListTitleField)); }
         }
 
-        public string SelectedEntryId
-        {
-            get
-            {
-                IReadOnlyList<EntryItem> entries = GetEntries();
-                int index = SelectedEntryIndex;
-                return index >= 0 && index < entries.Count ? entries[index].Id : string.Empty;
-            }
-        }
-
         public int SelectedEntryIndex
         {
             get
@@ -114,54 +104,30 @@ namespace SongsOfConquestAccess.Adapters
             }
         }
 
-        /// <summary>The candidate the pane is describing: the name, the level and the description
-        /// the pane draws under them, one line per paragraph of that description.</summary>
-        public IList<string> SelectedSummaryLines
+        /// <summary>The name the pane draws for the candidate it is describing.</summary>
+        public string SelectedName
+        {
+            get { return GetText(GetField<UITextMesh>(GetDetails(), DetailsNameField)); }
+        }
+
+        /// <summary>The level the pane draws beside that name, or empty while the pane hides it.
+        /// </summary>
+        public string SelectedLevel
         {
             get
             {
                 PurchaseWielderDetails details = GetDetails();
-                string name = GetText(GetField<UITextMesh>(details, DetailsNameField));
-                IList<string> description = GetLines(GetField<UITextMesh>(details, DetailsDescriptionField));
-                string level = IsVisible(GetField<GameObject>(details, DetailsLevelContainerField))
+                return IsVisible(GetField<GameObject>(details, DetailsLevelContainerField))
                     ? GetText(GetField<UITextMesh>(details, DetailsLevelTextField))
                     : string.Empty;
-                List<string> parts = new List<string>();
-                AddIfNotEmpty(parts, name);
-                if (!string.IsNullOrWhiteSpace(level))
-                {
-                    parts.Add(ModText.Get(ModStrings.Screens.LevelValue, level));
-                }
-
-                if (description.Count > 0)
-                {
-                    parts.Add(description[0]);
-                }
-
-                List<string> lines = new List<string>();
-                AddIfNotEmpty(lines, JoinSentences(parts));
-                for (int i = 1; i < description.Count; i++)
-                {
-                    lines.Add(description[i]);
-                }
-
-                return lines;
             }
         }
 
-        public string StatsHeader
+        /// <summary>The description the pane draws under the name, one line per paragraph of it.
+        /// </summary>
+        public IList<string> SelectedDescriptionLines
         {
-            get { return GetLocalizedText("Common/CommanderInventory/Stats", "Stats"); }
-        }
-
-        public string TroopsHeader
-        {
-            get { return GetLocalizedText("Adventure/PurchaseWielderMenu/TroopsAtStartHeader", "Troops"); }
-        }
-
-        public string SkillsHeader
-        {
-            get { return GetLocalizedText("Commanders/Tooltip/Skills", "Skills"); }
+            get { return GetLines(GetField<UITextMesh>(GetDetails(), DetailsDescriptionField)); }
         }
 
         public string OffenceHeader
@@ -182,20 +148,6 @@ namespace SongsOfConquestAccess.Adapters
         public string ViewRadiusHeader
         {
             get { return GetLocalizedText("Commanders/Tooltip/ViewRadius", "View radius"); }
-        }
-
-        public string StatsSummary
-        {
-            get
-            {
-                return JoinSentences(new List<string>
-                {
-                    OffenceHeader + " " + Offence,
-                    DefenceHeader + " " + Defence,
-                    MovementHeader + " " + Movement,
-                    ViewRadiusHeader + " " + ViewRadius
-                });
-            }
         }
 
         public string Offence
@@ -618,32 +570,10 @@ namespace SongsOfConquestAccess.Adapters
             return value is int ? (int)value : 0;
         }
 
-        private static void AddIfNotEmpty(List<string> parts, string value)
-        {
-            if (!string.IsNullOrWhiteSpace(value))
-            {
-                parts.Add(value);
-            }
-        }
-
         // A text mesh the game may have written more than one paragraph into.
         private static IList<string> GetLines(IUITextMesh textMesh)
         {
             return SpokenLines.Of(new[] { UITextMeshTextUtility.GetEffectiveText(textMesh) });
-        }
-
-        private static string JoinSentences(List<string> parts)
-        {
-            List<string> filtered = new List<string>();
-            for (int i = 0; i < parts.Count; i++)
-            {
-                if (!string.IsNullOrWhiteSpace(parts[i]))
-                {
-                    filtered.Add(parts[i]);
-                }
-            }
-
-            return string.Join(". ", filtered.ToArray());
         }
 
         private static bool IsVisible(Component component)

@@ -233,12 +233,12 @@ namespace SongsOfConquestAccess.Screens
 
         private void BuildDetails(GraphBuilder builder)
         {
-            if (_adapter.HasSelectedBuildingSummary())
+            if (SelectedBuildingSummaryLines().Count > 0)
             {
                 // One spoken line, one review-buffer line per paragraph the game wrote it in.
                 builder.AddItem(new SyntheticNode(
                     ControlId.For(Marker("summary"), "build:summary"),
-                    GraphNodes.Paragraphs(() => _adapter.SelectedBuildingSummaryLines)));
+                    GraphNodes.Paragraphs(SelectedBuildingSummaryLines)));
             }
 
             BuildTiers(builder);
@@ -262,6 +262,44 @@ namespace SongsOfConquestAccess.Screens
             }
 
             BuildPurchase(builder);
+        }
+
+        /// <summary>The building the pane is describing, read as the player sees it: the name and the
+        /// opening paragraph of the description as one line, then a line per further paragraph.
+        /// </summary>
+        private IList<string> SelectedBuildingSummaryLines()
+        {
+            IList<string> description = _adapter.SelectedBuildingDescriptionLines;
+            List<string> lines = new List<string>();
+            string first = JoinParts(
+                _adapter.SelectedBuildingName,
+                description.Count > 0 ? description[0] : null);
+            if (!string.IsNullOrWhiteSpace(first))
+            {
+                lines.Add(first);
+            }
+
+            for (int i = 1; i < description.Count; i++)
+            {
+                lines.Add(description[i]);
+            }
+
+            return lines;
+        }
+
+        private static string JoinParts(string first, string second)
+        {
+            if (string.IsNullOrWhiteSpace(first))
+            {
+                return second ?? string.Empty;
+            }
+
+            if (string.IsNullOrWhiteSpace(second))
+            {
+                return first;
+            }
+
+            return first.TrimEnd('.') + ". " + second;
         }
 
         private void BuildTiers(GraphBuilder builder)

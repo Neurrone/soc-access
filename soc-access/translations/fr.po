@@ -760,11 +760,6 @@ msgctxt "Screens.BattleLog"
 msgid "Battle log"
 msgstr "Journal de combat"
 
-#. Screens.BattleResult
-msgctxt "Screens.BattleResult"
-msgid "Battle result"
-msgstr "Résultat de bataille"
-
 #. Screens.Categories
 msgctxt "Screens.Categories"
 msgid "Categories"
@@ -835,11 +830,6 @@ msgctxt "Screens.DefendingWielderArmy"
 msgid "defending wielder army"
 msgstr "armée du porteur défenseur"
 
-#. Screens.Description
-msgctxt "Screens.Description"
-msgid "Description"
-msgstr "Description"
-
 #. Screens.DescriptionWithMissingBuilding
 msgctxt "Screens.DescriptionWithMissingBuilding"
 msgid "{0}. missing building"
@@ -864,11 +854,6 @@ msgstr "Téléchargements"
 msgctxt "Screens.Empty"
 msgid "empty"
 msgstr "vide"
-
-#. Screens.EjectWielder
-msgctxt "Screens.EjectWielder"
-msgid "Eject wielder"
-msgstr "Éjecter le porteur"
 
 #. Screens.GraphType
 msgctxt "Screens.GraphType"
@@ -899,11 +884,6 @@ msgstr "Disposition"
 msgctxt "Screens.MainMenu"
 msgid "Main menu"
 msgstr "Menu principal"
-
-#. Screens.Missing
-msgctxt "Screens.Missing"
-msgid "Missing {0}"
-msgstr "{0} manquant"
 
 #. Screens.MissingBuilding
 msgctxt "Screens.MissingBuilding"
@@ -949,11 +929,6 @@ msgstr "{0}, niveau {1}"
 msgctxt "Screens.NamedTabs"
 msgid "{0} {1}"
 msgstr "{0} {1}"
-
-#. Screens.Next
-msgctxt "Screens.Next"
-msgid "Next"
-msgstr "Suivant"
 
 #. Screens.NoBuildSiteSelected
 msgctxt "Screens.NoBuildSiteSelected"
@@ -1025,20 +1000,10 @@ msgctxt "Screens.PostAdventureResult"
 msgid "Post adventure result"
 msgstr "Résultat après aventure"
 
-#. Screens.PostAdventureStats
-msgctxt "Screens.PostAdventureStats"
-msgid "Post adventure stats"
-msgstr "Statistiques après aventure"
-
 #. Screens.Penalties
 msgctxt "Screens.Penalties"
 msgid "Penalties"
 msgstr "Pénalités"
-
-#. Screens.Previous
-msgctxt "Screens.Previous"
-msgid "Previous"
-msgstr "Précédent"
 
 #. Screens.Quickbar
 msgctxt "Screens.Quickbar"
@@ -1125,11 +1090,6 @@ msgctxt "Screens.TeamValue"
 msgid "Team {0}"
 msgstr "Équipe {0}"
 
-#. Screens.Teams
-msgctxt "Screens.Teams"
-msgid "Teams"
-msgstr "Équipes"
-
 #. Screens.TooltipActions
 msgctxt "Screens.TooltipActions"
 msgid "Tooltip actions"
@@ -1159,11 +1119,6 @@ msgstr "Tour {0}"
 msgctxt "Screens.Towers"
 msgid "Towers"
 msgstr "Tours"
-
-#. Screens.TroopLost
-msgctxt "Screens.TroopLost"
-msgid "{0} lost"
-msgstr "{0} perdu"
 
 #. Screens.TroopDistribution
 msgctxt "Screens.TroopDistribution"
@@ -1229,11 +1184,6 @@ msgstr "catégories modificateurs de {0}"
 msgctxt "Screens.WorldChoiceMenu"
 msgid "World choice menu"
 msgstr "Menu choix du monde"
-
-#. Screens.WorldConfirmationMenu
-msgctxt "Screens.WorldConfirmationMenu"
-msgid "World confirmation menu"
-msgstr "Menu confirmation du monde"
 
 #. Common.TileCount_0
 msgctxt "Common.TileCount_0"

@@ -159,7 +159,7 @@ namespace SongsOfConquestAccess.Screens
 
         private void BuildDetails(GraphBuilder builder)
         {
-            AddParagraphs(builder, "summary", () => _adapter.SelectedSummaryLines);
+            AddParagraphs(builder, "summary", SelectedSummaryLines);
             AddStat(builder, "offence", () => _adapter.OffenceHeader, () => _adapter.Offence);
             AddStat(builder, "defence", () => _adapter.DefenceHeader, () => _adapter.Defence);
             AddStat(builder, "movement", () => _adapter.MovementHeader, () => _adapter.Movement);
@@ -177,6 +177,53 @@ namespace SongsOfConquestAccess.Screens
             }
 
             BuildPurchase(builder);
+        }
+
+        /// <summary>The candidate the pane is describing, read as the player sees it: the name, the
+        /// level and the description's opening paragraph as one line, then a line per further
+        /// paragraph.</summary>
+        private IList<string> SelectedSummaryLines()
+        {
+            IList<string> description = _adapter.SelectedDescriptionLines;
+            List<string> parts = new List<string> { _adapter.SelectedName };
+            string level = _adapter.SelectedLevel;
+            if (!string.IsNullOrWhiteSpace(level))
+            {
+                parts.Add(ModText.Get(ModStrings.Screens.LevelValue, level));
+            }
+
+            if (description.Count > 0)
+            {
+                parts.Add(description[0]);
+            }
+
+            List<string> lines = new List<string>();
+            string first = JoinSentences(parts);
+            if (!string.IsNullOrWhiteSpace(first))
+            {
+                lines.Add(first);
+            }
+
+            for (int i = 1; i < description.Count; i++)
+            {
+                lines.Add(description[i]);
+            }
+
+            return lines;
+        }
+
+        private static string JoinSentences(List<string> parts)
+        {
+            List<string> filtered = new List<string>();
+            for (int i = 0; i < parts.Count; i++)
+            {
+                if (!string.IsNullOrWhiteSpace(parts[i]))
+                {
+                    filtered.Add(parts[i]);
+                }
+            }
+
+            return string.Join(". ", filtered.ToArray());
         }
 
         private void BuildTroops(GraphBuilder builder)

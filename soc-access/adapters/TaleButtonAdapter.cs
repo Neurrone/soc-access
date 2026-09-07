@@ -15,12 +15,8 @@ namespace SongsOfConquestAccess.Adapters
 {
     public sealed class TaleButtonAdapter : IMenuButtonAdapter
     {
-        private static readonly AccessTools.FieldRef<TaleButton, AddonProfile> AddonProfileRef =
-            AccessTools.FieldRefAccess<TaleButton, AddonProfile>("_addonProfile");
         private static readonly AccessTools.FieldRef<TaleButton, UIButton> MainButtonRef =
             AccessTools.FieldRefAccess<TaleButton, UIButton>("_mainButton");
-        private static readonly AccessTools.FieldRef<TaleButton, string> CampaignIdentifierRef =
-            AccessTools.FieldRefAccess<TaleButton, string>("_campaignIdentifier");
         private static readonly AccessTools.FieldRef<TaleButton, UITextMesh> CampaignTitleRef =
             AccessTools.FieldRefAccess<TaleButton, UITextMesh>("_campaignTitle");
         private static readonly AccessTools.FieldRef<TaleButton, UITextMesh> CampaignDescriptionRef =

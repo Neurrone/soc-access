@@ -20,7 +20,6 @@ namespace SongsOfConquestAccess.Adapters
         private static readonly FieldInfo ActiveEntriesField = AccessTools.Field(typeof(SaveLoadGameMenu), "_activeEntries");
         private static readonly FieldInfo SelectedEntryField = AccessTools.Field(typeof(SaveLoadGameMenu), "_selectedSaveEntry");
         private static readonly MethodInfo TryCloseMethod = AccessTools.Method(typeof(SaveLoadGameMenu), "TryClose");
-        private static readonly MethodInfo SetupSelectedSaveMethod = AccessTools.Method(typeof(SaveLoadGameMenu), "SetupSelectedSave");
 
         private static readonly FieldInfo EntryButtonField = AccessTools.Field(typeof(SaveLoadGameMenuEntry), "_button");
         private static readonly FieldInfo EntrySelectedFrameField = AccessTools.Field(typeof(SaveLoadGameMenuEntry), "_selectedFrame");
@@ -135,13 +134,6 @@ namespace SongsOfConquestAccess.Adapters
         {
             SaveLoadGameMenu.Settings settings = Settings;
             return settings != null && settings.SaveDescriptionContainer != null && settings.SaveDescriptionContainer.activeInHierarchy;
-        }
-
-        public string GetSelectedSaveText()
-        {
-            SaveLoadGameMenu.Settings settings = Settings;
-            return SpeechTextSanitizer.Normalize(
-                UITextMeshTextUtility.GetEffectiveText(settings != null ? settings.SelectedSaveText : null));
         }
 
         // The menu's own verdict on the selected save: SetupSelectedSave ends on InvalidEntry when

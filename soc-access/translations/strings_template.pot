@@ -2359,11 +2359,6 @@ msgctxt "Screens.BattleLog"
 msgid "Battle log"
 msgstr ""
 
-#. Screens.BattleResult
-msgctxt "Screens.BattleResult"
-msgid "Battle result"
-msgstr ""
-
 #. Screens.Battle
 msgctxt "Screens.Battle"
 msgid "Battle"
@@ -2549,11 +2544,6 @@ msgctxt "Screens.DefendingWielderArmy"
 msgid "defending wielder army"
 msgstr ""
 
-#. Screens.Description
-msgctxt "Screens.Description"
-msgid "Description"
-msgstr ""
-
 #. Screens.DescriptionWithMissingBuilding
 msgctxt "Screens.DescriptionWithMissingBuilding"
 msgid "{0}. missing building"
@@ -2587,11 +2577,6 @@ msgstr ""
 #. Screens.Enabled
 msgctxt "Screens.Enabled"
 msgid "Enabled"
-msgstr ""
-
-#. Screens.EjectWielder
-msgctxt "Screens.EjectWielder"
-msgid "Eject wielder"
 msgstr ""
 
 #. Screens.EntityAnnouncements
@@ -2642,11 +2627,6 @@ msgstr ""
 #. Screens.MainMenu
 msgctxt "Screens.MainMenu"
 msgid "Main menu"
-msgstr ""
-
-#. Screens.Missing
-msgctxt "Screens.Missing"
-msgid "Missing {0}"
 msgstr ""
 
 #. Screens.MissingBuilding
@@ -2742,11 +2722,6 @@ msgstr ""
 #. Screens.NamedTabs
 msgctxt "Screens.NamedTabs"
 msgid "{0} {1}"
-msgstr ""
-
-#. Screens.Next
-msgctxt "Screens.Next"
-msgid "Next"
 msgstr ""
 
 #. Screens.NoBuildSiteSelected
@@ -2864,19 +2839,9 @@ msgctxt "Screens.PostAdventureResult"
 msgid "Post adventure result"
 msgstr ""
 
-#. Screens.PostAdventureStats
-msgctxt "Screens.PostAdventureStats"
-msgid "Post adventure stats"
-msgstr ""
-
 #. Screens.Penalties
 msgctxt "Screens.Penalties"
 msgid "Penalties"
-msgstr ""
-
-#. Screens.Previous
-msgctxt "Screens.Previous"
-msgid "Previous"
 msgstr ""
 
 #. Screens.Quickbar
@@ -3029,11 +2994,6 @@ msgctxt "Screens.TeamValue"
 msgid "Team {0}"
 msgstr ""
 
-#. Screens.Teams
-msgctxt "Screens.Teams"
-msgid "Teams"
-msgstr ""
-
 #. Screens.TileAnnouncements
 msgctxt "Screens.TileAnnouncements"
 msgid "Tile announcements"
@@ -3067,11 +3027,6 @@ msgstr ""
 #. Screens.Towers
 msgctxt "Screens.Towers"
 msgid "Towers"
-msgstr ""
-
-#. Screens.TroopLost
-msgctxt "Screens.TroopLost"
-msgid "{0} lost"
 msgstr ""
 
 #. Screens.TroopDistribution
@@ -3162,11 +3117,6 @@ msgstr ""
 #. Screens.WorldChoiceMenu
 msgctxt "Screens.WorldChoiceMenu"
 msgid "World choice menu"
-msgstr ""
-
-#. Screens.WorldConfirmationMenu
-msgctxt "Screens.WorldConfirmationMenu"
-msgid "World confirmation menu"
 msgstr ""
 
 #. Screens.MapEntityAnnouncements

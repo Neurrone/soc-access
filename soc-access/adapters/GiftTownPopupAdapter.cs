@@ -66,22 +66,6 @@ namespace SongsOfConquestAccess.Adapters
             return GetTownItems("request", GetField<Component>(RequestButtonParentField));
         }
 
-        public bool Close()
-        {
-            if (_popup == null)
-            {
-                return false;
-            }
-
-            _popup.Hide();
-            return true;
-        }
-
-        public bool CanClose()
-        {
-            return IsPresent();
-        }
-
         /// <summary>The cross the popup draws at its top right. The game only draws it outside gamepad
         /// mode (<c>GiftTownPopup.Show</c>), so it is absent rather than merely refusing there.</summary>
         public Component CloseButton
@@ -107,11 +91,6 @@ namespace SongsOfConquestAccess.Adapters
         public void FocusClose()
         {
             NativeSelectionUtility.Select(GetField<UIButton>(CloseButtonField));
-        }
-
-        public void HideNativeTooltip()
-        {
-            NativeTooltipUtility.HideTooltip();
         }
 
         private IReadOnlyList<TownItem> GetTownItems(string rowId, Component parent)
