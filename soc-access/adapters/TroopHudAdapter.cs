@@ -595,9 +595,22 @@ namespace SongsOfConquestAccess.Adapters
 
             /// <summary>Whether the game would let this troop be disbanded, which is what decides
             /// whether its right click does anything (<c>TroopHUDEntry.HandleRightClick</c>).</summary>
+            /// <summary>Whether the game would take a right click on this troop: its own disband rule,
+            /// and the entry's button being one the game lets a click reach (<c>UIButton.OnPointerClick</c>
+            /// returns on a non-interactable button, which a band inside a menu whose canvas group the
+            /// game never enabled draws; seen 2026-09-08 on the world choice prompt variant).</summary>
             public bool CanDisband
             {
-                get { return Entry != null && Entry.TroopDetails != null && Entry.TroopDetails.CanDisband; }
+                get
+                {
+                    if (Entry == null || Entry.TroopDetails == null || !Entry.TroopDetails.CanDisband)
+                    {
+                        return false;
+                    }
+
+                    IUIButton button = _adapter.GetEntryButton(Entry);
+                    return button != null && button.Active && button.Interactable;
+                }
             }
 
             /// <summary>The entry's own left click, delivered as the pointer delivers it. The game
