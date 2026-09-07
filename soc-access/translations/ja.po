@@ -145,20 +145,10 @@ msgctxt "Common.TileCount_0"
 msgid "{0} tile"
 msgstr "{0} タイル"
 
-#. Draft.EssenceVariants
-msgctxt "Draft.EssenceVariants"
-msgid "Essence variants"
-msgstr "エッセンスのバリエーション"
-
 #. Draft.Purchase
 msgctxt "Draft.Purchase"
 msgid "Purchase"
 msgstr "購入"
-
-#. Draft.PurchaseForResources
-msgctxt "Draft.PurchaseForResources"
-msgid "Purchase for {0}"
-msgstr "{0}で購入"
 
 #. Draft.AvailableTroops_0
 msgctxt "Draft.AvailableTroops_0"
@@ -174,11 +164,6 @@ msgstr "アップグレード"
 msgctxt "Draft.UpgradeChoice"
 msgid "{0} to {1}"
 msgstr "{0}から{1}へ"
-
-#. Draft.UpgradeForResources
-msgctxt "Draft.UpgradeForResources"
-msgid "Upgrade for {0}"
-msgstr "{0}でアップグレード"
 
 #. Draft.UpgradeAvailableTroops
 msgctxt "Draft.UpgradeAvailableTroops"
@@ -710,11 +695,6 @@ msgctxt "Screens.AdventureMap"
 msgid "Adventure map"
 msgstr "冒険マップ"
 
-#. Screens.Articles
-msgctxt "Screens.Articles"
-msgid "Articles"
-msgstr "記事"
-
 #. Screens.ArtifactDestroyHint
 msgctxt "Screens.ArtifactDestroyHint"
 msgid "{0} destroys."
@@ -825,22 +805,6 @@ msgctxt "Screens.DefenderEssence"
 msgid "Defender essence"
 msgstr "防御側エッセンス"
 
-#. Screens.DefendingWielderStatus
-msgctxt "Screens.DefendingWielderStatus"
-msgid "Defending wielder: {0}"
-msgstr "防御中のウィールダー: {0}"
-
-
-#. Screens.DescriptionWithMissingBuilding
-msgctxt "Screens.DescriptionWithMissingBuilding"
-msgid "{0}. missing building"
-msgstr "{0}。建物が不足"
-
-#. Screens.DisabledWithReason
-msgctxt "Screens.DisabledWithReason"
-msgid "{0}. {1}"
-msgstr "{0}。{1}"
-
 #. Screens.Downloads
 msgctxt "Screens.Downloads"
 msgid "Downloads"
@@ -886,11 +850,6 @@ msgctxt "Screens.MissingBuilding"
 msgid "missing building"
 msgstr "建物が不足"
 
-#. Screens.ModSettings
-msgctxt "Screens.ModSettings"
-msgid "Mod settings"
-msgstr "Mod 設定"
-
 #. Screens.ModOptions
 msgctxt "Screens.ModOptions"
 msgid "Mod options"
@@ -910,11 +869,6 @@ msgstr "複数エッセンス呪文"
 msgctxt "Screens.NamedLevel"
 msgid "{0}, level {1}"
 msgstr "{0}、レベル {1}"
-
-#. Screens.NamedTabs
-msgctxt "Screens.NamedTabs"
-msgid "{0} {1}"
-msgstr "{0} {1}"
 
 #. Screens.NoBuildSiteSelected
 msgctxt "Screens.NoBuildSiteSelected"
@@ -1006,6 +960,11 @@ msgctxt "Screens.RecruitingFrom"
 msgid "Recruiting from {0}"
 msgstr "{0} から募集"
 
+#. Screens.Recruits
+msgctxt "Screens.Recruits"
+msgid "Recruits"
+msgstr "募集兵"
+
 #. Screens.Remove
 msgctxt "Screens.Remove"
 msgid "Remove"
@@ -1015,11 +974,6 @@ msgstr "削除"
 msgctxt "Screens.RemoveKeyword"
 msgid "Remove keyword, {0}"
 msgstr "キーワードを削除、{0}"
-
-#. Screens.RenameCustomCategory
-msgctxt "Screens.RenameCustomCategory"
-msgid "Rename"
-msgstr "名前を変更"
 
 #. Screens.ResearchTier
 msgctxt "Screens.ResearchTier"
@@ -1046,11 +1000,6 @@ msgctxt "Screens.Skill"
 msgid "Skill {0}"
 msgstr "スキル {0}"
 
-#. Screens.SpellTier
-msgctxt "Screens.SpellTier"
-msgid "{0} tier {1}"
-msgstr "{0} ティア {1}"
-
 #. Screens.SpellbookAddToQuickbarHint
 msgctxt "Screens.SpellbookAddToQuickbarHint"
 msgid "{0} adds to quickbar"
@@ -1060,11 +1009,6 @@ msgstr "{0} でクイックバーに追加します。"
 msgctxt "Screens.SpellbookDropToRemove"
 msgid "Drop a spell here to remove it from the quickbar"
 msgstr "ここに呪文をドロップするとクイックバーから外れます"
-
-#. Screens.Tabs
-msgctxt "Screens.Tabs"
-msgid "Tabs"
-msgstr "タブ"
 
 #. Screens.TeamValue
 msgctxt "Screens.TeamValue"
@@ -1126,21 +1070,6 @@ msgctxt "Screens.TurnOrder"
 msgid "Turn order"
 msgstr "ターン順"
 
-#. Screens.Unavailable
-msgctxt "Screens.Unavailable"
-msgid "Unavailable"
-msgstr "利用不可"
-
-#. Screens.WielderArmyPossessive
-msgctxt "Screens.WielderArmyPossessive"
-msgid "{0}'s army"
-msgstr "{0} の軍"
-
-#. Screens.WielderArmy
-msgctxt "Screens.WielderArmy"
-msgid "wielder army"
-msgstr "ウィールダー軍"
-
 #. Screens.WielderDead
 msgctxt "Screens.WielderDead"
 msgid "dead"
@@ -1170,11 +1099,6 @@ msgstr "追加"
 msgctxt "Screens.AddKeyword"
 msgid "Add keyword"
 msgstr "キーワードを追加"
-
-#. Screens.AmountToUpgrade
-msgctxt "Screens.AmountToUpgrade"
-msgid "Amount to upgrade, {0}"
-msgstr "{0}のアップグレード数"
 
 #. Screens.UnknownSpell
 msgctxt "Screens.UnknownSpell"
@@ -2416,11 +2340,6 @@ msgctxt "Spatial.Unseen"
 msgid "Unseen"
 msgstr "見えない"
 
-#. Spatial.VisitedSuffix
-msgctxt "Spatial.VisitedSuffix"
-msgid "{0} (visited)"
-msgstr "{0} (訪問済み)"
-
 #. Spatial.WithinZoneOfControl
 msgctxt "Spatial.WithinZoneOfControl"
 msgid "Within {0} zone of control"
@@ -2756,25 +2675,10 @@ msgctxt "Screens.Battle"
 msgid "Battle"
 msgstr "バトル"
 
-#. Screens.BuyResourceForGold
-msgctxt "Screens.BuyResourceForGold"
-msgid "Buy {0} for {1}"
-msgstr "{1}で{0}を購入"
-
-#. Screens.TextEntryUnavailable
-msgctxt "Screens.TextEntryUnavailable"
-msgid "Text entry is not available here"
-msgstr "ここではテキスト入力を利用できません"
-
 #. Screens.Sell
 msgctxt "Screens.Sell"
 msgid "Sell"
 msgstr "売却"
-
-#. Screens.SellResourceForGold
-msgctxt "Screens.SellResourceForGold"
-msgid "Sell {0} for {1}"
-msgstr "{0}を{1}で売却"
 
 #. Scanner.Wielders
 msgctxt "Scanner.Wielders"
@@ -3510,11 +3414,6 @@ msgctxt "Screens.AnnouncementReachabilityOrRoutePreview"
 msgid "Reachability or route preview"
 msgstr "到達可能性またはルートプレビュー"
 
-#. Screens.AnnouncementRelationship
-msgctxt "Screens.AnnouncementRelationship"
-msgid "Relationship"
-msgstr "関係"
-
 #. Screens.AnnouncementSelected
 msgctxt "Screens.AnnouncementSelected"
 msgid "Selected"
@@ -3675,11 +3574,6 @@ msgstr "音声用語集"
 msgctxt "Screens.Duration"
 msgid "Duration"
 msgstr "長さ"
-
-#. Screens.PercentValue
-msgctxt "Screens.PercentValue"
-msgid "{0}%"
-msgstr "{0}%"
 
 #. Screens.Pitch
 msgctxt "Screens.Pitch"

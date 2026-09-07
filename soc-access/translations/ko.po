@@ -145,20 +145,10 @@ msgctxt "Common.TileCount_0"
 msgid "{0} tile"
 msgstr "{0}칸"
 
-#. Draft.EssenceVariants
-msgctxt "Draft.EssenceVariants"
-msgid "Essence variants"
-msgstr "정수 변형"
-
 #. Draft.Purchase
 msgctxt "Draft.Purchase"
 msgid "Purchase"
 msgstr "구매"
-
-#. Draft.PurchaseForResources
-msgctxt "Draft.PurchaseForResources"
-msgid "Purchase for {0}"
-msgstr "{0}(으)로 구매"
 
 #. Draft.AvailableTroops_0
 msgctxt "Draft.AvailableTroops_0"
@@ -174,11 +164,6 @@ msgstr "업그레이드"
 msgctxt "Draft.UpgradeChoice"
 msgid "{0} to {1}"
 msgstr "{0}에서 {1}로"
-
-#. Draft.UpgradeForResources
-msgctxt "Draft.UpgradeForResources"
-msgid "Upgrade for {0}"
-msgstr "{0}(으)로 업그레이드"
 
 #. Draft.UpgradeAvailableTroops
 msgctxt "Draft.UpgradeAvailableTroops"
@@ -710,11 +695,6 @@ msgctxt "Screens.AdventureMap"
 msgid "Adventure map"
 msgstr "모험 지도"
 
-#. Screens.Articles
-msgctxt "Screens.Articles"
-msgid "Articles"
-msgstr "문서"
-
 #. Screens.ArtifactDestroyHint
 msgctxt "Screens.ArtifactDestroyHint"
 msgid "{0} destroys."
@@ -825,22 +805,6 @@ msgctxt "Screens.DefenderEssence"
 msgid "Defender essence"
 msgstr "방어자 정수"
 
-#. Screens.DefendingWielderStatus
-msgctxt "Screens.DefendingWielderStatus"
-msgid "Defending wielder: {0}"
-msgstr "방어 중인 위더: {0}"
-
-
-#. Screens.DescriptionWithMissingBuilding
-msgctxt "Screens.DescriptionWithMissingBuilding"
-msgid "{0}. missing building"
-msgstr "{0}. 건물 부족"
-
-#. Screens.DisabledWithReason
-msgctxt "Screens.DisabledWithReason"
-msgid "{0}. {1}"
-msgstr "{0}. {1}"
-
 #. Screens.Downloads
 msgctxt "Screens.Downloads"
 msgid "Downloads"
@@ -886,11 +850,6 @@ msgctxt "Screens.MissingBuilding"
 msgid "missing building"
 msgstr "건물 부족"
 
-#. Screens.ModSettings
-msgctxt "Screens.ModSettings"
-msgid "Mod settings"
-msgstr "모드 설정"
-
 #. Screens.ModOptions
 msgctxt "Screens.ModOptions"
 msgid "Mod options"
@@ -910,11 +869,6 @@ msgstr "다중 정수 주문"
 msgctxt "Screens.NamedLevel"
 msgid "{0}, level {1}"
 msgstr "{0}, 레벨 {1}"
-
-#. Screens.NamedTabs
-msgctxt "Screens.NamedTabs"
-msgid "{0} {1}"
-msgstr "{0} {1}"
 
 #. Screens.NoBuildSiteSelected
 msgctxt "Screens.NoBuildSiteSelected"
@@ -1006,6 +960,11 @@ msgctxt "Screens.RecruitingFrom"
 msgid "Recruiting from {0}"
 msgstr "{0}에서 모집 중"
 
+#. Screens.Recruits
+msgctxt "Screens.Recruits"
+msgid "Recruits"
+msgstr "모집 병력"
+
 #. Screens.Remove
 msgctxt "Screens.Remove"
 msgid "Remove"
@@ -1015,11 +974,6 @@ msgstr "제거"
 msgctxt "Screens.RemoveKeyword"
 msgid "Remove keyword, {0}"
 msgstr "키워드 제거, {0}"
-
-#. Screens.RenameCustomCategory
-msgctxt "Screens.RenameCustomCategory"
-msgid "Rename"
-msgstr "이름 바꾸기"
 
 #. Screens.ResearchTier
 msgctxt "Screens.ResearchTier"
@@ -1046,11 +1000,6 @@ msgctxt "Screens.Skill"
 msgid "Skill {0}"
 msgstr "기술 {0}"
 
-#. Screens.SpellTier
-msgctxt "Screens.SpellTier"
-msgid "{0} tier {1}"
-msgstr "{0} 티어 {1}"
-
 #. Screens.SpellbookAddToQuickbarHint
 msgctxt "Screens.SpellbookAddToQuickbarHint"
 msgid "{0} adds to quickbar"
@@ -1060,11 +1009,6 @@ msgstr "{0} 키로 빠른바에 추가"
 msgctxt "Screens.SpellbookDropToRemove"
 msgid "Drop a spell here to remove it from the quickbar"
 msgstr "여기에 주문을 놓으면 빠른바에서 제거됩니다"
-
-#. Screens.Tabs
-msgctxt "Screens.Tabs"
-msgid "Tabs"
-msgstr "탭"
 
 #. Screens.TeamValue
 msgctxt "Screens.TeamValue"
@@ -1126,21 +1070,6 @@ msgctxt "Screens.TurnOrder"
 msgid "Turn order"
 msgstr "턴 순서"
 
-#. Screens.Unavailable
-msgctxt "Screens.Unavailable"
-msgid "Unavailable"
-msgstr "사용 불가"
-
-#. Screens.WielderArmyPossessive
-msgctxt "Screens.WielderArmyPossessive"
-msgid "{0}'s army"
-msgstr "{0}의 군대"
-
-#. Screens.WielderArmy
-msgctxt "Screens.WielderArmy"
-msgid "wielder army"
-msgstr "위더 군대"
-
 #. Screens.WielderDead
 msgctxt "Screens.WielderDead"
 msgid "dead"
@@ -1170,11 +1099,6 @@ msgstr "추가"
 msgctxt "Screens.AddKeyword"
 msgid "Add keyword"
 msgstr "키워드 추가"
-
-#. Screens.AmountToUpgrade
-msgctxt "Screens.AmountToUpgrade"
-msgid "Amount to upgrade, {0}"
-msgstr "{0} 업그레이드 수량"
 
 #. Screens.UnknownSpell
 msgctxt "Screens.UnknownSpell"
@@ -2416,11 +2340,6 @@ msgctxt "Spatial.Unseen"
 msgid "Unseen"
 msgstr "보이지 않음"
 
-#. Spatial.VisitedSuffix
-msgctxt "Spatial.VisitedSuffix"
-msgid "{0} (visited)"
-msgstr "{0} (방문함)"
-
 #. Spatial.WithinZoneOfControl
 msgctxt "Spatial.WithinZoneOfControl"
 msgid "Within {0} zone of control"
@@ -2756,25 +2675,10 @@ msgctxt "Screens.Battle"
 msgid "Battle"
 msgstr "전장"
 
-#. Screens.BuyResourceForGold
-msgctxt "Screens.BuyResourceForGold"
-msgid "Buy {0} for {1}"
-msgstr "{1}에 {0} 구매"
-
-#. Screens.TextEntryUnavailable
-msgctxt "Screens.TextEntryUnavailable"
-msgid "Text entry is not available here"
-msgstr "여기서는 텍스트 입력을 사용할 수 없습니다"
-
 #. Screens.Sell
 msgctxt "Screens.Sell"
 msgid "Sell"
 msgstr "판매"
-
-#. Screens.SellResourceForGold
-msgctxt "Screens.SellResourceForGold"
-msgid "Sell {0} for {1}"
-msgstr "{1}에 {0} 판매"
 
 #. Scanner.Wielders
 msgctxt "Scanner.Wielders"
@@ -3510,11 +3414,6 @@ msgctxt "Screens.AnnouncementReachabilityOrRoutePreview"
 msgid "Reachability or route preview"
 msgstr "도달 가능 여부 또는 경로 미리보기"
 
-#. Screens.AnnouncementRelationship
-msgctxt "Screens.AnnouncementRelationship"
-msgid "Relationship"
-msgstr "관계"
-
 #. Screens.AnnouncementSelected
 msgctxt "Screens.AnnouncementSelected"
 msgid "Selected"
@@ -3675,11 +3574,6 @@ msgstr "오디오 용어집"
 msgctxt "Screens.Duration"
 msgid "Duration"
 msgstr "길이"
-
-#. Screens.PercentValue
-msgctxt "Screens.PercentValue"
-msgid "{0}%"
-msgstr "{0}%"
 
 #. Screens.Pitch
 msgctxt "Screens.Pitch"

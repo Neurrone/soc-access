@@ -70,13 +70,10 @@ namespace SongsOfConquestAccess.Localization
         public static class Draft
         {
             public static readonly ModPluralString AvailableTroops = new ModPluralString("Draft.AvailableTroops", "{0} available", "{0} available");
-            public static readonly ModString EssenceVariants = new ModString("Draft.EssenceVariants", "Essence variants");
             public static readonly ModString Purchase = new ModString("Draft.Purchase", "Purchase");
-            public static readonly ModString PurchaseForResources = new ModString("Draft.PurchaseForResources", "Purchase for {0}");
             public static readonly ModString Upgrade = new ModString("Draft.Upgrade", "Upgrade");
             public static readonly ModString UpgradeAvailableTroops = new ModString("Draft.UpgradeAvailableTroops", "Upgrade available troops");
             public static readonly ModString UpgradeChoice = new ModString("Draft.UpgradeChoice", "{0} to {1}");
-            public static readonly ModString UpgradeForResources = new ModString("Draft.UpgradeForResources", "Upgrade for {0}");
         }
 
         public static class Events
@@ -230,7 +227,6 @@ namespace SongsOfConquestAccess.Localization
             public static readonly ModString Unexplored = new ModString("Spatial.Unexplored", "Unexplored");
             public static readonly ModString Unseen = new ModString("Spatial.Unseen", "Unseen");
             public static readonly ModString Visited = new ModString("Spatial.Visited", "visited");
-            public static readonly ModString VisitedSuffix = new ModString("Spatial.VisitedSuffix", "{0} (visited)");
             public static readonly ModString Wall = new ModString("Spatial.Wall", "Wall");
             public static readonly ModString Water = new ModString("Spatial.Water", "Water");
             public static readonly ModString WaterEdge = new ModString("Spatial.WaterEdge", "Water edge");
@@ -542,8 +538,6 @@ namespace SongsOfConquestAccess.Localization
             public static readonly ModString AddCustomCategory = new ModString("Screens.AddCustomCategory", "Add custom category");
             public static readonly ModString Add = new ModString("Screens.Add", "Add");
             public static readonly ModString AddKeyword = new ModString("Screens.AddKeyword", "Add keyword");
-            public static readonly ModString AmountToUpgrade = new ModString("Screens.AmountToUpgrade", "Amount to upgrade, {0}");
-            public static readonly ModString Articles = new ModString("Screens.Articles", "Articles");
             public static readonly ModString ArtifactDestroyHint = new ModString("Screens.ArtifactDestroyHint", "{0} destroys.");
             public static readonly ModString ArtifactDropHint = new ModString("Screens.ArtifactDropHint", "{0} drops on the ground.");
             public static readonly ModString ArtifactEquipHint = new ModString("Screens.ArtifactEquipHint", "{0} equips.");
@@ -563,7 +557,6 @@ namespace SongsOfConquestAccess.Localization
             public static readonly ModString Ballista = new ModString("Screens.Ballista", "Ballista");
             public static readonly ModString BattleLog = new ModString("Screens.BattleLog", "Battle log");
             public static readonly ModString Battle = new ModString("Screens.Battle", "Battle");
-            public static readonly ModString BuyResourceForGold = new ModString("Screens.BuyResourceForGold", "Buy {0} for {1}");
             public static readonly ModString BuyArtifact = new ModString("Screens.BuyArtifact", "Buy");
             public static readonly ModString Categories = new ModString("Screens.Categories", "Categories");
             public static readonly ModString Chat = new ModString("Screens.Chat", "Chat");
@@ -594,9 +587,6 @@ namespace SongsOfConquestAccess.Localization
             public static readonly ModString Defender = new ModString("Screens.Defender", "Defender");
             public static readonly ModString DefenderEssence = new ModString("Screens.DefenderEssence", "Defender essence");
             public static readonly ModString DefenderPortrait = new ModString("Screens.DefenderPortrait", "Defender portrait");
-            public static readonly ModString DefendingWielderStatus = new ModString("Screens.DefendingWielderStatus", "Defending wielder: {0}");
-            public static readonly ModString DescriptionWithMissingBuilding = new ModString("Screens.DescriptionWithMissingBuilding", "{0}. missing building");
-            public static readonly ModString DisabledWithReason = new ModString("Screens.DisabledWithReason", "{0}. {1}");
             public static readonly ModString Downloads = new ModString("Screens.Downloads", "Downloads");
             public static readonly ModString Duration = new ModString("Screens.Duration", "Duration");
             public static readonly ModString Empty = new ModString("Screens.Empty", "empty");
@@ -612,7 +602,6 @@ namespace SongsOfConquestAccess.Localization
             public static readonly ModString LevelValue = new ModString("Screens.LevelValue", "level {0}");
             public static readonly ModString MainMenu = new ModString("Screens.MainMenu", "Main menu");
             public static readonly ModString MissingBuilding = new ModString("Screens.MissingBuilding", "missing building");
-            public static readonly ModString ModSettings = new ModString("Screens.ModSettings", "Mod settings");
             public static readonly ModString ModOptions = new ModString("Screens.ModOptions", "Mod options");
             public static readonly ModString MoveDown = new ModString("Screens.MoveDown", "Move down");
             public static readonly ModString MoveUp = new ModString("Screens.MoveUp", "Move up");
@@ -628,7 +617,6 @@ namespace SongsOfConquestAccess.Localization
             public static readonly ModString LeftRightDistribution = new ModString("Screens.LeftRightDistribution", "Left: {0}, right: {1}");
             public static readonly ModString MultiEssenceSpells = new ModString("Screens.MultiEssenceSpells", "Multi-essence spells");
             public static readonly ModString NamedLevel = new ModString("Screens.NamedLevel", "{0}, level {1}");
-            public static readonly ModString NamedTabs = new ModString("Screens.NamedTabs", "{0} {1}");
             public static readonly ModString NoBuildSiteSelected = new ModString("Screens.NoBuildSiteSelected", "No build site selected");
             public static readonly ModString None = new ModString("Screens.None", "None");
             public static readonly ModString NotReady = new ModString("Screens.NotReady", "Not ready");
@@ -643,7 +631,6 @@ namespace SongsOfConquestAccess.Localization
             public static readonly ModString LoseCondition = new ModString("Screens.LoseCondition", "Lose condition");
             public static readonly ModString Ok = new ModString("Screens.Ok", "OK");
             public static readonly ModString Options = new ModString("Screens.Options", "Options");
-            public static readonly ModString PercentValue = new ModString("Screens.PercentValue", "{0}%");
             public static readonly ModString Pitch = new ModString("Screens.Pitch", "Pitch");
             public static readonly ModString Play = new ModString("Screens.Play", "Play");
             public static readonly ModString PlayTileSoundCues = new ModString("Screens.PlayTileSoundCues", "Play tile sound cues");
@@ -660,7 +647,6 @@ namespace SongsOfConquestAccess.Localization
             public static readonly ModString Recruits = new ModString("Screens.Recruits", "Recruits");
             public static readonly ModString Remove = new ModString("Screens.Remove", "Remove");
             public static readonly ModString RemoveKeyword = new ModString("Screens.RemoveKeyword", "Remove keyword, {0}");
-            public static readonly ModString RenameCustomCategory = new ModString("Screens.RenameCustomCategory", "Rename");
             public static readonly ModString ResearchTier = new ModString("Screens.ResearchTier", "{0} ({1} {2})");
             public static readonly ModString ResetAllToDefaults = new ModString("Screens.ResetAllToDefaults", "Reset all to defaults");
             public static readonly ModString ResetToDefaults = new ModString("Screens.ResetToDefaults", "Reset to defaults");
@@ -674,14 +660,10 @@ namespace SongsOfConquestAccess.Localization
             public static readonly ModString SettlementTroops = new ModString("Screens.SettlementTroops", "settlement troops");
             public static readonly ModPluralString SelectedSubcategoryCount = new ModPluralString("Screens.SelectedSubcategoryCount", "{0} selected", "{0} selected");
             public static readonly ModString Skill = new ModString("Screens.Skill", "Skill {0}");
-            public static readonly ModString SpellTier = new ModString("Screens.SpellTier", "{0} tier {1}");
             public static readonly ModString SpellbookAddToQuickbarHint = new ModString("Screens.SpellbookAddToQuickbarHint", "{0} adds to quickbar");
             public static readonly ModString SpellbookDropToRemove = new ModString("Screens.SpellbookDropToRemove", "Drop a spell here to remove it from the quickbar");
-            public static readonly ModString TextEntryUnavailable = new ModString("Screens.TextEntryUnavailable", "Text entry is not available here");
             public static readonly ModString Sell = new ModString("Screens.Sell", "Sell");
-            public static readonly ModString SellResourceForGold = new ModString("Screens.SellResourceForGold", "Sell {0} for {1}");
             public static readonly ModString Suffix = new ModString("Screens.Suffix", "Include suffix punctuation");
-            public static readonly ModString Tabs = new ModString("Screens.Tabs", "Tabs");
             public static readonly ModString TeamValue = new ModString("Screens.TeamValue", "Team {0}");
             public static readonly ModString TileAnnouncements = new ModString("Screens.TileAnnouncements", "Tile announcements");
             public static readonly ModString TooltipActions = new ModString("Screens.TooltipActions", "Tooltip actions");
@@ -697,12 +679,9 @@ namespace SongsOfConquestAccess.Localization
             public static readonly ModString TroopPlacement = new ModString("Screens.TroopPlacement", "Troop placement");
             public static readonly ModString TroopAnnouncements = new ModString("Screens.TroopAnnouncements", "Troop announcements");
             public static readonly ModString TurnOrder = new ModString("Screens.TurnOrder", "Turn order");
-            public static readonly ModString Unavailable = new ModString("Screens.Unavailable", "Unavailable");
             public static readonly ModString UnknownSpell = new ModString("Screens.UnknownSpell", "unknown spell");
             public static readonly ModString Volume = new ModString("Screens.Volume", "Volume");
             public static readonly ModString WielderAnnouncements = new ModString("Screens.WielderAnnouncements", "Wielder announcements");
-            public static readonly ModString WielderArmyPossessive = new ModString("Screens.WielderArmyPossessive", "{0}'s army");
-            public static readonly ModString WielderArmy = new ModString("Screens.WielderArmy", "wielder army");
             public static readonly ModString WielderDead = new ModString("Screens.WielderDead", "dead");
             public static readonly ModString WielderOwned = new ModString("Screens.WielderOwned", "owned");
             public static readonly ModString Wielders = new ModString("Screens.Wielders", "Wielders");
@@ -735,7 +714,6 @@ namespace SongsOfConquestAccess.Localization
             public static readonly ModString AnnouncementOrderRow = new ModString("Screens.AnnouncementOrderRow", "{0} horizontal row");
             public static readonly ModString AnnouncementReachable = new ModString("Screens.AnnouncementReachable", "Reachable");
             public static readonly ModString AnnouncementReachabilityOrRoutePreview = new ModString("Screens.AnnouncementReachabilityOrRoutePreview", "Reachability or route preview");
-            public static readonly ModString AnnouncementRelationship = new ModString("Screens.AnnouncementRelationship", "Relationship");
             public static readonly ModString AnnouncementResultPosition = new ModString("Screens.AnnouncementResultPosition", "Result position");
             public static readonly ModString AnnouncementRoadDirections = new ModString("Screens.AnnouncementRoadDirections", "Road directions");
             public static readonly ModString AnnouncementSelected = new ModString("Screens.AnnouncementSelected", "Selected");

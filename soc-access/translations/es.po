@@ -140,20 +140,10 @@ msgctxt "Artifacts.NameWithColor"
 msgid "{0} ({1})"
 msgstr "{0} ({1})"
 
-#. Draft.EssenceVariants
-msgctxt "Draft.EssenceVariants"
-msgid "Essence variants"
-msgstr "Variantes de esencia"
-
 #. Draft.Purchase
 msgctxt "Draft.Purchase"
 msgid "Purchase"
 msgstr "Comprar"
-
-#. Draft.PurchaseForResources
-msgctxt "Draft.PurchaseForResources"
-msgid "Purchase for {0}"
-msgstr "Comprar por {0}"
 
 #. Draft.AvailableTroops_0
 msgctxt "Draft.AvailableTroops_0"
@@ -174,11 +164,6 @@ msgstr "Mejorar"
 msgctxt "Draft.UpgradeChoice"
 msgid "{0} to {1}"
 msgstr "{0} a {1}"
-
-#. Draft.UpgradeForResources
-msgctxt "Draft.UpgradeForResources"
-msgid "Upgrade for {0}"
-msgstr "Mejorar por {0}"
 
 #. Draft.UpgradeAvailableTroops
 msgctxt "Draft.UpgradeAvailableTroops"
@@ -710,11 +695,6 @@ msgctxt "Screens.AdventureMap"
 msgid "Adventure map"
 msgstr "Mapa de aventura"
 
-#. Screens.Articles
-msgctxt "Screens.Articles"
-msgid "Articles"
-msgstr "Artículos"
-
 #. Screens.ArtifactDestroyHint
 msgctxt "Screens.ArtifactDestroyHint"
 msgid "{0} destroys."
@@ -825,22 +805,6 @@ msgctxt "Screens.DefenderEssence"
 msgid "Defender essence"
 msgstr "Esencia del defensor"
 
-#. Screens.DefendingWielderStatus
-msgctxt "Screens.DefendingWielderStatus"
-msgid "Defending wielder: {0}"
-msgstr "Portador defensor: {0}"
-
-
-#. Screens.DescriptionWithMissingBuilding
-msgctxt "Screens.DescriptionWithMissingBuilding"
-msgid "{0}. missing building"
-msgstr "{0}. falta edificio"
-
-#. Screens.DisabledWithReason
-msgctxt "Screens.DisabledWithReason"
-msgid "{0}. {1}"
-msgstr "{0}. {1}"
-
 #. Screens.Downloads
 msgctxt "Screens.Downloads"
 msgid "Downloads"
@@ -886,11 +850,6 @@ msgctxt "Screens.MissingBuilding"
 msgid "missing building"
 msgstr "falta edificio"
 
-#. Screens.ModSettings
-msgctxt "Screens.ModSettings"
-msgid "Mod settings"
-msgstr "Ajustes del mod"
-
 #. Screens.ModOptions
 msgctxt "Screens.ModOptions"
 msgid "Mod options"
@@ -910,11 +869,6 @@ msgstr "Hechizos de varias esencias"
 msgctxt "Screens.NamedLevel"
 msgid "{0}, level {1}"
 msgstr "{0}, nivel {1}"
-
-#. Screens.NamedTabs
-msgctxt "Screens.NamedTabs"
-msgid "{0} {1}"
-msgstr "{0} {1}"
 
 #. Screens.NoBuildSiteSelected
 msgctxt "Screens.NoBuildSiteSelected"
@@ -1006,6 +960,11 @@ msgctxt "Screens.RecruitingFrom"
 msgid "Recruiting from {0}"
 msgstr "Reclutando de {0}"
 
+#. Screens.Recruits
+msgctxt "Screens.Recruits"
+msgid "Recruits"
+msgstr "Reclutas"
+
 #. Screens.Remove
 msgctxt "Screens.Remove"
 msgid "Remove"
@@ -1015,11 +974,6 @@ msgstr "Quitar"
 msgctxt "Screens.RemoveKeyword"
 msgid "Remove keyword, {0}"
 msgstr "Quitar palabra clave, {0}"
-
-#. Screens.RenameCustomCategory
-msgctxt "Screens.RenameCustomCategory"
-msgid "Rename"
-msgstr "Renombrar"
 
 #. Screens.ResearchTier
 msgctxt "Screens.ResearchTier"
@@ -1046,11 +1000,6 @@ msgctxt "Screens.Skill"
 msgid "Skill {0}"
 msgstr "Habilidad {0}"
 
-#. Screens.SpellTier
-msgctxt "Screens.SpellTier"
-msgid "{0} tier {1}"
-msgstr "{0}, rango {1}"
-
 #. Screens.SpellbookAddToQuickbarHint
 msgctxt "Screens.SpellbookAddToQuickbarHint"
 msgid "{0} adds to quickbar"
@@ -1060,11 +1009,6 @@ msgstr "{0} añade a la barra rápida"
 msgctxt "Screens.SpellbookDropToRemove"
 msgid "Drop a spell here to remove it from the quickbar"
 msgstr "Suelta aquí un hechizo para quitarlo de la barra rápida"
-
-#. Screens.Tabs
-msgctxt "Screens.Tabs"
-msgid "Tabs"
-msgstr "Pestañas"
 
 #. Screens.TeamValue
 msgctxt "Screens.TeamValue"
@@ -1126,21 +1070,6 @@ msgctxt "Screens.TurnOrder"
 msgid "Turn order"
 msgstr "Orden de turnos"
 
-#. Screens.Unavailable
-msgctxt "Screens.Unavailable"
-msgid "Unavailable"
-msgstr "No disponible"
-
-#. Screens.WielderArmyPossessive
-msgctxt "Screens.WielderArmyPossessive"
-msgid "{0}'s army"
-msgstr "ejército de {0}"
-
-#. Screens.WielderArmy
-msgctxt "Screens.WielderArmy"
-msgid "wielder army"
-msgstr "ejército del portador"
-
 #. Screens.WielderDead
 msgctxt "Screens.WielderDead"
 msgid "dead"
@@ -1180,11 +1109,6 @@ msgstr "Añadir"
 msgctxt "Screens.AddKeyword"
 msgid "Add keyword"
 msgstr "Añadir palabra clave"
-
-#. Screens.AmountToUpgrade
-msgctxt "Screens.AmountToUpgrade"
-msgid "Amount to upgrade, {0}"
-msgstr "Cantidad para mejorar, {0}"
 
 #. Screens.UnknownSpell
 msgctxt "Screens.UnknownSpell"
@@ -2436,11 +2360,6 @@ msgctxt "Spatial.Unseen"
 msgid "Unseen"
 msgstr "No visible"
 
-#. Spatial.VisitedSuffix
-msgctxt "Spatial.VisitedSuffix"
-msgid "{0} (visited)"
-msgstr "{0} (visitado)"
-
 #. Spatial.WithinZoneOfControl
 msgctxt "Spatial.WithinZoneOfControl"
 msgid "Within {0} zone of control"
@@ -2776,25 +2695,10 @@ msgctxt "Screens.Battle"
 msgid "Battle"
 msgstr "Batalla"
 
-#. Screens.BuyResourceForGold
-msgctxt "Screens.BuyResourceForGold"
-msgid "Buy {0} for {1}"
-msgstr "Comprar {0} por {1}"
-
-#. Screens.TextEntryUnavailable
-msgctxt "Screens.TextEntryUnavailable"
-msgid "Text entry is not available here"
-msgstr "La entrada de texto no está disponible aquí"
-
 #. Screens.Sell
 msgctxt "Screens.Sell"
 msgid "Sell"
 msgstr "Vender"
-
-#. Screens.SellResourceForGold
-msgctxt "Screens.SellResourceForGold"
-msgid "Sell {0} for {1}"
-msgstr "Vender {0} por {1}"
 
 #. Scanner.Wielders
 msgctxt "Scanner.Wielders"
@@ -3535,11 +3439,6 @@ msgctxt "Screens.AnnouncementReachabilityOrRoutePreview"
 msgid "Reachability or route preview"
 msgstr "Alcance o vista previa de ruta"
 
-#. Screens.AnnouncementRelationship
-msgctxt "Screens.AnnouncementRelationship"
-msgid "Relationship"
-msgstr "Relación"
-
 #. Screens.AnnouncementSelected
 msgctxt "Screens.AnnouncementSelected"
 msgid "Selected"
@@ -3700,11 +3599,6 @@ msgstr "Glosario de audio"
 msgctxt "Screens.Duration"
 msgid "Duration"
 msgstr "Duración"
-
-#. Screens.PercentValue
-msgctxt "Screens.PercentValue"
-msgid "{0}%"
-msgstr "{0}%"
 
 #. Screens.Pitch
 msgctxt "Screens.Pitch"

@@ -145,20 +145,10 @@ msgctxt "Common.TileCount_0"
 msgid "{0} tile"
 msgstr "{0} kare"
 
-#. Draft.EssenceVariants
-msgctxt "Draft.EssenceVariants"
-msgid "Essence variants"
-msgstr "Öz varyantları"
-
 #. Draft.Purchase
 msgctxt "Draft.Purchase"
 msgid "Purchase"
 msgstr "Satın al"
-
-#. Draft.PurchaseForResources
-msgctxt "Draft.PurchaseForResources"
-msgid "Purchase for {0}"
-msgstr "{0} karşılığında satın al"
 
 #. Draft.AvailableTroops_0
 msgctxt "Draft.AvailableTroops_0"
@@ -174,11 +164,6 @@ msgstr "Yükselt"
 msgctxt "Draft.UpgradeChoice"
 msgid "{0} to {1}"
 msgstr "{0}, {1} birimine"
-
-#. Draft.UpgradeForResources
-msgctxt "Draft.UpgradeForResources"
-msgid "Upgrade for {0}"
-msgstr "{0} karşılığında yükselt"
 
 #. Draft.UpgradeAvailableTroops
 msgctxt "Draft.UpgradeAvailableTroops"
@@ -710,11 +695,6 @@ msgctxt "Screens.AdventureMap"
 msgid "Adventure map"
 msgstr "Macera haritası"
 
-#. Screens.Articles
-msgctxt "Screens.Articles"
-msgid "Articles"
-msgstr "Makaleler"
-
 #. Screens.ArtifactDestroyHint
 msgctxt "Screens.ArtifactDestroyHint"
 msgid "{0} destroys."
@@ -825,22 +805,6 @@ msgctxt "Screens.DefenderEssence"
 msgid "Defender essence"
 msgstr "Savunan özü"
 
-#. Screens.DefendingWielderStatus
-msgctxt "Screens.DefendingWielderStatus"
-msgid "Defending wielder: {0}"
-msgstr "Savunan wielder: {0}"
-
-
-#. Screens.DescriptionWithMissingBuilding
-msgctxt "Screens.DescriptionWithMissingBuilding"
-msgid "{0}. missing building"
-msgstr "{0}. bina eksik"
-
-#. Screens.DisabledWithReason
-msgctxt "Screens.DisabledWithReason"
-msgid "{0}. {1}"
-msgstr "{0}. {1}"
-
 #. Screens.Downloads
 msgctxt "Screens.Downloads"
 msgid "Downloads"
@@ -886,11 +850,6 @@ msgctxt "Screens.MissingBuilding"
 msgid "missing building"
 msgstr "bina eksik"
 
-#. Screens.ModSettings
-msgctxt "Screens.ModSettings"
-msgid "Mod settings"
-msgstr "Mod ayarları"
-
 #. Screens.ModOptions
 msgctxt "Screens.ModOptions"
 msgid "Mod options"
@@ -910,11 +869,6 @@ msgstr "Çok özlü büyüler"
 msgctxt "Screens.NamedLevel"
 msgid "{0}, level {1}"
 msgstr "{0}, seviye {1}"
-
-#. Screens.NamedTabs
-msgctxt "Screens.NamedTabs"
-msgid "{0} {1}"
-msgstr "{0} {1}"
 
 #. Screens.NoBuildSiteSelected
 msgctxt "Screens.NoBuildSiteSelected"
@@ -1006,6 +960,11 @@ msgctxt "Screens.RecruitingFrom"
 msgid "Recruiting from {0}"
 msgstr "{0} üzerinden askere alınıyor"
 
+#. Screens.Recruits
+msgctxt "Screens.Recruits"
+msgid "Recruits"
+msgstr "Askere alınabilir birlikler"
+
 #. Screens.Remove
 msgctxt "Screens.Remove"
 msgid "Remove"
@@ -1015,11 +974,6 @@ msgstr "Kaldır"
 msgctxt "Screens.RemoveKeyword"
 msgid "Remove keyword, {0}"
 msgstr "Anahtar kelimeyi kaldır, {0}"
-
-#. Screens.RenameCustomCategory
-msgctxt "Screens.RenameCustomCategory"
-msgid "Rename"
-msgstr "Yeniden adlandır"
 
 #. Screens.ResearchTier
 msgctxt "Screens.ResearchTier"
@@ -1046,11 +1000,6 @@ msgctxt "Screens.Skill"
 msgid "Skill {0}"
 msgstr "Yetenek {0}"
 
-#. Screens.SpellTier
-msgctxt "Screens.SpellTier"
-msgid "{0} tier {1}"
-msgstr "{0} kademe {1}"
-
 #. Screens.SpellbookAddToQuickbarHint
 msgctxt "Screens.SpellbookAddToQuickbarHint"
 msgid "{0} adds to quickbar"
@@ -1060,11 +1009,6 @@ msgstr "{0} hızlı çubuğa ekler"
 msgctxt "Screens.SpellbookDropToRemove"
 msgid "Drop a spell here to remove it from the quickbar"
 msgstr "Bir büyüyü hızlı çubuktan kaldırmak için buraya bırakın"
-
-#. Screens.Tabs
-msgctxt "Screens.Tabs"
-msgid "Tabs"
-msgstr "Sekmeler"
 
 #. Screens.TeamValue
 msgctxt "Screens.TeamValue"
@@ -1126,21 +1070,6 @@ msgctxt "Screens.TurnOrder"
 msgid "Turn order"
 msgstr "Tur sırası"
 
-#. Screens.Unavailable
-msgctxt "Screens.Unavailable"
-msgid "Unavailable"
-msgstr "Kullanılamaz"
-
-#. Screens.WielderArmyPossessive
-msgctxt "Screens.WielderArmyPossessive"
-msgid "{0}'s army"
-msgstr "{0} ordusu"
-
-#. Screens.WielderArmy
-msgctxt "Screens.WielderArmy"
-msgid "wielder army"
-msgstr "wielder ordusu"
-
 #. Screens.WielderDead
 msgctxt "Screens.WielderDead"
 msgid "dead"
@@ -1170,11 +1099,6 @@ msgstr "Ekle"
 msgctxt "Screens.AddKeyword"
 msgid "Add keyword"
 msgstr "Anahtar kelime ekle"
-
-#. Screens.AmountToUpgrade
-msgctxt "Screens.AmountToUpgrade"
-msgid "Amount to upgrade, {0}"
-msgstr "Yükseltilecek miktar, {0}"
 
 #. Screens.UnknownSpell
 msgctxt "Screens.UnknownSpell"
@@ -2416,11 +2340,6 @@ msgctxt "Spatial.Unseen"
 msgid "Unseen"
 msgstr "Görünmüyor"
 
-#. Spatial.VisitedSuffix
-msgctxt "Spatial.VisitedSuffix"
-msgid "{0} (visited)"
-msgstr "{0} (ziyaret edildi)"
-
 #. Spatial.WithinZoneOfControl
 msgctxt "Spatial.WithinZoneOfControl"
 msgid "Within {0} zone of control"
@@ -2756,25 +2675,10 @@ msgctxt "Screens.Battle"
 msgid "Battle"
 msgstr "Muharebe"
 
-#. Screens.BuyResourceForGold
-msgctxt "Screens.BuyResourceForGold"
-msgid "Buy {0} for {1}"
-msgstr "{0} öğesini {1} karşılığında satın al"
-
-#. Screens.TextEntryUnavailable
-msgctxt "Screens.TextEntryUnavailable"
-msgid "Text entry is not available here"
-msgstr "Metin girişi burada kullanılamaz"
-
 #. Screens.Sell
 msgctxt "Screens.Sell"
 msgid "Sell"
 msgstr "Sat"
-
-#. Screens.SellResourceForGold
-msgctxt "Screens.SellResourceForGold"
-msgid "Sell {0} for {1}"
-msgstr "{0} öğesini {1} karşılığında sat"
 
 #. Scanner.Wielders
 msgctxt "Scanner.Wielders"
@@ -3510,11 +3414,6 @@ msgctxt "Screens.AnnouncementReachabilityOrRoutePreview"
 msgid "Reachability or route preview"
 msgstr "Erişilebilirlik veya rota önizlemesi"
 
-#. Screens.AnnouncementRelationship
-msgctxt "Screens.AnnouncementRelationship"
-msgid "Relationship"
-msgstr "İlişki"
-
 #. Screens.AnnouncementSelected
 msgctxt "Screens.AnnouncementSelected"
 msgid "Selected"
@@ -3675,11 +3574,6 @@ msgstr "Ses sözlüğü"
 msgctxt "Screens.Duration"
 msgid "Duration"
 msgstr "Süre"
-
-#. Screens.PercentValue
-msgctxt "Screens.PercentValue"
-msgid "{0}%"
-msgstr "%{0}"
 
 #. Screens.Pitch
 msgctxt "Screens.Pitch"

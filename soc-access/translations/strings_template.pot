@@ -244,19 +244,9 @@ msgctxt "Audio.TerrainWater"
 msgid "Water"
 msgstr ""
 
-#. Draft.EssenceVariants
-msgctxt "Draft.EssenceVariants"
-msgid "Essence variants"
-msgstr ""
-
 #. Draft.Purchase
 msgctxt "Draft.Purchase"
 msgid "Purchase"
-msgstr ""
-
-#. Draft.PurchaseForResources
-msgctxt "Draft.PurchaseForResources"
-msgid "Purchase for {0}"
 msgstr ""
 
 #. Draft.Upgrade
@@ -272,11 +262,6 @@ msgstr ""
 #. Draft.UpgradeChoice
 msgctxt "Draft.UpgradeChoice"
 msgid "{0} to {1}"
-msgstr ""
-
-#. Draft.UpgradeForResources
-msgctxt "Draft.UpgradeForResources"
-msgid "Upgrade for {0}"
 msgstr ""
 
 #. Events.BuildSiteLarge
@@ -917,11 +902,6 @@ msgstr ""
 #. Spatial.Visited
 msgctxt "Spatial.Visited"
 msgid "visited"
-msgstr ""
-
-#. Spatial.VisitedSuffix
-msgctxt "Spatial.VisitedSuffix"
-msgid "{0} (visited)"
 msgstr ""
 
 #. Spatial.Wall
@@ -2369,16 +2349,6 @@ msgctxt "Screens.AddKeyword"
 msgid "Add keyword"
 msgstr ""
 
-#. Screens.AmountToUpgrade
-msgctxt "Screens.AmountToUpgrade"
-msgid "Amount to upgrade, {0}"
-msgstr ""
-
-#. Screens.Articles
-msgctxt "Screens.Articles"
-msgid "Articles"
-msgstr ""
-
 #. Screens.ArtifactDestroyHint
 msgctxt "Screens.ArtifactDestroyHint"
 msgid "{0} destroys."
@@ -2472,11 +2442,6 @@ msgstr ""
 #. Screens.Battle
 msgctxt "Screens.Battle"
 msgid "Battle"
-msgstr ""
-
-#. Screens.BuyResourceForGold
-msgctxt "Screens.BuyResourceForGold"
-msgid "Buy {0} for {1}"
 msgstr ""
 
 #. Screens.BuyArtifact
@@ -2629,21 +2594,6 @@ msgctxt "Screens.DefenderPortrait"
 msgid "Defender portrait"
 msgstr ""
 
-#. Screens.DefendingWielderStatus
-msgctxt "Screens.DefendingWielderStatus"
-msgid "Defending wielder: {0}"
-msgstr ""
-
-#. Screens.DescriptionWithMissingBuilding
-msgctxt "Screens.DescriptionWithMissingBuilding"
-msgid "{0}. missing building"
-msgstr ""
-
-#. Screens.DisabledWithReason
-msgctxt "Screens.DisabledWithReason"
-msgid "{0}. {1}"
-msgstr ""
-
 #. Screens.Downloads
 msgctxt "Screens.Downloads"
 msgid "Downloads"
@@ -2717,11 +2667,6 @@ msgstr ""
 #. Screens.MissingBuilding
 msgctxt "Screens.MissingBuilding"
 msgid "missing building"
-msgstr ""
-
-#. Screens.ModSettings
-msgctxt "Screens.ModSettings"
-msgid "Mod settings"
 msgstr ""
 
 #. Screens.ModOptions
@@ -2799,11 +2744,6 @@ msgctxt "Screens.NamedLevel"
 msgid "{0}, level {1}"
 msgstr ""
 
-#. Screens.NamedTabs
-msgctxt "Screens.NamedTabs"
-msgid "{0} {1}"
-msgstr ""
-
 #. Screens.NoBuildSiteSelected
 msgctxt "Screens.NoBuildSiteSelected"
 msgid "No build site selected"
@@ -2874,11 +2814,6 @@ msgctxt "Screens.Options"
 msgid "Options"
 msgstr ""
 
-#. Screens.PercentValue
-msgctxt "Screens.PercentValue"
-msgid "{0}%"
-msgstr ""
-
 #. Screens.Pitch
 msgctxt "Screens.Pitch"
 msgid "Pitch"
@@ -2944,6 +2879,11 @@ msgctxt "Screens.RecruitingFrom"
 msgid "Recruiting from {0}"
 msgstr ""
 
+#. Screens.Recruits
+msgctxt "Screens.Recruits"
+msgid "Recruits"
+msgstr ""
+
 #. Screens.Remove
 msgctxt "Screens.Remove"
 msgid "Remove"
@@ -2952,11 +2892,6 @@ msgstr ""
 #. Screens.RemoveKeyword
 msgctxt "Screens.RemoveKeyword"
 msgid "Remove keyword, {0}"
-msgstr ""
-
-#. Screens.RenameCustomCategory
-msgctxt "Screens.RenameCustomCategory"
-msgid "Rename"
 msgstr ""
 
 #. Screens.ResearchTier
@@ -3019,11 +2954,6 @@ msgctxt "Screens.Skill"
 msgid "Skill {0}"
 msgstr ""
 
-#. Screens.SpellTier
-msgctxt "Screens.SpellTier"
-msgid "{0} tier {1}"
-msgstr ""
-
 #. Screens.SpellbookAddToQuickbarHint
 msgctxt "Screens.SpellbookAddToQuickbarHint"
 msgid "{0} adds to quickbar"
@@ -3034,29 +2964,14 @@ msgctxt "Screens.SpellbookDropToRemove"
 msgid "Drop a spell here to remove it from the quickbar"
 msgstr ""
 
-#. Screens.TextEntryUnavailable
-msgctxt "Screens.TextEntryUnavailable"
-msgid "Text entry is not available here"
-msgstr ""
-
 #. Screens.Sell
 msgctxt "Screens.Sell"
 msgid "Sell"
 msgstr ""
 
-#. Screens.SellResourceForGold
-msgctxt "Screens.SellResourceForGold"
-msgid "Sell {0} for {1}"
-msgstr ""
-
 #. Screens.Suffix
 msgctxt "Screens.Suffix"
 msgid "Include suffix punctuation"
-msgstr ""
-
-#. Screens.Tabs
-msgctxt "Screens.Tabs"
-msgid "Tabs"
 msgstr ""
 
 #. Screens.TeamValue
@@ -3134,11 +3049,6 @@ msgctxt "Screens.TurnOrder"
 msgid "Turn order"
 msgstr ""
 
-#. Screens.Unavailable
-msgctxt "Screens.Unavailable"
-msgid "Unavailable"
-msgstr ""
-
 #. Screens.UnknownSpell
 msgctxt "Screens.UnknownSpell"
 msgid "unknown spell"
@@ -3152,16 +3062,6 @@ msgstr ""
 #. Screens.WielderAnnouncements
 msgctxt "Screens.WielderAnnouncements"
 msgid "Wielder announcements"
-msgstr ""
-
-#. Screens.WielderArmyPossessive
-msgctxt "Screens.WielderArmyPossessive"
-msgid "{0}'s army"
-msgstr ""
-
-#. Screens.WielderArmy
-msgctxt "Screens.WielderArmy"
-msgid "wielder army"
 msgstr ""
 
 #. Screens.WielderDead
@@ -3317,11 +3217,6 @@ msgstr ""
 #. Screens.AnnouncementReachabilityOrRoutePreview
 msgctxt "Screens.AnnouncementReachabilityOrRoutePreview"
 msgid "Reachability or route preview"
-msgstr ""
-
-#. Screens.AnnouncementRelationship
-msgctxt "Screens.AnnouncementRelationship"
-msgid "Relationship"
 msgstr ""
 
 #. Screens.AnnouncementResultPosition
