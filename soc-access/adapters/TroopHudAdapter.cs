@@ -30,6 +30,7 @@ namespace SongsOfConquestAccess.Adapters
         private static readonly MethodInfo CanSwapMethod = AccessTools.Method(typeof(TroopHUDEntryMovable), "CanSwap");
         private static readonly MethodInfo DecideAmountMethod = AccessTools.Method(typeof(TroopHUDEntryMovable), "DecideAmount");
         private static readonly MethodInfo SwapMethod = AccessTools.Method(typeof(TroopHUDEntryMovable), "Swap");
+        private static readonly FieldInfo MovableMainRectField = AccessTools.Field(typeof(TroopHUDEntryMovable), "_mainRectTransform");
 
         private readonly TroopHUD _hud;
         private readonly IClientAdventureFacade _facade;
@@ -40,6 +41,38 @@ namespace SongsOfConquestAccess.Adapters
             _hud = hud;
             _facade = facade;
             _localization = localization;
+            WakeMovable();
+        }
+
+        /// <summary>
+        /// Let the game's drag ghost run its <c>Start()</c> before the first replayed drop. The ghost of
+        /// a wielder band (the artifact market, the world choice menu) is inactive until a drag begins,
+        /// and <c>TroopHUDEntryMovable.Start()</c> is where the game assigns <c>_mainRectTransform</c>
+        /// and wires the slider and button handlers. A mouse drag ends frames after it begins, so the
+        /// game never sees the gap; the mod's replay calls <c>BeginDrag</c> and <c>DecideAmount</c> in
+        /// one frame, and <c>DecideAmount</c> then threw on the unassigned rect. Activating the ghost
+        /// once here is what <c>BeginDrag</c> itself does; <c>Start()</c> runs on the next frame and,
+        /// finding the ghost idle, deactivates it again. Calling <c>Start()</c> by reflection instead
+        /// would wire every handler twice. Only while the bar is drawn: Unity runs <c>Start()</c>
+        /// only in an active hierarchy, and a ghost woken inside a closed menu would stay awake
+        /// until the menu opened.
+        /// </summary>
+        private void WakeMovable()
+        {
+            TroopHUDEntryMovable movable = GetMovable();
+            if (movable == null || movable.gameObject.activeSelf || _hud == null || !_hud.gameObject.activeInHierarchy)
+            {
+                return;
+            }
+
+            // A ghost whose Start() has run keeps its rect; waking that one again would leave it
+            // drawn and idle, since Unity never runs Start() twice.
+            if (MovableMainRectField != null && MovableMainRectField.GetValue(movable) != null)
+            {
+                return;
+            }
+
+            movable.gameObject.SetActive(true);
         }
 
         public enum DropResult
