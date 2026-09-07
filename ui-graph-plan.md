@@ -387,7 +387,8 @@ was deleted in A. Phase C: `PauseMenuScreen`, `WorldConfirmMenuScreen`, `ClaimMe
 `PostAdventureResultScreen`, `PostAdventureStatsScreen`. Phase D: `CommanderSheetScreen`,
 `SpellbookScreen`, `MoveTroopPopupScreen`, `WorldChoiceMenuScreen`,
 `ArtifactMarketScreen`, `TradingScreen`, `HostileJoinMenuScreen`, `SettlementScreen`,
-`DefenceMenuScreen`. Of `MessageDialogScreen`'s seven
+`DefenceMenuScreen`, `TroopManagementScreenBase`, `DraftTroopsScreen`, `UpgradeTroopsScreen`,
+`RallyPointScreen` (the essence tab row is unverified: no card in the `test` save draws one). Of `MessageDialogScreen`'s seven
 sources the random event and custom message ones are unverified (no reachable state produced
 them; the REPL draws the prefab's placeholder text).
 
@@ -397,10 +398,6 @@ decision, until the owner approves it):
 | Screen | Widgets today | Proposed model | Phase |
 |---|---|---|---|
 | `TooltipActionsMenuScreen` | Menu | stays a widget screen until no unported screen hands out `TooltipAction`s; deleted in G | G |
-| `TroopManagementScreenBase` | Buttons, Text | the shared base: Tutorial stop where the host draws it, Wielder stop where the host has an army, the content stop, Close; Escape is the game's, which on these sub-pages goes BACK to the host's landing page (`UI.ExitMenu` at `PopupInPopup`). Today's base has two id collisions (the wielder and recruit menus share an id; the defence host restores focus into the wrong child); both vanish with the port. | D |
-| `DraftTroopsScreen` | Menu, Slider, Buttons | PROPOSED 2026-09-07, awaiting approval: the Recruits stop is one expandable group per recruit card in drawn order, header `Militia, 12 available` (the game's `NothingInThePool` / `NoTroopsProduced` text as the value where the pool is empty), children: the essence radio row where the troop has variants (Enter = the game's tab click), the amount slider read `7 of 12` (Left/Right through the native `HandleSliderChanged`, Home/End its ends), the Buy button with its price and the game's own refusal text (`NotEnoughTroopSlots`) and `unavailable`, the upgrade-the-pool button. Same screen on the dwelling, town, defence and rally point hosts. | D |
-| `UpgradeTroopsScreen` | Menu, Slider, Buttons, Text | PROPOSED 2026-09-07, awaiting approval: the drawn no-upgrades text as a line when shown, else one expandable group per upgrade `Militia to Halberdiers, 4 available`, children: the current-troop amount button and the target-troop amount button (the game's own min and max shortcuts, Enter = their click), the slider, the Upgrade button with its price or the game's refusal text and `unavailable`. | D |
-| `RallyPointScreen` | Menu, Slider, Buttons, Text | PROPOSED 2026-09-07, awaiting approval: Wielder (portrait row, Troops region), then one stop with a Sources region as a radio list (each town `name, level N`, plus the all-towns entry; selected one lands; Enter = the game's click, which refreshes the recruits) and the Recruits region as the draft screen's groups, then Close. A rally point never has an upgrade page. | D |
 | `PreBattleMenuScreen` | TroopPlacementHexGrid, Buttons, Text | mode node plus buttons stop | E |
 | `CombatScreen` (+ `CombatTroopCycle`) | CombatHexGrid, CombatTroopCycle, Menu, Buttons, Text | mode node, timeline stop, actions stop | E |
 | `AdventureMapScreen` | AdventureMapGrid, Menu, Buttons, Text | mode node, HUD stops (troops, resources, objectives, notifications) | E |
