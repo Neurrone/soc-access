@@ -279,3 +279,4 @@ Filled in as the loop is used; keep entries to one line each with the date.
   construction of type 'Game'" and the main menu stayed faded out. `DynamicAssemblyTypesPatches`
   (dev-only, a finalizer on `AssemblyBuilder.GetTypes`) now reports the finished types instead;
   the warning "A dynamic assembly holds an unfinished type" in the log says it fired.
+- 2026-09-07: the wielder sheet opens with the game's `ToggleInventory` key, `C` by default (`POST /key` body `C` from the map); `CommanderHUD` is not a `UnityEngine.Object`, so `/eval` cannot find it, and the HUD's wielder button only selects the wielder.
