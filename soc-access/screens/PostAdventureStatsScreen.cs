@@ -32,9 +32,10 @@ namespace SongsOfConquestAccess.Screens
     /// it "Graph type".
     ///
     /// THE TABLE IS THE MOD'S, and stays one (owner ruling): the chart is a picture, and the numbers
-    /// behind it are read as a sheet of one row per round with a column per enabled team, under a
-    /// heading band the mod draws for it. A round a team lost a battle in says so after the figure,
-    /// which is the skull the chart draws over that dot.
+    /// behind it are read as a sheet of one row per round with a column per enabled team, each
+    /// crossing naming its column (no heading band: it would say the captions twice). A round a team
+    /// lost a battle in says so after the figure, which is the skull the chart draws over that dot.
+    /// A game with no round recorded declares no table at all; the footer says so.
     ///
     /// ESCAPE IS THE GAME'S (<c>ConsumesBack</c> false): <c>PostAdventureStatsMenu.ShowMenu</c>
     /// registers <c>UI.ExitMenu</c> on its own close.
@@ -113,8 +114,13 @@ namespace SongsOfConquestAccess.Screens
             builder.BeginStop(ChooserStop);
             BuildChooser(builder);
 
-            builder.BeginStop(TableStop);
-            BuildTable(builder);
+            // No table stop at all when the statistics hold no round: the footer says how many
+            // rounds there were, and a stop with nothing in it would be a table without rows.
+            if (_adapter.GetGraphRows().Count > 0)
+            {
+                builder.BeginStop(TableStop);
+                BuildTable(builder);
+            }
 
             builder.BeginStop(FooterStop);
             BuildFooter(builder);
@@ -236,8 +242,8 @@ namespace SongsOfConquestAccess.Screens
         {
             IReadOnlyList<PostAdventureStatsAdapter.GraphTeamColumn> teams = _adapter.GetEnabledGraphTeams();
             string[] columns = Columns(teams);
-            BuildHeadingBand(builder, teams, columns);
-
+            // No heading band: the sheet names the column on every crossing ("Neurrone, 1234"), so a
+            // row of the captions would say them a second time (owner ruling 2026-09-07).
             GraphSheet sheet = new GraphSheet(builder, SheetKey);
             sheet.Region(_adapter.GraphTitle, columns);
             IReadOnlyList<PostAdventureStatsAdapter.GraphRoundRow> rows = _adapter.GetGraphRows();
@@ -255,7 +261,7 @@ namespace SongsOfConquestAccess.Screens
             sheet.Finish();
             if (sheet.FirstRow != null)
             {
-                // Tab into the table lands on a ROUND, never on the heading band above it.
+                // Tab into the table lands on a ROUND.
                 builder.LandStopOn(sheet.FirstRow);
             }
         }
@@ -273,32 +279,6 @@ namespace SongsOfConquestAccess.Screens
             }
 
             return columns;
-        }
-
-        /// <summary>The captions as a row of the table's own stop immediately above the first round:
-        /// Up out of a row reaches the heading of the column the cursor was in, and Down comes back.
-        /// The row carries no positions - "1 of 5" there would count the table's columns, which is not
-        /// a place in a list.</summary>
-        private static void BuildHeadingBand(
-            GraphBuilder builder,
-            IReadOnlyList<PostAdventureStatsAdapter.GraphTeamColumn> teams,
-            string[] columns)
-        {
-            builder.StartRow(null, false);
-            for (int i = 0; i < columns.Length; i++)
-            {
-                string caption = columns[i];
-                NodeVtable vtable = GraphNodes.Text(() => caption);
-                vtable.Column = i;
-                // A heading is not a cell of the row below it, so the sheet's one-result-per-row filter
-                // would otherwise drop every heading past the first from type-ahead.
-                vtable.SearchesAsItself = true;
-                builder.AddItem(new SyntheticNode(
-                    ControlId.Structural("post-adventure-stats:heading/" + (i == 0 ? "round" : teams[i - 1].Id)),
-                    vtable));
-            }
-
-            builder.EndRow();
         }
 
         /// <summary>The row's own cell: the round number, which is what names the row on a vertical
