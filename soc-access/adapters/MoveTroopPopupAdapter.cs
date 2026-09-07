@@ -19,23 +19,17 @@ namespace SongsOfConquestAccess.Adapters
         private static readonly FieldInfo AmountTextField = AccessTools.Field(typeof(TroopHUDEntryMovable), "_amountText");
         private static readonly FieldInfo SliderField = AccessTools.Field(typeof(TroopHUDEntryMovable), "_slider");
         private static readonly FieldInfo NonPortraitContainerField = AccessTools.Field(typeof(TroopHUDEntryMovable), "_nonPortraitContainer");
-        private static readonly FieldInfo PortraitContainerField = AccessTools.Field(typeof(TroopHUDEntryMovable), "_portraitContainer");
-        private static readonly FieldInfo DraggableContainerField = AccessTools.Field(typeof(TroopHUDEntryMovable), "_draggableContainer");
-        private static readonly FieldInfo LeftContainerField = AccessTools.Field(typeof(TroopHUDEntryMovable), "_leftContainer");
-        private static readonly FieldInfo RightContainerField = AccessTools.Field(typeof(TroopHUDEntryMovable), "_rightContainer");
         private static readonly FieldInfo MoveAllButtonLeftField = AccessTools.Field(typeof(TroopHUDEntryMovable), "_moveAllButtonLeft");
         private static readonly FieldInfo MoveAllButtonRightField = AccessTools.Field(typeof(TroopHUDEntryMovable), "_moveAllButtonRight");
         private static readonly FieldInfo SplitHalfButtonField = AccessTools.Field(typeof(TroopHUDEntryMovable), "_splitHalfButton");
         private static readonly FieldInfo LocalizationField = AccessTools.Field(typeof(TroopHUDEntryMovable), "_localization");
         private static readonly FieldInfo LeftPortraitAmountField = AccessTools.Field(typeof(TroopHUDEntryMovable), "_leftPortraitAmount");
         private static readonly FieldInfo RightPortraitAmountField = AccessTools.Field(typeof(TroopHUDEntryMovable), "_rightPortraitAmount");
-        private static readonly FieldInfo DecideTargetTroopEntryField = AccessTools.Field(typeof(TroopHUDEntryMovable), "_decideTargetTroopEntry");
         private static readonly MethodInfo HandleMoveAllLeftMethod = AccessTools.Method(typeof(TroopHUDEntryMovable), "HandleMoveAllLeft");
         private static readonly MethodInfo HandleMoveAllRightMethod = AccessTools.Method(typeof(TroopHUDEntryMovable), "HandleMoveAllRight");
         private static readonly MethodInfo HandleSplitMethod = AccessTools.Method(typeof(TroopHUDEntryMovable), "HandleSplit");
         private static readonly MethodInfo HandleSliderChangedMethod = AccessTools.Method(typeof(TroopHUDEntryMovable), "HandleSliderChanged");
         private static readonly MethodInfo HandleSliderPointerUpMethod = AccessTools.Method(typeof(TroopHUDEntryMovable), "HandleSliderPointerUp");
-        private static readonly MethodInfo AnimateTroopsUIsToDestinationsMethod = AccessTools.Method(typeof(TroopHUDEntryMovable), "AnimateTroopsUIsToDestinations");
 
         private readonly TroopHUDEntryMovable _movable;
         private readonly ILocalizationHandler _localization;
@@ -56,34 +50,106 @@ namespace SongsOfConquestAccess.Adapters
             get { return GetText(GetField<IUITextMesh>(HeaderTextField)); }
         }
 
+        /// <summary>The split button's own name, read from the game's localization rather than off the
+        /// button: the tooltip the game writes there has the key that presses it appended
+        /// ("Split Equal(Space)"), which is a key name rather than the button's name.</summary>
         public string SplitEqualLabel
         {
-            get { return GetFirstTooltipLine(SplitEqualTooltip); }
+            get { return GameText.Get(_localization, "Common/MoveTroops/SplitHalf", string.Empty); }
         }
 
-        public string MaxTroopSizeAmount
+        /// <summary>The line the popup draws under its header: the game's own caption and the number
+        /// beside it, which the game draws as two texts in one container.</summary>
+        public IReadOnlyList<string> MaxTroopSizeTexts
         {
             get
             {
-                return GetText(GetField<IUITextMesh>(AmountTextField));
+                List<string> texts = new List<string>(2);
+                IUITextMesh amount = GetField<IUITextMesh>(AmountTextField);
+                Component component = amount as Component;
+                Transform container = component != null ? component.transform.parent : null;
+                if (container == null)
+                {
+                    Add(texts, GetText(amount));
+                    return texts;
+                }
+
+                UITextMesh[] drawn = container.GetComponentsInChildren<UITextMesh>(true);
+                for (int i = 0; i < drawn.Length; i++)
+                {
+                    Add(texts, GetText(drawn[i]));
+                }
+
+                return texts;
             }
         }
 
+        /// <summary>The icon the popup draws in its corner, whose tooltip is the game's own list of the
+        /// hotkeys this popup answers to. It is the one image in the panel with a tooltip of its own;
+        /// the buttons beside it are buttons.</summary>
+        public Tooltip HotkeysTooltip
+        {
+            get
+            {
+                GameObject container = GetField<GameObject>(NonPortraitContainerField);
+                Transform root = container != null ? container.transform : null;
+                for (int i = 0; root != null && i < root.childCount; i++)
+                {
+                    Transform child = root.GetChild(i);
+                    UIImage image = child.GetComponent<UIImage>();
+                    if (image == null || child.GetComponent<UIButton>() != null)
+                    {
+                        continue;
+                    }
+
+                    Tooltip tooltip = Tooltip.ForComponent(image, _localization);
+                    if (tooltip != null && tooltip.TextLines != null && tooltip.TextLines.Count > 0)
+                    {
+                        return tooltip;
+                    }
+                }
+
+                return null;
+            }
+        }
+
+        /// <summary>
+        /// Whether the game is asking how many troops to move. Only the DECIDING state counts: the
+        /// drag ghost is one object that is also the drag itself, and an idle one left active - after a
+        /// swap, or between a hot reload and the next frame - draws no popup and must not read as one.
+        /// </summary>
         public bool IsPresent()
         {
-            if (!IsMovableActive())
-            {
-                return false;
-            }
+            return IsMovableActive()
+                && GetStateName() == "Deciding"
+                && GetSlider() != null;
+        }
 
-            if (GetStateName() == "Deciding")
-            {
-                return true;
-            }
+        /// <summary>The number the popup draws for the maximum troop size - what the caption above is
+        /// about, and the component the line's node is drawn by.</summary>
+        public Component MaxTroopSizeText
+        {
+            get { return GetField<IUITextMesh>(AmountTextField) as Component; }
+        }
 
-            return IsDialogContainerActive()
-                && GetSlider() != null
-                && !IsGameObjectActive(GetField<Component>(DraggableContainerField));
+        public Component SliderComponent
+        {
+            get { return GetSlider(); }
+        }
+
+        public Component MoveAllLeftButton
+        {
+            get { return GetField<UIButton>(MoveAllButtonLeftField); }
+        }
+
+        public Component SplitEqualButton
+        {
+            get { return GetField<UIButton>(SplitHalfButtonField); }
+        }
+
+        public Component MoveAllRightButton
+        {
+            get { return GetField<UIButton>(MoveAllButtonRightField); }
         }
 
         public bool MoveAllLeft()
@@ -149,29 +215,6 @@ namespace SongsOfConquestAccess.Adapters
             return IsMovableActive()
                 && GetSlider() != null
                 && HandleSliderPointerUpMethod != null;
-        }
-
-        public bool Cancel()
-        {
-            if (AnimateTroopsUIsToDestinationsMethod == null)
-            {
-                return false;
-            }
-
-            AnimateTroopsUIsToDestinationsMethod.Invoke(_movable, null);
-            DecideTargetTroopEntryField?.SetValue(_movable, null);
-            return true;
-        }
-
-        public bool CanCancel()
-        {
-            return IsMovableActive()
-                && AnimateTroopsUIsToDestinationsMethod != null;
-        }
-
-        public void HideNativeTooltip()
-        {
-            NativeTooltipUtility.HideTooltip();
         }
 
         public string LeftAmount
@@ -244,24 +287,6 @@ namespace SongsOfConquestAccess.Adapters
                 && ((Component)_movable).gameObject.activeInHierarchy;
         }
 
-        private bool IsDialogContainerActive()
-        {
-            return IsGameObjectActive(GetField<GameObject>(NonPortraitContainerField))
-                || IsGameObjectActive(GetField<GameObject>(PortraitContainerField))
-                || IsGameObjectActive(GetField<Component>(LeftContainerField))
-                || IsGameObjectActive(GetField<Component>(RightContainerField));
-        }
-
-        private static bool IsGameObjectActive(GameObject gameObject)
-        {
-            return gameObject != null && gameObject.activeInHierarchy;
-        }
-
-        private static bool IsGameObjectActive(Component component)
-        {
-            return component != null && component.gameObject != null && component.gameObject.activeInHierarchy;
-        }
-
         private bool Invoke(MethodInfo method)
         {
             if (method == null)
@@ -289,24 +314,12 @@ namespace SongsOfConquestAccess.Adapters
             return SpeechTextSanitizer.Normalize(UITextMeshTextUtility.GetEffectiveText(textMesh));
         }
 
-        private static string GetFirstTooltipLine(Tooltip tooltip)
+        private static void Add(List<string> texts, string text)
         {
-            IReadOnlyList<string> lines = tooltip != null ? tooltip.TextLines : null;
-            if (lines == null)
+            if (!string.IsNullOrWhiteSpace(text))
             {
-                return string.Empty;
+                texts.Add(text);
             }
-
-            for (int i = 0; i < lines.Count; i++)
-            {
-                string line = SpeechTextSanitizer.Normalize(lines[i]);
-                if (!string.IsNullOrWhiteSpace(line))
-                {
-                    return line;
-                }
-            }
-
-            return string.Empty;
         }
 
         private static bool IsButtonEnabled(UIButton button)

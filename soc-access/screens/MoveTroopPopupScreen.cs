@@ -1,18 +1,46 @@
+using System;
 using SongsOfConquest.Client.Adventure.UI;
 using SongsOfConquestAccess.Adapters;
-using SongsOfConquestAccess.Input;
 using SongsOfConquestAccess.Localization;
 using SongsOfConquestAccess.UI;
+using SongsOfConquestAccess.UI.Graph;
 using UnityEngine;
 
 namespace SongsOfConquestAccess.Screens
 {
-    public sealed class MoveTroopPopupScreen : Screen
+    /// <summary>
+    /// The game's split popup, which opens over whichever screen's troop rows dropped a troop on an
+    /// empty slot or onto the same troop (<c>ui/TroopHudRows.cs</c>). One place to be, in the order
+    /// the popup draws it: the maximum troop size the game states, the slider that divides the troops
+    /// between the two portraits, and the three buttons under it.
+    ///
+    /// ENTER ON THE SLIDER IS THE COMMIT, because that is what the game does: the popup has no OK and
+    /// no Cancel of its own, and the mouse commits by RELEASING the handle
+    /// (<c>TroopHUDEntryMovable.HandleSliderPointerUp</c>), which is the call Enter makes here. Left
+    /// and Right move the handle through the game's own <c>HandleSliderChanged</c>, so the amounts the
+    /// value reads back are the game's own two numbers.
+    ///
+    /// Escape is the game's (<c>ConsumesBack</c> false): the movable polls <c>UI.Cancel</c> in its own
+    /// <c>Update</c> while it is deciding and puts the troops back itself. A carry cannot be live here
+    /// - it ended at the drop that opened this popup - so the navigator never wants the key either.
+    ///
+    /// The three buttons are ONE ROW because the game draws them in one, side by side under the
+    /// slider; the split button in the middle is the game's own <c>Common/MoveTroops/SplitHalf</c>
+    /// text, read from the localization rather than off its tooltip, which has the key that presses it
+    /// appended to it.
+    /// </summary>
+    public sealed class MoveTroopPopupScreen : GraphScreen
     {
+        private const string Stop = "move-troop";
+        private const string SliderKey = "move-troop:slider";
+
+        /// <summary>How many single steps a coarse one is worth - the shape the options window's
+        /// sliders established.</summary>
+        private const int CoarseSteps = 10;
+
         private readonly MoveTroopPopupAdapter _adapter;
 
         public MoveTroopPopupScreen(MoveTroopPopupAdapter adapter)
-            : base(BuildRoot(adapter))
         {
             _adapter = adapter;
         }
@@ -33,133 +61,153 @@ namespace SongsOfConquestAccess.Screens
             return null;
         }
 
+        public override string Key
+        {
+            get { return "move-troop-popup"; }
+        }
+
+        /// <summary>The header the popup draws ("Move troops").</summary>
+        public override string ScreenName
+        {
+            get { return _adapter == null ? null : _adapter.Title; }
+        }
+
+        public override object InitialFocusStop
+        {
+            get { return Stop; }
+        }
+
         public override bool IsPresent()
         {
             return _adapter != null && _adapter.IsPresent();
         }
 
-        public override void OnUnfocus()
+        public override void Build(GraphBuilder builder)
         {
-            _adapter?.HideNativeTooltip();
-            RootWidget?.Unfocus();
-        }
-
-        public override bool HasClaimed(string actionKey)
-        {
-            return actionKey == AccessibilityActions.Cancel.Key
-                || base.HasClaimed(actionKey);
-        }
-
-        public override bool HasFocusedWidgetClaimed(string actionKey)
-        {
-            return actionKey == AccessibilityActions.Cancel.Key
-                || base.HasFocusedWidgetClaimed(actionKey);
-        }
-
-        public override bool OnActionJustPressed(InputAction action)
-        {
-            if (action != null && action.Key == AccessibilityActions.Cancel.Key)
+            if (!IsPresent())
             {
-                return _adapter != null && _adapter.CanCancel() && _adapter.Cancel();
+                return;
             }
 
-            return base.OnActionJustPressed(action);
+            builder.BeginStop(Stop);
+            AddMaxTroopSize(builder);
+            AddSlider(builder);
+            AddButtons(builder);
         }
 
-        private static ContainerWidget BuildRoot(MoveTroopPopupAdapter adapter)
+        /// <summary>The line the popup states above the slider, as the game draws it: its caption and
+        /// the number beside it.</summary>
+        private void AddMaxTroopSize(GraphBuilder builder)
         {
-            ContainerWidget root = new ContainerWidget("move-troop-popup", adapter != null ? adapter.Title : string.Empty);
-            if (adapter == null)
+            Component drawnBy = _adapter.MaxTroopSizeText;
+            string line = ModText.JoinListWithCommas(_adapter.MaxTroopSizeTexts);
+            if (drawnBy == null || string.IsNullOrWhiteSpace(line))
             {
-                return root;
+                return;
             }
 
-            root.AddChild(new TextWidget(
-                "move-troop-title",
-                () => adapter.Title,
-                adapter.HideNativeTooltip,
-                includeParentLabelInAnnouncement: false));
+            builder.AddItem(new DrawnNode(
+                ControlId.For(drawnBy, "move-troop:max-size"),
+                GraphNodes.Text(() => line),
+                drawnBy));
+        }
 
-            root.AddChild(new TextWidget(
-                "move-troop-max-size",
-                () => BuildMaxTroopSize(adapter),
-                adapter.HideNativeTooltip,
-                includeParentLabelInAnnouncement: false));
+        /// <summary>The slider, read as the two amounts the game draws under the portraits either side
+        /// of it. The hotkeys the popup answers to are the game's own list, in the buffer.</summary>
+        private void AddSlider(GraphBuilder builder)
+        {
+            Component drawnBy = _adapter.SliderComponent;
+            if (drawnBy == null)
+            {
+                return;
+            }
 
-            root.AddChild(new ButtonWidget(
-                "move-troop-move-all-left",
+            NodeVtable vtable = GraphNodes.Slider(
+                () => ModText.Get(ModStrings.Screens.TroopDistribution),
+                Distribution,
+                Adjust,
+                _adapter.IsSliderEnabled,
+                _adapter.HotkeysTooltip,
+                activate: () => _adapter.Confirm());
+            vtable.OnFocusVisual = () => NativeSelectionUtility.Select(drawnBy);
+            ControlId id = ControlId.For(drawnBy, SliderKey);
+            builder.AddItem(new DrawnNode(id, vtable, drawnBy));
+            builder.SetStart(id);
+        }
+
+        /// <summary>The three buttons the popup draws in one row under the slider, in the order it
+        /// draws them.</summary>
+        private void AddButtons(GraphBuilder builder)
+        {
+            builder.StartRow("move-troop:buttons");
+            AddButton(
+                builder,
+                "move-all-left",
+                _adapter.MoveAllLeftButton,
                 () => ModText.Get(ModStrings.Screens.MoveAllLeft),
-                adapter.MoveAllLeft,
-                adapter.HideNativeTooltip,
-                adapter.IsMoveAllLeftEnabled,
-                getTooltip: () => adapter.MoveAllLeftTooltip));
-
-            root.AddChild(new ButtonWidget(
-                "move-troop-split-equal",
-                () => adapter.SplitEqualLabel,
-                adapter.SplitEqual,
-                adapter.HideNativeTooltip,
-                adapter.IsSplitEqualEnabled,
-                getTooltip: () => adapter.SplitEqualTooltip));
-
-            root.AddChild(new ButtonWidget(
-                "move-troop-move-all-right",
+                _adapter.IsMoveAllLeftEnabled,
+                _adapter.MoveAllLeftTooltip,
+                () => _adapter.MoveAllLeft());
+            AddButton(
+                builder,
+                "split-equal",
+                _adapter.SplitEqualButton,
+                () => _adapter.SplitEqualLabel,
+                _adapter.IsSplitEqualEnabled,
+                _adapter.SplitEqualTooltip,
+                () => _adapter.SplitEqual());
+            AddButton(
+                builder,
+                "move-all-right",
+                _adapter.MoveAllRightButton,
                 () => ModText.Get(ModStrings.Screens.MoveAllRight),
-                adapter.MoveAllRight,
-                adapter.HideNativeTooltip,
-                adapter.IsMoveAllRightEnabled,
-                getTooltip: () => adapter.MoveAllRightTooltip));
-
-            // Known minor issue: native TroopHUDEntryMovable stores SliderValue as the
-            // right-side balance size, then remaps visible left/right amounts based on
-            // drag direction. When moving troops right-to-left, keyboard right-arrow
-            // increases the native value but can visually move the slider left. We keep
-            // this native behavior for now because speech reports the resulting
-            // "Left: X, right: Y" distribution.
-            root.AddChild(new SliderWidget(
-                "move-troop-distribution",
-                ModText.Get(ModStrings.Screens.TroopDistribution),
-                () => BuildDistributionText(adapter),
-                adapter.GetSliderValue,
-                adapter.GetSliderMinimum,
-                adapter.GetSliderMaximum,
-                adapter.GetSliderStep,
-                adapter.SetSliderValue,
-                adapter.IsSliderEnabled));
-
-            root.AddChild(new ButtonWidget(
-                "move-troop-ok",
-                ModText.Get(ModStrings.Screens.Ok),
-                adapter.Confirm,
-                adapter.HideNativeTooltip,
-                adapter.CanConfirm));
-
-            root.AddChild(new ButtonWidget(
-                "move-troop-cancel",
-                ModText.Get(ModStrings.Actions.Cancel),
-                adapter.Cancel,
-                adapter.HideNativeTooltip,
-                adapter.CanCancel));
-
-            return root;
+                _adapter.IsMoveAllRightEnabled,
+                _adapter.MoveAllRightTooltip,
+                () => _adapter.MoveAllRight());
+            builder.EndRow();
         }
 
-        private static string BuildMaxTroopSize(MoveTroopPopupAdapter adapter)
+        private static void AddButton(
+            GraphBuilder builder,
+            string key,
+            Component drawnBy,
+            Func<string> label,
+            Func<bool> enabled,
+            Tooltip tooltip,
+            Action activate)
         {
-            string amount = adapter != null ? adapter.MaxTroopSizeAmount : string.Empty;
-            return string.IsNullOrWhiteSpace(amount)
-                ? string.Empty
-                : ModText.Get(ModStrings.Screens.MaxTroopSize, amount);
+            if (drawnBy == null)
+            {
+                return;
+            }
+
+            NodeVtable vtable = GraphNodes.Button(label, activate, enabled, tooltip);
+            vtable.OnFocusVisual = () => NativeSelectionUtility.Select(drawnBy);
+            builder.AddItem(new DrawnNode(ControlId.For(drawnBy, "move-troop:" + key), vtable, drawnBy));
         }
 
-        private static string BuildDistributionText(MoveTroopPopupAdapter adapter)
+        /// <summary>What the slider currently divides the troops into: the two amounts the game draws
+        /// under the left and right portraits.</summary>
+        private string Distribution()
         {
-            string left = adapter != null ? adapter.LeftAmount : string.Empty;
-            string right = adapter != null ? adapter.RightAmount : string.Empty;
+            string left = _adapter.LeftAmount;
+            string right = _adapter.RightAmount;
             return ModText.Get(
                 ModStrings.Screens.LeftRightDistribution,
                 string.IsNullOrWhiteSpace(left) ? "0" : left,
                 string.IsNullOrWhiteSpace(right) ? "0" : right);
+        }
+
+        /// <summary>
+        /// Move the handle, through the game's own value change. The native value is the RIGHT-hand
+        /// balance size and the game maps it onto the drawn left and right amounts by the direction the
+        /// drag went, so a step is reported by re-reading those two amounts rather than by the mod
+        /// working out which way the troops went.
+        /// </summary>
+        private void Adjust(int sign, bool large)
+        {
+            int step = large ? CoarseSteps : 1;
+            _adapter.SetSliderValue(_adapter.GetSliderValue() + sign * step);
         }
     }
 }
