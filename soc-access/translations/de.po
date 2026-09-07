@@ -702,8 +702,8 @@ msgstr "{0} zum Zerstören."
 
 #. Screens.ArtifactDropHint
 msgctxt "Screens.ArtifactDropHint"
-msgid "{0} drops on the ground."
-msgstr "{0} zum Fallenlassen auf den Boden."
+msgid "{0} to drop."
+msgstr "{0} zum Fallenlassen."
 
 #. Screens.ArtifactEquipHint
 msgctxt "Screens.ArtifactEquipHint"

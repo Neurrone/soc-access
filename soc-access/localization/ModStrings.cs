@@ -539,7 +539,7 @@ namespace SongsOfConquestAccess.Localization
             public static readonly ModString Add = new ModString("Screens.Add", "Add");
             public static readonly ModString AddKeyword = new ModString("Screens.AddKeyword", "Add keyword");
             public static readonly ModString ArtifactDestroyHint = new ModString("Screens.ArtifactDestroyHint", "{0} destroys.");
-            public static readonly ModString ArtifactDropHint = new ModString("Screens.ArtifactDropHint", "{0} drops on the ground.");
+            public static readonly ModString ArtifactDropHint = new ModString("Screens.ArtifactDropHint", "{0} to drop.");
             public static readonly ModString ArtifactEquipHint = new ModString("Screens.ArtifactEquipHint", "{0} equips.");
             public static readonly ModString ArtifactSelectForSaleHint = new ModString("Screens.ArtifactSelectForSaleHint", "{0} selects for sale.");
             public static readonly ModString ArtifactSellHint = new ModString("Screens.ArtifactSellHint", "{0} sells.");

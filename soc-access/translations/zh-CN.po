@@ -702,8 +702,8 @@ msgstr "按 {0} 销毁。"
 
 #. Screens.ArtifactDropHint
 msgctxt "Screens.ArtifactDropHint"
-msgid "{0} drops on the ground."
-msgstr "按 {0} 丢在地上。"
+msgid "{0} to drop."
+msgstr "按 {0} 丢弃。"
 
 #. Screens.ArtifactEquipHint
 msgctxt "Screens.ArtifactEquipHint"

@@ -702,8 +702,8 @@ msgstr "{0} 키로 파괴."
 
 #. Screens.ArtifactDropHint
 msgctxt "Screens.ArtifactDropHint"
-msgid "{0} drops on the ground."
-msgstr "{0} 키로 바닥에 떨어뜨리기."
+msgid "{0} to drop."
+msgstr "{0} 키로 떨어뜨리기."
 
 #. Screens.ArtifactEquipHint
 msgctxt "Screens.ArtifactEquipHint"

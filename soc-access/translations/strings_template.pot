@@ -2356,7 +2356,7 @@ msgstr ""
 
 #. Screens.ArtifactDropHint
 msgctxt "Screens.ArtifactDropHint"
-msgid "{0} drops on the ground."
+msgid "{0} to drop."
 msgstr ""
 
 #. Screens.ArtifactEquipHint
