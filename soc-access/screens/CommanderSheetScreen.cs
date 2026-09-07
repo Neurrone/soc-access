@@ -15,9 +15,9 @@ using NativeDropResult = SongsOfConquestAccess.Adapters.DropResult;
 namespace SongsOfConquestAccess.Screens
 {
     /// <summary>
-    /// The wielder sheet, made navigable as a graph. Six places to be, in the order the sheet draws
-    /// them: the tutorial button, the overview (stats, specialization, the modifier tabs and the
-    /// modifiers under them), the equipment, the backpack, the skills and powers, and the close cross.
+    /// The wielder sheet, made navigable as a graph. Seven places to be, in the order the sheet draws
+    /// them: the tutorial button, the overview (stats and specialization), the modifier tabs with the
+    /// modifiers under them, the equipment, the backpack, the skills and powers, and the close cross.
     ///
     /// EVERY GESTURE ON AN ARTIFACT IS THE GAME'S OWN CLICK, delivered into the button the game hangs
     /// its handlers on (<c>InventoryArtifactMovable</c>'s <c>UIButton</c>), so the game's own rules
@@ -54,6 +54,7 @@ namespace SongsOfConquestAccess.Screens
     {
         private const string TutorialStop = "commander-sheet-tutorial";
         private const string OverviewStop = "commander-sheet-overview";
+        private const string ModifiersStop = "commander-sheet-modifiers";
         private const string EquipmentStop = "commander-sheet-equipment";
         private const string InventoryStop = "commander-sheet-inventory";
         private const string SkillsStop = "commander-sheet-skills";
@@ -154,6 +155,9 @@ namespace SongsOfConquestAccess.Screens
             builder.BeginStop(OverviewStop);
             BuildOverview(builder);
 
+            builder.BeginStop(ModifiersStop);
+            BuildModifiers(builder);
+
             builder.BeginStop(EquipmentStop);
             BuildEquipment(builder);
 
@@ -201,6 +205,14 @@ namespace SongsOfConquestAccess.Screens
                 "specialization",
                 GameText.Get("Commanders/Tooltip/Specializations", string.Empty),
                 Items("Specializations", _adapter.GetSpecializations));
+        }
+
+        /// <summary>The modifier tab bar and the rows of the showing tab, a stop of their own as the
+        /// options screen's tabs are: a stop lands on whichever alternative is selected, and the bar
+        /// under the stats would have made Tab into the overview land mid-stop on the selected tab.
+        /// </summary>
+        private void BuildModifiers(GraphBuilder builder)
+        {
             BuildModifierTabs(builder);
             BuildBand(
                 builder,
