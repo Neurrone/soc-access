@@ -51,6 +51,17 @@ namespace SongsOfConquestAccess.Adapters
             get { return GetVisibleText(GetField<GameObject>(_subMenu, NoUpgradableTroopsField)); }
         }
 
+        /// <summary>The panel that line is drawn in, which is what proves it is on the screen.
+        /// </summary>
+        public Component NoUpgradableTroopsContainer
+        {
+            get
+            {
+                GameObject container = GetField<GameObject>(_subMenu, NoUpgradableTroopsField);
+                return container != null ? container.transform : null;
+            }
+        }
+
         public IReadOnlyList<UpgradeEntry> GetEntries()
         {
             object dictionary = EntriesField != null && _subMenu != null ? EntriesField.GetValue(_subMenu) : null;
@@ -60,15 +71,25 @@ namespace SongsOfConquestAccess.Adapters
                 return new UpgradeEntry[0];
             }
 
-            List<UpgradeEntry> result = new List<UpgradeEntry>();
+            List<UpgradeTroopsEntry> drawn = new List<UpgradeTroopsEntry>();
             foreach (object pair in enumerable)
             {
                 object value = GetPropertyValue(pair, "Value");
                 UpgradeTroopsEntry entry = value as UpgradeTroopsEntry;
                 if (entry != null && entry.gameObject != null && entry.gameObject.activeInHierarchy)
                 {
-                    result.Add(new UpgradeEntry(entry, _localization));
+                    drawn.Add(entry);
                 }
+            }
+
+            // The game keeps its entries in a dictionary and pools the cards, so the order they come
+            // back in is not the order they are drawn in; the sibling order is.
+            drawn.Sort((left, right) => left.transform.GetSiblingIndex().CompareTo(right.transform.GetSiblingIndex()));
+
+            List<UpgradeEntry> result = new List<UpgradeEntry>(drawn.Count);
+            for (int i = 0; i < drawn.Count; i++)
+            {
+                result.Add(new UpgradeEntry(drawn[i], _localization));
             }
 
             return result;
@@ -143,14 +164,10 @@ namespace SongsOfConquestAccess.Adapters
                 _localization = localization;
             }
 
-            public string IdPrefix
+            /// <summary>The card itself, which is what the menu draws for this upgrade.</summary>
+            public Component Card
             {
-                get { return "upgrade-troop-" + (_entry != null ? _entry.GetInstanceID().ToString() : "unknown"); }
-            }
-
-            public string CurrentTroopText
-            {
-                get { return MenuButtonTextUtility.JoinParts(GetText(GetField<UITextMesh>(_entry, CurrentTextField)), GetText(GetField<UITextMesh>(_entry, CurrentAmountTextField))); }
+                get { return _entry != null ? _entry.transform : null; }
             }
 
             public string CurrentTroopName
@@ -158,19 +175,55 @@ namespace SongsOfConquestAccess.Adapters
                 get { return GetText(GetField<UITextMesh>(_entry, CurrentTextField)); }
             }
 
-            public string TargetTroopText
-            {
-                get { return MenuButtonTextUtility.JoinParts(GetText(GetField<UITextMesh>(_entry, TargetTextField)), GetText(GetField<UITextMesh>(_entry, TargetAmountTextField))); }
-            }
-
             public string TargetTroopName
             {
                 get { return GetText(GetField<UITextMesh>(_entry, TargetTextField)); }
             }
 
-            public string SliderLabel
+            /// <summary>The two numbers the card draws under its portraits: how many of the troop
+            /// would be left as they are, and how many would be upgraded. The game writes them only
+            /// when it recalculates, so a shortcut that moves the slider without notifying leaves
+            /// them behind until it does.</summary>
+            public string CurrentAmountText
             {
-                get { return TargetTroopText; }
+                get { return GetText(GetField<UITextMesh>(_entry, CurrentAmountTextField)); }
+            }
+
+            public string TargetAmountText
+            {
+                get { return GetText(GetField<UITextMesh>(_entry, TargetAmountTextField)); }
+            }
+
+            /// <summary>The two portraits, which the game wires as the shortcuts to none of them and
+            /// as many as can be afforded.</summary>
+            public Component CurrentTroopButton
+            {
+                get { return GetField<UIButton>(_entry, CurrentButtonField) as Component; }
+            }
+
+            public Component TargetTroopButton
+            {
+                get { return GetField<UIButton>(_entry, TargetButtonField) as Component; }
+            }
+
+            public Component Slider
+            {
+                get { return GetSlider() as Component; }
+            }
+
+            public Component UpgradeButton
+            {
+                get { return GetPurchaseButton() as Component; }
+            }
+
+            public bool ClickCurrentTroop()
+            {
+                return NativeSelectionUtility.Click(GetField<UIButton>(_entry, CurrentButtonField));
+            }
+
+            public bool ClickTargetTroop()
+            {
+                return NativeSelectionUtility.Click(GetField<UIButton>(_entry, TargetButtonField));
             }
 
             public int SliderValue
@@ -250,39 +303,35 @@ namespace SongsOfConquestAccess.Adapters
                 }
             }
 
-            public string UpgradeLabel
+            /// <summary>The game's own reason it will not upgrade, which it writes over the price on
+            /// the button rather than in a tooltip - and only for the one reason it explains at all,
+            /// a troop with nowhere to go.</summary>
+            public bool IsRefusalVisible
             {
                 get
                 {
-                    string message = IsMessageVisible()
-                        ? GetText(GetField<UITextMesh>(_entry, PurchaseMessageTextField))
-                        : string.Empty;
-                    if (!string.IsNullOrWhiteSpace(message))
-                    {
-                        return message;
-                    }
-
-                    IReadOnlyList<ResourceCostLine> costs = UpgradeCosts;
-                    return costs.Count == 0
-                        ? ModText.Get(_localization, ModStrings.Draft.Upgrade)
-                        : ModText.Get(
-                            _localization,
-                            ModStrings.Draft.UpgradeForResources,
-                            FormatCostLines(costs));
+                    Component container = GetField<Component>(_entry, PurchaseMessageContainerField);
+                    return container != null && container.gameObject.activeInHierarchy;
                 }
             }
 
-            private IReadOnlyList<ResourceCostLine> UpgradeCosts
+            public string RefusalText
+            {
+                get { return GetText(GetField<UITextMesh>(_entry, PurchaseMessageTextField)); }
+            }
+
+            /// <summary>What upgrading the amount the slider is set to would cost.</summary>
+            public IReadOnlyList<PurchaseTroopsSubMenuAdapter.ResourceCostLine> UpgradeCosts
             {
                 get
                 {
                     Cost cost = GetUpgradeCost();
                     if (cost == null || cost.CostEntries == null)
                     {
-                        return new ResourceCostLine[0];
+                        return new PurchaseTroopsSubMenuAdapter.ResourceCostLine[0];
                     }
 
-                    List<ResourceCostLine> lines = new List<ResourceCostLine>();
+                    List<PurchaseTroopsSubMenuAdapter.ResourceCostLine> lines = new List<PurchaseTroopsSubMenuAdapter.ResourceCostLine>();
                     for (int i = 0; i < cost.SortedCostEntries.Count; i++)
                     {
                         Cost.CostEntry entry = cost.SortedCostEntries[i];
@@ -295,7 +344,7 @@ namespace SongsOfConquestAccess.Adapters
                         bool canAfford = team == null
                             || team.Resources == null
                             || team.Resources.CanAffordResource(entry.Type, entry.Amount);
-                        lines.Add(new ResourceCostLine(entry.Type, entry.Amount, canAfford));
+                        lines.Add(new PurchaseTroopsSubMenuAdapter.ResourceCostLine(entry.Type, entry.Amount, canAfford));
                     }
 
                     return lines;
@@ -322,11 +371,6 @@ namespace SongsOfConquestAccess.Adapters
                 NativeSelectionUtility.Select(_entry != null ? _entry.GetSelectable() : null);
             }
 
-            public void FocusTarget()
-            {
-                NativeSelectionUtility.Select(GetField<UIButton>(_entry, TargetButtonField));
-            }
-
             public bool Upgrade()
             {
                 if (!IsUpgradeEnabled || HandlePurchaseClickedMethod == null)
@@ -336,12 +380,6 @@ namespace SongsOfConquestAccess.Adapters
 
                 HandlePurchaseClickedMethod.Invoke(_entry, null);
                 return true;
-            }
-
-            private bool IsMessageVisible()
-            {
-                Component container = GetField<Component>(_entry, PurchaseMessageContainerField);
-                return container != null && container.gameObject.activeInHierarchy;
             }
 
             private float GetSliderValue()
@@ -396,60 +434,6 @@ namespace SongsOfConquestAccess.Adapters
                 }
             }
 
-            private string FormatCostLines(IReadOnlyList<ResourceCostLine> costs)
-            {
-                List<string> parts = new List<string>();
-                for (int i = 0; i < costs.Count; i++)
-                {
-                    ResourceCostLine cost = costs[i];
-                    if (cost != null)
-                    {
-                        parts.Add(ModText.Get(
-                            _localization,
-                            ModStrings.Common.ResourceAmount,
-                            cost.Amount,
-                            GetResourceName(cost.ResourceType)));
-                    }
-                }
-
-                return ModText.JoinList(_localization, parts);
-            }
-
-            private string GetResourceName(ResourceType resourceType)
-            {
-                string fallback = FormatEnumName(resourceType.ToString());
-                if (_localization == null)
-                {
-                    return fallback;
-                }
-
-                string key = "Common/Resource/" + resourceType;
-                string text = _localization.GetText(key);
-                return string.IsNullOrWhiteSpace(text) || text == key ? fallback : text;
-            }
-
-            private static string FormatEnumName(string value)
-            {
-                if (string.IsNullOrWhiteSpace(value))
-                {
-                    return string.Empty;
-                }
-
-                List<char> chars = new List<char>();
-                for (int i = 0; i < value.Length; i++)
-                {
-                    char c = value[i];
-                    if (i > 0 && char.IsUpper(c) && !char.IsWhiteSpace(value[i - 1]))
-                    {
-                        chars.Add(' ');
-                    }
-
-                    chars.Add(char.ToLowerInvariant(c));
-                }
-
-                return new string(chars.ToArray());
-            }
-
             private UISlider GetSlider()
             {
                 return GetField<UISlider>(_entry, SliderField);
@@ -458,20 +442,6 @@ namespace SongsOfConquestAccess.Adapters
             private UIButton GetPurchaseButton()
             {
                 return GetField<UIButton>(_entry, PurchaseButtonField);
-            }
-
-            private sealed class ResourceCostLine
-            {
-                public ResourceCostLine(ResourceType resourceType, int amount, bool canAfford)
-                {
-                    ResourceType = resourceType;
-                    Amount = amount;
-                    CanAfford = canAfford;
-                }
-
-                public ResourceType ResourceType { get; private set; }
-                public int Amount { get; private set; }
-                public bool CanAfford { get; private set; }
             }
         }
     }

@@ -657,6 +657,7 @@ namespace SongsOfConquestAccess.Localization
             public static readonly ModString ReadStoryCameraFocusChanges = new ModString("Screens.ReadStoryCameraFocusChanges", "Read story camera focus change events");
             public static readonly ModString RecruitFrom = new ModString("Screens.RecruitFrom", "Recruit from");
             public static readonly ModString RecruitingFrom = new ModString("Screens.RecruitingFrom", "Recruiting from {0}");
+            public static readonly ModString Recruits = new ModString("Screens.Recruits", "Recruits");
             public static readonly ModString Remove = new ModString("Screens.Remove", "Remove");
             public static readonly ModString RemoveKeyword = new ModString("Screens.RemoveKeyword", "Remove keyword, {0}");
             public static readonly ModString RenameCustomCategory = new ModString("Screens.RenameCustomCategory", "Rename");

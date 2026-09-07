@@ -1,11 +1,9 @@
-using SongsOfConquest.Client.Gamestate;
-using SongsOfConquest.Client.Gamestate.Facade;
-using SongsOfConquest.Common;
-using SongsOfConquest.Common.Gamestate;
-using SongsOfConquest.Common.Gamestate.Facade;
+using UnityEngine;
 
 namespace SongsOfConquestAccess.Adapters
 {
+    /// <summary>The town as a troop-management host: both sub-pages sit over its landing page, which
+    /// is what its back button returns to.</summary>
     public sealed class SettlementTroopManagementHostAdapter : ITroopManagementHostAdapter
     {
         private readonly TownInteractionMenuAdapter _adapter;
@@ -17,48 +15,43 @@ namespace SongsOfConquestAccess.Adapters
 
         public string IdPrefix { get { return "settlement"; } }
         public string Title { get { return _adapter != null ? _adapter.Title : string.Empty; } }
-        // The sub-page is titled by the button that opened it AND the line the landing page draws
-        // under that button, which is how the town names what the page is for.
-        public string DraftScreenTitle { get { return _adapter != null ? MenuButtonTextUtility.JoinParts(_adapter.DraftLabel, _adapter.DraftDescription) : string.Empty; } }
-        public string UpgradeScreenTitle { get { return _adapter != null ? MenuButtonTextUtility.JoinParts(_adapter.UpgradeLabel, _adapter.UpgradeDescription) : string.Empty; } }
-        public IClientAdventureFacade Facade { get { return _adapter != null ? _adapter.Facade : null; } }
         public PurchaseTroopsSubMenuAdapter PurchaseTroops { get { return _adapter != null ? _adapter.PurchaseTroops : null; } }
         public UpgradeTroopsSubMenuAdapter UpgradeTroops { get { return _adapter != null ? _adapter.UpgradeTroops : null; } }
 
         public bool IsDraftPresent() { return _adapter != null && _adapter.IsDraftPresent(); }
         public bool IsUpgradePresent() { return _adapter != null && _adapter.IsUpgradePresent(); }
-        public void HideNativeTooltip() { _adapter?.HideNativeTooltip(); }
 
+        public Component TutorialButton { get { return _adapter != null ? _adapter.TutorialButton : null; } }
         public bool IsTutorialVisible() { return _adapter != null && _adapter.IsTutorialButtonVisible(); }
         public string TutorialLabel { get { return _adapter != null ? _adapter.GetTutorialButtonLabel() : string.Empty; } }
         public bool ActivateTutorial() { return _adapter != null && _adapter.ActivateTutorial(); }
 
-        public bool IsBackVisible() { return IsDraftPresent() || IsUpgradePresent(); }
+        public WielderInteract Wielder { get { return _adapter != null ? _adapter.Wielder : null; } }
+
+        public Component BackButton { get { return _adapter != null ? _adapter.BackButton : null; } }
+        public string BackLabel { get { return _adapter != null ? _adapter.BackLabel : string.Empty; } }
+        public bool IsBackVisible() { return _adapter != null && _adapter.IsBackVisible(); }
         public bool Back() { return _adapter != null && _adapter.BackToTop(); }
 
-        public bool Close() { return _adapter != null && _adapter.Close(); }
-
-        public bool HasWielderArmy { get { return true; } }
-        public string WielderName { get { return _adapter != null ? _adapter.VisitingWielderName : string.Empty; } }
-        public Tooltip WielderTooltip { get { return _adapter != null ? _adapter.VisitingWielderTooltip : null; } }
-        public TroopHudAdapter WielderTroops { get { return _adapter != null ? _adapter.VisitingTroops : null; } }
-
-        public bool ShouldRefreshForTroops(OnTroopsUpdatedPayload payload)
+        public Component CloseButton
         {
-            return payload != null
-                && _adapter != null
-                && payload.ParentType == TroopParentType.Commander
-                && payload.ParentId == _adapter.VisitingCommanderId;
+            get
+            {
+                WielderInteract wielder = Wielder;
+                return wielder != null ? wielder.CloseButton : null;
+            }
         }
 
-        public bool ShouldRefreshForResource(ResourceUpdatedPayload payload)
+        public bool IsCloseVisible()
         {
-            return payload != null;
+            WielderInteract wielder = Wielder;
+            return wielder != null && wielder.IsCloseVisible;
         }
 
-        public bool ShouldRefreshForRecruitmentPool()
+        public bool Close()
         {
-            return true;
+            WielderInteract wielder = Wielder;
+            return wielder != null && wielder.ActivateClose();
         }
     }
 }

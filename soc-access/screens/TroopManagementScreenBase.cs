@@ -1,249 +1,167 @@
-using System;
-using SongsOfConquest.Client.Gamestate;
-using SongsOfConquest.Client.Gamestate.Facade;
-using SongsOfConquest.Common;
-using SongsOfConquest.Common.Gamestate.Facade;
 using SongsOfConquestAccess.Adapters;
-using SongsOfConquestAccess.Input;
 using SongsOfConquestAccess.Localization;
 using SongsOfConquestAccess.UI;
+using SongsOfConquestAccess.UI.Graph;
+using UnityEngine;
 
 namespace SongsOfConquestAccess.Screens
 {
-    public abstract class TroopManagementScreenBase : Screen
+    /// <summary>
+    /// What the draft page and the upgrade page have in common, on all three menus that draw them -
+    /// the dwelling, the town and the defence menu. Up to four places to be, in the order the host
+    /// draws them: the tutorial button in the corner where the host draws one, the band of the
+    /// wielder who walked in where there is one, the page itself, and the way out.
+    ///
+    /// ESCAPE IS THE GAME'S, and on these sub-pages it goes BACK rather than closing: the town and
+    /// the dwelling register <c>UI.ExitMenu</c> at <c>InputLevel.PopupInPopup</c> outside their
+    /// gamepad branch, which shadows the close binding their window registered at <c>Popup</c>, and
+    /// the defence menu swaps its own <c>Popup</c> handler from <c>Hide</c> to <c>ShowTopLevel</c>
+    /// while a sub-page is up (all three measured 2026-09-08 in the decompiled source). So
+    /// <c>ConsumesBack</c> stays false, no Back node is invented, and the back button each host
+    /// DRAWS over its sub-page is declared as the button it is, before the close cross.
+    ///
+    /// THE WIELDER'S ARMY is the same band every other menu draws (<c>ui/TroopHudRows.cs</c>), carry
+    /// and quick splits included; the defence menu is opened without a wielder and draws none.
+    ///
+    /// The host writes no title of its own over a sub-page - the building's name stays where it was
+    /// on the landing page - so that is what the page is called.
+    /// </summary>
+    public abstract class TroopManagementScreenBase : GraphScreen
     {
-        private const int WielderTroopMenuIndex = 3;
-
-        private Action<OnTroopsUpdatedPayload> _troopsUpdatedHandler;
-        private Action<ResourceUpdatedPayload> _resourceUpdatedHandler;
-        private Action _recruitmentPoolUpdatedHandler;
-
         protected TroopManagementScreenBase(ITroopManagementHostAdapter host)
-            : base(new ContainerWidget(host != null ? host.IdPrefix : "troop-management", host != null ? host.Title : string.Empty))
         {
             Host = host;
-            RootWidget = BuildRoot();
         }
 
         protected ITroopManagementHostAdapter Host { get; private set; }
 
+        /// <summary>Which host drew this page, which is how the detector tells one menu's sub-page
+        /// from another's.</summary>
         public string HostIdPrefix
         {
             get { return Host != null ? Host.IdPrefix : string.Empty; }
         }
 
+        /// <summary>What this page is, in control keys: "draft-troops" or "upgrade-troops".</summary>
         protected abstract string ScreenSuffix { get; }
-        protected abstract string ScreenTitle { get; }
+
         protected abstract bool IsContentPresent();
-        protected abstract void AddContentWidgets(ContainerWidget root);
+
+        /// <summary>The page itself, declared into the stop the base has already opened.</summary>
+        protected abstract void BuildContent(GraphBuilder builder);
+
+        public override string Key
+        {
+            get { return HostIdPrefix + "-" + ScreenSuffix; }
+        }
+
+        public override string ScreenName
+        {
+            get
+            {
+                string title = Host != null ? Host.Title : null;
+                return string.IsNullOrWhiteSpace(title) ? null : title;
+            }
+        }
 
         public override bool IsPresent()
         {
             return Host != null && IsContentPresent();
         }
 
-        public override void OnPush()
-        {
-            AttachListeners();
-        }
-
-        public override void OnUnfocus()
-        {
-            Host?.HideNativeTooltip();
-            RootWidget?.Unfocus();
-        }
-
-        public override void OnPop()
-        {
-            DetachListeners();
-            Host?.HideNativeTooltip();
-        }
-
-        public override bool OnActionJustPressed(InputAction action)
-        {
-            if (action != null && action.Key == AccessibilityActions.Cancel.Key)
-            {
-                if (RootWidget != null && RootWidget.HandleAction(action))
-                {
-                    return true;
-                }
-
-                if (Host != null && Host.IsBackVisible() && Host.Back())
-                {
-                    return true;
-                }
-
-                return Host != null && Host.Close();
-            }
-
-            return base.OnActionJustPressed(action);
-        }
-
-        public void Refresh()
+        public override void Build(GraphBuilder builder)
         {
             if (!IsPresent())
             {
                 return;
             }
 
-            int focusedIndex = RootWidget != null ? RootWidget.FocusedIndex : -1;
-            int troopMenuFocusedIndex = GetWielderTroopMenuFocusedIndex();
-            RootWidget = BuildRoot();
-            RestoreWielderTroopMenuFocus(troopMenuFocusedIndex);
-            RootWidget?.SetFocusByIndexSilently(focusedIndex);
+            BuildTutorial(builder);
+            TroopHudRows.WielderStop(builder, Key + ":wielder-stop", Key + ":wielder", Host.Wielder);
+
+            builder.BeginStop(Key + ":content");
+            BuildContent(builder);
+
+            builder.BeginStop(Key + ":close");
+            BuildBack(builder);
+            BuildClose(builder);
         }
 
-        private int GetWielderTroopMenuFocusedIndex()
+        /// <summary>The game's Ctrl+digit quick splits, on the wielder's own rows.</summary>
+        public override bool ClaimsAction(string actionKey)
         {
-            MenuWidget menu = RootWidget != null ? RootWidget.GetChildAt(WielderTroopMenuIndex) as MenuWidget : null;
-            return menu != null ? menu.FocusedIndex : -1;
+            return TroopHudRows.ClaimsAction(actionKey, Navigator, WielderTroops, Key + ":wielder");
         }
 
-        private void RestoreWielderTroopMenuFocus(int focusedIndex)
+        public override bool OnAction(string actionKey)
         {
-            if (focusedIndex < 0 || RootWidget == null)
+            return TroopHudRows.OnAction(actionKey, Navigator, WielderTroops, Key + ":wielder");
+        }
+
+        private TroopHudAdapter WielderTroops
+        {
+            get
+            {
+                WielderInteract wielder = Host == null ? null : Host.Wielder;
+                return wielder == null ? null : wielder.Troops;
+            }
+        }
+
+        private void BuildTutorial(GraphBuilder builder)
+        {
+            if (!Host.IsTutorialVisible())
             {
                 return;
             }
 
-            MenuWidget menu = RootWidget.GetChildAt(WielderTroopMenuIndex) as MenuWidget;
-            menu?.SetFocusByIndexSilently(focusedIndex);
-        }
-
-        private void AttachListeners()
-        {
-            IClientAdventureFacade facade = Host != null ? Host.Facade : null;
-            if (facade == null || facade.Commands == null)
-            {
-                return;
-            }
-
-            _troopsUpdatedHandler = HandleTroopsUpdated;
-            _resourceUpdatedHandler = HandleResourceUpdated;
-            _recruitmentPoolUpdatedHandler = HandleRecruitmentPoolUpdated;
-
-            IClientCommandsFacade commands = facade.Commands;
-            commands.OnTroopsUpdated = (Action<OnTroopsUpdatedPayload>)Delegate.Combine(commands.OnTroopsUpdated, _troopsUpdatedHandler);
-            commands.OnResourceUpdated = (Action<ResourceUpdatedPayload>)Delegate.Combine(commands.OnResourceUpdated, _resourceUpdatedHandler);
-            commands.OnRecruitmentPoolUpdated = (Action)Delegate.Combine(commands.OnRecruitmentPoolUpdated, _recruitmentPoolUpdatedHandler);
-        }
-
-        private void DetachListeners()
-        {
-            IClientAdventureFacade facade = Host != null ? Host.Facade : null;
-            if (facade == null || facade.Commands == null)
-            {
-                return;
-            }
-
-            IClientCommandsFacade commands = facade.Commands;
-            if (_troopsUpdatedHandler != null)
-            {
-                commands.OnTroopsUpdated = (Action<OnTroopsUpdatedPayload>)Delegate.Remove(commands.OnTroopsUpdated, _troopsUpdatedHandler);
-                _troopsUpdatedHandler = null;
-            }
-
-            if (_resourceUpdatedHandler != null)
-            {
-                commands.OnResourceUpdated = (Action<ResourceUpdatedPayload>)Delegate.Remove(commands.OnResourceUpdated, _resourceUpdatedHandler);
-                _resourceUpdatedHandler = null;
-            }
-
-            if (_recruitmentPoolUpdatedHandler != null)
-            {
-                commands.OnRecruitmentPoolUpdated = (Action)Delegate.Remove(commands.OnRecruitmentPoolUpdated, _recruitmentPoolUpdatedHandler);
-                _recruitmentPoolUpdatedHandler = null;
-            }
-        }
-
-        private void HandleTroopsUpdated(OnTroopsUpdatedPayload payload)
-        {
-            if (Host != null && Host.ShouldRefreshForTroops(payload))
-            {
-                RefreshIfTop();
-            }
-        }
-
-        private void HandleResourceUpdated(ResourceUpdatedPayload payload)
-        {
-            if (Host != null && Host.ShouldRefreshForResource(payload))
-            {
-                RefreshIfTop();
-            }
-        }
-
-        private void HandleRecruitmentPoolUpdated()
-        {
-            if (Host != null && Host.ShouldRefreshForRecruitmentPool())
-            {
-                RefreshIfTop();
-            }
-        }
-
-        private void RefreshIfTop()
-        {
-            if (ReferenceEquals(SocAccessMod.Instance?.ScreenManager?.CurrentScreen, this))
-            {
-                Refresh();
-            }
-        }
-
-        private ContainerWidget BuildRoot()
-        {
-            string prefix = Host != null ? Host.IdPrefix + "-" + ScreenSuffix : "troop-management";
-            ContainerWidget root = new ContainerWidget(prefix, ScreenTitle);
-            if (Host == null)
-            {
-                return root;
-            }
-
-            root.AddChild(new ButtonWidget(
-                prefix + "-tutorial",
+            builder.BeginStop(Key + ":tutorial");
+            SettlementNodes.Button(
+                builder,
+                Host.TutorialButton,
+                Key + ":tutorial-button",
                 () => Host.TutorialLabel,
-                Host.ActivateTutorial,
-                Host.HideNativeTooltip,
-                Host.IsTutorialVisible,
-                Host.IsTutorialVisible));
+                () => Host.ActivateTutorial(),
+                null,
+                null,
+                null);
+        }
 
-            root.AddChild(new TextWidget(
-                prefix + "-title",
-                () => Host.Title,
-                Host.HideNativeTooltip,
-                includeParentLabelInAnnouncement: false));
-
-            if (Host.HasWielderArmy)
+        /// <summary>The button the host draws over a sub-page to go back to its landing page - the
+        /// same thing Escape does here, and the only one of the two the mod has to name.</summary>
+        private void BuildBack(GraphBuilder builder)
+        {
+            if (!Host.IsBackVisible())
             {
-                root.AddChild(Portrait.Static(
-                    prefix + "-wielder",
-                    () => Host.WielderName,
-                    Host.HideNativeTooltip,
-                    () => Host.WielderTooltip));
-
-                root.AddChild(TroopHudMenu.Build(
-                    prefix + "-troops",
-                    GameText.Get("Commanders/Tooltip/Troops", string.Empty),
-                    Host.WielderTroops,
-                    () => true));
+                return;
             }
 
-            AddContentWidgets(root);
+            SettlementNodes.Button(
+                builder,
+                Host.BackButton,
+                Key + ":back",
+                () => Host.BackLabel,
+                () => Host.Back(),
+                null,
+                null,
+                () => NativeSelectionUtility.Select(Host.BackButton));
+        }
 
-            root.AddChild(new ButtonWidget(
-                prefix + "-back",
-                ModText.Get(ModStrings.Screens.Back),
-                Host.Back,
-                Host.HideNativeTooltip,
-                Host.IsBackVisible,
-                Host.IsBackVisible));
+        /// <summary>The cross that shuts the whole menu: the wielder band's on the town and the
+        /// dwelling, the menu's own on the defence menu. An icon with no text of its own, so the mod
+        /// names it.</summary>
+        private void BuildClose(GraphBuilder builder)
+        {
+            Component close = Host.CloseButton;
+            if (close == null || !Host.IsCloseVisible())
+            {
+                return;
+            }
 
-            root.AddChild(new ButtonWidget(
-                prefix + "-close",
-                ModText.Get(ModStrings.Screens.Close),
-                Host.Close,
-                Host.HideNativeTooltip,
-                IsContentPresent));
-
-            return root;
+            NodeVtable vtable = GraphNodes.Button(
+                () => ModText.Get(ModStrings.Screens.Close),
+                () => Host.Close());
+            vtable.OnFocusVisual = () => NativeSelectionUtility.Select(close);
+            builder.AddItem(new DrawnNode(ControlId.For(close, Key + ":close-button"), vtable, close));
         }
     }
 }

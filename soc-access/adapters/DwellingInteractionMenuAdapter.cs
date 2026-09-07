@@ -25,10 +25,12 @@ namespace SongsOfConquestAccess.Adapters
         private static readonly FieldInfo HeaderPortraitField = AccessTools.Field(typeof(WielderInteractHeader), "_wielderPortrait");
 
         private static readonly FieldInfo UpgradeTroopsSubMenuField = AccessTools.Field(typeof(DwellingInteractionMenu), "_upgradeTroopsSubMenu");
+        private static readonly FieldInfo BackToTopButtonField = AccessTools.Field(typeof(DwellingInteractionMenu), "_backToTopButton");
 
         private readonly DwellingInteractionMenu _menu;
         private readonly IClientAdventureFacade _facade;
         private readonly ILocalizationHandler _localization;
+        private WielderInteract _wielder;
 
         public DwellingInteractionMenuAdapter(DwellingInteractionMenu menu)
         {
@@ -129,9 +131,38 @@ namespace SongsOfConquestAccess.Adapters
             return true;
         }
 
-        public string CloseLabel
+        /// <summary>The band the menu hangs across its top: the wielder who walked in, their army and
+        /// the close cross.</summary>
+        public WielderInteract Wielder
         {
-            get { return string.Empty; }
+            get
+            {
+                WielderInteractHeader header = GetHeader();
+                if (_wielder == null || !ReferenceEquals(_wielder.Header, header))
+                {
+                    _wielder = new WielderInteract(header, _facade, _localization);
+                }
+
+                return _wielder;
+            }
+        }
+
+        /// <summary>The button the menu draws over its upgrade page to get back to the draft page it
+        /// opens on, and the word the prefab has written on it.</summary>
+        public Component BackButton
+        {
+            get { return GetField<UIButton>(_menu, BackToTopButtonField) as Component; }
+        }
+
+        public string BackLabel
+        {
+            get { return SpeechTextSanitizer.Normalize(MenuButtonTextUtility.GetAllVisibleText(GetField<UIButton>(_menu, BackToTopButtonField))); }
+        }
+
+        public bool IsBackVisible()
+        {
+            Component button = BackButton;
+            return button != null && button.gameObject != null && button.gameObject.activeInHierarchy;
         }
 
         public bool BackToTop()

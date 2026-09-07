@@ -340,6 +340,23 @@ namespace SongsOfConquestAccess.Adapters
             NativeSelectionUtility.Select(GetUpgradeButton());
         }
 
+        /// <summary>The button the menu draws over a sub-page to get back to its landing page, and the
+        /// word the prefab has written on it. The menu hides it on the landing page itself.</summary>
+        public Component BackButton
+        {
+            get { return GetField<UIButton>(_menu, BackToTopButtonField) as Component; }
+        }
+
+        public string BackLabel
+        {
+            get { return GetButtonLabel(GetField<UIButton>(_menu, BackToTopButtonField)); }
+        }
+
+        public bool IsBackVisible()
+        {
+            return IsVisible(BackButton);
+        }
+
         public bool BackToTop()
         {
             return NativeSelectionUtility.Click(GetField<UIButton>(_menu, BackToTopButtonField));

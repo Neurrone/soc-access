@@ -106,9 +106,27 @@ namespace SongsOfConquestAccess.Adapters
             public abstract string NoTroopsText { get; }
             public abstract bool IsNoTroopsVisible { get; }
 
+            /// <summary>The card itself, which is what the menu draws for this recruit.</summary>
+            public Component Card
+            {
+                get { return Entry != null ? Entry.transform : null; }
+            }
+
             public virtual bool IsSliderVisible { get { return false; } }
             public virtual bool IsSliderEnabled { get { return false; } }
             public virtual string SliderLabel { get { return string.Empty; } }
+            /// <summary>The number the card draws beside the slider, and the pool size it draws after
+            /// it - the game writes them as "7" and "/12", so the total comes back without the
+            /// separator the game draws between them.</summary>
+            public virtual string AmountText { get { return string.Empty; } }
+            public virtual string TotalAmountText { get { return string.Empty; } }
+            public virtual Component Slider { get { return null; } }
+            public virtual Component PurchaseButton { get { return null; } }
+            public virtual Component UpgradeInPoolButton { get { return null; } }
+            /// <summary>The tab the card draws for one essence variant, and the troop name the game
+            /// gives it as its tooltip. Null where the card draws no essence tabs.</summary>
+            public virtual Component EssenceButton(TroopUpgradeType upgradeType) { return null; }
+            public virtual Tooltip EssenceTooltip(TroopUpgradeType upgradeType) { return null; }
             public virtual int SliderValue { get { return 0; } }
             public virtual int SliderMinimum { get { return 0; } }
             public virtual int SliderMaximum { get { return 0; } }
@@ -245,6 +263,9 @@ namespace SongsOfConquestAccess.Adapters
             private static readonly FieldInfo PurchaseButtonField = AccessTools.Field(typeof(PurchaseTroopsEntry), "_purchaseButton");
             private static readonly FieldInfo UpgradeButtonField = AccessTools.Field(typeof(PurchaseTroopsEntry), "_upgradeButton");
             private static readonly FieldInfo EssenceTabsField = AccessTools.Field(typeof(PurchaseTroopsEntry), "_essenceTabs");
+            private static readonly FieldInfo ArcanaButtonField = AccessTools.Field(typeof(PurchaseTroopsEntry), "_arcanaButton");
+            private static readonly FieldInfo CreationButtonField = AccessTools.Field(typeof(PurchaseTroopsEntry), "_creationButton");
+            private static readonly FieldInfo OrderButtonField = AccessTools.Field(typeof(PurchaseTroopsEntry), "_orderButton");
             private static readonly FieldInfo GoldCostField = AccessTools.Field(typeof(PurchaseTroopsEntry), "_goldCost");
             private static readonly FieldInfo ExoticCostField = AccessTools.Field(typeof(PurchaseTroopsEntry), "_exoticCost");
             private static readonly FieldInfo SliderValueField = AccessTools.Field(typeof(PurchaseTroopsEntry), "_sliderValue");
@@ -279,6 +300,30 @@ namespace SongsOfConquestAccess.Adapters
                     string total = GetText(GetField<UITextMesh>(_entry, TotalAmountTextField));
                     return SpeechTextSanitizer.Normalize((amount + " " + total).Trim());
                 }
+            }
+
+            public override string AmountText
+            {
+                get { return GetText(GetField<UITextMesh>(_entry, AmountTextField)); }
+            }
+
+            public override string TotalAmountText
+            {
+                get { return GetText(GetField<UITextMesh>(_entry, TotalAmountTextField)).TrimStart('/').Trim(); }
+            }
+
+            public override Component Slider { get { return GetSlider() as Component; } }
+            public override Component PurchaseButton { get { return GetPurchaseButton() as Component; } }
+            public override Component UpgradeInPoolButton { get { return GetUpgradeButton() as Component; } }
+
+            public override Component EssenceButton(TroopUpgradeType upgradeType)
+            {
+                return GetEssenceButton(upgradeType) as Component;
+            }
+
+            public override Tooltip EssenceTooltip(TroopUpgradeType upgradeType)
+            {
+                return Tooltip.ForComponent(GetEssenceButton(upgradeType) as Component, Localization);
             }
 
             public override int SliderValue
@@ -365,6 +410,23 @@ namespace SongsOfConquestAccess.Adapters
 
                 HandleEssenceButtonClickedMethod.Invoke(_entry, new object[] { upgradeType });
                 return true;
+            }
+
+            private UIButton GetEssenceButton(TroopUpgradeType upgradeType)
+            {
+                if (upgradeType == TroopUpgradeType.ArcanaUpgraded)
+                {
+                    return GetField<UIButton>(_entry, ArcanaButtonField);
+                }
+
+                if (upgradeType == TroopUpgradeType.CreationUpgraded)
+                {
+                    return GetField<UIButton>(_entry, CreationButtonField);
+                }
+
+                return upgradeType == TroopUpgradeType.OrderUpgraded
+                    ? GetField<UIButton>(_entry, OrderButtonField)
+                    : null;
             }
 
             private UISlider GetSlider() { return GetField<UISlider>(_entry, SliderField); }

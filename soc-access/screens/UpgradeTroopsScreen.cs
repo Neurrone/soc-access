@@ -3,14 +3,31 @@ using SongsOfConquest.Client.Adventure;
 using SongsOfConquestAccess.Adapters;
 using SongsOfConquestAccess.Localization;
 using SongsOfConquestAccess.UI;
+using SongsOfConquestAccess.UI.Graph;
 using UnityEngine;
 
 namespace SongsOfConquestAccess.Screens
 {
+    /// <summary>
+    /// The page a wielder's own troops are upgraded on, over the landing page of the dwelling, the
+    /// town or the defence menu.
+    ///
+    /// THE PAGE IS ONE EXPANDABLE GROUP PER UPGRADE - "Militia to Halberdiers" and how many of them
+    /// there are - or, where there is nothing to upgrade, the one line the game writes instead.
+    /// Under each group is everything the card draws for that trade: the two portraits, which the
+    /// game wires as the shortcuts to none and to as many as can be afforded, the slider between
+    /// them, and the button that pays for it.
+    ///
+    /// THE TWO SHORTCUTS MOVE THE SLIDER WITHOUT TELLING THE CARD (the game sets
+    /// <c>UISlider.SliderValue</c>, which does not notify), so the amounts the card draws only catch
+    /// up on its next recalculation. The amounts are read live and watched, so the cursor standing
+    /// on them hears them arrive rather than reading a number the mod worked out itself.
+    ///
+    /// Escape, the tutorial button, the wielder's band, the back button and the close cross are the
+    /// base's (<c>screens/TroopManagementScreenBase.cs</c>).
+    /// </summary>
     public sealed class UpgradeTroopsScreen : TroopManagementScreenBase
     {
-        private string _selectedUpgradeId;
-
         public UpgradeTroopsScreen(ITroopManagementHostAdapter host)
             : base(host)
         {
@@ -61,177 +78,110 @@ namespace SongsOfConquestAccess.Screens
             return null;
         }
 
+        /// <summary>Where the upgrade cards' keys start, so the same prefix names them and finds the
+        /// one the cursor is on.</summary>
+        private string CardPrefix
+        {
+            get { return Key + ":upgrade/"; }
+        }
+
         protected override string ScreenSuffix { get { return "upgrade-troops"; } }
-        protected override string ScreenTitle { get { return Host != null ? Host.UpgradeScreenTitle : string.Empty; } }
-        protected override bool IsContentPresent() { return Host != null && Host.IsUpgradePresent(); }
 
-        protected override void AddContentWidgets(ContainerWidget root)
+        protected override bool IsContentPresent()
         {
-            if (root == null || Host == null || Host.UpgradeTroops == null)
-            {
-                return;
-            }
+            return Host != null && Host.IsUpgradePresent();
+        }
 
+        protected override void BuildContent(GraphBuilder builder)
+        {
             UpgradeTroopsSubMenuAdapter subMenu = Host.UpgradeTroops;
+            if (subMenu == null)
+            {
+                return;
+            }
+
+            if (subMenu.IsNoUpgradableTroopsVisible)
+            {
+                BuildNoUpgrades(builder, subMenu);
+            }
+
             IReadOnlyList<UpgradeTroopsSubMenuAdapter.UpgradeEntry> entries = subMenu.GetEntries();
-            EnsureSelectedUpgrade(entries);
-
-            root.AddChild(new TextWidget(
-                Host.IdPrefix + "-upgrade-none",
-                () => subMenu.NoUpgradableTroopsText,
-                Host.HideNativeTooltip,
-                includeParentLabelInAnnouncement: false,
-                isVisible: () => subMenu.IsNoUpgradableTroopsVisible));
-
-            root.AddChild(BuildTroopsMenu(entries));
             for (int i = 0; i < entries.Count; i++)
             {
-                AddUpgradeWidgets(root, entries[i]);
+                BuildUpgrade(builder, entries[i], CardPrefix + i);
             }
         }
 
-        private MenuWidget BuildTroopsMenu(IReadOnlyList<UpgradeTroopsSubMenuAdapter.UpgradeEntry> entries)
+        /// <summary>Home and End take the slider to none of the stack and to all of it - the same two
+        /// ends the game's own portrait shortcuts reach.</summary>
+        public override bool OnEdge(GraphNode node, bool first)
         {
-            string idPrefix = Host != null ? Host.IdPrefix + "-" + ScreenSuffix : "upgrade-troops";
-            MenuWidget menu = new MenuWidget(
-                idPrefix + "-troops",
-                GameText.Get("Commanders/Tooltip/Troops", string.Empty),
-                () => entries != null && entries.Count > 0);
-            if (entries == null)
-            {
-                return menu;
-            }
-
-            for (int i = 0; i < entries.Count; i++)
-            {
-                UpgradeTroopsSubMenuAdapter.UpgradeEntry entry = entries[i];
-                if (entry == null)
-                {
-                    continue;
-                }
-
-                UpgradeTroopsSubMenuAdapter.UpgradeEntry capturedEntry = entry;
-                menu.AddItem(new MenuItemWidget(
-                    capturedEntry.IdPrefix + "-menu-item",
-                    () => BuildUpgradeChoiceLabel(capturedEntry),
-                    () => BuildUpgradeStatus(capturedEntry),
-                    () => SelectUpgrade(capturedEntry, playSound: true),
-                    () => SelectUpgrade(capturedEntry, playSound: true),
-                    () => true,
-                    () => capturedEntry.CurrentTooltip));
-            }
-
-            menu.SetFocusedItemById(_selectedUpgradeId + "-menu-item");
-            return menu;
-        }
-
-        private void AddUpgradeWidgets(ContainerWidget root, UpgradeTroopsSubMenuAdapter.UpgradeEntry entry)
-        {
-            if (root == null || entry == null)
-            {
-                return;
-            }
-
-            root.AddChild(new TextWidget(
-                entry.IdPrefix + "-target",
-                () => entry.TargetTroopText,
-                entry.FocusTarget,
-                includeParentLabelInAnnouncement: false,
-                () => entry.TargetTooltip,
-                () => IsSelectedUpgrade(entry)));
-
-            root.AddChild(new SliderWidget(
-                entry.IdPrefix + "-quantity",
-                ModText.Get(ModStrings.Common.Quantity),
-                () => ModText.Get(ModStrings.Screens.AmountToUpgrade, entry.SliderLabel),
-                () => entry.SliderValue,
-                () => entry.SliderMinimum,
-                () => entry.SliderMaximum,
-                () => 1,
-                entry.SetSliderValue,
-                () => entry.IsSliderEnabled,
-                () => IsSelectedUpgrade(entry) && entry.IsSliderVisible));
-
-            root.AddChild(new ButtonWidget(
-                entry.IdPrefix + "-upgrade",
-                () => entry.UpgradeLabel,
-                entry.Upgrade,
-                entry.Focus,
-                () => entry.IsUpgradeEnabled,
-                () => IsSelectedUpgrade(entry) && entry.IsUpgradeVisible,
-                () => entry.UpgradeTooltip));
-        }
-
-        private void EnsureSelectedUpgrade(IReadOnlyList<UpgradeTroopsSubMenuAdapter.UpgradeEntry> entries)
-        {
-            if (FindUpgrade(entries, _selectedUpgradeId) != null)
-            {
-                return;
-            }
-
-            _selectedUpgradeId = entries != null && entries.Count > 0 && entries[0] != null
-                ? entries[0].IdPrefix
-                : null;
-        }
-
-        private static UpgradeTroopsSubMenuAdapter.UpgradeEntry FindUpgrade(
-            IReadOnlyList<UpgradeTroopsSubMenuAdapter.UpgradeEntry> entries,
-            string id)
-        {
-            if (entries == null || string.IsNullOrWhiteSpace(id))
-            {
-                return null;
-            }
-
-            for (int i = 0; i < entries.Count; i++)
-            {
-                UpgradeTroopsSubMenuAdapter.UpgradeEntry entry = entries[i];
-                if (entry != null && entry.IdPrefix == id)
-                {
-                    return entry;
-                }
-            }
-
-            return null;
-        }
-
-        private bool IsSelectedUpgrade(UpgradeTroopsSubMenuAdapter.UpgradeEntry entry)
-        {
-            return entry != null && entry.IdPrefix == _selectedUpgradeId;
-        }
-
-        private bool SelectUpgrade(UpgradeTroopsSubMenuAdapter.UpgradeEntry entry, bool playSound)
-        {
-            if (entry == null)
+            int index = RecruitGroups.ChildIndex(node, CardPrefix, "slider");
+            UpgradeTroopsSubMenuAdapter subMenu = Host == null ? null : Host.UpgradeTroops;
+            IReadOnlyList<UpgradeTroopsSubMenuAdapter.UpgradeEntry> entries = index < 0 || subMenu == null
+                ? null
+                : subMenu.GetEntries();
+            if (entries == null || index >= entries.Count)
             {
                 return false;
             }
 
-            bool changed = _selectedUpgradeId != entry.IdPrefix;
-            _selectedUpgradeId = entry.IdPrefix;
-            entry.Focus();
-            if (changed && playSound)
+            UpgradeTroopsSubMenuAdapter.UpgradeEntry entry = entries[index];
+            if (entry == null || !entry.IsSliderEnabled)
             {
-                NativeSoundUtility.PostEvent("Common_DefaultClick");
+                return false;
             }
 
+            entry.SetSliderValue(first ? entry.SliderMinimum : entry.SliderMaximum);
             return true;
         }
 
-        private static string BuildUpgradeStatus(UpgradeTroopsSubMenuAdapter.UpgradeEntry entry)
+        /// <summary>The game's own line for a page with nothing on it: every troop already upgraded,
+        /// or the buildings that would allow it not built yet.</summary>
+        private void BuildNoUpgrades(GraphBuilder builder, UpgradeTroopsSubMenuAdapter subMenu)
         {
-            return entry != null
-                ? ModText.Plural(ModStrings.Draft.AvailableTroops, entry.AvailableTroops, entry.AvailableTroops)
-                : string.Empty;
-        }
-
-        private static string BuildUpgradeChoiceLabel(UpgradeTroopsSubMenuAdapter.UpgradeEntry entry)
-        {
-            if (entry == null)
+            Component container = subMenu.NoUpgradableTroopsContainer;
+            if (container == null)
             {
-                return string.Empty;
+                return;
             }
 
+            builder.AddItem(new DrawnNode(
+                ControlId.For(container, Key + ":no-upgrades"),
+                GraphNodes.Text(() => subMenu.NoUpgradableTroopsText),
+                container));
+        }
+
+        /// <summary>One trade the page offers, and everything the card draws for it.</summary>
+        private void BuildUpgrade(
+            GraphBuilder builder,
+            UpgradeTroopsSubMenuAdapter.UpgradeEntry entry,
+            string key)
+        {
+            Component card = entry == null ? null : entry.Card;
+            if (card == null)
+            {
+                return;
+            }
+
+            UpgradeTroopsSubMenuAdapter.UpgradeEntry it = entry;
+            NodeVtable vtable = GraphNodes.Group(() => Choice(it), null, null, it.CurrentTooltip);
+            vtable.Announcements.Add(GraphNodes.ValuePart(
+                () => ModText.Plural(ModStrings.Draft.AvailableTroops, it.AvailableTroops, it.AvailableTroops)));
+            vtable.OnFocusVisual = () => it.Focus();
+            builder.BeginGroup(new DrawnNode(ControlId.For(card, key), vtable, card));
+
+            BuildPortrait(builder, it, key + "/current", it.CurrentTroopButton, () => it.CurrentTroopName, () => it.CurrentAmountText, () => it.ClickCurrentTroop(), it.CurrentTooltip);
+            BuildPortrait(builder, it, key + "/target", it.TargetTroopButton, () => it.TargetTroopName, () => it.TargetAmountText, () => it.ClickTargetTroop(), it.TargetTooltip);
+            BuildSlider(builder, it, key + "/slider");
+            BuildUpgradeButton(builder, it, key + "/upgrade");
+
+            builder.EndGroup();
+        }
+
+        /// <summary>What this card would turn what into.</summary>
+        private static string Choice(UpgradeTroopsSubMenuAdapter.UpgradeEntry entry)
+        {
             string current = entry.CurrentTroopName;
             string target = entry.TargetTroopName;
             if (string.IsNullOrWhiteSpace(target) || target == current)
@@ -240,6 +190,92 @@ namespace SongsOfConquestAccess.Screens
             }
 
             return ModText.Get(ModStrings.Draft.UpgradeChoice, current, target);
+        }
+
+        /// <summary>One of the two portraits: the troop it is about and how many of them the card is
+        /// drawing under it, watched, since the game's own shortcut on the other portrait rewrites
+        /// both. Pressing it is that shortcut - none of them on the current troop, as many as can be
+        /// afforded on the target.</summary>
+        private void BuildPortrait(
+            GraphBuilder builder,
+            UpgradeTroopsSubMenuAdapter.UpgradeEntry entry,
+            string key,
+            Component button,
+            System.Func<string> name,
+            System.Func<string> amount,
+            System.Action activate,
+            Tooltip tooltip)
+        {
+            if (button == null || button.gameObject == null || !button.gameObject.activeInHierarchy)
+            {
+                return;
+            }
+
+            UpgradeTroopsSubMenuAdapter.UpgradeEntry it = entry;
+            NodeVtable vtable = GraphNodes.Button(name, activate, null, tooltip);
+            vtable.Announcements.Add(GraphNodes.ValuePart(amount));
+            vtable.OnFocusVisual = () => it.Focus();
+            builder.AddItem(new DrawnNode(ControlId.For(button, key), vtable, button));
+        }
+
+        /// <summary>How many of the stack to upgrade, of the number that could be: the two amounts
+        /// the card itself draws.</summary>
+        private void BuildSlider(GraphBuilder builder, UpgradeTroopsSubMenuAdapter.UpgradeEntry entry, string key)
+        {
+            Component slider = entry.Slider;
+            if (slider == null || !entry.IsSliderVisible)
+            {
+                return;
+            }
+
+            UpgradeTroopsSubMenuAdapter.UpgradeEntry it = entry;
+            NodeVtable vtable = GraphNodes.Slider(
+                () => ModText.Get(ModStrings.Common.Quantity),
+                () => Amount(it),
+                (sign, large) => it.SetSliderValue(it.SliderValue + sign * (large ? RecruitGroups.CoarseStep : 1)),
+                () => it.IsSliderEnabled);
+            vtable.OnFocusVisual = () => it.Focus();
+            builder.AddItem(new DrawnNode(ControlId.For(slider, key), vtable, slider));
+        }
+
+        /// <summary>How many of the stack the card is set to upgrade, of the whole of it - both
+        /// numbers as the card draws them.</summary>
+        private static string Amount(UpgradeTroopsSubMenuAdapter.UpgradeEntry entry)
+        {
+            string target = entry.TargetAmountText;
+            int upgrading;
+            int keeping;
+            if (string.IsNullOrWhiteSpace(target)
+                || !int.TryParse(target, out upgrading)
+                || !int.TryParse(entry.CurrentAmountText, out keeping))
+            {
+                return target;
+            }
+
+            return ModText.Get(ModStrings.Common.CountOf, upgrading, upgrading + keeping);
+        }
+
+        /// <summary>The button that pays for the upgrade, which draws its price and nothing else -
+        /// or, where the troops would have nowhere to go, the game's own line saying so instead of
+        /// the price.</summary>
+        private void BuildUpgradeButton(GraphBuilder builder, UpgradeTroopsSubMenuAdapter.UpgradeEntry entry, string key)
+        {
+            Component button = entry.UpgradeButton;
+            if (button == null || !entry.IsUpgradeVisible)
+            {
+                return;
+            }
+
+            UpgradeTroopsSubMenuAdapter.UpgradeEntry it = entry;
+            NodeVtable vtable = GraphNodes.Button(
+                () => it.IsRefusalVisible ? it.RefusalText : ModText.Get(ModStrings.Draft.Upgrade),
+                () => it.Upgrade(),
+                () => it.IsUpgradeEnabled,
+                it.UpgradeTooltip);
+            vtable.Announcements.Add(GraphNodes.ValuePart(
+                () => it.IsRefusalVisible ? string.Empty : ResourceCosts.Text(it.UpgradeCosts)));
+            vtable.OnFocusVisual = () => it.Focus();
+            builder.AddItem(new DrawnNode(ControlId.For(button, key), vtable, button));
         }
     }
 }

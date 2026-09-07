@@ -1,11 +1,9 @@
-using SongsOfConquest.Client.Gamestate;
-using SongsOfConquest.Client.Gamestate.Facade;
-using SongsOfConquest.Common;
-using SongsOfConquest.Common.Gamestate;
-using SongsOfConquest.Common.Gamestate.Facade;
+using UnityEngine;
 
 namespace SongsOfConquestAccess.Adapters
 {
+    /// <summary>The defence menu as a troop-management host: it is opened without a wielder, so it
+    /// draws no wielder band, and its close cross is its own rather than a band's.</summary>
     public sealed class DefenceTroopManagementHostAdapter : ITroopManagementHostAdapter
     {
         private readonly DefenceMenuAdapter _adapter;
@@ -17,46 +15,26 @@ namespace SongsOfConquestAccess.Adapters
 
         public string IdPrefix { get { return "defences"; } }
         public string Title { get { return _adapter != null ? _adapter.Title : string.Empty; } }
-        public string DraftScreenTitle { get { return _adapter != null ? _adapter.DraftLabel : string.Empty; } }
-        public string UpgradeScreenTitle { get { return _adapter != null ? _adapter.UpgradeLabel : string.Empty; } }
-        public IClientAdventureFacade Facade { get { return _adapter != null ? _adapter.Facade : null; } }
         public PurchaseTroopsSubMenuAdapter PurchaseTroops { get { return _adapter != null ? _adapter.PurchaseTroops : null; } }
         public UpgradeTroopsSubMenuAdapter UpgradeTroops { get { return _adapter != null ? _adapter.UpgradeTroops : null; } }
 
         public bool IsDraftPresent() { return _adapter != null && _adapter.IsDraftPresent(); }
         public bool IsUpgradePresent() { return _adapter != null && _adapter.IsUpgradePresent(); }
-        public void HideNativeTooltip() { _adapter?.HideNativeTooltip(); }
 
+        public Component TutorialButton { get { return _adapter != null ? _adapter.TutorialButton : null; } }
         public bool IsTutorialVisible() { return _adapter != null && _adapter.IsTutorialButtonVisible(); }
         public string TutorialLabel { get { return _adapter != null ? _adapter.GetTutorialButtonLabel() : string.Empty; } }
         public bool ActivateTutorial() { return _adapter != null && _adapter.ActivateTutorial(); }
 
-        public bool IsBackVisible() { return IsDraftPresent() || IsUpgradePresent(); }
+        public WielderInteract Wielder { get { return null; } }
+
+        public Component BackButton { get { return _adapter != null ? _adapter.BackButton : null; } }
+        public string BackLabel { get { return _adapter != null ? _adapter.BackLabel : string.Empty; } }
+        public bool IsBackVisible() { return _adapter != null && _adapter.IsBackVisible(); }
         public bool Back() { return _adapter != null && _adapter.BackToTop(); }
 
-        public bool Close() { return _adapter != null && _adapter.Close(); }
-
-        public bool HasWielderArmy { get { return false; } }
-        public string WielderName { get { return string.Empty; } }
-        public Tooltip WielderTooltip { get { return null; } }
-        public TroopHudAdapter WielderTroops { get { return null; } }
-
-        public bool ShouldRefreshForTroops(OnTroopsUpdatedPayload payload)
-        {
-            return payload != null
-                && _adapter != null
-                && payload.ParentType == TroopParentType.MapEntity
-                && payload.ParentId == _adapter.MapEntityId;
-        }
-
-        public bool ShouldRefreshForResource(ResourceUpdatedPayload payload)
-        {
-            return payload != null;
-        }
-
-        public bool ShouldRefreshForRecruitmentPool()
-        {
-            return true;
-        }
+        public Component CloseButton { get { return _adapter != null ? _adapter.CloseButton : null; } }
+        public bool IsCloseVisible() { return _adapter != null && _adapter.IsCloseVisible(); }
+        public bool Close() { return _adapter != null && _adapter.ActivateClose(); }
     }
 }
