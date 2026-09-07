@@ -1600,15 +1600,15 @@ msgctxt "Actions.TooltipActionsMenu"
 msgid "Tooltip Actions Menu"
 msgstr "Tooltip-Aktionsmenü"
 
-#. Actions.UiActivate
-msgctxt "Actions.UiActivate"
-msgid "Activate"
-msgstr "Aktivieren"
-
 #. Actions.UiBack
 msgctxt "Actions.UiBack"
 msgid "Back"
 msgstr "Zurück"
+
+#. Actions.UiCarry
+msgctxt "Actions.UiCarry"
+msgid "Pick up or drop"
+msgstr "Aufnehmen oder ablegen"
 
 #. Actions.UiCoarseDecrease
 msgctxt "Actions.UiCoarseDecrease"
@@ -1640,6 +1640,11 @@ msgctxt "Actions.UiLeft"
 msgid "Move Left"
 msgstr "Nach links"
 
+#. Actions.UiLeftClick
+msgctxt "Actions.UiLeftClick"
+msgid "Left click"
+msgstr "Linksklick"
+
 #. Actions.UiNext
 msgctxt "Actions.UiNext"
 msgid "Next Stop"
@@ -1667,7 +1672,7 @@ msgstr "Nach rechts"
 
 #. Actions.UiRightClick
 msgctxt "Actions.UiRightClick"
-msgid "Right Click"
+msgid "Right click"
 msgstr "Rechtsklick"
 
 #. Actions.UiClearSearch
@@ -2119,6 +2124,96 @@ msgstr ", "
 msgctxt "Graph.Quantity"
 msgid "x {0}"
 msgstr "x {0}"
+
+#. Keys.Alt
+msgctxt "Keys.Alt"
+msgid "Alt"
+msgstr "Alt"
+
+#. Keys.Backquote
+msgctxt "Keys.Backquote"
+msgid "Backquote"
+msgstr "Gravis"
+
+#. Keys.Backslash
+msgctxt "Keys.Backslash"
+msgid "Backslash"
+msgstr "Backslash"
+
+#. Keys.Backspace
+msgctxt "Keys.Backspace"
+msgid "Backspace"
+msgstr "Rücktaste"
+
+#. Keys.ChordJoiner
+msgctxt "Keys.ChordJoiner"
+msgid "{0}+{1}"
+msgstr "{0}+{1}"
+
+#. Keys.Ctrl
+msgctxt "Keys.Ctrl"
+msgid "Ctrl"
+msgstr "Strg"
+
+#. Keys.DownArrow
+msgctxt "Keys.DownArrow"
+msgid "Down arrow"
+msgstr "Pfeil nach unten"
+
+#. Keys.End
+msgctxt "Keys.End"
+msgid "End"
+msgstr "Ende"
+
+#. Keys.Enter
+msgctxt "Keys.Enter"
+msgid "Enter"
+msgstr "Eingabe"
+
+#. Keys.Escape
+msgctxt "Keys.Escape"
+msgid "Escape"
+msgstr "Esc"
+
+#. Keys.Home
+msgctxt "Keys.Home"
+msgid "Home"
+msgstr "Pos1"
+
+#. Keys.LeftArrow
+msgctxt "Keys.LeftArrow"
+msgid "Left arrow"
+msgstr "Pfeil nach links"
+
+#. Keys.NumpadEnter
+msgctxt "Keys.NumpadEnter"
+msgid "Numpad Enter"
+msgstr "Eingabe (Ziffernblock)"
+
+#. Keys.RightArrow
+msgctxt "Keys.RightArrow"
+msgid "Right arrow"
+msgstr "Pfeil nach rechts"
+
+#. Keys.Shift
+msgctxt "Keys.Shift"
+msgid "Shift"
+msgstr "Umschalt"
+
+#. Keys.Space
+msgctxt "Keys.Space"
+msgid "Space"
+msgstr "Leertaste"
+
+#. Keys.Tab
+msgctxt "Keys.Tab"
+msgid "Tab"
+msgstr "Tab"
+
+#. Keys.UpArrow
+msgctxt "Keys.UpArrow"
+msgid "Up arrow"
+msgstr "Pfeil nach oben"
 
 #. Spatial.Acting
 msgctxt "Spatial.Acting"

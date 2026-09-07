@@ -1590,15 +1590,15 @@ msgctxt "Actions.TooltipActionsMenu"
 msgid "Tooltip Actions Menu"
 msgstr "ツールチップ操作メニュー"
 
-#. Actions.UiActivate
-msgctxt "Actions.UiActivate"
-msgid "Activate"
-msgstr "実行"
-
 #. Actions.UiBack
 msgctxt "Actions.UiBack"
 msgid "Back"
 msgstr "戻る"
+
+#. Actions.UiCarry
+msgctxt "Actions.UiCarry"
+msgid "Pick up or drop"
+msgstr "つかむまたは置く"
 
 #. Actions.UiCoarseDecrease
 msgctxt "Actions.UiCoarseDecrease"
@@ -1630,6 +1630,11 @@ msgctxt "Actions.UiLeft"
 msgid "Move Left"
 msgstr "左へ移動"
 
+#. Actions.UiLeftClick
+msgctxt "Actions.UiLeftClick"
+msgid "Left click"
+msgstr "左クリック"
+
 #. Actions.UiNext
 msgctxt "Actions.UiNext"
 msgid "Next Stop"
@@ -1657,7 +1662,7 @@ msgstr "右へ移動"
 
 #. Actions.UiRightClick
 msgctxt "Actions.UiRightClick"
-msgid "Right Click"
+msgid "Right click"
 msgstr "右クリック"
 
 #. Actions.UiClearSearch
@@ -2104,6 +2109,96 @@ msgstr "、"
 msgctxt "Graph.Quantity"
 msgid "x {0}"
 msgstr "×{0}"
+
+#. Keys.Alt
+msgctxt "Keys.Alt"
+msgid "Alt"
+msgstr "Alt"
+
+#. Keys.Backquote
+msgctxt "Keys.Backquote"
+msgid "Backquote"
+msgstr "バッククォート"
+
+#. Keys.Backslash
+msgctxt "Keys.Backslash"
+msgid "Backslash"
+msgstr "バックスラッシュ"
+
+#. Keys.Backspace
+msgctxt "Keys.Backspace"
+msgid "Backspace"
+msgstr "バックスペース"
+
+#. Keys.ChordJoiner
+msgctxt "Keys.ChordJoiner"
+msgid "{0}+{1}"
+msgstr "{0}+{1}"
+
+#. Keys.Ctrl
+msgctxt "Keys.Ctrl"
+msgid "Ctrl"
+msgstr "Ctrl"
+
+#. Keys.DownArrow
+msgctxt "Keys.DownArrow"
+msgid "Down arrow"
+msgstr "下矢印"
+
+#. Keys.End
+msgctxt "Keys.End"
+msgid "End"
+msgstr "エンド"
+
+#. Keys.Enter
+msgctxt "Keys.Enter"
+msgid "Enter"
+msgstr "Enter"
+
+#. Keys.Escape
+msgctxt "Keys.Escape"
+msgid "Escape"
+msgstr "Esc"
+
+#. Keys.Home
+msgctxt "Keys.Home"
+msgid "Home"
+msgstr "ホーム"
+
+#. Keys.LeftArrow
+msgctxt "Keys.LeftArrow"
+msgid "Left arrow"
+msgstr "左矢印"
+
+#. Keys.NumpadEnter
+msgctxt "Keys.NumpadEnter"
+msgid "Numpad Enter"
+msgstr "テンキーの Enter"
+
+#. Keys.RightArrow
+msgctxt "Keys.RightArrow"
+msgid "Right arrow"
+msgstr "右矢印"
+
+#. Keys.Shift
+msgctxt "Keys.Shift"
+msgid "Shift"
+msgstr "Shift"
+
+#. Keys.Space
+msgctxt "Keys.Space"
+msgid "Space"
+msgstr "スペース"
+
+#. Keys.Tab
+msgctxt "Keys.Tab"
+msgid "Tab"
+msgstr "Tab"
+
+#. Keys.UpArrow
+msgctxt "Keys.UpArrow"
+msgid "Up arrow"
+msgstr "上矢印"
 
 #. Spatial.Acting
 msgctxt "Spatial.Acting"

@@ -1600,15 +1600,15 @@ msgctxt "Actions.TooltipActionsMenu"
 msgid "Tooltip Actions Menu"
 msgstr "Menu des actions d'infobulle"
 
-#. Actions.UiActivate
-msgctxt "Actions.UiActivate"
-msgid "Activate"
-msgstr "Activer"
-
 #. Actions.UiBack
 msgctxt "Actions.UiBack"
 msgid "Back"
 msgstr "Retour"
+
+#. Actions.UiCarry
+msgctxt "Actions.UiCarry"
+msgid "Pick up or drop"
+msgstr "Prendre ou déposer"
 
 #. Actions.UiCoarseDecrease
 msgctxt "Actions.UiCoarseDecrease"
@@ -1640,6 +1640,11 @@ msgctxt "Actions.UiLeft"
 msgid "Move Left"
 msgstr "Aller à gauche"
 
+#. Actions.UiLeftClick
+msgctxt "Actions.UiLeftClick"
+msgid "Left click"
+msgstr "Clic gauche"
+
 #. Actions.UiNext
 msgctxt "Actions.UiNext"
 msgid "Next Stop"
@@ -1667,7 +1672,7 @@ msgstr "Aller à droite"
 
 #. Actions.UiRightClick
 msgctxt "Actions.UiRightClick"
-msgid "Right Click"
+msgid "Right click"
 msgstr "Clic droit"
 
 #. Actions.UiClearSearch
@@ -2119,6 +2124,96 @@ msgstr ", "
 msgctxt "Graph.Quantity"
 msgid "x {0}"
 msgstr "x {0}"
+
+#. Keys.Alt
+msgctxt "Keys.Alt"
+msgid "Alt"
+msgstr "Alt"
+
+#. Keys.Backquote
+msgctxt "Keys.Backquote"
+msgid "Backquote"
+msgstr "Accent grave"
+
+#. Keys.Backslash
+msgctxt "Keys.Backslash"
+msgid "Backslash"
+msgstr "Barre oblique inversée"
+
+#. Keys.Backspace
+msgctxt "Keys.Backspace"
+msgid "Backspace"
+msgstr "Retour arrière"
+
+#. Keys.ChordJoiner
+msgctxt "Keys.ChordJoiner"
+msgid "{0}+{1}"
+msgstr "{0}+{1}"
+
+#. Keys.Ctrl
+msgctxt "Keys.Ctrl"
+msgid "Ctrl"
+msgstr "Ctrl"
+
+#. Keys.DownArrow
+msgctxt "Keys.DownArrow"
+msgid "Down arrow"
+msgstr "Flèche bas"
+
+#. Keys.End
+msgctxt "Keys.End"
+msgid "End"
+msgstr "Fin"
+
+#. Keys.Enter
+msgctxt "Keys.Enter"
+msgid "Enter"
+msgstr "Entrée"
+
+#. Keys.Escape
+msgctxt "Keys.Escape"
+msgid "Escape"
+msgstr "Échap"
+
+#. Keys.Home
+msgctxt "Keys.Home"
+msgid "Home"
+msgstr "Origine"
+
+#. Keys.LeftArrow
+msgctxt "Keys.LeftArrow"
+msgid "Left arrow"
+msgstr "Flèche gauche"
+
+#. Keys.NumpadEnter
+msgctxt "Keys.NumpadEnter"
+msgid "Numpad Enter"
+msgstr "Entrée du pavé numérique"
+
+#. Keys.RightArrow
+msgctxt "Keys.RightArrow"
+msgid "Right arrow"
+msgstr "Flèche droite"
+
+#. Keys.Shift
+msgctxt "Keys.Shift"
+msgid "Shift"
+msgstr "Maj"
+
+#. Keys.Space
+msgctxt "Keys.Space"
+msgid "Space"
+msgstr "Espace"
+
+#. Keys.Tab
+msgctxt "Keys.Tab"
+msgid "Tab"
+msgstr "Tab"
+
+#. Keys.UpArrow
+msgctxt "Keys.UpArrow"
+msgid "Up arrow"
+msgstr "Flèche haut"
 
 #. Spatial.Acting
 msgctxt "Spatial.Acting"

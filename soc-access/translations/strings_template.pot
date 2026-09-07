@@ -504,6 +504,96 @@ msgctxt "Graph.Quantity"
 msgid "x {0}"
 msgstr ""
 
+#. Keys.Alt
+msgctxt "Keys.Alt"
+msgid "Alt"
+msgstr ""
+
+#. Keys.Backquote
+msgctxt "Keys.Backquote"
+msgid "Backquote"
+msgstr ""
+
+#. Keys.Backslash
+msgctxt "Keys.Backslash"
+msgid "Backslash"
+msgstr ""
+
+#. Keys.Backspace
+msgctxt "Keys.Backspace"
+msgid "Backspace"
+msgstr ""
+
+#. Keys.ChordJoiner
+msgctxt "Keys.ChordJoiner"
+msgid "{0}+{1}"
+msgstr ""
+
+#. Keys.Ctrl
+msgctxt "Keys.Ctrl"
+msgid "Ctrl"
+msgstr ""
+
+#. Keys.DownArrow
+msgctxt "Keys.DownArrow"
+msgid "Down arrow"
+msgstr ""
+
+#. Keys.End
+msgctxt "Keys.End"
+msgid "End"
+msgstr ""
+
+#. Keys.Enter
+msgctxt "Keys.Enter"
+msgid "Enter"
+msgstr ""
+
+#. Keys.Escape
+msgctxt "Keys.Escape"
+msgid "Escape"
+msgstr ""
+
+#. Keys.Home
+msgctxt "Keys.Home"
+msgid "Home"
+msgstr ""
+
+#. Keys.LeftArrow
+msgctxt "Keys.LeftArrow"
+msgid "Left arrow"
+msgstr ""
+
+#. Keys.NumpadEnter
+msgctxt "Keys.NumpadEnter"
+msgid "Numpad Enter"
+msgstr ""
+
+#. Keys.RightArrow
+msgctxt "Keys.RightArrow"
+msgid "Right arrow"
+msgstr ""
+
+#. Keys.Shift
+msgctxt "Keys.Shift"
+msgid "Shift"
+msgstr ""
+
+#. Keys.Space
+msgctxt "Keys.Space"
+msgid "Space"
+msgstr ""
+
+#. Keys.Tab
+msgctxt "Keys.Tab"
+msgid "Tab"
+msgstr ""
+
+#. Keys.UpArrow
+msgctxt "Keys.UpArrow"
+msgid "Up arrow"
+msgstr ""
+
 #. Spatial.Acting
 msgctxt "Spatial.Acting"
 msgid "acting"
@@ -1264,14 +1354,14 @@ msgctxt "Actions.TooltipActionsMenu"
 msgid "Tooltip Actions Menu"
 msgstr ""
 
-#. Actions.UiActivate
-msgctxt "Actions.UiActivate"
-msgid "Activate"
-msgstr ""
-
 #. Actions.UiBack
 msgctxt "Actions.UiBack"
 msgid "Back"
+msgstr ""
+
+#. Actions.UiCarry
+msgctxt "Actions.UiCarry"
+msgid "Pick up or drop"
 msgstr ""
 
 #. Actions.UiClearSearch
@@ -1309,6 +1399,11 @@ msgctxt "Actions.UiLeft"
 msgid "Move Left"
 msgstr ""
 
+#. Actions.UiLeftClick
+msgctxt "Actions.UiLeftClick"
+msgid "Left click"
+msgstr ""
+
 #. Actions.UiNext
 msgctxt "Actions.UiNext"
 msgid "Next Stop"
@@ -1336,7 +1431,7 @@ msgstr ""
 
 #. Actions.UiRightClick
 msgctxt "Actions.UiRightClick"
-msgid "Right Click"
+msgid "Right click"
 msgstr ""
 
 #. Actions.UiUp
