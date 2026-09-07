@@ -730,11 +730,6 @@ msgctxt "Screens.AdventureMap"
 msgid "Adventure map"
 msgstr "冒险地图"
 
-#. Screens.Army
-msgctxt "Screens.Army"
-msgid "army"
-msgstr "军队"
-
 #. Screens.Articles
 msgctxt "Screens.Articles"
 msgid "Articles"
@@ -764,6 +759,11 @@ msgstr "按 {0} 選擇出售。"
 msgctxt "Screens.ArtifactSellHint"
 msgid "{0} sells."
 msgstr "按 {0} 出售。"
+
+#. Screens.ArtifactTradeHint
+msgctxt "Screens.ArtifactTradeHint"
+msgid "{0} moves to the other backpack."
+msgstr "按 {0} 移動到另一個背包。"
 
 #. Screens.ArtifactUnequipHint
 msgctxt "Screens.ArtifactUnequipHint"
@@ -924,11 +924,6 @@ msgstr "新聊天訊息"
 msgctxt "Screens.MultiEssenceSpells"
 msgid "Multi-essence spells"
 msgstr "多精華法術"
-
-#. Screens.NamedArmy
-msgctxt "Screens.NamedArmy"
-msgid "{0} army"
-msgstr "{0} 的军队"
 
 #. Screens.NamedLevel
 msgctxt "Screens.NamedLevel"
@@ -1184,16 +1179,6 @@ msgstr "已擁有"
 msgctxt "Screens.Wielders"
 msgid "Wielders"
 msgstr "持有者"
-
-#. Screens.WielderStats
-msgctxt "Screens.WielderStats"
-msgid "{0}'s stats"
-msgstr "{0} 的屬性"
-
-#. Screens.WielderModifierCategories
-msgctxt "Screens.WielderModifierCategories"
-msgid "{0}'s modifier categories"
-msgstr "{0} 的修正類別"
 
 #. Screens.AddCustomCategory
 msgctxt "Screens.AddCustomCategory"

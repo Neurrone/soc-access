@@ -5,15 +5,13 @@ using SongsOfConquest.Client;
 using SongsOfConquest.Client.Adventure;
 using SongsOfConquest.Client.Adventure.UI;
 using SongsOfConquest.Client.Gamestate;
-using SongsOfConquest.Client.Gamestate.Facade;
-using SongsOfConquest.Client.Menu.Tooltip;
 using SongsOfConquest.Client.UI;
-using SongsOfConquest.Common;
 using SongsOfConquest.Common.Economy;
 using SongsOfConquest.Common.Gamestate;
 using SongsOfConquest.Common.Localization;
 using SongsOfConquestAccess.Localization;
 using SongsOfConquestAccess.Speech;
+using UnityEngine;
 
 namespace SongsOfConquestAccess.Adapters
 {
@@ -24,6 +22,17 @@ namespace SongsOfConquestAccess.Adapters
         Join
     }
 
+    /// <summary>
+    /// The offer a hostile army makes when a wielder walks into it. The menu has TWO SHAPES over the
+    /// same window, and the game's own <c>_stage</c> field says which is drawn: the CHOICE, where the
+    /// army is shown behind a lock and the player answers Yes or No, and the JOIN, where the lock is
+    /// gone and the troops are moved across before the window is done with.
+    ///
+    /// The attacking wielder's band is the same <c>WielderInteractHeader</c> every menu a wielder walks
+    /// into draws, here with no close cross of its own (<c>showCloseButton: false</c>): there is no
+    /// close cross anywhere on this menu, and Escape is the game's - No in the choice stage, Done in
+    /// the join stage (<c>HostileJoinMenu.ReregisterInput</c>).
+    /// </summary>
     public sealed class HostileJoinMenuAdapter : IDisposable
     {
         private static readonly FieldInfo SettingsField = AccessTools.Field(typeof(HostileJoinMenu), "_settings");
@@ -33,12 +42,13 @@ namespace SongsOfConquestAccess.Adapters
         private static readonly FieldInfo JoiningCommanderField = AccessTools.Field(typeof(HostileJoinMenu), "_joiningCommander");
         private static readonly FieldInfo AdventureFacadeField = AccessTools.Field(typeof(HostileJoinMenu), "_adventureFacade");
         private static readonly FieldInfo LocalizationField = AccessTools.Field(typeof(HostileJoinMenu), "_localizationHandler");
-        private static readonly FieldInfo HeaderTroopHudField = AccessTools.Field(typeof(WielderInteractHeader), "_troopHUD");
 
         private readonly HostileJoinMenu _menu;
         private readonly HostileJoinMenu.Settings _settings;
         private readonly IClientAdventureFacade _facade;
         private readonly ILocalizationHandler _localization;
+        private WielderInteract _wielder;
+        private TroopHudAdapter _joiningTroops;
         private bool _disposed;
 
         public HostileJoinMenuAdapter(HostileJoinMenu menu)
@@ -77,63 +87,6 @@ namespace SongsOfConquestAccess.Adapters
             }
         }
 
-        public string Title
-        {
-            get { return GetText(_settings != null ? _settings.TitleText : null); }
-        }
-
-        public string Instructions
-        {
-            get { return GetText(_settings != null ? _settings.JoinText : null); }
-        }
-
-        public string ChoiceBody
-        {
-            get { return GetText(_settings != null ? _settings.InformationText : null); }
-        }
-
-        public string AcceptLabel
-        {
-            get
-            {
-                if (_settings == null)
-                {
-                    return string.Empty;
-                }
-
-                string goldAmount = _settings.YesButtonGoldAmount != null && _settings.YesButtonGoldAmount.Active
-                    ? GetText(_settings.YesButtonGoldAmount)
-                    : string.Empty;
-                if (!string.IsNullOrWhiteSpace(goldAmount))
-                {
-                    return ModText.Get(ModStrings.Common.ResourceAmount, goldAmount, GetGoldName());
-                }
-
-                string label = GetButtonText(_settings.YesButton, string.Empty);
-                if (!string.IsNullOrWhiteSpace(label))
-                {
-                    return label;
-                }
-
-                return string.Empty;
-            }
-        }
-
-        public string RejectLabel
-        {
-            get { return GetButtonText(_settings != null ? _settings.NoButton : null, string.Empty); }
-        }
-
-        public string DiscardLabel
-        {
-            get { return GetButtonText(_settings != null ? _settings.DoneButton : null, "Discard"); }
-        }
-
-        public string MassMoveLabel
-        {
-            get { return GetButtonText(_settings != null ? _settings.MassMoveButton : null, "Mass move"); }
-        }
-
         public bool IsPresent()
         {
             return _menu != null
@@ -142,6 +95,8 @@ namespace SongsOfConquestAccess.Adapters
                 && Stage != HostileJoinMenuStage.None;
         }
 
+        /// <summary>Which of the menu's two shapes is drawn, read off the game's own stage and the
+        /// container it turned on for it.</summary>
         public HostileJoinMenuStage Stage
         {
             get
@@ -169,29 +124,125 @@ namespace SongsOfConquestAccess.Adapters
             }
         }
 
-        public TroopHudAdapter WielderTroops
+        /// <summary>The title the menu writes over the window, the same in both stages.</summary>
+        public string Title
         {
-            get { return new TroopHudAdapter(GetWielderTroopHud(), _facade, _localization); }
+            get { return GetText(_settings != null ? _settings.TitleText : null); }
         }
 
-        public TroopHudAdapter JoiningTroops
+        /// <summary>What the menu says about the offer, in the choice stage.</summary>
+        public string OfferText
         {
-            get { return new TroopHudAdapter(_settings != null ? _settings.TroopHUD : null, _facade, _localization); }
+            get { return GetText(_settings != null ? _settings.InformationText : null); }
         }
 
-        public string AttackingCommanderName
+        /// <summary>What the menu says about moving the troops, in the join stage.</summary>
+        public string JoinText
+        {
+            get { return GetText(_settings != null ? _settings.JoinText : null); }
+        }
+
+        /// <summary>The attacking wielder's band across the top of the window.</summary>
+        public WielderInteract Wielder
         {
             get
             {
-                ICommanderState commander = GetField<ICommanderState>(_menu, AttackingCommanderField);
-                string name = commander != null && _facade != null ? _facade.Commanders.GetName(commander.Id) : string.Empty;
-                return SpeechTextSanitizer.Normalize(name);
+                WielderInteractHeader header = _settings != null ? _settings.WielderInteractHeader : null;
+                if (header == null)
+                {
+                    return null;
+                }
+
+                if (_wielder == null || !ReferenceEquals(_wielder.Header, header))
+                {
+                    _wielder = new WielderInteract(header, _facade, _localization);
+                }
+
+                return _wielder;
             }
         }
 
-        public bool ActivateDiscard()
+        /// <summary>The army being offered. Kept: the adapter wakes the game's drag ghost when it is
+        /// made.</summary>
+        public TroopHudAdapter JoiningTroops
         {
-            return NativeSelectionUtility.Click(_settings != null ? _settings.DoneButton : null);
+            get
+            {
+                TroopHUD hud = _settings != null ? _settings.TroopHUD : null;
+                if (hud == null)
+                {
+                    return null;
+                }
+
+                if (_joiningTroops == null || !ReferenceEquals(_joiningTroops.Hud, hud))
+                {
+                    _joiningTroops = new TroopHudAdapter(hud, _facade, _localization);
+                }
+
+                return _joiningTroops;
+            }
+        }
+
+        /// <summary>Whether the game is still drawing the lock over the offered army, which is what it
+        /// takes off once the offer is accepted (<c>HostileJoinMenu.HandleYesButtonClicked</c>).
+        /// </summary>
+        public bool IsOfferLocked
+        {
+            get
+            {
+                GameObject overlay = _settings != null ? _settings.TroopHUDOverlay : null;
+                return overlay != null && overlay.activeInHierarchy;
+            }
+        }
+
+        // ---- the three buttons ----
+
+        public Component AcceptButton
+        {
+            get { return _settings != null ? _settings.YesButton : null; }
+        }
+
+        /// <summary>The game's own text on the accept button, which it draws only where the offer costs
+        /// nothing; a paid offer draws the price INSTEAD of a word, and the price is
+        /// <see cref="AcceptGoldAmount"/> rather than the button's name.</summary>
+        public string AcceptText
+        {
+            get
+            {
+                UITextMesh text = _settings != null ? _settings.YesButtonText : null;
+                if (text != null && text.Active)
+                {
+                    return GetText(text);
+                }
+
+                return string.IsNullOrWhiteSpace(AcceptGoldAmount)
+                    ? GetButtonText(_settings != null ? _settings.YesButton : null)
+                    : string.Empty;
+            }
+        }
+
+        /// <summary>The gold the offer costs, as the button draws it, or nothing where it draws no
+        /// price.</summary>
+        public string AcceptGoldAmount
+        {
+            get
+            {
+                UITextMesh amount = _settings != null ? _settings.YesButtonGoldAmount : null;
+                return amount != null && amount.Active ? GetText(amount) : string.Empty;
+            }
+        }
+
+        /// <summary>The game's own name for gold.</summary>
+        public string GoldName
+        {
+            get { return GameText.Get(_localization, "Common/Resource/" + ResourceType.Gold, ResourceType.Gold.ToString()); }
+        }
+
+        /// <summary>Whether the game will take the click: it turns the button off when the local team
+        /// cannot afford the price.</summary>
+        public bool IsAcceptEnabled()
+        {
+            return IsButtonEnabled(_settings != null ? _settings.YesButton : null);
         }
 
         public bool ActivateAccept()
@@ -199,19 +250,19 @@ namespace SongsOfConquestAccess.Adapters
             return NativeSelectionUtility.Click(_settings != null ? _settings.YesButton : null);
         }
 
-        public bool IsAcceptEnabled()
+        public bool FocusAccept()
         {
-            return IsButtonEnabled(_settings != null ? _settings.YesButton : null);
+            return NativeSelectionUtility.Select(_settings != null ? _settings.YesButton : null);
         }
 
-        public void FocusAccept()
+        public Component RejectButton
         {
-            NativeSelectionUtility.Select(_settings != null ? _settings.YesButton : null);
+            get { return _settings != null ? _settings.NoButton : null; }
         }
 
-        public bool ActivateReject()
+        public string RejectText
         {
-            return NativeSelectionUtility.Click(_settings != null ? _settings.NoButton : null);
+            get { return GetButtonText(_settings != null ? _settings.NoButton : null); }
         }
 
         public bool IsRejectEnabled()
@@ -219,14 +270,71 @@ namespace SongsOfConquestAccess.Adapters
             return IsButtonEnabled(_settings != null ? _settings.NoButton : null);
         }
 
-        public void FocusReject()
+        public bool ActivateReject()
         {
-            NativeSelectionUtility.Select(_settings != null ? _settings.NoButton : null);
+            return NativeSelectionUtility.Click(_settings != null ? _settings.NoButton : null);
         }
 
-        public bool IsDiscardEnabled()
+        public bool FocusReject()
+        {
+            return NativeSelectionUtility.Select(_settings != null ? _settings.NoButton : null);
+        }
+
+        public Component DoneButton
+        {
+            get { return _settings != null ? _settings.DoneButton : null; }
+        }
+
+        /// <summary>The game rewrites this button as the army empties: Discard while troops are still
+        /// on offer, Close once none are (<c>HostileJoinMenu.HandleTroopsupdated</c>).</summary>
+        public string DoneText
+        {
+            get { return GetButtonText(_settings != null ? _settings.DoneButton : null); }
+        }
+
+        public bool IsDoneEnabled()
         {
             return IsButtonEnabled(_settings != null ? _settings.DoneButton : null);
+        }
+
+        public bool ActivateDone()
+        {
+            return NativeSelectionUtility.Click(_settings != null ? _settings.DoneButton : null);
+        }
+
+        public bool FocusDone()
+        {
+            return NativeSelectionUtility.Select(_settings != null ? _settings.DoneButton : null);
+        }
+
+        public Component MassMoveButton
+        {
+            get { return _settings != null ? _settings.MassMoveButton : null; }
+        }
+
+        /// <summary>The game's own name for it: the button draws no text, only the details the menu
+        /// hangs on it in the join stage ("Common/MoveTroops/MoveMax").</summary>
+        public string MassMoveText
+        {
+            get
+            {
+                string label = GetButtonText(_settings != null ? _settings.MassMoveButton : null);
+                if (!string.IsNullOrWhiteSpace(label))
+                {
+                    return label;
+                }
+
+                Tooltip tooltip = Tooltip.ForComponent(MassMoveButton, _localization);
+                System.Collections.Generic.IReadOnlyList<string> lines = tooltip != null ? tooltip.TextLines : null;
+                return lines != null && lines.Count > 0 ? SpeechTextSanitizer.Normalize(lines[0]) : string.Empty;
+            }
+        }
+
+        /// <summary>Whether the game will take the click: it turns the button off once the offered army
+        /// is empty.</summary>
+        public bool IsMassMoveEnabled()
+        {
+            return IsButtonEnabled(_settings != null ? _settings.MassMoveButton : null);
         }
 
         public bool ActivateMassMove()
@@ -234,24 +342,9 @@ namespace SongsOfConquestAccess.Adapters
             return NativeSelectionUtility.Click(_settings != null ? _settings.MassMoveButton : null);
         }
 
-        public bool IsMassMoveEnabled()
+        public bool FocusMassMove()
         {
-            return IsButtonEnabled(_settings != null ? _settings.MassMoveButton : null);
-        }
-
-        public void FocusMassMove()
-        {
-            NativeSelectionUtility.Select(_settings != null ? _settings.MassMoveButton : null);
-        }
-
-        public Tooltip MassMoveTooltip
-        {
-            get { return Tooltip.ForComponent(_settings != null ? _settings.MassMoveButton : null, _localization); }
-        }
-
-        public void HideNativeTooltip()
-        {
-            NativeTooltipUtility.HideTooltip();
+            return NativeSelectionUtility.Select(_settings != null ? _settings.MassMoveButton : null);
         }
 
         public void Dispose()
@@ -262,13 +355,6 @@ namespace SongsOfConquestAccess.Adapters
             }
 
             _disposed = true;
-        }
-
-        private TroopHUD GetWielderTroopHud()
-        {
-            return _settings != null && _settings.WielderInteractHeader != null
-                ? GetField<TroopHUD>(_settings.WielderInteractHeader, HeaderTroopHudField)
-                : null;
         }
 
         private bool IsNativeStage(string stageName)
@@ -282,15 +368,9 @@ namespace SongsOfConquestAccess.Adapters
             return SpeechTextSanitizer.Normalize(UITextMeshTextUtility.GetEffectiveText(textMesh));
         }
 
-        private string GetGoldName()
+        private static string GetButtonText(UIButton button)
         {
-            return GameText.Get(_localization, "Common/Resource/" + ResourceType.Gold, ResourceType.Gold.ToString());
-        }
-
-        private static string GetButtonText(UIButton button, string fallback)
-        {
-            string text = MenuButtonTextUtility.GetStandardButtonLabel(button);
-            return string.IsNullOrWhiteSpace(text) ? fallback : text;
+            return MenuButtonTextUtility.GetStandardButtonLabel(button);
         }
 
         private static bool IsButtonEnabled(UIButton button)

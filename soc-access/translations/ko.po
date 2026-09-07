@@ -730,11 +730,6 @@ msgctxt "Screens.AdventureMap"
 msgid "Adventure map"
 msgstr "모험 지도"
 
-#. Screens.Army
-msgctxt "Screens.Army"
-msgid "army"
-msgstr "군대"
-
 #. Screens.Articles
 msgctxt "Screens.Articles"
 msgid "Articles"
@@ -764,6 +759,11 @@ msgstr "{0} 키로 판매 대상 선택."
 msgctxt "Screens.ArtifactSellHint"
 msgid "{0} sells."
 msgstr "{0} 키로 판매."
+
+#. Screens.ArtifactTradeHint
+msgctxt "Screens.ArtifactTradeHint"
+msgid "{0} moves to the other backpack."
+msgstr "{0} 키로 다른 배낭으로 이동."
 
 #. Screens.ArtifactUnequipHint
 msgctxt "Screens.ArtifactUnequipHint"
@@ -924,11 +924,6 @@ msgstr "새 채팅 메시지"
 msgctxt "Screens.MultiEssenceSpells"
 msgid "Multi-essence spells"
 msgstr "다중 정수 주문"
-
-#. Screens.NamedArmy
-msgctxt "Screens.NamedArmy"
-msgid "{0} army"
-msgstr "{0} 군대"
 
 #. Screens.NamedLevel
 msgctxt "Screens.NamedLevel"
@@ -1184,16 +1179,6 @@ msgstr "보유 중"
 msgctxt "Screens.Wielders"
 msgid "Wielders"
 msgstr "위더"
-
-#. Screens.WielderStats
-msgctxt "Screens.WielderStats"
-msgid "{0}'s stats"
-msgstr "{0}의 능력치"
-
-#. Screens.WielderModifierCategories
-msgctxt "Screens.WielderModifierCategories"
-msgid "{0}'s modifier categories"
-msgstr "{0}의 수정치 범주"
 
 #. Screens.AddCustomCategory
 msgctxt "Screens.AddCustomCategory"

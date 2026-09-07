@@ -2394,11 +2394,6 @@ msgctxt "Screens.AmountToUpgrade"
 msgid "Amount to upgrade, {0}"
 msgstr ""
 
-#. Screens.Army
-msgctxt "Screens.Army"
-msgid "army"
-msgstr ""
-
 #. Screens.Articles
 msgctxt "Screens.Articles"
 msgid "Articles"
@@ -2427,6 +2422,11 @@ msgstr ""
 #. Screens.ArtifactSellHint
 msgctxt "Screens.ArtifactSellHint"
 msgid "{0} sells."
+msgstr ""
+
+#. Screens.ArtifactTradeHint
+msgctxt "Screens.ArtifactTradeHint"
+msgid "{0} moves to the other backpack."
 msgstr ""
 
 #. Screens.ArtifactUnequipHint
@@ -2802,11 +2802,6 @@ msgstr ""
 #. Screens.MultiEssenceSpells
 msgctxt "Screens.MultiEssenceSpells"
 msgid "Multi-essence spells"
-msgstr ""
-
-#. Screens.NamedArmy
-msgctxt "Screens.NamedArmy"
-msgid "{0} army"
 msgstr ""
 
 #. Screens.NamedLevel
@@ -3197,16 +3192,6 @@ msgstr ""
 #. Screens.Wielders
 msgctxt "Screens.Wielders"
 msgid "Wielders"
-msgstr ""
-
-#. Screens.WielderStats
-msgctxt "Screens.WielderStats"
-msgid "{0}'s stats"
-msgstr ""
-
-#. Screens.WielderModifierCategories
-msgctxt "Screens.WielderModifierCategories"
-msgid "{0}'s modifier categories"
 msgstr ""
 
 #. Screens.MapEntityAnnouncements

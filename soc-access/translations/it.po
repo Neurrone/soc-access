@@ -730,11 +730,6 @@ msgctxt "Screens.AdventureMap"
 msgid "Adventure map"
 msgstr "Mappa avventura"
 
-#. Screens.Army
-msgctxt "Screens.Army"
-msgid "army"
-msgstr "esercito"
-
 #. Screens.Articles
 msgctxt "Screens.Articles"
 msgid "Articles"
@@ -764,6 +759,11 @@ msgstr "{0} per selezionare da vendere."
 msgctxt "Screens.ArtifactSellHint"
 msgid "{0} sells."
 msgstr "{0} per vendere."
+
+#. Screens.ArtifactTradeHint
+msgctxt "Screens.ArtifactTradeHint"
+msgid "{0} moves to the other backpack."
+msgstr "{0} per spostare nell'altro zaino."
 
 #. Screens.ArtifactUnequipHint
 msgctxt "Screens.ArtifactUnequipHint"
@@ -924,11 +924,6 @@ msgstr "Nuovo messaggio chat"
 msgctxt "Screens.MultiEssenceSpells"
 msgid "Multi-essence spells"
 msgstr "Incantesimi multi-essenza"
-
-#. Screens.NamedArmy
-msgctxt "Screens.NamedArmy"
-msgid "{0} army"
-msgstr "esercito {0}"
 
 #. Screens.NamedLevel
 msgctxt "Screens.NamedLevel"
@@ -1184,16 +1179,6 @@ msgstr "posseduto"
 msgctxt "Screens.Wielders"
 msgid "Wielders"
 msgstr "Portatori"
-
-#. Screens.WielderStats
-msgctxt "Screens.WielderStats"
-msgid "{0}'s stats"
-msgstr "statistiche di {0}"
-
-#. Screens.WielderModifierCategories
-msgctxt "Screens.WielderModifierCategories"
-msgid "{0}'s modifier categories"
-msgstr "categorie modificatori di {0}"
 
 #. Common.TileCount_0
 msgctxt "Common.TileCount_0"

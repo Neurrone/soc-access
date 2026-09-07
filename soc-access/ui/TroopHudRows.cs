@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using SongsOfConquest.Client.Adventure.UI;
 using SongsOfConquestAccess.Adapters;
@@ -86,8 +87,17 @@ namespace SongsOfConquestAccess.UI
         }
 
         /// <summary>The rows alone, one per drawn slot in the order the bar draws them, declared into
-        /// whatever stop and context the caller has opened.</summary>
-        public static void Rows(GraphBuilder builder, TroopHudAdapter troops, string rowPrefix)
+        /// whatever stop and context the caller has opened.
+        ///
+        /// <paramref name="available"/> is a bar the game has drawn but LOCKED - the hostile join
+        /// offer, whose overlay covers the army until the offer is accepted. Its rows still read as
+        /// rows, and say "unavailable" as well; nothing may be picked up from them or dropped on them.
+        /// Null, the usual answer, is a bar that can be worked.</summary>
+        public static void Rows(
+            GraphBuilder builder,
+            TroopHudAdapter troops,
+            string rowPrefix,
+            Func<bool> available = null)
         {
             if (builder == null || troops == null)
             {
@@ -101,7 +111,7 @@ namespace SongsOfConquestAccess.UI
             IReadOnlyList<TroopHudAdapter.SlotItem> slots = troops.GetSlots(includeLocked: true);
             for (int i = 0; i < slots.Count; i++)
             {
-                AddRow(builder, troops, slots[i], rowPrefix + i);
+                AddRow(builder, troops, slots[i], rowPrefix + i, available);
             }
         }
 
@@ -191,19 +201,22 @@ namespace SongsOfConquestAccess.UI
             GraphBuilder builder,
             TroopHudAdapter troops,
             TroopHudAdapter.SlotItem slot,
-            string key)
+            string key,
+            Func<bool> available)
         {
             TroopHudAdapter.SlotItem it = slot;
+            Func<bool> workable = available;
             NodeVtable vtable = GraphNodes.Button(
                 () => Label(it),
                 () => it.Click(),
-                () => it.IsUnlocked,
+                () => it.IsUnlocked && (workable == null || workable()),
                 it.IsOccupied ? it.Details : null);
             vtable.Announcements[0].Live = true;
             // Selecting the entry is what makes the game draw the troop's details for it.
             vtable.OnFocusVisual = () => it.Focus();
 
-            if (it.IsUnlocked)
+            bool open = workable == null || workable();
+            if (it.IsUnlocked && open)
             {
                 vtable.DropKind = TroopCargo;
                 vtable.DropAccepts = held => troops.CanDropOn(Cargo(held), it.Entry);
@@ -216,7 +229,7 @@ namespace SongsOfConquestAccess.UI
                     Carrying);
             }
 
-            if (it.IsUnlocked && it.IsOccupied)
+            if (it.IsUnlocked && it.IsOccupied && open)
             {
                 vtable.OnPickUp = () => new CarryItem(it.Entry, Label(it), TroopCargo);
                 if (it.CanDisband)

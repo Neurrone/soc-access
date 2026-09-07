@@ -750,11 +750,6 @@ msgctxt "Screens.AdventureMap"
 msgid "Adventure map"
 msgstr "Карта приключения"
 
-#. Screens.Army
-msgctxt "Screens.Army"
-msgid "army"
-msgstr "армия"
-
 #. Screens.Articles
 msgctxt "Screens.Articles"
 msgid "Articles"
@@ -784,6 +779,11 @@ msgstr "{0}, чтобы выбрать для продажи."
 msgctxt "Screens.ArtifactSellHint"
 msgid "{0} sells."
 msgstr "{0}, чтобы продать."
+
+#. Screens.ArtifactTradeHint
+msgctxt "Screens.ArtifactTradeHint"
+msgid "{0} moves to the other backpack."
+msgstr "{0}, чтобы переместить в другой рюкзак."
 
 #. Screens.ArtifactUnequipHint
 msgctxt "Screens.ArtifactUnequipHint"
@@ -944,11 +944,6 @@ msgstr "Новое сообщение чата"
 msgctxt "Screens.MultiEssenceSpells"
 msgid "Multi-essence spells"
 msgstr "Заклинания нескольких эссенций"
-
-#. Screens.NamedArmy
-msgctxt "Screens.NamedArmy"
-msgid "{0} army"
-msgstr "армия {0}"
 
 #. Screens.NamedLevel
 msgctxt "Screens.NamedLevel"
@@ -1204,16 +1199,6 @@ msgstr "уже есть"
 msgctxt "Screens.Wielders"
 msgid "Wielders"
 msgstr "Герои"
-
-#. Screens.WielderStats
-msgctxt "Screens.WielderStats"
-msgid "{0}'s stats"
-msgstr "характеристики {0}"
-
-#. Screens.WielderModifierCategories
-msgctxt "Screens.WielderModifierCategories"
-msgid "{0}'s modifier categories"
-msgstr "категории модификаторов {0}"
 
 #. Screens.AddCustomCategory
 msgctxt "Screens.AddCustomCategory"

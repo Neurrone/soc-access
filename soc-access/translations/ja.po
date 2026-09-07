@@ -730,11 +730,6 @@ msgctxt "Screens.AdventureMap"
 msgid "Adventure map"
 msgstr "冒険マップ"
 
-#. Screens.Army
-msgctxt "Screens.Army"
-msgid "army"
-msgstr "軍"
-
 #. Screens.Articles
 msgctxt "Screens.Articles"
 msgid "Articles"
@@ -764,6 +759,11 @@ msgstr "{0} で売却対象に選択します。"
 msgctxt "Screens.ArtifactSellHint"
 msgid "{0} sells."
 msgstr "{0} で売却します。"
+
+#. Screens.ArtifactTradeHint
+msgctxt "Screens.ArtifactTradeHint"
+msgid "{0} moves to the other backpack."
+msgstr "{0} でもう一方のバックパックに移動します。"
 
 #. Screens.ArtifactUnequipHint
 msgctxt "Screens.ArtifactUnequipHint"
@@ -924,11 +924,6 @@ msgstr "新しいチャットメッセージ"
 msgctxt "Screens.MultiEssenceSpells"
 msgid "Multi-essence spells"
 msgstr "複数エッセンス呪文"
-
-#. Screens.NamedArmy
-msgctxt "Screens.NamedArmy"
-msgid "{0} army"
-msgstr "{0} の軍"
 
 #. Screens.NamedLevel
 msgctxt "Screens.NamedLevel"
@@ -1184,16 +1179,6 @@ msgstr "所持済み"
 msgctxt "Screens.Wielders"
 msgid "Wielders"
 msgstr "ウィールダー"
-
-#. Screens.WielderStats
-msgctxt "Screens.WielderStats"
-msgid "{0}'s stats"
-msgstr "{0} の能力値"
-
-#. Screens.WielderModifierCategories
-msgctxt "Screens.WielderModifierCategories"
-msgid "{0}'s modifier categories"
-msgstr "{0} の修正カテゴリ"
 
 #. Screens.AddCustomCategory
 msgctxt "Screens.AddCustomCategory"

@@ -547,7 +547,6 @@ namespace SongsOfConquestAccess.Localization
             public static readonly ModString Add = new ModString("Screens.Add", "Add");
             public static readonly ModString AddKeyword = new ModString("Screens.AddKeyword", "Add keyword");
             public static readonly ModString AmountToUpgrade = new ModString("Screens.AmountToUpgrade", "Amount to upgrade, {0}");
-            public static readonly ModString Army = new ModString("Screens.Army", "army");
             public static readonly ModString Articles = new ModString("Screens.Articles", "Articles");
             public static readonly ModString ArtifactDestroyHint = new ModString("Screens.ArtifactDestroyHint", "{0} destroys.");
             public static readonly ModString ArtifactDropHint = new ModString("Screens.ArtifactDropHint", "{0} drops on the ground.");
@@ -630,7 +629,6 @@ namespace SongsOfConquestAccess.Localization
             public static readonly ModString MoveAllRight = new ModString("Screens.MoveAllRight", "Move all right");
             public static readonly ModString LeftRightDistribution = new ModString("Screens.LeftRightDistribution", "Left: {0}, right: {1}");
             public static readonly ModString MultiEssenceSpells = new ModString("Screens.MultiEssenceSpells", "Multi-essence spells");
-            public static readonly ModString NamedArmy = new ModString("Screens.NamedArmy", "{0} army");
             public static readonly ModString NamedLevel = new ModString("Screens.NamedLevel", "{0}, level {1}");
             public static readonly ModString NamedTabs = new ModString("Screens.NamedTabs", "{0} {1}");
             public static readonly ModString NoBuildSiteSelected = new ModString("Screens.NoBuildSiteSelected", "No build site selected");
@@ -710,8 +708,6 @@ namespace SongsOfConquestAccess.Localization
             public static readonly ModString WielderDead = new ModString("Screens.WielderDead", "dead");
             public static readonly ModString WielderOwned = new ModString("Screens.WielderOwned", "owned");
             public static readonly ModString Wielders = new ModString("Screens.Wielders", "Wielders");
-            public static readonly ModString WielderStats = new ModString("Screens.WielderStats", "{0}'s stats");
-            public static readonly ModString WielderModifierCategories = new ModString("Screens.WielderModifierCategories", "{0}'s modifier categories");
             public static readonly ModString MapEntityAnnouncements = new ModString("Screens.MapEntityAnnouncements", "Map entity announcements");
 
             public static readonly ModString AnnouncementActing = new ModString("Screens.AnnouncementActing", "Acting");
