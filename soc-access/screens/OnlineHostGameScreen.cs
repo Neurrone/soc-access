@@ -135,7 +135,7 @@ namespace SongsOfConquestAccess.Screens
             {
                 builder.AddItem(new SyntheticNode(
                     ControlId.For(_descriptionKey, "host-game:description"),
-                    GraphNodes.Text(() => _adapter.Description)));
+                    GraphNodes.Paragraphs(() => _adapter.DescriptionLines)));
             }
 
             AddNameField(builder);

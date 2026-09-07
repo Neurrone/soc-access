@@ -8,6 +8,7 @@ using SongsOfConquest.Common.Campaign;
 using SongsOfConquest.Common.Localization;
 using SongsOfConquest.Common.Map;
 using SongsOfConquestAccess.Speech;
+using SongsOfConquestAccess.UI;
 using UnityEngine;
 using UnityEngine.EventSystems;
 
@@ -110,16 +111,18 @@ namespace SongsOfConquestAccess.Adapters
             return SpeechTextSanitizer.Normalize(localization.GetText(map.Metadata.Name));
         }
 
-        public string GetDescription()
+        /// <summary>The paragraphs the mission's description is written in, kept apart rather than
+        /// collapsed.</summary>
+        public IList<string> GetDescriptionLines()
         {
             ILocalizationHandler localization = GetLocalization();
             MapFormat map = Map;
             if (localization == null || map == null || map.Metadata == null)
             {
-                return string.Empty;
+                return new List<string>();
             }
 
-            return SpeechTextSanitizer.Normalize(localization.GetText(map.Metadata.Description));
+            return SpokenLines.Of(new[] { localization.GetText(map.Metadata.Description) });
         }
 
         public string GetMissionCounter()

@@ -128,7 +128,9 @@ namespace SongsOfConquestAccess.Screens
             if (!string.IsNullOrWhiteSpace(_adapter.Body))
             {
                 ControlId bodyId = ControlId.For(_bodyKey, "claim-menu:body");
-                builder.AddItem(new SyntheticNode(bodyId, GraphNodes.Text(() => _adapter.Body)));
+                builder.AddItem(new SyntheticNode(
+                    bodyId,
+                    GraphNodes.Paragraphs(() => _adapter.BodyLines)));
                 // Focus starts on the body, so arrival reads the heading once as the screen name and
                 // then what the menu is asking before the choices.
                 builder.SetStart(bodyId);
@@ -145,8 +147,8 @@ namespace SongsOfConquestAccess.Screens
             }
         }
 
-        /// <summary>One choice: what it is called, then the two lines drawn with it, then the game's
-        /// own click.</summary>
+        /// <summary>One choice: what it is called, then the duration drawn beside it and the
+        /// paragraphs of the text drawn below it, then the game's own click.</summary>
         private static NodeVtable Choice(ClaimMenuAdapter.ChoiceItem choice)
         {
             NodeVtable vtable = GraphNodes.Button(
@@ -154,7 +156,7 @@ namespace SongsOfConquestAccess.Screens
                 () => choice.Activate(),
                 () => choice.IsEnabled);
             vtable.Announcements.Add(GraphNodes.ValuePart(choice.GetDuration, watch: false));
-            vtable.Announcements.Add(GraphNodes.ValuePart(choice.GetDescription, watch: false));
+            GraphNodes.ParagraphParts(vtable, choice.GetDescriptionLines);
             // The choice the cursor is on is the one the game shows as selected; the menu pushes a
             // selection layer with the first toggle as its default, and this keeps that in step.
             vtable.OnFocusVisual = () => choice.Focus();

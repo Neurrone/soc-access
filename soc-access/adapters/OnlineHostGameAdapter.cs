@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using HarmonyLib;
 using SongsOfConquest.Client;
 using SongsOfConquest.Client.Adventure.Menu;
@@ -80,9 +81,17 @@ namespace SongsOfConquestAccess.Adapters
             get { return GetText(_settings != null ? _settings.HostGameHeader : null); }
         }
 
-        public string Description
+        /// <summary>The paragraphs of the line the page draws under its heading, kept apart rather
+        /// than collapsed.</summary>
+        public IList<string> DescriptionLines
         {
-            get { return GetText(_settings != null ? _settings.HostGameSubheader : null); }
+            get
+            {
+                return SpokenLines.Of(new[]
+                {
+                    UITextMeshTextUtility.GetEffectiveText(_settings != null ? _settings.HostGameSubheader : null),
+                });
+            }
         }
 
         public string InviteOnlyLabel
@@ -102,7 +111,7 @@ namespace SongsOfConquestAccess.Adapters
 
         public bool HasDescription
         {
-            get { return !string.IsNullOrWhiteSpace(Description); }
+            get { return DescriptionLines.Count > 0; }
         }
 
         public bool IsInputVisible()

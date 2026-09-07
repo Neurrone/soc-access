@@ -8,6 +8,7 @@ using SongsOfConquest.Client.UI;
 using SongsOfConquest.Common;
 using SongsOfConquest.Common.Campaign;
 using SongsOfConquestAccess.Speech;
+using SongsOfConquestAccess.UI;
 using UnityEngine;
 
 namespace SongsOfConquestAccess.Adapters
@@ -58,18 +59,18 @@ namespace SongsOfConquestAccess.Adapters
             return GetText(GetCampaignTitle());
         }
 
-        /// <summary>The paragraph the card draws under its name, apart from the name itself: it is
-        /// always on the screen, so a screen can decide where in the readout it belongs. Empty while
-        /// the card draws its purchase state instead, which is what the card says in place of the
-        /// description.</summary>
-        public string GetDescription()
+        /// <summary>The paragraphs the card draws under its name, apart from the name itself: they
+        /// are always on the screen, so a screen can decide where in the readout they belong. Empty
+        /// while the card draws its purchase state instead, which is what the card says in place of
+        /// the description.</summary>
+        public IList<string> GetDescriptionLines()
         {
             if (IsActive(GetPurchaseContainer()))
             {
-                return string.Empty;
+                return new List<string>();
             }
 
-            return GetText(GetCampaignDescription());
+            return SpokenLines.Of(new[] { UITextMeshTextUtility.GetEffectiveText(GetCampaignDescription()) });
         }
 
         public string GetStatus()

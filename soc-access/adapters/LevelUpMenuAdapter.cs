@@ -9,6 +9,7 @@ using SongsOfConquest.Client.UI;
 using SongsOfConquest.Common.Localization;
 using SongsOfConquestAccess.Localization;
 using SongsOfConquestAccess.Speech;
+using SongsOfConquestAccess.UI;
 using UnityEngine;
 
 namespace SongsOfConquestAccess.Adapters
@@ -211,7 +212,7 @@ namespace SongsOfConquestAccess.Adapters
             string choiceHeader = GetSkillChoiceHeader(headerIndex);
             string skillName = GetText(GetField<UITextMesh>(component, HeaderTextField));
             string skillLevel = GetText(GetField<UITextMesh>(component, SkillLevelTextField));
-            string description = GetText(GetField<UITextMesh>(component, DescriptionTextField));
+            IList<string> description = GetLines(GetField<UITextMesh>(component, DescriptionTextField));
             Component buttonComponent = button as Component;
 
             choices.Add(new SkillChoice(
@@ -270,6 +271,12 @@ namespace SongsOfConquestAccess.Adapters
             return SpeechTextSanitizer.Normalize(UITextMeshTextUtility.GetEffectiveText(textMesh));
         }
 
+        // A text mesh the game may have written more than one paragraph into.
+        private static IList<string> GetLines(IUITextMesh textMesh)
+        {
+            return SpokenLines.Of(new[] { UITextMeshTextUtility.GetEffectiveText(textMesh) });
+        }
+
         private static T GetField<T>(object owner, FieldInfo field) where T : class
         {
             return owner != null && field != null ? field.GetValue(owner) as T : null;
@@ -306,7 +313,7 @@ namespace SongsOfConquestAccess.Adapters
                 string id,
                 string header,
                 string nameAndLevel,
-                string description,
+                IList<string> description,
                 Component button,
                 Func<bool> isEnabled,
                 Func<bool> activate,
@@ -315,7 +322,7 @@ namespace SongsOfConquestAccess.Adapters
                 Id = id ?? string.Empty;
                 Header = header ?? string.Empty;
                 NameAndLevel = nameAndLevel ?? string.Empty;
-                Description = description ?? string.Empty;
+                DescriptionLines = description ?? new List<string>();
                 Button = button;
                 IsEnabled = isEnabled;
                 Activate = activate;
@@ -331,8 +338,9 @@ namespace SongsOfConquestAccess.Adapters
             /// <summary>The skill the card offers and the level it would reach.</summary>
             public string NameAndLevel { get; private set; }
 
-            /// <summary>What the card draws under the name; always drawn, never a tooltip.</summary>
-            public string Description { get; private set; }
+            /// <summary>What the card draws under the name, one line per paragraph; always drawn,
+            /// never a tooltip.</summary>
+            public IList<string> DescriptionLines { get; private set; }
 
             /// <summary>The card's own button - what the game draws it with, and what a hover rests
             /// on.</summary>

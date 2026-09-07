@@ -1,5 +1,4 @@
 using System;
-using System.Collections.Generic;
 using System.Reflection;
 using HarmonyLib;
 using SongsOfConquest.Client.Adventure;
@@ -15,13 +14,13 @@ namespace SongsOfConquestAccess.Screens
     /// <summary>
     /// The story text the game shows between scenes - the panel, the letterbox and the dialogue line
     /// - made navigable as a graph. One stop: the heading, which the game draws in capitals and which
-    /// is also the screen name, and the body as the start node, whose sections are one line per
+    /// is also the screen name, and the body as the start node, one part per
     /// paragraph. The headerless variants declare no heading node and have no screen name: the body
     /// is all there is to say.
     ///
     /// The paragraphs survive because the adapters keep the game's own line breaks
-    /// (<c>IStoryTextAdapter.BodyLines</c>): the label is the whole body read as one line and the
-    /// sections are its paragraphs, so the review buffer holds the text the way it is written.
+    /// (<c>IStoryTextAdapter.BodyLines</c>): the body is a <c>GraphNodes.Paragraphs</c> node, read
+    /// aloud as one body and held in the review buffer one line per paragraph.
     ///
     /// ENTER on either node advances, through the game's own handler that a click would reach
     /// (<c>AbortCurrentState</c> on the two story texts, <c>HandlePrimaryClicked</c> on the dialogue
@@ -105,16 +104,7 @@ namespace SongsOfConquestAccess.Screens
             if (!string.IsNullOrWhiteSpace(_adapter.Body))
             {
                 ControlId bodyId = ControlId.For(_bodyKey, "story-text:body");
-                // One announcement part per paragraph (owner ruling 2026-09-07): spoken they read as
-                // the one body, and in the review buffer they are one line per paragraph and nothing
-                // else. A section would add the joined body as a line of its own.
-                NodeVtable body = GraphNodes.Text(() => Paragraph(0));
-                for (int i = 1; i < ParagraphCount(); i++)
-                {
-                    int it = i;
-                    body.Announcements.Add(GraphNodes.ValuePart(() => Paragraph(it), watch: false));
-                }
-
+                NodeVtable body = GraphNodes.Paragraphs(() => _adapter.BodyLines);
                 body.OnActivate = Advance;
                 builder.AddItem(new SyntheticNode(bodyId, body));
                 // Focus starts on the body, so arrival says the heading once as the screen name and
@@ -129,25 +119,6 @@ namespace SongsOfConquestAccess.Screens
             {
                 _adapter.AdvanceNow();
             }
-        }
-
-        private int ParagraphCount()
-        {
-            IList<string> lines = _adapter != null ? _adapter.BodyLines : null;
-            return lines != null ? lines.Count : 0;
-        }
-
-        /// <summary>Paragraph <paramref name="index"/> of the body; the whole body when the adapter
-        /// splits nothing, so a body with no paragraph break still reads.</summary>
-        private string Paragraph(int index)
-        {
-            IList<string> lines = _adapter != null ? _adapter.BodyLines : null;
-            if (lines == null || lines.Count == 0)
-            {
-                return index == 0 && _adapter != null ? _adapter.Body : null;
-            }
-
-            return index < lines.Count ? lines[index] : null;
         }
 
         private static LetterboxStoryTextAdapter FindActiveLetterboxStoryText()

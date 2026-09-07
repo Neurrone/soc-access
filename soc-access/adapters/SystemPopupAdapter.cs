@@ -1,8 +1,10 @@
 using System;
+using System.Collections.Generic;
 using HarmonyLib;
 using SongsOfConquest.Client;
 using SongsOfConquest.Client.UI;
 using SongsOfConquestAccess.Speech;
+using SongsOfConquestAccess.UI;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
@@ -41,7 +43,14 @@ namespace SongsOfConquestAccess.Adapters
 
         public string Body
         {
-            get { return GetActiveText(GetMessageText()); }
+            get { return string.Join(" ", BodyLines); }
+        }
+
+        /// <summary>The paragraphs the game broke the message into, kept apart rather than collapsed:
+        /// the popup reads a paragraph at a time.</summary>
+        public IList<string> BodyLines
+        {
+            get { return SpokenLines.Of(new[] { GetActiveRawText(GetMessageText()) }); }
         }
 
         public string PositiveLabel
@@ -227,13 +236,19 @@ namespace SongsOfConquestAccess.Adapters
 
         private static string GetActiveText(IUITextMesh textMesh)
         {
+            return SpeechTextSanitizer.Normalize(GetActiveRawText(textMesh));
+        }
+
+        // The text as the game wrote it, line breaks and all; a mesh the game has hidden says nothing.
+        private static string GetActiveRawText(IUITextMesh textMesh)
+        {
             IUITransform transform = textMesh as IUITransform;
             if (transform != null && !transform.Active)
             {
                 return string.Empty;
             }
 
-            return SpeechTextSanitizer.Normalize(UITextMeshTextUtility.GetEffectiveText(textMesh));
+            return UITextMeshTextUtility.GetEffectiveText(textMesh);
         }
     }
 }

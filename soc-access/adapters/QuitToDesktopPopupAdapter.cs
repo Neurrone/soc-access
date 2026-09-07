@@ -1,8 +1,10 @@
+using System.Collections.Generic;
 using HarmonyLib;
 using SongsOfConquest.Client;
 using SongsOfConquest.Client.Menu.Popup;
 using SongsOfConquest.Client.UI;
 using SongsOfConquestAccess.Speech;
+using SongsOfConquestAccess.UI;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
@@ -28,7 +30,20 @@ namespace SongsOfConquestAccess.Adapters
 
         public string Description
         {
-            get { return GetText(Settings != null ? Settings.Description : null); }
+            get { return string.Join(" ", DescriptionLines); }
+        }
+
+        /// <summary>The paragraphs the popup wrote its message in, kept apart rather than
+        /// collapsed.</summary>
+        public IList<string> DescriptionLines
+        {
+            get
+            {
+                return SpokenLines.Of(new[]
+                {
+                    UITextMeshTextUtility.GetEffectiveText(Settings != null ? Settings.Description : null),
+                });
+            }
         }
 
         public string FollowTitle

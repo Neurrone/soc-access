@@ -110,7 +110,7 @@ namespace SongsOfConquestAccess.Screens
         {
             if (_adapter.DescriptionVisible)
             {
-                return AddLine(builder, "description", () => _adapter.Description);
+                return AddParagraphs(builder, "description", () => _adapter.DescriptionLines);
             }
 
             IReadOnlyList<PostAdventureResultAdapter.ObjectiveEntry> objectives = _adapter.GetObjectives();
@@ -222,6 +222,21 @@ namespace SongsOfConquestAccess.Screens
 
             ControlId id = ControlId.For(Marker(key), "post-adventure:" + key);
             builder.AddItem(new SyntheticNode(id, GraphNodes.Text(text)));
+            return id;
+        }
+
+        /// <summary>The same, for a text the menu may have written in more than one paragraph: one
+        /// spoken line, one review-buffer line per paragraph.</summary>
+        private ControlId AddParagraphs(GraphBuilder builder, string key, Func<IList<string>> lines)
+        {
+            IList<string> paragraphs = lines();
+            if (paragraphs == null || paragraphs.Count == 0)
+            {
+                return null;
+            }
+
+            ControlId id = ControlId.For(Marker(key), "post-adventure:" + key);
+            builder.AddItem(new SyntheticNode(id, GraphNodes.Paragraphs(lines)));
             return id;
         }
 

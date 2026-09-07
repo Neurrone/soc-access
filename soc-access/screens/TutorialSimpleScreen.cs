@@ -9,8 +9,8 @@ namespace SongsOfConquestAccess.Screens
 {
     /// <summary>
     /// The one-page tutorial popup, made navigable as a graph. One stop: the title, which the game
-    /// draws in capitals and which is also the screen name, the body as the start node, then the two
-    /// controls in the order they are drawn.
+    /// draws in capitals and which is also the screen name, the body as the start node - one part per
+    /// paragraph the game broke it into - then the two controls in the order they are drawn.
     ///
     /// Measured 2026-09-07: the OK button is drawn at y 440, ABOVE the show-tutorials checkbox at
     /// y 480, while the widget tree read the checkbox first. The OK button stays declared while the
@@ -100,7 +100,9 @@ namespace SongsOfConquestAccess.Screens
             if (!string.IsNullOrWhiteSpace(_adapter.Description))
             {
                 ControlId bodyId = ControlId.For(_bodyKey, "tutorial-simple:body");
-                builder.AddItem(new SyntheticNode(bodyId, GraphNodes.Text(() => _adapter.Description)));
+                builder.AddItem(new SyntheticNode(
+                    bodyId,
+                    GraphNodes.Paragraphs(() => _adapter.DescriptionLines)));
                 // Focus starts on the body: arrival says the title once as the screen name and then
                 // what the tutorial has to say.
                 builder.SetStart(bodyId);

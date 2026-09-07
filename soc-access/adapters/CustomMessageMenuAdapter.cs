@@ -1,9 +1,11 @@
+using System.Collections.Generic;
 using System.Reflection;
 using HarmonyLib;
 using SongsOfConquest.Client;
 using SongsOfConquest.Client.Adventure;
 using SongsOfConquest.Client.UI;
 using SongsOfConquestAccess.Speech;
+using SongsOfConquestAccess.UI;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
@@ -38,10 +40,20 @@ namespace SongsOfConquestAccess.Adapters
 
         public string Body
         {
+            get { return string.Join(" ", BodyLines); }
+        }
+
+        /// <summary>The paragraphs the game broke the body into, kept apart rather than collapsed:
+        /// the dialog reads a paragraph at a time.</summary>
+        public IList<string> BodyLines
+        {
             get
             {
                 CustomMessageMenu.Settings settings = GetSettings();
-                return GetText(settings != null ? settings.BodyText : null);
+                return SpokenLines.Of(new[]
+                {
+                    UITextMeshTextUtility.GetEffectiveText(settings != null ? settings.BodyText : null),
+                });
             }
         }
 

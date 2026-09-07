@@ -235,7 +235,10 @@ namespace SongsOfConquestAccess.Screens
         {
             if (_adapter.HasSelectedBuildingSummary())
             {
-                AddLine(builder, "summary", () => _adapter.SelectedBuildingSummary);
+                // One spoken line, one review-buffer line per paragraph the game wrote it in.
+                builder.AddItem(new SyntheticNode(
+                    ControlId.For(Marker("summary"), "build:summary"),
+                    GraphNodes.Paragraphs(() => _adapter.SelectedBuildingSummaryLines)));
             }
 
             BuildTiers(builder);

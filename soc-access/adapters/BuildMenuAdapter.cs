@@ -19,6 +19,7 @@ using SongsOfConquest.Common.Localization;
 using SongsOfConquest.Common.Research;
 using SongsOfConquestAccess.Localization;
 using SongsOfConquestAccess.Speech;
+using SongsOfConquestAccess.UI;
 using UnityEngine;
 
 namespace SongsOfConquestAccess.Adapters
@@ -348,20 +349,34 @@ namespace SongsOfConquestAccess.Adapters
             }
         }
 
-        public string SelectedBuildingSummary
+        /// <summary>The building the pane is describing: its name and the description drawn under
+        /// it, one line per paragraph of that description.</summary>
+        public IList<string> SelectedBuildingSummaryLines
         {
             get
             {
                 BuildMenuHeaderSection header = GetField<BuildMenuHeaderSection>(_menu, HeaderSectionField);
                 string name = GetText(GetField<UITextMesh>(header, HeaderNameField));
-                string description = GetText(GetField<UITextMesh>(header, HeaderDescriptionField));
-                return JoinParts(name, description);
+                IList<string> description = GetLines(GetField<UITextMesh>(header, HeaderDescriptionField));
+                List<string> lines = new List<string>();
+                string first = JoinParts(name, description.Count > 0 ? description[0] : null);
+                if (!string.IsNullOrWhiteSpace(first))
+                {
+                    lines.Add(first);
+                }
+
+                for (int i = 1; i < description.Count; i++)
+                {
+                    lines.Add(description[i]);
+                }
+
+                return lines;
             }
         }
 
         public bool HasSelectedBuildingSummary()
         {
-            return !string.IsNullOrWhiteSpace(SelectedBuildingSummary);
+            return SelectedBuildingSummaryLines.Count > 0;
         }
 
         public int SelectedTier
@@ -1357,6 +1372,12 @@ namespace SongsOfConquestAccess.Adapters
         private static string GetText(IUITextMesh textMesh)
         {
             return SpeechTextSanitizer.Normalize(UITextMeshTextUtility.GetEffectiveText(textMesh));
+        }
+
+        // A text mesh the game may have written more than one paragraph into.
+        private static IList<string> GetLines(IUITextMesh textMesh)
+        {
+            return SpokenLines.Of(new[] { UITextMeshTextUtility.GetEffectiveText(textMesh) });
         }
 
         private static bool IsButtonEnabled(UIButton button)

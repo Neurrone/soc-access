@@ -262,14 +262,14 @@ namespace SongsOfConquestAccess.Screens
 
         private void BuildTip(GraphBuilder builder)
         {
-            if (string.IsNullOrWhiteSpace(_adapter.TipText))
+            if (_adapter.TipLines.Count == 0)
             {
                 return;
             }
 
             builder.AddItem(new SyntheticNode(
                 ControlId.For(Marker("tip"), "marketplace:tip"),
-                GraphNodes.Text(() => _adapter.TipText)));
+                GraphNodes.Paragraphs(() => _adapter.TipLines)));
         }
 
         // ---- the close ----

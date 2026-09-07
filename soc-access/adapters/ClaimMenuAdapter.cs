@@ -7,6 +7,7 @@ using SongsOfConquest.Client.Adventure;
 using SongsOfConquest.Client.UI;
 using SongsOfConquest.Common;
 using SongsOfConquestAccess.Speech;
+using SongsOfConquestAccess.UI;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -37,7 +38,14 @@ namespace SongsOfConquestAccess.Adapters
 
         public string Body
         {
-            get { return GetText(_settings != null ? _settings.DescriptionText : null); }
+            get { return string.Join(" ", BodyLines); }
+        }
+
+        /// <summary>The paragraphs the game broke the menu's description into, kept apart rather than
+        /// collapsed: the menu reads a paragraph at a time.</summary>
+        public IList<string> BodyLines
+        {
+            get { return GetLines(_settings != null ? _settings.DescriptionText : null); }
         }
 
         public bool IsPresent()
@@ -89,7 +97,7 @@ namespace SongsOfConquestAccess.Adapters
                 toggle,
                 () => GetText(title),
                 () => GetText(duration),
-                () => GetText(description),
+                () => GetLines(description),
                 () => toggle.interactable,
                 () => FocusToggle(toggle),
                 () => ActivateToggle(toggle)));
@@ -121,6 +129,12 @@ namespace SongsOfConquestAccess.Adapters
             return SpeechTextSanitizer.Normalize(UITextMeshTextUtility.GetEffectiveText(textMesh));
         }
 
+        // A text mesh the game may have written more than one paragraph into.
+        private static IList<string> GetLines(IUITextMesh textMesh)
+        {
+            return SpokenLines.Of(new[] { UITextMeshTextUtility.GetEffectiveText(textMesh) });
+        }
+
         private static bool IsVisible(Component component)
         {
             return component != null && component.gameObject != null && component.gameObject.activeInHierarchy;
@@ -145,7 +159,7 @@ namespace SongsOfConquestAccess.Adapters
                 Component toggle,
                 Func<string> getTitle,
                 Func<string> getDuration,
-                Func<string> getDescription,
+                Func<IList<string>> getDescriptionLines,
                 Func<bool> isEnabled,
                 Func<bool> focus,
                 Func<bool> activate)
@@ -154,7 +168,7 @@ namespace SongsOfConquestAccess.Adapters
                 Toggle = toggle;
                 GetTitle = getTitle;
                 GetDuration = getDuration;
-                GetDescription = getDescription;
+                GetDescriptionLines = getDescriptionLines;
                 _isEnabled = isEnabled;
                 Focus = focus;
                 Activate = activate;
@@ -167,7 +181,8 @@ namespace SongsOfConquestAccess.Adapters
 
             public Func<string> GetTitle { get; private set; }
             public Func<string> GetDuration { get; private set; }
-            public Func<string> GetDescription { get; private set; }
+            /// <summary>The choice's paragraph, one line each as the game wrote it.</summary>
+            public Func<IList<string>> GetDescriptionLines { get; private set; }
             public Func<bool> Focus { get; private set; }
             public Func<bool> Activate { get; private set; }
 

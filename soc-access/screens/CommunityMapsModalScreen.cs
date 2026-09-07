@@ -188,7 +188,7 @@ namespace SongsOfConquestAccess.Screens
                 // is what the modal has to say, which is where focus starts.
                 string key = "modal:text/" + text.Index;
                 ControlId id = ControlId.For(Marker(key), key);
-                builder.AddItem(new SyntheticNode(id, GraphNodes.Text(() => text.Text)));
+                builder.AddItem(new SyntheticNode(id, GraphNodes.Paragraphs(() => text.Lines)));
                 if (i > 0 && start == null)
                 {
                     start = id;

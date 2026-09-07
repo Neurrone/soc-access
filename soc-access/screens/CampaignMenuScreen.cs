@@ -138,14 +138,14 @@ namespace SongsOfConquestAccess.Screens
             // Tales and Community Campaigns buttons are plain buttons whose whole visible text is
             // one label.
             CampaignButtonAdapter campaign = item as CampaignButtonAdapter;
-            Func<string> description = campaign != null ? (Func<string>)campaign.GetDescription : null;
             // No details section beside these: an announcement part is a buffer line already, so a
             // section repeating the description and the progress line would put each of them in the
-            // review buffer twice (measured on the first build of this screen).
+            // review buffer twice (measured on the first build of this screen). The description is a
+            // part per paragraph, which is one spoken line and one buffer line each.
             NodeVtable vtable = GraphNodes.Button(item.GetLabel, () => item.Activate(), item.IsEnabled);
-            if (description != null)
+            if (campaign != null)
             {
-                vtable.Announcements.Add(GraphNodes.ValuePart(description, watch: false));
+                GraphNodes.ParagraphParts(vtable, campaign.GetDescriptionLines);
             }
 
             // Watched live: the page is ready before the game has filled the campaign state in, so a

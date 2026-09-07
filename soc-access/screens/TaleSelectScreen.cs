@@ -123,14 +123,14 @@ namespace SongsOfConquestAccess.Screens
         }
 
         /// <summary>
-        /// A card, activated through the game's own click. The description reads after the label and
-        /// is a review-buffer line by being a part; no details section beside it, because an
-        /// announcement part is a buffer line already and a section would put it there twice.
+        /// A card, activated through the game's own click. The description reads after the label, a
+        /// part per paragraph, and each of them is a review-buffer line by being a part; no details
+        /// section beside them, because a section would put them there twice.
         /// </summary>
         private static NodeVtable Card(TaleButtonAdapter item)
         {
             NodeVtable vtable = GraphNodes.Button(item.GetLabel, () => item.Activate(), item.IsEnabled);
-            vtable.Announcements.Add(GraphNodes.ValuePart(item.GetDescription, watch: false));
+            GraphNodes.ParagraphParts(vtable, item.GetDescriptionLines);
 
             // Watched live, as the campaign cards' is: the page is ready before the game has read the
             // campaign state back, so a card focused on arrival has no progress line yet.

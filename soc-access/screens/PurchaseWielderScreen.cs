@@ -159,7 +159,7 @@ namespace SongsOfConquestAccess.Screens
 
         private void BuildDetails(GraphBuilder builder)
         {
-            AddLine(builder, "summary", () => _adapter.SelectedSummary);
+            AddParagraphs(builder, "summary", () => _adapter.SelectedSummaryLines);
             AddStat(builder, "offence", () => _adapter.OffenceHeader, () => _adapter.Offence);
             AddStat(builder, "defence", () => _adapter.DefenceHeader, () => _adapter.Defence);
             AddStat(builder, "movement", () => _adapter.MovementHeader, () => _adapter.Movement);
@@ -168,7 +168,7 @@ namespace SongsOfConquestAccess.Screens
             BuildSkills(builder);
             if (_adapter.HasSpecialization())
             {
-                AddLine(builder, "specialization", () => _adapter.Specialization);
+                AddParagraphs(builder, "specialization", () => _adapter.SpecializationLines);
             }
 
             if (_adapter.HasPurchaseStatus())
@@ -307,6 +307,21 @@ namespace SongsOfConquestAccess.Screens
             builder.AddItem(new SyntheticNode(
                 ControlId.For(Marker(key), "purchase-wielder:" + key),
                 GraphNodes.Text(text)));
+        }
+
+        /// <summary>The same, for a text the pane may have written in more than one paragraph: one
+        /// spoken line, one review-buffer line per paragraph.</summary>
+        private void AddParagraphs(GraphBuilder builder, string key, Func<IList<string>> lines)
+        {
+            IList<string> paragraphs = lines();
+            if (paragraphs == null || paragraphs.Count == 0)
+            {
+                return;
+            }
+
+            builder.AddItem(new SyntheticNode(
+                ControlId.For(Marker(key), "purchase-wielder:" + key),
+                GraphNodes.Paragraphs(lines)));
         }
 
         private object Marker(string key)

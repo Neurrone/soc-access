@@ -246,15 +246,18 @@ namespace SongsOfConquestAccess.Screens
                 return;
             }
 
-            int firstBodyLine = string.IsNullOrWhiteSpace(heading) ? 1 : 0;
-            string label = firstBodyLine == 0 ? heading : lines[0];
-            NodeVtable vtable = GraphNodes.Text(() => label);
-            for (int i = firstBodyLine; i < lines.Count; i++)
+            // Nothing on this page changes under the cursor - a details page is opened for one mod
+            // and closed again - so the lines are read off the snapshot taken here.
+            NodeVtable vtable;
+            if (string.IsNullOrWhiteSpace(heading))
             {
-                // Nothing on this page changes under the cursor - a details page is opened for one
-                // mod and closed again - so the parts are read once and not watched.
-                string line = lines[i];
-                vtable.Announcements.Add(GraphNodes.ValuePart(() => line, watch: false));
+                vtable = GraphNodes.Paragraphs(() => lines);
+            }
+            else
+            {
+                string label = heading;
+                vtable = GraphNodes.Text(() => label);
+                GraphNodes.ParagraphParts(vtable, () => lines);
             }
 
             builder.AddItem(Synthetic(key, vtable));

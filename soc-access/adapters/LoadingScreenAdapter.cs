@@ -1,7 +1,9 @@
+using System.Collections.Generic;
 using HarmonyLib;
 using SongsOfConquest.Client.Menu;
 using SongsOfConquest.Client.UI;
 using SongsOfConquestAccess.Speech;
+using SongsOfConquestAccess.UI;
 using UnityEngine;
 
 namespace SongsOfConquestAccess.Adapters
@@ -53,16 +55,22 @@ namespace SongsOfConquestAccess.Adapters
         /// </summary>
         public string TipText
         {
+            get { return string.Join(" ", TipLines); }
+        }
+
+        /// <summary>The tip's own lines, kept apart rather than run together: the menu writes some
+        /// tips in more than one.</summary>
+        public IList<string> TipLines
+        {
             get
             {
                 UITextMesh tip = GetTipTextMesh();
                 if (tip == null || !tip.Active || !((Component)tip).gameObject.activeInHierarchy)
                 {
-                    return string.Empty;
+                    return new List<string>();
                 }
 
-                string text = tip.GetParsedText();
-                return text != null ? text.Trim() : string.Empty;
+                return SpokenLines.Of(new[] { tip.GetParsedText() });
             }
         }
 

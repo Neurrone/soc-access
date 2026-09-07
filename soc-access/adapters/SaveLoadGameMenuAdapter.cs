@@ -7,6 +7,7 @@ using SongsOfConquest.Client.Menu;
 using SongsOfConquest.Client.UI;
 using SongsOfConquest.Common;
 using SongsOfConquestAccess.Speech;
+using SongsOfConquestAccess.UI;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -119,11 +120,15 @@ namespace SongsOfConquestAccess.Adapters
             }
         }
 
-        public string GetSaveDescriptionText()
+        /// <summary>The paragraphs the menu wrote the save's description in, kept apart rather than
+        /// collapsed.</summary>
+        public IList<string> GetSaveDescriptionLines()
         {
             SaveLoadGameMenu.Settings settings = Settings;
-            return SpeechTextSanitizer.Normalize(
-                UITextMeshTextUtility.GetEffectiveText(settings != null ? settings.SaveDescriptionText : null));
+            return SpokenLines.Of(new[]
+            {
+                UITextMeshTextUtility.GetEffectiveText(settings != null ? settings.SaveDescriptionText : null),
+            });
         }
 
         public bool IsSaveDescriptionVisible()

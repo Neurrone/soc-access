@@ -1,8 +1,10 @@
 using HarmonyLib;
+using System.Collections.Generic;
 using System.Reflection;
 using System.Text.RegularExpressions;
 using SongsOfConquest.Client.Menu;
 using SongsOfConquest.Client.UI;
+using SongsOfConquestAccess.UI;
 using UnityEngine;
 
 namespace SongsOfConquestAccess.Adapters
@@ -58,6 +60,13 @@ namespace SongsOfConquestAccess.Adapters
         public string GetDescription()
         {
             return ReadTextMesh(DescriptionTextRef);
+        }
+
+        /// <summary>The paragraphs the card draws under its title, kept apart rather than run
+        /// together: a mod's blurb can be written in more than one.</summary>
+        public IList<string> GetDescriptionLines()
+        {
+            return SpokenLines.Of(new[] { GetDescription() });
         }
 
         public string GetActionText()

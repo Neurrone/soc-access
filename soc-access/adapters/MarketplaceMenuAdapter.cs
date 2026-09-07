@@ -10,6 +10,7 @@ using SongsOfConquest.Common.Economy;
 using SongsOfConquest.Common.Gamestate;
 using SongsOfConquest.Common.Localization;
 using SongsOfConquestAccess.Speech;
+using SongsOfConquestAccess.UI;
 using UnityEngine;
 
 namespace SongsOfConquestAccess.Adapters
@@ -142,13 +143,15 @@ namespace SongsOfConquestAccess.Adapters
             return button != null ? new TradeButtonItem(button) : null;
         }
 
-        public string TipText
+        /// <summary>The paragraphs of the tip the menu draws under the trade, kept apart rather than
+        /// collapsed.</summary>
+        public IList<string> TipLines
         {
             get
             {
                 if (_menu == null)
                 {
-                    return string.Empty;
+                    return new List<string>();
                 }
 
                 UITextMesh[] textMeshes = ((Component)_menu).GetComponentsInChildren<UITextMesh>(includeInactive: false);
@@ -157,11 +160,11 @@ namespace SongsOfConquestAccess.Adapters
                     UITextMesh textMesh = textMeshes[i];
                     if (textMesh != null && string.Equals(textMesh.gameObject.name, "TipText", StringComparison.OrdinalIgnoreCase))
                     {
-                        return GetText(textMesh);
+                        return SpokenLines.Of(new[] { UITextMeshTextUtility.GetEffectiveText(textMesh) });
                     }
                 }
 
-                return string.Empty;
+                return new List<string>();
             }
         }
 

@@ -40,7 +40,20 @@ namespace SongsOfConquestAccess.Adapters
 
         public string Body
         {
-            get { return GetText(_settings != null ? _settings.BodyText : null); }
+            get { return string.Join(" ", BodyLines); }
+        }
+
+        /// <summary>The paragraphs the game broke the body into, kept apart rather than collapsed:
+        /// the menu reads a paragraph at a time.</summary>
+        public IList<string> BodyLines
+        {
+            get
+            {
+                return SpokenLines.Of(new[]
+                {
+                    UITextMeshTextUtility.GetEffectiveText(_settings != null ? _settings.BodyText : null),
+                });
+            }
         }
 
         public string ConfirmLabel

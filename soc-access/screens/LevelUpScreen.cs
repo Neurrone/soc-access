@@ -198,7 +198,6 @@ namespace SongsOfConquestAccess.Screens
                 Component button = choice.Button;
                 string header = choice.Header;
                 string nameAndLevel = choice.NameAndLevel;
-                string description = choice.Description;
                 LevelUpMenuAdapter.SkillChoice it = choice;
                 NodeVtable vtable = GraphNodes.Button(
                     () => header,
@@ -206,8 +205,9 @@ namespace SongsOfConquestAccess.Screens
                     it.IsEnabled);
                 vtable.Announcements.Add(GraphNodes.ValuePart(() => nameAndLevel, watch: false));
                 // The description is DRAWN on the card, so it reads as part of the card rather than
-                // waiting in the buffer as a tooltip would.
-                vtable.Announcements.Add(GraphNodes.ValuePart(() => description, watch: false));
+                // waiting in the buffer as a tooltip would - a paragraph of it per part, which is one
+                // spoken line and one review-buffer line each.
+                GraphNodes.ParagraphParts(vtable, () => it.DescriptionLines);
                 // The card reveals itself on pointer enter and hides again on pointer exit; nothing
                 // else makes the game show which card the keyboard is on.
                 vtable.OnFocusVisual = () => PointerHover.MoveTo(button);

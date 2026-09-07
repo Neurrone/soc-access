@@ -13,6 +13,7 @@ using SongsOfConquest.Common.Economy;
 using SongsOfConquest.Common.Localization;
 using SongsOfConquestAccess.Localization;
 using SongsOfConquestAccess.Speech;
+using SongsOfConquestAccess.UI;
 using UnityEngine;
 
 namespace SongsOfConquestAccess.Adapters
@@ -113,13 +114,15 @@ namespace SongsOfConquestAccess.Adapters
             }
         }
 
-        public string SelectedSummary
+        /// <summary>The candidate the pane is describing: the name, the level and the description
+        /// the pane draws under them, one line per paragraph of that description.</summary>
+        public IList<string> SelectedSummaryLines
         {
             get
             {
                 PurchaseWielderDetails details = GetDetails();
                 string name = GetText(GetField<UITextMesh>(details, DetailsNameField));
-                string description = GetText(GetField<UITextMesh>(details, DetailsDescriptionField));
+                IList<string> description = GetLines(GetField<UITextMesh>(details, DetailsDescriptionField));
                 string level = IsVisible(GetField<GameObject>(details, DetailsLevelContainerField))
                     ? GetText(GetField<UITextMesh>(details, DetailsLevelTextField))
                     : string.Empty;
@@ -130,8 +133,19 @@ namespace SongsOfConquestAccess.Adapters
                     parts.Add(ModText.Get(ModStrings.Screens.LevelValue, level));
                 }
 
-                AddIfNotEmpty(parts, description);
-                return JoinSentences(parts);
+                if (description.Count > 0)
+                {
+                    parts.Add(description[0]);
+                }
+
+                List<string> lines = new List<string>();
+                AddIfNotEmpty(lines, JoinSentences(parts));
+                for (int i = 1; i < description.Count; i++)
+                {
+                    lines.Add(description[i]);
+                }
+
+                return lines;
             }
         }
 
@@ -315,18 +329,25 @@ namespace SongsOfConquestAccess.Adapters
             return IsVisible(text as Component) && !string.IsNullOrWhiteSpace(GetText(text));
         }
 
-        public string Specialization
+        /// <summary>The specialization the pane draws, under the game's own caption, one line per
+        /// paragraph of it.</summary>
+        public IList<string> SpecializationLines
         {
             get
             {
-                string body = GetText(GetField<UITextMesh>(GetDetails(), DetailsSpecializationField));
-                if (string.IsNullOrWhiteSpace(body))
+                IList<string> body = GetLines(GetField<UITextMesh>(GetDetails(), DetailsSpecializationField));
+                if (body.Count == 0)
                 {
-                    return string.Empty;
+                    return body;
                 }
 
                 string header = GetLocalizedText("Commanders/Tooltip/Specializations", string.Empty);
-                return string.IsNullOrWhiteSpace(header) ? body : header.TrimEnd(':') + ": " + body;
+                if (!string.IsNullOrWhiteSpace(header))
+                {
+                    body[0] = header.TrimEnd(':') + ": " + body[0];
+                }
+
+                return body;
             }
         }
 
@@ -603,6 +624,12 @@ namespace SongsOfConquestAccess.Adapters
             {
                 parts.Add(value);
             }
+        }
+
+        // A text mesh the game may have written more than one paragraph into.
+        private static IList<string> GetLines(IUITextMesh textMesh)
+        {
+            return SpokenLines.Of(new[] { UITextMeshTextUtility.GetEffectiveText(textMesh) });
         }
 
         private static string JoinSentences(List<string> parts)

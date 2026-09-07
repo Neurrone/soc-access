@@ -13,6 +13,7 @@ using SongsOfConquest.Common.Gamestate;
 using SongsOfConquest.Common.Localization;
 using SongsOfConquestAccess.Localization;
 using SongsOfConquestAccess.Speech;
+using SongsOfConquestAccess.UI;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -92,7 +93,14 @@ namespace SongsOfConquestAccess.Adapters
 
         public string BlueprintDescription
         {
-            get { return GetText(GetField<UITextMesh>(_menu, DescriptionTextField)); }
+            get { return string.Join(" ", BlueprintDescriptionLines); }
+        }
+
+        /// <summary>The paragraphs the game wrote the blueprint description in, kept apart rather
+        /// than collapsed.</summary>
+        public IList<string> BlueprintDescriptionLines
+        {
+            get { return GetLines(GetField<UITextMesh>(_menu, DescriptionTextField)); }
         }
 
         /// <summary>The text the blueprint description is drawn as.</summary>
@@ -267,8 +275,8 @@ namespace SongsOfConquestAccess.Adapters
 
                 UITextMesh text = GetField<UITextMesh>(entry, DescriptionEntryTextField);
                 UIImage icon = GetField<UIImage>(entry, DescriptionEntryIconField);
-                string label = GetText(text);
-                if (string.IsNullOrWhiteSpace(label))
+                IList<string> label = GetLines(text);
+                if (label.Count == 0)
                 {
                     continue;
                 }
@@ -480,6 +488,12 @@ namespace SongsOfConquestAccess.Adapters
             return SpeechTextSanitizer.Normalize(UITextMeshTextUtility.GetEffectiveText(text));
         }
 
+        // A text mesh the game may have written more than one paragraph into.
+        private static IList<string> GetLines(UITextMesh text)
+        {
+            return SpokenLines.Of(new[] { UITextMeshTextUtility.GetEffectiveText(text) });
+        }
+
         private static T GetField<T>(object instance, FieldInfo field) where T : class
         {
             return instance != null && field != null ? field.GetValue(instance) as T : null;
@@ -497,11 +511,11 @@ namespace SongsOfConquestAccess.Adapters
 
         public sealed class DescriptionRow
         {
-            public DescriptionRow(string id, Component component, string label, System.Func<Tooltip> getTooltip)
+            public DescriptionRow(string id, Component component, IList<string> lines, System.Func<Tooltip> getTooltip)
             {
                 Id = id;
                 Component = component;
-                Label = label ?? string.Empty;
+                Lines = lines ?? new List<string>();
                 GetTooltip = getTooltip;
             }
 
@@ -510,7 +524,8 @@ namespace SongsOfConquestAccess.Adapters
             /// <summary>The entry the game draws the row as.</summary>
             public Component Component { get; private set; }
 
-            public string Label { get; private set; }
+            /// <summary>What the row says, one line per paragraph the game wrote it in.</summary>
+            public IList<string> Lines { get; private set; }
 
             public System.Func<Tooltip> GetTooltip { get; private set; }
         }

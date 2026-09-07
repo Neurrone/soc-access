@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using HarmonyLib;
 using SongsOfConquest.Client;
 using SongsOfConquest.Client.Menu;
@@ -5,6 +6,7 @@ using SongsOfConquest.Client.UI;
 using SongsOfConquest.Common.Localization;
 using SongsOfConquestAccess.Localization;
 using SongsOfConquestAccess.Speech;
+using SongsOfConquestAccess.UI;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
@@ -47,7 +49,14 @@ namespace SongsOfConquestAccess.Adapters
 
         public string Body
         {
-            get { return GetText(GetDescription()); }
+            get { return string.Join(" ", BodyLines); }
+        }
+
+        /// <summary>The paragraphs the game broke the description into, kept apart rather than
+        /// collapsed: the dialog reads a paragraph at a time.</summary>
+        public IList<string> BodyLines
+        {
+            get { return SpokenLines.Of(new[] { UITextMeshTextUtility.GetEffectiveText(GetDescription()) }); }
         }
 
         public string PositiveLabel

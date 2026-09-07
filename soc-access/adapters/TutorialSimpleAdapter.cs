@@ -1,9 +1,11 @@
+using System.Collections.Generic;
 using HarmonyLib;
 using SongsOfConquest.Client.Menu;
 using SongsOfConquest.Client.UI;
 using SongsOfConquest.Common.Localization;
 using SongsOfConquestAccess.Localization;
 using SongsOfConquestAccess.Speech;
+using SongsOfConquestAccess.UI;
 using UnityEngine;
 
 namespace SongsOfConquestAccess.Adapters
@@ -61,7 +63,14 @@ namespace SongsOfConquestAccess.Adapters
 
         public string Description
         {
-            get { return Normalize(UITextMeshTextUtility.GetEffectiveText(BodyTextRef(SimplePopup))); }
+            get { return string.Join(" ", DescriptionLines); }
+        }
+
+        /// <summary>The paragraphs the game broke the tutorial's text into, kept apart rather than
+        /// collapsed: the popup reads a paragraph at a time.</summary>
+        public IList<string> DescriptionLines
+        {
+            get { return SpokenLines.Of(new[] { UITextMeshTextUtility.GetEffectiveText(BodyTextRef(SimplePopup)) }); }
         }
 
         public string TutorialsToggleLabel

@@ -106,7 +106,7 @@ namespace SongsOfConquestAccess.Screens
             if (!string.IsNullOrWhiteSpace(tip))
             {
                 ControlId tipId = ControlId.For(_adapter.TipLabel ?? _tipKey, "loading:tip");
-                builder.AddItem(Row(tipId, GraphNodes.Text(() => _adapter.TipText), _adapter.TipLabel));
+                builder.AddItem(Row(tipId, GraphNodes.Paragraphs(() => _adapter.TipLines), _adapter.TipLabel));
                 start = tipId;
             }
 

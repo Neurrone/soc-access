@@ -146,7 +146,7 @@ namespace SongsOfConquestAccess.Screens
             if (!string.IsNullOrWhiteSpace(_adapter.Description))
             {
                 ControlId bodyId = ControlId.For(_bodyKey, "quit:body");
-                NodeVtable body = GraphNodes.Text(() => _adapter.Description);
+                NodeVtable body = GraphNodes.Paragraphs(() => _adapter.DescriptionLines);
                 body.OnFocusVisual = _adapter.SelectBody;
                 builder.AddItem(new SyntheticNode(bodyId, body));
                 start = bodyId;

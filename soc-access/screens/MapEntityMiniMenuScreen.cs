@@ -152,8 +152,8 @@ namespace SongsOfConquestAccess.Screens
         {
             if (_adapter.IsBlueprintDescriptionVisible)
             {
-                AddText(builder, "blueprint-description", _adapter.BlueprintDescriptionComponent,
-                    () => _adapter.BlueprintDescription);
+                AddParagraphs(builder, "blueprint-description", _adapter.BlueprintDescriptionComponent,
+                    () => _adapter.BlueprintDescriptionLines);
             }
 
             AddStoredWielder(builder);
@@ -212,7 +212,7 @@ namespace SongsOfConquestAccess.Screens
                 }
 
                 MapEntityMiniMenuAdapter.DescriptionRow it = row;
-                NodeVtable vtable = GraphNodes.Text(() => it.Label, null, it.GetTooltip());
+                NodeVtable vtable = GraphNodes.Paragraphs(() => it.Lines, it.GetTooltip());
                 builder.AddItem(new DrawnNode(ControlId.For(it.Component, it.Id), vtable, it.Component));
             }
         }
@@ -236,6 +236,20 @@ namespace SongsOfConquestAccess.Screens
         private void AddText(GraphBuilder builder, string key, Component drawn, Func<string> label)
         {
             NodeVtable vtable = GraphNodes.Text(label);
+            if (drawn != null)
+            {
+                builder.AddItem(new DrawnNode(ControlId.For(drawn, "map-entity:" + key), vtable, drawn));
+                return;
+            }
+
+            builder.AddItem(new SyntheticNode(ControlId.For(Marker(key), "map-entity:" + key), vtable));
+        }
+
+        /// <summary>The same, for a text the menu may have written in more than one paragraph: one
+        /// spoken line, one review-buffer line per paragraph.</summary>
+        private void AddParagraphs(GraphBuilder builder, string key, Component drawn, Func<IList<string>> lines)
+        {
+            NodeVtable vtable = GraphNodes.Paragraphs(lines);
             if (drawn != null)
             {
                 builder.AddItem(new DrawnNode(ControlId.For(drawn, "map-entity:" + key), vtable, drawn));

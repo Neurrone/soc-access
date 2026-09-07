@@ -186,6 +186,35 @@ namespace SongsOfConquestAccess.UI
         }
 
         /// <summary>
+        /// A body of free text the game may have broken into paragraphs - a story, a tutorial page, a
+        /// dialog's message, a card's description.
+        ///
+        /// One node, one part per paragraph (owner ruling 2026-09-07): spoken they read as the one
+        /// body, joined by the announcer's part separator, and in the review buffer they are one line
+        /// per paragraph and nothing else. Declaring the same text as a details section as well would
+        /// put the joined copy in the buffer on top of the paragraphs, so a screen using this must not.
+        ///
+        /// The paragraphs are resolved from <paramref name="lines"/> on every read, never captured:
+        /// the text a screen shows can change under a RefreshTop, and the part count a graph was built
+        /// with is the one the node keeps until the next build - a resolver that runs late simply
+        /// reports null for a paragraph that is no longer there.
+        /// </summary>
+        public static NodeVtable Paragraphs(Func<IList<string>> lines, Tooltip tooltip = null)
+        {
+            NodeVtable vtable = Text(() => Paragraph(lines, 0), tooltip: tooltip);
+            AddParagraphs(vtable, lines, 1);
+            return vtable;
+        }
+
+        /// <summary>The same body of text where it is something a CONTROL draws beside its name - a
+        /// card's description, a summary's blurb - appended to that control's own readout as one part
+        /// per paragraph, rather than declared as a node or a section of its own.</summary>
+        public static void ParagraphParts(NodeVtable vtable, Func<IList<string>> lines)
+        {
+            AddParagraphs(vtable, lines, 0);
+        }
+
+        /// <summary>
         /// Free text the player types into the game's own editor. Activating it is the request for
         /// the keyboard; the handover itself, the words on the way in and out and the echo of what is
         /// typed all belong to <see cref="GameTextEditor"/>.
@@ -480,6 +509,30 @@ namespace SongsOfConquestAccess.UI
                     action();
                 }
             };
+        }
+
+        // One part per paragraph from the given index on, each resolving its own paragraph live.
+        private static void AddParagraphs(NodeVtable vtable, Func<IList<string>> lines, int first)
+        {
+            int count = Count(lines);
+            for (int i = first; i < count; i++)
+            {
+                int index = i;
+                vtable.Announcements.Add(ValuePart(() => Paragraph(lines, index), watch: false));
+            }
+        }
+
+        // Paragraph index of a live list: null past its end, and an empty list makes an empty label.
+        private static string Paragraph(Func<IList<string>> lines, int index)
+        {
+            IList<string> list = lines != null ? lines() : null;
+            return list != null && index < list.Count ? list[index] : null;
+        }
+
+        private static int Count(Func<IList<string>> lines)
+        {
+            IList<string> list = lines != null ? lines() : null;
+            return list != null ? list.Count : 0;
         }
 
         // The readout every control here is built from: what it is called and whether it is refusing.

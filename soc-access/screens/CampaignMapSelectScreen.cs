@@ -247,12 +247,10 @@ namespace SongsOfConquestAccess.Screens
                 return new List<string>();
             }
 
-            return SpokenLines.Of(new[]
-            {
-                information.GetDescription(),
-                information.GetWinConditions(),
-                EnsureSentenceTerminated(information.GetCompletedStatus()),
-            });
+            List<string> raw = new List<string>(information.GetDescriptionLines());
+            raw.Add(information.GetWinConditions());
+            raw.Add(EnsureSentenceTerminated(information.GetCompletedStatus()));
+            return SpokenLines.Of(raw);
         }
 
         // ---- the difficulty ----

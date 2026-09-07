@@ -31,6 +31,9 @@ namespace SongsOfConquestAccess.Screens
     /// so what the dialog asks is the next thing heard; then the field and the buttons. A source with
     /// no heading has no heading node and no screen name - the body is all there is to say.
     ///
+    /// THE BODY is a <c>GraphNodes.Paragraphs</c> node over the adapter's own lines: read aloud as
+    /// the one message and held in the review buffer one line per paragraph.
+    ///
     /// ESCAPE is the game's wherever the game acts on it, which differs per source and is a fact the
     /// adapter answers (<see cref="IMessageDialogAdapter.GameHandlesEscape"/>). Read out of the
     /// decompiled sources 2026-09-06: <c>ConfirmPopup.Show</c> registers <c>UI.ExitMenu</c> on
@@ -379,7 +382,7 @@ namespace SongsOfConquestAccess.Screens
             if (!string.IsNullOrWhiteSpace(_adapter.Body))
             {
                 ControlId bodyId = ControlId.For(_bodyKey, "dialog:body");
-                NodeVtable body = GraphNodes.Text(() => _adapter.Body, BodyLines);
+                NodeVtable body = GraphNodes.Paragraphs(() => _adapter.BodyLines);
                 body.OnFocusVisual = () => _adapter.SyncNativeSelection(DialogAction.Body);
                 builder.AddItem(new SyntheticNode(bodyId, body));
                 start = bodyId;
@@ -419,36 +422,6 @@ namespace SongsOfConquestAccess.Screens
                 // and failing that on the first button.
                 builder.SetStart(start);
             }
-        }
-
-        /// <summary>
-        /// The body's own lines, as a buffer section, and only where there is more than one of them.
-        /// An announcement part is already a review-buffer line, so a section repeating a one-line
-        /// body would put it in the buffer twice (the rule the campaign menu's port established).
-        /// Today every source's adapter collapses whitespace, so this is never more than one line;
-        /// it is written this way so that a source that stops collapsing reads as paragraphs rather
-        /// than as one run-on line.
-        /// </summary>
-        private IList<string> BodyLines()
-        {
-            string body = _adapter != null ? _adapter.Body : null;
-            if (string.IsNullOrWhiteSpace(body))
-            {
-                return null;
-            }
-
-            string[] split = body.Split(new[] { "\r\n", "\r", "\n" }, StringSplitOptions.None);
-            List<string> lines = new List<string>(split.Length);
-            for (int i = 0; i < split.Length; i++)
-            {
-                string line = split[i].Trim();
-                if (line.Length > 0)
-                {
-                    lines.Add(line);
-                }
-            }
-
-            return lines.Count > 1 ? lines : null;
         }
 
         /// <summary>The game's own text box, labelled with the dialog's heading (or with the body

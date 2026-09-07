@@ -4,6 +4,7 @@ using System.Reflection;
 using HarmonyLib;
 using ModIOBrowser;
 using ModIOBrowser.Implementation;
+using SongsOfConquestAccess.UI;
 using TMPro;
 using UnityEngine;
 using UnityEngine.EventSystems;
@@ -1018,11 +1019,17 @@ namespace SongsOfConquestAccess.Adapters
             public TextItem(int index, string text)
             {
                 Index = index;
-                Text = text ?? string.Empty;
+                Lines = SpokenLines.Of(new[] { text });
+                Text = string.Join(" ", Lines);
             }
 
             public int Index { get; private set; }
+
+            /// <summary>The whole block as one line, its paragraphs joined by a space.</summary>
             public string Text { get; private set; }
+
+            /// <summary>The block's paragraphs, one line each, as the modal wrote them.</summary>
+            public IList<string> Lines { get; private set; }
         }
 
         public sealed class InputItem

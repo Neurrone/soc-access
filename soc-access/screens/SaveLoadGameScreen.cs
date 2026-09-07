@@ -179,11 +179,11 @@ namespace SongsOfConquestAccess.Screens
         {
             // Save mode draws its "Saved as ..." line where load mode draws the tabs.
             if (_adapter.IsSaveDescriptionVisible()
-                && !string.IsNullOrWhiteSpace(_adapter.GetSaveDescriptionText()))
+                && _adapter.GetSaveDescriptionLines().Count > 0)
             {
                 builder.AddItem(new SyntheticNode(
                     ControlId.For(Marker("description"), "save-load:description"),
-                    GraphNodes.Text(() => _adapter.GetSaveDescriptionText())));
+                    GraphNodes.Paragraphs(() => _adapter.GetSaveDescriptionLines())));
             }
 
             IReadOnlyList<SaveLoadGameMenuAdapter.TabItem> tabs = _adapter.GetTabs();

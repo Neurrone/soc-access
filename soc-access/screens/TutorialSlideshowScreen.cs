@@ -16,10 +16,11 @@ namespace SongsOfConquestAccess.Screens
     /// panel rewrites the same description box - and every row therefore stands or falls with that
     /// box. The row of the page the panel is already showing is where focus lands.
     ///
-    /// The turn happens inside the row's label, which is the only thing that runs between the cursor
-    /// arriving and the landing being spoken, and it is guarded twice: the panel is already on the
-    /// page for every read but the first, and a read on a row the cursor is not standing on - a graph
-    /// dump, a type-ahead pass over the stop - turns nothing.
+    /// The turn happens inside the row's own text, which is the only thing that runs between the
+    /// cursor arriving and the landing being spoken, and it is guarded twice: the panel is already on
+    /// the page for every read but the first, and a read on a row the cursor is not standing on - a
+    /// graph dump, a type-ahead pass over the stop - turns nothing. The turned-to page then reads as
+    /// one line per paragraph the tutorial wrote it in.
     ///
     /// The game's Previous and Next arrows and its "1/3" counter are NOT declared: the list does what
     /// the arrows do, and the engine's own position stamp says which page the cursor is on.
@@ -158,15 +159,16 @@ namespace SongsOfConquestAccess.Screens
             }
         }
 
-        /// <summary>One page: the panel being turned to it, and then the words it is drawing. No role
-        /// word - a page is not a control the player works, it is what the tutorial has to say.</summary>
+        /// <summary>One page: the panel being turned to it, and then the words it is drawing, one
+        /// part per paragraph the page was written in. No role word - a page is not a control the
+        /// player works, it is what the tutorial has to say.</summary>
         private NodeVtable Page(int page)
         {
             int it = page;
-            return GraphNodes.Text(() =>
+            return GraphNodes.Paragraphs(() =>
             {
                 ShowPage(it);
-                return _adapter.Description;
+                return _adapter.DescriptionLines;
             });
         }
 

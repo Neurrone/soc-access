@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using System.Text.RegularExpressions;
 using HarmonyLib;
 using SongsOfConquest.Client;
@@ -6,6 +7,7 @@ using SongsOfConquest.Client.UI;
 using SongsOfConquest.Common.Localization;
 using SongsOfConquestAccess.Localization;
 using SongsOfConquestAccess.Speech;
+using SongsOfConquestAccess.UI;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
@@ -44,17 +46,26 @@ namespace SongsOfConquestAccess.Adapters
 
         public string Body
         {
+            get { return string.Join(" ", BodyLines); }
+        }
+
+        /// <summary>The event's chain name and its description, each its own line along with any
+        /// paragraph the game broke them into: the menu reads a paragraph at a time.</summary>
+        public IList<string> BodyLines
+        {
             get
             {
                 RandomEventMenu.Settings settings = GetSettings();
                 if (settings == null)
                 {
-                    return string.Empty;
+                    return new List<string>();
                 }
 
-                return JoinNonEmpty(
+                return SpokenLines.Of(new[]
+                {
                     GetActiveMultilineText(settings.ChainNameText),
-                    GetActiveMultilineText(settings.DescriptionText));
+                    GetActiveMultilineText(settings.DescriptionText),
+                });
             }
         }
 
@@ -224,21 +235,6 @@ namespace SongsOfConquestAccess.Adapters
 
             string withoutTags = RichTextTagRegex.Replace(value, string.Empty);
             return withoutTags.Trim();
-        }
-
-        private static string JoinNonEmpty(string first, string second)
-        {
-            if (string.IsNullOrWhiteSpace(first))
-            {
-                return second ?? string.Empty;
-            }
-
-            if (string.IsNullOrWhiteSpace(second))
-            {
-                return first;
-            }
-
-            return first + "\n\n" + second;
         }
 
         private static string FirstNonEmpty(string first, string fallback)

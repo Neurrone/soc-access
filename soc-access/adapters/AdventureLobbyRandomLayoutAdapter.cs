@@ -14,6 +14,7 @@ using SongsOfConquest.Common.Localization;
 using SongsOfConquest.Common.Map;
 using SongsOfConquestAccess.Localization;
 using SongsOfConquestAccess.Speech;
+using SongsOfConquestAccess.UI;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -262,6 +263,12 @@ namespace SongsOfConquestAccess.Adapters
             return SpeechTextSanitizer.Normalize(UITextMeshTextUtility.GetEffectiveText(textMesh));
         }
 
+        // A text mesh the game may have written more than one paragraph into.
+        private static IList<string> GetLines(IUITextMesh textMesh)
+        {
+            return SpokenLines.Of(new[] { UITextMeshTextUtility.GetEffectiveText(textMesh) });
+        }
+
         private static T GetEntryField<T>(LobbyRandomMapPreviewEntry entry, FieldInfo field) where T : class
         {
             return entry != null && field != null ? field.GetValue(entry) as T : null;
@@ -324,9 +331,11 @@ namespace SongsOfConquestAccess.Adapters
                 get { return GetText(GetEntryField<UITextMesh>(Entry, EntryTitleField)); }
             }
 
-            public string Description
+            /// <summary>The paragraphs the card draws under its title, kept apart rather than
+            /// collapsed.</summary>
+            public IList<string> DescriptionLines
             {
-                get { return GetText(GetEntryField<UITextMesh>(Entry, EntryDescriptionField)); }
+                get { return GetLines(GetEntryField<UITextMesh>(Entry, EntryDescriptionField)); }
             }
 
             public bool IsSelected

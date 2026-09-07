@@ -7,6 +7,7 @@ using SongsOfConquest.Common;
 using SongsOfConquest.Common.Campaign;
 using SongsOfConquest.Common.Localization;
 using SongsOfConquestAccess.Speech;
+using SongsOfConquestAccess.UI;
 using UnityEngine;
 using UnityEngine.EventSystems;
 
@@ -50,15 +51,17 @@ namespace SongsOfConquestAccess.Adapters
                 GetLocalizedText(definition != null ? definition.SubTitle : null, GetText(CampaignSubHeaderTextRef)));
         }
 
-        /// <summary>The paragraph the card draws under its subtitle, apart from the card's name: it
-        /// is always on the screen, so a screen can decide where in the readout it belongs.</summary>
-        public string GetDescription()
+        /// <summary>The paragraphs the card draws under its subtitle, apart from the card's name:
+        /// they are always on the screen, so a screen can decide where in the readout they belong.
+        /// Kept apart rather than collapsed - a campaign blurb can be written in more than one.
+        /// </summary>
+        public IList<string> GetDescriptionLines()
         {
             ICampaignDefinition definition = GetDefinition();
-            // Trimmed, not normalized: the localized paragraph ends in whitespace, which used to be
-            // eaten by the joiner that put the description inside the label.
-            string description = GetLocalizedText(definition != null ? definition.Description : null, GetText(DescriptionTextRef));
-            return description != null ? description.Trim() : string.Empty;
+            return SpokenLines.Of(new[]
+            {
+                GetLocalizedText(definition != null ? definition.Description : null, GetRawText(DescriptionTextRef)),
+            });
         }
 
         public string GetStatus()
@@ -143,6 +146,14 @@ namespace SongsOfConquestAccess.Adapters
         private static string GetText(UITextMesh textMesh)
         {
             return SpeechTextSanitizer.Normalize(UITextMeshTextUtility.GetEffectiveText(textMesh));
+        }
+
+        // The mesh's text as the game wrote it, line breaks and all.
+        private string GetRawText(AccessTools.FieldRef<CampaignButton, UITextMesh> fieldRef)
+        {
+            return _campaignButton != null
+                ? UITextMeshTextUtility.GetEffectiveText(fieldRef(_campaignButton))
+                : string.Empty;
         }
     }
 }

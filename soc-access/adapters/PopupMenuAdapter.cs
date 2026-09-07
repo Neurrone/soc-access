@@ -1,8 +1,10 @@
 using System;
+using System.Collections.Generic;
 using SongsOfConquest.Client;
 using SongsOfConquest.Client.Menu.Popup;
 using SongsOfConquest.Client.UI;
 using SongsOfConquestAccess.Speech;
+using SongsOfConquestAccess.UI;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
@@ -17,7 +19,7 @@ namespace SongsOfConquestAccess.Adapters
         private readonly IUIButton _positiveButton;
         private readonly IUIButton _negativeButton;
         private readonly string _title;
-        private readonly string _body;
+        private readonly IList<string> _bodyLines;
         private readonly string[] _actionLabels;
 
         private PopupMenuAdapter(
@@ -37,7 +39,7 @@ namespace SongsOfConquestAccess.Adapters
             _positiveButton = positiveButton;
             _negativeButton = negativeButton;
             _title = SpeechTextSanitizer.Normalize(title);
-            _body = SpeechTextSanitizer.Normalize(body);
+            _bodyLines = SpokenLines.Of(new[] { body });
             _actionLabels = new[] { SpeechTextSanitizer.Normalize(positiveLabel), SpeechTextSanitizer.Normalize(negativeLabel) };
         }
 
@@ -70,7 +72,14 @@ namespace SongsOfConquestAccess.Adapters
 
         public string Body
         {
-            get { return _body; }
+            get { return string.Join(" ", _bodyLines); }
+        }
+
+        /// <summary>The paragraphs the game broke the message into, kept apart rather than collapsed:
+        /// the popup reads a paragraph at a time.</summary>
+        public IList<string> BodyLines
+        {
+            get { return _bodyLines; }
         }
 
         public string PositiveLabel

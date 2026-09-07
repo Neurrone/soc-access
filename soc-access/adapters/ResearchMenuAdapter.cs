@@ -14,6 +14,7 @@ using SongsOfConquest.Common.Localization;
 using SongsOfConquest.Common.Research;
 using SongsOfConquestAccess.Localization;
 using SongsOfConquestAccess.Speech;
+using SongsOfConquestAccess.UI;
 using UnityEngine;
 
 namespace SongsOfConquestAccess.Adapters
@@ -174,7 +175,7 @@ namespace SongsOfConquestAccess.Adapters
                 int index = i;
                 UIButton button = GetButton(tab);
                 string label = GetBuildingLabel(tab, index);
-                string description = GetBuildingDescription(tab);
+                IList<string> description = GetBuildingDescription(tab);
                 int mapEntityId = BuildingTabMapEntityIdField != null ? (int)BuildingTabMapEntityIdField.GetValue(tab) : 0;
                 items.Add(new BuildingItem(
                     label,
@@ -316,10 +317,11 @@ namespace SongsOfConquestAccess.Adapters
             return string.IsNullOrWhiteSpace(label) ? "Building " + (index + 1) : label;
         }
 
-        private string GetBuildingDescription(ResearchMenuBuildingTabButton tab)
+        // The paragraphs the game wrote the tab's description in, kept apart rather than collapsed.
+        private IList<string> GetBuildingDescription(ResearchMenuBuildingTabButton tab)
         {
             UITextMesh description = GetField<UITextMesh>(tab, BuildingTabDescriptionField);
-            return SpeechTextSanitizer.Normalize(UITextMeshTextUtility.GetEffectiveText(description));
+            return SpokenLines.Of(new[] { UITextMeshTextUtility.GetEffectiveText(description) });
         }
 
         private string GetCategoryLabel(ResearchMenuCategory category, int index)
@@ -492,7 +494,7 @@ namespace SongsOfConquestAccess.Adapters
         {
             public BuildingItem(
                 string label,
-                string description,
+                IList<string> description,
                 bool missingBuilding,
                 bool isSelected,
                 Component button,
@@ -500,7 +502,7 @@ namespace SongsOfConquestAccess.Adapters
                 Func<bool> activate)
             {
                 Label = label ?? string.Empty;
-                Description = description ?? string.Empty;
+                DescriptionLines = description ?? new List<string>();
                 MissingBuilding = missingBuilding;
                 IsSelected = isSelected;
                 Button = button;
@@ -509,7 +511,9 @@ namespace SongsOfConquestAccess.Adapters
             }
 
             public string Label { get; private set; }
-            public string Description { get; private set; }
+
+            /// <summary>What the tab draws under its name, one line per paragraph.</summary>
+            public IList<string> DescriptionLines { get; private set; }
 
             /// <summary>The team owns no building of this kind, so nothing under the tab can be
             /// bought; the menu draws its "missing building" label over the page.</summary>

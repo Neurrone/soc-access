@@ -154,12 +154,12 @@ namespace SongsOfConquestAccess.Screens
                 }
 
                 // The description is always on the card, so it reads after the label rather than
-                // waiting in the buffer; it is a buffer line by being a part.
+                // waiting in the buffer; a part per paragraph, each of them a buffer line.
                 NodeVtable vtable = GraphNodes.Radio(
                     () => layout.Title,
                     () => layout.IsSelected,
                     () => layout.Activate());
-                vtable.Announcements.Add(GraphNodes.ValuePart(() => layout.Description, watch: false));
+                GraphNodes.ParagraphParts(vtable, () => layout.DescriptionLines);
                 ControlId id = ControlId.For(subject, "random-layout:card/" + layout.Id);
                 builder.AddItem(new DrawnNode(id, vtable, subject));
                 if (layout.IsSelected)

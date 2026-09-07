@@ -120,7 +120,9 @@ namespace SongsOfConquestAccess.Screens
             if (!string.IsNullOrWhiteSpace(_adapter.Body))
             {
                 ControlId bodyId = ControlId.For(_bodyKey, "world-confirm:body");
-                builder.AddItem(new SyntheticNode(bodyId, GraphNodes.Text(() => _adapter.Body)));
+                builder.AddItem(new SyntheticNode(
+                    bodyId,
+                    GraphNodes.Paragraphs(() => _adapter.BodyLines)));
                 // Focus starts on the body, so arrival reads the heading once as the screen name and
                 // then what the menu is actually asking.
                 builder.SetStart(bodyId);

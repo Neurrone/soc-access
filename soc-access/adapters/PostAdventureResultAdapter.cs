@@ -6,6 +6,7 @@ using SongsOfConquest.Client.Menu;
 using SongsOfConquest.Client.UI;
 using SongsOfConquestAccess.Localization;
 using SongsOfConquestAccess.Speech;
+using SongsOfConquestAccess.UI;
 using UnityEngine;
 
 namespace SongsOfConquestAccess.Adapters
@@ -61,7 +62,20 @@ namespace SongsOfConquestAccess.Adapters
 
         public string Description
         {
-            get { return GetText(GetField<UITextMesh>(DescriptionField)); }
+            get { return string.Join(" ", DescriptionLines); }
+        }
+
+        /// <summary>The paragraphs the menu wrote the outcome in - on a defeat it draws two, one
+        /// under the other - kept apart rather than collapsed.</summary>
+        public IList<string> DescriptionLines
+        {
+            get
+            {
+                return SpokenLines.Of(new[]
+                {
+                    UITextMeshTextUtility.GetEffectiveText(GetField<UITextMesh>(DescriptionField)),
+                });
+            }
         }
 
         public string ObjectivesTitle

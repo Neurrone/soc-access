@@ -176,7 +176,7 @@ namespace SongsOfConquestAccess.Screens
                 NodeVtable vtable = GraphNodes.Tab(() => it.Label, () => it.IsSelected);
                 // Both drawn on the tab: what the building researches, and, when the team owns none
                 // of it, that nothing under the tab can be bought.
-                vtable.Announcements.Add(GraphNodes.ValuePart(() => it.Description, watch: false));
+                GraphNodes.ParagraphParts(vtable, () => it.DescriptionLines);
                 vtable.Announcements.Add(GraphNodes.ValuePart(
                     () => it.MissingBuilding ? ModText.Get(ModStrings.Screens.MissingBuilding) : null));
                 vtable.OnActivate = () => { if (it.Activate != null) it.Activate(); };

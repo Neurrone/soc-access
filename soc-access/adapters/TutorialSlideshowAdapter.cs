@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using System.Reflection;
 using HarmonyLib;
 using SongsOfConquest.Client.Menu;
@@ -5,6 +6,7 @@ using SongsOfConquest.Client.UI;
 using SongsOfConquest.Common.Localization;
 using SongsOfConquestAccess.Localization;
 using SongsOfConquestAccess.Speech;
+using SongsOfConquestAccess.UI;
 using UnityEngine;
 
 namespace SongsOfConquestAccess.Adapters
@@ -70,9 +72,11 @@ namespace SongsOfConquestAccess.Adapters
             get { return Normalize(UITextMeshTextUtility.GetEffectiveText(HeaderTextRef(_menu))); }
         }
 
-        public string Description
+        /// <summary>The paragraphs the game broke the showing page into, kept apart rather than
+        /// collapsed: a page reads a paragraph at a time.</summary>
+        public IList<string> DescriptionLines
         {
-            get { return Normalize(UITextMeshTextUtility.GetEffectiveText(DescriptionTextRef(_menu))); }
+            get { return SpokenLines.Of(new[] { UITextMeshTextUtility.GetEffectiveText(DescriptionTextRef(_menu)) }); }
         }
 
         public string TutorialsToggleLabel

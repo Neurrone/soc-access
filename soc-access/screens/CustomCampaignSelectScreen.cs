@@ -142,11 +142,13 @@ namespace SongsOfConquestAccess.Screens
                 isTip ? (System.Func<string>)item.GetActionText : item.GetTitle,
                 () => item.Activate(),
                 item.IsEnabled);
-            vtable.Announcements.Add(GraphNodes.ValuePart(
+            // A part per paragraph: one spoken line, and one review-buffer line each. The tip card
+            // draws its title under its action text, so the title leads its own paragraphs there.
+            GraphNodes.ParagraphParts(
+                vtable,
                 isTip
-                    ? (System.Func<string>)(() => JoinNativeLines(item.GetTitle(), item.GetDescription()))
-                    : item.GetDescription,
-                watch: false));
+                    ? (System.Func<IList<string>>)(() => SpokenLines.Of(new[] { item.GetTitle(), item.GetDescription() }))
+                    : item.GetDescriptionLines);
             if (!isTip)
             {
                 vtable.Announcements.Add(new NodeAnnouncement(
