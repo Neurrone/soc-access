@@ -569,7 +569,6 @@ namespace SongsOfConquestAccess.Localization
             public static readonly ModString BuyArtifact = new ModString("Screens.BuyArtifact", "Buy");
             public static readonly ModString Buyback = new ModString("Screens.Buyback", "Buyback");
             public static readonly ModString Categories = new ModString("Screens.Categories", "Categories");
-            public static readonly ModString Choices = new ModString("Screens.Choices", "Choices");
             public static readonly ModString Chat = new ModString("Screens.Chat", "Chat");
             public static readonly ModString ChatInput = new ModString("Screens.ChatInput", "Message");
             public static readonly ModString ChatSendTo = new ModString("Screens.ChatSendTo", "Send to");
@@ -654,7 +653,6 @@ namespace SongsOfConquestAccess.Localization
             public static readonly ModString PlayerStatsBattle = new ModString("Screens.PlayerStatsBattle", "Conquest - Battle");
             public static readonly ModString PlayerStatsOverall = new ModString("Screens.PlayerStatsOverall", "Conquest - Overall");
             public static readonly ModString PostAdventureResult = new ModString("Screens.PostAdventureResult", "Post adventure result");
-            public static readonly ModString Penalties = new ModString("Screens.Penalties", "Penalties");
             public static readonly ModString Quickbar = new ModString("Screens.Quickbar", "Quickbar");
             public static readonly ModString Ready = new ModString("Screens.Ready", "Ready");
             public static readonly ModString ReadEnemyInfluence = new ModString("Screens.ReadEnemyInfluence", "Read attack, deadly and movement range for enemies on tiles in combat");
@@ -668,7 +666,6 @@ namespace SongsOfConquestAccess.Localization
             public static readonly ModString ResetAllToDefaults = new ModString("Screens.ResetAllToDefaults", "Reset all to defaults");
             public static readonly ModString ResetToDefaults = new ModString("Screens.ResetToDefaults", "Reset to defaults");
             public static readonly ModString Resources = new ModString("Screens.Resources", "Resources");
-            public static readonly ModString Rewards = new ModString("Screens.Rewards", "Rewards");
             public static readonly ModString Round = new ModString("Screens.Round", "Round {0}");
             public static readonly ModString Scanner = new ModString("Screens.Scanner", "Scanner");
             public static readonly ModString ScannerContentAnnouncements = new ModString("Screens.ScannerContentAnnouncements", "Scanner content announcements");
@@ -713,7 +710,6 @@ namespace SongsOfConquestAccess.Localization
             public static readonly ModString Wielders = new ModString("Screens.Wielders", "Wielders");
             public static readonly ModString WielderStats = new ModString("Screens.WielderStats", "{0}'s stats");
             public static readonly ModString WielderModifierCategories = new ModString("Screens.WielderModifierCategories", "{0}'s modifier categories");
-            public static readonly ModString WorldChoiceMenu = new ModString("Screens.WorldChoiceMenu", "World choice menu");
             public static readonly ModString MapEntityAnnouncements = new ModString("Screens.MapEntityAnnouncements", "Map entity announcements");
 
             public static readonly ModString AnnouncementActing = new ModString("Screens.AnnouncementActing", "Acting");

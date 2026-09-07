@@ -3,23 +3,51 @@ using System.Collections.Generic;
 using HarmonyLib;
 using SongsOfConquest.Client.Adventure;
 using SongsOfConquestAccess.Adapters;
-using SongsOfConquestAccess.Input;
 using SongsOfConquestAccess.Localization;
 using SongsOfConquestAccess.UI;
+using SongsOfConquestAccess.UI.Graph;
 using UnityEngine;
 using Zenject;
 
 namespace SongsOfConquestAccess.Screens
 {
-    public sealed class WorldChoiceMenuScreen : Screen
+    /// <summary>
+    /// The menu the map puts up when a wielder walks into something that offers a choice - a reward
+    /// to pick, a penalty to take, a question to answer. Three places to be, in the order the menu
+    /// draws them: the wielder band across the top, the choice itself, and the close cross.
+    ///
+    /// THE CARDS ARE A RADIO GROUP that never chooses on arrival: walking onto a card must not commit
+    /// the player to it, and the game's own model is select-then-confirm - a click on a card selects
+    /// it and turns the Confirm button on, and only Confirm closes the menu. So Enter is the card's
+    /// own pointer click and arriving on it only draws it (the widget screen selected on focus, which
+    /// this replaces). A card the game will not take is unavailable and says the game's own red
+    /// reason, which the card draws as part of its text.
+    ///
+    /// The wielder band comes from the shared contributor (<c>ui/TroopHudRows.cs</c>), because the
+    /// menu rebuilds its cards whenever the army changes - which is why it draws the army at all -
+    /// and because every wielder band in the game reads the same way.
+    ///
+    /// Escape is the game's (<c>ConsumesBack</c> false): the menu's <c>AdventureMenuBackground</c>
+    /// registers its own exit and closes on it. The navigator claims the key only while something is
+    /// being carried.
+    /// </summary>
+    public sealed class WorldChoiceMenuScreen : GraphScreen
     {
+        private const string WielderStop = "world-choice-wielder";
+        private const string ChoiceStop = "world-choice";
+        private const string CloseStop = "world-choice-close";
+        private const string WielderKey = "world-choice:wielder";
+
         private static readonly System.Reflection.PropertyInfo InstallerContainerProperty =
             AccessTools.Property(typeof(WorldChoiceMenuInstaller), "Container");
 
         private readonly WorldChoiceMenuAdapter _adapter;
 
+        // A subject of its own for the body, which the menu draws as a plain text rather than as a
+        // control, kept across rebuilds so the reconciler seats the cursor on the same one.
+        private readonly object _bodyMarker = new object();
+
         public WorldChoiceMenuScreen(WorldChoiceMenuAdapter adapter)
-            : base(BuildRoot(adapter))
         {
             _adapter = adapter;
         }
@@ -45,143 +73,156 @@ namespace SongsOfConquestAccess.Screens
             return null;
         }
 
+        public override string Key
+        {
+            get { return "world-choice-menu"; }
+        }
+
+        /// <summary>The title the menu draws.</summary>
+        public override string ScreenName
+        {
+            get { return _adapter == null ? null : _adapter.Title; }
+        }
+
+        public override object InitialFocusStop
+        {
+            get { return ChoiceStop; }
+        }
+
         public override bool IsPresent()
         {
             return _adapter != null && _adapter.IsPresent();
         }
 
-        public override void OnUnfocus()
+        public override void Build(GraphBuilder builder)
         {
-            _adapter?.HideNativeTooltip();
-            RootWidget?.Unfocus();
-        }
-
-        public override void OnPop()
-        {
-            _adapter?.HideNativeTooltip();
-        }
-
-        public override bool OnActionJustPressed(InputAction action)
-        {
-            if (action != null && action.Key == AccessibilityActions.Cancel.Key)
+            if (!IsPresent())
             {
-                return _adapter != null && _adapter.Close();
+                return;
             }
 
-            return base.OnActionJustPressed(action);
+            TroopHudRows.WielderStop(builder, WielderStop, WielderKey, _adapter.Wielder);
+
+            builder.BeginStop(ChoiceStop);
+            BuildBody(builder);
+            BuildChoices(builder);
+            BuildConfirm(builder);
+
+            builder.BeginStop(CloseStop);
+            BuildClose(builder);
         }
 
-        private static ContainerWidget BuildRoot(WorldChoiceMenuAdapter adapter)
+        /// <summary>The game's Ctrl+digit quick splits, on the band's troop rows.</summary>
+        public override bool ClaimsAction(string actionKey)
         {
-            string title = adapter != null ? adapter.Title : string.Empty;
-            ContainerWidget root = new ContainerWidget(
-                "world-choice-menu",
-                string.IsNullOrWhiteSpace(title) ? ModText.Get(ModStrings.Screens.WorldChoiceMenu) : title);
-            if (adapter == null)
+            return TroopHudRows.ClaimsAction(actionKey, Navigator, Troops, WielderKey);
+        }
+
+        public override bool OnAction(string actionKey)
+        {
+            return TroopHudRows.OnAction(actionKey, Navigator, Troops, WielderKey);
+        }
+
+        private TroopHudAdapter Troops
+        {
+            get { return _adapter == null || _adapter.Wielder == null ? null : _adapter.Wielder.Troops; }
+        }
+
+        /// <summary>What the menu says the choice is about, as one node of its paragraphs.</summary>
+        private void BuildBody(GraphBuilder builder)
+        {
+            string body = _adapter.Body;
+            if (string.IsNullOrWhiteSpace(body))
             {
-                return root;
+                return;
             }
 
-            root.AddChild(new TextWidget(
-                "world-choice-title",
-                () => adapter.Title,
-                adapter.HideNativeTooltip,
-                includeParentLabelInAnnouncement: false));
-
-            root.AddChild(TroopHudMenu.Build(
-                "world-choice-troops",
-                GameText.Get("Commanders/Tooltip/Troops", string.Empty),
-                adapter.Troops,
-                () => true));
-
-            root.AddChild(new TextWidget(
-                "world-choice-body",
-                () => adapter.Body,
-                adapter.HideNativeTooltip,
-                includeParentLabelInAnnouncement: false));
-
-            root.AddChild(BuildChoiceMenu(adapter));
-
-            root.AddChild(new ButtonWidget(
-                "world-choice-confirm",
-                () => adapter.ConfirmLabel,
-                adapter.ActivateConfirm,
-                adapter.HideNativeTooltip,
-                adapter.IsConfirmEnabled));
-
-            root.AddChild(new ButtonWidget(
-                "world-choice-cancel",
-                ModText.Get(ModStrings.Screens.Close),
-                adapter.Close,
-                adapter.HideNativeTooltip,
-                () => true));
-
-            return root;
+            builder.AddItem(new SyntheticNode(
+                ControlId.For(_bodyMarker, "world-choice:body"),
+                GraphNodes.Paragraphs(() => SpokenLines.Of(new[] { body }))));
         }
 
-        private static MenuWidget BuildChoiceMenu(WorldChoiceMenuAdapter adapter)
+        /// <summary>One card per row, walked with Up and Down: exactly one of them is the choice, and
+        /// arriving is not choosing.</summary>
+        private void BuildChoices(GraphBuilder builder)
         {
-            IReadOnlyList<WorldChoiceMenuAdapter.ChoiceItem> choices = adapter.GetChoices();
-            MenuWidget menu = new MenuWidget("world-choice-choices", BuildChoiceMenuLabel(choices));
+            IReadOnlyList<WorldChoiceMenuAdapter.ChoiceItem> choices = Items("choices", _adapter.GetChoices);
             for (int i = 0; i < choices.Count; i++)
             {
-                WorldChoiceMenuAdapter.ChoiceItem choice = choices[i];
-                menu.AddItem(new MenuItemWidget(
-                    BuildChoiceId(choice, i),
-                    () => choice.Label,
-                    () => choice.IsEnabled ? string.Empty : ModText.Get(ModStrings.UI.StatusDisabled),
-                    () => false,
-                    choice.OnFocus,
-                    choice.IsVisible,
-                    () => choice.Tooltip));
-            }
-
-            return menu;
-        }
-
-        private static string BuildChoiceMenuLabel(IReadOnlyList<WorldChoiceMenuAdapter.ChoiceItem> choices)
-        {
-            bool hasRewards = false;
-            bool hasPenalties = false;
-            bool hasGenericChoices = false;
-            for (int i = 0; choices != null && i < choices.Count; i++)
-            {
-                WorldChoiceMenuAdapter.ChoiceItem choice = choices[i];
-                if (choice == null)
+                WorldChoiceMenuAdapter.ChoiceItem it = choices[i];
+                if (it == null || it.Button == null)
                 {
                     continue;
                 }
 
-                if (choice.IsGeneric)
-                {
-                    hasGenericChoices = true;
-                }
-                else if (choice.IsPenalty)
-                {
-                    hasPenalties = true;
-                }
-                else
-                {
-                    hasRewards = true;
-                }
+                NodeVtable vtable = GraphNodes.Radio(
+                    () => it.Label,
+                    () => it.IsSelected,
+                    () => it.Choose(),
+                    () => it.IsEnabled,
+                    it.Tooltip);
+                vtable.OnFocusVisual = () => it.Select();
+                builder.AddItem(new DrawnNode(
+                    ControlId.For(it.Button, "world-choice:card/" + i),
+                    vtable,
+                    it.Button));
             }
-
-            if (hasGenericChoices || (hasRewards && hasPenalties))
-            {
-                return ModText.Get(ModStrings.Screens.Choices);
-            }
-
-            return hasPenalties
-                ? ModText.Get(ModStrings.Screens.Penalties)
-                : ModText.Get(ModStrings.Screens.Rewards);
         }
 
-        private static string BuildChoiceId(WorldChoiceMenuAdapter.ChoiceItem choice, int index)
+        /// <summary>The button that commits the choice. The game turns it on when a card is chosen,
+        /// so it is watched live under a cursor waiting here.</summary>
+        private void BuildConfirm(GraphBuilder builder)
         {
-            string prefix = choice != null && choice.IsGeneric
-                ? "choice"
-                : choice != null && choice.IsPenalty ? "penalty" : "reward";
-            return prefix + "-" + index;
+            Component confirm = _adapter.ConfirmButton;
+            if (confirm == null)
+            {
+                return;
+            }
+
+            NodeVtable vtable = GraphNodes.Button(
+                () => _adapter.ConfirmLabel,
+                () => _adapter.ActivateConfirm(),
+                _adapter.IsConfirmEnabled);
+            vtable.OnFocusVisual = () => NativeSelectionUtility.Select(confirm);
+            builder.AddItem(new DrawnNode(
+                ControlId.For(confirm, "world-choice:confirm"),
+                vtable,
+                confirm));
+        }
+
+        /// <summary>The cross the wielder band draws, which is the game's own way out of the menu.
+        /// </summary>
+        private void BuildClose(GraphBuilder builder)
+        {
+            WielderInteract wielder = _adapter.Wielder;
+            Component close = wielder == null ? null : wielder.CloseButton;
+            if (close == null || !wielder.IsCloseVisible)
+            {
+                return;
+            }
+
+            // An icon with no text of its own, so the mod names it.
+            NodeVtable vtable = GraphNodes.Button(
+                () => ModText.Get(ModStrings.Screens.Close),
+                () => wielder.ActivateClose());
+            vtable.OnFocusVisual = () => NativeSelectionUtility.Select(close);
+            builder.AddItem(new DrawnNode(ControlId.For(close, "world-choice:close"), vtable, close));
+        }
+
+        /// <summary>One section's items, or none where reading them threw: a part of the menu the game
+        /// has stopped answering for costs its own rows and never the rest of the page.</summary>
+        private static IReadOnlyList<T> Items<T>(string section, Func<IReadOnlyList<T>> getter)
+        {
+            try
+            {
+                IReadOnlyList<T> items = getter != null ? getter() : null;
+                return items ?? new T[0];
+            }
+            catch (Exception exception)
+            {
+                SocAccessMod.Instance?.LogWarning("WorldChoiceMenuScreen section " + section + " failed to build: " + exception);
+                return new T[0];
+            }
         }
 
         private static WorldChoiceMenu TryResolveWorldChoiceMenu(WorldChoiceMenuInstaller installer)

@@ -635,6 +635,11 @@ msgctxt "UI.TroopSlotWithSize"
 msgid "{0}, {1} / {2}, {3}"
 msgstr "{0}, {1} / {2}, {3}"
 
+#. UI.TroopWithSize
+msgctxt "UI.TroopWithSize"
+msgid "{0}, {1} / {2}"
+msgstr "{0}, {1} / {2}"
+
 #. UI.WielderArmy
 msgctxt "UI.WielderArmy"
 msgid "wielder's army"
@@ -784,11 +789,6 @@ msgstr "전투 기록"
 msgctxt "Screens.Categories"
 msgid "Categories"
 msgstr "범주"
-
-#. Screens.Choices
-msgctxt "Screens.Choices"
-msgid "Choices"
-msgstr "선택지"
 
 #. Screens.Chat
 msgctxt "Screens.Chat"
@@ -995,11 +995,6 @@ msgctxt "Screens.PostAdventureResult"
 msgid "Post adventure result"
 msgstr "모험 후 결과"
 
-#. Screens.Penalties
-msgctxt "Screens.Penalties"
-msgid "Penalties"
-msgstr "불이익"
-
 #. Screens.Quickbar
 msgctxt "Screens.Quickbar"
 msgid "Quickbar"
@@ -1049,11 +1044,6 @@ msgstr "{0} ({1} {2})"
 msgctxt "Screens.Resources"
 msgid "Resources"
 msgstr "자원"
-
-#. Screens.Rewards
-msgctxt "Screens.Rewards"
-msgid "Rewards"
-msgstr "보상"
 
 #. Screens.Round
 msgctxt "Screens.Round"
@@ -1130,6 +1120,16 @@ msgctxt "Screens.TroopDistribution"
 msgid "troop distribution"
 msgstr "부대 분배"
 
+#. Screens.TroopDisbandHint
+msgctxt "Screens.TroopDisbandHint"
+msgid "{0} disbands"
+msgstr "{0} 키로 해산"
+
+#. Screens.TroopMoveWholeHint
+msgctxt "Screens.TroopMoveWholeHint"
+msgid "{0} moves the whole troop"
+msgstr "{0} 키로 부대 전체 이동"
+
 #. Screens.TroopPlacement
 msgctxt "Screens.TroopPlacement"
 msgid "Troop placement"
@@ -1184,11 +1184,6 @@ msgstr "{0}의 능력치"
 msgctxt "Screens.WielderModifierCategories"
 msgid "{0}'s modifier categories"
 msgstr "{0}의 수정치 범주"
-
-#. Screens.WorldChoiceMenu
-msgctxt "Screens.WorldChoiceMenu"
-msgid "World choice menu"
-msgstr "세계 선택 메뉴"
 
 #. Screens.AddCustomCategory
 msgctxt "Screens.AddCustomCategory"
@@ -1589,6 +1584,11 @@ msgstr "자원 요약"
 msgctxt "Actions.TooltipActionsMenu"
 msgid "Tooltip Actions Menu"
 msgstr "툴팁 동작 메뉴"
+
+#. Actions.TroopSplit_0
+msgctxt "Actions.TroopSplit_0"
+msgid "Split Off {0} Troop"
+msgstr "{0} 부대 분리"
 
 #. Actions.UiBack
 msgctxt "Actions.UiBack"
@@ -2919,11 +2919,6 @@ msgstr "주문 취소"
 msgctxt "Screens.MarketplaceTradeColumn"
 msgid "{0} {1}"
 msgstr "{0} {1}"
-
-#. Screens.MaxTroopSize
-msgctxt "Screens.MaxTroopSize"
-msgid "Max troop size {0}"
-msgstr "최대 병력 크기 {0}"
 
 #. Screens.LeftRightDistribution
 msgctxt "Screens.LeftRightDistribution"

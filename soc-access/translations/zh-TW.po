@@ -635,6 +635,11 @@ msgctxt "UI.TroopSlotWithSize"
 msgid "{0}, {1} / {2}, {3}"
 msgstr "{0}，{1} / {2}，{3}"
 
+#. UI.TroopWithSize
+msgctxt "UI.TroopWithSize"
+msgid "{0}, {1} / {2}"
+msgstr "{0}，{1} / {2}"
+
 #. UI.WielderArmy
 msgctxt "UI.WielderArmy"
 msgid "wielder's army"
@@ -784,11 +789,6 @@ msgstr "戰鬥日誌"
 msgctxt "Screens.Categories"
 msgid "Categories"
 msgstr "類別"
-
-#. Screens.Choices
-msgctxt "Screens.Choices"
-msgid "Choices"
-msgstr "选择"
 
 #. Screens.Chat
 msgctxt "Screens.Chat"
@@ -995,11 +995,6 @@ msgctxt "Screens.PostAdventureResult"
 msgid "Post adventure result"
 msgstr "冒险后结果"
 
-#. Screens.Penalties
-msgctxt "Screens.Penalties"
-msgid "Penalties"
-msgstr "懲罰"
-
 #. Screens.Quickbar
 msgctxt "Screens.Quickbar"
 msgid "Quickbar"
@@ -1049,11 +1044,6 @@ msgstr "{0}（{1} {2}）"
 msgctxt "Screens.Resources"
 msgid "Resources"
 msgstr "資源"
-
-#. Screens.Rewards
-msgctxt "Screens.Rewards"
-msgid "Rewards"
-msgstr "獎勵"
 
 #. Screens.Round
 msgctxt "Screens.Round"
@@ -1130,6 +1120,16 @@ msgctxt "Screens.TroopDistribution"
 msgid "troop distribution"
 msgstr "部隊分配"
 
+#. Screens.TroopDisbandHint
+msgctxt "Screens.TroopDisbandHint"
+msgid "{0} disbands"
+msgstr "按 {0} 解散"
+
+#. Screens.TroopMoveWholeHint
+msgctxt "Screens.TroopMoveWholeHint"
+msgid "{0} moves the whole troop"
+msgstr "按 {0} 移動整支部隊"
+
 #. Screens.TroopPlacement
 msgctxt "Screens.TroopPlacement"
 msgid "Troop placement"
@@ -1184,11 +1184,6 @@ msgstr "{0} 的屬性"
 msgctxt "Screens.WielderModifierCategories"
 msgid "{0}'s modifier categories"
 msgstr "{0} 的修正類別"
-
-#. Screens.WorldChoiceMenu
-msgctxt "Screens.WorldChoiceMenu"
-msgid "World choice menu"
-msgstr "世界选择菜单"
 
 #. Screens.AddCustomCategory
 msgctxt "Screens.AddCustomCategory"
@@ -1589,6 +1584,11 @@ msgstr "彙總資源"
 msgctxt "Actions.TooltipActionsMenu"
 msgid "Tooltip Actions Menu"
 msgstr "提示操作選單"
+
+#. Actions.TroopSplit_0
+msgctxt "Actions.TroopSplit_0"
+msgid "Split Off {0} Troop"
+msgstr "分出 {0} 部隊"
 
 #. Actions.UiBack
 msgctxt "Actions.UiBack"
@@ -2919,11 +2919,6 @@ msgstr "取消法術"
 msgctxt "Screens.MarketplaceTradeColumn"
 msgid "{0} {1}"
 msgstr "{0} {1}"
-
-#. Screens.MaxTroopSize
-msgctxt "Screens.MaxTroopSize"
-msgid "Max troop size {0}"
-msgstr "最大部隊規模 {0}"
 
 #. Screens.LeftRightDistribution
 msgctxt "Screens.LeftRightDistribution"

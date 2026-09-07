@@ -28,12 +28,14 @@ namespace SongsOfConquestAccess.Adapters
         private static readonly FieldInfo ButtonPoolField = AccessTools.Field(typeof(WorldChoiceMenu), "_buttonPool");
         private static readonly FieldInfo LocalizationField = AccessTools.Field(typeof(WorldChoiceMenu), "_localization");
         private static readonly FieldInfo AdventureFacadeField = AccessTools.Field(typeof(WorldChoiceMenu), "_adventureFacade");
-        private static readonly FieldInfo HeaderTroopHudField = AccessTools.Field(typeof(WielderInteractHeader), "_troopHUD");
+        private static readonly FieldInfo SelectedRewardField = AccessTools.Field(typeof(WorldChoiceMenu), "selectedReward");
+        private static readonly FieldInfo SelectedPenaltyField = AccessTools.Field(typeof(WorldChoiceMenu), "selectedPenalty");
 
         private readonly WorldChoiceMenu _menu;
         private readonly WorldChoiceMenu.Settings _settings;
         private readonly ILocalizationHandler _localization;
         private readonly IClientAdventureFacade _facade;
+        private WielderInteract _wielder;
 
         public WorldChoiceMenuAdapter(WorldChoiceMenu menu)
         {
@@ -63,9 +65,22 @@ namespace SongsOfConquestAccess.Adapters
             get { return GetButtonText(_settings != null ? _settings.OkButton : null); }
         }
 
-        public TroopHudAdapter Troops
+        /// <summary>The band across the top: the wielder who walked in, their army, and the cross the
+        /// menu is closed with.</summary>
+        public WielderInteract Wielder
         {
-            get { return new TroopHudAdapter(GetWielderTroopHud(), _facade, _localization); }
+            get
+            {
+                if (_wielder == null)
+                {
+                    _wielder = new WielderInteract(
+                        _settings != null ? _settings.WielderInteractHeader : null,
+                        _facade,
+                        _localization);
+                }
+
+                return _wielder;
+            }
         }
 
         public bool IsPresent()
@@ -75,6 +90,12 @@ namespace SongsOfConquestAccess.Adapters
                 && AsyncField != null
                 && AsyncField.GetValue(_menu) != null
                 && (GetRewardButtons().Count > 0 || GetPenaltyButtons().Count > 0 || GetGenericChoiceButtons().Count > 0);
+        }
+
+        /// <summary>The button that commits the chosen card.</summary>
+        public Component ConfirmButton
+        {
+            get { return _settings != null ? _settings.OkButton : null; }
         }
 
         public bool IsConfirmEnabled()
@@ -94,180 +115,108 @@ namespace SongsOfConquestAccess.Adapters
             return NativeSelectionUtility.Click(_settings.OkButton);
         }
 
-        public bool Close()
-        {
-            if (_menu == null)
-            {
-                return false;
-            }
-
-            _menu.ForceClose();
-            return true;
-        }
-
-        public void HideNativeTooltip()
-        {
-            NativeTooltipUtility.HideTooltip();
-        }
-
+        /// <summary>
+        /// The cards the menu draws, in the order it spawned them: the rewards then the penalties,
+        /// or - where the menu was opened with plain lines of text rather than with reward data - the
+        /// generic buttons those lines were drawn on.
+        /// </summary>
         public IReadOnlyList<ChoiceItem> GetChoices()
         {
             List<IWorldMapChoiceButton> rewardButtons = GetRewardButtons();
             List<IWorldMapChoiceButton> penaltyButtons = GetPenaltyButtons();
             if (rewardButtons.Count == 0 && penaltyButtons.Count == 0)
             {
-                return GetGenericChoices();
+                return BuildChoices(GetGenericChoiceButtons(), isPenalty: false, isGeneric: true);
             }
 
             List<ChoiceItem> choices = new List<ChoiceItem>(rewardButtons.Count + penaltyButtons.Count);
-
-            for (int i = 0; i < rewardButtons.Count; i++)
-            {
-                int capturedIndex = i;
-                choices.Add(new ChoiceItem(
-                    isPenalty: false,
-                    () => BuildChoiceLabel(GetRewardButton(capturedIndex)),
-                    () => IsRewardEnabled(capturedIndex),
-                    () => FocusReward(capturedIndex),
-                    () => true,
-                    () => GetChoiceTooltip(GetRewardButton(capturedIndex))));
-            }
-
-            for (int i = 0; i < penaltyButtons.Count; i++)
-            {
-                int capturedIndex = i;
-                choices.Add(new ChoiceItem(
-                    isPenalty: true,
-                    () => BuildChoiceLabel(GetPenaltyButton(capturedIndex)),
-                    () => IsPenaltyEnabled(capturedIndex),
-                    () => FocusPenalty(capturedIndex),
-                    () => true,
-                    () => GetChoiceTooltip(GetPenaltyButton(capturedIndex))));
-            }
-
+            choices.AddRange(BuildChoices(rewardButtons, isPenalty: false, isGeneric: false));
+            choices.AddRange(BuildChoices(penaltyButtons, isPenalty: true, isGeneric: false));
             return choices;
         }
 
-        private IReadOnlyList<ChoiceItem> GetGenericChoices()
+        private List<ChoiceItem> BuildChoices(List<IWorldMapChoiceButton> buttons, bool isPenalty, bool isGeneric)
         {
-            List<IWorldMapChoiceButton> buttons = GetGenericChoiceButtons();
             List<ChoiceItem> choices = new List<ChoiceItem>(buttons.Count);
             for (int i = 0; i < buttons.Count; i++)
             {
-                int capturedIndex = i;
+                int index = i;
+                bool penalty = isPenalty;
                 choices.Add(new ChoiceItem(
-                    isPenalty: false,
-                    () => BuildChoiceLabel(GetGenericChoiceButton(capturedIndex)),
-                    () => IsGenericChoiceEnabled(capturedIndex),
-                    () => FocusGenericChoice(capturedIndex),
-                    () => true,
-                    () => GetChoiceTooltip(GetGenericChoiceButton(capturedIndex)),
-                    isGeneric: true));
+                    isPenalty,
+                    () => BuildChoiceLabel(GetChoiceButton(penalty, index)),
+                    () => IsChoiceEnabled(penalty, index),
+                    () => IsChoiceSelected(penalty, index),
+                    () => SelectChoice(penalty, index),
+                    () => ChooseChoice(penalty, index),
+                    () => GetChoiceTooltip(GetChoiceButton(penalty, index)),
+                    GetChoiceComponent(penalty, index),
+                    isGeneric));
             }
 
             return choices;
         }
 
-        private IWorldMapChoiceButton GetRewardButton(int index)
+        private List<IWorldMapChoiceButton> GetChoiceButtons(bool isPenalty)
         {
-            List<IWorldMapChoiceButton> buttons = GetRewardButtons();
+            if (isPenalty)
+            {
+                return GetPenaltyButtons();
+            }
+
+            List<IWorldMapChoiceButton> rewards = GetRewardButtons();
+            return rewards.Count > 0 ? rewards : GetGenericChoiceButtons();
+        }
+
+        private IWorldMapChoiceButton GetChoiceButton(bool isPenalty, int index)
+        {
+            List<IWorldMapChoiceButton> buttons = GetChoiceButtons(isPenalty);
             return index >= 0 && index < buttons.Count ? buttons[index] : null;
         }
 
-        private IWorldMapChoiceButton GetPenaltyButton(int index)
+        private Component GetChoiceComponent(bool isPenalty, int index)
         {
-            List<IWorldMapChoiceButton> buttons = GetPenaltyButtons();
-            return index >= 0 && index < buttons.Count ? buttons[index] : null;
+            IWorldMapChoiceButton button = GetChoiceButton(isPenalty, index);
+            return button != null ? button.Button : null;
         }
 
-        private IWorldMapChoiceButton GetGenericChoiceButton(int index)
+        private bool IsChoiceEnabled(bool isPenalty, int index)
         {
-            List<IWorldMapChoiceButton> buttons = GetGenericChoiceButtons();
-            return index >= 0 && index < buttons.Count ? buttons[index] : null;
-        }
-
-        private bool IsRewardEnabled(int index)
-        {
-            IWorldMapChoiceButton button = GetRewardButton(index);
+            IWorldMapChoiceButton button = GetChoiceButton(isPenalty, index);
             return button != null && button.Interactable;
         }
 
-        private bool IsPenaltyEnabled(int index)
+        /// <summary>Which card the menu has taken as chosen: the index it remembers for itself, which
+        /// is what its Confirm button acts on.</summary>
+        private bool IsChoiceSelected(bool isPenalty, int index)
         {
-            IWorldMapChoiceButton button = GetPenaltyButton(index);
-            return button != null && button.Interactable;
+            FieldInfo field = isPenalty ? SelectedPenaltyField : SelectedRewardField;
+            object selected = _menu != null && field != null ? field.GetValue(_menu) : null;
+            return selected is int && (int)selected == index;
         }
 
-        private bool IsGenericChoiceEnabled(int index)
+        /// <summary>Draw the card as the pointer resting on it would: the game's own selection, which
+        /// is what raises its tooltip. It does NOT choose.</summary>
+        private bool SelectChoice(bool isPenalty, int index)
         {
-            IWorldMapChoiceButton button = GetGenericChoiceButton(index);
-            return button != null && button.Interactable;
+            IWorldMapChoiceButton choice = GetChoiceButton(isPenalty, index);
+            return choice != null
+                && choice.Button != null
+                && NativeSelectionUtility.Select(choice.Button.GetSelectable());
         }
 
-        private bool FocusReward(int index)
+        /// <summary>
+        /// Choose the card, as a pointer click does: the game's own click handler takes it as the
+        /// selection and turns its Confirm button on.
+        ///
+        /// NOT through <c>UIButton.OnSubmit</c>: these buttons wire <c>OnGamepadDown</c> to immediate
+        /// confirmation, so submitting would close the whole menu on the card the player is only
+        /// looking at.
+        /// </summary>
+        private bool ChooseChoice(bool isPenalty, int index)
         {
-            List<IWorldMapChoiceButton> buttons = GetRewardButtons();
-            if (index < 0 || index >= buttons.Count)
-            {
-                return false;
-            }
-
-            IWorldMapChoiceButton choice = buttons[index];
-            if (choice == null || choice.Button == null)
-            {
-                return false;
-            }
-
-            Selectable selectable = choice.Button.GetSelectable();
-            NativeSelectionUtility.Select(selectable);
-
-            // Accessibility focus in this menu intentionally mirrors a single native click:
-            // the reward becomes the selected choice through the game's pointer-click handler.
-            // Do not route this through UIButton.OnSubmit;
-            // reward buttons wire OnGamepadDown to immediate confirmation, so submitting here
-            // would close the menu while the user is only moving through choices.
-            return !choice.Interactable || NativeSelectionUtility.Click(choice.Button);
-        }
-
-        private bool FocusPenalty(int index)
-        {
-            List<IWorldMapChoiceButton> buttons = GetPenaltyButtons();
-            if (index < 0 || index >= buttons.Count)
-            {
-                return false;
-            }
-
-            IWorldMapChoiceButton choice = buttons[index];
-            if (choice == null || choice.Button == null)
-            {
-                return false;
-            }
-
-            Selectable selectable = choice.Button.GetSelectable();
-            NativeSelectionUtility.Select(selectable);
-
-            // Match the reward path: a pointer click selects the native penalty
-            // choice, while the separate Confirm button commits it.
-            return !choice.Interactable || NativeSelectionUtility.Click(choice.Button);
-        }
-
-        private bool FocusGenericChoice(int index)
-        {
-            List<IWorldMapChoiceButton> buttons = GetGenericChoiceButtons();
-            if (index < 0 || index >= buttons.Count)
-            {
-                return false;
-            }
-
-            IWorldMapChoiceButton choice = buttons[index];
-            if (choice == null || choice.Button == null)
-            {
-                return false;
-            }
-
-            Selectable selectable = choice.Button.GetSelectable();
-            NativeSelectionUtility.Select(selectable);
-            return !choice.Interactable || NativeSelectionUtility.Click(choice.Button);
+            IWorldMapChoiceButton choice = GetChoiceButton(isPenalty, index);
+            return choice != null && choice.Button != null && NativeSelectionUtility.Click(choice.Button);
         }
 
         private string BuildChoiceLabel(IWorldMapChoiceButton button)
@@ -344,13 +293,6 @@ namespace SongsOfConquestAccess.Adapters
             return buttons;
         }
 
-        private TroopHUD GetWielderTroopHud()
-        {
-            return _settings != null && _settings.WielderInteractHeader != null
-                ? GetField<TroopHUD>(_settings.WielderInteractHeader, HeaderTroopHudField)
-                : null;
-        }
-
         private static string GetText(IUITextMesh textMesh)
         {
             return SpeechTextSanitizer.Normalize(UITextMeshTextUtility.GetEffectiveText(textMesh));
@@ -382,45 +324,75 @@ namespace SongsOfConquestAccess.Adapters
             return owner != null && field != null ? field.GetValue(owner) as T : null;
         }
 
+        /// <summary>One card the menu draws, with everything about it the screen asks for.</summary>
         public sealed class ChoiceItem
         {
             private readonly Func<string> _getLabel;
             private readonly Func<bool> _isEnabled;
+            private readonly Func<bool> _isSelected;
+            private readonly Func<bool> _select;
+            private readonly Func<bool> _choose;
             private readonly Func<Tooltip> _getTooltip;
 
             public ChoiceItem(
                 bool isPenalty,
                 Func<string> getLabel,
                 Func<bool> isEnabled,
-                Action onFocus,
-                Func<bool> isVisible,
-                Func<Tooltip> getTooltip = null,
+                Func<bool> isSelected,
+                Func<bool> select,
+                Func<bool> choose,
+                Func<Tooltip> getTooltip,
+                Component button,
                 bool isGeneric = false)
             {
                 IsPenalty = isPenalty;
                 IsGeneric = isGeneric;
+                Button = button;
                 _getLabel = getLabel;
                 _isEnabled = isEnabled;
-                OnFocus = onFocus;
-                IsVisible = isVisible;
+                _isSelected = isSelected;
+                _select = select;
+                _choose = choose;
                 _getTooltip = getTooltip;
             }
 
             public bool IsPenalty { get; private set; }
+
             public bool IsGeneric { get; private set; }
+
+            /// <summary>The card itself, which the game draws and the graph hangs its node on.</summary>
+            public Component Button { get; private set; }
+
+            /// <summary>What the card says, the game's own red reason for a card it will not take
+            /// included, since the card draws that as part of its text.</summary>
             public string Label
             {
                 get { return _getLabel != null ? _getLabel() ?? string.Empty : string.Empty; }
             }
+
             public bool IsEnabled
             {
                 get { return _isEnabled != null && _isEnabled(); }
             }
-            public Action OnFocus { get; private set; }
-            public Func<bool> IsVisible { get; private set; }
+
+            public bool IsSelected
+            {
+                get { return _isSelected != null && _isSelected(); }
+            }
+
             public Tooltip Tooltip
             {
                 get { return _getTooltip != null ? _getTooltip() : null; }
+            }
+
+            public bool Select()
+            {
+                return _select != null && _select();
+            }
+
+            public bool Choose()
+            {
+                return _choose != null && _choose();
             }
         }
     }

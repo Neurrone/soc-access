@@ -2354,6 +2354,11 @@ msgctxt "UI.TroopSlotWithSize"
 msgid "{0}, {1} / {2}, {3}"
 msgstr ""
 
+#. UI.TroopWithSize
+msgctxt "UI.TroopWithSize"
+msgid "{0}, {1} / {2}"
+msgstr ""
+
 #. UI.Unselected
 msgctxt "UI.Unselected"
 msgid "unselected"
@@ -2497,11 +2502,6 @@ msgstr ""
 #. Screens.Categories
 msgctxt "Screens.Categories"
 msgid "Categories"
-msgstr ""
-
-#. Screens.Choices
-msgctxt "Screens.Choices"
-msgid "Choices"
 msgstr ""
 
 #. Screens.Chat
@@ -2779,11 +2779,6 @@ msgctxt "Screens.MarketplaceTradeColumn"
 msgid "{0} {1}"
 msgstr ""
 
-#. Screens.MaxTroopSize
-msgctxt "Screens.MaxTroopSize"
-msgid "Max troop size {0}"
-msgstr ""
-
 #. Screens.MoveAllLeft
 msgctxt "Screens.MoveAllLeft"
 msgid "Move all left"
@@ -2929,11 +2924,6 @@ msgctxt "Screens.PostAdventureResult"
 msgid "Post adventure result"
 msgstr ""
 
-#. Screens.Penalties
-msgctxt "Screens.Penalties"
-msgid "Penalties"
-msgstr ""
-
 #. Screens.Quickbar
 msgctxt "Screens.Quickbar"
 msgid "Quickbar"
@@ -2997,11 +2987,6 @@ msgstr ""
 #. Screens.Resources
 msgctxt "Screens.Resources"
 msgid "Resources"
-msgstr ""
-
-#. Screens.Rewards
-msgctxt "Screens.Rewards"
-msgid "Rewards"
 msgstr ""
 
 #. Screens.Round
@@ -3129,6 +3114,16 @@ msgctxt "Screens.TroopDistribution"
 msgid "troop distribution"
 msgstr ""
 
+#. Screens.TroopDisbandHint
+msgctxt "Screens.TroopDisbandHint"
+msgid "{0} disbands"
+msgstr ""
+
+#. Screens.TroopMoveWholeHint
+msgctxt "Screens.TroopMoveWholeHint"
+msgid "{0} moves the whole troop"
+msgstr ""
+
 #. Screens.TroopDeployment
 msgctxt "Screens.TroopDeployment"
 msgid "Troop deployment"
@@ -3207,11 +3202,6 @@ msgstr ""
 #. Screens.WielderModifierCategories
 msgctxt "Screens.WielderModifierCategories"
 msgid "{0}'s modifier categories"
-msgstr ""
-
-#. Screens.WorldChoiceMenu
-msgctxt "Screens.WorldChoiceMenu"
-msgid "World choice menu"
 msgstr ""
 
 #. Screens.MapEntityAnnouncements
@@ -3837,6 +3827,21 @@ msgstr ""
 #. Spatial.SkippedTileCount_2
 msgctxt "Spatial.SkippedTileCount_2"
 msgid "Skipped {0} tiles"
+msgstr ""
+
+#. Actions.TroopSplit_0
+msgctxt "Actions.TroopSplit_0"
+msgid "Split Off {0} Troop"
+msgstr ""
+
+#. Actions.TroopSplit_1
+msgctxt "Actions.TroopSplit_1"
+msgid "Split Off {0} Troops"
+msgstr ""
+
+#. Actions.TroopSplit_2
+msgctxt "Actions.TroopSplit_2"
+msgid "Split Off {0} Troops"
 msgstr ""
 
 #. Combat.BoltAt_0

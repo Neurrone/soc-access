@@ -635,6 +635,11 @@ msgctxt "UI.TroopSlotWithSize"
 msgid "{0}, {1} / {2}, {3}"
 msgstr "{0}、{1} / {2}、{3}"
 
+#. UI.TroopWithSize
+msgctxt "UI.TroopWithSize"
+msgid "{0}, {1} / {2}"
+msgstr "{0}、{1} / {2}"
+
 #. UI.WielderArmy
 msgctxt "UI.WielderArmy"
 msgid "wielder's army"
@@ -784,11 +789,6 @@ msgstr "戦闘ログ"
 msgctxt "Screens.Categories"
 msgid "Categories"
 msgstr "カテゴリ"
-
-#. Screens.Choices
-msgctxt "Screens.Choices"
-msgid "Choices"
-msgstr "選択肢"
 
 #. Screens.Chat
 msgctxt "Screens.Chat"
@@ -995,11 +995,6 @@ msgctxt "Screens.PostAdventureResult"
 msgid "Post adventure result"
 msgstr "冒険後の結果"
 
-#. Screens.Penalties
-msgctxt "Screens.Penalties"
-msgid "Penalties"
-msgstr "ペナルティ"
-
 #. Screens.Quickbar
 msgctxt "Screens.Quickbar"
 msgid "Quickbar"
@@ -1049,11 +1044,6 @@ msgstr "{0}（{1} {2}）"
 msgctxt "Screens.Resources"
 msgid "Resources"
 msgstr "資源"
-
-#. Screens.Rewards
-msgctxt "Screens.Rewards"
-msgid "Rewards"
-msgstr "報酬"
 
 #. Screens.Round
 msgctxt "Screens.Round"
@@ -1130,6 +1120,16 @@ msgctxt "Screens.TroopDistribution"
 msgid "troop distribution"
 msgstr "部隊配分"
 
+#. Screens.TroopDisbandHint
+msgctxt "Screens.TroopDisbandHint"
+msgid "{0} disbands"
+msgstr "{0} で解散します"
+
+#. Screens.TroopMoveWholeHint
+msgctxt "Screens.TroopMoveWholeHint"
+msgid "{0} moves the whole troop"
+msgstr "{0} で部隊全体を移動します"
+
 #. Screens.TroopPlacement
 msgctxt "Screens.TroopPlacement"
 msgid "Troop placement"
@@ -1184,11 +1184,6 @@ msgstr "{0} の能力値"
 msgctxt "Screens.WielderModifierCategories"
 msgid "{0}'s modifier categories"
 msgstr "{0} の修正カテゴリ"
-
-#. Screens.WorldChoiceMenu
-msgctxt "Screens.WorldChoiceMenu"
-msgid "World choice menu"
-msgstr "ワールド選択メニュー"
 
 #. Screens.AddCustomCategory
 msgctxt "Screens.AddCustomCategory"
@@ -1589,6 +1584,11 @@ msgstr "資源を要約"
 msgctxt "Actions.TooltipActionsMenu"
 msgid "Tooltip Actions Menu"
 msgstr "ツールチップ操作メニュー"
+
+#. Actions.TroopSplit_0
+msgctxt "Actions.TroopSplit_0"
+msgid "Split Off {0} Troop"
+msgstr "{0} 部隊を分割"
 
 #. Actions.UiBack
 msgctxt "Actions.UiBack"
@@ -2919,11 +2919,6 @@ msgstr "呪文をキャンセル"
 msgctxt "Screens.MarketplaceTradeColumn"
 msgid "{0} {1}"
 msgstr "{0} {1}"
-
-#. Screens.MaxTroopSize
-msgctxt "Screens.MaxTroopSize"
-msgid "Max troop size {0}"
-msgstr "最大部隊サイズ {0}"
 
 #. Screens.LeftRightDistribution
 msgctxt "Screens.LeftRightDistribution"

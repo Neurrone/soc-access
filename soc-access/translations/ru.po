@@ -655,6 +655,11 @@ msgctxt "UI.TroopSlotWithSize"
 msgid "{0}, {1} / {2}, {3}"
 msgstr "{0}, {1} / {2}, {3}"
 
+#. UI.TroopWithSize
+msgctxt "UI.TroopWithSize"
+msgid "{0}, {1} / {2}"
+msgstr "{0}, {1} / {2}"
+
 #. UI.WielderArmy
 msgctxt "UI.WielderArmy"
 msgid "wielder's army"
@@ -804,11 +809,6 @@ msgstr "Журнал боя"
 msgctxt "Screens.Categories"
 msgid "Categories"
 msgstr "Категории"
-
-#. Screens.Choices
-msgctxt "Screens.Choices"
-msgid "Choices"
-msgstr "Варианты"
 
 #. Screens.Chat
 msgctxt "Screens.Chat"
@@ -1015,11 +1015,6 @@ msgctxt "Screens.PostAdventureResult"
 msgid "Post adventure result"
 msgstr "Итог после приключения"
 
-#. Screens.Penalties
-msgctxt "Screens.Penalties"
-msgid "Penalties"
-msgstr "Штрафы"
-
 #. Screens.Quickbar
 msgctxt "Screens.Quickbar"
 msgid "Quickbar"
@@ -1069,11 +1064,6 @@ msgstr "{0} ({1} {2})"
 msgctxt "Screens.Resources"
 msgid "Resources"
 msgstr "Ресурсы"
-
-#. Screens.Rewards
-msgctxt "Screens.Rewards"
-msgid "Rewards"
-msgstr "Награды"
 
 #. Screens.Round
 msgctxt "Screens.Round"
@@ -1150,6 +1140,16 @@ msgctxt "Screens.TroopDistribution"
 msgid "troop distribution"
 msgstr "распределение отрядов"
 
+#. Screens.TroopDisbandHint
+msgctxt "Screens.TroopDisbandHint"
+msgid "{0} disbands"
+msgstr "{0}, чтобы распустить"
+
+#. Screens.TroopMoveWholeHint
+msgctxt "Screens.TroopMoveWholeHint"
+msgid "{0} moves the whole troop"
+msgstr "{0} переносит весь отряд"
+
 #. Screens.TroopPlacement
 msgctxt "Screens.TroopPlacement"
 msgid "Troop placement"
@@ -1204,11 +1204,6 @@ msgstr "характеристики {0}"
 msgctxt "Screens.WielderModifierCategories"
 msgid "{0}'s modifier categories"
 msgstr "категории модификаторов {0}"
-
-#. Screens.WorldChoiceMenu
-msgctxt "Screens.WorldChoiceMenu"
-msgid "World choice menu"
-msgstr "Меню выбора мира"
 
 #. Screens.AddCustomCategory
 msgctxt "Screens.AddCustomCategory"
@@ -1609,6 +1604,21 @@ msgstr "Сводка ресурсов"
 msgctxt "Actions.TooltipActionsMenu"
 msgid "Tooltip Actions Menu"
 msgstr "Меню действий подсказки"
+
+#. Actions.TroopSplit_0
+msgctxt "Actions.TroopSplit_0"
+msgid "Split Off {0} Troop"
+msgstr "Отделить {0} отряд"
+
+#. Actions.TroopSplit_1
+msgctxt "Actions.TroopSplit_1"
+msgid "Split Off {0} Troops"
+msgstr "Отделить {0} отряда"
+
+#. Actions.TroopSplit_2
+msgctxt "Actions.TroopSplit_2"
+msgid "Split Off {0} Troops"
+msgstr "Отделить {0} отрядов"
 
 #. Actions.UiBack
 msgctxt "Actions.UiBack"
@@ -2949,11 +2959,6 @@ msgstr "Отменить заклинание"
 msgctxt "Screens.MarketplaceTradeColumn"
 msgid "{0} {1}"
 msgstr "{0} {1}"
-
-#. Screens.MaxTroopSize
-msgctxt "Screens.MaxTroopSize"
-msgid "Max troop size {0}"
-msgstr "Максимальный размер отряда {0}"
 
 #. Screens.LeftRightDistribution
 msgctxt "Screens.LeftRightDistribution"

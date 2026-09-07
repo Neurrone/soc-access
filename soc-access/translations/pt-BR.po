@@ -645,6 +645,11 @@ msgctxt "UI.TroopSlotWithSize"
 msgid "{0}, {1} / {2}, {3}"
 msgstr "{0}, {1} / {2}, {3}"
 
+#. UI.TroopWithSize
+msgctxt "UI.TroopWithSize"
+msgid "{0}, {1} / {2}"
+msgstr "{0}, {1} / {2}"
+
 #. UI.WielderArmy
 msgctxt "UI.WielderArmy"
 msgid "wielder's army"
@@ -794,11 +799,6 @@ msgstr "Registro de batalha"
 msgctxt "Screens.Categories"
 msgid "Categories"
 msgstr "Categorias"
-
-#. Screens.Choices
-msgctxt "Screens.Choices"
-msgid "Choices"
-msgstr "Escolhas"
 
 #. Screens.Chat
 msgctxt "Screens.Chat"
@@ -1005,11 +1005,6 @@ msgctxt "Screens.PostAdventureResult"
 msgid "Post adventure result"
 msgstr "Resultado pós-aventura"
 
-#. Screens.Penalties
-msgctxt "Screens.Penalties"
-msgid "Penalties"
-msgstr "Penalidades"
-
 #. Screens.Quickbar
 msgctxt "Screens.Quickbar"
 msgid "Quickbar"
@@ -1059,11 +1054,6 @@ msgstr "{0} ({1} {2})"
 msgctxt "Screens.Resources"
 msgid "Resources"
 msgstr "Recursos"
-
-#. Screens.Rewards
-msgctxt "Screens.Rewards"
-msgid "Rewards"
-msgstr "Recompensas"
 
 #. Screens.Round
 msgctxt "Screens.Round"
@@ -1140,6 +1130,16 @@ msgctxt "Screens.TroopDistribution"
 msgid "troop distribution"
 msgstr "distribuição de tropas"
 
+#. Screens.TroopDisbandHint
+msgctxt "Screens.TroopDisbandHint"
+msgid "{0} disbands"
+msgstr "{0} para dispensar"
+
+#. Screens.TroopMoveWholeHint
+msgctxt "Screens.TroopMoveWholeHint"
+msgid "{0} moves the whole troop"
+msgstr "{0} move a tropa inteira"
+
 #. Screens.TroopPlacement
 msgctxt "Screens.TroopPlacement"
 msgid "Troop placement"
@@ -1194,11 +1194,6 @@ msgstr "atributos de {0}"
 msgctxt "Screens.WielderModifierCategories"
 msgid "{0}'s modifier categories"
 msgstr "categorias de modificadores de {0}"
-
-#. Screens.WorldChoiceMenu
-msgctxt "Screens.WorldChoiceMenu"
-msgid "World choice menu"
-msgstr "Menu de escolha do mundo"
 
 #. Screens.AddCustomCategory
 msgctxt "Screens.AddCustomCategory"
@@ -1599,6 +1594,16 @@ msgstr "Resumir recursos"
 msgctxt "Actions.TooltipActionsMenu"
 msgid "Tooltip Actions Menu"
 msgstr "Menu de ações da dica"
+
+#. Actions.TroopSplit_0
+msgctxt "Actions.TroopSplit_0"
+msgid "Split Off {0} Troop"
+msgstr "Separar {0} tropa"
+
+#. Actions.TroopSplit_1
+msgctxt "Actions.TroopSplit_1"
+msgid "Split Off {0} Troops"
+msgstr "Separar {0} tropas"
 
 #. Actions.UiBack
 msgctxt "Actions.UiBack"
@@ -2934,11 +2939,6 @@ msgstr "Cancelar feitiço"
 msgctxt "Screens.MarketplaceTradeColumn"
 msgid "{0} {1}"
 msgstr "{0} {1}"
-
-#. Screens.MaxTroopSize
-msgctxt "Screens.MaxTroopSize"
-msgid "Max troop size {0}"
-msgstr "Tamanho máximo da tropa {0}"
 
 #. Screens.LeftRightDistribution
 msgctxt "Screens.LeftRightDistribution"
