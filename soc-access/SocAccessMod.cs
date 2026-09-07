@@ -181,6 +181,9 @@ namespace SongsOfConquestAccess
 
         private void Step(string name, Action action)
         {
+            // Logged before it runs: a quit that stops responding leaves the step it stalled in as
+            // the last line of the log (2026-09-07, a hang on quit with no stack to take).
+            _host.LogInfo("Mod stop: " + name);
             try { action(); }
             catch (Exception exception)
             {
