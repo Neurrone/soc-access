@@ -11,14 +11,13 @@ namespace SongsOfConquestAccess.Screens
 {
     /// <summary>
     /// The mini menu the map pops up over a settlement, a resource generator or a build site, made
-    /// navigable as a graph. Four places to be, in the order the menu draws them: the heading, the
-    /// details, the strip of action buttons, and the close.
+    /// navigable as a graph. Three places to be, in the order the menu draws them: the details, the
+    /// strip of action buttons, and the close.
     ///
     /// Measured 2026-09-07: the entity's own name ("Crowpoint") is drawn ABOVE its type name ("Small
-    /// Settlement"), then the description rows, then the actions in a row of icon buttons. The
-    /// heading is ONE node reading both names, in that drawn order, because they are one title split
-    /// across two labels; the screen's name is the custom name where the entity has one and the type
-    /// name where it does not.
+    /// Settlement"), then the description rows, then the actions in a row of icon buttons. The two
+    /// names are one title split across two labels, so together, in that drawn order, they are the
+    /// SCREEN'S NAME, said once on arrival, rather than a stop of their own (owner ruling 2026-09-07).
     ///
     /// The stored wielder is ONE BUTTON, not a line plus a mod-labelled command: the game draws a
     /// single control there (<c>MapEntityMiniMenu._storedWielderButton</c>) whose click ejects the
@@ -35,7 +34,6 @@ namespace SongsOfConquestAccess.Screens
     /// </summary>
     public sealed class MapEntityMiniMenuScreen : GraphScreen
     {
-        private const string HeadingStop = "map-entity-heading";
         private const string DetailsStop = "map-entity-details";
         private const string ActionsStop = "map-entity-actions";
         private const string CloseStop = "map-entity-close";
@@ -76,19 +74,16 @@ namespace SongsOfConquestAccess.Screens
             get { return "map-entity-mini-menu"; }
         }
 
-        /// <summary>The entity's own name where it has one, and its type name where it does not.
-        /// </summary>
-        /// <summary>None: the heading node is the start node and already says the entity's name, so a
-        /// screen name would read it twice on arrival.</summary>
+        /// <summary>Both drawn names, the entity's own first: the heading is the screen's name, said
+        /// once on arrival, and not a stop of its own (owner ruling 2026-09-07). Focus starts on the
+        /// first detail line.</summary>
         public override string ScreenName
         {
-            get { return null; }
-        }
-
-        /// <summary>The heading, so arrival reads what the menu is about before its details.</summary>
-        public override object InitialFocusStop
-        {
-            get { return HeadingStop; }
+            get
+            {
+                string heading = _adapter != null ? HeadingText() : null;
+                return string.IsNullOrWhiteSpace(heading) ? null : heading;
+            }
         }
 
         public override bool IsPresent()
@@ -103,9 +98,6 @@ namespace SongsOfConquestAccess.Screens
                 return;
             }
 
-            builder.BeginStop(HeadingStop);
-            BuildHeading(builder);
-
             builder.BeginStop(DetailsStop);
             BuildDetails(builder);
 
@@ -114,21 +106,6 @@ namespace SongsOfConquestAccess.Screens
 
             builder.BeginStop(CloseStop);
             BuildClose(builder);
-        }
-
-        // ---- the heading ----
-
-        private void BuildHeading(GraphBuilder builder)
-        {
-            NodeVtable vtable = GraphNodes.Text(HeadingText);
-            Component drawn = _adapter.EntityNameComponent;
-            if (drawn != null)
-            {
-                builder.AddItem(new DrawnNode(ControlId.For(drawn, "map-entity:heading"), vtable, drawn));
-                return;
-            }
-
-            builder.AddItem(new SyntheticNode(ControlId.For(Marker("heading"), "map-entity:heading"), vtable));
         }
 
         /// <summary>Both drawn names in their drawn order, the entity's own first.</summary>
