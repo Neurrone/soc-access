@@ -117,6 +117,12 @@ namespace SongsOfConquestAccess.Screens
         /// there.</summary>
         public bool ArrivedByRefresh { get; set; }
 
+        /// <summary>The name this screen actually spoke on arrival, null when it had none to say. A
+        /// refresh compares against this rather than the live name: a page pushed before the game
+        /// wrote its title (the post-battle page, refreshed once its animation ends) has said nothing,
+        /// and the title arriving with the refresh is news.</summary>
+        public string SpokenName { get; private set; }
+
         public override void OnFocus()
         {
             GraphNavigator navigator = Navigator;
@@ -133,6 +139,7 @@ namespace SongsOfConquestAccess.Screens
             {
                 // Queued, so the first control's readout follows it rather than cutting it off.
                 SpeechPipeline.Output(new SpeechRequest(name, interrupt: false));
+                SpokenName = name;
             }
         }
 

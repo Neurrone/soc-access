@@ -113,10 +113,12 @@ namespace SongsOfConquestAccess.Screens
                     navigator.Adopt(outgoing, incoming);
                 }
 
-                // The name is only silenced when it is the SAME name: a page whose title has changed
-                // under the refresh (the community maps modal walking from Authentication to Terms of
-                // use) has news, and saying it is the arrival the player did make.
-                incoming.ArrivedByRefresh = outgoing.ScreenName == incoming.ScreenName;
+                // The name is only silenced when it is the name ALREADY SPOKEN: a page whose title has
+                // changed under the refresh (the community maps modal walking from Authentication to
+                // Terms of use) has news, and so has a page that arrived before the game wrote its
+                // title (the post-battle page, refreshed once its animation ends) - the outgoing
+                // instance's live name would already match, but it never said it.
+                incoming.ArrivedByRefresh = outgoing.SpokenName == incoming.ScreenName;
             }
 
             removed.OnUnfocus();

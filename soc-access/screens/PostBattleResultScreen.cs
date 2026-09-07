@@ -111,11 +111,17 @@ namespace SongsOfConquestAccess.Screens
                 return;
             }
 
+            // Each side's stop is NAMED, "Attacker" and "Defender" (owner ruling 2026-09-07): the
+            // game draws no such caption, so the words are the mod's, said once on entering the stop.
             builder.BeginStop(AttackerStop);
+            builder.PushContext(ModText.Get(ModStrings.Screens.Attacker));
             ControlId start = BuildSide(builder, attacker: true);
+            builder.PopContext();
 
             builder.BeginStop(DefenderStop);
+            builder.PushContext(ModText.Get(ModStrings.Screens.Defender));
             BuildSide(builder, attacker: false);
+            builder.PopContext();
 
             builder.BeginStop(LootStop);
             BuildLoot(builder);
@@ -145,11 +151,18 @@ namespace SongsOfConquestAccess.Screens
                 AddLine(builder, key + "-xp", () => _adapter.XpText);
             }
 
+            // The troops lost, under the caption the game draws over the column, as a region: its
+            // name is said once on entering it, and each stack reads as the count and the name the
+            // entry draws, with no suffix (owner ruling 2026-09-07).
+            builder.PushContext(attacker ? _adapter.AttackerTroopsCaption : _adapter.DefenderTroopsCaption);
+            builder.SetRegion("post-battle:" + key + "-troops");
             BuildEntries(
                 builder,
                 key + "-troop",
                 attacker ? _adapter.AttackerTroopsLost : _adapter.DefenderTroopsLost,
                 addNoneWhenEmpty: true);
+            builder.SetRegion(null);
+            builder.PopContext();
 
             bool returned = attacker ? _adapter.AttackerReturnedTroopsVisible : _adapter.DefenderReturnedTroopsVisible;
             if (returned)
@@ -196,9 +209,14 @@ namespace SongsOfConquestAccess.Screens
 
         // ---- the troops lost and the loot ----
 
+        /// <summary>The loot band, named by the caption the game draws over it ("Battle Loot"): the
+        /// artifacts and resources the winner picks up, which are the only equipment this page draws.
+        /// </summary>
         private void BuildLoot(GraphBuilder builder)
         {
+            builder.PushContext(GameText.Get("Adventure/AdventurePostBattleMenu/BattleLoot", null));
             BuildEntries(builder, "loot", _adapter.Loot, addNoneWhenEmpty: false);
+            builder.PopContext();
         }
 
         /// <summary>A band of read-only lines, one per entry the menu is drawing, each carrying the
@@ -254,7 +272,7 @@ namespace SongsOfConquestAccess.Screens
         }
 
         /// <summary>What a line says: a lost troop is the amount the entry drew and the troop's name,
-        /// said as a loss; anything else is the name alone.</summary>
+        /// under the "Troops Lost" region that says the loss; anything else is the name alone.</summary>
         private static string EntryLabel(PostBattleResultAdapter.ResultEntry entry)
         {
             if (!entry.IsLostTroop)
@@ -273,10 +291,10 @@ namespace SongsOfConquestAccess.Screens
             }
             else
             {
-                label = entry.Amount + " " + entry.Name;
+                label = ModText.Get(ModStrings.Common.ResourceAmount, entry.Amount, entry.Name);
             }
 
-            return string.IsNullOrWhiteSpace(label) ? string.Empty : ModText.Get(ModStrings.Screens.TroopLost, label);
+            return string.IsNullOrWhiteSpace(label) ? string.Empty : label;
         }
 
         // ---- the buttons ----

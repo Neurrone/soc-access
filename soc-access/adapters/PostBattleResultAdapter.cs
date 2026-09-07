@@ -132,6 +132,33 @@ namespace SongsOfConquestAccess.Adapters
             get { return GetFieldValue<bool>(IsLocalTeamAttackerField); }
         }
 
+        /// <summary>The caption the menu draws over the attacker's troop column ("Troops Lost"): the
+        /// "Title" text beside the column's container, two levels above the troop parent
+        /// (AttackerContainer/TroopsLost/Title against .../TroopsLost/Container/AttackerTroopContainer).
+        /// The menu keeps no field for it and none of its localization keys yields the same words.
+        /// </summary>
+        public string AttackerTroopsCaption
+        {
+            get { return TroopsCaption(AttackerTroopsParentField); }
+        }
+
+        /// <summary>The caption over the defender's troop column.</summary>
+        public string DefenderTroopsCaption
+        {
+            get { return TroopsCaption(DefenderTroopsParentField); }
+        }
+
+        private string TroopsCaption(FieldInfo parentField)
+        {
+            Transform parent = GetField<Transform>(parentField);
+            Transform band = parent != null && parent.parent != null ? parent.parent.parent : null;
+            Transform title = band != null ? band.Find("Title") : null;
+            UITextMesh text = title != null ? title.GetComponent<UITextMesh>() : null;
+            return text != null && text.gameObject.activeInHierarchy
+                ? SpeechTextSanitizer.Normalize(UITextMeshTextUtility.GetEffectiveText(text))
+                : string.Empty;
+        }
+
         public IReadOnlyList<ResultEntry> AttackerTroopsLost
         {
             get { return BuildTroopEntries(AttackerTroopsParentField); }
