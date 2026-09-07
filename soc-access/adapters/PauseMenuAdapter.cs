@@ -134,51 +134,58 @@ namespace SongsOfConquestAccess.Adapters
             return transform == null || transform.Active;
         }
 
-        public sealed class Item
+        public sealed class Item : IMenuButtonAdapter
         {
-            private readonly UIButton _button;
-
             public Item(string id, UIButton button)
             {
                 Id = id;
-                _button = button;
+                Button = button;
             }
 
             public string Id { get; private set; }
 
+            public UIButton Button { get; private set; }
+
             public string GetLabel()
             {
-                return MenuButtonTextUtility.GetDirectButtonText(_button);
+                return MenuButtonTextUtility.GetDirectButtonText(Button);
             }
 
+            /// <summary>No status of its own; whether the button is refusing is
+            /// <see cref="IsEnabled"/>, and the wording for that belongs to the screen.</summary>
             public string GetStatus()
             {
-                return _button != null && !_button.Interactable ? "disabled" : string.Empty;
+                return string.Empty;
             }
 
             public bool IsVisible()
             {
-                return MenuButtonAdapterBase.IsButtonVisible(_button);
+                return MenuButtonAdapterBase.IsButtonVisible(Button);
+            }
+
+            public bool IsEnabled()
+            {
+                return Button != null && Button.Interactable;
             }
 
             public bool Activate()
             {
-                if (_button == null || !_button.Active || !_button.Interactable || !IsVisible())
+                if (Button == null || !Button.Active || !Button.Interactable || !IsVisible())
                 {
                     return false;
                 }
 
-                using (NativeScreenInputPositionOverride.Apply(_button.Position))
+                using (NativeScreenInputPositionOverride.Apply(Button.Position))
                 {
-                    return NativeSelectionUtility.Click(_button);
+                    return NativeSelectionUtility.Click(Button);
                 }
             }
 
             public void Select()
             {
-                if (_button != null)
+                if (Button != null)
                 {
-                    NativeSelectionUtility.Select(_button);
+                    NativeSelectionUtility.Select(Button);
                 }
             }
         }
