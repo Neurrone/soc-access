@@ -2885,6 +2885,11 @@ msgctxt "Screens.CancelSpell"
 msgid "Cancel spell"
 msgstr "Annuler le sort"
 
+#. Screens.MarketplaceTradeColumn
+msgctxt "Screens.MarketplaceTradeColumn"
+msgid "{0} {1}"
+msgstr "{0} {1}"
+
 #. Screens.MaxTroopSize
 msgctxt "Screens.MaxTroopSize"
 msgid "Max troop size {0}"

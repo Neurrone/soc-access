@@ -594,6 +594,7 @@ namespace SongsOfConquestAccess.Localization
             public static readonly ModString MovedBetween = new ModString("Screens.MovedBetween", "Moved between {0} and {1}");
             public static readonly ModString NewChatMessage = new ModString("Screens.NewChatMessage", "New chat message");
             public static readonly ModString ModifierCategoryTabs = new ModString("Screens.ModifierCategoryTabs", "Modifier category tabs");
+            public static readonly ModString MarketplaceTradeColumn = new ModString("Screens.MarketplaceTradeColumn", "{0} {1}");
             public static readonly ModString MaxTroopSize = new ModString("Screens.MaxTroopSize", "Max troop size {0}");
             public static readonly ModString MoveAllLeft = new ModString("Screens.MoveAllLeft", "Move all left");
             public static readonly ModString MoveAllRight = new ModString("Screens.MoveAllRight", "Move all right");

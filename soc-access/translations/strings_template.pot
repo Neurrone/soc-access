@@ -2694,6 +2694,11 @@ msgctxt "Screens.ModifierCategoryTabs"
 msgid "Modifier category tabs"
 msgstr ""
 
+#. Screens.MarketplaceTradeColumn
+msgctxt "Screens.MarketplaceTradeColumn"
+msgid "{0} {1}"
+msgstr ""
+
 #. Screens.MaxTroopSize
 msgctxt "Screens.MaxTroopSize"
 msgid "Max troop size {0}"

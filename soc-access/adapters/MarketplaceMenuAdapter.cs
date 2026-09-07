@@ -1,14 +1,11 @@
 using System;
 using System.Collections.Generic;
-using System.Globalization;
 using System.Reflection;
 using HarmonyLib;
 using SongsOfConquest.Client;
 using SongsOfConquest.Client.Adventure;
 using SongsOfConquest.Client.Gamestate;
-using SongsOfConquest.Client.Gamestate.Facade;
 using SongsOfConquest.Client.UI;
-using SongsOfConquest.Common;
 using SongsOfConquest.Common.Economy;
 using SongsOfConquest.Common.Gamestate;
 using SongsOfConquest.Common.Localization;
@@ -23,22 +20,28 @@ namespace SongsOfConquestAccess.Adapters
         private static readonly FieldInfo TitleTextField = AccessTools.Field(typeof(MarketplaceMenu), "_titleText");
         private static readonly FieldInfo NumberOfMarketplacesTextField = AccessTools.Field(typeof(MarketplaceMenu), "_numberOfMarketplacesText");
         private static readonly FieldInfo FacadeField = AccessTools.Field(typeof(MarketplaceMenu), "_facade");
-        private static readonly FieldInfo MarketplaceSystemField = AccessTools.Field(typeof(MarketplaceMenu), "_marketplaceSystem");
         private static readonly FieldInfo LocalizationField = AccessTools.Field(typeof(MarketplaceMenu), "_localizationHandler");
         private static readonly FieldInfo TeamIdField = AccessTools.Field(typeof(MarketplaceMenu), "_teamId");
-        private static readonly FieldInfo MarketplaceTypeField = AccessTools.Field(typeof(MarketplaceMenu), "_marketplaceType");
+
+        // The rows the menu draws, in their drawn order (measured 2026-09-07). Gold is the currency the
+        // grid prices everything in, and the menu draws no row for it.
+        private static readonly ResourceType[] TradedResources =
+        {
+            ResourceType.Stone,
+            ResourceType.Wood,
+            ResourceType.Glimmerweave,
+            ResourceType.AncientAmber,
+            ResourceType.CelestialOre
+        };
 
         private readonly MarketplaceMenu _menu;
         private readonly IClientAdventureFacade _facade;
-        private readonly IMarketplaceSystem _marketplaceSystem;
         private readonly ILocalizationHandler _localization;
-        private ResourceType _selectedResourceType = ResourceType.Gold;
 
         public MarketplaceMenuAdapter(MarketplaceMenu menu)
         {
             _menu = menu;
             _facade = GetField<IClientAdventureFacade>(menu, FacadeField);
-            _marketplaceSystem = GetField<IMarketplaceSystem>(menu, MarketplaceSystemField);
             _localization = GetField<ILocalizationHandler>(menu, LocalizationField);
         }
 
@@ -52,16 +55,13 @@ namespace SongsOfConquestAccess.Adapters
             get { return _facade; }
         }
 
-        public ResourceType SelectedResourceType
-        {
-            get { return _selectedResourceType; }
-        }
-
         public bool IsPresent()
         {
             return _menu != null && ((Component)_menu).gameObject.activeInHierarchy;
         }
 
+        /// <summary>The menu's own drawn heading, which is the marketplace building's name ("Court of
+        /// Trade").</summary>
         public string Title
         {
             get
@@ -71,55 +71,75 @@ namespace SongsOfConquestAccess.Adapters
             }
         }
 
+        /// <summary>The line the menu draws under the heading, counting the marketplaces the team owns
+        /// ("Owning: 2").</summary>
         public string OwningSummary
         {
             get { return GetText(GetField<UITextMesh>(_menu, NumberOfMarketplacesTextField)); }
         }
 
-        public string Summary
-        {
-            get { return MenuButtonTextUtility.JoinParts(Title, OwningSummary); }
-        }
-
+        /// <summary>One entry per resource the grid trades, in drawn order.</summary>
         public IReadOnlyList<ResourceItem> GetResources()
         {
-            return new[]
+            List<ResourceItem> resources = new List<ResourceItem>(TradedResources.Length);
+            for (int i = 0; i < TradedResources.Length; i++)
             {
-                BuildResourceItem(ResourceType.Gold),
-                BuildResourceItem(ResourceType.Stone),
-                BuildResourceItem(ResourceType.Wood),
-                BuildResourceItem(ResourceType.Glimmerweave),
-                BuildResourceItem(ResourceType.AncientAmber),
-                BuildResourceItem(ResourceType.CelestialOre)
-            };
-        }
-
-        public void SelectResource(ResourceType resourceType)
-        {
-            _selectedResourceType = resourceType;
-            if (resourceType == ResourceType.Gold)
-            {
-                HideNativeTooltip();
-                return;
+                ResourceType type = TradedResources[i];
+                resources.Add(new ResourceItem(type, FormatResource(type), GetResourceAmount(type)));
             }
 
-            MarketplaceButton button = FindButton(resourceType, isBuyButton: false, amount: 1)
-                ?? FindButton(resourceType, isBuyButton: false, amount: 5)
-                ?? FindButton(resourceType, isBuyButton: true, amount: 1)
-                ?? FindButton(resourceType, isBuyButton: true, amount: 5);
-            NativeSelectionUtility.Select(button as Component);
+            return resources;
         }
 
-        public TradeActionItem GetTradeAction(bool isBuyButton, int amount)
+        /// <summary>
+        /// The grid's columns, left to right as the menu draws them: one per fixed trade amount, each
+        /// carrying the caption drawn over it and the caption of the band it sits under.
+        ///
+        /// The columns themselves come from the buttons - a column IS a (buy or sell, amount) pair, and
+        /// the menu's own button list is the only place that pairing is written down. Their captions are
+        /// read off the menu's Header texts and paired with the columns by what is drawn where: the
+        /// headers drawn highest are the band captions ("Sell", "Purchase"), the rest are the column
+        /// captions ("-1", "-5", "+1", "+5"), and each column takes the nearest of each by drawn centre.
+        /// </summary>
+        public IReadOnlyList<TradeColumn> GetTradeColumns()
         {
-            return new TradeActionItem(
-                this,
-                isBuyButton,
-                amount,
-                () => FindButton(_selectedResourceType, isBuyButton, amount) != null,
-                () => IsButtonEnabled(FindButton(_selectedResourceType, isBuyButton, amount)),
-                () => ActivateButton(FindButton(_selectedResourceType, isBuyButton, amount)),
-                () => FocusButton(FindButton(_selectedResourceType, isBuyButton, amount)));
+            List<ColumnGeometry> geometry = GetColumnGeometry();
+            List<TradeColumn> columns = new List<TradeColumn>(geometry.Count);
+            if (geometry.Count == 0)
+            {
+                return columns;
+            }
+
+            float topmost = float.MinValue;
+            for (int i = 0; i < geometry.Count; i++)
+            {
+                topmost = Math.Max(topmost, geometry[i].Top);
+            }
+
+            List<UITextMesh> bandCaptions;
+            List<UITextMesh> columnCaptions;
+            SplitHeaderBands(GetHeaderTexts(topmost), geometry.Count, out bandCaptions, out columnCaptions);
+
+            for (int i = 0; i < geometry.Count; i++)
+            {
+                ColumnGeometry column = geometry[i];
+                UITextMesh caption = NearestByX(columnCaptions, column.Centre);
+                columns.Add(new TradeColumn(
+                    column.IsBuyButton,
+                    column.Amount,
+                    GetText(NearestByX(bandCaptions, column.Centre)),
+                    GetText(caption),
+                    caption));
+            }
+
+            return columns;
+        }
+
+        /// <summary>The button at one crossing of the grid, or null where the menu draws none.</summary>
+        public TradeButtonItem GetTradeButton(ResourceType resourceType, bool isBuyButton, int amount)
+        {
+            MarketplaceButton button = FindButton(resourceType, isBuyButton, amount);
+            return button != null ? new TradeButtonItem(button) : null;
         }
 
         public string TipText
@@ -161,56 +181,161 @@ namespace SongsOfConquestAccess.Adapters
             NativeTooltipUtility.HideTooltip();
         }
 
-        private ResourceItem BuildResourceItem(ResourceType resourceType)
-        {
-            string name = FormatResource(resourceType);
-            int amount = GetResourceAmount(resourceType);
-            return new ResourceItem(
-                resourceType,
-                name,
-                amount);
-        }
-
         public string GetResourceName(ResourceType resourceType)
         {
             return FormatResource(resourceType);
         }
 
-        public int GetTradeGoldAmount(ResourceType resourceType, bool isBuyButton, int amount)
+        // One column of the grid as its buttons are drawn: which trade it makes and where it sits, so
+        // the captions above it can be paired with it and the columns put in drawn order.
+        private sealed class ColumnGeometry
         {
-            ResourceType from = isBuyButton ? ResourceType.Gold : resourceType;
-            ResourceType to = isBuyButton ? resourceType : ResourceType.Gold;
-            return GetGoldAmount(from, to, amount);
+            public bool IsBuyButton;
+            public int Amount;
+            public float Sum;
+            public int Count;
+            public float Top;
+
+            public float Centre
+            {
+                get { return Count > 0 ? Sum / Count : 0f; }
+            }
         }
 
-        private int GetGoldAmount(ResourceType from, ResourceType to, int amount)
+        private List<ColumnGeometry> GetColumnGeometry()
         {
-            if (_marketplaceSystem == null)
+            List<ColumnGeometry> geometry = new List<ColumnGeometry>();
+            IReadOnlyList<MarketplaceButton> buttons = GetButtons();
+            for (int i = 0; i < buttons.Count; i++)
             {
-                return 0;
+                MarketplaceButton button = buttons[i];
+                Component component = button as Component;
+                if (button == null || component == null)
+                {
+                    continue;
+                }
+
+                Vector3 position = component.transform.position;
+                ColumnGeometry column = null;
+                for (int c = 0; c < geometry.Count; c++)
+                {
+                    if (geometry[c].IsBuyButton == button.IsBuyButton && geometry[c].Amount == button.Amount)
+                    {
+                        column = geometry[c];
+                        break;
+                    }
+                }
+
+                if (column == null)
+                {
+                    column = new ColumnGeometry
+                    {
+                        IsBuyButton = button.IsBuyButton,
+                        Amount = button.Amount,
+                        Top = position.y
+                    };
+                    geometry.Add(column);
+                }
+
+                column.Sum += position.x;
+                column.Count++;
+                column.Top = Math.Max(column.Top, position.y);
             }
 
-            MarketplaceConversionResult conversion = _marketplaceSystem.GetConversionRate(MarketplaceType, TeamId, from, to, amount);
-            return Math.Max(conversion.cost, conversion.gain);
+            geometry.Sort((left, right) => left.Centre.CompareTo(right.Centre));
+            return geometry;
         }
 
-        private bool ActivateButton(MarketplaceButton button)
+        // The menu's Header texts above the grid: the band captions and the column captions, and
+        // nothing else it draws. Its heading and its marketplace count are known by their own fields,
+        // and everything a row draws sits below the top row of buttons.
+        private List<UITextMesh> GetHeaderTexts(float above)
         {
-            return NativeSelectionUtility.Click(button);
+            List<UITextMesh> headers = new List<UITextMesh>();
+            if (_menu == null)
+            {
+                return headers;
+            }
+
+            UITextMesh title = GetField<UITextMesh>(_menu, TitleTextField);
+            UITextMesh owning = GetField<UITextMesh>(_menu, NumberOfMarketplacesTextField);
+            UITextMesh[] textMeshes = ((Component)_menu).GetComponentsInChildren<UITextMesh>(includeInactive: false);
+            for (int i = 0; i < textMeshes.Length; i++)
+            {
+                UITextMesh textMesh = textMeshes[i];
+                if (textMesh == null
+                    || !textMesh.gameObject.activeInHierarchy
+                    || ReferenceEquals(textMesh, title)
+                    || ReferenceEquals(textMesh, owning)
+                    || textMesh.gameObject.name.IndexOf("Header", StringComparison.OrdinalIgnoreCase) < 0
+                    || textMesh.transform.position.y <= above)
+                {
+                    continue;
+                }
+
+                headers.Add(textMesh);
+            }
+
+            return headers;
         }
 
-        private bool FocusButton(MarketplaceButton button)
+        // The band captions are the ones drawn ABOVE the column captions, so the two bands part at the
+        // widest gap between neighbouring heights. Where there are no more headers than there are
+        // columns, there is no band above them at all.
+        private static void SplitHeaderBands(
+            List<UITextMesh> headers,
+            int columnCount,
+            out List<UITextMesh> bandCaptions,
+            out List<UITextMesh> columnCaptions)
         {
-            return NativeSelectionUtility.Select(button as Component);
+            bandCaptions = new List<UITextMesh>();
+            columnCaptions = headers;
+            if (headers.Count <= columnCount)
+            {
+                return;
+            }
+
+            headers.Sort((left, right) => Top(right).CompareTo(Top(left)));
+            int split = 0;
+            float widest = float.MinValue;
+            for (int i = 0; i < headers.Count - 1; i++)
+            {
+                float gap = Top(headers[i]) - Top(headers[i + 1]);
+                if (gap > widest)
+                {
+                    widest = gap;
+                    split = i;
+                }
+            }
+
+            bandCaptions = headers.GetRange(0, split + 1);
+            columnCaptions = headers.GetRange(split + 1, headers.Count - split - 1);
+        }
+
+        private static UITextMesh NearestByX(List<UITextMesh> candidates, float x)
+        {
+            UITextMesh nearest = null;
+            float distance = float.MaxValue;
+            for (int i = 0; i < candidates.Count; i++)
+            {
+                float apart = Math.Abs(candidates[i].transform.position.x - x);
+                if (apart < distance)
+                {
+                    distance = apart;
+                    nearest = candidates[i];
+                }
+            }
+
+            return nearest;
+        }
+
+        private static float Top(UITextMesh textMesh)
+        {
+            return textMesh != null ? textMesh.transform.position.y : 0f;
         }
 
         private MarketplaceButton FindButton(ResourceType resourceType, bool isBuyButton, int amount)
         {
-            if (resourceType == ResourceType.Gold)
-            {
-                return null;
-            }
-
             IReadOnlyList<MarketplaceButton> buttons = GetButtons();
             for (int i = 0; i < buttons.Count; i++)
             {
@@ -245,11 +370,6 @@ namespace SongsOfConquestAccess.Adapters
             get { return GetFieldValue(_menu, TeamIdField, _facade != null && _facade.Teams != null ? _facade.Teams.LocalTeamInControlId : -1); }
         }
 
-        private MarketplaceType MarketplaceType
-        {
-            get { return GetFieldValue(_menu, MarketplaceTypeField, MarketplaceType.PlayerOwned); }
-        }
-
         private string FormatResource(ResourceType resourceType)
         {
             string key = "Common/Resource/" + resourceType;
@@ -268,16 +388,6 @@ namespace SongsOfConquestAccess.Adapters
                 default:
                     return resourceType.ToString();
             }
-        }
-
-        private static string FormatAmount(int amount)
-        {
-            return amount.ToString("N0", CultureInfo.InvariantCulture);
-        }
-
-        private static bool IsButtonEnabled(MarketplaceButton button)
-        {
-            return button != null && button.Active && button.Interactable;
         }
 
         private static string GetText(IUITextMesh textMesh)
@@ -315,38 +425,76 @@ namespace SongsOfConquestAccess.Adapters
             public int Amount { get; private set; }
         }
 
-        public sealed class TradeActionItem
+        /// <summary>One column of the trade grid: the trade every button in it makes, and the two
+        /// captions the menu draws over it.</summary>
+        public sealed class TradeColumn
         {
-            private readonly MarketplaceMenuAdapter _adapter;
-
-            public TradeActionItem(
-                MarketplaceMenuAdapter adapter,
-                bool isBuyButton,
-                int amount,
-                Func<bool> isVisible,
-                Func<bool> isEnabled,
-                Func<bool> activate,
-                Action focus)
+            public TradeColumn(bool isBuyButton, int amount, string bandCaption, string caption, Component captionComponent)
             {
-                _adapter = adapter;
                 IsBuyButton = isBuyButton;
                 Amount = amount;
-                IsVisible = isVisible;
-                IsEnabled = isEnabled;
-                Activate = activate;
-                Focus = focus;
+                BandCaption = bandCaption ?? string.Empty;
+                Caption = caption ?? string.Empty;
+                CaptionComponent = captionComponent;
             }
 
             public bool IsBuyButton { get; private set; }
+
             public int Amount { get; private set; }
-            public ResourceType ResourceType { get { return _adapter != null ? _adapter.SelectedResourceType : ResourceType.Gold; } }
-            public string ResourceName { get { return _adapter != null ? _adapter.GetResourceName(ResourceType) : string.Empty; } }
-            public string GoldResourceName { get { return _adapter != null ? _adapter.GetResourceName(ResourceType.Gold) : string.Empty; } }
-            public int GoldAmount { get { return _adapter != null ? _adapter.GetTradeGoldAmount(ResourceType, IsBuyButton, Amount) : 0; } }
-            public Func<bool> IsVisible { get; private set; }
-            public Func<bool> IsEnabled { get; private set; }
-            public Func<bool> Activate { get; private set; }
-            public Action Focus { get; private set; }
+
+            /// <summary>The caption of the band the column sits under ("Sell", "Purchase").</summary>
+            public string BandCaption { get; private set; }
+
+            /// <summary>The caption drawn directly over the column ("-1", "+5").</summary>
+            public string Caption { get; private set; }
+
+            /// <summary>The text the caption is drawn as.</summary>
+            public Component CaptionComponent { get; private set; }
+        }
+
+        /// <summary>One crossing of the grid: the button the menu draws, and the price it draws on it.
+        /// </summary>
+        public sealed class TradeButtonItem
+        {
+            private readonly MarketplaceButton _button;
+
+            public TradeButtonItem(MarketplaceButton button)
+            {
+                _button = button;
+            }
+
+            /// <summary>The button the menu draws this trade as.</summary>
+            public Component Component
+            {
+                get { return _button as Component; }
+            }
+
+            /// <summary>The gold the trade costs or gains, which the menu writes onto the button
+            /// (<c>MarketplaceMenu.ValidateButtons</c>).</summary>
+            public string Price
+            {
+                get { return MenuButtonTextUtility.GetDirectButtonText(_button); }
+            }
+
+            public bool IsVisible
+            {
+                get { return MenuButtonAdapterBase.IsButtonVisible(_button); }
+            }
+
+            public bool IsEnabled
+            {
+                get { return _button != null && _button.Active && _button.Interactable; }
+            }
+
+            public bool Activate()
+            {
+                return NativeSelectionUtility.Click(_button);
+            }
+
+            public void Focus()
+            {
+                NativeSelectionUtility.Select(_button as Component);
+            }
         }
     }
 }

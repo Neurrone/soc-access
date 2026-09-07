@@ -9,6 +9,7 @@ using SongsOfConquest.Common.Economy;
 using SongsOfConquest.Common.Localization;
 using SongsOfConquestAccess.Localization;
 using SongsOfConquestAccess.Speech;
+using SongsOfConquestAccess.UI;
 using UnityEngine;
 
 namespace SongsOfConquestAccess.Adapters
@@ -122,6 +123,24 @@ namespace SongsOfConquestAccess.Adapters
             return IsPresent();
         }
 
+        /// <summary>The cross the popup draws at its top right. The game only draws it outside gamepad
+        /// mode (<c>SendResourcePopup.Show</c>), so it is absent rather than merely refusing there.
+        /// </summary>
+        public Component CloseButton
+        {
+            get { return GetField<UIButton>(CloseButtonField) as Component; }
+        }
+
+        public bool IsCloseVisible()
+        {
+            return IsPresent() && MenuButtonAdapterBase.IsButtonVisible(GetField<UIButton>(CloseButtonField));
+        }
+
+        public bool ActivateClose()
+        {
+            return NativeSelectionUtility.Click(GetField<UIButton>(CloseButtonField));
+        }
+
         public Tooltip CloseTooltip
         {
             get { return Tooltip.ForComponent(GetField<UIButton>(CloseButtonField) as Component, _localization); }
@@ -191,13 +210,55 @@ namespace SongsOfConquestAccess.Adapters
 
             public ResourceType Type { get; private set; }
 
-            public string Label
+            /// <summary>The button the popup draws this entry as.</summary>
+            public Component Component
+            {
+                get { return _button as Component; }
+            }
+
+            /// <summary>The resource's own name, from the game's resource table.</summary>
+            public string Name
+            {
+                get { return _adapter != null ? _adapter.GetResourceName(Type) : string.Empty; }
+            }
+
+            /// <summary>How much one press moves, which the game fixes from its config and DRAWS on
+            /// the button (<c>SendResourcePopup.SetupResourceButtons</c>).</summary>
+            public string Amount
+            {
+                get { return MenuButtonTextUtility.GetDirectButtonText(_button); }
+            }
+
+            /// <summary>Why the game is refusing the transfer, which it puts in place of the
+            /// resource's name in the tooltip. Empty while the button is taking clicks.</summary>
+            public string Reason
             {
                 get
                 {
-                    string name = _adapter != null ? _adapter.GetResourceName(Type) : string.Empty;
-                    string amount = MenuButtonTextUtility.GetDirectButtonText(_button);
-                    return string.IsNullOrWhiteSpace(amount) ? name : name + " " + amount;
+                    if (IsEnabled)
+                    {
+                        return string.Empty;
+                    }
+
+                    IList<string> lines = TooltipLines;
+                    return lines.Count > 0 ? lines[0] : string.Empty;
+                }
+            }
+
+            /// <summary>What the ally is holding of this resource, which the game writes under the
+            /// name on a REQUEST button only (<c>SendResourcePopup.RefreshRequestResourceButton</c>).
+            /// </summary>
+            public string OtherTeamAmount
+            {
+                get
+                {
+                    if (!IsEnabled)
+                    {
+                        return string.Empty;
+                    }
+
+                    IList<string> lines = TooltipLines;
+                    return lines.Count > 1 ? lines[1] : string.Empty;
                 }
             }
 
@@ -234,6 +295,16 @@ namespace SongsOfConquestAccess.Adapters
             public bool Activate()
             {
                 return NativeSelectionUtility.Click(_button);
+            }
+
+            // The tooltip as the game wrote it, one drawn line at a time.
+            private IList<string> TooltipLines
+            {
+                get
+                {
+                    Tooltip tooltip = Tooltip;
+                    return SpokenLines.Of(tooltip != null ? tooltip.TextLines : null);
+                }
             }
         }
     }

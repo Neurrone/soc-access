@@ -26,6 +26,10 @@ namespace SongsOfConquestAccess.Adapters
             AccessTools.Field(typeof(AdventurePlayerMenu), "_adventureFacade");
         private static readonly FieldInfo UiBlockerField =
             AccessTools.Field(typeof(AdventurePlayerMenu), "_uiBlocker");
+        private static readonly FieldInfo AllyHeaderField =
+            AccessTools.Field(typeof(AdventurePlayerMenu), "_allyHeader");
+        private static readonly FieldInfo EnemyHeaderField =
+            AccessTools.Field(typeof(AdventurePlayerMenu), "_enemyHeader");
 
         private readonly AdventurePlayerMenu _menu;
         private readonly IClientAdventureFacade _facade;
@@ -62,6 +66,20 @@ namespace SongsOfConquestAccess.Adapters
             get { return GetTitle(); }
         }
 
+        /// <summary>The caption the menu draws over the rows of the local player's own partnership,
+        /// drawn only while there is one ("Allies").</summary>
+        public CaptionItem AllyCaption
+        {
+            get { return GetCaption(AllyHeaderField); }
+        }
+
+        /// <summary>The caption the menu draws over the rest of the rows ("Enemies"), drawn under the
+        /// same condition as the ally caption.</summary>
+        public CaptionItem EnemyCaption
+        {
+            get { return GetCaption(EnemyHeaderField); }
+        }
+
         public IReadOnlyList<PlayerItem> GetPlayers()
         {
             List<PlayerItem> players = new List<PlayerItem>();
@@ -83,7 +101,6 @@ namespace SongsOfConquestAccess.Adapters
                 players.Add(new PlayerItem(this, entry, i));
             }
 
-            players.Sort((left, right) => left.TeamId.CompareTo(right.TeamId));
             if (_selectedTeamId < 0 && players.Count > 0)
             {
                 _selectedTeamId = players[0].TeamId;
@@ -123,6 +140,18 @@ namespace SongsOfConquestAccess.Adapters
         public void HideNativeTooltip()
         {
             NativeTooltipUtility.HideTooltip();
+        }
+
+        private CaptionItem GetCaption(FieldInfo field)
+        {
+            GameObject header = GetField<GameObject>(_menu, field);
+            if (header == null)
+            {
+                return null;
+            }
+
+            UITextMesh text = header.GetComponentInChildren<UITextMesh>(includeInactive: true);
+            return new CaptionItem(GetText(text), header.transform);
         }
 
         private string GetTitle()
@@ -199,6 +228,33 @@ namespace SongsOfConquestAccess.Adapters
             return gameObject != null && gameObject.scene.IsValid() && gameObject.scene.isLoaded;
         }
 
+        /// <summary>One of the two captions the menu draws over its rows. The game places them by
+        /// SIBLING INDEX as it sorts the rows (<c>AdventurePlayerMenu.Show</c>), so the caption hands
+        /// out the object it is drawn as and the caller reads its drawn top rather than assuming the
+        /// ally caption comes first.</summary>
+        public sealed class CaptionItem
+        {
+            public CaptionItem(string text, Component component)
+            {
+                Text = text ?? string.Empty;
+                Component = component;
+            }
+
+            public string Text { get; private set; }
+
+            public Component Component { get; private set; }
+
+            public bool IsVisible
+            {
+                get
+                {
+                    return Component != null
+                        && Component.gameObject != null
+                        && Component.gameObject.activeInHierarchy;
+                }
+            }
+        }
+
         public sealed class PlayerItem
         {
             private static readonly FieldInfo TeamField =
@@ -251,6 +307,8 @@ namespace SongsOfConquestAccess.Adapters
                 AccessTools.Field(typeof(AdventurePlayerMenuEntry), "_scoreText");
             private static readonly FieldInfo NonAggressionPactInnerButtonField =
                 AccessTools.Field(typeof(NonAggressionPactButton), "_button");
+            private static readonly FieldInfo DeadContainerField =
+                AccessTools.Field(typeof(AdventurePlayerMenuEntry), "_deadContainer");
 
             private readonly AdventurePlayerMenuAdapter _adapter;
             private readonly AdventurePlayerMenuEntry _entry;
@@ -275,6 +333,38 @@ namespace SongsOfConquestAccess.Adapters
             public string Id
             {
                 get { return "adventure-player-" + Math.Max(TeamId, 0); }
+            }
+
+            /// <summary>The row the menu draws this player as.</summary>
+            public Component Entry
+            {
+                get { return _entry as Component; }
+            }
+
+            /// <summary>The button the row draws over the name, which opens the platform user menu.
+            /// The game leaves it non-interactable for the local player and for an AI.</summary>
+            public Component NameButton
+            {
+                get { return GetField<UIButton>(_entry, NameButtonField) as Component; }
+            }
+
+            /// <summary>Whether the row draws the game's own dead marker.</summary>
+            public bool IsDead
+            {
+                get
+                {
+                    GameObject container = GetField<GameObject>(_entry, DeadContainerField);
+                    return container != null && container.activeInHierarchy;
+                }
+            }
+
+            /// <summary>Every action button the row can draw, always in the same order so that a
+            /// caller keying a control by its place in this list keeps that key on a row which draws
+            /// fewer of them. An entry is null where the prefab has no such button, and one the game
+            /// is not drawing answers false to <see cref="ActionItem.IsVisible"/>.</summary>
+            public IReadOnlyList<ActionItem> Actions
+            {
+                get { return new[] { NonAggressionPact, Resources, Towns, SpectateBattle }; }
             }
 
             public string Name
@@ -579,6 +669,12 @@ namespace SongsOfConquestAccess.Adapters
             }
 
             public string Id { get; private set; }
+
+            /// <summary>The button the game draws this action as.</summary>
+            public Component Component
+            {
+                get { return _button as Component; }
+            }
 
             public string Label
             {

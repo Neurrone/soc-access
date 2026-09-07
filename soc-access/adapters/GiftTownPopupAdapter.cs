@@ -7,6 +7,7 @@ using SongsOfConquest.Client.Adventure;
 using SongsOfConquest.Client.UI;
 using SongsOfConquest.Common.Localization;
 using SongsOfConquestAccess.Speech;
+using SongsOfConquestAccess.UI;
 using UnityEngine;
 
 namespace SongsOfConquestAccess.Adapters
@@ -81,6 +82,23 @@ namespace SongsOfConquestAccess.Adapters
             return IsPresent();
         }
 
+        /// <summary>The cross the popup draws at its top right. The game only draws it outside gamepad
+        /// mode (<c>GiftTownPopup.Show</c>), so it is absent rather than merely refusing there.</summary>
+        public Component CloseButton
+        {
+            get { return GetField<UIButton>(CloseButtonField) as Component; }
+        }
+
+        public bool IsCloseVisible()
+        {
+            return IsPresent() && MenuButtonAdapterBase.IsButtonVisible(GetField<UIButton>(CloseButtonField));
+        }
+
+        public bool ActivateClose()
+        {
+            return NativeSelectionUtility.Click(GetField<UIButton>(CloseButtonField));
+        }
+
         public Tooltip CloseTooltip
         {
             get { return Tooltip.ForComponent(GetField<UIButton>(CloseButtonField) as Component, _localization); }
@@ -114,7 +132,7 @@ namespace SongsOfConquestAccess.Adapters
                 }
 
                 TownItem item = new TownItem(this, rowId, i, button);
-                if (!string.IsNullOrWhiteSpace(item.Label))
+                if (!string.IsNullOrWhiteSpace(item.TypeName))
                 {
                     items.Add(item);
                 }
@@ -143,27 +161,6 @@ namespace SongsOfConquestAccess.Adapters
             return component != null && component.gameObject != null && component.gameObject.activeInHierarchy;
         }
 
-        private static string GetTooltipLabel(Tooltip tooltip)
-        {
-            IReadOnlyList<string> lines = tooltip != null ? tooltip.TextLines : null;
-            if (lines == null || lines.Count == 0)
-            {
-                return string.Empty;
-            }
-
-            List<string> parts = new List<string>();
-            for (int i = 0; i < lines.Count; i++)
-            {
-                string line = SpeechTextSanitizer.Normalize(lines[i]);
-                if (!string.IsNullOrWhiteSpace(line))
-                {
-                    parts.Add(line);
-                }
-            }
-
-            return MenuButtonTextUtility.JoinParts(parts.ToArray());
-        }
-
         public sealed class TownItem
         {
             private readonly GiftTownPopupAdapter _adapter;
@@ -178,9 +175,45 @@ namespace SongsOfConquestAccess.Adapters
 
             public string Id { get; private set; }
 
-            public string Label
+            /// <summary>The button the popup draws this town as.</summary>
+            public Component Component
             {
-                get { return GetTooltipLabel(Tooltip); }
+                get { return _button; }
+            }
+
+            /// <summary>The town's own type name, which the game writes as the tooltip's TITLE
+            /// (<c>GiftTownButton.SetTown</c> passes the entity's name key).</summary>
+            public string TypeName
+            {
+                get
+                {
+                    IList<string> lines = TooltipLines;
+                    return lines.Count > 0 ? lines[0] : string.Empty;
+                }
+            }
+
+            /// <summary>The name the player gave the town, drawn under the type name. Empty where the
+            /// town has none.</summary>
+            public string CustomName
+            {
+                get
+                {
+                    IList<string> lines = TooltipLines;
+                    int end = CustomNameEnd(lines);
+                    return end > 1 ? lines[1] : string.Empty;
+                }
+            }
+
+            /// <summary>Why the game is refusing this town, which it appends to the tooltip in its
+            /// negative colour. Empty while the button is taking clicks.</summary>
+            public string Reason
+            {
+                get
+                {
+                    IList<string> lines = TooltipLines;
+                    int end = CustomNameEnd(lines);
+                    return end < lines.Count ? lines[end] : string.Empty;
+                }
             }
 
             public bool IsVisible
@@ -218,6 +251,26 @@ namespace SongsOfConquestAccess.Adapters
             public bool Activate()
             {
                 return _button != null && NativeSelectionUtility.Click(_button.Button);
+            }
+
+            // The tooltip as the game wrote it, one drawn line at a time: the title, the custom name,
+            // and - only where the game is refusing - the reason, which it appends to the custom name
+            // behind a newline rather than as a line of its own.
+            private IList<string> TooltipLines
+            {
+                get
+                {
+                    Tooltip tooltip = Tooltip;
+                    return SpokenLines.Of(tooltip != null ? tooltip.TextLines : null);
+                }
+            }
+
+            // Where the name ends and the refusal begins. The reason is always the LAST line and is
+            // only ever there while the button refuses: the custom name key can resolve to nothing, so
+            // reading either off a fixed index would hand the reason out as the town's name.
+            private int CustomNameEnd(IList<string> lines)
+            {
+                return !IsEnabled && lines.Count > 1 ? lines.Count - 1 : lines.Count;
             }
         }
     }
