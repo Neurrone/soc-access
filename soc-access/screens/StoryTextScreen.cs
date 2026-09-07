@@ -94,10 +94,11 @@ namespace SongsOfConquestAccess.Screens
 
             builder.BeginStop(StoryStop);
 
+            // Both nodes are BUTTONS: Enter on either advances the story, and a control that does
+            // something on Enter says so (owner ruling 2026-09-07).
             if (!string.IsNullOrWhiteSpace(_adapter.Title))
             {
-                NodeVtable heading = GraphNodes.Text(() => _adapter.Title);
-                heading.OnActivate = Advance;
+                NodeVtable heading = GraphNodes.Button(() => _adapter.Title, Advance);
                 builder.AddItem(new SyntheticNode(ControlId.For(_headingKey, "story-text:heading"), heading));
             }
 
@@ -105,6 +106,7 @@ namespace SongsOfConquestAccess.Screens
             {
                 ControlId bodyId = ControlId.For(_bodyKey, "story-text:body");
                 NodeVtable body = GraphNodes.Paragraphs(() => _adapter.BodyLines);
+                body.ControlType = ControlTypes.Button;
                 body.OnActivate = Advance;
                 builder.AddItem(new SyntheticNode(bodyId, body));
                 // Focus starts on the body, so arrival says the heading once as the screen name and
