@@ -138,7 +138,20 @@ namespace SongsOfConquestAccess.Screens
         private void BuildHeader(GraphBuilder builder)
         {
             AddLine(builder, "title", () => _adapter.GetTitle());
-            AddLine(builder, "commander", () => _adapter.GetCommanderIdentity());
+
+            // The wielder's line is the portrait the game draws at the top centre: its details tooltip
+            // fills the buffer, and selecting it is what makes the game draw that tooltip, as the
+            // mouse resting on it would.
+            Component portrait = _adapter.Portrait;
+            if (portrait == null)
+            {
+                AddLine(builder, "commander", () => _adapter.GetCommanderIdentity());
+                return;
+            }
+
+            NodeVtable vtable = GraphNodes.Text(() => _adapter.GetCommanderIdentity(), null, _adapter.PortraitTooltip);
+            vtable.OnFocusVisual = () => NativeSelectionUtility.Select(portrait);
+            builder.AddItem(new DrawnNode(ControlId.For(portrait, "level-up:commander"), vtable, portrait));
         }
 
         // ---- the stats row ----
@@ -170,7 +183,13 @@ namespace SongsOfConquestAccess.Screens
 
         private void BuildSkills(GraphBuilder builder)
         {
-            AddLine(builder, "choose-skill", () => _adapter.GetChooseSkillText());
+            // "Choose a Skill", the line the game draws over the cards, names the stop: it is said
+            // once on entering the cards, not as a line of its own (owner ruling 2026-09-07).
+            string caption = _adapter.GetChooseSkillText();
+            if (!string.IsNullOrWhiteSpace(caption))
+            {
+                builder.PushContext(caption);
+            }
 
             List<LevelUpMenuAdapter.SkillChoice> choices = DrawnOrder(_adapter.GetSkillChoices());
             for (int i = 0; i < choices.Count; i++)
@@ -206,6 +225,11 @@ namespace SongsOfConquestAccess.Screens
             if (_adapter.IsMaxLevelMessageVisible())
             {
                 AddLine(builder, "max-level", () => _adapter.GetMaxLevelMessage());
+            }
+
+            if (!string.IsNullOrWhiteSpace(caption))
+            {
+                builder.PopContext();
             }
         }
 

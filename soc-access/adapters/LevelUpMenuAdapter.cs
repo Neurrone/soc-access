@@ -75,6 +75,28 @@ namespace SongsOfConquestAccess.Adapters
                 GetText(_settings != null ? _settings.WielderTitleText : null));
         }
 
+        /// <summary>The wielder's portrait at the top centre, the image the game hangs the wielder's
+        /// details tooltip on (<c>CommanderLevelUpMenu.Open</c> calls <c>Portrait.SetDetails</c>);
+        /// null when the menu draws none.</summary>
+        public Component Portrait
+        {
+            get
+            {
+                Component portrait = _settings != null ? _settings.Portrait as Component : null;
+                return portrait != null && portrait.gameObject.activeInHierarchy ? portrait : null;
+            }
+        }
+
+        /// <summary>The portrait's native tooltip, the wielder's details.</summary>
+        public Tooltip PortraitTooltip
+        {
+            get
+            {
+                Component portrait = Portrait;
+                return portrait != null ? Tooltip.ForComponent(portrait, _localization) : null;
+            }
+        }
+
         /// <summary>The line the menu draws over the cards ("Choose a Skill"), set by
         /// <c>CommanderLevelUpMenu.Open</c> from <c>Adventure/CommanderLevelUp/Description</c>.</summary>
         public string GetChooseSkillText()
