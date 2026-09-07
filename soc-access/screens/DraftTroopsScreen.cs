@@ -14,6 +14,14 @@ namespace SongsOfConquestAccess.Screens
     /// which the rally point draws too. Everything else on the page - the tutorial button, the
     /// wielder's band, the back button and the close cross - is the base's
     /// (<c>screens/TroopManagementScreenBase.cs</c>), which also records where Escape goes.
+    ///
+    /// Against the widget page it replaced (walked on all three hosts 2026-09-08), nothing spoken
+    /// was lost: the page's title is now the screen's name rather than a line of its own, the buy
+    /// button says "Purchase" with its price as the value instead of "Purchase for 3500 Gold", the
+    /// slider says "5 of 5" instead of "5 /5", a card whose pool is empty reads the game's own line
+    /// ("Pool is empty") where the widget page said "0 available", and the slider, the price and the
+    /// pool-upgrade button live inside the card's group rather than beside a selection of the mod's
+    /// own. The wielder's rows lost "slot 5": the graph says where a row sits.
     /// </summary>
     public sealed class DraftTroopsScreen : TroopManagementScreenBase
     {

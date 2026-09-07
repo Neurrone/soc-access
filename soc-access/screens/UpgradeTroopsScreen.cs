@@ -25,6 +25,13 @@ namespace SongsOfConquestAccess.Screens
     ///
     /// Escape, the tutorial button, the wielder's band, the back button and the close cross are the
     /// base's (<c>screens/TroopManagementScreenBase.cs</c>).
+    ///
+    /// Against the widget page it replaced (walked on the dwelling, the town and the defence menu
+    /// 2026-09-08), nothing spoken was lost: the page's title is now the screen's name, the target
+    /// troop's line ("Archers. 14") is the target portrait button with its amount as its value, the
+    /// slider says "4 of 9" where it said "Amount to upgrade, Archers. 14", and the pay button says
+    /// "Upgrade" with its price as the value instead of "Upgrade for 2100 Gold". The wielder's rows
+    /// lost "slot 5": the graph says where a row sits.
     /// </summary>
     public sealed class UpgradeTroopsScreen : TroopManagementScreenBase
     {

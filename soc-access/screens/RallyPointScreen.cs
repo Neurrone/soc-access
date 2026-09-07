@@ -28,6 +28,12 @@ namespace SongsOfConquestAccess.Screens
     /// (<c>AdventureMenuBackground.AnimateEntry</c>, <c>UI.ExitMenu</c> at <c>InputLevel.Popup</c>,
     /// measured 2026-09-08 in the decompiled source). The navigator claims the key only while
     /// something is being carried.
+    ///
+    /// Against the widget page it replaced (walked 2026-09-08), nothing spoken was lost: the
+    /// building's name is now the screen's name rather than a line of its own, the towns read as
+    /// what they are - alternatives, one of them chosen - the buy button says "Purchase" with its
+    /// price as the value, and the slider and the price live inside the recruit's own group. The
+    /// wielder's rows lost "slot 5": the graph says where a row sits.
     /// </summary>
     public sealed class RallyPointScreen : GraphScreen
     {
