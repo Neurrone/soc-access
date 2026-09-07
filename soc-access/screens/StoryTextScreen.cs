@@ -94,13 +94,11 @@ namespace SongsOfConquestAccess.Screens
 
             builder.BeginStop(StoryStop);
 
-            // The body is the BUTTON: Enter on it advances the story, and a control that does something
-            // on Enter says so. The heading (the speaker) keeps Enter too but stays a plain line
-            // (owner ruling 2026-09-07).
+            // Both nodes are BUTTONS: Enter on either advances the story, and a control that does
+            // something on Enter says so (owner ruling 2026-09-07).
             if (!string.IsNullOrWhiteSpace(_adapter.Title))
             {
-                NodeVtable heading = GraphNodes.Text(() => _adapter.Title);
-                heading.OnActivate = Advance;
+                NodeVtable heading = GraphNodes.Button(() => _adapter.Title, Advance);
                 builder.AddItem(new SyntheticNode(ControlId.For(_headingKey, "story-text:heading"), heading));
             }
 
