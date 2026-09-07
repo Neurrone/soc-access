@@ -26,7 +26,7 @@ using UnityEngine.UI;
 
 namespace SongsOfConquestAccess.Adapters
 {
-    public sealed class CommanderSheetAdapter
+    public sealed class CommanderSheetAdapter : IArtifactSlots
     {
         private static readonly FieldInfo FacadeField = AccessTools.Field(typeof(CommanderSheet), "_facade");
         private static readonly FieldInfo LocalizationField = AccessTools.Field(typeof(CommanderSheet), "_localizationHandler");
@@ -443,27 +443,11 @@ namespace SongsOfConquestAccess.Adapters
             return tooltipImage as Component;
         }
 
-        /// <summary>The equipment slots in the order the sheet DRAWS them: the head, the chest and the
-        /// two hands down the left of the portrait, then the gloves, the boots and the three trinkets.
-        /// </summary>
-        public static readonly InventorySlot[] DrawnEquipmentSlots =
-        {
-            InventorySlot.Head,
-            InventorySlot.Chest,
-            InventorySlot.MainHand,
-            InventorySlot.OffHand,
-            InventorySlot.Hands,
-            InventorySlot.Feet,
-            InventorySlot.Trinket1,
-            InventorySlot.Trinket2,
-            InventorySlot.Trinket3
-        };
-
         public IReadOnlyList<InventorySlotInfo> GetEquipmentSlots()
         {
             List<InventorySlotInfo> slotsInfo = new List<InventorySlotInfo>();
             string ownerName = GetCommanderName();
-            InventorySlot[] slots = DrawnEquipmentSlots;
+            InventorySlot[] slots = InventorySlotInfo.DrawnEquipmentSlots;
             for (int i = 0; i < slots.Length; i++)
             {
                 InventorySlot slot = slots[i];

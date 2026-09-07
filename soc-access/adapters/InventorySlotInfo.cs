@@ -6,6 +6,23 @@ namespace SongsOfConquestAccess.Adapters
 {
     public sealed class InventorySlotInfo
     {
+        /// <summary>The equipment slots in the order every inventory panel DRAWS them: the head, the
+        /// chest and the two hands down the left of the portrait, then the gloves, the boots and the
+        /// three trinkets (measured on the wielder sheet and on the artifact market, 2026-09-07).
+        /// </summary>
+        public static readonly InventorySlot[] DrawnEquipmentSlots =
+        {
+            InventorySlot.Head,
+            InventorySlot.Chest,
+            InventorySlot.MainHand,
+            InventorySlot.OffHand,
+            InventorySlot.Hands,
+            InventorySlot.Feet,
+            InventorySlot.Trinket1,
+            InventorySlot.Trinket2,
+            InventorySlot.Trinket3
+        };
+
         private readonly Action _focusNative;
 
         public InventorySlotInfo(

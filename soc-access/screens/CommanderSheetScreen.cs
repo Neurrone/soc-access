@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using SongsOfConquest.Client.Adventure.UI;
-using SongsOfConquest.Common;
 using SongsOfConquest.Common.Details;
 using SongsOfConquestAccess.Adapters;
 using SongsOfConquestAccess.Input;
@@ -9,8 +8,6 @@ using SongsOfConquestAccess.Localization;
 using SongsOfConquestAccess.UI;
 using SongsOfConquestAccess.UI.Graph;
 using UnityEngine;
-using DropResult = SongsOfConquestAccess.UI.Graph.DropResult;
-using NativeDropResult = SongsOfConquestAccess.Adapters.DropResult;
 
 namespace SongsOfConquestAccess.Screens
 {
@@ -30,6 +27,10 @@ namespace SongsOfConquestAccess.Screens
     /// THE MODIFIER TABS SWITCH ON ENTER, not on arrival: Up from the first modifier row lands on the
     /// bar, and a switch on arrival would take the list the player is reading away. Their focus visual
     /// is the game's own button selection, as the build menu's tier tabs are.
+    ///
+    /// The equipment and backpack rows come from the shared contributor
+    /// (<c>ui/ArtifactSlotNodes.cs</c>), which every screen drawing an <c>InventoryHUD</c> uses; only
+    /// the three hint sentences below belong to this sheet.
     ///
     /// TWO-HANDERS: when the artifact in the main hand takes both hands
     /// (<c>IArtifactLookup.GetSlot</c> answers <c>ArtifactSlot.BothHands</c>), the game draws a ghost
@@ -59,13 +60,6 @@ namespace SongsOfConquestAccess.Screens
         private const string InventoryStop = "commander-sheet-inventory";
         private const string SkillsStop = "commander-sheet-skills";
         private const string CloseStop = "commander-sheet-close";
-
-        /// <summary>What is carried between the slots of this sheet.</summary>
-        public const string ArtifactCargo = "artifact";
-
-        /// <summary>The noise the game itself makes when a drag of an artifact begins
-        /// (<c>InventoryArtifactMovable.OnBeginDrag</c>).</summary>
-        public const string PickUpSound = "Adventure_InventoryPickupArtifact";
 
         private readonly CommanderSheetAdapter _adapter;
 
@@ -142,9 +136,7 @@ namespace SongsOfConquestAccess.Screens
                 return;
             }
 
-            // The game's own drag noise, for the keyboard's carry. Registered on every build: the
-            // registration is a delegate over this load and must not outlive it.
-            CarrySounds.Register(ArtifactCargo, () => NativeSoundUtility.PostEvent(PickUpSound), null);
+            ArtifactSlotNodes.RegisterSounds();
 
             if (_adapter.IsTutorialButtonVisible())
             {
@@ -261,149 +253,16 @@ namespace SongsOfConquestAccess.Screens
             builder.EndRow();
         }
 
-        // ---- the equipment ----
+        // ---- the equipment and the backpack ----
 
         private void BuildEquipment(GraphBuilder builder)
         {
-            IReadOnlyList<InventorySlotInfo> slots = _adapter.GetEquipmentSlots();
-            if (slots.Count == 0)
-            {
-                return;
-            }
-
-            bool merged = _adapter.IsMainHandTwoHanded();
-            InventorySlotInfo mainHand = Find(slots, InventorySlot.MainHand);
-            InventorySlotInfo offHand = Find(slots, InventorySlot.OffHand);
-
-            builder.PushContext(_adapter.EquipmentLabel);
-            for (int i = 0; i < slots.Count; i++)
-            {
-                InventorySlotInfo slot = slots[i];
-                if (merged && slot.Slot == InventorySlot.OffHand)
-                {
-                    // The game draws a ghost of the two-hander here; the one node below stands for
-                    // both hands.
-                    continue;
-                }
-
-                if (merged && slot.Slot == InventorySlot.MainHand)
-                {
-                    AddSlot(builder, mainHand, "equipment/both-hands", _adapter.BothHandsSlotName, offHand);
-                    continue;
-                }
-
-                AddSlot(builder, slot, "equipment/" + slot.Slot, slot.SlotName, null);
-            }
-
-            builder.PopContext();
+            ArtifactSlotNodes.Equipment(builder, _adapter, "commander-sheet", AddSlotHints);
         }
-
-        private static InventorySlotInfo Find(IReadOnlyList<InventorySlotInfo> slots, InventorySlot slot)
-        {
-            for (int i = 0; i < slots.Count; i++)
-            {
-                if (slots[i].Slot == slot)
-                {
-                    return slots[i];
-                }
-            }
-
-            return null;
-        }
-
-        // ---- the backpack ----
 
         private void BuildInventory(GraphBuilder builder)
         {
-            IReadOnlyList<InventorySlotInfo> slots = _adapter.GetBackpackSlots();
-            builder.PushContext(_adapter.InventoryLabel);
-            BuildAutoArrange(builder);
-            for (int i = 0; i < slots.Count; i++)
-            {
-                AddSlot(builder, slots[i], "inventory/" + i, null, null);
-            }
-
-            builder.PopContext();
-        }
-
-        /// <summary>Auto-arrange, the game's own middle click, as a button at the top of the backpack.
-        /// It sits in a row of its own that COUNTS NOTHING, so the positions the slots under it say are
-        /// the positions of the backpack ("5 of 16") rather than places in a list that has a button at
-        /// the top of it.</summary>
-        private void BuildAutoArrange(GraphBuilder builder)
-        {
-            string label = OneLine(_adapter.AutoArrangeText);
-            if (string.IsNullOrWhiteSpace(label))
-            {
-                return;
-            }
-
-            NodeVtable vtable = GraphNodes.Button(() => label, () => _adapter.AutoArrangeArtifacts());
-            builder.StartRow("commander-sheet:auto-arrange", positions: false);
-            builder.AddItem(new SyntheticNode(
-                ControlId.For(Marker("auto-arrange"), "commander-sheet:auto-arrange"),
-                vtable));
-            builder.EndRow();
-        }
-
-        // ---- a slot, equipment or backpack ----
-
-        /// <summary>
-        /// One slot: what is in it, where it is, and every gesture the game gives the artifact there.
-        ///
-        /// The name is what the slot HOLDS, watched live: both of the things that change it - a right
-        /// click that equips it away, a drop that fills it - happen under a cursor standing right
-        /// here. <paramref name="slotName"/> is the game's own name for an equipment slot, and null in
-        /// the backpack, where the position the graph speaks is the whole of where the slot is.
-        ///
-        /// <paramref name="dropInstead"/> is the off hand of a merged two-hander node: the one slot
-        /// whose drop may land somewhere other than the node the player is standing on.
-        /// </summary>
-        private void AddSlot(
-            GraphBuilder builder,
-            InventorySlotInfo slot,
-            string key,
-            string slotName,
-            InventorySlotInfo dropInstead)
-        {
-            if (slot == null)
-            {
-                return;
-            }
-
-            InventorySlotInfo it = slot;
-            InventorySlotInfo alternative = dropInstead;
-            NodeVtable vtable = GraphNodes.Button(
-                () => SlotName(it),
-                () => _adapter.LeftClickArtifact(it),
-                null,
-                it.Tooltip);
-            vtable.Announcements[0].Live = true;
-            if (!string.IsNullOrWhiteSpace(slotName))
-            {
-                string name = slotName;
-                vtable.Announcements.Add(GraphNodes.ValuePart(() => name, watch: false));
-            }
-
-            vtable.DropKind = ArtifactCargo;
-            vtable.OnDrop = held => Drop(held, Target(it, alternative, held));
-            vtable.DropAccepts = held => _adapter.CanRearrangeArtifactTo(Movable(held), Target(it, alternative, held));
-            vtable.OnPickUp = () => PickUp(it);
-            // Selecting the game's own cell is what makes it draw the artifact's tooltip, and what
-            // scrolls a backpack cell below the fold into view.
-            vtable.OnFocusVisual = it.FocusNative;
-
-            if (it.CanDrag)
-            {
-                vtable.OnContextual = () => _adapter.RightClickArtifact(it);
-                AddSlotHints(vtable, it);
-            }
-
-            object drawnBy = it.Movable != null ? (object)it.Movable : it.NativeSlot;
-            ControlId id = ControlId.Structural("commander-sheet:" + key);
-            builder.AddItem(drawnBy == null
-                ? (NodeDeclaration)new SyntheticNode(id, vtable)
-                : new DrawnNode(id, vtable, drawnBy));
+            ArtifactSlotNodes.Inventory(builder, _adapter, "commander-sheet", AddSlotHints, Marker("auto-arrange"));
         }
 
         /// <summary>The three gestures an occupied slot has, in the order they are said: what the right
@@ -429,52 +288,6 @@ namespace SongsOfConquestAccess.Screens
                 ModStrings.Screens.ArtifactDropHint,
                 AccessibilityActions.UiLeftClick.Key,
                 AccessibilityActions.UiLeftClickCtrlBindingIndex);
-        }
-
-        /// <summary>What a slot is called: the artifact in it, or the mod's word for an empty one.
-        /// </summary>
-        private static string SlotName(InventorySlotInfo slot)
-        {
-            return string.IsNullOrWhiteSpace(slot.ArtifactName)
-                ? ModText.Get(ModStrings.Screens.Empty)
-                : slot.ArtifactName;
-        }
-
-        private static CarryItem PickUp(InventorySlotInfo slot)
-        {
-            return slot.Movable == null
-                ? null
-                : new CarryItem(slot.Movable, SlotName(slot), ArtifactCargo);
-        }
-
-        /// <summary>Where a drop on this node really goes. Every slot but one is itself; the merged
-        /// two-hander node sends an artifact that fits the off hand ALONE to the off hand, which is
-        /// what the game's own right click does with it.</summary>
-        private InventorySlotInfo Target(InventorySlotInfo slot, InventorySlotInfo offHand, CarryItem held)
-        {
-            return offHand != null && _adapter.IsOffHandOnlyArtifact(Movable(held)) ? offHand : slot;
-        }
-
-        private static InventoryArtifactMovable Movable(CarryItem held)
-        {
-            return held == null ? null : held.Cargo as InventoryArtifactMovable;
-        }
-
-        /// <summary>The drop, through the game's own check and its own move. A refusal it has words
-        /// for is spoken in them; one it has none for falls back to the engine's sentence, and the
-        /// player keeps carrying either way.</summary>
-        private DropResult Drop(CarryItem held, InventorySlotInfo target)
-        {
-            NativeDropResult result = _adapter.DropArtifact(Movable(held), target);
-            switch (result)
-            {
-                case NativeDropResult.Dropped:
-                    return DropResult.Done();
-                case NativeDropResult.DeniedWithFeedback:
-                    return DropResult.Refused(_adapter.RearrangeRefusalText);
-                default:
-                    return DropResult.Refused();
-            }
         }
 
         // ---- the skills and the powers ----
@@ -578,14 +391,6 @@ namespace SongsOfConquestAccess.Screens
                 SocAccessMod.Instance?.LogWarning("CommanderSheetScreen section " + section + " failed to build: " + ex);
                 return new CommanderSheetAdapter.LabeledItem[0];
             }
-        }
-
-        /// <summary>Game text written for a renderer, read as one spoken line: its rich-text tags and
-        /// its mouse-button icons are not words.</summary>
-        private static string OneLine(string raw)
-        {
-            IList<string> lines = SpokenLines.Of(new[] { raw });
-            return lines.Count > 0 ? lines[0] : string.Empty;
         }
 
         private object Marker(string key)
