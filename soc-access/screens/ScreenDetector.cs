@@ -2417,13 +2417,12 @@ namespace SongsOfConquestAccess.Screens
                 return;
             }
 
+            // The page rebuilds itself on every operation, so a changed town list needs nothing said
+            // here; only a menu that has stopped being one has to be taken off the stack.
             if (!current.IsPresent())
             {
                 _screenManager.Pop<RallyPointScreen>("rally point no longer present");
-                return;
             }
-
-            current.Refresh();
         }
 
         public void OnRallyPointClosed(RallyPointInteractionMenu menu)

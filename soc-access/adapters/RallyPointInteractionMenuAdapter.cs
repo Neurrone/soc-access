@@ -28,12 +28,7 @@ namespace SongsOfConquestAccess.Adapters
         private static readonly FieldInfo LocalizationField = AccessTools.Field(typeof(RallyPointInteractionMenu), "_localizationHandler");
         private static readonly FieldInfo AsyncField = AccessTools.Field(typeof(RallyPointInteractionMenu), "_async");
         private static readonly FieldInfo ActiveEntriesField = AccessTools.Field(typeof(RallyPointInteractionMenu), "_activeEntries");
-        private static readonly FieldInfo RecruitmentPoolField = AccessTools.Field(typeof(RallyPointInteractionMenu), "_recruitmentPool");
-        private static readonly FieldInfo PurchaseSubMenuParentIdField = AccessTools.Field(typeof(PurchaseTroopsSubMenu), "_parentId");
 
-        private static readonly FieldInfo HeaderPortraitField = AccessTools.Field(typeof(WielderInteractHeader), "_wielderPortrait");
-        private static readonly FieldInfo HeaderTroopHudField = AccessTools.Field(typeof(WielderInteractHeader), "_troopHUD");
-        private static readonly FieldInfo HeaderCloseButtonField = AccessTools.Field(typeof(WielderInteractHeader), "_closeButton");
 
         private static readonly FieldInfo EntryButtonField = AccessTools.Field(typeof(RallyPointTownEntry), "_button");
         private static readonly FieldInfo EntrySelectedField = AccessTools.Field(typeof(RallyPointTownEntry), "_selected");
@@ -43,43 +38,13 @@ namespace SongsOfConquestAccess.Adapters
         private readonly RallyPointInteractionMenu _menu;
         private readonly IClientAdventureFacade _facade;
         private readonly ILocalizationHandler _localization;
+        private WielderInteract _wielder;
 
         public RallyPointInteractionMenuAdapter(RallyPointInteractionMenu menu)
         {
             _menu = menu;
             _facade = GetField<IClientAdventureFacade>(_menu, AdventureFacadeField);
             _localization = GetField<ILocalizationHandler>(_menu, LocalizationField);
-        }
-
-        public RallyPointInteractionMenu Source
-        {
-            get { return _menu; }
-        }
-
-        public IClientAdventureFacade Facade
-        {
-            get { return _facade; }
-        }
-
-        public int InteractingCommanderId
-        {
-            get
-            {
-                PurchaseTroopsSubMenu subMenu = GetPurchaseSubMenu();
-                object value = PurchaseSubMenuParentIdField != null && subMenu != null
-                    ? PurchaseSubMenuParentIdField.GetValue(subMenu)
-                    : null;
-                return value is int ? (int)value : -1;
-            }
-        }
-
-        public int RallyPointMapEntityId
-        {
-            get
-            {
-                IRallyPointRecruitmentPoolComponent pool = GetField<IRallyPointRecruitmentPoolComponent>(_menu, RecruitmentPoolField);
-                return pool != null && pool.MapEntity != null ? pool.MapEntity.Id : -1;
-            }
         }
 
         public bool IsPresent()
@@ -100,60 +65,38 @@ namespace SongsOfConquestAccess.Adapters
             get { return GetText(GetField<UITextMesh>(_menu, BuildingNameField)); }
         }
 
+        /// <summary>The name of the place the recruits are coming from, which the menu writes in a
+        /// line of its own over the grid: a town's name, or its own word for taking from all of
+        /// them.</summary>
         public string SelectedSourceName
         {
             get { return GetText(GetField<UITextMesh>(_menu, SelectedTownNameField)); }
         }
 
-        public string WielderName
+        public Component SelectedSourceLine
+        {
+            get { return GetField<UITextMesh>(_menu, SelectedTownNameField) as Component; }
+        }
+
+        /// <summary>The band the menu hangs across its top: the wielder who walked in, their army and
+        /// the close cross.</summary>
+        public WielderInteract Wielder
         {
             get
             {
-                int commanderId = InteractingCommanderId;
-                string name = commanderId >= 0 && _facade != null && _facade.Commanders != null
-                    ? _facade.Commanders.GetName(commanderId)
-                    : string.Empty;
-                return SpeechTextSanitizer.Normalize(name);
+                WielderInteractHeader header = GetHeader();
+                if (_wielder == null || !ReferenceEquals(_wielder.Header, header))
+                {
+                    _wielder = new WielderInteract(header, _facade, _localization);
+                }
+
+                return _wielder;
             }
-        }
-
-        public Tooltip WielderTooltip
-        {
-            get { return Tooltip.ForComponent(GetField<UIImage>(GetHeader(), HeaderPortraitField) as Component, _localization); }
-        }
-
-        public TroopHudAdapter Troops
-        {
-            get { return new TroopHudAdapter(GetField<TroopHUD>(GetHeader(), HeaderTroopHudField), _facade, _localization); }
         }
 
         public PurchaseTroopsSubMenuAdapter PurchaseTroops
         {
             get { return new PurchaseTroopsSubMenuAdapter(GetPurchaseSubMenu(), _facade, _localization); }
-        }
-
-        public string CloseLabel
-        {
-            get
-            {
-                return GetButtonLabel(GetField<UIButton>(GetHeader(), HeaderCloseButtonField));
-            }
-        }
-
-        public bool Close()
-        {
-            if (_menu == null || !IsMenuOpen())
-            {
-                return false;
-            }
-
-            _menu.Close();
-            return true;
-        }
-
-        public void HideNativeTooltip()
-        {
-            NativeTooltipUtility.HideTooltip();
         }
 
         public IReadOnlyList<SourceItem> GetSourceItems()
@@ -173,27 +116,10 @@ namespace SongsOfConquestAccess.Adapters
                     continue;
                 }
 
-                result.Add(new SourceItem(this, entry, i));
+                result.Add(new SourceItem(this, entry));
             }
 
             return result;
-        }
-
-        public int SelectedSourceIndex
-        {
-            get
-            {
-                IReadOnlyList<SourceItem> sources = GetSourceItems();
-                for (int i = 0; i < sources.Count; i++)
-                {
-                    if (sources[i].IsSelected)
-                    {
-                        return sources[i].Index;
-                    }
-                }
-
-                return -1;
-            }
         }
 
         private bool IsMenuOpen()
@@ -244,11 +170,6 @@ namespace SongsOfConquestAccess.Adapters
             return SpeechTextSanitizer.Normalize(string.IsNullOrWhiteSpace(name) || name == entity.NameKey ? entity.NameKey : name);
         }
 
-        private static string GetButtonLabel(UIButton button)
-        {
-            return SpeechTextSanitizer.Normalize(MenuButtonTextUtility.GetAllVisibleText(button));
-        }
-
         private static string GetText(IUITextMesh textMesh)
         {
             return SpeechTextSanitizer.Normalize(UITextMeshTextUtility.GetEffectiveText(textMesh));
@@ -273,34 +194,19 @@ namespace SongsOfConquestAccess.Adapters
         {
             private readonly RallyPointInteractionMenuAdapter _adapter;
             private readonly RallyPointTownEntry _entry;
-            public SourceItem(RallyPointInteractionMenuAdapter adapter, RallyPointTownEntry entry, int index)
+            public SourceItem(RallyPointInteractionMenuAdapter adapter, RallyPointTownEntry entry)
             {
                 _adapter = adapter;
                 _entry = entry;
-                Index = index;
             }
 
-            public int Index { get; private set; }
-
-            public int MapEntityId
-            {
-                get
-                {
-                    IMapEntity entity = _entry != null ? _entry.MapEntity : null;
-                    return entity != null ? entity.Id : -1;
-                }
-            }
-
-            public bool IsAllSources
-            {
-                get { return _entry != null && _entry.MapEntity == null; }
-            }
-
+            /// <summary>The town this entry stands for, or the game's own word for taking from every
+            /// town at once, which is the entry the game draws with no town behind it.</summary>
             public string Name
             {
                 get
                 {
-                    if (IsAllSources)
+                    if (_entry == null || _entry.MapEntity == null)
                     {
                         return _adapter.GetLocalizedText("Adventure/PurchaseTroopsMenu/RallyPoint/PurchaseFromAll");
                     }
@@ -327,6 +233,12 @@ namespace SongsOfConquestAccess.Adapters
             public Tooltip Tooltip
             {
                 get { return Tooltip.ForComponent(GetField<UIButton>(_entry, EntryButtonField) as Component, _adapter._localization); }
+            }
+
+            /// <summary>The button the entry draws, which is the whole of it.</summary>
+            public Component Button
+            {
+                get { return GetField<UIButton>(_entry, EntryButtonField) as Component; }
             }
 
             public void Focus()

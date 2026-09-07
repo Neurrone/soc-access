@@ -34,8 +34,14 @@ namespace SongsOfConquestAccess.UI
         public const int CoarseStep = 5;
 
         /// <summary>The whole grid, under the mod's own word for it, declared into whatever stop the
-        /// caller has opened.</summary>
-        public static void Region(GraphBuilder builder, PurchaseTroopsSubMenuAdapter subMenu, string keyPrefix)
+        /// caller has opened. <paramref name="lead"/> is whatever the page draws over the grid and
+        /// inside the same band - the rally point's line saying which town it is recruiting from.
+        /// </summary>
+        public static void Region(
+            GraphBuilder builder,
+            PurchaseTroopsSubMenuAdapter subMenu,
+            string keyPrefix,
+            Action<GraphBuilder> lead = null)
         {
             if (builder == null || subMenu == null)
             {
@@ -45,6 +51,11 @@ namespace SongsOfConquestAccess.UI
             IReadOnlyList<PurchaseTroopsSubMenuAdapter.RecruitEntry> entries = subMenu.GetRecruitEntries();
             builder.PushContext(ModText.Get(ModStrings.Screens.Recruits));
             builder.SetRegion(keyPrefix + ":recruits");
+
+            if (lead != null)
+            {
+                lead(builder);
+            }
 
             for (int i = 0; i < entries.Count; i++)
             {
