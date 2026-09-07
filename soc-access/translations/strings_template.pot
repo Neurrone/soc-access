@@ -2424,6 +2424,11 @@ msgctxt "Screens.AudioGlossary"
 msgid "Audio glossary"
 msgstr ""
 
+#. Screens.Available
+msgctxt "Screens.Available"
+msgid "Available"
+msgstr ""
+
 #. Screens.Back
 msgctxt "Screens.Back"
 msgid "Back"
@@ -2847,6 +2852,11 @@ msgstr ""
 #. Screens.PostAdventureResult
 msgctxt "Screens.PostAdventureResult"
 msgid "Post adventure result"
+msgstr ""
+
+#. Screens.Purchase
+msgctxt "Screens.Purchase"
+msgid "Purchase"
 msgstr ""
 
 #. Screens.Quickbar

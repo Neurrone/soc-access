@@ -404,10 +404,20 @@ namespace SongsOfConquestAccess.Adapters
         /// <summary>The artifact's LEFT click, through the button the game hangs its own handler on.
         /// In this menu the game answers it by SELECTING THE ARTIFACT FOR SALE
         /// (<c>ArtifactMarketMenu.HandleInventoryArtifactClicked</c>), and with Ctrl physically held it
-        /// drops the artifact on the ground first.</summary>
+        /// drops the artifact on the ground first. The shop's own answer to the click takes the
+        /// artifact's tooltip down with it (<c>ArtifactMarketMenu.HandleInventoryArtifactClicked</c>
+        /// rebuilds the band and the game stops drawing the hover), so the cell is selected again
+        /// afterwards: the cursor has not moved, and the tooltip the player was reading comes back.
+        /// </summary>
         public bool LeftClickArtifact(InventorySlotInfo slot)
         {
-            return NativeSelectionUtility.Click(GetMovableButton(slot));
+            bool clicked = NativeSelectionUtility.Click(GetMovableButton(slot));
+            if (clicked && slot != null)
+            {
+                slot.FocusNative();
+            }
+
+            return clicked;
         }
 
         /// <summary>The artifact's RIGHT click, through the same button: equip, unequip or use, and
@@ -516,24 +526,22 @@ namespace SongsOfConquestAccess.Adapters
             get { return FirstText(GetField<GameObject>(_menu, NoSelectionContainerField)); }
         }
 
-        /// <summary>Whichever of the band's three containers the game is drawing, so a cursor standing
-        /// on the band belongs to the thing that is really there.</summary>
-        public Component SelectionBandContainer
+        /// <summary>The container the prompt is drawn in, one of the band's three.</summary>
+        public Component NoSelectionContainer
         {
-            get
-            {
-                if (IsBuyShown)
-                {
-                    return ContainerTransform(GetField<GameObject>(_menu, BuyContainerField));
-                }
+            get { return ContainerTransform(GetField<GameObject>(_menu, NoSelectionContainerField)); }
+        }
 
-                if (IsSellShown)
-                {
-                    return ContainerTransform(GetField<GameObject>(_menu, SellContainerField));
-                }
+        /// <summary>The container the purchase is drawn in, one of the band's three.</summary>
+        public Component BuyContainer
+        {
+            get { return ContainerTransform(GetField<GameObject>(_menu, BuyContainerField)); }
+        }
 
-                return ContainerTransform(GetField<GameObject>(_menu, NoSelectionContainerField));
-            }
+        /// <summary>The container the sale is drawn in, one of the band's three.</summary>
+        public Component SellContainer
+        {
+            get { return ContainerTransform(GetField<GameObject>(_menu, SellContainerField)); }
         }
 
         /// <summary>Whether the band is showing the artifact the player is buying.</summary>

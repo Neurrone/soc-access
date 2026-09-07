@@ -12,18 +12,33 @@ using UnityEngine;
 namespace SongsOfConquestAccess.Screens
 {
     /// <summary>
-    /// The artifact merchant a wielder walks into. Five places to be, in the order the menu draws
-    /// them: the wielder band across the top, the market itself, the wielder's equipment, their
-    /// backpack, and the close cross.
+    /// The artifact merchant a wielder walks into. Seven places to be, in the order the menu draws
+    /// them: the wielder band across the top, the merchant's own words, the purchase, the sale, the
+    /// wielder's equipment, their backpack, and the close cross.
     ///
-    /// THE MARKET stop is the drawn left half: the merchant's description, the nine category filters
-    /// as ONE radio row named by the game's own tooltips on the toggles (never choosing on arrival -
-    /// switching category throws the offers away and clears the selection), the offers the grid
-    /// really holds (the game pads the grid to 24 empty cells, which are not content), and then the
-    /// SELECTION BAND at the foot, which is one line and one button whose parts are all watched live.
-    /// The band's two nodes are keyed structurally and gated on whichever of the game's three
-    /// containers is painted, so a cursor standing on the band stays there and hears it turn from the
-    /// prompt into Buy and from Buy into Sell.
+    /// THE DESCRIPTION IS A STOP OF ITS OWN and holds nothing else, so a player who came to trade
+    /// tabs past the merchant's paragraph rather than arrowing through it to reach the offers.
+    ///
+    /// PURCHASE holds everything buying takes, in the order the menu draws it: a region named
+    /// "Filters" over the nine category filters as ONE radio row named by the game's own tooltips on
+    /// the toggles (never choosing on arrival - switching category throws the offers away and clears
+    /// the selection), a region named "Available" over the offers the grid really holds (the game
+    /// pads the grid to 24 empty cells, which are not content), and, at the end of the stop, the buy
+    /// half of the SELECTION BAND: the line naming what is being bought and the Buy button.
+    ///
+    /// SELL is that band's other half as a stop of its own, right after Purchase, so the sale a
+    /// player sets up from the backpack is one Tab away rather than behind every offer. It is named
+    /// by the word the game itself writes over the button.
+    ///
+    /// THE GAME DRAWS ONE BAND with three containers, and each is declared in the stop it answers
+    /// for: the prompt ("Select an artifact to sell or purchase") stands in Sell while nothing is
+    /// being sold and in Purchase while nothing is being bought, because it is the answer to both
+    /// questions - the game paints it in one place only, but it is the state of both halves, so both
+    /// stops keep a line to be at. The band's nodes are keyed structurally and drawn by whichever
+    /// container the game paints for that half, so a cursor standing on the band stays there and
+    /// hears the line turn from the prompt into the artifact; the parts are watched live, the price
+    /// rides on the button, and the button is gone entirely while that half has nothing selected,
+    /// and for an important artifact, whose Sell button the game does not draw.
     ///
     /// THE CLICKS MEAN SOMETHING ELSE HERE than they do on the wielder sheet, and the difference is
     /// the game's, not the mod's - the same two native handlers branch on
@@ -48,7 +63,9 @@ namespace SongsOfConquestAccess.Screens
     public sealed class ArtifactMarketScreen : GraphScreen
     {
         private const string WielderStop = "artifact-market-wielder";
-        private const string MarketStop = "artifact-market";
+        private const string DescriptionStop = "artifact-market-description";
+        private const string PurchaseStop = "artifact-market-purchase";
+        private const string SellStop = "artifact-market-sell";
         private const string EquipmentStop = "artifact-market-equipment";
         private const string InventoryStop = "artifact-market-inventory";
         private const string CloseStop = "artifact-market-close";
@@ -116,11 +133,14 @@ namespace SongsOfConquestAccess.Screens
 
             TroopHudRows.WielderStop(builder, WielderStop, WielderKey, _adapter.Wielder);
 
-            builder.BeginStop(MarketStop);
+            builder.BeginStop(DescriptionStop);
             BuildDescription(builder);
-            BuildCategories(builder);
-            BuildOffers(builder);
-            BuildSelectionBand(builder);
+
+            builder.BeginStop(PurchaseStop);
+            BuildPurchase(builder);
+
+            builder.BeginStop(SellStop);
+            BuildSell(builder);
 
             builder.BeginStop(EquipmentStop);
             ArtifactSlotNodes.Equipment(builder, _adapter, KeyPrefix, AddSlotHints);
@@ -148,7 +168,7 @@ namespace SongsOfConquestAccess.Screens
             get { return _adapter == null || _adapter.Wielder == null ? null : _adapter.Wielder.Troops; }
         }
 
-        // ---- the market ----
+        // ---- the merchant's words ----
 
         /// <summary>What the merchant says about itself, as one node of its paragraphs.</summary>
         private void BuildDescription(GraphBuilder builder)
@@ -162,6 +182,29 @@ namespace SongsOfConquestAccess.Screens
             builder.AddItem(new SyntheticNode(
                 ControlId.For(Marker("description"), "artifact-market:description"),
                 GraphNodes.Paragraphs(() => SpokenLines.Of(new[] { description }))));
+        }
+
+        // ---- the purchase ----
+
+        /// <summary>Everything a purchase takes, in the order the menu draws it: the filters, the
+        /// offers they choose among, and the band's buy half at the end of the stop.</summary>
+        private void BuildPurchase(GraphBuilder builder)
+        {
+            builder.PushContext(ModText.Get(ModStrings.Screens.Purchase));
+
+            builder.PushContext(ModText.Get(ModStrings.UI.Filters));
+            builder.SetRegion("artifact-market:filters");
+            BuildCategories(builder);
+            builder.PopContext();
+
+            builder.PushContext(ModText.Get(ModStrings.Screens.Available));
+            builder.SetRegion("artifact-market:offers");
+            BuildOffers(builder);
+            builder.PopContext();
+
+            builder.SetRegion(null);
+            BuildBuyBand(builder);
+            builder.PopContext();
         }
 
         /// <summary>The nine filters as the ONE BAR the menu draws: Left and Right walk it, Enter is
@@ -228,88 +271,100 @@ namespace SongsOfConquestAccess.Screens
         }
 
         /// <summary>
-        /// The band at the foot of the menu, as the two things it ever holds: the line naming what is
-        /// selected - the game's prompt while nothing is - and the button that completes the deal.
+        /// The buy half of the band, at the end of the purchase stop: the line naming the artifact
+        /// being bought - the game's prompt while nothing is - and the Buy button under it.
         ///
-        /// Both are keyed STRUCTURALLY and vouched for by whichever container the game is painting, so
-        /// the cursor does not move when the band turns from the prompt into Buy or from Buy into
-        /// Sell; the parts are watched, so it hears the change instead. The button is gone entirely
-        /// while nothing is selected, and for an important artifact, whose Sell button the game does
-        /// not draw.
+        /// Both are keyed STRUCTURALLY and drawn by whichever of the game's containers is really
+        /// painted, so the cursor does not move when the band turns from the prompt into the
+        /// purchase; the parts are watched, so it hears the change instead.
         /// </summary>
-        private void BuildSelectionBand(GraphBuilder builder)
+        private void BuildBuyBand(GraphBuilder builder)
         {
-            Component container = _adapter.SelectionBandContainer;
+            bool buying = _adapter.IsBuyShown;
+            Component container = buying ? _adapter.BuyContainer : _adapter.NoSelectionContainer;
             if (container != null)
             {
-                NodeVtable line = GraphNodes.Text(BandLine);
+                NodeVtable line = GraphNodes.Text(BuyLine);
                 line.Announcements[0].Live = true;
                 builder.AddItem(new DrawnNode(
-                    ControlId.Structural("artifact-market:band/line"),
+                    ControlId.Structural("artifact-market:purchase/line"),
                     line,
                     container));
             }
 
-            Component button = BandButton();
+            Component button = buying ? _adapter.BuyButton : null;
             if (button == null)
             {
                 return;
             }
 
-            NodeVtable vtable = GraphNodes.Button(BandButtonLabel, BandActivate, BandEnabled);
+            NodeVtable vtable = GraphNodes.Button(
+                () => _adapter.BuyButtonLabel,
+                () => _adapter.BuySelectedMarketArtifact(),
+                _adapter.CanBuySelectedArtifact);
             vtable.Announcements[0].Live = true;
-            vtable.Announcements.Add(GraphNodes.ValuePart(BandPrice));
+            vtable.Announcements.Add(GraphNodes.ValuePart(() => _adapter.BuyPriceLabel));
             vtable.OnFocusVisual = () => NativeSelectionUtility.Select(button);
             builder.AddItem(new DrawnNode(
-                ControlId.Structural("artifact-market:band/action"),
+                ControlId.Structural("artifact-market:purchase/action"),
                 vtable,
                 button));
         }
 
-        private string BandLine()
+        private string BuyLine()
         {
-            if (_adapter.IsBuyShown)
+            return _adapter.IsBuyShown ? _adapter.BuyItemName : _adapter.NoSelectionText;
+        }
+
+        // ---- the sale ----
+
+        /// <summary>
+        /// The sell half of the same band, as a stop under the word the game writes over the button:
+        /// the line naming the artifact being sold - the prompt while nothing is - and the Sell
+        /// button under it, which the game does not draw at all for an artifact it treats as
+        /// important.
+        ///
+        /// While a purchase is selected the game paints the buy container instead, and the prompt line
+        /// stays here saying that nothing is up for sale, so the stop is always somewhere to be.
+        /// </summary>
+        private void BuildSell(GraphBuilder builder)
+        {
+            builder.PushContext(_adapter.SellButtonLabel);
+
+            bool selling = _adapter.IsSellShown;
+            Component container = selling ? _adapter.SellContainer : _adapter.NoSelectionContainer;
+            if (container != null)
             {
-                return _adapter.BuyItemName;
+                NodeVtable line = GraphNodes.Text(SellLine);
+                line.Announcements[0].Live = true;
+                builder.AddItem(new DrawnNode(
+                    ControlId.Structural("artifact-market:sell/line"),
+                    line,
+                    container));
             }
 
+            Component button = selling && _adapter.IsSellButtonShown ? _adapter.SellButton : null;
+            if (button != null)
+            {
+                NodeVtable vtable = GraphNodes.Button(
+                    () => _adapter.SellButtonLabel,
+                    () => _adapter.SellSelectedArtifact(),
+                    _adapter.CanSellSelectedArtifact);
+                vtable.Announcements[0].Live = true;
+                vtable.Announcements.Add(GraphNodes.ValuePart(() => _adapter.SellPriceLabel));
+                vtable.OnFocusVisual = () => NativeSelectionUtility.Select(button);
+                builder.AddItem(new DrawnNode(
+                    ControlId.Structural("artifact-market:sell/action"),
+                    vtable,
+                    button));
+            }
+
+            builder.PopContext();
+        }
+
+        private string SellLine()
+        {
             return _adapter.IsSellShown ? _adapter.SellItemName : _adapter.NoSelectionText;
-        }
-
-        private Component BandButton()
-        {
-            if (_adapter.IsBuyShown)
-            {
-                return _adapter.BuyButton;
-            }
-
-            return _adapter.IsSellShown && _adapter.IsSellButtonShown ? _adapter.SellButton : null;
-        }
-
-        private string BandButtonLabel()
-        {
-            return _adapter.IsBuyShown ? _adapter.BuyButtonLabel : _adapter.SellButtonLabel;
-        }
-
-        private string BandPrice()
-        {
-            return _adapter.IsBuyShown ? _adapter.BuyPriceLabel : _adapter.SellPriceLabel;
-        }
-
-        private bool BandEnabled()
-        {
-            return _adapter.IsBuyShown ? _adapter.CanBuySelectedArtifact() : _adapter.CanSellSelectedArtifact();
-        }
-
-        private void BandActivate()
-        {
-            if (_adapter.IsBuyShown)
-            {
-                _adapter.BuySelectedMarketArtifact();
-                return;
-            }
-
-            _adapter.SellSelectedArtifact();
         }
 
         // ---- the artifacts ----

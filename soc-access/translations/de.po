@@ -740,6 +740,11 @@ msgctxt "Screens.AttackerEssence"
 msgid "Attacker essence"
 msgstr "Essenz des Angreifers"
 
+#. Screens.Available
+msgctxt "Screens.Available"
+msgid "Available"
+msgstr "Verfügbar"
+
 #. Screens.Back
 msgctxt "Screens.Back"
 msgid "Back"
@@ -934,6 +939,11 @@ msgstr "OK"
 msgctxt "Screens.PostAdventureResult"
 msgid "Post adventure result"
 msgstr "Ergebnis nach dem Abenteuer"
+
+#. Screens.Purchase
+msgctxt "Screens.Purchase"
+msgid "Purchase"
+msgstr "Kauf"
 
 #. Screens.Quickbar
 msgctxt "Screens.Quickbar"

@@ -553,6 +553,7 @@ namespace SongsOfConquestAccess.Localization
             public static readonly ModString AttackerPortrait = new ModString("Screens.AttackerPortrait", "Attacker portrait");
             public static readonly ModString Audio = new ModString("Screens.Audio", "Audio");
             public static readonly ModString AudioGlossary = new ModString("Screens.AudioGlossary", "Audio glossary");
+            public static readonly ModString Available = new ModString("Screens.Available", "Available");
             public static readonly ModString Back = new ModString("Screens.Back", "Back");
             public static readonly ModString Ballista = new ModString("Screens.Ballista", "Ballista");
             public static readonly ModString BattleLog = new ModString("Screens.BattleLog", "Battle log");
@@ -638,6 +639,7 @@ namespace SongsOfConquestAccess.Localization
             public static readonly ModString PlayerStatsBattle = new ModString("Screens.PlayerStatsBattle", "Conquest - Battle");
             public static readonly ModString PlayerStatsOverall = new ModString("Screens.PlayerStatsOverall", "Conquest - Overall");
             public static readonly ModString PostAdventureResult = new ModString("Screens.PostAdventureResult", "Post adventure result");
+            public static readonly ModString Purchase = new ModString("Screens.Purchase", "Purchase");
             public static readonly ModString Quickbar = new ModString("Screens.Quickbar", "Quickbar");
             public static readonly ModString Ready = new ModString("Screens.Ready", "Ready");
             public static readonly ModString ReadEnemyInfluence = new ModString("Screens.ReadEnemyInfluence", "Read attack, deadly and movement range for enemies on tiles in combat");
