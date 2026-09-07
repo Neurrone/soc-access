@@ -755,6 +755,16 @@ msgctxt "Screens.ArtifactEquipHint"
 msgid "{0} equips."
 msgstr "{0} で装備します。"
 
+#. Screens.ArtifactSelectForSaleHint
+msgctxt "Screens.ArtifactSelectForSaleHint"
+msgid "{0} selects for sale."
+msgstr "{0} で売却対象に選択します。"
+
+#. Screens.ArtifactSellHint
+msgctxt "Screens.ArtifactSellHint"
+msgid "{0} sells."
+msgstr "{0} で売却します。"
+
 #. Screens.ArtifactUnequipHint
 msgctxt "Screens.ArtifactUnequipHint"
 msgid "{0} unequips."
@@ -3210,11 +3220,6 @@ msgstr "到達可能: なし"
 msgctxt "Screens.BuyArtifact"
 msgid "Buy"
 msgstr "購入"
-
-#. Screens.Buyback
-msgctxt "Screens.Buyback"
-msgid "Buyback"
-msgstr "買い戻し"
 
 #. Actions.DescribePosition
 msgctxt "Actions.DescribePosition"

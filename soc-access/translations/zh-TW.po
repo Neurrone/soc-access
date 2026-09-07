@@ -755,6 +755,16 @@ msgctxt "Screens.ArtifactEquipHint"
 msgid "{0} equips."
 msgstr "按 {0} 裝備。"
 
+#. Screens.ArtifactSelectForSaleHint
+msgctxt "Screens.ArtifactSelectForSaleHint"
+msgid "{0} selects for sale."
+msgstr "按 {0} 選擇出售。"
+
+#. Screens.ArtifactSellHint
+msgctxt "Screens.ArtifactSellHint"
+msgid "{0} sells."
+msgstr "按 {0} 出售。"
+
 #. Screens.ArtifactUnequipHint
 msgctxt "Screens.ArtifactUnequipHint"
 msgid "{0} unequips."
@@ -3210,11 +3220,6 @@ msgstr "可到達：無"
 msgctxt "Screens.BuyArtifact"
 msgid "Buy"
 msgstr "購買"
-
-#. Screens.Buyback
-msgctxt "Screens.Buyback"
-msgid "Buyback"
-msgstr "回購"
 
 #. Actions.DescribePosition
 msgctxt "Actions.DescribePosition"

@@ -14,6 +14,7 @@ using SongsOfConquest.Client.Menu;
 using SongsOfConquest.Client.UI;
 using SongsOfConquest.Common;
 using SongsOfConquest.Common.Artifacts;
+using SongsOfConquest.Common.Details;
 using SongsOfConquest.Common.Economy;
 using SongsOfConquest.Common.Gamestate;
 using SongsOfConquest.Common.Localization;
@@ -25,7 +26,7 @@ using UnityEngine.UI;
 
 namespace SongsOfConquestAccess.Adapters
 {
-    public sealed class ArtifactMarketMenuAdapter
+    public sealed class ArtifactMarketMenuAdapter : IArtifactSlots
     {
         private static readonly FieldInfo HeaderTextField = AccessTools.Field(typeof(ArtifactMarketMenu), "_headerText");
         private static readonly FieldInfo DescriptionTextField = AccessTools.Field(typeof(ArtifactMarketMenu), "_descriptionText");
@@ -40,16 +41,26 @@ namespace SongsOfConquestAccess.Adapters
         private static readonly FieldInfo FacadeField = AccessTools.Field(typeof(ArtifactMarketMenu), "_adventureFacade");
         private static readonly FieldInfo LocalizationField = AccessTools.Field(typeof(ArtifactMarketMenu), "_localizationHandler");
         private static readonly FieldInfo ArtifactLookupField = AccessTools.Field(typeof(ArtifactMarketMenu), "_artifactLookup");
+        private static readonly FieldInfo NoSelectionContainerField = AccessTools.Field(typeof(ArtifactMarketMenu), "_noSelectionContainer");
+        private static readonly FieldInfo BuyContainerField = AccessTools.Field(typeof(ArtifactMarketMenu), "_buyContainer");
+        private static readonly FieldInfo BuyItemTitleField = AccessTools.Field(typeof(ArtifactMarketMenu), "_buyItemTitle");
+        private static readonly FieldInfo SellContainerField = AccessTools.Field(typeof(ArtifactMarketMenu), "_sellContainer");
+        private static readonly FieldInfo SellItemTitleField = AccessTools.Field(typeof(ArtifactMarketMenu), "_sellItemTitle");
+        private static readonly FieldInfo SellButtonField = AccessTools.Field(typeof(ArtifactMarketMenu), "_sellButton");
+        private static readonly FieldInfo SellButtonTitleField = AccessTools.Field(typeof(ArtifactMarketMenu), "_sellButtonTitle");
+        private static readonly FieldInfo SelectedSellArtifactField = AccessTools.Field(typeof(ArtifactMarketMenu), "_selectedSellArtifact");
         private static readonly FieldInfo InventoryArtifactMapField = AccessTools.Field(typeof(InventoryHUD), "_artifactStateToGOMap");
         private static readonly FieldInfo PurchaseButtonButtonField = AccessTools.Field(typeof(PurchaseButton), "_button");
-        private static readonly FieldInfo HeaderWielderPortraitField = AccessTools.Field(typeof(WielderInteractHeader), "_wielderPortrait");
-        private static readonly FieldInfo HeaderTroopHudField = AccessTools.Field(typeof(WielderInteractHeader), "_troopHUD");
+        private static readonly FieldInfo BackgroundCloseButtonField = AccessTools.Field(typeof(AdventureMenuBackground), "_closeButton");
+        private static readonly FieldInfo MovableButtonField = AccessTools.Field(typeof(InventoryArtifactMovable), "_button");
+        private static readonly FieldInfo MarketEntryButtonField = AccessTools.Field(typeof(ArtifactMarketEntry), "_button");
 
         private readonly ArtifactMarketMenu _menu;
         private readonly InventoryHUD _inventory;
         private readonly IClientAdventureFacade _facade;
         private readonly ILocalizationHandler _localization;
         private readonly IArtifactLookup _artifactLookup;
+        private WielderInteract _wielder;
 
         public ArtifactMarketMenuAdapter(ArtifactMarketMenu menu)
         {
@@ -115,25 +126,46 @@ namespace SongsOfConquestAccess.Adapters
             get { return GetInventoryLabel(); }
         }
 
-        public string CommanderName
+        /// <summary>The band across the top of the menu: the wielder who walked in, their army, and
+        /// the market's own name where it has one. The same band every wielder-interaction menu draws.
+        /// </summary>
+        public WielderInteract Wielder
         {
-            get { return GetCommanderName(CommanderId); }
+            get
+            {
+                WielderInteractHeader header = GetWielderInteractHeader();
+                if (_wielder == null || !ReferenceEquals(_wielder.Header, header))
+                {
+                    _wielder = new WielderInteract(header, _facade, _localization);
+                }
+
+                return _wielder;
+            }
         }
 
-        public Component WielderPortraitTarget
+        /// <summary>The close cross the window itself draws, which the game turns on only where the
+        /// menu may be closed and the player is on mouse and keyboard
+        /// (<c>AdventureMenuBackground.AnimateEntry</c>). The wielder band draws a second cross wired
+        /// to the same handler.</summary>
+        public Component CloseButton
         {
-            get { return GetField<UIImage>(GetWielderInteractHeader(), HeaderWielderPortraitField) as Component; }
+            get { return GetCloseButton() as Component; }
         }
 
-        public TroopHudAdapter Troops
+        public bool IsCloseVisible()
         {
-            get { return new TroopHudAdapter(GetField<TroopHUD>(GetWielderInteractHeader(), HeaderTroopHudField), _facade, _localization); }
+            UIButton button = GetCloseButton();
+            return button != null && button.Active && ((Component)button).gameObject.activeInHierarchy;
         }
 
-        public bool IsArmyVisible()
+        public bool ActivateClose()
         {
-            TroopHUD troopHud = GetField<TroopHUD>(GetWielderInteractHeader(), HeaderTroopHudField);
-            return troopHud != null && ((Component)troopHud).gameObject.activeInHierarchy;
+            return NativeSelectionUtility.Click(GetCloseButton());
+        }
+
+        private UIButton GetCloseButton()
+        {
+            return GetField<UIButton>(_menu, BackgroundCloseButtonField);
         }
 
         public int ActiveCategoryIndex
@@ -152,32 +184,59 @@ namespace SongsOfConquestAccess.Adapters
             return true;
         }
 
+        /// <summary>
+        /// The category filters, in the order the menu draws them. Each is named by the GAME's own
+        /// tooltip on the toggle ("Head", "Main Hand", ... , "Buyback"); the first toggle, which shows
+        /// everything, is the only one the game gives no words at all, so the mod names that one.
+        /// </summary>
         public IReadOnlyList<CategoryItem> GetCategories()
         {
-            return new[]
+            List<CategoryItem> items = new List<CategoryItem>();
+            UIToggle[] toggles = GetCategoryToggles();
+            for (int i = 0; i < toggles.Length; i++)
             {
-                new CategoryItem("artifact-market-category-all", ModText.Get(_localization, ModStrings.Scanner.All), 0),
-                new CategoryItem("artifact-market-category-head", GetInventorySlotName(InventorySlot.Head), 1),
-                new CategoryItem("artifact-market-category-main-hand", GetInventorySlotName(InventorySlot.MainHand), 2),
-                new CategoryItem("artifact-market-category-off-hand", GetInventorySlotName(InventorySlot.OffHand), 3),
-                new CategoryItem("artifact-market-category-hands", GetInventorySlotName(InventorySlot.Hands), 4),
-                new CategoryItem("artifact-market-category-chest", GetInventorySlotName(InventorySlot.Chest), 5),
-                new CategoryItem("artifact-market-category-feet", GetInventorySlotName(InventorySlot.Feet), 6),
-                new CategoryItem("artifact-market-category-trinkets", GetInventorySlotName(InventorySlot.Trinket1), 7),
-                new CategoryItem("artifact-market-category-buyback", ModText.Get(_localization, ModStrings.Screens.Buyback), 8)
-            };
+                UIToggle toggle = toggles[i];
+                string label = FirstLine(Tooltip.ForComponent(toggle, _localization));
+                items.Add(new CategoryItem(
+                    string.IsNullOrWhiteSpace(label) ? ModText.Get(_localization, ModStrings.Scanner.All) : label,
+                    i,
+                    toggle));
+            }
+
+            return items;
         }
 
+        /// <summary>Switch to a category through the game's own toggle group, which is what the menu
+        /// hangs <c>HandleSwitchedCategory</c> on.</summary>
         public bool SelectCategory(int categoryIndex)
         {
             UIToggleGroup group = GetField<UIToggleGroup>(_menu, CategoryTabGroupField);
-            if (group == null || categoryIndex < 0 || categoryIndex > 8)
+            if (group == null || categoryIndex < 0 || categoryIndex >= GetCategoryToggles().Length)
             {
                 return false;
             }
 
             group.SetActiveToggle(categoryIndex);
             return true;
+        }
+
+        /// <summary>Move the game's selection onto a category toggle WITHOUT switching to it: the
+        /// switch rebuilds the grid and clears the selection, so arriving at a filter must not take
+        /// the offers the player is reading away.</summary>
+        public bool FocusCategory(int categoryIndex)
+        {
+            UIToggle[] toggles = GetCategoryToggles();
+            return categoryIndex >= 0
+                && categoryIndex < toggles.Length
+                && NativeSelectionUtility.Select(toggles[categoryIndex].GetSelectable());
+        }
+
+        private UIToggle[] GetCategoryToggles()
+        {
+            UIToggleGroup group = GetField<UIToggleGroup>(_menu, CategoryTabGroupField);
+            return group == null
+                ? new UIToggle[0]
+                : ((Component)group).GetComponentsInChildren<UIToggle>(true);
         }
 
         public IReadOnlyList<MarketArtifactItem> GetMarketArtifacts()
@@ -201,13 +260,10 @@ namespace SongsOfConquestAccess.Adapters
                 }
 
                 items.Add(new MarketArtifactItem(
-                    "artifact-market-offer-" + artifact.Id,
                     GetArtifactName(artifact),
                     GetArtifactBuyCostLabel(artifact),
                     entry,
-                    () => SelectMarketEntryForPurchase(entry),
-                    () => SelectMarketEntryForPurchase(entry),
-                    () => BuildMarketArtifactTooltip(entry)));
+                    Tooltip.ForComponent(entry.GetSelectable(), _localization)));
             }
 
             return items;
@@ -224,6 +280,8 @@ namespace SongsOfConquestAccess.Adapters
             return true;
         }
 
+        /// <summary>The offer's own pointer click, into the button the game hangs <c>OnClicked</c> on,
+        /// which is what fills the Buy band.</summary>
         public bool SelectMarketEntryForPurchase(ArtifactMarketEntry entry)
         {
             if (entry == null || entry.ArtifactState == null)
@@ -231,73 +289,13 @@ namespace SongsOfConquestAccess.Adapters
                 return false;
             }
 
-            SelectMarketEntry(entry);
-            Action<ArtifactMarketEntry> clicked = entry.OnClicked;
-            if (clicked == null)
-            {
-                return false;
-            }
-
-            clicked(entry);
-            return true;
-        }
-
-        public bool BuyMarketArtifact(ArtifactMarketEntry entry)
-        {
-            if (!SelectMarketEntryForPurchase(entry))
-            {
-                return false;
-            }
-
-            return BuySelectedMarketArtifact();
-        }
-
-        public bool BuySelectedMarketArtifact()
-        {
-            if (!HasSelectedBuyArtifact())
-            {
-                return false;
-            }
-
-            PurchaseButton buyButton = GetField<PurchaseButton>(_menu, BuyButtonField);
-            UIButton nativeButton = GetField<UIButton>(buyButton, PurchaseButtonButtonField);
-            return NativeSelectionUtility.Click(nativeButton);
-        }
-
-        public bool HasSelectedBuyArtifact()
-        {
-            return GetSelectedBuyArtifact() != null;
-        }
-
-        public bool CanBuySelectedArtifact()
-        {
-            PurchaseButton buyButton = GetField<PurchaseButton>(_menu, BuyButtonField);
-            return HasSelectedBuyArtifact() && buyButton != null && buyButton.Interactable;
-        }
-
-        public string SelectedBuyButtonLabel
-        {
-            get
-            {
-                return GetBuyActionLabel(GetSelectedBuyArtifact());
-            }
+            return NativeSelectionUtility.Click(GetField<UIButton>(entry, MarketEntryButtonField));
         }
 
         public IReadOnlyList<InventorySlotInfo> GetEquipmentSlots()
         {
             List<InventorySlotInfo> slotsInfo = new List<InventorySlotInfo>();
-            InventorySlot[] slots =
-            {
-                InventorySlot.Head,
-                InventorySlot.Chest,
-                InventorySlot.Hands,
-                InventorySlot.MainHand,
-                InventorySlot.OffHand,
-                InventorySlot.Feet,
-                InventorySlot.Trinket1,
-                InventorySlot.Trinket2,
-                InventorySlot.Trinket3
-            };
+            InventorySlot[] slots = InventorySlotInfo.DrawnEquipmentSlots;
 
             string ownerName = GetCommanderName(CommanderId);
             for (int i = 0; i < slots.Length; i++)
@@ -365,35 +363,393 @@ namespace SongsOfConquestAccess.Adapters
             return slotsInfo;
         }
 
-        public DropResult DropInventoryArtifact(InventorySlotInfo source, InventorySlotInfo target)
+        // ---- the gestures the game gives an artifact in this menu ----
+
+        /// <summary>Put an artifact down on a slot, through the game's own check and its own move.
+        /// </summary>
+        public DropResult DropArtifact(InventoryArtifactMovable movable, InventorySlotInfo target)
         {
-            return ArtifactDropUtility.DropInventoryArtifact(_facade, source, target, "ArtifactMarketMenuAdapter artifact grid drop");
+            return ArtifactDropUtility.DropArtifact(_facade, movable, target, "ArtifactMarketMenuAdapter artifact drop");
         }
 
-        public void HideNativeTooltip()
+        /// <summary>Whether the game would accept this artifact in this slot at this position - the
+        /// same check its own drop makes (<c>CanRearrangeArtifact</c>), asked without doing anything.
+        /// </summary>
+        public bool CanRearrangeArtifactTo(InventoryArtifactMovable movable, InventorySlotInfo target)
         {
-            NativeTooltipUtility.HideTooltip();
-        }
-
-        private Tooltip BuildMarketArtifactTooltip(ArtifactMarketEntry entry)
-        {
-            Tooltip tooltip = Tooltip.ForComponent(entry != null ? entry.GetSelectable() as Component : null, _localization);
-            if (tooltip == null || entry == null || entry.ArtifactState == null)
+            InventoryHUDSlot nativeSlot = target != null ? target.NativeSlot : null;
+            if (_facade == null || movable == null || movable.State == null || nativeSlot == null)
             {
-                return tooltip;
+                return false;
             }
 
-            return new Tooltip(
-                () => tooltip.TextLines,
-                tooltip.VisualMetadata,
-                new[]
-                {
-                    new TooltipAction(
-                        GetBuyActionLabel(entry.ArtifactState),
-                        () => BuyMarketArtifact(entry))
-                });
+            try
+            {
+                return _facade.Commands.CanRearrangeArtifact(movable.State.Id, nativeSlot.Slot, target.PositionIndex).success;
+            }
+            catch (Exception ex)
+            {
+                SocAccessMod.Instance?.LogWarning("ArtifactMarketMenuAdapter could not ask whether an artifact fits: " + ex.Message);
+                return false;
+            }
         }
 
+        /// <summary>The game's own notification for a rearrangement its Command skill blocks - what it
+        /// shows itself when the drop is refused with error code 10.</summary>
+        public string RearrangeRefusalText
+        {
+            get { return GetLocalizedText("Common/CommanderInventory/RearrangeArtifact/CannotRearrangeBecauseOfCommand", string.Empty); }
+        }
+
+        /// <summary>The artifact's LEFT click, through the button the game hangs its own handler on.
+        /// In this menu the game answers it by SELECTING THE ARTIFACT FOR SALE
+        /// (<c>ArtifactMarketMenu.HandleInventoryArtifactClicked</c>), and with Ctrl physically held it
+        /// drops the artifact on the ground first.</summary>
+        public bool LeftClickArtifact(InventorySlotInfo slot)
+        {
+            return NativeSelectionUtility.Click(GetMovableButton(slot));
+        }
+
+        /// <summary>The artifact's RIGHT click, through the same button: equip, unequip or use, and
+        /// with Ctrl physically held the game SELLS it here rather than destroying it
+        /// (<c>InventoryArtifactMovable.HandleRightClick</c> branches on
+        /// <c>InventoryHUD.IsArtifactShopInventory</c>).</summary>
+        public bool RightClickArtifact(InventorySlotInfo slot)
+        {
+            return NativeSelectionUtility.RightClick(GetMovableButton(slot));
+        }
+
+        /// <summary>What a right click on this artifact does, as the GAME decides it in
+        /// <c>InventoryArtifactMovable.GetDetails</c>: an artifact whose definition carries an action
+        /// is used, and every other one is equipped or unequipped by where it currently is.</summary>
+        public ArtifactDetails.EquipInstruction GetArtifactInstruction(InventorySlotInfo slot)
+        {
+            InventoryArtifactMovable movable = slot != null ? slot.Movable : null;
+            IArtifactState artifact = movable != null ? movable.State : null;
+            if (artifact == null)
+            {
+                return ArtifactDetails.EquipInstruction.None;
+            }
+
+            IArtifactDataDefinition definition = _artifactLookup != null ? _artifactLookup.GetDefinition(artifact.Type) : null;
+            if (definition != null && definition.Action != null)
+            {
+                return ArtifactDetails.EquipInstruction.Use;
+            }
+
+            return artifact.IsEquipped
+                ? ArtifactDetails.EquipInstruction.Unequip
+                : ArtifactDetails.EquipInstruction.Equip;
+        }
+
+        /// <summary>Whether the artifact in the main hand takes BOTH hands - the definition's own slot
+        /// (<c>IArtifactLookup.GetSlot</c>), which is what makes the game draw a ghost of it in the off
+        /// hand.</summary>
+        public bool IsMainHandTwoHanded()
+        {
+            IArtifactState artifact = GetDisplayArtifactForEquipmentSlot(InventorySlot.MainHand);
+            return artifact != null && _artifactLookup != null && _artifactLookup.GetSlot(artifact.Type) == ArtifactSlot.BothHands;
+        }
+
+        /// <summary>Whether an artifact fits the off hand ALONE - the one case the game's own
+        /// right-click resolution (<c>InventoryHUD.GetSlot(ArtifactSlot)</c>) sends to the off hand
+        /// rather than the main one.</summary>
+        public bool IsOffHandOnlyArtifact(InventoryArtifactMovable movable)
+        {
+            return movable != null
+                && movable.State != null
+                && _artifactLookup != null
+                && _artifactLookup.GetSlot(movable.State.Type) == ArtifactSlot.OffHand;
+        }
+
+        /// <summary>The game's own name for the two-handed slot ("Both Hands").</summary>
+        public string BothHandsSlotName
+        {
+            get { return GetInventorySlotName(ArtifactSlot.BothHands.ToString()); }
+        }
+
+        /// <summary>The game's own text for the auto-arrange instruction, as it draws it in an
+        /// artifact's tooltip.</summary>
+        public string AutoArrangeText
+        {
+            get { return GetLocalizedText("Adventure/TooltipInstruction/AutoArrange", string.Empty); }
+        }
+
+        /// <summary>Auto-arrange, the game's own middle click (<c>InventoryHUD.AutoArrangeArtifacts</c>).
+        /// Its second half only remembers which cell to re-select afterwards and needs an artifact to
+        /// remember, so with nothing in the inventory the command it runs is called on its own.</summary>
+        public bool AutoArrangeArtifacts()
+        {
+            if (_inventory == null)
+            {
+                return false;
+            }
+
+            InventoryArtifactMovable anyArtifact = FirstArtifactMovable();
+            if (anyArtifact != null)
+            {
+                _inventory.AutoArrangeArtifacts(anyArtifact);
+                return true;
+            }
+
+            if (_facade == null || CommanderId < 0)
+            {
+                return false;
+            }
+
+            _facade.Commands.EquipBestArtifacts(CommanderId);
+            return true;
+        }
+
+        // ---- the selection band at the foot of the menu ----
+
+        /// <summary>Whether the band is showing its prompt, which is what it shows while nothing is
+        /// selected.</summary>
+        public bool IsNoSelectionShown
+        {
+            get { return IsActive(GetField<GameObject>(_menu, NoSelectionContainerField)); }
+        }
+
+        /// <summary>The prompt the band draws while nothing is selected.</summary>
+        public string NoSelectionText
+        {
+            get { return FirstText(GetField<GameObject>(_menu, NoSelectionContainerField)); }
+        }
+
+        /// <summary>Whichever of the band's three containers the game is drawing, so a cursor standing
+        /// on the band belongs to the thing that is really there.</summary>
+        public Component SelectionBandContainer
+        {
+            get
+            {
+                if (IsBuyShown)
+                {
+                    return ContainerTransform(GetField<GameObject>(_menu, BuyContainerField));
+                }
+
+                if (IsSellShown)
+                {
+                    return ContainerTransform(GetField<GameObject>(_menu, SellContainerField));
+                }
+
+                return ContainerTransform(GetField<GameObject>(_menu, NoSelectionContainerField));
+            }
+        }
+
+        /// <summary>Whether the band is showing the artifact the player is buying.</summary>
+        public bool IsBuyShown
+        {
+            get { return IsActive(GetField<GameObject>(_menu, BuyContainerField)); }
+        }
+
+        /// <summary>The name of the artifact the Buy band is about, as the band draws it.</summary>
+        public string BuyItemName
+        {
+            get { return GetText(GetField<UITextMesh>(_menu, BuyItemTitleField)); }
+        }
+
+        /// <summary>The word on the Buy button, as the band draws it above it.</summary>
+        public string BuyButtonLabel
+        {
+            get
+            {
+                string title = GetBandButtonTitle(
+                    GetField<GameObject>(_menu, BuyContainerField),
+                    GetField<UITextMesh>(_menu, BuyItemTitleField),
+                    GetField<PurchaseButton>(_menu, BuyButtonField));
+                return string.IsNullOrWhiteSpace(title) ? ModText.Get(_localization, ModStrings.Screens.BuyArtifact) : title;
+            }
+        }
+
+        /// <summary>What the Buy button charges - the same cost it draws in its own price box.
+        /// </summary>
+        public string BuyPriceLabel
+        {
+            get { return GetArtifactBuyCostLabel(GetSelectedBuyArtifact()); }
+        }
+
+        /// <summary>The Buy button itself, for the focus visual and the node's identity.</summary>
+        public Component BuyButton
+        {
+            get { return GetField<PurchaseButton>(_menu, BuyButtonField) as Component; }
+        }
+
+        /// <summary>Whether the game will take the purchase: it turns the button off when the team
+        /// cannot afford the price, and says nothing about why.</summary>
+        public bool CanBuySelectedArtifact()
+        {
+            PurchaseButton buyButton = GetField<PurchaseButton>(_menu, BuyButtonField);
+            return GetSelectedBuyArtifact() != null && buyButton != null && buyButton.Interactable;
+        }
+
+        /// <summary>Buy, through the game's own click on its Buy button.</summary>
+        public bool BuySelectedMarketArtifact()
+        {
+            PurchaseButton buyButton = GetField<PurchaseButton>(_menu, BuyButtonField);
+            return NativeSelectionUtility.Click(GetField<UIButton>(buyButton, PurchaseButtonButtonField));
+        }
+
+        /// <summary>Whether the band is showing the artifact the player has picked out to sell.
+        /// </summary>
+        public bool IsSellShown
+        {
+            get { return IsActive(GetField<GameObject>(_menu, SellContainerField)); }
+        }
+
+        /// <summary>The name of the artifact the Sell band is about, as the band draws it.</summary>
+        public string SellItemName
+        {
+            get { return GetText(GetField<UITextMesh>(_menu, SellItemTitleField)); }
+        }
+
+        /// <summary>Whether the Sell button is drawn at all: the game hides it for an artifact it
+        /// treats as important (<c>ArtifactMarketMenu.SetArtifact</c>).</summary>
+        public bool IsSellButtonShown
+        {
+            get { return IsActive(ButtonObject(GetField<PurchaseButton>(_menu, SellButtonField))); }
+        }
+
+        /// <summary>The word on the Sell button, as the band draws it above it.</summary>
+        public string SellButtonLabel
+        {
+            get
+            {
+                string title = GetText(GetField<UITextMesh>(_menu, SellButtonTitleField));
+                return string.IsNullOrWhiteSpace(title) ? ModText.Get(_localization, ModStrings.Screens.Sell) : title;
+            }
+        }
+
+        /// <summary>What the Sell button pays - the same value it draws in its own price box.</summary>
+        public string SellPriceLabel
+        {
+            get
+            {
+                IArtifactState artifact = GetField<IArtifactState>(_menu, SelectedSellArtifactField);
+                if (artifact == null || _facade == null || _facade.Artifacts == null)
+                {
+                    return string.Empty;
+                }
+
+                return FormatCost(_facade.Artifacts.GetArtifactMarketSellValue(artifact.Type));
+            }
+        }
+
+        /// <summary>The Sell button itself, for the focus visual and the node's identity.</summary>
+        public Component SellButton
+        {
+            get { return GetField<PurchaseButton>(_menu, SellButtonField) as Component; }
+        }
+
+        public bool CanSellSelectedArtifact()
+        {
+            PurchaseButton sellButton = GetField<PurchaseButton>(_menu, SellButtonField);
+            return sellButton != null && sellButton.Interactable;
+        }
+
+        /// <summary>Sell, through the game's own click on its Sell button.</summary>
+        public bool SellSelectedArtifact()
+        {
+            PurchaseButton sellButton = GetField<PurchaseButton>(_menu, SellButtonField);
+            return NativeSelectionUtility.Click(GetField<UIButton>(sellButton, PurchaseButtonButtonField));
+        }
+
+        /// <summary>The one text a selection band draws that is neither the artifact's name nor a
+        /// price inside the button: the word over the button ("Buy", "Sell").</summary>
+        private string GetBandButtonTitle(GameObject container, UITextMesh itemTitle, PurchaseButton button)
+        {
+            if (container == null)
+            {
+                return string.Empty;
+            }
+
+            Transform buttonRoot = button != null ? ((Component)button).transform : null;
+            UITextMesh[] texts = container.GetComponentsInChildren<UITextMesh>(true);
+            for (int i = 0; i < texts.Length; i++)
+            {
+                UITextMesh text = texts[i];
+                if (text == null || ReferenceEquals(text, itemTitle))
+                {
+                    continue;
+                }
+
+                if (buttonRoot != null && ((Component)text).transform.IsChildOf(buttonRoot))
+                {
+                    continue;
+                }
+
+                return GetText(text);
+            }
+
+            return string.Empty;
+        }
+
+        private static Component ContainerTransform(GameObject container)
+        {
+            return container == null ? null : container.transform;
+        }
+
+        private static GameObject ButtonObject(PurchaseButton button)
+        {
+            return button == null ? null : ((Component)button).gameObject;
+        }
+
+        private static bool IsActive(GameObject gameObject)
+        {
+            return gameObject != null && gameObject.activeInHierarchy;
+        }
+
+        private static string FirstText(GameObject container)
+        {
+            UITextMesh text = container == null ? null : container.GetComponentInChildren<UITextMesh>(true);
+            return GetText(text);
+        }
+
+        private static string FirstLine(Tooltip tooltip)
+        {
+            IReadOnlyList<string> lines = tooltip == null ? null : tooltip.TextLines;
+            return lines != null && lines.Count > 0 ? lines[0] : string.Empty;
+        }
+
+        private static IUIButton GetMovableButton(InventorySlotInfo slot)
+        {
+            InventoryArtifactMovable movable = slot != null ? slot.Movable : null;
+            return movable != null && MovableButtonField != null
+                ? MovableButtonField.GetValue(movable) as IUIButton
+                : null;
+        }
+
+        private InventoryArtifactMovable FirstArtifactMovable()
+        {
+            IDictionary artifactMap = InventoryArtifactMapField != null && _inventory != null
+                ? InventoryArtifactMapField.GetValue(_inventory) as IDictionary
+                : null;
+            if (artifactMap == null)
+            {
+                return null;
+            }
+
+            foreach (object movable in artifactMap.Values)
+            {
+                InventoryArtifactMovable artifactMovable = movable as InventoryArtifactMovable;
+                if (artifactMovable != null)
+                {
+                    return artifactMovable;
+                }
+            }
+
+            return null;
+        }
+
+        /// <summary>
+        /// An artifact's own tooltip, without the lines that tell a MOUSE what to press.
+        ///
+        /// <c>ArtifactDetails</c> ends its tooltip with a row per gesture ("&lt;rmb&gt; Equip",
+        /// "&lt;hl&gt;CTRL&lt;/hl&gt; + &lt;rmb&gt; Sell", the drop and the auto-arrange), and the
+        /// keyboard gets those same gestures as usage hints on the slot itself, so the rows would be
+        /// said twice. They are removed by the localized text the game DREW them from rather than by
+        /// English, so a row this mod does not know about is left where it is and the player still
+        /// hears that something may be available.
+        /// </summary>
         private Tooltip BuildInventoryArtifactTooltip(IArtifactState artifact, InventoryArtifactMovable movable, Selectable selectable)
         {
             Tooltip tooltip = Tooltip.ForComponent(selectable as Component, _localization);
@@ -402,40 +758,17 @@ namespace SongsOfConquestAccess.Adapters
                 return tooltip;
             }
 
-            List<TooltipAction> actions = new List<TooltipAction>();
             List<string> instructionLines = new List<string>();
-
-            string equipInstructionKey = artifact.IsEquipped
-                ? "Adventure/TooltipInstruction/Unequip"
-                : "Adventure/TooltipInstruction/Equip";
-            AddLocalizedLine(instructionLines, equipInstructionKey);
-            actions.Add(new TooltipAction(
-                GetLocalizedText(equipInstructionKey, artifact.IsEquipped ? "Unequip" : "Equip"),
-                () => InvokeArtifactAction(movable, _inventory.EquipArtifact)));
-
-            if (artifact.IsImportant)
-            {
-                return new Tooltip(() => RemoveExactLines(tooltip.TextLines, instructionLines), tooltip.VisualMetadata, actions);
-            }
-
+            AddLocalizedLine(instructionLines, "Adventure/TooltipInstruction/Equip");
+            AddLocalizedLine(instructionLines, "Adventure/TooltipInstruction/Unequip");
             AddLocalizedLine(instructionLines, "Adventure/TooltipInstruction/Sell");
-            actions.Add(new TooltipAction(
-                ModText.Get(_localization, ModStrings.Screens.Sell),
-                () => InvokeArtifactAction(movable, _inventory.SellArtifact)));
-
+            AddLocalizedLine(instructionLines, "Adventure/TooltipInstruction/Destroy");
+            AddLocalizedLine(instructionLines, "Adventure/TooltipInstruction/Destroy.Gamepad");
             AddLocalizedLine(instructionLines, "Adventure/TooltipInstruction/Drop");
             AddLocalizedLine(instructionLines, "Adventure/TooltipInstruction/Drop.Gamepad");
-            actions.Add(new TooltipAction(
-                GetLocalizedText("Adventure/TooltipInstruction/Drop.Gamepad", "Drop"),
-                () => InvokeArtifactAction(movable, _inventory.DropArtifact)));
-
             AddLocalizedLine(instructionLines, "Adventure/TooltipInstruction/AutoArrange");
             AddLocalizedLine(instructionLines, "Adventure/TooltipInstruction/AutoArrange.Gamepad");
-            actions.Add(new TooltipAction(
-                GetLocalizedText("Adventure/TooltipInstruction/AutoArrange.Gamepad", "Auto Arrange"),
-                () => InvokeArtifactAction(movable, _inventory.AutoArrangeArtifacts)));
-
-            return new Tooltip(() => RemoveExactLines(tooltip.TextLines, instructionLines), tooltip.VisualMetadata, actions);
+            return new Tooltip(() => RemoveExactLines(tooltip.TextLines, instructionLines), tooltip.VisualMetadata);
         }
 
         private void SelectInventoryCell(InventoryHUDSlot nativeSlot, InventoryArtifactMovable movable, int positionIndex)
@@ -482,13 +815,6 @@ namespace SongsOfConquestAccess.Adapters
             }
 
             return _facade.Artifacts.GetForOwner(CommanderId, slot).FirstOrDefault();
-        }
-
-        private string GetBuyActionLabel(IArtifactState artifact)
-        {
-            return MenuButtonTextUtility.JoinParts(
-                ModText.Get(_localization, ModStrings.Screens.BuyArtifact),
-                GetArtifactBuyCostLabel(artifact));
         }
 
         private string GetArtifactBuyCostLabel(IArtifactState artifact)
@@ -608,6 +934,12 @@ namespace SongsOfConquestAccess.Adapters
                 : SpeechTextSanitizer.Normalize(text);
         }
 
+        private string GetInventorySlotName(string slotName)
+        {
+            string text = _localization != null ? _localization.GetText("InventorySlots/" + slotName) : string.Empty;
+            return string.IsNullOrWhiteSpace(text) ? slotName : SpeechTextSanitizer.Normalize(text);
+        }
+
         private string GetInventoryLabel()
         {
             return GetLocalizedText("Common/CommanderInventory/Inventory", "Inventory");
@@ -725,45 +1057,42 @@ namespace SongsOfConquestAccess.Adapters
 
         public sealed class CategoryItem
         {
-            public CategoryItem(string id, string label, int index)
+            public CategoryItem(string label, int index, Component toggle)
             {
-                Id = id ?? string.Empty;
                 Label = label ?? string.Empty;
                 Index = index;
+                Toggle = toggle;
             }
 
-            public string Id { get; private set; }
             public string Label { get; private set; }
             public int Index { get; private set; }
+
+            /// <summary>The toggle the menu draws for this category.</summary>
+            public Component Toggle { get; private set; }
         }
 
         public sealed class MarketArtifactItem
         {
             public MarketArtifactItem(
-                string id,
                 string label,
                 string costLabel,
                 ArtifactMarketEntry entry,
-                Action onFocus,
-                Func<bool> activate,
-                Func<Tooltip> getTooltip)
+                Tooltip tooltip)
             {
-                Id = id ?? string.Empty;
                 Label = label ?? string.Empty;
                 CostLabel = costLabel ?? string.Empty;
                 Entry = entry;
-                OnFocus = onFocus;
-                Activate = activate;
-                GetTooltip = getTooltip;
+                Tooltip = tooltip;
             }
 
-            public string Id { get; private set; }
+            /// <summary>The artifact's name, with the word for its rarity colour behind it.</summary>
             public string Label { get; private set; }
+
+            /// <summary>What the market asks for it.</summary>
             public string CostLabel { get; private set; }
+
             public ArtifactMarketEntry Entry { get; private set; }
-            public Action OnFocus { get; private set; }
-            public Func<bool> Activate { get; private set; }
-            public Func<Tooltip> GetTooltip { get; private set; }
+            public Tooltip Tooltip { get; private set; }
         }
     }
 }

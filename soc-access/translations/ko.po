@@ -755,6 +755,16 @@ msgctxt "Screens.ArtifactEquipHint"
 msgid "{0} equips."
 msgstr "{0} 키로 장착."
 
+#. Screens.ArtifactSelectForSaleHint
+msgctxt "Screens.ArtifactSelectForSaleHint"
+msgid "{0} selects for sale."
+msgstr "{0} 키로 판매 대상 선택."
+
+#. Screens.ArtifactSellHint
+msgctxt "Screens.ArtifactSellHint"
+msgid "{0} sells."
+msgstr "{0} 키로 판매."
+
 #. Screens.ArtifactUnequipHint
 msgctxt "Screens.ArtifactUnequipHint"
 msgid "{0} unequips."
@@ -3210,11 +3220,6 @@ msgstr "도달 가능: 없음"
 msgctxt "Screens.BuyArtifact"
 msgid "Buy"
 msgstr "구매"
-
-#. Screens.Buyback
-msgctxt "Screens.Buyback"
-msgid "Buyback"
-msgstr "재구매"
 
 #. Actions.DescribePosition
 msgctxt "Actions.DescribePosition"

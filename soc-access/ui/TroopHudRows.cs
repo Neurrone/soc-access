@@ -161,9 +161,10 @@ namespace SongsOfConquestAccess.UI
             return slot.IsUnlocked && slot.IsOccupied ? slot : null;
         }
 
-        /// <summary>The wielder the band is about: their name, with the stats the game draws on their
-        /// portrait behind it in the buffer. Focusing it selects the portrait, which is what makes the
-        /// game draw those stats.</summary>
+        /// <summary>The wielder the band is about: their name, then the banner naming the place they
+        /// walked into where the band draws one, with the stats the game draws on their portrait behind
+        /// both in the buffer. Focusing it selects the portrait, which is what makes the game draw
+        /// those stats.</summary>
         private static void AddPortrait(GraphBuilder builder, string keyPrefix, WielderInteract wielder)
         {
             Component portrait = wielder.Portrait;
@@ -173,6 +174,9 @@ namespace SongsOfConquestAccess.UI
             }
 
             NodeVtable vtable = GraphNodes.Text(() => wielder.WielderName, null, wielder.PortraitTooltip);
+            // The banner the band draws over the portrait when the place the wielder walked into has a
+            // name of its own; watched, since the game writes it as the band is set up.
+            vtable.Announcements.Add(GraphNodes.ValuePart(() => wielder.CustomName));
             vtable.OnFocusVisual = () => wielder.FocusPortrait();
             builder.AddItem(new DrawnNode(
                 ControlId.For(portrait, keyPrefix + "/portrait"),

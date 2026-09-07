@@ -23,6 +23,8 @@ namespace SongsOfConquestAccess.Adapters
         private static readonly FieldInfo TroopHudField = AccessTools.Field(typeof(WielderInteractHeader), "_troopHUD");
         private static readonly FieldInfo PortraitField = AccessTools.Field(typeof(WielderInteractHeader), "_wielderPortrait");
         private static readonly FieldInfo CloseButtonField = AccessTools.Field(typeof(WielderInteractHeader), "_closeButton");
+        private static readonly FieldInfo CustomNameContainerField = AccessTools.Field(typeof(WielderInteractHeader), "_customNameContainer");
+        private static readonly FieldInfo CustomNameTextField = AccessTools.Field(typeof(WielderInteractHeader), "_customNameText");
 
         private readonly WielderInteractHeader _header;
         private readonly IClientAdventureFacade _facade;
@@ -37,6 +39,13 @@ namespace SongsOfConquestAccess.Adapters
             _header = header;
             _facade = facade;
             _localization = localization;
+        }
+
+        /// <summary>The band this reads, so a screen holding one of these can tell whether the menu
+        /// has swapped its header out from under it.</summary>
+        public WielderInteractHeader Header
+        {
+            get { return _header; }
         }
 
         /// <summary>Whether the band is drawn at all: a menu that shows no wielder has none.</summary>
@@ -58,6 +67,24 @@ namespace SongsOfConquestAccess.Adapters
             {
                 TroopHudAdapter troops = Troops;
                 return troops == null ? string.Empty : troops.OwnerName;
+            }
+        }
+
+        /// <summary>The name of the PLACE the wielder walked into, which the band draws on a banner
+        /// over the portrait where the entity has one of its own (a town's or a market's custom name),
+        /// and nothing at all where it has not (<c>WielderInteractHeader.ForceCustomName</c>).
+        /// </summary>
+        public string CustomName
+        {
+            get
+            {
+                GameObject container = GetField<GameObject>(CustomNameContainerField);
+                if (container == null || !container.activeInHierarchy)
+                {
+                    return string.Empty;
+                }
+
+                return UITextMeshTextUtility.GetEffectiveText(GetField<UITextMesh>(CustomNameTextField));
             }
         }
 
@@ -119,6 +146,11 @@ namespace SongsOfConquestAccess.Adapters
         public bool FocusPortrait()
         {
             return NativeSelectionUtility.Select(Portrait);
+        }
+
+        private T GetField<T>(FieldInfo field) where T : class
+        {
+            return _header != null && field != null ? field.GetValue(_header) as T : null;
         }
 
         private TroopHUD GetTroopHud()

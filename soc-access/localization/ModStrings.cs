@@ -552,6 +552,8 @@ namespace SongsOfConquestAccess.Localization
             public static readonly ModString ArtifactDestroyHint = new ModString("Screens.ArtifactDestroyHint", "{0} destroys.");
             public static readonly ModString ArtifactDropHint = new ModString("Screens.ArtifactDropHint", "{0} drops on the ground.");
             public static readonly ModString ArtifactEquipHint = new ModString("Screens.ArtifactEquipHint", "{0} equips.");
+            public static readonly ModString ArtifactSelectForSaleHint = new ModString("Screens.ArtifactSelectForSaleHint", "{0} selects for sale.");
+            public static readonly ModString ArtifactSellHint = new ModString("Screens.ArtifactSellHint", "{0} sells.");
             public static readonly ModString ArtifactUnequipHint = new ModString("Screens.ArtifactUnequipHint", "{0} unequips.");
             public static readonly ModString ArtifactUseHint = new ModString("Screens.ArtifactUseHint", "{0} uses.");
             public static readonly ModString AiControl = new ModString("Screens.AiControl", "AI control");
@@ -567,7 +569,6 @@ namespace SongsOfConquestAccess.Localization
             public static readonly ModString Battle = new ModString("Screens.Battle", "Battle");
             public static readonly ModString BuyResourceForGold = new ModString("Screens.BuyResourceForGold", "Buy {0} for {1}");
             public static readonly ModString BuyArtifact = new ModString("Screens.BuyArtifact", "Buy");
-            public static readonly ModString Buyback = new ModString("Screens.Buyback", "Buyback");
             public static readonly ModString Categories = new ModString("Screens.Categories", "Categories");
             public static readonly ModString Chat = new ModString("Screens.Chat", "Chat");
             public static readonly ModString ChatInput = new ModString("Screens.ChatInput", "Message");

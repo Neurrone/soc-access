@@ -1,31 +1,68 @@
 using System;
 using System.Collections.Generic;
 using SongsOfConquest.Client.Adventure.Menu;
-using SongsOfConquest.Client.Gamestate.Facade;
-using SongsOfConquest.Client.Gamestate;
-using SongsOfConquest.Common.Gamestate.Facade;
+using SongsOfConquest.Common.Details;
 using SongsOfConquestAccess.Adapters;
 using SongsOfConquestAccess.Input;
 using SongsOfConquestAccess.Localization;
 using SongsOfConquestAccess.UI;
+using SongsOfConquestAccess.UI.Graph;
 using UnityEngine;
 
 namespace SongsOfConquestAccess.Screens
 {
-    public sealed class ArtifactMarketScreen : Screen
+    /// <summary>
+    /// The artifact merchant a wielder walks into. Five places to be, in the order the menu draws
+    /// them: the wielder band across the top, the market itself, the wielder's equipment, their
+    /// backpack, and the close cross.
+    ///
+    /// THE MARKET stop is the drawn left half: the merchant's description, the nine category filters
+    /// as ONE radio row named by the game's own tooltips on the toggles (never choosing on arrival -
+    /// switching category throws the offers away and clears the selection), the offers the grid
+    /// really holds (the game pads the grid to 24 empty cells, which are not content), and then the
+    /// SELECTION BAND at the foot, which is one line and one button whose parts are all watched live.
+    /// The band's two nodes are keyed structurally and gated on whichever of the game's three
+    /// containers is painted, so a cursor standing on the band stays there and hears it turn from the
+    /// prompt into Buy and from Buy into Sell.
+    ///
+    /// THE CLICKS MEAN SOMETHING ELSE HERE than they do on the wielder sheet, and the difference is
+    /// the game's, not the mod's - the same two native handlers branch on
+    /// <c>InventoryHUD.IsArtifactShopInventory</c>. Enter is the artifact's left click, which in this
+    /// menu SELECTS IT FOR SALE and fills the Sell band
+    /// (<c>ArtifactMarketMenu.HandleInventoryArtifactClicked</c>); Ctrl and the right click SELL it
+    /// rather than destroying it (<c>InventoryArtifactMovable.HandleRightClick</c>). The plain right
+    /// click still equips, unequips or uses, and Ctrl and the left click still drop on the ground. An
+    /// artifact the game treats as important has no Sell button drawn for it at all, which is its
+    /// rule and not something the mod says anything extra about; likewise an unaffordable purchase is
+    /// simply "unavailable", because the game itself is silent about why.
+    ///
+    /// The wielder band and the two artifact stops come from the shared contributors
+    /// (<c>ui/TroopHudRows.cs</c> and <c>ui/ArtifactSlotNodes.cs</c>): the rows are identical to the
+    /// sheet's, only the hints differ.
+    ///
+    /// Escape is the game's (<c>ConsumesBack</c> false): the menu IS an <c>AdventureMenuBackground</c>
+    /// with a close cross, and <c>AnimateEntry</c> registers <c>UI.ExitMenu</c> on its own close
+    /// outside any gamepad branch (measured 2026-09-07 in the decompiled source). The navigator claims
+    /// the key only while something is being carried.
+    /// </summary>
+    public sealed class ArtifactMarketScreen : GraphScreen
     {
-        private const string CategoriesMenuId = "artifact-market-categories";
-        private const string OffersMenuId = "artifact-market-offers";
-        private const string InventoryGridId = "artifact-market-inventory-grid";
-        private const string WielderArmyMenuId = "artifact-market-wielder-army";
+        private const string WielderStop = "artifact-market-wielder";
+        private const string MarketStop = "artifact-market";
+        private const string EquipmentStop = "artifact-market-equipment";
+        private const string InventoryStop = "artifact-market-inventory";
+        private const string CloseStop = "artifact-market-close";
+        private const string KeyPrefix = "artifact-market";
+        private const string WielderKey = "artifact-market:wielder";
 
         private readonly ArtifactMarketMenuAdapter _adapter;
-        private Action<int, bool> _artifactChangedHandler;
-        private Action<ArtifactMarketUpdatedPayoad> _artifactMarketUpdatedHandler;
-        private Action<OnTroopsUpdatedPayload> _troopsUpdatedHandler;
+
+        // A subject of its own per synthesized node, kept across rebuilds so the reconciler seats the
+        // cursor on the same one: the description and the auto-arrange button are not drawn as
+        // controls of their own.
+        private readonly Dictionary<string, object> _markers = new Dictionary<string, object>();
 
         public ArtifactMarketScreen(ArtifactMarketMenuAdapter adapter)
-            : base(BuildRoot(adapter))
         {
             _adapter = adapter;
         }
@@ -45,346 +82,312 @@ namespace SongsOfConquestAccess.Screens
             return null;
         }
 
+        public override string Key
+        {
+            get { return "artifact-market"; }
+        }
+
+        /// <summary>The merchant, by the title the menu draws over it ("Raider's Market").</summary>
+        public override string ScreenName
+        {
+            get { return _adapter == null ? null : _adapter.Title; }
+        }
+
         public override bool IsPresent()
         {
             return _adapter != null && _adapter.IsPresent();
         }
 
-        public override void OnPush()
-        {
-            AttachListeners();
-        }
-
-        public override void OnUnfocus()
-        {
-            _adapter?.HideNativeTooltip();
-            RootWidget?.Unfocus();
-        }
-
-        public override void OnPop()
-        {
-            DetachListeners();
-            _adapter?.HideNativeTooltip();
-        }
-
-        public override bool OnActionJustPressed(InputAction action)
-        {
-            if (action != null && action.Key == AccessibilityActions.Cancel.Key)
-            {
-                if (RootWidget != null && RootWidget.HandleAction(action))
-                {
-                    return true;
-                }
-
-                return _adapter != null && _adapter.Close();
-            }
-
-            return base.OnActionJustPressed(action);
-        }
-
+        /// <summary>Kept for the detector, which calls it whenever the stock, an artifact or the army
+        /// changes. The graph is declared afresh on every operation, so there is nothing to rebuild.
+        /// </summary>
         public void Refresh()
+        {
+        }
+
+        public override void Build(GraphBuilder builder)
         {
             if (!IsPresent())
             {
                 return;
             }
 
-            int focusedIndex = RootWidget != null ? RootWidget.FocusedIndex : -1;
-            int categoryFocusedIndex = GetFocusedMenuIndex(CategoriesMenuId);
-            int offerFocusedIndex = GetFocusedMenuIndex(OffersMenuId);
-            int armyFocusedIndex = GetFocusedMenuIndex(WielderArmyMenuId);
-            InventoryGridWidget.FocusState inventoryFocus = CaptureInventoryGridFocus();
-            RootWidget = BuildRoot(_adapter);
-            RestoreMenuFocus(CategoriesMenuId, categoryFocusedIndex);
-            RestoreMenuFocus(OffersMenuId, offerFocusedIndex);
-            RestoreMenuFocus(WielderArmyMenuId, armyFocusedIndex);
-            RestoreInventoryGridFocus(inventoryFocus);
-            RootWidget?.SetFocusByIndexSilently(focusedIndex);
+            ArtifactSlotNodes.RegisterSounds();
+
+            TroopHudRows.WielderStop(builder, WielderStop, WielderKey, _adapter.Wielder);
+
+            builder.BeginStop(MarketStop);
+            BuildDescription(builder);
+            BuildCategories(builder);
+            BuildOffers(builder);
+            BuildSelectionBand(builder);
+
+            builder.BeginStop(EquipmentStop);
+            ArtifactSlotNodes.Equipment(builder, _adapter, KeyPrefix, AddSlotHints);
+
+            builder.BeginStop(InventoryStop);
+            ArtifactSlotNodes.Inventory(builder, _adapter, KeyPrefix, AddSlotHints, Marker("auto-arrange"));
+
+            builder.BeginStop(CloseStop);
+            BuildClose(builder);
         }
 
-        private void AttachListeners()
+        /// <summary>The game's Ctrl+digit quick splits, on the band's troop rows.</summary>
+        public override bool ClaimsAction(string actionKey)
         {
-            if (_adapter == null || _adapter.Facade == null || _adapter.Facade.Commands == null)
+            return TroopHudRows.ClaimsAction(actionKey, Navigator, Troops, WielderKey);
+        }
+
+        public override bool OnAction(string actionKey)
+        {
+            return TroopHudRows.OnAction(actionKey, Navigator, Troops, WielderKey);
+        }
+
+        private TroopHudAdapter Troops
+        {
+            get { return _adapter == null || _adapter.Wielder == null ? null : _adapter.Wielder.Troops; }
+        }
+
+        // ---- the market ----
+
+        /// <summary>What the merchant says about itself, as one node of its paragraphs.</summary>
+        private void BuildDescription(GraphBuilder builder)
+        {
+            string description = _adapter.Description;
+            if (string.IsNullOrWhiteSpace(description))
             {
                 return;
             }
 
-            IClientCommandsFacade commands = _adapter.Facade.Commands;
-            _artifactChangedHandler = HandleArtifactChanged;
-            _artifactMarketUpdatedHandler = HandleArtifactMarketUpdated;
-            _troopsUpdatedHandler = HandleTroopsUpdated;
-            commands.OnArtifactChanged = (Action<int, bool>)Delegate.Combine(commands.OnArtifactChanged, _artifactChangedHandler);
-            commands.OnArtifactMarketUpdated = (Action<ArtifactMarketUpdatedPayoad>)Delegate.Combine(commands.OnArtifactMarketUpdated, _artifactMarketUpdatedHandler);
-            commands.OnTroopsUpdated = (Action<OnTroopsUpdatedPayload>)Delegate.Combine(commands.OnTroopsUpdated, _troopsUpdatedHandler);
+            builder.AddItem(new SyntheticNode(
+                ControlId.For(Marker("description"), "artifact-market:description"),
+                GraphNodes.Paragraphs(() => SpokenLines.Of(new[] { description }))));
         }
 
-        private void DetachListeners()
+        /// <summary>The nine filters as the ONE BAR the menu draws: Left and Right walk it, Enter is
+        /// the toggle's own switch. Arriving must not switch - the switch throws the offers away and
+        /// clears whatever is selected.</summary>
+        private void BuildCategories(GraphBuilder builder)
         {
-            if (_adapter == null || _adapter.Facade == null || _adapter.Facade.Commands == null)
+            IReadOnlyList<ArtifactMarketMenuAdapter.CategoryItem> categories = Items("categories", _adapter.GetCategories);
+            if (categories.Count == 0)
             {
                 return;
             }
 
-            IClientCommandsFacade commands = _adapter.Facade.Commands;
-            if (_artifactChangedHandler != null)
-            {
-                commands.OnArtifactChanged = (Action<int, bool>)Delegate.Remove(commands.OnArtifactChanged, _artifactChangedHandler);
-                _artifactChangedHandler = null;
-            }
-
-            if (_artifactMarketUpdatedHandler != null)
-            {
-                commands.OnArtifactMarketUpdated = (Action<ArtifactMarketUpdatedPayoad>)Delegate.Remove(commands.OnArtifactMarketUpdated, _artifactMarketUpdatedHandler);
-                _artifactMarketUpdatedHandler = null;
-            }
-
-            if (_troopsUpdatedHandler != null)
-            {
-                commands.OnTroopsUpdated = (Action<OnTroopsUpdatedPayload>)Delegate.Remove(commands.OnTroopsUpdated, _troopsUpdatedHandler);
-                _troopsUpdatedHandler = null;
-            }
-        }
-
-        private void HandleArtifactChanged(int artifactId, bool isNewArtifact)
-        {
-            RequestDetectorRefresh();
-        }
-
-        private void HandleArtifactMarketUpdated(ArtifactMarketUpdatedPayoad payload)
-        {
-            if (payload == null || _adapter == null || payload.InteractingCommanderId == _adapter.CommanderId)
-            {
-                RequestDetectorRefresh();
-            }
-        }
-
-        private void HandleTroopsUpdated(OnTroopsUpdatedPayload payload)
-        {
-            if (payload == null || _adapter == null || payload.ParentId == _adapter.CommanderId)
-            {
-                RequestDetectorRefresh();
-            }
-        }
-
-        private void RequestDetectorRefresh()
-        {
-            SocAccessMod.Instance?.ScreenDetector?.OnArtifactMarketChanged();
-        }
-
-        private int GetFocusedMenuIndex(string id)
-        {
-            MenuWidget menu = RootWidget != null ? RootWidget.GetChildById(id) as MenuWidget : null;
-            return menu != null ? menu.FocusedIndex : -1;
-        }
-
-        private void RestoreMenuFocus(string id, int focusedIndex)
-        {
-            MenuWidget menu = RootWidget != null ? RootWidget.GetChildById(id) as MenuWidget : null;
-            menu?.SetFocusByIndexSilently(focusedIndex);
-        }
-
-        private InventoryGridWidget.FocusState CaptureInventoryGridFocus()
-        {
-            InventoryGridWidget grid = RootWidget != null ? RootWidget.GetChildById(InventoryGridId) as InventoryGridWidget : null;
-            return grid != null ? grid.CaptureFocusState() : null;
-        }
-
-        private void RestoreInventoryGridFocus(InventoryGridWidget.FocusState focus)
-        {
-            if (focus == null || RootWidget == null)
-            {
-                return;
-            }
-
-            InventoryGridWidget grid = RootWidget.GetChildById(InventoryGridId) as InventoryGridWidget;
-            grid?.RestoreFocusState(focus);
-        }
-
-        private static ContainerWidget BuildRoot(ArtifactMarketMenuAdapter adapter)
-        {
-            ContainerWidget root = new ContainerWidget("artifact-market", adapter != null ? adapter.Title : string.Empty);
-            if (adapter == null)
-            {
-                return root;
-            }
-
-            root.AddChild(new TextWidget(
-                "artifact-market-title",
-                () => adapter.Title,
-                adapter.HideNativeTooltip,
-                includeParentLabelInAnnouncement: false,
-                isVisible: () => !string.IsNullOrWhiteSpace(adapter.Title)));
-
-            root.AddChild(Portrait.StaticNative(
-                "artifact-market-wielder-portrait",
-                () => adapter.CommanderName,
-                () => adapter.WielderPortraitTarget,
-                adapter.Localization,
-                null,
-                () => adapter.WielderPortraitTarget != null));
-
-            root.AddChild(TroopHudMenu.Build(
-                WielderArmyMenuId,
-                GameText.Get(adapter.Localization, "Commanders/Tooltip/Troops", "Troops"),
-                adapter.Troops,
-                adapter.IsArmyVisible));
-
-            root.AddChild(new TextWidget(
-                "artifact-market-description",
-                () => adapter.Description,
-                adapter.HideNativeTooltip,
-                includeParentLabelInAnnouncement: false,
-                isVisible: () => !string.IsNullOrWhiteSpace(adapter.Description)));
-
-            root.AddChild(BuildCategoriesMenu(adapter));
-            root.AddChild(BuildOffersMenu(adapter));
-            root.AddChild(new ButtonWidget(
-                "artifact-market-buy-selected",
-                () => adapter.SelectedBuyButtonLabel,
-                adapter.BuySelectedMarketArtifact,
-                adapter.HideNativeTooltip,
-                adapter.CanBuySelectedArtifact));
-            root.AddChild(new InventoryGridWidget(
-                InventoryGridId,
-                BuildInventoryGridColumns(adapter),
-                adapter.DropInventoryArtifact));
-
-            root.AddChild(new ButtonWidget(
-                "artifact-market-close",
-                ModText.Get(ModStrings.Screens.Close),
-                adapter.Close,
-                adapter.HideNativeTooltip,
-                () => true));
-
-            return root;
-        }
-
-        private static MenuWidget BuildCategoriesMenu(ArtifactMarketMenuAdapter adapter)
-        {
-            MenuWidget menu = new MenuWidget(CategoriesMenuId, ModText.Get(ModStrings.Screens.Categories));
-            IReadOnlyList<ArtifactMarketMenuAdapter.CategoryItem> categories = adapter.GetCategories();
-            string activeId = null;
+            builder.StartRow("artifact-market:categories");
             for (int i = 0; i < categories.Count; i++)
             {
-                ArtifactMarketMenuAdapter.CategoryItem category = categories[i];
-                ArtifactMarketMenuAdapter.CategoryItem captured = category;
-                if (captured.Index == adapter.ActiveCategoryIndex)
-                {
-                    activeId = captured.Id;
-                }
-
-                menu.AddItem(new MenuItemWidget(
-                    captured.Id,
-                    () => captured.Label,
-                    null,
-                    () => SelectCategory(adapter, captured.Index),
-                    () => SelectCategory(adapter, captured.Index),
-                    () => true));
-            }
-
-            menu.SetFocusedItemById(activeId);
-            return menu;
-        }
-
-        private static bool SelectCategory(ArtifactMarketMenuAdapter adapter, int categoryIndex)
-        {
-            if (adapter == null)
-            {
-                return false;
-            }
-
-            int previousCategoryIndex = adapter.ActiveCategoryIndex;
-            bool result = adapter.SelectCategory(categoryIndex);
-            if (result && previousCategoryIndex != adapter.ActiveCategoryIndex)
-            {
-                SocAccessMod.Instance?.ScreenDetector?.OnArtifactMarketChanged();
-            }
-
-            return result;
-        }
-
-        private static MenuWidget BuildOffersMenu(ArtifactMarketMenuAdapter adapter)
-        {
-            MenuWidget menu = new MenuWidget(OffersMenuId, adapter.Title);
-            IReadOnlyList<ArtifactMarketMenuAdapter.MarketArtifactItem> items = adapter.GetMarketArtifacts();
-            if (items.Count == 0)
-            {
-                menu.AddItem(new MenuItemWidget(
-                    "artifact-market-offers-none",
-                    () => ModText.Get(ModStrings.Screens.None),
-                    null,
-                    () => false,
-                    adapter.HideNativeTooltip,
-                    () => true));
-                return menu;
-            }
-
-            for (int i = 0; i < items.Count; i++)
-            {
-                ArtifactMarketMenuAdapter.MarketArtifactItem item = items[i];
-                ArtifactMarketMenuAdapter.MarketArtifactItem captured = item;
-                menu.AddItem(new MenuItemWidget(
-                    captured.Id,
-                    () => MenuButtonTextUtility.JoinParts(captured.Label, captured.CostLabel),
-                    null,
-                    captured.Activate,
-                    captured.OnFocus,
-                    () => true,
-                    captured.GetTooltip));
-            }
-
-            return menu;
-        }
-
-        private static IReadOnlyList<InventoryGridWidget.Column> BuildInventoryGridColumns(ArtifactMarketMenuAdapter adapter)
-        {
-            return new[]
-            {
-                new InventoryGridWidget.Column(
-                    "artifact-market-equipped",
-                    adapter.EquipmentLabel,
-                    BuildInventoryCells("artifact-market-equipped", adapter.GetEquipmentSlots())),
-                new InventoryGridWidget.Column(
-                    "artifact-market-inventory",
-                    adapter.InventoryLabel,
-                    BuildInventoryCells("artifact-market-inventory", adapter.GetBackpackSlots()))
-            };
-        }
-
-        private static IReadOnlyList<InventoryGridWidget.Cell> BuildInventoryCells(
-            string idPrefix,
-            IReadOnlyList<InventorySlotInfo> slots)
-        {
-            List<InventoryGridWidget.Cell> cells = new List<InventoryGridWidget.Cell>();
-            if (slots == null)
-            {
-                return cells;
-            }
-
-            for (int i = 0; i < slots.Count; i++)
-            {
-                InventorySlotInfo slot = slots[i];
-                if (slot == null)
+                ArtifactMarketMenuAdapter.CategoryItem it = categories[i];
+                if (it.Toggle == null)
                 {
                     continue;
                 }
 
-                cells.Add(new InventoryGridWidget.Cell(
-                    idPrefix + "-" + i,
-                    BuildInventorySlotLabel(slot),
-                    slot));
+                NodeVtable vtable = GraphNodes.Radio(
+                    () => it.Label,
+                    () => _adapter.ActiveCategoryIndex == it.Index,
+                    () => _adapter.SelectCategory(it.Index));
+                vtable.OnFocusVisual = () => _adapter.FocusCategory(it.Index);
+                builder.AddItem(new DrawnNode(
+                    ControlId.For(it.Toggle, "artifact-market:category/" + it.Index),
+                    vtable,
+                    it.Toggle));
             }
 
-            return cells;
+            builder.EndRow();
         }
 
-        private static string BuildInventorySlotLabel(InventorySlotInfo slot)
+        /// <summary>What the merchant has for sale, in the order the grid draws it. The grid is padded
+        /// out to twenty-four cells with empties by design, and an empty cell is not an offer.
+        /// </summary>
+        private void BuildOffers(GraphBuilder builder)
         {
-            string name = !slot.IsEmpty ? slot.ArtifactName : ModText.Get(ModStrings.Screens.Empty);
-            string location = slot.IsBackpackSlot
-                ? ModText.Get(ModStrings.UI.SlotInGroup, slot.InventoryName, slot.PositionIndex + 1)
-                : slot.SlotName;
-            return MenuButtonTextUtility.JoinParts(name, location);
+            IReadOnlyList<ArtifactMarketMenuAdapter.MarketArtifactItem> offers = Items("offers", _adapter.GetMarketArtifacts);
+            for (int i = 0; i < offers.Count; i++)
+            {
+                ArtifactMarketMenuAdapter.MarketArtifactItem it = offers[i];
+                if (it.Entry == null)
+                {
+                    continue;
+                }
+
+                NodeVtable vtable = GraphNodes.Button(
+                    () => it.Label,
+                    () => _adapter.SelectMarketEntryForPurchase(it.Entry),
+                    null,
+                    it.Tooltip);
+                vtable.Announcements.Add(GraphNodes.ValuePart(() => it.CostLabel, watch: false));
+                // Selecting the game's own cell draws the artifact's tooltip and scrolls the grid.
+                vtable.OnFocusVisual = () => _adapter.SelectMarketEntry(it.Entry);
+                builder.AddItem(new DrawnNode(
+                    ControlId.For(it.Entry, "artifact-market:offer/" + i),
+                    vtable,
+                    it.Entry));
+            }
+        }
+
+        /// <summary>
+        /// The band at the foot of the menu, as the two things it ever holds: the line naming what is
+        /// selected - the game's prompt while nothing is - and the button that completes the deal.
+        ///
+        /// Both are keyed STRUCTURALLY and vouched for by whichever container the game is painting, so
+        /// the cursor does not move when the band turns from the prompt into Buy or from Buy into
+        /// Sell; the parts are watched, so it hears the change instead. The button is gone entirely
+        /// while nothing is selected, and for an important artifact, whose Sell button the game does
+        /// not draw.
+        /// </summary>
+        private void BuildSelectionBand(GraphBuilder builder)
+        {
+            Component container = _adapter.SelectionBandContainer;
+            if (container != null)
+            {
+                NodeVtable line = GraphNodes.Text(BandLine);
+                line.Announcements[0].Live = true;
+                builder.AddItem(new DrawnNode(
+                    ControlId.Structural("artifact-market:band/line"),
+                    line,
+                    container));
+            }
+
+            Component button = BandButton();
+            if (button == null)
+            {
+                return;
+            }
+
+            NodeVtable vtable = GraphNodes.Button(BandButtonLabel, BandActivate, BandEnabled);
+            vtable.Announcements[0].Live = true;
+            vtable.Announcements.Add(GraphNodes.ValuePart(BandPrice));
+            vtable.OnFocusVisual = () => NativeSelectionUtility.Select(button);
+            builder.AddItem(new DrawnNode(
+                ControlId.Structural("artifact-market:band/action"),
+                vtable,
+                button));
+        }
+
+        private string BandLine()
+        {
+            if (_adapter.IsBuyShown)
+            {
+                return _adapter.BuyItemName;
+            }
+
+            return _adapter.IsSellShown ? _adapter.SellItemName : _adapter.NoSelectionText;
+        }
+
+        private Component BandButton()
+        {
+            if (_adapter.IsBuyShown)
+            {
+                return _adapter.BuyButton;
+            }
+
+            return _adapter.IsSellShown && _adapter.IsSellButtonShown ? _adapter.SellButton : null;
+        }
+
+        private string BandButtonLabel()
+        {
+            return _adapter.IsBuyShown ? _adapter.BuyButtonLabel : _adapter.SellButtonLabel;
+        }
+
+        private string BandPrice()
+        {
+            return _adapter.IsBuyShown ? _adapter.BuyPriceLabel : _adapter.SellPriceLabel;
+        }
+
+        private bool BandEnabled()
+        {
+            return _adapter.IsBuyShown ? _adapter.CanBuySelectedArtifact() : _adapter.CanSellSelectedArtifact();
+        }
+
+        private void BandActivate()
+        {
+            if (_adapter.IsBuyShown)
+            {
+                _adapter.BuySelectedMarketArtifact();
+                return;
+            }
+
+            _adapter.SellSelectedArtifact();
+        }
+
+        // ---- the artifacts ----
+
+        /// <summary>The four gestures an occupied slot has here, in the order they are said. Two of
+        /// them are this menu's own: the left click picks the artifact out to sell, and Ctrl with the
+        /// right click sells it where the sheet's would have destroyed it.</summary>
+        private void AddSlotHints(NodeVtable vtable, InventorySlotInfo slot)
+        {
+            NodeHints.Add(
+                vtable,
+                ModStrings.Screens.ArtifactSelectForSaleHint,
+                AccessibilityActions.UiLeftClick.Key);
+            ArtifactDetails.EquipInstruction instruction = _adapter.GetArtifactInstruction(slot);
+            ModString contextual = instruction == ArtifactDetails.EquipInstruction.Use
+                ? ModStrings.Screens.ArtifactUseHint
+                : instruction == ArtifactDetails.EquipInstruction.Unequip
+                    ? ModStrings.Screens.ArtifactUnequipHint
+                    : ModStrings.Screens.ArtifactEquipHint;
+            NodeHints.Add(vtable, contextual, AccessibilityActions.UiRightClick.Key);
+            NodeHints.Add(
+                vtable,
+                ModStrings.Screens.ArtifactSellHint,
+                AccessibilityActions.UiRightClick.Key,
+                AccessibilityActions.UiRightClickCtrlBindingIndex);
+            NodeHints.Add(
+                vtable,
+                ModStrings.Screens.ArtifactDropHint,
+                AccessibilityActions.UiLeftClick.Key,
+                AccessibilityActions.UiLeftClickCtrlBindingIndex);
+        }
+
+        // ---- the close cross ----
+
+        private void BuildClose(GraphBuilder builder)
+        {
+            Component close = _adapter.CloseButton;
+            if (close == null || !_adapter.IsCloseVisible())
+            {
+                return;
+            }
+
+            // An icon with no text of its own, so the mod names it.
+            NodeVtable vtable = GraphNodes.Button(
+                () => ModText.Get(ModStrings.Screens.Close),
+                () => _adapter.ActivateClose());
+            vtable.OnFocusVisual = () => NativeSelectionUtility.Select(close);
+            builder.AddItem(new DrawnNode(ControlId.For(close, "artifact-market:close"), vtable, close));
+        }
+
+        // ---- shared ----
+
+        /// <summary>One section's items, or none where reading them threw: a part of the menu the game
+        /// has stopped answering for costs its own rows and never the rest of the page.</summary>
+        private static IReadOnlyList<T> Items<T>(string section, Func<IReadOnlyList<T>> getter)
+        {
+            try
+            {
+                IReadOnlyList<T> items = getter != null ? getter() : null;
+                return items ?? new T[0];
+            }
+            catch (Exception exception)
+            {
+                SocAccessMod.Instance?.LogWarning("ArtifactMarketScreen section " + section + " failed to build: " + exception);
+                return new T[0];
+            }
+        }
+
+        private object Marker(string key)
+        {
+            object marker;
+            if (!_markers.TryGetValue(key, out marker))
+            {
+                marker = new object();
+                _markers.Add(key, marker);
+            }
+
+            return marker;
         }
     }
 }

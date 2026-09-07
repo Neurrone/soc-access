@@ -755,6 +755,16 @@ msgctxt "Screens.ArtifactEquipHint"
 msgid "{0} equips."
 msgstr "{0} per equipaggiare."
 
+#. Screens.ArtifactSelectForSaleHint
+msgctxt "Screens.ArtifactSelectForSaleHint"
+msgid "{0} selects for sale."
+msgstr "{0} per selezionare da vendere."
+
+#. Screens.ArtifactSellHint
+msgctxt "Screens.ArtifactSellHint"
+msgid "{0} sells."
+msgstr "{0} per vendere."
+
 #. Screens.ArtifactUnequipHint
 msgctxt "Screens.ArtifactUnequipHint"
 msgid "{0} unequips."
@@ -3235,11 +3245,6 @@ msgstr "Raggiungibile: nessuna"
 msgctxt "Screens.BuyArtifact"
 msgid "Buy"
 msgstr "Compra"
-
-#. Screens.Buyback
-msgctxt "Screens.Buyback"
-msgid "Buyback"
-msgstr "Riacquisto"
 
 #. Actions.DescribePosition
 msgctxt "Actions.DescribePosition"

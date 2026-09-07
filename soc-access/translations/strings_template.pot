@@ -2419,6 +2419,16 @@ msgctxt "Screens.ArtifactEquipHint"
 msgid "{0} equips."
 msgstr ""
 
+#. Screens.ArtifactSelectForSaleHint
+msgctxt "Screens.ArtifactSelectForSaleHint"
+msgid "{0} selects for sale."
+msgstr ""
+
+#. Screens.ArtifactSellHint
+msgctxt "Screens.ArtifactSellHint"
+msgid "{0} sells."
+msgstr ""
+
 #. Screens.ArtifactUnequipHint
 msgctxt "Screens.ArtifactUnequipHint"
 msgid "{0} unequips."
@@ -2492,11 +2502,6 @@ msgstr ""
 #. Screens.BuyArtifact
 msgctxt "Screens.BuyArtifact"
 msgid "Buy"
-msgstr ""
-
-#. Screens.Buyback
-msgctxt "Screens.Buyback"
-msgid "Buyback"
 msgstr ""
 
 #. Screens.Categories
