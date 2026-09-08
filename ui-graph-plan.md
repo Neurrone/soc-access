@@ -241,27 +241,72 @@ and forms, the composite grids with the carry, and the three modes.
 
 ### Phase F — the screen manager swap
 
-1. Replace `ScreenManager` with ES2's poll-and-diff manager: registered singleton screens,
-   `Layer`, `IsActive()` polled every frame, insertion-sorted, diffed, one focus-change
-   site, child screens (`PushChild`) for the mod-owned surfaces (`DropListScreen`, the mod
-   options dialogs).
-2. Every screen's `IsPresent()` becomes `IsActive()`. Screens that receive the native menu
-   instance in their constructor read it from an adapter static the existing `On*Ready` /
-   `On*Closed` handlers write; `ScreenDetector` shrinks to those writes and to flags with no
-   game-side state (`_storySequenceActive`, the community-maps refresh flags).
-   `ResyncFromRuntimeState`, `PushBelowTop`, `PushBottom`, `RefreshTop` go away. A predicate
-   is a field read, never a scan (`AGENTS.md`, Performance).
-3. Layers: map and combat 10; in-game panels and lobby 20-40; `MessageDialogScreen` 100
-   with `AnswersOnly`; story text and letterbox at a cutscene layer above the panels; the
-   loading screen above everything. `AdventureMapScreen.IsActive` gates on no popup, no
-   story sequence, no loading; `StoryFocusBlockerScreen` is deleted.
-4. `KeepStateOnPop` on the map, combat and settlement screens; cursor memory across push
-   and pop returns with the singletons. The modes' cursor classes (`AdventureMapGrid`,
-   `TroopPlacementHexGrid`, `CombatHexGrid`) are per screen instance today; a singleton keeps
-   one for the game's lifetime and resets it when the game changes (the map's `GetInitialTile`
-   guard against a session that has gone stays).
-5. Verify with `/gui/graph?screen=KEY` for every registered screen, the dialog-over-map case,
-   the story sequence gap, and the §4 diff of every `walks/after/` capture.
+Design taken 2026-09-08 (the session "phase F"); the steps below are the decisions, not
+options.
+
+1. `ScreenManager` becomes ES2's poll-and-diff manager (`Register`, `Registered`,
+   `Find(key)`, `Registered<T>()` for a singleton whether active or not, `Tick`, `Shutdown`,
+   `Current` = the top of the polled stack or the deepest child open over it, `Stack`,
+   `Get<T>()` = an ACTIVE screen). It keeps the global actions, `CurrentScreenClaimsAction`,
+   `DispatchAction` and the review-buffer visibility (recomputed after every diff). A throwing
+   `IsActive` is inactive and logged once per screen until it answers again, never per frame.
+   `Push`, `Pop`, `Remove`, `RefreshTop`, `PushBelowTop`, `PushBottom`, `Clear` and every
+   `UIManager` call go. The tooltip-actions route goes with `TooltipActionsMenuScreen` (F
+   deletes the screen and the manager branch; the action key and the adapters' `TooltipAction`s
+   are still G's).
+2. `Screen` takes ES2's shape: `Key`, `Layer`, `IsActive()`, `KeepStateOnPop`, the lifecycle,
+   `VisibleReviewBuffers`, and the child chain (`ParentScreen`, `ActiveChild`, `PushChild`,
+   `RemoveChild`, `CloseSelf`, `Deepest`). No widget root: `GraphScreen : Screen` keeps the
+   graph members; `StoryFocusBlockerScreen` is deleted. `ArrivedByRefresh` and
+   `GraphNavigator.Adopt` go; `SpokenName` stays for step 4.
+3. The slot. A screen that was handed a native menu in its constructor derives from
+   `LiveScreen<TAdapter> : GraphScreen`, which holds `Live` (settable) and `Forget()`
+   (`Live = null`). The slot is on the screen rather than on the adapter because six screens
+   have several adapter classes behind one slot (`MessageDialogScreen`'s six sources,
+   `StoryTextScreen`'s three, the troop screens' three hosts, the two tutorials); the slot's
+   type is the interface there. `IsActive()` is `Live != null && Live.IsPresent()` (or the
+   screen's own presence read), null-safe against a destroyed menu, never a scan. The
+   detector's `On*Ready` writes `Registered<T>().Live = new Adapter(menu)`, `On*Closed` calls
+   `Forget()` when the menu matches, a `Changed` that used to `RefreshTop` rewrites the slot,
+   and a `Changed` that called an empty `Refresh()` is deleted with its patch method. The
+   detector keeps only those writes, `_storySequenceActive` (public, read by the map), the
+   two refresh-pending flags and the deferred dropdown close. Hot reload: every screen's
+   `TryBuildActiveScreen` becomes `Recover()`, the same one-time scan writing `Live`, run
+   once from `Start` by `ScreenDetector.RecoverRuntimeState()`; polling does the rest.
+   `ChatPatches` writes the chat slot instead of pushing.
+4. A page that turns in place says its new name itself: `GraphScreen.SayNameIfChanged()`
+   speaks `ScreenName` (queued) when it differs from `SpokenName`; `LiveScreen`'s setter calls
+   it while the screen is focused, and so do the `Changed` handlers whose `RefreshTop` used to
+   carry news (the post-battle title, the community maps modal). Nothing else re-announces.
+5. Layers are static, numbered with gaps, derived from the detector's push order (a screen
+   pushed over another sits above it): main-menu pages 0-9 by their push order; map 10,
+   combat 10 registered after the map; in-game panels and the lobby's sub-pages 20-40; pause,
+   options, save/load, codex 40-49; `MessageDialogScreen` and `QuitToDesktopPopupScreen` 100;
+   story text and the letterbox 200; the loading screen 1000. `AnswersOnly` is dropped: there
+   are no shared contributions here to gate. The table lives in `screens/README.md`.
+6. `DropListScreen`, `ModOptionsScreen` and `ModDialogScreen` are children pushed on
+   `Current` (`PushChild`); a child is not polled, so its `OnUpdate` asks its own `IsActive`
+   and calls `CloseSelf()` when the game took the surface away. `ModOptionsScreen.Open` and
+   `ModDialogScreen.Open` push on `Current`; `Close` is `CloseSelf`.
+7. The map's `IsActive`: the adventure view installed and the adapter present, no story
+   sequence, no loading screen. Popups COVER it by layer rather than deactivating it (the HUD
+   stays drawn underneath, and a deactivation costs the listener and the audio every dialog);
+   the story gap and the loading screen are the two deactivations, so `KeepStateOnPop` on the
+   map, combat, settlement and defence keeps the cursor across them. The map builds its
+   event listener in `OnPush` from `Live` and detaches it in `OnPop`; the modes' cursor
+   classes are rebuilt when `Live` changes (a new adventure or battle) and kept otherwise.
+8. `SocAccessMod.Update`: detector, `ScreenManager.Tick`, router. `Stop` calls `Shutdown`.
+9. Dev server, pulled forward from G: `/gui/widgets`, `/gui/tree` and `dev/WidgetDump.cs`
+   go (the dump header moves to `GraphDump`); `/status` reports `focusedNodeId` and
+   `focusedNodeType`; `GET /screens` lists every registered screen (key, type, layer, active,
+   on the stack, focused, last `IsActive` error); `/gui/graph?screen=KEY` dumps a registered
+   screen's render over a fresh state whether or not it is focused; `DevProbe.RuntimeScreens`
+   goes. `docs/dev-loop.md` and the two `AGENTS.md` mentions follow.
+10. Tests: `tests/ScreenManagerTests.cs` for the stable layer sort, the diff order (closures
+    top-down, openings bottom-up), focus on the deepest child, and `KeepStateOnPop`.
+11. Verify with `/screens` and `/gui/graph?screen=KEY` for every registered screen, the
+    dialog-over-map case, the story sequence gap, a reload on the map and in combat, and the
+    §4 diff of every `walks/after/` capture. Measure `Tick` with §4a's recipe on the map.
 
 ### Phase G — cleanup
 
