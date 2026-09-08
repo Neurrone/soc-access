@@ -183,7 +183,7 @@ namespace SongsOfConquestAccess.Adapters
 
         public string OptionsButtonLabel
         {
-            get { return GetFirstTooltipLine(OptionsButtonTooltip); }
+            get { return TooltipLines.First(OptionsButtonTooltip); }
         }
 
         public void FocusOptionsButton()
@@ -1157,28 +1157,6 @@ namespace SongsOfConquestAccess.Adapters
         private static string GetText(UITextMesh text)
         {
             return SpokenLines.Clean(UITextMeshTextUtility.GetEffectiveText(text));
-        }
-
-        private static string GetFirstTooltipLine(Tooltip tooltip)
-        {
-            // Read ONCE: every evaluation of TextLines is a fresh capture of the game's details, so
-            // asking for it in the loop condition and again in the indexer costs about 2N captures.
-            IReadOnlyList<string> lines = tooltip != null ? tooltip.TextLines : null;
-            if (lines == null)
-            {
-                return string.Empty;
-            }
-
-            for (int i = 0; i < lines.Count; i++)
-            {
-                string line = SpokenLines.Clean(lines[i]);
-                if (!string.IsNullOrWhiteSpace(line))
-                {
-                    return line;
-                }
-            }
-
-            return string.Empty;
         }
 
         private static T Resolve<T>(DiContainer container) where T : class

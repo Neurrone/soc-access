@@ -346,7 +346,7 @@ namespace SongsOfConquestAccess.Adapters
                 Tooltip tooltip = Tooltip.ForComponent(tooltipComponent, _localization);
                 result.Add(new ResultEntry(
                     GetText(GetField<UITextMesh>(entry, TroopEntryAmountField)),
-                    GetFirstTooltipLine(tooltip),
+                    TooltipLines.First(tooltip),
                     isLostTroop: true,
                     tooltip,
                     () => entry != null && entry.gameObject.activeInHierarchy,
@@ -402,7 +402,7 @@ namespace SongsOfConquestAccess.Adapters
                 return artifactName;
             }
 
-            return GetFirstTooltipLine(tooltip);
+            return TooltipLines.First(tooltip);
         }
 
         private string BuildXpText()
@@ -438,25 +438,6 @@ namespace SongsOfConquestAccess.Adapters
             }
 
             return digits.Length > 0 && int.TryParse(digits, out value);
-        }
-
-        private static string GetFirstTooltipLine(Tooltip tooltip)
-        {
-            if (tooltip == null || tooltip.TextLines == null)
-            {
-                return string.Empty;
-            }
-
-            for (int i = 0; i < tooltip.TextLines.Count; i++)
-            {
-                string line = SpokenLines.Clean(tooltip.TextLines[i]);
-                if (!string.IsNullOrWhiteSpace(line))
-                {
-                    return line;
-                }
-            }
-
-            return string.Empty;
         }
 
         private string GetText(FieldInfo field)

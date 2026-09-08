@@ -360,7 +360,7 @@ namespace SongsOfConquestAccess.Adapters
 
         public string MoveToDestinationButtonLabel
         {
-            get { return GetFirstTooltipLine(MoveToDestinationButtonTooltip); }
+            get { return TooltipLines.First(MoveToDestinationButtonTooltip); }
         }
 
         public void FocusMoveToDestinationButton()
@@ -844,7 +844,7 @@ namespace SongsOfConquestAccess.Adapters
 
         public string OptionsButtonLabel
         {
-            get { return GetFirstTooltipLine(OptionsButtonTooltip); }
+            get { return TooltipLines.First(OptionsButtonTooltip); }
         }
 
         public void FocusOptionsButton()
@@ -870,7 +870,7 @@ namespace SongsOfConquestAccess.Adapters
 
         public string GetKingdomOverviewLabel(int index)
         {
-            return GetFirstTooltipLine(GetKingdomOverviewTooltip(index));
+            return TooltipLines.First(GetKingdomOverviewTooltip(index));
         }
 
         public bool IsKingdomOverviewItemVisible(int index)
@@ -910,7 +910,7 @@ namespace SongsOfConquestAccess.Adapters
 
         public string BugReportButtonLabel
         {
-            get { return GetFirstTooltipLine(BugReportButtonTooltip); }
+            get { return TooltipLines.First(BugReportButtonTooltip); }
         }
 
         public void FocusBugReportButton()
@@ -972,7 +972,7 @@ namespace SongsOfConquestAccess.Adapters
 
         public string EndTurnButtonLabel
         {
-            get { return GetFirstTooltipLine(EndTurnButtonTooltip) ?? string.Empty; }
+            get { return TooltipLines.First(EndTurnButtonTooltip) ?? string.Empty; }
         }
 
         /// <summary>
@@ -1934,25 +1934,6 @@ namespace SongsOfConquestAccess.Adapters
             }
 
             return canvasGroup.alpha > 0.01f && canvasGroup.interactable && canvasGroup.blocksRaycasts;
-        }
-
-        private static string GetFirstTooltipLine(Tooltip tooltip)
-        {
-            if (tooltip == null || tooltip.TextLines == null)
-            {
-                return string.Empty;
-            }
-
-            for (int i = 0; i < tooltip.TextLines.Count; i++)
-            {
-                string line = SpokenLines.Clean(tooltip.TextLines[i]);
-                if (!string.IsNullOrWhiteSpace(line))
-                {
-                    return line;
-                }
-            }
-
-            return string.Empty;
         }
 
         private string GetCommanderName(ICommanderState commander)

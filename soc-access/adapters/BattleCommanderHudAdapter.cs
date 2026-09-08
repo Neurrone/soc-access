@@ -162,7 +162,7 @@ namespace SongsOfConquestAccess.Adapters
 
         public string GetAiControlButtonLabel(CombatHudSide side)
         {
-            string label = GetFirstTooltipLine(GetAiControlButtonTooltip(side));
+            string label = TooltipLines.First(GetAiControlButtonTooltip(side));
             return string.IsNullOrWhiteSpace(label) ? ModText.Get(ModStrings.Screens.AiControl) : label;
         }
 
@@ -463,27 +463,6 @@ namespace SongsOfConquestAccess.Adapters
 
             CanvasGroup canvasGroup = gameObject.GetComponent<CanvasGroup>();
             return canvasGroup == null || canvasGroup.alpha > 0.01f;
-        }
-
-        private static string GetFirstTooltipLine(Tooltip tooltip)
-        {
-            // Read ONCE: every evaluation of TextLines is a fresh capture of the game's details.
-            IReadOnlyList<string> lines = tooltip != null ? tooltip.TextLines : null;
-            if (lines == null)
-            {
-                return string.Empty;
-            }
-
-            for (int i = 0; i < lines.Count; i++)
-            {
-                string line = SpokenLines.Clean(lines[i]);
-                if (!string.IsNullOrWhiteSpace(line))
-                {
-                    return line;
-                }
-            }
-
-            return string.Empty;
         }
     }
 }

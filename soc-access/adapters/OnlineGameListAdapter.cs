@@ -548,7 +548,7 @@ namespace SongsOfConquestAccess.Adapters
                             : string.Empty;
                     }
 
-                    string tooltip = GetFirstTooltipLine(GetStatusTooltip());
+                    string tooltip = TooltipLines.First(GetStatusTooltip());
                     return !string.IsNullOrWhiteSpace(tooltip)
                         ? tooltip
                         : ModText.Get(ModStrings.UI.StatusUnavailable);
@@ -618,24 +618,6 @@ namespace SongsOfConquestAccess.Adapters
                 return component != null && _adapter != null
                     ? Tooltip.ForComponent(component, _adapter._localization)
                     : null;
-            }
-
-            private static string GetFirstTooltipLine(Tooltip tooltip)
-            {
-                if (tooltip == null || tooltip.TextLines == null)
-                {
-                    return string.Empty;
-                }
-
-                for (int i = 0; i < tooltip.TextLines.Count; i++)
-                {
-                    if (!string.IsNullOrWhiteSpace(tooltip.TextLines[i]))
-                    {
-                        return tooltip.TextLines[i];
-                    }
-                }
-
-                return string.Empty;
             }
 
             private static string SanitizeId(string value)
