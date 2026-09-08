@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Reflection;
 using HarmonyLib;
@@ -106,11 +106,43 @@ namespace SongsOfConquestAccess.Adapters
         private readonly LobbyNavigation _navigation;
         private readonly ILocalizationHandler _localization;
 
+        // Fixed for the adapter's lifetime: the seven sort buttons, their drawn captions, the filter
+        // band and its clear button are serialized fields of the menu, and a new menu is a new adapter.
+        private readonly MapSelectSortButtonAdapter[] _sortButtons;
+        private readonly string[] _columnLabels = new string[7];
+        private readonly bool[] _columnLabelResolved = new bool[7];
+        private string[] _columnLabelList;
+        private string _title;
+        private List<MapSelectFilterAdapter> _filters;
+        private IMenuButtonAdapter _clearFiltersButton;
+        private bool _clearFiltersProbed;
+
+        // The visible rows, kept while the table's membership and drawn order are unchanged: a row
+        // adapter memoizes its labels and tooltips, which is what keeps the per-frame build cheap.
+        private readonly List<LobbyMapSelectMenuEntry> _visibleScratch = new List<LobbyMapSelectMenuEntry>();
+        private List<AdventureLobbyMapSelectRowAdapter> _rows;
+        private int _rowsSignature;
+        private LobbyMapSelectMenuEntry _selectedEntry;
+        private AdventureLobbyMapSelectRowAdapter _selectedRow;
+
         public AdventureLobbyMapSelectAdapter(MapSelectMenu menu)
         {
             _menu = menu;
             _navigation = FindNavigationFor(menu);
             _localization = menu != null ? LocalizationRef(menu) : GlobalLocalizationVariables.LocalizationHandler;
+
+            _sortButtons = menu != null
+                ? new[]
+                {
+                    new MapSelectSortButtonAdapter(this, SortTypeButtonRef(menu)),
+                    new MapSelectSortButtonAdapter(this, SortNameButtonRef(menu)),
+                    new MapSelectSortButtonAdapter(this, SortTagButtonRef(menu)),
+                    new MapSelectSortButtonAdapter(this, SortWinConditionButtonRef(menu)),
+                    new MapSelectSortButtonAdapter(this, SortPlayersButtonRef(menu)),
+                    new MapSelectSortButtonAdapter(this, SortSizeButtonRef(menu)),
+                    new MapSelectSortButtonAdapter(this, SortCompletedButtonRef(menu))
+                }
+                : new MapSelectSortButtonAdapter[0];
 
             SelectButton = new StandardMenuButtonAdapter(SelectButtonRef(menu));
             BackButton = CreateBackButton();
@@ -143,7 +175,7 @@ namespace SongsOfConquestAccess.Adapters
 
         public string Title
         {
-            get { return GetLocalizedText("Lobby/MapSelect/Title", "Select Map"); }
+            get { return _title ?? (_title = GetLocalizedText("Lobby/MapSelect/Title", "Select Map")); }
         }
 
         public string MapsLabel
@@ -163,20 +195,38 @@ namespace SongsOfConquestAccess.Adapters
             get
             {
                 LobbyMapSelectMenuEntry selected = _menu != null ? SelectedEntryRef(_menu) : null;
-                return selected != null ? new AdventureLobbyMapSelectRowAdapter(this, selected, _localization) : null;
+                if (selected == null)
+                {
+                    _selectedEntry = null;
+                    _selectedRow = null;
+                    return null;
+                }
+
+                if (!ReferenceEquals(_selectedEntry, selected))
+                {
+                    _selectedEntry = selected;
+                    _selectedRow = new AdventureLobbyMapSelectRowAdapter(this, selected, _localization);
+                }
+
+                return _selectedRow;
             }
         }
 
+        /// <summary>The drawn rows in drawn order. One cheap pass over the menu's own entry list says
+        /// whether the table still holds the same rows in the same order; while it does, the kept row
+        /// adapters - and everything they have already read off the game - are handed back unchanged.
+        /// </summary>
         public IReadOnlyList<AdventureLobbyMapSelectRowAdapter> GetVisibleRows()
         {
-            List<AdventureLobbyMapSelectRowAdapter> rows = new List<AdventureLobbyMapSelectRowAdapter>();
-            List<LobbyMapSelectMenuEntry> visibleEntries = new List<LobbyMapSelectMenuEntry>();
             List<LobbyMapSelectMenuEntry> entries = _menu != null ? EntriesRef(_menu) : null;
             if (entries == null)
             {
-                return rows;
+                _rows = null;
+                return new AdventureLobbyMapSelectRowAdapter[0];
             }
 
+            _visibleScratch.Clear();
+            int signature = 17;
             for (int i = 0; i < entries.Count; i++)
             {
                 LobbyMapSelectMenuEntry entry = entries[i];
@@ -186,19 +236,36 @@ namespace SongsOfConquestAccess.Adapters
                 }
 
                 GameObject gameObject = ((Component)entry).gameObject;
-                if (gameObject != null && gameObject.activeInHierarchy)
+                if (gameObject == null || !gameObject.activeInHierarchy)
                 {
-                    visibleEntries.Add(entry);
+                    continue;
+                }
+
+                _visibleScratch.Add(entry);
+                unchecked
+                {
+                    signature = (signature * 31) + entry.GetInstanceID();
+                    signature = (signature * 31) + ((Component)entry).transform.GetSiblingIndex();
                 }
             }
 
-            visibleEntries.Sort(CompareVisualOrder);
-            for (int i = 0; i < visibleEntries.Count; i++)
+            if (_rows != null && _rows.Count == _visibleScratch.Count && _rowsSignature == signature)
             {
-                rows.Add(new AdventureLobbyMapSelectRowAdapter(this, visibleEntries[i], _localization));
+                _visibleScratch.Clear();
+                return _rows;
             }
 
-            return rows;
+            _visibleScratch.Sort(CompareVisualOrder);
+            List<AdventureLobbyMapSelectRowAdapter> rows = new List<AdventureLobbyMapSelectRowAdapter>(_visibleScratch.Count);
+            for (int i = 0; i < _visibleScratch.Count; i++)
+            {
+                rows.Add(new AdventureLobbyMapSelectRowAdapter(this, _visibleScratch[i], _localization));
+            }
+
+            _visibleScratch.Clear();
+            _rows = rows;
+            _rowsSignature = signature;
+            return _rows;
         }
 
         private static int CompareVisualOrder(LobbyMapSelectMenuEntry left, LobbyMapSelectMenuEntry right)
@@ -224,52 +291,57 @@ namespace SongsOfConquestAccess.Adapters
 
         public IReadOnlyList<MapSelectSortButtonAdapter> GetSortButtons()
         {
-            return new[]
-            {
-                new MapSelectSortButtonAdapter(this, SortTypeButtonRef(_menu)),
-                new MapSelectSortButtonAdapter(this, SortNameButtonRef(_menu)),
-                new MapSelectSortButtonAdapter(this, SortTagButtonRef(_menu)),
-                new MapSelectSortButtonAdapter(this, SortWinConditionButtonRef(_menu)),
-                new MapSelectSortButtonAdapter(this, SortPlayersButtonRef(_menu)),
-                new MapSelectSortButtonAdapter(this, SortSizeButtonRef(_menu)),
-                new MapSelectSortButtonAdapter(this, SortCompletedButtonRef(_menu))
-            };
+            return _sortButtons;
         }
 
         public IReadOnlyList<MapSelectFilterAdapter> GetFilters()
         {
-            List<MapSelectFilterAdapter> filters = new List<MapSelectFilterAdapter>();
             LobbyMapFilters nativeFilters = _menu != null ? FiltersRef(_menu) : null;
             if (nativeFilters == null)
             {
-                return filters;
+                return new MapSelectFilterAdapter[0];
             }
 
-            AddFilter(filters, nativeFilters, GetColumnLabel(0), FilterMapTypeDropdownField, true, GetMapTypeFilterOptionLabel);
-            AddFilter(filters, nativeFilters, GetColumnLabel(2), FilterMapTagDropdownField, true, GetMapTagFilterOptionLabel);
-            AddFilter(filters, nativeFilters, GetColumnLabel(3), FilterWinConditionDropdownField, true, GetWinConditionFilterOptionLabel);
-            AddFilter(filters, nativeFilters, GetColumnLabel(4), FilterPlayersDropdownField, true, GetPlayersFilterOptionLabel);
-            AddFilter(filters, nativeFilters, GetColumnLabel(5), FilterSizeDropdownField, true, GetSizeFilterOptionLabel);
-            AddFilter(filters, nativeFilters, GetColumnLabel(6), FilterPlayedDropdownField, true, GetCompletedFilterOptionLabel);
-            AddFilter(filters, nativeFilters, GetLocalizedText("LevelEditor/ContentProfile/Name", "Content profile"), FilterContentProfileDropdownField, IsContentProfileFilterVisible(nativeFilters), GetContentProfileFilterOptionLabel);
-            return filters;
+            if (_filters != null)
+            {
+                return _filters;
+            }
+
+            LobbyMapFilters it = nativeFilters;
+            List<MapSelectFilterAdapter> filters = new List<MapSelectFilterAdapter>();
+            AddFilter(filters, nativeFilters, GetColumnLabel(0), FilterMapTypeDropdownField, null, GetMapTypeFilterOptionLabel);
+            AddFilter(filters, nativeFilters, GetColumnLabel(2), FilterMapTagDropdownField, null, GetMapTagFilterOptionLabel);
+            AddFilter(filters, nativeFilters, GetColumnLabel(3), FilterWinConditionDropdownField, null, GetWinConditionFilterOptionLabel);
+            AddFilter(filters, nativeFilters, GetColumnLabel(4), FilterPlayersDropdownField, null, GetPlayersFilterOptionLabel);
+            AddFilter(filters, nativeFilters, GetColumnLabel(5), FilterSizeDropdownField, null, GetSizeFilterOptionLabel);
+            AddFilter(filters, nativeFilters, GetColumnLabel(6), FilterPlayedDropdownField, null, GetCompletedFilterOptionLabel);
+            AddFilter(filters, nativeFilters, GetLocalizedText("LevelEditor/ContentProfile/Name", "Content profile"), FilterContentProfileDropdownField, () => IsContentProfileFilterVisible(it), GetContentProfileFilterOptionLabel);
+            _filters = filters;
+            return _filters;
         }
 
         public IMenuButtonAdapter GetClearFiltersButton()
         {
+            if (_clearFiltersProbed)
+            {
+                return _clearFiltersButton;
+            }
+
             LobbyMapFilters nativeFilters = _menu != null ? FiltersRef(_menu) : null;
             UIButton button = nativeFilters != null && FilterClearButtonField != null
                 ? FilterClearButtonField.GetValue(nativeFilters) as UIButton
                 : null;
 
-            return button != null
+            _clearFiltersProbed = true;
+            _clearFiltersButton = button != null
                 ? new StandardMenuButtonAdapter(button, () => MenuButtonAdapterBase.IsButtonVisible(button), () => NativeSelectionUtility.Click(button))
                 : null;
+            return _clearFiltersButton;
         }
 
         public IReadOnlyList<string> GetColumnLabels()
         {
-            return new[]
+            return _columnLabelList ?? (_columnLabelList = new[]
             {
                 GetColumnLabel(0),
                 GetColumnLabel(1),
@@ -278,10 +350,28 @@ namespace SongsOfConquestAccess.Adapters
                 GetColumnLabel(4),
                 GetColumnLabel(5),
                 GetColumnLabel(6)
-            };
+            });
         }
 
+        /// <summary>The caption the column's heading draws, read off the game once: a sort button's own
+        /// label is a subtree walk, and the band is set up before the page is navigable.</summary>
         private string GetColumnLabel(int columnIndex)
+        {
+            if (columnIndex < 0 || columnIndex >= _columnLabels.Length)
+            {
+                return ResolveColumnLabel(columnIndex);
+            }
+
+            if (!_columnLabelResolved[columnIndex])
+            {
+                _columnLabels[columnIndex] = ResolveColumnLabel(columnIndex);
+                _columnLabelResolved[columnIndex] = true;
+            }
+
+            return _columnLabels[columnIndex];
+        }
+
+        private string ResolveColumnLabel(int columnIndex)
         {
             MapSelectSortButtonAdapter button = GetSortButton(columnIndex);
             if (button != null && !string.IsNullOrWhiteSpace(button.Label))
@@ -406,7 +496,7 @@ namespace SongsOfConquestAccess.Adapters
             LobbyMapFilters nativeFilters,
             string label,
             FieldInfo dropdownField,
-            bool isVisible,
+            Func<bool> isVisible,
             Func<int, string> getOptionLabel)
         {
             UIFilterDropdown dropdown = nativeFilters != null && dropdownField != null
@@ -600,6 +690,25 @@ namespace SongsOfConquestAccess.Adapters
         private readonly LobbyMapSelectMenuEntry _entry;
         private readonly ILocalizationHandler _localization;
 
+        // Everything the row reads off the map's own metadata and off the game's tooltip data is fixed
+        // for the life of the row, and a tooltip's existence can only be answered by capturing it, so
+        // each is read once and kept. The live parts - the selection, the preview text - are not here.
+        private string _name;
+        private string _nativeKey;
+        private string _typeLabel;
+        private string _sizeLabel;
+        private string _completedLabel;
+        private string _notCompletedLabel;
+        private IReadOnlyList<string> _tagLabels;
+        private IReadOnlyList<string> _winConditionLabels;
+        private IReadOnlyList<Tooltip> _winConditionTooltips;
+        private Tooltip _typeTooltip;
+        private bool _typeTooltipProbed;
+        private Tooltip _tagTooltipCache;
+        private bool _tagTooltipProbed;
+        private Tooltip _winConditionTooltip;
+        private bool _winConditionTooltipProbed;
+
         public AdventureLobbyMapSelectRowAdapter(AdventureLobbyMapSelectAdapter owner, LobbyMapSelectMenuEntry entry, ILocalizationHandler localization)
         {
             _owner = owner;
@@ -609,21 +718,23 @@ namespace SongsOfConquestAccess.Adapters
 
         public string NativeKey
         {
-            get
-            {
-                string path = _entry != null && _entry.Map != null && _entry.Map.Metadata != null ? _entry.Map.Metadata.PathName : null;
-                if (string.IsNullOrWhiteSpace(path))
-                {
-                    path = _entry != null ? _entry.MapData.path : null;
-                }
+            get { return _nativeKey ?? (_nativeKey = ResolveNativeKey()); }
+        }
 
-                return string.IsNullOrWhiteSpace(path) ? Name : path;
+        private string ResolveNativeKey()
+        {
+            string path = _entry != null && _entry.Map != null && _entry.Map.Metadata != null ? _entry.Map.Metadata.PathName : null;
+            if (string.IsNullOrWhiteSpace(path))
+            {
+                path = _entry != null ? _entry.MapData.path : null;
             }
+
+            return string.IsNullOrWhiteSpace(path) ? Name : path;
         }
 
         public string Name
         {
-            get { return SpokenLines.Clean(_entry != null ? _entry.PrettyMapName : string.Empty); }
+            get { return _name ?? (_name = SpokenLines.Clean(_entry != null ? _entry.PrettyMapName : string.Empty)); }
         }
 
         public MapFormat.AdventureMapMetadata Metadata
@@ -663,11 +774,29 @@ namespace SongsOfConquestAccess.Adapters
             switch (columnId)
             {
                 case "type":
-                    return GetComponentTooltip(IconRef(_entry));
+                    if (!_typeTooltipProbed)
+                    {
+                        _typeTooltip = GetComponentTooltip(IconRef(_entry));
+                        _typeTooltipProbed = true;
+                    }
+
+                    return _typeTooltip;
                 case "tag":
-                    return GetTagTooltip();
+                    if (!_tagTooltipProbed)
+                    {
+                        _tagTooltipCache = GetTagTooltip();
+                        _tagTooltipProbed = true;
+                    }
+
+                    return _tagTooltipCache;
                 case "win-condition":
-                    return GetWinConditionTooltip();
+                    if (!_winConditionTooltipProbed)
+                    {
+                        _winConditionTooltip = GetWinConditionTooltip();
+                        _winConditionTooltipProbed = true;
+                    }
+
+                    return _winConditionTooltip;
                 default:
                     return null;
             }
@@ -675,17 +804,17 @@ namespace SongsOfConquestAccess.Adapters
 
         public string TypeLabel
         {
-            get { return GetTypeLabel(); }
+            get { return _typeLabel ?? (_typeLabel = GetTypeLabel()); }
         }
 
         public IReadOnlyList<string> TagLabels
         {
-            get { return GetTagLabels(); }
+            get { return _tagLabels ?? (_tagLabels = GetTagLabels()); }
         }
 
         public IReadOnlyList<string> WinConditionLabels
         {
-            get { return GetWinConditionLabels(); }
+            get { return _winConditionLabels ?? (_winConditionLabels = GetWinConditionLabels()); }
         }
 
         /// <summary>One tooltip per drawn win-condition icon, in the order of
@@ -694,19 +823,21 @@ namespace SongsOfConquestAccess.Adapters
         /// </summary>
         public IReadOnlyList<Tooltip> WinConditionTooltips
         {
-            get
-            {
-                IReadOnlyList<string> labels = GetWinConditionLabels();
-                UIImage[] icons = _entry != null ? WinConditionIconsRef(_entry) : null;
-                List<Tooltip> tooltips = new List<Tooltip>(labels.Count);
-                for (int i = 0; i < labels.Count; i++)
-                {
-                    UIImage icon = icons != null && i < icons.Length ? icons[i] : null;
-                    tooltips.Add(GetComponentTooltip(icon));
-                }
+            get { return _winConditionTooltips ?? (_winConditionTooltips = BuildWinConditionTooltips()); }
+        }
 
-                return tooltips;
+        private IReadOnlyList<Tooltip> BuildWinConditionTooltips()
+        {
+            IReadOnlyList<string> labels = WinConditionLabels;
+            UIImage[] icons = _entry != null ? WinConditionIconsRef(_entry) : null;
+            List<Tooltip> tooltips = new List<Tooltip>(labels.Count);
+            for (int i = 0; i < labels.Count; i++)
+            {
+                UIImage icon = icons != null && i < icons.Length ? icons[i] : null;
+                tooltips.Add(GetComponentTooltip(icon));
             }
+
+            return tooltips;
         }
 
         public int Players
@@ -716,7 +847,7 @@ namespace SongsOfConquestAccess.Adapters
 
         public string SizeLabel
         {
-            get { return GetSizeLabel(); }
+            get { return _sizeLabel ?? (_sizeLabel = GetSizeLabel()); }
         }
 
         public bool IsCompleted
@@ -726,12 +857,12 @@ namespace SongsOfConquestAccess.Adapters
 
         public string CompletedLabel
         {
-            get { return GetLocalizedText("Lobby/MapSelect/Filter/FilterButton/Completed", "Completed"); }
+            get { return _completedLabel ?? (_completedLabel = GetLocalizedText("Lobby/MapSelect/Filter/FilterButton/Completed", "Completed")); }
         }
 
         public string NotCompletedLabel
         {
-            get { return GetLocalizedText("Lobby/MapSelect/Filter/FilterButton/NotCompleted", "Not completed"); }
+            get { return _notCompletedLabel ?? (_notCompletedLabel = GetLocalizedText("Lobby/MapSelect/Filter/FilterButton/NotCompleted", "Not completed")); }
         }
 
         public string Description
@@ -996,18 +1127,25 @@ namespace SongsOfConquestAccess.Adapters
     {
         private readonly UIFilterDropdown _dropdown;
         private readonly Func<int, string> _getOptionLabel;
+        private readonly Func<bool> _isVisible;
+        private List<Option> _options;
 
-        public MapSelectFilterAdapter(string label, UIFilterDropdown dropdown, bool isVisible, Func<int, string> getOptionLabel)
+        public MapSelectFilterAdapter(string label, UIFilterDropdown dropdown, Func<bool> isVisible, Func<int, string> getOptionLabel)
         {
             Label = label ?? string.Empty;
             _dropdown = dropdown;
-            IsVisible = isVisible;
+            _isVisible = isVisible;
             _getOptionLabel = getOptionLabel;
         }
 
         public string Label { get; private set; }
 
-        public bool IsVisible { get; private set; }
+        /// <summary>Null means a filter the game always draws; the content-profile one is drawn only
+        /// while its container is.</summary>
+        public bool IsVisible
+        {
+            get { return _isVisible == null || _isVisible(); }
+        }
 
         /// <summary>The filter button the game draws in the header band.</summary>
         public Component Subject
@@ -1031,8 +1169,15 @@ namespace SongsOfConquestAccess.Adapters
             AdventureLobbyMapSelectAdapter.CloseDropdown(_dropdown);
         }
 
+        /// <summary>The checkboxes the dropdown holds. The list is a serialized field the game fills
+        /// once, so the options are resolved once too.</summary>
         public IReadOnlyList<Option> GetOptions()
         {
+            if (_options != null)
+            {
+                return _options;
+            }
+
             List<Option> options = new List<Option>();
             IReadOnlyList<UIToggle> toggles = AdventureLobbyMapSelectAdapter.GetDropdownToggles(_dropdown);
             for (int i = 0; i < toggles.Count; i++)
@@ -1044,7 +1189,8 @@ namespace SongsOfConquestAccess.Adapters
                 }
             }
 
-            return options;
+            _options = options;
+            return _options;
         }
 
         private string GetOptionLabel(int index)

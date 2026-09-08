@@ -169,10 +169,18 @@ namespace SongsOfConquestAccess.Screens
                 // on its own (a click elsewhere) collapses the group with no hook needed.
                 group.OnExpand = () => it.OpenNative();
                 group.OnCollapse = () => it.CloseNative();
+                bool open = it.IsOpen;
                 builder.BeginGroup(
                     new DrawnNode(ControlId.For(subject, "map-select:filter/" + i), group, subject),
-                    expanded: it.IsOpen);
-                BuildFilterOptions(builder, it, i);
+                    expanded: open);
+                // A shut dropdown's boxes are swallowed by the builder anyway, and reading them costs
+                // the game's own toggle list per filter per frame; the search build, which opens every
+                // group, still gets them.
+                if (open || builder.ExpandAll)
+                {
+                    BuildFilterOptions(builder, it, i);
+                }
+
                 builder.EndGroup();
             }
 
