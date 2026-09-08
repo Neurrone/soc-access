@@ -385,20 +385,10 @@ msgctxt "UI.DragCancelled"
 msgid "Drag cancelled."
 msgstr "ドラッグをキャンセルしました。"
 
-#. UI.DragComplete
-msgctxt "UI.DragComplete"
-msgid "Drag complete."
-msgstr "ドラッグ完了。"
-
 #. UI.DragStarted
 msgctxt "UI.DragStarted"
 msgid "Started drag. Move to destination and press enter to drop."
 msgstr "ドラッグを開始しました。目的地へ移動し、Enter でドロップします。"
-
-#. UI.DragStartedTroopPlacement
-msgctxt "UI.DragStartedTroopPlacement"
-msgid "Started drag for {0} at {1}. Press enter to drop on destination spawn point, or press escape to cancel."
-msgstr "{1} の {0} のドラッグを開始しました。目的の配置地点で Enter を押すか、Escape でキャンセルします。"
 
 #. UI.EditCancelled
 msgctxt "UI.EditCancelled"
@@ -1135,11 +1125,6 @@ msgctxt "Screens.UnknownSpell"
 msgid "unknown spell"
 msgstr "不明な呪文"
 
-#. Actions.Activate
-msgctxt "Actions.Activate"
-msgid "Activate"
-msgstr "実行"
-
 #. Common.EssenceVariant
 msgctxt "Common.EssenceVariant"
 msgid "{0} ({1})"
@@ -1199,16 +1184,6 @@ msgstr "前の関連戦闘マス"
 msgctxt "Actions.FirstBufferLine"
 msgid "First Buffer Line"
 msgstr "最初 バッファ 行"
-
-#. Actions.FirstMenuItem
-msgctxt "Actions.FirstMenuItem"
-msgid "First Menu Item"
-msgstr "最初 メニュー 項目"
-
-#. Actions.FirstRow
-msgctxt "Actions.FirstRow"
-msgid "First Row"
-msgstr "最初 行"
 
 #. Actions.FocusHudNotifications
 msgctxt "Actions.FocusHudNotifications"
@@ -1270,16 +1245,6 @@ msgctxt "Actions.LastBufferLine"
 msgid "Last Buffer Line"
 msgstr "最後 バッファ 行"
 
-#. Actions.LastMenuItem
-msgctxt "Actions.LastMenuItem"
-msgid "Last Menu Item"
-msgstr "最後 メニュー 項目"
-
-#. Actions.LastRow
-msgctxt "Actions.LastRow"
-msgid "Last Row"
-msgstr "最後 行"
-
 #. Actions.MapMoveEast
 msgctxt "Actions.MapMoveEast"
 msgid "Map Move East"
@@ -1315,35 +1280,10 @@ msgctxt "Actions.NextBufferLine"
 msgid "Next Buffer Line"
 msgstr "次 バッファ 行"
 
-#. Actions.NextColumn
-msgctxt "Actions.NextColumn"
-msgid "Next Column"
-msgstr "次 列"
-
-#. Actions.NextHeading
-msgctxt "Actions.NextHeading"
-msgid "Next Heading"
-msgstr "次 見出し"
-
-#. Actions.NextMenuItem
-msgctxt "Actions.NextMenuItem"
-msgid "Next Menu Item"
-msgstr "次 メニュー 項目"
-
-#. Actions.NextRow
-msgctxt "Actions.NextRow"
-msgid "Next Row"
-msgstr "次 行"
-
 #. Actions.NextSettlement
 msgctxt "Actions.NextSettlement"
 msgid "Next Settlement"
 msgstr "次の集落"
-
-#. Actions.NextWidget
-msgctxt "Actions.NextWidget"
-msgid "Next Widget"
-msgstr "次 ウィジェット"
 
 #. Actions.NextWielder
 msgctxt "Actions.NextWielder"
@@ -1364,31 +1304,6 @@ msgstr "前 バッファ"
 msgctxt "Actions.PreviousBufferLine"
 msgid "Previous Buffer Line"
 msgstr "前 バッファ 行"
-
-#. Actions.PreviousColumn
-msgctxt "Actions.PreviousColumn"
-msgid "Previous Column"
-msgstr "前 列"
-
-#. Actions.PreviousHeading
-msgctxt "Actions.PreviousHeading"
-msgid "Previous Heading"
-msgstr "前 見出し"
-
-#. Actions.PreviousMenuItem
-msgctxt "Actions.PreviousMenuItem"
-msgid "Previous Menu Item"
-msgstr "前 メニュー 項目"
-
-#. Actions.PreviousRow
-msgctxt "Actions.PreviousRow"
-msgid "Previous Row"
-msgstr "前 行"
-
-#. Actions.PreviousWidget
-msgctxt "Actions.PreviousWidget"
-msgid "Previous Widget"
-msgstr "前 ウィジェット"
 
 #. Actions.ReadThreat
 msgctxt "Actions.ReadThreat"
@@ -1465,35 +1380,10 @@ msgctxt "Actions.ScannerSpeakDistanceAndDirection"
 msgid "Scanner Result Distance and Direction"
 msgstr "スキャナー結果の距離と方角"
 
-#. Actions.SliderDecrease
-msgctxt "Actions.SliderDecrease"
-msgid "Slider Decrease"
-msgstr "スライダーを減少"
-
-#. Actions.SliderIncrease
-msgctxt "Actions.SliderIncrease"
-msgid "Slider Increase"
-msgstr "スライダーを増加"
-
-#. Actions.SliderMaximum
-msgctxt "Actions.SliderMaximum"
-msgid "Slider Maximum"
-msgstr "スライダー最大"
-
-#. Actions.SliderMinimum
-msgctxt "Actions.SliderMinimum"
-msgid "Slider Minimum"
-msgstr "スライダー最小"
-
 #. Actions.SonarSweep
 msgctxt "Actions.SonarSweep"
 msgid "Play Sonar Sweep"
 msgstr "ソナースイープを再生"
-
-#. Actions.StartDrag
-msgctxt "Actions.StartDrag"
-msgid "Start Drag"
-msgstr "ドラッグ開始"
 
 #. Actions.SummarizeEnemyResources
 msgctxt "Actions.SummarizeEnemyResources"

@@ -385,20 +385,10 @@ msgctxt "UI.DragCancelled"
 msgid "Drag cancelled."
 msgstr "Sürükleme iptal edildi."
 
-#. UI.DragComplete
-msgctxt "UI.DragComplete"
-msgid "Drag complete."
-msgstr "Sürükleme tamamlandı."
-
 #. UI.DragStarted
 msgctxt "UI.DragStarted"
 msgid "Started drag. Move to destination and press enter to drop."
 msgstr "Sürükleme başladı. Hedefe gidin ve bırakmak için Enter tuşuna basın."
-
-#. UI.DragStartedTroopPlacement
-msgctxt "UI.DragStartedTroopPlacement"
-msgid "Started drag for {0} at {1}. Press enter to drop on destination spawn point, or press escape to cancel."
-msgstr "{1} konumundaki {0} için sürükleme başladı. Hedef yerleştirme noktasına bırakmak için Enter, iptal için Escape tuşuna basın."
 
 #. UI.EditCancelled
 msgctxt "UI.EditCancelled"
@@ -1135,11 +1125,6 @@ msgctxt "Screens.UnknownSpell"
 msgid "unknown spell"
 msgstr "bilinmeyen büyü"
 
-#. Actions.Activate
-msgctxt "Actions.Activate"
-msgid "Activate"
-msgstr "Etkinleştir"
-
 #. Common.EssenceVariant
 msgctxt "Common.EssenceVariant"
 msgid "{0} ({1})"
@@ -1199,16 +1184,6 @@ msgstr "Önceki ilgili savaş karesi"
 msgctxt "Actions.FirstBufferLine"
 msgid "First Buffer Line"
 msgstr "İlk tampon satır"
-
-#. Actions.FirstMenuItem
-msgctxt "Actions.FirstMenuItem"
-msgid "First Menu Item"
-msgstr "İlk menü öğe"
-
-#. Actions.FirstRow
-msgctxt "Actions.FirstRow"
-msgid "First Row"
-msgstr "İlk satır"
 
 #. Actions.FocusHudNotifications
 msgctxt "Actions.FocusHudNotifications"
@@ -1270,16 +1245,6 @@ msgctxt "Actions.LastBufferLine"
 msgid "Last Buffer Line"
 msgstr "Son tampon satır"
 
-#. Actions.LastMenuItem
-msgctxt "Actions.LastMenuItem"
-msgid "Last Menu Item"
-msgstr "Son menü öğe"
-
-#. Actions.LastRow
-msgctxt "Actions.LastRow"
-msgid "Last Row"
-msgstr "Son satır"
-
 #. Actions.MapMoveEast
 msgctxt "Actions.MapMoveEast"
 msgid "Map Move East"
@@ -1315,35 +1280,10 @@ msgctxt "Actions.NextBufferLine"
 msgid "Next Buffer Line"
 msgstr "Sonraki tampon satır"
 
-#. Actions.NextColumn
-msgctxt "Actions.NextColumn"
-msgid "Next Column"
-msgstr "Sonraki sütun"
-
-#. Actions.NextHeading
-msgctxt "Actions.NextHeading"
-msgid "Next Heading"
-msgstr "Sonraki başlık"
-
-#. Actions.NextMenuItem
-msgctxt "Actions.NextMenuItem"
-msgid "Next Menu Item"
-msgstr "Sonraki menü öğe"
-
-#. Actions.NextRow
-msgctxt "Actions.NextRow"
-msgid "Next Row"
-msgstr "Sonraki satır"
-
 #. Actions.NextSettlement
 msgctxt "Actions.NextSettlement"
 msgid "Next Settlement"
 msgstr "Sonraki yerleşim"
-
-#. Actions.NextWidget
-msgctxt "Actions.NextWidget"
-msgid "Next Widget"
-msgstr "Sonraki widget"
 
 #. Actions.NextWielder
 msgctxt "Actions.NextWielder"
@@ -1364,31 +1304,6 @@ msgstr "Önceki tampon"
 msgctxt "Actions.PreviousBufferLine"
 msgid "Previous Buffer Line"
 msgstr "Önceki tampon satır"
-
-#. Actions.PreviousColumn
-msgctxt "Actions.PreviousColumn"
-msgid "Previous Column"
-msgstr "Önceki sütun"
-
-#. Actions.PreviousHeading
-msgctxt "Actions.PreviousHeading"
-msgid "Previous Heading"
-msgstr "Önceki başlık"
-
-#. Actions.PreviousMenuItem
-msgctxt "Actions.PreviousMenuItem"
-msgid "Previous Menu Item"
-msgstr "Önceki menü öğe"
-
-#. Actions.PreviousRow
-msgctxt "Actions.PreviousRow"
-msgid "Previous Row"
-msgstr "Önceki satır"
-
-#. Actions.PreviousWidget
-msgctxt "Actions.PreviousWidget"
-msgid "Previous Widget"
-msgstr "Önceki widget"
 
 #. Actions.ReadThreat
 msgctxt "Actions.ReadThreat"
@@ -1465,35 +1380,10 @@ msgctxt "Actions.ScannerSpeakDistanceAndDirection"
 msgid "Scanner Result Distance and Direction"
 msgstr "Tarayıcı Sonucunun Uzaklığı ve Yönü"
 
-#. Actions.SliderDecrease
-msgctxt "Actions.SliderDecrease"
-msgid "Slider Decrease"
-msgstr "Kaydırıcıyı azalt"
-
-#. Actions.SliderIncrease
-msgctxt "Actions.SliderIncrease"
-msgid "Slider Increase"
-msgstr "Kaydırıcıyı artır"
-
-#. Actions.SliderMaximum
-msgctxt "Actions.SliderMaximum"
-msgid "Slider Maximum"
-msgstr "Kaydırıcı maksimum"
-
-#. Actions.SliderMinimum
-msgctxt "Actions.SliderMinimum"
-msgid "Slider Minimum"
-msgstr "Kaydırıcı minimum"
-
 #. Actions.SonarSweep
 msgctxt "Actions.SonarSweep"
 msgid "Play Sonar Sweep"
 msgstr "Sonar taramasını çal"
-
-#. Actions.StartDrag
-msgctxt "Actions.StartDrag"
-msgid "Start Drag"
-msgstr "Sürüklemeyi başlat"
 
 #. Actions.SummarizeEnemyResources
 msgctxt "Actions.SummarizeEnemyResources"

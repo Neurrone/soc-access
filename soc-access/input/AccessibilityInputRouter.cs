@@ -133,13 +133,12 @@ namespace SongsOfConquestAccess.Input
             return screen != null && screen.Navigator != null && screen.Navigator.TakesTypedKey(key);
         }
 
-        // The stand-down applies on GRAPH screens only until the widget engine is gone: a widget
-        // screen's text input focuses the game's field itself on arrival and relies on the mod's own
-        // keys (Tab to the next widget) staying live to leave it again, so silencing the layer there
-        // would turn every remaining widget-era field into a trap.
+        // The stand-down applies wherever the game's own text field holds the keyboard, whatever is
+        // on the screen stack: while it does, every key is that field's and the mod's layer goes
+        // quiet rather than picking which keys to leave alone.
         private bool StandingDown()
         {
-            return GameTextFocus.IsTyping() && _screenManager != null && _screenManager.Current is GraphScreen;
+            return GameTextFocus.IsTyping();
         }
 
         /// <summary>

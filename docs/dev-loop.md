@@ -66,8 +66,8 @@ Mod routes answer 404 while the mod is down:
 - `GET /speech?since=N&wait=MS`: everything spoken since sequence N, `{entries:[{seq,text}],
   next}`; `wait` holds the answer until the next line (capped at 30 s). The ring resets on
   reload. The ready line spoken at start is captured too.
-- `POST /input`: body = one action key from `AccessibilityActions` (`next_menu_item`,
-  `activate`, `cancel`, `map_move_north`, `hex_grid_east`, ...). The action runs inside the
+- `POST /input`: body = one action key from `AccessibilityActions` (`ui_down`,
+  `ui_left_click`, `ui_back`, `map_move_north`, `hex_grid_east`, ...). The action runs inside the
   input router's own frame tick through the same claim check and dispatch a key press takes.
   Answers `{ok, action, outcome, speech:[...]}` with `outcome` one of `consumed`,
   `consumed (global)`, `claimed, not handled`, `unclaimed`, `no screen`; an unknown key is a

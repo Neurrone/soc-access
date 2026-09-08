@@ -385,20 +385,10 @@ msgctxt "UI.DragCancelled"
 msgid "Drag cancelled."
 msgstr "拖动已取消。"
 
-#. UI.DragComplete
-msgctxt "UI.DragComplete"
-msgid "Drag complete."
-msgstr "拖动完成。"
-
 #. UI.DragStarted
 msgctxt "UI.DragStarted"
 msgid "Started drag. Move to destination and press enter to drop."
 msgstr "已开始拖动。移动到目标位置并按回车放下。"
-
-#. UI.DragStartedTroopPlacement
-msgctxt "UI.DragStartedTroopPlacement"
-msgid "Started drag for {0} at {1}. Press enter to drop on destination spawn point, or press escape to cancel."
-msgstr "已开始拖动 {1} 的 {0}。按回车放到目标部署点，或按 Escape 取消。"
 
 #. UI.EditCancelled
 msgctxt "UI.EditCancelled"
@@ -1135,11 +1125,6 @@ msgctxt "Screens.UnknownSpell"
 msgid "unknown spell"
 msgstr "未知法术"
 
-#. Actions.Activate
-msgctxt "Actions.Activate"
-msgid "Activate"
-msgstr "执行"
-
 #. Common.EssenceVariant
 msgctxt "Common.EssenceVariant"
 msgid "{0} ({1})"
@@ -1199,16 +1184,6 @@ msgstr "上一个相关战斗格"
 msgctxt "Actions.FirstBufferLine"
 msgid "First Buffer Line"
 msgstr "第一个 缓冲区 行"
-
-#. Actions.FirstMenuItem
-msgctxt "Actions.FirstMenuItem"
-msgid "First Menu Item"
-msgstr "第一个 菜单 项目"
-
-#. Actions.FirstRow
-msgctxt "Actions.FirstRow"
-msgid "First Row"
-msgstr "第一个 行"
 
 #. Actions.FocusHudNotifications
 msgctxt "Actions.FocusHudNotifications"
@@ -1270,16 +1245,6 @@ msgctxt "Actions.LastBufferLine"
 msgid "Last Buffer Line"
 msgstr "最后一个 缓冲区 行"
 
-#. Actions.LastMenuItem
-msgctxt "Actions.LastMenuItem"
-msgid "Last Menu Item"
-msgstr "最后一个 菜单 项目"
-
-#. Actions.LastRow
-msgctxt "Actions.LastRow"
-msgid "Last Row"
-msgstr "最后一个 行"
-
 #. Actions.MapMoveEast
 msgctxt "Actions.MapMoveEast"
 msgid "Map Move East"
@@ -1315,35 +1280,10 @@ msgctxt "Actions.NextBufferLine"
 msgid "Next Buffer Line"
 msgstr "下一个 缓冲区 行"
 
-#. Actions.NextColumn
-msgctxt "Actions.NextColumn"
-msgid "Next Column"
-msgstr "下一个 列"
-
-#. Actions.NextHeading
-msgctxt "Actions.NextHeading"
-msgid "Next Heading"
-msgstr "下一个 标题"
-
-#. Actions.NextMenuItem
-msgctxt "Actions.NextMenuItem"
-msgid "Next Menu Item"
-msgstr "下一个 菜单 项目"
-
-#. Actions.NextRow
-msgctxt "Actions.NextRow"
-msgid "Next Row"
-msgstr "下一个 行"
-
 #. Actions.NextSettlement
 msgctxt "Actions.NextSettlement"
 msgid "Next Settlement"
 msgstr "下一个定居点"
-
-#. Actions.NextWidget
-msgctxt "Actions.NextWidget"
-msgid "Next Widget"
-msgstr "下一个 控件"
 
 #. Actions.NextWielder
 msgctxt "Actions.NextWielder"
@@ -1364,31 +1304,6 @@ msgstr "上一个 缓冲区"
 msgctxt "Actions.PreviousBufferLine"
 msgid "Previous Buffer Line"
 msgstr "上一个 缓冲区 行"
-
-#. Actions.PreviousColumn
-msgctxt "Actions.PreviousColumn"
-msgid "Previous Column"
-msgstr "上一个 列"
-
-#. Actions.PreviousHeading
-msgctxt "Actions.PreviousHeading"
-msgid "Previous Heading"
-msgstr "上一个 标题"
-
-#. Actions.PreviousMenuItem
-msgctxt "Actions.PreviousMenuItem"
-msgid "Previous Menu Item"
-msgstr "上一个 菜单 项目"
-
-#. Actions.PreviousRow
-msgctxt "Actions.PreviousRow"
-msgid "Previous Row"
-msgstr "上一个 行"
-
-#. Actions.PreviousWidget
-msgctxt "Actions.PreviousWidget"
-msgid "Previous Widget"
-msgstr "上一个 控件"
 
 #. Actions.ReadThreat
 msgctxt "Actions.ReadThreat"
@@ -1465,35 +1380,10 @@ msgctxt "Actions.ScannerSpeakDistanceAndDirection"
 msgid "Scanner Result Distance and Direction"
 msgstr "扫描结果的距离和方向"
 
-#. Actions.SliderDecrease
-msgctxt "Actions.SliderDecrease"
-msgid "Slider Decrease"
-msgstr "减小滑块"
-
-#. Actions.SliderIncrease
-msgctxt "Actions.SliderIncrease"
-msgid "Slider Increase"
-msgstr "增大滑块"
-
-#. Actions.SliderMaximum
-msgctxt "Actions.SliderMaximum"
-msgid "Slider Maximum"
-msgstr "滑块最大值"
-
-#. Actions.SliderMinimum
-msgctxt "Actions.SliderMinimum"
-msgid "Slider Minimum"
-msgstr "滑块最小值"
-
 #. Actions.SonarSweep
 msgctxt "Actions.SonarSweep"
 msgid "Play Sonar Sweep"
 msgstr "播放声呐扫描"
-
-#. Actions.StartDrag
-msgctxt "Actions.StartDrag"
-msgid "Start Drag"
-msgstr "开始拖动"
 
 #. Actions.SummarizeEnemyResources
 msgctxt "Actions.SummarizeEnemyResources"

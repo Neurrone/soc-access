@@ -405,20 +405,10 @@ msgctxt "UI.DragCancelled"
 msgid "Drag cancelled."
 msgstr "Перетаскивание отменено."
 
-#. UI.DragComplete
-msgctxt "UI.DragComplete"
-msgid "Drag complete."
-msgstr "Перетаскивание завершено."
-
 #. UI.DragStarted
 msgctxt "UI.DragStarted"
 msgid "Started drag. Move to destination and press enter to drop."
 msgstr "Перетаскивание начато. Перейдите к месту назначения и нажмите Enter, чтобы поместить."
-
-#. UI.DragStartedTroopPlacement
-msgctxt "UI.DragStartedTroopPlacement"
-msgid "Started drag for {0} at {1}. Press enter to drop on destination spawn point, or press escape to cancel."
-msgstr "Начато перетаскивание {0} на {1}. Нажмите Enter, чтобы поместить в точку размещения, или Escape для отмены."
 
 #. UI.EditCancelled
 msgctxt "UI.EditCancelled"
@@ -1155,11 +1145,6 @@ msgctxt "Screens.UnknownSpell"
 msgid "unknown spell"
 msgstr "неизвестное заклинание"
 
-#. Actions.Activate
-msgctxt "Actions.Activate"
-msgid "Activate"
-msgstr "Активировать"
-
 #. Common.EssenceVariant
 msgctxt "Common.EssenceVariant"
 msgid "{0} ({1})"
@@ -1219,16 +1204,6 @@ msgstr "Предыдущая важная боевая клетка"
 msgctxt "Actions.FirstBufferLine"
 msgid "First Buffer Line"
 msgstr "Первый буфер строка"
-
-#. Actions.FirstMenuItem
-msgctxt "Actions.FirstMenuItem"
-msgid "First Menu Item"
-msgstr "Первый меню элемент"
-
-#. Actions.FirstRow
-msgctxt "Actions.FirstRow"
-msgid "First Row"
-msgstr "Первый ряд"
 
 #. Actions.FocusHudNotifications
 msgctxt "Actions.FocusHudNotifications"
@@ -1290,16 +1265,6 @@ msgctxt "Actions.LastBufferLine"
 msgid "Last Buffer Line"
 msgstr "Последний буфер строка"
 
-#. Actions.LastMenuItem
-msgctxt "Actions.LastMenuItem"
-msgid "Last Menu Item"
-msgstr "Последний меню элемент"
-
-#. Actions.LastRow
-msgctxt "Actions.LastRow"
-msgid "Last Row"
-msgstr "Последний ряд"
-
 #. Actions.MapMoveEast
 msgctxt "Actions.MapMoveEast"
 msgid "Map Move East"
@@ -1335,35 +1300,10 @@ msgctxt "Actions.NextBufferLine"
 msgid "Next Buffer Line"
 msgstr "Следующий буфер строка"
 
-#. Actions.NextColumn
-msgctxt "Actions.NextColumn"
-msgid "Next Column"
-msgstr "Следующий столбец"
-
-#. Actions.NextHeading
-msgctxt "Actions.NextHeading"
-msgid "Next Heading"
-msgstr "Следующий заголовок"
-
-#. Actions.NextMenuItem
-msgctxt "Actions.NextMenuItem"
-msgid "Next Menu Item"
-msgstr "Следующий меню элемент"
-
-#. Actions.NextRow
-msgctxt "Actions.NextRow"
-msgid "Next Row"
-msgstr "Следующий ряд"
-
 #. Actions.NextSettlement
 msgctxt "Actions.NextSettlement"
 msgid "Next Settlement"
 msgstr "Следующее поселение"
-
-#. Actions.NextWidget
-msgctxt "Actions.NextWidget"
-msgid "Next Widget"
-msgstr "Следующий виджет"
 
 #. Actions.NextWielder
 msgctxt "Actions.NextWielder"
@@ -1384,31 +1324,6 @@ msgstr "Предыдущий буфер"
 msgctxt "Actions.PreviousBufferLine"
 msgid "Previous Buffer Line"
 msgstr "Предыдущий буфер строка"
-
-#. Actions.PreviousColumn
-msgctxt "Actions.PreviousColumn"
-msgid "Previous Column"
-msgstr "Предыдущий столбец"
-
-#. Actions.PreviousHeading
-msgctxt "Actions.PreviousHeading"
-msgid "Previous Heading"
-msgstr "Предыдущий заголовок"
-
-#. Actions.PreviousMenuItem
-msgctxt "Actions.PreviousMenuItem"
-msgid "Previous Menu Item"
-msgstr "Предыдущий меню элемент"
-
-#. Actions.PreviousRow
-msgctxt "Actions.PreviousRow"
-msgid "Previous Row"
-msgstr "Предыдущий ряд"
-
-#. Actions.PreviousWidget
-msgctxt "Actions.PreviousWidget"
-msgid "Previous Widget"
-msgstr "Предыдущий виджет"
 
 #. Actions.ReadThreat
 msgctxt "Actions.ReadThreat"
@@ -1485,35 +1400,10 @@ msgctxt "Actions.ScannerSpeakDistanceAndDirection"
 msgid "Scanner Result Distance and Direction"
 msgstr "Расстояние и направление результата сканера"
 
-#. Actions.SliderDecrease
-msgctxt "Actions.SliderDecrease"
-msgid "Slider Decrease"
-msgstr "Уменьшить ползунок"
-
-#. Actions.SliderIncrease
-msgctxt "Actions.SliderIncrease"
-msgid "Slider Increase"
-msgstr "Увеличить ползунок"
-
-#. Actions.SliderMaximum
-msgctxt "Actions.SliderMaximum"
-msgid "Slider Maximum"
-msgstr "Максимум ползунка"
-
-#. Actions.SliderMinimum
-msgctxt "Actions.SliderMinimum"
-msgid "Slider Minimum"
-msgstr "Минимум ползунка"
-
 #. Actions.SonarSweep
 msgctxt "Actions.SonarSweep"
 msgid "Play Sonar Sweep"
 msgstr "Воспроизвести сонарный обзор"
-
-#. Actions.StartDrag
-msgctxt "Actions.StartDrag"
-msgid "Start Drag"
-msgstr "Начать перетаскивание"
 
 #. Actions.SummarizeEnemyResources
 msgctxt "Actions.SummarizeEnemyResources"

@@ -385,20 +385,10 @@ msgctxt "UI.DragCancelled"
 msgid "Drag cancelled."
 msgstr "Glisser annulé."
 
-#. UI.DragComplete
-msgctxt "UI.DragComplete"
-msgid "Drag complete."
-msgstr "Glisser terminé."
-
 #. UI.DragStarted
 msgctxt "UI.DragStarted"
 msgid "Started drag. Move to destination and press enter to drop."
 msgstr "Glisser commencé. Allez à la destination et appuyez sur Entrée pour déposer."
-
-#. UI.DragStartedTroopPlacement
-msgctxt "UI.DragStartedTroopPlacement"
-msgid "Started drag for {0} at {1}. Press enter to drop on destination spawn point, or press escape to cancel."
-msgstr "Glisser de {0} vers {1} commencé. Appuyez sur Entrée pour déposer sur la cible de placement, ou Échap pour annuler."
 
 #. UI.EditCancelled
 msgctxt "UI.EditCancelled"
@@ -1145,11 +1135,6 @@ msgctxt "Screens.UnknownSpell"
 msgid "unknown spell"
 msgstr "sort inconnu"
 
-#. Actions.Activate
-msgctxt "Actions.Activate"
-msgid "Activate"
-msgstr "Activer"
-
 #. Common.EssenceVariant
 msgctxt "Common.EssenceVariant"
 msgid "{0} ({1})"
@@ -1209,16 +1194,6 @@ msgstr "Case de combat pertinente précédente"
 msgctxt "Actions.FirstBufferLine"
 msgid "First Buffer Line"
 msgstr "Premier tampon ligne"
-
-#. Actions.FirstMenuItem
-msgctxt "Actions.FirstMenuItem"
-msgid "First Menu Item"
-msgstr "Premier menu élément"
-
-#. Actions.FirstRow
-msgctxt "Actions.FirstRow"
-msgid "First Row"
-msgstr "Premier ligne"
 
 #. Actions.FocusHudNotifications
 msgctxt "Actions.FocusHudNotifications"
@@ -1280,16 +1255,6 @@ msgctxt "Actions.LastBufferLine"
 msgid "Last Buffer Line"
 msgstr "Dernier tampon ligne"
 
-#. Actions.LastMenuItem
-msgctxt "Actions.LastMenuItem"
-msgid "Last Menu Item"
-msgstr "Dernier menu élément"
-
-#. Actions.LastRow
-msgctxt "Actions.LastRow"
-msgid "Last Row"
-msgstr "Dernier ligne"
-
 #. Actions.MapMoveEast
 msgctxt "Actions.MapMoveEast"
 msgid "Map Move East"
@@ -1325,35 +1290,10 @@ msgctxt "Actions.NextBufferLine"
 msgid "Next Buffer Line"
 msgstr "Suivant tampon ligne"
 
-#. Actions.NextColumn
-msgctxt "Actions.NextColumn"
-msgid "Next Column"
-msgstr "Suivant colonne"
-
-#. Actions.NextHeading
-msgctxt "Actions.NextHeading"
-msgid "Next Heading"
-msgstr "Suivant titre"
-
-#. Actions.NextMenuItem
-msgctxt "Actions.NextMenuItem"
-msgid "Next Menu Item"
-msgstr "Suivant menu élément"
-
-#. Actions.NextRow
-msgctxt "Actions.NextRow"
-msgid "Next Row"
-msgstr "Suivant ligne"
-
 #. Actions.NextSettlement
 msgctxt "Actions.NextSettlement"
 msgid "Next Settlement"
 msgstr "Colonie suivante"
-
-#. Actions.NextWidget
-msgctxt "Actions.NextWidget"
-msgid "Next Widget"
-msgstr "Suivant widget"
 
 #. Actions.NextWielder
 msgctxt "Actions.NextWielder"
@@ -1374,31 +1314,6 @@ msgstr "Précédent tampon"
 msgctxt "Actions.PreviousBufferLine"
 msgid "Previous Buffer Line"
 msgstr "Précédent tampon ligne"
-
-#. Actions.PreviousColumn
-msgctxt "Actions.PreviousColumn"
-msgid "Previous Column"
-msgstr "Précédent colonne"
-
-#. Actions.PreviousHeading
-msgctxt "Actions.PreviousHeading"
-msgid "Previous Heading"
-msgstr "Précédent titre"
-
-#. Actions.PreviousMenuItem
-msgctxt "Actions.PreviousMenuItem"
-msgid "Previous Menu Item"
-msgstr "Précédent menu élément"
-
-#. Actions.PreviousRow
-msgctxt "Actions.PreviousRow"
-msgid "Previous Row"
-msgstr "Précédent ligne"
-
-#. Actions.PreviousWidget
-msgctxt "Actions.PreviousWidget"
-msgid "Previous Widget"
-msgstr "Précédent widget"
 
 #. Actions.ReadThreat
 msgctxt "Actions.ReadThreat"
@@ -1475,35 +1390,10 @@ msgctxt "Actions.ScannerSpeakDistanceAndDirection"
 msgid "Scanner Result Distance and Direction"
 msgstr "Distance et direction du résultat du scanner"
 
-#. Actions.SliderDecrease
-msgctxt "Actions.SliderDecrease"
-msgid "Slider Decrease"
-msgstr "Diminuer le curseur"
-
-#. Actions.SliderIncrease
-msgctxt "Actions.SliderIncrease"
-msgid "Slider Increase"
-msgstr "Augmenter le curseur"
-
-#. Actions.SliderMaximum
-msgctxt "Actions.SliderMaximum"
-msgid "Slider Maximum"
-msgstr "Curseur au maximum"
-
-#. Actions.SliderMinimum
-msgctxt "Actions.SliderMinimum"
-msgid "Slider Minimum"
-msgstr "Curseur au minimum"
-
 #. Actions.SonarSweep
 msgctxt "Actions.SonarSweep"
 msgid "Play Sonar Sweep"
 msgstr "Jouer le balayage sonar"
-
-#. Actions.StartDrag
-msgctxt "Actions.StartDrag"
-msgid "Start Drag"
-msgstr "Commencer le glissement"
 
 #. Actions.SummarizeEnemyResources
 msgctxt "Actions.SummarizeEnemyResources"

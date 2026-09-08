@@ -5,9 +5,9 @@ using SongsOfConquestAccess.Localization;
 
 namespace SongsOfConquestAccess.Input
 {
-    // If a new widget uses the same key (such as the arrow keys) as an existing widget, do not reuse the previous widget's action in the new widget
-    // Instead, create new semantic actions for the new widget.
-    // For example, the map navigation and menu widgets both use the arrow keys, but different actions
+    // If a new consumer uses the same key (such as the arrow keys) as an existing one, do not reuse
+    // the other's action. Instead, create new semantic actions for the new consumer.
+    // For example, the map cursor and the graph's own navigation both use the arrow keys, but different actions
     public static class AccessibilityActions
     {
         // Global actions are available on every accessibility screen. The input
@@ -71,30 +71,6 @@ namespace SongsOfConquestAccess.Input
 
             return false;
         }
-
-        public static readonly InputAction NextWidget = OneShot("next_widget", ModStrings.Actions.NextWidget, InputClaimScope.Screen)
-            .AddBinding(new KeyboardBinding(Key.Tab));
-
-        public static readonly InputAction PreviousWidget = OneShot("previous_widget", ModStrings.Actions.PreviousWidget, InputClaimScope.Screen)
-            .AddBinding(new KeyboardBinding(Key.Tab, shift: true));
-
-        public static readonly InputAction NextMenuItem = OneShot("next_menu_item", ModStrings.Actions.NextMenuItem, InputClaimScope.Screen)
-            .AddBinding(new KeyboardBinding(Key.DownArrow));
-
-        public static readonly InputAction PreviousMenuItem = OneShot("previous_menu_item", ModStrings.Actions.PreviousMenuItem, InputClaimScope.Screen)
-            .AddBinding(new KeyboardBinding(Key.UpArrow));
-
-        public static readonly InputAction FirstMenuItem = OneShot("first_menu_item", ModStrings.Actions.FirstMenuItem, InputClaimScope.Screen)
-            .AddBinding(new KeyboardBinding(Key.Home));
-
-        public static readonly InputAction LastMenuItem = OneShot("last_menu_item", ModStrings.Actions.LastMenuItem, InputClaimScope.Screen)
-            .AddBinding(new KeyboardBinding(Key.End));
-
-        public static readonly InputAction NextHeading = OneShot("next_heading", ModStrings.Actions.NextHeading, InputClaimScope.FocusedWidget)
-            .AddBinding(new KeyboardBinding(Key.H));
-
-        public static readonly InputAction PreviousHeading = OneShot("previous_heading", ModStrings.Actions.PreviousHeading, InputClaimScope.FocusedWidget)
-            .AddBinding(new KeyboardBinding(Key.H, shift: true));
 
         public static readonly InputAction MapMoveNorth = OneShot("map_move_north", ModStrings.Actions.MapMoveNorth, InputClaimScope.Screen)
             .AddBinding(new KeyboardBinding(Key.UpArrow));
@@ -225,51 +201,11 @@ namespace SongsOfConquestAccess.Input
         public static readonly InputAction ScannerPreviousCustomEntrySlash =
             CustomEntry("scanner_previous_custom_entry_slash", ModStrings.Actions.ScannerPreviousCustomEntry, ModStrings.Scanner.QuickKeySlash, Key.Slash, shift: true);
 
-        public static readonly InputAction SliderDecrease = OneShot("slider_decrease", ModStrings.Actions.SliderDecrease, InputClaimScope.FocusedWidget)
-            .AddBinding(new KeyboardBinding(Key.LeftArrow));
-
-        public static readonly InputAction SliderIncrease = OneShot("slider_increase", ModStrings.Actions.SliderIncrease, InputClaimScope.FocusedWidget)
-            .AddBinding(new KeyboardBinding(Key.RightArrow));
-
-        public static readonly InputAction SliderMinimum = OneShot("slider_minimum", ModStrings.Actions.SliderMinimum, InputClaimScope.FocusedWidget)
-            .AddBinding(new KeyboardBinding(Key.Home));
-
-        public static readonly InputAction SliderMaximum = OneShot("slider_maximum", ModStrings.Actions.SliderMaximum, InputClaimScope.FocusedWidget)
-            .AddBinding(new KeyboardBinding(Key.End));
-
-        public static readonly InputAction PreviousRow = OneShot("previous_row", ModStrings.Actions.PreviousRow, InputClaimScope.FocusedWidget)
-            .AddBinding(new KeyboardBinding(Key.UpArrow));
-
-        public static readonly InputAction NextRow = OneShot("next_row", ModStrings.Actions.NextRow, InputClaimScope.FocusedWidget)
-            .AddBinding(new KeyboardBinding(Key.DownArrow));
-
-        public static readonly InputAction PreviousColumn = OneShot("previous_column", ModStrings.Actions.PreviousColumn, InputClaimScope.FocusedWidget)
-            .AddBinding(new KeyboardBinding(Key.LeftArrow));
-
-        public static readonly InputAction NextColumn = OneShot("next_column", ModStrings.Actions.NextColumn, InputClaimScope.FocusedWidget)
-            .AddBinding(new KeyboardBinding(Key.RightArrow));
-
-        public static readonly InputAction FirstRow = OneShot("first_row", ModStrings.Actions.FirstRow, InputClaimScope.FocusedWidget)
-            .AddBinding(new KeyboardBinding(Key.Home));
-
-        public static readonly InputAction LastRow = OneShot("last_row", ModStrings.Actions.LastRow, InputClaimScope.FocusedWidget)
-            .AddBinding(new KeyboardBinding(Key.End));
-
-        public static readonly InputAction Activate = OneShot("activate", ModStrings.Actions.Activate, InputClaimScope.Screen)
-            .AddBinding(new KeyboardBinding(Key.Enter))
-            .AddBinding(new KeyboardBinding(Key.NumpadEnter));
-
-        public static readonly InputAction StartDrag = OneShot("start_drag", ModStrings.Actions.StartDrag, InputClaimScope.FocusedWidget)
-            .AddBinding(new KeyboardBinding(Key.Space));
-
-        public static readonly InputAction Cancel = OneShot("cancel", ModStrings.Actions.Cancel, InputClaimScope.Screen)
-            .AddBinding(new KeyboardBinding(Key.Escape));
-
         // The graph engine's own keys (screens/GraphScreen.cs). Named for what the player is doing
-        // rather than for the widget under the cursor, because on a graph screen one key means
+        // rather than for the control under the cursor, because on a graph screen one key means
         // several things in turn: Left adjusts a slider, else steps along a row, else collapses a
-        // group. They share physical keys with the widget actions above and never meet them, since a
-        // graph screen claims only these and a widget screen claims only those.
+        // group. They share physical keys with the map, combat and scanner actions above; a screen
+        // claims one set or the other, never both, so the two never meet.
         public static readonly InputAction UiUp = OneShot("ui_up", ModStrings.Actions.UiUp, InputClaimScope.Screen)
             .AddBinding(new KeyboardBinding(Key.UpArrow));
 
@@ -595,14 +531,6 @@ namespace SongsOfConquestAccess.Input
         {
             List<InputAction> actions = new List<InputAction>
             {
-                NextWidget,
-                PreviousWidget,
-                NextMenuItem,
-                PreviousMenuItem,
-                FirstMenuItem,
-                LastMenuItem,
-                NextHeading,
-                PreviousHeading,
                 MapMoveNorth,
                 MapMoveSouth,
                 MapMoveWest,
@@ -642,16 +570,6 @@ namespace SongsOfConquestAccess.Input
                 ScannerPreviousCustomEntryPeriod,
                 ScannerNextCustomEntrySlash,
                 ScannerPreviousCustomEntrySlash,
-                SliderDecrease,
-                SliderIncrease,
-                SliderMinimum,
-                SliderMaximum,
-                PreviousRow,
-                NextRow,
-                PreviousColumn,
-                NextColumn,
-                FirstRow,
-                LastRow,
                 HexGridWest,
                 HexGridEast,
                 HexGridNorthWest,
@@ -675,9 +593,6 @@ namespace SongsOfConquestAccess.Input
                 CombatPreviousRelevantTile,
                 CombatFocusTimeline,
                 ReadThreat,
-                StartDrag,
-                Activate,
-                Cancel,
                 UiUp,
                 UiDown,
                 UiLeft,

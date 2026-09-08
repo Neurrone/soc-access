@@ -238,7 +238,6 @@ namespace SongsOfConquestAccess.Localization
 
         public static class Actions
         {
-            public static readonly ModString Activate = new ModString("Actions.Activate", "Activate");
             public static readonly ModString Cancel = new ModString("Actions.Cancel", "Cancel");
             public static readonly ModString CombatFocusActingTroop = new ModString("Actions.CombatFocusActingTroop", "Focus Acting Troop");
             public static readonly ModString CombatFocusTimeline = new ModString("Actions.CombatFocusTimeline", "Focus Timeline");
@@ -252,8 +251,6 @@ namespace SongsOfConquestAccess.Localization
             public static readonly ModString DescribePosition = new ModString("Actions.DescribePosition", "Describe Position");
             public static readonly ModString Dismiss = new ModString("Actions.Dismiss", "Dismiss");
             public static readonly ModString FirstBufferLine = new ModString("Actions.FirstBufferLine", "First Buffer Line");
-            public static readonly ModString FirstMenuItem = new ModString("Actions.FirstMenuItem", "First Menu Item");
-            public static readonly ModString FirstRow = new ModString("Actions.FirstRow", "First Row");
             public static readonly ModString FocusHudNotifications = new ModString("Actions.FocusHudNotifications", "Focus HUD Notifications");
             public static readonly ModString FocusHudObjectives = new ModString("Actions.FocusHudObjectives", "Focus HUD Objectives");
             public static readonly ModString FocusHudResources = new ModString("Actions.FocusHudResources", "Focus HUD Resources");
@@ -266,8 +263,6 @@ namespace SongsOfConquestAccess.Localization
             public static readonly ModString HexGridFocusCenterTile = new ModString("Actions.HexGridFocusCenterTile", "Focus Center Tile");
             public static readonly ModString HexGridWest = new ModString("Actions.HexGridWest", "Hex Grid West");
             public static readonly ModString LastBufferLine = new ModString("Actions.LastBufferLine", "Last Buffer Line");
-            public static readonly ModString LastMenuItem = new ModString("Actions.LastMenuItem", "Last Menu Item");
-            public static readonly ModString LastRow = new ModString("Actions.LastRow", "Last Row");
             public static readonly ModString MapMoveEast = new ModString("Actions.MapMoveEast", "Map Move East");
             public static readonly ModString MapMoveNorth = new ModString("Actions.MapMoveNorth", "Map Move North");
             public static readonly ModString MapMoveSouth = new ModString("Actions.MapMoveSouth", "Map Move South");
@@ -275,21 +270,11 @@ namespace SongsOfConquestAccess.Localization
             public static readonly ModString MapSecondaryAction = new ModString("Actions.MapSecondaryAction", "Map Secondary Action");
             public static readonly ModString NextBuffer = new ModString("Actions.NextBuffer", "Next Buffer");
             public static readonly ModString NextBufferLine = new ModString("Actions.NextBufferLine", "Next Buffer Line");
-            public static readonly ModString NextColumn = new ModString("Actions.NextColumn", "Next Column");
-            public static readonly ModString NextHeading = new ModString("Actions.NextHeading", "Next Heading");
-            public static readonly ModString NextMenuItem = new ModString("Actions.NextMenuItem", "Next Menu Item");
-            public static readonly ModString NextRow = new ModString("Actions.NextRow", "Next Row");
             public static readonly ModString NextSettlement = new ModString("Actions.NextSettlement", "Next Settlement");
-            public static readonly ModString NextWidget = new ModString("Actions.NextWidget", "Next Widget");
             public static readonly ModString NextWielder = new ModString("Actions.NextWielder", "Next Wielder");
             public static readonly ModString OpenModSettings = new ModString("Actions.OpenModSettings", "Open Mod Settings");
             public static readonly ModString PreviousBuffer = new ModString("Actions.PreviousBuffer", "Previous Buffer");
             public static readonly ModString PreviousBufferLine = new ModString("Actions.PreviousBufferLine", "Previous Buffer Line");
-            public static readonly ModString PreviousColumn = new ModString("Actions.PreviousColumn", "Previous Column");
-            public static readonly ModString PreviousHeading = new ModString("Actions.PreviousHeading", "Previous Heading");
-            public static readonly ModString PreviousMenuItem = new ModString("Actions.PreviousMenuItem", "Previous Menu Item");
-            public static readonly ModString PreviousRow = new ModString("Actions.PreviousRow", "Previous Row");
-            public static readonly ModString PreviousWidget = new ModString("Actions.PreviousWidget", "Previous Widget");
             public static readonly ModString ReadThreat = new ModString("Actions.ReadThreat", "Read Threat");
             public static readonly ModString ScannerDecreaseLookAroundRadius = new ModString("Actions.ScannerDecreaseLookAroundRadius", "Decrease Look Around Radius");
             public static readonly ModString ScannerIncreaseLookAroundRadius = new ModString("Actions.ScannerIncreaseLookAroundRadius", "Increase Look Around Radius");
@@ -307,12 +292,7 @@ namespace SongsOfConquestAccess.Localization
             public static readonly ModString ScannerPreviousSubcategory = new ModString("Actions.ScannerPreviousSubcategory", "Previous Scanner Subcategory");
             public static readonly ModString ScannerReturnFromJump = new ModString("Actions.ScannerReturnFromJump", "Return To Tile Before Jump");
             public static readonly ModString ScannerSpeakDistanceAndDirection = new ModString("Actions.ScannerSpeakDistanceAndDirection", "Scanner Result Distance and Direction");
-            public static readonly ModString SliderDecrease = new ModString("Actions.SliderDecrease", "Slider Decrease");
-            public static readonly ModString SliderIncrease = new ModString("Actions.SliderIncrease", "Slider Increase");
-            public static readonly ModString SliderMaximum = new ModString("Actions.SliderMaximum", "Slider Maximum");
-            public static readonly ModString SliderMinimum = new ModString("Actions.SliderMinimum", "Slider Minimum");
             public static readonly ModString SonarSweep = new ModString("Actions.SonarSweep", "Play Sonar Sweep");
-            public static readonly ModString StartDrag = new ModString("Actions.StartDrag", "Start Drag");
             public static readonly ModString SummarizeReachableEntities = new ModString("Actions.SummarizeReachableEntities", "Summarize Reachable Entities");
             public static readonly ModString SummarizeEnemyResources = new ModString("Actions.SummarizeEnemyResources", "Summarize Enemy Resources");
             public static readonly ModString SummarizeResources = new ModString("Actions.SummarizeResources", "Summarize Resources");
@@ -463,9 +443,7 @@ namespace SongsOfConquestAccess.Localization
             public static readonly ModString Battlefield = new ModString("UI.Battlefield", "Battlefield");
             public static readonly ModString Cancelled = new ModString("UI.Cancelled", "Cancelled.");
             public static readonly ModString DragCancelled = new ModString("UI.DragCancelled", "Drag cancelled.");
-            public static readonly ModString DragComplete = new ModString("UI.DragComplete", "Drag complete.");
             public static readonly ModString DragStarted = new ModString("UI.DragStarted", "Started drag. Move to destination and press enter to drop.");
-            public static readonly ModString DragStartedTroopPlacement = new ModString("UI.DragStartedTroopPlacement", "Started drag for {0} at {1}. Press enter to drop on destination spawn point, or press escape to cancel.");
             public static readonly ModString EditCancelled = new ModString("UI.EditCancelled", "Cancelled");
             public static readonly ModString EditCommitted = new ModString("UI.EditCommitted", "edited");
             public static readonly ModString EditStarted = new ModString("UI.EditStarted", "editing");
