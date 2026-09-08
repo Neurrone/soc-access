@@ -2679,11 +2679,6 @@ msgctxt "Screens.ModOptions"
 msgid "Mod options"
 msgstr ""
 
-#. Screens.Modifiers
-msgctxt "Screens.Modifiers"
-msgid "Modifiers"
-msgstr ""
-
 #. Screens.MoveDown
 msgctxt "Screens.MoveDown"
 msgid "Move down"

@@ -437,12 +437,7 @@ namespace SongsOfConquestAccess.UI.Graph
 
         /// <summary>Where focus lands when entering a stop with no active cursor: the remembered
         /// position, else the SELECTED member (a radio/tab/list item currently checked — a boon on long
-        /// lists), else the stop's first node.
-        ///
-        /// A stop whose landing was declared EXACT (<see cref="GraphRender.ExactStopLandings"/>,
-        /// <see cref="GraphBuilder.LandStopOn"/>) skips the selected member: with no remembered
-        /// position it lands exactly where it said, even when an alternative below it reads as
-        /// selected, which is what a stop whose tail is a tab bar needs.</summary>
+        /// lists), else the stop's first node.</summary>
         public GraphNode StopLanding(object stopKey)
         {
             return StopLanding(_current, _state, stopKey);
@@ -456,11 +451,9 @@ namespace SongsOfConquestAccess.UI.Graph
                 GraphNode node = render.NodeAt(remembered);
                 if (node != null && Equals(node.StopKey, stopKey)) return node;
             }
-            GraphNode declared = DeclaredLanding(render, stopKey);
-            if (declared != null && stopKey != null && render.ExactStopLandings.Contains(stopKey))
-                return declared;
             GraphNode selected = SelectedNodeInStop(render, stopKey);
             if (selected != null) return selected;
+            GraphNode declared = DeclaredLanding(render, stopKey);
             if (declared != null) return declared;
             foreach (GraphNode n in render.Order)
                 if (Equals(n.StopKey, stopKey)) return n;

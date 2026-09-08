@@ -752,15 +752,8 @@ namespace SongsOfConquestAccess.UI.Graph
 
         /// <summary>Where Tab lands in a stop that does not want its FIRST node - see
         /// <see cref="GraphBuilder.LandStopOn"/>. Keyed by stop key; a stop with no entry lands on its
-        /// first node as before, and one listed in <see cref="ExactStopLandings"/> lands there whatever
-        /// else reads as selected.</summary>
+        /// first node as before.</summary>
         public readonly Dictionary<object, ControlId> StopLandings = new Dictionary<object, ControlId>();
-
-        /// <summary>The stops whose <see cref="StopLandings"/> entry must be used AS IT IS: the stop
-        /// lands exactly there when it has no remembered position, even when an alternative below it
-        /// reads as selected - what a stop whose tail is a tab bar needs. See
-        /// <see cref="GraphBuilder.LandStopOn"/>.</summary>
-        public readonly HashSet<object> ExactStopLandings = new HashSet<object>();
 
         /// <summary>This build offers FEWER KINDS of thing than the one before it - see
         /// <see cref="GraphBuilder.SeatOnContainer"/>.</summary>

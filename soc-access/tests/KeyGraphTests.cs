@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using SongsOfConquestAccess.UI.Graph;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
@@ -191,7 +191,7 @@ namespace SongsOfConquestAccess.Tests
         /// <summary>A stop whose first nodes are not what the player came for - a table's sort headings,
         /// where the SORTED column reads "selected" - says where Tab lands, and the
         /// land-on-the-selected-one rule runs from there rather than over the headings.</summary>
-        private static KeyGraph TableUnderHeadings(GraphState state, bool rowSelected, bool exact = false)
+        private static KeyGraph TableUnderHeadings(GraphState state, bool rowSelected)
         {
             return new KeyGraph(Renderer(b =>
             {
@@ -204,7 +204,7 @@ namespace SongsOfConquestAccess.Tests
                     Id("row2"),
                     Vt("Beta", Part(rowSelected ? "selected" : null, AnnouncementKinds.Selected))
                 ));
-                b.LandStopOn(Id("row1"), exact);
+                b.LandStopOn(Id("row1"));
             }), state);
         }
 
@@ -226,19 +226,6 @@ namespace SongsOfConquestAccess.Tests
             g.Rerender();
             Assert.IsTrue(g.MoveStop(1, true).Moved);
             Assert.AreEqual("row2", Focused(g));
-        }
-
-        /// <summary>A stop whose tail is a tab bar says where Tab lands EXACTLY: the showing tab is an
-        /// alternative in force and would otherwise take the landing off the thing the stop is about.
-        /// </summary>
-        [TestMethod]
-        public void ATabStopWithAnExactLandingIgnoresASelectedNodeBelowIt()
-        {
-            GraphState state = new GraphState();
-            KeyGraph g = TableUnderHeadings(state, true, exact: true);
-            g.Rerender();
-            Assert.IsTrue(g.MoveStop(1, true).Moved);
-            Assert.AreEqual("row1", Focused(g));
         }
 
         // ---- regions ----

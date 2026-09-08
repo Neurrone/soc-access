@@ -132,9 +132,6 @@ namespace SongsOfConquestAccess.UI.Graph
         // Per-stop Tab landings — see LandStopOn.
         private readonly Dictionary<object, ControlId> _stopLandings = new Dictionary<object, ControlId>();
 
-        // The stops whose landing is EXACT - see LandStopOn's exact argument.
-        private readonly HashSet<object> _exactStopLandings = new HashSet<object>();
-
         // The parent stack: structural levels (PushContext) and group headers (BeginGroup). A frame whose
         // group is collapsed suppresses every declaration beneath it (the stack stays balanced regardless).
         private sealed class ParentFrame
@@ -184,19 +181,10 @@ namespace SongsOfConquestAccess.UI.Graph
         /// selected node is looked for from here ONWARD, so the table still opens on the selected row
         /// and never on the sorted column's heading. Everything declared above it stays reachable with
         /// the arrow keys, which is how the player reaches a heading in the first place.
-        ///
-        /// <paramref name="exact"/> takes the alternatives rule away: the stop lands exactly here when
-        /// it has no remembered position, even when something below reads as SELECTED. That is what a
-        /// stop whose tail is a tab bar needs - the showing tab is an alternative in force and would
-        /// otherwise win the landing, so Tab into the stop would open on the bar rather than on the
-        /// thing the stop is about.
         /// </summary>
-        public GraphBuilder LandStopOn(ControlId id, bool exact = false)
+        public GraphBuilder LandStopOn(ControlId id)
         {
-            if (id == null) return this;
-            _stopLandings[_stopKey] = id;
-            if (exact) _exactStopLandings.Add(_stopKey);
-            else _exactStopLandings.Remove(_stopKey);
+            if (id != null) _stopLandings[_stopKey] = id;
             return this;
         }
 
@@ -529,12 +517,7 @@ namespace SongsOfConquestAccess.UI.Graph
                 ? _start
                 : render.Order[0].Id;
             foreach (KeyValuePair<object, ControlId> landing in _stopLandings)
-                if (render.Nodes.ContainsKey(landing.Value))
-                {
-                    render.StopLandings[landing.Key] = landing.Value;
-                    if (_exactStopLandings.Contains(landing.Key))
-                        render.ExactStopLandings.Add(landing.Key);
-                }
+                if (render.Nodes.ContainsKey(landing.Value)) render.StopLandings[landing.Key] = landing.Value;
             StampPositions();
             return render;
         }

@@ -880,11 +880,6 @@ msgctxt "Screens.ModOptions"
 msgid "Mod options"
 msgstr "Параметры мода"
 
-#. Screens.Modifiers
-msgctxt "Screens.Modifiers"
-msgid "Modifiers"
-msgstr "Модификаторы"
-
 #. Screens.NewChatMessage
 msgctxt "Screens.NewChatMessage"
 msgid "New chat message"

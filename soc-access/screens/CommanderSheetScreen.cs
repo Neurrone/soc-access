@@ -12,15 +12,9 @@ using UnityEngine;
 namespace SongsOfConquestAccess.Screens
 {
     /// <summary>
-    /// The wielder sheet, made navigable as a graph. Six places to be, in the order the sheet draws
-    /// them: the tutorial button, the overview, the equipment, the backpack, the skills and powers,
-    /// and the close cross.
-    ///
-    /// THE OVERVIEW IS THE STATS, THE SPECIALIZATION AND THE MODIFIERS, in that order, and it lands
-    /// on the first stat EXACTLY (<c>GraphBuilder.LandStopOn</c> with exact): the modifier bar in its
-    /// tail reads as selected, and a stop otherwise lands on whichever alternative is in force, so an
-    /// exact landing is what keeps Tab off the bar. The bar and the showing tab's lines are a region
-    /// named Modifiers after the specialization, which is what Alt+Down reaches them by.
+    /// The wielder sheet, made navigable as a graph. Seven places to be, in the order the sheet draws
+    /// them: the tutorial button, the overview (stats and specialization), the modifier tabs with the
+    /// modifiers under them, the equipment, the backpack, the skills and powers, and the close cross.
     ///
     /// EVERY GESTURE ON AN ARTIFACT IS THE GAME'S OWN CLICK, delivered into the button the game hangs
     /// its handlers on (<c>InventoryArtifactMovable</c>'s <c>UIButton</c>), so the game's own rules
@@ -61,6 +55,7 @@ namespace SongsOfConquestAccess.Screens
     {
         private const string TutorialStop = "commander-sheet-tutorial";
         private const string OverviewStop = "commander-sheet-overview";
+        private const string ModifiersStop = "commander-sheet-modifiers";
         private const string EquipmentStop = "commander-sheet-equipment";
         private const string InventoryStop = "commander-sheet-inventory";
         private const string SkillsStop = "commander-sheet-skills";
@@ -153,6 +148,9 @@ namespace SongsOfConquestAccess.Screens
             builder.BeginStop(OverviewStop);
             BuildOverview(builder);
 
+            builder.BeginStop(ModifiersStop);
+            BuildModifiers(builder);
+
             builder.BeginStop(EquipmentStop);
             BuildEquipment(builder);
 
@@ -190,7 +188,7 @@ namespace SongsOfConquestAccess.Screens
 
         private void BuildOverview(GraphBuilder builder)
         {
-            ControlId firstStat = BuildBand(
+            BuildBand(
                 builder,
                 "stats",
                 GameText.Get("Common/CommanderInventory/Stats", string.Empty),
@@ -200,20 +198,25 @@ namespace SongsOfConquestAccess.Screens
                 "specialization",
                 GameText.Get("Commanders/Tooltip/Specializations", string.Empty),
                 Items("Specializations", _adapter.GetSpecializations));
-            BuildModifiers(builder);
-
-            if (firstStat != null)
-            {
-                // Exactly there: the bar in the stop's tail reads as selected, and a stop otherwise
-                // lands on the alternative in force.
-                builder.LandStopOn(firstStat, exact: true);
-            }
         }
 
-        /// <summary>The modifier tab bar and the rows of the showing tab, one region of the overview
-        /// (<see cref="CommanderBands.Modifiers"/>) - read-only after the specialization, reached by
-        /// the region jump rather than by Tab.</summary>
+        /// <summary>The modifier tab bar and the rows of the showing tab, a stop of their own as the
+        /// options screen's tabs are: a stop lands on whichever alternative is selected, and the bar
+        /// under the stats would have made Tab into the overview land mid-stop on the selected tab.
+        /// </summary>
         private void BuildModifiers(GraphBuilder builder)
+        {
+            BuildModifierTabs(builder);
+            BuildBand(
+                builder,
+                "modifiers",
+                _adapter.GetActiveModifierListLabel(),
+                Items("Modifiers", _adapter.GetActiveModifiers));
+        }
+
+        /// <summary>The three modifier tabs as the ONE BAR the sheet draws
+        /// (<see cref="CommanderBands.Tabs"/>).</summary>
+        private void BuildModifierTabs(GraphBuilder builder)
         {
             IReadOnlyList<CommanderSheetAdapter.ModifierCategory> categories = _adapter.GetModifierCategories();
             List<CommanderBands.TabItem> tabs = new List<CommanderBands.TabItem>();
@@ -223,16 +226,13 @@ namespace SongsOfConquestAccess.Screens
                 tabs.Add(new CommanderBands.TabItem(it.Label, it.Index, it.Button, it.Tooltip));
             }
 
-            CommanderBands.Modifiers(
+            CommanderBands.Tabs(
                 builder,
                 KeyPrefix,
                 tabs,
                 _adapter.GetActiveModifierCategoryIndex,
                 index => _adapter.ActivateModifierCategory(index),
-                index => _adapter.SelectModifierCategory(index),
-                _adapter.GetActiveModifierListLabel(),
-                Lines(Items("Modifiers", _adapter.GetActiveModifiers)),
-                Marker);
+                index => _adapter.SelectModifierCategory(index));
         }
 
         // ---- the equipment and the backpack ----
@@ -310,18 +310,11 @@ namespace SongsOfConquestAccess.Screens
 
         /// <summary>One of the bands the sheet draws under a caption - the stats, the specialization,
         /// the modifiers of the showing tab, the skills, the powers
-        /// (<see cref="CommanderBands.Band"/>). Answers with the band's first line, which is what the
-        /// overview lands its stop on.</summary>
-        private ControlId BuildBand(
+        /// (<see cref="CommanderBands.Band"/>).</summary>
+        private void BuildBand(
             GraphBuilder builder,
             string key,
             string caption,
-            IReadOnlyList<CommanderSheetAdapter.LabeledItem> items)
-        {
-            return CommanderBands.Band(builder, KeyPrefix, key, caption, Lines(items), Marker);
-        }
-
-        private static IReadOnlyList<CommanderBands.Line> Lines(
             IReadOnlyList<CommanderSheetAdapter.LabeledItem> items)
         {
             List<CommanderBands.Line> lines = new List<CommanderBands.Line>();
@@ -331,7 +324,7 @@ namespace SongsOfConquestAccess.Screens
                 lines.Add(new CommanderBands.Line(it.Label, it.Value, it.Tooltip, it.OnFocus));
             }
 
-            return lines;
+            CommanderBands.Band(builder, KeyPrefix, key, caption, lines, Marker);
         }
 
         /// <summary>One band's items, or an empty band where reading them threw: a section the game
