@@ -23,11 +23,8 @@ namespace SongsOfConquestAccess.UI
     /// THE GAME'S CLICKS ARE THE NODE'S, not this class's: Enter (confirm a spell or ability target
     /// while aiming) and Backslash (the right click a troop acts with) are declared on the node by
     /// the screen, and Escape reaches <see cref="HandleBack"/> through the screen's Back.
-    ///
-    /// The widget base is still here; phase G removes it once no widget tree exists at all. Nothing
-    /// adds this to one any more.
     /// </summary>
-    public sealed class CombatHexGrid : Widget
+    public sealed class CombatHexGrid
     {
         private const string ScannerWrapCueKey = "Common_ClickUnfold";
         private static readonly Vector2Int CenterTile = new Vector2Int(6, 4);
@@ -41,7 +38,6 @@ namespace SongsOfConquestAccess.UI
         private readonly ScannerJumpAnchor _jumpAnchor = new ScannerJumpAnchor();
 
         public CombatHexGrid(CombatAdapter adapter)
-            : base("combat-hex-grid")
         {
             _adapter = adapter;
             RefreshSnapshot();
@@ -65,17 +61,7 @@ namespace SongsOfConquestAccess.UI
                 ScannerDirectionMode.Hex);
         }
 
-        public override string GetRole()
-        {
-            return string.Empty;
-        }
-
-        public override string GetAnnouncementKey()
-        {
-            return _cursor.ToString();
-        }
-
-        public override string GetLabel()
+        public string GetLabel()
         {
             CombatTile tile = GetFocusedTile();
             bool selectedForSpellcast = _adapter != null
@@ -86,7 +72,7 @@ namespace SongsOfConquestAccess.UI
                 : ModText.Get(ModStrings.UI.Battlefield);
         }
 
-        public override Tooltip GetTooltip()
+        public Tooltip GetTooltip()
         {
             return _adapter != null ? _adapter.GetInspectTooltip(_inspectContext, _cursor) : null;
         }
@@ -162,7 +148,7 @@ namespace SongsOfConquestAccess.UI
             return true;
         }
 
-        public override bool ClaimsAction(string actionKey)
+        public bool ClaimsAction(string actionKey)
         {
             return actionKey == AccessibilityActions.HexGridWest.Key
                 || actionKey == AccessibilityActions.HexGridEast.Key
@@ -192,7 +178,7 @@ namespace SongsOfConquestAccess.UI
                 || IsScannerAction(actionKey);
         }
 
-        public override bool HandleAction(InputAction action)
+        public bool HandleAction(InputAction action)
         {
             if (action == null)
             {

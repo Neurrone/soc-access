@@ -259,7 +259,7 @@ namespace SongsOfConquestAccess.Dev
             }
         }
 
-        // The state words the widget dump's status column carries: every effective part that is
+        // The state words the dump's status column carries: every effective part that is
         // neither the name, the role word, the tooltip nor the position - value, selection, enabled.
         private static string Status(GraphNode node)
         {

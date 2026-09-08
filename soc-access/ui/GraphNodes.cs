@@ -30,8 +30,7 @@ namespace SongsOfConquestAccess.UI
         /// <summary>Speaks only while the control is unavailable, and watched live so a control that
         /// becomes available under the cursor says so. The word is "unavailable", the state word
         /// Endless Space 2 Access uses (owner ruling 2026-09-06: the graph screens take ES2's role
-        /// and state words exactly), so the widget screens' "disabled" stands only on the screens
-        /// this migration has not reached yet.</summary>
+        /// and state words exactly).</summary>
         public static NodeAnnouncement DisabledPart(Func<bool> enabled)
         {
             return new NodeAnnouncement(

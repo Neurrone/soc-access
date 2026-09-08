@@ -23,11 +23,8 @@ namespace SongsOfConquestAccess.UI
     /// THE DRAG IS GONE FROM HERE: picking a troop up and putting it down is the graph engine's carry
     /// (<c>ui/graph/Carry.cs</c>), declared on the node by the screen, so this class no longer owns
     /// Space, Enter or Escape and holds no drag state of its own.
-    ///
-    /// The widget base is still here; phase G removes it once no widget tree exists at all. Nothing
-    /// adds this to one any more.
     /// </summary>
-    public sealed class TroopPlacementHexGrid : Widget
+    public sealed class TroopPlacementHexGrid
     {
         private const string ScannerWrapCueKey = "Common_ClickUnfold";
         private static readonly Vector2Int CenterTile = new Vector2Int(6, 4);
@@ -39,7 +36,6 @@ namespace SongsOfConquestAccess.UI
         private readonly ScannerJumpAnchor _jumpAnchor = new ScannerJumpAnchor();
 
         public TroopPlacementHexGrid(PreBattleMenuAdapter adapter)
-            : base("pre-battle-hex-grid")
         {
             _adapter = adapter;
             RefreshSnapshot();
@@ -63,17 +59,7 @@ namespace SongsOfConquestAccess.UI
                 ScannerDirectionMode.Hex);
         }
 
-        public override string GetRole()
-        {
-            return string.Empty;
-        }
-
-        public override string GetAnnouncementKey()
-        {
-            return _cursor.ToString();
-        }
-
-        public override string GetLabel()
+        public string GetLabel()
         {
             TroopPlacementTile tile = GetFocusedTile();
             return new TroopPlacementTileSpeechFormatter(_snapshot).DescribeTile(tile);
@@ -103,12 +89,12 @@ namespace SongsOfConquestAccess.UI
             }
         }
 
-        public override Tooltip GetTooltip()
+        public Tooltip GetTooltip()
         {
             return _adapter != null ? _adapter.GetTileTooltip(GetFocusedTile()) : null;
         }
 
-        public override bool ClaimsAction(string actionKey)
+        public bool ClaimsAction(string actionKey)
         {
             return actionKey == AccessibilityActions.HexGridWest.Key
                 || actionKey == AccessibilityActions.HexGridEast.Key
@@ -126,7 +112,7 @@ namespace SongsOfConquestAccess.UI
                 || IsScannerAction(actionKey);
         }
 
-        public override bool HandleAction(InputAction action)
+        public bool HandleAction(InputAction action)
         {
             if (action == null)
             {

@@ -154,7 +154,6 @@ namespace SongsOfConquestAccess
             Step("combat", CombatPatches.Reset);
             Step("chat", ChatPatches.Reset);
             Step("tooltips", TooltipPatches.Reset);
-            Step("UI", UIManager.Reset);
             Step("buffer recorder", () => _bufferEventRecorder?.Detach());
             _bufferEventRecorder = null;
             Step("speech announcer", () => _speechEventAnnouncer?.Detach());

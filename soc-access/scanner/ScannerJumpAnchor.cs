@@ -7,7 +7,7 @@ namespace SongsOfConquestAccess.Scanner
     /// jump that lands somewhere unhelpful is one keystroke from being undone.
     /// The anchor is cleared once used, so return is never a toggle.
     ///
-    /// This lives beside the grid widgets rather than on ScannerController
+    /// This lives beside the grid cursors rather than on ScannerController
     /// because the controller does not own the cursor, and bookmark jumps set
     /// the same anchor without going through the controller at all.
     /// </summary>

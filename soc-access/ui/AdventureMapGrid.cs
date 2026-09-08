@@ -28,11 +28,8 @@ namespace SongsOfConquestAccess.UI
     /// (<c>UIManager.Update</c> spoke with <c>interrupt: false</c>): the input router has already
     /// silenced the reader for the claimed key, and a skip's "Skipped 3 tiles" is said before the
     /// tile it landed on, which an interrupting landing would cut off.
-    ///
-    /// The widget base is still here; phase G removes it once no widget tree exists at all. Nothing
-    /// adds this to one any more.
     /// </summary>
-    public sealed class AdventureMapGrid : Widget
+    public sealed class AdventureMapGrid
     {
         private const string ScannerWrapCueKey = "Common_ClickUnfold";
         private const int DefaultLookAroundRadius = 15;
@@ -49,7 +46,6 @@ namespace SongsOfConquestAccess.UI
         private int _lookAroundRadius = DefaultLookAroundRadius;
 
         public AdventureMapGrid(AdventureMapAdapter adapter)
-            : base("adventure_map_grid")
         {
             _adapter = adapter;
             _cursorTile = adapter != null ? adapter.GetInitialTile() : Vector2Int.zero;
@@ -74,23 +70,13 @@ namespace SongsOfConquestAccess.UI
                 ScannerDirectionMode.Square);
         }
 
-        public override string GetRole()
-        {
-            return string.Empty;
-        }
-
-        public override string GetAnnouncementKey()
-        {
-            return _cursorTile.ToString();
-        }
-
-        public override string GetLabel()
+        public string GetLabel()
         {
             AdventureMapTile tile = _adapter != null ? _adapter.GetTile(_cursorTile) : null;
             return new AdventureMapTileSpeechFormatter().DescribeTile(tile);
         }
 
-        public override Tooltip GetTooltip()
+        public Tooltip GetTooltip()
         {
             return _adapter != null ? _adapter.GetTooltip(_cursorTile) : null;
         }
@@ -106,7 +92,7 @@ namespace SongsOfConquestAccess.UI
         /// here: Enter and Backslash are the map node's own activation and contextual command, so
         /// they reach the tile through the graph rather than through this set.
         /// </summary>
-        public override bool ClaimsAction(string actionKey)
+        public bool ClaimsAction(string actionKey)
         {
             return actionKey == AccessibilityActions.MapMoveNorth.Key
                 || actionKey == AccessibilityActions.MapMoveSouth.Key
@@ -126,7 +112,7 @@ namespace SongsOfConquestAccess.UI
                 || IsScannerAction(actionKey);
         }
 
-        public override bool HandleAction(InputAction action)
+        public bool HandleAction(InputAction action)
         {
             if (action == null || _adapter == null)
             {

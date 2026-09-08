@@ -28,7 +28,7 @@ namespace SongsOfConquestAccess.Dev
     /// unloaded or broken mod answers 404 here instead of reporting state that no longer exists.
     ///
     ///   GET  /status            mod version, speech backend, last spoken line, screen stack,
-    ///                           focused widget and scene size
+    ///                           focused node and scene size
     ///   GET  /speech?since=N&amp;wait=MS
     ///                           lines spoken after sequence N, plus the next cursor; with wait, hold
     ///                           the connection open until there is one
