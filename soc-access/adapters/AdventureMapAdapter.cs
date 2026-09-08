@@ -391,21 +391,41 @@ namespace SongsOfConquestAccess.Adapters
             return null;
         }
 
+        /// <summary>
+        /// Where the tile cursor starts. Asked while the session is coming apart as well as while it
+        /// runs - a resync on the way back to the main menu builds the map cursor over a view whose
+        /// selection handler never resolved - so every read here is guarded and the answer for "no
+        /// session left" is the origin rather than a throw (fixed 2026-09-08: this threw a null
+        /// reference on every frame of the quit).
+        /// </summary>
         public Vector2Int GetInitialTile()
         {
-            ICommanderState selectedCommander = _selectionHandler.SelectedCommander;
-            if (selectedCommander != null && IsWithinMap(selectedCommander.Position))
+            try
             {
-                return selectedCommander.Position;
-            }
+                if (_selectionHandler == null)
+                {
+                    return Vector2Int.zero;
+                }
 
-            IMapEntity selectedMapEntity = _selectionHandler.SelectedMapEntity;
-            if (selectedMapEntity != null && IsWithinMap(selectedMapEntity.Position))
+                ICommanderState selectedCommander = _selectionHandler.SelectedCommander;
+                if (selectedCommander != null && IsWithinMap(selectedCommander.Position))
+                {
+                    return selectedCommander.Position;
+                }
+
+                IMapEntity selectedMapEntity = _selectionHandler.SelectedMapEntity;
+                if (selectedMapEntity != null && IsWithinMap(selectedMapEntity.Position))
+                {
+                    return selectedMapEntity.Position;
+                }
+
+                return GetCameraCenterTile();
+            }
+            catch (Exception exception)
             {
-                return selectedMapEntity.Position;
+                SocAccessMod.Instance?.LogWarning("AdventureMapAdapter could not read the initial tile: " + exception.Message);
+                return Vector2Int.zero;
             }
-
-            return GetCameraCenterTile();
         }
 
         public bool TryGetSelectedWielderPosition(out Vector2Int position)
