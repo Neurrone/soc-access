@@ -239,8 +239,8 @@ carry, the three modes, and the polling screen manager (2026-09-08).
 ### Phase G — cleanup
 
 Delete `ui/UIManager.cs`, `ui/FocusContext.cs`, every `ui/*Widget.cs`, `ui/MenuWidget.cs`,
-`ui/TableWidget.cs`, the three grid classes' widget base, `TooltipActionsMenuScreen` with its
-Backquote action and the adapters' `TooltipAction`s, `/gui/widgets` and `dev/WidgetDump.cs`,
+`ui/TableWidget.cs`, the three grid classes' widget base, the Backquote tooltip-actions
+action and the adapters' `TooltipAction`s (the screen and the manager branch went in F),
 the widget-era input actions, `adapters/NativeTextPrompt.cs` (unused since the mod dialogs),
 and the unused drag strings (`UI.DragStartedTroopPlacement`, `UI.DragComplete`). Sweep every
 adapter's `SpeechTextSanitizer.Normalize` into per-line handling (`ui/SpokenLines.cs` is the
