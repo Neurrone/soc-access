@@ -248,6 +248,16 @@ namespace SongsOfConquestAccess.Adapters
             }
         }
 
+        /// <summary>Bumped whenever the game rewrites a description block
+        /// (<c>MiniMenuDescription.SetDetails</c> and its <c>Clear</c>, which destroy the rows and
+        /// build new ones). An adapter re-reads its rows when it moves and serves what it read
+        /// otherwise.</summary>
+        public static int DescriptionGeneration;
+
+        // The rows the block last drew, and the rewrite they were read at.
+        private List<DescriptionRow> _descriptionRows;
+        private int _descriptionAt = -1;
+
         public IReadOnlyList<DescriptionRow> GetDescriptionRows()
         {
             List<DescriptionRow> rows = new List<DescriptionRow>();
@@ -256,6 +266,14 @@ namespace SongsOfConquestAccess.Adapters
             {
                 return rows;
             }
+
+            if (_descriptionRows != null && _descriptionAt == DescriptionGeneration)
+            {
+                return _descriptionRows;
+            }
+
+            _descriptionRows = rows;
+            _descriptionAt = DescriptionGeneration;
 
             MapEntityHUDDescriptionEntry[] entries = description.GetComponentsInChildren<MapEntityHUDDescriptionEntry>(false);
             for (int i = 0; i < entries.Length; i++)
