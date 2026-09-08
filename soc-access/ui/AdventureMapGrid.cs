@@ -72,7 +72,13 @@ namespace SongsOfConquestAccess.UI
 
         public string GetLabel()
         {
-            AdventureMapTile tile = _adapter != null ? _adapter.GetTile(_cursorTile) : null;
+            return Describe(_adapter != null ? _adapter.GetTile(_cursorTile) : null);
+        }
+
+        /// <summary>The tile as it is said. Apart here so a caller holding a tile it has already read
+        /// - the screen's cached cursor tile - words it exactly as a landing does.</summary>
+        public static string Describe(AdventureMapTile tile)
+        {
             return new AdventureMapTileSpeechFormatter().DescribeTile(tile);
         }
 

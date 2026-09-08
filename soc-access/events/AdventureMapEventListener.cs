@@ -61,6 +61,11 @@ namespace SongsOfConquestAccess.Events
             _revealedRegistry = revealedRegistry;
         }
 
+        /// <summary>Raised for every change the map listens to, before the listener decides whether the
+        /// change is worth announcing. <see cref="Screens.AdventureMapScreen"/> hangs its cached cursor
+        /// tile off it, so nothing the game changes under a still cursor is read from the cache.</summary>
+        public Action OnMapChanged;
+
         public void Attach()
         {
             if (_attached)
@@ -184,6 +189,7 @@ namespace SongsOfConquestAccess.Events
             _discoveredMapEntityIds.Clear();
             _discoveredMapEntityLabelsById.Clear();
             _knownLocalCommanderIds.Clear();
+            OnMapChanged = null;
             _attached = false;
         }
 
@@ -216,8 +222,18 @@ namespace SongsOfConquestAccess.Events
             }
         }
 
+        private void RaiseMapChanged()
+        {
+            Action changed = OnMapChanged;
+            if (changed != null)
+            {
+                changed();
+            }
+        }
+
         private void HandleCommand(ICommandResponse response)
         {
+            RaiseMapChanged();
             KillCommanderCommand.Response killed = response as KillCommanderCommand.Response;
             if (killed != null)
             {
@@ -244,6 +260,7 @@ namespace SongsOfConquestAccess.Events
 
         private void HandleCommanderChanged(CommanderChangedPayload payload)
         {
+            RaiseMapChanged();
             if (payload == null)
             {
                 return;
@@ -260,6 +277,7 @@ namespace SongsOfConquestAccess.Events
 
         private void HandleMapEntityChanged(MapEntityChangedPayload payload)
         {
+            RaiseMapChanged();
             if (payload == null)
             {
                 return;
@@ -283,6 +301,7 @@ namespace SongsOfConquestAccess.Events
 
         private void HandleDestinationSet(int commanderId)
         {
+            RaiseMapChanged();
             ICommanderState commander = _facade != null && _facade.Commanders != null
                 ? _facade.Commanders.Get(commanderId)
                 : null;
@@ -316,6 +335,7 @@ namespace SongsOfConquestAccess.Events
 
         private void HandleCommanderMoved(OnCommanderMovedPayload payload)
         {
+            RaiseMapChanged();
             ICommanderState commander = payload != null ? payload.commander : null;
             if (commander == null)
             {
@@ -357,6 +377,7 @@ namespace SongsOfConquestAccess.Events
 
         private void HandleCommanderTeleported(TeleportCommanderCommand.Response response)
         {
+            RaiseMapChanged();
             ICommanderState commander = response != null && _facade != null && _facade.Commanders != null
                 ? _facade.Commanders.Get(response.CommanderId)
                 : null;
@@ -392,6 +413,7 @@ namespace SongsOfConquestAccess.Events
 
         private void HandleMapEntityCreated(int entityId)
         {
+            RaiseMapChanged();
             IMapEntity entity = _facade != null && _facade.MapEntities != null
                 ? _facade.MapEntities.Get(entityId)
                 : null;
@@ -403,6 +425,7 @@ namespace SongsOfConquestAccess.Events
 
         private void HandleFogUpdated()
         {
+            RaiseMapChanged();
             byte[] currentExploration = GetLocalExplorationSnapshot();
             if (currentExploration == null || currentExploration.Length == 0)
             {

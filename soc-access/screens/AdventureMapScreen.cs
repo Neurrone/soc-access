@@ -156,6 +156,14 @@ namespace SongsOfConquestAccess.Screens
         private Tooltip _tooltip;
         private bool _tooltipRead;
 
+        // The tile itself is the same story: reading one runs a reachability fill, a loop over every
+        // commander, a route preview and two shortest-path queries, and the focused node's label
+        // resolves it about twice a frame. It is read once per tile and kept until the cursor moves
+        // or the map changes under it, which is what the event listener's hook below reports.
+        private Vector2Int _tileTile;
+        private AdventureMapTile _tile;
+        private bool _tileRead;
+
         /// <summary>After a hot reload: point the slot at the adventure already installed.
         /// Scanned once, from <c>ScreenDetector.RecoverRuntimeState</c>.</summary>
         public static void Recover()
@@ -187,6 +195,7 @@ namespace SongsOfConquestAccess.Screens
 
             _gridAdapter = Live;
             _grid = Live == null ? null : new AdventureMapGrid(Live);
+            InvalidateTile();
             return _grid;
         }
 
@@ -270,6 +279,11 @@ namespace SongsOfConquestAccess.Screens
                     Live.LocalizationHandler,
                     Live.FogManager,
                     GetAdventureMapRevealedRegistry());
+            if (_eventListener != null)
+            {
+                _eventListener.OnMapChanged = InvalidateTile;
+            }
+
             _eventListener?.Attach();
             AccessibilityEventBus.Subscribe(HandleAccessibilityEvent);
         }
@@ -349,7 +363,7 @@ namespace SongsOfConquestAccess.Screens
             builder.BeginStop(MapStop);
             builder.PushContext(MapContext());
 
-            NodeVtable vtable = GraphNodes.Text(() => Grid().GetLabel(), null, TileTooltip());
+            NodeVtable vtable = GraphNodes.Text(() => AdventureMapGrid.Describe(CursorTile()), null, TileTooltip());
             vtable.OnActivate = ActivateTile;
             vtable.OnContextual = ContextualTile;
             vtable.OnFocusVisual = () => Grid()?.ShowOverlay();
@@ -367,6 +381,31 @@ namespace SongsOfConquestAccess.Screens
             TeleportMenuAdapter teleport = TeleportMenu;
             string instruction = teleport != null ? teleport.InstructionText : null;
             return string.IsNullOrWhiteSpace(instruction) ? ModText.Get(ModStrings.Screens.Map) : instruction;
+        }
+
+        /// <summary>The tile under the cursor, read once and kept until the cursor moves or the map
+        /// changes, the same shape as <see cref="TileTooltip"/> below.</summary>
+        private AdventureMapTile CursorTile()
+        {
+            Vector2Int tile = Grid().CursorTile;
+            if (_tileRead && tile == _tileTile)
+            {
+                return _tile;
+            }
+
+            _tileTile = tile;
+            _tileRead = true;
+            _tile = Live.GetTile(tile);
+            return _tile;
+        }
+
+        /// <summary>Every change the map listens to - a selection, a move, a teleport, a command, a
+        /// spawned entity, the fog - drops the kept tile, so nothing the game changes under a still
+        /// cursor is read from the cache.</summary>
+        private void InvalidateTile()
+        {
+            _tileRead = false;
+            _tile = null;
         }
 
         private Tooltip TileTooltip()
