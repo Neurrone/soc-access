@@ -407,9 +407,8 @@ namespace SongsOfConquestAccess.UI
                 case "ui_left_click":
                     return true;
                 case "ui_region_prev":
-                    return _graph != null && _graph.CanMoveRegion(-1);
                 case "ui_region_next":
-                    return _graph != null && _graph.CanMoveRegion(1);
+                    return InRegion();
                 case "ui_coarse_increase":
                 case "ui_coarse_decrease":
                     return HasAdjust();
@@ -468,9 +467,9 @@ namespace SongsOfConquestAccess.UI
                 case "ui_end":
                     return JumpEdge(false);
                 case "ui_region_prev":
-                    return Region(-1);
+                    return InRegion() && Region(-1);
                 case "ui_region_next":
-                    return Region(1);
+                    return InRegion() && Region(1);
                 case "ui_coarse_increase":
                     return Adjust(1, true);
                 case "ui_coarse_decrease":
@@ -813,6 +812,12 @@ namespace SongsOfConquestAccess.UI
             return node.Transitions != null
                 && node.Transitions.TryGetValue(dir, out transition)
                 && transition != null;
+        }
+
+        private bool InRegion()
+        {
+            GraphNode node = _graph == null ? null : _graph.CurrentNode;
+            return node != null && node.RegionKey != null;
         }
 
         private bool HasAdjust()

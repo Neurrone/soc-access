@@ -261,29 +261,6 @@ namespace SongsOfConquestAccess.Tests
         }
 
         [TestMethod]
-        public void MoveRegionFromOutsideAnyRegionReachesTheNeighbouringOnes()
-        {
-            GraphState state = new GraphState();
-            KeyGraph g = new KeyGraph(Renderer(b =>
-            {
-                b.AddItem(new SyntheticNode(Id("top"), Vt("Top")));
-                b.SetRegion("r1").AddItem(new SyntheticNode(Id("a1"), Vt("A1")));
-                b.SetRegion(null).AddItem(new SyntheticNode(Id("mid"), Vt("Mid")));
-                b.SetRegion("r2").AddItem(new SyntheticNode(Id("b1"), Vt("B1")));
-            }), state);
-            g.Rerender();
-            Assert.IsFalse(g.CanMoveRegion(-1));
-            Assert.IsTrue(g.MoveRegion(1).Moved);
-            Assert.AreEqual("a1", Focused(g));
-            Assert.IsTrue(g.Focus(Id("mid")));
-            Assert.IsTrue(g.MoveRegion(1).Moved);
-            Assert.AreEqual("b1", Focused(g));
-            Assert.IsTrue(g.Focus(Id("mid")));
-            Assert.IsTrue(g.MoveRegion(-1).Moved);
-            Assert.AreEqual("a1", Focused(g));
-        }
-
-        [TestMethod]
         public void MoveRegionNeverLeavesTheCurrentStop()
         {
             GraphState state = new GraphState();
