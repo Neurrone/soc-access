@@ -26,7 +26,9 @@ namespace SongsOfConquestAccess.Screens
     /// double click.
     ///
     /// The details are ONE stop rather than one per band: they are a description of the candidate the
-    /// player just arrived at, read top to bottom.
+    /// player just arrived at, read top to bottom. The troops and the skills are REGIONS in it, under
+    /// the captions the pane draws over them ("Starting Troops", "Skills"), so a troop or a skill is
+    /// heard with what it is and the region jump reaches each band.
     ///
     /// Escape is the game's (<c>ConsumesBack</c> false): the menu is an
     /// <c>AdventureMenuBackground</c> with <c>_canClose</c> true, so it draws the close cross and
@@ -233,6 +235,8 @@ namespace SongsOfConquestAccess.Screens
                 return;
             }
 
+            string header = _adapter.TroopsHeader;
+            BeginRegion(builder, header, "purchase-wielder:troops");
             for (int i = 0; i < _adapter.TroopSlotCount; i++)
             {
                 Component slot = _adapter.GetTroopComponent(i);
@@ -252,6 +256,8 @@ namespace SongsOfConquestAccess.Screens
                     vtable,
                     slot));
             }
+
+            EndRegion(builder, header);
         }
 
         private string TroopLabel(int index)
@@ -263,6 +269,8 @@ namespace SongsOfConquestAccess.Screens
 
         private void BuildSkills(GraphBuilder builder)
         {
+            string header = _adapter.SkillsHeader;
+            BeginRegion(builder, header, "purchase-wielder:skills");
             for (int i = 0; i < _adapter.SkillSlotCount; i++)
             {
                 Component slot = _adapter.GetSkillComponent(i);
@@ -282,6 +290,32 @@ namespace SongsOfConquestAccess.Screens
                     vtable,
                     slot));
             }
+
+            EndRegion(builder, header);
+        }
+
+        /// <summary>A band under the caption the pane draws over it, as a region of the details stop;
+        /// a band the pane draws no caption for is declared bare.</summary>
+        private static void BeginRegion(GraphBuilder builder, string caption, string key)
+        {
+            if (string.IsNullOrWhiteSpace(caption))
+            {
+                return;
+            }
+
+            builder.PushContext(caption);
+            builder.SetRegion(key);
+        }
+
+        private static void EndRegion(GraphBuilder builder, string caption)
+        {
+            if (string.IsNullOrWhiteSpace(caption))
+            {
+                return;
+            }
+
+            builder.PopContext();
+            builder.SetRegion(null);
         }
 
         private string SkillLabel(int index)

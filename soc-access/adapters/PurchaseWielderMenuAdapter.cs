@@ -227,6 +227,27 @@ namespace SongsOfConquestAccess.Adapters
             NativeSelectionUtility.Select(GetTroopComponent(index));
         }
 
+        /// <summary>The caption the pane draws over the troops ("Starting Troops"), as the game
+        /// writes it; empty where the section is not drawn.</summary>
+        public string TroopsHeader
+        {
+            get { return SectionHeader(GetField<GameObject>(GetDetails(), DetailsTroopsSectionField)); }
+        }
+
+        /// <summary>The caption the pane draws over the skills ("Skills"). The pane keeps no field for
+        /// the section, so it is reached from the first skill entry: entry, container, section.</summary>
+        public string SkillsHeader
+        {
+            get
+            {
+                IReadOnlyList<PurchaseWielderSkillEntry> entries = GetSkillEntries();
+                Component first = entries.Count > 0 ? entries[0] as Component : null;
+                Transform container = first == null ? null : first.transform.parent;
+                Transform section = container == null ? null : container.parent;
+                return SectionHeader(section == null ? null : section.gameObject);
+            }
+        }
+
         public int SkillSlotCount
         {
             get { return GetSkillEntries().Count; }
@@ -484,6 +505,15 @@ namespace SongsOfConquestAccess.Adapters
         private IReadOnlyList<PurchaseWielderSkillEntry> GetSkillEntries()
         {
             return GetField<List<PurchaseWielderSkillEntry>>(GetDetails(), DetailsSkillEntriesField) ?? new List<PurchaseWielderSkillEntry>();
+        }
+
+        /// <summary>The text a section's header draws, at the path the prefab keeps it at (measured
+        /// 2026-09-08: Header/HeaderText under both TroopsSection and SkillsSection).</summary>
+        private static string SectionHeader(GameObject section)
+        {
+            Transform header = section == null ? null : section.transform.Find("Header/HeaderText");
+            UITextMesh text = header == null ? null : header.GetComponent<UITextMesh>();
+            return text == null ? string.Empty : GetText(text);
         }
 
         private void AddCostPart(List<string> parts, LargeCostSection section, FieldInfo entryField, FieldInfo textField, ResourceType resourceType)
