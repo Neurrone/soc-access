@@ -41,11 +41,11 @@ overview screens were also compared against the pre-F build in the same state an
 
 - A page the game has closed that the mod still reads, or one it shows that the mod does not:
   `GET /screens` says which slot is stale.
-- The handover gap: "Adventure map" and the tile are spoken between the pause menu closing and
-  options opening, and again on the way out of a battle or a game. Measured on the pre-F build
-  too, so not a regression; options back to the pause menu no longer says it. The gap is frames
-  where no menu is open, so standing the map down under menus would not close it; a pause
-  screen lingering until the submenu it opened arrives would.
+- The handover gap. The pause menu used to hand the map back for the frames between its own
+  close and options, the load menu or the codex opening ("Adventure map", the tile, then the
+  menu; the pre-F build did the same). The pause screen now spans that gap (`BeginHandover`,
+  ended by the target's Ready handler or after two seconds); walk those three and listen for
+  the map. The same gap still exists on the way out of a battle or a game, as before.
 - A page that turns in place (the community maps modal, the post-battle title) says its new
   name itself now; nothing else should re-announce.
 - Once, closing the defence menu left the map's cursor on the last resource instead of the Game
