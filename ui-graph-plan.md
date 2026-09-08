@@ -326,9 +326,10 @@ lines under named regions, not a table, unless the game draws column headings.
 ### Phase D — composite grids (done)
 
 Fourteen screens, 2026-09-08 (§8). Rules learned, for every later port: a stop lands on the
-alternative in force and the engine looks for it from any pinned landing ONWARD, so a tab bar
-that is not the first thing in its stop is a stop of its own (the sheet's and the trade's
-modifier bars); a group with nothing to open is a line; an empty slot is a role-less `Text`
+alternative in force and the engine looks for it from any pinned landing ONWARD, so a stop
+whose tail is a tab bar pins its landing EXACTLY (`LandStopOn(id, exact: true)`) and keeps the
+bar a region rather than a stop of its own (the sheet's and the trade's modifier bars); a
+group with nothing to open is a line; an empty slot is a role-less `Text`
 node that still takes a drop; Enter and Backslash are the game's left and right clicks with
 the Ctrl chords as further bindings of the same actions, so the game's own handlers read the
 physical Ctrl; a hint is offered only where the game would take the gesture (a button the game

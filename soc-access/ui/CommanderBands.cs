@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using SongsOfConquestAccess.Adapters;
+using SongsOfConquestAccess.Localization;
 using SongsOfConquestAccess.UI.Graph;
 using UnityEngine;
 
@@ -20,6 +21,12 @@ namespace SongsOfConquestAccess.UI
     /// THE TABS ARE ONE BAR: Left and Right walk it, Enter switches. Arriving must not switch -
     /// switching redraws the list under the bar, and Up from the first line of that list lands here.
     /// Their focus visual is the game's own button selection.
+    ///
+    /// The bands and the tabs are declared into the stop the CALLER opened; none of them is a stop of
+    /// its own. <see cref="Modifiers"/> puts the bar and the showing tab's lines together in one
+    /// region named Modifiers, so the region jump reaches them and Tab never stops on the bar. A stop
+    /// holding that region has to land EXACTLY (<see cref="GraphBuilder.LandStopOn"/>), or the showing
+    /// tab takes the landing as the alternative in force.
     /// </summary>
     public static class CommanderBands
     {
@@ -61,8 +68,11 @@ namespace SongsOfConquestAccess.UI
         /// <summary>A band of lines under the game's own caption, declared into the stop the caller has
         /// opened. <paramref name="marker"/> answers with the caller's own stable subject for a
         /// synthesized node, keyed by the node's own id - which is what keeps two bands built from the
-        /// same key under different prefixes (the trade's two sides) apart.</summary>
-        public static void Band(
+        /// same key under different prefixes (the trade's two sides) apart.
+        ///
+        /// Answers with the id of its FIRST line, or null where it declared nothing - what a caller
+        /// whose stop should land on the band's opening line has to name.</summary>
+        public static ControlId Band(
             GraphBuilder builder,
             string keyPrefix,
             string key,
@@ -72,7 +82,7 @@ namespace SongsOfConquestAccess.UI
         {
             if (builder == null || lines == null || lines.Count == 0)
             {
-                return;
+                return null;
             }
 
             bool named = !string.IsNullOrWhiteSpace(caption);
@@ -82,6 +92,7 @@ namespace SongsOfConquestAccess.UI
                 builder.SetRegion(keyPrefix + ":" + key);
             }
 
+            ControlId first = null;
             for (int i = 0; i < lines.Count; i++)
             {
                 Line it = lines[i];
@@ -97,7 +108,13 @@ namespace SongsOfConquestAccess.UI
                     vtable.OnFocusVisual = () => it.OnFocus();
                 }
 
-                builder.AddItem(new SyntheticNode(ControlId.For(marker(id), id), vtable));
+                ControlId controlId = ControlId.For(marker(id), id);
+                if (first == null)
+                {
+                    first = controlId;
+                }
+
+                builder.AddItem(new SyntheticNode(controlId, vtable));
             }
 
             if (named)
@@ -106,6 +123,7 @@ namespace SongsOfConquestAccess.UI
             }
 
             builder.SetRegion(null);
+            return first;
         }
 
         /// <summary>The modifier tabs as the ONE BAR the game draws them as. Only tabs the game drew a
@@ -163,6 +181,34 @@ namespace SongsOfConquestAccess.UI
             }
 
             builder.EndRow();
+        }
+
+        /// <summary>The modifier bar and the lines of the showing tab as ONE region of the caller's
+        /// stop, named Modifiers: the bar is not a place Tab stops at, and Alt+Down reaches the whole
+        /// of it in one jump. The band re-opens the same region key under the game's own title for the
+        /// showing list, which is the inner level the lines are read under.</summary>
+        public static void Modifiers(
+            GraphBuilder builder,
+            string keyPrefix,
+            IReadOnlyList<TabItem> tabs,
+            Func<int> selectedIndex,
+            Action<int> activate,
+            Action<int> select,
+            string listCaption,
+            IReadOnlyList<Line> lines,
+            Func<string, object> marker)
+        {
+            if (builder == null)
+            {
+                return;
+            }
+
+            builder.PushContext(ModText.Get(ModStrings.Screens.Modifiers));
+            builder.SetRegion(keyPrefix + ":modifiers");
+            Tabs(builder, keyPrefix, tabs, selectedIndex, activate, select);
+            Band(builder, keyPrefix, "modifiers", listCaption, lines, marker);
+            builder.PopContext();
+            builder.SetRegion(null);
         }
     }
 }

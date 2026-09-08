@@ -17,21 +17,22 @@ namespace SongsOfConquestAccess.Screens
     /// The trade between two wielders standing next to each other. Seven places to be.
     ///
     /// THE STOP ORDER IS DELIBERATE AND IS NOT THE DRAWN ONE (owner ruling 2026-09-07): left Wielder,
-    /// right Wielder, left Equipment, left Inventory, right Equipment, right Inventory, then the two
-    /// modifier bars, then Close. The menu draws each side as one column - portrait, stats,
-    /// modifiers, artifacts, army - so the drawn order would put a wielder band between the two
-    /// backpacks, and every transfer would then cross it. Putting the two wielder bands first and the
-    /// four artifact stops together means a carry from one backpack to the other is one Tab away.
+    /// right Wielder, left Equipment, left Inventory, right Equipment, right Inventory, then Close.
+    /// The menu draws each side as one column - portrait, stats, modifiers, artifacts, army - so the
+    /// drawn order would put a wielder band between the two backpacks, and every transfer would then
+    /// cross it. Putting the two wielder bands first and the four artifact stops together means a
+    /// carry from one backpack to the other is one Tab away.
     ///
-    /// A WIELDER STOP HERE IS THE SHEET'S SHAPE, because the menu draws the sheet's own parts: the
-    /// portrait row, the stats band (through <c>ui/CommanderBands.cs</c>, shared with the sheet), the
-    /// army rows (<c>ui/TroopHudRows.cs</c>), and then the side's Move all button. Each side's
-    /// modifier bar, with the showing tab's lines under it, is a stop of its own after the artifact
-    /// stops, as the sheet's is: a stop lands on the alternative in force, so a bar inside the wielder
-    /// stop made Tab land on the showing tab instead of the wielder. Locked troop slots are not
-    /// there to find: the menu builds both bars with <c>hideLockedSlots</c>, so only drawn slots are
-    /// rows. Enter on a modifier tab switches BOTH sides, which is what the menu's own tab control
-    /// (<c>TradingMenu.HandleSwitchTab</c>) does.
+    /// A WIELDER STOP HERE IS THE SHEET'S SHAPE, because the menu draws the sheet's own parts, in the
+    /// column's own order: the portrait row, the stats band (through <c>ui/CommanderBands.cs</c>,
+    /// shared with the sheet), the modifiers, the army rows (<c>ui/TroopHudRows.cs</c>), and then the
+    /// side's Move all button. The stop lands EXACTLY on the wielder
+    /// (<c>GraphBuilder.LandStopOn</c> with exact), because a stop otherwise lands on the alternative
+    /// in force and the showing modifier tab is one; the bar and that tab's lines are a region named
+    /// Modifiers after the stats, which is what the region jump reaches them by. Locked troop slots
+    /// are not there to find: the menu builds both bars with <c>hideLockedSlots</c>, so only drawn
+    /// slots are rows. Enter on a modifier tab switches BOTH sides, which is what the menu's own tab
+    /// control (<c>TradingMenu.HandleSwitchTab</c>) does.
     ///
     /// THE CLICKS ON AN ARTIFACT MEAN SOMETHING ELSE HERE than they do on the sheet, and the
     /// difference is the game's: <c>InventoryHUD.EquipArtifact</c> answers the right click with
@@ -48,12 +49,6 @@ namespace SongsOfConquestAccess.Screens
     /// decompiled source). The navigator claims the key only while something is being carried.
     ///
     /// The menu draws no title of its own, so the screen is named after the two wielders in it.
-    ///
-    /// ONE CONSEQUENCE OF THE ONE-STOP WIELDER BAND, measured 2026-09-07 and left as the model has it:
-    /// a stop with no remembered position lands on whichever alternative of a set is in force, so Tab
-    /// into a wielder stop the player has not stood in yet lands on the modifier tab that is showing
-    /// rather than on the wielder. The sheet avoids this by giving its modifier bar a stop of its own;
-    /// here the bar is inside the band, which is what makes the band one stop instead of two.
     /// </summary>
     public sealed class TradingScreen : GraphScreen
     {
@@ -63,8 +58,6 @@ namespace SongsOfConquestAccess.Screens
         private const string LeftInventoryStop = "trade-left-inventory";
         private const string RightEquipmentStop = "trade-right-equipment";
         private const string RightInventoryStop = "trade-right-inventory";
-        private const string LeftModifiersStop = "trade-left-modifiers";
-        private const string RightModifiersStop = "trade-right-modifiers";
         private const string CloseStop = "trade-close";
         private const string LeftKey = "trade:left";
         private const string RightKey = "trade:right";
@@ -169,15 +162,6 @@ namespace SongsOfConquestAccess.Screens
             builder.BeginStop(RightInventoryStop);
             ArtifactSlotNodes.Inventory(builder, _adapter.Right, RightKey, AddSlotHints, Marker("right/auto-arrange"));
 
-            // The modifier bars last, each a stop of its own as the sheet's is: a stop lands on the
-            // alternative in force, so a bar inside the wielder stop made Tab land on the showing tab
-            // instead of the wielder. Read-only, so they sit after everything a transfer needs.
-            builder.BeginStop(LeftModifiersStop);
-            BuildModifiers(builder, LeftKey, _adapter.Left);
-
-            builder.BeginStop(RightModifiersStop);
-            BuildModifiers(builder, RightKey, _adapter.Right);
-
             builder.BeginStop(CloseStop);
             BuildClose(builder);
         }
@@ -209,31 +193,38 @@ namespace SongsOfConquestAccess.Screens
         private void BuildWielder(GraphBuilder builder, string stop, string keyPrefix, TradingMenuAdapter.Side side)
         {
             builder.BeginStop(stop);
-            BuildPortrait(builder, keyPrefix, side);
+            ControlId portrait = BuildPortrait(builder, keyPrefix, side);
             BuildStats(builder, keyPrefix, side);
+            BuildModifiers(builder, keyPrefix, side);
             BuildTroops(builder, keyPrefix, side);
             BuildMoveAll(builder, keyPrefix, side);
+
+            if (portrait != null)
+            {
+                // Exactly there: the showing modifier tab is an alternative in force, and a stop
+                // otherwise lands on one of those rather than on the wielder.
+                builder.LandStopOn(portrait, exact: true);
+            }
         }
 
         /// <summary>The wielder, as the menu draws them over their column: their name and the level on
         /// their portrait, with the stats the game draws on the portrait behind both in the buffer.
         /// </summary>
-        private void BuildPortrait(GraphBuilder builder, string keyPrefix, TradingMenuAdapter.Side side)
+        private ControlId BuildPortrait(GraphBuilder builder, string keyPrefix, TradingMenuAdapter.Side side)
         {
             Component portrait = side.Portrait;
             if (portrait == null)
             {
-                return;
+                return null;
             }
 
             NodeVtable vtable = GraphNodes.Text(() => side.CommanderName, null, side.PortraitTooltip);
             vtable.Announcements.Add(GraphNodes.ValuePart(
                 () => ModText.Get(ModStrings.Screens.LevelValue, side.Level)));
             vtable.OnFocusVisual = () => side.FocusPortrait();
-            builder.AddItem(new DrawnNode(
-                ControlId.For(portrait, keyPrefix + "/portrait"),
-                vtable,
-                portrait));
+            ControlId id = ControlId.For(portrait, keyPrefix + "/portrait");
+            builder.AddItem(new DrawnNode(id, vtable, portrait));
+            return id;
         }
 
         private void BuildStats(GraphBuilder builder, string keyPrefix, TradingMenuAdapter.Side side)
@@ -248,9 +239,10 @@ namespace SongsOfConquestAccess.Screens
         }
 
         /// <summary>The three modifier tabs as the one bar the menu draws, then the showing tab's lines
-        /// under the title the game writes over them. Enter switches BOTH sides, as the menu's own tab
-        /// control does; arriving only selects, since Up from the first line lands on the bar.
-        /// </summary>
+        /// under the title the game writes over them - one region of the side's wielder stop, named
+        /// Modifiers (<see cref="CommanderBands.Modifiers"/>). Enter switches BOTH sides, as the
+        /// menu's own tab control does; arriving only selects, since Up from the first line lands on
+        /// the bar.</summary>
         private void BuildModifiers(GraphBuilder builder, string keyPrefix, TradingMenuAdapter.Side side)
         {
             IReadOnlyList<TradingMenuAdapter.ModifierCategory> categories = Items(
@@ -263,18 +255,13 @@ namespace SongsOfConquestAccess.Screens
                 tabs.Add(new CommanderBands.TabItem(it.Label, it.Index, it.Button, it.Tooltip));
             }
 
-            CommanderBands.Tabs(
+            CommanderBands.Modifiers(
                 builder,
                 keyPrefix,
                 tabs,
                 side.GetActiveModifierCategoryIndex,
                 index => _adapter.ActivateModifierCategory(index),
-                index => side.SelectModifierCategory(index));
-
-            CommanderBands.Band(
-                builder,
-                keyPrefix,
-                "modifiers",
+                index => side.SelectModifierCategory(index),
                 side.GetActiveModifierListLabel(),
                 Lines("modifiers", side.GetActiveModifiers),
                 Marker);
