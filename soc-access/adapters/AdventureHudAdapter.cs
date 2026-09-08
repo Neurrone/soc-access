@@ -1012,12 +1012,26 @@ namespace SongsOfConquestAccess.Adapters
             return NativeSelectionUtility.Click(EndTurnSettings != null ? EndTurnSettings.EndTurnButton : null);
         }
 
+        /// <summary>The refresh runs when the LINES are read, never when a build asks whether the
+        /// button has a tooltip: the map's build passes this tooltip by value every frame, and the
+        /// game's private UpdateTooltip is too expensive to run for a tooltip nobody is reading.</summary>
         public Tooltip EndTurnButtonTooltip
         {
             get
             {
-                RefreshEndTurnTooltip();
-                return Tooltip.ForComponent(EndTurnSettings != null ? EndTurnSettings.EndTurnButton : null, LocalizationHandler);
+                Component button = EndTurnSettings != null ? EndTurnSettings.EndTurnButton : null;
+                if (button == null)
+                {
+                    return null;
+                }
+
+                return new Tooltip(
+                    () =>
+                    {
+                        RefreshEndTurnTooltip();
+                        return NativeTooltipUtility.GetTooltipLinesForComponent(button, LocalizationHandler);
+                    },
+                    VisualTooltipMetadata.ForComponent(button));
             }
         }
 
