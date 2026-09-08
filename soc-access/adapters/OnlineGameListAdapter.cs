@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Reflection;
 using HarmonyLib;
@@ -38,6 +38,12 @@ namespace SongsOfConquestAccess.Adapters
         private readonly GameListMenu _menu;
         private readonly GameListMenu.Settings _settings;
         private readonly ILocalizationHandler _localization;
+
+        // The region dropdown and the TMP_Dropdown under it are the same two objects for the life of
+        // the page; the walk that finds the second is probed once, the miss kept with the hit.
+        private RegionDropList _region;
+        private TMP_Dropdown _nativeRegionDropdown;
+        private bool _nativeRegionDropdownProbed;
 
         public OnlineGameListAdapter(GameListMenu menu)
             : this(
@@ -165,14 +171,14 @@ namespace SongsOfConquestAccess.Adapters
         /// <summary>The region dropdown as the mod's drop list screen needs it.</summary>
         public RegionDropList Region
         {
-            get { return new RegionDropList(this, _settings != null ? _settings.RegionDropdown : null); }
+            get { return _region ?? (_region = new RegionDropList(this, _settings != null ? _settings.RegionDropdown : null)); }
         }
 
         public IReadOnlyList<DropdownOption> GetRegionOptions()
         {
             List<DropdownOption> options = new List<DropdownOption>();
             UITextMeshDropdown dropdown = _settings != null ? _settings.RegionDropdown : null;
-            TMP_Dropdown nativeDropdown = GetNativeDropdown(dropdown);
+            TMP_Dropdown nativeDropdown = GetNativeRegionDropdown(dropdown);
             if (dropdown == null || nativeDropdown == null || nativeDropdown.options == null)
             {
                 return options;
@@ -332,6 +338,18 @@ namespace SongsOfConquestAccess.Adapters
             MainMenuManagerContainer container = _menu != null ? MainMenuContainerRef(_menu) : null;
             MainMenuManager manager = container != null ? container.CurrentManager as MainMenuManager : null;
             return manager != null ? MainMenuSettingsRef(manager) : null;
+        }
+
+        private TMP_Dropdown GetNativeRegionDropdown(UITextMeshDropdown dropdown)
+        {
+            if (_nativeRegionDropdownProbed)
+            {
+                return _nativeRegionDropdown;
+            }
+
+            _nativeRegionDropdownProbed = true;
+            _nativeRegionDropdown = GetNativeDropdown(dropdown);
+            return _nativeRegionDropdown;
         }
 
         private static TMP_Dropdown GetNativeDropdown(UITextMeshDropdown dropdown)
