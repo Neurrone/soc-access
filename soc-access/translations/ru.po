@@ -870,6 +870,16 @@ msgctxt "Screens.MainMenu"
 msgid "Main menu"
 msgstr "Главное меню"
 
+#. Screens.Map
+msgctxt "Screens.Map"
+msgid "Map"
+msgstr "Карта"
+
+#. Screens.Kingdom
+msgctxt "Screens.Kingdom"
+msgid "Kingdom"
+msgstr "Королевство"
+
 #. Screens.MissingBuilding
 msgctxt "Screens.MissingBuilding"
 msgid "missing building"
@@ -914,6 +924,11 @@ msgstr "Нет"
 msgctxt "Screens.Notifications"
 msgid "Notifications"
 msgstr "Уведомления"
+
+#. Screens.NotificationDismissHint
+msgctxt "Screens.NotificationDismissHint"
+msgid "{0} dismisses"
+msgstr "{0}, чтобы убрать"
 
 #. Screens.Objectives
 msgctxt "Screens.Objectives"
@@ -1079,6 +1094,11 @@ msgstr "Башня {0}"
 msgctxt "Screens.Towers"
 msgid "Towers"
 msgstr "Башни"
+
+#. Screens.Towns
+msgctxt "Screens.Towns"
+msgid "Towns"
+msgstr "Города"
 
 #. Screens.TroopDistribution
 msgctxt "Screens.TroopDistribution"

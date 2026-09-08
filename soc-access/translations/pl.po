@@ -855,6 +855,16 @@ msgctxt "Screens.MainMenu"
 msgid "Main menu"
 msgstr "Menu główne"
 
+#. Screens.Map
+msgctxt "Screens.Map"
+msgid "Map"
+msgstr "Mapa"
+
+#. Screens.Kingdom
+msgctxt "Screens.Kingdom"
+msgid "Kingdom"
+msgstr "Królestwo"
+
 #. Screens.MissingBuilding
 msgctxt "Screens.MissingBuilding"
 msgid "missing building"
@@ -899,6 +909,11 @@ msgstr "Brak"
 msgctxt "Screens.Notifications"
 msgid "Notifications"
 msgstr "Powiadomienia"
+
+#. Screens.NotificationDismissHint
+msgctxt "Screens.NotificationDismissHint"
+msgid "{0} dismisses"
+msgstr "{0}, aby odrzucić"
 
 #. Screens.Objectives
 msgctxt "Screens.Objectives"
@@ -1064,6 +1079,11 @@ msgstr "Wieża {0}"
 msgctxt "Screens.Towers"
 msgid "Towers"
 msgstr "Wieże"
+
+#. Screens.Towns
+msgctxt "Screens.Towns"
+msgid "Towns"
+msgstr "Miasta"
 
 #. Screens.TroopDistribution
 msgctxt "Screens.TroopDistribution"

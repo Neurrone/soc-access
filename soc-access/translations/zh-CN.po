@@ -850,6 +850,16 @@ msgctxt "Screens.MainMenu"
 msgid "Main menu"
 msgstr "主菜单"
 
+#. Screens.Map
+msgctxt "Screens.Map"
+msgid "Map"
+msgstr "地图"
+
+#. Screens.Kingdom
+msgctxt "Screens.Kingdom"
+msgid "Kingdom"
+msgstr "王国"
+
 #. Screens.MissingBuilding
 msgctxt "Screens.MissingBuilding"
 msgid "missing building"
@@ -894,6 +904,11 @@ msgstr "无"
 msgctxt "Screens.Notifications"
 msgid "Notifications"
 msgstr "通知"
+
+#. Screens.NotificationDismissHint
+msgctxt "Screens.NotificationDismissHint"
+msgid "{0} dismisses"
+msgstr "按 {0} 消除"
 
 #. Screens.Objectives
 msgctxt "Screens.Objectives"
@@ -1059,6 +1074,11 @@ msgstr "塔楼 {0}"
 msgctxt "Screens.Towers"
 msgid "Towers"
 msgstr "塔楼"
+
+#. Screens.Towns
+msgctxt "Screens.Towns"
+msgid "Towns"
+msgstr "城镇"
 
 #. Screens.TroopDistribution
 msgctxt "Screens.TroopDistribution"

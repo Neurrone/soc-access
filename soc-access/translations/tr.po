@@ -850,6 +850,16 @@ msgctxt "Screens.MainMenu"
 msgid "Main menu"
 msgstr "Ana menü"
 
+#. Screens.Map
+msgctxt "Screens.Map"
+msgid "Map"
+msgstr "Harita"
+
+#. Screens.Kingdom
+msgctxt "Screens.Kingdom"
+msgid "Kingdom"
+msgstr "Krallık"
+
 #. Screens.MissingBuilding
 msgctxt "Screens.MissingBuilding"
 msgid "missing building"
@@ -894,6 +904,11 @@ msgstr "Yok"
 msgctxt "Screens.Notifications"
 msgid "Notifications"
 msgstr "Bildirimler"
+
+#. Screens.NotificationDismissHint
+msgctxt "Screens.NotificationDismissHint"
+msgid "{0} dismisses"
+msgstr "{0} kapatır"
 
 #. Screens.Objectives
 msgctxt "Screens.Objectives"
@@ -1059,6 +1074,11 @@ msgstr "Kule {0}"
 msgctxt "Screens.Towers"
 msgid "Towers"
 msgstr "Kuleler"
+
+#. Screens.Towns
+msgctxt "Screens.Towns"
+msgid "Towns"
+msgstr "Kasabalar"
 
 #. Screens.TroopDistribution
 msgctxt "Screens.TroopDistribution"

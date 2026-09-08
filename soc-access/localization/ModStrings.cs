@@ -602,6 +602,11 @@ namespace SongsOfConquestAccess.Localization
             public static readonly ModString Layout = new ModString("Screens.Layout", "Layout");
             public static readonly ModString LevelValue = new ModString("Screens.LevelValue", "level {0}");
             public static readonly ModString MainMenu = new ModString("Screens.MainMenu", "Main menu");
+            /// <summary>The adventure map itself, as the stop the tile cursor lives in.</summary>
+            public static readonly ModString Map = new ModString("Screens.Map", "Map");
+            /// <summary>The adventure map's band of kingdom-wide buttons: the game menu and the
+            /// overview pages.</summary>
+            public static readonly ModString Kingdom = new ModString("Screens.Kingdom", "Kingdom");
             public static readonly ModString MissingBuilding = new ModString("Screens.MissingBuilding", "missing building");
             public static readonly ModString ModOptions = new ModString("Screens.ModOptions", "Mod options");
             public static readonly ModString Modifiers = new ModString("Screens.Modifiers", "Modifiers");
@@ -623,6 +628,7 @@ namespace SongsOfConquestAccess.Localization
             public static readonly ModString None = new ModString("Screens.None", "None");
             public static readonly ModString NotReady = new ModString("Screens.NotReady", "Not ready");
             public static readonly ModString Notifications = new ModString("Screens.Notifications", "Notifications");
+            public static readonly ModString NotificationDismissHint = new ModString("Screens.NotificationDismissHint", "{0} dismisses");
             public static readonly ModString Objectives = new ModString("Screens.Objectives", "Objectives");
             public static readonly ModString ObjectiveCannotBeCompleted = new ModString("Screens.ObjectiveCannotBeCompleted", "Cannot be completed");
             public static readonly ModString ObjectiveCompleted = new ModString("Screens.ObjectiveCompleted", "Completed");
@@ -675,6 +681,8 @@ namespace SongsOfConquestAccess.Localization
             public static readonly ModString TownStatusRounds = new ModString("Screens.TownStatusRounds", "{0}: {1} rounds complete, {2} rounds remaining");
             public static readonly ModString Tower = new ModString("Screens.Tower", "Tower {0}");
             public static readonly ModString Towers = new ModString("Screens.Towers", "Towers");
+            /// <summary>The adventure map's list of the towns the player owns.</summary>
+            public static readonly ModString Towns = new ModString("Screens.Towns", "Towns");
             public static readonly ModString TroopDistribution = new ModString("Screens.TroopDistribution", "troop distribution");
             public static readonly ModString TroopDisbandHint = new ModString("Screens.TroopDisbandHint", "{0} disbands");
             public static readonly ModString TroopMoveWholeHint = new ModString("Screens.TroopMoveWholeHint", "{0} moves the whole troop");
