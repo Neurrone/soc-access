@@ -275,9 +275,25 @@ namespace SongsOfConquestAccess.Screens
 
         /// <summary>One message as it is spoken: the line the window rendered, without the markup it
         /// rendered it with.</summary>
+        // A message's rendered line never changes once the game has written it, and the whole
+        // history is read on every build, so each distinct line is turned into speech once.
+        private static readonly Dictionary<string, string> SpokenCache = new Dictionary<string, string>();
+
         private static string Spoken(string text)
         {
-            return string.Join(" ", SpokenLines.Of(new[] { text }));
+            if (string.IsNullOrEmpty(text))
+            {
+                return string.Empty;
+            }
+
+            string spoken;
+            if (!SpokenCache.TryGetValue(text, out spoken))
+            {
+                spoken = string.Join(" ", SpokenLines.Of(new[] { text }));
+                SpokenCache[text] = spoken;
+            }
+
+            return spoken;
         }
 
         private object Marker(string key)

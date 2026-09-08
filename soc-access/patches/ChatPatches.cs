@@ -97,6 +97,10 @@ namespace SongsOfConquestAccess
         private static void HandleNewMessagePostfix(ChatWindowBehavior __instance, int teamId, ChatMessage message)
         {
             _currentWindow = __instance;
+
+            // The history has changed, whoever it was for: the open window re-reads it on its next
+            // build rather than rendering every message again on every build.
+            ChatAdapter.MessageGeneration++;
             ChatAdapter adapter = CurrentAdapter;
             if (adapter == null || !adapter.IsLocalTeamMessage(teamId))
             {

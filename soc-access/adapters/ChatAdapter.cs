@@ -354,16 +354,32 @@ namespace SongsOfConquestAccess.Adapters
             }
         }
 
+        /// <summary>Bumped whenever the game hands the window a message
+        /// (<c>ChatWindowBehavior.HandleNewMessage</c>, the only way one arrives). An adapter
+        /// re-reads the history when it moves and serves what it read otherwise.</summary>
+        public static int MessageGeneration;
+
+        // The history as it was last read, and the redraw and team it was read for. Rendering it is
+        // a pass over every message the game has ever shown this team.
+        private List<ChatMessageInfo> _messages;
+        private int _messagesAt = -1;
+        private int _messagesTeam = -1;
+
         public IReadOnlyList<ChatMessageInfo> GetMessages()
         {
-            List<ChatMessageInfo> messages = new List<ChatMessageInfo>();
             IClientChatSystem chatSystem = GetChatSystem();
             int teamId;
             if (chatSystem == null || !TryGetLocalTeamInControl(out teamId))
             {
-                return messages;
+                return new List<ChatMessageInfo>();
             }
 
+            if (_messages != null && _messagesAt == MessageGeneration && _messagesTeam == teamId)
+            {
+                return _messages;
+            }
+
+            List<ChatMessageInfo> messages = new List<ChatMessageInfo>();
             List<ChatMessage> nativeMessages = new List<ChatMessage>();
             chatSystem.GetMessagesForTeam(teamId, nativeMessages);
             for (int i = 0; i < nativeMessages.Count; i++)
@@ -371,6 +387,9 @@ namespace SongsOfConquestAccess.Adapters
                 messages.Add(BuildMessageInfo(nativeMessages[i]));
             }
 
+            _messages = messages;
+            _messagesAt = MessageGeneration;
+            _messagesTeam = teamId;
             return messages;
         }
 
