@@ -234,12 +234,13 @@ namespace SongsOfConquestAccess.Screens
 
         private void BuildDetails(GraphBuilder builder)
         {
-            if (SelectedBuildingSummaryLines().Count > 0)
+            IList<string> summary = SelectedBuildingSummaryLines();
+            if (summary.Count > 0)
             {
                 // One spoken line, one review-buffer line per paragraph the game wrote it in.
                 builder.AddItem(new SyntheticNode(
                     ControlId.For(Marker("summary"), "build:summary"),
-                    GraphNodes.Paragraphs(SelectedBuildingSummaryLines)));
+                    GraphNodes.Paragraphs(() => summary)));
             }
 
             BuildTiers(builder);
@@ -252,15 +253,12 @@ namespace SongsOfConquestAccess.Screens
             }
 
             BuildRequirements(builder);
-            if (Live.HasCurrentTierCost())
-            {
-                AddLine(builder, "cost", () => Live.CurrentTierCostText);
-            }
-
-            if (Live.HasWarning())
-            {
-                AddLine(builder, "warning", () => Live.CannotBuyText);
-            }
+            // Both are composed off the pane the build has just read, so each is read once and the
+            // node is declared over that string rather than over another read of it.
+            string cost = Live.CurrentTierCostText;
+            AddLine(builder, "cost", () => cost);
+            string warning = Live.CannotBuyText;
+            AddLine(builder, "warning", () => warning);
 
             BuildPurchase(builder);
         }

@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
@@ -89,6 +89,34 @@ namespace SongsOfConquestAccess.Adapters
         private readonly IBuildingRequirementValidator _buildingRequirementValidator;
         private readonly IResearchLookup _researchLookup;
 
+        // The pool's ActiveEntries property, looked up by name once per pool type rather than on
+        // every read of either pool.
+        private static readonly Dictionary<Type, PropertyInfo> ActiveEntriesByPoolType =
+            new Dictionary<Type, PropertyInfo>();
+
+        // The description sections and each section's entries, walked at most once a frame: the
+        // build asks for the available research, the income and garrison bands, the requirements and
+        // the cost, and each of those walked the same pooled subtrees again.
+        private int _sectionsFrame = -1;
+        private List<BuildMenuDescriptionSection> _sections;
+        private int _sectionEntriesFrame = -1;
+        private Dictionary<BuildMenuDescriptionSection, BuildMenuDescriptionEntry[]> _sectionEntries;
+
+        // The game's own GetSelectedLevel, invoked at most once a frame: the tier tabs and the cost
+        // line each asked for it, several times over.
+        private int _selectedTierFrame = -1;
+        private int _selectedTier = 1;
+
+        // Reflection handles and fixed answers resolved once per menu; misses are remembered too.
+        private bool _gameConfigProbed;
+        private MethodInfo _gameConfigGetValue;
+        private readonly Dictionary<BuildSiteSize, string> _buildTimeBySize =
+            new Dictionary<BuildSiteSize, string>();
+        private Type _validateResearchArgType;
+        private MethodInfo _validateResearchMethod;
+        private Type _researchDetailsArgType;
+        private MethodInfo _researchDetailsMethod;
+
         public BuildMenuAdapter(BuildMenu menu)
         {
             _menu = menu;
@@ -98,6 +126,18 @@ namespace SongsOfConquestAccess.Adapters
             _gameConfig = GetField<object>(menu, GameConfigField);
             _buildingRequirementValidator = GetField<IBuildingRequirementValidator>(menu, BuildingRequirementValidatorField);
             _researchLookup = GetField<IResearchLookup>(menu, ResearchLookupField);
+        }
+
+        /// <summary>Drop what is kept for the current frame only. Called wherever the mod drives the
+        /// menu's own click, because the game re-pools the sections and moves the selected level
+        /// under us in the same frame the build already read them in.</summary>
+        public void InvalidateFrameSnapshots()
+        {
+            _sectionsFrame = -1;
+            _sections = null;
+            _sectionEntriesFrame = -1;
+            _sectionEntries = null;
+            _selectedTierFrame = -1;
         }
 
         public bool IsPresent()
@@ -250,7 +290,14 @@ namespace SongsOfConquestAccess.Adapters
         {
             UIButton button = GetCategoryButton(size);
             NativeSelectionUtility.Select(button as Component);
-            return SelectedCategory == size || NativeSelectionUtility.Click(button);
+            if (SelectedCategory == size)
+            {
+                return true;
+            }
+
+            bool clicked = NativeSelectionUtility.Click(button);
+            InvalidateFrameSnapshots();
+            return clicked;
         }
 
         private CategoryItem BuildCategory(int index, BuildSiteSize size, UIButton button)
@@ -339,14 +386,27 @@ namespace SongsOfConquestAccess.Adapters
         {
             get
             {
-                if (_menu == null || GetSelectedLevelMethod == null)
+                int frame = Time.frameCount;
+                if (_selectedTierFrame == frame)
                 {
-                    return 1;
+                    return _selectedTier;
                 }
 
-                object value = GetSelectedLevelMethod.Invoke(_menu, null);
-                return value is int ? (int)value : 1;
+                _selectedTierFrame = frame;
+                _selectedTier = ReadSelectedTier();
+                return _selectedTier;
             }
+        }
+
+        private int ReadSelectedTier()
+        {
+            if (_menu == null || GetSelectedLevelMethod == null)
+            {
+                return 1;
+            }
+
+            object value = GetSelectedLevelMethod.Invoke(_menu, null);
+            return value is int ? (int)value : 1;
         }
 
         public IReadOnlyList<TierItem> GetTiers()
@@ -394,7 +454,14 @@ namespace SongsOfConquestAccess.Adapters
         {
             UIButton button = GetTierButton(level);
             NativeSelectionUtility.Select(button as Component);
-            return SelectedTier == level || NativeSelectionUtility.Click(button);
+            if (SelectedTier == level)
+            {
+                return true;
+            }
+
+            bool clicked = NativeSelectionUtility.Click(button);
+            InvalidateFrameSnapshots();
+            return clicked;
         }
 
         public IReadOnlyList<SectionItem> GetAvailableResearchItems()
@@ -572,7 +639,9 @@ namespace SongsOfConquestAccess.Adapters
 
         public bool ActivateBuild()
         {
-            return NativeSelectionUtility.Click(GetPurchaseButton());
+            bool clicked = NativeSelectionUtility.Click(GetPurchaseButton());
+            InvalidateFrameSnapshots();
+            return clicked;
         }
 
         public void FocusBuildButton()
@@ -774,7 +843,7 @@ namespace SongsOfConquestAccess.Adapters
                 return items;
             }
 
-            BuildMenuDescriptionEntry[] entries = section.GetComponentsInChildren<BuildMenuDescriptionEntry>(false);
+            BuildMenuDescriptionEntry[] entries = GetEntries(section);
             for (int i = 0; i < entries.Length; i++)
             {
                 BuildMenuDescriptionEntry entry = entries[i];
@@ -798,7 +867,7 @@ namespace SongsOfConquestAccess.Adapters
         private BuildMenuDescriptionEntry[] GetSectionEntries(string localizationKey, string fallbackHeader)
         {
             BuildMenuDescriptionSection section = GetVisibleSection(localizationKey, fallbackHeader);
-            return section != null ? section.GetComponentsInChildren<BuildMenuDescriptionEntry>(false) : new BuildMenuDescriptionEntry[0];
+            return GetEntries(section);
         }
 
         private string GetSectionBody(string localizationKey, string fallbackHeader)
@@ -810,7 +879,7 @@ namespace SongsOfConquestAccess.Adapters
             }
 
             List<string> lines = new List<string>();
-            BuildMenuDescriptionEntry[] entries = section.GetComponentsInChildren<BuildMenuDescriptionEntry>(false);
+            BuildMenuDescriptionEntry[] entries = GetEntries(section);
             for (int i = 0; i < entries.Length; i++)
             {
                 string text = GetText(GetField<UITextMesh>(entries[i], DescriptionEntryTextField));
@@ -895,7 +964,9 @@ namespace SongsOfConquestAccess.Adapters
                 return true;
             }
 
-            return NativeSelectionUtility.Click(button);
+            bool clicked = NativeSelectionUtility.Click(button);
+            InvalidateFrameSnapshots();
+            return clicked;
         }
 
         private IReadOnlyList<BuildMenuButton> GetActiveBuildButtons()
@@ -913,8 +984,18 @@ namespace SongsOfConquestAccess.Adapters
             return buttons;
         }
 
+        /// <summary>The pooled description sections, read at most once a frame: the available
+        /// research, the income and garrison bands, the requirements and the cost each asked the pool
+        /// again, and each of those then walked a section's children.</summary>
         private IReadOnlyList<BuildMenuDescriptionSection> GetActiveDescriptionSections()
         {
+            int frame = Time.frameCount;
+            if (_sections != null && _sectionsFrame == frame)
+            {
+                return _sections;
+            }
+
+            _sectionsFrame = frame;
             List<BuildMenuDescriptionSection> sections = new List<BuildMenuDescriptionSection>();
             foreach (object entry in GetActivePoolEntries(GetField<object>(_menu, BuildMenuIncomePoolField)))
             {
@@ -925,7 +1006,47 @@ namespace SongsOfConquestAccess.Adapters
                 }
             }
 
+            _sections = sections;
             return sections;
+        }
+
+        /// <summary>A section's drawn entries, walked at most once a frame per section.</summary>
+        private BuildMenuDescriptionEntry[] GetEntries(BuildMenuDescriptionSection section)
+        {
+            if (section == null)
+            {
+                return new BuildMenuDescriptionEntry[0];
+            }
+
+            int frame = Time.frameCount;
+            if (_sectionEntries == null || _sectionEntriesFrame != frame)
+            {
+                _sectionEntriesFrame = frame;
+                _sectionEntries = new Dictionary<BuildMenuDescriptionSection, BuildMenuDescriptionEntry[]>();
+            }
+
+            BuildMenuDescriptionEntry[] entries;
+            if (_sectionEntries.TryGetValue(section, out entries))
+            {
+                return entries;
+            }
+
+            entries = section.GetComponentsInChildren<BuildMenuDescriptionEntry>(false);
+            _sectionEntries[section] = entries;
+            return entries;
+        }
+
+        private static PropertyInfo GetActiveEntriesProperty(Type poolType)
+        {
+            PropertyInfo property;
+            if (ActiveEntriesByPoolType.TryGetValue(poolType, out property))
+            {
+                return property;
+            }
+
+            property = poolType.GetProperty("ActiveEntries");
+            ActiveEntriesByPoolType[poolType] = property;
+            return property;
         }
 
         private static IEnumerable<object> GetActivePoolEntries(object pool)
@@ -935,7 +1056,7 @@ namespace SongsOfConquestAccess.Adapters
                 yield break;
             }
 
-            PropertyInfo property = pool.GetType().GetProperty("ActiveEntries");
+            PropertyInfo property = GetActiveEntriesProperty(pool.GetType());
             IEnumerable entries = property != null ? property.GetValue(pool, null) as IEnumerable : null;
             if (entries == null)
             {
@@ -1075,7 +1196,22 @@ namespace SongsOfConquestAccess.Adapters
             return GetLocalizedText("Adventure/BuildMenu/Cost", "Cost").TrimEnd(':') + ": " + body;
         }
 
+        /// <summary>How long a size takes to build. Fixed for the life of the menu, and asked for
+        /// once per size tab on every build, so it is composed once per size.</summary>
         private string BuildTimeForSize(BuildSiteSize size)
+        {
+            string cached;
+            if (_buildTimeBySize.TryGetValue(size, out cached))
+            {
+                return cached;
+            }
+
+            string composed = ComposeBuildTimeForSize(size);
+            _buildTimeBySize[size] = composed;
+            return composed;
+        }
+
+        private string ComposeBuildTimeForSize(BuildSiteSize size)
         {
             int rounds;
             switch (size)
@@ -1150,20 +1286,27 @@ namespace SongsOfConquestAccess.Adapters
                 return false;
             }
 
-            MethodInfo method = _buildingRequirementValidator.GetType().GetMethods()
-                .FirstOrDefault(candidate =>
-                {
-                    if (candidate.Name != "Validate")
+            Type argType = research.GetType();
+            if (_validateResearchArgType != argType)
+            {
+                _validateResearchArgType = argType;
+                _validateResearchMethod = _buildingRequirementValidator.GetType().GetMethods()
+                    .FirstOrDefault(candidate =>
                     {
-                        return false;
-                    }
+                        if (candidate.Name != "Validate")
+                        {
+                            return false;
+                        }
 
-                    ParameterInfo[] parameters = candidate.GetParameters();
-                    return parameters.Length == 3
-                        && parameters[0].ParameterType.IsInstanceOfType(research)
-                        && parameters[1].ParameterType == typeof(int)
-                        && parameters[2].ParameterType == typeof(int);
-                });
+                        ParameterInfo[] parameters = candidate.GetParameters();
+                        return parameters.Length == 3
+                            && parameters[0].ParameterType.IsInstanceOfType(research)
+                            && parameters[1].ParameterType == typeof(int)
+                            && parameters[2].ParameterType == typeof(int);
+                    });
+            }
+
+            MethodInfo method = _validateResearchMethod;
             if (method == null)
             {
                 return false;
@@ -1180,17 +1323,24 @@ namespace SongsOfConquestAccess.Adapters
                 return null;
             }
 
-            MethodInfo method = _researchLookup.GetType().GetMethods()
-                .FirstOrDefault(candidate =>
-                {
-                    if (candidate.Name != "GetDetails")
+            Type argType = research.GetType();
+            if (_researchDetailsArgType != argType)
+            {
+                _researchDetailsArgType = argType;
+                _researchDetailsMethod = _researchLookup.GetType().GetMethods()
+                    .FirstOrDefault(candidate =>
                     {
-                        return false;
-                    }
+                        if (candidate.Name != "GetDetails")
+                        {
+                            return false;
+                        }
 
-                    ParameterInfo[] parameters = candidate.GetParameters();
-                    return parameters.Length == 1 && parameters[0].ParameterType.IsInstanceOfType(research);
-                });
+                        ParameterInfo[] parameters = candidate.GetParameters();
+                        return parameters.Length == 1 && parameters[0].ParameterType.IsInstanceOfType(research);
+                    });
+            }
+
+            MethodInfo method = _researchDetailsMethod;
             if (method == null)
             {
                 return null;
@@ -1207,26 +1357,32 @@ namespace SongsOfConquestAccess.Adapters
                 return fallback;
             }
 
-            MethodInfo method = _gameConfig.GetType().GetMethods()
-                .FirstOrDefault(candidate =>
-                {
-                    if (candidate.Name != "GetValue" || !candidate.IsGenericMethodDefinition)
+            if (!_gameConfigProbed)
+            {
+                _gameConfigProbed = true;
+                MethodInfo definition = _gameConfig.GetType().GetMethods()
+                    .FirstOrDefault(candidate =>
                     {
-                        return false;
-                    }
+                        if (candidate.Name != "GetValue" || !candidate.IsGenericMethodDefinition)
+                        {
+                            return false;
+                        }
 
-                    ParameterInfo[] parameters = candidate.GetParameters();
-                    return parameters.Length == 2
-                        && parameters[0].ParameterType == typeof(string);
-                });
-            if (method == null)
+                        ParameterInfo[] parameters = candidate.GetParameters();
+                        return parameters.Length == 2
+                            && parameters[0].ParameterType == typeof(string);
+                    });
+                _gameConfigGetValue = definition != null ? definition.MakeGenericMethod(typeof(int)) : null;
+            }
+
+            if (_gameConfigGetValue == null)
             {
                 return fallback;
             }
 
             try
             {
-                object value = method.MakeGenericMethod(typeof(int)).Invoke(_gameConfig, new object[] { key, fallback });
+                object value = _gameConfigGetValue.Invoke(_gameConfig, new object[] { key, fallback });
                 return value is int ? (int)value : fallback;
             }
             catch
@@ -1340,6 +1496,7 @@ namespace SongsOfConquestAccess.Adapters
                 return false;
             }
 
+            InvalidateFrameSnapshots();
             int after = CurrentBuildSite != null ? CurrentBuildSite.Id : -1;
             return before != after;
         }
