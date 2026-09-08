@@ -361,6 +361,19 @@ translates the graph's own navigation keys onto it (`ui_up` to the move, `ui_hom
 scanner jump), so an injected key behaves exactly as the physical one the router resolves to
 the mod's map action first.
 
+Approved model for `PreBattleMenuScreen` (2026-09-08), a sibling of `PostBattleResultScreen`
+(same `AdventureBattleMenu` frame): screen name stays "Troop placement"; stops Attacker (the
+commander line with the portrait tooltip, then a threat-level line with the scouting tooltip
+when drawn on that side), Defender (name line, "Threat Level – ..." line with the scouting
+tooltip, scouting information line when drawn), the grid (a mode node named by the instruction
+text; hex moves, skips, Ctrl+Space, scanner families, Home/End/Backspace through `ModeClaims`;
+the carry replaces the widget drag: Space picks up an own troop, Enter drops through the game's
+grab-and-drop, a refused drop says the existing "Invalid destination", Escape cancels; a
+passive watcher speaks a changed instruction queued), Buttons (Withdraw, Manual Battle, Quick
+Battle, Ready when drawn, by drawn left edge), and a final stop holding the drawn "Drag troops to
+rearrange" hint as a line (owner ruling). Start node the attacker line. Escape is the game's
+(no exit action registered; Withdraw has side effects).
+
 ### Phase F — the screen manager swap
 
 1. Replace `ScreenManager` with ES2's poll-and-diff manager: registered singleton screens,
