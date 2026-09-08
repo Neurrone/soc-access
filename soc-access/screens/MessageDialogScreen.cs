@@ -49,7 +49,7 @@ namespace SongsOfConquestAccess.Screens
     /// dialogs: <c>UITextMeshInputField</c> raises <c>OnSubmit</c>, and this screen answers it by
     /// pressing the positive action, exactly as the widget screen did.
     /// </summary>
-    public sealed class MessageDialogScreen : GraphScreen
+    public sealed class MessageDialogScreen : LiveScreen<IMessageDialogAdapter>
     {
         private const string DialogStop = "message-dialog";
 
@@ -62,9 +62,8 @@ namespace SongsOfConquestAccess.Screens
         private static readonly System.Reflection.PropertyInfo CustomMessageInstallerContainerProperty =
             AccessTools.Property(typeof(CustomMessageMenuInstaller), "Container");
 
-        private readonly IMessageDialogAdapter _adapter;
-        private readonly IInputDialogAdapter _inputAdapter;
-        private readonly Action<IUITextMeshInputField, string> _inputSubmitHandler;
+        private IInputDialogAdapter _inputAdapter;
+        private Action<IUITextMeshInputField, string> _inputSubmitHandler;
         private readonly GameTextEditor _editor = new GameTextEditor();
 
         // A subject of its own for each node the source gives no component for. The reconciler seats
@@ -77,10 +76,17 @@ namespace SongsOfConquestAccess.Screens
         private readonly object _positiveKey = new object();
         private readonly object _negativeKey = new object();
 
-        public MessageDialogScreen(IMessageDialogAdapter adapter)
+        /// <summary>The source that has just been written into the slot may have a text field of its
+        /// own (the rename box); the one that left must not be left holding a handler of ours.</summary>
+        public override void OnLiveChanged(IMessageDialogAdapter previous)
         {
-            _adapter = adapter;
-            _inputAdapter = adapter as IInputDialogAdapter;
+            if (_inputAdapter != null && _inputSubmitHandler != null)
+            {
+                _inputAdapter.DetachInputSubmit(_inputSubmitHandler);
+            }
+
+            _inputAdapter = Live as IInputDialogAdapter;
+            _inputSubmitHandler = null;
             if (_inputAdapter != null)
             {
                 _inputSubmitHandler = HandleInputSubmit;
@@ -88,7 +94,21 @@ namespace SongsOfConquestAccess.Screens
             }
         }
 
-        public static Screen TryBuildActiveMapMessagePopupScreen()
+        /// <summary>After a hot reload: the six sources tried in the order the detector's own
+        /// handlers would have written them, first one wins. Scanned once, from
+        /// <c>ScreenDetector.RecoverRuntimeState</c>.</summary>
+        public static void Recover()
+        {
+            Recovered<MessageDialogScreen>(
+                FindActiveMapMessagePopup()
+                ?? FindActiveRandomEventMenu()
+                ?? FindActiveCustomMessageMenu()
+                ?? FindActivePopupMenu()
+                ?? FindActiveConfirmPopup()
+                ?? FindActiveSystemPopup());
+        }
+
+        public static IMessageDialogAdapter FindActiveMapMessagePopup()
         {
             MapMessagePopup[] popups = Resources.FindObjectsOfTypeAll<MapMessagePopup>();
             for (int i = 0; i < popups.Length; i++)
@@ -102,14 +122,14 @@ namespace SongsOfConquestAccess.Screens
                 MapMessagePopupAdapter adapter = new MapMessagePopupAdapter(popup);
                 if (adapter.IsPresent())
                 {
-                    return new MessageDialogScreen(adapter);
+                    return adapter;
                 }
             }
 
             return null;
         }
 
-        public static Screen TryBuildActiveRandomEventMenuScreen()
+        public static IMessageDialogAdapter FindActiveRandomEventMenu()
         {
             RandomEventMenuInstaller[] installers = Resources.FindObjectsOfTypeAll<RandomEventMenuInstaller>();
             for (int i = 0; i < installers.Length; i++)
@@ -129,14 +149,14 @@ namespace SongsOfConquestAccess.Screens
                 RandomEventMenuAdapter adapter = new RandomEventMenuAdapter(menu);
                 if (adapter.IsPresent())
                 {
-                    return new MessageDialogScreen(adapter);
+                    return adapter;
                 }
             }
 
             return null;
         }
 
-        public static Screen TryBuildActiveCustomMessageMenuScreen()
+        public static IMessageDialogAdapter FindActiveCustomMessageMenu()
         {
             CustomMessageMenuInstaller[] installers = Resources.FindObjectsOfTypeAll<CustomMessageMenuInstaller>();
             for (int i = 0; i < installers.Length; i++)
@@ -156,14 +176,14 @@ namespace SongsOfConquestAccess.Screens
                 CustomMessageMenuAdapter adapter = new CustomMessageMenuAdapter(menu);
                 if (adapter.IsPresent())
                 {
-                    return new MessageDialogScreen(adapter);
+                    return adapter;
                 }
             }
 
             return null;
         }
 
-        public static Screen TryBuildActivePopupMenuScreen()
+        public static IMessageDialogAdapter FindActivePopupMenu()
         {
             PopupMenuInstaller[] installers = Resources.FindObjectsOfTypeAll<PopupMenuInstaller>();
             PopupMenuAdapter bestAdapter = null;
@@ -212,10 +232,10 @@ namespace SongsOfConquestAccess.Screens
                 }
             }
 
-            return bestAdapter != null ? new MessageDialogScreen(bestAdapter) : null;
+            return bestAdapter != null ? bestAdapter : null;
         }
 
-        public static Screen TryBuildActiveConfirmPopupScreen()
+        public static IMessageDialogAdapter FindActiveConfirmPopup()
         {
             ConfirmPopup[] popups = Resources.FindObjectsOfTypeAll<ConfirmPopup>();
             ConfirmPopupAdapter bestAdapter = null;
@@ -243,10 +263,10 @@ namespace SongsOfConquestAccess.Screens
                 }
             }
 
-            return bestAdapter != null ? new MessageDialogScreen(bestAdapter) : null;
+            return bestAdapter != null ? bestAdapter : null;
         }
 
-        public static Screen TryBuildActiveSystemPopupScreen()
+        public static IMessageDialogAdapter FindActiveSystemPopup()
         {
             SystemPopup[] popups = Resources.FindObjectsOfTypeAll<SystemPopup>();
             SystemPopupAdapter bestAdapter = null;
@@ -274,12 +294,18 @@ namespace SongsOfConquestAccess.Screens
                 }
             }
 
-            return bestAdapter != null ? new MessageDialogScreen(bestAdapter) : null;
+            return bestAdapter != null ? bestAdapter : null;
         }
 
         public override string Key
         {
             get { return "message-dialog"; }
+        }
+
+        /// <summary>Layer 100: a dialog: over every page, whichever raised it.</summary>
+        public override int Layer
+        {
+            get { return 100; }
         }
 
         /// <summary>The dialog's own heading, spoken once on arrival. Null where the source draws no
@@ -288,14 +314,14 @@ namespace SongsOfConquestAccess.Screens
         {
             get
             {
-                string title = _adapter != null ? _adapter.Title : null;
+                string title = Live != null ? Live.Title : null;
                 return string.IsNullOrWhiteSpace(title) ? null : title;
             }
         }
 
-        public override bool IsPresent()
+        public override bool IsActive()
         {
-            return _adapter != null && _adapter.IsPresent();
+            return Live != null && Live.IsPresent();
         }
 
         /// <summary>Escape is claimed only on the sources the game leaves it unanswered on, and only
@@ -304,18 +330,18 @@ namespace SongsOfConquestAccess.Screens
         {
             get
             {
-                return _adapter != null
-                    && !_adapter.GameHandlesEscape
-                    && _adapter.HasNegativeAction
-                    && _adapter.IsNegativeActionEnabled;
+                return Live != null
+                    && !Live.GameHandlesEscape
+                    && Live.HasNegativeAction
+                    && Live.IsNegativeActionEnabled;
             }
         }
 
         public override bool Back()
         {
-            return _adapter != null
-                && _adapter.IsNegativeActionEnabled
-                && _adapter.ActivateAction(DialogAction.Negative);
+            return Live != null
+                && Live.IsNegativeActionEnabled
+                && Live.ActivateAction(DialogAction.Negative);
         }
 
         /// <summary>While the keyboard is on its way to the game's field, what the player types next
@@ -330,15 +356,15 @@ namespace SongsOfConquestAccess.Screens
             get { return _editor.Pending || _editor.Editing; }
         }
 
-        public override void Update()
+        public override void OnUpdate()
         {
-            base.Update();
+            base.OnUpdate();
 
             // After the navigator, so the word the handover speaks follows the activation's own
             // readout. IsPresent is what tells an edit the player ended from a dialog that went away
             // under it: an Enter in the field submits the dialog, and an ending nobody is left to
             // hear is not announced.
-            _editor.Update(IsPresent());
+            _editor.Update(IsActive());
         }
 
         public override void OnUnfocus()
@@ -359,12 +385,12 @@ namespace SongsOfConquestAccess.Screens
 
         public object SourceKey
         {
-            get { return _adapter != null ? _adapter.SourceKey : null; }
+            get { return Live != null ? Live.SourceKey : null; }
         }
 
         public override void Build(GraphBuilder builder)
         {
-            if (!IsPresent())
+            if (!IsActive())
             {
                 return;
             }
@@ -372,18 +398,18 @@ namespace SongsOfConquestAccess.Screens
             builder.BeginStop(DialogStop);
             ControlId start = null;
 
-            if (!string.IsNullOrWhiteSpace(_adapter.Title))
+            if (!string.IsNullOrWhiteSpace(Live.Title))
             {
                 builder.AddItem(new SyntheticNode(
                     ControlId.For(_headingKey, "dialog:heading"),
-                    GraphNodes.Text(() => _adapter.Title)));
+                    GraphNodes.Text(() => Live.Title)));
             }
 
-            if (!string.IsNullOrWhiteSpace(_adapter.Body))
+            if (!string.IsNullOrWhiteSpace(Live.Body))
             {
                 ControlId bodyId = ControlId.For(_bodyKey, "dialog:body");
-                NodeVtable body = GraphNodes.Paragraphs(() => _adapter.BodyLines);
-                body.OnFocusVisual = () => _adapter.SyncNativeSelection(DialogAction.Body);
+                NodeVtable body = GraphNodes.Paragraphs(() => Live.BodyLines);
+                body.OnFocusVisual = () => Live.SyncNativeSelection(DialogAction.Body);
                 builder.AddItem(new SyntheticNode(bodyId, body));
                 start = bodyId;
             }
@@ -404,7 +430,7 @@ namespace SongsOfConquestAccess.Screens
 
             foreach (DialogAction action in DrawnButtons())
             {
-                Component button = _adapter.ButtonOf(action);
+                Component button = Live.ButtonOf(action);
                 ControlId buttonId = ControlId.For(
                     (object)button ?? (action == DialogAction.Positive ? _positiveKey : _negativeKey),
                     action == DialogAction.Positive ? "dialog:positive" : "dialog:negative");
@@ -429,7 +455,7 @@ namespace SongsOfConquestAccess.Screens
         private NodeVtable EditField()
         {
             return GraphNodes.EditField(
-                () => FirstNonEmpty(_adapter.Title, _adapter.Body),
+                () => FirstNonEmpty(Live.Title, Live.Body),
                 () =>
                 {
                     IUITextMeshInputField field = _inputAdapter != null ? _inputAdapter.InputField : null;
@@ -447,15 +473,15 @@ namespace SongsOfConquestAccess.Screens
         private NodeVtable Button(DialogAction action)
         {
             NodeVtable vtable = GraphNodes.Button(
-                () => action == DialogAction.Positive ? _adapter.PositiveLabel : _adapter.NegativeLabel,
-                () => _adapter.ActivateAction(action),
+                () => action == DialogAction.Positive ? Live.PositiveLabel : Live.NegativeLabel,
+                () => Live.ActivateAction(action),
                 () => action == DialogAction.Positive
-                    ? _adapter.IsPositiveActionEnabled
-                    : _adapter.IsNegativeActionEnabled);
+                    ? Live.IsPositiveActionEnabled
+                    : Live.IsNegativeActionEnabled);
 
             // The button the cursor is on is the button the game shows as selected, which is also what
             // its own Confirm key would press.
-            vtable.OnFocusVisual = () => _adapter.SyncNativeSelection(action);
+            vtable.OnFocusVisual = () => Live.SyncNativeSelection(action);
             return vtable;
         }
 
@@ -468,12 +494,12 @@ namespace SongsOfConquestAccess.Screens
         private List<DialogAction> DrawnButtons()
         {
             List<DialogAction> actions = new List<DialogAction>(2);
-            if (_adapter.HasPositiveAction)
+            if (Live.HasPositiveAction)
             {
                 actions.Add(DialogAction.Positive);
             }
 
-            if (_adapter.HasNegativeAction)
+            if (Live.HasNegativeAction)
             {
                 actions.Add(DialogAction.Negative);
             }
@@ -490,15 +516,15 @@ namespace SongsOfConquestAccess.Screens
 
         private float Left(DialogAction action)
         {
-            Component button = _adapter.ButtonOf(action);
+            Component button = Live.ButtonOf(action);
             return button != null ? button.transform.position.x : 0f;
         }
 
         private void HandleInputSubmit(IUITextMeshInputField inputField, string text)
         {
-            if (_adapter != null && _adapter.IsPositiveActionEnabled)
+            if (Live != null && Live.IsPositiveActionEnabled)
             {
-                _adapter.ActivateAction(DialogAction.Positive);
+                Live.ActivateAction(DialogAction.Positive);
             }
         }
 

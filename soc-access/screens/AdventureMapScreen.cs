@@ -68,7 +68,7 @@ namespace SongsOfConquestAccess.Screens
     /// against a drawn position. The town list had no town, so the Towns stop is built from the
     /// adapter and is likewise unverified.
     /// </summary>
-    public sealed class AdventureMapScreen : GraphScreen
+    public sealed class AdventureMapScreen : LiveScreen<AdventureMapAdapter>
     {
         private static readonly PropertyInfo InstallerContainerProperty =
             AccessTools.Property(typeof(AdventureViewInstaller), "Container");
@@ -138,9 +138,14 @@ namespace SongsOfConquestAccess.Screens
 
         private static string _lastProbeDiagnostic;
 
-        private readonly AdventureMapAdapter _adapter;
-        private readonly AdventureMapEventListener _eventListener;
-        private readonly AdventureMapGrid _grid;
+        private AdventureMapEventListener _eventListener;
+
+        // The tile cursor, built over the adapter it walks. Rebuilt when the slot is pointed at a
+        // DIFFERENT adventure and kept otherwise, so a dialog covering the map does not move the
+        // cursor: the map is only deactivated by the story gap and the loading screen, and it keeps
+        // its state across both.
+        private AdventureMapGrid _grid;
+        private AdventureMapAdapter _gridAdapter;
         private TeleportMenuAdapter _teleportMenuAdapter;
         private bool _isTopScreen;
 
@@ -151,26 +156,49 @@ namespace SongsOfConquestAccess.Screens
         private Tooltip _tooltip;
         private bool _tooltipRead;
 
-        public AdventureMapScreen(AdventureMapAdapter adapter, AdventureMapEventListener eventListener)
-            : this(adapter, eventListener, new AdventureMapGrid(adapter))
+        /// <summary>After a hot reload: point the slot at the adventure already installed.
+        /// Scanned once, from <c>ScreenDetector.RecoverRuntimeState</c>.</summary>
+        public static void Recover()
         {
+            Recovered<AdventureMapScreen>(FindActive());
         }
 
-        public static Screen TryBuildActiveScreen()
+        /// <summary>The adventure the game has installed and made ready, or null. The one scan.
+        /// </summary>
+        public static AdventureMapAdapter FindActive()
         {
             return FindActiveAdventureMap();
         }
 
-        private AdventureMapScreen(AdventureMapAdapter adapter, AdventureMapEventListener eventListener, AdventureMapGrid grid)
+        /// <summary>The cursor is built over one adventure: a new one gets a new grid, and the audio
+        /// and overlay of the old one are let go with it.</summary>
+        private AdventureMapGrid Grid()
         {
-            _adapter = adapter;
-            _eventListener = eventListener;
-            _grid = grid;
+            if (_grid != null && ReferenceEquals(_gridAdapter, Live))
+            {
+                return _grid;
+            }
+
+            if (_grid != null)
+            {
+                _grid.HideOverlay();
+                _grid.DisposeAudio();
+            }
+
+            _gridAdapter = Live;
+            _grid = Live == null ? null : new AdventureMapGrid(Live);
+            return _grid;
         }
 
         public override string Key
         {
             get { return "adventure-map"; }
+        }
+
+        /// <summary>Layer 10: the world, under everything drawn on it.</summary>
+        public override int Layer
+        {
+            get { return 10; }
         }
 
         public override string ScreenName
@@ -185,9 +213,34 @@ namespace SongsOfConquestAccess.Screens
             get { return false; }
         }
 
-        public override bool IsPresent()
+        /// <summary>The adventure view installed and ready, and neither of the two things that take
+        /// the map AWAY: a story sequence running (the camera and the keyboard are the story's) and
+        /// the loading screen. A popup does NOT deactivate the map - it covers it by layer, so the
+        /// HUD stays drawn underneath and the event listener and its audio are not torn down and
+        /// rebuilt for every dialog.</summary>
+        public override bool IsActive()
         {
-            return _adapter != null && _adapter.IsPresent();
+            if (Live == null || !Live.IsPresent())
+            {
+                return false;
+            }
+
+            ScreenDetector detector = SocAccessMod.Instance == null ? null : SocAccessMod.Instance.ScreenDetector;
+            if (detector != null && detector.StorySequenceActive)
+            {
+                return false;
+            }
+
+            ScreenManager screens = SocAccessMod.Instance == null ? null : SocAccessMod.Instance.ScreenManager;
+            LoadingCompleteScreen loading = screens == null ? null : screens.Registered<LoadingCompleteScreen>();
+            return loading == null || loading.Live == null;
+        }
+
+        /// <summary>The cursor survives the story gap and the loading screen, which are the only two
+        /// things that take the map off the stack.</summary>
+        public override bool KeepStateOnPop
+        {
+            get { return true; }
         }
 
         public override IEnumerable<ReviewBufferKind> VisibleReviewBuffers
@@ -203,8 +256,20 @@ namespace SongsOfConquestAccess.Screens
             }
         }
 
+        /// <summary>The map's events are listened to for exactly as long as the map is up. Built here
+        /// rather than held forever, because the listener is bound to the adventure the slot points
+        /// at.</summary>
         public override void OnPush()
         {
+            _eventListener = Live == null
+                ? null
+                : new AdventureMapEventListener(
+                    Live.Facade,
+                    Live.SelectionHandler,
+                    Live.HumanAdventureControllerFacade,
+                    Live.LocalizationHandler,
+                    Live.FogManager,
+                    GetAdventureMapRevealedRegistry());
             _eventListener?.Attach();
             AccessibilityEventBus.Subscribe(HandleAccessibilityEvent);
         }
@@ -213,14 +278,14 @@ namespace SongsOfConquestAccess.Screens
         {
             _isTopScreen = true;
             base.OnFocus();
-            _grid?.SetBeaconAudible(true);
+            Grid()?.SetBeaconAudible(true);
         }
 
         public override void OnUnfocus()
         {
             _isTopScreen = false;
-            _grid?.SetBeaconAudible(false);
-            _grid?.HideOverlay();
+            Grid()?.SetBeaconAudible(false);
+            Grid()?.HideOverlay();
             base.OnUnfocus();
         }
 
@@ -228,15 +293,16 @@ namespace SongsOfConquestAccess.Screens
         {
             AccessibilityEventBus.Unsubscribe(HandleAccessibilityEvent);
             _isTopScreen = false;
-            _grid?.DisposeAudio();
+            Grid()?.DisposeAudio();
             _eventListener?.Detach();
-            _grid?.HideOverlay();
+            _eventListener = null;
+            Grid()?.HideOverlay();
             base.OnPop();
         }
 
-        public override void Update()
+        public override void OnUpdate()
         {
-            base.Update();
+            base.OnUpdate();
             _eventListener?.Update();
         }
 
@@ -244,7 +310,7 @@ namespace SongsOfConquestAccess.Screens
 
         public override void Build(GraphBuilder builder)
         {
-            if (!IsPresent())
+            if (!IsActive())
             {
                 return;
             }
@@ -259,7 +325,7 @@ namespace SongsOfConquestAccess.Screens
                 return;
             }
 
-            AdventureHudAdapter hud = _adapter.Hud;
+            AdventureHudAdapter hud = Live.Hud;
             if (hud == null)
             {
                 return;
@@ -283,11 +349,11 @@ namespace SongsOfConquestAccess.Screens
             builder.BeginStop(MapStop);
             builder.PushContext(MapContext());
 
-            NodeVtable vtable = GraphNodes.Text(() => _grid.GetLabel(), null, TileTooltip());
+            NodeVtable vtable = GraphNodes.Text(() => Grid().GetLabel(), null, TileTooltip());
             vtable.OnActivate = ActivateTile;
             vtable.OnContextual = ContextualTile;
-            vtable.OnFocusVisual = () => _grid.ShowOverlay();
-            vtable.OnBlurVisual = () => _grid.HideOverlay();
+            vtable.OnFocusVisual = () => Grid().ShowOverlay();
+            vtable.OnBlurVisual = () => Grid().HideOverlay();
             builder.AddItem(new SyntheticNode(MapNodeId, vtable));
 
             builder.PopContext();
@@ -302,7 +368,7 @@ namespace SongsOfConquestAccess.Screens
 
         private Tooltip TileTooltip()
         {
-            Vector2Int tile = _grid.CursorTile;
+            Vector2Int tile = Grid().CursorTile;
             if (_tooltipRead && tile == _tooltipTile)
             {
                 return _tooltip;
@@ -310,7 +376,7 @@ namespace SongsOfConquestAccess.Screens
 
             _tooltipTile = tile;
             _tooltipRead = true;
-            _tooltip = _adapter.GetTooltip(tile);
+            _tooltip = Live.GetTooltip(tile);
             return _tooltip;
         }
 
@@ -322,7 +388,7 @@ namespace SongsOfConquestAccess.Screens
             TeleportMenuAdapter teleport = TeleportMenu;
             if (teleport != null)
             {
-                if (_grid.CursorTile == teleport.CurrentDestination)
+                if (Grid().CursorTile == teleport.CurrentDestination)
                 {
                     teleport.Confirm();
                 }
@@ -330,7 +396,7 @@ namespace SongsOfConquestAccess.Screens
                 return;
             }
 
-            _adapter.HandlePrimaryAction(_grid.CursorTile);
+            Live.HandlePrimaryAction(Grid().CursorTile);
         }
 
         private void ContextualTile()
@@ -340,7 +406,7 @@ namespace SongsOfConquestAccess.Screens
                 return;
             }
 
-            _adapter.HandleSecondaryAction(_grid.CursorTile);
+            Live.HandleSecondaryAction(Grid().CursorTile);
         }
 
         // ---- the wielder band ----
@@ -868,7 +934,7 @@ namespace SongsOfConquestAccess.Screens
         /// </summary>
         public override bool ModeClaims(string actionKey)
         {
-            return IsMapFocused() && _grid != null && ModeAction(actionKey) != null;
+            return IsMapFocused() && Grid() != null && ModeAction(actionKey) != null;
         }
 
         /// <summary>
@@ -879,7 +945,7 @@ namespace SongsOfConquestAccess.Screens
         /// </summary>
         private string ModeAction(string actionKey)
         {
-            if (_grid.ClaimsAction(actionKey))
+            if (Grid().ClaimsAction(actionKey))
             {
                 return actionKey;
             }
@@ -942,12 +1008,12 @@ namespace SongsOfConquestAccess.Screens
 
         public override bool OnAction(string actionKey)
         {
-            if (IsMapFocused() && _grid != null)
+            if (IsMapFocused() && Grid() != null)
             {
                 string mapAction = ModeAction(actionKey);
                 if (mapAction != null)
                 {
-                    return _grid.HandleAction(AccessibilityActions.FindByKey(mapAction));
+                    return Grid().HandleAction(AccessibilityActions.FindByKey(mapAction));
                 }
             }
 
@@ -985,7 +1051,7 @@ namespace SongsOfConquestAccess.Screens
         /// that panel is not drawn or the teleport menu has the screen.</summary>
         private ControlId HotkeyLanding(string actionKey)
         {
-            AdventureHudAdapter hud = _adapter != null ? _adapter.Hud : null;
+            AdventureHudAdapter hud = Live != null ? Live.Hud : null;
             if (hud == null || TeleportMenu != null)
             {
                 return null;
@@ -1045,7 +1111,7 @@ namespace SongsOfConquestAccess.Screens
         {
             get
             {
-                AdventureHudAdapter hud = _adapter != null ? _adapter.Hud : null;
+                AdventureHudAdapter hud = Live != null ? Live.Hud : null;
                 return hud != null ? hud.Troops : null;
             }
         }
@@ -1067,7 +1133,7 @@ namespace SongsOfConquestAccess.Screens
             }
 
             Navigator?.FocusNode(MapNodeId, announce: false);
-            _grid.FocusTile(adapter.CurrentDestination);
+            Grid().FocusTile(adapter.CurrentDestination);
         }
 
         /// <summary>The menu has closed. The cursor comes back to the wielder it was teleporting, and
@@ -1091,9 +1157,9 @@ namespace SongsOfConquestAccess.Screens
             }
 
             Vector2Int position;
-            if (_adapter != null && _adapter.TryGetSelectedWielderPosition(out position))
+            if (Live != null && Live.TryGetSelectedWielderPosition(out position))
             {
-                _grid.FocusTileSilently(position);
+                Grid().FocusTileSilently(position);
             }
 
             Navigator?.FocusNode(MapNodeId);
@@ -1135,7 +1201,7 @@ namespace SongsOfConquestAccess.Screens
                 return;
             }
 
-            _grid.FocusTile(teleport.CurrentDestination);
+            Grid().FocusTile(teleport.CurrentDestination);
         }
 
         // ---- the map moving on its own ----
@@ -1147,7 +1213,7 @@ namespace SongsOfConquestAccess.Screens
             {
                 if (_isTopScreen && !hudVisibility.IsVisible)
                 {
-                    MoveCursor(_grid.CursorTile, announce: false);
+                    MoveCursor(Grid().CursorTile, announce: false);
                 }
 
                 return;
@@ -1174,11 +1240,11 @@ namespace SongsOfConquestAccess.Screens
         {
             if (announce && _isTopScreen && IsMapFocused())
             {
-                _grid.FocusTile(tile);
+                Grid().FocusTile(tile);
                 return;
             }
 
-            _grid.FocusTileSilently(tile);
+            Grid().FocusTileSilently(tile);
             Navigator?.FocusNode(MapNodeId, announce: false);
         }
 
@@ -1186,7 +1252,7 @@ namespace SongsOfConquestAccess.Screens
 
         public bool SummarizeResources()
         {
-            AdventureHudAdapter hud = _adapter != null ? _adapter.Hud : null;
+            AdventureHudAdapter hud = Live != null ? Live.Hud : null;
             if (hud == null)
             {
                 return false;
@@ -1216,7 +1282,7 @@ namespace SongsOfConquestAccess.Screens
 
         // ---- the runtime probe (the reload resync) ----
 
-        private static AdventureMapScreen FindActiveAdventureMap()
+        private static AdventureMapAdapter FindActiveAdventureMap()
         {
             AdventureViewInstaller[] installers = Resources.FindObjectsOfTypeAll<AdventureViewInstaller>();
             if (installers.Length == 0)
@@ -1271,14 +1337,7 @@ namespace SongsOfConquestAccess.Screens
                 if (adapter.IsPresent())
                 {
                     LogProbeDiagnostic("Adventure map probe found ready adventure map");
-                    AdventureMapEventListener eventListener = new AdventureMapEventListener(
-                        facade,
-                        selectionHandler,
-                        humanAdventureControllerFacade,
-                        localizationHandler,
-                        fogManager,
-                        revealedRegistry);
-                    return new AdventureMapScreen(adapter, eventListener);
+                    return adapter;
                 }
 
                 LogProbeDiagnostic("Adventure map probe found installer but adapter is not ready: " + adapter.GetReadinessDiagnostic());

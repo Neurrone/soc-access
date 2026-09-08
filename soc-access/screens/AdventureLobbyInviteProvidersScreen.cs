@@ -23,29 +23,29 @@ namespace SongsOfConquestAccess.Screens
     /// binding throughout this game, so the key would do nothing; the screen runs the panel's own
     /// <c>HandleCancelInvitePopup</c>, which is what its full-screen blocker's click runs too.
     /// </summary>
-    public sealed class AdventureLobbyInviteProvidersScreen : GraphScreen
+    public sealed class AdventureLobbyInviteProvidersScreen : LiveScreen<AdventureLobbyInviteProvidersAdapter>
     {
         private const string MenuStop = "invite-providers";
-
-        private readonly AdventureLobbyInviteProvidersAdapter _adapter;
 
         // A subject of its own for the one node the popup draws nothing for.
         private readonly object _cancelKey = new object();
 
-        public AdventureLobbyInviteProvidersScreen(AdventureLobbyInviteProvidersAdapter adapter)
+        /// <summary>After a hot reload: point the slot at the menu already showing.
+        /// Scanned once, from <c>ScreenDetector.RecoverRuntimeState</c>.</summary>
+        public static void Recover()
         {
-            _adapter = adapter;
+            Recovered<AdventureLobbyInviteProvidersScreen>(FindActive());
         }
 
-        public static Screen TryBuildActiveScreen()
+        public static AdventureLobbyInviteProvidersAdapter FindActive()
         {
             AdventureLobbyInviteProvidersAdapter adapter = FindActiveInviteProviders(null);
-            return adapter != null ? new AdventureLobbyInviteProvidersScreen(adapter) : null;
+            return adapter;
         }
 
         public bool Matches(LobbyMultiplayerPanel panel)
         {
-            return _adapter != null && ReferenceEquals(_adapter.SourceKey, panel);
+            return Live != null && ReferenceEquals(Live.SourceKey, panel);
         }
 
         public override string Key
@@ -53,46 +53,52 @@ namespace SongsOfConquestAccess.Screens
             get { return "invite-providers"; }
         }
 
+        /// <summary>Layer 22: over the lobby sub-pages.</summary>
+        public override int Layer
+        {
+            get { return 22; }
+        }
+
         /// <summary>The Invite Friend button's own label, spoken once on arrival.</summary>
         public override string ScreenName
         {
             get
             {
-                string title = _adapter != null ? _adapter.Title : null;
+                string title = Live != null ? Live.Title : null;
                 return string.IsNullOrWhiteSpace(title) ? null : title;
             }
         }
 
-        public override bool IsPresent()
+        public override bool IsActive()
         {
-            return _adapter != null && _adapter.IsPresent();
+            return Live != null && Live.IsPresent();
         }
 
         public override bool ConsumesBack
         {
-            get { return IsPresent(); }
+            get { return IsActive(); }
         }
 
         public override bool Back()
         {
-            return _adapter != null && _adapter.Cancel();
+            return Live != null && Live.Cancel();
         }
 
         public override void OnUnfocus()
         {
             base.OnUnfocus();
-            _adapter?.HideNativeTooltip();
+            Live?.HideNativeTooltip();
         }
 
         public override void OnPop()
         {
             base.OnPop();
-            _adapter?.HideNativeTooltip();
+            Live?.HideNativeTooltip();
         }
 
         public override void Build(GraphBuilder builder)
         {
-            if (!IsPresent())
+            if (!IsActive())
             {
                 return;
             }
@@ -100,7 +106,7 @@ namespace SongsOfConquestAccess.Screens
             builder.BeginStop(MenuStop);
             ControlId start = null;
 
-            IReadOnlyList<AdventureLobbyInviteProvidersAdapter.ProviderButtonItem> items = _adapter.GetProviderButtons();
+            IReadOnlyList<AdventureLobbyInviteProvidersAdapter.ProviderButtonItem> items = Live.GetProviderButtons();
             for (int i = 0; i < items.Count; i++)
             {
                 AdventureLobbyInviteProvidersAdapter.ProviderButtonItem item = items[i];
@@ -126,8 +132,8 @@ namespace SongsOfConquestAccess.Screens
 
             // The mod's own way out, as the widget screen offered: the popup draws no Cancel of its
             // own, and the game's Cancel is bound to the gamepad only.
-            NodeVtable cancel = GraphNodes.Button(() => _adapter.CancelLabel, () => _adapter.Cancel());
-            cancel.OnFocusVisual = _adapter.HideNativeTooltip;
+            NodeVtable cancel = GraphNodes.Button(() => Live.CancelLabel, () => Live.Cancel());
+            cancel.OnFocusVisual = Live.HideNativeTooltip;
             ControlId cancelId = ControlId.For(_cancelKey, "invite-providers:cancel");
             builder.AddItem(new SyntheticNode(cancelId, cancel));
             if (start == null)

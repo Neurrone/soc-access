@@ -35,7 +35,7 @@ namespace SongsOfConquestAccess.Screens
     /// IS THE MOD'S too and runs the same path: the menu registers no input callback of any kind, so
     /// the keyboard has no way out of it otherwise.
     /// </summary>
-    public sealed class MarketplaceScreen : GraphScreen
+    public sealed class MarketplaceScreen : LiveScreen<MarketplaceMenuAdapter>
     {
         private const string SummaryStop = "marketplace-summary";
         private const string TradesStop = "marketplace-trades";
@@ -43,20 +43,18 @@ namespace SongsOfConquestAccess.Screens
         private const string CloseStop = "marketplace-close";
         private const string SheetKey = "marketplace:";
 
-        private readonly MarketplaceMenuAdapter _adapter;
-
         // Subjects of their own for the lines the menu gives no component the screen can key on, kept
         // across rebuilds so the reconciler seats the cursor back on the same node.
         private readonly Dictionary<string, object> _markers = new Dictionary<string, object>();
 
-        private Action<ResourceUpdatedPayload> _resourceUpdatedHandler;
-
-        public MarketplaceScreen(MarketplaceMenuAdapter adapter)
+        /// <summary>After a hot reload: point the slot at the menu already showing.
+        /// Scanned once, from <c>ScreenDetector.RecoverRuntimeState</c>.</summary>
+        public static void Recover()
         {
-            _adapter = adapter;
+            Recovered<MarketplaceScreen>(FindActive());
         }
 
-        public static Screen TryBuildActiveScreen()
+        public static MarketplaceMenuAdapter FindActive()
         {
             MarketplaceMenu[] menus = Resources.FindObjectsOfTypeAll<MarketplaceMenu>();
             for (int i = 0; i < menus.Length; i++)
@@ -64,7 +62,7 @@ namespace SongsOfConquestAccess.Screens
                 MarketplaceMenuAdapter adapter = new MarketplaceMenuAdapter(menus[i]);
                 if (adapter.IsPresent())
                 {
-                    return new MarketplaceScreen(adapter);
+                    return (adapter);
                 }
             }
 
@@ -76,19 +74,25 @@ namespace SongsOfConquestAccess.Screens
             get { return "marketplace"; }
         }
 
+        /// <summary>Layer 20: an in-game panel over the map.</summary>
+        public override int Layer
+        {
+            get { return 20; }
+        }
+
         /// <summary>The menu's own drawn heading ("Court of Trade").</summary>
         public override string ScreenName
         {
             get
             {
-                string title = _adapter != null ? _adapter.Title : null;
+                string title = Live != null ? Live.Title : null;
                 return string.IsNullOrWhiteSpace(title) ? null : title;
             }
         }
 
-        public override bool IsPresent()
+        public override bool IsActive()
         {
-            return _adapter != null && _adapter.IsPresent();
+            return Live != null && Live.IsPresent();
         }
 
         public override bool ConsumesBack
@@ -98,30 +102,12 @@ namespace SongsOfConquestAccess.Screens
 
         public override bool Back()
         {
-            return _adapter != null && _adapter.Close();
-        }
-
-        public override void OnPush()
-        {
-            AttachListeners();
-        }
-
-        public override void OnPop()
-        {
-            DetachListeners();
-            base.OnPop();
-        }
-
-        /// <summary>Called by the detector whenever the team's resources change. The graph is declared
-        /// afresh on every navigation operation and reads the prices and the amounts off the game each
-        /// time, so there is nothing here to invalidate.</summary>
-        public void Refresh()
-        {
+            return Live != null && Live.Close();
         }
 
         public override void Build(GraphBuilder builder)
         {
-            if (!IsPresent())
+            if (!IsActive())
             {
                 return;
             }
@@ -143,26 +129,26 @@ namespace SongsOfConquestAccess.Screens
 
         private void BuildSummary(GraphBuilder builder)
         {
-            if (string.IsNullOrWhiteSpace(_adapter.OwningSummary))
+            if (string.IsNullOrWhiteSpace(Live.OwningSummary))
             {
                 return;
             }
 
             builder.AddItem(new SyntheticNode(
                 ControlId.For(Marker("summary"), "marketplace:summary"),
-                GraphNodes.Text(() => _adapter.OwningSummary)));
+                GraphNodes.Text(() => Live.OwningSummary)));
         }
 
         // ---- the trade grid ----
 
         private void BuildTrades(GraphBuilder builder)
         {
-            IReadOnlyList<MarketplaceMenuAdapter.TradeColumn> columns = _adapter.GetTradeColumns();
+            IReadOnlyList<MarketplaceMenuAdapter.TradeColumn> columns = Live.GetTradeColumns();
             // No heading band: the sheet names the column on every crossing ("Sell -1, 50 Gold"),
             // so a row of the captions would say them a second time (owner ruling 2026-09-07).
             GraphSheet sheet = new GraphSheet(builder, SheetKey);
-            sheet.Region(_adapter.Title, SheetCaptions(columns));
-            IReadOnlyList<MarketplaceMenuAdapter.ResourceItem> resources = _adapter.GetResources();
+            sheet.Region(Live.Title, SheetCaptions(columns));
+            IReadOnlyList<MarketplaceMenuAdapter.ResourceItem> resources = Live.GetResources();
             for (int i = 0; i < resources.Count; i++)
             {
                 MarketplaceMenuAdapter.ResourceItem resource = resources[i];
@@ -177,7 +163,7 @@ namespace SongsOfConquestAccess.Screens
                 {
                     MarketplaceMenuAdapter.TradeColumn column = columns[c];
                     MarketplaceMenuAdapter.TradeButtonItem button =
-                        _adapter.GetTradeButton(resource.ResourceType, column.IsBuyButton, column.Amount);
+                        Live.GetTradeButton(resource.ResourceType, column.IsBuyButton, column.Amount);
                     if (button == null || !button.IsVisible || button.Component == null)
                     {
                         continue;
@@ -222,7 +208,7 @@ namespace SongsOfConquestAccess.Screens
         {
             MarketplaceMenuAdapter.TradeButtonItem it = button;
             string rowName = resource.ResourceName;
-            string gold = _adapter.GetResourceName(ResourceType.Gold);
+            string gold = Live.GetResourceName(ResourceType.Gold);
             NodeVtable vtable = GraphNodes.Button(
                 () => ModText.Get(ModStrings.Common.ResourceAmount, it.Price, gold),
                 () => it.Activate(),
@@ -262,14 +248,14 @@ namespace SongsOfConquestAccess.Screens
 
         private void BuildTip(GraphBuilder builder)
         {
-            if (_adapter.TipLines.Count == 0)
+            if (Live.TipLines.Count == 0)
             {
                 return;
             }
 
             builder.AddItem(new SyntheticNode(
                 ControlId.For(Marker("tip"), "marketplace:tip"),
-                GraphNodes.Paragraphs(() => _adapter.TipLines)));
+                GraphNodes.Paragraphs(() => Live.TipLines)));
         }
 
         // ---- the close ----
@@ -280,38 +266,7 @@ namespace SongsOfConquestAccess.Screens
                 ControlId.For(Marker("close"), "marketplace:close"),
                 GraphNodes.Button(
                     () => ModText.Get(ModStrings.Screens.Close),
-                    () => _adapter.Close())));
-        }
-
-        // ---- the game's own change signal ----
-
-        private void AttachListeners()
-        {
-            if (_adapter == null || _adapter.Facade == null || _adapter.Facade.Commands == null || _resourceUpdatedHandler != null)
-            {
-                return;
-            }
-
-            _resourceUpdatedHandler = HandleResourceUpdated;
-            IClientCommandsFacade commands = _adapter.Facade.Commands;
-            commands.OnResourceUpdated = (Action<ResourceUpdatedPayload>)Delegate.Combine(commands.OnResourceUpdated, _resourceUpdatedHandler);
-        }
-
-        private void DetachListeners()
-        {
-            if (_adapter == null || _adapter.Facade == null || _adapter.Facade.Commands == null || _resourceUpdatedHandler == null)
-            {
-                return;
-            }
-
-            IClientCommandsFacade commands = _adapter.Facade.Commands;
-            commands.OnResourceUpdated = (Action<ResourceUpdatedPayload>)Delegate.Remove(commands.OnResourceUpdated, _resourceUpdatedHandler);
-            _resourceUpdatedHandler = null;
-        }
-
-        private void HandleResourceUpdated(ResourceUpdatedPayload payload)
-        {
-            SocAccessMod.Instance?.ScreenDetector?.OnMarketplaceChanged();
+                    () => Live.Close())));
         }
 
         private object Marker(string key)

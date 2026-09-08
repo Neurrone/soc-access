@@ -35,25 +35,25 @@ namespace SongsOfConquestAccess.Screens
     ///
     /// Escape presses the drawn Back button, as the widget screen did.
     /// </summary>
-    public sealed class PlayerStatsScreen : GraphScreen
+    public sealed class PlayerStatsScreen : LiveScreen<PlayerStatsAdapter>
     {
         private const string TabsStop = "player-stats-tabs";
         private const string ContentStop = "player-stats-content";
         private const string ButtonsStop = "player-stats-buttons";
         private const string SheetKey = "player-stats:";
 
-        private readonly PlayerStatsAdapter _adapter;
-
         // A subject of its own per summary line, kept across rebuilds so the reconciler seats the
         // cursor on the same line: the page draws them as labels the mod has nothing else to key on.
         private readonly Dictionary<string, object> _markers = new Dictionary<string, object>();
 
-        public PlayerStatsScreen(PlayerStatsAdapter adapter)
+        /// <summary>After a hot reload: point the slot at the menu already showing.
+        /// Scanned once, from <c>ScreenDetector.RecoverRuntimeState</c>.</summary>
+        public static void Recover()
         {
-            _adapter = adapter;
+            Recovered<PlayerStatsScreen>(FindActive());
         }
 
-        public static Screen TryBuildActiveScreen()
+        public static PlayerStatsAdapter FindActive()
         {
             PlayerStatsMenuNavigation[] menus = Resources.FindObjectsOfTypeAll<PlayerStatsMenuNavigation>();
             for (int i = 0; i < menus.Length; i++)
@@ -61,7 +61,7 @@ namespace SongsOfConquestAccess.Screens
                 PlayerStatsAdapter adapter = new PlayerStatsAdapter(menus[i]);
                 if (adapter.IsPresent())
                 {
-                    return new PlayerStatsScreen(adapter);
+                    return (adapter);
                 }
             }
 
@@ -70,7 +70,7 @@ namespace SongsOfConquestAccess.Screens
 
         public bool Matches(PlayerStatsMenuNavigation menu)
         {
-            return _adapter != null && ReferenceEquals(_adapter.Source, menu);
+            return Live != null && ReferenceEquals(Live.Source, menu);
         }
 
         public override string Key
@@ -78,10 +78,16 @@ namespace SongsOfConquestAccess.Screens
             get { return "player-stats"; }
         }
 
+        /// <summary>Layer 30: over the panels it is opened from.</summary>
+        public override int Layer
+        {
+            get { return 30; }
+        }
+
         /// <summary>The page's own drawn title ("Player stats").</summary>
         public override string ScreenName
         {
-            get { return _adapter != null ? _adapter.Title : null; }
+            get { return Live != null ? Live.Title : null; }
         }
 
         /// <summary>The tab bar, so arrival reads which page is showing before its first line.
@@ -91,30 +97,24 @@ namespace SongsOfConquestAccess.Screens
             get { return TabsStop; }
         }
 
-        public override bool IsPresent()
+        public override bool IsActive()
         {
-            return _adapter != null && _adapter.IsPresent();
+            return Live != null && Live.IsPresent();
         }
 
         public override bool ConsumesBack
         {
-            get { return _adapter != null && _adapter.BackButton != null && _adapter.BackButton.IsVisible(); }
+            get { return Live != null && Live.BackButton != null && Live.BackButton.IsVisible(); }
         }
 
         public override bool Back()
         {
-            return _adapter != null && _adapter.BackButton != null && _adapter.BackButton.Activate();
-        }
-
-        /// <summary>Kept for the detector, which calls it when the page's content changes. The graph is
-        /// declared afresh on every operation, so there is nothing to rebuild.</summary>
-        public void Refresh()
-        {
+            return Live != null && Live.BackButton != null && Live.BackButton.Activate();
         }
 
         public override void Build(GraphBuilder builder)
         {
-            if (!IsPresent())
+            if (!IsActive())
             {
                 return;
             }
@@ -124,7 +124,7 @@ namespace SongsOfConquestAccess.Screens
 
             builder.BeginStop(ContentStop);
             GraphSheet sheet = new GraphSheet(builder, SheetKey);
-            if (_adapter.IsOverallTabSelected)
+            if (Live.IsOverallTabSelected)
             {
                 BuildOverall(sheet);
             }
@@ -143,14 +143,14 @@ namespace SongsOfConquestAccess.Screens
 
         private void BuildTabs(GraphBuilder builder)
         {
-            IReadOnlyList<PlayerStatsAdapter.TabItem> tabs = _adapter.GetTabs();
+            IReadOnlyList<PlayerStatsAdapter.TabItem> tabs = Live.GetTabs();
             for (int i = 0; i < tabs.Count; i++)
             {
                 PlayerStatsAdapter.TabItem tab = tabs[i];
                 NodeVtable vtable = GraphNodes.Tab(
                     () => tab.Label,
-                    () => _adapter.SelectedTabIndex == tab.Index);
-                vtable.OnActivate = () => _adapter.ActivateTab(tab.Index);
+                    () => Live.SelectedTabIndex == tab.Index);
+                vtable.OnActivate = () => Live.ActivateTab(tab.Index);
                 builder.AddItem(new SyntheticNode(
                     ControlId.For(Marker(tab.Id), "player-stats:" + tab.Id),
                     vtable));
@@ -161,56 +161,56 @@ namespace SongsOfConquestAccess.Screens
 
         private void BuildOverall(GraphSheet sheet)
         {
-            List(sheet, _adapter.OverallGeneralLabel, _adapter.GetOverallGeneralItems(), "overall-general");
+            List(sheet, Live.OverallGeneralLabel, Live.GetOverallGeneralItems(), "overall-general");
             Table(
                 sheet,
-                _adapter.FactionsLabel,
+                Live.FactionsLabel,
                 new[] { ModStrings.UI.ColumnFaction, ModStrings.UI.ColumnRank, ModStrings.UI.ColumnPlayDistribution },
                 new[] { "faction", "rank", "play-distribution" },
-                _adapter.GetFactionRows(),
+                Live.GetFactionRows(),
                 "factions");
             Table(
                 sheet,
-                _adapter.TopMapsLabel,
+                Live.TopMapsLabel,
                 new[] { ModStrings.UI.ColumnMap, ModStrings.UI.ColumnRank, ModStrings.UI.ColumnDetails, ModStrings.UI.ColumnGames },
                 new[] { "map", "rank", "details", "games" },
-                _adapter.GetMapRows(),
+                Live.GetMapRows(),
                 "maps");
             Table(
                 sheet,
-                _adapter.TopWieldersLabel,
+                Live.TopWieldersLabel,
                 new[] { ModStrings.UI.ColumnWielder, ModStrings.UI.ColumnRank, ModStrings.UI.ColumnFaction, ModStrings.UI.ColumnTimesRecruited },
                 new[] { "wielder", "rank", "faction", "times-recruited" },
-                _adapter.GetWielderRows(),
+                Live.GetWielderRows(),
                 "wielders");
-            Summary(sheet, "wielders", _adapter.WielderSummary, _adapter.WielderSummaryTransform);
+            Summary(sheet, "wielders", Live.WielderSummary, Live.WielderSummaryTransform);
             Table(
                 sheet,
-                _adapter.TopTroopsLabel,
+                Live.TopTroopsLabel,
                 new[] { ModStrings.UI.ColumnTroop, ModStrings.UI.ColumnRank, ModStrings.UI.ColumnFaction, ModStrings.UI.ColumnTimesTrained },
                 new[] { "troop", "rank", "faction", "times-trained" },
-                _adapter.GetTroopRows(),
+                Live.GetTroopRows(),
                 "troops");
-            Summary(sheet, "troops", _adapter.TroopSummary, _adapter.TroopSummaryTransform);
+            Summary(sheet, "troops", Live.TroopSummary, Live.TroopSummaryTransform);
         }
 
         private void BuildBattle(GraphSheet sheet)
         {
-            List(sheet, _adapter.BattleGeneralLabel, _adapter.GetBattleGeneralItems(), "battle-general");
+            List(sheet, Live.BattleGeneralLabel, Live.GetBattleGeneralItems(), "battle-general");
             Table(
                 sheet,
-                _adapter.SpellsLabel,
+                Live.SpellsLabel,
                 new[] { ModStrings.UI.ColumnSpell, ModStrings.UI.ColumnRank, ModStrings.UI.ColumnTimesCast },
                 new[] { "spell", "rank", "times-cast" },
-                _adapter.GetSpellRows(),
+                Live.GetSpellRows(),
                 "spells");
-            Summary(sheet, "spells", _adapter.SpellSummary, _adapter.SpellSummaryTransform);
+            Summary(sheet, "spells", Live.SpellSummary, Live.SpellSummaryTransform);
             Table(
                 sheet,
-                _adapter.EnemyTroopsLabel,
+                Live.EnemyTroopsLabel,
                 new[] { ModStrings.UI.ColumnTroop, ModStrings.UI.ColumnRank, ModStrings.UI.ColumnFaction, ModStrings.UI.ColumnKills },
                 new[] { "troop", "rank", "faction", "kills" },
-                _adapter.GetEnemyTroopRows(),
+                Live.GetEnemyTroopRows(),
                 "enemy-troops");
         }
 
@@ -228,7 +228,7 @@ namespace SongsOfConquestAccess.Screens
                 }
 
                 NodeVtable vtable = GraphNodes.Text(() => Plain(item.Label));
-                vtable.OnFocusVisual = () => _adapter.ScrollIntoView(item.SourceTransform);
+                vtable.OnFocusVisual = () => Live.ScrollIntoView(item.SourceTransform);
                 sheet.Line(vtable, item.SourceTransform);
             }
         }
@@ -278,7 +278,7 @@ namespace SongsOfConquestAccess.Screens
             {
                 string line = lines[i];
                 NodeVtable vtable = GraphNodes.Text(() => line);
-                vtable.OnFocusVisual = () => _adapter.ScrollIntoView(transform);
+                vtable.OnFocusVisual = () => Live.ScrollIntoView(transform);
                 sheet.Line(vtable, transform);
             }
         }
@@ -290,7 +290,7 @@ namespace SongsOfConquestAccess.Screens
             {
                 ControlType = ControlTypes.Text,
                 Announcements = new List<NodeAnnouncement> { GraphNodes.LabelPart(() => Plain(it.Label)) },
-                OnFocusVisual = () => _adapter.ScrollIntoView(it.SourceTransform),
+                OnFocusVisual = () => Live.ScrollIntoView(it.SourceTransform),
             };
             return vtable;
         }
@@ -307,7 +307,7 @@ namespace SongsOfConquestAccess.Screens
                 Announcements = new List<NodeAnnouncement> { GraphNodes.ValuePart(text, watch: false) },
                 SearchText = () => Plain(it.Label),
                 BufferHead = () => ModText.Get(ModStrings.Common.ListSeparator, caption, text()),
-                OnFocusVisual = () => _adapter.ScrollIntoView(it.SourceTransform),
+                OnFocusVisual = () => Live.ScrollIntoView(it.SourceTransform),
             };
         }
 
@@ -334,8 +334,8 @@ namespace SongsOfConquestAccess.Screens
         private void BuildButtons(GraphBuilder builder)
         {
             // Back (x 21) then Options (x 1233) of the header band, left to right.
-            AddButton(builder, "player-stats:back", _adapter.BackButton);
-            AddButton(builder, "player-stats:options", _adapter.OptionsButton);
+            AddButton(builder, "player-stats:back", Live.BackButton);
+            AddButton(builder, "player-stats:options", Live.OptionsButton);
         }
 
         private static void AddButton(GraphBuilder builder, string key, IMenuButtonAdapter button)

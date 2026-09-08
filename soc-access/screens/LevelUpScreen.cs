@@ -37,7 +37,7 @@ namespace SongsOfConquestAccess.Screens
     /// <c>AdventureMenuBackground</c> has <c>_canClose</c> true, so it draws the close cross and
     /// registers <c>UI.ExitMenu</c> on its own close in <c>AnimateEntry</c>.
     /// </summary>
-    public sealed class LevelUpScreen : GraphScreen
+    public sealed class LevelUpScreen : LiveScreen<LevelUpMenuAdapter>
     {
         private const string HeaderStop = "level-up-header";
         private const string StatsStop = "level-up-stats";
@@ -47,19 +47,19 @@ namespace SongsOfConquestAccess.Screens
         private static readonly System.Reflection.PropertyInfo InstallerContainerProperty =
             AccessTools.Property(typeof(CommanderLevelUpMenuInstaller), "Container");
 
-        private readonly LevelUpMenuAdapter _adapter;
-
         // A subject of its own per synthesized line, kept across rebuilds so the reconciler seats the
         // cursor on the same one: the menu gives no component for its heading, its identity line, the
         // "Choose a Skill" caption or the max-level notice.
         private readonly Dictionary<string, object> _markers = new Dictionary<string, object>();
 
-        public LevelUpScreen(LevelUpMenuAdapter adapter)
+        /// <summary>After a hot reload: point the slot at the menu already showing.
+        /// Scanned once, from <c>ScreenDetector.RecoverRuntimeState</c>.</summary>
+        public static void Recover()
         {
-            _adapter = adapter;
+            Recovered<LevelUpScreen>(FindActive());
         }
 
-        public static Screen TryBuildActiveScreen()
+        public static LevelUpMenuAdapter FindActive()
         {
             CommanderLevelUpMenuInstaller[] installers = Resources.FindObjectsOfTypeAll<CommanderLevelUpMenuInstaller>();
             for (int i = 0; i < installers.Length; i++)
@@ -73,7 +73,7 @@ namespace SongsOfConquestAccess.Screens
                 LevelUpMenuAdapter adapter = new LevelUpMenuAdapter(menu);
                 if (adapter.IsPresent())
                 {
-                    return new LevelUpScreen(adapter);
+                    return (adapter);
                 }
             }
 
@@ -85,20 +85,26 @@ namespace SongsOfConquestAccess.Screens
             get { return "level-up"; }
         }
 
+        /// <summary>Layer 30: raised after a battle, over its result.</summary>
+        public override int Layer
+        {
+            get { return 30; }
+        }
+
         /// <summary>The heading the menu draws ("New Level", with the level it reached); read again
         /// as the first node of the header stop.</summary>
         public override string ScreenName
         {
             get
             {
-                string title = _adapter != null ? _adapter.GetTitle() : null;
+                string title = Live != null ? Live.GetTitle() : null;
                 return string.IsNullOrWhiteSpace(title) ? null : title;
             }
         }
 
-        public override bool IsPresent()
+        public override bool IsActive()
         {
-            return _adapter != null && _adapter.IsPresent();
+            return Live != null && Live.IsPresent();
         }
 
         public override void OnUnfocus()
@@ -115,7 +121,7 @@ namespace SongsOfConquestAccess.Screens
 
         public override void Build(GraphBuilder builder)
         {
-            if (!IsPresent())
+            if (!IsActive())
             {
                 return;
             }
@@ -137,19 +143,19 @@ namespace SongsOfConquestAccess.Screens
 
         private void BuildHeader(GraphBuilder builder)
         {
-            AddLine(builder, "title", () => _adapter.GetTitle());
+            AddLine(builder, "title", () => Live.GetTitle());
 
             // The wielder's line is the portrait the game draws at the top centre: its details tooltip
             // fills the buffer, and selecting it is what makes the game draw that tooltip, as the
             // mouse resting on it would.
-            Component portrait = _adapter.Portrait;
+            Component portrait = Live.Portrait;
             if (portrait == null)
             {
-                AddLine(builder, "commander", () => _adapter.GetCommanderIdentity());
+                AddLine(builder, "commander", () => Live.GetCommanderIdentity());
                 return;
             }
 
-            NodeVtable vtable = GraphNodes.Text(() => _adapter.GetCommanderIdentity(), null, _adapter.PortraitTooltip);
+            NodeVtable vtable = GraphNodes.Text(() => Live.GetCommanderIdentity(), null, Live.PortraitTooltip);
             vtable.OnFocusVisual = () => NativeSelectionUtility.Select(portrait);
             builder.AddItem(new DrawnNode(ControlId.For(portrait, "level-up:commander"), vtable, portrait));
         }
@@ -158,7 +164,7 @@ namespace SongsOfConquestAccess.Screens
 
         private void BuildStats(GraphBuilder builder)
         {
-            IReadOnlyList<LevelUpMenuAdapter.StatItem> stats = _adapter.GetStats();
+            IReadOnlyList<LevelUpMenuAdapter.StatItem> stats = Live.GetStats();
             for (int i = 0; i < stats.Count; i++)
             {
                 LevelUpMenuAdapter.StatItem stat = stats[i];
@@ -185,13 +191,13 @@ namespace SongsOfConquestAccess.Screens
         {
             // "Choose a Skill", the line the game draws over the cards, names the stop: it is said
             // once on entering the cards, not as a line of its own (owner ruling 2026-09-07).
-            string caption = _adapter.GetChooseSkillText();
+            string caption = Live.GetChooseSkillText();
             if (!string.IsNullOrWhiteSpace(caption))
             {
                 builder.PushContext(caption);
             }
 
-            List<LevelUpMenuAdapter.SkillChoice> choices = DrawnOrder(_adapter.GetSkillChoices());
+            List<LevelUpMenuAdapter.SkillChoice> choices = DrawnOrder(Live.GetSkillChoices());
             for (int i = 0; i < choices.Count; i++)
             {
                 LevelUpMenuAdapter.SkillChoice choice = choices[i];
@@ -222,9 +228,9 @@ namespace SongsOfConquestAccess.Screens
                 }
             }
 
-            if (_adapter.IsMaxLevelMessageVisible())
+            if (Live.IsMaxLevelMessageVisible())
             {
-                AddLine(builder, "max-level", () => _adapter.GetMaxLevelMessage());
+                AddLine(builder, "max-level", () => Live.GetMaxLevelMessage());
             }
 
             if (!string.IsNullOrWhiteSpace(caption))
@@ -276,8 +282,8 @@ namespace SongsOfConquestAccess.Screens
 
         private void BuildClose(GraphBuilder builder)
         {
-            Component close = _adapter.CloseButton;
-            if (close == null || !_adapter.IsCloseVisible())
+            Component close = Live.CloseButton;
+            if (close == null || !Live.IsCloseVisible())
             {
                 return;
             }
@@ -285,7 +291,7 @@ namespace SongsOfConquestAccess.Screens
             // An icon with no text of its own, so the mod names it.
             NodeVtable vtable = GraphNodes.Button(
                 () => ModText.Get(ModStrings.Screens.Close),
-                () => _adapter.ActivateClose());
+                () => Live.ActivateClose());
             vtable.OnFocusVisual = () => NativeSelectionUtility.Select(close);
             builder.AddItem(new DrawnNode(ControlId.For(close, "level-up:close"), vtable, close));
         }

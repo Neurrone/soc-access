@@ -63,12 +63,5 @@ namespace SongsOfConquestAccess
         {
             SocAccessMod.Instance?.ScreenDetector?.OnOnlineHostGameClosed(__instance);
         }
-
-        [HarmonyPatch(typeof(GameListEntry), "Refresh")]
-        [HarmonyPostfix]
-        private static void GameListEntryRefreshPostfix()
-        {
-            SocAccessMod.Instance?.ScreenDetector?.OnOnlineGameListChanged();
-        }
     }
 }

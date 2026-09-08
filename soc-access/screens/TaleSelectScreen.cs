@@ -29,22 +29,22 @@ namespace SongsOfConquestAccess.Screens
     /// would do nothing here; the screen claims it and presses the drawn Back button, as the widget
     /// screen it replaces did.
     /// </summary>
-    public sealed class TaleSelectScreen : GraphScreen
+    public sealed class TaleSelectScreen : LiveScreen<TaleSelectAdapter>
     {
         private const string CardsStop = "tale-cards";
         private const string HeaderStop = "tale-header";
 
-        private readonly TaleSelectAdapter _adapter;
-
-        public TaleSelectScreen(TaleSelectAdapter adapter)
+        /// <summary>After a hot reload: point the slot at the menu already showing.
+        /// Scanned once, from <c>ScreenDetector.RecoverRuntimeState</c>.</summary>
+        public static void Recover()
         {
-            _adapter = adapter;
+            Recovered<TaleSelectScreen>(FindActive());
         }
 
-        public static Screen TryBuildActiveScreen()
+        public static TaleSelectAdapter FindActive()
         {
             TaleSelectAdapter adapter = FindActiveTaleSelect();
-            return adapter != null ? new TaleSelectScreen(adapter) : null;
+            return adapter;
         }
 
         public override string Key
@@ -52,10 +52,16 @@ namespace SongsOfConquestAccess.Screens
             get { return "tale-select"; }
         }
 
+        /// <summary>Layer 2: over the campaign menu that opens it.</summary>
+        public override int Layer
+        {
+            get { return 2; }
+        }
+
         /// <summary>The page's own drawn title ("Choose Campaign or Tale").</summary>
         public override string ScreenName
         {
-            get { return _adapter != null ? _adapter.GetTitle() : null; }
+            get { return Live != null ? Live.GetTitle() : null; }
         }
 
         public override object InitialFocusStop
@@ -63,9 +69,9 @@ namespace SongsOfConquestAccess.Screens
             get { return CardsStop; }
         }
 
-        public override bool IsPresent()
+        public override bool IsActive()
         {
-            return _adapter != null && _adapter.IsPresent();
+            return Live != null && Live.IsPresent();
         }
 
         /// <summary>The page hides its header band as it closes, and the cursor standing on a header
@@ -73,22 +79,22 @@ namespace SongsOfConquestAccess.Screens
         /// while the band is gone.</summary>
         public override bool IsWorkable
         {
-            get { return _adapter != null && _adapter.BackButton != null && _adapter.BackButton.IsVisible(); }
+            get { return Live != null && Live.BackButton != null && Live.BackButton.IsVisible(); }
         }
 
         public override bool ConsumesBack
         {
-            get { return _adapter != null && _adapter.BackButton != null && _adapter.BackButton.IsVisible(); }
+            get { return Live != null && Live.BackButton != null && Live.BackButton.IsVisible(); }
         }
 
         public override bool Back()
         {
-            return _adapter != null && _adapter.BackButton != null && _adapter.BackButton.Activate();
+            return Live != null && Live.BackButton != null && Live.BackButton.Activate();
         }
 
         public override void Build(GraphBuilder builder)
         {
-            if (!IsPresent())
+            if (!IsActive())
             {
                 return;
             }
@@ -107,8 +113,8 @@ namespace SongsOfConquestAccess.Screens
             }
 
             List<KeyValuePair<string, IMenuButtonAdapter>> header = new List<KeyValuePair<string, IMenuButtonAdapter>>(2);
-            Add(header, "tale:back", _adapter.BackButton);
-            Add(header, "tale:options", _adapter.OptionsButton);
+            Add(header, "tale:back", Live.BackButton);
+            Add(header, "tale:options", Live.OptionsButton);
             if (header.Count > 0)
             {
                 builder.BeginStop(HeaderStop);
@@ -147,7 +153,7 @@ namespace SongsOfConquestAccess.Screens
         private List<KeyValuePair<string, TaleButtonAdapter>> DrawnCards()
         {
             List<KeyValuePair<string, TaleButtonAdapter>> band = new List<KeyValuePair<string, TaleButtonAdapter>>();
-            IReadOnlyList<TaleButtonAdapter> tales = _adapter.Tales;
+            IReadOnlyList<TaleButtonAdapter> tales = Live.Tales;
             for (int i = 0; tales != null && i < tales.Count; i++)
             {
                 TaleButtonAdapter tale = tales[i];

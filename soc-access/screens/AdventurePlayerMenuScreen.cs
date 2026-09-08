@@ -53,7 +53,7 @@ namespace SongsOfConquestAccess.Screens
     /// is still the game's (<c>ConsumesBack</c> false): the kingdom HUD registers <c>UI.ExitMenu</c>
     /// for this menu in <c>KingdomInformationHUD.ReregisterHotKeys</c>.
     /// </summary>
-    public sealed class AdventurePlayerMenuScreen : GraphScreen
+    public sealed class AdventurePlayerMenuScreen : LiveScreen<AdventurePlayerMenuAdapter>
     {
         private const string PlayersStop = "adventure-players";
         private const string CloseStop = "adventure-players-close";
@@ -68,18 +68,18 @@ namespace SongsOfConquestAccess.Screens
             ResourceType.CelestialOre
         };
 
-        private readonly AdventurePlayerMenuAdapter _adapter;
-
         // The close node has nothing on screen to key on, so it gets a subject of its own, kept across
         // rebuilds so the reconciler seats the cursor back on it.
         private readonly object _closeKey = new object();
 
-        public AdventurePlayerMenuScreen(AdventurePlayerMenuAdapter adapter)
+        /// <summary>After a hot reload: point the slot at the menu already showing.
+        /// Scanned once, from <c>ScreenDetector.RecoverRuntimeState</c>.</summary>
+        public static void Recover()
         {
-            _adapter = adapter;
+            Recovered<AdventurePlayerMenuScreen>(FindActive());
         }
 
-        public static Screen TryBuildActiveScreen()
+        public static AdventurePlayerMenuAdapter FindActive()
         {
             AdventurePlayerMenu[] menus = Resources.FindObjectsOfTypeAll<AdventurePlayerMenu>();
             for (int i = 0; i < menus.Length; i++)
@@ -87,7 +87,7 @@ namespace SongsOfConquestAccess.Screens
                 AdventurePlayerMenuAdapter adapter = new AdventurePlayerMenuAdapter(menus[i]);
                 if (adapter.IsPresent())
                 {
-                    return new AdventurePlayerMenuScreen(adapter);
+                    return (adapter);
                 }
             }
 
@@ -96,7 +96,7 @@ namespace SongsOfConquestAccess.Screens
 
         public bool Matches(AdventurePlayerMenu menu)
         {
-            return _adapter != null && ReferenceEquals(_adapter.Source, menu);
+            return Live != null && ReferenceEquals(Live.Source, menu);
         }
 
         public override string Key
@@ -104,12 +104,18 @@ namespace SongsOfConquestAccess.Screens
             get { return "adventure-players"; }
         }
 
+        /// <summary>Layer 20: an in-game panel over the map.</summary>
+        public override int Layer
+        {
+            get { return 20; }
+        }
+
         /// <summary>The menu's own drawn title ("Players").</summary>
         public override string ScreenName
         {
             get
             {
-                string title = _adapter != null ? _adapter.Title : null;
+                string title = Live != null ? Live.Title : null;
                 return string.IsNullOrWhiteSpace(title) ? null : title;
             }
         }
@@ -120,21 +126,14 @@ namespace SongsOfConquestAccess.Screens
             get { return PlayersStop; }
         }
 
-        public override bool IsPresent()
+        public override bool IsActive()
         {
-            return _adapter != null && _adapter.IsPresent();
-        }
-
-        /// <summary>Called by the detector whenever the menu refreshes a row. The graph is declared
-        /// afresh on every navigation operation and reads the rows off the game each time, so there is
-        /// nothing here to invalidate.</summary>
-        public void Refresh()
-        {
+            return Live != null && Live.IsPresent();
         }
 
         public override void Build(GraphBuilder builder)
         {
-            if (!IsPresent())
+            if (!IsActive())
             {
                 return;
             }
@@ -151,10 +150,10 @@ namespace SongsOfConquestAccess.Screens
         private void BuildPlayers(GraphBuilder builder)
         {
             List<Band> bands = new List<Band>();
-            AddCaption(bands, _adapter.AllyCaption, "allies");
-            AddCaption(bands, _adapter.EnemyCaption, "enemies");
+            AddCaption(bands, Live.AllyCaption, "allies");
+            AddCaption(bands, Live.EnemyCaption, "enemies");
 
-            IReadOnlyList<AdventurePlayerMenuAdapter.PlayerItem> players = _adapter.GetPlayers();
+            IReadOnlyList<AdventurePlayerMenuAdapter.PlayerItem> players = Live.GetPlayers();
             for (int i = 0; i < players.Count; i++)
             {
                 AdventurePlayerMenuAdapter.PlayerItem player = players[i];
@@ -362,7 +361,7 @@ namespace SongsOfConquestAccess.Screens
                 ControlId.For(_closeKey, "adventure-players:close"),
                 GraphNodes.Button(
                     () => ModText.Get(ModStrings.Screens.Close),
-                    () => _adapter.Close())));
+                    () => Live.Close())));
         }
 
         // ---- shared helpers ----

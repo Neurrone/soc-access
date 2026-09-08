@@ -27,26 +27,26 @@ namespace SongsOfConquestAccess.Screens
     /// Escape is CLAIMED and runs the panel's own <c>Close</c>, which is exactly what mod.io's
     /// <c>Navigating.Cancel</c> reaches while this panel is up (decompiled).
     /// </summary>
-    public sealed class CommunityMapsDetailsScreen : GraphScreen
+    public sealed class CommunityMapsDetailsScreen : LiveScreen<CommunityMapsDetailsAdapter>
     {
         private const string CommandsStop = "community-maps-details-commands";
         private const string FactsStop = "community-maps-details-facts";
         private const string TextStop = "community-maps-details-text";
         private const string FooterStop = "community-maps-details-footer";
 
-        private readonly CommunityMapsDetailsAdapter _adapter;
-
         private readonly Dictionary<string, object> _markers = new Dictionary<string, object>();
 
-        public CommunityMapsDetailsScreen(CommunityMapsDetailsAdapter adapter)
+        /// <summary>After a hot reload: point the slot at the menu already showing.
+        /// Scanned once, from <c>ScreenDetector.RecoverRuntimeState</c>.</summary>
+        public static void Recover()
         {
-            _adapter = adapter;
+            Recovered<CommunityMapsDetailsScreen>(FindActive());
         }
 
-        public static Screen TryBuildActiveScreen()
+        public static CommunityMapsDetailsAdapter FindActive()
         {
             CommunityMapsDetailsAdapter adapter = CommunityMapsDetailsAdapter.TryCreate();
-            return adapter != null && adapter.IsPresent() ? new CommunityMapsDetailsScreen(adapter) : null;
+            return adapter != null && adapter.IsPresent() ? adapter : null;
         }
 
         public override string Key
@@ -54,10 +54,16 @@ namespace SongsOfConquestAccess.Screens
             get { return "community-maps-details"; }
         }
 
+        /// <summary>Layer 3: over the collection page that opens it.</summary>
+        public override int Layer
+        {
+            get { return 3; }
+        }
+
         /// <summary>The mod's own name, as the panel draws it.</summary>
         public override string ScreenName
         {
-            get { return _adapter != null ? _adapter.Title : null; }
+            get { return Live != null ? Live.Title : null; }
         }
 
         public override object InitialFocusStop
@@ -65,30 +71,24 @@ namespace SongsOfConquestAccess.Screens
             get { return CommandsStop; }
         }
 
-        public override bool IsPresent()
+        public override bool IsActive()
         {
-            return _adapter != null && _adapter.IsPresent();
+            return Live != null && Live.IsPresent();
         }
 
         public override bool ConsumesBack
         {
-            get { return IsPresent(); }
+            get { return IsActive(); }
         }
 
         public override bool Back()
         {
-            return _adapter != null && _adapter.Close();
-        }
-
-        /// <summary>Kept for the detector, which calls it whenever the browser's content changes. The
-        /// graph is declared afresh on every operation, so there is nothing to rebuild.</summary>
-        public void Refresh()
-        {
+            return Live != null && Live.Close();
         }
 
         public override void Build(GraphBuilder builder)
         {
-            if (!IsPresent())
+            if (!IsActive())
             {
                 return;
             }
@@ -111,27 +111,27 @@ namespace SongsOfConquestAccess.Screens
 
         private void BuildCommands(GraphBuilder builder)
         {
-            string title = _adapter.Title;
+            string title = Live.Title;
             if (!string.IsNullOrWhiteSpace(title))
             {
-                builder.AddItem(Synthetic("title", GraphNodes.Text(() => _adapter.Title)));
+                builder.AddItem(Synthetic("title", GraphNodes.Text(() => Live.Title)));
             }
 
-            if (!string.IsNullOrWhiteSpace(_adapter.SubscribeLabel))
+            if (!string.IsNullOrWhiteSpace(Live.SubscribeLabel))
             {
                 NodeVtable subscribe = GraphNodes.Button(
-                    () => _adapter.SubscribeLabel,
-                    () => _adapter.Subscribe());
+                    () => Live.SubscribeLabel,
+                    () => Live.Subscribe());
                 builder.AddItem(Synthetic("subscribe", subscribe));
             }
 
             NodeVtable downloads = GraphNodes.Button(
                 () => ModText.Get(ModStrings.Screens.Downloads),
-                () => _adapter.OpenDownloadsMenu(),
-                () => _adapter.HasDownloadsMenu);
+                () => Live.OpenDownloadsMenu(),
+                () => Live.HasDownloadsMenu);
             builder.AddItem(Synthetic("downloads", downloads));
 
-            IReadOnlyList<CommunityMapsDetailsAdapter.ActionItem> votes = _adapter.GetVoteActions();
+            IReadOnlyList<CommunityMapsDetailsAdapter.ActionItem> votes = Live.GetVoteActions();
             for (int i = 0; i < votes.Count; i++)
             {
                 CommunityMapsDetailsAdapter.ActionItem vote = votes[i];
@@ -151,11 +151,11 @@ namespace SongsOfConquestAccess.Screens
                 builder.AddItem(Synthetic("vote/" + captured.Id, vtable));
             }
 
-            if (!string.IsNullOrWhiteSpace(_adapter.ReportLabel))
+            if (!string.IsNullOrWhiteSpace(Live.ReportLabel))
             {
                 NodeVtable report = GraphNodes.Button(
-                    () => _adapter.ReportLabel,
-                    () => _adapter.Report());
+                    () => Live.ReportLabel,
+                    () => Live.Report());
                 builder.AddItem(Synthetic("report", report));
             }
         }
@@ -164,7 +164,7 @@ namespace SongsOfConquestAccess.Screens
 
         private void BuildFacts(GraphBuilder builder)
         {
-            IReadOnlyList<CommunityMapsDetailsAdapter.DetailItem> details = _adapter.GetDetails();
+            IReadOnlyList<CommunityMapsDetailsAdapter.DetailItem> details = Live.GetDetails();
             if (details.Count == 0)
             {
                 return;
@@ -192,7 +192,7 @@ namespace SongsOfConquestAccess.Screens
 
         private void BuildTags(GraphBuilder builder)
         {
-            IReadOnlyList<CommunityMapsDetailsAdapter.TagItem> tags = _adapter.GetTags();
+            IReadOnlyList<CommunityMapsDetailsAdapter.TagItem> tags = Live.GetTags();
             if (tags.Count == 0)
             {
                 return;
@@ -222,8 +222,8 @@ namespace SongsOfConquestAccess.Screens
 
         private void BuildProse(GraphBuilder builder)
         {
-            AddParagraph(builder, "summary", null, _adapter.Summary);
-            AddParagraph(builder, "description", _adapter.DescriptionLabel, _adapter.Description);
+            AddParagraph(builder, "summary", null, Live.Summary);
+            AddParagraph(builder, "description", Live.DescriptionLabel, Live.Description);
         }
 
         /// <summary>
@@ -268,8 +268,8 @@ namespace SongsOfConquestAccess.Screens
         private void BuildFooter(GraphBuilder builder)
         {
             NodeVtable back = GraphNodes.Button(
-                () => _adapter.BackLabel,
-                () => _adapter.Close());
+                () => Live.BackLabel,
+                () => Live.Close());
             builder.AddItem(Synthetic("back", back));
         }
 

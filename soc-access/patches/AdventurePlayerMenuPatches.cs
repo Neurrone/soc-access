@@ -31,20 +31,6 @@ namespace SongsOfConquestAccess
             }
         }
 
-        [HarmonyPatch(typeof(AdventurePlayerMenuEntry), "RefreshInteractable")]
-        [HarmonyPostfix]
-        private static void AdventurePlayerMenuEntryRefreshInteractablePostfix()
-        {
-            SocAccessMod.Instance?.ScreenDetector?.OnAdventurePlayerMenuChanged();
-        }
-
-        [HarmonyPatch(typeof(AdventurePlayerMenuEntry), "RefreshResources")]
-        [HarmonyPostfix]
-        private static void AdventurePlayerMenuEntryRefreshResourcesPostfix()
-        {
-            SocAccessMod.Instance?.ScreenDetector?.OnAdventurePlayerMenuChanged();
-        }
-
         [HarmonyPatch(typeof(SendResourcePopup), "Show")]
         [HarmonyPostfix]
         private static void SendResourcePopupShowPostfix(SendResourcePopup __instance)

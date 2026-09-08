@@ -50,7 +50,7 @@ namespace SongsOfConquestAccess.Screens
     /// Escape is the game's (<c>ConsumesBack</c> false): <c>SaveLoadGameMenu</c> registers
     /// <c>InputActions.UI.ExitMenu</c> on <c>TryClose</c> (decompiled, line 233).
     /// </summary>
-    public sealed class SaveLoadGameScreen : GraphScreen
+    public sealed class SaveLoadGameScreen : LiveScreen<SaveLoadGameMenuAdapter>
     {
         private const string TabsStop = "save-load-tabs";
         private const string SavesStop = "save-load-saves";
@@ -60,24 +60,25 @@ namespace SongsOfConquestAccess.Screens
         private static readonly PropertyInfo InstallerContainerProperty =
             AccessTools.Property(typeof(SaveLoadGameMenuInstaller), "Container");
 
-        private readonly SaveLoadGameMenuAdapter _adapter;
         private readonly GameTextEditor _editor = new GameTextEditor();
 
         // A subject of its own per synthesized node, kept across rebuilds so the reconciler seats the
         // cursor on the same line while what it says changes under it.
         private readonly Dictionary<string, object> _markers = new Dictionary<string, object>();
 
-        public SaveLoadGameScreen(SaveLoadGameMenuAdapter adapter)
-        {
-            _adapter = adapter;
-        }
-
         public object SourceKey
         {
-            get { return _adapter != null ? _adapter.SourceKey : null; }
+            get { return Live != null ? Live.SourceKey : null; }
         }
 
-        public static Screen TryBuildActiveScreen()
+        /// <summary>After a hot reload: point the slot at the menu already showing.
+        /// Scanned once, from <c>ScreenDetector.RecoverRuntimeState</c>.</summary>
+        public static void Recover()
+        {
+            Recovered<SaveLoadGameScreen>(FindActive());
+        }
+
+        public static SaveLoadGameMenuAdapter FindActive()
         {
             SaveLoadGameMenu menu = FindActiveSaveLoadGameMenu();
             if (menu == null)
@@ -86,7 +87,7 @@ namespace SongsOfConquestAccess.Screens
             }
 
             SaveLoadGameMenuAdapter adapter = new SaveLoadGameMenuAdapter(menu);
-            return adapter.IsPresent() ? new SaveLoadGameScreen(adapter) : null;
+            return adapter.IsPresent() ? (adapter) : null;
         }
 
         public bool Matches(SaveLoadGameMenu menu)
@@ -99,10 +100,16 @@ namespace SongsOfConquestAccess.Screens
             get { return "save-load-game"; }
         }
 
+        /// <summary>Layer 44: over the pause menu that opens it.</summary>
+        public override int Layer
+        {
+            get { return 44; }
+        }
+
         /// <summary>The window's own drawn title ("Load Game", "Save Game").</summary>
         public override string ScreenName
         {
-            get { return _adapter != null ? _adapter.Title : null; }
+            get { return Live != null ? Live.Title : null; }
         }
 
         /// <summary>The list, which is what the player came for; the tabs are one Shift+Tab away and
@@ -112,9 +119,9 @@ namespace SongsOfConquestAccess.Screens
             get { return SavesStop; }
         }
 
-        public override bool IsPresent()
+        public override bool IsActive()
         {
-            return _adapter != null && _adapter.IsPresent();
+            return Live != null && Live.IsPresent();
         }
 
         /// <summary>While the keyboard is on its way to the game's box, what the player types next is
@@ -129,10 +136,10 @@ namespace SongsOfConquestAccess.Screens
             get { return _editor.Pending || _editor.Editing; }
         }
 
-        public override void Update()
+        public override void OnUpdate()
         {
-            base.Update();
-            _editor.Update(IsPresent());
+            base.OnUpdate();
+            _editor.Update(IsActive());
         }
 
         public override void OnUnfocus()
@@ -147,15 +154,9 @@ namespace SongsOfConquestAccess.Screens
             _editor.Abandon();
         }
 
-        /// <summary>Kept for the detector, which calls it whenever the menu's content changes. The
-        /// graph is declared afresh on every operation, so there is nothing to rebuild.</summary>
-        public void Refresh()
-        {
-        }
-
         public override void Build(GraphBuilder builder)
         {
-            if (!IsPresent())
+            if (!IsActive())
             {
                 return;
             }
@@ -178,15 +179,15 @@ namespace SongsOfConquestAccess.Screens
         private void BuildBand(GraphBuilder builder)
         {
             // Save mode draws its "Saved as ..." line where load mode draws the tabs.
-            if (_adapter.IsSaveDescriptionVisible()
-                && _adapter.GetSaveDescriptionLines().Count > 0)
+            if (Live.IsSaveDescriptionVisible()
+                && Live.GetSaveDescriptionLines().Count > 0)
             {
                 builder.AddItem(new SyntheticNode(
                     ControlId.For(Marker("description"), "save-load:description"),
-                    GraphNodes.Paragraphs(() => _adapter.GetSaveDescriptionLines())));
+                    GraphNodes.Paragraphs(() => Live.GetSaveDescriptionLines())));
             }
 
-            IReadOnlyList<SaveLoadGameMenuAdapter.TabItem> tabs = _adapter.GetTabs();
+            IReadOnlyList<SaveLoadGameMenuAdapter.TabItem> tabs = Live.GetTabs();
             for (int i = 0; i < tabs.Count; i++)
             {
                 SaveLoadGameMenuAdapter.TabItem tab = tabs[i];
@@ -211,7 +212,7 @@ namespace SongsOfConquestAccess.Screens
         private void BuildSaves(GraphBuilder builder)
         {
             List<SaveLoadGameMenuAdapter.SaveEntry> entries = new List<SaveLoadGameMenuAdapter.SaveEntry>();
-            IReadOnlyList<SaveLoadGameMenuAdapter.SaveEntry> all = _adapter.GetEntries();
+            IReadOnlyList<SaveLoadGameMenuAdapter.SaveEntry> all = Live.GetEntries();
             for (int i = 0; i < all.Count; i++)
             {
                 if (all[i] != null && all[i].Entry != null && all[i].IsVisible())
@@ -300,7 +301,7 @@ namespace SongsOfConquestAccess.Screens
         /// block as a section, so the review buffer holds it one drawn line at a time.</summary>
         private void BuildDetails(GraphBuilder builder)
         {
-            if (!_adapter.HasDetailsText())
+            if (!Live.HasDetailsText())
             {
                 return;
             }
@@ -342,7 +343,7 @@ namespace SongsOfConquestAccess.Screens
 
         private IList<string> DetailsLines()
         {
-            return SpokenLines.Of(new[] { _adapter.GetDetailsText() });
+            return SpokenLines.Of(new[] { Live.GetDetailsText() });
         }
 
         // ---- the buttons ----
@@ -352,11 +353,11 @@ namespace SongsOfConquestAccess.Screens
             AddNameField(builder);
 
             List<SaveLoadGameMenuAdapter.ButtonItem> buttons = new List<SaveLoadGameMenuAdapter.ButtonItem>();
-            Add(buttons, _adapter.DeleteButton);
-            Add(buttons, _adapter.LoadAsHotseatButton);
-            Add(buttons, _adapter.LoadAsOnlineButton);
-            Add(buttons, _adapter.LoadButton);
-            Add(buttons, _adapter.SaveButton);
+            Add(buttons, Live.DeleteButton);
+            Add(buttons, Live.LoadAsHotseatButton);
+            Add(buttons, Live.LoadAsOnlineButton);
+            Add(buttons, Live.LoadButton);
+            Add(buttons, Live.SaveButton);
             SortByDrawnTop(buttons);
             for (int i = 0; i < buttons.Count; i++)
             {
@@ -365,7 +366,7 @@ namespace SongsOfConquestAccess.Screens
 
             // The window's cross, drawn in its top corner rather than in the column of commands, so
             // it reads last: it is the way out, not one of the things to do to a save.
-            AddButton(builder, _adapter.CancelButton, () => ModText.Get(ModStrings.Actions.Cancel));
+            AddButton(builder, Live.CancelButton, () => ModText.Get(ModStrings.Actions.Cancel));
         }
 
         private static void Add(List<SaveLoadGameMenuAdapter.ButtonItem> buttons, SaveLoadGameMenuAdapter.ButtonItem button)
@@ -427,7 +428,7 @@ namespace SongsOfConquestAccess.Screens
         /// the old name back.</summary>
         private void AddNameField(GraphBuilder builder)
         {
-            IUITextMeshInputField field = _adapter.IsInputVisible() ? _adapter.InputField : null;
+            IUITextMeshInputField field = Live.IsInputVisible() ? Live.InputField : null;
             Component subject = field != null ? field.MonoTransform : null;
             if (subject == null)
             {
@@ -435,12 +436,12 @@ namespace SongsOfConquestAccess.Screens
             }
 
             NodeVtable vtable = GraphNodes.EditField(
-                () => _adapter.Title,
+                () => Live.Title,
                 // Nothing while the game holds the keyboard: the echo is already speaking the keys.
                 () => _editor.Editing ? null : field.InputFieldValue,
                 () => _editor.Request(field),
-                _adapter.IsInputEnabled);
-            vtable.OnFocusVisual = () => _adapter.FocusInput();
+                Live.IsInputEnabled);
+            vtable.OnFocusVisual = () => Live.FocusInput();
             builder.AddItem(new DrawnNode(ControlId.For(subject, "save-load:name"), vtable, subject));
         }
 

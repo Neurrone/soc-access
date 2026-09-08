@@ -31,22 +31,22 @@ namespace SongsOfConquestAccess.Screens
     /// and registers no input callback of any kind, so there is nothing for a close node to press and
     /// nothing for the key to do (<c>ConsumesBack</c> false).
     /// </summary>
-    public sealed class PostAdventureResultScreen : GraphScreen
+    public sealed class PostAdventureResultScreen : LiveScreen<PostAdventureResultAdapter>
     {
         private const string ResultStop = "post-adventure-result";
-
-        private readonly PostAdventureResultAdapter _adapter;
 
         // A subject of its own per synthesized line, kept across rebuilds so the reconciler seats the
         // cursor on the same one: the menu gives no component the screen can key its texts on.
         private readonly Dictionary<string, object> _markers = new Dictionary<string, object>();
 
-        public PostAdventureResultScreen(PostAdventureResultAdapter adapter)
+        /// <summary>After a hot reload: point the slot at the menu already showing.
+        /// Scanned once, from <c>ScreenDetector.RecoverRuntimeState</c>.</summary>
+        public static void Recover()
         {
-            _adapter = adapter;
+            Recovered<PostAdventureResultScreen>(FindActive());
         }
 
-        public static Screen TryBuildActiveScreen()
+        public static PostAdventureResultAdapter FindActive()
         {
             PostAdventureMenu[] menus = Resources.FindObjectsOfTypeAll<PostAdventureMenu>();
             for (int i = 0; i < menus.Length; i++)
@@ -54,7 +54,7 @@ namespace SongsOfConquestAccess.Screens
                 PostAdventureResultAdapter adapter = new PostAdventureResultAdapter(menus[i]);
                 if (adapter.IsPresent())
                 {
-                    return new PostAdventureResultScreen(adapter);
+                    return (adapter);
                 }
             }
 
@@ -66,31 +66,37 @@ namespace SongsOfConquestAccess.Screens
             get { return "post-adventure-result"; }
         }
 
+        /// <summary>Layer 32: the end of the adventure, over everything in it.</summary>
+        public override int Layer
+        {
+            get { return 32; }
+        }
+
         /// <summary>The result the menu draws ("Defeat", or the victory text), read once on arrival
         /// and again as the page's first line.</summary>
         public override string ScreenName
         {
             get
             {
-                string title = _adapter != null ? _adapter.ResultTitle : null;
+                string title = Live != null ? Live.ResultTitle : null;
                 return string.IsNullOrWhiteSpace(title) ? null : title;
             }
         }
 
-        public override bool IsPresent()
+        public override bool IsActive()
         {
-            return _adapter != null && _adapter.IsPresent();
+            return Live != null && Live.IsPresent();
         }
 
         public override void Build(GraphBuilder builder)
         {
-            if (!IsPresent())
+            if (!IsActive())
             {
                 return;
             }
 
             builder.BeginStop(ResultStop);
-            AddLine(builder, "title", () => _adapter.ResultTitle);
+            AddLine(builder, "title", () => Live.ResultTitle);
 
             ControlId start = BuildMessage(builder);
             BuildButtons(builder);
@@ -108,19 +114,19 @@ namespace SongsOfConquestAccess.Screens
         /// their own caption. Answers where focus starts.</summary>
         private ControlId BuildMessage(GraphBuilder builder)
         {
-            if (_adapter.DescriptionVisible)
+            if (Live.DescriptionVisible)
             {
-                return AddParagraphs(builder, "description", () => _adapter.DescriptionLines);
+                return AddParagraphs(builder, "description", () => Live.DescriptionLines);
             }
 
-            IReadOnlyList<PostAdventureResultAdapter.ObjectiveEntry> objectives = _adapter.GetObjectives();
+            IReadOnlyList<PostAdventureResultAdapter.ObjectiveEntry> objectives = Live.GetObjectives();
             if (objectives == null || objectives.Count == 0)
             {
                 return null;
             }
 
             ControlId first = null;
-            builder.PushContext(_adapter.ObjectivesTitle);
+            builder.PushContext(Live.ObjectivesTitle);
             for (int i = 0; i < objectives.Count; i++)
             {
                 PostAdventureResultAdapter.ObjectiveEntry objective = objectives[i];
@@ -148,25 +154,25 @@ namespace SongsOfConquestAccess.Screens
         /// the menu has faded it in, since it arrives about two seconds after the rest.</summary>
         private void BuildButtons(GraphBuilder builder)
         {
-            AddButton(builder, "stats", _adapter.StatsButton);
+            AddButton(builder, "stats", Live.StatsButton);
 
             List<KeyValuePair<float, UIButton>> drawn = new List<KeyValuePair<float, UIButton>>(3);
-            AddDrawn(drawn, _adapter.ContinueCampaignButton);
-            AddDrawn(drawn, _adapter.RestartMapButton);
-            AddDrawn(drawn, _adapter.QuitToMainButton);
-            AddDrawn(drawn, _adapter.LoadButton);
+            AddDrawn(drawn, Live.ContinueCampaignButton);
+            AddDrawn(drawn, Live.RestartMapButton);
+            AddDrawn(drawn, Live.QuitToMainButton);
+            AddDrawn(drawn, Live.LoadButton);
             SortByLeftEdge(drawn);
             for (int i = 0; i < drawn.Count; i++)
             {
                 AddButton(builder, "button/" + i, drawn[i].Value);
             }
 
-            AddButton(builder, "player-stats", _adapter.PlayerStatsButton);
+            AddButton(builder, "player-stats", Live.PlayerStatsButton);
         }
 
         private void AddDrawn(List<KeyValuePair<float, UIButton>> drawn, UIButton button)
         {
-            if (!_adapter.IsButtonVisible(button))
+            if (!Live.IsButtonVisible(button))
             {
                 return;
             }
@@ -197,16 +203,16 @@ namespace SongsOfConquestAccess.Screens
         private void AddButton(GraphBuilder builder, string key, UIButton button)
         {
             Component component = button as Component;
-            if (component == null || !_adapter.IsButtonVisible(button))
+            if (component == null || !Live.IsButtonVisible(button))
             {
                 return;
             }
 
             UIButton it = button;
             NodeVtable vtable = GraphNodes.Button(
-                () => _adapter.GetButtonLabel(it),
-                () => _adapter.ActivateButton(it),
-                () => _adapter.IsButtonEnabled(it));
+                () => Live.GetButtonLabel(it),
+                () => Live.ActivateButton(it),
+                () => Live.IsButtonEnabled(it));
             vtable.OnFocusVisual = () => NativeSelectionUtility.Select(component);
             builder.AddItem(new DrawnNode(ControlId.For(component, "post-adventure:" + key), vtable, component));
         }

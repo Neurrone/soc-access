@@ -1,16 +1,34 @@
+using System;
 using System.Collections.Generic;
-using SongsOfConquestAccess.Adapters;
 using SongsOfConquestAccess.Buffers;
 using SongsOfConquestAccess.Input;
 using SongsOfConquestAccess.UI;
 
 namespace SongsOfConquestAccess.Screens
 {
+    /// <summary>
+    /// Decides which screen the player is on, every frame, by asking rather than by being told.
+    ///
+    /// Each tick re-evaluates <see cref="Screen.IsActive"/> across every registered screen, sorts the
+    /// survivors by layer, and diffs that list against the stack from last frame. Nothing subscribes
+    /// to the game's window events, so there is no way for the mod to end up believing in a screen the
+    /// game has closed - a whole class of "the mod is stuck on the previous page" bugs that a
+    /// push/pop model has to defend against and this one cannot have.
+    ///
+    /// The cost is one cheap predicate per screen per frame, which is why IsActive must stay cheap:
+    /// never a scene scan, never a subtree walk (AGENTS.md, Performance).
+    ///
+    /// A screen that throws is treated as inactive and logged ONCE, so one broken page cannot take the
+    /// navigation layer down with it and cannot fill the log either.
+    /// </summary>
     public sealed class ScreenManager
     {
-        private readonly List<Screen> _stack = new List<Screen>();
+        private readonly List<Screen> _registered = new List<Screen>();
+        private readonly Dictionary<Screen, string> _failures = new Dictionary<Screen, string>();
         private readonly ReviewBufferManager _reviewBuffers;
         private readonly ReviewBufferController _reviewBufferController;
+        private List<Screen> _stack = new List<Screen>();
+        private Screen _focused;
 
         public ScreenManager(ReviewBufferManager reviewBuffers, ReviewBufferController reviewBufferController)
         {
@@ -19,235 +37,67 @@ namespace SongsOfConquestAccess.Screens
             ApplyVisibleReviewBuffers();
         }
 
-        /// <summary>The stack bottom first, read-only, for the dev server's dump header.</summary>
+        /// <summary>The screen the player is on, or null when none of ours is showing: the top of the
+        /// polled stack, or whatever that screen has opened over itself.</summary>
+        public Screen Current
+        {
+            get { return _stack.Count > 0 ? _stack[_stack.Count - 1].Deepest() : null; }
+        }
+
+        /// <summary>The polled stack, bottom first. Children are not in it; they hang off the screen
+        /// that opened them.</summary>
         public IReadOnlyList<Screen> Stack
         {
             get { return _stack; }
         }
 
-        public Screen CurrentScreen
+        /// <summary>Every screen the mod knows about, active or not, in registration order.</summary>
+        public IReadOnlyList<Screen> RegisteredScreens
         {
-            get
+            get { return _registered; }
+        }
+
+        public void Register(Screen screen)
+        {
+            if (screen != null && !_registered.Contains(screen))
             {
-                if (_stack.Count == 0)
+                screen.Manager = this;
+                _registered.Add(screen);
+            }
+        }
+
+        /// <summary>The registered screen with this key, or null. Case-insensitive: the keys are
+        /// typed by hand into dev-server requests.</summary>
+        public Screen Find(string key)
+        {
+            for (int i = 0; i < _registered.Count; i++)
+            {
+                if (string.Compare(_registered[i].Key, key, StringComparison.OrdinalIgnoreCase) == 0)
                 {
-                    return null;
+                    return _registered[i];
                 }
-
-                return _stack[_stack.Count - 1];
             }
+
+            return null;
         }
 
-        public void Push(Screen screen, string reason)
+        /// <summary>The one registered instance of a screen type, whether or not it is showing - what
+        /// the detector writes a slot on.</summary>
+        public TScreen Registered<TScreen>() where TScreen : Screen
         {
-            if (screen == null)
+            for (int i = 0; i < _registered.Count; i++)
             {
-                return;
-            }
-
-            if (CurrentScreen != null && CurrentScreen.GetType() == screen.GetType())
-            {
-                SocAccessMod.Instance?.LogWarning(
-                    "ScreenManager.Push received duplicate top screen "
-                    + DescribeScreen(screen)
-                    + " for "
-                    + reason);
-            }
-
-            Screen previousTop = CurrentScreen;
-            previousTop?.OnUnfocus();
-            UIManager.Reset();
-            _stack.Add(screen);
-            screen.OnPush();
-            ApplyVisibleReviewBuffers();
-            screen.OnFocus();
-        }
-
-        public bool RefreshTop<TScreen>(Screen replacement, string reason) where TScreen : Screen
-        {
-            if (replacement == null)
-            {
-                SocAccessMod.Instance?.LogWarning("ScreenManager.RefreshTop ignored " + reason + " because replacement was null");
-                return false;
-            }
-
-            if (!replacement.IsPresent())
-            {
-                SocAccessMod.Instance?.LogWarning(
-                    "ScreenManager.RefreshTop ignored "
-                    + reason
-                    + " because "
-                    + DescribeScreen(replacement)
-                    + " is not present");
-                return false;
-            }
-
-            if (_stack.Count == 0 || !(_stack[_stack.Count - 1] is TScreen))
-            {
-                SocAccessMod.Instance?.LogWarning(
-                    "ScreenManager.RefreshTop ignored "
-                    + reason
-                    + "; expected top "
-                    + typeof(TScreen).Name
-                    + " but current top is "
-                    + DescribeScreen(CurrentScreen));
-                return false;
-            }
-
-            Screen removed = _stack[_stack.Count - 1];
-
-            // THE SAME PAGE, REBUILT. A detector that answers a change on the page by handing us a new
-            // instance of the same screen is not moving the player anywhere: the graph screen that goes
-            // adopts the cursor of the one it replaces, so the incoming instance neither re-seats the
-            // cursor, nor re-reads the control it is standing on, nor says the page's name a second
-            // time (the campaign mission page, which refreshes on every mission and difficulty change).
-            // Done BEFORE the outgoing screen is unfocused, so its OnUnfocus and OnPop - which detach
-            // and forget the cursor - see a navigator already pointed at the replacement.
-            GraphScreen outgoing = removed as GraphScreen;
-            GraphScreen incoming = replacement as GraphScreen;
-            if (outgoing != null && incoming != null && outgoing.GetType() == incoming.GetType())
-            {
-                GraphNavigator navigator = SocAccessMod.Instance != null ? SocAccessMod.Instance.Navigator : null;
-                if (navigator != null)
+                TScreen screen = _registered[i] as TScreen;
+                if (screen != null)
                 {
-                    navigator.Adopt(outgoing, incoming);
+                    return screen;
                 }
-
-                // The name is only silenced when it is the name ALREADY SPOKEN: a page whose title has
-                // changed under the refresh (the community maps modal walking from Authentication to
-                // Terms of use) has news, and so has a page that arrived before the game wrote its
-                // title (the post-battle page, refreshed once its animation ends) - the outgoing
-                // instance's live name would already match, but it never said it.
-                incoming.ArrivedByRefresh = outgoing.SpokenName == incoming.ScreenName;
             }
 
-            removed.OnUnfocus();
-            removed.OnPop();
-            UIManager.Reset();
-            _stack[_stack.Count - 1] = replacement;
-            replacement.OnPush();
-            ApplyVisibleReviewBuffers();
-            replacement.OnFocus();
-            return true;
+            return null;
         }
 
-        public void PushBelowTop(Screen screen, string reason)
-        {
-            if (screen == null)
-            {
-                return;
-            }
-
-            if (_stack.Count == 0)
-            {
-                Push(screen, reason);
-                return;
-            }
-
-            _stack.Insert(_stack.Count - 1, screen);
-            screen.OnPush();
-            ApplyVisibleReviewBuffers();
-        }
-
-        public void PushBottom(Screen screen, string reason)
-        {
-            if (screen == null)
-            {
-                return;
-            }
-
-            if (_stack.Count == 0)
-            {
-                Push(screen, reason);
-                return;
-            }
-
-            // Base screens can be restored below native follow-up overlays such
-            // as claim or story menus. Do not disturb the focused top screen.
-            _stack.Insert(0, screen);
-            screen.OnPush();
-            ApplyVisibleReviewBuffers();
-        }
-
-        public bool Pop<TScreen>(string reason) where TScreen : Screen
-        {
-            if (_stack.Count == 0)
-            {
-                SocAccessMod.Instance?.LogWarning(
-                    "ScreenManager.Pop ignored "
-                    + reason
-                    + "; expected top "
-                    + typeof(TScreen).Name
-                    + " but stack is empty");
-                return false;
-            }
-
-            int lastIndex = _stack.Count - 1;
-            if (!(_stack[lastIndex] is TScreen))
-            {
-                SocAccessMod.Instance?.LogWarning(
-                    "ScreenManager.Pop ignored "
-                    + reason
-                    + "; expected top "
-                    + typeof(TScreen).Name
-                    + " but current top is "
-                    + DescribeScreen(CurrentScreen));
-                return false;
-            }
-
-            Screen removed = _stack[lastIndex];
-            removed.OnUnfocus();
-            UIManager.Reset();
-            _stack.RemoveAt(lastIndex);
-            removed.OnPop();
-            ApplyVisibleReviewBuffers();
-            CurrentScreen?.OnFocus();
-            return true;
-        }
-
-        public bool Remove<TScreen>(string reason) where TScreen : Screen
-        {
-            for (int i = _stack.Count - 1; i >= 0; i--)
-            {
-                if (!(_stack[i] is TScreen))
-                {
-                    continue;
-                }
-
-                bool wasTop = i == _stack.Count - 1;
-                Screen removed = _stack[i];
-                if (wasTop)
-                {
-                    removed.OnUnfocus();
-                    UIManager.Reset();
-                }
-
-                _stack.RemoveAt(i);
-                removed.OnPop();
-                ApplyVisibleReviewBuffers();
-
-                if (wasTop)
-                {
-                    CurrentScreen?.OnFocus();
-                }
-
-                return true;
-            }
-
-            SocAccessMod.Instance?.LogWarning(
-                "ScreenManager.Remove ignored "
-                + reason
-                + "; no "
-                + typeof(TScreen).Name
-                + " found in stack");
-            return false;
-        }
-
-        public bool Contains<TScreen>() where TScreen : Screen
-        {
-            return Get<TScreen>() != null;
-        }
-
+        /// <summary>An ACTIVE screen of this type, top of the stack first, or null.</summary>
         public TScreen Get<TScreen>() where TScreen : Screen
         {
             for (int i = _stack.Count - 1; i >= 0; i--)
@@ -262,27 +112,264 @@ namespace SongsOfConquestAccess.Screens
             return null;
         }
 
-        public void Clear()
+        public bool Contains<TScreen>() where TScreen : Screen
         {
-            if (_stack.Count == 0)
+            return Get<TScreen>() != null;
+        }
+
+        /// <summary>Why a screen's <see cref="Screen.IsActive"/> last threw, or null - reported by
+        /// <c>GET /screens</c>.</summary>
+        public string LastFailure(Screen screen)
+        {
+            string message;
+            return screen != null && _failures.TryGetValue(screen, out message) ? message : null;
+        }
+
+        /// <summary>Whether the player is on this screen right now.</summary>
+        public bool IsFocused(Screen screen)
+        {
+            return screen != null && ReferenceEquals(screen, _focused);
+        }
+
+        /// <summary>Whether this screen is on the polled stack, or is a child hanging off it.</summary>
+        public bool IsOnStack(Screen screen)
+        {
+            if (screen == null)
+            {
+                return false;
+            }
+
+            for (Screen at = screen; at != null; at = at.ParentScreen)
+            {
+                if (_stack.Contains(at))
+                {
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
+        public void Tick()
+        {
+            ApplyDiff(Resolve());
+            SyncFocus();
+
+            Screen current = Current;
+            if (current != null)
+            {
+                Safe(current.OnUpdate, current, "OnUpdate");
+            }
+
+            // OnUpdate may have changed what is showing (a child closing itself); re-syncing is free
+            // when nothing moved.
+            SyncFocus();
+            GraphNavigator navigator = Navigator;
+            if (navigator != null)
+            {
+                navigator.Update();
+            }
+        }
+
+        /// <summary>Drop every screen as though the game had closed them all - the mod is going away.
+        /// </summary>
+        public void Shutdown()
+        {
+            for (int i = _stack.Count - 1; i >= 0; i--)
+            {
+                Pop(_stack[i]);
+            }
+
+            _stack = new List<Screen>();
+            _focused = null;
+            _failures.Clear();
+            GraphNavigator navigator = Navigator;
+            if (navigator != null)
+            {
+                navigator.Attach(null);
+            }
+
+            // Each screen is handed back its half of the registration: one kept alive by anything else
+            // would otherwise hold this manager, and through it the whole tree, after the mod has gone.
+            for (int i = 0; i < _registered.Count; i++)
+            {
+                if (_registered[i] != null)
+                {
+                    _registered[i].Manager = null;
+                }
+            }
+
+            _registered.Clear();
+            ApplyVisibleReviewBuffers();
+        }
+
+        /// <summary>A child screen has closed: drop its cursor, so opening the same menu again starts
+        /// at the top rather than where the player left it last time.</summary>
+        public void ChildClosed(Screen screen)
+        {
+            GraphNavigator navigator = Navigator;
+            GraphScreen graph = screen as GraphScreen;
+            if (navigator != null && graph != null && !screen.KeepStateOnPop)
+            {
+                navigator.ScreenClosed(graph);
+            }
+
+            ApplyVisibleReviewBuffers();
+        }
+
+        // Active screens, bottom layer first. Insertion-sorted rather than List.Sort, which is not
+        // stable: two screens on the same layer must stay in registration order, which is how combat
+        // sits above the map.
+        private List<Screen> Resolve()
+        {
+            List<Screen> active = new List<Screen>();
+            for (int i = 0; i < _registered.Count; i++)
+            {
+                Screen screen = _registered[i];
+                // A screen opened as a CHILD is its parent's, not the poll's: it is reached through
+                // Deepest and must not also stand on the stack in its own right.
+                if (screen.ParentScreen != null || !IsActive(screen))
+                {
+                    continue;
+                }
+
+                int at = active.Count;
+                while (at > 0 && active[at - 1].Layer > screen.Layer)
+                {
+                    at--;
+                }
+
+                active.Insert(at, screen);
+            }
+
+            return active;
+        }
+
+        private void ApplyDiff(List<Screen> desired)
+        {
+            bool changed = false;
+
+            // Closures first, from the top down, then openings from the bottom up, so a screen that
+            // replaced another hears about it in the order the player experienced it.
+            for (int i = _stack.Count - 1; i >= 0; i--)
+            {
+                if (!desired.Contains(_stack[i]))
+                {
+                    Pop(_stack[i]);
+                    changed = true;
+                }
+            }
+
+            for (int i = 0; i < desired.Count; i++)
+            {
+                if (!_stack.Contains(desired[i]))
+                {
+                    Safe(desired[i].OnPush, desired[i], "OnPush");
+                    changed = true;
+                }
+            }
+
+            _stack = desired;
+            if (changed)
+            {
+                ApplyVisibleReviewBuffers();
+            }
+        }
+
+        // A screen leaving takes whatever it had open with it: the game closed the page, so a menu
+        // over it is gone too, and it hears about that before the page does.
+        private void Pop(Screen screen)
+        {
+            if (screen.ActiveChild != null)
+            {
+                screen.RemoveChild(screen.ActiveChild);
+            }
+
+            Safe(screen.OnPop, screen, "OnPop");
+            GraphNavigator navigator = Navigator;
+            GraphScreen graph = screen as GraphScreen;
+            if (navigator != null && graph != null && !screen.KeepStateOnPop)
+            {
+                navigator.ScreenClosed(graph);
+            }
+        }
+
+        // The one place focus changes hands, so a screen opening, closing or being covered all
+        // announce identically.
+        private void SyncFocus()
+        {
+            Screen current = Current;
+            if (ReferenceEquals(current, _focused))
             {
                 return;
             }
 
-            _stack[_stack.Count - 1].OnUnfocus();
-            UIManager.Reset();
-            for (int i = _stack.Count - 1; i >= 0; i--)
+            if (_focused != null)
             {
-                _stack[i].OnPop();
+                Safe(_focused.OnUnfocus, _focused, "OnUnfocus");
             }
 
-            _stack.Clear();
-            ApplyVisibleReviewBuffers();
+            _focused = current;
+            if (current != null)
+            {
+                Safe(current.OnFocus, current, "OnFocus");
+            }
+
+            GraphNavigator navigator = Navigator;
+            if (navigator != null)
+            {
+                navigator.Attach(current as GraphScreen);
+            }
+
+            GraphScreen graph = current as GraphScreen;
+            if (graph != null)
+            {
+                // Queued, not interrupting: the focused control's readout follows it.
+                Safe(graph.SayName, graph, "SayName");
+            }
         }
 
-        public void Update()
+        private bool IsActive(Screen screen)
         {
-            CurrentScreen?.Update();
+            try
+            {
+                bool active = screen.IsActive();
+                if (_failures.Count > 0 && _failures.Remove(screen))
+                {
+                    SocAccessMod.Instance?.LogInfo("ScreenManager " + screen.Key + ".IsActive answered again");
+                }
+
+                return active;
+            }
+            catch (Exception exception)
+            {
+                // Once per screen, not once per frame: the poll runs every frame and a broken
+                // predicate would otherwise be the whole log.
+                if (!_failures.ContainsKey(screen))
+                {
+                    _failures[screen] = exception.Message;
+                    SocAccessMod.Instance?.LogWarning("ScreenManager " + screen.Key + ".IsActive threw: " + exception);
+                }
+
+                return false;
+            }
+        }
+
+        private static void Safe(Action action, Screen screen, string what)
+        {
+            try
+            {
+                action();
+            }
+            catch (Exception exception)
+            {
+                SocAccessMod.Instance?.LogWarning("ScreenManager " + screen.Key + "." + what + " threw: " + exception);
+            }
+        }
+
+        private static GraphNavigator Navigator
+        {
+            get { return SocAccessMod.Instance == null ? null : SocAccessMod.Instance.Navigator; }
         }
 
         public bool DispatchAction(InputAction action)
@@ -293,28 +380,26 @@ namespace SongsOfConquestAccess.Screens
                 return false;
             }
 
-            if (_stack.Count == 0)
+            Screen screen = Current;
+            if (screen == null)
             {
                 SocAccessMod.Instance?.LogInfo("ScreenManager.DispatchAction ignored because there is no active screen");
                 return false;
             }
 
-            Screen screen = CurrentScreen;
             bool handled = screen.OnActionJustPressed(action);
             SocAccessMod.Instance?.LogInfo(
                 "ScreenManager.DispatchAction action "
                 + action.Key
-                + " on top screen "
-                + DescribeScreen(screen)
+                + " on screen "
+                + screen.Key
                 + " returned "
                 + handled);
-            UIManager.Update();
 
-            // Accessibility actions are offered only to the top accessibility
-            // screen. Claiming happens before dispatch in the input router; if a
-            // screen claims an action, the router owns that input event even when
-            // this method returns false. The return value only reports whether
-            // the screen performed an action.
+            // Accessibility actions are offered only to the focused screen. Claiming happens before
+            // dispatch in the input router; if a screen claims an action, the router owns that input
+            // event even when this method returns false. The return value only reports whether the
+            // screen performed an action.
             return handled;
         }
 
@@ -323,13 +408,6 @@ namespace SongsOfConquestAccess.Screens
             if (!CanHandleGlobalAction(action))
             {
                 return false;
-            }
-
-            if (action.Key == AccessibilityActions.TooltipActionsMenu.Key)
-            {
-                Tooltip tooltip = CurrentScreen.CurrentTooltip;
-                Push(new TooltipActionsMenuScreen(tooltip.Actions, () => Pop<TooltipActionsMenuScreen>("tooltip actions menu closed")), "tooltip actions menu opened");
-                return true;
             }
 
             if (action.Key == AccessibilityActions.OpenModSettings.Key)
@@ -405,22 +483,9 @@ namespace SongsOfConquestAccess.Screens
                 return false;
             }
 
-            if (action.Key == AccessibilityActions.TooltipActionsMenu.Key)
-            {
-                if (CurrentScreen is TooltipActionsMenuScreen)
-                {
-                    return false;
-                }
-
-                Tooltip tooltip = CurrentScreen != null ? CurrentScreen.CurrentTooltip : null;
-                return tooltip != null
-                    && tooltip.Actions != null
-                    && tooltip.Actions.Count > 0;
-            }
-
             if (action.Key == AccessibilityActions.OpenModSettings.Key)
             {
-                return !(CurrentScreen is ModOptionsScreen);
+                return !(Current is ModOptionsScreen);
             }
 
             if (action.Key == AccessibilityActions.SummarizeResources.Key)
@@ -446,15 +511,17 @@ namespace SongsOfConquestAccess.Screens
             HashSet<ReviewBufferKind> result = new HashSet<ReviewBufferKind>();
             for (int i = 0; i < _stack.Count; i++)
             {
-                Screen screen = _stack[i];
-                if (screen == null || screen.VisibleReviewBuffers == null)
+                for (Screen screen = _stack[i]; screen != null; screen = screen.ActiveChild)
                 {
-                    continue;
-                }
+                    if (screen.VisibleReviewBuffers == null)
+                    {
+                        continue;
+                    }
 
-                foreach (ReviewBufferKind kind in screen.VisibleReviewBuffers)
-                {
-                    result.Add(kind);
+                    foreach (ReviewBufferKind kind in screen.VisibleReviewBuffers)
+                    {
+                        result.Add(kind);
+                    }
                 }
             }
 
@@ -463,20 +530,8 @@ namespace SongsOfConquestAccess.Screens
 
         public bool CurrentScreenClaimsAction(InputAction action)
         {
-            Screen screen = CurrentScreen;
-            if (screen == null || action == null)
-            {
-                return false;
-            }
-
-            return action.ClaimScope == InputClaimScope.Screen
-                ? screen.HasClaimed(action.Key)
-                : screen.HasFocusedWidgetClaimed(action.Key);
-        }
-
-        private static string DescribeScreen(Screen screen)
-        {
-            return screen != null ? screen.GetType().Name : "<null>";
+            Screen screen = Current;
+            return screen != null && action != null && screen.HasClaimed(action.Key);
         }
 
         private void ApplyVisibleReviewBuffers()

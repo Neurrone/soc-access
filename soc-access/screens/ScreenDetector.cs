@@ -1,5 +1,4 @@
 using System.Collections;
-using System.Collections.Generic;
 using _8_UILayer.ClientView.Menu.Paus;
 using SongsOfConquest.Client;
 using SongsOfConquest.Client.Adventure;
@@ -26,106 +25,35 @@ using SongsOfConquestAccess.Scanner;
 
 namespace SongsOfConquestAccess.Screens
 {
+    /// <summary>
+    /// THE READINESS LAYER: when a menu the mod knows about is ready to be worked, and when the game
+    /// has taken it away. The patches under <c>patches/</c> call the handlers here; each one points a
+    /// registered screen's SLOT at the menu (<see cref="LiveScreen{TAdapter}.Live"/>) or clears it.
+    ///
+    /// Nothing here decides which screen the player is on: that is the poll's job
+    /// (<see cref="ScreenManager"/>), which asks every registered screen every frame and sorts the
+    /// answers by layer. A handler that used to push, pop or refresh a screen now only writes what
+    /// the screen is reading, which is why a menu the game closed without telling us cannot strand
+    /// the mod on a dead page.
+    /// </summary>
     public sealed class ScreenDetector
     {
-        private delegate Screen RuntimeScreenFactory();
-
-        private readonly ScreenManager _screenManager;
-        private readonly List<RuntimeScreenFactory> _runtimeScreenFactories;
+        private readonly ScreenManager _screens;
         private AdventureViewInstaller _adventureViewInstaller;
         private BattleSceneInstaller _battleSceneInstaller;
         private IconDropdown _deferredAdventureLobbyDropdownClose;
         private bool _deferredAdventureLobbyDropdownHidden;
         private float _deferredAdventureLobbyDropdownDeadline;
-        private bool _storySequenceActive;
         private bool _communityMapsHomeContentRefreshPending;
-        private bool _artifactMarketRefreshPending;
 
-        public ScreenDetector(ScreenManager screenManager)
+        public ScreenDetector(ScreenManager screens)
         {
-            _screenManager = screenManager;
-            _runtimeScreenFactories = new List<RuntimeScreenFactory>
-            {
-                MainMenuScreen.TryBuildActiveScreen,
-                CampaignMenuScreen.TryBuildActiveScreen,
-                TaleSelectScreen.TryBuildActiveScreen,
-                CustomCampaignSelectScreen.TryBuildActiveScreen,
-                OnlineGameListScreen.TryBuildActiveScreen,
-                OnlineHostGameScreen.TryBuildActiveScreen,
-                CommunityMapsHomeScreen.TryBuildActiveScreen,
-                CommunityMapsCollectionScreen.TryBuildActiveScreen,
-                CommunityMapsDetailsScreen.TryBuildActiveScreen,
-                CommunityMapsSearchFilterScreen.TryBuildActiveScreen,
-                CommunityMapsSearchResultsScreen.TryBuildActiveScreen,
-                CommunityMapsModalScreen.TryBuildActiveScreen,
-                AdventureLobbyMapTypeScreen.TryBuildActiveScreen,
-                AdventureLobbyRandomLayoutScreen.TryBuildActiveScreen,
-                AdventureLobbyMapSelectScreen.TryBuildActiveScreen,
-                AdventureLobbyChallengeMapSelectScreen.TryBuildActiveScreen,
-                AdventureLobbyPlayersScreen.TryBuildActiveScreen,
-                AdventureLobbyGameSettingsScreen.TryBuildActiveScreen,
-                AdventureLobbyPlayerSettingsScreen.TryBuildActiveScreen,
-                AdventureLobbyIconDropdownScreen.TryBuildActiveScreen,
-                AdventureLobbyInviteProvidersScreen.TryBuildActiveScreen,
-                PlatformUserMenuScreen.TryBuildActiveScreen,
-                CampaignMapSelectScreen.TryBuildActiveScreen,
-                AdventureMapScreen.TryBuildActiveScreen,
-                AdventurePlayerMenuScreen.TryBuildActiveScreen,
-                SendResourcePopupScreen.TryBuildActiveScreen,
-                GiftTownPopupScreen.TryBuildActiveScreen,
-                OwnedEntitiesScreen.TryBuildActiveScreen,
-                TroopOverviewScreen.TryBuildActiveScreen,
-                MarketplaceScreen.TryBuildActiveScreen,
-                ArtifactMarketScreen.TryBuildActiveScreen,
-                MapEntityMiniMenuScreen.TryBuildActiveScreen,
-                CombatScreen.TryBuildActiveScreen,
-                ChatScreen.TryBuildActiveScreen,
-                SpellbookScreen.TryBuildActiveScreen,
-                PostAdventureResultScreen.TryBuildActiveScreen,
-                PostAdventureStatsScreen.TryBuildActiveScreen,
-                PlayerStatsScreen.TryBuildActiveScreen,
-                PostBattleResultScreen.TryBuildActiveScreen,
-                PreBattleMenuScreen.TryBuildActiveScreen,
-                ClaimMenuScreen.TryBuildActiveScreen,
-                UpgradeTroopsScreen.TryBuildActiveDwellingScreen,
-                DraftTroopsScreen.TryBuildActiveDwellingScreen,
-                RallyPointScreen.TryBuildActiveScreen,
-                DraftTroopsScreen.TryBuildActiveSettlementScreen,
-                UpgradeTroopsScreen.TryBuildActiveSettlementScreen,
-                SettlementScreen.TryBuildActiveScreen,
-                DraftTroopsScreen.TryBuildActiveDefenceScreen,
-                UpgradeTroopsScreen.TryBuildActiveDefenceScreen,
-                DefenceMenuScreen.TryBuildActiveScreen,
-                BuildMenuScreen.TryBuildActiveScreen,
-                ResearchScreen.TryBuildActiveScreen,
-                PurchaseWielderScreen.TryBuildActiveScreen,
-                HostileJoinMenuScreen.TryBuildActiveScreen,
-                MoveTroopPopupScreen.TryBuildActiveScreen,
-                WorldChoiceMenuScreen.TryBuildActiveScreen,
-                WorldConfirmMenuScreen.TryBuildActiveScreen,
-                LevelUpScreen.TryBuildActiveScreen,
-                CommanderSheetScreen.TryBuildActiveScreen,
-                TradingScreen.TryBuildActiveScreen,
-                () => StoryFocusBlockerScreen.TryBuildActiveScreen(() => _storySequenceActive),
-                StoryTextScreen.TryBuildActiveLetterboxScreen,
-                StoryTextScreen.TryBuildActiveScreen,
-                StoryTextScreen.TryBuildActiveDialogueScreen,
-                OptionsScreen.TryBuildActiveScreen,
-                PauseMenuScreen.TryBuildActiveScreen,
-                SaveLoadGameScreen.TryBuildActiveScreen,
-                MessageDialogScreen.TryBuildActiveMapMessagePopupScreen,
-                MessageDialogScreen.TryBuildActiveRandomEventMenuScreen,
-                MessageDialogScreen.TryBuildActiveCustomMessageMenuScreen,
-                MessageDialogScreen.TryBuildActivePopupMenuScreen,
-                MessageDialogScreen.TryBuildActiveConfirmPopupScreen,
-                MessageDialogScreen.TryBuildActiveSystemPopupScreen,
-                QuitToDesktopPopupScreen.TryBuildActiveScreen,
-                CodexScreen.TryBuildActiveScreen,
-                TutorialSlideshowScreen.TryBuildActiveScreen,
-                TutorialSimpleScreen.TryBuildActiveScreen,
-                LoadingCompleteScreen.TryBuildActiveScreen
-            };
+            _screens = screens;
         }
+
+        /// <summary>Whether a story sequence is running - the camera and the keyboard are the story's,
+        /// and the map stands down for it (<see cref="AdventureMapScreen.IsActive"/>).</summary>
+        public bool StorySequenceActive { get; private set; }
 
         public void Update()
         {
@@ -136,9 +64,38 @@ namespace SongsOfConquestAccess.Screens
 
             if (UnityEngine.Time.realtimeSinceStartup >= _deferredAdventureLobbyDropdownDeadline)
             {
-                CompleteDeferredAdventureLobbyDropdownClose("adventure lobby icon dropdown deferred timeout");
+                CompleteDeferredAdventureLobbyDropdownClose();
             }
         }
+
+        // ---- the slots ----
+
+        /// <summary>The one registered instance of a screen, whether or not it is showing.</summary>
+        private TScreen Reg<TScreen>() where TScreen : Screen
+        {
+            return _screens == null ? null : _screens.Registered<TScreen>();
+        }
+
+        /// <summary>Let go of every screen's slot but one - a new root state, with nothing from the
+        /// previous one left to read.</summary>
+        private void ForgetAllExcept(Screen keep)
+        {
+            if (_screens == null)
+            {
+                return;
+            }
+
+            System.Collections.Generic.IReadOnlyList<Screen> registered = _screens.RegisteredScreens;
+            for (int i = 0; i < registered.Count; i++)
+            {
+                if (!ReferenceEquals(registered[i], keep))
+                {
+                    registered[i].Forget();
+                }
+            }
+        }
+
+        // ---- loading ----
 
         public void OnLoadingScreenReady(LoadingScreenMenu menu)
         {
@@ -148,23 +105,25 @@ namespace SongsOfConquestAccess.Screens
                 return;
             }
 
-            if (_screenManager.CurrentScreen is LoadingCompleteScreen)
-            {
-                return;
-            }
-
-            // The loading-complete prompt is a root screen; nothing from the previous game state should remain beneath it.
-            _screenManager.Clear();
-            Push(new LoadingCompleteScreen(adapter), "loading screen complete");
+            LoadingCompleteScreen screen = Reg<LoadingCompleteScreen>();
+            // The loading-complete prompt is a root screen; nothing from the previous game state
+            // should remain readable beneath it.
+            ForgetAllExcept(screen);
+            screen?.Show(adapter);
         }
 
         public void OnLoadingScreenClosed(LoadingScreenMenu menu)
         {
-            if (_screenManager.CurrentScreen is LoadingCompleteScreen)
-            {
-                _screenManager.Pop<LoadingCompleteScreen>("loading screen closed");
-            }
+            Reg<LoadingCompleteScreen>()?.Forget();
         }
+
+        public void OnLoadingScreenOpening(LoadingScreenMenu menu)
+        {
+            NativeTooltipUtility.HideTooltip();
+            ForgetAllExcept(null);
+        }
+
+        // ---- the story ----
 
         public void OnStorySequenceTrigger(OnTriggerPayload payload, IClientAdventureFacade facade)
         {
@@ -173,524 +132,822 @@ namespace SongsOfConquestAccess.Screens
                 return;
             }
 
-            _storySequenceActive = true;
-            if (!_screenManager.Contains<StoryFocusBlockerScreen>())
-            {
-                _screenManager.Push(
-                    new StoryFocusBlockerScreen(() => _storySequenceActive),
-                    "story sequence focus blocker ready");
-            }
+            StorySequenceActive = true;
         }
 
         public void OnStorySequenceCompleted()
         {
-            _storySequenceActive = false;
-            if (_screenManager.Contains<StoryTextScreen>())
-            {
-                _screenManager.Remove<StoryTextScreen>("story sequence completed");
-            }
-
-            if (_screenManager.Contains<StoryFocusBlockerScreen>())
-            {
-                _screenManager.Remove<StoryFocusBlockerScreen>("story sequence completed");
-            }
+            StorySequenceActive = false;
+            Reg<StoryTextScreen>()?.Forget();
         }
+
+        // ---- the pause menu and its pages ----
 
         public void OnPauseMenuReady(PauseMenu pauseMenu)
         {
-            PauseMenuScreen screen = new PauseMenuScreen(new PauseMenuAdapter(pauseMenu));
-            if (_screenManager.CurrentScreen is PauseMenuScreen)
-            {
-                _screenManager.RefreshTop<PauseMenuScreen>(screen, "pause menu changed");
-                return;
-            }
+            Reg<PauseMenuScreen>()?.Show(new PauseMenuAdapter(pauseMenu));
+        }
 
-            Push(screen, "pause menu ready");
+        public void OnPauseMenuClosed(PauseMenu pauseMenu)
+        {
+            Reg<PauseMenuScreen>()?.Forget();
         }
 
         public void OnOptionsMenuReady(OptionsMenu optionsMenu)
         {
             OptionsMenuAdapter adapter = new OptionsMenuAdapter(optionsMenu);
-            if (!adapter.IsPresent())
+            if (adapter.IsPresent())
             {
-                return;
-            }
-
-            OptionsScreen current = _screenManager.CurrentScreen as OptionsScreen;
-            if (current != null)
-            {
-                current.Refresh();
-                return;
-            }
-
-            OptionsScreen screen = new OptionsScreen(adapter);
-            Push(screen, "options menu ready");
-        }
-
-        public void OnOptionsMenuChanged(OptionsMenu optionsMenu)
-        {
-            OptionsMenuAdapter adapter = new OptionsMenuAdapter(optionsMenu);
-            if (!adapter.IsPresent())
-            {
-                return;
-            }
-
-            OptionsScreen current = _screenManager.CurrentScreen as OptionsScreen;
-            if (current != null)
-            {
-                current.Refresh();
-                return;
+                Reg<OptionsScreen>()?.Show(adapter);
             }
         }
 
         public void OnOptionsMenuClosed(OptionsMenu optionsMenu)
         {
-            _screenManager.Remove<OptionsScreen>("options menu closed");
-        }
-
-        public void OnPauseMenuClosed(PauseMenu pauseMenu)
-        {
-            _screenManager.Pop<PauseMenuScreen>("pause menu closed");
+            Reg<OptionsScreen>()?.Forget();
         }
 
         public void OnSaveLoadGameMenuReady(SaveLoadGameMenu menu)
         {
             SaveLoadGameMenuAdapter adapter = new SaveLoadGameMenuAdapter(menu);
-            if (!adapter.IsPresent())
+            if (adapter.IsPresent())
             {
-                return;
-            }
-
-            SaveLoadGameScreen current = _screenManager.CurrentScreen as SaveLoadGameScreen;
-            if (current != null && current.Matches(menu))
-            {
-                return;
-            }
-
-            Push(new SaveLoadGameScreen(adapter), "save/load game menu ready");
-        }
-
-        public void OnSaveLoadGameMenuChanged(SaveLoadGameMenu menu)
-        {
-            SaveLoadGameMenuAdapter adapter = new SaveLoadGameMenuAdapter(menu);
-            if (!adapter.IsPresent())
-            {
-                return;
-            }
-
-            SaveLoadGameScreen current = _screenManager.Get<SaveLoadGameScreen>();
-            if (current != null && current.Matches(menu))
-            {
-                current.Refresh();
+                Reg<SaveLoadGameScreen>()?.Show(adapter);
             }
         }
 
         public void OnSaveLoadGameMenuClosed(SaveLoadGameMenu menu)
         {
-            SaveLoadGameScreen current = _screenManager.CurrentScreen as SaveLoadGameScreen;
-            if (current != null && current.Matches(menu))
+            SaveLoadGameScreen screen = Reg<SaveLoadGameScreen>();
+            if (screen != null && screen.Matches(menu))
             {
-                _screenManager.Pop<SaveLoadGameScreen>("save/load game menu closed");
+                screen.Forget();
             }
         }
+
+        public void OnCodexReady(CodexMenu codexMenu)
+        {
+            CodexMenuAdapter adapter = new CodexMenuAdapter(codexMenu);
+            if (adapter.IsPresent())
+            {
+                Reg<CodexScreen>()?.Show(adapter);
+            }
+        }
+
+        public void OnCodexClosed(CodexMenu codexMenu)
+        {
+            Reg<CodexScreen>()?.Forget();
+        }
+
+        // ---- the in-game panels ----
 
         public void OnOwnedEntitiesReady(KingdomEntityOverviewMenu menu)
         {
             KingdomEntityOverviewAdapter adapter = new KingdomEntityOverviewAdapter(menu);
-            if (!adapter.IsPresent())
+            if (adapter.IsPresent())
             {
-                return;
+                Reg<OwnedEntitiesScreen>()?.Show(adapter);
             }
-
-            if (_screenManager.CurrentScreen is OwnedEntitiesScreen)
-            {
-                SocAccessMod.Instance?.LogWarning("ScreenDetector ignored duplicate owned entities ready while owned entities is already top");
-                return;
-            }
-
-            Push(new OwnedEntitiesScreen(adapter), "owned entities ready");
         }
 
         public void OnOwnedEntitiesClosed(KingdomEntityOverviewMenu menu)
         {
-            if (_screenManager.CurrentScreen is OwnedEntitiesScreen)
-            {
-                _screenManager.Pop<OwnedEntitiesScreen>("owned entities closed");
-            }
+            Reg<OwnedEntitiesScreen>()?.Forget();
         }
 
         public void OnTroopOverviewReady(KingdomTroopOverviewMenu menu)
         {
             KingdomTroopOverviewAdapter adapter = new KingdomTroopOverviewAdapter(menu);
-            if (!adapter.IsPresent())
+            if (adapter.IsPresent())
             {
-                return;
+                Reg<TroopOverviewScreen>()?.Show(adapter);
             }
-
-            if (_screenManager.CurrentScreen is TroopOverviewScreen)
-            {
-                SocAccessMod.Instance?.LogWarning("ScreenDetector ignored duplicate troop overview ready while troop overview is already top");
-                return;
-            }
-
-            Push(new TroopOverviewScreen(adapter), "troop overview ready");
         }
 
         public void OnTroopOverviewClosed(KingdomTroopOverviewMenu menu)
         {
-            if (_screenManager.CurrentScreen is TroopOverviewScreen)
-            {
-                _screenManager.Pop<TroopOverviewScreen>("troop overview closed");
-            }
+            Reg<TroopOverviewScreen>()?.Forget();
         }
 
         public void OnAdventurePlayerMenuReady(AdventurePlayerMenu menu)
         {
             AdventurePlayerMenuAdapter adapter = new AdventurePlayerMenuAdapter(menu);
-            if (!adapter.IsPresent())
+            if (adapter.IsPresent())
             {
-                return;
+                Reg<AdventurePlayerMenuScreen>()?.Show(adapter);
             }
-
-            AdventurePlayerMenuScreen screen = new AdventurePlayerMenuScreen(adapter);
-            AdventurePlayerMenuScreen current = _screenManager.CurrentScreen as AdventurePlayerMenuScreen;
-            if (current != null && current.Matches(menu))
-            {
-                _screenManager.RefreshTop<AdventurePlayerMenuScreen>(screen, "adventure players menu shown");
-                return;
-            }
-
-            Push(screen, "adventure players menu ready");
-        }
-
-        public void OnAdventurePlayerMenuChanged()
-        {
-            AdventurePlayerMenuScreen screen = _screenManager.CurrentScreen as AdventurePlayerMenuScreen;
-            if (screen == null)
-            {
-                return;
-            }
-
-            if (!screen.IsPresent())
-            {
-                _screenManager.Pop<AdventurePlayerMenuScreen>("adventure players menu no longer present");
-                return;
-            }
-
-            screen.Refresh();
         }
 
         public void OnAdventurePlayerMenuClosed(AdventurePlayerMenu menu)
         {
-            AdventurePlayerMenuScreen current = _screenManager.CurrentScreen as AdventurePlayerMenuScreen;
-            if (current != null && (menu == null || current.Matches(menu)))
+            AdventurePlayerMenuScreen screen = Reg<AdventurePlayerMenuScreen>();
+            if (screen != null && (menu == null || screen.Matches(menu)))
             {
-                _screenManager.Pop<AdventurePlayerMenuScreen>("adventure players menu closed");
-                return;
-            }
-
-            if (_screenManager.Contains<AdventurePlayerMenuScreen>())
-            {
-                _screenManager.Remove<AdventurePlayerMenuScreen>("adventure players menu closed");
+                screen.Forget();
             }
         }
 
         public void OnSendResourcePopupReady(SendResourcePopup popup)
         {
             SendResourcePopupAdapter adapter = new SendResourcePopupAdapter(popup);
-            if (!adapter.IsPresent())
+            if (adapter.IsPresent())
             {
-                return;
+                Reg<SendResourcePopupScreen>()?.Show(adapter);
             }
-
-            SendResourcePopupScreen screen = new SendResourcePopupScreen(adapter);
-            if (_screenManager.CurrentScreen is SendResourcePopupScreen)
-            {
-                _screenManager.RefreshTop<SendResourcePopupScreen>(screen, "send resource popup shown");
-                return;
-            }
-
-            Push(screen, "send resource popup ready");
         }
 
         public void OnSendResourcePopupHidden()
         {
-            // SendResourcePopup.Hide is not a reliable close signal by itself:
-            // the game also calls it during injection-time initialization and can
-            // call it redundantly when the popup is already inactive. Only pop
-            // when the corresponding accessibility screen is currently on top.
-            if (_screenManager.CurrentScreen is SendResourcePopupScreen)
-            {
-                _screenManager.Pop<SendResourcePopupScreen>("send resource popup hidden");
-            }
+            // SendResourcePopup.Hide is not a reliable close signal by itself: the game also calls it
+            // during injection-time initialization and can call it redundantly when the popup is
+            // already inactive. Letting go of the slot is safe either way - the poll answers from the
+            // popup's own drawn state, and a Hide that meant nothing is followed by a Ready.
+            Reg<SendResourcePopupScreen>()?.Forget();
         }
 
         public void OnGiftTownPopupReady(GiftTownPopup popup)
         {
             GiftTownPopupAdapter adapter = new GiftTownPopupAdapter(popup);
-            if (!adapter.IsPresent())
+            if (adapter.IsPresent())
             {
-                return;
+                Reg<GiftTownPopupScreen>()?.Show(adapter);
             }
-
-            GiftTownPopupScreen screen = new GiftTownPopupScreen(adapter);
-            if (_screenManager.CurrentScreen is GiftTownPopupScreen)
-            {
-                _screenManager.RefreshTop<GiftTownPopupScreen>(screen, "gift town popup shown");
-                return;
-            }
-
-            Push(screen, "gift town popup ready");
         }
 
         public void OnGiftTownPopupHidden()
         {
-            // GiftTownPopup.Hide is not a reliable close signal by itself:
-            // the game also calls it during injection-time initialization and can
-            // call it redundantly when the popup is already inactive. Only pop
-            // when the corresponding accessibility screen is currently on top.
-            if (_screenManager.CurrentScreen is GiftTownPopupScreen)
-            {
-                _screenManager.Pop<GiftTownPopupScreen>("gift town popup hidden");
-            }
+            // GiftTownPopup.Hide is not a reliable close signal by itself, exactly as above.
+            Reg<GiftTownPopupScreen>()?.Forget();
         }
 
         public void OnMarketplaceReady(MarketplaceMenu menu)
         {
             MarketplaceMenuAdapter adapter = new MarketplaceMenuAdapter(menu);
-            if (!adapter.IsPresent())
+            if (adapter.IsPresent())
             {
-                return;
+                Reg<MarketplaceScreen>()?.Show(adapter);
             }
-
-            if (_screenManager.CurrentScreen is MarketplaceScreen)
-            {
-                SocAccessMod.Instance?.LogWarning("ScreenDetector ignored duplicate marketplace ready while marketplace is already top");
-                return;
-            }
-
-            Push(new MarketplaceScreen(adapter), "marketplace ready");
         }
 
         public void OnMarketplaceClosed(MarketplaceMenu menu)
         {
-            if (_screenManager.CurrentScreen is MarketplaceScreen)
-            {
-                _screenManager.Pop<MarketplaceScreen>("marketplace closed");
-            }
-        }
-
-        public void OnMarketplaceChanged()
-        {
-            MarketplaceScreen screen = _screenManager.CurrentScreen as MarketplaceScreen;
-            if (screen == null)
-            {
-                return;
-            }
-
-            if (!screen.IsPresent())
-            {
-                _screenManager.Pop<MarketplaceScreen>("marketplace no longer present");
-                return;
-            }
-
-            screen.Refresh();
+            Reg<MarketplaceScreen>()?.Forget();
         }
 
         public void OnArtifactMarketReady(ArtifactMarketMenu menu)
         {
             ArtifactMarketMenuAdapter adapter = new ArtifactMarketMenuAdapter(menu);
-            if (!adapter.IsPresent())
+            if (adapter.IsPresent())
             {
-                return;
+                Reg<ArtifactMarketScreen>()?.Show(adapter);
             }
-
-            ArtifactMarketScreen current = _screenManager.CurrentScreen as ArtifactMarketScreen;
-            if (current != null)
-            {
-                current.Refresh();
-                return;
-            }
-
-            Push(new ArtifactMarketScreen(adapter), "artifact market ready");
         }
 
         public void OnArtifactMarketClosed(ArtifactMarketMenu menu)
         {
-            // ArtifactMarketMenu.Close is a possible-close signal, not proof
-            // that the window was open: the game also calls it from Start() and
-            // HideAll() while cleaning up inactive menus. Only pop when the
-            // artifact market accessibility screen is currently at the top.
-            if (_screenManager.CurrentScreen is ArtifactMarketScreen)
+            // ArtifactMarketMenu.Close is a possible-close signal, not proof that the window was open:
+            // the game also calls it from Start() and HideAll() while cleaning up inactive menus. The
+            // slot going empty costs nothing when the window was never up.
+            Reg<ArtifactMarketScreen>()?.Forget();
+        }
+
+        public void OnMapEntityMiniMenuReady(MapEntityMiniMenu menu)
+        {
+            MapEntityMiniMenuAdapter adapter = new MapEntityMiniMenuAdapter(menu);
+            if (adapter.IsPresent())
             {
-                _screenManager.Pop<ArtifactMarketScreen>("artifact market closed");
+                Reg<MapEntityMiniMenuScreen>()?.Show(adapter);
             }
         }
 
-        public void OnArtifactMarketChanged()
+        public void OnMapEntityMiniMenuClosed(MapEntityMiniMenu menu)
         {
-            if (_artifactMarketRefreshPending)
+            // Selling a building closes the native mini menu from inside the confirm popup's async
+            // callback, while the dialog is still up over it.
+            Reg<MapEntityMiniMenuScreen>()?.Forget();
+        }
+
+        public void OnTradingMenuReady(TradingMenu menu)
+        {
+            Reg<TradingScreen>()?.Show(new TradingMenuAdapter(menu));
+        }
+
+        public void OnTradingMenuClosed(TradingMenu menu)
+        {
+            Reg<TradingScreen>()?.Forget();
+        }
+
+        public void OnCommanderSheetReady(CommanderSheet commanderSheet)
+        {
+            Reg<CommanderSheetScreen>()?.Show(new CommanderSheetAdapter(commanderSheet));
+        }
+
+        public void OnCommanderSheetClosed(CommanderSheet commanderSheet)
+        {
+            Reg<CommanderSheetScreen>()?.Forget();
+        }
+
+        public void OnSpellbookReady(SpellBook spellbook)
+        {
+            Reg<SpellbookScreen>()?.Show(new SpellbookAdapter(spellbook));
+        }
+
+        public void OnSpellbookClosed(SpellBook spellbook)
+        {
+            Reg<SpellbookScreen>()?.Forget();
+        }
+
+        public void OnLevelUpMenuReady(CommanderLevelUpMenu menu)
+        {
+            Reg<LevelUpScreen>()?.Show(new LevelUpMenuAdapter(menu));
+        }
+
+        public void OnLevelUpMenuClosed(CommanderLevelUpMenu menu)
+        {
+            Reg<LevelUpScreen>()?.Forget();
+        }
+
+        public void OnHostileJoinMenuChanged(HostileJoinMenu menu)
+        {
+            HostileJoinMenuAdapter adapter = new HostileJoinMenuAdapter(menu);
+            if (!adapter.IsPresent())
+            {
+                adapter.Dispose();
+                return;
+            }
+
+            HostileJoinMenuScreen screen = Reg<HostileJoinMenuScreen>();
+            if (screen == null)
+            {
+                adapter.Dispose();
+                return;
+            }
+
+            if (screen.Live == null)
+            {
+                screen.Live = adapter;
+                return;
+            }
+
+            // The menu walks through its stages in place: the screen keeps the adapter it has and is
+            // told the stage moved, which drops the cursor onto the new page.
+            adapter.Dispose();
+            screen.Refresh();
+        }
+
+        public void OnHostileJoinMenuClosed(HostileJoinMenu menu)
+        {
+            Reg<HostileJoinMenuScreen>()?.Forget();
+        }
+
+        public void OnMoveTroopPopupReady(TroopHUDEntryMovable movable)
+        {
+            Reg<MoveTroopPopupScreen>()?.Show(new MoveTroopPopupAdapter(movable));
+        }
+
+        public void OnMoveTroopPopupClosed(TroopHUDEntryMovable movable)
+        {
+            // The game calls TroopHUDEntryMovable.Reset even when the troop move popup is not open,
+            // such as during HUD teardown and refresh; an empty slot emptied again costs nothing.
+            Reg<MoveTroopPopupScreen>()?.Forget();
+        }
+
+        public void OnWorldChoiceMenuReady(WorldChoiceMenu menu)
+        {
+            Reg<WorldChoiceMenuScreen>()?.Show(new WorldChoiceMenuAdapter(menu));
+        }
+
+        public void OnWorldChoiceMenuClosed(WorldChoiceMenu menu)
+        {
+            Reg<WorldChoiceMenuScreen>()?.Forget();
+        }
+
+        public void OnWorldConfirmMenuReady(WorldConfirmMenu menu)
+        {
+            Reg<WorldConfirmMenuScreen>()?.Show(new WorldConfirmMenuAdapter(menu));
+        }
+
+        public void OnWorldConfirmMenuClosed(WorldConfirmMenu menu)
+        {
+            Reg<WorldConfirmMenuScreen>()?.Forget();
+        }
+
+        public void OnClaimMenuReady(ClaimMenu menu)
+        {
+            ClaimMenuAdapter adapter = new ClaimMenuAdapter(menu);
+            if (adapter.IsPresent())
+            {
+                Reg<ClaimMenuScreen>()?.Show(adapter);
+            }
+        }
+
+        public void OnClaimMenuClosed(ClaimMenu menu)
+        {
+            ClaimMenuScreen screen = Reg<ClaimMenuScreen>();
+            if (screen != null && (menu == null || screen.Matches(menu)))
+            {
+                screen.Forget();
+            }
+        }
+
+        public void OnPlayerStatsReady(PlayerStatsMenuNavigation menu)
+        {
+            PlayerStatsAdapter adapter = new PlayerStatsAdapter(menu);
+            if (adapter.IsPresent())
+            {
+                Reg<PlayerStatsScreen>()?.Show(adapter);
+            }
+        }
+
+        public void OnPlayerStatsClosed(PlayerStatsMenuNavigation menu)
+        {
+            Reg<PlayerStatsScreen>()?.Forget();
+        }
+
+        public void OnPurchaseWielderReady(PurchaseWielderMenu menu)
+        {
+            PurchaseWielderMenuAdapter adapter = new PurchaseWielderMenuAdapter(menu);
+            if (adapter.IsPresent())
+            {
+                Reg<PurchaseWielderScreen>()?.Show(adapter);
+            }
+        }
+
+        public void OnPurchaseWielderClosed(PurchaseWielderMenu menu)
+        {
+            PurchaseWielderScreen screen = Reg<PurchaseWielderScreen>();
+            if (screen != null
+                && (menu == null || (screen.Live != null && ReferenceEquals(screen.Live.Source, menu))))
+            {
+                screen.Forget();
+            }
+        }
+
+        public void OnBuildMenuReady(BuildMenu menu)
+        {
+            Reg<BuildMenuScreen>()?.Show(new BuildMenuAdapter(menu));
+        }
+
+        public void OnBuildMenuClosed(BuildMenu menu)
+        {
+            Reg<BuildMenuScreen>()?.Forget();
+        }
+
+        public void OnResearchMenuReady(ResearchMenu menu)
+        {
+            ResearchMenuAdapter adapter = new ResearchMenuAdapter(menu);
+            if (adapter.IsPresent())
+            {
+                Reg<ResearchScreen>()?.Show(adapter);
+            }
+        }
+
+        public void OnResearchMenuClosed(ResearchMenu menu)
+        {
+            Reg<ResearchScreen>()?.Forget();
+        }
+
+        // ---- the settlement, the dwelling and the defence menu, with their two sub-pages ----
+
+        public void OnSettlementReady(TownInteractionMenu menu)
+        {
+            Reg<SettlementScreen>()?.Show(new TownInteractionMenuAdapter(menu));
+        }
+
+        public void OnSettlementDraftReady(TownInteractionMenu menu)
+        {
+            Reg<DraftTroopsScreen>()?.Show(
+                new SettlementTroopManagementHostAdapter(new TownInteractionMenuAdapter(menu)));
+        }
+
+        public void OnSettlementUpgradeReady(TownInteractionMenu menu)
+        {
+            Reg<UpgradeTroopsScreen>()?.Show(
+                new SettlementTroopManagementHostAdapter(new TownInteractionMenuAdapter(menu)));
+        }
+
+        public void OnSettlementBackToTop(TownInteractionMenu menu)
+        {
+            ForgetTroopPages("settlement");
+            Reg<SettlementScreen>()?.Show(new TownInteractionMenuAdapter(menu));
+        }
+
+        public void OnSettlementClosed(TownInteractionMenu menu)
+        {
+            ForgetTroopPages("settlement");
+            Reg<SettlementScreen>()?.Forget();
+        }
+
+        public void OnDefenceMenuReady(DefenceMenu menu)
+        {
+            Reg<DefenceMenuScreen>()?.Show(new DefenceMenuAdapter(menu));
+        }
+
+        public void OnDefenceDraftReady(DefenceMenu menu)
+        {
+            Reg<DraftTroopsScreen>()?.Show(
+                new DefenceTroopManagementHostAdapter(new DefenceMenuAdapter(menu)));
+        }
+
+        public void OnDefenceUpgradeReady(DefenceMenu menu)
+        {
+            Reg<UpgradeTroopsScreen>()?.Show(
+                new DefenceTroopManagementHostAdapter(new DefenceMenuAdapter(menu)));
+        }
+
+        public void OnDefenceMenuBackToTop(DefenceMenu menu)
+        {
+            ForgetTroopPages("defences");
+            Reg<DefenceMenuScreen>()?.Show(new DefenceMenuAdapter(menu));
+        }
+
+        public void OnDefenceMenuClosed(DefenceMenu menu)
+        {
+            ForgetTroopPages("defences");
+            Reg<DefenceMenuScreen>()?.Forget();
+        }
+
+        public void OnDwellingInteractionReady(DwellingInteractionMenu menu)
+        {
+            Reg<DraftTroopsScreen>()?.Show(
+                new DwellingTroopManagementHostAdapter(new DwellingInteractionMenuAdapter(menu)));
+        }
+
+        public void OnDwellingUpgradeReady(DwellingInteractionMenu menu)
+        {
+            Reg<UpgradeTroopsScreen>()?.Show(
+                new DwellingTroopManagementHostAdapter(new DwellingInteractionMenuAdapter(menu)));
+        }
+
+        public void OnDwellingBackToTop(DwellingInteractionMenu menu)
+        {
+            ForgetTroopPages("dwelling");
+            Reg<DraftTroopsScreen>()?.Show(
+                new DwellingTroopManagementHostAdapter(new DwellingInteractionMenuAdapter(menu)));
+        }
+
+        public void OnDwellingInteractionClosed(DwellingInteractionMenu menu)
+        {
+            ForgetTroopPages("dwelling");
+        }
+
+        /// <summary>Let go of the draft and upgrade pages this host drew - the host has gone back to
+        /// its landing page, or closed. A page drawn by a DIFFERENT host is left alone: the two
+        /// screens are shared between the town, the dwelling and the defence menu.</summary>
+        private void ForgetTroopPages(string hostIdPrefix)
+        {
+            DraftTroopsScreen draft = Reg<DraftTroopsScreen>();
+            if (draft != null && draft.HostIdPrefix == hostIdPrefix)
+            {
+                draft.Forget();
+            }
+
+            UpgradeTroopsScreen upgrade = Reg<UpgradeTroopsScreen>();
+            if (upgrade != null && upgrade.HostIdPrefix == hostIdPrefix)
+            {
+                upgrade.Forget();
+            }
+        }
+
+        public void OnRallyPointReady(RallyPointInteractionMenu menu)
+        {
+            Reg<RallyPointScreen>()?.Show(new RallyPointInteractionMenuAdapter(menu));
+        }
+
+        public void OnRallyPointClosed(RallyPointInteractionMenu menu)
+        {
+            Reg<RallyPointScreen>()?.Forget();
+        }
+
+        // ---- the dialogs ----
+
+        public void OnConfirmPopupReady(ConfirmPopup popup)
+        {
+            ConfirmPopupAdapter adapter = new ConfirmPopupAdapter(popup);
+            if (adapter.IsPresent())
+            {
+                Reg<MessageDialogScreen>()?.Show(adapter);
+            }
+        }
+
+        public void OnConfirmPopupClosed(ConfirmPopup popup)
+        {
+            ForgetMessageDialog(popup);
+        }
+
+        public void OnSystemPopupReady(SystemPopup popup)
+        {
+            SystemPopupAdapter adapter = new SystemPopupAdapter(popup);
+            if (adapter.IsPresent())
+            {
+                Reg<MessageDialogScreen>()?.Show(adapter);
+            }
+        }
+
+        public void OnSystemPopupClosed(SystemPopup popup)
+        {
+            ForgetMessageDialog(popup);
+        }
+
+        public void OnPopupMenuReady(object sourceKey, PopupMenu.Settings settings)
+        {
+            if (settings == null)
+            {
+                SocAccessMod.Instance?.LogWarning("ScreenDetector.OnPopupMenuReady received null settings");
+                return;
+            }
+
+            object resolvedSourceKey = sourceKey ?? (object)settings.ContainerTransform;
+            Reg<MessageDialogScreen>()?.Show(new PopupMenuAdapter(resolvedSourceKey, settings));
+        }
+
+        public void OnPopupMenuClosed(object sourceKey)
+        {
+            ForgetMessageDialog(sourceKey);
+        }
+
+        public void OnMapMessagePopupReady(MapMessagePopup popup)
+        {
+            MapMessagePopupAdapter adapter = new MapMessagePopupAdapter(popup);
+            if (adapter.IsPresent())
+            {
+                Reg<MessageDialogScreen>()?.Show(adapter);
+            }
+        }
+
+        public void OnMapMessagePopupClosed(MapMessagePopup popup)
+        {
+            ForgetMessageDialog(popup);
+        }
+
+        public void OnRandomEventMenuReady(RandomEventMenu menu)
+        {
+            RandomEventMenuAdapter adapter = new RandomEventMenuAdapter(menu);
+            if (adapter.IsPresent())
+            {
+                Reg<MessageDialogScreen>()?.Show(adapter);
+            }
+        }
+
+        public void OnRandomEventMenuClosed(RandomEventMenu menu)
+        {
+            ForgetMessageDialog(menu);
+        }
+
+        public void OnCustomMessageMenuReady(CustomMessageMenu menu)
+        {
+            CustomMessageMenuAdapter adapter = new CustomMessageMenuAdapter(menu);
+            if (adapter.IsPresent())
+            {
+                Reg<MessageDialogScreen>()?.Show(adapter);
+            }
+        }
+
+        public void OnCustomMessageMenuClosed(CustomMessageMenu menu)
+        {
+            ForgetMessageDialog(menu);
+        }
+
+        /// <summary>One slot, six sources: a close is only this dialog's when the slot is reading the
+        /// source that closed. A null source key means "whatever is in there".</summary>
+        private void ForgetMessageDialog(object sourceKey)
+        {
+            MessageDialogScreen screen = Reg<MessageDialogScreen>();
+            if (screen == null || screen.Live == null)
             {
                 return;
             }
 
-            SocAccessMod plugin = SocAccessMod.Instance;
-            if (plugin == null)
+            object current = screen.SourceKey;
+            if (sourceKey == null || current == null || ReferenceEquals(sourceKey, current))
             {
-                RefreshArtifactMarket("artifact market changed");
+                screen.Forget();
+            }
+        }
+
+        public void OnQuitToDesktopPopupReady(QuitToDesktopPopup popup)
+        {
+            QuitToDesktopPopupAdapter adapter = new QuitToDesktopPopupAdapter(popup);
+            if (adapter.IsPresent())
+            {
+                Reg<QuitToDesktopPopupScreen>()?.Show(adapter);
+            }
+        }
+
+        public void OnQuitToDesktopPopupClosed(QuitToDesktopPopup popup)
+        {
+            Reg<QuitToDesktopPopupScreen>()?.Forget();
+        }
+
+        // ---- the tutorials ----
+
+        public void OnTutorialReady(TutorialMenu tutorialMenu)
+        {
+            ShowTutorial(tutorialMenu);
+        }
+
+        public void OnTutorialChanged(TutorialMenu tutorialMenu)
+        {
+            ShowTutorial(tutorialMenu);
+        }
+
+        public void OnTutorialClosed(TutorialMenu tutorialMenu)
+        {
+            Reg<TutorialSlideshowScreen>()?.Forget();
+            Reg<TutorialSimpleScreen>()?.Forget();
+        }
+
+        /// <summary>A tutorial popup is one of two shapes, and the menu says which by what it has
+        /// drawn. Whichever it is, the other's slot is emptied so a menu that changed shape does not
+        /// leave the old page standing.</summary>
+        private void ShowTutorial(TutorialMenu tutorialMenu)
+        {
+            TutorialSlideshowAdapter slideshow = new TutorialSlideshowAdapter(tutorialMenu);
+            if (slideshow.IsPresent())
+            {
+                Reg<TutorialSimpleScreen>()?.Forget();
+                Reg<TutorialSlideshowScreen>()?.Show(slideshow);
                 return;
             }
 
-            _artifactMarketRefreshPending = true;
-            plugin.StartCoroutine(RefreshArtifactMarketNextFrame());
+            TutorialSimpleAdapter simple = new TutorialSimpleAdapter(tutorialMenu);
+            if (simple.IsPresent())
+            {
+                Reg<TutorialSlideshowScreen>()?.Forget();
+                Reg<TutorialSimpleScreen>()?.Show(simple);
+            }
         }
 
-        private IEnumerator RefreshArtifactMarketNextFrame()
+        // ---- the story text ----
+
+        public void OnLetterboxStoryTextReady(LetterboxStoryText storyText)
         {
-            yield return null;
-            _artifactMarketRefreshPending = false;
-            RefreshArtifactMarket("artifact market changed");
+            Reg<StoryTextScreen>()?.Show(new LetterboxStoryTextAdapter(storyText));
         }
 
-        private void RefreshArtifactMarket(string reason)
+        public void OnLetterboxStoryTextClosed(LetterboxStoryText storyText)
         {
-            ArtifactMarketScreen screen = _screenManager.CurrentScreen as ArtifactMarketScreen;
+            Reg<StoryTextScreen>()?.Forget();
+        }
+
+        public void OnStoryTextReady(StoryText storyText)
+        {
+            Reg<StoryTextScreen>()?.Show(new StoryTextAdapter(storyText));
+        }
+
+        public void OnStoryTextClosed(StoryText storyText)
+        {
+            Reg<StoryTextScreen>()?.Forget();
+        }
+
+        public void OnDialogueMenuChanged(DialogueMenu dialogueMenu)
+        {
+            Reg<StoryTextScreen>()?.Show(new DialogueMenuAdapter(dialogueMenu));
+        }
+
+        public void OnDialogueMenuClosed(DialogueMenu dialogueMenu)
+        {
+            Reg<StoryTextScreen>()?.Forget();
+        }
+
+        // ---- the main menu and its pages ----
+
+        public void OnMainMenuReady(MainMenu mainMenu)
+        {
+            MainMenuScreen screen = Reg<MainMenuScreen>();
+            // The main menu is a root screen; letting go of everything else avoids reading state
+            // from the game or load that has just ended.
+            ForgetAllExcept(screen);
+            screen?.Show(new MainMenuAdapter(mainMenu));
+        }
+
+        public void OnMainMenuClosed(MainMenu mainMenu)
+        {
+            Reg<MainMenuScreen>()?.Forget();
+        }
+
+        public void OnCampaignMenuReady(CampaignMenu campaignMenu)
+        {
+            Reg<CampaignMenuScreen>()?.Show(new CampaignMenuAdapter(campaignMenu));
+        }
+
+        public void OnCampaignMenuClosed(CampaignMenu campaignMenu)
+        {
+            Reg<CampaignMenuScreen>()?.Forget();
+        }
+
+        public void OnTaleSelectLayoutRebuilt(TaleButtonLayoutCoordinator coordinator)
+        {
+            Reg<TaleSelectScreen>()?.Show(new TaleSelectAdapter(coordinator));
+        }
+
+        public void OnTaleSelectClosed(TaleButtonLayoutCoordinator coordinator)
+        {
+            Reg<TaleSelectScreen>()?.Forget();
+        }
+
+        public void OnCustomCampaignSelectRepopulated(CustomCampaignSelectMenuBehavior behavior)
+        {
+            CustomCampaignSelectAdapter adapter = new CustomCampaignSelectAdapter(behavior);
+            if (adapter.IsPresent())
+            {
+                Reg<CustomCampaignSelectScreen>()?.Show(adapter);
+            }
+        }
+
+        public void OnCustomCampaignSelectClosed(CustomCampaignSelectMenuBehavior behavior)
+        {
+            Reg<CustomCampaignSelectScreen>()?.Forget();
+        }
+
+        public void OnCampaignMapSelectShown(CampaignMapSelectMenu menu, CampaignMapSelectedInformationView informationView)
+        {
+            CampaignMapSelectScreen screen = Reg<CampaignMapSelectScreen>();
             if (screen == null)
             {
                 return;
             }
 
-            if (!screen.IsPresent())
-            {
-                _screenManager.Pop<ArtifactMarketScreen>("artifact market no longer present");
-                return;
-            }
-
-            screen.Refresh();
+            // Taking a difficulty redraws the page. Where the redraw also took the page off the stack,
+            // the cursor is seated afresh and belongs back on the difficulty rather than at the top.
+            screen.FocusDifficulty = CampaignMapSelectScreen.ConsumeFocusDifficultyAfterNextRebuild();
+            screen.Show(new CampaignMapSelectAdapter(menu, informationView));
         }
 
-        public void OnCodexReady(CodexMenu codexMenu)
+        public void OnCampaignMapSelectClosed(CampaignMapSelectedInformationView informationView)
         {
-            CodexMenuAdapter adapter = new CodexMenuAdapter(codexMenu);
-            if (!adapter.IsPresent())
-            {
-                return;
-            }
-
-            CodexScreen screen = new CodexScreen(adapter);
-            Push(screen, "codex ready");
+            Reg<CampaignMapSelectScreen>()?.Forget();
         }
 
-        public void OnCodexClosed(CodexMenu codexMenu)
+        public void OnOnlineGameListReady(GameListMenu menu)
         {
-            if (_screenManager.CurrentScreen is CodexScreen)
+            OnlineGameListAdapter adapter = new OnlineGameListAdapter(menu);
+            if (adapter.IsPresent())
             {
-                _screenManager.Pop<CodexScreen>("codex closed");
+                Reg<OnlineGameListScreen>()?.Show(adapter);
             }
         }
 
-        public void OnCodexTabChanged(CodexMenu codexMenu)
+        public void OnOnlineGameListChanged(GameListMenu menu)
         {
-            CodexMenuAdapter adapter = new CodexMenuAdapter(codexMenu);
-            if (!adapter.IsPresent())
+            OnlineGameListScreen screen = Reg<OnlineGameListScreen>();
+            if (screen != null && screen.Live != null && screen.Matches(menu))
             {
                 return;
             }
 
-            CodexScreen current = _screenManager.CurrentScreen as CodexScreen;
-            if (current != null)
+            OnOnlineGameListReady(menu);
+        }
+
+        public void OnOnlineGameListClosed(GameListMenu menu)
+        {
+            Reg<OnlineGameListScreen>()?.Forget();
+        }
+
+        public void OnOnlineHostGameReady(GameListMenu menu)
+        {
+            OnlineHostGameAdapter adapter = new OnlineHostGameAdapter(menu);
+            if (adapter.IsPresent())
             {
-                current.Refresh();
-                return;
+                Reg<OnlineHostGameScreen>()?.Show(adapter);
             }
         }
 
-        public void OnCodexArticleChanged(CodexMenu codexMenu)
+        public void OnOnlineHostGameClosed(GameListMenu menu)
         {
-            CodexScreen screen = _screenManager.CurrentScreen as CodexScreen;
-            if (screen != null)
+            OnlineHostGameScreen screen = Reg<OnlineHostGameScreen>();
+            if (screen != null && (menu == null || screen.Matches(menu)))
             {
-                screen.Refresh();
+                screen.Forget();
             }
         }
+
+        public void OnPlatformUserMenuReady(PlatformUserMenu menu)
+        {
+            PlatformUserMenuAdapter adapter = new PlatformUserMenuAdapter(menu);
+            if (adapter.IsPresent())
+            {
+                Reg<PlatformUserMenuScreen>()?.Show(adapter);
+            }
+        }
+
+        public void OnPlatformUserMenuClosed(PlatformUserMenu menu)
+        {
+            PlatformUserMenuScreen screen = Reg<PlatformUserMenuScreen>();
+            if (screen != null && (menu == null || screen.Matches(menu)))
+            {
+                screen.Forget();
+            }
+        }
+
+        // ---- the community maps browser ----
 
         public void OnCommunityMapsChanged()
         {
-            CommunityMapsHomeScreen home = _screenManager.Get<CommunityMapsHomeScreen>();
-            CommunityMapsCollectionScreen collection = _screenManager.Get<CommunityMapsCollectionScreen>();
-            CommunityMapsDetailsScreen details = _screenManager.Get<CommunityMapsDetailsScreen>();
-            Screen newHome = CommunityMapsHomeScreen.TryBuildActiveScreen();
-            Screen newCollection = CommunityMapsCollectionScreen.TryBuildActiveScreen();
-            Screen newDetails = CommunityMapsDetailsScreen.TryBuildActiveScreen();
-
-            if (newHome != null)
-            {
-                if (home == null)
-                {
-                    if (_screenManager.CurrentScreen is CommunityMapsModalScreen)
-                    {
-                        PushBelowTop(newHome, "community maps home ready below modal");
-                    }
-                    else
-                    {
-                        Push(newHome, "community maps home ready");
-                    }
-                }
-                else
-                {
-                    home.Refresh();
-                }
-            }
-            else if (home != null)
-            {
-                _screenManager.Remove<CommunityMapsHomeScreen>("community maps home closed");
-            }
-
-            if (newCollection != null)
-            {
-                if (collection == null)
-                {
-                    if (_screenManager.CurrentScreen is CommunityMapsModalScreen)
-                    {
-                        PushBelowTop(newCollection, "community maps collection ready below modal");
-                    }
-                    else
-                    {
-                        Push(newCollection, "community maps collection ready");
-                    }
-                }
-                else
-                {
-                    collection.Refresh();
-                }
-            }
-            else if (collection != null)
-            {
-                _screenManager.Remove<CommunityMapsCollectionScreen>("community maps collection closed");
-            }
-
-            if (newDetails != null)
-            {
-                if (details == null)
-                {
-                    if (_screenManager.CurrentScreen is CommunityMapsModalScreen)
-                    {
-                        PushBelowTop(newDetails, "community maps details ready below modal");
-                    }
-                    else
-                    {
-                        Push(newDetails, "community maps details ready");
-                    }
-                }
-                else
-                {
-                    details.Refresh();
-                }
-            }
-            else if (details != null)
-            {
-                _screenManager.Remove<CommunityMapsDetailsScreen>("community maps details closed");
-            }
+            ShowCommunityMapsHome();
+            ShowCommunityMapsCollection();
+            ShowCommunityMaps<CommunityMapsDetailsScreen, CommunityMapsDetailsAdapter>(
+                CommunityMapsDetailsScreen.FindActive());
         }
 
         public void OnCommunityMapsHomeContentChanged()
@@ -703,10 +960,12 @@ namespace SongsOfConquestAccess.Screens
             SocAccessMod plugin = SocAccessMod.Instance;
             if (plugin == null)
             {
-                RefreshCommunityMapsHome("community maps home content changed");
+                ShowCommunityMapsHome();
                 return;
             }
 
+            // The game fills the home panel's rows across the frame boundary; read a frame later, so
+            // what the slot points at is a panel with its content in it.
             _communityMapsHomeContentRefreshPending = true;
             plugin.StartCoroutine(RefreshCommunityMapsHomeContentNextFrame());
         }
@@ -715,1042 +974,307 @@ namespace SongsOfConquestAccess.Screens
         {
             yield return null;
             _communityMapsHomeContentRefreshPending = false;
-            RefreshCommunityMapsHome("community maps home content changed");
-        }
-
-        private void RefreshCommunityMapsHome(string reason)
-        {
-            CommunityMapsHomeScreen home = _screenManager.Get<CommunityMapsHomeScreen>();
-            Screen newHome = CommunityMapsHomeScreen.TryBuildActiveScreen();
-
-            if (newHome != null)
-            {
-                if (home == null)
-                {
-                    if (_screenManager.CurrentScreen is CommunityMapsModalScreen)
-                    {
-                        PushBelowTop(newHome, reason + " below modal");
-                    }
-                    else
-                    {
-                        Push(newHome, reason);
-                    }
-                }
-                else
-                {
-                    home.Refresh();
-                }
-            }
-            else if (home != null)
-            {
-                _screenManager.Remove<CommunityMapsHomeScreen>("community maps home closed");
-            }
+            ShowCommunityMapsHome();
         }
 
         public void OnCommunityMapsCollectionChanged()
         {
-            CommunityMapsCollectionScreen collection = _screenManager.Get<CommunityMapsCollectionScreen>();
-            if (collection != null && collection.IsPresent() && collection.IsSearchInputFocused())
+            CommunityMapsCollectionScreen collection = Reg<CommunityMapsCollectionScreen>();
+            if (collection != null && collection.IsActive() && collection.IsSearchInputFocused())
             {
-                collection.DeferRefreshUntilSearchInputUnfocused();
+                // The player is typing in the panel's own search box: rewriting the slot under it
+                // would take the field out from under the editor.
                 return;
             }
 
-            Screen newCollection = CommunityMapsCollectionScreen.TryBuildActiveScreen();
-
-            if (newCollection != null)
-            {
-                if (collection == null)
-                {
-                    if (_screenManager.CurrentScreen is CommunityMapsModalScreen)
-                    {
-                        PushBelowTop(newCollection, "community maps collection ready below modal");
-                    }
-                    else
-                    {
-                        Push(newCollection, "community maps collection ready");
-                    }
-                }
-                else
-                {
-                    collection.Refresh();
-                }
-            }
-            else if (collection != null)
-            {
-                _screenManager.Remove<CommunityMapsCollectionScreen>("community maps collection closed");
-            }
+            ShowCommunityMapsCollection();
         }
 
         public void OnCommunityMapsModalChanged()
         {
-            CommunityMapsModalScreen modal = _screenManager.CurrentScreen as CommunityMapsModalScreen;
-            Screen newModal = CommunityMapsModalScreen.TryBuildActiveScreen();
-
-            if (newModal != null)
-            {
-                if (modal == null)
-                {
-                    Push(newModal, "community maps modal ready");
-                }
-                else
-                {
-                    CommunityMapsModalScreen newModalScreen = newModal as CommunityMapsModalScreen;
-                    if (newModalScreen != null && modal.State != newModalScreen.State)
-                    {
-                        _screenManager.RefreshTop<CommunityMapsModalScreen>(newModal, "community maps modal changed");
-                    }
-                    else
-                    {
-                        modal.Refresh();
-                    }
-                }
-            }
-            else if (_screenManager.CurrentScreen is CommunityMapsModalScreen)
-            {
-                _screenManager.Pop<CommunityMapsModalScreen>("community maps modal closed");
-            }
-        }
-
-        public void OnCommunityMapsSearchFilterChanged()
-        {
-            CommunityMapsSearchFilterScreen searchFilter = _screenManager.CurrentScreen as CommunityMapsSearchFilterScreen;
-            Screen newSearchFilter = CommunityMapsSearchFilterScreen.TryBuildActiveScreen();
-
-            if (newSearchFilter != null)
-            {
-                if (searchFilter == null)
-                {
-                    Push(newSearchFilter, "community maps search filter ready");
-                }
-                else
-                {
-                    searchFilter.Refresh();
-                }
-            }
-            else if (_screenManager.CurrentScreen is CommunityMapsSearchFilterScreen)
-            {
-                _screenManager.Pop<CommunityMapsSearchFilterScreen>("community maps search filter closed");
-            }
-            else if (_screenManager.Contains<CommunityMapsSearchFilterScreen>())
-            {
-                _screenManager.Remove<CommunityMapsSearchFilterScreen>("community maps search filter closed below current screen");
-            }
-        }
-
-        public void OnCommunityMapsSearchFilterContentsChanged()
-        {
-            CommunityMapsSearchFilterScreen searchFilter = _screenManager.CurrentScreen as CommunityMapsSearchFilterScreen;
-            if (searchFilter != null && searchFilter.IsPresent())
-            {
-                searchFilter.Refresh();
-            }
-        }
-
-        public void OnCommunityMapsSearchResultsChanged()
-        {
-            CommunityMapsSearchResultsScreen searchResults = _screenManager.Get<CommunityMapsSearchResultsScreen>();
-            CommunityMapsSearchResultsScreen newSearchResults =
-                CommunityMapsSearchResultsScreen.TryBuildActiveScreen() as CommunityMapsSearchResultsScreen;
-
-            if (newSearchResults != null)
-            {
-                if (_screenManager.Contains<CommunityMapsSearchFilterScreen>())
-                {
-                    _screenManager.Remove<CommunityMapsSearchFilterScreen>("community maps search results opened");
-                }
-
-                if (searchResults == null)
-                {
-                    Push(newSearchResults, "community maps search results ready");
-                }
-                else
-                {
-                    searchResults.Refresh(newSearchResults.Adapter);
-                }
-            }
-            else if (searchResults != null)
-            {
-                _screenManager.Remove<CommunityMapsSearchResultsScreen>("community maps search results closed");
-            }
-        }
-
-        public void OnCommunityMapsClosed()
-        {
-            if (_screenManager.CurrentScreen is CommunityMapsSearchFilterScreen)
-            {
-                _screenManager.Pop<CommunityMapsSearchFilterScreen>("community maps browser closed with search filter open");
-            }
-
-            if (_screenManager.CurrentScreen is CommunityMapsSearchResultsScreen)
-            {
-                _screenManager.Pop<CommunityMapsSearchResultsScreen>("community maps browser closed with search results open");
-            }
-
-            if (_screenManager.CurrentScreen is CommunityMapsModalScreen)
-            {
-                _screenManager.Pop<CommunityMapsModalScreen>("community maps browser closed with modal open");
-            }
-
-            if (_screenManager.Contains<CommunityMapsHomeScreen>())
-            {
-                _screenManager.Remove<CommunityMapsHomeScreen>("community maps browser closed");
-            }
-
-            if (_screenManager.Contains<CommunityMapsCollectionScreen>())
-            {
-                _screenManager.Remove<CommunityMapsCollectionScreen>("community maps browser closed");
-            }
-
-            if (_screenManager.Contains<CommunityMapsDetailsScreen>())
-            {
-                _screenManager.Remove<CommunityMapsDetailsScreen>("community maps browser closed");
-            }
-        }
-
-        public void OnConfirmPopupReady(ConfirmPopup popup)
-        {
-            ConfirmPopupAdapter adapter = new ConfirmPopupAdapter(popup);
-            if (!adapter.IsPresent())
-            {
-                return;
-            }
-
-            Push(new MessageDialogScreen(adapter), "confirm popup ready");
-        }
-
-        public void OnConfirmPopupClosed(ConfirmPopup popup)
-        {
-            if (!IsCurrentMessageDialogSource(popup))
-            {
-                return;
-            }
-
-            _screenManager.Pop<MessageDialogScreen>("confirm popup closed");
-        }
-
-        public void OnSystemPopupReady(SystemPopup popup)
-        {
-            SystemPopupAdapter adapter = new SystemPopupAdapter(popup);
-            if (!adapter.IsPresent())
-            {
-                return;
-            }
-
-            Push(new MessageDialogScreen(adapter), "system popup ready");
-        }
-
-        public void OnSystemPopupClosed(SystemPopup popup)
-        {
-            if (!IsCurrentMessageDialogSource(popup))
-            {
-                return;
-            }
-
-            _screenManager.Pop<MessageDialogScreen>("system popup closed");
-        }
-
-        public void OnQuitToDesktopPopupReady(QuitToDesktopPopup popup)
-        {
-            QuitToDesktopPopupAdapter adapter = new QuitToDesktopPopupAdapter(popup);
-            if (!adapter.IsPresent())
-            {
-                return;
-            }
-
-            Push(new QuitToDesktopPopupScreen(adapter), "quit to desktop popup ready");
-        }
-
-        public void OnQuitToDesktopPopupClosed(QuitToDesktopPopup popup)
-        {
-            if (_screenManager.CurrentScreen is QuitToDesktopPopupScreen)
-            {
-                _screenManager.Pop<QuitToDesktopPopupScreen>("quit to desktop popup closed");
-            }
-        }
-
-        public void OnTutorialReady(TutorialMenu tutorialMenu)
-        {
-            Push(BuildTutorialScreen(tutorialMenu), "tutorial ready");
-        }
-
-        public void OnTutorialChanged(TutorialMenu tutorialMenu)
-        {
-            Screen screen = BuildTutorialScreen(tutorialMenu);
-            if (_screenManager.CurrentScreen is TutorialSlideshowScreen)
-            {
-                _screenManager.RefreshTop<TutorialSlideshowScreen>(screen, "tutorial changed");
-                return;
-            }
-
-            if (_screenManager.CurrentScreen is TutorialSimpleScreen)
-            {
-                _screenManager.RefreshTop<TutorialSimpleScreen>(screen, "tutorial changed");
-                return;
-            }
-
-            LogUnexpectedTop("tutorial changed");
-        }
-
-        public void OnTutorialClosed(TutorialMenu tutorialMenu)
-        {
-            if (_screenManager.CurrentScreen is TutorialSlideshowScreen)
-            {
-                _screenManager.Pop<TutorialSlideshowScreen>("tutorial closed");
-                return;
-            }
-
-            if (_screenManager.CurrentScreen is TutorialSimpleScreen)
-            {
-                _screenManager.Pop<TutorialSimpleScreen>("tutorial closed");
-                return;
-            }
-
-            LogUnexpectedTop("tutorial closed");
-        }
-
-        public void OnPopupMenuReady(object sourceKey, PopupMenu.Settings settings)
-        {
-            if (settings == null)
-            {
-                SocAccessMod.Instance?.LogWarning("ScreenDetector.OnPopupMenuReady received null settings");
-                return;
-            }
-
-            object resolvedSourceKey = sourceKey ?? (settings != null ? (object)settings.ContainerTransform : null);
-            MessageDialogScreen screen = new MessageDialogScreen(new PopupMenuAdapter(resolvedSourceKey, settings));
-            if (IsCurrentMessageDialogSource(resolvedSourceKey))
-            {
-                _screenManager.RefreshTop<MessageDialogScreen>(screen, "popup menu refreshed");
-                return;
-            }
-
-            Push(screen, "popup menu ready");
-        }
-
-        public void OnPopupMenuClosed(object sourceKey)
-        {
-            if (sourceKey != null && !IsCurrentMessageDialogSource(sourceKey))
-            {
-                return;
-            }
-
-            _screenManager.Pop<MessageDialogScreen>("popup menu closed");
-        }
-
-        public void OnMapMessagePopupReady(MapMessagePopup popup)
-        {
-            MapMessagePopupAdapter adapter = new MapMessagePopupAdapter(popup);
-            if (!adapter.IsPresent())
-            {
-                return;
-            }
-
-            Push(new MessageDialogScreen(adapter), "map message popup ready");
-        }
-
-        public void OnMapMessagePopupClosed(MapMessagePopup popup)
-        {
-            if (popup != null && !IsCurrentMessageDialogSource(popup))
-            {
-                return;
-            }
-
-            _screenManager.Pop<MessageDialogScreen>("map message popup closed");
-        }
-
-        public void OnRandomEventMenuReady(RandomEventMenu menu)
-        {
-            RandomEventMenuAdapter adapter = new RandomEventMenuAdapter(menu);
-            if (!adapter.IsPresent())
-            {
-                return;
-            }
-
-            Push(new MessageDialogScreen(adapter), "random event menu ready");
-        }
-
-        public void OnRandomEventMenuClosed(RandomEventMenu menu)
-        {
-            if (menu != null && !IsCurrentMessageDialogSource(menu))
-            {
-                return;
-            }
-
-            _screenManager.Pop<MessageDialogScreen>("random event menu closed");
-        }
-
-        public void OnCustomMessageMenuReady(CustomMessageMenu menu)
-        {
-            CustomMessageMenuAdapter adapter = new CustomMessageMenuAdapter(menu);
-            if (!adapter.IsPresent())
-            {
-                return;
-            }
-
-            Push(new MessageDialogScreen(adapter), "custom message menu ready");
-        }
-
-        public void OnCustomMessageMenuClosed(CustomMessageMenu menu)
-        {
-            if (menu != null && !IsCurrentMessageDialogSource(menu))
-            {
-                return;
-            }
-
-            _screenManager.Pop<MessageDialogScreen>("custom message menu closed");
-        }
-
-        public void OnLetterboxStoryTextReady(LetterboxStoryText storyText)
-        {
-            Push(new StoryTextScreen(new LetterboxStoryTextAdapter(storyText)), "letterbox story text ready");
-        }
-
-        public void OnLetterboxStoryTextClosed(LetterboxStoryText storyText)
-        {
-            _screenManager.Pop<StoryTextScreen>("letterbox story text closed");
-        }
-
-        public void OnStoryTextReady(StoryText storyText)
-        {
-            Push(new StoryTextScreen(new StoryTextAdapter(storyText)), "story text ready");
-        }
-
-        public void OnStoryTextClosed(StoryText storyText)
-        {
-            _screenManager.Pop<StoryTextScreen>("story text closed");
-        }
-
-        public void OnDialogueMenuChanged(DialogueMenu dialogueMenu)
-        {
-            StoryTextScreen screen = new StoryTextScreen(new DialogueMenuAdapter(dialogueMenu));
-            if (_screenManager.CurrentScreen is StoryTextScreen)
-            {
-                _screenManager.RefreshTop<StoryTextScreen>(screen, "dialogue menu changed");
-                return;
-            }
-
-            Push(screen, "dialogue menu ready");
-        }
-
-        public void OnDialogueMenuClosed(DialogueMenu dialogueMenu)
-        {
-            _screenManager.Pop<StoryTextScreen>("dialogue menu closed");
-        }
-
-        public void OnMainMenuReady(MainMenu mainMenu)
-        {
-            // The main menu is a root screen; clearing avoids stale screens from a previous game/load state.
-            _screenManager.Clear();
-            Push(new MainMenuScreen(new MainMenuAdapter(mainMenu)), "main menu ready");
-        }
-
-        public void OnMainMenuClosed(MainMenu mainMenu)
-        {
-            _screenManager.Pop<MainMenuScreen>("main menu closed");
-        }
-
-        public void OnCampaignMenuReady(CampaignMenu campaignMenu)
-        {
-            Push(new CampaignMenuScreen(new CampaignMenuAdapter(campaignMenu)), "campaign menu ready");
-        }
-
-        public void OnCampaignMenuClosed(CampaignMenu campaignMenu)
-        {
-            _screenManager.Pop<CampaignMenuScreen>("campaign menu closed");
-        }
-
-        public void OnOnlineGameListReady(GameListMenu menu)
-        {
-            OnlineGameListAdapter adapter = new OnlineGameListAdapter(menu);
-            if (!adapter.IsPresent())
-            {
-                return;
-            }
-
-            OnlineGameListScreen screen = new OnlineGameListScreen(adapter);
-            if (_screenManager.CurrentScreen is OnlineGameListScreen)
-            {
-                _screenManager.RefreshTop<OnlineGameListScreen>(screen, "online game list shown");
-                return;
-            }
-
-            Push(screen, "online game list ready");
-        }
-
-        public void OnOnlineGameListChanged()
-        {
-            OnlineGameListScreen screen = _screenManager.Get<OnlineGameListScreen>();
+            CommunityMapsModalScreen screen = Reg<CommunityMapsModalScreen>();
             if (screen == null)
             {
                 return;
             }
 
-            if (!screen.IsPresent())
+            CommunityMapsModalAdapter adapter = CommunityMapsModalScreen.FindActive();
+            if (adapter == null)
             {
-                _screenManager.Remove<OnlineGameListScreen>("online game list no longer present");
+                screen.Forget();
                 return;
             }
 
-            screen.Refresh(announceFocus: false);
+            screen.Live = adapter;
+            // The modal walks from Authentication to Terms of use to the code box in place, and each
+            // is a different page with a different name: the news is the title.
+            screen.SayNameIfChanged();
         }
 
-        public void OnOnlineGameListChanged(GameListMenu menu)
+        public void OnCommunityMapsSearchFilterChanged()
         {
-            OnlineGameListScreen current = _screenManager.Get<OnlineGameListScreen>();
-            if (current != null && current.Matches(menu))
-            {
-                if (current.IsPresent())
-                {
-                    current.Refresh(announceFocus: false);
-                    return;
-                }
-
-                _screenManager.Remove<OnlineGameListScreen>("online game list no longer present");
-                return;
-            }
-
-            OnOnlineGameListReady(menu);
+            ShowCommunityMaps<CommunityMapsSearchFilterScreen, CommunityMapsSearchFilterAdapter>(
+                CommunityMapsSearchFilterScreen.FindActive());
         }
 
-        public void OnOnlineGameListClosed(GameListMenu menu)
+        public void OnCommunityMapsSearchResultsChanged()
         {
-            if (_screenManager.Contains<OnlineGameListScreen>())
+            CommunityMapsSearchResultsAdapter adapter = CommunityMapsSearchResultsScreen.FindActive();
+            if (adapter != null)
             {
-                _screenManager.Remove<OnlineGameListScreen>("online game list closed");
+                // Searching leaves the filter panel: the results are what the player asked for.
+                Reg<CommunityMapsSearchFilterScreen>()?.Forget();
             }
+
+            ShowCommunityMaps<CommunityMapsSearchResultsScreen, CommunityMapsSearchResultsAdapter>(adapter);
         }
 
-        public void OnOnlineHostGameReady(GameListMenu menu)
+        public void OnCommunityMapsClosed()
         {
-            OnlineHostGameAdapter adapter = new OnlineHostGameAdapter(menu);
-            if (!adapter.IsPresent())
-            {
-                return;
-            }
-
-            OnlineHostGameScreen screen = new OnlineHostGameScreen(adapter);
-            if (_screenManager.CurrentScreen is OnlineHostGameScreen)
-            {
-                _screenManager.RefreshTop<OnlineHostGameScreen>(screen, "online host game shown");
-                return;
-            }
-
-            Push(screen, "online host game ready");
+            Reg<CommunityMapsSearchFilterScreen>()?.Forget();
+            Reg<CommunityMapsSearchResultsScreen>()?.Forget();
+            Reg<CommunityMapsModalScreen>()?.Forget();
+            Reg<CommunityMapsHomeScreen>()?.Forget();
+            Reg<CommunityMapsCollectionScreen>()?.Forget();
+            Reg<CommunityMapsDetailsScreen>()?.Forget();
         }
 
-        public void OnOnlineHostGameClosed(GameListMenu menu)
+        private void ShowCommunityMapsHome()
         {
-            OnlineHostGameScreen current = _screenManager.CurrentScreen as OnlineHostGameScreen;
-            if (current != null && (menu == null || current.Matches(menu)))
-            {
-                _screenManager.Pop<OnlineHostGameScreen>("online host game closed");
-                return;
-            }
-
-            if (_screenManager.Contains<OnlineHostGameScreen>())
-            {
-                _screenManager.Remove<OnlineHostGameScreen>("online host game closed");
-            }
+            ShowCommunityMaps<CommunityMapsHomeScreen, CommunityMapsHomeAdapter>(
+                CommunityMapsHomeScreen.FindActive());
         }
 
-        public void OnTaleSelectLayoutRebuilt(TaleButtonLayoutCoordinator coordinator)
+        private void ShowCommunityMapsCollection()
         {
-            TaleSelectScreen screen = new TaleSelectScreen(new TaleSelectAdapter(coordinator));
-            if (_screenManager.CurrentScreen is TaleSelectScreen)
-            {
-                _screenManager.RefreshTop<TaleSelectScreen>(screen, "tale select layout rebuilt");
-                return;
-            }
-
-            Push(screen, "tale select ready");
+            ShowCommunityMaps<CommunityMapsCollectionScreen, CommunityMapsCollectionAdapter>(
+                CommunityMapsCollectionScreen.FindActive());
         }
 
-        public void OnTaleSelectClosed(TaleButtonLayoutCoordinator coordinator)
+        /// <summary>The browser tells the mod that SOMETHING changed and nothing more, so each of its
+        /// panels is re-read: the panel is either there, and the slot points at it, or it is not.
+        /// </summary>
+        private void ShowCommunityMaps<TScreen, TAdapter>(TAdapter adapter)
+            where TScreen : LiveScreen<TAdapter>
+            where TAdapter : class
         {
-            _screenManager.Pop<TaleSelectScreen>("tale select closed");
-        }
-
-        public void OnCustomCampaignSelectRepopulated(CustomCampaignSelectMenuBehavior behavior)
-        {
-            CustomCampaignSelectAdapter adapter = new CustomCampaignSelectAdapter(behavior);
-            if (!adapter.IsPresent())
+            TScreen screen = Reg<TScreen>();
+            if (screen == null)
             {
                 return;
             }
 
-            CustomCampaignSelectScreen screen = new CustomCampaignSelectScreen(adapter);
-            if (_screenManager.CurrentScreen is CustomCampaignSelectScreen)
+            if (adapter != null)
             {
-                _screenManager.RefreshTop<CustomCampaignSelectScreen>(screen, "custom campaign select repopulated");
-                return;
+                screen.Live = adapter;
             }
-
-            Push(screen, "custom campaign select ready");
-        }
-
-        public void OnCustomCampaignSelectClosed(CustomCampaignSelectMenuBehavior behavior)
-        {
-            if (_screenManager.CurrentScreen is CustomCampaignSelectScreen)
+            else
             {
-                _screenManager.Pop<CustomCampaignSelectScreen>("custom campaign select closed");
-                return;
-            }
-
-            if (_screenManager.Contains<CustomCampaignSelectScreen>())
-            {
-                _screenManager.Remove<CustomCampaignSelectScreen>("custom campaign select closed");
+                screen.Forget();
             }
         }
 
-        public void OnCustomCampaignEntryStatusChanged(CustomCampaignEntry entry)
-        {
-            CustomCampaignSelectScreen screen = _screenManager.CurrentScreen as CustomCampaignSelectScreen;
-            screen?.AnnounceStatusChanged(entry);
-        }
-
-        public void OnCampaignMapSelectShown(CampaignMapSelectMenu menu, CampaignMapSelectedInformationView informationView)
-        {
-            CampaignMapSelectScreen screen = new CampaignMapSelectScreen(
-                new CampaignMapSelectAdapter(menu, informationView),
-                CampaignMapSelectScreen.ConsumeFocusDifficultyAfterNextRebuild());
-
-            if (_screenManager.CurrentScreen is CampaignMapSelectScreen)
-            {
-                _screenManager.RefreshTop<CampaignMapSelectScreen>(screen, "campaign map select shown");
-                return;
-            }
-
-            Push(screen, "campaign map select ready");
-        }
-
-        public void OnCampaignMapSelectClosed(CampaignMapSelectedInformationView informationView)
-        {
-            _screenManager.Pop<CampaignMapSelectScreen>("campaign map select closed");
-        }
+        // ---- the adventure lobby ----
 
         public void OnAdventureLobbyMapTypeReady(MapTypeMenu menu)
         {
             AdventureLobbyMapTypeAdapter adapter = new AdventureLobbyMapTypeAdapter(menu);
-            if (!adapter.IsPresent())
+            if (adapter.IsPresent())
             {
-                return;
+                Reg<AdventureLobbyMapTypeScreen>()?.Show(adapter);
             }
-
-            AdventureLobbyMapTypeScreen screen = new AdventureLobbyMapTypeScreen(adapter);
-            if (_screenManager.CurrentScreen is AdventureLobbyMapTypeScreen)
-            {
-                _screenManager.RefreshTop<AdventureLobbyMapTypeScreen>(screen, "adventure lobby map type shown");
-                return;
-            }
-
-            Push(screen, "adventure lobby map type ready");
         }
 
         public void OnAdventureLobbyMapTypeClosed(MapTypeMenu menu)
         {
-            if (_screenManager.CurrentScreen is AdventureLobbyMapTypeScreen)
-            {
-                _screenManager.Pop<AdventureLobbyMapTypeScreen>("adventure lobby map type closed");
-            }
+            Reg<AdventureLobbyMapTypeScreen>()?.Forget();
         }
 
         public void OnAdventureLobbyRandomLayoutReady(LobbyRandomMapSelectionMenu menu)
         {
             AdventureLobbyRandomLayoutAdapter adapter = new AdventureLobbyRandomLayoutAdapter(menu);
-            if (!adapter.IsPresent())
+            if (adapter.IsPresent())
             {
-                return;
+                Reg<AdventureLobbyRandomLayoutScreen>()?.Show(adapter);
             }
-
-            AdventureLobbyRandomLayoutScreen screen = new AdventureLobbyRandomLayoutScreen(adapter);
-            AdventureLobbyRandomLayoutScreen current = _screenManager.CurrentScreen as AdventureLobbyRandomLayoutScreen;
-            if (current != null && current.Matches(menu))
-            {
-                _screenManager.RefreshTop<AdventureLobbyRandomLayoutScreen>(screen, "adventure lobby random layout shown");
-                return;
-            }
-
-            Push(screen, "adventure lobby random layout ready");
         }
 
         public void OnAdventureLobbyRandomLayoutSelectionChanged(LobbyRandomMapSelectionMenu menu)
         {
-            AdventureLobbyRandomLayoutScreen current = _screenManager.CurrentScreen as AdventureLobbyRandomLayoutScreen;
-            if (current != null && current.Matches(menu))
-            {
-                if (current.IsPresent())
-                {
-                    current.Refresh(announceFocus: false);
-                    return;
-                }
-
-                _screenManager.Pop<AdventureLobbyRandomLayoutScreen>("adventure lobby random layout no longer present");
-                return;
-            }
-
-            AdventureLobbyRandomLayoutAdapter adapter = new AdventureLobbyRandomLayoutAdapter(menu);
-            if (adapter.IsPresent() && _screenManager.CurrentScreen is AdventureLobbyMapTypeScreen)
-            {
-                Push(new AdventureLobbyRandomLayoutScreen(adapter), "adventure lobby random layout selection changed ready");
-            }
-        }
-
-        public void OnAdventureLobbyRandomLayoutEntryChanged(LobbyRandomMapPreviewEntry entry)
-        {
-            AdventureLobbyRandomLayoutScreen current = _screenManager.CurrentScreen as AdventureLobbyRandomLayoutScreen;
-            if (current == null)
+            AdventureLobbyRandomLayoutScreen screen = Reg<AdventureLobbyRandomLayoutScreen>();
+            if (screen != null && screen.Live != null && screen.Matches(menu))
             {
                 return;
             }
 
-            if (!current.IsPresent())
-            {
-                _screenManager.Pop<AdventureLobbyRandomLayoutScreen>("adventure lobby random layout no longer present");
-                return;
-            }
-
-            current.Refresh(announceFocus: false);
+            OnAdventureLobbyRandomLayoutReady(menu);
         }
 
         public void OnAdventureLobbyRandomLayoutClosed(LobbyRandomMapSelectionMenu menu)
         {
-            AdventureLobbyRandomLayoutScreen current = _screenManager.CurrentScreen as AdventureLobbyRandomLayoutScreen;
-            if (current != null && (menu == null || current.Matches(menu)))
+            AdventureLobbyRandomLayoutScreen screen = Reg<AdventureLobbyRandomLayoutScreen>();
+            if (screen != null && (menu == null || screen.Matches(menu)))
             {
-                _screenManager.Pop<AdventureLobbyRandomLayoutScreen>("adventure lobby random layout closed");
-                return;
-            }
-
-            if (_screenManager.Contains<AdventureLobbyRandomLayoutScreen>())
-            {
-                _screenManager.Remove<AdventureLobbyRandomLayoutScreen>("adventure lobby random layout closed");
+                screen.Forget();
             }
         }
 
         public void OnAdventureLobbyMapSelectReady(MapSelectMenu menu)
         {
             AdventureLobbyMapSelectAdapter adapter = new AdventureLobbyMapSelectAdapter(menu);
-            if (!adapter.IsPresent())
+            if (adapter.IsPresent())
             {
-                return;
+                Reg<AdventureLobbyMapSelectScreen>()?.Show(adapter);
             }
-
-            AdventureLobbyMapSelectScreen screen = new AdventureLobbyMapSelectScreen(adapter);
-            if (_screenManager.CurrentScreen is AdventureLobbyMapSelectScreen)
-            {
-                _screenManager.RefreshTop<AdventureLobbyMapSelectScreen>(screen, "adventure lobby map select shown");
-                return;
-            }
-
-            Push(screen, "adventure lobby map select ready");
         }
 
         public void OnAdventureLobbyMapSelectChanged(MapSelectMenu menu)
         {
-            AdventureLobbyMapSelectScreen current = _screenManager.CurrentScreen as AdventureLobbyMapSelectScreen;
-            if (current != null && current.Matches(menu))
+            AdventureLobbyMapSelectScreen screen = Reg<AdventureLobbyMapSelectScreen>();
+            if (screen != null && screen.Live != null && screen.Matches(menu))
             {
-                if (current.IsPresent())
-                {
-                    current.Refresh();
-                    return;
-                }
-
-                _screenManager.Pop<AdventureLobbyMapSelectScreen>("adventure lobby map select no longer present");
                 return;
             }
 
-            AdventureLobbyMapSelectAdapter adapter = new AdventureLobbyMapSelectAdapter(menu);
-            if (adapter.IsPresent() && _screenManager.CurrentScreen is AdventureLobbyMapTypeScreen)
-            {
-                Push(new AdventureLobbyMapSelectScreen(adapter), "adventure lobby map select changed ready");
-            }
+            OnAdventureLobbyMapSelectReady(menu);
         }
 
         public void OnAdventureLobbyMapSelectSelectionChanged(MapSelectMenu menu)
         {
-            AdventureLobbyMapSelectScreen current = _screenManager.CurrentScreen as AdventureLobbyMapSelectScreen;
-            if (current != null && current.Matches(menu))
-            {
-                if (current.IsPresent())
-                {
-                    current.Refresh(announceFocus: false);
-                    return;
-                }
-
-                _screenManager.Pop<AdventureLobbyMapSelectScreen>("adventure lobby map select no longer present");
-                return;
-            }
-
-            AdventureLobbyMapSelectAdapter adapter = new AdventureLobbyMapSelectAdapter(menu);
-            if (adapter.IsPresent() && _screenManager.CurrentScreen is AdventureLobbyMapTypeScreen)
-            {
-                Push(new AdventureLobbyMapSelectScreen(adapter), "adventure lobby map select selection changed ready");
-            }
+            OnAdventureLobbyMapSelectChanged(menu);
         }
 
         public void OnAdventureLobbyMapSelectClosed(MapSelectMenu menu)
         {
-            if (_screenManager.Contains<AdventureLobbyMapSelectScreen>())
-            {
-                _screenManager.Remove<AdventureLobbyMapSelectScreen>("adventure lobby map select closed");
-            }
+            Reg<AdventureLobbyMapSelectScreen>()?.Forget();
         }
 
         public void OnAdventureLobbyChallengeMapSelectReady(ChallengeMapsMenu menu)
         {
             AdventureLobbyChallengeMapSelectAdapter adapter = new AdventureLobbyChallengeMapSelectAdapter(menu);
-            if (!adapter.IsPresent())
+            if (adapter.IsPresent())
             {
-                return;
+                Reg<AdventureLobbyChallengeMapSelectScreen>()?.Show(adapter);
             }
-
-            AdventureLobbyChallengeMapSelectScreen screen = new AdventureLobbyChallengeMapSelectScreen(adapter);
-            if (_screenManager.CurrentScreen is AdventureLobbyChallengeMapSelectScreen)
-            {
-                _screenManager.RefreshTop<AdventureLobbyChallengeMapSelectScreen>(screen, "adventure lobby challenge map select shown");
-                return;
-            }
-
-            Push(screen, "adventure lobby challenge map select ready");
         }
 
         public void OnAdventureLobbyChallengeMapSelectSelectionChanged(ChallengeMapsMenu menu)
         {
-            AdventureLobbyChallengeMapSelectScreen current = _screenManager.CurrentScreen as AdventureLobbyChallengeMapSelectScreen;
-            if (current != null && current.Matches(menu))
+            AdventureLobbyChallengeMapSelectScreen screen = Reg<AdventureLobbyChallengeMapSelectScreen>();
+            if (screen != null && screen.Live != null && screen.Matches(menu))
             {
-                if (current.IsPresent())
-                {
-                    current.Refresh(announceFocus: false);
-                    return;
-                }
-
-                _screenManager.Pop<AdventureLobbyChallengeMapSelectScreen>("adventure lobby challenge map select no longer present");
                 return;
             }
 
-            AdventureLobbyChallengeMapSelectAdapter adapter = new AdventureLobbyChallengeMapSelectAdapter(menu);
-            if (adapter.IsPresent() && _screenManager.CurrentScreen is AdventureLobbyMapTypeScreen)
-            {
-                Push(new AdventureLobbyChallengeMapSelectScreen(adapter), "adventure lobby challenge map select selection changed ready");
-            }
+            OnAdventureLobbyChallengeMapSelectReady(menu);
         }
 
         public void OnAdventureLobbyChallengeMapSelectClosed(ChallengeMapsMenu menu)
         {
-            if (_screenManager.Contains<AdventureLobbyChallengeMapSelectScreen>())
-            {
-                _screenManager.Remove<AdventureLobbyChallengeMapSelectScreen>("adventure lobby challenge map select closed");
-            }
+            Reg<AdventureLobbyChallengeMapSelectScreen>()?.Forget();
         }
 
         public void OnAdventureLobbyPlayersReady(LobbyMenu menu)
         {
             AdventureLobbyPlayersAdapter adapter = new AdventureLobbyPlayersAdapter(menu);
-            if (!adapter.IsPresent())
+            if (adapter.IsPresent())
             {
-                return;
+                Reg<AdventureLobbyPlayersScreen>()?.Show(adapter);
             }
-
-            AdventureLobbyPlayersScreen screen = new AdventureLobbyPlayersScreen(adapter);
-            if (_screenManager.CurrentScreen is AdventureLobbyPlayersScreen)
-            {
-                _screenManager.RefreshTop<AdventureLobbyPlayersScreen>(screen, "adventure lobby players shown");
-                return;
-            }
-
-            Push(screen, "adventure lobby players ready");
         }
 
         public void OnAdventureLobbyPlayersChanged()
         {
-            AdventureLobbyPlayersScreen screen = _screenManager.Get<AdventureLobbyPlayersScreen>();
-            if (screen == null)
+            AdventureLobbyPlayersScreen screen = Reg<AdventureLobbyPlayersScreen>();
+            if (screen == null || screen.Live == null)
             {
                 return;
             }
 
-            if (!screen.IsPresent())
-            {
-                _screenManager.Remove<AdventureLobbyPlayersScreen>("adventure lobby players no longer present");
-                return;
-            }
-
+            // The rows are read from a snapshot the adapter keeps: what changed is inside the lobby,
+            // not the lobby itself, so the snapshot is what has to go.
             screen.Refresh();
             CompleteDeferredAdventureLobbyDropdownClose();
+        }
+
+        public void OnAdventureLobbyPlayersClosed(LobbyMenu menu)
+        {
+            Reg<AdventureLobbyInviteProvidersScreen>()?.Forget();
+            Reg<AdventureLobbyGameSettingsScreen>()?.Forget();
+            Reg<AdventureLobbyPlayerSettingsScreen>()?.Forget();
+            Reg<AdventureLobbyIconDropdownScreen>()?.Forget();
+            ClearDeferredAdventureLobbyDropdownClose();
+            Reg<AdventureLobbyPlayersScreen>()?.Forget();
         }
 
         public void OnAdventureLobbyInviteProvidersReady(LobbyMultiplayerPanel panel)
         {
             AdventureLobbyInviteProvidersAdapter adapter = new AdventureLobbyInviteProvidersAdapter(panel);
-            if (!adapter.IsPresent())
+            if (adapter.IsPresent())
             {
-                return;
+                Reg<AdventureLobbyInviteProvidersScreen>()?.Show(adapter);
             }
-
-            AdventureLobbyInviteProvidersScreen screen = new AdventureLobbyInviteProvidersScreen(adapter);
-            AdventureLobbyInviteProvidersScreen current = _screenManager.CurrentScreen as AdventureLobbyInviteProvidersScreen;
-            if (current != null && current.Matches(panel))
-            {
-                _screenManager.RefreshTop<AdventureLobbyInviteProvidersScreen>(screen, "adventure lobby invite providers shown");
-                return;
-            }
-
-            Push(screen, "adventure lobby invite providers ready");
         }
 
         public void OnAdventureLobbyInviteProvidersClosed(LobbyMultiplayerPanel panel)
         {
-            AdventureLobbyInviteProvidersScreen current = _screenManager.CurrentScreen as AdventureLobbyInviteProvidersScreen;
-            if (current != null && (panel == null || current.Matches(panel)))
+            AdventureLobbyInviteProvidersScreen screen = Reg<AdventureLobbyInviteProvidersScreen>();
+            if (screen != null && (panel == null || screen.Matches(panel)))
             {
-                _screenManager.Pop<AdventureLobbyInviteProvidersScreen>("adventure lobby invite providers closed");
-                return;
-            }
-
-            if (_screenManager.Contains<AdventureLobbyInviteProvidersScreen>())
-            {
-                _screenManager.Remove<AdventureLobbyInviteProvidersScreen>("adventure lobby invite providers closed");
-            }
-        }
-
-        public void OnAdventureLobbyPlayersClosed(LobbyMenu menu)
-        {
-            if (_screenManager.Contains<AdventureLobbyInviteProvidersScreen>())
-            {
-                _screenManager.Remove<AdventureLobbyInviteProvidersScreen>("adventure lobby players closed");
-            }
-
-            if (_screenManager.Contains<AdventureLobbyGameSettingsScreen>())
-            {
-                _screenManager.Remove<AdventureLobbyGameSettingsScreen>("adventure lobby players closed");
-            }
-
-            if (_screenManager.Contains<AdventureLobbyPlayerSettingsScreen>())
-            {
-                _screenManager.Remove<AdventureLobbyPlayerSettingsScreen>("adventure lobby players closed");
-            }
-
-            if (_screenManager.Contains<AdventureLobbyIconDropdownScreen>())
-            {
-                _screenManager.Remove<AdventureLobbyIconDropdownScreen>("adventure lobby players closed");
-            }
-
-            ClearDeferredAdventureLobbyDropdownClose();
-
-            if (_screenManager.Contains<AdventureLobbyPlayersScreen>())
-            {
-                _screenManager.Remove<AdventureLobbyPlayersScreen>("adventure lobby players closed");
+                screen.Forget();
             }
         }
 
         public void OnAdventureLobbyGameSettingsReady(LobbyMapSettingsMenu menu)
         {
             AdventureLobbyGameSettingsAdapter adapter = new AdventureLobbyGameSettingsAdapter(menu);
-            if (!adapter.IsPresent())
+            if (adapter.IsPresent())
             {
-                return;
+                Reg<AdventureLobbyGameSettingsScreen>()?.Show(adapter);
             }
-
-            AdventureLobbyGameSettingsScreen screen = new AdventureLobbyGameSettingsScreen(adapter);
-            AdventureLobbyGameSettingsScreen current = _screenManager.CurrentScreen as AdventureLobbyGameSettingsScreen;
-            if (current != null && current.Matches(menu))
-            {
-                _screenManager.RefreshTop<AdventureLobbyGameSettingsScreen>(screen, "adventure lobby game settings shown");
-                return;
-            }
-
-            Push(screen, "adventure lobby game settings ready");
-        }
-
-        public void OnAdventureLobbyGameSettingsChanged(LobbyMapSettingsMenu menu)
-        {
-            AdventureLobbyGameSettingsScreen current = _screenManager.CurrentScreen as AdventureLobbyGameSettingsScreen;
-            if (current == null || !current.Matches(menu))
-            {
-                return;
-            }
-
-            if (!current.IsPresent())
-            {
-                _screenManager.Pop<AdventureLobbyGameSettingsScreen>("adventure lobby game settings no longer present");
-                return;
-            }
-
-            current.Refresh();
         }
 
         public void OnAdventureLobbyGameSettingsClosed(LobbyMapSettingsMenu menu)
         {
-            AdventureLobbyGameSettingsScreen current = _screenManager.CurrentScreen as AdventureLobbyGameSettingsScreen;
-            if (current != null && (menu == null || current.Matches(menu)))
+            AdventureLobbyGameSettingsScreen screen = Reg<AdventureLobbyGameSettingsScreen>();
+            if (screen != null && (menu == null || screen.Matches(menu)))
             {
-                _screenManager.Pop<AdventureLobbyGameSettingsScreen>("adventure lobby game settings closed");
-                return;
-            }
-
-            if (_screenManager.Contains<AdventureLobbyGameSettingsScreen>())
-            {
-                _screenManager.Remove<AdventureLobbyGameSettingsScreen>("adventure lobby game settings closed");
+                screen.Forget();
             }
         }
 
         public void OnAdventureLobbyPlayerSettingsReady(LobbyPlayerSettingsMenu menu)
         {
             AdventureLobbyPlayerSettingsAdapter adapter = new AdventureLobbyPlayerSettingsAdapter(menu);
-            if (!adapter.IsPresent())
+            if (adapter.IsPresent())
             {
-                return;
+                Reg<AdventureLobbyPlayerSettingsScreen>()?.Show(adapter);
             }
-
-            AdventureLobbyPlayerSettingsScreen screen = new AdventureLobbyPlayerSettingsScreen(adapter);
-            AdventureLobbyPlayerSettingsScreen current = _screenManager.CurrentScreen as AdventureLobbyPlayerSettingsScreen;
-            if (current != null && current.Matches(menu))
-            {
-                _screenManager.RefreshTop<AdventureLobbyPlayerSettingsScreen>(screen, "adventure lobby player settings shown");
-                return;
-            }
-
-            Push(screen, "adventure lobby player settings ready");
         }
 
         public void OnAdventureLobbyPlayerSettingsClosed(LobbyPlayerSettingsMenu menu)
         {
-            AdventureLobbyPlayerSettingsScreen current = _screenManager.CurrentScreen as AdventureLobbyPlayerSettingsScreen;
-            if (current != null && (menu == null || current.Matches(menu)))
+            AdventureLobbyPlayerSettingsScreen screen = Reg<AdventureLobbyPlayerSettingsScreen>();
+            if (screen != null && (menu == null || screen.Matches(menu)))
             {
-                _screenManager.Pop<AdventureLobbyPlayerSettingsScreen>("adventure lobby player settings closed");
-                return;
-            }
-
-            if (_screenManager.Contains<AdventureLobbyPlayerSettingsScreen>())
-            {
-                _screenManager.Remove<AdventureLobbyPlayerSettingsScreen>("adventure lobby player settings closed");
+                screen.Forget();
             }
         }
 
         public void OnAdventureLobbyIconDropdownReady(IconDropdown dropdown)
         {
             AdventureLobbyIconDropdownAdapter adapter = new AdventureLobbyIconDropdownAdapter(dropdown);
-            if (!adapter.IsPresent())
+            if (adapter.IsPresent())
             {
-                return;
+                Reg<AdventureLobbyIconDropdownScreen>()?.Show(adapter);
             }
-
-            AdventureLobbyIconDropdownScreen screen = new AdventureLobbyIconDropdownScreen(adapter);
-            if (_screenManager.CurrentScreen is AdventureLobbyIconDropdownScreen)
-            {
-                _screenManager.RefreshTop<AdventureLobbyIconDropdownScreen>(screen, "adventure lobby icon dropdown shown");
-                return;
-            }
-
-            Push(screen, "adventure lobby icon dropdown ready");
         }
 
         public void OnAdventureLobbyIconDropdownClosed(IconDropdown dropdown)
         {
+            // Taking an option other than a colour hides the dropdown BEFORE the lobby has redrawn the
+            // row it changed. Closing then would put the player back on a row that is about to be
+            // replaced, so the close waits for the lobby's own change - or, failing that, a second.
             if (_deferredAdventureLobbyDropdownClose != null
                 && (dropdown == null || ReferenceEquals(_deferredAdventureLobbyDropdownClose, dropdown)))
             {
@@ -1759,10 +1283,10 @@ namespace SongsOfConquestAccess.Screens
                 return;
             }
 
-            AdventureLobbyIconDropdownScreen current = _screenManager.CurrentScreen as AdventureLobbyIconDropdownScreen;
-            if (current != null && (dropdown == null || current.Matches(dropdown)))
+            AdventureLobbyIconDropdownScreen screen = Reg<AdventureLobbyIconDropdownScreen>();
+            if (screen != null && (dropdown == null || screen.Matches(dropdown)))
             {
-                _screenManager.Pop<AdventureLobbyIconDropdownScreen>("adventure lobby icon dropdown closed");
+                screen.Forget();
             }
         }
 
@@ -1791,20 +1315,15 @@ namespace SongsOfConquestAccess.Screens
 
         private void CompleteDeferredAdventureLobbyDropdownClose()
         {
-            CompleteDeferredAdventureLobbyDropdownClose("adventure lobby icon dropdown changed");
-        }
-
-        private void CompleteDeferredAdventureLobbyDropdownClose(string reason)
-        {
             if (_deferredAdventureLobbyDropdownClose == null)
             {
                 return;
             }
 
-            AdventureLobbyIconDropdownScreen current = _screenManager.CurrentScreen as AdventureLobbyIconDropdownScreen;
-            if (current != null && current.Matches(_deferredAdventureLobbyDropdownClose))
+            AdventureLobbyIconDropdownScreen screen = Reg<AdventureLobbyIconDropdownScreen>();
+            if (screen != null && screen.Matches(_deferredAdventureLobbyDropdownClose))
             {
-                _screenManager.Pop<AdventureLobbyIconDropdownScreen>(reason);
+                screen.Forget();
             }
 
             ClearDeferredAdventureLobbyDropdownClose();
@@ -1817,120 +1336,49 @@ namespace SongsOfConquestAccess.Screens
             _deferredAdventureLobbyDropdownDeadline = 0f;
         }
 
-        public void OnPlatformUserMenuReady(PlatformUserMenu menu)
-        {
-            PlatformUserMenuAdapter adapter = new PlatformUserMenuAdapter(menu);
-            if (!adapter.IsPresent())
-            {
-                return;
-            }
-
-            PlatformUserMenuScreen screen = new PlatformUserMenuScreen(adapter);
-            if (_screenManager.CurrentScreen is PlatformUserMenuScreen)
-            {
-                _screenManager.RefreshTop<PlatformUserMenuScreen>(screen, "platform user menu shown");
-                return;
-            }
-
-            Push(screen, "platform user menu ready");
-        }
-
-        public void OnPlatformUserMenuClosed(PlatformUserMenu menu)
-        {
-            PlatformUserMenuScreen current = _screenManager.CurrentScreen as PlatformUserMenuScreen;
-            if (current != null && (menu == null || current.Matches(menu)))
-            {
-                _screenManager.Pop<PlatformUserMenuScreen>("platform user menu closed");
-                return;
-            }
-
-            if (_screenManager.Contains<PlatformUserMenuScreen>())
-            {
-                _screenManager.Remove<PlatformUserMenuScreen>("platform user menu closed");
-            }
-        }
-
         public void OnMainMenuSceneLoaded(MainMenuSceneType loadedScene)
         {
-            CustomCampaignSelectScreen customCampaignSelect = _screenManager.Get<CustomCampaignSelectScreen>();
             if (loadedScene == MainMenuSceneType.MainMenu)
             {
                 SocAccessMod.Instance?.ReviewBuffers?.Clear(ReviewBufferKind.AdventureMapNotifications);
                 SocAccessMod.Instance?.AdventureMapScannerState?.Clear();
             }
 
-            if (loadedScene != MainMenuSceneType.Campaign && _screenManager.CurrentScreen is CampaignMenuScreen)
+            if (loadedScene != MainMenuSceneType.Campaign)
             {
-                _screenManager.Pop<CampaignMenuScreen>("main menu scene changed away from campaign");
+                Reg<CampaignMenuScreen>()?.Forget();
             }
 
+            CustomCampaignSelectScreen customCampaignSelect = Reg<CustomCampaignSelectScreen>();
             if (loadedScene != MainMenuSceneType.CustomCampaign
                 && customCampaignSelect != null
-                && !customCampaignSelect.IsPresent())
+                && !customCampaignSelect.IsActive())
             {
-                _screenManager.Remove<CustomCampaignSelectScreen>("main menu scene changed away from custom campaign");
+                customCampaignSelect.Forget();
             }
 
-            if (loadedScene != MainMenuSceneType.OnlineGameList && _screenManager.Contains<OnlineHostGameScreen>())
+            if (loadedScene != MainMenuSceneType.OnlineGameList)
             {
-                _screenManager.Remove<OnlineHostGameScreen>("main menu scene changed away from online game list");
+                Reg<OnlineHostGameScreen>()?.Forget();
+                Reg<OnlineGameListScreen>()?.Forget();
             }
 
-            if (loadedScene != MainMenuSceneType.OnlineGameList && _screenManager.Contains<OnlineGameListScreen>())
+            if (loadedScene != MainMenuSceneType.AdventureLobby)
             {
-                _screenManager.Remove<OnlineGameListScreen>("main menu scene changed away from online game list");
-            }
-
-            if (loadedScene != MainMenuSceneType.AdventureLobby && _screenManager.Contains<AdventureLobbyMapTypeScreen>())
-            {
-                _screenManager.Remove<AdventureLobbyMapTypeScreen>("main menu scene changed away from adventure lobby");
-            }
-
-            if (loadedScene != MainMenuSceneType.AdventureLobby && _screenManager.Contains<AdventureLobbyRandomLayoutScreen>())
-            {
-                _screenManager.Remove<AdventureLobbyRandomLayoutScreen>("main menu scene changed away from adventure lobby");
-            }
-
-            if (loadedScene != MainMenuSceneType.AdventureLobby && _screenManager.Contains<AdventureLobbyMapSelectScreen>())
-            {
-                _screenManager.Remove<AdventureLobbyMapSelectScreen>("main menu scene changed away from adventure lobby");
-            }
-
-            if (loadedScene != MainMenuSceneType.AdventureLobby && _screenManager.Contains<AdventureLobbyChallengeMapSelectScreen>())
-            {
-                _screenManager.Remove<AdventureLobbyChallengeMapSelectScreen>("main menu scene changed away from adventure lobby");
-            }
-
-            if (loadedScene != MainMenuSceneType.AdventureLobby && _screenManager.Contains<AdventureLobbyIconDropdownScreen>())
-            {
-                _screenManager.Remove<AdventureLobbyIconDropdownScreen>("main menu scene changed away from adventure lobby");
-            }
-
-            if (loadedScene != MainMenuSceneType.AdventureLobby && _screenManager.Contains<AdventureLobbyInviteProvidersScreen>())
-            {
-                _screenManager.Remove<AdventureLobbyInviteProvidersScreen>("main menu scene changed away from adventure lobby");
-            }
-
-            if (loadedScene != MainMenuSceneType.AdventureLobby && _screenManager.Contains<AdventureLobbyGameSettingsScreen>())
-            {
-                _screenManager.Remove<AdventureLobbyGameSettingsScreen>("main menu scene changed away from adventure lobby");
-            }
-
-            if (loadedScene != MainMenuSceneType.AdventureLobby && _screenManager.Contains<AdventureLobbyPlayerSettingsScreen>())
-            {
-                _screenManager.Remove<AdventureLobbyPlayerSettingsScreen>("main menu scene changed away from adventure lobby");
-            }
-
-            if (loadedScene != MainMenuSceneType.AdventureLobby && _screenManager.Contains<PlatformUserMenuScreen>())
-            {
-                _screenManager.Remove<PlatformUserMenuScreen>("main menu scene changed away from adventure lobby");
-            }
-
-            if (loadedScene != MainMenuSceneType.AdventureLobby && _screenManager.Contains<AdventureLobbyPlayersScreen>())
-            {
-                _screenManager.Remove<AdventureLobbyPlayersScreen>("main menu scene changed away from adventure lobby");
+                Reg<AdventureLobbyMapTypeScreen>()?.Forget();
+                Reg<AdventureLobbyRandomLayoutScreen>()?.Forget();
+                Reg<AdventureLobbyMapSelectScreen>()?.Forget();
+                Reg<AdventureLobbyChallengeMapSelectScreen>()?.Forget();
+                Reg<AdventureLobbyIconDropdownScreen>()?.Forget();
+                Reg<AdventureLobbyInviteProvidersScreen>()?.Forget();
+                Reg<AdventureLobbyGameSettingsScreen>()?.Forget();
+                Reg<AdventureLobbyPlayerSettingsScreen>()?.Forget();
+                Reg<PlatformUserMenuScreen>()?.Forget();
+                Reg<AdventureLobbyPlayersScreen>()?.Forget();
             }
         }
+
+        // ---- the adventure map ----
 
         public void OnAdventureViewReady(AdventureViewInstaller installer)
         {
@@ -1939,33 +1387,29 @@ namespace SongsOfConquestAccess.Screens
 
         public void OnAdventureMapReady()
         {
-            // The scene loader raises this on every return to its idle state while the current
-            // scene is still the adventure, including the frames after the player quit to the main
-            // menu with the view installer already gone; a screen built on an absent adapter threw
-            // on its first read of the map and did so on every frame the loop lasted (2026-09-07).
-            AdventureMapScreen screen = BuildAdventureMapScreen("adventure map ready");
-            if (screen != null)
-            {
-                Push(screen, "adventure map ready");
-            }
+            // The scene loader raises this on every return to its idle state while the current scene
+            // is still the adventure, including the frames after the player quit to the main menu with
+            // the view installer already gone; a screen reading an absent adapter threw on its first
+            // read of the map and did so on every frame the loop lasted (2026-09-07).
+            ShowAdventureMap("adventure map ready");
         }
 
-        private void EnsureAdventureMapBaseScreen(string reason)
+        public void OnAdventureMapClosed()
         {
-            if (_screenManager.Contains<AdventureMapScreen>())
+            _adventureViewInstaller = null;
+            Reg<AdventureMapScreen>()?.Forget();
+        }
+
+        /// <summary>Point the map's slot at the installed adventure, unless the adapter says the
+        /// adventure is not ready to be read yet.</summary>
+        private void ShowAdventureMap(string reason)
+        {
+            AdventureMapScreen screen = Reg<AdventureMapScreen>();
+            if (screen == null)
             {
                 return;
             }
 
-            AdventureMapScreen screen = BuildAdventureMapScreen(reason);
-            if (screen != null)
-            {
-                PushBottom(screen, reason + " adventure map base");
-            }
-        }
-
-        private AdventureMapScreen BuildAdventureMapScreen(string reason)
-        {
             AdventureMapRevealedRegistry revealedRegistry = GetAdventureMapRevealedRegistry();
             AdventureMapAdapter adapter = new AdventureMapAdapter(_adventureViewInstaller, revealedRegistry);
             string readinessDiagnostic = adapter.GetReadinessDiagnostic();
@@ -1976,51 +1420,46 @@ namespace SongsOfConquestAccess.Screens
                     + reason
                     + " adventure map adapter is not present: "
                     + readinessDiagnostic);
+                return;
             }
 
-            // An absent adapter is no screen: everything the screen reads on arrival is null.
-            if (readinessDiagnostic != null)
-            {
-                return null;
-            }
-
-            AdventureMapEventListener eventListener = readinessDiagnostic == null
-                ? new AdventureMapEventListener(
-                    adapter.Facade,
-                    adapter.SelectionHandler,
-                    adapter.HumanAdventureControllerFacade,
-                    adapter.LocalizationHandler,
-                    adapter.FogManager,
-                    revealedRegistry)
-                : null;
-            return new AdventureMapScreen(adapter, eventListener);
+            screen.Live = adapter;
         }
 
-        public void OnAdventureMapClosed()
+        public void OnTeleportMenuReady(TeleportMenu menu)
         {
-            _adventureViewInstaller = null;
-            _screenManager.Pop<AdventureMapScreen>("adventure map closed");
-        }
-
-        public void OnMapEntityMiniMenuReady(MapEntityMiniMenu menu)
-        {
-            MapEntityMiniMenuAdapter adapter = new MapEntityMiniMenuAdapter(menu);
+            TeleportMenuAdapter adapter = new TeleportMenuAdapter(menu);
             if (!adapter.IsPresent())
             {
                 return;
             }
 
-            Push(new MapEntityMiniMenuScreen(adapter), "map entity mini menu ready");
+            AdventureMapScreen screen = Reg<AdventureMapScreen>();
+            if (screen == null || screen.Live == null)
+            {
+                return;
+            }
+
+            // The teleport menu takes the whole screen over: a mini menu still standing on the map
+            // would keep the destination cursor from the player.
+            if (_screens.Current is MapEntityMiniMenuScreen)
+            {
+                Reg<MapEntityMiniMenuScreen>()?.Forget();
+            }
+
+            screen.EnterTeleportDestinationMode(adapter);
         }
 
-        public void OnMapEntityMiniMenuClosed(MapEntityMiniMenu menu)
+        public void OnTeleportMenuClosed(TeleportMenu menu, bool cancelled)
         {
-            // Selling a building closes the native mini menu from inside the
-            // confirm popup's async callback, before ConfirmPopup.Close's
-            // postfix pops MessageDialogScreen. Remove the mini menu screen
-            // even when it is temporarily below that dialog.
-            _screenManager.Remove<MapEntityMiniMenuScreen>("map entity mini menu closed");
+            AdventureMapScreen screen = Reg<AdventureMapScreen>();
+            if (screen != null && screen.MatchesTeleportMenu(menu))
+            {
+                screen.ExitTeleportDestinationMode(menu, cancelled);
+            }
         }
+
+        // ---- the battle ----
 
         public void OnBattleSceneReady(BattleSceneInstaller installer)
         {
@@ -2036,903 +1475,174 @@ namespace SongsOfConquestAccess.Screens
                 return false;
             }
 
+            CombatScreen screen = Reg<CombatScreen>();
+            if (screen == null)
+            {
+                return false;
+            }
+
             CombatEventNarrator.SetActiveAdapter(adapter);
             SocAccessMod.Instance?.ReviewBuffers?.Clear(ReviewBufferKind.CombatEvents);
-            CombatScreen screen = new CombatScreen(adapter);
-            if (IsTutorialTopScreen())
-            {
-                return PushBelowTop(screen, "combat ready");
-            }
-
-            return Push(screen, "combat ready");
-        }
-
-        public void OnSpellbookReady(SpellBook spellbook)
-        {
-            SpellbookScreen screen = new SpellbookScreen(new SpellbookAdapter(spellbook));
-            if (_screenManager.CurrentScreen is SpellbookScreen)
-            {
-                SocAccessMod.Instance?.LogWarning("ScreenDetector ignored duplicate spellbook ready while spellbook is already top");
-                return;
-            }
-
-            Push(screen, "spellbook ready");
-        }
-
-        public void OnSpellbookClosed(SpellBook spellbook)
-        {
-            _screenManager.Pop<SpellbookScreen>("spellbook closed");
+            screen.Live = adapter;
+            return true;
         }
 
         public void OnCombatEnded()
         {
             _battleSceneInstaller = null;
-            if (_screenManager.Contains<CombatScreen>())
-            {
-                _screenManager.Remove<CombatScreen>("combat ended");
-                SocAccessMod.Instance?.LogInfo("ScreenDetector removed CombatScreen when combat ended");
-            }
-
+            Reg<CombatScreen>()?.Forget();
             CombatEventNarrator.FlushPendingEventsForCombatEnd();
             CombatEventNarrator.Reset();
         }
 
-        public void OnLoadingScreenOpening(LoadingScreenMenu menu)
+        public void OnPreBattleMenuChanged(PreBattleMenu menu)
         {
-            NativeTooltipUtility.HideTooltip();
-            _screenManager.Clear();
+            Reg<PreBattleMenuScreen>()?.Show(new PreBattleMenuAdapter(menu));
+        }
+
+        public void OnPreBattleMenuClosed(PreBattleMenu menu)
+        {
+            Reg<PreBattleMenuScreen>()?.Forget();
         }
 
         public void OnPostBattleResultReady(AdventureBattleMenu battleMenu)
         {
             PostBattleMenu menu = PostBattleResultAdapter.GetPostBattleMenu(battleMenu);
-            Push(new PostBattleResultScreen(new PostBattleResultAdapter(battleMenu, menu)), "post battle result ready");
+            Reg<PostBattleResultScreen>()?.Show(new PostBattleResultAdapter(battleMenu, menu));
         }
 
         public void OnPostBattleResultChanged()
         {
-            PostBattleResultScreen screen = _screenManager.CurrentScreen as PostBattleResultScreen;
-            if (screen == null)
-            {
-                LogUnexpectedTop("post battle result changed");
-                return;
-            }
-
-            _screenManager.RefreshTop<PostBattleResultScreen>(screen.Rebuild(), "post battle result changed");
+            // The page is pushed before the game has written its title, which arrives when the battle
+            // animation ends: the same adapter, with news on it.
+            Reg<PostBattleResultScreen>()?.SayNameIfChanged();
         }
 
         public void OnPostBattleResultClosed()
         {
-            // PostBattleMenu invokes its completion callback before it hides itself.
-            // If a victorious town attack opens the claim menu from that callback,
-            // ClaimMenuScreen is already top when PostBattleMenu.Hide runs, so this
-            // must remove the victory screen from below the claim menu.
-            _screenManager.Remove<PostBattleResultScreen>("post battle result closed");
+            Reg<PostBattleResultScreen>()?.Forget();
 
-            if (_screenManager.Contains<PostAdventureResultScreen>() || _screenManager.Contains<PostAdventureStatsScreen>())
+            if (_screens.Contains<PostAdventureResultScreen>() || _screens.Contains<PostAdventureStatsScreen>())
             {
                 return;
             }
 
-            // Returning from manual combat can report SceneLoaderState.None before
-            // every adventure dependency is ready, causing the normal map creation
-            // hook to reject the screen. Once post-battle closes, the native battle
-            // menu has completed and any follow-up overlays, such as claim or story
-            // menus, should sit above the adventure map base screen.
-            EnsureAdventureMapBaseScreen("post battle result closed");
+            // Returning from manual combat can report SceneLoaderState.None before every adventure
+            // dependency is ready, causing the normal map creation hook to reject the adapter. Once
+            // post-battle closes, the native battle menu has completed and the map is readable again.
+            AdventureMapScreen map = Reg<AdventureMapScreen>();
+            if (map != null && map.Live == null)
+            {
+                ShowAdventureMap("post battle result closed");
+            }
         }
 
         public void OnPostAdventureResultReady(PostAdventureMenu menu)
         {
-            PostAdventureResultScreen screen = new PostAdventureResultScreen(new PostAdventureResultAdapter(menu));
-            if (_screenManager.CurrentScreen is PostAdventureResultScreen)
-            {
-                _screenManager.RefreshTop<PostAdventureResultScreen>(screen, "post adventure result ready");
-                return;
-            }
-
-            // The post-adventure result is a root screen for the ended game.
-            // Clearing avoids briefly returning focus to the adventure map while
-            // transitioning away from victory/defeat.
-            if (!screen.IsPresent())
+            PostAdventureResultScreen screen = Reg<PostAdventureResultScreen>();
+            if (screen == null)
             {
                 return;
             }
 
-            _screenManager.Clear();
-            Push(screen, "post adventure result ready");
+            PostAdventureResultAdapter adapter = new PostAdventureResultAdapter(menu);
+            // The post-adventure result is a root screen for the ended game: letting go of everything
+            // else avoids briefly returning to the adventure map while transitioning away from
+            // victory or defeat.
+            ForgetAllExcept(screen);
+            screen.Live = adapter;
         }
 
         public void OnPostAdventureResultClosed(PostAdventureMenu menu)
         {
-            if (_screenManager.CurrentScreen is PostAdventureResultScreen)
-            {
-                _screenManager.Pop<PostAdventureResultScreen>("post adventure result closed");
-            }
+            Reg<PostAdventureResultScreen>()?.Forget();
         }
 
         public void OnPostAdventureStatsReady(PostAdventureStatsMenu menu)
         {
-            PostAdventureStatsScreen screen = new PostAdventureStatsScreen(new PostAdventureStatsAdapter(menu));
-            if (_screenManager.CurrentScreen is PostAdventureStatsScreen)
-            {
-                _screenManager.RefreshTop<PostAdventureStatsScreen>(screen, "post adventure stats ready");
-                return;
-            }
-
-            Push(screen, "post adventure stats ready");
+            Reg<PostAdventureStatsScreen>()?.Show(new PostAdventureStatsAdapter(menu));
         }
 
         public void OnPostAdventureStatsClosed(PostAdventureStatsMenu menu)
         {
-            if (_screenManager.CurrentScreen is PostAdventureStatsScreen)
-            {
-                _screenManager.Pop<PostAdventureStatsScreen>("post adventure stats closed");
-            }
+            Reg<PostAdventureStatsScreen>()?.Forget();
         }
 
-        public void OnPostAdventureStatsChanged(bool announceFocus = false)
+        // ---- the hot reload ----
+
+        /// <summary>
+        /// Point every screen's slot at whatever the game is already showing - the one moment the mod
+        /// scans the scene for menus, run once from <c>SocAccessMod.Start</c>. Everything after this is
+        /// the patches telling us and the poll deciding.
+        /// </summary>
+        public void RecoverRuntimeState()
         {
-            PostAdventureStatsScreen screen = _screenManager.CurrentScreen as PostAdventureStatsScreen;
-            if (screen == null)
-            {
-                return;
-            }
-
-            if (!screen.IsPresent())
-            {
-                _screenManager.Pop<PostAdventureStatsScreen>("post adventure stats no longer present");
-                return;
-            }
-
-            screen.Refresh(announceFocus);
-        }
-
-        public void OnPlayerStatsReady(PlayerStatsMenuNavigation menu)
-        {
-            PlayerStatsAdapter adapter = new PlayerStatsAdapter(menu);
-            if (!adapter.IsPresent())
-            {
-                return;
-            }
-
-            PlayerStatsScreen screen = new PlayerStatsScreen(adapter);
-            if (_screenManager.CurrentScreen is PlayerStatsScreen)
-            {
-                _screenManager.RefreshTop<PlayerStatsScreen>(screen, "player stats ready");
-                return;
-            }
-
-            Push(screen, "player stats ready");
-        }
-
-        public void OnPlayerStatsChanged()
-        {
-            PlayerStatsScreen screen = _screenManager.CurrentScreen as PlayerStatsScreen;
-            if (screen == null)
-            {
-                return;
-            }
-
-            if (!screen.IsPresent())
-            {
-                _screenManager.Pop<PlayerStatsScreen>("player stats no longer present");
-                return;
-            }
-
-            screen.Refresh();
-        }
-
-        public void OnPlayerStatsClosed(PlayerStatsMenuNavigation menu)
-        {
-            if (_screenManager.CurrentScreen is PlayerStatsScreen)
-            {
-                _screenManager.Pop<PlayerStatsScreen>("player stats closed");
-                return;
-            }
-
-            if (_screenManager.Contains<PlayerStatsScreen>())
-            {
-                _screenManager.Remove<PlayerStatsScreen>("player stats closed");
-            }
-        }
-
-        public void OnPreBattleMenuReady(PreBattleMenu menu)
-        {
-            Push(new PreBattleMenuScreen(new PreBattleMenuAdapter(menu)), "pre battle menu ready");
-        }
-
-        public void OnPreBattleMenuChanged(PreBattleMenu menu)
-        {
-            PreBattleMenuScreen screen = new PreBattleMenuScreen(new PreBattleMenuAdapter(menu));
-            if (_screenManager.CurrentScreen is PreBattleMenuScreen)
-            {
-                _screenManager.RefreshTop<PreBattleMenuScreen>(screen, "pre battle menu changed");
-                return;
-            }
-
-            Push(screen, "pre battle menu ready");
-        }
-
-        public void OnPreBattleMenuClosed(PreBattleMenu menu)
-        {
-            _screenManager.Pop<PreBattleMenuScreen>("pre battle menu closed");
-        }
-
-        public void OnClaimMenuReady(ClaimMenu menu)
-        {
-            ClaimMenuAdapter adapter = new ClaimMenuAdapter(menu);
-            if (!adapter.IsPresent())
-            {
-                return;
-            }
-
-            ClaimMenuScreen current = _screenManager.CurrentScreen as ClaimMenuScreen;
-            if (current != null && current.Matches(menu))
-            {
-                return;
-            }
-
-            Push(new ClaimMenuScreen(adapter), "claim menu ready");
-        }
-
-        public void OnClaimMenuClosed(ClaimMenu menu)
-        {
-            ClaimMenuScreen current = _screenManager.CurrentScreen as ClaimMenuScreen;
-            if (current != null && (menu == null || current.Matches(menu)))
-            {
-                _screenManager.Pop<ClaimMenuScreen>("claim menu closed");
-            }
-        }
-
-        public void OnWorldChoiceMenuReady(WorldChoiceMenu menu)
-        {
-            WorldChoiceMenuAdapter adapter = new WorldChoiceMenuAdapter(menu);
-            Push(new WorldChoiceMenuScreen(adapter), "world choice menu ready");
-        }
-
-        public void OnWorldChoiceMenuClosed(WorldChoiceMenu menu)
-        {
-            _screenManager.Pop<WorldChoiceMenuScreen>("world choice menu closed");
-        }
-
-        public void OnWorldConfirmMenuReady(WorldConfirmMenu menu)
-        {
-            WorldConfirmMenuAdapter adapter = new WorldConfirmMenuAdapter(menu);
-            Push(new WorldConfirmMenuScreen(adapter), "world confirm menu ready");
-        }
-
-        public void OnWorldConfirmMenuClosed(WorldConfirmMenu menu)
-        {
-            if (_screenManager.CurrentScreen is WorldConfirmMenuScreen)
-            {
-                _screenManager.Pop<WorldConfirmMenuScreen>("world confirm menu closed");
-            }
-        }
-
-        public void OnTeleportMenuReady(TeleportMenu menu)
-        {
-            TeleportMenuAdapter adapter = new TeleportMenuAdapter(menu);
-            if (!adapter.IsPresent())
-            {
-                return;
-            }
-
-            AdventureMapScreen screen = _screenManager.Get<AdventureMapScreen>();
-            if (screen == null)
-            {
-                return;
-            }
-
-            if (!ReferenceEquals(_screenManager.CurrentScreen, screen))
-            {
-                if (_screenManager.CurrentScreen is MapEntityMiniMenuScreen)
-                {
-                    _screenManager.Pop<MapEntityMiniMenuScreen>("teleport menu opened");
-                }
-            }
-
-            screen.EnterTeleportDestinationMode(adapter);
-        }
-
-        public void OnTeleportMenuClosed(TeleportMenu menu, bool cancelled)
-        {
-            AdventureMapScreen screen = _screenManager.Get<AdventureMapScreen>();
-            if (screen != null && screen.MatchesTeleportMenu(menu))
-            {
-                screen.ExitTeleportDestinationMode(menu, cancelled);
-            }
-        }
-
-        public void OnDwellingInteractionReady(DwellingInteractionMenu menu)
-        {
-            DraftTroopsScreen screen = new DraftTroopsScreen(new DwellingTroopManagementHostAdapter(new DwellingInteractionMenuAdapter(menu)));
-            DraftTroopsScreen currentDraft = _screenManager.CurrentScreen as DraftTroopsScreen;
-            if (currentDraft != null && currentDraft.HostIdPrefix == "dwelling")
-            {
-                _screenManager.RefreshTop<DraftTroopsScreen>(screen, "dwelling draft changed");
-                return;
-            }
-
-            Push(screen, "dwelling draft ready");
-        }
-
-        public void OnDwellingUpgradeReady(DwellingInteractionMenu menu)
-        {
-            DraftTroopsScreen draft = _screenManager.CurrentScreen as DraftTroopsScreen;
-            if (draft != null && draft.HostIdPrefix == "dwelling")
-            {
-                _screenManager.Pop<DraftTroopsScreen>("dwelling upgrade opened");
-            }
-
-            Push(new UpgradeTroopsScreen(new DwellingTroopManagementHostAdapter(new DwellingInteractionMenuAdapter(menu))), "dwelling upgrade ready");
-        }
-
-        public void OnDwellingBackToTop(DwellingInteractionMenu menu)
-        {
-            UpgradeTroopsScreen upgrade = _screenManager.CurrentScreen as UpgradeTroopsScreen;
-            if (upgrade != null && upgrade.HostIdPrefix == "dwelling")
-            {
-                _screenManager.Pop<UpgradeTroopsScreen>("dwelling upgrade closed");
-            }
-            else
-            {
-                DraftTroopsScreen draft = _screenManager.CurrentScreen as DraftTroopsScreen;
-                if (draft != null && draft.HostIdPrefix == "dwelling")
-                {
-                    SocAccessMod.Instance?.LogWarning("ScreenDetector ignored dwelling back to top while draft is already top");
-                    return;
-                }
-            }
-
-            Push(new DraftTroopsScreen(new DwellingTroopManagementHostAdapter(new DwellingInteractionMenuAdapter(menu))), "dwelling draft ready");
-        }
-
-        public void OnDwellingInteractionClosed(DwellingInteractionMenu menu)
-        {
-            UpgradeTroopsScreen upgrade = _screenManager.CurrentScreen as UpgradeTroopsScreen;
-            if (upgrade != null && upgrade.HostIdPrefix == "dwelling")
-            {
-                _screenManager.Pop<UpgradeTroopsScreen>("dwelling closed with upgrade open");
-            }
-
-            DraftTroopsScreen draft = _screenManager.CurrentScreen as DraftTroopsScreen;
-            if (draft != null && draft.HostIdPrefix == "dwelling")
-            {
-                _screenManager.Pop<DraftTroopsScreen>("dwelling interaction closed");
-            }
-        }
-
-        public void OnRallyPointReady(RallyPointInteractionMenu menu)
-        {
-            RallyPointScreen screen = new RallyPointScreen(new RallyPointInteractionMenuAdapter(menu));
-            Push(screen, "rally point ready");
-        }
-
-        public void OnRallyPointChanged(RallyPointInteractionMenu menu)
-        {
-            RallyPointScreen current = _screenManager.CurrentScreen as RallyPointScreen;
-            if (current == null)
-            {
-                return;
-            }
-
-            // The page rebuilds itself on every operation, so a changed town list needs nothing said
-            // here; only a menu that has stopped being one has to be taken off the stack.
-            if (!current.IsPresent())
-            {
-                _screenManager.Pop<RallyPointScreen>("rally point no longer present");
-            }
-        }
-
-        public void OnRallyPointClosed(RallyPointInteractionMenu menu)
-        {
-            if (_screenManager.CurrentScreen is RallyPointScreen)
-            {
-                _screenManager.Pop<RallyPointScreen>("rally point closed");
-            }
-        }
-
-        public void OnSettlementReady(TownInteractionMenu menu)
-        {
-            SettlementScreen screen = new SettlementScreen(new TownInteractionMenuAdapter(menu));
-            if (_screenManager.CurrentScreen is SettlementScreen)
-            {
-                SocAccessMod.Instance?.LogWarning("ScreenDetector ignored duplicate settlement ready while settlement is already top");
-                return;
-            }
-
-            Push(screen, "settlement ready");
-        }
-
-        public void OnSettlementDraftReady(TownInteractionMenu menu)
-        {
-            if (_screenManager.CurrentScreen is SettlementScreen)
-            {
-                _screenManager.Pop<SettlementScreen>("settlement draft opened");
-            }
-
-            Push(new DraftTroopsScreen(new SettlementTroopManagementHostAdapter(new TownInteractionMenuAdapter(menu))), "settlement draft ready");
-        }
-
-        public void OnSettlementUpgradeReady(TownInteractionMenu menu)
-        {
-            if (_screenManager.CurrentScreen is SettlementScreen)
-            {
-                _screenManager.Pop<SettlementScreen>("settlement upgrade opened");
-            }
-
-            Push(new UpgradeTroopsScreen(new SettlementTroopManagementHostAdapter(new TownInteractionMenuAdapter(menu))), "settlement upgrade ready");
-        }
-
-        public void OnSettlementBackToTop(TownInteractionMenu menu)
-        {
-            DraftTroopsScreen draft = _screenManager.CurrentScreen as DraftTroopsScreen;
-            if (draft != null && draft.HostIdPrefix == "settlement")
-            {
-                _screenManager.Pop<DraftTroopsScreen>("settlement draft closed");
-            }
-            else
-            {
-                UpgradeTroopsScreen upgrade = _screenManager.CurrentScreen as UpgradeTroopsScreen;
-                if (upgrade != null && upgrade.HostIdPrefix == "settlement")
-                {
-                    _screenManager.Pop<UpgradeTroopsScreen>("settlement upgrade closed");
-                }
-                else if (_screenManager.CurrentScreen is SettlementScreen)
-                {
-                    SocAccessMod.Instance?.LogWarning("ScreenDetector ignored settlement back to top while settlement is already top");
-                    return;
-                }
-            }
-
-            Push(new SettlementScreen(new TownInteractionMenuAdapter(menu)), "settlement top level ready");
-        }
-
-        public void OnSettlementClosed(TownInteractionMenu menu)
-        {
-            DraftTroopsScreen draft = _screenManager.CurrentScreen as DraftTroopsScreen;
-            if (draft != null && draft.HostIdPrefix == "settlement")
-            {
-                _screenManager.Pop<DraftTroopsScreen>("settlement closed with draft open");
-            }
-
-            UpgradeTroopsScreen upgrade = _screenManager.CurrentScreen as UpgradeTroopsScreen;
-            if (upgrade != null && upgrade.HostIdPrefix == "settlement")
-            {
-                _screenManager.Pop<UpgradeTroopsScreen>("settlement closed with upgrade open");
-            }
-
-            if (_screenManager.CurrentScreen is SettlementScreen)
-            {
-                _screenManager.Pop<SettlementScreen>("settlement closed");
-            }
-        }
-
-        public void OnDefenceMenuReady(DefenceMenu menu)
-        {
-            DefenceMenuScreen screen = new DefenceMenuScreen(new DefenceMenuAdapter(menu));
-            if (_screenManager.CurrentScreen is DefenceMenuScreen)
-            {
-                SocAccessMod.Instance?.LogWarning("ScreenDetector ignored duplicate defence menu ready while defence menu is already top");
-                return;
-            }
-
-            Push(screen, "defence menu ready");
-        }
-
-        public void OnDefenceDraftReady(DefenceMenu menu)
-        {
-            if (_screenManager.CurrentScreen is DefenceMenuScreen)
-            {
-                _screenManager.Pop<DefenceMenuScreen>("defence draft opened");
-            }
-
-            Push(new DraftTroopsScreen(new DefenceTroopManagementHostAdapter(new DefenceMenuAdapter(menu))), "defence draft ready");
-        }
-
-        public void OnDefenceUpgradeReady(DefenceMenu menu)
-        {
-            if (_screenManager.CurrentScreen is DefenceMenuScreen)
-            {
-                _screenManager.Pop<DefenceMenuScreen>("defence upgrade opened");
-            }
-
-            Push(new UpgradeTroopsScreen(new DefenceTroopManagementHostAdapter(new DefenceMenuAdapter(menu))), "defence upgrade ready");
-        }
-
-        public void OnDefenceMenuBackToTop(DefenceMenu menu)
-        {
-            DraftTroopsScreen draft = _screenManager.CurrentScreen as DraftTroopsScreen;
-            if (draft != null && draft.HostIdPrefix == "defences")
-            {
-                _screenManager.Pop<DraftTroopsScreen>("defence draft closed");
-            }
-            else
-            {
-                UpgradeTroopsScreen upgrade = _screenManager.CurrentScreen as UpgradeTroopsScreen;
-                if (upgrade != null && upgrade.HostIdPrefix == "defences")
-                {
-                    _screenManager.Pop<UpgradeTroopsScreen>("defence upgrade closed");
-                }
-                else if (_screenManager.CurrentScreen is DefenceMenuScreen)
-                {
-                    SocAccessMod.Instance?.LogWarning("ScreenDetector ignored defence back to top while defence menu is already top");
-                    return;
-                }
-                else
-                {
-                    return;
-                }
-            }
-
-            Push(new DefenceMenuScreen(new DefenceMenuAdapter(menu)), "defence top level ready");
-        }
-
-        public void OnDefenceMenuClosed(DefenceMenu menu)
-        {
-            DraftTroopsScreen draft = _screenManager.CurrentScreen as DraftTroopsScreen;
-            if (draft != null && draft.HostIdPrefix == "defences")
-            {
-                _screenManager.Pop<DraftTroopsScreen>("defence closed with draft open");
-            }
-
-            UpgradeTroopsScreen upgrade = _screenManager.CurrentScreen as UpgradeTroopsScreen;
-            if (upgrade != null && upgrade.HostIdPrefix == "defences")
-            {
-                _screenManager.Pop<UpgradeTroopsScreen>("defence closed with upgrade open");
-            }
-
-            if (_screenManager.CurrentScreen is DefenceMenuScreen)
-            {
-                _screenManager.Pop<DefenceMenuScreen>("defence closed");
-            }
-        }
-
-        public void OnBuildMenuReady(BuildMenu menu)
-        {
-            if (_screenManager.CurrentScreen is BuildMenuScreen)
-            {
-                SocAccessMod.Instance?.LogWarning("ScreenDetector ignored duplicate build menu ready while build menu is already top");
-                return;
-            }
-
-            BuildMenuAdapter adapter = new BuildMenuAdapter(menu);
-            BuildMenuScreen screen = new BuildMenuScreen(adapter);
-            Push(screen, "build menu ready");
-        }
-
-        public void OnBuildMenuClosed(BuildMenu menu)
-        {
-            if (_screenManager.CurrentScreen is BuildMenuScreen)
-            {
-                _screenManager.Pop<BuildMenuScreen>("build menu closed");
-            }
-        }
-
-        public void OnBuildMenuSiteChanged(BuildMenu menu)
-        {
-            RefreshCurrentBuildMenu();
-        }
-
-        public void OnBuildMenuCategoryChanged(BuildMenu menu)
-        {
-            RefreshCurrentBuildMenu();
-        }
-
-        public void OnResearchMenuReady(ResearchMenu menu)
-        {
-            ResearchMenuAdapter adapter = new ResearchMenuAdapter(menu);
-            if (!adapter.IsPresent())
-            {
-                return;
-            }
-
-            if (_screenManager.CurrentScreen is ResearchScreen)
-            {
-                SocAccessMod.Instance?.LogWarning("ScreenDetector ignored duplicate research menu ready while research menu is already top");
-                return;
-            }
-
-            Push(new ResearchScreen(adapter), "research menu ready");
-        }
-
-        public void OnResearchMenuClosed(ResearchMenu menu)
-        {
-            if (_screenManager.CurrentScreen is ResearchScreen)
-            {
-                _screenManager.Pop<ResearchScreen>("research menu closed");
-            }
-        }
-
-        public void OnResearchMenuChanged(ResearchMenu menu)
-        {
-            RefreshCurrentResearchMenu();
-        }
-
-        public void OnPurchaseWielderReady(PurchaseWielderMenu menu)
-        {
-            PurchaseWielderMenuAdapter adapter = new PurchaseWielderMenuAdapter(menu);
-            if (!adapter.IsPresent())
-            {
-                return;
-            }
-
-            Push(new PurchaseWielderScreen(adapter), "purchase wielder ready");
-        }
-
-        public void OnPurchaseWielderClosed(PurchaseWielderMenu menu)
-        {
-            PurchaseWielderScreen current = _screenManager.CurrentScreen as PurchaseWielderScreen;
-            if (current != null && (menu == null || ReferenceEquals(current.Adapter.Source, menu)))
-            {
-                _screenManager.Pop<PurchaseWielderScreen>("purchase wielder closed");
-            }
-        }
-
-        private void RefreshCurrentBuildMenu()
-        {
-            BuildMenuScreen screen = _screenManager.CurrentScreen as BuildMenuScreen;
-            if (screen == null || !screen.IsPresent())
-            {
-                return;
-            }
-
-            screen.Refresh();
-        }
-
-        private void RefreshCurrentResearchMenu()
-        {
-            ResearchScreen screen = _screenManager.CurrentScreen as ResearchScreen;
-            if (screen == null || !screen.IsPresent())
-            {
-                return;
-            }
-
-            screen.Refresh();
-        }
-
-        public void OnLevelUpMenuReady(CommanderLevelUpMenu menu)
-        {
-            LevelUpScreen screen = new LevelUpScreen(new LevelUpMenuAdapter(menu));
-            if (_screenManager.CurrentScreen is LevelUpScreen)
-            {
-                _screenManager.RefreshTop<LevelUpScreen>(screen, "level up menu changed");
-                return;
-            }
-
-            Push(screen, "level up menu ready");
-        }
-
-        public void OnLevelUpMenuClosed(CommanderLevelUpMenu menu)
-        {
-            if (_screenManager.CurrentScreen is LevelUpScreen)
-            {
-                _screenManager.Pop<LevelUpScreen>("level up menu closed");
-            }
-        }
-
-        public void OnHostileJoinMenuReady(HostileJoinMenu menu)
-        {
-            HostileJoinMenuAdapter adapter = new HostileJoinMenuAdapter(menu);
-            if (!adapter.IsPresent())
-            {
-                adapter.Dispose();
-                return;
-            }
-
-            Push(new HostileJoinMenuScreen(adapter), "hostile join menu ready");
-        }
-
-        public void OnHostileJoinMenuChanged(HostileJoinMenu menu)
-        {
-            HostileJoinMenuAdapter adapter = new HostileJoinMenuAdapter(menu);
-            if (!adapter.IsPresent())
-            {
-                adapter.Dispose();
-                return;
-            }
-
-            HostileJoinMenuScreen current = _screenManager.CurrentScreen as HostileJoinMenuScreen;
-            if (current != null)
-            {
-                adapter.Dispose();
-                current.Refresh();
-                return;
-            }
-
-            HostileJoinMenuScreen screen = new HostileJoinMenuScreen(adapter);
-            Push(screen, "hostile join menu ready");
-        }
-
-        public void OnHostileJoinMenuClosed(HostileJoinMenu menu)
-        {
-            _screenManager.Pop<HostileJoinMenuScreen>("hostile join menu closed");
-        }
-
-        public void OnMoveTroopPopupReady(TroopHUDEntryMovable movable)
-        {
-            if (_screenManager.CurrentScreen is MoveTroopPopupScreen)
-            {
-                return;
-            }
-
-            Push(new MoveTroopPopupScreen(new MoveTroopPopupAdapter(movable)), "move troop popup ready");
-        }
-
-        public void OnMoveTroopPopupClosed(TroopHUDEntryMovable movable)
-        {
-            // The game calls TroopHUDEntryMovable.Reset even when the troop move
-            // popup is not open, such as during HUD teardown and refresh.
-            if (!_screenManager.Contains<MoveTroopPopupScreen>())
-            {
-                return;
-            }
-
-            _screenManager.Pop<MoveTroopPopupScreen>("move troop popup closed");
-        }
-
-        public void OnCommanderSheetReady(CommanderSheet commanderSheet)
-        {
-            Push(new CommanderSheetScreen(new CommanderSheetAdapter(commanderSheet)), "commander sheet ready");
-        }
-
-        public void OnCommanderSheetClosed(CommanderSheet commanderSheet)
-        {
-            _screenManager.Pop<CommanderSheetScreen>("commander sheet closed");
-        }
-
-        public void OnCommanderSheetChanged()
-        {
-            CommanderSheetScreen screen = _screenManager.CurrentScreen as CommanderSheetScreen;
-            if (screen == null)
-            {
-                return;
-            }
-
-            if (!screen.IsPresent())
-            {
-                _screenManager.Pop<CommanderSheetScreen>("commander sheet no longer present");
-                return;
-            }
-
-            screen.Refresh();
-        }
-
-        public void OnCommanderSheetComponentChanged(UnityEngine.Component component)
-        {
-            if (component == null || component.GetComponentInParent<CommanderSheet>(true) == null)
-            {
-                return;
-            }
-
-            OnCommanderSheetChanged();
-        }
-
-        public void OnTradingMenuReady(TradingMenu menu)
-        {
-            TradingScreen current = _screenManager.CurrentScreen as TradingScreen;
-            if (current != null)
-            {
-                current.Refresh();
-                return;
-            }
-
-            TradingScreen screen = new TradingScreen(new TradingMenuAdapter(menu));
-            Push(screen, "trading menu ready");
-        }
-
-        public void OnTradingMenuClosed(TradingMenu menu)
-        {
-            if (_screenManager.CurrentScreen is TradingScreen)
-            {
-                _screenManager.Pop<TradingScreen>("trading menu closed");
-            }
-        }
-
-        /// <summary>The runtime factories that would answer present right now, by screen type
-        /// name, in factory order - what a resync would push. For the dev server's probes.</summary>
-        public List<string> PresentRuntimeScreens()
-        {
-            List<string> names = new List<string>();
-            for (int i = 0; i < _runtimeScreenFactories.Count; i++)
-            {
-                Screen screen = _runtimeScreenFactories[i]();
-                if (screen != null && screen.IsPresent())
-                {
-                    names.Add(screen.GetType().Name);
-                }
-            }
-
-            return names;
-        }
-
-        public void ResyncFromRuntimeState()
-        {
-            List<Screen> activeScreens = new List<Screen>();
-            for (int i = 0; i < _runtimeScreenFactories.Count; i++)
-            {
-                Screen screen = _runtimeScreenFactories[i]();
-                if (screen != null && screen.IsPresent())
-                {
-                    activeScreens.Add(screen);
-                }
-            }
-
-            _screenManager.Clear();
-            for (int i = 0; i < activeScreens.Count; i++)
-            {
-                _screenManager.Push(activeScreens[i], "runtime resync");
-            }
-        }
-
-        private bool Push(Screen screen, string reason)
-        {
-            if (screen == null)
-            {
-                SocAccessMod.Instance?.LogWarning("ScreenDetector ignored " + reason + " because no screen could be built");
-                return false;
-            }
-
-            if (!screen.IsPresent())
-            {
-                SocAccessMod.Instance?.LogWarning(
-                    "ScreenDetector ignored "
-                    + reason
-                    + " because "
-                    + screen.GetType().Name
-                    + " is not present");
-                return false;
-            }
-
-            _screenManager.Push(screen, reason);
-            return true;
-        }
-
-        private bool PushBelowTop(Screen screen, string reason)
-        {
-            if (screen == null)
-            {
-                SocAccessMod.Instance?.LogWarning("ScreenDetector ignored " + reason + " because no screen could be built");
-                return false;
-            }
-
-            if (!screen.IsPresent())
-            {
-                SocAccessMod.Instance?.LogWarning(
-                    "ScreenDetector ignored "
-                    + reason
-                    + " because "
-                    + screen.GetType().Name
-                    + " is not present");
-                return false;
-            }
-
-            _screenManager.PushBelowTop(screen, reason);
-            return true;
-        }
-
-        private bool PushBottom(Screen screen, string reason)
-        {
-            if (screen == null)
-            {
-                SocAccessMod.Instance?.LogWarning("ScreenDetector ignored " + reason + " because no screen could be built");
-                return false;
-            }
-
-            if (!screen.IsPresent())
-            {
-                SocAccessMod.Instance?.LogWarning(
-                    "ScreenDetector ignored "
-                    + reason
-                    + " because "
-                    + screen.GetType().Name
-                    + " is not present");
-                return false;
-            }
-
-            _screenManager.PushBottom(screen, reason);
-            return true;
+            MainMenuScreen.Recover();
+            CampaignMenuScreen.Recover();
+            TaleSelectScreen.Recover();
+            CustomCampaignSelectScreen.Recover();
+            OnlineGameListScreen.Recover();
+            OnlineHostGameScreen.Recover();
+            CommunityMapsHomeScreen.Recover();
+            CommunityMapsCollectionScreen.Recover();
+            CommunityMapsDetailsScreen.Recover();
+            CommunityMapsSearchFilterScreen.Recover();
+            CommunityMapsSearchResultsScreen.Recover();
+            CommunityMapsModalScreen.Recover();
+            AdventureLobbyMapTypeScreen.Recover();
+            AdventureLobbyRandomLayoutScreen.Recover();
+            AdventureLobbyMapSelectScreen.Recover();
+            AdventureLobbyChallengeMapSelectScreen.Recover();
+            AdventureLobbyPlayersScreen.Recover();
+            AdventureLobbyGameSettingsScreen.Recover();
+            AdventureLobbyPlayerSettingsScreen.Recover();
+            AdventureLobbyIconDropdownScreen.Recover();
+            AdventureLobbyInviteProvidersScreen.Recover();
+            PlatformUserMenuScreen.Recover();
+            CampaignMapSelectScreen.Recover();
+            AdventureMapScreen.Recover();
+            AdventurePlayerMenuScreen.Recover();
+            SendResourcePopupScreen.Recover();
+            GiftTownPopupScreen.Recover();
+            OwnedEntitiesScreen.Recover();
+            TroopOverviewScreen.Recover();
+            MarketplaceScreen.Recover();
+            ArtifactMarketScreen.Recover();
+            MapEntityMiniMenuScreen.Recover();
+            CombatScreen.Recover();
+            ChatScreen.Recover();
+            SpellbookScreen.Recover();
+            PostAdventureResultScreen.Recover();
+            PostAdventureStatsScreen.Recover();
+            PlayerStatsScreen.Recover();
+            PostBattleResultScreen.Recover();
+            PreBattleMenuScreen.Recover();
+            ClaimMenuScreen.Recover();
+            UpgradeTroopsScreen.Recover();
+            DraftTroopsScreen.Recover();
+            RallyPointScreen.Recover();
+            SettlementScreen.Recover();
+            DefenceMenuScreen.Recover();
+            BuildMenuScreen.Recover();
+            ResearchScreen.Recover();
+            PurchaseWielderScreen.Recover();
+            HostileJoinMenuScreen.Recover();
+            MoveTroopPopupScreen.Recover();
+            WorldChoiceMenuScreen.Recover();
+            WorldConfirmMenuScreen.Recover();
+            LevelUpScreen.Recover();
+            CommanderSheetScreen.Recover();
+            TradingScreen.Recover();
+            StoryTextScreen.Recover();
+            OptionsScreen.Recover();
+            PauseMenuScreen.Recover();
+            SaveLoadGameScreen.Recover();
+            MessageDialogScreen.Recover();
+            QuitToDesktopPopupScreen.Recover();
+            CodexScreen.Recover();
+            TutorialSlideshowScreen.Recover();
+            TutorialSimpleScreen.Recover();
+            LoadingCompleteScreen.Recover();
         }
 
         private static AdventureMapRevealedRegistry GetAdventureMapRevealedRegistry()
@@ -2941,6 +1651,8 @@ namespace SongsOfConquestAccess.Screens
             return scannerState != null ? scannerState.RevealedRegistry : new AdventureMapRevealedRegistry();
         }
 
+        /// <summary>Whether a story trigger is the local player's - a remote or AI commander's story
+        /// is not the one this keyboard is waiting on.</summary>
         private static bool IsLocalStoryTrigger(OnTriggerPayload payload, IClientAdventureFacade facade)
         {
             if (payload == null || facade == null || payload.TriggerData == null)
@@ -2963,53 +1675,6 @@ namespace SongsOfConquestAccess.Screens
             return sourceValue >= 2
                 && sourceValue <= 8
                 && !facade.Teams.GetIsRemoteOrAI(payload.TriggerCommanderTeamId);
-        }
-
-        private bool IsTutorialTopScreen()
-        {
-            return _screenManager.CurrentScreen is TutorialSlideshowScreen
-                || _screenManager.CurrentScreen is TutorialSimpleScreen;
-        }
-
-        private static Screen BuildTutorialScreen(TutorialMenu tutorialMenu)
-        {
-            TutorialSlideshowAdapter slideshowAdapter = new TutorialSlideshowAdapter(tutorialMenu);
-            if (slideshowAdapter.IsPresent())
-            {
-                return new TutorialSlideshowScreen(slideshowAdapter);
-            }
-
-            TutorialSimpleAdapter simpleAdapter = new TutorialSimpleAdapter(tutorialMenu);
-            if (simpleAdapter.IsPresent())
-            {
-                return new TutorialSimpleScreen(simpleAdapter);
-            }
-
-            return null;
-        }
-
-        private void LogUnexpectedTop(string reason)
-        {
-            Screen current = _screenManager.CurrentScreen;
-            SocAccessMod.Instance?.LogWarning(
-                "ScreenDetector ignored "
-                + reason
-                + "; unexpected top screen "
-                + (current != null ? current.GetType().Name : "<none>"));
-        }
-
-        private bool IsCurrentMessageDialogSource(object sourceKey)
-        {
-            MessageDialogScreen screen = _screenManager.CurrentScreen as MessageDialogScreen;
-            if (screen == null)
-            {
-                return false;
-            }
-
-            object currentSourceKey = screen.SourceKey;
-            return sourceKey == null
-                || currentSourceKey == null
-                || ReferenceEquals(sourceKey, currentSourceKey);
         }
     }
 }

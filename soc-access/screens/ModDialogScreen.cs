@@ -60,11 +60,20 @@ namespace SongsOfConquestAccess.Screens
                 return null;
             }
 
+            Screen owner = manager.Current;
+            if (owner == null)
+            {
+                dialog.Close();
+                return null;
+            }
+
             ModDialogScreen screen = new ModDialogScreen(key, title, dialog, draw, cancel);
             dialog.DrawContent = index => draw(screen);
             dialog.OnClose = () => screen.Cancel();
             dialog.Select(0);
-            manager.Push(screen, key + " dialog opened");
+            // A CHILD of whatever it was opened over - the mod options window, or another dialog of
+            // its own: the layers beneath stay where they are and get their cursors back.
+            owner.PushChild(screen);
             return screen;
         }
 
@@ -78,7 +87,7 @@ namespace SongsOfConquestAccess.Screens
             get { return _title; }
         }
 
-        public override bool IsPresent()
+        public override bool IsActive()
         {
             return _dialog != null && _dialog.IsOpen;
         }
@@ -108,10 +117,17 @@ namespace SongsOfConquestAccess.Screens
         /// <summary>The editor behind the text rows is driven from here: without this tick a request
         /// for the keyboard stayed pending forever and Enter on a name box did nothing (owner,
         /// 2026-09-07).</summary>
-        public override void Update()
+        public override void OnUpdate()
         {
-            base.Update();
-            _rows.Editor.Update(IsPresent());
+            base.OnUpdate();
+            _rows.Editor.Update(IsActive());
+
+            // The game took the window away underneath, so the screen goes with it. A child is not
+            // polled; it asks for itself.
+            if (!IsActive())
+            {
+                CloseSelf();
+            }
         }
 
         public override void OnUnfocus()
@@ -165,13 +181,20 @@ namespace SongsOfConquestAccess.Screens
         public bool Close()
         {
             _dialog.Close();
-            ScreenManager manager = SocAccessMod.Instance != null ? SocAccessMod.Instance.ScreenManager : null;
-            return manager != null && manager.Pop<ModDialogScreen>(_key + " dialog closed");
+            CloseSelf();
+            return true;
+        }
+
+        /// <summary>Above the mod options window it is stacked over. Read only by the dev server: a
+        /// child screen is not polled.</summary>
+        public override int Layer
+        {
+            get { return 55; }
         }
 
         public override void Build(GraphBuilder builder)
         {
-            if (!IsPresent())
+            if (!IsActive())
             {
                 return;
             }

@@ -33,7 +33,7 @@ namespace SongsOfConquestAccess.Screens
     /// A STAGE CHANGE SWAPS THE WHOLE PAGE, so the cursor is given up and seated afresh rather than
     /// recovered onto whatever survived.
     /// </summary>
-    public sealed class HostileJoinMenuScreen : GraphScreen
+    public sealed class HostileJoinMenuScreen : LiveScreen<HostileJoinMenuAdapter>
     {
         private const string WielderStop = "hostile-join-wielder";
         private const string OfferStop = "hostile-join-offer";
@@ -44,8 +44,6 @@ namespace SongsOfConquestAccess.Screens
         private static readonly System.Reflection.PropertyInfo InstallerContainerProperty =
             AccessTools.Property(typeof(HostileJoinMenuInstaller), "Container");
 
-        private readonly HostileJoinMenuAdapter _adapter;
-
         // A subject of its own per synthesized node, kept across rebuilds so the reconciler seats the
         // cursor on the same one: the menu's two bodies of text are not drawn as controls.
         private readonly object _offerTextMarker = new object();
@@ -53,13 +51,14 @@ namespace SongsOfConquestAccess.Screens
 
         private HostileJoinMenuStage _stage;
 
-        public HostileJoinMenuScreen(HostileJoinMenuAdapter adapter)
+        /// <summary>After a hot reload: point the slot at the menu already showing.
+        /// Scanned once, from <c>ScreenDetector.RecoverRuntimeState</c>.</summary>
+        public static void Recover()
         {
-            _adapter = adapter;
-            _stage = adapter != null ? adapter.Stage : HostileJoinMenuStage.None;
+            Recovered<HostileJoinMenuScreen>(FindActive());
         }
 
-        public static Screen TryBuildActiveScreen()
+        public static HostileJoinMenuAdapter FindActive()
         {
             HostileJoinMenuInstaller[] installers = Resources.FindObjectsOfTypeAll<HostileJoinMenuInstaller>();
             for (int i = 0; i < installers.Length; i++)
@@ -73,7 +72,7 @@ namespace SongsOfConquestAccess.Screens
                 HostileJoinMenuAdapter adapter = new HostileJoinMenuAdapter(menu);
                 if (adapter.IsPresent())
                 {
-                    return new HostileJoinMenuScreen(adapter);
+                    return (adapter);
                 }
 
                 adapter.Dispose();
@@ -87,15 +86,21 @@ namespace SongsOfConquestAccess.Screens
             get { return "hostile-join"; }
         }
 
+        /// <summary>Layer 30: a story follow-up over the map.</summary>
+        public override int Layer
+        {
+            get { return 30; }
+        }
+
         /// <summary>The title the menu draws, which it writes once and keeps through both stages.
         /// </summary>
         public override string ScreenName
         {
             get
             {
-                return _adapter == null
+                return Live == null
                     ? null
-                    : TroopHudRows.NameWithPlace(_adapter.Title, _adapter.Wielder);
+                    : TroopHudRows.NameWithPlace(Live.Title, Live.Wielder);
             }
         }
 
@@ -103,12 +108,12 @@ namespace SongsOfConquestAccess.Screens
         /// </summary>
         public override object InitialFocusStop
         {
-            get { return _adapter != null && _adapter.Stage == HostileJoinMenuStage.Join ? JoinStop : OfferStop; }
+            get { return Live != null && Live.Stage == HostileJoinMenuStage.Join ? JoinStop : OfferStop; }
         }
 
-        public override bool IsPresent()
+        public override bool IsActive()
         {
-            return _adapter != null && _adapter.IsPresent();
+            return Live != null && Live.IsPresent();
         }
 
         /// <summary>Called by the detector whenever the menu changes. The graph is declared afresh on
@@ -116,7 +121,7 @@ namespace SongsOfConquestAccess.Screens
         /// swapped one whole page for the other.</summary>
         public void Refresh()
         {
-            HostileJoinMenuStage stage = _adapter == null ? HostileJoinMenuStage.None : _adapter.Stage;
+            HostileJoinMenuStage stage = Live == null ? HostileJoinMenuStage.None : Live.Stage;
             if (stage == _stage)
             {
                 return;
@@ -132,17 +137,17 @@ namespace SongsOfConquestAccess.Screens
 
         public override void Build(GraphBuilder builder)
         {
-            if (!IsPresent())
+            if (!IsActive())
             {
                 return;
             }
 
-            TroopHudRows.WielderStop(builder, WielderStop, WielderKey, _adapter.Wielder);
+            TroopHudRows.WielderStop(builder, WielderStop, WielderKey, Live.Wielder);
 
-            if (_adapter.Stage == HostileJoinMenuStage.Join)
+            if (Live.Stage == HostileJoinMenuStage.Join)
             {
                 builder.BeginStop(JoinStop);
-                BuildBody(builder, _joinTextMarker, "hostile-join:join-text", _adapter.JoinText);
+                BuildBody(builder, _joinTextMarker, "hostile-join:join-text", Live.JoinText);
                 BuildJoiningTroops(builder, null);
                 BuildMassMove(builder);
                 BuildDone(builder);
@@ -150,8 +155,8 @@ namespace SongsOfConquestAccess.Screens
             }
 
             builder.BeginStop(OfferStop);
-            BuildBody(builder, _offerTextMarker, "hostile-join:offer-text", _adapter.OfferText);
-            BuildJoiningTroops(builder, () => !_adapter.IsOfferLocked);
+            BuildBody(builder, _offerTextMarker, "hostile-join:offer-text", Live.OfferText);
+            BuildJoiningTroops(builder, () => !Live.IsOfferLocked);
             BuildReject(builder);
             BuildAccept(builder);
         }
@@ -174,14 +179,14 @@ namespace SongsOfConquestAccess.Screens
         {
             get
             {
-                WielderInteract wielder = _adapter == null ? null : _adapter.Wielder;
+                WielderInteract wielder = Live == null ? null : Live.Wielder;
                 return wielder == null ? null : wielder.Troops;
             }
         }
 
         private TroopHudAdapter JoiningTroops
         {
-            get { return _adapter == null ? null : _adapter.JoiningTroops; }
+            get { return Live == null ? null : Live.JoiningTroops; }
         }
 
         /// <summary>What the menu says about the offer or about moving the troops, as one node of its
@@ -223,17 +228,17 @@ namespace SongsOfConquestAccess.Screens
 
         private void BuildReject(GraphBuilder builder)
         {
-            Component button = _adapter.RejectButton;
+            Component button = Live.RejectButton;
             if (button == null)
             {
                 return;
             }
 
             NodeVtable vtable = GraphNodes.Button(
-                () => _adapter.RejectText,
-                () => _adapter.ActivateReject(),
-                _adapter.IsRejectEnabled);
-            vtable.OnFocusVisual = () => _adapter.FocusReject();
+                () => Live.RejectText,
+                () => Live.ActivateReject(),
+                Live.IsRejectEnabled);
+            vtable.OnFocusVisual = () => Live.FocusReject();
             builder.AddItem(new DrawnNode(ControlId.For(button, "hostile-join:reject"), vtable, button));
         }
 
@@ -242,44 +247,44 @@ namespace SongsOfConquestAccess.Screens
         /// about why, so neither does the mod.</summary>
         private void BuildAccept(GraphBuilder builder)
         {
-            Component button = _adapter.AcceptButton;
+            Component button = Live.AcceptButton;
             if (button == null)
             {
                 return;
             }
 
             NodeVtable vtable = GraphNodes.Button(
-                () => _adapter.AcceptText,
-                () => _adapter.ActivateAccept(),
-                _adapter.IsAcceptEnabled);
+                () => Live.AcceptText,
+                () => Live.ActivateAccept(),
+                Live.IsAcceptEnabled);
             vtable.Announcements.Add(GraphNodes.ValuePart(AcceptPrice));
-            vtable.OnFocusVisual = () => _adapter.FocusAccept();
+            vtable.OnFocusVisual = () => Live.FocusAccept();
             builder.AddItem(new DrawnNode(ControlId.For(button, "hostile-join:accept"), vtable, button));
         }
 
         private string AcceptPrice()
         {
-            string amount = _adapter.AcceptGoldAmount;
+            string amount = Live.AcceptGoldAmount;
             return string.IsNullOrWhiteSpace(amount)
                 ? string.Empty
-                : ModText.Get(ModStrings.Common.ResourceAmount, amount, _adapter.GoldName);
+                : ModText.Get(ModStrings.Common.ResourceAmount, amount, Live.GoldName);
         }
 
         // ---- the join stage's two buttons ----
 
         private void BuildMassMove(GraphBuilder builder)
         {
-            Component button = _adapter.MassMoveButton;
+            Component button = Live.MassMoveButton;
             if (button == null)
             {
                 return;
             }
 
             NodeVtable vtable = GraphNodes.Button(
-                () => _adapter.MassMoveText,
-                () => _adapter.ActivateMassMove(),
-                _adapter.IsMassMoveEnabled);
-            vtable.OnFocusVisual = () => _adapter.FocusMassMove();
+                () => Live.MassMoveText,
+                () => Live.ActivateMassMove(),
+                Live.IsMassMoveEnabled);
+            vtable.OnFocusVisual = () => Live.FocusMassMove();
             builder.AddItem(new DrawnNode(ControlId.For(button, "hostile-join:mass-move"), vtable, button));
         }
 
@@ -287,18 +292,18 @@ namespace SongsOfConquestAccess.Screens
         /// so its label is watched under a cursor waiting on it.</summary>
         private void BuildDone(GraphBuilder builder)
         {
-            Component button = _adapter.DoneButton;
+            Component button = Live.DoneButton;
             if (button == null)
             {
                 return;
             }
 
             NodeVtable vtable = GraphNodes.Button(
-                () => _adapter.DoneText,
-                () => _adapter.ActivateDone(),
-                _adapter.IsDoneEnabled);
+                () => Live.DoneText,
+                () => Live.ActivateDone(),
+                Live.IsDoneEnabled);
             vtable.Announcements[0].Live = true;
-            vtable.OnFocusVisual = () => _adapter.FocusDone();
+            vtable.OnFocusVisual = () => Live.FocusDone();
             builder.AddItem(new DrawnNode(ControlId.For(button, "hostile-join:done"), vtable, button));
         }
 

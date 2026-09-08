@@ -35,14 +35,12 @@ namespace SongsOfConquestAccess.Screens
     /// (decompiled, line 251), so the key would do nothing here; the screen claims it and presses the
     /// drawn Main Menu button, as the widget screen did.
     /// </summary>
-    public sealed class OnlineGameListScreen : GraphScreen
+    public sealed class OnlineGameListScreen : LiveScreen<OnlineGameListAdapter>
     {
         private const string RegionStop = "online-game-region";
         private const string TableStop = "online-game-table";
         private const string ButtonsStop = "online-game-buttons";
         private const string SheetKey = "online-game:";
-
-        private readonly OnlineGameListAdapter _adapter;
 
         // Subjects of their own for the two lines the game draws no widget the mod can key on, kept
         // across rebuilds so the reconciler seats the cursor on the same line.
@@ -50,20 +48,22 @@ namespace SongsOfConquestAccess.Screens
         private readonly object _selectedMarker = new object();
         private readonly object[] _bandMarkers = { new object(), new object(), new object() };
 
-        public OnlineGameListScreen(OnlineGameListAdapter adapter)
+        /// <summary>After a hot reload: point the slot at the menu already showing.
+        /// Scanned once, from <c>ScreenDetector.RecoverRuntimeState</c>.</summary>
+        public static void Recover()
         {
-            _adapter = adapter;
+            Recovered<OnlineGameListScreen>(FindActive());
         }
 
-        public static Screen TryBuildActiveScreen()
+        public static OnlineGameListAdapter FindActive()
         {
             OnlineGameListAdapter adapter = OnlineGameListAdapter.TryCreateActive();
-            return adapter != null ? new OnlineGameListScreen(adapter) : null;
+            return adapter;
         }
 
         public bool Matches(GameListMenu menu)
         {
-            return _adapter != null && ReferenceEquals(_adapter.SourceKey, menu);
+            return Live != null && ReferenceEquals(Live.SourceKey, menu);
         }
 
         public override string Key
@@ -71,10 +71,16 @@ namespace SongsOfConquestAccess.Screens
             get { return "online-game-list"; }
         }
 
+        /// <summary>Layer 1: a main-menu page, over the main menu.</summary>
+        public override int Layer
+        {
+            get { return 1; }
+        }
+
         /// <summary>The page's own drawn title ("Game List").</summary>
         public override string ScreenName
         {
-            get { return _adapter != null ? _adapter.Title : null; }
+            get { return Live != null ? Live.Title : null; }
         }
 
         public override object InitialFocusStop
@@ -82,34 +88,24 @@ namespace SongsOfConquestAccess.Screens
             get { return TableStop; }
         }
 
-        public override bool IsPresent()
+        public override bool IsActive()
         {
-            return _adapter != null && _adapter.IsPresent();
+            return Live != null && Live.IsPresent();
         }
 
         public override bool ConsumesBack
         {
-            get { return _adapter != null && _adapter.BackButton != null && _adapter.BackButton.IsVisible(); }
+            get { return Live != null && Live.BackButton != null && Live.BackButton.IsVisible(); }
         }
 
         public override bool Back()
         {
-            return _adapter != null && _adapter.BackButton != null && _adapter.BackButton.Activate();
-        }
-
-        /// <summary>Kept for the detector, which calls them as the list arrives from the network. The
-        /// graph is declared afresh on every operation, so there is nothing to rebuild.</summary>
-        public void Refresh()
-        {
-        }
-
-        public void Refresh(bool announceFocus)
-        {
+            return Live != null && Live.BackButton != null && Live.BackButton.Activate();
         }
 
         public override void Build(GraphBuilder builder)
         {
-            if (!IsPresent())
+            if (!IsActive())
             {
                 return;
             }
@@ -126,7 +122,7 @@ namespace SongsOfConquestAccess.Screens
 
         private void BuildRegion(GraphBuilder builder)
         {
-            OnlineGameListAdapter.RegionDropList region = _adapter.Region;
+            OnlineGameListAdapter.RegionDropList region = Live.Region;
             Component subject = region != null ? region.Subject : null;
             if (subject == null || !region.IsVisible())
             {
@@ -134,7 +130,7 @@ namespace SongsOfConquestAccess.Screens
             }
 
             OnlineGameListAdapter.RegionDropList it = region;
-            Func<string> label = () => _adapter.RegionLabel;
+            Func<string> label = () => Live.RegionLabel;
             NodeVtable vtable = GraphNodes.ComboBox(
                 label,
                 () => CurrentOption(it),
@@ -153,11 +149,11 @@ namespace SongsOfConquestAccess.Screens
 
         private void BuildTable(GraphBuilder builder)
         {
-            if (_adapter.IsStatusVisible)
+            if (Live.IsStatusVisible)
             {
                 builder.AddItem(new SyntheticNode(
                     ControlId.For(_statusMarker, "online-game:status"),
-                    GraphNodes.Text(() => _adapter.StatusText)));
+                    GraphNodes.Text(() => Live.StatusText)));
             }
 
             string[] captions =
@@ -169,8 +165,8 @@ namespace SongsOfConquestAccess.Screens
             BuildHeadingBand(builder, captions);
 
             GraphSheet sheet = new GraphSheet(builder, SheetKey);
-            sheet.Region(_adapter.Title, captions);
-            IReadOnlyList<OnlineGameListAdapter.GameRow> rows = _adapter.GetRows();
+            sheet.Region(Live.Title, captions);
+            IReadOnlyList<OnlineGameListAdapter.GameRow> rows = Live.GetRows();
             for (int i = 0; i < rows.Count; i++)
             {
                 OnlineGameListAdapter.GameRow row = rows[i];
@@ -288,19 +284,19 @@ namespace SongsOfConquestAccess.Screens
 
         private void BuildButtons(GraphBuilder builder)
         {
-            if (_adapter.IsSelectedEntryTextVisible)
+            if (Live.IsSelectedEntryTextVisible)
             {
                 builder.AddItem(new SyntheticNode(
                     ControlId.For(_selectedMarker, "online-game:selected"),
-                    GraphNodes.Text(() => _adapter.SelectedEntryText)));
+                    GraphNodes.Text(() => Live.SelectedEntryText)));
             }
 
-            AddButton(builder, "online-game:host", _adapter.HostGameButton);
-            AddButton(builder, "online-game:load-and-host", _adapter.HostSavedGameButton);
-            AddButton(builder, "online-game:join-with-code", _adapter.JoinWithCodeButton);
-            AddButton(builder, "online-game:join", _adapter.JoinSelectedButton);
-            AddButton(builder, "online-game:options", _adapter.OptionsButton);
-            AddButton(builder, "online-game:back", _adapter.BackButton);
+            AddButton(builder, "online-game:host", Live.HostGameButton);
+            AddButton(builder, "online-game:load-and-host", Live.HostSavedGameButton);
+            AddButton(builder, "online-game:join-with-code", Live.JoinWithCodeButton);
+            AddButton(builder, "online-game:join", Live.JoinSelectedButton);
+            AddButton(builder, "online-game:options", Live.OptionsButton);
+            AddButton(builder, "online-game:back", Live.BackButton);
         }
 
         private void AddButton(GraphBuilder builder, string key, IMenuButtonAdapter button)
@@ -315,7 +311,7 @@ namespace SongsOfConquestAccess.Screens
                 it.GetLabel,
                 () => it.Activate(),
                 it.IsEnabled,
-                _adapter.GetButtonTooltip(it));
+                Live.GetButtonTooltip(it));
             vtable.OnFocusVisual = () => NativeSelectionUtility.Select(it.Button as Component);
             builder.AddItem(new DrawnNode(ControlId.For(it.Button, key), vtable, it.Button));
         }

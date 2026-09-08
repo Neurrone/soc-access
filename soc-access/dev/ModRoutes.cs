@@ -32,11 +32,10 @@ namespace SongsOfConquestAccess.Dev
     ///   GET  /speech?since=N&amp;wait=MS
     ///                           lines spoken after sequence N, plus the next cursor; with wait, hold
     ///                           the connection open until there is one
-    ///   GET  /gui/widgets?buffers=1&amp;flat=1
     ///                           the accessible tree of the top screen (see <see cref="WidgetDump"/>)
     ///   GET  /gui/graph?buffers=1&amp;flat=1&amp;edges=1
     ///                           the same for a graph screen (see <see cref="GraphDump"/>)
-    ///   GET  /gui/tree          whichever of the two fits the top screen
+    ///   GET  /screens          every registered screen: key, type, layer, active, on stack, focused
     ///   POST /type              body = characters; typed into the graph screen's type-ahead search
     ///   POST /input             body = an action key; run it as a keypress would
     ///   POST /key?hold=MS&amp;gap=MS&amp;text=1
@@ -44,7 +43,7 @@ namespace SongsOfConquestAccess.Dev
     ///                           OS key events at the game's window (see RawKeyboard)
     ///   POST /loadsave          body = a save name, or empty for the most recent save
     ///
-    /// /speech reads the thread-safe buffer straight from the HTTP thread; /status and /gui/widgets
+    /// /speech reads the thread-safe buffer straight from the HTTP thread; /status and /gui/graph
     /// touch the scene, so they go through the main-thread queue and answer 503 if the game is
     /// wedged. /input, /loadsave and /speech?wait block the HTTP thread and never the main one: the
     /// game has to keep running frames for any of them to be answered at all.
@@ -104,9 +103,8 @@ namespace SongsOfConquestAccess.Dev
             // anything else before the handler runs, so a mistyped parameter is never ignored.
             _host.RegisterRoute("GET", "/status", Status);
             _host.RegisterRoute("GET", "/speech", Speech, "since", "wait");
-            _host.RegisterRoute("GET", "/gui/widgets", Widgets, "buffers", "flat");
-            _host.RegisterRoute("GET", "/gui/graph", Graph, "buffers", "flat", "edges");
-            _host.RegisterRoute("GET", "/gui/tree", Tree, "buffers", "flat", "edges");
+            _host.RegisterRoute("GET", "/screens", Screens);
+            _host.RegisterRoute("GET", "/gui/graph", Graph, "buffers", "flat", "edges", "screen");
             _host.RegisterRoute("POST", "/type", Type);
             _host.RegisterRoute(
                 "GET",
@@ -144,8 +142,7 @@ namespace SongsOfConquestAccess.Dev
                 (string)
                     _host.MainThread.Run(() =>
                     {
-                        Widget focused = UIManager.CurrentWidget;
-                        Screen top = _screens == null ? null : _screens.CurrentScreen;
+                        Screen top = _screens == null ? null : _screens.Current;
                         int gameObjectCount = UnityEngine
                             .Object.FindObjectsOfType(typeof(GameObject))
                             .Length;
@@ -176,26 +173,26 @@ namespace SongsOfConquestAccess.Dev
                                 for (int i = 0; i < stack.Count; i++)
                                 {
                                     json.WriteValue(stack[i].GetType().Name);
+                                    for (Screen child = stack[i].ActiveChild; child != null; child = child.ActiveChild)
+                                    {
+                                        json.WriteValue(child.GetType().Name);
+                                    }
                                 }
                             }
 
                             json.WriteEndArray();
                             json.WritePropertyName("topScreen");
                             json.WriteValue(top == null ? null : top.GetType().Name);
-                            // On a graph screen the "widget" is the focused node: its structural
-                            // key and its control type, so the two engines answer the same fields.
                             GraphScreen graphTop = top as GraphScreen;
                             GraphNode node = graphTop == null || graphTop.Navigator == null
                                 ? null
                                 : graphTop.Navigator.CurrentNode;
-                            json.WritePropertyName("focusedWidgetId");
-                            json.WriteValue(node != null
-                                ? Convert.ToString(node.Id.StructuralKey)
-                                : focused == null ? null : focused.Id);
-                            json.WritePropertyName("focusedWidgetType");
-                            json.WriteValue(node != null
-                                ? (node.Vtable.ControlType == null ? "node" : node.Vtable.ControlType.Key)
-                                : focused == null ? null : focused.GetType().Name);
+                            json.WritePropertyName("focusedNodeId");
+                            json.WriteValue(node == null ? null : Convert.ToString(node.Id.StructuralKey));
+                            json.WritePropertyName("focusedNodeType");
+                            json.WriteValue(node == null
+                                ? null
+                                : node.Vtable.ControlType == null ? "node" : node.Vtable.ControlType.Key);
                             json.WritePropertyName("gameObjectCount");
                             json.WriteValue(gameObjectCount);
                             json.WriteEndObject();
@@ -204,23 +201,51 @@ namespace SongsOfConquestAccess.Dev
             );
         }
 
-        /// <summary>The accessible tree of the top screen, as text: every line of it is a sentence
-        /// meant to be read. Side-effect free, so two calls answer identically.</summary>
-        private DevResponse Widgets(DevRequest request)
+        /// <summary>Every registered screen, one line each: key, type, layer, whether it is active,
+        /// whether it is on the stack, whether the player is on it, and why its predicate last threw.
+        /// The answer to "why is the mod not on the page I am looking at".</summary>
+        private DevResponse Screens(DevRequest request)
         {
-            bool buffers;
-            bool flat;
-            DevResponse badBuffers = Flag(request, "buffers", out buffers);
-            DevResponse badFlat = Flag(request, "flat", out flat);
-            DevResponse bad = badBuffers ?? badFlat;
-            if (bad != null)
+            return Plain((string)_host.MainThread.Run(() =>
             {
-                return bad;
-            }
+                if (_screens == null)
+                {
+                    return "(the mod has no screen manager)";
+                }
 
-            return Plain(
-                (string)_host.MainThread.Run(() => WidgetDump.Dump(_screens, buffers, flat))
-            );
+                StringBuilder text = new StringBuilder();
+                text.Append(GraphDump.Header(_screens)).Append("\n");
+                IReadOnlyList<Screen> registered = _screens.RegisteredScreens;
+                for (int i = 0; i < registered.Count; i++)
+                {
+                    Screen screen = registered[i];
+                    bool active;
+                    try
+                    {
+                        active = screen.IsActive();
+                    }
+                    catch (Exception)
+                    {
+                        active = false;
+                    }
+
+                    text.Append(screen.Key)
+                        .Append(" | ").Append(screen.GetType().Name)
+                        .Append(" | layer ").Append(screen.Layer)
+                        .Append(active ? " | active" : " | inactive")
+                        .Append(_screens.IsOnStack(screen) ? " | on stack" : " |")
+                        .Append(_screens.IsFocused(screen) ? " | FOCUSED" : " |");
+                    string failure = _screens.LastFailure(screen);
+                    if (failure != null)
+                    {
+                        text.Append(" | IsActive threw: ").Append(failure);
+                    }
+
+                    text.Append("\n");
+                }
+
+                return text.ToString();
+            }));
         }
 
         /// <summary>The same for a graph screen (see <see cref="GraphDump"/>); <c>edges=1</c> adds
@@ -239,17 +264,57 @@ namespace SongsOfConquestAccess.Dev
                 return bad;
             }
 
-            return Plain(
-                (string)_host.MainThread.Run(() => GraphDump.Dump(_screens, buffers, flat, edges))
-            );
+            string key = request.QueryValue("screen");
+            if (string.IsNullOrEmpty(key))
+            {
+                return Plain(
+                    (string)_host.MainThread.Run(() => GraphDump.Dump(_screens, buffers, flat, edges))
+                );
+            }
+
+            object answer = _host.MainThread.Run(() =>
+            {
+                Screen named = _screens == null ? null : _screens.Find(key);
+                GraphScreen graph = named as GraphScreen;
+                if (graph == null)
+                {
+                    return null;
+                }
+
+                return GraphDump.Dump(_screens, graph, buffers, flat, edges);
+            });
+
+            if (answer == null)
+            {
+                return DevResponse.Json(404, DevJson.Error("no registered screen '" + key + "'; the keys are: " + KnownScreenKeys()));
+            }
+
+            return Plain((string)answer);
         }
 
-        /// <summary>Whichever dump fits the focused screen's kind, so a caller walking a mixed stack
-        /// during the migration need not know which engine draws the top screen.</summary>
-        private DevResponse Tree(DevRequest request)
+        private string KnownScreenKeys()
         {
-            bool graph = (bool)_host.MainThread.Run(() => GraphDump.Fits(_screens));
-            return graph ? Graph(request) : Widgets(request);
+            return (string)_host.MainThread.Run(() =>
+            {
+                if (_screens == null)
+                {
+                    return "(none)";
+                }
+
+                StringBuilder keys = new StringBuilder();
+                IReadOnlyList<Screen> registered = _screens.RegisteredScreens;
+                for (int i = 0; i < registered.Count; i++)
+                {
+                    if (i > 0)
+                    {
+                        keys.Append(", ");
+                    }
+
+                    keys.Append(registered[i].Key);
+                }
+
+                return keys.ToString();
+            });
         }
 
         /// <summary>
@@ -279,7 +344,7 @@ namespace SongsOfConquestAccess.Dev
             });
             if (!graph)
             {
-                return DevResponse.Json(409, DevJson.Error("the focused screen is not a graph screen"));
+                return DevResponse.Json(409, DevJson.Error("no screen is focused"));
             }
 
             List<SpeechLog.Entry> spoken = Settled(spokenBefore);
@@ -521,13 +586,13 @@ namespace SongsOfConquestAccess.Dev
         private object BeginLoad(string name)
         {
             ScreenManager screens = _screens;
-            if (screens == null || screens.CurrentScreen == null)
+            if (screens == null || screens.Current == null)
             {
                 return NotReady("the mod has no screen yet");
             }
 
             IReadOnlyList<Screen> stack = screens.Stack;
-            string topName = screens.CurrentScreen.GetType().Name;
+            string topName = screens.Current.GetType().Name;
             if (Present(stack, "LoadingCompleteScreen"))
             {
                 return NotReady("a loading screen is up");
@@ -539,7 +604,6 @@ namespace SongsOfConquestAccess.Dev
             }
 
             if (topName == "MessageDialogScreen"
-                || topName == "TooltipActionsMenuScreen"
                 || topName.EndsWith("PopupScreen", StringComparison.Ordinal))
             {
                 return NotReady("a dialog is open");

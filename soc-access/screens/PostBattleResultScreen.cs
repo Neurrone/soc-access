@@ -44,7 +44,7 @@ namespace SongsOfConquestAccess.Screens
     /// registers <c>UI.ExitMenu</c> on <c>HandleConfirmClicked</c>, so the key accepts the result
     /// rather than dismissing the page.
     /// </summary>
-    public sealed class PostBattleResultScreen : GraphScreen
+    public sealed class PostBattleResultScreen : LiveScreen<PostBattleResultAdapter>
     {
         private const string AttackerStop = "post-battle-attacker";
         private const string DefenderStop = "post-battle-defender";
@@ -56,8 +56,6 @@ namespace SongsOfConquestAccess.Screens
         private static readonly System.Reflection.FieldInfo PostBattleMenuOnHideField =
             AccessTools.Field(typeof(PostBattleMenu), "OnHidePostBattle");
 
-        private readonly PostBattleResultAdapter _adapter;
-
         // A subject of its own per synthesized line, kept across rebuilds so the reconciler seats the
         // cursor back on the same one: the menu gives no component the screen can key the XP figure,
         // the returned-troops line or the "None" row on.
@@ -68,12 +66,14 @@ namespace SongsOfConquestAccess.Screens
         private CommanderHudPortraitAdapter _attackerPortrait;
         private CommanderHudPortraitAdapter _defenderPortrait;
 
-        public PostBattleResultScreen(PostBattleResultAdapter adapter)
+        /// <summary>After a hot reload: point the slot at the menu already showing.
+        /// Scanned once, from <c>ScreenDetector.RecoverRuntimeState</c>.</summary>
+        public static void Recover()
         {
-            _adapter = adapter;
+            Recovered<PostBattleResultScreen>(FindActive());
         }
 
-        public static Screen TryBuildActiveScreen()
+        public static PostBattleResultAdapter FindActive()
         {
             return FindActivePostBattleResultScreen();
         }
@@ -83,30 +83,31 @@ namespace SongsOfConquestAccess.Screens
             get { return "post-battle-result"; }
         }
 
+        /// <summary>Layer 28: the battle result, over what raised the battle.</summary>
+        public override int Layer
+        {
+            get { return 28; }
+        }
+
         /// <summary>The outcome the menu draws ("Defeat!"), which is the one thing that names this
         /// page.</summary>
         public override string ScreenName
         {
             get
             {
-                string header = _adapter != null ? _adapter.HeaderText : null;
+                string header = Live != null ? Live.HeaderText : null;
                 return string.IsNullOrWhiteSpace(header) ? null : header;
             }
         }
 
-        public override bool IsPresent()
+        public override bool IsActive()
         {
-            return _adapter != null && _adapter.IsPresent();
-        }
-
-        public PostBattleResultScreen Rebuild()
-        {
-            return new PostBattleResultScreen(_adapter);
+            return Live != null && Live.IsPresent();
         }
 
         public override void Build(GraphBuilder builder)
         {
-            if (!IsPresent())
+            if (!IsActive())
             {
                 return;
             }
@@ -146,31 +147,31 @@ namespace SongsOfConquestAccess.Screens
             string key = attacker ? "attacker" : "defender";
             ControlId commander = BuildCommander(builder, attacker);
 
-            if (_adapter.XpBelongsToAttacker == attacker && _adapter.XpVisible)
+            if (Live.XpBelongsToAttacker == attacker && Live.XpVisible)
             {
-                AddLine(builder, key + "-xp", () => _adapter.XpText);
+                AddLine(builder, key + "-xp", () => Live.XpText);
             }
 
             // The troops lost, under the caption the game draws over the column, as a region: its
             // name is said once on entering it, and each stack reads as the count and the name the
             // entry draws, with no suffix (owner ruling 2026-09-07).
-            builder.PushContext(attacker ? _adapter.AttackerTroopsCaption : _adapter.DefenderTroopsCaption);
+            builder.PushContext(attacker ? Live.AttackerTroopsCaption : Live.DefenderTroopsCaption);
             builder.SetRegion("post-battle:" + key + "-troops");
             BuildEntries(
                 builder,
                 key + "-troop",
-                attacker ? _adapter.AttackerTroopsLost : _adapter.DefenderTroopsLost,
+                attacker ? Live.AttackerTroopsLost : Live.DefenderTroopsLost,
                 addNoneWhenEmpty: true);
             builder.SetRegion(null);
             builder.PopContext();
 
-            bool returned = attacker ? _adapter.AttackerReturnedTroopsVisible : _adapter.DefenderReturnedTroopsVisible;
+            bool returned = attacker ? Live.AttackerReturnedTroopsVisible : Live.DefenderReturnedTroopsVisible;
             if (returned)
             {
                 AddLine(
                     builder,
                     key + "-returned",
-                    () => attacker ? _adapter.AttackerReturnedTroopsText : _adapter.DefenderReturnedTroopsText);
+                    () => attacker ? Live.AttackerReturnedTroopsText : Live.DefenderReturnedTroopsText);
             }
 
             return commander;
@@ -185,7 +186,7 @@ namespace SongsOfConquestAccess.Screens
             string key = attacker ? "attacker-commander" : "defender-commander";
             Func<string> name = () => portrait != null
                 ? portrait.Name
-                : (attacker ? _adapter.AttackerCommanderText : _adapter.DefenderCommanderText);
+                : (attacker ? Live.AttackerCommanderText : Live.DefenderCommanderText);
             Tooltip tooltip = portrait != null
                 ? Portrait.BuildNativeTooltip(() => portrait.TooltipTarget, portrait.Localization, portrait.RefreshTooltip)
                 : null;
@@ -215,7 +216,7 @@ namespace SongsOfConquestAccess.Screens
         private void BuildLoot(GraphBuilder builder)
         {
             builder.PushContext(GameText.Get("Adventure/AdventurePostBattleMenu/BattleLoot", null));
-            BuildEntries(builder, "loot", _adapter.Loot, addNoneWhenEmpty: false);
+            BuildEntries(builder, "loot", Live.Loot, addNoneWhenEmpty: false);
             builder.PopContext();
         }
 
@@ -304,13 +305,13 @@ namespace SongsOfConquestAccess.Screens
         private void BuildButtons(GraphBuilder builder)
         {
             List<KeyValuePair<float, NodeDeclaration>> drawn = new List<KeyValuePair<float, NodeDeclaration>>(2);
-            Component accept = _adapter.IsAcceptButtonVisible() ? _adapter.AcceptButton : null;
+            Component accept = Live.IsAcceptButtonVisible() ? Live.AcceptButton : null;
             if (accept != null)
             {
                 drawn.Add(new KeyValuePair<float, NodeDeclaration>(Left(accept), AcceptNode(accept)));
             }
 
-            Component redo = _adapter.IsRedoManualBattleButtonVisible() ? _adapter.RedoManualBattleButton : null;
+            Component redo = Live.IsRedoManualBattleButtonVisible() ? Live.RedoManualBattleButton : null;
             if (redo != null)
             {
                 drawn.Add(new KeyValuePair<float, NodeDeclaration>(Left(redo), RedoNode(redo)));
@@ -332,10 +333,10 @@ namespace SongsOfConquestAccess.Screens
         private NodeDeclaration AcceptNode(Component button)
         {
             NodeVtable vtable = GraphNodes.Button(
-                () => _adapter.AcceptButtonLabel,
-                () => _adapter.Accept(),
-                _adapter.IsAcceptButtonEnabled,
-                _adapter.AcceptButtonTooltip);
+                () => Live.AcceptButtonLabel,
+                () => Live.Accept(),
+                Live.IsAcceptButtonEnabled,
+                Live.AcceptButtonTooltip);
             vtable.OnFocusVisual = () => NativeSelectionUtility.Select(button);
             return new DrawnNode(ControlId.For(button, "post-battle:accept"), vtable, button);
         }
@@ -343,14 +344,14 @@ namespace SongsOfConquestAccess.Screens
         private NodeDeclaration RedoNode(Component button)
         {
             NodeVtable vtable = GraphNodes.Button(
-                () => _adapter.RedoManualBattleButtonLabel,
-                () => _adapter.RedoManualBattle(),
-                _adapter.IsRedoManualBattleButtonEnabled,
-                _adapter.RedoManualBattleButtonTooltip);
+                () => Live.RedoManualBattleButtonLabel,
+                () => Live.RedoManualBattle(),
+                Live.IsRedoManualBattleButtonEnabled,
+                Live.RedoManualBattleButtonTooltip);
             // The game rewrites this button's text once a second while the turn timer runs it down, so
             // the count is read under the cursor rather than only on arrival.
             vtable.Announcements[0] = new NodeAnnouncement(
-                () => _adapter.RedoManualBattleButtonLabel,
+                () => Live.RedoManualBattleButtonLabel,
                 live: true,
                 kind: AnnouncementKinds.Label);
             vtable.OnFocusVisual = () => NativeSelectionUtility.Select(button);
@@ -390,17 +391,17 @@ namespace SongsOfConquestAccess.Screens
 
         private CommanderHudPortraitAdapter AttackerPortrait
         {
-            get { return _attackerPortrait ?? (_attackerPortrait = _adapter.AttackerCommanderPortrait); }
+            get { return _attackerPortrait ?? (_attackerPortrait = Live.AttackerCommanderPortrait); }
         }
 
         private CommanderHudPortraitAdapter DefenderPortrait
         {
-            get { return _defenderPortrait ?? (_defenderPortrait = _adapter.DefenderCommanderPortrait); }
+            get { return _defenderPortrait ?? (_defenderPortrait = Live.DefenderCommanderPortrait); }
         }
 
         // ---- finding the live menu ----
 
-        private static PostBattleResultScreen FindActivePostBattleResultScreen()
+        private static PostBattleResultAdapter FindActivePostBattleResultScreen()
         {
             PostBattleMenu menu = FindActivePostBattleMenu();
             if (!IsActive(menu) || GetResult(menu) == null)
@@ -410,7 +411,7 @@ namespace SongsOfConquestAccess.Screens
 
             AdventureBattleMenu battleMenu = ResolveOwningBattleMenu(menu);
             PostBattleResultAdapter adapter = new PostBattleResultAdapter(battleMenu, menu);
-            return adapter.IsPresent() ? new PostBattleResultScreen(adapter) : null;
+            return adapter.IsPresent() ? adapter : null;
         }
 
         private static PostBattleMenu FindActivePostBattleMenu()

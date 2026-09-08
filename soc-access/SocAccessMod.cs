@@ -82,6 +82,7 @@ namespace SongsOfConquestAccess
             GraphNavigator.InstallWiring();
             _navigator = new GraphNavigator();
             _screenManager = new ScreenManager(_reviewBufferManager, _reviewBufferController);
+            RegisterScreens(_screenManager);
             _screenDetector = new ScreenDetector(_screenManager);
             // One door for the drawn entries and for Ctrl+M alike; the manager itself gains nothing.
             Adapters.ModOptionsEntries.Open = OpenModOptions;
@@ -107,7 +108,7 @@ namespace SongsOfConquestAccess
             // Before the resync: a screen rebuilt from runtime state lists the mod's drawn entries
             // only if they are already there, and a hot reload has just destroyed the old load's.
             Adapters.ModOptionsEntries.Tick();
-            _screenDetector?.ResyncFromRuntimeState();
+            _screenDetector?.RecoverRuntimeState();
             _host.SetUpdateHandler(Update);
         }
 
@@ -122,7 +123,7 @@ namespace SongsOfConquestAccess
             Step("main menu waits", MainMenuPatches.Reset);
             Step("mod options entries", Adapters.ModOptionsEntries.Remove);
             Step("mod dialogs", UI.ModDialog.CloseAll);
-            Step("screens", () => _screenManager?.Clear());
+            Step("screens", () => _screenManager?.Shutdown());
             Step("drop list", Screens.DropListScreen.Reset);
             Step("graph navigator", () =>
             {
@@ -191,6 +192,92 @@ namespace SongsOfConquestAccess
             }
         }
 
+        /// <summary>
+        /// EVERY SCREEN THE MOD KNOWS ABOUT, registered once and polled from here on
+        /// (<see cref="ScreenManager"/>). Order matters only within a layer: a screen registered
+        /// later covers one registered earlier on the same number, which is how combat sits above the
+        /// adventure map. The layers themselves are in <c>screens/README.md</c>.
+        /// </summary>
+        private static void RegisterScreens(ScreenManager screens)
+        {
+            screens.Register(new MainMenuScreen());
+            screens.Register(new CampaignMenuScreen());
+            screens.Register(new TaleSelectScreen());
+            screens.Register(new CustomCampaignSelectScreen());
+            screens.Register(new CampaignMapSelectScreen());
+            screens.Register(new OnlineGameListScreen());
+            screens.Register(new OnlineHostGameScreen());
+            screens.Register(new CommunityMapsHomeScreen());
+            screens.Register(new CommunityMapsCollectionScreen());
+            screens.Register(new CommunityMapsDetailsScreen());
+            screens.Register(new CommunityMapsSearchResultsScreen());
+            screens.Register(new CommunityMapsSearchFilterScreen());
+            screens.Register(new CommunityMapsModalScreen());
+            screens.Register(new AdventureLobbyMapTypeScreen());
+            screens.Register(new AdventureLobbyMapSelectScreen());
+            screens.Register(new AdventureLobbyChallengeMapSelectScreen());
+            screens.Register(new AdventureLobbyRandomLayoutScreen());
+            screens.Register(new AdventureLobbyPlayersScreen());
+            screens.Register(new AdventureLobbyGameSettingsScreen());
+            screens.Register(new AdventureLobbyPlayerSettingsScreen());
+            screens.Register(new AdventureLobbyInviteProvidersScreen());
+            screens.Register(new AdventureLobbyIconDropdownScreen());
+            screens.Register(new PlatformUserMenuScreen());
+
+            screens.Register(new AdventureMapScreen());
+            // After the map, so the battlefield covers it on the layer they share.
+            screens.Register(new CombatScreen());
+            screens.Register(new PreBattleMenuScreen());
+
+            screens.Register(new MapEntityMiniMenuScreen());
+            screens.Register(new AdventurePlayerMenuScreen());
+            screens.Register(new OwnedEntitiesScreen());
+            screens.Register(new TroopOverviewScreen());
+            screens.Register(new MarketplaceScreen());
+            screens.Register(new ArtifactMarketScreen());
+            screens.Register(new TradingScreen());
+            screens.Register(new SettlementScreen());
+            screens.Register(new DefenceMenuScreen());
+            screens.Register(new GiftTownPopupScreen());
+            screens.Register(new SendResourcePopupScreen());
+            screens.Register(new DraftTroopsScreen());
+            screens.Register(new UpgradeTroopsScreen());
+            screens.Register(new RallyPointScreen());
+            screens.Register(new BuildMenuScreen());
+            screens.Register(new ResearchScreen());
+            screens.Register(new PurchaseWielderScreen());
+            screens.Register(new CommanderSheetScreen());
+            screens.Register(new SpellbookScreen());
+            screens.Register(new PostBattleResultScreen());
+            screens.Register(new ClaimMenuScreen());
+            screens.Register(new WorldChoiceMenuScreen());
+            screens.Register(new WorldConfirmMenuScreen());
+            screens.Register(new HostileJoinMenuScreen());
+            screens.Register(new LevelUpScreen());
+            screens.Register(new PlayerStatsScreen());
+            screens.Register(new PostAdventureResultScreen());
+            screens.Register(new PostAdventureStatsScreen());
+            screens.Register(new MoveTroopPopupScreen());
+            screens.Register(new TutorialSlideshowScreen());
+            screens.Register(new TutorialSimpleScreen());
+            screens.Register(new ChatScreen());
+
+            screens.Register(new PauseMenuScreen());
+            screens.Register(new OptionsScreen());
+            screens.Register(new SaveLoadGameScreen());
+            screens.Register(new CodexScreen());
+
+            screens.Register(new MessageDialogScreen());
+            screens.Register(new QuitToDesktopPopupScreen());
+            screens.Register(new StoryTextScreen());
+            screens.Register(new LoadingCompleteScreen());
+
+            // Children: pushed by the page that opens them rather than polled, and registered so the
+            // dev server can name them and so their state survives the mod's load.
+            screens.Register(new ModOptionsScreen());
+            screens.Register(new DropListScreen());
+        }
+
         /// <summary>Open the mod's own options. The drawn entries of
         /// <see cref="Adapters.ModOptionsEntries"/> and the Ctrl+M route in
         /// <c>ScreenManager.HandleGlobalAction</c> both come here, so one place decides what "mod
@@ -205,9 +292,10 @@ namespace SongsOfConquestAccess
             AttachLocalizationHandler();
             Adapters.ModOptionsEntries.Tick();
             _screenDetector?.Update();
+            // Readiness, then who the player is on, then the keys: a screen the detector has just
+            // been told about is focused in the same frame, before any key reaches it.
+            _screenManager?.Tick();
             _inputRouter?.Update();
-            _screenManager?.Update();
-            UIManager.Update();
         }
 
         /// <summary>Whether the speech backend came up. Reported by GET /status, where a silent

@@ -35,19 +35,5 @@ namespace SongsOfConquestAccess
                 SocAccessMod.Instance?.ScreenDetector?.OnCodexClosed(__instance);
             }
         }
-
-        [HarmonyPatch(typeof(CodexMenu), "SetActiveTab")]
-        [HarmonyPostfix]
-        private static void CodexMenuSetActiveTabPostfix(CodexMenu __instance)
-        {
-            SocAccessMod.Instance?.ScreenDetector?.OnCodexTabChanged(__instance);
-        }
-
-        [HarmonyPatch(typeof(CodexMenu), "HandleContentButtonClicked")]
-        [HarmonyPostfix]
-        private static void CodexMenuHandleContentButtonClickedPostfix(CodexMenu __instance)
-        {
-            SocAccessMod.Instance?.ScreenDetector?.OnCodexArticleChanged(__instance);
-        }
     }
 }

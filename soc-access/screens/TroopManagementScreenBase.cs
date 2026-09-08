@@ -26,20 +26,20 @@ namespace SongsOfConquestAccess.Screens
     /// The host writes no title of its own over a sub-page - the building's name stays where it was
     /// on the landing page - so that is what the page is called.
     /// </summary>
-    public abstract class TroopManagementScreenBase : GraphScreen
+    public abstract class TroopManagementScreenBase : LiveScreen<ITroopManagementHostAdapter>
     {
-        protected TroopManagementScreenBase(ITroopManagementHostAdapter host)
+        /// <summary>The host that drew this page - the slot, under the name the page reads it by.
+        /// </summary>
+        protected ITroopManagementHostAdapter Host
         {
-            Host = host;
+            get { return Live; }
         }
-
-        protected ITroopManagementHostAdapter Host { get; private set; }
 
         /// <summary>Which host drew this page, which is how the detector tells one menu's sub-page
         /// from another's.</summary>
         public string HostIdPrefix
         {
-            get { return Host != null ? Host.IdPrefix : string.Empty; }
+            get { return Live != null ? Live.IdPrefix : string.Empty; }
         }
 
         /// <summary>What this page is, in control keys: "draft-troops" or "upgrade-troops".</summary>
@@ -50,9 +50,16 @@ namespace SongsOfConquestAccess.Screens
         /// <summary>The page itself, declared into the stop the base has already opened.</summary>
         protected abstract void BuildContent(GraphBuilder builder);
 
+        /// <summary>The host's prefix and the page: "settlement-draft-troops". With no host - the
+        /// page is not showing - the suffix alone, so the screen still has a name to be found by.
+        /// </summary>
         public override string Key
         {
-            get { return HostIdPrefix + "-" + ScreenSuffix; }
+            get
+            {
+                string prefix = HostIdPrefix;
+                return string.IsNullOrEmpty(prefix) ? ScreenSuffix : prefix + "-" + ScreenSuffix;
+            }
         }
 
         public override string ScreenName
@@ -63,14 +70,14 @@ namespace SongsOfConquestAccess.Screens
             }
         }
 
-        public override bool IsPresent()
+        public override bool IsActive()
         {
-            return Host != null && IsContentPresent();
+            return Live != null && IsContentPresent();
         }
 
         public override void Build(GraphBuilder builder)
         {
-            if (!IsPresent())
+            if (!IsActive())
             {
                 return;
             }

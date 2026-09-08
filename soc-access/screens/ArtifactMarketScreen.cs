@@ -63,7 +63,7 @@ namespace SongsOfConquestAccess.Screens
     /// outside any gamepad branch (measured 2026-09-07 in the decompiled source). The navigator claims
     /// the key only while something is being carried.
     /// </summary>
-    public sealed class ArtifactMarketScreen : GraphScreen
+    public sealed class ArtifactMarketScreen : LiveScreen<ArtifactMarketMenuAdapter>
     {
         private const string WielderStop = "artifact-market-wielder";
         private const string DescriptionStop = "artifact-market-description";
@@ -75,19 +75,19 @@ namespace SongsOfConquestAccess.Screens
         private const string KeyPrefix = "artifact-market";
         private const string WielderKey = "artifact-market:wielder";
 
-        private readonly ArtifactMarketMenuAdapter _adapter;
-
         // A subject of its own per synthesized node, kept across rebuilds so the reconciler seats the
         // cursor on the same one: the description and the auto-arrange button are not drawn as
         // controls of their own.
         private readonly Dictionary<string, object> _markers = new Dictionary<string, object>();
 
-        public ArtifactMarketScreen(ArtifactMarketMenuAdapter adapter)
+        /// <summary>After a hot reload: point the slot at the menu already showing.
+        /// Scanned once, from <c>ScreenDetector.RecoverRuntimeState</c>.</summary>
+        public static void Recover()
         {
-            _adapter = adapter;
+            Recovered<ArtifactMarketScreen>(FindActive());
         }
 
-        public static Screen TryBuildActiveScreen()
+        public static ArtifactMarketMenuAdapter FindActive()
         {
             ArtifactMarketMenu[] menus = Resources.FindObjectsOfTypeAll<ArtifactMarketMenu>();
             for (int i = 0; i < menus.Length; i++)
@@ -95,7 +95,7 @@ namespace SongsOfConquestAccess.Screens
                 ArtifactMarketMenuAdapter adapter = new ArtifactMarketMenuAdapter(menus[i]);
                 if (adapter.IsPresent())
                 {
-                    return new ArtifactMarketScreen(adapter);
+                    return (adapter);
                 }
             }
 
@@ -107,6 +107,12 @@ namespace SongsOfConquestAccess.Screens
             get { return "artifact-market"; }
         }
 
+        /// <summary>Layer 20: an in-game panel over the map.</summary>
+        public override int Layer
+        {
+            get { return 20; }
+        }
+
         /// <summary>The merchant, by the title the menu draws over it ("Raider's Market") and the
         /// banner the wielder's band draws over the portrait where the place has a name of its own.
         /// </summary>
@@ -114,34 +120,27 @@ namespace SongsOfConquestAccess.Screens
         {
             get
             {
-                return _adapter == null
+                return Live == null
                     ? null
-                    : TroopHudRows.NameWithPlace(_adapter.Title, _adapter.Wielder);
+                    : TroopHudRows.NameWithPlace(Live.Title, Live.Wielder);
             }
         }
 
-        public override bool IsPresent()
+        public override bool IsActive()
         {
-            return _adapter != null && _adapter.IsPresent();
-        }
-
-        /// <summary>Kept for the detector, which calls it whenever the stock, an artifact or the army
-        /// changes. The graph is declared afresh on every operation, so there is nothing to rebuild.
-        /// </summary>
-        public void Refresh()
-        {
+            return Live != null && Live.IsPresent();
         }
 
         public override void Build(GraphBuilder builder)
         {
-            if (!IsPresent())
+            if (!IsActive())
             {
                 return;
             }
 
             ArtifactSlotNodes.RegisterSounds();
 
-            TroopHudRows.WielderStop(builder, WielderStop, WielderKey, _adapter.Wielder);
+            TroopHudRows.WielderStop(builder, WielderStop, WielderKey, Live.Wielder);
 
             builder.BeginStop(DescriptionStop);
             BuildDescription(builder);
@@ -153,10 +152,10 @@ namespace SongsOfConquestAccess.Screens
             BuildSell(builder);
 
             builder.BeginStop(EquipmentStop);
-            ArtifactSlotNodes.Equipment(builder, _adapter, KeyPrefix, AddSlotHints);
+            ArtifactSlotNodes.Equipment(builder, Live, KeyPrefix, AddSlotHints);
 
             builder.BeginStop(InventoryStop);
-            ArtifactSlotNodes.Inventory(builder, _adapter, KeyPrefix, AddSlotHints, Marker("auto-arrange"));
+            ArtifactSlotNodes.Inventory(builder, Live, KeyPrefix, AddSlotHints, Marker("auto-arrange"));
 
             builder.BeginStop(CloseStop);
             BuildClose(builder);
@@ -175,7 +174,7 @@ namespace SongsOfConquestAccess.Screens
 
         private TroopHudAdapter Troops
         {
-            get { return _adapter == null || _adapter.Wielder == null ? null : _adapter.Wielder.Troops; }
+            get { return Live == null || Live.Wielder == null ? null : Live.Wielder.Troops; }
         }
 
         // ---- the merchant's words ----
@@ -184,7 +183,7 @@ namespace SongsOfConquestAccess.Screens
         /// band's prompt while the game is painting it: nothing is selected to buy or sell.</summary>
         private void BuildDescription(GraphBuilder builder)
         {
-            string description = _adapter.Description;
+            string description = Live.Description;
             if (!string.IsNullOrWhiteSpace(description))
             {
                 builder.AddItem(new SyntheticNode(
@@ -192,12 +191,12 @@ namespace SongsOfConquestAccess.Screens
                     GraphNodes.Paragraphs(() => SpokenLines.Of(new[] { description }))));
             }
 
-            Component prompt = _adapter.IsNoSelectionShown ? _adapter.NoSelectionContainer : null;
+            Component prompt = Live.IsNoSelectionShown ? Live.NoSelectionContainer : null;
             if (prompt != null)
             {
                 builder.AddItem(new DrawnNode(
                     ControlId.Structural("artifact-market:prompt"),
-                    GraphNodes.Text(() => _adapter.NoSelectionText),
+                    GraphNodes.Text(() => Live.NoSelectionText),
                     prompt));
             }
         }
@@ -230,7 +229,7 @@ namespace SongsOfConquestAccess.Screens
         /// clears whatever is selected.</summary>
         private void BuildCategories(GraphBuilder builder)
         {
-            IReadOnlyList<ArtifactMarketMenuAdapter.CategoryItem> categories = Items("categories", _adapter.GetCategories);
+            IReadOnlyList<ArtifactMarketMenuAdapter.CategoryItem> categories = Items("categories", Live.GetCategories);
             if (categories.Count == 0)
             {
                 return;
@@ -247,9 +246,9 @@ namespace SongsOfConquestAccess.Screens
 
                 NodeVtable vtable = GraphNodes.Radio(
                     () => it.Label,
-                    () => _adapter.ActiveCategoryIndex == it.Index,
-                    () => _adapter.SelectCategory(it.Index));
-                vtable.OnFocusVisual = () => _adapter.FocusCategory(it.Index);
+                    () => Live.ActiveCategoryIndex == it.Index,
+                    () => Live.SelectCategory(it.Index));
+                vtable.OnFocusVisual = () => Live.FocusCategory(it.Index);
                 builder.AddItem(new DrawnNode(
                     ControlId.For(it.Toggle, "artifact-market:category/" + it.Index),
                     vtable,
@@ -264,7 +263,7 @@ namespace SongsOfConquestAccess.Screens
         /// category with no offer at all is one line saying so.</summary>
         private void BuildOffers(GraphBuilder builder)
         {
-            IReadOnlyList<ArtifactMarketMenuAdapter.MarketArtifactItem> offers = Items("offers", _adapter.GetMarketArtifacts);
+            IReadOnlyList<ArtifactMarketMenuAdapter.MarketArtifactItem> offers = Items("offers", Live.GetMarketArtifacts);
             bool any = false;
             for (int i = 0; i < offers.Count; i++)
             {
@@ -278,12 +277,12 @@ namespace SongsOfConquestAccess.Screens
 
                 NodeVtable vtable = GraphNodes.Button(
                     () => it.Label,
-                    () => _adapter.SelectMarketEntryForPurchase(it.Entry),
+                    () => Live.SelectMarketEntryForPurchase(it.Entry),
                     null,
                     it.Tooltip);
                 vtable.Announcements.Add(GraphNodes.ValuePart(() => it.CostLabel, watch: false));
                 // Selecting the game's own cell draws the artifact's tooltip and scrolls the grid.
-                vtable.OnFocusVisual = () => _adapter.SelectMarketEntry(it.Entry);
+                vtable.OnFocusVisual = () => Live.SelectMarketEntry(it.Entry);
                 builder.AddItem(new DrawnNode(
                     ControlId.For(it.Entry, "artifact-market:offer/" + i),
                     vtable,
@@ -306,15 +305,15 @@ namespace SongsOfConquestAccess.Screens
         /// </summary>
         private void BuildBuyBand(GraphBuilder builder)
         {
-            if (!_adapter.IsBuyShown)
+            if (!Live.IsBuyShown)
             {
                 return;
             }
 
-            Component container = _adapter.BuyContainer;
+            Component container = Live.BuyContainer;
             if (container != null)
             {
-                NodeVtable line = GraphNodes.Text(() => _adapter.BuyItemName, null, _adapter.BuyItemTooltip);
+                NodeVtable line = GraphNodes.Text(() => Live.BuyItemName, null, Live.BuyItemTooltip);
                 line.Announcements[0].Live = true;
                 builder.AddItem(new DrawnNode(
                     ControlId.Structural("artifact-market:purchase/line"),
@@ -322,18 +321,18 @@ namespace SongsOfConquestAccess.Screens
                     container));
             }
 
-            Component button = _adapter.BuyButton;
+            Component button = Live.BuyButton;
             if (button == null)
             {
                 return;
             }
 
             NodeVtable vtable = GraphNodes.Button(
-                () => _adapter.BuyButtonLabel,
-                () => _adapter.BuySelectedMarketArtifact(),
-                _adapter.CanBuySelectedArtifact);
+                () => Live.BuyButtonLabel,
+                () => Live.BuySelectedMarketArtifact(),
+                Live.CanBuySelectedArtifact);
             vtable.Announcements[0].Live = true;
-            vtable.Announcements.Add(GraphNodes.ValuePart(() => _adapter.BuyPriceLabel));
+            vtable.Announcements.Add(GraphNodes.ValuePart(() => Live.BuyPriceLabel));
             vtable.OnFocusVisual = () => NativeSelectionUtility.Select(button);
             builder.AddItem(new DrawnNode(
                 ControlId.Structural("artifact-market:purchase/action"),
@@ -351,17 +350,17 @@ namespace SongsOfConquestAccess.Screens
         /// </summary>
         private void BuildSell(GraphBuilder builder)
         {
-            if (!_adapter.IsSellShown)
+            if (!Live.IsSellShown)
             {
                 return;
             }
 
-            builder.PushContext(_adapter.SellButtonLabel);
+            builder.PushContext(Live.SellButtonLabel);
 
-            Component container = _adapter.SellContainer;
+            Component container = Live.SellContainer;
             if (container != null)
             {
-                NodeVtable line = GraphNodes.Text(() => _adapter.SellItemName, null, _adapter.SellItemTooltip);
+                NodeVtable line = GraphNodes.Text(() => Live.SellItemName, null, Live.SellItemTooltip);
                 line.Announcements[0].Live = true;
                 builder.AddItem(new DrawnNode(
                     ControlId.Structural("artifact-market:sell/line"),
@@ -369,15 +368,15 @@ namespace SongsOfConquestAccess.Screens
                     container));
             }
 
-            Component button = _adapter.IsSellButtonShown ? _adapter.SellButton : null;
+            Component button = Live.IsSellButtonShown ? Live.SellButton : null;
             if (button != null)
             {
                 NodeVtable vtable = GraphNodes.Button(
-                    () => _adapter.SellButtonLabel,
-                    () => _adapter.SellSelectedArtifact(),
-                    _adapter.CanSellSelectedArtifact);
+                    () => Live.SellButtonLabel,
+                    () => Live.SellSelectedArtifact(),
+                    Live.CanSellSelectedArtifact);
                 vtable.Announcements[0].Live = true;
-                vtable.Announcements.Add(GraphNodes.ValuePart(() => _adapter.SellPriceLabel));
+                vtable.Announcements.Add(GraphNodes.ValuePart(() => Live.SellPriceLabel));
                 vtable.OnFocusVisual = () => NativeSelectionUtility.Select(button);
                 builder.AddItem(new DrawnNode(
                     ControlId.Structural("artifact-market:sell/action"),
@@ -399,7 +398,7 @@ namespace SongsOfConquestAccess.Screens
                 vtable,
                 ModStrings.Screens.ArtifactSelectForSaleHint,
                 AccessibilityActions.UiLeftClick.Key);
-            ArtifactDetails.EquipInstruction instruction = _adapter.GetArtifactInstruction(slot);
+            ArtifactDetails.EquipInstruction instruction = Live.GetArtifactInstruction(slot);
             ModString contextual = instruction == ArtifactDetails.EquipInstruction.Use
                 ? ModStrings.Screens.ArtifactUseHint
                 : instruction == ArtifactDetails.EquipInstruction.Unequip
@@ -422,8 +421,8 @@ namespace SongsOfConquestAccess.Screens
 
         private void BuildClose(GraphBuilder builder)
         {
-            Component close = _adapter.CloseButton;
-            if (close == null || !_adapter.IsCloseVisible())
+            Component close = Live.CloseButton;
+            if (close == null || !Live.IsCloseVisible())
             {
                 return;
             }
@@ -431,7 +430,7 @@ namespace SongsOfConquestAccess.Screens
             // An icon with no text of its own, so the mod names it.
             NodeVtable vtable = GraphNodes.Button(
                 () => ModText.Get(ModStrings.Screens.Close),
-                () => _adapter.ActivateClose());
+                () => Live.ActivateClose());
             vtable.OnFocusVisual = () => NativeSelectionUtility.Select(close);
             builder.AddItem(new DrawnNode(ControlId.For(close, "artifact-market:close"), vtable, close));
         }

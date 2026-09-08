@@ -326,20 +326,6 @@ namespace SongsOfConquestAccess
     }
 
     [HarmonyPatch]
-    public static class CommunityMapsSearchPanelCreateTagsPatches
-    {
-        private static MethodBase TargetMethod()
-        {
-            return AccessTools.Method(AccessTools.TypeByName("ModIOBrowser.Implementation.SearchPanel"), "CreateTagCategoryListItems");
-        }
-
-        private static void Postfix()
-        {
-            SocAccessMod.Instance?.ScreenDetector?.OnCommunityMapsSearchFilterContentsChanged();
-        }
-    }
-
-    [HarmonyPatch]
     public static class CommunityMapsSearchResultsOpenPatches
     {
         private static MethodBase TargetMethod()

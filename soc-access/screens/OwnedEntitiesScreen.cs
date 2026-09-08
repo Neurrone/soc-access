@@ -38,23 +38,23 @@ namespace SongsOfConquestAccess.Screens
     /// Escape is still the game's (<c>ConsumesBack</c> false): the kingdom HUD registers
     /// <c>UI.ExitMenu</c> for this menu in <c>KingdomInformationHUD.ReregisterHotKeys</c>.
     /// </summary>
-    public sealed class OwnedEntitiesScreen : GraphScreen
+    public sealed class OwnedEntitiesScreen : LiveScreen<KingdomEntityOverviewAdapter>
     {
         private const string ContentStop = "owned-entities-content";
         private const string CloseStop = "owned-entities-close";
-
-        private readonly KingdomEntityOverviewAdapter _adapter;
 
         // The close node has nothing on screen to key on, so it gets a subject of its own, kept
         // across rebuilds so the reconciler seats the cursor back on it.
         private readonly object _closeKey = new object();
 
-        public OwnedEntitiesScreen(KingdomEntityOverviewAdapter adapter)
+        /// <summary>After a hot reload: point the slot at the menu already showing.
+        /// Scanned once, from <c>ScreenDetector.RecoverRuntimeState</c>.</summary>
+        public static void Recover()
         {
-            _adapter = adapter;
+            Recovered<OwnedEntitiesScreen>(FindActive());
         }
 
-        public static Screen TryBuildActiveScreen()
+        public static KingdomEntityOverviewAdapter FindActive()
         {
             KingdomEntityOverviewMenu[] menus = Resources.FindObjectsOfTypeAll<KingdomEntityOverviewMenu>();
             for (int i = 0; i < menus.Length; i++)
@@ -62,7 +62,7 @@ namespace SongsOfConquestAccess.Screens
                 KingdomEntityOverviewAdapter adapter = new KingdomEntityOverviewAdapter(menus[i]);
                 if (adapter.IsPresent())
                 {
-                    return new OwnedEntitiesScreen(adapter);
+                    return (adapter);
                 }
             }
 
@@ -74,24 +74,30 @@ namespace SongsOfConquestAccess.Screens
             get { return "owned-entities"; }
         }
 
+        /// <summary>Layer 20: an in-game panel over the map.</summary>
+        public override int Layer
+        {
+            get { return 20; }
+        }
+
         /// <summary>The menu's own drawn title ("Building Overview").</summary>
         public override string ScreenName
         {
             get
             {
-                string title = _adapter != null ? _adapter.Title : null;
+                string title = Live != null ? Live.Title : null;
                 return string.IsNullOrWhiteSpace(title) ? null : title;
             }
         }
 
-        public override bool IsPresent()
+        public override bool IsActive()
         {
-            return _adapter != null && _adapter.IsPresent();
+            return Live != null && Live.IsPresent();
         }
 
         public override void Build(GraphBuilder builder)
         {
-            if (!IsPresent())
+            if (!IsActive())
             {
                 return;
             }
@@ -107,7 +113,7 @@ namespace SongsOfConquestAccess.Screens
 
         private void BuildCategories(GraphBuilder builder)
         {
-            IReadOnlyList<KingdomEntityOverviewAdapter.CategoryItem> categories = _adapter.GetCategories();
+            IReadOnlyList<KingdomEntityOverviewAdapter.CategoryItem> categories = Live.GetCategories();
             ControlId first = null;
             for (int c = 0; c < categories.Count; c++)
             {
@@ -281,7 +287,7 @@ namespace SongsOfConquestAccess.Screens
                 ControlId.For(_closeKey, "owned-entities:close"),
                 GraphNodes.Button(
                     () => ModText.Get(ModStrings.Screens.Close),
-                    () => _adapter.Close())));
+                    () => Live.Close())));
         }
     }
 }

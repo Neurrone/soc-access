@@ -55,7 +55,7 @@ namespace SongsOfConquestAccess.Screens
     ///
     /// The menu draws no title of its own, so the screen is named after the two wielders in it.
     /// </summary>
-    public sealed class TradingScreen : GraphScreen
+    public sealed class TradingScreen : LiveScreen<TradingMenuAdapter>
     {
         private const string LeftWielderStop = "trade-left-wielder";
         private const string RightWielderStop = "trade-right-wielder";
@@ -70,19 +70,19 @@ namespace SongsOfConquestAccess.Screens
         private static readonly PropertyInfo InstallerContainerProperty =
             AccessTools.Property(typeof(TradingMenuInstaller), "Container");
 
-        private readonly TradingMenuAdapter _adapter;
-
         // A subject of its own per synthesized node, kept across rebuilds so the reconciler seats the
         // cursor on the same one: the band lines and the auto-arrange buttons are not drawn as
         // controls of their own.
         private readonly Dictionary<string, object> _markers = new Dictionary<string, object>();
 
-        public TradingScreen(TradingMenuAdapter adapter)
+        /// <summary>After a hot reload: point the slot at the menu already showing.
+        /// Scanned once, from <c>ScreenDetector.RecoverRuntimeState</c>.</summary>
+        public static void Recover()
         {
-            _adapter = adapter;
+            Recovered<TradingScreen>(FindActive());
         }
 
-        public static Screen TryBuildActiveScreen()
+        public static TradingMenuAdapter FindActive()
         {
             TradingMenuInstaller[] installers = Resources.FindObjectsOfTypeAll<TradingMenuInstaller>();
             for (int i = 0; i < installers.Length; i++)
@@ -91,7 +91,7 @@ namespace SongsOfConquestAccess.Screens
                 TradingMenuAdapter adapter = new TradingMenuAdapter(menu);
                 if (adapter.IsPresent())
                 {
-                    return new TradingScreen(adapter);
+                    return (adapter);
                 }
             }
 
@@ -100,12 +100,18 @@ namespace SongsOfConquestAccess.Screens
 
         public TradingMenuAdapter Adapter
         {
-            get { return _adapter; }
+            get { return Live; }
         }
 
         public override string Key
         {
             get { return "trading"; }
+        }
+
+        /// <summary>Layer 20: an in-game panel over the map.</summary>
+        public override int Layer
+        {
+            get { return 20; }
         }
 
         /// <summary>The two wielders the menu is about, in the order it draws them: the menu writes no
@@ -114,13 +120,13 @@ namespace SongsOfConquestAccess.Screens
         {
             get
             {
-                if (_adapter == null)
+                if (Live == null)
                 {
                     return null;
                 }
 
-                string left = _adapter.Left.CommanderName;
-                string right = _adapter.Right.CommanderName;
+                string left = Live.Left.CommanderName;
+                string right = Live.Right.CommanderName;
                 if (string.IsNullOrWhiteSpace(left))
                 {
                     return string.IsNullOrWhiteSpace(right) ? null : right;
@@ -132,40 +138,34 @@ namespace SongsOfConquestAccess.Screens
             }
         }
 
-        public override bool IsPresent()
+        public override bool IsActive()
         {
-            return _adapter != null && _adapter.IsPresent();
-        }
-
-        /// <summary>Kept for the detector, which calls it whenever the menu is reopened over itself.
-        /// The graph is declared afresh on every operation, so there is nothing to rebuild.</summary>
-        public void Refresh()
-        {
+            return Live != null && Live.IsPresent();
         }
 
         public override void Build(GraphBuilder builder)
         {
-            if (!IsPresent())
+            if (!IsActive())
             {
                 return;
             }
 
             ArtifactSlotNodes.RegisterSounds();
 
-            BuildWielder(builder, LeftWielderStop, LeftKey, _adapter.Left);
-            BuildWielder(builder, RightWielderStop, RightKey, _adapter.Right);
+            BuildWielder(builder, LeftWielderStop, LeftKey, Live.Left);
+            BuildWielder(builder, RightWielderStop, RightKey, Live.Right);
 
             builder.BeginStop(LeftEquipmentStop);
-            ArtifactSlotNodes.Equipment(builder, _adapter.Left, LeftKey, AddSlotHints, Section(_adapter.Left, _adapter.Left.EquipmentLabel));
+            ArtifactSlotNodes.Equipment(builder, Live.Left, LeftKey, AddSlotHints, Section(Live.Left, Live.Left.EquipmentLabel));
 
             builder.BeginStop(LeftInventoryStop);
-            ArtifactSlotNodes.Inventory(builder, _adapter.Left, LeftKey, AddSlotHints, Marker("left/auto-arrange"), Section(_adapter.Left, _adapter.Left.InventoryLabel));
+            ArtifactSlotNodes.Inventory(builder, Live.Left, LeftKey, AddSlotHints, Marker("left/auto-arrange"), Section(Live.Left, Live.Left.InventoryLabel));
 
             builder.BeginStop(RightEquipmentStop);
-            ArtifactSlotNodes.Equipment(builder, _adapter.Right, RightKey, AddSlotHints, Section(_adapter.Right, _adapter.Right.EquipmentLabel));
+            ArtifactSlotNodes.Equipment(builder, Live.Right, RightKey, AddSlotHints, Section(Live.Right, Live.Right.EquipmentLabel));
 
             builder.BeginStop(RightInventoryStop);
-            ArtifactSlotNodes.Inventory(builder, _adapter.Right, RightKey, AddSlotHints, Marker("right/auto-arrange"), Section(_adapter.Right, _adapter.Right.InventoryLabel));
+            ArtifactSlotNodes.Inventory(builder, Live.Right, RightKey, AddSlotHints, Marker("right/auto-arrange"), Section(Live.Right, Live.Right.InventoryLabel));
 
             builder.BeginStop(CloseStop);
             BuildClose(builder);
@@ -175,14 +175,14 @@ namespace SongsOfConquestAccess.Screens
         /// </summary>
         public override bool ClaimsAction(string actionKey)
         {
-            return TroopHudRows.ClaimsAction(actionKey, Navigator, Troops(_adapter?.Left), LeftKey)
-                || TroopHudRows.ClaimsAction(actionKey, Navigator, Troops(_adapter?.Right), RightKey);
+            return TroopHudRows.ClaimsAction(actionKey, Navigator, Troops(Live?.Left), LeftKey)
+                || TroopHudRows.ClaimsAction(actionKey, Navigator, Troops(Live?.Right), RightKey);
         }
 
         public override bool OnAction(string actionKey)
         {
-            return TroopHudRows.OnAction(actionKey, Navigator, Troops(_adapter?.Left), LeftKey)
-                || TroopHudRows.OnAction(actionKey, Navigator, Troops(_adapter?.Right), RightKey);
+            return TroopHudRows.OnAction(actionKey, Navigator, Troops(Live?.Left), LeftKey)
+                || TroopHudRows.OnAction(actionKey, Navigator, Troops(Live?.Right), RightKey);
         }
 
         private static TroopHudAdapter Troops(TradingMenuAdapter.Side side)
@@ -280,7 +280,7 @@ namespace SongsOfConquestAccess.Screens
                 keyPrefix,
                 tabs,
                 side.GetActiveModifierCategoryIndex,
-                index => _adapter.ActivateModifierCategory(index),
+                index => Live.ActivateModifierCategory(index),
                 index => side.SelectModifierCategory(index),
                 side.GetActiveModifierListLabel(),
                 Lines("modifiers", side.GetActiveModifiers),
@@ -356,8 +356,8 @@ namespace SongsOfConquestAccess.Screens
 
         private void BuildClose(GraphBuilder builder)
         {
-            Component close = _adapter.CloseButton;
-            if (close == null || !_adapter.IsCloseVisible())
+            Component close = Live.CloseButton;
+            if (close == null || !Live.IsCloseVisible())
             {
                 return;
             }
@@ -365,7 +365,7 @@ namespace SongsOfConquestAccess.Screens
             // An icon with no text of its own, so the mod names it.
             NodeVtable vtable = GraphNodes.Button(
                 () => ModText.Get(ModStrings.Screens.Close),
-                () => _adapter.ActivateClose());
+                () => Live.ActivateClose());
             vtable.OnFocusVisual = () => NativeSelectionUtility.Select(close);
             builder.AddItem(new DrawnNode(ControlId.For(close, "trade:close"), vtable, close));
         }

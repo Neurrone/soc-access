@@ -23,34 +23,40 @@ namespace SongsOfConquestAccess.Screens
     /// established). So Escape does nothing here and the screen claims it, running the same
     /// <c>Hide</c> the Cancel row runs.
     /// </summary>
-    public sealed class AdventureLobbyIconDropdownScreen : GraphScreen
+    public sealed class AdventureLobbyIconDropdownScreen : LiveScreen<AdventureLobbyIconDropdownAdapter>
     {
         private const string OptionsStop = "icon-dropdown";
-
-        private readonly AdventureLobbyIconDropdownAdapter _adapter;
 
         // The Cancel row is the mod's own control, so it needs a subject the game does not provide.
         private readonly object _cancelKey = new object();
 
-        public AdventureLobbyIconDropdownScreen(AdventureLobbyIconDropdownAdapter adapter)
+        /// <summary>After a hot reload: point the slot at the menu already showing.
+        /// Scanned once, from <c>ScreenDetector.RecoverRuntimeState</c>.</summary>
+        public static void Recover()
         {
-            _adapter = adapter;
+            Recovered<AdventureLobbyIconDropdownScreen>(FindActive());
         }
 
-        public static Screen TryBuildActiveScreen()
+        public static AdventureLobbyIconDropdownAdapter FindActive()
         {
             AdventureLobbyIconDropdownAdapter adapter = FindActiveDropdown(null);
-            return adapter != null ? new AdventureLobbyIconDropdownScreen(adapter) : null;
+            return adapter;
         }
 
         public bool Matches(IconDropdown dropdown)
         {
-            return _adapter != null && ReferenceEquals(_adapter.SourceKey, dropdown);
+            return Live != null && ReferenceEquals(Live.SourceKey, dropdown);
         }
 
         public override string Key
         {
             get { return "adventure-lobby-icon-dropdown"; }
+        }
+
+        /// <summary>Layer 24: over the lobby row it was opened from.</summary>
+        public override int Layer
+        {
+            get { return 24; }
         }
 
         /// <summary>What the dropdown is choosing, in the game's own words ("Colour", "Faction").
@@ -59,19 +65,19 @@ namespace SongsOfConquestAccess.Screens
         {
             get
             {
-                string title = _adapter != null ? _adapter.Title : null;
+                string title = Live != null ? Live.Title : null;
                 return string.IsNullOrWhiteSpace(title) ? null : title;
             }
         }
 
-        public override bool IsPresent()
+        public override bool IsActive()
         {
-            return _adapter != null && _adapter.IsPresent();
+            return Live != null && Live.IsPresent();
         }
 
         public override bool ConsumesBack
         {
-            get { return IsPresent(); }
+            get { return IsActive(); }
         }
 
         public override bool Back()
@@ -82,29 +88,29 @@ namespace SongsOfConquestAccess.Screens
         public override void OnUnfocus()
         {
             base.OnUnfocus();
-            if (_adapter != null)
+            if (Live != null)
             {
-                _adapter.HideNativeTooltip();
+                Live.HideNativeTooltip();
             }
         }
 
         public override void OnPop()
         {
             base.OnPop();
-            if (_adapter != null)
+            if (Live != null)
             {
-                _adapter.HideNativeTooltip();
+                Live.HideNativeTooltip();
             }
         }
 
         public override void Build(GraphBuilder builder)
         {
-            if (!IsPresent())
+            if (!IsActive())
             {
                 return;
             }
 
-            IReadOnlyList<AdventureLobbyIconDropdownAdapter.OptionItem> items = _adapter.GetOptions();
+            IReadOnlyList<AdventureLobbyIconDropdownAdapter.OptionItem> items = Live.GetOptions();
             builder.BeginStop(OptionsStop);
             for (int i = 0; i < items.Count; i++)
             {
@@ -136,21 +142,21 @@ namespace SongsOfConquestAccess.Screens
 
         private NodeVtable CancelRow()
         {
-            NodeVtable vtable = GraphNodes.Button(() => _adapter.CancelLabel, () => Cancel());
-            vtable.OnFocusVisual = _adapter.HideNativeTooltip;
+            NodeVtable vtable = GraphNodes.Button(() => Live.CancelLabel, () => Cancel());
+            vtable.OnFocusVisual = Live.HideNativeTooltip;
             return vtable;
         }
 
         private bool Cancel()
         {
-            return _adapter != null && _adapter.Cancel();
+            return Live != null && Live.Cancel();
         }
 
         private void Activate(AdventureLobbyIconDropdownAdapter.OptionItem item)
         {
             SocAccessMod mod = SocAccessMod.Instance;
             ScreenDetector detector = mod != null ? mod.ScreenDetector : null;
-            IconDropdown dropdown = _adapter != null ? _adapter.SourceKey as IconDropdown : null;
+            IconDropdown dropdown = Live != null ? Live.SourceKey as IconDropdown : null;
             if (detector != null)
             {
                 detector.OnAdventureLobbyIconDropdownOptionActivating(dropdown, item.TypeName);

@@ -44,32 +44,32 @@ namespace SongsOfConquestAccess.Screens
     /// context menu, dropdown, search panel, authentication, download queue, details or other panel is
     /// up, is <c>Browser.Close()</c>).
     /// </summary>
-    public sealed class CommunityMapsHomeScreen : GraphScreen
+    public sealed class CommunityMapsHomeScreen : LiveScreen<CommunityMapsHomeAdapter>
     {
         private const string TabsStop = "community-maps-tabs";
         private const string CommandsStop = "community-maps-commands";
         private const string RowsStop = "community-maps-rows";
         private const string FooterStop = "community-maps-footer";
 
-        private readonly CommunityMapsHomeAdapter _adapter;
-
         // A subject of its own per synthesized node, kept across rebuilds so the reconciler seats the
         // cursor on the same row: mod.io rebuilds its list item objects whenever a band refreshes, and
         // a band's item is a place in a named band either way.
         private readonly Dictionary<string, object> _markers = new Dictionary<string, object>();
 
-        public CommunityMapsHomeScreen(CommunityMapsHomeAdapter adapter)
+        /// <summary>After a hot reload: point the slot at the menu already showing.
+        /// Scanned once, from <c>ScreenDetector.RecoverRuntimeState</c>.</summary>
+        public static void Recover()
         {
-            _adapter = adapter;
+            Recovered<CommunityMapsHomeScreen>(FindActive());
         }
 
-        public static Screen TryBuildActiveScreen()
+        public static CommunityMapsHomeAdapter FindActive()
         {
             CommunityMapsHomeAdapter adapter = CommunityMapsHomeAdapter.TryCreate();
             return adapter != null
                 && adapter.IsPresent()
                 && adapter.IsBrowseSelected
-                    ? new CommunityMapsHomeScreen(adapter)
+                    ? (adapter)
                     : null;
         }
 
@@ -78,10 +78,16 @@ namespace SongsOfConquestAccess.Screens
             get { return "community-maps-home"; }
         }
 
+        /// <summary>Layer 1: the community maps browser, over the main menu.</summary>
+        public override int Layer
+        {
+            get { return 1; }
+        }
+
         /// <summary>The page's own name in mod.io's words ("Browse"), which is also its tab.</summary>
         public override string ScreenName
         {
-            get { return _adapter != null ? _adapter.Title : null; }
+            get { return Live != null ? Live.Title : null; }
         }
 
         /// <summary>The tab pair, so arrival reads which page is showing before its first band.</summary>
@@ -90,30 +96,24 @@ namespace SongsOfConquestAccess.Screens
             get { return TabsStop; }
         }
 
-        public override bool IsPresent()
+        public override bool IsActive()
         {
-            return _adapter != null && _adapter.IsPresent();
+            return Live != null && Live.IsPresent();
         }
 
         public override bool ConsumesBack
         {
-            get { return IsPresent(); }
+            get { return IsActive(); }
         }
 
         public override bool Back()
         {
-            return _adapter != null && _adapter.Close();
-        }
-
-        /// <summary>Kept for the detector, which calls it whenever the browser's content changes. The
-        /// graph is declared afresh on every operation, so there is nothing to rebuild.</summary>
-        public void Refresh()
-        {
+            return Live != null && Live.Close();
         }
 
         public override void Build(GraphBuilder builder)
         {
-            if (!IsPresent())
+            if (!IsActive())
             {
                 return;
             }
@@ -136,7 +136,7 @@ namespace SongsOfConquestAccess.Screens
 
         private void BuildTabs(GraphBuilder builder)
         {
-            IReadOnlyList<CommunityMapsHomeAdapter.TabItem> tabs = _adapter.GetTabs();
+            IReadOnlyList<CommunityMapsHomeAdapter.TabItem> tabs = Live.GetTabs();
             for (int i = 0; i < tabs.Count; i++)
             {
                 CommunityMapsHomeAdapter.TabItem tab = tabs[i];
@@ -159,15 +159,15 @@ namespace SongsOfConquestAccess.Screens
         private void BuildCommands(GraphBuilder builder)
         {
             NodeVtable searchFilter = GraphNodes.Button(
-                () => _adapter.SearchFilterLabel,
-                () => _adapter.OpenSearchFilter(),
-                () => _adapter.HasSearchFilter);
+                () => Live.SearchFilterLabel,
+                () => Live.OpenSearchFilter(),
+                () => Live.HasSearchFilter);
             builder.AddItem(Synthetic("search-filter", searchFilter));
 
             NodeVtable downloads = GraphNodes.Button(
                 () => ModText.Get(ModStrings.Screens.Downloads),
-                () => _adapter.OpenDownloadsMenu(),
-                () => _adapter.HasDownloadsMenu);
+                () => Live.OpenDownloadsMenu(),
+                () => Live.HasDownloadsMenu);
             builder.AddItem(Synthetic("downloads", downloads));
         }
 
@@ -175,13 +175,13 @@ namespace SongsOfConquestAccess.Screens
 
         private void BuildFeatured(GraphBuilder builder)
         {
-            IReadOnlyList<CommunityMapsHomeAdapter.FeaturedItem> items = _adapter.GetFeaturedItems();
+            IReadOnlyList<CommunityMapsHomeAdapter.FeaturedItem> items = Live.GetFeaturedItems();
             if (items.Count == 0)
             {
                 return;
             }
 
-            builder.PushContext(_adapter.FeaturedLabel);
+            builder.PushContext(Live.FeaturedLabel);
             builder.SetRegion("community-maps:featured");
             for (int i = 0; i < items.Count; i++)
             {
@@ -195,8 +195,8 @@ namespace SongsOfConquestAccess.Screens
                 string key = "featured/" + captured.Index;
                 NodeVtable vtable = GraphNodes.Button(
                     () => captured.Label,
-                    () => _adapter.ActivateFeaturedItem(captured));
-                vtable.OnFocusVisual = () => _adapter.FocusFeaturedItem(captured);
+                    () => Live.ActivateFeaturedItem(captured));
+                vtable.OnFocusVisual = () => Live.FocusFeaturedItem(captured);
 
                 // mod.io draws ONE Subscribe / More options block under the carousel, acting on
                 // whichever featured item is highlighted. The owner wants it reachable from each
@@ -205,25 +205,25 @@ namespace SongsOfConquestAccess.Screens
                 builder.BeginGroup(Synthetic(key, vtable));
 
                 NodeVtable subscribe = GraphNodes.Button(
-                    () => _adapter.FeaturedSubscribeLabel,
+                    () => Live.FeaturedSubscribeLabel,
                     () =>
                     {
-                        _adapter.FocusFeaturedItem(captured);
-                        _adapter.SubscribeFeatured();
+                        Live.FocusFeaturedItem(captured);
+                        Live.SubscribeFeatured();
                     },
-                    () => _adapter.HasFeatured);
-                subscribe.OnFocusVisual = () => _adapter.FocusFeaturedItem(captured);
+                    () => Live.HasFeatured);
+                subscribe.OnFocusVisual = () => Live.FocusFeaturedItem(captured);
                 builder.AddItem(Synthetic(key + "/subscribe", subscribe));
 
                 NodeVtable options = GraphNodes.Button(
-                    () => _adapter.MoreOptionsLabel,
+                    () => Live.MoreOptionsLabel,
                     () =>
                     {
-                        _adapter.FocusFeaturedItem(captured);
-                        _adapter.OpenFeaturedOptions();
+                        Live.FocusFeaturedItem(captured);
+                        Live.OpenFeaturedOptions();
                     },
-                    () => _adapter.HasFeatured);
-                options.OnFocusVisual = () => _adapter.FocusFeaturedItem(captured);
+                    () => Live.HasFeatured);
+                options.OnFocusVisual = () => Live.FocusFeaturedItem(captured);
                 builder.AddItem(Synthetic(key + "/options", options));
 
                 builder.EndGroup();
@@ -237,7 +237,7 @@ namespace SongsOfConquestAccess.Screens
 
         private void BuildRows(GraphBuilder builder)
         {
-            IReadOnlyList<CommunityMapsHomeAdapter.RowItem> rows = _adapter.GetRows();
+            IReadOnlyList<CommunityMapsHomeAdapter.RowItem> rows = Live.GetRows();
             for (int r = 0; r < rows.Count; r++)
             {
                 CommunityMapsHomeAdapter.RowItem row = rows[r];
@@ -285,23 +285,23 @@ namespace SongsOfConquestAccess.Screens
             string key = "row/" + captured.RowIndex + "/item/" + captured.Index;
             NodeVtable vtable = GraphNodes.Button(
                 () => captured.Label,
-                () => _adapter.ActivateItem(captured));
+                () => Live.ActivateItem(captured));
             vtable.Announcements.Add(GraphNodes.ValuePart(() => captured.Status));
-            vtable.OnFocusVisual = () => _adapter.FocusItem(captured);
+            vtable.OnFocusVisual = () => Live.FocusItem(captured);
 
             builder.BeginGroup(Synthetic(key, vtable));
 
             NodeVtable subscribe = GraphNodes.Button(
-                () => _adapter.GetItemSubscribeLabel(captured),
-                () => _adapter.SubscribeItem(captured));
+                () => Live.GetItemSubscribeLabel(captured),
+                () => Live.SubscribeItem(captured));
             // The overlay follows mod.io's selection, so standing on a child keeps the item selected.
-            subscribe.OnFocusVisual = () => _adapter.FocusItem(captured);
+            subscribe.OnFocusVisual = () => Live.FocusItem(captured);
             builder.AddItem(Synthetic(key + "/subscribe", subscribe));
 
             NodeVtable options = GraphNodes.Button(
-                () => _adapter.MoreOptionsLabel,
-                () => _adapter.OpenItemOptions(captured));
-            options.OnFocusVisual = () => _adapter.FocusItem(captured);
+                () => Live.MoreOptionsLabel,
+                () => Live.OpenItemOptions(captured));
+            options.OnFocusVisual = () => Live.FocusItem(captured);
             builder.AddItem(Synthetic(key + "/options", options));
 
             builder.EndGroup();
@@ -313,7 +313,7 @@ namespace SongsOfConquestAccess.Screens
         {
             NodeVtable close = GraphNodes.Button(
                 () => ModText.Get(ModStrings.Screens.Close),
-                () => _adapter.Close());
+                () => Live.Close());
             builder.AddItem(Synthetic("close", close));
         }
 

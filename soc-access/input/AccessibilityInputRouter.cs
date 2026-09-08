@@ -139,7 +139,7 @@ namespace SongsOfConquestAccess.Input
         // would turn every remaining widget-era field into a trap.
         private bool StandingDown()
         {
-            return GameTextFocus.IsTyping() && _screenManager != null && _screenManager.CurrentScreen is GraphScreen;
+            return GameTextFocus.IsTyping() && _screenManager != null && _screenManager.Current is GraphScreen;
         }
 
         /// <summary>
@@ -154,7 +154,7 @@ namespace SongsOfConquestAccess.Input
         /// </summary>
         private GraphScreen TypingScreen()
         {
-            GraphScreen screen = _screenManager == null ? null : _screenManager.CurrentScreen as GraphScreen;
+            GraphScreen screen = _screenManager == null ? null : _screenManager.Current as GraphScreen;
             GraphNavigator navigator = screen == null ? null : screen.Navigator;
             return navigator != null && navigator.HasTicked(screen) ? screen : null;
         }
@@ -163,7 +163,7 @@ namespace SongsOfConquestAccess.Input
         // screen can change between two frames with no key of the mod's at all.
         private void ForgetTypedAcrossScreens()
         {
-            Screen current = _screenManager == null ? null : _screenManager.CurrentScreen;
+            Screen current = _screenManager == null ? null : _screenManager.Current;
             if (ReferenceEquals(current, _screenTyped))
             {
                 return;
@@ -230,7 +230,7 @@ namespace SongsOfConquestAccess.Input
             try
             {
                 InputAction action = injection.Action;
-                if (_screenManager == null || _screenManager.CurrentScreen == null)
+                if (_screenManager == null || _screenManager.Current == null)
                 {
                     injection.Outcome = "no screen";
                     return;

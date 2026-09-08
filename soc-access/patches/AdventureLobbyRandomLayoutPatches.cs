@@ -37,34 +37,6 @@ namespace SongsOfConquestAccess
             SocAccessMod.Instance?.ScreenDetector?.OnAdventureLobbyRandomLayoutSelectionChanged(__instance);
         }
 
-        [HarmonyPatch(typeof(LobbyRandomMapPreviewEntry), "HandleDropdown")]
-        [HarmonyPostfix]
-        private static void LobbyRandomMapPreviewEntryHandleDropdownPostfix(LobbyRandomMapPreviewEntry __instance)
-        {
-            SocAccessMod.Instance?.ScreenDetector?.OnAdventureLobbyRandomLayoutEntryChanged(__instance);
-        }
-
-        [HarmonyPatch(typeof(LobbyRandomMapPreviewEntry), "HandleKingToggleChanged")]
-        [HarmonyPostfix]
-        private static void LobbyRandomMapPreviewEntryHandleKingToggleChangedPostfix(LobbyRandomMapPreviewEntry __instance)
-        {
-            SocAccessMod.Instance?.ScreenDetector?.OnAdventureLobbyRandomLayoutEntryChanged(__instance);
-        }
-
-        [HarmonyPatch(typeof(LobbyRandomMapPreviewEntry), "HandleBeaconToggleChanged")]
-        [HarmonyPostfix]
-        private static void LobbyRandomMapPreviewEntryHandleBeaconToggleChangedPostfix(LobbyRandomMapPreviewEntry __instance)
-        {
-            SocAccessMod.Instance?.ScreenDetector?.OnAdventureLobbyRandomLayoutEntryChanged(__instance);
-        }
-
-        [HarmonyPatch(typeof(LobbyRandomMapPreviewEntry), "HandleArtifactToggleChanged")]
-        [HarmonyPostfix]
-        private static void LobbyRandomMapPreviewEntryHandleArtifactToggleChangedPostfix(LobbyRandomMapPreviewEntry __instance)
-        {
-            SocAccessMod.Instance?.ScreenDetector?.OnAdventureLobbyRandomLayoutEntryChanged(__instance);
-        }
-
         private static IEnumerator WaitForRandomLayoutMenuReady(LobbyRandomMapSelectionMenu menu)
         {
             float deadline = Time.realtimeSinceStartup + 5f;

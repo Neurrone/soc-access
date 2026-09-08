@@ -27,20 +27,20 @@ namespace SongsOfConquestAccess.Screens
     /// ESCAPE IS THE MOD'S here and presses the drawn cross: <c>SendResourcePopup.Show</c> registers
     /// only <c>UI.Cancel</c>, the gamepad binding, so the keyboard's Escape would otherwise do nothing.
     /// </summary>
-    public sealed class SendResourcePopupScreen : GraphScreen
+    public sealed class SendResourcePopupScreen : LiveScreen<SendResourcePopupAdapter>
     {
         private const string SendStop = "send-resource-send";
         private const string RequestStop = "send-resource-request";
         private const string CloseStop = "send-resource-close";
 
-        private readonly SendResourcePopupAdapter _adapter;
-
-        public SendResourcePopupScreen(SendResourcePopupAdapter adapter)
+        /// <summary>After a hot reload: point the slot at the menu already showing.
+        /// Scanned once, from <c>ScreenDetector.RecoverRuntimeState</c>.</summary>
+        public static void Recover()
         {
-            _adapter = adapter;
+            Recovered<SendResourcePopupScreen>(FindActive());
         }
 
-        public static Screen TryBuildActiveScreen()
+        public static SendResourcePopupAdapter FindActive()
         {
             SendResourcePopup[] popups = Resources.FindObjectsOfTypeAll<SendResourcePopup>();
             for (int i = 0; i < popups.Length; i++)
@@ -48,7 +48,7 @@ namespace SongsOfConquestAccess.Screens
                 SendResourcePopupAdapter adapter = new SendResourcePopupAdapter(popups[i]);
                 if (adapter.IsPresent())
                 {
-                    return new SendResourcePopupScreen(adapter);
+                    return (adapter);
                 }
             }
 
@@ -60,6 +60,12 @@ namespace SongsOfConquestAccess.Screens
             get { return "send-resource-popup"; }
         }
 
+        /// <summary>Layer 21: a popup over the player menu that opens it.</summary>
+        public override int Layer
+        {
+            get { return 21; }
+        }
+
         /// <summary>None: each band's stop is named by its drawn header, and the first is what
         /// arrival lands in.</summary>
         public override string ScreenName
@@ -67,24 +73,24 @@ namespace SongsOfConquestAccess.Screens
             get { return null; }
         }
 
-        public override bool IsPresent()
+        public override bool IsActive()
         {
-            return _adapter != null && _adapter.IsPresent();
+            return Live != null && Live.IsPresent();
         }
 
         public override bool ConsumesBack
         {
-            get { return _adapter != null && _adapter.IsCloseVisible(); }
+            get { return Live != null && Live.IsCloseVisible(); }
         }
 
         public override bool Back()
         {
-            return _adapter != null && _adapter.ActivateClose();
+            return Live != null && Live.ActivateClose();
         }
 
         public override void Build(GraphBuilder builder)
         {
-            if (!IsPresent())
+            if (!IsActive())
             {
                 return;
             }
@@ -92,15 +98,15 @@ namespace SongsOfConquestAccess.Screens
             // Each band is named by the header the game draws over it, said once on entering the
             // stop (owner ruling 2026-09-07); the popup has no name of its own beyond them.
             builder.BeginStop(SendStop);
-            builder.PushContext(_adapter.SendHeader);
-            BuildResources(builder, _adapter.GetSendResources());
+            builder.PushContext(Live.SendHeader);
+            BuildResources(builder, Live.GetSendResources());
             builder.PopContext();
 
-            if (_adapter.IsRequestMenuVisible())
+            if (Live.IsRequestMenuVisible())
             {
                 builder.BeginStop(RequestStop);
-                builder.PushContext(_adapter.RequestHeader);
-                BuildResources(builder, _adapter.GetRequestResources());
+                builder.PushContext(Live.RequestHeader);
+                BuildResources(builder, Live.GetRequestResources());
                 builder.PopContext();
             }
 
@@ -142,18 +148,18 @@ namespace SongsOfConquestAccess.Screens
 
         private void BuildClose(GraphBuilder builder)
         {
-            Component close = _adapter.CloseButton;
-            if (close == null || !_adapter.IsCloseVisible())
+            Component close = Live.CloseButton;
+            if (close == null || !Live.IsCloseVisible())
             {
                 return;
             }
 
             NodeVtable vtable = GraphNodes.Button(
                 () => ModText.Get(ModStrings.Screens.Close),
-                () => _adapter.ActivateClose(),
+                () => Live.ActivateClose(),
                 null,
-                _adapter.CloseTooltip);
-            vtable.OnFocusVisual = _adapter.FocusClose;
+                Live.CloseTooltip);
+            vtable.OnFocusVisual = Live.FocusClose;
             builder.AddItem(new DrawnNode(ControlId.For(close, "send-resource:close"), vtable, close));
         }
     }

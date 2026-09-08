@@ -39,25 +39,25 @@ namespace SongsOfConquestAccess.Screens
     /// <c>AdventureMenuBackground</c> with <c>_canClose</c> true, so it draws the close cross and
     /// registers <c>UI.ExitMenu</c> on its own close in <c>AnimateEntry</c>.
     /// </summary>
-    public sealed class PurchaseWielderScreen : GraphScreen
+    public sealed class PurchaseWielderScreen : LiveScreen<PurchaseWielderMenuAdapter>
     {
         private const string EntriesStop = "purchase-wielder-list";
         private const string DetailsStop = "purchase-wielder-details";
         private const string CloseStop = "purchase-wielder-close";
-
-        private readonly PurchaseWielderMenuAdapter _adapter;
 
         // A subject of its own per synthesized line, kept across rebuilds so the reconciler seats the
         // cursor on the same one: the quote, the four stats, the specialization and the purchase
         // status are read off text meshes the details pane rebinds rather than off rows of their own.
         private readonly Dictionary<string, object> _markers = new Dictionary<string, object>();
 
-        public PurchaseWielderScreen(PurchaseWielderMenuAdapter adapter)
+        /// <summary>After a hot reload: point the slot at the menu already showing.
+        /// Scanned once, from <c>ScreenDetector.RecoverRuntimeState</c>.</summary>
+        public static void Recover()
         {
-            _adapter = adapter;
+            Recovered<PurchaseWielderScreen>(FindActive());
         }
 
-        public static Screen TryBuildActiveScreen()
+        public static PurchaseWielderMenuAdapter FindActive()
         {
             PurchaseWielderMenu[] menus = Resources.FindObjectsOfTypeAll<PurchaseWielderMenu>();
             for (int i = 0; i < menus.Length; i++)
@@ -65,7 +65,7 @@ namespace SongsOfConquestAccess.Screens
                 PurchaseWielderMenuAdapter adapter = new PurchaseWielderMenuAdapter(menus[i]);
                 if (adapter.IsPresent())
                 {
-                    return new PurchaseWielderScreen(adapter);
+                    return (adapter);
                 }
             }
 
@@ -74,7 +74,7 @@ namespace SongsOfConquestAccess.Screens
 
         public PurchaseWielderMenuAdapter Adapter
         {
-            get { return _adapter; }
+            get { return Live; }
         }
 
         public override string Key
@@ -82,24 +82,30 @@ namespace SongsOfConquestAccess.Screens
             get { return "purchase-wielder"; }
         }
 
+        /// <summary>Layer 24: over the settlement page that opens it.</summary>
+        public override int Layer
+        {
+            get { return 24; }
+        }
+
         /// <summary>The title the menu draws over the list ("Arleon Wielders 2/2").</summary>
         public override string ScreenName
         {
             get
             {
-                string title = _adapter != null ? _adapter.Title : null;
+                string title = Live != null ? Live.Title : null;
                 return string.IsNullOrWhiteSpace(title) ? null : title;
             }
         }
 
-        public override bool IsPresent()
+        public override bool IsActive()
         {
-            return _adapter != null && _adapter.IsPresent();
+            return Live != null && Live.IsPresent();
         }
 
         public override void Build(GraphBuilder builder)
         {
-            if (!IsPresent())
+            if (!IsActive())
             {
                 return;
             }
@@ -118,7 +124,7 @@ namespace SongsOfConquestAccess.Screens
 
         private void BuildEntries(GraphBuilder builder)
         {
-            IReadOnlyList<PurchaseWielderMenuAdapter.EntryItem> entries = _adapter.GetEntries();
+            IReadOnlyList<PurchaseWielderMenuAdapter.EntryItem> entries = Live.GetEntries();
             ControlId selected = null;
             for (int i = 0; i < entries.Count; i++)
             {
@@ -170,23 +176,23 @@ namespace SongsOfConquestAccess.Screens
             AddParagraphs(builder, "quote", SelectedQuoteLines);
             string stats = GameText.Get("Common/CommanderInventory/Stats", string.Empty);
             BeginRegion(builder, stats, "purchase-wielder:stats");
-            AddStat(builder, "offence", () => _adapter.OffenceHeader, () => _adapter.Offence);
-            AddStat(builder, "defence", () => _adapter.DefenceHeader, () => _adapter.Defence);
-            AddStat(builder, "movement", () => _adapter.MovementHeader, () => _adapter.Movement);
-            AddStat(builder, "view-radius", () => _adapter.ViewRadiusHeader, () => _adapter.ViewRadius);
+            AddStat(builder, "offence", () => Live.OffenceHeader, () => Live.Offence);
+            AddStat(builder, "defence", () => Live.DefenceHeader, () => Live.Defence);
+            AddStat(builder, "movement", () => Live.MovementHeader, () => Live.Movement);
+            AddStat(builder, "view-radius", () => Live.ViewRadiusHeader, () => Live.ViewRadius);
             EndRegion(builder, stats);
             BuildTroops(builder);
             BuildSkills(builder);
-            if (_adapter.HasSpecialization())
+            if (Live.HasSpecialization())
             {
                 builder.SetRegion("purchase-wielder:specialization");
-                AddParagraphs(builder, "specialization", () => _adapter.SpecializationLines);
+                AddParagraphs(builder, "specialization", () => Live.SpecializationLines);
             }
 
             builder.SetRegion("purchase-wielder:purchase");
-            if (_adapter.HasPurchaseStatus())
+            if (Live.HasPurchaseStatus())
             {
-                AddLine(builder, "status", () => _adapter.PurchaseStatus);
+                AddLine(builder, "status", () => Live.PurchaseStatus);
             }
 
             BuildPurchase(builder);
@@ -198,9 +204,9 @@ namespace SongsOfConquestAccess.Screens
         /// paragraph.</summary>
         private IList<string> SelectedQuoteLines()
         {
-            IList<string> description = _adapter.SelectedDescriptionLines;
-            List<string> parts = new List<string> { _adapter.SelectedName };
-            string level = _adapter.SelectedLevel;
+            IList<string> description = Live.SelectedDescriptionLines;
+            List<string> parts = new List<string> { Live.SelectedName };
+            string level = Live.SelectedLevel;
             if (!string.IsNullOrWhiteSpace(level))
             {
                 parts.Add(ModText.Get(ModStrings.Screens.LevelValue, level));
@@ -242,17 +248,17 @@ namespace SongsOfConquestAccess.Screens
 
         private void BuildTroops(GraphBuilder builder)
         {
-            if (!_adapter.HasTroops())
+            if (!Live.HasTroops())
             {
                 return;
             }
 
-            string header = _adapter.TroopsHeader;
+            string header = Live.TroopsHeader;
             BeginRegion(builder, header, "purchase-wielder:troops");
-            for (int i = 0; i < _adapter.TroopSlotCount; i++)
+            for (int i = 0; i < Live.TroopSlotCount; i++)
             {
-                Component slot = _adapter.GetTroopComponent(i);
-                if (slot == null || !_adapter.IsTroopVisible(i))
+                Component slot = Live.GetTroopComponent(i);
+                if (slot == null || !Live.IsTroopVisible(i))
                 {
                     continue;
                 }
@@ -261,8 +267,8 @@ namespace SongsOfConquestAccess.Screens
                 NodeVtable vtable = GraphNodes.Text(
                     () => TroopLabel(index),
                     null,
-                    _adapter.GetTroopTooltip(index));
-                vtable.OnFocusVisual = () => _adapter.FocusTroop(index);
+                    Live.GetTroopTooltip(index));
+                vtable.OnFocusVisual = () => Live.FocusTroop(index);
                 builder.AddItem(new DrawnNode(
                     ControlId.For(slot, "purchase-wielder:troop/" + index),
                     vtable,
@@ -274,19 +280,19 @@ namespace SongsOfConquestAccess.Screens
 
         private string TroopLabel(int index)
         {
-            string name = _adapter.GetTroopName(index);
-            int amount = _adapter.GetTroopAmount(index);
+            string name = Live.GetTroopName(index);
+            int amount = Live.GetTroopAmount(index);
             return amount > 0 ? ModText.Get(ModStrings.Combat.TroopQuantity, amount, name) : name;
         }
 
         private void BuildSkills(GraphBuilder builder)
         {
-            string header = _adapter.SkillsHeader;
+            string header = Live.SkillsHeader;
             BeginRegion(builder, header, "purchase-wielder:skills");
-            for (int i = 0; i < _adapter.SkillSlotCount; i++)
+            for (int i = 0; i < Live.SkillSlotCount; i++)
             {
-                Component slot = _adapter.GetSkillComponent(i);
-                if (slot == null || !_adapter.IsSkillVisible(i))
+                Component slot = Live.GetSkillComponent(i);
+                if (slot == null || !Live.IsSkillVisible(i))
                 {
                     continue;
                 }
@@ -295,8 +301,8 @@ namespace SongsOfConquestAccess.Screens
                 NodeVtable vtable = GraphNodes.Text(
                     () => SkillLabel(index),
                     null,
-                    _adapter.GetSkillTooltip(index));
-                vtable.OnFocusVisual = () => _adapter.FocusSkill(index);
+                    Live.GetSkillTooltip(index));
+                vtable.OnFocusVisual = () => Live.FocusSkill(index);
                 builder.AddItem(new DrawnNode(
                     ControlId.For(slot, "purchase-wielder:skill/" + index),
                     vtable,
@@ -327,24 +333,24 @@ namespace SongsOfConquestAccess.Screens
 
         private string SkillLabel(int index)
         {
-            string name = _adapter.GetSkillName(index);
+            string name = Live.GetSkillName(index);
             return string.IsNullOrWhiteSpace(name) ? ModText.Get(ModStrings.Screens.Skill, index + 1) : name;
         }
 
         private void BuildPurchase(GraphBuilder builder)
         {
-            Component purchase = _adapter.PurchaseButton;
-            if (purchase == null || !_adapter.IsPurchaseVisible())
+            Component purchase = Live.PurchaseButton;
+            if (purchase == null || !Live.IsPurchaseVisible())
             {
                 return;
             }
 
             NodeVtable vtable = GraphNodes.Button(
-                () => _adapter.PurchaseLabel,
-                () => _adapter.ActivatePurchase(),
-                _adapter.IsPurchaseEnabled,
-                _adapter.PurchaseTooltip);
-            vtable.OnFocusVisual = () => _adapter.FocusPurchase();
+                () => Live.PurchaseLabel,
+                () => Live.ActivatePurchase(),
+                Live.IsPurchaseEnabled,
+                Live.PurchaseTooltip);
+            vtable.OnFocusVisual = () => Live.FocusPurchase();
             builder.AddItem(new DrawnNode(
                 ControlId.For(purchase, "purchase-wielder:purchase"),
                 vtable,
@@ -355,8 +361,8 @@ namespace SongsOfConquestAccess.Screens
 
         private void BuildClose(GraphBuilder builder)
         {
-            Component close = _adapter.CloseButton;
-            if (close == null || !_adapter.IsCloseVisible())
+            Component close = Live.CloseButton;
+            if (close == null || !Live.IsCloseVisible())
             {
                 return;
             }
@@ -364,7 +370,7 @@ namespace SongsOfConquestAccess.Screens
             // An icon with no text of its own, so the mod names it.
             NodeVtable vtable = GraphNodes.Button(
                 () => ModText.Get(ModStrings.Screens.Close),
-                () => _adapter.ActivateClose());
+                () => Live.ActivateClose());
             vtable.OnFocusVisual = () => NativeSelectionUtility.Select(close);
             builder.AddItem(new DrawnNode(ControlId.For(close, "purchase-wielder:close"), vtable, close));
         }

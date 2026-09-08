@@ -21,13 +21,6 @@ namespace SongsOfConquestAccess.Patches
             plugin.StartCoroutine(NotifyReadyNextFrame(__instance));
         }
 
-        [HarmonyPatch(typeof(LobbyMapSettingsMenu), "Refresh")]
-        [HarmonyPostfix]
-        private static void LobbyMapSettingsMenuRefreshPostfix(LobbyMapSettingsMenu __instance)
-        {
-            SocAccessMod.Instance?.ScreenDetector?.OnAdventureLobbyGameSettingsChanged(__instance);
-        }
-
         [HarmonyPatch(typeof(LobbyMapSettingsMenu), "CloseAndStoreSettings")]
         [HarmonyPostfix]
         private static void LobbyMapSettingsMenuCloseAndStoreSettingsPostfix(LobbyMapSettingsMenu __instance)

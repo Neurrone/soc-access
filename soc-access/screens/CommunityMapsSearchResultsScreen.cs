@@ -23,32 +23,25 @@ namespace SongsOfConquestAccess.Screens
     /// Escape is CLAIMED and runs mod.io's own cancel, which from this panel opens the browse page
     /// again (decompiled <c>Navigating.Cancel</c>) - the same thing the drawn Back prompt does.
     /// </summary>
-    public sealed class CommunityMapsSearchResultsScreen : GraphScreen
+    public sealed class CommunityMapsSearchResultsScreen : LiveScreen<CommunityMapsSearchResultsAdapter>
     {
         private const string TopStop = "community-maps-search-results-top";
         private const string ResultsStop = "community-maps-search-results-list";
         private const string FooterStop = "community-maps-search-results-footer";
 
-        private CommunityMapsSearchResultsAdapter _adapter;
-
         private readonly Dictionary<string, object> _markers = new Dictionary<string, object>();
 
-        public CommunityMapsSearchResultsScreen(CommunityMapsSearchResultsAdapter adapter)
+        /// <summary>After a hot reload: point the slot at the panel already showing.
+        /// Scanned once, from <c>ScreenDetector.RecoverRuntimeState</c>.</summary>
+        public static void Recover()
         {
-            _adapter = adapter;
+            Recovered<CommunityMapsSearchResultsScreen>(FindActive());
         }
 
-        public CommunityMapsSearchResultsAdapter Adapter
-        {
-            get { return _adapter; }
-        }
-
-        public static Screen TryBuildActiveScreen()
+        public static CommunityMapsSearchResultsAdapter FindActive()
         {
             CommunityMapsSearchResultsAdapter adapter = CommunityMapsSearchResultsAdapter.TryCreate();
-            return adapter != null && adapter.IsPresent()
-                ? new CommunityMapsSearchResultsScreen(adapter)
-                : null;
+            return adapter != null && adapter.IsPresent() ? adapter : null;
         }
 
         public override string Key
@@ -56,10 +49,16 @@ namespace SongsOfConquestAccess.Screens
             get { return "community-maps-search-results"; }
         }
 
+        /// <summary>Layer 4: over the browser pages it was searched from.</summary>
+        public override int Layer
+        {
+            get { return 4; }
+        }
+
         /// <summary>The panel's own drawn heading ("Search results").</summary>
         public override string ScreenName
         {
-            get { return _adapter != null ? _adapter.Title : null; }
+            get { return Live != null ? Live.Title : null; }
         }
 
         /// <summary>The band above the grid, NOT the results: the page is pushed the moment mod.io
@@ -71,35 +70,24 @@ namespace SongsOfConquestAccess.Screens
             get { return TopStop; }
         }
 
-        public override bool IsPresent()
+        public override bool IsActive()
         {
-            return _adapter != null && _adapter.IsPresent();
+            return Live != null && Live.IsPresent();
         }
 
         public override bool ConsumesBack
         {
-            get { return IsPresent(); }
+            get { return IsActive(); }
         }
 
         public override bool Back()
         {
-            return _adapter != null && _adapter.Back();
-        }
-
-        /// <summary>Kept for the detector, which hands over a freshly read adapter whenever the search
-        /// changes. The graph is declared afresh on every operation, so taking the new adapter is the
-        /// whole of the refresh.</summary>
-        public void Refresh(CommunityMapsSearchResultsAdapter adapter)
-        {
-            if (adapter != null && adapter.IsPresent())
-            {
-                _adapter = adapter;
-            }
+            return Live != null && Live.Back();
         }
 
         public override void Build(GraphBuilder builder)
         {
-            if (!IsPresent())
+            if (!IsActive())
             {
                 return;
             }
@@ -119,21 +107,21 @@ namespace SongsOfConquestAccess.Screens
 
         private void BuildTop(GraphBuilder builder)
         {
-            string summary = _adapter.SummaryText;
+            string summary = Live.SummaryText;
             if (!string.IsNullOrWhiteSpace(summary))
             {
                 builder.AddItem(Synthetic("summary", GraphNodes.Text(() => summary)));
             }
 
-            if (_adapter.HasRefineFilter)
+            if (Live.HasRefineFilter)
             {
                 NodeVtable refine = GraphNodes.Button(
-                    () => _adapter.RefineFilterLabel,
-                    () => _adapter.OpenRefineFilter());
+                    () => Live.RefineFilterLabel,
+                    () => Live.OpenRefineFilter());
                 builder.AddItem(Synthetic("refine-filter", refine));
             }
 
-            CommunityMapsSearchResultsAdapter.SortDropdown sort = _adapter.Sort;
+            CommunityMapsSearchResultsAdapter.SortDropdown sort = Live.Sort;
             if (sort != null && sort.IsVisible() && sort.Subject != null)
             {
                 NodeVtable vtable = GraphNodes.ComboBox(
@@ -155,7 +143,7 @@ namespace SongsOfConquestAccess.Screens
         {
             // Read live rather than from the adapter's snapshot: mod.io appends to this grid as the
             // page scrolls, without the detector hearing about it.
-            IReadOnlyList<CommunityMapsSearchResultsAdapter.ResultItem> results = _adapter.BuildResults();
+            IReadOnlyList<CommunityMapsSearchResultsAdapter.ResultItem> results = Live.BuildResults();
             for (int i = 0; i < results.Count; i++)
             {
                 CommunityMapsSearchResultsAdapter.ResultItem result = results[i];
@@ -167,8 +155,8 @@ namespace SongsOfConquestAccess.Screens
                 CommunityMapsSearchResultsAdapter.ResultItem captured = result;
                 NodeVtable vtable = GraphNodes.Button(
                     () => captured.Label,
-                    () => _adapter.ActivateResult(captured));
-                vtable.OnFocusVisual = () => _adapter.FocusResult(captured);
+                    () => Live.ActivateResult(captured));
+                vtable.OnFocusVisual = () => Live.FocusResult(captured);
                 // Keyed by PLACE in the grid, not by mod id: mod.io's grid can hold the same mod
                 // twice (measured - the engine refused a build with "Duplicate control id:
                 // community-maps-search-results:result/3561654"), while a page only ever appends, so
@@ -181,7 +169,7 @@ namespace SongsOfConquestAccess.Screens
         /// read where it is drawn, after the results rather than before them.</summary>
         private void BuildEndOfResults(GraphBuilder builder)
         {
-            string footer = _adapter.FooterText;
+            string footer = Live.FooterText;
             if (string.IsNullOrWhiteSpace(footer))
             {
                 return;
@@ -195,8 +183,8 @@ namespace SongsOfConquestAccess.Screens
         private void BuildFooter(GraphBuilder builder)
         {
             NodeVtable back = GraphNodes.Button(
-                () => _adapter.BackLabel,
-                () => _adapter.Back());
+                () => Live.BackLabel,
+                () => Live.Back());
             builder.AddItem(Synthetic("back", back));
         }
 

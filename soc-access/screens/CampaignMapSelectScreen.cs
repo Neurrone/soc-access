@@ -39,7 +39,7 @@ namespace SongsOfConquestAccess.Screens
     /// <c>UI.Confirm</c> on Start Mission and two gamepad buttons, and nothing else (decompiled,
     /// lines 143 to 148) - so the key would otherwise do nothing.
     /// </summary>
-    public sealed class CampaignMapSelectScreen : GraphScreen
+    public sealed class CampaignMapSelectScreen : LiveScreen<CampaignMapSelectAdapter>
     {
         private const string MissionsStop = "campaign-map-missions";
         private const string DetailsStop = "campaign-map-details";
@@ -49,33 +49,30 @@ namespace SongsOfConquestAccess.Screens
         private static readonly PropertyInfo InstallerContainerProperty =
             AccessTools.Property(typeof(CampaignMapSelectMenuInstaller), "Container");
 
-        // Taking a difficulty makes the game redraw the page, which pushes a NEW screen over this
-        // one through the detector's RefreshTop - and a new screen has no cursor memory. The flag
+        // Taking a difficulty makes the game redraw the page, and a redraw the screen did not
+        // survive - the menu object went away and came back - starts with no cursor memory. The flag
         // carries the one thing worth keeping across that: that the player was at the difficulty.
         private static bool _focusDifficultyAfterNextRebuild;
-
-        private readonly CampaignMapSelectAdapter _adapter;
-        private readonly bool _focusDifficulty;
 
         // A subject of its own for the details line, kept across rebuilds so the reconciler seats the
         // cursor on the same node while the mission under it changes.
         private readonly object _detailsMarker = new object();
 
-        public CampaignMapSelectScreen(CampaignMapSelectAdapter adapter)
-            : this(adapter, false)
+        /// <summary>Whether the page was redrawn by taking a difficulty, so an arrival that has to
+        /// seat the cursor afresh puts it back on the difficulty. Written by the detector from
+        /// <see cref="ConsumeFocusDifficultyAfterNextRebuild"/>.</summary>
+        public bool FocusDifficulty { get; set; }
+
+        /// <summary>After a hot reload: point the slot at the menu already showing.
+        /// Scanned once, from <c>ScreenDetector.RecoverRuntimeState</c>.</summary>
+        public static void Recover()
         {
+            Recovered<CampaignMapSelectScreen>(FindActive());
         }
 
-        public CampaignMapSelectScreen(CampaignMapSelectAdapter adapter, bool focusDifficulty)
+        public static CampaignMapSelectAdapter FindActive()
         {
-            _adapter = adapter;
-            _focusDifficulty = focusDifficulty;
-        }
-
-        public static Screen TryBuildActiveScreen()
-        {
-            CampaignMapSelectAdapter adapter = FindActiveCampaignMapSelect(null);
-            return adapter != null ? new CampaignMapSelectScreen(adapter) : null;
+            return FindActiveCampaignMapSelect(null);
         }
 
         public static bool ConsumeFocusDifficultyAfterNextRebuild()
@@ -90,37 +87,43 @@ namespace SongsOfConquestAccess.Screens
             get { return "campaign-map-select"; }
         }
 
+        /// <summary>Layer 3: over the campaign or tale page that opens it.</summary>
+        public override int Layer
+        {
+            get { return 3; }
+        }
+
         /// <summary>The campaign's own drawn title pair ("The First Song. The Song of Stoutheart").
         /// </summary>
         public override string ScreenName
         {
-            get { return _adapter != null ? _adapter.GetCampaignTitle() : null; }
+            get { return Live != null ? Live.GetCampaignTitle() : null; }
         }
 
         /// <summary>The missions, or the difficulty when the page was redrawn by taking one.</summary>
         public override object InitialFocusStop
         {
-            get { return _focusDifficulty ? DifficultyStop : MissionsStop; }
+            get { return FocusDifficulty ? DifficultyStop : MissionsStop; }
         }
 
-        public override bool IsPresent()
+        public override bool IsActive()
         {
-            return _adapter != null && _adapter.IsPresent();
+            return Live != null && Live.IsPresent();
         }
 
         public override bool ConsumesBack
         {
-            get { return _adapter != null && _adapter.BackButton != null && _adapter.BackButton.IsVisible(); }
+            get { return Live != null && Live.BackButton != null && Live.BackButton.IsVisible(); }
         }
 
         public override bool Back()
         {
-            return _adapter != null && _adapter.BackButton != null && _adapter.BackButton.Activate();
+            return Live != null && Live.BackButton != null && Live.BackButton.Activate();
         }
 
         public override void Build(GraphBuilder builder)
         {
-            if (!IsPresent())
+            if (!IsActive())
             {
                 return;
             }
@@ -142,8 +145,8 @@ namespace SongsOfConquestAccess.Screens
 
         private void BuildMissions(GraphBuilder builder)
         {
-            IReadOnlyList<CampaignMapButtonAdapter> missions = _adapter.Missions;
-            int selected = _adapter.SelectedMissionIndex;
+            IReadOnlyList<CampaignMapButtonAdapter> missions = Live.Missions;
+            int selected = Live.SelectedMissionIndex;
             ControlId landing = null;
             for (int i = 0; missions != null && i < missions.Count; i++)
             {
@@ -179,7 +182,7 @@ namespace SongsOfConquestAccess.Screens
         /// the panel is describing it, as the widget screen read them.</summary>
         private string MissionLabel(CampaignMapButtonAdapter mission)
         {
-            CampaignMapSelectedInformationAdapter information = _adapter.Information;
+            CampaignMapSelectedInformationAdapter information = Live.Information;
             if (information == null || mission == null)
             {
                 return mission != null ? mission.GetLabel() : string.Empty;
@@ -208,7 +211,7 @@ namespace SongsOfConquestAccess.Screens
         /// arrival and the review buffer holds it a drawn line at a time.</summary>
         private void BuildDetails(GraphBuilder builder)
         {
-            CampaignMapSelectedInformationAdapter information = _adapter.Information;
+            CampaignMapSelectedInformationAdapter information = Live.Information;
             if (information == null)
             {
                 return;
@@ -230,7 +233,7 @@ namespace SongsOfConquestAccess.Screens
 
         private string DetailsTitle()
         {
-            CampaignMapSelectedInformationAdapter information = _adapter.Information;
+            CampaignMapSelectedInformationAdapter information = Live.Information;
             if (information == null)
             {
                 return string.Empty;
@@ -241,7 +244,7 @@ namespace SongsOfConquestAccess.Screens
 
         private IList<string> DetailsLines()
         {
-            CampaignMapSelectedInformationAdapter information = _adapter.Information;
+            CampaignMapSelectedInformationAdapter information = Live.Information;
             if (information == null)
             {
                 return new List<string>();
@@ -257,7 +260,7 @@ namespace SongsOfConquestAccess.Screens
 
         private void BuildDifficulty(GraphBuilder builder)
         {
-            CampaignMapSelectedInformationAdapter information = _adapter.Information;
+            CampaignMapSelectedInformationAdapter information = Live.Information;
             if (information == null || !information.HasDifficultyMenu())
             {
                 return;
@@ -301,13 +304,13 @@ namespace SongsOfConquestAccess.Screens
 
         private void BuildButtons(GraphBuilder builder)
         {
-            CampaignMapSelectedInformationAdapter information = _adapter.Information;
+            CampaignMapSelectedInformationAdapter information = Live.Information;
             // The panel's own commands, in the order it draws them (Start above Replay).
             AddButton(builder, "campaign-map:start", information != null ? information.StartButton : null);
             AddButton(builder, "campaign-map:replay", information != null ? information.ReplayButton : null);
             // Then the header band above the page, left to right.
-            AddButton(builder, "campaign-map:back", _adapter.BackButton);
-            AddButton(builder, "campaign-map:options", _adapter.OptionsButton);
+            AddButton(builder, "campaign-map:back", Live.BackButton);
+            AddButton(builder, "campaign-map:options", Live.OptionsButton);
         }
 
         private void AddButton(GraphBuilder builder, string key, IMenuButtonAdapter button)
@@ -325,7 +328,7 @@ namespace SongsOfConquestAccess.Screens
 
         private void FocusNativeButton(UIButton button)
         {
-            CampaignMapSelectedInformationAdapter information = _adapter.Information;
+            CampaignMapSelectedInformationAdapter information = Live.Information;
             if (information != null && button != null)
             {
                 information.FocusButton(button);

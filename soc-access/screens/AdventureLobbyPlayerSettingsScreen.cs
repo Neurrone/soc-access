@@ -26,7 +26,7 @@ namespace SongsOfConquestAccess.Screens
     /// registers <c>InputActions.UI.ExitMenu</c> outside its gamepad branch (decompiled, line 146),
     /// so the key already cancels the popup.
     /// </summary>
-    public sealed class AdventureLobbyPlayerSettingsScreen : GraphScreen
+    public sealed class AdventureLobbyPlayerSettingsScreen : LiveScreen<AdventureLobbyPlayerSettingsAdapter>
     {
         private const string RowsStop = "player-settings-rows";
         private const string ButtonsStop = "player-settings-buttons";
@@ -34,18 +34,18 @@ namespace SongsOfConquestAccess.Screens
         /// <summary>How many fine steps one coarse slider step is worth, as on the options window.</summary>
         private const int CoarseSteps = 10;
 
-        private readonly AdventureLobbyPlayerSettingsAdapter _adapter;
-
         // A subject of its own per synthesized row, kept across rebuilds so the reconciler seats the
         // cursor on the same line: the popup's own buttons.
         private readonly Dictionary<string, object> _markers = new Dictionary<string, object>();
 
-        public AdventureLobbyPlayerSettingsScreen(AdventureLobbyPlayerSettingsAdapter adapter)
+        /// <summary>After a hot reload: point the slot at the menu already showing.
+        /// Scanned once, from <c>ScreenDetector.RecoverRuntimeState</c>.</summary>
+        public static void Recover()
         {
-            _adapter = adapter;
+            Recovered<AdventureLobbyPlayerSettingsScreen>(FindActive());
         }
 
-        public static Screen TryBuildActiveScreen()
+        public static AdventureLobbyPlayerSettingsAdapter FindActive()
         {
             LobbyPlayerSettingsMenu menu = FindActiveMenu(null);
             if (menu == null)
@@ -54,12 +54,12 @@ namespace SongsOfConquestAccess.Screens
             }
 
             AdventureLobbyPlayerSettingsAdapter adapter = new AdventureLobbyPlayerSettingsAdapter(menu);
-            return adapter.IsPresent() ? new AdventureLobbyPlayerSettingsScreen(adapter) : null;
+            return adapter.IsPresent() ? (adapter) : null;
         }
 
         public bool Matches(LobbyPlayerSettingsMenu menu)
         {
-            return _adapter != null && ReferenceEquals(_adapter.SourceKey, menu);
+            return Live != null && ReferenceEquals(Live.SourceKey, menu);
         }
 
         public override string Key
@@ -67,10 +67,16 @@ namespace SongsOfConquestAccess.Screens
             get { return "player-settings"; }
         }
 
+        /// <summary>Layer 20: a lobby sub-page, over the lobby.</summary>
+        public override int Layer
+        {
+            get { return 20; }
+        }
+
         /// <summary>The popup's own drawn title ("Player settings").</summary>
         public override string ScreenName
         {
-            get { return _adapter != null ? _adapter.Title : null; }
+            get { return Live != null ? Live.Title : null; }
         }
 
         public override object InitialFocusStop
@@ -78,15 +84,9 @@ namespace SongsOfConquestAccess.Screens
             get { return RowsStop; }
         }
 
-        public override bool IsPresent()
+        public override bool IsActive()
         {
-            return _adapter != null && _adapter.IsPresent();
-        }
-
-        /// <summary>Kept for the detector, which calls it whenever the popup's content changes. The
-        /// graph is declared afresh on every operation, so there is nothing to rebuild.</summary>
-        public void Refresh()
-        {
+            return Live != null && Live.IsPresent();
         }
 
         public static LobbyPlayerSettingsMenu FindActiveMenu(LobbyPlayerSettingsMenu targetMenu)
@@ -123,21 +123,21 @@ namespace SongsOfConquestAccess.Screens
 
         public override void Build(GraphBuilder builder)
         {
-            if (!IsPresent())
+            if (!IsActive())
             {
                 return;
             }
 
             builder.BeginStop(RowsStop);
-            IReadOnlyList<AdventureLobbyPlayerSettingsAdapter.ControlItem> controls = _adapter.GetContentControls();
+            IReadOnlyList<AdventureLobbyPlayerSettingsAdapter.ControlItem> controls = Live.GetContentControls();
             for (int i = 0; i < controls.Count; i++)
             {
                 AddRow(builder, controls[i]);
             }
 
             builder.BeginStop(ButtonsStop);
-            AddButton(builder, _adapter.GetCancelButton());
-            AddButton(builder, _adapter.GetConfirmButton());
+            AddButton(builder, Live.GetCancelButton());
+            AddButton(builder, Live.GetConfirmButton());
         }
 
         private void AddRow(GraphBuilder builder, AdventureLobbyPlayerSettingsAdapter.ControlItem control)

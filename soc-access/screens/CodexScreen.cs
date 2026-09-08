@@ -54,7 +54,7 @@ namespace SongsOfConquestAccess.Screens
     /// <c>InputActions.UI.ExitMenu</c> on <c>Hide</c> outside its gamepad branch (decompiled,
     /// line 108), so the key already closes the window.
     /// </summary>
-    public sealed class CodexScreen : GraphScreen
+    public sealed class CodexScreen : LiveScreen<CodexMenuAdapter>
     {
         private const string TabsStop = "codex-tabs";
         private const string ArticlesStop = "codex-articles";
@@ -64,19 +64,19 @@ namespace SongsOfConquestAccess.Screens
         private static readonly PropertyInfo ContainerProperty = AccessTools.Property(typeof(MonoInstallerBase), "Container");
         private static readonly FieldInfo ContainerField = AccessTools.Field(typeof(MonoInstallerBase), "_container");
 
-        private readonly CodexMenuAdapter _adapter;
-
         // A subject of its own per synthesized node, kept across rebuilds so the reconciler seats the
         // cursor on the same line: the body's lines, which the mod reads off text meshes several of
         // them share, and the footer's Close.
         private readonly Dictionary<string, object> _markers = new Dictionary<string, object>();
 
-        public CodexScreen(CodexMenuAdapter adapter)
+        /// <summary>After a hot reload: point the slot at the menu already showing.
+        /// Scanned once, from <c>ScreenDetector.RecoverRuntimeState</c>.</summary>
+        public static void Recover()
         {
-            _adapter = adapter;
+            Recovered<CodexScreen>(FindActive());
         }
 
-        public static Screen TryBuildActiveScreen()
+        public static CodexMenuAdapter FindActive()
         {
             CodexMenuInstaller[] installers = Resources.FindObjectsOfTypeAll<CodexMenuInstaller>();
             for (int i = 0; i < installers.Length; i++)
@@ -84,7 +84,7 @@ namespace SongsOfConquestAccess.Screens
                 CodexMenuAdapter adapter = new CodexMenuAdapter(ResolveCodexMenu(installers[i]));
                 if (adapter.IsPresent())
                 {
-                    return new CodexScreen(adapter);
+                    return (adapter);
                 }
             }
 
@@ -96,11 +96,17 @@ namespace SongsOfConquestAccess.Screens
             get { return "codex"; }
         }
 
+        /// <summary>Layer 46: over the pause menu or the main menu that opens it.</summary>
+        public override int Layer
+        {
+            get { return 46; }
+        }
+
         /// <summary>The window's own drawn heading ("Tutorials &amp; Codex"); the line under it is
         /// the showing tab's name, which the tab bar reads.</summary>
         public override string ScreenName
         {
-            get { return _adapter != null ? _adapter.Title : null; }
+            get { return Live != null ? Live.Title : null; }
         }
 
         /// <summary>The tab row, so arrival reads which page is showing before its first line - and,
@@ -110,20 +116,14 @@ namespace SongsOfConquestAccess.Screens
             get { return TabsStop; }
         }
 
-        public override bool IsPresent()
+        public override bool IsActive()
         {
-            return _adapter != null && _adapter.IsPresent();
-        }
-
-        /// <summary>Kept for the detector, which calls it when the tab or the article changes. The
-        /// graph is declared afresh on every operation, so there is nothing to rebuild.</summary>
-        public void Refresh()
-        {
+            return Live != null && Live.IsPresent();
         }
 
         public override void Build(GraphBuilder builder)
         {
-            if (!IsPresent())
+            if (!IsActive())
             {
                 return;
             }
@@ -145,7 +145,7 @@ namespace SongsOfConquestAccess.Screens
 
         private void BuildTabs(GraphBuilder builder)
         {
-            IReadOnlyList<CodexMenuAdapter.TabItem> tabs = _adapter.GetTabs();
+            IReadOnlyList<CodexMenuAdapter.TabItem> tabs = Live.GetTabs();
             for (int i = 0; i < tabs.Count; i++)
             {
                 CodexMenuAdapter.TabItem tab = tabs[i];
@@ -158,17 +158,17 @@ namespace SongsOfConquestAccess.Screens
                 string label = tab.Label;
                 NodeVtable vtable = GraphNodes.Tab(
                     () => label,
-                    () => _adapter.GetActiveTabIndex() == index);
+                    () => Live.GetActiveTabIndex() == index);
                 // Focusing the tab IS switching to it; the guard keeps the showing tab's native
                 // selection - which is the article the window is drawing - where the game put it.
                 vtable.OnFocusVisual = () =>
                 {
-                    if (_adapter.GetActiveTabIndex() != index)
+                    if (Live.GetActiveTabIndex() != index)
                     {
-                        _adapter.FocusTab(index);
+                        Live.FocusTab(index);
                     }
                 };
-                vtable.OnActivate = () => _adapter.FocusTab(index);
+                vtable.OnActivate = () => Live.FocusTab(index);
                 builder.AddItem(new SyntheticNode(ControlId.Structural("codex:tab/" + index), vtable));
             }
         }
@@ -177,7 +177,7 @@ namespace SongsOfConquestAccess.Screens
 
         private void BuildArticles(GraphBuilder builder)
         {
-            IReadOnlyList<CodexMenuAdapter.ArticleGroupItem> groups = _adapter.GetArticleGroups();
+            IReadOnlyList<CodexMenuAdapter.ArticleGroupItem> groups = Live.GetArticleGroups();
             ControlId landing = null;
             for (int g = 0; g < groups.Count; g++)
             {
@@ -200,8 +200,8 @@ namespace SongsOfConquestAccess.Screens
 
                     string label = article.Label;
                     CodexMenuAdapter.ArticleItem it = article;
-                    NodeVtable vtable = GraphNodes.Button(() => label, () => _adapter.ActivateArticle(it));
-                    vtable.OnFocusVisual = () => _adapter.FocusArticle(it);
+                    NodeVtable vtable = GraphNodes.Button(() => label, () => Live.ActivateArticle(it));
+                    vtable.OnFocusVisual = () => Live.FocusArticle(it);
                     ControlId id = ControlId.For(subject, "codex:article/" + g + "/" + a);
                     builder.AddItem(new DrawnNode(id, vtable, subject));
                     if (article.IsSelected)
@@ -222,7 +222,7 @@ namespace SongsOfConquestAccess.Screens
 
         private void BuildContent(GraphBuilder builder)
         {
-            IReadOnlyList<CodexContentItem> items = _adapter.GetContentItems();
+            IReadOnlyList<CodexContentItem> items = Live.GetContentItems();
             if (items.Count == 0)
             {
                 return;
@@ -304,7 +304,7 @@ namespace SongsOfConquestAccess.Screens
             }
 
             NodeVtable vtable = GraphNodes.Text(() => text);
-            vtable.OnFocusVisual = () => _adapter.ScrollContentItemIntoView(it);
+            vtable.OnFocusVisual = () => Live.ScrollContentItemIntoView(it);
             builder.AddItem(new SyntheticNode(
                 ControlId.For(Marker("content/" + index), "codex:content-line/" + index),
                 vtable));
@@ -343,14 +343,14 @@ namespace SongsOfConquestAccess.Screens
 
         private void BuildFooter(GraphBuilder builder)
         {
-            if (_adapter.IsTutorialSettingsVisible())
+            if (Live.IsTutorialSettingsVisible())
             {
-                Component reset = _adapter.ResetButton;
+                Component reset = Live.ResetButton;
                 if (reset != null)
                 {
                     NodeVtable vtable = GraphNodes.Button(
-                        () => _adapter.ResetButtonLabel,
-                        () => _adapter.ResetTutorials());
+                        () => Live.ResetButtonLabel,
+                        () => Live.ResetTutorials());
                     vtable.OnFocusVisual = () => NativeSelectionUtility.Select(reset);
                     builder.AddItem(new DrawnNode(
                         ControlId.For(reset, "codex:reset-tutorials"),
@@ -358,13 +358,13 @@ namespace SongsOfConquestAccess.Screens
                         reset));
                 }
 
-                Component toggle = _adapter.TutorialsToggle;
+                Component toggle = Live.TutorialsToggle;
                 if (toggle != null)
                 {
                     NodeVtable vtable = GraphNodes.Checkbox(
-                        () => _adapter.TutorialsToggleLabel,
-                        _adapter.IsTutorialsChecked,
-                        _adapter.ToggleTutorials);
+                        () => Live.TutorialsToggleLabel,
+                        Live.IsTutorialsChecked,
+                        Live.ToggleTutorials);
                     vtable.OnFocusVisual = () => NativeSelectionUtility.Select(toggle);
                     builder.AddItem(new DrawnNode(
                         ControlId.For(toggle, "codex:show-tutorials"),
@@ -373,12 +373,12 @@ namespace SongsOfConquestAccess.Screens
                 }
             }
 
-            Component close = _adapter.CloseButton;
+            Component close = Live.CloseButton;
             if (close != null)
             {
                 NodeVtable vtable = GraphNodes.Button(
                     () => ModText.Get(ModStrings.Screens.Close),
-                    () => _adapter.Close());
+                    () => Live.Close());
                 vtable.OnFocusVisual = () => NativeSelectionUtility.Select(close);
                 builder.AddItem(new DrawnNode(ControlId.For(close, "codex:close"), vtable, close));
             }

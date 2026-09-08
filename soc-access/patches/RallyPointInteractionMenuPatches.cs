@@ -49,32 +49,16 @@ namespace SongsOfConquestAccess
             }
         }
 
-        [HarmonyPatch(typeof(RallyPointInteractionMenu), "HandleEntrySelected")]
-        [HarmonyPostfix]
-        private static void RallyPointInteractionMenuHandleEntrySelectedPostfix(RallyPointInteractionMenu __instance)
-        {
-            StartWaitForChanged(__instance);
-        }
-
         private static void StartWaitForReady(RallyPointInteractionMenu menu)
         {
             SocAccessMod plugin = SocAccessMod.Instance;
             if (plugin != null && menu != null)
             {
-                plugin.StartCoroutine(WaitForReady(menu, initialOpen: true));
+                plugin.StartCoroutine(WaitForReady(menu));
             }
         }
 
-        private static void StartWaitForChanged(RallyPointInteractionMenu menu)
-        {
-            SocAccessMod plugin = SocAccessMod.Instance;
-            if (plugin != null && menu != null)
-            {
-                plugin.StartCoroutine(WaitForReady(menu, initialOpen: false));
-            }
-        }
-
-        private static IEnumerator WaitForReady(RallyPointInteractionMenu menu, bool initialOpen)
+        private static IEnumerator WaitForReady(RallyPointInteractionMenu menu)
         {
             int frames = 0;
             while (menu != null && frames < 120)
@@ -82,15 +66,7 @@ namespace SongsOfConquestAccess
                 RallyPointInteractionMenuAdapter adapter = new RallyPointInteractionMenuAdapter(menu);
                 if (adapter.IsPresent())
                 {
-                    if (initialOpen)
-                    {
-                        SocAccessMod.Instance?.ScreenDetector?.OnRallyPointReady(menu);
-                    }
-                    else
-                    {
-                        SocAccessMod.Instance?.ScreenDetector?.OnRallyPointChanged(menu);
-                    }
-
+                    SocAccessMod.Instance?.ScreenDetector?.OnRallyPointReady(menu);
                     yield break;
                 }
 

@@ -29,7 +29,7 @@ namespace SongsOfConquestAccess.Screens
     /// Escape is still the game's (<c>ConsumesBack</c> false): the kingdom HUD registers
     /// <c>UI.ExitMenu</c> for this menu in <c>KingdomInformationHUD.ReregisterHotKeys</c>.
     /// </summary>
-    public sealed class ResearchScreen : GraphScreen
+    public sealed class ResearchScreen : LiveScreen<ResearchMenuAdapter>
     {
         private const string TutorialStop = "research-tutorial";
         private const string FactionsStop = "research-factions";
@@ -37,18 +37,18 @@ namespace SongsOfConquestAccess.Screens
         private const string ResearchStop = "research-items";
         private const string CloseStop = "research-close";
 
-        private readonly ResearchMenuAdapter _adapter;
-
         // The close node has nothing on screen to key on, so it gets a subject of its own, kept
         // across rebuilds so the reconciler seats the cursor back on it.
         private readonly object _closeKey = new object();
 
-        public ResearchScreen(ResearchMenuAdapter adapter)
+        /// <summary>After a hot reload: point the slot at the menu already showing.
+        /// Scanned once, from <c>ScreenDetector.RecoverRuntimeState</c>.</summary>
+        public static void Recover()
         {
-            _adapter = adapter;
+            Recovered<ResearchScreen>(FindActive());
         }
 
-        public static Screen TryBuildActiveScreen()
+        public static ResearchMenuAdapter FindActive()
         {
             ResearchMenu[] menus = Resources.FindObjectsOfTypeAll<ResearchMenu>();
             for (int i = 0; i < menus.Length; i++)
@@ -56,7 +56,7 @@ namespace SongsOfConquestAccess.Screens
                 ResearchMenuAdapter adapter = new ResearchMenuAdapter(menus[i]);
                 if (adapter.IsPresent())
                 {
-                    return new ResearchScreen(adapter);
+                    return (adapter);
                 }
             }
 
@@ -68,31 +68,31 @@ namespace SongsOfConquestAccess.Screens
             get { return "research"; }
         }
 
+        /// <summary>Layer 24: over the settlement page that opens it.</summary>
+        public override int Layer
+        {
+            get { return 24; }
+        }
+
         /// <summary>The header the menu draws, which on a mixed-factions map also says whose research
         /// is showing.</summary>
         public override string ScreenName
         {
             get
             {
-                string header = _adapter != null ? _adapter.HeaderText : null;
+                string header = Live != null ? Live.HeaderText : null;
                 return string.IsNullOrWhiteSpace(header) ? null : header;
             }
         }
 
-        public override bool IsPresent()
+        public override bool IsActive()
         {
-            return _adapter != null && _adapter.IsPresent();
-        }
-
-        /// <summary>Kept for the detector, which calls it whenever the menu's content changes. The
-        /// graph is declared afresh on every operation, so there is nothing to rebuild.</summary>
-        public void Refresh()
-        {
+            return Live != null && Live.IsPresent();
         }
 
         public override void Build(GraphBuilder builder)
         {
-            if (!IsPresent())
+            if (!IsActive())
             {
                 return;
             }
@@ -100,7 +100,7 @@ namespace SongsOfConquestAccess.Screens
             builder.BeginStop(TutorialStop);
             BuildTutorial(builder);
 
-            if (_adapter.HasFactionSelector())
+            if (Live.HasFactionSelector())
             {
                 builder.BeginStop(FactionsStop);
                 BuildFactions(builder);
@@ -120,15 +120,15 @@ namespace SongsOfConquestAccess.Screens
 
         private void BuildTutorial(GraphBuilder builder)
         {
-            Component button = _adapter.TutorialButton;
-            if (button == null || !_adapter.IsTutorialButtonVisible())
+            Component button = Live.TutorialButton;
+            if (button == null || !Live.IsTutorialButtonVisible())
             {
                 return;
             }
 
             NodeVtable vtable = GraphNodes.Button(
-                _adapter.GetTutorialButtonLabel,
-                () => _adapter.ActivateTutorial());
+                Live.GetTutorialButtonLabel,
+                () => Live.ActivateTutorial());
             vtable.OnFocusVisual = () => NativeSelectionUtility.Select(button);
             builder.AddItem(new DrawnNode(ControlId.For(button, "research:tutorial"), vtable, button));
         }
@@ -137,7 +137,7 @@ namespace SongsOfConquestAccess.Screens
 
         private void BuildFactions(GraphBuilder builder)
         {
-            IReadOnlyList<ResearchMenuAdapter.FactionItem> factions = _adapter.GetFactions();
+            IReadOnlyList<ResearchMenuAdapter.FactionItem> factions = Live.GetFactions();
             for (int i = 0; i < factions.Count; i++)
             {
                 ResearchMenuAdapter.FactionItem faction = factions[i];
@@ -162,7 +162,7 @@ namespace SongsOfConquestAccess.Screens
 
         private void BuildBuildings(GraphBuilder builder)
         {
-            IReadOnlyList<ResearchMenuAdapter.BuildingItem> buildings = _adapter.GetBuildings();
+            IReadOnlyList<ResearchMenuAdapter.BuildingItem> buildings = Live.GetBuildings();
             for (int i = 0; i < buildings.Count; i++)
             {
                 ResearchMenuAdapter.BuildingItem building = buildings[i];
@@ -192,7 +192,7 @@ namespace SongsOfConquestAccess.Screens
 
         private void BuildResearch(GraphBuilder builder)
         {
-            IReadOnlyList<ResearchMenuAdapter.CategoryItem> categories = _adapter.GetCategories();
+            IReadOnlyList<ResearchMenuAdapter.CategoryItem> categories = Live.GetCategories();
             ControlId first = null;
             for (int c = 0; c < categories.Count; c++)
             {
@@ -260,7 +260,7 @@ namespace SongsOfConquestAccess.Screens
                 ControlId.For(_closeKey, "research:close"),
                 GraphNodes.Button(
                     () => ModText.Get(ModStrings.Screens.Close),
-                    () => _adapter.Close())));
+                    () => Live.Close())));
         }
     }
 }

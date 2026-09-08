@@ -36,26 +36,22 @@ namespace SongsOfConquestAccess.Screens
     /// <c>UI.Cancel</c> is this game's GAMEPAD binding throughout - every keyboard branch registers
     /// <c>UI.ExitMenu</c> instead - so the key would otherwise do nothing here.
     /// </summary>
-    public sealed class ChatScreen : GraphScreen
+    public sealed class ChatScreen : LiveScreen<ChatAdapter>
     {
         private const string ChatStop = "chat";
 
-        private readonly ChatAdapter _adapter;
         private readonly GameTextEditor _editor = new GameTextEditor();
 
         // Subjects of their own for the lines the game gives no component for: a message is text the
         // window renders into one mesh, and the way out is the mod's own row.
         private readonly Dictionary<string, object> _markers = new Dictionary<string, object>();
 
-        public ChatScreen(ChatAdapter adapter)
-        {
-            _adapter = adapter;
-        }
-
-        public static Screen TryBuildActiveScreen()
+        /// <summary>After a hot reload: point the slot at the chat window already showing.
+        /// Scanned once, from <c>ScreenDetector.RecoverRuntimeState</c>.</summary>
+        public static void Recover()
         {
             ChatAdapter adapter = ChatPatches.CurrentAdapter;
-            return adapter != null && adapter.IsOpen ? new ChatScreen(adapter) : null;
+            Recovered<ChatScreen>(adapter != null && adapter.IsOpen ? adapter : null);
         }
 
         public override string Key
@@ -63,14 +59,20 @@ namespace SongsOfConquestAccess.Screens
             get { return "chat"; }
         }
 
+        /// <summary>Layer 38: over whatever it was opened on.</summary>
+        public override int Layer
+        {
+            get { return 38; }
+        }
+
         public override string ScreenName
         {
             get { return ModText.Get(ModStrings.Screens.Chat); }
         }
 
-        public override bool IsPresent()
+        public override bool IsActive()
         {
-            return _adapter != null && _adapter.IsOpen;
+            return Live != null && Live.IsOpen;
         }
 
         public override bool ConsumesBack
@@ -80,7 +82,7 @@ namespace SongsOfConquestAccess.Screens
 
         public override bool Back()
         {
-            return _adapter != null && _adapter.Close();
+            return Live != null && Live.Close();
         }
 
         /// <summary>While the keyboard is on its way to the message box, what the player types next is
@@ -95,14 +97,14 @@ namespace SongsOfConquestAccess.Screens
             get { return _editor.Pending || _editor.Editing; }
         }
 
-        public override void Update()
+        public override void OnUpdate()
         {
-            base.Update();
+            base.OnUpdate();
 
             // After the navigator, so the word the handover speaks follows the activation's own
             // readout. IsPresent is what tells an edit the player ended from a window that went away
             // under it: Enter in the box sends and the game may close the window with it.
-            _editor.Update(IsPresent());
+            _editor.Update(IsActive());
         }
 
         public override void OnUnfocus()
@@ -117,22 +119,16 @@ namespace SongsOfConquestAccess.Screens
             _editor.Abandon();
         }
 
-        /// <summary>Kept for <c>ChatPatches</c>, which calls it whenever the window changes. The graph
-        /// is declared afresh on every operation, so there is nothing to rebuild.</summary>
-        public void Refresh()
-        {
-        }
-
         /// <summary>A message has arrived while the window is open: it is spoken as it lands, the
         /// graph having already grown a row for it.</summary>
         public void RefreshAndAnnounce(ChatMessage message)
         {
-            if (!IsPresent() || _adapter == null)
+            if (!IsActive() || Live == null)
             {
                 return;
             }
 
-            string text = Spoken(_adapter.BuildMessageInfo(message).DisplayText);
+            string text = Spoken(Live.BuildMessageInfo(message).DisplayText);
             if (!string.IsNullOrWhiteSpace(text))
             {
                 SpeechPipeline.Output(new SpeechRequest(text, interrupt: false));
@@ -141,7 +137,7 @@ namespace SongsOfConquestAccess.Screens
 
         public override void Build(GraphBuilder builder)
         {
-            if (!IsPresent())
+            if (!IsActive())
             {
                 return;
             }
@@ -165,7 +161,7 @@ namespace SongsOfConquestAccess.Screens
         /// <see cref="SpokenLines"/> like every other string the game wrote for its renderer.</summary>
         private void AddMessages(GraphBuilder builder)
         {
-            IReadOnlyList<ChatMessageInfo> messages = _adapter.GetMessages();
+            IReadOnlyList<ChatMessageInfo> messages = Live.GetMessages();
             for (int i = 0; i < messages.Count; i++)
             {
                 ChatMessageInfo message = messages[i];
@@ -191,7 +187,7 @@ namespace SongsOfConquestAccess.Screens
         /// game's own dropdown, opening the mod's drop list. The lobby's window hides it.</summary>
         private void AddTargetSelector(GraphBuilder builder)
         {
-            ChatAdapter.TargetDropList target = _adapter.TargetSelector;
+            ChatAdapter.TargetDropList target = Live.TargetSelector;
             Component subject = target != null ? target.Subject : null;
             if (subject == null)
             {
@@ -205,7 +201,7 @@ namespace SongsOfConquestAccess.Screens
                 () => CurrentOption(it),
                 () => DropListScreen.Open(it, label, index => it.SetValue(index)),
                 it.IsEnabled,
-                _adapter.TargetSelectorTooltip);
+                Live.TargetSelectorTooltip);
             vtable.OnFocusVisual = it.Focus;
             builder.AddItem(new DrawnNode(ControlId.For(subject, "chat:target"), vtable, subject));
         }
@@ -222,9 +218,9 @@ namespace SongsOfConquestAccess.Screens
         /// Enter inside it is the game's own submit, which sends.</summary>
         private ControlId AddMessageField(GraphBuilder builder)
         {
-            IUITextMeshInputField field = _adapter.InputField;
+            IUITextMeshInputField field = Live.InputField;
             Component subject = field != null ? field.MonoTransform : null;
-            if (subject == null || !_adapter.IsInputVisible())
+            if (subject == null || !Live.IsInputVisible())
             {
                 return null;
             }
@@ -233,12 +229,12 @@ namespace SongsOfConquestAccess.Screens
                 () => ModText.Get(ModStrings.Screens.ChatInput),
                 () =>
                 {
-                    IUITextMeshInputField live = _adapter.InputField;
+                    IUITextMeshInputField live = Live.InputField;
                     // Nothing while the game holds the keyboard: the echo is already speaking the keys.
                     return live == null || _editor.Editing ? null : live.InputFieldValue;
                 },
-                () => _editor.RequestSilentEnd(_adapter.InputField),
-                _adapter.IsInputEnabled);
+                () => _editor.RequestSilentEnd(Live.InputField),
+                Live.IsInputEnabled);
             ControlId id = ControlId.For(subject, "chat:input");
             builder.AddItem(new DrawnNode(id, vtable, subject));
             return id;
@@ -246,18 +242,18 @@ namespace SongsOfConquestAccess.Screens
 
         private void AddSend(GraphBuilder builder)
         {
-            UIButton send = _adapter.SendButton;
-            if (send == null || !_adapter.IsSendVisible())
+            UIButton send = Live.SendButton;
+            if (send == null || !Live.IsSendVisible())
             {
                 return;
             }
 
             NodeVtable vtable = GraphNodes.Button(
-                () => _adapter.SendLabel,
-                () => _adapter.Send(),
-                _adapter.IsSendEnabled,
-                _adapter.SendTooltip);
-            vtable.OnFocusVisual = _adapter.FocusSend;
+                () => Live.SendLabel,
+                () => Live.Send(),
+                Live.IsSendEnabled,
+                Live.SendTooltip);
+            vtable.OnFocusVisual = Live.FocusSend;
             builder.AddItem(new DrawnNode(ControlId.For(send, "chat:send"), vtable, send));
         }
 
@@ -268,10 +264,10 @@ namespace SongsOfConquestAccess.Screens
         {
             NodeVtable vtable = GraphNodes.Button(
                 () => ModText.Get(ModStrings.Screens.Close),
-                () => _adapter.Close(),
-                _adapter.IsCloseEnabled,
-                _adapter.CloseTooltip);
-            vtable.OnFocusVisual = _adapter.FocusClose;
+                () => Live.Close(),
+                Live.IsCloseEnabled,
+                Live.CloseTooltip);
+            vtable.OnFocusVisual = Live.FocusClose;
             builder.AddItem(new SyntheticNode(
                 ControlId.For(Marker("chat:close"), "chat:close"),
                 vtable));

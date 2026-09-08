@@ -19,23 +19,8 @@ namespace SongsOfConquestAccess.Screens
     /// </summary>
     public abstract class GraphScreen : Screen
     {
-        protected GraphScreen()
-            : base(null)
-        {
-        }
-
-        /// <summary>Stable identity, for logging and the dev server.</summary>
-        public abstract string Key { get; }
-
         /// <summary>Declare the screen's controls. Called on every navigation operation.</summary>
         public abstract void Build(GraphBuilder builder);
-
-        /// <summary>Spoken when the player arrives on the screen, before the focused control reads.
-        /// Null for a screen whose content already says where you are.</summary>
-        public virtual string ScreenName
-        {
-            get { return null; }
-        }
 
         /// <summary>Where focus lands on first arrival, as a Tab-stop key; null starts at the graph's
         /// own start node.</summary>
@@ -146,59 +131,44 @@ namespace SongsOfConquestAccess.Screens
             get { return SocAccessMod.Instance == null ? null : SocAccessMod.Instance.Navigator; }
         }
 
-        /// <summary>This instance replaced an identical one that was already on screen, so the player
-        /// has not arrived anywhere: the screen does not say its own name again. Set by
-        /// <see cref="ScreenManager.RefreshTop{TScreen}"/> before <see cref="OnFocus"/>, and spent
-        /// there.</summary>
-        public bool ArrivedByRefresh { get; set; }
-
         /// <summary>The name this screen actually spoke on arrival, null when it had none to say. A
-        /// refresh compares against this rather than the live name: a page pushed before the game
-        /// wrote its title (the post-battle page, refreshed once its animation ends) has said nothing,
-        /// and the title arriving with the refresh is news.</summary>
+        /// page that turns in place compares against this rather than against the live name: a page
+        /// pushed before the game wrote its title (the post-battle page, whose title arrives with its
+        /// animation) has said nothing, and the title arriving later is news.</summary>
         public string SpokenName { get; private set; }
 
-        public override void OnFocus()
+        /// <summary>Say the screen's name on arrival - the manager's one announcement site
+        /// (<see cref="ScreenManager"/>). Queued, so the focused control's readout follows it rather
+        /// than cutting it off.</summary>
+        public void SayName()
         {
-            GraphNavigator navigator = Navigator;
-            if (navigator == null)
+            string name = ScreenName;
+            if (string.IsNullOrEmpty(name))
             {
                 return;
             }
 
-            navigator.Attach(this);
-            bool refreshed = ArrivedByRefresh;
-            ArrivedByRefresh = false;
+            SpeechPipeline.Output(new SpeechRequest(name, interrupt: false));
+            SpokenName = name;
+        }
+
+        /// <summary>The page turned in place and is now called something else: say the new name.
+        /// Nothing is said when the name has not moved, so a rewrite of the slot that carried no news
+        /// is silent.</summary>
+        public void SayNameIfChanged()
+        {
             string name = ScreenName;
-            if (!refreshed && !string.IsNullOrEmpty(name))
+            if (string.IsNullOrEmpty(name) || name == SpokenName)
             {
-                // Queued, so the first control's readout follows it rather than cutting it off.
-                SpeechPipeline.Output(new SpeechRequest(name, interrupt: false));
-                SpokenName = name;
+                return;
             }
+
+            SpeechPipeline.Output(new SpeechRequest(name, interrupt: false));
+            SpokenName = name;
         }
 
-        public override void OnUnfocus()
+        public override void OnUpdate()
         {
-            GraphNavigator navigator = Navigator;
-            if (navigator != null && ReferenceEquals(navigator.Screen, this))
-            {
-                navigator.Attach(null);
-            }
-        }
-
-        public override void OnPop()
-        {
-            GraphNavigator navigator = Navigator;
-            if (navigator != null)
-            {
-                navigator.ScreenClosed(this);
-            }
-        }
-
-        public override void Update()
-        {
-            GraphNavigator navigator = Navigator;
             // Every frame, not only on arrival: a game field that takes the keyboard on its own at any
             // time (the chat box re-focusing itself after a send) would otherwise keep every key from
             // the mod until the player found Escape. The screen's own editor is left alone.
@@ -206,22 +176,12 @@ namespace SongsOfConquestAccess.Screens
             {
                 GameTextFocus.Release();
             }
-
-            if (navigator != null && ReferenceEquals(navigator.Screen, this))
-            {
-                navigator.Update();
-            }
         }
 
         public override bool HasClaimed(string actionKey)
         {
             GraphNavigator navigator = Navigator;
             return navigator != null && ReferenceEquals(navigator.Screen, this) && navigator.Claims(actionKey);
-        }
-
-        public override bool HasFocusedWidgetClaimed(string actionKey)
-        {
-            return HasClaimed(actionKey);
         }
 
         public override bool OnActionJustPressed(InputAction action)
@@ -233,7 +193,8 @@ namespace SongsOfConquestAccess.Screens
                 && navigator.Dispatch(action.Key);
         }
 
-        public override Tooltip CurrentTooltip
+        /// <summary>The tooltip of whatever the player is standing on, or null.</summary>
+        public Tooltip CurrentTooltip
         {
             get
             {

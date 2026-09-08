@@ -32,23 +32,23 @@ namespace SongsOfConquestAccess.Screens
     /// Escape is still the game's (<c>ConsumesBack</c> false): the kingdom HUD registers
     /// <c>UI.ExitMenu</c> for this menu in <c>KingdomInformationHUD.ReregisterHotKeys</c>.
     /// </summary>
-    public sealed class TroopOverviewScreen : GraphScreen
+    public sealed class TroopOverviewScreen : LiveScreen<KingdomTroopOverviewAdapter>
     {
         private const string ContentStop = "troop-overview-content";
         private const string CloseStop = "troop-overview-close";
-
-        private readonly KingdomTroopOverviewAdapter _adapter;
 
         // The close node has nothing on screen to key on, so it gets a subject of its own, kept
         // across rebuilds so the reconciler seats the cursor back on it.
         private readonly object _closeKey = new object();
 
-        public TroopOverviewScreen(KingdomTroopOverviewAdapter adapter)
+        /// <summary>After a hot reload: point the slot at the menu already showing.
+        /// Scanned once, from <c>ScreenDetector.RecoverRuntimeState</c>.</summary>
+        public static void Recover()
         {
-            _adapter = adapter;
+            Recovered<TroopOverviewScreen>(FindActive());
         }
 
-        public static Screen TryBuildActiveScreen()
+        public static KingdomTroopOverviewAdapter FindActive()
         {
             KingdomTroopOverviewMenu[] menus = Resources.FindObjectsOfTypeAll<KingdomTroopOverviewMenu>();
             for (int i = 0; i < menus.Length; i++)
@@ -56,7 +56,7 @@ namespace SongsOfConquestAccess.Screens
                 KingdomTroopOverviewAdapter adapter = new KingdomTroopOverviewAdapter(menus[i]);
                 if (adapter.IsPresent())
                 {
-                    return new TroopOverviewScreen(adapter);
+                    return (adapter);
                 }
             }
 
@@ -68,25 +68,31 @@ namespace SongsOfConquestAccess.Screens
             get { return "troop-overview"; }
         }
 
+        /// <summary>Layer 20: an in-game panel over the map.</summary>
+        public override int Layer
+        {
+            get { return 20; }
+        }
+
         /// <summary>The menu's own drawn title ("Troop Overview"). Nothing drawn means no screen
         /// name.</summary>
         public override string ScreenName
         {
             get
             {
-                string title = _adapter != null ? _adapter.Title : null;
+                string title = Live != null ? Live.Title : null;
                 return string.IsNullOrWhiteSpace(title) ? null : title;
             }
         }
 
-        public override bool IsPresent()
+        public override bool IsActive()
         {
-            return _adapter != null && _adapter.IsPresent();
+            return Live != null && Live.IsPresent();
         }
 
         public override void Build(GraphBuilder builder)
         {
-            if (!IsPresent())
+            if (!IsActive())
             {
                 return;
             }
@@ -102,7 +108,7 @@ namespace SongsOfConquestAccess.Screens
 
         private void BuildTowns(GraphBuilder builder)
         {
-            IReadOnlyList<KingdomTroopOverviewAdapter.TownItem> towns = _adapter.GetTowns();
+            IReadOnlyList<KingdomTroopOverviewAdapter.TownItem> towns = Live.GetTowns();
             ControlId first = null;
             for (int t = 0; t < towns.Count; t++)
             {
@@ -188,7 +194,7 @@ namespace SongsOfConquestAccess.Screens
                 ControlId.For(_closeKey, "troop-overview:close"),
                 GraphNodes.Button(
                     () => ModText.Get(ModStrings.Screens.Close),
-                    () => _adapter.Close())));
+                    () => Live.Close())));
         }
     }
 }

@@ -26,21 +26,21 @@ namespace SongsOfConquestAccess.Screens
     /// Escape is the game's own: it registers the pause menu's exit action itself, so this screen
     /// claims nothing.
     /// </summary>
-    public sealed class PauseMenuScreen : GraphScreen
+    public sealed class PauseMenuScreen : LiveScreen<PauseMenuAdapter>
     {
         private const string MenuStop = "pause-menu";
 
         private static readonly PropertyInfo InstallerContainerProperty =
             AccessTools.Property(typeof(PauseMenuInstaller), "Container");
 
-        private readonly PauseMenuAdapter _adapter;
-
-        public PauseMenuScreen(PauseMenuAdapter adapter)
+        /// <summary>After a hot reload: point the slot at the menu already showing.
+        /// Scanned once, from <c>ScreenDetector.RecoverRuntimeState</c>.</summary>
+        public static void Recover()
         {
-            _adapter = adapter;
+            Recovered<PauseMenuScreen>(FindActive());
         }
 
-        public static Screen TryBuildActiveScreen()
+        public static PauseMenuAdapter FindActive()
         {
             PauseMenu pauseMenu = FindActivePauseMenu();
             if (pauseMenu == null)
@@ -49,7 +49,7 @@ namespace SongsOfConquestAccess.Screens
             }
 
             PauseMenuAdapter adapter = new PauseMenuAdapter(pauseMenu);
-            return adapter.IsPresent() ? new PauseMenuScreen(adapter) : null;
+            return adapter.IsPresent() ? (adapter) : null;
         }
 
         public override string Key
@@ -57,30 +57,36 @@ namespace SongsOfConquestAccess.Screens
             get { return "pause-menu"; }
         }
 
+        /// <summary>Layer 40: over the game it pauses.</summary>
+        public override int Layer
+        {
+            get { return 40; }
+        }
+
         /// <summary>The title the game draws over the menu ("Game Menu").</summary>
         public override string ScreenName
         {
             get
             {
-                string title = _adapter != null ? _adapter.Title : null;
+                string title = Live != null ? Live.Title : null;
                 return string.IsNullOrWhiteSpace(title) ? null : title;
             }
         }
 
-        public override bool IsPresent()
+        public override bool IsActive()
         {
-            return _adapter != null && _adapter.IsPresent();
+            return Live != null && Live.IsPresent();
         }
 
         public override void Build(GraphBuilder builder)
         {
-            if (!IsPresent())
+            if (!IsActive())
             {
                 return;
             }
 
             builder.BeginStop(MenuStop);
-            List<PauseMenuAdapter.Item> items = DrawnOrder(_adapter.Items);
+            List<PauseMenuAdapter.Item> items = DrawnOrder(Live.Items);
             for (int i = 0; i < items.Count; i++)
             {
                 PauseMenuAdapter.Item item = items[i];

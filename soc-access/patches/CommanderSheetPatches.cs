@@ -34,40 +34,5 @@ namespace SongsOfConquestAccess
 
             SocAccessMod.Instance?.ScreenDetector?.OnCommanderSheetClosed(__instance);
         }
-
-        [HarmonyPatch(typeof(CommanderSheet), "HandleTutorialClicked")]
-        [HarmonyPostfix]
-        private static void CommanderSheetHandleTutorialClickedPostfix(CommanderSheet __instance)
-        {
-            SocAccessMod.Instance?.ScreenDetector?.OnCommanderSheetChanged();
-        }
-
-        [HarmonyPatch(typeof(CommanderSheetModifierTabNavigation), "SetActiveTab")]
-        [HarmonyPostfix]
-        private static void CommanderSheetModifierTabNavigationSetActiveTabPostfix(CommanderSheetModifierTabNavigation __instance)
-        {
-            SocAccessMod.Instance?.ScreenDetector?.OnCommanderSheetComponentChanged(__instance);
-        }
-
-        [HarmonyPatch(typeof(CommanderSheetSummary), "UpdateSummary")]
-        [HarmonyPostfix]
-        private static void CommanderSheetSummaryUpdateSummaryPostfix(CommanderSheetSummary __instance)
-        {
-            SocAccessMod.Instance?.ScreenDetector?.OnCommanderSheetComponentChanged(__instance);
-        }
-
-        [HarmonyPatch(typeof(CommanderSheetTroopSummary), "UpdateSummary")]
-        [HarmonyPostfix]
-        private static void CommanderSheetTroopSummaryUpdateSummaryPostfix(CommanderSheetTroopSummary __instance)
-        {
-            SocAccessMod.Instance?.ScreenDetector?.OnCommanderSheetComponentChanged(__instance);
-        }
-
-        [HarmonyPatch(typeof(CommanderSheetTempEffectSummary), "UpdateSummary")]
-        [HarmonyPostfix]
-        private static void CommanderSheetTempEffectSummaryUpdateSummaryPostfix(CommanderSheetTempEffectSummary __instance)
-        {
-            SocAccessMod.Instance?.ScreenDetector?.OnCommanderSheetComponentChanged(__instance);
-        }
     }
 }

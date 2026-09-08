@@ -61,7 +61,7 @@ namespace SongsOfConquestAccess.Screens
     /// (the game draws neither against an unscouted neutral army), the Ready button and the
     /// defender-placement instruction (hot-seat and multiplayer states only).
     /// </summary>
-    public sealed class PreBattleMenuScreen : GraphScreen
+    public sealed class PreBattleMenuScreen : LiveScreen<PreBattleMenuAdapter>
     {
         private const string AttackerStop = "pre-battle-attacker";
         private const string DefenderStop = "pre-battle-defender";
@@ -82,8 +82,10 @@ namespace SongsOfConquestAccess.Screens
         /// far as the navigator is concerned.</summary>
         public static readonly ControlId GridNodeId = ControlId.Structural("pre-battle:tile");
 
-        private readonly PreBattleMenuAdapter _adapter;
-        private readonly TroopPlacementHexGrid _hexGrid;
+        // The placement cursor, built over the menu it walks. Rebuilt when the slot is pointed at a
+        // DIFFERENT battle and kept otherwise.
+        private TroopPlacementHexGrid _hexGrid;
+        private PreBattleMenuAdapter _hexGridAdapter;
         private Action<OnChangedPayload> _deploymentChangedHandler;
 
         // A subject of its own per synthesized line, kept across rebuilds so the reconciler seats the
@@ -101,12 +103,27 @@ namespace SongsOfConquestAccess.Screens
         // passively: baselined on arrival, so only a CHANGE is spoken.
         private string _instruction;
 
-        public PreBattleMenuScreen(PreBattleMenuAdapter adapter)
-            : this(adapter, new TroopPlacementHexGrid(adapter))
+        /// <summary>After a hot reload: point the slot at the placement menu already showing.
+        /// Scanned once, from <c>ScreenDetector.RecoverRuntimeState</c>.</summary>
+        public static void Recover()
         {
+            Recovered<PreBattleMenuScreen>(FindActive());
         }
 
-        public static Screen TryBuildActiveScreen()
+        /// <summary>The cursor is built over one placement: a new one gets a new grid.</summary>
+        private TroopPlacementHexGrid HexGrid()
+        {
+            if (_hexGrid != null && ReferenceEquals(_hexGridAdapter, Live))
+            {
+                return _hexGrid;
+            }
+
+            _hexGridAdapter = Live;
+            _hexGrid = Live == null ? null : new TroopPlacementHexGrid(Live);
+            return _hexGrid;
+        }
+
+        public static PreBattleMenuAdapter FindActive()
         {
             PreBattleMenu[] menus = Resources.FindObjectsOfTypeAll<PreBattleMenu>();
             for (int i = 0; i < menus.Length; i++)
@@ -120,22 +137,22 @@ namespace SongsOfConquestAccess.Screens
                 PreBattleMenuAdapter adapter = new PreBattleMenuAdapter(menu);
                 if (adapter.IsPresent())
                 {
-                    return new PreBattleMenuScreen(adapter);
+                    return adapter;
                 }
             }
 
             return null;
         }
 
-        private PreBattleMenuScreen(PreBattleMenuAdapter adapter, TroopPlacementHexGrid hexGrid)
-        {
-            _adapter = adapter;
-            _hexGrid = hexGrid;
-        }
-
         public override string Key
         {
             get { return "pre-battle-menu"; }
+        }
+
+        /// <summary>Layer 12: over the map, under what the battle raises.</summary>
+        public override int Layer
+        {
+            get { return 12; }
         }
 
         public override string ScreenName
@@ -150,22 +167,22 @@ namespace SongsOfConquestAccess.Screens
             get { return !IsGridFocused(); }
         }
 
-        public override bool IsPresent()
+        public override bool IsActive()
         {
-            return _adapter != null && _adapter.IsPresent();
+            return Live != null && Live.IsPresent();
         }
 
         public override void OnPush()
         {
             _deploymentChangedHandler = HandleDeploymentChanged;
-            _adapter?.AddDeploymentChangedHandler(_deploymentChangedHandler);
-            _instruction = _adapter != null ? _adapter.InstructionText : null;
+            Live?.AddDeploymentChangedHandler(_deploymentChangedHandler);
+            _instruction = Live != null ? Live.InstructionText : null;
         }
 
         public override void OnUnfocus()
         {
-            _adapter?.HideNativeTooltip();
-            _adapter?.ClearFocusedTileOverlay();
+            Live?.HideNativeTooltip();
+            Live?.ClearFocusedTileOverlay();
             base.OnUnfocus();
         }
 
@@ -173,18 +190,18 @@ namespace SongsOfConquestAccess.Screens
         {
             if (_deploymentChangedHandler != null)
             {
-                _adapter?.RemoveDeploymentChangedHandler(_deploymentChangedHandler);
+                Live?.RemoveDeploymentChangedHandler(_deploymentChangedHandler);
                 _deploymentChangedHandler = null;
             }
 
-            _adapter?.HideNativeTooltip();
-            _adapter?.ClearFocusedTileOverlay();
+            Live?.HideNativeTooltip();
+            Live?.ClearFocusedTileOverlay();
             base.OnPop();
         }
 
-        public override void Update()
+        public override void OnUpdate()
         {
-            base.Update();
+            base.OnUpdate();
             WatchInstruction();
         }
 
@@ -193,7 +210,7 @@ namespace SongsOfConquestAccess.Screens
         /// it is the board's stop name - so it is watched and said, queued, when it changes.</summary>
         private void WatchInstruction()
         {
-            string text = _adapter != null ? _adapter.InstructionText : null;
+            string text = Live != null ? Live.InstructionText : null;
             if (string.Equals(text, _instruction, StringComparison.Ordinal))
             {
                 return;
@@ -218,14 +235,14 @@ namespace SongsOfConquestAccess.Screens
             }
 
             _tooltipRead = false;
-            _hexGrid?.RebuildAfterPlacementChanged(IsGridFocused());
+            HexGrid()?.RebuildAfterPlacementChanged(IsGridFocused());
         }
 
         // ---- the graph ----
 
         public override void Build(GraphBuilder builder)
         {
-            if (!IsPresent())
+            if (!IsActive())
             {
                 return;
             }
@@ -266,13 +283,13 @@ namespace SongsOfConquestAccess.Screens
             AddLine(
                 builder,
                 key + "-threat",
-                attacker ? (Func<string>)(() => _adapter.AttackerThreatText) : () => _adapter.DefenderThreatText,
-                attacker ? _adapter.AttackerScoutingTooltip : _adapter.DefenderScoutingTooltip);
+                attacker ? (Func<string>)(() => Live.AttackerThreatText) : () => Live.DefenderThreatText,
+                attacker ? Live.AttackerScoutingTooltip : Live.DefenderScoutingTooltip);
 
             AddLine(
                 builder,
                 key + "-scouting",
-                attacker ? (Func<string>)(() => _adapter.AttackerScoutingText) : () => _adapter.DefenderScoutingText,
+                attacker ? (Func<string>)(() => Live.AttackerScoutingText) : () => Live.DefenderScoutingText,
                 null);
 
             return commander;
@@ -284,17 +301,17 @@ namespace SongsOfConquestAccess.Screens
         private ControlId BuildCommander(GraphBuilder builder, bool attacker, string key)
         {
             Func<string> name = attacker
-                ? (Func<string>)(() => _adapter.AttackerName)
-                : () => _adapter.DefenderName;
+                ? (Func<string>)(() => Live.AttackerName)
+                : () => Live.DefenderName;
             if (string.IsNullOrWhiteSpace(name()))
             {
                 return null;
             }
 
-            Component button = attacker ? _adapter.AttackerPortraitButton : _adapter.DefenderPortraitButton;
+            Component button = attacker ? Live.AttackerPortraitButton : Live.DefenderPortraitButton;
             Tooltip tooltip = button == null
                 ? null
-                : (attacker ? _adapter.AttackerPortraitTooltip : _adapter.DefenderPortraitTooltip);
+                : (attacker ? Live.AttackerPortraitTooltip : Live.DefenderPortraitTooltip);
             NodeVtable vtable = GraphNodes.Text(name, null, tooltip);
             if (button == null)
             {
@@ -306,8 +323,8 @@ namespace SongsOfConquestAccess.Screens
             // The mouse resting on the portrait is what makes the game draw its tooltip, and the
             // portrait refreshes its own contents on the way.
             vtable.OnFocusVisual = attacker
-                ? (Action)_adapter.FocusAttackerPortrait
-                : _adapter.FocusDefenderPortrait;
+                ? (Action)Live.FocusAttackerPortrait
+                : Live.FocusDefenderPortrait;
             ControlId id = ControlId.For(button, "pre-battle:" + key + "-commander");
             builder.AddItem(new DrawnNode(id, vtable, button));
             return id;
@@ -326,9 +343,9 @@ namespace SongsOfConquestAccess.Screens
             // registration is a delegate over this load and must not outlive it.
             CarrySounds.Register(TroopCargo, () => NativeSoundUtility.PostEvent(PickUpSound), null);
 
-            NodeVtable vtable = GraphNodes.Text(() => _hexGrid.GetLabel(), null, TileTooltip());
-            vtable.OnFocusVisual = () => _hexGrid.ShowOverlay();
-            vtable.OnBlurVisual = () => _hexGrid.HideOverlay();
+            NodeVtable vtable = GraphNodes.Text(() => HexGrid().GetLabel(), null, TileTooltip());
+            vtable.OnFocusVisual = () => HexGrid().ShowOverlay();
+            vtable.OnBlurVisual = () => HexGrid().HideOverlay();
 
             // Only a troop of the player's own can be lifted, and every tile takes a drop: which
             // destinations are legal is the GAME's answer, given when the drop replays its drag. The
@@ -336,8 +353,8 @@ namespace SongsOfConquestAccess.Screens
             // nothing to give, which is the engine's contract for a pure query - and here it is also
             // what keeps the readout's part COUNT the same from tile to tile, so the live watch does
             // not read the whole node a second time every time the cursor steps off a troop.
-            vtable.OnPickUp = () => _hexGrid.CanPickUp
-                ? new CarryItem(_hexGrid.CursorTile, _hexGrid.FocusedTroopLabel, TroopCargo)
+            vtable.OnPickUp = () => HexGrid().CanPickUp
+                ? new CarryItem(HexGrid().CursorTile, HexGrid().FocusedTroopLabel, TroopCargo)
                 : null;
 
             vtable.DropKind = TroopCargo;
@@ -349,13 +366,13 @@ namespace SongsOfConquestAccess.Screens
 
         private string GridContext()
         {
-            string instruction = _adapter != null ? _adapter.InstructionText : null;
+            string instruction = Live != null ? Live.InstructionText : null;
             return string.IsNullOrWhiteSpace(instruction) ? ModText.Get(ModStrings.Screens.TroopPlacement) : instruction;
         }
 
         private Tooltip TileTooltip()
         {
-            Vector2Int tile = _hexGrid.CursorTile;
+            Vector2Int tile = HexGrid().CursorTile;
             if (_tooltipRead && tile == _tooltipTile)
             {
                 return _tooltip;
@@ -363,7 +380,7 @@ namespace SongsOfConquestAccess.Screens
 
             _tooltipTile = tile;
             _tooltipRead = true;
-            _tooltip = _hexGrid.GetTooltip();
+            _tooltip = HexGrid().GetTooltip();
             return _tooltip;
         }
 
@@ -372,7 +389,7 @@ namespace SongsOfConquestAccess.Screens
         private SongsOfConquestAccess.UI.Graph.DropResult Drop(CarryItem held)
         {
             Vector2Int? source = held == null ? null : held.Cargo as Vector2Int?;
-            return source.HasValue && _adapter.TryMoveTroop(source.Value, _hexGrid.CursorTile)
+            return source.HasValue && Live.TryMoveTroop(source.Value, HexGrid().CursorTile)
                 ? SongsOfConquestAccess.UI.Graph.DropResult.Done()
                 : SongsOfConquestAccess.UI.Graph.DropResult.Refused(ModText.Get(ModStrings.UI.InvalidDestination));
         }
@@ -385,18 +402,18 @@ namespace SongsOfConquestAccess.Screens
         private void BuildButtons(GraphBuilder builder)
         {
             List<KeyValuePair<float, NodeDeclaration>> drawn = new List<KeyValuePair<float, NodeDeclaration>>(4);
-            AddButton(drawn, "withdraw", _adapter.IsWithdrawButtonVisible(), _adapter.WithdrawButton,
-                () => _adapter.WithdrawButtonLabel, () => _adapter.Withdraw(),
-                _adapter.IsWithdrawButtonEnabled, _adapter.WithdrawButtonTooltip, _adapter.FocusWithdrawButton);
-            AddButton(drawn, "manual-battle", _adapter.IsManualBattleButtonVisible(), _adapter.ManualBattleButton,
-                () => _adapter.ManualBattleButtonLabel, () => _adapter.ManualBattle(),
-                _adapter.IsManualBattleButtonEnabled, _adapter.ManualBattleButtonTooltip, _adapter.FocusManualBattleButton);
-            AddButton(drawn, "quick-battle", _adapter.IsQuickBattleButtonVisible(), _adapter.QuickBattleButton,
-                () => _adapter.QuickBattleButtonLabel, () => _adapter.QuickBattle(),
-                _adapter.IsQuickBattleButtonEnabled, _adapter.QuickBattleButtonTooltip, _adapter.FocusQuickBattleButton);
-            AddButton(drawn, "ready", _adapter.IsReadyButtonVisible(), _adapter.ReadyButton,
-                () => _adapter.ReadyButtonLabel, () => _adapter.Ready(),
-                _adapter.IsReadyButtonEnabled, _adapter.ReadyButtonTooltip, _adapter.FocusReadyButton);
+            AddButton(drawn, "withdraw", Live.IsWithdrawButtonVisible(), Live.WithdrawButton,
+                () => Live.WithdrawButtonLabel, () => Live.Withdraw(),
+                Live.IsWithdrawButtonEnabled, Live.WithdrawButtonTooltip, Live.FocusWithdrawButton);
+            AddButton(drawn, "manual-battle", Live.IsManualBattleButtonVisible(), Live.ManualBattleButton,
+                () => Live.ManualBattleButtonLabel, () => Live.ManualBattle(),
+                Live.IsManualBattleButtonEnabled, Live.ManualBattleButtonTooltip, Live.FocusManualBattleButton);
+            AddButton(drawn, "quick-battle", Live.IsQuickBattleButtonVisible(), Live.QuickBattleButton,
+                () => Live.QuickBattleButtonLabel, () => Live.QuickBattle(),
+                Live.IsQuickBattleButtonEnabled, Live.QuickBattleButtonTooltip, Live.FocusQuickBattleButton);
+            AddButton(drawn, "ready", Live.IsReadyButtonVisible(), Live.ReadyButton,
+                () => Live.ReadyButtonLabel, () => Live.Ready(),
+                Live.IsReadyButtonEnabled, Live.ReadyButtonTooltip, Live.FocusReadyButton);
             if (drawn.Count == 0)
             {
                 return;
@@ -442,7 +459,7 @@ namespace SongsOfConquestAccess.Screens
         /// its own (owner ruling 2026-09-08) and built only while the menu is drawing it.</summary>
         private void BuildHint(GraphBuilder builder)
         {
-            if (string.IsNullOrWhiteSpace(_adapter.DragHintText))
+            if (string.IsNullOrWhiteSpace(Live.DragHintText))
             {
                 return;
             }
@@ -450,7 +467,7 @@ namespace SongsOfConquestAccess.Screens
             builder.BeginStop(HintStop);
             builder.AddItem(new SyntheticNode(
                 ControlId.For(Marker("hint"), "pre-battle:hint"),
-                GraphNodes.Text(() => _adapter.DragHintText)));
+                GraphNodes.Text(() => Live.DragHintText)));
         }
 
         // ---- keys ----
@@ -462,7 +479,7 @@ namespace SongsOfConquestAccess.Screens
         /// </summary>
         public override bool ModeClaims(string actionKey)
         {
-            return IsGridFocused() && _hexGrid != null && ModeAction(actionKey) != null;
+            return IsGridFocused() && HexGrid() != null && ModeAction(actionKey) != null;
         }
 
         /// <summary>The board action a key means here, or null where the key is not the cursor's. The
@@ -473,7 +490,7 @@ namespace SongsOfConquestAccess.Screens
         /// letters.</summary>
         private string ModeAction(string actionKey)
         {
-            if (_hexGrid.ClaimsAction(actionKey))
+            if (HexGrid().ClaimsAction(actionKey))
             {
                 return actionKey;
             }
@@ -498,13 +515,13 @@ namespace SongsOfConquestAccess.Screens
 
         public override bool OnAction(string actionKey)
         {
-            if (!IsGridFocused() || _hexGrid == null)
+            if (!IsGridFocused() || HexGrid() == null)
             {
                 return false;
             }
 
             string action = ModeAction(actionKey);
-            return action != null && _hexGrid.HandleAction(AccessibilityActions.FindByKey(action));
+            return action != null && HexGrid().HandleAction(AccessibilityActions.FindByKey(action));
         }
 
         private bool IsGridFocused()

@@ -29,30 +29,30 @@ namespace SongsOfConquestAccess.Screens
     /// both show - so Escape does nothing here. The screen claims it and runs the same <c>Hide</c>
     /// the game's own callback would.
     /// </summary>
-    public sealed class PlatformUserMenuScreen : GraphScreen
+    public sealed class PlatformUserMenuScreen : LiveScreen<PlatformUserMenuAdapter>
     {
         private const string MenuStop = "platform-user-menu";
-
-        private readonly PlatformUserMenuAdapter _adapter;
 
         // A subject of its own for each node the popup gives no component for.
         private readonly object _headingKey = new object();
         private readonly object _cancelKey = new object();
 
-        public PlatformUserMenuScreen(PlatformUserMenuAdapter adapter)
+        /// <summary>After a hot reload: point the slot at the menu already showing.
+        /// Scanned once, from <c>ScreenDetector.RecoverRuntimeState</c>.</summary>
+        public static void Recover()
         {
-            _adapter = adapter;
+            Recovered<PlatformUserMenuScreen>(FindActive());
         }
 
-        public static Screen TryBuildActiveScreen()
+        public static PlatformUserMenuAdapter FindActive()
         {
             PlatformUserMenuAdapter adapter = FindActiveMenu(null);
-            return adapter != null ? new PlatformUserMenuScreen(adapter) : null;
+            return adapter;
         }
 
         public bool Matches(PlatformUserMenu menu)
         {
-            return _adapter != null && ReferenceEquals(_adapter.SourceKey, menu);
+            return Live != null && ReferenceEquals(Live.SourceKey, menu);
         }
 
         public override string Key
@@ -60,48 +60,54 @@ namespace SongsOfConquestAccess.Screens
             get { return "platform-user-menu"; }
         }
 
+        /// <summary>Layer 7: a popup over the lobby.</summary>
+        public override int Layer
+        {
+            get { return 7; }
+        }
+
         /// <summary>The menu's own name, spoken once on arrival.</summary>
         public override string ScreenName
         {
             get
             {
-                string title = _adapter != null ? _adapter.Title : null;
+                string title = Live != null ? Live.Title : null;
                 return string.IsNullOrWhiteSpace(title) ? null : title;
             }
         }
 
-        public override bool IsPresent()
+        public override bool IsActive()
         {
-            return _adapter != null && _adapter.IsPresent();
+            return Live != null && Live.IsPresent();
         }
 
         /// <summary>Escape: the game binds only its gamepad Cancel here, so the key would do nothing;
         /// the screen takes it and closes the popup the way the game does.</summary>
         public override bool ConsumesBack
         {
-            get { return IsPresent(); }
+            get { return IsActive(); }
         }
 
         public override bool Back()
         {
-            return _adapter != null && _adapter.Cancel();
+            return Live != null && Live.Cancel();
         }
 
         public override void OnUnfocus()
         {
             base.OnUnfocus();
-            _adapter?.HideNativeTooltip();
+            Live?.HideNativeTooltip();
         }
 
         public override void OnPop()
         {
             base.OnPop();
-            _adapter?.HideNativeTooltip();
+            Live?.HideNativeTooltip();
         }
 
         public override void Build(GraphBuilder builder)
         {
-            if (!IsPresent())
+            if (!IsActive())
             {
                 return;
             }
@@ -109,14 +115,14 @@ namespace SongsOfConquestAccess.Screens
             builder.BeginStop(MenuStop);
             ControlId start = null;
 
-            if (!string.IsNullOrWhiteSpace(_adapter.Title))
+            if (!string.IsNullOrWhiteSpace(Live.Title))
             {
                 builder.AddItem(new SyntheticNode(
                     ControlId.For(_headingKey, "platform-user:heading"),
-                    GraphNodes.Text(() => _adapter.Title)));
+                    GraphNodes.Text(() => Live.Title)));
             }
 
-            IReadOnlyList<PlatformUserMenuAdapter.ActionItem> actions = _adapter.GetActions();
+            IReadOnlyList<PlatformUserMenuAdapter.ActionItem> actions = Live.GetActions();
             for (int i = 0; i < actions.Count; i++)
             {
                 PlatformUserMenuAdapter.ActionItem action = actions[i];
@@ -148,8 +154,8 @@ namespace SongsOfConquestAccess.Screens
 
             // The mod's own way out: the popup draws none, and the game's Cancel is bound to the
             // gamepad only.
-            NodeVtable cancel = GraphNodes.Button(() => _adapter.CancelLabel, () => _adapter.Cancel());
-            cancel.OnFocusVisual = _adapter.HideNativeTooltip;
+            NodeVtable cancel = GraphNodes.Button(() => Live.CancelLabel, () => Live.Cancel());
+            cancel.OnFocusVisual = Live.HideNativeTooltip;
             ControlId cancelId = ControlId.For(_cancelKey, "platform-user:cancel");
             builder.AddItem(new SyntheticNode(cancelId, cancel));
             if (start == null)

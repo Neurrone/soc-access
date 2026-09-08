@@ -47,7 +47,7 @@ namespace SongsOfConquestAccess.Screens
     /// <c>LobbyNavigation</c> registers no input callback at all, so the key would do nothing here;
     /// the screen claims it and presses the drawn Back button.
     /// </summary>
-    public sealed class AdventureLobbyMapSelectScreen : GraphScreen
+    public sealed class AdventureLobbyMapSelectScreen : LiveScreen<AdventureLobbyMapSelectAdapter>
     {
         private const string FiltersStop = "map-select-filters";
         private const string TableStop = "map-select-table";
@@ -61,26 +61,26 @@ namespace SongsOfConquestAccess.Screens
         /// </summary>
         private static readonly int[] SheetColumns = { 1, 0, 2, 3, 4, 5, 6 };
 
-        private readonly AdventureLobbyMapSelectAdapter _adapter;
-
         // A subject of its own for the preview line, kept across rebuilds so the reconciler seats the
         // cursor on the same node while the selection under it changes.
         private readonly object _detailsMarker = new object();
 
-        public AdventureLobbyMapSelectScreen(AdventureLobbyMapSelectAdapter adapter)
+        /// <summary>After a hot reload: point the slot at the menu already showing.
+        /// Scanned once, from <c>ScreenDetector.RecoverRuntimeState</c>.</summary>
+        public static void Recover()
         {
-            _adapter = adapter;
+            Recovered<AdventureLobbyMapSelectScreen>(FindActive());
         }
 
-        public static Screen TryBuildActiveScreen()
+        public static AdventureLobbyMapSelectAdapter FindActive()
         {
             AdventureLobbyMapSelectAdapter adapter = FindActiveMapSelectMenu(null);
-            return adapter != null ? new AdventureLobbyMapSelectScreen(adapter) : null;
+            return adapter;
         }
 
         public bool Matches(MapSelectMenu menu)
         {
-            return _adapter != null && ReferenceEquals(_adapter.SourceKey, menu);
+            return Live != null && ReferenceEquals(Live.SourceKey, menu);
         }
 
         public override string Key
@@ -88,10 +88,16 @@ namespace SongsOfConquestAccess.Screens
             get { return "map-select"; }
         }
 
+        /// <summary>Layer 2: over the map type page that opens it.</summary>
+        public override int Layer
+        {
+            get { return 2; }
+        }
+
         /// <summary>The page's own drawn title ("Select Map").</summary>
         public override string ScreenName
         {
-            get { return _adapter != null ? _adapter.Title : null; }
+            get { return Live != null ? Live.Title : null; }
         }
 
         /// <summary>The filters, which is where the page starts: the table is the whole point of the
@@ -102,35 +108,24 @@ namespace SongsOfConquestAccess.Screens
             get { return FiltersStop; }
         }
 
-        public override bool IsPresent()
+        public override bool IsActive()
         {
-            return _adapter != null && _adapter.IsPresent();
+            return Live != null && Live.IsPresent();
         }
 
         public override bool ConsumesBack
         {
-            get { return _adapter != null && _adapter.BackButton != null && _adapter.BackButton.IsVisible(); }
+            get { return Live != null && Live.BackButton != null && Live.BackButton.IsVisible(); }
         }
 
         public override bool Back()
         {
-            return _adapter != null && _adapter.BackButton != null && _adapter.BackButton.Activate();
-        }
-
-        /// <summary>Kept for the detector, which calls them whenever the page or its selection
-        /// changes. The graph is declared afresh on every operation, so there is nothing to rebuild.
-        /// </summary>
-        public void Refresh()
-        {
-        }
-
-        public void Refresh(bool announceFocus)
-        {
+            return Live != null && Live.BackButton != null && Live.BackButton.Activate();
         }
 
         public override void Build(GraphBuilder builder)
         {
-            if (!IsPresent())
+            if (!IsActive())
             {
                 return;
             }
@@ -157,7 +152,7 @@ namespace SongsOfConquestAccess.Screens
         private void BuildFilters(GraphBuilder builder)
         {
             builder.PushContext(ModText.Get(ModStrings.UI.Filters));
-            IReadOnlyList<MapSelectFilterAdapter> filters = _adapter.GetFilters();
+            IReadOnlyList<MapSelectFilterAdapter> filters = Live.GetFilters();
             for (int i = 0; i < filters.Count; i++)
             {
                 MapSelectFilterAdapter filter = filters[i];
@@ -181,7 +176,7 @@ namespace SongsOfConquestAccess.Screens
                 builder.EndGroup();
             }
 
-            AddButton(builder, "map-select:clear-filters", _adapter.GetClearFiltersButton());
+            AddButton(builder, "map-select:clear-filters", Live.GetClearFiltersButton());
             builder.PopContext();
         }
 
@@ -216,12 +211,12 @@ namespace SongsOfConquestAccess.Screens
 
         private void BuildTable(GraphBuilder builder)
         {
-            IReadOnlyList<string> captions = _adapter.GetColumnLabels();
+            IReadOnlyList<string> captions = Live.GetColumnLabels();
             BuildSortBand(builder, captions);
 
             GraphSheet sheet = new GraphSheet(builder, SheetKey);
-            sheet.Region(_adapter.Title, SheetCaptions(captions));
-            IReadOnlyList<AdventureLobbyMapSelectRowAdapter> rows = _adapter.GetVisibleRows();
+            sheet.Region(Live.Title, SheetCaptions(captions));
+            IReadOnlyList<AdventureLobbyMapSelectRowAdapter> rows = Live.GetVisibleRows();
             object selected = null;
             for (int i = 0; i < rows.Count; i++)
             {
@@ -256,7 +251,7 @@ namespace SongsOfConquestAccess.Screens
         /// </summary>
         private void BuildSortBand(GraphBuilder builder, IReadOnlyList<string> captions)
         {
-            IReadOnlyList<MapSelectSortButtonAdapter> sortButtons = _adapter.GetSortButtons();
+            IReadOnlyList<MapSelectSortButtonAdapter> sortButtons = Live.GetSortButtons();
             builder.StartRow(positions: false);
             for (int column = 0; column < SheetColumns.Length; column++)
             {
@@ -448,7 +443,7 @@ namespace SongsOfConquestAccess.Screens
         /// </summary>
         private void BuildDetails(GraphBuilder builder)
         {
-            AdventureLobbyMapSelectRowAdapter selected = _adapter.SelectedRow;
+            AdventureLobbyMapSelectRowAdapter selected = Live.SelectedRow;
             if (selected == null)
             {
                 return;
@@ -474,25 +469,25 @@ namespace SongsOfConquestAccess.Screens
 
         private string PreviewTitle()
         {
-            string title = _adapter.PreviewTitle;
+            string title = Live.PreviewTitle;
             if (!string.IsNullOrWhiteSpace(title))
             {
                 return title;
             }
 
-            AdventureLobbyMapSelectRowAdapter selected = _adapter.SelectedRow;
+            AdventureLobbyMapSelectRowAdapter selected = Live.SelectedRow;
             return selected != null ? selected.Name : string.Empty;
         }
 
         private string Description()
         {
-            AdventureLobbyMapSelectRowAdapter selected = _adapter.SelectedRow;
+            AdventureLobbyMapSelectRowAdapter selected = Live.SelectedRow;
             return selected != null ? selected.Description : string.Empty;
         }
 
         private string PreviewWinConditions()
         {
-            AdventureLobbyMapSelectRowAdapter selected = _adapter.SelectedRow;
+            AdventureLobbyMapSelectRowAdapter selected = Live.SelectedRow;
             return selected != null ? ModText.JoinList(selected.WinConditionLabels) : string.Empty;
         }
 
@@ -501,9 +496,9 @@ namespace SongsOfConquestAccess.Screens
         private void BuildButtons(GraphBuilder builder)
         {
             // Back (x 21) and Options (x 1233) in the header band, then Confirm at the bottom right.
-            AddButton(builder, "map-select:back", _adapter.BackButton);
-            AddButton(builder, "map-select:options", _adapter.OptionsButton);
-            AddButton(builder, "map-select:confirm", _adapter.SelectButton);
+            AddButton(builder, "map-select:back", Live.BackButton);
+            AddButton(builder, "map-select:options", Live.OptionsButton);
+            AddButton(builder, "map-select:confirm", Live.SelectButton);
         }
 
         private static void AddButton(GraphBuilder builder, string key, IMenuButtonAdapter button)

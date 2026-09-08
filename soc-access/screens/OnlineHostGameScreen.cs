@@ -24,31 +24,32 @@ namespace SongsOfConquestAccess.Screens
     /// an Enter inside the name box creates the game. The mod does not add to that - the edit field
     /// follows the usual contract and the player's Enter is the game's own submit.
     /// </summary>
-    public sealed class OnlineHostGameScreen : GraphScreen
+    public sealed class OnlineHostGameScreen : LiveScreen<OnlineHostGameAdapter>
     {
         private const string RowsStop = "host-game-rows";
         private const string ButtonsStop = "host-game-buttons";
 
-        private readonly OnlineHostGameAdapter _adapter;
         private readonly GameTextEditor _editor = new GameTextEditor();
         private readonly object _descriptionKey = new object();
         private readonly object _cancelKey = new object();
         private readonly object _confirmKey = new object();
 
-        public OnlineHostGameScreen(OnlineHostGameAdapter adapter)
+        /// <summary>After a hot reload: point the slot at the menu already showing.
+        /// Scanned once, from <c>ScreenDetector.RecoverRuntimeState</c>.</summary>
+        public static void Recover()
         {
-            _adapter = adapter;
+            Recovered<OnlineHostGameScreen>(FindActive());
         }
 
-        public static Screen TryBuildActiveScreen()
+        public static OnlineHostGameAdapter FindActive()
         {
             OnlineHostGameAdapter adapter = OnlineHostGameAdapter.TryCreateActive();
-            return adapter != null ? new OnlineHostGameScreen(adapter) : null;
+            return adapter;
         }
 
         public bool Matches(GameListMenu menu)
         {
-            return _adapter != null && ReferenceEquals(_adapter.SourceKey, menu);
+            return Live != null && ReferenceEquals(Live.SourceKey, menu);
         }
 
         public override string Key
@@ -56,10 +57,16 @@ namespace SongsOfConquestAccess.Screens
             get { return "host-game"; }
         }
 
+        /// <summary>Layer 2: over the game list that opens it.</summary>
+        public override int Layer
+        {
+            get { return 2; }
+        }
+
         /// <summary>The popup's own drawn heading ("Host Game").</summary>
         public override string ScreenName
         {
-            get { return _adapter != null ? _adapter.Title : null; }
+            get { return Live != null ? Live.Title : null; }
         }
 
         public override object InitialFocusStop
@@ -67,24 +74,24 @@ namespace SongsOfConquestAccess.Screens
             get { return RowsStop; }
         }
 
-        public override bool IsPresent()
+        public override bool IsActive()
         {
-            return _adapter != null && _adapter.IsPresent();
+            return Live != null && Live.IsPresent();
         }
 
         public override bool ConsumesBack
         {
             get
             {
-                return _adapter != null
-                    && _adapter.NegativeButton != null
-                    && _adapter.NegativeButton.IsVisible();
+                return Live != null
+                    && Live.NegativeButton != null
+                    && Live.NegativeButton.IsVisible();
             }
         }
 
         public override bool Back()
         {
-            return _adapter != null && _adapter.Cancel();
+            return Live != null && Live.Cancel();
         }
 
         /// <summary>While the keyboard is on its way to the name box, what the player types next is
@@ -99,16 +106,10 @@ namespace SongsOfConquestAccess.Screens
             get { return _editor.Pending || _editor.Editing; }
         }
 
-        /// <summary>Kept for the detector, which calls it whenever the popup's content changes. The
-        /// graph is declared afresh on every operation, so there is nothing to rebuild.</summary>
-        public void Refresh()
+        public override void OnUpdate()
         {
-        }
-
-        public override void Update()
-        {
-            base.Update();
-            _editor.Update(IsPresent());
+            base.OnUpdate();
+            _editor.Update(IsActive());
         }
 
         public override void OnUnfocus()
@@ -125,65 +126,65 @@ namespace SongsOfConquestAccess.Screens
 
         public override void Build(GraphBuilder builder)
         {
-            if (!IsPresent())
+            if (!IsActive())
             {
                 return;
             }
 
             builder.BeginStop(RowsStop);
-            if (_adapter.HasDescription)
+            if (Live.HasDescription)
             {
                 builder.AddItem(new SyntheticNode(
                     ControlId.For(_descriptionKey, "host-game:description"),
-                    GraphNodes.Paragraphs(() => _adapter.DescriptionLines)));
+                    GraphNodes.Paragraphs(() => Live.DescriptionLines)));
             }
 
             AddNameField(builder);
             AddInviteOnly(builder);
 
             builder.BeginStop(ButtonsStop);
-            AddButton(builder, "host-game:cancel", _cancelKey, _adapter.NegativeButton);
-            AddButton(builder, "host-game:confirm", _confirmKey, _adapter.PositiveButton);
+            AddButton(builder, "host-game:cancel", _cancelKey, Live.NegativeButton);
+            AddButton(builder, "host-game:confirm", _confirmKey, Live.PositiveButton);
         }
 
         private void AddNameField(GraphBuilder builder)
         {
-            IUITextMeshInputField field = _adapter.InputField;
+            IUITextMeshInputField field = Live.InputField;
             Component subject = field != null ? field.MonoTransform : null;
-            if (subject == null || !_adapter.IsInputVisible())
+            if (subject == null || !Live.IsInputVisible())
             {
                 return;
             }
 
             NodeVtable vtable = GraphNodes.EditField(
-                () => _adapter.Title,
+                () => Live.Title,
                 () =>
                 {
-                    IUITextMeshInputField live = _adapter.InputField;
+                    IUITextMeshInputField live = Live.InputField;
                     // Nothing while the game holds the keyboard: the echo is already speaking the keys.
                     return live == null || _editor.Editing ? null : live.InputFieldValue;
                 },
-                () => _editor.Request(_adapter.InputField),
-                _adapter.IsInputEnabled,
-                _adapter.GetInputTooltip());
+                () => _editor.Request(Live.InputField),
+                Live.IsInputEnabled,
+                Live.GetInputTooltip());
             GraphNodes.DoNotDrawTooltip(vtable);
             builder.AddItem(new DrawnNode(ControlId.For(subject, "host-game:name"), vtable, subject));
         }
 
         private void AddInviteOnly(GraphBuilder builder)
         {
-            UIToggle toggle = _adapter.InviteOnlyToggle;
-            if (toggle == null || !_adapter.IsInviteOnlyVisible())
+            UIToggle toggle = Live.InviteOnlyToggle;
+            if (toggle == null || !Live.IsInviteOnlyVisible())
             {
                 return;
             }
 
             NodeVtable vtable = GraphNodes.Checkbox(
-                () => _adapter.InviteOnlyLabel,
-                _adapter.IsInviteOnlyChecked,
-                _adapter.ToggleInviteOnly,
-                _adapter.IsInviteOnlyEnabled,
-                _adapter.GetInviteOnlyTooltip());
+                () => Live.InviteOnlyLabel,
+                Live.IsInviteOnlyChecked,
+                Live.ToggleInviteOnly,
+                Live.IsInviteOnlyEnabled,
+                Live.GetInviteOnlyTooltip());
             vtable.OnFocusVisual = () => NativeSelectionUtility.Select(toggle.GetSelectable());
             builder.AddItem(new DrawnNode(ControlId.For(toggle, "host-game:invite-only"), vtable, toggle));
         }
@@ -199,7 +200,7 @@ namespace SongsOfConquestAccess.Screens
                 button.GetLabel,
                 () => button.Activate(),
                 button.IsEnabled,
-                _adapter.GetButtonTooltip(button));
+                Live.GetButtonTooltip(button));
             Component subject = button.Button;
             if (subject != null)
             {

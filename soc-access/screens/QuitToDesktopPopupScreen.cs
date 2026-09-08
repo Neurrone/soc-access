@@ -30,7 +30,7 @@ namespace SongsOfConquestAccess.Screens
     /// `decompiled/Lavapotion.SongsOfConquest.UILayer.Runtime/SongsOfConquest/Client/Menu/Popup/QuitToDesktopPopup.cs`
     /// lines 145 to 152.
     /// </summary>
-    public sealed class QuitToDesktopPopupScreen : GraphScreen
+    public sealed class QuitToDesktopPopupScreen : LiveScreen<QuitToDesktopPopupAdapter>
     {
         private const string DialogStop = "quit-to-desktop";
         private const string ConfirmKey = "quit:confirm";
@@ -39,8 +39,6 @@ namespace SongsOfConquestAccess.Screens
         private static readonly System.Reflection.PropertyInfo InstallerContainerProperty =
             AccessTools.Property(typeof(QuitToDesktopPopupInstaller), "Container");
 
-        private readonly QuitToDesktopPopupAdapter _adapter;
-
         // A subject of its own for each node the popup gives no component for: the reconciler seats
         // the cursor by SUBJECT before it looks at the structural key, so two nodes sharing one would
         // collapse onto whichever was declared first (the rule the message dialog's port established).
@@ -48,12 +46,14 @@ namespace SongsOfConquestAccess.Screens
         private readonly object _headingKey = new object();
         private readonly object _bodyKey = new object();
 
-        public QuitToDesktopPopupScreen(QuitToDesktopPopupAdapter adapter)
+        /// <summary>After a hot reload: point the slot at the menu already showing.
+        /// Scanned once, from <c>ScreenDetector.RecoverRuntimeState</c>.</summary>
+        public static void Recover()
         {
-            _adapter = adapter;
+            Recovered<QuitToDesktopPopupScreen>(FindActive());
         }
 
-        public static Screen TryBuildActiveScreen()
+        public static QuitToDesktopPopupAdapter FindActive()
         {
             QuitToDesktopPopupInstaller[] installers = Resources.FindObjectsOfTypeAll<QuitToDesktopPopupInstaller>();
             for (int i = 0; i < installers.Length; i++)
@@ -73,7 +73,7 @@ namespace SongsOfConquestAccess.Screens
                 QuitToDesktopPopupAdapter adapter = new QuitToDesktopPopupAdapter(popup);
                 if (adapter.IsPresent())
                 {
-                    return new QuitToDesktopPopupScreen(adapter);
+                    return (adapter);
                 }
             }
 
@@ -85,24 +85,30 @@ namespace SongsOfConquestAccess.Screens
             get { return "quit-to-desktop"; }
         }
 
+        /// <summary>Layer 100: a dialog: over every page, whichever raised it.</summary>
+        public override int Layer
+        {
+            get { return 100; }
+        }
+
         /// <summary>The popup's own heading, spoken once on arrival.</summary>
         public override string ScreenName
         {
             get
             {
-                string title = _adapter != null ? _adapter.Title : null;
+                string title = Live != null ? Live.Title : null;
                 return string.IsNullOrWhiteSpace(title) ? null : title;
             }
         }
 
-        public override bool IsPresent()
+        public override bool IsActive()
         {
-            return _adapter != null && _adapter.IsPresent();
+            return Live != null && Live.IsPresent();
         }
 
         public override void Build(GraphBuilder builder)
         {
-            if (!IsPresent())
+            if (!IsActive())
             {
                 return;
             }
@@ -110,25 +116,25 @@ namespace SongsOfConquestAccess.Screens
             builder.BeginStop(DialogStop);
             ControlId start = null;
 
-            if (_adapter.HasSteamFollow)
+            if (Live.HasSteamFollow)
             {
-                if (!string.IsNullOrWhiteSpace(_adapter.FollowTitle))
+                if (!string.IsNullOrWhiteSpace(Live.FollowTitle))
                 {
-                    NodeVtable followTitle = GraphNodes.Text(() => _adapter.FollowTitle);
-                    followTitle.OnFocusVisual = _adapter.SelectBody;
+                    NodeVtable followTitle = GraphNodes.Text(() => Live.FollowTitle);
+                    followTitle.OnFocusVisual = Live.SelectBody;
                     builder.AddItem(new SyntheticNode(
                         ControlId.For(_followTitleKey, "quit:follow-title"),
                         followTitle));
                 }
 
-                Component followButton = _adapter.SteamFollowButton;
+                Component followButton = Live.SteamFollowButton;
                 if (followButton != null)
                 {
                     NodeVtable follow = GraphNodes.Button(
-                        () => _adapter.SteamFollowLabel,
-                        () => _adapter.ActivateSteamFollow(),
-                        () => _adapter.HasSteamFollow);
-                    follow.OnFocusVisual = _adapter.SelectSteamFollow;
+                        () => Live.SteamFollowLabel,
+                        () => Live.ActivateSteamFollow(),
+                        () => Live.HasSteamFollow);
+                    follow.OnFocusVisual = Live.SelectSteamFollow;
                     builder.AddItem(new DrawnNode(
                         ControlId.For(followButton, "quit:follow"),
                         follow,
@@ -136,18 +142,18 @@ namespace SongsOfConquestAccess.Screens
                 }
             }
 
-            if (!string.IsNullOrWhiteSpace(_adapter.Title))
+            if (!string.IsNullOrWhiteSpace(Live.Title))
             {
                 builder.AddItem(new SyntheticNode(
                     ControlId.For(_headingKey, "quit:heading"),
-                    GraphNodes.Text(() => _adapter.Title)));
+                    GraphNodes.Text(() => Live.Title)));
             }
 
-            if (!string.IsNullOrWhiteSpace(_adapter.Description))
+            if (!string.IsNullOrWhiteSpace(Live.Description))
             {
                 ControlId bodyId = ControlId.For(_bodyKey, "quit:body");
-                NodeVtable body = GraphNodes.Paragraphs(() => _adapter.DescriptionLines);
-                body.OnFocusVisual = _adapter.SelectBody;
+                NodeVtable body = GraphNodes.Paragraphs(() => Live.DescriptionLines);
+                body.OnFocusVisual = Live.SelectBody;
                 builder.AddItem(new SyntheticNode(bodyId, body));
                 start = bodyId;
             }
@@ -174,13 +180,13 @@ namespace SongsOfConquestAccess.Screens
         {
             bool confirm = key == ConfirmKey;
             NodeVtable vtable = GraphNodes.Button(
-                () => confirm ? _adapter.ConfirmLabel : _adapter.CancelLabel,
-                () => { if (confirm) { _adapter.ActivateConfirm(); } else { _adapter.ActivateCancel(); } },
-                () => confirm ? _adapter.HasConfirm : _adapter.HasCancel);
+                () => confirm ? Live.ConfirmLabel : Live.CancelLabel,
+                () => { if (confirm) { Live.ActivateConfirm(); } else { Live.ActivateCancel(); } },
+                () => confirm ? Live.HasConfirm : Live.HasCancel);
 
             // The button the cursor is on is the button the game shows as selected, which is also
             // what its own Confirm key would press.
-            vtable.OnFocusVisual = confirm ? (Action)_adapter.SelectConfirm : _adapter.SelectCancel;
+            vtable.OnFocusVisual = confirm ? (Action)Live.SelectConfirm : Live.SelectCancel;
             return vtable;
         }
 
@@ -189,14 +195,14 @@ namespace SongsOfConquestAccess.Screens
         private List<KeyValuePair<string, Component>> DrawnButtons()
         {
             List<KeyValuePair<string, Component>> buttons = new List<KeyValuePair<string, Component>>(2);
-            if (_adapter.HasConfirm && _adapter.ConfirmButton != null)
+            if (Live.HasConfirm && Live.ConfirmButton != null)
             {
-                buttons.Add(new KeyValuePair<string, Component>(ConfirmKey, _adapter.ConfirmButton));
+                buttons.Add(new KeyValuePair<string, Component>(ConfirmKey, Live.ConfirmButton));
             }
 
-            if (_adapter.HasCancel && _adapter.CancelButton != null)
+            if (Live.HasCancel && Live.CancelButton != null)
             {
-                buttons.Add(new KeyValuePair<string, Component>(CancelKey, _adapter.CancelButton));
+                buttons.Add(new KeyValuePair<string, Component>(CancelKey, Live.CancelButton));
             }
 
             if (buttons.Count == 2 && Left(buttons[1].Value) < Left(buttons[0].Value))

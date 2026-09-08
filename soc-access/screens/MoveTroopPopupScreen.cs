@@ -29,7 +29,7 @@ namespace SongsOfConquestAccess.Screens
     /// text, read from the localization rather than off its tooltip, which has the key that presses it
     /// appended to it.
     /// </summary>
-    public sealed class MoveTroopPopupScreen : GraphScreen
+    public sealed class MoveTroopPopupScreen : LiveScreen<MoveTroopPopupAdapter>
     {
         private const string Stop = "move-troop";
         private const string SliderKey = "move-troop:slider";
@@ -38,14 +38,14 @@ namespace SongsOfConquestAccess.Screens
         /// sliders established.</summary>
         private const int CoarseSteps = 10;
 
-        private readonly MoveTroopPopupAdapter _adapter;
-
-        public MoveTroopPopupScreen(MoveTroopPopupAdapter adapter)
+        /// <summary>After a hot reload: point the slot at the menu already showing.
+        /// Scanned once, from <c>ScreenDetector.RecoverRuntimeState</c>.</summary>
+        public static void Recover()
         {
-            _adapter = adapter;
+            Recovered<MoveTroopPopupScreen>(FindActive());
         }
 
-        public static Screen TryBuildActiveScreen()
+        public static MoveTroopPopupAdapter FindActive()
         {
             TroopHUDEntryMovable[] movables = Resources.FindObjectsOfTypeAll<TroopHUDEntryMovable>();
             for (int i = 0; i < movables.Length; i++)
@@ -54,7 +54,7 @@ namespace SongsOfConquestAccess.Screens
                 MoveTroopPopupAdapter adapter = new MoveTroopPopupAdapter(movable);
                 if (adapter.IsPresent())
                 {
-                    return new MoveTroopPopupScreen(adapter);
+                    return (adapter);
                 }
             }
 
@@ -66,10 +66,16 @@ namespace SongsOfConquestAccess.Screens
             get { return "move-troop-popup"; }
         }
 
+        /// <summary>Layer 34: over every page that draws a troop row.</summary>
+        public override int Layer
+        {
+            get { return 34; }
+        }
+
         /// <summary>The header the popup draws ("Move troops").</summary>
         public override string ScreenName
         {
-            get { return _adapter == null ? null : _adapter.Title; }
+            get { return Live == null ? null : Live.Title; }
         }
 
         public override object InitialFocusStop
@@ -77,14 +83,14 @@ namespace SongsOfConquestAccess.Screens
             get { return Stop; }
         }
 
-        public override bool IsPresent()
+        public override bool IsActive()
         {
-            return _adapter != null && _adapter.IsPresent();
+            return Live != null && Live.IsPresent();
         }
 
         public override void Build(GraphBuilder builder)
         {
-            if (!IsPresent())
+            if (!IsActive())
             {
                 return;
             }
@@ -99,8 +105,8 @@ namespace SongsOfConquestAccess.Screens
         /// the number beside it.</summary>
         private void AddMaxTroopSize(GraphBuilder builder)
         {
-            Component drawnBy = _adapter.MaxTroopSizeText;
-            string line = ModText.JoinListWithCommas(_adapter.MaxTroopSizeTexts);
+            Component drawnBy = Live.MaxTroopSizeText;
+            string line = ModText.JoinListWithCommas(Live.MaxTroopSizeTexts);
             if (drawnBy == null || string.IsNullOrWhiteSpace(line))
             {
                 return;
@@ -116,7 +122,7 @@ namespace SongsOfConquestAccess.Screens
         /// of it. The hotkeys the popup answers to are the game's own list, in the buffer.</summary>
         private void AddSlider(GraphBuilder builder)
         {
-            Component drawnBy = _adapter.SliderComponent;
+            Component drawnBy = Live.SliderComponent;
             if (drawnBy == null)
             {
                 return;
@@ -126,9 +132,9 @@ namespace SongsOfConquestAccess.Screens
                 () => ModText.Get(ModStrings.Screens.TroopDistribution),
                 Distribution,
                 Adjust,
-                _adapter.IsSliderEnabled,
-                _adapter.HotkeysTooltip,
-                activate: () => _adapter.Confirm());
+                Live.IsSliderEnabled,
+                Live.HotkeysTooltip,
+                activate: () => Live.Confirm());
             vtable.OnFocusVisual = () => NativeSelectionUtility.Select(drawnBy);
             ControlId id = ControlId.For(drawnBy, SliderKey);
             builder.AddItem(new DrawnNode(id, vtable, drawnBy));
@@ -143,27 +149,27 @@ namespace SongsOfConquestAccess.Screens
             AddButton(
                 builder,
                 "move-all-left",
-                _adapter.MoveAllLeftButton,
+                Live.MoveAllLeftButton,
                 () => ModText.Get(ModStrings.Screens.MoveAllLeft),
-                _adapter.IsMoveAllLeftEnabled,
-                _adapter.MoveAllLeftTooltip,
-                () => _adapter.MoveAllLeft());
+                Live.IsMoveAllLeftEnabled,
+                Live.MoveAllLeftTooltip,
+                () => Live.MoveAllLeft());
             AddButton(
                 builder,
                 "split-equal",
-                _adapter.SplitEqualButton,
-                () => _adapter.SplitEqualLabel,
-                _adapter.IsSplitEqualEnabled,
-                _adapter.SplitEqualTooltip,
-                () => _adapter.SplitEqual());
+                Live.SplitEqualButton,
+                () => Live.SplitEqualLabel,
+                Live.IsSplitEqualEnabled,
+                Live.SplitEqualTooltip,
+                () => Live.SplitEqual());
             AddButton(
                 builder,
                 "move-all-right",
-                _adapter.MoveAllRightButton,
+                Live.MoveAllRightButton,
                 () => ModText.Get(ModStrings.Screens.MoveAllRight),
-                _adapter.IsMoveAllRightEnabled,
-                _adapter.MoveAllRightTooltip,
-                () => _adapter.MoveAllRight());
+                Live.IsMoveAllRightEnabled,
+                Live.MoveAllRightTooltip,
+                () => Live.MoveAllRight());
             builder.EndRow();
         }
 
@@ -190,8 +196,8 @@ namespace SongsOfConquestAccess.Screens
         /// under the left and right portraits.</summary>
         private string Distribution()
         {
-            string left = _adapter.LeftAmount;
-            string right = _adapter.RightAmount;
+            string left = Live.LeftAmount;
+            string right = Live.RightAmount;
             return ModText.Get(
                 ModStrings.Screens.LeftRightDistribution,
                 string.IsNullOrWhiteSpace(left) ? "0" : left,
@@ -207,7 +213,7 @@ namespace SongsOfConquestAccess.Screens
         private void Adjust(int sign, bool large)
         {
             int step = large ? CoarseSteps : 1;
-            _adapter.SetSliderValue(_adapter.GetSliderValue() + sign * step);
+            Live.SetSliderValue(Live.GetSliderValue() + sign * step);
         }
     }
 }

@@ -23,7 +23,7 @@ namespace SongsOfConquestAccess.Screens
     /// Entries the game hides (Hotseat, the map editor) are not declared; entries it disables stay
     /// in the list and say so.
     /// </summary>
-    public sealed class MainMenuScreen : GraphScreen
+    public sealed class MainMenuScreen : LiveScreen<MainMenuAdapter>
     {
         private const string MenuStop = "main-menu";
         private const string OptionsStop = "options";
@@ -43,17 +43,17 @@ namespace SongsOfConquestAccess.Screens
             "quit"
         };
 
-        private readonly MainMenuAdapter _adapter;
-
-        public MainMenuScreen(MainMenuAdapter adapter)
+        /// <summary>After a hot reload: point the slot at the menu already showing.
+        /// Scanned once, from <c>ScreenDetector.RecoverRuntimeState</c>.</summary>
+        public static void Recover()
         {
-            _adapter = adapter;
+            Recovered<MainMenuScreen>(FindActive());
         }
 
-        public static Screen TryBuildActiveScreen()
+        public static MainMenuAdapter FindActive()
         {
             MainMenuAdapter adapter = FindActiveMainMenu();
-            return adapter != null ? new MainMenuScreen(adapter) : null;
+            return adapter;
         }
 
         public static MainMenuAdapter FindActiveMainMenu()
@@ -82,14 +82,20 @@ namespace SongsOfConquestAccess.Screens
             get { return "main-menu"; }
         }
 
+        /// <summary>Layer 0: the root of the main menu.</summary>
+        public override int Layer
+        {
+            get { return 0; }
+        }
+
         public override string ScreenName
         {
             get { return ModText.Get(ModStrings.Screens.MainMenu); }
         }
 
-        public override bool IsPresent()
+        public override bool IsActive()
         {
-            return _adapter != null && _adapter.IsPresent();
+            return Live != null && Live.IsPresent();
         }
 
         /// <summary>The menu fades out after a click (Conquest fades the whole canvas group before it
@@ -97,18 +103,18 @@ namespace SongsOfConquestAccess.Screens
         /// not the button changing.</summary>
         public override bool IsWorkable
         {
-            get { return _adapter != null && !_adapter.IsFading(); }
+            get { return Live != null && !Live.IsFading(); }
         }
 
         public override void Build(GraphBuilder builder)
         {
-            if (!IsPresent())
+            if (!IsActive())
             {
                 return;
             }
 
             builder.BeginStop(MenuStop);
-            IReadOnlyList<IMenuButtonAdapter> items = _adapter.TopLevelItems;
+            IReadOnlyList<IMenuButtonAdapter> items = Live.TopLevelItems;
             foreach (int index in DrawnOrder(items))
             {
                 IMenuButtonAdapter item = items[index];
@@ -142,7 +148,7 @@ namespace SongsOfConquestAccess.Screens
                 builder.EndGroup();
             }
 
-            IMenuButtonAdapter options = _adapter.OptionsButton;
+            IMenuButtonAdapter options = Live.OptionsButton;
             IMenuButtonAdapter modOptions = ModOptionsEntries.MainMenuEntry;
             bool hasOptions = options != null && options.IsVisible();
             bool hasModOptions = modOptions != null && modOptions.IsVisible();
@@ -173,14 +179,14 @@ namespace SongsOfConquestAccess.Screens
 
         private MainMenuAdapter.NativeFoldoutAdapter FoldoutFor(IMenuButtonAdapter item)
         {
-            if (_adapter.ExtrasFoldout != null && ReferenceEquals(item, _adapter.ExtrasFoldout.TriggerButton))
+            if (Live.ExtrasFoldout != null && ReferenceEquals(item, Live.ExtrasFoldout.TriggerButton))
             {
-                return _adapter.ExtrasFoldout;
+                return Live.ExtrasFoldout;
             }
 
-            if (_adapter.MultiplayerFoldout != null && ReferenceEquals(item, _adapter.MultiplayerFoldout.TriggerButton))
+            if (Live.MultiplayerFoldout != null && ReferenceEquals(item, Live.MultiplayerFoldout.TriggerButton))
             {
-                return _adapter.MultiplayerFoldout;
+                return Live.MultiplayerFoldout;
             }
 
             return null;

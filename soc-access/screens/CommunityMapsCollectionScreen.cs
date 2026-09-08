@@ -33,7 +33,7 @@ namespace SongsOfConquestAccess.Screens
     /// again (decompiled <c>Navigating.Cancel</c>); the drawn Close closes the whole browser, as the
     /// widget screen's did.
     /// </summary>
-    public sealed class CommunityMapsCollectionScreen : GraphScreen
+    public sealed class CommunityMapsCollectionScreen : LiveScreen<CommunityMapsCollectionAdapter>
     {
         private const string TabsStop = "community-maps-collection-tabs";
         private const string CommandsStop = "community-maps-collection-commands";
@@ -41,20 +41,21 @@ namespace SongsOfConquestAccess.Screens
         private const string ItemsStop = "community-maps-collection-items";
         private const string FooterStop = "community-maps-collection-footer";
 
-        private readonly CommunityMapsCollectionAdapter _adapter;
         private readonly GameTextEditor _editor = new GameTextEditor();
         private readonly Dictionary<string, object> _markers = new Dictionary<string, object>();
 
-        public CommunityMapsCollectionScreen(CommunityMapsCollectionAdapter adapter)
+        /// <summary>After a hot reload: point the slot at the menu already showing.
+        /// Scanned once, from <c>ScreenDetector.RecoverRuntimeState</c>.</summary>
+        public static void Recover()
         {
-            _adapter = adapter;
+            Recovered<CommunityMapsCollectionScreen>(FindActive());
         }
 
-        public static Screen TryBuildActiveScreen()
+        public static CommunityMapsCollectionAdapter FindActive()
         {
             CommunityMapsCollectionAdapter adapter = CommunityMapsCollectionAdapter.TryCreate();
             return adapter != null && adapter.IsPresent()
-                ? new CommunityMapsCollectionScreen(adapter)
+                ? (adapter)
                 : null;
         }
 
@@ -63,10 +64,16 @@ namespace SongsOfConquestAccess.Screens
             get { return "community-maps-collection"; }
         }
 
+        /// <summary>Layer 2: over the browser home page.</summary>
+        public override int Layer
+        {
+            get { return 2; }
+        }
+
         /// <summary>The panel's own drawn title, which carries the count ("Collection (0)").</summary>
         public override string ScreenName
         {
-            get { return _adapter != null ? _adapter.Title : null; }
+            get { return Live != null ? Live.Title : null; }
         }
 
         public override object InitialFocusStop
@@ -74,19 +81,19 @@ namespace SongsOfConquestAccess.Screens
             get { return TabsStop; }
         }
 
-        public override bool IsPresent()
+        public override bool IsActive()
         {
-            return _adapter != null && _adapter.IsPresent();
+            return Live != null && Live.IsPresent();
         }
 
         public override bool ConsumesBack
         {
-            get { return IsPresent(); }
+            get { return IsActive(); }
         }
 
         public override bool Back()
         {
-            return _adapter != null && _adapter.Cancel();
+            return Live != null && Live.Cancel();
         }
 
         /// <summary>While the keyboard is on its way to the keyword box, what the player types next is
@@ -108,22 +115,10 @@ namespace SongsOfConquestAccess.Screens
             return _editor.Pending || _editor.Editing;
         }
 
-        /// <summary>Kept for the detector. The graph is declared afresh on every operation, so there is
-        /// nothing to defer.</summary>
-        public void DeferRefreshUntilSearchInputUnfocused()
+        public override void OnUpdate()
         {
-        }
-
-        /// <summary>Kept for the detector, which calls it whenever the collection changes. The graph is
-        /// declared afresh on every operation, so there is nothing to rebuild.</summary>
-        public void Refresh()
-        {
-        }
-
-        public override void Update()
-        {
-            base.Update();
-            _editor.Update(IsPresent());
+            base.OnUpdate();
+            _editor.Update(IsActive());
         }
 
         public override void OnUnfocus()
@@ -140,7 +135,7 @@ namespace SongsOfConquestAccess.Screens
 
         public override void Build(GraphBuilder builder)
         {
-            if (!IsPresent())
+            if (!IsActive())
             {
                 return;
             }
@@ -154,8 +149,8 @@ namespace SongsOfConquestAccess.Screens
             builder.BeginStop(FiltersStop);
             BuildKeyword(builder);
             BuildCheckForUpdates(builder);
-            BuildDropdown(builder, _adapter.FilterDropdown);
-            BuildDropdown(builder, _adapter.SortDropdown);
+            BuildDropdown(builder, Live.FilterDropdown);
+            BuildDropdown(builder, Live.SortDropdown);
 
             builder.BeginStop(ItemsStop);
             BuildItems(builder);
@@ -168,7 +163,7 @@ namespace SongsOfConquestAccess.Screens
 
         private void BuildTabs(GraphBuilder builder)
         {
-            IReadOnlyList<CommunityMapsCollectionAdapter.TabItem> tabs = _adapter.GetTabs();
+            IReadOnlyList<CommunityMapsCollectionAdapter.TabItem> tabs = Live.GetTabs();
             for (int i = 0; i < tabs.Count; i++)
             {
                 CommunityMapsCollectionAdapter.TabItem tab = tabs[i];
@@ -191,15 +186,15 @@ namespace SongsOfConquestAccess.Screens
         private void BuildCommands(GraphBuilder builder)
         {
             NodeVtable searchFilter = GraphNodes.Button(
-                () => _adapter.SearchFilterLabel,
-                () => _adapter.OpenSearchFilter(),
-                () => _adapter.HasSearchFilter);
+                () => Live.SearchFilterLabel,
+                () => Live.OpenSearchFilter(),
+                () => Live.HasSearchFilter);
             builder.AddItem(Synthetic("search-filter", searchFilter));
 
             NodeVtable downloads = GraphNodes.Button(
-                () => _adapter.DownloadsLabel,
-                () => _adapter.OpenDownloadsMenu(),
-                () => _adapter.HasDownloadsMenu);
+                () => Live.DownloadsLabel,
+                () => Live.OpenDownloadsMenu(),
+                () => Live.HasDownloadsMenu);
             builder.AddItem(Synthetic("downloads", downloads));
         }
 
@@ -210,16 +205,16 @@ namespace SongsOfConquestAccess.Screens
         /// is the only thing the band writes next to it.</summary>
         private void BuildKeyword(GraphBuilder builder)
         {
-            TMP_InputField field = _adapter.SearchField;
+            TMP_InputField field = Live.SearchField;
             if (field == null || !field.gameObject.activeInHierarchy)
             {
                 return;
             }
 
             NodeVtable vtable = GraphNodes.EditField(
-                () => _adapter.SearchFieldLabel,
+                () => Live.SearchFieldLabel,
                 () => _editor.Editing ? null : field.text,
-                () => _editor.Request(_adapter.SearchField),
+                () => _editor.Request(Live.SearchField),
                 () => field.interactable);
             // Arriving puts the game's own selection on the box - the search filter panel's finding:
             // without it an activation that follows a row whose focus visual selected one of mod.io's
@@ -233,7 +228,7 @@ namespace SongsOfConquestAccess.Screens
 
         private void BuildCheckForUpdates(GraphBuilder builder)
         {
-            CommunityMapsCollectionAdapter.ButtonAction action = _adapter.CheckForUpdatesAction;
+            CommunityMapsCollectionAdapter.ButtonAction action = Live.CheckForUpdatesAction;
             if (action == null || !action.IsVisible())
             {
                 return;
@@ -270,7 +265,7 @@ namespace SongsOfConquestAccess.Screens
 
         private void BuildItems(GraphBuilder builder)
         {
-            IReadOnlyList<CommunityMapsCollectionAdapter.CollectionItem> items = _adapter.GetItems();
+            IReadOnlyList<CommunityMapsCollectionAdapter.CollectionItem> items = Live.GetItems();
             for (int i = 0; i < items.Count; i++)
             {
                 CommunityMapsCollectionAdapter.CollectionItem item = items[i];
@@ -282,9 +277,9 @@ namespace SongsOfConquestAccess.Screens
                 CommunityMapsCollectionAdapter.CollectionItem captured = item;
                 NodeVtable vtable = GraphNodes.Button(
                     () => captured.Label,
-                    () => _adapter.ActivateItem(captured));
+                    () => Live.ActivateItem(captured));
                 vtable.Announcements.Add(GraphNodes.ValuePart(() => captured.Status));
-                vtable.OnFocusVisual = () => _adapter.FocusItem(captured);
+                vtable.OnFocusVisual = () => Live.FocusItem(captured);
                 builder.AddItem(Synthetic("item/" + captured.Index, vtable));
             }
         }
@@ -295,7 +290,7 @@ namespace SongsOfConquestAccess.Screens
         {
             NodeVtable close = GraphNodes.Button(
                 () => ModText.Get(ModStrings.Screens.Close),
-                () => _adapter.Close());
+                () => Live.Close());
             builder.AddItem(Synthetic("close", close));
         }
 

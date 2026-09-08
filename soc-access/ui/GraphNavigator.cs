@@ -213,6 +213,21 @@ namespace SongsOfConquestAccess.UI
             return _screen == null ? null : BuildRender(_screen, _state);
         }
 
+        /// <summary>The same for a screen nobody is on: built over a THROWAWAY state, so a screen the
+        /// player has never opened can be read and neither its cursor nor the focused screen's is
+        /// touched (<c>/gui/graph?screen=KEY</c>).</summary>
+        public GraphRender InspectRender(GraphScreen screen)
+        {
+            if (screen == null)
+            {
+                return null;
+            }
+
+            return ReferenceEquals(screen, _screen)
+                ? BuildRender(_screen, _state)
+                : BuildRender(screen, new GraphState());
+        }
+
         /// <summary>Point the navigator at a screen (null when none is focused). The screen's cursor
         /// is restored if it has one, and the differ starts fresh so the arrival reads in full.</summary>
         public void Attach(GraphScreen screen)
@@ -254,63 +269,6 @@ namespace SongsOfConquestAccess.UI
             _graph = new KeyGraph(() => BuildRender(built, state), state);
         }
 
-        /// <summary>
-        /// Hand one screen instance's cursor to another - THE SAME PAGE, rebuilt by the detector as a
-        /// new object (<see cref="ScreenManager.RefreshTop{TScreen}"/>). The state entry moves, the
-        /// graph is re-pointed at the incoming screen over that same state, a landing still in flight
-        /// is re-owned, and the "last spoken" memory is LEFT ALONE.
-        ///
-        /// That memory is the whole point: <see cref="Attach"/> starts the differ fresh so an arrival
-        /// reads in full, which is right for a page the player has just walked onto and wrong for a
-        /// page that never went away. Without this the cursor was re-seated and the control it had
-        /// never left read again, under a second announcement of the screen's own name.
-        /// </summary>
-        public void Adopt(GraphScreen from, GraphScreen to)
-        {
-            if (from == null || to == null || ReferenceEquals(from, to))
-            {
-                return;
-            }
-
-            GraphState state;
-            if (!_states.TryGetValue(from, out state))
-            {
-                state = new GraphState();
-            }
-
-            _states.Remove(from);
-            _states[to] = state;
-
-            // The SAME page, rebuilt as a new object: what is being held is still being held over it,
-            // so the carry moves to the incoming instance rather than lapsing under it.
-            if (_carry.IsCarrying && ReferenceEquals(_carry.Owner, from))
-            {
-                _carry.PickUp(_carry.Held, to);
-            }
-
-            CarryFollowedThePage();
-
-            if (_pendingFocus != null && ReferenceEquals(_pendingFocus.Owner, from))
-            {
-                _pendingFocus = new FocusRequest(
-                    _pendingFocus.Id,
-                    _pendingFocus.Announce,
-                    to,
-                    _pendingFocus.FramesLeft);
-            }
-
-            if (!ReferenceEquals(_screen, from))
-            {
-                return;
-            }
-
-            _screen = to;
-            _state = state;
-            GraphScreen built = to;
-            GraphState adopted = state;
-            _graph = new KeyGraph(() => BuildRender(built, adopted), adopted);
-        }
-
         /// <summary>Forget a closed screen's cursor, so re-opening it starts at the top - and with it
         /// any landing that screen was still waiting to make.</summary>
         public void ScreenClosed(GraphScreen screen)
@@ -332,6 +290,13 @@ namespace SongsOfConquestAccess.UI
             {
                 Attach(null);
             }
+        }
+
+        /// <summary>Give up a landing still in flight - the mod is going away, and nothing may
+        /// outlive Stop.</summary>
+        public void ForgetPendingLanding()
+        {
+            _pendingFocus = null;
         }
 
         /// <summary>Give up the cursor entirely; the next EnsureFocus seats it again.</summary>
@@ -966,16 +931,11 @@ namespace SongsOfConquestAccess.UI
         private bool OwnerIsOnTheScreenStack()
         {
             ScreenManager manager = SocAccessMod.Instance == null ? null : SocAccessMod.Instance.ScreenManager;
-            IReadOnlyList<Screen> stack = manager == null ? null : manager.Stack;
-            for (int i = 0; stack != null && i < stack.Count; i++)
-            {
-                if (ReferenceEquals(stack[i], _carry.Owner))
-                {
-                    return true;
-                }
-            }
-
-            return false;
+            Screen owner = _carry.Owner as Screen;
+            // A child screen opened over the owner is still the owner's page, and so is the owner
+            // itself when a child is what the player is on: the question is whether the page is
+            // anywhere in the stack, counting the chains hanging off it.
+            return manager != null && owner != null && manager.IsOnStack(owner);
         }
 
         // The focused control's vtable off the STANDING render - what the claim questions are

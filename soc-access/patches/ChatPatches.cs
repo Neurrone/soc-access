@@ -54,11 +54,7 @@ namespace SongsOfConquestAccess
                 _currentWindow = null;
             }
 
-            ScreenManager screenManager = SocAccessMod.Instance?.ScreenManager;
-            if (screenManager != null && screenManager.CurrentScreen is ChatScreen)
-            {
-                screenManager.Pop<ChatScreen>("chat window disposed");
-            }
+            SocAccessMod.Instance?.ScreenManager?.Registered<ChatScreen>()?.Forget();
         }
 
         [HarmonyPatch(typeof(ChatWindowBehavior), "Show", new[] { typeof(bool), typeof(bool) })]
@@ -72,35 +68,24 @@ namespace SongsOfConquestAccess
                 return;
             }
 
-            ScreenManager screenManager = SocAccessMod.Instance?.ScreenManager;
-            if (screenManager == null)
+            ChatScreen screen = SocAccessMod.Instance?.ScreenManager?.Registered<ChatScreen>();
+            if (screen == null || screen.Live != null)
             {
+                // Native chat calls Show from HandleInputFieldChanged while the user is typing.
+                // Rewriting the slot here would take the editor's field out from under it.
                 return;
             }
 
-            if (screenManager.CurrentScreen is ChatScreen)
-            {
-                // Native chat calls Show from HandleInputFieldChanged while the
-                // user is typing. Rebuilding ChatScreen here replaces the
-                // focused TextInputWidget, resetting edit echo and interrupting
-                // native input focus.
-                return;
-            }
-
-            screenManager.Push(new ChatScreen(adapter), "chat window shown");
+            screen.Live = adapter;
         }
 
         [HarmonyPatch(typeof(ChatWindowBehavior), "Hide", new[] { typeof(bool) })]
         [HarmonyPostfix]
         private static void HidePostfix()
         {
-            ScreenManager screenManager = SocAccessMod.Instance?.ScreenManager;
-            // Native Hide is also called during initialization and cleanup when
-            // the chat window may not be open, so only pop an active top screen.
-            if (screenManager != null && screenManager.CurrentScreen is ChatScreen)
-            {
-                screenManager.Pop<ChatScreen>("chat window hidden");
-            }
+            // Native Hide is also called during initialization and cleanup when the chat window may
+            // not be open; an empty slot emptied again costs nothing.
+            SocAccessMod.Instance?.ScreenManager?.Registered<ChatScreen>()?.Forget();
         }
 
         [HarmonyPatch(typeof(ChatWindowBehavior), "HandleNewMessage")]
@@ -114,9 +99,8 @@ namespace SongsOfConquestAccess
                 return;
             }
 
-            ScreenManager screenManager = SocAccessMod.Instance?.ScreenManager;
-            ChatScreen chatScreen = screenManager?.CurrentScreen as ChatScreen;
-            if (adapter.IsOpen && chatScreen != null)
+            ChatScreen chatScreen = SocAccessMod.Instance?.ScreenManager?.Registered<ChatScreen>();
+            if (adapter.IsOpen && chatScreen != null && chatScreen.Live != null)
             {
                 chatScreen.RefreshAndAnnounce(message);
                 return;

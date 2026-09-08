@@ -24,25 +24,26 @@ namespace SongsOfConquestAccess.Screens
     /// Escape is CLAIMED and runs mod.io's own Close: this panel is the browser's, not the game's,
     /// and nothing registers the key for it - the same finding the community maps modal recorded.
     /// </summary>
-    public sealed class CommunityMapsSearchFilterScreen : GraphScreen
+    public sealed class CommunityMapsSearchFilterScreen : LiveScreen<CommunityMapsSearchFilterAdapter>
     {
         private const string RowsStop = "search-filter-rows";
         private const string ButtonsStop = "search-filter-buttons";
 
-        private readonly CommunityMapsSearchFilterAdapter _adapter;
         private readonly GameTextEditor _editor = new GameTextEditor();
         private readonly Dictionary<string, object> _markers = new Dictionary<string, object>();
 
-        public CommunityMapsSearchFilterScreen(CommunityMapsSearchFilterAdapter adapter)
+        /// <summary>After a hot reload: point the slot at the menu already showing.
+        /// Scanned once, from <c>ScreenDetector.RecoverRuntimeState</c>.</summary>
+        public static void Recover()
         {
-            _adapter = adapter;
+            Recovered<CommunityMapsSearchFilterScreen>(FindActive());
         }
 
-        public static Screen TryBuildActiveScreen()
+        public static CommunityMapsSearchFilterAdapter FindActive()
         {
             CommunityMapsSearchFilterAdapter adapter = CommunityMapsSearchFilterAdapter.TryCreate();
             return adapter != null && adapter.IsPresent()
-                ? new CommunityMapsSearchFilterScreen(adapter)
+                ? (adapter)
                 : null;
         }
 
@@ -51,10 +52,16 @@ namespace SongsOfConquestAccess.Screens
             get { return "community-maps-search-filter"; }
         }
 
+        /// <summary>Layer 5: over the results it filters.</summary>
+        public override int Layer
+        {
+            get { return 5; }
+        }
+
         /// <summary>The panel's own drawn title ("Search &amp; filter").</summary>
         public override string ScreenName
         {
-            get { return _adapter != null ? _adapter.Title : null; }
+            get { return Live != null ? Live.Title : null; }
         }
 
         public override object InitialFocusStop
@@ -62,19 +69,19 @@ namespace SongsOfConquestAccess.Screens
             get { return RowsStop; }
         }
 
-        public override bool IsPresent()
+        public override bool IsActive()
         {
-            return _adapter != null && _adapter.IsPresent();
+            return Live != null && Live.IsPresent();
         }
 
         public override bool ConsumesBack
         {
-            get { return IsPresent(); }
+            get { return IsActive(); }
         }
 
         public override bool Back()
         {
-            return _adapter != null && _adapter.Close();
+            return Live != null && Live.Close();
         }
 
         /// <summary>While the keyboard is on its way to the keyword box, what the player types next is
@@ -89,16 +96,10 @@ namespace SongsOfConquestAccess.Screens
             get { return _editor.Pending || _editor.Editing; }
         }
 
-        /// <summary>Kept for the detector, which calls it whenever the panel's content changes. The
-        /// graph is declared afresh on every operation, so there is nothing to rebuild.</summary>
-        public void Refresh()
+        public override void OnUpdate()
         {
-        }
-
-        public override void Update()
-        {
-            base.Update();
-            _editor.Update(IsPresent());
+            base.OnUpdate();
+            _editor.Update(IsActive());
         }
 
         public override void OnUnfocus()
@@ -115,7 +116,7 @@ namespace SongsOfConquestAccess.Screens
 
         public override void Build(GraphBuilder builder)
         {
-            if (!IsPresent())
+            if (!IsActive())
             {
                 return;
             }
@@ -125,7 +126,7 @@ namespace SongsOfConquestAccess.Screens
             AddTags(builder);
 
             builder.BeginStop(ButtonsStop);
-            IReadOnlyList<CommunityMapsSearchFilterAdapter.ActionItem> actions = _adapter.GetActions();
+            IReadOnlyList<CommunityMapsSearchFilterAdapter.ActionItem> actions = Live.GetActions();
             for (int i = 0; i < actions.Count; i++)
             {
                 AddAction(builder, actions[i]);
@@ -137,16 +138,16 @@ namespace SongsOfConquestAccess.Screens
         /// which is the only thing the panel writes next to it.</summary>
         private void AddKeyword(GraphBuilder builder)
         {
-            TMP_InputField field = _adapter.SearchField;
+            TMP_InputField field = Live.SearchField;
             if (field == null || !field.gameObject.activeInHierarchy)
             {
                 return;
             }
 
             NodeVtable vtable = GraphNodes.EditField(
-                () => _adapter.SearchFieldLabel,
+                () => Live.SearchFieldLabel,
                 () => _editor.Editing ? null : field.text,
-                () => _editor.Request(_adapter.SearchField),
+                () => _editor.Request(Live.SearchField),
                 () => field.interactable);
             // Arriving puts the game's own selection on the box. Measured: without it, an activation
             // that follows a tag row - whose focus visual selected mod.io's toggle - selects the box
@@ -161,7 +162,7 @@ namespace SongsOfConquestAccess.Screens
 
         private void AddTags(GraphBuilder builder)
         {
-            IReadOnlyList<CommunityMapsSearchFilterAdapter.CategoryItem> categories = _adapter.GetCategories();
+            IReadOnlyList<CommunityMapsSearchFilterAdapter.CategoryItem> categories = Live.GetCategories();
             for (int i = 0; i < categories.Count; i++)
             {
                 CommunityMapsSearchFilterAdapter.CategoryItem category = categories[i];

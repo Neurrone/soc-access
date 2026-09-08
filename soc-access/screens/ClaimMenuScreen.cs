@@ -32,26 +32,26 @@ namespace SongsOfConquestAccess.Screens
     /// control, the choices are the exits, and the one hide path Escape reaches is the game's own,
     /// which is entitled to refuse.
     /// </summary>
-    public sealed class ClaimMenuScreen : GraphScreen
+    public sealed class ClaimMenuScreen : LiveScreen<ClaimMenuAdapter>
     {
         private const string DialogStop = "claim-menu";
 
         private static readonly System.Reflection.PropertyInfo InstallerContainerProperty =
             AccessTools.Property(typeof(ClaimMenuInstaller), "Container");
 
-        private readonly ClaimMenuAdapter _adapter;
-
         // A subject of its own for each node the menu gives no component for; two nodes sharing one
         // subject would collapse onto whichever was declared first.
         private readonly object _headingKey = new object();
         private readonly object _bodyKey = new object();
 
-        public ClaimMenuScreen(ClaimMenuAdapter adapter)
+        /// <summary>After a hot reload: point the slot at the menu already showing.
+        /// Scanned once, from <c>ScreenDetector.RecoverRuntimeState</c>.</summary>
+        public static void Recover()
         {
-            _adapter = adapter;
+            Recovered<ClaimMenuScreen>(FindActive());
         }
 
-        public static Screen TryBuildActiveScreen()
+        public static ClaimMenuAdapter FindActive()
         {
             ClaimMenuInstaller[] installers = Resources.FindObjectsOfTypeAll<ClaimMenuInstaller>();
             for (int i = 0; i < installers.Length; i++)
@@ -65,7 +65,7 @@ namespace SongsOfConquestAccess.Screens
                 ClaimMenuAdapter adapter = new ClaimMenuAdapter(menu);
                 if (adapter.IsPresent())
                 {
-                    return new ClaimMenuScreen(adapter);
+                    return (adapter);
                 }
             }
 
@@ -77,66 +77,72 @@ namespace SongsOfConquestAccess.Screens
             get { return "claim-menu"; }
         }
 
+        /// <summary>Layer 30: raised by the battle result, over it.</summary>
+        public override int Layer
+        {
+            get { return 30; }
+        }
+
         /// <summary>The heading the menu draws over the choices ("Siege").</summary>
         public override string ScreenName
         {
             get
             {
-                string title = _adapter != null ? _adapter.Title : null;
+                string title = Live != null ? Live.Title : null;
                 return string.IsNullOrWhiteSpace(title) ? null : title;
             }
         }
 
-        public override bool IsPresent()
+        public override bool IsActive()
         {
-            return _adapter != null && _adapter.IsPresent();
+            return Live != null && Live.IsPresent();
         }
 
         public bool Matches(ClaimMenu menu)
         {
-            return _adapter != null && ReferenceEquals(_adapter.SourceKey, menu);
+            return Live != null && ReferenceEquals(Live.SourceKey, menu);
         }
 
         public override void OnUnfocus()
         {
             base.OnUnfocus();
-            _adapter?.HideNativeTooltip();
+            Live?.HideNativeTooltip();
         }
 
         public override void OnPop()
         {
             base.OnPop();
-            _adapter?.HideNativeTooltip();
+            Live?.HideNativeTooltip();
         }
 
         public override void Build(GraphBuilder builder)
         {
-            if (!IsPresent())
+            if (!IsActive())
             {
                 return;
             }
 
             builder.BeginStop(DialogStop);
 
-            if (!string.IsNullOrWhiteSpace(_adapter.Title))
+            if (!string.IsNullOrWhiteSpace(Live.Title))
             {
                 builder.AddItem(new SyntheticNode(
                     ControlId.For(_headingKey, "claim-menu:heading"),
-                    GraphNodes.Text(() => _adapter.Title)));
+                    GraphNodes.Text(() => Live.Title)));
             }
 
-            if (!string.IsNullOrWhiteSpace(_adapter.Body))
+            if (!string.IsNullOrWhiteSpace(Live.Body))
             {
                 ControlId bodyId = ControlId.For(_bodyKey, "claim-menu:body");
                 builder.AddItem(new SyntheticNode(
                     bodyId,
-                    GraphNodes.Paragraphs(() => _adapter.BodyLines)));
+                    GraphNodes.Paragraphs(() => Live.BodyLines)));
                 // Focus starts on the body, so arrival reads the heading once as the screen name and
                 // then what the menu is asking before the choices.
                 builder.SetStart(bodyId);
             }
 
-            List<ClaimMenuAdapter.ChoiceItem> choices = DrawnOrder(_adapter.GetChoices());
+            List<ClaimMenuAdapter.ChoiceItem> choices = DrawnOrder(Live.GetChoices());
             for (int i = 0; i < choices.Count; i++)
             {
                 ClaimMenuAdapter.ChoiceItem choice = choices[i];

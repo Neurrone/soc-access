@@ -82,28 +82,6 @@ namespace SongsOfConquestAccess.Dev
             });
         }
 
-        /// <summary>The screens the detector's runtime factories currently read as present, in
-        /// factory order: what <c>ResyncFromRuntimeState</c> would push after a reload.</summary>
-        public static string RuntimeScreens()
-        {
-            return Guarded(json =>
-            {
-                json.WritePropertyName("present");
-                json.WriteStartArray();
-                ScreenDetector detector = SocAccessMod.Instance?.ScreenDetector;
-                if (detector != null)
-                {
-                    List<string> names = detector.PresentRuntimeScreens();
-                    for (int i = 0; i < names.Count; i++)
-                    {
-                        json.WriteValue(names[i]);
-                    }
-                }
-
-                json.WriteEndArray();
-            });
-        }
-
         /// <summary>
         /// Press "any key" on the loading-complete screen the way the game's own key handling does
         /// (<see cref="Adapters.LoadingScreenAdapter.Continue"/>). <c>continued</c> is false when
@@ -245,7 +223,7 @@ namespace SongsOfConquestAccess.Dev
         private static SongsOfConquestAccess.Screens.Screen Top()
         {
             ScreenManager screens = SocAccessMod.Instance?.ScreenManager;
-            return screens == null ? null : screens.CurrentScreen;
+            return screens == null ? null : screens.Current;
         }
 
         private static IReadOnlyList<SongsOfConquestAccess.Screens.Screen> Stacked()

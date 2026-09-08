@@ -57,7 +57,7 @@ namespace SongsOfConquestAccess.Screens
     /// (<c>ArtifactDetails</c> draws no instruction row for a usable artifact). Which of the three
     /// sentences is used is still the game's answer, read off the same state its own tooltip reads.
     /// </summary>
-    public sealed class CommanderSheetScreen : GraphScreen
+    public sealed class CommanderSheetScreen : LiveScreen<CommanderSheetAdapter>
     {
         private const string TutorialStop = "commander-sheet-tutorial";
         private const string OverviewStop = "commander-sheet-overview";
@@ -67,19 +67,19 @@ namespace SongsOfConquestAccess.Screens
         private const string CloseStop = "commander-sheet-close";
         private const string KeyPrefix = "commander-sheet";
 
-        private readonly CommanderSheetAdapter _adapter;
-
         // A subject of its own per synthesized node, kept across rebuilds so the reconciler seats the
         // cursor on the same one: the auto-arrange button and the read-only lines are not drawn as
         // controls of their own.
         private readonly Dictionary<string, object> _markers = new Dictionary<string, object>();
 
-        public CommanderSheetScreen(CommanderSheetAdapter adapter)
+        /// <summary>After a hot reload: point the slot at the menu already showing.
+        /// Scanned once, from <c>ScreenDetector.RecoverRuntimeState</c>.</summary>
+        public static void Recover()
         {
-            _adapter = adapter;
+            Recovered<CommanderSheetScreen>(FindActive());
         }
 
-        public static Screen TryBuildActiveScreen()
+        public static CommanderSheetAdapter FindActive()
         {
             CommanderSheet[] sheets = Resources.FindObjectsOfTypeAll<CommanderSheet>();
             for (int i = 0; i < sheets.Length; i++)
@@ -87,7 +87,7 @@ namespace SongsOfConquestAccess.Screens
                 CommanderSheetAdapter adapter = new CommanderSheetAdapter(sheets[i]);
                 if (adapter.IsPresent())
                 {
-                    return new CommanderSheetScreen(adapter);
+                    return (adapter);
                 }
             }
 
@@ -99,19 +99,25 @@ namespace SongsOfConquestAccess.Screens
             get { return "commander-sheet"; }
         }
 
+        /// <summary>Layer 26: over every panel it can be opened from.</summary>
+        public override int Layer
+        {
+            get { return 26; }
+        }
+
         /// <summary>The wielder the sheet is about, as it draws them at the top: the name and the race
         /// and title under it.</summary>
         public override string ScreenName
         {
             get
             {
-                if (_adapter == null)
+                if (Live == null)
                 {
                     return null;
                 }
 
-                string name = _adapter.CommanderName;
-                string title = _adapter.CommanderClass;
+                string name = Live.CommanderName;
+                string title = Live.CommanderClass;
                 if (string.IsNullOrWhiteSpace(name))
                 {
                     return string.IsNullOrWhiteSpace(title) ? null : title;
@@ -123,28 +129,21 @@ namespace SongsOfConquestAccess.Screens
             }
         }
 
-        public override bool IsPresent()
+        public override bool IsActive()
         {
-            return _adapter != null && _adapter.IsPresent();
-        }
-
-        /// <summary>Kept for the detector, which calls it whenever an artifact, a statistic or a skill
-        /// changes. The graph is declared afresh on every operation, so there is nothing to rebuild.
-        /// </summary>
-        public void Refresh()
-        {
+            return Live != null && Live.IsPresent();
         }
 
         public override void Build(GraphBuilder builder)
         {
-            if (!IsPresent())
+            if (!IsActive())
             {
                 return;
             }
 
             ArtifactSlotNodes.RegisterSounds();
 
-            if (_adapter.IsTutorialButtonVisible())
+            if (Live.IsTutorialButtonVisible())
             {
                 builder.BeginStop(TutorialStop);
                 BuildTutorial(builder);
@@ -170,15 +169,15 @@ namespace SongsOfConquestAccess.Screens
 
         private void BuildTutorial(GraphBuilder builder)
         {
-            Component button = _adapter.TutorialButton;
+            Component button = Live.TutorialButton;
             if (button == null)
             {
                 return;
             }
 
             NodeVtable vtable = GraphNodes.Button(
-                () => _adapter.GetTutorialButtonLabel(),
-                () => _adapter.ActivateTutorial());
+                () => Live.GetTutorialButtonLabel(),
+                () => Live.ActivateTutorial());
             vtable.OnFocusVisual = () => NativeSelectionUtility.Select(button);
             builder.AddItem(new DrawnNode(
                 ControlId.For(button, "commander-sheet:tutorial"),
@@ -194,12 +193,12 @@ namespace SongsOfConquestAccess.Screens
                 builder,
                 "stats",
                 GameText.Get("Common/CommanderInventory/Stats", string.Empty),
-                Items("Stats", _adapter.GetStats));
+                Items("Stats", Live.GetStats));
             BuildBand(
                 builder,
                 "specialization",
                 GameText.Get("Commanders/Tooltip/Specializations", string.Empty),
-                Items("Specializations", _adapter.GetSpecializations));
+                Items("Specializations", Live.GetSpecializations));
             BuildModifiers(builder);
 
             if (firstStat != null)
@@ -215,7 +214,7 @@ namespace SongsOfConquestAccess.Screens
         /// the region jump rather than by Tab.</summary>
         private void BuildModifiers(GraphBuilder builder)
         {
-            IReadOnlyList<CommanderSheetAdapter.ModifierCategory> categories = _adapter.GetModifierCategories();
+            IReadOnlyList<CommanderSheetAdapter.ModifierCategory> categories = Live.GetModifierCategories();
             List<CommanderBands.TabItem> tabs = new List<CommanderBands.TabItem>();
             for (int i = 0; i < categories.Count; i++)
             {
@@ -227,11 +226,11 @@ namespace SongsOfConquestAccess.Screens
                 builder,
                 KeyPrefix,
                 tabs,
-                _adapter.GetActiveModifierCategoryIndex,
-                index => _adapter.ActivateModifierCategory(index),
-                index => _adapter.SelectModifierCategory(index),
-                _adapter.GetActiveModifierListLabel(),
-                Lines(Items("Modifiers", _adapter.GetActiveModifiers)),
+                Live.GetActiveModifierCategoryIndex,
+                index => Live.ActivateModifierCategory(index),
+                index => Live.SelectModifierCategory(index),
+                Live.GetActiveModifierListLabel(),
+                Lines(Items("Modifiers", Live.GetActiveModifiers)),
                 Marker);
         }
 
@@ -239,12 +238,12 @@ namespace SongsOfConquestAccess.Screens
 
         private void BuildEquipment(GraphBuilder builder)
         {
-            ArtifactSlotNodes.Equipment(builder, _adapter, "commander-sheet", AddSlotHints);
+            ArtifactSlotNodes.Equipment(builder, Live, "commander-sheet", AddSlotHints);
         }
 
         private void BuildInventory(GraphBuilder builder)
         {
-            ArtifactSlotNodes.Inventory(builder, _adapter, "commander-sheet", AddSlotHints, Marker("auto-arrange"));
+            ArtifactSlotNodes.Inventory(builder, Live, "commander-sheet", AddSlotHints, Marker("auto-arrange"));
         }
 
         /// <summary>The three gestures an occupied slot has, in the order they are said: what the right
@@ -253,7 +252,7 @@ namespace SongsOfConquestAccess.Screens
         /// click re-words all three.</summary>
         private void AddSlotHints(NodeVtable vtable, InventorySlotInfo slot)
         {
-            ArtifactDetails.EquipInstruction instruction = _adapter.GetArtifactInstruction(slot);
+            ArtifactDetails.EquipInstruction instruction = Live.GetArtifactInstruction(slot);
             ModString contextual = instruction == ArtifactDetails.EquipInstruction.Use
                 ? ModStrings.Screens.ArtifactUseHint
                 : instruction == ArtifactDetails.EquipInstruction.Unequip
@@ -280,20 +279,20 @@ namespace SongsOfConquestAccess.Screens
                 builder,
                 "skills",
                 GameText.Get("Commanders/Tooltip/Skills", string.Empty),
-                Items("Skills", () => _adapter.GetSkills(powers: false)));
+                Items("Skills", () => Live.GetSkills(powers: false)));
             BuildBand(
                 builder,
                 "powers",
                 GameText.Get("Commanders/Tooltip/Powers", string.Empty),
-                Items("Powers", () => _adapter.GetSkills(powers: true)));
+                Items("Powers", () => Live.GetSkills(powers: true)));
         }
 
         // ---- the close cross ----
 
         private void BuildClose(GraphBuilder builder)
         {
-            Component close = _adapter.CloseButton;
-            if (close == null || !_adapter.IsCloseVisible())
+            Component close = Live.CloseButton;
+            if (close == null || !Live.IsCloseVisible())
             {
                 return;
             }
@@ -301,7 +300,7 @@ namespace SongsOfConquestAccess.Screens
             // An icon with no text of its own, so the mod names it.
             NodeVtable vtable = GraphNodes.Button(
                 () => ModText.Get(ModStrings.Screens.Close),
-                () => _adapter.ActivateClose());
+                () => Live.ActivateClose());
             vtable.OnFocusVisual = () => NativeSelectionUtility.Select(close);
             builder.AddItem(new DrawnNode(ControlId.For(close, "commander-sheet:close"), vtable, close));
         }

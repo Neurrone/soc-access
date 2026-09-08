@@ -19,22 +19,22 @@ namespace SongsOfConquestAccess.Screens
     /// ESCAPE is the game's: <c>TutorialMenu.Open</c> registers <c>UI.ExitMenu</c> on <c>Close</c>
     /// unconditionally, outside the gamepad branch, so the key closes the popup without the mod.
     /// </summary>
-    public sealed class TutorialSimpleScreen : GraphScreen
+    public sealed class TutorialSimpleScreen : LiveScreen<TutorialSimpleAdapter>
     {
         private const string PopupStop = "tutorial-simple";
-
-        private readonly TutorialSimpleAdapter _adapter;
 
         // A subject of its own for each node the popup gives no component for.
         private readonly object _headingKey = new object();
         private readonly object _bodyKey = new object();
 
-        public TutorialSimpleScreen(TutorialSimpleAdapter adapter)
+        /// <summary>After a hot reload: point the slot at the menu already showing.
+        /// Scanned once, from <c>ScreenDetector.RecoverRuntimeState</c>.</summary>
+        public static void Recover()
         {
-            _adapter = adapter;
+            Recovered<TutorialSimpleScreen>(FindActive());
         }
 
-        public static Screen TryBuildActiveScreen()
+        public static TutorialSimpleAdapter FindActive()
         {
             TutorialMenu[] menus = Resources.FindObjectsOfTypeAll<TutorialMenu>();
             for (int i = 0; i < menus.Length; i++)
@@ -54,7 +54,7 @@ namespace SongsOfConquestAccess.Screens
                 TutorialSimpleAdapter adapter = new TutorialSimpleAdapter(menu);
                 if (adapter.IsPresent())
                 {
-                    return new TutorialSimpleScreen(adapter);
+                    return (adapter);
                 }
             }
 
@@ -66,69 +66,75 @@ namespace SongsOfConquestAccess.Screens
             get { return "tutorial-simple"; }
         }
 
+        /// <summary>Layer 36: over the page it explains, combat included.</summary>
+        public override int Layer
+        {
+            get { return 36; }
+        }
+
         /// <summary>The tutorial's title, as the popup draws it (the game uppercases it itself).</summary>
         public override string ScreenName
         {
             get
             {
-                string header = _adapter != null ? _adapter.Header : null;
+                string header = Live != null ? Live.Header : null;
                 return string.IsNullOrWhiteSpace(header) ? null : header;
             }
         }
 
-        public override bool IsPresent()
+        public override bool IsActive()
         {
-            return _adapter != null && _adapter.IsPresent();
+            return Live != null && Live.IsPresent();
         }
 
         public override void Build(GraphBuilder builder)
         {
-            if (!IsPresent())
+            if (!IsActive())
             {
                 return;
             }
 
             builder.BeginStop(PopupStop);
 
-            if (!string.IsNullOrWhiteSpace(_adapter.Header))
+            if (!string.IsNullOrWhiteSpace(Live.Header))
             {
                 builder.AddItem(new SyntheticNode(
                     ControlId.For(_headingKey, "tutorial-simple:heading"),
-                    GraphNodes.Text(() => _adapter.Header)));
+                    GraphNodes.Text(() => Live.Header)));
             }
 
-            if (!string.IsNullOrWhiteSpace(_adapter.Description))
+            if (!string.IsNullOrWhiteSpace(Live.Description))
             {
                 ControlId bodyId = ControlId.For(_bodyKey, "tutorial-simple:body");
                 builder.AddItem(new SyntheticNode(
                     bodyId,
-                    GraphNodes.Paragraphs(() => _adapter.DescriptionLines)));
+                    GraphNodes.Paragraphs(() => Live.DescriptionLines)));
                 // Focus starts on the body: arrival says the title once as the screen name and then
                 // what the tutorial has to say.
                 builder.SetStart(bodyId);
             }
 
-            Component ok = _adapter.OkButton;
-            if (ok != null && _adapter.IsOkVisible())
+            Component ok = Live.OkButton;
+            if (ok != null && Live.IsOkVisible())
             {
                 builder.AddItem(new DrawnNode(
                     ControlId.For(ok, "tutorial-simple:ok"),
                     GraphNodes.Button(
                         () => ModText.Get(ModStrings.Screens.Ok),
-                        () => _adapter.ActivateOk(),
-                        _adapter.IsOkEnabled),
+                        () => Live.ActivateOk(),
+                        Live.IsOkEnabled),
                     ok));
             }
 
-            Component toggle = _adapter.TutorialsToggle;
+            Component toggle = Live.TutorialsToggle;
             if (toggle != null)
             {
                 builder.AddItem(new DrawnNode(
                     ControlId.For(toggle, "tutorial-simple:tutorials"),
                     GraphNodes.Checkbox(
-                        () => _adapter.TutorialsToggleLabel,
-                        _adapter.IsTutorialsChecked,
-                        _adapter.ToggleTutorials),
+                        () => Live.TutorialsToggleLabel,
+                        Live.IsTutorialsChecked,
+                        Live.ToggleTutorials),
                     toggle));
             }
         }

@@ -50,7 +50,7 @@ namespace SongsOfConquestAccess.Screens
     /// gate (measured 2026-09-07 in the decompiled source), and <c>Common.ToggleSpellBook</c> - V -
     /// closes the window too. The navigator claims the key only while something is being carried.
     /// </summary>
-    public sealed class SpellbookScreen : GraphScreen
+    public sealed class SpellbookScreen : LiveScreen<SpellbookAdapter>
     {
         private const string TutorialStop = "spellbook-tutorial";
         private const string QuickbarStop = "spellbook-quickbar";
@@ -68,8 +68,6 @@ namespace SongsOfConquestAccess.Screens
         /// (<c>SpellbookMovableSpell.EndDrag</c>), which is what a given-up carry is.</summary>
         public const string CancelSound = "Common_SpellbookEndDragCancel";
 
-        private readonly SpellbookAdapter _adapter;
-
         // A subject of its own per synthesized node, kept across rebuilds so the reconciler seats the
         // cursor on the same one: the removal target is a line the mod invented.
         private readonly Dictionary<string, object> _markers = new Dictionary<string, object>();
@@ -79,12 +77,14 @@ namespace SongsOfConquestAccess.Screens
         // the game would not take - is the mod's to make a noise about.
         private bool _nativeDragRan;
 
-        public SpellbookScreen(SpellbookAdapter adapter)
+        /// <summary>After a hot reload: point the slot at the menu already showing.
+        /// Scanned once, from <c>ScreenDetector.RecoverRuntimeState</c>.</summary>
+        public static void Recover()
         {
-            _adapter = adapter;
+            Recovered<SpellbookScreen>(FindActive());
         }
 
-        public static Screen TryBuildActiveScreen()
+        public static SpellbookAdapter FindActive()
         {
             SpellBook[] spellbooks = Resources.FindObjectsOfTypeAll<SpellBook>();
             for (int i = 0; i < spellbooks.Length; i++)
@@ -98,7 +98,7 @@ namespace SongsOfConquestAccess.Screens
                 SpellbookAdapter adapter = new SpellbookAdapter(spellbook);
                 if (adapter.IsPresent())
                 {
-                    return new SpellbookScreen(adapter);
+                    return (adapter);
                 }
             }
 
@@ -110,6 +110,12 @@ namespace SongsOfConquestAccess.Screens
             get { return "spellbook"; }
         }
 
+        /// <summary>Layer 26: over the map and the battlefield alike.</summary>
+        public override int Layer
+        {
+            get { return 26; }
+        }
+
         /// <summary>The window draws no title of its own, so it is named after the HUD button that
         /// opens it.</summary>
         public override string ScreenName
@@ -117,14 +123,14 @@ namespace SongsOfConquestAccess.Screens
             get { return GameText.Get("Common/HUD/SpellbookButton", string.Empty); }
         }
 
-        public override bool IsPresent()
+        public override bool IsActive()
         {
-            return _adapter != null && _adapter.IsPresent();
+            return Live != null && Live.IsPresent();
         }
 
         public override void Build(GraphBuilder builder)
         {
-            if (!IsPresent())
+            if (!IsActive())
             {
                 return;
             }
@@ -133,7 +139,7 @@ namespace SongsOfConquestAccess.Screens
             // registration is a delegate over this load and must not outlive it.
             CarrySounds.Register(SpellCargo, () => NativeSoundUtility.PostEvent(PickUpSound), EndedCarry);
 
-            if (_adapter.IsTutorialButtonVisible())
+            if (Live.IsTutorialButtonVisible())
             {
                 builder.BeginStop(TutorialStop);
                 BuildTutorial(builder);
@@ -167,15 +173,15 @@ namespace SongsOfConquestAccess.Screens
 
         private void BuildTutorial(GraphBuilder builder)
         {
-            UIButton button = _adapter.TutorialButton;
+            UIButton button = Live.TutorialButton;
             if (button == null)
             {
                 return;
             }
 
             NodeVtable vtable = GraphNodes.Button(
-                () => _adapter.GetTutorialButtonLabel(),
-                () => _adapter.ActivateTutorial());
+                () => Live.GetTutorialButtonLabel(),
+                () => Live.ActivateTutorial());
             vtable.OnFocusVisual = () => NativeSelectionUtility.Select((Component)button);
             builder.AddItem(new DrawnNode(
                 ControlId.For(button, "spellbook:tutorial"),
@@ -187,7 +193,7 @@ namespace SongsOfConquestAccess.Screens
 
         private void BuildQuickbar(GraphBuilder builder)
         {
-            string header = OneLine(_adapter.GetQuickbarHeaderText());
+            string header = OneLine(Live.GetQuickbarHeaderText());
             bool named = !string.IsNullOrWhiteSpace(header);
             if (named)
             {
@@ -197,7 +203,7 @@ namespace SongsOfConquestAccess.Screens
 
             BuildAutoPopulate(builder);
 
-            IReadOnlyList<SpellbookAdapter.QuickbarItem> items = Items("quickbar", _adapter.GetQuickbarItems);
+            IReadOnlyList<SpellbookAdapter.QuickbarItem> items = Items("quickbar", Live.GetQuickbarItems);
             for (int i = 0; i < items.Count; i++)
             {
                 AddSlot(builder, items[i], i);
@@ -221,17 +227,17 @@ namespace SongsOfConquestAccess.Screens
         /// than in a list with a box at the top of it.</summary>
         private void BuildAutoPopulate(GraphBuilder builder)
         {
-            Component toggle = _adapter.AutoPopulateToggle;
-            if (toggle == null || !_adapter.IsAutoPopulateVisible())
+            Component toggle = Live.AutoPopulateToggle;
+            if (toggle == null || !Live.IsAutoPopulateVisible())
             {
                 return;
             }
 
             // The box's name IS its tooltip, so the tooltip is not also declared: it would read twice.
             NodeVtable vtable = GraphNodes.Checkbox(
-                () => _adapter.GetAutoPopulateLabel(),
-                () => _adapter.IsAutoPopulateChecked(),
-                () => _adapter.ToggleAutoPopulate());
+                () => Live.GetAutoPopulateLabel(),
+                () => Live.IsAutoPopulateChecked(),
+                () => Live.ToggleAutoPopulate());
             vtable.OnFocusVisual = () => NativeSelectionUtility.Select(toggle);
             builder.StartRow("spellbook:auto-populate", positions: false);
             builder.AddItem(new DrawnNode(
@@ -316,7 +322,7 @@ namespace SongsOfConquestAccess.Screens
             vtable.DropKind = SpellCargo;
             vtable.DropAccepts = held => held != null
                 && held.Cargo is SpellbookQuickbarEntry
-                && !_adapter.IsAutoPopulateChecked();
+                && !Live.IsAutoPopulateChecked();
             vtable.OnDrop = DropToRemove;
             builder.StartRow("spellbook:remove-target", positions: false);
             builder.AddItem(new SyntheticNode(
@@ -336,8 +342,8 @@ namespace SongsOfConquestAccess.Screens
         {
             SpellbookQuickbarEntry fromSlot = held == null ? null : held.Cargo as SpellbookQuickbarEntry;
             bool ran = fromSlot != null
-                ? _adapter.DragQuickbarSpell(fromSlot, target.Entry)
-                : _adapter.DragSpellToQuickbar(held == null ? null : held.Cargo as SpellbookSpellEntry, target.Entry);
+                ? Live.DragQuickbarSpell(fromSlot, target.Entry)
+                : Live.DragSpellToQuickbar(held == null ? null : held.Cargo as SpellbookSpellEntry, target.Entry);
             if (!ran)
             {
                 return DropResult.Refused();
@@ -352,7 +358,7 @@ namespace SongsOfConquestAccess.Screens
         private DropResult DropToRemove(CarryItem held)
         {
             SpellbookQuickbarEntry fromSlot = held == null ? null : held.Cargo as SpellbookQuickbarEntry;
-            if (fromSlot == null || !_adapter.DragQuickbarSpell(fromSlot, null))
+            if (fromSlot == null || !Live.DragQuickbarSpell(fromSlot, null))
             {
                 return DropResult.Refused();
             }
@@ -365,7 +371,7 @@ namespace SongsOfConquestAccess.Screens
 
         private void BuildSpells(GraphBuilder builder)
         {
-            IReadOnlyList<SpellbookAdapter.SchoolItem> schools = Items("schools", _adapter.GetSchools);
+            IReadOnlyList<SpellbookAdapter.SchoolItem> schools = Items("schools", Live.GetSchools);
             for (int i = 0; i < schools.Count; i++)
             {
                 SpellbookAdapter.SchoolItem school = schools[i];
@@ -393,7 +399,7 @@ namespace SongsOfConquestAccess.Screens
         {
             IReadOnlyList<SpellbookAdapter.SpellItem> spells = Items(
                 group.ToString(),
-                () => _adapter.GetSpells(group));
+                () => Live.GetSpells(group));
             if (spells.Count == 0 && school == null)
             {
                 return;
@@ -485,7 +491,7 @@ namespace SongsOfConquestAccess.Screens
 
         private CarryItem PickUpSpell(SpellbookAdapter.SpellItem item)
         {
-            return _adapter.IsAutoPopulateChecked()
+            return Live.IsAutoPopulateChecked()
                 ? null
                 : new CarryItem(item.Entry, item.Label, SpellCargo);
         }
@@ -494,8 +500,8 @@ namespace SongsOfConquestAccess.Screens
 
         private void BuildClose(GraphBuilder builder)
         {
-            UIButton close = _adapter.CloseButton;
-            if (close == null || !_adapter.IsCloseVisible())
+            UIButton close = Live.CloseButton;
+            if (close == null || !Live.IsCloseVisible())
             {
                 return;
             }
@@ -503,7 +509,7 @@ namespace SongsOfConquestAccess.Screens
             // An icon with no text of its own, so the mod names it.
             NodeVtable vtable = GraphNodes.Button(
                 () => ModText.Get(ModStrings.Screens.Close),
-                () => _adapter.ActivateClose());
+                () => Live.ActivateClose());
             vtable.OnFocusVisual = () => NativeSelectionUtility.Select((Component)close);
             builder.AddItem(new DrawnNode(ControlId.For(close, "spellbook:close"), vtable, close));
         }

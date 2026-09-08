@@ -31,7 +31,7 @@ namespace SongsOfConquestAccess.Screens
     /// registers its own exit and closes on it. The navigator claims the key only while something is
     /// being carried.
     /// </summary>
-    public sealed class WorldChoiceMenuScreen : GraphScreen
+    public sealed class WorldChoiceMenuScreen : LiveScreen<WorldChoiceMenuAdapter>
     {
         private const string WielderStop = "world-choice-wielder";
         private const string ChoiceStop = "world-choice";
@@ -41,18 +41,18 @@ namespace SongsOfConquestAccess.Screens
         private static readonly System.Reflection.PropertyInfo InstallerContainerProperty =
             AccessTools.Property(typeof(WorldChoiceMenuInstaller), "Container");
 
-        private readonly WorldChoiceMenuAdapter _adapter;
-
         // A subject of its own for the body, which the menu draws as a plain text rather than as a
         // control, kept across rebuilds so the reconciler seats the cursor on the same one.
         private readonly object _bodyMarker = new object();
 
-        public WorldChoiceMenuScreen(WorldChoiceMenuAdapter adapter)
+        /// <summary>After a hot reload: point the slot at the menu already showing.
+        /// Scanned once, from <c>ScreenDetector.RecoverRuntimeState</c>.</summary>
+        public static void Recover()
         {
-            _adapter = adapter;
+            Recovered<WorldChoiceMenuScreen>(FindActive());
         }
 
-        public static Screen TryBuildActiveScreen()
+        public static WorldChoiceMenuAdapter FindActive()
         {
             WorldChoiceMenuInstaller[] installers = Resources.FindObjectsOfTypeAll<WorldChoiceMenuInstaller>();
             for (int i = 0; i < installers.Length; i++)
@@ -66,7 +66,7 @@ namespace SongsOfConquestAccess.Screens
                 WorldChoiceMenuAdapter adapter = new WorldChoiceMenuAdapter(menu);
                 if (adapter.IsPresent())
                 {
-                    return new WorldChoiceMenuScreen(adapter);
+                    return (adapter);
                 }
             }
 
@@ -78,14 +78,20 @@ namespace SongsOfConquestAccess.Screens
             get { return "world-choice-menu"; }
         }
 
+        /// <summary>Layer 30: a story follow-up over the map.</summary>
+        public override int Layer
+        {
+            get { return 30; }
+        }
+
         /// <summary>The title the menu draws.</summary>
         public override string ScreenName
         {
             get
             {
-                return _adapter == null
+                return Live == null
                     ? null
-                    : TroopHudRows.NameWithPlace(_adapter.Title, _adapter.Wielder);
+                    : TroopHudRows.NameWithPlace(Live.Title, Live.Wielder);
             }
         }
 
@@ -94,19 +100,19 @@ namespace SongsOfConquestAccess.Screens
             get { return ChoiceStop; }
         }
 
-        public override bool IsPresent()
+        public override bool IsActive()
         {
-            return _adapter != null && _adapter.IsPresent();
+            return Live != null && Live.IsPresent();
         }
 
         public override void Build(GraphBuilder builder)
         {
-            if (!IsPresent())
+            if (!IsActive())
             {
                 return;
             }
 
-            TroopHudRows.WielderStop(builder, WielderStop, WielderKey, _adapter.Wielder);
+            TroopHudRows.WielderStop(builder, WielderStop, WielderKey, Live.Wielder);
 
             builder.BeginStop(ChoiceStop);
             BuildBody(builder);
@@ -130,13 +136,13 @@ namespace SongsOfConquestAccess.Screens
 
         private TroopHudAdapter Troops
         {
-            get { return _adapter == null || _adapter.Wielder == null ? null : _adapter.Wielder.Troops; }
+            get { return Live == null || Live.Wielder == null ? null : Live.Wielder.Troops; }
         }
 
         /// <summary>What the menu says the choice is about, as one node of its paragraphs.</summary>
         private void BuildBody(GraphBuilder builder)
         {
-            string body = _adapter.Body;
+            string body = Live.Body;
             if (string.IsNullOrWhiteSpace(body))
             {
                 return;
@@ -151,7 +157,7 @@ namespace SongsOfConquestAccess.Screens
         /// arriving is not choosing.</summary>
         private void BuildChoices(GraphBuilder builder)
         {
-            IReadOnlyList<WorldChoiceMenuAdapter.ChoiceItem> choices = Items("choices", _adapter.GetChoices);
+            IReadOnlyList<WorldChoiceMenuAdapter.ChoiceItem> choices = Items("choices", Live.GetChoices);
             for (int i = 0; i < choices.Count; i++)
             {
                 WorldChoiceMenuAdapter.ChoiceItem it = choices[i];
@@ -178,16 +184,16 @@ namespace SongsOfConquestAccess.Screens
         /// so it is watched live under a cursor waiting here.</summary>
         private void BuildConfirm(GraphBuilder builder)
         {
-            Component confirm = _adapter.ConfirmButton;
+            Component confirm = Live.ConfirmButton;
             if (confirm == null)
             {
                 return;
             }
 
             NodeVtable vtable = GraphNodes.Button(
-                () => _adapter.ConfirmLabel,
-                () => _adapter.ActivateConfirm(),
-                _adapter.IsConfirmEnabled);
+                () => Live.ConfirmLabel,
+                () => Live.ActivateConfirm(),
+                Live.IsConfirmEnabled);
             vtable.OnFocusVisual = () => NativeSelectionUtility.Select(confirm);
             builder.AddItem(new DrawnNode(
                 ControlId.For(confirm, "world-choice:confirm"),
@@ -199,7 +205,7 @@ namespace SongsOfConquestAccess.Screens
         /// </summary>
         private void BuildClose(GraphBuilder builder)
         {
-            WielderInteract wielder = _adapter.Wielder;
+            WielderInteract wielder = Live.Wielder;
             Component close = wielder == null ? null : wielder.CloseButton;
             if (close == null || !wielder.IsCloseVisible)
             {

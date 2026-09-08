@@ -30,7 +30,7 @@ namespace SongsOfConquestAccess.Screens
     /// <c>AdventureMenuBackground</c> with <c>_canClose</c> true, so it draws the close cross and
     /// registers <c>UI.ExitMenu</c> on its own close in <c>AnimateEntry</c>.
     /// </summary>
-    public sealed class BuildMenuScreen : GraphScreen
+    public sealed class BuildMenuScreen : LiveScreen<BuildMenuAdapter>
     {
         private const string SiteStop = "build-site";
         private const string SizesStop = "build-sizes";
@@ -38,19 +38,19 @@ namespace SongsOfConquestAccess.Screens
         private const string DetailsStop = "build-details";
         private const string CloseStop = "build-close";
 
-        private readonly BuildMenuAdapter _adapter;
-
         // A subject of its own per synthesized line, kept across rebuilds so the reconciler seats the
         // cursor on the same one: the site summary, the selected building's description, the cost and
         // the warning are read off text meshes the menu rebinds rather than off rows of their own.
         private readonly Dictionary<string, object> _markers = new Dictionary<string, object>();
 
-        public BuildMenuScreen(BuildMenuAdapter adapter)
+        /// <summary>After a hot reload: point the slot at the menu already showing.
+        /// Scanned once, from <c>ScreenDetector.RecoverRuntimeState</c>.</summary>
+        public static void Recover()
         {
-            _adapter = adapter;
+            Recovered<BuildMenuScreen>(FindActive());
         }
 
-        public static Screen TryBuildActiveScreen()
+        public static BuildMenuAdapter FindActive()
         {
             BuildMenu[] menus = Resources.FindObjectsOfTypeAll<BuildMenu>();
             for (int i = 0; i < menus.Length; i++)
@@ -58,7 +58,7 @@ namespace SongsOfConquestAccess.Screens
                 BuildMenuAdapter adapter = new BuildMenuAdapter(menus[i]);
                 if (adapter.IsPresent())
                 {
-                    return new BuildMenuScreen(adapter);
+                    return (adapter);
                 }
             }
 
@@ -70,30 +70,30 @@ namespace SongsOfConquestAccess.Screens
             get { return "build-menu"; }
         }
 
+        /// <summary>Layer 24: over the settlement page that opens it.</summary>
+        public override int Layer
+        {
+            get { return 24; }
+        }
+
         /// <summary>The header the menu draws over the page ("Build").</summary>
         public override string ScreenName
         {
             get
             {
-                string header = _adapter != null ? _adapter.HeaderText : null;
+                string header = Live != null ? Live.HeaderText : null;
                 return string.IsNullOrWhiteSpace(header) ? null : header;
             }
         }
 
-        public override bool IsPresent()
+        public override bool IsActive()
         {
-            return _adapter != null && _adapter.IsPresent();
-        }
-
-        /// <summary>Kept for the detector, which calls it when the site or the size changes. The
-        /// graph is declared afresh on every operation, so there is nothing to rebuild.</summary>
-        public void Refresh()
-        {
+            return Live != null && Live.IsPresent();
         }
 
         public override void Build(GraphBuilder builder)
         {
-            if (!IsPresent())
+            if (!IsActive())
             {
                 return;
             }
@@ -118,43 +118,43 @@ namespace SongsOfConquestAccess.Screens
 
         private void BuildSite(GraphBuilder builder)
         {
-            Component tutorial = _adapter.TutorialButton;
-            if (tutorial != null && _adapter.IsTutorialButtonVisible())
+            Component tutorial = Live.TutorialButton;
+            if (tutorial != null && Live.IsTutorialButtonVisible())
             {
                 AddButton(
                     builder,
                     tutorial,
                     "tutorial",
-                    _adapter.GetTutorialButtonLabel,
-                    () => _adapter.ActivateTutorial(),
+                    Live.GetTutorialButtonLabel,
+                    () => Live.ActivateTutorial(),
                     null);
             }
 
-            AddLine(builder, "current-site", () => _adapter.BuildSiteSummary);
+            AddLine(builder, "current-site", () => Live.BuildSiteSummary);
 
             AddButton(
                 builder,
-                _adapter.PreviousBuildSiteButton,
+                Live.PreviousBuildSiteButton,
                 "previous-site",
-                () => _adapter.PreviousBuildSiteButtonLabel,
-                () => _adapter.ActivatePreviousBuildSite(),
-                _adapter.IsPreviousBuildSiteEnabled);
+                () => Live.PreviousBuildSiteButtonLabel,
+                () => Live.ActivatePreviousBuildSite(),
+                Live.IsPreviousBuildSiteEnabled);
 
             AddButton(
                 builder,
-                _adapter.NextBuildSiteButton,
+                Live.NextBuildSiteButton,
                 "next-site",
-                () => _adapter.NextBuildSiteButtonLabel,
-                () => _adapter.ActivateNextBuildSite(),
-                _adapter.IsNextBuildSiteEnabled);
+                () => Live.NextBuildSiteButtonLabel,
+                () => Live.ActivateNextBuildSite(),
+                Live.IsNextBuildSiteEnabled);
 
-            Component toggle = _adapter.AutoSelectToggle;
-            if (toggle != null && _adapter.IsAutoSelectVisible())
+            Component toggle = Live.AutoSelectToggle;
+            if (toggle != null && Live.IsAutoSelectVisible())
             {
                 NodeVtable vtable = GraphNodes.Checkbox(
-                    () => _adapter.AutoSelectLabel,
-                    _adapter.IsAutoSelectChecked,
-                    _adapter.ToggleAutoSelect);
+                    () => Live.AutoSelectLabel,
+                    Live.IsAutoSelectChecked,
+                    Live.ToggleAutoSelect);
                 vtable.OnFocusVisual = () => NativeSelectionUtility.Select(toggle);
                 builder.AddItem(new DrawnNode(
                     ControlId.For(toggle, "build:auto-select"),
@@ -167,7 +167,7 @@ namespace SongsOfConquestAccess.Screens
 
         private void BuildSizes(GraphBuilder builder)
         {
-            IReadOnlyList<BuildMenuAdapter.CategoryItem> categories = _adapter.GetCategories();
+            IReadOnlyList<BuildMenuAdapter.CategoryItem> categories = Live.GetCategories();
             for (int i = 0; i < categories.Count; i++)
             {
                 BuildMenuAdapter.CategoryItem category = categories[i];
@@ -184,8 +184,8 @@ namespace SongsOfConquestAccess.Screens
                     () => it.Enabled);
                 // Drawn under the bar: how long anything of this size takes to build.
                 vtable.Announcements.Add(GraphNodes.ValuePart(() => it.BuildTime, watch: false));
-                vtable.OnActivate = () => _adapter.ActivateCategory(it.Size);
-                vtable.OnFocusVisual = () => _adapter.SelectCategory(it.Size);
+                vtable.OnActivate = () => Live.ActivateCategory(it.Size);
+                vtable.OnFocusVisual = () => Live.SelectCategory(it.Size);
                 builder.AddItem(new DrawnNode(
                     ControlId.For(button, "build:size/" + category.Index),
                     vtable,
@@ -197,7 +197,7 @@ namespace SongsOfConquestAccess.Screens
 
         private void BuildBuildings(GraphBuilder builder)
         {
-            IReadOnlyList<BuildMenuAdapter.BuildingItem> buildings = _adapter.GetBuildings();
+            IReadOnlyList<BuildMenuAdapter.BuildingItem> buildings = Live.GetBuildings();
             ControlId selected = null;
             for (int i = 0; i < buildings.Count; i++)
             {
@@ -243,23 +243,23 @@ namespace SongsOfConquestAccess.Screens
             }
 
             BuildTiers(builder);
-            BuildSection(builder, "available-research", _adapter.AvailableResearchHeader, _adapter.GetAvailableResearchItems());
+            BuildSection(builder, "available-research", Live.AvailableResearchHeader, Live.GetAvailableResearchItems());
 
-            IReadOnlyList<BuildMenuAdapter.SectionMenu> sections = _adapter.GetIncomeAndGarrisonMenus();
+            IReadOnlyList<BuildMenuAdapter.SectionMenu> sections = Live.GetIncomeAndGarrisonMenus();
             for (int i = 0; i < sections.Count; i++)
             {
                 BuildSection(builder, "section/" + i, sections[i].Label, sections[i].Items);
             }
 
             BuildRequirements(builder);
-            if (_adapter.HasCurrentTierCost())
+            if (Live.HasCurrentTierCost())
             {
-                AddLine(builder, "cost", () => _adapter.CurrentTierCostText);
+                AddLine(builder, "cost", () => Live.CurrentTierCostText);
             }
 
-            if (_adapter.HasWarning())
+            if (Live.HasWarning())
             {
-                AddLine(builder, "warning", () => _adapter.CannotBuyText);
+                AddLine(builder, "warning", () => Live.CannotBuyText);
             }
 
             BuildPurchase(builder);
@@ -270,10 +270,10 @@ namespace SongsOfConquestAccess.Screens
         /// </summary>
         private IList<string> SelectedBuildingSummaryLines()
         {
-            IList<string> description = _adapter.SelectedBuildingDescriptionLines;
+            IList<string> description = Live.SelectedBuildingDescriptionLines;
             List<string> lines = new List<string>();
             string first = JoinParts(
-                _adapter.SelectedBuildingName,
+                Live.SelectedBuildingName,
                 description.Count > 0 ? description[0] : null);
             if (!string.IsNullOrWhiteSpace(first))
             {
@@ -309,7 +309,7 @@ namespace SongsOfConquestAccess.Screens
         /// (arriving must not redraw the pane the player is reading).</summary>
         private void BuildTiers(GraphBuilder builder)
         {
-            IReadOnlyList<BuildMenuAdapter.TierItem> tiers = _adapter.GetTiers();
+            IReadOnlyList<BuildMenuAdapter.TierItem> tiers = Live.GetTiers();
             List<BuildMenuAdapter.TierItem> drawn = new List<BuildMenuAdapter.TierItem>();
             for (int i = 0; i < tiers.Count; i++)
             {
@@ -401,13 +401,13 @@ namespace SongsOfConquestAccess.Screens
 
         private void BuildRequirements(GraphBuilder builder)
         {
-            IReadOnlyList<BuildMenuAdapter.RequirementItem> requirements = _adapter.GetRequirements();
+            IReadOnlyList<BuildMenuAdapter.RequirementItem> requirements = Live.GetRequirements();
             if (requirements.Count == 0)
             {
                 return;
             }
 
-            string caption = _adapter.RequirementsHeader;
+            string caption = Live.RequirementsHeader;
             bool named = !string.IsNullOrWhiteSpace(caption);
             if (named)
             {
@@ -440,17 +440,17 @@ namespace SongsOfConquestAccess.Screens
 
         private void BuildPurchase(GraphBuilder builder)
         {
-            Component purchase = _adapter.PurchaseButton;
-            if (purchase == null || !_adapter.IsBuildButtonVisible())
+            Component purchase = Live.PurchaseButton;
+            if (purchase == null || !Live.IsBuildButtonVisible())
             {
                 return;
             }
 
             NodeVtable vtable = GraphNodes.Button(
-                () => _adapter.BuildButtonLabel,
-                () => _adapter.ActivateBuild(),
-                _adapter.IsBuildButtonEnabled);
-            vtable.OnFocusVisual = () => _adapter.FocusBuildButton();
+                () => Live.BuildButtonLabel,
+                () => Live.ActivateBuild(),
+                Live.IsBuildButtonEnabled);
+            vtable.OnFocusVisual = () => Live.FocusBuildButton();
             builder.AddItem(new DrawnNode(
                 ControlId.For(purchase, "build:purchase"),
                 vtable,
@@ -461,8 +461,8 @@ namespace SongsOfConquestAccess.Screens
 
         private void BuildClose(GraphBuilder builder)
         {
-            Component close = _adapter.CloseButton;
-            if (close == null || !_adapter.IsCloseVisible())
+            Component close = Live.CloseButton;
+            if (close == null || !Live.IsCloseVisible())
             {
                 return;
             }
@@ -470,7 +470,7 @@ namespace SongsOfConquestAccess.Screens
             // An icon with no text of its own, so the mod names it.
             NodeVtable vtable = GraphNodes.Button(
                 () => ModText.Get(ModStrings.Screens.Close),
-                () => _adapter.ActivateClose());
+                () => Live.ActivateClose());
             vtable.OnFocusVisual = () => NativeSelectionUtility.Select(close);
             builder.AddItem(new DrawnNode(ControlId.For(close, "build:close"), vtable, close));
         }

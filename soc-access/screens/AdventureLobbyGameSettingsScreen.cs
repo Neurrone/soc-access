@@ -34,20 +34,21 @@ namespace SongsOfConquestAccess.Screens
     /// registers <c>InputActions.UI.ExitMenu</c> outside its gamepad branch (decompiled, line 333),
     /// so the key already cancels the window.
     /// </summary>
-    public sealed class AdventureLobbyGameSettingsScreen : GraphScreen
+    public sealed class AdventureLobbyGameSettingsScreen : LiveScreen<AdventureLobbyGameSettingsAdapter>
     {
         private const string RowsStop = "game-settings-rows";
         private const string ButtonsStop = "game-settings-buttons";
 
-        private readonly AdventureLobbyGameSettingsAdapter _adapter;
         private readonly GameTextEditor _editor = new GameTextEditor();
 
-        public AdventureLobbyGameSettingsScreen(AdventureLobbyGameSettingsAdapter adapter)
+        /// <summary>After a hot reload: point the slot at the menu already showing.
+        /// Scanned once, from <c>ScreenDetector.RecoverRuntimeState</c>.</summary>
+        public static void Recover()
         {
-            _adapter = adapter;
+            Recovered<AdventureLobbyGameSettingsScreen>(FindActive());
         }
 
-        public static Screen TryBuildActiveScreen()
+        public static AdventureLobbyGameSettingsAdapter FindActive()
         {
             LobbyMapSettingsMenu menu = FindActiveMenu(null);
             if (menu == null)
@@ -56,12 +57,12 @@ namespace SongsOfConquestAccess.Screens
             }
 
             AdventureLobbyGameSettingsAdapter adapter = new AdventureLobbyGameSettingsAdapter(menu);
-            return adapter.IsPresent() ? new AdventureLobbyGameSettingsScreen(adapter) : null;
+            return adapter.IsPresent() ? (adapter) : null;
         }
 
         public bool Matches(LobbyMapSettingsMenu menu)
         {
-            return _adapter != null && ReferenceEquals(_adapter.SourceKey, menu);
+            return Live != null && ReferenceEquals(Live.SourceKey, menu);
         }
 
         public override string Key
@@ -69,10 +70,16 @@ namespace SongsOfConquestAccess.Screens
             get { return "game-settings"; }
         }
 
+        /// <summary>Layer 20: a lobby sub-page, over the lobby.</summary>
+        public override int Layer
+        {
+            get { return 20; }
+        }
+
         /// <summary>The window's own drawn title ("Game settings").</summary>
         public override string ScreenName
         {
-            get { return _adapter != null ? _adapter.Title : null; }
+            get { return Live != null ? Live.Title : null; }
         }
 
         public override object InitialFocusStop
@@ -80,9 +87,9 @@ namespace SongsOfConquestAccess.Screens
             get { return RowsStop; }
         }
 
-        public override bool IsPresent()
+        public override bool IsActive()
         {
-            return _adapter != null && _adapter.IsPresent();
+            return Live != null && Live.IsPresent();
         }
 
         /// <summary>While the keyboard is on its way to one of the page's text fields, what the player
@@ -97,16 +104,10 @@ namespace SongsOfConquestAccess.Screens
             get { return _editor.Pending || _editor.Editing; }
         }
 
-        /// <summary>Kept for the detector, which calls it whenever the window's content changes. The
-        /// graph is declared afresh on every operation, so there is nothing to rebuild.</summary>
-        public void Refresh()
+        public override void OnUpdate()
         {
-        }
-
-        public override void Update()
-        {
-            base.Update();
-            _editor.Update(IsPresent());
+            base.OnUpdate();
+            _editor.Update(IsActive());
         }
 
         public override void OnUnfocus()
@@ -155,21 +156,21 @@ namespace SongsOfConquestAccess.Screens
 
         public override void Build(GraphBuilder builder)
         {
-            if (!IsPresent())
+            if (!IsActive())
             {
                 return;
             }
 
             builder.BeginStop(RowsStop);
-            IReadOnlyList<AdventureLobbyGameSettingsAdapter.ControlItem> controls = _adapter.GetContentControls();
+            IReadOnlyList<AdventureLobbyGameSettingsAdapter.ControlItem> controls = Live.GetContentControls();
             for (int i = 0; i < controls.Count; i++)
             {
                 AddRow(builder, controls[i]);
             }
 
             builder.BeginStop(ButtonsStop);
-            AddButton(builder, _adapter.GetCancelButton());
-            AddButton(builder, _adapter.GetApplyButton());
+            AddButton(builder, Live.GetCancelButton());
+            AddButton(builder, Live.GetApplyButton());
         }
 
         private void AddRow(GraphBuilder builder, AdventureLobbyGameSettingsAdapter.ControlItem control)

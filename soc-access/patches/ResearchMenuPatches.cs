@@ -19,19 +19,5 @@ namespace SongsOfConquestAccess
         {
             SocAccessMod.Instance?.ScreenDetector?.OnResearchMenuClosed(__instance);
         }
-
-        [HarmonyPatch(typeof(ResearchMenu), "HandleBuildingTabSwitched", new[] { typeof(int) })]
-        [HarmonyPostfix]
-        private static void ResearchMenuHandleBuildingTabSwitchedPostfix(ResearchMenu __instance)
-        {
-            SocAccessMod.Instance?.ScreenDetector?.OnResearchMenuChanged(__instance);
-        }
-
-        [HarmonyPatch(typeof(ResearchMenu), "HandleFactionButtonClicked", new[] { typeof(int), typeof(bool) })]
-        [HarmonyPostfix]
-        private static void ResearchMenuHandleFactionButtonClickedPostfix(ResearchMenu __instance)
-        {
-            SocAccessMod.Instance?.ScreenDetector?.OnResearchMenuChanged(__instance);
-        }
     }
 }

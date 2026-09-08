@@ -35,19 +35,19 @@ namespace SongsOfConquestAccess.Screens
     /// price as the value, and the slider and the price live inside the recruit's own group. The
     /// wielder's rows lost "slot 5": the graph says where a row sits.
     /// </summary>
-    public sealed class RallyPointScreen : GraphScreen
+    public sealed class RallyPointScreen : LiveScreen<RallyPointInteractionMenuAdapter>
     {
         private const string KeyPrefix = "rally-point";
         private const string WielderKey = "rally-point:wielder";
 
-        private readonly RallyPointInteractionMenuAdapter _adapter;
-
-        public RallyPointScreen(RallyPointInteractionMenuAdapter adapter)
+        /// <summary>After a hot reload: point the slot at the menu already showing.
+        /// Scanned once, from <c>ScreenDetector.RecoverRuntimeState</c>.</summary>
+        public static void Recover()
         {
-            _adapter = adapter;
+            Recovered<RallyPointScreen>(FindActive());
         }
 
-        public static Screen TryBuildActiveScreen()
+        public static RallyPointInteractionMenuAdapter FindActive()
         {
             RallyPointInteractionMenu[] menus = Resources.FindObjectsOfTypeAll<RallyPointInteractionMenu>();
             for (int i = 0; i < menus.Length; i++)
@@ -55,7 +55,7 @@ namespace SongsOfConquestAccess.Screens
                 RallyPointInteractionMenuAdapter adapter = new RallyPointInteractionMenuAdapter(menus[i]);
                 if (adapter.IsPresent())
                 {
-                    return new RallyPointScreen(adapter);
+                    return (adapter);
                 }
             }
 
@@ -67,34 +67,40 @@ namespace SongsOfConquestAccess.Screens
             get { return KeyPrefix; }
         }
 
+        /// <summary>Layer 22: a dwelling sub-page.</summary>
+        public override int Layer
+        {
+            get { return 22; }
+        }
+
         /// <summary>The building's own name, which the menu draws over the page.</summary>
         public override string ScreenName
         {
             get
             {
-                return _adapter == null
+                return Live == null
                     ? null
-                    : TroopHudRows.NameWithPlace(_adapter.Title, _adapter.Wielder);
+                    : TroopHudRows.NameWithPlace(Live.Title, Live.Wielder);
             }
         }
 
-        public override bool IsPresent()
+        public override bool IsActive()
         {
-            return _adapter != null && _adapter.IsPresent();
+            return Live != null && Live.IsPresent();
         }
 
         public override void Build(GraphBuilder builder)
         {
-            if (!IsPresent())
+            if (!IsActive())
             {
                 return;
             }
 
-            TroopHudRows.WielderStop(builder, KeyPrefix + ":wielder-stop", WielderKey, _adapter.Wielder);
+            TroopHudRows.WielderStop(builder, KeyPrefix + ":wielder-stop", WielderKey, Live.Wielder);
 
             builder.BeginStop(KeyPrefix + ":page");
             BuildSources(builder);
-            RecruitGroups.Region(builder, _adapter.PurchaseTroops, KeyPrefix, BuildSelectedSource);
+            RecruitGroups.Region(builder, Live.PurchaseTroops, KeyPrefix, BuildSelectedSource);
 
             builder.BeginStop(KeyPrefix + ":close");
             BuildClose(builder);
@@ -115,7 +121,7 @@ namespace SongsOfConquestAccess.Screens
         {
             get
             {
-                WielderInteract wielder = _adapter == null ? null : _adapter.Wielder;
+                WielderInteract wielder = Live == null ? null : Live.Wielder;
                 return wielder == null ? null : wielder.Troops;
             }
         }
@@ -125,7 +131,7 @@ namespace SongsOfConquestAccess.Screens
         /// click, which the game answers by refreshing the grid; focus alone picks nothing.</summary>
         private void BuildSources(GraphBuilder builder)
         {
-            IReadOnlyList<RallyPointInteractionMenuAdapter.SourceItem> sources = _adapter.GetSourceItems();
+            IReadOnlyList<RallyPointInteractionMenuAdapter.SourceItem> sources = Live.GetSourceItems();
             builder.PushContext(ModText.Get(ModStrings.Screens.RecruitFrom));
             builder.SetRegion(KeyPrefix + ":sources");
 
@@ -175,14 +181,14 @@ namespace SongsOfConquestAccess.Screens
         /// picked, under a cursor that may be standing right here.</summary>
         private void BuildSelectedSource(GraphBuilder builder)
         {
-            Component line = _adapter.SelectedSourceLine;
-            if (line == null || string.IsNullOrWhiteSpace(_adapter.SelectedSourceName))
+            Component line = Live.SelectedSourceLine;
+            if (line == null || string.IsNullOrWhiteSpace(Live.SelectedSourceName))
             {
                 return;
             }
 
             NodeVtable vtable = GraphNodes.Text(
-                () => ModText.Get(ModStrings.Screens.RecruitingFrom, _adapter.SelectedSourceName));
+                () => ModText.Get(ModStrings.Screens.RecruitingFrom, Live.SelectedSourceName));
             vtable.Announcements[0].Live = true;
             builder.AddItem(new DrawnNode(
                 ControlId.For(line, KeyPrefix + ":recruiting-from"),
@@ -194,7 +200,7 @@ namespace SongsOfConquestAccess.Screens
         /// An icon with no text of its own, so the mod names it.</summary>
         private void BuildClose(GraphBuilder builder)
         {
-            WielderInteract wielder = _adapter.Wielder;
+            WielderInteract wielder = Live.Wielder;
             Component close = wielder == null ? null : wielder.CloseButton;
             if (close == null || !wielder.IsCloseVisible)
             {

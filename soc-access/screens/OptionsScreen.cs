@@ -41,7 +41,7 @@ namespace SongsOfConquestAccess.Screens
     /// Escape is the game's: <c>OptionsMenu.ReregisterInput</c> registers <c>UI.ExitMenu</c> on its
     /// keyboard branch (decompiled, lines 532 to 544), so the key already closes the window.
     /// </summary>
-    public sealed class OptionsScreen : GraphScreen
+    public sealed class OptionsScreen : LiveScreen<OptionsMenuAdapter>
     {
         private const string TabsStop = "options-tabs";
         private const string RowsStop = "options-rows";
@@ -50,18 +50,18 @@ namespace SongsOfConquestAccess.Screens
         private static readonly PropertyInfo InstallerContainerProperty =
             AccessTools.Property(typeof(OptionsMenuInstaller), "Container");
 
-        private readonly OptionsMenuAdapter _adapter;
-
         /// <summary>The rows of the form, declared the way every settings form the game draws is
         /// declared - shared with the mod's own options dialog, which is a copy of this panel.</summary>
         private readonly MenuFormNodes _rows = new MenuFormNodes("options");
 
-        public OptionsScreen(OptionsMenuAdapter adapter)
+        /// <summary>After a hot reload: point the slot at the menu already showing.
+        /// Scanned once, from <c>ScreenDetector.RecoverRuntimeState</c>.</summary>
+        public static void Recover()
         {
-            _adapter = adapter;
+            Recovered<OptionsScreen>(FindActive());
         }
 
-        public static Screen TryBuildActiveScreen()
+        public static OptionsMenuAdapter FindActive()
         {
             OptionsMenu menu = FindActiveOptionsMenu();
             if (menu == null)
@@ -70,12 +70,18 @@ namespace SongsOfConquestAccess.Screens
             }
 
             OptionsMenuAdapter adapter = new OptionsMenuAdapter(menu);
-            return adapter.IsPresent() ? new OptionsScreen(adapter) : null;
+            return adapter.IsPresent() ? (adapter) : null;
         }
 
         public override string Key
         {
             get { return "options"; }
+        }
+
+        /// <summary>Layer 42: over the pause menu or the main menu that opens it.</summary>
+        public override int Layer
+        {
+            get { return 42; }
         }
 
         public override string ScreenName
@@ -91,20 +97,14 @@ namespace SongsOfConquestAccess.Screens
             get { return TabsStop; }
         }
 
-        public override bool IsPresent()
+        public override bool IsActive()
         {
-            return _adapter != null && _adapter.IsPresent();
-        }
-
-        /// <summary>Kept for the detector, which calls it whenever the window's content changes. The
-        /// graph is declared afresh on every operation, so there is nothing to rebuild.</summary>
-        public void Refresh()
-        {
+            return Live != null && Live.IsPresent();
         }
 
         public override void Build(GraphBuilder builder)
         {
-            if (!IsPresent())
+            if (!IsActive())
             {
                 return;
             }
@@ -113,12 +113,12 @@ namespace SongsOfConquestAccess.Screens
             BuildTabs(builder);
 
             builder.BeginStop(RowsStop);
-            _rows.BuildRows(builder, _adapter.GetCurrentContentControls());
+            _rows.BuildRows(builder, Live.GetCurrentContentControls());
 
             builder.BeginStop(ButtonsStop);
             _rows.AddWindowButton(
                 builder,
-                _adapter.GetOkButton(),
+                Live.GetOkButton(),
                 () => ModText.Get(ModStrings.Screens.Close));
         }
 
@@ -126,7 +126,7 @@ namespace SongsOfConquestAccess.Screens
 
         private void BuildTabs(GraphBuilder builder)
         {
-            IReadOnlyList<OptionsMenuAdapter.TabItem> tabs = _adapter.GetTabs();
+            IReadOnlyList<OptionsMenuAdapter.TabItem> tabs = Live.GetTabs();
             for (int i = 0; i < tabs.Count; i++)
             {
                 OptionsMenuAdapter.TabItem tab = tabs[i];
@@ -138,13 +138,13 @@ namespace SongsOfConquestAccess.Screens
                 int index = i;
                 NodeVtable vtable = GraphNodes.Tab(
                     tab.GetLabel,
-                    () => _adapter.GetActiveTabIndex() == index,
+                    () => Live.GetActiveTabIndex() == index,
                     tab.IsVisible);
                 // Focusing the tab IS switching to it; the guard makes re-focusing the showing tab a
                 // no-op, so re-entering the bar does not restart the page.
                 vtable.OnFocusVisual = () =>
                 {
-                    if (_adapter.GetActiveTabIndex() != index)
+                    if (Live.GetActiveTabIndex() != index)
                     {
                         tab.Select();
                     }
@@ -153,7 +153,6 @@ namespace SongsOfConquestAccess.Screens
                 builder.AddItem(new SyntheticNode(ControlId.Structural("options:tab/" + tab.Id), vtable));
             }
         }
-
 
         private static OptionsMenu FindActiveOptionsMenu()
         {

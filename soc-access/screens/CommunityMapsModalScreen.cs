@@ -48,12 +48,10 @@ namespace SongsOfConquestAccess.Screens
     /// Backspace. While that panel is up the screen also turns type-ahead off, because the letters and
     /// digits the player types are the code the game is reading.
     /// </summary>
-    public sealed class CommunityMapsModalScreen : GraphScreen
+    public sealed class CommunityMapsModalScreen : LiveScreen<CommunityMapsModalAdapter>
     {
         private const string ModalStop = "community-maps-modal";
 
-        private readonly CommunityMapsModalAdapter _adapter;
-        private readonly CommunityMapsModalState _state;
         private readonly GameTextEditor _editor = new GameTextEditor();
 
         // A subject of its own for each node the modal gives no component for, kept across rebuilds:
@@ -63,16 +61,17 @@ namespace SongsOfConquestAccess.Screens
 
         private string _lastCode;
 
-        public CommunityMapsModalScreen(CommunityMapsModalAdapter adapter)
+        /// <summary>After a hot reload: point the slot at the menu already showing.
+        /// Scanned once, from <c>ScreenDetector.RecoverRuntimeState</c>.</summary>
+        public static void Recover()
         {
-            _adapter = adapter;
-            _state = adapter != null ? adapter.State : CommunityMapsModalState.None;
+            Recovered<CommunityMapsModalScreen>(FindActive());
         }
 
-        public static Screen TryBuildActiveScreen()
+        public static CommunityMapsModalAdapter FindActive()
         {
             CommunityMapsModalAdapter adapter = CommunityMapsModalAdapter.TryCreate();
-            return adapter != null && adapter.IsPresent() ? new CommunityMapsModalScreen(adapter) : null;
+            return adapter != null && adapter.IsPresent() ? adapter : null;
         }
 
         public override string Key
@@ -80,40 +79,44 @@ namespace SongsOfConquestAccess.Screens
             get { return "community-maps-modal"; }
         }
 
+        /// <summary>Layer 6: over every browser page: the pages are drawn underneath it.</summary>
+        public override int Layer
+        {
+            get { return 6; }
+        }
+
         /// <summary>The modal's own heading, spoken once on arrival. Null where it draws none.</summary>
         public override string ScreenName
         {
             get
             {
-                string title = _adapter != null ? _adapter.Title : null;
+                string title = Live != null ? Live.Title : null;
                 return string.IsNullOrWhiteSpace(title) ? null : title;
             }
         }
 
-        public override bool IsPresent()
+        public override bool IsActive()
         {
-            return _adapter != null && _adapter.IsPresent();
+            return Live != null && Live.IsPresent();
         }
 
-        /// <summary>The state the modal was in when this screen was built. The detector compares it
-        /// with a freshly read one to decide whether the modal became a DIFFERENT modal - a different
-        /// panel object, which this screen's adapter cannot follow - so it is a snapshot, not a live
-        /// reading.</summary>
+        /// <summary>Which panel the modal is showing now (authentication, terms, a code box). Read
+        /// live off the slot: the page turns in place and says its new name itself.</summary>
         public CommunityMapsModalState State
         {
-            get { return _state; }
+            get { return Live != null ? Live.State : CommunityMapsModalState.None; }
         }
 
         /// <summary>Escape: the key does nothing here on its own, so the screen takes it and runs
         /// mod.io's own cancel.</summary>
         public override bool ConsumesBack
         {
-            get { return IsPresent(); }
+            get { return IsActive(); }
         }
 
         public override bool Back()
         {
-            return _adapter != null && _adapter.Cancel();
+            return Live != null && Live.Cancel();
         }
 
         /// <summary>While the keyboard is on its way to the modal's text box, what the player types
@@ -132,24 +135,15 @@ namespace SongsOfConquestAccess.Screens
         /// read by the game's own per-frame key scan, and a search must not eat them.</summary>
         public override bool AllowsTypeahead
         {
-            get { return _state != CommunityMapsModalState.InputFiveDigits; }
+            get { return State != CommunityMapsModalState.InputFiveDigits; }
         }
 
-        /// <summary>
-        /// The modal's contents changed without becoming a different modal. Nothing to do: the graph
-        /// is declared afresh on every operation, so the next build already reads what is there. The
-        /// detector still calls this, so it stays.
-        /// </summary>
-        public void Refresh()
+        public override void OnUpdate()
         {
-        }
-
-        public override void Update()
-        {
-            base.Update();
+            base.OnUpdate();
 
             // After the navigator, so a word about the edit follows the activation's own readout.
-            _editor.Update(IsPresent());
+            _editor.Update(IsActive());
             AnnounceCodeTyped();
         }
 
@@ -167,7 +161,7 @@ namespace SongsOfConquestAccess.Screens
 
         public override void Build(GraphBuilder builder)
         {
-            if (!IsPresent())
+            if (!IsActive())
             {
                 return;
             }
@@ -175,7 +169,7 @@ namespace SongsOfConquestAccess.Screens
             builder.BeginStop(ModalStop);
             ControlId start = null;
 
-            IReadOnlyList<CommunityMapsModalAdapter.TextItem> texts = _adapter.GetTexts();
+            IReadOnlyList<CommunityMapsModalAdapter.TextItem> texts = Live.GetTexts();
             for (int i = 0; i < texts.Count; i++)
             {
                 CommunityMapsModalAdapter.TextItem text = texts[i];
@@ -195,7 +189,7 @@ namespace SongsOfConquestAccess.Screens
                 }
             }
 
-            IReadOnlyList<CommunityMapsModalAdapter.InputItem> inputs = _adapter.GetInputs();
+            IReadOnlyList<CommunityMapsModalAdapter.InputItem> inputs = Live.GetInputs();
             for (int i = 0; i < inputs.Count; i++)
             {
                 CommunityMapsModalAdapter.InputItem input = inputs[i];
@@ -213,7 +207,7 @@ namespace SongsOfConquestAccess.Screens
                 }
             }
 
-            IReadOnlyList<CommunityMapsModalAdapter.FiveDigitInputItem> codes = _adapter.GetFiveDigitInputs();
+            IReadOnlyList<CommunityMapsModalAdapter.FiveDigitInputItem> codes = Live.GetFiveDigitInputs();
             for (int i = 0; i < codes.Count; i++)
             {
                 CommunityMapsModalAdapter.FiveDigitInputItem code = codes[i];
@@ -245,13 +239,13 @@ namespace SongsOfConquestAccess.Screens
                 }
             }
 
-            if (_state == CommunityMapsModalState.DownloadQueue)
+            if (State == CommunityMapsModalState.DownloadQueue)
             {
                 // The download queue draws no way out of its own, so the mod adds one.
                 ControlId id = ControlId.For(Marker("modal:downloads-back"), "modal:downloads-back");
                 builder.AddItem(new SyntheticNode(
                     id,
-                    GraphNodes.Button(() => ModText.Get(ModStrings.Screens.Back), () => _adapter.Cancel())));
+                    GraphNodes.Button(() => ModText.Get(ModStrings.Screens.Back), () => Live.Cancel())));
                 if (start == null)
                 {
                     start = id;
@@ -303,13 +297,13 @@ namespace SongsOfConquestAccess.Screens
         /// </summary>
         private void AnnounceCodeTyped()
         {
-            if (_state != CommunityMapsModalState.InputFiveDigits || !IsPresent())
+            if (State != CommunityMapsModalState.InputFiveDigits || !IsActive())
             {
                 _lastCode = null;
                 return;
             }
 
-            IReadOnlyList<CommunityMapsModalAdapter.FiveDigitInputItem> codes = _adapter.GetFiveDigitInputs();
+            IReadOnlyList<CommunityMapsModalAdapter.FiveDigitInputItem> codes = Live.GetFiveDigitInputs();
             if (codes.Count == 0)
             {
                 _lastCode = null;
@@ -339,7 +333,7 @@ namespace SongsOfConquestAccess.Screens
         private List<CommunityMapsModalAdapter.ActionItem> DrawnActions()
         {
             List<CommunityMapsModalAdapter.ActionItem> actions = new List<CommunityMapsModalAdapter.ActionItem>();
-            IReadOnlyList<CommunityMapsModalAdapter.ActionItem> declared = _adapter.GetActions();
+            IReadOnlyList<CommunityMapsModalAdapter.ActionItem> declared = Live.GetActions();
             for (int i = 0; i < declared.Count; i++)
             {
                 if (declared[i] != null && declared[i].Button != null)

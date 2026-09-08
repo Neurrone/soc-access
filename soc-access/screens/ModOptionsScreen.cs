@@ -32,20 +32,21 @@ namespace SongsOfConquestAccess.Screens
         private const string RowsStop = "mod-options-rows";
         private const string ButtonsStop = "mod-options-buttons";
 
-        private readonly ModDialog _dialog;
-        private readonly MenuFormNodes _rows = new MenuFormNodes("mod-options");
+        /// <summary>The window this screen reads, or null when it is not open. Written by
+        /// <see cref="Open"/>: the screen is registered once and lives for the whole mod load.
+        /// </summary>
+        private ModDialog _dialog;
 
-        private ModOptionsScreen(ModDialog dialog)
-        {
-            _dialog = dialog;
-        }
+        private readonly MenuFormNodes _rows = new MenuFormNodes("mod-options");
 
         /// <summary>Draw the window and put its screen on the stack. Answers false when the options
         /// panel it copies cannot be found, which is the only way it can fail.</summary>
         public static bool Open()
         {
             ScreenManager manager = SocAccessMod.Instance != null ? SocAccessMod.Instance.ScreenManager : null;
-            if (manager == null || manager.Get<ModOptionsScreen>() != null)
+            ModOptionsScreen screen = manager == null ? null : manager.Registered<ModOptionsScreen>();
+            Screen owner = manager == null ? null : manager.Current;
+            if (screen == null || owner == null || screen.IsActive() || ReferenceEquals(owner, screen))
             {
                 return false;
             }
@@ -56,7 +57,7 @@ namespace SongsOfConquestAccess.Screens
                 return false;
             }
 
-            ModOptionsScreen screen = new ModOptionsScreen(dialog);
+            screen._dialog = dialog;
             dialog.DrawContent = screen.Draw;
             dialog.OnClose = () => screen.Close();
             for (int i = 0; i < TabLabels.Length; i++)
@@ -65,7 +66,9 @@ namespace SongsOfConquestAccess.Screens
             }
 
             dialog.Select(0);
-            manager.Push(screen, "mod options opened");
+            // A CHILD of the page it was opened from: nothing in the game says the window is up, and
+            // the page underneath keeps its own cursor while it is.
+            owner.PushChild(screen);
             return true;
         }
 
@@ -86,7 +89,7 @@ namespace SongsOfConquestAccess.Screens
             get { return TabsStop; }
         }
 
-        public override bool IsPresent()
+        public override bool IsActive()
         {
             return _dialog != null && _dialog.IsOpen;
         }
@@ -104,14 +107,38 @@ namespace SongsOfConquestAccess.Screens
 
         public bool Close()
         {
-            _dialog.Close();
-            ScreenManager manager = SocAccessMod.Instance != null ? SocAccessMod.Instance.ScreenManager : null;
-            return manager != null && manager.Pop<ModOptionsScreen>("mod options closed");
+            ModDialog dialog = _dialog;
+            _dialog = null;
+            if (dialog != null)
+            {
+                dialog.Close();
+            }
+
+            CloseSelf();
+            return dialog != null;
+        }
+
+        /// <summary>Above every page it can be opened from and below the drop list its own combo boxes
+        /// open. Read only by the dev server: a child screen is not polled.</summary>
+        public override int Layer
+        {
+            get { return 50; }
+        }
+
+        /// <summary>The game took the window away underneath (the page it was drawn over closed), so
+        /// the screen goes with it. A child is not polled; it asks for itself.</summary>
+        public override void OnUpdate()
+        {
+            base.OnUpdate();
+            if (!IsActive())
+            {
+                CloseSelf();
+            }
         }
 
         public override void Build(GraphBuilder builder)
         {
-            if (!IsPresent())
+            if (!IsActive())
             {
                 return;
             }

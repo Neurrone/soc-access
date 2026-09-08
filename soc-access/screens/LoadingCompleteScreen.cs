@@ -28,14 +28,12 @@ namespace SongsOfConquestAccess.Screens
     /// key" true of every other key. Type-ahead is therefore OFF - a letter here is one of the keys
     /// the game is waiting for - and Escape is left alone for the same reason.
     /// </summary>
-    public sealed class LoadingCompleteScreen : GraphScreen
+    public sealed class LoadingCompleteScreen : LiveScreen<LoadingScreenAdapter>
     {
         private const string RowsStop = "loading-complete";
 
         private static readonly PropertyInfo InstallerContainerProperty =
             AccessTools.Property(typeof(LoadingScreenMenuInstaller), "Container");
-
-        private readonly LoadingScreenAdapter _adapter;
 
         // A subject of its own for each row, because the reconciler seats the cursor by SUBJECT before
         // it looks at the structural key and the two rows would otherwise collapse onto one another
@@ -43,12 +41,14 @@ namespace SongsOfConquestAccess.Screens
         private readonly object _tipKey = new object();
         private readonly object _promptKey = new object();
 
-        public LoadingCompleteScreen(LoadingScreenAdapter adapter)
+        /// <summary>After a hot reload: point the slot at the menu already showing.
+        /// Scanned once, from <c>ScreenDetector.RecoverRuntimeState</c>.</summary>
+        public static void Recover()
         {
-            _adapter = adapter;
+            Recovered<LoadingCompleteScreen>(FindActive());
         }
 
-        public static Screen TryBuildActiveScreen()
+        public static LoadingScreenAdapter FindActive()
         {
             LoadingScreenMenuInstaller[] installers = Resources.FindObjectsOfTypeAll<LoadingScreenMenuInstaller>();
             for (int i = 0; i < installers.Length; i++)
@@ -63,7 +63,7 @@ namespace SongsOfConquestAccess.Screens
                 LoadingScreenAdapter adapter = new LoadingScreenAdapter(menu);
                 if (adapter.IsPresent())
                 {
-                    return new LoadingCompleteScreen(adapter);
+                    return (adapter);
                 }
             }
 
@@ -72,7 +72,7 @@ namespace SongsOfConquestAccess.Screens
 
         public LoadingScreenAdapter Adapter
         {
-            get { return _adapter; }
+            get { return Live; }
         }
 
         public override string Key
@@ -80,9 +80,15 @@ namespace SongsOfConquestAccess.Screens
             get { return "loading-complete"; }
         }
 
-        public override bool IsPresent()
+        /// <summary>Layer 1000: nothing can be worked while the game is loading.</summary>
+        public override int Layer
         {
-            return _adapter != null && _adapter.IsPresent();
+            get { return 1000; }
+        }
+
+        public override bool IsActive()
+        {
+            return Live != null && Live.IsPresent();
         }
 
         /// <summary>Off: the page is waiting for any key, and a letter that started a search here
@@ -94,7 +100,7 @@ namespace SongsOfConquestAccess.Screens
 
         public override void Build(GraphBuilder builder)
         {
-            if (!IsPresent())
+            if (!IsActive())
             {
                 return;
             }
@@ -102,19 +108,19 @@ namespace SongsOfConquestAccess.Screens
             builder.BeginStop(RowsStop);
             ControlId start = null;
 
-            string tip = _adapter.TipText;
+            string tip = Live.TipText;
             if (!string.IsNullOrWhiteSpace(tip))
             {
-                ControlId tipId = ControlId.For(_adapter.TipLabel ?? _tipKey, "loading:tip");
-                builder.AddItem(Row(tipId, GraphNodes.Paragraphs(() => _adapter.TipLines), _adapter.TipLabel));
+                ControlId tipId = ControlId.For(Live.TipLabel ?? _tipKey, "loading:tip");
+                builder.AddItem(Row(tipId, GraphNodes.Paragraphs(() => Live.TipLines), Live.TipLabel));
                 start = tipId;
             }
 
             NodeVtable prompt = GraphNodes.Button(
-                () => _adapter.PromptText,
-                () => _adapter.Continue());
-            ControlId promptId = ControlId.For(_adapter.PromptLabel ?? _promptKey, "loading:continue");
-            builder.AddItem(Row(promptId, prompt, _adapter.PromptLabel));
+                () => Live.PromptText,
+                () => Live.Continue());
+            ControlId promptId = ControlId.For(Live.PromptLabel ?? _promptKey, "loading:continue");
+            builder.AddItem(Row(promptId, prompt, Live.PromptLabel));
             if (start == null)
             {
                 start = promptId;

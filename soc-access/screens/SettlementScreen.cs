@@ -37,7 +37,7 @@ namespace SongsOfConquestAccess.Screens
     /// The menu writes no title over the page other than the building's name and, on a banner over
     /// the wielder's portrait, whatever the place is called, so the screen is named after both.
     /// </summary>
-    public sealed class SettlementScreen : GraphScreen
+    public sealed class SettlementScreen : LiveScreen<TownInteractionMenuAdapter>
     {
         private const string TutorialStop = "settlement-tutorial";
         private const string WielderStop = "settlement-wielder";
@@ -49,14 +49,14 @@ namespace SongsOfConquestAccess.Screens
         private const string WielderKey = "settlement:wielder";
         private const string SettlementArmyKey = "settlement:army";
 
-        private readonly TownInteractionMenuAdapter _adapter;
-
-        public SettlementScreen(TownInteractionMenuAdapter adapter)
+        /// <summary>After a hot reload: point the slot at the menu already showing.
+        /// Scanned once, from <c>ScreenDetector.RecoverRuntimeState</c>.</summary>
+        public static void Recover()
         {
-            _adapter = adapter;
+            Recovered<SettlementScreen>(FindActive());
         }
 
-        public static Screen TryBuildActiveScreen()
+        public static TownInteractionMenuAdapter FindActive()
         {
             TownInteractionMenu[] menus = Resources.FindObjectsOfTypeAll<TownInteractionMenu>();
             for (int i = 0; i < menus.Length; i++)
@@ -64,7 +64,7 @@ namespace SongsOfConquestAccess.Screens
                 TownInteractionMenuAdapter adapter = new TownInteractionMenuAdapter(menus[i]);
                 if (adapter.IsTopLevelPresent())
                 {
-                    return new SettlementScreen(adapter);
+                    return (adapter);
                 }
             }
 
@@ -76,19 +76,25 @@ namespace SongsOfConquestAccess.Screens
             get { return "settlement"; }
         }
 
+        /// <summary>Layer 20: the settlement landing page, under its own sub-pages.</summary>
+        public override int Layer
+        {
+            get { return 20; }
+        }
+
         /// <summary>The building the menu names at the top, and the name this particular place has
         /// where it has one of its own.</summary>
         public override string ScreenName
         {
             get
             {
-                if (_adapter == null)
+                if (Live == null)
                 {
                     return null;
                 }
 
-                string building = _adapter.Title;
-                string custom = _adapter.IsCustomNameVisible ? _adapter.CustomName : null;
+                string building = Live.Title;
+                string custom = Live.IsCustomNameVisible ? Live.CustomName : null;
                 if (string.IsNullOrWhiteSpace(custom) || SameText(building, custom))
                 {
                     return string.IsNullOrWhiteSpace(building) ? null : building;
@@ -100,33 +106,39 @@ namespace SongsOfConquestAccess.Screens
             }
         }
 
-        public override bool IsPresent()
+        /// <summary>A dialog or a sub-page covers the settlement rather than closing it, and the cursor comes back to the control that opened it.</summary>
+        public override bool KeepStateOnPop
         {
-            return _adapter != null && _adapter.IsTopLevelPresent();
+            get { return true; }
+        }
+
+        public override bool IsActive()
+        {
+            return Live != null && Live.IsTopLevelPresent();
         }
 
         public override void Build(GraphBuilder builder)
         {
-            if (!IsPresent())
+            if (!IsActive())
             {
                 return;
             }
 
             BuildTutorial(builder);
-            TroopHudRows.WielderStop(builder, WielderStop, WielderKey, _adapter.Wielder);
+            TroopHudRows.WielderStop(builder, WielderStop, WielderKey, Live.Wielder);
             BuildStoredWielder(builder);
 
             builder.BeginStop(PageStop);
             BuildDraft(builder);
             BuildUpgrade(builder);
-            SettlementNodes.WielderBand(builder, KeyPrefix, _adapter.DefendingWielder);
+            SettlementNodes.WielderBand(builder, KeyPrefix, Live.DefendingWielder);
             BuildSettlementTroops(builder);
             SettlementNodes.SlotBands(
                 builder,
                 KeyPrefix,
-                _adapter.TroopsPanel,
-                _adapter.GetGarrisonSlots(),
-                _adapter.GetBallistaSlots());
+                Live.TroopsPanel,
+                Live.GetGarrisonSlots(),
+                Live.GetBallistaSlots());
 
             builder.BeginStop(CloseStop);
             BuildClose(builder);
@@ -152,14 +164,14 @@ namespace SongsOfConquestAccess.Screens
         {
             get
             {
-                WielderInteract wielder = _adapter == null ? null : _adapter.Wielder;
+                WielderInteract wielder = Live == null ? null : Live.Wielder;
                 return wielder == null ? null : wielder.Troops;
             }
         }
 
         private TroopHudAdapter SettlementTroops
         {
-            get { return _adapter == null ? null : _adapter.SettlementTroops; }
+            get { return Live == null ? null : Live.SettlementTroops; }
         }
 
         // ---- the tutorial ----
@@ -171,7 +183,7 @@ namespace SongsOfConquestAccess.Screens
         /// as it is on the defence menu.</summary>
         private void BuildStoredWielder(GraphBuilder builder)
         {
-            DefencePanelWielderAdapter panel = _adapter.DefendingWielder;
+            DefencePanelWielderAdapter panel = Live.DefendingWielder;
             if (panel == null || !panel.IsStoredWielderVisible)
             {
                 return;
@@ -192,14 +204,14 @@ namespace SongsOfConquestAccess.Screens
         {
             get
             {
-                DefencePanelWielderAdapter panel = _adapter == null ? null : _adapter.DefendingWielder;
+                DefencePanelWielderAdapter panel = Live == null ? null : Live.DefendingWielder;
                 return panel == null || !panel.IsStoredWielderVisible ? null : panel.Troops;
             }
         }
 
         private void BuildTutorial(GraphBuilder builder)
         {
-            if (!_adapter.IsTutorialButtonVisible())
+            if (!Live.IsTutorialButtonVisible())
             {
                 return;
             }
@@ -207,10 +219,10 @@ namespace SongsOfConquestAccess.Screens
             builder.BeginStop(TutorialStop);
             SettlementNodes.Button(
                 builder,
-                _adapter.TutorialButton,
+                Live.TutorialButton,
                 "settlement:tutorial",
-                () => _adapter.GetTutorialButtonLabel(),
-                () => _adapter.ActivateTutorial(),
+                () => Live.GetTutorialButtonLabel(),
+                () => Live.ActivateTutorial(),
                 null,
                 null,
                 null);
@@ -222,19 +234,19 @@ namespace SongsOfConquestAccess.Screens
         /// drafting here would do, or the game's own reason there is nothing to draft.</summary>
         private void BuildDraft(GraphBuilder builder)
         {
-            Component button = _adapter.DraftButton;
+            Component button = Live.DraftButton;
             if (button == null)
             {
                 return;
             }
 
             NodeVtable vtable = GraphNodes.Button(
-                () => _adapter.DraftLabel,
-                () => _adapter.ActivateDraft(),
-                _adapter.IsDraftEnabled,
-                _adapter.DraftTooltip);
-            vtable.Announcements.Add(GraphNodes.ValuePart(() => _adapter.DraftDescription));
-            vtable.OnFocusVisual = () => _adapter.FocusDraft();
+                () => Live.DraftLabel,
+                () => Live.ActivateDraft(),
+                Live.IsDraftEnabled,
+                Live.DraftTooltip);
+            vtable.Announcements.Add(GraphNodes.ValuePart(() => Live.DraftDescription));
+            vtable.OnFocusVisual = () => Live.FocusDraft();
             builder.AddItem(new DrawnNode(ControlId.For(button, "settlement:draft"), vtable, button));
         }
 
@@ -242,20 +254,20 @@ namespace SongsOfConquestAccess.Screens
         /// something can be upgraded. The game turns the button off when nothing can be.</summary>
         private void BuildUpgrade(GraphBuilder builder)
         {
-            Component button = _adapter.UpgradeButton;
+            Component button = Live.UpgradeButton;
             if (button == null)
             {
                 return;
             }
 
             NodeVtable vtable = GraphNodes.Button(
-                () => _adapter.UpgradeLabel,
-                () => _adapter.ActivateUpgrade(),
-                _adapter.IsUpgradeEnabled,
-                _adapter.UpgradeTooltip);
-            vtable.Announcements.Add(GraphNodes.ValuePart(() => _adapter.UpgradeDescription));
-            vtable.Announcements.Add(GraphNodes.ValuePart(() => _adapter.UpgradesAvailableNumber));
-            vtable.OnFocusVisual = () => _adapter.FocusUpgrade();
+                () => Live.UpgradeLabel,
+                () => Live.ActivateUpgrade(),
+                Live.IsUpgradeEnabled,
+                Live.UpgradeTooltip);
+            vtable.Announcements.Add(GraphNodes.ValuePart(() => Live.UpgradeDescription));
+            vtable.Announcements.Add(GraphNodes.ValuePart(() => Live.UpgradesAvailableNumber));
+            vtable.OnFocusVisual = () => Live.FocusUpgrade();
             builder.AddItem(new DrawnNode(ControlId.For(button, "settlement:upgrade"), vtable, button));
         }
 
@@ -271,22 +283,22 @@ namespace SongsOfConquestAccess.Screens
             TroopHudRows.Rows(builder, SettlementTroops, TroopHudRows.RowPrefix(SettlementArmyKey));
             SettlementNodes.Button(
                 builder,
-                _adapter.MoveToDefenceButton,
+                Live.MoveToDefenceButton,
                 "settlement:move-to-defence",
                 () => ModText.Get(ModStrings.Screens.MoveAllToDefence),
-                () => _adapter.ActivateMoveToDefence(),
-                _adapter.IsMoveToDefenceEnabled,
-                _adapter.MoveToDefenceTooltip,
-                _adapter.FocusMoveToDefence);
+                () => Live.ActivateMoveToDefence(),
+                Live.IsMoveToDefenceEnabled,
+                Live.MoveToDefenceTooltip,
+                Live.FocusMoveToDefence);
             SettlementNodes.Button(
                 builder,
-                _adapter.MoveToWielderButton,
+                Live.MoveToWielderButton,
                 "settlement:move-to-wielder",
                 () => ModText.Get(ModStrings.Screens.MoveAllToWielder),
-                () => _adapter.ActivateMoveToWielder(),
-                _adapter.IsMoveToWielderEnabled,
-                _adapter.MoveToWielderTooltip,
-                _adapter.FocusMoveToWielder);
+                () => Live.ActivateMoveToWielder(),
+                Live.IsMoveToWielderEnabled,
+                Live.MoveToWielderTooltip,
+                Live.FocusMoveToWielder);
 
             builder.PopContext();
             builder.SetRegion(null);
@@ -298,7 +310,7 @@ namespace SongsOfConquestAccess.Screens
         /// (<c>WielderInteractHeader.OnCloseButtonClicked</c>).</summary>
         private void BuildClose(GraphBuilder builder)
         {
-            WielderInteract wielder = _adapter.Wielder;
+            WielderInteract wielder = Live.Wielder;
             Component close = wielder == null ? null : wielder.CloseButton;
             if (close == null || !wielder.IsCloseVisible)
             {

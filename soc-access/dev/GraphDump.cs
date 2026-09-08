@@ -12,9 +12,7 @@ using Screen = SongsOfConquestAccess.Screens.Screen;
 namespace SongsOfConquestAccess.Dev
 {
     /// <summary>
-    /// The focused graph screen's whole accessible tree, as text, in the grammar <see cref="WidgetDump"/>
-    /// emits for widget screens (docs/dev-loop.md section 2a) so the migration diff of one against
-    /// the other is a sort and a diff.
+    /// A graph screen's whole accessible tree, as text (docs/dev-loop.md section 2a).
     ///
     /// Two properties make it trustworthy, and both are structural: it reads like navigation sounds
     /// (the render comes from <see cref="GraphNavigator.InspectRender"/>, the same build navigation
@@ -32,34 +30,82 @@ namespace SongsOfConquestAccess.Dev
 
         private static readonly GraphDir[] Dirs = { GraphDir.Up, GraphDir.Down, GraphDir.Left, GraphDir.Right };
 
-        /// <summary>Whether the focused screen is one this dump reads - what <c>/gui/tree</c> asks
-        /// before choosing between the two dumps.</summary>
+        /// <summary>Whether there is a graph screen to dump - what <c>POST /type</c> asks before it
+        /// types into the focused screen's search.</summary>
         public static bool Fits(ScreenManager screens)
         {
-            return screens != null && screens.CurrentScreen is GraphScreen;
+            return screens != null && screens.Current is GraphScreen;
+        }
+
+        /// <summary>The first line of every dump: the focused screen and the stack it sits on, with a
+        /// child screen written as <c>Parent+Child</c>.</summary>
+        public static string Header(ScreenManager screens)
+        {
+            Screen top = screens == null ? null : screens.Current;
+            if (top == null)
+            {
+                return "screen: none | stack: (empty)";
+            }
+
+            StringBuilder text = new StringBuilder();
+            text.Append("screen: ").Append(top.GetType().Name).Append(" | stack: ");
+            IReadOnlyList<Screen> stack = screens.Stack;
+            for (int i = 0; i < stack.Count; i++)
+            {
+                if (i > 0)
+                {
+                    text.Append(" > ");
+                }
+
+                text.Append(stack[i].GetType().Name);
+                for (Screen child = stack[i].ActiveChild; child != null; child = child.ActiveChild)
+                {
+                    text.Append("+").Append(child.GetType().Name);
+                }
+            }
+
+            return text.ToString();
         }
 
         public static string Dump(ScreenManager screens, bool buffers, bool flat, bool edges)
         {
+            return Dump(screens, null, buffers, flat, edges);
+        }
+
+        /// <summary>
+        /// One screen's render as text. With no <paramref name="named"/> screen this is the focused
+        /// one, read through the navigator's own state so the dump shows the cursor where it stands;
+        /// with one, that registered screen is built over a THROWAWAY state, so a screen nobody is on
+        /// can be read without moving anything.
+        /// </summary>
+        public static string Dump(ScreenManager screens, GraphScreen named, bool buffers, bool flat, bool edges)
+        {
             Sink sink = new Sink();
-            Screen top = screens == null ? null : screens.CurrentScreen;
-            sink.Line(WidgetDump.Header(screens));
-            GraphScreen screen = top as GraphScreen;
+            Screen top = screens == null ? null : screens.Current;
+            sink.Line(Header(screens));
+            GraphScreen screen = named ?? top as GraphScreen;
             if (screen == null)
             {
-                sink.Line(top == null
-                    ? "(no screen is focused)"
-                    : "(" + top.GetType().Name + " is a widget screen: read it with /gui/widgets)");
+                sink.Line("(no screen is focused)");
                 return sink.ToString();
+            }
+
+            if (named != null)
+            {
+                sink.Line("dumping: "
+                    + named.Key
+                    + (ReferenceEquals(named, top) ? " (the focused screen)" : " (not the focused screen)"));
             }
 
             GraphNavigator navigator = screen.Navigator;
             GraphRender render = null;
             try
             {
-                render = navigator == null || !ReferenceEquals(navigator.Screen, screen)
+                render = navigator == null
                     ? null
-                    : navigator.InspectRender();
+                    : ReferenceEquals(navigator.Screen, screen)
+                        ? navigator.InspectRender()
+                        : navigator.InspectRender(screen);
             }
             catch (Exception e)
             {
@@ -78,7 +124,12 @@ namespace SongsOfConquestAccess.Dev
             }
             else
             {
-                WriteTree(sink, render, navigator.FocusedKey, buffers, edges);
+                WriteTree(
+                    sink,
+                    render,
+                    ReferenceEquals(navigator.Screen, screen) ? navigator.FocusedKey : null,
+                    buffers,
+                    edges);
             }
 
             return sink.ToString();

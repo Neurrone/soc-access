@@ -27,22 +27,22 @@ namespace SongsOfConquestAccess.Screens
     /// 2026-09-06 in `decompiled/Lavapotion.SongsOfConquest.UILayer.Runtime/`), so Escape would do
     /// nothing here; the screen claims it and presses the drawn Back button.
     /// </summary>
-    public sealed class CustomCampaignSelectScreen : GraphScreen
+    public sealed class CustomCampaignSelectScreen : LiveScreen<CustomCampaignSelectAdapter>
     {
         private const string CardsStop = "custom-campaign-cards";
         private const string HeaderStop = "custom-campaign-header";
 
-        private readonly CustomCampaignSelectAdapter _adapter;
-
-        public CustomCampaignSelectScreen(CustomCampaignSelectAdapter adapter)
+        /// <summary>After a hot reload: point the slot at the menu already showing.
+        /// Scanned once, from <c>ScreenDetector.RecoverRuntimeState</c>.</summary>
+        public static void Recover()
         {
-            _adapter = adapter;
+            Recovered<CustomCampaignSelectScreen>(FindActive());
         }
 
-        public static Screen TryBuildActiveScreen()
+        public static CustomCampaignSelectAdapter FindActive()
         {
             CustomCampaignSelectAdapter adapter = new CustomCampaignSelectAdapter(null);
-            return adapter.IsPresent() ? new CustomCampaignSelectScreen(adapter) : null;
+            return adapter.IsPresent() ? (adapter) : null;
         }
 
         public override string Key
@@ -50,10 +50,16 @@ namespace SongsOfConquestAccess.Screens
             get { return "custom-campaign-select"; }
         }
 
+        /// <summary>Layer 1: a main-menu page, over the main menu.</summary>
+        public override int Layer
+        {
+            get { return 1; }
+        }
+
         /// <summary>The page's own drawn title ("Community Campaigns").</summary>
         public override string ScreenName
         {
-            get { return _adapter != null ? _adapter.GetTitle() : null; }
+            get { return Live != null ? Live.GetTitle() : null; }
         }
 
         public override object InitialFocusStop
@@ -61,41 +67,31 @@ namespace SongsOfConquestAccess.Screens
             get { return CardsStop; }
         }
 
-        public override bool IsPresent()
+        public override bool IsActive()
         {
-            return _adapter != null && _adapter.IsPresent();
+            return Live != null && Live.IsPresent();
         }
 
         /// <summary>The page hides its header band as it closes, and the cursor standing on a header
         /// button falls onto a card: that recovery is the page leaving, not a move.</summary>
         public override bool IsWorkable
         {
-            get { return _adapter != null && _adapter.BackButton != null && _adapter.BackButton.IsVisible(); }
+            get { return Live != null && Live.BackButton != null && Live.BackButton.IsVisible(); }
         }
 
         public override bool ConsumesBack
         {
-            get { return _adapter != null && _adapter.BackButton != null && _adapter.BackButton.IsVisible(); }
+            get { return Live != null && Live.BackButton != null && Live.BackButton.IsVisible(); }
         }
 
         public override bool Back()
         {
-            return _adapter != null && _adapter.BackButton != null && _adapter.BackButton.Activate();
-        }
-
-        /// <summary>
-        /// A download's progress landed on an entry. Nothing to do: the entry's status line is a
-        /// live-watched announcement part, so the navigator's own watch reads the change out while
-        /// the cursor stands on that card, which is exactly what the widget screen did by hand here.
-        /// The detector still calls this, so it stays.
-        /// </summary>
-        public void AnnounceStatusChanged(CustomCampaignEntry entry)
-        {
+            return Live != null && Live.BackButton != null && Live.BackButton.Activate();
         }
 
         public override void Build(GraphBuilder builder)
         {
-            if (!IsPresent())
+            if (!IsActive())
             {
                 return;
             }
@@ -114,8 +110,8 @@ namespace SongsOfConquestAccess.Screens
             }
 
             List<KeyValuePair<string, IMenuButtonAdapter>> header = new List<KeyValuePair<string, IMenuButtonAdapter>>(2);
-            Add(header, "custom-campaign:back", _adapter.BackButton);
-            Add(header, "custom-campaign:options", _adapter.OptionsButton);
+            Add(header, "custom-campaign:back", Live.BackButton);
+            Add(header, "custom-campaign:options", Live.OptionsButton);
             if (header.Count > 0)
             {
                 builder.BeginStop(HeaderStop);
@@ -137,7 +133,7 @@ namespace SongsOfConquestAccess.Screens
         /// </summary>
         private NodeVtable Card(CustomCampaignEntryAdapter item)
         {
-            bool isTip = ReferenceEquals(item, _adapter.DownloadTip);
+            bool isTip = ReferenceEquals(item, Live.DownloadTip);
             NodeVtable vtable = GraphNodes.Button(
                 isTip ? (System.Func<string>)item.GetActionText : item.GetTitle,
                 () => item.Activate(),
@@ -167,13 +163,13 @@ namespace SongsOfConquestAccess.Screens
         {
             List<KeyValuePair<string, CustomCampaignEntryAdapter>> band =
                 new List<KeyValuePair<string, CustomCampaignEntryAdapter>>();
-            IReadOnlyList<CustomCampaignEntryAdapter> entries = _adapter.CampaignEntries;
+            IReadOnlyList<CustomCampaignEntryAdapter> entries = Live.CampaignEntries;
             for (int i = 0; entries != null && i < entries.Count; i++)
             {
                 AddCard(band, "custom-campaign:card/" + i, entries[i]);
             }
 
-            AddCard(band, "custom-campaign:find-more", _adapter.DownloadTip);
+            AddCard(band, "custom-campaign:find-more", Live.DownloadTip);
             SortByDrawnLeft(band);
             return band;
         }

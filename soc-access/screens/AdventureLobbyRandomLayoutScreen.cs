@@ -57,7 +57,7 @@ namespace SongsOfConquestAccess.Screens
     /// <c>MapTypeMenu</c> registers any input callback at all, so the key does nothing here and the
     /// screen claims it to press the drawn Back button.
     /// </summary>
-    public sealed class AdventureLobbyRandomLayoutScreen : GraphScreen
+    public sealed class AdventureLobbyRandomLayoutScreen : LiveScreen<AdventureLobbyRandomLayoutAdapter>
     {
         private const string RowsStop = "random-layout-rows";
         private const string ButtonsStop = "random-layout-buttons";
@@ -65,22 +65,22 @@ namespace SongsOfConquestAccess.Screens
         private const string WinConditionsRegion = "random-layout-win-conditions";
         private const string LayoutRegion = "random-layout-variant";
 
-        private readonly AdventureLobbyRandomLayoutAdapter _adapter;
-
-        public AdventureLobbyRandomLayoutScreen(AdventureLobbyRandomLayoutAdapter adapter)
+        /// <summary>After a hot reload: point the slot at the menu already showing.
+        /// Scanned once, from <c>ScreenDetector.RecoverRuntimeState</c>.</summary>
+        public static void Recover()
         {
-            _adapter = adapter;
+            Recovered<AdventureLobbyRandomLayoutScreen>(FindActive());
         }
 
-        public static Screen TryBuildActiveScreen()
+        public static AdventureLobbyRandomLayoutAdapter FindActive()
         {
             AdventureLobbyRandomLayoutAdapter adapter = FindActiveRandomLayoutMenu(null);
-            return adapter != null ? new AdventureLobbyRandomLayoutScreen(adapter) : null;
+            return adapter;
         }
 
         public bool Matches(LobbyRandomMapSelectionMenu menu)
         {
-            return _adapter != null && ReferenceEquals(_adapter.SourceKey, menu);
+            return Live != null && ReferenceEquals(Live.SourceKey, menu);
         }
 
         public override string Key
@@ -88,10 +88,16 @@ namespace SongsOfConquestAccess.Screens
             get { return "random-layout"; }
         }
 
+        /// <summary>Layer 2: over the map type page that opens it.</summary>
+        public override int Layer
+        {
+            get { return 2; }
+        }
+
         /// <summary>The page's own drawn title ("Select layout").</summary>
         public override string ScreenName
         {
-            get { return _adapter != null ? _adapter.Title : null; }
+            get { return Live != null ? Live.Title : null; }
         }
 
         public override object InitialFocusStop
@@ -99,30 +105,24 @@ namespace SongsOfConquestAccess.Screens
             get { return RowsStop; }
         }
 
-        public override bool IsPresent()
+        public override bool IsActive()
         {
-            return _adapter != null && _adapter.IsPresent();
+            return Live != null && Live.IsPresent();
         }
 
         public override bool ConsumesBack
         {
-            get { return _adapter != null && _adapter.BackButton != null && _adapter.BackButton.IsVisible(); }
+            get { return Live != null && Live.BackButton != null && Live.BackButton.IsVisible(); }
         }
 
         public override bool Back()
         {
-            return _adapter != null && _adapter.BackButton != null && _adapter.BackButton.Activate();
-        }
-
-        /// <summary>Kept for the detector, which calls it whenever the selected card changes. The
-        /// graph is declared afresh on every operation, so there is nothing to rebuild.</summary>
-        public void Refresh(bool announceFocus)
-        {
+            return Live != null && Live.BackButton != null && Live.BackButton.Activate();
         }
 
         public override void Build(GraphBuilder builder)
         {
-            if (!IsPresent())
+            if (!IsActive())
             {
                 return;
             }
@@ -133,14 +133,14 @@ namespace SongsOfConquestAccess.Screens
 
             builder.BeginStop(ButtonsStop);
             // Confirm under the cards, then the header band's Back and Options.
-            AddButton(builder, "random-layout:confirm", _adapter.ConfirmButton);
-            AddButton(builder, "random-layout:back", _adapter.BackButton);
-            AddButton(builder, "random-layout:options", _adapter.OptionsButton);
+            AddButton(builder, "random-layout:confirm", Live.ConfirmButton);
+            AddButton(builder, "random-layout:back", Live.BackButton);
+            AddButton(builder, "random-layout:options", Live.OptionsButton);
         }
 
         private void BuildLayouts(GraphBuilder builder)
         {
-            IReadOnlyList<AdventureLobbyRandomLayoutAdapter.RandomLayoutItem> layouts = _adapter.GetLayouts();
+            IReadOnlyList<AdventureLobbyRandomLayoutAdapter.RandomLayoutItem> layouts = Live.GetLayouts();
             ControlId landing = null;
             builder.PushContext(GameText.Get("Common/Players", "Players"));
             builder.SetRegion(PlayersRegion);
@@ -183,7 +183,7 @@ namespace SongsOfConquestAccess.Screens
 
         private void BuildSelectedLayoutSettings(GraphBuilder builder)
         {
-            AdventureLobbyRandomLayoutAdapter.RandomLayoutItem selected = _adapter.SelectedLayout;
+            AdventureLobbyRandomLayoutAdapter.RandomLayoutItem selected = Live.SelectedLayout;
             if (selected == null)
             {
                 return;

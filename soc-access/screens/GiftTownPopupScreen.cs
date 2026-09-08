@@ -29,20 +29,20 @@ namespace SongsOfConquestAccess.Screens
     /// ESCAPE IS THE MOD'S here and presses the drawn cross: <c>GiftTownPopup.Show</c> registers only
     /// <c>UI.Cancel</c>, the gamepad binding, so the keyboard's Escape would otherwise do nothing.
     /// </summary>
-    public sealed class GiftTownPopupScreen : GraphScreen
+    public sealed class GiftTownPopupScreen : LiveScreen<GiftTownPopupAdapter>
     {
         private const string GiftStop = "gift-town-gift";
         private const string RequestStop = "gift-town-request";
         private const string CloseStop = "gift-town-close";
 
-        private readonly GiftTownPopupAdapter _adapter;
-
-        public GiftTownPopupScreen(GiftTownPopupAdapter adapter)
+        /// <summary>After a hot reload: point the slot at the menu already showing.
+        /// Scanned once, from <c>ScreenDetector.RecoverRuntimeState</c>.</summary>
+        public static void Recover()
         {
-            _adapter = adapter;
+            Recovered<GiftTownPopupScreen>(FindActive());
         }
 
-        public static Screen TryBuildActiveScreen()
+        public static GiftTownPopupAdapter FindActive()
         {
             GiftTownPopup[] popups = Resources.FindObjectsOfTypeAll<GiftTownPopup>();
             for (int i = 0; i < popups.Length; i++)
@@ -50,7 +50,7 @@ namespace SongsOfConquestAccess.Screens
                 GiftTownPopupAdapter adapter = new GiftTownPopupAdapter(popups[i]);
                 if (adapter.IsPresent())
                 {
-                    return new GiftTownPopupScreen(adapter);
+                    return (adapter);
                 }
             }
 
@@ -62,6 +62,12 @@ namespace SongsOfConquestAccess.Screens
             get { return "gift-town-popup"; }
         }
 
+        /// <summary>Layer 21: a popup over the player menu that opens it.</summary>
+        public override int Layer
+        {
+            get { return 21; }
+        }
+
         /// <summary>None: each band's stop is named by its drawn header, and the first is what
         /// arrival lands in.</summary>
         public override string ScreenName
@@ -69,24 +75,24 @@ namespace SongsOfConquestAccess.Screens
             get { return null; }
         }
 
-        public override bool IsPresent()
+        public override bool IsActive()
         {
-            return _adapter != null && _adapter.IsPresent();
+            return Live != null && Live.IsPresent();
         }
 
         public override bool ConsumesBack
         {
-            get { return _adapter != null && _adapter.IsCloseVisible(); }
+            get { return Live != null && Live.IsCloseVisible(); }
         }
 
         public override bool Back()
         {
-            return _adapter != null && _adapter.ActivateClose();
+            return Live != null && Live.ActivateClose();
         }
 
         public override void Build(GraphBuilder builder)
         {
-            if (!IsPresent())
+            if (!IsActive())
             {
                 return;
             }
@@ -94,15 +100,15 @@ namespace SongsOfConquestAccess.Screens
             // Each band is named by the header the game draws over it, said once on entering the
             // stop (owner ruling 2026-09-07); the popup has no name of its own beyond them.
             builder.BeginStop(GiftStop);
-            builder.PushContext(_adapter.GiftHeader);
-            BuildTowns(builder, _adapter.GetGiftTowns());
+            builder.PushContext(Live.GiftHeader);
+            BuildTowns(builder, Live.GetGiftTowns());
             builder.PopContext();
 
-            if (_adapter.IsRequestMenuVisible())
+            if (Live.IsRequestMenuVisible())
             {
                 builder.BeginStop(RequestStop);
-                builder.PushContext(_adapter.RequestHeader);
-                BuildTowns(builder, _adapter.GetRequestTowns());
+                builder.PushContext(Live.RequestHeader);
+                BuildTowns(builder, Live.GetRequestTowns());
                 builder.PopContext();
             }
 
@@ -150,18 +156,18 @@ namespace SongsOfConquestAccess.Screens
 
         private void BuildClose(GraphBuilder builder)
         {
-            Component close = _adapter.CloseButton;
-            if (close == null || !_adapter.IsCloseVisible())
+            Component close = Live.CloseButton;
+            if (close == null || !Live.IsCloseVisible())
             {
                 return;
             }
 
             NodeVtable vtable = GraphNodes.Button(
                 () => ModText.Get(ModStrings.Screens.Close),
-                () => _adapter.ActivateClose(),
+                () => Live.ActivateClose(),
                 null,
-                _adapter.CloseTooltip);
-            vtable.OnFocusVisual = _adapter.FocusClose;
+                Live.CloseTooltip);
+            vtable.OnFocusVisual = Live.FocusClose;
             builder.AddItem(new DrawnNode(ControlId.For(close, "gift-town:close"), vtable, close));
         }
     }

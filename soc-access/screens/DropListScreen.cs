@@ -45,16 +45,13 @@ namespace SongsOfConquestAccess.Screens
         /// underneath makes and this screen's existence is the consequence.</summary>
         private static Request _open;
 
-        private readonly Request _request;
+        /// <summary>The list this screen is showing, or null. Written by <see cref="Open"/>: the
+        /// screen is registered once and lives for the whole mod load.</summary>
+        private Request _request;
 
         /// <summary>The frame the popup was opened on. The game needs the frame to build the list, so
         /// "the game closed it underneath us" is only a question worth asking after it.</summary>
         private int _openedFrame = -1;
-
-        public DropListScreen(Request request)
-        {
-            _request = request;
-        }
 
         /// <summary>Open <paramref name="item"/>'s list as a screen over whatever is showing.
         /// <paramref name="choose"/> is what taking an entry means, which only the page that owns the
@@ -67,9 +64,19 @@ namespace SongsOfConquestAccess.Screens
                 return;
             }
 
+            DropListScreen screen = screens.Registered<DropListScreen>();
+            Screen owner = screens.Current;
+            if (screen == null || owner == null || ReferenceEquals(owner, screen))
+            {
+                return;
+            }
+
             Request request = new Request { Item = item, Title = title, Choose = choose };
             _open = request;
-            screens.Push(new DropListScreen(request), "drop list opened");
+            screen._request = request;
+            // A CHILD of the page that opened it: nothing in the game says the list is up, and the
+            // page underneath keeps its own cursor while it is.
+            owner.PushChild(screen);
         }
 
         /// <summary>Forget any open list - the mod is going away.</summary>
@@ -90,9 +97,16 @@ namespace SongsOfConquestAccess.Screens
             get { return _request != null ? _request.Title : null; }
         }
 
+        /// <summary>Below the pause menu and the dialogs, above the pages whose settings open it. Read
+        /// only by the dev server: a child screen is not polled.</summary>
+        public override int Layer
+        {
+            get { return 60; }
+        }
+
         /// <summary>Ours while this is still the list the mod asked for and the control it belongs to
         /// is still drawn.</summary>
-        public override bool IsPresent()
+        public override bool IsActive()
         {
             return _request != null
                 && ReferenceEquals(_open, _request)
@@ -142,13 +156,16 @@ namespace SongsOfConquestAccess.Screens
             {
                 _open = null;
             }
+
+            _request = null;
+            _openedFrame = -1;
         }
 
         /// <summary>The game closing the popup underneath - a click outside it, the page going away -
         /// is the list ending, so the screen goes with it.</summary>
-        public override void Update()
+        public override void OnUpdate()
         {
-            base.Update();
+            base.OnUpdate();
             if (_request == null || _request.Item == null || _openedFrame < 0 || Time.frameCount <= _openedFrame)
             {
                 return;
@@ -164,7 +181,7 @@ namespace SongsOfConquestAccess.Screens
         public override void Build(GraphBuilder builder)
         {
             IDropList item = _request != null ? _request.Item : null;
-            if (item == null || !IsPresent())
+            if (item == null || !IsActive())
             {
                 return;
             }
@@ -222,11 +239,7 @@ namespace SongsOfConquestAccess.Screens
                 _open = null;
             }
 
-            ScreenManager screens = SocAccessMod.Instance != null ? SocAccessMod.Instance.ScreenManager : null;
-            if (screens != null)
-            {
-                screens.Pop<DropListScreen>("drop list closed");
-            }
+            CloseSelf();
         }
     }
 }

@@ -33,7 +33,7 @@ namespace SongsOfConquestAccess.Screens
     /// is called - and writes the same text in both where the place has no name of its own, so the
     /// screen says it once.
     /// </summary>
-    public sealed class DefenceMenuScreen : GraphScreen
+    public sealed class DefenceMenuScreen : LiveScreen<DefenceMenuAdapter>
     {
         private const string TutorialStop = "defences-tutorial";
         private const string WielderStop = "defences-wielder";
@@ -43,14 +43,14 @@ namespace SongsOfConquestAccess.Screens
         private const string WielderKey = "defences:wielder";
         private const string SettlementArmyKey = "defences:army";
 
-        private readonly DefenceMenuAdapter _adapter;
-
-        public DefenceMenuScreen(DefenceMenuAdapter adapter)
+        /// <summary>After a hot reload: point the slot at the menu already showing.
+        /// Scanned once, from <c>ScreenDetector.RecoverRuntimeState</c>.</summary>
+        public static void Recover()
         {
-            _adapter = adapter;
+            Recovered<DefenceMenuScreen>(FindActive());
         }
 
-        public static Screen TryBuildActiveScreen()
+        public static DefenceMenuAdapter FindActive()
         {
             DefenceMenu[] menus = Resources.FindObjectsOfTypeAll<DefenceMenu>();
             for (int i = 0; i < menus.Length; i++)
@@ -58,7 +58,7 @@ namespace SongsOfConquestAccess.Screens
                 DefenceMenuAdapter adapter = new DefenceMenuAdapter(menus[i]);
                 if (adapter.IsTopLevelPresent())
                 {
-                    return new DefenceMenuScreen(adapter);
+                    return (adapter);
                 }
             }
 
@@ -70,19 +70,25 @@ namespace SongsOfConquestAccess.Screens
             get { return "defences"; }
         }
 
+        /// <summary>Layer 20: the defence landing page, under its own sub-pages.</summary>
+        public override int Layer
+        {
+            get { return 20; }
+        }
+
         /// <summary>The title and the subtitle the menu draws over the page, said once where the game
         /// has written the same text in both.</summary>
         public override string ScreenName
         {
             get
             {
-                if (_adapter == null)
+                if (Live == null)
                 {
                     return null;
                 }
 
-                string title = _adapter.Title;
-                string subtitle = _adapter.Subtitle;
+                string title = Live.Title;
+                string subtitle = Live.Subtitle;
                 if (string.IsNullOrWhiteSpace(subtitle) || SameText(title, subtitle))
                 {
                     return string.IsNullOrWhiteSpace(title) ? null : title;
@@ -94,14 +100,20 @@ namespace SongsOfConquestAccess.Screens
             }
         }
 
-        public override bool IsPresent()
+        /// <summary>A dialog or a sub-page covers the defence menu rather than closing it, and the cursor comes back to the control that opened it.</summary>
+        public override bool KeepStateOnPop
         {
-            return _adapter != null && _adapter.IsTopLevelPresent();
+            get { return true; }
+        }
+
+        public override bool IsActive()
+        {
+            return Live != null && Live.IsTopLevelPresent();
         }
 
         public override void Build(GraphBuilder builder)
         {
-            if (!IsPresent())
+            if (!IsActive())
             {
                 return;
             }
@@ -112,15 +124,15 @@ namespace SongsOfConquestAccess.Screens
             builder.BeginStop(PageStop);
             BuildDraft(builder);
             BuildUpgrade(builder);
-            SettlementNodes.WielderBand(builder, KeyPrefix, _adapter.DefendingWielder);
+            SettlementNodes.WielderBand(builder, KeyPrefix, Live.DefendingWielder);
             BuildSettlementTroops(builder);
             BuildTowers(builder);
             SettlementNodes.SlotBands(
                 builder,
                 KeyPrefix,
-                _adapter.TroopsPanel,
-                _adapter.GetGarrisonSlots(),
-                _adapter.GetBallistaSlots());
+                Live.TroopsPanel,
+                Live.GetGarrisonSlots(),
+                Live.GetBallistaSlots());
 
             builder.BeginStop(CloseStop);
             BuildClose(builder);
@@ -144,21 +156,21 @@ namespace SongsOfConquestAccess.Screens
         {
             get
             {
-                DefencePanelWielderAdapter panel = _adapter == null ? null : _adapter.DefendingWielder;
+                DefencePanelWielderAdapter panel = Live == null ? null : Live.DefendingWielder;
                 return panel == null || !panel.IsStoredWielderVisible ? null : panel.Troops;
             }
         }
 
         private TroopHudAdapter SettlementTroops
         {
-            get { return _adapter == null ? null : _adapter.SettlementTroops; }
+            get { return Live == null ? null : Live.SettlementTroops; }
         }
 
         // ---- the tutorial ----
 
         private void BuildTutorial(GraphBuilder builder)
         {
-            if (!_adapter.IsTutorialButtonVisible())
+            if (!Live.IsTutorialButtonVisible())
             {
                 return;
             }
@@ -166,10 +178,10 @@ namespace SongsOfConquestAccess.Screens
             builder.BeginStop(TutorialStop);
             SettlementNodes.Button(
                 builder,
-                _adapter.TutorialButton,
+                Live.TutorialButton,
                 "defences:tutorial",
-                () => _adapter.GetTutorialButtonLabel(),
-                () => _adapter.ActivateTutorial(),
+                () => Live.GetTutorialButtonLabel(),
+                () => Live.ActivateTutorial(),
                 null,
                 null,
                 null);
@@ -181,7 +193,7 @@ namespace SongsOfConquestAccess.Screens
         /// naming them, then their army as carry sources and targets.</summary>
         private void BuildStoredWielder(GraphBuilder builder)
         {
-            DefencePanelWielderAdapter panel = _adapter.DefendingWielder;
+            DefencePanelWielderAdapter panel = Live.DefendingWielder;
             if (panel == null || !panel.IsStoredWielderVisible)
             {
                 return;
@@ -204,13 +216,13 @@ namespace SongsOfConquestAccess.Screens
         {
             SettlementNodes.Button(
                 builder,
-                _adapter.DraftButton,
+                Live.DraftButton,
                 "defences:draft",
-                () => _adapter.DraftLabel,
-                () => _adapter.ActivateDraft(),
-                _adapter.IsDraftEnabled,
-                _adapter.DraftTooltip,
-                _adapter.FocusDraft);
+                () => Live.DraftLabel,
+                () => Live.ActivateDraft(),
+                Live.IsDraftEnabled,
+                Live.DraftTooltip,
+                Live.FocusDraft);
         }
 
         /// <summary>The Upgrade button, which the game does not draw at all while nothing in the
@@ -219,13 +231,13 @@ namespace SongsOfConquestAccess.Screens
         {
             SettlementNodes.Button(
                 builder,
-                _adapter.UpgradeButton,
+                Live.UpgradeButton,
                 "defences:upgrade",
-                () => _adapter.UpgradeLabel,
-                () => _adapter.ActivateUpgrade(),
-                _adapter.IsUpgradeEnabled,
-                _adapter.UpgradeTooltip,
-                _adapter.FocusUpgrade);
+                () => Live.UpgradeLabel,
+                () => Live.ActivateUpgrade(),
+                Live.IsUpgradeEnabled,
+                Live.UpgradeTooltip,
+                Live.FocusUpgrade);
         }
 
         // ---- the settlement's own army ----
@@ -234,12 +246,12 @@ namespace SongsOfConquestAccess.Screens
         /// two buttons that move a whole army in or out of it.</summary>
         private void BuildSettlementTroops(GraphBuilder builder)
         {
-            if (!_adapter.IsSettlementTroopsVisible())
+            if (!Live.IsSettlementTroopsVisible())
             {
                 return;
             }
 
-            string caption = _adapter.DefendingTroopsLabel;
+            string caption = Live.DefendingTroopsLabel;
             bool named = !string.IsNullOrWhiteSpace(caption);
             if (named)
             {
@@ -250,22 +262,22 @@ namespace SongsOfConquestAccess.Screens
             TroopHudRows.Rows(builder, SettlementTroops, TroopHudRows.RowPrefix(SettlementArmyKey));
             SettlementNodes.Button(
                 builder,
-                _adapter.MoveToDefenceButton,
+                Live.MoveToDefenceButton,
                 "defences:move-to-defence",
                 () => ModText.Get(ModStrings.Screens.MoveAllToDefence),
-                () => _adapter.ActivateMoveToDefence(),
-                _adapter.IsMoveToDefenceEnabled,
-                _adapter.MoveToDefenceTooltip,
-                _adapter.FocusMoveToDefence);
+                () => Live.ActivateMoveToDefence(),
+                Live.IsMoveToDefenceEnabled,
+                Live.MoveToDefenceTooltip,
+                Live.FocusMoveToDefence);
             SettlementNodes.Button(
                 builder,
-                _adapter.MoveToWielderButton,
+                Live.MoveToWielderButton,
                 "defences:move-to-wielder",
                 () => ModText.Get(ModStrings.Screens.MoveAllToWielder),
-                () => _adapter.ActivateMoveToWielder(),
-                _adapter.IsMoveToWielderEnabled,
-                _adapter.MoveToWielderTooltip,
-                _adapter.FocusMoveToWielder);
+                () => Live.ActivateMoveToWielder(),
+                Live.IsMoveToWielderEnabled,
+                Live.MoveToWielderTooltip,
+                Live.FocusMoveToWielder);
 
             if (named)
             {
@@ -285,7 +297,7 @@ namespace SongsOfConquestAccess.Screens
             builder.PushContext(ModText.Get(ModStrings.Screens.Towers));
             builder.SetRegion("defences:towers");
 
-            IReadOnlyList<DefenceMenuAdapter.TowerItem> towers = _adapter.GetTowerItems();
+            IReadOnlyList<DefenceMenuAdapter.TowerItem> towers = Live.GetTowerItems();
             for (int i = 0; i < towers.Count; i++)
             {
                 DefenceMenuAdapter.TowerItem it = towers[i];
@@ -303,13 +315,13 @@ namespace SongsOfConquestAccess.Screens
                     source));
             }
 
-            if (_adapter.HasVisibleTowerSummary())
+            if (Live.HasVisibleTowerSummary())
             {
-                AddLine(builder, "defences:towers/summary", () => _adapter.TowerSummary);
+                AddLine(builder, "defences:towers/summary", () => Live.TowerSummary);
             }
-            else if (_adapter.HasVisibleNoTowersHelp())
+            else if (Live.HasVisibleNoTowersHelp())
             {
-                AddLine(builder, "defences:towers/help", () => _adapter.TowerInfoText);
+                AddLine(builder, "defences:towers/help", () => Live.TowerInfoText);
             }
 
             builder.PopContext();
@@ -320,8 +332,8 @@ namespace SongsOfConquestAccess.Screens
 
         private void BuildClose(GraphBuilder builder)
         {
-            Component close = _adapter.CloseButton;
-            if (close == null || !_adapter.IsCloseVisible())
+            Component close = Live.CloseButton;
+            if (close == null || !Live.IsCloseVisible())
             {
                 return;
             }
@@ -329,7 +341,7 @@ namespace SongsOfConquestAccess.Screens
             // An icon with no text of its own, so the mod names it.
             NodeVtable vtable = GraphNodes.Button(
                 () => ModText.Get(ModStrings.Screens.Close),
-                () => _adapter.ActivateClose());
+                () => Live.ActivateClose());
             vtable.OnFocusVisual = () => NativeSelectionUtility.Select(close);
             builder.AddItem(new DrawnNode(ControlId.For(close, "defences:close"), vtable, close));
         }
@@ -338,7 +350,7 @@ namespace SongsOfConquestAccess.Screens
 
         private void AddLine(GraphBuilder builder, string key, System.Func<string> text)
         {
-            Component panel = _adapter.TroopsPanel;
+            Component panel = Live.TroopsPanel;
             if (panel == null)
             {
                 return;

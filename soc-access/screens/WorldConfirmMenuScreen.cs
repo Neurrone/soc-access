@@ -29,14 +29,12 @@ namespace SongsOfConquestAccess.Screens
     /// <c>_canClose</c> false, so the game draws no close cross and answers the keyboard's Escape with
     /// nothing. The screen claims Back and presses the drawn Cancel through the game's own click.
     /// </summary>
-    public sealed class WorldConfirmMenuScreen : GraphScreen
+    public sealed class WorldConfirmMenuScreen : LiveScreen<WorldConfirmMenuAdapter>
     {
         private const string DialogStop = "world-confirm-menu";
 
         private static readonly System.Reflection.PropertyInfo InstallerContainerProperty =
             AccessTools.Property(typeof(WorldConfirmMenuInstaller), "Container");
-
-        private readonly WorldConfirmMenuAdapter _adapter;
 
         // A subject of its own for each node the menu gives no component for, so that two nodes
         // sharing one subject do not collapse onto whichever was declared first (the reconciler seats
@@ -44,12 +42,14 @@ namespace SongsOfConquestAccess.Screens
         private readonly object _headingKey = new object();
         private readonly object _bodyKey = new object();
 
-        public WorldConfirmMenuScreen(WorldConfirmMenuAdapter adapter)
+        /// <summary>After a hot reload: point the slot at the menu already showing.
+        /// Scanned once, from <c>ScreenDetector.RecoverRuntimeState</c>.</summary>
+        public static void Recover()
         {
-            _adapter = adapter;
+            Recovered<WorldConfirmMenuScreen>(FindActive());
         }
 
-        public static Screen TryBuildActiveScreen()
+        public static WorldConfirmMenuAdapter FindActive()
         {
             WorldConfirmMenuInstaller[] installers = Resources.FindObjectsOfTypeAll<WorldConfirmMenuInstaller>();
             for (int i = 0; i < installers.Length; i++)
@@ -63,7 +63,7 @@ namespace SongsOfConquestAccess.Screens
                 WorldConfirmMenuAdapter adapter = new WorldConfirmMenuAdapter(menu);
                 if (adapter.IsPresent())
                 {
-                    return new WorldConfirmMenuScreen(adapter);
+                    return (adapter);
                 }
             }
 
@@ -75,54 +75,60 @@ namespace SongsOfConquestAccess.Screens
             get { return "world-confirm-menu"; }
         }
 
+        /// <summary>Layer 31: the confirmation of a world choice, over it.</summary>
+        public override int Layer
+        {
+            get { return 31; }
+        }
+
         /// <summary>The heading the menu draws, spoken once on arrival and read again as the first
         /// node.</summary>
         public override string ScreenName
         {
             get
             {
-                string title = _adapter != null ? _adapter.Title : null;
+                string title = Live != null ? Live.Title : null;
                 return string.IsNullOrWhiteSpace(title) ? null : title;
             }
         }
 
-        public override bool IsPresent()
+        public override bool IsActive()
         {
-            return _adapter != null && _adapter.IsPresent();
+            return Live != null && Live.IsPresent();
         }
 
         public override bool ConsumesBack
         {
-            get { return _adapter != null && _adapter.CancelButton != null; }
+            get { return Live != null && Live.CancelButton != null; }
         }
 
         public override bool Back()
         {
-            return _adapter != null && _adapter.ActivateCancel();
+            return Live != null && Live.ActivateCancel();
         }
 
         public override void Build(GraphBuilder builder)
         {
-            if (!IsPresent())
+            if (!IsActive())
             {
                 return;
             }
 
             builder.BeginStop(DialogStop);
 
-            if (!string.IsNullOrWhiteSpace(_adapter.Title))
+            if (!string.IsNullOrWhiteSpace(Live.Title))
             {
                 builder.AddItem(new SyntheticNode(
                     ControlId.For(_headingKey, "world-confirm:heading"),
-                    GraphNodes.Text(() => _adapter.Title)));
+                    GraphNodes.Text(() => Live.Title)));
             }
 
-            if (!string.IsNullOrWhiteSpace(_adapter.Body))
+            if (!string.IsNullOrWhiteSpace(Live.Body))
             {
                 ControlId bodyId = ControlId.For(_bodyKey, "world-confirm:body");
                 builder.AddItem(new SyntheticNode(
                     bodyId,
-                    GraphNodes.Paragraphs(() => _adapter.BodyLines)));
+                    GraphNodes.Paragraphs(() => Live.BodyLines)));
                 // Focus starts on the body, so arrival reads the heading once as the screen name and
                 // then what the menu is actually asking.
                 builder.SetStart(bodyId);
@@ -138,7 +144,7 @@ namespace SongsOfConquestAccess.Screens
         /// list the adapter enumerates.</summary>
         private void AddCosts(GraphBuilder builder)
         {
-            IReadOnlyList<string> costs = _adapter.GetCostLabels();
+            IReadOnlyList<string> costs = Live.GetCostLabels();
             for (int i = 0; i < costs.Count; i++)
             {
                 int index = i;
@@ -150,7 +156,7 @@ namespace SongsOfConquestAccess.Screens
 
         private string CostLabel(int index)
         {
-            IReadOnlyList<string> costs = _adapter.GetCostLabels();
+            IReadOnlyList<string> costs = Live.GetCostLabels();
             return index >= 0 && index < costs.Count ? costs[index] : string.Empty;
         }
 
@@ -158,15 +164,15 @@ namespace SongsOfConquestAccess.Screens
         /// while it is drawn and only where it has wording to read.</summary>
         private void AddResourceWarning(GraphBuilder builder)
         {
-            Component warning = _adapter.ResourceWarning;
-            if (warning == null || string.IsNullOrWhiteSpace(_adapter.ResourceWarningLabel))
+            Component warning = Live.ResourceWarning;
+            if (warning == null || string.IsNullOrWhiteSpace(Live.ResourceWarningLabel))
             {
                 return;
             }
 
             builder.AddItem(new DrawnNode(
                 ControlId.For(warning, "world-confirm:resource-warning"),
-                GraphNodes.Text(() => _adapter.ResourceWarningLabel),
+                GraphNodes.Text(() => Live.ResourceWarningLabel),
                 warning));
         }
 
@@ -174,22 +180,22 @@ namespace SongsOfConquestAccess.Screens
         private void AddButtons(GraphBuilder builder)
         {
             List<DrawnButton> buttons = new List<DrawnButton>(2);
-            Component confirm = _adapter.ConfirmButton;
+            Component confirm = Live.ConfirmButton;
             if (confirm != null)
             {
                 buttons.Add(new DrawnButton(
                     confirm,
                     "world-confirm:confirm",
-                    Vtable(confirm, () => _adapter.ConfirmLabel, () => _adapter.ActivateConfirm(), _adapter.IsConfirmEnabled)));
+                    Vtable(confirm, () => Live.ConfirmLabel, () => Live.ActivateConfirm(), Live.IsConfirmEnabled)));
             }
 
-            Component cancel = _adapter.CancelButton;
+            Component cancel = Live.CancelButton;
             if (cancel != null)
             {
                 buttons.Add(new DrawnButton(
                     cancel,
                     "world-confirm:cancel",
-                    Vtable(cancel, () => _adapter.CancelLabel, () => _adapter.ActivateCancel(), null)));
+                    Vtable(cancel, () => Live.CancelLabel, () => Live.ActivateCancel(), null)));
             }
 
             if (buttons.Count == 2 && Left(buttons[1].Component) < Left(buttons[0].Component))

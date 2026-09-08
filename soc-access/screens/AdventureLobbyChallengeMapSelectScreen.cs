@@ -34,33 +34,33 @@ namespace SongsOfConquestAccess.Screens
     /// `InputActions.UI.Confirm` on its keyboard branch (decompiled, line 232) and `LobbyNavigation`
     /// registers no input callback at all, so the screen claims it and presses the drawn Back button.
     /// </summary>
-    public sealed class AdventureLobbyChallengeMapSelectScreen : GraphScreen
+    public sealed class AdventureLobbyChallengeMapSelectScreen : LiveScreen<AdventureLobbyChallengeMapSelectAdapter>
     {
         private const string TableStop = "challenge-map-table";
         private const string DetailsStop = "challenge-map-details";
         private const string ButtonsStop = "challenge-map-buttons";
         private const string SheetKey = "challenge-map:";
 
-        private readonly AdventureLobbyChallengeMapSelectAdapter _adapter;
-
         // A subject of its own for the preview line, kept across rebuilds so the reconciler seats the
         // cursor on the same node while the selection under it changes.
         private readonly object _detailsMarker = new object();
 
-        public AdventureLobbyChallengeMapSelectScreen(AdventureLobbyChallengeMapSelectAdapter adapter)
+        /// <summary>After a hot reload: point the slot at the menu already showing.
+        /// Scanned once, from <c>ScreenDetector.RecoverRuntimeState</c>.</summary>
+        public static void Recover()
         {
-            _adapter = adapter;
+            Recovered<AdventureLobbyChallengeMapSelectScreen>(FindActive());
         }
 
-        public static Screen TryBuildActiveScreen()
+        public static AdventureLobbyChallengeMapSelectAdapter FindActive()
         {
             AdventureLobbyChallengeMapSelectAdapter adapter = FindActiveChallengeMapSelectMenu(null);
-            return adapter != null ? new AdventureLobbyChallengeMapSelectScreen(adapter) : null;
+            return adapter;
         }
 
         public bool Matches(ChallengeMapsMenu menu)
         {
-            return _adapter != null && ReferenceEquals(_adapter.SourceKey, menu);
+            return Live != null && ReferenceEquals(Live.SourceKey, menu);
         }
 
         public override string Key
@@ -68,10 +68,16 @@ namespace SongsOfConquestAccess.Screens
             get { return "challenge-map-select"; }
         }
 
+        /// <summary>Layer 2: over the map type page that opens it.</summary>
+        public override int Layer
+        {
+            get { return 2; }
+        }
+
         /// <summary>The page's own drawn title ("Challenge maps").</summary>
         public override string ScreenName
         {
-            get { return _adapter != null ? _adapter.Title : null; }
+            get { return Live != null ? Live.Title : null; }
         }
 
         public override object InitialFocusStop
@@ -79,35 +85,24 @@ namespace SongsOfConquestAccess.Screens
             get { return TableStop; }
         }
 
-        public override bool IsPresent()
+        public override bool IsActive()
         {
-            return _adapter != null && _adapter.IsPresent();
+            return Live != null && Live.IsPresent();
         }
 
         public override bool ConsumesBack
         {
-            get { return _adapter != null && _adapter.BackButton != null && _adapter.BackButton.IsVisible(); }
+            get { return Live != null && Live.BackButton != null && Live.BackButton.IsVisible(); }
         }
 
         public override bool Back()
         {
-            return _adapter != null && _adapter.BackButton != null && _adapter.BackButton.Activate();
-        }
-
-        /// <summary>Kept for the detector, which calls them whenever the page or its selection
-        /// changes. The graph is declared afresh on every operation, so there is nothing to rebuild.
-        /// </summary>
-        public void Refresh()
-        {
-        }
-
-        public void Refresh(bool announceFocus)
-        {
+            return Live != null && Live.BackButton != null && Live.BackButton.Activate();
         }
 
         public override void Build(GraphBuilder builder)
         {
-            if (!IsPresent())
+            if (!IsActive())
             {
                 return;
             }
@@ -126,14 +121,14 @@ namespace SongsOfConquestAccess.Screens
         {
             string[] captions =
             {
-                _adapter.NameColumnLabel,
-                _adapter.WinConditionColumnLabel,
-                _adapter.CompletedColumnLabel
+                Live.NameColumnLabel,
+                Live.WinConditionColumnLabel,
+                Live.CompletedColumnLabel
             };
 
             GraphSheet sheet = new GraphSheet(builder, SheetKey);
-            sheet.Region(_adapter.Title, captions);
-            IReadOnlyList<AdventureLobbyChallengeMapRowAdapter> rows = _adapter.GetVisibleRows();
+            sheet.Region(Live.Title, captions);
+            IReadOnlyList<AdventureLobbyChallengeMapRowAdapter> rows = Live.GetVisibleRows();
             object selected = null;
             for (int i = 0; i < rows.Count; i++)
             {
@@ -254,7 +249,7 @@ namespace SongsOfConquestAccess.Screens
         /// on arrival and held in the review buffer one drawn line at a time.</summary>
         private void BuildDetails(GraphBuilder builder)
         {
-            AdventureLobbyChallengeMapRowAdapter selected = _adapter.SelectedRow;
+            AdventureLobbyChallengeMapRowAdapter selected = Live.SelectedRow;
             if (selected == null)
             {
                 return;
@@ -279,34 +274,34 @@ namespace SongsOfConquestAccess.Screens
 
         private string PreviewTitle()
         {
-            string title = _adapter.PreviewTitle;
+            string title = Live.PreviewTitle;
             if (!string.IsNullOrWhiteSpace(title))
             {
                 return title;
             }
 
-            AdventureLobbyChallengeMapRowAdapter selected = _adapter.SelectedRow;
+            AdventureLobbyChallengeMapRowAdapter selected = Live.SelectedRow;
             return selected != null ? selected.Name : string.Empty;
         }
 
         private string Description()
         {
-            AdventureLobbyChallengeMapRowAdapter selected = _adapter.SelectedRow;
+            AdventureLobbyChallengeMapRowAdapter selected = Live.SelectedRow;
             return selected != null ? selected.Description : string.Empty;
         }
 
         private string PreviewWinConditions()
         {
-            AdventureLobbyChallengeMapRowAdapter selected = _adapter.SelectedRow;
+            AdventureLobbyChallengeMapRowAdapter selected = Live.SelectedRow;
             return selected != null ? ModText.JoinList(selected.WinConditionLabels) : string.Empty;
         }
 
         private void BuildButtons(GraphBuilder builder)
         {
             // Back (x 21) and Options (x 1233) in the header band, then Confirm at the bottom right.
-            AddButton(builder, "challenge-map:back", _adapter.BackButton);
-            AddButton(builder, "challenge-map:options", _adapter.OptionsButton);
-            AddButton(builder, "challenge-map:confirm", _adapter.ConfirmButton);
+            AddButton(builder, "challenge-map:back", Live.BackButton);
+            AddButton(builder, "challenge-map:options", Live.OptionsButton);
+            AddButton(builder, "challenge-map:confirm", Live.ConfirmButton);
         }
 
         private static void AddButton(GraphBuilder builder, string key, IMenuButtonAdapter button)

@@ -51,7 +51,7 @@ namespace SongsOfConquestAccess.Screens
     /// and <c>LobbyNavigation</c> register no input callback at all (decompiled; the navigation only
     /// UNregisters), so the key would otherwise do nothing here.
     /// </summary>
-    public sealed class AdventureLobbyPlayersScreen : GraphScreen
+    public sealed class AdventureLobbyPlayersScreen : LiveScreen<AdventureLobbyPlayersAdapter>
     {
         private const string PlayersStop = "lobby-players";
         private const string PanelStop = "lobby-panel";
@@ -74,8 +74,6 @@ namespace SongsOfConquestAccess.Screens
         private const int ToggleAiColumn = 10;
         private const int ColumnCount = 11;
 
-        private readonly AdventureLobbyPlayersAdapter _adapter;
-
         // Subjects of their own for the lines the game gives no component for, kept across rebuilds so
         // the reconciler seats the cursor on the same line.
         private readonly Dictionary<string, object> _markers = new Dictionary<string, object>();
@@ -84,20 +82,22 @@ namespace SongsOfConquestAccess.Screens
         // held rather than asked for on every rebuild.
         private ChatAdapter _chat;
 
-        public AdventureLobbyPlayersScreen(AdventureLobbyPlayersAdapter adapter)
+        /// <summary>After a hot reload: point the slot at the menu already showing.
+        /// Scanned once, from <c>ScreenDetector.RecoverRuntimeState</c>.</summary>
+        public static void Recover()
         {
-            _adapter = adapter;
+            Recovered<AdventureLobbyPlayersScreen>(FindActive());
         }
 
-        public static Screen TryBuildActiveScreen()
+        public static AdventureLobbyPlayersAdapter FindActive()
         {
             AdventureLobbyPlayersAdapter adapter = FindActiveLobbyMenu(null);
-            return adapter != null ? new AdventureLobbyPlayersScreen(adapter) : null;
+            return adapter;
         }
 
         public bool Matches(LobbyMenu menu)
         {
-            return _adapter != null && ReferenceEquals(_adapter.SourceKey, menu);
+            return Live != null && ReferenceEquals(Live.SourceKey, menu);
         }
 
         public override string Key
@@ -105,10 +105,16 @@ namespace SongsOfConquestAccess.Screens
             get { return "lobby-players"; }
         }
 
+        /// <summary>Layer 4: the lobby proper, over the map pages it was reached through.</summary>
+        public override int Layer
+        {
+            get { return 4; }
+        }
+
         /// <summary>The header band's drawn title ("Conquest", "Online Conquest").</summary>
         public override string ScreenName
         {
-            get { return _adapter != null ? _adapter.Title : null; }
+            get { return Live != null ? Live.Title : null; }
         }
 
         /// <summary>The slots, which are what the page is about.</summary>
@@ -117,24 +123,24 @@ namespace SongsOfConquestAccess.Screens
             get { return PlayersStop; }
         }
 
-        public override bool IsPresent()
+        public override bool IsActive()
         {
-            return _adapter != null && _adapter.IsPresent();
+            return Live != null && Live.IsPresent();
         }
 
         public override bool IsWorkable
         {
-            get { return _adapter != null && _adapter.IsInteractive(); }
+            get { return Live != null && Live.IsInteractive(); }
         }
 
         public override bool ConsumesBack
         {
-            get { return _adapter != null && _adapter.BackButton != null && _adapter.BackButton.IsVisible(); }
+            get { return Live != null && Live.BackButton != null && Live.BackButton.IsVisible(); }
         }
 
         public override bool Back()
         {
-            return _adapter != null && _adapter.BackButton != null && _adapter.BackButton.Activate();
+            return Live != null && Live.BackButton != null && Live.BackButton.Activate();
         }
 
         /// <summary>Called by the detector whenever the lobby changes. The graph is declared afresh on
@@ -142,15 +148,15 @@ namespace SongsOfConquestAccess.Screens
         /// cached because enumerating them walks the scene.</summary>
         public void Refresh()
         {
-            if (_adapter != null)
+            if (Live != null)
             {
-                _adapter.InvalidateSnapshot();
+                Live.InvalidateSnapshot();
             }
         }
 
         public override void Build(GraphBuilder builder)
         {
-            if (!IsPresent())
+            if (!IsActive())
             {
                 return;
             }
@@ -173,9 +179,9 @@ namespace SongsOfConquestAccess.Screens
             // The columns are all caption-less: the page draws no heading band, and every cell of a
             // row is a control that says its own name, so a caption crossed into the column would be
             // the same word twice. The array's LENGTH is what makes the region read as a table.
-            sheet.Region(_adapter.PlayersLabel, new string[ColumnCount]);
+            sheet.Region(Live.PlayersLabel, new string[ColumnCount]);
 
-            IReadOnlyList<AdventureLobbyPlayersAdapter.PlayerSlotItem> slots = _adapter.GetPlayerSlots();
+            IReadOnlyList<AdventureLobbyPlayersAdapter.PlayerSlotItem> slots = Live.GetPlayerSlots();
             for (int i = 0; i < slots.Count; i++)
             {
                 AdventureLobbyPlayersAdapter.PlayerSlotItem slot = slots[i];
@@ -232,11 +238,11 @@ namespace SongsOfConquestAccess.Screens
         private List<GraphSheet.SheetCell> Cells(AdventureLobbyPlayersAdapter.PlayerSlotItem slot)
         {
             List<GraphSheet.SheetCell> cells = new List<GraphSheet.SheetCell>();
-            AddSetting(cells, slot, FactionColumn, _adapter.FactionLabel, slot.FactionButton);
-            AddSetting(cells, slot, ColorColumn, _adapter.ColorLabel, slot.ColorButton);
-            AddSetting(cells, slot, StartingWielderColumn, _adapter.StartingWielderLabel, slot.StartingWielderButton);
-            AddSetting(cells, slot, PartnershipColumn, _adapter.PartnershipLabel, slot.PartnershipButton);
-            AddSetting(cells, slot, AiDifficultyColumn, _adapter.AiDifficultyLabel, slot.AiDifficultyButton);
+            AddSetting(cells, slot, FactionColumn, Live.FactionLabel, slot.FactionButton);
+            AddSetting(cells, slot, ColorColumn, Live.ColorLabel, slot.ColorButton);
+            AddSetting(cells, slot, StartingWielderColumn, Live.StartingWielderLabel, slot.StartingWielderButton);
+            AddSetting(cells, slot, PartnershipColumn, Live.PartnershipLabel, slot.PartnershipButton);
+            AddSetting(cells, slot, AiDifficultyColumn, Live.AiDifficultyLabel, slot.AiDifficultyButton);
 
             List<GraphSheet.SheetCell> actions = new List<GraphSheet.SheetCell>();
             List<float> lefts = new List<float>();
@@ -321,9 +327,9 @@ namespace SongsOfConquestAccess.Screens
             AddMapPreview(builder);
             AddMixedFactions(builder);
             AddGameSettings(builder);
-            AddLobbyButton(builder, "lobby:set-ready", _adapter.GetSetReadyButton());
-            AddLobbyButton(builder, "lobby:set-not-ready", _adapter.GetSetNotReadyButton());
-            AddLobbyButton(builder, "lobby:start-game", _adapter.GetStartGameButton());
+            AddLobbyButton(builder, "lobby:set-ready", Live.GetSetReadyButton());
+            AddLobbyButton(builder, "lobby:set-not-ready", Live.GetSetNotReadyButton());
+            AddLobbyButton(builder, "lobby:start-game", Live.GetStartGameButton());
             AddChatButton(builder);
         }
 
@@ -334,7 +340,7 @@ namespace SongsOfConquestAccess.Screens
         /// </summary>
         private void AddMultiplayerBand(GraphBuilder builder)
         {
-            AdventureLobbyPlayersAdapter.MultiplayerPanelItem panel = _adapter.GetMultiplayerPanel();
+            AdventureLobbyPlayersAdapter.MultiplayerPanelItem panel = Live.GetMultiplayerPanel();
             if (panel == null)
             {
                 return;
@@ -393,7 +399,7 @@ namespace SongsOfConquestAccess.Screens
         /// drawn line at a time.</summary>
         private void AddMapPreview(GraphBuilder builder)
         {
-            if (string.IsNullOrWhiteSpace(_adapter.MapTitle) && string.IsNullOrWhiteSpace(_adapter.MapDescription))
+            if (string.IsNullOrWhiteSpace(Live.MapTitle) && string.IsNullOrWhiteSpace(Live.MapDescription))
             {
                 return;
             }
@@ -403,11 +409,11 @@ namespace SongsOfConquestAccess.Screens
                 ControlType = ControlTypes.Text,
                 Announcements = new List<NodeAnnouncement>
                 {
-                    new NodeAnnouncement(() => _adapter.MapTitle, live: true, kind: AnnouncementKinds.Label),
+                    new NodeAnnouncement(() => Live.MapTitle, live: true, kind: AnnouncementKinds.Label),
                 },
                 Sections = new List<NodeSection>
                 {
-                    NodeSection.Composed(() => SpokenLines.Of(new[] { _adapter.MapDescription })),
+                    NodeSection.Composed(() => SpokenLines.Of(new[] { Live.MapDescription })),
                 },
             };
             builder.AddItem(new SyntheticNode(
@@ -417,7 +423,7 @@ namespace SongsOfConquestAccess.Screens
 
         private void AddMixedFactions(GraphBuilder builder)
         {
-            AdventureLobbyPlayersAdapter.MixedFactionsItem item = _adapter.GetMixedFactionsItem();
+            AdventureLobbyPlayersAdapter.MixedFactionsItem item = Live.GetMixedFactionsItem();
             if (item == null || !item.IsVisible)
             {
                 return;
@@ -437,7 +443,7 @@ namespace SongsOfConquestAccess.Screens
 
         private void AddGameSettings(GraphBuilder builder)
         {
-            AdventureLobbyPlayersAdapter.LobbyPlayerSettingsItem item = _adapter.GetSettingsItem();
+            AdventureLobbyPlayersAdapter.LobbyPlayerSettingsItem item = Live.GetSettingsItem();
             if (item == null || !item.IsVisible)
             {
                 return;
@@ -555,8 +561,8 @@ namespace SongsOfConquestAccess.Screens
         private void BuildHeader(GraphBuilder builder)
         {
             // Back (x 21) then Options (x 1233), left to right.
-            AddHeaderButton(builder, "lobby:back", _adapter.BackButton);
-            AddHeaderButton(builder, "lobby:options", _adapter.OptionsButton);
+            AddHeaderButton(builder, "lobby:back", Live.BackButton);
+            AddHeaderButton(builder, "lobby:options", Live.OptionsButton);
         }
 
         private void AddHeaderButton(GraphBuilder builder, string key, IMenuButtonAdapter button)
@@ -571,7 +577,7 @@ namespace SongsOfConquestAccess.Screens
                 it.GetLabel,
                 () => it.Activate(),
                 it.IsEnabled,
-                _adapter.GetButtonTooltip(it));
+                Live.GetButtonTooltip(it));
             vtable.OnFocusVisual = () => NativeSelectionUtility.Select(it.Button);
             builder.AddItem(new DrawnNode(ControlId.For(it.Button, key), vtable, it.Button));
         }

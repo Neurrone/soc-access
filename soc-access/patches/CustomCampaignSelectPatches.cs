@@ -23,13 +23,6 @@ namespace SongsOfConquestAccess
             SocAccessMod.Instance?.ScreenDetector?.OnCustomCampaignSelectClosed(__instance);
         }
 
-        [HarmonyPatch(typeof(CustomCampaignEntry), "HandleStatusChanged")]
-        [HarmonyPostfix]
-        private static void CustomCampaignEntryHandleStatusChangedPostfix(CustomCampaignEntry __instance)
-        {
-            SocAccessMod.Instance?.ScreenDetector?.OnCustomCampaignEntryStatusChanged(__instance);
-        }
-
         private static async UniTask WaitForCustomCampaignSelectRepopulate(
             CustomCampaignSelectMenuBehavior behavior,
             UniTask original)

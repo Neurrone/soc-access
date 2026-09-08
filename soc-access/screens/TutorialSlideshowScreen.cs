@@ -35,20 +35,20 @@ namespace SongsOfConquestAccess.Screens
     /// ESCAPE is the game's: <c>TutorialMenu.Open</c> registers <c>UI.ExitMenu</c> on <c>Close</c>
     /// unconditionally, so the key closes the panel from any page.
     /// </summary>
-    public sealed class TutorialSlideshowScreen : GraphScreen
+    public sealed class TutorialSlideshowScreen : LiveScreen<TutorialSlideshowAdapter>
     {
         private const string PagesStop = "tutorial-slideshow:pages";
         private const string ControlsStop = "tutorial-slideshow:controls";
         private const string PageKey = "tutorial:page/";
 
-        private readonly TutorialSlideshowAdapter _adapter;
-
-        public TutorialSlideshowScreen(TutorialSlideshowAdapter adapter)
+        /// <summary>After a hot reload: point the slot at the menu already showing.
+        /// Scanned once, from <c>ScreenDetector.RecoverRuntimeState</c>.</summary>
+        public static void Recover()
         {
-            _adapter = adapter;
+            Recovered<TutorialSlideshowScreen>(FindActive());
         }
 
-        public static Screen TryBuildActiveScreen()
+        public static TutorialSlideshowAdapter FindActive()
         {
             TutorialMenu[] menus = Resources.FindObjectsOfTypeAll<TutorialMenu>();
             for (int i = 0; i < menus.Length; i++)
@@ -62,7 +62,7 @@ namespace SongsOfConquestAccess.Screens
                 TutorialSlideshowAdapter adapter = new TutorialSlideshowAdapter(menu);
                 if (adapter.IsPresent())
                 {
-                    return new TutorialSlideshowScreen(adapter);
+                    return (adapter);
                 }
             }
 
@@ -82,24 +82,30 @@ namespace SongsOfConquestAccess.Screens
             get { return "tutorial-slideshow"; }
         }
 
+        /// <summary>Layer 36: over the page it explains, combat included.</summary>
+        public override int Layer
+        {
+            get { return 36; }
+        }
+
         /// <summary>The tutorial entry's header, which the panel draws over the page.</summary>
         public override string ScreenName
         {
             get
             {
-                string header = _adapter != null ? _adapter.Header : null;
+                string header = Live != null ? Live.Header : null;
                 return string.IsNullOrWhiteSpace(header) ? null : header;
             }
         }
 
-        public override bool IsPresent()
+        public override bool IsActive()
         {
-            return _adapter != null && _adapter.IsPresent();
+            return Live != null && Live.IsPresent();
         }
 
         public override void Build(GraphBuilder builder)
         {
-            if (!IsPresent())
+            if (!IsActive())
             {
                 return;
             }
@@ -110,14 +116,14 @@ namespace SongsOfConquestAccess.Screens
 
         private void AddPages(GraphBuilder builder)
         {
-            Component box = _adapter.DescriptionBox;
-            int pages = _adapter.PageCount;
+            Component box = Live.DescriptionBox;
+            int pages = Live.PageCount;
             if (box == null || pages <= 0)
             {
                 return;
             }
 
-            int current = _adapter.CurrentPage;
+            int current = Live.CurrentPage;
             builder.BeginStop(PagesStop);
             for (int i = 0; i < pages; i++)
             {
@@ -134,27 +140,27 @@ namespace SongsOfConquestAccess.Screens
         {
             builder.BeginStop(ControlsStop);
 
-            Component toggle = _adapter.TutorialsToggle;
+            Component toggle = Live.TutorialsToggle;
             if (toggle != null)
             {
                 builder.AddItem(new DrawnNode(
                     ControlId.For(toggle, "tutorial-slideshow:tutorials"),
                     GraphNodes.Checkbox(
-                        () => _adapter.TutorialsToggleLabel,
-                        _adapter.IsTutorialsChecked,
-                        _adapter.ToggleTutorials),
+                        () => Live.TutorialsToggleLabel,
+                        Live.IsTutorialsChecked,
+                        Live.ToggleTutorials),
                     toggle));
             }
 
-            Component close = _adapter.CloseButton;
-            if (close != null && _adapter.IsCloseVisible())
+            Component close = Live.CloseButton;
+            if (close != null && Live.IsCloseVisible())
             {
                 builder.AddItem(new DrawnNode(
                     ControlId.For(close, "tutorial-slideshow:close"),
                     GraphNodes.Button(
-                        () => _adapter.CloseLabel,
-                        () => _adapter.ActivateClose(),
-                        _adapter.IsCloseEnabled),
+                        () => Live.CloseLabel,
+                        () => Live.ActivateClose(),
+                        Live.IsCloseEnabled),
                     close));
             }
         }
@@ -168,7 +174,7 @@ namespace SongsOfConquestAccess.Screens
             return GraphNodes.Paragraphs(() =>
             {
                 ShowPage(it);
-                return _adapter.DescriptionLines;
+                return Live.DescriptionLines;
             });
         }
 
@@ -179,12 +185,12 @@ namespace SongsOfConquestAccess.Screens
             GraphNavigator navigator = Navigator;
             if (navigator == null
                 || navigator.FocusedIndex(PageKey) != page
-                || _adapter.CurrentPage == page)
+                || Live.CurrentPage == page)
             {
                 return;
             }
 
-            _adapter.ShowPage(page);
+            Live.ShowPage(page);
         }
     }
 }

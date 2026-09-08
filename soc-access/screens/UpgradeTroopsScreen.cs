@@ -35,12 +35,15 @@ namespace SongsOfConquestAccess.Screens
     /// </summary>
     public sealed class UpgradeTroopsScreen : TroopManagementScreenBase
     {
-        public UpgradeTroopsScreen(ITroopManagementHostAdapter host)
-            : base(host)
+        /// <summary>After a hot reload: the three hosts that draw this page, tried in the order the
+        /// detector's own handlers would have written them. Scanned once, from
+        /// <c>ScreenDetector.RecoverRuntimeState</c>.</summary>
+        public static void Recover()
         {
+            Recovered<UpgradeTroopsScreen>(FindActiveDwelling() ?? FindActiveSettlement() ?? FindActiveDefence());
         }
 
-        public static Screen TryBuildActiveDwellingScreen()
+        public static ITroopManagementHostAdapter FindActiveDwelling()
         {
             DwellingInteractionMenu[] menus = Resources.FindObjectsOfTypeAll<DwellingInteractionMenu>();
             for (int i = 0; i < menus.Length; i++)
@@ -48,14 +51,14 @@ namespace SongsOfConquestAccess.Screens
                 DwellingInteractionMenuAdapter adapter = new DwellingInteractionMenuAdapter(menus[i]);
                 if (adapter.IsUpgradePresent())
                 {
-                    return new UpgradeTroopsScreen(new DwellingTroopManagementHostAdapter(adapter));
+                    return new DwellingTroopManagementHostAdapter(adapter);
                 }
             }
 
             return null;
         }
 
-        public static Screen TryBuildActiveSettlementScreen()
+        public static ITroopManagementHostAdapter FindActiveSettlement()
         {
             TownInteractionMenu[] menus = Resources.FindObjectsOfTypeAll<TownInteractionMenu>();
             for (int i = 0; i < menus.Length; i++)
@@ -63,14 +66,14 @@ namespace SongsOfConquestAccess.Screens
                 TownInteractionMenuAdapter adapter = new TownInteractionMenuAdapter(menus[i]);
                 if (adapter.IsUpgradePresent())
                 {
-                    return new UpgradeTroopsScreen(new SettlementTroopManagementHostAdapter(adapter));
+                    return new SettlementTroopManagementHostAdapter(adapter);
                 }
             }
 
             return null;
         }
 
-        public static Screen TryBuildActiveDefenceScreen()
+        public static ITroopManagementHostAdapter FindActiveDefence()
         {
             DefenceMenu[] menus = Resources.FindObjectsOfTypeAll<DefenceMenu>();
             for (int i = 0; i < menus.Length; i++)
@@ -78,7 +81,7 @@ namespace SongsOfConquestAccess.Screens
                 DefenceMenuAdapter adapter = new DefenceMenuAdapter(menus[i]);
                 if (adapter.IsUpgradePresent())
                 {
-                    return new UpgradeTroopsScreen(new DefenceTroopManagementHostAdapter(adapter));
+                    return new DefenceTroopManagementHostAdapter(adapter);
                 }
             }
 
@@ -90,6 +93,12 @@ namespace SongsOfConquestAccess.Screens
         private string CardPrefix
         {
             get { return Key + ":upgrade/"; }
+        }
+
+        /// <summary>Layer 22: a sub-page over the settlement, dwelling or defence page.</summary>
+        public override int Layer
+        {
+            get { return 22; }
         }
 
         protected override string ScreenSuffix { get { return "upgrade-troops"; } }

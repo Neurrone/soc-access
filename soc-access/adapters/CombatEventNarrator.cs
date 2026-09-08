@@ -152,7 +152,7 @@ namespace SongsOfConquestAccess.Adapters
 
         private static void MoveCombatCursorToLocalActingTroop(int troopId)
         {
-            CombatScreen screen = SocAccessMod.Instance?.ScreenManager?.CurrentScreen as CombatScreen;
+            CombatScreen screen = SocAccessMod.Instance?.ScreenManager?.Current as CombatScreen;
             screen?.MoveCursorToLocalActingTroop(troopId);
         }
 

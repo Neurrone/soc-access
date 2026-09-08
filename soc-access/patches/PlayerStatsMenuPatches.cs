@@ -15,17 +15,6 @@ namespace SongsOfConquestAccess
             __result = WaitForPlayerStatsReady(__instance, __result);
         }
 
-        [HarmonyPatch(typeof(PlayerStatsMenuNavigation), "HandleSwitchedTab", new[] { typeof(int) })]
-        [HarmonyPostfix]
-        private static void PlayerStatsMenuNavigationHandleSwitchedTabPostfix(PlayerStatsMenuNavigation __instance)
-        {
-            SocAccessMod plugin = SocAccessMod.Instance;
-            if (plugin != null && __instance != null)
-            {
-                plugin.StartCoroutine(WaitForPlayerStatsChanged(__instance));
-            }
-        }
-
         [HarmonyPatch(typeof(PlayerStatsMenuNavigation), "OnDestroy")]
         [HarmonyPrefix]
         private static void PlayerStatsMenuNavigationOnDestroyPrefix(PlayerStatsMenuNavigation __instance)
@@ -47,23 +36,6 @@ namespace SongsOfConquestAccess
                 if (adapter.IsReadyAfterAnimation())
                 {
                     SocAccessMod.Instance?.ScreenDetector?.OnPlayerStatsReady(menu);
-                    yield break;
-                }
-
-                frames++;
-                yield return null;
-            }
-        }
-
-        private static IEnumerator WaitForPlayerStatsChanged(PlayerStatsMenuNavigation menu)
-        {
-            int frames = 0;
-            while (menu != null && frames < 120)
-            {
-                PlayerStatsAdapter adapter = new PlayerStatsAdapter(menu);
-                if (adapter.IsReadyAfterAnimation())
-                {
-                    SocAccessMod.Instance?.ScreenDetector?.OnPlayerStatsChanged();
                     yield break;
                 }
 

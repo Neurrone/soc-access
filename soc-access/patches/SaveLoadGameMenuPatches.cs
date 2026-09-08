@@ -20,59 +20,5 @@ namespace SongsOfConquestAccess.Patches
         {
             SocAccessMod.Instance?.ScreenDetector?.OnSaveLoadGameMenuClosed(__instance);
         }
-
-        [HarmonyPatch(typeof(SaveLoadGameMenu), "SpawnEntriesGameDefinitionsLoaded")]
-        [HarmonyPostfix]
-        private static void SaveLoadGameMenuEntriesLoadedPostfix(SaveLoadGameMenu __instance)
-        {
-            NotifyChanged(__instance);
-        }
-
-        [HarmonyPatch(typeof(SaveLoadGameMenu), "HandleSwitchedTab")]
-        [HarmonyPostfix]
-        private static void SaveLoadGameMenuHandleSwitchedTabPostfix(SaveLoadGameMenu __instance)
-        {
-            NotifyChanged(__instance);
-        }
-
-        [HarmonyPatch(typeof(SaveLoadGameMenu), "ClearSelection")]
-        [HarmonyPostfix]
-        private static void SaveLoadGameMenuClearSelectionPostfix(SaveLoadGameMenu __instance)
-        {
-            NotifyChanged(__instance);
-        }
-
-        [HarmonyPatch(typeof(SaveLoadGameMenu), "OnControlsChanged")]
-        [HarmonyPostfix]
-        private static void SaveLoadGameMenuControlsChangedPostfix(SaveLoadGameMenu __instance)
-        {
-            NotifyChanged(__instance);
-        }
-
-        private static void NotifyChanged(SaveLoadGameMenu menu)
-        {
-            SocAccessMod.Instance?.ScreenDetector?.OnSaveLoadGameMenuChanged(menu);
-        }
-
-        private static void NotifyChangedAfterFrames(SaveLoadGameMenu menu, int frames)
-        {
-            SocAccessMod plugin = SocAccessMod.Instance;
-            if (plugin == null)
-            {
-                return;
-            }
-
-            plugin.StartCoroutine(NotifyChangedCoroutine(menu, frames));
-        }
-
-        private static IEnumerator NotifyChangedCoroutine(SaveLoadGameMenu menu, int frames)
-        {
-            for (int i = 0; i < frames; i++)
-            {
-                yield return null;
-            }
-
-            NotifyChanged(menu);
-        }
     }
 }

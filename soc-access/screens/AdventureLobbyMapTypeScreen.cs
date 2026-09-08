@@ -28,22 +28,22 @@ namespace SongsOfConquestAccess.Screens
     /// subscribes to the sub-menus' own OnCancel events), so the screen claims Escape and presses the
     /// drawn Back button, which leaves the lobby scene for the main menu.
     /// </summary>
-    public sealed class AdventureLobbyMapTypeScreen : GraphScreen
+    public sealed class AdventureLobbyMapTypeScreen : LiveScreen<AdventureLobbyMapTypeAdapter>
     {
         private const string CardsStop = "map-type-cards";
         private const string HeaderStop = "map-type-header";
 
-        private readonly AdventureLobbyMapTypeAdapter _adapter;
-
-        public AdventureLobbyMapTypeScreen(AdventureLobbyMapTypeAdapter adapter)
+        /// <summary>After a hot reload: point the slot at the menu already showing.
+        /// Scanned once, from <c>ScreenDetector.RecoverRuntimeState</c>.</summary>
+        public static void Recover()
         {
-            _adapter = adapter;
+            Recovered<AdventureLobbyMapTypeScreen>(FindActive());
         }
 
-        public static Screen TryBuildActiveScreen()
+        public static AdventureLobbyMapTypeAdapter FindActive()
         {
             AdventureLobbyMapTypeAdapter adapter = FindActiveMapTypeMenu();
-            return adapter != null ? new AdventureLobbyMapTypeScreen(adapter) : null;
+            return adapter;
         }
 
         public override string Key
@@ -51,10 +51,16 @@ namespace SongsOfConquestAccess.Screens
             get { return "adventure-lobby-map-type"; }
         }
 
+        /// <summary>Layer 1: the lobby landing page, over the main menu.</summary>
+        public override int Layer
+        {
+            get { return 1; }
+        }
+
         /// <summary>The page's own drawn title ("Map type").</summary>
         public override string ScreenName
         {
-            get { return _adapter != null ? _adapter.GetTitle() : null; }
+            get { return Live != null ? Live.GetTitle() : null; }
         }
 
         public override object InitialFocusStop
@@ -62,9 +68,9 @@ namespace SongsOfConquestAccess.Screens
             get { return CardsStop; }
         }
 
-        public override bool IsPresent()
+        public override bool IsActive()
         {
-            return _adapter != null && _adapter.IsPresent();
+            return Live != null && Live.IsPresent();
         }
 
         /// <summary>The page hides its header band as it leaves for the next scene, and the cursor
@@ -72,22 +78,22 @@ namespace SongsOfConquestAccess.Screens
         /// move.</summary>
         public override bool IsWorkable
         {
-            get { return _adapter != null && _adapter.BackButton != null && _adapter.BackButton.IsVisible(); }
+            get { return Live != null && Live.BackButton != null && Live.BackButton.IsVisible(); }
         }
 
         public override bool ConsumesBack
         {
-            get { return _adapter != null && _adapter.BackButton != null && _adapter.BackButton.IsVisible(); }
+            get { return Live != null && Live.BackButton != null && Live.BackButton.IsVisible(); }
         }
 
         public override bool Back()
         {
-            return _adapter != null && _adapter.BackButton != null && _adapter.BackButton.Activate();
+            return Live != null && Live.BackButton != null && Live.BackButton.Activate();
         }
 
         public override void Build(GraphBuilder builder)
         {
-            if (!IsPresent())
+            if (!IsActive())
             {
                 return;
             }
@@ -106,8 +112,8 @@ namespace SongsOfConquestAccess.Screens
             }
 
             List<KeyValuePair<string, IMenuButtonAdapter>> header = new List<KeyValuePair<string, IMenuButtonAdapter>>(2);
-            Add(header, "map-type:back", _adapter.BackButton);
-            Add(header, "map-type:options", _adapter.OptionsButton);
+            Add(header, "map-type:back", Live.BackButton);
+            Add(header, "map-type:options", Live.OptionsButton);
             if (header.Count > 0)
             {
                 builder.BeginStop(HeaderStop);
@@ -138,9 +144,9 @@ namespace SongsOfConquestAccess.Screens
         {
             List<KeyValuePair<string, AdventureLobbyMapTypeAdapter.MapTypeMenuButtonAdapter>> band =
                 new List<KeyValuePair<string, AdventureLobbyMapTypeAdapter.MapTypeMenuButtonAdapter>>();
-            AddCard(band, "map-type:all-maps", _adapter.AllMapsButton);
-            AddCard(band, "map-type:challenge-maps", _adapter.ChallengeMapsButton);
-            AddCard(band, "map-type:random-maps", _adapter.RandomMapsButton);
+            AddCard(band, "map-type:all-maps", Live.AllMapsButton);
+            AddCard(band, "map-type:challenge-maps", Live.ChallengeMapsButton);
+            AddCard(band, "map-type:random-maps", Live.RandomMapsButton);
             SortByDrawnLeft(band);
             return band;
         }

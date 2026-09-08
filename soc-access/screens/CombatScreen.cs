@@ -81,7 +81,7 @@ namespace SongsOfConquestAccess.Screens
     /// neutral army draws no wielder there), the battle log (the log window was empty), the player
     /// name lines and the turn timer (multiplayer only), and the spell and ability targeting states.
     /// </summary>
-    public sealed class CombatScreen : GraphScreen
+    public sealed class CombatScreen : LiveScreen<CombatAdapter>
     {
         private static readonly PropertyInfo InstallerContainerProperty =
             AccessTools.Property(typeof(BattleSceneInstaller), "Container");
@@ -117,8 +117,10 @@ namespace SongsOfConquestAccess.Screens
         /// move as far as the navigator is concerned.</summary>
         public static readonly ControlId BoardNodeId = ControlId.Structural("combat:tile");
 
-        private readonly CombatAdapter _adapter;
-        private readonly CombatHexGrid _grid;
+        // The hex cursor, built over the battle it walks. Rebuilt when the slot is pointed at a
+        // DIFFERENT battle and kept otherwise, so a dialog covering the battlefield does not move it.
+        private CombatHexGrid _grid;
+        private CombatAdapter _gridAdapter;
         private readonly CombatTroopCycle _localActingTroopCycle = new CombatTroopCycle();
         private readonly CombatTroopCycle _enemyActingTroopCycle = new CombatTroopCycle();
         private int _lastCycleCurrentTroopId = -1;
@@ -142,25 +144,41 @@ namespace SongsOfConquestAccess.Screens
         // instruction the game REPLACED under a still cursor is announced.
         private string _instruction;
 
-        public CombatScreen(CombatAdapter adapter)
-            : this(adapter, new CombatHexGrid(adapter))
+        /// <summary>After a hot reload: point the slot at the battle already installed.
+        /// Scanned once, from <c>ScreenDetector.RecoverRuntimeState</c>.</summary>
+        public static void Recover()
         {
+            Recovered<CombatScreen>(FindActive());
         }
 
-        public static Screen TryBuildActiveScreen()
+        /// <summary>The battle the game has installed and made ready, or null. The one scan.</summary>
+        public static CombatAdapter FindActive()
         {
             return FindActiveCombatScreen();
         }
 
-        private CombatScreen(CombatAdapter adapter, CombatHexGrid grid)
+        /// <summary>The cursor is built over one battle: a new one gets a new grid.</summary>
+        private CombatHexGrid Grid()
         {
-            _adapter = adapter;
-            _grid = grid;
+            if (_grid != null && ReferenceEquals(_gridAdapter, Live))
+            {
+                return _grid;
+            }
+
+            _gridAdapter = Live;
+            _grid = Live == null ? null : new CombatHexGrid(Live);
+            return _grid;
         }
 
         public override string Key
         {
             get { return "combat"; }
+        }
+
+        /// <summary>Layer 10: the battlefield; registered after the map, so it covers it.</summary>
+        public override int Layer
+        {
+            get { return 10; }
         }
 
         public override string ScreenName
@@ -176,14 +194,21 @@ namespace SongsOfConquestAccess.Screens
             get { return false; }
         }
 
-        public override bool IsPresent()
+        public override bool IsActive()
         {
-            return _adapter != null && _adapter.IsPresent();
+            return Live != null && Live.IsPresent();
         }
 
         public CombatAdapter Adapter
         {
-            get { return _adapter; }
+            get { return Live; }
+        }
+
+        /// <summary>The cursor survives the story gap, which is the one thing that takes the
+        /// battlefield off the stack while the battle is still being fought.</summary>
+        public override bool KeepStateOnPop
+        {
+            get { return true; }
         }
 
         public override IEnumerable<ReviewBufferKind> VisibleReviewBuffers
@@ -202,40 +227,40 @@ namespace SongsOfConquestAccess.Screens
         public override void OnPush()
         {
             AccessibilityEventBus.Subscribe(HandleAccessibilityEvent);
-            _adapter?.AttachSpellCastBegin(HandleSpellCastBegin);
-            _adapter?.AttachSpellTargetingNarration();
+            Live?.AttachSpellCastBegin(HandleSpellCastBegin);
+            Live?.AttachSpellTargetingNarration();
             _abilityTargetingBeginHandler = HandleAbilityTargetingBegin;
-            _adapter?.AttachAbilityTargetingBegin(_abilityTargetingBeginHandler);
-            _adapter?.AttachAbilityTargetingEnd(HandleAbilityTargetingEnd);
-            _adapter?.AnnounceVisibleSpellTargetInstruction();
+            Live?.AttachAbilityTargetingBegin(_abilityTargetingBeginHandler);
+            Live?.AttachAbilityTargetingEnd(HandleAbilityTargetingEnd);
+            Live?.AnnounceVisibleSpellTargetInstruction();
             _instruction = InstructionText;
         }
 
         public override void OnUnfocus()
         {
-            _adapter?.ClearNativeTooltip();
-            _adapter?.ClearFocusedTileOverlay();
+            Live?.ClearNativeTooltip();
+            Live?.ClearFocusedTileOverlay();
             base.OnUnfocus();
         }
 
         public override void OnPop()
         {
             AccessibilityEventBus.Unsubscribe(HandleAccessibilityEvent);
-            _adapter?.DetachSpellCastBegin();
-            _adapter?.DetachSpellTargetingNarration();
-            _adapter?.DetachAbilityTargetingBegin(_abilityTargetingBeginHandler);
-            _adapter?.DetachAbilityTargetingEnd();
+            Live?.DetachSpellCastBegin();
+            Live?.DetachSpellTargetingNarration();
+            Live?.DetachAbilityTargetingBegin(_abilityTargetingBeginHandler);
+            Live?.DetachAbilityTargetingEnd();
             _abilityTargetingBeginHandler = null;
-            _adapter?.Hud.ClearSpellTargetInstructionText();
-            _adapter?.Hud.ClearAbilityTargetInstructionText();
-            _adapter?.ClearNativeTooltip();
-            _adapter?.ClearFocusedTileOverlay();
+            Live?.Hud.ClearSpellTargetInstructionText();
+            Live?.Hud.ClearAbilityTargetInstructionText();
+            Live?.ClearNativeTooltip();
+            Live?.ClearFocusedTileOverlay();
             base.OnPop();
         }
 
-        public override void Update()
+        public override void OnUpdate()
         {
-            base.Update();
+            base.OnUpdate();
             WatchInstruction();
         }
 
@@ -243,14 +268,14 @@ namespace SongsOfConquestAccess.Screens
 
         public override void Build(GraphBuilder builder)
         {
-            if (!IsPresent())
+            if (!IsActive())
             {
                 return;
             }
 
             BuildBoard(builder);
 
-            BattleHudAdapter hud = _adapter.Hud;
+            BattleHudAdapter hud = Live.Hud;
             if (hud == null)
             {
                 return;
@@ -276,11 +301,11 @@ namespace SongsOfConquestAccess.Screens
             builder.BeginStop(BoardStop);
             builder.PushContext(BoardContext());
 
-            NodeVtable vtable = GraphNodes.Text(() => _grid.GetLabel(), null, TileTooltip());
+            NodeVtable vtable = GraphNodes.Text(() => Grid().GetLabel(), null, TileTooltip());
             vtable.OnActivate = ConfirmTarget;
             vtable.OnContextual = ContextualTile;
-            vtable.OnFocusVisual = () => _grid.ShowOverlay();
-            vtable.OnBlurVisual = () => _grid.HideOverlay();
+            vtable.OnFocusVisual = () => Grid().ShowOverlay();
+            vtable.OnBlurVisual = () => Grid().HideOverlay();
             builder.AddItem(new SyntheticNode(BoardNodeId, vtable));
             builder.SetStart(BoardNodeId);
 
@@ -295,9 +320,9 @@ namespace SongsOfConquestAccess.Screens
 
         private Tooltip TileTooltip()
         {
-            Vector2Int tile = _grid.CursorTile;
-            bool inspecting = _grid.IsInspecting;
-            CombatTargetingMode targeting = _adapter.GetTargetingMode();
+            Vector2Int tile = Grid().CursorTile;
+            bool inspecting = Grid().IsInspecting;
+            CombatTargetingMode targeting = Live.GetTargetingMode();
             if (_tooltipRead && tile == _tooltipTile && inspecting == _tooltipInspecting && targeting == _tooltipTargeting)
             {
                 return _tooltip;
@@ -307,7 +332,7 @@ namespace SongsOfConquestAccess.Screens
             _tooltipInspecting = inspecting;
             _tooltipTargeting = targeting;
             _tooltipRead = true;
-            _tooltip = _grid.GetTooltip();
+            _tooltip = Grid().GetTooltip();
             return _tooltip;
         }
 
@@ -315,14 +340,14 @@ namespace SongsOfConquestAccess.Screens
         /// confirms the target of a spell or an ability being aimed and is otherwise silent.</summary>
         private void ConfirmTarget()
         {
-            _grid.ConfirmTarget();
+            Grid().ConfirmTarget();
         }
 
         /// <summary>Backslash on the board: the game's own right click, which is how a troop moves
         /// and attacks.</summary>
         private void ContextualTile()
         {
-            _adapter.HandleSecondaryAction(_grid.CursorTile);
+            Live.HandleSecondaryAction(Grid().CursorTile);
         }
 
         // ---- the quickbar ----
@@ -557,7 +582,7 @@ namespace SongsOfConquestAccess.Screens
         /// board, so the cursor goes there.</summary>
         private void ActivateAbilityButton()
         {
-            if (_adapter == null || !_adapter.Hud.ClickAbilityButton())
+            if (Live == null || !Live.Hud.ClickAbilityButton())
             {
                 return;
             }
@@ -567,7 +592,7 @@ namespace SongsOfConquestAccess.Screens
 
         private void ActivateCancelAbilityButton()
         {
-            if (_adapter == null || !_adapter.Hud.ClickCancelAbilityButton())
+            if (Live == null || !Live.Hud.ClickCancelAbilityButton())
             {
                 return;
             }
@@ -788,7 +813,7 @@ namespace SongsOfConquestAccess.Screens
         /// </summary>
         public override bool ModeClaims(string actionKey)
         {
-            return IsBoardFocused() && _grid != null && ModeAction(actionKey) != null;
+            return IsBoardFocused() && Grid() != null && ModeAction(actionKey) != null;
         }
 
         /// <summary>The board action a key means here, or null where the key is not the cursor's. The
@@ -800,7 +825,7 @@ namespace SongsOfConquestAccess.Screens
         private string ModeAction(string actionKey)
         {
             string translated = Translate(actionKey);
-            return _grid.ClaimsAction(translated) ? translated : null;
+            return Grid().ClaimsAction(translated) ? translated : null;
         }
 
         private static string Translate(string actionKey)
@@ -830,13 +855,13 @@ namespace SongsOfConquestAccess.Screens
 
         public override bool OnAction(string actionKey)
         {
-            if (!IsBoardFocused() || _grid == null)
+            if (!IsBoardFocused() || Grid() == null)
             {
                 return false;
             }
 
             string action = ModeAction(actionKey);
-            return action != null && _grid.HandleAction(AccessibilityActions.FindByKey(action));
+            return action != null && Grid().HandleAction(AccessibilityActions.FindByKey(action));
         }
 
         /// <summary>Escape is the screen's wherever the cursor has left the board - it lands back on
@@ -844,14 +869,14 @@ namespace SongsOfConquestAccess.Screens
         /// what opens the pause menu.</summary>
         public override bool ConsumesBack
         {
-            get { return !IsBoardFocused() || _grid.IsInspecting || IsAiming; }
+            get { return !IsBoardFocused() || Grid().IsInspecting || IsAiming; }
         }
 
         public override bool Back()
         {
             if (IsBoardFocused())
             {
-                return _grid != null && _grid.HandleBack();
+                return Grid() != null && Grid().HandleBack();
             }
 
             Navigator?.FocusNode(BoardNodeId);
@@ -869,12 +894,12 @@ namespace SongsOfConquestAccess.Screens
 
         private bool IsAiming
         {
-            get { return _adapter != null && _adapter.GetTargetingMode() != CombatTargetingMode.None; }
+            get { return Live != null && Live.GetTargetingMode() != CombatTargetingMode.None; }
         }
 
         private string InstructionText
         {
-            get { return _adapter != null && _adapter.Hud != null ? _adapter.Hud.TargetingInstructionText : null; }
+            get { return Live != null && Live.Hud != null ? Live.Hud.TargetingInstructionText : null; }
         }
 
         // ---- the cursor, driven from elsewhere ----
@@ -887,14 +912,14 @@ namespace SongsOfConquestAccess.Screens
         public bool MoveCursorToTroop(int troopId, bool focusGrid, bool requireLocalCurrentTurn)
         {
             Vector2Int position;
-            if (_adapter == null
-                || _grid == null
-                || !_adapter.TryGetTroopPosition(troopId, out position, requireLocalCurrentTurn))
+            if (Live == null
+                || Grid() == null
+                || !Live.TryGetTroopPosition(troopId, out position, requireLocalCurrentTurn))
             {
                 return false;
             }
 
-            bool moved = _grid.MoveToTroop(position);
+            bool moved = Grid().MoveToTroop(position);
             if (focusGrid && moved)
             {
                 // Silent: the grid has just read the tile it landed on, which is the whole answer.
@@ -941,7 +966,7 @@ namespace SongsOfConquestAccess.Screens
         /// </summary>
         public bool FocusTimeline()
         {
-            BattleHudAdapter hud = _adapter != null ? _adapter.Hud : null;
+            BattleHudAdapter hud = Live != null ? Live.Hud : null;
             if (hud == null || hud.GetQueueItems().Count == 0)
             {
                 return true;
@@ -953,7 +978,7 @@ namespace SongsOfConquestAccess.Screens
 
         public bool SummarizeResources()
         {
-            string summary = _adapter != null ? _adapter.BuildLocalEssenceSummary() : string.Empty;
+            string summary = Live != null ? Live.BuildLocalEssenceSummary() : string.Empty;
             if (string.IsNullOrWhiteSpace(summary))
             {
                 return false;
@@ -965,7 +990,7 @@ namespace SongsOfConquestAccess.Screens
 
         public bool SummarizeEnemyResources()
         {
-            string summary = _adapter != null ? _adapter.BuildEnemyEssenceSummary() : string.Empty;
+            string summary = Live != null ? Live.BuildEnemyEssenceSummary() : string.Empty;
             if (!string.IsNullOrWhiteSpace(summary))
             {
                 SpeechPipeline.Output(new SpeechRequest(summary, interrupt: false));
@@ -986,7 +1011,7 @@ namespace SongsOfConquestAccess.Screens
 
         private bool HasActingTroops(bool enemy)
         {
-            if (_adapter == null || !_adapter.IsLocalTurn())
+            if (Live == null || !Live.IsLocalTurn())
             {
                 return false;
             }
@@ -1031,17 +1056,17 @@ namespace SongsOfConquestAccess.Screens
 
         private IReadOnlyList<int> GetActingTroopIds(bool enemy)
         {
-            if (_adapter == null || !_adapter.IsLocalTurn())
+            if (Live == null || !Live.IsLocalTurn())
             {
                 return new int[0];
             }
 
-            return enemy ? _adapter.GetEnemyActingTroopIds() : _adapter.GetLocalActingTroopIds();
+            return enemy ? Live.GetEnemyActingTroopIds() : Live.GetLocalActingTroopIds();
         }
 
         private void SyncTroopCyclesWithCurrent()
         {
-            int currentTroopId = _adapter != null ? _adapter.GetCurrentTroopId() : -1;
+            int currentTroopId = Live != null ? Live.GetCurrentTroopId() : -1;
             if (currentTroopId == _lastCycleCurrentTroopId)
             {
                 return;
@@ -1060,17 +1085,17 @@ namespace SongsOfConquestAccess.Screens
         private void HandleSpellCastBegin()
         {
             Navigator?.FocusNode(BoardNodeId, announce: false);
-            _grid?.HandleTargetingBegin();
+            Grid()?.HandleTargetingBegin();
             _instruction = InstructionText;
         }
 
         private void HandleAbilityTargetingBegin(TroopAbilityTargeting targeting)
         {
             Navigator?.FocusNode(BoardNodeId, announce: false);
-            _grid?.HandleTargetingBegin();
+            Grid()?.HandleTargetingBegin();
 
-            string instruction = _adapter != null ? _adapter.BuildAbilityTargetInstruction(targeting) : string.Empty;
-            _adapter?.Hud.SetAbilityTargetInstructionText(instruction);
+            string instruction = Live != null ? Live.BuildAbilityTargetInstruction(targeting) : string.Empty;
+            Live?.Hud.SetAbilityTargetInstructionText(instruction);
             if (!string.IsNullOrWhiteSpace(instruction))
             {
                 SpeechPipeline.Output(new SpeechRequest(instruction, interrupt: false));
@@ -1081,7 +1106,7 @@ namespace SongsOfConquestAccess.Screens
 
         private void HandleAbilityTargetingEnd(bool usedAbility)
         {
-            _adapter?.Hud.ClearAbilityTargetInstructionText();
+            Live?.Hud.ClearAbilityTargetInstructionText();
             if (!usedAbility)
             {
                 SpeechPipeline.Output(new SpeechRequest(ModText.Get(ModStrings.Combat.AbilityCancelled), interrupt: false));
@@ -1121,7 +1146,7 @@ namespace SongsOfConquestAccess.Screens
 
         // ---- finding the battle ----
 
-        private static CombatScreen FindActiveCombatScreen()
+        private static CombatAdapter FindActiveCombatScreen()
         {
             BattleSceneInstaller[] installers = Resources.FindObjectsOfTypeAll<BattleSceneInstaller>();
             if (installers.Length == 0)
@@ -1188,7 +1213,7 @@ namespace SongsOfConquestAccess.Screens
                     CombatEventNarrator.SetActiveAdapter(adapter);
                     CombatEventNarrator.SyncCurrentTurnTroop(adapter);
                     LogProbeDiagnostic("Combat probe found ready battle");
-                    return new CombatScreen(adapter);
+                    return adapter;
                 }
 
                 LogProbeDiagnostic("Combat probe found installer but adapter is not ready: " + adapter.GetReadinessDiagnostic());

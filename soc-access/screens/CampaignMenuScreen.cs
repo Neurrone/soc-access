@@ -27,22 +27,22 @@ namespace SongsOfConquestAccess.Screens
     /// The menu registers no keyboard input of its own (`CampaignMenu` wires no input callbacks), so
     /// Escape would do nothing here; the screen claims it and presses the drawn Back button.
     /// </summary>
-    public sealed class CampaignMenuScreen : GraphScreen
+    public sealed class CampaignMenuScreen : LiveScreen<CampaignMenuAdapter>
     {
         private const string CardsStop = "campaign-cards";
         private const string HeaderStop = "campaign-header";
 
-        private readonly CampaignMenuAdapter _adapter;
-
-        public CampaignMenuScreen(CampaignMenuAdapter adapter)
+        /// <summary>After a hot reload: point the slot at the menu already showing.
+        /// Scanned once, from <c>ScreenDetector.RecoverRuntimeState</c>.</summary>
+        public static void Recover()
         {
-            _adapter = adapter;
+            Recovered<CampaignMenuScreen>(FindActive());
         }
 
-        public static Screen TryBuildActiveScreen()
+        public static CampaignMenuAdapter FindActive()
         {
             CampaignMenuAdapter adapter = FindActiveCampaignMenu();
-            return adapter != null ? new CampaignMenuScreen(adapter) : null;
+            return adapter;
         }
 
         public override string Key
@@ -50,10 +50,16 @@ namespace SongsOfConquestAccess.Screens
             get { return "campaign-menu"; }
         }
 
+        /// <summary>Layer 1: a main-menu page, over the main menu.</summary>
+        public override int Layer
+        {
+            get { return 1; }
+        }
+
         /// <summary>The page's own drawn title ("Choose Campaign or Tale").</summary>
         public override string ScreenName
         {
-            get { return _adapter != null ? _adapter.GetTitle() : null; }
+            get { return Live != null ? Live.GetTitle() : null; }
         }
 
         public override object InitialFocusStop
@@ -61,9 +67,9 @@ namespace SongsOfConquestAccess.Screens
             get { return CardsStop; }
         }
 
-        public override bool IsPresent()
+        public override bool IsActive()
         {
-            return _adapter != null && _adapter.IsPresent();
+            return Live != null && Live.IsPresent();
         }
 
         /// <summary>The page hides its header band as it closes (Back and Options go first), and the
@@ -71,22 +77,22 @@ namespace SongsOfConquestAccess.Screens
         /// not a move, and stays silent while the band is gone.</summary>
         public override bool IsWorkable
         {
-            get { return _adapter != null && _adapter.BackButton != null && _adapter.BackButton.IsVisible(); }
+            get { return Live != null && Live.BackButton != null && Live.BackButton.IsVisible(); }
         }
 
         public override bool ConsumesBack
         {
-            get { return _adapter != null && _adapter.BackButton != null && _adapter.BackButton.IsVisible(); }
+            get { return Live != null && Live.BackButton != null && Live.BackButton.IsVisible(); }
         }
 
         public override bool Back()
         {
-            return _adapter != null && _adapter.BackButton != null && _adapter.BackButton.Activate();
+            return Live != null && Live.BackButton != null && Live.BackButton.Activate();
         }
 
         public override void Build(GraphBuilder builder)
         {
-            if (!IsPresent())
+            if (!IsActive())
             {
                 return;
             }
@@ -107,8 +113,8 @@ namespace SongsOfConquestAccess.Screens
             // Back at x 21 and Options at x 1233 of the header band: declared left to right, the
             // order they are drawn in.
             List<KeyValuePair<string, IMenuButtonAdapter>> header = new List<KeyValuePair<string, IMenuButtonAdapter>>(2);
-            Add(header, "campaign:back", _adapter.BackButton);
-            Add(header, "campaign:options", _adapter.OptionsButton);
+            Add(header, "campaign:back", Live.BackButton);
+            Add(header, "campaign:options", Live.OptionsButton);
             if (header.Count > 0)
             {
                 builder.BeginStop(HeaderStop);
@@ -171,15 +177,15 @@ namespace SongsOfConquestAccess.Screens
         private List<KeyValuePair<string, IMenuButtonAdapter>> DrawnCards()
         {
             List<KeyValuePair<string, IMenuButtonAdapter>> band = new List<KeyValuePair<string, IMenuButtonAdapter>>();
-            IReadOnlyList<CampaignButtonAdapter> campaigns = _adapter.CampaignButtons;
+            IReadOnlyList<CampaignButtonAdapter> campaigns = Live.CampaignButtons;
             for (int i = 0; campaigns != null && i < campaigns.Count; i++)
             {
                 Add(band, "campaign:card/" + i, campaigns[i]);
             }
 
-            Add(band, "campaign:tales", _adapter.TalesButton);
+            Add(band, "campaign:tales", Live.TalesButton);
             SortByDrawnLeft(band);
-            Add(band, "campaign:community", _adapter.CustomCampaignButton);
+            Add(band, "campaign:community", Live.CustomCampaignButton);
             return band;
         }
 

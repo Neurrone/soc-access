@@ -32,24 +32,24 @@ namespace SongsOfConquestAccess.Screens
     /// game's (<c>ConsumesBack</c> false): <c>MapEntityMiniMenu.Show</c> registers <c>UI.ExitMenu</c>
     /// against <c>Hide</c> itself.
     /// </summary>
-    public sealed class MapEntityMiniMenuScreen : GraphScreen
+    public sealed class MapEntityMiniMenuScreen : LiveScreen<MapEntityMiniMenuAdapter>
     {
         private const string DetailsStop = "map-entity-details";
         private const string ActionsStop = "map-entity-actions";
         private const string CloseStop = "map-entity-close";
 
-        private readonly MapEntityMiniMenuAdapter _adapter;
-
         // The lines the game gives no component of their own for, and the close, keyed by subjects
         // held across rebuilds so the reconciler seats the cursor back on the same node.
         private readonly Dictionary<string, object> _markers = new Dictionary<string, object>();
 
-        public MapEntityMiniMenuScreen(MapEntityMiniMenuAdapter adapter)
+        /// <summary>After a hot reload: point the slot at the menu already showing.
+        /// Scanned once, from <c>ScreenDetector.RecoverRuntimeState</c>.</summary>
+        public static void Recover()
         {
-            _adapter = adapter;
+            Recovered<MapEntityMiniMenuScreen>(FindActive());
         }
 
-        public static Screen TryBuildActiveScreen()
+        public static MapEntityMiniMenuAdapter FindActive()
         {
             MapEntityMiniMenu[] menus = Resources.FindObjectsOfTypeAll<MapEntityMiniMenu>();
             for (int i = 0; i < menus.Length; i++)
@@ -57,7 +57,7 @@ namespace SongsOfConquestAccess.Screens
                 MapEntityMiniMenuAdapter adapter = new MapEntityMiniMenuAdapter(menus[i]);
                 if (adapter.IsPresent())
                 {
-                    return new MapEntityMiniMenuScreen(adapter);
+                    return (adapter);
                 }
             }
 
@@ -66,12 +66,18 @@ namespace SongsOfConquestAccess.Screens
 
         public MapEntityMiniMenuAdapter Adapter
         {
-            get { return _adapter; }
+            get { return Live; }
         }
 
         public override string Key
         {
             get { return "map-entity-mini-menu"; }
+        }
+
+        /// <summary>Layer 20: an in-game panel over the map.</summary>
+        public override int Layer
+        {
+            get { return 20; }
         }
 
         /// <summary>Both drawn names, the entity's own first: the heading is the screen's name, said
@@ -81,19 +87,19 @@ namespace SongsOfConquestAccess.Screens
         {
             get
             {
-                string heading = _adapter != null ? HeadingText() : null;
+                string heading = Live != null ? HeadingText() : null;
                 return string.IsNullOrWhiteSpace(heading) ? null : heading;
             }
         }
 
-        public override bool IsPresent()
+        public override bool IsActive()
         {
-            return _adapter != null && _adapter.IsPresent();
+            return Live != null && Live.IsPresent();
         }
 
         public override void Build(GraphBuilder builder)
         {
-            if (!IsPresent())
+            if (!IsActive())
             {
                 return;
             }
@@ -111,13 +117,13 @@ namespace SongsOfConquestAccess.Screens
         /// <summary>Both drawn names in their drawn order, the entity's own first.</summary>
         private string HeadingText()
         {
-            string type = _adapter.EntityName;
-            if (!_adapter.IsCustomNameVisible)
+            string type = Live.EntityName;
+            if (!Live.IsCustomNameVisible)
             {
                 return type;
             }
 
-            string custom = _adapter.CustomName;
+            string custom = Live.CustomName;
             return string.IsNullOrWhiteSpace(type)
                 ? custom
                 : ModText.Get(ModStrings.Common.ListSeparator, custom, type);
@@ -127,28 +133,28 @@ namespace SongsOfConquestAccess.Screens
 
         private void BuildDetails(GraphBuilder builder)
         {
-            if (_adapter.IsBlueprintDescriptionVisible)
+            if (Live.IsBlueprintDescriptionVisible)
             {
-                AddParagraphs(builder, "blueprint-description", _adapter.BlueprintDescriptionComponent,
-                    () => _adapter.BlueprintDescriptionLines);
+                AddParagraphs(builder, "blueprint-description", Live.BlueprintDescriptionComponent,
+                    () => Live.BlueprintDescriptionLines);
             }
 
             AddStoredWielder(builder);
             AddDescriptionRows(builder);
 
-            if (_adapter.IsUpgradeSummaryVisible)
+            if (Live.IsUpgradeSummaryVisible)
             {
-                AddText(builder, "upgrades", _adapter.UpgradesComponent, () => _adapter.UpgradeSummary);
+                AddText(builder, "upgrades", Live.UpgradesComponent, () => Live.UpgradeSummary);
             }
 
-            if (_adapter.IsSiegeStateVisible)
+            if (Live.IsSiegeStateVisible)
             {
-                AddText(builder, "siege-state", _adapter.SiegeStateComponent, () => _adapter.SiegeState);
+                AddText(builder, "siege-state", Live.SiegeStateComponent, () => Live.SiegeState);
             }
 
-            if (_adapter.IsTownStatusVisible)
+            if (Live.IsTownStatusVisible)
             {
-                AddText(builder, "town-status", _adapter.TownStatusComponent, TownStatusText);
+                AddText(builder, "town-status", Live.TownStatusComponent, TownStatusText);
             }
         }
 
@@ -156,30 +162,30 @@ namespace SongsOfConquestAccess.Screens
         /// and the click that ejects them.</summary>
         private void AddStoredWielder(GraphBuilder builder)
         {
-            if (!_adapter.IsStoredWielderVisible)
+            if (!Live.IsStoredWielderVisible)
             {
                 return;
             }
 
-            string name = _adapter.StoredWielderName;
+            string name = Live.StoredWielderName;
             if (string.IsNullOrWhiteSpace(name))
             {
                 return;
             }
 
             NodeVtable vtable = GraphNodes.Button(
-                () => _adapter.StoredWielderName,
-                () => _adapter.ActivateEjectWielder(),
-                _adapter.IsEjectWielderEnabled,
-                _adapter.StoredWielderTooltip);
-            Component drawn = _adapter.StoredWielderButton;
+                () => Live.StoredWielderName,
+                () => Live.ActivateEjectWielder(),
+                Live.IsEjectWielderEnabled,
+                Live.StoredWielderTooltip);
+            Component drawn = Live.StoredWielderButton;
             vtable.OnFocusVisual = () => NativeSelectionUtility.Select(drawn);
             builder.AddItem(new DrawnNode(ControlId.For(drawn, "map-entity:stored-wielder"), vtable, drawn));
         }
 
         private void AddDescriptionRows(GraphBuilder builder)
         {
-            IReadOnlyList<MapEntityMiniMenuAdapter.DescriptionRow> rows = _adapter.GetDescriptionRows();
+            IReadOnlyList<MapEntityMiniMenuAdapter.DescriptionRow> rows = Live.GetDescriptionRows();
             for (int i = 0; i < rows.Count; i++)
             {
                 MapEntityMiniMenuAdapter.DescriptionRow row = rows[i];
@@ -198,13 +204,13 @@ namespace SongsOfConquestAccess.Screens
         /// and named by the siege state it belongs to where there is one.</summary>
         private string TownStatusText()
         {
-            string siege = _adapter.SiegeState;
+            string siege = Live.SiegeState;
             string prefix = string.IsNullOrWhiteSpace(siege) ? ModText.Get(ModStrings.Screens.TownStatus) : siege;
             return ModText.Get(
                 ModStrings.Screens.TownStatusRounds,
                 prefix,
-                _adapter.TownStatusRoundsComplete,
-                _adapter.TownStatusRoundsRemaining);
+                Live.TownStatusRoundsComplete,
+                Live.TownStatusRoundsRemaining);
         }
 
         /// <summary>One line the menu draws and the player only reads, keyed by the component the game
@@ -240,7 +246,7 @@ namespace SongsOfConquestAccess.Screens
 
         private void BuildActions(GraphBuilder builder)
         {
-            IReadOnlyList<MapEntityMiniMenuAdapter.ActionButton> actions = _adapter.GetActions();
+            IReadOnlyList<MapEntityMiniMenuAdapter.ActionButton> actions = Live.GetActions();
             for (int i = 0; i < actions.Count; i++)
             {
                 MapEntityMiniMenuAdapter.ActionButton action = actions[i];
@@ -268,7 +274,7 @@ namespace SongsOfConquestAccess.Screens
                 ControlId.For(Marker("close"), "map-entity:close"),
                 GraphNodes.Button(
                     () => ModText.Get(ModStrings.Screens.Close),
-                    () => _adapter.Close())));
+                    () => Live.Close())));
         }
 
         private object Marker(string key)

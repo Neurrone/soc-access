@@ -40,7 +40,7 @@ namespace SongsOfConquestAccess.Screens
     /// ESCAPE IS THE GAME'S (<c>ConsumesBack</c> false): <c>PostAdventureStatsMenu.ShowMenu</c>
     /// registers <c>UI.ExitMenu</c> on its own close.
     /// </summary>
-    public sealed class PostAdventureStatsScreen : GraphScreen
+    public sealed class PostAdventureStatsScreen : LiveScreen<PostAdventureStatsAdapter>
     {
         private const string ChooserStop = "post-adventure-stats-chooser";
         private const string TableStop = "post-adventure-stats-table";
@@ -50,18 +50,18 @@ namespace SongsOfConquestAccess.Screens
 
         private static readonly FieldInfo StatsMenuField = AccessTools.Field(typeof(PostAdventureMenu), "_statsMenu");
 
-        private readonly PostAdventureStatsAdapter _adapter;
-
         // A subject of its own per synthesized line, kept across rebuilds so the reconciler seats the
         // cursor on the same one: the menu gives no component the screen can key its figures on.
         private readonly Dictionary<string, object> _markers = new Dictionary<string, object>();
 
-        public PostAdventureStatsScreen(PostAdventureStatsAdapter adapter)
+        /// <summary>After a hot reload: point the slot at the menu already showing.
+        /// Scanned once, from <c>ScreenDetector.RecoverRuntimeState</c>.</summary>
+        public static void Recover()
         {
-            _adapter = adapter;
+            Recovered<PostAdventureStatsScreen>(FindActive());
         }
 
-        public static Screen TryBuildActiveScreen()
+        public static PostAdventureStatsAdapter FindActive()
         {
             PostAdventureMenu[] resultMenus = Resources.FindObjectsOfTypeAll<PostAdventureMenu>();
             for (int i = 0; i < resultMenus.Length; i++)
@@ -70,7 +70,7 @@ namespace SongsOfConquestAccess.Screens
                 PostAdventureStatsAdapter adapter = new PostAdventureStatsAdapter(statsMenu);
                 if (adapter.IsPresent())
                 {
-                    return new PostAdventureStatsScreen(adapter);
+                    return (adapter);
                 }
             }
 
@@ -82,31 +82,30 @@ namespace SongsOfConquestAccess.Screens
             get { return "post-adventure-stats"; }
         }
 
+        /// <summary>Layer 33: over the adventure result that opens it.</summary>
+        public override int Layer
+        {
+            get { return 33; }
+        }
+
         /// <summary>The menu's own drawn title ("Summary").</summary>
         public override string ScreenName
         {
             get
             {
-                string header = _adapter != null ? _adapter.Header : null;
+                string header = Live != null ? Live.Header : null;
                 return string.IsNullOrWhiteSpace(header) ? null : header;
             }
         }
 
-        public override bool IsPresent()
+        public override bool IsActive()
         {
-            return _adapter != null && _adapter.IsPresent();
-        }
-
-        /// <summary>Kept for the detector, which calls it when the page's content changes. The graph is
-        /// declared afresh on every operation and reads the chart off the game each time, so there is
-        /// nothing here to rebuild.</summary>
-        public void Refresh(bool announceFocus = false)
-        {
+            return Live != null && Live.IsPresent();
         }
 
         public override void Build(GraphBuilder builder)
         {
-            if (!IsPresent())
+            if (!IsActive())
             {
                 return;
             }
@@ -116,7 +115,7 @@ namespace SongsOfConquestAccess.Screens
 
             // No table stop at all when the statistics hold no round: the footer says how many
             // rounds there were, and a stop with nothing in it would be a table without rows.
-            if (_adapter.GetGraphRows().Count > 0)
+            if (Live.GetGraphRows().Count > 0)
             {
                 builder.BeginStop(TableStop);
                 BuildTable(builder);
@@ -141,7 +140,7 @@ namespace SongsOfConquestAccess.Screens
         /// what the chart shows does not move until an entry is taken.</summary>
         private void BuildGraphType(GraphBuilder builder)
         {
-            PostAdventureStatsAdapter.GraphDropList chooser = _adapter.GraphChooser;
+            PostAdventureStatsAdapter.GraphDropList chooser = Live.GraphChooser;
             Component subject = chooser != null ? chooser.Subject : null;
             if (subject == null || !chooser.IsVisible())
             {
@@ -153,9 +152,9 @@ namespace SongsOfConquestAccess.Screens
             NodeVtable vtable = GraphNodes.ComboBox(
                 label,
                 () => SelectedOption(it),
-                () => DropListScreen.Open(it, label(), index => _adapter.SelectGraph(index)),
+                () => DropListScreen.Open(it, label(), index => Live.SelectGraph(index)),
                 it.IsEnabled);
-            vtable.OnFocusVisual = () => _adapter.FocusGraphDropdown();
+            vtable.OnFocusVisual = () => Live.FocusGraphDropdown();
             builder.AddItem(new DrawnNode(
                 ControlId.For(subject, "post-adventure-stats:graph-type"),
                 vtable,
@@ -172,7 +171,7 @@ namespace SongsOfConquestAccess.Screens
         /// <summary>One tick per team, in the order the menu draws them down the page.</summary>
         private void BuildTeams(GraphBuilder builder)
         {
-            List<PostAdventureStatsAdapter.TeamOption> teams = DrawnOrder(_adapter.GetTeamOptions());
+            List<PostAdventureStatsAdapter.TeamOption> teams = DrawnOrder(Live.GetTeamOptions());
             for (int i = 0; i < teams.Count; i++)
             {
                 PostAdventureStatsAdapter.TeamOption team = teams[i];
@@ -185,9 +184,9 @@ namespace SongsOfConquestAccess.Screens
                 PostAdventureStatsAdapter.TeamOption it = team;
                 NodeVtable vtable = GraphNodes.Checkbox(
                     () => it.Label,
-                    () => _adapter.IsTeamSelected(it.Entry),
-                    () => _adapter.ToggleTeam(it.Entry));
-                vtable.OnFocusVisual = () => _adapter.FocusTeam(it.Entry);
+                    () => Live.IsTeamSelected(it.Entry),
+                    () => Live.ToggleTeam(it.Entry));
+                vtable.OnFocusVisual = () => Live.FocusTeam(it.Entry);
                 // The structural key carries the drawn index: a ControlId is equal on its structural
                 // key alone, so the teams under one key would be one duplicate id.
                 builder.AddItem(new DrawnNode(
@@ -240,13 +239,13 @@ namespace SongsOfConquestAccess.Screens
 
         private void BuildTable(GraphBuilder builder)
         {
-            IReadOnlyList<PostAdventureStatsAdapter.GraphTeamColumn> teams = _adapter.GetEnabledGraphTeams();
+            IReadOnlyList<PostAdventureStatsAdapter.GraphTeamColumn> teams = Live.GetEnabledGraphTeams();
             string[] columns = Columns(teams);
             // No heading band: the sheet names the column on every crossing ("Neurrone, 1234"), so a
             // row of the captions would say them a second time (owner ruling 2026-09-07).
             GraphSheet sheet = new GraphSheet(builder, SheetKey);
-            sheet.Region(_adapter.GraphTitle, columns);
-            IReadOnlyList<PostAdventureStatsAdapter.GraphRoundRow> rows = _adapter.GetGraphRows();
+            sheet.Region(Live.GraphTitle, columns);
+            IReadOnlyList<PostAdventureStatsAdapter.GraphRoundRow> rows = Live.GetGraphRows();
             for (int i = 0; i < rows.Count; i++)
             {
                 PostAdventureStatsAdapter.GraphRoundRow row = rows[i];
@@ -309,16 +308,16 @@ namespace SongsOfConquestAccess.Screens
 
         private void BuildFooter(GraphBuilder builder)
         {
-            AddLine(builder, "rounds", () => _adapter.TotalRounds);
-            AddLine(builder, "playtime", () => _adapter.TotalPlayTime);
+            AddLine(builder, "rounds", () => Live.TotalRounds);
+            AddLine(builder, "playtime", () => Live.TotalPlayTime);
         }
 
         // ---- the close cross ----
 
         private void BuildClose(GraphBuilder builder)
         {
-            Component close = _adapter.CloseButton;
-            if (close == null || !_adapter.IsCloseButtonVisible())
+            Component close = Live.CloseButton;
+            if (close == null || !Live.IsCloseButtonVisible())
             {
                 return;
             }
@@ -326,8 +325,8 @@ namespace SongsOfConquestAccess.Screens
             // An icon with no text of its own, so the mod names it.
             NodeVtable vtable = GraphNodes.Button(
                 () => ModText.Get(ModStrings.Screens.Close),
-                () => _adapter.Close(),
-                _adapter.IsCloseButtonEnabled);
+                () => Live.Close(),
+                Live.IsCloseButtonEnabled);
             vtable.OnFocusVisual = () => NativeSelectionUtility.Select(close);
             builder.AddItem(new DrawnNode(
                 ControlId.For(close, "post-adventure-stats:close"),

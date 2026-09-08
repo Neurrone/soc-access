@@ -29,45 +29,37 @@ namespace SongsOfConquestAccess.Screens
     /// menu). ESCAPE is the game's on all three sources: each binds it to advancing, and every key
     /// the navigator does not claim reaches the game's press-anything handling unchanged.
     /// </summary>
-    public sealed class StoryTextScreen : GraphScreen
+    public sealed class StoryTextScreen : LiveScreen<IStoryTextAdapter>
     {
         private const string StoryStop = "story-text";
 
         private static readonly PropertyInfo DialogueInstallerContainerProperty =
             AccessTools.Property(typeof(DialogueMenuInstaller), "Container");
 
-        private readonly IStoryTextAdapter _adapter;
-
         // A subject of its own for the node: the sources draw the text in meshes the adapters do not
         // hand out.
         private readonly object _bodyKey = new object();
 
-        public StoryTextScreen(IStoryTextAdapter adapter)
+        /// <summary>After a hot reload: the three sources tried in the order the detector's own
+        /// handlers would have written them, first one wins. Scanned once, from
+        /// <c>ScreenDetector.RecoverRuntimeState</c>.</summary>
+        public static void Recover()
         {
-            _adapter = adapter;
-        }
-
-        public static Screen TryBuildActiveLetterboxScreen()
-        {
-            LetterboxStoryTextAdapter adapter = FindActiveLetterboxStoryText();
-            return adapter != null ? new StoryTextScreen(adapter) : null;
-        }
-
-        public static Screen TryBuildActiveScreen()
-        {
-            StoryTextAdapter adapter = FindActiveStoryText();
-            return adapter != null ? new StoryTextScreen(adapter) : null;
-        }
-
-        public static Screen TryBuildActiveDialogueScreen()
-        {
-            DialogueMenuAdapter adapter = FindActiveDialogueMenu();
-            return adapter != null ? new StoryTextScreen(adapter) : null;
+            Recovered<StoryTextScreen>(
+                (IStoryTextAdapter)FindActiveLetterboxStoryText()
+                ?? FindActiveStoryText()
+                ?? (IStoryTextAdapter)FindActiveDialogueMenu());
         }
 
         public override string Key
         {
             get { return "story-text"; }
+        }
+
+        /// <summary>Layer 200: the story speaks over everything, dialogs included.</summary>
+        public override int Layer
+        {
+            get { return 200; }
         }
 
         /// <summary>None: the one node says the speaker or heading itself.</summary>
@@ -76,14 +68,14 @@ namespace SongsOfConquestAccess.Screens
             get { return null; }
         }
 
-        public override bool IsPresent()
+        public override bool IsActive()
         {
-            return _adapter != null && _adapter.IsPresent();
+            return Live != null && Live.IsPresent();
         }
 
         public override void Build(GraphBuilder builder)
         {
-            if (!IsPresent())
+            if (!IsActive())
             {
                 return;
             }
@@ -93,7 +85,7 @@ namespace SongsOfConquestAccess.Screens
             // ONE BUTTON: "{speaker}: {first paragraph}" then the further paragraphs as parts, every
             // part live, so the next line the game writes in place is read by the live watch under a
             // cursor that never moved. Enter advances (owner ruling 2026-09-07).
-            if (!string.IsNullOrWhiteSpace(_adapter.Body))
+            if (!string.IsNullOrWhiteSpace(Live.Body))
             {
                 ControlId bodyId = ControlId.For(_bodyKey, "story-text:body");
                 NodeVtable body = GraphNodes.Paragraphs(Lines, live: true);
@@ -108,8 +100,8 @@ namespace SongsOfConquestAccess.Screens
         /// draws one ("Cecilia Stoutheart: Peradine, I came as quickly as I could.").</summary>
         private IList<string> Lines()
         {
-            IList<string> lines = _adapter != null ? _adapter.BodyLines : null;
-            string title = _adapter != null ? _adapter.Title : null;
+            IList<string> lines = Live != null ? Live.BodyLines : null;
+            string title = Live != null ? Live.Title : null;
             if (lines == null || lines.Count == 0 || string.IsNullOrWhiteSpace(title))
             {
                 return lines;
@@ -122,9 +114,9 @@ namespace SongsOfConquestAccess.Screens
 
         private void Advance()
         {
-            if (_adapter != null)
+            if (Live != null)
             {
-                _adapter.AdvanceNow();
+                Live.AdvanceNow();
             }
         }
 
