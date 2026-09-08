@@ -178,13 +178,17 @@ namespace SongsOfConquestAccess.Screens
 
         private void BuildBand(GraphBuilder builder)
         {
-            // Save mode draws its "Saved as ..." line where load mode draws the tabs.
-            if (Live.IsSaveDescriptionVisible()
-                && Live.GetSaveDescriptionLines().Count > 0)
+            // Save mode draws its "Saved as ..." line where load mode draws the tabs. The
+            // description is read ONCE: the guard and the paragraph count are the same question.
+            if (Live.IsSaveDescriptionVisible())
             {
-                builder.AddItem(new SyntheticNode(
-                    ControlId.For(Marker("description"), "save-load:description"),
-                    GraphNodes.Paragraphs(() => Live.GetSaveDescriptionLines())));
+                IList<string> description = Live.GetSaveDescriptionLines();
+                if (description.Count > 0)
+                {
+                    builder.AddItem(new SyntheticNode(
+                        ControlId.For(Marker("description"), "save-load:description"),
+                        GraphNodes.Paragraphs(() => description)));
+                }
             }
 
             IReadOnlyList<SaveLoadGameMenuAdapter.TabItem> tabs = Live.GetTabs();
