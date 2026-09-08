@@ -36,7 +36,8 @@ combat walks were injected because the game never held the foreground.
   I inspects, Escape leaves inspect and only then reaches the game; comma and period cycle
   troops, W relevant tiles, S threat, T the turn order, Backslash acts. Then Quickbar, Attacker,
   Defender, Current troop (its ability under it), Turn order, Game menu with Chat, Battle log,
-  End turn. Watch the first aim of a spell: the instruction should be spoken once, not twice.
+  End turn. Type-ahead is off on the whole screen. Watch the first aim of a spell: the
+  instruction should be spoken once, not twice.
 
 ## Decisions taken
 
@@ -44,8 +45,8 @@ combat walks were injected because the game never held the foreground.
   navigator never announces one. The mode's keys go through `GraphScreen.ModeClaims`, asked
   before the navigator's own set, and the graph's Home, End and Backspace are translated onto
   the scanner on a mode node.
-- Type-ahead is off screen-wide on the map (its letter hotkeys) and off on the board node only
-  elsewhere.
+- Type-ahead is off screen-wide on the map and in combat, so the game keeps its own letter
+  hotkeys from every stop (C, V, E); on troop placement it is off on the board node only.
 - Escape stays the game's on every mode node unless the mod owns a state there (a carry,
   inspect, aiming); from a HUD stop it returns to the mode node with the game's close sound.
 - Cancel spell and Cancel ability sit where the game draws them (the Spells spot, the acting

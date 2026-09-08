@@ -168,11 +168,12 @@ namespace SongsOfConquestAccess.Screens
             get { return ModText.Get(ModStrings.Screens.Combat); }
         }
 
-        /// <summary>On everywhere but the board, where A, D, Q, E, Z, C, I, W and S are the cursor's
-        /// keys rather than letters to search with. Read live by the navigator.</summary>
+        /// <summary>Off for the whole screen (owner ruling 2026-09-08): the game keeps its battle
+        /// hotkeys (V the spellbook, E end turn) from every stop, as on the adventure map, and on
+        /// the board A, D, Q, E, Z, C, I, W and S are the cursor's keys.</summary>
         public override bool AllowsTypeahead
         {
-            get { return !IsBoardFocused(); }
+            get { return false; }
         }
 
         public override bool IsPresent()
