@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Reflection;
 using HarmonyLib;
@@ -58,6 +58,8 @@ namespace SongsOfConquestAccess.Adapters
         private readonly ILocalizationHandler _localization;
         private WielderInteract _wielder;
         private DefencePanelWielderAdapter _defendingWielder;
+        private DefenceSlotListAdapter _garrison;
+        private DefenceSlotListAdapter _ballistae;
         private TroopHudAdapter _settlementTroops;
 
         public TownInteractionMenuAdapter(TownInteractionMenu menu)
@@ -399,14 +401,28 @@ namespace SongsOfConquestAccess.Adapters
             }
         }
 
+        /// <summary>The garrison's slots. Kept while the game hands back the same list, so the page's
+        /// build does not allocate a slot list adapter and a slot per entry every frame.</summary>
         public IReadOnlyList<DefenceSlotListAdapter.Slot> GetGarrisonSlots()
         {
-            return new DefenceSlotListAdapter(GetField<List<TroopHUDEntry>>(GetDefencePanelTroops(), GarrisonTroopsField), _localization).GetSlots();
+            List<TroopHUDEntry> entries = GetField<List<TroopHUDEntry>>(GetDefencePanelTroops(), GarrisonTroopsField);
+            if (_garrison == null || !ReferenceEquals(_garrison.Entries, entries))
+            {
+                _garrison = new DefenceSlotListAdapter(entries, _localization);
+            }
+
+            return _garrison.GetSlots();
         }
 
         public IReadOnlyList<DefenceSlotListAdapter.Slot> GetBallistaSlots()
         {
-            return new DefenceSlotListAdapter(GetField<List<TroopHUDEntry>>(GetDefencePanelTroops(), BallistaTroopsField), _localization).GetSlots();
+            List<TroopHUDEntry> entries = GetField<List<TroopHUDEntry>>(GetDefencePanelTroops(), BallistaTroopsField);
+            if (_ballistae == null || !ReferenceEquals(_ballistae.Entries, entries))
+            {
+                _ballistae = new DefenceSlotListAdapter(entries, _localization);
+            }
+
+            return _ballistae.GetSlots();
         }
 
         public void HideNativeTooltip()
