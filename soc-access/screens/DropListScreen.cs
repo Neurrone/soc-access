@@ -196,8 +196,12 @@ namespace SongsOfConquestAccess.Screens
             for (int i = 0; i < options.Count; i++)
             {
                 int index = i;
+                // Named from the list this build was made from rather than fetching the list again:
+                // a label that fetched resolved the whole list once per option read, twice a frame
+                // for the focused option. The graph is rebuilt every frame, so the next build takes
+                // the list afresh.
                 NodeVtable vtable = GraphNodes.Choice(
-                    () => Option(item, index),
+                    () => Option(options, index),
                     () => item.GetValue() == index,
                     () => Choose(index),
                     item.IsEnabled);
@@ -216,9 +220,8 @@ namespace SongsOfConquestAccess.Screens
             }
         }
 
-        private static string Option(IDropList item, int index)
+        private static string Option(IReadOnlyList<string> options, int index)
         {
-            IReadOnlyList<string> options = item.GetOptions();
             return options != null && index < options.Count ? options[index] : string.Empty;
         }
 
