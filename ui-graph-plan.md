@@ -62,8 +62,6 @@ Paths relative to `soc-access/`.
   from `Widget` but are the modes' cursors, in no tree (drop the base in G). `TroopHudMenu` and
   every other `ui/*Widget.cs` are dead code for G. `Portrait` is still read by ported screens as
   a native-portrait reader. `TextInputEchoHelper` survives as the graph editor's echo.
-  `TooltipActionsMenuScreen` (Backquote) is unreachable from any screen and goes in G with the
-  `TooltipAction`s the adapters still build.
 - Widget-era input actions (`input/AccessibilityActions.cs`): `next_widget`, `next_menu_item`,
   `activate`, `cancel`, `start_drag`, `slider_*`; the map, combat, scanner and bookmark sets
   are still the modes' keys and stay. The input stand-down for a focused game text box applies
@@ -239,13 +237,16 @@ carry, the three modes, and the polling screen manager (2026-09-08).
 ### Phase G — cleanup
 
 Delete `ui/UIManager.cs`, `ui/FocusContext.cs`, every `ui/*Widget.cs`, `ui/MenuWidget.cs`,
-`ui/TableWidget.cs`, the three grid classes' widget base, the Backquote tooltip-actions
-action and the adapters' `TooltipAction`s (the screen and the manager branch went in F),
+`ui/TableWidget.cs`, the three grid classes' widget base,
 the widget-era input actions, `adapters/NativeTextPrompt.cs` (unused since the mod dialogs),
 and the unused drag strings (`UI.DragStartedTroopPlacement`, `UI.DragComplete`). Sweep every
 adapter's `SpeechTextSanitizer.Normalize` into per-line handling (`ui/SpokenLines.cs` is the
 shape). Lift the graph-screens-only limit on the input stand-down. Update `AGENTS.md` (the
 adapter rule stays; widget-tree wording becomes graph wording) and `screens/README.md`.
+
+Done in G: the tooltip actions machinery is gone. The map and battle tiles now say the game's
+own click instructions as usage hints on the keys that perform them (`ui/TileInstructionHints.cs`,
+`adapters/TileInstruction.cs`) instead of an "Available actions" buffer line.
 
 ## 6. Screen inventory
 
@@ -280,8 +281,8 @@ attacker threat level, the scouting lines, the multiplayer wait; in combat the q
 defender wielder, the battle log, spell and ability aiming, the multiplayer names and turn
 timer.
 
-Not graph screens: `TooltipActionsMenuScreen` (a widget menu, unreachable now; deleted in G)
-and `StoryFocusBlockerScreen` (a container; deleted in F, its flag becomes a predicate).
+Not graph screens: `StoryFocusBlockerScreen` (a container; deleted in F, its flag becomes a
+predicate).
 
 ## 7. Risks
 

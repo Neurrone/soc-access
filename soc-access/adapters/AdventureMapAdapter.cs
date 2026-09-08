@@ -68,6 +68,25 @@ namespace SongsOfConquestAccess.Adapters
         private readonly FieldInfo _gamepadTooltipHandleField;
         private readonly FieldInfo _fogHasFinishedLoadingField;
         private readonly FieldInfo _currentInputModuleField;
+        // The kinds the game names its map tooltip instruction rows after
+        // ("Adventure/TooltipInstruction/<Kind>"), paired with what the mod calls them.
+        private static readonly TileInstruction[] MapInstructionKinds =
+        {
+            TileInstruction.Select,
+            TileInstruction.Visit,
+            TileInstruction.Trade,
+            TileInstruction.Repair,
+            TileInstruction.Interact,
+            TileInstruction.Pillage,
+            TileInstruction.Attack,
+            TileInstruction.Pickup,
+            TileInstruction.Claim,
+            TileInstruction.Teleport
+        };
+
+        private readonly HashSet<string> _unknownMapInstructions = new HashSet<string>(StringComparer.Ordinal);
+        private Dictionary<string, TileInstruction> _mapInstructionKinds;
+        private bool _mapInstructionKindsProbed;
         private GameObject _cursorOverlay;
         private RectTransform[] _cursorOverlaySegments;
         private Vector2Int? _focusedOverlayTile;
@@ -2751,11 +2770,14 @@ namespace SongsOfConquestAccess.Adapters
             DetailsTextUtility captured = DetailsTextUtility.Capture(details, _localizationHandler);
             List<string> textLines = new List<string>(captured.TextLines);
             EnrichArtifactTooltipLines(details, textLines);
-            List<TooltipAction> actions = BuildMapTooltipActions(tile, captured.InstructionRows, textLines);
+            TileInstruction primary;
+            TileInstruction secondary;
+            TakeMapTooltipInstructions(captured.InstructionRows, textLines, out primary, out secondary);
             return new Tooltip(
                 () => textLines,
                 new VisualTooltipMetadata(tooltipable, GetScreenPoint(tile), details),
-                actions);
+                primary,
+                secondary);
         }
 
         private void EnrichArtifactTooltipLines(IDetails details, List<string> textLines)
@@ -2795,15 +2817,23 @@ namespace SongsOfConquestAccess.Adapters
             return false;
         }
 
-        private List<TooltipAction> BuildMapTooltipActions(
-            Vector2Int tile,
+        /// <summary>
+        /// Take the native click-instruction rows out of the tooltip text and report what each one
+        /// said the click would DO. The row is stripped either way - it describes a mouse gesture the
+        /// keyboard player is not making - and the screen says the kind as a usage hint on the key
+        /// that performs it.
+        /// </summary>
+        private void TakeMapTooltipInstructions(
             IReadOnlyList<TooltipInstructionRow> instructionRows,
-            List<string> textLines)
+            List<string> textLines,
+            out TileInstruction primary,
+            out TileInstruction secondary)
         {
-            List<TooltipAction> actions = new List<TooltipAction>();
+            primary = TileInstruction.None;
+            secondary = TileInstruction.None;
             if (instructionRows == null || instructionRows.Count == 0)
             {
-                return actions;
+                return;
             }
 
             for (int i = 0; i < instructionRows.Count; i++)
@@ -2814,20 +2844,68 @@ namespace SongsOfConquestAccess.Adapters
                     continue;
                 }
 
-                Vector2Int capturedTile = tile;
                 if (IsPrimaryMapInstruction(row.InputType))
                 {
                     RemoveExactLine(textLines, row.Text);
-                    actions.Add(new TooltipAction(row.Text, () => HandlePrimaryAction(capturedTile)));
+                    primary = ClassifyMapInstruction(row.Text);
                 }
                 else if (IsSecondaryMapInstruction(row.InputType))
                 {
                     RemoveExactLine(textLines, row.Text);
-                    actions.Add(new TooltipAction(row.Text, () => HandleSecondaryAction(capturedTile)));
+                    secondary = ClassifyMapInstruction(row.Text);
+                }
+            }
+        }
+
+        /// <summary>The kind a row's text names, matched against the game's own
+        /// "Adventure/TooltipInstruction/&lt;Kind&gt;" strings, which are resolved once per adapter.
+        /// A wording the table does not hold is logged once so a new game kind shows up in the log
+        /// rather than vanishing.</summary>
+        private TileInstruction ClassifyMapInstruction(string text)
+        {
+            EnsureMapInstructionKinds();
+            TileInstruction kind;
+            if (_mapInstructionKinds != null
+                && _mapInstructionKinds.TryGetValue(text.Trim(), out kind))
+            {
+                return kind;
+            }
+
+            if (_unknownMapInstructions.Add(text))
+            {
+                SocAccessMod.Instance?.LogWarning(
+                    "AdventureMapAdapter saw an unrecognized tooltip instruction row: " + text);
+            }
+
+            return TileInstruction.None;
+        }
+
+        private void EnsureMapInstructionKinds()
+        {
+            if (_mapInstructionKindsProbed)
+            {
+                return;
+            }
+
+            _mapInstructionKindsProbed = true;
+            if (_localizationHandler == null)
+            {
+                return;
+            }
+
+            Dictionary<string, TileInstruction> kinds =
+                new Dictionary<string, TileInstruction>(StringComparer.Ordinal);
+            for (int i = 0; i < MapInstructionKinds.Length; i++)
+            {
+                TileInstruction kind = MapInstructionKinds[i];
+                string text = Localize("Adventure/TooltipInstruction/" + kind);
+                if (!string.IsNullOrWhiteSpace(text))
+                {
+                    kinds[text.Trim()] = kind;
                 }
             }
 
-            return actions;
+            _mapInstructionKinds = kinds;
         }
 
         private bool IsPrimaryMapInstruction(InputType inputType)

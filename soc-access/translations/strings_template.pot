@@ -1329,11 +1329,6 @@ msgctxt "Actions.SummarizeResources"
 msgid "Summarize Resources"
 msgstr ""
 
-#. Actions.TooltipActionsMenu
-msgctxt "Actions.TooltipActionsMenu"
-msgid "Tooltip Actions Menu"
-msgstr ""
-
 #. Actions.UiBack
 msgctxt "Actions.UiBack"
 msgid "Back"
@@ -1852,11 +1847,6 @@ msgstr ""
 #. Combat.YourTroops
 msgctxt "Combat.YourTroops"
 msgid "your troops"
-msgstr ""
-
-#. UI.AvailableActions
-msgctxt "UI.AvailableActions"
-msgid "Available actions: {0}."
 msgstr ""
 
 #. UI.Blank
@@ -3014,9 +3004,59 @@ msgctxt "Screens.TileAnnouncements"
 msgid "Tile announcements"
 msgstr ""
 
-#. Screens.TooltipActions
-msgctxt "Screens.TooltipActions"
-msgid "Tooltip actions"
+#. Screens.TileAttackHint
+msgctxt "Screens.TileAttackHint"
+msgid "{0} attacks"
+msgstr ""
+
+#. Screens.TileClaimHint
+msgctxt "Screens.TileClaimHint"
+msgid "{0} claims"
+msgstr ""
+
+#. Screens.TileInteractHint
+msgctxt "Screens.TileInteractHint"
+msgid "{0} interacts"
+msgstr ""
+
+#. Screens.TileMoveHint
+msgctxt "Screens.TileMoveHint"
+msgid "{0} moves"
+msgstr ""
+
+#. Screens.TilePickupHint
+msgctxt "Screens.TilePickupHint"
+msgid "{0} picks up"
+msgstr ""
+
+#. Screens.TilePillageHint
+msgctxt "Screens.TilePillageHint"
+msgid "{0} pillages"
+msgstr ""
+
+#. Screens.TileRepairHint
+msgctxt "Screens.TileRepairHint"
+msgid "{0} repairs"
+msgstr ""
+
+#. Screens.TileSelectHint
+msgctxt "Screens.TileSelectHint"
+msgid "{0} selects"
+msgstr ""
+
+#. Screens.TileTeleportHint
+msgctxt "Screens.TileTeleportHint"
+msgid "{0} teleports"
+msgstr ""
+
+#. Screens.TileTradeHint
+msgctxt "Screens.TileTradeHint"
+msgid "{0} trades"
+msgstr ""
+
+#. Screens.TileVisitHint
+msgctxt "Screens.TileVisitHint"
+msgid "{0} visits"
 msgstr ""
 
 #. Screens.Tier

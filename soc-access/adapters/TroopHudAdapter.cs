@@ -438,12 +438,10 @@ namespace SongsOfConquestAccess.Adapters
 
         /// <summary>
         /// The troop's own details, as the game draws them on hover. The line telling the player to
-        /// right click to disband is dropped either way - it describes a gesture rather than the troop
-        /// - and <paramref name="offerDisbandAction"/> decides whether it comes back as a structured
-        /// action instead, which is what the widget screens' tooltip actions menu offers. The graph
-        /// rows say it as a usage hint on the right-click key, so they ask for no action.
+        /// right click to disband is dropped - it describes a gesture rather than the troop - and the
+        /// graph rows say the gesture as a usage hint on the right-click key instead.
         /// </summary>
-        private Tooltip BuildTroopTooltip(TroopHUDEntry entry, bool offerDisbandAction)
+        private Tooltip BuildTroopTooltip(TroopHUDEntry entry)
         {
             Tooltip tooltip = Tooltip.ForComponent(entry != null ? entry.GetSelectable() : null, _localization);
             AdventureTroopDetails details = entry != null ? entry.TroopDetails : null;
@@ -454,22 +452,7 @@ namespace SongsOfConquestAccess.Adapters
 
             string disbandLine = GetLocalizedText("Adventure/TroopHUD/DisbandInstruction", "Disband Troop");
             List<string> instructionLines = new List<string> { disbandLine };
-            List<TooltipAction> actions = offerDisbandAction
-                ? new List<TooltipAction> { new TooltipAction(disbandLine, () => InvokeTroopRightClick(entry)) }
-                : null;
-
-            return new Tooltip(() => RemoveExactLines(tooltip.TextLines, instructionLines), tooltip.VisualMetadata, actions);
-        }
-
-        private static bool InvokeTroopRightClick(TroopHUDEntry entry)
-        {
-            if (entry == null || entry.OnRightClick == null)
-            {
-                return false;
-            }
-
-            entry.OnRightClick(entry);
-            return true;
+            return new Tooltip(() => RemoveExactLines(tooltip.TextLines, instructionLines), tooltip.VisualMetadata);
         }
 
         private string GetLocalizedText(string key, string fallback)
@@ -572,18 +555,11 @@ namespace SongsOfConquestAccess.Adapters
                 get { return IsOccupied && Entry.Troop.Stats != null && Entry.Troop.Stats.MaxTroopSize != null ? Entry.Troop.Stats.MaxTroopSize.GetValue() : 0; }
             }
 
-            /// <summary>The troop's details with the disband instruction offered as a structured
-            /// action - what the widget screens' tooltip actions menu reads.</summary>
-            public Tooltip Tooltip
-            {
-                get { return _adapter.BuildTroopTooltip(Entry, offerDisbandAction: true); }
-            }
-
-            /// <summary>The same details with no action attached: the graph rows say the disband
-            /// gesture as a usage hint instead.</summary>
+            /// <summary>The troop's details, minus the disband instruction row: the graph rows say
+            /// the disband gesture as a usage hint instead.</summary>
             public Tooltip Details
             {
-                get { return _adapter.BuildTroopTooltip(Entry, offerDisbandAction: false); }
+                get { return _adapter.BuildTroopTooltip(Entry); }
             }
 
             /// <summary>False for a slot the bar draws with a lock on it - a slot the wielder has not

@@ -10,17 +10,18 @@ namespace SongsOfConquestAccess.Adapters
     public sealed class Tooltip
     {
         private static readonly IReadOnlyList<string> EmptyLines = new string[0];
-        private static readonly IReadOnlyList<TooltipAction> EmptyActions = new TooltipAction[0];
         private readonly Func<IReadOnlyList<string>> _getTextLines;
 
         public Tooltip(
             Func<IReadOnlyList<string>> getTextLines,
             VisualTooltipMetadata visualMetadata,
-            IReadOnlyList<TooltipAction> actions = null)
+            TileInstruction primaryInstruction = TileInstruction.None,
+            TileInstruction secondaryInstruction = TileInstruction.None)
         {
             _getTextLines = getTextLines;
             VisualMetadata = visualMetadata;
-            Actions = actions ?? EmptyActions;
+            PrimaryInstruction = primaryInstruction;
+            SecondaryInstruction = secondaryInstruction;
         }
 
         // Final tooltip lines after optional adapter enrichment. These are raw
@@ -33,10 +34,12 @@ namespace SongsOfConquestAccess.Adapters
 
         public VisualTooltipMetadata VisualMetadata { get; private set; }
 
-        // Structured actions the accessibility layer can invoke for this
-        // tooltip. These are added by adapters that understand the native source
-        // object; generic tooltip extraction does not infer actions from text.
-        public IReadOnlyList<TooltipAction> Actions { get; private set; }
+        // What the game's own instruction rows said a click here would do. Only
+        // the map and battle tile adapters classify them; everywhere else both
+        // stay None.
+        public TileInstruction PrimaryInstruction { get; private set; }
+
+        public TileInstruction SecondaryInstruction { get; private set; }
 
         public static Tooltip ForComponent(Component component, ILocalizationHandler localization)
         {
@@ -71,19 +74,6 @@ namespace SongsOfConquestAccess.Adapters
                 VisualTooltipMetadata.ForComponent(component, anchor, anchors));
         }
 
-    }
-
-    public sealed class TooltipAction
-    {
-        public TooltipAction(string label, Func<bool> invoke)
-        {
-            Label = label ?? string.Empty;
-            Invoke = invoke;
-        }
-
-        public string Label { get; private set; }
-
-        public Func<bool> Invoke { get; private set; }
     }
 
     public sealed class VisualTooltipMetadata

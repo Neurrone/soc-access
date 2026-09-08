@@ -190,17 +190,11 @@ namespace SongsOfConquestAccess.Dev
                         }
                     }
                 }
-
-                string actions = ActionLabels(node);
-                if (actions.Length > 0 && !sink.Line(indent + "    actions: " + actions))
-                {
-                    return;
-                }
             }
         }
 
-        /// <summary>One line per node, four columns, nothing positional - the shape a walk of two
-        /// implementations can be sorted and diffed in: label, status words, buffer lines, actions.</summary>
+        /// <summary>One line per node, three columns, nothing positional - the shape a walk of two
+        /// implementations can be sorted and diffed in: label, status words, buffer lines.</summary>
         private static void WriteFlat(Sink sink, GraphRender render, bool buffers)
         {
             foreach (ControlId key in Order(render))
@@ -213,8 +207,7 @@ namespace SongsOfConquestAccess.Dev
 
                 string line = Label(node)
                     + " | " + Status(node)
-                    + " | " + (buffers ? string.Join(" / ", Buffer(node).ToArray()) : string.Empty)
-                    + " | " + ActionLabels(node);
+                    + " | " + (buffers ? string.Join(" / ", Buffer(node).ToArray()) : string.Empty);
                 if (!sink.Line(line))
                 {
                     return;
@@ -315,37 +308,6 @@ namespace SongsOfConquestAccess.Dev
             {
                 return new List<string> { "<err: " + e.Message + ">" };
             }
-        }
-
-        private static string ActionLabels(GraphNode node)
-        {
-            Tooltip tooltip;
-            try
-            {
-                Func<object> points = node.Vtable.PointsAt;
-                tooltip = points == null ? null : points() as Tooltip;
-            }
-            catch (Exception)
-            {
-                return string.Empty;
-            }
-
-            if (tooltip == null || tooltip.Actions == null)
-            {
-                return string.Empty;
-            }
-
-            List<string> labels = new List<string>(tooltip.Actions.Count);
-            for (int i = 0; i < tooltip.Actions.Count; i++)
-            {
-                TooltipAction action = tooltip.Actions[i];
-                if (action != null && !string.IsNullOrWhiteSpace(action.Label))
-                {
-                    labels.Add(action.Label);
-                }
-            }
-
-            return string.Join(", ", labels.ToArray());
         }
 
         /// <summary>Where each arrow goes from here, resolved the way the navigator resolves it: a

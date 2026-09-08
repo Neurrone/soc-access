@@ -82,7 +82,7 @@ Mod routes answer 404 while the mod is down:
   screen (`screens/GraphScreen.cs`): one line per node in navigation order, indented by its
   depth, with `-- stop:` markers between Tab stops and `(collapsed)` on a shut group;
   `buffers=1` adds each node's review-buffer lines, `flat=1` answers one
-  `label | status | buffer | actions` line per leaf for diffing, `edges=1` adds where each arrow
+  `label | status | buffer` line per leaf for diffing, `edges=1` adds where each arrow
   goes from every node (a wired edge, `adjust value`, `expand`, `descend to`, `collapse`,
   `ascend to`). `screen=KEY` dumps that registered screen instead, built over a throwaway state
   whether or not anyone is on it; an unknown key answers 404 listing the keys. Side-effect free:
@@ -144,7 +144,6 @@ screen: <ScreenType> | stack: <Bottom> > ... > <Top>
 <indent>[*] <WidgetType> #<id> "<line as spoken on arrival>"
 <indent>    buffer: <line 1>
 <indent>    buffer: <line 2>
-<indent>    actions: <a>, <b>
 <indent>[ ] <MultiPositionType> #<id> (multi-position) current="<GetFocusMessage()>" key=<GetAnnouncementKey()>
 ```
 
@@ -155,14 +154,14 @@ Flat mode (`flat=1`): one line per leaf, no indentation, no focus marker, no rol
 no position text, no context prefix:
 
 ```
-<label> | <status> | <buffer lines joined " / "> | <actions joined ", ">
+<label> | <status> | <buffer lines joined " / ">
 ```
 
 Labels come from `GetLabel()`, status from `GetStatus()`, buffer lines from the same
 composition the UI review buffer uses (label lines, status, tooltip lines with the duplicated
-heading dropped, actions text). Multi-position widgets print one flat line
+heading dropped). Multi-position widgets print one flat line
 `<Type> (multi-position) | <current focus message>`. The graph dump maps its node parts onto
-the same four columns.
+the same three columns.
 
 ## 3. Probes (`/eval` one-liners)
 

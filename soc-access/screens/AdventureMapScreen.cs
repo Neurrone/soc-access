@@ -354,6 +354,9 @@ namespace SongsOfConquestAccess.Screens
             vtable.OnContextual = ContextualTile;
             vtable.OnFocusVisual = () => Grid()?.ShowOverlay();
             vtable.OnBlurVisual = () => Grid()?.HideOverlay();
+            // While the teleport menu is up the stop already carries the game's instruction and Enter
+            // means confirm, so the tile's own click hints say nothing then.
+            TileInstructionHints.Add(vtable, TileTooltip, () => TeleportMenu == null);
             builder.AddItem(new SyntheticNode(MapNodeId, vtable));
 
             builder.PopContext();

@@ -13,9 +13,6 @@ namespace SongsOfConquestAccess.Input
         // Global actions are available on every accessibility screen. The input
         // router checks screen-claimed actions first, then global actions, so
         // screens can own keys before global fallbacks see them.
-        public static readonly InputAction TooltipActionsMenu = OneShot("tooltip_actions_menu", ModStrings.Actions.TooltipActionsMenu, InputClaimScope.Screen)
-            .AddBinding(new KeyboardBinding(Key.Backquote));
-
         public static readonly InputAction SummarizeResources = OneShot("summarize_resources", ModStrings.Actions.SummarizeResources, InputClaimScope.Screen)
             .AddBinding(new KeyboardBinding(Key.R, ctrl: true));
 
@@ -45,7 +42,6 @@ namespace SongsOfConquestAccess.Input
 
         public static readonly InputAction[] GLOBAL_ACTIONS =
         {
-            TooltipActionsMenu,
             SummarizeResources,
             SummarizeEnemyResources,
             OpenModSettings,

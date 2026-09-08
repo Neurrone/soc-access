@@ -320,11 +320,6 @@ msgctxt "Events.WielderTeleported"
 msgid "{0} teleported to {1}"
 msgstr "{0} teleportował się do {1}"
 
-#. UI.AvailableActions
-msgctxt "UI.AvailableActions"
-msgid "Available actions: {0}."
-msgstr "Dostępne akcje: {0}."
-
 #. UI.Blank
 msgctxt "UI.Blank"
 msgid "blank"
@@ -1050,11 +1045,6 @@ msgctxt "Screens.TeamValue"
 msgid "Team {0}"
 msgstr "Drużyna {0}"
 
-#. Screens.TooltipActions
-msgctxt "Screens.TooltipActions"
-msgid "Tooltip actions"
-msgstr "Akcje podpowiedzi"
-
 #. Screens.Tier
 msgctxt "Screens.Tier"
 msgid "Tier"
@@ -1534,11 +1524,6 @@ msgstr "Podsumuj zasoby wroga"
 msgctxt "Actions.SummarizeResources"
 msgid "Summarize Resources"
 msgstr "Podsumuj zasoby"
-
-#. Actions.TooltipActionsMenu
-msgctxt "Actions.TooltipActionsMenu"
-msgid "Tooltip Actions Menu"
-msgstr "Menu akcji podpowiedzi"
 
 #. Actions.TroopSplit_0
 msgctxt "Actions.TroopSplit_0"
@@ -3257,6 +3242,61 @@ msgstr "Uwzględnij interpunkcję sufiksu"
 msgctxt "Screens.TileAnnouncements"
 msgid "Tile announcements"
 msgstr "Komunikaty pól"
+
+#. Screens.TileAttackHint
+msgctxt "Screens.TileAttackHint"
+msgid "{0} attacks"
+msgstr "{0}, aby zaatakować"
+
+#. Screens.TileClaimHint
+msgctxt "Screens.TileClaimHint"
+msgid "{0} claims"
+msgstr "{0}, aby przejąć"
+
+#. Screens.TileInteractHint
+msgctxt "Screens.TileInteractHint"
+msgid "{0} interacts"
+msgstr "{0}, aby wejść w interakcję"
+
+#. Screens.TileMoveHint
+msgctxt "Screens.TileMoveHint"
+msgid "{0} moves"
+msgstr "{0}, aby się poruszyć"
+
+#. Screens.TilePickupHint
+msgctxt "Screens.TilePickupHint"
+msgid "{0} picks up"
+msgstr "{0}, aby podnieść"
+
+#. Screens.TilePillageHint
+msgctxt "Screens.TilePillageHint"
+msgid "{0} pillages"
+msgstr "{0}, aby splądrować"
+
+#. Screens.TileRepairHint
+msgctxt "Screens.TileRepairHint"
+msgid "{0} repairs"
+msgstr "{0}, aby naprawić"
+
+#. Screens.TileSelectHint
+msgctxt "Screens.TileSelectHint"
+msgid "{0} selects"
+msgstr "{0}, aby wybrać"
+
+#. Screens.TileTeleportHint
+msgctxt "Screens.TileTeleportHint"
+msgid "{0} teleports"
+msgstr "{0}, aby się teleportować"
+
+#. Screens.TileTradeHint
+msgctxt "Screens.TileTradeHint"
+msgid "{0} trades"
+msgstr "{0}, aby handlować"
+
+#. Screens.TileVisitHint
+msgctxt "Screens.TileVisitHint"
+msgid "{0} visits"
+msgstr "{0}, aby odwiedzić"
 
 #. Screens.TroopAnnouncements
 msgctxt "Screens.TroopAnnouncements"

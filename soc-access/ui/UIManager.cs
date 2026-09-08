@@ -208,8 +208,6 @@ namespace SongsOfConquestAccess.UI
                         AddNormalizedTextLines(lines, tooltipLines[i]);
                     }
                 }
-
-                AddIfNotEmpty(lines, widget.GetTooltipActionsText());
             }
 
             return lines;

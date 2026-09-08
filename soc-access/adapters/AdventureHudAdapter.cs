@@ -310,11 +310,6 @@ namespace SongsOfConquestAccess.Adapters
             }
         }
 
-        public Tooltip GetTroopSlotTooltip(int index)
-        {
-            return BuildTroopSlotTooltip(GetTroopSlot(index));
-        }
-
         public bool IsInventoryButtonVisible()
         {
             return IsSelectionHudVisible() && IsButtonVisible(CommanderSettings != null ? CommanderSettings.InventoryButton : null);
@@ -1707,36 +1702,6 @@ namespace SongsOfConquestAccess.Adapters
             return entries != null && index >= 0 && index < entries.Count ? entries[index] : null;
         }
 
-        private Tooltip BuildTroopSlotTooltip(TroopHUDEntry entry)
-        {
-            Tooltip tooltip = Tooltip.ForComponent(entry, LocalizationHandler);
-            AdventureTroopDetails details = entry != null ? entry.TroopDetails : null;
-            if (tooltip == null || details == null || !details.ShowDisbandInstruction || !details.CanDisband)
-            {
-                return tooltip;
-            }
-
-            string disbandLine = Localize("Adventure/TroopHUD/DisbandInstruction", "Disband Troop");
-            List<string> instructionLines = new List<string> { disbandLine };
-            List<TooltipAction> actions = new List<TooltipAction>
-            {
-                new TooltipAction(disbandLine, () => InvokeTroopRightClick(entry))
-            };
-
-            return new Tooltip(() => RemoveExactLines(tooltip.TextLines, instructionLines), tooltip.VisualMetadata, actions);
-        }
-
-        private static bool InvokeTroopRightClick(TroopHUDEntry entry)
-        {
-            if (entry == null || entry.OnRightClick == null)
-            {
-                return false;
-            }
-
-            entry.OnRightClick(entry);
-            return true;
-        }
-
         private string GetRoundTextLabel()
         {
             UITextMesh[] texts = GetField<UITextMesh[]>(TeamQueueHud, TeamQueueRoundTextsField);
@@ -1974,39 +1939,6 @@ namespace SongsOfConquestAccess.Adapters
             }
 
             return string.Empty;
-        }
-
-        private static IReadOnlyList<string> RemoveExactLines(IReadOnlyList<string> lines, IReadOnlyList<string> linesToRemove)
-        {
-            if (lines == null || lines.Count == 0 || linesToRemove == null || linesToRemove.Count == 0)
-            {
-                return lines ?? new string[0];
-            }
-
-            List<string> result = new List<string>();
-            for (int i = 0; i < lines.Count; i++)
-            {
-                string line = lines[i];
-                if (!ContainsExact(linesToRemove, line))
-                {
-                    result.Add(line);
-                }
-            }
-
-            return result;
-        }
-
-        private static bool ContainsExact(IReadOnlyList<string> lines, string candidate)
-        {
-            for (int i = 0; i < lines.Count; i++)
-            {
-                if (string.Equals(lines[i], candidate, StringComparison.Ordinal))
-                {
-                    return true;
-                }
-            }
-
-            return false;
         }
 
         private string GetCommanderName(ICommanderState commander)

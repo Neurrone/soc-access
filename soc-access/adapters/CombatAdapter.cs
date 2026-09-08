@@ -69,6 +69,9 @@ namespace SongsOfConquestAccess.Adapters
         private readonly IBattleTooltipUtility _tooltipUtility;
         private readonly IInputManager _inputManager;
         private readonly ILocalizationHandler _localization;
+        private readonly HashSet<string> _unknownCombatInstructions = new HashSet<string>(StringComparer.Ordinal);
+        private Dictionary<string, TileInstruction> _combatInstructionKinds;
+        private bool _combatInstructionKindsProbed;
         private readonly ICameraLookup _cameraLookup;
         private readonly object _cartographyConverter;
         private readonly IHumanBattleControllerFacade _humanBattleController;
@@ -1166,11 +1169,12 @@ namespace SongsOfConquestAccess.Adapters
 
             DetailsTextUtility captured = DetailsTextUtility.Capture(details, _localization);
             List<string> textLines = new List<string>(captured.TextLines);
-            List<TooltipAction> actions = BuildCombatTooltipActions(tile, captured.InstructionRows, textLines);
+            TileInstruction secondary = TakeCombatTooltipInstruction(captured.InstructionRows, textLines);
             return new Tooltip(
                 () => includeAttackPreview ? BuildTooltipLinesWithAttackPreview(textLines, attackPreviewTargetIsEntity) : textLines,
                 CreateScreenPointTooltipMetadata(details, tile),
-                actions);
+                TileInstruction.None,
+                secondary);
         }
 
         private IReadOnlyList<string> BuildTooltipLinesWithAttackPreview(IReadOnlyList<string> detailsLines, bool targetIsEntity)
@@ -1373,36 +1377,91 @@ namespace SongsOfConquestAccess.Adapters
             }
         }
 
-        private List<TooltipAction> BuildCombatTooltipActions(
-            Vector2Int tile,
+        /// <summary>
+        /// Take the native right-click instruction row out of the tooltip text and report what it
+        /// said the click would DO. The board has no primary row. The row is stripped either way - it
+        /// describes a mouse gesture the keyboard player is not making - and the screen says the kind
+        /// as a usage hint on the key that performs it.
+        /// </summary>
+        private TileInstruction TakeCombatTooltipInstruction(
             IReadOnlyList<TooltipInstructionRow> instructionRows,
             List<string> textLines)
         {
-            List<TooltipAction> actions = new List<TooltipAction>();
+            TileInstruction secondary = TileInstruction.None;
             if (instructionRows == null || instructionRows.Count == 0)
             {
-                return actions;
+                return secondary;
             }
 
             for (int i = 0; i < instructionRows.Count; i++)
             {
                 TooltipInstructionRow row = instructionRows[i];
-                if (row == null || string.IsNullOrWhiteSpace(row.Text))
+                if (row == null
+                    || string.IsNullOrWhiteSpace(row.Text)
+                    || !IsSecondaryCombatInstruction(row.InputType))
                 {
                     continue;
                 }
 
-                if (!IsSecondaryCombatInstruction(row.InputType))
-                {
-                    continue;
-                }
-
-                Vector2Int capturedTile = tile;
                 RemoveExactLine(textLines, row.Text);
-                actions.Add(new TooltipAction(row.Text, () => InvokeSecondaryTooltipAction(capturedTile)));
+                secondary = ClassifyCombatInstruction(row.Text);
             }
 
-            return actions;
+            return secondary;
+        }
+
+        /// <summary>The kind a row's text names, matched against the game's own battle instruction
+        /// strings, which are resolved once per adapter. A wording the table does not hold is logged
+        /// once so a new game kind shows up in the log rather than vanishing.</summary>
+        private TileInstruction ClassifyCombatInstruction(string text)
+        {
+            EnsureCombatInstructionKinds();
+            TileInstruction kind;
+            if (_combatInstructionKinds != null
+                && _combatInstructionKinds.TryGetValue(text.Trim(), out kind))
+            {
+                return kind;
+            }
+
+            if (_unknownCombatInstructions.Add(text))
+            {
+                SocAccessMod.Instance?.LogWarning(
+                    "CombatAdapter saw an unrecognized tooltip instruction row: " + text);
+            }
+
+            return TileInstruction.None;
+        }
+
+        private void EnsureCombatInstructionKinds()
+        {
+            if (_combatInstructionKindsProbed)
+            {
+                return;
+            }
+
+            _combatInstructionKindsProbed = true;
+            if (_localization == null)
+            {
+                return;
+            }
+
+            Dictionary<string, TileInstruction> kinds =
+                new Dictionary<string, TileInstruction>(StringComparer.Ordinal);
+            AddCombatInstructionKind(kinds, "Battle/InspectTile/ClickToMove", TileInstruction.Move);
+            AddCombatInstructionKind(kinds, "Battle/InspectTroop/AttackPreview/ClickToAttack", TileInstruction.Attack);
+            _combatInstructionKinds = kinds;
+        }
+
+        private void AddCombatInstructionKind(
+            Dictionary<string, TileInstruction> kinds,
+            string key,
+            TileInstruction kind)
+        {
+            string text = Localize(key);
+            if (!string.IsNullOrWhiteSpace(text))
+            {
+                kinds[text.Trim()] = kind;
+            }
         }
 
         private bool IsSecondaryCombatInstruction(InputType inputType)
@@ -1413,17 +1472,6 @@ namespace SongsOfConquestAccess.Adapters
             }
 
             return inputType == InputType.RightMouseClickOrCursorConfirm;
-        }
-
-        private bool InvokeSecondaryTooltipAction(Vector2Int tile)
-        {
-            if (_secondaryClickMethod == null || _mouseKeyboardInputModule == null)
-            {
-                return false;
-            }
-
-            HandleSecondaryAction(tile);
-            return true;
         }
 
         private static void RemoveExactLine(List<string> lines, string lineToRemove)

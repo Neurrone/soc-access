@@ -84,11 +84,6 @@ namespace SongsOfConquestAccess.UI
             return tooltip != null && tooltip.TextLines != null ? tooltip.TextLines : EmptyTooltipLines;
         }
 
-        public string GetTooltipActionsText()
-        {
-            return BuildAvailableActionsText(GetTooltip());
-        }
-
         public virtual bool ClaimsAction(string actionKey)
         {
             return false;
@@ -181,36 +176,6 @@ namespace SongsOfConquestAccess.UI
             return last == '.' || last == '!' || last == '?' || last == ':' || last == ';'
                 ? value
                 : value + ".";
-        }
-
-        private static string BuildAvailableActionsText(Tooltip tooltip)
-        {
-            if (tooltip == null || tooltip.Actions == null || tooltip.Actions.Count == 0)
-            {
-                return string.Empty;
-            }
-
-            List<string> labels = new List<string>();
-            for (int i = 0; i < tooltip.Actions.Count; i++)
-            {
-                TooltipAction action = tooltip.Actions[i];
-                string label = SpeechTextSanitizer.Normalize(action != null ? action.Label : null);
-                if (!string.IsNullOrWhiteSpace(label))
-                {
-                    labels.Add(label);
-                }
-            }
-
-            if (labels.Count == 0)
-            {
-                return string.Empty;
-            }
-
-            // Enriched tooltips remove native mouse/gamepad instruction rows such
-            // as "CTRL + Drop" and replace them with structured actions. Announce
-            // the action labels here so the player knows the Applications menu
-            // has commands.
-            return ModText.Get(ModStrings.UI.AvailableActions, ModText.JoinList(labels));
         }
     }
 }

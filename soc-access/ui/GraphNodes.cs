@@ -85,46 +85,15 @@ namespace SongsOfConquestAccess.UI
 
         /// <summary>
         /// The declared sections of a control, in the order they read: what the control DRAWS beyond
-        /// its readout first, then its tooltip, then the structured actions the tooltip offers (named
-        /// so the player knows the tooltip actions menu has commands). Null when there is none of
-        /// them, which is a complete declaration - the buffer still has the control's own readout.
+        /// its readout first, then its tooltip. Null when there is neither of them, which is a
+        /// complete declaration - the buffer still has the control's own readout.
         /// </summary>
         public static IList<NodeSection> Sections(Func<IList<string>> details, Tooltip tooltip)
         {
             List<NodeSection> list = null;
             Add(ref list, NodeSection.Buffer(details == null ? null : (Func<IList<string>>)(() => SpokenLines.Of(details()))));
             Add(ref list, TooltipSection(tooltip));
-            if (tooltip != null && tooltip.Actions != null && tooltip.Actions.Count > 0)
-            {
-                Tooltip it = tooltip;
-                Add(ref list, NodeSection.Buffer(() => ActionLines(it)));
-            }
-
             return list;
-        }
-
-        /// <summary>The buffer line naming a tooltip's structured actions, as the widget engine
-        /// writes it today.</summary>
-        public static IList<string> ActionLines(Tooltip tooltip)
-        {
-            List<string> labels = new List<string>();
-            IReadOnlyList<TooltipAction> actions = tooltip != null ? tooltip.Actions : null;
-            for (int i = 0; actions != null && i < actions.Count; i++)
-            {
-                TooltipAction action = actions[i];
-                if (action != null && !string.IsNullOrWhiteSpace(action.Label))
-                {
-                    labels.Add(action.Label);
-                }
-            }
-
-            List<string> lines = new List<string>(1);
-            if (labels.Count > 0)
-            {
-                lines.Add(ModText.Get(ModStrings.UI.AvailableActions, ModText.JoinList(labels)));
-            }
-
-            return lines;
         }
 
         /// <summary>A control the player activates. An unavailable one stays focusable and readable

@@ -30,7 +30,7 @@ namespace SongsOfConquestAccess.UI
                     () => BuildSlotLabel(item),
                     item.Focus,
                     () => true,
-                    () => item.IsOccupied ? item.Tooltip : null));
+                    () => item.IsOccupied ? item.Details : null));
             }
 
             return menu;
@@ -79,7 +79,7 @@ namespace SongsOfConquestAccess.UI
                     () => true,
                     () => item.IsOccupied,
                     () => ReferenceEquals(menu.DragSource, widget),
-                    () => item.IsOccupied ? item.Tooltip : null);
+                    () => item.IsOccupied ? item.Details : null);
                 slotByWidget.Add(widget, item);
                 menu.AddItem(widget);
             }

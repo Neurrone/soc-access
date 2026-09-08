@@ -315,11 +315,6 @@ msgctxt "Events.WielderTeleported"
 msgid "{0} teleported to {1}"
 msgstr "{0}傳送到{1}"
 
-#. UI.AvailableActions
-msgctxt "UI.AvailableActions"
-msgid "Available actions: {0}."
-msgstr "可用操作：{0}。"
-
 #. UI.Blank
 msgctxt "UI.Blank"
 msgid "blank"
@@ -1045,11 +1040,6 @@ msgctxt "Screens.TeamValue"
 msgid "Team {0}"
 msgstr "隊伍 {0}"
 
-#. Screens.TooltipActions
-msgctxt "Screens.TooltipActions"
-msgid "Tooltip actions"
-msgstr "提示操作"
-
 #. Screens.Tier
 msgctxt "Screens.Tier"
 msgid "Tier"
@@ -1514,11 +1504,6 @@ msgstr "彙總敵方資源"
 msgctxt "Actions.SummarizeResources"
 msgid "Summarize Resources"
 msgstr "彙總資源"
-
-#. Actions.TooltipActionsMenu
-msgctxt "Actions.TooltipActionsMenu"
-msgid "Tooltip Actions Menu"
-msgstr "提示操作選單"
 
 #. Actions.TroopSplit_0
 msgctxt "Actions.TroopSplit_0"
@@ -3207,6 +3192,61 @@ msgstr "包含後綴標點符號"
 msgctxt "Screens.TileAnnouncements"
 msgid "Tile announcements"
 msgstr "地格播報"
+
+#. Screens.TileAttackHint
+msgctxt "Screens.TileAttackHint"
+msgid "{0} attacks"
+msgstr "按 {0} 攻擊"
+
+#. Screens.TileClaimHint
+msgctxt "Screens.TileClaimHint"
+msgid "{0} claims"
+msgstr "按 {0} 佔領"
+
+#. Screens.TileInteractHint
+msgctxt "Screens.TileInteractHint"
+msgid "{0} interacts"
+msgstr "按 {0} 互動"
+
+#. Screens.TileMoveHint
+msgctxt "Screens.TileMoveHint"
+msgid "{0} moves"
+msgstr "按 {0} 移動"
+
+#. Screens.TilePickupHint
+msgctxt "Screens.TilePickupHint"
+msgid "{0} picks up"
+msgstr "按 {0} 拾取"
+
+#. Screens.TilePillageHint
+msgctxt "Screens.TilePillageHint"
+msgid "{0} pillages"
+msgstr "按 {0} 劫掠"
+
+#. Screens.TileRepairHint
+msgctxt "Screens.TileRepairHint"
+msgid "{0} repairs"
+msgstr "按 {0} 修復"
+
+#. Screens.TileSelectHint
+msgctxt "Screens.TileSelectHint"
+msgid "{0} selects"
+msgstr "按 {0} 選擇"
+
+#. Screens.TileTeleportHint
+msgctxt "Screens.TileTeleportHint"
+msgid "{0} teleports"
+msgstr "按 {0} 傳送"
+
+#. Screens.TileTradeHint
+msgctxt "Screens.TileTradeHint"
+msgid "{0} trades"
+msgstr "按 {0} 交易"
+
+#. Screens.TileVisitHint
+msgctxt "Screens.TileVisitHint"
+msgid "{0} visits"
+msgstr "按 {0} 造訪"
 
 #. Screens.TroopAnnouncements
 msgctxt "Screens.TroopAnnouncements"

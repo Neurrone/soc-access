@@ -56,9 +56,9 @@ namespace SongsOfConquestAccess.Adapters
             // or AddLabelsWithInputTypes. Generic extraction preserves those
             // rows because they are ambiguous: some are status messages, while
             // others describe real actions. Adapters that understand a specific
-            // tooltip source may replace known action instruction rows with
-            // structured TooltipAction entries. Unknown rows remain in TextLines
-            // so unsupported actions are still spoken.
+            // tooltip source may drop known action instruction rows and report
+            // them as a <see cref="TileInstruction"/> instead. Unknown rows
+            // remain in TextLines so unsupported actions are still spoken.
             DetailsTextUtility drawer = new DetailsTextUtility();
             drawer._localization = localization;
             try

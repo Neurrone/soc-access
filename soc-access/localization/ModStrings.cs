@@ -316,7 +316,6 @@ namespace SongsOfConquestAccess.Localization
             public static readonly ModString SummarizeReachableEntities = new ModString("Actions.SummarizeReachableEntities", "Summarize Reachable Entities");
             public static readonly ModString SummarizeEnemyResources = new ModString("Actions.SummarizeEnemyResources", "Summarize Enemy Resources");
             public static readonly ModString SummarizeResources = new ModString("Actions.SummarizeResources", "Summarize Resources");
-            public static readonly ModString TooltipActionsMenu = new ModString("Actions.TooltipActionsMenu", "Tooltip Actions Menu");
             public static readonly ModPluralString TroopSplit = new ModPluralString("Actions.TroopSplit", "Split Off {0} Troop", "Split Off {0} Troops");
             public static readonly ModString UiBack = new ModString("Actions.UiBack", "Back");
             public static readonly ModString UiCarry = new ModString("Actions.UiCarry", "Pick up or drop");
@@ -435,7 +434,6 @@ namespace SongsOfConquestAccess.Localization
 
         public static class UI
         {
-            public static readonly ModString AvailableActions = new ModString("UI.AvailableActions", "Available actions: {0}.");
             public static readonly ModString Blank = new ModString("UI.Blank", "blank");
             public static readonly ModString BufferEmpty = new ModString("UI.BufferEmpty", "Buffer empty");
             public static readonly ModString CannotDropThere = new ModString("UI.CannotDropThere", "Cannot drop there.");
@@ -675,7 +673,17 @@ namespace SongsOfConquestAccess.Localization
             public static readonly ModString Suffix = new ModString("Screens.Suffix", "Include suffix punctuation");
             public static readonly ModString TeamValue = new ModString("Screens.TeamValue", "Team {0}");
             public static readonly ModString TileAnnouncements = new ModString("Screens.TileAnnouncements", "Tile announcements");
-            public static readonly ModString TooltipActions = new ModString("Screens.TooltipActions", "Tooltip actions");
+            public static readonly ModString TileAttackHint = new ModString("Screens.TileAttackHint", "{0} attacks");
+            public static readonly ModString TileClaimHint = new ModString("Screens.TileClaimHint", "{0} claims");
+            public static readonly ModString TileInteractHint = new ModString("Screens.TileInteractHint", "{0} interacts");
+            public static readonly ModString TileMoveHint = new ModString("Screens.TileMoveHint", "{0} moves");
+            public static readonly ModString TilePickupHint = new ModString("Screens.TilePickupHint", "{0} picks up");
+            public static readonly ModString TilePillageHint = new ModString("Screens.TilePillageHint", "{0} pillages");
+            public static readonly ModString TileRepairHint = new ModString("Screens.TileRepairHint", "{0} repairs");
+            public static readonly ModString TileSelectHint = new ModString("Screens.TileSelectHint", "{0} selects");
+            public static readonly ModString TileTeleportHint = new ModString("Screens.TileTeleportHint", "{0} teleports");
+            public static readonly ModString TileTradeHint = new ModString("Screens.TileTradeHint", "{0} trades");
+            public static readonly ModString TileVisitHint = new ModString("Screens.TileVisitHint", "{0} visits");
             public static readonly ModString Tier = new ModString("Screens.Tier", "Tier");
             public static readonly ModString TownStatus = new ModString("Screens.TownStatus", "Town status");
             public static readonly ModString TownStatusRounds = new ModString("Screens.TownStatusRounds", "{0}: {1} rounds complete, {2} rounds remaining");
