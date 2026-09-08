@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
@@ -78,8 +78,16 @@ namespace SongsOfConquestAccess.Adapters
         private readonly ILocalizationHandler _localization;
         private List<PlayerSlotItem> _playerSlots;
         private LobbyMapSettings _mapSettings;
+        private bool _mapSettingsProbed;
         private LobbyMenuButtons.Settings _lobbyButtonsSettings;
+        private bool _lobbyButtonsProbed;
         private MultiplayerPanelItem _multiplayerPanel;
+        private bool _multiplayerPanelProbed;
+        private string _factionLabel;
+        private string _colorLabel;
+        private string _startingWielderLabel;
+        private string _partnershipLabel;
+        private string _aiDifficultyLabel;
 
         public AdventureLobbyPlayersAdapter(LobbyMenu menu)
         {
@@ -104,8 +112,11 @@ namespace SongsOfConquestAccess.Adapters
         {
             _playerSlots = null;
             _mapSettings = null;
+            _mapSettingsProbed = false;
             _lobbyButtonsSettings = null;
+            _lobbyButtonsProbed = false;
             _multiplayerPanel = null;
+            _multiplayerPanelProbed = false;
         }
 
         public bool IsPresent()
@@ -164,27 +175,27 @@ namespace SongsOfConquestAccess.Adapters
         /// from the same localization keys <c>LobbyPlayerEntry</c> writes their tooltips with.</summary>
         public string FactionLabel
         {
-            get { return GetLocalizedText("Adventure/TeamQueueHUD/Faction", string.Empty); }
+            get { return _factionLabel ?? (_factionLabel = GetLocalizedText("Adventure/TeamQueueHUD/Faction", string.Empty)); }
         }
 
         public string ColorLabel
         {
-            get { return GetLocalizedText("Lobby/LobbyPlayerMenu/SetColor", string.Empty); }
+            get { return _colorLabel ?? (_colorLabel = GetLocalizedText("Lobby/LobbyPlayerMenu/SetColor", string.Empty)); }
         }
 
         public string StartingWielderLabel
         {
-            get { return GetLocalizedText("Lobby/LobbyPlayerMenu/SetStartingWielder", string.Empty); }
+            get { return _startingWielderLabel ?? (_startingWielderLabel = GetLocalizedText("Lobby/LobbyPlayerMenu/SetStartingWielder", string.Empty)); }
         }
 
         public string PartnershipLabel
         {
-            get { return GetLocalizedText("Lobby/LobbyPlayerMenu/Coop", string.Empty); }
+            get { return _partnershipLabel ?? (_partnershipLabel = GetLocalizedText("Lobby/LobbyPlayerMenu/Coop", string.Empty)); }
         }
 
         public string AiDifficultyLabel
         {
-            get { return GetLocalizedText("Lobby/LobbyPlayerMenu/SetAiDifficulty", string.Empty); }
+            get { return _aiDifficultyLabel ?? (_aiDifficultyLabel = GetLocalizedText("Lobby/LobbyPlayerMenu/SetAiDifficulty", string.Empty)); }
         }
 
         public IReadOnlyList<PlayerSlotItem> GetPlayerSlots()
@@ -262,13 +273,29 @@ namespace SongsOfConquestAccess.Adapters
             return settings != null ? LobbyButtonItem.ForButton(settings.StartGameButton, _localization) : null;
         }
 
+        /// <summary>The online band, or null in a lobby that has none. The miss is kept as well as the
+        /// hit: an offline lobby has no panel at all, and a scan of the scene per frame to be told so
+        /// again is what the snapshot exists to prevent - the detector drops it with everything else.
+        /// </summary>
         public MultiplayerPanelItem GetMultiplayerPanel()
         {
-            if (_multiplayerPanel != null && _multiplayerPanel.IsPresent)
+            if (_multiplayerPanel != null)
             {
-                return _multiplayerPanel;
+                if (_multiplayerPanel.IsPresent)
+                {
+                    return _multiplayerPanel;
+                }
+
+                _multiplayerPanel = null;
+                _multiplayerPanelProbed = false;
             }
 
+            if (_multiplayerPanelProbed)
+            {
+                return null;
+            }
+
+            _multiplayerPanelProbed = true;
             LobbyMultiplayerPanel panel = FindMultiplayerPanel();
             _multiplayerPanel = panel != null ? new MultiplayerPanelItem(panel, _localization) : null;
             return _multiplayerPanel;
@@ -286,11 +313,12 @@ namespace SongsOfConquestAccess.Adapters
 
         private LobbyMenuButtons.Settings GetLobbyButtonsSettings()
         {
-            if (_lobbyButtonsSettings != null)
+            if (_lobbyButtonsSettings != null || _lobbyButtonsProbed)
             {
                 return _lobbyButtonsSettings;
             }
 
+            _lobbyButtonsProbed = true;
             LobbyMenuButtonsInstaller[] installers = Resources.FindObjectsOfTypeAll<LobbyMenuButtonsInstaller>();
             for (int i = 0; i < installers.Length; i++)
             {
@@ -311,11 +339,23 @@ namespace SongsOfConquestAccess.Adapters
 
         private LobbyMapSettings FindMapSettings()
         {
-            if (_mapSettings != null && IsLiveSceneObject(((Component)_mapSettings).gameObject))
+            if (_mapSettings != null)
             {
-                return _mapSettings;
+                if (IsLiveSceneObject(((Component)_mapSettings).gameObject))
+                {
+                    return _mapSettings;
+                }
+
+                _mapSettings = null;
+                _mapSettingsProbed = false;
             }
 
+            if (_mapSettingsProbed)
+            {
+                return null;
+            }
+
+            _mapSettingsProbed = true;
             LobbyMapSettings[] settings = Resources.FindObjectsOfTypeAll<LobbyMapSettings>();
             for (int i = 0; i < settings.Length; i++)
             {
@@ -474,6 +514,26 @@ namespace SongsOfConquestAccess.Adapters
             private static readonly FieldInfo WielderLockedIconField = AccessTools.Field(typeof(LobbyPlayerEntry), "_wielderLockedIcon");
             private static readonly FieldInfo ReadyImageField = AccessTools.Field(typeof(LobbyPlayerEntry), "_isReadyImage");
             private static readonly FieldInfo NotReadyImageField = AccessTools.Field(typeof(LobbyPlayerEntry), "_isNotReadyImage");
+            private static readonly FieldInfo FactionLookupField = AccessTools.Field(typeof(LobbyPlayerEntry), "_factionLookup");
+            private static readonly FieldInfo WielderLookupField = AccessTools.Field(typeof(LobbyPlayerEntry), "_wielderLookup");
+
+            /// <summary>The row's buttons in the order the tooltip walk asks for them, held once
+            /// rather than gathered into a fresh array on every read.</summary>
+            private static readonly FieldInfo[] PrimarySelectableFields =
+            {
+                SetFactionButtonField,
+                SetColorButtonField,
+                SetStartingWielderButtonField,
+                SetPartnershipButtonField,
+                SetAiButtonField,
+                JoinButtonField,
+                LeaveButtonField,
+                ToggleAiButtonField,
+                KickButtonField,
+                PlayerSettingsButtonField,
+                UserActionsButtonField,
+                DlcNeededButtonField
+            };
 
             private readonly AdventureLobbyPlayersAdapter _adapter;
             private readonly LobbyPlayerEntry _entry;
@@ -554,27 +614,27 @@ namespace SongsOfConquestAccess.Adapters
 
             public LobbyButtonItem FactionButton
             {
-                get { return BuildValueButton(SetFactionButtonField, GetFactionLabel(), GetField<Component>(_entry, FactionIconImageField)); }
+                get { return BuildValueButton(SetFactionButtonField, GetFactionLabel, GetField<Component>(_entry, FactionIconImageField)); }
             }
 
             public LobbyButtonItem ColorButton
             {
-                get { return BuildValueButton(SetColorButtonField, GetColorLabel()); }
+                get { return BuildValueButton(SetColorButtonField, GetColorLabel); }
             }
 
             public LobbyButtonItem StartingWielderButton
             {
-                get { return BuildValueButton(SetStartingWielderButtonField, GetStartingWielderLabel()); }
+                get { return BuildValueButton(SetStartingWielderButtonField, GetStartingWielderLabel); }
             }
 
             public LobbyButtonItem PartnershipButton
             {
-                get { return BuildValueButton(SetPartnershipButtonField, GetPartnershipNumber(), GetField<Component>(_entry, PartnershipTransformField)); }
+                get { return BuildValueButton(SetPartnershipButtonField, GetPartnershipNumber, GetField<Component>(_entry, PartnershipTransformField)); }
             }
 
             public LobbyButtonItem AiDifficultyButton
             {
-                get { return BuildValueButton(SetAiButtonField, GetAiDifficultyLabel()); }
+                get { return BuildValueButton(SetAiButtonField, GetAiDifficultyLabel); }
             }
 
             public LobbyButtonItem PlayerSettingsButton
@@ -631,7 +691,7 @@ namespace SongsOfConquestAccess.Adapters
                     return Localize("Factions/Random/Name");
                 }
 
-                IFactionLookup factionLookup = GetInjectedField<IFactionLookup>(_entry, "_factionLookup");
+                IFactionLookup factionLookup = GetField<IFactionLookup>(_entry, FactionLookupField);
                 IFactionDefinition faction = factionLookup != null ? factionLookup.GetFaction(team.FactionIndex) : null;
                 return faction != null ? Localize(faction.NameKey) : string.Empty;
             }
@@ -681,7 +741,7 @@ namespace SongsOfConquestAccess.Adapters
                     return Localize("Lobby/PlayerSetting/SettingUnknown");
                 }
 
-                IWielderLookup wielderLookup = GetInjectedField<IWielderLookup>(_entry, "_wielderLookup");
+                IWielderLookup wielderLookup = GetField<IWielderLookup>(_entry, WielderLookupField);
                 ICommanderDefinition commander = wielderLookup != null ? wielderLookup.Get(team.StartingCommander) : null;
                 return commander != null ? Localize(commander.NameKey) : string.Empty;
             }
@@ -709,16 +769,18 @@ namespace SongsOfConquestAccess.Adapters
                 return LobbyButtonItem.ForButton(button, _adapter != null ? _adapter._localization : null);
             }
 
-            private LobbyButtonItem BuildValueButton(FieldInfo field, string label)
+            private LobbyButtonItem BuildValueButton(FieldInfo field, Func<string> label)
             {
                 return BuildValueButton(field, label, null);
             }
 
-            private LobbyButtonItem BuildValueButton(FieldInfo field, string label, Component tooltipComponent)
+            /// <summary>The label is handed over unread: what a setting button draws is a lookup
+            /// through the lobby's own team state, and the build only needs the button.</summary>
+            private LobbyButtonItem BuildValueButton(FieldInfo field, Func<string> label, Component tooltipComponent)
             {
                 UIButton button = GetField<UIButton>(_entry, field);
                 return button != null
-                    ? new LobbyButtonItem(button, () => label, _adapter != null ? _adapter._localization : null, tooltipComponent)
+                    ? new LobbyButtonItem(button, label, _adapter != null ? _adapter._localization : null, tooltipComponent)
                     : null;
             }
 
@@ -743,22 +805,7 @@ namespace SongsOfConquestAccess.Adapters
 
             private Component GetPrimarySelectableComponent()
             {
-                FieldInfo[] fields =
-                {
-                    SetFactionButtonField,
-                    SetColorButtonField,
-                    SetStartingWielderButtonField,
-                    SetPartnershipButtonField,
-                    SetAiButtonField,
-                    JoinButtonField,
-                    LeaveButtonField,
-                    ToggleAiButtonField,
-                    KickButtonField,
-                    PlayerSettingsButtonField,
-                    UserActionsButtonField,
-                    DlcNeededButtonField
-                };
-
+                FieldInfo[] fields = PrimarySelectableFields;
                 for (int i = 0; i < fields.Length; i++)
                 {
                     UIButton button = GetField<UIButton>(_entry, fields[i]);
@@ -789,12 +836,6 @@ namespace SongsOfConquestAccess.Adapters
             private static bool IsDrawn(GameObject gameObject)
             {
                 return gameObject != null && gameObject.activeInHierarchy;
-            }
-
-            private static T GetInjectedField<T>(object owner, string fieldName) where T : class
-            {
-                FieldInfo field = AccessTools.Field(owner != null ? owner.GetType() : null, fieldName);
-                return owner != null && field != null ? field.GetValue(owner) as T : null;
             }
 
             private static T GetField<T>(object owner, FieldInfo field) where T : class
