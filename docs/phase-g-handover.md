@@ -53,3 +53,9 @@ things to watch and what turned up:
 - **A stale tile under a still cursor.** The map tile's cached label and tooltip (and so
   its "Enter selects" hint) now refresh on the map events the adapter already listens to,
   not only on cursor moves. Select a wielder with Enter and read the buffer without moving.
+- **Enter on the selected wielder's own map tile** answers "Mod error: Could not target
+  tile." (pre-existing, seen while measuring the settlement pages). The game's own left
+  click there does nothing; the mod should say nothing too.
+- **The research page** still spends most of its build asking the game
+  `HasGlobalResearch` once per tier of every row, about 50 queries a frame. Left as is:
+  it is a game query, not a scan, and 0.27 ms.
