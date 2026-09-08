@@ -736,10 +736,17 @@ namespace SongsOfConquestAccess.Screens
             for (int i = 0; i < WielderSlots; i++)
             {
                 int index = i;
+                // Checked here rather than handed to AddHudButton, because the tooltip beside it is
+                // an argument: an undrawn slot would compose one for a node nothing draws.
+                if (!hud.IsWielderListEntryVisible(index))
+                {
+                    continue;
+                }
+
                 AddHudButton(
                     builder,
                     WielderKeyPrefix + index,
-                    hud.IsWielderListEntryVisible(index),
+                    true,
                     () => hud.GetWielderListEntryLabel(index),
                     () => hud.ClickWielderListEntry(index),
                     null,

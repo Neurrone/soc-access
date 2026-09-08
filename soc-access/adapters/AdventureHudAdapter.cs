@@ -141,6 +141,10 @@ namespace SongsOfConquestAccess.Adapters
         private bool _teamQueueHudProbed;
         private List<ObjectiveEntrySnapshot> _objectiveSnapshots;
         private int _objectiveSnapshotsFrame = -1;
+        private List<WielderListHUDEntry> _wielderListEntries;
+        private int _wielderListEntriesFrame = -1;
+        private PropertyInfo _wielderListActiveEntriesProperty;
+        private bool _wielderListActiveEntriesProbed;
 
         public AdventureHudAdapter(AdventureMapAdapter map, DiContainer container)
         {
@@ -1643,7 +1647,23 @@ namespace SongsOfConquestAccess.Adapters
             return entries != null && index >= 0 && index < entries.Count ? entries[index] : null;
         }
 
+        /// <summary>The wielder list's drawn entries, read at most once a frame: the map's build asks
+        /// each of thirty-two slots whether it is drawn and then for its tooltip, and the pool's
+        /// ActiveEntries property was looked up by name on every one of those calls.</summary>
         private List<WielderListHUDEntry> GetWielderListEntries()
+        {
+            int frame = Time.frameCount;
+            if (_wielderListEntriesFrame == frame)
+            {
+                return _wielderListEntries;
+            }
+
+            _wielderListEntriesFrame = frame;
+            _wielderListEntries = ReadWielderListEntries();
+            return _wielderListEntries;
+        }
+
+        private List<WielderListHUDEntry> ReadWielderListEntries()
         {
             object pool = HudStateSettings != null && HudStateSettings.WielderList != null
                 ? WielderListEntryPoolField.GetValue(HudStateSettings.WielderList)
@@ -1653,8 +1673,15 @@ namespace SongsOfConquestAccess.Adapters
                 return null;
             }
 
-            PropertyInfo property = AccessTools.Property(pool.GetType(), "ActiveEntries");
-            return property != null ? property.GetValue(pool, null) as List<WielderListHUDEntry> : null;
+            if (!_wielderListActiveEntriesProbed)
+            {
+                _wielderListActiveEntriesProbed = true;
+                _wielderListActiveEntriesProperty = AccessTools.Property(pool.GetType(), "ActiveEntries");
+            }
+
+            return _wielderListActiveEntriesProperty != null
+                ? _wielderListActiveEntriesProperty.GetValue(pool, null) as List<WielderListHUDEntry>
+                : null;
         }
 
         private static Selectable GetWielderListSelectable(WielderListHUDEntry entry)
