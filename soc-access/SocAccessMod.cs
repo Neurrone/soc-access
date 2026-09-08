@@ -81,7 +81,7 @@ namespace SongsOfConquestAccess
             _bufferEventRecorder.Attach();
             GraphNavigator.InstallWiring();
             _navigator = new GraphNavigator();
-            _screenManager = new ScreenManager(_reviewBufferManager, _reviewBufferController);
+            _screenManager = new ScreenManager(_navigator, _reviewBufferManager, _reviewBufferController);
             RegisterScreens(_screenManager);
             _screenDetector = new ScreenDetector(_screenManager);
             // One door for the drawn entries and for Ctrl+M alike; the manager itself gains nothing.

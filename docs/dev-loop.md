@@ -61,8 +61,8 @@ Loader routes keep answering while the mod is broken or unloaded:
 Mod routes answer 404 while the mod is down:
 
 - `GET /status`: `version`, `modAssemblyName` (as the mod itself sees it), `speechAvailable`,
-  `speechMuted`, `lastSpoken`, `screenStack` (bottom first), `topScreen`, `focusedWidgetId`,
-  `focusedWidgetType`, `gameObjectCount`.
+  `speechMuted`, `lastSpoken`, `screenStack` (bottom first, a child screen listed after the
+  page it was opened on), `topScreen`, `focusedNodeId`, `focusedNodeType`, `gameObjectCount`.
 - `GET /speech?since=N&wait=MS`: everything spoken since sequence N, `{entries:[{seq,text}],
   next}`; `wait` holds the answer until the next line (capped at 30 s). The ring resets on
   reload. The ready line spoken at start is captured too.
@@ -74,21 +74,22 @@ Mod routes answer 404 while the mod is down:
   400 listing every registered action. No physical key is down during an injection, so
   anything that branches on held-key state (the release debounce in the router, the game's
   own key scans) is not exercised.
-- `GET /gui/widgets?buffers=1&flat=1`: the whole accessible tree of the focused screen, one
-  line per widget reading what arriving on it would speak; `buffers=1` adds each widget's
-  review-buffer lines, `flat=1` answers one `label | status | buffer | actions` line per
-  leaf for diffing. Side-effect free: two calls answer identically. Multi-position widgets
-  (map grid, hex grids, inventory grid, army exchange grid, announcement order menu, codex
-  content) print one placeholder line each. Grammar in §2a below.
-- `GET /gui/graph?buffers=1&flat=1&edges=1`: the same for a graph screen (`screens/GraphScreen.cs`):
-  one line per node in navigation order, indented by its depth, with `-- stop:` markers between
-  Tab stops and `(collapsed)` on a shut group; `edges=1` adds where each arrow goes from every
-  node (a wired edge, `adjust value`, `expand`, `descend to`, `collapse`, `ascend to`). A widget
-  screen answers with one line saying to use `/gui/widgets`, and vice versa.
-- `GET /gui/tree?buffers=1&flat=1&edges=1`: whichever of the two dumps fits the focused screen.
+- `GET /screens`: every registered screen, one line each - key, type, layer, whether its
+  `IsActive()` answers true, whether it is on the stack, whether the player is on it, and the
+  last exception its predicate threw. The answer to "why is the mod not on the page I am
+  looking at". Side-effect free.
+- `GET /gui/graph?buffers=1&flat=1&edges=1&screen=KEY`: the whole accessible tree of the focused
+  screen (`screens/GraphScreen.cs`): one line per node in navigation order, indented by its
+  depth, with `-- stop:` markers between Tab stops and `(collapsed)` on a shut group;
+  `buffers=1` adds each node's review-buffer lines, `flat=1` answers one
+  `label | status | buffer | actions` line per leaf for diffing, `edges=1` adds where each arrow
+  goes from every node (a wired edge, `adjust value`, `expand`, `descend to`, `collapse`,
+  `ascend to`). `screen=KEY` dumps that registered screen instead, built over a throwaway state
+  whether or not anyone is on it; an unknown key answers 404 listing the keys. Side-effect free:
+  two calls answer identically, and the cursor is never moved. Grammar in §2a below.
 - `POST /type`: body = characters typed into the focused graph screen's type-ahead search,
   through the same per-frame tick a keypress takes. Answers `{ok, searchText, searchActive,
-  results, speech:[...]}`; 409 when the focused screen is a widget screen.
+  results, speech:[...]}`; 409 when no screen is focused.
 - `GET /gui/unity?path=&depth=&visibleOnly=&fields=`: the game's own UI read as accessible
   meaning - the coverage baseline the mod's tree is diffed against. Per node `name`, `kind`
   (button/toggle/slider/dropdown/input/text/image/canvas/panel), `text` (markup stripped),
@@ -133,12 +134,10 @@ Main-thread routes answer 503 when a frame takes longer than 5 s (boot, loading,
 Harmony pass): retry, and confirm state-changing requests through their status route rather
 than assuming they failed.
 
-## 2a. Dump grammar (shared with the UI rewrite)
+## 2a. Dump grammar
 
-Both `/gui/widgets` (today) and `/gui/graph` (the UI rewrite) emit the same grammar so the
-migration diff is `sort | diff`.
-
-Tree mode (default):
+Tree mode (default). A child screen is written onto the page it was opened on as
+`<Page>+<Child>`:
 
 ```
 screen: <ScreenType> | stack: <Bottom> > ... > <Top>
@@ -177,8 +176,6 @@ the same four columns.
 - `Saves()`: the saves the load menu would list, newest first, with `corrupt` flagged.
 - `ContinueLoading()`: press "any key" on the loading-complete screen through the game's own
   `FinalizeLoadingScreen`; `continued:false` when that screen is not up.
-- `RuntimeScreens()`: the screens the detector's runtime factories read as present right
-  now, which is exactly what a reload's resync would push. Read it when a resync looks wrong.
 - `TilesAround(radius)`: the tiles around the selected wielder, no fog applied, each
   `free:true` or with the `obstacle` (entity, commander or impassable terrain) that stops a
   spawned map entity from covering it.
@@ -210,7 +207,7 @@ REPL facts observed on this Mono (Unity 2022.3, `mcs.dll` built for net35):
   loses that record on a hot reload while the menu is open, so its close is missed until the
   next reload; close and reopen the menu after reloading over it.
 - Mod types are public, as in ES2, so `/eval` can name them directly
-  (`SongsOfConquestAccess.SocAccessMod.Instance.ScreenManager.CurrentScreen`); a question
+  (`SongsOfConquestAccess.SocAccessMod.Instance.ScreenManager.Current`); a question
   asked more than once still belongs in `DevProbe` (mod side, hot-reloads), compile-checked.
 - The evaluator references a FIXED list of assemblies (`CSharpEvaluator.ReferencedAssemblies`:
   the UnityEngine modules, the game's Lavapotion assemblies, Zenject, TextMeshPro, the
@@ -258,8 +255,9 @@ owned (`IAddonManager.OwnsAddons`).
 **Reload.** `dotnet build soc-access\soc-access.csproj` (deploys) → `POST /reload` →
 poll `GET /loader/status` until `modLoaded:true` with `staleBuild:false` and the new
 `modAssemblyName` → then interpret results. The screen stack is rebuilt from the game's
-runtime state on start (`ScreenDetector.ResyncFromRuntimeState`), so reloading on the map or
-in combat keeps speech going. A loader change (`soc-access/loader/`) needs a restart: the
+runtime state on start (`ScreenDetector.RecoverRuntimeState`, which points every screen's slot
+at whatever is showing and lets the poll decide the rest), so reloading on the map or in combat
+keeps speech going. A loader change (`soc-access/loader/`) needs a restart: the
 build cannot overwrite the locked loader DLL and says so.
 
 **Verify a key.** `POST /input <key>` and read the `speech` it answers with; for a sequence,
@@ -270,7 +268,7 @@ physical key the game would have seen it instead (Escape closing a game menu is 
 case), so close such a menu through its native method from `/eval`, and treat "the key
 reaches the game" as untestable from here.
 
-**Prove a change altered no spoken line.** `GET /gui/widgets?buffers=1` before and after,
+**Prove a change altered no spoken line.** `GET /gui/graph?buffers=1` before and after,
 diffed; `flat=1` when the tree shape is what changed. Capture every reachable screen the
 change could touch.
 
@@ -280,14 +278,15 @@ Graph screens rebuild every frame, so a slow `Build` is a slow game. On the scre
 
 ```
 POST /eval?settle=0&speech=0
-var scr = (SongsOfConquestAccess.Screens.GraphScreen)SongsOfConquestAccess.SocAccessMod.Instance.ScreenManager.CurrentScreen; var sw = System.Diagnostics.Stopwatch.StartNew(); for (int i = 0; i < 200; i++) { var b = new SongsOfConquestAccess.UI.Graph.GraphBuilder(); scr.Build(b); b.Build(); } sw.Elapsed.TotalMilliseconds / 200.0
+var scr = (SongsOfConquestAccess.Screens.GraphScreen)SongsOfConquestAccess.SocAccessMod.Instance.ScreenManager.Current; var sw = System.Diagnostics.Stopwatch.StartNew(); for (int i = 0; i < 200; i++) { var b = new SongsOfConquestAccess.UI.Graph.GraphBuilder(); scr.Build(b); b.Build(); } sw.Elapsed.TotalMilliseconds / 200.0
 ```
 
 is one build in ms; run it twice, the first run of a cold path includes JIT. `scr.Navigator.Update()`
 timed the same way is the whole per-frame graph cost; reflecting the mod's private `Update` and
 invoking it is the whole mod frame; `UnityEngine.Time.smoothDeltaTime` is the frame. Time an
-adapter getter by reflecting the screen's private `_adapter`. Reference: a `FindObjectsOfTypeAll`
-scan costs about 19 ms here; a build should be under 1 ms.
+adapter getter through the screen's own `Live` slot. Reference: a `FindObjectsOfTypeAll`
+scan costs about 19 ms here; a build should be under 1 ms. `ScreenManager.Tick()` timed the same
+way is the cost of asking every registered screen whether it is showing.
 
 ## 5. Evidence
 
@@ -312,8 +311,8 @@ Filled in as the loop is used; keep entries to one line each with the date.
   load menu had been opened and closed resynced with `SaveLoadGameScreen`, then
   `OptionsScreen` and `PauseMenuScreen`, stacked over the map although nothing was open.
   Two replays of the same sequence resynced cleanly. If `State()` answers `dialog` on a bare
-  map after a reload, read `DevProbe.RuntimeScreens()` before touching anything and keep the
-  answer; that is the evidence the fix needs.
+  map after a reload, read `GET /screens` before touching anything and keep the answer; that is
+  the evidence the fix needs.
 - 2026-09-05: the "The Enemy Revealed" campaign saves (`QuickSave_*`, `AutoSave_*`) are
   refused in-session with "Content not available" ONLY while a base-campaign save such as
   `test` is running: the Yulan addon profile prevents use in older campaigns, and

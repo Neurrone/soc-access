@@ -269,6 +269,13 @@ namespace SongsOfConquestAccess.UI
             _graph = new KeyGraph(() => BuildRender(built, state), state);
         }
 
+        /// <summary>Whether a cursor is being kept for this screen - what the manager's
+        /// <c>KeepStateOnPop</c> decides, read back.</summary>
+        public bool HasState(GraphScreen screen)
+        {
+            return screen != null && _states.ContainsKey(screen);
+        }
+
         /// <summary>Forget a closed screen's cursor, so re-opening it starts at the top - and with it
         /// any landing that screen was still waiting to make.</summary>
         public void ScreenClosed(GraphScreen screen)

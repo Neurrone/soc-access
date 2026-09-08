@@ -50,16 +50,14 @@ Paths relative to `soc-access/`.
 
 - `screens/Screen.cs` is the base of both engines: `IsPresent()`, `OnPush/OnFocus/OnUnfocus/
   OnPop`, `Update`, `HasClaimed`, `OnActionJustPressed`, `CurrentTooltip`.
-  `screens/ScreenManager.cs` is a push/pop stack (`Push`, `RefreshTop<T>`, `PushBelowTop`,
-  `PushBottom`, `Pop<T>`, `Remove<T>`, global actions); `RefreshTop` lets a graph screen adopt
-  the cursor and the spoken memory of the instance it replaces (`GraphNavigator.Adopt`,
-  `GraphScreen.ArrivedByRefresh`), so a refresh neither re-seats nor repeats the name (the
-  incoming `ScreenName` must be what the outgoing instance spoke, `GraphScreen.SpokenName`).
+  `screens/ScreenManager.cs` polls every registered screen's `IsActive()` and diffs the
+  result (phase F): a page that turns in place keeps its instance and its cursor and says its
+  new name itself (`GraphScreen.SayNameIfChanged` against `GraphScreen.SpokenName`).
 - `screens/ScreenDetector.cs` is the readiness layer: about 150 `On*Ready` / `On*Changed` /
-  `On*Closed` handlers called from `patches/*Patches.cs`; `ResyncFromRuntimeState` rebuilds
-  the stack after a hot reload by asking each registered factory's screen `IsPresent()`;
-  `_storySequenceActive` is the flag behind `StoryFocusBlockerScreen`. Its knowledge is the
-  most expensive thing in the repo to lose: in phase F move it, never rewrite it.
+  `On*Closed` handlers called from `patches/*Patches.cs`, each writing a screen's slot;
+  `RecoverRuntimeState` points every slot at whatever is showing after a hot reload;
+  `StorySequenceActive` is the flag the map's predicate reads. Its knowledge is the most
+  expensive thing in the repo to lose: move it, never rewrite it.
 - `ui/UIManager.cs` and `ui/Widget.cs` are the widget focus engine; no screen puts a widget in a
   tree any more. `AdventureMapGrid`, `TroopPlacementHexGrid` and `CombatHexGrid` still derive
   from `Widget` but are the modes' cursors, in no tree (drop the base in G). `TroopHudMenu` and
@@ -97,7 +95,7 @@ does not touch it.
   every frame), `TypeAheadScope`, `OnFocusVisual`. Constructor sites, detector handlers and
   `IsPresent()` stay as they were; only the class body changes.
 - `ui/GraphNavigator.cs` + `.Search.cs` — the adapter: one `GraphState` per screen instance,
-  `Attach`, `Adopt`, `Claims`, `Dispatch`, `Update` (type-ahead tick then `EnsureFocus`, the
+  `Attach`, `Claims`, `Dispatch`, `Update` (type-ahead tick then `EnsureFocus`, the
   single site that announces, fills `ReviewBufferKind.Ui`, draws the native tooltip and runs
   the live-part watch; a recovery onto a survivor is silent while the screen is unworkable),
   `FocusNode` (pending landings), `InspectRender` (the dump), `FocusedTooltip`. A focus
@@ -170,8 +168,8 @@ does not touch it.
   Ctrl+Enter, Ctrl+NumpadEnter), `ui_carry` (Space),
   `ui_clear_search` (Backspace, live during a search), `ui_right_click` (Backslash,
   Ctrl+Backslash), `ui_back` (Escape); the router claims letters (and Space mid-search) for type-ahead on graph screens.
-- `dev/GraphDump.cs` — `/gui/graph?buffers=1&flat=1&edges=1`, `/gui/tree`, `POST /type`;
-  `/status` reports the focused node as `focusedWidgetId`/`focusedWidgetType`.
+- `dev/GraphDump.cs` — `/gui/graph?buffers=1&flat=1&edges=1&screen=KEY`, `GET /screens`,
+  `POST /type`; `/status` reports `focusedNodeId`/`focusedNodeType`.
 - Dev-loop guards: a failed `/eval` no longer breaks the game's type scans
   (`patches/DynamicAssemblyTypesPatches.cs`, dev-only); a reload logs posted-work failures.
 

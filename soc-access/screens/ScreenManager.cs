@@ -25,13 +25,18 @@ namespace SongsOfConquestAccess.Screens
     {
         private readonly List<Screen> _registered = new List<Screen>();
         private readonly Dictionary<Screen, string> _failures = new Dictionary<Screen, string>();
+        private readonly GraphNavigator _navigator;
         private readonly ReviewBufferManager _reviewBuffers;
         private readonly ReviewBufferController _reviewBufferController;
         private List<Screen> _stack = new List<Screen>();
         private Screen _focused;
 
-        public ScreenManager(ReviewBufferManager reviewBuffers, ReviewBufferController reviewBufferController)
+        public ScreenManager(
+            GraphNavigator navigator,
+            ReviewBufferManager reviewBuffers,
+            ReviewBufferController reviewBufferController)
         {
+            _navigator = navigator;
             _reviewBuffers = reviewBuffers;
             _reviewBufferController = reviewBufferController;
             ApplyVisibleReviewBuffers();
@@ -164,7 +169,7 @@ namespace SongsOfConquestAccess.Screens
             // OnUpdate may have changed what is showing (a child closing itself); re-syncing is free
             // when nothing moved.
             SyncFocus();
-            GraphNavigator navigator = Navigator;
+            GraphNavigator navigator = _navigator;
             if (navigator != null)
             {
                 navigator.Update();
@@ -183,7 +188,7 @@ namespace SongsOfConquestAccess.Screens
             _stack = new List<Screen>();
             _focused = null;
             _failures.Clear();
-            GraphNavigator navigator = Navigator;
+            GraphNavigator navigator = _navigator;
             if (navigator != null)
             {
                 navigator.Attach(null);
@@ -207,7 +212,7 @@ namespace SongsOfConquestAccess.Screens
         /// at the top rather than where the player left it last time.</summary>
         public void ChildClosed(Screen screen)
         {
-            GraphNavigator navigator = Navigator;
+            GraphNavigator navigator = _navigator;
             GraphScreen graph = screen as GraphScreen;
             if (navigator != null && graph != null && !screen.KeepStateOnPop)
             {
@@ -286,7 +291,7 @@ namespace SongsOfConquestAccess.Screens
             }
 
             Safe(screen.OnPop, screen, "OnPop");
-            GraphNavigator navigator = Navigator;
+            GraphNavigator navigator = _navigator;
             GraphScreen graph = screen as GraphScreen;
             if (navigator != null && graph != null && !screen.KeepStateOnPop)
             {
@@ -315,7 +320,7 @@ namespace SongsOfConquestAccess.Screens
                 Safe(current.OnFocus, current, "OnFocus");
             }
 
-            GraphNavigator navigator = Navigator;
+            GraphNavigator navigator = _navigator;
             if (navigator != null)
             {
                 navigator.Attach(current as GraphScreen);
@@ -365,11 +370,6 @@ namespace SongsOfConquestAccess.Screens
             {
                 SocAccessMod.Instance?.LogWarning("ScreenManager " + screen.Key + "." + what + " threw: " + exception);
             }
-        }
-
-        private static GraphNavigator Navigator
-        {
-            get { return SocAccessMod.Instance == null ? null : SocAccessMod.Instance.Navigator; }
         }
 
         public bool DispatchAction(InputAction action)
