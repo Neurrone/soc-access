@@ -64,3 +64,6 @@ things to watch and what turned up:
   HUD, quickbar and cancel-spell readings are gated on the first. They now fall back to the
   installer's container. Whether the scene container ever missed them is unknown until a
   battle: if the quickbar starts reading where it did not, that was it.
+- **The HUD's marketplace button** is named from the first line of a tooltip the game
+  recomposes, so after the marketplace has been opened once it reads "Marketplace bonus
+  3/5" instead of "Open Marketplace" (pre-existing; a state-dependent name).
