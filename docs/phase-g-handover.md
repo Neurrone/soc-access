@@ -36,3 +36,20 @@ player can hear. Everything else should read exactly as it did after phase F.
 
 - Combat's "Backslash moves" and "Backslash attacks" were not walked in a battle.
 - The player manual (`docs_src/`) is stale about the widget era and needs its own pass.
+
+## Performance pass (2026-09-09)
+
+The items in the untracked `performance.md` were fixed in one commit each, measured before
+and after on the screen, with every screen's dump unchanged. Nothing should read differently;
+things to watch and what turned up:
+
+- **The online game list.** A row's join button takes its label from the first line of the
+  status tooltip when the button face has no text; that line is now cleaned of rich-text
+  tags like every other label, where before it was raw. Hear one such row once.
+- **The map's town list is never built on the test save.** `AdventureHudAdapter.TownList`
+  resolves through Zenject, which throws and is caught every frame, so the mod cannot see
+  the town list at all. Not a performance fix: a probed flag there would hide it for good.
+  Needs a look at how the game registers `TownListUI`.
+- **A stale tile under a still cursor.** The map tile's cached label and tooltip (and so
+  its "Enter selects" hint) now refresh on the map events the adapter already listens to,
+  not only on cursor moves. Select a wielder with Enter and read the buffer without moving.
