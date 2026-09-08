@@ -2,92 +2,59 @@
 
 Self-contained brief for a fresh session. Goal: replace the retained, stack-based widget
 tree in `soc-access/ui/` with the immediate-mode graph engine that Endless Space 2 Access
-uses, one screen at a time, with both systems live until the last screen is ported. Every
-screen the mod supports is listed in §8 with its state or its proposed model.
+uses. Every screen is ported (phases A to E, 2026-09-08). What remains is the screen manager
+swap (phase F) and the cleanup (phase G).
 
-Prerequisite: the dev server (`docs/dev-loop.md`). This plan uses `/gui/widgets`,
-`/gui/graph`, `/gui/unity`, `/input`, `/key`, `/speech`, `/eval`, `/reload` and `run-game.ps1`
-throughout.
+Prerequisite: the dev server (`docs/dev-loop.md`). This plan uses `/gui/graph`, `/gui/unity`,
+`/input`, `/key`, `/speech`, `/eval`, `/reload` and `run-game.ps1` throughout.
 
-Resuming in a fresh session: read §0's docs, then §2 (what is built) and §3 (keys), then the
-current phase in §7 and its rows in §8, then `docs/dev-loop.md` for the verification loop.
-Every screen goes through §4's loop; the before-capture must be taken on the unported build,
-before the screen is touched. Commit per logical step and update this file as decisions are
-taken; prune it at the end of each phase so it holds only what the remaining work needs.
-Phases A to E are done (2026-09-08). Start at phase F.
+Resuming in a fresh session: read §0's docs, then §1 (what F replaces) and §2 (what exists),
+§3 (keys), then phase F in §5 and the inventory in §6, then `docs/dev-loop.md`. Commit per
+logical step and update this file as decisions are taken; prune it at the end of each phase
+so it holds only what the remaining work needs. Start at phase F.
 
 Owner decisions already made (do not re-ask):
 
-- The owner gives input on every screen: each screen's model is proposed and approved before
-  it is implemented. Screens are proposed by FAMILY: one representative per family is
-  proposed and approved first, then the siblings are shown against it, and the owner walks
-  the representative of each new kind with real keys.
+- The owner approves the model of anything user-facing before it is implemented, and walks
+  each new kind with real keys. Phase F changes no screen's reading: the `walks/after/`
+  captures are the contract.
 - Types and members are public by default, as in ES2; nothing is declared `internal`.
-- Graph screens use ES2's four-arrow key model (§3), and ES2's words for roles and states
-  exactly: "unavailable", "checked" / "not checked", "checkbox", "combo box", "tab", "radio
-  button", "editable", "table"; positions are announced.
 - Escape follows ES2: the game keeps it on its own surfaces wherever it registers its own
   exit action in keyboard mode (`AddInputCallback` for `UI.ExitMenu` outside a gamepad branch
   in the decompiled class; `UI.Cancel` is the gamepad binding); elsewhere the screen claims
   Back and presses the drawn close control; a mod-owned surface always denies the game the
-  key. Measured per screen, recorded in the screen's doc comment.
-- Text boxes follow ES2: Enter ends the edit and nothing else, Escape restores the pre-edit
-  text, the mod echoes typing and says "editing" / "edited" / "Cancelled". Two exceptions: a
-  dialog's box submits the dialog on Enter, and the chat box sends (silently). While a game
-  box has the keyboard the mod's input layer is silent; a box the game focuses on its own is
-  taken back by the mod.
-- Always-drawn text (a card's description) reads after the label; hover-revealed text
-  (tooltips) is buffer-only. Drop lists walk Up/Down even where the game draws a strip.
-  Tables read as tables, a drawn icon per piece under its column, Enter on any cell acts on
-  the row. Tabs switch on focus where the game's switch is instant and free, on Enter
-  otherwise (measured). A choice among alternatives is a radio group that never chooses on
-  arrival.
-- The multi-position widgets may have a placeholder in a "before" capture.
-- The handover to the owner is ONE SHORT PAGE per phase (§4 step 7). This plan holds only
-  what the remaining work needs.
-- The mod's own settings are DRAWN dialogs built from the game's parts (done in phase B):
-  "Mod options" entries on the main menu and the pause menu, a dialog cloned from the
-  options panel, sub-dialogs stacked over it with the layers beneath inert to the mouse; no
-  categories are ever added to the game's own options window.
+  key. Recorded per screen in its doc comment; F keeps every one.
+- The handover to the owner is ONE SHORT PAGE per phase (§4). This plan holds only what the
+  remaining work needs.
+- The mod's own settings are DRAWN dialogs built from the game's parts: "Mod options" entries
+  on the main menu and the pause menu, a dialog cloned from the options panel, sub-dialogs
+  stacked over it with the layers beneath inert to the mouse. In F they are child screens.
+- Performance (`AGENTS.md`, Performance): a graph build costs under a millisecond, measured
+  with `docs/dev-loop.md` §4a; F's manager polls `IsActive()` for every registered screen
+  each frame, so a predicate never scans the scene. `performance.md` in the repo root,
+  untracked, lists the per-frame costs still to fix on other screens.
 
 ## 0. Read first
 
-In `../endless-space-2-access/docs/generic/`:
+In `../endless-space-2-access/docs/generic/`: `ui-navigation.md`, the adapter section on
+screens (poll-and-diff, `Layer`, `IsActive()`, child screens, `KeepStateOnPop`) and
+"Camera-follows-focus" for the map's seat after a dialog; `input.md` for the stand-down
+doctrine G lifts; `performance.md` for bounded rebuilds. Source exemplars to imitate, never
+copy, under `docs/generic/src/engine-example/`: `ScreenManager.cs` and `Screen.cs` (phase F),
+`GraphNavigator.cs`. Live ES2 screens under `../endless-space-2-access/ES2Access/Screens/`
+only where a predicate's shape is in doubt (`GalaxyHudScreen.IsActive`).
 
-- `ui-navigation.md` — the engine: immediate mode, `ControlId`, `GraphTypes`,
-  `GraphBuilder` (menu mode, raw mode, contexts, stops, regions, expandable groups),
-  `GraphAnnouncer`, `KeyGraph`, `GraphSheet`, `TypeAheadSearch`; then the adapter section
-  (navigator, screens, node factories, focus visuals, scroll-into-view); "Rows, columns and
-  tables"; "A mode whose cursor is not the focus cursor" (phase E).
-- `making-screens-accessible.md` — the per-screen process: measure, propose, approve,
-  implement, verify with evidence, hand over.
-- `widgets.md` — the widget vocabulary, gesture parity, the keyboard drag (`Carry`, phase
-  D), popups and child screens, the confirmation-dialog screen.
-- `buffers.md` and `tooltips.md` — sections as the one declaration behind both the tooltip
-  announcement and the review buffer.
-- `input.md` — the key model and the stand-down doctrine, for the map and combat phases.
-- `performance.md` — bounded immediate-mode rebuilds.
+## 1. What phase F replaces and phase G deletes
 
-Source: the engine under `docs/generic/src/graph-ui/` (already copied, §2); adapter
-exemplars to imitate, never copy, under `docs/generic/src/engine-example/` (`GraphNavigator.cs`,
-`GraphNodes.cs`, `Screen.cs`, `ScreenManager.cs` for phase F, `PointerFocus.cs`,
-`ScrollIntoView.cs`); live ES2 screens under `../endless-space-2-access/ES2Access/Screens/`
-(`GalaxyHudScreen*.cs` and `GalaxyInspect*.cs` for the map mode, `BattleTacticsScreen.cs`
-and `AdvancedEncounterPlayScreen*.cs` for combat, `HeroInspectionScreen.cs` and
-`ShipDesignScreen.cs` for inventories with `Carry`).
-
-## 1. What still stands of the widget engine
-
-Paths relative to `soc-access/`. Every screen is a graph screen now; this is what phase F
-replaces and phase G deletes.
+Paths relative to `soc-access/`.
 
 - `screens/Screen.cs` is the base of both engines: `IsPresent()`, `OnPush/OnFocus/OnUnfocus/
   OnPop`, `Update`, `HasClaimed`, `OnActionJustPressed`, `CurrentTooltip`.
   `screens/ScreenManager.cs` is a push/pop stack (`Push`, `RefreshTop<T>`, `PushBelowTop`,
   `PushBottom`, `Pop<T>`, `Remove<T>`, global actions); `RefreshTop` lets a graph screen adopt
   the cursor and the spoken memory of the instance it replaces (`GraphNavigator.Adopt`,
-  `GraphScreen.ArrivedByRefresh`), so a refresh neither re-seats nor repeats the name (the incoming `ScreenName` must be what
-  the outgoing instance spoke, `GraphScreen.SpokenName`).
+  `GraphScreen.ArrivedByRefresh`), so a refresh neither re-seats nor repeats the name (the
+  incoming `ScreenName` must be what the outgoing instance spoke, `GraphScreen.SpokenName`).
 - `screens/ScreenDetector.cs` is the readiness layer: about 150 `On*Ready` / `On*Changed` /
   `On*Closed` handlers called from `patches/*Patches.cs`; `ResyncFromRuntimeState` rebuilds
   the stack after a hot reload by asking each registered factory's screen `IsPresent()`;
@@ -101,21 +68,20 @@ replaces and phase G deletes.
   `TooltipActionsMenuScreen` (Backquote) is unreachable from any screen and goes in G with the
   `TooltipAction`s the adapters still build.
 - Widget-era input actions (`input/AccessibilityActions.cs`): `next_widget`, `next_menu_item`,
-  `activate`, `cancel`, `start_drag`, `slider_*`, the map, combat, scanner and bookmark sets;
-  the physical bindings are in `input/KeyboardBinding.cs`. The input stand-down for a
-  focused game text box applies on graph screens only (`AccessibilityInputRouter.StandingDown`)
-  because widget-era text inputs rely on the mod's own keys to leave a field; lift it in G.
+  `activate`, `cancel`, `start_drag`, `slider_*`; the map, combat, scanner and bookmark sets
+  are still the modes' keys and stay. The input stand-down for a focused game text box applies
+  on graph screens only (`AccessibilityInputRouter.StandingDown`); lift the limit in G.
 - Review buffers (`buffers/`, `ReviewBufferKind.Ui/AdventureMapNotifications/CombatEvents`)
   and speech (`SpeechPipeline.Output`, silenced by the router on every claimed key) stay as
-  they are. Localization: every `ModString` costs `update-pot`, 13 `.po` translations and
-  `validate`; batch per phase. Tests are MSTest under `tests/`.
+  they are. Tests are MSTest under `tests/`.
 - Every adapter still normalises text with `SpeechTextSanitizer.Normalize`, which collapses
   newlines; the graph cleans tooltip and details lines itself (`ui/SpokenLines.cs`). The
   sweep is phase G's.
 
 ## 2. What exists now: the graph side
 
-Paths relative to `soc-access/`. Read these before porting a screen.
+Paths relative to `soc-access/`. The graph side as it stands; phase F rewires it, phase G
+does not touch it.
 
 - `ui/graph/` — the engine, 20 files copied from ES2, namespace `SongsOfConquestAccess.UI.Graph`.
   Changed only where the repo's rules required (`public`, `ModText`, `NodeHint.Template` a
@@ -142,7 +108,7 @@ Paths relative to `soc-access/`. Read these before porting a screen.
   and `ui_back` dispatched through `CarryActions`, the owner's page answered off the screen
   stack (a child screen over it is still it), `ui/CarrySounds.cs` the seam a screen registers
   the game's own drag noises for its cargo kind on, `input/ChordNames.cs` installed as
-  `NodeHints.Chord`. Modes (phase E): `GraphScreen.ModeClaims(action)` is asked BEFORE the
+  `NodeHints.Chord`. Modes: `GraphScreen.ModeClaims(action)` is asked BEFORE the
   navigator's own set in both `Claims` and `Dispatch` (after a live search, which is innermost),
   and an action it answers runs through `OnAction`; a screen answers it only while its mode node
   is focused. `ui/PointerHover.cs` simulates the pointer hover a card
@@ -173,7 +139,7 @@ Paths relative to `soc-access/`. Read these before porting a screen.
   drag replayed through `TroopHudAdapter` including its Ctrl branches), the game's clicks
   (Backslash = disband where the game would take the right click) and its Ctrl+digit quick
   splits (`troop_split_1..10`, answered through `GraphScreen.ClaimsAction`/`OnAction`, the
-  screen-level action hook phase E's modes also use); over `adapters/WielderInteract.cs`. The
+  screen-level action hook the modes also use); over `adapters/WielderInteract.cs`. The
   map's HUD stop calls `Rows` alone.
 - `ui/ArtifactSlotNodes.cs` over `adapters/IArtifactSlots.cs` — the Equipment and Inventory
   stops (Both Hands merge, positions, Auto arrange first, cargo `artifact`, `DropAccepts` off
@@ -181,7 +147,7 @@ Paths relative to `soc-access/`. Read these before porting a screen.
   `ui/CommanderBands.cs` (stats band, modifier tab row + rows), `ui/SettlementNodes.cs`
   (defending-wielder band, garrison lines), `ui/RecruitGroups.cs` + `ui/ResourceCosts.cs`
   (a recruit or upgrade card as a collapsed group, or a line when it has no children).
-- Input rule since D: a character typed in the frame the focused screen changed is dropped
+- Input rule: a character typed in the frame the focused screen changed is dropped
   (`GraphNavigator.HasTicked`, the router's `TypingScreen`), so the game hotkey that opens a
   graph screen is never typed into its search.
 - `screens/DropListScreen.cs` — the mod-owned child screen every combo box opens over the
@@ -206,10 +172,11 @@ Paths relative to `soc-access/`. Read these before porting a screen.
   Ctrl+Backslash), `ui_back` (Escape); the router claims letters (and Space mid-search) for type-ahead on graph screens.
 - `dev/GraphDump.cs` — `/gui/graph?buffers=1&flat=1&edges=1`, `/gui/tree`, `POST /type`;
   `/status` reports the focused node as `focusedWidgetId`/`focusedWidgetType`.
-- Dev-loop guards added in phase B: a failed `/eval` no longer breaks the game's type scans
+- Dev-loop guards: a failed `/eval` no longer breaks the game's type scans
   (`patches/DynamicAssemblyTypesPatches.cs`, dev-only); a reload logs posted-work failures.
 
-Exemplars, one per kind, all approved and walked: menu page `screens/CampaignMenuScreen.cs`
+Exemplars, one per kind, all approved and walked (phase F must leave each reading exactly as
+its `walks/after/` capture does): menu page `screens/CampaignMenuScreen.cs`
 (header band + cards, drawn-order sort, `IsWorkable`); dialog `MessageDialogScreen.cs` (the
 three-part contract, per-source Escape, an edit field); form `OptionsScreen.cs` (tabs, regions
 per caption, rows, scroll-into-view through native selection); table
@@ -246,116 +213,31 @@ A mode's keys (`GraphScreen.ModeClaims`) are asked before this whole table and r
 Type-ahead ranks by match tier before list order; a chord is never typing; a group header
 the game wires no click to gets no `OnActivate` (Right is the way in). `GraphState` is keyed by
 screen instance, so cursor memory across a push and pop is lost until phase F's registered
-singletons restore it.
+singletons restore it (`KeepStateOnPop`).
 
-## 4. The dump-and-diff loop (per screen)
+## 4. Verification and handover
 
-1. **Before.** On the unported build, open the screen in-game, then `GET /gui/widgets?flat=1&buffers=1`
-   and `GET /gui/widgets?buffers=1` to `walks/before/<Screen>[-variant].txt` and `-tree.txt`.
-   Capture each variant (tabs, modes, empty and full states). Placeholders for multi-position
-   widgets are expected.
-2. **Propose.** Measure the game's own layout (`/gui/unity` rects and a cropped screenshot,
-   plus the decompiled view classes), write the model (stops, regions, sheets, groups, which
-   controls merge into one node, Escape from the decompiled input registrations), and get the
-   owner's approval, by family (§7). Nothing is written before that.
-3. **Implement.** Change the base class to `GraphScreen`, write `Build`, delete the widget
-   construction. Touch the adapter only for a missing game fact.
-4. **After.** `dotnet build`, `POST /reload`, confirm `modAssemblyName` incremented, reopen the
-   screen, `GET /gui/graph?flat=1&buffers=1` to `walks/after/<Screen>[-variant].txt`.
-5. **Diff.** `sort -u` both and `diff`. Every before-line absent after is a miss unless it is a
-   placeholder or the approved model dropped it; explain every difference in the commit.
-6. **Walk.** `POST /input` through every stop and a sample of nodes; `/speech` must read as the
-   tree dump reads. Activate one control per kind through the game's own click path. Check the
-   picture against the mod with a cropped screenshot (`crop-shot.ps1`) and read it. End with real
-   keys (`POST /key`) for anything an injection cannot exercise (typing, held keys, Escape).
-7. **Hand over.** ONE SHORT PAGE per phase, never per screen: which screens to test, what to
-   watch for, the decisions taken, and what needs the owner's attention. No key-by-key steps
-   and no expected speech; per-screen detail (measurements, deviations, diff verdicts,
-   follow-ups) goes in the commit message and the screen's doc comment. The owner tests; the
-   screen is done when they say so.
+`walks/after/<Screen>[-variant].txt` (gitignored, `GET /gui/graph?flat=1&buffers=1` on each
+ported screen) is the reading every screen has today. After the manager swap, reopen each
+screen, capture again, `sort -u` both and `diff`: any difference is a regression unless F's
+approved design explains it (a cursor kept across a pop, a child screen). Walk with
+`POST /input`, confirm with `/speech`, end with real keys (`POST /key`, which refuses while
+the game window is not in the foreground) for Escape, typing and held keys. Measure the mod
+frame with `docs/dev-loop.md` §4a on the map and in combat.
 
-`walks/` is gitignored. Injected actions never press a physical key: the stand-down, the
-release debounce and the game's own key handling are only proved with `/key` or a hand on the
-keyboard. `/key` refuses while the game window is not in the foreground (a locked desktop).
+The handover is ONE SHORT PAGE per phase (`docs/phase-<x>-handover.md`, deleted when the phase
+closes): which screens to test, what to watch for, the decisions taken, and what needs the
+owner's attention. No key-by-key steps and no expected speech; detail goes in the commit
+message and the doc comment. The owner tests; the phase is done when they say so.
 
-## 5. Widget kind to graph model
+Localization: every `ModString` added, removed or changed costs `update-pot`, real
+translations in all 13 `.po` files, and `validate` passing. G removes strings; the validator
+catches the stale entries.
 
-Every kind is ported. The mode shape (a grid class as the cursor behind one node) is in §7
-phase E; the rest is in the ported screens.
+## 5. Phases
 
-## 6. Localization
-
-Each phase adds its screen names, role words and other `ModString`s in batches (per
-subagent run at most): `update-pot`, real translations in all 13 `.po` files, `validate`.
-Never leave English placeholders.
-
-## 7. Phases and order
-
-Order rationale: out-of-game screens first (done), then the in-game menus and forms with the
-factories proven, then the composite grids (carry, two-sided sheets), then the three modes,
-then the manager swap once the map and combat predicates are graph screens, then cleanup.
-Within a phase the order is by kind (menus, dialogs, forms, tables); the first screen of each
-new kind goes to the owner's real-key walk before its siblings are batched. Each phase ends
-with the localization batch, this file pruned, and a one-page handover.
-
-### Phase A — engine, bridge, main menu (done)
-
-### Phase B — every screen outside a running game (done)
-
-All 33 screens.
-
-### Phase C — in-game menus, popups, forms and tables (done)
-
-Twenty screens, 2026-09-07 (§8). `SpellbookScreen` and `WorldChoiceMenuScreen` moved to phase
-D, where drag is introduced. Rules learned, for every later port: a `ControlId` is equal on
-its structural key alone, so rows built under one key with different components collide
-(index the key); a tooltip that is the SOURCE of a node's parts is not also a section (it
-would read twice); a screen whose start node is its heading gets no `ScreenName`; a drawn
-band is named by pushing its drawn header as the context of its stop, not by a heading node;
-a popup with no name of its own has `ScreenName` null and lands in its first named stop; a
-text the game replaces in place (a dialogue) is one node of live parts, `{speaker}: {text}`,
-so Enter's advance is read by the watch; a list of allies or players is an expandable group
-per row whose children are its facts then its actions; a summary with rows of counts is
-lines under named regions, not a table, unless the game draws column headings.
-
-### Phase D — composite grids (done)
-
-Fourteen screens, 2026-09-08 (§8). Rules learned, for every later port: a stop that names no
-landing opens on the alternative in force, and a named landing (`LandStopOn(id)`) wins over
-it, so a stop whose tail is a tab bar names its landing and keeps the bar a region rather than
-a stop of its own (the sheet's and the trade's modifier bars); a
-group with nothing to open is a line; an empty slot is a role-less `Text`
-node that still takes a drop; Enter and Backslash are the game's left and right clicks with
-the Ctrl chords as further bindings of the same actions, so the game's own handlers read the
-physical Ctrl; a hint is offered only where the game would take the gesture (a button the game
-draws non-interactable refuses its click); a mod-authored drop target exists only where the
-game's own gesture is a release over nothing, and reads as a short instruction; a refresh the
-game runs only on mouse-over (a tooltip recomposed on hover) is run through the same private
-method before the mod reads it; a wielder band inside a menu whose canvas group the game
-never enabled refuses every click, so a REPL-opened prompt variant is not a fixture.
-
-### Phase E — modes (done)
-
-`AdventureMapScreen`, `PreBattleMenuScreen`, `CombatScreen`, 2026-09-08 (§8). The shape, for
-phase F and any later mode: ONE node with a fixed `ControlId` on the mode's stop, so the
-navigator never announces a move and the cursor class (`AdventureMapGrid`,
-`TroopPlacementHexGrid`, `CombatHexGrid`) speaks each landing itself, queued, because the
-router has already silenced the reader for the key and a skip's count must precede the tile;
-the review buffer refills on its own because the node's readout changed. `GraphScreen.ModeClaims`
-answers the cursor's whole key set while its node is focused and translates the graph's own keys
-onto it (`ui_up` to the move on the map, `ui_home`/`ui_end`/`ui_clear_search` to the scanner's
-jump, distance and return), so an injected key behaves as the physical one; a hex board leaves
-the arrows alone. The stop is named by the mode's word, replaced by the game's instruction text
-while the game has armed a targeting state (teleport, spell, ability), and a passive watcher
-speaks a replaced instruction queued. A mod-owned state on the node (a carry, inspect, aiming)
-is the only time the node claims Escape; a HUD stop's Escape lands back on the node with
-`Common_ClosePauseMenu`; landings from a cycle or a queue row are `FocusNode(announce: false)`
-because the cursor has just read the tile. Rules learned: a pick-up query declared only on some
-tiles changes the node's part count and makes the live watch re-read the tile, so declare it on
-every tile and answer null; a cancel the game draws in another control's spot (Cancel spell in
-the Spells spot, Cancel ability on the acting troop) is declared there, not in a stop of its own;
-a `Resources.FindObjectsOfTypeAll` reached from a build costs about 19 ms a frame per read, so
-adapters cache what a menu keeps, misses included (`AGENTS.md`, Performance).
+Phases A to E are done: the engine and bridge, every screen outside a game, the in-game menus
+and forms, the composite grids with the carry, and the three modes.
 
 ### Phase F — the screen manager swap
 
@@ -367,68 +249,69 @@ adapters cache what a menu keeps, misses included (`AGENTS.md`, Performance).
    instance in their constructor read it from an adapter static the existing `On*Ready` /
    `On*Closed` handlers write; `ScreenDetector` shrinks to those writes and to flags with no
    game-side state (`_storySequenceActive`, the community-maps refresh flags).
-   `ResyncFromRuntimeState`, `PushBelowTop`, `PushBottom`, `RefreshTop` go away.
+   `ResyncFromRuntimeState`, `PushBelowTop`, `PushBottom`, `RefreshTop` go away. A predicate
+   is a field read, never a scan (`AGENTS.md`, Performance).
 3. Layers: map and combat 10; in-game panels and lobby 20-40; `MessageDialogScreen` 100
    with `AnswersOnly`; story text and letterbox at a cutscene layer above the panels; the
    loading screen above everything. `AdventureMapScreen.IsActive` gates on no popup, no
    story sequence, no loading; `StoryFocusBlockerScreen` is deleted.
 4. `KeepStateOnPop` on the map, combat and settlement screens; cursor memory across push
-   and pop returns with the singletons.
+   and pop returns with the singletons. The modes' cursor classes (`AdventureMapGrid`,
+   `TroopPlacementHexGrid`, `CombatHexGrid`) are per screen instance today; a singleton keeps
+   one for the game's lifetime and resets it when the game changes (the map's `GetInitialTile`
+   guard against a session that has gone stays).
 5. Verify with `/gui/graph?screen=KEY` for every registered screen, the dialog-over-map case,
-   and the story sequence gap.
+   the story sequence gap, and the §4 diff of every `walks/after/` capture.
 
 ### Phase G — cleanup
 
 Delete `ui/UIManager.cs`, `ui/FocusContext.cs`, every `ui/*Widget.cs`, `ui/MenuWidget.cs`,
-`ui/TableWidget.cs`, the three grid classes' widget base once their mode wrappers own them,
-`TooltipActionsMenuScreen` with its Backquote action, `/gui/widgets`, the widget-era input
-actions, and `adapters/NativeTextPrompt.cs` (unused since the mod dialogs). Sweep every
+`ui/TableWidget.cs`, the three grid classes' widget base, `TooltipActionsMenuScreen` with its
+Backquote action and the adapters' `TooltipAction`s, `/gui/widgets` and `dev/WidgetDump.cs`,
+the widget-era input actions, `adapters/NativeTextPrompt.cs` (unused since the mod dialogs),
+and the unused drag strings (`UI.DragStartedTroopPlacement`, `UI.DragComplete`). Sweep every
 adapter's `SpeechTextSanitizer.Normalize` into per-line handling (`ui/SpokenLines.cs` is the
 shape). Lift the graph-screens-only limit on the input stand-down. Update `AGENTS.md` (the
 adapter rule stays; widget-tree wording becomes graph wording) and `screens/README.md`.
 
-## 8. Screen inventory
+## 6. Screen inventory
 
-Ported (one line each): `MainMenuScreen`, `CampaignMenuScreen`, `TaleSelectScreen`,
-`CustomCampaignSelectScreen`, `AdventureLobbyMapTypeScreen`, `AdventureLobbyInviteProvidersScreen`
-(unverified, needs two providers), `MessageDialogScreen` (three of seven sources verified),
-`QuitToDesktopPopupScreen`, `PlatformUserMenuScreen`, `CommunityMapsModalScreen` (login
-variants unverified), `LoadingCompleteScreen`, `OptionsScreen`, `AdventureLobbyRandomLayoutScreen`,
-`AdventureLobbyGameSettingsScreen`, `AdventureLobbyPlayerSettingsScreen`,
-`OnlineHostGameScreen`, `CommunityMapsSearchFilterScreen`, `DropListScreen` (new),
-`AdventureLobbyIconDropdownScreen`, `AdventureLobbyMapSelectScreen`,
+Every registered screen, for F's singleton table: `MainMenuScreen`, `CampaignMenuScreen`,
+`TaleSelectScreen`, `CustomCampaignSelectScreen`, `AdventureLobbyMapTypeScreen`,
+`AdventureLobbyInviteProvidersScreen` (unverified, needs two providers), `MessageDialogScreen`
+(three of seven sources verified), `QuitToDesktopPopupScreen`, `PlatformUserMenuScreen`,
+`CommunityMapsModalScreen` (login variants unverified), `LoadingCompleteScreen`,
+`OptionsScreen`, `AdventureLobbyRandomLayoutScreen`, `AdventureLobbyGameSettingsScreen`,
+`AdventureLobbyPlayerSettingsScreen`, `OnlineHostGameScreen`, `CommunityMapsSearchFilterScreen`,
+`DropListScreen`, `AdventureLobbyIconDropdownScreen`, `AdventureLobbyMapSelectScreen`,
 `AdventureLobbyChallengeMapSelectScreen`, `OnlineGameListScreen`, `PlayerStatsScreen`,
-`CodexScreen`, `SaveLoadGameScreen`, `CampaignMapSelectScreen`,
-`CommunityMapsHomeScreen`, `CommunityMapsCollectionScreen`, `CommunityMapsSearchResultsScreen`,
-`CommunityMapsDetailsScreen`, `AdventureLobbyPlayersScreen`, `ChatScreen` (the in-game
-recipient selector needs a multiplayer game, unverified), `ModOptionsScreen` and
-`ModDialogScreen` (new; the nine widget-era settings menus are deleted). `FoldoutMenuScreen`
-was deleted in A. Phase C: `PauseMenuScreen`, `WorldConfirmMenuScreen`, `ClaimMenuScreen`,
-`TutorialSimpleScreen`, `TutorialSlideshowScreen`, `StoryTextScreen`, `LevelUpScreen`,
-`PurchaseWielderScreen`, `ResearchScreen`, `BuildMenuScreen`, `OwnedEntitiesScreen`,
-`TroopOverviewScreen`, `MapEntityMiniMenuScreen`, `AdventurePlayerMenuScreen`,
-`GiftTownPopupScreen`, `SendResourcePopupScreen`, `MarketplaceScreen`, `PostBattleResultScreen`,
-`PostAdventureResultScreen`, `PostAdventureStatsScreen`. Phase D: `CommanderSheetScreen`,
-`SpellbookScreen`, `MoveTroopPopupScreen`, `WorldChoiceMenuScreen`,
-`ArtifactMarketScreen`, `TradingScreen`, `HostileJoinMenuScreen`, `SettlementScreen`,
-`DefenceMenuScreen`, `TroopManagementScreenBase`, `DraftTroopsScreen`, `UpgradeTroopsScreen`,
-`RallyPointScreen`. Phase E: `AdventureMapScreen`, `PreBattleMenuScreen`, `CombatScreen`.
-Unverified corners: `MessageDialogScreen`'s random event and custom message sources (no
-reachable state produced them), a recruit card's essence tab row; on the map the teleport mode,
-the town list, the chat and bug report buttons; on placement the hot-seat defender turn and
-Ready, an attacker threat level, the scouting lines, the multiplayer wait; in combat the
-quickbar, a defender wielder, the battle log, spell and ability aiming, the multiplayer names
-and turn timer (no reachable state drew any of them).
+`CodexScreen`, `SaveLoadGameScreen`, `CampaignMapSelectScreen`, `CommunityMapsHomeScreen`,
+`CommunityMapsCollectionScreen`, `CommunityMapsSearchResultsScreen`, `CommunityMapsDetailsScreen`,
+`AdventureLobbyPlayersScreen`, `ChatScreen` (the in-game recipient selector needs a
+multiplayer game, unverified), `ModOptionsScreen`, `ModDialogScreen`, `PauseMenuScreen`,
+`WorldConfirmMenuScreen`, `ClaimMenuScreen`, `TutorialSimpleScreen`, `TutorialSlideshowScreen`,
+`StoryTextScreen`, `LevelUpScreen`, `PurchaseWielderScreen`, `ResearchScreen`,
+`BuildMenuScreen`, `OwnedEntitiesScreen`, `TroopOverviewScreen`, `MapEntityMiniMenuScreen`,
+`AdventurePlayerMenuScreen`, `GiftTownPopupScreen`, `SendResourcePopupScreen`,
+`MarketplaceScreen`, `PostBattleResultScreen`, `PostAdventureResultScreen`,
+`PostAdventureStatsScreen`, `CommanderSheetScreen`, `SpellbookScreen`, `MoveTroopPopupScreen`,
+`WorldChoiceMenuScreen`, `ArtifactMarketScreen`, `TradingScreen`, `HostileJoinMenuScreen`,
+`SettlementScreen`, `DefenceMenuScreen`, `TroopManagementScreenBase` (`DraftTroopsScreen`,
+`UpgradeTroopsScreen`), `RallyPointScreen`, `AdventureMapScreen`, `PreBattleMenuScreen`,
+`CombatScreen`.
 
-Remaining:
+Unverified corners, for want of a fixture: `MessageDialogScreen`'s random event and custom
+message sources, a recruit card's essence tab row; on the map the teleport mode, the town
+list, the chat and bug report buttons; on placement the hot-seat defender turn and Ready, an
+attacker threat level, the scouting lines, the multiplayer wait; in combat the quickbar, a
+defender wielder, the battle log, spell and ability aiming, the multiplayer names and turn
+timer.
 
-| Screen | Widgets today | Proposed model | Phase |
-|---|---|---|---|
-| `TooltipActionsMenuScreen` | Menu | unreachable now; deleted in G with the adapters' `TooltipAction`s | G |
-| `StoryFocusBlockerScreen` | Container | deleted in F; becomes a predicate | F |
+Not graph screens: `TooltipActionsMenuScreen` (a widget menu, unreachable now; deleted in G)
+and `StoryFocusBlockerScreen` (a container; deleted in F, its flag becomes a predicate).
 
-## 9. Risks
+## 7. Risks
 
 - `ScreenDetector`'s readiness knowledge is the most expensive thing in the repo to lose. In
   phase F, move it, never rewrite it from memory.
-- Each phase's localization batch is real work; a phase is not done until `validate` passes.
+- A phase is not done until `validate` passes and the owner has walked the result.
