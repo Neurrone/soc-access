@@ -228,6 +228,11 @@ REPL facts observed on this Mono (Unity 2022.3, `mcs.dll` built for net35):
   (`SongsOfConquestAccess.Adapters`, not `.UI`), and `grep -n "^namespace" <file>` in
   `decompiled/` answers a game type's. A guessed namespace is the commonest way an eval
   dies, and the whole body dies with it.
+- `UnityEngine.UI` (uGUI: `Image`, `Button`) is not referenced either; only the UI *module*
+  is. And a `for` loop whose body calls `Append` on a top-level `StringBuilder` failed twice
+  on 2026-09-08 with `Internal compiler error: not implemented` at the call, while the same
+  walk as one LINQ expression (`string.Join(" | ", array.Select(...).Where(...).ToArray())`)
+  worked every time: prefer LINQ over a loop for a one-off hierarchy dump.
 - SIZE RULE: an eval is ONE question of a few statements, usually a call into `DevProbe` or
   `DevFixtures`. Anything that walks a hierarchy, reflects over fields, loops, or runs past
   about five statements goes into those two files instead: they are compile-checked, and a

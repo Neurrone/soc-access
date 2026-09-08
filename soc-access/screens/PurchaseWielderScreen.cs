@@ -30,8 +30,10 @@ namespace SongsOfConquestAccess.Screens
     /// 2026-09-08): the summary, the stats, the troops, the skills, the specialization and the
     /// purchase, so the region jump walks the pane band by band from wherever the cursor stands. The
     /// troops and the skills are named by the captions the pane draws over them ("Starting Troops",
-    /// "Skills"), so a troop or a skill is heard with what it is; the pane draws no caption over the
-    /// others (measured 2026-09-08: StatsSection has no header), so those regions are bare.
+    /// "Skills"), so a troop or a skill is heard with what it is, and the stats by the word the game
+    /// uses for the same band on the wielder sheet (owner ruling 2026-09-08; the pane itself draws no
+    /// text over its StatsSection, measured the same day). The summary, the specialization (whose
+    /// line already opens with the game's caption) and the purchase are bare regions.
     ///
     /// Escape is the game's (<c>ConsumesBack</c> false): the menu is an
     /// <c>AdventureMenuBackground</c> with <c>_canClose</c> true, so it draws the close cross and
@@ -166,11 +168,13 @@ namespace SongsOfConquestAccess.Screens
         {
             builder.SetRegion("purchase-wielder:summary");
             AddParagraphs(builder, "summary", SelectedSummaryLines);
-            builder.SetRegion("purchase-wielder:stats");
+            string stats = GameText.Get("Common/CommanderInventory/Stats", string.Empty);
+            BeginRegion(builder, stats, "purchase-wielder:stats");
             AddStat(builder, "offence", () => _adapter.OffenceHeader, () => _adapter.Offence);
             AddStat(builder, "defence", () => _adapter.DefenceHeader, () => _adapter.Defence);
             AddStat(builder, "movement", () => _adapter.MovementHeader, () => _adapter.Movement);
             AddStat(builder, "view-radius", () => _adapter.ViewRadiusHeader, () => _adapter.ViewRadius);
+            EndRegion(builder, stats);
             BuildTroops(builder);
             BuildSkills(builder);
             if (_adapter.HasSpecialization())
