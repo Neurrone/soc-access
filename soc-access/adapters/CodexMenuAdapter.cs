@@ -136,6 +136,12 @@ namespace SongsOfConquestAccess.Adapters
             return NativeSelectionUtility.PointerClick(tabComponent);
         }
 
+        /// <summary>Bumped whenever the window redraws its body (the game's own
+        /// <c>CodexMenu.HandleContentButtonClicked</c>, which is the one place <c>DrawContent</c> is
+        /// called from, tab switches included). An adapter re-reads the body when it changes and
+        /// serves what it read otherwise.</summary>
+        public static int ContentGeneration;
+
         public IReadOnlyList<ArticleGroupItem> GetArticleGroups()
         {
             List<ArticleGroupItem> groups = new List<ArticleGroupItem>();
@@ -149,7 +155,7 @@ namespace SongsOfConquestAccess.Adapters
                     continue;
                 }
 
-                string sectionLabel = SpokenLines.Clean(UITextMeshTextUtility.GetEffectiveText(GetField<UITextMesh>(section, CategorySectionTextField)));
+                string sectionLabel = CleanLabel(UITextMeshTextUtility.GetEffectiveText(GetField<UITextMesh>(section, CategorySectionTextField)));
                 List<CodexContentButton> buttons = section.Buttons;
                 List<ArticleItem> articles = new List<ArticleItem>();
                 bool containsSelectedArticle = false;
@@ -162,7 +168,7 @@ namespace SongsOfConquestAccess.Adapters
                     }
 
                     UITextMesh textMesh = GetField<UITextMesh>(button, ContentButtonTextField);
-                    string label = SpokenLines.Clean(UITextMeshTextUtility.GetEffectiveText(textMesh));
+                    string label = CleanLabel(UITextMeshTextUtility.GetEffectiveText(textMesh));
                     if (string.IsNullOrWhiteSpace(label))
                     {
                         continue;
@@ -223,12 +229,20 @@ namespace SongsOfConquestAccess.Adapters
 
         public IReadOnlyList<CodexContentItem> GetContentItems()
         {
+            if (_contentItems != null && _contentAt == ContentGeneration)
+            {
+                return _contentItems;
+            }
+
             List<CodexContentItem> items = new List<CodexContentItem>();
             Transform contentParent = GetSettingsField<Transform>("ContentParent");
             if (contentParent == null)
             {
                 return items;
             }
+
+            _contentItems = items;
+            _contentAt = ContentGeneration;
 
             if (TryAddWielderContentItems(contentParent, items))
             {
@@ -439,6 +453,38 @@ namespace SongsOfConquestAccess.Adapters
             return settings != null ? settings.GetComponent<CodexTutorialSettings>() : null;
         }
 
+        // The body the window last drew, and the redraw it was read at. Reading it walks every text
+        // mesh of the article and cleans each one, which is the page's whole cost.
+        private List<CodexContentItem> _contentItems;
+        private int _contentAt = -1;
+
+        // The settings object's fields and each entry pool's ActiveEntries: one reflection lookup per
+        // name rather than one per call.
+        private readonly Dictionary<string, FieldInfo> _settingsFields = new Dictionary<string, FieldInfo>();
+        private static readonly Dictionary<Type, PropertyInfo> ActiveEntriesProperties =
+            new Dictionary<Type, PropertyInfo>();
+
+        // The article labels the window draws, cleaned once per distinct line: cleaning runs three
+        // regexes, and the list is read whole on every build.
+        private readonly Dictionary<string, string> _cleanLabels = new Dictionary<string, string>();
+
+        private string CleanLabel(string raw)
+        {
+            if (string.IsNullOrEmpty(raw))
+            {
+                return string.Empty;
+            }
+
+            string clean;
+            if (!_cleanLabels.TryGetValue(raw, out clean))
+            {
+                clean = SpokenLines.Clean(raw);
+                _cleanLabels[raw] = clean;
+            }
+
+            return clean;
+        }
+
         private T GetSettingsField<T>(string fieldName) where T : class
         {
             object settings = SettingsField != null && _menu != null ? SettingsField.GetValue(_menu) : null;
@@ -447,7 +493,13 @@ namespace SongsOfConquestAccess.Adapters
                 return null;
             }
 
-            FieldInfo field = AccessTools.Field(settings.GetType(), fieldName);
+            FieldInfo field;
+            if (!_settingsFields.TryGetValue(fieldName, out field))
+            {
+                field = AccessTools.Field(settings.GetType(), fieldName);
+                _settingsFields[fieldName] = field;
+            }
+
             return field != null ? field.GetValue(settings) as T : null;
         }
 
@@ -459,7 +511,14 @@ namespace SongsOfConquestAccess.Adapters
                 return new object[0];
             }
 
-            PropertyInfo activeEntriesProperty = pool.GetType().GetProperty("ActiveEntries");
+            Type poolType = pool.GetType();
+            PropertyInfo activeEntriesProperty;
+            if (!ActiveEntriesProperties.TryGetValue(poolType, out activeEntriesProperty))
+            {
+                activeEntriesProperty = poolType.GetProperty("ActiveEntries");
+                ActiveEntriesProperties[poolType] = activeEntriesProperty;
+            }
+
             IList entries = activeEntriesProperty != null ? activeEntriesProperty.GetValue(pool, null) as IList : null;
             return entries ?? new object[0];
         }

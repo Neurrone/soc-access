@@ -19,6 +19,16 @@ namespace SongsOfConquestAccess
             SocAccessMod.Instance?.ScreenDetector?.OnCodexReady(__instance);
         }
 
+        /// <summary>The one place the window redraws its body: the game calls DrawContent from
+        /// here, for a click on an article and for the first article of a tab it has just switched
+        /// to. The adapter re-reads the body when this has run and not before.</summary>
+        [HarmonyPatch(typeof(CodexMenu), "HandleContentButtonClicked")]
+        [HarmonyPostfix]
+        private static void CodexMenuContentDrawnPostfix()
+        {
+            CodexMenuAdapter.ContentGeneration++;
+        }
+
         [HarmonyPatch(typeof(CodexMenu), "Hide")]
         [HarmonyPrefix]
         private static void CodexMenuHidePrefix(CodexMenu __instance, out bool __state)
