@@ -24,6 +24,11 @@ namespace SongsOfConquestAccess.UI
     /// destroy, and in the market the left click selects the artifact for sale and Ctrl and the right
     /// click sell it.
     ///
+    /// A SLOT IS A BUTTON ONLY WHERE ENTER DOES SOMETHING (owner ruling 2026-09-08): the market's
+    /// occupied slots, whose left click the game answers. Every other slot - the sheet's and the
+    /// trade's, and an empty one anywhere - is a line, with the same carry, drop and right-click
+    /// gestures on it; those never needed the role.
+    ///
     /// TWO-HANDERS: when the artifact in the main hand takes both hands, the game draws a ghost of it
     /// in the off hand, and the Main Hand and Off Hand nodes become ONE node carrying the game's own
     /// name for that slot ("Both Hands"). It picks up from the main hand, and a drop on it goes to the
@@ -165,11 +170,9 @@ namespace SongsOfConquestAccess.UI
 
             InventorySlotInfo it = slot;
             InventorySlotInfo alternative = dropInstead;
-            NodeVtable vtable = GraphNodes.Button(
-                () => SlotName(it),
-                () => slots.LeftClickArtifact(it),
-                null,
-                it.Tooltip);
+            NodeVtable vtable = slots.AnswersLeftClick(it)
+                ? GraphNodes.Button(() => SlotName(it), () => slots.LeftClickArtifact(it), null, it.Tooltip)
+                : GraphNodes.Text(() => SlotName(it), null, it.Tooltip);
             vtable.Announcements[0].Live = true;
             if (!string.IsNullOrWhiteSpace(slotName))
             {

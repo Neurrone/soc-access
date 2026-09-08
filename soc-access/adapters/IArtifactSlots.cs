@@ -51,6 +51,11 @@ namespace SongsOfConquestAccess.Adapters
         /// </summary>
         string RearrangeRefusalText { get; }
 
+        /// <summary>Whether the game does anything with a plain left click on this slot: only the
+        /// artifact market subscribes to the inventory's left click (<c>InventoryHUD.OnLeftClicked</c>),
+        /// and only a slot with an artifact in it can be clicked at all.</summary>
+        bool AnswersLeftClick(InventorySlotInfo slot);
+
         /// <summary>The artifact's LEFT click, through the button the game hangs its own handler on.
         /// </summary>
         bool LeftClickArtifact(InventorySlotInfo slot);

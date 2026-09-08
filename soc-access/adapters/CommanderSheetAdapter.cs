@@ -601,6 +601,12 @@ namespace SongsOfConquestAccess.Adapters
             get { return GetLocalizedText("Common/CommanderInventory/RearrangeArtifact/CannotRearrangeBecauseOfCommand", string.Empty); }
         }
 
+        /// <summary>Nothing on this sheet listens to the inventory's left click.</summary>
+        public bool AnswersLeftClick(InventorySlotInfo slot)
+        {
+            return false;
+        }
+
         /// <summary>The artifact's LEFT click, through the button the game hangs its own handler on -
         /// inert on this sheet, and with Ctrl physically held the game's own drop on the ground.</summary>
         public bool LeftClickArtifact(InventorySlotInfo slot)

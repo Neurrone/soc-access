@@ -401,6 +401,13 @@ namespace SongsOfConquestAccess.Adapters
             get { return GetLocalizedText("Common/CommanderInventory/RearrangeArtifact/CannotRearrangeBecauseOfCommand", string.Empty); }
         }
 
+        /// <summary>The market answers the left click on an artifact by selecting it for sale; an
+        /// empty slot has no artifact to click.</summary>
+        public bool AnswersLeftClick(InventorySlotInfo slot)
+        {
+            return slot != null && slot.Movable != null;
+        }
+
         /// <summary>The artifact's LEFT click, through the button the game hangs its own handler on.
         /// In this menu the game answers it by SELECTING THE ARTIFACT FOR SALE
         /// (<c>ArtifactMarketMenu.HandleInventoryArtifactClicked</c>), and with Ctrl physically held it
