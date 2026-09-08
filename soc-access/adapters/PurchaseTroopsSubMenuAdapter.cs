@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Reflection;
 using HarmonyLib;
@@ -33,6 +33,13 @@ namespace SongsOfConquestAccess.Adapters
             _subMenu = subMenu;
             _facade = facade;
             _localization = localization;
+        }
+
+        /// <summary>The sub-menu this reads, so an owner keeping one of these can tell whether the
+        /// page has swapped it out from under it.</summary>
+        public PurchaseTroopsSubMenu SubMenu
+        {
+            get { return _subMenu; }
         }
 
         public bool IsPresent()

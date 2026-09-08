@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Reflection;
@@ -23,13 +23,32 @@ namespace SongsOfConquestAccess.Adapters
         private static readonly FieldInfo EntriesField = AccessTools.Field(typeof(UpgradeTroopsSubMenu), "_entries");
         private static readonly FieldInfo NoUpgradableTroopsField = AccessTools.Field(typeof(UpgradeTroopsSubMenu), "_noUpgradableTroops");
 
+        // The game keeps its cards in a dictionary, so every entry read is a KeyValuePair whose Value
+        // property was looked up by name on every card on every build. The pair type is the same one
+        // every time.
+        private static Type PairType;
+        private static PropertyInfo PairValueProperty;
+
         private readonly UpgradeTroopsSubMenu _subMenu;
         private readonly ILocalizationHandler _localization;
+
+        // The meshes under the game's "nothing to upgrade" panel, walked once rather than on every
+        // read of the line they spell.
+        private bool _noUpgradableProbed;
+        private GameObject _noUpgradableRoot;
+        private UITextMesh[] _noUpgradableMeshes;
 
         public UpgradeTroopsSubMenuAdapter(UpgradeTroopsSubMenu subMenu, ILocalizationHandler localization)
         {
             _subMenu = subMenu;
             _localization = localization;
+        }
+
+        /// <summary>The sub-menu this reads, so an owner keeping one of these can tell whether the
+        /// page has swapped it out from under it.</summary>
+        public UpgradeTroopsSubMenu SubMenu
+        {
+            get { return _subMenu; }
         }
 
         public bool IsPresent()
@@ -48,7 +67,20 @@ namespace SongsOfConquestAccess.Adapters
 
         public string NoUpgradableTroopsText
         {
-            get { return GetVisibleText(GetField<GameObject>(_subMenu, NoUpgradableTroopsField)); }
+            get
+            {
+                GameObject root = GetField<GameObject>(_subMenu, NoUpgradableTroopsField);
+                if (!_noUpgradableProbed || !ReferenceEquals(_noUpgradableRoot, root))
+                {
+                    _noUpgradableProbed = true;
+                    _noUpgradableRoot = root;
+                    _noUpgradableMeshes = root == null
+                        ? new UITextMesh[0]
+                        : root.GetComponentsInChildren<UITextMesh>(includeInactive: true);
+                }
+
+                return JoinVisibleText(_noUpgradableMeshes);
+            }
         }
 
         /// <summary>The panel that line is drawn in, which is what proves it is on the screen.
@@ -74,7 +106,7 @@ namespace SongsOfConquestAccess.Adapters
             List<UpgradeTroopsEntry> drawn = new List<UpgradeTroopsEntry>();
             foreach (object pair in enumerable)
             {
-                object value = GetPropertyValue(pair, "Value");
+                object value = GetPairValue(pair);
                 UpgradeTroopsEntry entry = value as UpgradeTroopsEntry;
                 if (entry != null && entry.gameObject != null && entry.gameObject.activeInHierarchy)
                 {
@@ -95,10 +127,21 @@ namespace SongsOfConquestAccess.Adapters
             return result;
         }
 
-        private static object GetPropertyValue(object owner, string propertyName)
+        private static object GetPairValue(object pair)
         {
-            PropertyInfo property = owner != null ? owner.GetType().GetProperty(propertyName) : null;
-            return property != null ? property.GetValue(owner, null) : null;
+            if (pair == null)
+            {
+                return null;
+            }
+
+            Type pairType = pair.GetType();
+            if (!ReferenceEquals(PairType, pairType))
+            {
+                PairType = pairType;
+                PairValueProperty = pairType.GetProperty("Value");
+            }
+
+            return PairValueProperty != null ? PairValueProperty.GetValue(pair, null) : null;
         }
 
         private static T GetField<T>(object owner, FieldInfo field) where T : class
@@ -111,17 +154,21 @@ namespace SongsOfConquestAccess.Adapters
             return SpokenLines.Clean(UITextMeshTextUtility.GetEffectiveText(textMesh));
         }
 
-        private static string GetVisibleText(GameObject root)
+        private static string JoinVisibleText(UITextMesh[] textMeshes)
         {
-            if (root == null)
+            if (textMeshes == null)
             {
                 return string.Empty;
             }
 
             List<string> parts = new List<string>();
-            UITextMesh[] textMeshes = root.GetComponentsInChildren<UITextMesh>(includeInactive: false);
             for (int i = 0; i < textMeshes.Length; i++)
             {
+                if (textMeshes[i] == null || !textMeshes[i].gameObject.activeInHierarchy)
+                {
+                    continue;
+                }
+
                 string text = GetText(textMeshes[i]);
                 if (!string.IsNullOrWhiteSpace(text) && !parts.Contains(text))
                 {

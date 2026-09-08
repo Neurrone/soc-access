@@ -1,4 +1,4 @@
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Reflection;
 using HarmonyLib;
 using Lavapotion.Utilities;
@@ -39,6 +39,7 @@ namespace SongsOfConquestAccess.Adapters
         private readonly IClientAdventureFacade _facade;
         private readonly ILocalizationHandler _localization;
         private WielderInteract _wielder;
+        private PurchaseTroopsSubMenuAdapter _purchaseTroops;
 
         public RallyPointInteractionMenuAdapter(RallyPointInteractionMenu menu)
         {
@@ -94,9 +95,20 @@ namespace SongsOfConquestAccess.Adapters
             }
         }
 
+        /// <summary>The draft sub-page. Kept, so the page's build reads one adapter rather than a new
+        /// one every frame.</summary>
         public PurchaseTroopsSubMenuAdapter PurchaseTroops
         {
-            get { return new PurchaseTroopsSubMenuAdapter(GetPurchaseSubMenu(), _facade, _localization); }
+            get
+            {
+                PurchaseTroopsSubMenu subMenu = GetPurchaseSubMenu();
+                if (_purchaseTroops == null || !ReferenceEquals(_purchaseTroops.SubMenu, subMenu))
+                {
+                    _purchaseTroops = new PurchaseTroopsSubMenuAdapter(subMenu, _facade, _localization);
+                }
+
+                return _purchaseTroops;
+            }
         }
 
         public IReadOnlyList<SourceItem> GetSourceItems()

@@ -1,4 +1,4 @@
-using System.Reflection;
+﻿using System.Reflection;
 using HarmonyLib;
 using SongsOfConquest.Client;
 using SongsOfConquest.Client.Adventure;
@@ -31,6 +31,8 @@ namespace SongsOfConquestAccess.Adapters
         private readonly IClientAdventureFacade _facade;
         private readonly ILocalizationHandler _localization;
         private WielderInteract _wielder;
+        private PurchaseTroopsSubMenuAdapter _purchaseTroops;
+        private UpgradeTroopsSubMenuAdapter _upgradeTroops;
 
         public DwellingInteractionMenuAdapter(DwellingInteractionMenu menu)
         {
@@ -105,14 +107,35 @@ namespace SongsOfConquestAccess.Adapters
             get { return new TroopHudAdapter(GetTroopHud(), _facade, _localization); }
         }
 
+        /// <summary>The draft sub-page. Kept, so the page's build reads one adapter rather than a new
+        /// one every frame.</summary>
         public PurchaseTroopsSubMenuAdapter PurchaseTroops
         {
-            get { return new PurchaseTroopsSubMenuAdapter(GetPurchaseTroopsSubMenu(), _facade, _localization); }
+            get
+            {
+                PurchaseTroopsSubMenu subMenu = GetPurchaseTroopsSubMenu();
+                if (_purchaseTroops == null || !ReferenceEquals(_purchaseTroops.SubMenu, subMenu))
+                {
+                    _purchaseTroops = new PurchaseTroopsSubMenuAdapter(subMenu, _facade, _localization);
+                }
+
+                return _purchaseTroops;
+            }
         }
 
+        /// <summary>The upgrade sub-page. Kept for the same reason as the draft one.</summary>
         public UpgradeTroopsSubMenuAdapter UpgradeTroops
         {
-            get { return new UpgradeTroopsSubMenuAdapter(GetUpgradeTroopsSubMenu(), _localization); }
+            get
+            {
+                UpgradeTroopsSubMenu subMenu = GetUpgradeTroopsSubMenu();
+                if (_upgradeTroops == null || !ReferenceEquals(_upgradeTroops.SubMenu, subMenu))
+                {
+                    _upgradeTroops = new UpgradeTroopsSubMenuAdapter(subMenu, _localization);
+                }
+
+                return _upgradeTroops;
+            }
         }
 
         public void HideNativeTooltip()
