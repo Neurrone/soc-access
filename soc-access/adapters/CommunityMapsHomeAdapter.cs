@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Reflection;
@@ -33,6 +33,11 @@ namespace SongsOfConquestAccess.Adapters
         private static readonly FieldInfo RowContainerField = AccessTools.Field(typeof(ModListRow), "ModListItemContainer");
         private static readonly FieldInfo RowErrorPanelField = AccessTools.Field(typeof(ModListRow), "ErrorPanel");
         private static readonly FieldInfo RowLoadingPanelField = AccessTools.Field(typeof(ModListRow), "LoadingPanel");
+        // The browser's own list item and progress tab are named by fields rather than by properties,
+        // and every mod of every band is read through several of them on every build. The handle for
+        // each (type, name) is resolved once, misses among them.
+        private static readonly Dictionary<Type, Dictionary<string, FieldInfo>> FieldHandles =
+            new Dictionary<Type, Dictionary<string, FieldInfo>>();
 
         private readonly Home _home;
         private ListItem _selectedItem;
@@ -45,6 +50,19 @@ namespace SongsOfConquestAccess.Adapters
         private readonly string _moreOptionsLabel;
         private readonly string _subscribeLabel;
         private readonly string _unsubscribeLabel;
+        private readonly string _loadingLabel;
+        private readonly string _errorLabel;
+
+        // mod.io's own subscription check, and the collection object it is asked on: both were looked
+        // up afresh for every mod whose Subscribe label was read.
+        private static readonly MethodInfo CollectionIsSubscribedMethod =
+            AccessTools.Method(typeof(Collection), "IsSubscribed", new[] { typeof(ModId) });
+        private Collection _collection;
+        private bool _collectionProbed;
+
+        // Which mesh each band's caption was found on. The search for it is up to three walks of the
+        // band and of its neighbours; the words are still read off the mesh live.
+        private readonly Dictionary<ModListRow, TMP_Text> _rowLabelTexts = new Dictionary<ModListRow, TMP_Text>();
 
         public CommunityMapsHomeAdapter(Home home)
         {
@@ -56,6 +74,8 @@ namespace SongsOfConquestAccess.Adapters
             _moreOptionsLabel = Translate("More options");
             _subscribeLabel = Translate("Subscribe");
             _unsubscribeLabel = Translate("Unsubscribe");
+            _loadingLabel = Translate("Loading");
+            _errorLabel = Translate("Error");
         }
 
         public static CommunityMapsHomeAdapter TryCreate()
@@ -541,9 +561,31 @@ namespace SongsOfConquestAccess.Adapters
 
         private string FindRowLabel(ModListRow row)
         {
+            TMP_Text kept;
+            if (row != null && _rowLabelTexts.TryGetValue(row, out kept))
+            {
+                return kept != null ? GetText(kept) : string.Empty;
+            }
+
+            TMP_Text found = FindRowLabelText(row);
+            if (row != null)
+            {
+                _rowLabelTexts[row] = found;
+            }
+
+            return found != null ? GetText(found) : string.Empty;
+        }
+
+        private static TMP_Text FindRowLabelText(ModListRow row)
+        {
+            if (row == null)
+            {
+                return null;
+            }
+
             Transform itemContainer = RowContainerField != null ? RowContainerField.GetValue(row) as Transform : null;
-            string ancestorHeader = FindAncestorRowHeader(row, itemContainer);
-            if (!string.IsNullOrWhiteSpace(ancestorHeader))
+            TMP_Text ancestorHeader = FindAncestorRowHeader(row, itemContainer);
+            if (ancestorHeader != null)
             {
                 return ancestorHeader;
             }
@@ -557,10 +599,9 @@ namespace SongsOfConquestAccess.Adapters
                     continue;
                 }
 
-                string value = GetText(text);
-                if (!string.IsNullOrWhiteSpace(value))
+                if (!string.IsNullOrWhiteSpace(GetText(text)))
                 {
-                    return value;
+                    return text;
                 }
             }
 
@@ -568,7 +609,7 @@ namespace SongsOfConquestAccess.Adapters
             Transform parent = rowTransform.parent;
             if (parent == null)
             {
-                return string.Empty;
+                return null;
             }
 
             int rowSiblingIndex = rowTransform.GetSiblingIndex();
@@ -583,18 +624,17 @@ namespace SongsOfConquestAccess.Adapters
                 TMP_Text[] siblingTexts = sibling.GetComponentsInChildren<TMP_Text>(false);
                 for (int textIndex = 0; textIndex < siblingTexts.Length; textIndex++)
                 {
-                    string value = GetText(siblingTexts[textIndex]);
-                    if (!string.IsNullOrWhiteSpace(value))
+                    if (!string.IsNullOrWhiteSpace(GetText(siblingTexts[textIndex])))
                     {
-                        return value;
+                        return siblingTexts[textIndex];
                     }
                 }
             }
 
-            return string.Empty;
+            return null;
         }
 
-        private static string FindAncestorRowHeader(ModListRow row, Transform itemContainer)
+        private static TMP_Text FindAncestorRowHeader(ModListRow row, Transform itemContainer)
         {
             Transform current = row != null ? row.transform : null;
             while (current != null && current.parent != null)
@@ -612,20 +652,19 @@ namespace SongsOfConquestAccess.Adapters
                             continue;
                         }
 
-                        string value = GetText(text);
-                        if (!string.IsNullOrWhiteSpace(value))
+                        if (!string.IsNullOrWhiteSpace(GetText(text)))
                         {
-                            return value;
+                            return text;
                         }
                     }
 
-                    return string.Empty;
+                    return null;
                 }
 
                 current = current.parent;
             }
 
-            return string.Empty;
+            return null;
         }
 
         private static string FindTopBarText(string transformName)
@@ -669,13 +708,13 @@ namespace SongsOfConquestAccess.Adapters
             GameObject loading = RowLoadingPanelField != null ? RowLoadingPanelField.GetValue(row) as GameObject : null;
             if (loading != null && loading.activeInHierarchy)
             {
-                return Translate("Loading");
+                return _loadingLabel;
             }
 
             GameObject error = RowErrorPanelField != null ? RowErrorPanelField.GetValue(row) as GameObject : null;
             if (error != null && error.activeInHierarchy)
             {
-                return Translate("Error");
+                return _errorLabel;
             }
 
             return string.Empty;
@@ -781,15 +820,27 @@ namespace SongsOfConquestAccess.Adapters
 
         private bool IsSubscribed(ModId id)
         {
-            Collection[] collections = Resources.FindObjectsOfTypeAll<Collection>();
-            if (collections.Length == 0 || collections[0] == null)
+            Collection collection = GetCollection();
+            if (collection == null || CollectionIsSubscribedMethod == null)
             {
                 return false;
             }
 
-            MethodInfo method = AccessTools.Method(typeof(Collection), "IsSubscribed", new[] { typeof(ModId) });
-            object result = method != null ? method.Invoke(collections[0], new object[] { id }) : null;
+            object result = CollectionIsSubscribedMethod.Invoke(collection, new object[] { id });
             return result is bool && (bool)result;
+        }
+
+        private Collection GetCollection()
+        {
+            if (_collectionProbed)
+            {
+                return _collection;
+            }
+
+            _collectionProbed = true;
+            Collection[] collections = Resources.FindObjectsOfTypeAll<Collection>();
+            _collection = collections.Length > 0 ? collections[0] : null;
+            return _collection;
         }
 
         private ModProfile[] GetFeaturedProfiles()
@@ -830,8 +881,35 @@ namespace SongsOfConquestAccess.Adapters
                 return default(T);
             }
 
-            FieldInfo field = AccessTools.Field(instance.GetType(), name);
+            FieldInfo field = ResolveField(instance.GetType(), name);
             return field != null ? (T)field.GetValue(instance) : default(T);
+        }
+
+        /// <summary>The handle for one named field of one runtime type, resolved once. The field is
+        /// looked up on the object's own type, as the browser's items are subclasses of what its
+        /// public surface names.</summary>
+        private static FieldInfo ResolveField(Type type, string name)
+        {
+            if (type == null || string.IsNullOrEmpty(name))
+            {
+                return null;
+            }
+
+            Dictionary<string, FieldInfo> byName;
+            if (!FieldHandles.TryGetValue(type, out byName))
+            {
+                byName = new Dictionary<string, FieldInfo>();
+                FieldHandles[type] = byName;
+            }
+
+            FieldInfo field;
+            if (!byName.TryGetValue(name, out field))
+            {
+                field = AccessTools.Field(type, name);
+                byName[name] = field;
+            }
+
+            return field;
         }
 
         private static string GetText(TMP_Text text)

@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Reflection;
 using HarmonyLib;
@@ -19,6 +19,13 @@ namespace SongsOfConquestAccess.Adapters
         private readonly CommunityMapsModalState? _cachedState;
         private readonly IReadOnlyList<TextItem> _cachedTexts;
         private readonly IReadOnlyList<ActionItem> _cachedActions;
+
+        // What the plain panel turned out to be, and the download queue behind it. Both are settled
+        // by the panel this adapter was made for, which never changes under it; answering them meant
+        // a scan of the scene and seven parent walks, one to three times per build.
+        private CommunityMapsModalState? _panelState;
+        private DownloadQueue _downloadQueue;
+        private bool _downloadQueueProbed;
 
         private CommunityMapsModalAdapter(
             GameObject panel,
@@ -119,48 +126,64 @@ namespace SongsOfConquestAccess.Adapters
                     return _cachedState.Value;
                 }
 
+                // The authentication flow moves from panel to panel under one adapter, so its state is
+                // the one that is asked again every time.
                 if (_authPanels != null)
                 {
                     return GetAuthenticationState();
                 }
 
-                if (_panel == null)
+                if (_panelState.HasValue)
                 {
-                    return CommunityMapsModalState.None;
+                    return _panelState.Value;
                 }
 
-                if (_panel.GetComponentInParent<KeyInput5DigitsUi>() != null)
-                {
-                    return CommunityMapsModalState.InputFiveDigits;
-                }
-
-                if (_panel.GetComponentInParent<Reporting>() != null)
-                {
-                    return CommunityMapsModalState.Report;
-                }
-
-                if (_panel.GetComponentInParent<Collection>() != null)
-                {
-                    return CommunityMapsModalState.ConfirmUninstall;
-                }
-
-                if (HasComponentInParent(_panel.transform, "ModIOBrowser.Implementation.NotificationPopup"))
-                {
-                    return CommunityMapsModalState.Notification;
-                }
-
-                if (HasComponentInParent(_panel.transform, "ModIOBrowser.Implementation.ModioContextMenu"))
-                {
-                    return CommunityMapsModalState.ContextMenu;
-                }
-
-                if (IsDownloadQueuePanel(_panel))
-                {
-                    return CommunityMapsModalState.DownloadQueue;
-                }
-
-                return CommunityMapsModalState.Unknown;
+                _panelState = ResolvePanelState();
+                return _panelState.Value;
             }
+        }
+
+        /// <summary>What the panel this adapter was made for turned out to be. Settled once: the
+        /// parents of a panel do not change, and the answer was worth a scan of the scene plus seven
+        /// walks up the hierarchy on every read.</summary>
+        private CommunityMapsModalState ResolvePanelState()
+        {
+            if (_panel == null)
+            {
+                return CommunityMapsModalState.None;
+            }
+
+            if (_panel.GetComponentInParent<KeyInput5DigitsUi>() != null)
+            {
+                return CommunityMapsModalState.InputFiveDigits;
+            }
+
+            if (_panel.GetComponentInParent<Reporting>() != null)
+            {
+                return CommunityMapsModalState.Report;
+            }
+
+            if (_panel.GetComponentInParent<Collection>() != null)
+            {
+                return CommunityMapsModalState.ConfirmUninstall;
+            }
+
+            if (HasComponentInParent(_panel.transform, "ModIOBrowser.Implementation.NotificationPopup"))
+            {
+                return CommunityMapsModalState.Notification;
+            }
+
+            if (HasComponentInParent(_panel.transform, "ModIOBrowser.Implementation.ModioContextMenu"))
+            {
+                return CommunityMapsModalState.ContextMenu;
+            }
+
+            if (GetDownloadQueue() != null)
+            {
+                return CommunityMapsModalState.DownloadQueue;
+            }
+
+            return CommunityMapsModalState.Unknown;
         }
 
         public IReadOnlyList<TextItem> GetTexts()
@@ -566,30 +589,10 @@ namespace SongsOfConquestAccess.Adapters
             return null;
         }
 
-        private static bool IsDownloadQueuePanel(GameObject panel)
-        {
-            if (panel == null)
-            {
-                return false;
-            }
-
-            DownloadQueue[] queues = Resources.FindObjectsOfTypeAll<DownloadQueue>();
-            for (int i = 0; i < queues.Length; i++)
-            {
-                DownloadQueue queue = queues[i];
-                if (queue != null && queue.DownloadQueuePanel == panel)
-                {
-                    return true;
-                }
-            }
-
-            return false;
-        }
-
         private IReadOnlyList<TextItem> GetDownloadQueueTexts()
         {
             List<TextItem> result = new List<TextItem>();
-            DownloadQueue queue = GetDownloadQueueForPanel(_panel);
+            DownloadQueue queue = GetDownloadQueue();
             if (queue == null)
             {
                 return result;
@@ -609,7 +612,7 @@ namespace SongsOfConquestAccess.Adapters
         private IReadOnlyList<ActionItem> GetDownloadQueueActions()
         {
             List<ActionItem> result = new List<ActionItem>();
-            DownloadQueue queue = GetDownloadQueueForPanel(_panel);
+            DownloadQueue queue = GetDownloadQueue();
             if (queue == null)
             {
                 return result;
@@ -622,6 +625,21 @@ namespace SongsOfConquestAccess.Adapters
                 result,
                 GetField<Button>(queue, "DownloadQueueCurrentLogoutButton"));
             return result;
+        }
+
+        /// <summary>The queue this modal's panel belongs to, or null for a panel that is not one.
+        /// Scanned for once: the answer is a property of the panel, and both the texts and the actions
+        /// ask for it on every build.</summary>
+        private DownloadQueue GetDownloadQueue()
+        {
+            if (_downloadQueueProbed)
+            {
+                return _downloadQueue;
+            }
+
+            _downloadQueueProbed = true;
+            _downloadQueue = GetDownloadQueueForPanel(_panel);
+            return _downloadQueue;
         }
 
         private static DownloadQueue GetDownloadQueueForPanel(GameObject panel)
