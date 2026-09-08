@@ -261,7 +261,9 @@ namespace SongsOfConquestAccess.UI
 
         /// <summary>One drawn slot: what is in it, and every gesture the game gives the troop there.
         /// The name is watched live - a split, a merge and a disband all happen under a cursor standing
-        /// right here.</summary>
+        /// right here. An EMPTY slot is a line and not a button (owner ruling 2026-09-08): the game
+        /// wires the entry's click to the troop in it, so there is nothing to press, only somewhere a
+        /// carried troop can be dropped.</summary>
         private static void AddRow(
             GraphBuilder builder,
             TroopHudAdapter troops,
@@ -271,11 +273,15 @@ namespace SongsOfConquestAccess.UI
         {
             TroopHudAdapter.SlotItem it = slot;
             Func<bool> workable = available;
-            NodeVtable vtable = GraphNodes.Button(
-                () => Label(it),
-                () => it.Click(),
-                () => it.IsUnlocked && (workable == null || workable()),
-                it.IsOccupied ? it.Details : null);
+            Func<bool> enabled = () => it.IsUnlocked && (workable == null || workable());
+            NodeVtable vtable = it.IsOccupied
+                ? GraphNodes.Button(() => Label(it), () => it.Click(), enabled, it.Details)
+                : GraphNodes.Text(() => Label(it));
+            if (!it.IsOccupied)
+            {
+                vtable.Announcements.Add(GraphNodes.DisabledPart(enabled));
+            }
+
             vtable.Announcements[0].Live = true;
             // Selecting the entry is what makes the game draw the troop's details for it.
             vtable.OnFocusVisual = () => it.Focus();
