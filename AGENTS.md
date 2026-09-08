@@ -14,7 +14,7 @@ Layout:
 - `soc-access/speech/` for Prism and output plumbing
 - `soc-access/screens/` for accessible screen models. Screens can depend on adaptors and use widgets
 - `soc-access/ui/` for UI widgets in the accessibility tree, and `soc-access/ui/graph/` for the immediate-mode graph engine the widgets are being replaced by, one screen at a time; `ui-graph-plan.md` is the brief for that rewrite and says which screens are graph screens (`screens/GraphScreen.cs`) today
-- `soc-access/dev/` for the mod-side dev server routes and probes (`ModRoutes`, `WidgetDump`, `DevProbe`); development only, never spoken
+- `soc-access/dev/` for the mod-side dev server routes and probes (`ModRoutes`, `WidgetDump`, `DevProbe`, `DevFixtures`); development only, never spoken
 - `soc-access/loader/` for the loader plugin and the loader-side dev server. Changing anything here needs a game restart; prefer a mod-side probe over a new loader member
 - `soc-access/tests/` for tests
 - `soc-access/soc-access.csproj` is the live mod project and currently targets `.NET Framework 4.7.2`

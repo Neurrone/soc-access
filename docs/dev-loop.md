@@ -179,6 +179,15 @@ the same four columns.
   `FinalizeLoadingScreen`; `continued:false` when that screen is not up.
 - `RuntimeScreens()`: the screens the detector's runtime factories read as present right
   now, which is exactly what a reload's resync would push. Read it when a resync looks wrong.
+- `TilesAround(radius)`: the tiles around the selected wielder, no fog applied, each with
+  `entity`, `commander` or `impassable` when something is there and `free:true` when the game
+  would accept a spawned map entity on it.
+
+`SongsOfConquestAccess.Dev.DevFixtures` is the same idea for calls that change the game to
+set a test up, kept apart from the probes because a probe never writes:
+
+- `SpawnAt(blueprint, x, y)`: spawn a map entity blueprint on a tile through the game's own
+  debug route; `accepted` is the validator's answer. Read `TilesAround` first.
 
 REPL facts observed on this Mono (Unity 2022.3, `mcs.dll` built for net35):
 
@@ -283,17 +292,16 @@ Filled in as the loop is used; keep entries to one line each with the date.
 - 2026-09-07: REPL recipes for phase D fixtures. The game object is not in the project
   context: resolve it from the AdventureScene's `Zenject.SceneContext` (`FindObjectsOfTypeAll<SceneContext>()`,
   `Container.TryResolve<Lavapotion.Networking.IGame>()`); the same container answers
-  `IAdventureMenuSystem`, `IHUDActionSignals` and `ISelectionHandler`
-  (`SongsOfConquest.Client.Gamestate`), whose `SelectedCommander.Position` is the selected
-  wielder's tile as a `Vector2Int`; `x + 1` on the same row is always a neighbour on this hex
-  grid. A map entity is spawned beside the wielder with
-  `game.server.Commands.ProcessServerRequest(new CreateAdventureMapEntityCommand.Request((ushort)blueprint, position))`
-  (`SongsOfConquest.Common.Entities.Adventure`; the debug console's own route; the state
-  appears a frame later, and the mod's "Revealed ..." line in the eval's `speech` confirms
-  it landed). Verified 2026-09-08 in one eval: resolve `IGame` and `ISelectionHandler` from the
-  scene contexts, `var target = new UnityEngine.Vector2Int(sel.SelectedCommander.Position.x + 1, sel.SelectedCommander.Position.y);`,
-  then the request above with `(ushort)174` and `target`. `IGame` has no `state` member; do not
-  guess one to check the tile, the speech line is the check. 174 is an artifact market
+  `IAdventureMenuSystem` and `IHUDActionSignals`. To put a map entity beside the wielder, first
+  read `DevProbe.TilesAround(2)` (the radius is the argument; 2 is 5x5): every tile around the
+  selected wielder with what occupies it, and `free:true` where the game's own placement
+  validator would accept an entity. Never assume a neighbour is free; the tile east may hold
+  a building, another wielder or impassable terrain. Pick a free tile and call
+  `DevFixtures.SpawnAt(blueprint, x, y)`, the debug console's own route
+  (`CreateAdventureMapEntityCommand`); `accepted:false` means the validator refused the tile.
+  The state appears a frame later, and the mod's "Revealed ..." line in the eval's `speech`
+  confirms it landed. (`IGame` has no `state` member; do not guess one to check the tile.)
+  174 is an artifact market
   (Raider's Market; 156 is the resource market), 285 a standalone rally point (claim it with
   `ClaimMapEntityCommand.Request(commanderId, entityId)`). Menus open through the menu system:
   `ShowArtifactMarketMenu(entityId, commanderId)`, `OpenDefenceMenu(entity)`,
