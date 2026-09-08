@@ -400,12 +400,15 @@ namespace SongsOfConquestAccess.Screens
         }
 
         /// <summary>Every change the map listens to - a selection, a move, a teleport, a command, a
-        /// spawned entity, the fog - drops the kept tile, so nothing the game changes under a still
-        /// cursor is read from the cache.</summary>
+        /// spawned entity, the fog - drops the kept tile AND the kept tooltip, so nothing the game
+        /// changes under a still cursor is read from either cache. The tooltip carries the tile's
+        /// click instructions, which a selection changes without moving the cursor.</summary>
         private void InvalidateTile()
         {
             _tileRead = false;
             _tile = null;
+            _tooltipRead = false;
+            _tooltip = null;
         }
 
         private Tooltip TileTooltip()
