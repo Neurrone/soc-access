@@ -44,8 +44,10 @@ namespace SongsOfConquestAccess.Adapters
         private static readonly FieldInfo NoSelectionContainerField = AccessTools.Field(typeof(ArtifactMarketMenu), "_noSelectionContainer");
         private static readonly FieldInfo BuyContainerField = AccessTools.Field(typeof(ArtifactMarketMenu), "_buyContainer");
         private static readonly FieldInfo BuyItemTitleField = AccessTools.Field(typeof(ArtifactMarketMenu), "_buyItemTitle");
+        private static readonly FieldInfo BuyItemIconField = AccessTools.Field(typeof(ArtifactMarketMenu), "_buyItemIcon");
         private static readonly FieldInfo SellContainerField = AccessTools.Field(typeof(ArtifactMarketMenu), "_sellContainer");
         private static readonly FieldInfo SellItemTitleField = AccessTools.Field(typeof(ArtifactMarketMenu), "_sellItemTitle");
+        private static readonly FieldInfo SellItemIconField = AccessTools.Field(typeof(ArtifactMarketMenu), "_sellItemIcon");
         private static readonly FieldInfo SellButtonField = AccessTools.Field(typeof(ArtifactMarketMenu), "_sellButton");
         private static readonly FieldInfo SellButtonTitleField = AccessTools.Field(typeof(ArtifactMarketMenu), "_sellButtonTitle");
         private static readonly FieldInfo SelectedSellArtifactField = AccessTools.Field(typeof(ArtifactMarketMenu), "_selectedSellArtifact");
@@ -557,30 +559,12 @@ namespace SongsOfConquestAccess.Adapters
             get { return IsActive(GetField<GameObject>(_menu, BuyContainerField)); }
         }
 
-        /// <summary>The tooltip of the artifact the Buy band is about: the game draws none on the band
-        /// itself, so it is the one on the offer's own cell, found by the artifact state the band and
-        /// the cell share (<c>ArtifactMarketMenu.SetArtifact</c> keeps the entry's state).</summary>
+        /// <summary>The tooltip on the Buy band's icon: the game hangs the artifact's details on it
+        /// (<c>ArtifactMarketMenu.SetArtifact</c>, <c>UIImage.SetDetails</c>), which is what the mouse
+        /// sees hovering the band.</summary>
         public Tooltip BuyItemTooltip
         {
-            get
-            {
-                IArtifactState artifact = GetSelectedBuyArtifact();
-                if (artifact == null)
-                {
-                    return null;
-                }
-
-                IReadOnlyList<MarketArtifactItem> offers = GetMarketArtifacts();
-                for (int i = 0; i < offers.Count; i++)
-                {
-                    if (offers[i].Entry != null && ReferenceEquals(offers[i].Entry.ArtifactState, artifact))
-                    {
-                        return offers[i].Tooltip;
-                    }
-                }
-
-                return null;
-            }
+            get { return Tooltip.ForComponent(GetField<UIImage>(_menu, BuyItemIconField) as Component, _localization); }
         }
 
         /// <summary>The name of the artifact the Buy band is about, as the band draws it.</summary>
@@ -637,36 +621,12 @@ namespace SongsOfConquestAccess.Adapters
             get { return IsActive(GetField<GameObject>(_menu, SellContainerField)); }
         }
 
-        /// <summary>The tooltip of the artifact the Sell band is about: the game draws none on the band
-        /// itself, so it is the one on the artifact's own slot, found by the artifact state the band
-        /// and the slot share (<c>HandleInventoryArtifactClicked</c> keeps the movable's state).</summary>
+        /// <summary>The tooltip on the Sell band's icon: the game hangs the artifact's details on it
+        /// (<c>ArtifactMarketMenu.SetArtifact</c>, <c>UIImage.SetDetails</c>), which is what the mouse
+        /// sees hovering the band.</summary>
         public Tooltip SellItemTooltip
         {
-            get
-            {
-                IArtifactState artifact = GetField<IArtifactState>(_menu, SelectedSellArtifactField);
-                if (artifact == null)
-                {
-                    return null;
-                }
-
-                Tooltip tooltip = SlotTooltipFor(artifact, GetEquipmentSlots());
-                return tooltip ?? SlotTooltipFor(artifact, GetBackpackSlots());
-            }
-        }
-
-        private static Tooltip SlotTooltipFor(IArtifactState artifact, IReadOnlyList<InventorySlotInfo> slots)
-        {
-            for (int i = 0; i < slots.Count; i++)
-            {
-                InventorySlotInfo slot = slots[i];
-                if (slot != null && slot.Movable != null && ReferenceEquals(slot.Movable.State, artifact))
-                {
-                    return slot.Tooltip;
-                }
-            }
-
-            return null;
+            get { return Tooltip.ForComponent(GetField<UIImage>(_menu, SellItemIconField) as Component, _localization); }
         }
 
         /// <summary>The name of the artifact the Sell band is about, as the band draws it.</summary>
