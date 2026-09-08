@@ -189,8 +189,8 @@ namespace SongsOfConquestAccess.Tests
         }
 
         /// <summary>A stop whose first nodes are not what the player came for - a table's sort headings,
-        /// where the SORTED column reads "selected" - says where Tab lands, and the
-        /// land-on-the-selected-one rule runs from there rather than over the headings.</summary>
+        /// where the SORTED column reads "selected" - says where Tab lands, and that wins over the
+        /// land-on-the-selected-one rule, headings and rows alike.</summary>
         private static KeyGraph TableUnderHeadings(GraphState state, bool rowSelected)
         {
             return new KeyGraph(Renderer(b =>
@@ -219,13 +219,13 @@ namespace SongsOfConquestAccess.Tests
         }
 
         [TestMethod]
-        public void ATabStopWithADeclaredLandingStillPrefersASelectedNodeBelowIt()
+        public void ATabStopWithADeclaredLandingIgnoresASelectedNodeBelowIt()
         {
             GraphState state = new GraphState();
             KeyGraph g = TableUnderHeadings(state, true);
             g.Rerender();
             Assert.IsTrue(g.MoveStop(1, true).Moved);
-            Assert.AreEqual("row2", Focused(g));
+            Assert.AreEqual("row1", Focused(g));
         }
 
         // ---- regions ----

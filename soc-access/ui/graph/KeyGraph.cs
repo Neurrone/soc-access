@@ -218,7 +218,7 @@ namespace SongsOfConquestAccess.UI.Graph
         /// absent means a panel is hidden or a modal is up, and it may return with the very keys the
         /// memory names. Same where the previous order never listed the dead key (a first render, a
         /// control that came and went between rebuilds) — there is no neighborhood to fall back into,
-        /// and <see cref="StopLanding(object)"/>'s selected/declared/first chain covers it.
+        /// and <see cref="StopLanding(object)"/>'s declared/selected/first chain covers it.
         /// </summary>
         private static void RepairStopMemory(GraphRender render, GraphState state)
         {
@@ -436,8 +436,10 @@ namespace SongsOfConquestAccess.UI.Graph
         }
 
         /// <summary>Where focus lands when entering a stop with no active cursor: the remembered
-        /// position, else the SELECTED member (a radio/tab/list item currently checked — a boon on long
-        /// lists), else the stop's first node.</summary>
+        /// position, else where the stop SAID to land (<see cref="GraphBuilder.LandStopOn"/> - a screen
+        /// that names a landing knows more than the default below does, so it wins outright, a selected
+        /// tab further down included), else the SELECTED member (a radio/tab/list item currently
+        /// checked - a boon on long lists), else the stop's first node.</summary>
         public GraphNode StopLanding(object stopKey)
         {
             return StopLanding(_current, _state, stopKey);
@@ -451,10 +453,10 @@ namespace SongsOfConquestAccess.UI.Graph
                 GraphNode node = render.NodeAt(remembered);
                 if (node != null && Equals(node.StopKey, stopKey)) return node;
             }
-            GraphNode selected = SelectedNodeInStop(render, stopKey);
-            if (selected != null) return selected;
             GraphNode declared = DeclaredLanding(render, stopKey);
             if (declared != null) return declared;
+            GraphNode selected = SelectedNodeInStop(render, stopKey);
+            if (selected != null) return selected;
             foreach (GraphNode n in render.Order)
                 if (Equals(n.StopKey, stopKey)) return n;
             return null;
@@ -498,20 +500,12 @@ namespace SongsOfConquestAccess.UI.Graph
 
         /// <summary>The first node in a stop that reads as SELECTED — carries a non-empty selected-kind
         /// announcement part (list selection / choice option / tab / radio all declare one), or null.
-        /// The search starts at the stop's declared landing where it has one, so a table's sort headings
-        /// — where the SORTED column reads "selected" — are not mistaken for the chosen row.</summary>
+        /// Only consulted for a stop that declared no landing of its own.</summary>
         public static GraphNode SelectedNodeInStop(GraphRender render, object stopKey)
         {
-            GraphNode from = DeclaredLanding(render, stopKey);
-            bool reached = from == null;
             foreach (GraphNode n in render.Order)
             {
                 if (!Equals(n.StopKey, stopKey)) continue;
-                if (!reached)
-                {
-                    if (!ReferenceEquals(n, from)) continue;
-                    reached = true;
-                }
                 IList<NodeAnnouncement> anns = n.Vtable != null ? n.Vtable.Announcements : null;
                 if (anns == null) continue;
                 foreach (NodeAnnouncement a in anns)

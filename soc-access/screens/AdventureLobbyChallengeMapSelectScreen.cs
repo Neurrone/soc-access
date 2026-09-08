@@ -134,6 +134,7 @@ namespace SongsOfConquestAccess.Screens
             GraphSheet sheet = new GraphSheet(builder, SheetKey);
             sheet.Region(_adapter.Title, captions);
             IReadOnlyList<AdventureLobbyChallengeMapRowAdapter> rows = _adapter.GetVisibleRows();
+            object selected = null;
             for (int i = 0; i < rows.Count; i++)
             {
                 AdventureLobbyChallengeMapRowAdapter row = rows[i];
@@ -143,12 +144,18 @@ namespace SongsOfConquestAccess.Screens
                 }
 
                 sheet.RowAt(Primary(row), row.NativeKey, Cells(row, captions), row.Entry);
+                if (row.IsSelected)
+                {
+                    selected = row.NativeKey;
+                }
             }
 
             sheet.Finish();
             if (sheet.FirstRow != null)
             {
-                builder.LandStopOn(sheet.FirstRow);
+                // Tab into the table lands on the selected map, else on the first one - never on the
+                // heading band above them.
+                builder.LandStopOn(sheet.RowId(selected) ?? sheet.FirstRow);
             }
         }
 

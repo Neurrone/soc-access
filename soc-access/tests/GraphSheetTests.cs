@@ -514,6 +514,22 @@ namespace SongsOfConquestAccess.Tests
             Assert.AreEqual(s.FirstRow.StructuralKey, b.Build().StartKey.StructuralKey);
         }
 
+        [TestMethod]
+        public void TheSheetNamesAnyRowByItsRowObjectSoATableCanOpenOnTheSelectedOne()
+        {
+            GraphBuilder b = new GraphBuilder();
+            GraphSheet s = new GraphSheet(b, "t:");
+            s.Region("Report");
+            s.Row(Vt("Alpha"), _rowA, null);
+            s.Row(Vt("Beta"), _rowB, null);
+            s.Finish();
+            Assert.AreEqual(s.FirstRow, s.RowId(_rowA));
+            Assert.AreEqual(s.CellKey(_rowB, 0), s.RowId(_rowB).StructuralKey);
+            Assert.AreSame(_rowB, s.RowId(_rowB).Subject);
+            Assert.IsNull(s.RowId(null));
+            Assert.IsTrue(b.Build().Nodes.ContainsKey(s.RowId(_rowB)));
+        }
+
         private static string Say(MoveResult move)
         {
             return GraphAnnouncer.Compose(move.From, move.To, move.TransitionLabel);

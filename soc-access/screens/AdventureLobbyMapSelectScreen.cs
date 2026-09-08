@@ -29,9 +29,9 @@ namespace SongsOfConquestAccess.Screens
     /// caption is spoken as the edge crossed into it. The WIN CONDITION cell is read as one piece per
     /// drawn icon under that one column, each with the icon's own tooltip, so a map with two ways to
     /// win is two steps rather than one sentence. The heading band is a ROW of the table's own stop,
-    /// declared above the first map so Up reaches it, and the stop's Tab landing is pinned to the
-    /// first data row (<c>GraphBuilder.LandStopOn</c>) - which is also what lets the landing find the
-    /// SELECTED map, since the search for the alternative in force starts there.
+    /// declared above the first map so Up reaches it, and the stop's Tab landing is pinned
+    /// (<c>GraphBuilder.LandStopOn</c>) to the SELECTED map, the one the game opened on, and to the
+    /// first data row while none is.
     ///
     /// ARRIVING ON A ROW SELECTS THAT MAP: the row's focus visual is the game's own
     /// <c>SetSelectedEntry</c> (through <c>FocusEntry</c>), which is what fills the preview, so there
@@ -222,6 +222,7 @@ namespace SongsOfConquestAccess.Screens
             GraphSheet sheet = new GraphSheet(builder, SheetKey);
             sheet.Region(_adapter.Title, SheetCaptions(captions));
             IReadOnlyList<AdventureLobbyMapSelectRowAdapter> rows = _adapter.GetVisibleRows();
+            object selected = null;
             for (int i = 0; i < rows.Count; i++)
             {
                 AdventureLobbyMapSelectRowAdapter row = rows[i];
@@ -231,14 +232,18 @@ namespace SongsOfConquestAccess.Screens
                 }
 
                 sheet.RowAt(Primary(row), row.NativeKey, Cells(row, captions), row.Entry);
+                if (row.IsSelected)
+                {
+                    selected = row.NativeKey;
+                }
             }
 
             sheet.Finish();
             if (sheet.FirstRow != null)
             {
-                // Tab into the table lands on a MAP, never on the heading band above it - and, since
-                // the search for the alternative in force starts here, on the map the game opened on.
-                builder.LandStopOn(sheet.FirstRow);
+                // Tab into the table lands on the map the game opened on, else on the first map -
+                // never on the heading band above them.
+                builder.LandStopOn(sheet.RowId(selected) ?? sheet.FirstRow);
             }
         }
 

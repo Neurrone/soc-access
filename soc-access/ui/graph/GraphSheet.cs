@@ -144,6 +144,15 @@ namespace SongsOfConquestAccess.UI.Graph
             get { return _first; }
         }
 
+        /// <summary>The id of the primary cell of the row built for <paramref name="rowRef"/> - the
+        /// same id <see cref="FirstRow"/> answers for the first one - so a table that should open on
+        /// its SELECTED row can name it to <see cref="GraphBuilder.LandStopOn"/>; null for null.
+        /// Minted the way the cell was, so it needs no memory of which rows were emitted.</summary>
+        public ControlId RowId(object rowRef)
+        {
+            return rowRef == null ? null : ControlId.For(rowRef, RowKeyFor(rowRef) + "c0");
+        }
+
         /// <summary>
         /// The structural key this sheet mints for one cell of the row belonging to
         /// <paramref name="rowRef"/> — the same identity-keyed rows <see cref="Row"/> takes a domain

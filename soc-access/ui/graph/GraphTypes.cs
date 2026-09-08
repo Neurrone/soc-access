@@ -752,7 +752,7 @@ namespace SongsOfConquestAccess.UI.Graph
 
         /// <summary>Where Tab lands in a stop that does not want its FIRST node - see
         /// <see cref="GraphBuilder.LandStopOn"/>. Keyed by stop key; a stop with no entry lands on its
-        /// first node as before.</summary>
+        /// selected member, else its first node, as before.</summary>
         public readonly Dictionary<object, ControlId> StopLandings = new Dictionary<object, ControlId>();
 
         /// <summary>This build offers FEWER KINDS of thing than the one before it - see

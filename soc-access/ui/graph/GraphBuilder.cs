@@ -177,10 +177,11 @@ namespace SongsOfConquestAccess.UI.Graph
         /// first declared node is not what the player came for: a table's rows sit under its sort-header
         /// band, and landing on "Name, button, selected" reads like a row called Name.
         ///
-        /// It moves the "land on whichever alternative is in force" rule as well as the fallback: the
-        /// selected node is looked for from here ONWARD, so the table still opens on the selected row
-        /// and never on the sorted column's heading. Everything declared above it stays reachable with
-        /// the arrow keys, which is how the player reaches a heading in the first place.
+        /// It WINS over the "land on whichever alternative is in force" rule (owner ruling 2026-09-08):
+        /// a screen that names a landing knows more than that default does, so a stop whose tail is a
+        /// tab bar still opens where it said, and a table that wants to open on its selected row names
+        /// that row. Everything declared above it stays reachable with the arrow keys, which is how the
+        /// player reaches a heading in the first place.
         /// </summary>
         public GraphBuilder LandStopOn(ControlId id)
         {
