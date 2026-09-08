@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Reflection;
 using System.Text.RegularExpressions;
@@ -692,8 +692,15 @@ namespace SongsOfConquestAccess.Adapters
 
             string key = root.GetInstanceID() + "/" + prefix;
             UITextMesh kept;
-            if (_prefixedTexts.TryGetValue(key, out kept) && kept != null)
+            if (_prefixedTexts.TryGetValue(key, out kept))
             {
+                // A page that draws no such line is remembered as drawing none: searching for it
+                // again is a walk of the whole page, twice a frame, for the same answer.
+                if (kept == null)
+                {
+                    return string.Empty;
+                }
+
                 string keptText = GetText(kept);
                 if (!string.IsNullOrWhiteSpace(keptText) && keptText.TrimStart().StartsWith(prefix, StringComparison.Ordinal))
                 {
@@ -720,8 +727,16 @@ namespace SongsOfConquestAccess.Adapters
         {
             string expectedSuffix = index == OverallTabIndex ? "Overall" : "Battle";
             UITextMesh kept;
-            if (_tabLabels.TryGetValue(index, out kept) && kept != null)
+            if (_tabLabels.TryGetValue(index, out kept))
             {
+                // The same for the tab bar, which matters most where the search cannot succeed at
+                // all: the words looked for are English, so a game in another language would walk
+                // the whole page for both tabs on every frame and take the fallback anyway.
+                if (kept == null)
+                {
+                    return fallback;
+                }
+
                 string keptText = GetText(kept);
                 if (!string.IsNullOrWhiteSpace(keptText)
                     && keptText.IndexOf(expectedSuffix, StringComparison.OrdinalIgnoreCase) >= 0)
