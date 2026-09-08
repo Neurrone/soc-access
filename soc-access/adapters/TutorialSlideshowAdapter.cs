@@ -5,7 +5,6 @@ using SongsOfConquest.Client.Menu;
 using SongsOfConquest.Client.UI;
 using SongsOfConquest.Common.Localization;
 using SongsOfConquestAccess.Localization;
-using SongsOfConquestAccess.Speech;
 using SongsOfConquestAccess.UI;
 using UnityEngine;
 
@@ -211,12 +210,12 @@ namespace SongsOfConquestAccess.Adapters
 
         private static string Normalize(string value)
         {
-            return SpeechTextSanitizer.Normalize(value);
+            return SpokenLines.Clean(value);
         }
 
         private static string GetLocalizedText(string key, string fallback)
         {
-            return SpeechTextSanitizer.Normalize(GameText.Get(key, fallback ?? string.Empty));
+            return SpokenLines.Clean(GameText.Get(key, fallback ?? string.Empty));
         }
     }
 }

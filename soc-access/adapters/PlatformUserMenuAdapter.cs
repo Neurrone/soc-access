@@ -6,7 +6,6 @@ using SongsOfConquest.Client.Menu;
 using SongsOfConquest.Client.UI;
 using SongsOfConquest.Common.Localization;
 using SongsOfConquestAccess.Localization;
-using SongsOfConquestAccess.Speech;
 using SongsOfConquestAccess.UI;
 using UnityEngine;
 
@@ -32,12 +31,12 @@ namespace SongsOfConquestAccess.Adapters
 
         public string Title
         {
-            get { return SpeechTextSanitizer.Normalize(GameText.Get(GetLocalization(), "Lobby/LobbyPlayerMenu/ShowPlayerActions", string.Empty)); }
+            get { return SpokenLines.Clean(GameText.Get(GetLocalization(), "Lobby/LobbyPlayerMenu/ShowPlayerActions", string.Empty)); }
         }
 
         public string CancelLabel
         {
-            get { return SpeechTextSanitizer.Normalize(GameText.Get(GetLocalization(), "Common/Cancel", string.Empty)); }
+            get { return SpokenLines.Clean(GameText.Get(GetLocalization(), "Common/Cancel", string.Empty)); }
         }
 
         public bool IsPresent()
@@ -148,7 +147,7 @@ namespace SongsOfConquestAccess.Adapters
                     UITextMesh label = _entry != null && ButtonLabelField != null
                         ? ButtonLabelField.GetValue(_entry) as UITextMesh
                         : null;
-                    return SpeechTextSanitizer.Normalize(UITextMeshTextUtility.GetEffectiveText(label));
+                    return SpokenLines.Clean(UITextMeshTextUtility.GetEffectiveText(label));
                 }
             }
 

@@ -6,7 +6,6 @@ using SongsOfConquest.Client.Menu;
 using SongsOfConquest.Client.UI;
 using SongsOfConquest.Common.Localization;
 using SongsOfConquestAccess.Localization;
-using SongsOfConquestAccess.Speech;
 using SongsOfConquestAccess.UI;
 using UnityEngine;
 
@@ -151,7 +150,7 @@ namespace SongsOfConquestAccess.Adapters
                 {
                     string label = MenuButtonTextUtility.GetStandardButtonLabel(_button);
                     return string.IsNullOrWhiteSpace(label)
-                        ? SpeechTextSanitizer.Normalize(_button != null ? _button.Text : string.Empty)
+                        ? SpokenLines.Clean(_button != null ? _button.Text : string.Empty)
                         : label;
                 }
             }

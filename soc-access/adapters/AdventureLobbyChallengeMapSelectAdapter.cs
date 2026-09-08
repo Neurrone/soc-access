@@ -13,7 +13,6 @@ using SongsOfConquest.Common;
 using SongsOfConquest.Common.Localization;
 using SongsOfConquest.Common.Map;
 using SongsOfConquestAccess.Localization;
-using SongsOfConquestAccess.Speech;
 using SongsOfConquestAccess.UI;
 using UnityEngine;
 using UnityEngine.UI;
@@ -239,7 +238,7 @@ namespace SongsOfConquestAccess.Adapters
                 return string.Empty;
             }
 
-            return SpeechTextSanitizer.Normalize(GameText.Get(_localization, key, fallback ?? string.Empty));
+            return SpokenLines.Clean(GameText.Get(_localization, key, fallback ?? string.Empty));
         }
 
         private static int CompareVisualOrder(LobbyChallengeMapEntry left, LobbyChallengeMapEntry right)
@@ -339,7 +338,7 @@ namespace SongsOfConquestAccess.Adapters
 
         public string Name
         {
-            get { return SpeechTextSanitizer.Normalize(_entry != null ? _entry.LocalizedMapName : string.Empty); }
+            get { return SpokenLines.Clean(_entry != null ? _entry.LocalizedMapName : string.Empty); }
         }
 
         public IReadOnlyList<string> WinConditionLabels
@@ -502,7 +501,7 @@ namespace SongsOfConquestAccess.Adapters
                 return string.Empty;
             }
 
-            return SpeechTextSanitizer.Normalize(GameText.Get(_localization, key, fallback ?? string.Empty));
+            return SpokenLines.Clean(GameText.Get(_localization, key, fallback ?? string.Empty));
         }
 
         private static bool IsVisible(Component component)

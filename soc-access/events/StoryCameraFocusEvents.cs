@@ -1,6 +1,6 @@
 using System.Collections.Generic;
 using SongsOfConquestAccess.Localization;
-using SongsOfConquestAccess.Speech;
+using SongsOfConquestAccess.UI;
 using UnityEngine;
 
 namespace SongsOfConquestAccess.Events
@@ -57,11 +57,11 @@ namespace SongsOfConquestAccess.Events
 
             if (FocusKind == StoryCameraFocusKind.ConversationArea)
             {
-                return SpeechTextSanitizer.Normalize(
+                return SpokenLines.Clean(
                     ModText.Get(ModStrings.Events.StoryCameraFocusConversationArea, JoinTargets()));
             }
 
-            return SpeechTextSanitizer.Normalize(ModText.Get(ModStrings.Events.StoryCameraFocusAreaAround, Targets[0].ToSpeech()));
+            return SpokenLines.Clean(ModText.Get(ModStrings.Events.StoryCameraFocusAreaAround, Targets[0].ToSpeech()));
         }
 
         private string JoinTargets()

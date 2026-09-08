@@ -9,7 +9,7 @@ using SongsOfConquest.Common;
 using SongsOfConquest.Common.Economy;
 using SongsOfConquest.Common.Gamestate;
 using SongsOfConquestAccess.Localization;
-using SongsOfConquestAccess.Speech;
+using SongsOfConquestAccess.UI;
 using TMPro;
 using UnityEngine;
 
@@ -92,7 +92,7 @@ namespace SongsOfConquestAccess.Adapters
             List<GraphOption> options = new List<GraphOption>(nativeDropdown.options.Count);
             for (int i = 0; i < nativeDropdown.options.Count; i++)
             {
-                string label = SpeechTextSanitizer.Normalize(nativeDropdown.options[i].text);
+                string label = SpokenLines.Clean(nativeDropdown.options[i].text);
                 if (string.IsNullOrWhiteSpace(label))
                 {
                     continue;
@@ -433,7 +433,7 @@ namespace SongsOfConquestAccess.Adapters
 
         private static string GetText(UITextMesh text)
         {
-            return SpeechTextSanitizer.Normalize(UITextMeshTextUtility.GetEffectiveText(text));
+            return SpokenLines.Clean(UITextMeshTextUtility.GetEffectiveText(text));
         }
 
         private static bool IsComponentVisible(Component component)

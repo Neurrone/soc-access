@@ -2,7 +2,7 @@ using HarmonyLib;
 using System.Collections.Generic;
 using SongsOfConquest.Client.UI;
 using SongsOfConquest.Common.Localization;
-using SongsOfConquestAccess.Speech;
+using SongsOfConquestAccess.UI;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -15,7 +15,7 @@ namespace SongsOfConquestAccess.Adapters
 
         public static string GetDirectButtonText(UIButton button)
         {
-            return SpeechTextSanitizer.Normalize(UITextMeshTextUtility.GetEffectiveButtonText(button));
+            return SpokenLines.Clean(UITextMeshTextUtility.GetEffectiveButtonText(button));
         }
 
         public static string GetStandardButtonLabel(UIButton button)
@@ -133,7 +133,7 @@ namespace SongsOfConquestAccess.Adapters
                     continue;
                 }
 
-                string candidate = SpeechTextSanitizer.Normalize(text.text);
+                string candidate = SpokenLines.Clean(text.text);
                 if (!string.IsNullOrWhiteSpace(candidate))
                 {
                     return candidate;
@@ -182,7 +182,7 @@ namespace SongsOfConquestAccess.Adapters
                     continue;
                 }
 
-                string candidate = SpeechTextSanitizer.Normalize(text.text);
+                string candidate = SpokenLines.Clean(text.text);
                 if (!string.IsNullOrWhiteSpace(candidate))
                 {
                     parts.Add(candidate);
@@ -222,7 +222,7 @@ namespace SongsOfConquestAccess.Adapters
             List<string> cleaned = new List<string>();
             for (int i = 0; i < parts.Length; i++)
             {
-                string part = SpeechTextSanitizer.Normalize(parts[i]);
+                string part = SpokenLines.Clean(parts[i]);
                 if (!string.IsNullOrWhiteSpace(part))
                 {
                     cleaned.Add(part);
@@ -268,7 +268,7 @@ namespace SongsOfConquestAccess.Adapters
                 return localized;
             }
 
-            return SpeechTextSanitizer.Normalize(UITextMeshTextUtility.GetEffectiveText(textMesh));
+            return SpokenLines.Clean(UITextMeshTextUtility.GetEffectiveText(textMesh));
         }
 
         private static string GetLocalizedText(UITextMesh textMesh)
@@ -284,7 +284,7 @@ namespace SongsOfConquestAccess.Adapters
                 string key = UITextMeshLocalizationKeyRef(localization);
                 if (!string.IsNullOrWhiteSpace(key))
                 {
-                    return SpeechTextSanitizer.Normalize(GlobalLocalizationVariables.LocalizationHandler.GetText(key));
+                    return SpokenLines.Clean(GlobalLocalizationVariables.LocalizationHandler.GetText(key));
                 }
             }
 
@@ -304,7 +304,7 @@ namespace SongsOfConquestAccess.Adapters
                     continue;
                 }
 
-                string candidate = SpeechTextSanitizer.Normalize(text.text);
+                string candidate = SpokenLines.Clean(text.text);
                 if (!string.IsNullOrWhiteSpace(candidate))
                 {
                     return candidate;

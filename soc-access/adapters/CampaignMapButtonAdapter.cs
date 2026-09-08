@@ -3,7 +3,7 @@ using HarmonyLib;
 using SongsOfConquest.Client.Menu;
 using SongsOfConquest.Client.UI;
 using SongsOfConquest.Common.Campaign;
-using SongsOfConquestAccess.Speech;
+using SongsOfConquestAccess.UI;
 using UnityEngine;
 using UnityEngine.EventSystems;
 
@@ -41,7 +41,7 @@ namespace SongsOfConquestAccess.Adapters
         public string GetDisplayName()
         {
             ICampaignMapDefinition definition = Definition;
-            return SpeechTextSanitizer.Normalize(definition != null ? definition.DisplayName : string.Empty);
+            return SpokenLines.Clean(definition != null ? definition.DisplayName : string.Empty);
         }
 
         public string GetStatus()

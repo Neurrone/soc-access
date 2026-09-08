@@ -6,7 +6,6 @@ using HarmonyLib;
 using SongsOfConquest.Client.Menu;
 using SongsOfConquest.Client.UI;
 using SongsOfConquest.Common;
-using SongsOfConquestAccess.Speech;
 using SongsOfConquestAccess.UI;
 using UnityEngine;
 using UnityEngine.UI;
@@ -56,7 +55,7 @@ namespace SongsOfConquestAccess.Adapters
             get
             {
                 SaveLoadGameMenu.Settings settings = Settings;
-                string title = SpeechTextSanitizer.Normalize(
+                string title = SpokenLines.Clean(
                     UITextMeshTextUtility.GetEffectiveText(settings != null ? settings.TitleText : null));
                 if (!string.IsNullOrWhiteSpace(title))
                 {
@@ -464,11 +463,11 @@ namespace SongsOfConquestAccess.Adapters
                     LoadGameDefinition definition = Definition;
                     if (definition != null && !string.IsNullOrWhiteSpace(definition.SaveName))
                     {
-                        return SpeechTextSanitizer.Normalize(definition.SaveName);
+                        return SpokenLines.Clean(definition.SaveName);
                     }
 
                     UIButton button = EntryButtonField != null ? EntryButtonField.GetValue(_entry) as UIButton : null;
-                    return SpeechTextSanitizer.Normalize(button != null ? button.Text : null);
+                    return SpokenLines.Clean(button != null ? button.Text : null);
                 }
             }
 
@@ -477,7 +476,7 @@ namespace SongsOfConquestAccess.Adapters
                 get
                 {
                     UITextMesh text = EntryDateTextField != null ? EntryDateTextField.GetValue(_entry) as UITextMesh : null;
-                    return SpeechTextSanitizer.Normalize(UITextMeshTextUtility.GetEffectiveText(text));
+                    return SpokenLines.Clean(UITextMeshTextUtility.GetEffectiveText(text));
                 }
             }
 

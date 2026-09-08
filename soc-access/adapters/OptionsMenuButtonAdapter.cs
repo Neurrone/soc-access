@@ -1,6 +1,6 @@
 using System;
 using SongsOfConquest.Client.UI;
-using SongsOfConquestAccess.Speech;
+using SongsOfConquestAccess.UI;
 using UnityEngine;
 
 namespace SongsOfConquestAccess.Adapters
@@ -31,7 +31,7 @@ namespace SongsOfConquestAccess.Adapters
             }
 
             UITextMesh textMesh = labelTransform.GetComponent<UITextMesh>();
-            return SpeechTextSanitizer.Normalize(UITextMeshTextUtility.GetEffectiveText(textMesh));
+            return SpokenLines.Clean(UITextMeshTextUtility.GetEffectiveText(textMesh));
         }
     }
 }

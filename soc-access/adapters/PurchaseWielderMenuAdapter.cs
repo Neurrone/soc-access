@@ -12,7 +12,6 @@ using SongsOfConquest.Client.UI;
 using SongsOfConquest.Common.Economy;
 using SongsOfConquest.Common.Localization;
 using SongsOfConquestAccess.Localization;
-using SongsOfConquestAccess.Speech;
 using SongsOfConquestAccess.UI;
 using UnityEngine;
 
@@ -348,7 +347,7 @@ namespace SongsOfConquestAccess.Adapters
 
                 Tooltip tooltip = PurchaseTooltip;
                 return tooltip != null && tooltip.TextLines.Count > 0
-                    ? SpeechTextSanitizer.Normalize(string.Join(". ", tooltip.TextLines))
+                    ? SpokenLines.Clean(string.Join(". ", tooltip.TextLines))
                     : string.Empty;
             }
         }
@@ -557,17 +556,17 @@ namespace SongsOfConquestAccess.Adapters
 
         private static string GetText(IUITextMesh textMesh)
         {
-            return SpeechTextSanitizer.Normalize(UITextMeshTextUtility.GetEffectiveText(textMesh));
+            return SpokenLines.Clean(UITextMeshTextUtility.GetEffectiveText(textMesh));
         }
 
         private static string GetButtonLabel(UIButton button)
         {
-            return SpeechTextSanitizer.Normalize(UITextMeshTextUtility.GetEffectiveButtonText(button));
+            return SpokenLines.Clean(UITextMeshTextUtility.GetEffectiveButtonText(button));
         }
 
         private string GetLocalizedText(string key, string fallback)
         {
-            return SpeechTextSanitizer.Normalize(GameText.Get(_localization, key, fallback ?? string.Empty));
+            return SpokenLines.Clean(GameText.Get(_localization, key, fallback ?? string.Empty));
         }
 
         private static string FirstTooltipLine(Tooltip tooltip)
@@ -579,7 +578,7 @@ namespace SongsOfConquestAccess.Adapters
 
             for (int i = 0; i < tooltip.TextLines.Count; i++)
             {
-                string line = SpeechTextSanitizer.Normalize(tooltip.TextLines[i]);
+                string line = SpokenLines.Clean(tooltip.TextLines[i]);
                 if (!string.IsNullOrWhiteSpace(line))
                 {
                     return line;

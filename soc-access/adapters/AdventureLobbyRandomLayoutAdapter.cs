@@ -13,7 +13,6 @@ using SongsOfConquest.Common;
 using SongsOfConquest.Common.Localization;
 using SongsOfConquest.Common.Map;
 using SongsOfConquestAccess.Localization;
-using SongsOfConquestAccess.Speech;
 using SongsOfConquestAccess.UI;
 using TMPro;
 using UnityEngine;
@@ -260,7 +259,7 @@ namespace SongsOfConquestAccess.Adapters
 
         private static string GetText(IUITextMesh textMesh)
         {
-            return SpeechTextSanitizer.Normalize(UITextMeshTextUtility.GetEffectiveText(textMesh));
+            return SpokenLines.Clean(UITextMeshTextUtility.GetEffectiveText(textMesh));
         }
 
         // A text mesh the game may have written more than one paragraph into.
@@ -297,7 +296,7 @@ namespace SongsOfConquestAccess.Adapters
             List<string> options = new List<string>();
             for (int i = 0; i < tmpDropdown.options.Count; i++)
             {
-                options.Add(SpeechTextSanitizer.Normalize(tmpDropdown.options[i].text));
+                options.Add(SpokenLines.Clean(tmpDropdown.options[i].text));
             }
 
             return options;
@@ -409,13 +408,13 @@ namespace SongsOfConquestAccess.Adapters
             {
                 get
                 {
-                    string text = SpeechTextSanitizer.Normalize(UITextMeshTextUtility.GetEffectiveText(_toggle != null ? _toggle.GetTextMesh() : null));
+                    string text = SpokenLines.Clean(UITextMeshTextUtility.GetEffectiveText(_toggle != null ? _toggle.GetTextMesh() : null));
                     if (!string.IsNullOrWhiteSpace(text))
                     {
                         return text;
                     }
 
-                    return SpeechTextSanitizer.Normalize(GameText.Get(_localization, "GameModes/" + Condition + "/Name", Condition.ToString()));
+                    return SpokenLines.Clean(GameText.Get(_localization, "GameModes/" + Condition + "/Name", Condition.ToString()));
                 }
             }
 

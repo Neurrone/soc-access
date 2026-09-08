@@ -6,7 +6,7 @@ using SongsOfConquest.Client.Menu.Loading;
 using SongsOfConquest.Client.Menu.Main;
 using SongsOfConquest.Client.UI;
 using SongsOfConquest.Common.Localization;
-using SongsOfConquestAccess.Speech;
+using SongsOfConquestAccess.UI;
 using UnityEngine;
 
 namespace SongsOfConquestAccess.Adapters
@@ -75,7 +75,7 @@ namespace SongsOfConquestAccess.Adapters
                 return string.Empty;
             }
 
-            return SpeechTextSanitizer.Normalize(
+            return SpokenLines.Clean(
                 GlobalLocalizationVariables.LocalizationHandler.GetText("Lobby/MapTypeMenu/Title"));
         }
 

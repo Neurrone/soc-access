@@ -7,7 +7,7 @@ using SongsOfConquest.Client.UI;
 using SongsOfConquest.Common.Economy;
 using SongsOfConquest.Common.Entities;
 using SongsOfConquestAccess.Localization;
-using SongsOfConquestAccess.Speech;
+using SongsOfConquestAccess.UI;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -255,14 +255,14 @@ namespace SongsOfConquestAccess.Adapters
         private static string WrittenText(UITextMesh text)
         {
             return text != null
-                ? SpeechTextSanitizer.Normalize(UITextMeshTextUtility.GetStringBuilderText(text) ?? string.Empty)
+                ? SpokenLines.Clean(UITextMeshTextUtility.GetStringBuilderText(text) ?? string.Empty)
                 : string.Empty;
         }
 
         private static string NormalizeText(UITextMesh text)
         {
             return text != null
-                ? SpeechTextSanitizer.Normalize(UITextMeshTextUtility.GetEffectiveText(text))
+                ? SpokenLines.Clean(UITextMeshTextUtility.GetEffectiveText(text))
                 : string.Empty;
         }
 

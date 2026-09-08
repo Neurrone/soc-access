@@ -6,7 +6,6 @@ using SongsOfConquest.Client;
 using SongsOfConquest.Client.Adventure;
 using SongsOfConquest.Client.UI;
 using SongsOfConquest.Common;
-using SongsOfConquestAccess.Speech;
 using SongsOfConquestAccess.UI;
 using UnityEngine;
 using UnityEngine.UI;
@@ -126,7 +125,7 @@ namespace SongsOfConquestAccess.Adapters
 
         private static string GetText(IUITextMesh textMesh)
         {
-            return SpeechTextSanitizer.Normalize(UITextMeshTextUtility.GetEffectiveText(textMesh));
+            return SpokenLines.Clean(UITextMeshTextUtility.GetEffectiveText(textMesh));
         }
 
         // A text mesh the game may have written more than one paragraph into.

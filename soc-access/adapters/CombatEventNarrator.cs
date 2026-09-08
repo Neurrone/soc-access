@@ -20,7 +20,7 @@ using SongsOfConquest.Utilities;
 using SongsOfConquestAccess.Events;
 using SongsOfConquestAccess.Events.Combat;
 using SongsOfConquestAccess.Screens;
-using SongsOfConquestAccess.Speech;
+using SongsOfConquestAccess.UI;
 using UnityEngine;
 
 namespace SongsOfConquestAccess.Adapters
@@ -130,7 +130,7 @@ namespace SongsOfConquestAccess.Adapters
 
         public static void AnnounceNativeNotification(string localizedText)
         {
-            string text = SpeechTextSanitizer.Normalize(localizedText);
+            string text = SpokenLines.Clean(localizedText);
             if (string.IsNullOrWhiteSpace(text))
             {
                 return;
@@ -158,7 +158,7 @@ namespace SongsOfConquestAccess.Adapters
 
         public static void NotifyBacteriaAddedStarted(int troopId, string localizedText)
         {
-            string text = SpeechTextSanitizer.Normalize(localizedText);
+            string text = SpokenLines.Clean(localizedText);
             if (!string.IsNullOrWhiteSpace(text))
             {
                 SuppressedNativeNotifications.Enqueue(text);

@@ -11,6 +11,7 @@ using SongsOfConquest.Common.Gamestate.Unit;
 using SongsOfConquest.Common.Localization;
 using SongsOfConquestAccess.Localization;
 using SongsOfConquestAccess.Speech;
+using SongsOfConquestAccess.UI;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
@@ -148,7 +149,7 @@ namespace SongsOfConquestAccess.Adapters
                     continue;
                 }
 
-                string sectionLabel = SpeechTextSanitizer.Normalize(UITextMeshTextUtility.GetEffectiveText(GetField<UITextMesh>(section, CategorySectionTextField)));
+                string sectionLabel = SpokenLines.Clean(UITextMeshTextUtility.GetEffectiveText(GetField<UITextMesh>(section, CategorySectionTextField)));
                 List<CodexContentButton> buttons = section.Buttons;
                 List<ArticleItem> articles = new List<ArticleItem>();
                 bool containsSelectedArticle = false;
@@ -161,7 +162,7 @@ namespace SongsOfConquestAccess.Adapters
                     }
 
                     UITextMesh textMesh = GetField<UITextMesh>(button, ContentButtonTextField);
-                    string label = SpeechTextSanitizer.Normalize(UITextMeshTextUtility.GetEffectiveText(textMesh));
+                    string label = SpokenLines.Clean(UITextMeshTextUtility.GetEffectiveText(textMesh));
                     if (string.IsNullOrWhiteSpace(label))
                     {
                         continue;
@@ -471,7 +472,7 @@ namespace SongsOfConquestAccess.Adapters
 
         private string GetLocalizedText(string key, string fallback, params object[] parameters)
         {
-            return SpeechTextSanitizer.Normalize(GameText.Get(_localization, key, fallback, parameters));
+            return SpokenLines.Clean(GameText.Get(_localization, key, fallback, parameters));
         }
 
         private static bool IsHeadingTextMesh(UITextMesh textMesh)
@@ -719,7 +720,7 @@ namespace SongsOfConquestAccess.Adapters
             string[] parts = rawText.Replace("\r\n", "\n").Replace('\r', '\n').Split('\n');
             for (int i = 0; i < parts.Length; i++)
             {
-                string text = SpeechTextSanitizer.Normalize(parts[i]);
+                string text = SpokenLines.Clean(parts[i]);
                 if (string.IsNullOrWhiteSpace(text))
                 {
                     continue;

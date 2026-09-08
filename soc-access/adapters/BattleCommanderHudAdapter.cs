@@ -14,7 +14,7 @@ using SongsOfConquest.Common.Game;
 using SongsOfConquest.Common.Gamestate;
 using SongsOfConquest.Common.Localization;
 using SongsOfConquestAccess.Localization;
-using SongsOfConquestAccess.Speech;
+using SongsOfConquestAccess.UI;
 using UnityEngine;
 
 namespace SongsOfConquestAccess.Adapters
@@ -114,7 +114,7 @@ namespace SongsOfConquestAccess.Adapters
                 name = string.Empty;
             }
 
-            name = SpeechTextSanitizer.Normalize(name);
+            name = SpokenLines.Clean(name);
             if (string.IsNullOrWhiteSpace(name))
             {
                 name = ModText.Get(ModStrings.Combat.Wielder);
@@ -147,7 +147,7 @@ namespace SongsOfConquestAccess.Adapters
         public string GetPlayerName(CombatHudSide side)
         {
             UITextMesh text = GetField<UITextMesh>(GetCommanderHud(side), PlayerNameTextField);
-            return SpeechTextSanitizer.Normalize(UITextMeshTextUtility.GetEffectiveText(text));
+            return SpokenLines.Clean(UITextMeshTextUtility.GetEffectiveText(text));
         }
 
         public bool IsAiControlButtonVisible(CombatHudSide side)
@@ -399,7 +399,7 @@ namespace SongsOfConquestAccess.Adapters
 
         private string Localize(string key, string fallback)
         {
-            return SpeechTextSanitizer.Normalize(GameText.Get(_localization, key, fallback));
+            return SpokenLines.Clean(GameText.Get(_localization, key, fallback));
         }
 
         private static string FormatEnumName(string name)
@@ -476,7 +476,7 @@ namespace SongsOfConquestAccess.Adapters
 
             for (int i = 0; i < lines.Count; i++)
             {
-                string line = SpeechTextSanitizer.Normalize(lines[i]);
+                string line = SpokenLines.Clean(lines[i]);
                 if (!string.IsNullOrWhiteSpace(line))
                 {
                     return line;

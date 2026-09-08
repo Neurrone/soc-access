@@ -6,7 +6,6 @@ using SongsOfConquest.Client.UI;
 using SongsOfConquest.Common;
 using SongsOfConquest.Common.Campaign;
 using SongsOfConquest.Common.Localization;
-using SongsOfConquestAccess.Speech;
 using SongsOfConquestAccess.UI;
 using UnityEngine;
 using UnityEngine.EventSystems;
@@ -145,7 +144,7 @@ namespace SongsOfConquestAccess.Adapters
 
         private static string GetText(UITextMesh textMesh)
         {
-            return SpeechTextSanitizer.Normalize(UITextMeshTextUtility.GetEffectiveText(textMesh));
+            return SpokenLines.Clean(UITextMeshTextUtility.GetEffectiveText(textMesh));
         }
 
         // The mesh's text as the game wrote it, line breaks and all.

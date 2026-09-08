@@ -318,8 +318,8 @@ namespace SongsOfConquestAccess.Adapters
 
         private void AddResourceRow(ResourceType resourceType, string text, string value)
         {
-            string amount = SongsOfConquestAccess.Speech.SpeechTextSanitizer.Normalize(text);
-            string right = SongsOfConquestAccess.Speech.SpeechTextSanitizer.Normalize(value);
+            string amount = SongsOfConquestAccess.UI.SpokenLines.Clean(text);
+            string right = SongsOfConquestAccess.UI.SpokenLines.Clean(value);
             string resourceName = GetResourceName(resourceType, amount);
             string row = amount;
             if (!string.IsNullOrWhiteSpace(resourceName) && !ContainsResourceName(amount, resourceName))
@@ -362,12 +362,12 @@ namespace SongsOfConquestAccess.Adapters
 
             int amount;
             string key = "Common/Resource/" + resourceType;
-            if (int.TryParse(SongsOfConquestAccess.Speech.SpeechTextSanitizer.Normalize(amountText), out amount))
+            if (int.TryParse(SongsOfConquestAccess.UI.SpokenLines.Clean(amountText), out amount))
             {
-                return SongsOfConquestAccess.Speech.SpeechTextSanitizer.Normalize(_localization.GetPluralText(key, amount));
+                return SongsOfConquestAccess.UI.SpokenLines.Clean(_localization.GetPluralText(key, amount));
             }
 
-            return SongsOfConquestAccess.Speech.SpeechTextSanitizer.Normalize(_localization.GetPluralTextGeneric(key));
+            return SongsOfConquestAccess.UI.SpokenLines.Clean(_localization.GetPluralTextGeneric(key));
         }
 
         private static bool ContainsResourceName(string text, string resourceName)
@@ -379,15 +379,15 @@ namespace SongsOfConquestAccess.Adapters
 
         private bool IsCostHeader(string text)
         {
-            string normalized = SongsOfConquestAccess.Speech.SpeechTextSanitizer.Normalize(text).Trim().TrimEnd(':');
-            string costHeader = SongsOfConquestAccess.Speech.SpeechTextSanitizer.Normalize(GetCostHeader()).Trim().TrimEnd(':');
+            string normalized = SongsOfConquestAccess.UI.SpokenLines.Clean(text).Trim().TrimEnd(':');
+            string costHeader = SongsOfConquestAccess.UI.SpokenLines.Clean(GetCostHeader()).Trim().TrimEnd(':');
             return normalized.Equals(costHeader, StringComparison.OrdinalIgnoreCase);
         }
 
         private bool IsCostLine(string text)
         {
-            string normalized = SongsOfConquestAccess.Speech.SpeechTextSanitizer.Normalize(text).Trim();
-            string costHeader = SongsOfConquestAccess.Speech.SpeechTextSanitizer.Normalize(GetCostHeader()).Trim().TrimEnd(':');
+            string normalized = SongsOfConquestAccess.UI.SpokenLines.Clean(text).Trim();
+            string costHeader = SongsOfConquestAccess.UI.SpokenLines.Clean(GetCostHeader()).Trim().TrimEnd(':');
             return normalized.StartsWith(costHeader + ": ", StringComparison.OrdinalIgnoreCase);
         }
 
@@ -410,7 +410,7 @@ namespace SongsOfConquestAccess.Adapters
             StringBuilder builder = new StringBuilder();
             for (int i = 0; i < parts.Count; i++)
             {
-                string part = SongsOfConquestAccess.Speech.SpeechTextSanitizer.Normalize(parts[i]);
+                string part = SongsOfConquestAccess.UI.SpokenLines.Clean(parts[i]);
                 if (string.IsNullOrWhiteSpace(part))
                 {
                     continue;

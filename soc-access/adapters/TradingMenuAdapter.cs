@@ -17,6 +17,7 @@ using SongsOfConquest.Common.Gamestate;
 using SongsOfConquest.Common.Localization;
 using SongsOfConquestAccess.Localization;
 using SongsOfConquestAccess.Speech;
+using SongsOfConquestAccess.UI;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -171,13 +172,13 @@ namespace SongsOfConquestAccess.Adapters
 
         private string GetLocalizedText(string key, string fallback)
         {
-            return SpeechTextSanitizer.Normalize(GameText.Get(_localization, key, fallback));
+            return SpokenLines.Clean(GameText.Get(_localization, key, fallback));
         }
 
         private string GetCommanderName(int commanderId)
         {
             string name = commanderId >= 0 && _facade != null ? _facade.Commanders.GetName(commanderId) : string.Empty;
-            return SpeechTextSanitizer.Normalize(name);
+            return SpokenLines.Clean(name);
         }
 
         private ICommanderState GetCommander(int commanderId)
@@ -381,7 +382,7 @@ namespace SongsOfConquestAccess.Adapters
             public string GetActiveModifierListLabel()
             {
                 UITextMesh title = GetField<UITextMesh>(ModifierTabs, ModifierTitleField);
-                return SpeechTextSanitizer.Normalize(UITextMeshTextUtility.GetEffectiveText(title));
+                return SpokenLines.Clean(UITextMeshTextUtility.GetEffectiveText(title));
             }
 
             public IReadOnlyList<LabeledItem> GetActiveModifiers()
@@ -394,7 +395,7 @@ namespace SongsOfConquestAccess.Adapters
                     for (int i = 0; i < entries.Length; i++)
                     {
                         UITextMesh text = GetField<UITextMesh>(entries[i], SummaryEntryTextField);
-                        string label = SpeechTextSanitizer.Normalize(UITextMeshTextUtility.GetEffectiveText(text));
+                        string label = SpokenLines.Clean(UITextMeshTextUtility.GetEffectiveText(text));
                         if (!string.IsNullOrWhiteSpace(label))
                         {
                             items.Add(new LabeledItem(label));
@@ -405,7 +406,7 @@ namespace SongsOfConquestAccess.Adapters
                 if (items.Count == 0)
                 {
                     UITextMesh noneText = GetField<UITextMesh>(ModifierTabs, NoModifiersTextField);
-                    string label = SpeechTextSanitizer.Normalize(UITextMeshTextUtility.GetEffectiveText(noneText));
+                    string label = SpokenLines.Clean(UITextMeshTextUtility.GetEffectiveText(noneText));
                     if (!string.IsNullOrWhiteSpace(label))
                     {
                         items.Add(new LabeledItem(label));
@@ -471,7 +472,7 @@ namespace SongsOfConquestAccess.Adapters
 
                     Tooltip tooltip = Tooltip.ForComponent(button, _owner._localization);
                     IReadOnlyList<string> lines = tooltip != null ? tooltip.TextLines : null;
-                    return lines != null && lines.Count > 0 ? SpeechTextSanitizer.Normalize(lines[0]) : string.Empty;
+                    return lines != null && lines.Count > 0 ? SpokenLines.Clean(lines[0]) : string.Empty;
                 }
             }
 
@@ -880,7 +881,7 @@ namespace SongsOfConquestAccess.Adapters
                 string text = _owner._localization != null ? _owner._localization.GetText("InventorySlots/" + slot) : string.Empty;
                 return string.IsNullOrWhiteSpace(text) || text == "InventorySlots/" + slot
                     ? FormatSlotName(slot)
-                    : SpeechTextSanitizer.Normalize(text);
+                    : SpokenLines.Clean(text);
             }
 
             private string GetInventoryLabel()

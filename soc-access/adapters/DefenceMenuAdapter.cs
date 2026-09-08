@@ -13,7 +13,7 @@ using SongsOfConquest.Common.Details;
 using SongsOfConquest.Common.Gamestate;
 using SongsOfConquest.Common.Localization;
 using SongsOfConquestAccess.Localization;
-using SongsOfConquestAccess.Speech;
+using SongsOfConquestAccess.UI;
 using UnityEngine;
 
 namespace SongsOfConquestAccess.Adapters
@@ -523,17 +523,17 @@ namespace SongsOfConquestAccess.Adapters
 
         private static string GetButtonLabel(UIButton button)
         {
-            return SpeechTextSanitizer.Normalize(MenuButtonTextUtility.GetAllVisibleText(button));
+            return SpokenLines.Clean(MenuButtonTextUtility.GetAllVisibleText(button));
         }
 
         private static string GetText(IUITextMesh textMesh)
         {
-            return SpeechTextSanitizer.Normalize(UITextMeshTextUtility.GetEffectiveText(textMesh));
+            return SpokenLines.Clean(UITextMeshTextUtility.GetEffectiveText(textMesh));
         }
 
         private string GetLocalizedText(string key, string fallback)
         {
-            return SpeechTextSanitizer.Normalize(GameText.Get(_localization, key, fallback));
+            return SpokenLines.Clean(GameText.Get(_localization, key, fallback));
         }
 
         private static bool IsButtonEnabled(UIButton button)
@@ -587,7 +587,7 @@ namespace SongsOfConquestAccess.Adapters
                     IDetails details;
                     if (NativeTooltipUtility.TryGetUiDetails(tooltipArea, out details) && details is DefenceTowerDetails towerDetails)
                     {
-                        return SpeechTextSanitizer.Normalize(towerDetails.Header);
+                        return SpokenLines.Clean(towerDetails.Header);
                     }
 
                     return ModText.Get(ModStrings.Screens.Tower, _number);

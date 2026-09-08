@@ -5,7 +5,6 @@ using HarmonyLib;
 using SongsOfConquest.Client.Menu;
 using SongsOfConquest.Client.UI;
 using SongsOfConquestAccess.Localization;
-using SongsOfConquestAccess.Speech;
 using SongsOfConquestAccess.UI;
 using UnityEngine;
 
@@ -277,7 +276,7 @@ namespace SongsOfConquestAccess.Adapters
 
         private static string GetText(UITextMesh text)
         {
-            return SpeechTextSanitizer.Normalize(UITextMeshTextUtility.GetEffectiveText(text));
+            return SpokenLines.Clean(UITextMeshTextUtility.GetEffectiveText(text));
         }
 
         private static bool IsCanvasActive(CanvasGroup canvasGroup)

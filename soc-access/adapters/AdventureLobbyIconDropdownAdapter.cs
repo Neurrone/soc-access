@@ -8,7 +8,6 @@ using SongsOfConquest.Common;
 using SongsOfConquest.Common.Ai;
 using SongsOfConquest.Common.Localization;
 using SongsOfConquestAccess.Localization;
-using SongsOfConquestAccess.Speech;
 using SongsOfConquestAccess.UI;
 using UnityEngine;
 using UnityEngine.UI;
@@ -60,7 +59,7 @@ namespace SongsOfConquestAccess.Adapters
 
         public string CancelLabel
         {
-            get { return SpeechTextSanitizer.Normalize(GameText.Get(GetDropdownLocalization(), "Common/Cancel", string.Empty)); }
+            get { return SpokenLines.Clean(GameText.Get(GetDropdownLocalization(), "Common/Cancel", string.Empty)); }
         }
 
         public IReadOnlyList<OptionItem> GetOptions()
@@ -128,7 +127,7 @@ namespace SongsOfConquestAccess.Adapters
                     break;
             }
 
-            title = SpeechTextSanitizer.Normalize(title);
+            title = SpokenLines.Clean(title);
             if (!string.IsNullOrWhiteSpace(title))
             {
                 return title;
@@ -404,7 +403,7 @@ namespace SongsOfConquestAccess.Adapters
                 UITextMesh text = _entry != null && EntryPartnershipTextField != null
                     ? EntryPartnershipTextField.GetValue(_entry) as UITextMesh
                     : null;
-                return SpeechTextSanitizer.Normalize(UITextMeshTextUtility.GetEffectiveText(text));
+                return SpokenLines.Clean(UITextMeshTextUtility.GetEffectiveText(text));
             }
 
             private string Localize(string key)
@@ -414,7 +413,7 @@ namespace SongsOfConquestAccess.Adapters
                     return string.Empty;
                 }
 
-                return SpeechTextSanitizer.Normalize(GameText.Get(_adapter.GetLocalization(_entry), key, string.Empty));
+                return SpokenLines.Clean(GameText.Get(_adapter.GetLocalization(_entry), key, string.Empty));
             }
 
             private T GetFieldValue<T>(FieldInfo field, T fallback)

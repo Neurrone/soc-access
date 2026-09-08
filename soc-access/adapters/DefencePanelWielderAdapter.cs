@@ -9,7 +9,7 @@ using SongsOfConquest.Client.UI;
 using SongsOfConquest.Common.Gamestate;
 using SongsOfConquest.Common.Localization;
 using SongsOfConquestAccess.Localization;
-using SongsOfConquestAccess.Speech;
+using SongsOfConquestAccess.UI;
 using UnityEngine;
 
 namespace SongsOfConquestAccess.Adapters
@@ -62,7 +62,7 @@ namespace SongsOfConquestAccess.Adapters
                 string name = storedCommander != null && _facade != null
                     ? _facade.Commanders.GetName(storedCommander.Id)
                     : string.Empty;
-                return SpeechTextSanitizer.Normalize(name);
+                return SpokenLines.Clean(name);
             }
         }
 
@@ -269,7 +269,7 @@ namespace SongsOfConquestAccess.Adapters
 
         private string GetButtonLabel(UIButton button, string localizationKey, string fallback)
         {
-            string label = SpeechTextSanitizer.Normalize(MenuButtonTextUtility.GetAllVisibleText(button));
+            string label = SpokenLines.Clean(MenuButtonTextUtility.GetAllVisibleText(button));
             if (!string.IsNullOrWhiteSpace(label))
             {
                 return label;
@@ -280,12 +280,12 @@ namespace SongsOfConquestAccess.Adapters
 
         private string GetLocalizedText(string key, string fallback)
         {
-            return SpeechTextSanitizer.Normalize(GameText.Get(_localization, key, fallback));
+            return SpokenLines.Clean(GameText.Get(_localization, key, fallback));
         }
 
         private static string GetText(IUITextMesh textMesh)
         {
-            return SpeechTextSanitizer.Normalize(UITextMeshTextUtility.GetEffectiveText(textMesh));
+            return SpokenLines.Clean(UITextMeshTextUtility.GetEffectiveText(textMesh));
         }
 
         private static string GetVisibleText(GameObject root)

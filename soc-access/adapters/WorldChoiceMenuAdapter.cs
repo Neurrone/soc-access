@@ -14,6 +14,7 @@ using SongsOfConquest.Client.UI;
 using SongsOfConquest.Common.Details;
 using SongsOfConquest.Common.Localization;
 using SongsOfConquestAccess.Speech;
+using SongsOfConquestAccess.UI;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -295,7 +296,7 @@ namespace SongsOfConquestAccess.Adapters
 
         private static string GetText(IUITextMesh textMesh)
         {
-            return SpeechTextSanitizer.Normalize(UITextMeshTextUtility.GetEffectiveText(textMesh));
+            return SpokenLines.Clean(UITextMeshTextUtility.GetEffectiveText(textMesh));
         }
 
         private static string GetButtonText(IUIButton button)
@@ -306,7 +307,7 @@ namespace SongsOfConquestAccess.Adapters
                 return MenuButtonTextUtility.GetStandardButtonLabel(concreteButton);
             }
 
-            return SpeechTextSanitizer.Normalize(UITextMeshTextUtility.GetEffectiveButtonText(button));
+            return SpokenLines.Clean(UITextMeshTextUtility.GetEffectiveButtonText(button));
         }
 
         private static string NormalizeChoiceText(string text)

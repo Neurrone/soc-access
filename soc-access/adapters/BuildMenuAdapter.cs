@@ -18,7 +18,6 @@ using SongsOfConquest.Common.Gamestate;
 using SongsOfConquest.Common.Localization;
 using SongsOfConquest.Common.Research;
 using SongsOfConquestAccess.Localization;
-using SongsOfConquestAccess.Speech;
 using SongsOfConquestAccess.UI;
 using UnityEngine;
 
@@ -281,7 +280,7 @@ namespace SongsOfConquestAccess.Adapters
 
                 IMapEntityBlueprint blueprint = _facade != null ? _facade.MapEntities.GetBlueprint(action.BuildingBlueprintId) : null;
                 string label = blueprint != null && _localization != null
-                    ? SpeechTextSanitizer.Normalize(_localization.GetText(blueprint.NameKey))
+                    ? SpokenLines.Clean(_localization.GetText(blueprint.NameKey))
                     : "Building " + (i + 1);
                 BuildMenuButton captured = button;
                 BuildOnBuildSiteAction capturedAction = action;
@@ -1094,7 +1093,7 @@ namespace SongsOfConquestAccess.Adapters
 
             string label = GetLocalizedText("Adventure/Tooltips/Build/BuildTimeLabel", "Build time");
             string value = _localization != null
-                ? SpeechTextSanitizer.Normalize(_localization.GetPluralText("Adventure/Tooltips/Build/BuildTime", rounds, rounds))
+                ? SpokenLines.Clean(_localization.GetPluralText("Adventure/Tooltips/Build/BuildTime", rounds, rounds))
                 : rounds + (rounds == 1 ? " round" : " rounds");
             return label + ": " + value;
         }
@@ -1103,7 +1102,7 @@ namespace SongsOfConquestAccess.Adapters
         {
             IMapEntityBlueprint blueprint = _facade != null ? _facade.MapEntities.GetBlueprint((ushort)building.entity) : null;
             string name = blueprint != null && _localization != null
-                ? SpeechTextSanitizer.Normalize(_localization.GetText(blueprint.NameKey))
+                ? SpokenLines.Clean(_localization.GetText(blueprint.NameKey))
                 : building.entity.ToString();
 
             if (_localization == null)
@@ -1119,7 +1118,7 @@ namespace SongsOfConquestAccess.Adapters
                     amountNeeded = building.count.ToString(),
                     minLevel = building.minLevel.ToString()
                 };
-                return SpeechTextSanitizer.Normalize(_localization.GetPluralText("Common/Details/RequiredBuildings/EntryLevel", building.count, data));
+                return SpokenLines.Clean(_localization.GetPluralText("Common/Details/RequiredBuildings/EntryLevel", building.count, data));
             }
 
             var simpleData = new
@@ -1127,7 +1126,7 @@ namespace SongsOfConquestAccess.Adapters
                 mapEntityName = name,
                 amountNeeded = building.count.ToString()
             };
-            return SpeechTextSanitizer.Normalize(_localization.GetPluralText("Common/Details/RequiredBuildings/Entry", building.count, simpleData));
+            return SpokenLines.Clean(_localization.GetPluralText("Common/Details/RequiredBuildings/Entry", building.count, simpleData));
         }
 
         private string FormatRequiredResearch(object research)
@@ -1139,8 +1138,8 @@ namespace SongsOfConquestAccess.Adapters
             }
 
             ResearchDetails value = details.Value;
-            string name = SpeechTextSanitizer.Normalize(_localization.GetText(value.Description.NameKey));
-            string source = SpeechTextSanitizer.Normalize(_localization.GetText(value.ResearchMapEntityNameKey));
+            string name = SpokenLines.Clean(_localization.GetText(value.Description.NameKey));
+            string source = SpokenLines.Clean(_localization.GetText(value.ResearchMapEntityNameKey));
             return string.IsNullOrWhiteSpace(source) ? name : name + " (" + source + ")";
         }
 
@@ -1238,7 +1237,7 @@ namespace SongsOfConquestAccess.Adapters
 
         private string GetLocalizedText(string key, string fallback)
         {
-            return SpeechTextSanitizer.Normalize(GameText.Get(_localization, key, fallback ?? string.Empty));
+            return SpokenLines.Clean(GameText.Get(_localization, key, fallback ?? string.Empty));
         }
 
         private string GetBuildSiteLabel(BuildSiteSize size)
@@ -1298,12 +1297,12 @@ namespace SongsOfConquestAccess.Adapters
 
         private static string GetButtonLabel(UIButton button)
         {
-            return SpeechTextSanitizer.Normalize(UITextMeshTextUtility.GetEffectiveButtonText(button));
+            return SpokenLines.Clean(UITextMeshTextUtility.GetEffectiveButtonText(button));
         }
 
         private static string GetText(IUITextMesh textMesh)
         {
-            return SpeechTextSanitizer.Normalize(UITextMeshTextUtility.GetEffectiveText(textMesh));
+            return SpokenLines.Clean(UITextMeshTextUtility.GetEffectiveText(textMesh));
         }
 
         // A text mesh the game may have written more than one paragraph into.

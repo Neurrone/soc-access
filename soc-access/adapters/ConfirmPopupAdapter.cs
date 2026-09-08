@@ -5,7 +5,6 @@ using SongsOfConquest.Client.Menu;
 using SongsOfConquest.Client.UI;
 using SongsOfConquest.Common.Localization;
 using SongsOfConquestAccess.Localization;
-using SongsOfConquestAccess.Speech;
 using SongsOfConquestAccess.UI;
 using UnityEngine;
 using UnityEngine.EventSystems;
@@ -222,13 +221,13 @@ namespace SongsOfConquestAccess.Adapters
 
         private static string GetText(IUITextMesh textMesh)
         {
-            return SpeechTextSanitizer.Normalize(UITextMeshTextUtility.GetEffectiveText(textMesh));
+            return SpokenLines.Clean(UITextMeshTextUtility.GetEffectiveText(textMesh));
         }
 
         private string GetLocalizedText(string key)
         {
             ILocalizationHandler localizationHandler = GetLocalizationHandler();
-            return SpeechTextSanitizer.Normalize(GameText.Get(localizationHandler, key, string.Empty));
+            return SpokenLines.Clean(GameText.Get(localizationHandler, key, string.Empty));
         }
     }
 }

@@ -4,7 +4,6 @@ using HarmonyLib;
 using Lavapotion.Utilities;
 using SongsOfConquest.Client.Adventure;
 using SongsOfConquest.Client.UI;
-using SongsOfConquestAccess.Speech;
 using SongsOfConquestAccess.UI;
 using TMPro;
 using UnityEngine;
@@ -48,7 +47,7 @@ namespace SongsOfConquestAccess.Adapters
 
         public string Title
         {
-            get { return IsTitleVisible() ? SpeechTextSanitizer.Normalize(GetText(TitleTextRef)) : string.Empty; }
+            get { return IsTitleVisible() ? SpokenLines.Clean(GetText(TitleTextRef)) : string.Empty; }
         }
 
         public string Body

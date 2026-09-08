@@ -20,7 +20,7 @@ using SongsOfConquest.Common.Levels;
 using SongsOfConquest.Common.Localization;
 using SongsOfConquest.Common.Objectives;
 using SongsOfConquestAccess.Localization;
-using SongsOfConquestAccess.Speech;
+using SongsOfConquestAccess.UI;
 using UnityEngine;
 using UnityEngine.UI;
 using Zenject;
@@ -663,7 +663,7 @@ namespace SongsOfConquestAccess.Adapters
                 return string.Empty;
             }
 
-            return SpeechTextSanitizer.Normalize(entry.Information.Text);
+            return SpokenLines.Clean(entry.Information.Text);
         }
 
         public void FocusNotification(int index)
@@ -935,7 +935,7 @@ namespace SongsOfConquestAccess.Adapters
         {
             TeamQueueEntryBehaviour entry = GetTeamQueueEntry(index);
             UITextMesh text = GetField<UITextMesh>(entry, TeamQueueEntryNameTextField);
-            return SpeechTextSanitizer.Normalize(GetText(text));
+            return SpokenLines.Clean(GetText(text));
         }
 
         public void FocusTeamQueueEntry(int index)
@@ -1882,7 +1882,7 @@ namespace SongsOfConquestAccess.Adapters
 
         private static string GetText(UITextMesh text)
         {
-            return SpeechTextSanitizer.Normalize(UITextMeshTextUtility.GetEffectiveText(text));
+            return SpokenLines.Clean(UITextMeshTextUtility.GetEffectiveText(text));
         }
 
         private static bool IsButtonVisible(UIButton button)
@@ -1931,7 +1931,7 @@ namespace SongsOfConquestAccess.Adapters
 
             for (int i = 0; i < tooltip.TextLines.Count; i++)
             {
-                string line = SpeechTextSanitizer.Normalize(tooltip.TextLines[i]);
+                string line = SpokenLines.Clean(tooltip.TextLines[i]);
                 if (!string.IsNullOrWhiteSpace(line))
                 {
                     return line;

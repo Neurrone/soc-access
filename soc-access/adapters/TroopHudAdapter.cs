@@ -14,7 +14,7 @@ using SongsOfConquest.Common.Gamestate;
 using SongsOfConquest.Common.Gamestate.Facade;
 using SongsOfConquest.Common.Localization;
 using SongsOfConquestAccess.Localization;
-using SongsOfConquestAccess.Speech;
+using SongsOfConquestAccess.UI;
 using UnityEngine;
 
 namespace SongsOfConquestAccess.Adapters
@@ -112,7 +112,7 @@ namespace SongsOfConquestAccess.Adapters
 
                 object parentId = HudParentIdField.GetValue(_hud);
                 return parentId is int
-                    ? SpeechTextSanitizer.Normalize(_facade.Commanders.GetName((int)parentId))
+                    ? SpokenLines.Clean(_facade.Commanders.GetName((int)parentId))
                     : string.Empty;
             }
         }
@@ -433,7 +433,7 @@ namespace SongsOfConquestAccess.Adapters
 
         private string GetTroopName(int troopId)
         {
-            return SpeechTextSanitizer.Normalize(_facade != null ? _facade.Troops.GetName(troopId) : string.Empty);
+            return SpokenLines.Clean(_facade != null ? _facade.Troops.GetName(troopId) : string.Empty);
         }
 
         /// <summary>

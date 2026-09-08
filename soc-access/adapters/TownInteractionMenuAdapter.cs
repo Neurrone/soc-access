@@ -13,7 +13,7 @@ using SongsOfConquest.Common.Entities;
 using SongsOfConquest.Common.Entities.Adventure;
 using SongsOfConquest.Common.Gamestate;
 using SongsOfConquest.Common.Localization;
-using SongsOfConquestAccess.Speech;
+using SongsOfConquestAccess.UI;
 using UnityEngine;
 
 namespace SongsOfConquestAccess.Adapters
@@ -124,7 +124,7 @@ namespace SongsOfConquestAccess.Adapters
             {
                 int commanderId = GetInteractingCommanderId();
                 string name = commanderId >= 0 && _facade != null ? _facade.Commanders.GetName(commanderId) : string.Empty;
-                return SpeechTextSanitizer.Normalize(name);
+                return SpokenLines.Clean(name);
             }
         }
 
@@ -480,12 +480,12 @@ namespace SongsOfConquestAccess.Adapters
 
         private static string GetButtonLabel(UIButton button)
         {
-            return SpeechTextSanitizer.Normalize(MenuButtonTextUtility.GetAllVisibleText(button));
+            return SpokenLines.Clean(MenuButtonTextUtility.GetAllVisibleText(button));
         }
 
         private static string GetText(IUITextMesh textMesh)
         {
-            return SpeechTextSanitizer.Normalize(UITextMeshTextUtility.GetEffectiveText(textMesh));
+            return SpokenLines.Clean(UITextMeshTextUtility.GetEffectiveText(textMesh));
         }
 
         private static string GetVisibleText(GameObject root)

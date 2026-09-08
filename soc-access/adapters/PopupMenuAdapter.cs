@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using SongsOfConquest.Client;
 using SongsOfConquest.Client.Menu.Popup;
 using SongsOfConquest.Client.UI;
-using SongsOfConquestAccess.Speech;
 using SongsOfConquestAccess.UI;
 using UnityEngine;
 using UnityEngine.EventSystems;
@@ -38,9 +37,9 @@ namespace SongsOfConquestAccess.Adapters
             _inputField = inputField;
             _positiveButton = positiveButton;
             _negativeButton = negativeButton;
-            _title = SpeechTextSanitizer.Normalize(title);
+            _title = SpokenLines.Clean(title);
             _bodyLines = SpokenLines.Of(new[] { body });
-            _actionLabels = new[] { SpeechTextSanitizer.Normalize(positiveLabel), SpeechTextSanitizer.Normalize(negativeLabel) };
+            _actionLabels = new[] { SpokenLines.Clean(positiveLabel), SpokenLines.Clean(negativeLabel) };
         }
 
         public PopupMenuAdapter(object sourceKey, PopupMenu.Settings settings)

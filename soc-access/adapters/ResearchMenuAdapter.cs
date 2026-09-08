@@ -13,7 +13,6 @@ using SongsOfConquest.Common.Gamestate.Facade;
 using SongsOfConquest.Common.Localization;
 using SongsOfConquest.Common.Research;
 using SongsOfConquestAccess.Localization;
-using SongsOfConquestAccess.Speech;
 using SongsOfConquestAccess.UI;
 using UnityEngine;
 
@@ -289,13 +288,13 @@ namespace SongsOfConquestAccess.Adapters
 
         private static string GetText(UITextMesh textMesh)
         {
-            return SpeechTextSanitizer.Normalize(UITextMeshTextUtility.GetEffectiveText(textMesh));
+            return SpokenLines.Clean(UITextMeshTextUtility.GetEffectiveText(textMesh));
         }
 
         private string GetBuildingLabel(ResearchMenuBuildingTabButton tab, int index)
         {
             UITextMesh name = GetField<UITextMesh>(tab, BuildingTabNameField);
-            string label = SpeechTextSanitizer.Normalize(UITextMeshTextUtility.GetEffectiveText(name));
+            string label = SpokenLines.Clean(UITextMeshTextUtility.GetEffectiveText(name));
             return string.IsNullOrWhiteSpace(label) ? "Building " + (index + 1) : label;
         }
 
@@ -309,7 +308,7 @@ namespace SongsOfConquestAccess.Adapters
         private string GetCategoryLabel(ResearchMenuCategory category, int index)
         {
             UITextMesh name = GetField<UITextMesh>(category, CategoryNameField);
-            string label = SpeechTextSanitizer.Normalize(UITextMeshTextUtility.GetEffectiveText(name));
+            string label = SpokenLines.Clean(UITextMeshTextUtility.GetEffectiveText(name));
             return string.IsNullOrWhiteSpace(label) ? "Research category " + (index + 1) : label;
         }
 
@@ -434,7 +433,7 @@ namespace SongsOfConquestAccess.Adapters
         private string Localize(string key, string fallback)
         {
             ILocalizationHandler localization = GetLocalization();
-            return SpeechTextSanitizer.Normalize(GameText.Get(localization, key, fallback ?? string.Empty));
+            return SpokenLines.Clean(GameText.Get(localization, key, fallback ?? string.Empty));
         }
 
         private static bool IsVisible(Component component)

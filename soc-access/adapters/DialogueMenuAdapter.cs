@@ -5,7 +5,6 @@ using HarmonyLib;
 using SongsOfConquest.Client.Menu;
 using SongsOfConquest.Client.UI;
 using SongsOfConquest.Common.Dialogue;
-using SongsOfConquestAccess.Speech;
 using SongsOfConquestAccess.UI;
 using TMPro;
 using UnityEngine;
@@ -57,10 +56,10 @@ namespace SongsOfConquestAccess.Adapters
                 string nativeHeader;
                 if (TryGetNativeHeaderText(out nativeHeader))
                 {
-                    return SpeechTextSanitizer.Normalize(nativeHeader);
+                    return SpokenLines.Clean(nativeHeader);
                 }
 
-                return SpeechTextSanitizer.Normalize(GetVisibleNameText(GetSettings()));
+                return SpokenLines.Clean(GetVisibleNameText(GetSettings()));
             }
         }
 

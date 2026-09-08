@@ -12,7 +12,7 @@ using SongsOfConquest.Common.Entities;
 using SongsOfConquest.Common.Entities.Adventure;
 using SongsOfConquest.Common.Localization;
 using SongsOfConquestAccess.Localization;
-using SongsOfConquestAccess.Speech;
+using SongsOfConquestAccess.UI;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -142,7 +142,7 @@ namespace SongsOfConquestAccess.Adapters
 
         private string GetLocalizedText(string key)
         {
-            return SpeechTextSanitizer.Normalize(GameText.Get(_localization, key, string.Empty));
+            return SpokenLines.Clean(GameText.Get(_localization, key, string.Empty));
         }
 
         private string GetTownName(IMapEntity entity)
@@ -162,17 +162,17 @@ namespace SongsOfConquestAccess.Adapters
                 string customName = _localization != null ? _localization.GetText(customNameKey) : customNameKey;
                 if (!string.IsNullOrWhiteSpace(customName) && customName != customNameKey)
                 {
-                    return SpeechTextSanitizer.Normalize(customName);
+                    return SpokenLines.Clean(customName);
                 }
             }
 
             string name = _localization != null ? _localization.GetText(entity.NameKey) : entity.NameKey;
-            return SpeechTextSanitizer.Normalize(string.IsNullOrWhiteSpace(name) || name == entity.NameKey ? entity.NameKey : name);
+            return SpokenLines.Clean(string.IsNullOrWhiteSpace(name) || name == entity.NameKey ? entity.NameKey : name);
         }
 
         private static string GetText(IUITextMesh textMesh)
         {
-            return SpeechTextSanitizer.Normalize(UITextMeshTextUtility.GetEffectiveText(textMesh));
+            return SpokenLines.Clean(UITextMeshTextUtility.GetEffectiveText(textMesh));
         }
 
         private static bool IsVisible(Component component)

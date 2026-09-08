@@ -16,7 +16,6 @@ using SongsOfConquest.Common.Localization;
 using SongsOfConquest.Common.Map;
 using SongsOfConquest.Server.Adventure.Map.Provider;
 using SongsOfConquestAccess.Localization;
-using SongsOfConquestAccess.Speech;
 using SongsOfConquestAccess.UI;
 using UnityEngine;
 using UnityEngine.UI;
@@ -505,7 +504,7 @@ namespace SongsOfConquestAccess.Adapters
                 return string.Empty;
             }
 
-            return SpeechTextSanitizer.Normalize(GameText.Get(_localization, key, fallback ?? string.Empty));
+            return SpokenLines.Clean(GameText.Get(_localization, key, fallback ?? string.Empty));
         }
 
         private static LobbyNavigation FindNavigationFor(MapSelectMenu menu)
@@ -624,7 +623,7 @@ namespace SongsOfConquestAccess.Adapters
 
         public string Name
         {
-            get { return SpeechTextSanitizer.Normalize(_entry != null ? _entry.PrettyMapName : string.Empty); }
+            get { return SpokenLines.Clean(_entry != null ? _entry.PrettyMapName : string.Empty); }
         }
 
         public MapFormat.AdventureMapMetadata Metadata
@@ -888,7 +887,7 @@ namespace SongsOfConquestAccess.Adapters
                 return string.Empty;
             }
 
-            return SpeechTextSanitizer.Normalize(GameText.Get(_localization, key, fallback ?? string.Empty));
+            return SpokenLines.Clean(GameText.Get(_localization, key, fallback ?? string.Empty));
         }
 
         private static void AddIfNotEmpty(List<string> parts, string value)
@@ -945,7 +944,7 @@ namespace SongsOfConquestAccess.Adapters
 
         public string Label
         {
-            get { return SpeechTextSanitizer.Normalize(MenuButtonTextUtility.GetStandardButtonLabel(_button)); }
+            get { return SpokenLines.Clean(MenuButtonTextUtility.GetStandardButtonLabel(_button)); }
         }
 
         public MapSelectSortDirection Direction
@@ -1064,7 +1063,7 @@ namespace SongsOfConquestAccess.Adapters
                 _owner = owner;
                 Index = index;
                 _toggle = toggle;
-                _label = SpeechTextSanitizer.Normalize(_toggle != null ? _toggle.Text : string.Empty);
+                _label = SpokenLines.Clean(_toggle != null ? _toggle.Text : string.Empty);
                 if (string.IsNullOrWhiteSpace(_label))
                 {
                     _label = fallbackLabel ?? string.Empty;

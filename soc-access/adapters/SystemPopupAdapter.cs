@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using HarmonyLib;
 using SongsOfConquest.Client;
 using SongsOfConquest.Client.UI;
-using SongsOfConquestAccess.Speech;
 using SongsOfConquestAccess.UI;
 using UnityEngine;
 using UnityEngine.EventSystems;
@@ -231,12 +230,12 @@ namespace SongsOfConquestAccess.Adapters
 
         private static string GetButtonText(IUIButton button)
         {
-            return SpeechTextSanitizer.Normalize(UITextMeshTextUtility.GetEffectiveButtonText(button));
+            return SpokenLines.Clean(UITextMeshTextUtility.GetEffectiveButtonText(button));
         }
 
         private static string GetActiveText(IUITextMesh textMesh)
         {
-            return SpeechTextSanitizer.Normalize(GetActiveRawText(textMesh));
+            return SpokenLines.Clean(GetActiveRawText(textMesh));
         }
 
         // The text as the game wrote it, line breaks and all; a mesh the game has hidden says nothing.

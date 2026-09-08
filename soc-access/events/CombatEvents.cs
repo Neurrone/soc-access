@@ -9,8 +9,8 @@ using SongsOfConquest.Common.Battle.Bacterias;
 using SongsOfConquest.Common.Entities.Battle;
 using SongsOfConquest.Common.Spells;
 using SongsOfConquestAccess.Localization;
-using SongsOfConquestAccess.Speech;
 using SongsOfConquestAccess.Speech.Spatial;
+using SongsOfConquestAccess.UI;
 using UnityEngine;
 using static SongsOfConquestAccess.Events.Combat.CombatText;
 
@@ -51,7 +51,7 @@ namespace SongsOfConquestAccess.Events.Combat
             TroopId = troopId;
             TeamId = teamId;
             LocalTeamId = localTeamId;
-            Name = string.IsNullOrWhiteSpace(name) ? ModText.Get(ModStrings.Combat.Troop) : SpeechTextSanitizer.Normalize(name);
+            Name = string.IsNullOrWhiteSpace(name) ? ModText.Get(ModStrings.Combat.Troop) : SpokenLines.Clean(name);
             Count = count;
             Position = position;
         }
@@ -103,7 +103,7 @@ namespace SongsOfConquestAccess.Events.Combat
         {
             EntityId = entityId;
             BlueprintId = blueprintId;
-            Name = string.IsNullOrWhiteSpace(name) ? ModText.Get(ModStrings.Combat.AttackableEntity) : SpeechTextSanitizer.Normalize(name);
+            Name = string.IsNullOrWhiteSpace(name) ? ModText.Get(ModStrings.Combat.AttackableEntity) : SpokenLines.Clean(name);
             Position = position;
         }
 
@@ -125,7 +125,7 @@ namespace SongsOfConquestAccess.Events.Combat
             CommanderId = commanderId;
             TeamId = teamId;
             LocalTeamId = localTeamId;
-            Name = string.IsNullOrWhiteSpace(name) ? ModText.Get(ModStrings.Combat.Wielder) : SpeechTextSanitizer.Normalize(name);
+            Name = string.IsNullOrWhiteSpace(name) ? ModText.Get(ModStrings.Combat.Wielder) : SpokenLines.Clean(name);
         }
 
         public int CommanderId { get; private set; }
@@ -196,7 +196,7 @@ namespace SongsOfConquestAccess.Events.Combat
         public SpellRef(SpellTypes spellType, string name, int tier)
         {
             SpellType = spellType;
-            Name = string.IsNullOrWhiteSpace(name) ? string.Empty : SpeechTextSanitizer.Normalize(name);
+            Name = string.IsNullOrWhiteSpace(name) ? string.Empty : SpokenLines.Clean(name);
             Tier = tier;
         }
 
@@ -210,7 +210,7 @@ namespace SongsOfConquestAccess.Events.Combat
         public AbilityRef(TroopAbilityType abilityType, string name)
         {
             AbilityType = abilityType;
-            Name = string.IsNullOrWhiteSpace(name) ? string.Empty : SpeechTextSanitizer.Normalize(name);
+            Name = string.IsNullOrWhiteSpace(name) ? string.Empty : SpokenLines.Clean(name);
         }
 
         public TroopAbilityType AbilityType { get; private set; }
@@ -223,7 +223,7 @@ namespace SongsOfConquestAccess.Events.Combat
         {
             BacteriaId = bacteriaId;
             BacteriaType = bacteriaType;
-            Name = string.IsNullOrWhiteSpace(name) ? string.Empty : SpeechTextSanitizer.Normalize(name);
+            Name = string.IsNullOrWhiteSpace(name) ? string.Empty : SpokenLines.Clean(name);
         }
 
         public int BacteriaId { get; private set; }
@@ -1055,7 +1055,7 @@ namespace SongsOfConquestAccess.Events.Combat
 
         public string Kind { get { return AccessibilityEvents.Combat.HudNotification; } }
         public string Text { get; private set; }
-        public string GetSpeechText() { return SpeechTextSanitizer.Normalize(Text); }
+        public string GetSpeechText() { return SpokenLines.Clean(Text); }
     }
 
     public static class CombatText

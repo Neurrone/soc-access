@@ -20,6 +20,7 @@ using SongsOfConquest.Common.Gamestate;
 using SongsOfConquest.Common.Localization;
 using SongsOfConquestAccess.Localization;
 using SongsOfConquestAccess.Speech;
+using SongsOfConquestAccess.UI;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
@@ -964,13 +965,13 @@ namespace SongsOfConquestAccess.Adapters
             string text = _localization != null ? _localization.GetText("InventorySlots/" + slot) : string.Empty;
             return string.IsNullOrWhiteSpace(text) || text == "InventorySlots/" + slot
                 ? FormatSlotName(slot)
-                : SpeechTextSanitizer.Normalize(text);
+                : SpokenLines.Clean(text);
         }
 
         private string GetInventorySlotName(string slotName)
         {
             string text = _localization != null ? _localization.GetText("InventorySlots/" + slotName) : string.Empty;
-            return string.IsNullOrWhiteSpace(text) ? slotName : SpeechTextSanitizer.Normalize(text);
+            return string.IsNullOrWhiteSpace(text) ? slotName : SpokenLines.Clean(text);
         }
 
         private string GetInventoryLabel()
@@ -981,12 +982,12 @@ namespace SongsOfConquestAccess.Adapters
         private string GetCommanderName(int commanderId)
         {
             string name = commanderId >= 0 && _facade != null ? _facade.Commanders.GetName(commanderId) : string.Empty;
-            return SpeechTextSanitizer.Normalize(name);
+            return SpokenLines.Clean(name);
         }
 
         private string GetLocalizedText(string key, string fallback)
         {
-            return SpeechTextSanitizer.Normalize(GameText.Get(_localization, key, fallback));
+            return SpokenLines.Clean(GameText.Get(_localization, key, fallback));
         }
 
         private void AddLocalizedLine(List<string> lines, string key)
@@ -1044,7 +1045,7 @@ namespace SongsOfConquestAccess.Adapters
 
         private static string GetText(IUITextMesh textMesh)
         {
-            return SpeechTextSanitizer.Normalize(UITextMeshTextUtility.GetEffectiveText(textMesh));
+            return SpokenLines.Clean(UITextMeshTextUtility.GetEffectiveText(textMesh));
         }
 
         private static int CompareSiblingIndex(ArtifactMarketEntry left, ArtifactMarketEntry right)

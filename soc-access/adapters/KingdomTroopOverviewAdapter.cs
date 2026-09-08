@@ -4,7 +4,7 @@ using System.Reflection;
 using HarmonyLib;
 using SongsOfConquest.Client.Adventure;
 using SongsOfConquest.Client.UI;
-using SongsOfConquestAccess.Speech;
+using SongsOfConquestAccess.UI;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -204,7 +204,7 @@ namespace SongsOfConquestAccess.Adapters
         private static string NormalizeText(UITextMesh text)
         {
             return text != null
-                ? SpeechTextSanitizer.Normalize(UITextMeshTextUtility.GetEffectiveText(text))
+                ? SpokenLines.Clean(UITextMeshTextUtility.GetEffectiveText(text))
                 : string.Empty;
         }
 

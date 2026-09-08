@@ -17,7 +17,7 @@ using SongsOfConquest.Common.Gamestate;
 using SongsOfConquest.Common.Localization;
 using SongsOfConquest.Common.Spells;
 using SongsOfConquestAccess.Localization;
-using SongsOfConquestAccess.Speech;
+using SongsOfConquestAccess.UI;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
@@ -208,7 +208,7 @@ namespace SongsOfConquestAccess.Adapters
 
         public void SetAbilityTargetInstructionText(string text)
         {
-            _abilityTargetInstructionText = SpeechTextSanitizer.Normalize(text);
+            _abilityTargetInstructionText = SpokenLines.Clean(text);
         }
 
         public void ClearAbilityTargetInstructionText()
@@ -218,7 +218,7 @@ namespace SongsOfConquestAccess.Adapters
 
         public void SetSpellTargetInstructionText(string text)
         {
-            _spellTargetInstructionText = SpeechTextSanitizer.Normalize(text);
+            _spellTargetInstructionText = SpokenLines.Clean(text);
         }
 
         public void ClearSpellTargetInstructionText()
@@ -485,7 +485,7 @@ namespace SongsOfConquestAccess.Adapters
                 List<string> result = new List<string>();
                 for (int i = 0; i < entries.Count; i++)
                 {
-                    string text = SpeechTextSanitizer.Normalize(entries[i]);
+                    string text = SpokenLines.Clean(entries[i]);
                     if (!string.IsNullOrWhiteSpace(text))
                     {
                         result.Add(text);
@@ -881,7 +881,7 @@ namespace SongsOfConquestAccess.Adapters
                 }
 
                 int size = troop.Stats != null ? troop.Stats.Size : 0;
-                string name = SpeechTextSanitizer.Normalize(_facade.Troops.GetName(troop.Id, size));
+                string name = SpokenLines.Clean(_facade.Troops.GetName(troop.Id, size));
                 if (string.IsNullOrWhiteSpace(name))
                 {
                     name = string.Empty;
@@ -1114,7 +1114,7 @@ namespace SongsOfConquestAccess.Adapters
 
         private string Localize(string key, string fallback, params object[] args)
         {
-            return SpeechTextSanitizer.Normalize(GameText.Get(_localization, key, fallback, args));
+            return SpokenLines.Clean(GameText.Get(_localization, key, fallback, args));
         }
 
         private static bool IsButtonVisible(UIButton button)
@@ -1156,7 +1156,7 @@ namespace SongsOfConquestAccess.Adapters
 
         private static string GetText(UITextMesh text)
         {
-            return SpeechTextSanitizer.Normalize(UITextMeshTextUtility.GetEffectiveText(text));
+            return SpokenLines.Clean(UITextMeshTextUtility.GetEffectiveText(text));
         }
 
         private static string GetFirstTooltipLine(Tooltip tooltip)
@@ -1171,7 +1171,7 @@ namespace SongsOfConquestAccess.Adapters
 
             for (int i = 0; i < lines.Count; i++)
             {
-                string line = SpeechTextSanitizer.Normalize(lines[i]);
+                string line = SpokenLines.Clean(lines[i]);
                 if (!string.IsNullOrWhiteSpace(line))
                 {
                     return line;

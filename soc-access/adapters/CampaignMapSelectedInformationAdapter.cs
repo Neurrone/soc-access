@@ -7,7 +7,6 @@ using SongsOfConquest.Common;
 using SongsOfConquest.Common.Campaign;
 using SongsOfConquest.Common.Localization;
 using SongsOfConquest.Common.Map;
-using SongsOfConquestAccess.Speech;
 using SongsOfConquestAccess.UI;
 using UnityEngine;
 using UnityEngine.EventSystems;
@@ -108,7 +107,7 @@ namespace SongsOfConquestAccess.Adapters
                 return string.Empty;
             }
 
-            return SpeechTextSanitizer.Normalize(localization.GetText(map.Metadata.Name));
+            return SpokenLines.Clean(localization.GetText(map.Metadata.Name));
         }
 
         /// <summary>The paragraphs the mission's description is written in, kept apart rather than
@@ -138,7 +137,7 @@ namespace SongsOfConquestAccess.Adapters
                 return string.Empty;
             }
 
-            return SpeechTextSanitizer.Normalize(localization.GetText(MissionCounterLocalizationKey, displayName));
+            return SpokenLines.Clean(localization.GetText(MissionCounterLocalizationKey, displayName));
         }
 
         public string GetCompletedStatus()
@@ -164,7 +163,7 @@ namespace SongsOfConquestAccess.Adapters
             for (int i = 0; i < map.Metadata.WinConditions.Length; i++)
             {
                 string text = localization.GetText("GameModes/" + map.Metadata.WinConditions[i] + "/Name");
-                text = SpeechTextSanitizer.Normalize(text);
+                text = SpokenLines.Clean(text);
                 if (!string.IsNullOrWhiteSpace(text) && !parts.Contains(text))
                 {
                     parts.Add(text);
@@ -182,7 +181,7 @@ namespace SongsOfConquestAccess.Adapters
                 return string.Empty;
             }
 
-            return SpeechTextSanitizer.Normalize(localization.GetText("Campaign/Difficulty/" + difficulty));
+            return SpokenLines.Clean(localization.GetText("Campaign/Difficulty/" + difficulty));
         }
 
         public bool SelectDifficulty(CampaignDifficulty difficulty)
@@ -246,7 +245,7 @@ namespace SongsOfConquestAccess.Adapters
 
         private static string GetText(UITextMesh textMesh)
         {
-            return SpeechTextSanitizer.Normalize(UITextMeshTextUtility.GetEffectiveText(textMesh));
+            return SpokenLines.Clean(UITextMeshTextUtility.GetEffectiveText(textMesh));
         }
 
         private static bool IsGameObjectActive(GameObject gameObject)

@@ -1,6 +1,6 @@
 using System.Text;
 using SongsOfConquestAccess.Localization;
-using SongsOfConquestAccess.Speech;
+using SongsOfConquestAccess.UI;
 
 namespace SongsOfConquestAccess.Events
 {
@@ -26,7 +26,7 @@ namespace SongsOfConquestAccess.Events
 
         public string GetSpeechText()
         {
-            return SpeechTextSanitizer.Normalize(NotificationSpeechText.JoinNonEmpty(Header, Body));
+            return SpokenLines.Clean(NotificationSpeechText.JoinNonEmpty(Header, Body));
         }
     }
 
@@ -46,7 +46,7 @@ namespace SongsOfConquestAccess.Events
 
         public string GetSpeechText()
         {
-            return SpeechTextSanitizer.Normalize(Text);
+            return SpokenLines.Clean(Text);
         }
     }
 
@@ -68,7 +68,7 @@ namespace SongsOfConquestAccess.Events
 
         public string GetSpeechText()
         {
-            return SpeechTextSanitizer.Normalize(ModText.Get(ModStrings.Events.LeveledUpTo, WielderName, LevelText));
+            return SpokenLines.Clean(ModText.Get(ModStrings.Events.LeveledUpTo, WielderName, LevelText));
         }
     }
 
@@ -88,7 +88,7 @@ namespace SongsOfConquestAccess.Events
 
         public string GetSpeechText()
         {
-            return SpeechTextSanitizer.Normalize(Text);
+            return SpokenLines.Clean(Text);
         }
     }
 
@@ -107,7 +107,7 @@ namespace SongsOfConquestAccess.Events
 
         public string GetSpeechText()
         {
-            return SpeechTextSanitizer.Normalize(Text);
+            return SpokenLines.Clean(Text);
         }
     }
 
@@ -126,7 +126,7 @@ namespace SongsOfConquestAccess.Events
 
         public string GetSpeechText()
         {
-            return SpeechTextSanitizer.Normalize(Text);
+            return SpokenLines.Clean(Text);
         }
     }
 
@@ -157,7 +157,7 @@ namespace SongsOfConquestAccess.Events
 
         public string GetSpeechText()
         {
-            return SpeechTextSanitizer.Normalize(NotificationSpeechText.JoinNonEmpty(Header, Body, Effects));
+            return SpokenLines.Clean(NotificationSpeechText.JoinNonEmpty(Header, Body, Effects));
         }
 
     }
@@ -170,7 +170,7 @@ namespace SongsOfConquestAccess.Events
 
         public CenteredNotificationEvent(string text)
         {
-            _text = SpeechTextSanitizer.Normalize(text);
+            _text = SpokenLines.Clean(text);
             if (string.IsNullOrWhiteSpace(_text))
             {
                 throw new System.ArgumentException("Centered notification text must be non-empty.", "text");
@@ -193,7 +193,7 @@ namespace SongsOfConquestAccess.Events
 
         public CenteredHeavyNotificationEvent(string text)
         {
-            _text = SpeechTextSanitizer.Normalize(text);
+            _text = SpokenLines.Clean(text);
             if (string.IsNullOrWhiteSpace(_text))
             {
                 throw new System.ArgumentException("Centered heavy notification text must be non-empty.", "text");

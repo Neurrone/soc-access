@@ -13,7 +13,7 @@ using SongsOfConquest.Common.Gamestate;
 using SongsOfConquest.Common.Gamestate.Faction;
 using SongsOfConquest.Common.Gamestate.Unit;
 using SongsOfConquest.Common.Localization;
-using SongsOfConquestAccess.Speech;
+using SongsOfConquestAccess.UI;
 using UnityEngine;
 
 namespace SongsOfConquestAccess.Adapters
@@ -82,7 +82,7 @@ namespace SongsOfConquestAccess.Adapters
 
         private static string GetText(IUITextMesh textMesh)
         {
-            return SpeechTextSanitizer.Normalize(UITextMeshTextUtility.GetEffectiveText(textMesh));
+            return SpokenLines.Clean(UITextMeshTextUtility.GetEffectiveText(textMesh));
         }
 
         public abstract class RecruitEntry
@@ -200,7 +200,7 @@ namespace SongsOfConquestAccess.Adapters
                         return string.Empty;
                     }
 
-                    string name = SpeechTextSanitizer.Normalize(Localization.GetText(unit.NameKey));
+                    string name = SpokenLines.Clean(Localization.GetText(unit.NameKey));
                     if (string.IsNullOrWhiteSpace(name))
                     {
                         LogTroopNameFailure(reference, "localized unit name is empty for key " + unit.NameKey);
@@ -298,7 +298,7 @@ namespace SongsOfConquestAccess.Adapters
                 {
                     string amount = GetText(GetField<UITextMesh>(_entry, AmountTextField));
                     string total = GetText(GetField<UITextMesh>(_entry, TotalAmountTextField));
-                    return SpeechTextSanitizer.Normalize((amount + " " + total).Trim());
+                    return SpokenLines.Clean((amount + " " + total).Trim());
                 }
             }
 

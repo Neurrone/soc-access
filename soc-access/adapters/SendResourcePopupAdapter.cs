@@ -8,7 +8,6 @@ using SongsOfConquest.Client.UI;
 using SongsOfConquest.Common.Economy;
 using SongsOfConquest.Common.Localization;
 using SongsOfConquestAccess.Localization;
-using SongsOfConquestAccess.Speech;
 using SongsOfConquestAccess.UI;
 using UnityEngine;
 
@@ -152,12 +151,12 @@ namespace SongsOfConquestAccess.Adapters
 
         private string GetResourceName(ResourceType type)
         {
-            return SpeechTextSanitizer.Normalize(GameText.Get(_localization, "Common/Resource/" + type, string.Empty));
+            return SpokenLines.Clean(GameText.Get(_localization, "Common/Resource/" + type, string.Empty));
         }
 
         private static string GetText(IUITextMesh textMesh)
         {
-            return SpeechTextSanitizer.Normalize(UITextMeshTextUtility.GetEffectiveText(textMesh));
+            return SpokenLines.Clean(UITextMeshTextUtility.GetEffectiveText(textMesh));
         }
 
         private static bool IsLiveSceneObject(GameObject gameObject)

@@ -20,6 +20,7 @@ using SongsOfConquest.Common.Localization;
 using SongsOfConquest.Common.Skills;
 using SongsOfConquestAccess.Localization;
 using SongsOfConquestAccess.Speech;
+using SongsOfConquestAccess.UI;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
@@ -252,7 +253,7 @@ namespace SongsOfConquestAccess.Adapters
                 string text = details != null
                     ? details.GetBacteriaDescription(_localization, hasDifferentDurations: true)
                     : string.Empty;
-                items.Add(new LabeledItem("specialization-" + i, SpeechTextSanitizer.Normalize(text)));
+                items.Add(new LabeledItem("specialization-" + i, SpokenLines.Clean(text)));
             }
 
             return items;
@@ -334,7 +335,7 @@ namespace SongsOfConquestAccess.Adapters
                 for (int i = 0; i < entries.Length; i++)
                 {
                     UITextMesh text = GetField<UITextMesh>(entries[i], SummaryEntryTextField);
-                    string label = SpeechTextSanitizer.Normalize(UITextMeshTextUtility.GetEffectiveText(text));
+                    string label = SpokenLines.Clean(UITextMeshTextUtility.GetEffectiveText(text));
                     if (!string.IsNullOrWhiteSpace(label))
                     {
                         items.Add(new LabeledItem("modifier-" + i, label));
@@ -345,7 +346,7 @@ namespace SongsOfConquestAccess.Adapters
             if (items.Count == 0)
             {
                 UITextMesh noneText = GetField<UITextMesh>(_modifierTabs, NoModifiersTextField);
-                string label = SpeechTextSanitizer.Normalize(UITextMeshTextUtility.GetEffectiveText(noneText));
+                string label = SpokenLines.Clean(UITextMeshTextUtility.GetEffectiveText(noneText));
                 items.Add(new LabeledItem("modifiers-none", string.IsNullOrWhiteSpace(label) ? "None" : label));
             }
 
@@ -924,7 +925,7 @@ namespace SongsOfConquestAccess.Adapters
         {
             ICommanderState commander = GetCommander();
             string name = commander != null && _facade != null ? _facade.Commanders.GetName(commander.Id) : string.Empty;
-            return SpeechTextSanitizer.Normalize(name);
+            return SpokenLines.Clean(name);
         }
 
         private string GetInventoryLabel()
@@ -940,7 +941,7 @@ namespace SongsOfConquestAccess.Adapters
                 string text = _localization.GetText(key, skill.Level);
                 if (!string.IsNullOrWhiteSpace(text) && text != key)
                 {
-                    return SpeechTextSanitizer.Normalize(text);
+                    return SpokenLines.Clean(text);
                 }
             }
 
@@ -959,7 +960,7 @@ namespace SongsOfConquestAccess.Adapters
                 string text = _localization.GetText("InventorySlots/" + slotName);
                 if (!string.IsNullOrWhiteSpace(text))
                 {
-                    return SpeechTextSanitizer.Normalize(text);
+                    return SpokenLines.Clean(text);
                 }
             }
 

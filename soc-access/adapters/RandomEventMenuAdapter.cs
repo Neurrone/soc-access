@@ -6,7 +6,6 @@ using SongsOfConquest.Client.Adventure;
 using SongsOfConquest.Client.UI;
 using SongsOfConquest.Common.Localization;
 using SongsOfConquestAccess.Localization;
-using SongsOfConquestAccess.Speech;
 using SongsOfConquestAccess.UI;
 using UnityEngine;
 using UnityEngine.EventSystems;
@@ -202,7 +201,7 @@ namespace SongsOfConquestAccess.Adapters
 
         private static string GetText(IUITextMesh textMesh)
         {
-            return SpeechTextSanitizer.Normalize(UITextMeshTextUtility.GetEffectiveText(textMesh));
+            return SpokenLines.Clean(UITextMeshTextUtility.GetEffectiveText(textMesh));
         }
 
         private static string GetActiveMultilineText(IUITextMesh textMesh)
@@ -218,12 +217,12 @@ namespace SongsOfConquestAccess.Adapters
 
         private static string GetButtonText(IUIButton button)
         {
-            return SpeechTextSanitizer.Normalize(UITextMeshTextUtility.GetEffectiveButtonText(button));
+            return SpokenLines.Clean(UITextMeshTextUtility.GetEffectiveButtonText(button));
         }
 
         private string GetLocalizedText(string key)
         {
-            return SpeechTextSanitizer.Normalize(GameText.Get(GetLocalizationHandler(), key, string.Empty));
+            return SpokenLines.Clean(GameText.Get(GetLocalizationHandler(), key, string.Empty));
         }
 
         private static string StripRichTextPreservingLines(string value)

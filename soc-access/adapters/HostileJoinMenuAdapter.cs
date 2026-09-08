@@ -10,7 +10,7 @@ using SongsOfConquest.Common.Economy;
 using SongsOfConquest.Common.Gamestate;
 using SongsOfConquest.Common.Localization;
 using SongsOfConquestAccess.Localization;
-using SongsOfConquestAccess.Speech;
+using SongsOfConquestAccess.UI;
 using UnityEngine;
 
 namespace SongsOfConquestAccess.Adapters
@@ -331,7 +331,7 @@ namespace SongsOfConquestAccess.Adapters
 
                 Tooltip tooltip = Tooltip.ForComponent(MassMoveButton, _localization);
                 System.Collections.Generic.IReadOnlyList<string> lines = tooltip != null ? tooltip.TextLines : null;
-                return lines != null && lines.Count > 0 ? SpeechTextSanitizer.Normalize(lines[0]) : string.Empty;
+                return lines != null && lines.Count > 0 ? SpokenLines.Clean(lines[0]) : string.Empty;
             }
         }
 
@@ -370,7 +370,7 @@ namespace SongsOfConquestAccess.Adapters
 
         private static string GetText(IUITextMesh textMesh)
         {
-            return SpeechTextSanitizer.Normalize(UITextMeshTextUtility.GetEffectiveText(textMesh));
+            return SpokenLines.Clean(UITextMeshTextUtility.GetEffectiveText(textMesh));
         }
 
         private static string GetButtonText(UIButton button)

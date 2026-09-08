@@ -154,12 +154,12 @@ namespace SongsOfConquestAccess
 
         private static string GetText(IUITextMesh text)
         {
-            return text != null ? SongsOfConquestAccess.Speech.SpeechTextSanitizer.Normalize(UITextMeshTextUtility.GetEffectiveText(text)) : string.Empty;
+            return text != null ? SongsOfConquestAccess.UI.SpokenLines.Clean(UITextMeshTextUtility.GetEffectiveText(text)) : string.Empty;
         }
 
         private static string GetButtonText(IUIButton button)
         {
-            return SongsOfConquestAccess.Speech.SpeechTextSanitizer.Normalize(UITextMeshTextUtility.GetEffectiveButtonText(button));
+            return SongsOfConquestAccess.UI.SpokenLines.Clean(UITextMeshTextUtility.GetEffectiveButtonText(button));
         }
     }
 }

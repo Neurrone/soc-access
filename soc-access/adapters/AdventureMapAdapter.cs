@@ -29,6 +29,7 @@ using SongsOfConquestAccess.Events;
 using SongsOfConquestAccess.Scanner;
 using SongsOfConquestAccess.Speech;
 using SongsOfConquestAccess.Speech.Spatial;
+using SongsOfConquestAccess.UI;
 using Unity.Mathematics;
 using UnityEngine;
 using UnityEngine.UI;
@@ -2804,10 +2805,10 @@ namespace SongsOfConquestAccess.Adapters
 
         private static bool ReplaceFirstTooltipLine(List<string> textLines, string oldText, string newText)
         {
-            string normalizedOldText = SpeechTextSanitizer.Normalize(oldText);
+            string normalizedOldText = SpokenLines.Clean(oldText);
             for (int i = 0; i < textLines.Count; i++)
             {
-                if (SpeechTextSanitizer.Normalize(textLines[i]).Equals(normalizedOldText, StringComparison.OrdinalIgnoreCase))
+                if (SpokenLines.Clean(textLines[i]).Equals(normalizedOldText, StringComparison.OrdinalIgnoreCase))
                 {
                     textLines[i] = newText;
                     return true;

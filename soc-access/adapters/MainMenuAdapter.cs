@@ -4,7 +4,7 @@ using HarmonyLib;
 using SongsOfConquest.Client.Menu.Main;
 using SongsOfConquest.Client.Menu.Utils;
 using SongsOfConquest.Client.UI;
-using SongsOfConquestAccess.Speech;
+using SongsOfConquestAccess.UI;
 using UnityEngine;
 
 namespace SongsOfConquestAccess.Adapters
@@ -210,7 +210,7 @@ namespace SongsOfConquestAccess.Adapters
                 return string.Empty;
             }
 
-            return SpeechTextSanitizer.Normalize(UITextMeshTextUtility.GetEffectiveText(textMesh));
+            return SpokenLines.Clean(UITextMeshTextUtility.GetEffectiveText(textMesh));
         }
 
         private static bool IsLiveSceneObject(GameObject gameObject)

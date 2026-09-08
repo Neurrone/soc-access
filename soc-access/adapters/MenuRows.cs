@@ -4,7 +4,7 @@ using HarmonyLib;
 using SongsOfConquest.Client;
 using SongsOfConquest.Client.Menu.Utils;
 using SongsOfConquest.Client.UI;
-using SongsOfConquestAccess.Speech;
+using SongsOfConquestAccess.UI;
 using TMPro;
 using UnityEngine;
 
@@ -85,7 +85,7 @@ namespace SongsOfConquestAccess.Adapters
                     component.transform,
                     new MenuRowText(
                         "options-text-" + i,
-                        () => SpeechTextSanitizer.Normalize(UITextMeshTextUtility.GetEffectiveText(text)),
+                        () => SpokenLines.Clean(UITextMeshTextUtility.GetEffectiveText(text)),
                         () => IsActive(component))));
             }
         }
@@ -244,7 +244,7 @@ namespace SongsOfConquestAccess.Adapters
             UIButton concrete = button as UIButton;
             return concrete != null
                 ? MenuButtonTextUtility.GetAllVisibleText(concrete)
-                : SpeechTextSanitizer.Normalize(button != null ? button.Text : null);
+                : SpokenLines.Clean(button != null ? button.Text : null);
         }
 
         private static string ToggleLabel(IUIToggle toggle)
@@ -252,7 +252,7 @@ namespace SongsOfConquestAccess.Adapters
             UIToggle concrete = toggle as UIToggle;
             if (concrete != null)
             {
-                string text = SpeechTextSanitizer.Normalize(
+                string text = SpokenLines.Clean(
                     UITextMeshTextUtility.GetEffectiveText(concrete.GetTextMesh()));
                 if (!string.IsNullOrWhiteSpace(text))
                 {
@@ -260,7 +260,7 @@ namespace SongsOfConquestAccess.Adapters
                 }
             }
 
-            return SpeechTextSanitizer.Normalize(toggle != null ? toggle.Text : null);
+            return SpokenLines.Clean(toggle != null ? toggle.Text : null);
         }
 
         private static Component ToggleTextMesh(IUIToggle toggle)
@@ -274,14 +274,14 @@ namespace SongsOfConquestAccess.Adapters
             IUITextMesh textMesh = SliderText.Of(slider);
             if (textMesh != null)
             {
-                string text = SpeechTextSanitizer.Normalize(UITextMeshTextUtility.GetEffectiveText(textMesh));
+                string text = SpokenLines.Clean(UITextMeshTextUtility.GetEffectiveText(textMesh));
                 if (!string.IsNullOrWhiteSpace(text))
                 {
                     return text;
                 }
             }
 
-            return SpeechTextSanitizer.Normalize(slider != null ? slider.Text : null);
+            return SpokenLines.Clean(slider != null ? slider.Text : null);
         }
 
         private static Component SliderTextMesh(IUISlider slider)
@@ -294,14 +294,14 @@ namespace SongsOfConquestAccess.Adapters
             IUITextMesh textMesh = InputTextMesh(field) as IUITextMesh;
             if (textMesh != null)
             {
-                string text = SpeechTextSanitizer.Normalize(UITextMeshTextUtility.GetEffectiveText(textMesh));
+                string text = SpokenLines.Clean(UITextMeshTextUtility.GetEffectiveText(textMesh));
                 if (!string.IsNullOrWhiteSpace(text))
                 {
                     return text;
                 }
             }
 
-            return SpeechTextSanitizer.Normalize(field != null ? field.Text : null);
+            return SpokenLines.Clean(field != null ? field.Text : null);
         }
 
         /// <summary>An input field's own label mesh - the field draws its caption beside the box, and
@@ -317,14 +317,14 @@ namespace SongsOfConquestAccess.Adapters
             IUITextMesh textMesh = DropdownText.Of(dropdown);
             if (textMesh != null)
             {
-                string text = SpeechTextSanitizer.Normalize(UITextMeshTextUtility.GetEffectiveText(textMesh));
+                string text = SpokenLines.Clean(UITextMeshTextUtility.GetEffectiveText(textMesh));
                 if (!string.IsNullOrWhiteSpace(text))
                 {
                     return text;
                 }
             }
 
-            return SpeechTextSanitizer.Normalize(dropdown != null ? dropdown.Text : null);
+            return SpokenLines.Clean(dropdown != null ? dropdown.Text : null);
         }
 
         private static Component DropdownTextMesh(IUITextMeshDropdown dropdown)
@@ -349,7 +349,7 @@ namespace SongsOfConquestAccess.Adapters
             List<string> options = new List<string>();
             for (int i = 0; i < tmpDropdown.options.Count; i++)
             {
-                options.Add(SpeechTextSanitizer.Normalize(tmpDropdown.options[i].text));
+                options.Add(SpokenLines.Clean(tmpDropdown.options[i].text));
             }
 
             return options;

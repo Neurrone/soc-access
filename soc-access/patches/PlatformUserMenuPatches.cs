@@ -6,7 +6,7 @@ using SongsOfConquest.Client.Menu;
 using SongsOfConquest.Client.UI;
 using SongsOfConquestAccess.Adapters;
 using SongsOfConquestAccess.Screens;
-using SongsOfConquestAccess.Speech;
+using SongsOfConquestAccess.UI;
 using UnityEngine;
 
 namespace SongsOfConquestAccess
@@ -112,7 +112,7 @@ namespace SongsOfConquestAccess
             UITextMesh label = entry != null && ButtonLabelField != null
                 ? ButtonLabelField.GetValue(entry) as UITextMesh
                 : null;
-            return SpeechTextSanitizer.Normalize(UITextMeshTextUtility.GetEffectiveText(label));
+            return SpokenLines.Clean(UITextMeshTextUtility.GetEffectiveText(label));
         }
 
         private static string GetActionType(PlatformUserButtonEntry entry)

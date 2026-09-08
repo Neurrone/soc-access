@@ -3,7 +3,7 @@ using SongsOfConquest.Client.Adventure.UI;
 using SongsOfConquest.Client.Gamestate.Facade;
 using SongsOfConquest.Common.Details;
 using SongsOfConquest.Common.Localization;
-using SongsOfConquestAccess.Speech;
+using SongsOfConquestAccess.UI;
 using UnityEngine;
 
 namespace SongsOfConquestAccess.Adapters
@@ -57,7 +57,7 @@ namespace SongsOfConquestAccess.Adapters
                     AdventureTroopDetails details = GetDetails();
                     string nameKey = details != null ? details.TroopDetails.Description.NameKey : string.Empty;
                     return !string.IsNullOrWhiteSpace(nameKey) && _localization != null
-                        ? SpeechTextSanitizer.Normalize(_localization.GetPluralTextGeneric(nameKey, CurrentSize))
+                        ? SpokenLines.Clean(_localization.GetPluralTextGeneric(nameKey, CurrentSize))
                         : string.Empty;
                 }
             }
@@ -126,7 +126,7 @@ namespace SongsOfConquestAccess.Adapters
 
             private static int ParseAmount(string amountText)
             {
-                string normalized = SpeechTextSanitizer.Normalize(amountText);
+                string normalized = SpokenLines.Clean(amountText);
                 if (string.IsNullOrWhiteSpace(normalized))
                 {
                     return 0;

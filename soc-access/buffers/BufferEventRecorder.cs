@@ -1,5 +1,5 @@
 using SongsOfConquestAccess.Events;
-using SongsOfConquestAccess.Speech;
+using SongsOfConquestAccess.UI;
 
 namespace SongsOfConquestAccess.Buffers
 {
@@ -42,7 +42,7 @@ namespace SongsOfConquestAccess.Buffers
                 return;
             }
 
-            string text = SpeechTextSanitizer.Normalize(accessibilityEvent.GetSpeechText());
+            string text = SpokenLines.Clean(accessibilityEvent.GetSpeechText());
             if (string.IsNullOrWhiteSpace(text))
             {
                 return;

@@ -14,7 +14,7 @@ using SongsOfConquest.Common.Gamestate;
 using SongsOfConquest.Common.Localization;
 using SongsOfConquest.Common.Spells;
 using SongsOfConquestAccess.Localization;
-using SongsOfConquestAccess.Speech;
+using SongsOfConquestAccess.UI;
 using TMPro;
 using UnityEngine;
 using UnityEngine.EventSystems;
@@ -907,7 +907,7 @@ namespace SongsOfConquestAccess.Adapters
             List<string> parts = new List<string>();
             for (int i = 0; i < lines.Count; i++)
             {
-                string part = SpeechTextSanitizer.Normalize(lines[i]);
+                string part = SpokenLines.Clean(lines[i]);
                 if (!string.IsNullOrWhiteSpace(part))
                 {
                     parts.Add(part);

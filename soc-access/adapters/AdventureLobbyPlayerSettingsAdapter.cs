@@ -8,7 +8,7 @@ using SongsOfConquest.Client.Menu.Utils;
 using SongsOfConquest.Client.UI;
 using SongsOfConquest.Common.Localization;
 using SongsOfConquestAccess.Localization;
-using SongsOfConquestAccess.Speech;
+using SongsOfConquestAccess.UI;
 using UnityEngine;
 
 namespace SongsOfConquestAccess.Adapters
@@ -48,7 +48,7 @@ namespace SongsOfConquestAccess.Adapters
         {
             get
             {
-                return SpeechTextSanitizer.Normalize(
+                return SpokenLines.Clean(
                     GameText.Get(_localization, "Lobby/PlayerSettingsMenu/Header", string.Empty));
             }
         }
@@ -116,7 +116,7 @@ namespace SongsOfConquestAccess.Adapters
                     component.transform,
                     new TextItem(
                         "player-settings-text-" + index,
-                        () => SpeechTextSanitizer.Normalize(UITextMeshTextUtility.GetEffectiveText(text)),
+                        () => SpokenLines.Clean(UITextMeshTextUtility.GetEffectiveText(text)),
                         () => IsActive(component))));
             }
         }
@@ -237,7 +237,7 @@ namespace SongsOfConquestAccess.Adapters
             UIButton concrete = button as UIButton;
             return concrete != null
                 ? MenuButtonTextUtility.GetAllVisibleText(concrete)
-                : SpeechTextSanitizer.Normalize(button != null ? button.Text : null);
+                : SpokenLines.Clean(button != null ? button.Text : null);
         }
 
         private static string GetToggleLabel(IUIToggle toggle)
@@ -245,14 +245,14 @@ namespace SongsOfConquestAccess.Adapters
             UIToggle concrete = toggle as UIToggle;
             if (concrete != null)
             {
-                string text = SpeechTextSanitizer.Normalize(UITextMeshTextUtility.GetEffectiveText(concrete.GetTextMesh()));
+                string text = SpokenLines.Clean(UITextMeshTextUtility.GetEffectiveText(concrete.GetTextMesh()));
                 if (!string.IsNullOrWhiteSpace(text))
                 {
                     return text;
                 }
             }
 
-            return SpeechTextSanitizer.Normalize(toggle != null ? toggle.Text : null);
+            return SpokenLines.Clean(toggle != null ? toggle.Text : null);
         }
 
         private static Component GetToggleTooltipComponent(IUIToggle toggle)
@@ -267,14 +267,14 @@ namespace SongsOfConquestAccess.Adapters
             if (concrete != null && SliderGetTextMeshMethod != null)
             {
                 IUITextMesh textMesh = SliderGetTextMeshMethod.Invoke(concrete, new object[0]) as IUITextMesh;
-                string text = SpeechTextSanitizer.Normalize(UITextMeshTextUtility.GetEffectiveText(textMesh));
+                string text = SpokenLines.Clean(UITextMeshTextUtility.GetEffectiveText(textMesh));
                 if (!string.IsNullOrWhiteSpace(text))
                 {
                     return text;
                 }
             }
 
-            return SpeechTextSanitizer.Normalize(slider != null ? slider.Text : null);
+            return SpokenLines.Clean(slider != null ? slider.Text : null);
         }
 
         private static Component GetSliderTooltipComponent(IUISlider slider)

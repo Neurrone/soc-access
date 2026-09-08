@@ -12,7 +12,6 @@ using SongsOfConquest.Common.Ai;
 using SongsOfConquest.Common.Gamestate;
 using SongsOfConquest.Common.Localization;
 using SongsOfConquestAccess.Localization;
-using SongsOfConquestAccess.Speech;
 using SongsOfConquestAccess.UI;
 using SongsOfConquest.Common.Economy;
 using UnityEngine;
@@ -167,12 +166,12 @@ namespace SongsOfConquestAccess.Adapters
 
         private string Localize(string key)
         {
-            return SpeechTextSanitizer.Normalize(GameText.Get(_localization, key, string.Empty));
+            return SpokenLines.Clean(GameText.Get(_localization, key, string.Empty));
         }
 
         private static string GetText(IUITextMesh textMesh)
         {
-            return SpeechTextSanitizer.Normalize(UITextMeshTextUtility.GetEffectiveText(textMesh));
+            return SpokenLines.Clean(UITextMeshTextUtility.GetEffectiveText(textMesh));
         }
 
         private static T GetField<T>(object target, FieldInfo field) where T : class
@@ -393,7 +392,7 @@ namespace SongsOfConquestAccess.Adapters
                         return string.Empty;
                     }
 
-                    string difficulty = SpeechTextSanitizer.Normalize(GameText.Get(_adapter != null ? _adapter._localization : null, "Common/AiMode/" + team.AiDifficulty, string.Empty));
+                    string difficulty = SpokenLines.Clean(GameText.Get(_adapter != null ? _adapter._localization : null, "Common/AiMode/" + team.AiDifficulty, string.Empty));
                     return string.IsNullOrWhiteSpace(difficulty)
                         ? string.Empty
                         : ModText.Get(ModStrings.Screens.AiDifficulty, difficulty);
@@ -431,7 +430,7 @@ namespace SongsOfConquestAccess.Adapters
 
             public string GetResourceLabel(ResourceType resourceType)
             {
-                string name = SpeechTextSanitizer.Normalize(GameText.Get(_adapter != null ? _adapter._localization : null, "Common/Resource/" + resourceType, string.Empty));
+                string name = SpokenLines.Clean(GameText.Get(_adapter != null ? _adapter._localization : null, "Common/Resource/" + resourceType, string.Empty));
                 string amount = GetText(GetResourceAmountText(resourceType));
                 string income = IsGameObjectVisible(GetResourceIncomeText(resourceType))
                     ? GetText(GetResourceIncomeText(resourceType))
@@ -468,7 +467,7 @@ namespace SongsOfConquestAccess.Adapters
                     return BuildAction(
                         "platform-actions",
                         button,
-                        () => SpeechTextSanitizer.Normalize(GameText.Get(_adapter != null ? _adapter._localization : null, "Lobby/LobbyPlayerMenu/ShowPlayerActions", string.Empty)));
+                        () => SpokenLines.Clean(GameText.Get(_adapter != null ? _adapter._localization : null, "Lobby/LobbyPlayerMenu/ShowPlayerActions", string.Empty)));
                 }
             }
 
@@ -493,7 +492,7 @@ namespace SongsOfConquestAccess.Adapters
                     return BuildAction(
                         "non-aggression-pact",
                         button,
-                        () => SpeechTextSanitizer.Normalize(GameText.Get(_adapter != null ? _adapter._localization : null, "Adventure/NonAggressionPact/TooltipTitle", string.Empty)));
+                        () => SpokenLines.Clean(GameText.Get(_adapter != null ? _adapter._localization : null, "Adventure/NonAggressionPact/TooltipTitle", string.Empty)));
                 }
             }
 
@@ -650,7 +649,7 @@ namespace SongsOfConquestAccess.Adapters
                     Tooltip tooltip = Tooltip;
                     if (tooltip != null && tooltip.TextLines.Count > 0)
                     {
-                        return SpeechTextSanitizer.Normalize(tooltip.TextLines[0]);
+                        return SpokenLines.Clean(tooltip.TextLines[0]);
                     }
 
                     string buttonText = MenuButtonTextUtility.GetStandardButtonLabel(_button);

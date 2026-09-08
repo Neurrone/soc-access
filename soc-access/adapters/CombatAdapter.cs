@@ -31,6 +31,7 @@ using SongsOfConquestAccess.Scanner;
 using SongsOfConquestAccess.Speech;
 using SongsOfConquestAccess.Speech.Spatial;
 using SongsOfConquest.Utilities;
+using SongsOfConquestAccess.UI;
 using Unity.Mathematics;
 using UnityEngine;
 using UnityEngine.UI;
@@ -274,7 +275,7 @@ namespace SongsOfConquestAccess.Adapters
                 return;
             }
 
-            text = SpeechTextSanitizer.Normalize(text);
+            text = SpokenLines.Clean(text);
             if (string.IsNullOrWhiteSpace(text))
             {
                 AttackPreviewAdditionalTexts.Remove(preview);
@@ -878,8 +879,8 @@ namespace SongsOfConquestAccess.Adapters
             ITroopAbilityDefinition ability = current != null && _abilityUtility != null
                 ? _abilityUtility.GetAbilityDefinition(current)
                 : null;
-            string abilityName = ability != null ? SpeechTextSanitizer.Normalize(Localize(ability.NameKey)) : string.Empty;
-            string instruction = SpeechTextSanitizer.Normalize(Localize("Battle/AbilityTargeting/" + targeting));
+            string abilityName = ability != null ? SpokenLines.Clean(Localize(ability.NameKey)) : string.Empty;
+            string instruction = SpokenLines.Clean(Localize("Battle/AbilityTargeting/" + targeting));
             if (!string.IsNullOrWhiteSpace(abilityName) && !string.IsNullOrWhiteSpace(instruction))
             {
                 return abilityName + ": " + instruction;
@@ -1297,7 +1298,7 @@ namespace SongsOfConquestAccess.Adapters
         private string GetPreviewText(BattleAttackPreview preview, FieldInfo field)
         {
             UITextMesh text = preview != null && field != null ? field.GetValue(preview) as UITextMesh : null;
-            return text != null ? TrimSentence(SpeechTextSanitizer.Normalize(UITextMeshTextUtility.GetEffectiveText(text))) : string.Empty;
+            return text != null ? TrimSentence(SpokenLines.Clean(UITextMeshTextUtility.GetEffectiveText(text))) : string.Empty;
         }
 
         private static string GetCapturedAdditionalText(BattleAttackPreview preview)
@@ -1633,8 +1634,8 @@ namespace SongsOfConquestAccess.Adapters
 
         private void HandleTargetInstruction(ISpellDefinition spell, string instruction)
         {
-            string spellName = spell != null ? SpeechTextSanitizer.Normalize(Localize(spell.NameKey)) : string.Empty;
-            instruction = SpeechTextSanitizer.Normalize(instruction);
+            string spellName = spell != null ? SpokenLines.Clean(Localize(spell.NameKey)) : string.Empty;
+            instruction = SpokenLines.Clean(instruction);
             string text = !string.IsNullOrWhiteSpace(spellName) && !string.IsNullOrWhiteSpace(instruction)
                 ? spellName + ": " + instruction
                 : (!string.IsNullOrWhiteSpace(spellName) ? spellName : instruction);
@@ -2474,7 +2475,7 @@ namespace SongsOfConquestAccess.Adapters
                 return new TroopRef(-1, -1, GetLocalTeamId(), ModText.Get(ModStrings.Combat.UnknownTroop), sizeOverride, positionOverride);
             }
 
-            string name = SpeechTextSanitizer.Normalize(_facade.Troops.GetName(troop.Id, sizeOverride));
+            string name = SpokenLines.Clean(_facade.Troops.GetName(troop.Id, sizeOverride));
             return new TroopRef(troop.Id, troop.TeamId, GetLocalTeamId(), name, sizeOverride, positionOverride);
         }
 
@@ -2709,7 +2710,7 @@ namespace SongsOfConquestAccess.Adapters
 
         private string FormatTroopLabel(IBattleTroopState troop, int size, bool includeHealth, bool includePosition)
         {
-            string name = SpeechTextSanitizer.Normalize(_facade.Troops.GetName(troop.Id, size));
+            string name = SpokenLines.Clean(_facade.Troops.GetName(troop.Id, size));
             int localTeamId = GetLocalTeamId();
             string label = localTeamId < 0 || troop.TeamId == localTeamId
                 ? ModText.Get(ModStrings.Combat.TroopQuantity, size, name)
@@ -3027,22 +3028,22 @@ namespace SongsOfConquestAccess.Adapters
                 string customName = Localize(customNameKey);
                 if (!string.IsNullOrWhiteSpace(customName))
                 {
-                    return SpeechTextSanitizer.Normalize(customName);
+                    return SpokenLines.Clean(customName);
                 }
             }
 
             string localizedName = Localize(entity.NameKey);
             if (!string.IsNullOrWhiteSpace(localizedName))
             {
-                return SpeechTextSanitizer.Normalize(localizedName);
+                return SpokenLines.Clean(localizedName);
             }
 
             if (!string.IsNullOrWhiteSpace(entity.Name))
             {
-                return SpeechTextSanitizer.Normalize(entity.Name);
+                return SpokenLines.Clean(entity.Name);
             }
 
-            return SpeechTextSanitizer.Normalize(entity.NameKey);
+            return SpokenLines.Clean(entity.NameKey);
         }
 
         private static bool IsDebris(IMapEntity entity)

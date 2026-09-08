@@ -69,9 +69,6 @@ Paths relative to `soc-access/`.
 - Review buffers (`buffers/`, `ReviewBufferKind.Ui/AdventureMapNotifications/CombatEvents`)
   and speech (`SpeechPipeline.Output`, silenced by the router on every claimed key) stay as
   they are. Tests are MSTest under `tests/`.
-- Every adapter still normalises text with `SpeechTextSanitizer.Normalize`, which collapses
-  newlines; the graph cleans tooltip and details lines itself (`ui/SpokenLines.cs`). The
-  sweep is phase G's.
 
 ## 2. What exists now: the graph side
 
@@ -239,12 +236,12 @@ carry, the three modes, and the polling screen manager (2026-09-08).
 Delete `ui/UIManager.cs`, `ui/FocusContext.cs`, every `ui/*Widget.cs`, `ui/MenuWidget.cs`,
 `ui/TableWidget.cs`, the three grid classes' widget base,
 the widget-era input actions, `adapters/NativeTextPrompt.cs` (unused since the mod dialogs),
-and the unused drag strings (`UI.DragStartedTroopPlacement`, `UI.DragComplete`). Sweep every
-adapter's `SpeechTextSanitizer.Normalize` into per-line handling (`ui/SpokenLines.cs` is the
-shape). Lift the graph-screens-only limit on the input stand-down. Update `AGENTS.md` (the
+and the unused drag strings (`UI.DragStartedTroopPlacement`, `UI.DragComplete`).
+Lift the graph-screens-only limit on the input stand-down. Update `AGENTS.md` (the
 adapter rule stays; widget-tree wording becomes graph wording) and `screens/README.md`.
 
-Done in G: the tooltip actions machinery is gone. The map and battle tiles now say the game's
+Done in G: every adapter cleans text per line through `SpokenLines.Clean`, and the
+whitespace-collapsing sanitizer is deleted. The tooltip actions machinery is gone. The map and battle tiles now say the game's
 own click instructions as usage hints on the keys that perform them (`ui/TileInstructionHints.cs`,
 `adapters/TileInstruction.cs`) instead of an "Available actions" buffer line.
 

@@ -11,6 +11,7 @@ using SongsOfConquest.Common.Gamestate.Facade;
 using SongsOfConquest.Common.Localization;
 using SongsOfConquestAccess.Localization;
 using SongsOfConquestAccess.Speech;
+using SongsOfConquestAccess.UI;
 using UnityEngine;
 
 namespace SongsOfConquestAccess.Adapters
@@ -191,7 +192,7 @@ namespace SongsOfConquestAccess.Adapters
 
             for (int i = 0; i < lines.Count; i++)
             {
-                string line = SpeechTextSanitizer.Normalize(lines[i]);
+                string line = SpokenLines.Clean(lines[i]);
                 if (!string.IsNullOrWhiteSpace(line))
                 {
                     return line;
@@ -246,7 +247,7 @@ namespace SongsOfConquestAccess.Adapters
             out ArtifactDetails artifact)
         {
             artifact = default(ArtifactDetails);
-            string normalizedLine = SpeechTextSanitizer.Normalize(capturedLine).Trim();
+            string normalizedLine = SpokenLines.Clean(capturedLine).Trim();
             if (artifacts == null || string.IsNullOrWhiteSpace(normalizedLine))
             {
                 return false;
@@ -254,7 +255,7 @@ namespace SongsOfConquestAccess.Adapters
 
             for (int i = 0; i < artifacts.Length; i++)
             {
-                string name = SpeechTextSanitizer.Normalize(Localize(localization, artifacts[i].NameKey)).Trim();
+                string name = SpokenLines.Clean(Localize(localization, artifacts[i].NameKey)).Trim();
                 if (string.Equals(normalizedLine, name, StringComparison.OrdinalIgnoreCase))
                 {
                     artifact = artifacts[i];

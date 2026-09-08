@@ -21,7 +21,7 @@ using SongsOfConquest.Common.Map;
 using SongsOfConquest.Server.Map;
 using SongsOfConquestAccess.Localization;
 using SongsOfConquestAccess.Scanner;
-using SongsOfConquestAccess.Speech;
+using SongsOfConquestAccess.UI;
 using Unity.Mathematics;
 using UnityEngine;
 using UnityEngine.UI;
@@ -819,7 +819,7 @@ namespace SongsOfConquestAccess.Adapters
                     continue;
                 }
 
-                string name = SpeechTextSanitizer.Normalize(entity.Name);
+                string name = SpokenLines.Clean(entity.Name);
                 if (string.IsNullOrWhiteSpace(name))
                 {
                     continue;
@@ -854,7 +854,7 @@ namespace SongsOfConquestAccess.Adapters
                 SocAccessMod.Instance?.LogWarning("PreBattleMenuAdapter failed to localize troop name: " + ex.Message);
             }
 
-            name = SpeechTextSanitizer.Normalize(name);
+            name = SpokenLines.Clean(name);
             if (string.IsNullOrWhiteSpace(name))
             {
                 name = "troops";
@@ -1062,7 +1062,7 @@ namespace SongsOfConquestAccess.Adapters
                 return string.Empty;
             }
 
-            return SpeechTextSanitizer.Normalize(UITextMeshTextUtility.GetEffectiveText(text));
+            return SpokenLines.Clean(UITextMeshTextUtility.GetEffectiveText(text));
         }
 
         private static bool IsVisibleText(UITextMesh text)

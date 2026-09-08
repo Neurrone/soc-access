@@ -402,7 +402,7 @@ namespace SongsOfConquestAccess.Adapters
 
         private string GetLocalizedText(string key, string fallback)
         {
-            return SpeechTextSanitizer.Normalize(GameText.Get(_localization, key, fallback ?? string.Empty));
+            return SpokenLines.Clean(GameText.Get(_localization, key, fallback ?? string.Empty));
         }
 
         private static LobbyNavigation FindNavigationFor(LobbyMenu menu)
@@ -434,7 +434,7 @@ namespace SongsOfConquestAccess.Adapters
 
         private static string GetText(IUITextMesh textMesh)
         {
-            return SpeechTextSanitizer.Normalize(UITextMeshTextUtility.GetEffectiveText(textMesh));
+            return SpokenLines.Clean(UITextMeshTextUtility.GetEffectiveText(textMesh));
         }
 
         private static T GetField<T>(object owner, FieldInfo field) where T : class
@@ -615,7 +615,7 @@ namespace SongsOfConquestAccess.Adapters
             private string GetName()
             {
                 UITextMesh text = GetField<UITextMesh>(_entry, NameTextField);
-                return SpeechTextSanitizer.Normalize(UITextMeshTextUtility.GetEffectiveText(text));
+                return SpokenLines.Clean(UITextMeshTextUtility.GetEffectiveText(text));
             }
 
             private string GetFactionLabel()
@@ -778,7 +778,7 @@ namespace SongsOfConquestAccess.Adapters
                     return string.Empty;
                 }
 
-                return SpeechTextSanitizer.Normalize(GameText.Get(_adapter != null ? _adapter._localization : null, key, string.Empty));
+                return SpokenLines.Clean(GameText.Get(_adapter != null ? _adapter._localization : null, key, string.Empty));
             }
 
             private static bool IsVisible(Component component)
@@ -938,7 +938,7 @@ namespace SongsOfConquestAccess.Adapters
 
             private static string GetText(IUITextMesh textMesh)
             {
-                return SpeechTextSanitizer.Normalize(UITextMeshTextUtility.GetEffectiveText(textMesh));
+                return SpokenLines.Clean(UITextMeshTextUtility.GetEffectiveText(textMesh));
             }
         }
 

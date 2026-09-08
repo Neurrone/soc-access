@@ -12,7 +12,7 @@ using SongsOfConquest.Common.Gamestate;
 using SongsOfConquest.Common.Gamestate.Facade;
 using SongsOfConquestAccess.Adapters;
 using SongsOfConquestAccess.Events;
-using SongsOfConquestAccess.Speech;
+using SongsOfConquestAccess.UI;
 using UnityEngine;
 
 namespace SongsOfConquestAccess
@@ -242,7 +242,7 @@ namespace SongsOfConquestAccess
                     continue;
                 }
 
-                string label = SpeechTextSanitizer.Normalize(UITextMeshTextUtility.GetEffectiveText(text));
+                string label = SpokenLines.Clean(UITextMeshTextUtility.GetEffectiveText(text));
                 if (!string.IsNullOrWhiteSpace(label))
                 {
                     return label;

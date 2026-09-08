@@ -7,7 +7,7 @@ using SongsOfConquest.Client.UI;
 using SongsOfConquestAccess.Adapters;
 using SongsOfConquestAccess.Events;
 using SongsOfConquestAccess.Localization;
-using SongsOfConquestAccess.Speech;
+using SongsOfConquestAccess.UI;
 using UnityEngine;
 
 namespace SongsOfConquestAccess
@@ -34,7 +34,7 @@ namespace SongsOfConquestAccess
         [HarmonyPostfix]
         private static void SimpleNotificationShowPostfix(string localizedString)
         {
-            string normalized = SpeechTextSanitizer.Normalize(localizedString);
+            string normalized = SpokenLines.Clean(localizedString);
             if (string.IsNullOrWhiteSpace(normalized) || IsNewArtifactBadge(normalized))
             {
                 return;
@@ -83,7 +83,7 @@ namespace SongsOfConquestAccess
                 text = entryInfo.Text;
             }
 
-            text = SpeechTextSanitizer.Normalize(text);
+            text = SpokenLines.Clean(text);
             if (string.IsNullOrWhiteSpace(text))
             {
                 return;
@@ -96,7 +96,7 @@ namespace SongsOfConquestAccess
         [HarmonyPostfix]
         private static void ObjectiveAnimationShowPostfix(ObjectiveAnimation __instance, ObjectivesHUD.LocalizedObjective localizedObjective, bool canBeCompleted, Vector3 destination, ObjectiveAnimation.ObjectiveState state)
         {
-            string text = SpeechTextSanitizer.Normalize(GetVisibleText(__instance));
+            string text = SpokenLines.Clean(GetVisibleText(__instance));
             if (string.IsNullOrWhiteSpace(text))
             {
                 return;
@@ -114,7 +114,7 @@ namespace SongsOfConquestAccess
                 return;
             }
 
-            string text = SpeechTextSanitizer.Normalize(GetVisibleText(__instance));
+            string text = SpokenLines.Clean(GetVisibleText(__instance));
             if (string.IsNullOrWhiteSpace(text))
             {
                 return;
@@ -127,7 +127,7 @@ namespace SongsOfConquestAccess
         [HarmonyPostfix]
         private static void CenteredNotificationShowPostfix(string text)
         {
-            string normalized = SongsOfConquestAccess.Speech.SpeechTextSanitizer.Normalize(text);
+            string normalized = SongsOfConquestAccess.UI.SpokenLines.Clean(text);
             if (string.IsNullOrWhiteSpace(normalized))
             {
                 return;
@@ -140,7 +140,7 @@ namespace SongsOfConquestAccess
         [HarmonyPostfix]
         private static void CenteredNotificationHeavyShowPostfix(string text)
         {
-            string normalized = SongsOfConquestAccess.Speech.SpeechTextSanitizer.Normalize(text);
+            string normalized = SongsOfConquestAccess.UI.SpokenLines.Clean(text);
             if (string.IsNullOrWhiteSpace(normalized))
             {
                 return;
@@ -186,7 +186,7 @@ namespace SongsOfConquestAccess
                     continue;
                 }
 
-                string text = SpeechTextSanitizer.Normalize(UITextMeshTextUtility.GetEffectiveText(textMesh));
+                string text = SpokenLines.Clean(UITextMeshTextUtility.GetEffectiveText(textMesh));
                 if (string.IsNullOrWhiteSpace(text))
                 {
                     continue;

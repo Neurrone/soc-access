@@ -9,7 +9,6 @@ using SongsOfConquest.Client.UI;
 using SongsOfConquest.Common.Economy;
 using SongsOfConquest.Common.Gamestate;
 using SongsOfConquest.Common.Localization;
-using SongsOfConquestAccess.Speech;
 using SongsOfConquestAccess.UI;
 using UnityEngine;
 
@@ -377,7 +376,7 @@ namespace SongsOfConquestAccess.Adapters
             string text = _localization != null ? _localization.GetText(key) : string.Empty;
             if (!string.IsNullOrWhiteSpace(text) && text != key)
             {
-                return SpeechTextSanitizer.Normalize(text);
+                return SpokenLines.Clean(text);
             }
 
             switch (resourceType)
@@ -393,7 +392,7 @@ namespace SongsOfConquestAccess.Adapters
 
         private static string GetText(IUITextMesh textMesh)
         {
-            return SpeechTextSanitizer.Normalize(UITextMeshTextUtility.GetEffectiveText(textMesh));
+            return SpokenLines.Clean(UITextMeshTextUtility.GetEffectiveText(textMesh));
         }
 
         private static T GetField<T>(object owner, FieldInfo field) where T : class

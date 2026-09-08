@@ -11,8 +11,8 @@ namespace SongsOfConquestAccess.UI
     /// paragraph. A screen reader must hear neither the tags nor a whole block as one breath, so
     /// every raw string is split on its newlines FIRST and each line then loses its tags and its
     /// doubled spaces. The order matters: a normaliser that collapses whitespace before splitting
-    /// swallows the newlines, which is the defect the repo's rule against
-    /// <c>SpeechTextSanitizer.Normalize</c> exists for.
+    /// swallows the newlines and the reader hears the whole block as one breath, which is the
+    /// defect this class exists to avoid.
     ///
     /// &lt;br&gt; IS A LINE BREAK, not a tag to drop: the game writes rows with it where it does not
     /// write a newline (the spellbook's essence tooltip is
@@ -39,22 +39,39 @@ namespace SongsOfConquestAccess.UI
 
             foreach (string text in raw)
             {
-                if (string.IsNullOrEmpty(text))
-                {
-                    continue;
-                }
-
-                foreach (string part in LineBreaksDrawn.Replace(text, "\n").Split(LineBreaks))
-                {
-                    string line = Spaces.Replace(Tags.Replace(part, string.Empty), " ").Trim();
-                    if (line.Length > 0)
-                    {
-                        lines.Add(line);
-                    }
-                }
+                AddLines(text, lines);
             }
 
             return lines;
+        }
+
+        /// <summary>
+        /// The lines <see cref="Of"/> would make of one raw string, joined back with newlines.
+        /// Empty when there is nothing to say, so a caller testing
+        /// <c>string.IsNullOrWhiteSpace</c> on the result still sees nothing.
+        /// </summary>
+        public static string Clean(string raw)
+        {
+            List<string> lines = new List<string>();
+            AddLines(raw, lines);
+            return string.Join("\n", lines.ToArray());
+        }
+
+        private static void AddLines(string text, List<string> lines)
+        {
+            if (string.IsNullOrEmpty(text))
+            {
+                return;
+            }
+
+            foreach (string part in LineBreaksDrawn.Replace(text, "\n").Split(LineBreaks))
+            {
+                string line = Spaces.Replace(Tags.Replace(part, string.Empty), " ").Trim();
+                if (line.Length > 0)
+                {
+                    lines.Add(line);
+                }
+            }
         }
     }
 }

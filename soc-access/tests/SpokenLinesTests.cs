@@ -36,5 +36,21 @@ namespace SongsOfConquestAccess.Tests
             CollectionAssert.AreEqual(new[] { "Skills" }, (List<string>)lines);
             Assert.AreEqual(0, SpokenLines.Of(null).Count);
         }
+
+        [TestMethod]
+        public void CleanKeepsTheLinesOfOneRawString()
+        {
+            Assert.AreEqual(
+                "Offence: 10\nDefence: 5\nMovement: 12",
+                SpokenLines.Clean("<b>Offence</b>: 10\nDefence:   5\r\n\n<i>Movement</i>: 12"));
+        }
+
+        [TestMethod]
+        public void CleanTrimsASingleLabel()
+        {
+            Assert.AreEqual("Start Campaign", SpokenLines.Clean("  <color=#decca8>Start  Campaign</color> "));
+            Assert.AreEqual(string.Empty, SpokenLines.Clean(null));
+            Assert.AreEqual(string.Empty, SpokenLines.Clean("   "));
+        }
     }
 }

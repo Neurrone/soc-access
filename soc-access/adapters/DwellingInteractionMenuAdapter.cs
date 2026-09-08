@@ -6,7 +6,7 @@ using SongsOfConquest.Client.Adventure.UI;
 using SongsOfConquest.Client.Gamestate;
 using SongsOfConquest.Client.UI;
 using SongsOfConquest.Common.Localization;
-using SongsOfConquestAccess.Speech;
+using SongsOfConquestAccess.UI;
 using UnityEngine;
 
 namespace SongsOfConquestAccess.Adapters
@@ -62,7 +62,7 @@ namespace SongsOfConquestAccess.Adapters
                 string name = _facade != null && _facade.Commanders != null && commanderId >= 0
                     ? _facade.Commanders.GetName(commanderId)
                     : string.Empty;
-                return SpeechTextSanitizer.Normalize(name);
+                return SpokenLines.Clean(name);
             }
         }
 
@@ -156,7 +156,7 @@ namespace SongsOfConquestAccess.Adapters
 
         public string BackLabel
         {
-            get { return SpeechTextSanitizer.Normalize(MenuButtonTextUtility.GetAllVisibleText(GetField<UIButton>(_menu, BackToTopButtonField))); }
+            get { return SpokenLines.Clean(MenuButtonTextUtility.GetAllVisibleText(GetField<UIButton>(_menu, BackToTopButtonField))); }
         }
 
         public bool IsBackVisible()
@@ -217,7 +217,7 @@ namespace SongsOfConquestAccess.Adapters
 
         private static string GetText(IUITextMesh textMesh)
         {
-            return SpeechTextSanitizer.Normalize(UITextMeshTextUtility.GetEffectiveText(textMesh));
+            return SpokenLines.Clean(UITextMeshTextUtility.GetEffectiveText(textMesh));
         }
 
         private static T GetField<T>(object owner, FieldInfo field) where T : class

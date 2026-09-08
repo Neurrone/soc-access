@@ -9,6 +9,7 @@ using SongsOfConquest.Common.Battle;
 using SongsOfConquest.Common.Details;
 using SongsOfConquest.Common.Localization;
 using SongsOfConquestAccess.Speech;
+using SongsOfConquestAccess.UI;
 using UnityEngine;
 
 namespace SongsOfConquestAccess.Adapters
@@ -155,7 +156,7 @@ namespace SongsOfConquestAccess.Adapters
             Transform title = band != null ? band.Find("Title") : null;
             UITextMesh text = title != null ? title.GetComponent<UITextMesh>() : null;
             return text != null && text.gameObject.activeInHierarchy
-                ? SpeechTextSanitizer.Normalize(UITextMeshTextUtility.GetEffectiveText(text))
+                ? SpokenLines.Clean(UITextMeshTextUtility.GetEffectiveText(text))
                 : string.Empty;
         }
 
@@ -414,7 +415,7 @@ namespace SongsOfConquestAccess.Adapters
 
             int amount;
             return TryParsePositiveInt(text, out amount) && _localization != null
-                ? SpeechTextSanitizer.Normalize(_localization.GetText("Common/Stats/xp", amount))
+                ? SpokenLines.Clean(_localization.GetText("Common/Stats/xp", amount))
                 : text;
         }
 
@@ -448,7 +449,7 @@ namespace SongsOfConquestAccess.Adapters
 
             for (int i = 0; i < tooltip.TextLines.Count; i++)
             {
-                string line = SpeechTextSanitizer.Normalize(tooltip.TextLines[i]);
+                string line = SpokenLines.Clean(tooltip.TextLines[i]);
                 if (!string.IsNullOrWhiteSpace(line))
                 {
                     return line;
@@ -465,7 +466,7 @@ namespace SongsOfConquestAccess.Adapters
 
         private static string GetText(UITextMesh text)
         {
-            return SpeechTextSanitizer.Normalize(UITextMeshTextUtility.GetEffectiveText(text));
+            return SpokenLines.Clean(UITextMeshTextUtility.GetEffectiveText(text));
         }
 
         private bool IsTextVisible(FieldInfo field)

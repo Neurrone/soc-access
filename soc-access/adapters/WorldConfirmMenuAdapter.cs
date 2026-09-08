@@ -7,7 +7,6 @@ using SongsOfConquest.Client.Adventure.WorldMenuComponents;
 using SongsOfConquest.Client.UI;
 using SongsOfConquest.Common.Economy;
 using SongsOfConquest.Common.Localization;
-using SongsOfConquestAccess.Speech;
 using SongsOfConquestAccess.UI;
 using UnityEngine;
 
@@ -189,7 +188,7 @@ namespace SongsOfConquestAccess.Adapters
 
         private static string GetText(IUITextMesh textMesh)
         {
-            return SpeechTextSanitizer.Normalize(UITextMeshTextUtility.GetEffectiveText(textMesh));
+            return SpokenLines.Clean(UITextMeshTextUtility.GetEffectiveText(textMesh));
         }
 
         private static string GetButtonText(UIButton button)
@@ -205,7 +204,7 @@ namespace SongsOfConquestAccess.Adapters
             }
 
             return System.Text.RegularExpressions.Regex.Replace(
-                SpeechTextSanitizer.Normalize(text),
+                SpokenLines.Clean(text),
                 @"-\s+(\d)",
                 "-$1");
         }

@@ -4,7 +4,7 @@ using System.Reflection;
 using HarmonyLib;
 using SongsOfConquest.Client.Lobby;
 using SongsOfConquest.Client.UI;
-using SongsOfConquestAccess.Speech;
+using SongsOfConquestAccess.UI;
 
 namespace SongsOfConquestAccess.Adapters
 {
@@ -38,7 +38,7 @@ namespace SongsOfConquestAccess.Adapters
 
         private static string NormalizeSingleLine(string value)
         {
-            return SpeechTextSanitizer.Normalize(value);
+            return SpokenLines.Clean(value);
         }
 
         private static string NormalizeMultiline(string value)
@@ -53,7 +53,7 @@ namespace SongsOfConquestAccess.Adapters
             bool lastWasBlank = false;
             for (int i = 0; i < rawLines.Length; i++)
             {
-                string line = SpeechTextSanitizer.Normalize(rawLines[i]);
+                string line = SpokenLines.Clean(rawLines[i]);
                 if (string.IsNullOrWhiteSpace(line))
                 {
                     if (lines.Count > 0 && !lastWasBlank)

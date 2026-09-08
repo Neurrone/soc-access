@@ -12,7 +12,6 @@ using SongsOfConquest.Common.GameActions;
 using SongsOfConquest.Common.Gamestate;
 using SongsOfConquest.Common.Localization;
 using SongsOfConquestAccess.Localization;
-using SongsOfConquestAccess.Speech;
 using SongsOfConquestAccess.UI;
 using UnityEngine;
 using UnityEngine.UI;
@@ -120,7 +119,7 @@ namespace SongsOfConquestAccess.Adapters
                 }
 
                 ICommanderState storedCommander = facade.MapEntities.GetStoredCommander(entity.Id);
-                return storedCommander != null ? SpeechTextSanitizer.Normalize(facade.Commanders.GetName(storedCommander.Id)) : string.Empty;
+                return storedCommander != null ? SpokenLines.Clean(facade.Commanders.GetName(storedCommander.Id)) : string.Empty;
             }
         }
 
@@ -357,7 +356,7 @@ namespace SongsOfConquestAccess.Adapters
         private string GetLocalizedText(string key, string fallback)
         {
             ILocalizationHandler localization = Localization;
-            return SpeechTextSanitizer.Normalize(GameText.Get(localization, key, fallback ?? string.Empty));
+            return SpokenLines.Clean(GameText.Get(localization, key, fallback ?? string.Empty));
         }
 
         private void GetUpgradeCounts(out int used, out int total)
@@ -398,14 +397,14 @@ namespace SongsOfConquestAccess.Adapters
             IReadOnlyList<string> lines = NativeTooltipUtility.ToSpeechLines(details, Localization);
             for (int i = 0; i < lines.Count; i++)
             {
-                string line = SpeechTextSanitizer.Normalize(lines[i]);
+                string line = SpokenLines.Clean(lines[i]);
                 if (!string.IsNullOrWhiteSpace(line))
                 {
                     return BuildActionLabel(line, details);
                 }
             }
 
-            return SpeechTextSanitizer.Normalize(action.ActionType.ToString());
+            return SpokenLines.Clean(action.ActionType.ToString());
         }
 
         private string BuildActionLabel(string baseLabel, IDetails details)
@@ -443,7 +442,7 @@ namespace SongsOfConquestAccess.Adapters
                 case EssenceType.Destruction:
                     return GetLocalizedText("Units/Types/Destruction", "Destruction");
                 default:
-                    return SpeechTextSanitizer.Normalize(essenceType.ToString());
+                    return SpokenLines.Clean(essenceType.ToString());
             }
         }
 
@@ -479,7 +478,7 @@ namespace SongsOfConquestAccess.Adapters
 
         private static string GetText(UITextMesh text)
         {
-            return SpeechTextSanitizer.Normalize(UITextMeshTextUtility.GetEffectiveText(text));
+            return SpokenLines.Clean(UITextMeshTextUtility.GetEffectiveText(text));
         }
 
         // A text mesh the game may have written more than one paragraph into.

@@ -1,10 +1,10 @@
 using System.Collections.Generic;
 using System.Reflection;
+using SongsOfConquestAccess.UI;
 using _8_UILayer.ClientView.Menu.Paus;
 using HarmonyLib;
 using SongsOfConquest.Client.InputManagement;
 using SongsOfConquest.Client.UI;
-using SongsOfConquestAccess.Speech;
 using UnityEngine;
 
 namespace SongsOfConquestAccess.Adapters
@@ -26,7 +26,7 @@ namespace SongsOfConquestAccess.Adapters
             get
             {
                 PauseMenu.Settings settings = Settings;
-                return SpeechTextSanitizer.Normalize(
+                return SpokenLines.Clean(
                     UITextMeshTextUtility.GetEffectiveText(settings != null ? settings.titleText : null));
             }
         }
