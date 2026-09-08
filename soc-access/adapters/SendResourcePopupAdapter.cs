@@ -275,13 +275,22 @@ namespace SongsOfConquestAccess.Adapters
                 return NativeSelectionUtility.Click(_button);
             }
 
-            // The tooltip as the game wrote it, one drawn line at a time.
+            // The tooltip as the game wrote it, one drawn line at a time. Captured ONCE per item:
+            // the reason and the ally's holding are two readings of the same capture, and the item
+            // itself is built anew on every build.
+            private IList<string> _lines;
+
             private IList<string> TooltipLines
             {
                 get
                 {
-                    Tooltip tooltip = Tooltip;
-                    return SpokenLines.Of(tooltip != null ? tooltip.TextLines : null);
+                    if (_lines == null)
+                    {
+                        Tooltip tooltip = Tooltip;
+                        _lines = SpokenLines.Of(tooltip != null ? tooltip.TextLines : null);
+                    }
+
+                    return _lines;
                 }
             }
         }

@@ -233,13 +233,22 @@ namespace SongsOfConquestAccess.Adapters
 
             // The tooltip as the game wrote it, one drawn line at a time: the title, the custom name,
             // and - only where the game is refusing - the reason, which it appends to the custom name
-            // behind a newline rather than as a line of its own.
+            // behind a newline rather than as a line of its own. Captured ONCE per item: the name,
+            // the custom name and the reason are three readings of the same capture, and the item
+            // itself is built anew on every build.
+            private IList<string> _lines;
+
             private IList<string> TooltipLines
             {
                 get
                 {
-                    Tooltip tooltip = Tooltip;
-                    return SpokenLines.Of(tooltip != null ? tooltip.TextLines : null);
+                    if (_lines == null)
+                    {
+                        Tooltip tooltip = Tooltip;
+                        _lines = SpokenLines.Of(tooltip != null ? tooltip.TextLines : null);
+                    }
+
+                    return _lines;
                 }
             }
 
