@@ -34,7 +34,8 @@ player can hear. Everything else should read exactly as it did after phase F.
 
 ## Needs the owner
 
-- Combat's "Backslash moves" and "Backslash attacks" were not walked in a battle.
+- Combat's "Backslash moves" and "Backslash attacks" were read in a REPL battle (a reachable
+  tile and an enemy troop); a real-keys walk is still yours.
 - The player manual (`docs_src/`) is stale about the widget era and needs its own pass.
 
 ## Performance pass (2026-09-09)
@@ -74,3 +75,11 @@ things to watch and what turned up:
   not drawn on an offline lobby), the community browser's report and notification panels
   (mod.io unauthenticated) and its collection page (nothing subscribed). Their fixes are by
   inspection; read each once when you have the fixture.
+- **The post-battle result page** now snapshots its troop columns once the game's result
+  animation ends (the hook the mod already had); the reading is byte-identical, the build
+  fell from 10 ms to 0.1 ms with eight entries. Read one result page after a real battle.
+- **The battle HUD fallback was not needed on the live path**: in a REPL battle the scene
+  container resolved both types directly. It stays as a safety net.
+- **The running game was not saved.** Two REPL battles were fought from the wielder's tile
+  and cost troops in the loaded session; the wielder never moved and the turn was not
+  ended. Reloading the autosave restores everything.
