@@ -67,3 +67,10 @@ things to watch and what turned up:
 - **The HUD's marketplace button** is named from the first line of a tooltip the game
   recomposes, so after the marketplace has been opened once it reads "Marketplace bonus
   3/5" instead of "Open Marketplace" (pre-existing; a state-dependent name).
+- **Player stats tab names match English.** `PlayerStatsAdapter.FindTabLabel` looks for the
+  drawn words "Overall" and "Battle", so in any other language both tabs fall back to the
+  mod's own strings (pre-existing). Worth reading the tab's own component instead.
+- **Not measured for want of a fixture:** the lobby's player settings page (its button is
+  not drawn on an offline lobby), the community browser's report and notification panels
+  (mod.io unauthenticated) and its collection page (nothing subscribed). Their fixes are by
+  inspection; read each once when you have the fixture.
