@@ -372,6 +372,10 @@ namespace SongsOfConquestAccess.Screens
         private void BuildSpells(GraphBuilder builder)
         {
             IReadOnlyList<SpellbookAdapter.SchoolItem> schools = Items("schools", Live.GetSchools);
+
+            // Every column's spells in one pass over the entries: asking column by column walked the
+            // whole list six times a frame.
+            Dictionary<SpellbookSpellGroup, List<SpellbookAdapter.SpellItem>> spells = Grouped();
             for (int i = 0; i < schools.Count; i++)
             {
                 SpellbookAdapter.SchoolItem school = schools[i];
@@ -380,10 +384,10 @@ namespace SongsOfConquestAccess.Screens
                     continue;
                 }
 
-                BuildColumn(builder, school.Group, school.Title, school);
+                BuildColumn(builder, school.Group, school.Title, school, spells);
             }
 
-            BuildColumn(builder, SpellbookSpellGroup.Multi, ModText.Get(ModStrings.Screens.MultiEssenceSpells), null);
+            BuildColumn(builder, SpellbookSpellGroup.Multi, ModText.Get(ModStrings.Screens.MultiEssenceSpells), null, spells);
             builder.SetRegion(null);
         }
 
@@ -395,11 +399,15 @@ namespace SongsOfConquestAccess.Screens
             GraphBuilder builder,
             SpellbookSpellGroup group,
             string title,
-            SpellbookAdapter.SchoolItem school)
+            SpellbookAdapter.SchoolItem school,
+            Dictionary<SpellbookSpellGroup, List<SpellbookAdapter.SpellItem>> grouped)
         {
-            IReadOnlyList<SpellbookAdapter.SpellItem> spells = Items(
-                group.ToString(),
-                () => Live.GetSpells(group));
+            List<SpellbookAdapter.SpellItem> spells;
+            if (grouped == null || !grouped.TryGetValue(group, out spells) || spells == null)
+            {
+                spells = EmptySpells;
+            }
+
             if (spells.Count == 0 && school == null)
             {
                 return;
@@ -518,6 +526,23 @@ namespace SongsOfConquestAccess.Screens
 
         /// <summary>One section's items, or none where reading them threw: a part of the window the
         /// game has stopped answering for costs its own rows and never the rest of the page.</summary>
+        private static readonly List<SpellbookAdapter.SpellItem> EmptySpells =
+            new List<SpellbookAdapter.SpellItem>();
+
+        /// <summary>Every column's spells, or none where reading them threw.</summary>
+        private Dictionary<SpellbookSpellGroup, List<SpellbookAdapter.SpellItem>> Grouped()
+        {
+            try
+            {
+                return Live.GetSpellsByGroup();
+            }
+            catch (Exception exception)
+            {
+                SocAccessMod.Instance?.LogWarning("SpellbookScreen section spells failed to build: " + exception);
+                return null;
+            }
+        }
+
         private static IReadOnlyList<T> Items<T>(string section, Func<IReadOnlyList<T>> getter)
         {
             try

@@ -71,6 +71,14 @@ namespace SongsOfConquestAccess.Adapters
         private readonly SpellBook _spellbook;
         private SpellbookSpellEntry _hoveredEntry;
 
+        // The quick bar's header mesh and the component the auto-fill box hangs its tooltip on: both
+        // are fixed for the window's life, and finding either walks a subtree. Cached on the miss too
+        // (the probed flags), so an absent one costs one walk and not one a frame.
+        private UITextMesh _quickbarHeader;
+        private bool _quickbarHeaderProbed;
+        private Component _autoPopulateLabelled;
+        private bool _autoPopulateLabelledProbed;
+
         public SpellbookAdapter(SpellBook spellbook)
         {
             _spellbook = spellbook;
@@ -143,12 +151,24 @@ namespace SongsOfConquestAccess.Adapters
         /// <summary>The drawn header over the quick bar.</summary>
         public string GetQuickbarHeaderText()
         {
+            UITextMesh header = GetQuickbarHeader();
+            return header == null ? string.Empty : UITextMeshTextUtility.GetEffectiveText(header);
+        }
+
+        private UITextMesh GetQuickbarHeader()
+        {
+            if (_quickbarHeaderProbed)
+            {
+                return _quickbarHeader;
+            }
+
             SpellbookQuickbar quickbar = GetQuickbar();
             if (quickbar == null)
             {
-                return string.Empty;
+                return null;
             }
 
+            _quickbarHeaderProbed = true;
             List<SpellbookQuickbarEntry> entries = QuickbarEntriesField != null
                 ? QuickbarEntriesField.GetValue(quickbar) as List<SpellbookQuickbarEntry>
                 : null;
@@ -161,14 +181,14 @@ namespace SongsOfConquestAccess.Adapters
                     continue;
                 }
 
-                string value = UITextMeshTextUtility.GetEffectiveText(text);
-                if (!string.IsNullOrWhiteSpace(value))
+                if (!string.IsNullOrWhiteSpace(UITextMeshTextUtility.GetEffectiveText(text)))
                 {
-                    return value;
+                    _quickbarHeader = text;
+                    return text;
                 }
             }
 
-            return string.Empty;
+            return null;
         }
 
         // The cost numbers a slot draws are text meshes of the quick bar too; only the header sits
@@ -187,9 +207,12 @@ namespace SongsOfConquestAccess.Adapters
             return false;
         }
 
-        public IReadOnlyList<SpellItem> GetSpells(SpellbookSpellGroup group)
+        /// <summary>Every drawn spell, under the column it belongs to. One pass over the entries:
+        /// asking for one column at a time walked all of them once per column.</summary>
+        public Dictionary<SpellbookSpellGroup, List<SpellItem>> GetSpellsByGroup()
         {
-            List<SpellItem> items = new List<SpellItem>();
+            Dictionary<SpellbookSpellGroup, List<SpellItem>> groups =
+                new Dictionary<SpellbookSpellGroup, List<SpellItem>>();
             IReadOnlyList<SpellbookSpellEntry> entries = GetEntries();
             for (int i = 0; i < entries.Count; i++)
             {
@@ -199,13 +222,18 @@ namespace SongsOfConquestAccess.Adapters
                     continue;
                 }
 
-                if (GetGroup(entry.SpellDefinition) == group)
+                SpellbookSpellGroup group = GetGroup(entry.SpellDefinition);
+                List<SpellItem> items;
+                if (!groups.TryGetValue(group, out items))
                 {
-                    items.Add(new SpellItem(this, entry, group.ToString().ToLowerInvariant() + "-" + entry.SpellDefinition.Id));
+                    items = new List<SpellItem>();
+                    groups.Add(group, items);
                 }
+
+                items.Add(new SpellItem(this, entry, group.ToString().ToLowerInvariant() + "-" + entry.SpellDefinition.Id));
             }
 
-            return items;
+            return groups;
         }
 
         public IReadOnlyList<QuickbarItem> GetQuickbarItems()
@@ -240,8 +268,28 @@ namespace SongsOfConquestAccess.Adapters
 
         public string GetAutoPopulateLabel()
         {
+            Component labelled = GetAutoPopulateLabelled();
+            return labelled == null ? string.Empty : GetTooltipLabel(labelled);
+        }
+
+        // Which child of the box carries the tooltip that names it is fixed for the window's life, so
+        // the subtree is walked once and the answer - including "none" - is kept.
+        private Component GetAutoPopulateLabelled()
+        {
+            if (_autoPopulateLabelledProbed)
+            {
+                return _autoPopulateLabelled;
+            }
+
             UIToggle toggle = GetAutoPopulateToggle();
-            return GetFirstTooltipLabel(toggle);
+            if (toggle == null)
+            {
+                return null;
+            }
+
+            _autoPopulateLabelledProbed = true;
+            _autoPopulateLabelled = FindFirstTooltipComponent(toggle);
+            return _autoPopulateLabelled;
         }
 
         public bool IsAutoPopulateChecked()
@@ -917,11 +965,11 @@ namespace SongsOfConquestAccess.Adapters
             return parts.Count == 0 ? string.Empty : string.Join(". ", parts.ToArray());
         }
 
-        private string GetFirstTooltipLabel(Component root)
+        private Component FindFirstTooltipComponent(Component root)
         {
             if (root == null)
             {
-                return string.Empty;
+                return null;
             }
 
             Component[] components = root.GetComponentsInChildren<Component>(true);
@@ -933,14 +981,13 @@ namespace SongsOfConquestAccess.Adapters
                     continue;
                 }
 
-                string label = GetTooltipLabel(component);
-                if (!string.IsNullOrWhiteSpace(label))
+                if (!string.IsNullOrWhiteSpace(GetTooltipLabel(component)))
                 {
-                    return label;
+                    return component;
                 }
             }
 
-            return string.Empty;
+            return null;
         }
 
         private UIButton GetTutorialButton()
