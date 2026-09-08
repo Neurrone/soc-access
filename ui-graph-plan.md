@@ -14,7 +14,7 @@ current phase in §7 and its rows in §8, then `docs/dev-loop.md` for the verifi
 Every screen goes through §4's loop; the before-capture must be taken on the unported build,
 before the screen is touched. Commit per logical step and update this file as decisions are
 taken; prune it at the end of each phase so it holds only what the remaining work needs.
-Phases A to D are done (2026-09-08). Start at phase E.
+Phases A to E are done (2026-09-08). Start at phase F.
 
 Owner decisions already made (do not re-ask):
 
@@ -78,7 +78,8 @@ and `AdvancedEncounterPlayScreen*.cs` for combat, `HeroInspectionScreen.cs` and
 
 ## 1. What still stands of the widget engine
 
-Paths relative to `soc-access/`. This is what the unported screens (§8) are built on.
+Paths relative to `soc-access/`. Every screen is a graph screen now; this is what phase F
+replaces and phase G deletes.
 
 - `screens/Screen.cs` is the base of both engines: `IsPresent()`, `OnPush/OnFocus/OnUnfocus/
   OnPop`, `Update`, `HasClaimed`, `OnActionJustPressed`, `CurrentTooltip`.
@@ -92,14 +93,13 @@ Paths relative to `soc-access/`. This is what the unported screens (§8) are bui
   the stack after a hot reload by asking each registered factory's screen `IsPresent()`;
   `_storySequenceActive` is the flag behind `StoryFocusBlockerScreen`. Its knowledge is the
   most expensive thing in the repo to lose: in phase F move it, never rewrite it.
-- `ui/UIManager.cs` and `ui/Widget.cs` are the widget focus engine; the widget kinds still
-  in use by the two unported screens are `ContainerWidget`, `MenuWidget` + `MenuItemWidget`,
-  `ButtonWidget`, `TextWidget`, `CombatHexGrid`, `TroopPlacementHexGrid`. `AdventureMapGrid`
-  + `TileSkipNavigator` still derive from `Widget` but are in no widget tree any more (the map
-  is ported); `TroopHudMenu` is dead. Every other `ui/*Widget.cs` is dead code for G. `Portrait` is still
-  read by ported screens as a native-portrait reader. `TextInputEchoHelper` survives as the
-  graph editor's echo. `TooltipActionsMenuScreen` (Backquote) stays until no unported screen
-  hands out a `TooltipAction`.
+- `ui/UIManager.cs` and `ui/Widget.cs` are the widget focus engine; no screen puts a widget in a
+  tree any more. `AdventureMapGrid`, `TroopPlacementHexGrid` and `CombatHexGrid` still derive
+  from `Widget` but are the modes' cursors, in no tree (drop the base in G). `TroopHudMenu` and
+  every other `ui/*Widget.cs` are dead code for G. `Portrait` is still read by ported screens as
+  a native-portrait reader. `TextInputEchoHelper` survives as the graph editor's echo.
+  `TooltipActionsMenuScreen` (Backquote) is unreachable from any screen and goes in G with the
+  `TooltipAction`s the adapters still build.
 - Widget-era input actions (`input/AccessibilityActions.cs`): `next_widget`, `next_menu_item`,
   `activate`, `cancel`, `start_drag`, `slider_*`, the map, combat, scanner and bookmark sets;
   the physical bindings are in `input/KeyboardBinding.cs`. The input stand-down for a
@@ -240,9 +240,9 @@ screen answers it, so an unclaimed key still reaches the game.
 | `ui_back` | something is being carried, `Screen.ConsumesBack`, or a search is live | cancel the carry, else `Screen.Back()`; in a search, "Search cleared" |
 | letters, Space mid-search | `AllowsTypeahead && !CapturesRawInput`, no Ctrl or Alt held, no game box focused | type-ahead over the focused stop plus the fully-open build |
 
-Still to add: the mode keys (phase E), answered through the existing screen-level hook
-`GraphScreen.ClaimsAction`/`OnAction` the quick splits use. `troop_split_1..10` (Ctrl+1..0)
-are claimed only while a troop row is focused.
+A mode's keys (`GraphScreen.ModeClaims`) are asked before this whole table and run through
+`OnAction`; anything else a screen takes (`ClaimsAction`) is asked after it. `troop_split_1..10`
+(Ctrl+1..0) are claimed only while a troop row is focused.
 Type-ahead ranks by match tier before list order; a chord is never typing; a group header
 the game wires no click to gets no `OnActivate` (Right is the way in). `GraphState` is keyed by
 screen instance, so cursor memory across a push and pop is lost until phase F's registered
@@ -278,18 +278,10 @@ singletons restore it.
 release debounce and the game's own key handling are only proved with `/key` or a hand on the
 keyboard. `/key` refuses while the game window is not in the foreground (a locked desktop).
 
-## 5. Widget kind to graph model (the kinds still to port)
+## 5. Widget kind to graph model
 
-| Today | Graph model |
-|---|---|
-| `ContainerWidget` with `AnnounceName` | `PushContext(label)` or a `BeginStop` when it is a panel the player tabs to |
-| `MenuWidget` + `MenuItemWidget` | menu mode: one node per item |
-| `ButtonWidget` | `Button` |
-| `TextWidget` heading / body | region name, never a node (unless it carries a tooltip) / read-only `Text` node with `Sections` |
-| `TroopHudMenu` | `TroopHudRows.Rows` in the map's HUD stop |
-| `AdventureMapGrid` + `TileSkipNavigator` | a MODE: one node on a map stop whose handler owns the tile cursor; the grid class survives, wrapped |
-| `CombatHexGrid`, `TroopPlacementHexGrid` | the same mode shape |
-| `Portrait` | an announcement part, not a node |
+Every kind is ported. The mode shape (a grid class as the cursor behind one node) is in §7
+phase E; the rest is in the ported screens.
 
 ## 6. Localization
 
@@ -342,61 +334,28 @@ game runs only on mouse-over (a tooltip recomposed on hover) is run through the 
 method before the mod reads it; a wielder band inside a menu whose canvas group the game
 never enabled refuses every click, so a REPL-opened prompt variant is not a fixture.
 
-### Phase E — modes
+### Phase E — modes (done)
 
-Remaining: `PreBattleMenuScreen` (troop placement hex grid; smallest mode, first) and
-`CombatScreen` with `CombatTroopCycle` (combat hex grid, timeline, troop cycling, threat).
-The grid classes survive as the mode's cursor; the side panels become stops, and the mode node
-owns its keys, its buffer and its exit announcement. A battle is reached by walking the map
-cursor onto a neutral army and pressing the right-click action twice; the post-game pages by
-Surrender in the pause menu (a fresh random skirmish).
-
-`AdventureMapScreen` is done (2026-09-08) and is the worked example of the shape: ONE node
-with a fixed `ControlId` on the mode's stop, so the navigator never announces a move and the
-cursor class speaks each landing itself (queued, not interrupting - the router has already
-silenced the reader for the key, and a skip's "Skipped N tiles" must precede the tile). The
-review buffer refills on its own because the node's readout changed, so no buffer override was
-needed. `ModeClaims` answers the cursor's whole key set while its node is focused AND
-translates the graph's own navigation keys onto it (`ui_up` to the move, `ui_home` to the
-scanner jump), so an injected key behaves exactly as the physical one the router resolves to
-the mod's map action first.
-
-Approved model for `PreBattleMenuScreen` (2026-09-08), a sibling of `PostBattleResultScreen`
-(same `AdventureBattleMenu` frame): screen name stays "Troop placement"; stops Attacker (the
-commander line with the portrait tooltip, then a threat-level line with the scouting tooltip
-when drawn on that side), Defender (name line, "Threat Level – ..." line with the scouting
-tooltip, scouting information line when drawn), the grid (a mode node named by the instruction
-text; hex moves, skips, Ctrl+Space, scanner families, Home/End/Backspace through `ModeClaims`;
-the carry replaces the widget drag: Space picks up an own troop, Enter drops through the game's
-grab-and-drop, a refused drop says the existing "Invalid destination", Escape cancels; a
-passive watcher speaks a changed instruction queued), Buttons (Withdraw, Manual Battle, Quick
-Battle, Ready when drawn, by drawn left edge), and a final stop holding the drawn "Drag troops to
-rearrange" hint as a line (owner ruling). Start node the attacker line. Escape is the game's
-(no exit action registered; Withdraw has side effects). Type-ahead is on for the whole screen
-EXCEPT while the grid node is focused (`AllowsTypeahead` answers per focused node); the map's
-screen-wide off was for the map's own letter hotkeys, which this screen has only on the grid.
-
-Approved model for `CombatScreen` (2026-09-08). Screen name stays "Combat". Stops, in this
-order: Battlefield (the mode node, named by the existing combat grid string or by the spell /
-ability targeting instruction while aiming; one node with a fixed id; label = the adapter's
-tile description with the inspect context, buffer = the inspect tooltip; `ModeClaims` takes the
-hex moves and skips, Ctrl+Space, I inspect, the comma/period acting and enemy troop cycles,
-Space to the acting troop, W relevant tiles, T to the turn order stop, S threat, the scanner
-families with Home/End/Backspace; Enter confirms a target while aiming and is silent
-otherwise (the game binds no confirm key in battle); Backslash is the game's right click;
-type-ahead off on this node only; inspect is a sub-mode, Escape claimed only while inspecting
-or aiming, cancelling through the adapter as today); Quickbar when drawn (the spell slots down
-the left edge); Attacker (player name when drawn, portrait line with tooltip, Auto Battle,
-Essences region, Spells or Cancel spell, which the game draws in the Spells spot while aiming);
-Defender, same shape, when a wielder is drawn; Current troop (a line, Enter moves the cursor to
-it; its ability button or Cancel ability as the next row when drawn); Turn order (the queue
-with round markers, Enter on a troop moves the cursor; T lands here); Game menu (Chat, Game
-Menu); Battle log when drawn; End turn alone. Escape on a HUD stop returns to the battlefield
-with today's sound; on the battlefield otherwise it is the game's. Spell cast and ability
-targeting land focus on the battlefield silently and speak the instruction; the queue change is
-free under immediate mode; `CombatTroopCycle`, the narrator and the combat events buffer stay.
-Multiplayer follow-ups, not ported: the turn timer beside End Turn and the per-side player
-message panels (textless or unmeasured; need a multiplayer fixture).
+`AdventureMapScreen`, `PreBattleMenuScreen`, `CombatScreen`, 2026-09-08 (§8). The shape, for
+phase F and any later mode: ONE node with a fixed `ControlId` on the mode's stop, so the
+navigator never announces a move and the cursor class (`AdventureMapGrid`,
+`TroopPlacementHexGrid`, `CombatHexGrid`) speaks each landing itself, queued, because the
+router has already silenced the reader for the key and a skip's count must precede the tile;
+the review buffer refills on its own because the node's readout changed. `GraphScreen.ModeClaims`
+answers the cursor's whole key set while its node is focused and translates the graph's own keys
+onto it (`ui_up` to the move on the map, `ui_home`/`ui_end`/`ui_clear_search` to the scanner's
+jump, distance and return), so an injected key behaves as the physical one; a hex board leaves
+the arrows alone. The stop is named by the mode's word, replaced by the game's instruction text
+while the game has armed a targeting state (teleport, spell, ability), and a passive watcher
+speaks a replaced instruction queued. A mod-owned state on the node (a carry, inspect, aiming)
+is the only time the node claims Escape; a HUD stop's Escape lands back on the node with
+`Common_ClosePauseMenu`; landings from a cycle or a queue row are `FocusNode(announce: false)`
+because the cursor has just read the tile. Rules learned: a pick-up query declared only on some
+tiles changes the node's part count and makes the live watch re-read the tile, so declare it on
+every tile and answer null; a cancel the game draws in another control's spot (Cancel spell in
+the Spells spot, Cancel ability on the acting troop) is declared there, not in a stop of its own;
+a `Resources.FindObjectsOfTypeAll` reached from a build costs about 19 ms a frame per read, so
+adapters cache what a menu keeps, misses included (`AGENTS.md`, Performance).
 
 ### Phase F — the screen manager swap
 
@@ -453,19 +412,19 @@ was deleted in A. Phase C: `PauseMenuScreen`, `WorldConfirmMenuScreen`, `ClaimMe
 `SpellbookScreen`, `MoveTroopPopupScreen`, `WorldChoiceMenuScreen`,
 `ArtifactMarketScreen`, `TradingScreen`, `HostileJoinMenuScreen`, `SettlementScreen`,
 `DefenceMenuScreen`, `TroopManagementScreenBase`, `DraftTroopsScreen`, `UpgradeTroopsScreen`,
-`RallyPointScreen`. Phase E: `AdventureMapScreen`. Unverified corners: `MessageDialogScreen`'s random event and custom
-message sources (no reachable state produced them), a recruit card's essence tab row, and on
-the map the teleport mode, the town list, the chat button and the bug report button (no
-reachable state drew any of them).
+`RallyPointScreen`. Phase E: `AdventureMapScreen`, `PreBattleMenuScreen`, `CombatScreen`.
+Unverified corners: `MessageDialogScreen`'s random event and custom message sources (no
+reachable state produced them), a recruit card's essence tab row; on the map the teleport mode,
+the town list, the chat and bug report buttons; on placement the hot-seat defender turn and
+Ready, an attacker threat level, the scouting lines, the multiplayer wait; in combat the
+quickbar, a defender wielder, the battle log, spell and ability aiming, the multiplayer names
+and turn timer (no reachable state drew any of them).
 
-Remaining, with what the file constructs today and the proposed model (a proposal, not a
-decision, until the owner approves it; phase E's three are proposed by family as before):
+Remaining:
 
 | Screen | Widgets today | Proposed model | Phase |
 |---|---|---|---|
-| `TooltipActionsMenuScreen` | Menu | stays a widget screen until no unported screen hands out `TooltipAction`s; deleted in G | G |
-| `PreBattleMenuScreen` | TroopPlacementHexGrid, Buttons, Text | mode node plus buttons stop | E |
-| `CombatScreen` (+ `CombatTroopCycle`) | CombatHexGrid, CombatTroopCycle, Menu, Buttons, Text | mode node, timeline stop, actions stop | E |
+| `TooltipActionsMenuScreen` | Menu | unreachable now; deleted in G with the adapters' `TooltipAction`s | G |
 | `StoryFocusBlockerScreen` | Container | deleted in F; becomes a predicate | F |
 
 ## 9. Risks
