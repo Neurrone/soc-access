@@ -375,10 +375,10 @@ msgctxt "UI.CombatDisconnectedTiles"
 msgid "Some shown tiles are separated. Use W and Shift W to reach all range tiles."
 msgstr "표시된 일부 칸이 서로 떨어져 있습니다. 모든 사거리 칸에 도달하려면 W와 Shift W를 사용하세요."
 
-#. UI.CombatGrid
-msgctxt "UI.CombatGrid"
-msgid "Combat grid"
-msgstr "전투 격자"
+#. UI.Battlefield
+msgctxt "UI.Battlefield"
+msgid "Battlefield"
+msgstr "전장"
 
 #. UI.Cancelled
 msgctxt "UI.Cancelled"
@@ -735,11 +735,6 @@ msgctxt "Screens.ArtifactUseHint"
 msgid "{0} uses."
 msgstr "{0} 키로 사용."
 
-#. Screens.AttackerEssence
-msgctxt "Screens.AttackerEssence"
-msgid "Attacker essence"
-msgstr "공격자 정수"
-
 #. Screens.Available
 msgctxt "Screens.Available"
 msgid "Available"
@@ -809,11 +804,6 @@ msgstr "현재 부대, {0}"
 msgctxt "Screens.CurrentTroopSection"
 msgid "Current troop"
 msgstr "현재 부대"
-
-#. Screens.DefenderEssence
-msgctxt "Screens.DefenderEssence"
-msgid "Defender essence"
-msgstr "방어자 정수"
 
 #. Screens.Downloads
 msgctxt "Screens.Downloads"

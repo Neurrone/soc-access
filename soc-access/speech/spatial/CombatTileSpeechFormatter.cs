@@ -28,7 +28,7 @@ namespace SongsOfConquestAccess.Speech.Spatial
         {
             if (tile == null)
             {
-                return ModText.Get(ModStrings.UI.CombatGrid);
+                return ModText.Get(ModStrings.UI.Battlefield);
             }
 
             return ConfigurableAnnouncementComposer.Compose(

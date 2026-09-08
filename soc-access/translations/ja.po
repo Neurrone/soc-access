@@ -375,10 +375,10 @@ msgctxt "UI.CombatDisconnectedTiles"
 msgid "Some shown tiles are separated. Use W and Shift W to reach all range tiles."
 msgstr "表示されている一部のタイルは離れています。すべての射程タイルに移動するには W と Shift W を使ってください。"
 
-#. UI.CombatGrid
-msgctxt "UI.CombatGrid"
-msgid "Combat grid"
-msgstr "戦闘グリッド"
+#. UI.Battlefield
+msgctxt "UI.Battlefield"
+msgid "Battlefield"
+msgstr "戦場"
 
 #. UI.Cancelled
 msgctxt "UI.Cancelled"
@@ -735,11 +735,6 @@ msgctxt "Screens.ArtifactUseHint"
 msgid "{0} uses."
 msgstr "{0} で使用します。"
 
-#. Screens.AttackerEssence
-msgctxt "Screens.AttackerEssence"
-msgid "Attacker essence"
-msgstr "攻撃側エッセンス"
-
 #. Screens.Available
 msgctxt "Screens.Available"
 msgid "Available"
@@ -809,11 +804,6 @@ msgstr "現在の部隊、{0}"
 msgctxt "Screens.CurrentTroopSection"
 msgid "Current troop"
 msgstr "現在の部隊"
-
-#. Screens.DefenderEssence
-msgctxt "Screens.DefenderEssence"
-msgid "Defender essence"
-msgstr "防御側エッセンス"
 
 #. Screens.Downloads
 msgctxt "Screens.Downloads"

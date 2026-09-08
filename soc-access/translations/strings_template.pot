@@ -1989,9 +1989,9 @@ msgctxt "UI.CombatDisconnectedTiles"
 msgid "Some shown tiles are separated. Use W and Shift W to reach all range tiles."
 msgstr ""
 
-#. UI.CombatGrid
-msgctxt "UI.CombatGrid"
-msgid "Combat grid"
+#. UI.Battlefield
+msgctxt "UI.Battlefield"
+msgid "Battlefield"
 msgstr ""
 
 #. UI.Cancelled
@@ -2404,11 +2404,6 @@ msgctxt "Screens.Attacker"
 msgid "Attacker"
 msgstr ""
 
-#. Screens.AttackerEssence
-msgctxt "Screens.AttackerEssence"
-msgid "Attacker essence"
-msgstr ""
-
 #. Screens.AttackerPortrait
 msgctxt "Screens.AttackerPortrait"
 msgid "Attacker portrait"
@@ -2592,11 +2587,6 @@ msgstr ""
 #. Screens.Defender
 msgctxt "Screens.Defender"
 msgid "Defender"
-msgstr ""
-
-#. Screens.DefenderEssence
-msgctxt "Screens.DefenderEssence"
-msgid "Defender essence"
 msgstr ""
 
 #. Screens.DefenderPortrait

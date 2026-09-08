@@ -375,10 +375,10 @@ msgctxt "UI.CombatDisconnectedTiles"
 msgid "Some shown tiles are separated. Use W and Shift W to reach all range tiles."
 msgstr "Certaines cases affichées sont séparées. Utilisez W et Maj W pour atteindre toutes les cases à portée."
 
-#. UI.CombatGrid
-msgctxt "UI.CombatGrid"
-msgid "Combat grid"
-msgstr "Grille de combat"
+#. UI.Battlefield
+msgctxt "UI.Battlefield"
+msgid "Battlefield"
+msgstr "Champ de bataille"
 
 #. UI.Cancelled
 msgctxt "UI.Cancelled"
@@ -735,11 +735,6 @@ msgctxt "Screens.ArtifactUseHint"
 msgid "{0} uses."
 msgstr "{0} pour utiliser."
 
-#. Screens.AttackerEssence
-msgctxt "Screens.AttackerEssence"
-msgid "Attacker essence"
-msgstr "Essence attaquant"
-
 #. Screens.Available
 msgctxt "Screens.Available"
 msgid "Available"
@@ -809,11 +804,6 @@ msgstr "Troupe actuelle, {0}"
 msgctxt "Screens.CurrentTroopSection"
 msgid "Current troop"
 msgstr "Troupe actuelle"
-
-#. Screens.DefenderEssence
-msgctxt "Screens.DefenderEssence"
-msgid "Defender essence"
-msgstr "Essence défenseur"
 
 #. Screens.Downloads
 msgctxt "Screens.Downloads"

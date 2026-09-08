@@ -395,10 +395,10 @@ msgctxt "UI.CombatDisconnectedTiles"
 msgid "Some shown tiles are separated. Use W and Shift W to reach all range tiles."
 msgstr "Деякі показані клітинки відокремлені. Використовуйте W і Shift W, щоб дістатися до всіх клітинок у радіусі."
 
-#. UI.CombatGrid
-msgctxt "UI.CombatGrid"
-msgid "Combat grid"
-msgstr "Бойова сітка"
+#. UI.Battlefield
+msgctxt "UI.Battlefield"
+msgid "Battlefield"
+msgstr "Поле бою"
 
 #. UI.Cancelled
 msgctxt "UI.Cancelled"
@@ -755,11 +755,6 @@ msgctxt "Screens.ArtifactUseHint"
 msgid "{0} uses."
 msgstr "{0}, щоб використати."
 
-#. Screens.AttackerEssence
-msgctxt "Screens.AttackerEssence"
-msgid "Attacker essence"
-msgstr "Есенція нападника"
-
 #. Screens.Available
 msgctxt "Screens.Available"
 msgid "Available"
@@ -829,11 +824,6 @@ msgstr "Поточне військо, {0}"
 msgctxt "Screens.CurrentTroopSection"
 msgid "Current troop"
 msgstr "Поточне військо"
-
-#. Screens.DefenderEssence
-msgctxt "Screens.DefenderEssence"
-msgid "Defender essence"
-msgstr "Есенція захисника"
 
 #. Screens.Downloads
 msgctxt "Screens.Downloads"

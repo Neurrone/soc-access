@@ -462,7 +462,7 @@ namespace SongsOfConquestAccess.Localization
             public static readonly ModString ColumnTroop = new ModString("UI.ColumnTroop", "Troop");
             public static readonly ModString ColumnWielder = new ModString("UI.ColumnWielder", "Wielder");
             public static readonly ModString CombatDisconnectedTiles = new ModString("UI.CombatDisconnectedTiles", "Some shown tiles are separated. Use W and Shift W to reach all range tiles.");
-            public static readonly ModString CombatGrid = new ModString("UI.CombatGrid", "Combat grid");
+            public static readonly ModString Battlefield = new ModString("UI.Battlefield", "Battlefield");
             public static readonly ModString Cancelled = new ModString("UI.Cancelled", "Cancelled.");
             public static readonly ModString DragCancelled = new ModString("UI.DragCancelled", "Drag cancelled.");
             public static readonly ModString DragComplete = new ModString("UI.DragComplete", "Drag complete.");
@@ -549,7 +549,6 @@ namespace SongsOfConquestAccess.Localization
             public static readonly ModString AiControl = new ModString("Screens.AiControl", "AI control");
             public static readonly ModString AiDifficulty = new ModString("Screens.AiDifficulty", "{0} AI");
             public static readonly ModString Attacker = new ModString("Screens.Attacker", "Attacker");
-            public static readonly ModString AttackerEssence = new ModString("Screens.AttackerEssence", "Attacker essence");
             public static readonly ModString AttackerPortrait = new ModString("Screens.AttackerPortrait", "Attacker portrait");
             public static readonly ModString Audio = new ModString("Screens.Audio", "Audio");
             public static readonly ModString AudioGlossary = new ModString("Screens.AudioGlossary", "Audio glossary");
@@ -587,7 +586,6 @@ namespace SongsOfConquestAccess.Localization
             public static readonly ModString CurrentTroopSection = new ModString("Screens.CurrentTroopSection", "Current troop");
             public static readonly ModString CombatPortraitDetail = new ModString("Screens.CombatPortraitDetail", "{0}, {1}, level {2}");
             public static readonly ModString Defender = new ModString("Screens.Defender", "Defender");
-            public static readonly ModString DefenderEssence = new ModString("Screens.DefenderEssence", "Defender essence");
             public static readonly ModString DefenderPortrait = new ModString("Screens.DefenderPortrait", "Defender portrait");
             public static readonly ModString Downloads = new ModString("Screens.Downloads", "Downloads");
             public static readonly ModString Duration = new ModString("Screens.Duration", "Duration");

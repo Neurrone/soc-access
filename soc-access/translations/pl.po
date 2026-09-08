@@ -380,10 +380,10 @@ msgctxt "UI.CombatDisconnectedTiles"
 msgid "Some shown tiles are separated. Use W and Shift W to reach all range tiles."
 msgstr "Niektóre pokazane pola są oddzielone. Użyj W i Shift W, aby dotrzeć do wszystkich pól w zasięgu."
 
-#. UI.CombatGrid
-msgctxt "UI.CombatGrid"
-msgid "Combat grid"
-msgstr "Siatka walki"
+#. UI.Battlefield
+msgctxt "UI.Battlefield"
+msgid "Battlefield"
+msgstr "Pole bitwy"
 
 #. UI.Cancelled
 msgctxt "UI.Cancelled"
@@ -740,11 +740,6 @@ msgctxt "Screens.ArtifactUseHint"
 msgid "{0} uses."
 msgstr "{0}, aby użyć."
 
-#. Screens.AttackerEssence
-msgctxt "Screens.AttackerEssence"
-msgid "Attacker essence"
-msgstr "Esencja atakującego"
-
 #. Screens.Available
 msgctxt "Screens.Available"
 msgid "Available"
@@ -814,11 +809,6 @@ msgstr "Obecny oddział, {0}"
 msgctxt "Screens.CurrentTroopSection"
 msgid "Current troop"
 msgstr "Obecny oddział"
-
-#. Screens.DefenderEssence
-msgctxt "Screens.DefenderEssence"
-msgid "Defender essence"
-msgstr "Esencja obrońcy"
 
 #. Screens.Downloads
 msgctxt "Screens.Downloads"

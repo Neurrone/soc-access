@@ -289,7 +289,7 @@ namespace SongsOfConquestAccess.Screens
         private string BoardContext()
         {
             string instruction = IsAiming ? InstructionText : null;
-            return string.IsNullOrWhiteSpace(instruction) ? ModText.Get(ModStrings.UI.CombatGrid) : instruction;
+            return string.IsNullOrWhiteSpace(instruction) ? ModText.Get(ModStrings.UI.Battlefield) : instruction;
         }
 
         private Tooltip TileTooltip()

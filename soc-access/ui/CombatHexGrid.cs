@@ -83,7 +83,7 @@ namespace SongsOfConquestAccess.UI
                 && _adapter.IsSpellTargetSelected(_cursor);
             return _adapter != null
                 ? _adapter.DescribeTile(tile, GetEffectiveInspectContext(), selectedForSpellcast)
-                : ModText.Get(ModStrings.UI.CombatGrid);
+                : ModText.Get(ModStrings.UI.Battlefield);
         }
 
         public override Tooltip GetTooltip()

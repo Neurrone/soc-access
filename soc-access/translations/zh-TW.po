@@ -148,7 +148,7 @@ msgstr "{0} 個格子"
 #. Draft.Purchase
 msgctxt "Draft.Purchase"
 msgid "Purchase"
-msgstr "购买"
+msgstr "購買"
 
 #. Draft.AvailableTroops_0
 msgctxt "Draft.AvailableTroops_0"
@@ -333,7 +333,7 @@ msgstr "不能放在那裡。"
 #. UI.CharacterColon
 msgctxt "UI.CharacterColon"
 msgid "colon"
-msgstr "冒号"
+msgstr "冒號"
 
 #. UI.CharacterComma
 msgctxt "UI.CharacterComma"
@@ -348,7 +348,7 @@ msgstr "短橫線"
 #. UI.CharacterDot
 msgctxt "UI.CharacterDot"
 msgid "dot"
-msgstr "点"
+msgstr "點"
 
 #. UI.CharacterSemicolon
 msgctxt "UI.CharacterSemicolon"
@@ -375,10 +375,10 @@ msgctxt "UI.CombatDisconnectedTiles"
 msgid "Some shown tiles are separated. Use W and Shift W to reach all range tiles."
 msgstr "部分顯示的格子彼此不相連。使用 W 和 Shift W 可到達所有射程格子。"
 
-#. UI.CombatGrid
-msgctxt "UI.CombatGrid"
-msgid "Combat grid"
-msgstr "戰鬥網格"
+#. UI.Battlefield
+msgctxt "UI.Battlefield"
+msgid "Battlefield"
+msgstr "戰場"
 
 #. UI.Cancelled
 msgctxt "UI.Cancelled"
@@ -428,7 +428,7 @@ msgstr "空"
 #. UI.EmptyTroopSlot
 msgctxt "UI.EmptyTroopSlot"
 msgid "Empty troop {0}"
-msgstr "空部队{0}"
+msgstr "空部隊{0}"
 
 #. UI.ExitedInspectMode
 msgctxt "UI.ExitedInspectMode"
@@ -478,7 +478,7 @@ msgstr "按空白鍵拖曳。"
 #. UI.RoleButton
 msgctxt "UI.RoleButton"
 msgid "button"
-msgstr "按钮"
+msgstr "按鈕"
 
 #. UI.RoleCheckBox
 msgctxt "UI.RoleCheckBox"
@@ -493,7 +493,7 @@ msgstr "欄標題"
 #. UI.RoleDocument
 msgctxt "UI.RoleDocument"
 msgid "document"
-msgstr "文档"
+msgstr "文件"
 
 #. UI.RoleEdit
 msgctxt "UI.RoleEdit"
@@ -508,7 +508,7 @@ msgstr "可編輯"
 #. UI.RoleGrid
 msgctxt "UI.RoleGrid"
 msgid "grid"
-msgstr "网格"
+msgstr "網格"
 
 #. UI.RoleGroup
 msgctxt "UI.RoleGroup"
@@ -518,7 +518,7 @@ msgstr "群組"
 #. UI.RoleMenu
 msgctxt "UI.RoleMenu"
 msgid "menu"
-msgstr "菜单"
+msgstr "選單"
 
 #. UI.RoleRadioButton
 msgctxt "UI.RoleRadioButton"
@@ -528,7 +528,7 @@ msgstr "選項按鈕"
 #. UI.RoleSlider
 msgctxt "UI.RoleSlider"
 msgid "slider"
-msgstr "滑块"
+msgstr "滑桿"
 
 #. UI.SearchCleared
 msgctxt "UI.SearchCleared"
@@ -543,7 +543,7 @@ msgstr "沒有符合 {0} 的項目"
 #. UI.Selected
 msgctxt "UI.Selected"
 msgid "selected"
-msgstr "已选中"
+msgstr "已選取"
 
 #. UI.Slot
 msgctxt "UI.Slot"
@@ -593,7 +593,7 @@ msgstr "遞減"
 #. UI.Target
 msgctxt "UI.Target"
 msgid "target"
-msgstr "目标"
+msgstr "目標"
 
 #. UI.TroopSlot
 msgctxt "UI.TroopSlot"
@@ -693,7 +693,7 @@ msgstr "未選取"
 #. Screens.AdventureMap
 msgctxt "Screens.AdventureMap"
 msgid "Adventure map"
-msgstr "冒险地图"
+msgstr "冒險地圖"
 
 #. Screens.ArtifactDestroyHint
 msgctxt "Screens.ArtifactDestroyHint"
@@ -734,11 +734,6 @@ msgstr "按 {0} 卸下。"
 msgctxt "Screens.ArtifactUseHint"
 msgid "{0} uses."
 msgstr "按 {0} 使用。"
-
-#. Screens.AttackerEssence
-msgctxt "Screens.AttackerEssence"
-msgid "Attacker essence"
-msgstr "攻擊方精華"
 
 #. Screens.Available
 msgctxt "Screens.Available"
@@ -788,7 +783,7 @@ msgstr "聊天，未讀訊息"
 #. Screens.Close
 msgctxt "Screens.Close"
 msgid "Close"
-msgstr "关闭"
+msgstr "關閉"
 
 #. Screens.CampaignMissionProgress
 msgctxt "Screens.CampaignMissionProgress"
@@ -798,22 +793,17 @@ msgstr "已完成：{0} / {1} 個任務"
 #. Screens.Combat
 msgctxt "Screens.Combat"
 msgid "Combat"
-msgstr "战斗"
+msgstr "戰鬥"
 
 #. Screens.CurrentTroop
 msgctxt "Screens.CurrentTroop"
 msgid "Current troop, {0}"
-msgstr "当前部队，{0}"
+msgstr "目前部隊，{0}"
 
 #. Screens.CurrentTroopSection
 msgctxt "Screens.CurrentTroopSection"
 msgid "Current troop"
 msgstr "當前部隊"
-
-#. Screens.DefenderEssence
-msgctxt "Screens.DefenderEssence"
-msgid "Defender essence"
-msgstr "防守方精华"
 
 #. Screens.Downloads
 msgctxt "Screens.Downloads"
@@ -828,7 +818,7 @@ msgstr "空"
 #. Screens.GraphType
 msgctxt "Screens.GraphType"
 msgid "Graph type"
-msgstr "图表类型"
+msgstr "圖表類型"
 
 #. Screens.General
 msgctxt "Screens.General"
@@ -838,7 +828,7 @@ msgstr "一般"
 #. Screens.Group
 msgctxt "Screens.Group"
 msgid "Group {0}"
-msgstr "组 {0}"
+msgstr "組 {0}"
 
 #. Screens.KeywordAlreadyAdded
 msgctxt "Screens.KeywordAlreadyAdded"
@@ -853,7 +843,7 @@ msgstr "佈局"
 #. Screens.MainMenu
 msgctxt "Screens.MainMenu"
 msgid "Main menu"
-msgstr "主菜单"
+msgstr "主選單"
 
 #. Screens.Map
 msgctxt "Screens.Map"
@@ -873,7 +863,7 @@ msgstr "王國"
 #. Screens.MissingBuilding
 msgctxt "Screens.MissingBuilding"
 msgid "missing building"
-msgstr "缺少建筑"
+msgstr "缺少建築"
 
 #. Screens.ModOptions
 msgctxt "Screens.ModOptions"
@@ -898,7 +888,7 @@ msgstr "多精華法術"
 #. Screens.NamedLevel
 msgctxt "Screens.NamedLevel"
 msgid "{0}, level {1}"
-msgstr "{0}，等级 {1}"
+msgstr "{0}，等級 {1}"
 
 #. Screens.NoBuildSiteSelected
 msgctxt "Screens.NoBuildSiteSelected"
@@ -908,7 +898,7 @@ msgstr "尚未選擇建造地點"
 #. Screens.None
 msgctxt "Screens.None"
 msgid "None"
-msgstr "无"
+msgstr "無"
 
 #. Screens.Notifications
 msgctxt "Screens.Notifications"
@@ -963,12 +953,12 @@ msgstr "有一段距離"
 #. Screens.Ok
 msgctxt "Screens.Ok"
 msgid "OK"
-msgstr "确定"
+msgstr "確定"
 
 #. Screens.PostAdventureResult
 msgctxt "Screens.PostAdventureResult"
 msgid "Post adventure result"
-msgstr "冒险后结果"
+msgstr "冒險後結果"
 
 #. Screens.Purchase
 msgctxt "Screens.Purchase"
@@ -993,12 +983,12 @@ msgstr "朗讀劇情鏡頭焦點變更事件"
 #. Screens.RecruitFrom
 msgctxt "Screens.RecruitFrom"
 msgid "Recruit from"
-msgstr "招募来源"
+msgstr "招募來源"
 
 #. Screens.RecruitingFrom
 msgctxt "Screens.RecruitingFrom"
 msgid "Recruiting from {0}"
-msgstr "从 {0} 招募"
+msgstr "從 {0} 招募"
 
 #. Screens.Recruits
 msgctxt "Screens.Recruits"
@@ -1033,7 +1023,7 @@ msgstr "第 {0} 回合"
 #. Screens.SettlementTroops
 msgctxt "Screens.SettlementTroops"
 msgid "settlement troops"
-msgstr "定居点部队"
+msgstr "定居點部隊"
 
 #. Screens.Skill
 msgctxt "Screens.Skill"
@@ -1063,7 +1053,7 @@ msgstr "提示操作"
 #. Screens.Tier
 msgctxt "Screens.Tier"
 msgid "Tier"
-msgstr "阶级"
+msgstr "階級"
 
 #. Screens.TownStatus
 msgctxt "Screens.TownStatus"
@@ -1113,7 +1103,7 @@ msgstr "部隊部署"
 #. Screens.TurnOrder
 msgctxt "Screens.TurnOrder"
 msgid "Turn order"
-msgstr "回合顺序"
+msgstr "回合順序"
 
 #. Screens.WielderDead
 msgctxt "Screens.WielderDead"
