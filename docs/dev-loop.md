@@ -283,9 +283,17 @@ Filled in as the loop is used; keep entries to one line each with the date.
 - 2026-09-07: REPL recipes for phase D fixtures. The game object is not in the project
   context: resolve it from the AdventureScene's `Zenject.SceneContext` (`FindObjectsOfTypeAll<SceneContext>()`,
   `Container.TryResolve<Lavapotion.Networking.IGame>()`); the same container answers
-  `IAdventureMenuSystem` and `IHUDActionSignals`. A map entity is spawned beside the wielder with
+  `IAdventureMenuSystem`, `IHUDActionSignals` and `ISelectionHandler`
+  (`SongsOfConquest.Client.Gamestate`), whose `SelectedCommander.Position` is the selected
+  wielder's tile as a `Vector2Int`; `x + 1` on the same row is always a neighbour on this hex
+  grid. A map entity is spawned beside the wielder with
   `game.server.Commands.ProcessServerRequest(new CreateAdventureMapEntityCommand.Request((ushort)blueprint, position))`
-  (the debug console's own route; the state appears a frame later): 174 is an artifact market
+  (`SongsOfConquest.Common.Entities.Adventure`; the debug console's own route; the state
+  appears a frame later, and the mod's "Revealed ..." line in the eval's `speech` confirms
+  it landed). Verified 2026-09-08 in one eval: resolve `IGame` and `ISelectionHandler` from the
+  scene contexts, `var target = new UnityEngine.Vector2Int(sel.SelectedCommander.Position.x + 1, sel.SelectedCommander.Position.y);`,
+  then the request above with `(ushort)174` and `target`. `IGame` has no `state` member; do not
+  guess one to check the tile, the speech line is the check. 174 is an artifact market
   (Raider's Market; 156 is the resource market), 285 a standalone rally point (claim it with
   `ClaimMapEntityCommand.Request(commanderId, entityId)`). Menus open through the menu system:
   `ShowArtifactMarketMenu(entityId, commanderId)`, `OpenDefenceMenu(entity)`,
