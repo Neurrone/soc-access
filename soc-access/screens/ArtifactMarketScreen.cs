@@ -13,32 +13,34 @@ namespace SongsOfConquestAccess.Screens
 {
     /// <summary>
     /// The artifact merchant a wielder walks into. Seven places to be, in the order the menu draws
-    /// them: the wielder band across the top, the merchant's own words, the purchase, the sale, the
-    /// wielder's equipment, their backpack, and the close cross.
+    /// them: the wielder band across the top, the merchant's own words, the purchase, the sale (only
+    /// while an artifact is up for sale), the wielder's equipment, their backpack, and the close
+    /// cross.
     ///
-    /// THE DESCRIPTION IS A STOP OF ITS OWN and holds nothing else, so a player who came to trade
-    /// tabs past the merchant's paragraph rather than arrowing through it to reach the offers.
+    /// THE DESCRIPTION IS A STOP OF ITS OWN, so a player who came to trade tabs past the merchant's
+    /// paragraph rather than arrowing through it to reach the offers. It holds the merchant's words
+    /// and, while nothing is selected, the game's prompt ("Select an artifact to sell or purchase")
+    /// as a second line (owner ruling 2026-09-08): the prompt is the state of the whole menu rather
+    /// than of either half of the band, and saying it once in each half read as two things to do.
     ///
     /// PURCHASE holds everything buying takes, in the order the menu draws it: a region named
     /// "Filters" over the nine category filters as ONE radio row named by the game's own tooltips on
     /// the toggles (never choosing on arrival - switching category throws the offers away and clears
     /// the selection), a region named "Available" over the offers the grid really holds (the game
-    /// pads the grid to 24 empty cells, which are not content), and, at the end of the stop, the buy
-    /// half of the SELECTION BAND: the line naming what is being bought and the Buy button.
+    /// pads the grid to 24 empty cells, which are not content; a category with nothing in it is one
+    /// line saying so, so the region is never silent), and, while an offer is selected, the buy half
+    /// of the SELECTION BAND at the end of the stop: the line naming what is being bought and the
+    /// Buy button.
     ///
-    /// SELL is that band's other half as a stop of its own, right after Purchase, so the sale a
-    /// player sets up from the backpack is one Tab away rather than behind every offer. It is named
-    /// by the word the game itself writes over the button.
+    /// SELL is that band's other half as a stop of its own, right after Purchase, declared only while
+    /// the game paints it, so the sale a player sets up from the backpack is one Tab away and a
+    /// market with nothing selected has no empty stop to tab through. It is named by the word the
+    /// game itself writes over the button.
     ///
-    /// THE GAME DRAWS ONE BAND with three containers, and each is declared in the stop it answers
-    /// for: the prompt ("Select an artifact to sell or purchase") stands in Sell while nothing is
-    /// being sold and in Purchase while nothing is being bought, because it is the answer to both
-    /// questions - the game paints it in one place only, but it is the state of both halves, so both
-    /// stops keep a line to be at. The band's nodes are keyed structurally and drawn by whichever
-    /// container the game paints for that half, so a cursor standing on the band stays there and
-    /// hears the line turn from the prompt into the artifact; the parts are watched live, the price
-    /// rides on the button, and the button is gone entirely while that half has nothing selected,
-    /// and for an important artifact, whose Sell button the game does not draw.
+    /// THE GAME DRAWS ONE BAND with three containers - the prompt, the purchase, the sale - and
+    /// paints one of them at a time. Each half's nodes are keyed structurally, the parts are watched
+    /// live, the price rides on the button, and the button is gone for an important artifact, whose
+    /// Sell button the game does not draw.
     ///
     /// THE CLICKS MEAN SOMETHING ELSE HERE than they do on the wielder sheet, and the difference is
     /// the game's, not the mod's - the same two native handlers branch on
@@ -177,18 +179,26 @@ namespace SongsOfConquestAccess.Screens
 
         // ---- the merchant's words ----
 
-        /// <summary>What the merchant says about itself, as one node of its paragraphs.</summary>
+        /// <summary>What the merchant says about itself, as one node of its paragraphs, and then the
+        /// band's prompt while the game is painting it: nothing is selected to buy or sell.</summary>
         private void BuildDescription(GraphBuilder builder)
         {
             string description = _adapter.Description;
-            if (string.IsNullOrWhiteSpace(description))
+            if (!string.IsNullOrWhiteSpace(description))
             {
-                return;
+                builder.AddItem(new SyntheticNode(
+                    ControlId.For(Marker("description"), "artifact-market:description"),
+                    GraphNodes.Paragraphs(() => SpokenLines.Of(new[] { description }))));
             }
 
-            builder.AddItem(new SyntheticNode(
-                ControlId.For(Marker("description"), "artifact-market:description"),
-                GraphNodes.Paragraphs(() => SpokenLines.Of(new[] { description }))));
+            Component prompt = _adapter.IsNoSelectionShown ? _adapter.NoSelectionContainer : null;
+            if (prompt != null)
+            {
+                builder.AddItem(new DrawnNode(
+                    ControlId.Structural("artifact-market:prompt"),
+                    GraphNodes.Text(() => _adapter.NoSelectionText),
+                    prompt));
+            }
         }
 
         // ---- the purchase ----
@@ -249,11 +259,12 @@ namespace SongsOfConquestAccess.Screens
         }
 
         /// <summary>What the merchant has for sale, in the order the grid draws it. The grid is padded
-        /// out to twenty-four cells with empties by design, and an empty cell is not an offer.
-        /// </summary>
+        /// out to twenty-four cells with empties by design, and an empty cell is not an offer; a
+        /// category with no offer at all is one line saying so.</summary>
         private void BuildOffers(GraphBuilder builder)
         {
             IReadOnlyList<ArtifactMarketMenuAdapter.MarketArtifactItem> offers = Items("offers", _adapter.GetMarketArtifacts);
+            bool any = false;
             for (int i = 0; i < offers.Count; i++)
             {
                 ArtifactMarketMenuAdapter.MarketArtifactItem it = offers[i];
@@ -261,6 +272,8 @@ namespace SongsOfConquestAccess.Screens
                 {
                     continue;
                 }
+
+                any = true;
 
                 NodeVtable vtable = GraphNodes.Button(
                     () => it.Label,
@@ -275,23 +288,32 @@ namespace SongsOfConquestAccess.Screens
                     vtable,
                     it.Entry));
             }
+
+            if (!any)
+            {
+                builder.AddItem(new SyntheticNode(
+                    ControlId.For(Marker("no-offers"), "artifact-market:no-offers"),
+                    GraphNodes.Text(() => ModText.Get(ModStrings.Screens.Empty))));
+            }
         }
 
         /// <summary>
-        /// The buy half of the band, at the end of the purchase stop: the line naming the artifact
-        /// being bought - the game's prompt while nothing is - and the Buy button under it.
-        ///
-        /// Both are keyed STRUCTURALLY and drawn by whichever of the game's containers is really
-        /// painted, so the cursor does not move when the band turns from the prompt into the
-        /// purchase; the parts are watched, so it hears the change instead.
+        /// The buy half of the band, at the end of the purchase stop while the game paints it: the
+        /// line naming the artifact being bought and the Buy button under it. Both are keyed
+        /// STRUCTURALLY and their parts watched, so a cursor standing here hears one purchase turn
+        /// into the next.
         /// </summary>
         private void BuildBuyBand(GraphBuilder builder)
         {
-            bool buying = _adapter.IsBuyShown;
-            Component container = buying ? _adapter.BuyContainer : _adapter.NoSelectionContainer;
+            if (!_adapter.IsBuyShown)
+            {
+                return;
+            }
+
+            Component container = _adapter.BuyContainer;
             if (container != null)
             {
-                NodeVtable line = GraphNodes.Text(BuyLine);
+                NodeVtable line = GraphNodes.Text(() => _adapter.BuyItemName);
                 line.Announcements[0].Live = true;
                 builder.AddItem(new DrawnNode(
                     ControlId.Structural("artifact-market:purchase/line"),
@@ -299,7 +321,7 @@ namespace SongsOfConquestAccess.Screens
                     container));
             }
 
-            Component button = buying ? _adapter.BuyButton : null;
+            Component button = _adapter.BuyButton;
             if (button == null)
             {
                 return;
@@ -318,31 +340,27 @@ namespace SongsOfConquestAccess.Screens
                 button));
         }
 
-        private string BuyLine()
-        {
-            return _adapter.IsBuyShown ? _adapter.BuyItemName : _adapter.NoSelectionText;
-        }
-
         // ---- the sale ----
 
         /// <summary>
-        /// The sell half of the same band, as a stop under the word the game writes over the button:
-        /// the line naming the artifact being sold - the prompt while nothing is - and the Sell
-        /// button under it, which the game does not draw at all for an artifact it treats as
-        /// important.
-        ///
-        /// While a purchase is selected the game paints the buy container instead, and the prompt line
-        /// stays here saying that nothing is up for sale, so the stop is always somewhere to be.
+        /// The sell half of the same band, as a stop under the word the game writes over the button,
+        /// declared only while the game paints it: the line naming the artifact being sold and the
+        /// Sell button under it, which the game does not draw at all for an artifact it treats as
+        /// important. While nothing is up for sale there is no stop here at all.
         /// </summary>
         private void BuildSell(GraphBuilder builder)
         {
+            if (!_adapter.IsSellShown)
+            {
+                return;
+            }
+
             builder.PushContext(_adapter.SellButtonLabel);
 
-            bool selling = _adapter.IsSellShown;
-            Component container = selling ? _adapter.SellContainer : _adapter.NoSelectionContainer;
+            Component container = _adapter.SellContainer;
             if (container != null)
             {
-                NodeVtable line = GraphNodes.Text(SellLine);
+                NodeVtable line = GraphNodes.Text(() => _adapter.SellItemName);
                 line.Announcements[0].Live = true;
                 builder.AddItem(new DrawnNode(
                     ControlId.Structural("artifact-market:sell/line"),
@@ -350,7 +368,7 @@ namespace SongsOfConquestAccess.Screens
                     container));
             }
 
-            Component button = selling && _adapter.IsSellButtonShown ? _adapter.SellButton : null;
+            Component button = _adapter.IsSellButtonShown ? _adapter.SellButton : null;
             if (button != null)
             {
                 NodeVtable vtable = GraphNodes.Button(
@@ -367,11 +385,6 @@ namespace SongsOfConquestAccess.Screens
             }
 
             builder.PopContext();
-        }
-
-        private string SellLine()
-        {
-            return _adapter.IsSellShown ? _adapter.SellItemName : _adapter.NoSelectionText;
         }
 
         // ---- the artifacts ----
