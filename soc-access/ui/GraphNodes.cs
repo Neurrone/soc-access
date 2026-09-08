@@ -162,22 +162,23 @@ namespace SongsOfConquestAccess.UI
         /// per paragraph and nothing else. Declaring the same text as a details section as well would
         /// put the joined copy in the buffer on top of the paragraphs, so a screen using this must not.
         ///
-        /// The paragraphs are resolved from <paramref name="lines"/> on every read, never captured:
-        /// the text a screen shows can change under it, and the part count a graph was built
-        /// with is the one the node keeps until the next build - a resolver that runs late simply
-        /// reports null for a paragraph that is no longer there.
+        /// The paragraphs are resolved from <paramref name="lines"/> once per NODE and never captured
+        /// across builds: the text a screen shows can change under it and the graph is rebuilt every
+        /// frame, so the body is read afresh on every frame. Within the one node the part count and
+        /// the parts come from the same reading, so they cannot disagree.
         /// </summary>
         /// <param name="live">Whether the paragraphs are WATCHED: a text the game replaces in place under
         /// a still cursor (a dialogue's next line) is then read again by the live watch.</param>
         public static NodeVtable Paragraphs(Func<IList<string>> lines, Tooltip tooltip = null, bool live = false)
         {
-            NodeVtable vtable = Text(() => Paragraph(lines, 0), tooltip: tooltip);
+            ParagraphBody body = new ParagraphBody(lines);
+            NodeVtable vtable = Text(() => body.At(0), tooltip: tooltip);
             if (live && vtable.Announcements.Count > 0)
             {
                 vtable.Announcements[0].Live = true;
             }
 
-            AddParagraphs(vtable, lines, 1, live);
+            AddParagraphs(vtable, body, 1, live);
             return vtable;
         }
 
@@ -186,7 +187,7 @@ namespace SongsOfConquestAccess.UI
         /// per paragraph, rather than declared as a node or a section of its own.</summary>
         public static void ParagraphParts(NodeVtable vtable, Func<IList<string>> lines, bool live = false)
         {
-            AddParagraphs(vtable, lines, 0, live);
+            AddParagraphs(vtable, new ParagraphBody(lines), 0, live);
         }
 
         /// <summary>
@@ -486,28 +487,67 @@ namespace SongsOfConquestAccess.UI
             };
         }
 
-        // One part per paragraph from the given index on, each resolving its own paragraph live.
-        private static void AddParagraphs(NodeVtable vtable, Func<IList<string>> lines, int first, bool live)
+        // One part per paragraph from the given index on, each reading its own paragraph from the body.
+        private static void AddParagraphs(NodeVtable vtable, ParagraphBody body, int first, bool live)
         {
-            int count = Count(lines);
+            int count = body.Count;
             for (int i = first; i < count; i++)
             {
                 int index = i;
-                vtable.Announcements.Add(ValuePart(() => Paragraph(lines, index), watch: live));
+                vtable.Announcements.Add(ValuePart(() => body.At(index), watch: live));
             }
         }
 
-        // Paragraph index of a live list: null past its end, and an empty list makes an empty label.
-        private static string Paragraph(Func<IList<string>> lines, int index)
+        /// <summary>
+        /// One resolution of a paragraph body per NODE, shared by the count taken while the node is
+        /// declared and by every paragraph part read from it afterwards.
+        ///
+        /// A node is made by the build and thrown away with it, so a body is still resolved once a
+        /// frame and a live paragraph is still re-read on every one of them. What goes away is the
+        /// re-resolving WITHIN a frame: a six-paragraph node resolved its lines thirteen times in the
+        /// frame it was read - one for the count, six for the focus readout, six for the review
+        /// buffer - and six more again when it was watched live.
+        /// </summary>
+        private sealed class ParagraphBody
         {
-            IList<string> list = lines != null ? lines() : null;
-            return list != null && index < list.Count ? list[index] : null;
-        }
+            private readonly Func<IList<string>> _lines;
+            private IList<string> _list;
+            private bool _read;
 
-        private static int Count(Func<IList<string>> lines)
-        {
-            IList<string> list = lines != null ? lines() : null;
-            return list != null ? list.Count : 0;
+            public ParagraphBody(Func<IList<string>> lines)
+            {
+                _lines = lines;
+            }
+
+            public int Count
+            {
+                get
+                {
+                    IList<string> list = List;
+                    return list != null ? list.Count : 0;
+                }
+            }
+
+            // Paragraph index of the body: null past its end, and an empty body makes an empty label.
+            public string At(int index)
+            {
+                IList<string> list = List;
+                return list != null && index < list.Count ? list[index] : null;
+            }
+
+            private IList<string> List
+            {
+                get
+                {
+                    if (!_read)
+                    {
+                        _read = true;
+                        _list = _lines != null ? _lines() : null;
+                    }
+
+                    return _list;
+                }
+            }
         }
 
         // The readout every control here is built from: what it is called and whether it is refusing.
