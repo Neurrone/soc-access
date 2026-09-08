@@ -59,3 +59,8 @@ things to watch and what turned up:
 - **The research page** still spends most of its build asking the game
   `HasGlobalResearch` once per tier of every row, about 50 queries a frame. Left as is:
   it is a game query, not a scan, and 0.27 ms.
+- **The battle HUD may have had the same miss.** `BattleHUDStateHandler` and
+  `BattleViewManager` are bound in their own installers like the town list, and the spells
+  HUD, quickbar and cancel-spell readings are gated on the first. They now fall back to the
+  installer's container. Whether the scene container ever missed them is unknown until a
+  battle: if the quickbar starts reading where it did not, that was it.
