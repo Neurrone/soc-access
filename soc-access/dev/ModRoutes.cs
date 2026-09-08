@@ -32,9 +32,9 @@ namespace SongsOfConquestAccess.Dev
     ///   GET  /speech?since=N&amp;wait=MS
     ///                           lines spoken after sequence N, plus the next cursor; with wait, hold
     ///                           the connection open until there is one
-    ///                           the accessible tree of the top screen (see <see cref="WidgetDump"/>)
-    ///   GET  /gui/graph?buffers=1&amp;flat=1&amp;edges=1
-    ///                           the same for a graph screen (see <see cref="GraphDump"/>)
+    ///   GET  /gui/graph?buffers=1&amp;flat=1&amp;edges=1&amp;screen=KEY
+    ///                           the accessible tree of the focused screen, or of the named one
+    ///                           (see <see cref="GraphDump"/>)
     ///   GET  /screens          every registered screen: key, type, layer, active, on stack, focused
     ///   POST /type              body = characters; typed into the graph screen's type-ahead search
     ///   POST /input             body = an action key; run it as a keypress would

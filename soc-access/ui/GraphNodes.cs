@@ -195,7 +195,7 @@ namespace SongsOfConquestAccess.UI
         /// put the joined copy in the buffer on top of the paragraphs, so a screen using this must not.
         ///
         /// The paragraphs are resolved from <paramref name="lines"/> on every read, never captured:
-        /// the text a screen shows can change under a RefreshTop, and the part count a graph was built
+        /// the text a screen shows can change under it, and the part count a graph was built
         /// with is the one the node keeps until the next build - a resolver that runs late simply
         /// reports null for a paragraph that is no longer there.
         /// </summary>

@@ -175,7 +175,6 @@ namespace SongsOfConquestAccess.Dev
 
             string topName = top.GetType().Name;
             if (topName == "MessageDialogScreen"
-                || topName == "TooltipActionsMenuScreen"
                 || topName.EndsWith("PopupScreen", StringComparison.Ordinal))
             {
                 return "dialog";
