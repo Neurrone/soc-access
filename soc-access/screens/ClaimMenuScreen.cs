@@ -131,12 +131,15 @@ namespace SongsOfConquestAccess.Screens
                     GraphNodes.Text(() => Live.Title)));
             }
 
-            if (!string.IsNullOrWhiteSpace(Live.Body))
+            // The body is broken into its paragraphs ONCE: the guard and the node ask the same
+            // question, and the paragraph node counts them at build.
+            IList<string> bodyLines = Live.BodyLines;
+            if (bodyLines.Count > 0)
             {
                 ControlId bodyId = ControlId.For(_bodyKey, "claim-menu:body");
                 builder.AddItem(new SyntheticNode(
                     bodyId,
-                    GraphNodes.Paragraphs(() => Live.BodyLines)));
+                    GraphNodes.Paragraphs(() => bodyLines)));
                 // Focus starts on the body, so arrival reads the heading once as the screen name and
                 // then what the menu is asking before the choices.
                 builder.SetStart(bodyId);

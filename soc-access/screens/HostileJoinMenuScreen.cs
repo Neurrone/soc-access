@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using HarmonyLib;
 using SongsOfConquest.Client.Adventure;
 using SongsOfConquestAccess.Adapters;
@@ -198,9 +199,12 @@ namespace SongsOfConquestAccess.Screens
                 return;
             }
 
+            // Broken into paragraphs ONCE: the node counts them at build and would break the same
+            // string again on every readout.
+            IList<string> lines = SpokenLines.Of(new[] { body });
             builder.AddItem(new SyntheticNode(
                 ControlId.For(marker, key),
-                GraphNodes.Paragraphs(() => SpokenLines.Of(new[] { body }))));
+                GraphNodes.Paragraphs(() => lines)));
         }
 
         /// <summary>The army being offered, under the game's own word for an army.</summary>

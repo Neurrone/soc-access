@@ -405,10 +405,13 @@ namespace SongsOfConquestAccess.Screens
                     GraphNodes.Text(() => Live.Title)));
             }
 
-            if (!string.IsNullOrWhiteSpace(Live.Body))
+            // The body is broken into its paragraphs ONCE: the guard and the node ask the same
+            // question, and the paragraph node counts them at build.
+            IList<string> bodyLines = Live.BodyLines;
+            if (bodyLines.Count > 0)
             {
                 ControlId bodyId = ControlId.For(_bodyKey, "dialog:body");
-                NodeVtable body = GraphNodes.Paragraphs(() => Live.BodyLines);
+                NodeVtable body = GraphNodes.Paragraphs(() => bodyLines);
                 body.OnFocusVisual = () => Live.SyncNativeSelection(DialogAction.Body);
                 builder.AddItem(new SyntheticNode(bodyId, body));
                 start = bodyId;

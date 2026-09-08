@@ -144,20 +144,16 @@ namespace SongsOfConquestAccess.Screens
         /// list the adapter enumerates.</summary>
         private void AddCosts(GraphBuilder builder)
         {
+            // The whole list is read ONCE and each line keeps its own text: asking for the list
+            // again per line rebuilt it once per cost.
             IReadOnlyList<string> costs = Live.GetCostLabels();
             for (int i = 0; i < costs.Count; i++)
             {
-                int index = i;
+                string label = costs[i] ?? string.Empty;
                 builder.AddItem(new SyntheticNode(
-                    ControlId.Structural("world-confirm:cost/" + index),
-                    GraphNodes.Text(() => CostLabel(index))));
+                    ControlId.Structural("world-confirm:cost/" + i),
+                    GraphNodes.Text(() => label)));
             }
-        }
-
-        private string CostLabel(int index)
-        {
-            IReadOnlyList<string> costs = Live.GetCostLabels();
-            return index >= 0 && index < costs.Count ? costs[index] : string.Empty;
         }
 
         /// <summary>The warning the game draws when the player cannot afford the cost, declared only
@@ -165,14 +161,21 @@ namespace SongsOfConquestAccess.Screens
         private void AddResourceWarning(GraphBuilder builder)
         {
             Component warning = Live.ResourceWarning;
-            if (warning == null || string.IsNullOrWhiteSpace(Live.ResourceWarningLabel))
+            if (warning == null)
+            {
+                return;
+            }
+
+            // The wording is read ONCE: the guard and the node ask the same question.
+            string label = Live.ResourceWarningLabel;
+            if (string.IsNullOrWhiteSpace(label))
             {
                 return;
             }
 
             builder.AddItem(new DrawnNode(
                 ControlId.For(warning, "world-confirm:resource-warning"),
-                GraphNodes.Text(() => Live.ResourceWarningLabel),
+                GraphNodes.Text(() => label),
                 warning));
         }
 

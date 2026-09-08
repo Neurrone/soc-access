@@ -329,11 +329,23 @@ namespace SongsOfConquestAccess.Adapters
                     return label;
                 }
 
-                Tooltip tooltip = Tooltip.ForComponent(MassMoveButton, _localization);
-                System.Collections.Generic.IReadOnlyList<string> lines = tooltip != null ? tooltip.TextLines : null;
-                return lines != null && lines.Count > 0 ? SpokenLines.Clean(lines[0]) : string.Empty;
+                // The button draws no text of its own, so its name is a tooltip capture - which
+                // the label func would make twice a frame. The wording is the menu's own and does
+                // not change, so it is captured once.
+                if (!_massMoveProbed)
+                {
+                    _massMoveProbed = true;
+                    Tooltip tooltip = Tooltip.ForComponent(MassMoveButton, _localization);
+                    System.Collections.Generic.IReadOnlyList<string> lines = tooltip != null ? tooltip.TextLines : null;
+                    _massMoveText = lines != null && lines.Count > 0 ? SpokenLines.Clean(lines[0]) : string.Empty;
+                }
+
+                return _massMoveText;
             }
         }
+
+        private string _massMoveText;
+        private bool _massMoveProbed;
 
         /// <summary>Whether the game will take the click: it turns the button off once the offered army
         /// is empty.</summary>

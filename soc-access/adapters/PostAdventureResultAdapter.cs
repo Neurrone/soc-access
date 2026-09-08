@@ -254,11 +254,26 @@ namespace SongsOfConquestAccess.Adapters
             return GetText(text);
         }
 
-        private static string GetFirstVisibleText(CanvasGroup canvasGroup)
+        // Which mesh under a canvas says something is fixed once the page is drawn, so the walk
+        // that finds it runs once per canvas and the text is read off it live. A mesh that has
+        // stopped saying anything sends the search over the canvas again.
+        private readonly Dictionary<CanvasGroup, UITextMesh> _firstTexts = new Dictionary<CanvasGroup, UITextMesh>();
+
+        private string GetFirstVisibleText(CanvasGroup canvasGroup)
         {
             if (canvasGroup == null)
             {
                 return string.Empty;
+            }
+
+            UITextMesh kept;
+            if (_firstTexts.TryGetValue(canvasGroup, out kept) && kept != null)
+            {
+                string keptText = GetText(kept);
+                if (!string.IsNullOrWhiteSpace(keptText))
+                {
+                    return keptText;
+                }
             }
 
             UITextMesh[] texts = canvasGroup.GetComponentsInChildren<UITextMesh>(false);
@@ -267,10 +282,12 @@ namespace SongsOfConquestAccess.Adapters
                 string candidate = GetText(texts[i]);
                 if (!string.IsNullOrWhiteSpace(candidate))
                 {
+                    _firstTexts[canvasGroup] = texts[i];
                     return candidate;
                 }
             }
 
+            _firstTexts[canvasGroup] = null;
             return string.Empty;
         }
 

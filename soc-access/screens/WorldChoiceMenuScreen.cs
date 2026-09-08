@@ -148,9 +148,12 @@ namespace SongsOfConquestAccess.Screens
                 return;
             }
 
+            // Broken into paragraphs ONCE: the node counts them at build and would break the same
+            // string again on every readout.
+            IList<string> lines = SpokenLines.Of(new[] { body });
             builder.AddItem(new SyntheticNode(
                 ControlId.For(_bodyMarker, "world-choice:body"),
-                GraphNodes.Paragraphs(() => SpokenLines.Of(new[] { body }))));
+                GraphNodes.Paragraphs(() => lines)));
         }
 
         /// <summary>One card per row, walked with Up and Down: exactly one of them is the choice, and

@@ -87,11 +87,27 @@ namespace SongsOfConquestAccess.Adapters
             get
             {
                 GameObject warning = _settings != null ? _settings.ResourceWarning : null;
-                return warning != null && warning.activeInHierarchy
-                    ? warning.GetComponentInChildren<UITextMesh>(false)
+                if (warning == null || !warning.activeInHierarchy)
+                {
+                    return null;
+                }
+
+                // Which mesh the warning draws on is fixed; whether it is drawn is not, so the
+                // search runs once and the answer is checked live.
+                if (!_warningProbed)
+                {
+                    _warningProbed = true;
+                    _warningText = warning.GetComponentInChildren<UITextMesh>(true);
+                }
+
+                return _warningText != null && _warningText.gameObject.activeInHierarchy
+                    ? _warningText
                     : null;
             }
         }
+
+        private UITextMesh _warningText;
+        private bool _warningProbed;
 
         /// <summary>The wording the warning draws, with the game's rich-text tags taken off.</summary>
         public string ResourceWarningLabel

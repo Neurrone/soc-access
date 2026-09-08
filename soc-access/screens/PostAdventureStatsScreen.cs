@@ -114,11 +114,14 @@ namespace SongsOfConquestAccess.Screens
             BuildChooser(builder);
 
             // No table stop at all when the statistics hold no round: the footer says how many
-            // rounds there were, and a stop with nothing in it would be a table without rows.
-            if (Live.GetGraphRows().Count > 0)
+            // rounds there were, and a stop with nothing in it would be a table without rows. The
+            // rows are built ONCE - the guard and the table are the same question, and building
+            // them walks every team's every round.
+            IReadOnlyList<PostAdventureStatsAdapter.GraphRoundRow> graphRows = Live.GetGraphRows();
+            if (graphRows.Count > 0)
             {
                 builder.BeginStop(TableStop);
-                BuildTable(builder);
+                BuildTable(builder, graphRows);
             }
 
             builder.BeginStop(FooterStop);
@@ -237,7 +240,7 @@ namespace SongsOfConquestAccess.Screens
 
         // ---- the chart, as a table ----
 
-        private void BuildTable(GraphBuilder builder)
+        private void BuildTable(GraphBuilder builder, IReadOnlyList<PostAdventureStatsAdapter.GraphRoundRow> rows)
         {
             IReadOnlyList<PostAdventureStatsAdapter.GraphTeamColumn> teams = Live.GetEnabledGraphTeams();
             string[] columns = Columns(teams);
@@ -245,7 +248,6 @@ namespace SongsOfConquestAccess.Screens
             // row of the captions would say them a second time (owner ruling 2026-09-07).
             GraphSheet sheet = new GraphSheet(builder, SheetKey);
             sheet.Region(Live.GraphTitle, columns);
-            IReadOnlyList<PostAdventureStatsAdapter.GraphRoundRow> rows = Live.GetGraphRows();
             for (int i = 0; i < rows.Count; i++)
             {
                 PostAdventureStatsAdapter.GraphRoundRow row = rows[i];

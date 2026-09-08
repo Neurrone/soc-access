@@ -366,9 +366,11 @@ namespace SongsOfConquestAccess.Adapters
             return values;
         }
 
+        private static readonly Array GraphTypes = Enum.GetValues(typeof(PostAdventureStatsGraphType));
+
         private PostAdventureStatsGraphType GetSelectedGraphType()
         {
-            Array values = Enum.GetValues(typeof(PostAdventureStatsGraphType));
+            Array values = GraphTypes;
             int selected = SelectedGraphIndex;
             if (selected < 0 || selected >= values.Length)
             {
