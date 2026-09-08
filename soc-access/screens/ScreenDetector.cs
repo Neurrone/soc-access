@@ -148,13 +148,28 @@ namespace SongsOfConquestAccess.Screens
             Reg<PauseMenuScreen>()?.Show(new PauseMenuAdapter(pauseMenu));
         }
 
-        public void OnPauseMenuClosed(PauseMenu pauseMenu)
+        /// <summary><paramref name="handsOver"/>: the menu closed to open options, a save or load
+        /// menu or the codex, which the game shows a frame or more later; the pause screen stays
+        /// active across that gap (<see cref="PauseMenuScreen.BeginHandover"/>) so the map is not
+        /// handed back for it.</summary>
+        public void OnPauseMenuClosed(PauseMenu pauseMenu, bool handsOver)
         {
-            Reg<PauseMenuScreen>()?.Forget();
+            PauseMenuScreen screen = Reg<PauseMenuScreen>();
+            if (screen == null)
+            {
+                return;
+            }
+
+            screen.Forget();
+            if (handsOver)
+            {
+                screen.BeginHandover();
+            }
         }
 
         public void OnOptionsMenuReady(OptionsMenu optionsMenu)
         {
+            Reg<PauseMenuScreen>()?.EndHandover();
             OptionsMenuAdapter adapter = new OptionsMenuAdapter(optionsMenu);
             if (adapter.IsPresent())
             {
@@ -169,6 +184,7 @@ namespace SongsOfConquestAccess.Screens
 
         public void OnSaveLoadGameMenuReady(SaveLoadGameMenu menu)
         {
+            Reg<PauseMenuScreen>()?.EndHandover();
             SaveLoadGameMenuAdapter adapter = new SaveLoadGameMenuAdapter(menu);
             if (adapter.IsPresent())
             {
@@ -187,6 +203,7 @@ namespace SongsOfConquestAccess.Screens
 
         public void OnCodexReady(CodexMenu codexMenu)
         {
+            Reg<PauseMenuScreen>()?.EndHandover();
             CodexMenuAdapter adapter = new CodexMenuAdapter(codexMenu);
             if (adapter.IsPresent())
             {

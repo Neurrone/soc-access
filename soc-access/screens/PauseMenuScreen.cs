@@ -73,14 +73,51 @@ namespace SongsOfConquestAccess.Screens
             }
         }
 
+        /// <summary>Until when the screen stays active with no menu behind it, or 0.</summary>
+        private float _handoverUntil;
+
+        /// <summary>The menu closed to open another (options, save, load, the codex), which the game
+        /// shows a frame or more later. Between the two nothing is open, and a screen that stood down
+        /// here would hand the player to the map for those frames: "Adventure map" and the tile,
+        /// then the menu they asked for. So the screen stays active, declaring nothing, until the
+        /// target arrives (<see cref="EndHandover"/>) or a bounded wait runs out.</summary>
+        public void BeginHandover()
+        {
+            _handoverUntil = Time.realtimeSinceStartup + HandoverSeconds;
+        }
+
+        public void EndHandover()
+        {
+            _handoverUntil = 0f;
+        }
+
+        private const float HandoverSeconds = 2f;
+
+        private bool HandingOver
+        {
+            get { return _handoverUntil > 0f && Time.realtimeSinceStartup < _handoverUntil; }
+        }
+
+        private bool Shown
+        {
+            get { return Live != null && Live.IsPresent(); }
+        }
+
         public override bool IsActive()
         {
-            return Live != null && Live.IsPresent();
+            return Shown || HandingOver;
+        }
+
+        /// <summary>Not while spanning a handover: the page is gone and nothing on it can be judged.
+        /// </summary>
+        public override bool IsWorkable
+        {
+            get { return Shown; }
         }
 
         public override void Build(GraphBuilder builder)
         {
-            if (!IsActive())
+            if (!Shown)
             {
                 return;
             }
