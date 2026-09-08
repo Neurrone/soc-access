@@ -20,6 +20,8 @@ namespace SongsOfConquestAccess
             AccessTools.Property(typeof(ChatButton), "Container");
         private static ChatWindowBehavior _currentWindow;
         private static ChatButtonBehavior _currentButton;
+        private static bool _windowProbed;
+        private static bool _buttonProbed;
 
         public static ChatAdapter CurrentAdapter
         {
@@ -36,6 +38,8 @@ namespace SongsOfConquestAccess
         {
             _currentWindow = null;
             _currentButton = null;
+            _windowProbed = false;
+            _buttonProbed = false;
         }
 
         [HarmonyPatch(typeof(ChatWindowBehavior), "Initialize")]
@@ -133,13 +137,17 @@ namespace SongsOfConquestAccess
 
         private static void RecoverRuntimeReferences()
         {
-            if (_currentWindow == null)
+            // The scans exist only to recover references a hot reload missed, so they run once
+            // per load: the Initialize postfixes catch every window and button created later.
+            if (_currentWindow == null && !_windowProbed)
             {
+                _windowProbed = true;
                 _currentWindow = FindRuntimeWindowBehavior();
             }
 
-            if (_currentButton == null)
+            if (_currentButton == null && !_buttonProbed)
             {
+                _buttonProbed = true;
                 _currentButton = FindRuntimeButtonBehavior();
             }
         }
