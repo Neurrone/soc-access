@@ -8,22 +8,22 @@ Keep all authored mod code under `soc-access/`. Current reusable speech code liv
 
 Layout:
 
-- `soc-access/adapters/` for code that interacts directly with the game. Adapters must never create accessibility widgets directly or expose widget-tree concepts such as widget ids, menu item ids, row ids, column ids, or screen layout/grouping. Adapters may expose native/game text and semantic facts, such as localized building names, resource names, troop names, button text, tooltip text, counts, owners, indexes, levels, enabled/available/met state, and native focus/action hooks. Screens are responsible for constructing widgets and for accessibility/UI wording: combined row labels, slot labels, positional text, grouping labels, status strings like `unavailable`, `missing`, `disabled`, `dragging`, and any prefix/suffix such as `Missing ...` or `... lost`.
+- `soc-access/adapters/` for code that interacts directly with the game. Adapters must never build graph nodes directly or expose graph concepts such as node ids, stops, regions, row or column ids, or screen layout/grouping. Adapters may expose native/game text and semantic facts, such as localized building names, resource names, troop names, button text, tooltip text, counts, owners, indexes, levels, enabled/available/met state, and native focus/action hooks. Screens are responsible for constructing nodes and for accessibility/UI wording: combined row labels, slot labels, positional text, grouping labels, status strings like `unavailable`, `missing`, `disabled`, `dragging`, and any prefix/suffix such as `Missing ...` or `... lost`.
 - `soc-access/input/` for receiving keyboard input
 - `soc-access/patches/` for Harmony or BepInEx hook classes
 - `soc-access/speech/` for Prism and output plumbing
-- `soc-access/screens/` for accessible screen models. Screens can depend on adaptors and use widgets
-- `soc-access/ui/` for UI widgets in the accessibility tree, and `soc-access/ui/graph/` for the immediate-mode graph engine the widgets are being replaced by, one screen at a time; `ui-graph-plan.md` is the brief for that rewrite and says which screens are graph screens (`screens/GraphScreen.cs`) today
+- `soc-access/screens/` for accessible screen models: one `GraphScreen` per game surface, building its nodes every frame from adapters
+- `soc-access/ui/graph/` for the immediate-mode graph engine (copied from Endless Space 2 Access; re-sync against it rather than editing it for a screen), and `soc-access/ui/` for what screens build with: the node factories (`GraphNodes`), the navigator, and the shared node groups (troop rows, artifact slots, menu forms)
 - `soc-access/dev/` for the mod-side dev server routes and probes (`ModRoutes`, `GraphDump`, `DevProbe`, `DevFixtures`); development only, never spoken
 - `soc-access/loader/` for the loader plugin and the loader-side dev server. Changing anything here needs a game restart; prefer a mod-side probe over a new loader member
 - `soc-access/tests/` for tests
 - `soc-access/soc-access.csproj` is the live mod project and currently targets `.NET Framework 4.7.2`
 
-Adapter label rule: ask whether a string is authored by the game or composed for the accessibility widget tree. Game-authored/native text can come from adapters. Accessibility wording and composition belongs in screens/widgets.
+Adapter label rule: ask whether a string is authored by the game or composed for the accessibility tree. Game-authored/native text can come from adapters. Accessibility wording and composition belongs in screens and the shared node groups under `ui/`.
 
 ## Localization
 
-All user-facing text that the mod authors must be localizable. Do not add hard-coded English for spoken text, widget labels, status text, review-buffer labels, scanner messages, or accessibility-only composition.
+All user-facing text that the mod authors must be localizable. Do not add hard-coded English for spoken text, node labels, status text, review-buffer labels, scanner messages, or accessibility-only composition.
 
 Use the game's localized text whenever the wording is authored by the game: native UI labels, tooltips, entity names, resource names, troop names, spell names, building names, and other text that already exists in the game localization tables or UI components. Use `GameText.Get(...)` only after verifying the localization key in decompiled source or reading the native UI component text through an adapter.
 
@@ -47,7 +47,7 @@ Prefer fast text search over manual browsing when tracing the game code.
 
 Use C# conventions: 4-space indentation, PascalCase for types and public members, camelCase for locals and private fields unless the surrounding code already uses underscore-prefixed fields. Types and members are public by default, as in Endless Space 2 Access, so the dev server's REPL can name any of them; use `private` for what a type keeps to itself and never `internal`. Avoid repeating words in file names. For example, use `adapters/ContinueMenuButton.cs` instead of `adapters/ContinueMenuButtonAdapter.cs` to avoid repeating adapter.
 
-Never use `SpeechTextSanitizer.Normalize` unless explicitly given approval to do so. It is problematic as it strips newlines.
+Never collapse whitespace across newlines in text the game wrote: clean native text with `SpokenLines.Clean` (one string) or `SpokenLines.Of` (lines), which split on newlines and `<br>` first and strip tags per line. A normaliser that flattens a whole string to one line turns a multi-line tooltip into one breath.
 
 Keep engine-specific access isolated in patch or adapter classes; keep speech composition out of hook methods. Favor small, explicit wrappers around reflected or patched game objects. Avoid creating unneeded abstractions and change code sergically so that you never implement more than what is requested.
 
