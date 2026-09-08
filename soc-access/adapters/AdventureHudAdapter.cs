@@ -139,6 +139,8 @@ namespace SongsOfConquestAccess.Adapters
         private bool _endTurnHudProbed;
         private bool _endTurnSettingsProbed;
         private bool _teamQueueHudProbed;
+        private List<ObjectiveEntrySnapshot> _objectiveSnapshots;
+        private int _objectiveSnapshotsFrame = -1;
 
         public AdventureHudAdapter(AdventureMapAdapter map, DiContainer container)
         {
@@ -1494,7 +1496,24 @@ namespace SongsOfConquestAccess.Adapters
             return handler == null || handler.IsVisible;
         }
 
+        /// <summary>The objectives as the HUD is drawing them, walked at most once a frame: the map's
+        /// build asks whether the menu is visible, then whether each of sixteen slots is, then for
+        /// each one's tooltip, which is about seventeen walks of the same subtree for one frame's
+        /// worth of unchanged rows.</summary>
         private List<ObjectiveEntrySnapshot> GetObjectiveSnapshots()
+        {
+            int frame = Time.frameCount;
+            if (_objectiveSnapshots != null && _objectiveSnapshotsFrame == frame)
+            {
+                return _objectiveSnapshots;
+            }
+
+            _objectiveSnapshotsFrame = frame;
+            _objectiveSnapshots = BuildObjectiveSnapshots();
+            return _objectiveSnapshots;
+        }
+
+        private List<ObjectiveEntrySnapshot> BuildObjectiveSnapshots()
         {
             Transform container = ObjectivesEntryContainer;
             List<ObjectiveEntrySnapshot> result = new List<ObjectiveEntrySnapshot>();
