@@ -8,6 +8,11 @@ doctrine this engine was copied from.
 
 ## 1. The graph side
 
+- `ui/graph/` — the engine, 20 files copied from ES2, namespace `SongsOfConquestAccess.UI.Graph`.
+  Changed only where the repo's rules required (`public`, `ModText`, `NodeHint.Template` a
+  `ModString`). Never edit these for a screen's needs; re-sync against ES2 instead. Tests
+  under `tests/` (`Graph*Tests`, `KeyGraphTests`, `GraphSheetTests`, `TypeAhead*Tests`, ...)
+  with `tests/GraphFixtures.cs` as the helper.
 - `screens/GraphScreen.cs` — the bridge. A screen ports by deriving from it, dropping its
   widget tree, and writing `Key`, `Layer`, `Build(GraphBuilder)`, `IsActive()`, and optionally
   `ScreenName`, `InitialFocusStop`, `Back()`/`ConsumesBack`, `IsWorkable` (mutes the live
