@@ -68,6 +68,7 @@ namespace SongsOfConquestAccess.Adapters
         private static readonly MethodInfo DropMethod = AccessTools.Method(typeof(DeploymentUIController), "Drop");
 
         private readonly PreBattleMenu _menu;
+        private AdventureBattleMenu.Settings _settings;
         private GameObject _cursorOverlay;
         private RectTransform[] _cursorOverlaySegments;
 
@@ -619,8 +620,21 @@ namespace SongsOfConquestAccess.Adapters
                 return null;
             }
 
-            CommanderHudPortraitAdapter.RefreshTooltip(portrait);
-            return Tooltip.ForComponent(button, localization);
+            Tooltip native = Tooltip.ForComponent(button, localization);
+            if (native == null)
+            {
+                return null;
+            }
+
+            // The game recomposes the portrait's tooltip on hover; the refresh runs when the lines
+            // are READ, never on the per-frame build that only asks whether a tooltip exists.
+            return new Tooltip(
+                () =>
+                {
+                    CommanderHudPortraitAdapter.RefreshTooltip(portrait);
+                    return native.TextLines;
+                },
+                native.VisualMetadata);
         }
 
         private CommanderHUDPortrait GetCommanderPortrait(BattleParticipantSide side)
@@ -989,8 +1003,17 @@ namespace SongsOfConquestAccess.Adapters
                 : DefenderThreatLevelField);
         }
 
+        /// <summary>The battle menu's settings, resolved ONCE: the scan behind it walks every loaded
+        /// object (19 ms measured), and the graph build read it eight times a frame before this cache
+        /// (2026-09-08, 7 frames per second on the placement page). The settings are matched on this
+        /// very menu instance, so they cannot change for the adapter's lifetime.</summary>
         private AdventureBattleMenu.Settings GetAdventureBattleMenuSettings()
         {
+            if (_settings != null)
+            {
+                return _settings;
+            }
+
             if (AdventureBattleMenuSettingsField == null || _menu == null)
             {
                 return null;
@@ -1004,6 +1027,7 @@ namespace SongsOfConquestAccess.Adapters
                     installer != null ? AdventureBattleMenuSettingsField.GetValue(installer) as AdventureBattleMenu.Settings : null;
                 if (settings != null && settings.PreBattleMenu == _menu)
                 {
+                    _settings = settings;
                     return settings;
                 }
             }
