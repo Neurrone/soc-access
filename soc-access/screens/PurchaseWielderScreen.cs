@@ -26,9 +26,12 @@ namespace SongsOfConquestAccess.Screens
     /// double click.
     ///
     /// The details are ONE stop rather than one per band: they are a description of the candidate the
-    /// player just arrived at, read top to bottom. The troops and the skills are REGIONS in it, under
-    /// the captions the pane draws over them ("Starting Troops", "Skills"), so a troop or a skill is
-    /// heard with what it is and the region jump reaches each band.
+    /// player just arrived at, read top to bottom. EVERY BAND OF IT IS A REGION (owner ruling
+    /// 2026-09-08): the summary, the stats, the troops, the skills, the specialization and the
+    /// purchase, so the region jump walks the pane band by band from wherever the cursor stands. The
+    /// troops and the skills are named by the captions the pane draws over them ("Starting Troops",
+    /// "Skills"), so a troop or a skill is heard with what it is; the pane draws no caption over the
+    /// others (measured 2026-09-08: StatsSection has no header), so those regions are bare.
     ///
     /// Escape is the game's (<c>ConsumesBack</c> false): the menu is an
     /// <c>AdventureMenuBackground</c> with <c>_canClose</c> true, so it draws the close cross and
@@ -161,7 +164,9 @@ namespace SongsOfConquestAccess.Screens
 
         private void BuildDetails(GraphBuilder builder)
         {
+            builder.SetRegion("purchase-wielder:summary");
             AddParagraphs(builder, "summary", SelectedSummaryLines);
+            builder.SetRegion("purchase-wielder:stats");
             AddStat(builder, "offence", () => _adapter.OffenceHeader, () => _adapter.Offence);
             AddStat(builder, "defence", () => _adapter.DefenceHeader, () => _adapter.Defence);
             AddStat(builder, "movement", () => _adapter.MovementHeader, () => _adapter.Movement);
@@ -170,15 +175,18 @@ namespace SongsOfConquestAccess.Screens
             BuildSkills(builder);
             if (_adapter.HasSpecialization())
             {
+                builder.SetRegion("purchase-wielder:specialization");
                 AddParagraphs(builder, "specialization", () => _adapter.SpecializationLines);
             }
 
+            builder.SetRegion("purchase-wielder:purchase");
             if (_adapter.HasPurchaseStatus())
             {
                 AddLine(builder, "status", () => _adapter.PurchaseStatus);
             }
 
             BuildPurchase(builder);
+            builder.SetRegion(null);
         }
 
         /// <summary>The candidate the pane is describing, read as the player sees it: the name, the
@@ -294,28 +302,23 @@ namespace SongsOfConquestAccess.Screens
             EndRegion(builder, header);
         }
 
-        /// <summary>A band under the caption the pane draws over it, as a region of the details stop;
-        /// a band the pane draws no caption for is declared bare.</summary>
+        /// <summary>A band as a region of the details stop, under the caption the pane draws over it
+        /// where it draws one.</summary>
         private static void BeginRegion(GraphBuilder builder, string caption, string key)
         {
-            if (string.IsNullOrWhiteSpace(caption))
-            {
-                return;
-            }
-
-            builder.PushContext(caption);
             builder.SetRegion(key);
+            if (!string.IsNullOrWhiteSpace(caption))
+            {
+                builder.PushContext(caption);
+            }
         }
 
         private static void EndRegion(GraphBuilder builder, string caption)
         {
-            if (string.IsNullOrWhiteSpace(caption))
+            if (!string.IsNullOrWhiteSpace(caption))
             {
-                return;
+                builder.PopContext();
             }
-
-            builder.PopContext();
-            builder.SetRegion(null);
         }
 
         private string SkillLabel(int index)
