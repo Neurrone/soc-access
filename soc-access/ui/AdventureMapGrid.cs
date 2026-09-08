@@ -16,6 +16,22 @@ using UnityEngine;
 
 namespace SongsOfConquestAccess.UI
 {
+    /// <summary>
+    /// The adventure map's TILE CURSOR - the cursor of a mode whose cursor is not the focus cursor
+    /// (<c>ui-graph-plan.md</c> phase E). <see cref="AdventureMapScreen"/> declares ONE node for the
+    /// whole map and hands this class every key that belongs to the map: the moves, the skips, the
+    /// scanner, the bookmarks, the beacons and the sonar sweep. Because the node's identity never
+    /// changes as the cursor walks, the navigator has nothing to announce and this class says each
+    /// landing itself.
+    ///
+    /// Queued rather than interrupting, which is what the widget engine's focus commit did
+    /// (<c>UIManager.Update</c> spoke with <c>interrupt: false</c>): the input router has already
+    /// silenced the reader for the claimed key, and a skip's "Skipped 3 tiles" is said before the
+    /// tile it landed on, which an interrupting landing would cut off.
+    ///
+    /// The widget base is still here; phase G removes it once no widget tree exists at all. Nothing
+    /// adds this to one any more.
+    /// </summary>
     public sealed class AdventureMapGrid : Widget
     {
         private const string ScannerWrapCueKey = "Common_ClickUnfold";
@@ -31,7 +47,6 @@ namespace SongsOfConquestAccess.UI
         private readonly AdventureBeaconAudio _beacons;
         private readonly ScannerJumpAnchor _jumpAnchor = new ScannerJumpAnchor();
         private int _lookAroundRadius = DefaultLookAroundRadius;
-        private bool _tileCuesHandled;
 
         public AdventureMapGrid(AdventureMapAdapter adapter)
             : base("adventure_map_grid")
@@ -85,11 +100,14 @@ namespace SongsOfConquestAccess.UI
             get { return _cursorTile; }
         }
 
+        /// <summary>
+        /// The keys the tile cursor owns, which is exactly what the screen answers
+        /// <c>GraphScreen.ModeClaims</c> with while the map node is focused. The two CLICKS are not
+        /// here: Enter and Backslash are the map node's own activation and contextual command, so
+        /// they reach the tile through the graph rather than through this set.
+        /// </summary>
         public override bool ClaimsAction(string actionKey)
         {
-            // TODO: Enter on an already-selected wielder should eventually open an
-            // accessible selected-wielder HUD screen. That is explicitly outside
-            // the initial adventure-map interaction scope; see wielders.md.
             return actionKey == AccessibilityActions.MapMoveNorth.Key
                 || actionKey == AccessibilityActions.MapMoveSouth.Key
                 || actionKey == AccessibilityActions.MapMoveWest.Key
@@ -98,8 +116,6 @@ namespace SongsOfConquestAccess.UI
                 || actionKey == AccessibilityActions.MapSkipSouth.Key
                 || actionKey == AccessibilityActions.MapSkipWest.Key
                 || actionKey == AccessibilityActions.MapSkipEast.Key
-                || actionKey == AccessibilityActions.Activate.Key
-                || actionKey == AccessibilityActions.MapSecondaryAction.Key
                 || actionKey == AccessibilityActions.NextWielder.Key
                 || actionKey == AccessibilityActions.NextSettlement.Key
                 || actionKey == AccessibilityActions.SummarizeReachableEntities.Key
@@ -167,16 +183,6 @@ namespace SongsOfConquestAccess.UI
                 return SkipMove(1, 0);
             }
 
-            if (action.Key == AccessibilityActions.Activate.Key)
-            {
-                return _adapter.HandlePrimaryAction(_cursorTile);
-            }
-
-            if (action.Key == AccessibilityActions.MapSecondaryAction.Key)
-            {
-                return _adapter.HandleSecondaryAction(_cursorTile);
-            }
-
             if (action.Key == AccessibilityActions.NextWielder.Key)
             {
                 return _adapter.TrySelectNextWielder();
@@ -205,21 +211,17 @@ namespace SongsOfConquestAccess.UI
             return false;
         }
 
-        protected override void OnFocus()
+        /// <summary>Draw the game's own highlight on the tile the cursor is standing on - what the
+        /// screen does when the map node takes the focus.</summary>
+        public void ShowOverlay()
         {
             _adapter?.SetFocusedTileOverlay(_cursorTile);
-
-            // Focus arrival announces the current tile, so it gets a cue too. Paths that already
-            // cued while claiming focus mark the arrival handled so it only sounds once.
-            if (!_tileCuesHandled)
-            {
-                PlayTileCues();
-            }
         }
 
-        protected override void OnUnfocus()
+        /// <summary>Take the highlight off again: the focus has gone to a HUD stop or off the
+        /// screen.</summary>
+        public void HideOverlay()
         {
-            _tileCuesHandled = false;
             _adapter?.ClearFocusedTileOverlay();
         }
 
@@ -233,17 +235,20 @@ namespace SongsOfConquestAccess.UI
             _beacons.Dispose();
         }
 
+        /// <summary>Put the cursor on a tile and read it, as a move does.</summary>
         public bool FocusTile(Vector2Int tile)
         {
-            return FocusTile(tile, updateUiManager: true);
+            return FocusTile(tile, announce: true);
         }
 
+        /// <summary>Put the cursor on a tile without a word and without a cue - the player is
+        /// somewhere else and the map moved under them.</summary>
         public bool FocusTileSilently(Vector2Int tile)
         {
-            return FocusTile(tile, updateUiManager: false);
+            return FocusTile(tile, announce: false);
         }
 
-        private bool FocusTile(Vector2Int tile, bool updateUiManager)
+        private bool FocusTile(Vector2Int tile, bool announce)
         {
             if (_adapter == null)
             {
@@ -251,30 +256,38 @@ namespace SongsOfConquestAccess.UI
             }
 
             _cursorTile = tile;
-            _adapter.SetFocusedTileOverlay(_cursorTile);
-            if (updateUiManager)
-            {
-                UIManager.SetFocusedWidget(this);
-            }
-
-            _beacons.UpdateListener(_cursorTile);
-            if (updateUiManager)
-            {
-                PlayTileCues();
-            }
-            else
-            {
-                // Silent variant: no announcement, so no cue, and the focus commit it still
-                // triggers must not produce one either.
-                _tileCuesHandled = true;
-            }
-
+            Land(announce);
             return true;
+        }
+
+        /// <summary>What every landing does: the highlight, the beacon listener, and - where the
+        /// player went there themselves - the tile read out with its cues.</summary>
+        private void Land(bool announce)
+        {
+            _adapter.SetFocusedTileOverlay(_cursorTile);
+            _beacons.UpdateListener(_cursorTile);
+            if (!announce)
+            {
+                return;
+            }
+
+            SpeakTile();
+            PlayTileCues();
+        }
+
+        /// <summary>The tile description, said the way the widget engine's focus commit said it:
+        /// queued behind whatever the same keypress has already said.</summary>
+        private void SpeakTile()
+        {
+            string label = GetLabel();
+            if (!string.IsNullOrWhiteSpace(label))
+            {
+                SpeechPipeline.Output(new SpeechRequest(label, interrupt: false));
+            }
         }
 
         private void PlayTileCues()
         {
-            _tileCuesHandled = true;
             PlayTileCuesFor(_cursorTile, 0f, 1f, 0f);
         }
 
@@ -343,10 +356,7 @@ namespace SongsOfConquestAccess.UI
 
             _cursorTile = nextTile;
             _adapter.EnsureTileInView(_cursorTile);
-            _adapter.SetFocusedTileOverlay(_cursorTile);
-            UIManager.SetFocusedWidget(this);
-            _beacons.UpdateListener(_cursorTile);
-            PlayTileCues();
+            Land(announce: true);
             return true;
         }
 
@@ -372,10 +382,7 @@ namespace SongsOfConquestAccess.UI
             SpeakSkipped(result.SkippedCount);
             _cursorTile = result.Target;
             _adapter.EnsureTileInView(_cursorTile);
-            _adapter.SetFocusedTileOverlay(_cursorTile);
-            UIManager.SetFocusedWidget(this);
-            _beacons.UpdateListener(_cursorTile);
-            PlayTileCues();
+            Land(announce: true);
             return true;
         }
 
@@ -395,10 +402,7 @@ namespace SongsOfConquestAccess.UI
             _jumpAnchor.Remember(_cursorTile);
             _cursorTile = point;
             _adapter.MoveCameraToTile(_cursorTile);
-            _adapter.SetFocusedTileOverlay(_cursorTile);
-            UIManager.SetFocusedWidget(this);
-            _beacons.UpdateListener(_cursorTile);
-            PlayTileCues();
+            Land(announce: true);
             return true;
         }
 
@@ -418,10 +422,7 @@ namespace SongsOfConquestAccess.UI
             _jumpAnchor.Remember(_cursorTile);
             _cursorTile = point;
             _adapter.MoveCameraToTile(_cursorTile);
-            _adapter.SetFocusedTileOverlay(_cursorTile);
-            UIManager.SetFocusedWidget(this);
-            _beacons.UpdateListener(_cursorTile);
-            PlayTileCues();
+            Land(announce: true);
             return true;
         }
 
@@ -598,10 +599,7 @@ namespace SongsOfConquestAccess.UI
 
             _cursorTile = anchor;
             _adapter.MoveCameraToTile(_cursorTile);
-            _adapter.SetFocusedTileOverlay(_cursorTile);
-            UIManager.SetFocusedWidget(this);
-            _beacons.UpdateListener(_cursorTile);
-            PlayTileCues();
+            Land(announce: true);
             return true;
         }
 

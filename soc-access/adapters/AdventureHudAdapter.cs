@@ -87,6 +87,12 @@ namespace SongsOfConquestAccess.Adapters
             AccessTools.Field(typeof(WielderListHUDEntry), "_button");
         private static readonly MethodInfo WielderListEntryRefreshTooltipMethod =
             AccessTools.Method(typeof(WielderListHUDEntry), "RefreshTooltip");
+        private static readonly FieldInfo WielderAmountTextField =
+            AccessTools.Field(typeof(WielderListHUD), "_wielderAmountText");
+        private static readonly FieldInfo WielderAmountContainerField =
+            AccessTools.Field(typeof(WielderListHUD), "_wielderAmountContainer");
+        private static readonly FieldInfo WielderLimitTooltipAreaField =
+            AccessTools.Field(typeof(WielderListHUD), "_wielderLimitTooltipArea");
         private static readonly FieldInfo TeamQueueEntriesField =
             AccessTools.Field(typeof(TeamQueueHUDBehaviour), "_teamQueueEntries");
         private static readonly FieldInfo TeamQueueRoundTextsField =
@@ -746,6 +752,35 @@ namespace SongsOfConquestAccess.Adapters
                 && GetWielderListEntryCount() > 0;
         }
 
+        /// <summary>
+        /// Whether the list draws its "Wielders n of m" count. The game only turns the container on
+        /// where the team has a wielder cap and more than one wielder it could buy
+        /// (<c>WielderListHUD.UpdateOwnedWieldersText</c>), so this is the container's own answer.
+        /// </summary>
+        public bool IsWielderAmountVisible()
+        {
+            return IsWielderListMenuVisible()
+                && HudGroupVisible(GetField<GameObject>(WielderList, WielderAmountContainerField));
+        }
+
+        /// <summary>The count the list writes over itself, in the game's own words
+        /// ("Adventure/CommanderListHUD/WielderAmount").</summary>
+        public string WielderAmountLabel
+        {
+            get { return GetText(GetField<UITextMesh>(WielderList, WielderAmountTextField)); }
+        }
+
+        /// <summary>The wielder-limit explanation the game hangs on the count's hover area.</summary>
+        public Tooltip WielderAmountTooltip
+        {
+            get
+            {
+                return Tooltip.ForComponent(
+                    GetField<UITransform>(WielderList, WielderLimitTooltipAreaField),
+                    LocalizationHandler);
+            }
+        }
+
         public bool IsWielderListEntryVisible(int index)
         {
             return GetWielderListEntry(index) != null;
@@ -1176,6 +1211,11 @@ namespace SongsOfConquestAccess.Adapters
 
                 return _townListUi;
             }
+        }
+
+        private WielderListHUD WielderList
+        {
+            get { return HudStateSettings != null ? HudStateSettings.WielderList : null; }
         }
 
         private KingdomInformationHUD.Settings KingdomSettings

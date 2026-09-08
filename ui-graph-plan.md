@@ -93,10 +93,10 @@ Paths relative to `soc-access/`. This is what the unported screens (§8) are bui
   `_storySequenceActive` is the flag behind `StoryFocusBlockerScreen`. Its knowledge is the
   most expensive thing in the repo to lose: in phase F move it, never rewrite it.
 - `ui/UIManager.cs` and `ui/Widget.cs` are the widget focus engine; the widget kinds still
-  in use by the three unported screens are `ContainerWidget`, `MenuWidget` + `MenuItemWidget`,
-  `ButtonWidget`, `TextWidget`, `AdventureMapGrid` + `TileSkipNavigator`, `CombatHexGrid`,
-  `TroopPlacementHexGrid`, `TroopHudMenu` (the map's troop bar; its graph replacement is
-  `TroopHudRows.Rows`). Every other `ui/*Widget.cs` is dead code for G. `Portrait` is still
+  in use by the two unported screens are `ContainerWidget`, `MenuWidget` + `MenuItemWidget`,
+  `ButtonWidget`, `TextWidget`, `CombatHexGrid`, `TroopPlacementHexGrid`. `AdventureMapGrid`
+  + `TileSkipNavigator` still derive from `Widget` but are in no widget tree any more (the map
+  is ported); `TroopHudMenu` is dead. Every other `ui/*Widget.cs` is dead code for G. `Portrait` is still
   read by ported screens as a native-portrait reader. `TextInputEchoHelper` survives as the
   graph editor's echo. `TooltipActionsMenuScreen` (Backquote) stays until no unported screen
   hands out a `TooltipAction`.
@@ -344,46 +344,22 @@ never enabled refuses every click, so a REPL-opened prompt variant is not a fixt
 
 ### Phase E — modes
 
-`PreBattleMenuScreen` (troop placement hex grid; smallest mode, first), `CombatScreen` with
-`CombatTroopCycle` (combat hex grid, timeline, troop cycling, threat), `AdventureMapScreen`
-(map grid, tile skipping, scanner, bookmarks, HUD stops, teleport mode, the summaries). The
-grid classes survive as the mode's cursor; the HUD and side panels become stops, and the
-mode node owns its keys, its buffer and its exit announcement. A pre-existing crash on quit
-to the main menu (`AdventureMapAdapter.GetInitialTile` throwing on resync) belongs here. A
-battle is reached by walking the map cursor onto a neutral army and pressing the right-click
-action twice; the post-game pages by Surrender in the pause menu (a fresh random skirmish).
+Remaining: `PreBattleMenuScreen` (troop placement hex grid; smallest mode, first) and
+`CombatScreen` with `CombatTroopCycle` (combat hex grid, timeline, troop cycling, threat).
+The grid classes survive as the mode's cursor; the side panels become stops, and the mode node
+owns its keys, its buffer and its exit announcement. A battle is reached by walking the map
+cursor onto a neutral army and pressing the right-click action twice; the post-game pages by
+Surrender in the pause menu (a fresh random skirmish).
 
-Owner rulings for the map (2026-09-08): type-ahead is OFF on `AdventureMapScreen`
-(`AllowsTypeahead` false), so no letter is ever claimed for a search and the game keeps its own
-hotkeys (C the sheet, V the spellbook, E end turn); the mod's own map letters (W, S, A, D, P, L,
-K, J, T, R, B, N) and digit chords stay bound as they are today, claimed only while the map node
-is focused. The map's
-troop bar is `TroopHudRows.Rows` in a HUD stop. The end-turn button is named by the game's
-tooltip, which `AdventureHudAdapter` refreshes through the game's own hover refresh before
-reading (the button's state is refreshed every frame, its title only on hover). The map's
-`Portrait` and `TooltipAction` uses go with the port.
-
-Approved model for `AdventureMapScreen` (2026-09-08): one stop `map` named "Map" (the teleport
-menu's instruction text while that menu is up) holding ONE node with a fixed id; the node's
-label is the tile description, its buffer the tile's tooltip lines, Enter/Backslash the
-primary/secondary tile actions; `AdventureMapGrid` survives as the mode's cursor (tile, scanner,
-bookmarks, beacons, cues, overlay) and speaks each move itself, so the navigator never announces
-a move. `ModeClaims` answers the grid's whole key set while the map node is focused. Then, in
-drawn order, stops that exist only while the game draws their panel: Wielder (named after the
-selected wielder: portrait button with the stat tooltip, experience line, Level Up when drawn,
-an Essences region of five tooltip lines, Wielder Sheet / Movement / Spells buttons), Troops
-(`TroopHudRows.Rows`, T), Resources (six lines, R), Kingdom (named "Kingdom": Game Menu then the
-four overview buttons, "unavailable" when greyed), Wielders (the drawn "Wielders n/m" line with
-its tooltip, then a button per wielder), Towns (same shape), Objectives (B), Notifications (N;
-Enter clicks, Backslash dismisses as a usage hint), Turn (round line, End Turn, then a Turn
-order region when drawn; Tab lands on End Turn). Chat and Bug report buttons are placed by
-measurement when drawn. Teleport: Escape stays the game's (`TeleportMenu` registers
-`UI.ExitMenu` to Cancel); the HUD stops are not built; a Teleport stop after the map holds
-Previous / Next / Confirm / Cancel; selecting a destination moves the cursor and reads the
-tile; Enter on the map confirms only on the destination; the close hook lands the cursor on the
-wielder and says "Cancelled" when cancelled. Escape on a HUD stop returns to the map with
-today's sound; on the map it is the game's. Cursor-moving events go through one
-`MoveCursor(tile, announce)`, announced only while the map is the top screen.
+`AdventureMapScreen` is done (2026-09-08) and is the worked example of the shape: ONE node
+with a fixed `ControlId` on the mode's stop, so the navigator never announces a move and the
+cursor class speaks each landing itself (queued, not interrupting - the router has already
+silenced the reader for the key, and a skip's "Skipped N tiles" must precede the tile). The
+review buffer refills on its own because the node's readout changed, so no buffer override was
+needed. `ModeClaims` answers the cursor's whole key set while its node is focused AND
+translates the graph's own navigation keys onto it (`ui_up` to the move, `ui_home` to the
+scanner jump), so an injected key behaves exactly as the physical one the router resolves to
+the mod's map action first.
 
 ### Phase F — the screen manager swap
 
@@ -440,8 +416,10 @@ was deleted in A. Phase C: `PauseMenuScreen`, `WorldConfirmMenuScreen`, `ClaimMe
 `SpellbookScreen`, `MoveTroopPopupScreen`, `WorldChoiceMenuScreen`,
 `ArtifactMarketScreen`, `TradingScreen`, `HostileJoinMenuScreen`, `SettlementScreen`,
 `DefenceMenuScreen`, `TroopManagementScreenBase`, `DraftTroopsScreen`, `UpgradeTroopsScreen`,
-`RallyPointScreen`. Unverified corners: `MessageDialogScreen`'s random event and custom
-message sources (no reachable state produced them), and a recruit card's essence tab row.
+`RallyPointScreen`. Phase E: `AdventureMapScreen`. Unverified corners: `MessageDialogScreen`'s random event and custom
+message sources (no reachable state produced them), a recruit card's essence tab row, and on
+the map the teleport mode, the town list, the chat button and the bug report button (no
+reachable state drew any of them).
 
 Remaining, with what the file constructs today and the proposed model (a proposal, not a
 decision, until the owner approves it; phase E's three are proposed by family as before):
@@ -451,7 +429,6 @@ decision, until the owner approves it; phase E's three are proposed by family as
 | `TooltipActionsMenuScreen` | Menu | stays a widget screen until no unported screen hands out `TooltipAction`s; deleted in G | G |
 | `PreBattleMenuScreen` | TroopPlacementHexGrid, Buttons, Text | mode node plus buttons stop | E |
 | `CombatScreen` (+ `CombatTroopCycle`) | CombatHexGrid, CombatTroopCycle, Menu, Buttons, Text | mode node, timeline stop, actions stop | E |
-| `AdventureMapScreen` | AdventureMapGrid, Menu, Buttons, Text | mode node, HUD stops (troops, resources, objectives, notifications) | E |
 | `StoryFocusBlockerScreen` | Container | deleted in F; becomes a predicate | F |
 
 ## 9. Risks

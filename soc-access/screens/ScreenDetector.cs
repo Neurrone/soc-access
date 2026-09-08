@@ -2335,12 +2335,12 @@ namespace SongsOfConquestAccess.Screens
             screen.EnterTeleportDestinationMode(adapter);
         }
 
-        public void OnTeleportMenuClosed(TeleportMenu menu)
+        public void OnTeleportMenuClosed(TeleportMenu menu, bool cancelled)
         {
             AdventureMapScreen screen = _screenManager.Get<AdventureMapScreen>();
             if (screen != null && screen.MatchesTeleportMenu(menu))
             {
-                screen.ExitTeleportDestinationMode(menu);
+                screen.ExitTeleportDestinationMode(menu, cancelled);
             }
         }
 
