@@ -46,10 +46,10 @@ things to watch and what turned up:
 - **The online game list.** A row's join button takes its label from the first line of the
   status tooltip when the button face has no text; that line is now cleaned of rich-text
   tags like every other label, where before it was raw. Hear one such row once.
-- **The map's town list is never built on the test save.** `AdventureHudAdapter.TownList`
-  resolves through Zenject, which throws and is caught every frame, so the mod cannot see
-  the town list at all. Not a performance fix: a probed flag there would hide it for good.
-  Needs a look at how the game registers `TownListUI`.
+- **The map's town list is new.** The mod never built the towns band before: the HUD adapter
+  resolved `TownListUI` from the wrong container, which threw and was caught every frame.
+  It is now found through its installer, so the map screen gains a Towns band (this save
+  has three). Walk it: names, tooltips, and whether Enter opens the town.
 - **A stale tile under a still cursor.** The map tile's cached label and tooltip (and so
   its "Enter selects" hint) now refresh on the map events the adapter already listens to,
   not only on cursor moves. Select a wielder with Enter and read the buffer without moving.
