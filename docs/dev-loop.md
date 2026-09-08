@@ -274,6 +274,21 @@ reaches the game" as untestable from here.
 diffed; `flat=1` when the tree shape is what changed. Capture every reachable screen the
 change could touch.
 
+## 4a. Measuring a screen's build
+
+Graph screens rebuild every frame, so a slow `Build` is a slow game. On the screen in question:
+
+```
+POST /eval?settle=0&speech=0
+var scr = (SongsOfConquestAccess.Screens.GraphScreen)SongsOfConquestAccess.SocAccessMod.Instance.ScreenManager.CurrentScreen; var sw = System.Diagnostics.Stopwatch.StartNew(); for (int i = 0; i < 200; i++) { var b = new SongsOfConquestAccess.UI.Graph.GraphBuilder(); scr.Build(b); b.Build(); } sw.Elapsed.TotalMilliseconds / 200.0
+```
+
+is one build in ms; run it twice, the first run of a cold path includes JIT. `scr.Navigator.Update()`
+timed the same way is the whole per-frame graph cost; reflecting the mod's private `Update` and
+invoking it is the whole mod frame; `UnityEngine.Time.smoothDeltaTime` is the frame. Time an
+adapter getter by reflecting the screen's private `_adapter`. Reference: a `FindObjectsOfTypeAll`
+scan costs about 19 ms here; a build should be under 1 ms.
+
 ## 5. Evidence
 
 `.\crop-shot.ps1 -Rect x,y,w,h [-Out path]` fetches `/screenshot` and keeps one region

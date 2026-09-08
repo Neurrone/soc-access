@@ -376,6 +376,28 @@ rearrange" hint as a line (owner ruling). Start node the attacker line. Escape i
 EXCEPT while the grid node is focused (`AllowsTypeahead` answers per focused node); the map's
 screen-wide off was for the map's own letter hotkeys, which this screen has only on the grid.
 
+Approved model for `CombatScreen` (2026-09-08). Screen name stays "Combat". Stops, in this
+order: Battlefield (the mode node, named by the existing combat grid string or by the spell /
+ability targeting instruction while aiming; one node with a fixed id; label = the adapter's
+tile description with the inspect context, buffer = the inspect tooltip; `ModeClaims` takes the
+hex moves and skips, Ctrl+Space, I inspect, the comma/period acting and enemy troop cycles,
+Space to the acting troop, W relevant tiles, T to the turn order stop, S threat, the scanner
+families with Home/End/Backspace; Enter confirms a target while aiming and is silent
+otherwise (the game binds no confirm key in battle); Backslash is the game's right click;
+type-ahead off on this node only; inspect is a sub-mode, Escape claimed only while inspecting
+or aiming, cancelling through the adapter as today); Quickbar when drawn (the spell slots down
+the left edge); Attacker (player name when drawn, portrait line with tooltip, Auto Battle,
+Essences region, Spells or Cancel spell, which the game draws in the Spells spot while aiming);
+Defender, same shape, when a wielder is drawn; Current troop (a line, Enter moves the cursor to
+it; its ability button or Cancel ability as the next row when drawn); Turn order (the queue
+with round markers, Enter on a troop moves the cursor; T lands here); Game menu (Chat, Game
+Menu); Battle log when drawn; End turn alone. Escape on a HUD stop returns to the battlefield
+with today's sound; on the battlefield otherwise it is the game's. Spell cast and ability
+targeting land focus on the battlefield silently and speak the instruction; the queue change is
+free under immediate mode; `CombatTroopCycle`, the narrator and the combat events buffer stay.
+Multiplayer follow-ups, not ported: the turn timer beside End Turn and the per-side player
+message panels (textless or unmeasured; need a multiplayer fixture).
+
 ### Phase F — the screen manager swap
 
 1. Replace `ScreenManager` with ES2's poll-and-diff manager: registered singleton screens,

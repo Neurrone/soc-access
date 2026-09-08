@@ -115,6 +115,25 @@ Current environment assumptions:
 - The dev server is off for players: `[Dev] devServer = false` in `BepInEx/config/songs.of.conquest.access.cfg`. `run-game.ps1` writes it true for development runs; `SOCACCESS_NO_DEV=1` forces it off, `SOCACCESS_DEV_PORT` overrides the port, `SOCACCESS_NO_SPEECH=1` mutes the screen reader while `/speech` still captures
 - `mcs.dll` (the REPL compiler) sits next to the loader in both the development deployment and the release; it is only loaded on the first `/eval`, so with the server off it never runs
 
+## Performance
+
+A graph screen's `Build` runs every frame. Nothing inside it, or inside a predicate, context
+name or eagerly passed argument it evaluates, may scan the scene (`Resources.FindObjectsOfTypeAll`,
+`FindObjectOfType`), walk a subtree (`GetComponentsInChildren`), invoke a game refresh through
+reflection, or iterate a whole game collection. That work belongs in the adapter's constructor,
+in a snapshot taken on the detector's change hook, or inside a tooltip's lines function.
+
+An adapter resolves each game object, `FieldInfo`, `PropertyInfo` and `MethodInfo` once per
+instance. Cache misses too, behind a probed flag, so an absent panel costs one lookup and not
+one per frame.
+
+A game-side refresh (a tooltip recomposed on hover) runs when the text is read, never when the
+build asks whether a tooltip exists; `PostBattleResultScreen`'s portrait tooltip is the pattern.
+
+Before handing over a graph screen, measure one build with the eval recipe in `docs/dev-loop.md`
+("Measuring a screen's build") and put the number in the commit message. Over one millisecond
+is a finding to fix, not a note.
+
 ## Logs
 
 Look at `GamePaths.props` for the path to the local game install. Logs are in the `BepInEx/LogOutput.log` in the game installation; while the game runs with the dev server, `GET http://127.0.0.1:8772/log?since=N&grep=TEXT` answers the same lines without reading the file.
