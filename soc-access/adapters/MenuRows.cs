@@ -45,7 +45,7 @@ namespace SongsOfConquestAccess.Adapters
             AddToggles(items, factory);
             AddSliders(items, factory);
             AddButtons(items, factory);
-            items.Sort(Compare);
+            SortByHierarchy(items);
             return items;
         }
 
@@ -472,14 +472,40 @@ namespace SongsOfConquestAccess.Adapters
             return slider == null || slider.ValueMultiplier == 0f ? 1f : slider.ValueMultiplier;
         }
 
-        private static int Compare(MenuRow left, MenuRow right)
+        /// <summary>Order the rows the way the game drew them, computing each row's hierarchy key
+        /// ONCE. Comparing two rows by walking both their parent chains and building two strings
+        /// there and then costs a walk per comparison - n log n of them for a tree that has not
+        /// moved - so the keys are taken first and only the keys are compared. Rows that landed on
+        /// the same transform keep the order they were read in.</summary>
+        private static void SortByHierarchy(List<MenuRow> items)
         {
-            if (ReferenceEquals(left, right))
+            int count = items.Count;
+            if (count < 2)
             {
-                return 0;
+                return;
             }
 
-            return string.CompareOrdinal(HierarchyKey(left.Transform), HierarchyKey(right.Transform));
+            MenuRow[] rows = items.ToArray();
+            string[] keys = new string[count];
+            int[] order = new int[count];
+            for (int i = 0; i < count; i++)
+            {
+                keys[i] = HierarchyKey(rows[i].Transform);
+                order[i] = i;
+            }
+
+            Array.Sort(
+                order,
+                (left, right) =>
+                {
+                    int byKey = string.CompareOrdinal(keys[left], keys[right]);
+                    return byKey != 0 ? byKey : left - right;
+                });
+
+            for (int i = 0; i < count; i++)
+            {
+                items[i] = rows[order[i]];
+            }
         }
 
         private static string HierarchyKey(Transform transform)
