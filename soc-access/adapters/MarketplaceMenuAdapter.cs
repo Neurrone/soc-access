@@ -55,6 +55,13 @@ namespace SongsOfConquestAccess.Adapters
             get { return _facade; }
         }
 
+        // The meshes the menu draws its tip and its captions on. Which meshes they ARE is fixed for
+        // the menu's life and finding them walked the whole page twice a frame; what they SAY, and
+        // whether they are drawn, is still read live.
+        private UITextMesh _tipText;
+        private bool _tipProbed;
+        private List<UITextMesh> _headerTexts;
+
         public bool IsPresent()
         {
             return _menu != null && ((Component)_menu).gameObject.activeInHierarchy;
@@ -146,23 +153,38 @@ namespace SongsOfConquestAccess.Adapters
         {
             get
             {
-                if (_menu == null)
-                {
-                    return new List<string>();
-                }
-
-                UITextMesh[] textMeshes = ((Component)_menu).GetComponentsInChildren<UITextMesh>(includeInactive: false);
-                for (int i = 0; i < textMeshes.Length; i++)
-                {
-                    UITextMesh textMesh = textMeshes[i];
-                    if (textMesh != null && string.Equals(textMesh.gameObject.name, "TipText", StringComparison.OrdinalIgnoreCase))
-                    {
-                        return SpokenLines.Of(new[] { UITextMeshTextUtility.GetEffectiveText(textMesh) });
-                    }
-                }
-
-                return new List<string>();
+                UITextMesh tip = GetTipText();
+                return tip == null || !tip.gameObject.activeInHierarchy
+                    ? new List<string>()
+                    : SpokenLines.Of(new[] { UITextMeshTextUtility.GetEffectiveText(tip) });
             }
+        }
+
+        private UITextMesh GetTipText()
+        {
+            if (_tipProbed)
+            {
+                return _tipText;
+            }
+
+            if (_menu == null)
+            {
+                return null;
+            }
+
+            _tipProbed = true;
+            UITextMesh[] textMeshes = ((Component)_menu).GetComponentsInChildren<UITextMesh>(includeInactive: true);
+            for (int i = 0; i < textMeshes.Length; i++)
+            {
+                UITextMesh textMesh = textMeshes[i];
+                if (textMesh != null && string.Equals(textMesh.gameObject.name, "TipText", StringComparison.OrdinalIgnoreCase))
+                {
+                    _tipText = textMesh;
+                    return textMesh;
+                }
+            }
+
+            return null;
         }
 
         public bool Close()
@@ -252,22 +274,12 @@ namespace SongsOfConquestAccess.Adapters
         private List<UITextMesh> GetHeaderTexts(float above)
         {
             List<UITextMesh> headers = new List<UITextMesh>();
-            if (_menu == null)
+            List<UITextMesh> candidates = GetHeaderCandidates();
+            for (int i = 0; i < candidates.Count; i++)
             {
-                return headers;
-            }
-
-            UITextMesh title = GetField<UITextMesh>(_menu, TitleTextField);
-            UITextMesh owning = GetField<UITextMesh>(_menu, NumberOfMarketplacesTextField);
-            UITextMesh[] textMeshes = ((Component)_menu).GetComponentsInChildren<UITextMesh>(includeInactive: false);
-            for (int i = 0; i < textMeshes.Length; i++)
-            {
-                UITextMesh textMesh = textMeshes[i];
+                UITextMesh textMesh = candidates[i];
                 if (textMesh == null
                     || !textMesh.gameObject.activeInHierarchy
-                    || ReferenceEquals(textMesh, title)
-                    || ReferenceEquals(textMesh, owning)
-                    || textMesh.gameObject.name.IndexOf("Header", StringComparison.OrdinalIgnoreCase) < 0
                     || textMesh.transform.position.y <= above)
                 {
                     continue;
@@ -277,6 +289,43 @@ namespace SongsOfConquestAccess.Adapters
             }
 
             return headers;
+        }
+
+        // Which meshes are named Header, and are neither the heading nor the marketplace count: a
+        // fact about the menu's own layout, so the walk that finds them runs once. Whether one is
+        // drawn, and how high it is drawn, are still read per call.
+        private List<UITextMesh> GetHeaderCandidates()
+        {
+            if (_headerTexts != null)
+            {
+                return _headerTexts;
+            }
+
+            List<UITextMesh> candidates = new List<UITextMesh>();
+            if (_menu == null)
+            {
+                return candidates;
+            }
+
+            UITextMesh title = GetField<UITextMesh>(_menu, TitleTextField);
+            UITextMesh owning = GetField<UITextMesh>(_menu, NumberOfMarketplacesTextField);
+            UITextMesh[] textMeshes = ((Component)_menu).GetComponentsInChildren<UITextMesh>(includeInactive: true);
+            for (int i = 0; i < textMeshes.Length; i++)
+            {
+                UITextMesh textMesh = textMeshes[i];
+                if (textMesh == null
+                    || ReferenceEquals(textMesh, title)
+                    || ReferenceEquals(textMesh, owning)
+                    || textMesh.gameObject.name.IndexOf("Header", StringComparison.OrdinalIgnoreCase) < 0)
+                {
+                    continue;
+                }
+
+                candidates.Add(textMesh);
+            }
+
+            _headerTexts = candidates;
+            return candidates;
         }
 
         // The band captions are the ones drawn ABOVE the column captions, so the two bands part at the
