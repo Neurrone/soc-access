@@ -2,8 +2,8 @@
 
 Self-contained brief for a fresh session. Goal: replace the retained, stack-based widget
 tree in `soc-access/ui/` with the immediate-mode graph engine that Endless Space 2 Access
-uses. Every screen is ported (phases A to E) and the manager polls (phase F, 2026-09-08). What
-remains is the owner's walk of F and the cleanup (phase G).
+uses. Every screen is ported (phases A to E) and the manager polls (phase F, walked and closed
+2026-09-08). What remains is the cleanup (phase G).
 
 Prerequisite: the dev server (`docs/dev-loop.md`). This plan uses `/gui/graph`, `/gui/unity`,
 `/input`, `/key`, `/speech`, `/eval`, `/reload` and `run-game.ps1` throughout.
@@ -11,7 +11,7 @@ Prerequisite: the dev server (`docs/dev-loop.md`). This plan uses `/gui/graph`, 
 Resuming in a fresh session: read §0's docs, then §1 (what F replaces) and §2 (what exists),
 §3 (keys), then phase F in §5 and the inventory in §6, then `docs/dev-loop.md`. Commit per
 logical step and update this file as decisions are taken; prune it at the end of each phase
-so it holds only what the remaining work needs. Start at phase G once F's walk is done.
+so it holds only what the remaining work needs. Start at phase G.
 
 Owner decisions already made (do not re-ask):
 
@@ -233,19 +233,8 @@ catches the stale entries.
 
 ## 5. Phases
 
-Phases A to E are done: the engine and bridge, every screen outside a game, the in-game menus
-and forms, the composite grids with the carry, and the three modes.
-
-### Phase F — the screen manager swap
-
-Implemented 2026-09-08 (commits `550bf48`, `0e624e0`, `c8fbd6f`, `36625df`): `ScreenManager`
-polls and diffs, `Screen` has ES2's shape with the child chain, `LiveScreen<TAdapter>` is the
-slot the detector writes, every screen is a registered singleton (`SocAccessMod.RegisterScreens`,
-layers in `screens/README.md`), `DropListScreen`, `ModOptionsScreen` and `ModDialogScreen` are
-children, `RecoverRuntimeState` re-points the slots after a hot reload, and the dev server has
-`/screens` and `/gui/graph?screen=KEY` with the widget dumps gone. What remains is the owner's
-walk: `docs/phase-f-handover.md` lists what was verified, what to walk and what to watch for.
-The phase closes when the owner says so; delete the handover then.
+Phases A to F are done: the engine and bridge, every screen, the composite grids with the
+carry, the three modes, and the polling screen manager (2026-09-08).
 
 ### Phase G — cleanup
 
