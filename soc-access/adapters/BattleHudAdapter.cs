@@ -27,6 +27,9 @@ namespace SongsOfConquestAccess.Adapters
 {
     public sealed class BattleHudAdapter
     {
+        private static readonly PropertyInfo InstallerContainerProperty =
+            AccessTools.Property(typeof(MonoInstallerBase), "Container");
+
         private static readonly FieldInfo BattleHudSettingsField =
             AccessTools.Field(typeof(BattleHUDStateHandler), "_settings");
         private static readonly FieldInfo BattleEndTurnButtonField =
@@ -88,12 +91,12 @@ namespace SongsOfConquestAccess.Adapters
         {
             _facade = facade;
             _localization = localization;
-            _stateHandler = Resolve<BattleHUDStateHandler>(container);
+            _stateHandler = ResolveHud<BattleHUDStateHandler, BattleHUDStateHandlerInstaller>(container);
             _settings = Resolve<BattleHUDStateHandler.Settings>(container)
                 ?? GetField<BattleHUDStateHandler.Settings>(_stateHandler, BattleHudSettingsField);
             _gameLog = Resolve<IGameLog>(container);
             _abilityUtility = Resolve<ITroopAbilityUtility>(container);
-            _battleViewManager = Resolve<BattleViewManager>(container);
+            _battleViewManager = ResolveHud<BattleViewManager, BattleViewInstaller>(container);
             _spellsLookup = Resolve<ISpellsLookup>(container);
             Commanders = new BattleCommanderHudAdapter(_settings, facade, localization);
         }
@@ -1157,6 +1160,34 @@ namespace SongsOfConquestAccess.Adapters
         private static string GetText(UITextMesh text)
         {
             return SpokenLines.Clean(UITextMeshTextUtility.GetEffectiveText(text));
+        }
+
+        /// <summary>
+        /// A HUD bound in its own MonoInstaller's container is invisible to the scene container the
+        /// battle installer hands out (the adventure map's town list was lost that way), so a miss
+        /// there is retried on the installer's own container. Constructor-time, once per battle.
+        /// </summary>
+        private static T ResolveHud<T, TInstaller>(DiContainer container)
+            where T : class
+            where TInstaller : MonoInstallerBase
+        {
+            T found = Resolve<T>(container);
+            if (found != null)
+            {
+                return found;
+            }
+
+            TInstaller[] installers = Resources.FindObjectsOfTypeAll<TInstaller>();
+            for (int i = 0; i < installers.Length && found == null; i++)
+            {
+                TInstaller installer = installers[i];
+                if (installer != null && installer.gameObject.scene.IsValid() && InstallerContainerProperty != null)
+                {
+                    found = Resolve<T>(InstallerContainerProperty.GetValue(installer, null) as DiContainer);
+                }
+            }
+
+            return found;
         }
 
         private static T Resolve<T>(DiContainer container) where T : class
