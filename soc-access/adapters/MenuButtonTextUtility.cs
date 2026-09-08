@@ -80,7 +80,7 @@ namespace SongsOfConquestAccess.Adapters
                 return string.Empty;
             }
 
-            UITextMesh[] textMeshes = ((Component)button).GetComponentsInChildren<UITextMesh>(includeInactive: false);
+            UITextMesh[] textMeshes = TextMeshesOf(button);
             for (int i = 0; i < textMeshes.Length; i++)
             {
                 UITextMesh textMesh = textMeshes[i];
@@ -108,7 +108,7 @@ namespace SongsOfConquestAccess.Adapters
                 return string.Empty;
             }
 
-            UITextMesh[] textMeshes = ((Component)button).GetComponentsInChildren<UITextMesh>(includeInactive: false);
+            UITextMesh[] textMeshes = TextMeshesOf(button);
             for (int i = 0; i < textMeshes.Length; i++)
             {
                 UITextMesh textMesh = textMeshes[i];
@@ -124,7 +124,7 @@ namespace SongsOfConquestAccess.Adapters
                 }
             }
 
-            Text[] texts = ((Component)button).GetComponentsInChildren<Text>(includeInactive: false);
+            Text[] texts = UnityTextsOf(button);
             for (int i = 0; i < texts.Length; i++)
             {
                 Text text = texts[i];
@@ -157,7 +157,7 @@ namespace SongsOfConquestAccess.Adapters
             }
 
             List<string> parts = new List<string>();
-            UITextMesh[] textMeshes = ((Component)button).GetComponentsInChildren<UITextMesh>(includeInactive: false);
+            UITextMesh[] textMeshes = TextMeshesOf(button);
             for (int i = 0; i < textMeshes.Length; i++)
             {
                 UITextMesh textMesh = textMeshes[i];
@@ -173,7 +173,7 @@ namespace SongsOfConquestAccess.Adapters
                 }
             }
 
-            Text[] texts = ((Component)button).GetComponentsInChildren<Text>(includeInactive: false);
+            Text[] texts = UnityTextsOf(button);
             for (int i = 0; i < texts.Length; i++)
             {
                 Text text = texts[i];
@@ -234,7 +234,7 @@ namespace SongsOfConquestAccess.Adapters
 
         private static string GetVisibleUITextMeshByName(UIButton button, string nodeName)
         {
-            UITextMesh[] textMeshes = ((Component)button).GetComponentsInChildren<UITextMesh>(includeInactive: false);
+            UITextMesh[] textMeshes = TextMeshesOf(button);
             for (int i = 0; i < textMeshes.Length; i++)
             {
                 UITextMesh textMesh = textMeshes[i];
@@ -293,7 +293,7 @@ namespace SongsOfConquestAccess.Adapters
 
         private static string GetVisibleUnityTextByName(UIButton button, string nodeName)
         {
-            Text[] texts = ((Component)button).GetComponentsInChildren<Text>(includeInactive: false);
+            Text[] texts = UnityTextsOf(button);
             for (int i = 0; i < texts.Length; i++)
             {
                 Text text = texts[i];
@@ -312,6 +312,104 @@ namespace SongsOfConquestAccess.Adapters
             }
 
             return string.Empty;
+        }
+
+        // ---- the text nodes under a button ----
+
+        /// <summary>
+        /// The text nodes under a button, walked once per button and kept. A label read walked the
+        /// whole subtree - twice for every visible text, up to five times for a standard label - for
+        /// a set of components that does not change while the button is drawn, and the FOCUSED row's
+        /// label is read twice a frame. Both sets are kept even when empty, so a button with no text
+        /// of a kind costs one walk and not one per frame.
+        ///
+        /// The sets are walked WITH the inactive nodes and filtered on activeInHierarchy where they
+        /// are read, which is what every reader here did anyway, so what a read answers is unchanged.
+        /// A subtree the game has torn down - a destroyed node, or a different number of children, as
+        /// a pooled list row gets - is walked again rather than answered from what the old subtree
+        /// left behind.
+        /// </summary>
+        private sealed class ButtonTexts
+        {
+            public UITextMesh[] TextMeshes;
+            public Text[] Texts;
+            public int ChildCount;
+        }
+
+        private static readonly Dictionary<UIButton, ButtonTexts> TextsByButton =
+            new Dictionary<UIButton, ButtonTexts>();
+
+        private static readonly UITextMesh[] NoTextMeshes = new UITextMesh[0];
+        private static readonly Text[] NoTexts = new Text[0];
+
+        /// <summary>Forget every button's text nodes - the mod is going away.</summary>
+        public static void Reset()
+        {
+            TextsByButton.Clear();
+        }
+
+        private static UITextMesh[] TextMeshesOf(UIButton button)
+        {
+            ButtonTexts texts = TextsOf(button);
+            return texts != null ? texts.TextMeshes : NoTextMeshes;
+        }
+
+        private static Text[] UnityTextsOf(UIButton button)
+        {
+            ButtonTexts texts = TextsOf(button);
+            return texts != null ? texts.Texts : NoTexts;
+        }
+
+        private static ButtonTexts TextsOf(UIButton button)
+        {
+            if (button == null)
+            {
+                return null;
+            }
+
+            Component root = button;
+            ButtonTexts texts;
+            if (TextsByButton.TryGetValue(button, out texts) && StillDescribes(texts, root))
+            {
+                return texts;
+            }
+
+            texts = new ButtonTexts
+            {
+                TextMeshes = root.GetComponentsInChildren<UITextMesh>(includeInactive: true),
+                Texts = root.GetComponentsInChildren<Text>(includeInactive: true),
+                ChildCount = root.transform.childCount,
+            };
+            TextsByButton[button] = texts;
+            return texts;
+        }
+
+        // Whether a kept set still describes the button: nothing in it has been destroyed and the
+        // button has the same number of children it had when the set was taken.
+        private static bool StillDescribes(ButtonTexts texts, Component root)
+        {
+            if (texts.ChildCount != root.transform.childCount)
+            {
+                return false;
+            }
+
+            for (int i = 0; i < texts.TextMeshes.Length; i++)
+            {
+                if (texts.TextMeshes[i] == null)
+                {
+                    return false;
+                }
+            }
+
+            for (int i = 0; i < texts.Texts.Length; i++)
+            {
+                if (texts.Texts[i] == null)
+                {
+                    return false;
+                }
+            }
+
+            return true;
         }
 
         private static bool HasMatchingNodeName(string actualName, string[] nodeNames)

@@ -125,6 +125,7 @@ namespace SongsOfConquestAccess
             Step("mod dialogs", UI.ModDialog.CloseAll);
             Step("screens", () => _screenManager?.Shutdown());
             Step("drop list", Screens.DropListScreen.Reset);
+            Step("button text", Adapters.MenuButtonTextUtility.Reset);
             Step("graph navigator", () =>
             {
                 _navigator?.Attach(null);
