@@ -10,6 +10,23 @@ using UnityEngine;
 
 namespace SongsOfConquestAccess.UI
 {
+    /// <summary>
+    /// The battlefield's TILE CURSOR - the cursor of a mode whose cursor is not the focus cursor
+    /// (<c>ui-graph-plan.md</c> phase E), the same shape as <see cref="AdventureMapGrid"/> and
+    /// <see cref="TroopPlacementHexGrid"/>. <see cref="Screens.CombatScreen"/> declares ONE node for
+    /// the whole board and hands this class every key that walks it: the six hex moves and their
+    /// skips, the centre tile, inspect, the troop cycles, the relevant-tile walk, the threat readout
+    /// and the scanner. Because the node's identity never changes as the cursor walks, the navigator
+    /// has nothing to announce and this class says each landing itself, queued rather than
+    /// interrupting, exactly as the widget engine's focus commit said it.
+    ///
+    /// THE GAME'S CLICKS ARE THE NODE'S, not this class's: Enter (confirm a spell or ability target
+    /// while aiming) and Backslash (the right click a troop acts with) are declared on the node by
+    /// the screen, and Escape reaches <see cref="HandleBack"/> through the screen's Back.
+    ///
+    /// The widget base is still here; phase G removes it once no widget tree exists at all. Nothing
+    /// adds this to one any more.
+    /// </summary>
     public sealed class CombatHexGrid : Widget
     {
         private const string ScannerWrapCueKey = "Common_ClickUnfold";
@@ -21,7 +38,6 @@ namespace SongsOfConquestAccess.UI
         private CombatInspectContext _inspectContext;
         private bool _componentWarningSpoken;
         private readonly ScannerController _scanner;
-        private bool _tileCuesHandled;
         private readonly ScannerJumpAnchor _jumpAnchor = new ScannerJumpAnchor();
 
         public CombatHexGrid(CombatAdapter adapter)
@@ -49,11 +65,6 @@ namespace SongsOfConquestAccess.UI
                 ScannerDirectionMode.Hex);
         }
 
-        public override bool AnnounceName
-        {
-            get { return true; }
-        }
-
         public override string GetRole()
         {
             return string.Empty;
@@ -78,6 +89,77 @@ namespace SongsOfConquestAccess.UI
         public override Tooltip GetTooltip()
         {
             return _adapter != null ? _adapter.GetInspectTooltip(_inspectContext, _cursor) : null;
+        }
+
+        /// <summary>Where the cursor stands - the tile the node's clicks act on.</summary>
+        public Vector2Int CursorTile
+        {
+            get { return _cursor; }
+        }
+
+        /// <summary>Whether the inspect sub-mode is on, which is one of the two states in which the
+        /// screen takes Escape away from the game.</summary>
+        public bool IsInspecting
+        {
+            get { return _inspectContext != null; }
+        }
+
+        /// <summary>Draw the game's own highlight on the tile the cursor stands on and give the tile
+        /// the game's focus - what the screen does when the board's node takes the cursor. While
+        /// inspecting the native focus is left where the inspection pinned it.</summary>
+        public void ShowOverlay()
+        {
+            FocusCurrentTile(updateNativeFocus: _inspectContext == null);
+        }
+
+        /// <summary>Take the highlight off again: the cursor has gone to a HUD stop or off the
+        /// screen.</summary>
+        public void HideOverlay()
+        {
+            _adapter?.ClearFocusedTileOverlay();
+        }
+
+        /// <summary>Enter on the board: while a spell or an ability is being aimed it confirms the
+        /// target under the cursor. The game binds no confirm key in battle otherwise, so anywhere
+        /// else it does nothing.</summary>
+        public bool ConfirmTarget()
+        {
+            if (_adapter == null)
+            {
+                return false;
+            }
+
+            CombatTargetingMode mode = _adapter.GetTargetingMode();
+            return mode == CombatTargetingMode.Spell
+                ? _adapter.ConfirmSpellTarget(_cursor)
+                : mode == CombatTargetingMode.Ability && _adapter.ConfirmAbilityTarget(_cursor);
+        }
+
+        /// <summary>Escape while the board has the cursor: it gives up whatever sub-mode is on - the
+        /// spell being aimed, the ability being aimed, or the inspection - and answers false when
+        /// none of them is, which is what leaves the key to the game's pause menu.</summary>
+        public bool HandleBack()
+        {
+            if (_adapter != null && _adapter.GetTargetingMode() == CombatTargetingMode.Spell && _adapter.CancelSpellTargeting())
+            {
+                return true;
+            }
+
+            if (_adapter != null && _adapter.GetTargetingMode() == CombatTargetingMode.Ability && _adapter.CancelAbilityTargeting())
+            {
+                return true;
+            }
+
+            // Cued here rather than inside ExitInspect: the other callers exit inspect as a
+            // prelude to their own cursor move and would double up.
+            if (!ExitInspect())
+            {
+                return false;
+            }
+
+            SpeakTile();
+            PlayTileCues();
+            return true;
         }
 
         public override bool ClaimsAction(string actionKey)
@@ -107,15 +189,7 @@ namespace SongsOfConquestAccess.UI
                 || actionKey == AccessibilityActions.CombatPreviousRelevantTile.Key
                 || actionKey == AccessibilityActions.CombatFocusTimeline.Key
                 || actionKey == AccessibilityActions.ReadThreat.Key
-                || (_adapter != null && _adapter.GetTargetingMode() != CombatTargetingMode.None && actionKey == AccessibilityActions.Activate.Key)
-                || actionKey == AccessibilityActions.MapSecondaryAction.Key
-                || IsScannerAction(actionKey)
-                || ((_inspectContext != null || (_adapter != null && _adapter.GetTargetingMode() != CombatTargetingMode.None)) && actionKey == AccessibilityActions.Cancel.Key);
-        }
-
-        public override bool HasClaimInTree(string actionKey)
-        {
-            return ClaimsAction(actionKey);
+                || IsScannerAction(actionKey);
         }
 
         public override bool HandleAction(InputAction action)
@@ -256,48 +330,6 @@ namespace SongsOfConquestAccess.UI
                 return ReadThreat();
             }
 
-            if (action.Key == AccessibilityActions.MapSecondaryAction.Key)
-            {
-                _adapter?.HandleSecondaryAction(_cursor);
-                UIManager.SetFocusedWidget(this);
-                return true;
-            }
-
-            if (action.Key == AccessibilityActions.Activate.Key && _adapter != null)
-            {
-                CombatTargetingMode mode = _adapter.GetTargetingMode();
-                bool handled = mode == CombatTargetingMode.Spell
-                    ? _adapter.ConfirmSpellTarget(_cursor)
-                    : mode == CombatTargetingMode.Ability && _adapter.ConfirmAbilityTarget(_cursor);
-                UIManager.SetFocusedWidget(this);
-                return handled;
-            }
-
-            if (action.Key == AccessibilityActions.Cancel.Key)
-            {
-                if (_adapter != null && _adapter.GetTargetingMode() == CombatTargetingMode.Spell && _adapter.CancelSpellTargeting())
-                {
-                    UIManager.SetFocusedWidget(this);
-                    return true;
-                }
-
-                if (_adapter != null && _adapter.GetTargetingMode() == CombatTargetingMode.Ability && _adapter.CancelAbilityTargeting())
-                {
-                    UIManager.SetFocusedWidget(this);
-                    return true;
-                }
-
-                // Cued here rather than inside ExitInspect: the other callers exit inspect as a
-                // prelude to their own cursor move and would double up.
-                if (!ExitInspect())
-                {
-                    return false;
-                }
-
-                PlayTileCues();
-                return true;
-            }
-
             return false;
         }
 
@@ -313,29 +345,8 @@ namespace SongsOfConquestAccess.UI
             return screen != null && screen.CanNavigateEnemyActingTroops();
         }
 
-        protected override void OnFocus()
-        {
-            FocusCurrentTile(updateNativeFocus: _inspectContext == null);
-
-            // Focus arrival announces the current tile, so it gets a cue too. Paths that already
-            // cued while claiming focus mark the arrival handled so it only sounds once.
-            if (!_tileCuesHandled)
-            {
-                PlayTileCues();
-            }
-        }
-
-        protected override void OnUnfocus()
-        {
-            _tileCuesHandled = false;
-            _adapter?.ClearFocusedTileOverlay();
-        }
-
-        public bool MoveToActingTroop(Vector2Int point)
-        {
-            return MoveToTroop(point);
-        }
-
+        /// <summary>Put the cursor on a troop's tile and read it, as a move does: the queue's Enter,
+        /// the troop cycles and the narrator's "it is your turn" all land this way.</summary>
         public bool MoveToTroop(Vector2Int point)
         {
             RefreshSnapshot();
@@ -351,13 +362,25 @@ namespace SongsOfConquestAccess.UI
 
             _cursor = point;
             FocusCurrentTile(updateNativeFocus: true);
+            SpeakTile();
             PlayTileCues();
             return true;
         }
 
+        /// <summary>The tile description, said the way the widget engine's focus commit said it:
+        /// queued behind whatever the same keypress has already said, so a skip's "Skipped 3 tiles"
+        /// is heard before the tile it landed on.</summary>
+        private void SpeakTile()
+        {
+            string label = GetLabel();
+            if (!string.IsNullOrWhiteSpace(label))
+            {
+                SpeechPipeline.Output(new SpeechRequest(label, interrupt: false));
+            }
+        }
+
         private void PlayTileCues()
         {
-            _tileCuesHandled = true;
             PlayTileCuesFor(_cursor, 0f, 1f, 0f);
         }
 
@@ -422,6 +445,7 @@ namespace SongsOfConquestAccess.UI
 
             _cursor = CenterTile;
             FocusCurrentTile(updateNativeFocus: true);
+            SpeakTile();
             PlayTileCues();
             return true;
         }
@@ -589,6 +613,7 @@ namespace SongsOfConquestAccess.UI
 
             _cursor = point;
             FocusCurrentTile(updateNativeFocus: _inspectContext == null);
+            SpeakTile();
             PlayTileCues();
             return true;
         }
@@ -741,7 +766,6 @@ namespace SongsOfConquestAccess.UI
             }
 
             _adapter?.SetFocusedTileOverlay(_cursor);
-            UIManager.SetFocusedWidget(this);
         }
 
         public void HandleTargetingBegin()

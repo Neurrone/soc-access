@@ -2579,6 +2579,11 @@ msgctxt "Screens.CurrentTroop"
 msgid "Current troop, {0}"
 msgstr ""
 
+#. Screens.CurrentTroopSection
+msgctxt "Screens.CurrentTroopSection"
+msgid "Current troop"
+msgstr ""
+
 #. Screens.CombatPortraitDetail
 msgctxt "Screens.CombatPortraitDetail"
 msgid "{0}, {1}, level {2}"
@@ -2672,6 +2677,11 @@ msgstr ""
 #. Screens.Map
 msgctxt "Screens.Map"
 msgid "Map"
+msgstr ""
+
+#. Screens.Menu
+msgctxt "Screens.Menu"
+msgid "Menu"
 msgstr ""
 
 #. Screens.Kingdom

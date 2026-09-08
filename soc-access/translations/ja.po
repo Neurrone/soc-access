@@ -805,6 +805,11 @@ msgctxt "Screens.CurrentTroop"
 msgid "Current troop, {0}"
 msgstr "現在の部隊、{0}"
 
+#. Screens.CurrentTroopSection
+msgctxt "Screens.CurrentTroopSection"
+msgid "Current troop"
+msgstr "現在の部隊"
+
 #. Screens.DefenderEssence
 msgctxt "Screens.DefenderEssence"
 msgid "Defender essence"
@@ -854,6 +859,11 @@ msgstr "メインメニュー"
 msgctxt "Screens.Map"
 msgid "Map"
 msgstr "マップ"
+
+#. Screens.Menu
+msgctxt "Screens.Menu"
+msgid "Menu"
+msgstr "メニュー"
 
 #. Screens.Kingdom
 msgctxt "Screens.Kingdom"

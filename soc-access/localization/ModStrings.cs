@@ -584,6 +584,7 @@ namespace SongsOfConquestAccess.Localization
             public static readonly ModString CancelAbility = new ModString("Screens.CancelAbility", "Cancel ability");
             public static readonly ModString CancelSpell = new ModString("Screens.CancelSpell", "Cancel spell");
             public static readonly ModString CurrentTroop = new ModString("Screens.CurrentTroop", "Current troop, {0}");
+            public static readonly ModString CurrentTroopSection = new ModString("Screens.CurrentTroopSection", "Current troop");
             public static readonly ModString CombatPortraitDetail = new ModString("Screens.CombatPortraitDetail", "{0}, {1}, level {2}");
             public static readonly ModString Defender = new ModString("Screens.Defender", "Defender");
             public static readonly ModString DefenderEssence = new ModString("Screens.DefenderEssence", "Defender essence");
@@ -604,6 +605,7 @@ namespace SongsOfConquestAccess.Localization
             public static readonly ModString MainMenu = new ModString("Screens.MainMenu", "Main menu");
             /// <summary>The adventure map itself, as the stop the tile cursor lives in.</summary>
             public static readonly ModString Map = new ModString("Screens.Map", "Map");
+            public static readonly ModString Menu = new ModString("Screens.Menu", "Menu");
             /// <summary>The adventure map's band of kingdom-wide buttons: the game menu and the
             /// overview pages.</summary>
             public static readonly ModString Kingdom = new ModString("Screens.Kingdom", "Kingdom");

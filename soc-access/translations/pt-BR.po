@@ -815,6 +815,11 @@ msgctxt "Screens.CurrentTroop"
 msgid "Current troop, {0}"
 msgstr "Tropa atual, {0}"
 
+#. Screens.CurrentTroopSection
+msgctxt "Screens.CurrentTroopSection"
+msgid "Current troop"
+msgstr "Tropa atual"
+
 #. Screens.DefenderEssence
 msgctxt "Screens.DefenderEssence"
 msgid "Defender essence"
@@ -864,6 +869,11 @@ msgstr "Menu principal"
 msgctxt "Screens.Map"
 msgid "Map"
 msgstr "Mapa"
+
+#. Screens.Menu
+msgctxt "Screens.Menu"
+msgid "Menu"
+msgstr "Menu"
 
 #. Screens.Kingdom
 msgctxt "Screens.Kingdom"
