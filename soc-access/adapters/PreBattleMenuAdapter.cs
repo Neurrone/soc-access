@@ -69,6 +69,7 @@ namespace SongsOfConquestAccess.Adapters
 
         private readonly PreBattleMenu _menu;
         private AdventureBattleMenu.Settings _settings;
+        private bool _settingsProbed;
         private GameObject _cursorOverlay;
         private RectTransform[] _cursorOverlaySegments;
 
@@ -1006,10 +1007,12 @@ namespace SongsOfConquestAccess.Adapters
         /// <summary>The battle menu's settings, resolved ONCE: the scan behind it walks every loaded
         /// object (19 ms measured), and the graph build read it eight times a frame before this cache
         /// (2026-09-08, 7 frames per second on the placement page). The settings are matched on this
-        /// very menu instance, so they cannot change for the adapter's lifetime.</summary>
+        /// very menu instance, so they cannot change for the adapter's lifetime - which is why the
+        /// MISS is kept too, behind the probed flag: a lookup that kept only hits scanned every loaded
+        /// object every frame for as long as no installer answered for this menu.</summary>
         private AdventureBattleMenu.Settings GetAdventureBattleMenuSettings()
         {
-            if (_settings != null)
+            if (_settings != null || _settingsProbed)
             {
                 return _settings;
             }
@@ -1019,6 +1022,7 @@ namespace SongsOfConquestAccess.Adapters
                 return null;
             }
 
+            _settingsProbed = true;
             AdventureBattleMenuInstaller[] installers = Resources.FindObjectsOfTypeAll<AdventureBattleMenuInstaller>();
             for (int i = 0; i < installers.Length; i++)
             {
