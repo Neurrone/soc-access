@@ -126,6 +126,7 @@ namespace SongsOfConquestAccess.Adapters
         private Transform _objectivesEntryContainer;
         private NotificationHUD _notificationHud;
         private TownListUI _townListUi;
+        private bool _townListUiProbed;
         private KingdomInformationHUD.Settings _kingdomInformationSettings;
         private EndTurnHUD.Settings _endTurnSettings;
         private EndTurnHUD _endTurnHud;
@@ -1229,9 +1230,16 @@ namespace SongsOfConquestAccess.Adapters
         {
             get
             {
-                if (_townListUi == null)
+                // TownListUI is bound in TownListHUDInstaller's own container, not the scene's, so the
+                // plain resolve throws (caught) and the installer is where it is found. Probed once.
+                if (_townListUi == null && !_townListUiProbed)
                 {
+                    _townListUiProbed = true;
                     _townListUi = Resolve<TownListUI>();
+                    if (_townListUi == null)
+                    {
+                        _townListUi = ResolveFromInstaller<TownListUI>(FindSameSceneComponent<TownListHUDInstaller>());
+                    }
                 }
 
                 return _townListUi;
