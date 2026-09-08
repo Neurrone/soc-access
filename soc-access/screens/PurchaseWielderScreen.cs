@@ -27,12 +27,12 @@ namespace SongsOfConquestAccess.Screens
     ///
     /// The details are ONE stop rather than one per band: they are a description of the candidate the
     /// player just arrived at, read top to bottom. EVERY BAND OF IT IS A REGION (owner ruling
-    /// 2026-09-08): the summary, the stats, the troops, the skills, the specialization and the
+    /// 2026-09-08): the quote, the stats, the troops, the skills, the specialization and the
     /// purchase, so the region jump walks the pane band by band from wherever the cursor stands. The
     /// troops and the skills are named by the captions the pane draws over them ("Starting Troops",
     /// "Skills"), so a troop or a skill is heard with what it is, and the stats by the word the game
     /// uses for the same band on the wielder sheet (owner ruling 2026-09-08; the pane itself draws no
-    /// text over its StatsSection, measured the same day). The summary, the specialization (whose
+    /// text over its StatsSection, measured the same day). The quote, the specialization (whose
     /// line already opens with the game's caption) and the purchase are bare regions.
     ///
     /// Escape is the game's (<c>ConsumesBack</c> false): the menu is an
@@ -48,7 +48,7 @@ namespace SongsOfConquestAccess.Screens
         private readonly PurchaseWielderMenuAdapter _adapter;
 
         // A subject of its own per synthesized line, kept across rebuilds so the reconciler seats the
-        // cursor on the same one: the summary, the four stats, the specialization and the purchase
+        // cursor on the same one: the quote, the four stats, the specialization and the purchase
         // status are read off text meshes the details pane rebinds rather than off rows of their own.
         private readonly Dictionary<string, object> _markers = new Dictionary<string, object>();
 
@@ -166,8 +166,8 @@ namespace SongsOfConquestAccess.Screens
 
         private void BuildDetails(GraphBuilder builder)
         {
-            builder.SetRegion("purchase-wielder:summary");
-            AddParagraphs(builder, "summary", SelectedSummaryLines);
+            builder.SetRegion("purchase-wielder:quote");
+            AddParagraphs(builder, "quote", SelectedQuoteLines);
             string stats = GameText.Get("Common/CommanderInventory/Stats", string.Empty);
             BeginRegion(builder, stats, "purchase-wielder:stats");
             AddStat(builder, "offence", () => _adapter.OffenceHeader, () => _adapter.Offence);
@@ -196,7 +196,7 @@ namespace SongsOfConquestAccess.Screens
         /// <summary>The candidate the pane is describing, read as the player sees it: the name, the
         /// level and the description's opening paragraph as one line, then a line per further
         /// paragraph.</summary>
-        private IList<string> SelectedSummaryLines()
+        private IList<string> SelectedQuoteLines()
         {
             IList<string> description = _adapter.SelectedDescriptionLines;
             List<string> parts = new List<string> { _adapter.SelectedName };
