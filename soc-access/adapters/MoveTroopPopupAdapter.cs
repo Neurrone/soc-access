@@ -74,15 +74,28 @@ namespace SongsOfConquestAccess.Adapters
                     return texts;
                 }
 
-                UITextMesh[] drawn = container.GetComponentsInChildren<UITextMesh>(true);
-                for (int i = 0; i < drawn.Length; i++)
+                if (_maxSizeTexts == null || !ReferenceEquals(_maxSizeContainer, container))
                 {
-                    Add(texts, GetText(drawn[i]));
+                    _maxSizeContainer = container;
+                    _maxSizeTexts = container.GetComponentsInChildren<UITextMesh>(true);
+                }
+
+                for (int i = 0; i < _maxSizeTexts.Length; i++)
+                {
+                    Add(texts, GetText(_maxSizeTexts[i]));
                 }
 
                 return texts;
             }
         }
+
+        // The two texts of the caption line, and the image the hotkey list hangs on: which components
+        // they are is fixed while the popup is up, and finding the image read a full tooltip capture
+        // per child of the panel on every build. What they say is still read live.
+        private Transform _maxSizeContainer;
+        private UITextMesh[] _maxSizeTexts;
+        private UIImage _hotkeysImage;
+        private bool _hotkeysProbed;
 
         /// <summary>The icon the popup draws in its corner, whose tooltip is the game's own list of the
         /// hotkeys this popup answers to. It is the one image in the panel with a tooltip of its own;
@@ -91,26 +104,44 @@ namespace SongsOfConquestAccess.Adapters
         {
             get
             {
-                GameObject container = GetField<GameObject>(NonPortraitContainerField);
-                Transform root = container != null ? container.transform : null;
-                for (int i = 0; root != null && i < root.childCount; i++)
-                {
-                    Transform child = root.GetChild(i);
-                    UIImage image = child.GetComponent<UIImage>();
-                    if (image == null || child.GetComponent<UIButton>() != null)
-                    {
-                        continue;
-                    }
+                UIImage image = GetHotkeysImage();
+                return image == null ? null : Tooltip.ForComponent(image, _localization);
+            }
+        }
 
-                    Tooltip tooltip = Tooltip.ForComponent(image, _localization);
-                    if (tooltip != null && tooltip.TextLines != null && tooltip.TextLines.Count > 0)
-                    {
-                        return tooltip;
-                    }
-                }
+        private UIImage GetHotkeysImage()
+        {
+            if (_hotkeysProbed)
+            {
+                return _hotkeysImage;
+            }
 
+            GameObject container = GetField<GameObject>(NonPortraitContainerField);
+            Transform root = container != null ? container.transform : null;
+            if (root == null)
+            {
                 return null;
             }
+
+            _hotkeysProbed = true;
+            for (int i = 0; i < root.childCount; i++)
+            {
+                Transform child = root.GetChild(i);
+                UIImage image = child.GetComponent<UIImage>();
+                if (image == null || child.GetComponent<UIButton>() != null)
+                {
+                    continue;
+                }
+
+                Tooltip tooltip = Tooltip.ForComponent(image, _localization);
+                if (tooltip != null && tooltip.TextLines != null && tooltip.TextLines.Count > 0)
+                {
+                    _hotkeysImage = image;
+                    return image;
+                }
+            }
+
+            return null;
         }
 
         /// <summary>
