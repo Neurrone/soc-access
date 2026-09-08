@@ -69,6 +69,21 @@ namespace SongsOfConquestAccess.Adapters
         private string _spellTargetInstructionText;
         private string _abilityTargetInstructionText;
 
+        // The three child lookups the HUD's own containers answer once for the life of a battle, and
+        // the queue pool's ActiveItems property: resolved on demand and remembered, MISSES INCLUDED
+        // (the probed flags), so an absent panel costs one lookup rather than one per frame. The
+        // combat screen is a graph screen and rebuilds every frame.
+        private BattleEndTurnHUD _endTurnHud;
+        private bool _endTurnHudProbed;
+        private UIButton _optionsButton;
+        private bool _optionsButtonProbed;
+        private GameLogHandleUI _gameLogHandle;
+        private bool _gameLogHandleProbed;
+        private PropertyInfo _queuePoolActiveItemsProperty;
+        private Type _queuePoolType;
+        private FieldInfo _troopViewStatusField;
+        private Type _troopContainerType;
+
         public BattleHudAdapter(DiContainer container, IClientBattleFacade facade, ILocalizationHandler localization)
         {
             _facade = facade;
@@ -89,6 +104,14 @@ namespace SongsOfConquestAccess.Adapters
         {
             UIButton button = GetSpellbookButton();
             return IsButtonVisible(button);
+        }
+
+        /// <summary>Whether the Spells button the game is drawing belongs to this side. There is one
+        /// spellbook button on the screen at a time - the game draws it in the panel of whichever side
+        /// owns it - so the side's own panel is the only place it should be declared.</summary>
+        public bool IsSpellbookButtonVisible(CombatHudSide side)
+        {
+            return IsSpellbookButtonVisible() && GetSide(GetSpellsHud()) == side;
         }
 
         public bool IsSpellbookButtonEnabled()
@@ -224,6 +247,13 @@ namespace SongsOfConquestAccess.Adapters
         public bool IsCancelSpellButtonVisible()
         {
             return IsButtonVisible(GetCancelSpellButton());
+        }
+
+        /// <summary>Whether the Cancel spell button, which the game draws in the Spells spot while a
+        /// spell is being aimed, belongs to this side.</summary>
+        public bool IsCancelSpellButtonVisible(CombatHudSide side)
+        {
+            return IsCancelSpellButtonVisible() && GetSide(GetSpellsHudWithVisibleCancelSpell()) == side;
         }
 
         public bool IsCancelSpellButtonEnabled()
@@ -535,6 +565,24 @@ namespace SongsOfConquestAccess.Adapters
             return null;
         }
 
+        /// <summary>Which side's panel a spells HUD is drawn in, or null when it is neither.</summary>
+        private CombatHudSide? GetSide(SpellsHUD spellsHud)
+        {
+            if (spellsHud == null || _stateHandler == null)
+            {
+                return null;
+            }
+
+            if (ReferenceEquals(spellsHud, _stateHandler.AttackerSpellsHUD))
+            {
+                return CombatHudSide.Attacker;
+            }
+
+            return ReferenceEquals(spellsHud, _stateHandler.DefenderSpellsHUD)
+                ? CombatHudSide.Defender
+                : (CombatHudSide?)null;
+        }
+
         private UIButton GetSpellbookButton()
         {
             SpellsHUD spellsHud = GetSpellsHud();
@@ -621,8 +669,19 @@ namespace SongsOfConquestAccess.Adapters
             }
 
             object container = dictionary[current.Id];
-            FieldInfo viewStatusField = container != null ? AccessTools.Field(container.GetType(), "ViewStatus") : null;
-            return viewStatusField != null ? viewStatusField.GetValue(container) as BattleTroopStatusPanel : null;
+            if (container == null)
+            {
+                return null;
+            }
+
+            Type containerType = container.GetType();
+            if (_troopContainerType != containerType)
+            {
+                _troopContainerType = containerType;
+                _troopViewStatusField = AccessTools.Field(containerType, "ViewStatus");
+            }
+
+            return _troopViewStatusField != null ? _troopViewStatusField.GetValue(container) as BattleTroopStatusPanel : null;
         }
 
         private IBattleTroopState GetCurrentTroop()
@@ -639,22 +698,31 @@ namespace SongsOfConquestAccess.Adapters
 
         private UIButton GetEndTurnButton()
         {
-            BattleEndTurnHUD hud = _settings != null && _settings.BattleEndTurnContainer != null
-                ? _settings.BattleEndTurnContainer.GetComponentInChildren<BattleEndTurnHUD>(true)
-                : null;
-            return GetField<UIButton>(hud, BattleEndTurnButtonField);
+            if (_endTurnHud == null && !_endTurnHudProbed)
+            {
+                _endTurnHudProbed = true;
+                _endTurnHud = _settings != null && _settings.BattleEndTurnContainer != null
+                    ? _settings.BattleEndTurnContainer.GetComponentInChildren<BattleEndTurnHUD>(true)
+                    : null;
+            }
+
+            return GetField<UIButton>(_endTurnHud, BattleEndTurnButtonField);
         }
 
         private UIButton GetOptionsButton()
         {
-            GameObject container = _settings != null ? _settings.OptionsButtonsContainer : null;
-            OptionsButtonInstaller installer = container != null ? container.GetComponentInChildren<OptionsButtonInstaller>(false) : null;
-            if (installer != null)
+            if (_optionsButton != null || _optionsButtonProbed)
             {
-                return installer.GetComponent<UIButton>();
+                return _optionsButton;
             }
 
-            return container != null ? container.GetComponentInChildren<UIButton>(false) : null;
+            _optionsButtonProbed = true;
+            GameObject container = _settings != null ? _settings.OptionsButtonsContainer : null;
+            OptionsButtonInstaller installer = container != null ? container.GetComponentInChildren<OptionsButtonInstaller>(false) : null;
+            _optionsButton = installer != null
+                ? installer.GetComponent<UIButton>()
+                : (container != null ? container.GetComponentInChildren<UIButton>(false) : null);
+            return _optionsButton;
         }
 
         private QueueHUD GetQueueHud()
@@ -672,7 +740,14 @@ namespace SongsOfConquestAccess.Adapters
                 return new IQueueHUDEntry[0];
             }
 
-            PropertyInfo property = AccessTools.Property(pool.GetType(), "ActiveItems");
+            Type poolType = pool.GetType();
+            if (_queuePoolType != poolType)
+            {
+                _queuePoolType = poolType;
+                _queuePoolActiveItemsProperty = AccessTools.Property(poolType, "ActiveItems");
+            }
+
+            PropertyInfo property = _queuePoolActiveItemsProperty;
             object value = property != null ? property.GetValue(pool, null) : null;
             IList<IQueueHUDEntry> typed = value as IList<IQueueHUDEntry>;
             if (typed != null)
@@ -779,8 +854,15 @@ namespace SongsOfConquestAccess.Adapters
 
         private GameLogHandleUI GetGameLogHandle()
         {
+            if (_gameLogHandle != null || _gameLogHandleProbed)
+            {
+                return _gameLogHandle;
+            }
+
+            _gameLogHandleProbed = true;
             GameObject container = _settings != null ? _settings.GameLogContainer : null;
-            return container != null ? container.GetComponentInChildren<GameLogHandleUI>(true) : null;
+            _gameLogHandle = container != null ? container.GetComponentInChildren<GameLogHandleUI>(true) : null;
+            return _gameLogHandle;
         }
 
         public TroopInfo GetCurrentTroopInfo()
@@ -1079,14 +1161,17 @@ namespace SongsOfConquestAccess.Adapters
 
         private static string GetFirstTooltipLine(Tooltip tooltip)
         {
-            if (tooltip == null || tooltip.TextLines == null)
+            // Read ONCE: every evaluation of TextLines is a fresh capture of the game's details, so
+            // asking for it in the loop condition and again in the indexer costs about 2N captures.
+            IReadOnlyList<string> lines = tooltip != null ? tooltip.TextLines : null;
+            if (lines == null)
             {
                 return string.Empty;
             }
 
-            for (int i = 0; i < tooltip.TextLines.Count; i++)
+            for (int i = 0; i < lines.Count; i++)
             {
-                string line = SpeechTextSanitizer.Normalize(tooltip.TextLines[i]);
+                string line = SpeechTextSanitizer.Normalize(lines[i]);
                 if (!string.IsNullOrWhiteSpace(line))
                 {
                     return line;

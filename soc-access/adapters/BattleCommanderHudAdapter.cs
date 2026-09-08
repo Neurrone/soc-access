@@ -45,10 +45,21 @@ namespace SongsOfConquestAccess.Adapters
             AccessTools.Field(typeof(BattleEssenceContainer), "_arcanaImageNonActive");
         private static readonly FieldInfo BattleEssenceDestructionImageNonActiveField =
             AccessTools.Field(typeof(BattleEssenceContainer), "_destructionImageNonActive");
+        private static readonly FieldInfo PlayerNameContainerField =
+            AccessTools.Field(typeof(BattleCommanderHUD), "_playerNameContainer");
+        private static readonly FieldInfo PlayerNameTextField =
+            AccessTools.Field(typeof(BattleCommanderHUD), "_playerNameText");
 
         private readonly BattleHUDStateHandler.Settings _settings;
         private readonly IClientBattleFacade _facade;
         private readonly ILocalizationHandler _localization;
+
+        // One component lookup per side for the life of the battle, misses included: the combat
+        // screen is a graph screen and asks these questions on every frame.
+        private BattleCommanderHUD _attackerHud;
+        private bool _attackerHudProbed;
+        private BattleCommanderHUD _defenderHud;
+        private bool _defenderHudProbed;
 
         public BattleCommanderHudAdapter(
             BattleHUDStateHandler.Settings settings,
@@ -121,6 +132,22 @@ namespace SongsOfConquestAccess.Adapters
         public UIButton GetPortraitButton(CombatHudSide side)
         {
             return GetField<UIButton>(GetCommanderHud(side), WielderPortraitButtonField);
+        }
+
+        /// <summary>Whether the side's panel is drawing the player's name, which the game does only
+        /// when both sides are played by people (<c>BattleCommanderHUD.SetPlayerName</c>).</summary>
+        public bool IsPlayerNameVisible(CombatHudSide side)
+        {
+            BattleCommanderHUD hud = GetCommanderHud(side);
+            return IsGameObjectVisible(GetField<GameObject>(hud, PlayerNameContainerField))
+                && !string.IsNullOrWhiteSpace(GetPlayerName(side));
+        }
+
+        /// <summary>The player's name as the game wrote it on the side's panel.</summary>
+        public string GetPlayerName(CombatHudSide side)
+        {
+            UITextMesh text = GetField<UITextMesh>(GetCommanderHud(side), PlayerNameTextField);
+            return SpeechTextSanitizer.Normalize(UITextMeshTextUtility.GetEffectiveText(text));
         }
 
         public bool IsAiControlButtonVisible(CombatHudSide side)
@@ -203,15 +230,34 @@ namespace SongsOfConquestAccess.Adapters
 
         private BattleCommanderHUD GetCommanderHud(CombatHudSide side)
         {
+            bool attacker = side == CombatHudSide.Attacker;
+            BattleCommanderHUD cached = attacker ? _attackerHud : _defenderHud;
+            if (cached != null || (attacker ? _attackerHudProbed : _defenderHudProbed))
+            {
+                return cached;
+            }
+
             GameObject container = null;
             if (_settings != null)
             {
-                container = side == CombatHudSide.Attacker
+                container = attacker
                     ? _settings.AttackingCommanderContainer
                     : _settings.DefendingCommanderContainer;
             }
 
-            return container != null ? container.GetComponent<BattleCommanderHUD>() : null;
+            BattleCommanderHUD hud = container != null ? container.GetComponent<BattleCommanderHUD>() : null;
+            if (attacker)
+            {
+                _attackerHudProbed = true;
+                _attackerHud = hud;
+            }
+            else
+            {
+                _defenderHudProbed = true;
+                _defenderHud = hud;
+            }
+
+            return hud;
         }
 
         private ICommanderState GetCommander(BattleCommanderHUD hud)
@@ -421,14 +467,16 @@ namespace SongsOfConquestAccess.Adapters
 
         private static string GetFirstTooltipLine(Tooltip tooltip)
         {
-            if (tooltip == null || tooltip.TextLines == null)
+            // Read ONCE: every evaluation of TextLines is a fresh capture of the game's details.
+            IReadOnlyList<string> lines = tooltip != null ? tooltip.TextLines : null;
+            if (lines == null)
             {
                 return string.Empty;
             }
 
-            for (int i = 0; i < tooltip.TextLines.Count; i++)
+            for (int i = 0; i < lines.Count; i++)
             {
-                string line = SpeechTextSanitizer.Normalize(tooltip.TextLines[i]);
+                string line = SpeechTextSanitizer.Normalize(lines[i]);
                 if (!string.IsNullOrWhiteSpace(line))
                 {
                     return line;
