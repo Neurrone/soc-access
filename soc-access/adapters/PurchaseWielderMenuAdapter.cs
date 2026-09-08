@@ -569,16 +569,20 @@ namespace SongsOfConquestAccess.Adapters
             return SpokenLines.Clean(GameText.Get(_localization, key, fallback ?? string.Empty));
         }
 
+        /// <summary>The first line a tooltip has anything to say on. <c>Tooltip.TextLines</c> captures
+        /// the game's details afresh on every read, so the capture is taken once rather than once per
+        /// loop test and once per indexer.</summary>
         private static string FirstTooltipLine(Tooltip tooltip)
         {
-            if (tooltip == null || tooltip.TextLines == null)
+            IReadOnlyList<string> lines = tooltip != null ? tooltip.TextLines : null;
+            if (lines == null)
             {
                 return string.Empty;
             }
 
-            for (int i = 0; i < tooltip.TextLines.Count; i++)
+            for (int i = 0; i < lines.Count; i++)
             {
-                string line = SpokenLines.Clean(tooltip.TextLines[i]);
+                string line = SpokenLines.Clean(lines[i]);
                 if (!string.IsNullOrWhiteSpace(line))
                 {
                     return line;

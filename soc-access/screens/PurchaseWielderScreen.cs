@@ -415,7 +415,7 @@ namespace SongsOfConquestAccess.Screens
 
             builder.AddItem(new SyntheticNode(
                 ControlId.For(Marker(key), "purchase-wielder:" + key),
-                GraphNodes.Paragraphs(lines)));
+                GraphNodes.Paragraphs(() => paragraphs)));
         }
 
         private object Marker(string key)
