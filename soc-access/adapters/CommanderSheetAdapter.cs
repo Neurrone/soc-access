@@ -75,6 +75,9 @@ namespace SongsOfConquestAccess.Adapters
         private readonly CommanderSheet _sheet;
         private readonly IClientAdventureFacade _facade;
         private readonly ILocalizationHandler _localization;
+
+        // The mouse rows every artifact tooltip ends with, resolved on the first slot that needs them.
+        private List<string> _mouseInstructionLines;
         private readonly IWielderLookup _wielderLookup;
         private readonly InventoryHUD _inventory;
         private readonly IArtifactLookup _artifactLookup;
@@ -448,6 +451,7 @@ namespace SongsOfConquestAccess.Adapters
         {
             List<InventorySlotInfo> slotsInfo = new List<InventorySlotInfo>();
             string ownerName = GetCommanderName();
+            string inventoryLabel = GetInventoryLabel();
             InventorySlot[] slots = InventorySlotInfo.DrawnEquipmentSlots;
             for (int i = 0; i < slots.Length; i++)
             {
@@ -472,7 +476,7 @@ namespace SongsOfConquestAccess.Adapters
                     0,
                     isBackpackSlot: false,
                     GetInventorySlotName(slot),
-                    GetInventoryLabel(),
+                    inventoryLabel,
                     artifact != null ? GetArtifactName(artifact) : string.Empty,
                     movable,
                     nativeSlot,
@@ -488,10 +492,27 @@ namespace SongsOfConquestAccess.Adapters
             List<InventorySlotInfo> slotsInfo = new List<InventorySlotInfo>();
             InventoryHUDSlot nativeSlot = _inventory != null ? _inventory.GetSlot(InventorySlot.None) : null;
             string ownerName = GetCommanderName();
+            string inventoryLabel = GetInventoryLabel();
+
+            // What the backpack holds, read once and laid out by cell: asking cell by cell re-queried
+            // the owner's whole artifact list per cell.
+            Dictionary<int, IArtifactState> carried = new Dictionary<int, IArtifactState>();
+            foreach (IArtifactState held in GetArtifactsForSlot(InventorySlot.None))
+            {
+                if (held != null && !carried.ContainsKey(held.PositionIndex))
+                {
+                    carried.Add(held.PositionIndex, held);
+                }
+            }
+
             int cellCount = nativeSlot != null ? nativeSlot.CellsCount : 0;
             for (int i = 0; i < cellCount; i++)
             {
-                IArtifactState artifact = GetArtifactsForSlot(InventorySlot.None).FirstOrDefault(x => x.PositionIndex == i);
+                IArtifactState artifact;
+                if (!carried.TryGetValue(i, out artifact))
+                {
+                    artifact = null;
+                }
                 InventoryArtifactMovable movable = GetArtifactMovable(artifact);
                 int capturedIndex = i;
                 InventoryArtifactMovable capturedMovable = movable;
@@ -502,7 +523,7 @@ namespace SongsOfConquestAccess.Adapters
                     i,
                     isBackpackSlot: true,
                     string.Empty,
-                    GetInventoryLabel(),
+                    inventoryLabel,
                     artifact != null ? GetArtifactName(artifact) : string.Empty,
                     movable,
                     nativeSlot,
@@ -731,17 +752,31 @@ namespace SongsOfConquestAccess.Adapters
                 return tooltip;
             }
 
-            List<string> instructionLines = new List<string>();
-            AddLocalizedLine(instructionLines, "Adventure/TooltipInstruction/Equip");
-            AddLocalizedLine(instructionLines, "Adventure/TooltipInstruction/Unequip");
-            AddLocalizedLine(instructionLines, "Adventure/TooltipInstruction/Sell");
-            AddLocalizedLine(instructionLines, "Adventure/TooltipInstruction/Destroy");
-            AddLocalizedLine(instructionLines, "Adventure/TooltipInstruction/Destroy.Gamepad");
-            AddLocalizedLine(instructionLines, "Adventure/TooltipInstruction/Drop");
-            AddLocalizedLine(instructionLines, "Adventure/TooltipInstruction/Drop.Gamepad");
-            AddLocalizedLine(instructionLines, "Adventure/TooltipInstruction/AutoArrange");
-            AddLocalizedLine(instructionLines, "Adventure/TooltipInstruction/AutoArrange.Gamepad");
+            List<string> instructionLines = GetMouseInstructionLines();
             return new Tooltip(() => RemoveExactLines(tooltip.TextLines, instructionLines), tooltip.VisualMetadata);
+        }
+
+        // The nine rows the game writes for a mouse. They are the same for every slot and for the
+        // window's whole life, so they are looked up once instead of nine times a slot a frame.
+        private List<string> GetMouseInstructionLines()
+        {
+            if (_mouseInstructionLines != null)
+            {
+                return _mouseInstructionLines;
+            }
+
+            List<string> lines = new List<string>();
+            AddLocalizedLine(lines, "Adventure/TooltipInstruction/Equip");
+            AddLocalizedLine(lines, "Adventure/TooltipInstruction/Unequip");
+            AddLocalizedLine(lines, "Adventure/TooltipInstruction/Sell");
+            AddLocalizedLine(lines, "Adventure/TooltipInstruction/Destroy");
+            AddLocalizedLine(lines, "Adventure/TooltipInstruction/Destroy.Gamepad");
+            AddLocalizedLine(lines, "Adventure/TooltipInstruction/Drop");
+            AddLocalizedLine(lines, "Adventure/TooltipInstruction/Drop.Gamepad");
+            AddLocalizedLine(lines, "Adventure/TooltipInstruction/AutoArrange");
+            AddLocalizedLine(lines, "Adventure/TooltipInstruction/AutoArrange.Gamepad");
+            _mouseInstructionLines = lines;
+            return lines;
         }
 
         private InventoryArtifactMovable GetArtifactMovable(IArtifactState artifact)

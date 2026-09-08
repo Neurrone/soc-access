@@ -272,10 +272,23 @@ namespace SongsOfConquestAccess.UI
 
         /// <summary>Game text written for a renderer, read as one spoken line: its rich-text tags and
         /// its mouse-button icons are not words.</summary>
+        // The auto-arrange caption is the same localized string on every build, and cleaning it ran
+        // three regexes a frame. One remembered answer covers it: every backpack draws that one line.
+        private static string _lastRaw;
+        private static string _lastClean;
+
         private static string OneLine(string raw)
         {
+            if (_lastClean != null && string.Equals(raw, _lastRaw, StringComparison.Ordinal))
+            {
+                return _lastClean;
+            }
+
             IList<string> lines = SpokenLines.Of(new[] { raw });
-            return lines.Count > 0 ? lines[0] : string.Empty;
+            string clean = lines.Count > 0 ? lines[0] : string.Empty;
+            _lastRaw = raw;
+            _lastClean = clean;
+            return clean;
         }
     }
 }
