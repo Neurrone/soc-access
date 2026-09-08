@@ -6,39 +6,52 @@ active, on the stack and focused; `GET /gui/graph?screen=KEY` dumps any screen b
 
 ## Verified with the dev server (dumps diffed against the phase E captures, same reading)
 
-Map, pause menu, options (all seven tabs), load menu, wielder sheet, spellbook, building
-overview, troop overview, players menu, codex, tutorial slideshow, quit confirmation over the
-pause menu, defence menu, defence draft page and Back (the cursor returns to the row that opened
-it), hire wielder, troop placement, combat with its tutorial above it, the combat game menu, the
-mod options window over the map. A hot reload on the map and in combat recovers the screen.
-`ScreenManager.Tick` on the map: 1.0 ms, of which the poll of 68 predicates is 0.02 ms and the
-map's own build 1.0 ms (pre-existing, `performance.md` B).
+Map, pause menu, options (all seven tabs, in-game and at the main menu), load menu, wielder
+sheet, spellbook, building overview, troop overview, players menu, codex, tutorial slideshow,
+quit confirmation and quit-to-desktop popup, custom message, world choice, story text and
+letterbox text, settlement mini menu, defence menu with its draft page and Back (the cursor
+returns to the row that opened it), hire wielder, artifact market, troop placement, combat with
+its tutorial above it, the combat game menu and its load menu, the post-battle result (its title
+turns from "Victory" to "Victory!" under the cursor and is said again, as before), the loading
+screen, main menu, campaign menu, the lobby's map type, map select, players page, platform user
+menu and game settings with a drop list opened as a child over it, mod options over the map and
+over the main menu with the audio glossary as a child of a child. A hot reload on the map, in
+combat and on the main menu recovers the screen. `ScreenManager.Tick` on the map: 1.0 ms, of
+which the poll of 68 predicates is 0.02 ms and the map's own build 1.0 ms (pre-existing,
+`performance.md` B).
+
+Where a capture differed, the difference was content (a different save state, a read tutorial)
+or a phase E commit later than the capture (the story heading folded into its button, the mini
+menu's names moved to the screen name, the slider value box made the slider's Enter); the three
+overview screens were also compared against the pre-F build in the same state and read the same.
 
 ## Screens to walk with real keys
 
-- Settlement landing page, its draft and upgrade pages and Back; build, research, marketplace,
-  artifact market, rally point, dwelling; the story text, letterbox and dialogue (no fixture
-  reaches them here); message dialogs from every source; the post-battle result and the
-  post-adventure pages; chat.
-- The main-menu family: campaign, tale select, community maps, the lobby pages, every drop list,
-  mod options and its sub-dialogs (child screens; only the window over the map was opened).
+- The settlement landing page and its draft, upgrade, build, research and marketplace pages
+  (the move validator refuses the town tile and the mod's Enter opens the mini menu there, so
+  walking in needs the mouse's double click); the rally point and dwelling; message dialogs
+  from the map's own events (a custom message raised from the REPL with raw strings read its
+  two buttons as "button"); the lobby's icon dropdowns and player settings; community maps;
+  chat; the post-adventure pages.
 - Escape everywhere: the key route refused to send while the game window could not take the
-  foreground, so Escape was exercised only on the pause menu, options and the load menu.
+  foreground, so Escape was exercised only on the pause menu, options and the load menu; the
+  mod-owned surfaces' Escape (drop list, mod dialogs) went through `/input`.
 
 ## What to watch for
 
 - A page the game has closed that the mod still reads, or one it shows that the mod does not:
   `GET /screens` says which slot is stale.
 - The handover gap: "Adventure map" and the tile are spoken between the pause menu closing and
-  options opening. Measured on the pre-F build too, so not a regression; options back to the
-  pause menu no longer says it. Closing this gap would need the map to stand down under the
-  game's menus, which the plan's decision 7 chose not to do.
+  options opening, and again on the way out of a battle or a game. Measured on the pre-F build
+  too, so not a regression; options back to the pause menu no longer says it. The gap is frames
+  where no menu is open, so standing the map down under menus would not close it; a pause
+  screen lingering until the submenu it opened arrives would.
 - A page that turns in place (the community maps modal, the post-battle title) says its new
   name itself now; nothing else should re-announce.
 - Once, closing the defence menu left the map's cursor on the last resource instead of the Game
-  Menu button it had stood on; a second round trip kept the cursor. Not explained.
-- The in-game Options page draws no edit box beside its sliders; the main-menu page does. Both
-  builds, pre-existing.
+  Menu button it had stood on; every later round trip kept the cursor. Not explained.
+- The build menu refused to open by build-site id from the REPL (a game-side null), so it is
+  untested here.
 
 ## Decisions taken beyond the plan's list
 
