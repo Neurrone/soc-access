@@ -372,7 +372,9 @@ grab-and-drop, a refused drop says the existing "Invalid destination", Escape ca
 passive watcher speaks a changed instruction queued), Buttons (Withdraw, Manual Battle, Quick
 Battle, Ready when drawn, by drawn left edge), and a final stop holding the drawn "Drag troops to
 rearrange" hint as a line (owner ruling). Start node the attacker line. Escape is the game's
-(no exit action registered; Withdraw has side effects).
+(no exit action registered; Withdraw has side effects). Type-ahead is on for the whole screen
+EXCEPT while the grid node is focused (`AllowsTypeahead` answers per focused node); the map's
+screen-wide off was for the map's own letter hotkeys, which this screen has only on the grid.
 
 ### Phase F — the screen manager swap
 
