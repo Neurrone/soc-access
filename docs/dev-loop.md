@@ -212,6 +212,28 @@ REPL facts observed on this Mono (Unity 2022.3, `mcs.dll` built for net35):
 - Mod types are public, as in ES2, so `/eval` can name them directly
   (`SongsOfConquestAccess.SocAccessMod.Instance.ScreenManager.CurrentScreen`); a question
   asked more than once still belongs in `DevProbe` (mod side, hot-reloads), compile-checked.
+- The evaluator references a FIXED list of assemblies (`CSharpEvaluator.ReferencedAssemblies`:
+  the UnityEngine modules, the game's Lavapotion assemblies, Zenject, TextMeshPro, the
+  InputSystem, Newtonsoft.Json) plus the mod. `HarmonyLib` (0Harmony) and BepInEx are NOT
+  among them: reach a private member with
+  `typeof(T).GetField(name, BindingFlags.NonPublic | BindingFlags.Instance)`, never
+  `HarmonyLib.AccessTools` (verified 2026-09-08: `The name HarmonyLib does not exist`).
+- A name that does not resolve CASCADES: a `var` whose initializer names a missing namespace
+  or member gets an error type, and every later statement touching it fails with an
+  unrelated-looking error (`StringBuilder does not contain a member Append`, or an
+  `Internal compiler error: not implemented`). Read the FIRST `CS0103`/`CS0234` in the list;
+  the rest are its shadow. Verified 2026-09-08.
+- NEVER WRITE A MOD OR GAME TYPE NAME FROM MEMORY IN AN EVAL. Grep first:
+  `grep -rn "class UITextMeshTextUtility" soc-access` answers the namespace
+  (`SongsOfConquestAccess.Adapters`, not `.UI`), and `grep -n "^namespace" <file>` in
+  `decompiled/` answers a game type's. A guessed namespace is the commonest way an eval
+  dies, and the whole body dies with it.
+- SIZE RULE: an eval is ONE question of a few statements, usually a call into `DevProbe` or
+  `DevFixtures`. Anything that walks a hierarchy, reflects over fields, loops, or runs past
+  about five statements goes into those two files instead: they are compile-checked, and a
+  build plus reload is about 20 s, less than one failed exploratory eval and its retries,
+  and the answer is kept. `DevProbe.TilesAround` and `DevFixtures.SpawnAt` began as evals
+  that failed this way.
 
 ## 4. The loops
 
@@ -318,3 +340,15 @@ Filled in as the loop is used; keep entries to one line each with the date.
   bodies with pattern matching or `List<T>` constructors over game types with an internal compiler
   error; plain loops and field assignments work.
 - 2026-09-07: a trade opened by `OnTradeInitiated` between wielders that are not adjacent refuses every cross-side artifact drop (`GiveArtifactCommand` requires `AreNeighbors`); troops still move. Put the two wielders side by side first for the artifact cases.
+- 2026-09-08: more menu recipes. The hire menu of a settlement opens without walking there:
+  `menus.ShowPurchaseWielderMenu(facade.MapEntities.GetAt(new Vector2Int(x, y)))` with any tile
+  of the settlement (`IAdventureMenuSystem` and `IClientAdventureFacade` both from
+  `DevFixtures.ResolveFromScenes<T>()`); the settlement's own landing page has no such method
+  and only opens by walking in. A spawned fixture is removed with
+  `game.server.Commands.ProcessServerRequest(new DestroyMapEntityCommand.Request(entityId))`
+  (`SongsOfConquest.Common.Entities.Adventure`). Prefer these over walking: `map_move_north`
+  RAISES the row number and south lowers it, the grid's Enter is the game's own click (the
+  first press previews the path, the second walks), and a walk the game refuses says nothing
+  at all - a two-tile market spawned on the road between the build sites and Gravekeep's
+  entrance (`GetInteractionPoints(82)`: 74..76,49) boxed the wielder in silently, which
+  `DevProbe.TilesAround` showed and the walk did not.
