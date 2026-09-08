@@ -860,6 +860,11 @@ msgctxt "Screens.ModOptions"
 msgid "Mod options"
 msgstr "Mod オプション"
 
+#. Screens.Modifiers
+msgctxt "Screens.Modifiers"
+msgid "Modifiers"
+msgstr "補正"
+
 #. Screens.NewChatMessage
 msgctxt "Screens.NewChatMessage"
 msgid "New chat message"
