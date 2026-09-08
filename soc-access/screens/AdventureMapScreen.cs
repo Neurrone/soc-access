@@ -352,8 +352,8 @@ namespace SongsOfConquestAccess.Screens
             NodeVtable vtable = GraphNodes.Text(() => Grid().GetLabel(), null, TileTooltip());
             vtable.OnActivate = ActivateTile;
             vtable.OnContextual = ContextualTile;
-            vtable.OnFocusVisual = () => Grid().ShowOverlay();
-            vtable.OnBlurVisual = () => Grid().HideOverlay();
+            vtable.OnFocusVisual = () => Grid()?.ShowOverlay();
+            vtable.OnBlurVisual = () => Grid()?.HideOverlay();
             builder.AddItem(new SyntheticNode(MapNodeId, vtable));
 
             builder.PopContext();
