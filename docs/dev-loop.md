@@ -371,3 +371,13 @@ Filled in as the loop is used; keep entries to one line each with the date.
   at all - a two-tile market spawned on the road between the build sites and Gravekeep's
   entrance (`GetInteractionPoints(82)`: 74..76,49) boxed the wielder in silently, which
   `DevProbe.TilesAround` showed and the walk did not.
+- 2026-09-08: a battle from the REPL. A hostile army spawns with `DevFixtures.SpawnAt(37, x, y)`
+  (blueprint 37 is `MapEntities/Hostile/Arleon/Easy`; the call answers a null-reference error
+  text but the entity lands, and 69 `RandomHostile` reports the tile blocked by it). The map's
+  Enter on the army did nothing here; `game.server.Commands.ProcessServerRequest(new
+  SongsOfConquest.Common.Adventure.AttackCommanderCommand.Request(attackerId, defenderId))`
+  (`game` from `DevFixtures.ResolveFromScenes<Lavapotion.Networking.IGame>()`, the defender from
+  `DevFixtures.CommanderAt`) opens the placement page; Manual Battle starts the fight. Nothing
+  ends a battle from outside but playing it or loading a save through the pause menu;
+  `POST /loadsave` refuses during one. `POST /key` refuses while the game window cannot take the
+  foreground; every menu above was driven with `/type`, `/input` and native `Show`/`Hide` calls.
