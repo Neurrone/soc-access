@@ -131,6 +131,14 @@ namespace SongsOfConquestAccess.Adapters
         private EndTurnHUD _endTurnHud;
         private static readonly MethodInfo EndTurnUpdateTooltipMethod = AccessTools.Method(typeof(EndTurnHUD), "UpdateTooltip");
         private TeamQueueHUDBehaviour _teamQueueHud;
+        // Each of these resolvers ends in a whole-scene scan, so a session whose panel is
+        // absent would rescan every frame; the flag makes the miss cost one lookup.
+        private bool _objectivesHudInstallerProbed;
+        private bool _notificationHudProbed;
+        private bool _kingdomInformationSettingsProbed;
+        private bool _endTurnHudProbed;
+        private bool _endTurnSettingsProbed;
+        private bool _teamQueueHudProbed;
 
         public AdventureHudAdapter(AdventureMapAdapter map, DiContainer container)
         {
@@ -1139,8 +1147,9 @@ namespace SongsOfConquestAccess.Adapters
         {
             get
             {
-                if (_objectivesHudInstaller == null)
+                if (_objectivesHudInstaller == null && !_objectivesHudInstallerProbed)
                 {
+                    _objectivesHudInstallerProbed = true;
                     _objectivesHudInstaller = FindSameSceneComponent<ObjectivesHUDInstaller>();
                 }
 
@@ -1182,8 +1191,9 @@ namespace SongsOfConquestAccess.Adapters
         {
             get
             {
-                if (_notificationHud == null)
+                if (_notificationHud == null && !_notificationHudProbed)
                 {
+                    _notificationHudProbed = true;
                     _notificationHud = Resolve<NotificationHUD>();
                     if (_notificationHud == null)
                     {
@@ -1217,8 +1227,9 @@ namespace SongsOfConquestAccess.Adapters
         {
             get
             {
-                if (_kingdomInformationSettings == null)
+                if (_kingdomInformationSettings == null && !_kingdomInformationSettingsProbed)
                 {
+                    _kingdomInformationSettingsProbed = true;
                     _kingdomInformationSettings = Resolve<KingdomInformationHUD.Settings>();
                     if (_kingdomInformationSettings == null)
                     {
@@ -1243,8 +1254,9 @@ namespace SongsOfConquestAccess.Adapters
         {
             get
             {
-                if (_endTurnHud == null)
+                if (_endTurnHud == null && !_endTurnHudProbed)
                 {
+                    _endTurnHudProbed = true;
                     DiContainer container = GetInstallerContainer(FindSameSceneComponent<EndTurnHUDInstaller>());
                     _endTurnHud = container != null ? container.TryResolve<EndTurnHUD>() : null;
                 }
@@ -1257,8 +1269,9 @@ namespace SongsOfConquestAccess.Adapters
         {
             get
             {
-                if (_endTurnSettings == null)
+                if (_endTurnSettings == null && !_endTurnSettingsProbed)
                 {
+                    _endTurnSettingsProbed = true;
                     _endTurnSettings = Resolve<EndTurnHUD.Settings>();
                     if (_endTurnSettings == null)
                     {
@@ -1275,8 +1288,9 @@ namespace SongsOfConquestAccess.Adapters
         {
             get
             {
-                if (_teamQueueHud == null)
+                if (_teamQueueHud == null && !_teamQueueHudProbed)
                 {
+                    _teamQueueHudProbed = true;
                     _teamQueueHud = FindSameSceneComponent<TeamQueueHUDBehaviour>();
                 }
 
