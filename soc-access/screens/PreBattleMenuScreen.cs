@@ -1,17 +1,105 @@
+using System;
+using System.Collections.Generic;
+using SongsOfConquest.Client.Deployment;
 using SongsOfConquest.Client.Menu;
 using SongsOfConquestAccess.Adapters;
+using SongsOfConquestAccess.Input;
 using SongsOfConquestAccess.Localization;
+using SongsOfConquestAccess.Speech;
 using SongsOfConquestAccess.UI;
-using SongsOfConquest.Client.Deployment;
+using SongsOfConquestAccess.UI.Graph;
 using UnityEngine;
 
 namespace SongsOfConquestAccess.Screens
 {
-    public sealed class PreBattleMenuScreen : Screen
+    /// <summary>
+    /// The troop placement page a battle opens on, and the smallest of phase E's three MODES: the
+    /// deployment board is one node whose cursor is not the focus cursor
+    /// (<see cref="TroopPlacementHexGrid"/>), with the menu's own panels as ordinary stops around it.
+    /// A sibling of <see cref="PostBattleResultScreen"/> - the same <c>AdventureBattleMenu</c> frame,
+    /// the same Attacker/Defender sides, the same commander-as-a-line - so it is built the same way.
+    ///
+    /// Measured on the 1280x800 fixture 2026-09-08 (<c>PreBattleMenu</c>, Cecilia Stoutheart against
+    /// a neutral "Risen Dead"): the attacker's panel LEFT (<c>AttackerCommander</c> [177,73,335,654],
+    /// the name at x 325 beside a portrait <c>Button</c> [225,121,65,65] carrying the wielder's stat
+    /// tooltip), the defender's RIGHT (<c>DefenderCommander</c> [768,73], the name at x 681 with NO
+    /// portrait button - a neutral army draws none), the defender's
+    /// <c>DefenderThreathLevelHolder</c> [844,89] holding "Threat Level - Fair" and carrying the
+    /// tooltip "Scouting provided by Cecilia". At the bottom the hint "Drag troops to rearrange"
+    /// [325,568], the instruction "Place attacker troops" [212,583], and the three buttons Withdraw
+    /// (x 412), Manual Battle (x 547) and Quick Battle (x 720), declared in the order of their drawn
+    /// left edges, measured every build.
+    ///
+    /// THE BOARD IS ONE NODE with a fixed identity, alone in a stop NAMED BY THE INSTRUCTION the menu
+    /// draws ("Place attacker troops"), so entering it says what the game is asking for. Its label is
+    /// the tile under the cursor and its buffer that tile's own troop tooltip.
+    /// <see cref="ModeClaims"/> hands the grid its whole key set - the six hex moves, their skips,
+    /// Ctrl+Space for the centre tile, the scanner families - and TRANSLATES the graph's own Home,
+    /// End and Backspace onto the scanner's jump, distance and return, exactly as the map does, so an
+    /// injected key behaves as the physical one. The grid speaks each landing itself, queued; the
+    /// navigator never announces a move because the node's id never changes.
+    ///
+    /// THE DRAG IS THE ENGINE'S CARRY. Space picks a troop up off a tile the player owns (cargo is
+    /// the tile point, kind "pre-battle-troop", with the game's own <c>Common_PreBattle_Grab</c>
+    /// registered through <see cref="CarrySounds"/>), Enter drops it on the tile under the cursor
+    /// through the game's own <c>Grab</c>-and-<c>Drop</c> pair, and Escape gives up. Every tile takes
+    /// a drop: the GAME decides whether a destination is legal, and a move it refused answers with
+    /// the existing "Invalid destination". The widget era's "draggable"/"dragging" wording is gone -
+    /// the carry says both itself.
+    ///
+    /// TYPE-AHEAD is on everywhere EXCEPT the board (owner ruling 2026-09-08): the side panels, the
+    /// buttons and the hint search normally, while on the board the letters A, D, Q, E, Z and C are
+    /// the hex moves. <see cref="AllowsTypeahead"/> is therefore a live answer rather than a
+    /// constant, which <c>GraphNavigator.TypeAheadArmed</c> already asks per keypress and per frame,
+    /// so a search still live when the cursor lands on the board is dropped on the next tick.
+    ///
+    /// ESCAPE IS THE GAME'S (<see cref="ConsumesBack"/> false): <c>PreBattleMenu</c> registers no
+    /// exit action of its own, and Withdraw has side effects. The navigator still cancels a held
+    /// carry with it first, which is the carry's own rule.
+    ///
+    /// UNVERIFIED on this fixture: the attacker's threat level and both scouting-information lines
+    /// (the game draws neither against an unscouted neutral army), the Ready button and the
+    /// defender-placement instruction (hot-seat and multiplayer states only).
+    /// </summary>
+    public sealed class PreBattleMenuScreen : GraphScreen
     {
+        private const string AttackerStop = "pre-battle-attacker";
+        private const string DefenderStop = "pre-battle-defender";
+        private const string GridStop = "pre-battle-grid";
+        private const string ButtonsStop = "pre-battle-buttons";
+        private const string HintStop = "pre-battle-hint";
+
+        /// <summary>The cargo kind of a troop lifted off the deployment board. Its own kind rather
+        /// than the army bar's "troop": the two carries are different drags with different noises,
+        /// and <see cref="CarrySounds"/> is keyed by kind.</summary>
+        private const string TroopCargo = "pre-battle-troop";
+
+        /// <summary>What the game's own mouse plays when it lifts a troop off a spawn point
+        /// (<c>DeploymentUIController.Grab</c>).</summary>
+        private const string PickUpSound = "Common_PreBattle_Grab";
+
+        /// <summary>The one node the whole board is. Fixed, so walking the cursor is never a move as
+        /// far as the navigator is concerned.</summary>
+        public static readonly ControlId GridNodeId = ControlId.Structural("pre-battle:tile");
+
         private readonly PreBattleMenuAdapter _adapter;
         private readonly TroopPlacementHexGrid _hexGrid;
-        private System.Action<OnChangedPayload> _deploymentChangedHandler;
+        private Action<OnChangedPayload> _deploymentChangedHandler;
+
+        // A subject of its own per synthesized line, kept across rebuilds so the reconciler seats the
+        // cursor back on the same one: the menu gives no component a text line can be keyed on.
+        private readonly Dictionary<string, object> _markers = new Dictionary<string, object>();
+
+        // The tile tooltip is the game's whole troop-details capture and the graph is rebuilt for
+        // every navigation operation, so it is composed once per tile - which is exactly as often as
+        // the widget engine's focus commit composed it.
+        private Vector2Int _tooltipTile;
+        private Tooltip _tooltip;
+        private bool _tooltipRead;
+
+        // The instruction the menu rewrites as the deployment moves through its states, watched
+        // passively: baselined on arrival, so only a CHANGE is spoken.
+        private string _instruction;
 
         public PreBattleMenuScreen(PreBattleMenuAdapter adapter)
             : this(adapter, new TroopPlacementHexGrid(adapter))
@@ -40,10 +128,26 @@ namespace SongsOfConquestAccess.Screens
         }
 
         private PreBattleMenuScreen(PreBattleMenuAdapter adapter, TroopPlacementHexGrid hexGrid)
-            : base(BuildRoot(adapter, hexGrid))
         {
             _adapter = adapter;
             _hexGrid = hexGrid;
+        }
+
+        public override string Key
+        {
+            get { return "pre-battle-menu"; }
+        }
+
+        public override string ScreenName
+        {
+            get { return ModText.Get(ModStrings.Screens.TroopPlacement); }
+        }
+
+        /// <summary>On everywhere but the board, where A, D, Q, E, Z and C are the hex moves rather
+        /// than letters to search with. Read live by the navigator, per keypress and per frame.</summary>
+        public override bool AllowsTypeahead
+        {
+            get { return !IsGridFocused(); }
         }
 
         public override bool IsPresent()
@@ -55,13 +159,14 @@ namespace SongsOfConquestAccess.Screens
         {
             _deploymentChangedHandler = HandleDeploymentChanged;
             _adapter?.AddDeploymentChangedHandler(_deploymentChangedHandler);
+            _instruction = _adapter != null ? _adapter.InstructionText : null;
         }
 
         public override void OnUnfocus()
         {
             _adapter?.HideNativeTooltip();
             _adapter?.ClearFocusedTileOverlay();
-            RootWidget?.Unfocus();
+            base.OnUnfocus();
         }
 
         public override void OnPop()
@@ -74,76 +179,366 @@ namespace SongsOfConquestAccess.Screens
 
             _adapter?.HideNativeTooltip();
             _adapter?.ClearFocusedTileOverlay();
+            base.OnPop();
         }
 
-        private void HandleDeploymentChanged(OnChangedPayload payload)
+        public override void Update()
         {
-            _hexGrid?.RebuildAfterPlacementChanged();
+            base.Update();
+            WatchInstruction();
         }
 
-        private static ContainerWidget BuildRoot(PreBattleMenuAdapter adapter, TroopPlacementHexGrid hexGrid)
+        /// <summary>The menu rewrites the instruction as the deployment changes hands ("Place
+        /// attacker troops", "Waiting for opponent", "Ready to battle"). Nobody is standing on it -
+        /// it is the board's stop name - so it is watched and said, queued, when it changes.</summary>
+        private void WatchInstruction()
         {
-            ContainerWidget root = new ContainerWidget("pre-battle-menu", ModText.Get(ModStrings.Screens.TroopPlacement));
-            if (adapter == null)
+            string text = _adapter != null ? _adapter.InstructionText : null;
+            if (string.Equals(text, _instruction, StringComparison.Ordinal))
             {
-                return root;
+                return;
             }
 
-            root.AddChild(Portrait.Static(
-                "pre-battle-left-portrait",
-                () => adapter.LeftPortraitText,
-                adapter.FocusLeftPortrait,
-                () => adapter.LeftPortraitTooltip));
+            _instruction = text;
+            if (!string.IsNullOrWhiteSpace(text))
+            {
+                SpeechPipeline.Output(new SpeechRequest(text, interrupt: false));
+            }
+        }
 
-            root.AddChild(Portrait.Static(
-                "pre-battle-right-portrait",
-                () => adapter.RightPortraitText,
-                adapter.FocusRightPortrait,
-                () => adapter.RightPortraitTooltip));
+        /// <summary>The board changed: a troop was placed or moved. The cursor keeps its tile, the
+        /// tile is read again where the player is standing on the board, and anything being carried
+        /// is let go - the tile it came from no longer holds what was picked up.</summary>
+        private void HandleDeploymentChanged(OnChangedPayload payload)
+        {
+            GraphNavigator navigator = Navigator;
+            if (navigator != null && navigator.Carry != null)
+            {
+                navigator.Carry.Clear();
+            }
 
-            root.AddChild(new TextWidget(
-                "pre-battle-instructions",
-                () => adapter.InstructionText,
-                adapter.HideNativeTooltip,
-                includeParentLabelInAnnouncement: false));
+            _tooltipRead = false;
+            _hexGrid?.RebuildAfterPlacementChanged(IsGridFocused());
+        }
 
-            root.AddChild(hexGrid);
-            root.AddChild(new ButtonWidget(
-                "pre-battle-withdraw",
-                adapter.WithdrawButtonLabel,
-                adapter.Withdraw,
-                adapter.FocusWithdrawButton,
-                adapter.IsWithdrawButtonEnabled,
-                adapter.IsWithdrawButtonVisible,
-                adapter.WithdrawButtonTooltip));
+        // ---- the graph ----
 
-            root.AddChild(new ButtonWidget(
-                "pre-battle-manual-battle",
-                adapter.ManualBattleButtonLabel,
-                adapter.ManualBattle,
-                adapter.FocusManualBattleButton,
-                adapter.IsManualBattleButtonEnabled,
-                adapter.IsManualBattleButtonVisible,
-                adapter.ManualBattleButtonTooltip));
+        public override void Build(GraphBuilder builder)
+        {
+            if (!IsPresent())
+            {
+                return;
+            }
 
-            root.AddChild(new ButtonWidget(
-                "pre-battle-quick-battle",
-                adapter.QuickBattleButtonLabel,
-                adapter.QuickBattle,
-                adapter.FocusQuickBattleButton,
-                adapter.IsQuickBattleButtonEnabled,
-                adapter.IsQuickBattleButtonVisible,
-                adapter.QuickBattleButtonTooltip));
+            // Each side's stop is NAMED, "Attacker" and "Defender", as the post-battle page's are:
+            // the game draws no such caption, so the words are the mod's.
+            builder.BeginStop(AttackerStop);
+            builder.PushContext(ModText.Get(ModStrings.Screens.Attacker));
+            ControlId start = BuildSide(builder, attacker: true);
+            builder.PopContext();
 
-            root.AddChild(new ButtonWidget(
-                "pre-battle-ready",
-                adapter.ReadyButtonLabel,
-                adapter.Ready,
-                adapter.FocusReadyButton,
-                adapter.IsReadyButtonEnabled,
-                adapter.IsReadyButtonVisible,
-                adapter.ReadyButtonTooltip));
-            return root;
+            builder.BeginStop(DefenderStop);
+            builder.PushContext(ModText.Get(ModStrings.Screens.Defender));
+            BuildSide(builder, attacker: false);
+            builder.PopContext();
+
+            BuildGrid(builder);
+            BuildButtons(builder);
+            BuildHint(builder);
+
+            if (start != null)
+            {
+                // Top left, where the page is read from.
+                builder.SetStart(start);
+            }
+        }
+
+        // ---- one side of the page ----
+
+        /// <summary>One side's panel, in drawn order: the commander, the threat level the menu draws
+        /// for a side that was scouted, and the partial scouting information it draws instead of the
+        /// full army. Answers the commander's node, which is where the page starts.</summary>
+        private ControlId BuildSide(GraphBuilder builder, bool attacker)
+        {
+            string key = attacker ? "attacker" : "defender";
+            ControlId commander = BuildCommander(builder, attacker, key);
+
+            AddLine(
+                builder,
+                key + "-threat",
+                attacker ? (Func<string>)(() => _adapter.AttackerThreatText) : () => _adapter.DefenderThreatText,
+                attacker ? _adapter.AttackerScoutingTooltip : _adapter.DefenderScoutingTooltip);
+
+            AddLine(
+                builder,
+                key + "-scouting",
+                attacker ? (Func<string>)(() => _adapter.AttackerScoutingText) : () => _adapter.DefenderScoutingText,
+                null);
+
+            return commander;
+        }
+
+        /// <summary>The commander's name as the portrait the game draws it beside: a line carrying the
+        /// portrait's native tooltip, which is where the stats, skills and status are read. A side
+        /// with no portrait - a neutral army - is the name alone.</summary>
+        private ControlId BuildCommander(GraphBuilder builder, bool attacker, string key)
+        {
+            Func<string> name = attacker
+                ? (Func<string>)(() => _adapter.AttackerName)
+                : () => _adapter.DefenderName;
+            if (string.IsNullOrWhiteSpace(name()))
+            {
+                return null;
+            }
+
+            Component button = attacker ? _adapter.AttackerPortraitButton : _adapter.DefenderPortraitButton;
+            Tooltip tooltip = button == null
+                ? null
+                : (attacker ? _adapter.AttackerPortraitTooltip : _adapter.DefenderPortraitTooltip);
+            NodeVtable vtable = GraphNodes.Text(name, null, tooltip);
+            if (button == null)
+            {
+                ControlId synthetic = ControlId.For(Marker(key + "-commander"), "pre-battle:" + key + "-commander");
+                builder.AddItem(new SyntheticNode(synthetic, vtable));
+                return synthetic;
+            }
+
+            // The mouse resting on the portrait is what makes the game draw its tooltip, and the
+            // portrait refreshes its own contents on the way.
+            vtable.OnFocusVisual = attacker
+                ? (Action)_adapter.FocusAttackerPortrait
+                : _adapter.FocusDefenderPortrait;
+            ControlId id = ControlId.For(button, "pre-battle:" + key + "-commander");
+            builder.AddItem(new DrawnNode(id, vtable, button));
+            return id;
+        }
+
+        // ---- the board ----
+
+        /// <summary>The deployment board: one node, named by the tile under the cursor, alone in a
+        /// stop the menu's own instruction names.</summary>
+        private void BuildGrid(GraphBuilder builder)
+        {
+            builder.BeginStop(GridStop);
+            builder.PushContext(GridContext());
+
+            // The game's own drag noise, for the keyboard's carry. Registered on every build: the
+            // registration is a delegate over this load and must not outlive it.
+            CarrySounds.Register(TroopCargo, () => NativeSoundUtility.PostEvent(PickUpSound), null);
+
+            NodeVtable vtable = GraphNodes.Text(() => _hexGrid.GetLabel(), null, TileTooltip());
+            vtable.OnFocusVisual = () => _hexGrid.ShowOverlay();
+            vtable.OnBlurVisual = () => _hexGrid.HideOverlay();
+
+            // Only a troop of the player's own can be lifted, and every tile takes a drop: which
+            // destinations are legal is the GAME's answer, given when the drop replays its drag. The
+            // pick-up is DECLARED ON EVERY TILE and answers for itself with null where there is
+            // nothing to give, which is the engine's contract for a pure query - and here it is also
+            // what keeps the readout's part COUNT the same from tile to tile, so the live watch does
+            // not read the whole node a second time every time the cursor steps off a troop.
+            vtable.OnPickUp = () => _hexGrid.CanPickUp
+                ? new CarryItem(_hexGrid.CursorTile, _hexGrid.FocusedTroopLabel, TroopCargo)
+                : null;
+
+            vtable.DropKind = TroopCargo;
+            vtable.OnDrop = Drop;
+            builder.AddItem(new SyntheticNode(GridNodeId, vtable));
+
+            builder.PopContext();
+        }
+
+        private string GridContext()
+        {
+            string instruction = _adapter != null ? _adapter.InstructionText : null;
+            return string.IsNullOrWhiteSpace(instruction) ? ModText.Get(ModStrings.Screens.TroopPlacement) : instruction;
+        }
+
+        private Tooltip TileTooltip()
+        {
+            Vector2Int tile = _hexGrid.CursorTile;
+            if (_tooltipRead && tile == _tooltipTile)
+            {
+                return _tooltip;
+            }
+
+            _tooltipTile = tile;
+            _tooltipRead = true;
+            _tooltip = _hexGrid.GetTooltip();
+            return _tooltip;
+        }
+
+        /// <summary>The drop, through the game's own grab-and-drop pair. A destination the game
+        /// refuses leaves the deployment untouched and the troop still held.</summary>
+        private SongsOfConquestAccess.UI.Graph.DropResult Drop(CarryItem held)
+        {
+            Vector2Int? source = held == null ? null : held.Cargo as Vector2Int?;
+            return source.HasValue && _adapter.TryMoveTroop(source.Value, _hexGrid.CursorTile)
+                ? SongsOfConquestAccess.UI.Graph.DropResult.Done()
+                : SongsOfConquestAccess.UI.Graph.DropResult.Refused(ModText.Get(ModStrings.UI.InvalidDestination));
+        }
+
+        // ---- the buttons and the hint ----
+
+        /// <summary>The buttons the menu is drawing, in the order of their drawn left edges, measured
+        /// every build: Withdraw, Manual Battle, Quick Battle, and the Ready button the hot-seat and
+        /// multiplayer states add.</summary>
+        private void BuildButtons(GraphBuilder builder)
+        {
+            List<KeyValuePair<float, NodeDeclaration>> drawn = new List<KeyValuePair<float, NodeDeclaration>>(4);
+            AddButton(drawn, "withdraw", _adapter.IsWithdrawButtonVisible(), _adapter.WithdrawButton,
+                () => _adapter.WithdrawButtonLabel, () => _adapter.Withdraw(),
+                _adapter.IsWithdrawButtonEnabled, _adapter.WithdrawButtonTooltip, _adapter.FocusWithdrawButton);
+            AddButton(drawn, "manual-battle", _adapter.IsManualBattleButtonVisible(), _adapter.ManualBattleButton,
+                () => _adapter.ManualBattleButtonLabel, () => _adapter.ManualBattle(),
+                _adapter.IsManualBattleButtonEnabled, _adapter.ManualBattleButtonTooltip, _adapter.FocusManualBattleButton);
+            AddButton(drawn, "quick-battle", _adapter.IsQuickBattleButtonVisible(), _adapter.QuickBattleButton,
+                () => _adapter.QuickBattleButtonLabel, () => _adapter.QuickBattle(),
+                _adapter.IsQuickBattleButtonEnabled, _adapter.QuickBattleButtonTooltip, _adapter.FocusQuickBattleButton);
+            AddButton(drawn, "ready", _adapter.IsReadyButtonVisible(), _adapter.ReadyButton,
+                () => _adapter.ReadyButtonLabel, () => _adapter.Ready(),
+                _adapter.IsReadyButtonEnabled, _adapter.ReadyButtonTooltip, _adapter.FocusReadyButton);
+            if (drawn.Count == 0)
+            {
+                return;
+            }
+
+            drawn.Sort((left, right) => left.Key.CompareTo(right.Key));
+            builder.BeginStop(ButtonsStop);
+            for (int i = 0; i < drawn.Count; i++)
+            {
+                builder.AddItem(drawn[i].Value);
+            }
+        }
+
+        private void AddButton(
+            List<KeyValuePair<float, NodeDeclaration>> into,
+            string key,
+            bool drawn,
+            Component button,
+            Func<string> label,
+            Func<bool> activate,
+            Func<bool> enabled,
+            Tooltip tooltip,
+            Action focus)
+        {
+            if (!drawn || button == null)
+            {
+                return;
+            }
+
+            NodeVtable vtable = GraphNodes.Button(label, () => activate(), enabled, tooltip);
+            vtable.OnFocusVisual = focus;
+            into.Add(new KeyValuePair<float, NodeDeclaration>(
+                Left(button),
+                new DrawnNode(ControlId.For(button, "pre-battle:" + key), vtable, button)));
+        }
+
+        private static float Left(Component button)
+        {
+            return button != null && button.transform != null ? button.transform.position.x : 0f;
+        }
+
+        /// <summary>The hint the menu draws under the board ("Drag troops to rearrange"), a stop of
+        /// its own (owner ruling 2026-09-08) and built only while the menu is drawing it.</summary>
+        private void BuildHint(GraphBuilder builder)
+        {
+            if (string.IsNullOrWhiteSpace(_adapter.DragHintText))
+            {
+                return;
+            }
+
+            builder.BeginStop(HintStop);
+            builder.AddItem(new SyntheticNode(
+                ControlId.For(Marker("hint"), "pre-battle:hint"),
+                GraphNodes.Text(() => _adapter.DragHintText)));
+        }
+
+        // ---- keys ----
+
+        /// <summary>
+        /// The tile cursor's whole key set, while the board's node is the one the cursor is on. Asked
+        /// BEFORE the navigator's own set, which is what makes the hex letters walk the board rather
+        /// than start a search; on any other stop none of it is claimed.
+        /// </summary>
+        public override bool ModeClaims(string actionKey)
+        {
+            return IsGridFocused() && _hexGrid != null && ModeAction(actionKey) != null;
+        }
+
+        /// <summary>The board action a key means here, or null where the key is not the cursor's. The
+        /// mod's own hex and scanner keys answer for themselves; Home, End and Backspace are
+        /// TRANSLATED onto the scanner's jump, distance and return, so the dev server's injections
+        /// behave exactly as the physical keys the router resolves to the scanner first. The arrows
+        /// are NOT translated: a hex board has no north or south, and its six directions are the
+        /// letters.</summary>
+        private string ModeAction(string actionKey)
+        {
+            if (_hexGrid.ClaimsAction(actionKey))
+            {
+                return actionKey;
+            }
+
+            if (actionKey == AccessibilityActions.UiHome.Key)
+            {
+                return AccessibilityActions.ScannerJumpToResult.Key;
+            }
+
+            if (actionKey == AccessibilityActions.UiEnd.Key)
+            {
+                return AccessibilityActions.ScannerSpeakDistanceAndDirection.Key;
+            }
+
+            if (actionKey == AccessibilityActions.UiClearSearch.Key)
+            {
+                return AccessibilityActions.ScannerReturnFromJump.Key;
+            }
+
+            return null;
+        }
+
+        public override bool OnAction(string actionKey)
+        {
+            if (!IsGridFocused() || _hexGrid == null)
+            {
+                return false;
+            }
+
+            string action = ModeAction(actionKey);
+            return action != null && _hexGrid.HandleAction(AccessibilityActions.FindByKey(action));
+        }
+
+        private bool IsGridFocused()
+        {
+            GraphNavigator navigator = Navigator;
+            return navigator != null
+                && ReferenceEquals(navigator.Screen, this)
+                && GridNodeId.Equals(navigator.FocusedKey);
+        }
+
+        // ---- the lines the menu gives nothing to key on ----
+
+        private void AddLine(GraphBuilder builder, string key, Func<string> text, Tooltip tooltip)
+        {
+            if (string.IsNullOrWhiteSpace(text()))
+            {
+                return;
+            }
+
+            builder.AddItem(new SyntheticNode(
+                ControlId.For(Marker(key), "pre-battle:" + key),
+                GraphNodes.Text(text, null, tooltip)));
+        }
+
+        private object Marker(string key)
+        {
+            object marker;
+            if (!_markers.TryGetValue(key, out marker))
+            {
+                marker = new object();
+                _markers.Add(key, marker);
+            }
+
+            return marker;
         }
     }
 }

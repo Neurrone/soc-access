@@ -11,6 +11,22 @@ using UnityEngine;
 
 namespace SongsOfConquestAccess.UI
 {
+    /// <summary>
+    /// The troop placement board's TILE CURSOR - the cursor of a mode whose cursor is not the focus
+    /// cursor (<c>ui-graph-plan.md</c> phase E), built on the same shape as
+    /// <see cref="AdventureMapGrid"/>. <see cref="Screens.PreBattleMenuScreen"/> declares ONE node for
+    /// the whole board and hands this class every key that walks it: the six hex moves and their
+    /// skips, the centre-tile jump and the scanner. Because the node's identity never changes as the
+    /// cursor walks, the navigator has nothing to announce and this class says each landing itself,
+    /// queued rather than interrupting, exactly as the widget engine's focus commit said it.
+    ///
+    /// THE DRAG IS GONE FROM HERE: picking a troop up and putting it down is the graph engine's carry
+    /// (<c>ui/graph/Carry.cs</c>), declared on the node by the screen, so this class no longer owns
+    /// Space, Enter or Escape and holds no drag state of its own.
+    ///
+    /// The widget base is still here; phase G removes it once no widget tree exists at all. Nothing
+    /// adds this to one any more.
+    /// </summary>
     public sealed class TroopPlacementHexGrid : Widget
     {
         private const string ScannerWrapCueKey = "Common_ClickUnfold";
@@ -19,10 +35,7 @@ namespace SongsOfConquestAccess.UI
         private readonly PreBattleMenuAdapter _adapter;
         private TroopPlacementSnapshot _snapshot;
         private Vector2Int _cursor;
-        private Vector2Int? _dragSource;
         private readonly ScannerController _scanner;
-        private bool _tileCuesArmed;
-        private bool _tileCuesHandled;
         private readonly ScannerJumpAnchor _jumpAnchor = new ScannerJumpAnchor();
 
         public TroopPlacementHexGrid(PreBattleMenuAdapter adapter)
@@ -50,11 +63,6 @@ namespace SongsOfConquestAccess.UI
                 ScannerDirectionMode.Hex);
         }
 
-        public override bool AnnounceName
-        {
-            get { return true; }
-        }
-
         public override string GetRole()
         {
             return string.Empty;
@@ -71,20 +79,28 @@ namespace SongsOfConquestAccess.UI
             return new TroopPlacementTileSpeechFormatter(_snapshot).DescribeTile(tile);
         }
 
-        public override string GetStatus()
+        /// <summary>Where the cursor stands - the source of a carry, and what a drop lands on.</summary>
+        public Vector2Int CursorTile
         {
-            TroopPlacementTile tile = GetFocusedTile();
-            if (tile == null)
-            {
-                return string.Empty;
-            }
+            get { return _cursor; }
+        }
 
-            if (_dragSource.HasValue)
-            {
-                return tile.Point == _dragSource.Value ? ModText.Get(ModStrings.UI.StatusDragging) : string.Empty;
-            }
+        /// <summary>Whether the tile under the cursor holds one of the player's OWN troops, which is
+        /// the only thing that can be picked up here.</summary>
+        public bool CanPickUp
+        {
+            get { return IsOwnTroop(GetFocusedTile()); }
+        }
 
-            return IsOwnTroop(tile) ? ModText.Get(ModStrings.UI.StatusDraggable) : string.Empty;
+        /// <summary>The game's own name for the troop under the cursor, captured when it is picked
+        /// up.</summary>
+        public string FocusedTroopLabel
+        {
+            get
+            {
+                TroopPlacementTile tile = GetFocusedTile();
+                return tile != null ? tile.TroopLabel : null;
+            }
         }
 
         public override Tooltip GetTooltip()
@@ -107,15 +123,7 @@ namespace SongsOfConquestAccess.UI
                 || actionKey == AccessibilityActions.HexGridSkipNorthEast.Key
                 || actionKey == AccessibilityActions.HexGridSkipSouthWest.Key
                 || actionKey == AccessibilityActions.HexGridSkipSouthEast.Key
-                || actionKey == AccessibilityActions.StartDrag.Key
-                || actionKey == AccessibilityActions.Activate.Key
-                || (_dragSource.HasValue && actionKey == AccessibilityActions.Cancel.Key)
                 || IsScannerAction(actionKey);
-        }
-
-        public override bool HasClaimInTree(string actionKey)
-        {
-            return ClaimsAction(actionKey);
         }
 
         public override bool HandleAction(InputAction action)
@@ -195,28 +203,16 @@ namespace SongsOfConquestAccess.UI
                 return SkipMove(point => GetDiagonalNeighbor(point, north: false, east: true));
             }
 
-            if (action.Key == AccessibilityActions.StartDrag.Key)
-            {
-                return StartDrag();
-            }
-
-            if (action.Key == AccessibilityActions.Activate.Key)
-            {
-                return Drop();
-            }
-
-            if (action.Key == AccessibilityActions.Cancel.Key && _dragSource.HasValue)
-            {
-                return CancelDrag();
-            }
-
             return false;
         }
 
-        public void RebuildAfterPlacementChanged()
+        /// <summary>The board changed under the cursor - a troop was placed, moved or removed. The
+        /// cursor keeps its tile where that tile still exists, and the tile is read again only where
+        /// the player is standing on the board (<paramref name="announce"/>): a change made while the
+        /// cursor is on a side panel or on a button is not a landing.</summary>
+        public void RebuildAfterPlacementChanged(bool announce)
         {
             Vector2Int previousCursor = _cursor;
-            _dragSource = null;
             RefreshSnapshot();
             if (_snapshot != null && _snapshot.IsValidTile(previousCursor))
             {
@@ -227,22 +223,11 @@ namespace SongsOfConquestAccess.UI
                 _cursor = GetInitialCursor();
             }
 
-            if (_tileCuesArmed)
-            {
-                FocusCurrentTile();
-                PlayTileCues();
-                return;
-            }
-
-            // The game can fire a deployment change while the screen is still arming. That rebuild
-            // stays silent, including the focus it claims below.
-            _tileCuesHandled = true;
-            FocusCurrentTile();
+            Land(announce);
         }
 
         private void PlayTileCues()
         {
-            _tileCuesHandled = true;
             PlayTileCuesFor(_cursor, 0f, 1f, 0f);
         }
 
@@ -275,28 +260,19 @@ namespace SongsOfConquestAccess.UI
             PlayTileCuesFor(target, pan, gainScale, semitones);
         }
 
-        protected override void OnFocus()
+        /// <summary>Draw the game's own highlight on the tile the cursor stands on and hover it, so
+        /// the game draws the troop's own details - what the screen does when the board's node takes
+        /// the focus.</summary>
+        public void ShowOverlay()
         {
-            FocusCurrentTile();
-            _tileCuesArmed = true;
-
-            // Focus arrival announces the current tile, so it gets a cue too. Paths that already
-            // cued while claiming focus mark the arrival handled so it only sounds once.
-            if (!_tileCuesHandled)
-            {
-                PlayTileCues();
-            }
+            _adapter?.FocusTile(GetFocusedTile());
+            _adapter?.SetFocusedTileOverlay(_cursor);
         }
 
-        protected override void OnUnfocus()
+        /// <summary>Take the highlight and the hover off again: the focus has gone to a panel, a
+        /// button, or off the screen.</summary>
+        public void HideOverlay()
         {
-            _tileCuesHandled = false;
-            if (_dragSource.HasValue)
-            {
-                NativeSoundUtility.PostEvent("Common_SpellbookEndDragCancel");
-            }
-
-            ClearDrag();
             _adapter?.HideNativeTooltip();
             _adapter?.ClearFocusedTileOverlay();
         }
@@ -345,57 +321,6 @@ namespace SongsOfConquestAccess.UI
             return new Vector2Int(point.x + xDelta, point.y + yDelta);
         }
 
-        private bool StartDrag()
-        {
-            TroopPlacementTile tile = GetFocusedTile();
-            if (!IsOwnTroop(tile))
-            {
-                return true;
-            }
-
-            _dragSource = _cursor;
-            Speak(ModText.Get(ModStrings.UI.DragStartedTroopPlacement, tile.TroopLabel, HexCoordinateFormatter.Format(_cursor)));
-            return true;
-        }
-
-        private bool Drop()
-        {
-            if (!_dragSource.HasValue)
-            {
-                Speak(ModText.Get(ModStrings.UI.PressSpaceToDrag));
-                return true;
-            }
-
-            Vector2Int source = _dragSource.Value;
-            if (_adapter != null && _adapter.TryMoveTroop(source, _cursor))
-            {
-                _dragSource = null;
-                Speak(ModText.Get(ModStrings.UI.DragComplete));
-                return true;
-            }
-
-            Speak(ModText.Get(ModStrings.UI.InvalidDestination));
-            return true;
-        }
-
-        private bool CancelDrag()
-        {
-            if (!_dragSource.HasValue)
-            {
-                return false;
-            }
-
-            ClearDrag();
-            NativeSoundUtility.PostEvent("Common_SpellbookEndDragCancel");
-            Speak(ModText.Get(ModStrings.UI.DragCancelled));
-            return true;
-        }
-
-        private void ClearDrag()
-        {
-            _dragSource = null;
-        }
-
         private bool SetCursor(Vector2Int point)
         {
             if (_snapshot == null || !_snapshot.IsValidTile(point))
@@ -410,9 +335,34 @@ namespace SongsOfConquestAccess.UI
             }
 
             _cursor = point;
-            FocusCurrentTile();
-            PlayTileCues();
+            Land(announce: true);
             return true;
+        }
+
+        /// <summary>What every landing does: the highlight, the hover the game draws its details for,
+        /// and - where the player went there themselves - the tile read out with its cues.</summary>
+        private void Land(bool announce)
+        {
+            ShowOverlay();
+            if (!announce)
+            {
+                return;
+            }
+
+            SpeakTile();
+            PlayTileCues();
+        }
+
+        /// <summary>The tile description, said the way the widget engine's focus commit said it:
+        /// queued behind whatever the same keypress has already said, so a skip's "Skipped 3 tiles"
+        /// is heard before the tile it landed on.</summary>
+        private void SpeakTile()
+        {
+            string label = GetLabel();
+            if (!string.IsNullOrWhiteSpace(label))
+            {
+                SpeechPipeline.Output(new SpeechRequest(label, interrupt: false));
+            }
         }
 
         private bool JumpToScannerResult(Vector2Int point)
@@ -559,13 +509,6 @@ namespace SongsOfConquestAccess.UI
                 || actionKey == AccessibilityActions.ScannerReturnFromJump.Key;
         }
 
-        private void FocusCurrentTile()
-        {
-            _adapter?.FocusTile(GetFocusedTile());
-            _adapter?.SetFocusedTileOverlay(_cursor);
-            UIManager.SetFocusedWidget(this);
-        }
-
         private void RefreshSnapshot()
         {
             _snapshot = _adapter != null ? _adapter.BuildSnapshot() : null;
@@ -613,11 +556,6 @@ namespace SongsOfConquestAccess.UI
             }
 
             return tile.TroopSide.Value == _snapshot.OwnSide.Value;
-        }
-
-        private static void Speak(string text)
-        {
-            SpeechPipeline.Output(new SpeechRequest(text, interrupt: false));
         }
 
         private static void SpeakSkipped(int skippedCount)

@@ -43,6 +43,9 @@ namespace SongsOfConquestAccess.Adapters
         private static readonly FieldInfo AttackerThreatLevelField = AccessTools.Field(typeof(PreBattleMenu), "_attackerThreatLevel");
         private static readonly FieldInfo DefenderScoutingInformationField = AccessTools.Field(typeof(PreBattleMenu), "_defenderScoutingInformation");
         private static readonly FieldInfo DefenderThreatLevelField = AccessTools.Field(typeof(PreBattleMenu), "_defenderThreatLevel");
+        private static readonly FieldInfo AttackerScoutingAreaField = AccessTools.Field(typeof(PreBattleMenu), "_attackerScoutingArea");
+        private static readonly FieldInfo DefenderScoutingAreaField = AccessTools.Field(typeof(PreBattleMenu), "_defenderScoutingArea");
+        private static readonly FieldInfo DragHintTextField = AccessTools.Field(typeof(PreBattleMenu), "_dragHintText");
         private static readonly FieldInfo LocalizationField = AccessTools.Field(typeof(PreBattleMenu), "_localizationHandler");
         private static readonly FieldInfo AdventureFacadeField = AccessTools.Field(typeof(PreBattleMenu), "_adventureFacade");
         private static readonly FieldInfo FactionLookupField = AccessTools.Field(typeof(PreBattleMenu), "_factionLookup");
@@ -101,14 +104,60 @@ namespace SongsOfConquestAccess.Adapters
                 && GetMap() != null;
         }
 
-        public string LeftPortraitText
+        /// <summary>The wielder name the menu draws over each side, alone: the threat level and the
+        /// scouting information the panel also draws are read separately, each with the tooltip that
+        /// belongs to it.</summary>
+        public string AttackerName
         {
-            get { return GetParticipantText(BattleParticipantSide.Attacker); }
+            get { return GetParticipantNameText(BattleParticipantSide.Attacker); }
         }
 
-        public string RightPortraitText
+        public string DefenderName
         {
-            get { return GetParticipantText(BattleParticipantSide.Defender); }
+            get { return GetParticipantNameText(BattleParticipantSide.Defender); }
+        }
+
+        /// <summary>"Threat Level - Fair", empty while the game is not drawing it (it is drawn on the
+        /// side the local player scouted, and in a siege).</summary>
+        public string AttackerThreatText
+        {
+            get { return GetParticipantThreatText(BattleParticipantSide.Attacker); }
+        }
+
+        public string DefenderThreatText
+        {
+            get { return GetParticipantThreatText(BattleParticipantSide.Defender); }
+        }
+
+        /// <summary>The partial-information line the menu draws instead of the full army when the
+        /// side was not fully scouted; empty when the scouting is complete.</summary>
+        public string AttackerScoutingText
+        {
+            get { return GetUIText(AttackerScoutingInformationField); }
+        }
+
+        public string DefenderScoutingText
+        {
+            get { return GetUIText(DefenderScoutingInformationField); }
+        }
+
+        /// <summary>The scouting holder's own tooltip ("Scouting provided by Cecilia"), set by
+        /// <c>SetupScoutingInfo</c> on the image the threat level sits inside.</summary>
+        public Tooltip AttackerScoutingTooltip
+        {
+            get { return GetScoutingTooltip(BattleParticipantSide.Attacker); }
+        }
+
+        public Tooltip DefenderScoutingTooltip
+        {
+            get { return GetScoutingTooltip(BattleParticipantSide.Defender); }
+        }
+
+        /// <summary>The hint the menu draws under the grid ("Drag troops to rearrange"), empty in the
+        /// states that hide it.</summary>
+        public string DragHintText
+        {
+            get { return GetUIText(DragHintTextField); }
         }
 
         public string InstructionText
@@ -116,26 +165,39 @@ namespace SongsOfConquestAccess.Adapters
             get { return GetUIText(InstructionsTextField); }
         }
 
-        public void FocusLeftPortrait()
+        public void FocusAttackerPortrait()
         {
             FocusCommanderPortrait(BattleParticipantSide.Attacker);
         }
 
-        public void FocusRightPortrait()
+        public void FocusDefenderPortrait()
         {
             FocusCommanderPortrait(BattleParticipantSide.Defender);
         }
 
-        public Tooltip LeftPortraitTooltip
+        /// <summary>The portrait button the side draws, or null where it draws none - a neutral army
+        /// has a name and no portrait.</summary>
+        public Component AttackerPortraitButton
+        {
+            get { return GetCommanderPortraitButton(GetCommanderPortrait(BattleParticipantSide.Attacker)) as Component; }
+        }
+
+        public Component DefenderPortraitButton
+        {
+            get { return GetCommanderPortraitButton(GetCommanderPortrait(BattleParticipantSide.Defender)) as Component; }
+        }
+
+        public Tooltip AttackerPortraitTooltip
         {
             get { return GetCommanderPortraitTooltip(BattleParticipantSide.Attacker); }
         }
 
-        public Tooltip RightPortraitTooltip
+        public Tooltip DefenderPortraitTooltip
         {
             get { return GetCommanderPortraitTooltip(BattleParticipantSide.Defender); }
         }
 
+        public Component WithdrawButton { get { return GetField<UIButton>(CancelButtonField) as Component; } }
         public string WithdrawButtonLabel { get { return GetButtonLabel(CancelButtonField); } }
         public bool Withdraw() { return ActivateButton(CancelButtonField); }
         public void FocusWithdrawButton() { FocusButton(CancelButtonField); }
@@ -143,6 +205,7 @@ namespace SongsOfConquestAccess.Adapters
         public bool IsWithdrawButtonVisible() { return IsButtonVisible(CancelButtonField); }
         public Tooltip WithdrawButtonTooltip { get { return GetButtonTooltip(CancelButtonField); } }
 
+        public Component ManualBattleButton { get { return GetField<UIButton>(BattleButtonField) as Component; } }
         public string ManualBattleButtonLabel { get { return GetButtonLabel(BattleButtonField); } }
         public bool ManualBattle() { return ActivateButton(BattleButtonField); }
         public void FocusManualBattleButton() { FocusButton(BattleButtonField); }
@@ -150,6 +213,7 @@ namespace SongsOfConquestAccess.Adapters
         public bool IsManualBattleButtonVisible() { return IsButtonVisible(BattleButtonField); }
         public Tooltip ManualBattleButtonTooltip { get { return GetButtonTooltip(BattleButtonField); } }
 
+        public Component QuickBattleButton { get { return GetField<UIButton>(QuickButtonField) as Component; } }
         public string QuickBattleButtonLabel { get { return GetButtonLabel(QuickButtonField); } }
         public bool QuickBattle() { return ActivateButton(QuickButtonField); }
         public void FocusQuickBattleButton() { FocusButton(QuickButtonField); }
@@ -157,6 +221,7 @@ namespace SongsOfConquestAccess.Adapters
         public bool IsQuickBattleButtonVisible() { return IsButtonVisible(QuickButtonField); }
         public Tooltip QuickBattleButtonTooltip { get { return GetButtonTooltip(QuickButtonField); } }
 
+        public Component ReadyButton { get { return GetField<UIButton>(ReadyButtonField) as Component; } }
         public string ReadyButtonLabel { get { return GetButtonLabel(ReadyButtonField); } }
         public bool Ready() { return ActivateButton(ReadyButtonField); }
         public void FocusReadyButton() { FocusButton(ReadyButtonField); }
@@ -893,14 +958,6 @@ namespace SongsOfConquestAccess.Adapters
             return GetField<ILocalizationHandler>(LocalizationField);
         }
 
-        private string GetParticipantText(BattleParticipantSide side)
-        {
-            string name = GetParticipantNameText(side);
-            string scouting = GetParticipantScoutingText(side);
-            string threat = GetParticipantThreatText(side);
-            return MenuButtonTextUtility.JoinParts(name, scouting, threat);
-        }
-
         private string GetParticipantNameText(BattleParticipantSide side)
         {
             AdventureBattleMenu.Settings settings = GetAdventureBattleMenuSettings();
@@ -915,11 +972,14 @@ namespace SongsOfConquestAccess.Adapters
             return UITextMeshTextUtility.GetEffectiveText(text);
         }
 
-        private string GetParticipantScoutingText(BattleParticipantSide side)
+        private Tooltip GetScoutingTooltip(BattleParticipantSide side)
         {
-            return GetUIText(side == BattleParticipantSide.Attacker
-                ? AttackerScoutingInformationField
-                : DefenderScoutingInformationField);
+            UIImage area = GetField<UIImage>(side == BattleParticipantSide.Attacker
+                ? AttackerScoutingAreaField
+                : DefenderScoutingAreaField);
+            return area != null && area.Active && ((Component)area).gameObject != null && ((Component)area).gameObject.activeInHierarchy
+                ? Tooltip.ForComponent(area as Component, GetLocalization())
+                : null;
         }
 
         private string GetParticipantThreatText(BattleParticipantSide side)
