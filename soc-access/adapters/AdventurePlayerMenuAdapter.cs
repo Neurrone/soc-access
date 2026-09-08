@@ -32,6 +32,12 @@ namespace SongsOfConquestAccess.Adapters
         private readonly IClientAdventureFacade _facade;
         private readonly ILocalizationHandler _localization;
 
+        // Which mesh draws the title, and which mesh each caption hangs on: fixed for the menu's
+        // life, and finding either walked the whole page. The TEXT is still read live off the mesh.
+        private UITextMesh _titleText;
+        private readonly Dictionary<FieldInfo, UITextMesh> _captionTexts = new Dictionary<FieldInfo, UITextMesh>();
+        private readonly Dictionary<FieldInfo, Transform> _captionRoots = new Dictionary<FieldInfo, Transform>();
+
         public AdventurePlayerMenuAdapter(AdventurePlayerMenu menu)
         {
             _menu = menu;
@@ -112,19 +118,44 @@ namespace SongsOfConquestAccess.Adapters
 
         private CaptionItem GetCaption(FieldInfo field)
         {
-            GameObject header = GetField<GameObject>(_menu, field);
-            if (header == null)
+            UITextMesh text;
+            Transform root;
+            if (!_captionTexts.TryGetValue(field, out text))
             {
-                return null;
+                GameObject header = GetField<GameObject>(_menu, field);
+                if (header == null)
+                {
+                    return null;
+                }
+
+                text = header.GetComponentInChildren<UITextMesh>(includeInactive: true);
+                root = header.transform;
+                _captionTexts[field] = text;
+                _captionRoots[field] = root;
+            }
+            else if (!_captionRoots.TryGetValue(field, out root))
+            {
+                root = null;
             }
 
-            UITextMesh text = header.GetComponentInChildren<UITextMesh>(includeInactive: true);
-            return new CaptionItem(GetText(text), header.transform);
+            return root == null ? null : new CaptionItem(GetText(text), root);
         }
 
         private string GetTitle()
         {
             string nativePlayers = Localize("Common/Players");
+
+            // The mesh the title was found on last time, read live. Only a mesh that has stopped
+            // saying anything sends the search over the whole page again.
+            if (_titleText != null)
+            {
+                string kept = GetText(_titleText);
+                if (!string.IsNullOrWhiteSpace(kept))
+                {
+                    return kept;
+                }
+            }
+
             if (_menu != null)
             {
                 UITextMesh[] texts = ((Component)_menu).GetComponentsInChildren<UITextMesh>(includeInactive: false);
@@ -141,6 +172,7 @@ namespace SongsOfConquestAccess.Adapters
                         && !string.IsNullOrWhiteSpace(nativePlayers)
                         && string.Equals(candidate.Trim(), nativePlayers.Trim(), StringComparison.OrdinalIgnoreCase))
                     {
+                        _titleText = text;
                         return candidate;
                     }
                 }
@@ -156,6 +188,7 @@ namespace SongsOfConquestAccess.Adapters
                     string candidate = GetText(text);
                     if (!string.IsNullOrWhiteSpace(candidate))
                     {
+                        _titleText = text;
                         return candidate;
                     }
                 }

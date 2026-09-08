@@ -80,6 +80,14 @@ namespace SongsOfConquestAccess.Adapters
 
         private readonly PlayerStatsMenuNavigation _navigation;
 
+        // Which mesh each label was found on, kept so the page is not walked again for it every
+        // frame. Every entry is re-resolved the moment its mesh stops answering the search that
+        // found it, so a kept answer can never be one the walk would not have found.
+        private readonly Dictionary<int, UITextMesh> _tabLabels = new Dictionary<int, UITextMesh>();
+        private readonly Dictionary<string, UITextMesh> _titleTexts = new Dictionary<string, UITextMesh>();
+        private readonly Dictionary<string, UITextMesh> _prefixedTexts = new Dictionary<string, UITextMesh>();
+        private readonly Dictionary<UITextMesh, string[]> _siblingLabels = new Dictionary<UITextMesh, string[]>();
+
         public PlayerStatsAdapter(PlayerStatsMenuNavigation navigation)
         {
             _navigation = navigation;
@@ -572,11 +580,20 @@ namespace SongsOfConquestAccess.Adapters
                 : value;
         }
 
-        private static string FindSiblingLabel(UITextMesh valueText, string value)
+        private string FindSiblingLabel(UITextMesh valueText, string value)
         {
             if (valueText == null)
             {
                 return string.Empty;
+            }
+
+            // The caption beside a figure is drawn once and never redrawn, so it is remembered
+            // against the figure it was found for; a figure that has changed searches again.
+            string[] remembered;
+            if (_siblingLabels.TryGetValue(valueText, out remembered)
+                && string.Equals(remembered[0], value, StringComparison.Ordinal))
+            {
+                return remembered[1];
             }
 
             Transform current = valueText.transform;
@@ -606,19 +623,31 @@ namespace SongsOfConquestAccess.Adapters
 
                 if (parts.Count > 0 && parts.Count <= 3)
                 {
-                    return string.Join(" ", parts.ToArray());
+                    string found = string.Join(" ", parts.ToArray());
+                    _siblingLabels[valueText] = new[] { value, found };
+                    return found;
                 }
             }
 
+            _siblingLabels[valueText] = new[] { value, string.Empty };
             return string.Empty;
         }
 
-        private static string ReadRequiredTitle(Component root, params string[] path)
+        private string ReadRequiredTitle(Component root, params string[] path)
         {
             if (root == null)
             {
                 SocAccessMod.Instance?.LogWarning("PlayerStats title lookup failed because the root component is null.");
                 return string.Empty;
+            }
+
+            // The Find chain, and the warnings a missing one writes, run once per container rather
+            // than once a frame. The text is still read live off the mesh they settle on.
+            string key = root.GetInstanceID() + "/" + string.Join("/", path);
+            UITextMesh kept;
+            if (_titleTexts.TryGetValue(key, out kept))
+            {
+                return kept == null ? string.Empty : GetText(kept);
             }
 
             Transform current = root.transform;
@@ -633,11 +662,14 @@ namespace SongsOfConquestAccess.Adapters
                         + " at "
                         + string.Join("/", path)
                         + ".");
+                    _titleTexts[key] = null;
                     return string.Empty;
                 }
             }
 
-            string text = GetText(current.GetComponent<UITextMesh>());
+            UITextMesh titleText = current.GetComponent<UITextMesh>();
+            _titleTexts[key] = titleText;
+            string text = GetText(titleText);
             if (string.IsNullOrWhiteSpace(text))
             {
                 SocAccessMod.Instance?.LogWarning(
@@ -658,32 +690,58 @@ namespace SongsOfConquestAccess.Adapters
                 return string.Empty;
             }
 
+            string key = root.GetInstanceID() + "/" + prefix;
+            UITextMesh kept;
+            if (_prefixedTexts.TryGetValue(key, out kept) && kept != null)
+            {
+                string keptText = GetText(kept);
+                if (!string.IsNullOrWhiteSpace(keptText) && keptText.TrimStart().StartsWith(prefix, StringComparison.Ordinal))
+                {
+                    return keptText;
+                }
+            }
+
             UITextMesh[] textMeshes = root.GetComponentsInChildren<UITextMesh>(false);
             for (int i = 0; i < textMeshes.Length; i++)
             {
                 string text = GetText(textMeshes[i]);
                 if (!string.IsNullOrWhiteSpace(text) && text.TrimStart().StartsWith(prefix, StringComparison.Ordinal))
                 {
+                    _prefixedTexts[key] = textMeshes[i];
                     return text;
                 }
             }
 
+            _prefixedTexts[key] = null;
             return string.Empty;
         }
 
         private string FindTabLabel(int index, string fallback)
         {
             string expectedSuffix = index == OverallTabIndex ? "Overall" : "Battle";
+            UITextMesh kept;
+            if (_tabLabels.TryGetValue(index, out kept) && kept != null)
+            {
+                string keptText = GetText(kept);
+                if (!string.IsNullOrWhiteSpace(keptText)
+                    && keptText.IndexOf(expectedSuffix, StringComparison.OrdinalIgnoreCase) >= 0)
+                {
+                    return keptText;
+                }
+            }
+
             UITextMesh[] textMeshes = _navigation != null ? _navigation.GetComponentsInChildren<UITextMesh>(false) : new UITextMesh[0];
             for (int i = 0; i < textMeshes.Length; i++)
             {
                 string text = GetText(textMeshes[i]);
                 if (!string.IsNullOrWhiteSpace(text) && text.IndexOf(expectedSuffix, StringComparison.OrdinalIgnoreCase) >= 0)
                 {
+                    _tabLabels[index] = textMeshes[i];
                     return text;
                 }
             }
 
+            _tabLabels[index] = null;
             return fallback;
         }
 
