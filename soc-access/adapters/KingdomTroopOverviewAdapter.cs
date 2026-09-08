@@ -30,6 +30,12 @@ namespace SongsOfConquestAccess.Adapters
 
         private readonly KingdomTroopOverviewMenu _menu;
 
+        // What the menu drew, read once. The game fills the whole page inside
+        // KingdomTroopOverviewMenu.Show and never touches it again until Hide, which ends this
+        // adapter, so reading the entries every frame re-read a page that cannot change.
+        private List<TownItem> _towns;
+        private string _title;
+
         public KingdomTroopOverviewAdapter(KingdomTroopOverviewMenu menu)
         {
             _menu = menu;
@@ -45,40 +51,56 @@ namespace SongsOfConquestAccess.Adapters
         {
             get
             {
-                if (_menu == null)
+                if (_title == null)
                 {
-                    return string.Empty;
+                    _title = ReadTitle();
                 }
 
-                UITextMesh[] texts = ((Component)_menu).GetComponentsInChildren<UITextMesh>(includeInactive: false);
-                for (int i = 0; i < texts.Length; i++)
-                {
-                    UITextMesh text = texts[i];
-                    if (text == null || IsOverviewEntryText(text))
-                    {
-                        continue;
-                    }
-
-                    string candidate = NormalizeText(text);
-                    if (!string.IsNullOrWhiteSpace(candidate))
-                    {
-                        return candidate;
-                    }
-                }
-
-                return string.Empty;
+                return _title;
             }
         }
 
-        /// <summary>The towns in hierarchy order, which is the order the menu draws them.</summary>
-        public IReadOnlyList<TownItem> GetTowns()
+        private string ReadTitle()
         {
-            List<TownItem> towns = new List<TownItem>();
-            if (!IsPresent())
+            if (_menu == null)
             {
-                return towns;
+                return string.Empty;
             }
 
+            UITextMesh[] texts = ((Component)_menu).GetComponentsInChildren<UITextMesh>(includeInactive: false);
+            for (int i = 0; i < texts.Length; i++)
+            {
+                UITextMesh text = texts[i];
+                if (text == null || IsOverviewEntryText(text))
+                {
+                    continue;
+                }
+
+                string candidate = NormalizeText(text);
+                if (!string.IsNullOrWhiteSpace(candidate))
+                {
+                    return candidate;
+                }
+            }
+
+            return string.Empty;
+        }
+
+        /// <summary>The towns in hierarchy order, which is the order the menu draws them. Read off
+        /// the page once: the game builds it in Show and leaves it alone until Hide.</summary>
+        public IReadOnlyList<TownItem> GetTowns()
+        {
+            if (_towns == null && IsPresent())
+            {
+                _towns = ReadTowns();
+            }
+
+            return _towns ?? new List<TownItem>();
+        }
+
+        private List<TownItem> ReadTowns()
+        {
+            List<TownItem> towns = new List<TownItem>();
             KingdomTroopOverviewTownEntry[] entries =
                 ((Component)_menu).GetComponentsInChildren<KingdomTroopOverviewTownEntry>(includeInactive: false);
             for (int i = 0; i < entries.Length; i++)

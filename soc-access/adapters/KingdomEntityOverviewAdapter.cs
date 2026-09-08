@@ -60,6 +60,12 @@ namespace SongsOfConquestAccess.Adapters
 
         private readonly KingdomEntityOverviewMenu _menu;
 
+        // What the menu drew, read once. The game fills the whole page inside
+        // KingdomEntityOverviewMenu.Show and never touches it again until Hide, which ends this
+        // adapter, so reading the entries every frame re-read a page that cannot change.
+        private List<CategoryItem> _categories;
+        private string _title;
+
         public KingdomEntityOverviewAdapter(KingdomEntityOverviewMenu menu)
         {
             _menu = menu;
@@ -75,40 +81,56 @@ namespace SongsOfConquestAccess.Adapters
         {
             get
             {
-                if (_menu == null)
+                if (_title == null)
                 {
-                    return string.Empty;
+                    _title = ReadTitle();
                 }
 
-                UITextMesh[] texts = ((Component)_menu).GetComponentsInChildren<UITextMesh>(includeInactive: false);
-                for (int i = 0; i < texts.Length; i++)
-                {
-                    UITextMesh text = texts[i];
-                    if (text == null || IsOverviewEntryText(text))
-                    {
-                        continue;
-                    }
-
-                    string candidate = NormalizeText(text);
-                    if (!string.IsNullOrWhiteSpace(candidate))
-                    {
-                        return candidate;
-                    }
-                }
-
-                return string.Empty;
+                return _title;
             }
         }
 
-        /// <summary>The categories in hierarchy order, which is the order the menu draws them.</summary>
-        public IReadOnlyList<CategoryItem> GetCategories()
+        private string ReadTitle()
         {
-            List<CategoryItem> categories = new List<CategoryItem>();
-            if (!IsPresent())
+            if (_menu == null)
             {
-                return categories;
+                return string.Empty;
             }
 
+            UITextMesh[] texts = ((Component)_menu).GetComponentsInChildren<UITextMesh>(includeInactive: false);
+            for (int i = 0; i < texts.Length; i++)
+            {
+                UITextMesh text = texts[i];
+                if (text == null || IsOverviewEntryText(text))
+                {
+                    continue;
+                }
+
+                string candidate = NormalizeText(text);
+                if (!string.IsNullOrWhiteSpace(candidate))
+                {
+                    return candidate;
+                }
+            }
+
+            return string.Empty;
+        }
+
+        /// <summary>The categories in hierarchy order, which is the order the menu draws them. Read
+        /// off the page once: the game builds it in Show and leaves it alone until Hide.</summary>
+        public IReadOnlyList<CategoryItem> GetCategories()
+        {
+            if (_categories == null && IsPresent())
+            {
+                _categories = ReadCategories();
+            }
+
+            return _categories ?? new List<CategoryItem>();
+        }
+
+        private List<CategoryItem> ReadCategories()
+        {
+            List<CategoryItem> categories = new List<CategoryItem>();
             KingdomEntityOverviewCategoryEntry[] entries =
                 ((Component)_menu).GetComponentsInChildren<KingdomEntityOverviewCategoryEntry>(includeInactive: false);
             for (int i = 0; i < entries.Length; i++)
