@@ -40,7 +40,9 @@ namespace SongsOfConquestAccess.Screens
     /// THE GAME DRAWS ONE BAND with three containers - the prompt, the purchase, the sale - and
     /// paints one of them at a time. Each half's nodes are keyed structurally, the parts are watched
     /// live, the price rides on the button, and the button is gone for an important artifact, whose
-    /// Sell button the game does not draw.
+    /// Sell button the game does not draw. The band's line carries the artifact's own tooltip (owner
+    /// ruling 2026-09-08): the game draws none on the band, but the player standing on the thing
+    /// they are about to sell or buy should be able to read what it is.
     ///
     /// THE CLICKS MEAN SOMETHING ELSE HERE than they do on the wielder sheet, and the difference is
     /// the game's, not the mod's - the same two native handlers branch on
@@ -313,7 +315,7 @@ namespace SongsOfConquestAccess.Screens
             Component container = _adapter.BuyContainer;
             if (container != null)
             {
-                NodeVtable line = GraphNodes.Text(() => _adapter.BuyItemName);
+                NodeVtable line = GraphNodes.Text(() => _adapter.BuyItemName, null, _adapter.BuyItemTooltip);
                 line.Announcements[0].Live = true;
                 builder.AddItem(new DrawnNode(
                     ControlId.Structural("artifact-market:purchase/line"),
@@ -360,7 +362,7 @@ namespace SongsOfConquestAccess.Screens
             Component container = _adapter.SellContainer;
             if (container != null)
             {
-                NodeVtable line = GraphNodes.Text(() => _adapter.SellItemName);
+                NodeVtable line = GraphNodes.Text(() => _adapter.SellItemName, null, _adapter.SellItemTooltip);
                 line.Announcements[0].Live = true;
                 builder.AddItem(new DrawnNode(
                     ControlId.Structural("artifact-market:sell/line"),
