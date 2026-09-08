@@ -142,7 +142,10 @@ Paths relative to `soc-access/`. Read these before porting a screen.
   and `ui_back` dispatched through `CarryActions`, the owner's page answered off the screen
   stack (a child screen over it is still it), `ui/CarrySounds.cs` the seam a screen registers
   the game's own drag noises for its cargo kind on, `input/ChordNames.cs` installed as
-  `NodeHints.Chord`. Not wired yet: modes (phase E). `ui/PointerHover.cs` simulates the pointer hover a card
+  `NodeHints.Chord`. Modes (phase E): `GraphScreen.ModeClaims(action)` is asked BEFORE the
+  navigator's own set in both `Claims` and `Dispatch` (after a live search, which is innermost),
+  and an action it answers runs through `OnAction`; a screen answers it only while its mode node
+  is focused. `ui/PointerHover.cs` simulates the pointer hover a card
   reveals its detail on, released in `Stop()`.
 - `ui/GraphNodes.cs` — the factories, every one taking the same cross-cutting parameters:
   `Button`, `Group`, `Text`, `EditField`, `Checkbox`, `Slider` (Left/Right adjust; an optional
@@ -351,12 +354,36 @@ battle is reached by walking the map cursor onto a neutral army and pressing the
 action twice; the post-game pages by Surrender in the pause menu (a fresh random skirmish).
 
 Owner rulings for the map (2026-09-08): type-ahead is OFF on `AdventureMapScreen`
-(`AllowsTypeahead` false), so no letter is ever claimed there and the game keeps its own
-hotkeys (C the sheet, V the spellbook, E end turn, Ctrl+digits the quick splits). The map's
+(`AllowsTypeahead` false), so no letter is ever claimed for a search and the game keeps its own
+hotkeys (C the sheet, V the spellbook, E end turn); the mod's own map letters (W, S, A, D, P, L,
+K, J, T, R, B, N) and digit chords stay bound as they are today, claimed only while the map node
+is focused. The map's
 troop bar is `TroopHudRows.Rows` in a HUD stop. The end-turn button is named by the game's
 tooltip, which `AdventureHudAdapter` refreshes through the game's own hover refresh before
 reading (the button's state is refreshed every frame, its title only on hover). The map's
 `Portrait` and `TooltipAction` uses go with the port.
+
+Approved model for `AdventureMapScreen` (2026-09-08): one stop `map` named "Map" (the teleport
+menu's instruction text while that menu is up) holding ONE node with a fixed id; the node's
+label is the tile description, its buffer the tile's tooltip lines, Enter/Backslash the
+primary/secondary tile actions; `AdventureMapGrid` survives as the mode's cursor (tile, scanner,
+bookmarks, beacons, cues, overlay) and speaks each move itself, so the navigator never announces
+a move. `ModeClaims` answers the grid's whole key set while the map node is focused. Then, in
+drawn order, stops that exist only while the game draws their panel: Wielder (named after the
+selected wielder: portrait button with the stat tooltip, experience line, Level Up when drawn,
+an Essences region of five tooltip lines, Wielder Sheet / Movement / Spells buttons), Troops
+(`TroopHudRows.Rows`, T), Resources (six lines, R), Kingdom (named "Kingdom": Game Menu then the
+four overview buttons, "unavailable" when greyed), Wielders (the drawn "Wielders n/m" line with
+its tooltip, then a button per wielder), Towns (same shape), Objectives (B), Notifications (N;
+Enter clicks, Backslash dismisses as a usage hint), Turn (round line, End Turn, then a Turn
+order region when drawn; Tab lands on End Turn). Chat and Bug report buttons are placed by
+measurement when drawn. Teleport: Escape stays the game's (`TeleportMenu` registers
+`UI.ExitMenu` to Cancel); the HUD stops are not built; a Teleport stop after the map holds
+Previous / Next / Confirm / Cancel; selecting a destination moves the cursor and reads the
+tile; Enter on the map confirms only on the destination; the close hook lands the cursor on the
+wielder and says "Cancelled" when cancelled. Escape on a HUD stop returns to the map with
+today's sound; on the map it is the game's. Cursor-moving events go through one
+`MoveCursor(tile, announce)`, announced only while the map is the top screen.
 
 ### Phase F — the screen manager swap
 

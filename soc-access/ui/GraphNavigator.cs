@@ -394,6 +394,13 @@ namespace SongsOfConquestAccess.UI
                 return true;
             }
 
+            // A mode of the screen that is driving takes its keys before the tree does
+            // (<see cref="GraphScreen.ModeClaims"/>); the search above is innermost still.
+            if (_screen.ModeClaims(actionKey))
+            {
+                return true;
+            }
+
             switch (actionKey)
             {
                 case "ui_up":
@@ -446,6 +453,11 @@ namespace SongsOfConquestAccess.UI
             if (_typeAhead.IsActive && SearchAction(actionKey))
             {
                 return true;
+            }
+
+            if (_screen.ModeClaims(actionKey))
+            {
+                return _screen.OnAction(actionKey);
             }
 
             switch (actionKey)

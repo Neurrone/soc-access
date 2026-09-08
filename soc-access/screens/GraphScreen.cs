@@ -70,6 +70,20 @@ namespace SongsOfConquestAccess.Screens
             return false;
         }
 
+        /// <summary>
+        /// Whether a MODE of this screen takes the action - asked BEFORE the navigator's own set, which
+        /// is the opposite of <see cref="ClaimsAction"/>. For a mode whose cursor is not the focus
+        /// cursor (the map's tile cursor, combat's hex cursor): while the focused node is the mode's,
+        /// the arrows, Home, End and the rest mean the cursor rather than the tree, and the screen
+        /// answers them in <see cref="OnAction"/>. Answer only while the mode is driving; a stop that is
+        /// not the mode's keeps every key of its own. A live type-ahead search is innermost and is
+        /// asked first still; the carry's back key is not displaced either.
+        /// </summary>
+        public virtual bool ModeClaims(string actionKey)
+        {
+            return false;
+        }
+
         /// <summary>Run an action <see cref="ClaimsAction"/> answered for. True when it was
         /// handled.</summary>
         public virtual bool OnAction(string actionKey)
