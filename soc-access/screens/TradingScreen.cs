@@ -26,10 +26,15 @@ namespace SongsOfConquestAccess.Screens
     /// A WIELDER STOP HERE IS THE SHEET'S SHAPE, because the menu draws the sheet's own parts, in the
     /// column's own order: the portrait row, the stats band (through <c>ui/CommanderBands.cs</c>,
     /// shared with the sheet), the modifiers, the army rows (<c>ui/TroopHudRows.cs</c>), and then the
-    /// side's Move all button. The stop names the wielder as its landing
+    /// side's Move all button. THE STOP IS NAMED AFTER THE WIELDER (owner ruling 2026-09-08): the
+    /// name is the stop's context, so Tab into it says who this column belongs to, and the portrait
+    /// line under it says the level. The portrait is a region of its own, unnamed, so the region jump
+    /// works from it as from anywhere else in the stop. The stop names the portrait as its landing
     /// (<c>GraphBuilder.LandStopOn</c>), because a stop that names none opens on the alternative in
     /// force and the showing modifier tab is one; the bar and that tab's lines are a region named
-    /// Modifiers after the stats, which is what the region jump reaches them by. Locked troop slots
+    /// Modifiers after the stats, which is what the region jump reaches them by. The four artifact
+    /// stops are named after their owner too ("Cecilia's Equipment"), since a page with two
+    /// backpacks on it cannot call either of them just Inventory. Locked troop slots
     /// are not there to find: the menu builds both bars with <c>hideLockedSlots</c>, so only drawn
     /// slots are rows. Enter on a modifier tab switches BOTH sides, which is what the menu's own tab
     /// control (<c>TradingMenu.HandleSwitchTab</c>) does.
@@ -151,16 +156,16 @@ namespace SongsOfConquestAccess.Screens
             BuildWielder(builder, RightWielderStop, RightKey, _adapter.Right);
 
             builder.BeginStop(LeftEquipmentStop);
-            ArtifactSlotNodes.Equipment(builder, _adapter.Left, LeftKey, AddSlotHints);
+            ArtifactSlotNodes.Equipment(builder, _adapter.Left, LeftKey, AddSlotHints, Section(_adapter.Left, _adapter.Left.EquipmentLabel));
 
             builder.BeginStop(LeftInventoryStop);
-            ArtifactSlotNodes.Inventory(builder, _adapter.Left, LeftKey, AddSlotHints, Marker("left/auto-arrange"));
+            ArtifactSlotNodes.Inventory(builder, _adapter.Left, LeftKey, AddSlotHints, Marker("left/auto-arrange"), Section(_adapter.Left, _adapter.Left.InventoryLabel));
 
             builder.BeginStop(RightEquipmentStop);
-            ArtifactSlotNodes.Equipment(builder, _adapter.Right, RightKey, AddSlotHints);
+            ArtifactSlotNodes.Equipment(builder, _adapter.Right, RightKey, AddSlotHints, Section(_adapter.Right, _adapter.Right.EquipmentLabel));
 
             builder.BeginStop(RightInventoryStop);
-            ArtifactSlotNodes.Inventory(builder, _adapter.Right, RightKey, AddSlotHints, Marker("right/auto-arrange"));
+            ArtifactSlotNodes.Inventory(builder, _adapter.Right, RightKey, AddSlotHints, Marker("right/auto-arrange"), Section(_adapter.Right, _adapter.Right.InventoryLabel));
 
             builder.BeginStop(CloseStop);
             BuildClose(builder);
@@ -193,23 +198,25 @@ namespace SongsOfConquestAccess.Screens
         private void BuildWielder(GraphBuilder builder, string stop, string keyPrefix, TradingMenuAdapter.Side side)
         {
             builder.BeginStop(stop);
+            builder.PushContext(side.CommanderName);
             ControlId portrait = BuildPortrait(builder, keyPrefix, side);
             BuildStats(builder, keyPrefix, side);
             BuildModifiers(builder, keyPrefix, side);
             BuildTroops(builder, keyPrefix, side);
             BuildMoveAll(builder, keyPrefix, side);
+            builder.PopContext();
 
             if (portrait != null)
             {
-                // Exactly there: the showing modifier tab is an alternative in force, and a stop
-                // otherwise lands on one of those rather than on the wielder.
+                // The wielder, not the showing modifier tab: a stop that names no landing opens on
+                // the alternative in force.
                 builder.LandStopOn(portrait);
             }
         }
 
-        /// <summary>The wielder, as the menu draws them over their column: their name and the level on
-        /// their portrait, with the stats the game draws on the portrait behind both in the buffer.
-        /// </summary>
+        /// <summary>The wielder's portrait, as its own unnamed region under the stop that carries
+        /// their name: the level the menu draws on it, with the stats the game draws on the portrait
+        /// behind it in the buffer.</summary>
         private ControlId BuildPortrait(GraphBuilder builder, string keyPrefix, TradingMenuAdapter.Side side)
         {
             Component portrait = side.Portrait;
@@ -218,13 +225,26 @@ namespace SongsOfConquestAccess.Screens
                 return null;
             }
 
-            NodeVtable vtable = GraphNodes.Text(() => side.CommanderName, null, side.PortraitTooltip);
-            vtable.Announcements.Add(GraphNodes.ValuePart(
-                () => ModText.Get(ModStrings.Screens.LevelValue, side.Level)));
+            builder.SetRegion(keyPrefix + ":portrait");
+            NodeVtable vtable = GraphNodes.Text(
+                () => ModText.Get(ModStrings.Screens.LevelValue, side.Level),
+                null,
+                side.PortraitTooltip);
             vtable.OnFocusVisual = () => side.FocusPortrait();
             ControlId id = ControlId.For(portrait, keyPrefix + "/portrait");
             builder.AddItem(new DrawnNode(id, vtable, portrait));
+            builder.SetRegion(null);
             return id;
+        }
+
+        /// <summary>A section of the page named after the wielder it belongs to, in the game's own
+        /// word for the section: "Cecilia's Equipment".</summary>
+        private static string Section(TradingMenuAdapter.Side side, string caption)
+        {
+            return ModText.Get(
+                ModStrings.Screens.WielderSection,
+                ModText.FormatPossessiveName(side.CommanderName, ModStrings.Spatial.CommanderPossessive),
+                caption);
         }
 
         private void BuildStats(GraphBuilder builder, string keyPrefix, TradingMenuAdapter.Side side)

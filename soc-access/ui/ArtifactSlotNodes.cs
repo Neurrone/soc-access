@@ -55,13 +55,15 @@ namespace SongsOfConquestAccess.UI
             CarrySounds.Register(ArtifactCargo, () => NativeSoundUtility.PostEvent(PickUpSound), null);
         }
 
-        /// <summary>The equipment column, under the game's own caption: one node per drawn slot, with
-        /// the two hands merged into one where the main hand holds a two-hander.</summary>
+        /// <summary>The equipment column, under the game's own caption or the one the caller composed
+        /// (a page with two wielders on it names each column after its owner): one node per drawn
+        /// slot, with the two hands merged into one where the main hand holds a two-hander.</summary>
         public static void Equipment(
             GraphBuilder builder,
             IArtifactSlots slots,
             string keyPrefix,
-            SlotHints hints)
+            SlotHints hints,
+            string caption = null)
         {
             IReadOnlyList<InventorySlotInfo> drawn = slots == null ? null : slots.GetEquipmentSlots();
             if (builder == null || drawn == null || drawn.Count == 0)
@@ -73,7 +75,7 @@ namespace SongsOfConquestAccess.UI
             InventorySlotInfo mainHand = Find(drawn, InventorySlot.MainHand);
             InventorySlotInfo offHand = Find(drawn, InventorySlot.OffHand);
 
-            builder.PushContext(slots.EquipmentLabel);
+            builder.PushContext(caption ?? slots.EquipmentLabel);
             for (int i = 0; i < drawn.Count; i++)
             {
                 InventorySlotInfo slot = drawn[i];
@@ -96,14 +98,15 @@ namespace SongsOfConquestAccess.UI
             builder.PopContext();
         }
 
-        /// <summary>The backpack, under the game's own caption: auto-arrange, then one node per drawn
-        /// cell.</summary>
+        /// <summary>The backpack, under the game's own caption or the one the caller composed:
+        /// auto-arrange, then one node per drawn cell.</summary>
         public static void Inventory(
             GraphBuilder builder,
             IArtifactSlots slots,
             string keyPrefix,
             SlotHints hints,
-            object autoArrangeMarker)
+            object autoArrangeMarker,
+            string caption = null)
         {
             IReadOnlyList<InventorySlotInfo> cells = slots == null ? null : slots.GetBackpackSlots();
             if (builder == null || cells == null)
@@ -111,7 +114,7 @@ namespace SongsOfConquestAccess.UI
                 return;
             }
 
-            builder.PushContext(slots.InventoryLabel);
+            builder.PushContext(caption ?? slots.InventoryLabel);
             AddAutoArrange(builder, slots, keyPrefix, autoArrangeMarker);
             for (int i = 0; i < cells.Count; i++)
             {

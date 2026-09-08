@@ -1095,6 +1095,11 @@ msgctxt "Screens.WielderOwned"
 msgid "owned"
 msgstr "已擁有"
 
+#. Screens.WielderSection
+msgctxt "Screens.WielderSection"
+msgid "{0} {1}"
+msgstr "{0}{1}"
+
 #. Screens.Wielders
 msgctxt "Screens.Wielders"
 msgid "Wielders"

@@ -687,6 +687,10 @@ namespace SongsOfConquestAccess.Localization
             public static readonly ModString WielderAnnouncements = new ModString("Screens.WielderAnnouncements", "Wielder announcements");
             public static readonly ModString WielderDead = new ModString("Screens.WielderDead", "dead");
             public static readonly ModString WielderOwned = new ModString("Screens.WielderOwned", "owned");
+            /// <summary>A section of the page that belongs to one wielder, named after them: {0} is the
+            /// wielder's name in the possessive (<c>ModText.FormatPossessiveName</c>), {1} the game's own
+            /// caption for the section ("Equipment", "Inventory").</summary>
+            public static readonly ModString WielderSection = new ModString("Screens.WielderSection", "{0} {1}");
             public static readonly ModString Wielders = new ModString("Screens.Wielders", "Wielders");
             public static readonly ModString MapEntityAnnouncements = new ModString("Screens.MapEntityAnnouncements", "Map entity announcements");
 
