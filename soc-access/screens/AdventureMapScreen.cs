@@ -774,10 +774,17 @@ namespace SongsOfConquestAccess.Screens
             for (int i = 0; i < TownSlots; i++)
             {
                 int index = i;
+                // Checked here rather than handed to AddHudButton, because the tooltip beside it is
+                // an argument: an undrawn slot would compose one for a node nothing draws.
+                if (!hud.IsTownListEntryVisible(index))
+                {
+                    continue;
+                }
+
                 AddHudButton(
                     builder,
                     TownKeyPrefix + index,
-                    hud.IsTownListEntryVisible(index),
+                    true,
                     () => hud.GetTownListEntryLabel(index),
                     () => hud.ClickTownListEntry(index),
                     null,
