@@ -41,6 +41,23 @@ namespace SongsOfConquestAccess.Adapters
         private readonly PostBattleMenu _menu;
         private readonly ILocalizationHandler _localization;
 
+        // The lines the menu draws are made by its AnimateResults coroutine - one troop entry per
+        // stack lost, then the loot - and nothing changes them once it ends. Naming one costs a
+        // details capture, and the page is a graph screen that rebuilds every frame, so they are
+        // walked live only while the animation runs and kept from the moment it finishes.
+        private bool _resultsAnimated;
+        private ResultEntry[] _attackerTroopsLost;
+        private ResultEntry[] _defenderTroopsLost;
+        private ResultEntry[] _loot;
+
+        // The caption over each troop column is the menu's own "Title" text two levels above the
+        // column; it is found once per side, MISS INCLUDED, so a menu that draws none costs one walk
+        // rather than one per frame.
+        private UITextMesh _attackerTroopsCaptionText;
+        private bool _attackerTroopsCaptionProbed;
+        private UITextMesh _defenderTroopsCaptionText;
+        private bool _defenderTroopsCaptionProbed;
+
         public PostBattleResultAdapter(AdventureBattleMenu battleMenu, PostBattleMenu menu)
         {
             _battleMenu = battleMenu;
@@ -51,6 +68,17 @@ namespace SongsOfConquestAccess.Adapters
         public object Source
         {
             get { return SourceKey; }
+        }
+
+        /// <summary>The menu's result animation has ended: what it drew is final, so the lines it
+        /// made are read once more and then kept. Called from the animation's own end
+        /// (<c>CombatPatches</c> wraps <c>PostBattleMenu.AnimateResults</c>).</summary>
+        public void MarkResultsAnimated()
+        {
+            _resultsAnimated = true;
+            _attackerTroopsLost = null;
+            _defenderTroopsLost = null;
+            _loot = null;
         }
 
         public bool IsPresent()
@@ -140,21 +168,39 @@ namespace SongsOfConquestAccess.Adapters
         /// </summary>
         public string AttackerTroopsCaption
         {
-            get { return TroopsCaption(AttackerTroopsParentField); }
+            get
+            {
+                return TroopsCaption(
+                    AttackerTroopsParentField,
+                    ref _attackerTroopsCaptionText,
+                    ref _attackerTroopsCaptionProbed);
+            }
         }
 
         /// <summary>The caption over the defender's troop column.</summary>
         public string DefenderTroopsCaption
         {
-            get { return TroopsCaption(DefenderTroopsParentField); }
+            get
+            {
+                return TroopsCaption(
+                    DefenderTroopsParentField,
+                    ref _defenderTroopsCaptionText,
+                    ref _defenderTroopsCaptionProbed);
+            }
         }
 
-        private string TroopsCaption(FieldInfo parentField)
+        private string TroopsCaption(FieldInfo parentField, ref UITextMesh cached, ref bool probed)
         {
-            Transform parent = GetField<Transform>(parentField);
-            Transform band = parent != null && parent.parent != null ? parent.parent.parent : null;
-            Transform title = band != null ? band.Find("Title") : null;
-            UITextMesh text = title != null ? title.GetComponent<UITextMesh>() : null;
+            if (!probed)
+            {
+                probed = true;
+                Transform parent = GetField<Transform>(parentField);
+                Transform band = parent != null && parent.parent != null ? parent.parent.parent : null;
+                Transform title = band != null ? band.Find("Title") : null;
+                cached = title != null ? title.GetComponent<UITextMesh>() : null;
+            }
+
+            UITextMesh text = cached;
             return text != null && text.gameObject.activeInHierarchy
                 ? SpokenLines.Clean(UITextMeshTextUtility.GetEffectiveText(text))
                 : string.Empty;
@@ -162,17 +208,43 @@ namespace SongsOfConquestAccess.Adapters
 
         public IReadOnlyList<ResultEntry> AttackerTroopsLost
         {
-            get { return BuildTroopEntries(AttackerTroopsParentField); }
+            get
+            {
+                if (!_resultsAnimated)
+                {
+                    return BuildTroopEntries(AttackerTroopsParentField);
+                }
+
+                return _attackerTroopsLost
+                    ?? (_attackerTroopsLost = BuildTroopEntries(AttackerTroopsParentField));
+            }
         }
 
         public IReadOnlyList<ResultEntry> DefenderTroopsLost
         {
-            get { return BuildTroopEntries(DefenderTroopsParentField); }
+            get
+            {
+                if (!_resultsAnimated)
+                {
+                    return BuildTroopEntries(DefenderTroopsParentField);
+                }
+
+                return _defenderTroopsLost
+                    ?? (_defenderTroopsLost = BuildTroopEntries(DefenderTroopsParentField));
+            }
         }
 
         public IReadOnlyList<ResultEntry> Loot
         {
-            get { return BuildLootEntries(); }
+            get
+            {
+                if (!_resultsAnimated)
+                {
+                    return BuildLootEntries();
+                }
+
+                return _loot ?? (_loot = BuildLootEntries());
+            }
         }
 
         public string AcceptButtonLabel
@@ -324,7 +396,7 @@ namespace SongsOfConquestAccess.Adapters
             return candidates[0];
         }
 
-        private IReadOnlyList<ResultEntry> BuildTroopEntries(FieldInfo parentField)
+        private ResultEntry[] BuildTroopEntries(FieldInfo parentField)
         {
             Transform parent = GetField<Transform>(parentField);
             if (parent == null)
@@ -356,7 +428,7 @@ namespace SongsOfConquestAccess.Adapters
             return result.ToArray();
         }
 
-        private IReadOnlyList<ResultEntry> BuildLootEntries()
+        private ResultEntry[] BuildLootEntries()
         {
             List<ResultEntry> result = new List<ResultEntry>();
             AddLootEntries(result, GetField<PostBattleLootContainer>(AttackerLootContainerField));
