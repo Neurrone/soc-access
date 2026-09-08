@@ -15,6 +15,8 @@ namespace SongsOfConquestAccess.Adapters
             AccessTools.FieldRefAccess<PauseMenu, PauseMenu.Settings>("_settings");
 
         private readonly PauseMenu _pauseMenu;
+        private List<Item> _items;
+        private int _itemsFrame = -1;
 
         public PauseMenuAdapter(PauseMenu pauseMenu)
         {
@@ -31,36 +33,51 @@ namespace SongsOfConquestAccess.Adapters
             }
         }
 
+        /// <summary>The menu's visible buttons, listed at most once a frame: the screen's build asks
+        /// whether the menu is present, which counts them, and then for the list itself.</summary>
         public IReadOnlyList<Item> Items
         {
             get
             {
-                List<Item> items = new List<Item>();
-                PauseMenu.Settings settings = Settings;
-                if (settings == null)
+                int frame = Time.frameCount;
+                if (_items != null && _itemsFrame == frame)
                 {
-                    return items;
+                    return _items;
                 }
 
-                AddItem(items, "continue", settings.continueButton);
-                AddItem(items, "quick-save", settings.quickSaveButton);
-                AddItem(items, "quick-load", settings.quickLoadButton);
-                AddItem(items, "save", settings.saveButton);
-                AddItem(items, "load", settings.loadButton);
-                AddItem(items, "restart", settings.restartButton);
-                AddItem(items, "options", settings.optionsButton);
-                // The mod's own entry, drawn straight after Options by ModOptionsEntries. The pause
-                // menu's items are fixed serialized fields rather than a list, so it is named here
-                // as well as drawn there.
-                AddItem(items, "mod-options", ModOptionsEntries.PauseMenuButton);
-                AddItem(items, "tutorials", settings.tutorialsButton);
-                AddItem(items, "quit-to-main-menu", settings.exitButton);
-                AddItem(items, "quit-application", settings.quitButton);
-                AddItem(items, "surrender", settings.surrenderButton);
-                AddItem(items, "surrender-battle", settings.surrenderBattleOnlyButton);
-                AddItem(items, "quit-to-map-editor", settings.quitToMapEditorButton);
+                _itemsFrame = frame;
+                _items = BuildItems();
+                return _items;
+            }
+        }
+
+        private List<Item> BuildItems()
+        {
+            List<Item> items = new List<Item>();
+            PauseMenu.Settings settings = Settings;
+            if (settings == null)
+            {
                 return items;
             }
+
+            AddItem(items, "continue", settings.continueButton);
+            AddItem(items, "quick-save", settings.quickSaveButton);
+            AddItem(items, "quick-load", settings.quickLoadButton);
+            AddItem(items, "save", settings.saveButton);
+            AddItem(items, "load", settings.loadButton);
+            AddItem(items, "restart", settings.restartButton);
+            AddItem(items, "options", settings.optionsButton);
+            // The mod's own entry, drawn straight after Options by ModOptionsEntries. The pause
+            // menu's items are fixed serialized fields rather than a list, so it is named here
+            // as well as drawn there.
+            AddItem(items, "mod-options", ModOptionsEntries.PauseMenuButton);
+            AddItem(items, "tutorials", settings.tutorialsButton);
+            AddItem(items, "quit-to-main-menu", settings.exitButton);
+            AddItem(items, "quit-application", settings.quitButton);
+            AddItem(items, "surrender", settings.surrenderButton);
+            AddItem(items, "surrender-battle", settings.surrenderBattleOnlyButton);
+            AddItem(items, "quit-to-map-editor", settings.quitToMapEditorButton);
+            return items;
         }
 
         public bool IsPresent()
