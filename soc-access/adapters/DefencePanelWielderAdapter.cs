@@ -1,4 +1,4 @@
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Reflection;
 using HarmonyLib;
 using SongsOfConquest.Client;
@@ -29,6 +29,15 @@ namespace SongsOfConquestAccess.Adapters
         private readonly IClientAdventureFacade _facade;
         private readonly ILocalizationHandler _localization;
         private TroopHudAdapter _troops;
+
+        // The prefab's own header mesh and the meshes under the no-wielder container. Both are fixed
+        // for the life of the panel and both were a Find plus a subtree walk on every build, from the
+        // settlement page and from the defence menu alike. Misses are remembered too.
+        private bool _headerProbed;
+        private UITextMesh _headerMesh;
+        private bool _noStoredWielderProbed;
+        private GameObject _noStoredWielderRoot;
+        private UITextMesh[] _noStoredWielderMeshes;
 
         public DefencePanelWielderAdapter(DefencePanelWielder panel, IClientAdventureFacade facade, ILocalizationHandler localization)
         {
@@ -81,25 +90,47 @@ namespace SongsOfConquestAccess.Adapters
         {
             get
             {
-                Component panel = _panel;
-                Transform root = panel != null ? panel.transform : null;
-                Transform header = root != null ? root.Find("Background/HeaderLayout") : null;
-                if (header == null && root != null)
+                if (!_headerProbed)
                 {
-                    header = root.Find("HeaderLayout");
+                    _headerProbed = true;
+                    _headerMesh = FindHeaderMesh();
                 }
 
-                return header == null
-                    ? string.Empty
-                    : GetText(header.GetComponentInChildren<UITextMesh>(includeInactive: false));
+                return GetText(_headerMesh);
             }
+        }
+
+        private UITextMesh FindHeaderMesh()
+        {
+            Component panel = _panel;
+            Transform root = panel != null ? panel.transform : null;
+            Transform header = root != null ? root.Find("Background/HeaderLayout") : null;
+            if (header == null && root != null)
+            {
+                header = root.Find("HeaderLayout");
+            }
+
+            return header == null ? null : header.GetComponentInChildren<UITextMesh>(includeInactive: false);
         }
 
         /// <summary>What the game writes where no wielder is stored ("Place wielder inside building to
         /// strengthen the defences").</summary>
         public string NoStoredWielderText
         {
-            get { return GetVisibleText(GetField<GameObject>(_panel, NoStoredWielderContainerField)); }
+            get
+            {
+                GameObject root = GetField<GameObject>(_panel, NoStoredWielderContainerField);
+                if (!_noStoredWielderProbed || !ReferenceEquals(_noStoredWielderRoot, root))
+                {
+                    _noStoredWielderProbed = true;
+                    _noStoredWielderRoot = root;
+                    _noStoredWielderMeshes = root == null
+                        ? new UITextMesh[0]
+                        : root.GetComponentsInChildren<UITextMesh>(includeInactive: true);
+                }
+
+                return JoinVisibleText(_noStoredWielderMeshes);
+            }
         }
 
         /// <summary>The stored wielder's portrait, whose details are the stats the game draws on
@@ -288,17 +319,21 @@ namespace SongsOfConquestAccess.Adapters
             return SpokenLines.Clean(UITextMeshTextUtility.GetEffectiveText(textMesh));
         }
 
-        private static string GetVisibleText(GameObject root)
+        private static string JoinVisibleText(UITextMesh[] textMeshes)
         {
-            if (root == null)
+            if (textMeshes == null)
             {
                 return string.Empty;
             }
 
             List<string> parts = new List<string>();
-            UITextMesh[] textMeshes = root.GetComponentsInChildren<UITextMesh>(includeInactive: false);
             for (int i = 0; i < textMeshes.Length; i++)
             {
+                if (!IsVisible(textMeshes[i] as Component))
+                {
+                    continue;
+                }
+
                 string text = GetText(textMeshes[i]);
                 if (!string.IsNullOrWhiteSpace(text) && !parts.Contains(text))
                 {

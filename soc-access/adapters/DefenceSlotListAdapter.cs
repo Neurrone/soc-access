@@ -1,4 +1,4 @@
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using SongsOfConquest.Client.Adventure.UI;
 using SongsOfConquest.Client.Gamestate.Facade;
 using SongsOfConquest.Common.Details;
@@ -10,17 +10,35 @@ namespace SongsOfConquestAccess.Adapters
 {
     public sealed class DefenceSlotListAdapter
     {
+        private readonly IReadOnlyList<TroopHUDEntry> _source;
         private readonly IReadOnlyList<TroopHUDEntry> _entries;
         private readonly ILocalizationHandler _localization;
+        private List<Slot> _slots;
 
         public DefenceSlotListAdapter(IReadOnlyList<TroopHUDEntry> entries, ILocalizationHandler localization)
         {
+            _source = entries;
             _entries = entries ?? new TroopHUDEntry[0];
             _localization = localization;
         }
 
+        /// <summary>The game's own list this reads, so an owner keeping one of these can tell whether
+        /// the menu has swapped the list out from under it.</summary>
+        public IReadOnlyList<TroopHUDEntry> Entries
+        {
+            get { return _source; }
+        }
+
+        /// <summary>The slots over the game's list. A slot is a view onto its entry rather than a
+        /// snapshot of it, so the list is rebuilt only when the game's own has changed: both pages
+        /// that draw these ask for them on every build.</summary>
         public IReadOnlyList<Slot> GetSlots()
         {
+            if (IsSlotListCurrent())
+            {
+                return _slots;
+            }
+
             List<Slot> slots = new List<Slot>();
             for (int i = 0; i < _entries.Count; i++)
             {
@@ -28,7 +46,26 @@ namespace SongsOfConquestAccess.Adapters
                 slots.Add(new Slot(i + 1, entry, _localization));
             }
 
+            _slots = slots;
             return slots;
+        }
+
+        private bool IsSlotListCurrent()
+        {
+            if (_slots == null || _slots.Count != _entries.Count)
+            {
+                return false;
+            }
+
+            for (int i = 0; i < _entries.Count; i++)
+            {
+                if (!ReferenceEquals(_slots[i].Entry, _entries[i]))
+                {
+                    return false;
+                }
+            }
+
+            return true;
         }
 
         public sealed class Slot
@@ -44,6 +81,12 @@ namespace SongsOfConquestAccess.Adapters
             }
 
             public int SlotNumber { get; private set; }
+
+            /// <summary>The game's entry this slot is a view onto.</summary>
+            public TroopHUDEntry Entry
+            {
+                get { return _entry; }
+            }
 
             public bool IsOccupied
             {

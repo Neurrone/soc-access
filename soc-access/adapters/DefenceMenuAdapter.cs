@@ -1,4 +1,4 @@
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Reflection;
 using HarmonyLib;
 using Lavapotion.Utilities;
@@ -59,6 +59,10 @@ namespace SongsOfConquestAccess.Adapters
         private readonly ILocalizationHandler _localization;
         private DefencePanelWielderAdapter _defendingWielder;
         private TroopHudAdapter _settlementTroops;
+        private DefenceSlotListAdapter _garrison;
+        private DefenceSlotListAdapter _ballistae;
+        private int _towerItemsFrame = -1;
+        private List<TowerItem> _towerItems;
 
         public DefenceMenuAdapter(DefenceMenu menu)
         {
@@ -425,12 +429,21 @@ namespace SongsOfConquestAccess.Adapters
                 && !string.IsNullOrWhiteSpace(TowerInfoText);
         }
 
+        /// <summary>The towers the panel is drawing, walked at most once a frame.</summary>
         public IReadOnlyList<TowerItem> GetTowerItems()
         {
+            int frame = Time.frameCount;
+            if (_towerItems != null && _towerItemsFrame == frame)
+            {
+                return _towerItems;
+            }
+
+            _towerItemsFrame = frame;
             Transform container = GetField<Transform>(GetDefencePanelTroops(), TowerContainerField);
             if (container == null)
             {
-                return new TowerItem[0];
+                _towerItems = new List<TowerItem>();
+                return _towerItems;
             }
 
             List<TowerItem> result = new List<TowerItem>();
@@ -440,17 +453,30 @@ namespace SongsOfConquestAccess.Adapters
                 result.Add(new TowerItem("defences-tower-" + (i + 1), i + 1, entries[i], _localization));
             }
 
+            _towerItems = result;
             return result;
         }
 
         public IReadOnlyList<DefenceSlotListAdapter.Slot> GetGarrisonSlots()
         {
-            return new DefenceSlotListAdapter(GetField<List<TroopHUDEntry>>(GetDefencePanelTroops(), GarrisonTroopsField), _localization).GetSlots();
+            List<TroopHUDEntry> entries = GetField<List<TroopHUDEntry>>(GetDefencePanelTroops(), GarrisonTroopsField);
+            if (_garrison == null || !ReferenceEquals(_garrison.Entries, entries))
+            {
+                _garrison = new DefenceSlotListAdapter(entries, _localization);
+            }
+
+            return _garrison.GetSlots();
         }
 
         public IReadOnlyList<DefenceSlotListAdapter.Slot> GetBallistaSlots()
         {
-            return new DefenceSlotListAdapter(GetField<List<TroopHUDEntry>>(GetDefencePanelTroops(), BallistaTroopsField), _localization).GetSlots();
+            List<TroopHUDEntry> entries = GetField<List<TroopHUDEntry>>(GetDefencePanelTroops(), BallistaTroopsField);
+            if (_ballistae == null || !ReferenceEquals(_ballistae.Entries, entries))
+            {
+                _ballistae = new DefenceSlotListAdapter(entries, _localization);
+            }
+
+            return _ballistae.GetSlots();
         }
 
         public void HideNativeTooltip()
