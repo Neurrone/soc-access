@@ -49,9 +49,23 @@ namespace SongsOfConquestAccess.Adapters
 
         private readonly ResearchMenu _menu;
 
+        // A category's stack buttons, walked at most once a frame per category: the build asks for
+        // every category and every row on every frame, and each category was a fresh subtree walk.
+        private int _categoryButtonsFrame = -1;
+        private Dictionary<ResearchMenuCategory, ResearchMenuStackButton[]> _categoryButtons;
+
         public ResearchMenuAdapter(ResearchMenu menu)
         {
             _menu = menu;
+        }
+
+        /// <summary>Drop what is kept for the current frame only. Switching a building tab or a
+        /// faction respawns the categories and re-pools their stack buttons, so a read later in the
+        /// same frame must not see the page the build read before the click.</summary>
+        public void InvalidateFrameSnapshots()
+        {
+            _categoryButtonsFrame = -1;
+            _categoryButtons = null;
         }
 
         public IClientAdventureFacade Facade
@@ -183,6 +197,8 @@ namespace SongsOfConquestAccess.Adapters
         public IReadOnlyList<CategoryItem> GetCategories()
         {
             List<CategoryItem> items = new List<CategoryItem>();
+            // One localization lookup for the whole page rather than one per row.
+            string tierHeader = GetTierHeader();
             IReadOnlyList<ResearchMenuCategory> categories = GetNativeCategories();
             for (int i = 0; i < categories.Count; i++)
             {
@@ -211,7 +227,7 @@ namespace SongsOfConquestAccess.Adapters
                     researchItems.Add(new ResearchItem(
                         name,
                         GetOwnedTier(stack),
-                        GetTierHeader(),
+                        tierHeader,
                         button as Component,
                         () => button != null && button.Active && button.Interactable,
                         () => FocusResearch(button),
@@ -259,7 +275,9 @@ namespace SongsOfConquestAccess.Adapters
 
         private bool ActivateBuilding(UIButton button)
         {
-            return ClickBuilding(button);
+            bool clicked = ClickBuilding(button);
+            InvalidateFrameSnapshots();
+            return clicked;
         }
 
         private bool SelectFaction(UIButton button)
@@ -271,7 +289,14 @@ namespace SongsOfConquestAccess.Adapters
         {
             HideNativeTooltip();
             NativeSelectionUtility.Select(button as Component);
-            return SelectedFactionIndex == factionIndex || NativeSelectionUtility.Click(button);
+            if (SelectedFactionIndex == factionIndex)
+            {
+                return true;
+            }
+
+            bool clicked = NativeSelectionUtility.Click(button);
+            InvalidateFrameSnapshots();
+            return clicked;
         }
 
         private static bool ClickBuilding(UIButton button)
@@ -376,11 +401,31 @@ namespace SongsOfConquestAccess.Adapters
 
         private ResearchMenuStackButton[] GetResearchButtons(ResearchMenuCategory category)
         {
+            if (category == null)
+            {
+                return new ResearchMenuStackButton[0];
+            }
+
+            int frame = Time.frameCount;
+            if (_categoryButtons == null || _categoryButtonsFrame != frame)
+            {
+                _categoryButtonsFrame = frame;
+                _categoryButtons = new Dictionary<ResearchMenuCategory, ResearchMenuStackButton[]>();
+            }
+
+            ResearchMenuStackButton[] buttons;
+            if (_categoryButtons.TryGetValue(category, out buttons))
+            {
+                return buttons;
+            }
+
             UITransform container = GetField<UITransform>(category, CategoryButtonsContainerField);
             Component component = container as Component;
-            return component != null
+            buttons = component != null
                 ? component.GetComponentsInChildren<ResearchMenuStackButton>(false)
                 : new ResearchMenuStackButton[0];
+            _categoryButtons[category] = buttons;
+            return buttons;
         }
 
         private int SelectedFactionIndex
