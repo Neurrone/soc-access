@@ -258,10 +258,10 @@ namespace SongsOfConquestAccess.Dev
         /// The tiles within <paramref name="radius"/> steps of the selected wielder (a square,
         /// so <c>2</c> is 5x5), read straight from the game state with no fog applied. Each tile
         /// says <c>free</c> when the game's own placement validator would accept a map entity
-        /// there (<see cref="CreateAdventureMapEntityCommand"/>: static walkability and no
-        /// entity), and otherwise what is in the way: <c>entity</c>, <c>commander</c>, or
-        /// <c>impassable</c> terrain. Ask this before <see cref="DevFixtures.SpawnAt"/> and pick
-        /// a free tile.
+        /// there (<see cref="DevFixtures.Obstacle"/>: static walkability, no entity, no
+        /// commander), and otherwise names the <c>obstacle</c>. Ask this before
+        /// <see cref="DevFixtures.SpawnAt"/> and pick a free tile; a blueprint wider than one
+        /// tile needs its whole footprint free, which <c>SpawnAt</c> checks itself.
         /// </summary>
         public static string TilesAround(int radius = 2)
         {
@@ -306,54 +306,21 @@ namespace SongsOfConquestAccess.Dev
                         json.WriteValue(point.x);
                         json.WritePropertyName("y");
                         json.WriteValue(point.y);
-                        IMapEntity entity = facade.MapEntities.GetAt(point);
-                        ICommanderState commander = CommanderAt(facade, point);
-                        bool walkable = CreateAdventureMapEntityCommand.RequestValidator.IsWalkableTerrain(-1, facade, point, null);
-                        if (entity != null)
+                        string obstacle = DevFixtures.Obstacle(facade, point);
+                        if (obstacle != null)
                         {
-                            json.WritePropertyName("entity");
-                            json.WriteValue(entity.Name + " #" + entity.Id);
-                        }
-
-                        if (commander != null)
-                        {
-                            json.WritePropertyName("commander");
-                            json.WriteValue(facade.Commanders.GetName(commander.Id));
-                        }
-
-                        if (!walkable)
-                        {
-                            json.WritePropertyName("impassable");
-                            json.WriteValue(true);
+                            json.WritePropertyName("obstacle");
+                            json.WriteValue(obstacle);
                         }
 
                         json.WritePropertyName("free");
-                        json.WriteValue(walkable && entity == null && commander == null);
+                        json.WriteValue(obstacle == null);
                         json.WriteEndObject();
                     }
                 }
 
                 json.WriteEndArray();
             });
-        }
-
-        private static ICommanderState CommanderAt(IClientAdventureFacade facade, Vector2Int point)
-        {
-            IEnumerable<ICommanderState> all = facade.Commanders.All;
-            if (all == null)
-            {
-                return null;
-            }
-
-            foreach (ICommanderState commander in all)
-            {
-                if (commander != null && commander.IsAlive && commander.Position == point)
-                {
-                    return commander;
-                }
-            }
-
-            return null;
         }
 
         private static string Guarded(Action<JsonTextWriter> body)

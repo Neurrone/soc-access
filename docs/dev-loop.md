@@ -179,15 +179,16 @@ the same four columns.
   `FinalizeLoadingScreen`; `continued:false` when that screen is not up.
 - `RuntimeScreens()`: the screens the detector's runtime factories read as present right
   now, which is exactly what a reload's resync would push. Read it when a resync looks wrong.
-- `TilesAround(radius)`: the tiles around the selected wielder, no fog applied, each with
-  `entity`, `commander` or `impassable` when something is there and `free:true` when the game
-  would accept a spawned map entity on it.
+- `TilesAround(radius)`: the tiles around the selected wielder, no fog applied, each
+  `free:true` or with the `obstacle` (entity, commander or impassable terrain) that stops a
+  spawned map entity from covering it.
 
 `SongsOfConquestAccess.Dev.DevFixtures` is the same idea for calls that change the game to
 set a test up, kept apart from the probes because a probe never writes:
 
-- `SpawnAt(blueprint, x, y)`: spawn a map entity blueprint on a tile through the game's own
-  debug route; `accepted` is the validator's answer. Read `TilesAround` first.
+- `SpawnAt(blueprint, x, y)`: spawn a map entity blueprint with its origin on a tile through
+  the game's own debug route, after checking the blueprint's whole footprint (`footprint`,
+  `blocked`); `accepted` is the validator's answer. Read `TilesAround` first.
 
 REPL facts observed on this Mono (Unity 2022.3, `mcs.dll` built for net35):
 
@@ -294,13 +295,15 @@ Filled in as the loop is used; keep entries to one line each with the date.
   `Container.TryResolve<Lavapotion.Networking.IGame>()`); the same container answers
   `IAdventureMenuSystem` and `IHUDActionSignals`. To put a map entity beside the wielder, first
   read `DevProbe.TilesAround(2)` (the radius is the argument; 2 is 5x5): every tile around the
-  selected wielder with what occupies it, and `free:true` where the game's own placement
-  validator would accept an entity. Never assume a neighbour is free; the tile east may hold
-  a building, another wielder or impassable terrain. Pick a free tile and call
-  `DevFixtures.SpawnAt(blueprint, x, y)`, the debug console's own route
-  (`CreateAdventureMapEntityCommand`); `accepted:false` means the validator refused the tile.
-  The state appears a frame later, and the mod's "Revealed ..." line in the eval's `speech`
-  confirms it landed. (`IGame` has no `state` member; do not guess one to check the tile.)
+  selected wielder, `free:true` or the `obstacle` (an entity with its name key and id, a
+  commander by name, impassable terrain). Never assume a neighbour is free. Pick a free tile
+  and call `DevFixtures.SpawnAt(blueprint, x, y)`, the debug console's own route
+  (`CreateAdventureMapEntityCommand`). Blueprints can cover more than one tile (a market is
+  two, origin and the tile east); the game's validator checks only the origin and shoves a
+  wielder standing on the rest of the footprint aside, so `SpawnAt` checks the whole footprint
+  first and answers `footprint` plus `blocked` without spawning when any of it is taken. The
+  state appears a frame later, and the mod's "Revealed ..." line in the eval's `speech` confirms
+  it landed. (`IGame` has no `state` member; do not guess one to check the tile.)
   174 is an artifact market
   (Raider's Market; 156 is the resource market), 285 a standalone rally point (claim it with
   `ClaimMapEntityCommand.Request(commanderId, entityId)`). Menus open through the menu system:
