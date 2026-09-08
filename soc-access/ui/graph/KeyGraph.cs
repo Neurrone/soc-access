@@ -370,7 +370,9 @@ namespace SongsOfConquestAccess.UI.Graph
         }
 
         /// <summary>Jump to the next/previous region within the current stop (declaration order), landing
-        /// on the region's first node.</summary>
+        /// on the region's first node. From a node OUTSIDE any region the next region is the first one
+        /// declared after it and the previous is the last one declared before it, so a stop that opens
+        /// with unregioned lines (a summary, the stats) still reaches its regions.</summary>
         public MoveResult MoveRegion(int dir)
         {
             MoveResult result = default(MoveResult);
@@ -379,26 +381,52 @@ namespace SongsOfConquestAccess.UI.Graph
             GraphNode node = CurrentNode;
             result.From = node;
             result.To = node;
-            if (node == null || node.RegionKey == null) return result;
+            GraphNode target = RegionTarget(dir);
+            if (target == null) return result;
 
-            List<object> regions = new List<object>();
-            foreach (GraphNode n in _current.Order)
-                if (Equals(n.StopKey, node.StopKey) && n.RegionKey != null && !regions.Contains(n.RegionKey))
-                    regions.Add(n.RegionKey);
-
-            int idx = regions.IndexOf(node.RegionKey);
-            int ni = idx + dir;
-            if (idx < 0 || ni < 0 || ni >= regions.Count) return result;
-
-            foreach (GraphNode n in _current.Order)
-                if (Equals(n.StopKey, node.StopKey) && Equals(n.RegionKey, regions[ni]))
-                {
-                    SetCurrent(n);
-                    result.To = n;
-                    result.Moved = true;
-                    return result;
-                }
+            SetCurrent(target);
+            result.To = target;
+            result.Moved = true;
             return result;
+        }
+
+        /// <summary>Whether <see cref="MoveRegion"/> would move, read off the last render without
+        /// re-rendering: the claim half runs inside the game's own key scans.</summary>
+        public bool CanMoveRegion(int dir)
+        {
+            return _current != null && RegionTarget(dir) != null;
+        }
+
+        /// <summary>The first node of the region a jump of <paramref name="dir"/> lands in, or null.</summary>
+        private GraphNode RegionTarget(int dir)
+        {
+            GraphNode node = CurrentNode;
+            if (node == null || dir == 0) return null;
+
+            // The stop's regions in declaration order; the node's own, and for a node outside any, the
+            // last one declared before it.
+            List<object> regions = new List<object>();
+            int own = -1;
+            int before = -1;
+            bool passed = false;
+            foreach (GraphNode n in _current.Order)
+            {
+                if (!Equals(n.StopKey, node.StopKey)) continue;
+                if (ReferenceEquals(n, node)) passed = true;
+                if (n.RegionKey == null) continue;
+                if (!regions.Contains(n.RegionKey)) regions.Add(n.RegionKey);
+                int idx = regions.IndexOf(n.RegionKey);
+                if (ReferenceEquals(n, node)) own = idx;
+                else if (!passed) before = idx;
+            }
+
+            int target = own >= 0 ? own + dir : (dir > 0 ? before + 1 : before);
+            if (target < 0 || target >= regions.Count) return null;
+
+            foreach (GraphNode n in _current.Order)
+                if (Equals(n.StopKey, node.StopKey) && Equals(n.RegionKey, regions[target]))
+                    return n;
+            return null;
         }
 
         /// <summary>Move focus to a specific control (a node just revealed, a screen's chosen landing).
@@ -437,7 +465,12 @@ namespace SongsOfConquestAccess.UI.Graph
 
         /// <summary>Where focus lands when entering a stop with no active cursor: the remembered
         /// position, else the SELECTED member (a radio/tab/list item currently checked — a boon on long
-        /// lists), else the stop's first node.</summary>
+        /// lists), else the stop's first node.
+        ///
+        /// A stop whose landing was declared EXACT (<see cref="GraphRender.ExactStopLandings"/>,
+        /// <see cref="GraphBuilder.LandStopOn"/>) skips the selected member: with no remembered
+        /// position it lands exactly where it said, even when an alternative below it reads as
+        /// selected, which is what a stop whose tail is a tab bar needs.</summary>
         public GraphNode StopLanding(object stopKey)
         {
             return StopLanding(_current, _state, stopKey);
@@ -451,9 +484,11 @@ namespace SongsOfConquestAccess.UI.Graph
                 GraphNode node = render.NodeAt(remembered);
                 if (node != null && Equals(node.StopKey, stopKey)) return node;
             }
+            GraphNode declared = DeclaredLanding(render, stopKey);
+            if (declared != null && stopKey != null && render.ExactStopLandings.Contains(stopKey))
+                return declared;
             GraphNode selected = SelectedNodeInStop(render, stopKey);
             if (selected != null) return selected;
-            GraphNode declared = DeclaredLanding(render, stopKey);
             if (declared != null) return declared;
             foreach (GraphNode n in render.Order)
                 if (Equals(n.StopKey, stopKey)) return n;
