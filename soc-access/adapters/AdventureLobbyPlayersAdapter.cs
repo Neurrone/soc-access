@@ -449,11 +449,6 @@ namespace SongsOfConquestAccess.Adapters
                 get { return _entry != null ? _entry.TeamId : -1; }
             }
 
-            public string Id
-            {
-                get { return "lobby-player-slot-" + Math.Max(TeamId + 1, 0); }
-            }
-
             /// <summary>The row the game draws this slot as.</summary>
             public Component Entry
             {

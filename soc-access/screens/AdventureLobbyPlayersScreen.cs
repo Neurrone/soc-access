@@ -78,6 +78,17 @@ namespace SongsOfConquestAccess.Screens
         // the reconciler seats the cursor on the same line.
         private readonly Dictionary<string, object> _markers = new Dictionary<string, object>();
 
+        // The identity of each slot row, one string instance per row kept across rebuilds. The sheet
+        // keys every cell of a row off this and hands the primary the same object as its subject, so
+        // the cursor seats back on the column it left when the lobby redraws the row under it - which
+        // is what a non-colour pick from the icon dropdown does, the dropdown hiding a frame before
+        // the row is rebuilt. It is the row's POSITION in the drawn list, not anything read off the
+        // game's row: LobbyPlayerEntry.TeamId is the team state's id and reads -1 while the entry
+        // holds no state, which would move the whole row's keys mid-redraw and collapse two rows onto
+        // one. The text is the one the rows have always had, the drawn list being the map's first N
+        // slots in team order.
+        private readonly Dictionary<int, string> _rowKeys = new Dictionary<int, string>();
+
         /// <summary>The lobby page, off the lobby navigator (<see cref="LobbySources"/>).</summary>
         protected override object ResolveMenu()
         {
@@ -173,7 +184,7 @@ namespace SongsOfConquestAccess.Screens
                     continue;
                 }
 
-                sheet.RowAt(Primary(slot), slot.Id, Cells(slot), slot.Entry);
+                sheet.RowAt(Primary(slot), RowKey(i), Cells(slot), slot.Entry);
             }
 
             sheet.Finish();
@@ -593,6 +604,20 @@ namespace SongsOfConquestAccess.Screens
         private static float Left(Component component)
         {
             return component != null ? component.transform.position.x : 0f;
+        }
+
+        /// <summary>The row's identity, minted once per position and handed back as the same string
+        /// instance every frame.</summary>
+        private string RowKey(int index)
+        {
+            string key;
+            if (!_rowKeys.TryGetValue(index, out key))
+            {
+                key = "lobby-player-slot-" + (index + 1);
+                _rowKeys.Add(index, key);
+            }
+
+            return key;
         }
 
         private object Marker(string key)
