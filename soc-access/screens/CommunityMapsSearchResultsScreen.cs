@@ -135,8 +135,9 @@ namespace SongsOfConquestAccess.Screens
 
         private void BuildResults(GraphBuilder builder)
         {
-            // Read live rather than from the adapter's snapshot: mod.io appends to this grid as the
-            // page scrolls, without the detector hearing about it.
+            // The adapter's snapshot, retaken whenever the grid has fetched: mod.io appends to it as
+            // the page scrolls, and the row count it appends to is one of the three things the
+            // snapshot is stamped with. A row's own words are still read when they are read.
             IReadOnlyList<CommunityMapsSearchResultsAdapter.ResultItem> results = Live.BuildResults();
             for (int i = 0; i < results.Count; i++)
             {

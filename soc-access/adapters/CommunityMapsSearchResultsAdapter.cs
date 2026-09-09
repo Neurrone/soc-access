@@ -66,6 +66,7 @@ namespace SongsOfConquestAccess.Adapters
         private string _stampPhrase;
         private string _summaryText;
         private string _footerText;
+        private List<ResultItem> _resultItems = new List<ResultItem>();
         private object _activeOverlay;
         private bool _hasSelectedResult;
         private string _subscribeLabel;
@@ -127,6 +128,7 @@ namespace SongsOfConquestAccess.Adapters
             _stampPhrase = phrase;
             _summaryText = BuildSummaryText();
             _footerText = BuildFooterText();
+            _resultItems = ScanResults();
             _activeOverlay = FindActiveOverlay();
             _hasSelectedResult = GetOverlayItem(_activeOverlay) != null;
             _subscribeLabel = GetOverlaySubscribeLabel(_activeOverlay);
@@ -201,7 +203,20 @@ namespace SongsOfConquestAccess.Adapters
             get { EnsureLabels(); return _sort; }
         }
 
+        /// <summary>The grid's rows, taken with the rest of the page's snapshot. A row is a child of
+        /// the list parent with a title on it, and finding it is a walk of the hundred children with a
+        /// <c>GetComponent</c> and three reflected field reads each - half a millisecond, which is not
+        /// something a build can pay every frame. mod.io only ever APPENDS to this grid, and an append
+        /// moves the list parent's <c>childCount</c>, which the stamp above already reads; a new search
+        /// moves the phrase or the status. So the walk runs once per change and the rows are handed
+        /// back unchanged in between.</summary>
         public IReadOnlyList<ResultItem> BuildResults()
+        {
+            EnsureSnapshot();
+            return _resultItems;
+        }
+
+        private List<ResultItem> ScanResults()
         {
             List<ResultItem> result = new List<ResultItem>();
             if (SearchResultListItemType == null || _results == null || _results.SearchResultsListItemParent == null)
@@ -225,13 +240,13 @@ namespace SongsOfConquestAccess.Adapters
                     continue;
                 }
 
-                string label = GetText(GetField<TMP_Text>(component, "title"));
-                if (string.IsNullOrWhiteSpace(label))
+                TMP_Text title = GetField<TMP_Text>(component, "title");
+                if (string.IsNullOrWhiteSpace(GetText(title)))
                 {
                     continue;
                 }
 
-                result.Add(new ResultItem(result.Count, BuildResultId(component, result.Count), label, component, listItem));
+                result.Add(new ResultItem(result.Count, BuildResultId(component, result.Count), title, component, listItem));
             }
 
             result.Sort(CompareResultPosition);
@@ -805,11 +820,13 @@ namespace SongsOfConquestAccess.Adapters
 
         public sealed class ResultItem
         {
-            public ResultItem(int index, string id, string label, Component nativeComponent, ListItem nativeListItem)
+            private readonly TMP_Text _title;
+
+            public ResultItem(int index, string id, TMP_Text title, Component nativeComponent, ListItem nativeListItem)
             {
                 DisplayIndex = index;
                 Id = id ?? index.ToString();
-                Label = label ?? string.Empty;
+                _title = title;
                 NativeComponent = nativeComponent;
                 NativeListItem = nativeListItem;
             }
@@ -818,7 +835,13 @@ namespace SongsOfConquestAccess.Adapters
 
             public string Id { get; private set; }
 
-            public string Label { get; private set; }
+            /// <summary>The row's drawn title, read off the game's own text when the node is READ
+            /// rather than when the row was found: the rows are a snapshot, and mod.io refills a
+            /// pooled row's text without the walk being made again.</summary>
+            public string Label
+            {
+                get { return GetText(_title); }
+            }
 
             public Component NativeComponent { get; private set; }
 
