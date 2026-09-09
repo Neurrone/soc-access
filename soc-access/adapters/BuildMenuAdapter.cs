@@ -99,8 +99,8 @@ namespace SongsOfConquestAccess.Adapters
         // the cost, and each of those walked the same pooled subtrees again.
         private int _sectionsFrame = -1;
         private List<BuildMenuDescriptionSection> _sections;
-        private int _sectionEntriesFrame = -1;
-        private Dictionary<BuildMenuDescriptionSection, BuildMenuDescriptionEntry[]> _sectionEntries;
+        private readonly FrameSweep<BuildMenuDescriptionEntry> _sectionEntries =
+            new FrameSweep<BuildMenuDescriptionEntry>("build menu description section", inactiveToo: false);
 
         // The game's own GetSelectedLevel, invoked at most once a frame: the tier tabs and the cost
         // line each asked for it, several times over.
@@ -135,8 +135,7 @@ namespace SongsOfConquestAccess.Adapters
         {
             _sectionsFrame = -1;
             _sections = null;
-            _sectionEntriesFrame = -1;
-            _sectionEntries = null;
+            _sectionEntries.Invalidate();
             _selectedTierFrame = -1;
         }
 
@@ -1013,27 +1012,7 @@ namespace SongsOfConquestAccess.Adapters
         /// <summary>A section's drawn entries, walked at most once a frame per section.</summary>
         private BuildMenuDescriptionEntry[] GetEntries(BuildMenuDescriptionSection section)
         {
-            if (section == null)
-            {
-                return new BuildMenuDescriptionEntry[0];
-            }
-
-            int frame = Time.frameCount;
-            if (_sectionEntries == null || _sectionEntriesFrame != frame)
-            {
-                _sectionEntriesFrame = frame;
-                _sectionEntries = new Dictionary<BuildMenuDescriptionSection, BuildMenuDescriptionEntry[]>();
-            }
-
-            BuildMenuDescriptionEntry[] entries;
-            if (_sectionEntries.TryGetValue(section, out entries))
-            {
-                return entries;
-            }
-
-            entries = section.GetComponentsInChildren<BuildMenuDescriptionEntry>(false);
-            _sectionEntries[section] = entries;
-            return entries;
+            return _sectionEntries.Under(section);
         }
 
         private static PropertyInfo GetActiveEntriesProperty(Type poolType)

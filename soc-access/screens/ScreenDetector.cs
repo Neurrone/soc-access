@@ -1380,22 +1380,6 @@ namespace SongsOfConquestAccess.Screens
             Reg<PostBattleResultScreen>()?.Show(new PostBattleResultAdapter(battleMenu, menu));
         }
 
-        public void OnPostBattleResultChanged()
-        {
-            // The page is pushed before the game has written its title, which arrives when the battle
-            // animation ends: the same adapter, with news on it. The animation also makes the troop
-            // and loot lines, and nothing changes them afterwards, so this is where the adapter stops
-            // walking for them on every build.
-            PostBattleResultScreen screen = Reg<PostBattleResultScreen>();
-            if (screen == null)
-            {
-                return;
-            }
-
-            screen.Live?.MarkResultsAnimated();
-            screen.SayNameIfChanged();
-        }
-
         public void OnPostBattleResultClosed()
         {
             Reg<PostBattleResultScreen>()?.Forget();

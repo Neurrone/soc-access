@@ -36,6 +36,8 @@ namespace SongsOfConquestAccess.Adapters
         private static readonly FieldInfo TroopEntryAmountField = AccessTools.Field(typeof(AdventureBattleMenuTroopEntry), "_amount");
         private static readonly FieldInfo TroopEntryTooltipAreaField = AccessTools.Field(typeof(AdventureBattleMenuTroopEntry), "_tooltipArea");
         private static readonly FieldInfo LootEntryMainTransformField = AccessTools.Field(typeof(PostBattleLootEntry), "_mainTransform");
+        private static readonly FieldInfo TroopInstancesField = AccessTools.Field(typeof(PostBattleMenu), "_troopInstances");
+        private static readonly FieldInfo LootContainerActiveEntriesField = AccessTools.Field(typeof(PostBattleLootContainer), "_activeEntries");
 
         private readonly AdventureBattleMenu _battleMenu;
         private readonly PostBattleMenu _menu;
@@ -43,12 +45,18 @@ namespace SongsOfConquestAccess.Adapters
 
         // The lines the menu draws are made by its AnimateResults coroutine - one troop entry per
         // stack lost, then the loot - and nothing changes them once it ends. Naming one costs a
-        // details capture, and the page is a graph screen that rebuilds every frame, so they are
-        // walked live only while the animation runs and kept from the moment it finishes.
-        private bool _resultsAnimated;
+        // details capture, and the page is a graph screen that rebuilds every frame, so each column
+        // is kept while the game's OWN list for it is the same length and rebuilt when it grows:
+        // the menu adds one entry to _troopInstances per ShowTroop and each loot container keeps
+        // its _activeEntries, so counting them is a field read a frame and no walk. Read from the
+        // game rather than from a hook saying the animation has ended, which a hot reload in the
+        // middle of the page would never send (AGENTS.md, "Screen Resolution").
         private ResultEntry[] _attackerTroopsLost;
         private ResultEntry[] _defenderTroopsLost;
+        private int _troopInstanceCount = -1;
         private ResultEntry[] _loot;
+        private int _attackerLootCount = -1;
+        private int _defenderLootCount = -1;
 
         // The caption over each troop column is the menu's own "Title" text two levels above the
         // column; it is found once per side, MISS INCLUDED, so a menu that draws none costs one walk
@@ -68,17 +76,6 @@ namespace SongsOfConquestAccess.Adapters
         public object Source
         {
             get { return SourceKey; }
-        }
-
-        /// <summary>The menu's result animation has ended: what it drew is final, so the lines it
-        /// made are read once more and then kept. Called from the animation's own end
-        /// (<c>CombatPatches</c> wraps <c>PostBattleMenu.AnimateResults</c>).</summary>
-        public void MarkResultsAnimated()
-        {
-            _resultsAnimated = true;
-            _attackerTroopsLost = null;
-            _defenderTroopsLost = null;
-            _loot = null;
         }
 
         public bool IsPresent()
@@ -210,11 +207,7 @@ namespace SongsOfConquestAccess.Adapters
         {
             get
             {
-                if (!_resultsAnimated)
-                {
-                    return BuildTroopEntries(AttackerTroopsParentField);
-                }
-
+                SyncTroopEntries();
                 return _attackerTroopsLost
                     ?? (_attackerTroopsLost = BuildTroopEntries(AttackerTroopsParentField));
             }
@@ -224,11 +217,7 @@ namespace SongsOfConquestAccess.Adapters
         {
             get
             {
-                if (!_resultsAnimated)
-                {
-                    return BuildTroopEntries(DefenderTroopsParentField);
-                }
-
+                SyncTroopEntries();
                 return _defenderTroopsLost
                     ?? (_defenderTroopsLost = BuildTroopEntries(DefenderTroopsParentField));
             }
@@ -238,13 +227,60 @@ namespace SongsOfConquestAccess.Adapters
         {
             get
             {
-                if (!_resultsAnimated)
-                {
-                    return BuildLootEntries();
-                }
-
+                SyncLootEntries();
                 return _loot ?? (_loot = BuildLootEntries());
             }
+        }
+
+        /// <summary>Let go of both troop columns when the menu has made another entry. The menu keeps
+        /// ONE list for the two sides - <c>ShowTroop</c> adds to <c>_troopInstances</c> whichever
+        /// parent it draws into - so a stack appearing on either side rebuilds both, which is the
+        /// animation running; once it has stopped adding, neither is walked again.</summary>
+        private void SyncTroopEntries()
+        {
+            int count = TroopInstanceCount;
+            if (count == _troopInstanceCount)
+            {
+                return;
+            }
+
+            _troopInstanceCount = count;
+            _attackerTroopsLost = null;
+            _defenderTroopsLost = null;
+        }
+
+        /// <summary>Let go of the loot when either container's own list of active entries has changed
+        /// length: the menu shows the loot in one of the two and hides the other, and each keeps the
+        /// entries it has spawned.</summary>
+        private void SyncLootEntries()
+        {
+            int attacker = ActiveLootCount(GetField<PostBattleLootContainer>(AttackerLootContainerField));
+            int defender = ActiveLootCount(GetField<PostBattleLootContainer>(DefenderLootContainerField));
+            if (attacker == _attackerLootCount && defender == _defenderLootCount)
+            {
+                return;
+            }
+
+            _attackerLootCount = attacker;
+            _defenderLootCount = defender;
+            _loot = null;
+        }
+
+        private int TroopInstanceCount
+        {
+            get
+            {
+                List<AdventureBattleMenuTroopEntry> entries =
+                    GetField<List<AdventureBattleMenuTroopEntry>>(TroopInstancesField);
+                return entries != null ? entries.Count : -1;
+            }
+        }
+
+        private static int ActiveLootCount(PostBattleLootContainer container)
+        {
+            List<PostBattleLootEntry> entries =
+                GetField<List<PostBattleLootEntry>>(container, LootContainerActiveEntriesField);
+            return entries != null ? entries.Count : -1;
         }
 
         public string AcceptButtonLabel

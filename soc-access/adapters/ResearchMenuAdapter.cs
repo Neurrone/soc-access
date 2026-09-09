@@ -52,8 +52,8 @@ namespace SongsOfConquestAccess.Adapters
 
         // A category's stack buttons, walked at most once a frame per category: the build asks for
         // every category and every row on every frame, and each category was a fresh subtree walk.
-        private int _categoryButtonsFrame = -1;
-        private Dictionary<ResearchMenuCategory, ResearchMenuStackButton[]> _categoryButtons;
+        private readonly FrameSweep<ResearchMenuStackButton> _categoryButtons =
+            new FrameSweep<ResearchMenuStackButton>("research menu category", inactiveToo: false);
 
         public ResearchMenuAdapter(ResearchMenu menu)
         {
@@ -65,8 +65,7 @@ namespace SongsOfConquestAccess.Adapters
         /// same frame must not see the page the build read before the click.</summary>
         public void InvalidateFrameSnapshots()
         {
-            _categoryButtonsFrame = -1;
-            _categoryButtons = null;
+            _categoryButtons.Invalidate();
         }
 
         public IClientAdventureFacade Facade
@@ -421,26 +420,8 @@ namespace SongsOfConquestAccess.Adapters
                 return new ResearchMenuStackButton[0];
             }
 
-            int frame = Time.frameCount;
-            if (_categoryButtons == null || _categoryButtonsFrame != frame)
-            {
-                _categoryButtonsFrame = frame;
-                _categoryButtons = new Dictionary<ResearchMenuCategory, ResearchMenuStackButton[]>();
-            }
-
-            ResearchMenuStackButton[] buttons;
-            if (_categoryButtons.TryGetValue(category, out buttons))
-            {
-                return buttons;
-            }
-
             UITransform container = GetField<UITransform>(category, CategoryButtonsContainerField);
-            Component component = container as Component;
-            buttons = component != null
-                ? component.GetComponentsInChildren<ResearchMenuStackButton>(false)
-                : new ResearchMenuStackButton[0];
-            _categoryButtons[category] = buttons;
-            return buttons;
+            return _categoryButtons.Under(container as Component);
         }
 
         private int SelectedFactionIndex

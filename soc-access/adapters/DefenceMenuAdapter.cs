@@ -63,8 +63,9 @@ namespace SongsOfConquestAccess.Adapters
         private DefenceSlotListAdapter _ballistae;
         private PurchaseTroopsSubMenuAdapter _purchaseTroops;
         private UpgradeTroopsSubMenuAdapter _upgradeTroops;
-        private int _towerItemsFrame = -1;
-        private List<TowerItem> _towerItems;
+        // The towers the panel draws, walked at most once a frame however often the build asks.
+        private readonly FrameSweep<DefenceTowerEntry> _towerEntries =
+            new FrameSweep<DefenceTowerEntry>("defence menu towers", inactiveToo: false);
 
         public DefenceMenuAdapter(DefenceMenu menu)
         {
@@ -455,28 +456,14 @@ namespace SongsOfConquestAccess.Adapters
         /// <summary>The towers the panel is drawing, walked at most once a frame.</summary>
         public IReadOnlyList<TowerItem> GetTowerItems()
         {
-            int frame = Time.frameCount;
-            if (_towerItems != null && _towerItemsFrame == frame)
-            {
-                return _towerItems;
-            }
-
-            _towerItemsFrame = frame;
             Transform container = GetField<Transform>(GetDefencePanelTroops(), TowerContainerField);
-            if (container == null)
-            {
-                _towerItems = new List<TowerItem>();
-                return _towerItems;
-            }
-
-            List<TowerItem> result = new List<TowerItem>();
-            DefenceTowerEntry[] entries = container.GetComponentsInChildren<DefenceTowerEntry>(includeInactive: false);
+            DefenceTowerEntry[] entries = _towerEntries.Under(container);
+            List<TowerItem> result = new List<TowerItem>(entries.Length);
             for (int i = 0; i < entries.Length; i++)
             {
                 result.Add(new TowerItem("defences-tower-" + (i + 1), i + 1, entries[i], _localization));
             }
 
-            _towerItems = result;
             return result;
         }
 

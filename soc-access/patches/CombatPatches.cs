@@ -15,16 +15,12 @@ using SongsOfConquest.Client.Menu;
 using SongsOfConquestAccess.Adapters;
 using SongsOfConquestAccess.Localization;
 using SongsOfConquestAccess.Speech;
-using System.Collections;
-using System.Collections.Generic;
 
 namespace SongsOfConquestAccess
 {
     [HarmonyPatch]
     public static class CombatPatches
     {
-        private static readonly HashSet<int> ActivePostBattleMenus = new HashSet<int>();
-
         [HarmonyPatch(typeof(ClientBattleCommandsFacade), "Ready")]
         [HarmonyPostfix]
         private static void ClientBattleCommandsReadyPostfix(ClientBattleCommandsFacade __instance)
@@ -108,42 +104,24 @@ namespace SongsOfConquestAccess
         [HarmonyPostfix]
         private static void AdventureBattleMenuOpenPostBattlePostfix(AdventureBattleMenu __instance)
         {
-            PostBattleMenu menu = PostBattleResultAdapter.GetPostBattleMenu(__instance);
-            if (menu != null)
-            {
-                ActivePostBattleMenus.Add(menu.GetInstanceID());
-            }
-
             SocAccessMod.Instance?.ScreenDetector?.OnPostBattleResultReady(__instance);
         }
 
+        // The menu the game is hiding was UP, read off its own object: Hide is also how the menu is
+        // put away unshown when the PRE-battle menu opens (AdventureBattleMenu.Open sets up the
+        // commanders and then hides the post-battle menu), and only a menu that was showing has a
+        // page to close. activeSelf rather than activeInHierarchy: confirming the result deactivates
+        // the battle menu's container first, and this prefix runs after that.
         [HarmonyPatch(typeof(PostBattleMenu), "Hide")]
         [HarmonyPrefix]
         private static void PostBattleMenuHidePrefix(PostBattleMenu __instance)
         {
-            if (__instance == null || !ActivePostBattleMenus.Remove(__instance.GetInstanceID()))
+            if (__instance == null || !__instance.gameObject.activeSelf)
             {
                 return;
             }
 
             SocAccessMod.Instance?.ScreenDetector?.OnPostBattleResultClosed();
-        }
-
-        [HarmonyPatch(typeof(PostBattleMenu), "AnimateResults")]
-        [HarmonyPostfix]
-        private static void PostBattleMenuAnimateResultsPostfix(ref IEnumerator __result)
-        {
-            __result = PostBattleMenuAnimateResultsWrapper(__result);
-        }
-
-        private static IEnumerator PostBattleMenuAnimateResultsWrapper(IEnumerator original)
-        {
-            while (original != null && original.MoveNext())
-            {
-                yield return original.Current;
-            }
-
-            SocAccessMod.Instance?.ScreenDetector?.OnPostBattleResultChanged();
         }
 
         [HarmonyPatch(typeof(NotificationPanel), "Show", new[] { typeof(string), typeof(UnityEngine.Vector3), typeof(UnityEngine.Vector2) })]
