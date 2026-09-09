@@ -113,9 +113,15 @@ that `SocAccessMod.Stop` calls. Every patch is on the inventory allowlist as `ev
 `interception`; the lints under `soc-access/tests/Lint/` enforce this and the rest of this
 section, and an exception to any of them is reported to the owner before it merges.
 
-Screens keep no state across a change of `Live` without an `OnLiveChanged` that resets it, and
-every cache on a build path is keyed on something read from the game each frame (frame count,
-object identity, a count, a generation the game owns). A cache dropped only when a hook says so
+Per-menu state lives on the adapter, never on the screen. A screen object lives for the whole
+mod load; an adapter lives exactly as long as the menu instance it wraps (`SyncLive` builds one
+per instance and the slot disposes the one it replaces), so a cache, a stage or a probe that is
+"about this menu" is an adapter field and needs no reset. A screen keeps a mutable field only
+for mod-owned state that outlives the menu (a cursor intent, a said-name baseline), with a
+comment saying so; there is no reset hook to remember. What an adapter attaches to the game (a
+handler, a subscription) is released in its `Dispose`. Every cache on a build path is keyed on
+something read from the game each frame (frame count, object identity, a count, a generation
+the game owns). A cache dropped only when a hook says so
 is the bug this section exists to prevent (2026-09-09 audit: the post-battle snapshot, the
 teleport mode, the map installer).
 
