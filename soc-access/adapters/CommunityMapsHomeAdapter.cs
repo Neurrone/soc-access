@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Reflection;
@@ -6,6 +6,7 @@ using HarmonyLib;
 using ModIO;
 using ModIOBrowser;
 using ModIOBrowser.Implementation;
+using SongsOfConquestAccess.Screens;
 using SongsOfConquestAccess.Localization;
 using TMPro;
 using UnityEngine;
@@ -76,21 +77,6 @@ namespace SongsOfConquestAccess.Adapters
             _unsubscribeLabel = Translate("Unsubscribe");
             _loadingLabel = Translate("Loading");
             _errorLabel = Translate("Error");
-        }
-
-        public static CommunityMapsHomeAdapter TryCreate()
-        {
-            Home[] homes = Resources.FindObjectsOfTypeAll<Home>();
-            for (int i = 0; i < homes.Length; i++)
-            {
-                CommunityMapsHomeAdapter adapter = new CommunityMapsHomeAdapter(homes[i]);
-                if (adapter.IsPresent())
-                {
-                    return adapter;
-                }
-            }
-
-            return null;
         }
 
         public bool IsPresent()
@@ -435,20 +421,14 @@ namespace SongsOfConquestAccess.Adapters
                 return true;
             }
 
-            Collection[] collections = Resources.FindObjectsOfTypeAll<Collection>();
-            for (int i = 0; i < collections.Length; i++)
+            Collection collection = CommunityMapsSources.Collection;
+            if (collection == null || collection.CollectionPanel == null)
             {
-                Collection collection = collections[i];
-                if (collection == null || collection.CollectionPanel == null)
-                {
-                    continue;
-                }
-
-                collection.Open();
-                return true;
+                return false;
             }
 
-            return false;
+            collection.Open();
+            return true;
         }
 
         public bool OpenSearchFilter()
@@ -480,13 +460,13 @@ namespace SongsOfConquestAccess.Adapters
 
         public string Translate(string key)
         {
-            TranslationManager[] managers = Resources.FindObjectsOfTypeAll<TranslationManager>();
-            if (managers.Length == 0 || string.IsNullOrWhiteSpace(key))
+            TranslationManager manager = CommunityMapsSources.Translations;
+            if (manager == null || string.IsNullOrWhiteSpace(key))
             {
                 return key ?? string.Empty;
             }
 
-            string translated = managers[0].Get(key);
+            string translated = manager.Get(key);
             return StripTmpMarkup(translated);
         }
 
@@ -674,16 +654,10 @@ namespace SongsOfConquestAccess.Adapters
                 return string.Empty;
             }
 
-            NavBar[] navBars = Resources.FindObjectsOfTypeAll<NavBar>();
-            for (int navIndex = 0; navIndex < navBars.Length; navIndex++)
+            NavBar navBar = CommunityMapsSources.NavBar;
+            TMP_Text[] texts = navBar != null ? navBar.GetComponentsInChildren<TMP_Text>(false) : null;
+            if (texts != null)
             {
-                NavBar navBar = navBars[navIndex];
-                TMP_Text[] texts = navBar != null ? navBar.GetComponentsInChildren<TMP_Text>(false) : null;
-                if (texts == null)
-                {
-                    continue;
-                }
-
                 for (int i = 0; i < texts.Length; i++)
                 {
                     TMP_Text text = texts[i];
@@ -804,14 +778,11 @@ namespace SongsOfConquestAccess.Adapters
                 return false;
             }
 
-            if (InputNavigationType != null && InputNavigationSelectMethod != null)
+            object navigation = CommunityMapsSources.InputNavigation;
+            if (navigation != null && InputNavigationSelectMethod != null)
             {
-                UnityEngine.Object[] instances = Resources.FindObjectsOfTypeAll(InputNavigationType);
-                if (instances.Length > 0)
-                {
-                    InputNavigationSelectMethod.Invoke(instances[0], new object[] { selectable, true });
-                    return true;
-                }
+                InputNavigationSelectMethod.Invoke(navigation, new object[] { selectable, true });
+                return true;
             }
 
             selectable.Select();
@@ -832,14 +803,13 @@ namespace SongsOfConquestAccess.Adapters
 
         private Collection GetCollection()
         {
-            if (_collectionProbed)
+            if (_collectionProbed && _collection != null)
             {
                 return _collection;
             }
 
             _collectionProbed = true;
-            Collection[] collections = Resources.FindObjectsOfTypeAll<Collection>();
-            _collection = collections.Length > 0 ? collections[0] : null;
+            _collection = CommunityMapsSources.Collection;
             return _collection;
         }
 

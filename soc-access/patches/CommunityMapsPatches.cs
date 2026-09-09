@@ -1,386 +1,23 @@
 using System.Collections.Generic;
 using System.Reflection;
 using HarmonyLib;
-using ModIOBrowser;
 using ModIOBrowser.Implementation;
 using TMPro;
 using UnityEngine;
 
 namespace SongsOfConquestAccess
 {
-    [HarmonyPatch]
-    public static class CommunityMapsPatches
-    {
-        [HarmonyPatch(typeof(Browser), "Close")]
-        [HarmonyPostfix]
-        private static void BrowserClosePostfix()
-        {
-            SocAccessMod.Instance?.ScreenDetector?.OnCommunityMapsClosed();
-        }
-
-        [HarmonyPatch(typeof(Home), "RefreshHomePanel")]
-        [HarmonyPostfix]
-        private static void HomeRefreshHomePanelPostfix()
-        {
-            SocAccessMod.Instance?.ScreenDetector?.OnCommunityMapsChanged();
-        }
-    }
-
-    [HarmonyPatch]
-    public static class CommunityMapsHomeOpenPatches
-    {
-        private static MethodBase TargetMethod()
-        {
-            return AccessTools.Method(typeof(Home), "Open");
-        }
-
-        private static void Postfix()
-        {
-            SocAccessMod.Instance?.ScreenDetector?.OnCommunityMapsChanged();
-        }
-    }
-
-    [HarmonyPatch]
-    public static class CommunityMapsFeaturedLoadedPatches
-    {
-        private static MethodBase TargetMethod()
-        {
-            return AccessTools.Method(typeof(Home), "AddModProfilesToFeaturedCarousel");
-        }
-
-        private static void Postfix()
-        {
-            SocAccessMod.Instance?.ScreenDetector?.OnCommunityMapsHomeContentChanged();
-        }
-    }
-
-    [HarmonyPatch]
-    public static class CommunityMapsRowLoadedPatches
-    {
-        private static MethodBase TargetMethod()
-        {
-            return AccessTools.Method(typeof(ModListRow), "PopulateRowFromModPage");
-        }
-
-        private static void Postfix()
-        {
-            SocAccessMod.Instance?.ScreenDetector?.OnCommunityMapsHomeContentChanged();
-        }
-    }
-
-    [HarmonyPatch]
-    public static class CommunityMapsContextMenuOpenPatches
-    {
-        private static MethodBase TargetMethod()
-        {
-            return AccessTools.Method(AccessTools.TypeByName("ModIOBrowser.Implementation.ModioContextMenu"), "Open");
-        }
-
-        private static void Postfix()
-        {
-            SocAccessMod.Instance?.ScreenDetector?.OnCommunityMapsModalChanged();
-        }
-    }
-
-    [HarmonyPatch]
-    public static class CommunityMapsContextMenuClosePatches
-    {
-        private static MethodBase TargetMethod()
-        {
-            return AccessTools.Method(AccessTools.TypeByName("ModIOBrowser.Implementation.ModioContextMenu"), "Close");
-        }
-
-        private static void Postfix()
-        {
-            SocAccessMod.Instance?.ScreenDetector?.OnCommunityMapsModalChanged();
-        }
-    }
-
-    [HarmonyPatch]
-    public static class CommunityMapsDetailsOpenPatches
-    {
-        private static MethodBase TargetMethod()
-        {
-            return AccessTools.Method(typeof(Details), "Open");
-        }
-
-        private static void Postfix()
-        {
-            SocAccessMod.Instance?.ScreenDetector?.OnCommunityMapsChanged();
-        }
-    }
-
-    [HarmonyPatch]
-    public static class CommunityMapsDetailsClosePatches
-    {
-        private static MethodBase TargetMethod()
-        {
-            return AccessTools.Method(typeof(Details), "Close");
-        }
-
-        private static void Postfix()
-        {
-            SocAccessMod.Instance?.ScreenDetector?.OnCommunityMapsChanged();
-        }
-    }
-
-    [HarmonyPatch]
-    public static class CommunityMapsReportOpenPatches
-    {
-        private static MethodBase TargetMethod()
-        {
-            return AccessTools.Method(typeof(Reporting), "Open");
-        }
-
-        private static void Postfix()
-        {
-            SocAccessMod.Instance?.ScreenDetector?.OnCommunityMapsModalChanged();
-        }
-    }
-
-    [HarmonyPatch]
-    public static class CommunityMapsReportClosePatches
-    {
-        private static MethodBase TargetMethod()
-        {
-            return AccessTools.Method(typeof(Reporting), "Close");
-        }
-
-        private static void Postfix()
-        {
-            SocAccessMod.Instance?.ScreenDetector?.OnCommunityMapsModalChanged();
-        }
-    }
-
-    [HarmonyPatch]
-    public static class CommunityMapsDownloadQueueOpenPatches
-    {
-        private static MethodBase TargetMethod()
-        {
-            return AccessTools.Method(typeof(DownloadQueue), "OpenDownloadQueuePanel");
-        }
-
-        private static void Postfix()
-        {
-            SocAccessMod.Instance?.ScreenDetector?.OnCommunityMapsModalChanged();
-        }
-    }
-
-    [HarmonyPatch]
-    public static class CommunityMapsDownloadQueueClosePatches
-    {
-        private static MethodBase TargetMethod()
-        {
-            return AccessTools.Method(typeof(DownloadQueue), "Close");
-        }
-
-        private static void Postfix()
-        {
-            SocAccessMod.Instance?.ScreenDetector?.OnCommunityMapsModalChanged();
-        }
-    }
-
-    [HarmonyPatch]
-    public static class CommunityMapsCollectionOpenPatches
-    {
-        private static MethodBase TargetMethod()
-        {
-            return AccessTools.Method(typeof(Collection), "Open");
-        }
-
-        private static void Postfix()
-        {
-            SocAccessMod.Instance?.ScreenDetector?.OnCommunityMapsChanged();
-        }
-    }
-
-    [HarmonyPatch]
-    public static class CommunityMapsAuthenticationOpenPatches
-    {
-        private static MethodBase TargetMethod()
-        {
-            return AccessTools.Method(typeof(AuthenticationPanels), "Open");
-        }
-
-        private static void Postfix()
-        {
-            SocAccessMod.Instance?.ScreenDetector?.OnCommunityMapsModalChanged();
-        }
-    }
-
-    [HarmonyPatch]
-    public static class CommunityMapsAuthenticationClosePatches
-    {
-        private static MethodBase TargetMethod()
-        {
-            return AccessTools.Method(typeof(AuthenticationPanels), "Close");
-        }
-
-        private static void Postfix()
-        {
-            SocAccessMod.Instance?.ScreenDetector?.OnCommunityMapsModalChanged();
-        }
-    }
-
-    [HarmonyPatch]
-    public static class CommunityMapsAuthenticationLogoutOpenPatches
-    {
-        private static MethodBase TargetMethod()
-        {
-            return AccessTools.Method(typeof(AuthenticationPanels), "OpenPanel_Logout");
-        }
-
-        private static void Postfix()
-        {
-            SocAccessMod.Instance?.ScreenDetector?.OnCommunityMapsModalChanged();
-        }
-    }
-
-    [HarmonyPatch]
-    public static class CommunityMapsNotificationPopupOpenPatches
-    {
-        private static MethodBase TargetMethod()
-        {
-            return AccessTools.Method(
-                AccessTools.TypeByName("ModIOBrowser.Implementation.NotificationPopup"),
-                "Open");
-        }
-
-        private static void Postfix()
-        {
-            SocAccessMod.Instance?.ScreenDetector?.OnCommunityMapsModalChanged();
-        }
-    }
-
-    [HarmonyPatch]
-    public static class CommunityMapsNotificationPopupClosePatches
-    {
-        private static MethodBase TargetMethod()
-        {
-            return AccessTools.Method(
-                AccessTools.TypeByName("ModIOBrowser.Implementation.NotificationPopup"),
-                "Close");
-        }
-
-        private static void Postfix()
-        {
-            SocAccessMod.Instance?.ScreenDetector?.OnCommunityMapsModalChanged();
-        }
-    }
-
-    [HarmonyPatch]
-    public static class CommunityMapsSearchPanelOpenPatches
-    {
-        private static MethodBase TargetMethod()
-        {
-            return AccessTools.Method(AccessTools.TypeByName("ModIOBrowser.Implementation.SearchPanel"), "Open");
-        }
-
-        private static void Postfix()
-        {
-            SocAccessMod.Instance?.ScreenDetector?.OnCommunityMapsSearchFilterChanged();
-        }
-    }
-
-    [HarmonyPatch]
-    public static class CommunityMapsSearchPanelClosePatches
-    {
-        private static MethodBase TargetMethod()
-        {
-            return AccessTools.Method(AccessTools.TypeByName("ModIOBrowser.Implementation.SearchPanel"), "Close");
-        }
-
-        private static void Postfix()
-        {
-            SocAccessMod.Instance?.ScreenDetector?.OnCommunityMapsSearchFilterChanged();
-        }
-    }
-
-    [HarmonyPatch]
-    public static class CommunityMapsSearchPanelApplyFilterPatches
-    {
-        private static MethodBase TargetMethod()
-        {
-            return AccessTools.Method(AccessTools.TypeByName("ModIOBrowser.Implementation.SearchPanel"), "ApplyFilter");
-        }
-
-        private static void Postfix()
-        {
-            SocAccessMod.Instance?.ScreenDetector?.OnCommunityMapsSearchFilterChanged();
-            SocAccessMod.Instance?.ScreenDetector?.OnCommunityMapsChanged();
-        }
-    }
-
-    [HarmonyPatch]
-    public static class CommunityMapsSearchPanelClearFilterPatches
-    {
-        private static MethodBase TargetMethod()
-        {
-            return AccessTools.Method(AccessTools.TypeByName("ModIOBrowser.Implementation.SearchPanel"), "ClearFilter");
-        }
-
-        private static void Postfix()
-        {
-            SocAccessMod.Instance?.ScreenDetector?.OnCommunityMapsSearchFilterChanged();
-        }
-    }
-
-    [HarmonyPatch]
-    public static class CommunityMapsSearchResultsOpenPatches
-    {
-        private static MethodBase TargetMethod()
-        {
-            return AccessTools.Method(typeof(SearchResults), "Open");
-        }
-
-        private static void Postfix()
-        {
-            SocAccessMod.Instance?.ScreenDetector?.OnCommunityMapsSearchResultsChanged();
-        }
-    }
-
-    [HarmonyPatch]
-    public static class CommunityMapsSearchResultsOpenWithoutRefreshingPatches
-    {
-        private static MethodBase TargetMethod()
-        {
-            return AccessTools.Method(typeof(SearchResults), "OpenWithoutRefreshing");
-        }
-
-        private static void Postfix()
-        {
-            SocAccessMod.Instance?.ScreenDetector?.OnCommunityMapsSearchResultsChanged();
-        }
-    }
-
-    [HarmonyPatch]
-    public static class CommunityMapsSearchResultsRefreshPatches
-    {
-        private static MethodBase TargetMethod()
-        {
-            return AccessTools.Method(typeof(SearchResults), "Refresh");
-        }
-
-        private static void Postfix()
-        {
-            SocAccessMod.Instance?.ScreenDetector?.OnCommunityMapsSearchResultsChanged();
-        }
-    }
-
-    [HarmonyPatch]
-    public static class CommunityMapsSearchResultsGetPatches
-    {
-        private static MethodBase TargetMethod()
-        {
-            return AccessTools.Method(typeof(SearchResults), "Get");
-        }
-
-        private static void Postfix()
-        {
-            SocAccessMod.Instance?.ScreenDetector?.OnCommunityMapsSearchResultsChanged();
-        }
-    }
-
+    /// <summary>
+    /// What is left of the community maps hooks after the six screens learned to find their own
+    /// panel (AGENTS.md, "Screen Resolution"). Everything that only told the detector something had
+    /// opened, closed or refreshed is gone: mod.io's panels are singletons whose game objects say
+    /// which one is drawn, and <c>Navigating.GoToPanel</c> deactivates every other panel before it
+    /// shows one, so a per-frame read answers all of it.
+    ///
+    /// The two below stay because each ALTERS BEHAVIOUR rather than reporting readiness: the first
+    /// keeps the collection's search box usable across a list refresh, the second swallows a
+    /// duplicate key in the code box.
+    /// </summary>
     [HarmonyPatch]
     public static class CommunityMapsCollectionRefreshListPatches
     {
@@ -391,6 +28,8 @@ namespace SongsOfConquestAccess
             return AccessTools.Method(typeof(Collection), "RefreshList");
         }
 
+        /// <summary>INTERCEPTION. Refreshing the list rebuilds the panel under the keyboard, which
+        /// drops the search field's focus and caret mid-word; both are put back afterwards.</summary>
         private static void Prefix(Collection __instance, out SearchFocusState __state)
         {
             __state = CaptureSearchFocus(__instance);
@@ -399,7 +38,6 @@ namespace SongsOfConquestAccess
         private static void Postfix(SearchFocusState __state)
         {
             RestoreSearchFocus(__state);
-            SocAccessMod.Instance?.ScreenDetector?.OnCommunityMapsCollectionChanged();
         }
 
         private static SearchFocusState CaptureSearchFocus(Collection collection)
@@ -448,7 +86,7 @@ namespace SongsOfConquestAccess
             return position > text.Length ? text.Length : position;
         }
 
-        private sealed class SearchFocusState
+        public sealed class SearchFocusState
         {
             public SearchFocusState(
                 TMP_InputField field,
@@ -473,72 +111,26 @@ namespace SongsOfConquestAccess
     }
 
     [HarmonyPatch]
-    public static class CommunityMapsOpenUninstallConfirmationPatches
-    {
-        private static MethodBase TargetMethod()
-        {
-            return AccessTools.Method(typeof(Collection), "OpenUninstallConfirmation");
-        }
-
-        private static void Postfix()
-        {
-            SocAccessMod.Instance?.ScreenDetector?.OnCommunityMapsModalChanged();
-        }
-    }
-
-    [HarmonyPatch]
-    public static class CommunityMapsCloseUninstallConfirmationPatches
-    {
-        private static MethodBase TargetMethod()
-        {
-            return AccessTools.Method(typeof(Collection), "CloseUninstallConfirmation");
-        }
-
-        private static void Postfix()
-        {
-            SocAccessMod.Instance?.ScreenDetector?.OnCommunityMapsModalChanged();
-        }
-    }
-
-    [HarmonyPatch]
-    public static class CommunityMapsFiveDigitInputOpenPatches
-    {
-        private static MethodBase TargetMethod()
-        {
-            return AccessTools.Method(typeof(KeyInput5DigitsUi), "Open");
-        }
-
-        private static void Postfix()
-        {
-            SocAccessMod.Instance?.ScreenDetector?.OnCommunityMapsModalChanged();
-        }
-    }
-
-    [HarmonyPatch]
-    public static class CommunityMapsFiveDigitInputClosePatches
-    {
-        private static MethodBase TargetMethod()
-        {
-            return AccessTools.Method(typeof(KeyInput5DigitsUi), "Close");
-        }
-
-        private static void Postfix()
-        {
-            SocAccessMod.Instance?.ScreenDetector?.OnCommunityMapsModalChanged();
-        }
-    }
-
-    [HarmonyPatch]
     public static class CommunityMapsFiveDigitInputDuplicateKeyPatches
     {
         private static readonly Dictionary<int, FrameInput> LastInputByInstance =
             new Dictionary<int, FrameInput>();
+
+        /// <summary>Per-load state, cleared by <c>SocAccessMod.Stop</c>: a dictionary keyed on
+        /// instance ids that would otherwise hold entries for code boxes of a previous load.</summary>
+        public static void Reset()
+        {
+            LastInputByInstance.Clear();
+        }
 
         private static MethodBase TargetMethod()
         {
             return AccessTools.Method(typeof(KeyInput5Digits), "AddToInput");
         }
 
+        /// <summary>INTERCEPTION. The code box takes the same key twice in one frame - once from
+        /// mod.io's own scan and once from the key the mod pressed - so the second is dropped.
+        /// </summary>
         private static bool Prefix(KeyInput5Digits __instance, KeyCode keyCode)
         {
             if (__instance == null)

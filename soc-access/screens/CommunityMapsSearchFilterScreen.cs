@@ -32,19 +32,18 @@ namespace SongsOfConquestAccess.Screens
         private readonly GameTextEditor _editor = new GameTextEditor();
         private readonly Dictionary<string, object> _markers = new Dictionary<string, object>();
 
-        /// <summary>After a hot reload: point the slot at the menu already showing.
-        /// Scanned once, from <c>ScreenDetector.RecoverRuntimeState</c>.</summary>
-        public static void Recover()
+        /// <summary>The search and filter panel, read off mod.io's own singleton every frame
+        /// (<see cref="CommunityMapsSources"/>). mod.io hides this panel's game object when a search
+        /// opens the results page, so the adapter's <c>IsPresent</c> is what answers "the player has
+        /// left the filter" - the detector used to be told.</summary>
+        protected override object ResolveMenu()
         {
-            Recovered<CommunityMapsSearchFilterScreen>(FindActive());
+            return CommunityMapsSources.SearchPanel;
         }
 
-        public static CommunityMapsSearchFilterAdapter FindActive()
+        protected override CommunityMapsSearchFilterAdapter Adapt(object menu)
         {
-            CommunityMapsSearchFilterAdapter adapter = CommunityMapsSearchFilterAdapter.TryCreate();
-            return adapter != null && adapter.IsPresent()
-                ? (adapter)
-                : null;
+            return new CommunityMapsSearchFilterAdapter(menu);
         }
 
         public override string Key
@@ -71,6 +70,7 @@ namespace SongsOfConquestAccess.Screens
 
         public override bool IsActive()
         {
+            SyncLive();
             return Live != null && Live.IsPresent();
         }
 

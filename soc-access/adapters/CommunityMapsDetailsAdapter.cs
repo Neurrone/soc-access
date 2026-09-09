@@ -5,6 +5,7 @@ using System.Text.RegularExpressions;
 using HarmonyLib;
 using ModIOBrowser;
 using ModIOBrowser.Implementation;
+using SongsOfConquestAccess.Screens;
 using TMPro;
 using UnityEngine;
 using UnityEngine.EventSystems;
@@ -47,21 +48,6 @@ namespace SongsOfConquestAccess.Adapters
             {
                 _backLabel = Translate("Back");
             }
-        }
-
-        public static CommunityMapsDetailsAdapter TryCreate()
-        {
-            Details[] details = Resources.FindObjectsOfTypeAll<Details>();
-            for (int i = 0; i < details.Length; i++)
-            {
-                CommunityMapsDetailsAdapter adapter = new CommunityMapsDetailsAdapter(details[i]);
-                if (adapter.IsPresent())
-                {
-                    return adapter;
-                }
-            }
-
-            return null;
         }
 
         public bool IsPresent()
@@ -151,13 +137,13 @@ namespace SongsOfConquestAccess.Adapters
 
         public string Translate(string key)
         {
-            TranslationManager[] managers = Resources.FindObjectsOfTypeAll<TranslationManager>();
-            if (managers.Length == 0 || string.IsNullOrWhiteSpace(key))
+            TranslationManager manager = CommunityMapsSources.Translations;
+            if (manager == null || string.IsNullOrWhiteSpace(key))
             {
                 return key ?? string.Empty;
             }
 
-            return CleanText(managers[0].Get(key));
+            return CleanText(manager.Get(key));
         }
 
         public bool Report()
@@ -297,16 +283,10 @@ namespace SongsOfConquestAccess.Adapters
                 return string.Empty;
             }
 
-            NavBar[] navBars = Resources.FindObjectsOfTypeAll<NavBar>();
-            for (int navIndex = 0; navIndex < navBars.Length; navIndex++)
+            NavBar navBar = CommunityMapsSources.NavBar;
+            TMP_Text[] texts = navBar != null ? navBar.GetComponentsInChildren<TMP_Text>(false) : null;
+            if (texts != null)
             {
-                NavBar navBar = navBars[navIndex];
-                TMP_Text[] texts = navBar != null ? navBar.GetComponentsInChildren<TMP_Text>(false) : null;
-                if (texts == null)
-                {
-                    continue;
-                }
-
                 for (int i = 0; i < texts.Length; i++)
                 {
                     TMP_Text text = texts[i];

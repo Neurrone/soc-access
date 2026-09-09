@@ -41,28 +41,16 @@ namespace SongsOfConquestAccess.Screens
 
         private readonly GameTextEditor _editor = new GameTextEditor();
 
-        /// <summary>After a hot reload: point the slot at the menu already showing.
-        /// Scanned once, from <c>ScreenDetector.RecoverRuntimeState</c>.</summary>
-        public static void Recover()
+        /// <summary>The popup the lobby page holds in <c>_mapSettingsMenu</c>
+        /// (<see cref="LobbySources"/>).</summary>
+        protected override object ResolveMenu()
         {
-            Recovered<AdventureLobbyGameSettingsScreen>(FindActive());
+            return LobbySources.GameSettings.Current;
         }
 
-        public static AdventureLobbyGameSettingsAdapter FindActive()
+        protected override AdventureLobbyGameSettingsAdapter Adapt(object menu)
         {
-            LobbyMapSettingsMenu menu = FindActiveMenu(null);
-            if (menu == null)
-            {
-                return null;
-            }
-
-            AdventureLobbyGameSettingsAdapter adapter = new AdventureLobbyGameSettingsAdapter(menu);
-            return adapter.IsPresent() ? (adapter) : null;
-        }
-
-        public bool Matches(LobbyMapSettingsMenu menu)
-        {
-            return Live != null && ReferenceEquals(Live.SourceKey, menu);
+            return new AdventureLobbyGameSettingsAdapter((LobbyMapSettingsMenu)menu);
         }
 
         public override string Key
@@ -89,6 +77,7 @@ namespace SongsOfConquestAccess.Screens
 
         public override bool IsActive()
         {
+            SyncLive();
             return Live != null && Live.IsPresent();
         }
 
@@ -122,37 +111,6 @@ namespace SongsOfConquestAccess.Screens
             _editor.Abandon();
         }
 
-        public static LobbyMapSettingsMenu FindActiveMenu(LobbyMapSettingsMenu targetMenu)
-        {
-            LobbyMapSettingsMenu[] menus = Resources.FindObjectsOfTypeAll<LobbyMapSettingsMenu>();
-            for (int i = 0; i < menus.Length; i++)
-            {
-                LobbyMapSettingsMenu menu = menus[i];
-                if (menu == null)
-                {
-                    continue;
-                }
-
-                if (targetMenu != null && !ReferenceEquals(targetMenu, menu))
-                {
-                    continue;
-                }
-
-                GameObject gameObject = ((Component)menu).gameObject;
-                if (gameObject == null || !gameObject.scene.IsValid() || !gameObject.scene.isLoaded)
-                {
-                    continue;
-                }
-
-                AdventureLobbyGameSettingsAdapter adapter = new AdventureLobbyGameSettingsAdapter(menu);
-                if (adapter.IsPresent())
-                {
-                    return menu;
-                }
-            }
-
-            return null;
-        }
 
         public override void Build(GraphBuilder builder)
         {

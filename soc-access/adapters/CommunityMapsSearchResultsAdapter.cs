@@ -5,6 +5,7 @@ using System.Text;
 using HarmonyLib;
 using ModIOBrowser;
 using ModIOBrowser.Implementation;
+using SongsOfConquestAccess.Screens;
 using SongsOfConquestAccess.Localization;
 using TMPro;
 using UnityEngine;
@@ -35,23 +36,66 @@ namespace SongsOfConquestAccess.Adapters
         private static readonly FieldInfo OverlayListItemField = AccessTools.Field(SearchResultOverlayType, "listItemToReplicate");
         private static readonly FieldInfo OverlaySubscribeTextField = AccessTools.Field(SearchResultOverlayType, "subscribeButtonText");
 
-        private readonly SearchResults _results;
-        private readonly string _backLabel;
-        private readonly string _title;
-        private readonly string _summaryText;
-        private readonly string _footerText;
-        private readonly Selectable _refineFilter;
-        private readonly string _refineFilterLabel;
-        private readonly SortDropdown _sort;
-        private readonly IReadOnlyList<ResultItem> _resultsSnapshot;
-        private readonly object _activeOverlay;
-        private readonly bool _hasSelectedResult;
-        private readonly string _subscribeLabel;
-        private readonly string _moreOptionsLabel;
+        // WHAT THE PAGE IS KEYED ON. The four deleted hooks (SearchResults.Open,
+        // OpenWithoutRefreshing, Refresh and Get) each reported one fetch, and all they did was drop
+        // this snapshot. The panel says the same thing itself: how many rows its list parent holds,
+        // the fetch status it keeps, and the phrase it last searched for. A fetch cannot change the
+        // results without changing at least one of the three, and reading them costs three field
+        // reads a frame.
+        private static readonly FieldInfo StatusField = AccessTools.Field(typeof(SearchResults), "searchResultsStatus");
+        private static readonly FieldInfo LastPhraseField = AccessTools.Field(typeof(SearchResults), "lastUsedSearchPhrase");
 
-        private CommunityMapsSearchResultsAdapter(SearchResults results)
+        private readonly SearchResults _results;
+        private string _backLabel;
+        private string _title;
+        private Selectable _refineFilter;
+        private string _refineFilterLabel;
+        private SortDropdown _sort;
+
+        // Whether the panel's own texts have been read since it was last shown. The adapter is built
+        // as soon as mod.io's SearchResults singleton exists, which is when the browser OPENS and
+        // long before this panel is drawn, and a walk of a hidden panel finds none of its texts. So
+        // the walk is keyed on the panel being drawn, and repeated once each time it is drawn again -
+        // which is exactly what the deleted SearchResults.Open hook used to be for.
+        private bool _panelWasDrawn;
+        private bool _labelsRead;
+
+        private bool _snapshotTaken;
+        private int _stampRowCount;
+        private int _stampStatus;
+        private string _stampPhrase;
+        private string _summaryText;
+        private string _footerText;
+        private object _activeOverlay;
+        private bool _hasSelectedResult;
+        private string _subscribeLabel;
+        private string _moreOptionsLabel;
+
+        public CommunityMapsSearchResultsAdapter(SearchResults results)
         {
             _results = results;
+            _sort = new SortDropdown(null);
+        }
+
+        /// <summary>Read the panel's own texts once per showing, on the frame it becomes drawn.
+        /// </summary>
+        private void EnsureLabels()
+        {
+            bool drawn = IsPresent();
+            if (drawn && !_panelWasDrawn)
+            {
+                _labelsRead = false;
+            }
+
+            _panelWasDrawn = drawn;
+            if (_labelsRead || !drawn)
+            {
+                return;
+            }
+
+            _labelsRead = true;
+            // The summary is one of the panel's texts, so the snapshot below is taken again with it.
+            _snapshotTaken = false;
             _backLabel = FindTopBarText("Back / Exit");
             if (string.IsNullOrWhiteSpace(_backLabel))
             {
@@ -59,31 +103,52 @@ namespace SongsOfConquestAccess.Adapters
             }
 
             _title = FindPanelTitle();
-            _summaryText = BuildSummaryText();
-            _footerText = BuildFooterText();
             _refineFilter = GetField<Selectable>(RefineFilterField);
             _refineFilterLabel = GetSelectableLabel(_refineFilter);
             _sort = new SortDropdown(GetField<TMP_Dropdown>(SortDropdownField));
-            _resultsSnapshot = BuildResults();
+        }
+
+        /// <summary>Take the page again when the panel has fetched since the last time.</summary>
+        private void EnsureSnapshot()
+        {
+            int rowCount = _results != null && _results.SearchResultsListItemParent != null
+                ? _results.SearchResultsListItemParent.childCount
+                : 0;
+            int status = ReadStatus();
+            string phrase = ReadLastPhrase();
+            if (_snapshotTaken && rowCount == _stampRowCount && status == _stampStatus && phrase == _stampPhrase)
+            {
+                return;
+            }
+
+            _snapshotTaken = true;
+            _stampRowCount = rowCount;
+            _stampStatus = status;
+            _stampPhrase = phrase;
+            _summaryText = BuildSummaryText();
+            _footerText = BuildFooterText();
             _activeOverlay = FindActiveOverlay();
             _hasSelectedResult = GetOverlayItem(_activeOverlay) != null;
             _subscribeLabel = GetOverlaySubscribeLabel(_activeOverlay);
             _moreOptionsLabel = GetOverlayMoreOptionsLabel(_activeOverlay, _subscribeLabel);
         }
 
-        public static CommunityMapsSearchResultsAdapter TryCreate()
+        private int ReadStatus()
         {
-            SearchResults[] results = Resources.FindObjectsOfTypeAll<SearchResults>();
-            for (int i = 0; i < results.Length; i++)
+            if (_results == null || StatusField == null)
             {
-                CommunityMapsSearchResultsAdapter adapter = new CommunityMapsSearchResultsAdapter(results[i]);
-                if (adapter.IsPresent())
-                {
-                    return adapter;
-                }
+                return -1;
             }
 
-            return null;
+            object value = StatusField.GetValue(_results);
+            return value == null ? -1 : (int)value;
+        }
+
+        private string ReadLastPhrase()
+        {
+            return _results != null && LastPhraseField != null
+                ? LastPhraseField.GetValue(_results) as string
+                : null;
         }
 
         public bool IsPresent()
@@ -96,28 +161,29 @@ namespace SongsOfConquestAccess.Adapters
 
         public string Title
         {
-            get { return _title; }
+            get { EnsureLabels(); return _title; }
         }
 
         public string SummaryText
         {
-            get { return _summaryText; }
+            get { EnsureSnapshot(); return _summaryText; }
         }
 
         public string FooterText
         {
-            get { return _footerText; }
+            get { EnsureSnapshot(); return _footerText; }
         }
 
         public string RefineFilterLabel
         {
-            get { return _refineFilterLabel; }
+            get { EnsureLabels(); return _refineFilterLabel; }
         }
 
         public bool HasRefineFilter
         {
             get
             {
+                EnsureLabels();
                 return _refineFilter != null
                     && _refineFilter.gameObject.activeInHierarchy
                     && !string.IsNullOrWhiteSpace(RefineFilterLabel);
@@ -132,12 +198,7 @@ namespace SongsOfConquestAccess.Adapters
 
         public SortDropdown Sort
         {
-            get { return _sort; }
-        }
-
-        public IReadOnlyList<ResultItem> Results
-        {
-            get { return _resultsSnapshot; }
+            get { EnsureLabels(); return _sort; }
         }
 
         public IReadOnlyList<ResultItem> BuildResults()
@@ -184,26 +245,27 @@ namespace SongsOfConquestAccess.Adapters
 
         public string SubscribeLabel
         {
-            get { return _subscribeLabel; }
+            get { EnsureSnapshot(); return _subscribeLabel; }
         }
 
         public bool HasSelectedResult
         {
-            get { return _hasSelectedResult; }
+            get { EnsureSnapshot(); return _hasSelectedResult; }
         }
 
         public bool HasSubscribeAction
         {
-            get { return _hasSelectedResult && !string.IsNullOrWhiteSpace(_subscribeLabel); }
+            get { EnsureSnapshot(); return _hasSelectedResult && !string.IsNullOrWhiteSpace(_subscribeLabel); }
         }
 
         public bool HasMoreOptionsAction
         {
-            get { return _hasSelectedResult && !string.IsNullOrWhiteSpace(_moreOptionsLabel); }
+            get { EnsureSnapshot(); return _hasSelectedResult && !string.IsNullOrWhiteSpace(_moreOptionsLabel); }
         }
 
         public bool SubscribeSelected()
         {
+            EnsureSnapshot();
             if (_activeOverlay == null || OverlaySubscribeMethod == null)
             {
                 return false;
@@ -215,11 +277,12 @@ namespace SongsOfConquestAccess.Adapters
 
         public string MoreOptionsLabel
         {
-            get { return _moreOptionsLabel; }
+            get { EnsureSnapshot(); return _moreOptionsLabel; }
         }
 
         public bool OpenSelectedOptions()
         {
+            EnsureSnapshot();
             if (_activeOverlay == null || OverlayMoreOptionsMethod == null)
             {
                 return false;
@@ -231,7 +294,7 @@ namespace SongsOfConquestAccess.Adapters
 
         public string BackLabel
         {
-            get { return _backLabel; }
+            get { EnsureLabels(); return _backLabel; }
         }
 
         public bool Back()
@@ -267,6 +330,7 @@ namespace SongsOfConquestAccess.Adapters
 
         private string BuildSummaryText()
         {
+            EnsureLabels();
             return _title;
         }
 
@@ -550,15 +614,10 @@ namespace SongsOfConquestAccess.Adapters
                 return string.Empty;
             }
 
-            NavBar[] navBars = Resources.FindObjectsOfTypeAll<NavBar>();
-            for (int navIndex = 0; navIndex < navBars.Length; navIndex++)
+            NavBar navBar = CommunityMapsSources.NavBar;
+            TMP_Text[] texts = navBar != null ? navBar.GetComponentsInChildren<TMP_Text>(false) : null;
+            if (texts != null)
             {
-                TMP_Text[] texts = navBars[navIndex] != null ? navBars[navIndex].GetComponentsInChildren<TMP_Text>(false) : null;
-                if (texts == null)
-                {
-                    continue;
-                }
-
                 for (int i = 0; i < texts.Length; i++)
                 {
                     TMP_Text text = texts[i];

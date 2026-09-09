@@ -65,22 +65,15 @@ namespace SongsOfConquestAccess.Screens
         private const string WinConditionsRegion = "random-layout-win-conditions";
         private const string LayoutRegion = "random-layout-variant";
 
-        /// <summary>After a hot reload: point the slot at the menu already showing.
-        /// Scanned once, from <c>ScreenDetector.RecoverRuntimeState</c>.</summary>
-        public static void Recover()
+        /// <summary>The lobby navigator's own random layout page (<see cref="LobbySources"/>).</summary>
+        protected override object ResolveMenu()
         {
-            Recovered<AdventureLobbyRandomLayoutScreen>(FindActive());
+            return LobbySources.RandomLayout.Current;
         }
 
-        public static AdventureLobbyRandomLayoutAdapter FindActive()
+        protected override AdventureLobbyRandomLayoutAdapter Adapt(object menu)
         {
-            AdventureLobbyRandomLayoutAdapter adapter = FindActiveRandomLayoutMenu(null);
-            return adapter;
-        }
-
-        public bool Matches(LobbyRandomMapSelectionMenu menu)
-        {
-            return Live != null && ReferenceEquals(Live.SourceKey, menu);
+            return new AdventureLobbyRandomLayoutAdapter((LobbyRandomMapSelectionMenu)menu, LobbySources.Navigation.Current);
         }
 
         public override string Key
@@ -107,6 +100,7 @@ namespace SongsOfConquestAccess.Screens
 
         public override bool IsActive()
         {
+            SyncLive();
             return Live != null && Live.IsPresent();
         }
 
@@ -282,43 +276,6 @@ namespace SongsOfConquestAccess.Screens
             NodeVtable vtable = GraphNodes.Button(button.GetLabel, () => button.Activate(), button.IsEnabled);
             vtable.OnFocusVisual = () => NativeSelectionUtility.Select(button.Button);
             builder.AddItem(new DrawnNode(ControlId.For(button.Button, key), vtable, button.Button));
-        }
-
-        public static AdventureLobbyRandomLayoutAdapter FindActiveRandomLayoutMenu(LobbyRandomMapSelectionMenu targetMenu)
-        {
-            LobbyRandomMapSelectionMenu[] menus = Resources.FindObjectsOfTypeAll<LobbyRandomMapSelectionMenu>();
-            for (int i = 0; i < menus.Length; i++)
-            {
-                LobbyRandomMapSelectionMenu menu = menus[i];
-                if (!IsLiveSceneRandomLayoutMenu(menu))
-                {
-                    continue;
-                }
-
-                if (targetMenu != null && !ReferenceEquals(targetMenu, menu))
-                {
-                    continue;
-                }
-
-                AdventureLobbyRandomLayoutAdapter adapter = new AdventureLobbyRandomLayoutAdapter(menu);
-                if (adapter.IsPresent())
-                {
-                    return adapter;
-                }
-            }
-
-            return null;
-        }
-
-        private static bool IsLiveSceneRandomLayoutMenu(LobbyRandomMapSelectionMenu menu)
-        {
-            if (menu == null)
-            {
-                return false;
-            }
-
-            GameObject gameObject = ((Component)menu).gameObject;
-            return gameObject != null && gameObject.scene.IsValid() && gameObject.scene.isLoaded;
         }
     }
 }

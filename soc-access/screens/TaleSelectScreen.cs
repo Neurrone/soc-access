@@ -34,17 +34,14 @@ namespace SongsOfConquestAccess.Screens
         private const string CardsStop = "tale-cards";
         private const string HeaderStop = "tale-header";
 
-        /// <summary>After a hot reload: point the slot at the menu already showing.
-        /// Scanned once, from <c>ScreenDetector.RecoverRuntimeState</c>.</summary>
-        public static void Recover()
+        protected override object ResolveMenu()
         {
-            Recovered<TaleSelectScreen>(FindActive());
+            return MainMenuSources.TaleSelect.Current;
         }
 
-        public static TaleSelectAdapter FindActive()
+        protected override TaleSelectAdapter Adapt(object menu)
         {
-            TaleSelectAdapter adapter = FindActiveTaleSelect();
-            return adapter;
+            return new TaleSelectAdapter((TaleButtonLayoutCoordinator)menu);
         }
 
         public override string Key
@@ -71,6 +68,7 @@ namespace SongsOfConquestAccess.Screens
 
         public override bool IsActive()
         {
+            SyncLive();
             return Live != null && Live.IsPresent();
         }
 
@@ -206,38 +204,6 @@ namespace SongsOfConquestAccess.Screens
         {
             Component component = item.Button;
             return component != null ? component.transform.position.x : 0f;
-        }
-
-        private static TaleSelectAdapter FindActiveTaleSelect()
-        {
-            TaleButtonLayoutCoordinator[] coordinators = Resources.FindObjectsOfTypeAll<TaleButtonLayoutCoordinator>();
-            for (int i = 0; i < coordinators.Length; i++)
-            {
-                TaleButtonLayoutCoordinator coordinator = coordinators[i];
-                if (!IsLiveSceneCoordinator(coordinator))
-                {
-                    continue;
-                }
-
-                TaleSelectAdapter adapter = new TaleSelectAdapter(coordinator);
-                if (adapter.IsPresent())
-                {
-                    return adapter;
-                }
-            }
-
-            return null;
-        }
-
-        private static bool IsLiveSceneCoordinator(TaleButtonLayoutCoordinator coordinator)
-        {
-            if (coordinator == null)
-            {
-                return false;
-            }
-
-            GameObject gameObject = ((Component)coordinator).gameObject;
-            return gameObject != null && gameObject.scene.IsValid() && gameObject.scene.isLoaded;
         }
     }
 }

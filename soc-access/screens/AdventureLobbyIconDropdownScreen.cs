@@ -30,22 +30,17 @@ namespace SongsOfConquestAccess.Screens
         // The Cancel row is the mod's own control, so it needs a subject the game does not provide.
         private readonly object _cancelKey = new object();
 
-        /// <summary>After a hot reload: point the slot at the menu already showing.
-        /// Scanned once, from <c>ScreenDetector.RecoverRuntimeState</c>.</summary>
-        public static void Recover()
+        /// <summary>The ONE icon dropdown the lobby has: <c>LobbyPlayerMenu</c> hands the same
+        /// object to every row it spawns, so which row opened it is not a question the source has to
+        /// answer (<see cref="LobbySources"/>).</summary>
+        protected override object ResolveMenu()
         {
-            Recovered<AdventureLobbyIconDropdownScreen>(FindActive());
+            return LobbySources.Dropdown.Current;
         }
 
-        public static AdventureLobbyIconDropdownAdapter FindActive()
+        protected override AdventureLobbyIconDropdownAdapter Adapt(object menu)
         {
-            AdventureLobbyIconDropdownAdapter adapter = FindActiveDropdown(null);
-            return adapter;
-        }
-
-        public bool Matches(IconDropdown dropdown)
-        {
-            return Live != null && ReferenceEquals(Live.SourceKey, dropdown);
+            return new AdventureLobbyIconDropdownAdapter((IconDropdown)menu);
         }
 
         public override string Key
@@ -70,8 +65,11 @@ namespace SongsOfConquestAccess.Screens
             }
         }
 
+        /// <summary>Whether the dropdown is OPEN, which is the adapter's own reading of the
+        /// container <c>IconDropdown.Show</c> turns on and <c>Hide</c> turns off.</summary>
         public override bool IsActive()
         {
+            SyncLive();
             return Live != null && Live.IsPresent();
         }
 
@@ -124,7 +122,7 @@ namespace SongsOfConquestAccess.Screens
                 NodeVtable vtable = GraphNodes.Choice(
                     () => it.Label,
                     () => it.IsCurrentValue,
-                    () => Activate(it),
+                    () => it.Activate(),
                     () => it.IsEnabled,
                     null,
                     it.Tooltip);
@@ -150,48 +148,6 @@ namespace SongsOfConquestAccess.Screens
         private bool Cancel()
         {
             return Live != null && Live.Cancel();
-        }
-
-        private void Activate(AdventureLobbyIconDropdownAdapter.OptionItem item)
-        {
-            SocAccessMod mod = SocAccessMod.Instance;
-            ScreenDetector detector = mod != null ? mod.ScreenDetector : null;
-            IconDropdown dropdown = Live != null ? Live.SourceKey as IconDropdown : null;
-            if (detector != null)
-            {
-                detector.OnAdventureLobbyIconDropdownOptionActivating(dropdown, item.TypeName);
-            }
-
-            if (!item.Activate() && detector != null)
-            {
-                detector.OnAdventureLobbyIconDropdownOptionActivationFailed(dropdown);
-            }
-        }
-
-        public static AdventureLobbyIconDropdownAdapter FindActiveDropdown(IconDropdown targetDropdown)
-        {
-            IconDropdown[] dropdowns = Resources.FindObjectsOfTypeAll<IconDropdown>();
-            for (int i = 0; i < dropdowns.Length; i++)
-            {
-                IconDropdown dropdown = dropdowns[i];
-                if (dropdown == null)
-                {
-                    continue;
-                }
-
-                if (targetDropdown != null && !ReferenceEquals(targetDropdown, dropdown))
-                {
-                    continue;
-                }
-
-                AdventureLobbyIconDropdownAdapter adapter = new AdventureLobbyIconDropdownAdapter(dropdown);
-                if (adapter.IsPresent())
-                {
-                    return adapter;
-                }
-            }
-
-            return null;
         }
     }
 }

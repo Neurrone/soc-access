@@ -46,31 +46,16 @@ namespace SongsOfConquestAccess.Screens
         // cursor on the same line: the page draws them as labels the mod has nothing else to key on.
         private readonly Dictionary<string, object> _markers = new Dictionary<string, object>();
 
-        /// <summary>After a hot reload: point the slot at the menu already showing.
-        /// Scanned once, from <c>ScreenDetector.RecoverRuntimeState</c>.</summary>
-        public static void Recover()
+        /// <summary>The page's navigation object, an unbound scene object found by one gated walk of
+        /// its own scene's roots (<see cref="MenuSceneSources"/>).</summary>
+        protected override object ResolveMenu()
         {
-            Recovered<PlayerStatsScreen>(FindActive());
+            return MenuSceneSources.PlayerStats.Current;
         }
 
-        public static PlayerStatsAdapter FindActive()
+        protected override PlayerStatsAdapter Adapt(object menu)
         {
-            PlayerStatsMenuNavigation[] menus = Resources.FindObjectsOfTypeAll<PlayerStatsMenuNavigation>();
-            for (int i = 0; i < menus.Length; i++)
-            {
-                PlayerStatsAdapter adapter = new PlayerStatsAdapter(menus[i]);
-                if (adapter.IsPresent())
-                {
-                    return (adapter);
-                }
-            }
-
-            return null;
-        }
-
-        public bool Matches(PlayerStatsMenuNavigation menu)
-        {
-            return Live != null && ReferenceEquals(Live.Source, menu);
+            return new PlayerStatsAdapter((PlayerStatsMenuNavigation)menu);
         }
 
         public override string Key
@@ -99,6 +84,7 @@ namespace SongsOfConquestAccess.Screens
 
         public override bool IsActive()
         {
+            SyncLive();
             return Live != null && Live.IsPresent();
         }
 

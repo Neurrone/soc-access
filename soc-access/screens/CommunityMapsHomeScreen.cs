@@ -56,21 +56,16 @@ namespace SongsOfConquestAccess.Screens
         // a band's item is a place in a named band either way.
         private readonly Dictionary<string, object> _markers = new Dictionary<string, object>();
 
-        /// <summary>After a hot reload: point the slot at the menu already showing.
-        /// Scanned once, from <c>ScreenDetector.RecoverRuntimeState</c>.</summary>
-        public static void Recover()
+        /// <summary>The Browse page, read off mod.io's own singleton every frame
+        /// (<see cref="CommunityMapsSources"/>).</summary>
+        protected override object ResolveMenu()
         {
-            Recovered<CommunityMapsHomeScreen>(FindActive());
+            return CommunityMapsSources.Home;
         }
 
-        public static CommunityMapsHomeAdapter FindActive()
+        protected override CommunityMapsHomeAdapter Adapt(object menu)
         {
-            CommunityMapsHomeAdapter adapter = CommunityMapsHomeAdapter.TryCreate();
-            return adapter != null
-                && adapter.IsPresent()
-                && adapter.IsBrowseSelected
-                    ? (adapter)
-                    : null;
+            return new CommunityMapsHomeAdapter((ModIOBrowser.Implementation.Home)menu);
         }
 
         public override string Key
@@ -96,9 +91,13 @@ namespace SongsOfConquestAccess.Screens
             get { return TabsStop; }
         }
 
+        /// <summary>Showing means the browser is up, the home object is there, AND the BROWSE panel
+        /// is the one drawn: the adapter answers present for either tab, because it owns the tab pair
+        /// both pages draw, so the panel's own active state is read here every frame.</summary>
         public override bool IsActive()
         {
-            return Live != null && Live.IsPresent();
+            SyncLive();
+            return Live != null && Live.IsPresent() && Live.IsBrowseSelected;
         }
 
         public override bool ConsumesBack

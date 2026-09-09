@@ -76,6 +76,7 @@ namespace SongsOfConquestAccess.Adapters
 
         private readonly MainMenu _mainMenu;
         private readonly List<IMenuButtonAdapter> _topLevelItems;
+        private IMenuButtonAdapter _optionsButton;
 
         public MainMenuAdapter(MainMenu mainMenu)
         {
@@ -128,12 +129,6 @@ namespace SongsOfConquestAccess.Adapters
                 MultiplayerFoldout.TriggerButton,
                 CreateMainMenuButton(QuitButtonRef(_mainMenu))
             };
-
-            MainMenuManager.Settings settings = GetMainMenuSettings();
-            OptionsButton = settings != null ? new OptionsMenuButtonAdapter(
-                settings.OptionsButton,
-                () => settings.OptionsButton != null && MenuButtonAdapterBase.IsButtonVisible(settings.OptionsButton),
-                () => NativeSelectionUtility.Click(settings.OptionsButton)) : null;
         }
 
         public object SourceKey
@@ -150,7 +145,28 @@ namespace SongsOfConquestAccess.Adapters
 
         public NativeFoldoutAdapter MultiplayerFoldout { get; private set; }
 
-        public IMenuButtonAdapter OptionsButton { get; private set; }
+        /// <summary>The Options button in the corner, which the main menu manager owns rather than
+        /// the menu. Built the first time the manager answers with its settings, which it may not do
+        /// on the frame the menu is first found, and kept once it has.</summary>
+        public IMenuButtonAdapter OptionsButton
+        {
+            get
+            {
+                if (_optionsButton == null)
+                {
+                    MainMenuManager.Settings settings = GetMainMenuSettings();
+                    if (settings != null)
+                    {
+                        _optionsButton = new OptionsMenuButtonAdapter(
+                            settings.OptionsButton,
+                            () => settings.OptionsButton != null && MenuButtonAdapterBase.IsButtonVisible(settings.OptionsButton),
+                            () => NativeSelectionUtility.Click(settings.OptionsButton));
+                    }
+                }
+
+                return _optionsButton;
+            }
+        }
 
         public bool IsPresent()
         {

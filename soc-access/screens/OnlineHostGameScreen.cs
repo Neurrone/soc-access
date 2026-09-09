@@ -34,22 +34,17 @@ namespace SongsOfConquestAccess.Screens
         private readonly object _cancelKey = new object();
         private readonly object _confirmKey = new object();
 
-        /// <summary>After a hot reload: point the slot at the menu already showing.
-        /// Scanned once, from <c>ScreenDetector.RecoverRuntimeState</c>.</summary>
-        public static void Recover()
+        /// <summary>The same game list menu the list underneath reads
+        /// (<see cref="MenuSceneSources"/>): the popup is one of the containers that menu shows and
+        /// hides, and <c>IsPresent</c> is what says which of the two is drawing.</summary>
+        protected override object ResolveMenu()
         {
-            Recovered<OnlineHostGameScreen>(FindActive());
+            return MenuSceneSources.GameList.Current;
         }
 
-        public static OnlineHostGameAdapter FindActive()
+        protected override OnlineHostGameAdapter Adapt(object menu)
         {
-            OnlineHostGameAdapter adapter = OnlineHostGameAdapter.TryCreateActive();
-            return adapter;
-        }
-
-        public bool Matches(GameListMenu menu)
-        {
-            return Live != null && ReferenceEquals(Live.SourceKey, menu);
+            return new OnlineHostGameAdapter((GameListMenu)menu);
         }
 
         public override string Key
@@ -76,6 +71,7 @@ namespace SongsOfConquestAccess.Screens
 
         public override bool IsActive()
         {
+            SyncLive();
             return Live != null && Live.IsPresent();
         }
 

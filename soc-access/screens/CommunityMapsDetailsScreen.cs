@@ -36,17 +36,16 @@ namespace SongsOfConquestAccess.Screens
 
         private readonly Dictionary<string, object> _markers = new Dictionary<string, object>();
 
-        /// <summary>After a hot reload: point the slot at the menu already showing.
-        /// Scanned once, from <c>ScreenDetector.RecoverRuntimeState</c>.</summary>
-        public static void Recover()
+        /// <summary>The details page, read off mod.io's own singleton every frame
+        /// (<see cref="CommunityMapsSources"/>).</summary>
+        protected override object ResolveMenu()
         {
-            Recovered<CommunityMapsDetailsScreen>(FindActive());
+            return CommunityMapsSources.Details;
         }
 
-        public static CommunityMapsDetailsAdapter FindActive()
+        protected override CommunityMapsDetailsAdapter Adapt(object menu)
         {
-            CommunityMapsDetailsAdapter adapter = CommunityMapsDetailsAdapter.TryCreate();
-            return adapter != null && adapter.IsPresent() ? adapter : null;
+            return new CommunityMapsDetailsAdapter((ModIOBrowser.Implementation.Details)menu);
         }
 
         public override string Key
@@ -73,6 +72,7 @@ namespace SongsOfConquestAccess.Screens
 
         public override bool IsActive()
         {
+            SyncLive();
             return Live != null && Live.IsPresent();
         }
 

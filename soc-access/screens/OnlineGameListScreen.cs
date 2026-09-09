@@ -48,22 +48,16 @@ namespace SongsOfConquestAccess.Screens
         private readonly object _selectedMarker = new object();
         private readonly object[] _bandMarkers = { new object(), new object(), new object() };
 
-        /// <summary>After a hot reload: point the slot at the menu already showing.
-        /// Scanned once, from <c>ScreenDetector.RecoverRuntimeState</c>.</summary>
-        public static void Recover()
+        /// <summary>The one game list menu of the online game list scene, shared with the host-game
+        /// popup drawn over it (<see cref="MenuSceneSources"/>).</summary>
+        protected override object ResolveMenu()
         {
-            Recovered<OnlineGameListScreen>(FindActive());
+            return MenuSceneSources.GameList.Current;
         }
 
-        public static OnlineGameListAdapter FindActive()
+        protected override OnlineGameListAdapter Adapt(object menu)
         {
-            OnlineGameListAdapter adapter = OnlineGameListAdapter.TryCreateActive();
-            return adapter;
-        }
-
-        public bool Matches(GameListMenu menu)
-        {
-            return Live != null && ReferenceEquals(Live.SourceKey, menu);
+            return new OnlineGameListAdapter((GameListMenu)menu);
         }
 
         public override string Key
@@ -90,6 +84,7 @@ namespace SongsOfConquestAccess.Screens
 
         public override bool IsActive()
         {
+            SyncLive();
             return Live != null && Live.IsPresent();
         }
 

@@ -6,6 +6,7 @@ using HarmonyLib;
 using ModIO;
 using ModIOBrowser;
 using ModIOBrowser.Implementation;
+using SongsOfConquestAccess.Screens;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -36,7 +37,7 @@ namespace SongsOfConquestAccess.Adapters
         private readonly string _unsubscribeLabel;
         private CollectionItem _selectedItem;
 
-        private CommunityMapsCollectionAdapter(Collection collection)
+        public CommunityMapsCollectionAdapter(Collection collection)
         {
             _collection = collection;
             _browseLabel = Translate("Browse");
@@ -45,21 +46,6 @@ namespace SongsOfConquestAccess.Adapters
             _downloadsLabel = Translate("Downloads");
             _moreOptionsLabel = Translate("More options");
             _unsubscribeLabel = Translate("Unsubscribe");
-        }
-
-        public static CommunityMapsCollectionAdapter TryCreate()
-        {
-            Collection[] collections = Resources.FindObjectsOfTypeAll<Collection>();
-            for (int i = 0; i < collections.Length; i++)
-            {
-                CommunityMapsCollectionAdapter adapter = new CommunityMapsCollectionAdapter(collections[i]);
-                if (adapter.IsPresent())
-                {
-                    return adapter;
-                }
-            }
-
-            return null;
         }
 
         public bool IsPresent()
@@ -344,18 +330,14 @@ namespace SongsOfConquestAccess.Adapters
 
         private bool OpenBrowse()
         {
-            Home[] homes = Resources.FindObjectsOfTypeAll<Home>();
-            for (int i = 0; i < homes.Length; i++)
+            Home home = CommunityMapsSources.Home;
+            if (home == null || home.BrowserPanel == null)
             {
-                if (homes[i] != null && homes[i].BrowserPanel != null)
-                {
-                    homes[i].Open();
-                    SocAccessMod.Instance?.ScreenDetector?.OnCommunityMapsChanged();
-                    return true;
-                }
+                return false;
             }
 
-            return false;
+            home.Open();
+            return true;
         }
 
         private bool OpenCollection()
@@ -577,16 +559,10 @@ namespace SongsOfConquestAccess.Adapters
                 return string.Empty;
             }
 
-            NavBar[] navBars = Resources.FindObjectsOfTypeAll<NavBar>();
-            for (int navIndex = 0; navIndex < navBars.Length; navIndex++)
+            NavBar navBar = CommunityMapsSources.NavBar;
+            TMP_Text[] texts = navBar != null ? navBar.GetComponentsInChildren<TMP_Text>(false) : null;
+            if (texts != null)
             {
-                NavBar navBar = navBars[navIndex];
-                TMP_Text[] texts = navBar != null ? navBar.GetComponentsInChildren<TMP_Text>(false) : null;
-                if (texts == null)
-                {
-                    continue;
-                }
-
                 for (int i = 0; i < texts.Length; i++)
                 {
                     TMP_Text text = texts[i];
@@ -608,13 +584,13 @@ namespace SongsOfConquestAccess.Adapters
 
         private static string Translate(string key)
         {
-            TranslationManager[] managers = Resources.FindObjectsOfTypeAll<TranslationManager>();
-            if (managers.Length == 0 || string.IsNullOrWhiteSpace(key))
+            TranslationManager manager = CommunityMapsSources.Translations;
+            if (manager == null || string.IsNullOrWhiteSpace(key))
             {
                 return key ?? string.Empty;
             }
 
-            return StripTmpMarkup(managers[0].Get(key));
+            return StripTmpMarkup(manager.Get(key));
         }
 
         private static string GetText(TMP_Text text)
@@ -664,14 +640,11 @@ namespace SongsOfConquestAccess.Adapters
                 return false;
             }
 
-            if (InputNavigationType != null && InputNavigationSelectMethod != null)
+            object navigation = CommunityMapsSources.InputNavigation;
+            if (navigation != null && InputNavigationSelectMethod != null)
             {
-                UnityEngine.Object[] instances = Resources.FindObjectsOfTypeAll(InputNavigationType);
-                if (instances.Length > 0)
-                {
-                    InputNavigationSelectMethod.Invoke(instances[0], new object[] { selectable, true });
-                    return true;
-                }
+                InputNavigationSelectMethod.Invoke(navigation, new object[] { selectable, true });
+                return true;
             }
 
             selectable.Select();

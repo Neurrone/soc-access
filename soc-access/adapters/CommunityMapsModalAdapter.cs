@@ -1,9 +1,10 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Reflection;
 using HarmonyLib;
 using ModIOBrowser;
 using ModIOBrowser.Implementation;
+using SongsOfConquestAccess.Screens;
 using SongsOfConquestAccess.UI;
 using TMPro;
 using UnityEngine;
@@ -41,6 +42,48 @@ namespace SongsOfConquestAccess.Adapters
             _cachedActions = cachedActions;
         }
 
+        /// <summary>The panel the walk below would land on, and nothing more. This is what the
+        /// screen's source answers with: it changes exactly when the modal changes, so the adapter is
+        /// built once per panel rather than once per frame. Every read here is a mod.io singleton
+        /// guarded by <see cref="CommunityMapsSources"/>.</summary>
+        public static GameObject ActivePanel
+        {
+            get
+            {
+                KeyInput5DigitsUi keyInput = GetActiveKeyInput();
+                if (keyInput != null)
+                {
+                    return keyInput.gameObject;
+                }
+
+                AuthenticationPanels authPanels = GetActiveAuthenticationPanels();
+                if (authPanels != null)
+                {
+                    return authPanels.AuthenticationPanel;
+                }
+
+                ConfirmUninstallPanel confirmUninstall = GetActiveConfirmUninstallPanel();
+                if (confirmUninstall != null)
+                {
+                    return confirmUninstall.Panel;
+                }
+
+                GameObject contextMenu = GetActiveContextMenuPanel(CommunityMapsSources.ContextMenu);
+                if (contextMenu != null)
+                {
+                    return contextMenu;
+                }
+
+                GameObject downloadQueue = GetActiveDownloadQueuePanel();
+                if (downloadQueue != null)
+                {
+                    return downloadQueue;
+                }
+
+                return GetActivePanel();
+            }
+        }
+
         public static CommunityMapsModalAdapter TryCreate()
         {
             KeyInput5DigitsUi keyInput = GetActiveKeyInput();
@@ -65,7 +108,7 @@ namespace SongsOfConquestAccess.Adapters
                 return confirmUninstall;
             }
 
-            object contextMenuComponent = FindFirst("ModIOBrowser.Implementation.ModioContextMenu");
+            object contextMenuComponent = CommunityMapsSources.ContextMenu;
             GameObject contextMenu = GetActiveContextMenuPanel(contextMenuComponent);
             if (contextMenu != null)
             {
@@ -331,7 +374,7 @@ namespace SongsOfConquestAccess.Adapters
 
         private static bool CloseContextMenu()
         {
-            object contextMenu = FindFirst("ModIOBrowser.Implementation.ModioContextMenu");
+            object contextMenu = CommunityMapsSources.ContextMenu;
             MethodInfo close = contextMenu != null ? AccessTools.Method(contextMenu.GetType(), "Close") : null;
             if (close == null)
             {
@@ -344,14 +387,13 @@ namespace SongsOfConquestAccess.Adapters
 
         private static GameObject GetActivePanel()
         {
-            object contextMenuComponent = FindFirst("ModIOBrowser.Implementation.ModioContextMenu");
-            GameObject contextMenu = GetActiveContextMenuPanel(contextMenuComponent);
+            GameObject contextMenu = GetActiveContextMenuPanel(CommunityMapsSources.ContextMenu);
             if (contextMenu != null && contextMenu.activeInHierarchy)
             {
                 return contextMenu;
             }
 
-            GameObject notification = GetGameObject(FindFirst("ModIOBrowser.Implementation.NotificationPopup"));
+            GameObject notification = GetGameObject(CommunityMapsSources.NotificationPopup);
             if (notification != null && notification.activeInHierarchy)
             {
                 return notification;
@@ -381,34 +423,20 @@ namespace SongsOfConquestAccess.Adapters
                 return confirmUninstall.Panel;
             }
 
-            Reporting[] reports = Resources.FindObjectsOfTypeAll<Reporting>();
-            for (int i = 0; i < reports.Length; i++)
-            {
-                Reporting report = reports[i];
-                if (report != null && report.Panel != null && report.Panel.activeInHierarchy)
-                {
-                    return report.Panel;
-                }
-            }
-
-            return null;
+            Reporting report = CommunityMapsSources.Reporting;
+            return report != null && report.Panel != null && report.Panel.activeInHierarchy
+                ? report.Panel
+                : null;
         }
 
         private static ConfirmUninstallPanel GetActiveConfirmUninstallPanel()
         {
-            Collection[] collections = Resources.FindObjectsOfTypeAll<Collection>();
-            for (int i = 0; i < collections.Length; i++)
-            {
-                Collection collection = collections[i];
-                if (collection != null
-                    && collection.uninstallConfirmationPanel != null
-                    && collection.uninstallConfirmationPanel.activeInHierarchy)
-                {
-                    return new ConfirmUninstallPanel(collection, collection.uninstallConfirmationPanel);
-                }
-            }
-
-            return null;
+            Collection collection = CommunityMapsSources.Collection;
+            return collection != null
+                && collection.uninstallConfirmationPanel != null
+                && collection.uninstallConfirmationPanel.activeInHierarchy
+                    ? new ConfirmUninstallPanel(collection, collection.uninstallConfirmationPanel)
+                    : null;
         }
 
         private static IReadOnlyList<TextItem> GetConfirmUninstallTexts(ConfirmUninstallPanel confirmUninstall)
@@ -538,16 +566,8 @@ namespace SongsOfConquestAccess.Adapters
 
         private static KeyInput5DigitsUi GetActiveKeyInput()
         {
-            KeyInput5DigitsUi[] keyInputs = Resources.FindObjectsOfTypeAll<KeyInput5DigitsUi>();
-            for (int i = 0; i < keyInputs.Length; i++)
-            {
-                if (keyInputs[i] != null && keyInputs[i].gameObject.activeInHierarchy)
-                {
-                    return keyInputs[i];
-                }
-            }
-
-            return null;
+            KeyInput5DigitsUi keyInput = CommunityMapsSources.KeyInput;
+            return keyInput != null && keyInput.gameObject.activeInHierarchy ? keyInput : null;
         }
 
         private static KeyInput5DigitsUi GetKeyInput(GameObject panel)
@@ -574,19 +594,12 @@ namespace SongsOfConquestAccess.Adapters
 
         private static GameObject GetActiveDownloadQueuePanel()
         {
-            DownloadQueue[] queues = Resources.FindObjectsOfTypeAll<DownloadQueue>();
-            for (int i = 0; i < queues.Length; i++)
-            {
-                DownloadQueue queue = queues[i];
-                if (queue != null
-                    && queue.DownloadQueuePanel != null
-                    && queue.DownloadQueuePanel.activeInHierarchy)
-                {
-                    return queue.DownloadQueuePanel;
-                }
-            }
-
-            return null;
+            DownloadQueue queue = CommunityMapsSources.DownloadQueue;
+            return queue != null
+                && queue.DownloadQueuePanel != null
+                && queue.DownloadQueuePanel.activeInHierarchy
+                    ? queue.DownloadQueuePanel
+                    : null;
         }
 
         private IReadOnlyList<TextItem> GetDownloadQueueTexts()
@@ -644,22 +657,8 @@ namespace SongsOfConquestAccess.Adapters
 
         private static DownloadQueue GetDownloadQueueForPanel(GameObject panel)
         {
-            if (panel == null)
-            {
-                return null;
-            }
-
-            DownloadQueue[] queues = Resources.FindObjectsOfTypeAll<DownloadQueue>();
-            for (int i = 0; i < queues.Length; i++)
-            {
-                DownloadQueue queue = queues[i];
-                if (queue != null && queue.DownloadQueuePanel == panel)
-                {
-                    return queue;
-                }
-            }
-
-            return null;
+            DownloadQueue queue = CommunityMapsSources.DownloadQueue;
+            return panel != null && queue != null && queue.DownloadQueuePanel == panel ? queue : null;
         }
 
         private static void AddHeadingAndBody(List<TextItem> result, TMP_Text heading, GameObject bodyRoot)
@@ -904,29 +903,12 @@ namespace SongsOfConquestAccess.Adapters
 
         private static AuthenticationPanels GetActiveAuthenticationPanels()
         {
-            AuthenticationPanels[] authPanels = Resources.FindObjectsOfTypeAll<AuthenticationPanels>();
-            for (int i = 0; i < authPanels.Length; i++)
-            {
-                AuthenticationPanels panels = authPanels[i];
-                if (panels != null && panels.AuthenticationPanel != null && panels.AuthenticationPanel.activeInHierarchy)
-                {
-                    return panels;
-                }
-            }
-
-            return null;
-        }
-
-        private static object FindFirst(string typeName)
-        {
-            Type type = AccessTools.TypeByName(typeName);
-            if (type == null)
-            {
-                return null;
-            }
-
-            UnityEngine.Object[] objects = Resources.FindObjectsOfTypeAll(type);
-            return objects.Length > 0 ? objects[0] : null;
+            AuthenticationPanels panels = CommunityMapsSources.AuthenticationPanels;
+            return panels != null
+                && panels.AuthenticationPanel != null
+                && panels.AuthenticationPanel.activeInHierarchy
+                    ? panels
+                    : null;
         }
 
         private static GameObject GetActiveContextMenuPanel(object contextMenu)

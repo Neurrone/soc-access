@@ -61,10 +61,10 @@ namespace SongsOfConquestAccess.Adapters
         private readonly LobbyNavigation _navigation;
         private readonly ILocalizationHandler _localization;
 
-        public AdventureLobbyRandomLayoutAdapter(LobbyRandomMapSelectionMenu menu)
+        public AdventureLobbyRandomLayoutAdapter(LobbyRandomMapSelectionMenu menu, LobbyNavigation navigation)
         {
             _menu = menu;
-            _navigation = FindNavigationFor(menu);
+            _navigation = navigation;
             _localization = menu != null ? LocalizationRef(menu) : GlobalLocalizationVariables.LocalizationHandler;
 
             ConfirmButton = CreateConfirmButton();
@@ -212,32 +212,6 @@ namespace SongsOfConquestAccess.Adapters
             return item != null && item.Entry != null ? ((Component)item.Entry).transform.GetSiblingIndex() : int.MaxValue;
         }
 
-        private static LobbyNavigation FindNavigationFor(LobbyRandomMapSelectionMenu menu)
-        {
-            if (menu == null)
-            {
-                return null;
-            }
-
-            GameObject menuObject = ((Component)menu).gameObject;
-            LobbyNavigation[] navigations = Resources.FindObjectsOfTypeAll<LobbyNavigation>();
-            for (int i = 0; i < navigations.Length; i++)
-            {
-                LobbyNavigation navigation = navigations[i];
-                if (navigation == null)
-                {
-                    continue;
-                }
-
-                GameObject navigationObject = ((Component)navigation).gameObject;
-                if (IsLiveSceneObject(navigationObject) && navigationObject.scene == menuObject.scene)
-                {
-                    return navigation;
-                }
-            }
-
-            return null;
-        }
 
         private static bool IsLoadedMainMenuScene(MainMenuSceneType sceneType)
         {

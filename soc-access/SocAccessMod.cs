@@ -54,13 +54,15 @@ namespace SongsOfConquestAccess
         private AdventureMapScannerState _adventureMapScannerState;
         private ScreenManager _screenManager;
         private GraphNavigator _navigator;
-        private ScreenDetector _screenDetector;
         private AccessibilityInputRouter _inputRouter;
         private ILocalizationHandler _localizationHandler;
         private ModRoutes _modRoutes;
         private bool _speechAvailable;
         private bool _announcedReady;
         private bool _reportedLocalizationUnavailable;
+        // Mod-owned state that outlives every menu: whether the game was at the main menu on the
+        // previous frame, so the adventure's buffers are cleared once on arrival there.
+        private readonly Adapters.MainMenuArrival _mainMenuArrival = new Adapters.MainMenuArrival();
 
         public void Start()
         {
@@ -83,7 +85,6 @@ namespace SongsOfConquestAccess
             _navigator = new GraphNavigator();
             _screenManager = new ScreenManager(_navigator, _reviewBufferManager, _reviewBufferController);
             RegisterScreens(_screenManager);
-            _screenDetector = new ScreenDetector(_screenManager);
             // One door for the drawn entries and for Ctrl+M alike; the manager itself gains nothing.
             Adapters.ModOptionsEntries.Open = OpenModOptions;
             _inputRouter = new AccessibilityInputRouter(_screenManager);
@@ -105,10 +106,9 @@ namespace SongsOfConquestAccess
             }
             AttachLocalizationHandler();
             TryAnnounceReady();
-            // Before the resync: a screen rebuilt from runtime state lists the mod's drawn entries
-            // only if they are already there, and a hot reload has just destroyed the old load's.
+            // The mod's drawn entries are put back before the first tick: a hot reload has just
+            // destroyed the old load's, and a screen that lists them builds on the next frame.
             Adapters.ModOptionsEntries.Tick();
-            _screenDetector?.RecoverRuntimeState();
             _host.SetUpdateHandler(Update);
         }
 
@@ -120,7 +120,6 @@ namespace SongsOfConquestAccess
             Step("update handler", () => _host.SetUpdateHandler(null));
             Step("routes", _host.UnregisterAllModRoutes);
             Step("coroutines", _host.StopAllCoroutines);
-            Step("main menu waits", MainMenuPatches.Reset);
             Step("mod options entries", Adapters.ModOptionsEntries.Remove);
             Step("mod dialogs", UI.ModDialog.CloseAll);
             Step("screens", () => _screenManager?.Shutdown());
@@ -136,8 +135,6 @@ namespace SongsOfConquestAccess
             Step("beacon audio", AdventureBeaconAudio.DisposeAll);
             Step("synth audio", SynthCuePlayer.DisposeAll);
             Step("sweep audio", SweepPlayer.DisposeAll);
-            Step("campaign notifiers", CampaignMenuLifetimeNotifier.DetachAll);
-            Step("tale notifiers", Adapters.TaleSelectLifetimeNotifier.DetachAll);
             Step("Harmony", () => _harmony?.UnpatchSelf());
             _harmony = null;
             Step("input", () => _inputRouter?.Dispose());
@@ -149,12 +146,12 @@ namespace SongsOfConquestAccess
             });
             _localizationHandler = null;
             Step("translations", ModTranslationLoader.Reset);
-            _screenDetector = null;
             _screenManager = null;
             Step("story camera", StoryCameraFocusPatches.ResetDedupe);
             Step("combat", CombatPatches.Reset);
             Step("chat", Screens.ChatSource.Reset);
             Step("tooltips", TooltipPatches.Reset);
+            Step("community maps keys", CommunityMapsFiveDigitInputDuplicateKeyPatches.Reset);
             Step("buffer recorder", () => _bufferEventRecorder?.Detach());
             _bufferEventRecorder = null;
             Step("speech announcer", () => _speechEventAnnouncer?.Detach());
@@ -291,11 +288,26 @@ namespace SongsOfConquestAccess
         {
             AttachLocalizationHandler();
             Adapters.ModOptionsEntries.Tick();
-            _screenDetector?.Update();
-            // Readiness, then who the player is on, then the keys: a screen the detector has just
-            // been told about is focused in the same frame, before any key reaches it.
+            ClearAdventureStateOnMainMenuArrival();
+            // Who the player is on, then the keys: every screen resolves its own menu from the game
+            // inside the tick, so a page the game has just put up is focused before any key reaches
+            // it.
             _screenManager?.Tick();
             _inputRouter?.Update();
+        }
+
+        /// <summary>The adventure map's notification review buffer and the scanner's state describe
+        /// a game that is over once the main menu is up, and nothing in the game clears them. The
+        /// arrival is read from the game's own scene loader rather than from a hook.</summary>
+        private void ClearAdventureStateOnMainMenuArrival()
+        {
+            if (!_mainMenuArrival.Arrived())
+            {
+                return;
+            }
+
+            _reviewBufferManager?.Clear(ReviewBufferKind.AdventureMapNotifications);
+            _adventureMapScannerState?.Clear();
         }
 
         /// <summary>Whether the speech backend came up. Reported by GET /status, where a silent
@@ -303,11 +315,6 @@ namespace SongsOfConquestAccess
         public bool SpeechAvailable
         {
             get { return _speechAvailable; }
-        }
-
-        public ScreenDetector ScreenDetector
-        {
-            get { return _screenDetector; }
         }
 
         public AccessibilityInputRouter InputRouter

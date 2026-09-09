@@ -1,6 +1,8 @@
 using System.Collections.Generic;
+using System.Reflection;
 using HarmonyLib;
 using SongsOfConquest.Client.Menu;
+using SongsOfConquest.Client.Menu.Loading;
 using SongsOfConquest.Client.UI;
 using SongsOfConquestAccess.UI;
 using UnityEngine;
@@ -14,6 +16,15 @@ namespace SongsOfConquestAccess.Adapters
 
         private static readonly AccessTools.FieldRef<LoadingBarVisuals, UITextMesh> LoadingBarTextRef =
             AccessTools.FieldRefAccess<LoadingBarVisuals, UITextMesh>("_loadingText");
+
+        private static readonly AccessTools.FieldRef<LoadingScreenMenu, ISceneLoader> SceneLoaderRef =
+            AccessTools.FieldRefAccess<LoadingScreenMenu, ISceneLoader>("_sceneLoader");
+
+        private static readonly AccessTools.FieldRef<LoadingScreenMenu, bool> IsFinalizingRef =
+            AccessTools.FieldRefAccess<LoadingScreenMenu, bool>("_isFinalizing");
+
+        private static readonly MethodInfo FinalizeMethod =
+            AccessTools.Method(typeof(LoadingScreenMenu), "FinalizeLoadingScreen");
 
         private readonly LoadingScreenMenu _menu;
 
@@ -91,31 +102,26 @@ namespace SongsOfConquestAccess.Adapters
         // for finalization. Invoking the same method is the native path minus the key.
         public bool Continue()
         {
-            if (!IsPresent())
+            if (!IsPresent() || FinalizeMethod == null)
             {
                 return false;
             }
 
-            object sceneLoader = AccessTools.Field(typeof(LoadingScreenMenu), "_sceneLoader")?.GetValue(_menu);
-            object state = sceneLoader != null ? Traverse.Create(sceneLoader).Property("State").GetValue() : null;
-            if (state == null || state.ToString() != "WaitingForFinalization")
-            {
-                return false;
-            }
-
-            System.Reflection.MethodInfo finalize = AccessTools.Method(typeof(LoadingScreenMenu), "FinalizeLoadingScreen");
-            if (finalize == null)
-            {
-                return false;
-            }
-
-            finalize.Invoke(_menu, null);
+            FinalizeMethod.Invoke(_menu, null);
             return true;
         }
 
+        /// <summary>The page as the game leaves it while it waits for a key, which is the only state
+        /// this screen describes. The scene loader is at <c>WaitingForFinalization</c> and the menu
+        /// has not begun dismissing itself, and the prompt the menu writes there
+        /// ("Common/LoadingMenu/PressAnyKeyToContinue") is drawn - the multiplayer branch of
+        /// <c>HandleWaitForFinalizationEntered</c> writes a waiting line instead and no prompt, so it
+        /// reads as absent. Pressing continue sets <c>_isFinalizing</c> for the half-second fade
+        /// before the scene unloads, which is what takes the page away here, as the deleted
+        /// <c>FinalizeLoadingScreen</c> hook used to.</summary>
         public bool IsPresent()
         {
-            if (_menu == null || !_menu.Active)
+            if (_menu == null || !_menu.Active || !IsWaitingForKey())
             {
                 return false;
             }
@@ -126,6 +132,17 @@ namespace SongsOfConquestAccess.Adapters
                 && gameObject.scene.isLoaded
                 && gameObject.activeInHierarchy
                 && !string.IsNullOrWhiteSpace(PromptText);
+        }
+
+        private bool IsWaitingForKey()
+        {
+            if (_menu == null || IsFinalizingRef(_menu))
+            {
+                return false;
+            }
+
+            ISceneLoader sceneLoader = SceneLoaderRef(_menu);
+            return sceneLoader != null && sceneLoader.State == SceneLoaderState.WaitingForFinalization;
         }
 
         private UITextMesh GetPromptTextMesh()

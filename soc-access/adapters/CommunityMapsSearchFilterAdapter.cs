@@ -6,6 +6,7 @@ using System.Text;
 using HarmonyLib;
 using ModIOBrowser;
 using ModIOBrowser.Implementation;
+using SongsOfConquestAccess.Screens;
 using SongsOfConquestAccess.Localization;
 using TMPro;
 using UnityEngine;
@@ -28,30 +29,10 @@ namespace SongsOfConquestAccess.Adapters
         private readonly object _searchPanel;
         private readonly string _title;
 
-        private CommunityMapsSearchFilterAdapter(object searchPanel)
+        public CommunityMapsSearchFilterAdapter(object searchPanel)
         {
             _searchPanel = searchPanel;
             _title = FindTopBarText("Search & filter");
-        }
-
-        public static CommunityMapsSearchFilterAdapter TryCreate()
-        {
-            if (SearchPanelType == null)
-            {
-                return null;
-            }
-
-            UnityEngine.Object[] panels = Resources.FindObjectsOfTypeAll(SearchPanelType);
-            for (int i = 0; i < panels.Length; i++)
-            {
-                CommunityMapsSearchFilterAdapter adapter = new CommunityMapsSearchFilterAdapter(panels[i]);
-                if (adapter.IsPresent())
-                {
-                    return adapter;
-                }
-            }
-
-            return null;
         }
 
         public bool IsPresent()
@@ -392,15 +373,10 @@ namespace SongsOfConquestAccess.Adapters
                 return string.Empty;
             }
 
-            NavBar[] navBars = Resources.FindObjectsOfTypeAll<NavBar>();
-            for (int navIndex = 0; navIndex < navBars.Length; navIndex++)
+            NavBar navBar = CommunityMapsSources.NavBar;
+            TMP_Text[] texts = navBar != null ? navBar.GetComponentsInChildren<TMP_Text>(false) : null;
+            if (texts != null)
             {
-                TMP_Text[] texts = navBars[navIndex] != null ? navBars[navIndex].GetComponentsInChildren<TMP_Text>(false) : null;
-                if (texts == null)
-                {
-                    continue;
-                }
-
                 for (int i = 0; i < texts.Length; i++)
                 {
                     TMP_Text text = texts[i];

@@ -251,7 +251,10 @@ namespace SongsOfConquestAccess.Screens
 
             ScreenManager screens = SocAccessMod.Instance == null ? null : SocAccessMod.Instance.ScreenManager;
             LoadingCompleteScreen loading = screens == null ? null : screens.Registered<LoadingCompleteScreen>();
-            return loading == null || loading.Live == null;
+            // Whether the loading screen is SHOWING, not whether its menu exists: the loading scene's
+            // menu is now resolved for as long as that scene is loaded, and the map comes back when
+            // the prompt is answered rather than when the scene finally unloads.
+            return loading == null || !loading.IsActive();
         }
 
         /// <summary>The cursor survives the story gap and the loading screen, which are the only two

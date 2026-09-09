@@ -124,6 +124,8 @@ namespace SongsOfConquestAccess.Tests.Lint
         private static readonly Dictionary<string, string[]> LineCache =
             new Dictionary<string, string[]>(StringComparer.Ordinal);
 
+        private static readonly string[] Empty = new string[0];
+
         public static string[] Lines(string relativePath)
         {
             lock (LineCache)
@@ -131,9 +133,11 @@ namespace SongsOfConquestAccess.Tests.Lint
                 string[] lines;
                 if (!LineCache.TryGetValue(relativePath, out lines))
                 {
-                    lines = File.ReadAllLines(Path.Combine(
-                        RepoRoot(),
-                        relativePath.Replace('/', Path.DirectorySeparatorChar)));
+                    // A file a rule names may be gone - the detector file went when the last screen
+                    // stopped being hook-fed. A file that is not there holds no sites, which is what
+                    // an empty answer says; a rule that needs the file to exist says so itself.
+                    string path = Path.Combine(RepoRoot(), relativePath.Replace('/', Path.DirectorySeparatorChar));
+                    lines = File.Exists(path) ? File.ReadAllLines(path) : Empty;
                     LineCache[relativePath] = lines;
                 }
 

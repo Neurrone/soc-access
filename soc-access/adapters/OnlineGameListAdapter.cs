@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Reflection;
 using HarmonyLib;
@@ -30,8 +30,6 @@ namespace SongsOfConquestAccess.Adapters
             AccessTools.FieldRefAccess<GameListMenu, List<GameListEntry>>("_activeEntries");
         private static readonly AccessTools.FieldRef<MainMenuManager, MainMenuManager.Settings> MainMenuSettingsRef =
             AccessTools.FieldRefAccess<MainMenuManager, MainMenuManager.Settings>("_settings");
-        private static readonly FieldInfo InstallerSettingsField =
-            AccessTools.Field(typeof(GameListMenuInstaller), "_settings");
         private static readonly MethodInfo DropdownGetTextMethod =
             AccessTools.Method(typeof(UITextMeshDropdown), "GetText");
 
@@ -46,18 +44,11 @@ namespace SongsOfConquestAccess.Adapters
         private bool _nativeRegionDropdownProbed;
 
         public OnlineGameListAdapter(GameListMenu menu)
-            : this(
-                menu,
-                menu != null ? SettingsRef(menu) : null,
-                menu != null ? LocalizationRef(menu) : GlobalLocalizationVariables.LocalizationHandler)
-        {
-        }
-
-        private OnlineGameListAdapter(GameListMenu menu, GameListMenu.Settings settings, ILocalizationHandler localization)
         {
             _menu = menu;
+            GameListMenu.Settings settings = menu != null ? SettingsRef(menu) : null;
             _settings = settings;
-            _localization = localization ?? GlobalLocalizationVariables.LocalizationHandler;
+            _localization = (menu != null ? LocalizationRef(menu) : null) ?? GlobalLocalizationVariables.LocalizationHandler;
 
             HostGameButton = CreateButton(settings != null ? settings.HostGameButton : null);
             HostSavedGameButton = CreateButton(settings != null ? settings.HostSavedGameButton : null);
@@ -65,11 +56,6 @@ namespace SongsOfConquestAccess.Adapters
             JoinSelectedButton = CreateButton(settings != null ? settings.JoinSelectedButton : null);
             BackButton = CreateBackButton();
             OptionsButton = CreateOptionsButton();
-        }
-
-        public object SourceKey
-        {
-            get { return _menu ?? (object)_settings; }
         }
 
         public IMenuButtonAdapter HostGameButton { get; private set; }
@@ -83,30 +69,6 @@ namespace SongsOfConquestAccess.Adapters
         public IMenuButtonAdapter BackButton { get; private set; }
 
         public IMenuButtonAdapter OptionsButton { get; private set; }
-
-        public static OnlineGameListAdapter TryCreateActive()
-        {
-            GameListMenuInstaller[] installers = Resources.FindObjectsOfTypeAll<GameListMenuInstaller>();
-            for (int i = 0; i < installers.Length; i++)
-            {
-                GameListMenuInstaller installer = installers[i];
-                if (installer == null || !IsLiveSceneObject(((Component)installer).gameObject))
-                {
-                    continue;
-                }
-
-                GameListMenu.Settings settings = InstallerSettingsField != null
-                    ? InstallerSettingsField.GetValue(installer) as GameListMenu.Settings
-                    : null;
-                OnlineGameListAdapter adapter = new OnlineGameListAdapter(null, settings, GlobalLocalizationVariables.LocalizationHandler);
-                if (adapter.IsPresent())
-                {
-                    return adapter;
-                }
-            }
-
-            return null;
-        }
 
         public bool IsPresent()
         {
@@ -241,6 +203,11 @@ namespace SongsOfConquestAccess.Adapters
             }
         }
 
+        /// <summary>The games the list is drawing, read from the menu's own <c>_activeEntries</c> every
+        /// call. Nothing is cached here, so nothing has to be dropped: the detector's
+        /// <c>OnOnlineGameListChanged</c> pulse, which fired on every list update, selection and region
+        /// change, existed only to replace an adapter built over the installer's settings with one
+        /// built over the menu, and the source hands the menu itself now.</summary>
         public IReadOnlyList<GameRow> GetRows()
         {
             List<GameListEntry> entries = GetVisibleEntries();
@@ -262,25 +229,9 @@ namespace SongsOfConquestAccess.Adapters
         {
             List<GameListEntry> result = new List<GameListEntry>();
             List<GameListEntry> activeEntries = _menu != null ? ActiveEntriesRef(_menu) : null;
-            if (activeEntries != null)
+            for (int i = 0; activeEntries != null && i < activeEntries.Count; i++)
             {
-                for (int i = 0; i < activeEntries.Count; i++)
-                {
-                    AddIfVisible(result, activeEntries[i]);
-                }
-            }
-            else
-            {
-                Transform parent = _settings != null && _settings.EntryParent != null
-                    ? _settings.EntryParent.MonoTransform
-                    : null;
-                if (parent != null)
-                {
-                    foreach (Transform child in parent)
-                    {
-                        AddIfVisible(result, child != null ? child.GetComponent<GameListEntry>() : null);
-                    }
-                }
+                AddIfVisible(result, activeEntries[i]);
             }
 
             result.Sort(CompareVisualOrder);

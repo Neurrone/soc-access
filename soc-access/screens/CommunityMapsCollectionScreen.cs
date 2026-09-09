@@ -44,19 +44,17 @@ namespace SongsOfConquestAccess.Screens
         private readonly GameTextEditor _editor = new GameTextEditor();
         private readonly Dictionary<string, object> _markers = new Dictionary<string, object>();
 
-        /// <summary>After a hot reload: point the slot at the menu already showing.
-        /// Scanned once, from <c>ScreenDetector.RecoverRuntimeState</c>.</summary>
-        public static void Recover()
+        /// <summary>The Collection page, read off mod.io's own singleton every frame
+        /// (<see cref="CommunityMapsSources"/>). Whether it is the page SHOWING is the adapter's
+        /// <c>IsPresent</c>, which reads the panel's own active state.</summary>
+        protected override object ResolveMenu()
         {
-            Recovered<CommunityMapsCollectionScreen>(FindActive());
+            return CommunityMapsSources.Collection;
         }
 
-        public static CommunityMapsCollectionAdapter FindActive()
+        protected override CommunityMapsCollectionAdapter Adapt(object menu)
         {
-            CommunityMapsCollectionAdapter adapter = CommunityMapsCollectionAdapter.TryCreate();
-            return adapter != null && adapter.IsPresent()
-                ? (adapter)
-                : null;
+            return new CommunityMapsCollectionAdapter((ModIOBrowser.Implementation.Collection)menu);
         }
 
         public override string Key
@@ -83,6 +81,7 @@ namespace SongsOfConquestAccess.Screens
 
         public override bool IsActive()
         {
+            SyncLive();
             return Live != null && Live.IsPresent();
         }
 
@@ -106,13 +105,6 @@ namespace SongsOfConquestAccess.Screens
         public override bool OwnsGameField
         {
             get { return _editor.Pending || _editor.Editing; }
-        }
-
-        /// <summary>Asked by the detector before it refreshes the page. The keyword box is the one
-        /// thing here that must not be disturbed mid-edit.</summary>
-        public bool IsSearchInputFocused()
-        {
-            return _editor.Pending || _editor.Editing;
         }
 
         public override void OnUpdate()

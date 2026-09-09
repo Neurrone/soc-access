@@ -65,22 +65,15 @@ namespace SongsOfConquestAccess.Screens
         // cursor on the same node while the selection under it changes.
         private readonly object _detailsMarker = new object();
 
-        /// <summary>After a hot reload: point the slot at the menu already showing.
-        /// Scanned once, from <c>ScreenDetector.RecoverRuntimeState</c>.</summary>
-        public static void Recover()
+        /// <summary>The lobby navigator's own map select page (<see cref="LobbySources"/>).</summary>
+        protected override object ResolveMenu()
         {
-            Recovered<AdventureLobbyMapSelectScreen>(FindActive());
+            return LobbySources.MapSelect.Current;
         }
 
-        public static AdventureLobbyMapSelectAdapter FindActive()
+        protected override AdventureLobbyMapSelectAdapter Adapt(object menu)
         {
-            AdventureLobbyMapSelectAdapter adapter = FindActiveMapSelectMenu(null);
-            return adapter;
-        }
-
-        public bool Matches(MapSelectMenu menu)
-        {
-            return Live != null && ReferenceEquals(Live.SourceKey, menu);
+            return new AdventureLobbyMapSelectAdapter((MapSelectMenu)menu, LobbySources.Navigation.Current);
         }
 
         public override string Key
@@ -110,6 +103,7 @@ namespace SongsOfConquestAccess.Screens
 
         public override bool IsActive()
         {
+            SyncLive();
             return Live != null && Live.IsPresent();
         }
 
@@ -524,43 +518,6 @@ namespace SongsOfConquestAccess.Screens
         private static T At<T>(IReadOnlyList<T> items, int index) where T : class
         {
             return items != null && index >= 0 && index < items.Count ? items[index] : null;
-        }
-
-        public static AdventureLobbyMapSelectAdapter FindActiveMapSelectMenu(MapSelectMenu targetMenu)
-        {
-            MapSelectMenu[] menus = Resources.FindObjectsOfTypeAll<MapSelectMenu>();
-            for (int i = 0; i < menus.Length; i++)
-            {
-                MapSelectMenu menu = menus[i];
-                if (!IsLiveSceneMapSelectMenu(menu))
-                {
-                    continue;
-                }
-
-                if (targetMenu != null && !ReferenceEquals(targetMenu, menu))
-                {
-                    continue;
-                }
-
-                AdventureLobbyMapSelectAdapter adapter = new AdventureLobbyMapSelectAdapter(menu);
-                if (adapter.IsPresent())
-                {
-                    return adapter;
-                }
-            }
-
-            return null;
-        }
-
-        private static bool IsLiveSceneMapSelectMenu(MapSelectMenu menu)
-        {
-            if (menu == null)
-            {
-                return false;
-            }
-
-            GameObject gameObject = ((Component)menu).gameObject;
-            return gameObject != null && gameObject.scene.IsValid() && gameObject.scene.isLoaded;
         }
     }
 }

@@ -1,11 +1,8 @@
-using System.Reflection;
-using HarmonyLib;
 using SongsOfConquest.Client.Menu;
 using SongsOfConquestAccess.Adapters;
 using SongsOfConquestAccess.UI;
 using SongsOfConquestAccess.UI.Graph;
 using UnityEngine;
-using Zenject;
 
 namespace SongsOfConquestAccess.Screens
 {
@@ -32,42 +29,22 @@ namespace SongsOfConquestAccess.Screens
     {
         private const string RowsStop = "loading-complete";
 
-        private static readonly PropertyInfo InstallerContainerProperty =
-            AccessTools.Property(typeof(LoadingScreenMenuInstaller), "Container");
-
         // A subject of its own for each row, because the reconciler seats the cursor by SUBJECT before
         // it looks at the structural key and the two rows would otherwise collapse onto one another
         // when the page draws no tip (the rule the message dialog's port established).
         private readonly object _tipKey = new object();
         private readonly object _promptKey = new object();
 
-        /// <summary>After a hot reload: point the slot at the menu already showing.
-        /// Scanned once, from <c>ScreenDetector.RecoverRuntimeState</c>.</summary>
-        public static void Recover()
+        /// <summary>The loading screen's own menu, bound into a <c>GameObjectContext</c> of the scene
+        /// the load puts up over everything else (<see cref="MenuSceneSources"/>).</summary>
+        protected override object ResolveMenu()
         {
-            Recovered<LoadingCompleteScreen>(FindActive());
+            return MenuSceneSources.LoadingScreen.Current;
         }
 
-        public static LoadingScreenAdapter FindActive()
+        protected override LoadingScreenAdapter Adapt(object menu)
         {
-            LoadingScreenMenuInstaller[] installers = Resources.FindObjectsOfTypeAll<LoadingScreenMenuInstaller>();
-            for (int i = 0; i < installers.Length; i++)
-            {
-                LoadingScreenMenuInstaller installer = installers[i];
-                if (!IsLiveSceneInstaller(installer))
-                {
-                    continue;
-                }
-
-                LoadingScreenMenu menu = TryResolve<LoadingScreenMenu>(GetContainer(installer));
-                LoadingScreenAdapter adapter = new LoadingScreenAdapter(menu);
-                if (adapter.IsPresent())
-                {
-                    return (adapter);
-                }
-            }
-
-            return null;
+            return new LoadingScreenAdapter((LoadingScreenMenu)menu);
         }
 
         public LoadingScreenAdapter Adapter
@@ -88,6 +65,7 @@ namespace SongsOfConquestAccess.Screens
 
         public override bool IsActive()
         {
+            SyncLive();
             return Live != null && Live.IsPresent();
         }
 
@@ -134,44 +112,6 @@ namespace SongsOfConquestAccess.Screens
             return drawnBy != null
                 ? (NodeDeclaration)new DrawnNode(id, vtable, drawnBy)
                 : new SyntheticNode(id, vtable);
-        }
-
-        private static bool IsLiveSceneInstaller(LoadingScreenMenuInstaller installer)
-        {
-            if (installer == null)
-            {
-                return false;
-            }
-
-            GameObject gameObject = installer.gameObject;
-            return gameObject != null && gameObject.scene.IsValid() && gameObject.scene.isLoaded;
-        }
-
-        private static DiContainer GetContainer(LoadingScreenMenuInstaller installer)
-        {
-            if (installer == null || InstallerContainerProperty == null)
-            {
-                return null;
-            }
-
-            return InstallerContainerProperty.GetValue(installer, null) as DiContainer;
-        }
-
-        private static T TryResolve<T>(DiContainer container) where T : class
-        {
-            if (container == null)
-            {
-                return null;
-            }
-
-            try
-            {
-                return container.Resolve<T>();
-            }
-            catch (System.Exception)
-            {
-                return null;
-            }
         }
     }
 }

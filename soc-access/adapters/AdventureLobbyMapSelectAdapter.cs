@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Reflection;
 using HarmonyLib;
@@ -125,10 +125,10 @@ namespace SongsOfConquestAccess.Adapters
         private LobbyMapSelectMenuEntry _selectedEntry;
         private AdventureLobbyMapSelectRowAdapter _selectedRow;
 
-        public AdventureLobbyMapSelectAdapter(MapSelectMenu menu)
+        public AdventureLobbyMapSelectAdapter(MapSelectMenu menu, LobbyNavigation navigation)
         {
             _menu = menu;
-            _navigation = FindNavigationFor(menu);
+            _navigation = navigation;
             _localization = menu != null ? LocalizationRef(menu) : GlobalLocalizationVariables.LocalizationHandler;
 
             _sortButtons = menu != null
@@ -597,32 +597,6 @@ namespace SongsOfConquestAccess.Adapters
             return SpokenLines.Clean(GameText.Get(_localization, key, fallback ?? string.Empty));
         }
 
-        private static LobbyNavigation FindNavigationFor(MapSelectMenu menu)
-        {
-            if (menu == null)
-            {
-                return null;
-            }
-
-            GameObject menuObject = ((Component)menu).gameObject;
-            LobbyNavigation[] navigations = Resources.FindObjectsOfTypeAll<LobbyNavigation>();
-            for (int i = 0; i < navigations.Length; i++)
-            {
-                LobbyNavigation navigation = navigations[i];
-                if (navigation == null)
-                {
-                    continue;
-                }
-
-                GameObject navigationObject = ((Component)navigation).gameObject;
-                if (IsLiveSceneObject(navigationObject) && navigationObject.scene == menuObject.scene)
-                {
-                    return navigation;
-                }
-            }
-
-            return null;
-        }
 
         private static bool IsLiveSceneObject(GameObject gameObject)
         {

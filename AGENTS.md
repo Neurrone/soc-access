@@ -104,6 +104,18 @@ signal:
   menu-scene objects (main menu, campaign menu, tale select, lobby, game list, player stats),
   gated to the scenes that can hold them; about 3.5 ms on the adventure scene, so never there.
 
+One family does not use `ScreenSource<T>` at all, and the reason is a lifetime the memo cannot
+see: mod.io's community-maps browser is a prefab instantiated into the scene already loaded, so
+it opens and closes without the scene set changing, and a source over it would cache "closed" for
+the session. Its six screens read their panel from mod.io's own singletons every frame
+(`CommunityMapsSources`), which is a static field access and needs no memo. `Browser.IsOpen` is
+asked first and `SingletonIsInstantiated()` second, because a `SelfInstancingMonoSingleton`
+CREATES its object when asked for `Instance`.
+
+Nothing tells a screen when its menu is ready any more: the readiness layer
+(`ScreenDetector`) is gone, and so is the hot-reload scan it ran. A reload starts every source
+with no memo, so the first tick resolves as first entry does.
+
 Readiness is read from the game: `IsPresent` gates on the end state the menu's own coroutine
 leaves behind (a title set, a canvas alpha at 1, buttons activated, entries instantiated), never
 on the object merely existing. Readiness hooks are forbidden; the four menus once thought to

@@ -1,7 +1,4 @@
-using System;
 using System.Collections.Generic;
-using System.Reflection;
-using HarmonyLib;
 using SongsOfConquest.Client.Menu;
 using SongsOfConquest.Client.UI;
 using SongsOfConquestAccess.Adapters;
@@ -9,7 +6,6 @@ using SongsOfConquestAccess.Localization;
 using SongsOfConquestAccess.UI;
 using SongsOfConquestAccess.UI.Graph;
 using UnityEngine;
-using Zenject;
 
 namespace SongsOfConquestAccess.Screens
 {
@@ -46,70 +42,30 @@ namespace SongsOfConquestAccess.Screens
         private const string DifficultyStop = "campaign-map-difficulty";
         private const string ButtonsStop = "campaign-map-buttons";
 
-        private static readonly PropertyInfo InstallerContainerProperty =
-            AccessTools.Property(typeof(CampaignMapSelectMenuInstaller), "Container");
-
-        // Taking a difficulty makes the game redraw the page, and a redraw the screen did not
-        // survive - the menu object went away and came back - starts with no cursor memory. The flag
-        // carries the one thing worth keeping across that: that the player was at the difficulty.
-        private static bool _focusDifficultyAfterNextRebuild;
+        // MOD-OWNED CURSOR INTENT, which outlives the menu (AGENTS.md, "Screen Resolution"): taking
+        // a difficulty makes the game redraw the page, and a redraw the screen did not survive
+        // starts with no cursor memory. This carries the one thing worth keeping across that - that
+        // the player was at the difficulty - and is read once, by the seating that follows.
+        private bool _focusDifficultyAfterNextRebuild;
 
         // A subject of its own for the details line, kept across rebuilds so the reconciler seats the
         // cursor on the same node while the mission under it changes.
         private readonly object _detailsMarker = new object();
 
-        /// <summary>Whether the page was redrawn by taking a difficulty, so an arrival that has to
-        /// seat the cursor afresh puts it back on the difficulty. Written by the detector from
-        /// <see cref="ConsumeFocusDifficultyAfterNextRebuild"/>.</summary>
-        public bool FocusDifficulty { get; set; }
-
-        /// <summary>After a hot reload: point the slot at the menu already showing.
-        /// Scanned once, from <c>ScreenDetector.RecoverRuntimeState</c>.</summary>
-        public static void Recover()
+        /// <summary>The menu, once its information view is there to read. The view is bound lazily,
+        /// so it comes off the menu's own field rather than out of the container
+        /// (<see cref="MainMenuSources"/>).</summary>
+        protected override object ResolveMenu()
         {
-            Recovered<CampaignMapSelectScreen>(FindActive());
+            CampaignMapSelectMenu menu = MainMenuSources.CampaignMapSelect.Current;
+            return menu != null && MainMenuSources.CampaignMapSelectInformation.Current != null ? menu : null;
         }
 
-        public static CampaignMapSelectAdapter FindActive()
+        protected override CampaignMapSelectAdapter Adapt(object menu)
         {
-            return FindActiveCampaignMapSelect(null);
-        }
-
-        /// <summary>The menu the game bound alongside this information view. The view keeps no
-        /// back-reference to its menu (<c>CampaignMapSelectedInformationView.cs</c>), so the pair is
-        /// read out of the installer's own container, where the menu and the view are each bound to
-        /// self as a single (<c>CampaignMapSelectMenuInstaller.cs</c> lines 20 and 23). Called from
-        /// the view's own Show, never from a build.</summary>
-        public static CampaignMapSelectMenu FindMenu(CampaignMapSelectedInformationView informationView)
-        {
-            if (informationView == null)
-            {
-                return null;
-            }
-
-            CampaignMapSelectMenuInstaller[] installers = Resources.FindObjectsOfTypeAll<CampaignMapSelectMenuInstaller>();
-            for (int i = 0; i < installers.Length; i++)
-            {
-                CampaignMapSelectMenuInstaller installer = installers[i];
-                if (!IsLiveSceneInstaller(installer))
-                {
-                    continue;
-                }
-
-                if (ReferenceEquals(TryResolve<CampaignMapSelectedInformationView>(installer), informationView))
-                {
-                    return TryResolve<CampaignMapSelectMenu>(installer);
-                }
-            }
-
-            return null;
-        }
-
-        public static bool ConsumeFocusDifficultyAfterNextRebuild()
-        {
-            bool result = _focusDifficultyAfterNextRebuild;
-            _focusDifficultyAfterNextRebuild = false;
-            return result;
+            return new CampaignMapSelectAdapter(
+                (CampaignMapSelectMenu)menu,
+                MainMenuSources.CampaignMapSelectInformation.Current);
         }
 
         public override string Key
@@ -130,14 +86,25 @@ namespace SongsOfConquestAccess.Screens
             get { return Live != null ? Live.GetCampaignTitle() : null; }
         }
 
-        /// <summary>The missions, or the difficulty when the page was redrawn by taking one.</summary>
+        /// <summary>The missions, or the difficulty when the page was redrawn by taking one. Read
+        /// once: the seating this answers is the one the intent was kept for.</summary>
         public override object InitialFocusStop
         {
-            get { return FocusDifficulty ? DifficultyStop : MissionsStop; }
+            get
+            {
+                if (!_focusDifficultyAfterNextRebuild)
+                {
+                    return MissionsStop;
+                }
+
+                _focusDifficultyAfterNextRebuild = false;
+                return DifficultyStop;
+            }
         }
 
         public override bool IsActive()
         {
+            SyncLive();
             return Live != null && Live.IsPresent();
         }
 
@@ -319,9 +286,9 @@ namespace SongsOfConquestAccess.Screens
         }
 
         /// <summary>Take a difficulty from the open list. The game answers by redrawing the page,
-        /// which pushes a new screen over this one, so the flag is set BEFORE the value changes: the
-        /// redraw can happen inside this call.</summary>
-        private static void TakeDifficulty(CampaignMapSelectedInformationAdapter.DifficultyDropList list, int index)
+        /// which reseats the cursor, so the flag is set BEFORE the value changes: the redraw can
+        /// happen inside this call.</summary>
+        private void TakeDifficulty(CampaignMapSelectedInformationAdapter.DifficultyDropList list, int index)
         {
             _focusDifficultyAfterNextRebuild = true;
             if (!list.SetValue(index))
@@ -392,73 +359,6 @@ namespace SongsOfConquestAccess.Screens
             return last == '.' || last == '!' || last == '?' || last == ':' || last == ';'
                 ? value
                 : value + ".";
-        }
-
-        private static CampaignMapSelectAdapter FindActiveCampaignMapSelect(CampaignMapSelectedInformationView targetInformationView)
-        {
-            CampaignMapSelectMenuInstaller[] installers = Resources.FindObjectsOfTypeAll<CampaignMapSelectMenuInstaller>();
-            for (int i = 0; i < installers.Length; i++)
-            {
-                CampaignMapSelectMenuInstaller installer = installers[i];
-                if (!IsLiveSceneInstaller(installer))
-                {
-                    continue;
-                }
-
-                CampaignMapSelectMenu menu = TryResolve<CampaignMapSelectMenu>(installer);
-                CampaignMapSelectedInformationView informationView = TryResolve<CampaignMapSelectedInformationView>(installer);
-                if (menu == null || informationView == null)
-                {
-                    continue;
-                }
-
-                if (targetInformationView != null && !ReferenceEquals(targetInformationView, informationView))
-                {
-                    continue;
-                }
-
-                CampaignMapSelectAdapter adapter = new CampaignMapSelectAdapter(menu, informationView);
-                if (adapter.IsPresent())
-                {
-                    return adapter;
-                }
-            }
-
-            return null;
-        }
-
-        private static bool IsLiveSceneInstaller(CampaignMapSelectMenuInstaller installer)
-        {
-            if (installer == null)
-            {
-                return false;
-            }
-
-            GameObject gameObject = installer.gameObject;
-            return gameObject != null && gameObject.scene.IsValid() && gameObject.scene.isLoaded;
-        }
-
-        private static T TryResolve<T>(CampaignMapSelectMenuInstaller installer) where T : class
-        {
-            if (installer == null || InstallerContainerProperty == null)
-            {
-                return null;
-            }
-
-            DiContainer container = InstallerContainerProperty.GetValue(installer, null) as DiContainer;
-            if (container == null)
-            {
-                return null;
-            }
-
-            try
-            {
-                return container.Resolve<T>();
-            }
-            catch (Exception)
-            {
-                return null;
-            }
         }
     }
 }

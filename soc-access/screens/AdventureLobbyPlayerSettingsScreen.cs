@@ -38,28 +38,16 @@ namespace SongsOfConquestAccess.Screens
         // cursor on the same line: the popup's own buttons.
         private readonly Dictionary<string, object> _markers = new Dictionary<string, object>();
 
-        /// <summary>After a hot reload: point the slot at the menu already showing.
-        /// Scanned once, from <c>ScreenDetector.RecoverRuntimeState</c>.</summary>
-        public static void Recover()
+        /// <summary>The popup the player menu holds in its settings
+        /// (<see cref="LobbySources"/>).</summary>
+        protected override object ResolveMenu()
         {
-            Recovered<AdventureLobbyPlayerSettingsScreen>(FindActive());
+            return LobbySources.PlayerSettings.Current;
         }
 
-        public static AdventureLobbyPlayerSettingsAdapter FindActive()
+        protected override AdventureLobbyPlayerSettingsAdapter Adapt(object menu)
         {
-            LobbyPlayerSettingsMenu menu = FindActiveMenu(null);
-            if (menu == null)
-            {
-                return null;
-            }
-
-            AdventureLobbyPlayerSettingsAdapter adapter = new AdventureLobbyPlayerSettingsAdapter(menu);
-            return adapter.IsPresent() ? (adapter) : null;
-        }
-
-        public bool Matches(LobbyPlayerSettingsMenu menu)
-        {
-            return Live != null && ReferenceEquals(Live.SourceKey, menu);
+            return new AdventureLobbyPlayerSettingsAdapter((LobbyPlayerSettingsMenu)menu);
         }
 
         public override string Key
@@ -86,40 +74,10 @@ namespace SongsOfConquestAccess.Screens
 
         public override bool IsActive()
         {
+            SyncLive();
             return Live != null && Live.IsPresent();
         }
 
-        public static LobbyPlayerSettingsMenu FindActiveMenu(LobbyPlayerSettingsMenu targetMenu)
-        {
-            LobbyPlayerSettingsMenu[] menus = Resources.FindObjectsOfTypeAll<LobbyPlayerSettingsMenu>();
-            for (int i = 0; i < menus.Length; i++)
-            {
-                LobbyPlayerSettingsMenu menu = menus[i];
-                if (menu == null)
-                {
-                    continue;
-                }
-
-                if (targetMenu != null && !ReferenceEquals(targetMenu, menu))
-                {
-                    continue;
-                }
-
-                GameObject gameObject = ((Component)menu).gameObject;
-                if (gameObject == null || !gameObject.scene.IsValid() || !gameObject.scene.isLoaded)
-                {
-                    continue;
-                }
-
-                AdventureLobbyPlayerSettingsAdapter adapter = new AdventureLobbyPlayerSettingsAdapter(menu);
-                if (adapter.IsPresent())
-                {
-                    return menu;
-                }
-            }
-
-            return null;
-        }
 
         public override void Build(GraphBuilder builder)
         {

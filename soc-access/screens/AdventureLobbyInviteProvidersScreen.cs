@@ -30,22 +30,17 @@ namespace SongsOfConquestAccess.Screens
         // A subject of its own for the one node the popup draws nothing for.
         private readonly object _cancelKey = new object();
 
-        /// <summary>After a hot reload: point the slot at the menu already showing.
-        /// Scanned once, from <c>ScreenDetector.RecoverRuntimeState</c>.</summary>
-        public static void Recover()
+        /// <summary>The lobby's online band (<see cref="LobbySources"/>). The panel is in the scene
+        /// whether the lobby is online or not; the adapter reads whether the invite dropdown under it
+        /// is drawn.</summary>
+        protected override object ResolveMenu()
         {
-            Recovered<AdventureLobbyInviteProvidersScreen>(FindActive());
+            return LobbySources.MultiplayerPanel.Current;
         }
 
-        public static AdventureLobbyInviteProvidersAdapter FindActive()
+        protected override AdventureLobbyInviteProvidersAdapter Adapt(object menu)
         {
-            AdventureLobbyInviteProvidersAdapter adapter = FindActiveInviteProviders(null);
-            return adapter;
-        }
-
-        public bool Matches(LobbyMultiplayerPanel panel)
-        {
-            return Live != null && ReferenceEquals(Live.SourceKey, panel);
+            return new AdventureLobbyInviteProvidersAdapter((LobbyMultiplayerPanel)menu);
         }
 
         public override string Key
@@ -71,6 +66,7 @@ namespace SongsOfConquestAccess.Screens
 
         public override bool IsActive()
         {
+            SyncLive();
             return Live != null && Live.IsPresent();
         }
 
@@ -142,32 +138,6 @@ namespace SongsOfConquestAccess.Screens
             }
 
             builder.SetStart(start);
-        }
-
-        public static AdventureLobbyInviteProvidersAdapter FindActiveInviteProviders(LobbyMultiplayerPanel targetPanel)
-        {
-            LobbyMultiplayerPanel[] panels = Resources.FindObjectsOfTypeAll<LobbyMultiplayerPanel>();
-            for (int i = 0; i < panels.Length; i++)
-            {
-                LobbyMultiplayerPanel panel = panels[i];
-                if (panel == null)
-                {
-                    continue;
-                }
-
-                if (targetPanel != null && !ReferenceEquals(targetPanel, panel))
-                {
-                    continue;
-                }
-
-                AdventureLobbyInviteProvidersAdapter adapter = new AdventureLobbyInviteProvidersAdapter(panel);
-                if (adapter.IsPresent())
-                {
-                    return adapter;
-                }
-            }
-
-            return null;
         }
     }
 }

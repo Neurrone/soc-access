@@ -61,17 +61,22 @@ namespace SongsOfConquestAccess.Screens
 
         private string _lastCode;
 
-        /// <summary>After a hot reload: point the slot at the menu already showing.
-        /// Scanned once, from <c>ScreenDetector.RecoverRuntimeState</c>.</summary>
-        public static void Recover()
+        // The last heading spoken, so a modal that walks from panel to panel UNDER ONE GAME OBJECT
+        // still says where it has arrived. Mod-owned announcement state, which outlives the panel.
+        private string _spokenTitle;
+
+        /// <summary>Whichever of mod.io's popups is drawn, in the order the walk in
+        /// <see cref="CommunityMapsModalAdapter.ActivePanel"/> tries them. The panel object is what
+        /// the slot is keyed on, so the adapter is built once per popup rather than once per
+        /// frame.</summary>
+        protected override object ResolveMenu()
         {
-            Recovered<CommunityMapsModalScreen>(FindActive());
+            return CommunityMapsModalAdapter.ActivePanel;
         }
 
-        public static CommunityMapsModalAdapter FindActive()
+        protected override CommunityMapsModalAdapter Adapt(object menu)
         {
-            CommunityMapsModalAdapter adapter = CommunityMapsModalAdapter.TryCreate();
-            return adapter != null && adapter.IsPresent() ? adapter : null;
+            return CommunityMapsModalAdapter.TryCreate();
         }
 
         public override string Key
@@ -97,6 +102,7 @@ namespace SongsOfConquestAccess.Screens
 
         public override bool IsActive()
         {
+            SyncLive();
             return Live != null && Live.IsPresent();
         }
 
@@ -144,6 +150,7 @@ namespace SongsOfConquestAccess.Screens
 
             // After the navigator, so a word about the edit follows the activation's own readout.
             _editor.Update(IsActive());
+            AnnounceTitleIfChanged();
             AnnounceCodeTyped();
         }
 
@@ -295,6 +302,29 @@ namespace SongsOfConquestAccess.Screens
         /// keys itself and says nothing, so the screen watches the string it keeps and speaks only
         /// what changed - which is what the widget this replaces did.
         /// </summary>
+        /// <summary>The authentication modal walks from Authentication to Terms of use to the code
+        /// box IN PLACE: one game object, three pages, each with a heading of its own. The slot never
+        /// changes under that, so the heading is compared here instead, once a frame while this is
+        /// the page the player is on. The base class speaks a name only when it differs from the last
+        /// one, so a heading that has not moved says nothing.</summary>
+        private void AnnounceTitleIfChanged()
+        {
+            if (!IsActive())
+            {
+                _spokenTitle = null;
+                return;
+            }
+
+            string title = Live.Title;
+            if (string.IsNullOrWhiteSpace(title) || title == _spokenTitle)
+            {
+                return;
+            }
+
+            _spokenTitle = title;
+            SayNameIfChanged();
+        }
+
         private void AnnounceCodeTyped()
         {
             if (State != CommunityMapsModalState.InputFiveDigits || !IsActive())

@@ -43,38 +43,14 @@ namespace SongsOfConquestAccess.Screens
             "quit"
         };
 
-        /// <summary>After a hot reload: point the slot at the menu already showing.
-        /// Scanned once, from <c>ScreenDetector.RecoverRuntimeState</c>.</summary>
-        public static void Recover()
+        protected override object ResolveMenu()
         {
-            Recovered<MainMenuScreen>(FindActive());
+            return MainMenuSources.Main.Current;
         }
 
-        public static MainMenuAdapter FindActive()
+        protected override MainMenuAdapter Adapt(object menu)
         {
-            MainMenuAdapter adapter = FindActiveMainMenu();
-            return adapter;
-        }
-
-        public static MainMenuAdapter FindActiveMainMenu()
-        {
-            MainMenu[] mainMenus = Resources.FindObjectsOfTypeAll<MainMenu>();
-            for (int i = 0; i < mainMenus.Length; i++)
-            {
-                MainMenu mainMenu = mainMenus[i];
-                if (!IsLiveSceneMainMenu(mainMenu))
-                {
-                    continue;
-                }
-
-                MainMenuAdapter adapter = new MainMenuAdapter(mainMenu);
-                if (adapter.IsPresent())
-                {
-                    return adapter;
-                }
-            }
-
-            return null;
+            return new MainMenuAdapter((MainMenu)menu);
         }
 
         public override string Key
@@ -95,6 +71,7 @@ namespace SongsOfConquestAccess.Screens
 
         public override bool IsActive()
         {
+            SyncLive();
             return Live != null && Live.IsPresent();
         }
 
@@ -246,17 +223,6 @@ namespace SongsOfConquestAccess.Screens
             return index >= 0 && index < TopLevelItemIds.Length
                 ? TopLevelItemIds[index]
                 : "main-menu-item-" + index;
-        }
-
-        private static bool IsLiveSceneMainMenu(MainMenu mainMenu)
-        {
-            if (mainMenu == null)
-            {
-                return false;
-            }
-
-            GameObject gameObject = mainMenu.gameObject;
-            return gameObject != null && gameObject.scene.IsValid() && gameObject.scene.isLoaded;
         }
     }
 }

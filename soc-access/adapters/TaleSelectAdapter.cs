@@ -16,6 +16,10 @@ namespace SongsOfConquestAccess.Adapters
             AccessTools.FieldRefAccess<TaleButtonLayoutCoordinator, CanvasGroup>("_canvasGroup");
         private static readonly AccessTools.FieldRef<TaleButton, MainMenuManagerContainer> TaleButtonManagerContainerRef =
             AccessTools.FieldRefAccess<TaleButton, MainMenuManagerContainer>("_mainMenuManagerContainer");
+        // The card's own clickable button, read here as well as in TaleButtonAdapter so that
+        // counting the drawn cards every frame costs a field read and allocates nothing.
+        private static readonly AccessTools.FieldRef<TaleButton, UIButton> TaleButtonMainButtonRef =
+            AccessTools.FieldRefAccess<TaleButton, UIButton>("_mainButton");
         private static readonly AccessTools.FieldRef<MainMenuManager, MainMenuManager.Settings> MainMenuSettingsRef =
             AccessTools.FieldRefAccess<MainMenuManager, MainMenuManager.Settings>("_settings");
 
@@ -23,33 +27,23 @@ namespace SongsOfConquestAccess.Adapters
         private readonly List<TaleButtonAdapter> _tales = new List<TaleButtonAdapter>();
         private readonly TaleButton[] _taleButtons;
 
+        // How many of the coordinator's own tale buttons were drawn when the list above was built.
+        // The coordinator fades its canvas group in at the end of a coroutine and a tale the account
+        // cannot use hides itself in Awake, so the adapter can be made before the page's cards are
+        // drawn; the list is rebuilt whenever the count read from the game differs from this.
+        private int _talesKey = -1;
+        private bool _headerFound;
+        private IMenuButtonAdapter _backButton;
+        private IMenuButtonAdapter _optionsButton;
+
         public TaleSelectAdapter(TaleButtonLayoutCoordinator coordinator)
         {
             _coordinator = coordinator;
+            // Every tale button under the coordinator, drawn or not, walked once here and never
+            // again: which of them are DRAWN is asked per frame below.
             _taleButtons = coordinator != null
-                ? ((Component)coordinator).GetComponentsInChildren<TaleButton>(includeInactive: false)
+                ? ((Component)coordinator).GetComponentsInChildren<TaleButton>(includeInactive: true)
                 : null;
-            if (_taleButtons != null)
-            {
-                for (int i = 0; i < _taleButtons.Length; i++)
-                {
-                    TaleButtonAdapter adapter = new TaleButtonAdapter(_taleButtons[i]);
-                    if (adapter.IsVisible())
-                    {
-                        _tales.Add(adapter);
-                    }
-                }
-            }
-
-            MainMenuManager.Settings settings = GetMainMenuSettings(_taleButtons);
-            BackButton = settings != null ? new StandardMenuButtonAdapter(
-                settings.BackButton,
-                () => settings.BackButton != null && MenuButtonAdapterBase.IsButtonVisible(settings.BackButton),
-                null) : null;
-            OptionsButton = settings != null ? new OptionsMenuButtonAdapter(
-                settings.OptionsButton,
-                () => settings.OptionsButton != null && MenuButtonAdapterBase.IsButtonVisible(settings.OptionsButton),
-                null) : null;
         }
 
         public object SourceKey
@@ -57,14 +51,68 @@ namespace SongsOfConquestAccess.Adapters
             get { return _coordinator; }
         }
 
+        /// <summary>The tale cards. Rebuilt only when the number of drawn tale buttons changes,
+        /// which is one walk of an array of seven per read and no allocation while nothing moves.
+        /// </summary>
         public IReadOnlyList<TaleButtonAdapter> Tales
         {
-            get { return _tales; }
+            get
+            {
+                int key = CountVisibleTales();
+                if (key != _talesKey)
+                {
+                    _talesKey = key;
+                    BuildTales();
+                }
+
+                return _tales;
+            }
         }
 
-        public IMenuButtonAdapter BackButton { get; private set; }
+        /// <summary>The main menu's own header band, shared with the campaign menu. Built the first
+        /// time a tale button's injected manager answers with its settings, which it may not do on
+        /// the frame the coordinator is first found, and kept once it has.</summary>
+        public IMenuButtonAdapter BackButton
+        {
+            get
+            {
+                SyncHeader();
+                return _backButton;
+            }
+        }
 
-        public IMenuButtonAdapter OptionsButton { get; private set; }
+        public IMenuButtonAdapter OptionsButton
+        {
+            get
+            {
+                SyncHeader();
+                return _optionsButton;
+            }
+        }
+
+        private void SyncHeader()
+        {
+            if (_headerFound)
+            {
+                return;
+            }
+
+            MainMenuManager.Settings settings = GetMainMenuSettings(_taleButtons);
+            if (settings == null)
+            {
+                return;
+            }
+
+            _headerFound = true;
+            _backButton = new StandardMenuButtonAdapter(
+                settings.BackButton,
+                () => settings.BackButton != null && MenuButtonAdapterBase.IsButtonVisible(settings.BackButton),
+                null);
+            _optionsButton = new OptionsMenuButtonAdapter(
+                settings.OptionsButton,
+                () => settings.OptionsButton != null && MenuButtonAdapterBase.IsButtonVisible(settings.OptionsButton),
+                null);
+        }
 
         public string GetTitle()
         {
@@ -94,15 +142,49 @@ namespace SongsOfConquestAccess.Adapters
 
         private bool HasVisibleTale()
         {
-            for (int i = 0; i < _tales.Count; i++)
+            return CountVisibleTales() > 0;
+        }
+
+        /// <summary>The coordinator's own tale buttons that are drawn now. Both the readiness gate
+        /// and the list's key, so the count is what the list is keyed on.</summary>
+        private int CountVisibleTales()
+        {
+            int count = 0;
+            for (int i = 0; _taleButtons != null && i < _taleButtons.Length; i++)
             {
-                if (_tales[i] != null && _tales[i].IsVisible())
+                if (IsVisibleTaleButton(_taleButtons[i]))
                 {
-                    return true;
+                    count++;
                 }
             }
 
-            return false;
+            return count;
+        }
+
+        private void BuildTales()
+        {
+            _tales.Clear();
+            for (int i = 0; _taleButtons != null && i < _taleButtons.Length; i++)
+            {
+                if (IsVisibleTaleButton(_taleButtons[i]))
+                {
+                    _tales.Add(new TaleButtonAdapter(_taleButtons[i]));
+                }
+            }
+        }
+
+        private static bool IsVisibleTaleButton(TaleButton taleButton)
+        {
+            if (taleButton == null)
+            {
+                return false;
+            }
+
+            GameObject gameObject = ((Component)taleButton).gameObject;
+            return gameObject != null
+                && gameObject.scene.IsValid()
+                && gameObject.scene.isLoaded
+                && MenuButtonAdapterBase.IsButtonVisible(TaleButtonMainButtonRef(taleButton));
         }
 
         private static MainMenuManager.Settings GetMainMenuSettings(TaleButton[] taleButtons)

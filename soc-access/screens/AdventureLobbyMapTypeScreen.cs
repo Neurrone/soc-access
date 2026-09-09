@@ -33,17 +33,15 @@ namespace SongsOfConquestAccess.Screens
         private const string CardsStop = "map-type-cards";
         private const string HeaderStop = "map-type-header";
 
-        /// <summary>After a hot reload: point the slot at the menu already showing.
-        /// Scanned once, from <c>ScreenDetector.RecoverRuntimeState</c>.</summary>
-        public static void Recover()
+        /// <summary>The lobby navigator's own map type menu (<see cref="LobbySources"/>).</summary>
+        protected override object ResolveMenu()
         {
-            Recovered<AdventureLobbyMapTypeScreen>(FindActive());
+            return LobbySources.MapType.Current;
         }
 
-        public static AdventureLobbyMapTypeAdapter FindActive()
+        protected override AdventureLobbyMapTypeAdapter Adapt(object menu)
         {
-            AdventureLobbyMapTypeAdapter adapter = FindActiveMapTypeMenu();
-            return adapter;
+            return new AdventureLobbyMapTypeAdapter((MapTypeMenu)menu, LobbySources.Navigation.Current);
         }
 
         public override string Key
@@ -70,6 +68,7 @@ namespace SongsOfConquestAccess.Screens
 
         public override bool IsActive()
         {
+            SyncLive();
             return Live != null && Live.IsPresent();
         }
 
@@ -202,38 +201,6 @@ namespace SongsOfConquestAccess.Screens
         {
             Component component = item.Button;
             return component != null ? component.transform.position.x : 0f;
-        }
-
-        private static AdventureLobbyMapTypeAdapter FindActiveMapTypeMenu()
-        {
-            MapTypeMenu[] menus = Resources.FindObjectsOfTypeAll<MapTypeMenu>();
-            for (int i = 0; i < menus.Length; i++)
-            {
-                MapTypeMenu menu = menus[i];
-                if (!IsLiveSceneMapTypeMenu(menu))
-                {
-                    continue;
-                }
-
-                AdventureLobbyMapTypeAdapter adapter = new AdventureLobbyMapTypeAdapter(menu);
-                if (adapter.IsPresent())
-                {
-                    return adapter;
-                }
-            }
-
-            return null;
-        }
-
-        private static bool IsLiveSceneMapTypeMenu(MapTypeMenu menu)
-        {
-            if (menu == null)
-            {
-                return false;
-            }
-
-            GameObject gameObject = ((Component)menu).gameObject;
-            return gameObject != null && gameObject.scene.IsValid() && gameObject.scene.isLoaded;
         }
     }
 }

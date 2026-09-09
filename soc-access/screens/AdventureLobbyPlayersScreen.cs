@@ -78,22 +78,25 @@ namespace SongsOfConquestAccess.Screens
         // the reconciler seats the cursor on the same line.
         private readonly Dictionary<string, object> _markers = new Dictionary<string, object>();
 
-        /// <summary>After a hot reload: point the slot at the menu already showing.
-        /// Scanned once, from <c>ScreenDetector.RecoverRuntimeState</c>.</summary>
-        public static void Recover()
+        /// <summary>The lobby page, off the lobby navigator (<see cref="LobbySources"/>).</summary>
+        protected override object ResolveMenu()
         {
-            Recovered<AdventureLobbyPlayersScreen>(FindActive());
+            return LobbySources.Lobby.Current;
         }
 
-        public static AdventureLobbyPlayersAdapter FindActive()
+        /// <summary>Everything the page reads that is not on the lobby menu itself: the player menu
+        /// whose row list the slots come from, the map settings band, the ready and start buttons,
+        /// and the online band. All of them are in the same scene as the lobby menu, so they are
+        /// resolved once here rather than looked for again per frame.</summary>
+        protected override AdventureLobbyPlayersAdapter Adapt(object menu)
         {
-            AdventureLobbyPlayersAdapter adapter = FindActiveLobbyMenu(null);
-            return adapter;
-        }
-
-        public bool Matches(LobbyMenu menu)
-        {
-            return Live != null && ReferenceEquals(Live.SourceKey, menu);
+            return new AdventureLobbyPlayersAdapter(
+                (LobbyMenu)menu,
+                LobbySources.Navigation.Current,
+                LobbySources.PlayerMenu.Current,
+                LobbySources.MapSettings.Current,
+                LobbySources.LobbyButtons.Current,
+                LobbySources.MultiplayerPanel.Current);
         }
 
         public override string Key
@@ -121,6 +124,7 @@ namespace SongsOfConquestAccess.Screens
 
         public override bool IsActive()
         {
+            SyncLive();
             return Live != null && Live.IsPresent();
         }
 
@@ -137,17 +141,6 @@ namespace SongsOfConquestAccess.Screens
         public override bool Back()
         {
             return Live != null && Live.BackButton != null && Live.BackButton.Activate();
-        }
-
-        /// <summary>Called by the detector whenever the lobby changes. The graph is declared afresh on
-        /// every operation, so all this does is drop the adapter's snapshot of the slots - which is
-        /// cached because enumerating them walks the scene.</summary>
-        public void Refresh()
-        {
-            if (Live != null)
-            {
-                Live.InvalidateSnapshot();
-            }
         }
 
         public override void Build(GraphBuilder builder)
@@ -618,43 +611,6 @@ namespace SongsOfConquestAccess.Screens
             }
 
             return marker;
-        }
-
-        public static AdventureLobbyPlayersAdapter FindActiveLobbyMenu(LobbyMenu targetMenu)
-        {
-            LobbyMenu[] menus = Resources.FindObjectsOfTypeAll<LobbyMenu>();
-            for (int i = 0; i < menus.Length; i++)
-            {
-                LobbyMenu menu = menus[i];
-                if (!IsLiveSceneLobbyMenu(menu))
-                {
-                    continue;
-                }
-
-                if (targetMenu != null && !ReferenceEquals(targetMenu, menu))
-                {
-                    continue;
-                }
-
-                AdventureLobbyPlayersAdapter adapter = new AdventureLobbyPlayersAdapter(menu);
-                if (adapter.IsPresent())
-                {
-                    return adapter;
-                }
-            }
-
-            return null;
-        }
-
-        private static bool IsLiveSceneLobbyMenu(LobbyMenu menu)
-        {
-            if (menu == null)
-            {
-                return false;
-            }
-
-            GameObject gameObject = ((Component)menu).gameObject;
-            return gameObject != null && gameObject.scene.IsValid() && gameObject.scene.isLoaded;
         }
     }
 }

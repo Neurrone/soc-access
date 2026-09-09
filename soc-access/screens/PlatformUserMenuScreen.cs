@@ -12,6 +12,13 @@ namespace SongsOfConquestAccess.Screens
     /// family's representative (<see cref="MessageDialogScreen"/>) established: one stop, the heading
     /// as a line of its own and as the screen name, then the actions, then the way out.
     ///
+    /// THE GAME HAS TWO OF THESE MENUS. <c>MenuProjectInstaller</c> binds one into the project
+    /// container, which <c>OptionsMenuBlockedPlayers</c> and the post-adventure stats page use; the
+    /// lobby scene carries a second on <c>LobbyPlayerMenu</c>'s settings, and that is the one a
+    /// player row's "Show Player Actions" opens (<c>LobbyPlayerEntry.HandlePlatformUserMenuClicked</c>
+    /// shows the object <c>LobbyPlayerMenu</c> handed it, not the bound one). The page therefore has
+    /// two sources and belongs to whichever is drawing.
+    ///
     /// The popup draws less than a dialog does. Measured 2026-09-06 at 1280x800 under
     /// `PlatformUserMenu`: a `PlatformUserMainContainer` at [141,122,163,41] holding one
     /// `PlatformUserButtonEntry` per action ("Set Name" here), a full-screen `UIBlocker` behind it,
@@ -37,18 +44,38 @@ namespace SongsOfConquestAccess.Screens
         private readonly object _headingKey = new object();
         private readonly object _cancelKey = new object();
 
-        /// <summary>The one platform user menu the project container holds for the whole game.
-        /// </summary>
-        private readonly ScreenSource<PlatformUserMenu> _source = ScreenSource<PlatformUserMenu>.FromProject();
+        // THE TWO MENUS, each adapted once per object it answers with. The game has two: the project
+        // container binds one, which the options window's blocked-players page shows, and the lobby
+        // scene carries a second on LobbyPlayerMenu's settings, which is the one a player row's
+        // "Show Player Actions" opens. Only one of them is ever drawing, and which one is read from
+        // the container each of them turns on, so the page belongs to whichever answers first with a
+        // drawn container - the lobby's, because that is the one a lobby row shows.
+        private readonly AdaptedSource<PlatformUserMenu, PlatformUserMenuAdapter> _lobbyMenu =
+            new AdaptedSource<PlatformUserMenu, PlatformUserMenuAdapter>(
+                LobbySources.PlatformUser,
+                menu => new PlatformUserMenuAdapter(menu));
 
+        private readonly AdaptedSource<PlatformUserMenu, PlatformUserMenuAdapter> _projectMenu =
+            new AdaptedSource<PlatformUserMenu, PlatformUserMenuAdapter>(
+                ScreenSource<PlatformUserMenu>.FromProject(),
+                menu => new PlatformUserMenuAdapter(menu));
+
+        /// <summary>The adapter itself is what the slot holds here: two unrelated objects draw the
+        /// one page, so the "menu" a source answers with IS the adapter over it, built once per
+        /// object.</summary>
         protected override object ResolveMenu()
         {
-            return _source.Current;
+            return Drawing(_lobbyMenu.Current) ?? Drawing(_projectMenu.Current);
         }
 
         protected override PlatformUserMenuAdapter Adapt(object menu)
         {
-            return new PlatformUserMenuAdapter((PlatformUserMenu)menu);
+            return (PlatformUserMenuAdapter)menu;
+        }
+
+        private static PlatformUserMenuAdapter Drawing(PlatformUserMenuAdapter adapter)
+        {
+            return adapter != null && adapter.IsPresent() ? adapter : null;
         }
 
         public override string Key

@@ -48,10 +48,10 @@ namespace SongsOfConquestAccess.Adapters
         private readonly LobbyNavigation _navigation;
         private readonly ILocalizationHandler _localization;
 
-        public AdventureLobbyChallengeMapSelectAdapter(ChallengeMapsMenu menu)
+        public AdventureLobbyChallengeMapSelectAdapter(ChallengeMapsMenu menu, LobbyNavigation navigation)
         {
             _menu = menu;
-            _navigation = FindNavigationFor(menu);
+            _navigation = navigation;
             _localization = menu != null ? LocalizationRef(menu) : GlobalLocalizationVariables.LocalizationHandler;
 
             ConfirmButton = new StandardMenuButtonAdapter(ConfirmButtonRef(menu));
@@ -262,32 +262,6 @@ namespace SongsOfConquestAccess.Adapters
             return entry != null ? entry.LocalizedMapName ?? string.Empty : string.Empty;
         }
 
-        private static LobbyNavigation FindNavigationFor(ChallengeMapsMenu menu)
-        {
-            if (menu == null)
-            {
-                return null;
-            }
-
-            GameObject menuObject = ((Component)menu).gameObject;
-            LobbyNavigation[] navigations = Resources.FindObjectsOfTypeAll<LobbyNavigation>();
-            for (int i = 0; i < navigations.Length; i++)
-            {
-                LobbyNavigation navigation = navigations[i];
-                if (navigation == null)
-                {
-                    continue;
-                }
-
-                GameObject navigationObject = ((Component)navigation).gameObject;
-                if (IsLiveSceneObject(navigationObject) && navigationObject.scene == menuObject.scene)
-                {
-                    return navigation;
-                }
-            }
-
-            return null;
-        }
 
         private static bool IsLiveSceneObject(GameObject gameObject)
         {

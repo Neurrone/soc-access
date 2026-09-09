@@ -31,10 +31,10 @@ namespace SongsOfConquestAccess.Adapters
         private readonly MapTypeMenu _menu;
         private readonly LobbyNavigation _navigation;
 
-        public AdventureLobbyMapTypeAdapter(MapTypeMenu menu)
+        public AdventureLobbyMapTypeAdapter(MapTypeMenu menu, LobbyNavigation navigation)
         {
             _menu = menu;
-            _navigation = FindNavigationFor(menu);
+            _navigation = navigation;
 
             AllMapsButton = CreateButton(menu != null ? AllMapsButtonRef(menu) : null);
             RandomMapsButton = CreateButton(menu != null ? RandomMapsButtonRef(menu) : null);
@@ -122,32 +122,6 @@ namespace SongsOfConquestAccess.Adapters
             return button != null && button.IsVisible();
         }
 
-        private static LobbyNavigation FindNavigationFor(MapTypeMenu menu)
-        {
-            if (menu == null)
-            {
-                return null;
-            }
-
-            GameObject menuObject = ((Component)menu).gameObject;
-            LobbyNavigation[] navigations = Resources.FindObjectsOfTypeAll<LobbyNavigation>();
-            for (int i = 0; i < navigations.Length; i++)
-            {
-                LobbyNavigation navigation = navigations[i];
-                if (navigation == null)
-                {
-                    continue;
-                }
-
-                GameObject navigationObject = ((Component)navigation).gameObject;
-                if (IsLiveSceneObject(navigationObject) && navigationObject.scene == menuObject.scene)
-                {
-                    return navigation;
-                }
-            }
-
-            return null;
-        }
 
         private static bool IsLiveSceneObject(GameObject gameObject)
         {

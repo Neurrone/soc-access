@@ -1,6 +1,5 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Reflection;
 using HarmonyLib;
 using Lavapotion.Networking;
@@ -45,8 +44,8 @@ namespace SongsOfConquestAccess.Adapters
         private static readonly AccessTools.FieldRef<MainMenuManager, MainMenuManager.Settings> MainMenuSettingsRef =
             AccessTools.FieldRefAccess<MainMenuManager, MainMenuManager.Settings>("_settings");
 
-        private static readonly FieldInfo LobbyButtonsSettingsField =
-            AccessTools.Field(typeof(LobbyMenuButtonsInstaller), "_settings");
+        private static readonly FieldInfo ActiveEntriesField =
+            AccessTools.Field(typeof(LobbyPlayerMenu), "_activeEntries");
         private static readonly FieldInfo MapSettingsChangeButtonField =
             AccessTools.Field(typeof(LobbyMapSettings), "_changeMapSettingsButton");
         private static readonly FieldInfo MapSettingsMixedFactionsToggleField =
@@ -74,27 +73,42 @@ namespace SongsOfConquestAccess.Adapters
 
         private readonly LobbyMenu _menu;
         private readonly LobbyNavigation _navigation;
+        private readonly LobbyPlayerMenu _playerMenu;
+        private readonly LobbyMapSettings _mapSettings;
+        private readonly LobbyMenuButtons.Settings _lobbyButtonsSettings;
+        private readonly MultiplayerPanelItem _multiplayerPanel;
         private readonly IClientLobbyFacade _facade;
         private readonly ILocalizationHandler _localization;
+
+        // The rows the lobby is drawing, kept while the game's own row list is unchanged.
+        private readonly List<LobbyPlayerEntry> _entryScratch = new List<LobbyPlayerEntry>();
         private List<PlayerSlotItem> _playerSlots;
-        private LobbyMapSettings _mapSettings;
-        private bool _mapSettingsProbed;
-        private LobbyMenuButtons.Settings _lobbyButtonsSettings;
-        private bool _lobbyButtonsProbed;
-        private MultiplayerPanelItem _multiplayerPanel;
-        private bool _multiplayerPanelProbed;
+        private int _playerSlotsSignature;
+
         private string _factionLabel;
         private string _colorLabel;
         private string _startingWielderLabel;
         private string _partnershipLabel;
         private string _aiDifficultyLabel;
 
-        public AdventureLobbyPlayersAdapter(LobbyMenu menu)
+        public AdventureLobbyPlayersAdapter(
+            LobbyMenu menu,
+            LobbyNavigation navigation,
+            LobbyPlayerMenu playerMenu,
+            LobbyMapSettings mapSettings,
+            LobbyMenuButtons.Settings lobbyButtons,
+            LobbyMultiplayerPanel multiplayerPanel)
         {
             _menu = menu;
             _facade = menu != null ? LobbyFacadeRef(menu) : null;
             _localization = menu != null ? LocalizationRef(menu) : GlobalLocalizationVariables.LocalizationHandler;
-            _navigation = FindNavigationFor(menu);
+            _navigation = navigation;
+            _playerMenu = playerMenu;
+            _mapSettings = mapSettings;
+            _lobbyButtonsSettings = lobbyButtons;
+            _multiplayerPanel = multiplayerPanel != null
+                ? new MultiplayerPanelItem(multiplayerPanel, _localization)
+                : null;
             BackButton = CreateBackButton();
             OptionsButton = CreateOptionsButton();
         }
@@ -107,17 +121,6 @@ namespace SongsOfConquestAccess.Adapters
         public IMenuButtonAdapter BackButton { get; private set; }
 
         public IMenuButtonAdapter OptionsButton { get; private set; }
-
-        public void InvalidateSnapshot()
-        {
-            _playerSlots = null;
-            _mapSettings = null;
-            _mapSettingsProbed = false;
-            _lobbyButtonsSettings = null;
-            _lobbyButtonsProbed = false;
-            _multiplayerPanel = null;
-            _multiplayerPanelProbed = false;
-        }
 
         public bool IsPresent()
         {
@@ -198,43 +201,72 @@ namespace SongsOfConquestAccess.Adapters
             get { return _aiDifficultyLabel ?? (_aiDifficultyLabel = GetLocalizedText("Lobby/LobbyPlayerMenu/SetAiDifficulty", string.Empty)); }
         }
 
+        /// <summary>The rows the lobby is drawing, in team order. They are read off the player menu's
+        /// own list of live rows (<c>_activeEntries</c>, which it adds to in <c>Spawn</c> and removes
+        /// from in <c>Despawn</c>), and the list is rebuilt when that changes: the key is the row
+        /// count with each row's instance id and team id, which is what a spawn, a despawn or a move
+        /// to another team alters. This is what the lobby's own refresh used to be reported for.
+        /// </summary>
         public IReadOnlyList<PlayerSlotItem> GetPlayerSlots()
         {
-            if (_playerSlots != null)
-            {
-                return _playerSlots;
-            }
+            List<LobbyPlayerEntry> entries = _playerMenu != null && ActiveEntriesField != null
+                ? ActiveEntriesField.GetValue(_playerMenu) as List<LobbyPlayerEntry>
+                : null;
 
-            List<PlayerSlotItem> slots = new List<PlayerSlotItem>();
-            LobbyPlayerEntry[] entries = Resources.FindObjectsOfTypeAll<LobbyPlayerEntry>();
-            for (int i = 0; i < entries.Length; i++)
+            _entryScratch.Clear();
+            int signature = 17;
+            for (int i = 0; entries != null && i < entries.Count; i++)
             {
                 LobbyPlayerEntry entry = entries[i];
-                if (entry == null || !IsLiveSceneObject(((Component)entry).gameObject) || !((Component)entry).gameObject.activeInHierarchy)
+                if (entry == null)
                 {
                     continue;
                 }
 
-                slots.Add(new PlayerSlotItem(this, entry));
+                GameObject gameObject = ((Component)entry).gameObject;
+                if (gameObject == null || !gameObject.activeInHierarchy)
+                {
+                    continue;
+                }
+
+                _entryScratch.Add(entry);
+                unchecked
+                {
+                    signature = (signature * 31) + entry.GetInstanceID();
+                    signature = (signature * 31) + entry.TeamId;
+                }
             }
 
+            if (_playerSlots != null && _playerSlots.Count == _entryScratch.Count && _playerSlotsSignature == signature)
+            {
+                _entryScratch.Clear();
+                return _playerSlots;
+            }
+
+            List<PlayerSlotItem> slots = new List<PlayerSlotItem>(_entryScratch.Count);
+            for (int i = 0; i < _entryScratch.Count; i++)
+            {
+                slots.Add(new PlayerSlotItem(this, _entryScratch[i]));
+            }
+
+            _entryScratch.Clear();
             slots.Sort((left, right) => left.TeamId.CompareTo(right.TeamId));
             _playerSlots = slots;
+            _playerSlotsSignature = signature;
             return _playerSlots;
         }
 
         public LobbyPlayerSettingsItem GetSettingsItem()
         {
-            LobbyMapSettings settings = FindMapSettings();
-            UIButton button = settings != null && MapSettingsChangeButtonField != null
-                ? MapSettingsChangeButtonField.GetValue(settings) as UIButton
+            UIButton button = _mapSettings != null && MapSettingsChangeButtonField != null
+                ? MapSettingsChangeButtonField.GetValue(_mapSettings) as UIButton
                 : null;
             return button != null ? new LobbyPlayerSettingsItem(button, _localization) : null;
         }
 
         public MixedFactionsItem GetMixedFactionsItem()
         {
-            LobbyMapSettings settings = FindMapSettings();
+            LobbyMapSettings settings = _mapSettings;
             if (settings == null)
             {
                 return null;
@@ -257,48 +289,30 @@ namespace SongsOfConquestAccess.Adapters
 
         public LobbyButtonItem GetSetReadyButton()
         {
-            LobbyMenuButtons.Settings settings = GetLobbyButtonsSettings();
-            return settings != null ? LobbyButtonItem.ForButton(settings.SetReadyButton, _localization) : null;
+            return _lobbyButtonsSettings != null
+                ? LobbyButtonItem.ForButton(_lobbyButtonsSettings.SetReadyButton, _localization)
+                : null;
         }
 
         public LobbyButtonItem GetSetNotReadyButton()
         {
-            LobbyMenuButtons.Settings settings = GetLobbyButtonsSettings();
-            return settings != null ? LobbyButtonItem.ForButton(settings.SetNotReadyButton, _localization) : null;
+            return _lobbyButtonsSettings != null
+                ? LobbyButtonItem.ForButton(_lobbyButtonsSettings.SetNotReadyButton, _localization)
+                : null;
         }
 
         public LobbyButtonItem GetStartGameButton()
         {
-            LobbyMenuButtons.Settings settings = GetLobbyButtonsSettings();
-            return settings != null ? LobbyButtonItem.ForButton(settings.StartGameButton, _localization) : null;
+            return _lobbyButtonsSettings != null
+                ? LobbyButtonItem.ForButton(_lobbyButtonsSettings.StartGameButton, _localization)
+                : null;
         }
 
-        /// <summary>The online band, or null in a lobby that has none. The miss is kept as well as the
-        /// hit: an offline lobby has no panel at all, and a scan of the scene per frame to be told so
-        /// again is what the snapshot exists to prevent - the detector drops it with everything else.
-        /// </summary>
+        /// <summary>The online band, or null in a lobby that has none. The panel object is in the
+        /// scene either way; whether it is DRAWN is read from it every frame.</summary>
         public MultiplayerPanelItem GetMultiplayerPanel()
         {
-            if (_multiplayerPanel != null)
-            {
-                if (_multiplayerPanel.IsPresent)
-                {
-                    return _multiplayerPanel;
-                }
-
-                _multiplayerPanel = null;
-                _multiplayerPanelProbed = false;
-            }
-
-            if (_multiplayerPanelProbed)
-            {
-                return null;
-            }
-
-            _multiplayerPanelProbed = true;
-            LobbyMultiplayerPanel panel = FindMultiplayerPanel();
-            _multiplayerPanel = panel != null ? new MultiplayerPanelItem(panel, _localization) : null;
-            return _multiplayerPanel;
+            return _multiplayerPanel != null && _multiplayerPanel.IsPresent ? _multiplayerPanel : null;
         }
 
         public Tooltip GetButtonTooltip(IMenuButtonAdapter button)
@@ -309,94 +323,6 @@ namespace SongsOfConquestAccess.Adapters
         public void HideNativeTooltip()
         {
             NativeTooltipUtility.HideTooltip();
-        }
-
-        private LobbyMenuButtons.Settings GetLobbyButtonsSettings()
-        {
-            if (_lobbyButtonsSettings != null || _lobbyButtonsProbed)
-            {
-                return _lobbyButtonsSettings;
-            }
-
-            _lobbyButtonsProbed = true;
-            LobbyMenuButtonsInstaller[] installers = Resources.FindObjectsOfTypeAll<LobbyMenuButtonsInstaller>();
-            for (int i = 0; i < installers.Length; i++)
-            {
-                LobbyMenuButtonsInstaller installer = installers[i];
-                if (installer == null || !IsLiveSceneObject(((Component)installer).gameObject))
-                {
-                    continue;
-                }
-
-                _lobbyButtonsSettings = LobbyButtonsSettingsField != null
-                    ? LobbyButtonsSettingsField.GetValue(installer) as LobbyMenuButtons.Settings
-                    : null;
-                return _lobbyButtonsSettings;
-            }
-
-            return null;
-        }
-
-        private LobbyMapSettings FindMapSettings()
-        {
-            if (_mapSettings != null)
-            {
-                if (IsLiveSceneObject(((Component)_mapSettings).gameObject))
-                {
-                    return _mapSettings;
-                }
-
-                _mapSettings = null;
-                _mapSettingsProbed = false;
-            }
-
-            if (_mapSettingsProbed)
-            {
-                return null;
-            }
-
-            _mapSettingsProbed = true;
-            LobbyMapSettings[] settings = Resources.FindObjectsOfTypeAll<LobbyMapSettings>();
-            for (int i = 0; i < settings.Length; i++)
-            {
-                LobbyMapSettings item = settings[i];
-                if (item != null && IsLiveSceneObject(((Component)item).gameObject))
-                {
-                    _mapSettings = item;
-                    return _mapSettings;
-                }
-            }
-
-            return null;
-        }
-
-        private LobbyMultiplayerPanel FindMultiplayerPanel()
-        {
-            GameObject menuObject = _menu != null ? ((Component)_menu).gameObject : null;
-            LobbyMultiplayerPanel[] panels = Resources.FindObjectsOfTypeAll<LobbyMultiplayerPanel>();
-            for (int i = 0; i < panels.Length; i++)
-            {
-                LobbyMultiplayerPanel panel = panels[i];
-                if (panel == null)
-                {
-                    continue;
-                }
-
-                GameObject panelObject = ((Component)panel).gameObject;
-                if (!IsLiveSceneObject(panelObject) || !panelObject.activeInHierarchy)
-                {
-                    continue;
-                }
-
-                if (menuObject != null && panelObject.scene != menuObject.scene)
-                {
-                    continue;
-                }
-
-                return panel;
-            }
-
-            return null;
         }
 
         private IMenuButtonAdapter CreateBackButton()
@@ -445,32 +371,6 @@ namespace SongsOfConquestAccess.Adapters
             return SpokenLines.Clean(GameText.Get(_localization, key, fallback ?? string.Empty));
         }
 
-        private static LobbyNavigation FindNavigationFor(LobbyMenu menu)
-        {
-            if (menu == null)
-            {
-                return null;
-            }
-
-            GameObject menuObject = ((Component)menu).gameObject;
-            LobbyNavigation[] navigations = Resources.FindObjectsOfTypeAll<LobbyNavigation>();
-            for (int i = 0; i < navigations.Length; i++)
-            {
-                LobbyNavigation navigation = navigations[i];
-                if (navigation == null)
-                {
-                    continue;
-                }
-
-                GameObject navigationObject = ((Component)navigation).gameObject;
-                if (IsLiveSceneObject(navigationObject) && navigationObject.scene == menuObject.scene)
-                {
-                    return navigation;
-                }
-            }
-
-            return null;
-        }
 
         private static string GetText(IUITextMesh textMesh)
         {

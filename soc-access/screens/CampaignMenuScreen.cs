@@ -32,17 +32,14 @@ namespace SongsOfConquestAccess.Screens
         private const string CardsStop = "campaign-cards";
         private const string HeaderStop = "campaign-header";
 
-        /// <summary>After a hot reload: point the slot at the menu already showing.
-        /// Scanned once, from <c>ScreenDetector.RecoverRuntimeState</c>.</summary>
-        public static void Recover()
+        protected override object ResolveMenu()
         {
-            Recovered<CampaignMenuScreen>(FindActive());
+            return MainMenuSources.Campaign.Current;
         }
 
-        public static CampaignMenuAdapter FindActive()
+        protected override CampaignMenuAdapter Adapt(object menu)
         {
-            CampaignMenuAdapter adapter = FindActiveCampaignMenu();
-            return adapter;
+            return new CampaignMenuAdapter((CampaignMenu)menu);
         }
 
         public override string Key
@@ -69,6 +66,7 @@ namespace SongsOfConquestAccess.Screens
 
         public override bool IsActive()
         {
+            SyncLive();
             return Live != null && Live.IsPresent();
         }
 
@@ -228,38 +226,6 @@ namespace SongsOfConquestAccess.Screens
         {
             Component component = item.Button;
             return component != null ? component.transform.position.x : 0f;
-        }
-
-        private static CampaignMenuAdapter FindActiveCampaignMenu()
-        {
-            CampaignMenu[] campaignMenus = Resources.FindObjectsOfTypeAll<CampaignMenu>();
-            for (int i = 0; i < campaignMenus.Length; i++)
-            {
-                CampaignMenu campaignMenu = campaignMenus[i];
-                if (!IsLiveSceneCampaignMenu(campaignMenu))
-                {
-                    continue;
-                }
-
-                CampaignMenuAdapter adapter = new CampaignMenuAdapter(campaignMenu);
-                if (adapter.IsPresent())
-                {
-                    return adapter;
-                }
-            }
-
-            return null;
-        }
-
-        private static bool IsLiveSceneCampaignMenu(CampaignMenu campaignMenu)
-        {
-            if (campaignMenu == null)
-            {
-                return false;
-            }
-
-            GameObject gameObject = campaignMenu.gameObject;
-            return gameObject != null && gameObject.scene.IsValid() && gameObject.scene.isLoaded;
         }
     }
 }

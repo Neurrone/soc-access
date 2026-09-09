@@ -24,35 +24,87 @@ namespace SongsOfConquestAccess.Adapters
         private readonly CustomCampaignSelectMenuBehavior _behavior;
         private readonly List<CustomCampaignEntryAdapter> _campaignEntries = new List<CustomCampaignEntryAdapter>();
 
+        // The content container's children when the list above was built: how many there are, and
+        // how many of them are drawn. The page instantiates its cards into that container after the
+        // scene is up, so the adapter can be made before there is a single one; both numbers are
+        // read from the game on every access and the list is rebuilt when either changes.
+        private int _campaignEntriesKey = -1;
+        private CustomCampaignEntryAdapter _downloadTip;
+        private bool _headerFound;
+        private IMenuButtonAdapter _backButton;
+        private IMenuButtonAdapter _optionsButton;
+
         public CustomCampaignSelectAdapter(CustomCampaignSelectMenuBehavior behavior)
         {
             _behavior = behavior;
-            BuildEntries(GetEntriesFromBehavior(behavior), GetDownloadTip(behavior));
-            MainMenuManager.Settings settings = GetMainMenuSettings(behavior);
-            BackButton = settings != null
-                ? new StandardMenuButtonAdapter(
-                    settings.BackButton,
-                    () => settings.BackButton != null && MenuButtonAdapterBase.IsButtonVisible(settings.BackButton),
-                    () => NativeSelectionUtility.Click(settings.BackButton))
-                : CreateFallbackBackButton();
-            OptionsButton = settings != null
-                ? new OptionsMenuButtonAdapter(
-                    settings.OptionsButton,
-                    () => settings.OptionsButton != null && MenuButtonAdapterBase.IsButtonVisible(settings.OptionsButton),
-                    () => NativeSelectionUtility.Click(settings.OptionsButton))
-                : CreateFallbackOptionsButton();
         }
 
+        /// <summary>The campaign cards. Rebuilt only when the content container's children change,
+        /// which is two field reads and a walk of four transforms per access.</summary>
         public IReadOnlyList<CustomCampaignEntryAdapter> CampaignEntries
         {
-            get { return _campaignEntries; }
+            get
+            {
+                SyncEntries();
+                return _campaignEntries;
+            }
         }
 
-        public CustomCampaignEntryAdapter DownloadTip { get; private set; }
+        /// <summary>The card the page draws instead of a campaign when there are none to show.
+        /// Picked out of the same rebuild the entries come from.</summary>
+        public CustomCampaignEntryAdapter DownloadTip
+        {
+            get
+            {
+                SyncEntries();
+                return _downloadTip;
+            }
+        }
 
-        public IMenuButtonAdapter BackButton { get; private set; }
+        /// <summary>The main menu's own header band, shared with the campaign menu. Built the first
+        /// time the manager answers with its settings, which it may not do on the frame the page's
+        /// behaviour is first found, and kept once it has.</summary>
+        public IMenuButtonAdapter BackButton
+        {
+            get
+            {
+                SyncHeader();
+                return _backButton;
+            }
+        }
 
-        public IMenuButtonAdapter OptionsButton { get; private set; }
+        public IMenuButtonAdapter OptionsButton
+        {
+            get
+            {
+                SyncHeader();
+                return _optionsButton;
+            }
+        }
+
+        private void SyncHeader()
+        {
+            if (_headerFound)
+            {
+                return;
+            }
+
+            MainMenuManager.Settings settings = GetMainMenuSettings(_behavior);
+            if (settings == null)
+            {
+                return;
+            }
+
+            _headerFound = true;
+            _backButton = new StandardMenuButtonAdapter(
+                settings.BackButton,
+                () => settings.BackButton != null && MenuButtonAdapterBase.IsButtonVisible(settings.BackButton),
+                () => NativeSelectionUtility.Click(settings.BackButton));
+            _optionsButton = new OptionsMenuButtonAdapter(
+                settings.OptionsButton,
+                () => settings.OptionsButton != null && MenuButtonAdapterBase.IsButtonVisible(settings.OptionsButton),
+                () => NativeSelectionUtility.Click(settings.OptionsButton));
+        }
 
         public string GetTitle()
         {
@@ -67,16 +119,31 @@ namespace SongsOfConquestAccess.Adapters
                 && (HasVisibleCampaignEntry() || (DownloadTip != null && DownloadTip.IsVisible()));
         }
 
-        private void BuildEntries(IReadOnlyList<CustomCampaignEntry> entries, CustomCampaignEntry downloadTip)
+        /// <summary>Rebuild the cards when the container they are drawn in has changed.</summary>
+        private void SyncEntries()
         {
-            if (entries == null)
+            int key = ContentKey();
+            if (key == _campaignEntriesKey)
             {
                 return;
             }
 
-            for (int i = 0; i < entries.Count; i++)
+            _campaignEntriesKey = key;
+            _campaignEntries.Clear();
+            _downloadTip = null;
+
+            Transform contentTransform = GetContentTransform();
+            CustomCampaignEntry downloadTip = GetDownloadTip(_behavior);
+            for (int i = 0; contentTransform != null && i < contentTransform.childCount; i++)
             {
-                CustomCampaignEntryAdapter adapter = new CustomCampaignEntryAdapter(entries[i]);
+                Transform child = contentTransform.GetChild(i);
+                CustomCampaignEntry entry = child != null ? child.GetComponent<CustomCampaignEntry>() : null;
+                if (entry == null)
+                {
+                    continue;
+                }
+
+                CustomCampaignEntryAdapter adapter = new CustomCampaignEntryAdapter(entry);
                 if (!adapter.IsVisible())
                 {
                     continue;
@@ -84,7 +151,7 @@ namespace SongsOfConquestAccess.Adapters
 
                 if (adapter.Matches(downloadTip))
                 {
-                    DownloadTip = adapter;
+                    _downloadTip = adapter;
                     continue;
                 }
 
@@ -95,73 +162,50 @@ namespace SongsOfConquestAccess.Adapters
             }
         }
 
+        /// <summary>What the cards are keyed on: how many children the content container has and how
+        /// many of them are drawn. Instantiating a card changes the first, showing or hiding one
+        /// changes the second.</summary>
+        private int ContentKey()
+        {
+            Transform contentTransform = GetContentTransform();
+            if (contentTransform == null)
+            {
+                return 0;
+            }
+
+            int childCount = contentTransform.childCount;
+            int active = 0;
+            for (int i = 0; i < childCount; i++)
+            {
+                Transform child = contentTransform.GetChild(i);
+                if (child != null && child.gameObject.activeInHierarchy)
+                {
+                    active++;
+                }
+            }
+
+            return childCount * 397 + active;
+        }
+
+        private Transform GetContentTransform()
+        {
+            CustomCampaignSelectMenuBehavior.Settings settings = _behavior != null ? SettingsRef(_behavior) : null;
+            UITransform contentContainer = settings != null ? settings.contentContainer : null;
+            return contentContainer != null ? ((Component)contentContainer).transform : null;
+        }
+
         private bool HasVisibleCampaignEntry()
         {
-            for (int i = 0; i < _campaignEntries.Count; i++)
+            IReadOnlyList<CustomCampaignEntryAdapter> entries = CampaignEntries;
+            for (int i = 0; i < entries.Count; i++)
             {
-                if (_campaignEntries[i] != null && _campaignEntries[i].IsVisible())
+                if (entries[i] != null && entries[i].IsVisible())
                 {
                     return true;
                 }
             }
 
             return false;
-        }
-
-        private static IReadOnlyList<CustomCampaignEntry> GetEntriesFromBehavior(CustomCampaignSelectMenuBehavior behavior)
-        {
-            List<CustomCampaignEntry> entries = new List<CustomCampaignEntry>();
-            CustomCampaignSelectMenuBehavior.Settings settings = behavior != null ? SettingsRef(behavior) : null;
-            UITransform contentContainer = settings != null ? settings.contentContainer : null;
-            Transform contentTransform = contentContainer != null ? ((Component)contentContainer).transform : null;
-            if (contentTransform != null)
-            {
-                for (int i = 0; i < contentTransform.childCount; i++)
-                {
-                    Transform child = contentTransform.GetChild(i);
-                    CustomCampaignEntry entry = child != null ? ((Component)child).GetComponent<CustomCampaignEntry>() : null;
-                    if (entry != null)
-                    {
-                        entries.Add(entry);
-                    }
-                }
-
-                return entries;
-            }
-
-            CustomCampaignEntry[] found = Resources.FindObjectsOfTypeAll<CustomCampaignEntry>();
-            for (int i = 0; i < found.Length; i++)
-            {
-                CustomCampaignEntry entry = found[i];
-                if (entry != null && IsLiveSceneObject(((Component)entry).gameObject))
-                {
-                    entries.Add(entry);
-                }
-            }
-
-            entries.Sort(CompareEntriesByHierarchy);
-            return entries;
-        }
-
-        private static int CompareEntriesByHierarchy(CustomCampaignEntry left, CustomCampaignEntry right)
-        {
-            if (ReferenceEquals(left, right))
-            {
-                return 0;
-            }
-
-            Transform leftTransform = left != null ? ((Component)left).transform : null;
-            Transform rightTransform = right != null ? ((Component)right).transform : null;
-            Transform leftParent = leftTransform != null ? leftTransform.parent : null;
-            Transform rightParent = rightTransform != null ? rightTransform.parent : null;
-            if (leftParent != null && ReferenceEquals(leftParent, rightParent))
-            {
-                return leftTransform.GetSiblingIndex().CompareTo(rightTransform.GetSiblingIndex());
-            }
-
-            float leftX = leftTransform != null ? leftTransform.position.x : 0f;
-            float rightX = rightTransform != null ? rightTransform.position.x : 0f;
-            return leftX.CompareTo(rightX);
         }
 
         private static MainMenuManager.Settings GetMainMenuSettings(CustomCampaignSelectMenuBehavior behavior)
@@ -174,51 +218,6 @@ namespace SongsOfConquestAccess.Adapters
         private static CustomCampaignEntry GetDownloadTip(CustomCampaignSelectMenuBehavior behavior)
         {
             return behavior != null ? DownloadTipRef(behavior) : null;
-        }
-
-        private static IMenuButtonAdapter CreateFallbackBackButton()
-        {
-            UIBackButton[] buttons = Resources.FindObjectsOfTypeAll<UIBackButton>();
-            for (int i = 0; i < buttons.Length; i++)
-            {
-                UIBackButton button = buttons[i];
-                if (button != null && MenuButtonAdapterBase.IsButtonVisible(button))
-                {
-                    return new StandardMenuButtonAdapter(
-                        button,
-                        () => button != null && MenuButtonAdapterBase.IsButtonVisible(button),
-                        () => NativeSelectionUtility.Click(button));
-                }
-            }
-
-            return null;
-        }
-
-        private static IMenuButtonAdapter CreateFallbackOptionsButton()
-        {
-            UIButton[] buttons = Resources.FindObjectsOfTypeAll<UIButton>();
-            for (int i = 0; i < buttons.Length; i++)
-            {
-                UIButton button = buttons[i];
-                if (button == null || !MenuButtonAdapterBase.IsButtonVisible(button))
-                {
-                    continue;
-                }
-
-                Transform transform = ((Component)button).transform;
-                Transform parent = transform != null ? transform.parent : null;
-                if (parent == null || parent.Find("OptionsLabel") == null)
-                {
-                    continue;
-                }
-
-                return new OptionsMenuButtonAdapter(
-                    button,
-                    () => button != null && MenuButtonAdapterBase.IsButtonVisible(button),
-                    () => NativeSelectionUtility.Click(button));
-            }
-
-            return null;
         }
 
         private static bool IsLiveSceneObject(GameObject gameObject)

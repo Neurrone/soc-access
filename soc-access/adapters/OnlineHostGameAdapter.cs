@@ -6,7 +6,6 @@ using SongsOfConquest.Client.Menu.Loading;
 using SongsOfConquest.Client.Menu.Main;
 using SongsOfConquest.Client.UI;
 using SongsOfConquestAccess.UI;
-using System.Reflection;
 using UnityEngine;
 
 namespace SongsOfConquestAccess.Adapters
@@ -15,59 +14,25 @@ namespace SongsOfConquestAccess.Adapters
     {
         private static readonly AccessTools.FieldRef<GameListMenu, GameListMenu.Settings> SettingsRef =
             AccessTools.FieldRefAccess<GameListMenu, GameListMenu.Settings>("_settings");
-        private static readonly FieldInfo InstallerSettingsField =
-            AccessTools.Field(typeof(GameListMenuInstaller), "_settings");
 
-        private readonly GameListMenu _menu;
         private readonly GameListMenu.Settings _settings;
 
         public OnlineHostGameAdapter(GameListMenu menu)
-            : this(menu, menu != null ? SettingsRef(menu) : null)
         {
-        }
-
-        private OnlineHostGameAdapter(GameListMenu menu, GameListMenu.Settings settings)
-        {
-            _menu = menu;
+            GameListMenu.Settings settings = menu != null ? SettingsRef(menu) : null;
             _settings = settings;
 
             PositiveButton = CreateButton(settings != null ? settings.HostGamePositiveButton : null);
             NegativeButton = CreateButton(settings != null ? settings.HostGameNegativeButton : null);
         }
 
-        public object SourceKey
-        {
-            get { return _menu ?? (object)_settings; }
-        }
-
         public IMenuButtonAdapter PositiveButton { get; private set; }
 
         public IMenuButtonAdapter NegativeButton { get; private set; }
 
-        public static OnlineHostGameAdapter TryCreateActive()
-        {
-            GameListMenuInstaller[] installers = Resources.FindObjectsOfTypeAll<GameListMenuInstaller>();
-            for (int i = 0; i < installers.Length; i++)
-            {
-                GameListMenuInstaller installer = installers[i];
-                if (installer == null || !IsLiveSceneObject(((Component)installer).gameObject))
-                {
-                    continue;
-                }
-
-                GameListMenu.Settings settings = InstallerSettingsField != null
-                    ? InstallerSettingsField.GetValue(installer) as GameListMenu.Settings
-                    : null;
-                OnlineHostGameAdapter adapter = new OnlineHostGameAdapter(null, settings);
-                if (adapter.IsPresent())
-                {
-                    return adapter;
-                }
-            }
-
-            return null;
-        }
-
+        /// <summary>Whether the popup is the page drawing: the game list menu shows and hides one
+        /// container for it, and its <c>Active</c> is read every frame. The list underneath answers
+        /// present at the same time, which is what stacks the popup over it.</summary>
         public bool IsPresent()
         {
             return _settings != null
@@ -199,11 +164,6 @@ namespace SongsOfConquestAccess.Adapters
         {
             MainMenuSceneLoader loader = MainMenuSceneLoader.UnsafeInstance;
             return loader != null && loader.CurrentlyLoadedScene == sceneType;
-        }
-
-        private static bool IsLiveSceneObject(GameObject gameObject)
-        {
-            return gameObject != null && gameObject.scene.IsValid() && gameObject.scene.isLoaded;
         }
     }
 }

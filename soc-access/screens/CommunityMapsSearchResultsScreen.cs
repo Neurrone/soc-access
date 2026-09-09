@@ -31,17 +31,16 @@ namespace SongsOfConquestAccess.Screens
 
         private readonly Dictionary<string, object> _markers = new Dictionary<string, object>();
 
-        /// <summary>After a hot reload: point the slot at the panel already showing.
-        /// Scanned once, from <c>ScreenDetector.RecoverRuntimeState</c>.</summary>
-        public static void Recover()
+        /// <summary>The results page, read off mod.io's own singleton every frame
+        /// (<see cref="CommunityMapsSources"/>).</summary>
+        protected override object ResolveMenu()
         {
-            Recovered<CommunityMapsSearchResultsScreen>(FindActive());
+            return CommunityMapsSources.SearchResults;
         }
 
-        public static CommunityMapsSearchResultsAdapter FindActive()
+        protected override CommunityMapsSearchResultsAdapter Adapt(object menu)
         {
-            CommunityMapsSearchResultsAdapter adapter = CommunityMapsSearchResultsAdapter.TryCreate();
-            return adapter != null && adapter.IsPresent() ? adapter : null;
+            return new CommunityMapsSearchResultsAdapter((ModIOBrowser.Implementation.SearchResults)menu);
         }
 
         public override string Key
@@ -72,6 +71,7 @@ namespace SongsOfConquestAccess.Screens
 
         public override bool IsActive()
         {
+            SyncLive();
             return Live != null && Live.IsPresent();
         }
 

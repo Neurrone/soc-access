@@ -32,17 +32,14 @@ namespace SongsOfConquestAccess.Screens
         private const string CardsStop = "custom-campaign-cards";
         private const string HeaderStop = "custom-campaign-header";
 
-        /// <summary>After a hot reload: point the slot at the menu already showing.
-        /// Scanned once, from <c>ScreenDetector.RecoverRuntimeState</c>.</summary>
-        public static void Recover()
+        protected override object ResolveMenu()
         {
-            Recovered<CustomCampaignSelectScreen>(FindActive());
+            return MainMenuSources.CustomCampaignSelect.Current;
         }
 
-        public static CustomCampaignSelectAdapter FindActive()
+        protected override CustomCampaignSelectAdapter Adapt(object menu)
         {
-            CustomCampaignSelectAdapter adapter = new CustomCampaignSelectAdapter(null);
-            return adapter.IsPresent() ? (adapter) : null;
+            return new CustomCampaignSelectAdapter((CustomCampaignSelectMenuBehavior)menu);
         }
 
         public override string Key
@@ -69,6 +66,7 @@ namespace SongsOfConquestAccess.Screens
 
         public override bool IsActive()
         {
+            SyncLive();
             return Live != null && Live.IsPresent();
         }
 

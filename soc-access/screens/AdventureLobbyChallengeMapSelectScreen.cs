@@ -45,22 +45,15 @@ namespace SongsOfConquestAccess.Screens
         // cursor on the same node while the selection under it changes.
         private readonly object _detailsMarker = new object();
 
-        /// <summary>After a hot reload: point the slot at the menu already showing.
-        /// Scanned once, from <c>ScreenDetector.RecoverRuntimeState</c>.</summary>
-        public static void Recover()
+        /// <summary>The lobby navigator's own challenge maps page (<see cref="LobbySources"/>).</summary>
+        protected override object ResolveMenu()
         {
-            Recovered<AdventureLobbyChallengeMapSelectScreen>(FindActive());
+            return LobbySources.ChallengeMaps.Current;
         }
 
-        public static AdventureLobbyChallengeMapSelectAdapter FindActive()
+        protected override AdventureLobbyChallengeMapSelectAdapter Adapt(object menu)
         {
-            AdventureLobbyChallengeMapSelectAdapter adapter = FindActiveChallengeMapSelectMenu(null);
-            return adapter;
-        }
-
-        public bool Matches(ChallengeMapsMenu menu)
-        {
-            return Live != null && ReferenceEquals(Live.SourceKey, menu);
+            return new AdventureLobbyChallengeMapSelectAdapter((ChallengeMapsMenu)menu, LobbySources.Navigation.Current);
         }
 
         public override string Key
@@ -87,6 +80,7 @@ namespace SongsOfConquestAccess.Screens
 
         public override bool IsActive()
         {
+            SyncLive();
             return Live != null && Live.IsPresent();
         }
 
@@ -314,43 +308,6 @@ namespace SongsOfConquestAccess.Screens
             NodeVtable vtable = GraphNodes.Button(button.GetLabel, () => button.Activate(), button.IsEnabled);
             vtable.OnFocusVisual = () => NativeSelectionUtility.Select(button.Button);
             builder.AddItem(new DrawnNode(ControlId.For(button.Button, key), vtable, button.Button));
-        }
-
-        public static AdventureLobbyChallengeMapSelectAdapter FindActiveChallengeMapSelectMenu(ChallengeMapsMenu targetMenu)
-        {
-            ChallengeMapsMenu[] menus = Resources.FindObjectsOfTypeAll<ChallengeMapsMenu>();
-            for (int i = 0; i < menus.Length; i++)
-            {
-                ChallengeMapsMenu menu = menus[i];
-                if (!IsLiveSceneChallengeMapSelectMenu(menu))
-                {
-                    continue;
-                }
-
-                if (targetMenu != null && !ReferenceEquals(targetMenu, menu))
-                {
-                    continue;
-                }
-
-                AdventureLobbyChallengeMapSelectAdapter adapter = new AdventureLobbyChallengeMapSelectAdapter(menu);
-                if (adapter.IsPresent())
-                {
-                    return adapter;
-                }
-            }
-
-            return null;
-        }
-
-        private static bool IsLiveSceneChallengeMapSelectMenu(ChallengeMapsMenu menu)
-        {
-            if (menu == null)
-            {
-                return false;
-            }
-
-            GameObject gameObject = ((Component)menu).gameObject;
-            return gameObject != null && gameObject.scene.IsValid() && gameObject.scene.isLoaded;
         }
     }
 }

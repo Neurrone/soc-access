@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Reflection;
 using System.Text.RegularExpressions;
@@ -111,11 +111,6 @@ namespace SongsOfConquestAccess.Adapters
 
         public IMenuButtonAdapter OptionsButton { get; private set; }
 
-        public PlayerStatsMenuNavigation Source
-        {
-            get { return _navigation; }
-        }
-
         public int SelectedTabIndex
         {
             get
@@ -135,19 +130,24 @@ namespace SongsOfConquestAccess.Adapters
             get { return GameText.Get("PlayerStats/TopTitle", ModText.Get(ModStrings.Screens.PlayerStats)); }
         }
 
+        /// <summary>The page as the game leaves it once it is workable. <c>PlayerStatsMenuNavigation</c>
+        /// sets its canvas group to alpha 0 in <c>Awake</c> and fades it to 1 at the end of its
+        /// <c>Start</c> coroutine, after nine end-of-frame waits, so an alpha at 1 with both tab views
+        /// resolved IS the end state - it is what the deleted 600-frame poll was waiting for. The tab
+        /// switch animates the two views and not this group, so the gate stays true while the player
+        /// moves between the tabs.</summary>
         public bool IsPresent()
         {
-            return _navigation != null
-                && IsLoadedPlayerStatsScene()
-                && IsLiveSceneObject(_navigation.gameObject)
-                && _navigation.gameObject.activeInHierarchy;
-        }
+            if (_navigation == null
+                || !IsLoadedPlayerStatsScene()
+                || !IsLiveSceneObject(_navigation.gameObject)
+                || !_navigation.gameObject.activeInHierarchy)
+            {
+                return false;
+            }
 
-        public bool IsReadyAfterAnimation()
-        {
             CanvasGroup canvasGroup = GetField<CanvasGroup>(_navigation, NavigationCanvasGroupField);
-            return IsPresent()
-                && canvasGroup != null
+            return canvasGroup != null
                 && canvasGroup.alpha >= 0.95f
                 && GetOverallMenu() != null
                 && GetBattleMenu() != null;
