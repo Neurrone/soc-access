@@ -200,7 +200,16 @@ namespace SongsOfConquestAccess.Screens
                 // whichever featured item is highlighted. The owner wants it reachable from each
                 // item, as the bands' own per-item overlay is (2026-09-07), so every featured item
                 // is a group whose children highlight the item first and then press that block.
-                builder.BeginGroup(Synthetic(key, vtable));
+                SyntheticNode header = Synthetic(key, vtable);
+                builder.BeginGroup(header);
+                // A shut group's children are swallowed by the builder anyway, and there are two of
+                // them under each of the ninety items this page draws: composing them costs a vtable,
+                // its closures and a keyed node apiece, every frame, for nothing anyone can reach.
+                if (!builder.IsExpanded(header.Id))
+                {
+                    builder.EndGroup();
+                    continue;
+                }
 
                 NodeVtable subscribe = GraphNodes.Button(
                     () => Live.FeaturedSubscribeLabel,
@@ -287,7 +296,13 @@ namespace SongsOfConquestAccess.Screens
             vtable.Announcements.Add(GraphNodes.ValuePart(() => captured.Status));
             vtable.OnFocusVisual = () => Live.FocusItem(captured);
 
-            builder.BeginGroup(Synthetic(key, vtable));
+            SyntheticNode header = Synthetic(key, vtable);
+            builder.BeginGroup(header);
+            if (!builder.IsExpanded(header.Id))
+            {
+                builder.EndGroup();
+                return;
+            }
 
             NodeVtable subscribe = GraphNodes.Button(
                 () => Live.GetItemSubscribeLabel(captured),
