@@ -100,23 +100,6 @@ namespace SongsOfConquestAccess
             CombatEventNarrator.NotifyBacteriaAddedStarted(troopId, localizedText);
         }
 
-        // The menu the game is hiding was UP, read off its own object: Hide is also how the menu is
-        // put away unshown when the PRE-battle menu opens (AdventureBattleMenu.Open sets up the
-        // commanders and then hides the post-battle menu), and only a menu that was showing has a
-        // page to close. activeSelf rather than activeInHierarchy: confirming the result deactivates
-        // the battle menu's container first, and this prefix runs after that.
-        [HarmonyPatch(typeof(PostBattleMenu), "Hide")]
-        [HarmonyPrefix]
-        private static void PostBattleMenuHidePrefix(PostBattleMenu __instance)
-        {
-            if (__instance == null || !__instance.gameObject.activeSelf)
-            {
-                return;
-            }
-
-            SocAccessMod.Instance?.ScreenDetector?.OnPostBattleResultClosed();
-        }
-
         [HarmonyPatch(typeof(NotificationPanel), "Show", new[] { typeof(string), typeof(UnityEngine.Vector3), typeof(UnityEngine.Vector2) })]
         [HarmonyPostfix]
         private static void NotificationPanelShowWithPivotPostfix(string localizedString)

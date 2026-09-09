@@ -95,7 +95,7 @@ namespace SongsOfConquestAccess
             try
             {
                 Logger.LogInfo("Applying Harmony patches");
-                _harmony.PatchAll(typeof(PopupMenuPatches).Assembly);
+                _harmony.PatchAll(typeof(ChatPatches).Assembly);
                 Logger.LogInfo("Harmony patches applied");
             }
             catch (System.Exception exception)
@@ -153,7 +153,7 @@ namespace SongsOfConquestAccess
             _screenManager = null;
             Step("story camera", StoryCameraFocusPatches.ResetDedupe);
             Step("combat", CombatPatches.Reset);
-            Step("chat", ChatPatches.Reset);
+            Step("chat", Screens.ChatSource.Reset);
             Step("tooltips", TooltipPatches.Reset);
             Step("buffer recorder", () => _bufferEventRecorder?.Detach());
             _bufferEventRecorder = null;

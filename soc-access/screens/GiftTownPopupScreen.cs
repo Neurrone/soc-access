@@ -35,26 +35,19 @@ namespace SongsOfConquestAccess.Screens
         private const string RequestStop = "gift-town-request";
         private const string CloseStop = "gift-town-close";
 
-        /// <summary>After a hot reload: point the slot at the menu already showing.
-        /// Scanned once, from <c>ScreenDetector.RecoverRuntimeState</c>.</summary>
-        public static void Recover()
+        /// <summary>The player menu holds this popup in a field of its own
+        /// (<see cref="HudSources"/>).</summary>
+        private readonly ScreenSource<GiftTownPopup> _source =
+            ScreenSource<GiftTownPopup>.FromOwner(HudSources.PlayerMenu, HudSources.GiftTown);
+
+        protected override object ResolveMenu()
         {
-            Recovered<GiftTownPopupScreen>(FindActive());
+            return _source.Current;
         }
 
-        public static GiftTownPopupAdapter FindActive()
+        protected override GiftTownPopupAdapter Adapt(object menu)
         {
-            GiftTownPopup[] popups = Resources.FindObjectsOfTypeAll<GiftTownPopup>();
-            for (int i = 0; i < popups.Length; i++)
-            {
-                GiftTownPopupAdapter adapter = new GiftTownPopupAdapter(popups[i]);
-                if (adapter.IsPresent())
-                {
-                    return (adapter);
-                }
-            }
-
-            return null;
+            return new GiftTownPopupAdapter((GiftTownPopup)menu);
         }
 
         public override string Key
@@ -77,6 +70,7 @@ namespace SongsOfConquestAccess.Screens
 
         public override bool IsActive()
         {
+            SyncLive();
             return Live != null && Live.IsPresent();
         }
 

@@ -4,7 +4,6 @@ using SongsOfConquestAccess.Adapters;
 using SongsOfConquestAccess.Localization;
 using SongsOfConquestAccess.UI;
 using SongsOfConquestAccess.UI.Graph;
-using UnityEngine;
 
 namespace SongsOfConquestAccess.Screens
 {
@@ -41,26 +40,19 @@ namespace SongsOfConquestAccess.Screens
         // across rebuilds so the reconciler seats the cursor back on it.
         private readonly object _closeKey = new object();
 
-        /// <summary>After a hot reload: point the slot at the menu already showing.
-        /// Scanned once, from <c>ScreenDetector.RecoverRuntimeState</c>.</summary>
-        public static void Recover()
+        /// <summary>The kingdom HUD holds this menu in a field of its own
+        /// (<see cref="HudSources"/>).</summary>
+        private readonly ScreenSource<KingdomTroopOverviewMenu> _source =
+            ScreenSource<KingdomTroopOverviewMenu>.FromOwner(HudSources.Kingdom, HudSources.TroopOverview);
+
+        protected override object ResolveMenu()
         {
-            Recovered<TroopOverviewScreen>(FindActive());
+            return _source.Current;
         }
 
-        public static KingdomTroopOverviewAdapter FindActive()
+        protected override KingdomTroopOverviewAdapter Adapt(object menu)
         {
-            KingdomTroopOverviewMenu[] menus = Resources.FindObjectsOfTypeAll<KingdomTroopOverviewMenu>();
-            for (int i = 0; i < menus.Length; i++)
-            {
-                KingdomTroopOverviewAdapter adapter = new KingdomTroopOverviewAdapter(menus[i]);
-                if (adapter.IsPresent())
-                {
-                    return (adapter);
-                }
-            }
-
-            return null;
+            return new KingdomTroopOverviewAdapter((KingdomTroopOverviewMenu)menu);
         }
 
         public override string Key
@@ -87,6 +79,7 @@ namespace SongsOfConquestAccess.Screens
 
         public override bool IsActive()
         {
+            SyncLive();
             return Live != null && Live.IsPresent();
         }
 

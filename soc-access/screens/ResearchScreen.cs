@@ -41,26 +41,20 @@ namespace SongsOfConquestAccess.Screens
         // across rebuilds so the reconciler seats the cursor back on it.
         private readonly object _closeKey = new object();
 
-        /// <summary>After a hot reload: point the slot at the menu already showing.
-        /// Scanned once, from <c>ScreenDetector.RecoverRuntimeState</c>.</summary>
-        public static void Recover()
+        /// <summary>The kingdom HUD holds this menu in a field of its own: its binding is
+        /// <c>WhenInjectedInto&lt;KingdomInformationHUD&gt;</c> and invisible from outside
+        /// (<see cref="HudSources"/>).</summary>
+        private readonly ScreenSource<ResearchMenu> _source =
+            ScreenSource<ResearchMenu>.FromOwner(HudSources.Kingdom, HudSources.Research);
+
+        protected override object ResolveMenu()
         {
-            Recovered<ResearchScreen>(FindActive());
+            return _source.Current;
         }
 
-        public static ResearchMenuAdapter FindActive()
+        protected override ResearchMenuAdapter Adapt(object menu)
         {
-            ResearchMenu[] menus = Resources.FindObjectsOfTypeAll<ResearchMenu>();
-            for (int i = 0; i < menus.Length; i++)
-            {
-                ResearchMenuAdapter adapter = new ResearchMenuAdapter(menus[i]);
-                if (adapter.IsPresent())
-                {
-                    return (adapter);
-                }
-            }
-
-            return null;
+            return new ResearchMenuAdapter((ResearchMenu)menu);
         }
 
         public override string Key
@@ -87,6 +81,7 @@ namespace SongsOfConquestAccess.Screens
 
         public override bool IsActive()
         {
+            SyncLive();
             return Live != null && Live.IsPresent();
         }
 

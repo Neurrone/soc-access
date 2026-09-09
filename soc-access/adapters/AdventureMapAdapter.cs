@@ -9,11 +9,13 @@ using Lavapotion.Pathfinding;
 using SongsOfConquest.Client;
 using SongsOfConquest.Client.Adventure;
 using SongsOfConquest.Client.Adventure.Map;
+using SongsOfConquest.Client.Adventure.Menu;
 using SongsOfConquest.Client.Adventure.View;
 using SongsOfConquest.Client.Gamestate;
 using SongsOfConquest.Client.Gamestate.Facade;
 using SongsOfConquest.Client.Grid;
 using SongsOfConquest.Client.InputManagement;
+using SongsOfConquest.Client.Menu.Loading;
 using SongsOfConquest.Client.Menu.Tooltip;
 using SongsOfConquest.Client.UI;
 using SongsOfConquest.Common.Details;
@@ -40,11 +42,18 @@ namespace SongsOfConquestAccess.Adapters
     public sealed class AdventureMapAdapter
     {
         private const byte ExploredButNotVisibleFogValue = 128;
+
         private const ushort ObjectiveBeaconBlueprintId = 50;
         private const ushort FallenBeaconBlueprintId = 158;
         private static readonly PropertyInfo InstallerContainerProperty =
             AccessTools.Property(typeof(AdventureViewInstaller), "Container");
         private static readonly ScannerDirection[] NoRoadDirections = new ScannerDirection[0];
+        // The names ReactiveAdventureMenuSystem waits under while it shows a story page
+        // (RegisterCommandWaiter composes them as "<type name>_<name>").
+        private static readonly string MessageTriggerWait =
+            typeof(ReactiveAdventureMenuSystem).Name + "_MessageTrigger";
+        private static readonly string DialogueTriggerWait =
+            typeof(ReactiveAdventureMenuSystem).Name + "_DialogueTrigger";
 
         private readonly DiContainer _container;
         private readonly IClientAdventureFacade _facade;
@@ -61,6 +70,8 @@ namespace SongsOfConquestAccess.Adapters
         private readonly IInputManager _inputManager;
         private readonly ISystemPopups _systemPopups;
         private readonly AdventureMapRevealedRegistry _revealedRegistry;
+        private readonly ICommandWaiter _commandWaiter;
+        private readonly ISceneLoader _sceneLoader;
         private readonly MethodInfo _worldToPointMethod;
         private readonly MethodInfo _pointToWorldMethod;
         private readonly MethodInfo _getTooltipForTilePositionMethod;
@@ -147,6 +158,10 @@ namespace SongsOfConquestAccess.Adapters
             _inputManager = inputManager;
             _systemPopups = systemPopups;
             _revealedRegistry = revealedRegistry;
+            _commandWaiter = Resolve<ICommandWaiter>(container);
+            _sceneLoader = ProjectContext.HasInstance && ProjectContext.Instance.Container != null
+                ? ProjectContext.Instance.Container.TryResolve<ISceneLoader>()
+                : null;
             _worldToPointMethod = cartographyConverter != null
                 ? AccessTools.Method(cartographyConverter.GetType(), "WorldToPoint", new[] { typeof(float3) })
                 : null;
@@ -306,6 +321,35 @@ namespace SongsOfConquestAccess.Adapters
             return GetReadinessDiagnostic() == null;
         }
 
+        /// <summary>Whether the game is showing a STORY TRIGGER of the local player's - a message, a
+        /// letterbox page or a dialogue - which is the whole of "the map has stood down": the camera
+        /// and the keyboard belong to the story until it is dismissed.
+        ///
+        /// Read off the game rather than remembered.
+        /// <c>ReactiveAdventureMenuSystem.HandleTrigger</c> returns before it shows anything unless
+        /// the trigger is the local player's (the same test the mod used to repeat on the payload),
+        /// and what it does show, it holds the command stream open for through
+        /// <c>ICommandWaiter</c> under a name of its own, until the page is dismissed. So the
+        /// waiter's identifiers ARE the answer, and losing sight of one is impossible: the game
+        /// drops it itself when the story ends.</summary>
+        public bool IsStoryTriggerRunning()
+        {
+            if (_commandWaiter == null || !_commandWaiter.IsWaiting)
+            {
+                return false;
+            }
+
+            foreach (string identifier in _commandWaiter.WaitDebugIdentifiers)
+            {
+                if (identifier == MessageTriggerWait || identifier == DialogueTriggerWait)
+                {
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
         public string GetReadinessDiagnostic()
         {
             if (SourceKey == null)
@@ -406,6 +450,27 @@ namespace SongsOfConquestAccess.Adapters
             if (!IsFogReady())
             {
                 return "fog not ready";
+            }
+
+            // THE SCENE IS BEING SWAPPED. The adventure's objects are torn down while its scene is
+            // still listed as loaded, and reading the map then reads a fog renderer that has already
+            // let its buffers go (2026-09-09: a null reference inside FogRenderer.GetFog on every
+            // frame of a save load). The loader saying it is idle ON THE ADVENTURE is the game's own
+            // "the map is the thing on screen", and is what the deleted SceneLoader.SetState hook
+            // used to report.
+            if (_sceneLoader == null)
+            {
+                return "missing scene loader";
+            }
+
+            if (_sceneLoader.State != SceneLoaderState.None)
+            {
+                return "scene loader busy: " + _sceneLoader.State;
+            }
+
+            if (_sceneLoader.Current != SceneType.Adventure)
+            {
+                return "scene loader is on " + (_sceneLoader.Current == null ? "nothing" : _sceneLoader.Current.SceneName);
             }
 
             return null;

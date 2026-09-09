@@ -72,26 +72,18 @@ namespace SongsOfConquestAccess.Screens
         // controls of their own.
         private readonly Dictionary<string, object> _markers = new Dictionary<string, object>();
 
-        /// <summary>After a hot reload: point the slot at the menu already showing.
-        /// Scanned once, from <c>ScreenDetector.RecoverRuntimeState</c>.</summary>
-        public static void Recover()
+        /// <summary>The commander HUD's settings hold the sheet (<see cref="HudSources"/>).</summary>
+        private readonly ScreenSource<CommanderSheet> _source =
+            ScreenSource<CommanderSheet>.FromOwner(HudSources.Commander, HudSources.Sheet);
+
+        protected override object ResolveMenu()
         {
-            Recovered<CommanderSheetScreen>(FindActive());
+            return _source.Current;
         }
 
-        public static CommanderSheetAdapter FindActive()
+        protected override CommanderSheetAdapter Adapt(object menu)
         {
-            CommanderSheet[] sheets = Resources.FindObjectsOfTypeAll<CommanderSheet>();
-            for (int i = 0; i < sheets.Length; i++)
-            {
-                CommanderSheetAdapter adapter = new CommanderSheetAdapter(sheets[i]);
-                if (adapter.IsPresent())
-                {
-                    return (adapter);
-                }
-            }
-
-            return null;
+            return new CommanderSheetAdapter((CommanderSheet)menu);
         }
 
         public override string Key
@@ -131,6 +123,7 @@ namespace SongsOfConquestAccess.Screens
 
         public override bool IsActive()
         {
+            SyncLive();
             return Live != null && Live.IsPresent();
         }
 

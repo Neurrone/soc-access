@@ -38,27 +38,20 @@ namespace SongsOfConquestAccess.Screens
         /// sliders established.</summary>
         private const int CoarseSteps = 10;
 
-        /// <summary>After a hot reload: point the slot at the menu already showing.
-        /// Scanned once, from <c>ScreenDetector.RecoverRuntimeState</c>.</summary>
-        public static void Recover()
+        /// <summary>The commander HUD's own troop rows hold the drag popup
+        /// (<see cref="HudSources"/>). Several <c>TroopHUD</c>s exist - the settlement's, the trade
+        /// menu's - and only this one's drag opens from the map.</summary>
+        private readonly ScreenSource<TroopHUDEntryMovable> _source =
+            ScreenSource<TroopHUDEntryMovable>.FromOwner(HudSources.Commander, HudSources.MovableTroop);
+
+        protected override object ResolveMenu()
         {
-            Recovered<MoveTroopPopupScreen>(FindActive());
+            return _source.Current;
         }
 
-        public static MoveTroopPopupAdapter FindActive()
+        protected override MoveTroopPopupAdapter Adapt(object menu)
         {
-            TroopHUDEntryMovable[] movables = Resources.FindObjectsOfTypeAll<TroopHUDEntryMovable>();
-            for (int i = 0; i < movables.Length; i++)
-            {
-                TroopHUDEntryMovable movable = movables[i];
-                MoveTroopPopupAdapter adapter = new MoveTroopPopupAdapter(movable);
-                if (adapter.IsPresent())
-                {
-                    return (adapter);
-                }
-            }
-
-            return null;
+            return new MoveTroopPopupAdapter((TroopHUDEntryMovable)menu);
         }
 
         public override string Key
@@ -85,6 +78,7 @@ namespace SongsOfConquestAccess.Screens
 
         public override bool IsActive()
         {
+            SyncLive();
             return Live != null && Live.IsPresent();
         }
 

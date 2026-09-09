@@ -10,7 +10,7 @@ using UnityEngine.UI;
 
 namespace SongsOfConquestAccess.Adapters
 {
-    public sealed class SystemPopupAdapter : IMessageDialogAdapter, IInputDialogAdapter
+    public sealed class SystemPopupAdapter : IMessageDialogAdapter, IInputDialogAdapter, IDisposable
     {
         private static readonly AccessTools.FieldRef<SystemPopup, UITextMesh> HeaderTextRef =
             AccessTools.FieldRefAccess<SystemPopup, UITextMesh>("_headerText");
@@ -24,6 +24,7 @@ namespace SongsOfConquestAccess.Adapters
             AccessTools.FieldRefAccess<SystemPopup, UIButton>("_cancelButton");
 
         private readonly SystemPopup _popup;
+        private Action<IUITextMeshInputField, string> _attachedSubmit;
 
         public SystemPopupAdapter(SystemPopup popup)
         {
@@ -138,6 +139,7 @@ namespace SongsOfConquestAccess.Adapters
             if (inputField != null && handler != null)
             {
                 inputField.OnSubmit = (Action<IUITextMeshInputField, string>)Delegate.Combine(inputField.OnSubmit, handler);
+                _attachedSubmit = handler;
             }
         }
 
@@ -148,6 +150,18 @@ namespace SongsOfConquestAccess.Adapters
             {
                 inputField.OnSubmit = (Action<IUITextMeshInputField, string>)Delegate.Remove(inputField.OnSubmit, handler);
             }
+
+            if (ReferenceEquals(_attachedSubmit, handler))
+            {
+                _attachedSubmit = null;
+            }
+        }
+
+        /// <summary>The slot has let this adapter go: the game's field must not be left holding a
+        /// handler of ours (AGENTS.md, "Screen Resolution").</summary>
+        public void Dispose()
+        {
+            DetachInputSubmit(_attachedSubmit);
         }
 
         public void SyncNativeSelection(DialogAction action)

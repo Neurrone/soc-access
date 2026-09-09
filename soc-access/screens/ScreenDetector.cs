@@ -36,12 +36,11 @@ namespace SongsOfConquestAccess.Screens
     ///
     /// SHRINKING: a screen that resolves its own menu (AGENTS.md, "Screen Resolution") has no handler
     /// here at all. What is left are the screens that have not moved yet and the events that are not
-    /// readiness - the story trigger, the lobby's dropdown, the community maps refreshes.
+    /// readiness - the lobby's dropdown, the community maps refreshes.
     /// </summary>
     public sealed class ScreenDetector
     {
         private readonly ScreenManager _screens;
-        private AdventureViewInstaller _adventureViewInstaller;
         private BattleSceneInstaller _battleSceneInstaller;
         private IconDropdown _deferredAdventureLobbyDropdownClose;
         private bool _deferredAdventureLobbyDropdownHidden;
@@ -52,10 +51,6 @@ namespace SongsOfConquestAccess.Screens
         {
             _screens = screens;
         }
-
-        /// <summary>Whether a story sequence is running - the camera and the keyboard are the story's,
-        /// and the map stands down for it (<see cref="AdventureMapScreen.IsActive"/>).</summary>
-        public bool StorySequenceActive { get; private set; }
 
         public void Update()
         {
@@ -125,150 +120,7 @@ namespace SongsOfConquestAccess.Screens
             ForgetAllExcept(null);
         }
 
-        // ---- the story ----
-
-        public void OnStorySequenceTrigger(OnTriggerPayload payload, IClientAdventureFacade facade)
-        {
-            if (!IsLocalStoryTrigger(payload, facade))
-            {
-                return;
-            }
-
-            StorySequenceActive = true;
-        }
-
-        public void OnStorySequenceCompleted()
-        {
-            StorySequenceActive = false;
-            Reg<StoryTextScreen>()?.Forget();
-        }
-
-        // ---- the in-game panels ----
-
-        public void OnOwnedEntitiesReady(KingdomEntityOverviewMenu menu)
-        {
-            KingdomEntityOverviewAdapter adapter = new KingdomEntityOverviewAdapter(menu);
-            if (adapter.IsPresent())
-            {
-                Reg<OwnedEntitiesScreen>()?.Show(adapter);
-            }
-        }
-
-        public void OnOwnedEntitiesClosed(KingdomEntityOverviewMenu menu)
-        {
-            Reg<OwnedEntitiesScreen>()?.Forget();
-        }
-
-        public void OnTroopOverviewReady(KingdomTroopOverviewMenu menu)
-        {
-            KingdomTroopOverviewAdapter adapter = new KingdomTroopOverviewAdapter(menu);
-            if (adapter.IsPresent())
-            {
-                Reg<TroopOverviewScreen>()?.Show(adapter);
-            }
-        }
-
-        public void OnTroopOverviewClosed(KingdomTroopOverviewMenu menu)
-        {
-            Reg<TroopOverviewScreen>()?.Forget();
-        }
-
-        public void OnAdventurePlayerMenuReady(AdventurePlayerMenu menu)
-        {
-            AdventurePlayerMenuAdapter adapter = new AdventurePlayerMenuAdapter(menu);
-            if (adapter.IsPresent())
-            {
-                Reg<AdventurePlayerMenuScreen>()?.Show(adapter);
-            }
-        }
-
-        public void OnAdventurePlayerMenuClosed(AdventurePlayerMenu menu)
-        {
-            AdventurePlayerMenuScreen screen = Reg<AdventurePlayerMenuScreen>();
-            if (screen != null && (menu == null || screen.Matches(menu)))
-            {
-                screen.Forget();
-            }
-        }
-
-        public void OnSendResourcePopupReady(SendResourcePopup popup)
-        {
-            SendResourcePopupAdapter adapter = new SendResourcePopupAdapter(popup);
-            if (adapter.IsPresent())
-            {
-                Reg<SendResourcePopupScreen>()?.Show(adapter);
-            }
-        }
-
-        public void OnSendResourcePopupHidden()
-        {
-            // SendResourcePopup.Hide is not a reliable close signal by itself: the game also calls it
-            // during injection-time initialization and can call it redundantly when the popup is
-            // already inactive. Letting go of the slot is safe either way - the poll answers from the
-            // popup's own drawn state, and a Hide that meant nothing is followed by a Ready.
-            Reg<SendResourcePopupScreen>()?.Forget();
-        }
-
-        public void OnGiftTownPopupReady(GiftTownPopup popup)
-        {
-            GiftTownPopupAdapter adapter = new GiftTownPopupAdapter(popup);
-            if (adapter.IsPresent())
-            {
-                Reg<GiftTownPopupScreen>()?.Show(adapter);
-            }
-        }
-
-        public void OnGiftTownPopupHidden()
-        {
-            // GiftTownPopup.Hide is not a reliable close signal by itself, exactly as above.
-            Reg<GiftTownPopupScreen>()?.Forget();
-        }
-
-        public void OnMarketplaceReady(MarketplaceMenu menu)
-        {
-            MarketplaceMenuAdapter adapter = new MarketplaceMenuAdapter(menu);
-            if (adapter.IsPresent())
-            {
-                Reg<MarketplaceScreen>()?.Show(adapter);
-            }
-        }
-
-        public void OnMarketplaceClosed(MarketplaceMenu menu)
-        {
-            Reg<MarketplaceScreen>()?.Forget();
-        }
-
-        public void OnCommanderSheetReady(CommanderSheet commanderSheet)
-        {
-            Reg<CommanderSheetScreen>()?.Show(new CommanderSheetAdapter(commanderSheet));
-        }
-
-        public void OnCommanderSheetClosed(CommanderSheet commanderSheet)
-        {
-            Reg<CommanderSheetScreen>()?.Forget();
-        }
-
-        public void OnSpellbookReady(SpellBook spellbook)
-        {
-            Reg<SpellbookScreen>()?.Show(new SpellbookAdapter(spellbook));
-        }
-
-        public void OnSpellbookClosed(SpellBook spellbook)
-        {
-            Reg<SpellbookScreen>()?.Forget();
-        }
-
-        public void OnMoveTroopPopupReady(TroopHUDEntryMovable movable)
-        {
-            Reg<MoveTroopPopupScreen>()?.Show(new MoveTroopPopupAdapter(movable));
-        }
-
-        public void OnMoveTroopPopupClosed(TroopHUDEntryMovable movable)
-        {
-            // The game calls TroopHUDEntryMovable.Reset even when the troop move popup is not open,
-            // such as during HUD teardown and refresh; an empty slot emptied again costs nothing.
-            Reg<MoveTroopPopupScreen>()?.Forget();
-        }
+        // ---- the player stats page ----
 
         public void OnPlayerStatsReady(PlayerStatsMenuNavigation menu)
         {
@@ -283,130 +135,6 @@ namespace SongsOfConquestAccess.Screens
         {
             Reg<PlayerStatsScreen>()?.Forget();
         }
-
-        public void OnResearchMenuReady(ResearchMenu menu)
-        {
-            ResearchMenuAdapter adapter = new ResearchMenuAdapter(menu);
-            if (adapter.IsPresent())
-            {
-                Reg<ResearchScreen>()?.Show(adapter);
-            }
-        }
-
-        public void OnResearchMenuClosed(ResearchMenu menu)
-        {
-            Reg<ResearchScreen>()?.Forget();
-        }
-
-        // ---- the settlement, the dwelling and the defence menu, with their two sub-pages ----
-
-        // ---- the dialogs ----
-
-        public void OnConfirmPopupReady(ConfirmPopup popup)
-        {
-            ConfirmPopupAdapter adapter = new ConfirmPopupAdapter(popup);
-            if (adapter.IsPresent())
-            {
-                Reg<MessageDialogScreen>()?.Show(adapter);
-            }
-        }
-
-        public void OnConfirmPopupClosed(ConfirmPopup popup)
-        {
-            ForgetMessageDialog(popup);
-        }
-
-        public void OnSystemPopupReady(SystemPopup popup)
-        {
-            SystemPopupAdapter adapter = new SystemPopupAdapter(popup);
-            if (adapter.IsPresent())
-            {
-                Reg<MessageDialogScreen>()?.Show(adapter);
-            }
-        }
-
-        public void OnSystemPopupClosed(SystemPopup popup)
-        {
-            ForgetMessageDialog(popup);
-        }
-
-        public void OnPopupMenuReady(object sourceKey, PopupMenu.Settings settings)
-        {
-            if (settings == null)
-            {
-                SocAccessMod.Instance?.LogWarning("ScreenDetector.OnPopupMenuReady received null settings");
-                return;
-            }
-
-            object resolvedSourceKey = sourceKey ?? (object)settings.ContainerTransform;
-            Reg<MessageDialogScreen>()?.Show(new PopupMenuAdapter(resolvedSourceKey, settings));
-        }
-
-        public void OnPopupMenuClosed(object sourceKey)
-        {
-            ForgetMessageDialog(sourceKey);
-        }
-
-        public void OnMapMessagePopupReady(MapMessagePopup popup)
-        {
-            MapMessagePopupAdapter adapter = new MapMessagePopupAdapter(popup);
-            if (adapter.IsPresent())
-            {
-                Reg<MessageDialogScreen>()?.Show(adapter);
-            }
-        }
-
-        public void OnMapMessagePopupClosed(MapMessagePopup popup)
-        {
-            ForgetMessageDialog(popup);
-        }
-
-        public void OnRandomEventMenuReady(RandomEventMenu menu)
-        {
-            RandomEventMenuAdapter adapter = new RandomEventMenuAdapter(menu);
-            if (adapter.IsPresent())
-            {
-                Reg<MessageDialogScreen>()?.Show(adapter);
-            }
-        }
-
-        public void OnRandomEventMenuClosed(RandomEventMenu menu)
-        {
-            ForgetMessageDialog(menu);
-        }
-
-        public void OnCustomMessageMenuReady(CustomMessageMenu menu)
-        {
-            CustomMessageMenuAdapter adapter = new CustomMessageMenuAdapter(menu);
-            if (adapter.IsPresent())
-            {
-                Reg<MessageDialogScreen>()?.Show(adapter);
-            }
-        }
-
-        public void OnCustomMessageMenuClosed(CustomMessageMenu menu)
-        {
-            ForgetMessageDialog(menu);
-        }
-
-        /// <summary>One slot, six sources: a close is only this dialog's when the slot is reading the
-        /// source that closed. A null source key means "whatever is in there".</summary>
-        private void ForgetMessageDialog(object sourceKey)
-        {
-            MessageDialogScreen screen = Reg<MessageDialogScreen>();
-            if (screen == null || screen.Live == null)
-            {
-                return;
-            }
-
-            object current = screen.SourceKey;
-            if (sourceKey == null || current == null || ReferenceEquals(sourceKey, current))
-            {
-                screen.Forget();
-            }
-        }
-
-        // ---- the story text ----
 
         // ---- the main menu and its pages ----
 
@@ -957,54 +685,6 @@ namespace SongsOfConquestAccess.Screens
             }
         }
 
-        // ---- the adventure map ----
-
-        public void OnAdventureViewReady(AdventureViewInstaller installer)
-        {
-            _adventureViewInstaller = installer;
-        }
-
-        public void OnAdventureMapReady()
-        {
-            // The scene loader raises this on every return to its idle state while the current scene
-            // is still the adventure, including the frames after the player quit to the main menu with
-            // the view installer already gone; a screen reading an absent adapter threw on its first
-            // read of the map and did so on every frame the loop lasted (2026-09-07).
-            ShowAdventureMap("adventure map ready");
-        }
-
-        public void OnAdventureMapClosed()
-        {
-            _adventureViewInstaller = null;
-            Reg<AdventureMapScreen>()?.Forget();
-        }
-
-        /// <summary>Point the map's slot at the installed adventure, unless the adapter says the
-        /// adventure is not ready to be read yet.</summary>
-        private void ShowAdventureMap(string reason)
-        {
-            AdventureMapScreen screen = Reg<AdventureMapScreen>();
-            if (screen == null)
-            {
-                return;
-            }
-
-            AdventureMapRevealedRegistry revealedRegistry = GetAdventureMapRevealedRegistry();
-            AdventureMapAdapter adapter = new AdventureMapAdapter(_adventureViewInstaller, revealedRegistry);
-            string readinessDiagnostic = adapter.GetReadinessDiagnostic();
-            if (readinessDiagnostic != null)
-            {
-                SocAccessMod.Instance?.LogWarning(
-                    "ScreenDetector "
-                    + reason
-                    + " adventure map adapter is not present: "
-                    + readinessDiagnostic);
-                return;
-            }
-
-            screen.Live = adapter;
-        }
-
         // ---- the battle ----
 
         public void OnBattleSceneReady(BattleSceneInstaller installer)
@@ -1041,26 +721,6 @@ namespace SongsOfConquestAccess.Screens
             CombatEventNarrator.Reset();
         }
 
-        /// <summary>The battle result page has been put away. The page itself now finds its own menu,
-        /// so all that is left here is the ADVENTURE MAP, which is still slot-fed: this goes with the
-        /// map when it resolves itself.</summary>
-        public void OnPostBattleResultClosed()
-        {
-            if (_screens.Contains<PostAdventureResultScreen>() || _screens.Contains<PostAdventureStatsScreen>())
-            {
-                return;
-            }
-
-            // Returning from manual combat can report SceneLoaderState.None before every adventure
-            // dependency is ready, causing the normal map creation hook to reject the adapter. Once
-            // post-battle closes, the native battle menu has completed and the map is readable again.
-            AdventureMapScreen map = Reg<AdventureMapScreen>();
-            if (map != null && map.Live == null)
-            {
-                ShowAdventureMap("post battle result closed");
-            }
-        }
-
         // ---- the hot reload ----
 
         /// <summary>
@@ -1092,54 +752,10 @@ namespace SongsOfConquestAccess.Screens
             AdventureLobbyIconDropdownScreen.Recover();
             AdventureLobbyInviteProvidersScreen.Recover();
             CampaignMapSelectScreen.Recover();
-            AdventureMapScreen.Recover();
-            AdventurePlayerMenuScreen.Recover();
-            SendResourcePopupScreen.Recover();
-            GiftTownPopupScreen.Recover();
-            OwnedEntitiesScreen.Recover();
-            TroopOverviewScreen.Recover();
-            MarketplaceScreen.Recover();
             CombatScreen.Recover();
-            ChatScreen.Recover();
-            SpellbookScreen.Recover();
             PlayerStatsScreen.Recover();
-            ResearchScreen.Recover();
-            MoveTroopPopupScreen.Recover();
-            CommanderSheetScreen.Recover();
-            MessageDialogScreen.Recover();
             LoadingCompleteScreen.Recover();
         }
 
-        private static AdventureMapRevealedRegistry GetAdventureMapRevealedRegistry()
-        {
-            AdventureMapScannerState scannerState = SocAccessMod.Instance?.AdventureMapScannerState;
-            return scannerState != null ? scannerState.RevealedRegistry : new AdventureMapRevealedRegistry();
-        }
-
-        /// <summary>Whether a story trigger is the local player's - a remote or AI commander's story
-        /// is not the one this keyboard is waiting on.</summary>
-        private static bool IsLocalStoryTrigger(OnTriggerPayload payload, IClientAdventureFacade facade)
-        {
-            if (payload == null || facade == null || payload.TriggerData == null)
-            {
-                return false;
-            }
-
-            TriggerType type = payload.TriggerData.Type;
-            if (type != TriggerType.Message && type != TriggerType.Dialogue)
-            {
-                return false;
-            }
-
-            if (!facade.Teams.GetIsRemoteOrAI(payload.InteractingCommanderTeamId))
-            {
-                return true;
-            }
-
-            int sourceValue = (int)payload.Source;
-            return sourceValue >= 2
-                && sourceValue <= 8
-                && !facade.Teams.GetIsRemoteOrAI(payload.TriggerCommanderTeamId);
-        }
     }
 }

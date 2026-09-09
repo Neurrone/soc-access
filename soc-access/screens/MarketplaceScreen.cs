@@ -47,26 +47,18 @@ namespace SongsOfConquestAccess.Screens
         // across rebuilds so the reconciler seats the cursor back on the same node.
         private readonly Dictionary<string, object> _markers = new Dictionary<string, object>();
 
-        /// <summary>After a hot reload: point the slot at the menu already showing.
-        /// Scanned once, from <c>ScreenDetector.RecoverRuntimeState</c>.</summary>
-        public static void Recover()
+        /// <summary>The kingdom HUD's settings hold this menu (<see cref="HudSources"/>).</summary>
+        private readonly ScreenSource<MarketplaceMenu> _source =
+            ScreenSource<MarketplaceMenu>.FromOwner(HudSources.Kingdom, HudSources.Marketplace);
+
+        protected override object ResolveMenu()
         {
-            Recovered<MarketplaceScreen>(FindActive());
+            return _source.Current;
         }
 
-        public static MarketplaceMenuAdapter FindActive()
+        protected override MarketplaceMenuAdapter Adapt(object menu)
         {
-            MarketplaceMenu[] menus = Resources.FindObjectsOfTypeAll<MarketplaceMenu>();
-            for (int i = 0; i < menus.Length; i++)
-            {
-                MarketplaceMenuAdapter adapter = new MarketplaceMenuAdapter(menus[i]);
-                if (adapter.IsPresent())
-                {
-                    return (adapter);
-                }
-            }
-
-            return null;
+            return new MarketplaceMenuAdapter((MarketplaceMenu)menu);
         }
 
         public override string Key
@@ -92,6 +84,7 @@ namespace SongsOfConquestAccess.Screens
 
         public override bool IsActive()
         {
+            SyncLive();
             return Live != null && Live.IsPresent();
         }
 

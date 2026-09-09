@@ -10,53 +10,19 @@ using UnityEngine.UI;
 
 namespace SongsOfConquestAccess.Adapters
 {
-    public sealed class PopupMenuAdapter : IMessageDialogAdapter, IInputDialogAdapter
+    public sealed class PopupMenuAdapter : IMessageDialogAdapter, IInputDialogAdapter, IDisposable
     {
         private readonly object _sourceKey;
-        private readonly IUITransform _containerTransform;
-        private readonly UITextMeshInputField _inputField;
-        private readonly IUIButton _positiveButton;
-        private readonly IUIButton _negativeButton;
-        private readonly string _title;
-        private readonly IList<string> _bodyLines;
-        private readonly string[] _actionLabels;
+        private readonly PopupMenu.Settings _settings;
+        private Action<IUITextMeshInputField, string> _attachedSubmit;
 
-        private PopupMenuAdapter(
-            object sourceKey,
-            IUITransform containerTransform,
-            UITextMeshInputField inputField,
-            IUIButton positiveButton,
-            IUIButton negativeButton,
-            string title,
-            string body,
-            string positiveLabel,
-            string negativeLabel)
+        /// <summary>The ONE popup object the game reuses for every message it shows, so nothing is
+        /// read at construction: the heading, the body and the button labels are whatever the popup
+        /// is drawing when they are asked for.</summary>
+        public PopupMenuAdapter(object sourceKey, PopupMenu.Settings settings)
         {
             _sourceKey = sourceKey;
-            _containerTransform = containerTransform;
-            _inputField = inputField;
-            _positiveButton = positiveButton;
-            _negativeButton = negativeButton;
-            _title = SpokenLines.Clean(title);
-            _bodyLines = SpokenLines.Of(new[] { body });
-            _actionLabels = new[] { SpokenLines.Clean(positiveLabel), SpokenLines.Clean(negativeLabel) };
-        }
-
-        public PopupMenuAdapter(object sourceKey, PopupMenu.Settings settings)
-            : this(
-                sourceKey,
-                settings != null ? settings.ContainerTransform : null,
-                settings != null ? settings.InputField : null,
-                settings != null ? settings.PositiveButton : null,
-                settings != null ? settings.NegativeButton : null,
-                // Read popup text through UITextMeshTextUtility rather than the raw public
-                // Text properties. On hot reload, PopupMenu can remain visible while those
-                // public values revert to prefab placeholder content.
-                GetActiveText(settings != null ? settings.HeaderText : null),
-                GetActiveText(settings != null ? settings.MessageText : null),
-                GetButtonText(settings != null ? settings.PositiveButton : null),
-                GetButtonText(settings != null ? settings.NegativeButton : null))
-        {
+            _settings = settings;
         }
 
         public object SourceKey
@@ -64,61 +30,98 @@ namespace SongsOfConquestAccess.Adapters
             get { return _sourceKey; }
         }
 
+        /// <summary>Read through <c>UITextMeshTextUtility</c> rather than the raw public Text
+        /// properties: on a hot reload the popup can stay visible while those revert to the prefab's
+        /// placeholder content.</summary>
         public string Title
         {
-            get { return _title; }
+            get { return SpokenLines.Clean(GetActiveText(Header)); }
         }
 
         public string Body
         {
-            get { return string.Join(" ", _bodyLines); }
+            get { return string.Join(" ", BodyLines); }
         }
 
         /// <summary>The paragraphs the game broke the message into, kept apart rather than collapsed:
         /// the popup reads a paragraph at a time.</summary>
         public IList<string> BodyLines
         {
-            get { return _bodyLines; }
+            get { return SpokenLines.Of(new[] { GetActiveText(Message) }); }
         }
 
         public string PositiveLabel
         {
-            get { return GetActionLabel(0); }
+            get { return SpokenLines.Clean(GetButtonText(PositiveButton)); }
         }
 
         public string NegativeLabel
         {
-            get { return GetActionLabel(1); }
+            get { return SpokenLines.Clean(GetButtonText(NegativeButton)); }
+        }
+
+        private IUITextMesh Header
+        {
+            get { return _settings != null ? _settings.HeaderText : null; }
+        }
+
+        private IUITextMesh Message
+        {
+            get { return _settings != null ? _settings.MessageText : null; }
+        }
+
+        private IUITransform ContainerTransform
+        {
+            get { return _settings != null ? _settings.ContainerTransform : null; }
+        }
+
+        private UITextMeshInputField Field
+        {
+            get { return _settings != null ? _settings.InputField : null; }
+        }
+
+        private IUIButton PositiveButton
+        {
+            get { return _settings != null ? _settings.PositiveButton : null; }
+        }
+
+        private IUIButton NegativeButton
+        {
+            get { return _settings != null ? _settings.NegativeButton : null; }
         }
 
         public bool HasPositiveAction
         {
-            get { return IsButtonActive(_positiveButton); }
+            get { return IsButtonActive(PositiveButton); }
         }
 
         public bool HasNegativeAction
         {
-            get { return IsButtonActive(_negativeButton); }
+            get { return IsButtonActive(NegativeButton); }
         }
 
         public bool IsPositiveActionEnabled
         {
-            get { return IsButtonEnabled(_positiveButton); }
+            get { return IsButtonEnabled(PositiveButton); }
         }
 
         public bool IsNegativeActionEnabled
         {
-            get { return IsButtonEnabled(_negativeButton); }
+            get { return IsButtonEnabled(NegativeButton); }
         }
 
         public bool HasInputField
         {
-            get { return _inputField != null && _inputField.Active && _inputField.Interactable; }
+            get
+            {
+                UITextMeshInputField field = Field;
+                return field != null && field.Active && field.Interactable;
+            }
         }
 
         public IUITextMeshInputField InputField
         {
-            get { return HasInputField ? _inputField : null; }
+            get { return HasInputField ? Field : null; }
         }
 
         /// <summary>True: every <c>PopupMenu.Show</c> overload registers
@@ -134,9 +137,9 @@ namespace SongsOfConquestAccess.Adapters
             switch (action)
             {
                 case DialogAction.Positive:
-                    return ComponentOf(_positiveButton);
+                    return ComponentOf(PositiveButton);
                 case DialogAction.Negative:
-                    return ComponentOf(_negativeButton);
+                    return ComponentOf(NegativeButton);
                 default:
                     return null;
             }
@@ -144,29 +147,45 @@ namespace SongsOfConquestAccess.Adapters
 
         public bool IsPresent()
         {
-            if (_containerTransform == null)
+            IUITransform container = ContainerTransform;
+            if (container == null)
             {
                 return false;
             }
 
-            return _containerTransform.Active
+            return container.Active
                 && (HasPositiveAction || HasNegativeAction);
         }
 
         public void AttachInputSubmit(Action<IUITextMeshInputField, string> handler)
         {
-            if (_inputField != null && handler != null)
+            UITextMeshInputField field = Field;
+            if (field != null && handler != null)
             {
-                _inputField.OnSubmit = (Action<IUITextMeshInputField, string>)Delegate.Combine(_inputField.OnSubmit, handler);
+                field.OnSubmit = (Action<IUITextMeshInputField, string>)Delegate.Combine(field.OnSubmit, handler);
+                _attachedSubmit = handler;
             }
         }
 
         public void DetachInputSubmit(Action<IUITextMeshInputField, string> handler)
         {
-            if (_inputField != null && handler != null)
+            UITextMeshInputField field = Field;
+            if (field != null && handler != null)
             {
-                _inputField.OnSubmit = (Action<IUITextMeshInputField, string>)Delegate.Remove(_inputField.OnSubmit, handler);
+                field.OnSubmit = (Action<IUITextMeshInputField, string>)Delegate.Remove(field.OnSubmit, handler);
             }
+
+            if (ReferenceEquals(_attachedSubmit, handler))
+            {
+                _attachedSubmit = null;
+            }
+        }
+
+        /// <summary>The slot has let this adapter go: the game's field must not be left holding a
+        /// handler of ours (AGENTS.md, "Screen Resolution").</summary>
+        public void Dispose()
+        {
+            DetachInputSubmit(_attachedSubmit);
         }
 
         public void SyncNativeSelection(DialogAction action)
@@ -185,10 +204,10 @@ namespace SongsOfConquestAccess.Adapters
             switch (action)
             {
                 case DialogAction.Positive:
-                    selectable = GetSelectable(_positiveButton);
+                    selectable = GetSelectable(PositiveButton);
                     break;
                 case DialogAction.Negative:
-                    selectable = GetSelectable(_negativeButton);
+                    selectable = GetSelectable(NegativeButton);
                     break;
             }
 
@@ -211,9 +230,9 @@ namespace SongsOfConquestAccess.Adapters
             switch (action)
             {
                 case DialogAction.Positive:
-                    return InvokeButton(_positiveButton);
+                    return InvokeButton(PositiveButton);
                 case DialogAction.Negative:
-                    return InvokeButton(_negativeButton);
+                    return InvokeButton(NegativeButton);
                 default:
                     return false;
             }
@@ -243,16 +262,6 @@ namespace SongsOfConquestAccess.Adapters
 
             IUISelectableHolder holder = button;
             return holder.GetSelectable();
-        }
-
-        private string GetActionLabel(int index)
-        {
-            if (_actionLabels == null || index < 0 || index >= _actionLabels.Length)
-            {
-                return string.Empty;
-            }
-
-            return _actionLabels[index] ?? string.Empty;
         }
 
         private static bool InvokeButton(IUIButton button)

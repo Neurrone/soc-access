@@ -33,26 +33,19 @@ namespace SongsOfConquestAccess.Screens
         private const string RequestStop = "send-resource-request";
         private const string CloseStop = "send-resource-close";
 
-        /// <summary>After a hot reload: point the slot at the menu already showing.
-        /// Scanned once, from <c>ScreenDetector.RecoverRuntimeState</c>.</summary>
-        public static void Recover()
+        /// <summary>The player menu holds this popup in a field of its own
+        /// (<see cref="HudSources"/>).</summary>
+        private readonly ScreenSource<SendResourcePopup> _source =
+            ScreenSource<SendResourcePopup>.FromOwner(HudSources.PlayerMenu, HudSources.SendResource);
+
+        protected override object ResolveMenu()
         {
-            Recovered<SendResourcePopupScreen>(FindActive());
+            return _source.Current;
         }
 
-        public static SendResourcePopupAdapter FindActive()
+        protected override SendResourcePopupAdapter Adapt(object menu)
         {
-            SendResourcePopup[] popups = Resources.FindObjectsOfTypeAll<SendResourcePopup>();
-            for (int i = 0; i < popups.Length; i++)
-            {
-                SendResourcePopupAdapter adapter = new SendResourcePopupAdapter(popups[i]);
-                if (adapter.IsPresent())
-                {
-                    return (adapter);
-                }
-            }
-
-            return null;
+            return new SendResourcePopupAdapter((SendResourcePopup)menu);
         }
 
         public override string Key
@@ -75,6 +68,7 @@ namespace SongsOfConquestAccess.Screens
 
         public override bool IsActive()
         {
+            SyncLive();
             return Live != null && Live.IsPresent();
         }
 

@@ -78,10 +78,6 @@ namespace SongsOfConquestAccess.Screens
         // the reconciler seats the cursor on the same line.
         private readonly Dictionary<string, object> _markers = new Dictionary<string, object>();
 
-        // The chat button is the chat's own adapter's, and looking it up walks the scene, so it is
-        // held rather than asked for on every rebuild.
-        private ChatAdapter _chat;
-
         /// <summary>After a hot reload: point the slot at the menu already showing.
         /// Scanned once, from <c>ScreenDetector.RecoverRuntimeState</c>.</summary>
         public static void Recover()
@@ -482,12 +478,7 @@ namespace SongsOfConquestAccess.Screens
 
         private ChatAdapter Chat()
         {
-            if (_chat == null || _chat.Button == null)
-            {
-                _chat = ChatPatches.CurrentAdapter;
-            }
-
-            return _chat;
+            return ChatSource.Current;
         }
 
         private void AddLobbyButton(GraphBuilder builder, string key, AdventureLobbyPlayersAdapter.LobbyButtonItem item)

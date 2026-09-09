@@ -1,7 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Reflection;
-using HarmonyLib;
 using Lavapotion.Cartography;
 using SongsOfConquest.Client;
 using SongsOfConquest.Client.Adventure;
@@ -24,7 +22,6 @@ using SongsOfConquest.Common.Economy;
 using SongsOfConquest.Common.Gamestate;
 using SongsOfConquest.Common.Localization;
 using UnityEngine;
-using Zenject;
 
 namespace SongsOfConquestAccess.Screens
 {
@@ -70,8 +67,6 @@ namespace SongsOfConquestAccess.Screens
     /// </summary>
     public sealed class AdventureMapScreen : LiveScreen<AdventureMapAdapter>
     {
-        private static readonly PropertyInfo InstallerContainerProperty =
-            AccessTools.Property(typeof(AdventureViewInstaller), "Container");
         private static readonly ResourceType[] ResourceSummaryOrder =
         {
             ResourceType.Gold,
@@ -136,8 +131,6 @@ namespace SongsOfConquestAccess.Screens
         /// far as the navigator is concerned.</summary>
         public static readonly ControlId MapNodeId = ControlId.Structural("adventure-map:tile");
 
-        private static string _lastProbeDiagnostic;
-
         private AdventureMapEventListener _eventListener;
 
         // The tile cursor, built over the adapter it walks. Rebuilt when the slot is pointed at a
@@ -174,18 +167,24 @@ namespace SongsOfConquestAccess.Screens
         private AdventureMapTile _tile;
         private bool _tileRead;
 
-        /// <summary>After a hot reload: point the slot at the adventure already installed.
-        /// Scanned once, from <c>ScreenDetector.RecoverRuntimeState</c>.</summary>
-        public static void Recover()
+        // THE ADVENTURE FINDS ITSELF: the view installer is a component on the adventure scene's
+        // SceneContext object, and its container is where everything the map reads is bound, so the
+        // installer IS the adventure as far as this screen is concerned. A battle, a save load and a
+        // quit to the menu all end with this scene unloaded (SceneLoader unloads every scene but the
+        // one it just brought in), so each of them answers with a NEW installer and gets a new
+        // adapter and a new cursor; the bookmarks are on disk under the game's own identity and
+        // outlive all three.
+        private readonly ScreenSource<AdventureViewInstaller> _installer =
+            ScreenSource<AdventureViewInstaller>.FromSceneRoot(LoadedScenes.AdventureScene);
+
+        protected override object ResolveMenu()
         {
-            Recovered<AdventureMapScreen>(FindActive());
+            return _installer.Current;
         }
 
-        /// <summary>The adventure the game has installed and made ready, or null. The one scan.
-        /// </summary>
-        public static AdventureMapAdapter FindActive()
+        protected override AdventureMapAdapter Adapt(object menu)
         {
-            return FindActiveAdventureMap();
+            return new AdventureMapAdapter((AdventureViewInstaller)menu, GetAdventureMapRevealedRegistry());
         }
 
         /// <summary>The cursor is built over one adventure: a new one gets a new grid, and the audio
@@ -239,13 +238,13 @@ namespace SongsOfConquestAccess.Screens
         /// rebuilt for every dialog.</summary>
         public override bool IsActive()
         {
+            SyncLive();
             if (Live == null || !Live.IsPresent())
             {
                 return false;
             }
 
-            ScreenDetector detector = SocAccessMod.Instance == null ? null : SocAccessMod.Instance.ScreenDetector;
-            if (detector != null && detector.StorySequenceActive)
+            if (Live.IsStoryTriggerRunning())
             {
                 return false;
             }
@@ -671,7 +670,7 @@ namespace SongsOfConquestAccess.Screens
         {
             bool optionsDrawn = hud.IsOptionsButtonVisible();
             bool overviewDrawn = hud.IsKingdomOverviewMenuVisible();
-            ChatAdapter chat = ChatPatches.CurrentAdapter;
+            ChatAdapter chat = ChatSource.Current;
             bool chatDrawn = chat != null && chat.IsButtonVisible();
             bool bugReportDrawn = hud.IsBugReportButtonVisible();
             if (!optionsDrawn && !overviewDrawn && !chatDrawn && !bugReportDrawn)
@@ -1311,13 +1310,22 @@ namespace SongsOfConquestAccess.Screens
         /// word and focus is put back on the map without announcing that either.</summary>
         private void MoveCursor(Vector2Int tile, bool announce)
         {
-            if (announce && _isTopScreen && IsMapFocused())
+            // The events that land here (a camera focus published from a HUD click) arrive while the
+            // adventure is still being built as well as while it is up, and the cursor exists only
+            // once the map does.
+            AdventureMapGrid grid = Grid();
+            if (grid == null)
             {
-                Grid().FocusTile(tile);
                 return;
             }
 
-            Grid().FocusTileSilently(tile);
+            if (announce && _isTopScreen && IsMapFocused())
+            {
+                grid.FocusTile(tile);
+                return;
+            }
+
+            grid.FocusTileSilently(tile);
             Navigator?.FocusNode(MapNodeId, announce: false);
         }
 
@@ -1353,153 +1361,11 @@ namespace SongsOfConquestAccess.Screens
             return true;
         }
 
-        // ---- the runtime probe (the reload resync) ----
-
-        private static AdventureMapAdapter FindActiveAdventureMap()
-        {
-            AdventureViewInstaller[] installers = Resources.FindObjectsOfTypeAll<AdventureViewInstaller>();
-            if (installers.Length == 0)
-            {
-                LogProbeDiagnostic("Adventure map probe found no AdventureViewInstaller instances");
-                return null;
-            }
-
-            int liveInstallers = 0;
-            for (int i = 0; i < installers.Length; i++)
-            {
-                AdventureViewInstaller installer = installers[i];
-                if (!IsLiveSceneInstaller(installer))
-                {
-                    continue;
-                }
-
-                liveInstallers++;
-                DiContainer container = GetContainer(installer);
-                IClientAdventureFacade facade = TryResolve<IClientAdventureFacade>(container);
-                ISelectionHandler selectionHandler = TryResolve<ISelectionHandler>(container);
-                IFogManager fogManager = TryResolve<IFogManager>(container);
-                IGrid grid = TryResolve<IGrid>(container);
-                ICameraController cameraController = TryResolve<ICameraController>(container);
-                IAdventureTooltipManager tooltipManager = TryResolve<IAdventureTooltipManager>(container);
-                ILocalizationHandler localizationHandler = TryResolve<ILocalizationHandler>(container);
-                ICartographyVisualManifest cartographyVisualManifest = TryResolve<ICartographyVisualManifest>(container);
-                IHumanAdventureController humanAdventureController = TryResolve<IHumanAdventureController>(container);
-                IHumanAdventureControllerFacade humanAdventureControllerFacade = TryResolve<IHumanAdventureControllerFacade>(container);
-                IInputManager inputManager = TryResolve<IInputManager>(container);
-                ISystemPopups systemPopups = TryResolve<ISystemPopups>(container);
-                object cartographyConverter = TryResolveByTypeName(container, "Lavapotion.Cartography.ICartographyConverter");
-
-                AdventureMapRevealedRegistry revealedRegistry = GetAdventureMapRevealedRegistry();
-                AdventureMapAdapter adapter = new AdventureMapAdapter(
-                    installer,
-                    container,
-                    facade,
-                    selectionHandler,
-                    fogManager,
-                    grid,
-                    cameraController,
-                    cartographyConverter,
-                    tooltipManager,
-                    localizationHandler,
-                    cartographyVisualManifest,
-                    humanAdventureController,
-                    humanAdventureControllerFacade,
-                    inputManager,
-                    systemPopups,
-                    revealedRegistry);
-                if (adapter.IsPresent())
-                {
-                    LogProbeDiagnostic("Adventure map probe found ready adventure map");
-                    return adapter;
-                }
-
-                LogProbeDiagnostic("Adventure map probe found installer but adapter is not ready: " + adapter.GetReadinessDiagnostic());
-            }
-
-            if (liveInstallers == 0)
-            {
-                LogProbeDiagnostic("Adventure map probe found " + installers.Length + " installer instances but none in a loaded scene");
-            }
-
-            return null;
-        }
-
         private static AdventureMapRevealedRegistry GetAdventureMapRevealedRegistry()
         {
             AdventureMapScannerState scannerState = SocAccessMod.Instance?.AdventureMapScannerState;
             return scannerState != null ? scannerState.RevealedRegistry : new AdventureMapRevealedRegistry();
         }
 
-        private static bool IsLiveSceneInstaller(AdventureViewInstaller installer)
-        {
-            if (installer == null)
-            {
-                return false;
-            }
-
-            GameObject gameObject = installer.gameObject;
-            return gameObject != null && gameObject.scene.IsValid() && gameObject.scene.isLoaded;
-        }
-
-        private static DiContainer GetContainer(AdventureViewInstaller installer)
-        {
-            if (installer == null || InstallerContainerProperty == null)
-            {
-                return null;
-            }
-
-            return InstallerContainerProperty.GetValue(installer, null) as DiContainer;
-        }
-
-        private static T TryResolve<T>(DiContainer container) where T : class
-        {
-            if (container == null)
-            {
-                return null;
-            }
-
-            try
-            {
-                return container.Resolve<T>();
-            }
-            catch (Exception)
-            {
-                return null;
-            }
-        }
-
-        private static object TryResolveByTypeName(DiContainer container, string typeName)
-        {
-            if (container == null || string.IsNullOrWhiteSpace(typeName))
-            {
-                return null;
-            }
-
-            Type type = AccessTools.TypeByName(typeName);
-            if (type == null)
-            {
-                return null;
-            }
-
-            try
-            {
-                return container.Resolve(type);
-            }
-            catch (Exception)
-            {
-                return null;
-            }
-        }
-
-        private static void LogProbeDiagnostic(string message)
-        {
-            if (message == _lastProbeDiagnostic)
-            {
-                return;
-            }
-
-            _lastProbeDiagnostic = message;
-            SocAccessMod.Instance?.LogInfo(message);
-        }
     }
 }

@@ -18,20 +18,6 @@ namespace SongsOfConquestAccess
         private static readonly FieldInfo IncomeEntryCurrentCycleIndexField =
             AccessTools.Field(typeof(KingdomTroopOverviewIncomeEntry), "_currentCycleIndex");
 
-        [HarmonyPatch(typeof(KingdomTroopOverviewMenu), "Show")]
-        [HarmonyPostfix]
-        private static void KingdomTroopOverviewShowPostfix(KingdomTroopOverviewMenu __instance)
-        {
-            SocAccessMod.Instance?.ScreenDetector?.OnTroopOverviewReady(__instance);
-        }
-
-        [HarmonyPatch(typeof(KingdomTroopOverviewMenu), "Hide")]
-        [HarmonyPostfix]
-        private static void KingdomTroopOverviewHidePostfix(KingdomTroopOverviewMenu __instance)
-        {
-            SocAccessMod.Instance?.ScreenDetector?.OnTroopOverviewClosed(__instance);
-        }
-
         [HarmonyPatch(typeof(KingdomTroopOverviewTownEntry), "HandleTownNameClicked")]
         [HarmonyPrefix]
         private static void TownNameClickedPrefix(KingdomTroopOverviewTownEntry __instance, ref IMapEntity __state)

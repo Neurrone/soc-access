@@ -126,10 +126,6 @@ namespace SongsOfConquestAccess.Screens
         private int _lastCycleCurrentTroopId = -1;
         private Action<TroopAbilityTargeting> _abilityTargetingBeginHandler;
 
-        // The chat adapter this battle draws, kept while it is the one the game still draws: the
-        // patch answers from the references its own hooks keep, so asking again costs a field read.
-        private ChatAdapter _chat;
-
         // The tile's inspect tooltip is the game's whole details capture and the graph is rebuilt for
         // every navigation operation, so it is composed once per tile - which is exactly as often as
         // the widget engine's focus commit composed it. The key is the cursor's state AND the board's,
@@ -263,12 +259,11 @@ namespace SongsOfConquestAccess.Screens
         }
 
         /// <summary>A new battle is a new <see cref="Live"/>, and nothing read from the old one holds:
-        /// the chat button is probed again for this one, and the tile tooltip's cache starts empty so
-        /// the same coordinates in a new battle are not answered with the previous battle's tile.
+        /// the tile tooltip's cache starts empty so the same coordinates in a new battle are not
+        /// answered with the previous battle's tile.
         /// </summary>
         public override void OnLiveChanged(CombatAdapter previous)
         {
-            _chat = null;
             _tooltip = null;
             _tooltipRead = false;
             // A new battle starts the troop cycles and the instruction baseline over: the first
@@ -757,21 +752,11 @@ namespace SongsOfConquestAccess.Screens
             builder.PopContext();
         }
 
-        /// <summary>The chat adapter, asked for again whenever there is none or the button it wraps
-        /// has gone - as the lobby's does. A battle without chat therefore costs a null field read a
-        /// frame, and the chat window a later battle creates is picked up; the patch's own scene scan
-        /// is behind ITS probed flags and runs once per mod load, not once per ask.</summary>
+        /// <summary>The chat the game has up, found by <see cref="ChatSource"/> and memoised there
+        /// on the set of loaded scenes, so a battle without chat costs a comparison a frame.</summary>
         private ChatAdapter Chat
         {
-            get
-            {
-                if (_chat == null || _chat.Button == null)
-                {
-                    _chat = ChatPatches.CurrentAdapter;
-                }
-
-                return _chat;
-            }
+            get { return ChatSource.Current; }
         }
 
         // ---- the battle log ----

@@ -46,12 +46,17 @@ namespace SongsOfConquestAccess.Screens
         // window renders into one mesh, and the way out is the mod's own row.
         private readonly Dictionary<string, object> _markers = new Dictionary<string, object>();
 
-        /// <summary>After a hot reload: point the slot at the chat window already showing.
-        /// Scanned once, from <c>ScreenDetector.RecoverRuntimeState</c>.</summary>
-        public static void Recover()
+        /// <summary>The chat window the game has up, drawn or not (<see cref="ChatSource"/>); the
+        /// page is this screen only while the window is OPEN.</summary>
+        protected override object ResolveMenu()
         {
-            ChatAdapter adapter = ChatPatches.CurrentAdapter;
-            Recovered<ChatScreen>(adapter != null && adapter.IsOpen ? adapter : null);
+            ChatAdapter adapter = ChatSource.Current;
+            return adapter != null && adapter.IsOpen ? adapter : null;
+        }
+
+        protected override ChatAdapter Adapt(object menu)
+        {
+            return (ChatAdapter)menu;
         }
 
         public override string Key
@@ -72,6 +77,7 @@ namespace SongsOfConquestAccess.Screens
 
         public override bool IsActive()
         {
+            SyncLive();
             return Live != null && Live.IsOpen;
         }
 

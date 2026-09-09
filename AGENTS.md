@@ -82,7 +82,7 @@ If native emulation behaves differently from mouse input:
 
 A screen finds its own menu; no hook tells it. `IsActive()` is "the source found the menu and
 `Live.IsPresent()`", both read from the game every frame. The source (`ScreenSource<T>`) resolves
-the menu one of four ways and memoises the answer, hit or miss, keyed on the set of loaded scene
+the menu one of six ways and memoises the answer, hit or miss, keyed on the set of loaded scene
 handles, so a scene change, a hot reload and a new game are the same event and none needs a
 signal:
 
@@ -92,6 +92,12 @@ signal:
   adventure and battle menus; a binding marked `WhenInjectedInto` is invisible from outside and
   resolves through its owner's field instead (the kingdom HUD's four menus, the battle menu's
   settings); never resolve a lazy binding, it constructs the object;
+- a `GameObjectContext`'s own sub-container (`SceneSubContainers`) for what a HUD installer binds
+  into a container of its own, which neither the scene nor the project container can see: the
+  kingdom HUD, the commander HUD's settings, the chat window's and button's behaviours. One walk
+  of the loaded scenes' root objects answers every one of them, about 7 ms per scene load;
+- a component on a scene ROOT object (`GetComponent<T>` per root) for a scene's installers, which
+  share the `SceneContext`'s own object: the adventure view installer the map reads;
 - a field off a resolved owner for a menu the owner holds (commander sheet, spellbook, the
   pre- and post-battle menus, a lobby row's dropdown);
 - a walk of the scene's root objects (`GetComponentInChildren<T>(true)`) for the unbound

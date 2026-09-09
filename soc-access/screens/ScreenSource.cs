@@ -153,6 +153,23 @@ namespace SongsOfConquestAccess.Screens
             }, null);
         }
 
+        /// <summary>A component on a ROOT object of one of the named scenes, which is where the
+        /// scene's installers sit (they share the SceneContext's own object). A handful of
+        /// <c>GetComponent</c> calls rather than the subtree walk below.</summary>
+        public static ScreenSource<T> FromSceneRoot(params string[] scenes)
+        {
+            return new ScreenSource<T>(() => OnRoots(scenes), scenes);
+        }
+
+        /// <summary>A binding in the container of a <c>GameObjectContext</c> - a sub-container the
+        /// scene container cannot see into, which is where the adventure HUD installers put their
+        /// bindings. Shares one walk of the scene's contexts with every other source that asks
+        /// (<see cref="SceneSubContainers"/>).</summary>
+        public static ScreenSource<T> FromSubContainer(params string[] scenes)
+        {
+            return new ScreenSource<T>(SceneSubContainers.Resolve<T>, scenes);
+        }
+
         /// <summary>A scene object nothing binds or holds: one walk of the named scenes' root
         /// objects. Gated to those scenes because the walk costs milliseconds on a big scene and
         /// a miss costs the same as a hit.</summary>
@@ -247,6 +264,31 @@ namespace SongsOfConquestAccess.Screens
             return null;
         }
 
+        private static T OnRoots(string[] scenes)
+        {
+            int count = SceneManager.sceneCount;
+            for (int i = 0; i < count; i++)
+            {
+                Scene scene = SceneManager.GetSceneAt(i);
+                if (!scene.isLoaded || !Named(scene, scenes))
+                {
+                    continue;
+                }
+
+                GameObject[] roots = scene.GetRootGameObjects();
+                for (int r = 0; r < roots.Length; r++)
+                {
+                    T found = roots[r].GetComponent(typeof(T)) as T;
+                    if (found != null)
+                    {
+                        return found;
+                    }
+                }
+            }
+
+            return null;
+        }
+
         private static T WalkRoots(string[] scenes)
         {
             int count = SceneManager.sceneCount;
@@ -292,13 +334,120 @@ namespace SongsOfConquestAccess.Screens
     }
 
     /// <summary>
+    /// The Zenject SUB-CONTAINERS of the loaded scenes: a <c>GameObjectContext</c> installs its
+    /// bindings into a container of its own, and neither the scene container nor the project
+    /// container can see into one, so a menu bound there (the kingdom HUD, the commander HUD, the
+    /// chat window and button) is resolved from the sub-container that binds it.
+    ///
+    /// One walk of every loaded scene's root objects answers all of them, and it is memoised on the
+    /// set of loaded scenes exactly as a <see cref="ScreenSource{T}"/> is, so the walk happens once
+    /// per scene load however many sources ask.
+    /// </summary>
+    public static class SceneSubContainers
+    {
+        private static readonly DiContainer[] None = new DiContainer[0];
+
+        private static int _sceneKey = int.MinValue;
+        private static DiContainer[] _containers = None;
+
+        /// <summary>The first sub-container that answers to this contract, or null.</summary>
+        public static T Resolve<T>() where T : class
+        {
+            DiContainer[] containers = All;
+            for (int i = 0; i < containers.Length; i++)
+            {
+                T found = containers[i].TryResolve<T>();
+                if (found != null)
+                {
+                    return found;
+                }
+            }
+
+            return null;
+        }
+
+        /// <summary>The first sub-container's <c>IInitializable</c> of this type. For a service the
+        /// game binds with <c>BindInterfacesTo</c> and no interface of its own: the chat window's
+        /// and the chat button's behaviours are reachable no other way.</summary>
+        public static T ResolveInitializable<T>() where T : class
+        {
+            DiContainer[] containers = All;
+            for (int i = 0; i < containers.Length; i++)
+            {
+                List<IInitializable> initializables = containers[i].ResolveAll<IInitializable>();
+                for (int j = 0; j < initializables.Count; j++)
+                {
+                    T match = initializables[j] as T;
+                    if (match != null)
+                    {
+                        return match;
+                    }
+                }
+            }
+
+            return null;
+        }
+
+        private static DiContainer[] All
+        {
+            get
+            {
+                int key = LoadedScenes.Key;
+                if (key != _sceneKey)
+                {
+                    // The walk first, so a throw leaves neither the key nor the answer half written.
+                    _containers = Walk();
+                    _sceneKey = key;
+                }
+
+                return _containers;
+            }
+        }
+
+        private static DiContainer[] Walk()
+        {
+            List<DiContainer> containers = new List<DiContainer>();
+            List<GameObjectContext> contexts = new List<GameObjectContext>();
+            int count = SceneManager.sceneCount;
+            for (int i = 0; i < count; i++)
+            {
+                Scene scene = SceneManager.GetSceneAt(i);
+                if (!scene.isLoaded)
+                {
+                    continue;
+                }
+
+                GameObject[] roots = scene.GetRootGameObjects();
+                for (int r = 0; r < roots.Length; r++)
+                {
+                    contexts.Clear();
+                    roots[r].GetComponentsInChildren(true, contexts);
+                    for (int c = 0; c < contexts.Count; c++)
+                    {
+                        DiContainer container = contexts[c] == null ? null : contexts[c].Container;
+                        if (container != null)
+                        {
+                            containers.Add(container);
+                        }
+                    }
+                }
+            }
+
+            return containers.Count == 0 ? None : containers.ToArray();
+        }
+    }
+
+    /// <summary>
     /// A source and the adapter over what it finds, paired: the adapter is built once per object the
     /// source answers with and kept while it keeps answering with the same one, so a screen with
     /// SEVERAL sources can ask each of them "are you the one drawing" without building an adapter a
     /// frame. The pairing is keyed on the object read from the game, so a menu the game replaces
     /// gets a new adapter and nothing has to be reset (AGENTS.md, "Screen Resolution").
     ///
-    /// Not for an adapter the slot disposes: the pairing would hand out the disposed one again.
+    /// Not for an adapter the slot disposes, unless everything its <c>Dispose</c> lets go of is put
+    /// back by the screen's <c>Adapt</c>: the pairing hands the disposed one out again the next time
+    /// its source answers with the same object (the message dialog's popup adapters, whose Dispose
+    /// only detaches the submit handler Adapt attaches).
     /// </summary>
     public sealed class AdaptedSource<TMenu, TAdapter>
         where TMenu : class

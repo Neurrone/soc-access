@@ -77,32 +77,20 @@ namespace SongsOfConquestAccess.Screens
         // the game would not take - is the mod's to make a noise about.
         private bool _nativeDragRan;
 
-        /// <summary>After a hot reload: point the slot at the menu already showing.
-        /// Scanned once, from <c>ScreenDetector.RecoverRuntimeState</c>.</summary>
-        public static void Recover()
+        /// <summary>The adventure spellbook: the commander HUD's settings hold the opener, and the
+        /// opener holds the book (<see cref="HudSources"/>). The battle's spellbook is a different
+        /// object and a different screen.</summary>
+        private readonly ScreenSource<SpellBook> _source =
+            ScreenSource<SpellBook>.FromOwner(HudSources.Commander, HudSources.Spellbook);
+
+        protected override object ResolveMenu()
         {
-            Recovered<SpellbookScreen>(FindActive());
+            return _source.Current;
         }
 
-        public static SpellbookAdapter FindActive()
+        protected override SpellbookAdapter Adapt(object menu)
         {
-            SpellBook[] spellbooks = Resources.FindObjectsOfTypeAll<SpellBook>();
-            for (int i = 0; i < spellbooks.Length; i++)
-            {
-                SpellBook spellbook = spellbooks[i];
-                if (spellbook == null)
-                {
-                    continue;
-                }
-
-                SpellbookAdapter adapter = new SpellbookAdapter(spellbook);
-                if (adapter.IsPresent())
-                {
-                    return (adapter);
-                }
-            }
-
-            return null;
+            return new SpellbookAdapter((SpellBook)menu);
         }
 
         public override string Key
@@ -125,6 +113,7 @@ namespace SongsOfConquestAccess.Screens
 
         public override bool IsActive()
         {
+            SyncLive();
             return Live != null && Live.IsPresent();
         }
 

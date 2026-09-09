@@ -18,7 +18,7 @@ namespace SongsOfConquestAccess.Screens
     /// Every message dialog the game puts up, made navigable as a graph: one stop holding the
     /// heading, the body, the field where the source has one, and the buttons.
     ///
-    /// Seven native sources share this class, and the shape is read off each of them every build
+    /// Six native sources share this class, and the shape is read off each of them every build
     /// rather than assumed. Measured 2026-09-06 at 1280x800 on the quit popup: the heading ("Quit to
     /// Desktop") is drawn above the body ("Are you sure?"), and the buttons are drawn No at x 508 then
     /// Yes at x 647. The delete-save popup draws No then Yes as well, and the options confirm draws a
@@ -55,15 +55,9 @@ namespace SongsOfConquestAccess.Screens
 
         private static readonly AccessTools.FieldRef<PopupMenu, PopupMenu.Settings> PopupSettingsRef =
             AccessTools.FieldRefAccess<PopupMenu, PopupMenu.Settings>("_settings");
-        private static readonly System.Reflection.PropertyInfo PopupInstallerContainerProperty =
-            AccessTools.Property(typeof(PopupMenuInstaller), "Container");
-        private static readonly System.Reflection.PropertyInfo RandomEventInstallerContainerProperty =
-            AccessTools.Property(typeof(RandomEventMenuInstaller), "Container");
-        private static readonly System.Reflection.PropertyInfo CustomMessageInstallerContainerProperty =
-            AccessTools.Property(typeof(CustomMessageMenuInstaller), "Container");
+        private static readonly AccessTools.FieldRef<SystemPopupManager, ISystemPopup> SystemPopupRef =
+            AccessTools.FieldRefAccess<SystemPopupManager, ISystemPopup>("_popup");
 
-        private IInputDialogAdapter _inputAdapter;
-        private Action<IUITextMeshInputField, string> _inputSubmitHandler;
         private readonly GameTextEditor _editor = new GameTextEditor();
 
         // A subject of its own for each node the source gives no component for. The reconciler seats
@@ -76,225 +70,83 @@ namespace SongsOfConquestAccess.Screens
         private readonly object _positiveKey = new object();
         private readonly object _negativeKey = new object();
 
+        // THE SIX SOURCES, each resolved from the game and adapted once per object it answers with.
+        // The map message, the random event and the custom message are bound in the adventure
+        // scene's container; the popup menu, the confirm popup and the system popup are bound in the
+        // project's, the system popup only into its manager (WhenInjectedInto), so it comes off that
+        // manager's own field. The page belongs to whichever of them is DRAWING, asked in the order
+        // the detector's own handlers used to be tried.
+        //
+        // Two of these adapters ARE disposed by the slot, which AdaptedSource warns about: the game
+        // reuses one popup object for every message it shows, so the pairing hands the same adapter
+        // out again after its Dispose. That is safe here and only here, because the only thing
+        // Dispose lets go of is the submit handler, and Adapt below puts it back every time the slot
+        // takes the adapter.
+        private readonly AdaptedSource<IMapMessagePopup, IMessageDialogAdapter> _mapMessage =
+            new AdaptedSource<IMapMessagePopup, IMessageDialogAdapter>(
+                ScreenSource<IMapMessagePopup>.FromScene(LoadedScenes.AdventureScene),
+                popup => new MapMessagePopupAdapter((MapMessagePopup)popup));
+
+        private readonly AdaptedSource<IRandomEventMenu, IMessageDialogAdapter> _randomEvent =
+            new AdaptedSource<IRandomEventMenu, IMessageDialogAdapter>(
+                ScreenSource<IRandomEventMenu>.FromScene(LoadedScenes.AdventureScene),
+                menu => new RandomEventMenuAdapter((RandomEventMenu)menu));
+
+        private readonly AdaptedSource<ICustomMessageMenu, IMessageDialogAdapter> _customMessage =
+            new AdaptedSource<ICustomMessageMenu, IMessageDialogAdapter>(
+                ScreenSource<ICustomMessageMenu>.FromScene(LoadedScenes.AdventureScene),
+                menu => new CustomMessageMenuAdapter((CustomMessageMenu)menu));
+
+        private readonly AdaptedSource<IPopupMenu, IMessageDialogAdapter> _popupMenu =
+            new AdaptedSource<IPopupMenu, IMessageDialogAdapter>(
+                ScreenSource<IPopupMenu>.FromProject(),
+                menu => new PopupMenuAdapter(menu, PopupSettingsRef((PopupMenu)menu)));
+
+        private readonly AdaptedSource<ConfirmPopup, IMessageDialogAdapter> _confirmPopup =
+            new AdaptedSource<ConfirmPopup, IMessageDialogAdapter>(
+                ScreenSource<ConfirmPopup>.FromProject(),
+                popup => new ConfirmPopupAdapter(popup));
+
+        private readonly AdaptedSource<ISystemPopup, IMessageDialogAdapter> _systemPopup =
+            new AdaptedSource<ISystemPopup, IMessageDialogAdapter>(
+                // BindInterfacesTo, so the manager answers only to ISystemPopups; the popup itself is
+                // bound WhenInjectedInto<SystemPopupManager> and reachable only off its field.
+                ScreenSource<ISystemPopup>.FromOwner(
+                    ScreenSource<ISystemPopups>.FromProject(),
+                    manager => SystemPopupRef((SystemPopupManager)manager)),
+                popup => new SystemPopupAdapter((SystemPopup)popup));
+
+        /// <summary>The adapter itself is what the slot holds here: six unrelated objects draw the
+        /// one page, so the "menu" a source answers with IS the adapter over it, built once per
+        /// object.</summary>
+        protected override object ResolveMenu()
+        {
+            return Drawing(_mapMessage.Current)
+                ?? Drawing(_randomEvent.Current)
+                ?? Drawing(_customMessage.Current)
+                ?? Drawing(_popupMenu.Current)
+                ?? Drawing(_confirmPopup.Current)
+                ?? Drawing(_systemPopup.Current);
+        }
+
         /// <summary>The source that has just been written into the slot may have a text field of its
-        /// own (the rename box); the one that left must not be left holding a handler of ours.</summary>
-        public override void OnLiveChanged(IMessageDialogAdapter previous)
+        /// own (the rename box), and the game's field must not be left holding a handler of ours: the
+        /// adapter releases it in its own <c>Dispose</c> when the slot lets it go.</summary>
+        protected override IMessageDialogAdapter Adapt(object menu)
         {
-            if (_inputAdapter != null && _inputSubmitHandler != null)
+            IMessageDialogAdapter adapter = (IMessageDialogAdapter)menu;
+            IInputDialogAdapter input = adapter as IInputDialogAdapter;
+            if (input != null)
             {
-                _inputAdapter.DetachInputSubmit(_inputSubmitHandler);
+                input.AttachInputSubmit(HandleInputSubmit);
             }
 
-            _inputAdapter = Live as IInputDialogAdapter;
-            _inputSubmitHandler = null;
-            if (_inputAdapter != null)
-            {
-                _inputSubmitHandler = HandleInputSubmit;
-                _inputAdapter.AttachInputSubmit(_inputSubmitHandler);
-            }
+            return adapter;
         }
 
-        /// <summary>After a hot reload: the six sources tried in the order the detector's own
-        /// handlers would have written them, first one wins. Scanned once, from
-        /// <c>ScreenDetector.RecoverRuntimeState</c>.</summary>
-        public static void Recover()
+        private static IMessageDialogAdapter Drawing(IMessageDialogAdapter adapter)
         {
-            Recovered<MessageDialogScreen>(
-                FindActiveMapMessagePopup()
-                ?? FindActiveRandomEventMenu()
-                ?? FindActiveCustomMessageMenu()
-                ?? FindActivePopupMenu()
-                ?? FindActiveConfirmPopup()
-                ?? FindActiveSystemPopup());
-        }
-
-        public static IMessageDialogAdapter FindActiveMapMessagePopup()
-        {
-            MapMessagePopup[] popups = Resources.FindObjectsOfTypeAll<MapMessagePopup>();
-            for (int i = 0; i < popups.Length; i++)
-            {
-                MapMessagePopup popup = popups[i];
-                if (!IsLiveScenePopup(popup))
-                {
-                    continue;
-                }
-
-                MapMessagePopupAdapter adapter = new MapMessagePopupAdapter(popup);
-                if (adapter.IsPresent())
-                {
-                    return adapter;
-                }
-            }
-
-            return null;
-        }
-
-        public static IMessageDialogAdapter FindActiveRandomEventMenu()
-        {
-            RandomEventMenuInstaller[] installers = Resources.FindObjectsOfTypeAll<RandomEventMenuInstaller>();
-            for (int i = 0; i < installers.Length; i++)
-            {
-                RandomEventMenuInstaller installer = installers[i];
-                if (!IsLiveSceneInstaller(installer))
-                {
-                    continue;
-                }
-
-                RandomEventMenu menu = TryResolveRandomEventMenu(installer);
-                if (menu == null)
-                {
-                    continue;
-                }
-
-                RandomEventMenuAdapter adapter = new RandomEventMenuAdapter(menu);
-                if (adapter.IsPresent())
-                {
-                    return adapter;
-                }
-            }
-
-            return null;
-        }
-
-        public static IMessageDialogAdapter FindActiveCustomMessageMenu()
-        {
-            CustomMessageMenuInstaller[] installers = Resources.FindObjectsOfTypeAll<CustomMessageMenuInstaller>();
-            for (int i = 0; i < installers.Length; i++)
-            {
-                CustomMessageMenuInstaller installer = installers[i];
-                if (!IsLiveSceneInstaller(installer))
-                {
-                    continue;
-                }
-
-                CustomMessageMenu menu = TryResolveCustomMessageMenu(installer);
-                if (menu == null)
-                {
-                    continue;
-                }
-
-                CustomMessageMenuAdapter adapter = new CustomMessageMenuAdapter(menu);
-                if (adapter.IsPresent())
-                {
-                    return adapter;
-                }
-            }
-
-            return null;
-        }
-
-        public static IMessageDialogAdapter FindActivePopupMenu()
-        {
-            PopupMenuInstaller[] installers = Resources.FindObjectsOfTypeAll<PopupMenuInstaller>();
-            PopupMenuAdapter bestAdapter = null;
-            int bestSiblingIndex = int.MinValue;
-
-            for (int i = 0; i < installers.Length; i++)
-            {
-                PopupMenuInstaller installer = installers[i];
-                if (!IsLiveSceneInstaller(installer))
-                {
-                    continue;
-                }
-
-                PopupMenu popupMenu = TryResolvePopupMenu(installer);
-                if (popupMenu == null)
-                {
-                    continue;
-                }
-
-                PopupMenu.Settings settings = null;
-                try
-                {
-                    settings = PopupSettingsRef(popupMenu);
-                }
-                catch (Exception)
-                {
-                    settings = null;
-                }
-
-                if (settings == null)
-                {
-                    continue;
-                }
-
-                PopupMenuAdapter adapter = new PopupMenuAdapter(popupMenu, settings);
-                if (!adapter.IsPresent())
-                {
-                    continue;
-                }
-
-                int siblingIndex = GetPopupSiblingIndex(settings);
-                if (bestAdapter == null || siblingIndex > bestSiblingIndex)
-                {
-                    bestAdapter = adapter;
-                    bestSiblingIndex = siblingIndex;
-                }
-            }
-
-            return bestAdapter != null ? bestAdapter : null;
-        }
-
-        public static IMessageDialogAdapter FindActiveConfirmPopup()
-        {
-            ConfirmPopup[] popups = Resources.FindObjectsOfTypeAll<ConfirmPopup>();
-            ConfirmPopupAdapter bestAdapter = null;
-            int bestSiblingIndex = int.MinValue;
-
-            for (int i = 0; i < popups.Length; i++)
-            {
-                ConfirmPopup popup = popups[i];
-                if (!IsLiveScenePopup(popup))
-                {
-                    continue;
-                }
-
-                ConfirmPopupAdapter adapter = new ConfirmPopupAdapter(popup);
-                if (!adapter.IsPresent())
-                {
-                    continue;
-                }
-
-                int siblingIndex = popup.transform != null ? popup.transform.GetSiblingIndex() : 0;
-                if (bestAdapter == null || siblingIndex > bestSiblingIndex)
-                {
-                    bestAdapter = adapter;
-                    bestSiblingIndex = siblingIndex;
-                }
-            }
-
-            return bestAdapter != null ? bestAdapter : null;
-        }
-
-        public static IMessageDialogAdapter FindActiveSystemPopup()
-        {
-            SystemPopup[] popups = Resources.FindObjectsOfTypeAll<SystemPopup>();
-            SystemPopupAdapter bestAdapter = null;
-            int bestSiblingIndex = int.MinValue;
-
-            for (int i = 0; i < popups.Length; i++)
-            {
-                SystemPopup popup = popups[i];
-                if (!IsLiveScenePopup(popup))
-                {
-                    continue;
-                }
-
-                SystemPopupAdapter adapter = new SystemPopupAdapter(popup);
-                if (!adapter.IsPresent())
-                {
-                    continue;
-                }
-
-                int siblingIndex = popup.transform != null ? popup.transform.GetSiblingIndex() : 0;
-                if (bestAdapter == null || siblingIndex > bestSiblingIndex)
-                {
-                    bestAdapter = adapter;
-                    bestSiblingIndex = siblingIndex;
-                }
-            }
-
-            return bestAdapter != null ? bestAdapter : null;
+            return adapter != null && adapter.IsPresent() ? adapter : null;
         }
 
         public override string Key
@@ -321,6 +173,7 @@ namespace SongsOfConquestAccess.Screens
 
         public override bool IsActive()
         {
+            SyncLive();
             return Live != null && Live.IsPresent();
         }
 
@@ -373,19 +226,14 @@ namespace SongsOfConquestAccess.Screens
             _editor.Abandon();
         }
 
+        /// <summary>The page has gone. The slot goes with it, so the adapter releases the handler it
+        /// put on the game's field; a dialog that is still up is adapted again on the next tick.
+        /// </summary>
         public override void OnPop()
         {
             base.OnPop();
             _editor.Abandon();
-            if (_inputAdapter != null && _inputSubmitHandler != null)
-            {
-                _inputAdapter.DetachInputSubmit(_inputSubmitHandler);
-            }
-        }
-
-        public object SourceKey
-        {
-            get { return Live != null ? Live.SourceKey : null; }
+            Forget();
         }
 
         public override void Build(GraphBuilder builder)
@@ -417,8 +265,9 @@ namespace SongsOfConquestAccess.Screens
                 start = bodyId;
             }
 
-            IUITextMeshInputField field = _inputAdapter != null && _inputAdapter.HasInputField
-                ? _inputAdapter.InputField
+            IInputDialogAdapter inputAdapter = Live as IInputDialogAdapter;
+            IUITextMeshInputField field = inputAdapter != null && inputAdapter.HasInputField
+                ? inputAdapter.InputField
                 : null;
             Component fieldComponent = field != null ? field.MonoTransform : null;
             if (fieldComponent != null)
@@ -461,16 +310,12 @@ namespace SongsOfConquestAccess.Screens
                 () => FirstNonEmpty(Live.Title, Live.Body),
                 () =>
                 {
-                    IUITextMeshInputField field = _inputAdapter != null ? _inputAdapter.InputField : null;
+                    IUITextMeshInputField field = InputField;
                     // Nothing while the game holds the keyboard: the echo is already speaking the keys.
                     return field == null || _editor.Editing ? null : field.InputFieldValue;
                 },
-                () =>
-                {
-                    IUITextMeshInputField field = _inputAdapter != null ? _inputAdapter.InputField : null;
-                    _editor.Request(field);
-                },
-                () => _inputAdapter != null && _inputAdapter.HasInputField);
+                () => _editor.Request(InputField),
+                () => InputField != null);
         }
 
         private NodeVtable Button(DialogAction action)
@@ -523,157 +368,21 @@ namespace SongsOfConquestAccess.Screens
             return button != null ? button.transform.position.x : 0f;
         }
 
+        private IUITextMeshInputField InputField
+        {
+            get
+            {
+                IInputDialogAdapter input = Live as IInputDialogAdapter;
+                return input == null ? null : input.InputField;
+            }
+        }
+
         private void HandleInputSubmit(IUITextMeshInputField inputField, string text)
         {
             if (Live != null && Live.IsPositiveActionEnabled)
             {
                 Live.ActivateAction(DialogAction.Positive);
             }
-        }
-
-        private static bool IsLiveScenePopup(MapMessagePopup popup)
-        {
-            if (popup == null)
-            {
-                return false;
-            }
-
-            GameObject gameObject = popup.gameObject;
-            return gameObject != null && gameObject.scene.IsValid() && gameObject.scene.isLoaded;
-        }
-
-        private static bool IsLiveScenePopup(ConfirmPopup popup)
-        {
-            if (popup == null)
-            {
-                return false;
-            }
-
-            GameObject gameObject = popup.gameObject;
-            return gameObject != null && gameObject.scene.IsValid() && gameObject.scene.isLoaded;
-        }
-
-        private static bool IsLiveScenePopup(SystemPopup popup)
-        {
-            if (popup == null)
-            {
-                return false;
-            }
-
-            GameObject gameObject = popup.gameObject;
-            return gameObject != null && gameObject.scene.IsValid() && gameObject.scene.isLoaded;
-        }
-
-        private static bool IsLiveSceneInstaller(PopupMenuInstaller installer)
-        {
-            if (installer == null)
-            {
-                return false;
-            }
-
-            GameObject gameObject = installer.gameObject;
-            return gameObject != null && gameObject.scene.IsValid() && gameObject.scene.isLoaded;
-        }
-
-        private static bool IsLiveSceneInstaller(RandomEventMenuInstaller installer)
-        {
-            if (installer == null)
-            {
-                return false;
-            }
-
-            GameObject gameObject = installer.gameObject;
-            return gameObject != null && gameObject.scene.IsValid() && gameObject.scene.isLoaded;
-        }
-
-        private static bool IsLiveSceneInstaller(CustomMessageMenuInstaller installer)
-        {
-            if (installer == null)
-            {
-                return false;
-            }
-
-            GameObject gameObject = installer.gameObject;
-            return gameObject != null && gameObject.scene.IsValid() && gameObject.scene.isLoaded;
-        }
-
-        private static PopupMenu TryResolvePopupMenu(PopupMenuInstaller installer)
-        {
-            if (installer == null || PopupInstallerContainerProperty == null)
-            {
-                return null;
-            }
-
-            DiContainer container = PopupInstallerContainerProperty.GetValue(installer, null) as DiContainer;
-            if (container == null)
-            {
-                return null;
-            }
-
-            try
-            {
-                return container.Resolve<PopupMenu>();
-            }
-            catch (Exception)
-            {
-                return null;
-            }
-        }
-
-        private static RandomEventMenu TryResolveRandomEventMenu(RandomEventMenuInstaller installer)
-        {
-            if (installer == null || RandomEventInstallerContainerProperty == null)
-            {
-                return null;
-            }
-
-            DiContainer container = RandomEventInstallerContainerProperty.GetValue(installer, null) as DiContainer;
-            if (container == null)
-            {
-                return null;
-            }
-
-            try
-            {
-                return container.Resolve<RandomEventMenu>();
-            }
-            catch (Exception)
-            {
-                return null;
-            }
-        }
-
-        private static CustomMessageMenu TryResolveCustomMessageMenu(CustomMessageMenuInstaller installer)
-        {
-            if (installer == null || CustomMessageInstallerContainerProperty == null)
-            {
-                return null;
-            }
-
-            DiContainer container = CustomMessageInstallerContainerProperty.GetValue(installer, null) as DiContainer;
-            if (container == null)
-            {
-                return null;
-            }
-
-            try
-            {
-                return container.Resolve<CustomMessageMenu>();
-            }
-            catch (Exception)
-            {
-                return null;
-            }
-        }
-
-        private static int GetPopupSiblingIndex(PopupMenu.Settings settings)
-        {
-            if (settings == null || settings.TopContainer == null)
-            {
-                return int.MinValue;
-            }
-
-            return settings.TopContainer.GetSiblingIndex();
         }
 
         private static string FirstNonEmpty(string first, string second)

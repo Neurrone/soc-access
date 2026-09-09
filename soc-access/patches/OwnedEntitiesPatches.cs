@@ -18,20 +18,6 @@ namespace SongsOfConquestAccess
         private static readonly FieldInfo ClaimedEntryCurrentCycleIndexField =
             AccessTools.Field(typeof(KingdomEntityOverviewClaimedEntry), "_currentCycleIndex");
 
-        [HarmonyPatch(typeof(KingdomEntityOverviewMenu), "Show")]
-        [HarmonyPostfix]
-        private static void KingdomEntityOverviewShowPostfix(KingdomEntityOverviewMenu __instance)
-        {
-            SocAccessMod.Instance?.ScreenDetector?.OnOwnedEntitiesReady(__instance);
-        }
-
-        [HarmonyPatch(typeof(KingdomEntityOverviewMenu), "Hide")]
-        [HarmonyPostfix]
-        private static void KingdomEntityOverviewHidePostfix(KingdomEntityOverviewMenu __instance)
-        {
-            SocAccessMod.Instance?.ScreenDetector?.OnOwnedEntitiesClosed(__instance);
-        }
-
         [HarmonyPatch(typeof(KingdomEntityOverviewCategoryEntry), "HandleCategoryTextClicked")]
         [HarmonyPrefix]
         private static void CategoryTextClickedPrefix(KingdomEntityOverviewCategoryEntry __instance, ref IMapEntity __state)
