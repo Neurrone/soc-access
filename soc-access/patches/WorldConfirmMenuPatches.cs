@@ -1,4 +1,3 @@
-using System.Collections.Generic;
 using HarmonyLib;
 using SongsOfConquest.Client.Adventure;
 using SongsOfConquest.Common.Economy;
@@ -8,19 +7,6 @@ namespace SongsOfConquestAccess
     [HarmonyPatch]
     public static class WorldConfirmMenuPatches
     {
-        private static readonly Dictionary<WorldConfirmMenu, Cost> ActiveCosts = new Dictionary<WorldConfirmMenu, Cost>();
-
-        public static Cost GetCost(WorldConfirmMenu menu)
-        {
-            if (menu == null)
-            {
-                return null;
-            }
-
-            Cost cost;
-            return ActiveCosts.TryGetValue(menu, out cost) ? cost : null;
-        }
-
         [HarmonyPatch(typeof(WorldConfirmMenu), "ShowMenuAtPoint", new[]
         {
             typeof(string),
@@ -28,13 +14,8 @@ namespace SongsOfConquestAccess
             typeof(Cost)
         })]
         [HarmonyPostfix]
-        private static void WorldConfirmMenuShowMenuAtPointPostfix(WorldConfirmMenu __instance, Cost cost)
+        private static void WorldConfirmMenuShowMenuAtPointPostfix(WorldConfirmMenu __instance)
         {
-            if (__instance != null)
-            {
-                ActiveCosts[__instance] = cost;
-            }
-
             SocAccessMod.Instance?.ScreenDetector?.OnWorldConfirmMenuReady(__instance);
         }
 
@@ -42,11 +23,6 @@ namespace SongsOfConquestAccess
         [HarmonyPostfix]
         private static void WorldConfirmMenuHideMenuPostfix(WorldConfirmMenu __instance)
         {
-            if (__instance != null)
-            {
-                ActiveCosts.Remove(__instance);
-            }
-
             SocAccessMod.Instance?.ScreenDetector?.OnWorldConfirmMenuClosed(__instance);
         }
     }

@@ -139,9 +139,9 @@ namespace SongsOfConquestAccess.Screens
             AddButtons(builder);
         }
 
-        /// <summary>The cost lines the menu lists, read out of the game's cost model rather than off a
-        /// widget of their own: the entries are pooled, so each line is keyed by its position in the
-        /// list the adapter enumerates.</summary>
+        /// <summary>The cost lines the menu lists, read off the entries it drew them with: the menu
+        /// keeps no cost after it has spent it on those entries. The entries are pooled, so each line
+        /// is keyed by its position in the list the adapter enumerates.</summary>
         private void AddCosts(GraphBuilder builder)
         {
             // The whole list is read ONCE and each line keeps its own text: asking for the list
