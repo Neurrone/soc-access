@@ -61,10 +61,13 @@ namespace SongsOfConquestAccess.Screens
         // the returned-troops line or the "None" row on.
         private readonly Dictionary<string, object> _markers = new Dictionary<string, object>();
 
-        // Resolving a portrait walks the menu's parents and the scene root, so it is done once per
-        // side rather than on every navigation operation; a side that has not resolved yet is retried.
+        // Resolving a portrait walks the menu's parents and the scene root, so each side is looked
+        // for once per menu, hit or miss: a defender without a commander has no portrait to find,
+        // and the search would otherwise run again every frame. A new menu starts both over.
         private CommanderHudPortraitAdapter _attackerPortrait;
         private CommanderHudPortraitAdapter _defenderPortrait;
+        private bool _attackerPortraitProbed;
+        private bool _defenderPortraitProbed;
 
         /// <summary>After a hot reload: point the slot at the menu already showing.
         /// Scanned once, from <c>ScreenDetector.RecoverRuntimeState</c>.</summary>
@@ -389,14 +392,40 @@ namespace SongsOfConquestAccess.Screens
             return marker;
         }
 
+        public override void OnLiveChanged(PostBattleResultAdapter previous)
+        {
+            _attackerPortrait = null;
+            _defenderPortrait = null;
+            _attackerPortraitProbed = false;
+            _defenderPortraitProbed = false;
+        }
+
         private CommanderHudPortraitAdapter AttackerPortrait
         {
-            get { return _attackerPortrait ?? (_attackerPortrait = Live.AttackerCommanderPortrait); }
+            get
+            {
+                if (!_attackerPortraitProbed)
+                {
+                    _attackerPortrait = Live.AttackerCommanderPortrait;
+                    _attackerPortraitProbed = true;
+                }
+
+                return _attackerPortrait;
+            }
         }
 
         private CommanderHudPortraitAdapter DefenderPortrait
         {
-            get { return _defenderPortrait ?? (_defenderPortrait = Live.DefenderCommanderPortrait); }
+            get
+            {
+                if (!_defenderPortraitProbed)
+                {
+                    _defenderPortrait = Live.DefenderCommanderPortrait;
+                    _defenderPortraitProbed = true;
+                }
+
+                return _defenderPortrait;
+            }
         }
 
         // ---- finding the live menu ----
