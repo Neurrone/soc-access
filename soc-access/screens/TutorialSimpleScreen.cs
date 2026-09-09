@@ -28,38 +28,19 @@ namespace SongsOfConquestAccess.Screens
         private readonly object _headingKey = new object();
         private readonly object _bodyKey = new object();
 
-        /// <summary>After a hot reload: point the slot at the menu already showing.
-        /// Scanned once, from <c>ScreenDetector.RecoverRuntimeState</c>.</summary>
-        public static void Recover()
+        /// <summary>The same tutorial menu the slideshow screen reads; the two adapters' own
+        /// <c>IsPresent</c> are mutually exclusive - each answers true only for the container the
+        /// menu has actually drawn - so the two screens never both stand up over one menu.</summary>
+        private readonly ScreenSource<ITutorialMenu> _source = ScreenSource<ITutorialMenu>.FromProject();
+
+        protected override object ResolveMenu()
         {
-            Recovered<TutorialSimpleScreen>(FindActive());
+            return _source.Current;
         }
 
-        public static TutorialSimpleAdapter FindActive()
+        protected override TutorialSimpleAdapter Adapt(object menu)
         {
-            TutorialMenu[] menus = Resources.FindObjectsOfTypeAll<TutorialMenu>();
-            for (int i = 0; i < menus.Length; i++)
-            {
-                TutorialMenu menu = menus[i];
-                if (!TutorialSlideshowScreen.IsLiveSceneMenu(menu))
-                {
-                    continue;
-                }
-
-                TutorialSlideshowAdapter slideshowAdapter = new TutorialSlideshowAdapter(menu);
-                if (slideshowAdapter.IsPresent())
-                {
-                    continue;
-                }
-
-                TutorialSimpleAdapter adapter = new TutorialSimpleAdapter(menu);
-                if (adapter.IsPresent())
-                {
-                    return (adapter);
-                }
-            }
-
-            return null;
+            return new TutorialSimpleAdapter((TutorialMenu)menu);
         }
 
         public override string Key
@@ -85,6 +66,7 @@ namespace SongsOfConquestAccess.Screens
 
         public override bool IsActive()
         {
+            SyncLive();
             return Live != null && Live.IsPresent();
         }
 

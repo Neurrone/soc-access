@@ -1,13 +1,9 @@
-using System;
 using System.Collections.Generic;
-using System.Reflection;
 using _8_UILayer.ClientView.Menu.Paus;
-using HarmonyLib;
 using SongsOfConquestAccess.Adapters;
 using SongsOfConquestAccess.UI;
 using SongsOfConquestAccess.UI.Graph;
 using UnityEngine;
-using Zenject;
 
 namespace SongsOfConquestAccess.Screens
 {
@@ -30,26 +26,17 @@ namespace SongsOfConquestAccess.Screens
     {
         private const string MenuStop = "pause-menu";
 
-        private static readonly PropertyInfo InstallerContainerProperty =
-            AccessTools.Property(typeof(PauseMenuInstaller), "Container");
+        /// <summary>The one pause menu the project container holds for the whole game.</summary>
+        private readonly ScreenSource<PauseMenu> _source = ScreenSource<PauseMenu>.FromProject();
 
-        /// <summary>After a hot reload: point the slot at the menu already showing.
-        /// Scanned once, from <c>ScreenDetector.RecoverRuntimeState</c>.</summary>
-        public static void Recover()
+        protected override object ResolveMenu()
         {
-            Recovered<PauseMenuScreen>(FindActive());
+            return _source.Current;
         }
 
-        public static PauseMenuAdapter FindActive()
+        protected override PauseMenuAdapter Adapt(object menu)
         {
-            PauseMenu pauseMenu = FindActivePauseMenu();
-            if (pauseMenu == null)
-            {
-                return null;
-            }
-
-            PauseMenuAdapter adapter = new PauseMenuAdapter(pauseMenu);
-            return adapter.IsPresent() ? (adapter) : null;
+            return new PauseMenuAdapter((PauseMenu)menu);
         }
 
         public override string Key
@@ -73,51 +60,22 @@ namespace SongsOfConquestAccess.Screens
             }
         }
 
-        /// <summary>Until when the screen stays active with no menu behind it, or 0.</summary>
-        private float _handoverUntil;
-
-        /// <summary>The menu closed to open another (options, save, load, the codex), which the game
-        /// shows a frame or more later. Between the two nothing is open, and a screen that stood down
-        /// here would hand the player to the map for those frames: "Adventure map" and the tile,
-        /// then the menu they asked for. So the screen stays active, declaring nothing, until the
-        /// target arrives (<see cref="EndHandover"/>) or a bounded wait runs out.</summary>
-        public void BeginHandover()
-        {
-            _handoverUntil = Time.realtimeSinceStartup + HandoverSeconds;
-        }
-
-        public void EndHandover()
-        {
-            _handoverUntil = 0f;
-        }
-
-        private const float HandoverSeconds = 2f;
-
-        private bool HandingOver
-        {
-            get { return _handoverUntil > 0f && Time.realtimeSinceStartup < _handoverUntil; }
-        }
-
-        private bool Shown
-        {
-            get { return Live != null && Live.IsPresent(); }
-        }
-
+        /// <summary>NO HANDOVER any more. The menu used to stay active for up to two seconds after it
+        /// closed, so the map was not handed back for the frames between the pause menu going and the
+        /// options, save/load or codex window arriving. There are no such frames: MenuSystem's
+        /// callback runs the close and the open in ONE call, and each of those three screens now reads
+        /// its own menu every frame instead of waiting for a hook that answered a frame late.
+        /// Measured 2026-09-09 on the adventure map with <c>/wait</c>, which sees single frames: zero
+        /// frames with neither menu present on all three routes.</summary>
         public override bool IsActive()
         {
-            return Shown || HandingOver;
-        }
-
-        /// <summary>Not while spanning a handover: the page is gone and nothing on it can be judged.
-        /// </summary>
-        public override bool IsWorkable
-        {
-            get { return Shown; }
+            SyncLive();
+            return Live != null && Live.IsPresent();
         }
 
         public override void Build(GraphBuilder builder)
         {
-            if (!Shown)
+            if (!IsActive())
             {
                 return;
             }
@@ -183,67 +141,6 @@ namespace SongsOfConquestAccess.Screens
         {
             Component component = item.Button;
             return component != null ? component.transform.position.y : 0f;
-        }
-
-        private static PauseMenu FindActivePauseMenu()
-        {
-            PauseMenuInstaller[] installers = Resources.FindObjectsOfTypeAll<PauseMenuInstaller>();
-            for (int i = 0; i < installers.Length; i++)
-            {
-                PauseMenuInstaller installer = installers[i];
-                if (!IsLiveSceneInstaller(installer))
-                {
-                    continue;
-                }
-
-                PauseMenu pauseMenu = TryResolve<PauseMenu>(installer);
-                if (pauseMenu == null)
-                {
-                    continue;
-                }
-
-                PauseMenuAdapter adapter = new PauseMenuAdapter(pauseMenu);
-                if (adapter.IsPresent())
-                {
-                    return pauseMenu;
-                }
-            }
-
-            return null;
-        }
-
-        private static bool IsLiveSceneInstaller(PauseMenuInstaller installer)
-        {
-            if (installer == null)
-            {
-                return false;
-            }
-
-            GameObject gameObject = installer.gameObject;
-            return gameObject != null && gameObject.scene.IsValid() && gameObject.scene.isLoaded;
-        }
-
-        private static T TryResolve<T>(PauseMenuInstaller installer) where T : class
-        {
-            if (installer == null || InstallerContainerProperty == null)
-            {
-                return null;
-            }
-
-            DiContainer container = InstallerContainerProperty.GetValue(installer, null) as DiContainer;
-            if (container == null)
-            {
-                return null;
-            }
-
-            try
-            {
-                return container.Resolve<T>();
-            }
-            catch (Exception)
-            {
-                return null;
-            }
         }
     }
 }

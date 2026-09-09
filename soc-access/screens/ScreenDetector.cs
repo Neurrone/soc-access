@@ -141,81 +141,6 @@ namespace SongsOfConquestAccess.Screens
             Reg<StoryTextScreen>()?.Forget();
         }
 
-        // ---- the pause menu and its pages ----
-
-        public void OnPauseMenuReady(PauseMenu pauseMenu)
-        {
-            Reg<PauseMenuScreen>()?.Show(new PauseMenuAdapter(pauseMenu));
-        }
-
-        /// <summary><paramref name="handsOver"/>: the menu closed to open options, a save or load
-        /// menu or the codex, which the game shows a frame or more later; the pause screen stays
-        /// active across that gap (<see cref="PauseMenuScreen.BeginHandover"/>) so the map is not
-        /// handed back for it.</summary>
-        public void OnPauseMenuClosed(PauseMenu pauseMenu, bool handsOver)
-        {
-            PauseMenuScreen screen = Reg<PauseMenuScreen>();
-            if (screen == null)
-            {
-                return;
-            }
-
-            screen.Forget();
-            if (handsOver)
-            {
-                screen.BeginHandover();
-            }
-        }
-
-        public void OnOptionsMenuReady(OptionsMenu optionsMenu)
-        {
-            Reg<PauseMenuScreen>()?.EndHandover();
-            OptionsMenuAdapter adapter = new OptionsMenuAdapter(optionsMenu);
-            if (adapter.IsPresent())
-            {
-                Reg<OptionsScreen>()?.Show(adapter);
-            }
-        }
-
-        public void OnOptionsMenuClosed(OptionsMenu optionsMenu)
-        {
-            Reg<OptionsScreen>()?.Forget();
-        }
-
-        public void OnSaveLoadGameMenuReady(SaveLoadGameMenu menu)
-        {
-            Reg<PauseMenuScreen>()?.EndHandover();
-            SaveLoadGameMenuAdapter adapter = new SaveLoadGameMenuAdapter(menu);
-            if (adapter.IsPresent())
-            {
-                Reg<SaveLoadGameScreen>()?.Show(adapter);
-            }
-        }
-
-        public void OnSaveLoadGameMenuClosed(SaveLoadGameMenu menu)
-        {
-            SaveLoadGameScreen screen = Reg<SaveLoadGameScreen>();
-            if (screen != null && screen.Matches(menu))
-            {
-                screen.Forget();
-            }
-        }
-
-        public void OnCodexReady(CodexMenu codexMenu)
-        {
-            Reg<PauseMenuScreen>()?.EndHandover();
-            CodexMenuAdapter adapter = new CodexMenuAdapter(codexMenu);
-            if (adapter.IsPresent())
-            {
-                Reg<CodexScreen>()?.Show(adapter);
-            }
-        }
-
-        public void OnCodexClosed(CodexMenu codexMenu)
-        {
-            Reg<CodexScreen>()?.Forget();
-        }
-
         // ---- the in-game panels ----
 
         public void OnOwnedEntitiesReady(KingdomEntityOverviewMenu menu)
@@ -741,59 +666,6 @@ namespace SongsOfConquestAccess.Screens
             }
         }
 
-        public void OnQuitToDesktopPopupReady(QuitToDesktopPopup popup)
-        {
-            QuitToDesktopPopupAdapter adapter = new QuitToDesktopPopupAdapter(popup);
-            if (adapter.IsPresent())
-            {
-                Reg<QuitToDesktopPopupScreen>()?.Show(adapter);
-            }
-        }
-
-        public void OnQuitToDesktopPopupClosed(QuitToDesktopPopup popup)
-        {
-            Reg<QuitToDesktopPopupScreen>()?.Forget();
-        }
-
-        // ---- the tutorials ----
-
-        public void OnTutorialReady(TutorialMenu tutorialMenu)
-        {
-            ShowTutorial(tutorialMenu);
-        }
-
-        public void OnTutorialChanged(TutorialMenu tutorialMenu)
-        {
-            ShowTutorial(tutorialMenu);
-        }
-
-        public void OnTutorialClosed(TutorialMenu tutorialMenu)
-        {
-            Reg<TutorialSlideshowScreen>()?.Forget();
-            Reg<TutorialSimpleScreen>()?.Forget();
-        }
-
-        /// <summary>A tutorial popup is one of two shapes, and the menu says which by what it has
-        /// drawn. Whichever it is, the other's slot is emptied so a menu that changed shape does not
-        /// leave the old page standing.</summary>
-        private void ShowTutorial(TutorialMenu tutorialMenu)
-        {
-            TutorialSlideshowAdapter slideshow = new TutorialSlideshowAdapter(tutorialMenu);
-            if (slideshow.IsPresent())
-            {
-                Reg<TutorialSimpleScreen>()?.Forget();
-                Reg<TutorialSlideshowScreen>()?.Show(slideshow);
-                return;
-            }
-
-            TutorialSimpleAdapter simple = new TutorialSimpleAdapter(tutorialMenu);
-            if (simple.IsPresent())
-            {
-                Reg<TutorialSlideshowScreen>()?.Forget();
-                Reg<TutorialSimpleScreen>()?.Show(simple);
-            }
-        }
-
         // ---- the story text ----
 
         public void OnLetterboxStoryTextReady(LetterboxStoryText storyText)
@@ -932,24 +804,6 @@ namespace SongsOfConquestAccess.Screens
         public void OnOnlineHostGameClosed(GameListMenu menu)
         {
             OnlineHostGameScreen screen = Reg<OnlineHostGameScreen>();
-            if (screen != null && (menu == null || screen.Matches(menu)))
-            {
-                screen.Forget();
-            }
-        }
-
-        public void OnPlatformUserMenuReady(PlatformUserMenu menu)
-        {
-            PlatformUserMenuAdapter adapter = new PlatformUserMenuAdapter(menu);
-            if (adapter.IsPresent())
-            {
-                Reg<PlatformUserMenuScreen>()?.Show(adapter);
-            }
-        }
-
-        public void OnPlatformUserMenuClosed(PlatformUserMenu menu)
-        {
-            PlatformUserMenuScreen screen = Reg<PlatformUserMenuScreen>();
             if (screen != null && (menu == null || screen.Matches(menu)))
             {
                 screen.Forget();
@@ -1389,7 +1243,6 @@ namespace SongsOfConquestAccess.Screens
                 Reg<AdventureLobbyInviteProvidersScreen>()?.Forget();
                 Reg<AdventureLobbyGameSettingsScreen>()?.Forget();
                 Reg<AdventureLobbyPlayerSettingsScreen>()?.Forget();
-                Reg<PlatformUserMenuScreen>()?.Forget();
                 Reg<AdventureLobbyPlayersScreen>()?.Forget();
             }
         }
@@ -1623,7 +1476,6 @@ namespace SongsOfConquestAccess.Screens
             AdventureLobbyPlayerSettingsScreen.Recover();
             AdventureLobbyIconDropdownScreen.Recover();
             AdventureLobbyInviteProvidersScreen.Recover();
-            PlatformUserMenuScreen.Recover();
             CampaignMapSelectScreen.Recover();
             AdventureMapScreen.Recover();
             AdventurePlayerMenuScreen.Recover();
@@ -1659,14 +1511,7 @@ namespace SongsOfConquestAccess.Screens
             CommanderSheetScreen.Recover();
             TradingScreen.Recover();
             StoryTextScreen.Recover();
-            OptionsScreen.Recover();
-            PauseMenuScreen.Recover();
-            SaveLoadGameScreen.Recover();
             MessageDialogScreen.Recover();
-            QuitToDesktopPopupScreen.Recover();
-            CodexScreen.Recover();
-            TutorialSlideshowScreen.Recover();
-            TutorialSimpleScreen.Recover();
             LoadingCompleteScreen.Recover();
         }
 

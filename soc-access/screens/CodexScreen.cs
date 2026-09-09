@@ -1,14 +1,11 @@
 using System;
 using System.Collections.Generic;
-using System.Reflection;
-using HarmonyLib;
 using SongsOfConquest.Client.Menu;
 using SongsOfConquestAccess.Adapters;
 using SongsOfConquestAccess.Localization;
 using SongsOfConquestAccess.UI;
 using SongsOfConquestAccess.UI.Graph;
 using UnityEngine;
-using Zenject;
 using CodexContentItem = SongsOfConquestAccess.Adapters.CodexMenuAdapter.CodexContentItem;
 using CodexContentItemKind = SongsOfConquestAccess.Adapters.CodexMenuAdapter.CodexContentItemKind;
 
@@ -61,34 +58,22 @@ namespace SongsOfConquestAccess.Screens
         private const string ContentStop = "codex-content";
         private const string FooterStop = "codex-footer";
 
-        private static readonly PropertyInfo ContainerProperty = AccessTools.Property(typeof(MonoInstallerBase), "Container");
-        private static readonly FieldInfo ContainerField = AccessTools.Field(typeof(MonoInstallerBase), "_container");
+        /// <summary>The one codex window the project container holds for the whole game.</summary>
+        private readonly ScreenSource<ICodexMenu> _source = ScreenSource<ICodexMenu>.FromProject();
 
         // A subject of its own per synthesized node, kept across rebuilds so the reconciler seats the
         // cursor on the same line: the body's lines, which the mod reads off text meshes several of
         // them share, and the footer's Close.
         private readonly Dictionary<string, object> _markers = new Dictionary<string, object>();
 
-        /// <summary>After a hot reload: point the slot at the menu already showing.
-        /// Scanned once, from <c>ScreenDetector.RecoverRuntimeState</c>.</summary>
-        public static void Recover()
+        protected override object ResolveMenu()
         {
-            Recovered<CodexScreen>(FindActive());
+            return _source.Current;
         }
 
-        public static CodexMenuAdapter FindActive()
+        protected override CodexMenuAdapter Adapt(object menu)
         {
-            CodexMenuInstaller[] installers = Resources.FindObjectsOfTypeAll<CodexMenuInstaller>();
-            for (int i = 0; i < installers.Length; i++)
-            {
-                CodexMenuAdapter adapter = new CodexMenuAdapter(ResolveCodexMenu(installers[i]));
-                if (adapter.IsPresent())
-                {
-                    return (adapter);
-                }
-            }
-
-            return null;
+            return new CodexMenuAdapter((CodexMenu)menu);
         }
 
         public override string Key
@@ -118,6 +103,7 @@ namespace SongsOfConquestAccess.Screens
 
         public override bool IsActive()
         {
+            SyncLive();
             return Live != null && Live.IsPresent();
         }
 
@@ -394,34 +380,6 @@ namespace SongsOfConquestAccess.Screens
             }
 
             return marker;
-        }
-
-        private static CodexMenu ResolveCodexMenu(CodexMenuInstaller installer)
-        {
-            DiContainer container = GetContainer(installer);
-            if (container == null)
-            {
-                return null;
-            }
-
-            return container.HasBinding<CodexMenu>()
-                ? container.Resolve<CodexMenu>()
-                : null;
-        }
-
-        private static DiContainer GetContainer(CodexMenuInstaller installer)
-        {
-            if (installer == null)
-            {
-                return null;
-            }
-
-            if (ContainerProperty != null)
-            {
-                return ContainerProperty.GetValue(installer, null) as DiContainer;
-            }
-
-            return ContainerField != null ? ContainerField.GetValue(installer) as DiContainer : null;
         }
     }
 }

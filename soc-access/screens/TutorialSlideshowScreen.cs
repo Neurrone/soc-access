@@ -41,40 +41,19 @@ namespace SongsOfConquestAccess.Screens
         private const string ControlsStop = "tutorial-slideshow:controls";
         private const string PageKey = "tutorial:page/";
 
-        /// <summary>After a hot reload: point the slot at the menu already showing.
-        /// Scanned once, from <c>ScreenDetector.RecoverRuntimeState</c>.</summary>
-        public static void Recover()
+        /// <summary>The one tutorial menu the project container holds for the whole game. Both
+        /// tutorial screens read it; the adapter's <c>IsPresent</c> says which shape it has drawn.
+        /// </summary>
+        private readonly ScreenSource<ITutorialMenu> _source = ScreenSource<ITutorialMenu>.FromProject();
+
+        protected override object ResolveMenu()
         {
-            Recovered<TutorialSlideshowScreen>(FindActive());
+            return _source.Current;
         }
 
-        public static TutorialSlideshowAdapter FindActive()
+        protected override TutorialSlideshowAdapter Adapt(object menu)
         {
-            TutorialMenu[] menus = Resources.FindObjectsOfTypeAll<TutorialMenu>();
-            for (int i = 0; i < menus.Length; i++)
-            {
-                TutorialMenu menu = menus[i];
-                if (!IsLiveSceneMenu(menu))
-                {
-                    continue;
-                }
-
-                TutorialSlideshowAdapter adapter = new TutorialSlideshowAdapter(menu);
-                if (adapter.IsPresent())
-                {
-                    return (adapter);
-                }
-            }
-
-            return null;
-        }
-
-        public static bool IsLiveSceneMenu(TutorialMenu menu)
-        {
-            return menu != null
-                && menu.gameObject != null
-                && menu.gameObject.scene.IsValid()
-                && menu.gameObject.scene.isLoaded;
+            return new TutorialSlideshowAdapter((TutorialMenu)menu);
         }
 
         public override string Key
@@ -100,6 +79,7 @@ namespace SongsOfConquestAccess.Screens
 
         public override bool IsActive()
         {
+            SyncLive();
             return Live != null && Live.IsPresent();
         }
 

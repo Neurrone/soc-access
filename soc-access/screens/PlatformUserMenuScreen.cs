@@ -37,22 +37,18 @@ namespace SongsOfConquestAccess.Screens
         private readonly object _headingKey = new object();
         private readonly object _cancelKey = new object();
 
-        /// <summary>After a hot reload: point the slot at the menu already showing.
-        /// Scanned once, from <c>ScreenDetector.RecoverRuntimeState</c>.</summary>
-        public static void Recover()
+        /// <summary>The one platform user menu the project container holds for the whole game.
+        /// </summary>
+        private readonly ScreenSource<PlatformUserMenu> _source = ScreenSource<PlatformUserMenu>.FromProject();
+
+        protected override object ResolveMenu()
         {
-            Recovered<PlatformUserMenuScreen>(FindActive());
+            return _source.Current;
         }
 
-        public static PlatformUserMenuAdapter FindActive()
+        protected override PlatformUserMenuAdapter Adapt(object menu)
         {
-            PlatformUserMenuAdapter adapter = FindActiveMenu(null);
-            return adapter;
-        }
-
-        public bool Matches(PlatformUserMenu menu)
-        {
-            return Live != null && ReferenceEquals(Live.SourceKey, menu);
+            return new PlatformUserMenuAdapter((PlatformUserMenu)menu);
         }
 
         public override string Key
@@ -78,6 +74,7 @@ namespace SongsOfConquestAccess.Screens
 
         public override bool IsActive()
         {
+            SyncLive();
             return Live != null && Live.IsPresent();
         }
 
@@ -166,32 +163,6 @@ namespace SongsOfConquestAccess.Screens
             // There is no body here, so focus starts on the first action, as the family's contract
             // says it does where a dialog draws none.
             builder.SetStart(start);
-        }
-
-        public static PlatformUserMenuAdapter FindActiveMenu(PlatformUserMenu targetMenu)
-        {
-            PlatformUserMenu[] menus = Resources.FindObjectsOfTypeAll<PlatformUserMenu>();
-            for (int i = 0; i < menus.Length; i++)
-            {
-                PlatformUserMenu menu = menus[i];
-                if (menu == null)
-                {
-                    continue;
-                }
-
-                if (targetMenu != null && !ReferenceEquals(targetMenu, menu))
-                {
-                    continue;
-                }
-
-                PlatformUserMenuAdapter adapter = new PlatformUserMenuAdapter(menu);
-                if (adapter.IsPresent())
-                {
-                    return adapter;
-                }
-            }
-
-            return null;
         }
     }
 }

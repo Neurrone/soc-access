@@ -1,14 +1,10 @@
-using System;
 using System.Collections.Generic;
-using System.Reflection;
-using HarmonyLib;
 using SongsOfConquest.Client.Menu.Options;
 using SongsOfConquestAccess.Adapters;
 using SongsOfConquestAccess.Localization;
 using SongsOfConquestAccess.UI;
 using SongsOfConquestAccess.UI.Graph;
 using UnityEngine;
-using Zenject;
 
 namespace SongsOfConquestAccess.Screens
 {
@@ -47,30 +43,22 @@ namespace SongsOfConquestAccess.Screens
         private const string RowsStop = "options-rows";
         private const string ButtonsStop = "options-buttons";
 
-        private static readonly PropertyInfo InstallerContainerProperty =
-            AccessTools.Property(typeof(OptionsMenuInstaller), "Container");
-
         /// <summary>The rows of the form, declared the way every settings form the game draws is
         /// declared - shared with the mod's own options dialog, which is a copy of this panel.</summary>
         private readonly MenuFormNodes _rows = new MenuFormNodes("options");
 
-        /// <summary>After a hot reload: point the slot at the menu already showing.
-        /// Scanned once, from <c>ScreenDetector.RecoverRuntimeState</c>.</summary>
-        public static void Recover()
+        /// <summary>The one options window the project container holds for the whole game; the main
+        /// menu and a game in progress open the same one.</summary>
+        private readonly ScreenSource<OptionsMenu> _source = ScreenSource<OptionsMenu>.FromProject();
+
+        protected override object ResolveMenu()
         {
-            Recovered<OptionsScreen>(FindActive());
+            return _source.Current;
         }
 
-        public static OptionsMenuAdapter FindActive()
+        protected override OptionsMenuAdapter Adapt(object menu)
         {
-            OptionsMenu menu = FindActiveOptionsMenu();
-            if (menu == null)
-            {
-                return null;
-            }
-
-            OptionsMenuAdapter adapter = new OptionsMenuAdapter(menu);
-            return adapter.IsPresent() ? (adapter) : null;
+            return new OptionsMenuAdapter((OptionsMenu)menu);
         }
 
         public override string Key
@@ -99,6 +87,7 @@ namespace SongsOfConquestAccess.Screens
 
         public override bool IsActive()
         {
+            SyncLive();
             return Live != null && Live.IsPresent();
         }
 
@@ -151,67 +140,6 @@ namespace SongsOfConquestAccess.Screens
                 };
                 vtable.OnActivate = () => tab.Select();
                 builder.AddItem(new SyntheticNode(ControlId.Structural("options:tab/" + tab.Id), vtable));
-            }
-        }
-
-        private static OptionsMenu FindActiveOptionsMenu()
-        {
-            OptionsMenuInstaller[] installers = Resources.FindObjectsOfTypeAll<OptionsMenuInstaller>();
-            for (int i = 0; i < installers.Length; i++)
-            {
-                OptionsMenuInstaller installer = installers[i];
-                if (!IsLiveSceneInstaller(installer))
-                {
-                    continue;
-                }
-
-                OptionsMenu menu = TryResolve<OptionsMenu>(installer);
-                if (menu == null)
-                {
-                    continue;
-                }
-
-                OptionsMenuAdapter adapter = new OptionsMenuAdapter(menu);
-                if (adapter.IsPresent())
-                {
-                    return menu;
-                }
-            }
-
-            return null;
-        }
-
-        private static bool IsLiveSceneInstaller(OptionsMenuInstaller installer)
-        {
-            if (installer == null)
-            {
-                return false;
-            }
-
-            GameObject gameObject = installer.gameObject;
-            return gameObject != null && gameObject.scene.IsValid() && gameObject.scene.isLoaded;
-        }
-
-        private static T TryResolve<T>(OptionsMenuInstaller installer) where T : class
-        {
-            if (installer == null || InstallerContainerProperty == null)
-            {
-                return null;
-            }
-
-            DiContainer container = InstallerContainerProperty.GetValue(installer, null) as DiContainer;
-            if (container == null)
-            {
-                return null;
-            }
-
-            try
-            {
-                return container.Resolve<T>();
-            }
-            catch (Exception)
-            {
-                return null;
             }
         }
     }

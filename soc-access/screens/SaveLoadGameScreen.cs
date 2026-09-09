@@ -1,7 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Reflection;
-using HarmonyLib;
 using SongsOfConquest.Client.Menu;
 using SongsOfConquest.Client.UI;
 using SongsOfConquestAccess.Adapters;
@@ -9,7 +7,6 @@ using SongsOfConquestAccess.Localization;
 using SongsOfConquestAccess.UI;
 using SongsOfConquestAccess.UI.Graph;
 using UnityEngine;
-using Zenject;
 
 namespace SongsOfConquestAccess.Screens
 {
@@ -57,8 +54,9 @@ namespace SongsOfConquestAccess.Screens
         private const string DetailsStop = "save-load-details";
         private const string ButtonsStop = "save-load-buttons";
 
-        private static readonly PropertyInfo InstallerContainerProperty =
-            AccessTools.Property(typeof(SaveLoadGameMenuInstaller), "Container");
+        /// <summary>The one save/load window the project container holds for the whole game; the
+        /// pause menu's Save and Load buttons open it in different modes.</summary>
+        private readonly ScreenSource<SaveLoadGameMenu> _source = ScreenSource<SaveLoadGameMenu>.FromProject();
 
         private readonly GameTextEditor _editor = new GameTextEditor();
 
@@ -71,28 +69,14 @@ namespace SongsOfConquestAccess.Screens
             get { return Live != null ? Live.SourceKey : null; }
         }
 
-        /// <summary>After a hot reload: point the slot at the menu already showing.
-        /// Scanned once, from <c>ScreenDetector.RecoverRuntimeState</c>.</summary>
-        public static void Recover()
+        protected override object ResolveMenu()
         {
-            Recovered<SaveLoadGameScreen>(FindActive());
+            return _source.Current;
         }
 
-        public static SaveLoadGameMenuAdapter FindActive()
+        protected override SaveLoadGameMenuAdapter Adapt(object menu)
         {
-            SaveLoadGameMenu menu = FindActiveSaveLoadGameMenu();
-            if (menu == null)
-            {
-                return null;
-            }
-
-            SaveLoadGameMenuAdapter adapter = new SaveLoadGameMenuAdapter(menu);
-            return adapter.IsPresent() ? (adapter) : null;
-        }
-
-        public bool Matches(SaveLoadGameMenu menu)
-        {
-            return ReferenceEquals(SourceKey, menu);
+            return new SaveLoadGameMenuAdapter((SaveLoadGameMenu)menu);
         }
 
         public override string Key
@@ -121,6 +105,7 @@ namespace SongsOfConquestAccess.Screens
 
         public override bool IsActive()
         {
+            SyncLive();
             return Live != null && Live.IsPresent();
         }
 
@@ -459,67 +444,6 @@ namespace SongsOfConquestAccess.Screens
             }
 
             return marker;
-        }
-
-        private static SaveLoadGameMenu FindActiveSaveLoadGameMenu()
-        {
-            SaveLoadGameMenuInstaller[] installers = Resources.FindObjectsOfTypeAll<SaveLoadGameMenuInstaller>();
-            for (int i = 0; i < installers.Length; i++)
-            {
-                SaveLoadGameMenuInstaller installer = installers[i];
-                if (!IsLiveSceneInstaller(installer))
-                {
-                    continue;
-                }
-
-                SaveLoadGameMenu menu = TryResolve<SaveLoadGameMenu>(installer);
-                if (menu == null)
-                {
-                    continue;
-                }
-
-                SaveLoadGameMenuAdapter adapter = new SaveLoadGameMenuAdapter(menu);
-                if (adapter.IsPresent())
-                {
-                    return menu;
-                }
-            }
-
-            return null;
-        }
-
-        private static bool IsLiveSceneInstaller(SaveLoadGameMenuInstaller installer)
-        {
-            if (installer == null)
-            {
-                return false;
-            }
-
-            GameObject gameObject = installer.gameObject;
-            return gameObject != null && gameObject.scene.IsValid() && gameObject.scene.isLoaded;
-        }
-
-        private static T TryResolve<T>(SaveLoadGameMenuInstaller installer) where T : class
-        {
-            if (installer == null || InstallerContainerProperty == null)
-            {
-                return null;
-            }
-
-            DiContainer container = InstallerContainerProperty.GetValue(installer, null) as DiContainer;
-            if (container == null)
-            {
-                return null;
-            }
-
-            try
-            {
-                return container.Resolve<T>();
-            }
-            catch (Exception)
-            {
-                return null;
-            }
         }
     }
 }

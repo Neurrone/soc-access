@@ -1,12 +1,10 @@
 using System;
 using System.Collections.Generic;
-using HarmonyLib;
 using SongsOfConquest.Client.Menu.Popup;
 using SongsOfConquestAccess.Adapters;
 using SongsOfConquestAccess.UI;
 using SongsOfConquestAccess.UI.Graph;
 using UnityEngine;
-using Zenject;
 
 namespace SongsOfConquestAccess.Screens
 {
@@ -36,8 +34,8 @@ namespace SongsOfConquestAccess.Screens
         private const string ConfirmKey = "quit:confirm";
         private const string CancelKey = "quit:cancel";
 
-        private static readonly System.Reflection.PropertyInfo InstallerContainerProperty =
-            AccessTools.Property(typeof(QuitToDesktopPopupInstaller), "Container");
+        /// <summary>The one quit popup the project container holds for the whole game.</summary>
+        private readonly ScreenSource<IQuitToDesktopPopup> _source = ScreenSource<IQuitToDesktopPopup>.FromProject();
 
         // A subject of its own for each node the popup gives no component for: the reconciler seats
         // the cursor by SUBJECT before it looks at the structural key, so two nodes sharing one would
@@ -46,38 +44,14 @@ namespace SongsOfConquestAccess.Screens
         private readonly object _headingKey = new object();
         private readonly object _bodyKey = new object();
 
-        /// <summary>After a hot reload: point the slot at the menu already showing.
-        /// Scanned once, from <c>ScreenDetector.RecoverRuntimeState</c>.</summary>
-        public static void Recover()
+        protected override object ResolveMenu()
         {
-            Recovered<QuitToDesktopPopupScreen>(FindActive());
+            return _source.Current;
         }
 
-        public static QuitToDesktopPopupAdapter FindActive()
+        protected override QuitToDesktopPopupAdapter Adapt(object menu)
         {
-            QuitToDesktopPopupInstaller[] installers = Resources.FindObjectsOfTypeAll<QuitToDesktopPopupInstaller>();
-            for (int i = 0; i < installers.Length; i++)
-            {
-                QuitToDesktopPopupInstaller installer = installers[i];
-                if (!IsLiveSceneInstaller(installer))
-                {
-                    continue;
-                }
-
-                QuitToDesktopPopup popup = TryResolvePopup(installer);
-                if (popup == null)
-                {
-                    continue;
-                }
-
-                QuitToDesktopPopupAdapter adapter = new QuitToDesktopPopupAdapter(popup);
-                if (adapter.IsPresent())
-                {
-                    return (adapter);
-                }
-            }
-
-            return null;
+            return new QuitToDesktopPopupAdapter((QuitToDesktopPopup)menu);
         }
 
         public override string Key
@@ -103,6 +77,7 @@ namespace SongsOfConquestAccess.Screens
 
         public override bool IsActive()
         {
+            SyncLive();
             return Live != null && Live.IsPresent();
         }
 
@@ -218,40 +193,6 @@ namespace SongsOfConquestAccess.Screens
         private static float Left(Component button)
         {
             return button != null ? button.transform.position.x : 0f;
-        }
-
-        private static bool IsLiveSceneInstaller(QuitToDesktopPopupInstaller installer)
-        {
-            if (installer == null)
-            {
-                return false;
-            }
-
-            GameObject gameObject = installer.gameObject;
-            return gameObject != null && gameObject.scene.IsValid() && gameObject.scene.isLoaded;
-        }
-
-        private static QuitToDesktopPopup TryResolvePopup(QuitToDesktopPopupInstaller installer)
-        {
-            if (installer == null || InstallerContainerProperty == null)
-            {
-                return null;
-            }
-
-            DiContainer container = InstallerContainerProperty.GetValue(installer, null) as DiContainer;
-            if (container == null)
-            {
-                return null;
-            }
-
-            try
-            {
-                return container.Resolve<QuitToDesktopPopup>();
-            }
-            catch (Exception)
-            {
-                return null;
-            }
         }
     }
 }
