@@ -117,11 +117,20 @@ namespace SongsOfConquestAccess.Screens
             return Live != null && Live.IsPresent();
         }
 
-        /// <summary>Called by the detector whenever the menu changes. The graph is declared afresh on
-        /// every operation, so the only thing to do here is give up the cursor when the menu has
-        /// swapped one whole page for the other.</summary>
-        public void Refresh()
+        /// <summary>A different menu is in the slot, so the stage the last one ended on says nothing
+        /// about this one: kept, it would swallow the first transition of the new encounter.</summary>
+        public override void OnLiveChanged(HostileJoinMenuAdapter previous)
         {
+            _stage = HostileJoinMenuStage.None;
+        }
+
+        /// <summary>The stage is read off the game every frame rather than waited for: the menu swaps
+        /// one whole page for the other in place, and the cursor is given up when it does. The graph
+        /// is declared afresh on every operation, so there is nothing else to do.</summary>
+        public override void OnUpdate()
+        {
+            base.OnUpdate();
+
             HostileJoinMenuStage stage = Live == null ? HostileJoinMenuStage.None : Live.Stage;
             if (stage == _stage)
             {

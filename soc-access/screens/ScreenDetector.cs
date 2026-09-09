@@ -406,10 +406,9 @@ namespace SongsOfConquestAccess.Screens
                 return;
             }
 
-            // The menu walks through its stages in place: the screen keeps the adapter it has and is
-            // told the stage moved, which drops the cursor onto the new page.
+            // The menu walks through its stages in place: the screen keeps the adapter it has and
+            // watches the game's own stage itself, so there is nothing to tell it.
             adapter.Dispose();
-            screen.Refresh();
         }
 
         public void OnHostileJoinMenuClosed(HostileJoinMenu menu)
