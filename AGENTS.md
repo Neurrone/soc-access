@@ -78,30 +78,46 @@ If native emulation behaves differently from mouse input:
 3. Fix the state mismatch, not the symptom.
 4. Avoid adding special-case fallback logic unless the user explicitly asks for it.
 
-## Screen Readiness Hooks
+## Screen Resolution
 
-Do not treat Unity scene load or `MonoBehaviour.Awake()` as proof that a menu is accessible-ready.
+A screen finds its own menu; no hook tells it. `IsActive()` is "the source found the menu and
+`Live.IsPresent()`", both read from the game every frame. The source (`ScreenSource<T>`) resolves
+the menu one of four ways and memoises the answer, hit or miss, keyed on the set of loaded scene
+handles, so a scene change, a hot reload and a new game are the same event and none needs a
+signal:
 
-For menu screens, first identify the game's own readiness point:
+- the Zenject project container (`ProjectContext.Instance.Container.TryResolve<T>()`) for the
+  system menus: pause, options, save/load, popups, codex, tutorial, platform user;
+- the scene container (`SceneContext` on a scene root object, then `TryResolve<T>()`) for the
+  adventure and battle menus; a binding marked `WhenInjectedInto` is invisible from outside and
+  resolves through its owner's field instead (the kingdom HUD's four menus, the battle menu's
+  settings); never resolve a lazy binding, it constructs the object;
+- a field off a resolved owner for a menu the owner holds (commander sheet, spellbook, the
+  pre- and post-battle menus, a lobby row's dropdown);
+- a walk of the scene's root objects (`GetComponentInChildren<T>(true)`) for the unbound
+  menu-scene objects (main menu, campaign menu, tale select, lobby, game list, player stats),
+  gated to the scenes that can hold them; about 3.5 ms on the adventure scene, so never there.
 
-- prefer a screen-specific coroutine or callback that runs after the UI is actually shown
-- if the screen has a `Start()` coroutine that enables containers, waits for animations, sets the title, or plays an entry sound, hook the end of that coroutine
-- if an owner or manager exposes an `OnSceneLoaded` event and the target UI is still hidden afterward, use that event only to start waiting for the specific visible container
-- avoid patching `Awake()` for accessibility screen activation; `Awake()` is often too early, and under hot reload or additive scene loading it may already have run before our patch is applied
+Readiness is read from the game: `IsPresent` gates on the end state the menu's own coroutine
+leaves behind (a title set, a canvas alpha at 1, buttons activated, entries instantiated), never
+on the object merely existing. Readiness hooks are forbidden; the four menus once thought to
+need one (campaign menu, tale select, custom campaign select, player stats) all leave such a
+trace. A new menu that seems not to gets its coroutine read again in the decompiled source, not
+a patch.
 
-Examples:
+A Harmony patch may deliver an event (a notification, a chat line, a battle response, a story
+trigger) or alter game behaviour (force a tooltip, route a close). It is never the source of
+truth for anything a `Build`, `IsActive`, `ScreenName` or tooltip reads, and losing one call may
+cost one announcement and nothing else. Patch classes hold no static state without a `Reset`
+that `SocAccessMod.Stop` calls. Every patch is on the inventory allowlist as `event` or
+`interception`; the lints under `soc-access/tests/Lint/` enforce this and the rest of this
+section, and an exception to any of them is reported to the owner before it merges.
 
-- Main menu: `MainMenu.HandleSceneLoaded(MainMenuSceneType.MainMenu)` is the stable transition signal, but the menu is not usable until `_leftButtonContainer.activeInHierarchy`. Start a coroutine from the scene-loaded hook and push `MainMenuScreen` only after that container is active.
-- Campaign select: `CampaignMenu.Awake()` is unreliable and too early. The reliable readiness point is the end of `CampaignMenu.Start()`, after it enables `_campaignButtonContainer`, waits `0.3s`, sets the title, and plays the campaign select entry sound. Wrap the `Start()` coroutine and call the accessibility detector after the original coroutine completes.
-
-When adding a new screen:
-
-1. Inspect decompiled lifecycle code before choosing hooks.
-2. Find the exact game state that means "the user can now interact with this screen."
-3. Gate `Screen.IsPresent()` on that state, not merely on the object existing.
-4. Prefer a semantic readiness hook over frame-count delays.
-5. Use bounded runtime probes for hot reload recovery, not as the primary first-entry mechanism.
-6. Keep temporary readiness logs only while debugging; remove them once the hook is proven.
+Screens keep no state across a change of `Live` without an `OnLiveChanged` that resets it, and
+every cache on a build path is keyed on something read from the game each frame (frame count,
+object identity, a count, a generation the game owns). A cache dropped only when a hook says so
+is the bug this section exists to prevent (2026-09-09 audit: the post-battle snapshot, the
+teleport mode, the map installer).
 
 ## Testing Guidelines
 
@@ -121,7 +137,9 @@ A graph screen's `Build` runs every frame. Nothing inside it, or inside a predic
 name or eagerly passed argument it evaluates, may scan the scene (`Resources.FindObjectsOfTypeAll`,
 `FindObjectOfType`), walk a subtree (`GetComponentsInChildren`), invoke a game refresh through
 reflection, or iterate a whole game collection. That work belongs in the adapter's constructor,
-in a snapshot taken on the detector's change hook, or inside a tooltip's lines function.
+in a `FrameSweep` keyed on the frame, in a snapshot keyed on game state (an entry count, an
+object identity, a game-owned generation), or inside a tooltip's lines function. Row text is
+built when the row is read, never for every row per frame.
 
 An adapter resolves each game object, `FieldInfo`, `PropertyInfo` and `MethodInfo` once per
 instance. Cache misses too, behind a probed flag, so an absent panel costs one lookup and not

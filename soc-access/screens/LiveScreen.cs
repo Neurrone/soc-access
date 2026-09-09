@@ -54,6 +54,45 @@ namespace SongsOfConquestAccess.Screens
         public override void Forget()
         {
             Live = null;
+            _menuOfLive = null;
+        }
+
+        // ---- self-resolution (AGENTS.md, "Screen Resolution") ----
+
+        // The menu the current adapter was built over, so a menu the source keeps answering costs
+        // one reference comparison a frame and a new instance gets a new adapter.
+        private object _menuOfLive;
+
+        /// <summary>The game object this screen reads now, or null: the memoised answer of the
+        /// screen's <see cref="ScreenSource{T}"/>. A screen that resolves itself overrides this;
+        /// a detector-fed screen keeps the default, and the detector writes <see cref="Live"/>.</summary>
+        protected virtual object ResolveMenu()
+        {
+            return null;
+        }
+
+        /// <summary>The adapter over a menu the source found. Called once per menu instance, never
+        /// per frame.</summary>
+        protected virtual TAdapter Adapt(object menu)
+        {
+            return null;
+        }
+
+        /// <summary>Point the slot at what the source finds now; the first line of a
+        /// self-resolving screen's <c>IsActive</c>. A vanished menu clears the slot, a new instance
+        /// replaces the adapter, the same instance costs a comparison. A source that answers null
+        /// while the slot was never source-written leaves the slot alone, which is how a
+        /// detector-fed screen and a self-resolving one share this base.</summary>
+        protected void SyncLive()
+        {
+            object menu = ResolveMenu();
+            if (ReferenceEquals(menu, _menuOfLive))
+            {
+                return;
+            }
+
+            _menuOfLive = menu;
+            Live = menu == null ? null : Adapt(menu);
         }
 
         /// <summary>Point the REGISTERED singleton's slot at what a one-time scan found - what every
