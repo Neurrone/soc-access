@@ -214,6 +214,13 @@ namespace SongsOfConquestAccess.Adapters
         /// </summary>
         public sealed class Side : IArtifactSlots
         {
+            // The showing modifier tab's rows, walked at most once a frame per side: the build
+            // asks the left side and the right side, and each row's live readout asks again. Keyed
+            // on the frame rather than held, because a tab switch replaces the rows under the same
+            // content transform.
+            private readonly FrameSweep<CommanderSheetSummaryEntry> _modifierEntries =
+                new FrameSweep<CommanderSheetSummaryEntry>("trading modifiers", inactiveToo: false);
+
             private readonly TradingMenuAdapter _owner;
             private readonly bool _left;
             private TroopHudAdapter _troops;
@@ -391,7 +398,7 @@ namespace SongsOfConquestAccess.Adapters
                 Transform content = GetActiveModifierContent();
                 if (content != null)
                 {
-                    CommanderSheetSummaryEntry[] entries = ((Component)content).GetComponentsInChildren<CommanderSheetSummaryEntry>(false);
+                    CommanderSheetSummaryEntry[] entries = _modifierEntries.Under(content);
                     for (int i = 0; i < entries.Length; i++)
                     {
                         UITextMesh text = GetField<UITextMesh>(entries[i], SummaryEntryTextField);

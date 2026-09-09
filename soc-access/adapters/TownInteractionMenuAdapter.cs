@@ -530,27 +530,6 @@ namespace SongsOfConquestAccess.Adapters
             return SpokenLines.Clean(UITextMeshTextUtility.GetEffectiveText(textMesh));
         }
 
-        private static string GetVisibleText(GameObject root)
-        {
-            if (root == null)
-            {
-                return string.Empty;
-            }
-
-            List<string> parts = new List<string>();
-            UITextMesh[] textMeshes = root.GetComponentsInChildren<UITextMesh>(includeInactive: false);
-            for (int i = 0; i < textMeshes.Length; i++)
-            {
-                string text = GetText(textMeshes[i]);
-                if (!string.IsNullOrWhiteSpace(text) && !parts.Contains(text))
-                {
-                    parts.Add(text);
-                }
-            }
-
-            return string.Join(". ", parts.ToArray());
-        }
-
         private static bool IsVisible(Component component)
         {
             return component != null && component.gameObject != null && component.gameObject.activeInHierarchy;

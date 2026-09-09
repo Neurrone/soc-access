@@ -13,12 +13,11 @@ namespace SongsOfConquestAccess
     {
         private static readonly FieldInfo ButtonLabelField = AccessTools.Field(typeof(PlatformUserButtonEntry), "_buttonLabel");
         private static readonly FieldInfo UserButtonTypeField = AccessTools.Field(typeof(PlatformUserButtonEntry), "_userButtonType");
+        // No Reset, and none is wanted: a Time.realtimeSinceStartup stamp holding no game
+        // reference, so a value left by a previous load is at most a wrong number of seconds. It has
+        // had no reader since HasRecentActivity went; this whole class is a debug probe that
+        // survived, and deleting it is the owner's call. On patch-statics.allow for that reason.
         private static float _lastActionTime = -100f;
-
-        public static bool HasRecentActivity
-        {
-            get { return Time.realtimeSinceStartup - _lastActionTime <= 2f; }
-        }
 
         [HarmonyPatch(typeof(PlatformUserButtonEntry), "HandleClicked")]
         [HarmonyPostfix]

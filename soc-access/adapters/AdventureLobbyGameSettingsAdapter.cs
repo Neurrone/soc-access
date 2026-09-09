@@ -401,6 +401,8 @@ namespace SongsOfConquestAccess.Adapters
             return DropdownGetTextMethod.Invoke(concrete, new object[0]) as Component;
         }
 
+        // LAZY, never on a build path: the options are reached only through a Func the node holds,
+        // so the walk is paid when the player opens the dropdown.
         private static IReadOnlyList<string> GetDropdownOptions(IUITextMeshDropdown dropdown)
         {
             Component component = dropdown as Component;

@@ -546,6 +546,12 @@ namespace SongsOfConquestAccess.Tests.Lint
         /// reports inconclusive and its regenerated output is a work list.</summary>
         public static readonly HashSet<string> Armed = new HashSet<string>(StringComparer.Ordinal)
         {
+            "hook-called-members.allow",
+            "patch-statics.allow",
+            "patches.allow",
+            "scene-scans.allow",
+            "screen-state.allow",
+            "wrapped-coroutines.allow",
         };
 
         /// <summary>An armed rule's list exists; an unarmed one's may not.</summary>

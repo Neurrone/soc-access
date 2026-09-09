@@ -59,6 +59,8 @@ namespace SongsOfConquestAccess.Screens
         // nodes sharing one collapse onto whichever was declared first.
         private readonly Dictionary<string, object> _markers = new Dictionary<string, object>();
 
+        // The five-digit code as it was last spoken, so typing echoes the digit that changed rather
+        // than the whole box. Mod-owned announcement state, which outlives the panel.
         private string _lastCode;
 
         // The last heading spoken, so a modal that walks from panel to panel UNDER ONE GAME OBJECT

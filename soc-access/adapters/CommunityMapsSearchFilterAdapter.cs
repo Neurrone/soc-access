@@ -8,6 +8,7 @@ using ModIOBrowser;
 using ModIOBrowser.Implementation;
 using SongsOfConquestAccess.Screens;
 using SongsOfConquestAccess.Localization;
+using SongsOfConquestAccess.UI;
 using TMPro;
 using UnityEngine;
 using UnityEngine.Events;
@@ -274,6 +275,7 @@ namespace SongsOfConquestAccess.Adapters
             return false;
         }
 
+        // LAZY: a click. The walk under the tag chip is paid when the player toggles it.
         private bool ToggleTag(string category, string name)
         {
             TagListItem item = FindNativeTag(category, name);
@@ -287,6 +289,7 @@ namespace SongsOfConquestAccess.Adapters
             return true;
         }
 
+        // LAZY: a focus move. The walk under the tag chip is paid when the cursor arrives on it.
         private void FocusTag(string category, string name)
         {
             TagListItem item = FindNativeTag(category, name);
@@ -353,10 +356,16 @@ namespace SongsOfConquestAccess.Adapters
             return value is T ? (T)value : default(T);
         }
 
+        // FindActionButtons walks the panel for its buttons and then asked each of them for its
+        // label, so the filter panel paid one subtree walk per button per build. Keyed on the
+        // frame, the walk under a button is paid once however often the label is asked for.
+        private static readonly FrameSweep<TMP_Text> ButtonTexts =
+            new FrameSweep<TMP_Text>("community maps filter button", inactiveToo: false);
+
         private static string GetButtonLabel(Button button)
         {
-            TMP_Text text = button != null ? button.GetComponentInChildren<TMP_Text>(false) : null;
-            return GetText(text);
+            TMP_Text[] texts = button != null ? ButtonTexts.Under(button.transform) : null;
+            return GetText(texts != null && texts.Length > 0 ? texts[0] : null);
         }
 
         private static string GetText(TMP_Text text)

@@ -14,6 +14,7 @@ namespace SongsOfConquestAccess.Adapters
         private static readonly System.Reflection.FieldInfo StringBuilderField =
             AccessTools.Field(typeof(UITextMesh), "_stringBuilder");
 
+        [HookWritable]
         public static string GetEffectiveText(IUITextMesh textMesh)
         {
             UITextMesh concreteTextMesh = textMesh as UITextMesh;

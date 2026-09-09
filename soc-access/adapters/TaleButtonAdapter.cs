@@ -196,6 +196,13 @@ namespace SongsOfConquestAccess.Adapters
             return SpokenLines.Clean(UITextMeshTextUtility.GetEffectiveText(textMesh));
         }
 
+        // The coming-soon and purchase containers a tale button draws, walked at most once a
+        // frame: the status is a live announcement, so the graph polls it on every frame the tale
+        // list is up. Static because the reader is, and safe to be: a FrameSweep holds only the
+        // frame it was filled on.
+        private static readonly FrameSweep<UITextMesh> ContainerTexts =
+            new FrameSweep<UITextMesh>("tale button container", inactiveToo: false);
+
         private static string GetAllVisibleText(GameObject root, params UITextMesh[] ignoredTextMeshes)
         {
             if (root == null || !root.activeInHierarchy)
@@ -204,7 +211,7 @@ namespace SongsOfConquestAccess.Adapters
             }
 
             List<string> parts = new List<string>();
-            UITextMesh[] textMeshes = root.GetComponentsInChildren<UITextMesh>(includeInactive: false);
+            UITextMesh[] textMeshes = ContainerTexts.Under(root.transform);
             for (int i = 0; i < textMeshes.Length; i++)
             {
                 UITextMesh textMesh = textMeshes[i];

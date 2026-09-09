@@ -37,6 +37,19 @@ namespace SongsOfConquestAccess.Tests.Lint
         private static readonly Regex Patch = new Regex(
             @"\[HarmonyPatch\s*\(\s*typeof\s*\([^)]*\)\s*,\s*""");
 
+        /// <summary>The other way a patch names its target: a <c>TargetMethod</c> that hands Harmony
+        /// a <c>MethodBase</c> it looked up itself. Three classes in this tree do it, and the
+        /// attribute regex alone could not see any of them - a roster that silently omits a hook is
+        /// worse than no roster, because the missing one reads as already reviewed.</summary>
+        private static readonly Regex Resolved = new Regex(
+            @"AccessTools\.(?:Method|Property|PropertyGetter|PropertySetter|Constructor|DeclaredMethod)\s*\(\s*typeof\s*\(");
+
+        /// <summary>The member a resolved target may be looked up in: Harmony calls a method named
+        /// <c>TargetMethod</c> or one marked <c>[HarmonyTargetMethod]</c>, and nothing else.</summary>
+        private static readonly Regex TargetMember = new Regex(@"^(TargetMethod|TargetMethods)$");
+
+        private static readonly Regex TargetAttribute = new Regex(@"\[HarmonyTargetMethod(?:s)?\]");
+
         private static readonly HashSet<string> Kinds = new HashSet<string>(StringComparer.Ordinal)
         {
             "event",
@@ -73,16 +86,70 @@ namespace SongsOfConquestAccess.Tests.Lint
             LintSources.AssertArmed(Allowlist);
         }
 
+        /// <summary>The members in this file Harmony asks for a target: named <c>TargetMethod</c>,
+        /// or marked with the attribute whatever they are called.</summary>
+        private static HashSet<string> TargetMembers(string[] lines, Structure structure)
+        {
+            HashSet<string> members = new HashSet<string>(StringComparer.Ordinal);
+            for (int i = 0; i < lines.Length; i++)
+            {
+                if (LintSources.IsComment(lines[i]))
+                {
+                    continue;
+                }
+
+                if (TargetAttribute.IsMatch(lines[i]))
+                {
+                    for (int j = i + 1; j < lines.Length && j <= i + 4; j++)
+                    {
+                        if (structure.Member[j] != null)
+                        {
+                            members.Add(structure.Member[j]);
+                            break;
+                        }
+                    }
+
+                    continue;
+                }
+
+                if (structure.Member[i] != null && TargetMember.IsMatch(structure.Member[i]))
+                {
+                    members.Add(structure.Member[i]);
+                }
+            }
+
+            return members;
+        }
+
         public static Dictionary<Site, int> Sites()
         {
             Dictionary<Site, int> found = new Dictionary<Site, int>();
             foreach (string file in LintSources.Under("soc-access/patches/"))
             {
-                foreach (string line in LintSources.Lines(file))
+                string[] lines = LintSources.Lines(file);
+                Structure structure = LintSources.Read(file);
+                HashSet<string> targetMembers = TargetMembers(lines, structure);
+                for (int i = 0; i < lines.Length; i++)
                 {
-                    if (!LintSources.IsComment(line) && Patch.IsMatch(line))
+                    if (LintSources.IsComment(lines[i]))
                     {
-                        LintSources.Add(found, file, line);
+                        continue;
+                    }
+
+                    if (Patch.IsMatch(lines[i]))
+                    {
+                        LintSources.Add(found, file, lines[i]);
+                        continue;
+                    }
+
+                    // The lookup line inside a TargetMethod is the site: it is where the class says
+                    // what it patches, the same thing the attribute says on its own line.
+                    string member = structure.Member[i];
+                    if (member != null
+                        && targetMembers.Contains(member)
+                        && Resolved.IsMatch(LintSources.Code(lines[i])))
+                    {
+                        LintSources.Add(found, file, lines[i]);
                     }
                 }
             }

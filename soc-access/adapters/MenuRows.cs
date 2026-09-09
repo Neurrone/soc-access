@@ -337,6 +337,8 @@ namespace SongsOfConquestAccess.Adapters
             return component != null && component.gameObject.activeInHierarchy;
         }
 
+        // LAZY, never on a build path: the options are reached only through a Func the node holds,
+        // so the walk is paid when the player opens the dropdown.
         private static IReadOnlyList<string> DropdownOptions(IUITextMeshDropdown dropdown)
         {
             Component component = dropdown as Component;

@@ -63,6 +63,17 @@ namespace SongsOfConquestAccess.Adapters
         private readonly IClientAdventureFacade _facade;
         private readonly ILocalizationHandler _localization;
         private readonly IArtifactLookup _artifactLookup;
+
+        // The three subtrees the build walks every frame: the category tab strip, the offer grid,
+        // and the buy and sell bands, whose word over the button is read as a context name and so
+        // is composed eagerly. Keyed on the frame rather than held, because the grid is pooled and
+        // a retired entry must not answer for the next category.
+        private readonly FrameSweep<UIToggle> _categoryToggles =
+            new FrameSweep<UIToggle>("artifact market categories");
+        private readonly FrameSweep<ArtifactMarketEntry> _marketEntries =
+            new FrameSweep<ArtifactMarketEntry>("artifact market grid", inactiveToo: false);
+        private readonly FrameSweep<UITextMesh> _bandTexts =
+            new FrameSweep<UITextMesh>("artifact market band");
         private WielderInteract _wielder;
 
         public ArtifactMarketMenuAdapter(ArtifactMarketMenu menu)
@@ -237,9 +248,7 @@ namespace SongsOfConquestAccess.Adapters
         private UIToggle[] GetCategoryToggles()
         {
             UIToggleGroup group = GetField<UIToggleGroup>(_menu, CategoryTabGroupField);
-            return group == null
-                ? new UIToggle[0]
-                : ((Component)group).GetComponentsInChildren<UIToggle>(true);
+            return group == null ? new UIToggle[0] : _categoryToggles.Under((Component)group);
         }
 
         public IReadOnlyList<MarketArtifactItem> GetMarketArtifacts()
@@ -251,7 +260,9 @@ namespace SongsOfConquestAccess.Adapters
                 return items;
             }
 
-            ArtifactMarketEntry[] entries = gridContainer.GetComponentsInChildren<ArtifactMarketEntry>(false);
+            // A copy, because the sweep's answer is shared for the rest of the frame and the order
+            // it was walked in is what the next caller expects.
+            ArtifactMarketEntry[] entries = (ArtifactMarketEntry[])_marketEntries.Under(gridContainer.transform).Clone();
             Array.Sort(entries, CompareSiblingIndex);
             for (int i = 0; i < entries.Length; i++)
             {
@@ -697,7 +708,7 @@ namespace SongsOfConquestAccess.Adapters
             }
 
             Transform buttonRoot = button != null ? ((Component)button).transform : null;
-            UITextMesh[] texts = container.GetComponentsInChildren<UITextMesh>(true);
+            UITextMesh[] texts = _bandTexts.Under(container.transform);
             for (int i = 0; i < texts.Length; i++)
             {
                 UITextMesh text = texts[i];
@@ -732,6 +743,8 @@ namespace SongsOfConquestAccess.Adapters
             return gameObject != null && gameObject.activeInHierarchy;
         }
 
+        // LAZY: reached only through GraphNodes.Text's Func for the "no selection" line, so the walk
+        // is paid when that line is read rather than on every build.
         private static string FirstText(GameObject container)
         {
             UITextMesh text = container == null ? null : container.GetComponentInChildren<UITextMesh>(true);

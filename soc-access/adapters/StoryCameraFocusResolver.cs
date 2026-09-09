@@ -18,6 +18,7 @@ namespace SongsOfConquestAccess.Adapters
 {
     public static class StoryCameraFocusResolver
     {
+        [HookWritable]
         public static StoryCameraFocusTarget ResolvePointTarget(
             IClientAdventureFacade facade,
             object cartographyConverter,
@@ -40,6 +41,7 @@ namespace SongsOfConquestAccess.Adapters
             return new StoryCameraFocusTarget(DescribeTileTarget(facade, localizationHandler, tile, focusPoint), tile);
         }
 
+        [HookWritable]
         public static StoryCameraFocusTarget ResolveWielderTarget(
             IClientAdventureFacade facade,
             ICommanderState commander)
@@ -53,6 +55,7 @@ namespace SongsOfConquestAccess.Adapters
             return new StoryCameraFocusTarget(name, commander.Position);
         }
 
+        [HookWritable]
         public static StoryCameraFocusTarget ResolveWorldPositionTarget(
             IClientAdventureFacade facade,
             object cartographyConverter,
@@ -77,6 +80,7 @@ namespace SongsOfConquestAccess.Adapters
             return new StoryCameraFocusTarget(resolvedLabel, tile.Value);
         }
 
+        [HookWritable]
         public static Vector2Int? TryWorldToTile(object cartographyConverter, Vector3 worldPosition)
         {
             if (!IsValidWorldPosition(worldPosition))
@@ -87,6 +91,7 @@ namespace SongsOfConquestAccess.Adapters
             return WorldToTile(cartographyConverter, worldPosition);
         }
 
+        [HookWritable]
         public static string LocalizeName(ILocalizationHandler localizationHandler, string nameKey, int pluralCount)
         {
             if (string.IsNullOrWhiteSpace(nameKey))
@@ -112,6 +117,7 @@ namespace SongsOfConquestAccess.Adapters
             }
         }
 
+        [HookWritable]
         public static bool IsValidWorldPosition(Vector3 position)
         {
             return !float.IsInfinity(position.x)

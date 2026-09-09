@@ -27,6 +27,9 @@ namespace SongsOfConquestAccess.Patches
     [HarmonyPatch]
     public static class DynamicAssemblyTypesPatches
     {
+        // No Reset, and none is wanted: a log-once flag holding no game reference. A reload gives
+        // the new assembly a fresh false, so the worst a reload costs is the warning being logged
+        // one more time. On patch-statics.allow for that reason.
         private static bool _reported;
 
         [HarmonyPrepare]

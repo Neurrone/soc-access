@@ -140,6 +140,8 @@ namespace SongsOfConquestAccess.Adapters
         private bool _endTurnHudProbed;
         private bool _endTurnSettingsProbed;
         private bool _teamQueueHudProbed;
+        private UIButton _optionsButton;
+        private bool _optionsButtonProbed;
         private List<ObjectiveEntrySnapshot> _objectiveSnapshots;
         private int _objectiveSnapshotsFrame = -1;
         private List<WielderListHUDEntry> _wielderListEntries;
@@ -1735,16 +1737,24 @@ namespace SongsOfConquestAccess.Adapters
             }
         }
 
+        // The map and combat builds both ask whether this button is drawn and for its tooltip, so
+        // the walk was paid up to four times a frame. The button is instantiated with the HUD and
+        // outlives every page, so it is found once per adapter and the miss is remembered too -
+        // the same shape BattleHudAdapter.GetOptionsButton already uses.
         private UIButton GetOptionsButton()
         {
-            GameObject container = HudStateSettings != null ? HudStateSettings.OptionsButtonsContainer : null;
-            OptionsButtonInstaller installer = container != null ? container.GetComponentInChildren<OptionsButtonInstaller>(false) : null;
-            if (installer != null)
+            if (_optionsButton != null || _optionsButtonProbed)
             {
-                return installer.GetComponent<UIButton>();
+                return _optionsButton;
             }
 
-            return container != null ? container.GetComponentInChildren<UIButton>(false) : null;
+            _optionsButtonProbed = true;
+            GameObject container = HudStateSettings != null ? HudStateSettings.OptionsButtonsContainer : null;
+            OptionsButtonInstaller installer = container != null ? container.GetComponentInChildren<OptionsButtonInstaller>(false) : null;
+            _optionsButton = installer != null
+                ? installer.GetComponent<UIButton>()
+                : (container != null ? container.GetComponentInChildren<UIButton>(false) : null);
+            return _optionsButton;
         }
 
         private UIButton GetKingdomOverviewButton(int index)

@@ -122,6 +122,7 @@ namespace SongsOfConquestAccess.Adapters
             TooltipPatches.ShowAccessibilityTooltipAtScreenPoint(tooltipable, screenPoint, details);
         }
 
+        [HookWritable]
         public static void HideTooltip()
         {
             TooltipPatches.HideAccessibilityTooltip();

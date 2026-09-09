@@ -74,6 +74,8 @@ namespace SongsOfConquestAccess.Adapters
                 {
                     _noUpgradableProbed = true;
                     _noUpgradableRoot = root;
+                    // Probe plus an identity check: the walk is repeated only when the game hands
+                    // the sub-menu a different root, not once a frame.
                     _noUpgradableMeshes = root == null
                         ? new UITextMesh[0]
                         : root.GetComponentsInChildren<UITextMesh>(includeInactive: true);

@@ -136,12 +136,6 @@ namespace SongsOfConquestAccess.Adapters
             return NativeSelectionUtility.PointerClick(tabComponent);
         }
 
-        /// <summary>Bumped whenever the window redraws its body (the game's own
-        /// <c>CodexMenu.HandleContentButtonClicked</c>, which is the one place <c>DrawContent</c> is
-        /// called from, tab switches included). An adapter re-reads the body when it changes and
-        /// serves what it read otherwise.</summary>
-        public static int ContentGeneration;
-
         public IReadOnlyList<ArticleGroupItem> GetArticleGroups()
         {
             List<ArticleGroupItem> groups = new List<ArticleGroupItem>();
@@ -229,20 +223,27 @@ namespace SongsOfConquestAccess.Adapters
 
         public IReadOnlyList<CodexContentItem> GetContentItems()
         {
-            if (_contentItems != null && _contentAt == ContentGeneration)
+            Transform contentParent = GetSettingsField<Transform>("ContentParent");
+            if (contentParent == null)
+            {
+                return new List<CodexContentItem>();
+            }
+
+            int childCount = contentParent.childCount;
+            int firstChildId = childCount > 0 && contentParent.GetChild(0) != null
+                ? contentParent.GetChild(0).GetInstanceID()
+                : 0;
+            if (_contentItems != null
+                && _contentChildCount == childCount
+                && _contentFirstChildId == firstChildId)
             {
                 return _contentItems;
             }
 
             List<CodexContentItem> items = new List<CodexContentItem>();
-            Transform contentParent = GetSettingsField<Transform>("ContentParent");
-            if (contentParent == null)
-            {
-                return items;
-            }
-
             _contentItems = items;
-            _contentAt = ContentGeneration;
+            _contentChildCount = childCount;
+            _contentFirstChildId = firstChildId;
 
             if (TryAddWielderContentItems(contentParent, items))
             {
@@ -254,6 +255,8 @@ namespace SongsOfConquestAccess.Adapters
                 return items;
             }
 
+            // Reached only when the key above says the body has been redrawn, so a still article
+            // costs no walk.
             UITextMesh[] textMeshes = contentParent.GetComponentsInChildren<UITextMesh>(false);
             for (int i = 0; i < textMeshes.Length; i++)
             {
@@ -453,10 +456,14 @@ namespace SongsOfConquestAccess.Adapters
             return settings != null ? settings.GetComponent<CodexTutorialSettings>() : null;
         }
 
-        // The body the window last drew, and the redraw it was read at. Reading it walks every text
-        // mesh of the article and cleans each one, which is the page's whole cost.
+        // The body the window last drew, and what the game's own content parent looked like when it
+        // was read. Reading it walks every text mesh of the article and cleans each one, which is the
+        // page's whole cost. DrawContent destroys the body and builds a new one, so the parent's
+        // child count and the identity of its first child both move on every redraw - a key read
+        // from the game each build, not a generation a hook feeds (AGENTS.md, Screen Resolution).
         private List<CodexContentItem> _contentItems;
-        private int _contentAt = -1;
+        private int _contentChildCount = -1;
+        private int _contentFirstChildId;
 
         // The settings object's fields and each entry pool's ActiveEntries: one reflection lookup per
         // name rather than one per call.
@@ -573,6 +580,9 @@ namespace SongsOfConquestAccess.Adapters
             return false;
         }
 
+        // Under GetContentItems, which reads the body only when the game's own content parent has
+        // been emptied and refilled - a key read from the game, not a hook. A redraw costs one walk
+        // for the wielder card and one for the unit card; a still page costs none.
         private bool TryAddWielderContentItems(Transform contentParent, List<CodexContentItem> items)
         {
             WielderCodexContent content = contentParent.GetComponentInChildren<WielderCodexContent>(false);
@@ -595,6 +605,8 @@ namespace SongsOfConquestAccess.Adapters
             return true;
         }
 
+        // As above: only on a redraw. The unit card's sections and each section's info sections are
+        // walked in the same pass.
         private bool TryAddUnitContentItems(Transform contentParent, List<CodexContentItem> items)
         {
             UnitCodexContent content = contentParent.GetComponentInChildren<UnitCodexContent>(false);
@@ -626,6 +638,7 @@ namespace SongsOfConquestAccess.Adapters
 
                 AddTextMeshItems(items, CodexContentItemKind.Text, GetField<UITextMesh>(section, UnitContentSectionDescriptionField));
 
+                // Same pass, one level down: only on a redraw.
                 UnitCodexContentInfoSection[] infoSections = section.GetComponentsInChildren<UnitCodexContentInfoSection>(false);
                 for (int j = 0; j < infoSections.Length; j++)
                 {

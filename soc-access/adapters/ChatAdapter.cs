@@ -361,15 +361,14 @@ namespace SongsOfConquestAccess.Adapters
             }
         }
 
-        /// <summary>Bumped whenever the game hands the window a message
-        /// (<c>ChatWindowBehavior.HandleNewMessage</c>, the only way one arrives). An adapter
-        /// re-reads the history when it moves and serves what it read otherwise.</summary>
-        public static int MessageGeneration;
-
-        // The history as it was last read, and the redraw and team it was read for. Rendering it is
-        // a pass over every message the game has ever shown this team.
+        // The history as it was last read, and the team and rendered text it was read for.
+        // Rendering it is a pass over every message the game has shown this team, so it is redone
+        // only when the game's own rendering of the same history has moved: the window writes every
+        // message into one text mesh in Refresh(), which it runs for each message that lands and
+        // when it opens. Keyed on what the game drew, not on a hook that told us it drew (AGENTS.md,
+        // Screen Resolution).
         private List<ChatMessageInfo> _messages;
-        private int _messagesAt = -1;
+        private string _messagesRendered;
         private int _messagesTeam = -1;
 
         public IReadOnlyList<ChatMessageInfo> GetMessages()
@@ -381,7 +380,8 @@ namespace SongsOfConquestAccess.Adapters
                 return new List<ChatMessageInfo>();
             }
 
-            if (_messages != null && _messagesAt == MessageGeneration && _messagesTeam == teamId)
+            string rendered = GetRenderedHistory();
+            if (_messages != null && _messagesTeam == teamId && _messagesRendered == rendered)
             {
                 return _messages;
             }
@@ -395,7 +395,7 @@ namespace SongsOfConquestAccess.Adapters
             }
 
             _messages = messages;
-            _messagesAt = MessageGeneration;
+            _messagesRendered = rendered;
             _messagesTeam = teamId;
             return messages;
         }
@@ -409,12 +409,14 @@ namespace SongsOfConquestAccess.Adapters
                 && chatSystem.HasTeamUnreadMessages(teamId);
         }
 
+        [HookWritable]
         public bool IsLocalTeamMessage(int teamId)
         {
             int localTeamId;
             return TryGetLocalTeamInControl(out localTeamId) && localTeamId == teamId;
         }
 
+        [HookWritable]
         public bool IsOwnMessage(ChatMessage message)
         {
             if (message.Type == ChatMessageType.LocalEasterEggResponse)
@@ -447,6 +449,17 @@ namespace SongsOfConquestAccess.Adapters
                 isLocalResponse,
                 message.Message,
                 displayText);
+        }
+
+        /// <summary>What the window has drawn of the history, as the game wrote it: every message
+        /// rendered into one text mesh by <c>ChatWindowBehavior.Refresh</c>. The mod's own reading
+        /// of the history is redone exactly when this moves.</summary>
+        private string GetRenderedHistory()
+        {
+            ChatWindowBehavior.Settings settings = WindowSettings;
+            return settings != null
+                ? UITextMeshTextUtility.GetEffectiveText(settings.text)
+                : string.Empty;
         }
 
         private ChatWindowBehavior.Settings WindowSettings

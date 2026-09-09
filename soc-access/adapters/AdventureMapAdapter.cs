@@ -39,7 +39,7 @@ using Zenject;
 
 namespace SongsOfConquestAccess.Adapters
 {
-    public sealed class AdventureMapAdapter : IPresent
+    public sealed class AdventureMapAdapter : IPresent, IDisposable
     {
         private const byte ExploredButNotVisibleFogValue = 128;
 
@@ -102,6 +102,12 @@ namespace SongsOfConquestAccess.Adapters
         private GameObject _cursorOverlay;
         private RectTransform[] _cursorOverlaySegments;
         private Vector2Int? _focusedOverlayTile;
+
+        // WHAT THIS ADAPTER ATTACHED TO THE GAME. The map's own event listener is bound to this
+        // adventure's facade, selection handler and fog manager, so it lives exactly as long as the
+        // adapter over them does and is released in Dispose - never on the screen, which outlives
+        // every adventure the game loads (AGENTS.md, Screen Resolution).
+        private AdventureMapEventListener _eventListener;
 
         public AdventureMapAdapter(AdventureViewInstaller installer, AdventureMapRevealedRegistry revealedRegistry = null)
             : this(
@@ -188,6 +194,40 @@ namespace SongsOfConquestAccess.Adapters
                 ? AccessTools.Field(humanAdventureController.GetType(), "_currentInputModule")
                 : null;
             Hud = new AdventureHudAdapter(this, _container);
+        }
+
+        /// <summary>Start listening to this adventure's events. Called once per adapter, from the
+        /// screen's <c>Adapt</c>; <paramref name="onMapChanged"/> is what the screen hangs its tile
+        /// memo off, so nothing the game changes under a still cursor is read from the cache.</summary>
+        public void AttachEvents(Action onMapChanged)
+        {
+            if (_eventListener != null)
+            {
+                return;
+            }
+
+            _eventListener = new AdventureMapEventListener(
+                _facade,
+                _selectionHandler,
+                _humanAdventureControllerFacade,
+                _localizationHandler,
+                _fogManager,
+                _revealedRegistry);
+            _eventListener.OnMapChanged = onMapChanged;
+            _eventListener.Attach();
+        }
+
+        /// <summary>Pump the listener's per-frame half, from the screen's <c>OnUpdate</c>.</summary>
+        public void UpdateEvents()
+        {
+            _eventListener?.Update();
+        }
+
+        public void Dispose()
+        {
+            AdventureMapEventListener listener = _eventListener;
+            _eventListener = null;
+            listener?.Detach();
         }
 
         public object SourceKey { get; private set; }

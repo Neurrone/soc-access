@@ -374,6 +374,9 @@ namespace SongsOfConquestAccess.Adapters
                 return texts;
             }
 
+            // Once per button, kept in TextsByButton with the child count it was read at, so a
+            // pooled button whose subtree has been rebuilt is walked again and a still one is not.
+            // Cleared by MenuButtonTextUtility.Reset from SocAccessMod.Stop.
             texts = new ButtonTexts
             {
                 TextMeshes = root.GetComponentsInChildren<UITextMesh>(includeInactive: true),

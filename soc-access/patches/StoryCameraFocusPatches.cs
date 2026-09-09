@@ -20,6 +20,10 @@ namespace SongsOfConquestAccess
     [HarmonyPatch]
     public static class StoryCameraFocusPatches
     {
+        // A weak table keyed on the game's own camera manager: an entry dies with the manager it is
+        // keyed on, so nothing here survives a scene change or a hot reload and there is nothing for
+        // a Reset to drop. It is on patch-statics.allow for the collection it is, not for what it
+        // holds.
         private static readonly ConditionalWeakTable<AdventureDialogueCameraManager, ConversationTargets> DialogueTargets =
             new ConditionalWeakTable<AdventureDialogueCameraManager, ConversationTargets>();
 
@@ -187,6 +191,14 @@ namespace SongsOfConquestAccess
         public static void ResetDedupe()
         {
             LastEmittedFocus = null;
+        }
+
+        /// <summary>The teardown <c>SocAccessMod.Stop</c> calls. The dedupe key is the one thing
+        /// this class keeps between calls, and the next load's first focus must not be swallowed as
+        /// a repeat of one the previous load announced.</summary>
+        public static void Reset()
+        {
+            ResetDedupe();
         }
 
         private static ConversationTargets BuildConversationTargets(

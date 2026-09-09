@@ -164,6 +164,8 @@ namespace SongsOfConquestAccess
             AccessibilityEventBus.Publish(new WorldMessageNotificationEvent(entityId, commanderId, localizedHeader, localizedBody, localizedEffects));
         }
 
+        // On the event path, not a build path: run inside the objective and new-round postfixes to
+        // compose the one announcement each of them makes.
         private static string GetVisibleText(Component root)
         {
             if (root == null)

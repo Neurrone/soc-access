@@ -6,6 +6,7 @@ using HarmonyLib;
 using ModIOBrowser;
 using ModIOBrowser.Implementation;
 using SongsOfConquestAccess.Screens;
+using SongsOfConquestAccess.UI;
 using TMPro;
 using UnityEngine;
 using UnityEngine.EventSystems;
@@ -30,6 +31,20 @@ namespace SongsOfConquestAccess.Adapters
         private static readonly FieldInfo UpVoteActiveOverlayField = AccessTools.Field(typeof(Details), "ModDetailsUpVoteActiveOverlay");
         private static readonly FieldInfo DownVoteActiveOverlayField = AccessTools.Field(typeof(Details), "ModDetailsDownVoteActiveOverlay");
         private static readonly Regex RichTextTagRegex = new Regex("<.*?>", RegexOptions.Compiled);
+
+        // The tag chips and the text inside each of them, walked at most once a frame: the outer
+        // walk found the chips and then walked each chip again for its label, so a panel of twenty
+        // tags paid twenty-one subtree walks per build. Keyed on the frame rather than held,
+        // because mod.io pools the chips and a different map draws different ones.
+        private readonly FrameSweep<ModDetailsTagListItem> _tagItems =
+            new FrameSweep<ModDetailsTagListItem>("community maps details tags", inactiveToo: false);
+        private readonly FrameSweep<TMP_Text> _tagTexts =
+            new FrameSweep<TMP_Text>("community maps details tag text", inactiveToo: false);
+
+        // The static label beside each stat value ("File size:"). The value mesh is instantiated
+        // with the panel and keeps its label for the panel's life, so the walk that finds it is
+        // paid once per mesh rather than once per detail row per frame.
+        private readonly Dictionary<TMP_Text, string> _nearbyLabels = new Dictionary<TMP_Text, string>();
 
         private readonly Details _details;
         private readonly string _voteUpLabel;
@@ -99,11 +114,11 @@ namespace SongsOfConquestAccess.Adapters
                 return tags;
             }
 
-            ModDetailsTagListItem[] nativeTags = _details.GetComponentsInChildren<ModDetailsTagListItem>(false);
+            ModDetailsTagListItem[] nativeTags = _tagItems.Under(_details);
             for (int i = 0; i < nativeTags.Length; i++)
             {
-                TMP_Text text = nativeTags[i] != null ? nativeTags[i].GetComponentInChildren<TMP_Text>(false) : null;
-                string label = GetText(text);
+                TMP_Text[] texts = _tagTexts.Under(nativeTags[i]);
+                string label = GetText(texts.Length > 0 ? texts[0] : null);
                 if (!string.IsNullOrWhiteSpace(label))
                 {
                     tags.Add(new TagItem(i, label));
@@ -231,6 +246,8 @@ namespace SongsOfConquestAccess.Adapters
             get { return IsActive(GetField<GameObject>(DownVoteActiveOverlayField)); }
         }
 
+        // LAZY: only from Report(), which mod.io refuses without a selected object. The walk is paid
+        // when the player reports a map.
         private void EnsureSelectedGameObjectForReport()
         {
             if (EventSystem.current == null || EventSystem.current.currentSelectedGameObject != null || _details == null)
@@ -252,6 +269,25 @@ namespace SongsOfConquestAccess.Adapters
                 return string.Empty;
             }
 
+            string remembered;
+            if (_nearbyLabels.TryGetValue(valueText, out remembered))
+            {
+                return remembered;
+            }
+
+            string label = FindNearbyLabel(valueText);
+            if (!string.IsNullOrEmpty(label))
+            {
+                // Only an answer is remembered: a panel still being built has no label yet, and a
+                // remembered blank would outlive the frame that had none.
+                _nearbyLabels[valueText] = label;
+            }
+
+            return label;
+        }
+
+        private string FindNearbyLabel(TMP_Text valueText)
+        {
             Transform dynamicTexts = valueText.transform.parent;
             Transform statsRoot = dynamicTexts != null ? dynamicTexts.parent : null;
             if (statsRoot == null)

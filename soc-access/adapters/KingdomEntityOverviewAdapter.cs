@@ -172,6 +172,8 @@ namespace SongsOfConquestAccess.Adapters
                     text != null && text.gameObject.activeInHierarchy));
             }
 
+            // Under ReadCategories, once per menu: the game builds these rows in Show and leaves
+            // them alone until Hide.
             List<RowItem> rows = new List<RowItem>();
             KingdomEntityOverviewClaimedEntry[] buildings =
                 entry.GetComponentsInChildren<KingdomEntityOverviewClaimedEntry>(includeInactive: false);

@@ -56,6 +56,10 @@ namespace SongsOfConquestAccess.Adapters
     {
         private static readonly PropertyInfo InstallerContainerProperty =
             AccessTools.Property(typeof(BattleSceneInstaller), "Container");
+        // The extra sentence the game passes to AddAdditionalText and keeps nowhere readable, held
+        // per preview because the hook is the only place it exists. Static, so it is dropped in
+        // Reset from SocAccessMod.Stop: a preview the game destroyed would otherwise be held here
+        // for the life of the process, across every hot reload.
         private static readonly Dictionary<BattleAttackPreview, string> AttackPreviewAdditionalTexts =
             new Dictionary<BattleAttackPreview, string>();
         private readonly object _sourceKey;
@@ -100,6 +104,10 @@ namespace SongsOfConquestAccess.Adapters
         private Action<ISpellDefinition, string> _targetInstructionHandler;
         private Action _spellTargetingEndHandler;
         private Action<ISpellDefinition> _beginCastHandler;
+        // The delegate this adapter handed the battle HUD's signals, held here rather than on the
+        // screen: it is a subscription to THIS battle, so it lives as long as the adapter does and
+        // is let go in Dispose (AGENTS.md, Screen Resolution).
+        private Action<TroopAbilityTargeting> _beginAbilityTargetingHandler;
         private Action<bool> _endAbilityTargetingHandler;
         private bool _hasBeenPresent;
         private bool _combatEnded;
@@ -263,6 +271,7 @@ namespace SongsOfConquestAccess.Adapters
             }
         }
 
+        [HookWritable]
         public static void CaptureAttackPreviewAdditionalText(BattleAttackPreview preview, string text)
         {
             if (preview == null)
@@ -280,12 +289,20 @@ namespace SongsOfConquestAccess.Adapters
             AttackPreviewAdditionalTexts[preview] = text;
         }
 
+        [HookWritable]
         public static void ClearAttackPreviewAdditionalText(BattleAttackPreview preview)
         {
             if (preview != null)
             {
                 AttackPreviewAdditionalTexts.Remove(preview);
             }
+        }
+
+        /// <summary>The teardown <c>SocAccessMod.Stop</c> calls: let go of every attack preview the
+        /// captures are keyed on, so the next load starts holding nothing.</summary>
+        public static void Reset()
+        {
+            AttackPreviewAdditionalTexts.Clear();
         }
 
         public bool IsPresent()
@@ -326,6 +343,7 @@ namespace SongsOfConquestAccess.Adapters
 
         public void Dispose()
         {
+            DetachAbilityTargetingBegin();
             EndCombat();
         }
 
@@ -852,24 +870,28 @@ namespace SongsOfConquestAccess.Adapters
 
         public void AttachAbilityTargetingBegin(Action<TroopAbilityTargeting> handler)
         {
-            if (_battleHudSignals == null || handler == null)
+            if (_battleHudSignals == null || handler == null || _beginAbilityTargetingHandler != null)
             {
                 return;
             }
 
+            _beginAbilityTargetingHandler = handler;
             _battleHudSignals.OnBeginAbilityTargeting =
-                (Action<TroopAbilityTargeting>)Delegate.Combine(_battleHudSignals.OnBeginAbilityTargeting, handler);
+                (Action<TroopAbilityTargeting>)Delegate.Combine(
+                    _battleHudSignals.OnBeginAbilityTargeting, _beginAbilityTargetingHandler);
         }
 
-        public void DetachAbilityTargetingBegin(Action<TroopAbilityTargeting> handler)
+        public void DetachAbilityTargetingBegin()
         {
-            if (_battleHudSignals == null || handler == null)
+            if (_battleHudSignals == null || _beginAbilityTargetingHandler == null)
             {
                 return;
             }
 
             _battleHudSignals.OnBeginAbilityTargeting =
-                (Action<TroopAbilityTargeting>)Delegate.Remove(_battleHudSignals.OnBeginAbilityTargeting, handler);
+                (Action<TroopAbilityTargeting>)Delegate.Remove(
+                    _battleHudSignals.OnBeginAbilityTargeting, _beginAbilityTargetingHandler);
+            _beginAbilityTargetingHandler = null;
         }
 
         public void AttachAbilityTargetingEnd(Action<bool> handler)

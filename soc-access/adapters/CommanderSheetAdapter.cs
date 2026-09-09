@@ -72,6 +72,12 @@ namespace SongsOfConquestAccess.Adapters
         private static readonly FieldInfo InventoryCommandProcessorField = AccessTools.Field(typeof(InventoryHUD), "_commandProcessor");
         private static readonly FieldInfo InventoryArtifactMapField = AccessTools.Field(typeof(InventoryHUD), "_artifactStateToGOMap");
 
+        // The showing modifier tab's rows, walked at most once a frame: the build asks for them
+        // and each row's live readout asks again. Keyed on the frame rather than held, because the
+        // tab switch replaces the rows under the same content transform.
+        private readonly FrameSweep<CommanderSheetSummaryEntry> _modifierEntries =
+            new FrameSweep<CommanderSheetSummaryEntry>("commander sheet modifiers", inactiveToo: false);
+
         private readonly CommanderSheet _sheet;
         private readonly IClientAdventureFacade _facade;
         private readonly ILocalizationHandler _localization;
@@ -334,7 +340,7 @@ namespace SongsOfConquestAccess.Adapters
             Transform content = GetActiveModifierContent();
             if (content != null)
             {
-                CommanderSheetSummaryEntry[] entries = ((Component)content).GetComponentsInChildren<CommanderSheetSummaryEntry>(false);
+                CommanderSheetSummaryEntry[] entries = _modifierEntries.Under(content);
                 for (int i = 0; i < entries.Length; i++)
                 {
                     UITextMesh text = GetField<UITextMesh>(entries[i], SummaryEntryTextField);

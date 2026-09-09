@@ -460,6 +460,8 @@ namespace SongsOfConquestAccess.Adapters
                 return new ResultEntry[0];
             }
 
+            // Read once per menu, behind the lost-troop lists the page snapshots when it arrives:
+            // the game builds these rows with the result and leaves them alone.
             AdventureBattleMenuTroopEntry[] entries = parent.GetComponentsInChildren<AdventureBattleMenuTroopEntry>(false);
             List<ResultEntry> result = new List<ResultEntry>(entries.Length);
             for (int i = 0; i < entries.Length; i++)
@@ -499,6 +501,7 @@ namespace SongsOfConquestAccess.Adapters
                 return;
             }
 
+            // Read once per menu, behind the loot snapshot, for the same reason.
             PostBattleLootEntry[] entries = container.GetComponentsInChildren<PostBattleLootEntry>(false);
             for (int i = 0; i < entries.Length; i++)
             {

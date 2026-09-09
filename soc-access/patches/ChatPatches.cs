@@ -11,7 +11,8 @@ namespace SongsOfConquestAccess
     /// <summary>
     /// THE ONE CHAT EVENT: a message has landed. Nothing here decides whether the chat page is
     /// showing - the page finds its own window (<see cref="ChatSource"/>) - and losing this call
-    /// costs one announcement and a stale history until the next message.
+    /// costs one announcement and nothing else: the history the page reads is keyed on what the
+    /// window itself drew, not on this hook.
     /// </summary>
     [HarmonyPatch]
     public static class ChatPatches
@@ -20,9 +21,6 @@ namespace SongsOfConquestAccess
         [HarmonyPostfix]
         private static void HandleNewMessagePostfix(int teamId, ChatMessage message)
         {
-            // The history has changed, whoever it was for: the open window re-reads it on its next
-            // build rather than rendering every message again on every build.
-            ChatAdapter.MessageGeneration++;
             ChatAdapter adapter = ChatSource.Current;
             if (adapter == null || !adapter.IsLocalTeamMessage(teamId))
             {

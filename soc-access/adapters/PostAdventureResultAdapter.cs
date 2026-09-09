@@ -236,6 +236,12 @@ namespace SongsOfConquestAccess.Adapters
                 || IsButtonVisible(PlayerStatsButton);
         }
 
+        // The objective rows are pooled under one container and the build walks them once a frame;
+        // the sweep is keyed on the frame rather than held, because a pooled row that has been
+        // retired must not answer for the next page.
+        private readonly FrameSweep<PostAdventureMenuObjectiveEntry> _objectiveEntries =
+            new FrameSweep<PostAdventureMenuObjectiveEntry>("post-adventure objectives", inactiveToo: false);
+
         private PostAdventureMenuObjectiveEntry[] GetObjectiveEntries()
         {
             UITransform container = GetField<UITransform>(ObjectiveEntryContainerField);
@@ -245,7 +251,7 @@ namespace SongsOfConquestAccess.Adapters
                 return new PostAdventureMenuObjectiveEntry[0];
             }
 
-            return transform.GetComponentsInChildren<PostAdventureMenuObjectiveEntry>(false);
+            return _objectiveEntries.Under(transform);
         }
 
         private static string GetObjectiveText(PostAdventureMenuObjectiveEntry entry)
@@ -258,6 +264,13 @@ namespace SongsOfConquestAccess.Adapters
         // that finds it runs once per canvas and the text is read off it live. A mesh that has
         // stopped saying anything sends the search over the canvas again.
         private readonly Dictionary<CanvasGroup, UITextMesh> _firstTexts = new Dictionary<CanvasGroup, UITextMesh>();
+
+        // The title is asked twice a frame - the screen's name and the page's first line - and
+        // while the result canvas is drawn but still blank (the buttons fade in about two seconds
+        // later) neither ask can be answered off the remembered mesh. Keyed on the frame, the two
+        // asks share one walk and the blank frames cost one walk each instead of two.
+        private readonly FrameSweep<UITextMesh> _canvasTexts =
+            new FrameSweep<UITextMesh>("post-adventure result canvas", inactiveToo: false);
 
         private string GetFirstVisibleText(CanvasGroup canvasGroup)
         {
@@ -276,7 +289,7 @@ namespace SongsOfConquestAccess.Adapters
                 }
             }
 
-            UITextMesh[] texts = canvasGroup.GetComponentsInChildren<UITextMesh>(false);
+            UITextMesh[] texts = _canvasTexts.Under(canvasGroup);
             for (int i = 0; i < texts.Length; i++)
             {
                 string candidate = GetText(texts[i]);

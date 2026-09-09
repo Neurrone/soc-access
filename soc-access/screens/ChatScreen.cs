@@ -121,6 +121,7 @@ namespace SongsOfConquestAccess.Screens
 
         /// <summary>A message has arrived while the window is open: it is spoken as it lands, the
         /// graph having already grown a row for it.</summary>
+        [HookWritable]
         public void RefreshAndAnnounce(ChatMessage message)
         {
             if (!IsActive() || Live == null)

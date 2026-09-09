@@ -35,6 +35,12 @@ namespace SongsOfConquestAccess.Adapters
         // Which mesh draws the title, and which mesh each caption hangs on: fixed for the menu's
         // life, and finding either walked the whole page. The TEXT is still read live off the mesh.
         private UITextMesh _titleText;
+        // The rows the menu draws, walked at most once a frame: the build asks for the players and
+        // each row's readout asks the adapter again. Keyed on the frame rather than held, because
+        // the rows are instantiated per player and a menu reopened for a new game draws new ones.
+        private readonly FrameSweep<AdventurePlayerMenuEntry> _entries =
+            new FrameSweep<AdventurePlayerMenuEntry>("adventure player menu rows", inactiveToo: false);
+
         private readonly Dictionary<FieldInfo, UITextMesh> _captionTexts = new Dictionary<FieldInfo, UITextMesh>();
         private readonly Dictionary<FieldInfo, Transform> _captionRoots = new Dictionary<FieldInfo, Transform>();
 
@@ -84,8 +90,7 @@ namespace SongsOfConquestAccess.Adapters
                 return players;
             }
 
-            AdventurePlayerMenuEntry[] entries =
-                ((Component)_menu).GetComponentsInChildren<AdventurePlayerMenuEntry>(includeInactive: false);
+            AdventurePlayerMenuEntry[] entries = _entries.Under((Component)_menu);
             for (int i = 0; i < entries.Length; i++)
             {
                 AdventurePlayerMenuEntry entry = entries[i];
@@ -128,6 +133,8 @@ namespace SongsOfConquestAccess.Adapters
                     return null;
                 }
 
+                // Once per caption field, kept in _captionTexts with the root it was found under;
+                // a mesh that has gone blank sends the search over that header again.
                 text = header.GetComponentInChildren<UITextMesh>(includeInactive: true);
                 root = header.transform;
                 _captionTexts[field] = text;

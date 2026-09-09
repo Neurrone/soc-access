@@ -88,6 +88,7 @@ namespace SongsOfConquestAccess.Screens
 
         /// <summary>The one registered instance of a screen type, whether or not it is showing - what
         /// the detector writes a slot on.</summary>
+        [HookWritable]
         public TScreen Registered<TScreen>() where TScreen : Screen
         {
             for (int i = 0; i < _registered.Count; i++)

@@ -15,6 +15,18 @@ namespace SongsOfConquestAccess.Adapters
 {
     public sealed class CommunityMapsModalAdapter : IPresent
     {
+        // The modal's subtrees, walked at most once a frame. The panel's texts, its buttons and
+        // the text inside each of those buttons were three nested walks per build, so a panel of a
+        // few hundred transforms with a dozen buttons paid a dozen subtree walks for its labels
+        // alone. Static because the helpers that read them are, and safe to be: a FrameSweep holds
+        // only the frame it was filled on and the first call of the next frame drops it.
+        private static readonly FrameSweep<TMP_Text> PanelTexts =
+            new FrameSweep<TMP_Text>("community maps modal texts", inactiveToo: false);
+        private static readonly FrameSweep<Button> PanelButtons =
+            new FrameSweep<Button>("community maps modal buttons", inactiveToo: false);
+        private static readonly FrameSweep<TMP_InputField> PanelInputs =
+            new FrameSweep<TMP_InputField>("community maps modal inputs", inactiveToo: false);
+
         private readonly AuthenticationPanels _authPanels;
         private readonly GameObject _panel;
         private readonly CommunityMapsModalState? _cachedState;
@@ -297,7 +309,7 @@ namespace SongsOfConquestAccess.Adapters
                 return result;
             }
 
-            TMP_InputField[] fields = _panel.GetComponentsInChildren<TMP_InputField>(false);
+            TMP_InputField[] fields = PanelInputs.Under(_panel.transform);
             for (int i = 0; i < fields.Length; i++)
             {
                 TMP_InputField field = fields[i];
@@ -493,7 +505,7 @@ namespace SongsOfConquestAccess.Adapters
             }
 
             HashSet<string> seen = new HashSet<string>();
-            TMP_Text[] texts = panel.GetComponentsInChildren<TMP_Text>(false);
+            TMP_Text[] texts = PanelTexts.Under(panel.transform);
             for (int i = 0; i < texts.Length; i++)
             {
                 TMP_Text text = texts[i];
@@ -543,7 +555,7 @@ namespace SongsOfConquestAccess.Adapters
                 return result;
             }
 
-            Button[] buttons = panel.GetComponentsInChildren<Button>(false);
+            Button[] buttons = PanelButtons.Under(panel.transform);
             for (int i = 0; i < buttons.Length; i++)
             {
                 Button button = buttons[i];
@@ -583,7 +595,7 @@ namespace SongsOfConquestAccess.Adapters
                 return result;
             }
 
-            Button[] buttons = keyInput.GetComponentsInChildren<Button>(false);
+            Button[] buttons = PanelButtons.Under(keyInput.transform);
             for (int i = 0; i < buttons.Length; i++)
             {
                 AddButtonAction(result, buttons[i]);
@@ -739,6 +751,8 @@ namespace SongsOfConquestAccess.Adapters
                 }
 
                 string label = GetFirstText(child);
+                // CONSTRUCTION: the context menu's rows are read once, when TryCreate builds the
+                // adapter for the popup, never on a build path.
                 Button button = child.GetComponentInChildren<Button>(false);
                 if (button == null || !button.gameObject.activeInHierarchy || string.IsNullOrWhiteSpace(label))
                 {
@@ -964,7 +978,7 @@ namespace SongsOfConquestAccess.Adapters
 
         private static string GetButtonLabel(Button button)
         {
-            TMP_Text[] texts = button.GetComponentsInChildren<TMP_Text>(false);
+            TMP_Text[] texts = PanelTexts.Under(button.transform);
             for (int i = 0; i < texts.Length; i++)
             {
                 string value = CleanText(texts[i] != null ? texts[i].text : string.Empty);
@@ -979,7 +993,7 @@ namespace SongsOfConquestAccess.Adapters
 
         private static string GetFirstText(Transform transform)
         {
-            TMP_Text[] texts = transform.GetComponentsInChildren<TMP_Text>(false);
+            TMP_Text[] texts = PanelTexts.Under(transform);
             for (int i = 0; i < texts.Length; i++)
             {
                 string value = CleanText(texts[i] != null ? texts[i].text : string.Empty);

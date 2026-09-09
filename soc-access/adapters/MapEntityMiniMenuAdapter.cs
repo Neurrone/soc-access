@@ -27,6 +27,7 @@ namespace SongsOfConquestAccess.Adapters
         private static readonly FieldInfo DescriptionTextField = AccessTools.Field(typeof(MapEntityMiniMenu), "_descriptionText");
         private static readonly FieldInfo DescriptionTextContainerField = AccessTools.Field(typeof(MapEntityMiniMenu), "_descriptionTextContainer");
         private static readonly FieldInfo DescriptionField = AccessTools.Field(typeof(MapEntityMiniMenu), "_description");
+        private static readonly FieldInfo DescriptionEntryContainerField = AccessTools.Field(typeof(MiniMenuDescription), "_entryContainer");
         private static readonly FieldInfo ActionsField = AccessTools.Field(typeof(MapEntityMiniMenu), "_actions");
         private static readonly FieldInfo UpgradesParentField = AccessTools.Field(typeof(MapEntityMiniMenu), "_upgradesParent");
         private static readonly FieldInfo SlotsField = AccessTools.Field(typeof(MapEntityMiniMenu), "_slots");
@@ -248,15 +249,14 @@ namespace SongsOfConquestAccess.Adapters
             }
         }
 
-        /// <summary>Bumped whenever the game rewrites a description block
-        /// (<c>MiniMenuDescription.SetDetails</c> and its <c>Clear</c>, which destroy the rows and
-        /// build new ones). An adapter re-reads its rows when it moves and serves what it read
-        /// otherwise.</summary>
-        public static int DescriptionGeneration;
-
-        // The rows the block last drew, and the rewrite they were read at.
+        // The rows the block last drew, and what its entry container looked like when they were
+        // read. SetDetails clears the container and instantiates new rows into it and Clear destroys
+        // them, so the child count and the identity of the first row both move on every rewrite - a
+        // key read from the game each build, not a generation a hook feeds (AGENTS.md, Screen
+        // Resolution).
         private List<DescriptionRow> _descriptionRows;
-        private int _descriptionAt = -1;
+        private int _descriptionChildCount = -1;
+        private int _descriptionFirstChildId;
 
         public IReadOnlyList<DescriptionRow> GetDescriptionRows()
         {
@@ -267,14 +267,24 @@ namespace SongsOfConquestAccess.Adapters
                 return rows;
             }
 
-            if (_descriptionRows != null && _descriptionAt == DescriptionGeneration)
+            Transform entryContainer = GetDescriptionEntryContainer(description);
+            int childCount = entryContainer != null ? entryContainer.childCount : 0;
+            int firstChildId = childCount > 0 && entryContainer.GetChild(0) != null
+                ? entryContainer.GetChild(0).GetInstanceID()
+                : 0;
+            if (_descriptionRows != null
+                && _descriptionChildCount == childCount
+                && _descriptionFirstChildId == firstChildId)
             {
                 return _descriptionRows;
             }
 
             _descriptionRows = rows;
-            _descriptionAt = DescriptionGeneration;
+            _descriptionChildCount = childCount;
+            _descriptionFirstChildId = firstChildId;
 
+            // Reached only when the key above says the block has been rewritten, so a still menu
+            // costs no walk.
             MapEntityHUDDescriptionEntry[] entries = description.GetComponentsInChildren<MapEntityHUDDescriptionEntry>(false);
             for (int i = 0; i < entries.Length; i++)
             {
@@ -300,6 +310,16 @@ namespace SongsOfConquestAccess.Adapters
             }
 
             return rows;
+        }
+
+        /// <summary>The transform the block instantiates its rows into, which is what a rewrite
+        /// empties and refills.</summary>
+        private static Transform GetDescriptionEntryContainer(MiniMenuDescription description)
+        {
+            UITransform container = description != null && DescriptionEntryContainerField != null
+                ? DescriptionEntryContainerField.GetValue(description) as UITransform
+                : null;
+            return container != null ? container.MonoTransform : null;
         }
 
         public IReadOnlyList<ActionButton> GetActions()

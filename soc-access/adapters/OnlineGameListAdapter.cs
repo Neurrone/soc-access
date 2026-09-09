@@ -303,6 +303,8 @@ namespace SongsOfConquestAccess.Adapters
             return _nativeRegionDropdown;
         }
 
+        // Once per adapter: the caller keeps the answer in _nativeRegionDropdown, and the region
+        // dropdown is instantiated with the list and never replaced under it.
         private static TMP_Dropdown GetNativeDropdown(UITextMeshDropdown dropdown)
         {
             Component component = dropdown as Component;

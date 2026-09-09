@@ -619,6 +619,9 @@ namespace SongsOfConquestAccess.Adapters
                 return default(T);
             }
 
+            // NOT A SCAN: the declaration of a null-object stub, which answers nothing so a caller
+            // needs no null check. The rule matches the signature's text; the entry stays rather
+            // than the regex being taught about declarations.
             public T GetComponentInChildren<T>()
             {
                 return default(T);

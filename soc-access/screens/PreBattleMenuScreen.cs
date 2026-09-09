@@ -86,7 +86,6 @@ namespace SongsOfConquestAccess.Screens
         // DIFFERENT battle and kept otherwise.
         private TroopPlacementHexGrid _hexGrid;
         private PreBattleMenuAdapter _hexGridAdapter;
-        private Action<OnChangedPayload> _deploymentChangedHandler;
 
         // A subject of its own per synthesized line, kept across rebuilds so the reconciler seats the
         // cursor back on the same one: the menu gives no component a text line can be keyed on.
@@ -171,8 +170,7 @@ namespace SongsOfConquestAccess.Screens
             // rather than when the slot changes.
             _hexGrid = null;
             _hexGridAdapter = null;
-            _deploymentChangedHandler = HandleDeploymentChanged;
-            Live?.AddDeploymentChangedHandler(_deploymentChangedHandler);
+            Live?.AddDeploymentChangedHandler(HandleDeploymentChanged);
             _instruction = Live != null ? Live.InstructionText : null;
         }
 
@@ -185,11 +183,7 @@ namespace SongsOfConquestAccess.Screens
 
         public override void OnPop()
         {
-            if (_deploymentChangedHandler != null)
-            {
-                Live?.RemoveDeploymentChangedHandler(_deploymentChangedHandler);
-                _deploymentChangedHandler = null;
-            }
+            Live?.RemoveDeploymentChangedHandler();
 
             Live?.HideNativeTooltip();
             Live?.ClearFocusedTileOverlay();

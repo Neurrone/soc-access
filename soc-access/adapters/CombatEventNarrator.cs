@@ -50,6 +50,7 @@ namespace SongsOfConquestAccess.Adapters
         private static readonly Dictionary<int, WielderEssenceGeneration> CapturedWielderEssence =
             new Dictionary<int, WielderEssenceGeneration>();
 
+        [HookWritable]
         public static void HandleResponse(ICommandResponse response)
         {
             if (response == null)
@@ -128,6 +129,7 @@ namespace SongsOfConquestAccess.Adapters
                 || responseType == typeof(ChangeBattleBacteriaModifierCommand.Response);
         }
 
+        [HookWritable]
         public static void AnnounceNativeNotification(string localizedText)
         {
             string text = SpokenLines.Clean(localizedText);
@@ -156,6 +158,7 @@ namespace SongsOfConquestAccess.Adapters
             screen?.MoveCursorToLocalActingTroop(troopId);
         }
 
+        [HookWritable]
         public static void NotifyBacteriaAddedStarted(int troopId, string localizedText)
         {
             string text = SpokenLines.Clean(localizedText);
@@ -165,6 +168,7 @@ namespace SongsOfConquestAccess.Adapters
             }
         }
 
+        [HookWritable]
         public static void Reset()
         {
             Planner.Reset();

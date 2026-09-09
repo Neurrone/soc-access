@@ -7,6 +7,7 @@ using ModIO;
 using ModIOBrowser;
 using ModIOBrowser.Implementation;
 using SongsOfConquestAccess.Screens;
+using SongsOfConquestAccess.UI;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -27,6 +28,12 @@ namespace SongsOfConquestAccess.Adapters
         private static readonly Type InputNavigationType = AccessTools.TypeByName("ModIOBrowser.InputNavigation");
         private static readonly MethodInfo InputNavigationSelectMethod =
             InputNavigationType != null ? AccessTools.Method(InputNavigationType, "Select", new[] { typeof(Selectable), typeof(bool) }) : null;
+
+        // The subscribed maps the list draws, walked at most once a frame: the build asks for the
+        // items and each row's live readout asks the adapter again. Keyed on the frame rather than
+        // held, because mod.io pools the rows and a refresh retires them under the same parent.
+        private readonly FrameSweep<ListItem> _listItems =
+            new FrameSweep<ListItem>("community maps collection list", inactiveToo: false);
 
         private readonly Collection _collection;
         private readonly string _browseLabel;
@@ -149,7 +156,7 @@ namespace SongsOfConquestAccess.Adapters
                 return result;
             }
 
-            ListItem[] nativeItems = parent.GetComponentsInChildren<ListItem>(false);
+            ListItem[] nativeItems = _listItems.Under(parent);
             for (int i = 0; i < nativeItems.Length; i++)
             {
                 ListItem item = nativeItems[i];

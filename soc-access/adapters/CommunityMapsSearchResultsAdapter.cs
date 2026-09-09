@@ -412,6 +412,8 @@ namespace SongsOfConquestAccess.Adapters
             return GetText(text);
         }
 
+        // Under EnsureSnapshot, which re-reads only when the result list's child count, its status
+        // or the searched phrase has moved - all read from the game.
         private static string GetOverlayMoreOptionsLabel(object overlay, string subscribeLabel)
         {
             Component component = overlay as Component;
@@ -549,18 +551,23 @@ namespace SongsOfConquestAccess.Adapters
             return child.transform == parent.transform || child.transform.IsChildOf(parent.transform);
         }
 
+        // Under EnsureLabels, once per adapter: the browser's fixed chrome labels do not change
+        // while the panel is up.
         private static string GetSelectableLabel(Selectable selectable)
         {
             TMP_Text text = selectable != null ? selectable.GetComponentInChildren<TMP_Text>(false) : null;
             return GetText(text);
         }
 
+        // Under EnsureSnapshot, which re-reads only when the result list's child count, its status
+        // or the searched phrase has moved - all read from the game.
         private static string GetButtonLabel(Button button)
         {
             TMP_Text text = button != null ? button.GetComponentInChildren<TMP_Text>(false) : null;
             return GetText(text);
         }
 
+        // Under EnsureSnapshot as well, for the footer the browser draws under the results.
         private static string JoinVisibleText(GameObject parent)
         {
             if (parent == null || !parent.activeInHierarchy)

@@ -19,6 +19,13 @@ namespace SongsOfConquestAccess.Adapters
         private static readonly FieldInfo GiftHeaderField = AccessTools.Field(typeof(GiftTownPopup), "_giftHeader");
         private static readonly FieldInfo RequestHeaderField = AccessTools.Field(typeof(GiftTownPopup), "_requestHeader");
 
+        // The town buttons under each of the popup's two rows, walked at most once a frame: the
+        // build asks for the gift row and the request row, and each button's live readout asks the
+        // adapter again. Keyed on the frame rather than held, because the rows are rebuilt for
+        // whichever player the popup was opened for.
+        private readonly FrameSweep<GiftTownButton> _townButtons =
+            new FrameSweep<GiftTownButton>("gift town popup rows", inactiveToo: false);
+
         private readonly GiftTownPopup _popup;
         private readonly ILocalizationHandler _localization;
 
@@ -100,7 +107,7 @@ namespace SongsOfConquestAccess.Adapters
                 return items;
             }
 
-            GiftTownButton[] buttons = parent.GetComponentsInChildren<GiftTownButton>(includeInactive: false);
+            GiftTownButton[] buttons = _townButtons.Under(parent);
             for (int i = 0; i < buttons.Length; i++)
             {
                 GiftTownButton button = buttons[i];

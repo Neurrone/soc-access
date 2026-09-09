@@ -117,7 +117,6 @@ namespace SongsOfConquestAccess.Screens
         private readonly CombatTroopCycle _localActingTroopCycle = new CombatTroopCycle();
         private readonly CombatTroopCycle _enemyActingTroopCycle = new CombatTroopCycle();
         private int _lastCycleCurrentTroopId = -1;
-        private Action<TroopAbilityTargeting> _abilityTargetingBeginHandler;
 
         // The tile's inspect tooltip is the game's whole details capture and the graph is rebuilt for
         // every navigation operation, so it is composed once per tile - which is exactly as often as
@@ -248,8 +247,7 @@ namespace SongsOfConquestAccess.Screens
             AccessibilityEventBus.Subscribe(HandleAccessibilityEvent);
             Live?.AttachSpellCastBegin(HandleSpellCastBegin);
             Live?.AttachSpellTargetingNarration();
-            _abilityTargetingBeginHandler = HandleAbilityTargetingBegin;
-            Live?.AttachAbilityTargetingBegin(_abilityTargetingBeginHandler);
+            Live?.AttachAbilityTargetingBegin(HandleAbilityTargetingBegin);
             Live?.AttachAbilityTargetingEnd(HandleAbilityTargetingEnd);
             Live?.AnnounceVisibleSpellTargetInstruction();
             _instruction = InstructionText;
@@ -267,9 +265,8 @@ namespace SongsOfConquestAccess.Screens
             AccessibilityEventBus.Unsubscribe(HandleAccessibilityEvent);
             Live?.DetachSpellCastBegin();
             Live?.DetachSpellTargetingNarration();
-            Live?.DetachAbilityTargetingBegin(_abilityTargetingBeginHandler);
+            Live?.DetachAbilityTargetingBegin();
             Live?.DetachAbilityTargetingEnd();
-            _abilityTargetingBeginHandler = null;
             Live?.Hud.ClearSpellTargetInstructionText();
             Live?.Hud.ClearAbilityTargetInstructionText();
             Live?.ClearNativeTooltip();

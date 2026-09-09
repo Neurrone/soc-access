@@ -557,6 +557,8 @@ namespace SongsOfConquestAccess.UI
             }
         }
 
+        // CONSTRUCTION: a freshly instantiated clone of the mod's own dialog, walked once while it
+        // is being built.
         private static void StripLocalization(GameObject cloned)
         {
             UITextMeshLocalization[] bindings = cloned.GetComponentsInChildren<UITextMeshLocalization>(true);

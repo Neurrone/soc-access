@@ -128,8 +128,10 @@ trigger) or alter game behaviour (force a tooltip, route a close). It is never t
 truth for anything a `Build`, `IsActive`, `ScreenName` or tooltip reads, and losing one call may
 cost one announcement and nothing else. Patch classes hold no static state without a `Reset`
 that `SocAccessMod.Stop` calls. Every patch is on the inventory allowlist as `event` or
-`interception`; the lints under `soc-access/tests/Lint/` enforce this and the rest of this
-section, and an exception to any of them is reported to the owner before it merges.
+`interception`, and a patch may call or assign only a screen or adapter member marked
+`[HookWritable]`, the announcement-side surface (a narrator queue, a review buffer, a captured
+text no game state answers); the lints under `soc-access/tests/Lint/` enforce this and the rest
+of this section, and an exception to any of them is reported to the owner before it merges.
 
 Per-menu state lives on the adapter, never on the screen. A screen object lives for the whole
 mod load; an adapter lives exactly as long as the menu instance it wraps (`SyncLive` builds one

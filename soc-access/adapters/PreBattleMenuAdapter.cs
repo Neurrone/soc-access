@@ -28,7 +28,7 @@ using UnityEngine.UI;
 
 namespace SongsOfConquestAccess.Adapters
 {
-    public sealed class PreBattleMenuAdapter : IPresent
+    public sealed class PreBattleMenuAdapter : IPresent, IDisposable
     {
         private static readonly FieldInfo GridContainerField = AccessTools.Field(typeof(PreBattleMenu), "_gridContainer");
         private static readonly FieldInfo MainContainerField = AccessTools.Field(typeof(PreBattleMenu), "_mainContainer");
@@ -68,6 +68,11 @@ namespace SongsOfConquestAccess.Adapters
         private static readonly FieldInfo DefenderSpawnPointsField = AccessTools.Field(typeof(DeploymentMenu), "_defenderSpawnPoints");
         private static readonly MethodInfo GrabMethod = AccessTools.Method(typeof(DeploymentUIController), "Grab");
         private static readonly MethodInfo DropMethod = AccessTools.Method(typeof(DeploymentUIController), "Drop");
+
+        // The delegate this adapter handed the deployment menu, held here rather than on the
+        // screen: it is a subscription to THIS placement, so it lives as long as the adapter does
+        // and is let go in Dispose (AGENTS.md, Screen Resolution).
+        private Action<OnChangedPayload> _deploymentChangedHandler;
 
         private readonly PreBattleMenu _menu;
         private AdventureBattleMenu.Settings _settings;
@@ -525,23 +530,32 @@ namespace SongsOfConquestAccess.Adapters
         public void AddDeploymentChangedHandler(Action<OnChangedPayload> handler)
         {
             DeploymentMenu deployment = GetDeploymentMenu();
-            if (deployment == null || handler == null)
+            if (deployment == null || handler == null || _deploymentChangedHandler != null)
             {
                 return;
             }
 
-            deployment.OnChanged = (Action<OnChangedPayload>)Delegate.Combine(deployment.OnChanged, handler);
+            _deploymentChangedHandler = handler;
+            deployment.OnChanged =
+                (Action<OnChangedPayload>)Delegate.Combine(deployment.OnChanged, _deploymentChangedHandler);
         }
 
-        public void RemoveDeploymentChangedHandler(Action<OnChangedPayload> handler)
+        public void RemoveDeploymentChangedHandler()
         {
             DeploymentMenu deployment = GetDeploymentMenu();
-            if (deployment == null || handler == null)
+            if (deployment == null || _deploymentChangedHandler == null)
             {
                 return;
             }
 
-            deployment.OnChanged = (Action<OnChangedPayload>)Delegate.Remove(deployment.OnChanged, handler);
+            deployment.OnChanged =
+                (Action<OnChangedPayload>)Delegate.Remove(deployment.OnChanged, _deploymentChangedHandler);
+            _deploymentChangedHandler = null;
+        }
+
+        public void Dispose()
+        {
+            RemoveDeploymentChangedHandler();
         }
 
         public void SetFocusedTileOverlay(Vector2Int tile)

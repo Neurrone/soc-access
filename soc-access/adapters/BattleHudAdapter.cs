@@ -699,6 +699,9 @@ namespace SongsOfConquestAccess.Adapters
             }
         }
 
+        // ONCE PER ADAPTER, miss included: the end-turn HUD is instantiated with the battle HUD and
+        // outlives every page, so a session whose container is absent costs one walk and not one a
+        // frame.
         private UIButton GetEndTurnButton()
         {
             if (_endTurnHud == null && !_endTurnHudProbed)
@@ -712,6 +715,8 @@ namespace SongsOfConquestAccess.Adapters
             return GetField<UIButton>(_endTurnHud, BattleEndTurnButtonField);
         }
 
+        // ONCE PER ADAPTER, miss included: the options button is instantiated with the HUD and
+        // outlives every page, and the build asks whether it is drawn and for its tooltip.
         private UIButton GetOptionsButton()
         {
             if (_optionsButton != null || _optionsButtonProbed)
@@ -855,6 +860,8 @@ namespace SongsOfConquestAccess.Adapters
                 : null;
         }
 
+        // ONCE PER ADAPTER, miss included, and only from the focus and unfocus actions: the game log
+        // handle is instantiated with the battle HUD and never replaced under it.
         private GameLogHandleUI GetGameLogHandle()
         {
             if (_gameLogHandle != null || _gameLogHandleProbed)

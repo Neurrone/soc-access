@@ -131,14 +131,16 @@ namespace SongsOfConquestAccess.Screens
         /// far as the navigator is concerned.</summary>
         public static readonly ControlId MapNodeId = ControlId.Structural("adventure-map:tile");
 
-        private AdventureMapEventListener _eventListener;
-
         // The tile cursor, built over the adapter it walks. Rebuilt when the slot is pointed at a
         // DIFFERENT adventure and kept otherwise, so a dialog covering the map does not move the
         // cursor: the map is only deactivated by the story gap and the loading screen, and it keeps
         // its state across both.
         private AdventureMapGrid _grid;
         private AdventureMapAdapter _gridAdapter;
+
+        // Whether the map is the screen the player is on rather than one under a menu. The baseline
+        // for the HUD announcements: a container the game hides while a menu covers the map is not
+        // news, and saying so would talk over the menu the player opened.
         private bool _isTopScreen;
 
         // THE TELEPORT MODE IS DERIVED, NOT REMEMBERED: the map reads the teleport menu from the
@@ -150,6 +152,8 @@ namespace SongsOfConquestAccess.Screens
                 ScreenSource<TeleportMenu>.FromScene(LoadedScenes.AdventureScene),
                 menu => new TeleportMenuAdapter(menu));
 
+        // Whether the mod has already said the mode was entered, so arrival and departure are each
+        // announced once. The mode itself is read off the menu above, never remembered.
         private bool _inTeleportMode;
 
         // The tile tooltip is expensive to compose (the game's whole details capture) and the graph
@@ -184,7 +188,13 @@ namespace SongsOfConquestAccess.Screens
 
         protected override AdventureMapAdapter Adapt(object menu)
         {
-            return new AdventureMapAdapter((AdventureViewInstaller)menu, GetAdventureMapRevealedRegistry());
+            AdventureMapAdapter adapter =
+                new AdventureMapAdapter((AdventureViewInstaller)menu, GetAdventureMapRevealedRegistry());
+
+            // The map's events are listened to for exactly as long as this adventure's adapter
+            // lives, and let go in its Dispose when the slot moves off it.
+            adapter.AttachEvents(InvalidateTile);
+            return adapter;
         }
 
         /// <summary>The cursor is built over one adventure: a new one gets a new grid, and the audio
@@ -276,26 +286,8 @@ namespace SongsOfConquestAccess.Screens
             }
         }
 
-        /// <summary>The map's events are listened to for exactly as long as the map is up. Built here
-        /// rather than held forever, because the listener is bound to the adventure the slot points
-        /// at.</summary>
         public override void OnPush()
         {
-            _eventListener = Live == null
-                ? null
-                : new AdventureMapEventListener(
-                    Live.Facade,
-                    Live.SelectionHandler,
-                    Live.HumanAdventureControllerFacade,
-                    Live.LocalizationHandler,
-                    Live.FogManager,
-                    GetAdventureMapRevealedRegistry());
-            if (_eventListener != null)
-            {
-                _eventListener.OnMapChanged = InvalidateTile;
-            }
-
-            _eventListener?.Attach();
             AccessibilityEventBus.Subscribe(HandleAccessibilityEvent);
         }
 
@@ -319,8 +311,6 @@ namespace SongsOfConquestAccess.Screens
             AccessibilityEventBus.Unsubscribe(HandleAccessibilityEvent);
             _isTopScreen = false;
             Grid()?.DisposeAudio();
-            _eventListener?.Detach();
-            _eventListener = null;
             Grid()?.HideOverlay();
             base.OnPop();
         }
@@ -328,7 +318,7 @@ namespace SongsOfConquestAccess.Screens
         public override void OnUpdate()
         {
             base.OnUpdate();
-            _eventListener?.Update();
+            Live?.UpdateEvents();
             WatchTeleportMode();
         }
 
