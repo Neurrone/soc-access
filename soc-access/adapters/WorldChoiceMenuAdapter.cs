@@ -20,7 +20,7 @@ using UnityEngine.UI;
 
 namespace SongsOfConquestAccess.Adapters
 {
-    public sealed class WorldChoiceMenuAdapter
+    public sealed class WorldChoiceMenuAdapter : IPresent
     {
         private static readonly FieldInfo SettingsField = AccessTools.Field(typeof(WorldChoiceMenu), "_settings");
         private static readonly FieldInfo AsyncField = AccessTools.Field(typeof(WorldChoiceMenu), "_async");

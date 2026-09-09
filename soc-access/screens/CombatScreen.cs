@@ -194,6 +194,9 @@ namespace SongsOfConquestAccess.Screens
             get { return false; }
         }
 
+        /// <summary>Spelled out rather than layered over the base: the battle state is synced between
+        /// the slot and the presence check, and "not present" is where the fight ENDS, not merely a
+        /// false answer.</summary>
         public override bool IsActive()
         {
             SyncLive();

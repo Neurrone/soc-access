@@ -109,12 +109,6 @@ namespace SongsOfConquestAccess.Screens
             }
         }
 
-        public override bool IsActive()
-        {
-            SyncLive();
-            return Live != null && IsContentPresent(Live);
-        }
-
         public override void Build(GraphBuilder builder)
         {
             if (!IsActive())

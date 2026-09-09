@@ -12,7 +12,7 @@ using UnityEngine.UI;
 
 namespace SongsOfConquestAccess.Adapters
 {
-    public sealed class SaveLoadGameMenuAdapter
+    public sealed class SaveLoadGameMenuAdapter : IPresent
     {
         private static readonly FieldInfo SettingsField = AccessTools.Field(typeof(SaveLoadGameMenu), "_settings");
         private static readonly FieldInfo CurrentModeField = AccessTools.Field(typeof(SaveLoadGameMenu), "_currentMode");

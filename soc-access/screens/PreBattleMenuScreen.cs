@@ -164,12 +164,6 @@ namespace SongsOfConquestAccess.Screens
             get { return !IsGridFocused(); }
         }
 
-        public override bool IsActive()
-        {
-            SyncLive();
-            return Live != null && Live.IsPresent();
-        }
-
         public override void OnPush()
         {
             // A FRESH CURSOR PER VISIT: the adapter lives as long as the placement menu

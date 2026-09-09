@@ -100,12 +100,6 @@ namespace SongsOfConquestAccess.Screens
             }
         }
 
-        public override bool IsActive()
-        {
-            SyncLive();
-            return Live != null && Live.IsPresent();
-        }
-
         /// <summary>Which panel the modal is showing now (authentication, terms, a code box). Read
         /// live off the slot: the page turns in place and says its new name itself.</summary>
         public CommunityMapsModalState State

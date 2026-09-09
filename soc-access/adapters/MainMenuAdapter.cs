@@ -9,7 +9,7 @@ using UnityEngine;
 
 namespace SongsOfConquestAccess.Adapters
 {
-    public sealed class MainMenuAdapter
+    public sealed class MainMenuAdapter : IPresent
     {
         private static readonly AccessTools.FieldRef<MainMenu, GameObject> LeftButtonContainerRef =
             AccessTools.FieldRefAccess<MainMenu, GameObject>("_leftButtonContainer");

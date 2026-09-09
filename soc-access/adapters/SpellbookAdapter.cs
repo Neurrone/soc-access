@@ -22,7 +22,7 @@ using UnityEngine.UI;
 
 namespace SongsOfConquestAccess.Adapters
 {
-    public sealed class SpellbookAdapter
+    public sealed class SpellbookAdapter : IPresent
     {
         private static readonly FieldInfo EntriesField = AccessTools.Field(typeof(SpellBook), "_entries");
         private static readonly FieldInfo CommanderStateField = AccessTools.Field(typeof(SpellBook), "_commanderState");

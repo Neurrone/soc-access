@@ -64,12 +64,6 @@ namespace SongsOfConquestAccess.Screens
             get { return CardsStop; }
         }
 
-        public override bool IsActive()
-        {
-            SyncLive();
-            return Live != null && Live.IsPresent();
-        }
-
         /// <summary>The page hides its header band as it closes (Back and Options go first), and the
         /// cursor standing on a header button falls onto a card: that recovery is the page leaving,
         /// not a move, and stays silent while the band is gone.</summary>

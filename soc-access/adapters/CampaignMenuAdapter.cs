@@ -11,7 +11,7 @@ using UnityEngine;
 
 namespace SongsOfConquestAccess.Adapters
 {
-    public sealed class CampaignMenuAdapter
+    public sealed class CampaignMenuAdapter : IPresent
     {
         private static readonly AccessTools.FieldRef<CampaignMenu, GameObject> CampaignButtonContainerRef =
             AccessTools.FieldRefAccess<CampaignMenu, GameObject>("_campaignButtonContainer");

@@ -14,7 +14,7 @@ using UnityEngine.UI;
 
 namespace SongsOfConquestAccess.Adapters
 {
-    public sealed class CommunityMapsHomeAdapter
+    public sealed class CommunityMapsHomeAdapter : IPresent
     {
         private static readonly FieldInfo RowsField = AccessTools.Field(typeof(Home), "BrowserPanelModListRows");
         private static readonly FieldInfo FeaturedNameField = AccessTools.Field(typeof(Home), "featuredSelectedName");

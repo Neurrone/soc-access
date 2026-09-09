@@ -65,14 +65,6 @@ namespace SongsOfConquestAccess.Screens
             }
         }
 
-        /// <summary>Whether the dropdown is OPEN, which is the adapter's own reading of the
-        /// container <c>IconDropdown.Show</c> turns on and <c>Hide</c> turns off.</summary>
-        public override bool IsActive()
-        {
-            SyncLive();
-            return Live != null && Live.IsPresent();
-        }
-
         public override bool ConsumesBack
         {
             get { return IsActive(); }

@@ -9,7 +9,7 @@ using UnityEngine;
 
 namespace SongsOfConquestAccess.Adapters
 {
-    public sealed class PauseMenuAdapter
+    public sealed class PauseMenuAdapter : IPresent
     {
         private static readonly AccessTools.FieldRef<PauseMenu, PauseMenu.Settings> SettingsRef =
             AccessTools.FieldRefAccess<PauseMenu, PauseMenu.Settings>("_settings");

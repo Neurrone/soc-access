@@ -171,12 +171,6 @@ namespace SongsOfConquestAccess.Screens
             }
         }
 
-        public override bool IsActive()
-        {
-            SyncLive();
-            return Live != null && Live.IsPresent();
-        }
-
         /// <summary>Escape is claimed only on the sources the game leaves it unanswered on, and only
         /// while there is a drawn negative button to press with it.</summary>
         public override bool ConsumesBack

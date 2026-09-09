@@ -17,7 +17,7 @@ using UnityEngine;
 
 namespace SongsOfConquestAccess.Adapters
 {
-    public sealed class PurchaseWielderMenuAdapter
+    public sealed class PurchaseWielderMenuAdapter : IPresent
     {
         private static readonly FieldInfo AsyncField = AccessTools.Field(typeof(PurchaseWielderMenu), "_async");
         private static readonly FieldInfo WielderListTitleField = AccessTools.Field(typeof(PurchaseWielderMenu), "_wielderListTitle");

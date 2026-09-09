@@ -8,10 +8,13 @@ namespace SongsOfConquestAccess.Adapters
     /// <c>UpgradeTroopsSubMenu</c> inside their own window, with their own tutorial button, their own
     /// wielder band and their own way back to whatever they show when no sub-page is open.
     ///
+    /// <c>IsPresent</c> (from <c>IPresent</c>) is "one of my troop sub-pages is drawn" - which one
+    /// is the two predicates below it. The host's own landing page is a different screen's page.
+    ///
     /// Nothing here composes anything: the pages are named, grouped and worded by
     /// <c>screens/TroopManagementScreenBase.cs</c> and its two subclasses.
     /// </summary>
-    public interface ITroopManagementHostAdapter
+    public interface ITroopManagementHostAdapter : IPresent
     {
         /// <summary>Which host this is, for control keys and for the detector's own bookkeeping.
         /// </summary>

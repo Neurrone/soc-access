@@ -18,7 +18,7 @@ using UnityEngine.UI;
 
 namespace SongsOfConquestAccess.Adapters
 {
-    public sealed class CodexMenuAdapter
+    public sealed class CodexMenuAdapter : IPresent
     {
         private static readonly FieldInfo SettingsField = AccessTools.Field(typeof(CodexMenu), "_settings");
         private static readonly FieldInfo LocalizationField = AccessTools.Field(typeof(CodexMenu), "_localizationHandler");

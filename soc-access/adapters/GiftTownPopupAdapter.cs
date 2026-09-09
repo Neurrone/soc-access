@@ -11,7 +11,7 @@ using UnityEngine;
 
 namespace SongsOfConquestAccess.Adapters
 {
-    public sealed class GiftTownPopupAdapter
+    public sealed class GiftTownPopupAdapter : IPresent
     {
         private static readonly FieldInfo GiftButtonParentField = AccessTools.Field(typeof(GiftTownPopup), "_giftButtonParent");
         private static readonly FieldInfo RequestButtonParentField = AccessTools.Field(typeof(GiftTownPopup), "_requestButtonParent");

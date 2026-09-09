@@ -33,7 +33,7 @@ namespace SongsOfConquestAccess.Adapters
     /// close cross anywhere on this menu, and Escape is the game's - No in the choice stage, Done in
     /// the join stage (<c>HostileJoinMenu.ReregisterInput</c>).
     /// </summary>
-    public sealed class HostileJoinMenuAdapter : IDisposable
+    public sealed class HostileJoinMenuAdapter : IPresent, IDisposable
     {
         private static readonly FieldInfo SettingsField = AccessTools.Field(typeof(HostileJoinMenu), "_settings");
         private static readonly FieldInfo AsyncField = AccessTools.Field(typeof(HostileJoinMenu), "_async");

@@ -13,7 +13,7 @@ using UnityEngine;
 
 namespace SongsOfConquestAccess.Adapters
 {
-    public sealed class LevelUpMenuAdapter
+    public sealed class LevelUpMenuAdapter : IPresent
     {
         private static readonly FieldInfo SettingsField = AccessTools.Field(typeof(CommanderLevelUpMenu), "_settings");
         private static readonly FieldInfo AsyncField = AccessTools.Field(typeof(CommanderLevelUpMenu), "_async");

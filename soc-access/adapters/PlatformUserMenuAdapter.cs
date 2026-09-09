@@ -11,7 +11,7 @@ using UnityEngine;
 
 namespace SongsOfConquestAccess.Adapters
 {
-    public sealed class PlatformUserMenuAdapter
+    public sealed class PlatformUserMenuAdapter : IPresent
     {
         private static readonly FieldInfo ContainerField = AccessTools.Field(typeof(PlatformUserMenu), "_container");
         private static readonly FieldInfo UserButtonsField = AccessTools.Field(typeof(PlatformUserMenu), "_userButtons");

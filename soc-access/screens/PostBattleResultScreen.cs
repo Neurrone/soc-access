@@ -105,12 +105,6 @@ namespace SongsOfConquestAccess.Screens
             }
         }
 
-        public override bool IsActive()
-        {
-            SyncLive();
-            return Live != null && Live.IsPresent();
-        }
-
         /// <summary>The page is pushed before the game has written its outcome header, which arrives
         /// with the result animation: the name is compared against what was actually said, so the
         /// title is announced the frame the menu draws it and no hook has to say it has.</summary>

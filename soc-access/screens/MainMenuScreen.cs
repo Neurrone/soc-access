@@ -69,12 +69,6 @@ namespace SongsOfConquestAccess.Screens
             get { return ModText.Get(ModStrings.Screens.MainMenu); }
         }
 
-        public override bool IsActive()
-        {
-            SyncLive();
-            return Live != null && Live.IsPresent();
-        }
-
         /// <summary>The menu fades out after a click (Conquest fades the whole canvas group before it
         /// starts the lobby), and every button reads disabled on the way; that is the page leaving,
         /// not the button changing.</summary>

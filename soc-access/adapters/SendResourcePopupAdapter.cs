@@ -13,7 +13,7 @@ using UnityEngine;
 
 namespace SongsOfConquestAccess.Adapters
 {
-    public sealed class SendResourcePopupAdapter
+    public sealed class SendResourcePopupAdapter : IPresent
     {
         private static readonly FieldInfo GoldButtonField = AccessTools.Field(typeof(SendResourcePopup), "_goldButton");
         private static readonly FieldInfo StoneButtonField = AccessTools.Field(typeof(SendResourcePopup), "_stoneButton");

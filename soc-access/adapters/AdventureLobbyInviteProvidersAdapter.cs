@@ -11,7 +11,7 @@ using UnityEngine;
 
 namespace SongsOfConquestAccess.Adapters
 {
-    public sealed class AdventureLobbyInviteProvidersAdapter
+    public sealed class AdventureLobbyInviteProvidersAdapter : IPresent
     {
         private static readonly FieldInfo InviteDropdownContainerField =
             AccessTools.Field(typeof(LobbyMultiplayerPanel), "_inviteDropdownContainer");

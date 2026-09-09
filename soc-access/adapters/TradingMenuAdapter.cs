@@ -39,7 +39,7 @@ namespace SongsOfConquestAccess.Adapters
     /// being set and answers the right click with <c>MoveItemToOtherBackpack</c>. Saying so is the
     /// screen's business.
     /// </summary>
-    public sealed class TradingMenuAdapter
+    public sealed class TradingMenuAdapter : IPresent
     {
         private static readonly FieldInfo SettingsField = AccessTools.Field(typeof(TradingMenu), "_settings");
         private static readonly FieldInfo FacadeField = AccessTools.Field(typeof(TradingMenu), "_facade");

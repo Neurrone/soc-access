@@ -15,7 +15,7 @@ namespace SongsOfConquestAccess.Adapters
     /// <see cref="KingdomTroopOverviewTownEntry"/> per settlement, each drawing its name and its
     /// tier, and one <see cref="KingdomTroopOverviewIncomeEntry"/> per recruitable troop.
     /// </summary>
-    public sealed class KingdomTroopOverviewAdapter
+    public sealed class KingdomTroopOverviewAdapter : IPresent
     {
         private static readonly FieldInfo TownNameTextField =
             AccessTools.Field(typeof(KingdomTroopOverviewTownEntry), "_townNameText");

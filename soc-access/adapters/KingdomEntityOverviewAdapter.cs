@@ -19,7 +19,7 @@ namespace SongsOfConquestAccess.Adapters
     /// spawns with no parent), each drawing its name, its tier, a band of six resource incomes, and
     /// one <see cref="KingdomEntityOverviewClaimedEntry"/> per building.
     /// </summary>
-    public sealed class KingdomEntityOverviewAdapter
+    public sealed class KingdomEntityOverviewAdapter : IPresent
     {
         private static readonly FieldInfo CategoryTextField =
             AccessTools.Field(typeof(KingdomEntityOverviewCategoryEntry), "_categoryText");

@@ -13,7 +13,7 @@ using UnityEngine.UI;
 
 namespace SongsOfConquestAccess.Adapters
 {
-    public sealed class CommunityMapsDetailsAdapter
+    public sealed class CommunityMapsDetailsAdapter : IPresent
     {
         private static readonly FieldInfo ContentRectField = AccessTools.Field(typeof(Details), "ModDetailsContentRect");
         private static readonly FieldInfo NameField = AccessTools.Field(typeof(Details), "ModDetailsName");

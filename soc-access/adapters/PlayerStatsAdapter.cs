@@ -14,7 +14,7 @@ using UnityEngine.UI;
 
 namespace SongsOfConquestAccess.Adapters
 {
-    public sealed class PlayerStatsAdapter
+    public sealed class PlayerStatsAdapter : IPresent
     {
         private const int OverallTabIndex = 0;
         private const int BattleTabIndex = 1;

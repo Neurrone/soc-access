@@ -19,6 +19,7 @@ namespace SongsOfConquestAccess.Adapters
         public PurchaseTroopsSubMenuAdapter PurchaseTroops { get { return _adapter != null ? _adapter.PurchaseTroops : null; } }
         public UpgradeTroopsSubMenuAdapter UpgradeTroops { get { return _adapter != null ? _adapter.UpgradeTroops : null; } }
 
+        public bool IsPresent() { return IsDraftPresent() || IsUpgradePresent(); }
         public bool IsDraftPresent() { return _adapter != null && _adapter.IsDraftPresent(); }
         public bool IsUpgradePresent() { return _adapter != null && _adapter.IsUpgradePresent(); }
 

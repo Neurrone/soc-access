@@ -18,7 +18,7 @@ using UnityEngine;
 
 namespace SongsOfConquestAccess.Adapters
 {
-    public sealed class TownInteractionMenuAdapter
+    public sealed class TownInteractionMenuAdapter : IPresent
     {
         private static readonly FieldInfo AsyncField = AccessTools.Field(typeof(TownInteractionMenu), "_async");
         private static readonly FieldInfo HeaderField = AccessTools.Field(typeof(TownInteractionMenu), "_wielderInteractHeader");
@@ -90,7 +90,10 @@ namespace SongsOfConquestAccess.Adapters
             }
         }
 
-        public bool IsTopLevelPresent()
+        /// <summary>The menu's own LANDING page is drawn: the page this adapter reads. A troop
+        /// sub-page over it is a page of its own (<c>IsDraftPresent</c>, <c>IsUpgradePresent</c>),
+        /// read by <c>TroopManagementScreenBase</c> through the host interface.</summary>
+        public bool IsPresent()
         {
             return IsMenuOpen() && IsVisible(GetField<GameObject>(_menu, LandingPageContainerField));
         }

@@ -15,7 +15,7 @@ using UnityEngine.UI;
 
 namespace SongsOfConquestAccess.Adapters
 {
-    public sealed class CommunityMapsSearchFilterAdapter
+    public sealed class CommunityMapsSearchFilterAdapter : IPresent
     {
         private static readonly Type SearchPanelType = AccessTools.TypeByName("ModIOBrowser.Implementation.SearchPanel");
         private static readonly FieldInfo PanelField = AccessTools.Field(SearchPanelType, "SearchPanelGameObject");

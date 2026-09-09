@@ -75,12 +75,6 @@ namespace SongsOfConquestAccess.Screens
             get { return ModText.Get(ModStrings.Screens.Chat); }
         }
 
-        public override bool IsActive()
-        {
-            SyncLive();
-            return Live != null && Live.IsOpen;
-        }
-
         public override bool ConsumesBack
         {
             get { return true; }

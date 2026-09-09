@@ -15,7 +15,7 @@ using UnityEngine;
 
 namespace SongsOfConquestAccess.Adapters
 {
-    public sealed class PostAdventureStatsAdapter
+    public sealed class PostAdventureStatsAdapter : IPresent
     {
         private static readonly FieldInfo SettingsField = AccessTools.Field(typeof(PostAdventureStatsMenu), "_settings");
         private static readonly FieldInfo DropdownField = AccessTools.Field(typeof(UITextMeshDropdown), "_dropdown");

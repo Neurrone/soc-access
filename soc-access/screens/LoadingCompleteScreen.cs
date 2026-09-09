@@ -63,12 +63,6 @@ namespace SongsOfConquestAccess.Screens
             get { return 1000; }
         }
 
-        public override bool IsActive()
-        {
-            SyncLive();
-            return Live != null && Live.IsPresent();
-        }
-
         /// <summary>Off: the page is waiting for any key, and a letter that started a search here
         /// would be a letter the game never saw.</summary>
         public override bool AllowsTypeahead

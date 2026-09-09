@@ -89,12 +89,6 @@ namespace SongsOfConquestAccess.Screens
             get { return Live != null && Live.Stage == HostileJoinMenuStage.Join ? JoinStop : OfferStop; }
         }
 
-        public override bool IsActive()
-        {
-            SyncLive();
-            return Live != null && Live.IsPresent();
-        }
-
         /// <summary>The stage is read off the game every frame rather than waited for: the menu swaps
         /// one whole page for the other in place, and the cursor is given up when it does. The graph
         /// is declared afresh on every operation, so there is nothing else to do. The stage last seen

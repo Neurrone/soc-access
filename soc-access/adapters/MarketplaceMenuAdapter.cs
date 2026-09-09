@@ -14,7 +14,7 @@ using UnityEngine;
 
 namespace SongsOfConquestAccess.Adapters
 {
-    public sealed class MarketplaceMenuAdapter
+    public sealed class MarketplaceMenuAdapter : IPresent
     {
         private static readonly FieldInfo ButtonsField = AccessTools.Field(typeof(MarketplaceMenu), "_buttons");
         private static readonly FieldInfo TitleTextField = AccessTools.Field(typeof(MarketplaceMenu), "_titleText");

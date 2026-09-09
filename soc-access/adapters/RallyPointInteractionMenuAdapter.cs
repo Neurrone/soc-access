@@ -18,7 +18,7 @@ using UnityEngine.UI;
 
 namespace SongsOfConquestAccess.Adapters
 {
-    public sealed class RallyPointInteractionMenuAdapter
+    public sealed class RallyPointInteractionMenuAdapter : IPresent
     {
         private static readonly FieldInfo HeaderField = AccessTools.Field(typeof(RallyPointInteractionMenu), "_wielderInteractHeader");
         private static readonly FieldInfo PurchaseTroopsSubMenuField = AccessTools.Field(typeof(RallyPointInteractionMenu), "_purchaseTroopsSubMenu");

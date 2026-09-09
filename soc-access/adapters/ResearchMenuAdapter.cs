@@ -19,7 +19,7 @@ using UnityEngine;
 
 namespace SongsOfConquestAccess.Adapters
 {
-    public sealed class ResearchMenuAdapter
+    public sealed class ResearchMenuAdapter : IPresent
     {
         private static readonly TooltipAnchor[] ResearchTooltipAnchors =
         {

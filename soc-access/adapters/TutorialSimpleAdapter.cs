@@ -9,7 +9,7 @@ using UnityEngine;
 
 namespace SongsOfConquestAccess.Adapters
 {
-    public sealed class TutorialSimpleAdapter
+    public sealed class TutorialSimpleAdapter : IPresent
     {
         private static readonly AccessTools.FieldRef<TutorialMenu, GameObject> TopContainerRef =
             AccessTools.FieldRefAccess<TutorialMenu, GameObject>("_topContainer");

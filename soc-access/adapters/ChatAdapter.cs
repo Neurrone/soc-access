@@ -13,7 +13,7 @@ using UnityEngine;
 
 namespace SongsOfConquestAccess.Adapters
 {
-    public sealed class ChatAdapter
+    public sealed class ChatAdapter : IPresent
     {
         private static readonly FieldInfo WindowSettingsField =
             AccessTools.Field(typeof(ChatWindowBehavior), "_settings");
@@ -124,6 +124,13 @@ namespace SongsOfConquestAccess.Adapters
                 ChatWindowBehavior.Settings settings = WindowSettings;
                 return settings != null ? settings.inputField : null;
             }
+        }
+
+        /// <summary>The chat window being OPEN is the page being drawn; there is no later step
+        /// the mod has to wait for.</summary>
+        public bool IsPresent()
+        {
+            return IsOpen;
         }
 
         public bool IsInputVisible()

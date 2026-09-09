@@ -29,7 +29,7 @@ namespace SongsOfConquestAccess.Adapters
         Descending
     }
 
-    public sealed class AdventureLobbyMapSelectAdapter
+    public sealed class AdventureLobbyMapSelectAdapter : IPresent
     {
         private static readonly AccessTools.FieldRef<MapSelectMenu, CanvasGroup> CanvasGroupRef =
             AccessTools.FieldRefAccess<MapSelectMenu, CanvasGroup>("_canvasGroup");

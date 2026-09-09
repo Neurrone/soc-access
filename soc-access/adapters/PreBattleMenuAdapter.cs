@@ -28,7 +28,7 @@ using UnityEngine.UI;
 
 namespace SongsOfConquestAccess.Adapters
 {
-    public sealed class PreBattleMenuAdapter
+    public sealed class PreBattleMenuAdapter : IPresent
     {
         private static readonly FieldInfo GridContainerField = AccessTools.Field(typeof(PreBattleMenu), "_gridContainer");
         private static readonly FieldInfo MainContainerField = AccessTools.Field(typeof(PreBattleMenu), "_mainContainer");

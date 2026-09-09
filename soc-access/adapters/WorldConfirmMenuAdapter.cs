@@ -16,7 +16,7 @@ using UnityEngine.UI;
 
 namespace SongsOfConquestAccess.Adapters
 {
-    public sealed class WorldConfirmMenuAdapter
+    public sealed class WorldConfirmMenuAdapter : IPresent
     {
         private static readonly FieldInfo SettingsField = AccessTools.Field(typeof(WorldConfirmMenu), "_settings");
         private static readonly FieldInfo AsyncField = AccessTools.Field(typeof(WorldConfirmMenu), "_async");

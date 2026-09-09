@@ -52,7 +52,7 @@ namespace SongsOfConquestAccess.Adapters
         Enemy
     }
 
-    public sealed class CombatAdapter : IDisposable
+    public sealed class CombatAdapter : IPresent, IDisposable
     {
         private static readonly PropertyInfo InstallerContainerProperty =
             AccessTools.Property(typeof(BattleSceneInstaller), "Container");

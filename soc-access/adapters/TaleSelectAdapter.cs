@@ -10,7 +10,7 @@ using UnityEngine;
 
 namespace SongsOfConquestAccess.Adapters
 {
-    public sealed class TaleSelectAdapter
+    public sealed class TaleSelectAdapter : IPresent
     {
         private static readonly AccessTools.FieldRef<TaleButtonLayoutCoordinator, CanvasGroup> CanvasGroupRef =
             AccessTools.FieldRefAccess<TaleButtonLayoutCoordinator, CanvasGroup>("_canvasGroup");

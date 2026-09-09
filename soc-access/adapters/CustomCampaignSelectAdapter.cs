@@ -10,7 +10,7 @@ using UnityEngine;
 
 namespace SongsOfConquestAccess.Adapters
 {
-    public sealed class CustomCampaignSelectAdapter
+    public sealed class CustomCampaignSelectAdapter : IPresent
     {
         private static readonly AccessTools.FieldRef<CustomCampaignSelectMenuBehavior, CustomCampaignSelectMenuBehavior.Settings> SettingsRef =
             AccessTools.FieldRefAccess<CustomCampaignSelectMenuBehavior, CustomCampaignSelectMenuBehavior.Settings>("_settings");

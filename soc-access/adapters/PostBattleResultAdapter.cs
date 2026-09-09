@@ -14,7 +14,7 @@ using UnityEngine;
 
 namespace SongsOfConquestAccess.Adapters
 {
-    public sealed class PostBattleResultAdapter
+    public sealed class PostBattleResultAdapter : IPresent
     {
         public const string SourceKey = "POST_BATTLE_RESULT";
 

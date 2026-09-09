@@ -13,7 +13,7 @@ using UnityEngine.UI;
 
 namespace SongsOfConquestAccess.Adapters
 {
-    public sealed class CommunityMapsCollectionAdapter
+    public sealed class CommunityMapsCollectionAdapter : IPresent
     {
         private static readonly FieldInfo TitleField = AccessTools.Field(typeof(Collection), "CollectionPanelTitle");
         private static readonly FieldInfo SearchFieldInfo = AccessTools.Field(typeof(Collection), "CollectionPanelSearchField");

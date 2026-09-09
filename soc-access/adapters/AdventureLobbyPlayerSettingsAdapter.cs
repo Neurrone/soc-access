@@ -13,7 +13,7 @@ using UnityEngine;
 
 namespace SongsOfConquestAccess.Adapters
 {
-    public sealed class AdventureLobbyPlayerSettingsAdapter
+    public sealed class AdventureLobbyPlayerSettingsAdapter : IPresent
     {
         private static readonly FieldInfo SettingsContainerField =
             AccessTools.Field(typeof(LobbyPlayerSettingsMenu), "_settingsContainer");

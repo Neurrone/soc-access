@@ -12,7 +12,7 @@ namespace SongsOfConquestAccess.Adapters
         Negative = 2
     }
 
-    public interface IMessageDialogAdapter
+    public interface IMessageDialogAdapter : IPresent
     {
         object SourceKey { get; }
 
@@ -41,7 +41,6 @@ namespace SongsOfConquestAccess.Adapters
         /// </summary>
         bool GameHandlesEscape { get; }
 
-        bool IsPresent();
 
         /// <summary>The component the game draws this action's button with, or null where the source
         /// has no such button. Where a button IS on the screen is a game fact; what the reading order

@@ -238,8 +238,7 @@ namespace SongsOfConquestAccess.Screens
         /// rebuilt for every dialog.</summary>
         public override bool IsActive()
         {
-            SyncLive();
-            if (Live == null || !Live.IsPresent())
+            if (!base.IsActive())
             {
                 return false;
             }

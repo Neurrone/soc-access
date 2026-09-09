@@ -21,6 +21,14 @@ namespace SongsOfConquestAccess.Screens
     /// Buttons the game hides are not declared; buttons it disables stay in the list and say so.
     /// Escape is the game's own: it registers the pause menu's exit action itself, so this screen
     /// claims nothing.
+    ///
+    /// NO HANDOVER any more. The menu used to stay active for up to two seconds after it closed,
+    /// so the map was not handed back for the frames between the pause menu going and the options,
+    /// save/load or codex window arriving. There are no such frames: MenuSystem's callback runs the
+    /// close and the open in ONE call, and each of those three screens now reads its own menu every
+    /// frame instead of waiting for a hook that answered a frame late. Measured 2026-09-09 on the
+    /// adventure map with <c>/wait</c>, which sees single frames: zero frames with neither menu
+    /// present on all three routes.
     /// </summary>
     public sealed class PauseMenuScreen : LiveScreen<PauseMenuAdapter>
     {
@@ -58,19 +66,6 @@ namespace SongsOfConquestAccess.Screens
                 string title = Live != null ? Live.Title : null;
                 return string.IsNullOrWhiteSpace(title) ? null : title;
             }
-        }
-
-        /// <summary>NO HANDOVER any more. The menu used to stay active for up to two seconds after it
-        /// closed, so the map was not handed back for the frames between the pause menu going and the
-        /// options, save/load or codex window arriving. There are no such frames: MenuSystem's
-        /// callback runs the close and the open in ONE call, and each of those three screens now reads
-        /// its own menu every frame instead of waiting for a hook that answered a frame late.
-        /// Measured 2026-09-09 on the adventure map with <c>/wait</c>, which sees single frames: zero
-        /// frames with neither menu present on all three routes.</summary>
-        public override bool IsActive()
-        {
-            SyncLive();
-            return Live != null && Live.IsPresent();
         }
 
         public override void Build(GraphBuilder builder)

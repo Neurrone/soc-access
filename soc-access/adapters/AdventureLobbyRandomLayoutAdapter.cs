@@ -20,7 +20,7 @@ using UnityEngine.UI;
 
 namespace SongsOfConquestAccess.Adapters
 {
-    public sealed class AdventureLobbyRandomLayoutAdapter
+    public sealed class AdventureLobbyRandomLayoutAdapter : IPresent
     {
         private static readonly AccessTools.FieldRef<LobbyRandomMapSelectionMenu, CanvasGroup> CanvasGroupRef =
             AccessTools.FieldRefAccess<LobbyRandomMapSelectionMenu, CanvasGroup>("_canvasGroup");

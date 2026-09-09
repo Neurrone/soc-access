@@ -83,12 +83,6 @@ namespace SongsOfConquestAccess.Screens
             }
         }
 
-        public override bool IsActive()
-        {
-            SyncLive();
-            return Live != null && Live.IsPresent();
-        }
-
         public override void OnUnfocus()
         {
             PointerHover.Release();

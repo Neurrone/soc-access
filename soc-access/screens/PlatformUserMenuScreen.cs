@@ -99,12 +99,6 @@ namespace SongsOfConquestAccess.Screens
             }
         }
 
-        public override bool IsActive()
-        {
-            SyncLive();
-            return Live != null && Live.IsPresent();
-        }
-
         /// <summary>Escape: the game binds only its gamepad Cancel here, so the key would do nothing;
         /// the screen takes it and closes the popup the way the game does.</summary>
         public override bool ConsumesBack

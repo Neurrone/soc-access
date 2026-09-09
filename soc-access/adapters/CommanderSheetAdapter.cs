@@ -27,7 +27,7 @@ using UnityEngine.UI;
 
 namespace SongsOfConquestAccess.Adapters
 {
-    public sealed class CommanderSheetAdapter : IArtifactSlots
+    public sealed class CommanderSheetAdapter : IPresent, IArtifactSlots
     {
         private static readonly FieldInfo FacadeField = AccessTools.Field(typeof(CommanderSheet), "_facade");
         private static readonly FieldInfo LocalizationField = AccessTools.Field(typeof(CommanderSheet), "_localizationHandler");

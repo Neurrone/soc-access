@@ -39,7 +39,7 @@ using Zenject;
 
 namespace SongsOfConquestAccess.Adapters
 {
-    public sealed class AdventureMapAdapter
+    public sealed class AdventureMapAdapter : IPresent
     {
         private const byte ExploredButNotVisibleFogValue = 128;
 

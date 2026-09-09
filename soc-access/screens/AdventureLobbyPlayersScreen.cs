@@ -122,12 +122,6 @@ namespace SongsOfConquestAccess.Screens
             get { return PlayersStop; }
         }
 
-        public override bool IsActive()
-        {
-            SyncLive();
-            return Live != null && Live.IsPresent();
-        }
-
         public override bool IsWorkable
         {
             get { return Live != null && Live.IsInteractive(); }

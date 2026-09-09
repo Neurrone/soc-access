@@ -15,7 +15,7 @@ using UnityEngine.UI;
 
 namespace SongsOfConquestAccess.Adapters
 {
-    public sealed class AdventureLobbyGameSettingsAdapter
+    public sealed class AdventureLobbyGameSettingsAdapter : IPresent
     {
         private static readonly FieldInfo ContainerField =
             AccessTools.Field(typeof(LobbyMapSettingsMenu), "_container");

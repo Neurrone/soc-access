@@ -19,7 +19,7 @@ using UnityEngine.UI;
 
 namespace SongsOfConquestAccess.Adapters
 {
-    public sealed class AdventureLobbyChallengeMapSelectAdapter
+    public sealed class AdventureLobbyChallengeMapSelectAdapter : IPresent
     {
         private static readonly AccessTools.FieldRef<ChallengeMapsMenu, CanvasGroup> CanvasGroupRef =
             AccessTools.FieldRefAccess<ChallengeMapsMenu, CanvasGroup>("_canvasGroup");

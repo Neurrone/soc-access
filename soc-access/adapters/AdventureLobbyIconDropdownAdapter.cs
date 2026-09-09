@@ -14,7 +14,7 @@ using UnityEngine.UI;
 
 namespace SongsOfConquestAccess.Adapters
 {
-    public sealed class AdventureLobbyIconDropdownAdapter
+    public sealed class AdventureLobbyIconDropdownAdapter : IPresent
     {
         private static readonly FieldInfo MainContainerField = AccessTools.Field(typeof(IconDropdown), "_mainContainer");
         private static readonly FieldInfo SpawnedEntriesField = AccessTools.Field(typeof(IconDropdown), "_spawnedEntries");
@@ -43,6 +43,8 @@ namespace SongsOfConquestAccess.Adapters
             get { return _dropdown; }
         }
 
+        /// <summary>Whether the dropdown is OPEN, read off the container <c>IconDropdown.Show</c>
+        /// turns on and <c>Hide</c> turns off.</summary>
         public bool IsPresent()
         {
             GameObject container = GetMainContainer();

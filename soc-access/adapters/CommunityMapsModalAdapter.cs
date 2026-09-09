@@ -13,7 +13,7 @@ using UnityEngine.UI;
 
 namespace SongsOfConquestAccess.Adapters
 {
-    public sealed class CommunityMapsModalAdapter
+    public sealed class CommunityMapsModalAdapter : IPresent
     {
         private readonly AuthenticationPanels _authPanels;
         private readonly GameObject _panel;

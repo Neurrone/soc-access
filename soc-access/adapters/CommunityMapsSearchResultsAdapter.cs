@@ -13,7 +13,7 @@ using UnityEngine.UI;
 
 namespace SongsOfConquestAccess.Adapters
 {
-    public sealed class CommunityMapsSearchResultsAdapter
+    public sealed class CommunityMapsSearchResultsAdapter : IPresent
     {
         private static readonly Type SearchResultListItemType = AccessTools.TypeByName("ModIOBrowser.Implementation.SearchResultListItem");
         private static readonly Type SearchResultOverlayType = AccessTools.TypeByName("ModIOBrowser.Implementation.SearchResultListItem_Overlay");

@@ -23,7 +23,7 @@ using UnityEngine;
 
 namespace SongsOfConquestAccess.Adapters
 {
-    public sealed class BuildMenuAdapter
+    public sealed class BuildMenuAdapter : IPresent
     {
         private static readonly FieldInfo AsyncField = AccessTools.Field(typeof(BuildMenu), "_async");
         private static readonly FieldInfo TutorialButtonField = AccessTools.Field(typeof(BuildMenu), "_tutorialButton");

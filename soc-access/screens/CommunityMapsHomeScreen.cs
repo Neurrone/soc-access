@@ -96,8 +96,7 @@ namespace SongsOfConquestAccess.Screens
         /// both pages draw, so the panel's own active state is read here every frame.</summary>
         public override bool IsActive()
         {
-            SyncLive();
-            return Live != null && Live.IsPresent() && Live.IsBrowseSelected;
+            return base.IsActive() && Live.IsBrowseSelected;
         }
 
         public override bool ConsumesBack

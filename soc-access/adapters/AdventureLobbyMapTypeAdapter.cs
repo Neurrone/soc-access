@@ -11,7 +11,7 @@ using UnityEngine;
 
 namespace SongsOfConquestAccess.Adapters
 {
-    public sealed class AdventureLobbyMapTypeAdapter
+    public sealed class AdventureLobbyMapTypeAdapter : IPresent
     {
         private static readonly AccessTools.FieldRef<MapTypeMenu, UIButton> AllMapsButtonRef =
             AccessTools.FieldRefAccess<MapTypeMenu, UIButton>("_allMapsButton");

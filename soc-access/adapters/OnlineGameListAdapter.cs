@@ -18,7 +18,7 @@ using UnityEngine.UI;
 
 namespace SongsOfConquestAccess.Adapters
 {
-    public sealed class OnlineGameListAdapter
+    public sealed class OnlineGameListAdapter : IPresent
     {
         private static readonly AccessTools.FieldRef<GameListMenu, GameListMenu.Settings> SettingsRef =
             AccessTools.FieldRefAccess<GameListMenu, GameListMenu.Settings>("_settings");

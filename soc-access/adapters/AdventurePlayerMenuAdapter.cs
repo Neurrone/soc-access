@@ -19,7 +19,7 @@ using UnityEngine.UI;
 
 namespace SongsOfConquestAccess.Adapters
 {
-    public sealed class AdventurePlayerMenuAdapter
+    public sealed class AdventurePlayerMenuAdapter : IPresent
     {
         private static readonly FieldInfo AdventureFacadeField =
             AccessTools.Field(typeof(AdventurePlayerMenu), "_adventureFacade");

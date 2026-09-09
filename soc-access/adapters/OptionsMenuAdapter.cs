@@ -16,7 +16,7 @@ namespace SongsOfConquestAccess.Adapters
     /// <c>IMenuFactoryCollection</c>, which is the same reader the mod's own options dialog uses:
     /// both forms are drawn by a <c>MenuFactoryController</c>, so both are read the same way.
     /// </summary>
-    public sealed class OptionsMenuAdapter
+    public sealed class OptionsMenuAdapter : IPresent
     {
         private static readonly FieldInfo FactoryField = AccessTools.Field(typeof(OptionsMenu), "_factory");
         private static readonly FieldInfo SettingsField = AccessTools.Field(typeof(OptionsMenu), "_settings");

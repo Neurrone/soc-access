@@ -73,12 +73,6 @@ namespace SongsOfConquestAccess.Screens
             }
         }
 
-        public override bool IsActive()
-        {
-            SyncLive();
-            return Live != null && Live.IsPresent();
-        }
-
         public override bool ConsumesBack
         {
             get { return Live != null && Live.CancelButton != null; }

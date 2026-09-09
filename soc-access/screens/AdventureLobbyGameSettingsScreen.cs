@@ -75,12 +75,6 @@ namespace SongsOfConquestAccess.Screens
             get { return RowsStop; }
         }
 
-        public override bool IsActive()
-        {
-            SyncLive();
-            return Live != null && Live.IsPresent();
-        }
-
         /// <summary>While the keyboard is on its way to one of the page's text fields, what the player
         /// types next is meant for that field and must not start a search.</summary>
         public override bool CapturesRawInput

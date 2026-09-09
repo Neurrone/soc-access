@@ -2,7 +2,7 @@ using System.Collections.Generic;
 
 namespace SongsOfConquestAccess.Adapters
 {
-    public interface IStoryTextAdapter
+    public interface IStoryTextAdapter : IPresent
     {
         object SourceKey { get; }
 
@@ -14,7 +14,6 @@ namespace SongsOfConquestAccess.Adapters
         /// <summary>The body's paragraphs, one line each, as the game broke them.</summary>
         IList<string> BodyLines { get; }
 
-        bool IsPresent();
 
         bool AdvanceNow();
     }

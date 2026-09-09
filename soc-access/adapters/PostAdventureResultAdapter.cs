@@ -10,7 +10,7 @@ using UnityEngine;
 
 namespace SongsOfConquestAccess.Adapters
 {
-    public sealed class PostAdventureResultAdapter
+    public sealed class PostAdventureResultAdapter : IPresent
     {
         private static readonly FieldInfo DescriptionField = AccessTools.Field(typeof(PostAdventureMenu), "_description");
         private static readonly FieldInfo DescriptionTitleField = AccessTools.Field(typeof(PostAdventureMenu), "_descriptionTitle");

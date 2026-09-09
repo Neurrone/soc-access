@@ -24,7 +24,7 @@ using UnityEngine.UI;
 
 namespace SongsOfConquestAccess.Adapters
 {
-    public sealed class AdventureLobbyPlayersAdapter
+    public sealed class AdventureLobbyPlayersAdapter : IPresent
     {
         private static readonly AccessTools.FieldRef<LobbyMenu, CanvasGroup> CanvasGroupRef =
             AccessTools.FieldRefAccess<LobbyMenu, CanvasGroup>("_canvasGroup");

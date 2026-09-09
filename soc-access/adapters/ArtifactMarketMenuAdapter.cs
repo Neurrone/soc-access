@@ -27,7 +27,7 @@ using UnityEngine.UI;
 
 namespace SongsOfConquestAccess.Adapters
 {
-    public sealed class ArtifactMarketMenuAdapter : IArtifactSlots
+    public sealed class ArtifactMarketMenuAdapter : IPresent, IArtifactSlots
     {
         private static readonly FieldInfo HeaderTextField = AccessTools.Field(typeof(ArtifactMarketMenu), "_headerText");
         private static readonly FieldInfo DescriptionTextField = AccessTools.Field(typeof(ArtifactMarketMenu), "_descriptionText");

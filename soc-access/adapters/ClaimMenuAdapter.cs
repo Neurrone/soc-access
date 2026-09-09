@@ -12,7 +12,7 @@ using UnityEngine.UI;
 
 namespace SongsOfConquestAccess.Adapters
 {
-    public sealed class ClaimMenuAdapter
+    public sealed class ClaimMenuAdapter : IPresent
     {
         private static readonly FieldInfo SettingsField = AccessTools.Field(typeof(ClaimMenu), "_settings");
 

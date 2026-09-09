@@ -103,12 +103,6 @@ namespace SongsOfConquestAccess.Screens
             get { return SavesStop; }
         }
 
-        public override bool IsActive()
-        {
-            SyncLive();
-            return Live != null && Live.IsPresent();
-        }
-
         /// <summary>While the keyboard is on its way to the game's box, what the player types next is
         /// meant for that box and must not start a search.</summary>
         public override bool CapturesRawInput
