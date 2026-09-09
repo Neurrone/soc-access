@@ -42,31 +42,23 @@ namespace SongsOfConquestAccess.Screens
         // held across rebuilds so the reconciler seats the cursor back on the same node.
         private readonly Dictionary<string, object> _markers = new Dictionary<string, object>();
 
-        /// <summary>After a hot reload: point the slot at the menu already showing.
-        /// Scanned once, from <c>ScreenDetector.RecoverRuntimeState</c>.</summary>
-        public static void Recover()
-        {
-            Recovered<MapEntityMiniMenuScreen>(FindActive());
-        }
-
-        public static MapEntityMiniMenuAdapter FindActive()
-        {
-            MapEntityMiniMenu[] menus = Resources.FindObjectsOfTypeAll<MapEntityMiniMenu>();
-            for (int i = 0; i < menus.Length; i++)
-            {
-                MapEntityMiniMenuAdapter adapter = new MapEntityMiniMenuAdapter(menus[i]);
-                if (adapter.IsPresent())
-                {
-                    return (adapter);
-                }
-            }
-
-            return null;
-        }
-
         public MapEntityMiniMenuAdapter Adapter
         {
             get { return Live; }
+        }
+
+        /// <summary>The one mini menu the adventure scene holds for the whole game.</summary>
+        private readonly ScreenSource<MapEntityMiniMenu> _source =
+            ScreenSource<MapEntityMiniMenu>.FromScene(LoadedScenes.AdventureScene);
+
+        protected override object ResolveMenu()
+        {
+            return _source.Current;
+        }
+
+        protected override MapEntityMiniMenuAdapter Adapt(object menu)
+        {
+            return new MapEntityMiniMenuAdapter((MapEntityMiniMenu)menu);
         }
 
         public override string Key
@@ -94,6 +86,7 @@ namespace SongsOfConquestAccess.Screens
 
         public override bool IsActive()
         {
+            SyncLive();
             return Live != null && Live.IsPresent();
         }
 

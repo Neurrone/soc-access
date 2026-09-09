@@ -1,13 +1,11 @@
 using System;
 using System.Collections.Generic;
-using HarmonyLib;
 using SongsOfConquest.Client.Adventure;
 using SongsOfConquestAccess.Adapters;
 using SongsOfConquestAccess.Localization;
 using SongsOfConquestAccess.UI;
 using SongsOfConquestAccess.UI.Graph;
 using UnityEngine;
-using Zenject;
 
 namespace SongsOfConquestAccess.Screens
 {
@@ -44,40 +42,23 @@ namespace SongsOfConquestAccess.Screens
         private const string SkillsStop = "level-up-skills";
         private const string CloseStop = "level-up-close";
 
-        private static readonly System.Reflection.PropertyInfo InstallerContainerProperty =
-            AccessTools.Property(typeof(CommanderLevelUpMenuInstaller), "Container");
-
         // A subject of its own per synthesized line, kept across rebuilds so the reconciler seats the
         // cursor on the same one: the menu gives no component for its heading, its identity line, the
         // "Choose a Skill" caption or the max-level notice.
         private readonly Dictionary<string, object> _markers = new Dictionary<string, object>();
 
-        /// <summary>After a hot reload: point the slot at the menu already showing.
-        /// Scanned once, from <c>ScreenDetector.RecoverRuntimeState</c>.</summary>
-        public static void Recover()
+        /// <summary>The one level-up window the adventure scene holds for the whole game.</summary>
+        private readonly ScreenSource<ICommanderLevelUpMenu> _source =
+            ScreenSource<ICommanderLevelUpMenu>.FromScene(LoadedScenes.AdventureScene);
+
+        protected override object ResolveMenu()
         {
-            Recovered<LevelUpScreen>(FindActive());
+            return _source.Current;
         }
 
-        public static LevelUpMenuAdapter FindActive()
+        protected override LevelUpMenuAdapter Adapt(object menu)
         {
-            CommanderLevelUpMenuInstaller[] installers = Resources.FindObjectsOfTypeAll<CommanderLevelUpMenuInstaller>();
-            for (int i = 0; i < installers.Length; i++)
-            {
-                CommanderLevelUpMenu menu = TryResolveLevelUpMenu(installers[i]);
-                if (menu == null)
-                {
-                    continue;
-                }
-
-                LevelUpMenuAdapter adapter = new LevelUpMenuAdapter(menu);
-                if (adapter.IsPresent())
-                {
-                    return (adapter);
-                }
-            }
-
-            return null;
+            return new LevelUpMenuAdapter((CommanderLevelUpMenu)menu);
         }
 
         public override string Key
@@ -104,6 +85,7 @@ namespace SongsOfConquestAccess.Screens
 
         public override bool IsActive()
         {
+            SyncLive();
             return Live != null && Live.IsPresent();
         }
 
@@ -320,38 +302,5 @@ namespace SongsOfConquestAccess.Screens
             return marker;
         }
 
-        private static CommanderLevelUpMenu TryResolveLevelUpMenu(CommanderLevelUpMenuInstaller installer)
-        {
-            if (!IsLiveSceneInstaller(installer) || InstallerContainerProperty == null)
-            {
-                return null;
-            }
-
-            DiContainer container = InstallerContainerProperty.GetValue(installer, null) as DiContainer;
-            if (container == null)
-            {
-                return null;
-            }
-
-            try
-            {
-                return container.Resolve<CommanderLevelUpMenu>();
-            }
-            catch (Exception)
-            {
-                return null;
-            }
-        }
-
-        private static bool IsLiveSceneInstaller(CommanderLevelUpMenuInstaller installer)
-        {
-            if (installer == null)
-            {
-                return false;
-            }
-
-            GameObject gameObject = installer.gameObject;
-            return gameObject != null && gameObject.scene.IsValid() && gameObject.scene.isLoaded;
-        }
     }
 }

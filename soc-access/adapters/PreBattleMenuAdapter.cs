@@ -54,6 +54,8 @@ namespace SongsOfConquestAccess.Adapters
         private static readonly FieldInfo StateMachineField = AccessTools.Field(typeof(PreBattleMenu), "_stateMachine");
         private static readonly FieldInfo AdventureBattleMenuSettingsField =
             AccessTools.Field(typeof(AdventureBattleMenuInstaller), "_settings");
+        private static readonly FieldInfo BattleMenuSettingsField =
+            AccessTools.Field(typeof(AdventureBattleMenu), "_settings");
 
         private static readonly FieldInfo DeploymentControllerField = AccessTools.Field(typeof(DeploymentMenu), "_deploymentUIController");
         private static readonly FieldInfo CurrentContainerField = AccessTools.Field(typeof(DeploymentUIController), "_currentContainer");
@@ -87,6 +89,16 @@ namespace SongsOfConquestAccess.Adapters
         public object SourceKey
         {
             get { return _menu; }
+        }
+
+        /// <summary>The placement page the battle menu holds in its own settings: the one the game
+        /// bound in the adventure scene, read through its owner rather than looked for.</summary>
+        public static PreBattleMenu GetPreBattleMenu(AdventureBattleMenu battleMenu)
+        {
+            AdventureBattleMenu.Settings settings = battleMenu != null && BattleMenuSettingsField != null
+                ? BattleMenuSettingsField.GetValue(battleMenu) as AdventureBattleMenu.Settings
+                : null;
+            return settings != null ? settings.PreBattleMenu : null;
         }
 
         public bool IsPresent()

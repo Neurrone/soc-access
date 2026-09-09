@@ -43,26 +43,18 @@ namespace SongsOfConquestAccess.Screens
         // the warning are read off text meshes the menu rebinds rather than off rows of their own.
         private readonly Dictionary<string, object> _markers = new Dictionary<string, object>();
 
-        /// <summary>After a hot reload: point the slot at the menu already showing.
-        /// Scanned once, from <c>ScreenDetector.RecoverRuntimeState</c>.</summary>
-        public static void Recover()
+        /// <summary>The one build window the adventure scene holds for the whole game.</summary>
+        private readonly ScreenSource<IBuildMenu> _source =
+            ScreenSource<IBuildMenu>.FromScene(LoadedScenes.AdventureScene);
+
+        protected override object ResolveMenu()
         {
-            Recovered<BuildMenuScreen>(FindActive());
+            return _source.Current;
         }
 
-        public static BuildMenuAdapter FindActive()
+        protected override BuildMenuAdapter Adapt(object menu)
         {
-            BuildMenu[] menus = Resources.FindObjectsOfTypeAll<BuildMenu>();
-            for (int i = 0; i < menus.Length; i++)
-            {
-                BuildMenuAdapter adapter = new BuildMenuAdapter(menus[i]);
-                if (adapter.IsPresent())
-                {
-                    return (adapter);
-                }
-            }
-
-            return null;
+            return new BuildMenuAdapter((BuildMenu)menu);
         }
 
         public override string Key
@@ -88,6 +80,7 @@ namespace SongsOfConquestAccess.Screens
 
         public override bool IsActive()
         {
+            SyncLive();
             return Live != null && Live.IsPresent();
         }
 

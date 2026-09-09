@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Reflection;
 using HarmonyLib;
 using SongsOfConquest.Client.Adventure.UI.Trading;
 using SongsOfConquestAccess.Adapters;
@@ -9,7 +8,6 @@ using SongsOfConquestAccess.Localization;
 using SongsOfConquestAccess.UI;
 using SongsOfConquestAccess.UI.Graph;
 using UnityEngine;
-using Zenject;
 
 namespace SongsOfConquestAccess.Screens
 {
@@ -67,35 +65,23 @@ namespace SongsOfConquestAccess.Screens
         private const string LeftKey = "trade:left";
         private const string RightKey = "trade:right";
 
-        private static readonly PropertyInfo InstallerContainerProperty =
-            AccessTools.Property(typeof(TradingMenuInstaller), "Container");
-
         // A subject of its own per synthesized node, kept across rebuilds so the reconciler seats the
         // cursor on the same one: the band lines and the auto-arrange buttons are not drawn as
         // controls of their own.
         private readonly Dictionary<string, object> _markers = new Dictionary<string, object>();
 
-        /// <summary>After a hot reload: point the slot at the menu already showing.
-        /// Scanned once, from <c>ScreenDetector.RecoverRuntimeState</c>.</summary>
-        public static void Recover()
+        /// <summary>The one trading window the adventure scene holds for the whole game.</summary>
+        private readonly ScreenSource<ITradingMenu> _source =
+            ScreenSource<ITradingMenu>.FromScene(LoadedScenes.AdventureScene);
+
+        protected override object ResolveMenu()
         {
-            Recovered<TradingScreen>(FindActive());
+            return _source.Current;
         }
 
-        public static TradingMenuAdapter FindActive()
+        protected override TradingMenuAdapter Adapt(object menu)
         {
-            TradingMenuInstaller[] installers = Resources.FindObjectsOfTypeAll<TradingMenuInstaller>();
-            for (int i = 0; i < installers.Length; i++)
-            {
-                TradingMenu menu = TryResolveTradingMenu(installers[i]);
-                TradingMenuAdapter adapter = new TradingMenuAdapter(menu);
-                if (adapter.IsPresent())
-                {
-                    return (adapter);
-                }
-            }
-
-            return null;
+            return new TradingMenuAdapter((TradingMenu)menu);
         }
 
         public TradingMenuAdapter Adapter
@@ -140,6 +126,7 @@ namespace SongsOfConquestAccess.Screens
 
         public override bool IsActive()
         {
+            SyncLive();
             return Live != null && Live.IsPresent();
         }
 
@@ -415,29 +402,5 @@ namespace SongsOfConquestAccess.Screens
             return marker;
         }
 
-        private static TradingMenu TryResolveTradingMenu(TradingMenuInstaller installer)
-        {
-            if (installer == null || installer.gameObject == null || !installer.gameObject.scene.IsValid() || !installer.gameObject.scene.isLoaded)
-            {
-                return null;
-            }
-
-            DiContainer container = InstallerContainerProperty != null
-                ? InstallerContainerProperty.GetValue(installer, null) as DiContainer
-                : null;
-            if (container == null)
-            {
-                return null;
-            }
-
-            try
-            {
-                return container.Resolve<TradingMenu>();
-            }
-            catch
-            {
-                return null;
-            }
-        }
     }
 }

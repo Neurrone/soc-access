@@ -1,8 +1,6 @@
 using System;
 using System.Collections.Generic;
-using HarmonyLib;
 using SongsOfConquest.Client.Menu;
-using SongsOfConquest.Common.Battle;
 using SongsOfConquestAccess.Adapters;
 using SongsOfConquestAccess.Localization;
 using SongsOfConquestAccess.UI;
@@ -51,11 +49,6 @@ namespace SongsOfConquestAccess.Screens
         private const string LootStop = "post-battle-loot";
         private const string ButtonsStop = "post-battle-buttons";
 
-        private static readonly System.Reflection.FieldInfo PostBattleMenuResultField =
-            AccessTools.Field(typeof(PostBattleMenu), "_result");
-        private static readonly System.Reflection.FieldInfo PostBattleMenuOnHideField =
-            AccessTools.Field(typeof(PostBattleMenu), "OnHidePostBattle");
-
         // A subject of its own per synthesized line, kept across rebuilds so the reconciler seats the
         // cursor back on the same one: the menu gives no component the screen can key the XP figure,
         // the returned-troops line or the "None" row on.
@@ -64,21 +57,30 @@ namespace SongsOfConquestAccess.Screens
         // Resolving a portrait walks the menu's parents and the scene root, so each side is looked
         // for once per menu, hit or miss: a defender without a commander has no portrait to find,
         // and the search would otherwise run again every frame. A new menu starts both over.
-        private CommanderHudPortraitAdapter _attackerPortrait;
-        private CommanderHudPortraitAdapter _defenderPortrait;
-        private bool _attackerPortraitProbed;
-        private bool _defenderPortraitProbed;
 
-        /// <summary>After a hot reload: point the slot at the menu already showing.
-        /// Scanned once, from <c>ScreenDetector.RecoverRuntimeState</c>.</summary>
-        public static void Recover()
+        // The battle menu the adventure scene binds, and the post-battle page it holds in its
+        // settings: the page is a child of one menu that lives for the whole game, so it is read
+        // through its owner rather than looked for (AGENTS.md, "Screen Resolution").
+        private readonly ScreenSource<IAdventureBattleMenu> _battleMenu =
+            ScreenSource<IAdventureBattleMenu>.FromScene(LoadedScenes.AdventureScene);
+
+        private readonly ScreenSource<PostBattleMenu> _source;
+
+        public PostBattleResultScreen()
         {
-            Recovered<PostBattleResultScreen>(FindActive());
+            _source = ScreenSource<PostBattleMenu>.FromOwner(
+                _battleMenu,
+                battleMenu => PostBattleResultAdapter.GetPostBattleMenu((AdventureBattleMenu)battleMenu));
         }
 
-        public static PostBattleResultAdapter FindActive()
+        protected override object ResolveMenu()
         {
-            return FindActivePostBattleResultScreen();
+            return _source.Current;
+        }
+
+        protected override PostBattleResultAdapter Adapt(object menu)
+        {
+            return new PostBattleResultAdapter((AdventureBattleMenu)_battleMenu.Current, (PostBattleMenu)menu);
         }
 
         public override string Key
@@ -105,6 +107,7 @@ namespace SongsOfConquestAccess.Screens
 
         public override bool IsActive()
         {
+            SyncLive();
             return Live != null && Live.IsPresent();
         }
 
@@ -194,7 +197,7 @@ namespace SongsOfConquestAccess.Screens
         /// the portrait cannot be resolved the name is still said, off the menu's own label.</summary>
         private ControlId BuildCommander(GraphBuilder builder, bool attacker)
         {
-            CommanderHudPortraitAdapter portrait = attacker ? AttackerPortrait : DefenderPortrait;
+            CommanderHudPortraitAdapter portrait = attacker ? Live.AttackerCommanderPortrait : Live.DefenderCommanderPortrait;
             string key = attacker ? "attacker-commander" : "defender-commander";
             Func<string> name = () => portrait != null
                 ? portrait.Name
@@ -399,108 +402,6 @@ namespace SongsOfConquestAccess.Screens
             }
 
             return marker;
-        }
-
-        public override void OnLiveChanged(PostBattleResultAdapter previous)
-        {
-            _attackerPortrait = null;
-            _defenderPortrait = null;
-            _attackerPortraitProbed = false;
-            _defenderPortraitProbed = false;
-        }
-
-        private CommanderHudPortraitAdapter AttackerPortrait
-        {
-            get
-            {
-                if (!_attackerPortraitProbed)
-                {
-                    _attackerPortrait = Live.AttackerCommanderPortrait;
-                    _attackerPortraitProbed = true;
-                }
-
-                return _attackerPortrait;
-            }
-        }
-
-        private CommanderHudPortraitAdapter DefenderPortrait
-        {
-            get
-            {
-                if (!_defenderPortraitProbed)
-                {
-                    _defenderPortrait = Live.DefenderCommanderPortrait;
-                    _defenderPortraitProbed = true;
-                }
-
-                return _defenderPortrait;
-            }
-        }
-
-        // ---- finding the live menu ----
-
-        private static PostBattleResultAdapter FindActivePostBattleResultScreen()
-        {
-            PostBattleMenu menu = FindActivePostBattleMenu();
-            if (!IsActive(menu) || GetResult(menu) == null)
-            {
-                return null;
-            }
-
-            AdventureBattleMenu battleMenu = ResolveOwningBattleMenu(menu);
-            PostBattleResultAdapter adapter = new PostBattleResultAdapter(battleMenu, menu);
-            return adapter.IsPresent() ? adapter : null;
-        }
-
-        private static PostBattleMenu FindActivePostBattleMenu()
-        {
-            PostBattleMenu[] menus = Resources.FindObjectsOfTypeAll<PostBattleMenu>();
-            for (int i = 0; i < menus.Length; i++)
-            {
-                if (IsActive(menus[i]) && GetResult(menus[i]) != null)
-                {
-                    return menus[i];
-                }
-            }
-
-            return null;
-        }
-
-        private static IBattleResult GetResult(PostBattleMenu menu)
-        {
-            return menu != null && PostBattleMenuResultField != null
-                ? PostBattleMenuResultField.GetValue(menu) as IBattleResult
-                : null;
-        }
-
-        private static AdventureBattleMenu ResolveOwningBattleMenu(PostBattleMenu menu)
-        {
-            Action<PostBattleMenu.HideAction> onHidePostBattle = menu != null && PostBattleMenuOnHideField != null
-                ? PostBattleMenuOnHideField.GetValue(menu) as Action<PostBattleMenu.HideAction>
-                : null;
-            if (onHidePostBattle == null)
-            {
-                return null;
-            }
-
-            Delegate[] invocationList = onHidePostBattle.GetInvocationList();
-            for (int i = 0; i < invocationList.Length; i++)
-            {
-                AdventureBattleMenu battleMenu = invocationList[i]?.Target as AdventureBattleMenu;
-                if (battleMenu != null)
-                {
-                    return battleMenu;
-                }
-            }
-
-            return null;
-        }
-
-        private static bool IsActive(PostBattleMenu menu)
-        {
-            return menu != null
-                && menu.gameObject != null
-                && menu.gameObject.activeInHierarchy;
         }
     }
 }

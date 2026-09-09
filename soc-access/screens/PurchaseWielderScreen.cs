@@ -50,31 +50,23 @@ namespace SongsOfConquestAccess.Screens
         // status are read off text meshes the details pane rebinds rather than off rows of their own.
         private readonly Dictionary<string, object> _markers = new Dictionary<string, object>();
 
-        /// <summary>After a hot reload: point the slot at the menu already showing.
-        /// Scanned once, from <c>ScreenDetector.RecoverRuntimeState</c>.</summary>
-        public static void Recover()
-        {
-            Recovered<PurchaseWielderScreen>(FindActive());
-        }
-
-        public static PurchaseWielderMenuAdapter FindActive()
-        {
-            PurchaseWielderMenu[] menus = Resources.FindObjectsOfTypeAll<PurchaseWielderMenu>();
-            for (int i = 0; i < menus.Length; i++)
-            {
-                PurchaseWielderMenuAdapter adapter = new PurchaseWielderMenuAdapter(menus[i]);
-                if (adapter.IsPresent())
-                {
-                    return (adapter);
-                }
-            }
-
-            return null;
-        }
-
         public PurchaseWielderMenuAdapter Adapter
         {
             get { return Live; }
+        }
+
+        /// <summary>The one hire window the adventure scene holds for the whole game.</summary>
+        private readonly ScreenSource<PurchaseWielderMenu> _source =
+            ScreenSource<PurchaseWielderMenu>.FromScene(LoadedScenes.AdventureScene);
+
+        protected override object ResolveMenu()
+        {
+            return _source.Current;
+        }
+
+        protected override PurchaseWielderMenuAdapter Adapt(object menu)
+        {
+            return new PurchaseWielderMenuAdapter((PurchaseWielderMenu)menu);
         }
 
         public override string Key
@@ -100,6 +92,7 @@ namespace SongsOfConquestAccess.Screens
 
         public override bool IsActive()
         {
+            SyncLive();
             return Live != null && Live.IsPresent();
         }
 

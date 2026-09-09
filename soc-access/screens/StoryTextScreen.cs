@@ -1,7 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Reflection;
-using HarmonyLib;
 using SongsOfConquest.Client.Adventure;
 using SongsOfConquest.Client.Menu;
 using SongsOfConquestAccess.Adapters;
@@ -9,7 +7,6 @@ using SongsOfConquestAccess.Localization;
 using SongsOfConquestAccess.UI;
 using SongsOfConquestAccess.UI.Graph;
 using UnityEngine;
-using Zenject;
 
 namespace SongsOfConquestAccess.Screens
 {
@@ -33,22 +30,45 @@ namespace SongsOfConquestAccess.Screens
     {
         private const string StoryStop = "story-text";
 
-        private static readonly PropertyInfo DialogueInstallerContainerProperty =
-            AccessTools.Property(typeof(DialogueMenuInstaller), "Container");
-
         // A subject of its own for the node: the sources draw the text in meshes the adapters do not
         // hand out.
         private readonly object _bodyKey = new object();
 
-        /// <summary>After a hot reload: the three sources tried in the order the detector's own
-        /// handlers would have written them, first one wins. Scanned once, from
-        /// <c>ScreenDetector.RecoverRuntimeState</c>.</summary>
-        public static void Recover()
+        // The three sources that draw the story text, each resolved from the adventure scene's
+        // container and adapted once per object: the letterbox band, the lore panel and the dialogue
+        // menu. The page belongs to whichever is drawing now, asked in the order the detector's own
+        // handlers used to write them.
+        private readonly AdaptedSource<ILetterboxStoryText, IStoryTextAdapter> _letterbox =
+            new AdaptedSource<ILetterboxStoryText, IStoryTextAdapter>(
+                ScreenSource<ILetterboxStoryText>.FromScene(LoadedScenes.AdventureScene),
+                storyText => new LetterboxStoryTextAdapter((LetterboxStoryText)storyText));
+
+        private readonly AdaptedSource<IStoryText, IStoryTextAdapter> _storyText =
+            new AdaptedSource<IStoryText, IStoryTextAdapter>(
+                ScreenSource<IStoryText>.FromScene(LoadedScenes.AdventureScene),
+                storyText => new StoryTextAdapter((StoryText)storyText));
+
+        private readonly AdaptedSource<DialogueMenu, IStoryTextAdapter> _dialogue =
+            new AdaptedSource<DialogueMenu, IStoryTextAdapter>(
+                ScreenSource<DialogueMenu>.FromScene(LoadedScenes.AdventureScene),
+                menu => new DialogueMenuAdapter(menu));
+
+        /// <summary>The adapter itself is what the slot holds here: three unrelated objects draw the
+        /// one page, so the "menu" a source answers with IS the adapter over it, built once per
+        /// object.</summary>
+        protected override object ResolveMenu()
         {
-            Recovered<StoryTextScreen>(
-                (IStoryTextAdapter)FindActiveLetterboxStoryText()
-                ?? FindActiveStoryText()
-                ?? (IStoryTextAdapter)FindActiveDialogueMenu());
+            return Drawing(_letterbox.Current) ?? Drawing(_storyText.Current) ?? Drawing(_dialogue.Current);
+        }
+
+        protected override IStoryTextAdapter Adapt(object menu)
+        {
+            return (IStoryTextAdapter)menu;
+        }
+
+        private static IStoryTextAdapter Drawing(IStoryTextAdapter adapter)
+        {
+            return adapter != null && adapter.IsPresent() ? adapter : null;
         }
 
         public override string Key
@@ -70,6 +90,7 @@ namespace SongsOfConquestAccess.Screens
 
         public override bool IsActive()
         {
+            SyncLive();
             return Live != null && Live.IsPresent();
         }
 
@@ -120,129 +141,5 @@ namespace SongsOfConquestAccess.Screens
             }
         }
 
-        private static LetterboxStoryTextAdapter FindActiveLetterboxStoryText()
-        {
-            LetterboxStoryText[] storyTexts = Resources.FindObjectsOfTypeAll<LetterboxStoryText>();
-            for (int i = 0; i < storyTexts.Length; i++)
-            {
-                LetterboxStoryText storyText = storyTexts[i];
-                if (!IsLiveSceneStoryText(storyText))
-                {
-                    continue;
-                }
-
-                LetterboxStoryTextAdapter adapter = new LetterboxStoryTextAdapter(storyText);
-                if (adapter.IsPresent())
-                {
-                    return adapter;
-                }
-            }
-
-            return null;
-        }
-
-        private static StoryTextAdapter FindActiveStoryText()
-        {
-            StoryText[] storyTexts = Resources.FindObjectsOfTypeAll<StoryText>();
-            for (int i = 0; i < storyTexts.Length; i++)
-            {
-                StoryText storyText = storyTexts[i];
-                if (!IsLiveSceneStoryText(storyText))
-                {
-                    continue;
-                }
-
-                StoryTextAdapter adapter = new StoryTextAdapter(storyText);
-                if (adapter.IsPresent())
-                {
-                    return adapter;
-                }
-            }
-
-            return null;
-        }
-
-        private static DialogueMenuAdapter FindActiveDialogueMenu()
-        {
-            DialogueMenuInstaller[] installers = Resources.FindObjectsOfTypeAll<DialogueMenuInstaller>();
-            for (int i = 0; i < installers.Length; i++)
-            {
-                DialogueMenuInstaller installer = installers[i];
-                if (!IsLiveSceneInstaller(installer))
-                {
-                    continue;
-                }
-
-                DiContainer container = GetContainer(installer);
-                DialogueMenu dialogueMenu = TryResolve<DialogueMenu>(container);
-                DialogueMenuAdapter adapter = new DialogueMenuAdapter(dialogueMenu);
-                if (adapter.IsPresent())
-                {
-                    return adapter;
-                }
-            }
-
-            return null;
-        }
-
-        private static bool IsLiveSceneStoryText(LetterboxStoryText storyText)
-        {
-            if (storyText == null)
-            {
-                return false;
-            }
-
-            GameObject gameObject = storyText.gameObject;
-            return gameObject != null && gameObject.scene.IsValid() && gameObject.scene.isLoaded;
-        }
-
-        private static bool IsLiveSceneStoryText(StoryText storyText)
-        {
-            if (storyText == null)
-            {
-                return false;
-            }
-
-            GameObject gameObject = storyText.gameObject;
-            return gameObject != null && gameObject.scene.IsValid() && gameObject.scene.isLoaded;
-        }
-
-        private static bool IsLiveSceneInstaller(DialogueMenuInstaller installer)
-        {
-            if (installer == null)
-            {
-                return false;
-            }
-
-            GameObject gameObject = installer.gameObject;
-            return gameObject != null && gameObject.scene.IsValid() && gameObject.scene.isLoaded;
-        }
-
-        private static DiContainer GetContainer(DialogueMenuInstaller installer)
-        {
-            if (installer == null || DialogueInstallerContainerProperty == null)
-            {
-                return null;
-            }
-
-            return DialogueInstallerContainerProperty.GetValue(installer, null) as DiContainer;
-        }
-
-        private static T TryResolve<T>(DiContainer container) where T : class
-        {
-            if (container == null)
-            {
-                return null;
-            }
-
-            try
-            {
-                return container.Resolve<T>();
-            }
-            catch (Exception)
-            {
-                return null;
-            }
-        }
     }
 }

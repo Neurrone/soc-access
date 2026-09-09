@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Reflection;
 using HarmonyLib;
+using Lavapotion.Utilities;
 using SongsOfConquest.Client.Adventure.Menu;
 using SongsOfConquest.Client.UI;
 using SongsOfConquest.Common.Localization;
@@ -24,6 +25,7 @@ namespace SongsOfConquestAccess.Adapters
         private static readonly FieldInfo GamepadPreviousTextField = AccessTools.Field(typeof(TeleportMenu), "_gamepadPreviousText");
         private static readonly FieldInfo GamepadNextTextField = AccessTools.Field(typeof(TeleportMenu), "_gamepadNextText");
         private static readonly FieldInfo LocalizationHandlerField = AccessTools.Field(typeof(TeleportMenu), "_localizationHandler");
+        private static readonly FieldInfo CurrentAsyncField = AccessTools.Field(typeof(TeleportMenu), "_currentAsync");
 
         private readonly TeleportMenu _menu;
 
@@ -124,6 +126,21 @@ namespace SongsOfConquestAccess.Adapters
                 && container != null
                 && container.activeInHierarchy
                 && DestinationCount > 1;
+        }
+
+        /// <summary>Whether the teleport the menu has finished with was CANCELLED rather than
+        /// confirmed, read off the answer the menu completed its own async with: <c>Cancel</c>
+        /// completes it with confirm false and <c>Confirm</c> with true, and the completed answer
+        /// stays on the menu after it closes. False while the menu is still open.</summary>
+        public bool WasCancelled
+        {
+            get
+            {
+                Async<ValueTuple<bool, int>> async = _menu != null && CurrentAsyncField != null
+                    ? CurrentAsyncField.GetValue(_menu) as Async<ValueTuple<bool, int>>
+                    : null;
+                return async != null && async.IsCompleted && !async.Result.Item1;
+            }
         }
 
         public bool SelectPrevious()

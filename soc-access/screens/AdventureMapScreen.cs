@@ -146,8 +146,18 @@ namespace SongsOfConquestAccess.Screens
         // its state across both.
         private AdventureMapGrid _grid;
         private AdventureMapAdapter _gridAdapter;
-        private TeleportMenuAdapter _teleportMenuAdapter;
         private bool _isTopScreen;
+
+        // THE TELEPORT MODE IS DERIVED, NOT REMEMBERED: the map reads the teleport menu from the
+        // adventure scene's container every frame, and the menu being drawn IS the mode
+        // (AGENTS.md, "Screen Resolution"). The only thing kept is whether the mod has already said
+        // the mode was entered, so arrival and departure are each announced once.
+        private readonly AdaptedSource<TeleportMenu, TeleportMenuAdapter> _teleportSource =
+            new AdaptedSource<TeleportMenu, TeleportMenuAdapter>(
+                ScreenSource<TeleportMenu>.FromScene(LoadedScenes.AdventureScene),
+                menu => new TeleportMenuAdapter(menu));
+
+        private bool _inTeleportMode;
 
         // The tile tooltip is expensive to compose (the game's whole details capture) and the graph
         // is rebuilt every frame, so it is composed once per tile, which is exactly as often as the
@@ -318,6 +328,7 @@ namespace SongsOfConquestAccess.Screens
         {
             base.OnUpdate();
             _eventListener?.Update();
+            WatchTeleportMode();
         }
 
         // ---- the graph ----
@@ -333,7 +344,7 @@ namespace SongsOfConquestAccess.Screens
 
             // The teleport menu takes the whole screen over: the HUD is not workable under it and is
             // not declared, so Tab walks the map and the menu's four buttons and nothing else.
-            if (TeleportMenu != null)
+            if (Teleport != null)
             {
                 BuildTeleport(builder);
                 return;
@@ -370,7 +381,7 @@ namespace SongsOfConquestAccess.Screens
             vtable.OnBlurVisual = () => Grid()?.HideOverlay();
             // While the teleport menu is up the stop already carries the game's instruction and Enter
             // means confirm, so the tile's own click hints say nothing then.
-            TileInstructionHints.Add(vtable, TileTooltip, () => TeleportMenu == null);
+            TileInstructionHints.Add(vtable, TileTooltip, () => Teleport == null);
             builder.AddItem(new SyntheticNode(MapNodeId, vtable));
 
             builder.PopContext();
@@ -378,7 +389,7 @@ namespace SongsOfConquestAccess.Screens
 
         private string MapContext()
         {
-            TeleportMenuAdapter teleport = TeleportMenu;
+            TeleportMenuAdapter teleport = Teleport;
             string instruction = teleport != null ? teleport.InstructionText : null;
             return string.IsNullOrWhiteSpace(instruction) ? ModText.Get(ModStrings.Screens.Map) : instruction;
         }
@@ -430,7 +441,7 @@ namespace SongsOfConquestAccess.Screens
         /// today.</summary>
         private void ActivateTile()
         {
-            TeleportMenuAdapter teleport = TeleportMenu;
+            TeleportMenuAdapter teleport = Teleport;
             if (teleport != null)
             {
                 if (Grid().CursorTile == teleport.CurrentDestination)
@@ -446,7 +457,7 @@ namespace SongsOfConquestAccess.Screens
 
         private void ContextualTile()
         {
-            if (TeleportMenu != null)
+            if (Teleport != null)
             {
                 return;
             }
@@ -934,7 +945,7 @@ namespace SongsOfConquestAccess.Screens
 
         private void BuildTeleport(GraphBuilder builder)
         {
-            TeleportMenuAdapter teleport = TeleportMenu;
+            TeleportMenuAdapter teleport = Teleport;
             if (teleport == null)
             {
                 return;
@@ -1091,7 +1102,7 @@ namespace SongsOfConquestAccess.Screens
         /// teleport menu is up it is the menu's own Cancel.</summary>
         public override bool ConsumesBack
         {
-            get { return TeleportMenu == null && !IsMapFocused(); }
+            get { return Teleport == null && !IsMapFocused(); }
         }
 
         public override bool Back()
@@ -1111,7 +1122,7 @@ namespace SongsOfConquestAccess.Screens
         private ControlId HotkeyLanding(string actionKey)
         {
             AdventureHudAdapter hud = Live != null ? Live.Hud : null;
-            if (hud == null || TeleportMenu != null)
+            if (hud == null || Teleport != null)
             {
                 return null;
             }
@@ -1177,14 +1188,30 @@ namespace SongsOfConquestAccess.Screens
 
         // ---- the teleport mode ----
 
-        public void EnterTeleportDestinationMode(TeleportMenuAdapter adapter)
+        /// <summary>The mode the teleport menu puts the map into, watched rather than waited for: the
+        /// menu draws itself and the map reads it, so entering and leaving are edges of what the game
+        /// is doing and no hook has to report either.</summary>
+        private void WatchTeleportMode()
         {
-            if (adapter == null || !adapter.IsPresent())
+            TeleportMenuAdapter teleport = Teleport;
+            if ((teleport != null) == _inTeleportMode)
             {
                 return;
             }
 
-            _teleportMenuAdapter = adapter;
+            _inTeleportMode = teleport != null;
+            if (teleport != null)
+            {
+                EnterTeleportDestinationMode(teleport);
+            }
+            else
+            {
+                ExitTeleportDestinationMode();
+            }
+        }
+
+        private void EnterTeleportDestinationMode(TeleportMenuAdapter adapter)
+        {
             string instruction = adapter.InstructionText;
             if (!string.IsNullOrWhiteSpace(instruction))
             {
@@ -1196,20 +1223,12 @@ namespace SongsOfConquestAccess.Screens
         }
 
         /// <summary>The menu has closed. The cursor comes back to the wielder it was teleporting, and
-        /// a menu the player cancelled says so.</summary>
-        public void ExitTeleportDestinationMode(TeleportMenu menu, bool cancelled)
+        /// a menu the player cancelled says so - read off the answer the menu completed its own async
+        /// with rather than off a hook on Cancel.</summary>
+        private void ExitTeleportDestinationMode()
         {
-            if (_teleportMenuAdapter == null)
-            {
-                return;
-            }
-
-            if (menu != null && !ReferenceEquals(_teleportMenuAdapter.SourceKey, menu))
-            {
-                return;
-            }
-
-            _teleportMenuAdapter = null;
+            TeleportMenuAdapter adapter = _teleportSource.Current;
+            bool cancelled = adapter != null && adapter.WasCancelled;
             if (cancelled)
             {
                 SpeechPipeline.Output(new SpeechRequest(ModText.Get(ModStrings.UI.Cancelled), interrupt: true));
@@ -1224,19 +1243,14 @@ namespace SongsOfConquestAccess.Screens
             Navigator?.FocusNode(MapNodeId);
         }
 
-        public bool MatchesTeleportMenu(TeleportMenu menu)
-        {
-            return _teleportMenuAdapter != null
-                && (menu == null || ReferenceEquals(_teleportMenuAdapter.SourceKey, menu));
-        }
-
-        private TeleportMenuAdapter TeleportMenu
+        /// <summary>The teleport menu while it is drawn, which is the whole of "the map is picking a
+        /// destination"; null the rest of the time.</summary>
+        private TeleportMenuAdapter Teleport
         {
             get
             {
-                return _teleportMenuAdapter != null && _teleportMenuAdapter.IsPresent()
-                    ? _teleportMenuAdapter
-                    : null;
+                TeleportMenuAdapter adapter = _teleportSource.Current;
+                return adapter != null && adapter.IsPresent() ? adapter : null;
             }
         }
 
@@ -1254,7 +1268,7 @@ namespace SongsOfConquestAccess.Screens
         /// it landed, since the destination is a place on the map and nowhere else.</summary>
         private void SelectTeleportDestination(Func<TeleportMenuAdapter, bool> select)
         {
-            TeleportMenuAdapter teleport = TeleportMenu;
+            TeleportMenuAdapter teleport = Teleport;
             if (teleport == null || !select(teleport))
             {
                 return;

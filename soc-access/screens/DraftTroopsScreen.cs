@@ -25,58 +25,6 @@ namespace SongsOfConquestAccess.Screens
     /// </summary>
     public sealed class DraftTroopsScreen : TroopManagementScreenBase
     {
-        /// <summary>After a hot reload: the three hosts that draw this page, tried in the order the
-        /// detector's own handlers would have written them. Scanned once, from
-        /// <c>ScreenDetector.RecoverRuntimeState</c>.</summary>
-        public static void Recover()
-        {
-            Recovered<DraftTroopsScreen>(FindActiveDwelling() ?? FindActiveSettlement() ?? FindActiveDefence());
-        }
-
-        public static ITroopManagementHostAdapter FindActiveDwelling()
-        {
-            DwellingInteractionMenu[] menus = Resources.FindObjectsOfTypeAll<DwellingInteractionMenu>();
-            for (int i = 0; i < menus.Length; i++)
-            {
-                DwellingInteractionMenuAdapter adapter = new DwellingInteractionMenuAdapter(menus[i]);
-                if (adapter.IsDraftPresent())
-                {
-                    return new DwellingTroopManagementHostAdapter(adapter);
-                }
-            }
-
-            return null;
-        }
-
-        public static ITroopManagementHostAdapter FindActiveSettlement()
-        {
-            TownInteractionMenu[] menus = Resources.FindObjectsOfTypeAll<TownInteractionMenu>();
-            for (int i = 0; i < menus.Length; i++)
-            {
-                TownInteractionMenuAdapter adapter = new TownInteractionMenuAdapter(menus[i]);
-                if (adapter.IsDraftPresent())
-                {
-                    return new SettlementTroopManagementHostAdapter(adapter);
-                }
-            }
-
-            return null;
-        }
-
-        public static ITroopManagementHostAdapter FindActiveDefence()
-        {
-            DefenceMenu[] menus = Resources.FindObjectsOfTypeAll<DefenceMenu>();
-            for (int i = 0; i < menus.Length; i++)
-            {
-                DefenceMenuAdapter adapter = new DefenceMenuAdapter(menus[i]);
-                if (adapter.IsDraftPresent())
-                {
-                    return new DefenceTroopManagementHostAdapter(adapter);
-                }
-            }
-
-            return null;
-        }
 
         /// <summary>Layer 22: a sub-page over the settlement, dwelling or defence page.</summary>
         public override int Layer
@@ -86,9 +34,9 @@ namespace SongsOfConquestAccess.Screens
 
         protected override string ScreenSuffix { get { return "draft-troops"; } }
 
-        protected override bool IsContentPresent()
+        protected override bool IsContentPresent(ITroopManagementHostAdapter host)
         {
-            return Host != null && Host.IsDraftPresent();
+            return host.IsDraftPresent();
         }
 
         protected override void BuildContent(GraphBuilder builder)

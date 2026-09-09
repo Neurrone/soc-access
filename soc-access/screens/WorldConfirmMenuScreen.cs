@@ -1,12 +1,10 @@
 using System;
 using System.Collections.Generic;
-using HarmonyLib;
 using SongsOfConquest.Client.Adventure;
 using SongsOfConquestAccess.Adapters;
 using SongsOfConquestAccess.UI;
 using SongsOfConquestAccess.UI.Graph;
 using UnityEngine;
-using Zenject;
 
 namespace SongsOfConquestAccess.Screens
 {
@@ -33,41 +31,24 @@ namespace SongsOfConquestAccess.Screens
     {
         private const string DialogStop = "world-confirm-menu";
 
-        private static readonly System.Reflection.PropertyInfo InstallerContainerProperty =
-            AccessTools.Property(typeof(WorldConfirmMenuInstaller), "Container");
-
         // A subject of its own for each node the menu gives no component for, so that two nodes
         // sharing one subject do not collapse onto whichever was declared first (the reconciler seats
         // the cursor by subject before it looks at the structural key).
         private readonly object _headingKey = new object();
         private readonly object _bodyKey = new object();
 
-        /// <summary>After a hot reload: point the slot at the menu already showing.
-        /// Scanned once, from <c>ScreenDetector.RecoverRuntimeState</c>.</summary>
-        public static void Recover()
+        /// <summary>The one world confirm window the adventure scene holds for the whole game.</summary>
+        private readonly ScreenSource<IWorldConfirmMenu> _source =
+            ScreenSource<IWorldConfirmMenu>.FromScene(LoadedScenes.AdventureScene);
+
+        protected override object ResolveMenu()
         {
-            Recovered<WorldConfirmMenuScreen>(FindActive());
+            return _source.Current;
         }
 
-        public static WorldConfirmMenuAdapter FindActive()
+        protected override WorldConfirmMenuAdapter Adapt(object menu)
         {
-            WorldConfirmMenuInstaller[] installers = Resources.FindObjectsOfTypeAll<WorldConfirmMenuInstaller>();
-            for (int i = 0; i < installers.Length; i++)
-            {
-                WorldConfirmMenu menu = TryResolveWorldConfirmMenu(installers[i]);
-                if (menu == null)
-                {
-                    continue;
-                }
-
-                WorldConfirmMenuAdapter adapter = new WorldConfirmMenuAdapter(menu);
-                if (adapter.IsPresent())
-                {
-                    return (adapter);
-                }
-            }
-
-            return null;
+            return new WorldConfirmMenuAdapter((WorldConfirmMenu)menu);
         }
 
         public override string Key
@@ -94,6 +75,7 @@ namespace SongsOfConquestAccess.Screens
 
         public override bool IsActive()
         {
+            SyncLive();
             return Live != null && Live.IsPresent();
         }
 
@@ -246,38 +228,5 @@ namespace SongsOfConquestAccess.Screens
             }
         }
 
-        private static WorldConfirmMenu TryResolveWorldConfirmMenu(WorldConfirmMenuInstaller installer)
-        {
-            if (!IsLiveSceneInstaller(installer) || InstallerContainerProperty == null)
-            {
-                return null;
-            }
-
-            DiContainer container = InstallerContainerProperty.GetValue(installer, null) as DiContainer;
-            if (container == null)
-            {
-                return null;
-            }
-
-            try
-            {
-                return container.Resolve<WorldConfirmMenu>();
-            }
-            catch (Exception)
-            {
-                return null;
-            }
-        }
-
-        private static bool IsLiveSceneInstaller(WorldConfirmMenuInstaller installer)
-        {
-            if (installer == null)
-            {
-                return false;
-            }
-
-            GameObject gameObject = installer.gameObject;
-            return gameObject != null && gameObject.scene.IsValid() && gameObject.scene.isLoaded;
-        }
     }
 }

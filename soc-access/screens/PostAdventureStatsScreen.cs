@@ -54,27 +54,18 @@ namespace SongsOfConquestAccess.Screens
         // cursor on the same one: the menu gives no component the screen can key its figures on.
         private readonly Dictionary<string, object> _markers = new Dictionary<string, object>();
 
-        /// <summary>After a hot reload: point the slot at the menu already showing.
-        /// Scanned once, from <c>ScreenDetector.RecoverRuntimeState</c>.</summary>
-        public static void Recover()
+        /// <summary>The one post-adventure stats window the adventure scene holds for the whole game.</summary>
+        private readonly ScreenSource<IPostAdventureStatsMenu> _source =
+            ScreenSource<IPostAdventureStatsMenu>.FromScene(LoadedScenes.AdventureScene);
+
+        protected override object ResolveMenu()
         {
-            Recovered<PostAdventureStatsScreen>(FindActive());
+            return _source.Current;
         }
 
-        public static PostAdventureStatsAdapter FindActive()
+        protected override PostAdventureStatsAdapter Adapt(object menu)
         {
-            PostAdventureMenu[] resultMenus = Resources.FindObjectsOfTypeAll<PostAdventureMenu>();
-            for (int i = 0; i < resultMenus.Length; i++)
-            {
-                PostAdventureStatsMenu statsMenu = GetStatsMenu(resultMenus[i]);
-                PostAdventureStatsAdapter adapter = new PostAdventureStatsAdapter(statsMenu);
-                if (adapter.IsPresent())
-                {
-                    return (adapter);
-                }
-            }
-
-            return null;
+            return new PostAdventureStatsAdapter((PostAdventureStatsMenu)menu);
         }
 
         public override string Key
@@ -100,6 +91,7 @@ namespace SongsOfConquestAccess.Screens
 
         public override bool IsActive()
         {
+            SyncLive();
             return Live != null && Live.IsPresent();
         }
 

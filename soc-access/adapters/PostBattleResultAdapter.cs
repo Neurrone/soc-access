@@ -101,14 +101,28 @@ namespace SongsOfConquestAccess.Adapters
             get { return GetText(DefenderNameField); }
         }
 
+        // Resolving a portrait walks the menu's parents and the scene root, so each side is looked
+        // for ONCE per menu, hit or miss: a defender without a commander has no portrait to find,
+        // and the search would otherwise run again every frame.
+        private CommanderHudPortraitAdapter _attackerPortrait;
+        private bool _attackerPortraitProbed;
+        private CommanderHudPortraitAdapter _defenderPortrait;
+        private bool _defenderPortraitProbed;
+
         public CommanderHudPortraitAdapter AttackerCommanderPortrait
         {
             get
             {
-                return BuildCommanderPortrait(
-                    "post-battle-attacker-commander",
-                    () => AttackerCommanderText,
-                    "AttackerCommanderHudPortrait");
+                if (!_attackerPortraitProbed)
+                {
+                    _attackerPortraitProbed = true;
+                    _attackerPortrait = BuildCommanderPortrait(
+                        "post-battle-attacker-commander",
+                        () => AttackerCommanderText,
+                        "AttackerCommanderHudPortrait");
+                }
+
+                return _attackerPortrait;
             }
         }
 
@@ -116,10 +130,16 @@ namespace SongsOfConquestAccess.Adapters
         {
             get
             {
-                return BuildCommanderPortrait(
-                    "post-battle-defender-commander",
-                    () => DefenderCommanderText,
-                    "DefenderCommanderHudPortrait");
+                if (!_defenderPortraitProbed)
+                {
+                    _defenderPortraitProbed = true;
+                    _defenderPortrait = BuildCommanderPortrait(
+                        "post-battle-defender-commander",
+                        () => DefenderCommanderText,
+                        "DefenderCommanderHudPortrait");
+                }
+
+                return _defenderPortrait;
             }
         }
 

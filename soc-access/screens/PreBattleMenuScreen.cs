@@ -103,13 +103,6 @@ namespace SongsOfConquestAccess.Screens
         // passively: baselined on arrival, so only a CHANGE is spoken.
         private string _instruction;
 
-        /// <summary>After a hot reload: point the slot at the placement menu already showing.
-        /// Scanned once, from <c>ScreenDetector.RecoverRuntimeState</c>.</summary>
-        public static void Recover()
-        {
-            Recovered<PreBattleMenuScreen>(FindActive());
-        }
-
         /// <summary>The cursor is built over one placement: a new one gets a new grid.</summary>
         private TroopPlacementHexGrid HexGrid()
         {
@@ -123,25 +116,29 @@ namespace SongsOfConquestAccess.Screens
             return _hexGrid;
         }
 
-        public static PreBattleMenuAdapter FindActive()
+        // The battle menu the adventure scene binds, and the placement page it holds in its
+        // settings: the page is a child of one menu that lives for the whole game, so it is read
+        // through its owner rather than looked for (AGENTS.md, "Screen Resolution").
+        private readonly ScreenSource<IAdventureBattleMenu> _battleMenu =
+            ScreenSource<IAdventureBattleMenu>.FromScene(LoadedScenes.AdventureScene);
+
+        private readonly ScreenSource<PreBattleMenu> _source;
+
+        public PreBattleMenuScreen()
         {
-            PreBattleMenu[] menus = Resources.FindObjectsOfTypeAll<PreBattleMenu>();
-            for (int i = 0; i < menus.Length; i++)
-            {
-                PreBattleMenu menu = menus[i];
-                if (menu == null || menu.gameObject == null || !menu.gameObject.scene.IsValid() || !menu.gameObject.scene.isLoaded)
-                {
-                    continue;
-                }
+            _source = ScreenSource<PreBattleMenu>.FromOwner(
+                _battleMenu,
+                battleMenu => PreBattleMenuAdapter.GetPreBattleMenu((AdventureBattleMenu)battleMenu));
+        }
 
-                PreBattleMenuAdapter adapter = new PreBattleMenuAdapter(menu);
-                if (adapter.IsPresent())
-                {
-                    return adapter;
-                }
-            }
+        protected override object ResolveMenu()
+        {
+            return _source.Current;
+        }
 
-            return null;
+        protected override PreBattleMenuAdapter Adapt(object menu)
+        {
+            return new PreBattleMenuAdapter((PreBattleMenu)menu);
         }
 
         public override string Key
@@ -169,11 +166,17 @@ namespace SongsOfConquestAccess.Screens
 
         public override bool IsActive()
         {
+            SyncLive();
             return Live != null && Live.IsPresent();
         }
 
         public override void OnPush()
         {
+            // A FRESH CURSOR PER VISIT: the adapter lives as long as the placement menu
+            // object, which outlives one battle, so the board cursor is dropped here
+            // rather than when the slot changes.
+            _hexGrid = null;
+            _hexGridAdapter = null;
             _deploymentChangedHandler = HandleDeploymentChanged;
             Live?.AddDeploymentChangedHandler(_deploymentChangedHandler);
             _instruction = Live != null ? Live.InstructionText : null;

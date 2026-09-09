@@ -124,6 +124,26 @@ namespace SongsOfConquestAccess.Adapters
             }
         }
 
+        // The stage this encounter was last seen in. It belongs to the adapter because it is about
+        // THIS menu instance: a new encounter gets a new adapter and so starts at None, which is why
+        // nothing has to reset it (AGENTS.md, "Screen Resolution").
+        private HostileJoinMenuStage _seenStage;
+
+        /// <summary>Whether the menu has swapped one of its two shapes for the other since this was
+        /// last asked, which is the moment a page built over the old shape stops meaning anything.
+        /// </summary>
+        public bool TakeStageChange()
+        {
+            HostileJoinMenuStage stage = Stage;
+            if (stage == _seenStage)
+            {
+                return false;
+            }
+
+            _seenStage = stage;
+            return true;
+        }
+
         /// <summary>The title the menu writes over the window, the same in both stages.</summary>
         public string Title
         {

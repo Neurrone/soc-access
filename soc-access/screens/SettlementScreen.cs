@@ -49,26 +49,18 @@ namespace SongsOfConquestAccess.Screens
         private const string WielderKey = "settlement:wielder";
         private const string SettlementArmyKey = "settlement:army";
 
-        /// <summary>After a hot reload: point the slot at the menu already showing.
-        /// Scanned once, from <c>ScreenDetector.RecoverRuntimeState</c>.</summary>
-        public static void Recover()
+        /// <summary>The one settlement window the adventure scene holds for the whole game.</summary>
+        private readonly ScreenSource<TownInteractionMenu> _source =
+            ScreenSource<TownInteractionMenu>.FromScene(LoadedScenes.AdventureScene);
+
+        protected override object ResolveMenu()
         {
-            Recovered<SettlementScreen>(FindActive());
+            return _source.Current;
         }
 
-        public static TownInteractionMenuAdapter FindActive()
+        protected override TownInteractionMenuAdapter Adapt(object menu)
         {
-            TownInteractionMenu[] menus = Resources.FindObjectsOfTypeAll<TownInteractionMenu>();
-            for (int i = 0; i < menus.Length; i++)
-            {
-                TownInteractionMenuAdapter adapter = new TownInteractionMenuAdapter(menus[i]);
-                if (adapter.IsTopLevelPresent())
-                {
-                    return (adapter);
-                }
-            }
-
-            return null;
+            return new TownInteractionMenuAdapter((TownInteractionMenu)menu);
         }
 
         public override string Key
@@ -114,6 +106,7 @@ namespace SongsOfConquestAccess.Screens
 
         public override bool IsActive()
         {
+            SyncLive();
             return Live != null && Live.IsTopLevelPresent();
         }
 

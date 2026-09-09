@@ -1,13 +1,11 @@
 using System;
 using System.Collections.Generic;
-using HarmonyLib;
 using SongsOfConquest.Client.Adventure;
 using SongsOfConquestAccess.Adapters;
 using SongsOfConquestAccess.Localization;
 using SongsOfConquestAccess.UI;
 using SongsOfConquestAccess.UI.Graph;
 using UnityEngine;
-using Zenject;
 
 namespace SongsOfConquestAccess.Screens
 {
@@ -38,39 +36,22 @@ namespace SongsOfConquestAccess.Screens
         private const string CloseStop = "world-choice-close";
         private const string WielderKey = "world-choice:wielder";
 
-        private static readonly System.Reflection.PropertyInfo InstallerContainerProperty =
-            AccessTools.Property(typeof(WorldChoiceMenuInstaller), "Container");
-
         // A subject of its own for the body, which the menu draws as a plain text rather than as a
         // control, kept across rebuilds so the reconciler seats the cursor on the same one.
         private readonly object _bodyMarker = new object();
 
-        /// <summary>After a hot reload: point the slot at the menu already showing.
-        /// Scanned once, from <c>ScreenDetector.RecoverRuntimeState</c>.</summary>
-        public static void Recover()
+        /// <summary>The one world choice window the adventure scene holds for the whole game.</summary>
+        private readonly ScreenSource<IWorldChoiceMenu> _source =
+            ScreenSource<IWorldChoiceMenu>.FromScene(LoadedScenes.AdventureScene);
+
+        protected override object ResolveMenu()
         {
-            Recovered<WorldChoiceMenuScreen>(FindActive());
+            return _source.Current;
         }
 
-        public static WorldChoiceMenuAdapter FindActive()
+        protected override WorldChoiceMenuAdapter Adapt(object menu)
         {
-            WorldChoiceMenuInstaller[] installers = Resources.FindObjectsOfTypeAll<WorldChoiceMenuInstaller>();
-            for (int i = 0; i < installers.Length; i++)
-            {
-                WorldChoiceMenu menu = TryResolveWorldChoiceMenu(installers[i]);
-                if (menu == null)
-                {
-                    continue;
-                }
-
-                WorldChoiceMenuAdapter adapter = new WorldChoiceMenuAdapter(menu);
-                if (adapter.IsPresent())
-                {
-                    return (adapter);
-                }
-            }
-
-            return null;
+            return new WorldChoiceMenuAdapter((WorldChoiceMenu)menu);
         }
 
         public override string Key
@@ -102,6 +83,7 @@ namespace SongsOfConquestAccess.Screens
 
         public override bool IsActive()
         {
+            SyncLive();
             return Live != null && Live.IsPresent();
         }
 
@@ -239,38 +221,5 @@ namespace SongsOfConquestAccess.Screens
             }
         }
 
-        private static WorldChoiceMenu TryResolveWorldChoiceMenu(WorldChoiceMenuInstaller installer)
-        {
-            if (!IsLiveSceneInstaller(installer) || InstallerContainerProperty == null)
-            {
-                return null;
-            }
-
-            DiContainer container = InstallerContainerProperty.GetValue(installer, null) as DiContainer;
-            if (container == null)
-            {
-                return null;
-            }
-
-            try
-            {
-                return container.Resolve<WorldChoiceMenu>();
-            }
-            catch (Exception)
-            {
-                return null;
-            }
-        }
-
-        private static bool IsLiveSceneInstaller(WorldChoiceMenuInstaller installer)
-        {
-            if (installer == null)
-            {
-                return false;
-            }
-
-            GameObject gameObject = installer.gameObject;
-            return gameObject != null && gameObject.scene.IsValid() && gameObject.scene.isLoaded;
-        }
     }
 }

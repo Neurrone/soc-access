@@ -35,58 +35,6 @@ namespace SongsOfConquestAccess.Screens
     /// </summary>
     public sealed class UpgradeTroopsScreen : TroopManagementScreenBase
     {
-        /// <summary>After a hot reload: the three hosts that draw this page, tried in the order the
-        /// detector's own handlers would have written them. Scanned once, from
-        /// <c>ScreenDetector.RecoverRuntimeState</c>.</summary>
-        public static void Recover()
-        {
-            Recovered<UpgradeTroopsScreen>(FindActiveDwelling() ?? FindActiveSettlement() ?? FindActiveDefence());
-        }
-
-        public static ITroopManagementHostAdapter FindActiveDwelling()
-        {
-            DwellingInteractionMenu[] menus = Resources.FindObjectsOfTypeAll<DwellingInteractionMenu>();
-            for (int i = 0; i < menus.Length; i++)
-            {
-                DwellingInteractionMenuAdapter adapter = new DwellingInteractionMenuAdapter(menus[i]);
-                if (adapter.IsUpgradePresent())
-                {
-                    return new DwellingTroopManagementHostAdapter(adapter);
-                }
-            }
-
-            return null;
-        }
-
-        public static ITroopManagementHostAdapter FindActiveSettlement()
-        {
-            TownInteractionMenu[] menus = Resources.FindObjectsOfTypeAll<TownInteractionMenu>();
-            for (int i = 0; i < menus.Length; i++)
-            {
-                TownInteractionMenuAdapter adapter = new TownInteractionMenuAdapter(menus[i]);
-                if (adapter.IsUpgradePresent())
-                {
-                    return new SettlementTroopManagementHostAdapter(adapter);
-                }
-            }
-
-            return null;
-        }
-
-        public static ITroopManagementHostAdapter FindActiveDefence()
-        {
-            DefenceMenu[] menus = Resources.FindObjectsOfTypeAll<DefenceMenu>();
-            for (int i = 0; i < menus.Length; i++)
-            {
-                DefenceMenuAdapter adapter = new DefenceMenuAdapter(menus[i]);
-                if (adapter.IsUpgradePresent())
-                {
-                    return new DefenceTroopManagementHostAdapter(adapter);
-                }
-            }
-
-            return null;
-        }
 
         /// <summary>Where the upgrade cards' keys start, so the same prefix names them and finds the
         /// one the cursor is on.</summary>
@@ -103,9 +51,9 @@ namespace SongsOfConquestAccess.Screens
 
         protected override string ScreenSuffix { get { return "upgrade-troops"; } }
 
-        protected override bool IsContentPresent()
+        protected override bool IsContentPresent(ITroopManagementHostAdapter host)
         {
-            return Host != null && Host.IsUpgradePresent();
+            return host.IsUpgradePresent();
         }
 
         protected override void BuildContent(GraphBuilder builder)

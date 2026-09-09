@@ -1,13 +1,11 @@
 using System;
 using System.Collections.Generic;
-using HarmonyLib;
 using SongsOfConquest.Client.Adventure;
 using SongsOfConquestAccess.Adapters;
 using SongsOfConquestAccess.Localization;
 using SongsOfConquestAccess.UI;
 using SongsOfConquestAccess.UI.Graph;
 using UnityEngine;
-using Zenject;
 
 namespace SongsOfConquestAccess.Screens
 {
@@ -42,44 +40,23 @@ namespace SongsOfConquestAccess.Screens
         private const string WielderKey = "hostile-join:wielder";
         private const string JoiningKey = "hostile-join:joining";
 
-        private static readonly System.Reflection.PropertyInfo InstallerContainerProperty =
-            AccessTools.Property(typeof(HostileJoinMenuInstaller), "Container");
-
         // A subject of its own per synthesized node, kept across rebuilds so the reconciler seats the
         // cursor on the same one: the menu's two bodies of text are not drawn as controls.
         private readonly object _offerTextMarker = new object();
         private readonly object _joinTextMarker = new object();
 
-        private HostileJoinMenuStage _stage;
+        /// <summary>The one hostile join window the adventure scene holds for the whole game.</summary>
+        private readonly ScreenSource<IHostileJoinMenu> _source =
+            ScreenSource<IHostileJoinMenu>.FromScene(LoadedScenes.AdventureScene);
 
-        /// <summary>After a hot reload: point the slot at the menu already showing.
-        /// Scanned once, from <c>ScreenDetector.RecoverRuntimeState</c>.</summary>
-        public static void Recover()
+        protected override object ResolveMenu()
         {
-            Recovered<HostileJoinMenuScreen>(FindActive());
+            return _source.Current;
         }
 
-        public static HostileJoinMenuAdapter FindActive()
+        protected override HostileJoinMenuAdapter Adapt(object menu)
         {
-            HostileJoinMenuInstaller[] installers = Resources.FindObjectsOfTypeAll<HostileJoinMenuInstaller>();
-            for (int i = 0; i < installers.Length; i++)
-            {
-                HostileJoinMenu menu = TryResolveHostileJoinMenu(installers[i]);
-                if (menu == null)
-                {
-                    continue;
-                }
-
-                HostileJoinMenuAdapter adapter = new HostileJoinMenuAdapter(menu);
-                if (adapter.IsPresent())
-                {
-                    return (adapter);
-                }
-
-                adapter.Dispose();
-            }
-
-            return null;
+            return new HostileJoinMenuAdapter((HostileJoinMenu)menu);
         }
 
         public override string Key
@@ -114,30 +91,23 @@ namespace SongsOfConquestAccess.Screens
 
         public override bool IsActive()
         {
+            SyncLive();
             return Live != null && Live.IsPresent();
-        }
-
-        /// <summary>A different menu is in the slot, so the stage the last one ended on says nothing
-        /// about this one: kept, it would swallow the first transition of the new encounter.</summary>
-        public override void OnLiveChanged(HostileJoinMenuAdapter previous)
-        {
-            _stage = HostileJoinMenuStage.None;
         }
 
         /// <summary>The stage is read off the game every frame rather than waited for: the menu swaps
         /// one whole page for the other in place, and the cursor is given up when it does. The graph
-        /// is declared afresh on every operation, so there is nothing else to do.</summary>
+        /// is declared afresh on every operation, so there is nothing else to do. The stage last seen
+        /// lives on the adapter, which lasts exactly as long as the encounter does.</summary>
         public override void OnUpdate()
         {
             base.OnUpdate();
 
-            HostileJoinMenuStage stage = Live == null ? HostileJoinMenuStage.None : Live.Stage;
-            if (stage == _stage)
+            if (Live == null || !Live.TakeStageChange())
             {
                 return;
             }
 
-            _stage = stage;
             GraphNavigator navigator = Navigator;
             if (navigator != null && ReferenceEquals(navigator.Screen, this))
             {
@@ -320,38 +290,5 @@ namespace SongsOfConquestAccess.Screens
             builder.AddItem(new DrawnNode(ControlId.For(button, "hostile-join:done"), vtable, button));
         }
 
-        private static HostileJoinMenu TryResolveHostileJoinMenu(HostileJoinMenuInstaller installer)
-        {
-            if (!IsLiveSceneInstaller(installer) || InstallerContainerProperty == null)
-            {
-                return null;
-            }
-
-            DiContainer container = InstallerContainerProperty.GetValue(installer, null) as DiContainer;
-            if (container == null)
-            {
-                return null;
-            }
-
-            try
-            {
-                return container.Resolve<HostileJoinMenu>();
-            }
-            catch (Exception)
-            {
-                return null;
-            }
-        }
-
-        private static bool IsLiveSceneInstaller(HostileJoinMenuInstaller installer)
-        {
-            if (installer == null)
-            {
-                return false;
-            }
-
-            GameObject gameObject = installer.gameObject;
-            return gameObject != null && gameObject.scene.IsValid() && gameObject.scene.isLoaded;
-        }
     }
 }

@@ -40,26 +40,18 @@ namespace SongsOfConquestAccess.Screens
         private const string KeyPrefix = "rally-point";
         private const string WielderKey = "rally-point:wielder";
 
-        /// <summary>After a hot reload: point the slot at the menu already showing.
-        /// Scanned once, from <c>ScreenDetector.RecoverRuntimeState</c>.</summary>
-        public static void Recover()
+        /// <summary>The one rally point window the adventure scene holds for the whole game.</summary>
+        private readonly ScreenSource<RallyPointInteractionMenu> _source =
+            ScreenSource<RallyPointInteractionMenu>.FromScene(LoadedScenes.AdventureScene);
+
+        protected override object ResolveMenu()
         {
-            Recovered<RallyPointScreen>(FindActive());
+            return _source.Current;
         }
 
-        public static RallyPointInteractionMenuAdapter FindActive()
+        protected override RallyPointInteractionMenuAdapter Adapt(object menu)
         {
-            RallyPointInteractionMenu[] menus = Resources.FindObjectsOfTypeAll<RallyPointInteractionMenu>();
-            for (int i = 0; i < menus.Length; i++)
-            {
-                RallyPointInteractionMenuAdapter adapter = new RallyPointInteractionMenuAdapter(menus[i]);
-                if (adapter.IsPresent())
-                {
-                    return (adapter);
-                }
-            }
-
-            return null;
+            return new RallyPointInteractionMenuAdapter((RallyPointInteractionMenu)menu);
         }
 
         public override string Key
@@ -86,6 +78,7 @@ namespace SongsOfConquestAccess.Screens
 
         public override bool IsActive()
         {
+            SyncLive();
             return Live != null && Live.IsPresent();
         }
 

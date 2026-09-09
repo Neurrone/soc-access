@@ -1,3 +1,4 @@
+using SongsOfConquest.Client.Adventure;
 using SongsOfConquestAccess.Adapters;
 using SongsOfConquestAccess.Localization;
 using SongsOfConquestAccess.UI;
@@ -45,7 +46,45 @@ namespace SongsOfConquestAccess.Screens
         /// <summary>What this page is, in control keys: "draft-troops" or "upgrade-troops".</summary>
         protected abstract string ScreenSuffix { get; }
 
-        protected abstract bool IsContentPresent();
+        /// <summary>Whether this host is drawing THIS page now, read off the game.</summary>
+        protected abstract bool IsContentPresent(ITroopManagementHostAdapter host);
+
+        // The three menus that draw this page, each resolved from the adventure scene's container
+        // and adapted once per menu instance. The page belongs to whichever of them is drawing it,
+        // asked in the order the detector's own handlers used to write them; nothing is remembered,
+        // so a host going back to its landing page empties the slot on the next tick.
+        private readonly AdaptedSource<DwellingInteractionMenu, ITroopManagementHostAdapter> _dwelling =
+            new AdaptedSource<DwellingInteractionMenu, ITroopManagementHostAdapter>(
+                ScreenSource<DwellingInteractionMenu>.FromScene(LoadedScenes.AdventureScene),
+                menu => new DwellingTroopManagementHostAdapter(new DwellingInteractionMenuAdapter(menu)));
+
+        private readonly AdaptedSource<TownInteractionMenu, ITroopManagementHostAdapter> _settlement =
+            new AdaptedSource<TownInteractionMenu, ITroopManagementHostAdapter>(
+                ScreenSource<TownInteractionMenu>.FromScene(LoadedScenes.AdventureScene),
+                menu => new SettlementTroopManagementHostAdapter(new TownInteractionMenuAdapter(menu)));
+
+        private readonly AdaptedSource<DefenceMenu, ITroopManagementHostAdapter> _defence =
+            new AdaptedSource<DefenceMenu, ITroopManagementHostAdapter>(
+                ScreenSource<DefenceMenu>.FromScene(LoadedScenes.AdventureScene),
+                menu => new DefenceTroopManagementHostAdapter(new DefenceMenuAdapter(menu)));
+
+        /// <summary>The host adapter itself is what the slot holds here: the three hosts are three
+        /// different menus behind one page, so the "menu" a source answers with IS the adapter over
+        /// it, built once per menu instance.</summary>
+        protected override object ResolveMenu()
+        {
+            return Drawing(_dwelling.Current) ?? Drawing(_settlement.Current) ?? Drawing(_defence.Current);
+        }
+
+        protected override ITroopManagementHostAdapter Adapt(object menu)
+        {
+            return (ITroopManagementHostAdapter)menu;
+        }
+
+        private ITroopManagementHostAdapter Drawing(ITroopManagementHostAdapter host)
+        {
+            return host != null && IsContentPresent(host) ? host : null;
+        }
 
         /// <summary>The page itself, declared into the stop the base has already opened.</summary>
         protected abstract void BuildContent(GraphBuilder builder);
@@ -72,7 +111,8 @@ namespace SongsOfConquestAccess.Screens
 
         public override bool IsActive()
         {
-            return Live != null && IsContentPresent();
+            SyncLive();
+            return Live != null && IsContentPresent(Live);
         }
 
         public override void Build(GraphBuilder builder)

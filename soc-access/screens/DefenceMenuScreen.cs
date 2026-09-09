@@ -43,26 +43,18 @@ namespace SongsOfConquestAccess.Screens
         private const string WielderKey = "defences:wielder";
         private const string SettlementArmyKey = "defences:army";
 
-        /// <summary>After a hot reload: point the slot at the menu already showing.
-        /// Scanned once, from <c>ScreenDetector.RecoverRuntimeState</c>.</summary>
-        public static void Recover()
+        /// <summary>The one defence window the adventure scene holds for the whole game.</summary>
+        private readonly ScreenSource<DefenceMenu> _source =
+            ScreenSource<DefenceMenu>.FromScene(LoadedScenes.AdventureScene);
+
+        protected override object ResolveMenu()
         {
-            Recovered<DefenceMenuScreen>(FindActive());
+            return _source.Current;
         }
 
-        public static DefenceMenuAdapter FindActive()
+        protected override DefenceMenuAdapter Adapt(object menu)
         {
-            DefenceMenu[] menus = Resources.FindObjectsOfTypeAll<DefenceMenu>();
-            for (int i = 0; i < menus.Length; i++)
-            {
-                DefenceMenuAdapter adapter = new DefenceMenuAdapter(menus[i]);
-                if (adapter.IsTopLevelPresent())
-                {
-                    return (adapter);
-                }
-            }
-
-            return null;
+            return new DefenceMenuAdapter((DefenceMenu)menu);
         }
 
         public override string Key
@@ -108,6 +100,7 @@ namespace SongsOfConquestAccess.Screens
 
         public override bool IsActive()
         {
+            SyncLive();
             return Live != null && Live.IsTopLevelPresent();
         }
 

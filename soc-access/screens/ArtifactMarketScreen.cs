@@ -80,26 +80,18 @@ namespace SongsOfConquestAccess.Screens
         // controls of their own.
         private readonly Dictionary<string, object> _markers = new Dictionary<string, object>();
 
-        /// <summary>After a hot reload: point the slot at the menu already showing.
-        /// Scanned once, from <c>ScreenDetector.RecoverRuntimeState</c>.</summary>
-        public static void Recover()
+        /// <summary>The one artifact market the adventure scene holds for the whole game.</summary>
+        private readonly ScreenSource<ArtifactMarketMenu> _source =
+            ScreenSource<ArtifactMarketMenu>.FromScene(LoadedScenes.AdventureScene);
+
+        protected override object ResolveMenu()
         {
-            Recovered<ArtifactMarketScreen>(FindActive());
+            return _source.Current;
         }
 
-        public static ArtifactMarketMenuAdapter FindActive()
+        protected override ArtifactMarketMenuAdapter Adapt(object menu)
         {
-            ArtifactMarketMenu[] menus = Resources.FindObjectsOfTypeAll<ArtifactMarketMenu>();
-            for (int i = 0; i < menus.Length; i++)
-            {
-                ArtifactMarketMenuAdapter adapter = new ArtifactMarketMenuAdapter(menus[i]);
-                if (adapter.IsPresent())
-                {
-                    return (adapter);
-                }
-            }
-
-            return null;
+            return new ArtifactMarketMenuAdapter((ArtifactMarketMenu)menu);
         }
 
         public override string Key
@@ -128,6 +120,7 @@ namespace SongsOfConquestAccess.Screens
 
         public override bool IsActive()
         {
+            SyncLive();
             return Live != null && Live.IsPresent();
         }
 

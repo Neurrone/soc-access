@@ -14,6 +14,10 @@ namespace SongsOfConquestAccess.Screens
     /// </summary>
     public static class LoadedScenes
     {
+        /// <summary>The adventure scene, which holds the map and every menu bound in its container.
+        /// </summary>
+        public const string AdventureScene = "AdventureScene";
+
         private static int _frame = -1;
         private static int _key;
 
@@ -284,6 +288,47 @@ namespace SongsOfConquestAccess.Screens
             }
 
             return false;
+        }
+    }
+
+    /// <summary>
+    /// A source and the adapter over what it finds, paired: the adapter is built once per object the
+    /// source answers with and kept while it keeps answering with the same one, so a screen with
+    /// SEVERAL sources can ask each of them "are you the one drawing" without building an adapter a
+    /// frame. The pairing is keyed on the object read from the game, so a menu the game replaces
+    /// gets a new adapter and nothing has to be reset (AGENTS.md, "Screen Resolution").
+    ///
+    /// Not for an adapter the slot disposes: the pairing would hand out the disposed one again.
+    /// </summary>
+    public sealed class AdaptedSource<TMenu, TAdapter>
+        where TMenu : class
+        where TAdapter : class
+    {
+        private readonly ScreenSource<TMenu> _source;
+        private readonly Func<TMenu, TAdapter> _adapt;
+        private TMenu _of;
+        private TAdapter _adapter;
+
+        public AdaptedSource(ScreenSource<TMenu> source, Func<TMenu, TAdapter> adapt)
+        {
+            _source = source;
+            _adapt = adapt;
+        }
+
+        /// <summary>The adapter over what the source finds now, or null.</summary>
+        public TAdapter Current
+        {
+            get
+            {
+                TMenu menu = _source.Current;
+                if (!ReferenceEquals(menu, _of))
+                {
+                    _of = menu;
+                    _adapter = menu == null ? null : _adapt(menu);
+                }
+
+                return _adapter;
+            }
         }
     }
 }

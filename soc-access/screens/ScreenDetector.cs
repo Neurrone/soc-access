@@ -5,7 +5,6 @@ using SongsOfConquest.Client.Adventure;
 using SongsOfConquest.Client.Adventure.Menu;
 using SongsOfConquest.Client.Adventure.Menu.Lobby;
 using SongsOfConquest.Client.Adventure.UI;
-using SongsOfConquest.Client.Adventure.UI.Trading;
 using SongsOfConquest.Client.Adventure.View;
 using SongsOfConquest.Client.Battle;
 using SongsOfConquest.Client.Battle.Facade;
@@ -13,7 +12,6 @@ using SongsOfConquest.Client.Gamestate;
 using SongsOfConquest.Client.Menu;
 using SongsOfConquest.Client.Menu.Loading;
 using SongsOfConquest.Client.Menu.Main;
-using SongsOfConquest.Client.Menu.Options;
 using SongsOfConquest.Client.Menu.Popup;
 using SongsOfConquest.Client.UI;
 using SongsOfConquest.Common.Entities.Adventure;
@@ -35,6 +33,10 @@ namespace SongsOfConquestAccess.Screens
     /// answers by layer. A handler that used to push, pop or refresh a screen now only writes what
     /// the screen is reading, which is why a menu the game closed without telling us cannot strand
     /// the mod on a dead page.
+    ///
+    /// SHRINKING: a screen that resolves its own menu (AGENTS.md, "Screen Resolution") has no handler
+    /// here at all. What is left are the screens that have not moved yet and the events that are not
+    /// readiness - the story trigger, the lobby's dropdown, the community maps refreshes.
     /// </summary>
     public sealed class ScreenDetector
     {
@@ -236,49 +238,6 @@ namespace SongsOfConquestAccess.Screens
             Reg<MarketplaceScreen>()?.Forget();
         }
 
-        public void OnArtifactMarketReady(ArtifactMarketMenu menu)
-        {
-            ArtifactMarketMenuAdapter adapter = new ArtifactMarketMenuAdapter(menu);
-            if (adapter.IsPresent())
-            {
-                Reg<ArtifactMarketScreen>()?.Show(adapter);
-            }
-        }
-
-        public void OnArtifactMarketClosed(ArtifactMarketMenu menu)
-        {
-            // ArtifactMarketMenu.Close is a possible-close signal, not proof that the window was open:
-            // the game also calls it from Start() and HideAll() while cleaning up inactive menus. The
-            // slot going empty costs nothing when the window was never up.
-            Reg<ArtifactMarketScreen>()?.Forget();
-        }
-
-        public void OnMapEntityMiniMenuReady(MapEntityMiniMenu menu)
-        {
-            MapEntityMiniMenuAdapter adapter = new MapEntityMiniMenuAdapter(menu);
-            if (adapter.IsPresent())
-            {
-                Reg<MapEntityMiniMenuScreen>()?.Show(adapter);
-            }
-        }
-
-        public void OnMapEntityMiniMenuClosed(MapEntityMiniMenu menu)
-        {
-            // Selling a building closes the native mini menu from inside the confirm popup's async
-            // callback, while the dialog is still up over it.
-            Reg<MapEntityMiniMenuScreen>()?.Forget();
-        }
-
-        public void OnTradingMenuReady(TradingMenu menu)
-        {
-            Reg<TradingScreen>()?.Show(new TradingMenuAdapter(menu));
-        }
-
-        public void OnTradingMenuClosed(TradingMenu menu)
-        {
-            Reg<TradingScreen>()?.Forget();
-        }
-
         public void OnCommanderSheetReady(CommanderSheet commanderSheet)
         {
             Reg<CommanderSheetScreen>()?.Show(new CommanderSheetAdapter(commanderSheet));
@@ -299,48 +258,6 @@ namespace SongsOfConquestAccess.Screens
             Reg<SpellbookScreen>()?.Forget();
         }
 
-        public void OnLevelUpMenuReady(CommanderLevelUpMenu menu)
-        {
-            Reg<LevelUpScreen>()?.Show(new LevelUpMenuAdapter(menu));
-        }
-
-        public void OnLevelUpMenuClosed(CommanderLevelUpMenu menu)
-        {
-            Reg<LevelUpScreen>()?.Forget();
-        }
-
-        public void OnHostileJoinMenuChanged(HostileJoinMenu menu)
-        {
-            HostileJoinMenuAdapter adapter = new HostileJoinMenuAdapter(menu);
-            if (!adapter.IsPresent())
-            {
-                adapter.Dispose();
-                return;
-            }
-
-            HostileJoinMenuScreen screen = Reg<HostileJoinMenuScreen>();
-            if (screen == null)
-            {
-                adapter.Dispose();
-                return;
-            }
-
-            if (screen.Live == null)
-            {
-                screen.Live = adapter;
-                return;
-            }
-
-            // The menu walks through its stages in place: the screen keeps the adapter it has and
-            // watches the game's own stage itself, so there is nothing to tell it.
-            adapter.Dispose();
-        }
-
-        public void OnHostileJoinMenuClosed(HostileJoinMenu menu)
-        {
-            Reg<HostileJoinMenuScreen>()?.Forget();
-        }
-
         public void OnMoveTroopPopupReady(TroopHUDEntryMovable movable)
         {
             Reg<MoveTroopPopupScreen>()?.Show(new MoveTroopPopupAdapter(movable));
@@ -351,44 +268,6 @@ namespace SongsOfConquestAccess.Screens
             // The game calls TroopHUDEntryMovable.Reset even when the troop move popup is not open,
             // such as during HUD teardown and refresh; an empty slot emptied again costs nothing.
             Reg<MoveTroopPopupScreen>()?.Forget();
-        }
-
-        public void OnWorldChoiceMenuReady(WorldChoiceMenu menu)
-        {
-            Reg<WorldChoiceMenuScreen>()?.Show(new WorldChoiceMenuAdapter(menu));
-        }
-
-        public void OnWorldChoiceMenuClosed(WorldChoiceMenu menu)
-        {
-            Reg<WorldChoiceMenuScreen>()?.Forget();
-        }
-
-        public void OnWorldConfirmMenuReady(WorldConfirmMenu menu)
-        {
-            Reg<WorldConfirmMenuScreen>()?.Show(new WorldConfirmMenuAdapter(menu));
-        }
-
-        public void OnWorldConfirmMenuClosed(WorldConfirmMenu menu)
-        {
-            Reg<WorldConfirmMenuScreen>()?.Forget();
-        }
-
-        public void OnClaimMenuReady(ClaimMenu menu)
-        {
-            ClaimMenuAdapter adapter = new ClaimMenuAdapter(menu);
-            if (adapter.IsPresent())
-            {
-                Reg<ClaimMenuScreen>()?.Show(adapter);
-            }
-        }
-
-        public void OnClaimMenuClosed(ClaimMenu menu)
-        {
-            ClaimMenuScreen screen = Reg<ClaimMenuScreen>();
-            if (screen != null && (menu == null || screen.Matches(menu)))
-            {
-                screen.Forget();
-            }
         }
 
         public void OnPlayerStatsReady(PlayerStatsMenuNavigation menu)
@@ -403,35 +282,6 @@ namespace SongsOfConquestAccess.Screens
         public void OnPlayerStatsClosed(PlayerStatsMenuNavigation menu)
         {
             Reg<PlayerStatsScreen>()?.Forget();
-        }
-
-        public void OnPurchaseWielderReady(PurchaseWielderMenu menu)
-        {
-            PurchaseWielderMenuAdapter adapter = new PurchaseWielderMenuAdapter(menu);
-            if (adapter.IsPresent())
-            {
-                Reg<PurchaseWielderScreen>()?.Show(adapter);
-            }
-        }
-
-        public void OnPurchaseWielderClosed(PurchaseWielderMenu menu)
-        {
-            PurchaseWielderScreen screen = Reg<PurchaseWielderScreen>();
-            if (screen != null
-                && (menu == null || (screen.Live != null && ReferenceEquals(screen.Live.Source, menu))))
-            {
-                screen.Forget();
-            }
-        }
-
-        public void OnBuildMenuReady(BuildMenu menu)
-        {
-            Reg<BuildMenuScreen>()?.Show(new BuildMenuAdapter(menu));
-        }
-
-        public void OnBuildMenuClosed(BuildMenu menu)
-        {
-            Reg<BuildMenuScreen>()?.Forget();
         }
 
         public void OnResearchMenuReady(ResearchMenu menu)
@@ -449,116 +299,6 @@ namespace SongsOfConquestAccess.Screens
         }
 
         // ---- the settlement, the dwelling and the defence menu, with their two sub-pages ----
-
-        public void OnSettlementReady(TownInteractionMenu menu)
-        {
-            Reg<SettlementScreen>()?.Show(new TownInteractionMenuAdapter(menu));
-        }
-
-        public void OnSettlementDraftReady(TownInteractionMenu menu)
-        {
-            Reg<DraftTroopsScreen>()?.Show(
-                new SettlementTroopManagementHostAdapter(new TownInteractionMenuAdapter(menu)));
-        }
-
-        public void OnSettlementUpgradeReady(TownInteractionMenu menu)
-        {
-            Reg<UpgradeTroopsScreen>()?.Show(
-                new SettlementTroopManagementHostAdapter(new TownInteractionMenuAdapter(menu)));
-        }
-
-        public void OnSettlementBackToTop(TownInteractionMenu menu)
-        {
-            ForgetTroopPages("settlement");
-            Reg<SettlementScreen>()?.Show(new TownInteractionMenuAdapter(menu));
-        }
-
-        public void OnSettlementClosed(TownInteractionMenu menu)
-        {
-            ForgetTroopPages("settlement");
-            Reg<SettlementScreen>()?.Forget();
-        }
-
-        public void OnDefenceMenuReady(DefenceMenu menu)
-        {
-            Reg<DefenceMenuScreen>()?.Show(new DefenceMenuAdapter(menu));
-        }
-
-        public void OnDefenceDraftReady(DefenceMenu menu)
-        {
-            Reg<DraftTroopsScreen>()?.Show(
-                new DefenceTroopManagementHostAdapter(new DefenceMenuAdapter(menu)));
-        }
-
-        public void OnDefenceUpgradeReady(DefenceMenu menu)
-        {
-            Reg<UpgradeTroopsScreen>()?.Show(
-                new DefenceTroopManagementHostAdapter(new DefenceMenuAdapter(menu)));
-        }
-
-        public void OnDefenceMenuBackToTop(DefenceMenu menu)
-        {
-            ForgetTroopPages("defences");
-            Reg<DefenceMenuScreen>()?.Show(new DefenceMenuAdapter(menu));
-        }
-
-        public void OnDefenceMenuClosed(DefenceMenu menu)
-        {
-            ForgetTroopPages("defences");
-            Reg<DefenceMenuScreen>()?.Forget();
-        }
-
-        public void OnDwellingInteractionReady(DwellingInteractionMenu menu)
-        {
-            Reg<DraftTroopsScreen>()?.Show(
-                new DwellingTroopManagementHostAdapter(new DwellingInteractionMenuAdapter(menu)));
-        }
-
-        public void OnDwellingUpgradeReady(DwellingInteractionMenu menu)
-        {
-            Reg<UpgradeTroopsScreen>()?.Show(
-                new DwellingTroopManagementHostAdapter(new DwellingInteractionMenuAdapter(menu)));
-        }
-
-        public void OnDwellingBackToTop(DwellingInteractionMenu menu)
-        {
-            ForgetTroopPages("dwelling");
-            Reg<DraftTroopsScreen>()?.Show(
-                new DwellingTroopManagementHostAdapter(new DwellingInteractionMenuAdapter(menu)));
-        }
-
-        public void OnDwellingInteractionClosed(DwellingInteractionMenu menu)
-        {
-            ForgetTroopPages("dwelling");
-        }
-
-        /// <summary>Let go of the draft and upgrade pages this host drew - the host has gone back to
-        /// its landing page, or closed. A page drawn by a DIFFERENT host is left alone: the two
-        /// screens are shared between the town, the dwelling and the defence menu.</summary>
-        private void ForgetTroopPages(string hostIdPrefix)
-        {
-            DraftTroopsScreen draft = Reg<DraftTroopsScreen>();
-            if (draft != null && draft.HostIdPrefix == hostIdPrefix)
-            {
-                draft.Forget();
-            }
-
-            UpgradeTroopsScreen upgrade = Reg<UpgradeTroopsScreen>();
-            if (upgrade != null && upgrade.HostIdPrefix == hostIdPrefix)
-            {
-                upgrade.Forget();
-            }
-        }
-
-        public void OnRallyPointReady(RallyPointInteractionMenu menu)
-        {
-            Reg<RallyPointScreen>()?.Show(new RallyPointInteractionMenuAdapter(menu));
-        }
-
-        public void OnRallyPointClosed(RallyPointInteractionMenu menu)
-        {
-            Reg<RallyPointScreen>()?.Forget();
-        }
 
         // ---- the dialogs ----
 
@@ -667,36 +407,6 @@ namespace SongsOfConquestAccess.Screens
         }
 
         // ---- the story text ----
-
-        public void OnLetterboxStoryTextReady(LetterboxStoryText storyText)
-        {
-            Reg<StoryTextScreen>()?.Show(new LetterboxStoryTextAdapter(storyText));
-        }
-
-        public void OnLetterboxStoryTextClosed(LetterboxStoryText storyText)
-        {
-            Reg<StoryTextScreen>()?.Forget();
-        }
-
-        public void OnStoryTextReady(StoryText storyText)
-        {
-            Reg<StoryTextScreen>()?.Show(new StoryTextAdapter(storyText));
-        }
-
-        public void OnStoryTextClosed(StoryText storyText)
-        {
-            Reg<StoryTextScreen>()?.Forget();
-        }
-
-        public void OnDialogueMenuChanged(DialogueMenu dialogueMenu)
-        {
-            Reg<StoryTextScreen>()?.Show(new DialogueMenuAdapter(dialogueMenu));
-        }
-
-        public void OnDialogueMenuClosed(DialogueMenu dialogueMenu)
-        {
-            Reg<StoryTextScreen>()?.Forget();
-        }
 
         // ---- the main menu and its pages ----
 
@@ -1295,39 +1005,6 @@ namespace SongsOfConquestAccess.Screens
             screen.Live = adapter;
         }
 
-        public void OnTeleportMenuReady(TeleportMenu menu)
-        {
-            TeleportMenuAdapter adapter = new TeleportMenuAdapter(menu);
-            if (!adapter.IsPresent())
-            {
-                return;
-            }
-
-            AdventureMapScreen screen = Reg<AdventureMapScreen>();
-            if (screen == null || screen.Live == null)
-            {
-                return;
-            }
-
-            // The teleport menu takes the whole screen over: a mini menu still standing on the map
-            // would keep the destination cursor from the player.
-            if (_screens.Current is MapEntityMiniMenuScreen)
-            {
-                Reg<MapEntityMiniMenuScreen>()?.Forget();
-            }
-
-            screen.EnterTeleportDestinationMode(adapter);
-        }
-
-        public void OnTeleportMenuClosed(TeleportMenu menu, bool cancelled)
-        {
-            AdventureMapScreen screen = Reg<AdventureMapScreen>();
-            if (screen != null && screen.MatchesTeleportMenu(menu))
-            {
-                screen.ExitTeleportDestinationMode(menu, cancelled);
-            }
-        }
-
         // ---- the battle ----
 
         public void OnBattleSceneReady(BattleSceneInstaller installer)
@@ -1364,26 +1041,11 @@ namespace SongsOfConquestAccess.Screens
             CombatEventNarrator.Reset();
         }
 
-        public void OnPreBattleMenuChanged(PreBattleMenu menu)
-        {
-            Reg<PreBattleMenuScreen>()?.Show(new PreBattleMenuAdapter(menu));
-        }
-
-        public void OnPreBattleMenuClosed(PreBattleMenu menu)
-        {
-            Reg<PreBattleMenuScreen>()?.Forget();
-        }
-
-        public void OnPostBattleResultReady(AdventureBattleMenu battleMenu)
-        {
-            PostBattleMenu menu = PostBattleResultAdapter.GetPostBattleMenu(battleMenu);
-            Reg<PostBattleResultScreen>()?.Show(new PostBattleResultAdapter(battleMenu, menu));
-        }
-
+        /// <summary>The battle result page has been put away. The page itself now finds its own menu,
+        /// so all that is left here is the ADVENTURE MAP, which is still slot-fed: this goes with the
+        /// map when it resolves itself.</summary>
         public void OnPostBattleResultClosed()
         {
-            Reg<PostBattleResultScreen>()?.Forget();
-
             if (_screens.Contains<PostAdventureResultScreen>() || _screens.Contains<PostAdventureStatsScreen>())
             {
                 return;
@@ -1397,37 +1059,6 @@ namespace SongsOfConquestAccess.Screens
             {
                 ShowAdventureMap("post battle result closed");
             }
-        }
-
-        public void OnPostAdventureResultReady(PostAdventureMenu menu)
-        {
-            PostAdventureResultScreen screen = Reg<PostAdventureResultScreen>();
-            if (screen == null)
-            {
-                return;
-            }
-
-            PostAdventureResultAdapter adapter = new PostAdventureResultAdapter(menu);
-            // The post-adventure result is a root screen for the ended game: letting go of everything
-            // else avoids briefly returning to the adventure map while transitioning away from
-            // victory or defeat.
-            ForgetAllExcept(screen);
-            screen.Live = adapter;
-        }
-
-        public void OnPostAdventureResultClosed(PostAdventureMenu menu)
-        {
-            Reg<PostAdventureResultScreen>()?.Forget();
-        }
-
-        public void OnPostAdventureStatsReady(PostAdventureStatsMenu menu)
-        {
-            Reg<PostAdventureStatsScreen>()?.Show(new PostAdventureStatsAdapter(menu));
-        }
-
-        public void OnPostAdventureStatsClosed(PostAdventureStatsMenu menu)
-        {
-            Reg<PostAdventureStatsScreen>()?.Forget();
         }
 
         // ---- the hot reload ----
@@ -1468,33 +1099,13 @@ namespace SongsOfConquestAccess.Screens
             OwnedEntitiesScreen.Recover();
             TroopOverviewScreen.Recover();
             MarketplaceScreen.Recover();
-            ArtifactMarketScreen.Recover();
-            MapEntityMiniMenuScreen.Recover();
             CombatScreen.Recover();
             ChatScreen.Recover();
             SpellbookScreen.Recover();
-            PostAdventureResultScreen.Recover();
-            PostAdventureStatsScreen.Recover();
             PlayerStatsScreen.Recover();
-            PostBattleResultScreen.Recover();
-            PreBattleMenuScreen.Recover();
-            ClaimMenuScreen.Recover();
-            UpgradeTroopsScreen.Recover();
-            DraftTroopsScreen.Recover();
-            RallyPointScreen.Recover();
-            SettlementScreen.Recover();
-            DefenceMenuScreen.Recover();
-            BuildMenuScreen.Recover();
             ResearchScreen.Recover();
-            PurchaseWielderScreen.Recover();
-            HostileJoinMenuScreen.Recover();
             MoveTroopPopupScreen.Recover();
-            WorldChoiceMenuScreen.Recover();
-            WorldConfirmMenuScreen.Recover();
-            LevelUpScreen.Recover();
             CommanderSheetScreen.Recover();
-            TradingScreen.Recover();
-            StoryTextScreen.Recover();
             MessageDialogScreen.Recover();
             LoadingCompleteScreen.Recover();
         }

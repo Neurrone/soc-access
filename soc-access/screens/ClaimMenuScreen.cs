@@ -1,12 +1,10 @@
 using System;
 using System.Collections.Generic;
-using HarmonyLib;
 using SongsOfConquest.Client.Adventure;
 using SongsOfConquestAccess.Adapters;
 using SongsOfConquestAccess.UI;
 using SongsOfConquestAccess.UI.Graph;
 using UnityEngine;
-using Zenject;
 
 namespace SongsOfConquestAccess.Screens
 {
@@ -36,40 +34,23 @@ namespace SongsOfConquestAccess.Screens
     {
         private const string DialogStop = "claim-menu";
 
-        private static readonly System.Reflection.PropertyInfo InstallerContainerProperty =
-            AccessTools.Property(typeof(ClaimMenuInstaller), "Container");
-
         // A subject of its own for each node the menu gives no component for; two nodes sharing one
         // subject would collapse onto whichever was declared first.
         private readonly object _headingKey = new object();
         private readonly object _bodyKey = new object();
 
-        /// <summary>After a hot reload: point the slot at the menu already showing.
-        /// Scanned once, from <c>ScreenDetector.RecoverRuntimeState</c>.</summary>
-        public static void Recover()
+        /// <summary>The one claim window the adventure scene holds for the whole game.</summary>
+        private readonly ScreenSource<IClaimMenu> _source =
+            ScreenSource<IClaimMenu>.FromScene(LoadedScenes.AdventureScene);
+
+        protected override object ResolveMenu()
         {
-            Recovered<ClaimMenuScreen>(FindActive());
+            return _source.Current;
         }
 
-        public static ClaimMenuAdapter FindActive()
+        protected override ClaimMenuAdapter Adapt(object menu)
         {
-            ClaimMenuInstaller[] installers = Resources.FindObjectsOfTypeAll<ClaimMenuInstaller>();
-            for (int i = 0; i < installers.Length; i++)
-            {
-                ClaimMenu menu = TryResolveClaimMenu(installers[i]);
-                if (menu == null)
-                {
-                    continue;
-                }
-
-                ClaimMenuAdapter adapter = new ClaimMenuAdapter(menu);
-                if (adapter.IsPresent())
-                {
-                    return (adapter);
-                }
-            }
-
-            return null;
+            return new ClaimMenuAdapter((ClaimMenu)menu);
         }
 
         public override string Key
@@ -95,12 +76,8 @@ namespace SongsOfConquestAccess.Screens
 
         public override bool IsActive()
         {
+            SyncLive();
             return Live != null && Live.IsPresent();
-        }
-
-        public bool Matches(ClaimMenu menu)
-        {
-            return Live != null && ReferenceEquals(Live.SourceKey, menu);
         }
 
         public override void OnUnfocus()
@@ -210,38 +187,5 @@ namespace SongsOfConquestAccess.Screens
             return drawn;
         }
 
-        private static ClaimMenu TryResolveClaimMenu(ClaimMenuInstaller installer)
-        {
-            if (!IsLiveSceneInstaller(installer) || InstallerContainerProperty == null)
-            {
-                return null;
-            }
-
-            DiContainer container = InstallerContainerProperty.GetValue(installer, null) as DiContainer;
-            if (container == null)
-            {
-                return null;
-            }
-
-            try
-            {
-                return container.Resolve<IClaimMenu>() as ClaimMenu;
-            }
-            catch (Exception)
-            {
-                return null;
-            }
-        }
-
-        private static bool IsLiveSceneInstaller(ClaimMenuInstaller installer)
-        {
-            if (installer == null)
-            {
-                return false;
-            }
-
-            GameObject gameObject = installer.gameObject;
-            return gameObject != null && gameObject.scene.IsValid() && gameObject.scene.isLoaded;
-        }
     }
 }
