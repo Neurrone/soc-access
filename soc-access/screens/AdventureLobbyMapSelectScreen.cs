@@ -65,6 +65,16 @@ namespace SongsOfConquestAccess.Screens
         // cursor on the same node while the selection under it changes.
         private readonly object _detailsMarker = new object();
 
+        // The table's nodes, kept for as long as the adapter hands back the same row list. A row's
+        // primary and its cells are closures over the row adapter and read the game when they are
+        // READ, so rebuilding them every frame bought nothing but the allocation - a vtable, its
+        // announcement list and seven cells per row, 57 rows deep. The adapter already answers with
+        // the same list while the table's membership and drawn order are unchanged (a sort or a
+        // filter is a new list), so its identity is the only key this needs.
+        private object _rowNodesSource;
+
+        private List<RowNodes> _rowNodes;
+
         /// <summary>The lobby navigator's own map select page (<see cref="LobbySources"/>).</summary>
         protected override object ResolveMenu()
         {
@@ -212,20 +222,15 @@ namespace SongsOfConquestAccess.Screens
 
             GraphSheet sheet = new GraphSheet(builder, SheetKey);
             sheet.Region(Live.Title, SheetCaptions(captions));
-            IReadOnlyList<AdventureLobbyMapSelectRowAdapter> rows = Live.GetVisibleRows();
+            List<RowNodes> rows = RowNodesFor(Live.GetVisibleRows(), captions);
             object selected = null;
             for (int i = 0; i < rows.Count; i++)
             {
-                AdventureLobbyMapSelectRowAdapter row = rows[i];
-                if (row == null || row.Entry == null)
+                RowNodes row = rows[i];
+                sheet.RowAt(row.Primary, row.Key, row.Cells, row.Widget);
+                if (row.Row.IsSelected)
                 {
-                    continue;
-                }
-
-                sheet.RowAt(Primary(row), row.NativeKey, Cells(row, captions), row.Entry);
-                if (row.IsSelected)
-                {
-                    selected = row.NativeKey;
+                    selected = row.Key;
                 }
             }
 
@@ -236,6 +241,60 @@ namespace SongsOfConquestAccess.Screens
                 // never on the heading band above them.
                 builder.LandStopOn(sheet.RowId(selected) ?? sheet.FirstRow);
             }
+        }
+
+        /// <summary>One map's nodes, built when the table's rows change and read every frame after.
+        /// The key and the widget are read off the row once here for the same reason the cells are:
+        /// both are fixed for the life of the row.</summary>
+        private struct RowNodes
+        {
+            public readonly AdventureLobbyMapSelectRowAdapter Row;
+
+            public readonly object Key;
+
+            public readonly Component Widget;
+
+            public readonly NodeVtable Primary;
+
+            public readonly List<GraphSheet.SheetCell> Cells;
+
+            public RowNodes(
+                AdventureLobbyMapSelectRowAdapter row,
+                NodeVtable primary,
+                List<GraphSheet.SheetCell> cells)
+            {
+                Row = row;
+                Key = row.NativeKey;
+                Widget = row.Entry;
+                Primary = primary;
+                Cells = cells;
+            }
+        }
+
+        private List<RowNodes> RowNodesFor(
+            IReadOnlyList<AdventureLobbyMapSelectRowAdapter> rows,
+            IReadOnlyList<string> captions)
+        {
+            if (_rowNodes != null && ReferenceEquals(_rowNodesSource, rows))
+            {
+                return _rowNodes;
+            }
+
+            List<RowNodes> built = new List<RowNodes>(rows.Count);
+            for (int i = 0; i < rows.Count; i++)
+            {
+                AdventureLobbyMapSelectRowAdapter row = rows[i];
+                if (row == null || row.Entry == null)
+                {
+                    continue;
+                }
+
+                built.Add(new RowNodes(row, Primary(row), Cells(row, captions)));
+            }
+
+            _rowNodesSource = rows;
+            _rowNodes = built;
+            return _rowNodes;
         }
 
         /// <summary>

@@ -119,6 +119,8 @@ namespace SongsOfConquestAccess.Adapters
 
         // The visible rows, kept while the table's membership and drawn order are unchanged: a row
         // adapter memoizes its labels and tooltips, which is what keeps the per-frame build cheap.
+        private static readonly AdventureLobbyMapSelectRowAdapter[] NoRows = new AdventureLobbyMapSelectRowAdapter[0];
+
         private readonly List<LobbyMapSelectMenuEntry> _visibleScratch = new List<LobbyMapSelectMenuEntry>();
         private List<AdventureLobbyMapSelectRowAdapter> _rows;
         private int _rowsSignature;
@@ -222,7 +224,7 @@ namespace SongsOfConquestAccess.Adapters
             if (entries == null)
             {
                 _rows = null;
-                return new AdventureLobbyMapSelectRowAdapter[0];
+                return NoRows;
             }
 
             _visibleScratch.Clear();
