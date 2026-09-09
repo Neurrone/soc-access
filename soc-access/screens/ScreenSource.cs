@@ -18,6 +18,10 @@ namespace SongsOfConquestAccess.Screens
         /// </summary>
         public const string AdventureScene = "AdventureScene";
 
+        /// <summary>The battle scene, which holds the battlefield and the HUD drawn around it.
+        /// </summary>
+        public const string BattleScene = "BattleScene";
+
         private static int _frame = -1;
         private static int _key;
 

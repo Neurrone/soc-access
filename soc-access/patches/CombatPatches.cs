@@ -1,6 +1,5 @@
 using HarmonyLib;
 using SongsOfConquest.Common;
-using SongsOfConquest.Common.Battle;
 using SongsOfConquest.Common.Gamestate.Facade;
 using Lavapotion.Networking;
 using SongsOfConquest.Client;
@@ -21,20 +20,6 @@ namespace SongsOfConquestAccess
     [HarmonyPatch]
     public static class CombatPatches
     {
-        [HarmonyPatch(typeof(ClientBattleCommandsFacade), "Ready")]
-        [HarmonyPostfix]
-        private static void ClientBattleCommandsReadyPostfix(ClientBattleCommandsFacade __instance)
-        {
-            SocAccessMod.Instance?.ScreenDetector?.OnCombatReady(__instance);
-        }
-
-        [HarmonyPatch(typeof(BattleSceneInstaller), "InstallBindings")]
-        [HarmonyPostfix]
-        private static void BattleSceneInstallerInstallBindingsPostfix(BattleSceneInstaller __instance)
-        {
-            SocAccessMod.Instance?.ScreenDetector?.OnBattleSceneReady(__instance);
-        }
-
         [HarmonyPatch(typeof(HumanBattleSpellController), "HandleSpellCastCancelled")]
         [HarmonyPrefix]
         private static void HumanBattleSpellControllerHandleSpellCastCancelledPrefix(HumanBattleSpellController __instance)
@@ -54,10 +39,6 @@ namespace SongsOfConquestAccess
         private static void ClientBattleCommandsFacadeOnResponseExecutedPrefix(ICommandResponse r)
         {
             CombatEventNarrator.HandleResponse(r);
-            if (r is BattleResultCommand.Response)
-            {
-                SocAccessMod.Instance?.ScreenDetector?.OnCombatEnded();
-            }
         }
 
         private static void AnnounceSpellCancelledIfTargeting(HumanBattleSpellController controller)
@@ -132,6 +113,5 @@ namespace SongsOfConquestAccess
         {
             CombatEventNarrator.Reset();
         }
-
     }
 }

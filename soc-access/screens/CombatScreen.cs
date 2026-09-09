@@ -1,12 +1,9 @@
 using System;
 using System.Collections.Generic;
-using System.Reflection;
-using HarmonyLib;
 using SongsOfConquest.Client;
 using SongsOfConquest.Client.Battle;
 using SongsOfConquest.Client.Battle.Controller;
 using SongsOfConquest.Client.Battle.View;
-using SongsOfConquest.Client.InputManagement;
 using SongsOfConquest.Common;
 using SongsOfConquest.Common.Battle;
 using SongsOfConquest.Common.Economy;
@@ -24,7 +21,6 @@ using SongsOfConquestAccess.Speech;
 using SongsOfConquestAccess.UI;
 using SongsOfConquestAccess.UI.Graph;
 using UnityEngine;
-using Zenject;
 
 namespace SongsOfConquestAccess.Screens
 {
@@ -83,8 +79,6 @@ namespace SongsOfConquestAccess.Screens
     /// </summary>
     public sealed class CombatScreen : LiveScreen<CombatAdapter>
     {
-        private static readonly PropertyInfo InstallerContainerProperty =
-            AccessTools.Property(typeof(BattleSceneInstaller), "Container");
         private static readonly EssenceType[] EssenceRowOrder =
         {
             EssenceType.Order,
@@ -93,8 +87,6 @@ namespace SongsOfConquestAccess.Screens
             EssenceType.Arcana,
             EssenceType.Destruction
         };
-
-        private static string _lastProbeDiagnostic;
 
         private const string ReturnToGridSoundKey = "Common_ClosePauseMenu";
         private const string FocusWrapCueKey = "Common_ClickUnfold";
@@ -121,6 +113,7 @@ namespace SongsOfConquestAccess.Screens
         // DIFFERENT battle and kept otherwise, so a dialog covering the battlefield does not move it.
         private CombatHexGrid _grid;
         private CombatAdapter _gridAdapter;
+        private CombatAdapter _battleStateAdapter;
         private readonly CombatTroopCycle _localActingTroopCycle = new CombatTroopCycle();
         private readonly CombatTroopCycle _enemyActingTroopCycle = new CombatTroopCycle();
         private int _lastCycleCurrentTroopId = -1;
@@ -144,17 +137,24 @@ namespace SongsOfConquestAccess.Screens
         // instruction the game REPLACED under a still cursor is announced.
         private string _instruction;
 
-        /// <summary>After a hot reload: point the slot at the battle already installed.
-        /// Scanned once, from <c>ScreenDetector.RecoverRuntimeState</c>.</summary>
-        public static void Recover()
+        // THE BATTLE FINDS ITSELF: the scene installer is the battle (see BattleSources). One
+        // installer instance per fight, so a second battle gets a second adapter and everything the
+        // screen keeps about the first is dropped with it; a hot reload finds the same installer and
+        // rebuilds the adapter over it, which is all the old probe ever did.
+        protected override object ResolveMenu()
         {
-            Recovered<CombatScreen>(FindActive());
+            return BattleSources.Scene.Current;
         }
 
-        /// <summary>The battle the game has installed and made ready, or null. The one scan.</summary>
-        public static CombatAdapter FindActive()
+        /// <summary>The adapter over one battle, built once per installer. Building it is what
+        /// starting a battle means to the narration: it is told which battle it is reading, and the
+        /// combat-event buffer of the previous fight is emptied.</summary>
+        protected override CombatAdapter Adapt(object menu)
         {
-            return FindActiveCombatScreen();
+            CombatAdapter adapter = new CombatAdapter((BattleSceneInstaller)menu);
+            CombatEventNarrator.SetActiveAdapter(adapter);
+            SocAccessMod.Instance?.ReviewBuffers?.Clear(ReviewBufferKind.CombatEvents);
+            return adapter;
         }
 
         /// <summary>The cursor is built over one battle: a new one gets a new grid.</summary>
@@ -196,7 +196,23 @@ namespace SongsOfConquestAccess.Screens
 
         public override bool IsActive()
         {
-            return Live != null && Live.IsPresent();
+            SyncLive();
+            SyncBattleState();
+            if (Live == null)
+            {
+                return false;
+            }
+
+            if (!Live.IsPresent())
+            {
+                // The game ends the battle (BattleGameOverCommand clears IsBattleActive) while the
+                // scene, and so the source, is still there for the result page. The narration held
+                // back for the last blows is spoken here, once, by the adapter it belongs to.
+                Live.EndCombat();
+                return false;
+            }
+
+            return true;
         }
 
         public CombatAdapter Adapter
@@ -258,16 +274,24 @@ namespace SongsOfConquestAccess.Screens
             base.OnPop();
         }
 
-        /// <summary>A new battle is a new <see cref="Live"/>, and nothing read from the old one holds:
-        /// the tile tooltip's cache starts empty so the same coordinates in a new battle are not
-        /// answered with the previous battle's tile.
-        /// </summary>
-        public override void OnLiveChanged(CombatAdapter previous)
+        /// <summary>Everything the screen remembers ABOUT ONE BATTLE, dropped when the battle
+        /// changes. These are the mod's own wording state rather than anything the game holds - the
+        /// two troop cycles' anchors, the acting-troop baseline, the last spoken targeting
+        /// instruction and the tile tooltip's cache - so they stay on the screen; they are keyed on
+        /// the identity of the adapter, which <see cref="LiveScreen{TAdapter}.SyncLive"/> reads from
+        /// the game every frame, so a new battle and a hot reload start them fresh and no hook has to
+        /// reset them. Without this the same coordinates, troop id and turn number in a NEW battle
+        /// would be answered with the previous battle's tile.</summary>
+        private void SyncBattleState()
         {
+            if (ReferenceEquals(_battleStateAdapter, Live))
+            {
+                return;
+            }
+
+            _battleStateAdapter = Live;
             _tooltip = null;
             _tooltipRead = false;
-            // A new battle starts the troop cycles and the instruction baseline over: the first
-            // acting troop of this battle may carry the last one's id.
             _lastCycleCurrentTroopId = -1;
             _localActingTroopCycle.Reset();
             _enemyActingTroopCycle.Reset();
@@ -1166,161 +1190,6 @@ namespace SongsOfConquestAccess.Screens
             {
                 Navigator?.FocusNode(BoardNodeId);
             }
-        }
-
-        // ---- finding the battle ----
-
-        private static CombatAdapter FindActiveCombatScreen()
-        {
-            BattleSceneInstaller[] installers = Resources.FindObjectsOfTypeAll<BattleSceneInstaller>();
-            if (installers.Length == 0)
-            {
-                LogProbeDiagnostic("Combat probe found no BattleSceneInstaller instances");
-                return null;
-            }
-
-            int liveInstallers = 0;
-            for (int i = 0; i < installers.Length; i++)
-            {
-                BattleSceneInstaller installer = installers[i];
-                if (!IsLiveSceneInstaller(installer))
-                {
-                    continue;
-                }
-
-                liveInstallers++;
-                DiContainer container = GetContainer(installer);
-                IClientBattleFacade facade = TryResolve<IClientBattleFacade>(container);
-                IBattleCursorManager cursorManager = TryResolve<IBattleCursorManager>(container);
-                IBattleGridManager gridManager = TryResolve<IBattleGridManager>(container);
-                IBattlePathManager pathManager = TryResolve<IBattlePathManager>(container);
-                IBattleHighlightManager highlightManager = TryResolve<IBattleHighlightManager>(container);
-                IBattleViewManager battleViewManager = TryResolve<IBattleViewManager>(container);
-                IBattleAttackPreviewHandler attackPreviewHandler = TryResolve<IBattleAttackPreviewHandler>(container);
-                IBattleTooltipUtility tooltipUtility = TryResolve<IBattleTooltipUtility>(container);
-                IInputManager inputManager = TryResolve<IInputManager>(container);
-                ILocalizationHandler localization = TryResolve<ILocalizationHandler>(container);
-                ICameraLookup cameraLookup = TryResolve<ICameraLookup>(container);
-                IHumanBattleControllerFacade humanBattleController = TryResolve<IHumanBattleControllerFacade>(container);
-                MouseKeyboardHumanBattleControllerModule mouseKeyboardInputModule = TryResolve<MouseKeyboardHumanBattleControllerModule>(container);
-                IHumanBattleSpellController battleSpellController = TryResolve<IHumanBattleSpellController>(container);
-                MouseKeyboardHumanBattleSpellModule mouseKeyboardSpellInputModule = TryResolve<MouseKeyboardHumanBattleSpellModule>(container);
-                IBattleHudSignals battleHudSignals = TryResolve<IBattleHudSignals>(container);
-                ISpellsLookup spellsLookup = TryResolve<ISpellsLookup>(container);
-                ITroopAbilityUtility abilityUtility = TryResolve<ITroopAbilityUtility>(container);
-                object cartographyConverter = TryResolveByTypeName(container, "Lavapotion.Cartography.ICartographyConverter");
-
-                CombatAdapter adapter = new CombatAdapter(
-                    installer,
-                    container,
-                    facade,
-                    cursorManager,
-                    gridManager,
-                    pathManager,
-                    highlightManager,
-                    battleViewManager,
-                    attackPreviewHandler,
-                    tooltipUtility,
-                    inputManager,
-                    localization,
-                    cameraLookup,
-                    cartographyConverter,
-                    humanBattleController,
-                    mouseKeyboardInputModule,
-                    battleSpellController,
-                    mouseKeyboardSpellInputModule,
-                    battleHudSignals,
-                    spellsLookup,
-                    abilityUtility);
-                if (adapter.IsPresent())
-                {
-                    CombatEventNarrator.SetActiveAdapter(adapter);
-                    CombatEventNarrator.SyncCurrentTurnTroop(adapter);
-                    LogProbeDiagnostic("Combat probe found ready battle");
-                    return adapter;
-                }
-
-                LogProbeDiagnostic("Combat probe found installer but adapter is not ready: " + adapter.GetReadinessDiagnostic());
-            }
-
-            if (liveInstallers == 0)
-            {
-                LogProbeDiagnostic("Combat probe found " + installers.Length + " installer instances but none in a loaded scene");
-            }
-
-            return null;
-        }
-
-        private static bool IsLiveSceneInstaller(BattleSceneInstaller installer)
-        {
-            if (installer == null)
-            {
-                return false;
-            }
-
-            GameObject gameObject = installer.gameObject;
-            return gameObject != null && gameObject.scene.IsValid() && gameObject.scene.isLoaded;
-        }
-
-        private static DiContainer GetContainer(BattleSceneInstaller installer)
-        {
-            if (installer == null || InstallerContainerProperty == null)
-            {
-                return null;
-            }
-
-            return InstallerContainerProperty.GetValue(installer, null) as DiContainer;
-        }
-
-        private static T TryResolve<T>(DiContainer container) where T : class
-        {
-            if (container == null)
-            {
-                return null;
-            }
-
-            try
-            {
-                return container.Resolve<T>();
-            }
-            catch (Exception)
-            {
-                return null;
-            }
-        }
-
-        private static object TryResolveByTypeName(DiContainer container, string typeName)
-        {
-            if (container == null || string.IsNullOrWhiteSpace(typeName))
-            {
-                return null;
-            }
-
-            Type type = AccessTools.TypeByName(typeName);
-            if (type == null)
-            {
-                return null;
-            }
-
-            try
-            {
-                return container.Resolve(type);
-            }
-            catch (Exception)
-            {
-                return null;
-            }
-        }
-
-        private static void LogProbeDiagnostic(string message)
-        {
-            if (message == _lastProbeDiagnostic)
-            {
-                return;
-            }
-
-            _lastProbeDiagnostic = message;
-            SocAccessMod.Instance?.LogInfo(message);
         }
     }
 }

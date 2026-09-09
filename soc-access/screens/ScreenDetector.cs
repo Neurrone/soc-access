@@ -6,8 +6,6 @@ using SongsOfConquest.Client.Adventure.Menu;
 using SongsOfConquest.Client.Adventure.Menu.Lobby;
 using SongsOfConquest.Client.Adventure.UI;
 using SongsOfConquest.Client.Adventure.View;
-using SongsOfConquest.Client.Battle;
-using SongsOfConquest.Client.Battle.Facade;
 using SongsOfConquest.Client.Gamestate;
 using SongsOfConquest.Client.Menu;
 using SongsOfConquest.Client.Menu.Loading;
@@ -41,7 +39,6 @@ namespace SongsOfConquestAccess.Screens
     public sealed class ScreenDetector
     {
         private readonly ScreenManager _screens;
-        private BattleSceneInstaller _battleSceneInstaller;
         private IconDropdown _deferredAdventureLobbyDropdownClose;
         private bool _deferredAdventureLobbyDropdownHidden;
         private float _deferredAdventureLobbyDropdownDeadline;
@@ -685,42 +682,6 @@ namespace SongsOfConquestAccess.Screens
             }
         }
 
-        // ---- the battle ----
-
-        public void OnBattleSceneReady(BattleSceneInstaller installer)
-        {
-            _battleSceneInstaller = installer;
-        }
-
-        public bool OnCombatReady(ClientBattleCommandsFacade commands)
-        {
-            CombatAdapter adapter = new CombatAdapter(_battleSceneInstaller);
-            if (!adapter.Matches(commands))
-            {
-                SocAccessMod.Instance?.LogWarning("ScreenDetector.OnCombatReady ignored because the battle command facade did not match the stored battle scene");
-                return false;
-            }
-
-            CombatScreen screen = Reg<CombatScreen>();
-            if (screen == null)
-            {
-                return false;
-            }
-
-            CombatEventNarrator.SetActiveAdapter(adapter);
-            SocAccessMod.Instance?.ReviewBuffers?.Clear(ReviewBufferKind.CombatEvents);
-            screen.Live = adapter;
-            return true;
-        }
-
-        public void OnCombatEnded()
-        {
-            _battleSceneInstaller = null;
-            Reg<CombatScreen>()?.Forget();
-            CombatEventNarrator.FlushPendingEventsForCombatEnd();
-            CombatEventNarrator.Reset();
-        }
-
         // ---- the hot reload ----
 
         /// <summary>
@@ -752,7 +713,6 @@ namespace SongsOfConquestAccess.Screens
             AdventureLobbyIconDropdownScreen.Recover();
             AdventureLobbyInviteProvidersScreen.Recover();
             CampaignMapSelectScreen.Recover();
-            CombatScreen.Recover();
             PlayerStatsScreen.Recover();
             LoadingCompleteScreen.Recover();
         }

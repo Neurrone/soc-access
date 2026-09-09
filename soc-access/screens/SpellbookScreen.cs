@@ -12,8 +12,10 @@ using DropResult = SongsOfConquestAccess.UI.Graph.DropResult;
 namespace SongsOfConquestAccess.Screens
 {
     /// <summary>
-    /// The adventure spellbook, made navigable as a graph. Four places to be: the tutorial button
-    /// while the game still draws it, the quick bar, the spells, and the close cross.
+    /// The spellbook, made navigable as a graph - the adventure's, drawn over the map, and the
+    /// battle's, drawn over the battlefield, which are two objects and one page. Four places to be:
+    /// the tutorial button while the game still draws it, the quick bar, the spells, and the close
+    /// cross.
     ///
     /// EVERY GESTURE IS THE GAME'S OWN. Enter on a spell is its <c>UIButton</c>'s left click, which
     /// casts in battle and is inert on the map; Backslash is the same button's RIGHT click, which the
@@ -78,14 +80,20 @@ namespace SongsOfConquestAccess.Screens
         private bool _nativeDragRan;
 
         /// <summary>The adventure spellbook: the commander HUD's settings hold the opener, and the
-        /// opener holds the book (<see cref="HudSources"/>). The battle's spellbook is a different
-        /// object and a different screen.</summary>
-        private readonly ScreenSource<SpellBook> _source =
+        /// opener holds the book (<see cref="HudSources"/>).</summary>
+        private readonly ScreenSource<SpellBook> _adventure =
             ScreenSource<SpellBook>.FromOwner(HudSources.Commander, HudSources.Spellbook);
+
+        /// <summary>The battle spellbook, a DIFFERENT object on the battle HUD's settings
+        /// (<see cref="BattleSources"/>) and the same page to read. The two can never both be there:
+        /// the game unloads the adventure scene to fight and the battle scene to come back.</summary>
+        private readonly ScreenSource<SpellBook> _battle =
+            ScreenSource<SpellBook>.FromOwner(BattleSources.Hud, BattleSources.Spellbook);
 
         protected override object ResolveMenu()
         {
-            return _source.Current;
+            SpellBook book = _adventure.Current;
+            return book != null ? book : _battle.Current;
         }
 
         protected override SpellbookAdapter Adapt(object menu)

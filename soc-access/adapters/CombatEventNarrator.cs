@@ -191,6 +191,13 @@ namespace SongsOfConquestAccess.Adapters
             FlushPendingEventsImmediately("combat_ended");
         }
 
+        /// <summary>Whether this adapter is the one the narration is being read from - so a battle
+        /// that has already been replaced does not put the new one's narration back to rest.</summary>
+        public static bool IsActiveAdapter(CombatAdapter adapter)
+        {
+            return adapter != null && ReferenceEquals(_activeAdapter, adapter);
+        }
+
         public static void SetActiveAdapter(CombatAdapter adapter)
         {
             _activeAdapter = adapter;

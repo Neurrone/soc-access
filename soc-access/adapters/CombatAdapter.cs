@@ -52,7 +52,7 @@ namespace SongsOfConquestAccess.Adapters
         Enemy
     }
 
-    public sealed class CombatAdapter
+    public sealed class CombatAdapter : IDisposable
     {
         private static readonly PropertyInfo InstallerContainerProperty =
             AccessTools.Property(typeof(BattleSceneInstaller), "Container");
@@ -101,6 +101,8 @@ namespace SongsOfConquestAccess.Adapters
         private Action _spellTargetingEndHandler;
         private Action<ISpellDefinition> _beginCastHandler;
         private Action<bool> _endAbilityTargetingHandler;
+        private bool _hasBeenPresent;
+        private bool _combatEnded;
 
         public CombatAdapter(BattleSceneInstaller installer)
             : this(
@@ -211,13 +213,6 @@ namespace SongsOfConquestAccess.Adapters
 
         public BattleHudAdapter Hud { get; private set; }
 
-        public bool Matches(ClientBattleCommandsFacade commands)
-        {
-            return commands != null
-                && _facade != null
-                && ReferenceEquals(_facade.Commands, commands);
-        }
-
         private static DiContainer GetContainer(BattleSceneInstaller installer)
         {
             if (installer == null || InstallerContainerProperty == null)
@@ -295,13 +290,43 @@ namespace SongsOfConquestAccess.Adapters
 
         public bool IsPresent()
         {
-            return _sourceKey != null
+            bool present = _sourceKey != null
                 && _facade != null
                 && _facade.IsBattleActive
                 && !_facade.IsBattleFinalized
                 && _facade.Level != null
                 && _facade.Level.Size.x > 0
                 && _facade.Level.Size.y > 0;
+            // The scene exists before the battle does (the installer binds, then the game sends its
+            // start command), so "not present" only means the battle is OVER once it has been seen
+            // going. EndCombat reads this rather than a hook telling it the fight finished.
+            _hasBeenPresent = _hasBeenPresent || present;
+            return present;
+        }
+
+        /// <summary>The battle is over: speak what the narration was still holding and put it back to
+        /// rest. Called by the screen the frame <see cref="IsPresent"/> first answers false with the
+        /// scene still up, and by <see cref="Dispose"/> for a battle the scene took away before that
+        /// (a disconnect, a quit). Runs once, and does nothing at all for a scene whose battle never
+        /// started.</summary>
+        public void EndCombat()
+        {
+            if (_combatEnded || !_hasBeenPresent)
+            {
+                return;
+            }
+
+            _combatEnded = true;
+            CombatEventNarrator.FlushPendingEventsForCombatEnd();
+            if (CombatEventNarrator.IsActiveAdapter(this))
+            {
+                CombatEventNarrator.Reset();
+            }
+        }
+
+        public void Dispose()
+        {
+            EndCombat();
         }
 
         public int GetCurrentTroopId()
