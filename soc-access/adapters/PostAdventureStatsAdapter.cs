@@ -28,6 +28,10 @@ namespace SongsOfConquestAccess.Adapters
         private static readonly FieldInfo FacadeField = AccessTools.Field(typeof(PostAdventureStatsMenuGraphView), "_facade");
 
         private readonly PostAdventureStatsMenu _menu;
+        private GraphRoundRow[] _rows;
+        private PostAdventureStatsGraphType _rowsGraphType;
+        private int _rowsTeamCount = -1;
+        private int _rowsRoundCount = -1;
 
         public PostAdventureStatsAdapter(PostAdventureStatsMenu menu)
         {
@@ -239,7 +243,23 @@ namespace SongsOfConquestAccess.Adapters
 
         public IReadOnlyList<GraphRoundRow> GetGraphRows()
         {
-            Dictionary<int, Dictionary<int, GraphPoint>> values = BuildGraphValues();
+            // Walking every team's every round is the page's one expensive read, and on this page
+            // the statistics are final: only the chosen graph changes what the rows say. The team
+            // count and the round number are read off the game every frame as a guard in case the
+            // page is ever shown mid-adventure; both are O(1), so the key costs nothing.
+            PostAdventureStatsGraphType graphType = GetSelectedGraphType();
+            int teamCount;
+            int roundCount;
+            ReadStatisticsShape(out teamCount, out roundCount);
+            if (_rows != null
+                && _rowsGraphType == graphType
+                && _rowsTeamCount == teamCount
+                && _rowsRoundCount == roundCount)
+            {
+                return _rows;
+            }
+
+            Dictionary<int, Dictionary<int, GraphPoint>> values = BuildGraphValues(graphType);
             SortedSet<int> rounds = new SortedSet<int>(values.Keys);
             List<GraphRoundRow> rows = new List<GraphRoundRow>();
             foreach (int round in rounds)
@@ -247,7 +267,28 @@ namespace SongsOfConquestAccess.Adapters
                 rows.Add(new GraphRoundRow("round-" + round, round, values[round]));
             }
 
-            return rows.ToArray();
+            _rows = rows.ToArray();
+            _rowsGraphType = graphType;
+            _rowsTeamCount = teamCount;
+            _rowsRoundCount = roundCount;
+            return _rows;
+        }
+
+        /// <summary>The two O(1) numbers that say the statistics have moved: how many teams there
+        /// are and which round the adventure is on. Both are -1 while the facade is absent, so the
+        /// rows are read again once it arrives.</summary>
+        private void ReadStatisticsShape(out int teamCount, out int roundCount)
+        {
+            IClientAdventureFacade facade = Facade;
+            if (facade == null || facade.Teams == null)
+            {
+                teamCount = -1;
+                roundCount = -1;
+                return;
+            }
+
+            teamCount = facade.Teams.Count;
+            roundCount = facade.Teams.CurrentRound;
         }
 
         public void HideNativeTooltip()
@@ -318,7 +359,7 @@ namespace SongsOfConquestAccess.Adapters
             return GetField<UIToggle>(entry, TeamToggleField);
         }
 
-        private Dictionary<int, Dictionary<int, GraphPoint>> BuildGraphValues()
+        private Dictionary<int, Dictionary<int, GraphPoint>> BuildGraphValues(PostAdventureStatsGraphType graphType)
         {
             Dictionary<int, Dictionary<int, GraphPoint>> values = new Dictionary<int, Dictionary<int, GraphPoint>>();
             IClientAdventureFacade facade = Facade;
@@ -327,7 +368,6 @@ namespace SongsOfConquestAccess.Adapters
                 return values;
             }
 
-            PostAdventureStatsGraphType graphType = GetSelectedGraphType();
             ITeamState[] teams = facade.Teams.All;
             for (int i = 0; teams != null && i < teams.Length; i++)
             {
