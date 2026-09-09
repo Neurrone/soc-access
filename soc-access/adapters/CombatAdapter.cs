@@ -459,6 +459,18 @@ namespace SongsOfConquestAccess.Adapters
             return tile;
         }
 
+        /// <summary>Who stands on a tile, as the two facts that change what the tile reads as while
+        /// the cursor stands still: the id of the troop there - -1 for an empty tile, and for a dead
+        /// one, which the game's point lookup already answers null for - and the health its stack has
+        /// lost. The game's own point cache answers it, so this is the cheap read a per-frame cache
+        /// keys on; <see cref="GetTile"/> composes the whole tile and is not that.</summary>
+        public void GetTileTroopState(Vector2Int point, out int troopId, out int healthLost)
+        {
+            IBattleTroopState troop = GetTroopAt(point);
+            troopId = troop != null ? troop.Id : -1;
+            healthLost = troop != null ? troop.HealthLost : 0;
+        }
+
         public ScannerSnapshot BuildScannerSnapshot(Vector2Int origin)
         {
             ScannerSnapshot snapshot = new ScannerSnapshot(BattleScannerTaxonomy.Instance);
@@ -2859,6 +2871,22 @@ namespace SongsOfConquestAccess.Adapters
             catch
             {
                 return null;
+            }
+        }
+
+        /// <summary>The battle's own turn counter: <c>EndBattleTurnCommand</c> raises
+        /// <c>Queue.CurrentTurn</c> by one whenever a turn ends, so it is the generation anything
+        /// that changes with the turn - reach, the moves left, whose turn it is - can be keyed on.
+        /// One field read.</summary>
+        public int GetCurrentTurn()
+        {
+            try
+            {
+                return _facade != null && _facade.Queue != null ? _facade.Queue.CurrentTurn : 0;
+            }
+            catch
+            {
+                return 0;
             }
         }
 
