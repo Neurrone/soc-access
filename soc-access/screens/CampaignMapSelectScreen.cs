@@ -75,6 +75,36 @@ namespace SongsOfConquestAccess.Screens
             return FindActiveCampaignMapSelect(null);
         }
 
+        /// <summary>The menu the game bound alongside this information view. The view keeps no
+        /// back-reference to its menu (<c>CampaignMapSelectedInformationView.cs</c>), so the pair is
+        /// read out of the installer's own container, where the menu and the view are each bound to
+        /// self as a single (<c>CampaignMapSelectMenuInstaller.cs</c> lines 20 and 23). Called from
+        /// the view's own Show, never from a build.</summary>
+        public static CampaignMapSelectMenu FindMenu(CampaignMapSelectedInformationView informationView)
+        {
+            if (informationView == null)
+            {
+                return null;
+            }
+
+            CampaignMapSelectMenuInstaller[] installers = Resources.FindObjectsOfTypeAll<CampaignMapSelectMenuInstaller>();
+            for (int i = 0; i < installers.Length; i++)
+            {
+                CampaignMapSelectMenuInstaller installer = installers[i];
+                if (!IsLiveSceneInstaller(installer))
+                {
+                    continue;
+                }
+
+                if (ReferenceEquals(TryResolve<CampaignMapSelectedInformationView>(installer), informationView))
+                {
+                    return TryResolve<CampaignMapSelectMenu>(installer);
+                }
+            }
+
+            return null;
+        }
+
         public static bool ConsumeFocusDifficultyAfterNextRebuild()
         {
             bool result = _focusDifficultyAfterNextRebuild;

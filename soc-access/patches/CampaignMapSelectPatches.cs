@@ -1,9 +1,9 @@
-using System.Collections.Generic;
 using System.Reflection;
 using HarmonyLib;
 using SongsOfConquest.Client.Menu;
 using SongsOfConquest.Common.Campaign;
 using SongsOfConquest.Common.Map;
+using SongsOfConquestAccess.Screens;
 
 namespace SongsOfConquestAccess
 {
@@ -14,30 +14,6 @@ namespace SongsOfConquestAccess
             AccessTools.Field(typeof(CampaignMapSelectMenu), "_informationView");
         private static readonly FieldInfo SelectedButtonField =
             AccessTools.Field(typeof(CampaignMapSelectMenu), "_selectedButton");
-        private static readonly Dictionary<CampaignMapSelectedInformationView, CampaignMapSelectMenu> MenusByInformationView =
-            new Dictionary<CampaignMapSelectedInformationView, CampaignMapSelectMenu>();
-
-        [HarmonyPatch(typeof(CampaignMapSelectMenu), "Initialize")]
-        [HarmonyPostfix]
-        private static void CampaignMapSelectMenuInitializePostfix(CampaignMapSelectMenu __instance)
-        {
-            CampaignMapSelectedInformationView informationView = GetInformationView(__instance);
-            if (informationView != null)
-            {
-                MenusByInformationView[informationView] = __instance;
-            }
-        }
-
-        [HarmonyPatch(typeof(CampaignMapSelectMenu), "Dispose")]
-        [HarmonyPostfix]
-        private static void CampaignMapSelectMenuDisposePostfix(CampaignMapSelectMenu __instance)
-        {
-            CampaignMapSelectedInformationView informationView = GetInformationView(__instance);
-            if (informationView != null)
-            {
-                MenusByInformationView.Remove(informationView);
-            }
-        }
 
         [HarmonyPatch(typeof(CampaignMapSelectedInformationView), "Show")]
         [HarmonyPostfix]
@@ -47,9 +23,12 @@ namespace SongsOfConquestAccess
             MapFormat map,
             string path)
         {
-            CampaignMapSelectMenu menu;
-            MenusByInformationView.TryGetValue(__instance, out menu);
-            SocAccessMod.Instance?.ScreenDetector?.OnCampaignMapSelectShown(menu, __instance);
+            // The menu is found from the view every time rather than remembered from a hook the mod
+            // may have missed: a hot reload lands mid-page and the view's own Show is the first thing
+            // this class sees.
+            SocAccessMod.Instance?.ScreenDetector?.OnCampaignMapSelectShown(
+                CampaignMapSelectScreen.FindMenu(__instance),
+                __instance);
         }
 
         [HarmonyPatch(typeof(CampaignMapSelectMenu), "HandleMapButtonClicked")]
