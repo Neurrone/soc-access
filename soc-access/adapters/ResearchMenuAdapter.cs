@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Reflection;
 using HarmonyLib;
+using SongsOfConquest;
 using SongsOfConquest.Client.Adventure.UI;
 using SongsOfConquest.Client.Gamestate;
 using SongsOfConquest.Client.Menu.Tooltip;
@@ -199,6 +200,7 @@ namespace SongsOfConquestAccess.Adapters
             List<CategoryItem> items = new List<CategoryItem>();
             // One localization lookup for the whole page rather than one per row.
             string tierHeader = GetTierHeader();
+            HashSet<ResearchTypes> owned = GetOwnedGlobalResearch();
             IReadOnlyList<ResearchMenuCategory> categories = GetNativeCategories();
             for (int i = 0; i < categories.Count; i++)
             {
@@ -226,7 +228,7 @@ namespace SongsOfConquestAccess.Adapters
                     string name = Localize(stack != null ? stack.NameKey : null, "Research " + (itemIndex + 1));
                     researchItems.Add(new ResearchItem(
                         name,
-                        GetOwnedTier(stack),
+                        GetOwnedTier(stack, owned),
                         tierHeader,
                         button as Component,
                         () => button != null && button.Active && button.Interactable,
@@ -337,31 +339,44 @@ namespace SongsOfConquestAccess.Adapters
             return string.IsNullOrWhiteSpace(label) ? "Research category " + (index + 1) : label;
         }
 
-        private int GetOwnedTier(ResearchStack stack)
+        /// <summary>The local team's global research, asked for once per page. The game answers
+        /// <c>HasGlobalResearch</c> with a scan of every research state, and the page used to ask it
+        /// once per tier of every row; <c>GetGlobal</c> with disabled states included is the same
+        /// set in one scan.</summary>
+        private HashSet<ResearchTypes> GetOwnedGlobalResearch()
         {
-            if (stack == null)
-            {
-                return 0;
-            }
-
             IClientAdventureFacade facade = Facade;
             if (facade == null || facade.Research == null || facade.Teams == null)
             {
+                return null;
+            }
+
+            IResearchState[] states = facade.Research.GetGlobal(facade.Teams.LocalTeamInControlId, includeDisabled: true);
+            HashSet<ResearchTypes> owned = new HashSet<ResearchTypes>();
+            for (int i = 0; states != null && i < states.Length; i++)
+            {
+                if (states[i] != null)
+                {
+                    owned.Add(states[i].Type);
+                }
+            }
+
+            return owned;
+        }
+
+        private static int GetOwnedTier(ResearchStack stack, HashSet<ResearchTypes> owned)
+        {
+            if (stack == null || owned == null)
+            {
                 return 0;
             }
 
-            int teamId = facade.Teams.LocalTeamInControlId;
             List<ResearchDefinition> definitions = stack.Definitions;
             int ownedTier = 0;
             for (int i = 0; i < definitions.Count; i++)
             {
                 ResearchDefinition definition = definitions[i];
-                if (definition == null)
-                {
-                    continue;
-                }
-
-                if (facade.Research.HasGlobalResearch(definition.ResearchType, teamId, includeDisabled: true))
+                if (definition != null && owned.Contains(definition.ResearchType))
                 {
                     ownedTier = i + 1;
                 }
