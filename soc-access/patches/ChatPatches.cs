@@ -22,15 +22,33 @@ namespace SongsOfConquestAccess
         private static ChatButtonBehavior _currentButton;
         private static bool _windowProbed;
         private static bool _buttonProbed;
+        private static ChatAdapter _adapter;
+        private static ChatWindowBehavior _adapterWindow;
+        private static ChatButtonBehavior _adapterButton;
 
         public static ChatAdapter CurrentAdapter
         {
             get
             {
                 RecoverRuntimeReferences();
-                return _currentWindow != null
-                    ? new ChatAdapter(_currentWindow, _currentButton)
-                    : null;
+                if (_currentWindow == null)
+                {
+                    return null;
+                }
+
+                // The map asks for this every frame: one adapter is kept while the window and the
+                // button it wraps are the same objects, so the frame costs no allocation and the
+                // adapter's own message cache survives.
+                if (_adapter == null
+                    || !ReferenceEquals(_adapterWindow, _currentWindow)
+                    || !ReferenceEquals(_adapterButton, _currentButton))
+                {
+                    _adapter = new ChatAdapter(_currentWindow, _currentButton);
+                    _adapterWindow = _currentWindow;
+                    _adapterButton = _currentButton;
+                }
+
+                return _adapter;
             }
         }
 
@@ -40,6 +58,9 @@ namespace SongsOfConquestAccess
             _currentButton = null;
             _windowProbed = false;
             _buttonProbed = false;
+            _adapter = null;
+            _adapterWindow = null;
+            _adapterButton = null;
         }
 
         [HarmonyPatch(typeof(ChatWindowBehavior), "Initialize")]
