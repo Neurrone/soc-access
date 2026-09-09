@@ -1,3 +1,4 @@
+using System;
 namespace SongsOfConquestAccess.Screens
 {
     /// <summary>
@@ -29,6 +30,21 @@ namespace SongsOfConquestAccess.Screens
                 if (!ReferenceEquals(previous, value))
                 {
                     OnLiveChanged(previous);
+                    // An adapter lives as long as the menu instance it wraps; what it attached to
+                    // the game (a handler, a native subscription) goes with it. Per-menu state
+                    // belongs on the adapter for the same reason (AGENTS.md, Screen Resolution).
+                    IDisposable disposable = previous as IDisposable;
+                    if (disposable != null)
+                    {
+                        try
+                        {
+                            disposable.Dispose();
+                        }
+                        catch (Exception exception)
+                        {
+                            SocAccessMod.Instance?.LogWarning(Key + ": disposing the previous adapter threw: " + exception.Message);
+                        }
+                    }
                 }
 
                 // A PAGE THAT TURNS IN PLACE says its new name itself. The screen never left, so
