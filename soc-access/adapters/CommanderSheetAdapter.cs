@@ -86,6 +86,18 @@ namespace SongsOfConquestAccess.Adapters
 
         private readonly SlotSnapshot _backpack = new SlotSnapshot();
 
+        // The three bands whose rows are COMPOSED rather than read: the wielder's skills, their
+        // powers and their specializations. Each row costs a localization lookup, a tooltip over the
+        // drawn entry and, for a skill, the level read off the drawn text; none of it changes until
+        // the wielder does or a skill goes up, and both of those are in the key. The stats band is
+        // not here because its key would cost what the band does, and the modifier band is not
+        // because its rows ARE the game's own text, read live off the showing tab.
+        private readonly BandMemo _skillRows = new BandMemo();
+
+        private readonly BandMemo _powerRows = new BandMemo();
+
+        private readonly BandMemo _specializationRows = new BandMemo();
+
         private readonly CommanderSheet _sheet;
         private readonly IClientAdventureFacade _facade;
         private readonly ILocalizationHandler _localization;
@@ -118,6 +130,55 @@ namespace SongsOfConquestAccess.Adapters
             _factionLookup = GetField<IFactionLookup>(_specialization, FactionLookupField);
             _statsInfo = GetField<CommanderStatsInfo>(_specialization, StatsInfoField);
             _modifierTabs = GetField<CommanderSheetModifierTabNavigation>(sheet, ModifierTabsField);
+        }
+
+        /// <summary>One band's rows and the key they were built from - the same bargain
+        /// <see cref="SlotSnapshot"/> makes for the artifact lists, over the rows of a band. The
+        /// caller writes this frame's numbers into <see cref="BeginKey"/> and asks
+        /// <see cref="Unchanged"/> whether what it built last time still describes the game.</summary>
+        private sealed class BandMemo
+        {
+            private readonly List<int> _key = new List<int>();
+
+            private readonly List<int> _read = new List<int>();
+
+            private IReadOnlyList<LabeledItem> _rows;
+
+            /// <summary>The list this frame's key is written into, emptied for the caller.</summary>
+            public List<int> BeginKey()
+            {
+                _read.Clear();
+                return _read;
+            }
+
+            /// <summary>The rows built for the key just read, or null where the game has moved since.
+            /// </summary>
+            public IReadOnlyList<LabeledItem> Unchanged()
+            {
+                if (_rows == null || _key.Count != _read.Count)
+                {
+                    return null;
+                }
+
+                for (int i = 0; i < _key.Count; i++)
+                {
+                    if (_key[i] != _read[i])
+                    {
+                        return null;
+                    }
+                }
+
+                return _rows;
+            }
+
+            /// <summary>Hold these rows for the key just read, and answer with them.</summary>
+            public IReadOnlyList<LabeledItem> Keep(List<LabeledItem> rows)
+            {
+                _key.Clear();
+                _key.AddRange(_read);
+                _rows = rows;
+                return rows;
+            }
         }
 
         public object SourceKey
@@ -245,18 +306,24 @@ namespace SongsOfConquestAccess.Adapters
 
         public IReadOnlyList<LabeledItem> GetSpecializations()
         {
-            List<LabeledItem> items = new List<LabeledItem>();
             ICommanderState commander = GetCommander();
-            if (commander == null || _wielderLookup == null || _bacteriaLookup == null || _localization == null)
+            ICommanderDefinition definition = commander != null && _wielderLookup != null
+                ? _wielderLookup.Get(commander.Reference)
+                : null;
+            SerializableBacteriaDef[] specializations = definition != null ? definition.Specializations : null;
+            List<int> key = _specializationRows.BeginKey();
+            key.Add(CommanderId);
+            key.Add(specializations != null ? specializations.Length : -1);
+            IReadOnlyList<LabeledItem> unchanged = _specializationRows.Unchanged();
+            if (unchanged != null)
             {
-                return items;
+                return unchanged;
             }
 
-            ICommanderDefinition definition = _wielderLookup.Get(commander.Reference);
-            SerializableBacteriaDef[] specializations = definition != null ? definition.Specializations : null;
-            if (specializations == null)
+            List<LabeledItem> items = new List<LabeledItem>();
+            if (commander == null || _bacteriaLookup == null || _localization == null || specializations == null)
             {
-                return items;
+                return _specializationRows.Keep(items);
             }
 
             for (int i = 0; i < specializations.Length; i++)
@@ -273,7 +340,7 @@ namespace SongsOfConquestAccess.Adapters
                 items.Add(new LabeledItem("specialization-" + i, SpokenLines.Clean(text)));
             }
 
-            return items;
+            return _specializationRows.Keep(items);
         }
 
         public IReadOnlyList<ModifierCategory> GetModifierCategories()
@@ -382,11 +449,31 @@ namespace SongsOfConquestAccess.Adapters
 
         public IReadOnlyList<LabeledItem> GetSkills(bool powers)
         {
-            List<LabeledItem> items = new List<LabeledItem>();
             ICommanderState commander = GetCommander();
+            BandMemo memo = powers ? _powerRows : _skillRows;
+            List<int> key = memo.BeginKey();
+            key.Add(CommanderId);
+            IList<SkillReference> held = commander != null ? commander.Skills as IList<SkillReference> : null;
+            key.Add(held != null ? held.Count : -1);
+            if (held != null)
+            {
+                for (int i = 0; i < held.Count; i++)
+                {
+                    key.Add((int)held[i].Skill);
+                    key.Add(held[i].Level);
+                }
+            }
+
+            IReadOnlyList<LabeledItem> unchanged = memo.Unchanged();
+            if (unchanged != null)
+            {
+                return unchanged;
+            }
+
+            List<LabeledItem> items = new List<LabeledItem>();
             if (commander == null || commander.Skills == null || _skillLookup == null)
             {
-                return items;
+                return memo.Keep(items);
             }
 
             SkillVariant expectedVariant = powers ? SkillVariant.Power : SkillVariant.Normal;
@@ -422,7 +509,7 @@ namespace SongsOfConquestAccess.Adapters
                 }
             }
 
-            return items;
+            return memo.Keep(items);
         }
 
         public ICommanderState GetCommander()
