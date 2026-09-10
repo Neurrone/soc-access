@@ -299,9 +299,17 @@ namespace SongsOfConquestAccess.Screens
                 ModText.Get(ModStrings.Screens.AddCustomCategory),
                 () =>
                 {
+                    // The built-in labels are resolved once here rather than inside the predicate,
+                    // which the walk past a taken position calls again for every candidate name.
+                    IReadOnlyList<string> builtInNames = ScannerCustomCategoryNameConflict.BuiltInNames(taxonomy);
                     ScannerCustomCategory added = ModSettings.AddScannerCustomCategory(
                         taxonomy.Key,
-                        position => ModText.Get(ModStrings.Screens.CustomCategoryDefaultName, position));
+                        position => ModText.Get(ModStrings.Screens.CustomCategoryDefaultName, position),
+                        name => ScannerCustomCategoryNameConflict.Exists(
+                            name,
+                            builtInNames,
+                            ModSettings.GetScannerCustomCategories(taxonomy.Key),
+                            0));
                     if (added == null)
                     {
                         return;
@@ -431,20 +439,34 @@ namespace SongsOfConquestAccess.Screens
 
         /// <summary>
         /// Two categories under one name are one name in speech, which is the only way the category
-        /// cycle is ever read, so a name already spoken for is refused. The refusal is a dialog of
+        /// cycle is ever read, so a name already spoken for is refused, and so is an empty box,
+        /// which would leave a category the reader speaks as silence. Each refusal is a dialog of
         /// its own stacked over the editor, so it is read on arrival and has to be dismissed rather
         /// than passing by as one spoken line; the editor is left open underneath with what was
-        /// typed still in the box, so a near miss is edited rather than typed out again.
+        /// typed still in the box, so a near miss is edited rather than typed out again. A name
+        /// left as it was is not a refusal: Confirm simply closes.
         /// </summary>
         private static bool Rename(ScannerTaxonomy taxonomy, int id, string name)
         {
+            if (string.IsNullOrWhiteSpace(name))
+            {
+                OpenNameRefused(
+                    "mod-category-name-empty",
+                    ModText.Get(ModStrings.Screens.CustomCategoryNameMissingTitle),
+                    ModText.Get(ModStrings.Screens.CustomCategoryNameEmpty));
+                return false;
+            }
+
             if (ScannerCustomCategoryNameConflict.Exists(
                     name,
                     taxonomy,
                     ModSettings.GetScannerCustomCategories(taxonomy.Key),
                     id))
             {
-                OpenNameTaken(name);
+                OpenNameRefused(
+                    "mod-category-name-taken",
+                    ModText.Get(ModStrings.Screens.CustomCategoryNameTakenTitle),
+                    ModText.Get(ModStrings.Screens.CustomCategoryNameTaken, name));
                 return false;
             }
 
@@ -459,15 +481,15 @@ namespace SongsOfConquestAccess.Screens
         /// button". OK, the window's close button and Escape are all the same way out, and none of
         /// them changes anything.
         /// </summary>
-        private static void OpenNameTaken(string name)
+        private static void OpenNameRefused(string key, string title, string message)
         {
             ModDialogScreen.Open(
-                "mod-category-name-taken",
-                ModText.Get(ModStrings.Screens.CustomCategoryNameTakenTitle),
+                key,
+                title,
                 screen =>
                 {
                     ModDialog dialog = screen.Dialog;
-                    dialog.AddText(ModText.Get(ModStrings.Screens.CustomCategoryNameTaken, name));
+                    dialog.AddText(message);
                     dialog.AddButton(
                         GameText.Get("Common/Ok", ModText.Get(ModStrings.Screens.Ok)),
                         () => screen.Close());

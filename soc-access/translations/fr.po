@@ -3660,6 +3660,16 @@ msgctxt "Screens.CustomCategoryName"
 msgid "Name"
 msgstr "Nom"
 
+#. Screens.CustomCategoryNameEmpty
+msgctxt "Screens.CustomCategoryNameEmpty"
+msgid "A category needs a name"
+msgstr "Une catégorie doit avoir un nom"
+
+#. Screens.CustomCategoryNameMissingTitle
+msgctxt "Screens.CustomCategoryNameMissingTitle"
+msgid "Name missing"
+msgstr "Nom manquant"
+
 #. Screens.CustomCategoryNameTaken
 msgctxt "Screens.CustomCategoryNameTaken"
 msgid "{0} is already the name of a category"

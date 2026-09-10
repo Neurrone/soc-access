@@ -10,11 +10,11 @@ namespace SongsOfConquestAccess.Tests
         public void ARoundTripKeepsEveryCategoryIntact()
         {
             ScannerCustomCategoryList list = new ScannerCustomCategoryList();
-            ScannerCustomCategory first = list.Add(position => "Custom " + position);
+            ScannerCustomCategory first = list.Add(position => "Custom " + position, null);
             first.SetSelector(ScannerCategoryKeys.Pickups, ScannerSubcategoryKeys.Unvisited, selected: true);
             first.SetSelector(ScannerCategoryKeys.Buildings, ScannerSubcategoryKeys.Enemy, selected: true);
             first.AddKeyword("mine");
-            ScannerCustomCategory second = list.Add(position => "Custom " + position);
+            ScannerCustomCategory second = list.Add(position => "Custom " + position, null);
             second.AddKeyword("gold");
 
             ScannerCustomCategoryList decoded = ScannerCustomCategoryCodec.Decode(ScannerCustomCategoryCodec.Encode(list));
@@ -36,7 +36,7 @@ namespace SongsOfConquestAccess.Tests
         public void SeparatorsInPlayerTextSurviveTheRoundTrip()
         {
             ScannerCustomCategoryList list = new ScannerCustomCategoryList();
-            ScannerCustomCategory category = list.Add(position => "a;b|c,d:e\\f");
+            ScannerCustomCategory category = list.Add(position => "a;b|c,d:e\\f", null);
             category.AddKeyword("one, two");
             category.AddKeyword("three;four|five");
 
@@ -53,7 +53,7 @@ namespace SongsOfConquestAccess.Tests
         public void AnEmptyCategorySurvivesSoTheSettingsListStillShowsIt()
         {
             ScannerCustomCategoryList list = new ScannerCustomCategoryList();
-            ScannerCustomCategory category = list.Add(position => "Custom " + position);
+            ScannerCustomCategory category = list.Add(position => "Custom " + position, null);
 
             ScannerCustomCategoryList decoded = ScannerCustomCategoryCodec.Decode(ScannerCustomCategoryCodec.Encode(list));
 

@@ -40,7 +40,8 @@ namespace SongsOfConquestAccess.Tests
         {
             ScannerCustomCategory category = ModSettings.AddScannerCustomCategory(
                 Taxonomy,
-                position => "Custom " + position);
+                position => "Custom " + position,
+                null);
             Assert.IsNotNull(category);
             int id = category.Id;
             ModSettings.RenameScannerCustomCategory(Taxonomy, id, "Explorer");

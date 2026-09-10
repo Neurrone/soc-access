@@ -554,6 +554,8 @@
             public static readonly ModString CustomCategoryKeyHeldBy = new ModString("Screens.CustomCategoryKeyHeldBy", "{0}, held by {1}");
             public static readonly ModString CustomCategoryKeyTitle = new ModString("Screens.CustomCategoryKeyTitle", "Key for {0}");
             public static readonly ModString CustomCategoryName = new ModString("Screens.CustomCategoryName", "Name");
+            public static readonly ModString CustomCategoryNameEmpty = new ModString("Screens.CustomCategoryNameEmpty", "A category needs a name");
+            public static readonly ModString CustomCategoryNameMissingTitle = new ModString("Screens.CustomCategoryNameMissingTitle", "Name missing");
             public static readonly ModString CustomCategoryNameTaken = new ModString("Screens.CustomCategoryNameTaken", "{0} is already the name of a category");
             public static readonly ModString CustomCategoryNameTakenTitle = new ModString("Screens.CustomCategoryNameTakenTitle", "Name already in use");
             public static readonly ModString DeleteCustomCategory = new ModString("Screens.DeleteCustomCategory", "Delete this custom category");

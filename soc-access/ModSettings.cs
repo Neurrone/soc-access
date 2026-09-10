@@ -472,9 +472,15 @@ namespace SongsOfConquestAccess
         /// <summary>
         /// The caller supplies the starting name because the wording is
         /// localized accessibility text, and it is stored rather than derived so
-        /// it stays put when an earlier category is deleted.
+        /// it stays put when an earlier category is deleted. The caller also
+        /// says which names are already spoken for, because the built-in
+        /// category labels a new name must not collide with belong to the
+        /// taxonomy rather than to the stored list.
         /// </summary>
-        public static ScannerCustomCategory AddScannerCustomCategory(string taxonomyKey, Func<int, string> nameForPosition)
+        public static ScannerCustomCategory AddScannerCustomCategory(
+            string taxonomyKey,
+            Func<int, string> nameForPosition,
+            Func<string, bool> nameIsTaken)
         {
             ScannerCustomCategoryList list = GetScannerCustomCategoryList(taxonomyKey);
             if (list == null)
@@ -482,7 +488,7 @@ namespace SongsOfConquestAccess
                 return null;
             }
 
-            ScannerCustomCategory category = list.Add(nameForPosition);
+            ScannerCustomCategory category = list.Add(nameForPosition, nameIsTaken);
             if (SupportsScannerQuickKeys(taxonomyKey))
             {
                 category.SetQuickKey(list.FirstFreeQuickKey());

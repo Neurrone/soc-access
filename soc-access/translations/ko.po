@@ -3630,6 +3630,16 @@ msgctxt "Screens.CustomCategoryName"
 msgid "Name"
 msgstr "이름"
 
+#. Screens.CustomCategoryNameEmpty
+msgctxt "Screens.CustomCategoryNameEmpty"
+msgid "A category needs a name"
+msgstr "범주에는 이름이 필요합니다"
+
+#. Screens.CustomCategoryNameMissingTitle
+msgctxt "Screens.CustomCategoryNameMissingTitle"
+msgid "Name missing"
+msgstr "이름 없음"
+
 #. Screens.CustomCategoryNameTaken
 msgctxt "Screens.CustomCategoryNameTaken"
 msgid "{0} is already the name of a category"

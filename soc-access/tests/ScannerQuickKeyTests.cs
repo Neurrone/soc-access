@@ -69,7 +69,7 @@ namespace SongsOfConquestAccess.Tests
         {
             ScannerCustomCategoryList list = new ScannerCustomCategoryList();
             ScannerCustomCategory withKey = Add(list);
-            ScannerCustomCategory withoutKey = list.Add(position => "Custom " + position);
+            ScannerCustomCategory withoutKey = list.Add(position => "Custom " + position, null);
 
             ScannerCustomCategoryList decoded = ScannerCustomCategoryCodec.Decode(ScannerCustomCategoryCodec.Encode(list));
 
@@ -91,7 +91,7 @@ namespace SongsOfConquestAccess.Tests
 
         private static ScannerCustomCategory Add(ScannerCustomCategoryList list)
         {
-            ScannerCustomCategory category = list.Add(position => "Custom " + position);
+            ScannerCustomCategory category = list.Add(position => "Custom " + position, null);
             category.SetQuickKey(list.FirstFreeQuickKey());
             return category;
         }

@@ -24,11 +24,32 @@ namespace SongsOfConquestAccess.Scanner
             get { return _nextId; }
         }
 
-        public ScannerCustomCategory Add(Func<int, string> nameForPosition)
+        /// <summary>
+        /// Adds a category named after its position, walking past any position
+        /// whose name <paramref name="nameIsTaken"/> reports as spoken for:
+        /// deleting the second of three and adding again would otherwise mint
+        /// the third one's name a second time, and two categories under one
+        /// name are one name in the cycle the player hears. A generator that
+        /// ignores the position it is given stops the walk as soon as it repeats
+        /// itself, so a caller cannot hang the dialog.
+        /// </summary>
+        public ScannerCustomCategory Add(Func<int, string> nameForPosition, Func<string, bool> nameIsTaken)
         {
             int id = _nextId;
             _nextId = id + 1;
-            string name = nameForPosition != null ? nameForPosition(_categories.Count + 1) : string.Empty;
+            string name = string.Empty;
+            if (nameForPosition != null)
+            {
+                int position = _categories.Count + 1;
+                name = nameForPosition(position);
+                HashSet<string> tried = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+                while (nameIsTaken != null && nameIsTaken(name) && tried.Add(name))
+                {
+                    position++;
+                    name = nameForPosition(position);
+                }
+            }
+
             ScannerCustomCategory category = new ScannerCustomCategory(id, name);
             _categories.Add(category);
             return category;
