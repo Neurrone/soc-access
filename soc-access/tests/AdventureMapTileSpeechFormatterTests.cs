@@ -353,6 +353,47 @@ namespace SongsOfConquestAccess.Tests
             Assert.AreEqual("Grass, On route, next turn, 4, 2.", text);
         }
 
+        [TestMethod]
+        public void DescribeTileReadsNeitherTerrainNorRoadDirectionsUnderASettlement()
+        {
+            int calls = 0;
+            AdventureMapTile tile = new AdventureMapTile(new Vector2Int(4, 2))
+            {
+                IsExplored = true,
+                IsVisible = true,
+                Terrain = AdventureTerrainKind.DirtRoad,
+                IsReachable = true,
+                EntityCategory = AdventureEntityCategory.Settlement
+            };
+            tile.SetRoadDirectionsSource(() =>
+            {
+                calls++;
+                return new[] { ScannerDirection.East, ScannerDirection.West };
+            });
+
+            string text = CreateFormatter().DescribeTile(tile);
+
+            Assert.AreEqual("reachable, 4, 2.", text);
+            Assert.AreEqual(0, calls, "a settlement tile should not cost the work of finding road directions");
+        }
+
+        [TestMethod]
+        public void DescribeTileStillReadsTheTerrainUnderAWielder()
+        {
+            AdventureMapTile tile = new AdventureMapTile(new Vector2Int(4, 2))
+            {
+                IsExplored = true,
+                IsVisible = true,
+                Terrain = AdventureTerrainKind.Grass,
+                EntityCategory = AdventureEntityCategory.Wielder,
+                Commander = new AdventureMapTile.CommanderInfo { Name = "Cecilia Stoutheart" }
+            };
+
+            string text = CreateFormatter().DescribeTile(tile);
+
+            Assert.AreEqual("Cecilia Stoutheart, Grass, 4, 2.", text);
+        }
+
         private static AdventureMapTile CreateRouteTile(AdventureMapTile.PathIndicatorInfo indicator)
         {
             return new AdventureMapTile(new Vector2Int(4, 2))

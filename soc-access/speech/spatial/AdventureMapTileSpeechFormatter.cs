@@ -132,7 +132,14 @@ namespace SongsOfConquestAccess.Speech.Spatial
             bool hasContent = !string.IsNullOrWhiteSpace(wielder)
                 || !string.IsNullOrWhiteSpace(mapEntity)
                 || !string.IsNullOrWhiteSpace(interactionPoint);
-            string terrain = DescribeTerrain(tile.Terrain);
+            // A settlement or a resource deposit speaks for the whole tile: what stands here is
+            // the acknowledgment, so the ground underneath and the road through it stay silent
+            // rather than doubling every step. The tile cues suppress the terrain under a
+            // categorised entity the same way. Nothing suppressed is composed, so the road
+            // directions are never worked out for a tile that will not say them.
+            bool entityCoversTheGround = tile.EntityCategory == AdventureEntityCategory.Settlement
+                || tile.EntityCategory == AdventureEntityCategory.ResourceDeposit;
+            string terrain = entityCoversTheGround ? string.Empty : DescribeTerrain(tile.Terrain);
             bool appendRouteToTerrain = tile.IsExplored
                 && !hasContent
                 && !string.IsNullOrWhiteSpace(terrain)
@@ -159,7 +166,7 @@ namespace SongsOfConquestAccess.Speech.Spatial
                 yield return new AnnouncementPart(AdventureMapAnnouncementDefinitions.TileKeys.Terrain, terrain);
             }
 
-            string roadDirections = DescribeRoadDirections(tile);
+            string roadDirections = entityCoversTheGround ? string.Empty : DescribeRoadDirections(tile);
             if (!string.IsNullOrWhiteSpace(roadDirections))
             {
                 yield return new AnnouncementPart(AdventureMapAnnouncementDefinitions.TileKeys.RoadDirections, roadDirections);
