@@ -830,6 +830,11 @@ msgctxt "Screens.Layout"
 msgid "Layout"
 msgstr "Układ"
 
+#. Screens.LoadingProgress
+msgctxt "Screens.LoadingProgress"
+msgid "Loading progress, {0} percent"
+msgstr "Postęp wczytywania, {0} procent"
+
 #. Screens.MainMenu
 msgctxt "Screens.MainMenu"
 msgid "Main menu"

@@ -825,6 +825,11 @@ msgctxt "Screens.Layout"
 msgid "Layout"
 msgstr "레이아웃"
 
+#. Screens.LoadingProgress
+msgctxt "Screens.LoadingProgress"
+msgid "Loading progress, {0} percent"
+msgstr "로딩 진행률 {0}퍼센트"
+
 #. Screens.MainMenu
 msgctxt "Screens.MainMenu"
 msgid "Main menu"

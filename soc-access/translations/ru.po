@@ -845,6 +845,11 @@ msgctxt "Screens.Layout"
 msgid "Layout"
 msgstr "Макет"
 
+#. Screens.LoadingProgress
+msgctxt "Screens.LoadingProgress"
+msgid "Loading progress, {0} percent"
+msgstr "Прогресс загрузки, {0} процентов"
+
 #. Screens.MainMenu
 msgctxt "Screens.MainMenu"
 msgid "Main menu"

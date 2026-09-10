@@ -577,6 +577,7 @@
             public static readonly ModString KeywordAlreadyAdded = new ModString("Screens.KeywordAlreadyAdded", "That keyword is already in this custom category");
             public static readonly ModString Layout = new ModString("Screens.Layout", "Layout");
             public static readonly ModString LevelValue = new ModString("Screens.LevelValue", "level {0}");
+            public static readonly ModString LoadingProgress = new ModString("Screens.LoadingProgress", "Loading progress, {0} percent");
             public static readonly ModString MainMenu = new ModString("Screens.MainMenu", "Main menu");
             /// <summary>The adventure map itself, as the stop the tile cursor lives in.</summary>
             public static readonly ModString Map = new ModString("Screens.Map", "Map");

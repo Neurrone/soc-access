@@ -2544,6 +2544,11 @@ msgctxt "Screens.LevelValue"
 msgid "level {0}"
 msgstr ""
 
+#. Screens.LoadingProgress
+msgctxt "Screens.LoadingProgress"
+msgid "Loading progress, {0} percent"
+msgstr ""
+
 #. Screens.MainMenu
 msgctxt "Screens.MainMenu"
 msgid "Main menu"
