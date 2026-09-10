@@ -630,6 +630,8 @@
             public static readonly ModString ReadLongTooltips = new ModString("Screens.ReadLongTooltips", "Read long tooltips");
             public static readonly ModString ReadLongTooltipsTooltip = new ModString("Screens.ReadLongTooltipsTooltip", "Whether long tooltips like wielder and troop information are automatically read");
             public static readonly ModString ReadStoryCameraFocusChanges = new ModString("Screens.ReadStoryCameraFocusChanges", "Read story camera focus change events");
+            public static readonly ModString ReadUsageHints = new ModString("Screens.ReadUsageHints", "Read usage hints");
+            public static readonly ModString ReadUsageHintsTooltip = new ModString("Screens.ReadUsageHintsTooltip", "Whether usage hints in buffers are automatically read");
             public static readonly ModString RecruitFrom = new ModString("Screens.RecruitFrom", "Recruit from");
             public static readonly ModString RecruitingFrom = new ModString("Screens.RecruitingFrom", "Recruiting from {0}");
             public static readonly ModString Recruits = new ModString("Screens.Recruits", "Recruits");

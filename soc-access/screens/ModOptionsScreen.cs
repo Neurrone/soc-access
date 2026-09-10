@@ -232,6 +232,13 @@ namespace SongsOfConquestAccess.Screens
                 ModSettings.ReadLongTooltips,
                 ModSettings.SetReadLongTooltips,
                 tooltip: ModText.Get(ModStrings.Screens.ReadLongTooltipsTooltip));
+            // A checkbox over a setting that is a string: on is "always", off is "never", and the
+            // day a third value lands this row becomes a drop list without the stored value moving.
+            _dialog.AddToggle(
+                ModText.Get(ModStrings.Screens.ReadUsageHints),
+                ModSettings.ReadUsageHints != UsageHintReading.Never,
+                on => ModSettings.SetReadUsageHints(on ? UsageHintReading.Always : UsageHintReading.Never),
+                tooltip: ModText.Get(ModStrings.Screens.ReadUsageHintsTooltip));
         }
 
         private void DrawScanner()

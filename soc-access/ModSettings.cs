@@ -8,6 +8,19 @@ using SongsOfConquestAccess.Speech.Spatial;
 
 namespace SongsOfConquestAccess
 {
+    /// <summary>
+    /// What the "read usage hints" setting can say. Stored as a string rather than a flag because
+    /// the answer has more than two useful values in it - a third, "only where the control has
+    /// nothing else to say", is the obvious next one - and a flag would have to be migrated the day
+    /// one is added. A value this list does not name reads as <see cref="Always"/> and is left on
+    /// disk untouched, so a config written by a later build survives a run of this one.
+    /// </summary>
+    public static class UsageHintReading
+    {
+        public const string Always = "always";
+        public const string Never = "never";
+    }
+
     public static class ModSettings
     {
         public const int CueVolumeMinimum = 0;
@@ -29,6 +42,7 @@ namespace SongsOfConquestAccess
         private static ConfigEntry<bool> _scannerUsesLongDirections;
         private static ConfigEntry<bool> _adventureMapUsesLongRoadDirections;
         private static ConfigEntry<bool> _readLongTooltips;
+        private static ConfigEntry<string> _readUsageHints;
         private static readonly Dictionary<string, AnnouncementGroupConfig> _announcementGroups =
             new Dictionary<string, AnnouncementGroupConfig>();
         private static readonly Dictionary<string, AudioCueConfig> _audioCues =
@@ -69,6 +83,18 @@ namespace SongsOfConquestAccess
             get { return _readLongTooltips == null || _readLongTooltips.Value; }
         }
 
+        /// <summary>Whether a control's usage hints are spoken on focus - one of
+        /// <see cref="UsageHintReading"/>'s values. The hints are in the review buffer whatever this
+        /// says.</summary>
+        public static string ReadUsageHints
+        {
+            get
+            {
+                string value = _readUsageHints == null ? null : _readUsageHints.Value;
+                return value == UsageHintReading.Never ? UsageHintReading.Never : UsageHintReading.Always;
+            }
+        }
+
         public static void Bind(ConfigFile config)
         {
             _config = config;
@@ -102,6 +128,14 @@ namespace SongsOfConquestAccess
                 "ReadLongTooltips",
                 true,
                 "Whether long tooltips like wielder and troop information are automatically read.");
+            // A plain string entry, not an AcceptableValueList: the list COERCES a value it does not
+            // know back to the default and writes the correction to disk, which would throw away a
+            // value a later build wrote. The reader above tolerates it instead.
+            _readUsageHints = config.Bind(
+                "Speech",
+                "ReadUsageHints",
+                UsageHintReading.Always,
+                "Whether usage hints in buffers are automatically read: \"always\" or \"never\".");
             BindAnnouncementGroups(config);
             BindAudioCues(config);
             BindScannerCustomCategories(config);
@@ -137,6 +171,17 @@ namespace SongsOfConquestAccess
             }
 
             _readLongTooltips.Value = value;
+            _config?.Save();
+        }
+
+        public static void SetReadUsageHints(string value)
+        {
+            if (_readUsageHints == null)
+            {
+                return;
+            }
+
+            _readUsageHints.Value = value;
             _config?.Save();
         }
 
@@ -560,6 +605,7 @@ namespace SongsOfConquestAccess
             _scannerUsesLongDirections = null;
             _adventureMapUsesLongRoadDirections = null;
             _readLongTooltips = null;
+            _readUsageHints = null;
             _announcementGroups.Clear();
             _audioCues.Clear();
             _scannerCustomCategories.Clear();

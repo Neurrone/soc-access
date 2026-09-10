@@ -975,6 +975,16 @@ msgctxt "Screens.ReadStoryCameraFocusChanges"
 msgid "Read story camera focus change events"
 msgstr "Leer eventos de cambio de enfoque de la cámara de la historia"
 
+#. Screens.ReadUsageHints
+msgctxt "Screens.ReadUsageHints"
+msgid "Read usage hints"
+msgstr "Leer consejos de uso"
+
+#. Screens.ReadUsageHintsTooltip
+msgctxt "Screens.ReadUsageHintsTooltip"
+msgid "Whether usage hints in buffers are automatically read"
+msgstr "Si los consejos de uso en los búferes se leen automáticamente"
+
 #. Screens.RecruitFrom
 msgctxt "Screens.RecruitFrom"
 msgid "Recruit from"

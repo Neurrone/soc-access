@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using SongsOfConquestAccess.Adapters;
 using SongsOfConquestAccess.Buffers;
@@ -99,6 +99,11 @@ namespace SongsOfConquestAccess.UI
             // the action table, so the renderer is injected here and reads the LIVE bindings: a
             // re-bound gesture re-words every hint that names it, with nothing to keep in step.
             NodeHints.Chord = ChordNames.Of;
+
+            // Whether a hint is SAID. One stable delegate for the whole mod load: the announcer's
+            // per-node memo has the filter reference in its key, so re-assigning this when the
+            // setting changes would throw away every memo instead of changing one answer.
+            GraphAnnouncer.PartFilter = UsageHints.Speaks;
 
             // The carry's three gestures, named to the engine so its pick-up announcement and its
             // two derived hints spell whatever chords those actions are bound to now.
