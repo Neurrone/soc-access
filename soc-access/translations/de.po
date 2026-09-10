@@ -3750,3 +3750,48 @@ msgstr "{0}, um eine neue Taste festzulegen"
 msgctxt "Screens.KeyBindingClearHint"
 msgid "{0} to restore the default"
 msgstr "{0}, um die Standardbelegung wiederherzustellen"
+
+#. Screens.Keybinds
+msgctxt "Screens.Keybinds"
+msgid "Keybinds"
+msgstr "Tastenbelegung"
+
+#. Screens.GeneralAndReviewBuffer
+msgctxt "Screens.GeneralAndReviewBuffer"
+msgid "General and review buffer"
+msgstr "Allgemein und Verlaufspuffer"
+
+#. Screens.Bookmarks
+msgctxt "Screens.Bookmarks"
+msgid "Bookmarks"
+msgstr "Lesezeichen"
+
+#. Screens.HexGrid
+msgctxt "Screens.HexGrid"
+msgid "Hex grid"
+msgstr "Hexraster"
+
+#. Screens.KeybindRebind
+msgctxt "Screens.KeybindRebind"
+msgid "Rebind"
+msgstr "Neu belegen"
+
+#. Screens.KeybindPressKey
+msgctxt "Screens.KeybindPressKey"
+msgid "Press a key for {0}"
+msgstr "Drücke eine Taste für {0}"
+
+#. Screens.KeybindSet
+msgctxt "Screens.KeybindSet"
+msgid "{0} is now {1}"
+msgstr "{0} ist jetzt {1}"
+
+#. Screens.KeybindUnbound
+msgctxt "Screens.KeybindUnbound"
+msgid "unbound"
+msgstr "nicht belegt"
+
+#. Screens.KeybindShadowed
+msgctxt "Screens.KeybindShadowed"
+msgid "While the mod's {0} is active, the game's {1} will not fire."
+msgstr "Während {0} des Mods aktiv ist, wird {1} des Spiels nicht ausgelöst."

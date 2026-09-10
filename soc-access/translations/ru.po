@@ -3780,3 +3780,48 @@ msgstr "{0} — назначить новую клавишу"
 msgctxt "Screens.KeyBindingClearHint"
 msgid "{0} to restore the default"
 msgstr "{0} — восстановить значение по умолчанию"
+
+#. Screens.Keybinds
+msgctxt "Screens.Keybinds"
+msgid "Keybinds"
+msgstr "Назначение клавиш"
+
+#. Screens.GeneralAndReviewBuffer
+msgctxt "Screens.GeneralAndReviewBuffer"
+msgid "General and review buffer"
+msgstr "Общее и буфер просмотра"
+
+#. Screens.Bookmarks
+msgctxt "Screens.Bookmarks"
+msgid "Bookmarks"
+msgstr "Закладки"
+
+#. Screens.HexGrid
+msgctxt "Screens.HexGrid"
+msgid "Hex grid"
+msgstr "Гексагональная сетка"
+
+#. Screens.KeybindRebind
+msgctxt "Screens.KeybindRebind"
+msgid "Rebind"
+msgstr "Переназначить"
+
+#. Screens.KeybindPressKey
+msgctxt "Screens.KeybindPressKey"
+msgid "Press a key for {0}"
+msgstr "Нажмите клавишу для «{0}»"
+
+#. Screens.KeybindSet
+msgctxt "Screens.KeybindSet"
+msgid "{0} is now {1}"
+msgstr "{0} теперь {1}"
+
+#. Screens.KeybindUnbound
+msgctxt "Screens.KeybindUnbound"
+msgid "unbound"
+msgstr "не назначено"
+
+#. Screens.KeybindShadowed
+msgctxt "Screens.KeybindShadowed"
+msgid "While the mod's {0} is active, the game's {1} will not fire."
+msgstr "Пока действует «{0}» мода, «{1}» игры не сработает."

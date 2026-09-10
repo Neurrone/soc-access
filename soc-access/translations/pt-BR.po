@@ -3750,3 +3750,48 @@ msgstr "{0} para definir uma nova tecla"
 msgctxt "Screens.KeyBindingClearHint"
 msgid "{0} to restore the default"
 msgstr "{0} para restaurar o padrão"
+
+#. Screens.Keybinds
+msgctxt "Screens.Keybinds"
+msgid "Keybinds"
+msgstr "Atalhos de teclado"
+
+#. Screens.GeneralAndReviewBuffer
+msgctxt "Screens.GeneralAndReviewBuffer"
+msgid "General and review buffer"
+msgstr "Geral e buffer de revisão"
+
+#. Screens.Bookmarks
+msgctxt "Screens.Bookmarks"
+msgid "Bookmarks"
+msgstr "Marcadores"
+
+#. Screens.HexGrid
+msgctxt "Screens.HexGrid"
+msgid "Hex grid"
+msgstr "Grade hexagonal"
+
+#. Screens.KeybindRebind
+msgctxt "Screens.KeybindRebind"
+msgid "Rebind"
+msgstr "Reatribuir"
+
+#. Screens.KeybindPressKey
+msgctxt "Screens.KeybindPressKey"
+msgid "Press a key for {0}"
+msgstr "Pressione uma tecla para {0}"
+
+#. Screens.KeybindSet
+msgctxt "Screens.KeybindSet"
+msgid "{0} is now {1}"
+msgstr "{0} agora é {1}"
+
+#. Screens.KeybindUnbound
+msgctxt "Screens.KeybindUnbound"
+msgid "unbound"
+msgstr "não atribuído"
+
+#. Screens.KeybindShadowed
+msgctxt "Screens.KeybindShadowed"
+msgid "While the mod's {0} is active, the game's {1} will not fire."
+msgstr "Enquanto {0} do mod estiver ativo, {1} do jogo não será acionado."

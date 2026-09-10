@@ -3720,3 +3720,48 @@ msgstr "새 키를 지정하려면 {0}"
 msgctxt "Screens.KeyBindingClearHint"
 msgid "{0} to restore the default"
 msgstr "기본값으로 되돌리려면 {0}"
+
+#. Screens.Keybinds
+msgctxt "Screens.Keybinds"
+msgid "Keybinds"
+msgstr "키 지정"
+
+#. Screens.GeneralAndReviewBuffer
+msgctxt "Screens.GeneralAndReviewBuffer"
+msgid "General and review buffer"
+msgstr "일반 및 리뷰 버퍼"
+
+#. Screens.Bookmarks
+msgctxt "Screens.Bookmarks"
+msgid "Bookmarks"
+msgstr "북마크"
+
+#. Screens.HexGrid
+msgctxt "Screens.HexGrid"
+msgid "Hex grid"
+msgstr "헥스 그리드"
+
+#. Screens.KeybindRebind
+msgctxt "Screens.KeybindRebind"
+msgid "Rebind"
+msgstr "다시 지정"
+
+#. Screens.KeybindPressKey
+msgctxt "Screens.KeybindPressKey"
+msgid "Press a key for {0}"
+msgstr "{0}에 사용할 키를 누르세요"
+
+#. Screens.KeybindSet
+msgctxt "Screens.KeybindSet"
+msgid "{0} is now {1}"
+msgstr "{0}이(가) 이제 {1}입니다"
+
+#. Screens.KeybindUnbound
+msgctxt "Screens.KeybindUnbound"
+msgid "unbound"
+msgstr "지정 안 됨"
+
+#. Screens.KeybindShadowed
+msgctxt "Screens.KeybindShadowed"
+msgid "While the mod's {0} is active, the game's {1} will not fire."
+msgstr "모드의 {0}이(가) 활성화된 동안에는 게임의 {1}이(가) 작동하지 않습니다."

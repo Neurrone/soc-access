@@ -3780,3 +3780,48 @@ msgstr "{0}, щоб призначити нову клавішу"
 msgctxt "Screens.KeyBindingClearHint"
 msgid "{0} to restore the default"
 msgstr "{0}, щоб відновити типове значення"
+
+#. Screens.Keybinds
+msgctxt "Screens.Keybinds"
+msgid "Keybinds"
+msgstr "Призначення клавіш"
+
+#. Screens.GeneralAndReviewBuffer
+msgctxt "Screens.GeneralAndReviewBuffer"
+msgid "General and review buffer"
+msgstr "Загальне та буфер перегляду"
+
+#. Screens.Bookmarks
+msgctxt "Screens.Bookmarks"
+msgid "Bookmarks"
+msgstr "Закладки"
+
+#. Screens.HexGrid
+msgctxt "Screens.HexGrid"
+msgid "Hex grid"
+msgstr "Гексагональна сітка"
+
+#. Screens.KeybindRebind
+msgctxt "Screens.KeybindRebind"
+msgid "Rebind"
+msgstr "Перепризначити"
+
+#. Screens.KeybindPressKey
+msgctxt "Screens.KeybindPressKey"
+msgid "Press a key for {0}"
+msgstr "Натисніть клавішу для «{0}»"
+
+#. Screens.KeybindSet
+msgctxt "Screens.KeybindSet"
+msgid "{0} is now {1}"
+msgstr "{0} тепер {1}"
+
+#. Screens.KeybindUnbound
+msgctxt "Screens.KeybindUnbound"
+msgid "unbound"
+msgstr "не призначено"
+
+#. Screens.KeybindShadowed
+msgctxt "Screens.KeybindShadowed"
+msgid "While the mod's {0} is active, the game's {1} will not fire."
+msgstr "Поки діє «{0}» мода, «{1}» гри не спрацює."
