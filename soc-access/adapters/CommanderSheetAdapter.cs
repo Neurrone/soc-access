@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Collections;
 using System.Globalization;
@@ -759,7 +759,10 @@ namespace SongsOfConquestAccess.Adapters
             }
 
             List<string> instructionLines = GetMouseInstructionLines();
-            return new Tooltip(() => RemoveExactLines(tooltip.TextLines, instructionLines), tooltip.VisualMetadata);
+            return new Tooltip(
+                () => RemoveExactLines(tooltip.TextLines, instructionLines),
+                tooltip.VisualMetadata,
+                isLong: () => tooltip.IsLong);
         }
 
         // The nine rows the game writes for a mouse. They are the same for every slot and for the

@@ -1,4 +1,4 @@
-using BepInEx.Configuration;
+﻿using BepInEx.Configuration;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -28,6 +28,7 @@ namespace SongsOfConquestAccess
         private static ConfigEntry<bool> _tileCuesEnabled;
         private static ConfigEntry<bool> _scannerUsesLongDirections;
         private static ConfigEntry<bool> _adventureMapUsesLongRoadDirections;
+        private static ConfigEntry<bool> _readLongTooltips;
         private static readonly Dictionary<string, AnnouncementGroupConfig> _announcementGroups =
             new Dictionary<string, AnnouncementGroupConfig>();
         private static readonly Dictionary<string, AudioCueConfig> _audioCues =
@@ -60,6 +61,14 @@ namespace SongsOfConquestAccess
             get { return _adventureMapUsesLongRoadDirections != null && _adventureMapUsesLongRoadDirections.Value; }
         }
 
+        /// <summary>Whether a LONG tooltip - the game's wielder and troop dossiers - is read out on
+        /// focus. A short tooltip is always read; this setting governs only the long ones, which stay
+        /// in the review buffer either way.</summary>
+        public static bool ReadLongTooltips
+        {
+            get { return _readLongTooltips == null || _readLongTooltips.Value; }
+        }
+
         public static void Bind(ConfigFile config)
         {
             _config = config;
@@ -88,6 +97,11 @@ namespace SongsOfConquestAccess
                 "UseLongRoadDirections",
                 false,
                 "Whether road directions use the long form (\"east west\") instead of the short form (\"e w\").");
+            _readLongTooltips = config.Bind(
+                "Tooltips",
+                "ReadLongTooltips",
+                true,
+                "Whether long tooltips like wielder and troop information are automatically read.");
             BindAnnouncementGroups(config);
             BindAudioCues(config);
             BindScannerCustomCategories(config);
@@ -112,6 +126,17 @@ namespace SongsOfConquestAccess
             }
 
             _readStoryCameraFocusChanges.Value = value;
+            _config?.Save();
+        }
+
+        public static void SetReadLongTooltips(bool value)
+        {
+            if (_readLongTooltips == null)
+            {
+                return;
+            }
+
+            _readLongTooltips.Value = value;
             _config?.Save();
         }
 
@@ -534,6 +559,7 @@ namespace SongsOfConquestAccess
             _tileCuesEnabled = null;
             _scannerUsesLongDirections = null;
             _adventureMapUsesLongRoadDirections = null;
+            _readLongTooltips = null;
             _announcementGroups.Clear();
             _audioCues.Clear();
             _scannerCustomCategories.Clear();

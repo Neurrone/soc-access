@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Reflection;
 using HarmonyLib;
@@ -711,7 +711,8 @@ namespace SongsOfConquestAccess.Adapters
 
             return new Tooltip(
                 () => tooltip.TextLines,
-                tooltip.VisualMetadata);
+                tooltip.VisualMetadata,
+                isLong: () => tooltip.IsLong);
         }
 
         public bool DismissNotification(int index)
@@ -836,7 +837,8 @@ namespace SongsOfConquestAccess.Adapters
                     RefreshWielderListEntryTooltip(entry);
                     return NativeTooltipUtility.GetTooltipLinesForComponent(selectable, LocalizationHandler);
                 },
-                VisualTooltipMetadata.ForComponent(selectable));
+                VisualTooltipMetadata.ForComponent(selectable),
+                isLong: () => NativeTooltipUtility.IsLongForComponent(selectable, () => RefreshWielderListEntryTooltip(entry)));
         }
 
         public bool IsOptionsButtonVisible()
@@ -1040,7 +1042,11 @@ namespace SongsOfConquestAccess.Adapters
                         RefreshEndTurnTooltip();
                         return NativeTooltipUtility.GetTooltipLinesForComponent(button, LocalizationHandler);
                     },
-                    VisualTooltipMetadata.ForComponent(button));
+                    VisualTooltipMetadata.ForComponent(button),
+                    // No composition provoked here, unlike the wielder rows: what this button
+                    // composes is PLAIN TEXT, which never lands in _overriddenDetails and so would
+                    // be recomposed on every build for an answer that is short whatever it says.
+                    isLong: () => NativeTooltipUtility.IsLongForComponent(button));
             }
         }
 

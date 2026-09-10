@@ -42,8 +42,11 @@ doctrine this engine was copied from.
   `Button`, `Group`, `Text`, `EditField`, `Checkbox`, `Slider` (Left/Right adjust; an optional
   activation, used for a slider's drawn value box), `ComboBox`, `Tab`, `Radio`, `Choice`, `Paragraphs` / `ParagraphParts` (a body of text as
   one part per paragraph, `live` where the game replaces it in place under a still cursor); the
-  parts (`LabelPart`, `DisabledPart`, `ValuePart`, `SelectedPart`), `TooltipSection` (every
-  native tooltip is an `Indicate` section, buffer only; `Aim` makes focus draw it;
+  parts (`LabelPart`, `DisabledPart`, `ValuePart`, `SelectedPart`), `TooltipSection` (the mode is
+  `ModeFor(tooltip)`: a tooltip whose game details object is one of the troop and wielder dossier
+  classes is LONG and `Indicate`, buffer only, unless the player asked for those
+  (`ModSettings.ReadLongTooltips`); every other tooltip is short and `Announce`. The buffer holds
+  all of them either way; `Aim` makes focus draw it;
   `DoNotDrawTooltip` for an edit control, since drawing selects the component and takes the
   keyboard off the field), `ActedState` (a refused activation says nothing). Detail and
   tooltip lines pass through `ui/SpokenLines.cs` (tags stripped after splitting on newlines).

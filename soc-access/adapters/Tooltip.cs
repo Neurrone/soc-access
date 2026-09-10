@@ -1,4 +1,4 @@
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System;
 using SongsOfConquest.Client.Menu.Tooltip;
 using SongsOfConquest.Common.Details;
@@ -11,17 +11,41 @@ namespace SongsOfConquestAccess.Adapters
     {
         private static readonly IReadOnlyList<string> EmptyLines = new string[0];
         private readonly Func<IReadOnlyList<string>> _getTextLines;
+        private readonly Func<bool> _getIsLong;
+        private bool _isLongAsked;
+        private bool _isLong;
 
         public Tooltip(
             Func<IReadOnlyList<string>> getTextLines,
             VisualTooltipMetadata visualMetadata,
             TileInstruction primaryInstruction = TileInstruction.None,
-            TileInstruction secondaryInstruction = TileInstruction.None)
+            TileInstruction secondaryInstruction = TileInstruction.None,
+            Func<bool> isLong = null)
         {
             _getTextLines = getTextLines;
             VisualMetadata = visualMetadata;
             PrimaryInstruction = primaryInstruction;
             SecondaryInstruction = secondaryInstruction;
+            _getIsLong = isLong;
+        }
+
+        // Whether the game's own details behind this tooltip are one of its long dossiers
+        // (NativeTooltipUtility.IsLongForComponent). Asked once per tooltip instance and remembered:
+        // a tooltip wraps one game widget, whose details class does not change under it, and the
+        // question is put on every build of every node that points here. A tooltip the mod composed
+        // itself is short, so the default is false.
+        public bool IsLong
+        {
+            get
+            {
+                if (!_isLongAsked)
+                {
+                    _isLongAsked = true;
+                    _isLong = _getIsLong != null && _getIsLong();
+                }
+
+                return _isLong;
+            }
         }
 
         // Final tooltip lines after optional adapter enrichment. These are raw
@@ -50,7 +74,8 @@ namespace SongsOfConquestAccess.Adapters
 
             return new Tooltip(
                 () => NativeTooltipUtility.GetTooltipLinesForComponent(component, localization),
-                VisualTooltipMetadata.ForComponent(component));
+                VisualTooltipMetadata.ForComponent(component),
+                isLong: () => NativeTooltipUtility.IsLongForComponent(component));
         }
 
         public static Tooltip ForComponent(Component component, RectTransform anchor, ILocalizationHandler localization)
@@ -71,7 +96,8 @@ namespace SongsOfConquestAccess.Adapters
 
             return new Tooltip(
                 () => NativeTooltipUtility.GetTooltipLinesForComponent(component, localization),
-                VisualTooltipMetadata.ForComponent(component, anchor, anchors));
+                VisualTooltipMetadata.ForComponent(component, anchor, anchors),
+                isLong: () => NativeTooltipUtility.IsLongForComponent(component));
         }
 
     }

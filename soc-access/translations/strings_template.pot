@@ -2779,6 +2779,16 @@ msgctxt "Screens.ReadEnemyInfluence"
 msgid "Read attack, deadly and movement range for enemies on tiles in combat"
 msgstr ""
 
+#. Screens.ReadLongTooltips
+msgctxt "Screens.ReadLongTooltips"
+msgid "Read long tooltips"
+msgstr ""
+
+#. Screens.ReadLongTooltipsTooltip
+msgctxt "Screens.ReadLongTooltipsTooltip"
+msgid "Whether long tooltips like wielder and troop information are automatically read"
+msgstr ""
+
 #. Screens.ReadStoryCameraFocusChanges
 msgctxt "Screens.ReadStoryCameraFocusChanges"
 msgid "Read story camera focus change events"

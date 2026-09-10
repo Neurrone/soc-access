@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using Lavapotion.Cartography;
 using SongsOfConquest.Client;
@@ -565,7 +565,8 @@ namespace SongsOfConquestAccess.Screens
                     portrait.RefreshTooltip();
                     return NativeTooltipUtility.GetTooltipLinesForComponent(target, portrait.Localization);
                 },
-                VisualTooltipMetadata.ForComponent(target));
+                VisualTooltipMetadata.ForComponent(target),
+                isLong: () => NativeTooltipUtility.IsLongForComponent(target, portrait.RefreshTooltip));
         }
 
         private static void BuildEssences(GraphBuilder builder, AdventureHudAdapter hud, bool drawn)

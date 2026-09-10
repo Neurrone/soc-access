@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Reflection;
 using HarmonyLib;
@@ -264,12 +264,19 @@ namespace SongsOfConquestAccess.UI
         /// know verbatim (<c>MenuFactoryController.GetText</c> is a TryGet with the key as its own
         /// fallback), which is what lets the mod's text through unchanged.
         /// </summary>
-        public IUIToggle AddToggle(string label, bool value, Action<bool> changed, bool enabled = true)
+        public IUIToggle AddToggle(string label, bool value, Action<bool> changed, bool enabled = true, string tooltip = null)
         {
             IUIToggle toggle = _controller.AddToggle(label, value, changed);
             if (toggle != null && !enabled)
             {
                 toggle.Interactable = false;
+            }
+
+            // The toggle forwards its Tooltip to the label's text mesh, which is where
+            // MenuRows reads a row's tooltip from, so setting it here is what the row will speak.
+            if (toggle != null && !string.IsNullOrEmpty(tooltip))
+            {
+                toggle.Tooltip = new TooltipDescription(tooltip);
             }
 
             return toggle;

@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
@@ -2883,7 +2883,8 @@ namespace SongsOfConquestAccess.Adapters
                 () => textLines,
                 new VisualTooltipMetadata(tooltipable, GetScreenPoint(tile), details),
                 primary,
-                secondary);
+                secondary,
+                () => NativeTooltipUtility.IsLong(details));
         }
 
         private void EnrichArtifactTooltipLines(IDetails details, List<string> textLines)

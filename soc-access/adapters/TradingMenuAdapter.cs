@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Globalization;
@@ -890,7 +890,10 @@ namespace SongsOfConquestAccess.Adapters
                 AddLocalizedLine(instructionLines, "Adventure/TooltipInstruction/Drop.Gamepad");
                 AddLocalizedLine(instructionLines, "Adventure/TooltipInstruction/AutoArrange");
                 AddLocalizedLine(instructionLines, "Adventure/TooltipInstruction/AutoArrange.Gamepad");
-                return new Tooltip(() => RemoveExactLines(tooltip.TextLines, instructionLines), tooltip.VisualMetadata);
+                return new Tooltip(
+                    () => RemoveExactLines(tooltip.TextLines, instructionLines),
+                    tooltip.VisualMetadata,
+                    isLong: () => tooltip.IsLong);
             }
 
             private void AddLocalizedLine(List<string> lines, string key)

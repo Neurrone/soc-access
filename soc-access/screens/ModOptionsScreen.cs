@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using SongsOfConquestAccess.Adapters;
 using SongsOfConquestAccess.Audio;
@@ -227,6 +227,11 @@ namespace SongsOfConquestAccess.Screens
                 ModText.Get(ModStrings.Screens.ReadStoryCameraFocusChanges),
                 ModSettings.ReadStoryCameraFocusChanges,
                 ModSettings.SetReadStoryCameraFocusChanges);
+            _dialog.AddToggle(
+                ModText.Get(ModStrings.Screens.ReadLongTooltips),
+                ModSettings.ReadLongTooltips,
+                ModSettings.SetReadLongTooltips,
+                tooltip: ModText.Get(ModStrings.Screens.ReadLongTooltipsTooltip));
         }
 
         private void DrawScanner()

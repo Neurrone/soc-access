@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using SongsOfConquestAccess.Adapters;
 using SongsOfConquestAccess.Localization;
@@ -58,14 +58,44 @@ namespace SongsOfConquestAccess.UI
         }
 
         /// <summary>
+        /// How a tooltip reaches the player, decided from the tooltip itself so no screen has to
+        /// guess and no two screens can disagree.
+        ///
+        /// The line is drawn where the game itself draws it: a LONG tooltip is one whose details
+        /// object is one of the game's dossier classes - a troop's or a wielder's, the stat blocks
+        /// the player walks at their own pace - and a SHORT one is everything else, the sentence or
+        /// two that explains the control, which is exactly what saying it outright is for. Short is
+        /// always announced. Long is announced only for a player who asked for it
+        /// (<see cref="ModSettings.ReadLongTooltips"/>); otherwise it is
+        /// <see cref="TooltipMode.Indicate"/> - the review buffer alone, which holds every tooltip
+        /// whatever this answers.
+        /// </summary>
+        public static TooltipMode ModeFor(Tooltip tooltip)
+        {
+            try
+            {
+                if (tooltip == null)
+                {
+                    return TooltipMode.None;
+                }
+
+                return tooltip.IsLong && !ModSettings.ReadLongTooltips
+                    ? TooltipMode.Indicate
+                    : TooltipMode.Announce;
+            }
+            catch (Exception)
+            {
+                return TooltipMode.None;
+            }
+        }
+
+        /// <summary>
         /// A control's tooltip as a declared SECTION - the single place it is written down, from which
         /// the engine derives what the review buffer holds and what the focus readout says about it.
         ///
-        /// This mod's ruling on tooltips is buffer-only: the readout says nothing about them and the
-        /// player reads them from the UI buffer, so every native tooltip is an
-        /// <see cref="TooltipMode.Indicate"/> section, whatever its length. The section still marks
-        /// the node as pointing at a tooltip, which is what makes focus draw the game's own tooltip
-        /// window for it. Null when there is no tooltip.
+        /// The mode is the tooltip's own (<see cref="ModeFor"/>), never a screen's choice. The section
+        /// also marks the node as pointing at a tooltip, which is what makes focus draw the game's own
+        /// tooltip window for it. Null when there is no tooltip.
         /// </summary>
         public static NodeSection TooltipSection(Tooltip tooltip)
         {
@@ -77,7 +107,7 @@ namespace SongsOfConquestAccess.UI
             Tooltip it = tooltip;
             return NodeSection.Derived(
                 () => SpokenLines.Of(it.TextLines),
-                TooltipMode.Indicate,
+                ModeFor(it),
                 () => it.VisualMetadata != null,
                 it);
         }

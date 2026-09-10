@@ -1,4 +1,4 @@
-namespace SongsOfConquestAccess.Localization
+﻿namespace SongsOfConquestAccess.Localization
 {
     public static class ModStrings
     {
@@ -627,6 +627,8 @@ namespace SongsOfConquestAccess.Localization
             public static readonly ModString Quickbar = new ModString("Screens.Quickbar", "Quickbar");
             public static readonly ModString Ready = new ModString("Screens.Ready", "Ready");
             public static readonly ModString ReadEnemyInfluence = new ModString("Screens.ReadEnemyInfluence", "Read attack, deadly and movement range for enemies on tiles in combat");
+            public static readonly ModString ReadLongTooltips = new ModString("Screens.ReadLongTooltips", "Read long tooltips");
+            public static readonly ModString ReadLongTooltipsTooltip = new ModString("Screens.ReadLongTooltipsTooltip", "Whether long tooltips like wielder and troop information are automatically read");
             public static readonly ModString ReadStoryCameraFocusChanges = new ModString("Screens.ReadStoryCameraFocusChanges", "Read story camera focus change events");
             public static readonly ModString RecruitFrom = new ModString("Screens.RecruitFrom", "Recruit from");
             public static readonly ModString RecruitingFrom = new ModString("Screens.RecruitingFrom", "Recruiting from {0}");

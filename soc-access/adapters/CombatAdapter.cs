@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
@@ -1234,7 +1234,8 @@ namespace SongsOfConquestAccess.Adapters
                 () => includeAttackPreview ? BuildTooltipLinesWithAttackPreview(textLines, attackPreviewTargetIsEntity) : textLines,
                 CreateScreenPointTooltipMetadata(details, tile),
                 TileInstruction.None,
-                secondary);
+                secondary,
+                () => NativeTooltipUtility.IsLong(details));
         }
 
         private IReadOnlyList<string> BuildTooltipLinesWithAttackPreview(IReadOnlyList<string> detailsLines, bool targetIsEntity)

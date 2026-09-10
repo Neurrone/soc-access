@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Reflection;
@@ -619,7 +619,8 @@ namespace SongsOfConquestAccess.Adapters
             Vector2 screenPoint = GetScreenPoint(tile.Point);
             return new Tooltip(
                 () => NativeTooltipUtility.ToSpeechLines(details, localization),
-                new VisualTooltipMetadata(tooltipBehaviour, screenPoint, details));
+                new VisualTooltipMetadata(tooltipBehaviour, screenPoint, details),
+                isLong: () => NativeTooltipUtility.IsLong(details));
         }
 
         private void FocusCommanderPortrait(BattleParticipantSide side)
@@ -661,7 +662,10 @@ namespace SongsOfConquestAccess.Adapters
                     CommanderHudPortraitAdapter.RefreshTooltip(portrait);
                     return native.TextLines;
                 },
-                native.VisualMetadata);
+                native.VisualMetadata,
+                isLong: () => NativeTooltipUtility.IsLongForComponent(
+                    button,
+                    () => CommanderHudPortraitAdapter.RefreshTooltip(portrait)));
         }
 
         private CommanderHUDPortrait GetCommanderPortrait(BattleParticipantSide side)

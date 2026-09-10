@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using SongsOfConquestAccess.Adapters;
 using SongsOfConquest.Common.Localization;
 using UnityEngine;
@@ -24,7 +24,8 @@ namespace SongsOfConquestAccess.UI
                     refreshTooltip?.Invoke();
                     return NativeTooltipUtility.GetTooltipLinesForComponent(target, localization);
                 },
-                VisualTooltipMetadata.ForComponent(target));
+                VisualTooltipMetadata.ForComponent(target),
+                isLong: () => NativeTooltipUtility.IsLongForComponent(target, refreshTooltip));
         }
 
         public static void FocusNative(Func<Component> getTarget, Action refreshTooltip = null)

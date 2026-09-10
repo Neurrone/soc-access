@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Reflection;
 using HarmonyLib;
@@ -401,7 +401,8 @@ namespace SongsOfConquestAccess.Adapters
             // be a second door onto the same click.
             return new Tooltip(
                 () => CaptureResearchTooltip(component).TextLines,
-                VisualTooltipMetadata.ForComponent(component, component.GetComponent<RectTransform>(), ResearchTooltipAnchors));
+                VisualTooltipMetadata.ForComponent(component, component.GetComponent<RectTransform>(), ResearchTooltipAnchors),
+                isLong: () => NativeTooltipUtility.IsLongForComponent(component));
         }
 
         private DetailsTextUtility CaptureResearchTooltip(Component component)

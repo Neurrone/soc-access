@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Reflection;
 using HarmonyLib;
@@ -452,7 +452,10 @@ namespace SongsOfConquestAccess.Adapters
 
             string disbandLine = GetLocalizedText("Adventure/TroopHUD/DisbandInstruction", "Disband Troop");
             List<string> instructionLines = new List<string> { disbandLine };
-            return new Tooltip(() => RemoveExactLines(tooltip.TextLines, instructionLines), tooltip.VisualMetadata);
+            return new Tooltip(
+                () => RemoveExactLines(tooltip.TextLines, instructionLines),
+                tooltip.VisualMetadata,
+                isLong: () => tooltip.IsLong);
         }
 
         private string GetLocalizedText(string key, string fallback)
