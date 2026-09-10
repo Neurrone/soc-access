@@ -230,9 +230,9 @@ namespace SongsOfConquestAccess.Adapters
             // and what is in each of them), so a move, an auto-arrange, a trade across the menu and
             // a menu reopened over other wielders all rebuild with nothing having to say so
             // (AGENTS.md, Screen Resolution).
-            private readonly SlotMemo _equipment = new SlotMemo();
+            private readonly SlotSnapshot _equipment = new SlotSnapshot();
 
-            private readonly SlotMemo _backpack = new SlotMemo();
+            private readonly SlotSnapshot _backpack = new SlotSnapshot();
 
             private readonly TradingMenuAdapter _owner;
             private readonly bool _left;
@@ -955,57 +955,6 @@ namespace SongsOfConquestAccess.Adapters
             private string GetInventoryLabel()
             {
                 return _owner.GetLocalizedText("Common/CommanderInventory/Inventory", "Inventory");
-            }
-
-            /// <summary>One artifact list and the key it was built from - a run of numbers read off
-            /// the game, one per fact the list froze. The caller writes this frame's numbers into
-            /// <see cref="BeginKey"/> and asks <see cref="Unchanged"/> whether the list it built last
-            /// time still describes the game; a key that differs by one number rebuilds the whole
-            /// list, which is what makes a moved artifact appear without a hook.</summary>
-            private sealed class SlotMemo
-            {
-                private readonly List<int> _key = new List<int>();
-
-                private readonly List<int> _read = new List<int>();
-
-                private IReadOnlyList<InventorySlotInfo> _slots;
-
-                /// <summary>The list this frame's key is written into, emptied for the caller. Kept
-                /// across frames so a key that has not changed costs no allocation at all.</summary>
-                public List<int> BeginKey()
-                {
-                    _read.Clear();
-                    return _read;
-                }
-
-                /// <summary>The slots built for the key just read, or null where the game has moved
-                /// since - including the first read, which has built nothing yet.</summary>
-                public IReadOnlyList<InventorySlotInfo> Unchanged()
-                {
-                    if (_slots == null || _key.Count != _read.Count)
-                    {
-                        return null;
-                    }
-
-                    for (int i = 0; i < _key.Count; i++)
-                    {
-                        if (_key[i] != _read[i])
-                        {
-                            return null;
-                        }
-                    }
-
-                    return _slots;
-                }
-
-                /// <summary>Hold these slots for the key just read, and answer with them.</summary>
-                public IReadOnlyList<InventorySlotInfo> Keep(IReadOnlyList<InventorySlotInfo> slots)
-                {
-                    _key.Clear();
-                    _key.AddRange(_read);
-                    _slots = slots;
-                    return slots;
-                }
             }
 
             private static string FormatSlotName(string value)

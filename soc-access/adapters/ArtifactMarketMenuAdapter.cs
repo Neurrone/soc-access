@@ -74,6 +74,18 @@ namespace SongsOfConquestAccess.Adapters
             new FrameSweep<ArtifactMarketEntry>("artifact market grid", inactiveToo: false);
         private readonly FrameSweep<UITextMesh> _bandTexts =
             new FrameSweep<UITextMesh>("artifact market band");
+
+        // The wielder's two artifact lists, kept while the game's own inventory is unchanged. The
+        // key is read off the game every frame (the wielder the panel is showing, the pooled cells,
+        // and what is in each of them), so a sale, a purchase, a move and an auto-arrange all
+        // rebuild with nothing having to say so (AGENTS.md, Screen Resolution).
+        private readonly SlotSnapshot _equipment = new SlotSnapshot();
+
+        private readonly SlotSnapshot _backpack = new SlotSnapshot();
+
+        // The nine rows the game writes for a mouse. They are the same for every slot and for the
+        // menu's whole life, so they are looked up once instead of nine times a slot a frame.
+        private List<string> _mouseInstructionLines;
         private WielderInteract _wielder;
 
         public ArtifactMarketMenuAdapter(ArtifactMarketMenu menu)
@@ -308,10 +320,31 @@ namespace SongsOfConquestAccess.Adapters
 
         public IReadOnlyList<InventorySlotInfo> GetEquipmentSlots()
         {
-            List<InventorySlotInfo> slotsInfo = new List<InventorySlotInfo>();
             InventorySlot[] slots = InventorySlotInfo.DrawnEquipmentSlots;
+            int commanderId = CommanderId;
+            List<int> key = _equipment.BeginKey();
+            key.Add(commanderId);
+            key.Add(InstanceId(_inventory));
+            for (int i = 0; i < slots.Length; i++)
+            {
+                InventoryHUDSlot keySlot = _inventory != null ? _inventory.GetSlot(slots[i]) : null;
+                IArtifactState keyArtifact = GetDisplayArtifactForEquipmentSlot(slots[i]);
+                key.Add(InstanceId(keySlot));
+                key.Add(InstanceId(keySlot != null ? keySlot.TryGetArtifact(0) : null));
+                key.Add(keyArtifact != null ? keyArtifact.Id : 0);
+                key.Add(keyArtifact != null ? (int)keyArtifact.EquippedInSlot : -1);
+                key.Add(keyArtifact != null ? keyArtifact.PositionIndex : -1);
+            }
 
-            string ownerName = GetCommanderName(CommanderId);
+            IReadOnlyList<InventorySlotInfo> unchanged = _equipment.Unchanged();
+            if (unchanged != null)
+            {
+                return unchanged;
+            }
+
+            List<InventorySlotInfo> slotsInfo = new List<InventorySlotInfo>();
+            string ownerName = GetCommanderName(commanderId);
+            string inventoryName = GetInventoryLabel();
             for (int i = 0; i < slots.Length; i++)
             {
                 InventorySlot slot = slots[i];
@@ -330,13 +363,13 @@ namespace SongsOfConquestAccess.Adapters
                         ? artifactMovable.GetSelectable()
                         : GetEquipmentSlotSelectable(capturedNativeSlot, capturedSlot);
                 slotsInfo.Add(new InventorySlotInfo(
-                    CommanderId,
+                    commanderId,
                     ownerName,
                     slot,
                     0,
                     isBackpackSlot: false,
                     GetInventorySlotName(slot),
-                    GetInventoryLabel(),
+                    inventoryName,
                     artifact != null ? GetArtifactName(artifact) : string.Empty,
                     movable,
                     nativeSlot,
@@ -344,15 +377,33 @@ namespace SongsOfConquestAccess.Adapters
                     () => SelectInventoryCell(capturedNativeSlot, capturedMovable, 0)));
             }
 
-            return slotsInfo;
+            return _equipment.Keep(slotsInfo);
         }
 
         public IReadOnlyList<InventorySlotInfo> GetBackpackSlots()
         {
-            List<InventorySlotInfo> slotsInfo = new List<InventorySlotInfo>();
             InventoryHUDSlot nativeSlot = _inventory != null ? _inventory.GetSlot(InventorySlot.None) : null;
-            string ownerName = GetCommanderName(CommanderId);
+            int commanderId = CommanderId;
             int cellCount = nativeSlot != null ? nativeSlot.CellsCount : 0;
+            List<int> key = _backpack.BeginKey();
+            key.Add(commanderId);
+            key.Add(InstanceId(nativeSlot));
+            for (int i = 0; i < cellCount; i++)
+            {
+                InventoryArtifactMovable keyMovable = nativeSlot.TryGetArtifact(i);
+                key.Add(InstanceId(keyMovable));
+                key.Add(keyMovable != null && keyMovable.State != null ? keyMovable.State.Id : 0);
+            }
+
+            IReadOnlyList<InventorySlotInfo> unchanged = _backpack.Unchanged();
+            if (unchanged != null)
+            {
+                return unchanged;
+            }
+
+            List<InventorySlotInfo> slotsInfo = new List<InventorySlotInfo>();
+            string ownerName = GetCommanderName(commanderId);
+            string inventoryName = GetInventoryLabel();
             for (int i = 0; i < cellCount; i++)
             {
                 InventoryArtifactMovable movable = nativeSlot != null ? nativeSlot.TryGetArtifact(i) : null;
@@ -360,13 +411,13 @@ namespace SongsOfConquestAccess.Adapters
                 int capturedIndex = i;
                 InventoryArtifactMovable capturedMovable = movable;
                 slotsInfo.Add(new InventorySlotInfo(
-                    CommanderId,
+                    commanderId,
                     ownerName,
                     InventorySlot.None,
                     i,
                     isBackpackSlot: true,
                     string.Empty,
-                    GetInventoryLabel(),
+                    inventoryName,
                     artifact != null ? GetArtifactName(artifact) : string.Empty,
                     movable,
                     nativeSlot,
@@ -374,7 +425,7 @@ namespace SongsOfConquestAccess.Adapters
                     () => SelectInventoryCell(nativeSlot, capturedMovable, capturedIndex)));
             }
 
-            return slotsInfo;
+            return _backpack.Keep(slotsInfo);
         }
 
         // ---- the gestures the game gives an artifact in this menu ----
@@ -805,20 +856,32 @@ namespace SongsOfConquestAccess.Adapters
                 return tooltip;
             }
 
-            List<string> instructionLines = new List<string>();
-            AddLocalizedLine(instructionLines, "Adventure/TooltipInstruction/Equip");
-            AddLocalizedLine(instructionLines, "Adventure/TooltipInstruction/Unequip");
-            AddLocalizedLine(instructionLines, "Adventure/TooltipInstruction/Sell");
-            AddLocalizedLine(instructionLines, "Adventure/TooltipInstruction/Destroy");
-            AddLocalizedLine(instructionLines, "Adventure/TooltipInstruction/Destroy.Gamepad");
-            AddLocalizedLine(instructionLines, "Adventure/TooltipInstruction/Drop");
-            AddLocalizedLine(instructionLines, "Adventure/TooltipInstruction/Drop.Gamepad");
-            AddLocalizedLine(instructionLines, "Adventure/TooltipInstruction/AutoArrange");
-            AddLocalizedLine(instructionLines, "Adventure/TooltipInstruction/AutoArrange.Gamepad");
+            List<string> instructionLines = GetMouseInstructionLines();
             return new Tooltip(
                 () => RemoveExactLines(tooltip.TextLines, instructionLines),
                 tooltip.VisualMetadata,
                 isLong: () => tooltip.IsLong);
+        }
+
+        private List<string> GetMouseInstructionLines()
+        {
+            if (_mouseInstructionLines != null)
+            {
+                return _mouseInstructionLines;
+            }
+
+            List<string> lines = new List<string>();
+            AddLocalizedLine(lines, "Adventure/TooltipInstruction/Equip");
+            AddLocalizedLine(lines, "Adventure/TooltipInstruction/Unequip");
+            AddLocalizedLine(lines, "Adventure/TooltipInstruction/Sell");
+            AddLocalizedLine(lines, "Adventure/TooltipInstruction/Destroy");
+            AddLocalizedLine(lines, "Adventure/TooltipInstruction/Destroy.Gamepad");
+            AddLocalizedLine(lines, "Adventure/TooltipInstruction/Drop");
+            AddLocalizedLine(lines, "Adventure/TooltipInstruction/Drop.Gamepad");
+            AddLocalizedLine(lines, "Adventure/TooltipInstruction/AutoArrange");
+            AddLocalizedLine(lines, "Adventure/TooltipInstruction/AutoArrange.Gamepad");
+            _mouseInstructionLines = lines;
+            return lines;
         }
 
         private void SelectInventoryCell(InventoryHUDSlot nativeSlot, InventoryArtifactMovable movable, int positionIndex)
@@ -839,6 +902,13 @@ namespace SongsOfConquestAccess.Adapters
         private WielderInteractHeader GetWielderInteractHeader()
         {
             return GetField<WielderInteractHeader>(_menu, WielderInteractHeaderField);
+        }
+
+        /// <summary>What a game object is, as a number a key can hold: zero for one the game has not
+        /// made or has destroyed, which Unity's own null answers for.</summary>
+        private static int InstanceId(Component component)
+        {
+            return component == null ? 0 : component.GetInstanceID();
         }
 
         private static Selectable GetEquipmentSlotSelectable(InventoryHUDSlot nativeSlot, InventorySlot slot)
