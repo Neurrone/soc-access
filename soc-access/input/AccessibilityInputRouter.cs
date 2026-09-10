@@ -146,12 +146,15 @@ namespace SongsOfConquestAccess.Input
             return screen != null && screen.Navigator != null && screen.Navigator.TakesTypedKey(key);
         }
 
-        // The stand-down applies wherever the game's own text field holds the keyboard, whatever is
-        // on the screen stack: while it does, every key is that field's and the mod's layer goes
-        // quiet rather than picking which keys to leave alone.
+        // The stand-down applies wherever the game's own text field holds the keyboard, or the game's
+        // key-binding capture is listening for the next key, whatever is on the screen stack: while
+        // it does, every key is the game's and the mod's layer goes quiet rather than picking which
+        // keys to leave alone. One line covers the raw-key path, the typed-character path and
+        // injections, so during a capture the mod answers nothing and arrows, Escape and letters all
+        // reach the game to be bound.
         private bool StandingDown()
         {
-            return GameTextFocus.IsTyping();
+            return GameTextFocus.IsTyping() || KeyCaptureFocus.IsCapturing();
         }
 
         /// <summary>
