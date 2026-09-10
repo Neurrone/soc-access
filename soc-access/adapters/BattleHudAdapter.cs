@@ -125,7 +125,16 @@ namespace SongsOfConquestAccess.Adapters
 
         public string SpellbookButtonLabel
         {
-            get { return Localize("Common/HUD/SpellbookButton", "Spellbook"); }
+            // The button's tooltip carries the same word with the hotkey ("Spells (V)"); label from it
+            // so the readout is not "Spells, button, Spells (V)", the tooltip's first line then
+            // dropping as a duplicate. Fall back to the plain game label when no tooltip is drawn.
+            get
+            {
+                string label = TooltipLines.First(SpellbookButtonTooltip);
+                return string.IsNullOrWhiteSpace(label)
+                    ? Localize("Common/HUD/SpellbookButton", "Spellbook")
+                    : label;
+            }
         }
 
         public void FocusSpellbookButton()
@@ -155,7 +164,15 @@ namespace SongsOfConquestAccess.Adapters
 
         public string EndTurnButtonLabel
         {
-            get { return Localize("Battle/Labels/EndTurn", "End turn"); }
+            // As the adventure end-turn button already does: take the label from the tooltip so its
+            // hotkey-bearing first line is not read twice.
+            get
+            {
+                string label = TooltipLines.First(EndTurnButtonTooltip);
+                return string.IsNullOrWhiteSpace(label)
+                    ? Localize("Battle/Labels/EndTurn", "End turn")
+                    : label;
+            }
         }
 
         public void FocusEndTurnButton()
