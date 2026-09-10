@@ -2,9 +2,11 @@ using System;
 using System.Collections.Generic;
 using System.Reflection;
 using HarmonyLib;
+using SongsOfConquest.Client.InputManagement;
 using SongsOfConquest.Client.Menu.Options;
 using SongsOfConquest.Client.Menu.Utils;
 using SongsOfConquest.Client.UI;
+using UnityEngine;
 
 namespace SongsOfConquestAccess.Adapters
 {
@@ -24,11 +26,27 @@ namespace SongsOfConquestAccess.Adapters
         private static readonly FieldInfo ContentTabsField = AccessTools.Field(typeof(OptionsMenu), "_contentTabs");
         private static readonly FieldInfo CurrentContentField = AccessTools.Field(typeof(OptionsMenu), "_currentContent");
 
+        // The Controls page keeps each rebindable action's reference off its widget, on
+        // OptionsMenuKeyBindContent._keyBinders; the input manager beside it answers the current
+        // override text. Both are resolved through the controls content tab.
+        private static readonly FieldInfo KeyBindContentField = AccessTools.Field(typeof(OptionsMenuControlsContent), "_keyBindContent");
+        private static readonly FieldInfo KeyBindersField = AccessTools.Field(typeof(OptionsMenuKeyBindContent), "_keyBinders");
+        private static readonly FieldInfo KeyBindInputManagerField = AccessTools.Field(typeof(OptionsMenuKeyBindContent), "_inputManager");
+
         private readonly OptionsMenu _menu;
+
+        // Per-menu key-binding context: the reverse widget -> action map (rebuilt once per frame, not
+        // once per row) and the row whose capture the mod last started. It outlives the per-frame row
+        // records the reader mints, so it lives here on the adapter.
+        private readonly KeyBindingSource _keyBindings;
+        private Dictionary<IUIKeyBinding, ActionReference> _reverse;
+        private IInputManager _inputManager;
+        private int _reverseFrame = -1;
 
         public OptionsMenuAdapter(OptionsMenu menu)
         {
             _menu = menu;
+            _keyBindings = new KeyBindingSource { Resolve = ResolveBinding };
         }
 
         public object SourceKey
@@ -111,7 +129,81 @@ namespace SongsOfConquestAccess.Adapters
                 return new MenuRow[0];
             }
 
-            return MenuRows.Read(Factory);
+            return MenuRows.Read(Factory, _keyBindings);
+        }
+
+        // widget -> the binding it holds, for a row that needs the input manager's own text as a
+        // fallback. Null for an unknown widget; the reverse map is rebuilt at most once per frame.
+        private BindingContainer ResolveBinding(IUIKeyBinding widget)
+        {
+            EnsureReverseMap();
+            ActionReference action;
+            if (_reverse == null || widget == null || !_reverse.TryGetValue(widget, out action))
+            {
+                return null;
+            }
+
+            BindingContainer container;
+            return _inputManager != null && _inputManager.TryGetOverride(action, out container) ? container : null;
+        }
+
+        private void EnsureReverseMap()
+        {
+            int frame = Time.frameCount;
+            if (_reverseFrame == frame)
+            {
+                return;
+            }
+
+            _reverseFrame = frame;
+            _reverse = null;
+            _inputManager = null;
+
+            OptionsMenuKeyBindContent content = KeyBindContent();
+            if (content == null)
+            {
+                return;
+            }
+
+            _inputManager = KeyBindInputManagerField != null ? KeyBindInputManagerField.GetValue(content) as IInputManager : null;
+            Dictionary<ActionReference, IUIKeyBinding> binders = KeyBindersField != null
+                ? KeyBindersField.GetValue(content) as Dictionary<ActionReference, IUIKeyBinding>
+                : null;
+            if (binders == null)
+            {
+                return;
+            }
+
+            Dictionary<IUIKeyBinding, ActionReference> reverse = new Dictionary<IUIKeyBinding, ActionReference>();
+            foreach (KeyValuePair<ActionReference, IUIKeyBinding> binder in binders)
+            {
+                if (binder.Value != null)
+                {
+                    reverse[binder.Value] = binder.Key;
+                }
+            }
+
+            _reverse = reverse;
+        }
+
+        private OptionsMenuKeyBindContent KeyBindContent()
+        {
+            List<IOptionsContent> tabs = GetField<List<IOptionsContent>>(_menu, ContentTabsField);
+            if (tabs == null)
+            {
+                return null;
+            }
+
+            for (int i = 0; i < tabs.Count; i++)
+            {
+                OptionsMenuControlsContent controls = tabs[i] as OptionsMenuControlsContent;
+                if (controls != null)
+                {
+                    return KeyBindContentField != null ? KeyBindContentField.GetValue(controls) as OptionsMenuKeyBindContent : null;
+                }
+            }
+
+            return null;
         }
 
         public MenuRowButton GetOkButton()

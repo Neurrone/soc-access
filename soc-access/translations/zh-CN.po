@@ -3700,3 +3700,23 @@ msgstr "表格"
 msgctxt "UI.StatusNotChecked"
 msgid "not checked"
 msgstr "未勾选"
+
+#. Screens.NotBound
+msgctxt "Screens.NotBound"
+msgid "not bound"
+msgstr "未绑定"
+
+#. Screens.CaptureNoCancel
+msgctxt "Screens.CaptureNoCancel"
+msgid "The next key you press becomes the binding."
+msgstr "你按下的下一个键将成为绑定。"
+
+#. Screens.KeyBindingSetHint
+msgctxt "Screens.KeyBindingSetHint"
+msgid "{0} to set a new key"
+msgstr "{0} 设置新按键"
+
+#. Screens.KeyBindingClearHint
+msgctxt "Screens.KeyBindingClearHint"
+msgid "{0} to restore the default"
+msgstr "{0} 恢复默认"

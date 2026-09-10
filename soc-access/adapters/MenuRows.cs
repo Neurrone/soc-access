@@ -1,9 +1,12 @@
 using System;
 using System.Collections.Generic;
+using System.Reflection;
 using HarmonyLib;
 using SongsOfConquest.Client;
+using SongsOfConquest.Client.InputManagement;
 using SongsOfConquest.Client.Menu.Utils;
 using SongsOfConquest.Client.UI;
+using SongsOfConquestAccess.Input;
 using SongsOfConquestAccess.UI;
 using TMPro;
 using UnityEngine;
@@ -33,6 +36,15 @@ namespace SongsOfConquestAccess.Adapters
         /// <summary>Everything the collection has drawn, in drawn order.</summary>
         public static IReadOnlyList<MenuRow> Read(IMenuFactoryCollection factory)
         {
+            return Read(factory, null);
+        }
+
+        /// <summary>Everything the collection has drawn, in drawn order.
+        /// <paramref name="keyBindings"/> is the rebindable-action context (the Options window's
+        /// Controls page); null for a form that draws none, such as the mod's own options dialog.
+        /// </summary>
+        public static IReadOnlyList<MenuRow> Read(IMenuFactoryCollection factory, KeyBindingSource keyBindings)
+        {
             if (factory == null)
             {
                 return new MenuRow[0];
@@ -45,6 +57,7 @@ namespace SongsOfConquestAccess.Adapters
             AddToggles(items, factory);
             AddSliders(items, factory);
             AddButtons(items, factory);
+            AddKeyBindings(items, factory, keyBindings);
             SortByHierarchy(items);
             return items;
         }
@@ -235,6 +248,131 @@ namespace SongsOfConquestAccess.Adapters
                         () => IsActive(component),
                         () => Tooltip.ForComponent(component, null))));
             }
+        }
+
+        // ---- the rebindable-action rows ----
+
+        // The controls page draws one <see cref="UIKeyBinding"/> per rebindable action through
+        // AddKeyBinding, which the other GetCreated* readers never see. Each row has exactly one chip
+        // (the current hotkey) plus its "+" button; the fields the game keeps private are resolved
+        // once here, not per row.
+        private static readonly FieldInfo ButtonsField = AccessTools.Field(typeof(UIKeyBinding), "_buttons");
+        private static readonly FieldInfo PlusButtonField = AccessTools.Field(typeof(UIKeyBinding), "_plusButton");
+        private static readonly FieldInfo LabelMeshField = AccessTools.Field(typeof(UIKeyBinding), "_textMesh");
+        private static readonly FieldInfo EntryButtonField = AccessTools.Field(typeof(UIKeyBindingEntry), "_button");
+        private static readonly FieldInfo EntryTextField = AccessTools.Field(typeof(UIKeyBindingEntry), "_text");
+
+        private static void AddKeyBindings(List<MenuRow> items, IMenuFactoryCollection factory, KeyBindingSource source)
+        {
+            List<IUIKeyBinding> bindings = new List<IUIKeyBinding>();
+            factory.GetCreatedKeyBindings(bindings);
+            for (int i = 0; i < bindings.Count; i++)
+            {
+                IUIKeyBinding widget = bindings[i];
+                Component component = widget as Component;
+                if (component == null)
+                {
+                    continue;
+                }
+
+                items.Add(new MenuRow(component.transform, MakeKeyBinding("options-keybind-" + i, widget, source)));
+            }
+        }
+
+        private static MenuRowKeyBinding MakeKeyBinding(string id, IUIKeyBinding widget, KeyBindingSource source)
+        {
+            Component component = widget as Component;
+            // The game draws the override chip as an INTERACTABLE button and the default chip as a
+            // dead one (AddDefaultBinding sets its Button non-interactable), so the chip itself is the
+            // cheap, authoritative override signal - no per-row query into the input manager on the
+            // build path.
+            Func<bool> hasOverride = () =>
+            {
+                UIButton chip = ChipButton(widget);
+                return chip != null && chip.Interactable;
+            };
+
+            return new MenuRowKeyBinding(
+                id,
+                () => ActionText(widget),
+                () =>
+                {
+                    // The chip carries the exact drawn text - modifiers included for an override; the
+                    // container is the fallback where the chip cannot be read.
+                    string chip = ChipText(widget);
+                    if (!string.IsNullOrWhiteSpace(chip))
+                    {
+                        return chip;
+                    }
+
+                    BindingContainer container = source != null && source.Resolve != null ? source.Resolve(widget) : null;
+                    return container != null ? (container.currentOverride ?? container.defaultBinding) : null;
+                },
+                hasOverride,
+                () =>
+                {
+                    bool clicked = NativeSelectionUtility.Click(PlusButton(widget));
+                    if (clicked && source != null)
+                    {
+                        source.LastRebindWidget = widget;
+                    }
+
+                    return clicked;
+                },
+                () => hasOverride() && NativeSelectionUtility.Click(ChipButton(widget)),
+                () => KeyCaptureFocus.IsCapturing() && source != null && ReferenceEquals(source.LastRebindWidget, widget),
+                () => component != null && component.gameObject.activeInHierarchy,
+                () => NativeSelectionUtility.Select(component),
+                () => PlusTooltipText(widget),
+                () => Tooltip.ForComponent(PlusButton(widget) as Component, null),
+                () => Tooltip.ForComponent(ChipButton(widget) as Component, null));
+        }
+
+        // The action label the game draws. It is NOT on IUIKeyBinding.Text - the game leaves that
+        // empty and sets the row's own label mesh through a localization component - so it is read
+        // the same way every other native label is, off that mesh with GetEffectiveText. The mesh is
+        // the widget's cached field, so this is a field read and no subtree walk.
+        private static string ActionText(IUIKeyBinding widget)
+        {
+            IUITextMesh mesh = widget != null && LabelMeshField != null ? LabelMeshField.GetValue(widget) as IUITextMesh : null;
+            return mesh != null
+                ? SpokenLines.Clean(UITextMeshTextUtility.GetEffectiveText(mesh))
+                : SpokenLines.Clean(widget != null ? widget.Text : null);
+        }
+
+        private static UIKeyBindingEntry Chip(IUIKeyBinding widget)
+        {
+            List<UIKeyBindingEntry> buttons = widget != null && ButtonsField != null
+                ? ButtonsField.GetValue(widget) as List<UIKeyBindingEntry>
+                : null;
+            return buttons != null && buttons.Count > 0 ? buttons[0] : null;
+        }
+
+        private static UIButton PlusButton(IUIKeyBinding widget)
+        {
+            return widget != null && PlusButtonField != null ? PlusButtonField.GetValue(widget) as UIButton : null;
+        }
+
+        private static UIButton ChipButton(IUIKeyBinding widget)
+        {
+            UIKeyBindingEntry chip = Chip(widget);
+            return chip != null && EntryButtonField != null ? EntryButtonField.GetValue(chip) as UIButton : null;
+        }
+
+        private static string ChipText(IUIKeyBinding widget)
+        {
+            UIKeyBindingEntry chip = Chip(widget);
+            IUITextMesh mesh = chip != null && EntryTextField != null ? EntryTextField.GetValue(chip) as IUITextMesh : null;
+            return mesh != null ? SpokenLines.Clean(UITextMeshTextUtility.GetEffectiveText(mesh)) : null;
+        }
+
+        // The "+" button carries no visible text of its own; the game's own tooltip ("Create new
+        // binding") is the label a reader wants, read the same way the cell's tooltip is.
+        private static string PlusTooltipText(IUIKeyBinding widget)
+        {
+            Tooltip tooltip = Tooltip.ForComponent(PlusButton(widget) as Component, null);
+            IReadOnlyList<string> lines = tooltip != null ? tooltip.TextLines : null;
+            return lines != null && lines.Count > 0 ? SpokenLines.Clean(string.Join(" ", new List<string>(lines).ToArray())) : null;
         }
 
         // ---- reading one control ----
@@ -736,5 +874,96 @@ namespace SongsOfConquestAccess.Adapters
         /// slider draws no such box; and the native open itself.</summary>
         public Func<string> GetValueEditorLabel { get; private set; }
         public Func<bool> OpenValueEditor { get; private set; }
+    }
+
+    /// <summary>
+    /// The context the Options window's Controls page hands the reader so a key-binding row can name
+    /// its action and fall back to the input manager for its text: the game keeps the row's
+    /// <c>ActionReference</c> off the widget, on <c>OptionsMenuKeyBindContent._keyBinders</c>.
+    ///
+    /// <see cref="Resolve"/> maps a drawn row widget to the binding it holds (or null when the widget
+    /// is unknown); <see cref="LastRebindWidget"/> is the row whose "+" the mod last activated, which
+    /// is how a row tells its own capture from another's while the game is listening. It lives on the
+    /// adapter that builds it, so it outlives the per-frame row records.
+    /// </summary>
+    public sealed class KeyBindingSource
+    {
+        public Func<IUIKeyBinding, BindingContainer> Resolve;
+        public IUIKeyBinding LastRebindWidget;
+    }
+
+    /// <summary>
+    /// One rebindable-action row, read as facts: the game draws a gesture name, a chip holding the
+    /// current hotkey (or nothing), and a "+" that starts a capture. Native facts only - the
+    /// accessibility wording (the "not bound" chip, the column shape) is the screen's.
+    ///
+    /// The chip is a BUTTON only when the action is overridden, where activating it runs the game's
+    /// own remove; the "+" always starts the game's interactive rebind. Both are the game's own
+    /// clicks, not rules the mod reconstructs.
+    /// </summary>
+    public sealed class MenuRowKeyBinding
+    {
+        public MenuRowKeyBinding(
+            string id,
+            Func<string> getActionName,
+            Func<string> getBindingText,
+            Func<bool> hasOverride,
+            Func<bool> rebind,
+            Func<bool> clearOverride,
+            Func<bool> isCapturing,
+            Func<bool> isVisible,
+            Action focus,
+            Func<string> getPlusLabel,
+            Func<Tooltip> getPlusTooltip,
+            Func<Tooltip> getClearTooltip)
+        {
+            Id = id;
+            GetActionName = getActionName;
+            GetBindingText = getBindingText;
+            HasOverride = hasOverride;
+            Rebind = rebind;
+            ClearOverride = clearOverride;
+            IsCapturing = isCapturing;
+            IsVisible = isVisible;
+            Focus = focus;
+            GetPlusLabel = getPlusLabel;
+            GetPlusTooltip = getPlusTooltip;
+            GetClearTooltip = getClearTooltip;
+        }
+
+        public string Id { get; private set; }
+
+        /// <summary>The gesture name the game draws (the row's primary cell).</summary>
+        public Func<string> GetActionName { get; private set; }
+
+        /// <summary>The current hotkey the chip draws; empty where the game draws no binding.</summary>
+        public Func<string> GetBindingText { get; private set; }
+
+        /// <summary>Whether the row's binding is a player override rather than the game's default -
+        /// the game draws the chip as an interactable button only then.</summary>
+        public Func<bool> HasOverride { get; private set; }
+
+        /// <summary>Start the game's capture (the "+" click); true when the click landed.</summary>
+        public Func<bool> Rebind { get; private set; }
+
+        /// <summary>Clear the override back to the default (the chip's own click); false when there
+        /// is no override chip to click.</summary>
+        public Func<bool> ClearOverride { get; private set; }
+
+        /// <summary>Whether the game is listening for THIS row's new key right now.</summary>
+        public Func<bool> IsCapturing { get; private set; }
+
+        public Func<bool> IsVisible { get; private set; }
+
+        /// <summary>Put the game's own selection on the row, which is what scrolls it into view.</summary>
+        public Action Focus { get; private set; }
+
+        /// <summary>The game's own label for the "+" ("Create new binding"), which draws no text.</summary>
+        public Func<string> GetPlusLabel { get; private set; }
+
+        public Func<Tooltip> GetPlusTooltip { get; private set; }
+
+        /// <summary>The chip's own tooltip ("Remove binding") where it is an override chip.</summary>
+        public Func<Tooltip> GetClearTooltip { get; private set; }
     }
 }

@@ -3700,3 +3700,23 @@ msgstr "テーブル"
 msgctxt "UI.StatusNotChecked"
 msgid "not checked"
 msgstr "未チェック"
+
+#. Screens.NotBound
+msgctxt "Screens.NotBound"
+msgid "not bound"
+msgstr "未割り当て"
+
+#. Screens.CaptureNoCancel
+msgctxt "Screens.CaptureNoCancel"
+msgid "The next key you press becomes the binding."
+msgstr "次に押したキーが割り当てになります。"
+
+#. Screens.KeyBindingSetHint
+msgctxt "Screens.KeyBindingSetHint"
+msgid "{0} to set a new key"
+msgstr "{0} で新しいキーを設定"
+
+#. Screens.KeyBindingClearHint
+msgctxt "Screens.KeyBindingClearHint"
+msgid "{0} to restore the default"
+msgstr "{0} で既定に戻す"

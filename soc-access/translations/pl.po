@@ -3760,3 +3760,23 @@ msgstr "tabela"
 msgctxt "UI.StatusNotChecked"
 msgid "not checked"
 msgstr "niezaznaczone"
+
+#. Screens.NotBound
+msgctxt "Screens.NotBound"
+msgid "not bound"
+msgstr "nieprzypisane"
+
+#. Screens.CaptureNoCancel
+msgctxt "Screens.CaptureNoCancel"
+msgid "The next key you press becomes the binding."
+msgstr "Następny naciśnięty klawisz stanie się przypisaniem."
+
+#. Screens.KeyBindingSetHint
+msgctxt "Screens.KeyBindingSetHint"
+msgid "{0} to set a new key"
+msgstr "{0}, aby ustawić nowy klawisz"
+
+#. Screens.KeyBindingClearHint
+msgctxt "Screens.KeyBindingClearHint"
+msgid "{0} to restore the default"
+msgstr "{0}, aby przywrócić ustawienie domyślne"

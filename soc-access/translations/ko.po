@@ -3700,3 +3700,23 @@ msgstr "표"
 msgctxt "UI.StatusNotChecked"
 msgid "not checked"
 msgstr "선택 안 됨"
+
+#. Screens.NotBound
+msgctxt "Screens.NotBound"
+msgid "not bound"
+msgstr "지정되지 않음"
+
+#. Screens.CaptureNoCancel
+msgctxt "Screens.CaptureNoCancel"
+msgid "The next key you press becomes the binding."
+msgstr "다음에 누르는 키가 단축키로 지정됩니다."
+
+#. Screens.KeyBindingSetHint
+msgctxt "Screens.KeyBindingSetHint"
+msgid "{0} to set a new key"
+msgstr "새 키를 지정하려면 {0}"
+
+#. Screens.KeyBindingClearHint
+msgctxt "Screens.KeyBindingClearHint"
+msgid "{0} to restore the default"
+msgstr "기본값으로 되돌리려면 {0}"

@@ -3700,3 +3700,23 @@ msgstr "tablo"
 msgctxt "UI.StatusNotChecked"
 msgid "not checked"
 msgstr "işaretsiz"
+
+#. Screens.NotBound
+msgctxt "Screens.NotBound"
+msgid "not bound"
+msgstr "atanmadı"
+
+#. Screens.CaptureNoCancel
+msgctxt "Screens.CaptureNoCancel"
+msgid "The next key you press becomes the binding."
+msgstr "Basacağınız bir sonraki tuş atama olur."
+
+#. Screens.KeyBindingSetHint
+msgctxt "Screens.KeyBindingSetHint"
+msgid "{0} to set a new key"
+msgstr "Yeni tuş atamak için {0}"
+
+#. Screens.KeyBindingClearHint
+msgctxt "Screens.KeyBindingClearHint"
+msgid "{0} to restore the default"
+msgstr "Varsayılana döndürmek için {0}"

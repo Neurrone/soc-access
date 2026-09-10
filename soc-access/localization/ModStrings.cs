@@ -619,6 +619,17 @@
             public static readonly ModString LoseCondition = new ModString("Screens.LoseCondition", "Lose condition");
             public static readonly ModString Ok = new ModString("Screens.Ok", "OK");
             public static readonly ModString Options = new ModString("Screens.Options", "Options");
+            /// <summary>The binding chip of a key-binding row that the game draws empty.</summary>
+            public static readonly ModString NotBound = new ModString("Screens.NotBound", "not bound");
+            /// <summary>Spoken when a key-binding capture starts and the game's own instruction popup
+            /// is empty or unreadable: the next key pressed becomes the binding, with no way to cancel.
+            /// </summary>
+            public static readonly ModString CaptureNoCancel = new ModString("Screens.CaptureNoCancel", "The next key you press becomes the binding.");
+            /// <summary>Usage hint on a key-binding row's "+" cell: the gesture that starts a rebind.</summary>
+            public static readonly ModString KeyBindingSetHint = new ModString("Screens.KeyBindingSetHint", "{0} to set a new key");
+            /// <summary>Usage hint on an overridden key-binding row's chip: the gesture that clears the
+            /// override back to the game's default.</summary>
+            public static readonly ModString KeyBindingClearHint = new ModString("Screens.KeyBindingClearHint", "{0} to restore the default");
             public static readonly ModString Pitch = new ModString("Screens.Pitch", "Pitch");
             public static readonly ModString Play = new ModString("Screens.Play", "Play");
             public static readonly ModString PlayTileSoundCues = new ModString("Screens.PlayTileSoundCues", "Play tile sound cues");

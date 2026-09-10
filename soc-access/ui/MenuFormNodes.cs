@@ -1,8 +1,12 @@
 using System;
 using System.Collections.Generic;
 using SongsOfConquestAccess.Adapters;
+using SongsOfConquest.Client.Menu;
 using SongsOfConquest.Client.UI;
+using SongsOfConquestAccess.Input;
+using SongsOfConquestAccess.Localization;
 using SongsOfConquestAccess.Screens;
+using SongsOfConquestAccess.Speech;
 using SongsOfConquestAccess.UI.Graph;
 using UnityEngine;
 
@@ -18,9 +22,13 @@ namespace SongsOfConquestAccess.UI
     /// window and is shared with the mod's own options dialog, which is drawn with the same factory
     /// out of a copy of the same panel: one description of a form, so the two cannot drift.
     ///
-    /// A caption that heads nothing stays a read-only row - measured on the Options window's Controls
-    /// page, where the key binding rows are drawn by <c>AddKeyBinding</c>, which the reader does not
-    /// see, so the categories there head nothing at all and would otherwise be lost.
+    /// A caption that heads nothing stays a read-only row.
+    ///
+    /// The Options window's Controls page is the one form that draws rows this reader once could not
+    /// see: the rebindable-action rows, drawn by <c>AddKeyBinding</c>. They are now read as a TABLE of
+    /// their own (<see cref="BuildKeyBindingSheet"/>) - one row per action with a name cell, the
+    /// binding chip and a "+" - so <see cref="BuildRows"/> stops where the table begins and the
+    /// category captions there become the table's row-group regions rather than empty read-only rows.
     /// </summary>
     public sealed class MenuFormNodes
     {
@@ -49,8 +57,16 @@ namespace SongsOfConquestAccess.UI
 
         public void BuildRows(GraphBuilder builder, IReadOnlyList<MenuRow> controls)
         {
+            // The rebindable-action rows are a table of their own; stop where they begin so their
+            // category captions are the sheet's regions and not empty read-only rows here.
+            int end = FirstKeyBindingCaption(controls);
+            if (end < 0)
+            {
+                end = controls.Count;
+            }
+
             bool inCaption = false;
-            for (int i = 0; i < controls.Count; i++)
+            for (int i = 0; i < end; i++)
             {
                 MenuRow control = controls[i];
                 object item = control != null ? control.Item : null;
@@ -109,6 +125,195 @@ namespace SongsOfConquestAccess.UI
             builder.AddItem(new SyntheticNode(
                 ControlId.For(Marker(button.Id), _prefix + ":" + button.Id),
                 Button(button, label)));
+        }
+
+        /// <summary>
+        /// The rebindable-action rows of the Controls page as a table: one region per category
+        /// caption, one row per action. The primary cell is the gesture name; a binding cell reads the
+        /// current hotkey (or "not bound") and is a button that CLEARS the override where the row has
+        /// one; a "+" cell starts the game's capture. Does nothing for a form that draws no key
+        /// bindings, so the stop it is given stays empty and is dropped.
+        /// </summary>
+        public void BuildKeyBindingSheet(GraphBuilder builder, IReadOnlyList<MenuRow> controls)
+        {
+            int start = FirstKeyBindingCaption(controls);
+            if (start < 0)
+            {
+                return;
+            }
+
+            GraphSheet sheet = new GraphSheet(builder, _prefix + ":keybind:");
+            bool regionOpen = false;
+            for (int i = start; i < controls.Count; i++)
+            {
+                object item = controls[i] != null ? controls[i].Item : null;
+
+                MenuRowText caption = item as MenuRowText;
+                if (caption != null)
+                {
+                    if (!caption.IsVisible() || string.IsNullOrWhiteSpace(caption.GetText()))
+                    {
+                        continue;
+                    }
+
+                    // Three columns - name, binding, "+" - so the region reads as a table and the
+                    // caption names it.
+                    sheet.Region(caption.GetText(), new string[3]);
+                    regionOpen = true;
+                    continue;
+                }
+
+                MenuRowKeyBinding binding = item as MenuRowKeyBinding;
+                if (binding == null || !binding.IsVisible())
+                {
+                    continue;
+                }
+
+                if (!regionOpen)
+                {
+                    sheet.Region(null, new string[3]);
+                    regionOpen = true;
+                }
+
+                AddKeyBindingRow(sheet, controls[i], binding);
+            }
+
+            sheet.Finish();
+            if (sheet.FirstRow != null)
+            {
+                builder.LandStopOn(sheet.FirstRow);
+            }
+        }
+
+        private void AddKeyBindingRow(GraphSheet sheet, MenuRow row, MenuRowKeyBinding binding)
+        {
+            NodeVtable name = GraphNodes.Text(binding.GetActionName);
+            name.OnFocusVisual = binding.Focus;
+
+            List<GraphSheet.SheetCell> cells = new List<GraphSheet.SheetCell>
+            {
+                new GraphSheet.SheetCell(1, 0, BindingCell(binding)),
+                new GraphSheet.SheetCell(2, 0, PlusCell(binding)),
+            };
+
+            // The row's identity across rebuilds; the widget it is drawn as is the scroll anchor and
+            // the existence evidence.
+            sheet.RowAt(name, binding.Id, cells, row.Transform);
+        }
+
+        /// <summary>The binding chip: the current hotkey or "not bound". A BUTTON that clears the
+        /// override where the row has one - the game's chip is a dead label otherwise - and its text
+        /// is watched live so a rebind or clear the game redraws is spoken with no polling.</summary>
+        private static NodeVtable BindingCell(MenuRowKeyBinding binding)
+        {
+            Func<string> text = () => KeyBindingText.Display(
+                binding.GetBindingText(), ModText.Get(ModStrings.Screens.NotBound));
+
+            NodeVtable vtable;
+            if (binding.HasOverride())
+            {
+                vtable = GraphNodes.Button(text, () => binding.ClearOverride(), null, binding.GetClearTooltip());
+                NodeHints.Add(vtable, ModStrings.Screens.KeyBindingClearHint, AccessibilityActions.UiLeftClick.Key, 0);
+            }
+            else
+            {
+                vtable = GraphNodes.Text(text);
+            }
+
+            if (vtable.Announcements != null && vtable.Announcements.Count > 0)
+            {
+                vtable.Announcements[0].Live = true;
+            }
+
+            vtable.SearchText = binding.GetActionName;
+            vtable.OnFocusVisual = binding.Focus;
+            return vtable;
+        }
+
+        /// <summary>The "+" cell: starts the game's capture. When it does, the game's own "press a key"
+        /// popup text is spoken, queued, so it does not cut off whatever the activation itself said.</summary>
+        private static NodeVtable PlusCell(MenuRowKeyBinding binding)
+        {
+            NodeVtable vtable = GraphNodes.Button(
+                binding.GetPlusLabel,
+                () =>
+                {
+                    if (binding.Rebind())
+                    {
+                        AnnounceCapture();
+                    }
+                },
+                null,
+                binding.GetPlusTooltip());
+            NodeHints.Add(vtable, ModStrings.Screens.KeyBindingSetHint, AccessibilityActions.UiLeftClick.Key, 0);
+            vtable.SearchText = binding.GetActionName;
+            vtable.OnFocusVisual = binding.Focus;
+            return vtable;
+        }
+
+        /// <summary>Speak the instruction the game draws while it listens for the next key - queued,
+        /// never interrupting. The drawn text ("Listening... Press any key to assign it to this
+        /// action.") already tells the player any key binds, so the mod's own no-cancel line is only a
+        /// fallback for when the popup cannot be read.</summary>
+        private static void AnnounceCapture()
+        {
+            List<string> lines = new List<string>();
+            ConfirmPopup popup = KeyCaptureFocus.Popup;
+            if (popup != null)
+            {
+                ConfirmPopupAdapter reader = new ConfirmPopupAdapter(popup);
+                if (!string.IsNullOrWhiteSpace(reader.Title))
+                {
+                    lines.Add(reader.Title);
+                }
+
+                IList<string> body = reader.BodyLines;
+                if (body != null)
+                {
+                    for (int i = 0; i < body.Count; i++)
+                    {
+                        if (!string.IsNullOrWhiteSpace(body[i]))
+                        {
+                            lines.Add(body[i]);
+                        }
+                    }
+                }
+            }
+
+            string spoken = lines.Count > 0
+                ? string.Join(" ", lines.ToArray())
+                : ModText.Get(ModStrings.Screens.CaptureNoCancel);
+            SpeechPipeline.Output(new SpeechRequest(spoken, interrupt: false));
+        }
+
+        /// <summary>The index of the caption that heads the FIRST key-binding row - where the table
+        /// begins - or -1 for a form that draws none. Backs up over the category (and subcategory)
+        /// captions drawn directly above the first row; the header and Reset button above those are a
+        /// non-caption boundary the walk stops at, so they stay ordinary rows.</summary>
+        private static int FirstKeyBindingCaption(IReadOnlyList<MenuRow> controls)
+        {
+            int first = -1;
+            for (int i = 0; i < controls.Count; i++)
+            {
+                if ((controls[i] != null ? controls[i].Item : null) is MenuRowKeyBinding)
+                {
+                    first = i;
+                    break;
+                }
+            }
+
+            if (first < 0)
+            {
+                return -1;
+            }
+
+            int start = first;
+            while (start - 1 >= 0 && (controls[start - 1] != null ? controls[start - 1].Item : null) is MenuRowText)
+            {
+                start--;
+            }
+
+            return start;
         }
 
         /// <summary>Whether the caption at <paramref name="index"/> heads any rows: anything before the
