@@ -710,10 +710,7 @@ namespace SongsOfConquestAccess.Adapters
             /// game draw a ghost of it in the off hand.</summary>
             public bool IsMainHandTwoHanded()
             {
-                IArtifactState artifact = GetDisplayArtifactForEquipmentSlot(CommanderId, InventorySlot.MainHand);
-                return artifact != null
-                    && _owner._artifactLookup != null
-                    && _owner._artifactLookup.GetSlot(artifact.Type) == ArtifactSlot.BothHands;
+                return GetMainHandTwoHander() != null;
             }
 
             /// <summary>Whether an artifact fits the off hand ALONE - the one case the game's own
@@ -838,19 +835,53 @@ namespace SongsOfConquestAccess.Adapters
                 return entry != null ? (Selectable)entry : null;
             }
 
+            /// <summary>The artifact an equipment slot DRAWS, read off the drawn cell rather than
+            /// out of the adventure's whole artifact list. <c>ArtifactFacade.GetForOwner</c> is a
+            /// Where over EVERY artifact in the game, and it was asked nine times a frame per side
+            /// and a tenth in <see cref="IsMainHandTwoHanded"/>; the cell already holds the answer
+            /// (<c>InventoryHUDSlot.TryGetArtifact(0)</c>), and the movable's <c>State</c> is the
+            /// same <c>IArtifactState</c> the facade would have found.
+            ///
+            /// The off hand is the one slot with no movable of its own to read: when the main hand
+            /// holds a two-hander the game draws a GHOST there from the main hand's own movable
+            /// (<c>InventoryHUD.Refresh</c> calls <c>AddTintedArtifactImage</c> with the main-hand
+            /// state when <c>_lookup.GetSlot</c> answers <c>BothHands</c>), and that is what is
+            /// answered here.
+            ///
+            /// The drawn cell lags the facade by at most one frame after a move - the HUD refreshes
+            /// in its own Update - so for that frame this answers what the player is looking at,
+            /// which is what the graph is for.</summary>
             private IArtifactState GetDisplayArtifactForEquipmentSlot(int commanderId, InventorySlot slot)
             {
-                if (_owner._facade == null || commanderId < 0)
+                InventoryArtifactMovable movable = GetEquippedMovable(slot);
+                if (movable != null && movable.State != null)
                 {
-                    return null;
+                    return movable.State;
                 }
 
-                if (slot == InventorySlot.OffHand)
-                {
-                    return _owner._facade.Artifacts.GetForOwner(commanderId, ArtifactSlot.OffHand).FirstOrDefault();
-                }
+                return slot == InventorySlot.OffHand ? GetMainHandTwoHander() : null;
+            }
 
-                return _owner._facade.Artifacts.GetForOwner(commanderId, slot).FirstOrDefault();
+            /// <summary>What this side's drawn equipment cell holds, or null for an empty one.
+            /// </summary>
+            private InventoryArtifactMovable GetEquippedMovable(InventorySlot slot)
+            {
+                InventoryHUD inventory = Inventory;
+                InventoryHUDSlot nativeSlot = inventory != null ? inventory.GetSlot(slot) : null;
+                return nativeSlot != null ? nativeSlot.TryGetArtifact(0) : null;
+            }
+
+            /// <summary>The main hand's artifact when it takes both hands, which is what the game
+            /// draws the off hand's ghost from; null otherwise.</summary>
+            private IArtifactState GetMainHandTwoHander()
+            {
+                InventoryArtifactMovable movable = GetEquippedMovable(InventorySlot.MainHand);
+                IArtifactState artifact = movable != null ? movable.State : null;
+                return artifact != null
+                    && _owner._artifactLookup != null
+                    && _owner._artifactLookup.GetSlot(artifact.Type) == ArtifactSlot.BothHands
+                    ? artifact
+                    : null;
             }
 
             private static bool IsDisplayOnlyEquipmentArtifact(InventorySlot slot, IArtifactState artifact)
